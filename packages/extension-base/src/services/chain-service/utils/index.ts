@@ -324,37 +324,51 @@ export function _getTokenTypesSupportedByChain (chainInfo: _ChainInfo): _AssetTy
 }
 
 export function _getChainNativeTokenBasicInfo (chainInfo: _ChainInfo): BasicTokenInfo {
-  const defaultTokenInfo = {
+  const defaultTokenInfo: BasicTokenInfo = {
     symbol: '',
-    decimals: -1
+    decimals: -1,
+    icon: chainInfo?.icon || ''
   };
 
   if (!chainInfo) {
     return defaultTokenInfo;
   }
 
-  if (chainInfo.substrateInfo) { // substrate by default
+  if (chainInfo.substrateInfo) {
     return {
+      ...defaultTokenInfo,
       symbol: chainInfo.substrateInfo.symbol,
       decimals: chainInfo.substrateInfo.decimals
     };
-  } else if (chainInfo.evmInfo) {
+  }
+
+  if (chainInfo.evmInfo) {
     return {
+      ...defaultTokenInfo,
       symbol: chainInfo.evmInfo.symbol,
       decimals: chainInfo.evmInfo.decimals
     };
-  } else if (chainInfo.tonInfo) {
+  }
+
+  if (chainInfo.tonInfo) {
     return {
+      ...defaultTokenInfo,
       symbol: chainInfo.tonInfo.symbol,
       decimals: chainInfo.tonInfo.decimals
     };
-  } else if (chainInfo.cardanoInfo) {
+  }
+
+  if (chainInfo.cardanoInfo) {
     return {
+      ...defaultTokenInfo,
       symbol: chainInfo.cardanoInfo.symbol,
       decimals: chainInfo.cardanoInfo.decimals
     };
-  } else if (chainInfo.bitcoinInfo) {
+  }
+
+  if (chainInfo.bitcoinInfo) {
     return {
+      ...defaultTokenInfo,
       symbol: chainInfo.bitcoinInfo.symbol,
       decimals: chainInfo.bitcoinInfo.decimals
     };

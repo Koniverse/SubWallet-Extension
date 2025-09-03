@@ -7,7 +7,7 @@ import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { Button, Icon } from '@subwallet/react-ui';
 import { ALL_TRACK_ID, GovStatusKey, Referendum } from '@subwallet/subsquare-api-sdk';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { CaretRight, LockKey } from 'phosphor-react';
+import { LockKey } from 'phosphor-react';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -128,6 +128,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
       />
 
       <ReferendaList
+        chain={chainSlug}
         items={items}
         onClickItem={onClickReferendumItem}
         selectedReferendaCategory={selectedReferendaCategory}

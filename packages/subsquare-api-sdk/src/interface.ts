@@ -23,19 +23,9 @@ export interface Referendum {
     method: string;
   };
 
-  state: {
-    name: GovStatusKey;
-    indexer: {
-      blockTime: number;
-      blockHeight: number;
-    }
-  };
-
-  onchainData: {
-    info: {
-      alarm: number[]
-    }
-  };
+  state: OnchainState;
+  allSpends?: SpendItem[];
+  onchainData: OnchainData;
 }
 
 export interface ReferendumDetail {
@@ -75,31 +65,51 @@ export interface ReferendumDetail {
   reactions: unknown[];
 }
 
-export interface SpendItem {
+interface BaseSpendItem {
   isSpendLocal: boolean;
-  symbol?: string;
-  assetKind?: {
-    chain: string;
-    type: string;
-    symbol: string;
-  };
   amount: string;
+
   beneficiary: {
     chain: string;
     address: string;
     pubKey: string;
   };
-  beneficiaryLocation: {
+
+  beneficiaryLocation?: {
     name: string;
     type: string;
     value: {
-      v3: Record<string, unknown>;
+      v3?: {
+        parents: number;
+        interior: Record<string, unknown>;
+      };
+      v4?: {
+        parents: number;
+        interior: Record<string, unknown>;
+      };
     };
   };
-  validFrom: number | null;
-  after: unknown;
+
+  validFrom?: number | null;
+  after?: unknown;
 }
 
+interface LocalSpendItem extends BaseSpendItem {
+  isSpendLocal: true;
+  type: string;
+  symbol: string;
+}
+
+interface RemoteSpendItem extends BaseSpendItem {
+  isSpendLocal: false;
+  assetKind: {
+    chain: string;
+    type: string;
+    symbol: string;
+  };
+}
+
+export type SpendItem = LocalSpendItem | RemoteSpendItem;
 export interface TimelineItem {
   _id: string;
   referendumIndex: number;
@@ -199,7 +209,7 @@ interface Indexer {
 }
 interface OnchainState {
   indexer: Indexer;
-  name: string;
+  name: GovStatusKey;
 }
 
 interface OnchainData {

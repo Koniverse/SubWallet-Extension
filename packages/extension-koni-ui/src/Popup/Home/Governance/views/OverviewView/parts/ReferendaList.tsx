@@ -10,6 +10,7 @@ import styled from 'styled-components';
 
 type Props = ThemeProps & {
   onClickItem: (item: Referendum) => void;
+  chain: string;
   items: Referendum[];
   selectedReferendaCategory: ReferendaCategory
 };
@@ -18,7 +19,7 @@ type WrapperProps = Omit<Props, 'items'> & {
   items?: Referendum[];
 };
 
-const Component = ({ className, items, onClickItem, selectedReferendaCategory }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, items, onClickItem, selectedReferendaCategory }: Props): React.ReactElement<Props> => {
   const _onClickItem = useCallback((item: Referendum) => {
     return () => {
       onClickItem(item);
@@ -52,6 +53,7 @@ const Component = ({ className, items, onClickItem, selectedReferendaCategory }:
       {
         filteredItems.map((item, index) => (
           <ReferendumItem
+            chain={chain}
             className={'__referendum-item'}
             item={item}
             key={item.referendumIndex}

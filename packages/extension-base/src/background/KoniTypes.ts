@@ -681,6 +681,7 @@ export interface TransactionHistoryItemJson {
 export interface BasicTokenInfo {
   decimals: number;
   symbol: string;
+  icon: string;
 }
 
 export interface SufficientMetadata {

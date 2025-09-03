@@ -131,7 +131,12 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
         referendumDetail={data}
       />
 
-      { allSpends && (<RequestedAmount allSpend={allSpends} />)}
+      { allSpends && (
+        <RequestedAmount
+          allSpend={allSpends}
+          chain={chainSlug}
+        />
+      )}
 
       <TabsContainer referendumDetail={data} />
 
