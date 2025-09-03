@@ -39,7 +39,7 @@ import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
 import { EarningImpactResult } from '../services/earning-service/handlers/native-staking/dtao';
-import { GovVoteRequest, RemoveVoteRequest } from '../services/open-gov/interface';
+import { GovVoteRequest, GovVotingInfo, RemoveVoteRequest } from '../services/open-gov/interface';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -2763,6 +2763,7 @@ export interface KoniRequestSignatures {
   /* Gov */
   'pri(openGov.vote)': [GovVoteRequest, SWTransactionResponse];
   'pri(openGov.unvote)': [RemoveVoteRequest, SWTransactionResponse]
+  'pri(openGov.subscribeGovLockedInfo)': [null, GovVotingInfo[], GovVotingInfo[]];
 }
 
 export interface ApplicationMetadataType {
