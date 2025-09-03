@@ -330,7 +330,7 @@ const Component = () => {
 
     const isFromChanged = changedFields.some((field) => field.name.toString() === 'from');
 
-    if (isFromChanged && poolType === YieldPoolType.NOMINATION_POOL) {
+    if (isFromChanged && (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING)) {
       form.resetFields(['target']);
     }
 
