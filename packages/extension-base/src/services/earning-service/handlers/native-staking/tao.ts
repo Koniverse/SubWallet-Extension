@@ -13,6 +13,7 @@ import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earni
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
+import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject, combineLatest } from 'rxjs';
@@ -140,20 +141,15 @@ export class BittensorCache {
 
   private async fetchData (): Promise<ValidatorResponse> {
     try {
-      const resp = await fetchFromProxyService(ProxyServiceRoute.BITTENSOR, '/dtao/validator/latest/v1?limit=100', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
+      const fetchData = await fetchStaticCache<{ data: Record<string, Validator> }>(
+        'earning/dtao/validator.json',
+        { data: {} }
+      );
 
-      if (!resp.ok) {
-        console.error('Fetch bittensor delegates fail:', resp.status);
+      const validators = Object.values(fetchData.data);
 
-        return this.cache || { data: [] };
-      }
-
-      const rawData = await resp.json() as ValidatorResponse;
       const data = {
-        data: rawData.data.filter((validator) => parseFloat(validator.root_stake) > 0)
+        data: validators.filter((validator) => parseFloat(validator.root_stake) > 0)
       };
 
       this.cache = data;
@@ -164,12 +160,14 @@ export class BittensorCache {
       }
 
       this.cacheTimeout = setTimeout(() => {
-        this.fetchData().then((newData) => {
-          if (newData.data.length > 0) {
-            this.cache = newData;
-          }
-        }).catch(console.error);
-      }, 60 * 2000);
+        this.fetchData()
+          .then((newData) => {
+            if (newData.data.length > 0) {
+              this.cache = newData;
+            }
+          })
+          .catch(console.error);
+      }, 60 * 1000); // Cache 1 minute
 
       return data;
     } catch (error) {
@@ -711,7 +709,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const bnMinStake = await this.getMinBond(subnetData?.netuid);
 
     if (new BigN(amount).lt(bnMinStake)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Insufficient stake. You need to stake at least ${formatNumber(bnMinStake, _getAssetDecimals(this.nativeToken))} ${_getAssetSymbol(this.nativeToken)} to earn rewards`))];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.insufficientStakeToEarn', { replace: { bnMinStake: formatNumber(bnMinStake, _getAssetDecimals(this.nativeToken)), symbol: _getAssetSymbol(this.nativeToken) } }))];
     }
 
     return baseErrors;
@@ -767,7 +765,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const minUnstake = minDelegatorStake.dividedBy(alphaToTaoPrice);
 
     if (new BigN(amount).lt(minUnstake)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to unstake at least ${formatNumber(minUnstake, _getAssetDecimals(this.nativeToken))} ${poolInfo.metadata.subnetData?.subnetSymbol || _getAssetSymbol(this.nativeToken)}`))];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow', { replace: { bnMinUnstake: formatNumber(minUnstake, _getAssetDecimals(this.nativeToken)), symbol: poolInfo.metadata.subnetData?.subnetSymbol || _getAssetSymbol(this.nativeToken) } }))];
     }
 
     return baseErrors;
@@ -789,11 +787,11 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const destValidator = selectedValidatorInfo.address;
 
     if (new BigN(amount).lte(0)) {
-      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount must be greater than 0')));
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.amountMustBeGreaterThanZero')));
     }
 
     if (originValidator === destValidator) {
-      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'From validator is the same with to validator'));
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.fromValidatorSameAsTo')));
     }
 
     const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid));
@@ -805,14 +803,13 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const bnMinMoveStake = formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken));
 
     if (new BigN(amount).lt(bnMinMoveStake)) {
-      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formattedMinUnstake.toString()} ${metadata?.subnetSymbol || ''}`)));
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.moveStakeAmountTooLow', { replace: { bnMinMoveStake: formattedMinUnstake.toString(), symbol: metadata?.subnetSymbol || '' } })));
     }
 
     // Avoid remaining amount too low -> can't do anything with that amount
     if (!(maxAmount === amount) && new BigN(maxAmount).minus(new BigN(amount)).lt(bnMinMoveStake)) {
       return Promise.reject(new TransactionError(StakingTxErrorType.REMAINING_AMOUNT_TOO_LOW,
-        t(`Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit "Move all" to move all ${formatNumber(maxAmount, _getAssetDecimals(this.nativeToken))} ${metadata?.subnetSymbol || _getAssetSymbol(this.nativeToken)} to the new validator, or "Cancel" and lower the amount, then try again`
-        )));
+        t('bg.EARNING.services.service.earning.nativeStaking.tao.remainingStakeBelowMinimumWarning', { replace: { maxAmount: formatNumber(maxAmount, _getAssetDecimals(this.nativeToken)), subnetSymbol: metadata?.subnetSymbol || _getAssetSymbol(this.nativeToken) } })));
     }
 
     const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, netuid, netuid, amount);

@@ -22,6 +22,10 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return 'accounts';
   }
 
+  if (explorerLink.includes('explorer.comstats.org')) {
+    return 'accounts';
+  }
+
   if (explorerLink.includes('edgscan.ink')) {
     return 'accounts';
   }
@@ -98,7 +102,7 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
     return '#/extrinsics';
   }
 
-  if (['edgeware'].includes(chainInfo.slug)) {
+  if (['edgeware', 'commune'].includes(chainInfo.slug)) {
     return 'extrinsics';
   }
 

@@ -188,7 +188,7 @@ export const InjectContextProvider: React.FC<Props> = ({ children }: Props) => {
 
   const handleConnectFail = useCallback(() => {
     notification({
-      message: t('Fail to connect. Please try again later'),
+      message: t('ui.DAPP.context.Inject.failToConnectTryAgain'),
       type: 'warning'
     });
   }, [notification, t]);
