@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
+import { ledgerMustCheckNetwork } from '@subwallet/extension-base/core/utils';
 import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { TokenEmptyList, TokenSelectionItem } from '@subwallet/extension-web-ui/components';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
 import { RECEIVE_QR_MODAL, RECEIVE_TOKEN_SELECTOR_MODAL, WARNING_LEDGER_RECEIVE_MODAL } from '@subwallet/extension-web-ui/constants';
 import { useConfirmModal, useGetAccountByAddress, useGetZkAddress, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { ledgerMustCheckNetwork } from '@subwallet/extension-web-ui/utils';
 import { ModalContext, SwList, SwModalFuncProps } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';

@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _ChainStatus } from '@subwallet/chain-list/types';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
@@ -87,10 +87,12 @@ function getTokenAvailableDestinations (tokenSlug: string, xcmRefMap: Record<str
     if (xcmRef.srcAsset === tokenSlug) {
       const destinationChain = chainInfoMap[xcmRef.destChain];
 
-      result.push({
-        name: destinationChain.name,
-        slug: destinationChain.slug
-      });
+      if (destinationChain.chainStatus === _ChainStatus.ACTIVE) {
+        result.push({
+          name: destinationChain.name,
+          slug: destinationChain.slug
+        });
+      }
     }
   });
 
@@ -476,6 +478,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
       if (part.destChain) {
         form.resetFields(['to']);
         setCurrentTokenPayFee(defaultTokenPayFee);
+        setSelectedTransactionFee(undefined);
       }
 
       if (part.from || part.destChain) {

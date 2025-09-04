@@ -384,7 +384,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     onChange && onChange({ target: { value: selected } });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nominations, onInitValidators, isSingleSelect, autoValidator]);
+  }, [nominations, onInitValidators, isSingleSelect, autoValidator, originValidator]);
 
   useEffect(() => {
     if (!isActive) {

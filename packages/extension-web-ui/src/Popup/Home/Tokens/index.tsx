@@ -181,6 +181,32 @@ const Component = (): React.ReactElement => {
     }
   }, [accountProxies, currentAccountProxy, isAllAccount]);
 
+  const isSwapSupported = useMemo(() => {
+    const isSupportAccount = (currentAcc: AccountProxy) => {
+      const isReadOnlyAccount = currentAcc.accountType === AccountProxyType.READ_ONLY;
+      const isLedgerAccount = currentAcc.accountType === AccountProxyType.LEDGER;
+      const isSoloAccount = currentAcc.accountType === AccountProxyType.SOLO;
+      const validEcosystem = [AccountChainType.ETHEREUM, AccountChainType.SUBSTRATE, AccountChainType.BITCOIN].includes(currentAcc.chainTypes[0]);
+      const invalidSoloAccount = isSoloAccount && !validEcosystem;
+
+      return !invalidSoloAccount && !isLedgerAccount && !isReadOnlyAccount;
+    };
+
+    const isSupportAllAccount = (accountProxies: AccountProxy[]) => {
+      return accountProxies.filter((account) => account.accountType !== AccountProxyType.ALL_ACCOUNT).some((account) => isSupportAccount(account));
+    };
+
+    if (!currentAccountProxy || currentAccountProxy.chainTypes.length <= 0) {
+      return false;
+    }
+
+    if (isAllAccount) {
+      return isSupportAllAccount(accountProxies);
+    } else {
+      return isSupportAccount(currentAccountProxy);
+    }
+  }, [accountProxies, currentAccountProxy, isAllAccount]);
+
   const tonAccountList: AccountAddressItemType[] = useMemo(() => {
     return accountProxies.filter((acc) => acc?.accountType === AccountProxyType.SOLO && acc?.chainTypes.includes(AccountChainType.TON)).map((item) => ({
       accountName: item.name,
@@ -506,7 +532,7 @@ const Component = (): React.ReactElement => {
             isPriceDecrease={isTotalBalanceDecrease}
             isShrink={isShrink}
             isSupportBuyTokens={isSupportBuyTokens}
-            isSupportSwap={true}
+            isSupportSwap={isSwapSupported}
             onOpenBuyTokens={onOpenBuyTokens}
             onOpenReceive={onOpenReceive}
             onOpenSendFund={onOpenSendFund}

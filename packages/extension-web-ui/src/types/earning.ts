@@ -64,13 +64,14 @@ export interface NominationPoolDataType extends NominationPoolInfo {
   idStr: string;
   isRecommend?: boolean;
   disabled?: boolean;
-  isSessionHeader?: boolean;
+  isSectionHeader?: boolean
 }
 
 export interface ValidatorDataType extends ValidatorInfo {
   symbol: string;
   decimals: number;
   isMissingInfo?: boolean;
+  isSectionHeader?: boolean;
 }
 
 export enum NetworkType {

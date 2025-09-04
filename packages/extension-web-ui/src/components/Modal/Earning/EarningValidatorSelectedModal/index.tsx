@@ -247,6 +247,7 @@ const Component = (props: Props) => {
       }
 
       const nomination = item as NominationInfo;
+      const key = getValidatorKey(nomination.validatorAddress, nomination.validatorIdentity);
 
       return (
         <StakingNominationItem
@@ -254,6 +255,7 @@ const Component = (props: Props) => {
           isChangeValidator={true}
           isSelectable={false}
           isSelected={false}
+          key={key}
           nominationInfo={nomination}
           poolInfo={poolInfo}
         />

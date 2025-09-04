@@ -11,25 +11,28 @@ import { _ChainState } from '@subwallet/extension-base/services/chain-service/ty
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainName, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, HiddenInput, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, HiddenInput, LoadingScreen, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { SwapFromField, SwapToField } from '@subwallet/extension-koni-ui/components/Field/Swap';
 import { ChooseFeeTokenModal, SlippageModal, SwapIdleWarningModal, SwapQuotesSelectorModal, SwapTermsOfServiceModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useChainConnection, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { ChainAndExcludedTokenInfo } from '@subwallet/extension-koni-ui/hooks/chain/useCreateGetChainAndExcludedTokenByAccountProxy';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
 import { handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
+import EmptySwapPairs from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Swap/EmptySwapPairs';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
 import { convertFieldToObject, findAccountByAddress, isAccountAll, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowsDownUp, Book, CheckCircle } from 'phosphor-react';
@@ -48,6 +51,10 @@ type WrapperProps = ThemeProps;
 
 type ComponentProps = {
   targetAccountProxy: AccountProxy;
+  pairMap: Record<string, string[]>;
+  defaultSlug: string;
+  swappableSlugsSet: Set<string>;
+  allowedChainAndExcludedTokenForTargetAccountProxy: ChainAndExcludedTokenInfo;
 };
 
 type SortableTokenSelectorItemType = TokenSelectorItemType & SortableTokenItem;
@@ -103,7 +110,7 @@ function getTokenSelectorItem (
 
 // todo: recheck validation logic, especially recipientAddress
 
-const Component = ({ targetAccountProxy }: ComponentProps) => {
+const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultSlug, pairMap, swappableSlugsSet, targetAccountProxy }: ComponentProps) => {
   useSetCurrentPage('/transaction/swap');
   const { t } = useTranslation();
   const notify = useNotification();
@@ -148,7 +155,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   const [autoFormatValue] = useLocalStorage(ADDRESS_INPUT_AUTO_FORMAT_VALUE, false);
 
-  const { defaultSlug } = defaultData;
   const onIdle = useCallback(() => {
     !hasInternalConfirmations && !!confirmedTerm && showQuoteArea && setRequestUserInteractToContinue(true);
   }, [confirmedTerm, hasInternalConfirmations, showQuoteArea]);
@@ -216,7 +222,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const onPreCheck = usePreCheckAction(fromValue, undefined, preCheckMessage);
   const oneSign = useOneSignProcess(fromValue);
   const getReformatAddress = useCoreCreateReformatAddress();
-  const getChainAndExcludedTokenByAccountProxy = useCreateGetChainAndExcludedTokenByAccountProxy();
 
   const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
   const { onError, onSuccess } = useHandleSubmitMultiTransaction(dispatchProcessState);
@@ -267,6 +272,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return accountProxyByFromValue?.accountProxyId || targetAccountProxy.id;
   }, [accountAddressItems, fromValue, targetAccountProxy.id]);
 
+  // todo: Optimize assetItems filtering for improved performance. Utilize swappableSlugsSet or pairMap instead of using the whole assetRegistryMap
   const assetItems = useMemo<_ChainAsset[]>(() => {
     const result: _ChainAsset[] = [];
 
@@ -295,10 +301,6 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     return result;
   }, [assetItems, chainStateMap, getAccountTokenBalance, priorityTokens, targetAccountProxyIdForGetBalance]);
 
-  const allowedChainAndExcludedTokenForTargetAccountProxy = useMemo(() => {
-    return getChainAndExcludedTokenByAccountProxy(targetAccountProxy);
-  }, [getChainAndExcludedTokenByAccountProxy, targetAccountProxy]);
-
   const isTokenCompatibleWithTargetAccountProxy = useCallback((tokenSlug: string): boolean => {
     if (!tokenSlug) {
       return false;
@@ -316,21 +318,30 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       const slug = item.slug;
       const assetInfo = assetRegistryMap[slug];
 
-      if (!assetInfo || !isTokenCompatibleWithTargetAccountProxy(slug)) {
+      if (!swappableSlugsSet.has(slug) || !assetInfo || !isTokenCompatibleWithTargetAccountProxy(slug)) {
         return false;
       }
 
+      // todo: improve by checking once and returning the list
       if (!defaultSlug) {
         return true;
       }
 
       return defaultSlug === slug || _getMultiChainAsset(assetInfo) === defaultSlug;
     });
-  }, [assetRegistryMap, defaultSlug, isTokenCompatibleWithTargetAccountProxy, tokenSelectorItems]);
+  }, [assetRegistryMap, defaultSlug, swappableSlugsSet, isTokenCompatibleWithTargetAccountProxy, tokenSelectorItems]);
 
   const toTokenItems = useMemo(() => {
-    return tokenSelectorItems.filter((item) => item.slug !== fromTokenSlugValue);
-  }, [fromTokenSlugValue, tokenSelectorItems]);
+    const destinationSlugs = pairMap[fromTokenSlugValue] || [];
+
+    if (destinationSlugs.length === 0) {
+      return [];
+    }
+
+    const destinationSlugSet = new Set(destinationSlugs);
+
+    return tokenSelectorItems.filter((item) => destinationSlugSet.has(item.slug));
+  }, [fromTokenSlugValue, tokenSelectorItems, pairMap]);
 
   const fromAssetInfo = useMemo(() => {
     return assetRegistryMap[fromTokenSlugValue] || undefined;
@@ -783,7 +794,15 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
       return undefined;
     }
 
-    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((accountInfo) => _isChainInfoCompatibleWithAccountInfo(destChainInfo, accountInfo));
+    const accountJsonForRecipientAutoFilled = targetAccountProxy.accounts.find((accountInfo) => {
+      if (accountInfo.chainType === AccountChainType.BITCOIN) {
+        const isSegWit = accountInfo.type === 'bitcoin-84' || accountInfo.type === 'bittest-84';
+
+        return isSegWit && _isChainInfoCompatibleWithAccountInfo(destChainInfo, accountInfo);
+      }
+
+      return _isChainInfoCompatibleWithAccountInfo(destChainInfo, accountInfo);
+    });
 
     if (!accountJsonForRecipientAutoFilled) {
       return undefined;
@@ -1364,6 +1383,12 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const { defaultData } = useTransactionContext<SwapParams>();
   const { goHome } = useDefaultNavigate();
   const accountProxies = useSelector((state) => state.accountState.accountProxies);
+  const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
+  const [pairMap, setPairMap] = useState<Record<string, string[]>>({});
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<boolean>(false);
+  const [isSkipDefaultSlug, setIsSkipDefaultSlug] = useState<boolean>(false);
+  const getChainAndExcludedTokenByAccountProxy = useCreateGetChainAndExcludedTokenByAccountProxy();
 
   const targetAccountProxy = useMemo(() => {
     return accountProxies.find((ap) => {
@@ -1375,11 +1400,74 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
     });
   }, [accountProxies, defaultData.fromAccountProxy]);
 
+  const swappableSlugsSet: Set<string> = useMemo(() => new Set(Object.keys(pairMap).filter((key) => pairMap[key].length !== 0)), [pairMap]);
+  const finalDefaultSlug = isSkipDefaultSlug ? '' : defaultData.defaultSlug;
+  const allowedChainAndExcludedTokenForTargetAccountProxy = useMemo(() => {
+    if (!targetAccountProxy) {
+      return { allowedChains: [], excludedTokens: [] };
+    }
+
+    return getChainAndExcludedTokenByAccountProxy(targetAccountProxy);
+  }, [getChainAndExcludedTokenByAccountProxy, targetAccountProxy]);
+
+  const multiAssetOfAccountSwappable = useMemo(() => {
+    const { allowedChains, excludedTokens } = allowedChainAndExcludedTokenForTargetAccountProxy;
+
+    return Array.from(swappableSlugsSet).some((slug) => {
+      const assetInfo = assetRegistryMap[slug];
+      const multiChainAsset = _getMultiChainAsset(assetInfo);
+      const originChain = _getAssetOriginChain(assetInfo);
+
+      return (
+        multiChainAsset === finalDefaultSlug &&
+        allowedChains.includes(originChain) &&
+        !excludedTokens.includes(slug)
+      );
+    });
+  }, [allowedChainAndExcludedTokenForTargetAccountProxy, assetRegistryMap, finalDefaultSlug, swappableSlugsSet]);
+
+  const isUnsupportedDefaultSlug = useMemo(() => {
+    return (!!finalDefaultSlug &&
+      !swappableSlugsSet.has(finalDefaultSlug) &&
+      !multiAssetOfAccountSwappable);
+  }, [finalDefaultSlug, multiAssetOfAccountSwappable, swappableSlugsSet]);
+
+  const fetchDestinationsMap = useCallback(() => {
+    setLoading(true);
+
+    // todo: handle timeout
+    subwalletApiSdk.swapApi.fetchDestinationsMap()
+      .then((response) => {
+        // simple validate
+        if (!response || typeof response !== 'object') {
+          throw new Error('Invalid response format');
+        }
+
+        setPairMap(response);
+        setFetchError(false);
+        setLoading(false);
+      })
+      .catch((error: Error) => {
+        console.error(`Error while fetching swap destinations: ${error.message}`);
+
+        setFetchError(true);
+        setLoading(false);
+      });
+  }, []);
+
+  const handleReloadNotSupportDefault = useCallback(() => {
+    setIsSkipDefaultSlug(true);
+  }, []);
+
   useEffect(() => {
     if (!targetAccountProxy) {
       goHome();
     }
   }, [goHome, targetAccountProxy]);
+
+  useEffect(() => {
+    fetchDestinationsMap();
+  }, [fetchDestinationsMap]);
 
   if (!targetAccountProxy) {
     return (
@@ -1387,12 +1475,38 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
     );
   }
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (fetchError) {
+    return (
+      <EmptySwapPairs
+        onClickReload={fetchDestinationsMap}
+      />
+    );
+  }
+
+  if (isUnsupportedDefaultSlug) {
+    return (
+      <EmptySwapPairs
+        onClickReload={handleReloadNotSupportDefault}
+      />
+    );
+  }
+
   return (
     <PageWrapper
       className={CN(className)}
-      resolve={dataContext.awaitStores(['swap', 'price'])}
+      resolve={dataContext.awaitStores(['price'])}
     >
-      <Component targetAccountProxy={targetAccountProxy} />
+      <Component
+        allowedChainAndExcludedTokenForTargetAccountProxy={allowedChainAndExcludedTokenForTargetAccountProxy}
+        defaultSlug={finalDefaultSlug}
+        pairMap={pairMap}
+        swappableSlugsSet={swappableSlugsSet}
+        targetAccountProxy={targetAccountProxy}
+      />
     </PageWrapper>
   );
 };

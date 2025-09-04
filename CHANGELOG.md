@@ -1,14 +1,109 @@
 # CHANGELOG
 
+## 1.3.54
+Build date: Aug 21, 2025.
+
+Features & Updates:
+- Support swap for Unichain (#4389)
+- Support Change validator for more chains (#4540)
+  - Vara
+  - Aleph Zero
+  - Polkadex
+  - Avail
+  - Edgeware
+  - Ternoa
+  - Dentnet
+  - Cere
+  - Testnet networks: Westend, Vara Testnet, Aleph Zero Testnet, Avail Turing
+- Support bridge tBTC (Ethereum) to tBTC (Hydration) via Snowbridge (#4593)
+- Update for patch chain (#4013)
+- Update logo for subnet on Earning features (#4551)
+- Update TAO staking fee (#4604)
+- Update chain-list stable v0.2.112 (#4626)
+  - Update information for some tokens for Fraxtal Mainnet L2
+  - Update token symbol (ticker) of some tokens for Bifrost testnet, Autonomys Taurus Testnet, Polkadot Chainflip Testnet, Energy Web X Rococo/Energy Web X Paseo
+  - Update block explorer for some networks: Polkadot Collectives, Polkadot People, ....
+  - Update USDT token information for Arbitrum One
+  - ...
+
+Bug fixes:
+- Handle case connecting with network systems that do not support WalletConnect connection (#4579)
+- Fixed bug getting too many requests from Earning feature of Bittensor (#4598)
+
+
+## 1.3.53
+Build date: Aug 12, 2025.
+
+Features & Update:
+- Update UX/UI when support Swap for Bitcoin on Chainflip (#4581)
+- Update some UI for Change validator feature (#4539)
+- Improve UI for case connection unsuccessfully when connect WalletConnect (#3456)
+- Update logic for rpc that don't support custom fee on EVM system (#4559)
+- Hide icon Edit fee with some networks not supported (#4585)
+
+Bug fixed:
+- Fixed bug Can not disconnect when connecting to 2 URIs of the same website with WalletConnect (#2917)
+- Fixed bug Can not import Json Account from Polkadot{.js} extension (#4565)
+- Fixed bug Can't import JSON file(from Migrate account) on store version (#4031)
+- Fixed bug when custom priority fee for EVM (#4461)
+- Fixed bug Unable to detect domains name when transfer (#4072)
+- Fixed bug Unable to connect to Ledger apps via Ledger Nano X 2.5.0 & Ledger Nano S+ 1.4.0 (#4592)
+
+
+## 1.3.52
+Build date: Aug 07, 2025.
+
+Features & Update:
+- Refactor TAO earning position logic (#4520)
+- Update coinbase on-ramp feature (#4572)
+- Apply sw version when request to Backend (#4465)
+- Update chain-list stable v0.2.111 (#4546)
+  - Update block explorer for Polkadex, Moonbeam, Autonomys Mainnet
+  - Update logo for the NEURO token & the network for NeuroWeb Mainnet
+  - Exclude INACTIVE networks from destination chain display
+  - ...
+
+Bug fixed:
+- Fixed bug when withdraw (#4575)
+- Fixed bug no network support when connecting to the WalletConnect (#3025)
+
+
+## 1.3.51
+Build date: Jul 31, 2025.
+
+Features & Update:
+- Support for Bitcoin swap on ChainFlip (#4573)
+
+
+## 1.3.50
+Build date: Jul 30, 2025.
+
+Features & Update:
+- Support for New Swap Pairs on Chainflip (#4495)
+
+
+## 1.3.49
+Build date: Jul 28, 2025.
+
+Features & Update:
+- Display On-Chain Identity for Validators (#4449)
+- Re-check and update block action when stake with ledger account (#4464)
+- Block networks (Substrate & Ethereum) without runtime update for Ledger Substrate accounts (#4531)
+- Filter "To token" Based on Selected "From token" - Round 1 (#4468)
+
+Bug fixed:
+- Fixed bug import NFT (#3837) (#3818)
+
+
 ## 1.3.48
-Build date: Jul 11, 2025.
+Build date: Jul 21, 2025.
 
 Features & Update:
 - Support Change validator feature (#4214)
 - Stake TAO with Seamless Validator Switching (#4359)
 - Turn off default enabled tokens (#4475)
 - Update new content to submitted screen when swap (#4512)
-- Update chain-list stable v0.2.110
+- Update chain-list stable v0.2.110 (#4521)
 
 Bug fixed:
 - Fixed bug when stake/unstake with subnet staking (#4510)

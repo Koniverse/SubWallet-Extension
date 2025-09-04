@@ -11,12 +11,12 @@ import { _getTokenOnChainAssetId, _isNativeToken } from '@subwallet/extension-ba
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { DEFAULT_EXCESS_AMOUNT_WEIGHT } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, DynamicSwapType, GenSwapStepFuncV2, HydrationSwapStepMetadata, OptimalSwapPathParamsV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, DynamicSwapType, GenSwapStepFuncV2, HydrationSwapStepMetadata, OptimalSwapPathParamsV2, SwapQuote, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { BaseStepDetail, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { HydradxSwapTxData, SwapErrorType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
-import { SwapQuote } from '@subwallet/subwallet-api-sdk/modules/swapApi';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
+import { QuoteAskResponse } from '@subwallet-monorepos/subwallet-services-sdk/services';
 import BigN from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -222,16 +222,22 @@ export class HydradxHandler implements SwapBaseInterface {
       bnSendingValue = bnSendingValue.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
       bnExpectedReceive = bnExpectedReceive.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
 
-      const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData({
-        address: sender,
-        pair: {
-          from: swapPairInfo.from,
-          to: swapPairInfo.to,
-          slug: swapPairInfo.slug
-        },
-        fromAmount: bnSendingValue.toFixed(0, 1),
-        slippage: params.request.slippage
-      });
+      let quotes: QuoteAskResponse[] = []; // todo
+
+      try {
+        quotes = await subwalletApiSdk.swapApi.fetchSwapQuoteData({
+          address: sender,
+          pair: {
+            from: swapPairInfo.from,
+            to: swapPairInfo.to,
+            slug: swapPairInfo.slug
+          },
+          fromAmount: bnSendingValue.toFixed(0, 1),
+          slippage: params.request.slippage
+        });
+      } catch (error) {
+        throw new Error(`Failed to fetch swap quote: ${(error as Error).message}`);
+      }
 
       const quoteAskResponse = quotes?.find((quote) => quote.provider === this.providerSlug);
 

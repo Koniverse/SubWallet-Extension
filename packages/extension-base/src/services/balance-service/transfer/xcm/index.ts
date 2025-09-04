@@ -15,7 +15,7 @@ import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain
 import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -219,7 +219,13 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
   }
 
   try {
-    const data = await subwalletApiSdk.xcmApi?.fetchXcmData(sender, originTokenInfo.slug, destinationTokenInfo.slug, recipient, sendingValue);
+    const data = await subwalletApiSdk.xcmApi.fetchXcmData({
+      address: sender,
+      from: originTokenInfo.slug,
+      to: destinationTokenInfo.slug,
+      recipient,
+      value: sendingValue
+    });
 
     const _feeCustom = feeCustom as EvmEIP1559FeeOption;
     const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, feeOption, _feeCustom);
@@ -242,6 +248,10 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
 
     return transactionConfig;
   } catch (error) {
-    return Promise.reject(error);
+    if (error instanceof SyntaxError) {
+      return Promise.reject(new Error('Unable to perform this transaction at the moment. Try again later'));
+    }
+
+    return Promise.reject(new Error((error as Error)?.message || 'Unable to perform this transaction at the moment. Try again later'));
   }
 };

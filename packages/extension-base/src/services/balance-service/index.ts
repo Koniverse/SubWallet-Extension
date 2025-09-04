@@ -15,8 +15,8 @@ import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
 import keyring from '@subwallet/ui-keyring';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
@@ -532,9 +532,9 @@ export class BalanceService implements StoppableServiceInterface {
             setTimeout(() => _resolve([]), 30000);
           });
 
-          const apiPromise = subwalletApiSdk.balanceDetectionApi?.getEvmTokenBalanceSlug(address) || Promise.resolve([]);
+          const balanceDetectionApi = subwalletApiSdk.balanceDetectionApi || Promise.resolve([]);
 
-          Promise.race([timeOutPromise, apiPromise])
+          Promise.race([timeOutPromise, balanceDetectionApi.getEvmTokenBalanceSlug(address)])
             .then((result) => resolve(result))
             .catch((error) => {
               console.error(error);

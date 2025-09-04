@@ -6,7 +6,7 @@ import { AccountProxyExtra, AccountProxyStoreData, AccountProxyType, KeyringPair
 import { combineAccountsWithKeyPair, convertAccountProxyType, createPromiseHandler, transformAccount } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
 import { createPair } from '@subwallet/keyring';
-import { KeypairType, KeyringPair$Json } from '@subwallet/keyring/types';
+import { KeypairType, KeyringPair, KeyringPair$Json } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { t } from 'i18next';
 
@@ -149,7 +149,21 @@ export class AccountJsonHandler extends AccountBaseHandler {
     if (jsons) {
       try {
         const { accountProxies, modifyPairs } = json;
-        const pairs = jsons.map((pair) => keyring.createFromJson(pair));
+
+        const pairs = jsons.reduce<KeyringPair[]>((rs, pair) => {
+          try {
+            rs.push(keyring.createFromJson(pair));
+          } catch (e) {
+            console.error(e);
+          }
+
+          return rs;
+        }, []);
+
+        if (!pairs?.length) {
+          throw new Error(t('No valid accounts found to import'));
+        }
+
         const accountProxyMap = combineAccountsWithKeyPair(pairs, modifyPairs, accountProxies);
 
         const result = Object.values(accountProxyMap).map((proxy): AccountProxyExtra => {
@@ -187,8 +201,28 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
     if (jsons) {
       try {
-        const { accountProxies, modifyPairs } = file;
-        const pairs = jsons.map((pair) => keyring.createFromJson(pair));
+        const { accountProxies, modifyPairs: modifyPairsRestored } = file;
+        const modifyPairs: ModifyPairStoreData = {};
+        const pairs = jsons.reduce<KeyringPair[]>((rs, pairJson) => {
+          try {
+            const pair = keyring.createFromJson(pairJson);
+
+            if (modifyPairsRestored?.[pair.address]) {
+              modifyPairs[pair.address] = modifyPairsRestored[pair.address];
+            }
+
+            rs.push(pair);
+          } catch (e) {
+            console.error(e);
+          }
+
+          return rs;
+        }, []);
+
+        if (!pairs?.length) {
+          throw new Error(t('No valid accounts found to import'));
+        }
+
         const accountProxyMap = combineAccountsWithKeyPair(pairs, modifyPairs, accountProxies);
         const rawProxyIds = _proxyIds && _proxyIds.length ? _proxyIds : Object.keys(accountProxyMap);
         let _exists: { address: string; name: string; } | undefined;

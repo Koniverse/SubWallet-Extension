@@ -22,9 +22,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const { t } = useTranslation();
 
-  const isBittensorChain = useMemo(() => {
-    return data.poolPosition?.chain === 'bittensor' || data.poolPosition?.chain === 'bittensor_testnet';
-  }, [data.poolPosition?.chain]);
+  const stakingFee = data.subnetData?.stakingFee;
 
   const handleValidatorLabel = useMemo(() => {
     return getValidatorLabel(transaction.chain);
@@ -74,10 +72,10 @@ const Component: React.FC<Props> = (props: Props) => {
       {/*  type='warning' */}
       {/* /> */}
 
-      {isBittensorChain && (
+      {!!stakingFee && (
         <AlertBox
           className={CN(className, 'alert-box')}
-          description={t('A staking fee of 0.00005 TAO will be deducted from your stake once the transaction is complete')}
+          description={t('A staking fee of {{fee}} TAO will be deducted from your stake once the transaction is complete', { replace: { fee: stakingFee } })}
           title={t('TAO staking fee')}
           type='info'
         />
