@@ -3,7 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { isSameAddress } from '@subwallet/extension-base/utils';
+import { detectTranslate, isSameAddress } from '@subwallet/extension-base/utils';
 import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { InfoItemBase } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
 import { EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
@@ -165,9 +165,9 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
 
       const metaInfoItems = isSubnetStaking
         ? [
-          metaInfoNumber('Total stake', new BigN(item.totalStake)),
+          metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.totalStake'), new BigN(item.totalStake)),
           {
-            label: t('Derivative token balance'),
+            label: t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.derivativeTokenBalance'),
             value: item.subnetData?.originalTotalStake || '',
             decimals: inputAsset?.decimals || 0,
             suffix: item.subnetData?.subnetSymbol
@@ -175,14 +175,14 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         ]
         : !isSpecial
           ? [
-            metaInfoNumber('Total stake', new BigN(item.totalStake)),
-            metaInfoNumber('Active stake', item.activeStake),
-            metaInfoNumber('Unstaked', item.unstakeBalance)
+            metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.totalStake'), new BigN(item.totalStake)),
+            metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.activeStake'), item.activeStake),
+            metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.unstaked'), item.unstakeBalance)
           ]
           : [
-            metaInfoNumber('Total stake', new BigN(item.totalStake)),
+            metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.totalStake'), new BigN(item.totalStake)),
             {
-              label: t('Derivative token balance'),
+              label: t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.derivativeTokenBalance'),
               value: item.activeStake,
               decimals: deriveAsset?.decimals || 0,
               suffix: deriveAsset?.symbol
@@ -206,7 +206,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
               <MetaInfo.Account
                 address={item.address}
                 chainSlug={poolInfo.chain}
-                label={t('Account')}
+                label={t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.account')}
                 networkPrefix={networkPrefix}
               />
             )
@@ -215,13 +215,13 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
                 className={'__meta-earning-status-item'}
                 label={renderAccount(item)}
                 statusIcon={EarningStatusUi[item.status].icon}
-                statusName={EarningStatusUi[item.status].name}
+                statusName={t(EarningStatusUi[item.status].name)}
                 valueColorSchema={EarningStatusUi[item.status].schema}
               />
             )}
 
           <MetaInfo.Default
-            label={t('Staking type')}
+            label={t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.stakingType')}
             valueColorSchema={earningTagType.color as InfoItemBase['valueColorSchema']}
           >
             {earningTagType.label}
@@ -252,7 +252,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
                   type='ghost'
                 >
                   <div className='__nomination-button-label'>
-                    {t(canChangeValidator ? 'Your validators' : 'Nomination info')}
+                    {canChangeValidator ? t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.yourValidators') : t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.nominationInfo')}
                   </div>
 
                   <Icon
@@ -276,7 +276,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
           '-horizontal-mode': isAllAccount,
           '-has-one-item': list.length === 1
         })}
-        title={t('Account info')}
+        title={t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.accountInfo')}
       >
 
         {isAllAccount && list.length > 1

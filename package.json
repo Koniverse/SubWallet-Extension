@@ -15,6 +15,11 @@
     "packages/*"
   ],
   "bin": {
+    "i18n-combined-data": "scripts/i18n/koni-i18n-combined.mjs",
+    "i18n-mapping-generator": "scripts/i18n/koni-i18n-mapping-generator.mjs",
+    "i18n-text-replacer": "scripts/i18n/koni-i18n-text-replacer.mjs",
+    "i18n-update-trans-extension": "scripts/i18n/koni-i18n-update-trans-extension.mjs",
+    "i18n-update-trans-webapp-webrunner": "scripts/i18n/koni-i18n-update-trans-webapp-webrunner.mjs",
     "koni-ci-build-dev": "./scripts/koni-ci-build-dev.mjs",
     "koni-ci-build-i18n": "./scripts/koni-ci-build-i18n.mjs",
     "koni-ci-build-webapp": "./scripts/koni-ci-build-webapp.mjs",
@@ -39,6 +44,11 @@
     "clean": "polkadot-dev-clean-build && rm -rf packages/extension-koni/build-firefox",
     "dev": "yarn watch-dev",
     "dev:firefox": "cd packages/extension-koni && yarn polkadot-exec-webpack --config webpack.config-firefox.cjs --mode development --watch -d inline-source-map",
+    "i18n:combine-locales": "i18n-combined-data",
+    "i18n:replace-text": "i18n-text-replacer",
+    "i18n:scan": "i18n-mapping-generator",
+    "i18n:update:ext": "i18n-update-trans-extension",
+    "i18n:update:web-mobile": "i18n-update-trans-webapp-webrunner",
     "lint": "polkadot-dev-run-lint",
     "lint:changes": "git diff --name-only | grep -E '.(js|ts|tsx)$' | xargs eslint --fix",
     "postinstall": "polkadot-dev-yarn-only && patch-package",
@@ -82,7 +92,9 @@
     "jest-environment-jsdom": "^29.5.0",
     "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0",
-    "sinon-chrome": "^3.0.1"
+    "replace-in-file": "^8.3.0",
+    "sinon-chrome": "^3.0.1",
+    "vinyl-fs": "^4.0.2"
   },
   "resolutions": {
     "@ethereumjs/common": "^4.1.0",
@@ -107,7 +119,7 @@
     "@polkadot/util": "^13.5.3",
     "@polkadot/util-crypto": "^13.5.3",
     "@polkadot/x-global": "^13.5.3",
-    "@subwallet/chain-list": "0.2.112",
+    "@subwallet/chain-list": "0.2.113-beta.12",
     "@subwallet/keyring": "^0.1.13",
     "@subwallet/react-ui": "5.1.2-b79",
     "@subwallet/ui-keyring": "^0.1.13",

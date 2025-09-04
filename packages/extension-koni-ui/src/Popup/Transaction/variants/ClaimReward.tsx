@@ -210,7 +210,7 @@ const Component = () => {
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('Available balance')}
+            label={t('ui.TRANSACTION.screen.Transaction.ClaimReward.availableBalance')}
             onBalanceReady={setIsBalanceReady}
           />
           <Form.Item>
@@ -220,13 +220,13 @@ const Component = () => {
             >
               <MetaInfo.Chain
                 chain={chainValue}
-                label={t('Network')}
+                label={t('ui.TRANSACTION.screen.Transaction.ClaimReward.network')}
               />
               {
                 reward?.unclaimedReward && (
                   <MetaInfo.Number
                     decimals={decimals}
-                    label={t('Reward claiming')}
+                    label={t('ui.TRANSACTION.screen.Transaction.ClaimReward.rewardClaiming')}
                     suffix={symbol}
                     value={reward.unclaimedReward}
                   />
@@ -240,7 +240,7 @@ const Component = () => {
             valuePropName='checked'
           >
             <Checkbox>
-              <span className={'__option-label'}>{t('Stake reward after claim')}</span>
+              <span className={'__option-label'}>{t('ui.TRANSACTION.screen.Transaction.ClaimReward.stakeRewardAfterClaim')}</span>
             </Checkbox>
           </Form.Item>
         </Form>
@@ -257,7 +257,7 @@ const Component = () => {
           onClick={goHome}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.TRANSACTION.screen.Transaction.ClaimReward.cancel')}
         </Button>
 
         <Button
@@ -271,7 +271,7 @@ const Component = () => {
           loading={loading}
           onClick={checkAction(form.submit, ExtrinsicType.STAKING_CLAIM_REWARD)}
         >
-          {t('Continue')}
+          {t('ui.TRANSACTION.screen.Transaction.ClaimReward.continue')}
         </Button>
       </TransactionFooter>
     </>
