@@ -3,6 +3,7 @@
 
 import { NumberDisplay, ReferendumStatusTag, ReferendumTrackTag, ReferendumVoteProgressBar } from '@subwallet/extension-koni-ui/components';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { getMinApprovalThreshold, getTallyVotesBarPercent, getTimeLeft } from '@subwallet/extension-koni-ui/utils/gov';
 import { Icon } from '@subwallet/react-ui';
 import { Referendum } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
@@ -11,13 +12,21 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import SpendSummary from './SpendSummary';
+
 type Props = ThemeProps & {
   onClick?: VoidFunction;
   item: Referendum;
+  chain: string;
 };
 
-const Component = ({ className, item, onClick }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, item, onClick }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
+  const { ayesPercent, naysPercent } = getTallyVotesBarPercent(item.onchainData.tally);
+
+  const thresholdPercent = getMinApprovalThreshold(item);
+
+  const timeLeft = getTimeLeft(item);
 
   return (
     <div
@@ -28,15 +37,13 @@ const Component = ({ className, item, onClick }: Props): React.ReactElement<Prop
         <div className='__i-ref-id'>#{item.referendumIndex}</div>
         <div className='__i-requested-amount-container'>
 
-          <div className='__i-requested-amount'>
-            <NumberDisplay
-              className={'__i-requested-amount-value'}
-              decimal={0}
-              value={'200000'}
+          {item.allSpends && item.allSpends.length > 0 && (
+            <SpendSummary
+              chain={chain}
+              className='__i-requested-amount'
+              spends={item.allSpends}
             />
-
-            <span className={'__i-requested-amount-symbol'}>DOT</span>
-          </div>
+          )}
         </div>
       </div>
 
@@ -50,10 +57,10 @@ const Component = ({ className, item, onClick }: Props): React.ReactElement<Prop
       </div>
 
       <ReferendumVoteProgressBar
-        ayePercent={86}
+        ayePercent={ayesPercent}
         className={'__i-vote-progress-bar'}
-        nayPercent={14}
-        thresholdPercent={70}
+        nayPercent={naysPercent}
+        thresholdPercent={thresholdPercent}
       />
 
       <>
@@ -111,9 +118,14 @@ const Component = ({ className, item, onClick }: Props): React.ReactElement<Prop
             </div>
           </div>
 
-          <div className='__i-reject-time'>
-            Reject in 26d 15hrs
-          </div>
+          {timeLeft && (
+            <div className='__i-reject-time'>
+              {t('{{status}} in {{time}}', {
+                status: ayesPercent > naysPercent ? t('Approve') : t('Reject'),
+                time: timeLeft
+              })}
+            </div>
+          )}
         </div>
       </>
     </div>
@@ -153,14 +165,6 @@ const ReferendumItem = styled(Component)<Props>(({ theme: { token } }: Props) =>
       fontSize: token.fontSize,
       gap: token.sizeXXS,
       lineHeight: token.lineHeight
-    },
-
-    '.__i-requested-amount-value': {
-      color: token.colorTextLight1
-    },
-
-    '.__i-requested-amount-symbol': {
-      color: token.colorTextLight4
     },
 
     '.__i-ref-name': {

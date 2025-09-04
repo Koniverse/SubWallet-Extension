@@ -120,6 +120,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
       />
 
       <ReferendaList
+        chain={chainSlug}
         items={items}
         onClickItem={onClickReferendumItem}
         selectedReferendaCategory={selectedReferendaCategory}

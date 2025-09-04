@@ -139,7 +139,6 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
       }
     };
 
-    addGroup(groupedItemMap.notVoted, 'NOT VOTED', 'not voted');
     addGroup(groupedItemMap.voted, 'VOTED', 'voted');
     addGroup(groupedItemMap.delegated, 'DELEGATED', 'delegated');
 
