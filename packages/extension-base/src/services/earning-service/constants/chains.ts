@@ -6,8 +6,7 @@ export const _STAKING_CHAIN_GROUP = {
   assetHub: ['statemine', 'statemint', 'westend_assethub'],
   para: ['moonbeam', 'moonriver', 'moonbase', 'turing', 'turingStaging', 'bifrost', 'bifrost_testnet', 'calamari_test', 'calamari', 'manta_network', 'polimec'],
   astar: ['astar', 'shiden', 'shibuya'],
-  amplitude: ['amplitude', 'amplitude_test', 'kilt', 'kilt_peregrine', 'pendulum', 'krest_network'], // amplitude and kilt only share some common logic
-  kilt: ['kilt', 'kilt_peregrine'],
+  amplitude: ['amplitude', 'amplitude_test', 'pendulum', 'krest_network'], // amplitude and kilt only share some common logic
   nominationPool: ['polkadot', 'kusama', 'westend', 'alephTest', 'aleph', 'kate', 'vara_network', 'goldberg_testnet', 'availTuringTest', 'avail_mainnet', 'vara_testnet', 'cere', 'analog_timechain'],
   bifrost: ['bifrost', 'bifrost_testnet'],
   aleph: ['aleph', 'alephTest'], // A0 has distinct tokenomics
