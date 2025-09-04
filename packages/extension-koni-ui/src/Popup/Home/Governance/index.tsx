@@ -1,11 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useGovernanceView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView';
 import { UnlockTokenView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/views/UnlockToken';
 import { GovernanceScreenView } from '@subwallet/extension-koni-ui/types';
 import getSubsquareApi from '@subwallet/subsquare-api-sdk';
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 
 import { OverviewView } from './views/OverviewView';
 import { ReferendumDetailView } from './views/ReferendumDetailView';
@@ -57,6 +59,16 @@ const Component = () => {
   );
 };
 
-const Governance = (Component);
+const Governance = () => {
+  const dataContext = useContext(DataContext);
+
+  return (
+    <PageWrapper
+      resolve={dataContext.awaitStores(['balance', 'price'])}
+    >
+      <Component />
+    </PageWrapper>
+  );
+};
 
 export default Governance;
