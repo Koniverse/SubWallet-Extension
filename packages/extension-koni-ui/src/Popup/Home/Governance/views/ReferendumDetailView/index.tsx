@@ -144,8 +144,10 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
       />
 
       <VoteArea
+        chain={chainSlug}
         onClickVote={onClickVote}
         referendumDetail={data}
+        sdkInstance={sdkInstance}
       />
 
       { allSpends && (

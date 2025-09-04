@@ -255,6 +255,7 @@ export interface UserVotesParams {
 export interface ReferendumVoteDetail {
   referendumIndex: number;
   account: string;
+  target?: string;
   isDelegating: boolean;
   isStandard: boolean;
   isSplit: boolean;
