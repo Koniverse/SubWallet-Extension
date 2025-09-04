@@ -19,6 +19,7 @@ export type LedgerErrorStatus = 'warning' | 'error';
 
 export interface ConvertLedgerError {
   status: LedgerErrorStatus;
+  needCloseLedger?: boolean;
   message: string;
 }
 

@@ -9,10 +9,9 @@ import { _getAssetDecimals, _getAssetSymbol, _isChainEvmCompatible } from '@subw
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountSignMode, EarningStatus, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
+import { AccountSignMode, EarningStatus, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo, SlippageModal } from '@subwallet/extension-web-ui/components';
 import { EarningProcessItem } from '@subwallet/extension-web-ui/components/Earning';
 import { getInputValuesFromString } from '@subwallet/extension-web-ui/components/Field/AmountInput';
@@ -20,8 +19,9 @@ import { EarningInstructionModal } from '@subwallet/extension-web-ui/components/
 import { CREATE_RETURN, DEFAULT_ROUTER_PATH, EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, EVM_ACCOUNT_TYPE, STAKE_ALERT_DATA, SUBSTRATE_ACCOUNT_TYPE } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext';
-import { useChainConnection, useCoreCreateReformatAddress, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useInitValidateTransaction, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSetSelectedAccountTypes, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
-import { fetchPoolTarget, getEarningSlippage, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess } from '@subwallet/extension-web-ui/messaging';
+import { useChainConnection, useCoreCreateReformatAddress, useCreateGetSubnetStakingTokenName, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useInitValidateTransaction, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSetSelectedAccountTypes, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
+import { useTaoStakingFee } from '@subwallet/extension-web-ui/hooks/earning/useTaoStakingFee';
+import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess } from '@subwallet/extension-web-ui/messaging';
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-web-ui/reducer';
 import { store } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
@@ -104,6 +104,7 @@ const Component = ({ className }: ComponentProps) => {
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const poolTargetValue = useWatchTransaction('target', form, defaultData);
 
+  const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
   const oneSign = useOneSignProcess(fromValue);
   const nativeTokenSlug = useGetNativeTokenSlug(chainValue);
   const getReformatAddress = useCoreCreateReformatAddress();
@@ -124,7 +125,7 @@ const Component = ({ className }: ComponentProps) => {
   const [useParamValidator, setUseParamValidator] = useState<boolean>(hasPreSelectTarget);
   const setSelectedAccountTypes = useSetSelectedAccountTypes(false);
 
-  const poolInfo = poolInfoMap[slug] as YieldPoolInfo | undefined;
+  const poolInfo = poolInfoMap[slug];
   const poolType = poolInfo?.type || '' as YieldPoolType;
   const poolChain = poolInfo?.chain || '';
 
@@ -440,6 +441,14 @@ const Component = ({ className }: ComponentProps) => {
     },
     [notify, onDone, onError, onHandleOneSignConfirmation, t]
   );
+  const { earningRate, earningSlippage, stakingFee } = useTaoStakingFee(
+    poolInfo,
+    amountValue,
+    assetDecimals,
+    poolInfo.metadata.subnetData?.netuid || 0,
+    ExtrinsicType.STAKING_BOND,
+    setSubmitLoading
+  );
 
   const netuid = useMemo(() => poolInfo?.metadata.subnetData?.netuid, [poolInfo?.metadata.subnetData]);
   const onSubmit: FormCallbacks<EarnParams>['onFinish'] = useCallback((values: EarnParams) => {
@@ -473,7 +482,8 @@ const Component = ({ className }: ComponentProps) => {
             selectedValidators: targets,
             subnetData: {
               netuid: netuid,
-              slippage: maxSlippage?.slippage.toNumber()
+              slippage: maxSlippage?.slippage.toNumber(),
+              stakingFee: stakingFee
             }
           } as SubmitJoinNativeStaking;
         }
@@ -619,20 +629,15 @@ const Component = ({ className }: ComponentProps) => {
         console.error('Error occurred during sequential checks:', error);
       });
     }, 300);
-  }, [chainValue, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargetValue, poolTargets, processState.feeStructure, processState.processId, processState.steps, t]);
+  }, [chainValue, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargetValue, poolTargets, processState.feeStructure, processState.processId, processState.steps, stakingFee, t]);
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
 
-  const networkKey = useMemo(() => {
-    const netuid = poolInfo?.metadata.subnetData?.netuid || 0;
-
-    return DefaultLogosMap[`subnet-${netuid}`] ? `subnet-${netuid}` : 'subnet-0';
-  }, [poolInfo?.metadata.subnetData?.netuid]);
+  const subnetToken = useMemo(() => {
+    return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.netuid || 0);
+  }, [getSubnetStakingTokenName, poolInfo.chain, poolInfo.metadata.subnetData?.netuid]);
 
   // For subnet staking
-
-  const [earningSlippage, setEarningSlippage] = useState<number>(0);
-  const [earningRate, setEarningRate] = useState<number>(0);
   const [isSlippageModalVisible, setIsSlippageModalVisible] = useState<boolean>(false);
 
   const isDisabledSubnetContent = useMemo(
@@ -646,48 +651,6 @@ const Component = ({ className }: ComponentProps) => {
 
   const alertBoxRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState<boolean>(false);
-  const debounce = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (isDisabledSubnetContent || !poolInfo) {
-      return;
-    }
-
-    setSubmitLoading(true);
-
-    if (debounce.current) {
-      clearTimeout(debounce.current);
-    }
-
-    debounce.current = setTimeout(() => {
-      const netuid = poolInfo.metadata.subnetData?.netuid || 0;
-      const data = {
-        slug: poolInfo.slug,
-        value: amountValue,
-        netuid: netuid,
-        type: ExtrinsicType.STAKING_BOND
-      };
-
-      getEarningSlippage(data)
-        .then((result) => {
-          console.log('Actual stake slippage:', result.slippage * 100);
-          setEarningSlippage(result.slippage);
-          setEarningRate(result.rate);
-        })
-        .catch((error) => {
-          console.error('Error fetching earning slippage:', error);
-        })
-        .finally(() => {
-          setSubmitLoading(false);
-        });
-    }, 200);
-
-    return () => {
-      if (debounce.current) {
-        clearTimeout(debounce.current);
-      }
-    };
-  }, [amountValue, isDisabledSubnetContent, poolInfo]);
 
   const isSlippageAcceptable = useMemo(() => {
     if (earningSlippage === null || !amountValue) {
@@ -729,9 +692,10 @@ const Component = ({ className }: ComponentProps) => {
             <Logo
               className='__item-logo'
               isShowSubLogo={false}
-              network={networkKey}
+              network={poolChain}
               shape='circle'
               size={24}
+              token={subnetToken}
             />
             <span
               className='chain-name'
@@ -812,7 +776,7 @@ const Component = ({ className }: ComponentProps) => {
         </MetaInfo.Default>
       </>
     );
-  }, [amountValue, assetDecimals, earningRate, inputAsset?.symbol, isDisabledSubnetContent, isSlippageAcceptable, maxSlippage.slippage, networkKey, onOpenSlippageModal, poolInfo?.metadata.shortName, poolInfo?.metadata?.subnetData?.subnetSymbol, t]);
+  }, [amountValue, assetDecimals, earningRate, inputAsset?.symbol, isDisabledSubnetContent, isSlippageAcceptable, maxSlippage.slippage, onOpenSlippageModal, poolChain, poolInfo?.metadata.shortName, poolInfo?.metadata?.subnetData?.subnetSymbol, subnetToken, t]);
 
   // For subnet staking
 

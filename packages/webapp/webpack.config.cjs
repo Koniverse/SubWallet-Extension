@@ -14,6 +14,7 @@ module.exports = {
 
 const path = require('path');
 const webpack = require('webpack');
+const rootDir = path.resolve(__dirname, '../..');
 
 const CopyPlugin = require('copy-webpack-plugin');
 
@@ -171,7 +172,8 @@ const createConfig = (entry, alias = {}, useSplitChunk = false) => {
         [`@subwallet/${p}`]: path.resolve(__dirname, `../${p}/src`)
       }), {
         ...alias,
-        'react/jsx-runtime': require.resolve('react/jsx-runtime')
+        'react/jsx-runtime': require.resolve('react/jsx-runtime'),
+        ethers: path.resolve(rootDir, 'node_modules/ethers/lib.esm/index.js')
       }),
       extensions: ['.js', '.mjs', '.jsx', '.ts', '.tsx'],
       fallback: {

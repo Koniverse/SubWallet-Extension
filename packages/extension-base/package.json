@@ -84,7 +84,7 @@
     "dexie-export-import": "^4.0.7",
     "eth-simple-keyring": "^4.2.0",
     "ethereumjs-util": "^7.1.5",
-    "ethers": "^6.4.2",
+    "ethers": "^6.13.5",
     "eventemitter3": "^5.0.0",
     "graphql": "^16.8.1",
     "i18next": "^21.9.2",

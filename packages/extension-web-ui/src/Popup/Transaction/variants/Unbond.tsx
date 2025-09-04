@@ -10,7 +10,8 @@ import { AccountJson, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata,
 import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, MetaInfo, NominationSelector } from '@subwallet/extension-web-ui/components';
 import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA } from '@subwallet/extension-web-ui/constants';
 import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-web-ui/hooks';
-import { getEarningSlippage, yieldSubmitLeavePool } from '@subwallet/extension-web-ui/messaging';
+import { useTaoStakingFee } from '@subwallet/extension-web-ui/hooks/earning/useTaoStakingFee';
+import { yieldSubmitLeavePool } from '@subwallet/extension-web-ui/messaging';
 import { FormCallbacks, FormFieldData, ThemeProps, UnStakeParams } from '@subwallet/extension-web-ui/types';
 import { convertFieldToObject, getBannerButtonIcon, getEarningTimeText, noop, simpleCheckForm } from '@subwallet/extension-web-ui/utils';
 import { BackgroundIcon, Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
@@ -64,6 +65,8 @@ const Component: React.FC = () => {
   const [form] = Form.useForm<UnStakeParams>();
   const [isBalanceReady, setIsBalanceReady] = useState(true);
   const [amountChange, setAmountChange] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isDisable, setIsDisable] = useState(true);
 
   const formDefault = useMemo((): UnStakeParams => ({
     ...defaultData
@@ -99,10 +102,7 @@ const Component: React.FC = () => {
   // For subnet staking
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
-  const [earningSlippage, setEarningSlippage] = useState<number>(0);
   const [maxSlippage, setMaxSlippage] = useState<SlippageType>({ slippage: new BigN(0.005), isCustomType: true });
-  const [earningRate, setEarningRate] = useState<number>(0);
-  const debounce = useRef<NodeJS.Timeout | null>(null);
 
   const isDisabledSubnetContent = useMemo(
     () =>
@@ -112,46 +112,14 @@ const Component: React.FC = () => {
     [isSubnetStaking, amountValue]
   );
 
-  useEffect(() => {
-    if (isDisabledSubnetContent) {
-      return;
-    }
-
-    setLoading(true);
-
-    if (debounce.current) {
-      clearTimeout(debounce.current);
-    }
-
-    debounce.current = setTimeout(() => {
-      const netuid = poolInfo.metadata.subnetData?.netuid || 0;
-      const data = {
-        slug: poolInfo.slug,
-        value: amountValue,
-        netuid: netuid,
-        type: ExtrinsicType.STAKING_UNBOND
-      };
-
-      getEarningSlippage(data)
-        .then((result) => {
-          console.log('Actual stake slippage:', result.slippage * 100);
-          setEarningSlippage(result.slippage);
-          setEarningRate(result.rate);
-        })
-        .catch((error) => {
-          console.error('Error fetching earning slippage:', error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }, 200);
-
-    return () => {
-      if (debounce.current) {
-        clearTimeout(debounce.current);
-      }
-    };
-  }, [amountValue, isDisabledSubnetContent, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
+  const { earningRate, earningSlippage, stakingFee } = useTaoStakingFee(
+    poolInfo,
+    amountValue,
+    decimals,
+    poolInfo.metadata.subnetData?.netuid || 0,
+    ExtrinsicType.STAKING_UNBOND,
+    setLoading
+  );
 
   const isSlippageAcceptable = useMemo(() => {
     if (earningSlippage === null || !amountValue) {
@@ -289,8 +257,6 @@ const Component: React.FC = () => {
     [chainInfoMap, chainValue]
   );
 
-  const [loading, setLoading] = useState(false);
-  const [isDisable, setIsDisable] = useState(true);
   const { onError, onSuccess } = useHandleSubmitTransaction(undefined, handleDataForInsufficientAlert);
 
   const onValuesChange: FormCallbacks<UnStakeParams>['onValuesChange'] = useCallback((changes: Partial<UnStakeParams>, values: UnStakeParams) => {
@@ -344,7 +310,8 @@ const Component: React.FC = () => {
       fastLeave,
       slug,
       poolInfo: poolInfo,
-      slippage: maxSlippage.slippage.toNumber()
+      slippage: maxSlippage.slippage.toNumber(),
+      stakingFee: stakingFee
     };
 
     if (mustChooseValidator) {
@@ -363,7 +330,7 @@ const Component: React.FC = () => {
           setLoading(false);
         });
     }, 300);
-  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo]);
+  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, stakingFee]);
 
   const renderBounded = useCallback(() => {
     return (
@@ -602,7 +569,10 @@ const Component: React.FC = () => {
                           ref={alertBoxRef}
                         >
                           <AlertBox
-                            description={`Unable to unstake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again`}
+                            description={t(
+                              'Unable to unstake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again',
+                              { replace: { slippage: (earningSlippage * 100).toFixed(2) } }
+                            )}
                             title='Slippage too high!'
                             type='error'
                           />
