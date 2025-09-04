@@ -3,16 +3,17 @@
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { estimateTxFee } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _chainInfoToChainType, _getContractAddressOfToken, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { _chainInfoToChainType, _getChainNativeTokenSlug, _getContractAddressOfToken, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { SWTransaction } from '@subwallet/extension-base/services/transaction-service/types';
-import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
+import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BitcoinFeeInfo, CommonFeeComponent, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, OptimalSwapPathParamsV2, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { _reformatAddressWithChain, combineBitcoinFee, getSizeInfo } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import keyring from '@subwallet/ui-keyring';
 import BigNumber from 'bignumber.js';
@@ -209,15 +210,12 @@ export class OptimexHandler implements SwapBaseInterface {
   }
 
   async getApprovalStep (params: OptimalSwapPathParamsV2): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    // todo: implement this
+    // todo: handle this when support route has approve step
     // const selectedQuote = params.selectedQuote;
     //
     // if (selectedQuote) {
     //   const metadata = selectedQuote.metadata as OptimexMetadata;
     // }
-
-    console.log('params', params);
-    console.log('approve', this.currentTradeMetadata);
 
     return Promise.resolve(undefined);
   }
@@ -228,9 +226,89 @@ export class OptimexHandler implements SwapBaseInterface {
     }
 
     const originTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.from);
-    const destinationTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.to);
     const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
+    const destinationTokenInfo = this.chainService.getAssetBySlug(params.selectedQuote.pair.to);
     const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
+
+    const originChainType = _chainInfoToChainType(originChain);
+    const originChainNativeTokenSlug = _getChainNativeTokenSlug(originChain);
+
+    // optimex do not return fee in quote. Need calculate network fee manually.
+    let networkFeeAmount: string;
+
+    if (originChainType === ChainType.EVM) {
+      const evmApi = this.chainService.getEvmApi(originChain.slug);
+      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(getId(), originChain.slug, 'evm') as EvmFeeInfo;
+
+      let transactionConfig;
+
+      if (_isNativeToken(originTokenInfo)) {
+        [transactionConfig] = await getEVMTransactionObject({
+          chain: originChain.slug,
+          evmApi,
+          from: params.request.address,
+          to: this.currentTradeMetadata?.deposit_address || '',
+          value: params.request.fromAmount,
+          feeInfo,
+          transferAll: false,
+          fallbackFee: true
+        });
+      } else {
+        [transactionConfig] = await getERC20TransactionObject({
+          assetAddress: _getContractAddressOfToken(originTokenInfo),
+          chain: originChain.slug,
+          evmApi: this.chainService.getEvmApi(originChain.slug),
+          from: params.request.address,
+          to: this.currentTradeMetadata?.deposit_address || '',
+          value: params.request.fromAmount,
+          feeInfo,
+          transferAll: false
+        });
+      }
+
+      networkFeeAmount = await estimateTxFee(transactionConfig, evmApi, feeInfo);
+    } else if (originChainType === ChainType.BITCOIN) {
+      const bitcoinApi = this.chainService.getBitcoinApi(originChain.slug);
+      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(getId(), originChain.slug, 'bitcoin');
+      const network = originChain.isTestnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin;
+
+      const [transaction] = await createBitcoinTransaction({
+        bitcoinApi,
+        chain: originChain.slug,
+        from: params.request.address,
+        feeInfo,
+        to: this.currentTradeMetadata?.deposit_address || '',
+        transferAll: false,
+        value: params.request.fromAmount,
+        network
+      });
+
+      const feeCombine = combineBitcoinFee(feeInfo as BitcoinFeeInfo, undefined, undefined); // todo: recheck when implement custom fee
+
+      const recipients: string[] = [];
+
+      for (const txOutput of transaction.txOutputs) {
+        txOutput.address && recipients.push(txOutput.address);
+      }
+
+      const sizeInfo = getSizeInfo({
+        inputLength: transaction.inputCount,
+        recipients: recipients,
+        sender: params.request.address
+      });
+
+      networkFeeAmount = Math.ceil(feeCombine.feeRate * sizeInfo.txVBytes).toString();
+    } else {
+      console.log('Unsupported swap from this chain type', originChainType);
+
+      return Promise.resolve(undefined);
+    }
+
+    const networkFee: CommonFeeComponent = {
+      amount: networkFeeAmount || '0',
+      feeType: SwapFeeType.NETWORK_FEE,
+      tokenSlug: originChainNativeTokenSlug
+    };
 
     const submitStep: BaseStepDetail = {
       name: 'Swap',
@@ -247,7 +325,13 @@ export class OptimexHandler implements SwapBaseInterface {
       } as unknown as BaseSwapStepMetadata
     };
 
-    return Promise.resolve([submitStep, params.selectedQuote.feeInfo]);
+    const feeInfo: CommonStepFeeInfo = {
+      defaultFeeToken: params.selectedQuote.feeInfo.defaultFeeToken,
+      feeComponent: [...params.selectedQuote.feeInfo.feeComponent, networkFee],
+      feeOptions: params.selectedQuote.feeInfo.feeOptions
+    };
+
+    return Promise.resolve([submitStep, feeInfo]);
   }
 
   public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
@@ -304,8 +388,8 @@ export class OptimexHandler implements SwapBaseInterface {
     }
   }
 
-  public async handleApproveStep (params: SwapSubmitParams) {
-    // todo:
+  public handleApproveStep (params: SwapSubmitParams) {
+    // todo: handle this when support route has approve step
     const fromAsset = this.chainService.getAssetBySlug(params.quote.pair.from);
 
     return {
