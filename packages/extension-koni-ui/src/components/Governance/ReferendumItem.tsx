@@ -47,7 +47,7 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
         </div>
       </div>
 
-      <div className='__i-ref-name'>
+      <div className='__i-ref-title'>
         {item.title}
       </div>
 
@@ -167,7 +167,7 @@ const ReferendumItem = styled(Component)<Props>(({ theme: { token } }: Props) =>
       lineHeight: token.lineHeight
     },
 
-    '.__i-ref-name': {
+    '.__i-ref-title': {
       lineHeight: token.lineHeight,
       fontSize: token.fontSize,
       color: token.colorTextLight1,

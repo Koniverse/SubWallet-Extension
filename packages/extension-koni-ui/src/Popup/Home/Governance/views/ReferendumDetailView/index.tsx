@@ -11,8 +11,9 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
-import { ModalContext } from '@subwallet/react-ui';
+import { Icon, ModalContext, SwSubHeader } from '@subwallet/react-ui';
 import { useQuery } from '@tanstack/react-query';
+import { UploadSimple } from 'phosphor-react';
 import React, { useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -116,15 +117,31 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
 
   return (
     <div className={className}>
-      <div onClick={onBack}>
-        {'< Back'}
-      </div>
+      <SwSubHeader
+        background={'transparent'}
+        center
+        className={'transaction-header'}
+        onBack={onBack}
+        paddingVertical
+        rightButtons={[
+          {
+            icon: (
+              <Icon
+                customSize={'24px'}
+                phosphorIcon={UploadSimple}
+                type='phosphor'
+                weight={'bold'}
+              />
+            )
+          }
+        ]}
+        showBackButton
+        title={t('Referenda {{id}}', { replace: { id: data.referendumIndex } })}
+      />
 
-      <div>
-        {data.title}
-      </div>
-
-      <MetaArea />
+      <MetaArea
+        referendumDetail={data}
+      />
 
       <VoteArea
         onClickVote={onClickVote}

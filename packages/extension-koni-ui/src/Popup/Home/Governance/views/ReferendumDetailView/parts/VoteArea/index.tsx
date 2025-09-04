@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ReferendumVoteProgressBar } from '@subwallet/extension-koni-ui/components';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getMinApprovalThreshold, getTallyVotesBarPercent, getTimeLeft } from '@subwallet/extension-koni-ui/utils/gov';
@@ -28,9 +29,13 @@ const Component = ({ className, onClickVote, referendumDetail }: Props): React.R
       {timeLeft && (
         <div>timeLeft: {timeLeft}%</div>
       )}
-      <div>Aye: {ayesPercent}%</div>
-      <div>Nay: {naysPercent}%</div>
-      <div>Threshold: {thresholdPercent}%</div>
+
+      <ReferendumVoteProgressBar
+        ayePercent={ayesPercent}
+        className={'__i-vote-progress-bar'}
+        nayPercent={naysPercent}
+        thresholdPercent={thresholdPercent}
+      />
 
       <Button
         block={true}
