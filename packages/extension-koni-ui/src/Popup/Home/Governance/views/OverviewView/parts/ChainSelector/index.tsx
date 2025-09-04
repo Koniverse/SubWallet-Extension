@@ -43,6 +43,7 @@ const Component = ({ onChangeChain, selectedChain, triggerClassname = '' }: Prop
             modalId={modalId}
             onCancel={closeModal}
             onChangeChain={onChangeChain}
+            selectedChain={selectedChain}
           />
         )
       }

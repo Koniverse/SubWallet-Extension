@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _GOVERNANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
+import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import Search from '@subwallet/extension-koni-ui/components/Search';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetAccountTokenBalance, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { GovernanceChainSelectorItemType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { SwList, SwModal } from '@subwallet/react-ui';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +20,7 @@ type Props = ThemeProps & {
   modalId: string;
   onCancel?: VoidFunction;
   onChangeChain: (chainSlug: string) => void;
+  selectedChain: string;
 };
 
 type ListItemGroupLabel = {
@@ -30,10 +32,12 @@ type ListItem = GovernanceChainSelectorItemType | ListItemGroupLabel;
 
 const renderEmpty = () => <GeneralEmptyList />;
 
-const Component = ({ className = '', modalId, onCancel, onChangeChain }: Props): React.ReactElement<Props> => {
+const Component = ({ className = '', modalId, onCancel, onChangeChain, selectedChain }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const [searchValue, setSearchValue] = useState<string>('');
+  const getAccountTokenBalance = useGetAccountTokenBalance();
+  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
 
   const handleSearch = useCallback((value: string) => {
     setSearchValue(value);
@@ -102,6 +106,34 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain }: Props):
     };
   }, [_onCancel, onChangeChain]);
 
+  const chainAndNativeTokenSlugMap = useMemo(() => {
+    const result: Record<string, string> = {};
+
+    Object.values(itemGroupMap).forEach((groupItem) => {
+      groupItem.forEach(({ chainSlug }) => {
+        result[chainSlug] = _getChainNativeTokenSlug(chainInfoMap[chainSlug]);
+      });
+    });
+
+    return result;
+  }, [chainInfoMap, itemGroupMap]);
+
+  const chainBalanceMap = useMemo(() => {
+    if (!currentAccountProxy) {
+      return {};
+    }
+
+    const result: Record<string, TokenBalanceItemType | undefined> = {};
+
+    const tokenBalanceMap = getAccountTokenBalance(Object.values(chainAndNativeTokenSlugMap), currentAccountProxy.id);
+
+    Object.keys(chainAndNativeTokenSlugMap).forEach((chainSlug) => {
+      result[chainSlug] = tokenBalanceMap[chainAndNativeTokenSlugMap[chainSlug]];
+    });
+
+    return result;
+  }, [chainAndNativeTokenSlugMap, currentAccountProxy, getAccountTokenBalance]);
+
   const renderItem = useCallback((item: ListItem) => {
     if ((item as ListItemGroupLabel).groupLabel) {
       return (
@@ -114,16 +146,20 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain }: Props):
       );
     }
 
+    const _item = (item as GovernanceChainSelectorItemType);
+
     return (
       <ChainSelectorItem
-        chainName={(item as GovernanceChainSelectorItemType).chainName}
-        chainSlug={(item as GovernanceChainSelectorItemType).chainSlug}
+        balanceValue={chainBalanceMap[_item.chainSlug]?.free?.value}
+        chainName={_item.chainName}
+        chainSlug={_item.chainSlug}
         className={'__selector-item'}
-        key={(item as GovernanceChainSelectorItemType).chainSlug}
-        onClick={onSelect(item as GovernanceChainSelectorItemType)}
+        isSelected={_item.chainSlug === selectedChain}
+        key={_item.chainSlug}
+        onClick={onSelect(_item)}
       />
     );
-  }, [onSelect]);
+  }, [chainBalanceMap, onSelect, selectedChain]);
 
   return (
     <SwModal
@@ -152,6 +188,36 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain }: Props):
 
 export const ChainSelectorModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
+    '.__group-label + .__selector-item, .__selector-item + .__selector-item, .__selector-item + .__group-label': {
+      marginTop: token.marginXS
+    },
 
+    '.__group-label': {
+      fontSize: 11,
+      lineHeight: '20px',
+      fontWeight: token.headingFontWeight,
+      textTransform: 'uppercase',
+      color: token.colorTextLight3
+    },
+
+    '.ant-sw-modal-content': {
+      height: '100vh'
+    },
+
+    '.ant-sw-modal-body': {
+      overflow: 'auto',
+      display: 'flex',
+      flex: 1,
+      flexDirection: 'column'
+    },
+
+    '.__search-box': {
+      marginBottom: token.marginXS
+    },
+
+    '.__list-container': {
+      flex: 1,
+      overflow: 'auto'
+    }
   };
 });
