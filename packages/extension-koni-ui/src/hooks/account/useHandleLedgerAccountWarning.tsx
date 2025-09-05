@@ -17,7 +17,7 @@ type InputInfo = {
   targetSlug: string;
   accountProxy?: AccountProxy;
 }
-type HookType = (inputInfo: InputInfo, processFunction: VoidFunction) => void;
+type HookType = (inputInfo: InputInfo, processFunction: VoidFunction) => boolean;
 
 // `useHandleLedgerAccountWarning` will trigger a warning in the following two cases:
 //   1. When selecting a token address, it will display a warning for tokens belonging to unsupported networks of the ledgerEvm account, and tokens containing smart contracts on networks that bridge between the Ethereum and Substrate ecosystems for a substrate ecdsa ledger account type.
@@ -30,9 +30,7 @@ export default function useHandleLedgerAccountWarning (): HookType {
 
   return useCallback(({ accountProxy, context, targetSlug }, processFunction) => {
     if (!accountProxy) {
-      processFunction();
-
-      return;
+      return false;
     }
 
     const isTokenContext = context === 'useToken';
@@ -118,9 +116,9 @@ export default function useHandleLedgerAccountWarning (): HookType {
         }
       });
 
-      return;
+      return true;
     }
 
-    processFunction();
+    return false;
   }, [alertModal, assetRegistry, chainInfoMap, t]);
 }

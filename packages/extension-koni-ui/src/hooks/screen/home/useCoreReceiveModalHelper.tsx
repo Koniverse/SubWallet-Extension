@@ -11,7 +11,7 @@ import { useCoreCreateReformatAddress, useGetBitcoinAccounts, useGetChainAndExcl
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, AccountTokenAddress, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
-import { runNestedWarningModalHandlers } from '@subwallet/extension-koni-ui/utils';
+import { runPriorityWarningModalHandlers } from '@subwallet/extension-koni-ui/utils';
 import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { ModalContext } from '@subwallet/react-ui';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -77,7 +77,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
 
     const accountProxy = accountProxies.find((ap) => ap.id === accountProxyId);
 
-    runNestedWarningModalHandlers([
+    runPriorityWarningModalHandlers([
       [onHandleTonAccountWarning, accountType],
       [onHandleLedgerGenericAccountWarning, { accountProxy, chainSlug }],
       [onHandleLedgerAccountWarning, { accountProxy, targetSlug: tokenSlug, context: 'useToken' }]

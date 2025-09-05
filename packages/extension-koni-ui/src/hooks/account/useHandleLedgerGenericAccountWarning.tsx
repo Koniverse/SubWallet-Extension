@@ -14,7 +14,7 @@ type HookInputInfo = {
   accountProxy: AccountProxy | null | undefined;
   chainSlug: string;
 }
-type HookType = (inputInfo: HookInputInfo, processFunction: VoidFunction) => void;
+type HookType = (inputInfo: HookInputInfo, processFunction: VoidFunction) => boolean;
 
 export default function useHandleLedgerGenericAccountWarning (): HookType {
   const { t } = useTranslation();
@@ -76,9 +76,9 @@ export default function useHandleLedgerGenericAccountWarning (): HookType {
         }
       });
 
-      return;
+      return true;
     }
 
-    processFunction();
+    return false;
   }, [alertModal, chainInfoMap, ledgerGenericAllowNetworks, t]);
 }
