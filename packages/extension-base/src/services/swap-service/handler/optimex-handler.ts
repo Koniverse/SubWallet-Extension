@@ -235,6 +235,13 @@ export class OptimexHandler implements SwapBaseInterface {
 
     // optimex do not return fee in quote. Need calculate network fee manually.
     let networkFeeAmount: string;
+    const depositAddress = this.currentTradeMetadata?.deposit_address;
+
+    if (!depositAddress) {
+      console.log('Optimex Trade metadata is undefined');
+
+      return Promise.resolve(undefined);
+    }
 
     if (originChainType === ChainType.EVM) {
       const evmApi = this.chainService.getEvmApi(originChain.slug);
@@ -247,7 +254,7 @@ export class OptimexHandler implements SwapBaseInterface {
           chain: originChain.slug,
           evmApi,
           from: params.request.address,
-          to: this.currentTradeMetadata?.deposit_address || '',
+          to: depositAddress,
           value: params.request.fromAmount,
           feeInfo,
           transferAll: false,
@@ -259,7 +266,7 @@ export class OptimexHandler implements SwapBaseInterface {
           chain: originChain.slug,
           evmApi: this.chainService.getEvmApi(originChain.slug),
           from: params.request.address,
-          to: this.currentTradeMetadata?.deposit_address || '',
+          to: depositAddress,
           value: params.request.fromAmount,
           feeInfo,
           transferAll: false
@@ -277,7 +284,7 @@ export class OptimexHandler implements SwapBaseInterface {
         chain: originChain.slug,
         from: params.request.address,
         feeInfo,
-        to: this.currentTradeMetadata?.deposit_address || '',
+        to: depositAddress,
         transferAll: false,
         value: params.request.fromAmount,
         network
@@ -420,12 +427,13 @@ export class OptimexHandler implements SwapBaseInterface {
     };
 
     let extrinsic: SWTransaction['transaction'];
+    const depositAddress = this.currentTradeMetadata?.deposit_address;
 
-    if (!this.currentTradeMetadata) {
-      throw new Error('Unknown trade metadata');
+    console.log('Optimex Trade metadata', depositAddress);
+
+    if (!depositAddress) {
+      throw new Error('Optimex Trade metadata is undefined');
     }
-
-    const depositAddress = this.currentTradeMetadata.deposit_address;
 
     if (chainType === ChainType.BITCOIN) {
       const bitcoinApi = this.chainService.getBitcoinApi(chainInfo.slug);
