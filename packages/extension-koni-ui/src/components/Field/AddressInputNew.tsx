@@ -242,22 +242,22 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
 
     if (walletItems.length) {
       walletItems.sort(sortFuncAnalyzeAddress);
-      result.push(genAutoCompleteGroupItem(t('My wallet'), walletItems.map((i) => genAutoCompleteItem(i))));
+      result.push(genAutoCompleteGroupItem(t('ui.components.Field.AddressInputNew.myWallet'), walletItems.map((i) => genAutoCompleteItem(i))));
     }
 
     if (contactItems.length) {
       contactItems.sort(sortFuncAnalyzeAddress);
-      result.push(genAutoCompleteGroupItem(t('My contact'), contactItems.map((i) => genAutoCompleteItem(i))));
+      result.push(genAutoCompleteGroupItem(t('ui.components.Field.AddressInputNew.myContact'), contactItems.map((i) => genAutoCompleteItem(i))));
     }
 
     if (domainItems.length) {
       domainItems.sort(sortFuncAnalyzeAddress);
-      result.push(genAutoCompleteGroupItem(t('Domain name'), domainItems.map((i) => genAutoCompleteItem(i))));
+      result.push(genAutoCompleteGroupItem(t('ui.components.Field.AddressInputNew.domainName'), domainItems.map((i) => genAutoCompleteItem(i))));
     }
 
     if (recentItems.length) {
       recentItems.sort(sortFuncAnalyzeAddress);
-      result.push(genAutoCompleteGroupItem(t('Recent'), recentItems.map((i) => genAutoCompleteItem(i))));
+      result.push(genAutoCompleteGroupItem(t('ui.components.Field.AddressInputNew.recent'), recentItems.map((i) => genAutoCompleteItem(i))));
     }
 
     return result;
@@ -267,11 +267,11 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
     if (checked) {
       alertModal.open({
         closable: false,
-        title: t('Advanced address conversion'),
+        title: t('ui.components.Field.AddressInputNew.advancedAddressConversion'),
         type: NotificationType.WARNING,
-        content: t('This feature auto-converts your recipient address into the correct format for your chosen destination network. Wrong destination network will result in loss of funds. Only enable if you’re an advanced user'),
+        content: t('ui.components.Field.AddressInputNew.advancedAddressConversionInfo'),
         cancelButton: {
-          text: t('Cancel'),
+          text: t('ui.components.Field.AddressInputNew.cancel'),
           icon: XCircle,
           iconWeight: 'fill',
           onClick: () => {
@@ -281,7 +281,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
           schema: 'secondary'
         },
         okButton: {
-          text: t('Enable'),
+          text: t('ui.components.Field.AddressInputNew.enable'),
           icon: CheckCircle,
           iconWeight: 'fill',
           onClick: () => {
@@ -312,7 +312,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
               />
 
               <div className={'__advanced-address-detection-label'}>
-                {t('Advanced address detection')}
+                {t('ui.components.Field.AddressInputNew.advancedAddressDetection')}
               </div>
 
               <Switch
@@ -465,8 +465,8 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
             })}
             disabled={disabled}
             id={id}
-            label={label || t('Account address')}
-            placeholder={placeholder || t('Please type or paste an address')}
+            label={label || t('ui.components.Field.AddressInputNew.accountAddress')}
+            placeholder={placeholder || t('ui.components.Field.AddressInputNew.typeOrPasteAddress')}
             prefix={
               <>
                 {

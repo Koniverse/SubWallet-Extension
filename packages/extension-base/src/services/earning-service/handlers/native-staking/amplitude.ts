@@ -367,7 +367,7 @@ export default class AmplitudeNativeStakingPoolHandler extends BaseParaNativeSta
 
     await substrateApi.isReady;
 
-    if (!_STAKING_CHAIN_GROUP.kilt.includes(this.chain) && !_STAKING_CHAIN_GROUP.krest_network.includes(this.chain)) {
+    if (!_STAKING_CHAIN_GROUP.krest_network.includes(this.chain)) {
       await Promise.all(useAddresses.map(async (address) => {
         const _unclaimedReward = await substrateApi.api.query.parachainStaking.rewards(address);
 

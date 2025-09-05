@@ -1,19 +1,19 @@
-    3163	AnhMTV                        	Release version 1.3.54
+    3174	AnhMTV                        	Update chain-list to beta version
     2671	Nam Phạm                      	disable block explorer for truth network
     2599	S2kael                        	[Issue-4521] Update stable version for chain-list
-     936	bluezdot                      	
+     951	bluezdot                      	
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
      568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
-     465	Frenkie Nguyen                	[Issue-4585] Reset to custom fee in case of editing fee and then switching to cross chain
+     530	Frenkie Nguyen                	[Issue-4065] update styling(2)
      465	Jaco                          	0.42.5 (#969)
-     389	tunghp2002                    	[Issue-4626] Extension - Update logic show logo for earning position detail
+     391	tunghp2002                    	[Issue-4626] Extension - Update logic show logo for earning position detail
      355	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
      278	lw                            	[Issue-4512] refactor: Update swap submission content
-     239	PDTnhah                       	
+     242	PDTnhah                       	[Issue-4616] Update chainlist stable v0.2.113
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
      170	lw-cdm                        	
-     162	Thiendekaco                   	[Issue-4598] feat(wc): handle case connect with network system not support walletconnect connection
+     165	Thiendekaco                   	[Issue-3753] feat(dApp): add notification when dapp connection but network does not exist
      160	Automation Bot                	[CI Skip] Auto increase webapp build number
      104	khainh                        	predefine metadata for Polkadot & Kusama chains
       83	Hieu Dao                      	Update README.md
@@ -37,10 +37,10 @@
        4	namph                         	update UI for nft
        4	Quangdm-cdm                   	
        3	Antoine Estienne              	Add eth test for extension signature (#909)
+       3	bluezdot                      	[Issue-4606] chores: migrate to remove cached earning options
        3	quangdm                       	Update style for Auth Transaction Screen, Export Screen, Derive Screen
        2	Axel Chalon                   	Add typings to messages (#130)
        2	Bartłomiej Rutkowski          	Allow account creation by derivation from existing one (#296)
-       2	bluezdot                      	[Issue-4468] chores: add todos
        2	carumusan                     	Support ipfs and ipns urls (#667)
        2	ccris02                       	Adding Polish Language Option to the Extension (#761)
        2	joe petrowski                 	add plasm (#462)
