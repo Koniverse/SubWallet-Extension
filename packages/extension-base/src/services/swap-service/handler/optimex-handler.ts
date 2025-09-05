@@ -233,7 +233,7 @@ export class OptimexHandler implements SwapBaseInterface {
     const originChainType = _chainInfoToChainType(originChain);
     const originChainNativeTokenSlug = _getChainNativeTokenSlug(originChain);
 
-    // optimex do not return fee in quote. Need calculate network fee manually.
+    // Optimex do not return fee in quote. Need calculate network fee manually from client side
     let networkFeeAmount: string;
     const depositAddress = this.currentTradeMetadata?.deposit_address;
 
