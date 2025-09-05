@@ -1,12 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { DynamicSwapAction, OptimalSwapPathParamsV2, SwapFeeType, SwapStepType } from '@subwallet/extension-base/types/swap';
-import { OptimalYieldPath, OptimalYieldPathParams, YieldStepType } from '@subwallet/extension-base/types/yield';
-
-/* ServiceWithProcess */
-export type OptimalProcessParams = OptimalYieldPathParams | OptimalSwapPathParamsV2;
-export type OptimalProcessResult = OptimalYieldPath | CommonOptimalSwapPath;
+import { DynamicSwapAction, SwapFeeType, SwapStepType } from '@subwallet/extension-base/types/swap';
+import { YieldStepType } from '@subwallet/extension-base/types/yield';
 
 export enum CommonStepType {
   DEFAULT = 'DEFAULT',
