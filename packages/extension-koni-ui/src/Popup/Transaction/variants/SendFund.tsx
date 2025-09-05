@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _AssetRef, _AssetType, _ChainInfo, _ChainStatus } from '@subwallet/chain-list/types';
+import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _ChainStatus } from '@subwallet/chain-list/types';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
@@ -91,6 +91,24 @@ function getTokenAvailableDestinations (tokenSlug: string, xcmRefMap: Record<str
   return result;
 }
 
+const calculateHideMaxButton = (chain: string, destChain: string, assetInfo: _ChainAsset, chainInfoMap: Record<string, _ChainInfo>) => {
+  const chainInfo = chainInfoMap[chain];
+
+  if (_isPolygonChainBridge(chain, destChain) || _isPosChainBridge(chain, destChain)) {
+    return true;
+  }
+
+  return (
+    !!chainInfo &&
+    !!assetInfo &&
+    destChain === chain &&
+    _isNativeToken(assetInfo) &&
+    (_isChainEvmCompatible(chainInfo) ||
+      _isChainCardanoCompatible(chainInfo) ||
+      _isChainBitcoinCompatible(chainInfo))
+  );
+};
+
 const hiddenFields: Array<keyof TransferParams> = ['chain', 'fromAccountProxy', 'defaultSlug'];
 const alertModalId = 'confirmation-alert-modal';
 const defaultAddressInputRenderKey = 'address-input-render-key';
@@ -153,13 +171,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [chainValue, destChainValue, getCurrentConfirmation]);
 
   const hideMaxButton = useMemo(() => {
-    const chainInfo = chainInfoMap[chainValue];
-
-    if (_isPolygonChainBridge(chainValue, destChainValue) || _isPosChainBridge(chainValue, destChainValue)) {
-      return true;
-    }
-
-    return !!chainInfo && !!assetInfo && destChainValue === chainValue && _isNativeToken(assetInfo) && (_isChainEvmCompatible(chainInfo) || _isChainCardanoCompatible(chainInfo) || _isChainBitcoinCompatible(chainInfo));
+    return calculateHideMaxButton(chainValue, destChainValue, assetInfo, chainInfoMap);
   }, [chainInfoMap, chainValue, destChainValue, assetInfo]);
 
   const disabledToAddressInput = useMemo(() => {
@@ -437,9 +449,16 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           destChain: chain,
           to: ''
         });
+        const newAssetInfo = assetRegistry[part.asset];
+        const newHideMaxButton = calculateHideMaxButton(chain, chain, newAssetInfo, chainInfoMap);
+
+        if (newHideMaxButton) {
+          setIsTransferAll(false);
+          form.setFieldValue('value', undefined);
+          setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${Date.now()}`);
+        }
 
         setAddressInputRenderKey(`${defaultAddressInputRenderKey}-${Date.now()}`);
-        setIsTransferAll(false);
         setSelectedTransactionFee(undefined);
         setCurrentTokenPayFee(values.chain === chain ? defaultTokenPayFee : undefined);
         setTransferInfo(undefined);
@@ -479,7 +498,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
       persistData(form.getFieldsValue());
     },
-    [defaultTokenPayFee, persistData, form, assetRegistry]
+    [persistData, form, assetRegistry, chainInfoMap, defaultTokenPayFee]
   );
 
   const isShowWarningOnSubmit = useCallback((values: TransferParams): boolean => {
