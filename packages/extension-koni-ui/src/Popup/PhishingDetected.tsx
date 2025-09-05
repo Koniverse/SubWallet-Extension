@@ -51,6 +51,7 @@ function _PhishingDetected ({ className }: Props): React.ReactElement<Props> {
       subHeaderPaddingVertical={true}
       title={t('ui.SECURITY.screen.PhishingDetected.phishingDetection')}
     >
+      <BackgroundExpandView className={'background-phishing-page'} />
       <div className={CN('__upper-block-wrapper')} />
       <PageIcon
         color={token.colorError}
@@ -78,7 +79,6 @@ function _PhishingDetected ({ className }: Props): React.ReactElement<Props> {
       >
         {t('ui.SECURITY.screen.PhishingDetected.iTrustThisSite')}
       </div>
-      <BackgroundExpandView />
     </Layout.WithSubHeaderOnly>
   );
 }
@@ -107,6 +107,7 @@ const PhishingDetected = styled(_PhishingDetected)<Props>(({ theme }) => {
     },
 
     '.phishing-detection-message': {
+      zIndex: 5,
       paddingLeft: 40,
       paddingRight: 40,
       paddingTop: 16,
@@ -122,6 +123,7 @@ const PhishingDetected = styled(_PhishingDetected)<Props>(({ theme }) => {
       lineHeight: token.lineHeightHeading6,
       color: token.colorTextLight5,
       cursor: 'pointer',
+      zIndex: 5,
 
       '&:hover': {
         color: token.colorTextLight2

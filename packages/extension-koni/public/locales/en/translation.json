@@ -1505,6 +1505,7 @@
   "ui.SETTINGS.screen.Setting.Security.extensionAutoLock": "Extension auto lock",
   "ui.SETTINGS.screen.Setting.Security.authenticateWithPassword": "Authenticate with password",
   "ui.SETTINGS.screen.Setting.Security.advancedPhishingDetection": "Advanced phishing detection",
+  "ui.SETTINGS.screen.Setting.Security.phishingProtection": "Show warnings for phishing sites and protect your assets from scams",
   "ui.SETTINGS.screen.Setting.Security.cameraAccessForQr": "Camera access for QR",
   "ui.SETTINGS.screen.Setting.Security.signForMultipleTransactions": "Sign for multiple transactions",
   "ui.SETTINGS.screen.Setting.Security.allowSignOnceForMultiple": "Allow signing once for multiple transactions",

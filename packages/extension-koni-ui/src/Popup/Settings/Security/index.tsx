@@ -285,27 +285,31 @@ const Component: React.FC<Props> = (props: Props) => {
             {items.map(onRenderItem)}
           </div>
           <div className='setting-config-container'>
-            <div className='items-container'>
-              <SettingItem
-                className={CN('security-item', `security-type-${SecurityType.CHAIN_PATROL_SERVICE}`)}
-                leftItemIcon={(
-                  <BackgroundIcon
-                    backgroundColor={'var(--icon-bg-color)'}
-                    phosphorIcon={ShieldStar}
-                    size='sm'
-                    type='phosphor'
-                    weight='fill'
-                  />
-                )}
-                name={t('ui.SETTINGS.screen.Setting.Security.advancedPhishingDetection')}
-                rightItem={(
-                  <Switch
-                    checked={enableChainPatrol}
-                    loading={loadingChainPatrol}
-                    onClick={updateChainPatrolEnable(enableChainPatrol)}
-                  />
-                )}
-              />
+            <div className={CN('security-item', 'custom-security-item', `security-type-${SecurityType.CHAIN_PATROL_SERVICE}`)}>
+              <div className='__item-left-part'>
+                <BackgroundIcon
+                  backgroundColor={'var(--icon-bg-color)'}
+                  phosphorIcon={ShieldStar}
+                  size='sm'
+                  type='phosphor'
+                  weight='fill'
+                />
+              </div>
+              <div className='__item-center-part'>
+                <div className='__item-title'>
+                  {t('ui.SETTINGS.screen.Setting.Security.advancedPhishingDetection')}
+                </div>
+                <div className='__item-description'>
+                  {t('Show warnings for phishing sites and protect your assets from scams')}
+                </div>
+              </div>
+              <div className='__item-right-part'>
+                <Switch
+                  checked={enableChainPatrol}
+                  loading={loadingChainPatrol}
+                  onClick={updateChainPatrolEnable(enableChainPatrol)}
+                />
+              </div>
             </div>
             <SettingItem
               className={CN('security-item', `security-type-${SecurityType.CAMERA_ACCESS}`)}
