@@ -8,7 +8,7 @@ import { Icon } from '@subwallet/react-ui';
 import { Referendum } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
 import { CircleHalf, ThumbsDown, ThumbsUp } from 'phosphor-react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -23,10 +23,19 @@ type Props = ThemeProps & {
 const Component = ({ chain, className, item, onClick }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { ayesPercent, naysPercent } = getTallyVotesBarPercent(item.onchainData.tally);
+  const [timeLeft, setTimeLeft] = useState<string | undefined>(() =>
+    getTimeLeft(item)
+  );
 
   const thresholdPercent = getMinApprovalThreshold(item);
 
-  const timeLeft = getTimeLeft(item);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft(getTimeLeft(item));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [item]);
 
   return (
     <div

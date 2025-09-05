@@ -9,7 +9,7 @@ import { formatVoteResult } from '@subwallet/extension-koni-ui/utils/gov/votingS
 import { Button } from '@subwallet/react-ui';
 import { ReferendumDetail, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { useQuery } from '@tanstack/react-query';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { VotingStats } from './VotingStats';
@@ -26,7 +26,9 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   const { ayesPercent, naysPercent } = getTallyVotesBarPercent(referendumDetail.onchainData.tally);
   const referendumId = referendumDetail?.referendumIndex;
   const thresholdPercent = getMinApprovalThreshold(referendumDetail);
-  const timeLeft = getTimeLeft(referendumDetail);
+  const [timeLeft, setTimeLeft] = useState<string | undefined>(() =>
+    getTimeLeft(referendumDetail)
+  );
 
   const { data } = useQuery({
     queryKey: GOV_QUERY_KEYS.referendumVotes(chain, referendumId),
@@ -42,6 +44,14 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   });
 
   const votingData = useMemo(() => formatVoteResult(data || []), [data]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft(getTimeLeft(referendumDetail));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [referendumDetail]);
 
   return (
     <div className={className}>
