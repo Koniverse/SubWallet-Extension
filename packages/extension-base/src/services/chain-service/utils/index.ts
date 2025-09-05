@@ -506,6 +506,8 @@ export function _getBlockExplorerFromChain (chainInfo: _ChainInfo): string | und
     blockExplorer = chainInfo?.cardanoInfo?.blockExplorer;
   } else if (_isPureBitcoinChain(chainInfo)) {
     blockExplorer = chainInfo?.bitcoinInfo?.blockExplorer;
+  } else if (_isPureTonChain(chainInfo)) {
+    blockExplorer = chainInfo?.tonInfo?.blockExplorer;
   } else {
     blockExplorer = chainInfo?.substrateInfo?.blockExplorer;
   }

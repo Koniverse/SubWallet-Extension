@@ -19,9 +19,10 @@ import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/
 import { findAllBridgeDestinations, findBridgeTransitDestination, findSwapTransitDestination, getBridgeStep, getSupportedSwapChains, getSwapAltToken, getSwapStep, getTokenPairFromStep, isChainsHasSameProvider, processStepsToPathActions, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
 import { ActionPair, BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, SwapRequestV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalSwapPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
-import { _SUPPORTED_SWAP_PROVIDERS, QuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
+import { _SUPPORTED_SWAP_PROVIDERS, ProcessedQuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
+import { SwapPath } from '@subwallet-monorepos/subwallet-services-sdk/services';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
@@ -48,7 +49,7 @@ export class SwapService implements StoppableServiceInterface {
   }
 
   private async askProvidersForQuote (_request: SwapRequestV2) {
-    const availableQuotes: QuoteAskResponse[] = [];
+    const availableQuotes: ProcessedQuoteAskResponse[] = [];
 
     // hotfix // todo: remove later
     const request = {
@@ -56,25 +57,36 @@ export class SwapService implements StoppableServiceInterface {
       isSupportKyberVersion: true
     };
 
-    const quotes = await subwalletApiSdk.swapApi?.fetchSwapQuoteData(request);
+    try {
+      const quotes = await subwalletApiSdk.swapApi.fetchSwapQuoteData(request);
 
-    if (Array.isArray(quotes)) {
-      quotes.forEach((quoteData) => {
-        if (!_SUPPORTED_SWAP_PROVIDERS.includes(quoteData.provider)) {
-          return;
-        }
+      if (Array.isArray(quotes)) {
+        quotes.forEach((quoteData) => {
+          if (!_SUPPORTED_SWAP_PROVIDERS.includes(quoteData.provider)) {
+            return;
+          }
 
-        if (!quoteData.quote || Object.keys(quoteData.quote).length === 0) {
-          return;
-        }
+          if (!quoteData.quote || Object.keys(quoteData.quote).length === 0) {
+            return;
+          }
 
-        if (!('errorClass' in quoteData.quote)) {
-          availableQuotes.push({ quote: quoteData.quote as SwapQuote | undefined });
-        } else {
-          availableQuotes.push({
-            error: new SwapError(quoteData.quote.errorType as SwapErrorType, quoteData.quote.message)
-          });
-        }
+          if (!('errorClass' in quoteData.quote)) {
+            availableQuotes.push({
+              quote: quoteData.quote as SwapQuote | undefined
+            });
+          } else {
+            availableQuotes.push({
+              error: new SwapError(
+                quoteData.quote.errorType as SwapErrorType,
+                quoteData.quote.message
+              )
+            });
+          }
+        });
+      }
+    } catch (err) {
+      availableQuotes.push({
+        error: new SwapError(SwapErrorType.ASSET_NOT_SUPPORTED)
       });
     }
 
@@ -306,7 +318,13 @@ export class SwapService implements StoppableServiceInterface {
   }
 
   public async getLatestQuoteFromSwapRequest (request: SwapRequestV2): Promise<{path: DynamicSwapAction[], swapQuoteResponse: SwapQuoteResponse}> {
-    const availablePath = await subwalletApiSdk.swapApi?.findAvailablePath(request);
+    let availablePath: SwapPath | undefined;
+
+    try {
+      availablePath = await subwalletApiSdk.swapApi.findAvailablePath(request);
+    } catch (e) {
+      console.log('Error findAvailablePath', e);
+    }
 
     if (!availablePath) {
       return {
@@ -553,7 +571,7 @@ export class SwapService implements StoppableServiceInterface {
       const { blockedActionsMap } = blockedActionsFeaturesMap;
 
       if (blockedActionsMap.swap.includes(currentAction)) {
-        return [new TransactionError(BasicTxErrorType.UNSUPPORTED, t('Feature under maintenance. Try again later'))];
+        return [new TransactionError(BasicTxErrorType.UNSUPPORTED, t('bg.SWAP.services.service.swap.featureUnderMaintenance'))];
       }
     }
 

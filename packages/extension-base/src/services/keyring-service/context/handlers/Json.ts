@@ -6,7 +6,7 @@ import { AccountProxyExtra, AccountProxyStoreData, AccountProxyType, KeyringPair
 import { combineAccountsWithKeyPair, convertAccountProxyType, createPromiseHandler, transformAccount } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
 import { createPair } from '@subwallet/keyring';
-import { KeypairType, KeyringPair$Json } from '@subwallet/keyring/types';
+import { KeypairType, KeyringPair, KeyringPair$Json } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { t } from 'i18next';
 
@@ -89,7 +89,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         throw new Error((e as Error).message);
       }
     } else {
-      throw new Error(t('Incorrect password'));
+      throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.incorrectPassword'));
     }
   }
 
@@ -102,7 +102,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         const _pair = keyring.createFromJson(file);
         const exists = this.state.checkAddressExists([_pair.address]);
 
-        assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || _pair.address } }));
+        assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Json.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || _pair.address } }));
 
         keyring.restoreAccount(file, password, withMasterPassword);
 
@@ -127,7 +127,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         reject(error);
       }
     } else {
-      reject(new Error(t('Incorrect password')));
+      reject(new Error(t('bg.ACCOUNT.services.keyring.handler.Json.incorrectPassword')));
     }
 
     return promise;
@@ -149,7 +149,21 @@ export class AccountJsonHandler extends AccountBaseHandler {
     if (jsons) {
       try {
         const { accountProxies, modifyPairs } = json;
-        const pairs = jsons.map((pair) => keyring.createFromJson(pair));
+
+        const pairs = jsons.reduce<KeyringPair[]>((rs, pair) => {
+          try {
+            rs.push(keyring.createFromJson(pair));
+          } catch (e) {
+            console.error(e);
+          }
+
+          return rs;
+        }, []);
+
+        if (!pairs?.length) {
+          throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.noValidAccountsToImport'));
+        }
+
         const accountProxyMap = combineAccountsWithKeyPair(pairs, modifyPairs, accountProxies);
 
         const result = Object.values(accountProxyMap).map((proxy): AccountProxyExtra => {
@@ -177,7 +191,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         throw new Error((e as Error).message);
       }
     } else {
-      throw new Error(t('Incorrect password'));
+      throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.incorrectPassword'));
     }
   }
 
@@ -187,8 +201,28 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
     if (jsons) {
       try {
-        const { accountProxies, modifyPairs } = file;
-        const pairs = jsons.map((pair) => keyring.createFromJson(pair));
+        const { accountProxies, modifyPairs: modifyPairsRestored } = file;
+        const modifyPairs: ModifyPairStoreData = {};
+        const pairs = jsons.reduce<KeyringPair[]>((rs, pairJson) => {
+          try {
+            const pair = keyring.createFromJson(pairJson);
+
+            if (modifyPairsRestored?.[pair.address]) {
+              modifyPairs[pair.address] = modifyPairsRestored[pair.address];
+            }
+
+            rs.push(pair);
+          } catch (e) {
+            console.error(e);
+          }
+
+          return rs;
+        }, []);
+
+        if (!pairs?.length) {
+          throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.noValidAccountsToImport'));
+        }
+
         const accountProxyMap = combineAccountsWithKeyPair(pairs, modifyPairs, accountProxies);
         const rawProxyIds = _proxyIds && _proxyIds.length ? _proxyIds : Object.keys(accountProxyMap);
         let _exists: { address: string; name: string; } | undefined;
@@ -220,9 +254,9 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
         if (!addresses.length) {
           if (_exists) {
-            throw new Error(t('Account already exists under the name {{name}}', { replace: { name: _exists.name || _exists.address || '' } }));
+            throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.accountAlreadyExistsWithName', { replace: { name: _exists.name || _exists.address || '' } }));
           } else {
-            throw new Error(t('No accounts found to import'));
+            throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.noAccountsFoundToImport'));
           }
         }
 
@@ -298,7 +332,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         throw new Error((error as Error).message);
       }
     } else {
-      reject(new Error(t('Incorrect password')));
+      reject(new Error(t('bg.ACCOUNT.services.keyring.handler.Json.incorrectPassword')));
     }
 
     return promise;
@@ -309,7 +343,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
     try {
       if (proxyIds && !proxyIds.length) {
-        throw new Error(t('No accounts found to export'));
+        throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.noAccountsFoundToExport'));
       }
 
       const _accountProxy = this.state.value.accountProxy;
@@ -333,7 +367,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
       const error = e as Error;
 
       if (error.message === 'Invalid master password') {
-        throw new Error(t('Incorrect password'));
+        throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.incorrectPassword'));
       } else {
         throw error;
       }

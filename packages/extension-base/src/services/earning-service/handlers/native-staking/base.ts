@@ -4,7 +4,8 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestBondingSubmit, SubmitJoinNativeStaking, SubmitYieldJoinData, TransactionData, ValidatorInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { STAKING_IDENTITY_API_SLUG } from '@subwallet/extension-base/services/earning-service/constants';
+import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestBondingSubmit, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, SubmitYieldJoinData, TransactionData, ValidatorInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 
 import { noop } from '@polkadot/util';
 
@@ -15,13 +16,14 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
   protected readonly name: string;
   protected readonly shortName: string;
   public slug: string;
-  protected readonly availableMethod: YieldPoolMethodInfo = {
+  public availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: false,
     cancelUnstake: true,
     withdraw: true,
-    claimReward: false
+    claimReward: false,
+    changeValidator: false
   };
 
   static generateSlug (symbol: string, chain: string): string {
@@ -39,6 +41,7 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
     this.slug = `${symbol}___native_staking___${_chainInfo.slug}`;
     this.name = `${_chainInfo.name} Native Staking`;
     this.shortName = _chainInfo.name.replaceAll(' Relay Chain', '');
+    this.canOverrideIdentity = !!STAKING_IDENTITY_API_SLUG[chain];
   }
 
   protected getDescription (amount = '0'): string {
@@ -54,49 +57,65 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
     return new Promise((resolve) => resolve(noop));
   }
 
+  abstract checkAccountHaveStake (useAddresses: string[]): Promise<Array<string>>;
+
   async getPoolRewardHistory (useAddresses: string[], callBack: (rs: EarningRewardHistoryItem) => void): Promise<VoidFunction> {
     let cancel = false;
     const haveSubscanService = this.state.subscanService.checkSupportedSubscanChain(this.chain);
+    const requestGroupId = this.state.subscanService.getGroupId();
 
     if (haveSubscanService) {
-      for (const address of useAddresses) {
-        if (cancel) {
-          break;
-        }
-
-        try {
-          const rs = await this.state.subscanService.getRewardHistoryList(this.chain, address);
-          const items = rs?.list;
-
-          if (items) {
-            for (const item of items) {
-              const now = new Date();
-              const isMillisecond = now.getTime().toString().length === item.block_timestamp.toString().length;
-              const timeStamp = isMillisecond ? item.block_timestamp : item.block_timestamp * 1000;
-
-              const data: EarningRewardHistoryItem = {
-                slug: this.slug,
-                type: this.type,
-                chain: this.chain,
-                address: address,
-                group: this.group,
-                blockTimestamp: timeStamp,
-                amount: item.amount,
-                eventIndex: item.event_index
-              };
-
-              callBack(data);
+      this.checkAccountHaveStake(useAddresses)
+        .then((activeAddresses) => {
+          for (const address of useAddresses) {
+            if (cancel) {
+              break;
             }
+
+            if (!activeAddresses.includes(address)) {
+              continue;
+            }
+
+            this.state.subscanService.getRewardHistoryList(requestGroupId, this.chain, address)
+              .then((rs) => {
+                const items = rs?.list;
+
+                if (cancel) {
+                  return;
+                }
+
+                if (items) {
+                  for (const item of items) {
+                    const now = new Date();
+                    const isMillisecond = now.getTime().toString().length === item.block_timestamp.toString().length;
+                    const timeStamp = isMillisecond ? item.block_timestamp : item.block_timestamp * 1000;
+
+                    const data: EarningRewardHistoryItem = {
+                      slug: this.slug,
+                      type: this.type,
+                      chain: this.chain,
+                      address: address,
+                      group: this.group,
+                      blockTimestamp: timeStamp,
+                      amount: item.amount,
+                      eventIndex: item.event_index
+                    };
+
+                    callBack(data);
+                  }
+                }
+              })
+              .catch(console.error);
           }
-        } catch (e) {
-          console.error(e);
-        }
-      }
+        })
+        .catch(console.error);
     }
 
-    return () => {
+    return Promise.resolve(() => {
+      console.log('Cancel get pool reward history', requestGroupId);
       cancel = false;
-    };
+      this.state.subscanService.cancelGroupRequest(requestGroupId);
+    });
   }
 
   /* Get pool reward */
@@ -143,7 +162,8 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
 
   async handleYieldJoin (_data: SubmitYieldJoinData, path: OptimalYieldPath, currentStep: number): Promise<HandleYieldStepData> {
     const data = _data as SubmitJoinNativeStaking;
-    const { address, amount, selectedValidators, slug } = data;
+    const { address, amount, selectedValidators, slug, subnetData } = data;
+
     const positionInfo = await this.getPoolPosition(address, slug);
     const [extrinsic] = await this.createJoinExtrinsic(data, positionInfo);
 
@@ -152,7 +172,8 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
       slug: this.slug,
       amount,
       address,
-      selectedValidators
+      selectedValidators,
+      subnetData
     };
 
     return {
@@ -178,6 +199,10 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
   /* Other action */
 
   async handleYieldClaimReward (address: string, bondReward?: boolean): Promise<TransactionData> {
+    return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+  }
+
+  async handleChangeEarningValidator (_data: SubmitChangeValidatorStaking): Promise<TransactionData> {
     return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
   }
 

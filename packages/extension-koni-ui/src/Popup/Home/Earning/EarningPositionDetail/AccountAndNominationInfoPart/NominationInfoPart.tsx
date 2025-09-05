@@ -47,7 +47,7 @@ function Component ({ className, compound,
   return (
     <CollapsiblePanel
       className={CN(className)}
-      title={t('Nomination info')}
+      title={t('ui.EARNING.screen.EarningPositionDetail.NominationInfoPart.nominationInfo')}
     >
       <MetaInfo
         labelColorScheme='gray'

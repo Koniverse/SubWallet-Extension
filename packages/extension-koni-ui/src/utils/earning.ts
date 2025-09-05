@@ -4,9 +4,9 @@
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { EarningTagType } from '@subwallet/extension-koni-ui/types';
 import { shuffle } from '@subwallet/extension-koni-ui/utils';
+import { TFunction } from 'i18next';
 import { CirclesThreePlus, Database, HandsClapping, Leaf, User, Users } from 'phosphor-react';
 
 // todo: after supporting Astar v3, remove this
@@ -108,7 +108,7 @@ export function autoSelectValidatorOptimally (validators: ValidatorInfo[], maxCo
   return result;
 }
 
-export const getEarningTimeText = (hours?: number) => {
+export const getEarningTimeText = (t: TFunction, hours?: number) => {
   if (hours !== undefined) {
     const isDay = hours > 24;
     const isHour = hours >= 1 && !isDay;
@@ -117,18 +117,18 @@ export const getEarningTimeText = (hours?: number) => {
 
     if (isDay) {
       time = Math.floor(hours / 24);
-      unit = detectTranslate(time > 1 ? 'days' : 'day');
+      unit = time > 1 ? t('ui.EARNING.util.earning.days') : t('ui.EARNING.util.earning.day');
     } else if (isHour) {
       time = hours;
-      unit = detectTranslate(time > 1 ? 'hours' : 'hour');
+      unit = time > 1 ? t('ui.EARNING.util.earning.hours') : t('ui.EARNING.util.earning.hour');
     } else {
       time = hours * 60;
-      unit = detectTranslate(time > 1 ? 'minutes' : 'minute');
+      unit = time > 1 ? t('ui.EARNING.util.earning.minutes') : t('ui.EARNING.util.earning.minute');
     }
 
     return [time, unit].join(' ');
   } else {
-    return detectTranslate('unknown time');
+    return t('ui.EARNING.util.earning.unknownTime');
   }
 };
 

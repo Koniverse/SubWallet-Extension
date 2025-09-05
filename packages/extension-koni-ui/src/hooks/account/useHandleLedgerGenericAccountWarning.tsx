@@ -26,28 +26,34 @@ export default function useHandleLedgerGenericAccountWarning (): HookType {
     const ledgerCheck = ledgerGenericAccountProblemCheck(accountProxy);
 
     if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(chainSlug)) {
+      let ledgerApp = 'Migration';
+
+      if (ledgerCheck === 'polkadot') {
+        ledgerApp = 'Polkadot';
+      } else if (ledgerCheck === 'polkadot_ecdsa') {
+        ledgerApp = 'Polkadot (EVM)';
+      }
+
       alertModal.open({
         closable: false,
-        title: t('Unsupported network'),
-        subtitle: t('Do you still want to get the address?'),
+        title: t('ui.ACCOUNT.hook.account.useHandleLedgerWarning.unsupportedNetwork'),
+        subtitle: t('ui.ACCOUNT.hook.account.useHandleLedgerWarning.confirmGetAddress'),
         type: NotificationType.WARNING,
         content: (
           <>
             <div>
-              {t(
-                'Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.',
-                {
-                  replace: {
-                    ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
-                    networkName: chainInfoMap[chainSlug]?.name
-                  }
+              {t('ui.ACCOUNT.hook.account.useHandleLedgerWarning.ledgerIncompatibleNetworkWarning', {
+                replace: {
+                  ledgerApp: ledgerApp,
+                  networkName: chainInfoMap[chainSlug]?.name
                 }
+              }
               )}
             </div>
           </>
         ),
         cancelButton: {
-          text: t('Cancel'),
+          text: t('ui.ACCOUNT.hook.account.useHandleLedgerWarning.cancel'),
           icon: XCircle,
           iconWeight: 'fill',
           onClick: () => {
@@ -56,7 +62,7 @@ export default function useHandleLedgerGenericAccountWarning (): HookType {
           schema: 'secondary'
         },
         okButton: {
-          text: t('Get address'),
+          text: t('ui.ACCOUNT.hook.account.useHandleLedgerWarning.getAddress'),
           icon: CheckCircle,
           iconWeight: 'fill',
           onClick: () => {

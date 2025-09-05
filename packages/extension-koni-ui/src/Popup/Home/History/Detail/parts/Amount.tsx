@@ -41,18 +41,18 @@ const Component: React.FC<Props> = (props: Props) => {
     switch (transactionType) {
       case ExtrinsicType.STAKING_BOND:
       case ExtrinsicType.STAKING_JOIN_POOL:
-        return t('Staking value');
+        return t('ui.HISTORY.screen.HistoryDetail.Amount.stakingValue');
       case ExtrinsicType.STAKING_WITHDRAW:
       case ExtrinsicType.STAKING_POOL_WITHDRAW:
-        return t('Withdraw value');
+        return t('ui.HISTORY.screen.HistoryDetail.Amount.withdrawValue');
       case ExtrinsicType.STAKING_UNBOND:
-        return t('Unstake value');
+        return t('ui.HISTORY.screen.HistoryDetail.Amount.unstakeValue');
       case ExtrinsicType.STAKING_CANCEL_UNSTAKE:
-        return t('Cancel unstake value');
+        return t('ui.HISTORY.screen.HistoryDetail.Amount.cancelUnstakeValue');
       case ExtrinsicType.CROWDLOAN:
-        return t('Contribute balance');
+        return t('ui.HISTORY.screen.HistoryDetail.Amount.contributeBalance');
       default:
-        return t('Amount');
+        return t('ui.HISTORY.screen.HistoryDetail.Amount.amount');
     }
   }, [t, transactionType]);
 
@@ -102,7 +102,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   let symbol = amount?.symbol;
 
-  if (data.type === ExtrinsicType.STAKING_UNBOND) {
+  if (data.type === ExtrinsicType.STAKING_UNBOND || data.type === ExtrinsicType.CHANGE_EARNING_VALIDATOR) {
     const additionalInfo = data.additionalInfo as RequestClaimBridge;
 
     if (additionalInfo?.symbol) {
@@ -126,14 +126,14 @@ const Component: React.FC<Props> = (props: Props) => {
       {isMint && amountDerivative && (
         <MetaInfo.Number
           decimals={0}
-          label={t('Estimated receivables')}
+          label={t('ui.HISTORY.screen.HistoryDetail.Amount.estimatedReceivables')}
           suffix={derivativeSymbol}
           value={amountDerivative}
         />
       )}
       {data.additionalInfo && isNft && (
         <MetaInfo.Default
-          label={t('Collection Name')}
+          label={t('ui.HISTORY.screen.HistoryDetail.Amount.collectionName')}
         >
           {(data.additionalInfo as TransactionAdditionalInfo[ExtrinsicType.SEND_NFT]).collectionName}
         </MetaInfo.Default>

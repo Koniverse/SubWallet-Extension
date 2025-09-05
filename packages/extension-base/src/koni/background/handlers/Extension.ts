@@ -169,7 +169,7 @@ export default class KoniExtension {
   private metadataApprove ({ id }: RequestMetadataApprove): boolean {
     const queued = this.#koniState.getMetaRequest(id);
 
-    assert(queued, t('Unable to proceed. Please try again'));
+    assert(queued, t('bg.koni.handler.Extension.unableToProceed'));
 
     const { request, resolve } = queued;
 
@@ -191,7 +191,7 @@ export default class KoniExtension {
   private metadataReject ({ id }: RequestMetadataReject): boolean {
     const queued = this.#koniState.getMetaRequest(id);
 
-    assert(queued, t('Unable to proceed. Please try again'));
+    assert(queued, t('bg.koni.handler.Extension.unableToProceed'));
 
     const { reject } = queued;
 
@@ -218,7 +218,7 @@ export default class KoniExtension {
   private signingApproveSignature ({ id, signature, signedTransaction }: RequestSigningApproveSignature): boolean {
     const queued = this.#koniState.getSignRequest(id);
 
-    assert(queued, t('Unable to proceed. Please try again'));
+    assert(queued, t('bg.koni.handler.Extension.unableToProceed'));
 
     const { resolve } = queued;
 
@@ -231,7 +231,7 @@ export default class KoniExtension {
   private signingCancel ({ id }: RequestSigningCancel): boolean {
     const queued = this.#koniState.getSignRequest(id);
 
-    assert(queued, t('Unable to proceed. Please try again'));
+    assert(queued, t('bg.koni.handler.Extension.unableToProceed'));
 
     const { reject } = queued;
 
@@ -490,7 +490,7 @@ export default class KoniExtension {
         return { ...result.json, publicKey: decodeAddress(address) };
       }
     } else {
-      throw Error(t('This is not an address'));
+      throw Error(t('bg.koni.handler.Extension.thisIsNotAnAddress'));
     }
   }
 
@@ -505,7 +505,7 @@ export default class KoniExtension {
 
       return true;
     } else {
-      throw Error(t('This is not an address'));
+      throw Error(t('bg.koni.handler.Extension.thisIsNotAnAddress'));
     }
   }
 
@@ -520,7 +520,7 @@ export default class KoniExtension {
 
       return true;
     } else {
-      throw Error(t('This is not an address'));
+      throw Error(t('bg.koni.handler.Extension.thisIsNotAnAddress'));
     }
   }
 
@@ -579,7 +579,7 @@ export default class KoniExtension {
   private authorizeApproveV2 ({ accounts, id }: RequestAuthorizeApproveV2): boolean {
     const queued = this.#koniState.getAuthRequestV2(id);
 
-    assert(queued, t('Unable to proceed. Please try again'));
+    assert(queued, t('bg.koni.handler.Extension.unableToProceed'));
 
     const { resolve } = queued;
 
@@ -591,7 +591,7 @@ export default class KoniExtension {
   private authorizeRejectV2 ({ id }: RequestAuthorizeReject): boolean {
     const queued = this.#koniState.getAuthRequestV2(id);
 
-    assert(queued, t('Unable to proceed. Please try again'));
+    assert(queued, t('bg.koni.handler.Extension.unableToProceed'));
 
     const { reject } = queued;
 
@@ -603,7 +603,7 @@ export default class KoniExtension {
   private authorizeCancelV2 ({ id }: RequestAuthorizeCancel): boolean {
     const queued = this.#koniState.getAuthRequestV2(id);
 
-    assert(queued, t('Unable to proceed. Please try again'));
+    assert(queued, t('bg.koni.handler.Extension.unableToProceed'));
 
     const { reject } = queued;
 
@@ -790,13 +790,13 @@ export default class KoniExtension {
     const typeInfoKey = typeInfoMap[authSwitchNetworkType];
 
     if (!typeInfoKey || !chainInfo[typeInfoKey]) {
-      throw new Error(t('Network {{networkKey}} is not {{authSwitchNetworkType}}', { replace: { networkKey, authSwitchNetworkType } }));
+      throw new Error(t('bg.koni.handler.Extension.networkNotAuthType', { replace: { networkKey, authSwitchNetworkType } }));
     }
 
     const authUrl = authUrls[url];
 
     if (!authUrl) {
-      throw new Error(t('Not found {{url}} in auth list', { replace: { url } }));
+      throw new Error(t('bg.koni.handler.Extension.urlNotFoundInAuthList', { replace: { url } }));
     }
 
     if (chainInfo && !_isChainEnabled(chainState)) {
@@ -804,7 +804,7 @@ export default class KoniExtension {
     }
 
     if (!authUrl.accountAuthTypes.includes(authSwitchNetworkType)) {
-      throw new Error(t('Network {{networkKey}} is not supported by {{authSwitchNetworkType}}', { replace: { networkKey, authSwitchNetworkType } }));
+      throw new Error(t('bg.koni.handler.Extension.networkNotSupportedByAuthType', { replace: { networkKey, authSwitchNetworkType } }));
     }
 
     authUrl.currentNetworkMap[authSwitchNetworkType] = networkKey;
@@ -1594,7 +1594,7 @@ export default class KoniExtension {
       const error = e as Error;
 
       if (error.message.includes('transfer amount exceeds balance')) {
-        error.message = t('Insufficient balance');
+        error.message = t('bg.koni.handler.Extension.insufficientBalance');
       }
 
       throw error;
@@ -1968,7 +1968,7 @@ export default class KoniExtension {
       const error = e as Error;
 
       if (error.message.includes('transfer amount exceeds balance')) {
-        error.message = t('Insufficient balance');
+        error.message = t('bg.koni.handler.Extension.insufficientBalance');
       }
 
       throw error;
@@ -2047,7 +2047,7 @@ export default class KoniExtension {
     const freeBalance = await this.getAddressTransferableBalance({ address: from, networkKey: chain, token: tokenSlug });
 
     if (new BigN(freeBalance.value).lt(inputAmount)) {
-      throw new Error(t('Insufficient balance'));
+      throw new Error(t('bg.koni.handler.Extension.insufficientBalance'));
     }
 
     const transferNativeAmount = isTransferNativeToken ? transferAmount.value : '0';
@@ -2228,9 +2228,10 @@ export default class KoniExtension {
 
   private async validateERC721Token (data: _ChainAsset): Promise<boolean> {
     const evmApi = this.#koniState.getEvmApi(data.originChain);
+    const contractAddress = data.metadata?.contractAddress;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const tokenContract = new evmApi.api.eth.Contract(_ERC721_ABI, data.metadata?.contractAddress);
+    const tokenContract = new evmApi.api.eth.Contract(_ERC721_ABI, contractAddress);
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
@@ -2240,7 +2241,7 @@ export default class KoniExtension {
     } catch (err) {
       const error = err as Error;
 
-      if (error.message.includes('ERC721Enumerable: owner index out of bounds')) {
+      if (error.message.includes('index out of bounds')) {
         return true;
       } else {
         return false;
@@ -2314,7 +2315,7 @@ export default class KoniExtension {
   }
 
   private async subscribeMaxTransferable (request: RequestSubscribeTransfer, id: string, port: chrome.runtime.Port): Promise<ResponseSubscribeTransfer> {
-    const { address, chain, destChain: _destChain, feeCustom, feeOption, to, token, tokenPayFeeSlug, value } = request;
+    const { address, chain, destChain: _destChain, feeCustom, feeOption, to, token, tokenPayFeeSlug, transferAll, value } = request;
     const cb = createSubscription<'pri(transfer.subscribe)'>(id, port);
 
     const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(token);
@@ -2352,7 +2353,8 @@ export default class KoniExtension {
       bitcoinApi: this.#koniState.chainService.getBitcoinApi(chain),
       isTransferLocalTokenAndPayThatTokenAsFee,
       isTransferNativeTokenAndPayLocalTokenAsFee,
-      nativeToken
+      nativeToken,
+      transferAll: transferAll
     };
 
     const subscription = combineLatest({
@@ -2802,7 +2804,7 @@ export default class KoniExtension {
   private qrSignSubstrate ({ address, data, networkKey }: RequestQrSignSubstrate): ResponseQrSignSubstrate {
     const pair = keyring.getPair(address);
 
-    assert(pair, t('Unable to find account'));
+    assert(pair, t('bg.koni.handler.Extension.unableToFindAccount'));
 
     if (pair.isLocked) {
       keyring.unlockPair(pair.address);
@@ -2825,13 +2827,13 @@ export default class KoniExtension {
     const network: _ChainInfo | null = this.getNetworkJsonByChainId(chainId);
 
     if (!network) {
-      throw new Error(t('Cannot find network'));
+      throw new Error(t('bg.koni.handler.Extension.cannotFindNetwork'));
     }
 
     const pair = keyring.getPair(address);
 
     if (!pair) {
-      throw Error(t('Unable to find account'));
+      throw Error(t('bg.koni.handler.Extension.unableToFindAccount'));
     }
 
     if (pair.isLocked) {
@@ -2852,7 +2854,7 @@ export default class KoniExtension {
       const tx: QrTransaction | null = createTransactionFromRLP(message);
 
       if (!tx) {
-        throw new Error(t('Failed to decode data. Please use a valid QR code'));
+        throw new Error(t('bg.koni.handler.Extension.failedToDecodeQr'));
       }
 
       const txObject: TransactionConfig = {
@@ -2949,7 +2951,7 @@ export default class KoniExtension {
     const chainStakingMetadata = await this.#koniState.getStakingMetadataByChain(chain, StakingType.NOMINATED);
 
     if (!chainStakingMetadata) {
-      const errMessage = t('Unable to fetch staking data. Re-enable "{{chainName}}" and try again.', { replace: { chainName: chainInfo.name } });
+      const errMessage = t('bg.koni.handler.Extension.unableToFetchStakingDataReEnable', { replace: { chainName: chainInfo.name } });
 
       return this.#koniState.transactionService
         .generateBeforeHandleResponseErrors([new TransactionError(StakingTxErrorType.CAN_NOT_GET_METADATA, errMessage)]);
@@ -3057,7 +3059,7 @@ export default class KoniExtension {
     const chainStakingMetadata = await this.#koniState.getStakingMetadataByChain(chain, StakingType.NOMINATED);
 
     if (!chainStakingMetadata) {
-      const errMessage = t('Unable to fetch staking data. Re-enable "{{chainName}}" and try again.', { replace: { chainName: chainInfo.name } });
+      const errMessage = t('bg.koni.handler.Extension.unableToFetchStakingDataReEnable', { replace: { chainName: chainInfo.name } });
 
       return this.#koniState.transactionService
         .generateBeforeHandleResponseErrors([new TransactionError(StakingTxErrorType.CAN_NOT_GET_METADATA, errMessage)]);
@@ -3091,7 +3093,7 @@ export default class KoniExtension {
 
     if (!chainStakingMetadata || !nominatorMetadata) {
       const chainInfo = this.#koniState.getChainInfo(chain);
-      const errMessage = t('Unable to fetch staking data. Re-enable "{{chainName}}" and try again.', { replace: { chainName: chainInfo?.name } });
+      const errMessage = t('bg.koni.handler.Extension.unableToFetchStakingDataReEnable', { replace: { chainName: chainInfo?.name } });
 
       return this.#koniState.transactionService
         .generateBeforeHandleResponseErrors([new TransactionError(StakingTxErrorType.CAN_NOT_GET_METADATA, errMessage)]);
@@ -3294,7 +3296,7 @@ export default class KoniExtension {
   private async signingApprovePasswordV2 ({ id }: RequestSigningApprovePasswordV2): Promise<boolean> {
     const queued = this.#koniState.getSignRequest(id);
 
-    assert(queued, t('Unable to proceed. Please try again'));
+    assert(queued, t('bg.koni.handler.Extension.unableToProceed'));
 
     const { reject, request, resolve } = queued;
     const pair = keyring.getPair(queued.address);
@@ -3305,7 +3307,7 @@ export default class KoniExtension {
     const { address } = pair;
 
     if (!pair) {
-      reject(new Error(t('Unable to find account')));
+      reject(new Error(t('bg.koni.handler.Extension.unableToFindAccount')));
 
       return false;
     }
@@ -4375,7 +4377,7 @@ export default class KoniExtension {
     });
   }
 
-  private async yieldGetEarningSlippage (params: RequestEarningSlippage) {
+  private async yieldGetEarningImpact (params: RequestEarningImpact) {
     const { slug } = params;
 
     const poolHandler = this.#koniState.earningService.getPoolHandler(slug);
@@ -4384,9 +4386,30 @@ export default class KoniExtension {
       return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(BasicTxErrorType.INVALID_PARAMS)]);
     }
 
-    const slippage = await this.#koniState.earningService.yieldGetEarningSlippage(params);
+    const slippage = await this.#koniState.earningService.yieldGetEarningImpact(params);
 
     return slippage;
+  }
+
+  private async handleYieldChangeValidator (params: SubmitChangeValidatorStaking) {
+    const { address, slug } = params;
+
+    const poolHandler = this.#koniState.earningService.getPoolHandler(slug);
+
+    if (!poolHandler) {
+      return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(BasicTxErrorType.INVALID_PARAMS)]);
+    }
+
+    const extrinsic = await this.#koniState.earningService.handleYieldChangeValidator(params);
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address,
+      chain: poolHandler.chain,
+      transaction: extrinsic,
+      data: params,
+      extrinsicType: ExtrinsicType.CHANGE_EARNING_VALIDATOR,
+      chainType: ChainType.SUBSTRATE
+    });
   }
 
   /* Campaign */
@@ -5386,9 +5409,10 @@ export default class KoniExtension {
         return await this.yieldSubmitCancelWithdrawal(request as RequestStakeCancelWithdrawal);
       case 'pri(yield.claimReward.submit)':
         return await this.yieldSubmitClaimReward(request as RequestStakeClaimReward);
-      case 'pri(yield.getEarningSlippage)':
-        return await this.yieldGetEarningSlippage(request as RequestEarningSlippage);
-
+      case 'pri(yield.getEarningImpact)':
+        return await this.yieldGetEarningImpact(request as RequestEarningImpact);
+      case 'pri(yield.changeValidator.submit)':
+        return await this.handleYieldChangeValidator(request as SubmitChangeValidatorStaking);
         /* Others */
 
         /* Actions */

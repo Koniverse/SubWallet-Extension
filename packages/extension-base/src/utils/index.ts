@@ -322,7 +322,7 @@ export async function waitTimeout (ms: number) {
 }
 
 export const stripUrl = (url: string): string => {
-  assert(url && (url.startsWith('http:') || url.startsWith('https:') || url.startsWith('ipfs:') || url.startsWith('ipns:')), t('Invalid URL for provider'));
+  assert(url && (url.startsWith('http:') || url.startsWith('https:') || url.startsWith('ipfs:') || url.startsWith('ipns:')), t('bg.utils.invalidUrlForProvider'));
 
   const parts = url.split('/');
 
@@ -414,3 +414,4 @@ export * from './registry';
 export * from './swap';
 export * from './translate';
 export * from './bitcoin';
+export * from './setup-api-sdk';

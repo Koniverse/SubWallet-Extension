@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
+import { ledgerMustCheckNetwork } from '@subwallet/extension-base/core/utils';
 import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { RECEIVE_QR_MODAL, RECEIVE_TOKEN_SELECTOR_MODAL, WARNING_LEDGER_RECEIVE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useConfirmModal, useGetAccountByAddress, useGetZkAddress, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ledgerMustCheckNetwork } from '@subwallet/extension-koni-ui/utils';
 import { ModalContext, SwList, SwModal, SwModalFuncProps } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
@@ -38,15 +38,15 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
 
   const confirmModalProps = useMemo((): SwModalFuncProps => ({
     id: WARNING_LEDGER_RECEIVE_MODAL,
-    title: t<string>('Unsupported network'),
+    title: t<string>('ui.ACCOUNT.components.Modal.Receive.TokensSelector.unsupportedNetwork'),
     maskClosable: true,
     closable: true,
-    subTitle: t<string>('Do you still want to get the address?'),
-    okText: t<string>('Get address'),
+    subTitle: t<string>('ui.ACCOUNT.components.Modal.Receive.TokensSelector.confirmGetAddress'),
+    okText: t<string>('ui.ACCOUNT.components.Modal.Receive.TokensSelector.getAddress'),
     okCancel: true,
     type: 'warn',
     cancelButtonProps: {
-      children: t<string>('Cancel'),
+      children: t<string>('ui.ACCOUNT.components.Modal.Receive.TokensSelector.cancel'),
       schema: 'secondary'
     },
     className: 'ledger-warning-modal'
@@ -77,14 +77,12 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
     return () => {
       if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(item.originChain)) {
         handleSimpleConfirmModal({
-          content: t<string>(
-            'Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.',
-            {
-              replace: {
-                ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
-                networkName: chainInfoMap[item.originChain]?.name
-              }
+          content: t('ui.ACCOUNT.components.Modal.Receive.TokensSelector.ledgerIncompatibleNetworkWarning', {
+            replace: {
+              ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
+              networkName: chainInfoMap[item.originChain]?.name
             }
+          }
           )
         })
           .then(() => {
@@ -108,14 +106,12 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
   const onPreCopy = useCallback((item: _ChainAsset, ledgerCheck: string) => {
     return () => {
       return handleSimpleConfirmModal({
-        content: t<string>(
-          'Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.',
-          {
-            replace: {
-              ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
-              networkName: chainInfoMap[item.originChain]?.name
-            }
+        content: t('ui.ACCOUNT.components.Modal.Receive.TokensSelector.ledgerIncompatibleNetworkWarning', {
+          replace: {
+            ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
+            networkName: chainInfoMap[item.originChain]?.name
           }
+        }
         )
       });
     };
@@ -151,7 +147,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
       className={`${className} chain-selector-modal`}
       id={modalId}
       onCancel={onCancel}
-      title={t('Select token')}
+      title={t('ui.ACCOUNT.components.Modal.Receive.TokensSelector.selectToken')}
     >
       <SwList.Section
         enableSearchInput={true}
@@ -161,7 +157,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
         renderWhenEmpty={renderEmpty}
         searchFunction={searchFunction}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('Search token')}
+        searchPlaceholder={t<string>('ui.ACCOUNT.components.Modal.Receive.TokensSelector.searchToken')}
       />
     </SwModal>
   );

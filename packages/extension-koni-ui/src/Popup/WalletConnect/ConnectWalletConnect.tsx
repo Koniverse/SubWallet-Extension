@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { WALLET_CONNECT_SESSION_TIMEOUT } from '@subwallet/extension-base/services/wallet-connect-service/constants';
 import { CloseIcon, Layout, QrScannerErrorNotice, WalletConnect } from '@subwallet/extension-koni-ui/components';
 import { TIME_OUT_RECORD } from '@subwallet/extension-koni-ui/constants';
 import { useDefaultNavigate, useOpenQrScanner } from '@subwallet/extension-koni-ui/hooks';
@@ -9,6 +10,7 @@ import { FormCallbacks, ScannerResult, Theme, ThemeProps } from '@subwallet/exte
 import { noop, validWalletConnectUri } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, Input, ModalContext, PageIcon, SwModal, SwQrScanner } from '@subwallet/react-ui';
 import CN from 'classnames';
+import { t } from 'i18next';
 import { Scan, XCircle } from 'phosphor-react';
 import { RuleObject } from 'rc-field-form/lib/interface';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -23,6 +25,11 @@ interface AddConnectionFormState {
   uri: string;
 }
 
+interface ConnectionError {
+  message: string;
+  isConnectionBlockedError?: boolean;
+}
+
 const DEFAULT_FORM_VALUES: AddConnectionFormState = {
   uri: ''
 };
@@ -33,6 +40,9 @@ const scannerId = 'connect-connection-scanner-modal';
 const showScanner = true;
 const keyRecords = 'unsuccessful_connect_wc_modal';
 let idTimeOut: NodeJS.Timeout;
+const connectionErrorDefault: ConnectionError = {
+  message: t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectionUnsuccessfulReviewGuide')
+};
 
 const getTimeOutRecords = () => {
   return JSON.parse(localStorage.getItem(TIME_OUT_RECORD) || '{}') as Record<string, number>;
@@ -46,6 +56,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { token } = useTheme() as Theme;
 
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
+  const [connectionError, setConnectionError] = useState<ConnectionError>(connectionErrorDefault);
   const isActiveModal = useMemo(() => checkActive(modalId), [checkActive]);
   const [, setTimeOutRecords] = useLocalStorage(TIME_OUT_RECORD, {});
   const [form] = Form.useForm<AddConnectionFormState>();
@@ -66,7 +77,7 @@ const Component: React.FC<Props> = (props: Props) => {
     const timeOutRecord = getTimeOutRecords();
 
     if (loading && !isActiveModal && !timeOutRecord[keyRecords]) {
-      idTimeOut = setTimeout(reOpenModalWhenTimeOut, 20000);
+      idTimeOut = setTimeout(reOpenModalWhenTimeOut, WALLET_CONNECT_SESSION_TIMEOUT);
       setTimeOutRecords({ ...timeOutRecord, [keyRecords]: idTimeOut });
     } else if (timeOutRecord[keyRecords]) {
       setLoading(false);
@@ -86,21 +97,50 @@ const Component: React.FC<Props> = (props: Props) => {
     };
   }, [form, inactiveModal, setTimeOutRecords]);
 
+  const convertWCErrorMessage = useCallback((e: Error): ConnectionError => {
+    const message = e.message.toLowerCase();
+    let newStandardMessage = t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectionUnsuccessfulReviewGuide');
+    let isConnectionBlockedError = false;
+
+    if (message.includes('socket hang up') || message.includes('stalled') || message.includes('interrupted')) {
+      newStandardMessage = t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.turnOffVpnAdBlocker');
+      isConnectionBlockedError = true;
+    }
+
+    if (message.includes('failed for host')) {
+      newStandardMessage = t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.turnOffNetworksOrPrivacyApps');
+      isConnectionBlockedError = true;
+    }
+
+    return { message: newStandardMessage, isConnectionBlockedError };
+  }, [t]);
+
   const footerModalWC = useMemo(() => {
+    if (connectionError?.isConnectionBlockedError) {
+      return (
+        <div className={'__footer-wc-modal'}>
+          <Button
+            block={true}
+            onClick={onClickToFAQ(true)}
+          >{t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.iUnderstand')}</Button>
+        </div>
+      );
+    }
+
     return (
       <div className={'__footer-wc-modal'}>
         <Button
           block={true}
           onClick={onClickToFAQ(true)}
           schema={'secondary'}
-        >{t('Dismiss')}</Button>
+        >{t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.dismiss')}</Button>
         <Button
           block={true}
           onClick={onClickToFAQ(false)}
-        >{t('Review guide')}</Button>
+        >{t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.reviewGuide')}</Button>
       </div>
     );
-  }, [onClickToFAQ, t]);
+  }, [connectionError?.isConnectionBlockedError, onClickToFAQ, t]);
 
   const onConnect = useCallback((uri: string) => {
     setLoading(true);
@@ -109,12 +149,13 @@ const Component: React.FC<Props> = (props: Props) => {
       uri
     })
       .then(noop)
-      .catch((e) => {
+      .catch((e: Error) => {
         console.error(e);
         setLoading(false);
+        setConnectionError(convertWCErrorMessage(e));
         activeModal(modalId);
       });
-  }, [activeModal]);
+  }, [convertWCErrorMessage, activeModal]);
 
   const onFinish: FormCallbacks<AddConnectionFormState>['onFinish'] = useCallback((values: AddConnectionFormState) => {
     const { uri } = values;
@@ -174,7 +215,7 @@ const Component: React.FC<Props> = (props: Props) => {
       className={CN(className)}
       onBack={goBack}
       rightFooterButton={{
-        children: t('Connect'),
+        children: t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.connect'),
         onClick: form.submit,
         loading: loading,
         icon: (
@@ -193,11 +234,11 @@ const Component: React.FC<Props> = (props: Props) => {
         icon: <CloseIcon />,
         onClick: goHome
       }]}
-      title={t('WalletConnect')}
+      title={t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.walletConnect')}
     >
       <div className='body-container'>
         <div className='description'>
-          {t('By clicking "Connect", you allow this dapp to view your public address')}
+          {t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectToViewPublicAddress')}
         </div>
         <div className='page-icon'>
           <PageIcon
@@ -223,7 +264,7 @@ const Component: React.FC<Props> = (props: Props) => {
             rules={[
               {
                 required: true,
-                message: t('URI is required')
+                message: t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.uriIsRequired')
               },
               {
                 validator: uriValidator
@@ -233,8 +274,8 @@ const Component: React.FC<Props> = (props: Props) => {
           >
             <Input
               disabled={loading}
-              label={t('URI')}
-              placeholder={t('Please type or paste or scan URI')}
+              label={t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.uri')}
+              placeholder={t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.typePasteScanUri')}
               suffix={(
                 <>
                   {
@@ -278,7 +319,7 @@ const Component: React.FC<Props> = (props: Props) => {
         footer={footerModalWC}
         id={modalId}
         onCancel={onClickToFAQ(true)}
-        title={t('Connection unsuccessful')}
+        title={t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectionUnsuccessful')}
       >
         <div className='__wc-modal-container'>
           <div className='page-icon'>
@@ -291,7 +332,7 @@ const Component: React.FC<Props> = (props: Props) => {
             />
           </div>
           <div className={'__wc-modal-content'}>
-            {t('Connection unsuccessful. Review our user guide and try connecting again.')}
+            {connectionError.message}
           </div>
         </div>
       </SwModal>

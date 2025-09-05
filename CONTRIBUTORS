@@ -1,20 +1,20 @@
-    3094	AnhMTV                        	Release version 1.3.46
+    3174	AnhMTV                        	Update chain-list to beta version
     2671	Nam Phạm                      	disable block explorer for truth network
-    2587	S2kael                        	[Issue-4187] Feat: Update UI stake
-     871	bluezdot                      	chores: update content
+    2599	S2kael                        	[Issue-4521] Update stable version for chain-list
+     951	bluezdot                      	
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
      568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
+     530	Frenkie Nguyen                	[Issue-4065] update styling(2)
      465	Jaco                          	0.42.5 (#969)
-     459	Frenkie Nguyen                	[Issue-4263] hide custom fee for Bitcoin
+     391	tunghp2002                    	[Issue-4626] Extension - Update logic show logo for earning position detail
      355	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
-     291	tunghp2002                    	[Feat] Rollback subwallet api and rename api
-     271	lw                            	[Issue-4486] fix: Temporarily hardcode to disable "Advanced address conversion" to prevent errors
+     278	lw                            	[Issue-4512] refactor: Update swap submission content
+     242	PDTnhah                       	[Issue-4616] Update chainlist stable v0.2.113
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
-     185	PDTnhah                       	[Issue-465][Chainlist] Remove more inactive networks in the Polkadot ecosystem
      185	quangdo                       	
      170	lw-cdm                        	
+     165	Thiendekaco                   	[Issue-3753] feat(dApp): add notification when dapp connection but network does not exist
      160	Automation Bot                	[CI Skip] Auto increase webapp build number
-     115	Thiendekaco                   	
      104	khainh                        	predefine metadata for Polkadot & Kusama chains
       83	Hieu Dao                      	Update README.md
       83	leewong                       	
@@ -30,13 +30,14 @@
        9	Minh Le                       	
        9	minhld1029                    	[#115] [ForgetAccount] catch exception refList undefined
        7	Ivan Rukhavets                	Mention derivation in FAQ (#334)
+       6	thiendekaco                   	
        6	unknown                       	refactor code
        5	anhnhu                        	[issue-2231]: add condition branch_name webapp-dev auto increase run scripts change build number
-       5	thiendekaco                   	[Issue-4100] fix: throw success target error code to Dapp #
        4	Amaury Martiny                	PostMessageProvider with on('connected' | 'disconnected') (#279)
        4	namph                         	update UI for nft
        4	Quangdm-cdm                   	
        3	Antoine Estienne              	Add eth test for extension signature (#909)
+       3	bluezdot                      	[Issue-4606] chores: migrate to remove cached earning options
        3	quangdm                       	Update style for Auth Transaction Screen, Export Screen, Derive Screen
        2	Axel Chalon                   	Add typings to messages (#130)
        2	Bartłomiej Rutkowski          	Allow account creation by derivation from existing one (#296)
