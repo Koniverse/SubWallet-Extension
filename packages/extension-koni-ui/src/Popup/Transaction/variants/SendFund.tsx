@@ -441,6 +441,27 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     (part: Partial<TransferParams>, values: TransferParams) => {
       const validateField: Set<string> = new Set();
 
+      const timestamp = Date.now();
+
+      const resetValueField = () => {
+        setIsTransferAll(false);
+        form.setFieldValue('value', undefined);
+        setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${timestamp}`);
+      };
+
+      const resetToFieldErrors = () => {
+        form.setFields([{ name: 'to', errors: [] }]);
+      };
+
+      const resetValueFieldErrors = () => {
+        form.setFields([{ name: 'value', errors: [] }]);
+      };
+
+      const resetTransactionFee = () => {
+        setCurrentTokenPayFee(defaultTokenPayFee);
+        setSelectedTransactionFee(undefined);
+      };
+
       if (part.asset) {
         const chain = assetRegistry[part.asset].originChain;
 
@@ -452,10 +473,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         const newAssetInfo = assetRegistry[part.asset];
         const newHideMaxButton = determineHideMaxButton(chain, chain, newAssetInfo, chainInfoMap);
 
-        if (newHideMaxButton) {
-          setIsTransferAll(false);
-          form.setFieldValue('value', undefined);
-          setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${Date.now()}`);
+        if (newHideMaxButton && isTransferAll) {
+          resetValueField();
         }
 
         setAddressInputRenderKey(`${defaultAddressInputRenderKey}-${Date.now()}`);
@@ -464,32 +483,27 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         setTransferInfo(undefined);
       }
 
-      if (part.destChain || part.chain || part.value || part.asset) {
-        form.setFields([
-          {
-            name: 'to',
-            errors: []
-          },
-          {
-            name: 'value',
-            errors: []
-          }
-        ]);
+      if (part.destChain) {
+        const chain = values.chain;
+        const destChain = part.destChain;
+        const assetInfo = assetRegistry[values.asset];
+        const newHideMaxButton = determineHideMaxButton(chain, destChain, assetInfo, chainInfoMap);
+
+        if (newHideMaxButton && isTransferAll) {
+          resetValueField();
+        }
+
+        form.resetFields(['to']);
+        resetTransactionFee();
       }
 
-      if (part.destChain) {
-        form.resetFields(['to']);
-        setCurrentTokenPayFee(defaultTokenPayFee);
-        setSelectedTransactionFee(undefined);
+      if (part.destChain || part.chain || part.value || part.asset) {
+        resetToFieldErrors();
+        resetValueFieldErrors();
       }
 
       if (part.to) {
-        form.setFields([
-          {
-            name: 'to',
-            errors: []
-          }
-        ]);
+        resetToFieldErrors();
       }
 
       if (validateField.size) {
@@ -498,7 +512,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
       persistData(form.getFieldsValue());
     },
-    [persistData, form, assetRegistry, chainInfoMap, defaultTokenPayFee]
+    [persistData, form, assetRegistry, chainInfoMap, isTransferAll, defaultTokenPayFee]
   );
 
   const isShowWarningOnSubmit = useCallback((values: TransferParams): boolean => {
@@ -904,13 +918,13 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue, isTransferAll]);
 
   useEffect(() => {
-    if (isTransferAll && transferInfo?.maxTransferable) {
+    if (isTransferAll && transferInfo?.maxTransferable && !hideMaxButton) {
       form.setFieldsValue({
         value: transferInfo?.maxTransferable
       });
       setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${Date.now()}`);
     }
-  }, [form, isTransferAll, transferInfo]);
+  }, [form, hideMaxButton, isTransferAll, transferInfo]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');
