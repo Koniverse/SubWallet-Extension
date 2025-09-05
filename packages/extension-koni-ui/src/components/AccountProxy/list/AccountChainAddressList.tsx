@@ -8,7 +8,7 @@ import { AccountChainAddressItem, GeneralEmptyList } from '@subwallet/extension-
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useGetAccountChainAddresses, useGetBitcoinAccounts, useHandleLedgerAccountWarning, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AccountChainAddress, AccountInfoType, AccountTokenAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { copyToClipboard, runNestedWarningModalHandlers } from '@subwallet/extension-koni-ui/utils';
+import { copyToClipboard, runPriorityWarningModalHandlers } from '@subwallet/extension-koni-ui/utils';
 import { isBitcoinAddress } from '@subwallet/keyring';
 import { BitcoinAddressType } from '@subwallet/keyring/types';
 import { getBitcoinAddressInfo } from '@subwallet/keyring/utils/address/validate';
@@ -180,7 +180,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         }
       }
 
-      runNestedWarningModalHandlers([
+      runPriorityWarningModalHandlers([
         [onHandleTonAccountWarning, item.accountType],
         [onHandleLedgerGenericAccountWarning, { accountProxy, chainSlug: item.slug }],
         [onHandleLedgerAccountWarning, { accountProxy, targetSlug: item.slug, context: 'useNetwork' }]
@@ -218,7 +218,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
         }
       }
 
-      runNestedWarningModalHandlers([
+      runPriorityWarningModalHandlers([
         [onHandleTonAccountWarning, item.accountType],
         [onHandleLedgerGenericAccountWarning, { accountProxy, chainSlug: item.slug }],
         [onHandleLedgerAccountWarning, { accountProxy, targetSlug: item.slug, context: 'useNetwork' }]

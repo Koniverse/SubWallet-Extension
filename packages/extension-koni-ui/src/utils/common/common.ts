@@ -38,31 +38,38 @@ export const getLogoByNetworkKey = (networkKey: string, defaultLogo = 'default')
   return ChainLogoMap[networkKey] || ChainLogoMap[defaultLogo] || ChainLogoMap.default;
 };
 
-type WarningHandler<P> = (param: P, next: VoidFunction) => void;
+type WarningHandler<P> = (param: P, onComplete: VoidFunction) => boolean;
 
 /**
- * Executes a series of warning handler functions in a nested chain of modals.
+ * Executes a series of warning handler functions sequentially with priority.
  *
  * Logic:
- * - This function takes an array of warning handlers and parameters, and chains them together to run sequentially.
- * - Each handler function is wrapped in a closure that ensures it runs after the previous handler completes.
- * - The handlers are processed in reverse order using `reduceRight`, so the last handler in the array runs first.
- * - After all handlers are executed, the provided `onComplete` callback is triggered.
+ * - Iterates through the array of warning handlers in order.
+ * - Each handler receives its associated parameter and the `onComplete` callback.
+ * - If a handler returns `true` (active), the chain stops immediately.
+ *   The handler is responsible for calling `onComplete` when it finishes.
+ * - If a handler returns `false`, processing continues to the next handler.
+ * - If no handler is active, `onComplete` is called after all handlers have run.
  *
- * @param {Array} handlers - An array of tuples, where each tuple contains a warning handler function
- *                            and its associated parameter. These handlers will be executed in a nested
- *                            sequence.
- * @param {VoidFunction} onComplete - A callback function to be called when all handlers have been executed.
+ * @param {Array} handlers - An array of tuples: [handler function, its parameter].
+ * @param {VoidFunction} onComplete - Callback function to be called when processing is complete.
  */
-export function runNestedWarningModalHandlers<
+export function runPriorityWarningModalHandlers<
   THandlers extends readonly [WarningHandler<any>, any][]
 > (
   handlers: [...THandlers],
   onComplete: VoidFunction
 ): void {
-  const chain = handlers
-    .map(([fn, param]) => (next: VoidFunction) => () => fn(param, next))
-    .reduceRight((next, wrap) => wrap(next), onComplete);
+  for (const [fn, param] of handlers) {
+    // Call the handler with param and onComplete
+    const handled = fn(param, onComplete);
 
-  chain();
+    if (handled) {
+      // If the handler is active, stop processing further handlers
+      return;
+    }
+  }
+
+  // If no handler was active, call onComplete at the end
+  onComplete();
 }
