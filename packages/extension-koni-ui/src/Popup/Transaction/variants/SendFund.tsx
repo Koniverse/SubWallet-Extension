@@ -91,7 +91,7 @@ function getTokenAvailableDestinations (tokenSlug: string, xcmRefMap: Record<str
   return result;
 }
 
-const calculateHideMaxButton = (chain: string, destChain: string, assetInfo: _ChainAsset, chainInfoMap: Record<string, _ChainInfo>) => {
+const determineHideMaxButton = (chain: string, destChain: string, assetInfo: _ChainAsset, chainInfoMap: Record<string, _ChainInfo>) => {
   const chainInfo = chainInfoMap[chain];
 
   if (_isPolygonChainBridge(chain, destChain) || _isPosChainBridge(chain, destChain)) {
@@ -171,7 +171,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [chainValue, destChainValue, getCurrentConfirmation]);
 
   const hideMaxButton = useMemo(() => {
-    return calculateHideMaxButton(chainValue, destChainValue, assetInfo, chainInfoMap);
+    return determineHideMaxButton(chainValue, destChainValue, assetInfo, chainInfoMap);
   }, [chainInfoMap, chainValue, destChainValue, assetInfo]);
 
   const disabledToAddressInput = useMemo(() => {
@@ -450,7 +450,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           to: ''
         });
         const newAssetInfo = assetRegistry[part.asset];
-        const newHideMaxButton = calculateHideMaxButton(chain, chain, newAssetInfo, chainInfoMap);
+        const newHideMaxButton = determineHideMaxButton(chain, chain, newAssetInfo, chainInfoMap);
 
         if (newHideMaxButton) {
           setIsTransferAll(false);
