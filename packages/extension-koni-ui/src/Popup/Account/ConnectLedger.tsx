@@ -34,7 +34,7 @@ export const funcSortByName = (a: ChainItemType, b: ChainItemType) => {
 };
 
 const LIMIT_PER_PAGE = 5;
-const CONNECT_LEDGER_USER_GUIDE_URL = `${USER_GUIDE_URL}/account-management/connect-ledger-device`;
+const CONNECT_LEDGER_USER_GUIDE_URL = `${USER_GUIDE_URL}/cold-wallet-management/connect-ledger-devices`;
 
 const FooterIcon = (
   <Icon

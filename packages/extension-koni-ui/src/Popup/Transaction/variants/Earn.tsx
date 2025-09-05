@@ -7,8 +7,8 @@ import { _handleDisplayForEarningError, _handleDisplayInsufficientEarningError }
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountSignMode, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
-import { addLazy, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
+import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
+import { addLazy } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { EarningProcessItem } from '@subwallet/extension-koni-ui/components/Earning';
@@ -24,7 +24,7 @@ import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, submitProces
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, getSignModeByAccountProxy, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, getExtrinsicTypeByPoolInfo, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -289,18 +289,10 @@ const Component = () => {
       return [];
     }
 
-    const isIgnoreSubstrateEcdsaLedger = !isSubstrateEcdsaLedgerAssetSupported(inputAsset, chainInfo);
-
     const result: AccountAddressItemType[] = [];
 
     accountProxies.forEach((ap) => {
       if (!(!fromAccountProxy || ap.id === fromAccountProxy)) {
-        return;
-      }
-
-      const signMode = getSignModeByAccountProxy(ap);
-
-      if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && isIgnoreSubstrateEcdsaLedger) {
         return;
       }
 
@@ -320,7 +312,7 @@ const Component = () => {
     });
 
     return result;
-  }, [accountProxies, chainInfoMap, fromAccountProxy, getReformatAddress, inputAsset, poolChain]);
+  }, [accountProxies, chainInfoMap, fromAccountProxy, getReformatAddress, poolChain]);
 
   const onFieldsChange: FormCallbacks<EarnParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // TODO: field change
@@ -905,41 +897,7 @@ const Component = () => {
 
   const onPreCheck = usePreCheckAction(fromValue);
 
-  const exType = useMemo(() => {
-    if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING) {
-      return ExtrinsicType.STAKING_BOND;
-    }
-
-    if (poolType === YieldPoolType.LIQUID_STAKING) {
-      if (chainValue === 'moonbeam') {
-        return ExtrinsicType.MINT_STDOT;
-      }
-
-      if (chainValue === 'bifrost_dot') {
-        if (slug === 'MANTA___liquid_staking___bifrost_dot') {
-          return ExtrinsicType.MINT_VMANTA;
-        }
-
-        return ExtrinsicType.MINT_VDOT;
-      }
-
-      if (chainValue === 'parallel') {
-        return ExtrinsicType.MINT_SDOT;
-      }
-
-      if (chainValue === 'acala') {
-        return ExtrinsicType.MINT_LDOT;
-      }
-    }
-
-    if (poolType === YieldPoolType.LENDING) {
-      if (chainValue === 'interlay') {
-        return ExtrinsicType.MINT_QDOT;
-      }
-    }
-
-    return ExtrinsicType.STAKING_BOND;
-  }, [poolType, chainValue, slug]);
+  const exType = useMemo(() => getExtrinsicTypeByPoolInfo({ chain: chainValue, type: poolType, slug }), [poolType, chainValue, slug]);
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);

@@ -23,6 +23,7 @@ type Props = ThemeProps & {
   priceId?: string;
   symbol: string;
   isSupportBuyTokens: boolean;
+  isSupportSendFund: boolean;
   isSupportSwap: boolean;
   isShrink: boolean;
   isChartSupported?: boolean;
@@ -39,6 +40,7 @@ function Component (
     isChartSupported,
     isShrink,
     isSupportBuyTokens,
+    isSupportSendFund,
     isSupportSwap,
     onClickBack,
     onOpenBuyTokens,
@@ -97,6 +99,7 @@ function Component (
           />
           <div className={'__button-space'} />
           <Button
+            disabled={!isSupportSendFund}
             icon={(
               <Icon
                 phosphorIcon={PaperPlaneTilt}
