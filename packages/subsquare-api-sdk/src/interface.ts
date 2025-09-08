@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export interface Referendum {
+  _id: string;
   referendumIndex: number;
   proposer: string;
   title: string;
@@ -240,6 +241,7 @@ export interface ReferendaQueryParams {
 export interface ReferendaQueryParamsWithTrack {
   page?: number;
   page_size?: number;
+  ongoing?: boolean;
   status?: string;
   simple?: boolean;
 }

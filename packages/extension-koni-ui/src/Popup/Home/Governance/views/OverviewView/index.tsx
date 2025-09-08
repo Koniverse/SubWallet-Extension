@@ -2,14 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
+import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
-import { Button } from '@subwallet/react-ui';
-import { ALL_TRACK_ID, GovStatusKey, Referendum } from '@subwallet/subsquare-api-sdk';
+import { ActivityIndicator } from '@subwallet/react-ui';
+import { ALL_TRACK_ID, GOV_COMPLETED_STATES, GOV_ONGOING_STATES, GovStatusKey, Referendum } from '@subwallet/subsquare-api-sdk';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import React, { useCallback, useState } from 'react';
+import React, { Context, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import styled, { ThemeContext } from 'styled-components';
 
 import { ChainSelector } from './parts/ChainSelector';
 import { QuickActionsContainer } from './parts/QuickActionsContainer';
@@ -24,24 +25,21 @@ type Props = ThemeProps & ViewBaseType & {
 
 const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, onChangeChain, sdkInstance }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
+  const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const [selectedReferendaCategory, setSelectedReferendaCategory] = useState<ReferendaCategory>(ReferendaCategory.ONGOING);
-  const onClickReferendumItem = useCallback((item: Referendum) => {
-    goReferendumDetail(`${item.referendumIndex}`);
-  }, [goReferendumDetail]);
-
-  const onGoUnlockToken = useCallback(() => {
-    goUnlockToken();
-  }, [goUnlockToken]);
-
   const [isEnableTreasuryFilter, setIsEnableTreasuryFilter] = useState(false);
   const [statusSelected, setStatusSelected] = useState<GovStatusKey>(GovStatusKey.ALL);
   const [trackSelected, setTrackSelected] = useState<string>(ALL_TRACK_ID);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [referendaItems, setReferendaItems] = useState<Referendum[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+  const { data, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: [
       GOV_QUERY_KEYS.referendaList(chainSlug),
       {
         is_treasury: isEnableTreasuryFilter,
+        ongoing: selectedReferendaCategory === ReferendaCategory.ONGOING,
         status: statusSelected !== GovStatusKey.ALL ? statusSelected : undefined,
         track: trackSelected !== ALL_TRACK_ID ? trackSelected : undefined
       }
@@ -49,6 +47,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
     queryFn: async ({ pageParam, queryKey }) => {
       const [, filters] = queryKey as [string, {
         is_treasury?: boolean;
+        ongoing?: boolean;
         status?: string;
         track?: string;
       }];
@@ -58,6 +57,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
           page: pageParam,
           page_size: 20,
           status: filters.status,
+          ongoing: filters.ongoing,
           simple: true
         });
       }
@@ -66,6 +66,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
         page: pageParam,
         page_size: 20,
         is_treasury: filters.is_treasury,
+        ongoing: filters.ongoing,
         status: filters.status,
         simple: true
       });
@@ -83,14 +84,74 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
     staleTime: 60 * 1000
   });
 
+  const onClickReferendumItem = useCallback((item: Referendum) => {
+    goReferendumDetail(`${item.referendumIndex}`);
+  }, [goReferendumDetail]);
+
+  const onGoUnlockToken = useCallback(() => {
+    goUnlockToken();
+  }, [goUnlockToken]);
+
   const handleLoadMore = useCallback(() => {
-    fetchNextPage().catch((err) => console.error('Failed to load more:', err));
+    setIsLoadingMore(true);
+    fetchNextPage()
+      .catch((err) => console.error('Failed to load more:', err))
+      .finally(() => {
+        setTimeout(() => setIsLoadingMore(false), 500);
+      });
   }, [fetchNextPage]);
 
-  const items = (data?.pages.flatMap((page) => page?.items ?? []) || []);
+  const onScroll = useCallback(() => {
+    if (containerRef.current && hasNextPage && !isLoadingMore) {
+      const { clientHeight, scrollHeight, scrollTop } = containerRef.current;
+
+      if (scrollTop + clientHeight >= scrollHeight - 50) {
+        handleLoadMore();
+      }
+    }
+  }, [handleLoadMore, hasNextPage, isLoadingMore]);
+
+  useEffect(() => {
+    const items = (data?.pages.flatMap((page) => page?.items ?? []) || []);
+
+    const filterFunc = (item: Referendum) => {
+      const stateName = item.state.name;
+
+      if (selectedReferendaCategory === ReferendaCategory.ONGOING) {
+        return GOV_ONGOING_STATES.includes(stateName);
+      }
+
+      if (selectedReferendaCategory === ReferendaCategory.COMPLETED) {
+        return GOV_COMPLETED_STATES.includes(stateName);
+      }
+
+      if (selectedReferendaCategory === ReferendaCategory.VOTED) {
+        return false;
+      }
+
+      return false;
+    };
+
+    const filteredItems = items.filter(filterFunc);
+
+    setReferendaItems((prevState) => {
+      if (prevState.length === filteredItems.length) {
+        containerRef.current?.scrollTo({
+          top: containerRef.current.scrollTop - 300,
+          behavior: 'smooth'
+        });
+      }
+
+      return filteredItems;
+    });
+  }, [data?.pages, selectedReferendaCategory]);
 
   return (
-    <div className={className}>
+    <div
+      className={className}
+      onScroll={onScroll}
+      ref={containerRef}
+    >
       <div className='__view-header-area'>
         <div className='__view-title-area'>
           <div className='__view-title'>{t('Governance')}</div>
@@ -121,19 +182,14 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
 
       <ReferendaList
         chain={chainSlug}
-        items={items}
+        items={referendaItems}
         onClickItem={onClickReferendumItem}
         selectedReferendaCategory={selectedReferendaCategory}
       />
 
-      {hasNextPage && selectedReferendaCategory !== ReferendaCategory.VOTED && (
-        <div style={{ textAlign: 'center', marginTop: '16px' }}>
-          <Button
-            disabled={isFetchingNextPage}
-            onClick={handleLoadMore}
-          >
-            {isFetchingNextPage ? t('Loading...') : t('Load more')}
-          </Button>
+      {isLoadingMore && selectedReferendaCategory !== ReferendaCategory.VOTED && (
+        <div className='__load-more-container'>
+          <ActivityIndicator size={token.sizeXL} />
         </div>
       )}
     </div>
@@ -142,6 +198,8 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
 
 export const OverviewView = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
+    height: '100%',
+    overflowY: 'auto',
     '.__view-header-area': {
       backgroundColor: token.colorBgDefault,
       borderBottomLeftRadius: 16,
@@ -167,6 +225,11 @@ export const OverviewView = styled(Component)<Props>(({ theme: { token } }: Prop
       overflow: 'hidden',
       'white-space': 'nowrap',
       flex: 1
+    },
+
+    '.__load-more-container': {
+      textAlign: 'center',
+      marginBottom: token.margin
     }
   };
 });
