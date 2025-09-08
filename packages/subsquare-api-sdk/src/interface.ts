@@ -260,10 +260,10 @@ export interface ReferendumVoteDetail {
   isStandard: boolean;
   isSplit: boolean;
   isSplitAbstain: boolean;
-  balance: string;
+  balance?: string;
   aye?: boolean;
   conviction: number;
-  votes: string;
+  votes?: string;
   abstainBalance?: string,
   abstainVotes?: string,
   ayeBalance?: string,
