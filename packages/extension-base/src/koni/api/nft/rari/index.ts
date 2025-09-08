@@ -9,7 +9,7 @@ const options = {
   method: 'GET',
   headers: {
     accept: 'application/json',
-    'X-API-KEY': 'ed9df6bf-7eba-4ca2-8a42-9006706be064'
+    'X-API-KEY': '7a3ab50c-815b-4288-a945-1390bffd95ae'
   }
 };
 
@@ -49,6 +49,7 @@ export class RariNftApi extends BaseNftApi {
   }
 
   public async handleNfts (params: HandleNftParams): Promise<void> {
+    console.log('params', params);
     const collectionMap = new Map<string, string>();
     const size = 4;
     const waitTime = 1000;
