@@ -4,7 +4,7 @@
 export const _STAKING_CHAIN_GROUP = {
   relay: ['polkadot', 'kusama', 'aleph', 'polkadex', 'ternoa', 'alephTest', 'polkadexTest', 'westend', 'kate', 'edgeware', 'creditcoin', 'vara_network', 'goldberg_testnet', 'availTuringTest', 'avail_mainnet', 'vara_testnet', 'dentnet', 'cere', 'statemine', 'statemint', 'westend_assethub'],
   assetHub: ['statemine', 'statemint', 'westend_assethub'],
-  para: ['moonbeam', 'moonriver', 'moonbase', 'turing', 'turingStaging', 'bifrost', 'bifrost_testnet', 'calamari_test', 'calamari', 'manta_network', 'polimec', 'energy_web_x_rococo', 'energy_web_x_testnet', 'energy_web_x'],
+  para: ['moonbeam', 'moonriver', 'moonbase', 'turing', 'turingStaging', 'bifrost', 'bifrost_testnet', 'calamari_test', 'calamari', 'manta_network', 'polimec'],
   astar: ['astar', 'shiden', 'shibuya'],
   amplitude: ['amplitude', 'amplitude_test', 'kilt', 'kilt_peregrine', 'pendulum', 'krest_network'], // amplitude and kilt only share some common logic
   kilt: ['kilt', 'kilt_peregrine'],
@@ -17,6 +17,7 @@ export const _STAKING_CHAIN_GROUP = {
   krest_network: ['krest_network'],
   manta: ['manta_network'],
   bittensor: ['bittensor', 'bittensor_testnet'],
+  energy: ['energy_web_x_testnet', 'energy_web_x'],
   mythos: ['mythos', 'muse_testnet']
 };
 

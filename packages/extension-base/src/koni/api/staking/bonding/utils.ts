@@ -387,6 +387,8 @@ export function getYieldAvailableActionsByType (yieldPoolInfo: YieldPoolInfo): Y
 
     if (_STAKING_CHAIN_GROUP.para.includes(chain)) {
       return [YieldAction.STAKE, YieldAction.UNSTAKE, YieldAction.WITHDRAW, YieldAction.CANCEL_UNSTAKE];
+    } else if (_STAKING_CHAIN_GROUP.energy.includes(chain)) {
+      return [YieldAction.STAKE, YieldAction.UNSTAKE, YieldAction.WITHDRAW, YieldAction.CANCEL_UNSTAKE];
     } else if (_STAKING_CHAIN_GROUP.astar.includes(chain)) {
       return [YieldAction.STAKE, YieldAction.CLAIM_REWARD, YieldAction.UNSTAKE, YieldAction.WITHDRAW];
     } else if (_STAKING_CHAIN_GROUP.amplitude.includes(chain)) {

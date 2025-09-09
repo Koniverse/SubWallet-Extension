@@ -52,7 +52,7 @@ export const EARNING_DATA_RAW = {
       icon: 'Coins',
       title: 'Unstake and withdraw',
       description:
-        'Once staked, your funds will be locked. Unstake your funds anytime and withdraw after a period of <strong>{periodNumb}</strong>. Keep in mind that these actions are <strong>not automated</strong> and will incur network fees',
+        'Once staked, your funds will be locked. Unstake your funds anytime and they will be <strong>automatically withdrawn</strong> to your account. Keep in mind that the unstaking action will incur network fees',
       iconColor: '#e6dc25'
     },
     {
