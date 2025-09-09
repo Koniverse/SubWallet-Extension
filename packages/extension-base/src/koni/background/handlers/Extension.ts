@@ -2224,22 +2224,45 @@ export default class KoniExtension {
     const evmApi = this.#koniState.getEvmApi(data.originChain);
     const contractAddress = data.metadata?.contractAddress;
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    if (!contractAddress) {
+      return false;
+    }
+
     const tokenContract = new evmApi.api.eth.Contract(_ERC721_ABI, contractAddress);
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      await tokenContract.methods.tokenOfOwnerByIndex('0xB7fdD27a8Df011816205a6e3cAA097DC4D8C2C5d', 1).call();
+      // Check if the contract supports the ERC-721 interface
+      const supportsERC721 = await tokenContract.methods.supportsInterface('0x80ac58cd').call();
 
-      return true;
+      if (!supportsERC721) {
+        console.error('Contract does not support ERC-721 interface');
+
+        return false;
+      }
+
+      // Check for IERC721Enumerable interface (optional)
+      const supportsEnumerable = await tokenContract.methods.supportsInterface('0x780e9d63').call();
+
+      if (supportsEnumerable) {
+        await tokenContract.methods.tokenOfOwnerByIndex('0xB7fdD27a8Df011816205a6e3cAA097DC4D8C2C5d', 1).call();
+
+        return true;
+      } else {
+        // Check balanceOf for additional validation
+        await tokenContract.methods.balanceOf('0xB7fdD27a8Df011816205a6e3cAA097DC4D8C2C5d').call();
+
+        return true;
+      }
     } catch (err) {
       const error = err as Error;
 
       if (error.message.includes('index out of bounds')) {
-        return true;
-      } else {
-        return false;
+        return true; // Contract is ERC-721, index is invalid
       }
+
+      console.error('Error validating ERC-721 contract:', err);
+
+      return false;
     }
   }
 

@@ -49,7 +49,6 @@ export class RariNftApi extends BaseNftApi {
   }
 
   public async handleNfts (params: HandleNftParams): Promise<void> {
-    console.log('params', params);
     const collectionMap = new Map<string, string>();
     const size = 4;
     const waitTime = 1000;
