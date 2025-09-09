@@ -139,7 +139,7 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain, selectedC
       return (
         <div
           className={'__group-label'}
-          key={(item as ListItemGroupLabel).id}
+          key={(item as ListItemGroupLabel).id + '-label'}
         >
           {(item as ListItemGroupLabel).groupLabel}
         </div>
@@ -150,7 +150,7 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain, selectedC
 
     return (
       <ChainSelectorItem
-        balanceValue={chainBalanceMap[_item.chainSlug]?.free?.value}
+        balanceValue={chainBalanceMap[_item.chainSlug]?.total?.value}
         chainName={_item.chainName}
         chainSlug={_item.chainSlug}
         className={'__selector-item'}
