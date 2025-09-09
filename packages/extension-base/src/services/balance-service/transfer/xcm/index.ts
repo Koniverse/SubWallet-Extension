@@ -172,7 +172,13 @@ export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
     const originDryRunRs = dryRunResult.origin;
 
     if (originDryRunRs.success) {
-      const { assetHub, bridgeHub, destination } = dryRunResult;
+      const { assetHub, bridgeHub, destination, hops } = dryRunResult;
+
+      for (const hop of hops) {
+        if (!hop.result.success) {
+          return false;
+        }
+      }
 
       if (assetHub?.success === false || bridgeHub?.success === false || destination?.success === false) {
         if (destination?.success === false) {

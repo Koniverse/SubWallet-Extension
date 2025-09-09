@@ -214,7 +214,7 @@ export const findSoloNextDerive = (parentAddress: string): NextDerivePair => {
 
   }
 
-  assert(parentPair, t('Unable to find account'));
+  assert(parentPair, t('bg.ACCOUNT.utils.account.deriveSoloInfo.unableToFindAccount'));
 
   const deriveInfo = getSoloDerivationInfo(parentPair.type, parentPair.meta);
   const needChangeRoot = deriveInfo.depth > 0;
@@ -230,7 +230,7 @@ export const findSoloNextDerive = (parentAddress: string): NextDerivePair => {
     rootPair = parentPair;
   }
 
-  assert(rootPair, t('Unable to find parent account'));
+  assert(rootPair, t('bg.ACCOUNT.utils.account.deriveSoloInfo.unableToFindParentAccount'));
 
   const rootAddress = rootPair.address;
   const currentDepth = deriveInfo.depth;

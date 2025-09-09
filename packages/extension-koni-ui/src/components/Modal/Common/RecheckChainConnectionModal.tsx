@@ -27,15 +27,15 @@ const Component: React.FC<Props> = (props: Props) => {
             block={true}
             onClick={onClickConfirm}
           >
-            {t('Update')}
+            {t('ui.NETWORK.components.Modal.Common.RecheckChainConnection.update')}
           </Button>
         )}
         id={modalId}
         onCancel={onCancel}
-        title={t('Update network')}
+        title={t('ui.NETWORK.components.Modal.Common.RecheckChainConnection.updateNetwork')}
       >
         <div className={'__message'}>
-          {t('Your selected network has lost connection. Update it by re-enabling it or changing network provider.')}
+          {t('ui.NETWORK.components.Modal.Common.RecheckChainConnection.selectedNetworkConnectionLost')}
         </div>
       </SwModal>
     </>

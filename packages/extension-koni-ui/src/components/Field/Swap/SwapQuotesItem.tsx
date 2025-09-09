@@ -78,7 +78,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
               {isRecommend && (
                 <div className='__best-tag'>
-                  {t('Best')}
+                  {t('ui.SWAP.components.Field.Swap.QuotesItem.best')}
                 </div>
               )}
             </span>
@@ -95,7 +95,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
           <div className={'__line-2 __line'}>
             <div className='__line-label'>
-              <span className={'__est-receive-label'}>{t('Est. receive')}</span>
+              <span className={'__est-receive-label'}>{t('ui.SWAP.components.Field.Swap.QuotesItem.estReceive')}</span>
             </div>
 
             <div className='__line-value'>
@@ -110,7 +110,7 @@ const Component: React.FC<Props> = (props: Props) => {
           </div>
 
           <div className={'__line-3 __line'}>
-            <div className='__line-label'>{t('Fee')}</div>
+            <div className='__line-label'>{t('ui.SWAP.components.Field.Swap.QuotesItem.fee')}</div>
             <div className='__line-value'>
               <NumberDisplay
                 decimal={0}
@@ -123,7 +123,7 @@ const Component: React.FC<Props> = (props: Props) => {
           </div>
 
           <div className={'__line-4 __line hidden'}>
-            <div className='__line-label'>{t('Process')}</div>
+            <div className='__line-label'>{t('ui.SWAP.components.Field.Swap.QuotesItem.process')}</div>
             <div className='__line-value'>
               <TransactionProcessPreview chains={[]} />
             </div>
