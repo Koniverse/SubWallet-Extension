@@ -36,7 +36,7 @@ const groupOrdinal = (group: YieldGroupInfo): number => {
     return 3;
   } else if (group.group === 'KSM-Kusama') {
     return 2;
-  } else if (group.group === 'bittensor-NATIVE-TAO') {
+  } else if (group.chain === 'bittensor') {
     return 1;
   } else {
     return 0;
