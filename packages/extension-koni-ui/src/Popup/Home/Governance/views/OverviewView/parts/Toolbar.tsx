@@ -16,6 +16,10 @@ type Props = ThemeProps & {
   onChangeCategory: (category: ReferendaCategory) => void;
   selectedReferendaCategory: ReferendaCategory;
   isEnableTreasuryFilter: boolean;
+  isEnableVotedFilter: boolean;
+  isEnableDelegatedFilter: boolean;
+  setIsEnableVotedFilter: (value: boolean) => void;
+  setIsEnableDelegatedFilter: (value: boolean) => void;
   setIsEnableTreasuryFilter: (value: boolean) => void;
   statusSelected: GovStatusKey;
   setStatusSelected: (value: GovStatusKey) => void;
@@ -25,9 +29,9 @@ type Props = ThemeProps & {
   chain: string;
 };
 
-const Component = ({ chain, className, isEnableTreasuryFilter, onChangeCategory,
-  sdkInstance, selectedReferendaCategory, setIsEnableTreasuryFilter, setStatusSelected,
-  setTrackSelected, statusSelected, trackSelected }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasuryFilter,
+  isEnableVotedFilter, onChangeCategory, sdkInstance, selectedReferendaCategory,
+  setIsEnableDelegatedFilter, setIsEnableTreasuryFilter, setIsEnableVotedFilter, setStatusSelected, setTrackSelected, statusSelected, trackSelected }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { activeModal, inactiveModal } = useContext(ModalContext);
 
@@ -102,11 +106,15 @@ const Component = ({ chain, className, isEnableTreasuryFilter, onChangeCategory,
         <GovFilterModal
           chain={chain}
           id={govFilterModalId}
+          isEnableDelegatedFilter={isEnableDelegatedFilter}
           isEnableTreasuryFilter={isEnableTreasuryFilter}
+          isEnableVotedFilter={isEnableVotedFilter}
           onApplyFilter={onApplyFilter}
           onCancel={onCancelFilter}
           sdkInstance={sdkInstance}
+          setIsEnableDelegatedFilter={setIsEnableDelegatedFilter}
           setIsEnableTreasuryFilter={setIsEnableTreasuryFilter}
+          setIsEnableVotedFilter={setIsEnableVotedFilter}
           setStatusSelected={setStatusSelected}
           setTrackSelected={setTrackSelected}
           statusSelected={statusSelected}

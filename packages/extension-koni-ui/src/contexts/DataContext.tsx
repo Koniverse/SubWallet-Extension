@@ -269,7 +269,7 @@ export const DataContextProvider = ({ children }: DataContextProviderProps) => {
   _DataContext.addHandler({ ...subscribeUnreadNotificationCount, name: 'subscribeUnreadNotificationCount', relatedStores: ['notification'], isStartImmediately: true });
 
   // OpenGov
-  _DataContext.addHandler({ ...subscribeGovLockedInfo, name: 'subscribeGovLockedInfo', relatedStores: ['openGov'], isStartImmediately: true });
+  _DataContext.addHandler({ ...subscribeGovLockedInfo, name: 'subscribeGovLockedInfo', relatedStores: ['openGov'] });
 
   return <Provider store={store}>
     <PersistGate persistor={persistor}>

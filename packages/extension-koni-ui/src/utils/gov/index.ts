@@ -4,7 +4,6 @@
 import { GOV_ONGOING_STATES, GovStatusKey, Referendum, ReferendumDetail, Tally } from '@subwallet/subsquare-api-sdk';
 import BigNumber from 'bignumber.js';
 
-// HMM
 export const GOV_QUERY_KEYS = {
   referendaList: (chainSlug: string) =>
     ['subsquare', 'referendaList', chainSlug] as const,

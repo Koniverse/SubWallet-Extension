@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetGovLockedInfos, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon } from '@subwallet/react-ui';
 import { CaretLeft } from 'phosphor-react';
@@ -20,9 +20,9 @@ const Component = ({ className, goOverview }: Props): React.ReactElement<Props> 
   const onBack = useCallback(() => {
     goOverview();
   }, [goOverview]);
-  const govLockedInfo = useSelector((state) => state.openGov.govLockedInfos);
+  const govLockedInfos = useGetGovLockedInfos();
 
-  console.log('govLockedInfo', govLockedInfo);
+  console.log('govLockedInfo', govLockedInfos);
 
   return (
     <div className={className}>

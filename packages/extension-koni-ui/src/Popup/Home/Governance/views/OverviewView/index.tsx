@@ -1,9 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useGetGovLockedInfos, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ReferendumWithVoting, UserVoting } from '@subwallet/extension-koni-ui/types/gov';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { ActivityIndicator } from '@subwallet/react-ui';
 import { ALL_TRACK_ID, GOV_COMPLETED_STATES, GOV_ONGOING_STATES, GovStatusKey, Referendum } from '@subwallet/subsquare-api-sdk';
@@ -28,11 +30,14 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const [selectedReferendaCategory, setSelectedReferendaCategory] = useState<ReferendaCategory>(ReferendaCategory.ONGOING);
   const [isEnableTreasuryFilter, setIsEnableTreasuryFilter] = useState(false);
+  const [isEnableVotedFilter, setIsEnableVotedFilter] = useState(false);
+  const [isEnableDelegatedFilter, setIsEnableDelegatedFilter] = useState(false);
   const [statusSelected, setStatusSelected] = useState<GovStatusKey>(GovStatusKey.ALL);
   const [trackSelected, setTrackSelected] = useState<string>(ALL_TRACK_ID);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [referendaItems, setReferendaItems] = useState<Referendum[]>([]);
+  const [referendaItems, setReferendaItems] = useState<ReferendumWithVoting[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const govLockedInfos = useGetGovLockedInfos();
 
   const { data, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: [
@@ -125,14 +130,60 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
         return GOV_COMPLETED_STATES.includes(stateName);
       }
 
-      if (selectedReferendaCategory === ReferendaCategory.VOTED) {
-        return false;
-      }
-
       return false;
     };
 
     const filteredItems = items.filter(filterFunc);
+
+    const extended: ReferendumWithVoting[] = filteredItems.map((item) => {
+      const trackId = Number(item.trackInfo.id);
+
+      const userVoting: UserVoting[] = [];
+
+      (govLockedInfos || []).forEach((acc) => {
+        if (acc.chain !== chainSlug) {
+          return;
+        }
+
+        const track = acc.tracks?.find((t) => Number(t.trackId) === trackId);
+
+        if (!track) {
+          return;
+        }
+
+        const votesForThisRef = track.votes?.find(
+          (v) => Number(v.referendumIndex) === item.referendumIndex
+        );
+
+        const delegation = track.delegation ? { ...track.delegation } : undefined;
+
+        if (votesForThisRef || delegation) {
+          userVoting.push({
+            address: acc.address,
+            trackId,
+            votes: votesForThisRef,
+            delegation
+          });
+        }
+      });
+
+      return {
+        ...item,
+        userVoting: userVoting.length > 0 ? userVoting : undefined
+      };
+    });
+
+    const filteredExtended = extended.filter((ref) => {
+      if (isEnableVotedFilter) {
+        return !!ref.userVoting?.some((u) => u.votes);
+      }
+
+      if (isEnableDelegatedFilter) {
+        return !!ref.userVoting?.some((u) => u.delegation);
+      }
+
+      return true;
+    });
 
     setReferendaItems((prevState) => {
       if (prevState.length === filteredItems.length) {
@@ -142,9 +193,9 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
         });
       }
 
-      return filteredItems;
+      return filteredExtended;
     });
-  }, [data?.pages, selectedReferendaCategory]);
+  }, [data?.pages, selectedReferendaCategory, govLockedInfos, chainSlug, isEnableVotedFilter, isEnableDelegatedFilter]);
 
   return (
     <div
@@ -169,11 +220,15 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
 
       <Toolbar
         chain={chainSlug}
+        isEnableDelegatedFilter={isEnableDelegatedFilter}
         isEnableTreasuryFilter={isEnableTreasuryFilter}
+        isEnableVotedFilter={isEnableVotedFilter}
         onChangeCategory={setSelectedReferendaCategory}
         sdkInstance={sdkInstance}
         selectedReferendaCategory={selectedReferendaCategory}
+        setIsEnableDelegatedFilter={setIsEnableDelegatedFilter}
         setIsEnableTreasuryFilter={setIsEnableTreasuryFilter}
+        setIsEnableVotedFilter={setIsEnableVotedFilter}
         setStatusSelected={setStatusSelected}
         setTrackSelected={setTrackSelected}
         statusSelected={statusSelected}

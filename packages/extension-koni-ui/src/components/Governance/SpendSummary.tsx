@@ -3,7 +3,6 @@
 
 import { useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Logo } from '@subwallet/react-ui';
 import { SpendItem } from '@subwallet/subsquare-api-sdk';
 import BigNumber from 'bignumber.js';
 import React from 'react';

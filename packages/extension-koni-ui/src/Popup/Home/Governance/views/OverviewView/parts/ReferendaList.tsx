@@ -5,6 +5,7 @@ import { EmptyList } from '@subwallet/extension-koni-ui/components';
 import { ReferendumItem } from '@subwallet/extension-koni-ui/components/Governance';
 import { ReferendaCategory } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ReferendumWithVoting } from '@subwallet/extension-koni-ui/types/gov';
 import { Referendum } from '@subwallet/subsquare-api-sdk';
 import { t } from 'i18next';
 import { ListChecks } from 'phosphor-react';
@@ -14,7 +15,7 @@ import styled from 'styled-components';
 type Props = ThemeProps & {
   onClickItem: (item: Referendum) => void;
   chain: string;
-  items: Referendum[];
+  items: ReferendumWithVoting[];
   selectedReferendaCategory: ReferendaCategory
 };
 

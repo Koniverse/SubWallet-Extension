@@ -7,7 +7,7 @@ import { GovernanceStore, ReduxStatus } from '@subwallet/extension-koni-ui/store
 
 const initialState: GovernanceStore = {
   reduxStatus: ReduxStatus.INIT,
-  govLockedInfos: []  
+  govLockedInfos: []
 };
 
 const governanceSlice = createSlice({
@@ -15,8 +15,6 @@ const governanceSlice = createSlice({
   initialState,
   reducers: {
     updateGovLockedInfo (state, action: PayloadAction<GovVotingInfo[]>): GovernanceStore {
-      console.log('Reducer got govLockedInfo', [state, action.payload]);
-
       return {
         ...state,
         govLockedInfos: action.payload,

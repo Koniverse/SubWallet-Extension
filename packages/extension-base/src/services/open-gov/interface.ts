@@ -131,11 +131,37 @@ export interface VotingFor {
   casting?: Casting;
   delegating?: Delegating;
 }
+
 export interface GovVotingInfo {
   chain: string;
   address: string;
-  delegated: string;
-  voted: string;
-  unlocking: string;
-  unlockable: string;
+  summary: {
+    delegated: string;
+    voted: string;
+    unlocking: string;
+    unlockable: string;
+  };
+  tracks: GovTrackVoting[];
+}
+
+export interface GovTrackVoting {
+  trackId: number;
+  votes?: GovVoteDetail[];
+  delegation?: GovDelegationDetail;
+}
+
+export interface GovVoteDetail {
+  referendumIndex: string;
+  type: GovVoteType;
+  conviction: Conviction;
+  amount?: string;
+  ayeAmount?: string;
+  nayAmount?: string;
+  abstainAmount?: string;
+}
+
+export interface GovDelegationDetail {
+  balance: string;
+  target: string;
+  conviction: Conviction;
 }

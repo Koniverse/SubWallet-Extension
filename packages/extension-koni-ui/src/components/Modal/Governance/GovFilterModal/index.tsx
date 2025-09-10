@@ -19,11 +19,15 @@ interface Props extends ThemeProps {
   chain: string;
   onCancel: () => void;
   isEnableTreasuryFilter: boolean;
+  isEnableVotedFilter: boolean;
+  isEnableDelegatedFilter: boolean;
   title?: string;
   onApplyFilter?: () => void;
   closeIcon?: React.ReactNode;
   applyFilterButtonTitle?: string;
   setIsEnableTreasuryFilter: (value: boolean) => void;
+  setIsEnableVotedFilter: (value: boolean) => void;
+  setIsEnableDelegatedFilter: (value: boolean) => void;
   statusSelected: GovStatusKey;
   setStatusSelected: (value: GovStatusKey) => void;
   trackSelected: string;
@@ -33,7 +37,7 @@ interface Props extends ThemeProps {
 
 function Component (props: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
-  const { applyFilterButtonTitle, chain, className = '', closeIcon, id, isEnableTreasuryFilter, onApplyFilter, onCancel, sdkInstance, setIsEnableTreasuryFilter, setStatusSelected, setTrackSelected, statusSelected, title, trackSelected } = props;
+  const { applyFilterButtonTitle, chain, className = '', closeIcon, id, isEnableDelegatedFilter, isEnableTreasuryFilter, isEnableVotedFilter, onApplyFilter, onCancel, sdkInstance, setIsEnableDelegatedFilter, setIsEnableTreasuryFilter, setIsEnableVotedFilter, setStatusSelected, setTrackSelected, statusSelected, title, trackSelected } = props;
 
   const filterModalFooter = useMemo(() => {
     return (
@@ -77,6 +81,14 @@ function Component (props: Props): React.ReactElement<Props> {
     }
   }, [isEnableTreasuryFilter, setIsEnableTreasuryFilter, setTrackSelected]);
 
+  const applyVotedFilter = useCallback(() => {
+    setIsEnableVotedFilter(!isEnableVotedFilter);
+  }, [isEnableVotedFilter, setIsEnableVotedFilter]);
+
+  const applyDelegatedFilter = useCallback(() => {
+    setIsEnableDelegatedFilter(!isEnableDelegatedFilter);
+  }, [isEnableDelegatedFilter, setIsEnableDelegatedFilter]);
+
   return (
     <SwModal
       className={CN(className)}
@@ -104,6 +116,48 @@ function Component (props: Props): React.ReactElement<Props> {
           <Switch
             checked={isEnableTreasuryFilter}
             onClick={applyTreasuryFilter}
+          />
+        </div>
+      </div>
+      <div className='__filter-part'>
+        <Tooltip
+          placement={'topRight'}
+          title={t('Voted')}
+        >
+          <div className='__filter-left-part'>{t('Voted')}
+            <Icon
+              iconColor='white'
+              phosphorIcon={Info}
+              size='sm'
+              weight='fill'
+            />
+          </div>
+        </Tooltip>
+        <div className='__item-right-part'>
+          <Switch
+            checked={isEnableVotedFilter}
+            onClick={applyVotedFilter}
+          />
+        </div>
+      </div>
+      <div className='__filter-part'>
+        <Tooltip
+          placement={'topRight'}
+          title={t('Delegated')}
+        >
+          <div className='__filter-left-part'>{t('Delegated')}
+            <Icon
+              iconColor='white'
+              phosphorIcon={Info}
+              size='sm'
+              weight='fill'
+            />
+          </div>
+        </Tooltip>
+        <div className='__item-right-part'>
+          <Switch
+            checked={isEnableDelegatedFilter}
+            onClick={applyDelegatedFilter}
           />
         </div>
       </div>

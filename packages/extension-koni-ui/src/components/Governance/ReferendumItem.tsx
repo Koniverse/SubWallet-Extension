@@ -1,22 +1,21 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NumberDisplay, ReferendumStatusTag, ReferendumTrackTag, ReferendumVoteProgressBar } from '@subwallet/extension-koni-ui/components';
+import { ReferendumStatusTag, ReferendumTrackTag, ReferendumVoteProgressBar } from '@subwallet/extension-koni-ui/components';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ReferendumWithVoting } from '@subwallet/extension-koni-ui/types/gov';
 import { getMinApprovalThreshold, getTallyVotesBarPercent, getTimeLeft } from '@subwallet/extension-koni-ui/utils/gov';
-import { Icon } from '@subwallet/react-ui';
-import { Referendum } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
-import { CircleHalf, ThumbsDown, ThumbsUp } from 'phosphor-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import ReferendumVoteSummary from './ReferendumVoteSummary';
 import SpendSummary from './SpendSummary';
 
 type Props = ThemeProps & {
   onClick?: VoidFunction;
-  item: Referendum;
+  item: ReferendumWithVoting;
   chain: string;
 };
 
@@ -75,58 +74,10 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
       <>
         <div className='__i-separator' />
         <div className='__i-vote-summary-area'>
-
-          <div className='__i-vote-summary'>
-            <div className={'__i-vote-summary-label'}>
-              {t('Voted')}:&nbsp;
-            </div>
-
-            <div className={'__i-vote-stat -aye'}>
-              <NumberDisplay
-                className={'__i-vote-stat-value'}
-                decimal={0}
-                value={20}
-              />
-
-              <Icon
-                className={'__i-vote-stat-icon'}
-                customSize={'12px'}
-                phosphorIcon={ThumbsUp}
-                weight={'fill'}
-              />
-            </div>
-
-            <div className={'__i-vote-stat -abstain'}>
-              <NumberDisplay
-                className={'__i-vote-stat-value'}
-                decimal={0}
-                value={20}
-              />
-
-              <Icon
-                className={'__i-vote-stat-icon'}
-                customSize={'12px'}
-                phosphorIcon={CircleHalf}
-                weight={'fill'}
-              />
-            </div>
-
-            <div className={'__i-vote-stat -nay'}>
-              <NumberDisplay
-                className={'__i-vote-stat-value'}
-                decimal={0}
-                value={20}
-              />
-
-              <Icon
-                className={'__i-vote-stat-icon'}
-                customSize={'12px'}
-                phosphorIcon={ThumbsDown}
-                weight={'fill'}
-              />
-            </div>
-          </div>
-
+          <ReferendumVoteSummary
+            chain={chain}
+            userVoting={item.userVoting}
+          />
           {timeLeft && (
             <div className='__i-reject-time'>
               {t('{{status}} in {{time}}', {
@@ -206,45 +157,8 @@ const ReferendumItem = styled(Component)<Props>(({ theme: { token } }: Props) =>
     },
 
     '.__i-vote-summary-area': {
-      display: 'flex'
-    },
-
-    '.__i-vote-summary': {
       display: 'flex',
-      flex: 1,
-      color: token.colorTextLight4,
-      fontSize: token.fontSizeXS,
-      lineHeight: token.lineHeightXS
-    },
-
-    '.__i-vote-stat': {
-      display: 'flex'
-    },
-
-    '.__i-vote-stat + .__i-vote-stat': {
-      marginLeft: token.marginXXS
-    },
-
-    '.__i-vote-stat.-aye': {
-      '.__i-vote-stat-icon': {
-        color: token['green-7']
-      }
-    },
-
-    '.__i-vote-stat.-abstain': {
-      '.__i-vote-stat-icon': {
-        color: token.colorTextLight2
-      }
-    },
-
-    '.__i-vote-stat.-nay': {
-      '.__i-vote-stat-icon': {
-        color: token['red-7']
-      }
-    },
-
-    '.__i-vote-stat-icon': {
-      marginLeft: 2
+      justifyContent: 'space-between'
     },
 
     '.__i-reject-time': {

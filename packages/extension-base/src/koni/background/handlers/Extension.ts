@@ -5234,7 +5234,7 @@ export default class KoniExtension {
   private async subscribeGovLockedInfo (id: string, port: chrome.runtime.Port) {
     const cb = createSubscription<'pri(openGov.subscribeGovLockedInfo)'>(id, port);
 
-    await this.#koniState.earningService.waitForStarted();
+    await this.#koniState.openGovService.waitForStarted();
     const govLockedInfoSubscription = this.#koniState.openGovService.subscribeGovLockedInfoSubject().subscribe({
       next: (rs) => {
         cb(rs);

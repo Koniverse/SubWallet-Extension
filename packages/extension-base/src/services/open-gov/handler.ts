@@ -11,7 +11,7 @@ import { combineLatest, map, merge } from 'rxjs';
 
 import { _SubstrateApi } from '../chain-service/types';
 import { _getAssetDecimals } from '../chain-service/utils';
-import { GovVoteRequest, GovVoteType, GovVotingInfo, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, SplitVoteRequest, StandardVoteRequest, VotingFor } from './interface';
+import { Conviction, GovDelegationDetail, GovTrackVoting, GovVoteDetail, GovVoteRequest, GovVoteType, GovVotingInfo, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, SplitVoteRequest, StandardVoteRequest, VotingFor } from './interface';
 
 export default abstract class BaseOpenGovHandler {
   protected readonly state: KoniState;
@@ -244,48 +244,102 @@ export default abstract class BaseOpenGovHandler {
           let voted = new BigN(0);
           const prior = new BigN(0);
 
+          const tracks: GovTrackVoting[] = [];
+
           for (const [key, voting] of votingEntries) {
+            const trackId = key.args[1].toPrimitive() as number;
             const v = voting.toPrimitive() as VotingFor;
 
             if (v.delegating) {
+              const delegation: GovDelegationDetail = {
+                balance: v.delegating.balance.toString(),
+                target: v.delegating.target,
+                conviction: v.delegating.conviction
+              };
+
               delegated = delegated.plus(v.delegating.balance);
-            } else if (v.casting?.votes) {
-              for (const [, vote] of v.casting.votes) {
+
+              if (v.delegating.prior) {
+                const [locked] = v.delegating.prior;
+
+                delegated = delegated.plus(locked);
+              }
+
+              tracks.push({
+                trackId,
+                delegation
+              });
+            }
+
+            if (v.casting?.votes) {
+              const votes: GovVoteDetail[] = [];
+
+              for (const [refIndex, vote] of v.casting.votes) {
                 if ('standard' in vote) {
+                  const isAye = vote.standard.vote.aye === true;
+
+                  votes.push({
+                    referendumIndex: refIndex,
+                    type: isAye ? GovVoteType.AYE : GovVoteType.NAY,
+                    conviction: vote.standard.vote.conviction,
+                    ayeAmount: isAye ? vote.standard.balance : '0',
+                    nayAmount: !isAye ? vote.standard.balance : '0'
+                  });
+
                   voted = voted.plus(vote.standard.balance);
                 } else if ('split' in vote) {
+                  votes.push({
+                    referendumIndex: refIndex,
+                    type: GovVoteType.SPLIT,
+                    conviction: Conviction.None,
+                    ayeAmount: vote.split.aye,
+                    nayAmount: vote.split.nay
+                  });
+
                   voted = voted.plus(vote.split.aye).plus(vote.split.nay);
                 } else if ('splitAbstain' in vote) {
+                  votes.push({
+                    referendumIndex: refIndex,
+                    type: GovVoteType.ABSTAIN,
+                    conviction: Conviction.None,
+                    ayeAmount: vote.splitAbstain.aye,
+                    nayAmount: vote.splitAbstain.nay,
+                    abstainAmount: vote.splitAbstain.abstain
+                  });
+
                   voted = voted
                     .plus(vote.splitAbstain.aye)
                     .plus(vote.splitAbstain.nay)
                     .plus(vote.splitAbstain.abstain);
                 }
               }
-            }
 
-            if (v.casting?.prior) {
-            // prior = [balance locked, block unlock]
-              const [locked, until] = v.casting.prior;
+              if (v.casting.prior) {
+                const [locked] = v.casting.prior;
 
-              voted = voted.plus(locked);
-            }
+                voted = voted.plus(locked);
+              }
 
-            if (v.delegating?.prior) {
-              const [locked, until] = v.delegating.prior;
-
-              delegated = delegated.plus(locked);
+              tracks.push({
+                trackId,
+                votes
+              });
             }
           }
 
-          return {
+          const result = {
             chain: this.chain,
             address: addr,
-            delegated: delegated.toString(),
-            voted: voted.toString(),
-            unlocking: prior.toString(),
-            unlockable: '0'
+            summary: {
+              delegated: delegated.toString(),
+              voted: voted.toString(),
+              unlocking: prior.toString(),
+              unlockable: '0'
+            },
+            tracks
           };
+
+          return result;
         })
       );
     });

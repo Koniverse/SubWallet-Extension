@@ -2,14 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler } from '@subwallet/extension-base/utils';
 import { BehaviorSubject } from 'rxjs';
 
 import { ServiceStatus } from '../base/types';
+import { _isChainEnabled } from '../chain-service/utils';
 import { EventService } from '../event-service';
 import DatabaseService from '../storage-service/DatabaseService';
+import { SWTransactionBase } from '../transaction-service/types';
 import BaseOpenGovHandler from './handler';
 import { GovVoteRequest, GovVotingInfo, RemoveVoteRequest } from './interface';
 import { govChainSupportItems } from './utils';
@@ -57,23 +60,61 @@ export default class OpenGovService {
     this.handleActions();
   }
 
+  private delayReloadTimeout: NodeJS.Timeout | undefined;
+
   handleActions () {
     this.eventService.onLazy((events, eventTypes) => {
-      let needReload = false;
+      let delayReload = false;
+      const removedAddresses: string[] = [];
+      const removeChains: string[] = [];
 
       (async () => {
         for (const event of events) {
-          if (event.type === 'account.add' || event.type === 'account.remove' || event.type === 'account.updateCurrent') {
-            needReload = true;
+          if (event.type === 'account.remove') {
+            removedAddresses.push(event.data[0] as string);
+          }
+
+          if (event.type === 'account.add' || event.type === 'account.updateCurrent') {
+            delayReload = true;
           }
 
           if (event.type === 'chain.updateState') {
-            needReload = true;
+            const chainKey = event.data[0] as string;
+            const chainState = this.state.getChainStateByKey(chainKey);
+
+            if (chainState && !_isChainEnabled(chainState)) {
+              removeChains.push(chainKey);
+            }
+
+            delayReload = true;
+          }
+
+          if (event.type === 'transaction.done') {
+            const tx = event.data[0] as SWTransactionBase;
+            const govRelatedTypes = [
+              ExtrinsicType.GOV_VOTE,
+              ExtrinsicType.GOV_UNVOTE
+            ];
+
+            if (govRelatedTypes.includes(tx.extrinsicType)) {
+              delayReload = true;
+            }
           }
         }
 
-        if (needReload) {
-          await this.runSubscribeGovLockedInfo();
+        if (eventTypes.includes('account.updateCurrent') ||
+          eventTypes.includes('account.remove') ||
+          eventTypes.includes('chain.updateState') ||
+          delayReload) {
+          if (delayReload) {
+            this.delayReloadTimeout = setTimeout(() => {
+              this.runSubscribeGovLockedInfo().catch(console.error);
+            }, 3000);
+          } else {
+            this.delayReloadTimeout && clearTimeout(this.delayReloadTimeout);
+            this.delayReloadTimeout = undefined;
+            await this.runSubscribeGovLockedInfo();
+          }
         }
       })().catch(console.error);
     });
