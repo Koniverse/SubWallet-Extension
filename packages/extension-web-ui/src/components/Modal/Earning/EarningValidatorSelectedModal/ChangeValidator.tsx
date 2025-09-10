@@ -220,6 +220,7 @@ const Component = (props: Props) => {
       }
     });
   }, [items, sortSelection, sortValidator]);
+
   const validatorResultList = useMemo(() => {
     const recommendedHeader = {
       isSectionHeader: true,

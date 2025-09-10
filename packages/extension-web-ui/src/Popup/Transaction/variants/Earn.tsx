@@ -1594,7 +1594,10 @@ const Component = ({ className }: ComponentProps) => {
                   <div ref={alertBoxRef}>
                     <AlertBox
                       className='__alert-box'
-                      description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again`}
+                      description={t(
+                        'Unable to stake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again',
+                        { replace: { slippage: (earningSlippage * 100).toFixed(2) } }
+                      )}
                       title='Slippage too high!'
                       type='error'
                     />

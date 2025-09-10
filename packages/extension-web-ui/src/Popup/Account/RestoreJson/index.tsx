@@ -565,7 +565,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               }
 
               {
-                stepState === StepState.UPLOAD_JSON_FILE && requirePassword && (
+                stepState === StepState.UPLOAD_JSON_FILE && requirePassword && !showNoValidAccountAlert && (
                   <Form.Item
                     validateStatus={passwordValidateState.status}
                   >
