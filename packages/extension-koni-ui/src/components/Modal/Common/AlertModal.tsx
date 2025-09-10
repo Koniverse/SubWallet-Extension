@@ -38,6 +38,7 @@ const Component: React.FC<Props> = (props: Props) => {
     className,
     closable,
     cancelDisabled,
+    rightIconProps,
     content,
     modalId,
     subtitle,
@@ -99,6 +100,7 @@ const Component: React.FC<Props> = (props: Props) => {
         id={modalId}
         maskClosable={maskClosable}
         onCancel={closable === false ? undefined : (onCancel || onDefaultCancel)}
+        rightIconProps={rightIconProps}
         title={title}
       >
         <div className='__modal-content'>
