@@ -124,28 +124,17 @@ export class OptimexHandler implements SwapBaseInterface {
     const sender = request.request.address;
     const receiver = request.request.recipient;
     const sendingValue = request.request.fromAmount;
-
-    if (!fromChainType) {
-      return undefined;
-    }
-
     const metadata = request.selectedQuote?.metadata as OptimexQuoteMetadata;
+    const walletFeeInfo = request.selectedQuote?.feeInfo.feeComponent.find((fee) => fee.feeType === SwapFeeType.WALLET_FEE);
 
-    if (!metadata) {
+    if (!metadata || !walletFeeInfo) {
       return undefined;
     }
 
     let initTradeRequest: OptimexTradeRequest;
-    let swAffiliate: AffiliateInfo;
+    const swAffiliate = walletFeeInfo.metadata as AffiliateInfo;
 
     if (fromChainType === ChainType.EVM) {
-      swAffiliate = { // todo
-        provider: 'SubWallet',
-        rate: '25',
-        receiver: '0xdd718f9Ecaf8f144a3140b79361b5D713D3A6b19',
-        network: 'ethereum'
-      };
-
       initTradeRequest = {
         session_id: metadata.session_id,
         amount_in: sendingValue,
@@ -160,13 +149,6 @@ export class OptimexHandler implements SwapBaseInterface {
       };
     } else if (fromChainType === ChainType.BITCOIN) {
       const fromPublicKey = hexStripPrefix(u8aToHex(keyring.getPair(sender).publicKey));
-
-      swAffiliate = { // todo
-        provider: 'SubWallet',
-        rate: '25',
-        receiver: fromChain.slug === 'bitcoinTest' ? 'tb1q4vgvwexhn745qn404thq6a8mua3un899n2rhrl' : 'bc1q4g4l5drmt2a80m4rfva8cpj9czlwtvshu0nxef',
-        network: 'bitcoin'
-      };
 
       initTradeRequest = {
         session_id: metadata.session_id,

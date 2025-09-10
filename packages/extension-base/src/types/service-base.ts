@@ -25,6 +25,7 @@ export interface CommonFeeComponent {
   amount: string;
   tokenSlug: string;
   percentage?: number;
+  metadata?: any;
 }
 
 export interface CommonStepFeeInfo {
