@@ -109,7 +109,7 @@ export const _STAKING_ERA_LENGTH_MAP: Record<string, number> = { // in hours
   analog_timechain: 12,
   muse_testnet: 25 * 6 / 60 / 60, // 25 blocks per session
   mythos: 24,
-  energy_web_x_testnet:  22 * 12 / 3600, // 22 blocks per era, 1 block per 12s
+  energy_web_x_testnet: 22 * 12 / 3600, // 22 blocks per era, 1 block per 12s
   energy_web_x: 7200 * 12 / 3600 // 24 hours, 7200 blocks per era, 1 block per 12s
 };
 

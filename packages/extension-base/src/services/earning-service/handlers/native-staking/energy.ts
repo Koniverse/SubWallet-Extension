@@ -8,24 +8,9 @@ import { getBondedValidators, getEarningStatusByNominations, isUnstakeAll } from
 import { _EXPECTED_BLOCK_TIME, _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { parseIdentity } from '@subwallet/extension-base/services/earning-service/utils';
-import {
-  BaseYieldPositionInfo,
-  BasicTxErrorType,
-  CollatorExtraInfo,
-  EarningStatus,
-  NativeYieldPoolInfo,
-  PalletParachainStakingDelegationInfo,
-  PalletParachainStakingRequestType,
-  StakeCancelWithdrawalParams,
-  SubmitJoinNativeStaking,
-  TransactionData,
-  UnstakingStatus,
-  ValidatorInfo,
-  YieldPoolInfo,
-  YieldPositionInfo,
-  YieldTokenBaseInfo
-} from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, CollatorExtraInfo, EarningStatus, NativeYieldPoolInfo, PalletParachainStakingDelegationInfo, PalletParachainStakingRequestType, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingStatus, ValidatorInfo, YieldPoolInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, parseRawNumber, reformatAddress } from '@subwallet/extension-base/utils';
+
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
 import { Codec } from '@polkadot/types/types';
@@ -46,7 +31,7 @@ interface EnergyStakingCandidateMetadata {
   highestBottomNominationAmount: number,
   lowestBottomNominationAmount: number,
   lowestTopNominationAmount: number
-  nominationCount:number,
+  nominationCount: number,
   status: any | 'Active'
 }
 
@@ -65,7 +50,6 @@ export interface PalletEnergyStakingNominationRequestsScheduledRequest {
   whenExecutable: number,
   action: Record<PalletParachainStakingRequestType, number>
 }
-
 
 export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakingPoolHandler {
   /* Subscribe pool info */
@@ -118,7 +102,6 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
         chainApi.api.query.parachainStaking?.staked(era),
         chainApi.api.query.parachainStaking.delay()
       ]);
-
 
       const totalStake = _totalStake ? new BN(_totalStake.toString()) : BN_ZERO;
 
@@ -252,13 +235,6 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
         validatorMinStake: collatorInfo.lowestTopNominationAmount.toString()
       });
     }));
-
-    // await Promise.all(nominationList.map(async (nomination) => {
-    //   const _collatorInfo = await substrateApi.api.query.parachainStaking.candidateInfo(nomination.validatorAddress);
-    //   const collatorInfo = _collatorInfo.toPrimitive() as unknown as ParachainStakingCandidateMetadata;
-    //
-    //   nomination.validatorMinStake = collatorInfo.lowestTopDelegationAmount.toString();
-    // }));
 
     const stakingStatus = getEarningStatusByNominations(bnTotalActiveStake, nominationList);
 
@@ -426,8 +402,6 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
       validator.blocked = !extraInfoMap[validator.address].active;
       validator.identity = extraInfoMap[validator.address].identity;
       validator.isVerified = extraInfoMap[validator.address].isVerified;
-      // @ts-ignore
-      validator.commission = 0;
     }
 
     return allCollators;
@@ -444,27 +418,25 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
     const selectedCollatorInfo = selectedValidators[0];
     const { address: selectedCollatorAddress, nominatorCount: selectedCollatorNominatorCount } = selectedCollatorInfo;
 
-    // eslint-disable-next-line @typescript-eslint/require-await
-    const compoundResult = async (
+    const compoundResult = (
       extrinsic: SubmittableExtrinsic<'promise'>
     ): Promise<[TransactionData, YieldTokenBaseInfo]> => {
-      return [extrinsic, { slug: this.nativeToken.slug, amount: '0' }];
+      return Promise.resolve([extrinsic, { slug: this.nativeToken.slug, amount: '0' }]);
     };
 
     if (!positionInfo) {
-        const extrinsic = apiPromise.api.tx.parachainStaking.nominate(selectedCollatorAddress, binaryAmount, new BN(selectedCollatorNominatorCount), 0);
+      const extrinsic = apiPromise.api.tx.parachainStaking.nominate(selectedCollatorAddress, binaryAmount, new BN(selectedCollatorNominatorCount), 0);
 
-        return compoundResult(extrinsic);
+      return compoundResult(extrinsic);
     }
 
     const { bondedValidators, nominationCount } = getBondedValidators(positionInfo.nominations);
     const parsedSelectedCollatorAddress = reformatAddress(selectedCollatorInfo.address, 0);
 
     if (!bondedValidators.includes(parsedSelectedCollatorAddress)) {
-        const extrinsic = apiPromise.api.tx.parachainStaking.nominate(selectedCollatorAddress, binaryAmount, new BN(selectedCollatorNominatorCount), nominationCount);
+      const extrinsic = apiPromise.api.tx.parachainStaking.nominate(selectedCollatorAddress, binaryAmount, new BN(selectedCollatorNominatorCount), nominationCount);
 
-        return compoundResult(extrinsic);
-
+      return compoundResult(extrinsic);
     } else {
       const extrinsic = apiPromise.api.tx.parachainStaking.bondExtra(selectedCollatorAddress, binaryAmount);
 
