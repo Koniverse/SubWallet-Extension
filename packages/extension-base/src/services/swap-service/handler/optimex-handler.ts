@@ -238,7 +238,7 @@ export class OptimexHandler implements SwapBaseInterface {
     const depositAddress = this.currentTradeMetadata?.deposit_address;
 
     if (!depositAddress) {
-      console.log('Optimex Trade metadata is undefined');
+      console.log('Optimex Trade metadata is undefined, request for new quote');
 
       return Promise.resolve(undefined);
     }
@@ -432,7 +432,7 @@ export class OptimexHandler implements SwapBaseInterface {
     console.log('Optimex Trade metadata', depositAddress);
 
     if (!depositAddress) {
-      throw new Error('Optimex Trade metadata is undefined');
+      throw new Error('Optimex Trade metadata is undefined, request for new quote');
     }
 
     if (chainType === ChainType.BITCOIN) {
@@ -485,8 +485,8 @@ export class OptimexHandler implements SwapBaseInterface {
       throw new Error('Unknown swap chain type');
     }
 
-    // reset tradeMetadata after use
-    this.currentTradeMetadata = undefined;
+    // reset tradeMetadata after use // todo: review to check if need this clear
+    // this.currentTradeMetadata = undefined;
 
     return {
       txChain: fromAsset.originChain,
