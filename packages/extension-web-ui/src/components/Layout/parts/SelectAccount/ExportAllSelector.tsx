@@ -212,7 +212,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           className={'__icon-export-remind'}
           overlayClassName={CN(className, '__tooltip-overlay-remind')}
           placement={'bottomLeft'}
-          title={t('SubWallet only supports accounts created and attached directly on the SubWallet Dashboard, does not support exporting accounts connected from the extension.')}
+          title={t('SubWallet only supports exporting accounts created and attached directly on SubWallet Web dashboard. Accounts connected from the Extension or via Ledger aren\'t supported for this feature')}
         >
           <div className={'__tooltip-info-wrapper'}>
             <Icon

@@ -8,7 +8,7 @@ import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContex
 import { useDefaultNavigate, useOpenQrScanner } from '@subwallet/extension-web-ui/hooks';
 import { addConnection } from '@subwallet/extension-web-ui/messaging';
 import { FormCallbacks, ScannerResult, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { validWalletConnectUri } from '@subwallet/extension-web-ui/utils';
+import { noop, validWalletConnectUri } from '@subwallet/extension-web-ui/utils';
 import { Button, Form, Icon, Input, ModalContext, PageIcon, SwQrScanner } from '@subwallet/react-ui';
 import { SwModalProps } from '@subwallet/react-ui/es/sw-modal/SwModal';
 import CN from 'classnames';
@@ -27,7 +27,6 @@ type Props = ThemeProps & {
     closeIcon?: SwModalProps['closeIcon'],
     onCancel?: SwModalProps['onCancel'],
   };
-  onAfterConnect?: () => void;
 };
 
 interface ConnectionError {
@@ -44,7 +43,8 @@ const DEFAULT_FORM_VALUES: AddConnectionFormState = {
 };
 
 const faqUrl = 'https://docs.subwallet.app/main/web-dashboard-user-guide/connect-and-sign-transactions-on-dapps-with-walletconnect/connect-dapps-with-walletconnect#i-see-the-connection-unsuccessful-popup-after-approving-the-request-to-connect-to-dapp';
-const modalId = 'WALLET_CONNECT_CONFIRM_MODAL';
+const confirmErrorModalId = 'WALLET_CONNECT_CONFIRM_MODAL';
+const confirmConnectModalId = WALLET_CONNECT_CREATE_MODAL;
 const scannerId = 'connect-connection-scanner-modal';
 const showScanner = true;
 const keyRecords = 'unsuccessful_connect_wc_modal';
@@ -76,7 +76,7 @@ const getTimeOutRecords = () => {
 };
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, isModal, modalProps = {}, onAfterConnect } = props;
+  const { className, isModal, modalProps = {} } = props;
 
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -90,12 +90,12 @@ const Component: React.FC<Props> = (props: Props) => {
   const [loading, setLoading] = useState(false);
   const [connectionError, setConnectionError] = useState<ConnectionError>(connectionErrorDefault);
   const [scanError, setScanError] = useState('');
+  const isActiveConnectModal = useMemo(() => checkActive(confirmConnectModalId), [checkActive]);
+  const isActiveErrorModal = useMemo(() => checkActive(confirmErrorModalId), [checkActive]);
 
   const goBack = useCallback(() => {
     navigate('/wallet-connect/list');
   }, [navigate]);
-
-  const _onAfterConnect = onAfterConnect || goBack;
 
   const onConnect = useCallback((uri: string) => {
     setLoading(true);
@@ -103,18 +103,14 @@ const Component: React.FC<Props> = (props: Props) => {
     addConnection({
       uri
     })
-      .then(() => {
-        setLoading(false);
-        _onAfterConnect();
-        form.resetFields();
-      })
+      .then(noop)
       .catch((e: Error) => {
         console.error(e);
         setLoading(false);
         setConnectionError(convertWCErrorMessage(e));
-        activeModal(modalId);
+        activeModal(confirmErrorModalId);
       });
-  }, [_onAfterConnect, activeModal, form]);
+  }, [activeModal]);
 
   const onFinish: FormCallbacks<AddConnectionFormState>['onFinish'] = useCallback((values: AddConnectionFormState) => {
     const { uri } = values;
@@ -175,7 +171,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
     if (timeOutRecord[keyRecords]) {
       setLoading(false);
-      activeModal(modalId);
+      activeModal(confirmErrorModalId);
     }
   }, [activeModal]);
 
@@ -186,13 +182,11 @@ const Component: React.FC<Props> = (props: Props) => {
       clearTimeout(idTimeOut);
       delete timeOutRecord[keyRecords];
       !isDismiss && window.open(faqUrl, '_blank');
-      inactiveModal(modalId);
+      inactiveModal(confirmErrorModalId);
       form.setFieldValue('uri', DEFAULT_FORM_VALUES.uri);
       setTimeOutRecords(timeOutRecord);
     };
   }, [form, inactiveModal, setTimeOutRecords]);
-
-  const isActiveModal = useMemo(() => checkActive(modalId), [checkActive]);
 
   const footerModalWC = useMemo(() => {
     return (
@@ -295,7 +289,7 @@ const Component: React.FC<Props> = (props: Props) => {
         className={CN(className, '-wc-modal-unsuccessful')}
         closable={true}
         footer={footerModalWC}
-        id={modalId}
+        id={confirmErrorModalId}
         onCancel={onClickToFAQ(true)}
         title={t('Connection unsuccessful')}
       >
@@ -321,13 +315,20 @@ const Component: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     const timeOutRecord = getTimeOutRecords();
 
-    if (loading && !isActiveModal && !timeOutRecord[keyRecords]) {
+    if (loading && !isActiveErrorModal && !timeOutRecord[keyRecords]) {
       idTimeOut = setTimeout(reOpenModalWhenTimeOut, 20000);
       setTimeOutRecords({ ...timeOutRecord, [keyRecords]: idTimeOut });
     } else if (timeOutRecord[keyRecords]) {
       setLoading(false);
     }
-  }, [isActiveModal, loading, reOpenModalWhenTimeOut, setTimeOutRecords]);
+  }, [isActiveErrorModal, loading, reOpenModalWhenTimeOut, setTimeOutRecords]);
+
+  useEffect(() => {
+    if (!isActiveConnectModal) {
+      setLoading(false);
+      form.resetFields();
+    }
+  }, [form, isActiveConnectModal]);
 
   if (isModal) {
     return (

@@ -5,8 +5,7 @@ import BackIcon from '@subwallet/extension-web-ui/components/Icon/BackIcon';
 import CloseIcon from '@subwallet/extension-web-ui/components/Icon/CloseIcon';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
 import WordPhrase from '@subwallet/extension-web-ui/components/WordPhrase';
-import { SELECTED_ACCOUNT_TYPE } from '@subwallet/extension-web-ui/constants';
-import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE } from '@subwallet/extension-web-ui/constants/account';
+import { DEFAULT_MNEMONIC_TYPE } from '@subwallet/extension-web-ui/constants';
 import useGetDefaultAccountName from '@subwallet/extension-web-ui/hooks/account/useGetDefaultAccountName';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
@@ -20,7 +19,6 @@ import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useLocalStorage } from 'usehooks-ts';
 
 type Props = ThemeProps & {
   modalId: string,
@@ -36,14 +34,12 @@ const Component: React.FC<Props> = ({ className, modalId, onBack, onSubmitSucces
   const accountName = useGetDefaultAccountName();
   const checkUnlock = useUnlockChecker();
 
-  const [accountTypes] = useLocalStorage(SELECTED_ACCOUNT_TYPE, DEFAULT_ACCOUNT_TYPES);
-
   const [seedPhrase, setSeedPhrase] = useState('');
   const [loading, setLoading] = useState(false);
   const [createSeedTrigger, setCreateSeedTrigger] = useState<string>(`${Date.now()}`);
 
   useEffect(() => {
-    createSeedV2(undefined, undefined, [SUBSTRATE_ACCOUNT_TYPE, EVM_ACCOUNT_TYPE])
+    createSeedV2(undefined, undefined, DEFAULT_MNEMONIC_TYPE)
       .then((response): void => {
         const phrase = response.mnemonic;
 
@@ -76,7 +72,6 @@ const Component: React.FC<Props> = ({ className, modalId, onBack, onSubmitSucces
         createAccountSuriV2({
           name: accountName,
           suri: seedPhrase,
-          types: accountTypes,
           isAllowed: true
         })
           .then(() => {
@@ -96,7 +91,7 @@ const Component: React.FC<Props> = ({ className, modalId, onBack, onSubmitSucces
     }).catch(() => {
       // User cancel unlock
     });
-  }, [seedPhrase, checkUnlock, accountName, accountTypes, onSubmitSuccess, notify, onCancel]);
+  }, [seedPhrase, checkUnlock, accountName, onSubmitSuccess, notify, onCancel]);
 
   useClickOutSide(isActive, renderModalSelector(className), onCancel);
 

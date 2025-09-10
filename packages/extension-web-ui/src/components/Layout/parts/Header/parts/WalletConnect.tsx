@@ -132,7 +132,6 @@ const Component: React.FC<ThemeProps> = ({ className }: ThemeProps) => {
       <ConnectWalletConnectModal
         isModal
         modalProps={connectWalletConnectModalProps}
-        onAfterConnect={closeConnectModal}
       />
     </>
   );
