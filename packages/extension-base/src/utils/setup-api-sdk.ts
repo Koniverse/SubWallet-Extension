@@ -2,17 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { APP_VERSION, BACKEND_API_URL, BACKEND_PRICE_HISTORY_URL } from '@subwallet/extension-base/constants';
-import { ChainListVersion } from '@subwallet/extension-base/services/chain-service/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 
 import { TARGET_ENV } from './environment';
+
+const CHAIN_LIST_VERSION = process.env.CHAIN_LIST_VERSION as string;
 
 export function setupApiSDK () {
   subwalletApiSdk.updateConfig({
     appVersion: APP_VERSION,
     baseUrl: BACKEND_API_URL,
     platform: TARGET_ENV,
-    chainListVersion: ChainListVersion
+    chainListVersion: CHAIN_LIST_VERSION
   });
 
   // Custom the price history API with other different base URL
