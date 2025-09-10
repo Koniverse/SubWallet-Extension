@@ -53,13 +53,13 @@ const Component: React.FC<SelectAccountTypeProps> = (props: SelectAccountTypePro
     {
       icon: 'polkadot',
       key: SUBSTRATE_ACCOUNT_TYPE,
-      label: t('Polkadot'),
+      label: t('ui.ACCOUNT.components.Account.SelectType.polkadot'),
       onClick: onClickItem(SUBSTRATE_ACCOUNT_TYPE)
     },
     {
       icon: 'ethereum',
       key: EVM_ACCOUNT_TYPE,
-      label: t('Ethereum'),
+      label: t('ui.ACCOUNT.components.Account.SelectType.ethereum'),
       onClick: onClickItem(EVM_ACCOUNT_TYPE)
     }
   ]), [t, onClickItem]);
