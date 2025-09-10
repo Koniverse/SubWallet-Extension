@@ -534,7 +534,7 @@ export class BalanceService implements StoppableServiceInterface {
 
           const balanceDetectionApi = subwalletApiSdk.balanceDetectionApi || Promise.resolve([]);
 
-          Promise.race([timeOutPromise, balanceDetectionApi.getEvmTokenBalanceSlug(address)])
+          Promise.race([timeOutPromise, balanceDetectionApi.getSubWalletTokenBalance(address)])
             .then((result) => resolve(result))
             .catch((error) => {
               console.error(error);
@@ -553,17 +553,11 @@ export class BalanceService implements StoppableServiceInterface {
     const currentAssetSettings = await this.state.chainService.getAssetSettings();
     const chainInfoMap = this.state.chainService.getChainInfoMap();
     const detectBalanceChainSlugMap = this.state.chainService.detectBalanceChainSlugMap;
-    const popularTokenList = this.state.chainService.value.priorityTokens.token;
-    const popularTokenSlugs = Object.keys(popularTokenList);
 
-    console.log('popularTokenSlugs', popularTokenSlugs);
+    console.log('evmBalanceDataList', evmBalanceDataList);
 
     for (const balanceData of balanceDataList) {
       if (balanceData) {
-        console.log('balanceData sub', balanceData);
-
-        const tokensWithZeroBalance: string[] = [];
-
         for (const balanceDatum of balanceData) {
           const { balance, bonded, category, locked, network, symbol } = balanceDatum;
           const chain = detectBalanceChainSlugMap[network];
@@ -580,7 +574,6 @@ export class BalanceService implements StoppableServiceInterface {
 
           // Cancel is balance is 0
           if (balanceIsEmpty) {
-            tokensWithZeroBalance.push(tokenKey);
             continue;
           }
 
@@ -597,32 +590,17 @@ export class BalanceService implements StoppableServiceInterface {
             currentAssetSettings[existedKey] = { visible: true };
           }
         }
-
-        console.log('currentAssetSettings sub', currentAssetSettings);
-
-        Object.keys(currentAssetSettings).forEach((tokenSlug) => {
-          if (tokensWithZeroBalance.includes(tokenSlug)) {
-            const chain = tokenSlug.split('-')[0];
-            const chainState = this.state.chainService.getChainStateByKey(chain);
-
-            console.log('chainState sub', chainState);
-
-            if (chainState && !chainState.manualTurnOff && !popularTokenSlugs.includes(tokenSlug)) {
-              currentAssetSettings[tokenSlug] = { visible: false };
-            }
-          }
-        });
       }
     }
 
     for (const balanceData of evmBalanceDataList) {
       if (balanceData) {
-        console.log('balanceData', balanceData);
-
         for (const slug of balanceData) {
           const chainSlug = slug.split('-')[0];
           const chainState = this.state.chainService.getChainStateByKey(chainSlug);
           const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === slug.toLowerCase());
+
+          console.log('slug', slug);
 
           // Cancel if chain is turned off by user
           if (chainState && chainState.manualTurnOff) {
@@ -630,28 +608,13 @@ export class BalanceService implements StoppableServiceInterface {
           }
 
           if (existedKey && !currentAssetSettings[existedKey]?.visible) {
+            console.log('existedKey', existedKey);
+
             needEnableChains.push(chainSlug);
             needActiveTokens.push(existedKey);
             currentAssetSettings[existedKey] = { visible: true };
           }
         }
-
-        console.log('currentAssetSettings', currentAssetSettings);
-
-        Object.keys(currentAssetSettings).forEach((tokenSlug) => {
-          if (!balanceData.includes(tokenSlug)) {
-            const chain = tokenSlug.split('-')[0];
-            const chainState = this.state.chainService.getChainStateByKey(chain);
-
-            console.log('chainState', chainState);
-
-            if (chainState && !chainState.manualTurnOff && !popularTokenSlugs.includes(tokenSlug)) {
-              console.log('slug', tokenSlug);
-
-              currentAssetSettings[tokenSlug] = { visible: false };
-            }
-          }
-        });
       }
     }
 
