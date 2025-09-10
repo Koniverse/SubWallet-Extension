@@ -292,7 +292,7 @@ export enum GovStatusKey {
   APPROVED = 'Approved',
   EXECUTED = 'Executed',
   REJECTED = 'Rejected',
-  TIMEDOUT = 'Timedout',
+  TIMEDOUT = 'TimedOut',
   CANCELLED = 'Cancelled',
   KILLED = 'Killed',
 }

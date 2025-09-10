@@ -10,6 +10,7 @@ export type ViewBaseType = {
 }
 
 export enum ReferendaCategory {
+  ALL='all',
   ONGOING= 'ongoing',
   COMPLETED= 'completed',
   VOTED='voted',

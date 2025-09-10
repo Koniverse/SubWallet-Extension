@@ -40,16 +40,12 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
   const filterTabItems = useMemo(() => {
     return [
       {
+        label: t('All Referenda'),
+        value: ReferendaCategory.ALL
+      },
+      {
         label: t('Ongoing'),
         value: ReferendaCategory.ONGOING
-      },
-      {
-        label: t('Completed'),
-        value: ReferendaCategory.COMPLETED
-      },
-      {
-        label: t('Voted'),
-        value: ReferendaCategory.VOTED
       }
     ];
   }, [t]);

@@ -28,7 +28,7 @@ type Props = ThemeProps & ViewBaseType & {
 const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, onChangeChain, sdkInstance }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
-  const [selectedReferendaCategory, setSelectedReferendaCategory] = useState<ReferendaCategory>(ReferendaCategory.ONGOING);
+  const [selectedReferendaCategory, setSelectedReferendaCategory] = useState<ReferendaCategory>(ReferendaCategory.ALL);
   const [isEnableTreasuryFilter, setIsEnableTreasuryFilter] = useState(false);
   const [isEnableVotedFilter, setIsEnableVotedFilter] = useState(false);
   const [isEnableDelegatedFilter, setIsEnableDelegatedFilter] = useState(false);
@@ -122,12 +122,12 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
     const filterFunc = (item: Referendum) => {
       const stateName = item.state.name;
 
-      if (selectedReferendaCategory === ReferendaCategory.ONGOING) {
-        return GOV_ONGOING_STATES.includes(stateName);
+      if (selectedReferendaCategory === ReferendaCategory.ALL) {
+        return true;
       }
 
-      if (selectedReferendaCategory === ReferendaCategory.COMPLETED) {
-        return GOV_COMPLETED_STATES.includes(stateName);
+      if (selectedReferendaCategory === ReferendaCategory.ONGOING) {
+        return GOV_ONGOING_STATES.includes(stateName);
       }
 
       return false;
