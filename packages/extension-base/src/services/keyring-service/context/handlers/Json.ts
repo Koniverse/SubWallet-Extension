@@ -104,12 +104,12 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
         assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Json.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || _pair.address } }));
 
-        keyring.restoreAccount(file, password, withMasterPassword);
-
-        const pair = keyring.getPair(_pair.address);
-        const _name = pair.meta.name as string || '';
+        const _name = _pair.meta.name as string || '';
 
         const nameExists = this.state.checkNameExists(_name);
+
+        keyring.restoreAccount(file, password, withMasterPassword);
+        const pair = keyring.getPair(_pair.address);
 
         if (nameExists) {
           const newName = _name.concat(' - ').concat(generateRandomString());
