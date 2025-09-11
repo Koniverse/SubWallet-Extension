@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
-import { YieldPoolType } from '@subwallet/extension-base/types';
+import { AccountProxyType, YieldPoolType } from '@subwallet/extension-base/types';
+import { isAccountAll } from '@subwallet/extension-base/utils';
 import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
 import { useAccountBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector, useTokenGroup } from '@subwallet/extension-koni-ui/hooks';
 import { BalanceValueInfo, YieldGroupInfo } from '@subwallet/extension-koni-ui/types';
@@ -26,6 +27,18 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
     return getTransactionActionsByAccountProxy(currentAccountProxy, accountProxies);
   }, [accountProxies, currentAccountProxy]);
 
+  const hasWatchOnlyAccount = useMemo(() => {
+    if (!currentAccountProxy) {
+      return false;
+    }
+
+    if (isAccountAll(currentAccountProxy.id)) {
+      return accountProxies.some((item) => item.accountType === AccountProxyType.READ_ONLY);
+    } else {
+      return currentAccountProxy.accountType === AccountProxyType.READ_ONLY;
+    }
+  }, [accountProxies, currentAccountProxy]);
+
   return useMemo(() => {
     const result: Record<string, YieldGroupInfo> = {};
 
@@ -33,7 +46,7 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
       const chain = pool.chain;
       const extrinsicType = getExtrinsicTypeByPoolInfo(pool);
 
-      if (extrinsicTypeSupported && !extrinsicTypeSupported.includes(extrinsicType)) {
+      if (!hasWatchOnlyAccount && extrinsicTypeSupported && !extrinsicTypeSupported.includes(extrinsicType)) {
         continue;
       }
 
@@ -135,7 +148,7 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
     }
 
     return Object.values(result);
-  }, [poolInfoMap, extrinsicTypeSupported, allowedChains, chainInfoMap, tokenBalanceMap, multiChainAssetMap, assetRegistry, excludedTokens]);
+  }, [poolInfoMap, hasWatchOnlyAccount, extrinsicTypeSupported, allowedChains, chainInfoMap, tokenBalanceMap, multiChainAssetMap, assetRegistry, excludedTokens]);
 };
 
 export default useYieldGroupInfo;
