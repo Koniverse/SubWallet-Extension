@@ -37,7 +37,7 @@ export const ODYSSEY_ENDPOINT = 'https://indexer-v2.dev.aurascan.io/api/v2/graph
 // export const UNIQUE_SCAN_ENDPOINT = 'https://explorer-api.unique.network/v1/graphql';
 // export const QUARTZ_SCAN_ENDPOINT = 'https://hasura-quartz.unique.network/v1/graphql';
 
-export const VARA_SCAN_ENDPOINT = 'https://nft-explorer.vara-network.io/graphql';
+export const VARA_SCAN_ENDPOINT = 'https://nft-explorer.vara.network/graphql';
 
 export const AVAIL_LIGHT_CLIENT_NFT = 'https://indexer.availspace.app/graphql'; // 'https://indexer-nft.availspace.app/graphql';
 
