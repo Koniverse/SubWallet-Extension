@@ -1,5 +1,34 @@
 # CHANGELOG
 
+## 1.3.55
+Build date: Sep 05, 2025.
+
+Features & Updates:
+- Migrate to ParaSpell V4 & Update asset metadata (#4606)
+- Add support new XCM channels (#1457)
+  - DOT (Hydration) <--> PAH
+  - DOT (Hydration) <--> Bifrost Polkadot
+  - DOT (Bifrost Polkadot) <--> PAH
+  - USDT: Bifrost Polkadot <--> Hydration
+- Remove MYTH (PAH -> Ethereum) (#4444)
+- Replace Hardcoded Strings with i18n Keys (#4515)
+- Add notification when dapp connection but network does not exist (#3753)
+- Apply dry-run to validate bridge step for swap feature (#4644)
+- Update chainlist stable v0.2.113 (#4616)
+  - Add support for RegionX Kusama parachain, Stable Testnet, Abstract Mainnet
+  - [Commune AI] Add block explorer
+  - Add support for MYTH (base), TRAC (NeuroWeb Mainnet)
+  - [Polygon] Update USDT's token information
+  - Add chainbalanceSlug for Tanssi Mainnet
+  - Remove more networks in the Polkadot & Ethereum ecosystems, KILT token (Hydration), USDt (KAH)
+  - Remove KILT staking
+
+Bug fixes:
+- Fixed some bug for customizing fee for substrate/evm transactions features (#4065)
+- Fixed bug Incorrect price history chart display when changing currency in popup mode (#4586)
+- Fixed min amount on popup Pay attention in case there is not enough balance to stake (#3930)
+
+
 ## 1.3.54
 Build date: Aug 21, 2025.
 
