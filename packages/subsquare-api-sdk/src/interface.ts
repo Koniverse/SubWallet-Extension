@@ -111,7 +111,7 @@ interface RemoteSpendItem extends BaseSpendItem {
 }
 
 export type SpendItem = LocalSpendItem | RemoteSpendItem;
-export interface TimelineItem {
+export interface RefTimelineItem {
   _id: string;
   referendumIndex: number;
   indexer: {
@@ -215,7 +215,7 @@ interface OnchainState {
 
 interface OnchainData {
   proposalHash: string;
-  timeline: TimelineItem[];
+  timeline: RefTimelineItem[];
   tally: Tally;
   proposal: Proposal;
   info: OnchainInfo;

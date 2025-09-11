@@ -17,6 +17,12 @@ export enum ReferendaCategory {
   UNLOCK_TOKEN='unlock-token'
 }
 
+export enum ReferendumTimelineProcessState {
+  SUCCESS = 'success',
+  IN_PROGRESS = 'in_progress',
+  TERMINATED = 'terminated',
+}
+
 export type GovernanceChainSelectorItemType = {
   chainSlug: string;
   chainName: string;
