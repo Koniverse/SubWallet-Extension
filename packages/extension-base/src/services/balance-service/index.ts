@@ -554,8 +554,6 @@ export class BalanceService implements StoppableServiceInterface {
     const chainInfoMap = this.state.chainService.getChainInfoMap();
     const detectBalanceChainSlugMap = this.state.chainService.detectBalanceChainSlugMap;
 
-    console.log('evmBalanceDataList', evmBalanceDataList);
-
     for (const balanceData of balanceDataList) {
       if (balanceData) {
         for (const balanceDatum of balanceData) {
@@ -600,16 +598,12 @@ export class BalanceService implements StoppableServiceInterface {
           const chainState = this.state.chainService.getChainStateByKey(chainSlug);
           const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === slug.toLowerCase());
 
-          console.log('slug', slug);
-
           // Cancel if chain is turned off by user
           if (chainState && chainState.manualTurnOff) {
             continue;
           }
 
           if (existedKey && !currentAssetSettings[existedKey]?.visible) {
-            console.log('existedKey', existedKey);
-
             needEnableChains.push(chainSlug);
             needActiveTokens.push(existedKey);
             currentAssetSettings[existedKey] = { visible: true };

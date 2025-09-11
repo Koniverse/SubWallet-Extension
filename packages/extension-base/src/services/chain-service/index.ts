@@ -790,7 +790,6 @@ export class ChainService {
 
     await this.initApis();
     this.initAssetSettings();
-    // await this.autoEnableTokens();
   }
 
   initAssetRefMap () {
@@ -876,7 +875,7 @@ export class ChainService {
     const currentTokens = Object.keys(currentPriorityTokens.token || {});
     const latestTokens = Object.keys(latestPriorityTokens.token || {});
 
-    const rawBalanceMap = await this.dbService.getStoredBalance()
+    const rawBalanceMap = await this.dbService.getStoredBalance();
 
     const removedTokens = currentTokens.filter((key) => !latestTokens.includes(key));
     const balanceNonZero = rawBalanceMap.filter((item) => {
@@ -896,7 +895,7 @@ export class ChainService {
         }
 
         if (!nonZeroBalanceSlugs.has(tokenSlug)) {
-          await this.updateAssetSetting(tokenSlug, {visible: false}, false);
+          await this.updateAssetSetting(tokenSlug, { visible: false }, false);
         }
       }
     }
