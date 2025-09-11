@@ -64,7 +64,7 @@ const Governance = () => {
 
   return (
     <PageWrapper
-      resolve={dataContext.awaitStores(['balance', 'price', 'openGov'])}
+      resolve={dataContext.awaitStores(['openGov', 'balance', 'price'])}
     >
       <Component />
     </PageWrapper>

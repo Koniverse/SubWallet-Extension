@@ -108,11 +108,14 @@ export default class OpenGovService {
           delayReload) {
           if (delayReload) {
             this.delayReloadTimeout = setTimeout(() => {
-              this.runSubscribeGovLockedInfo().catch(console.error);
+              this.resetGovLockedInfo()
+                .then(() => this.runSubscribeGovLockedInfo())
+                .catch(console.error);
             }, 3000);
           } else {
             this.delayReloadTimeout && clearTimeout(this.delayReloadTimeout);
             this.delayReloadTimeout = undefined;
+            await this.resetGovLockedInfo();
             await this.runSubscribeGovLockedInfo();
           }
         }
@@ -166,6 +169,7 @@ export default class OpenGovService {
     const addresses = this.state.keyringService.context.getDecodedAddresses();
 
     this.subscribeGovLockedInfos(addresses, (data) => {
+      console.log('disdata', data);
       this.updateGovLockedInfo(data);
     }).then((rs) => {
       this.govLockedInfoUnsub = rs;
@@ -226,17 +230,24 @@ export default class OpenGovService {
         govInfo[key] = item;
       });
       this.govLockedInfoSubject.next(govInfo);
+      this.govLockedInfoListSubject.next(Object.values(govInfo));
 
       // Persist data
       this.dbService.updateGovLockedInfos(queue).catch(console.warn);
     }, 300, 900);
   }
 
+  public async resetGovLockedInfo () {
+    this.govLockedInfoPersistQueue = [];
+    await this.dbService.stores.govLockedInfo.clear();
+  }
+
   private async getGovLockedInfoFromDB () {
     await this.eventService.waitChainReady;
     await this.eventService.waitKeyringReady;
 
-    const existedInfos = await this.dbService.getGovLockedInfos();
+    const addresses = this.state.keyringService.context.getDecodedAddresses();
+    const existedInfos = await this.dbService.getGovLockedInfos(addresses, this.state.activeChainSlugs);
 
     const govInfo = this.govLockedInfoSubject.getValue();
 
@@ -245,6 +256,7 @@ export default class OpenGovService {
     });
 
     this.govLockedInfoSubject.next(govInfo);
+    this.govLockedInfoListSubject.next(Object.values(govInfo));
   }
 
   public subscribeGovLockedInfoSubject () {

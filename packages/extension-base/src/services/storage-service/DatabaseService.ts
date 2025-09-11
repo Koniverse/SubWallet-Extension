@@ -760,8 +760,8 @@ export default class DatabaseService {
 
   /* Gov */
 
-  async getGovLockedInfos () {
-    return this.stores.govLockedInfo.getAll();
+  async getGovLockedInfos (addresses: string[], chains: string[]) {
+    return this.stores.govLockedInfo.getByAddressesAndChains(addresses, chains);
   }
 
   async updateGovLockedInfos (infos: GovVotingInfo[]) {

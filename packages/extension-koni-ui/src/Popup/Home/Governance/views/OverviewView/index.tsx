@@ -1,14 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useGetGovLockedInfos, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetGovLockedInfos } from '@subwallet/extension-koni-ui/hooks';
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ReferendumWithVoting, UserVoting } from '@subwallet/extension-koni-ui/types/gov';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { ActivityIndicator } from '@subwallet/react-ui';
-import { ALL_TRACK_ID, GOV_COMPLETED_STATES, GOV_ONGOING_STATES, GovStatusKey, Referendum } from '@subwallet/subsquare-api-sdk';
+import { ALL_TRACK_ID, GOV_ONGOING_STATES, GovStatusKey, Referendum } from '@subwallet/subsquare-api-sdk';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import React, { Context, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -100,6 +100,15 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
   const handleLoadMore = useCallback(() => {
     setIsLoadingMore(true);
     fetchNextPage()
+      .then(() => {
+        setTimeout(() => {
+          containerRef.current?.scrollTo({
+            top: containerRef.current.scrollTop - 300,
+            behavior: 'smooth'
+          });
+          setIsLoadingMore(false);
+        }, 100);
+      })
       .catch((err) => console.error('Failed to load more:', err))
       .finally(() => {
         setTimeout(() => setIsLoadingMore(false), 500);
@@ -185,16 +194,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
       return true;
     });
 
-    setReferendaItems((prevState) => {
-      if (prevState.length === filteredItems.length) {
-        containerRef.current?.scrollTo({
-          top: containerRef.current.scrollTop - 300,
-          behavior: 'smooth'
-        });
-      }
-
-      return filteredExtended;
-    });
+    setReferendaItems(filteredExtended);
   }, [data?.pages, selectedReferendaCategory, govLockedInfos, chainSlug, isEnableVotedFilter, isEnableDelegatedFilter]);
 
   return (
