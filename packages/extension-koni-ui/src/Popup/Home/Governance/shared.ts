@@ -3,7 +3,11 @@
 
 export const chainSlugToSubsquareNetwork: Record<string, string> = {
   polkadot: 'polkadot',
+  bifrost_dot: 'bifrost',
+  hydradx_main: 'hydration',
   kusama: 'kusama',
+  basilisk: 'basilisk',
   westend_assethub: 'westend',
+  paseo_assethub: 'paseo',
   vara_network: 'vara'
 };

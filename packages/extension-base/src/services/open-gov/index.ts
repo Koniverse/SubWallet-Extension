@@ -9,13 +9,13 @@ import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler
 import { BehaviorSubject } from 'rxjs';
 
 import { ServiceStatus } from '../base/types';
+import { _GOVERNANCE_CHAIN_GROUP } from '../chain-service/constants';
 import { _isChainEnabled } from '../chain-service/utils';
 import { EventService } from '../event-service';
 import DatabaseService from '../storage-service/DatabaseService';
 import { SWTransactionBase } from '../transaction-service/types';
 import BaseOpenGovHandler from './handler';
 import { GovVoteRequest, GovVotingInfo, RemoveVoteRequest } from './interface';
-import { govChainSupportItems } from './utils';
 
 class OpenGovChainHandler extends BaseOpenGovHandler {
   public readonly slug: string;
@@ -124,8 +124,10 @@ export default class OpenGovService {
     await this.eventService.waitChainReady;
     const chains: string[] = [];
 
+    const supportedSlugs = Object.values(_GOVERNANCE_CHAIN_GROUP).flat();
+
     for (const chain of Object.values(this.state.getChainInfoMap())) {
-      if (chain.chainStatus === 'ACTIVE' && govChainSupportItems.some((item) => item.slug === chain.slug)) {
+      if (chain.chainStatus === 'ACTIVE' && supportedSlugs.includes(chain.slug)) {
         chains.push(chain.slug);
       }
     }

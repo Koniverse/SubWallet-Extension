@@ -25,6 +25,7 @@ const Component = ({ accounts, className = '', decimal, symbol }: Props) => {
     return (
       <Web3Block
         className='vote-item'
+        key={item.account}
         leftItem={
           <SwAvatar
             size={24}

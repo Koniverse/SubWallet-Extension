@@ -383,8 +383,6 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
   const isNotAllowed = !targetAccountProxy || !defaultData.referendumId || !defaultData.chain;
 
-  console.log('defaultData-----', defaultData);
-
   useEffect(() => {
     if (isNotAllowed) {
       // goHome();
