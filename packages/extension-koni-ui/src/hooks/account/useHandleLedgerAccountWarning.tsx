@@ -22,11 +22,17 @@ type HookType = (inputInfo: InputInfo, processFunction: VoidFunction) => boolean
 // `useHandleLedgerAccountWarning` will trigger a warning in the following two cases:
 //   1. When selecting a token address, it will display a warning for tokens belonging to unsupported networks of the ledgerEvm account, and tokens containing smart contracts on networks that bridge between the Ethereum and Substrate ecosystems for a substrate ecdsa ledger account type.
 //   2. When selecting a network address, it will show a warning for EVM networks that are not supported by the ledgerEvm account, and all bridge networks for the ledger substrate ecdsa account.
+const CONNECT_LEDGER_USER_GUIDE_URL = 'https://docs.subwallet.app/main/extension-user-guide/cold-wallet-management/connect-ledger-devices#token-compatibility-on-different-ledger-apps';
+
 export default function useHandleLedgerAccountWarning (): HookType {
   const { t } = useTranslation();
   const { alertModal } = useContext(WalletModalContext);
   const assetRegistry = useSelector((root) => root.assetRegistry.assetRegistry);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+
+  const goUserGuide = useCallback(() => {
+    window.open(CONNECT_LEDGER_USER_GUIDE_URL);
+  }, []);
 
   return useCallback(({ accountProxy, context, targetSlug }, processFunction) => {
     if (!accountProxy) {
@@ -95,7 +101,8 @@ export default function useHandleLedgerAccountWarning (): HookType {
         closable: false,
         rightIconProps: !isTokenContext
           ? {
-            icon: <InfoIcon />
+            icon: <InfoIcon />,
+            onClick: goUserGuide
           }
           : undefined,
         type: NotificationType.WARNING,
@@ -120,5 +127,5 @@ export default function useHandleLedgerAccountWarning (): HookType {
     }
 
     return false;
-  }, [alertModal, assetRegistry, chainInfoMap, t]);
+  }, [alertModal, assetRegistry, chainInfoMap, goUserGuide, t]);
 }
