@@ -3415,15 +3415,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@koniverse/utils@npm:^0.0.6":
-  version: 0.0.6
-  resolution: "@koniverse/utils@npm:0.0.6"
+"@koniverse/utils@npm:^0.0.9":
+  version: 0.0.9
+  resolution: "@koniverse/utils@npm:0.0.9"
   dependencies:
     axios: ^1.11.0
     eventemitter3: ^5.0.1
     rxjs: ^7.8.2
     spark-md5: ^3.0.2
-  checksum: c3c2b10a6f93196af2ab551a8c13cf78b3bc64aba10670fbebd1393fd135ad4cb99416d2d9f499a9be1e14b465e25ef2da0a60f062acf99b6151f524f968d270
+  checksum: e87dfe8ff76e0a83da8d2fbb6a5301ec20bc3efc3f2f782f4907d812b7ca1fdd194ff5e54cadbd7d77716dfb881f5f7da2604667e70aa1c91bdf784acb8fa251
   languageName: node
   linkType: hard
 
@@ -6242,13 +6242,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet-monorepos/subwallet-services-sdk@npm:0.1.9-beta.1":
-  version: 0.1.9-beta.1
-  resolution: "@subwallet-monorepos/subwallet-services-sdk@npm:0.1.9-beta.1"
+"@subwallet-monorepos/subwallet-services-sdk@npm:0.1.9-beta.2":
+  version: 0.1.9-beta.2
+  resolution: "@subwallet-monorepos/subwallet-services-sdk@npm:0.1.9-beta.2"
   dependencies:
-    "@koniverse/utils": ^0.0.6
+    "@koniverse/utils": ^0.0.9
     "@subwallet/chain-list": ^0.2.113
-  checksum: c4fa18303c37db893475748783a38f71a9f11788ef19cad42136c8a4f14d273388de370d2afdf6e9317f9ca32615eddd16e0a33931c11cbc43663955349c08c1
+  checksum: 9d4a4c0128c3ad22d8ac9c93532f2d66e3953208a434fda6c98dca917576a189c4055540208e0464c10e371dd031ffe208e8aae562ee31e4953ccd5e493f2c6c
   languageName: node
   linkType: hard
 
@@ -6302,7 +6302,7 @@ __metadata:
     "@snowbridge/registry": ^0.2.0
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
-    "@subwallet-monorepos/subwallet-services-sdk": 0.1.9-beta.1
+    "@subwallet-monorepos/subwallet-services-sdk": 0.1.9-beta.2
     "@subwallet/chain-list": 0.2.114-beta.1
     "@subwallet/extension-base": ^1.3.55-1
     "@subwallet/extension-chains": ^1.3.55-1

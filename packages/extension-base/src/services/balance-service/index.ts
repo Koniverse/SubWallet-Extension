@@ -534,7 +534,7 @@ export class BalanceService implements StoppableServiceInterface {
 
           const balanceDetectionApi = subwalletApiSdk.balanceDetectionApi || Promise.resolve([]);
 
-          Promise.race([timeOutPromise, balanceDetectionApi.getSubWalletTokenBalance(address)])
+          Promise.race([timeOutPromise, balanceDetectionApi.getRequest(address)])
             .then((result) => resolve(result))
             .catch((error) => {
               console.error(error);
