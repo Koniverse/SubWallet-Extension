@@ -1285,6 +1285,7 @@
   "ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.connectionExpired": "Connection expired",
   "ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.networks": "Сеты",
   "ui.BALANCE.components.Modal.Customize.Modal.networks": "Сеты",
+  "ui.BALANCE.components.Modal.Customize.Modal.tokens": "",
   "ui.TRANSACTION.Confirmations.EvmTransaction.toContract": "На контракт",
   "ui.TRANSACTION.Confirmations.EvmTransaction.estimatedGas": "Расчётный газ",
   "ui.TRANSACTION.Confirmations.EvmTransaction.highGasFeeWarning": "Gas fees on {{networkName}} are high due to high demands, so gas estimates are less accurate.",

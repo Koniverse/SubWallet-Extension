@@ -1285,6 +1285,7 @@
   "ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.connectionExpired": "接続期限切れ",
   "ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.networks": "ネットワーク",
   "ui.BALANCE.components.Modal.Customize.Modal.networks": "ネットワーク",
+  "ui.BALANCE.components.Modal.Customize.Modal.tokens": "",
   "ui.TRANSACTION.Confirmations.EvmTransaction.toContract": "コントラクトへ",
   "ui.TRANSACTION.Confirmations.EvmTransaction.estimatedGas": "推定ガス",
   "ui.TRANSACTION.Confirmations.EvmTransaction.highGasFeeWarning": "Gas fees on {{networkName}} are high due to high demands, so gas estimates are less accurate.",

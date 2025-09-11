@@ -1285,6 +1285,7 @@
   "ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.connectionExpired": "连接已过期",
   "ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.networks": "网络",
   "ui.BALANCE.components.Modal.Customize.Modal.networks": "网络",
+  "ui.BALANCE.components.Modal.Customize.Modal.tokens": "",
   "ui.TRANSACTION.Confirmations.EvmTransaction.toContract": "到合约",
   "ui.TRANSACTION.Confirmations.EvmTransaction.estimatedGas": "预估gas",
   "ui.TRANSACTION.Confirmations.EvmTransaction.highGasFeeWarning": "Gas fees on {{networkName}} are high due to high demands, so gas estimates are less accurate.",

@@ -1284,6 +1284,7 @@
   "ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.connectionExpired": "Connection expired",
   "ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.networks": "Networks",
   "ui.BALANCE.components.Modal.Customize.Modal.networks": "Networks",
+  "ui.BALANCE.components.Modal.Customize.Modal.tokens": "Tokens",
   "ui.TRANSACTION.Confirmations.EvmTransaction.toContract": "To contract",
   "ui.TRANSACTION.Confirmations.EvmTransaction.estimatedGas": "Estimated gas",
   "ui.TRANSACTION.Confirmations.EvmTransaction.highGasFeeWarning": "Gas fees on {{networkName}} are high due to high demands, so gas estimates are less accurate.",

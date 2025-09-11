@@ -1285,6 +1285,7 @@
   "ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.connectionExpired": "Kết nối đã quá hạn.",
   "ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.networks": "Mạng",
   "ui.BALANCE.components.Modal.Customize.Modal.networks": "Mạng",
+  "ui.BALANCE.components.Modal.Customize.Modal.tokens": "",
   "ui.TRANSACTION.Confirmations.EvmTransaction.toContract": "Tới contract",
   "ui.TRANSACTION.Confirmations.EvmTransaction.estimatedGas": "Phí gas ước tính",
   "ui.TRANSACTION.Confirmations.EvmTransaction.highGasFeeWarning": "Gas fees on {{networkName}} are high due to high demands, so gas estimates are less accurate.",
