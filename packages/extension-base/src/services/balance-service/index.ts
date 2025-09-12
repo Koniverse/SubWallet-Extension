@@ -527,22 +527,14 @@ export class BalanceService implements StoppableServiceInterface {
       const typeValid = [...EthereumKeypairTypes].includes(type);
 
       if (typeValid) {
-        return new Promise<string[] | null>((resolve) => {
-          const timeOutPromise = new Promise<string[]>((_resolve) => {
-            setTimeout(() => _resolve([]), 30000);
+        return subwalletApiSdk.balanceDetectionApi.getRequest(address)
+          .catch((e) => {
+            console.error(e);
+
+            return null;
           });
-
-          const balanceDetectionApi = subwalletApiSdk.balanceDetectionApi || Promise.resolve([]);
-
-          Promise.race([timeOutPromise, balanceDetectionApi.getRequest(address)])
-            .then((result) => resolve(result))
-            .catch((error) => {
-              console.error(error);
-              resolve(null);
-            });
-        });
       } else {
-        return Promise.resolve(null);
+        return null;
       }
     });
 
