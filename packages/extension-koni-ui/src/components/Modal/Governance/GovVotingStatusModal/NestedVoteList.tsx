@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { EmptyList } from '@subwallet/extension-koni-ui/components';
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { GOV_DELEGATION_DETAILS_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -11,7 +12,7 @@ import { Icon, ModalContext, SwList, Web3Block } from '@subwallet/react-ui';
 import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import CN from 'classnames';
 import { t } from 'i18next';
-import { CaretRight, Copy, UsersThree } from 'phosphor-react';
+import { CaretRight, Copy, ListChecks, UsersThree } from 'phosphor-react';
 import React, { forwardRef, useCallback, useContext, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
@@ -109,7 +110,12 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
   }, [className, decimals, networkPrefix, onClickMore, symbol]);
 
   const renderEmpty = useCallback(() => {
-    return <>No nested data</>;
+    return (
+      <EmptyList
+        emptyMessage={t('No nested data')}
+        phosphorIcon={ListChecks}
+      />
+    );
   }, []);
 
   const filteredAccounts = useMemo(() => {

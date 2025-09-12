@@ -82,6 +82,8 @@ const Component = ({ className, referendumDetail }: Props): React.ReactElement<P
 
 export const TabsContainer = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-
+    '.filter-tabs-bar': {
+      marginBottom: token.marginSM
+    }
   };
 });

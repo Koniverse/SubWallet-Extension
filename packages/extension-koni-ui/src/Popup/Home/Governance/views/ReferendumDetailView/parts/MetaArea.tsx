@@ -27,12 +27,12 @@ const Component = ({ className, referendumDetail }: Props): React.ReactElement<P
 
 export const MetaArea = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-    paddingInline: token.padding,
 
     '.__ref-title': {
-      lineHeight: token.lineHeight,
-      fontSize: token.fontSize,
+      lineHeight: token.lineHeightHeading5,
+      fontSize: token.fontSizeHeading5,
       color: token.colorTextLight1,
+      fontWeight: token.fontWeightStrong,
       marginBottom: token.marginXS
     },
 

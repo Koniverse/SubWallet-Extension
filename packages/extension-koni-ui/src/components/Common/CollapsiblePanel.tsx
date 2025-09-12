@@ -43,8 +43,8 @@ const Component: React.FC<Props> = (props: Props) => {
           <div className='__panel-title'>{title}</div>
           <div className='__panel-icon'>
             <Icon
+              customSize={'20px'}
               phosphorIcon={isOpen ? CaretUp : CaretDown}
-              size='sm'
             />
           </div>
         </div>

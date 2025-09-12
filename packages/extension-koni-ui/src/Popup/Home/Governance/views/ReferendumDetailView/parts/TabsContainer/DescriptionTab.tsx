@@ -4,8 +4,9 @@
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon } from '@subwallet/react-ui';
-import { CaretDoubleDown, CaretDoubleUp } from 'phosphor-react';
-import React, { useCallback, useState } from 'react';
+import CN from 'classnames';
+import { CaretDoubleDown } from 'phosphor-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
@@ -15,23 +16,35 @@ type Props = ThemeProps & {
   content: string;
 };
 
+const MAX_HEIGHT = 184;
+
 const Component = ({ className, content }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const _onClick = useCallback(() => {
     setIsExpanded(!isExpanded);
   }, [isExpanded]);
 
+  useEffect(() => {
+    if (contentRef.current) {
+      const el = contentRef.current;
+
+      if (el.scrollHeight > MAX_HEIGHT) {
+        setIsOverflowing(true);
+      } else {
+        setIsOverflowing(false);
+      }
+    }
+  }, [content]);
+
   return (
     <div className={className}>
       <div
-        style={{
-          overflow: 'hidden',
-          maxHeight: isExpanded ? 'none' : '150px',
-          transition: 'max-height 0.3s ease',
-          position: 'relative'
-        }}
+        className={CN('__description-content', { '-expanded': isExpanded })}
+        ref={contentRef}
       >
         <Markdown
           rehypePlugins={[rehypeRaw]}
@@ -39,41 +52,22 @@ const Component = ({ className, content }: Props): React.ReactElement<Props> => 
         >
           {content}
         </Markdown>
-
-        {!isExpanded && (
-          <div className='gradient-wrapper'>
-            <Button
-              icon={(
-                <Icon
-                  phosphorIcon={CaretDoubleDown}
-                  size={'sm'}
-                />
-              )}
-              onClick={_onClick}
-              shape={'circle'}
-              size={'xs'}
-            >
-              {t('Read more')}
-            </Button>
-          </div>
-        )}
       </div>
 
-      {isExpanded && (
-        <div className='gradient-wrapper'>
+      {!isExpanded && isOverflowing && (
+        <div className='__description-gradient-wrapper'>
           <Button
             icon={(
               <Icon
-                phosphorIcon={CaretDoubleUp}
+                phosphorIcon={CaretDoubleDown}
                 size={'sm'}
-
               />
             )}
             onClick={_onClick}
             shape={'circle'}
             size={'xs'}
           >
-            {t('Read less')}
+            {t('Read more')}
           </Button>
         </div>
       )}
@@ -85,7 +79,7 @@ export const DescriptionTab = styled(Component)<Props>(({ theme: { token } }: Pr
   return {
     position: 'relative',
 
-    '.gradient-wrapper': {
+    '.__description-gradient-wrapper': {
       position: 'absolute',
       bottom: 0,
       left: '50%',
@@ -99,9 +93,45 @@ export const DescriptionTab = styled(Component)<Props>(({ theme: { token } }: Pr
       background: 'linear-gradient(to bottom, rgba(12, 12, 12, 0), rgba(12, 12, 12, 1))'
     },
 
-    '.gradient-wrapper .ant-btn': {
+    '.__description-gradient-wrapper .ant-btn': {
       background: 'transparent',
       color: token.colorTextSecondary
+    },
+
+    '.__description-content': {
+      overflow: 'hidden',
+      maxHeight: MAX_HEIGHT,
+      transition: 'max-height 0.3s ease',
+      position: 'relative',
+
+      h1: {
+        fontSize: token.fontSizeHeading4,
+        lineHeight: token.lineHeightHeading4
+      },
+
+      h2: {
+        fontSize: token.fontSizeHeading5,
+        lineHeight: token.lineHeightHeading5
+      },
+
+      h3: {
+        fontSize: token.fontSizeHeading6,
+        lineHeight: token.lineHeightHeading6
+      },
+
+      'p, li': {
+        fontSize: token.fontSizeSM,
+        lineHeight: token.lineHeightSM,
+        color: token.colorTextLight4
+      },
+
+      img: {
+        maxWidth: '100%'
+      },
+
+      '&.-expanded': {
+        maxHeight: 'unset'
+      }
     }
   };
 });

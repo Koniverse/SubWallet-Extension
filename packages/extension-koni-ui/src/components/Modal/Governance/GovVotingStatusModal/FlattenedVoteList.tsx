@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { govConvictionOptions } from '@subwallet/extension-base/services/open-gov/interface';
+import { EmptyList } from '@subwallet/extension-koni-ui/components';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { formatBalance, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, SwList, Web3Block } from '@subwallet/react-ui';
 import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
-import { ArrowSquareOut, Copy } from 'phosphor-react';
+import { t } from 'i18next';
+import { ArrowSquareOut, Copy, ListChecks } from 'phosphor-react';
 import React, { forwardRef, useCallback } from 'react';
 import styled from 'styled-components';
 
@@ -70,7 +72,12 @@ const Component = ({ accounts, className = '', decimal, symbol }: Props) => {
   }, [decimal, symbol]);
 
   const renderEmpty = useCallback(() => {
-    return <div className='__empty'>No flattened data</div>;
+    return (
+      <EmptyList
+        emptyMessage={t('No nested data')}
+        phosphorIcon={ListChecks}
+      />
+    );
   }, []);
 
   return (

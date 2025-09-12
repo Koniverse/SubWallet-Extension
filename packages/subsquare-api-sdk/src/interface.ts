@@ -313,4 +313,16 @@ export const GOV_COMPLETED_STATES: GovStatusKey[] = [
   GovStatusKey.KILLED
 ];
 
+export const GOV_COMPLETED_SUCCESS_STATES: GovStatusKey[] = [
+  GovStatusKey.APPROVED,
+  GovStatusKey.EXECUTED
+];
+
+export const GOV_COMPLETED_FAILED_STATES: GovStatusKey[] = [
+  GovStatusKey.REJECTED,
+  GovStatusKey.TIMEDOUT,
+  GovStatusKey.CANCELLED,
+  GovStatusKey.KILLED
+];
+
 /* Gov Status */

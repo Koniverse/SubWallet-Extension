@@ -100,15 +100,6 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
   const handleLoadMore = useCallback(() => {
     setIsLoadingMore(true);
     fetchNextPage()
-      .then(() => {
-        setTimeout(() => {
-          containerRef.current?.scrollTo({
-            top: containerRef.current.scrollTop - 300,
-            behavior: 'smooth'
-          });
-          setIsLoadingMore(false);
-        }, 100);
-      })
       .catch((err) => console.error('Failed to load more:', err))
       .finally(() => {
         setTimeout(() => setIsLoadingMore(false), 500);

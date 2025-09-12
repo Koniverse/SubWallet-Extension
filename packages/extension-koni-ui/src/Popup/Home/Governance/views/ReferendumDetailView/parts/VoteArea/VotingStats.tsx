@@ -10,7 +10,7 @@ import { GovVoteSide } from '@subwallet/extension-koni-ui/types/gov';
 import { ReferendumVoteResult } from '@subwallet/extension-koni-ui/utils/gov/votingStats';
 import { Icon, ModalContext, Number } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { Info } from 'phosphor-react';
+import { CircleHalf, Info, ThumbsDown, ThumbsUp } from 'phosphor-react';
 import React, { useCallback, useContext, useState } from 'react';
 import styled from 'styled-components';
 
@@ -53,17 +53,33 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
   return (
     <div className={className}>
       <CollapsiblePanel
-        className={CN(className)}
+        className={'voting-stats-collapse'}
         onToggle={setIsOpen}
         title={isOpen ? t('Hide voting stats') : t('Show voting stats')}
       >
         <MetaInfo>
           <MetaInfo.Default
-            label={t('Aye') + ` (${votingData.Aye.totalVotedAccounts})`}
+            label={
+              <>
+                <Icon
+                  className={CN('voting-stats__icon', '-aye')}
+                  customSize={'16px'}
+                  phosphorIcon={ThumbsUp}
+                  weight={'fill'}
+                />
+                <div className={CN('voting-stats__label', '-aye')}>
+                  {t('Aye:')}
+                </div>
+                <div className='voting-stats__number'>
+                  {votingData.Aye.totalVotedAccounts}
+                </div>
+              </>
+            }
           >
             <div className='voting-stats__value'>
               <Number
                 decimal={decimals}
+                decimalOpacity={0.45}
                 prefix={'~'}
                 suffix={symbol}
                 value={votingData.Aye.totalVotedAmount}
@@ -78,11 +94,27 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
           </MetaInfo.Default>
 
           <MetaInfo.Default
-            label={t('Nay') + ` (${votingData.Nay.totalVotedAccounts})`}
+            label={
+              <>
+                <Icon
+                  className={CN('voting-stats__icon', '-nay')}
+                  customSize={'16px'}
+                  phosphorIcon={ThumbsDown}
+                  weight={'fill'}
+                />
+                <div className={CN('voting-stats__label', '-nay')}>
+                  {t('Nay:')}
+                </div>
+                <div className='voting-stats__number'>
+                  {votingData.Nay.totalVotedAccounts}
+                </div>
+              </>
+            }
           >
             <div className='voting-stats__value'>
               <Number
                 decimal={decimals}
+                decimalOpacity={0.45}
                 prefix={'~'}
                 suffix={symbol}
                 value={votingData.Nay.totalVotedAmount}
@@ -97,11 +129,28 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
           </MetaInfo.Default>
 
           <MetaInfo.Default
-            label={t('Abstain') + ` (${votingData.Abstain.totalVotedAccounts})`}
+            label={
+              <>
+                <Icon
+                  className={CN('voting-stats__icon', '-abstain')}
+                  customSize={'16px'}
+                  phosphorIcon={CircleHalf}
+                  weight={'fill'}
+                />
+
+                <div className={CN('voting-stats__label', '-abstain')}>
+                  {t('Abstain:')}
+                </div>
+                <div className='voting-stats__number'>
+                  {votingData.Abstain.totalVotedAccounts}
+                </div>
+              </>
+            }
           >
             <div className='voting-stats__value'>
               <Number
                 decimal={decimals}
+                decimalOpacity={0.45}
                 prefix={'~'}
                 suffix={symbol}
                 value={votingData.Abstain.totalVotedAmount}
@@ -133,6 +182,58 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
 
 export const VotingStats = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
+    borderTop: '2px solid ' + token.colorBgBorder,
+    marginTop: token.marginSM,
+
+    '.voting-stats-collapse': {
+      backgroundColor: 'transparent',
+
+      '.__panel-header': {
+        padding: 0
+      },
+
+      '.__panel-title': {
+        fontSize: token.fontSizeSM,
+        lineHeight: token.lineHeightSM,
+        fontWeight: token.bodyFontWeight
+      },
+
+      '.__panel-body': {
+        paddingLeft: token.paddingXS,
+        paddingRight: token.paddingXS
+      }
+    },
+
+    '.__label': {
+      display: 'flex',
+      alignItems: 'center'
+    },
+
+    '.voting-stats__icon': {
+      marginRight: token.marginXXS
+    },
+
+    '.voting-stats__label': {
+      marginRight: token.marginXXS / 2
+    },
+
+    '.voting-stats__number': {
+      fontWeight: token.bodyFontWeight,
+      color: token.colorTextLight4
+    },
+
+    '.-aye': {
+      color: token['green-7']
+    },
+
+    '.-nay': {
+      color: token['red-7']
+    },
+
+    '.-abstain': {
+      color: token.colorTextLight2
+    },
+
     '.voting-stats__value': {
       display: 'flex',
       alignItems: 'center',

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import GovAccountSelectoModal from '@subwallet/extension-koni-ui/components/Modal/Governance/GovAccountSelector';
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
@@ -11,7 +12,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
-import { Icon, ModalContext, SwSubHeader } from '@subwallet/react-ui';
+import { Button, Icon, ModalContext, SwSubHeader } from '@subwallet/react-ui';
 import { useQuery } from '@tanstack/react-query';
 import { UploadSimple } from 'phosphor-react';
 import React, { useCallback, useContext } from 'react';
@@ -63,6 +64,14 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
     },
     staleTime: 60 * 1000
   });
+
+  const onViewPolkassembly = useCallback(() => {
+    window.open(`https://${chainSlug}.polkassembly.io/referenda/${data?.referendumIndex || ''}`, '_blank');
+  }, [chainSlug, data?.referendumIndex]);
+
+  const onViewSubsquare = useCallback(() => {
+    window.open(`https://${chainSlug}.subsquare.io/referenda/${data?.referendumIndex || ''}`, '_blank');
+  }, [chainSlug, data?.referendumIndex]);
 
   const onSelectGovItem = useCallback((item: GovAccountAddressItemType) => {
     if (item.govVoteStatus === GovVoteStatus.DELEGATED) {
@@ -120,7 +129,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
       <SwSubHeader
         background={'transparent'}
         center
-        className={'transaction-header'}
+        className={'referendum-detail-header'}
         onBack={onBack}
         paddingVertical
         rightButtons={[
@@ -143,19 +152,21 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
         referendumDetail={data}
       />
 
-      <VoteArea
-        chain={chainSlug}
-        onClickVote={onClickVote}
-        referendumDetail={data}
-        sdkInstance={sdkInstance}
-      />
-
-      { allSpends && (
-        <RequestedAmount
-          allSpend={allSpends}
+      <div>
+        <VoteArea
           chain={chainSlug}
+          onClickVote={onClickVote}
+          referendumDetail={data}
+          sdkInstance={sdkInstance}
         />
-      )}
+
+        { allSpends && (
+          <RequestedAmount
+            allSpend={allSpends}
+            chain={chainSlug}
+          />
+        )}
+      </div>
 
       <TabsContainer referendumDetail={data} />
 
@@ -165,12 +176,61 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
         onCancel={onCancel}
         onSelectItem={onSelectGovItem}
       />
+
+      <div className={'referendum-detail-footer'}>
+        <Button
+          block={true}
+          className='ref-polkassambly-button'
+          icon={
+            <img
+              alt='Polkassembly'
+              className={'footer-button-logo'}
+              src={DefaultLogosMap.polkassembly}
+            />
+          }
+          onClick={onViewPolkassembly}
+          schema='secondary'
+        >
+          {t('Polkassembly')}
+        </Button>
+
+        <Button
+          block={true}
+          className={'ref-subsquare-button'}
+          icon={
+            <img
+              alt='Subsquare'
+              className={'footer-button-logo'}
+              src={DefaultLogosMap.subsquare}
+            />
+          }
+          onClick={onViewSubsquare}
+          schema='secondary'
+        >
+          {t('Subsquare')}
+        </Button>
+      </div>
     </div>
   );
 };
 
 export const ReferendumDetailView = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
+    paddingInline: token.padding,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: token.sizeMS,
 
+    '.referendum-detail-footer': {
+      display: 'flex',
+      gap: token.sizeSM,
+
+      '.footer-button-logo': {
+        height: 28,
+        width: 28
+      },
+
+      marginBottom: token.sizeXL
+    }
   };
 });
