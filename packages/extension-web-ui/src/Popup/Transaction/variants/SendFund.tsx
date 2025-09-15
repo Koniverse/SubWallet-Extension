@@ -824,6 +824,8 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
     }
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
+  const isDataReady = !isFetchingInfo && !isFetchingListFeeToken && !!transferInfo?.feeOptions;
+
   useEffect(() => {
     // Hotfix in case the form is disabled; useWatch may delay showing the latest result
     if (assetValue !== undefined) {
@@ -893,7 +895,8 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
         destChain: destChainValue,
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
-        tokenPayFeeSlug: currentTokenPayFee
+        tokenPayFeeSlug: currentTokenPayFee,
+        transferAll: isTransferAll
       }, callback)
         .then((callback))
         .catch((e) => {
@@ -911,7 +914,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
       cancel = true;
       id && cancelSubscription(id).catch(console.error);
     };
-  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue]);
+  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue, isTransferAll]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');
@@ -1175,7 +1178,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
         })}
       >
         <Button
-          disabled={!isBalanceReady || isFetchingListFeeToken || (isTransferAll ? isFetchingInfo : false)}
+          disabled={!isBalanceReady || isFetchingListFeeToken || (isTransferAll ? isFetchingInfo : false) || !isDataReady || !!transferInfo?.error}
           icon={(
             <Icon
               phosphorIcon={PaperPlaneTilt}
