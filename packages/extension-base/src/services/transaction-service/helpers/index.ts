@@ -80,6 +80,8 @@ const typeName = (type: SWTransactionBase['extrinsicType']) => {
       return 'Vote';
     case ExtrinsicType.GOV_UNVOTE:
       return 'Remove vote';
+    case ExtrinsicType.GOV_UNLOCK_VOTE:
+      return 'Unlock votes';
     case ExtrinsicType.CHANGE_EARNING_VALIDATOR:
       return 'Change validator';
     case ExtrinsicType.UNKNOWN:

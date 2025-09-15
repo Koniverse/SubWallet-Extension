@@ -15,7 +15,7 @@ import { EventService } from '../event-service';
 import DatabaseService from '../storage-service/DatabaseService';
 import { SWTransactionBase } from '../transaction-service/types';
 import BaseOpenGovHandler from './handler';
-import { GovVoteRequest, GovVotingInfo, RemoveVoteRequest } from './interface';
+import { GovVoteRequest, GovVotingInfo, RemoveVoteRequest, UnlockVoteRequest } from './interface';
 
 class OpenGovChainHandler extends BaseOpenGovHandler {
   public readonly slug: string;
@@ -93,7 +93,8 @@ export default class OpenGovService {
             const tx = event.data[0] as SWTransactionBase;
             const govRelatedTypes = [
               ExtrinsicType.GOV_VOTE,
-              ExtrinsicType.GOV_UNVOTE
+              ExtrinsicType.GOV_UNVOTE,
+              ExtrinsicType.GOV_UNLOCK_VOTE
             ];
 
             if (govRelatedTypes.includes(tx.extrinsicType)) {
@@ -158,6 +159,16 @@ export default class OpenGovService {
     }
 
     return handler.handleRemoveVote(request);
+  }
+
+  public async handleUnlockVote (request: UnlockVoteRequest): Promise<TransactionData> {
+    const handler = this.handlers[request.chain];
+
+    if (!handler) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+    }
+
+    return handler.handleUnlockVote(request);
   }
 
   /* Gov Locked Info */

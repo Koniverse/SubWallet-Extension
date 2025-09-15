@@ -89,3 +89,9 @@ export interface GovReferendumUnvoteParams extends TransactionFormBaseProps {
   referendumId: string;
   track: number;
 }
+
+export interface GovUnlockVoteParams extends TransactionFormBaseProps {
+  amount: string;
+  referendumIds?: string[];
+  tracks: number[];
+}

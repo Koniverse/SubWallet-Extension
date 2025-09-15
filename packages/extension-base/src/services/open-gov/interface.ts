@@ -183,3 +183,11 @@ export interface GovDelegationDetail {
   target: string;
   conviction: Conviction;
 }
+
+// Unlock Vote
+export interface UnlockVoteRequest {
+  address: string;
+  chain: string;
+  trackIds: number[];
+  referendumIds?: string[];
+}

@@ -39,7 +39,7 @@ import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
 import { EarningImpactResult } from '../services/earning-service/handlers/native-staking/dtao';
-import { GovVoteRequest, GovVotingInfo, RemoveVoteRequest } from '../services/open-gov/interface';
+import { GovVoteRequest, GovVotingInfo, RemoveVoteRequest, UnlockVoteRequest } from '../services/open-gov/interface';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -583,6 +583,7 @@ export enum ExtrinsicType {
   // OPEN GOV
   GOV_VOTE = 'gov.vote',
   GOV_UNVOTE= 'gov.unvote',
+  GOV_UNLOCK_VOTE='gov.unlock-vote',
 
   EVM_EXECUTE = 'evm.execute',
   UNKNOWN = 'unknown'
@@ -642,6 +643,8 @@ export interface ExtrinsicDataTypeMap {
   [ExtrinsicType.CROWDLOAN]: any,
   [ExtrinsicType.GOV_VOTE]: any,
   [ExtrinsicType.GOV_UNVOTE]: any,
+  [ExtrinsicType.GOV_UNLOCK_VOTE]: any,
+
   [ExtrinsicType.SWAP]: SwapTxData
   [ExtrinsicType.UNKNOWN]: any
 }
@@ -2764,6 +2767,7 @@ export interface KoniRequestSignatures {
   'pri(openGov.vote)': [GovVoteRequest, SWTransactionResponse];
   'pri(openGov.unvote)': [RemoveVoteRequest, SWTransactionResponse]
   'pri(openGov.subscribeGovLockedInfo)': [null, GovVotingInfo[], GovVotingInfo[]];
+  'pri(openGov.unlockVote)': [UnlockVoteRequest, SWTransactionResponse]
 }
 
 export interface ApplicationMetadataType {

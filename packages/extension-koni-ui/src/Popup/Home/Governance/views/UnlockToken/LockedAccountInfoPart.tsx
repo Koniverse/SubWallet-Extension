@@ -3,13 +3,16 @@
 
 import { GovVotingInfo } from '@subwallet/extension-base/services/open-gov/interface';
 import { Avatar, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { DEFAULT_GOV_UNLOCK_VOTE_PARAMS, GOV_UNLOCK_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainPrefixBySlug, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { findAccountByAddress, toShort } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, getTransactionFromAccountProxyValue, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretLeft, CaretRight, CheckCircle } from 'phosphor-react';
 import React, { useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 import Slider, { CustomArrowProps, Settings } from 'react-slick';
 import styled from 'styled-components';
 
@@ -52,6 +55,10 @@ function Component ({ chain, className, govLockedInfos }: Props) {
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
   const networkPrefix = useGetChainPrefixBySlug(chain);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chain);
+  const { currentAccountProxy } = useSelector((state) => state.accountState);
+  const fromAccountProxy = getTransactionFromAccountProxyValue(currentAccountProxy);
+  const [, setGovUnlockStorage] = useLocalStorage(GOV_UNLOCK_VOTE_TRANSACTION, DEFAULT_GOV_UNLOCK_VOTE_PARAMS);
+  const navigate = useNavigate();
 
   const sliderSettings: Settings = useMemo(() => {
     return {
@@ -86,11 +93,20 @@ function Component ({ chain, className, govLockedInfos }: Props) {
     [accounts, networkPrefix]
   );
 
-  const createOpenNomination = useCallback((item: GovVotingInfo) => {
+  const goUnlockVote = useCallback((item: GovVotingInfo) => {
     return () => {
-      console.log('item', item);
+      setGovUnlockStorage({
+        ...DEFAULT_GOV_UNLOCK_VOTE_PARAMS,
+        from: item.address,
+        fromAccountProxy,
+        referendumIds: item.summary.unlockable.unlockableReferenda,
+        tracks: item.summary.unlockable.trackIds,
+        chain: chain,
+        amount: item.summary.unlockable.balance
+      });
+      navigate('/transaction/gov-unlock-vote');
     };
-  }, []);
+  }, [chain, fromAccountProxy, navigate, setGovUnlockStorage]);
 
   const accountInfoItemsNode = useMemo(() => {
     return govLockedInfos.map((item) => {
@@ -149,7 +165,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
               block={true}
               className={'__unlock-button'}
               onClick={
-                createOpenNomination(item)
+                goUnlockVote(item)
               }
               size='xs'
             >
@@ -162,7 +178,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
         </MetaInfo>
       );
     });
-  }, [govLockedInfos, renderAccount, decimals, symbol, createOpenNomination, t]);
+  }, [govLockedInfos, renderAccount, decimals, symbol, goUnlockVote, t]);
 
   return (
     <>

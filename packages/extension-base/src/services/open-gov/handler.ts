@@ -12,7 +12,7 @@ import { combineLatest, merge, mergeMap } from 'rxjs';
 import { _EXPECTED_BLOCK_TIME } from '../chain-service/constants';
 import { _SubstrateApi } from '../chain-service/types';
 import { _getAssetDecimals } from '../chain-service/utils';
-import { Conviction, convictionToDays, GovDelegationDetail, GovTrackVoting, GovVoteDetail, GovVoteRequest, GovVoteType, GovVotingInfo, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, SplitVoteRequest, StandardVoteRequest, Vote, VotingFor } from './interface';
+import { Conviction, convictionToDays, GovDelegationDetail, GovTrackVoting, GovVoteDetail, GovVoteRequest, GovVoteType, GovVotingInfo, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, SplitVoteRequest, StandardVoteRequest, UnlockVoteRequest, Vote, VotingFor } from './interface';
 
 export default abstract class BaseOpenGovHandler {
   protected readonly state: KoniState;
@@ -146,6 +146,35 @@ export default abstract class BaseOpenGovHandler {
     );
 
     return extrinsic;
+  }
+
+  public async handleUnlockVote (request: UnlockVoteRequest): Promise<TransactionData> {
+    const substrateApi = await this.substrateApi.isReady;
+
+    if (request.referendumIds && request.referendumIds.length > 0) {
+      const extrinsics = request.trackIds.flatMap((trackId, index) => {
+        const referendumIndex = request.referendumIds?.[index];
+
+        return referendumIndex !== undefined
+          ? [
+            substrateApi.api.tx.convictionVoting.removeVote(trackId, referendumIndex),
+            substrateApi.api.tx.convictionVoting.unlock(trackId, request.address)
+          ]
+          : substrateApi.api.tx.convictionVoting.unlock(trackId, request.address);
+      });
+
+      return substrateApi.api.tx.utility.batchAll(extrinsics);
+    }
+
+    if (request.trackIds.length > 1) {
+      const extrinsics = request.trackIds.map((id) =>
+        substrateApi.api.tx.convictionVoting.unlock(id, request.address)
+      );
+
+      return substrateApi.api.tx.utility.batchAll(extrinsics);
+    }
+
+    return substrateApi.api.tx.convictionVoting.unlock(request.trackIds[0], request.address);
   }
 
   /* Validate OpengGov Action */
@@ -288,7 +317,14 @@ export default abstract class BaseOpenGovHandler {
               trackStates.set(trackId, 'casting');
               const votes = await this.parseVotesAndCheckFinished(v.casting.votes || [], unlockableReferenda, currentBlockNumber, substrateApi);
 
-              trackVotes.set(trackId, votes);
+              const totalCast = votes.reduce((sum, vote) => {
+                return sum
+                  .plus(new BigN(vote.ayeAmount || '0'))
+                  .plus(new BigN(vote.nayAmount || '0'))
+                  .plus(new BigN(vote.abstainAmount || '0'));
+              }, new BigN(0));
+
+              trackVotedAmounts.set(trackId, totalCast);
 
               if (v.casting.prior && new BigN(v.casting.prior[0]).gt(0)) {
                 trackUnlockingAmounts.set(trackId, new BigN(v.casting.prior[1]));
