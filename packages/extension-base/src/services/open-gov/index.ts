@@ -169,7 +169,6 @@ export default class OpenGovService {
     const addresses = this.state.keyringService.context.getDecodedAddresses();
 
     this.subscribeGovLockedInfos(addresses, (data) => {
-      console.log('disdata', data);
       this.updateGovLockedInfo(data);
     }).then((rs) => {
       this.govLockedInfoUnsub = rs;

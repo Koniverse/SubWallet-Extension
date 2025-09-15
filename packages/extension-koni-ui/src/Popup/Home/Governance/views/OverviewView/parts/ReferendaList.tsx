@@ -23,7 +23,7 @@ type WrapperProps = Omit<Props, 'items'> & {
   items?: Referendum[];
 };
 
-const Component = ({ chain, className, items, onClickItem, selectedReferendaCategory }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, items, onClickItem }: Props): React.ReactElement<Props> => {
   const _onClickItem = useCallback((item: Referendum) => {
     return () => {
       onClickItem(item);
@@ -41,7 +41,6 @@ const Component = ({ chain, className, items, onClickItem, selectedReferendaCate
               item={item}
               key={item.referendumIndex}
               onClick={_onClickItem(item)}
-              selectedReferendaCategory={selectedReferendaCategory}
             />
           ))
           : <EmptyList

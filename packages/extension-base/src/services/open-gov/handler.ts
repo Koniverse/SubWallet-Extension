@@ -4,14 +4,15 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, BlockHeader, TransactionData } from '@subwallet/extension-base/types';
 import { formatNumber } from '@subwallet/extension-base/utils/number';
 import BigN from 'bignumber.js';
-import { combineLatest, map, merge } from 'rxjs';
+import { combineLatest, merge, mergeMap } from 'rxjs';
 
+import { _EXPECTED_BLOCK_TIME } from '../chain-service/constants';
 import { _SubstrateApi } from '../chain-service/types';
 import { _getAssetDecimals } from '../chain-service/utils';
-import { Conviction, GovDelegationDetail, GovTrackVoting, GovVoteDetail, GovVoteRequest, GovVoteType, GovVotingInfo, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, SplitVoteRequest, StandardVoteRequest, VotingFor } from './interface';
+import { Conviction, convictionToDays, GovDelegationDetail, GovTrackVoting, GovVoteDetail, GovVoteRequest, GovVoteType, GovVotingInfo, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, SplitVoteRequest, StandardVoteRequest, Vote, VotingFor } from './interface';
 
 export default abstract class BaseOpenGovHandler {
   protected readonly state: KoniState;
@@ -29,6 +30,14 @@ export default abstract class BaseOpenGovHandler {
   public get chainInfo (): _ChainInfo {
     return this.state.getChainInfo(this.chain);
   }
+
+  private lockPeriod (days: number): number {
+    const blockTime = _EXPECTED_BLOCK_TIME[this.chain] ?? 6;
+    const baseLockedPeriod = 24 * 60 * 60 * days;
+
+    return baseLockedPeriod / blockTime;
+  }
+
   /* Referendum related actions */
 
   public async handleVote (request: GovVoteRequest): Promise<TransactionData> {
@@ -229,112 +238,109 @@ export default abstract class BaseOpenGovHandler {
   }
 
   /* Lock info */
-  public async subscribeGovLockedInfo (
-    addresses: string[],
-    cb: (info: GovVotingInfo) => void
-  ) {
+  public async subscribeGovLockedInfo (addresses: string[], cb: (info: GovVotingInfo) => void) {
     const substrateApi = await this.substrateApi.isReady;
 
     const streams = addresses.map((addr) => {
       return combineLatest([
-        substrateApi.api.query.convictionVoting.votingFor.entries(addr)
+        substrateApi.api.query.convictionVoting.votingFor.entries(addr),
+        substrateApi.api.query.convictionVoting.classLocksFor(addr)
       ]).pipe(
-        map(([votingEntries]): GovVotingInfo => {
-          let delegated = new BigN(0);
-          let voted = new BigN(0);
-          const prior = new BigN(0);
-
+        mergeMap(async ([votingEntries, classLocks]) => {
+          let totalDelegated = new BigN(0);
+          let totalVoted = new BigN(0);
           const tracks: GovTrackVoting[] = [];
+          const trackBalances = new Map<number, BigN>();
+          const trackStates = new Map<number, 'delegating' | 'casting' | 'empty'>();
+          const trackVotedAmounts = new Map<number, BigN>();
+          const trackUnlockingAmounts = new Map<number, BigN>();
+          const unlockableReferenda = new Set<string>();
+          const trackVotes = new Map<number, GovVoteDetail[]>();
+          const trackPriorBlocks = new Map<number, BigN>();
+          let totalLocked = new BigN(0);
+
+          const classLocksArray = classLocks.toPrimitive() as [number, string][];
+
+          for (const [trackId, balance] of classLocksArray) {
+            const bnBalance = new BigN(balance);
+
+            trackBalances.set(trackId, bnBalance);
+            totalLocked = BigN.max(totalLocked, bnBalance);
+          }
+
+          const currentBlockInfo = await substrateApi.api.rpc.chain.getHeader();
+          const currentBlockNumber = (currentBlockInfo.toPrimitive() as unknown as BlockHeader).number;
 
           for (const [key, voting] of votingEntries) {
             const trackId = key.args[1].toPrimitive() as number;
             const v = voting.toPrimitive() as VotingFor;
 
             if (v.delegating) {
+              trackStates.set(trackId, 'delegating');
               const delegation: GovDelegationDetail = {
                 balance: v.delegating.balance.toString(),
                 target: v.delegating.target,
                 conviction: v.delegating.conviction
               };
 
-              delegated = delegated.plus(v.delegating.balance);
+              tracks.push({ trackId, delegation });
+            } else if (v.casting) {
+              trackStates.set(trackId, 'casting');
+              const votes = await this.parseVotesAndCheckFinished(v.casting.votes || [], unlockableReferenda, currentBlockNumber, substrateApi);
 
-              if (v.delegating.prior) {
-                const [locked] = v.delegating.prior;
+              trackVotes.set(trackId, votes);
 
-                delegated = delegated.plus(locked);
+              if (v.casting.prior && new BigN(v.casting.prior[0]).gt(0)) {
+                trackUnlockingAmounts.set(trackId, new BigN(v.casting.prior[1]));
+                trackPriorBlocks.set(trackId, new BigN(v.casting.prior[0]));
               }
 
-              tracks.push({
-                trackId,
-                delegation
-              });
-            }
-
-            if (v.casting?.votes) {
-              const votes: GovVoteDetail[] = [];
-
-              for (const [refIndex, vote] of v.casting.votes) {
-                if ('standard' in vote) {
-                  const isAye = vote.standard.vote.aye === true;
-
-                  votes.push({
-                    referendumIndex: refIndex,
-                    type: isAye ? GovVoteType.AYE : GovVoteType.NAY,
-                    conviction: vote.standard.vote.conviction,
-                    ayeAmount: isAye ? vote.standard.balance : '0',
-                    nayAmount: !isAye ? vote.standard.balance : '0'
-                  });
-
-                  voted = voted.plus(vote.standard.balance);
-                } else if ('split' in vote) {
-                  votes.push({
-                    referendumIndex: refIndex,
-                    type: GovVoteType.SPLIT,
-                    conviction: Conviction.None,
-                    ayeAmount: vote.split.aye,
-                    nayAmount: vote.split.nay
-                  });
-
-                  voted = voted.plus(vote.split.aye).plus(vote.split.nay);
-                } else if ('splitAbstain' in vote) {
-                  votes.push({
-                    referendumIndex: refIndex,
-                    type: GovVoteType.ABSTAIN,
-                    conviction: Conviction.None,
-                    ayeAmount: vote.splitAbstain.aye,
-                    nayAmount: vote.splitAbstain.nay,
-                    abstainAmount: vote.splitAbstain.abstain
-                  });
-
-                  voted = voted
-                    .plus(vote.splitAbstain.aye)
-                    .plus(vote.splitAbstain.nay)
-                    .plus(vote.splitAbstain.abstain);
-                }
-              }
-
-              if (v.casting.prior) {
-                const [locked] = v.casting.prior;
-
-                voted = voted.plus(locked);
-              }
-
-              tracks.push({
-                trackId,
-                votes
-              });
+              tracks.push({ trackId, votes: votes.length > 0 ? votes : undefined });
             }
           }
+
+          const { totalUnlockable, totalUnlocking, unlockableTrackIds, unlockingTrackIds } = this.calculateUnlockAmounts(
+            trackBalances,
+            trackStates,
+            trackUnlockingAmounts,
+            unlockableReferenda,
+            trackVotes,
+            trackPriorBlocks,
+            new BigN(currentBlockNumber)
+          );
+
+          for (const [trackId, lockedBalance] of trackBalances) {
+            const state = trackStates.get(trackId) || 'empty';
+
+            if (state === 'delegating') {
+              totalDelegated = BigN.max(totalDelegated, lockedBalance);
+            } else if (state === 'casting') {
+              const votedAmount = trackVotedAmounts.get(trackId) || new BigN(0);
+
+              if (votedAmount.gt(0)) {
+                totalVoted = BigN.max(totalVoted, lockedBalance);
+              }
+            }
+          }
+
+          const maxLocked = totalDelegated.gte(totalVoted) ? totalDelegated : totalVoted;
 
           const result = {
             chain: this.chain,
             address: addr,
             summary: {
-              delegated: delegated.toString(),
-              voted: voted.toString(),
-              unlocking: prior.toString(),
-              unlockable: '0'
+              delegated: totalDelegated.toString(),
+              voted: totalVoted.toString(),
+              totalLocked: totalLocked.toString(),
+              unlocking: {
+                balance: BigN.max(totalUnlocking.minus(maxLocked), 0).toString(),
+                trackIds: unlockingTrackIds
+              },
+              unlockable: {
+                balance: totalUnlockable.toFixed(),
+                trackIds: unlockableTrackIds,
+                unlockableReferenda: Array.from(unlockableReferenda).sort((a, b) => Number(a) - Number(b))
+              }
             },
             tracks
           };
@@ -347,5 +353,192 @@ export default abstract class BaseOpenGovHandler {
     const sub = merge(...streams).subscribe(cb);
 
     return () => sub.unsubscribe();
+  }
+
+  private async parseVotesAndCheckFinished (votesData: [string, Vote][], unlockableReferenda: Set<string>, currentBlockNumber: number, substrateApi: _SubstrateApi): Promise<GovVoteDetail[]> {
+    if (!votesData || votesData.length === 0) {
+      return [];
+    }
+
+    const votes: GovVoteDetail[] = [];
+
+    for (const [refIndex, vote] of votesData) {
+      if ('standard' in vote) {
+        const isAye = vote.standard.vote.aye === true;
+
+        votes.push({
+          referendumIndex: refIndex,
+          type: isAye ? GovVoteType.AYE : GovVoteType.NAY,
+          conviction: vote.standard.vote.conviction,
+          ayeAmount: isAye ? vote.standard.balance : '0',
+          nayAmount: !isAye ? vote.standard.balance : '0'
+        });
+      } else if ('split' in vote) {
+        votes.push({
+          referendumIndex: refIndex,
+          type: GovVoteType.SPLIT,
+          conviction: Conviction.None,
+          ayeAmount: vote.split.aye,
+          nayAmount: vote.split.nay
+        });
+      } else if ('splitAbstain' in vote) {
+        votes.push({
+          referendumIndex: refIndex,
+          type: GovVoteType.ABSTAIN,
+          conviction: Conviction.None,
+          ayeAmount: vote.splitAbstain.aye,
+          nayAmount: vote.splitAbstain.nay,
+          abstainAmount: vote.splitAbstain.abstain
+        });
+      }
+    }
+
+    const refIndexes = votes.map((v) => v.referendumIndex);
+    const referendumInfos = await substrateApi.api.query.referenda.referendumInfoFor.multi(refIndexes);
+
+    referendumInfos.forEach((info, i: number) => {
+      if (info.isSome) {
+        const referendum = info.unwrap();
+        const refIndex = refIndexes[i];
+        const voteDetail = votes[i];
+
+        if (!referendum.isOngoing) {
+          const referendumInfo = referendum.toJSON() as Record<string, unknown>;
+
+          // 0x can unlock immediately
+          if (voteDetail.conviction === Conviction.None) {
+            unlockableReferenda.add(refIndex.toString());
+
+            return;
+          }
+
+          const statusKey = Object.keys(referendumInfo)[0];
+          const statusVal = referendumInfo[statusKey] as unknown[];
+          const endBlock = statusVal[0] as string | number;
+
+          if (endBlock) {
+            const lockBlocks = this.lockPeriod(convictionToDays[voteDetail.conviction]);
+            const canUnlock = new BigN(currentBlockNumber).gte(new BigN(endBlock).plus(lockBlocks));
+
+            // Check if can unlock based on referendum result and vote type
+            const shouldUnlock = referendum.isApproved
+              ? (voteDetail.type === GovVoteType.NAY || canUnlock)
+              : (voteDetail.type === GovVoteType.AYE || canUnlock);
+
+            if (shouldUnlock) {
+              unlockableReferenda.add(refIndex.toString());
+            }
+          }
+        }
+      }
+    });
+
+    return votes;
+  }
+
+  private calculateUnlockAmounts (
+    trackBalances: Map<number, BigN>,
+    trackStates: Map<number, 'delegating' | 'casting' | 'empty'>,
+    trackUnlockingAmounts: Map<number, BigN>,
+    unlockableReferenda: Set<string>,
+    trackVotes: Map<number, GovVoteDetail[]>,
+    trackPriorBlocks: Map<number, BigN>,
+    currentBlockNumber: BigN
+  ) {
+    const unlockableTrackIds: number[] = [];
+    const unlockingTrackIds: number[] = [];
+    let totalUnlocking = new BigN(0);
+
+    for (const [trackId, balance] of trackBalances) {
+      const state = trackStates.get(trackId) || 'empty';
+      const unlockingAmount = trackUnlockingAmounts.get(trackId) || new BigN(0);
+      const votes = trackVotes.get(trackId) || [];
+      const priorBlock = trackPriorBlocks.get(trackId) || new BigN(0);
+
+      if (state === 'casting') {
+        const allVotesUnlockable = votes.length === 0 || votes.every((vote) =>
+          unlockableReferenda.has(vote.referendumIndex.toString())
+        );
+
+        const activeVoteAmount = votes
+          .filter((vote) => !unlockableReferenda.has(vote.referendumIndex))
+          .reduce((sum, vote) => {
+            return sum
+              .plus(new BigN(vote.amount || '0'))
+              .plus(new BigN(vote.ayeAmount || '0'))
+              .plus(new BigN(vote.nayAmount || '0'))
+              .plus(new BigN(vote.abstainAmount || '0'));
+          }, new BigN(0));
+
+        if (allVotesUnlockable) {
+          if (priorBlock.eq(0) || currentBlockNumber.gte(priorBlock)) {
+            unlockableTrackIds.push(trackId);
+          } else {
+            unlockingTrackIds.push(trackId);
+            totalUnlocking = BigN.max(totalUnlocking, unlockingAmount);
+          }
+        } else if (activeVoteAmount.lt(balance)) {
+          if (priorBlock.eq(0) || currentBlockNumber.gte(priorBlock)) {
+            unlockableTrackIds.push(trackId);
+          } else {
+            unlockingTrackIds.push(trackId);
+            totalUnlocking = BigN.max(totalUnlocking, unlockingAmount);
+          }
+        } else if (unlockingAmount.gt(0)) {
+          totalUnlocking = BigN.max(totalUnlocking, unlockingAmount);
+          unlockingTrackIds.push(trackId);
+        }
+      } else if (state === 'empty') {
+        unlockableTrackIds.push(trackId);
+      }
+    }
+
+    const actualTrackBalances = new Map<number, BigN>();
+
+    for (const [trackId, balance] of trackBalances) {
+      const state = trackStates.get(trackId) || 'empty';
+      const votes = trackVotes.get(trackId) || [];
+
+      if (state === 'casting') {
+        const activeVoteAmount = votes
+          .filter((vote) => !unlockableReferenda.has(vote.referendumIndex))
+          .reduce((sum, vote) => {
+            return sum
+              .plus(new BigN(vote.amount || '0'))
+              .plus(new BigN(vote.ayeAmount || '0'))
+              .plus(new BigN(vote.nayAmount || '0'))
+              .plus(new BigN(vote.abstainAmount || '0'));
+          }, new BigN(0));
+
+        actualTrackBalances.set(trackId, balance.minus(activeVoteAmount));
+      } else {
+        actualTrackBalances.set(trackId, balance);
+      }
+    }
+
+    // Sort theo actual unlockable balances
+    const sortedBalances = Array.from(actualTrackBalances.entries())
+      .sort((a, b) => b[1].comparedTo(a[1]));
+
+    let totalUnlockable = new BigN(0);
+
+    if (unlockableTrackIds.length > 0) {
+      const unlockableBalances = unlockableTrackIds
+        .map((trackId) => trackBalances.get(trackId) || new BigN(0))
+        .sort((a, b) => b.comparedTo(a));
+
+      const maxUnlockableBalance = unlockableBalances[0];
+      const maxTotalBalance = sortedBalances.length > 0 ? sortedBalances[0][1] : new BigN(0);
+
+      if (maxUnlockableBalance.eq(maxTotalBalance)) {
+        const secondMaxBalance = sortedBalances.length > 1 ? sortedBalances[1][1] : new BigN(0);
+
+        totalUnlockable = maxUnlockableBalance.minus(secondMaxBalance);
+      } else {
+        totalUnlockable = new BigN(0);
+      }
+    }
+
+    return { unlockableTrackIds, unlockingTrackIds, totalUnlockable, totalUnlocking };
   }
 }
