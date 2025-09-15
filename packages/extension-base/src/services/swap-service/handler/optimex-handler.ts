@@ -11,6 +11,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _chainInfoToChainType, _getChainNativeTokenSlug, _getContractAddressOfToken, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
+import { getAmountAfterSlippage } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransaction } from '@subwallet/extension-base/services/transaction-service/types';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BitcoinFeeInfo, CommonFeeComponent, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, EvmFeeInfo, OptimalSwapPathParamsV2, SwapFeeType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, combineBitcoinFee, getSizeInfo } from '@subwallet/extension-base/utils';
@@ -124,6 +125,7 @@ export class OptimexHandler implements SwapBaseInterface {
     const sender = request.request.address;
     const receiver = request.request.recipient;
     const sendingValue = request.request.fromAmount;
+    const slippage = request.request.slippage;
     const metadata = request.selectedQuote?.metadata as OptimexQuoteMetadata;
     const walletFeeInfo = request.selectedQuote?.feeInfo.feeComponent.find((fee) => fee.feeType === SwapFeeType.WALLET_FEE);
 
@@ -144,7 +146,7 @@ export class OptimexHandler implements SwapBaseInterface {
         user_refund_pubkey: sender, // Refund pubkey if trade fails, in btc is pubkey and in evm is address
         creator_public_key: sender, // Compressed public key, in btc is pubkey and in evm is address
         from_wallet_address: sender, // Creator address
-        min_amount_out: metadata.best_quote,
+        min_amount_out: getAmountAfterSlippage(metadata.best_quote, slippage),
         affiliate_info: [swAffiliate]
       };
     } else if (fromChainType === ChainType.BITCOIN) {
@@ -159,7 +161,7 @@ export class OptimexHandler implements SwapBaseInterface {
         user_refund_pubkey: fromPublicKey,
         creator_public_key: fromPublicKey,
         from_wallet_address: sender,
-        min_amount_out: metadata.best_quote,
+        min_amount_out: getAmountAfterSlippage(metadata.best_quote, slippage),
         affiliate_info: [swAffiliate]
       };
     } else {
