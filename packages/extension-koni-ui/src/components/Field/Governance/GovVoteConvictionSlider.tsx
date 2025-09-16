@@ -55,6 +55,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
           onChange={handleChange}
           ref={inputRef}
           step={null}
+          tooltip={{ open: false }}
           value={value}
         />
       </div>
@@ -69,7 +70,81 @@ const GovVoteConvictionSlider = styled(forwardRef(Component))<Props>(({ theme: {
     paddingLeft: token.paddingSM,
     paddingRight: token.paddingSM,
     paddingTop: token.paddingXS,
-    paddingBottom: token.paddingSM
+    paddingBottom: token.paddingSM,
+
+    '.ant-slider.ant-slider.ant-slider': {
+      marginInline: 2,
+      marginTop: 18,
+      marginBottom: 32
+    },
+
+    '.ant-slider-rail.ant-slider-rail': {
+      backgroundColor: token.colorBgInput
+    },
+
+    '.ant-slider-track, .ant-slider:hover .ant-slider-track': {
+      backgroundColor: token.colorPrimary
+    },
+
+    '.ant-slider-handle.ant-slider-handle': {
+      width: 24,
+      height: 24,
+      borderRadius: 8,
+      top: -6,
+      border: '1px solid',
+      borderColor: token.colorWhite,
+      backgroundColor: token.colorPrimary,
+
+      '&:before, &:after': {
+        height: 9,
+        width: 3,
+        boxShadow: 'none',
+        borderRadius: 1,
+        top: 6.5,
+        backgroundColor: token.colorWhite
+      },
+
+      '&:before': {
+        left: 7,
+        right: 'auto'
+      },
+
+      '&:after': {
+        left: 'auto',
+        right: 7
+      }
+    },
+
+    '.ant-slider-dot.ant-slider-dot': {
+      border: 0,
+      height: 10,
+      width: 4,
+      top: -3,
+      borderRadius: 1,
+      backgroundColor: '#4D4D4D',
+
+      '&.ant-slider-dot-active': {
+        backgroundColor: token.colorWhite
+      }
+    },
+
+    '.ant-slider-mark.ant-slider-mark': {
+      top: 20
+    },
+
+    '.ant-slider-mark-text.ant-slider-mark-text': {
+      fontSize: token.fontSizeSM,
+      lineHeight: token.lineHeightSM,
+      color: token.colorTextLight2,
+
+      '&:first-of-type': {
+        transform: 'none !important'
+      },
+
+      '&:last-of-type': {
+        transform: 'translateX(-100%) !important'
+      }
+    }
   };
 });
 
