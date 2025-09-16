@@ -326,8 +326,7 @@ export function _getTokenTypesSupportedByChain (chainInfo: _ChainInfo): _AssetTy
 export function _getChainNativeTokenBasicInfo (chainInfo: _ChainInfo): BasicTokenInfo {
   const defaultTokenInfo: BasicTokenInfo = {
     symbol: '',
-    decimals: -1,
-    icon: chainInfo?.icon || ''
+    decimals: -1
   };
 
   if (!chainInfo) {

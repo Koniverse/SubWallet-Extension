@@ -383,6 +383,8 @@ const Component = function ({ className }: Props) {
           return t('Vote for #{{id}}', { id: (transaction.data as GovVoteRequest).referendumIndex });
         case ExtrinsicType.GOV_UNVOTE:
           return t('Unvote confirmation');
+        case ExtrinsicType.GOV_UNLOCK_VOTE:
+          return t('Unlock votes confirmation');
         case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.EVM_EXECUTE:
         case ExtrinsicType.UNKNOWN:

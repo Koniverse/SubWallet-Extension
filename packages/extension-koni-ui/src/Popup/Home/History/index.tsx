@@ -332,6 +332,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token'),
     [ExtrinsicType.GOV_VOTE]: t('Vote'),
     [ExtrinsicType.GOV_UNVOTE]: t('Unvote'),
+    [ExtrinsicType.GOV_UNLOCK_VOTE]: t('Unlock votes'),
     [ExtrinsicType.UNKNOWN]: t('Unknown')
   }), [t]);
 
@@ -380,6 +381,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token transaction'),
     [ExtrinsicType.GOV_VOTE]: t('Vote transaction'),
     [ExtrinsicType.GOV_UNVOTE]: t('Unvote transaction'),
+    [ExtrinsicType.GOV_UNLOCK_VOTE]: t('Unlock votes transaction'),
     [ExtrinsicType.UNKNOWN]: t('Unknown transaction')
   }), [t]);
 

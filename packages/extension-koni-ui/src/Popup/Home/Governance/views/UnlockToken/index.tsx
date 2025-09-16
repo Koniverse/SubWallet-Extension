@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useGetGovLockedInfos, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetGovLockedInfos } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon } from '@subwallet/react-ui';
 import { CaretLeft } from 'phosphor-react';
@@ -10,19 +10,18 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { ViewBaseType } from '../../types';
+import { LockedAccountInfoPart } from './LockedAccountInfoPart';
 
 type Props = ThemeProps & ViewBaseType & {
   goOverview: VoidFunction;
 };
 
-const Component = ({ className, goOverview }: Props): React.ReactElement<Props> => {
+const Component = ({ chainSlug, className, goOverview }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const onBack = useCallback(() => {
     goOverview();
   }, [goOverview]);
-  const govLockedInfos = useGetGovLockedInfos();
-
-  console.log('govLockedInfo', govLockedInfos);
+  const govLockedInfos = useGetGovLockedInfos(chainSlug);
 
   return (
     <div className={className}>
@@ -42,6 +41,12 @@ const Component = ({ className, goOverview }: Props): React.ReactElement<Props> 
         <div className={'__top-part-title'}>{t('Locked detail')}</div>
       </div>
 
+      <div className='__middle-part'>
+        <LockedAccountInfoPart
+          chain={chainSlug}
+          govLockedInfos={govLockedInfos}
+        />
+      </div>
     </div>
   );
 };
@@ -79,6 +84,10 @@ export const UnlockTokenView = styled(Component)<Props>(({ theme: { token } }: P
       '&:active': {
         color: token.colorTextLight4
       }
+    },
+
+    '.__middle-part': {
+      paddingInline: token.padding
     }
   };
 });
