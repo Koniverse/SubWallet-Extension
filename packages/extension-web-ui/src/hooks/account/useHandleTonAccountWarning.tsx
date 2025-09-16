@@ -11,7 +11,7 @@ import React, { useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
 
-type HookType = (accountType: KeypairType, processFunction: VoidFunction) => void;
+type HookType = (accountType: KeypairType, processFunction: VoidFunction) => boolean;
 const GeneralTermLocalDefault: SeedPhraseTermStorage = { state: 'nonConfirmed', useDefaultContent: false };
 
 export default function useHandleTonAccountWarning (): HookType {
@@ -62,9 +62,9 @@ export default function useHandleTonAccountWarning (): HookType {
         }
       });
 
-      return;
+      return true;
     }
 
-    processFunction();
+    return false;
   }, [alertModal, navigate, setConfirmedTermSeedPhrase, setSelectedMnemonicType, t]);
 }

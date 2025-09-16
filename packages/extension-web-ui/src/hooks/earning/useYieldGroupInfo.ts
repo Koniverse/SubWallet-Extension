@@ -5,11 +5,12 @@ import { _ChainAsset, _MultiChainAsset } from '@subwallet/chain-list/types';
 import { _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
-import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { AccountProxyType, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { isAccountAll } from '@subwallet/extension-base/utils';
 import { BN_TEN, BN_ZERO } from '@subwallet/extension-web-ui/constants';
 import { useAccountBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector, useTokenGroup } from '@subwallet/extension-web-ui/hooks';
 import { BalanceValueInfo, YieldGroupInfo } from '@subwallet/extension-web-ui/types';
-import { isRelatedToAstar } from '@subwallet/extension-web-ui/utils';
+import { getExtrinsicTypeByPoolInfo, getTransactionActionsByAccountProxy, isRelatedToAstar } from '@subwallet/extension-web-ui/utils';
 import BigN from 'bignumber.js';
 import { useMemo } from 'react';
 
@@ -46,16 +47,42 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
   const { poolInfoMap } = useSelector((state) => state.earning);
   const { assetRegistry, multiChainAssetMap } = useSelector((state) => state.assetRegistry);
   const { chainInfoMap } = useSelector((state) => state.chainStore);
+  const { accountProxies, currentAccountProxy } = useSelector((state) => state.accountState);
   const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const { tokenGroupMap } = useTokenGroup(allowedChains, excludedTokens);
   const { tokenBalanceMap, tokenGroupBalanceMap } = useAccountBalance(tokenGroupMap, true);
   const { priceMap } = useSelector((state) => state.price);
+
+  const extrinsicTypeSupported = useMemo(() => {
+    if (!currentAccountProxy) {
+      return null;
+    }
+
+    return getTransactionActionsByAccountProxy(currentAccountProxy, accountProxies);
+  }, [accountProxies, currentAccountProxy]);
+
+  const hasWatchOnlyAccount = useMemo(() => {
+    if (!currentAccountProxy) {
+      return false;
+    }
+
+    if (isAccountAll(currentAccountProxy.id)) {
+      return accountProxies.some((item) => item.accountType === AccountProxyType.READ_ONLY);
+    } else {
+      return currentAccountProxy.accountType === AccountProxyType.READ_ONLY;
+    }
+  }, [accountProxies, currentAccountProxy]);
 
   return useMemo(() => {
     const result: Record<string, YieldGroupInfo> = {};
 
     for (const pool of Object.values(poolInfoMap)) {
       const chain = pool.chain;
+      const extrinsicType = getExtrinsicTypeByPoolInfo(pool);
+
+      if (!hasWatchOnlyAccount && extrinsicTypeSupported && !extrinsicTypeSupported.includes(extrinsicType)) {
+        continue;
+      }
 
       if (allowedChains.includes(chain)) {
         const group = pool.group;
@@ -161,7 +188,7 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
     }
 
     return Object.values(result);
-  }, [allowedChains, assetRegistry, chainInfoMap, excludedTokens, multiChainAssetMap, poolInfoMap, priceMap, tokenBalanceMap, tokenGroupBalanceMap]);
+  }, [allowedChains, assetRegistry, chainInfoMap, excludedTokens, extrinsicTypeSupported, hasWatchOnlyAccount, multiChainAssetMap, poolInfoMap, priceMap, tokenBalanceMap, tokenGroupBalanceMap]);
 };
 
 export default useYieldGroupInfo;
