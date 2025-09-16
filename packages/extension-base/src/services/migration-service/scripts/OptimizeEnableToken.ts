@@ -1,10 +1,13 @@
-import subwalletApiSdk from "@subwallet-monorepos/subwallet-services-sdk";
-import {ChainInfoMap} from "@subwallet/chain-list";
-import {_ChainStatus} from "@subwallet/chain-list/types";
-import {_isCustomAsset} from "@subwallet/extension-base/services/chain-service/utils";
-import {AssetSetting} from "@subwallet/extension-base/background/KoniTypes";
-import BaseMigrationJob from "@subwallet/extension-base/services/migration-service/Base";
-import {keyring} from "@subwallet/ui-keyring";
+// Copyright 2019-2022 @subwallet/extension-koni authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+import { AssetSetting } from '@subwallet/extension-base/background/KoniTypes';
+import BaseMigrationJob from '@subwallet/extension-base/services/migration-service/Base';
+import { _isCustomAsset } from '@subwallet/extension-base/services/chain-service/utils';
+import { ChainInfoMap } from '@subwallet/chain-list';
+import { _ChainStatus } from '@subwallet/chain-list/types';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
+import { keyring } from '@subwallet/ui-keyring';
 
 const ignoredList = [
   'bevm',
@@ -25,7 +28,7 @@ const ignoredList = [
   'storyPartner_testnet'
 ];
 
-export default class OptimizeEnableToken extends BaseMigrationJob{
+export default class OptimizeEnableToken extends BaseMigrationJob {
   public override async run (): Promise<void> {
     try {
       const [
@@ -43,8 +46,8 @@ export default class OptimizeEnableToken extends BaseMigrationJob{
       const disableChains: string[] = [];
 
       const customTokens = storedAssetRegistry
-          .filter(asset => _isCustomAsset(asset.slug))
-          .map(asset => asset.slug);
+        .filter(asset => _isCustomAsset(asset.slug))
+        .map(asset => asset.slug);
 
       Object.values(ChainInfoMap)
         .filter((info) => info.chainStatus === _ChainStatus.ACTIVE && !ignoredList.includes(info.slug) && (!!info.evmInfo || !!info.substrateInfo))
