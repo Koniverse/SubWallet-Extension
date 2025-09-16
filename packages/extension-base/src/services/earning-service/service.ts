@@ -125,6 +125,10 @@ export default class EarningService implements StoppableServiceInterface, Persis
       }
 
       if (_STAKING_CHAIN_GROUP.nominationPool.includes(chain)) {
+        if (_STAKING_CHAIN_GROUP.assetHub.includes(chain)) {
+          continue;
+        }
+
         const ahChain = ahMapChain[chain];
 
         if (ahChain) {
