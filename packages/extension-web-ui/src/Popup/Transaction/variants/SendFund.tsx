@@ -12,11 +12,11 @@ import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, _isPosChainL2Bridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getContractAddressOfToken, _getEvmChainId, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getContractAddressOfToken, _getEvmChainId, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainCompatibleLedgerEvm, _isChainEvmCompatible, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee } from '@subwallet/extension-base/types';
 import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { _reformatAddressWithChain, detectTranslate, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
@@ -256,6 +256,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
     }
 
     const isIgnoreSubstrateEcdsaLedger = !isSubstrateEcdsaLedgerAssetSupported(assetInfo, chainInfo);
+    const isIgnoreEvmLedger = !_isChainCompatibleLedgerEvm(chainInfo);
 
     const result: AccountAddressItemType[] = [];
 
@@ -289,6 +290,12 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
 
         if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && isIgnoreSubstrateEcdsaLedger) {
           return;
+        }
+
+        if (signMode === AccountSignMode.GENERIC_LEDGER) {
+          if (ap.chainTypes.includes(AccountChainType.ETHEREUM) && isIgnoreEvmLedger) {
+            return;
+          }
         }
 
         updateResult(ap);

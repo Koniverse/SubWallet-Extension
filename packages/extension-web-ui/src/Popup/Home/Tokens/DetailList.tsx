@@ -97,7 +97,7 @@ function Component (): React.ReactElement {
   const [, setStorage] = useLocalStorage(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
 
-  const { allowedChains } = useGetChainAndExcludedTokenByCurrentAccountProxy();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const { tonWalletContractSelectorModal } = useContext(WalletModalContext);
   const [isShowTonWarning, setIsShowTonWarning] = useLocalStorage(IS_SHOW_TON_CONTRACT_VERSION_WARNING, true);
   const tonAddress = useMemo(() => {
@@ -166,15 +166,13 @@ function Component (): React.ReactElement {
     const result: BuyTokenInfo[] = [];
 
     Object.values(tokens).forEach((item) => {
-      if (!allowedChains.includes(item.network) || !slugs.includes(item.slug)) {
-        return;
+      if (!allowedChains.includes(item.network) || !slugs.includes(item.slug) || excludedTokens.includes(item.slug)) {
+        result.push(item);
       }
-
-      result.push(item);
     });
 
     return result;
-  }, [allowedChains, tokenGroupMap, tokenGroupSlug, tokens]);
+  }, [allowedChains, excludedTokens, tokenGroupMap, tokenGroupSlug, tokens]);
 
   const tokenBalanceValue = useMemo<SwNumberProps['value']>(() => {
     if (tokenGroupSlug) {
@@ -241,6 +239,10 @@ function Component (): React.ReactElement {
       return currentAccountProxy && checkValidAcc(currentAccountProxy);
     }
   }, [accountProxies, currentAccountProxy, isAllAccount]);
+
+  const isSupportSendFund = useMemo(() => {
+    return !excludedTokens.length || tokenBalanceItems.some(({ slug }) => !excludedTokens.includes(slug));
+  }, [excludedTokens, tokenBalanceItems]);
 
   const isSwapSupported = useMemo(() => {
     const isSupportAccount = (currentAcc: AccountProxy) => {
@@ -575,6 +577,7 @@ function Component (): React.ReactElement {
               isChartSupported={isChartSupported}
               isShrink={isShrink}
               isSupportBuyTokens={isSupportBuyTokens}
+              isSupportSendFund={isSupportSendFund}
               isSupportSwap={isSwapSupported}
               onClickBack={goHome}
               onOpenBuyTokens={onOpenBuyTokens}
