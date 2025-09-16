@@ -299,22 +299,24 @@ const Component: React.FC<Props> = (props: Props) => {
             });
           }
 
-          return EARNING_DATA_RAW[YieldPoolType.NATIVE_STAKING].map((item) => {
-            const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
+          return EARNING_DATA_RAW[YieldPoolType.NATIVE_STAKING]
+            .filter((item) => _STAKING_CHAIN_GROUP.energy.includes(poolInfo.chain) ? item.icon !== 'ThumbsUp' : true)
+            .map((item) => {
+              const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
 
-            replaceEarningValue(_item, '{validatorNumber}', maxCandidatePerFarmer.toString());
-            replaceEarningValue(_item, '{validatorType}', label);
-            replaceEarningValue(_item, '{periodNumb}', unBondedTime);
-            replaceEarningValue(_item, '{maintainBalance}', maintainBalance);
-            replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
+              replaceEarningValue(_item, '{validatorNumber}', maxCandidatePerFarmer.toString());
+              replaceEarningValue(_item, '{validatorType}', label);
+              replaceEarningValue(_item, '{periodNumb}', unBondedTime);
+              replaceEarningValue(_item, '{maintainBalance}', maintainBalance);
+              replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
 
-            if (paidOut !== undefined) {
-              replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());
-              replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : paidOut === 1 ? 'hour' : 'minutes');
-            }
+              if (paidOut !== undefined) {
+                replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());
+                replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : paidOut === 1 ? 'hour' : 'minutes');
+              }
 
-            return _item;
-          });
+              return _item;
+            });
         } else {
           return [];
         }
