@@ -8,7 +8,7 @@ import { _isXcmWithinSameConsensus } from '@subwallet/extension-base/core/substr
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { getAcrossbridgeTransferProcessFromEvm, getDefaultTransferProcess, getSnowbridgeTransferProcessFromEvm, RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
-import { _getChainNativeTokenSlug, _isNativeToken, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getChainNativeTokenSlug, _isCustomAsset, _isNativeToken, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
 import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
@@ -42,6 +42,8 @@ export class BalanceService implements StoppableServiceInterface {
   status: ServiceStatus = ServiceStatus.NOT_INITIALIZED;
 
   private isReload = false;
+  private hasOptimizedTokens = false;
+
   get isStarted (): boolean {
     return this.status === ServiceStatus.STARTED;
   }
@@ -106,6 +108,11 @@ export class BalanceService implements StoppableServiceInterface {
     this.stopPromiseHandler = createPromiseHandler();
     this.status = ServiceStatus.STARTED;
     this.startPromiseHandler.resolve();
+
+    if (!this.hasOptimizedTokens) {
+      this.hasOptimizedTokens = true;
+      await this.optimizeEnableTokens();
+    }
   }
 
   /** Stop service */
@@ -585,10 +592,10 @@ export class BalanceService implements StoppableServiceInterface {
 
     for (const balanceData of evmBalanceDataList) {
       if (balanceData) {
-        for (const slug of balanceData) {
-          const chainSlug = slug.split('-')[0];
+        for (const tokenSlug of balanceData) {
+          const chainSlug = tokenSlug.split('-')[0];
           const chainState = this.state.chainService.getChainStateByKey(chainSlug);
-          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === slug.toLowerCase());
+          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === tokenSlug.toLowerCase());
 
           // Cancel if chain is turned off by user
           if (chainState && chainState.manualTurnOff) {
@@ -714,4 +721,158 @@ export class BalanceService implements StoppableServiceInterface {
 
     return getDefaultTransferProcess();
   }
+
+  public async evmDetectBalanceToken (addresses: string[]) {
+    const assetMap = this.state.chainService.getAssetRegistry();
+    const evmPromiseList = addresses.map((address) => {
+      const type = getKeypairTypeByAddress(address);
+      const typeValid = [...EthereumKeypairTypes].includes(type);
+
+      if (typeValid) {
+        return subwalletApiSdk.balanceDetectionApi.getSubWalletTokenBalance(address)
+          .catch((e) => {
+            console.error(e);
+
+            return null;
+          });
+      } else {
+        return null;
+      }
+    });
+
+    const needActiveTokens: string[] = [];
+    const evmBalanceDataList = await Promise.all(evmPromiseList);
+
+    for (const balanceData of evmBalanceDataList) {
+      if (balanceData) {
+        for (const tokenSlug of balanceData) {
+          const chainSlug = tokenSlug.split('-')[0];
+          const chainState = this.state.chainService.getChainStateByKey(chainSlug);
+          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === tokenSlug.toLowerCase());
+
+          // Cancel is chain is turned off by user
+          if (chainState && chainState.manualTurnOff) {
+            continue;
+          }
+
+          if (existedKey) {
+            needActiveTokens.push(existedKey);
+          }
+        }
+      }
+    }
+
+    return needActiveTokens;
+  }
+
+  public async substrateDetectBalanceToken (addresses: string[]) {
+    const assetMap = this.state.chainService.getAssetRegistry();
+    const promiseList = addresses.map((address) => {
+      const type = getKeypairTypeByAddress(address);
+      const typeValid = [...SubstrateKeypairTypes, ...EthereumKeypairTypes].includes(type);
+
+      if (typeValid) {
+        return this.state.subscanService.getMultiChainBalance(address)
+          .catch((e) => {
+            console.error(e);
+
+            return null;
+          });
+      } else {
+        return null;
+      }
+    });
+
+    const needActiveTokens: string[] = [];
+    const balanceDataList = await Promise.all(promiseList);
+    const chainInfoMap = this.state.chainService.getChainInfoMap();
+    const detectBalanceChainSlugMap = this.state.chainService.detectBalanceChainSlugMap;
+
+    for (const balanceData of balanceDataList) {
+      if (balanceData) {
+        for (const balanceDatum of balanceData) {
+          const { balance, bonded, category, locked, network, symbol } = balanceDatum;
+          const chain = detectBalanceChainSlugMap[network];
+          const chainState = this.state.chainService.getChainStateByKey(chain);
+          const chainInfo = chain ? chainInfoMap[chain] : null;
+          const balanceIsEmpty = (!balance || balance === '0') && (!locked || locked === '0') && (!bonded || bonded === '0');
+          const tokenKey = `${chain}-${category === 'native' ? 'NATIVE' : 'LOCAL'}-${symbol.toUpperCase()}`;
+          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === tokenKey.toLowerCase());
+
+          // Cancel if chain is not supported or is testnet
+          if (!chainInfo || chainInfo.isTestnet) {
+            continue;
+          }
+
+          // Cancel is balance is 0
+          if (balanceIsEmpty) {
+            continue;
+          }
+
+          // Cancel is chain is turned off by user
+          if (chainState && chainState.manualTurnOff) {
+            continue;
+          }
+
+          if (existedKey) {
+            needActiveTokens.push(existedKey);
+          }
+        }
+      }
+    }
+
+    return needActiveTokens;
+  }
+
+  /** optimize token area **/
+
+  public resetOptimizeTokensFlag(): void {
+    this.hasOptimizedTokens = false;
+  }
+
+  public async forceOptimizeEnableTokens(): Promise<void> {
+    this.hasOptimizedTokens = true;
+    await this.optimizeEnableTokens();
+  }
+
+  public getOptimizationStatus(): boolean {
+    return this.hasOptimizedTokens;
+  }
+
+  public async optimizeEnableTokens () {
+    try {
+      const assetSettings = await this.state.chainService.getAssetSettings();
+      const assetMap = this.state.chainService.getAssetRegistry();
+      const addresses = keyring.getPairs().map((account) => account.address);
+
+      const [nonZeroBalanceEvmToken, nonZeroBalanceSubstrateToken] = await Promise.all([
+        this.evmDetectBalanceToken(addresses),
+        this.substrateDetectBalanceToken(addresses)
+      ])
+
+      const updatedSettings = structuredClone(assetSettings);
+
+      Object.entries(assetSettings).forEach(([tokenSlug, setting]) => {
+        const isNonZeroBalanceToken = nonZeroBalanceEvmToken.includes(tokenSlug) || nonZeroBalanceSubstrateToken.includes(tokenSlug);
+
+        if (isNonZeroBalanceToken && !setting.visible) {
+          // enable non-zero balance tokens
+          updatedSettings[tokenSlug] = {
+            visible: true
+          };
+        } else if (!isNonZeroBalanceToken && setting.visible && !_isNativeToken(assetMap[tokenSlug]) && !_isCustomAsset(tokenSlug)) {
+          // hide tokens with zero balance that aren't native or custom
+          updatedSettings[tokenSlug] = {
+            visible: false
+          };
+        }
+      });
+
+      this.state.chainService.setAssetSettings(updatedSettings);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /** optimize token area **/
 }

@@ -868,40 +868,13 @@ export class ChainService {
     }
   }
 
-  async enablePopularTokens (currentPriorityTokens: TokenPriorityDetails, latestPriorityTokens: TokenPriorityDetails) {
+  async enablePopularTokens () {
     const assetSettings = this.assetSettingSubject.value;
     const chainStateMap = this.getChainStateMap();
+    const priorityTokensMap = this.priorityTokensSubject.value || {};
 
-    const currentTokens = Object.keys(currentPriorityTokens.token || {});
-    const latestTokens = Object.keys(latestPriorityTokens.token || {});
-
-    const rawBalanceMap = await this.dbService.getStoredBalance();
-
-    const removedTokens = currentTokens.filter((key) => !latestTokens.includes(key));
-    const balanceNonZero = rawBalanceMap.filter((item) => {
-      return (BigInt(item.free) + BigInt(item.locked) > 0);
-    });
-    const nonZeroBalanceSlugs = new Set(balanceNonZero.map((item) => item.tokenSlug));
-
-    // Disable removed tokens
-    if (removedTokens.length > 0) {
-      // Update settings for removed tokens
-      for (const tokenSlug of removedTokens) {
-        const assetInfo = this.getAssetBySlug(tokenSlug);
-
-        // This can occur if the assetSlug is not present in the current chainlist version
-        if (!assetInfo) {
-          continue;
-        }
-
-        if (!nonZeroBalanceSlugs.has(tokenSlug)) {
-          await this.updateAssetSetting(tokenSlug, { visible: false }, false);
-        }
-      }
-    }
-
-    const priorityTokensList = latestPriorityTokens.token && typeof latestPriorityTokens.token === 'object'
-      ? Object.keys(latestPriorityTokens.token)
+    const priorityTokensList = priorityTokensMap.token && typeof priorityTokensMap.token === 'object'
+      ? Object.keys(priorityTokensMap.token)
       : [];
 
     for (const assetSlug of priorityTokensList) {
@@ -930,16 +903,16 @@ export class ChainService {
   }
 
   handleLatestPriorityTokens (latestPriorityTokens: TokenPriorityDetails) {
-    const currentPriorityTokens = this.priorityTokensSubject.value || {};
+    const currentTokens = this.priorityTokensSubject.value || {};
 
     this.priorityTokensSubject.next(latestPriorityTokens);
     this.logger.log('Finished updating latest popular tokens');
 
-    const currentTokenKeys = Object.keys(currentPriorityTokens.token || {}); // Extract keys from current tokens
+    const currentTokenKeys = Object.keys(currentTokens.token || {}); // Extract keys from current tokens
     const newTokenKeys = Object.keys(latestPriorityTokens.token || {}); // Extract keys from new tokens
 
     if (JSON.stringify(currentTokenKeys) !== JSON.stringify(newTokenKeys)) { // Check if token keys have changed
-      this.enablePopularTokens(currentPriorityTokens, latestPriorityTokens)
+      this.enablePopularTokens()
         .then(() => this.logger.log('Popular tokens enabled due to priority tokens change')) // Log success after enabling tokens
         .catch((e) => console.error('Error enabling popular tokens:', e)); // Log error if enabling fails
     }
