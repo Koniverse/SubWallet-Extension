@@ -12,7 +12,7 @@ import { combineLatest, merge, mergeMap } from 'rxjs';
 import { _EXPECTED_BLOCK_TIME } from '../chain-service/constants';
 import { _SubstrateApi } from '../chain-service/types';
 import { _getAssetDecimals } from '../chain-service/utils';
-import { Conviction, convictionToDays, GovDelegationDetail, GovTrackVoting, GovVoteDetail, GovVoteRequest, GovVoteType, GovVotingInfo, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, SplitVoteRequest, StandardVoteRequest, UnlockVoteRequest, Vote, VotingFor } from './interface';
+import { Conviction, convictionToDays, GovDelegationDetail, GovTrackVoting, GovVoteDetail, GovVoteRequest, GovVoteType, GovVotingInfo, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, SplitVoteRequest, StandardVoteRequest, UnlockingReferendaData, UnlockVoteRequest, Vote, VotingFor } from './interface';
 
 export default abstract class BaseOpenGovHandler {
   protected readonly state: KoniState;
@@ -282,7 +282,7 @@ export default abstract class BaseOpenGovHandler {
           const trackBalances = new Map<number, BigN>();
           const trackStates = new Map<number, 'delegating' | 'casting' | 'empty'>();
           const trackVotedAmounts = new Map<number, BigN>();
-          const trackUnlockingAmounts = new Map<number, BigN>();
+          const unlockingReferenda: UnlockingReferendaData[] = [];
           const unlockableReferenda = new Set<string>();
           const trackVotes = new Map<number, GovVoteDetail[]>();
           const trackPriorBlocks = new Map<number, BigN>();
@@ -315,7 +315,15 @@ export default abstract class BaseOpenGovHandler {
               tracks.push({ trackId, delegation });
             } else if (v.casting) {
               trackStates.set(trackId, 'casting');
-              const votes = await this.parseVotesAndCheckFinished(v.casting.votes || [], unlockableReferenda, currentBlockNumber, substrateApi);
+              const { unlockingReferenda: trackUnlocking, votes } = await this.parseVotesAndCheckFinished(
+                v.casting.votes || [],
+                unlockableReferenda,
+                currentBlockNumber,
+                substrateApi
+              );
+
+              unlockingReferenda.push(...trackUnlocking);
+              trackVotes.set(trackId, votes);
 
               const totalCast = votes.reduce((sum, vote) => {
                 return sum
@@ -327,7 +335,6 @@ export default abstract class BaseOpenGovHandler {
               trackVotedAmounts.set(trackId, totalCast);
 
               if (v.casting.prior && new BigN(v.casting.prior[0]).gt(0)) {
-                trackUnlockingAmounts.set(trackId, new BigN(v.casting.prior[1]));
                 trackPriorBlocks.set(trackId, new BigN(v.casting.prior[0]));
               }
 
@@ -335,10 +342,9 @@ export default abstract class BaseOpenGovHandler {
             }
           }
 
-          const { totalUnlockable, totalUnlocking, unlockableTrackIds, unlockingTrackIds } = this.calculateUnlockAmounts(
+          const { totalUnlockable, unlockableTrackIds } = this.calculateUnlockAmounts(
             trackBalances,
             trackStates,
-            trackUnlockingAmounts,
             unlockableReferenda,
             trackVotes,
             trackPriorBlocks,
@@ -359,8 +365,6 @@ export default abstract class BaseOpenGovHandler {
             }
           }
 
-          const maxLocked = totalDelegated.gte(totalVoted) ? totalDelegated : totalVoted;
-
           const result = {
             chain: this.chain,
             address: addr,
@@ -368,10 +372,7 @@ export default abstract class BaseOpenGovHandler {
               delegated: totalDelegated.toString(),
               voted: totalVoted.toString(),
               totalLocked: totalLocked.toString(),
-              unlocking: {
-                balance: BigN.max(totalUnlocking.minus(maxLocked), 0).toString(),
-                trackIds: unlockingTrackIds
-              },
+              unlocking: { unlockingReferenda },
               unlockable: {
                 balance: totalUnlockable.toFixed(),
                 trackIds: unlockableTrackIds,
@@ -391,12 +392,13 @@ export default abstract class BaseOpenGovHandler {
     return () => sub.unsubscribe();
   }
 
-  private async parseVotesAndCheckFinished (votesData: [string, Vote][], unlockableReferenda: Set<string>, currentBlockNumber: number, substrateApi: _SubstrateApi): Promise<GovVoteDetail[]> {
+  private async parseVotesAndCheckFinished (votesData: [string, Vote][], unlockableReferenda: Set<string>, currentBlockNumber: number, substrateApi: _SubstrateApi): Promise<{votes: GovVoteDetail[], unlockingReferenda: UnlockingReferendaData[]}> {
     if (!votesData || votesData.length === 0) {
-      return [];
+      return { votes: [], unlockingReferenda: [] };
     }
 
     const votes: GovVoteDetail[] = [];
+    const unlockingReferenda: UnlockingReferendaData[] = [];
 
     for (const [refIndex, vote] of votesData) {
       if ('standard' in vote) {
@@ -454,40 +456,51 @@ export default abstract class BaseOpenGovHandler {
 
           if (endBlock) {
             const lockBlocks = this.lockPeriod(convictionToDays[voteDetail.conviction]);
-            const canUnlock = new BigN(currentBlockNumber).gte(new BigN(endBlock).plus(lockBlocks));
+            const unlockBlock = new BigN(endBlock).plus(lockBlocks);
+            const canUnlock = new BigN(currentBlockNumber).gte(unlockBlock);
 
-            // Check if can unlock based on referendum result and vote type
             const shouldUnlock = referendum.isApproved
               ? (voteDetail.type === GovVoteType.NAY || canUnlock)
               : (voteDetail.type === GovVoteType.AYE || canUnlock);
 
             if (shouldUnlock) {
               unlockableReferenda.add(refIndex.toString());
+            } else {
+              const balance =
+              new BigN(voteDetail.ayeAmount || '0')
+                .plus(new BigN(voteDetail.nayAmount || '0'))
+                .plus(new BigN(voteDetail.abstainAmount || '0'));
+              const blockTimeSec = _EXPECTED_BLOCK_TIME[this.chain] ?? 6;
+              const remainingBlocks = unlockBlock.minus(currentBlockNumber);
+
+              const timestamp = Date.now() + remainingBlocks.multipliedBy(blockTimeSec * 1000).toNumber();
+
+              unlockingReferenda.push({
+                id: refIndex.toString(),
+                balance: balance.toFixed(),
+                timestamp: timestamp
+              });
             }
           }
         }
       }
     });
 
-    return votes;
+    return { votes, unlockingReferenda };
   }
 
   private calculateUnlockAmounts (
     trackBalances: Map<number, BigN>,
     trackStates: Map<number, 'delegating' | 'casting' | 'empty'>,
-    trackUnlockingAmounts: Map<number, BigN>,
     unlockableReferenda: Set<string>,
     trackVotes: Map<number, GovVoteDetail[]>,
     trackPriorBlocks: Map<number, BigN>,
     currentBlockNumber: BigN
   ) {
     const unlockableTrackIds: number[] = [];
-    const unlockingTrackIds: number[] = [];
-    let totalUnlocking = new BigN(0);
 
     for (const [trackId, balance] of trackBalances) {
       const state = trackStates.get(trackId) || 'empty';
-      const unlockingAmount = trackUnlockingAmounts.get(trackId) || new BigN(0);
       const votes = trackVotes.get(trackId) || [];
       const priorBlock = trackPriorBlocks.get(trackId) || new BigN(0);
 
@@ -495,6 +508,8 @@ export default abstract class BaseOpenGovHandler {
         const allVotesUnlockable = votes.length === 0 || votes.every((vote) =>
           unlockableReferenda.has(vote.referendumIndex.toString())
         );
+
+        console.log('Hmm', [allVotesUnlockable, unlockableReferenda, votes, this.chain]);
 
         const activeVoteAmount = votes
           .filter((vote) => !unlockableReferenda.has(vote.referendumIndex))
@@ -509,20 +524,11 @@ export default abstract class BaseOpenGovHandler {
         if (allVotesUnlockable) {
           if (priorBlock.eq(0) || currentBlockNumber.gte(priorBlock)) {
             unlockableTrackIds.push(trackId);
-          } else {
-            unlockingTrackIds.push(trackId);
-            totalUnlocking = BigN.max(totalUnlocking, unlockingAmount);
           }
         } else if (activeVoteAmount.lt(balance)) {
           if (priorBlock.eq(0) || currentBlockNumber.gte(priorBlock)) {
             unlockableTrackIds.push(trackId);
-          } else {
-            unlockingTrackIds.push(trackId);
-            totalUnlocking = BigN.max(totalUnlocking, unlockingAmount);
           }
-        } else if (unlockingAmount.gt(0)) {
-          totalUnlocking = BigN.max(totalUnlocking, unlockingAmount);
-          unlockingTrackIds.push(trackId);
         }
       } else if (state === 'empty') {
         unlockableTrackIds.push(trackId);
@@ -567,14 +573,21 @@ export default abstract class BaseOpenGovHandler {
       const maxTotalBalance = sortedBalances.length > 0 ? sortedBalances[0][1] : new BigN(0);
 
       if (maxUnlockableBalance.eq(maxTotalBalance)) {
-        const secondMaxBalance = sortedBalances.length > 1 ? sortedBalances[1][1] : new BigN(0);
+        const maxTracks = sortedBalances.filter(([, bal]) => bal.eq(maxTotalBalance));
+        const lockedTracks = maxTracks.filter(([trackId]) => !unlockableTrackIds.includes(trackId));
 
-        totalUnlockable = maxUnlockableBalance.minus(secondMaxBalance);
+        if (lockedTracks.length === 0) {
+          totalUnlockable = maxUnlockableBalance;
+        } else {
+          const worstLockedBalance = lockedTracks[0][1];
+
+          totalUnlockable = maxUnlockableBalance.minus(worstLockedBalance);
+        }
       } else {
         totalUnlockable = new BigN(0);
       }
     }
 
-    return { unlockableTrackIds, unlockingTrackIds, totalUnlockable, totalUnlocking };
+    return { unlockableTrackIds, totalUnlockable };
   }
 }

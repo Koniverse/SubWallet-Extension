@@ -3,12 +3,13 @@
 
 import { GovVotingInfo } from '@subwallet/extension-base/services/open-gov/interface';
 import { Avatar, MetaInfo } from '@subwallet/extension-koni-ui/components';
-import { DEFAULT_GOV_UNLOCK_VOTE_PARAMS, GOV_UNLOCK_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { BN_ZERO, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, GOV_UNLOCK_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainPrefixBySlug, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, getTransactionFromAccountProxyValue, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon } from '@subwallet/react-ui';
+import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CaretLeft, CaretRight, CheckCircle } from 'phosphor-react';
 import React, { useCallback, useMemo } from 'react';
@@ -109,75 +110,117 @@ function Component ({ chain, className, govLockedInfos }: Props) {
   }, [chain, fromAccountProxy, navigate, setGovUnlockStorage]);
 
   const accountInfoItemsNode = useMemo(() => {
-    return govLockedInfos.map((item) => {
-      return (
-        <MetaInfo
-          className={CN('__account-info-item')}
-          hasBackgroundWrapper={true}
-          key={item.address}
-          labelColorScheme='gray'
-          labelFontWeight='regular'
-          spaceSize='sm'
-          valueColorScheme='light'
-        >
-          <MetaInfo.Status
-            className={'__meta-locked-status-item'}
-            label={renderAccount(item)}
-            statusIcon={CheckCircle}
-            statusName={'Unlockable'}
-            valueColorSchema={'success'}
-          />
+    return govLockedInfos
+      .filter((item) => {
+        return (
+          new BigN(item.summary.totalLocked).gt(BN_ZERO)
+        );
+      })
+      .map((item) => {
+        const maxUnlockingBalance = item.summary.unlocking.unlockingReferenda.length
+          ? item.summary.unlocking.unlockingReferenda
+            .map((unlockingReferenda) => new BigN(unlockingReferenda.balance))
+            .reduce((max, cur) => (cur.gt(max) ? cur : max), BN_ZERO)
+            .toString()
+          : '0';
 
-          <MetaInfo.Number
-            decimals={decimals}
-            label={'Delegated'}
-            suffix={symbol}
-            value={item.summary.delegated}
-            valueColorSchema='even-odd'
-          />
+        return (
+          <MetaInfo
+            className={CN('__account-info-item')}
+            hasBackgroundWrapper={true}
+            key={item.address}
+            labelColorScheme='gray'
+            labelFontWeight='regular'
+            spaceSize='sm'
+            valueColorScheme='light'
+          >
+            <MetaInfo.Status
+              className={'__meta-locked-status-item'}
+              label={renderAccount(item)}
+              statusIcon={CheckCircle}
+              statusName={'Unlockable'}
+              valueColorSchema={'success'}
+            />
 
-          <MetaInfo.Number
-            decimals={decimals}
-            label={'Voted'}
-            suffix={symbol}
-            value={item.summary.voted}
-            valueColorSchema='even-odd'
-          />
+            <MetaInfo.Number
+              decimals={decimals}
+              label={'Delegated'}
+              suffix={symbol}
+              value={item.summary.delegated}
+              valueColorSchema='even-odd'
+            />
 
-          <MetaInfo.Number
-            decimals={decimals}
-            label={'Unlocking'}
-            suffix={symbol}
-            value={item.summary.unlocking.balance}
-            valueColorSchema='even-odd'
-          />
+            <MetaInfo.Number
+              decimals={decimals}
+              label={'Voted'}
+              suffix={symbol}
+              value={item.summary.voted}
+              valueColorSchema='even-odd'
+            />
 
-          <MetaInfo.Number
-            decimals={decimals}
-            label={'Unlockable'}
-            suffix={symbol}
-            value={item.summary.unlockable.balance}
-            valueColorSchema='even-odd'
-          />
+            <MetaInfo.Number
+              decimals={decimals}
+              label={'Unlocking'}
+              suffix={symbol}
+              value={maxUnlockingBalance}
+              valueColorSchema='even-odd'
+            />
 
-          <div className={'__unlock-button-wrapper'}>
-            <Button
-              block={true}
-              className={'__unlock-button'}
-              onClick={
-                goUnlockVote(item)
-              }
-              size='xs'
-            >
-              <div className='__unlock-button-label'>
-                {t('Unlock')}
-              </div>
-            </Button>
-          </div>
+            <MetaInfo.Number
+              decimals={decimals}
+              label={'Unlockable'}
+              suffix={symbol}
+              value={item.summary.unlockable.balance}
+              valueColorSchema='even-odd'
+            />
 
-        </MetaInfo>
-      );
-    });
+            {item?.summary.unlocking.unlockingReferenda?.length > 0 && (
+              <MetaInfo.Default label={t('Unlocking referenda')}>
+                <div className='unlocking-list'>
+                  {item.summary.unlocking.unlockingReferenda.map((u) => {
+                    const diffMs = u.timestamp - Date.now();
+                    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+                    const diffDays = Math.floor(diffHrs / 24);
+
+                    return (
+                      <div
+                        className='unlocking-item'
+                        key={u.id}
+                      >
+                        <span>#{u.id}&nbsp;&nbsp;</span>
+                        <span>
+                          {diffMs <= 0
+                            ? t('Unlockable')
+                            : diffDays > 0
+                              ? `${diffDays}d ${diffHrs % 24}h`
+                              : `${diffHrs}h`}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </MetaInfo.Default>
+            )}
+
+            <div className={'__unlock-button-wrapper'}>
+              <Button
+                block={true}
+                className={'__unlock-button'}
+                disabled={item.summary.unlockable.trackIds.length === 0}
+                onClick={
+                  goUnlockVote(item)
+                }
+                size='xs'
+              >
+                <div className='__unlock-button-label'>
+                  {t('Unlock')}
+                </div>
+              </Button>
+            </div>
+
+          </MetaInfo>
+        );
+      });
   }, [govLockedInfos, renderAccount, decimals, symbol, goUnlockVote, t]);
 
   return (

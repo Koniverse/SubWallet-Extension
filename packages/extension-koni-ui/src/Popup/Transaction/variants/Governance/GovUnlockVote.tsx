@@ -3,16 +3,15 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
-import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
-import { isAccountAll } from '@subwallet/extension-base/utils';
-import { AccountAddressSelector, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
-import { DEFAULT_GOV_UNLOCK_VOTE_PARAMS, GOV_UNLOCK_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
-import { useCoreCreateReformatAddress, useDefaultNavigate, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { BN_ZERO, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, GOV_UNLOCK_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { useDefaultNavigate, useGetGovLockedInfos, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleUnlockVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AccountAddressItemType, FormCallbacks, FormFieldData, GovUnlockVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, simpleCheckForm, toShort } from '@subwallet/extension-koni-ui/utils';
+import { FormCallbacks, FormFieldData, GovUnlockVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { convertFieldToObject, funcSortByName, simpleCheckForm, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
+import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle, XCircle } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -27,17 +26,16 @@ type WrapperProps = ThemeProps;
 
 type ComponentProps = {
   className?: string;
-  targetAccountProxy: AccountProxy;
   isAllAccount?: boolean
 };
 
 const hideFields: Array<keyof GovUnlockVoteParams> = ['chain', 'amount', 'referendumIds', 'tracks'];
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
-  const { className = '', targetAccountProxy } = props;
+  const { className = '', isAllAccount } = props;
   const { t } = useTranslation();
   const { defaultData, persistData, setBackProps } = useTransactionContext<GovUnlockVoteParams>();
-  const [govUnlockVoteStorage, setGovUnlockVoteStorage] = useLocalStorage(GOV_UNLOCK_VOTE_TRANSACTION, DEFAULT_GOV_UNLOCK_VOTE_PARAMS);
+  const [, setGovUnlockVoteStorage] = useLocalStorage(GOV_UNLOCK_VOTE_TRANSACTION, DEFAULT_GOV_UNLOCK_VOTE_PARAMS);
   const formDefault = useMemo((): GovUnlockVoteParams => ({ ...defaultData }), [defaultData]);
   const [form] = Form.useForm<GovUnlockVoteParams>();
   const [loading, setLoading] = useState(false);
@@ -46,12 +44,25 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
 
+  const govLockInfo = useGetGovLockedInfos(chainValue);
+
+  const accounts = useSelector((state: RootState) => {
+    const accs = [...state.accountState.accounts];
+
+    return accs.filter((acc) => {
+      const votingInfo = govLockInfo.find((v) => v.address === acc.address);
+
+      return votingInfo && votingInfo.summary.unlockable.unlockableReferenda.length > 0;
+    })
+      .sort(funcSortByName);
+  });
+
   const { chainInfoMap } = useSelector((root) => root.chainStore);
+  const networkPrefix = chainInfoMap[chainValue].substrateInfo?.addressPrefix;
+
   const onPreCheck = usePreCheckAction(fromValue);
   const { onError, onSuccess } = useHandleSubmitTransaction();
-  const getReformatAddress = useCoreCreateReformatAddress();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chainValue);
-  const { accountProxies } = useSelector((state: RootState) => state.accountState);
 
   const onFieldsChange: FormCallbacks<GovUnlockVoteParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // // TODO: field change
@@ -89,49 +100,25 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     navigate('/home/governance');
   }, [defaultData.chain, defaultData.fromAccountProxy, navigate, setGovUnlockVoteStorage]);
 
-  const accountAddressItems = useMemo(() => {
-    const chainInfo = chainValue ? chainInfoMap[chainValue] : undefined;
+  const selectedLockInfo = useMemo(() => {
+    return govLockInfo.find((info) => info.address === fromValue);
+  }, [govLockInfo, fromValue]);
 
-    if (!chainInfo) {
+  const unlockableReferenda = useMemo((): string[] => {
+    if (!selectedLockInfo) {
       return [];
     }
 
-    const result: AccountAddressItemType[] = [];
+    return selectedLockInfo.summary.unlockable.unlockableReferenda || [];
+  }, [selectedLockInfo]);
 
-    const updateResult = (ap: AccountProxy) => {
-      ap.accounts.forEach((a) => {
-        const address = getReformatAddress(a, chainInfo);
-
-        if (address) {
-          result.push({
-            accountName: ap.name,
-            accountProxyId: ap.id,
-            accountProxyType: ap.accountType,
-            accountType: a.type,
-            address
-          });
-        }
-      });
-    };
-
-    if (isAccountAll(targetAccountProxy.id)) {
-      accountProxies.forEach((ap) => {
-        if (isAccountAll(ap.id)) {
-          return;
-        }
-
-        if ([AccountProxyType.READ_ONLY].includes(ap.accountType)) {
-          return;
-        }
-
-        updateResult(ap);
-      });
-    } else {
-      updateResult(targetAccountProxy);
+  const lockedAmount = useMemo(() => {
+    if (!selectedLockInfo) {
+      return BN_ZERO;
     }
 
-    return result;
-  }, [accountProxies, chainInfoMap, chainValue, getReformatAddress, targetAccountProxy]);
+    return new BigN(selectedLockInfo.summary.totalLocked || BN_ZERO);
+  }, [selectedLockInfo]);
 
   useEffect(() => {
     setBackProps((prev) => ({
@@ -146,6 +133,22 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       }));
     };
   }, [goHome, setBackProps, setGovUnlockVoteStorage]);
+
+  useEffect(() => {
+    if (selectedLockInfo) {
+      form.setFieldsValue({
+        referendumIds: selectedLockInfo.summary.unlockable.unlockableReferenda,
+        tracks: selectedLockInfo.tracks.map((t) => t.trackId)
+      });
+
+      persistData({
+        ...defaultData,
+        from: fromValue,
+        referendumIds: selectedLockInfo.summary.unlockable.unlockableReferenda,
+        tracks: selectedLockInfo.tracks.map((t) => t.trackId)
+      } as GovUnlockVoteParams);
+    }
+  }, [form, fromValue, selectedLockInfo, persistData, defaultData]);
 
   return (
     <>
@@ -162,11 +165,11 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           <Form.Item
             name={'from'}
           >
-            <AccountAddressSelector
-              autoSelectFirstItem={true}
-              items={accountAddressItems}
-              label={`${t('From')}:`}
-              labelStyle={'horizontal'}
+            <AccountSelector
+              addressPrefix={networkPrefix}
+              disabled={!isAllAccount}
+              doFilter={false}
+              externalAccounts={accounts}
             />
           </Form.Item>
         </Form>
@@ -182,12 +185,12 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             decimals={decimals}
             label={t('Amount')}
             suffix={symbol}
-            value={govUnlockVoteStorage.amount || 0}
+            value={lockedAmount.toFixed()}
           />
 
-          {govUnlockVoteStorage.referendumIds && govUnlockVoteStorage.referendumIds.length > 0 && (
+          {unlockableReferenda && unlockableReferenda.length > 0 && (
             <MetaInfo.Default label={t('Referenda voted')}>
-              {govUnlockVoteStorage.referendumIds.length}
+              {unlockableReferenda.length}
             </MetaInfo.Default>
           )}
         </MetaInfo>
@@ -209,7 +212,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         </Button>
 
         <Button
-          disabled={isDisable}
+          disabled={isDisable || accounts.length === 0}
           icon={(
             <Icon
               phosphorIcon={CheckCircle}
@@ -230,19 +233,9 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const { className } = props;
   const { defaultData } = useTransactionContext<GovUnlockVoteParams>();
   const { goHome } = useDefaultNavigate();
-  const { accountProxies, isAllAccount } = useSelector((state) => state.accountState);
+  const { isAllAccount } = useSelector((state) => state.accountState);
 
-  const targetAccountProxy = useMemo(() => {
-    return accountProxies.find((ap) => {
-      if (!defaultData.fromAccountProxy) {
-        return isAccountAll(ap.id);
-      }
-
-      return ap.id === defaultData.fromAccountProxy;
-    });
-  }, [accountProxies, defaultData.fromAccountProxy]);
-
-  const isNotAllowed = !targetAccountProxy || !defaultData.tracks || !defaultData.chain;
+  const isNotAllowed = !defaultData.tracks || !defaultData.chain;
 
   useEffect(() => {
     if (isNotAllowed) {
@@ -260,7 +253,6 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
     <Component
       className={className}
       isAllAccount={isAllAccount}
-      targetAccountProxy={targetAccountProxy}
     />
   );
 };

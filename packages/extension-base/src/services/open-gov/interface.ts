@@ -142,6 +142,12 @@ export interface VotingFor {
   delegating?: Delegating;
 }
 
+export interface UnlockingReferendaData{
+  id: string;
+  balance: string;
+  timestamp: number;
+}
+
 export interface GovVotingInfo {
   chain: string;
   address: string;
@@ -150,8 +156,7 @@ export interface GovVotingInfo {
     voted: string;
     totalLocked: string;
     unlocking: {
-      balance: string;
-      trackIds: number[]
+      unlockingReferenda: UnlockingReferendaData[];
     };
     unlockable: {
       balance: string;
