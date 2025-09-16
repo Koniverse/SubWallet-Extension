@@ -71,7 +71,7 @@ export class OptimexHandler implements SwapBaseInterface {
       providerSlug: isTestnet ? SwapProviderId.OPTIMEX_TESTNET : SwapProviderId.OPTIMEX
     });
     this.providerSlug = isTestnet ? SwapProviderId.OPTIMEX_TESTNET : SwapProviderId.OPTIMEX;
-    this.baseUrl = isTestnet ? 'https://provider-stg.bitdex.xyz' : 'https://api.optimex.xyz';
+    this.baseUrl = isTestnet ? 'https://provider-stg.bitdex.xyz' : 'https://api.optimex.xyz'; // todo: move to cloud worker
   }
 
   get chainService () {
@@ -141,7 +141,7 @@ export class OptimexHandler implements SwapBaseInterface {
         session_id: metadata.session_id,
         amount_in: sendingValue,
         from_user_address: sender, // compressPublicKey for BTC and SOLANA, address for EVM
-        to_user_address: receiver || '', // Receiving address // todo
+        to_user_address: receiver || '', // Receiving address
         user_refund_address: sender, // Refund address if trade fails
         user_refund_pubkey: sender, // Refund pubkey if trade fails, in btc is pubkey and in evm is address
         creator_public_key: sender, // Compressed public key, in btc is pubkey and in evm is address
@@ -156,7 +156,7 @@ export class OptimexHandler implements SwapBaseInterface {
         session_id: metadata.session_id,
         amount_in: sendingValue,
         from_user_address: fromPublicKey,
-        to_user_address: receiver || '', // todo
+        to_user_address: receiver || '',
         user_refund_address: sender,
         user_refund_pubkey: fromPublicKey,
         creator_public_key: fromPublicKey,
@@ -180,13 +180,15 @@ export class OptimexHandler implements SwapBaseInterface {
       });
 
       if (!rawResponse.ok) {
-        console.log('Error while init quote');
+        console.log('Error bad request while init quote');
       }
 
       const response = await rawResponse.json() as unknown as { data: OptimexTradeMetadata };
 
       tradeInfo = response.data;
-    } catch {
+    } catch (e) {
+      console.log('Error while init quote');
+
       return undefined;
     }
 
@@ -338,14 +340,14 @@ export class OptimexHandler implements SwapBaseInterface {
     const xcmSwap = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP]);
     const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
 
-    const swapIndex = params.process.steps.findIndex((step) => step.type === SwapStepType.SWAP); // todo
+    const swapIndex = params.process.steps.findIndex((step) => step.type === SwapStepType.SWAP);
 
     if (swapIndex <= -1) {
       return [new TransactionError(BasicTxErrorType.INTERNAL_ERROR)];
     }
 
     if (swap) {
-      return this.swapBaseHandler.validateSwapOnlyProcess(params, swapIndex); // todo: create interface for input request
+      return this.swapBaseHandler.validateSwapOnlyProcess(params, swapIndex);
     }
 
     if (swapXcm) {
@@ -412,12 +414,15 @@ export class OptimexHandler implements SwapBaseInterface {
 
     let extrinsic: SWTransaction['transaction'];
     const depositAddress = this.currentTradeMetadata?.deposit_address;
+    const tradeId = this.currentTradeMetadata?.trade_id;
 
-    console.log('Optimex Trade metadata', depositAddress);
-
-    if (!depositAddress) {
+    if (!depositAddress || !tradeId) {
       throw new Error('Optimex Trade metadata is undefined, request for new quote');
     }
+
+    // dont remove this log
+    console.log('Optimex Trade metadata', depositAddress);
+    console.log('Optimex Trade channel:', `https://provider-api-docs.vercel.app/swap/${tradeId}`); // todo: log for mainnet
 
     if (chainType === ChainType.BITCOIN) {
       const bitcoinApi = this.chainService.getBitcoinApi(chainInfo.slug);
@@ -476,7 +481,7 @@ export class OptimexHandler implements SwapBaseInterface {
       txChain: fromAsset.originChain,
       txData,
       extrinsic,
-      transferNativeAmount: _isNativeToken(fromAsset) ? quote.fromAmount : '0', // todo
+      transferNativeAmount: _isNativeToken(fromAsset) ? quote.fromAmount : '0',
       extrinsicType: ExtrinsicType.SWAP,
       chainType
     } as SwapSubmitStepData;
