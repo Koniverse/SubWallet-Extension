@@ -48,8 +48,8 @@ export class BalanceService implements StoppableServiceInterface {
 
   private readonly detectAccountBalanceStore = new DetectAccountBalanceStore();
   private readonly balanceDetectSubject: BehaviorSubject<DetectBalanceCache> = new BehaviorSubject<DetectBalanceCache>({});
-  private readonly intervalTime = 3 * 60 * 1000;
-  private readonly cacheTime = 15 * 60 * 1000;
+  private readonly intervalTime = 3 * 60 * 1000; // scan balance every 3 mins
+  private readonly cacheTime = 15 * 60 * 1000; // cache time 15 mins to run again
 
   /**
    * @constructor
@@ -527,7 +527,7 @@ export class BalanceService implements StoppableServiceInterface {
       const typeValid = [...EthereumKeypairTypes].includes(type);
 
       if (typeValid) {
-        return subwalletApiSdk.balanceDetectionApi.getRequest(address)
+        return subwalletApiSdk.balanceDetectionApi.getSubWalletTokenBalance(address)
           .catch((e) => {
             console.error(e);
 
