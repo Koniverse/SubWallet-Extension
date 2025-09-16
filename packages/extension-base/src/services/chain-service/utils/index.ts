@@ -759,10 +759,6 @@ export const _isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, acc
       return _isSubstrateEvmCompatibleChain(chainInfo) && EthereumKeypairTypes.includes(accountType);
     }
 
-    if (accountSignMode === AccountSignMode.GENERIC_LEDGER) {
-      return _isChainCompatibleLedgerEvm(chainInfo) && EthereumKeypairTypes.includes(accountType);
-    }
-
     return _isChainEvmCompatible(chainInfo) && EthereumKeypairTypes.includes(accountType);
   }
 
