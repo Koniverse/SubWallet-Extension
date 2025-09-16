@@ -4,6 +4,7 @@
 import { PriceChartPoint, PriceChartTimeframe } from '@subwallet/extension-base/background/KoniTypes';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
 import { cancelSubscription, getHistoryTokenPrice, subscribeCurrentTokenPrice } from '@subwallet/extension-web-ui/messaging';
+import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
@@ -45,11 +46,12 @@ const TIMEFRAMES: Record<PriceChartTimeframe, TimeframeConfig> = {
 const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
   const { priceId } = props;
   const [selectedTimeframe, setSelectedTimeframe] = useState<PriceChartTimeframe>('1D');
-
+  const { currency } = useSelector((state: RootState) => state.price);
   const [rawPricePoints, setRawPricePoints] = useState<PriceChartPoint[]>([]);
   const [hoverPricePointIndex, setHoverPricePointIndex] = useState<number | null>(null);
   const [livePrice, setLivePrice] = useState<LivePrice | null>(null);
   const lastFetchPriceHistoryTimeRef = useRef<Record<string, number>>({});
+  const prevCurrencyRef = useRef<string>(currency);
   const priceHistoryCacheRef = useRef<Record<string, PriceChartPoint[]>>({});
 
   const { interval } = TIMEFRAMES[selectedTimeframe];
@@ -117,6 +119,27 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
       sync = false;
     };
   }, [priceId, selectedTimeframe]);
+
+  useEffect(() => {
+    let sync = true;
+
+    if (currency !== prevCurrencyRef.current) {
+      lastFetchPriceHistoryTimeRef.current[selectedTimeframe] = Date.now();
+
+      getHistoryTokenPrice(priceId, selectedTimeframe).then(({ history }) => {
+        if (sync) {
+          priceHistoryCacheRef.current[selectedTimeframe] = history;
+          setRawPricePoints(history);
+        }
+      }).catch(console.error);
+
+      prevCurrencyRef.current = currency;
+    }
+
+    return () => {
+      sync = false;
+    };
+  }, [currency, priceId, selectedTimeframe]);
 
   useEffect(() => {
     let subscriptionId: string;
