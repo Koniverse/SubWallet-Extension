@@ -42,7 +42,7 @@ export class BalanceService implements StoppableServiceInterface {
   status: ServiceStatus = ServiceStatus.NOT_INITIALIZED;
 
   private isReload = false;
-  private hasOptimizedTokens = false;
+  private requireOptimizeTokenList = false;
 
   get isStarted (): boolean {
     return this.status === ServiceStatus.STARTED;
@@ -109,9 +109,9 @@ export class BalanceService implements StoppableServiceInterface {
     this.status = ServiceStatus.STARTED;
     this.startPromiseHandler.resolve();
 
-    if (!this.hasOptimizedTokens) {
-      this.hasOptimizedTokens = true;
+    if (this.requireOptimizeTokenList) {
       await this.optimizeEnableTokens();
+      this.requireOptimizeTokenList = false;
     }
   }
 
@@ -826,17 +826,8 @@ export class BalanceService implements StoppableServiceInterface {
 
   /** optimize token area **/
 
-  public resetOptimizeTokensFlag(): void {
-    this.hasOptimizedTokens = false;
-  }
-
-  public async forceOptimizeEnableTokens(): Promise<void> {
-    this.hasOptimizedTokens = true;
-    await this.optimizeEnableTokens();
-  }
-
-  public getOptimizationStatus(): boolean {
-    return this.hasOptimizedTokens;
+  public enableOptimizeTokenPromise (): void {
+    this.requireOptimizeTokenList = true;
   }
 
   public async optimizeEnableTokens () {
@@ -848,7 +839,7 @@ export class BalanceService implements StoppableServiceInterface {
       const [nonZeroBalanceEvmToken, nonZeroBalanceSubstrateToken] = await Promise.all([
         this.evmDetectBalanceToken(addresses),
         this.substrateDetectBalanceToken(addresses)
-      ])
+      ]);
 
       const updatedSettings = structuredClone(assetSettings);
 

@@ -6,6 +6,8 @@ import BaseMigrationJob from '@subwallet/extension-base/services/migration-servi
 export default class OptimizeEnableToken extends BaseMigrationJob {
   public override async run (): Promise<void> {
     // Reset the hasOptimizedTokens flag to allow re-optimize tokens
-    this.state.balanceService.resetOptimizeTokensFlag();
+    this.state.balanceService.enableOptimizeTokenPromise();
+
+    return Promise.resolve();
   }
 }
