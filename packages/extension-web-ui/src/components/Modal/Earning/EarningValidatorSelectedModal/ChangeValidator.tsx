@@ -516,6 +516,7 @@ const Component = (props: Props) => {
           onSearch={handleSearch}
           placeholder={t<string>('Search validator')}
           searchValue={searchValue}
+          simpleLayout={true}
         />
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
