@@ -4,6 +4,7 @@
 import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountSelectorModal, AlertBox, CloseIcon, EmptyList, PageWrapper, ReceiveModal, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
+import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import BannerGenerator from '@subwallet/extension-koni-ui/components/StaticContent/BannerGenerator';
 import { TokenGroupBalanceItem } from '@subwallet/extension-koni-ui/components/TokenItem/TokenGroupBalanceItem';
 import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
@@ -32,6 +33,11 @@ type Props = ThemeProps;
 
 const tonWalletContractSelectorModalId = TON_WALLET_CONTRACT_SELECTOR_MODAL;
 const tonAccountSelectorModalId = TON_ACCOUNT_SELECTOR_MODAL;
+
+export enum AssetsTab {
+  TOKEN = 'token',
+  NFTs = 'nfts'
+}
 
 const Component = (): React.ReactElement => {
   useSetCurrentPage('/home/tokens');
@@ -63,6 +69,7 @@ const Component = (): React.ReactElement => {
     return currentAccountProxy?.accounts.find((acc) => isTonAddress(acc.address))?.address;
   }, [currentAccountProxy]);
   const [currentTonAddress, setCurrentTonAddress] = useState(isAllAccount ? undefined : tonAddress);
+  const [selectedFilterTab, setSelectedFilterTab] = useState<string>(AssetsTab.TOKEN);
 
   const handleScroll = useCallback((event: React.UIEvent<HTMLElement>) => {
     const topPosition = event.currentTarget.scrollTop;
@@ -252,14 +259,12 @@ const Component = (): React.ReactElement => {
       fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy)
     });
     navigate('/transaction/send-fund');
-  },
-  [currentAccountProxy, setStorage, navigate, notify, t]
+  }, [currentAccountProxy, setStorage, navigate, notify, t]
   );
 
   const onOpenBuyTokens = useCallback(() => {
     navigate('/buy-tokens');
-  },
-  [navigate]
+  }, [navigate]
   );
 
   const onOpenSwap = useCallback(() => {
@@ -314,6 +319,23 @@ const Component = (): React.ReactElement => {
     return result;
   }, [tokenGroups, debouncedTokenGroupBalanceMap, priorityTokens]);
 
+  const filterTabItems = useMemo<FilterTabItemType[]>(() => {
+    return [
+      {
+        label: t('Tokens'),
+        value: AssetsTab.TOKEN
+      },
+      {
+        label: t('NFTs'),
+        value: AssetsTab.NFTs
+      }
+    ];
+  }, [t]);
+
+  const onSelectFilterTab = useCallback((value: string) => {
+    setSelectedFilterTab(value);
+  }, []);
+
   useEffect(() => {
     window.addEventListener('resize', handleResize);
 
@@ -348,6 +370,12 @@ const Component = (): React.ReactElement => {
           totalChangePercent={totalBalanceInfo.change.percent}
           totalChangeValue={totalBalanceInfo.change.value}
           totalValue={totalBalanceInfo.convertedValue}
+        />
+        <FilterTabs
+          className={'filter-tabs-container'}
+          items={filterTabItems}
+          onSelect={onSelectFilterTab}
+          selectedItem={selectedFilterTab}
         />
       </div>
       <div
@@ -506,6 +534,7 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       display: 'flex',
       alignItems: 'center',
       transition: 'opacity, padding-top 0.27s ease',
+      flexDirection: 'column',
 
       '&:before': {
         content: '""',
