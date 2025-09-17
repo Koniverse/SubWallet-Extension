@@ -19,7 +19,7 @@ type InputInfo = {
 }
 type HookType = (inputInfo: InputInfo, processFunction: VoidFunction) => boolean;
 
-// `useHandleLedgerAccountWarning` will trigger a warning in the following two cases:
+// `useHandleLedgerAccountWarning`  will trigger a warning in the following two cases:
 //   1. When selecting a token address, it will display a warning for tokens belonging to unsupported networks of the ledgerEvm account, and tokens containing smart contracts on networks that bridge between the Ethereum and Substrate ecosystems for a substrate ecdsa ledger account type.
 //   2. When selecting a network address, it will show a warning for EVM networks that are not supported by the ledgerEvm account, and all bridge networks for the ledger substrate ecdsa account.
 const CONNECT_LEDGER_USER_GUIDE_URL = 'https://docs.subwallet.app/main/web-dashboard-user-guide/cold-wallet-management/connect-ledger-devices#token-compatibility-on-different-ledger-apps';
