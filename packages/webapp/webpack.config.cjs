@@ -14,6 +14,7 @@ module.exports = {
 
 const path = require('path');
 const webpack = require('webpack');
+const chainListPkgJson = require('@subwallet/chain-list/package.json');
 const rootDir = path.resolve(__dirname, '../..');
 
 const CopyPlugin = require('copy-webpack-plugin');
@@ -134,6 +135,7 @@ const createConfig = (entry, alias = {}, useSplitChunk = false) => {
           NODE_ENV: JSON.stringify(mode),
           PKG_NAME: JSON.stringify(pkgJson.name),
           PKG_VERSION: JSON.stringify(pkgJson.version),
+          CHAIN_LIST_VERSION: JSON.stringify(chainListPkgJson.version),
           PKG_BUILD_NUMBER: JSON.stringify(pkgJson.buildNumber),
           TARGET_ENV: JSON.stringify('webapp'),
           BRANCH_NAME: JSON.stringify(process.env.BRANCH_NAME),
