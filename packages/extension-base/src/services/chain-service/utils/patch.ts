@@ -28,6 +28,8 @@ export interface PatchInfo {
 
 export async function fetchPatchData<T> () {
   try {
+    console.log('?', `${fetchDomain}/patch/${ChainListVersion}/${fetchFile}`);
+
     const fetchPromise = fetch(`${fetchDomain}/patch/${ChainListVersion}/${fetchFile}`);
     const timeout = new Promise<null>((resolve) => {
       const id = setTimeout(() => {
