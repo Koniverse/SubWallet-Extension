@@ -134,6 +134,7 @@ export class SwapService implements StoppableServiceInterface {
       const handler = this.handlers[providerId];
 
       if (handler) {
+        // todo: handle error response from generateOptimalProcess
         return handler.generateOptimalProcessV2(params);
       } else {
         return this.getDefaultProcessV2(params);

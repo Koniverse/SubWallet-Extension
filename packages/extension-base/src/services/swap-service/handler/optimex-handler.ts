@@ -181,6 +181,8 @@ export class OptimexHandler implements SwapBaseInterface {
 
       if (!rawResponse.ok) {
         console.log('Error bad request while init quote');
+
+        return undefined;
       }
 
       const response = await rawResponse.json() as unknown as { data: OptimexTradeMetadata };
@@ -244,7 +246,8 @@ export class OptimexHandler implements SwapBaseInterface {
           value: params.request.fromAmount,
           feeInfo,
           transferAll: false,
-          fallbackFee: true
+          fallbackFee: true,
+          data: this.currentTradeMetadata?.payload
         });
       } else {
         [transactionConfig] = await getERC20TransactionObject({
@@ -403,6 +406,14 @@ export class OptimexHandler implements SwapBaseInterface {
     const chainInfo = this.chainService.getChainInfoByKey(fromAsset.originChain);
     const chainType = _chainInfoToChainType(chainInfo);
 
+    const depositAddress = this.currentTradeMetadata?.deposit_address;
+    const tradeId = this.currentTradeMetadata?.trade_id;
+    const payload = this.currentTradeMetadata?.payload; // undefined in case swap from btc
+
+    if (!depositAddress || !tradeId) {
+      throw new Error('Optimex Trade metadata is undefined, request for new quote');
+    }
+
     const txData = {
       address,
       provider: this.providerInfo,
@@ -413,15 +424,9 @@ export class OptimexHandler implements SwapBaseInterface {
     };
 
     let extrinsic: SWTransaction['transaction'];
-    const depositAddress = this.currentTradeMetadata?.deposit_address;
-    const tradeId = this.currentTradeMetadata?.trade_id;
-
-    if (!depositAddress || !tradeId) {
-      throw new Error('Optimex Trade metadata is undefined, request for new quote');
-    }
 
     // dont remove this log
-    console.log('Optimex Trade metadata', depositAddress);
+    console.log('Optimex Trade metadata:', depositAddress);
     console.log('Optimex Trade channel:', `https://provider-api-docs.vercel.app/swap/${tradeId}`); // todo: log for mainnet
 
     if (chainType === ChainType.BITCOIN) {
@@ -452,10 +457,14 @@ export class OptimexHandler implements SwapBaseInterface {
           to: depositAddress,
           value: quote.fromAmount,
           feeInfo,
-          transferAll: false
+          transferAll: false,
+          data: payload
         });
 
-        extrinsic = transactionConfig;
+        extrinsic = {
+          ...transactionConfig,
+          data: payload
+        };
       } else {
         const [transactionConfig] = await getERC20TransactionObject({
           assetAddress: _getContractAddressOfToken(fromAsset),
