@@ -1507,7 +1507,6 @@
   "ui.SETTINGS.screen.Setting.Security.extensionAutoLock": "Extension auto lock",
   "ui.SETTINGS.screen.Setting.Security.authenticateWithPassword": "Phê duyệt bằng mật khẩu",
   "ui.SETTINGS.screen.Setting.Security.advancedPhishingDetection": "Phát hiện lừa đảo nâng cao",
-  "ui.SETTINGS.screen.Setting.Security.phishingProtection": "",
   "ui.SETTINGS.screen.Setting.Security.cameraAccessForQr": "Truy cập máy ảnh cho QR",
   "ui.SETTINGS.screen.Setting.Security.signForMultipleTransactions": "Sign for multiple transactions",
   "ui.SETTINGS.screen.Setting.Security.allowSignOnceForMultiple": "Allow signing once for multiple transactions",
@@ -2274,5 +2273,13 @@
   "ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.nonce": "Nonce",
   "ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.tip": "Tip",
   "ui.EARNING.screen.EarningOptions.earningOptions": "Earning options",
-  "ui.EARNING.screen.EarningPositions.yourEarningPositions": "Your earning positions"
+  "ui.EARNING.screen.EarningPositions.yourEarningPositions": "Your earning positions",
+  "Unsupported token": "",
+  "Pay attention!": "",
+  "Do you still want to get the address?": "",
+  "Your account is not compatible with {{symbol}} token. Transferring {{symbol}} to this account will result in tokens getting stuck (i.e., can’t be transferred out or staked)": "",
+  " This address can only be used to receive compatible tokens. Sending incompatible tokens to this address will result in these tokens getting stuck (i.e., can’t be sent out or staked)": "",
+  "Get address": "",
+  "Cancel": "",
+  "Show warnings for phishing sites and protect your assets from scams": ""
 }

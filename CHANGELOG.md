@@ -1,5 +1,31 @@
 # CHANGELOG
 
+## 1.3.57
+Build date: Sep 17, 2025.
+
+Features & Updates:
+- Add support for in-app EWT staking (#4638)
+
+
+## 1.3.56
+Build date: Sep 11, 2025.
+
+Features & Updates:
+- Improve UX for the "Advanced phishing detection" feature (#4617)
+- Update ledger-substrate-js library (Round 2) (#4501)
+- Update chain-list stable v0.2.114 (#4651)
+  - Add support for Wormhole Bridged WSOL (SOL) for Unichain mainnet
+  - Add support for Hydration Hollarnet
+  - [Moonbeam] Remove USDC.wh token
+
+Bug fixes:
+- Fixed bug Do not display NFT images on Vara network, PAH (#4132)
+- Fixed bug Show incorrect pool/validator when earning on All accounts mode (#3972)
+- Fixed automatically adding suffix to account name (#4620)
+- Fixed bug Unmatched address set when connecting via Ledger Polkadot app & Ledger Avail Recovery app (#4645)
+- Fixed TAO's position in Earning options (#4654)
+
+
 ## 1.3.55
 Build date: Sep 05, 2025.
 
