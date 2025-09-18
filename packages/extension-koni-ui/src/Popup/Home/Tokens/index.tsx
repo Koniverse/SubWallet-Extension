@@ -1,31 +1,36 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountSelectorModal, AlertBox, CloseIcon, EmptyList, PageWrapper, ReceiveModal, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import BannerGenerator from '@subwallet/extension-koni-ui/components/StaticContent/BannerGenerator';
 import { TokenGroupBalanceItem } from '@subwallet/extension-koni-ui/components/TokenItem/TokenGroupBalanceItem';
-import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { CUSTOMIZE_MODAL, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
-import { useCoreReceiveModalHelper, useDebouncedValue, useGetBannerByScreen, useGetChainAndExcludedTokenByCurrentAccountProxy, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreReceiveModalHelper, useDebouncedValue, useGetBannerByScreen, useGetChainAndExcludedTokenByCurrentAccountProxy, useGetNftByAccount, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
+import { reloadCron } from '@subwallet/extension-koni-ui/messaging';
+import { GlobalSearchTokenModalId } from '@subwallet/extension-koni-ui/Popup/Home';
+import { INftCollectionDetail } from '@subwallet/extension-koni-ui/Popup/Home/Nfts';
+import { NftGalleryWrapper } from '@subwallet/extension-koni-ui/Popup/Home/Nfts/component/NftGalleryWrapper';
 import { UpperBlock } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/UpperBlock';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
 import { TokenBalanceItemType } from '@subwallet/extension-koni-ui/types/balance';
 import { getTransactionFromAccountProxyValue, isAccountAll, sortTokensByStandard } from '@subwallet/extension-koni-ui/utils';
 import { isTonAddress } from '@subwallet/keyring';
-import { Button, Icon, ModalContext, SwAlert } from '@subwallet/react-ui';
+import { ActivityIndicator, Button, ButtonProps, Dropdown, Icon, ModalContext, SwAlert, SwList } from '@subwallet/react-ui';
 import classNames from 'classnames';
-import { Coins, FadersHorizontal } from 'phosphor-react';
+import { ArrowClockwise, Coins, DotsThree, FadersHorizontal, MagnifyingGlass, Plus, PlusCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -35,8 +40,12 @@ const tonWalletContractSelectorModalId = TON_WALLET_CONTRACT_SELECTOR_MODAL;
 const tonAccountSelectorModalId = TON_ACCOUNT_SELECTOR_MODAL;
 
 export enum AssetsTab {
-  TOKEN = 'token',
-  NFTs = 'nfts'
+  TOKENS = 'tokens',
+  NFTS = 'nfts'
+}
+
+interface LocationState {
+  assetTab?: AssetsTab;
 }
 
 const Component = (): React.ReactElement => {
@@ -44,6 +53,8 @@ const Component = (): React.ReactElement => {
   const { t } = useTranslation();
   const [isShrink, setIsShrink] = useState<boolean>(false);
   const navigate = useNavigate();
+  const location = useLocation() as unknown as { state?: LocationState };
+  const assetTab = location.state?.assetTab ?? '';
   const containerRef = useRef<HTMLDivElement>(null);
   const topBlockRef = useRef<HTMLDivElement>(null);
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
@@ -53,8 +64,9 @@ const Component = (): React.ReactElement => {
     totalBalanceInfo }, tokenGroupStructure: { tokenGroups } } = useContext(HomeContext);
   const notify = useNotification();
   const { onOpenReceive, receiveModalProps } = useCoreReceiveModalHelper();
+  const { nftCollections, nftItems } = useGetNftByAccount();
   const priorityTokens = useSelector((state: RootState) => state.chainStore.priorityTokens);
-
+  const [loading, setLoading] = React.useState<boolean>(false);
   const isZkModeSyncing = useSelector((state: RootState) => state.mantaPay.isSyncing);
   const zkModeSyncProgress = useSelector((state: RootState) => state.mantaPay.progress);
   const [, setStorage] = useLocalStorage<TransferParams>(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
@@ -69,7 +81,7 @@ const Component = (): React.ReactElement => {
     return currentAccountProxy?.accounts.find((acc) => isTonAddress(acc.address))?.address;
   }, [currentAccountProxy]);
   const [currentTonAddress, setCurrentTonAddress] = useState(isAllAccount ? undefined : tonAddress);
-  const [selectedFilterTab, setSelectedFilterTab] = useState<string>(AssetsTab.TOKEN);
+  const [selectedFilterTab, setSelectedFilterTab] = useState<string>(AssetsTab.TOKENS);
 
   const handleScroll = useCallback((event: React.UIEvent<HTMLElement>) => {
     const topPosition = event.currentTarget.scrollTop;
@@ -323,11 +335,11 @@ const Component = (): React.ReactElement => {
     return [
       {
         label: t('Tokens'),
-        value: AssetsTab.TOKEN
+        value: AssetsTab.TOKENS
       },
       {
         label: t('NFTs'),
-        value: AssetsTab.NFTs
+        value: AssetsTab.NFTS
       }
     ];
   }, [t]);
@@ -335,6 +347,210 @@ const Component = (): React.ReactElement => {
   const onSelectFilterTab = useCallback((value: string) => {
     setSelectedFilterTab(value);
   }, []);
+
+  const searchCollection = useCallback((collection: NftCollection, searchText: string) => {
+    const searchTextLowerCase = searchText.toLowerCase();
+
+    return (
+      collection.collectionName?.toLowerCase().includes(searchTextLowerCase) ||
+      collection.collectionId.toLowerCase().includes(searchTextLowerCase)
+    );
+  }, []);
+
+  const emptyButtonProps = useMemo((): ButtonProps => {
+    return {
+      icon: (
+        <Icon
+          phosphorIcon={PlusCircle}
+          weight='fill'
+        />
+      ),
+      children: t('Import NFT'),
+      shape: 'circle',
+      size: 'xs',
+      onClick: () => {
+        navigate('/settings/tokens/import-nft', { state: { isExternalRequest: false } });
+      }
+    };
+  }, [navigate, t]);
+
+  const emptyNft = useCallback(() => {
+    return (
+      <EmptyList
+        buttonProps={emptyButtonProps}
+        emptyMessage={t('Click [+] on the top right corner to import your NFT')}
+        emptyTitle={t('ui.NFT.screen.NftsCollections.noNftsFound')}
+      />
+    );
+  }, [emptyButtonProps, t]);
+
+  const handleOnClickCollection = useCallback((state: INftCollectionDetail) => {
+    navigate('/home/nfts/collection-detail', { state });
+  }, [navigate]);
+
+  const handleImportNft = useCallback(() => {
+    navigate('/settings/tokens/import-nft', { state: { isExternalRequest: false } });
+  }, [navigate]);
+
+  const getNftsByCollection = useCallback((nftCollection: NftCollection) => {
+    const nftList: NftItem[] = [];
+
+    nftItems.forEach((nftItem) => {
+      if (nftItem.collectionId === nftCollection.collectionId && nftItem.chain === nftCollection.chain) {
+        nftList.push(nftItem);
+      }
+    });
+
+    return nftList;
+  }, [nftItems]);
+
+  const renderNftCollection = useCallback((nftCollection: NftCollection) => {
+    const nftList = getNftsByCollection(nftCollection);
+
+    let fallbackImage: string | undefined;
+
+    for (const nft of nftList) { // fallback to any nft image
+      if (nft.image) {
+        fallbackImage = nft.image;
+        break;
+      }
+    }
+
+    const state: INftCollectionDetail = { collectionInfo: nftCollection, nftList };
+
+    return (
+      <NftGalleryWrapper
+        fallbackImage={fallbackImage}
+        handleOnClick={handleOnClickCollection}
+        image={nftCollection.image}
+        itemCount={nftList.length}
+        key={`${nftCollection.collectionId}_${nftCollection.chain}`}
+        routingParams={state}
+        title={nftCollection.collectionName || nftCollection.collectionId}
+      />
+    );
+  }, [getNftsByCollection, handleOnClickCollection]);
+
+  const onOpenGlobalSearchToken = useCallback(() => {
+    activeModal(GlobalSearchTokenModalId);
+  }, [activeModal]);
+
+  const onOpenCustomizeModal = useCallback(() => {
+    activeModal(CUSTOMIZE_MODAL);
+  }, [activeModal]);
+
+  const onCronReloadNfts = useCallback(() => {
+    setLoading(true);
+    notify({
+      icon: <ActivityIndicator size={32} />,
+      style: { top: 210 },
+      direction: 'vertical',
+      duration: 1.8,
+      closable: false,
+      message: t('ui.NFT.screen.NftsCollections.reloading', 'Reloading NFTs...')
+    });
+
+    reloadCron({ data: 'nft' })
+      .then(() => {
+        setLoading(false);
+      })
+      .catch(console.error);
+  }, [notify, t]);
+
+  const tokenActions = useMemo(() => (
+    <>
+      <Button
+        icon={<Icon
+          phosphorIcon={MagnifyingGlass}
+          size='sm'
+        />}
+        onClick={onOpenGlobalSearchToken}
+        size='sm'
+        type='ghost'
+      />
+      <Button
+        icon={<Icon
+          phosphorIcon={FadersHorizontal}
+          size='sm'
+          weight='bold'
+        />}
+        onClick={onOpenCustomizeModal}
+        size='sm'
+        tooltip={t('Customize networks')}
+        type='ghost'
+      />
+    </>
+  ), [onOpenGlobalSearchToken, onOpenCustomizeModal, t]);
+
+  const nftActions = useMemo(() => (
+    !isShrink
+      ? (
+        <>
+          <Button
+            icon={<Icon
+              phosphorIcon={MagnifyingGlass}
+              size='sm'
+            />}
+            onClick={onOpenSwap}
+            size='sm'
+            type='ghost'
+          />
+          <Button
+            icon={<Icon
+              phosphorIcon={Plus}
+              size='sm'
+              weight='bold'
+            />}
+            onClick={handleImportNft}
+            size='sm'
+            type='ghost'
+          />
+          <Button
+            disabled={loading}
+            icon={<Icon
+              phosphorIcon={ArrowClockwise}
+              size='sm'
+              weight='bold'
+            />}
+            onClick={onCronReloadNfts}
+            size='sm'
+            type='ghost'
+          />
+        </>
+      )
+      : (
+        <Dropdown
+          arrow={false}
+          menu={{
+            items: [
+              { key: 'import', label: t('Import NFT'), icon: <Icon phosphorIcon={Plus} />, onClick: handleImportNft },
+              { key: 'reload', label: t('Reload NFT list'), icon: <Icon phosphorIcon={ArrowClockwise} />, onClick: onCronReloadNfts }
+            ]
+          }}
+          overlayClassName='sw-dropdown-menu'
+          placement='bottomRight'
+          trigger={['click']}
+        >
+          <Button
+            icon={<Icon
+              phosphorIcon={DotsThree}
+              size='sm'
+              weight='bold'
+            />}
+            size='sm'
+            type='ghost'
+          />
+        </Dropdown>
+      )
+  ), [isShrink, loading, handleImportNft, onCronReloadNfts, onOpenSwap, t]);
+
+  console.log('selectedFilterTab', selectedFilterTab);
+
+  useEffect(() => {
+    if (assetTab && Object.values(AssetsTab).includes(assetTab)) {
+      setSelectedFilterTab(assetTab);
+    }
+  }, [assetTab]);
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
@@ -371,12 +587,22 @@ const Component = (): React.ReactElement => {
           totalChangeValue={totalBalanceInfo.change.value}
           totalValue={totalBalanceInfo.convertedValue}
         />
-        <FilterTabs
-          className={'filter-tabs-container'}
-          items={filterTabItems}
-          onSelect={onSelectFilterTab}
-          selectedItem={selectedFilterTab}
-        />
+        <div className={'option-tab-wrapper'}>
+          <div className={'left-block'}>
+            <FilterTabs
+              className={'filter-tabs-container'}
+              items={filterTabItems}
+              onSelect={onSelectFilterTab}
+              selectedItem={selectedFilterTab}
+            />
+          </div>
+          <div className='right-block'>
+            {selectedFilterTab === AssetsTab.TOKENS && tokenActions}
+            {selectedFilterTab === AssetsTab.NFTS && nftActions}
+          </div>
+
+        </div>
+
       </div>
       <div
         className={'__scroll-container'}
@@ -442,37 +668,60 @@ const Component = (): React.ReactElement => {
             />
           </div>
         )}
-        {
-          tokenGroupBalanceItems.map((item) => {
-            return (
-              <TokenGroupBalanceItem
-                key={item.slug}
-                {...item}
-                onPressItem={onClickItem(item)}
-              />
-            );
-          })
-        }
-        {
-          !tokenGroupBalanceItems.length && (
-            <EmptyList
-              className={'__empty-list'}
-              emptyMessage={t('ui.BALANCE.screen.Tokens.trySearchingOrImporting')}
-              emptyTitle={t('ui.BALANCE.screen.Tokens.noTokensFound')}
-              phosphorIcon={Coins}
+
+        {selectedFilterTab === AssetsTab.TOKENS && (
+          <>
+            {tokenGroupBalanceItems.length > 0
+              ? (
+                tokenGroupBalanceItems.map((item) => (
+                  <TokenGroupBalanceItem
+                    key={item.slug}
+                    {...item}
+                    onPressItem={onClickItem(item)}
+                  />
+                ))
+              )
+              : (
+                <EmptyList
+                  className='__empty-list'
+                  emptyMessage={t('ui.BALANCE.screen.Tokens.trySearchingOrImporting')}
+                  emptyTitle={t('ui.BALANCE.screen.Tokens.noTokensFound')}
+                  phosphorIcon={Coins}
+                />
+              )}
+
+            <div className='__scroll-footer'>
+              <Button
+                icon={<Icon phosphorIcon={FadersHorizontal} />}
+                onClick={onClickManageToken}
+                size='xs'
+                type='ghost'
+              >
+                {t('ui.BALANCE.screen.Tokens.manageTokens')}
+              </Button>
+            </div>
+          </>
+        )}
+
+        {selectedFilterTab === AssetsTab.NFTS && (
+          <>
+            <SwList
+              className={classNames('nft_collection_list__container')}
+              displayGrid={true}
+              enableSearchInput={true}
+              gridGap={'14px'}
+              list={nftCollections}
+              minColumnWidth={'160px'}
+              renderItem={renderNftCollection}
+              renderOnScroll={true}
+              renderWhenEmpty={emptyNft}
+              searchFunction={searchCollection}
+              searchMinCharactersCount={2}
+              searchPlaceholder={t<string>('ui.NFT.screen.NftsCollections.searchCollectionName')}
             />
-          )
-        }
-        <div className={'__scroll-footer'}>
-          <Button
-            icon={<Icon phosphorIcon={FadersHorizontal} />}
-            onClick={onClickManageToken}
-            size={'xs'}
-            type={'ghost'}
-          >
-            {t('ui.BALANCE.screen.Tokens.manageTokens')}
-          </Button>
-        </div>
+          </>
+        )}
+
       </div>
 
       <ReceiveModal
@@ -489,7 +738,7 @@ const WrapperComponent = ({ className = '' }: ThemeProps): React.ReactElement<Pr
     <PageWrapper
       className={`tokens ${className}`}
       hideLoading={true}
-      resolve={dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance', 'mantaPay', 'swap'])}
+      resolve={dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance', 'mantaPay', 'swap', 'nft', 'balance'])}
     >
       <Component />
     </PageWrapper>
@@ -514,7 +763,15 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       flexDirection: 'column',
       overflowY: 'auto',
       overflowX: 'hidden',
-      paddingTop: 206
+      paddingTop: 246
+    },
+
+    '.option-tab-wrapper': {
+      paddingLeft: token.padding,
+      paddingRight: token.padding,
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'space-between'
     },
 
     '.__scroll-container': {
@@ -524,9 +781,10 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
 
     '.__upper-block-wrapper': {
       backgroundColor: token.colorBgDefault,
+      paddingBottom: 12,
       position: 'absolute',
       paddingTop: '32px',
-      height: 206,
+      height: 246,
       zIndex: 10,
       top: 0,
       left: 0,
@@ -553,7 +811,7 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       },
 
       '&.-is-shrink': {
-        height: 104,
+        height: 144,
 
         '&:before': {
           height: 80
@@ -564,7 +822,8 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
     '.tokens-upper-block': {
       flex: 1,
       position: 'relative',
-      zIndex: 5
+      zIndex: 5,
+      paddingBottom: 12
     },
 
     '.__scroll-footer': {

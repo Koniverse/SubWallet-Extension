@@ -87,7 +87,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [collectionInfo, handleOnClickNft]);
 
   const onBack = useCallback(() => {
-    navigate('/home/nfts/collections');
+    console.log('hello');
+    navigate('/home/tokens', { state: { assetTab: 'nfts' } });
   }, [navigate]);
 
   const emptyNft = useCallback(() => {
