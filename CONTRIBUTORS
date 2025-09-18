@@ -1,20 +1,20 @@
-    3134	AnhMTV                        	Release version 1.3.52
+    3189	AnhMTV                        	Release version 1.3.57
     2671	Nam Phạm                      	disable block explorer for truth network
     2599	S2kael                        	[Issue-4521] Update stable version for chain-list
-     920	bluezdot                      	[Issue-4465] chores (deps): bump sdk to v0.1.8
+     951	bluezdot                      	
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
      568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
+     541	Frenkie Nguyen                	[Issue-4462] update styling for background phishing page
      465	Jaco                          	0.42.5 (#969)
-     459	Frenkie Nguyen                	[Issue-4263] hide custom fee for Bitcoin
-     359	tunghp2002                    	[Issue-4520] Revert mindbond dtao
+     394	tunghp2002                    	[Issue-4638] Fix typos and separate energy chain check from native staking logic
      355	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
      278	lw                            	[Issue-4512] refactor: Update swap submission content
-     210	PDTnhah                       	
+     244	PDTnhah                       	[Issue-4654] Update chainlist version
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
+     185	Thiendekaco                   	[Issue-4501] fix(earning): update link guide
      170	lw-cdm                        	
      160	Automation Bot                	[CI Skip] Auto increase webapp build number
-     136	Thiendekaco                   	[Issue-3456] merge: dev into koni/dev/issue-4572
      104	khainh                        	predefine metadata for Polkadot & Kusama chains
       83	Hieu Dao                      	Update README.md
       83	leewong                       	
@@ -37,10 +37,10 @@
        4	namph                         	update UI for nft
        4	Quangdm-cdm                   	
        3	Antoine Estienne              	Add eth test for extension signature (#909)
+       3	bluezdot                      	[Issue-4606] chores: migrate to remove cached earning options
        3	quangdm                       	Update style for Auth Transaction Screen, Export Screen, Derive Screen
        2	Axel Chalon                   	Add typings to messages (#130)
        2	Bartłomiej Rutkowski          	Allow account creation by derivation from existing one (#296)
-       2	bluezdot                      	[Issue-4468] chores: add todos
        2	carumusan                     	Support ipfs and ipns urls (#667)
        2	ccris02                       	Adding Polish Language Option to the Extension (#761)
        2	joe petrowski                 	add plasm (#462)

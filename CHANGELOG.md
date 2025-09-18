@@ -1,5 +1,110 @@
 # CHANGELOG
 
+## 1.3.57
+Build date: Sep 17, 2025.
+
+Features & Updates:
+- Add support for in-app EWT staking (#4638)
+
+
+## 1.3.56
+Build date: Sep 11, 2025.
+
+Features & Updates:
+- Improve UX for the "Advanced phishing detection" feature (#4617)
+- Update ledger-substrate-js library (Round 2) (#4501)
+- Update chain-list stable v0.2.114 (#4651)
+  - Add support for Wormhole Bridged WSOL (SOL) for Unichain mainnet
+  - Add support for Hydration Hollarnet
+  - [Moonbeam] Remove USDC.wh token
+
+Bug fixes:
+- Fixed bug Do not display NFT images on Vara network, PAH (#4132)
+- Fixed bug Show incorrect pool/validator when earning on All accounts mode (#3972)
+- Fixed automatically adding suffix to account name (#4620)
+- Fixed bug Unmatched address set when connecting via Ledger Polkadot app & Ledger Avail Recovery app (#4645)
+- Fixed TAO's position in Earning options (#4654)
+
+
+## 1.3.55
+Build date: Sep 05, 2025.
+
+Features & Updates:
+- Migrate to ParaSpell V4 & Update asset metadata (#4606)
+- Add support new XCM channels (#1457)
+  - DOT (Hydration) <--> PAH
+  - DOT (Hydration) <--> Bifrost Polkadot
+  - DOT (Bifrost Polkadot) <--> PAH
+  - USDT: Bifrost Polkadot <--> Hydration
+- Remove MYTH (PAH -> Ethereum) (#4444)
+- Replace Hardcoded Strings with i18n Keys (#4515)
+- Add notification when dapp connection but network does not exist (#3753)
+- Apply dry-run to validate bridge step for swap feature (#4644)
+- Update chainlist stable v0.2.113 (#4616)
+  - Add support for RegionX Kusama parachain, Stable Testnet, Abstract Mainnet
+  - [Commune AI] Add block explorer
+  - Add support for MYTH (base), TRAC (NeuroWeb Mainnet)
+  - [Polygon] Update USDT's token information
+  - Add chainbalanceSlug for Tanssi Mainnet
+  - Remove more networks in the Polkadot & Ethereum ecosystems, KILT token (Hydration), USDt (KAH)
+  - Remove KILT staking
+
+Bug fixes:
+- Fixed some bug for customizing fee for substrate/evm transactions features (#4065)
+- Fixed bug Incorrect price history chart display when changing currency in popup mode (#4586)
+- Fixed min amount on popup Pay attention in case there is not enough balance to stake (#3930)
+
+
+## 1.3.54
+Build date: Aug 21, 2025.
+
+Features & Updates:
+- Support swap for Unichain (#4389)
+- Support Change validator for more chains (#4540)
+  - Vara
+  - Aleph Zero
+  - Polkadex
+  - Avail
+  - Edgeware
+  - Ternoa
+  - Dentnet
+  - Cere
+  - Testnet networks: Westend, Vara Testnet, Aleph Zero Testnet, Avail Turing
+- Support bridge tBTC (Ethereum) to tBTC (Hydration) via Snowbridge (#4593)
+- Update for patch chain (#4013)
+- Update logo for subnet on Earning features (#4551, #4626)
+- Update TAO staking fee (#4604)
+- Update chain-list stable v0.2.112 (#4517)
+  - Update information for some tokens for Fraxtal Mainnet L2
+  - Update token symbol (ticker) of some tokens for Bifrost testnet, Autonomys Taurus Testnet, Polkadot Chainflip Testnet, Energy Web X Rococo/Energy Web X Paseo
+  - Update block explorer for some networks: Polkadot Collectives, Polkadot People, ....
+  - Update USDT token information for Arbitrum One
+  - ...
+
+Bug fixes:
+- Handle case connecting with network systems that do not support WalletConnect connection (#4598)
+- Fixed bug getting too many requests from Earning feature of Bittensor (#4623)
+
+
+## 1.3.53
+Build date: Aug 12, 2025.
+
+Features & Update:
+- Update UX/UI when support Swap for Bitcoin on Chainflip (#4581)
+- Update some UI for Change validator feature (#4539)
+- Improve UI for case connection unsuccessfully when connect WalletConnect (#3456)
+- Update logic for rpc that don't support custom fee on EVM system (#4559)
+- Hide icon Edit fee with some networks not supported (#4585)
+
+Bug fixed:
+- Fixed bug Can not disconnect when connecting to 2 URIs of the same website with WalletConnect (#2917)
+- Fixed bug Can not import Json Account from Polkadot{.js} extension (#4565)
+- Fixed bug Can't import JSON file(from Migrate account) on store version (#4031)
+- Fixed bug when custom priority fee for EVM (#4461)
+- Fixed bug Unable to detect domains name when transfer (#4072)
+- Fixed bug Unable to connect to Ledger apps via Ledger Nano X 2.5.0 & Ledger Nano S+ 1.4.0 (#4592)
+
+
 ## 1.3.52
 Build date: Aug 07, 2025.
 

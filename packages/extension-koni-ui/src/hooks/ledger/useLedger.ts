@@ -5,6 +5,7 @@ import { LedgerNetwork, MigrationLedgerNetwork, POLKADOT_LEDGER_SCHEME } from '@
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { createPromiseHandler, isSameAddress } from '@subwallet/extension-base/utils';
 import { EVMLedger, SubstrateGenericLedger, SubstrateLegacyLedger, SubstrateMigrationLedger } from '@subwallet/extension-koni-ui/connector';
+import { LedgerTransportManager } from '@subwallet/extension-koni-ui/connector/Ledger/LedgerTransportManager';
 import { SubstrateECDSALedger } from '@subwallet/extension-koni-ui/connector/Ledger/SubstrateECDSALedger';
 import { isLedgerCapable, ledgerIncompatible, NotNeedMigrationGens } from '@subwallet/extension-koni-ui/constants';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -66,28 +67,28 @@ const retrieveLedger = (chainSlug: string, ledgerChains: LedgerNetwork[], migrat
 
   if (def.isGeneric) {
     if (def.isEthereum) {
-      return new EVMLedger('webusb', def.slip44);
+      return new EVMLedger(def.slip44);
     } else {
       if (originGenesisHash) {
         const def = getNetworkByGenesisHash(migrateLedgerChains, originGenesisHash);
 
         assert(def, 'There is no known Ledger app available for this chain');
 
-        return new SubstrateMigrationLedger('webusb', def.slip44, def.ss58_addr_type);
+        return new SubstrateMigrationLedger(def.slip44, def.ss58_addr_type);
       } else if (ledgerScheme === POLKADOT_LEDGER_SCHEME.ECDSA) {
-        return new SubstrateECDSALedger('webusb', def.slip44);
+        return new SubstrateECDSALedger(def.slip44);
       } else {
-        return new SubstrateGenericLedger('webusb', def.slip44);
+        return new SubstrateGenericLedger(def.slip44);
       }
     }
   } else {
     if (!forceMigration) {
-      return new SubstrateLegacyLedger('webusb', def.network);
+      return new SubstrateLegacyLedger(def.network);
     } else {
       if (NotNeedMigrationGens.includes(def.genesisHash)) {
-        return new SubstrateGenericLedger('webusb', def.slip44);
+        return new SubstrateGenericLedger(def.slip44);
       } else {
-        return new SubstrateMigrationLedger('webusb', def.slip44);
+        return new SubstrateMigrationLedger(def.slip44);
       }
     }
   }
@@ -179,6 +180,10 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
     const convertedError = convertLedgerError(error, t, appName, isSigning, expandError, isGetAddress);
     const message = convertedError.message;
 
+    if (convertedError.needCloseLedger) {
+      LedgerTransportManager.getInstance().closeTransport().catch(console.error);
+    }
+
     switch (convertedError.status) {
       case 'error':
         setWarning(null);
@@ -200,7 +205,7 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
 
     if (!ledger_) {
       return new Promise((resolve, reject) => {
-        reject(new Error(t("Can't find Ledger device")));
+        reject(new Error(t('ui.LEDGER.hook.ledger.useLedger.cantFindLedgerDevice')));
       });
     }
 
@@ -227,7 +232,7 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
 
     if (!ledger_) {
       return new Promise((resolve, reject) => {
-        reject(new Error(t("Can't find Ledger device")));
+        reject(new Error(t('ui.LEDGER.hook.ledger.useLedger.cantFindLedgerDevice')));
       });
     }
 
@@ -249,7 +254,7 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
       ledger.getAddress(false, accountOffset, addressOffset, accountOption)
         .then((addressOnCurrentLedger) => {
           if (address && !isSameAddress(addressOnCurrentLedger.address, address)) {
-            throw new Error(t('Wrong device. Connect your previously used Ledger and try again'));
+            throw new Error(t('ui.LEDGER.hook.ledger.useLedger.wrongLedgerDevice'));
           }
 
           ledger.signTransaction(message, metadata, accountOffset, addressOffset, accountOption)
@@ -266,8 +271,8 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
           reject(error);
         });
     } else {
-      reject(new Error(t("Can't find Ledger device")));
-      handleError(new Error(t("Can't find Ledger device")));
+      reject(new Error(t('ui.LEDGER.hook.ledger.useLedger.cantFindLedgerDevice')));
+      handleError(new Error(t('ui.LEDGER.hook.ledger.useLedger.cantFindLedgerDevice')));
     }
 
     return promise;
@@ -281,7 +286,7 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
       ledger.getAddress(false, accountOffset, addressOffset, accountOption)
         .then((addressOnCurrentLedger) => {
           if (address && !isSameAddress(addressOnCurrentLedger.address, address)) {
-            throw new Error(t('Wrong device. Connect your previously used Ledger and try again'));
+            throw new Error(t('ui.LEDGER.hook.ledger.useLedger.wrongLedgerDevice'));
           }
 
           ledger.signMessage(message, accountOffset, addressOffset, accountOption)
@@ -298,8 +303,8 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
           reject(error);
         });
     } else {
-      reject(new Error(t("Can't find Ledger device")));
-      handleError(new Error(t("Can't find Ledger device")));
+      reject(new Error(t('ui.LEDGER.hook.ledger.useLedger.cantFindLedgerDevice')));
+      handleError(new Error(t('ui.LEDGER.hook.ledger.useLedger.cantFindLedgerDevice')));
     }
 
     return promise;

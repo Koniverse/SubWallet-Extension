@@ -48,18 +48,18 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
     let pairTypes: KeypairType[] = [];
 
     if (isHex(phrase)) {
-      assert(isHex(phrase, 256), t('Invalid seed phrase. Please try again.'));
+      assert(isHex(phrase, 256), t('bg.ACCOUNT.services.keyring.handler.Mnemonic.invalidSeedPhraseTryAgain'));
     } else {
       // sadly isHex detects as string, so we need a cast here
-      assert(SEED_LENGTHS.includes((phrase).split(' ').length), t('Seed phrase needs to contain {{x}} words', { replace: { x: SEED_LENGTHS.join(', ') } }));
+      assert(SEED_LENGTHS.includes((phrase).split(' ').length), t('bg.ACCOUNT.services.keyring.handler.Mnemonic.seedPhraseWordCount', { replace: { x: SEED_LENGTHS.join(', ') } }));
 
       try {
-        assert(mnemonicValidate(phrase), t('Invalid seed phrase. Please try again.'));
+        assert(mnemonicValidate(phrase), t('bg.ACCOUNT.services.keyring.handler.Mnemonic.invalidSeedPhraseTryAgain'));
 
         mnemonicTypes = 'general';
         pairTypes = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
       } catch (e) {
-        assert(tonMnemonicValidate(phrase), t('Invalid seed phrase. Please try again.'));
+        assert(tonMnemonicValidate(phrase), t('bg.ACCOUNT.services.keyring.handler.Mnemonic.invalidSeedPhraseTryAgain'));
         mnemonicTypes = 'ton';
         pairTypes = ['ton-native'];
       }
@@ -78,7 +78,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
 
     const exists = this.state.checkAddressExists(Object.values(rs.addressMap));
 
-    assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || '' } }));
+    assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
 
     return rs;
   }
@@ -93,7 +93,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
 
     if (!hasMasterPassword) {
       if (!password) {
-        throw Error(t('The password of each account is needed to set up master password'));
+        throw Error(t('bg.ACCOUNT.services.keyring.handler.Mnemonic.eachAccountPasswordNeeded'));
       } else {
         keyring.changeMasterPassword(password);
         this.parentService.updateKeyringState();
@@ -101,7 +101,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
     }
 
     if (!types || !types.length) {
-      throw Error(t('Please choose at least one account type'));
+      throw Error(t('bg.ACCOUNT.services.keyring.handler.Mnemonic.chooseAtLeastOneAccountType'));
     }
 
     const nameExists = this.state.checkNameExists(name);
@@ -129,7 +129,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
 
     const exists = this.state.checkAddressExists(Object.values(addressDict));
 
-    assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || '' } }));
+    assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
 
     // Upsert account group first, to avoid combine latest have no account group data.
     // Q&A: How will accounts with proxyId be stored and managed?
@@ -181,7 +181,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
     if (!isUnified) {
       const pair = keyring.getPair(proxyId);
 
-      assert(pair, t('Unable to find account'));
+      assert(pair, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.unableToFindAccount'));
 
       const result = pair.exportMnemonic(password);
 
@@ -200,7 +200,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
         }
       }
 
-      assert(pair, t('Unable to find account'));
+      assert(pair, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.unableToFindAccount'));
 
       const result = pair.exportMnemonic(password) || '';
 

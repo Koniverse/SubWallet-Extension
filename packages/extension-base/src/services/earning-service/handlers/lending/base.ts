@@ -47,13 +47,13 @@ export default abstract class BaseLendingPoolHandler extends BaseSpecialStakingP
     const derivativeTokenInfo = this.state.getAssetBySlug(this.derivativeAssets[0]);
 
     if (bnAmount.lte(BN_ZERO)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount must be greater than 0'))];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.lending.amountMustBeGreaterThanZero'))];
     }
 
     if (bnAmount.lt(minUnstake)) {
       const minUnstakeStr = formatNumber(minUnstake.toString(), derivativeTokenInfo.decimals || 0);
 
-      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_UNSTAKE, t('You need to unstake at least {{amount}} {{token}}', { replace: { amount: minUnstakeStr, token: derivativeTokenInfo.symbol } })));
+      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_UNSTAKE, t('bg.EARNING.services.service.earning.lending.unstakeMinimumAmount', { replace: { amount: minUnstakeStr, token: derivativeTokenInfo.symbol } })));
     }
 
     if (!fastLeave) {
@@ -62,7 +62,7 @@ export default abstract class BaseLendingPoolHandler extends BaseSpecialStakingP
       }
 
       if (poolPosition.unstakings.length > maxUnstakeRequest) {
-        errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('You cannot unstake more than {{number}} times', { replace: { number: maxUnstakeRequest } })));
+        errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('bg.EARNING.services.service.earning.lending.maxUnstakeTimes', { replace: { number: maxUnstakeRequest } })));
       }
     }
 

@@ -31,10 +31,10 @@ function Component ({ className, request, type }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('Signature required')}
+          {t('ui.DAPP.Confirmations.Message.CardanoSignature.signatureRequired')}
         </div>
         <div className='description'>
-          {t('You are approving a request with the following account')}
+          {t('ui.DAPP.Confirmations.Message.CardanoSignature.approvingRequestWithAccount')}
         </div>
         <AccountItemWithProxyAvatar
           account={account}
@@ -49,7 +49,7 @@ function Component ({ className, request, type }: Props) {
             size='xs'
             type='ghost'
           >
-            {t('View details')}
+            {t('ui.DAPP.Confirmations.Message.CardanoSignature.viewDetails')}
           </Button>
         </div>
         }
@@ -60,7 +60,7 @@ function Component ({ className, request, type }: Props) {
         type={type}
       />
       {(!errors || errors.length === 0) && <BaseDetailModal
-        title={t('Message details')}
+        title={t('ui.DAPP.Confirmations.Message.CardanoSignature.messageDetails')}
       >
         <CardanoMessageDetail bytes={payload.hashPayload} />
       </BaseDetailModal>}

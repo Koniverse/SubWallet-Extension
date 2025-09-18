@@ -237,7 +237,7 @@ export async function validationAuthMiddleware (koni: KoniState, url: string, pa
         }
 
         if (payload.pair.meta.noPublicKey) {
-          return handleAuthError(payload, t('This account is not supported for this action'), 'dApp', errors);
+          return handleAuthError(payload, t('bg.TRANSACTION.core.validation.request.accountNotSupportedForAction'), 'dApp', errors);
         }
 
         payload.authInfo = authInfo;
@@ -878,17 +878,17 @@ export async function validationBitcoinSignMessageMiddleware (koni: KoniState, u
   };
 
   if (address === '' || !message) {
-    handleError(t('not found address or payload to sign'));
+    handleError(t('bg.TRANSACTION.core.validation.request.notFoundAddressOrPayload'));
   }
 
   if (!isBitcoinAddress(address)) {
-    handleError(t('Invalid bitcoin address'));
+    handleError(t('bg.TRANSACTION.core.validation.request.invalidBitcoinAddress'));
   }
 
   const pair = pair_ || keyring.getPair(address);
 
   if (!pair) {
-    handleError(t('Unable to find account'));
+    handleError(t('bg.TRANSACTION.core.validation.request.unableToFindAccount'));
   }
 
   const hashPayload = '';
@@ -935,29 +935,29 @@ export async function validationBitcoinSignPsbtMiddleware (koni: KoniState, url:
   };
 
   if (!(psbtParams.network === 'mainnet' || psbtParams.network === 'testnet')) {
-    handleError(t('Network to try this request is must be mainnet or testnet'));
+    handleError(t('bg.TRANSACTION.core.validation.request.networkMustBeMainnetOrTestnet'));
   }
 
   if (!networkKey) {
-    handleError(t('Network unavailable. Please switch network or manually add network to wallet'));
+    handleError(t('bg.TRANSACTION.core.validation.request.networkUnavailableSwitchOrAdd'));
   }
 
   if (!psbt || !address) {
-    handleError(t('Not found payload to sign'));
+    handleError(t('bg.TRANSACTION.core.validation.request.notFoundPayloadToSign'));
   }
 
   if (!isHex(`0x${psbt}`)) {
-    handleError(t('Psbt to be signed must be hex-encoded'));
+    handleError(t('bg.TRANSACTION.core.validation.request.psbtMustBeHexEncoded'));
   }
 
   if (!isBitcoinAddress(address)) {
-    handleError(t('Not found address'));
+    handleError(t('bg.TRANSACTION.core.validation.request.notFoundAddress'));
   }
 
   const addressInfo = getBitcoinAddressInfo(address);
 
   if (psbtParams.network !== addressInfo.network) {
-    handleError(t('The account or the network is not matched'));
+    handleError(t('bg.TRANSACTION.core.validation.request.accountOrNetworkNotMatched'));
   }
 
   const payload = {
@@ -1017,15 +1017,15 @@ export async function validationBitcoinSendTransactionMiddleware (koni: KoniStat
   };
 
   if (transactionParams.network !== senderAccountInfo.network) {
-    handleError(t('The account or the network is not matched'));
+    handleError(t('bg.TRANSACTION.core.validation.request.accountOrNetworkNotMatched'));
   }
 
   if (!transactionParams.recipients?.length) {
-    handleError(t('please provide the recipient and the amount'));
+    handleError(t('bg.TRANSACTION.core.validation.request.provideRecipientAndAmount'));
   }
 
   if (transactionParams.recipients?.length > 1) {
-    handleError(t("we don't support multiple recipients yet. Please provide only one for now."));
+    handleError(t('bg.TRANSACTION.core.validation.request.multipleRecipientsNotSupported'));
   }
 
   if (transactionParams.recipients.filter(({ address, amount }) => !address || !amount).length > 0) {
@@ -1035,21 +1035,21 @@ export async function validationBitcoinSendTransactionMiddleware (koni: KoniStat
   const recipientAccountInfo = getBitcoinAddressInfo(transactionParams.recipients[0].address);
 
   if (recipientAccountInfo.network !== transactionParams.network) {
-    handleError(t('invalid recipient address'));
+    handleError(t('bg.TRANSACTION.core.validation.request.invalidRecipientAddress'));
   }
 
   if (transactionParams.recipients.length !== 1) {
-    handleError(t('receiving address must be a single account'));
+    handleError(t('bg.TRANSACTION.core.validation.request.receivingAddressMustBeSingleAccount'));
   }
 
   if (address === transactionParams.recipients[0].address) {
-    handleError(t('must be different from sending address'));
+    handleError(t('bg.TRANSACTION.core.validation.request.mustBeDifferentFromSendingAddress'));
   }
 
   const pair = pair_ || keyring.getPair(address);
 
   if (!pair) {
-    handleError(t('unable to find account'));
+    handleError(t('bg.TRANSACTION.core.validation.request.unableToFindAccountError'));
   }
 
   const tokenInfo = koni.getNativeTokenInfo(networkKey);
@@ -1066,12 +1066,12 @@ export async function validationBitcoinSendTransactionMiddleware (koni: KoniStat
   } catch (e) {
     const message = (e as Error).message;
 
-    if (message.toLowerCase().includes(t('please enable network'))) {
+    if (message.toLowerCase().includes(t('bg.TRANSACTION.core.validation.request.pleaseEnableNetwork'))) {
       const chainInfo = koni.chainService.getChainInfoByKey(networkKey);
 
       payload_.errorPosition = 'ui';
       payload_.confirmationType = 'bitcoinSendTransactionRequestAfterConfirmation';
-      const [message, name] = [t('Enable {{chain}} network on the extension and try again', { replace: { chain: chainInfo.name } }), t('Network not enabled')];
+      const [message, name] = [t('bg.TRANSACTION.core.validation.request.enableChainOnExtension', { replace: { chain: chainInfo.name } }), t('bg.TRANSACTION.core.validation.request.networkNotEnabled')];
       const error = new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, message, undefined, name);
 
       console.error(error);
@@ -1093,7 +1093,7 @@ export async function validationBitcoinSendTransactionMiddleware (koni: KoniStat
   });
 
   if (new BigN(freeBalance.value).lte(totalValue)) {
-    handleError(t('insufficient balance'));
+    handleError(t('bg.TRANSACTION.core.validation.request.insufficientBalanceError'));
   }
 
   const sendTransactionRequest = {
@@ -1128,11 +1128,11 @@ export function convertErrorMessage (message_: string, name?: string): string[] 
     message.includes('invalid json rpc') ||
     message.includes('internet connection')
   ) {
-    return [t('Re-enable the network or change RPC on the extension and try again'), t('Unstable network connection')];
+    return [t('bg.TRANSACTION.core.validation.request.reEnableOrChangeRpc'), t('bg.TRANSACTION.core.validation.request.unstableNetworkConnection')];
   }
 
   if (message.includes('network is currently not supported')) {
-    return [t('This network is not yet supported on SubWallet. (Import the network)[https://docs.subwallet.app/main/extension-user-guide/customize-your-networks#import-networks] on SubWallet and try again'), t('Network not supported')];
+    return [t('bg.TRANSACTION.core.validation.request.networkNotSupportedImport'), t('bg.TRANSACTION.core.validation.request.networkNotSupported')];
   }
 
   // Authentication
@@ -1148,60 +1148,60 @@ export function convertErrorMessage (message_: string, name?: string): string[] 
   // Transaction
 
   if (message.includes('recipient address not found')) {
-    return [t('Enter recipient address and try again'), t('Recipient address not found')];
+    return [t('bg.TRANSACTION.core.validation.request.enterRecipientAddress'), t('bg.TRANSACTION.core.validation.request.recipientAddressNotFound')];
   }
 
   if (message.includes('is not a number') || message.includes('invalid number value') || message.includes('invalid bignumberish')) {
-    return [t('Amount must be an integer. Enter an integer and try again'), t('Invalid amount')];
+    return [t('bg.TRANSACTION.core.validation.request.amountMustBeInteger'), t('bg.TRANSACTION.core.validation.request.invalidAmount')];
   }
 
   if (message.includes('calculate estimate gas fee') || message.includes('invalidcode')) {
-    return [t('Unable to calculate estimated gas for this transaction. Try again or contact support at agent@subwallet.app'), t('Gas calculation error')];
+    return [t('bg.TRANSACTION.core.validation.request.gasCalculationError'), t('bg.TRANSACTION.core.validation.request.gasCalculationErrorTitle')];
   }
 
   if (message.includes('invalid recipient address')) {
-    return [t('Make sure the recipient address is valid and in the same type as the sender address, then try again'), t('Invalid recipient address')];
+    return [t('bg.TRANSACTION.core.validation.request.recipientAddressTypeMismatch'), t('bg.TRANSACTION.core.validation.request.invalidRecipientAddressError')];
   }
 
   if (message.includes('must be different from sending address')) {
-    return [t('The recipient address must be different from the sender address'), t('Invalid recipient address')];
+    return [t('bg.TRANSACTION.core.validation.request.recipientMustBeDifferentFromSender'), t('bg.TRANSACTION.core.validation.request.invalidRecipientAddressError')];
   }
 
   if (message.includes('the sender address must be the ethereum address type')) {
-    return [t('The sender address must be the ethereum address type'), t('Invalid address type')];
+    return [t('bg.TRANSACTION.core.validation.request.senderMustBeEthereumAddress'), t('bg.TRANSACTION.core.validation.request.invalidAddressType')];
   }
 
   if (message.includes('the sender address must be the ethereum address type')) {
-    return [t('The sender address must be the bitcoin address type'), t('Invalid address type')];
+    return [t('bg.TRANSACTION.core.validation.request.senderMustBeBitcoinAddress'), t('bg.TRANSACTION.core.validation.request.invalidAddressType')];
   }
 
   if (message.includes('account or the network is not matched')) {
-    return [t('The account does not match the selected network'), t('Invalid address type')];
+    return [t('bg.TRANSACTION.core.validation.request.accountDoesNotMatchNetwork'), t('bg.TRANSACTION.core.validation.request.invalidAddressType')];
   }
 
   if (message.includes('receiving address must be a single account')) {
-    return [t('The receiving address must be a single account'), t('Invalid recipient address')];
+    return [t('bg.TRANSACTION.core.validation.request.receivingAddressMustBeSingle'), t('bg.TRANSACTION.core.validation.request.invalidRecipientAddressError')];
   }
 
   if (message.includes('insufficient balance') || message.includes('insufficient funds')) {
-    return [t('Insufficient balance on the sender address. Top up your balance and try again'), t('Unable to sign transaction')];
+    return [t('bg.TRANSACTION.core.validation.request.insufficientSenderBalance'), t('bg.TRANSACTION.core.validation.request.unableToSignTransaction')];
   }
 
   if (message.includes('substrate') && message.includes('receive this token')) {
-    return [t('The recipient account is a Ledger Polkadot (EVM) account, which is not supported for this transaction. Change recipient account and try again'), t('Invalid account type')];
+    return [t('bg.TRANSACTION.core.validation.request.recipientLedgerEvmNotSupported'), t('bg.TRANSACTION.core.validation.request.invalidAccountType')];
   }
 
   // Sign Message
   if (message.includes('not found address or payload to sign')) {
-    return [t('An error occurred when signing this request. Try again or contact support at agent@subwallet.app'), t('Unable to sign')];
+    return [t('bg.TRANSACTION.core.validation.request.errorSigningRequest'), t('bg.TRANSACTION.core.validation.request.unableToSign')];
   }
 
   if (message.includes('unsupported method') || message.includes('unsupported action')) {
-    return [t('This sign method is not supported by SubWallet. Try again or contact support at agent@subwallet.app'), t('Method not supported')];
+    return [t('bg.TRANSACTION.core.validation.request.signMethodNotSupported'), t('bg.TRANSACTION.core.validation.request.methodNotSupported')];
   }
 
   if (message.includes('eip712 typed data') || message.includes('invalid message')) {
-    return [t('An error occurred when attempting to sign this request. Contact support at email: agent@subwallet.app'), t('Unable to sign')];
+    return [t('bg.TRANSACTION.core.validation.request.errorAttemptingToSign'), t('bg.TRANSACTION.core.validation.request.unableToSign')];
   }
 
   return [message, name || 'Error'];
