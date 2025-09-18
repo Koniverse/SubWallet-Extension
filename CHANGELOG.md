@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.3.57
+Build date: Sep 17, 2025.
+
+Features & Updates:
+- Add support for in-app EWT staking (#4638)
+
+
 ## 1.3.56
 Build date: Sep 11, 2025.
 
