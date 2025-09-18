@@ -109,7 +109,9 @@ const Component: React.FC<Props> = (props: Props) => {
         console.error(e);
         setLoading(false);
         setConnectionError(convertWCErrorMessage(e));
-        activeModal(confirmErrorModalId);
+        setTimeout(() => {
+          activeModal(confirmErrorModalId);
+        }, 200);
       });
   }, [activeModal]);
 
@@ -190,6 +192,17 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [form, inactiveModal, setTimeOutRecords]);
 
   const footerModalWC = useMemo(() => {
+    if (connectionError?.isConnectionBlockedError) {
+      return (
+        <div className={'__footer-wc-modal'}>
+          <Button
+            block={true}
+            onClick={onClickToFAQ(true)}
+          >{t('I understand')}</Button>
+        </div>
+      );
+    }
+
     return (
       <div className={'__footer-wc-modal'}>
         <Button
@@ -203,7 +216,7 @@ const Component: React.FC<Props> = (props: Props) => {
         >{t('Review guide')}</Button>
       </div>
     );
-  }, [onClickToFAQ, t]);
+  }, [connectionError?.isConnectionBlockedError, onClickToFAQ, t]);
 
   const contentNode = (
     <>
