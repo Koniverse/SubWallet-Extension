@@ -82,6 +82,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { activeModal, checkActive } = useContext(ModalContext);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const defaultValueRef = useRef({ _default: '_', selected: '_' });
+  const prevOriginValidator = useRef(originValidator);
 
   useExcludeModal(id);
   const isActive = checkActive(id);
@@ -354,13 +355,13 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     const _default = nominations?.map((item) => getValidatorKey(item.validatorAddress, item.validatorIdentity)).join(',') || autoValidator || '';
     const selected = defaultValue || (isSingleSelect ? '' : _default);
 
-    if (defaultValueRef.current._default === _default && defaultValueRef.current.selected === selected) {
+    if (defaultValueRef.current._default === _default && defaultValueRef.current.selected === selected && prevOriginValidator.current === originValidator) {
       return;
     }
 
     onInitValidators(_default, selected);
     onChange && onChange({ target: { value: selected } });
-
+    prevOriginValidator.current = originValidator;
     defaultValueRef.current = { _default, selected };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nominations, onInitValidators, isSingleSelect, defaultValue, autoValidator, originValidator]);

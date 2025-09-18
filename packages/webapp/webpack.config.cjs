@@ -60,6 +60,7 @@ const _additionalEnv = {
   INFURA_API_KEY: JSON.stringify(process.env.INFURA_API_KEY),
   INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET),
   SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
+  PATCH_CHAIN_LIST_URL: JSON.stringify(process.env.PATCH_CHAIN_LIST_URL),
   SW_EXTERNAL_SERVICES_API: JSON.stringify(process.env.SW_EXTERNAL_SERVICES_API),
   BTC_SERVICE_TOKEN: JSON.stringify(process.env.BTC_SERVICE_TOKEN),
   MELD_API_KEY: JSON.stringify(process.env.MELD_API_KEY),
