@@ -641,9 +641,9 @@ export interface ExtrinsicDataTypeMap {
 
   [ExtrinsicType.EVM_EXECUTE]: TransactionConfig,
   [ExtrinsicType.CROWDLOAN]: any,
-  [ExtrinsicType.GOV_VOTE]: any,
-  [ExtrinsicType.GOV_UNVOTE]: any,
-  [ExtrinsicType.GOV_UNLOCK_VOTE]: any,
+  [ExtrinsicType.GOV_VOTE]: GovVoteRequest,
+  [ExtrinsicType.GOV_UNVOTE]: RemoveVoteRequest,
+  [ExtrinsicType.GOV_UNLOCK_VOTE]: UnlockVoteRequest,
 
   [ExtrinsicType.SWAP]: SwapTxData
   [ExtrinsicType.UNKNOWN]: any

@@ -52,7 +52,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     return accs.filter((acc) => {
       const votingInfo = govLockInfo.find((v) => v.address === acc.address);
 
-      return votingInfo && votingInfo.summary.unlockable.unlockableReferenda.length > 0;
+      return votingInfo && votingInfo.summary.unlockable.trackIds.length > 0;
     })
       .sort(funcSortByName);
   });
@@ -80,7 +80,8 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       chain: chainValue,
       address: values.from,
       referendumIds: values.referendumIds,
-      trackIds: values.tracks
+      trackIds: values.tracks,
+      amount: values.amount || '0'
     };
 
     handleUnlockVote(unlockVoteRequest)
@@ -117,7 +118,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       return BN_ZERO;
     }
 
-    return new BigN(selectedLockInfo.summary.totalLocked || BN_ZERO);
+    return new BigN(selectedLockInfo.summary.unlockable.balance || BN_ZERO);
   }, [selectedLockInfo]);
 
   useEffect(() => {
@@ -138,6 +139,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     if (selectedLockInfo) {
       form.setFieldsValue({
         referendumIds: selectedLockInfo.summary.unlockable.unlockableReferenda,
+        amount: selectedLockInfo.summary.unlockable.balance || '0',
         tracks: selectedLockInfo.tracks.map((t) => t.trackId)
       });
 
@@ -145,6 +147,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         ...defaultData,
         from: fromValue,
         referendumIds: selectedLockInfo.summary.unlockable.unlockableReferenda,
+        amount: selectedLockInfo.summary.unlockable.balance || '0',
         tracks: selectedLockInfo.tracks.map((t) => t.trackId)
       } as GovUnlockVoteParams);
     }

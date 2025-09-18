@@ -509,8 +509,6 @@ export default abstract class BaseOpenGovHandler {
           unlockableReferenda.has(vote.referendumIndex.toString())
         );
 
-        console.log('Hmm', [allVotesUnlockable, unlockableReferenda, votes, this.chain]);
-
         const activeVoteAmount = votes
           .filter((vote) => !unlockableReferenda.has(vote.referendumIndex))
           .reduce((sum, vote) => {
@@ -552,13 +550,17 @@ export default abstract class BaseOpenGovHandler {
               .plus(new BigN(vote.abstainAmount || '0'));
           }, new BigN(0));
 
-        actualTrackBalances.set(trackId, balance.minus(activeVoteAmount));
+        if (activeVoteAmount.lt(balance)) {
+          actualTrackBalances.set(trackId, balance.minus(activeVoteAmount));
+        } else {
+          actualTrackBalances.set(trackId, balance);
+        }
       } else {
         actualTrackBalances.set(trackId, balance);
       }
     }
 
-    // Sort theo actual unlockable balances
+    // Sort by actual unlockable balances
     const sortedBalances = Array.from(actualTrackBalances.entries())
       .sort((a, b) => b[1].comparedTo(a[1]));
 
@@ -570,20 +572,14 @@ export default abstract class BaseOpenGovHandler {
         .sort((a, b) => b.comparedTo(a));
 
       const maxUnlockableBalance = unlockableBalances[0];
-      const maxTotalBalance = sortedBalances.length > 0 ? sortedBalances[0][1] : new BigN(0);
 
-      if (maxUnlockableBalance.eq(maxTotalBalance)) {
-        const maxTracks = sortedBalances.filter(([, bal]) => bal.eq(maxTotalBalance));
-        const lockedTracks = maxTracks.filter(([trackId]) => !unlockableTrackIds.includes(trackId));
+      const lockedTracks = sortedBalances.filter(([trackId]) => !unlockableTrackIds.includes(trackId));
 
-        if (lockedTracks.length === 0) {
-          totalUnlockable = maxUnlockableBalance;
-        } else {
-          const worstLockedBalance = lockedTracks[0][1];
+      const worstLockedBalance = lockedTracks.length > 0 ? lockedTracks[0][1] : new BigN(0);
 
-          totalUnlockable = maxUnlockableBalance.minus(worstLockedBalance);
-        }
-      } else {
+      totalUnlockable = maxUnlockableBalance.minus(worstLockedBalance);
+
+      if (totalUnlockable.lt(0)) {
         totalUnlockable = new BigN(0);
       }
     }

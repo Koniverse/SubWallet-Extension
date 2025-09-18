@@ -195,4 +195,5 @@ export interface UnlockVoteRequest {
   chain: string;
   trackIds: number[];
   referendumIds?: string[];
+  amount: string;
 }
