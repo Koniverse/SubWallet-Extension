@@ -340,7 +340,15 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
 
   public static getInstance () {
     if (!SubscanService._instance) {
-      SubscanService._instance = new SubscanService(SUBSCAN_API_CHAIN_MAP);
+      // Subscan API allows only ~2 requests per second.
+      // However, each request from the webapp also triggers an OPTIONS request (CORS preflight),
+      // which Subscan counts towards the quota as well → effectively 1 call = 2 requests.
+      // To avoid hitting the rate limit, we configure the queue
+      // to allow only 1 request per second.
+      SubscanService._instance = new SubscanService(SUBSCAN_API_CHAIN_MAP, {
+        limitRate: 1,
+        intervalCheck: 1000
+      });
     }
 
     return SubscanService._instance;
