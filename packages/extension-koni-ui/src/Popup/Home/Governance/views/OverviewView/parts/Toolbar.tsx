@@ -29,13 +29,14 @@ type Props = ThemeProps & {
   chain: string;
 };
 
+const GOV_FILTER_MODAL_ID = 'gov-filter-modal';
+const GOV_SEARCH_MODAL_ID = 'referenda-search-modal';
+
 const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasuryFilter,
   isEnableVotedFilter, onChangeCategory, sdkInstance, selectedReferendaCategory,
   setIsEnableDelegatedFilter, setIsEnableTreasuryFilter, setIsEnableVotedFilter, setStatusSelected, setTrackSelected, statusSelected, trackSelected }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { activeModal, inactiveModal } = useContext(ModalContext);
-
-  const govFilterModalId = 'gov-filter-modal';
 
   const filterTabItems = useMemo(() => {
     return [
@@ -51,11 +52,15 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
   }, [t]);
 
   const onOpenFilter = useCallback(() => {
-    activeModal(govFilterModalId);
+    activeModal(GOV_FILTER_MODAL_ID);
+  }, [activeModal]);
+
+  const onOpenSearch = useCallback(() => {
+    activeModal(GOV_SEARCH_MODAL_ID);
   }, [activeModal]);
 
   const onCancelFilter = useCallback(() => {
-    inactiveModal(govFilterModalId);
+    inactiveModal(GOV_FILTER_MODAL_ID);
   }, [inactiveModal]);
 
   const onSelectFilterTab = useCallback((value: string) => {
@@ -63,7 +68,7 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
   }, [onChangeCategory]);
 
   const onApplyFilter = useCallback(() => {
-    inactiveModal(govFilterModalId);
+    inactiveModal(GOV_FILTER_MODAL_ID);
   }, [inactiveModal]);
 
   return (
@@ -83,6 +88,7 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
               phosphorIcon={MagnifyingGlass}
             />
           )}
+          onClick={onOpenSearch}
           size={'xs'}
           type={'ghost'}
         />
@@ -101,7 +107,7 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
 
         <GovFilterModal
           chain={chain}
-          id={govFilterModalId}
+          id={GOV_FILTER_MODAL_ID}
           isEnableDelegatedFilter={isEnableDelegatedFilter}
           isEnableTreasuryFilter={isEnableTreasuryFilter}
           isEnableVotedFilter={isEnableVotedFilter}

@@ -100,14 +100,14 @@ function Component (props: Props): React.ReactElement<Props> {
     >
       <div className='__filter-part'>
         <Tooltip
-          placement={'topRight'}
-          title={t('Only show the referenda that requested treasury')}
+          placement={'topLeft'}
+          title={t('Only shows referenda that requested treasury')}
         >
           <div className='__filter-left-part'>{t('Treasury-related')}
             <Icon
+              customSize={'16px'}
               iconColor='white'
               phosphorIcon={Info}
-              size='sm'
               weight='fill'
             />
           </div>
@@ -121,14 +121,14 @@ function Component (props: Props): React.ReactElement<Props> {
       </div>
       <div className='__filter-part'>
         <Tooltip
-          placement={'topRight'}
-          title={t('Voted')}
+          placement={'topLeft'}
+          title={t('Only shows referenda you\'ve voted directly in')}
         >
           <div className='__filter-left-part'>{t('Voted')}
             <Icon
+              customSize={'16px'}
               iconColor='white'
               phosphorIcon={Info}
-              size='sm'
               weight='fill'
             />
           </div>
@@ -142,14 +142,14 @@ function Component (props: Props): React.ReactElement<Props> {
       </div>
       <div className='__filter-part'>
         <Tooltip
-          placement={'topRight'}
-          title={t('Delegated')}
+          placement={'topLeft'}
+          title={t('Only shows referenda you\'ve voted through delegation')}
         >
           <div className='__filter-left-part'>{t('Delegated')}
             <Icon
+              customSize={'16px'}
               iconColor='white'
               phosphorIcon={Info}
-              size='sm'
               weight='fill'
             />
           </div>

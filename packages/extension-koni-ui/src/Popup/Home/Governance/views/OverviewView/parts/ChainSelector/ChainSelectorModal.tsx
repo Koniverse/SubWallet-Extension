@@ -150,7 +150,7 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain, selectedC
 
     return (
       <ChainSelectorItem
-        balanceValue={chainBalanceMap[_item.chainSlug]?.total?.value}
+        balanceInfo={chainBalanceMap[_item.chainSlug]}
         chainName={_item.chainName}
         chainSlug={_item.chainSlug}
         className={'__selector-item'}

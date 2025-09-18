@@ -3,6 +3,7 @@
 
 import { useGetGovLockedInfos } from '@subwallet/extension-koni-ui/hooks';
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
+import { ReferendaSearchModal } from '@subwallet/extension-koni-ui/Popup/Home/Governance/views/OverviewView/parts/ReferendaSearchModal';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ReferendumWithVoting, UserVoting } from '@subwallet/extension-koni-ui/types/gov';
@@ -230,7 +231,6 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
         chain={chainSlug}
         items={referendaItems}
         onClickItem={onClickReferendumItem}
-        selectedReferendaCategory={selectedReferendaCategory}
       />
 
       {isLoadingMore && selectedReferendaCategory !== ReferendaCategory.VOTED && (
@@ -238,6 +238,13 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
           <ActivityIndicator size={token.sizeXL} />
         </div>
       )}
+
+      <ReferendaSearchModal
+        chain={chainSlug}
+        items={referendaItems}
+        onClickItem={onClickReferendumItem}
+        sdkInstance={sdkInstance}
+      />
     </div>
   );
 };

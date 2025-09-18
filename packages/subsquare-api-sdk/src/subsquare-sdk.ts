@@ -3,7 +3,7 @@
 
 import axios, { AxiosInstance } from 'axios';
 
-import { ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
+import { ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, Referendum, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
 import { gov2ReferendumsApi, gov2TracksApi } from './url';
 import { ALL_TRACK, reformatTrackName } from './utils';
 
@@ -107,5 +107,14 @@ export class SubsquareApiSdk {
     );
 
     return userVoteRes.data;
+  }
+
+  async findReferendumByValue (text: string): Promise<{ openGovReferenda: Referendum[] }> {
+    const referendaRes = await this.client.get<{ openGovReferenda: Referendum[] }>(
+      '/search',
+      { params: { text } }
+    );
+
+    return referendaRes.data;
   }
 }

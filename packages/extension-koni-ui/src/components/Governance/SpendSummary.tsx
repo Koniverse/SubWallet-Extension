@@ -2,10 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { getGovTokenLogoSlugBySymbol } from '@subwallet/extension-koni-ui/utils/gov';
+import { Logo } from '@subwallet/react-ui';
 import { SpendItem } from '@subwallet/subsquare-api-sdk';
 import BigNumber from 'bignumber.js';
-import React from 'react';
+import CN from 'classnames';
+import React, { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import NumberDisplay from '../NumberDisplay';
@@ -17,6 +22,8 @@ type Props = ThemeProps & {
 
 const Component = ({ chain, className, spends }: Props): React.ReactElement<Props> | null => {
   const { decimals: nativeDecimals } = useGetNativeTokenBasicInfo(chain);
+  const { assetRegistry } = useSelector((root: RootState) => root.assetRegistry);
+  const assetList = useMemo(() => Object.values(assetRegistry), [assetRegistry]);
 
   if (!spends || spends.length === 0) {
     return null;
@@ -26,19 +33,23 @@ const Component = ({ chain, className, spends }: Props): React.ReactElement<Prop
 
   if (symbols.length > 1) {
     return (
-      <div className={'__i-requested-amount-icons'}>
-        {symbols.map((sym) => (
-          <span
-            className='__token-icon'
-            key={sym}
-          >
-            {/* <Logo
-              network={chain}
-              shape='circle'
-              size={20}
-            /> */}
-          </span>
-        ))}
+      <div className={CN(className, '__i-requested-amount-icons')}>
+        {symbols.map((sym) => {
+          const tokenSlug = getGovTokenLogoSlugBySymbol(sym, assetList) || '';
+
+          return (
+            <span
+              className='__chain-type-logo'
+              key={sym}
+            >
+              <Logo
+                shape='circle'
+                size={20}
+                token={tokenSlug}
+              />
+            </span>
+          );
+        })}
       </div>
     );
   }
@@ -71,6 +82,23 @@ const SpendSummary = styled(Component)<Props>(({ theme: { token } }: Props) => {
 
     '.__i-requested-amount-symbol': {
       color: token.colorTextLight4
+    },
+
+    '&.__i-requested-amount-icons': {
+      display: 'flex',
+      alignItems: 'center',
+
+      '.__chain-type-logo': {
+        display: 'block',
+        boxShadow: '-4px 0px 4px 0px rgba(0, 0, 0, 0.40)',
+        width: token.size,
+        height: token.size,
+        borderRadius: '100%'
+      },
+
+      '.__chain-type-logo + .__chain-type-logo': {
+        marginLeft: -10
+      }
     }
   };
 });

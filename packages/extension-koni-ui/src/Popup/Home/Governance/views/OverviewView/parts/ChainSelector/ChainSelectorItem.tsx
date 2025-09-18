@@ -5,19 +5,19 @@ import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
 import { GovernanceChainSelectorItemType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
 import { Icon, Logo } from '@subwallet/react-ui';
-import { SwNumberProps } from '@subwallet/react-ui/es/number';
 import { CheckCircle } from 'phosphor-react';
 import React from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & GovernanceChainSelectorItemType & {
   onClick?: VoidFunction;
-  balanceValue?: SwNumberProps['value'];
+  balanceInfo?: TokenSelectorItemType['balanceInfo'];
   isSelected?: boolean;
 };
 
-const Component = ({ balanceValue,
+const Component = ({ balanceInfo,
   chainName, chainSlug,
   className, isSelected,
   onClick }: Props): React.ReactElement<Props> => {
@@ -40,13 +40,23 @@ const Component = ({ balanceValue,
         {chainName}
       </div>
 
-      <NumberDisplay
-        className='__i-balance-value'
-        decimal={0}
-        decimalOpacity={0.45}
-        suffix={symbol}
-        value={balanceValue || 0}
-      />
+      {!!balanceInfo && balanceInfo.isReady && !balanceInfo.isNotSupport
+
+        ? <NumberDisplay
+          className='__i-balance-value'
+          decimal={0}
+          decimalOpacity={0.45}
+          suffix={symbol}
+          value={balanceInfo?.total?.value || 0}
+        />
+        : (
+          <>
+            <span className={'__i-value-fallback'}>--</span>
+            <span className={'__i-symbol-fallback'}>&nbsp;{symbol} </span>
+          </>
+        )
+
+      }
 
       <div className='__i-checked-icon-wrapper'>
         {isSelected && (
@@ -109,6 +119,12 @@ export const ChainSelectorItem = styled(Component)<Props>(({ theme: { token } }:
       justifyContent: 'center',
       alignItems: 'center',
       color: token.colorSuccess
+    },
+
+    '.__i-value-fallback, .__i-symbol-fallback': {
+      fontSize: token.fontSize,
+      lineHeight: token.lineHeight,
+      color: token.colorTextLight1
     }
   };
 });

@@ -1,12 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainAsset } from '@subwallet/chain-list/types';
 import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { getGovTokenLogoSlugBySymbol } from '@subwallet/extension-koni-ui/utils/gov';
 import { Logo } from '@subwallet/react-ui';
 import { SpendItem } from '@subwallet/subsquare-api-sdk';
 import BigNumber from 'bignumber.js';
@@ -17,12 +17,6 @@ import styled, { ThemeContext } from 'styled-components';
 type Props = ThemeProps & {
   chain: string;
   allSpend: SpendItem[];
-};
-
-const getTokenLogoSlugBySymbol = (assetRegistry: _ChainAsset[], symbol: string): string | undefined => {
-  const asset = assetRegistry.find((item) => item.symbol === symbol);
-
-  return asset?.slug;
 };
 
 const Component = ({ allSpend, chain, className }: Props): React.ReactElement<Props> => {
@@ -40,7 +34,7 @@ const Component = ({ allSpend, chain, className }: Props): React.ReactElement<Pr
             ? { symbol: item.symbol, type: item.type }
             : { symbol: item.assetKind.symbol, type: item.assetKind.type };
 
-          const tokenSlug = getTokenLogoSlugBySymbol(assetList, symbol) || '';
+          const tokenSlug = getGovTokenLogoSlugBySymbol(symbol, assetList) || '';
           const decimals = type === 'native' ? nativeDecimals : 6;
 
           return (
@@ -66,7 +60,7 @@ const Component = ({ allSpend, chain, className }: Props): React.ReactElement<Pr
                 <Logo
                   shape={'circle'}
                   size={token.sizeMD}
-                  token={tokenSlug.toLowerCase()}
+                  token={tokenSlug}
                 />
               </div>
             </div>

@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _ChainAsset } from '@subwallet/chain-list/types';
 import { GOV_ONGOING_STATES, GovStatusKey, Referendum, ReferendumDetail, Tally } from '@subwallet/subsquare-api-sdk';
 import BigNumber from 'bignumber.js';
 
@@ -147,4 +148,11 @@ export const getTimeLeft = (data: Referendum | ReferendumDetail): string | undef
     data.onchainData.info.alarm?.[0] || null,
     data.state.name
   ).timeLeft;
+};
+
+export const getGovTokenLogoSlugBySymbol = (symbol: string, assetRegistry: _ChainAsset[]): string | undefined => {
+  const lowerSymbol = symbol.toLowerCase();
+  const asset = assetRegistry.find((item) => item.symbol.toLowerCase() === lowerSymbol);
+
+  return asset?.slug.toLowerCase();
 };

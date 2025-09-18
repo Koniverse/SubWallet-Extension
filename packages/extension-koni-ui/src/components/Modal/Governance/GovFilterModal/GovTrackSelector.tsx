@@ -8,6 +8,7 @@ import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { Icon, InputRef, SelectModal } from '@subwallet/react-ui';
 import { ALL_TRACK_ID, SubsquareApiSdk, TrackInfo } from '@subwallet/subsquare-api-sdk';
 import { useQuery } from '@tanstack/react-query';
+import CN from 'classnames';
 import { CaretRight, CheckCircle } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -56,7 +57,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
 
   const renderItem = useCallback((item: TrackInfo, selected: boolean) => {
     return (
-      <div className='__status-item'>
+      <div className={CN('__status-item', { '-selected': selected })}>
         <div className='__status-left'>
           {item.name}
         </div>
@@ -127,12 +128,31 @@ export const GovTrackSelector = styled(forwardRef(Component))<Props>(({ theme: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: '4px 8px'
+      padding: '14px 4px 14px 12px',
+      borderRadius: token.borderRadiusLG,
+      cursor: 'pointer',
+      transition: 'background-color .05s ease',
+
+      '&.-selected, &:hover': {
+        backgroundColor: token.colorBgSecondary
+      }
+    },
+
+    '.__status-label': {
+      fontSize: token.fontSizeHeading6,
+      lineHeight: token.lineHeightHeading6,
+      fontWeight: token.fontWeightStrong
+    },
+
+    '.__status-left': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.sizeXS
     },
 
     '.__check-icon': {
       display: 'flex',
-      width: 24,
+      width: 40,
       justifyContent: 'center'
     }
   });

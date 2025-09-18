@@ -3,7 +3,6 @@
 
 import { EmptyList } from '@subwallet/extension-koni-ui/components';
 import { ReferendumItem } from '@subwallet/extension-koni-ui/components/Governance';
-import { ReferendaCategory } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ReferendumWithVoting } from '@subwallet/extension-koni-ui/types/gov';
 import { Referendum } from '@subwallet/subsquare-api-sdk';
@@ -16,14 +15,13 @@ type Props = ThemeProps & {
   onClickItem: (item: Referendum) => void;
   chain: string;
   items: ReferendumWithVoting[];
-  selectedReferendaCategory: ReferendaCategory
 };
 
 type WrapperProps = Omit<Props, 'items'> & {
   items?: Referendum[];
 };
 
-const Component = ({ chain, className, items, onClickItem, selectedReferendaCategory }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, items, onClickItem }: Props): React.ReactElement<Props> => {
   const _onClickItem = useCallback((item: Referendum) => {
     return () => {
       onClickItem(item);
@@ -41,7 +39,6 @@ const Component = ({ chain, className, items, onClickItem, selectedReferendaCate
               item={item}
               key={item.referendumIndex}
               onClick={_onClickItem(item)}
-              selectedReferendaCategory={selectedReferendaCategory}
             />
           ))
           : <EmptyList

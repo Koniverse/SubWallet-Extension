@@ -6,6 +6,7 @@ import { govStatusItems } from '@subwallet/extension-koni-ui/constants';
 import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks';
 import { GovStatusItem, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, InputRef, SelectModal } from '@subwallet/react-ui';
+import CN from 'classnames';
 import { CaretRight, CheckCircle } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,17 +35,20 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
     const color = item.colorToken && token[item.colorToken] ? (token[item.colorToken] as string) : token.colorText;
 
     return (
-      <div className='__status-item'>
+      <div className={CN('__status-item', { '-selected': selected })}>
         <div className='__status-left'>
           {StatusIcon && (
             <Icon
-              customSize='16.25px'
+              customSize='20px'
               iconColor={color}
               phosphorIcon={StatusIcon}
               weight='fill'
             />
           )}
-          <span style={{ marginLeft: 8, color }}>{item.label}</span>
+          <span
+            className={'__status-label'}
+            style={{ color }}
+          >{item.label}</span>
         </div>
         {selected && (
           <div className='__check-icon'>
@@ -110,12 +114,31 @@ export const GovStatusSelector = styled(forwardRef(Component))<Props>(({ theme: 
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: '4px 8px'
+      padding: '14px 4px 14px 12px',
+      borderRadius: token.borderRadiusLG,
+      cursor: 'pointer',
+      transition: 'background-color .05s ease',
+
+      '&.-selected, &:hover': {
+        backgroundColor: token.colorBgSecondary
+      }
+    },
+
+    '.__status-label': {
+      fontSize: token.fontSizeHeading6,
+      lineHeight: token.lineHeightHeading6,
+      fontWeight: token.fontWeightStrong
+    },
+
+    '.__status-left': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.sizeXS
     },
 
     '.__check-icon': {
       display: 'flex',
-      width: 24,
+      width: 40,
       justifyContent: 'center'
     }
   });
