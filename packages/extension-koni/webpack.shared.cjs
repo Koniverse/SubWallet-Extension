@@ -9,6 +9,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const ManifestPlugin = require('webpack-extension-manifest-plugin');
 
 const pkgJson = require('./package.json');
+const chainListPkgJson = require('@subwallet/chain-list/package.json');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const args = process.argv.slice(2);
@@ -35,8 +36,7 @@ const packages = [
   'extension-dapp',
   'extension-inject',
   'extension-koni',
-  'extension-koni-ui',
-  'subwallet-api-sdk'
+  'extension-koni-ui'
 ];
 
 const _additionalEnv = {
@@ -51,7 +51,8 @@ const _additionalEnv = {
   SW_EXTERNAL_SERVICES_API: JSON.stringify(process.env.SW_EXTERNAL_SERVICES_API),
   MELD_WIZARD_KEY: JSON.stringify(process.env.MELD_WIZARD_KEY),
   MELD_TEST_MODE: JSON.stringify(false),
-  BTC_SERVICE_TOKEN: JSON.stringify(process.env.BTC_SERVICE_TOKEN)
+  BTC_SERVICE_TOKEN: JSON.stringify(process.env.BTC_SERVICE_TOKEN),
+  PATCH_CHAIN_LIST_URL: JSON.stringify(process.env.PATCH_CHAIN_LIST_URL)
 };
 
 const additionalEnvDict = {
@@ -120,6 +121,7 @@ module.exports = (entry, alias = {}, isFirefox = false) => {
           NODE_ENV: JSON.stringify(mode),
           PKG_NAME: JSON.stringify(pkgJson.name),
           PKG_VERSION: JSON.stringify(pkgJson.version),
+          CHAIN_LIST_VERSION: JSON.stringify(chainListPkgJson.version),
           TARGET_ENV: JSON.stringify('extension'),
           BRANCH_NAME: JSON.stringify(process.env.BRANCH_NAME),
           ID_PREDIX: JSON.stringify('sw-ext-'),

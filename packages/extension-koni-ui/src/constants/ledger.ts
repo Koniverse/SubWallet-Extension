@@ -524,3 +524,4 @@ export const StandardDerivationPathGens: string[] = Object.values(PredefinedLedg
 
 export const NotNeedMigrationGens: string[] = [...PolkadotDerivationPathGens, ...StandardDerivationPathGens];
 export const SubstrateLedgerSignModeSupport: AccountSignMode[] = [AccountSignMode.LEGACY_LEDGER, AccountSignMode.GENERIC_LEDGER, AccountSignMode.ECDSA_SUBSTRATE_LEDGER];
+export const BIP32_HARDENED_OFFSET = 0x80000000;

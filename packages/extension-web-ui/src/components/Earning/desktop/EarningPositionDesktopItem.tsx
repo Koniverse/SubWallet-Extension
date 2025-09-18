@@ -4,12 +4,11 @@
 import { getYieldAvailableActionsByPosition, getYieldAvailableActionsByType, YieldAction } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { BN_TEN } from '@subwallet/extension-base/utils';
-import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
 import { MetaInfo } from '@subwallet/extension-web-ui/components';
 import EarningTypeTag from '@subwallet/extension-web-ui/components/Earning/EarningTypeTag';
 import NetworkTag from '@subwallet/extension-web-ui/components/NetworkTag';
 import { EarningStatusUi } from '@subwallet/extension-web-ui/constants';
-import { useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { useCreateGetSubnetStakingTokenName, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ExtraYieldPositionInfo, NetworkType, PhosphorIcon, Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, ButtonProps, Icon, Logo, Number } from '@subwallet/react-ui';
@@ -54,6 +53,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { chainInfoMap } = useSelector((state) => state.chainStore);
   const { currencyData } = useSelector((state: RootState) => state.price);
   const { token } = useTheme() as Theme;
+  const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
 
   const line3Ref = useRef<HTMLDivElement | null>(null);
   const line3LeftPartRef = useRef<HTMLDivElement | null>(null);
@@ -200,15 +200,18 @@ const Component: React.FC<Props> = (props: Props) => {
     return positionInfo.subnetData?.subnetShortName || poolInfo.metadata.shortName;
   }, [poolInfo.metadata.shortName, positionInfo.subnetData?.subnetShortName]);
 
+  const subnetToken = useMemo(() => {
+    return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.netuid || 0);
+  }, [getSubnetStakingTokenName, poolInfo.chain, poolInfo.metadata.subnetData?.netuid]);
+
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type) && !poolInfo.slug.includes('testnet'), [poolInfo.slug, poolInfo.type]);
-  const subnetLogoNetwork = `subnet-${poolInfo.metadata.subnetData?.netuid || 0}`;
 
   return (
     <div
       className={CN(className)}
       onClick={onClickItem}
     >
-      {!isSubnetStaking || !DefaultLogosMap[subnetLogoNetwork]
+      {!isSubnetStaking
         ? (
           <Logo
             className='__item-logo'
@@ -222,8 +225,9 @@ const Component: React.FC<Props> = (props: Props) => {
           <Logo
             className='__item-logo'
             isShowSubLogo={false}
-            network={subnetLogoNetwork}
+            network={poolInfo.metadata.logo || poolInfo.chain}
             size={64}
+            token={subnetToken}
           />
         )}
 

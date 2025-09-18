@@ -65,7 +65,7 @@ function Component ({ className = '', collectionInfo,
 
   const navigate = useNavigate();
   const { goBack } = useDefaultNavigate();
-  const { token } = useTheme() as Theme;
+  const { extendToken, token } = useTheme() as Theme;
 
   const { activeModal, addExclude, checkActive, inactiveModal, removeExclude } = useContext(ModalContext);
   const { accounts, currentAccountProxy } = useSelector((root: RootState) => root.accountState);
@@ -76,6 +76,8 @@ function Component ({ className = '', collectionInfo,
   const isSendNftModalActive = checkActive(modalId);
 
   useNavigateOnChangeAccount('/home/nfts/collections');
+
+  const nftDetailImageUrl = useMemo(() => nftItem.image || collectionInfo.image || extendToken.defaultImagePlaceholder, [nftItem.image, collectionInfo.image, extendToken.defaultImagePlaceholder]);
 
   const onClickSend = useCallback(() => {
     if (nftItem && nftItem.owner) {
@@ -252,7 +254,7 @@ function Component ({ className = '', collectionInfo,
               height={imageSize}
               modelViewerProps={show3DModel ? { ...DEFAULT_MODEL_VIEWER_PROPS, ...CAMERA_CONTROLS_MODEL_VIEWER_PROPS } : undefined}
               onClick={onImageClick}
-              src={nftItem.image}
+              src={nftDetailImageUrl}
               width={ show3DModel ? imageSize : undefined}
             />
 

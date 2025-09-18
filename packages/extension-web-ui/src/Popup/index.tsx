@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { setupApiSDK } from '@subwallet/extension-base/utils';
 import { DataContextProvider } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { InjectContextProvider } from '@subwallet/extension-web-ui/contexts/InjectContext';
 import { ScannerContextProvider } from '@subwallet/extension-web-ui/contexts/ScannerContext';
@@ -13,6 +14,9 @@ import { RouterProvider } from 'react-router-dom';
 import LoadingScreen from '../components/LoadingScreen';
 import { ScreenContextProvider } from '../contexts/ScreenContext';
 import { router } from './router';
+
+// Setup API SDK before app init
+setupApiSDK();
 
 export default function Popup (): React.ReactElement {
   return (

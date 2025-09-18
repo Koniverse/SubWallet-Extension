@@ -183,7 +183,7 @@ export const EARNING_DATA_RAW = {
       iconColor: '#008dff'
     }
   ],
-  BITTENOSR_STAKING: [
+  BITTENSOR_STAKING: [
     {
       icon: 'ThumbsUp',
       title: 'Select {validatorNumber} {validatorType}',

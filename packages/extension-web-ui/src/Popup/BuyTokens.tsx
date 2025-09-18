@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Resolver } from '@subwallet/extension-base/background/types';
-import { _getOriginChainOfAsset } from '@subwallet/extension-base/services/chain-service/utils';
-import { AccountProxy, AccountProxyType, AccountSignMode, BuyServiceInfo, BuyTokenInfo, SupportService } from '@subwallet/extension-base/types';
+import { _getOriginChainOfAsset, _isChainCompatibleLedgerEvm } from '@subwallet/extension-base/services/chain-service/utils';
+import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, BuyServiceInfo, BuyTokenInfo, SupportService } from '@subwallet/extension-base/types';
 import { detectTranslate, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BaseModal, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-web-ui/components';
 import { ServiceSelector } from '@subwallet/extension-web-ui/components/Field/BuyTokens/ServiceSelector';
@@ -313,6 +313,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
     }
 
     const isIgnoreSubstrateEcdsaLedger = !isSubstrateEcdsaLedgerAssetSupported(tokenInfo, chainInfo);
+    const isIgnoreEvmLedger = !_isChainCompatibleLedgerEvm(chainInfo);
 
     const result: AccountAddressItemType[] = [];
 
@@ -342,6 +343,12 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
 
         if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER && isIgnoreSubstrateEcdsaLedger) {
           return;
+        }
+
+        if (signMode === AccountSignMode.GENERIC_LEDGER) {
+          if (ap.chainTypes.includes(AccountChainType.ETHEREUM) && isIgnoreEvmLedger) {
+            return;
+          }
         }
 
         updateResult(ap);

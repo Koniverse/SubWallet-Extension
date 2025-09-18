@@ -639,8 +639,32 @@ export default class KoniTabs {
         };
 
         await this.addEvmChain(id, url, { method: 'wallet_addEthereumChain', params: [chainData] });
+
+        const [networkKey] = this.#koniState.findNetworkKeyByChainId(chainIdDec);
+
+        if (networkKey) {
+          await this.#koniState.switchEvmNetworkByUrl(stripUrl(url), networkKey);
+        }
       } else {
-        throw new EvmProviderError(EvmProviderErrorType.NETWORK_NOT_SUPPORTED, 'This network is currently not supported');
+        await this.#koniState.showUnsupportedNetworkSwitchConfirm(id, url, {
+          mode: 'insert',
+          chainSpec: {
+            genesisHash: '',
+            paraId: null,
+            addressPrefix: 0,
+            evmChainId: chainIdDec,
+            existentialDeposit: '',
+            decimals: 0
+          },
+          chainEditInfo: {
+            chainType: 'EVM',
+            currentProvider: '',
+            providers: {},
+            slug: ''
+          },
+          unconfirmed: true,
+          providerError: _CHAIN_VALIDATION_ERROR.UNSUPPORTED_CHAIN_CANNOT_ADD
+        });
       }
     }
 

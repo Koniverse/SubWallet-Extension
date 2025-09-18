@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { WALLET_CONNECT_SESSION_TIMEOUT } from '@subwallet/extension-base/services/wallet-connect-service/constants';
 import { CloseIcon, Layout, QrScannerErrorNotice, WalletConnect } from '@subwallet/extension-web-ui/components';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
 import { TIME_OUT_RECORD, WALLET_CONNECT_CREATE_MODAL } from '@subwallet/extension-web-ui/constants';
@@ -108,7 +109,9 @@ const Component: React.FC<Props> = (props: Props) => {
         console.error(e);
         setLoading(false);
         setConnectionError(convertWCErrorMessage(e));
-        activeModal(confirmErrorModalId);
+        setTimeout(() => {
+          activeModal(confirmErrorModalId);
+        }, 200);
       });
   }, [activeModal]);
 
@@ -189,6 +192,17 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [form, inactiveModal, setTimeOutRecords]);
 
   const footerModalWC = useMemo(() => {
+    if (connectionError?.isConnectionBlockedError) {
+      return (
+        <div className={'__footer-wc-modal'}>
+          <Button
+            block={true}
+            onClick={onClickToFAQ(true)}
+          >{t('I understand')}</Button>
+        </div>
+      );
+    }
+
     return (
       <div className={'__footer-wc-modal'}>
         <Button
@@ -202,7 +216,7 @@ const Component: React.FC<Props> = (props: Props) => {
         >{t('Review guide')}</Button>
       </div>
     );
-  }, [onClickToFAQ, t]);
+  }, [connectionError?.isConnectionBlockedError, onClickToFAQ, t]);
 
   const contentNode = (
     <>
@@ -316,7 +330,7 @@ const Component: React.FC<Props> = (props: Props) => {
     const timeOutRecord = getTimeOutRecords();
 
     if (loading && !isActiveErrorModal && !timeOutRecord[keyRecords]) {
-      idTimeOut = setTimeout(reOpenModalWhenTimeOut, 20000);
+      idTimeOut = setTimeout(reOpenModalWhenTimeOut, WALLET_CONNECT_SESSION_TIMEOUT);
       setTimeOutRecords({ ...timeOutRecord, [keyRecords]: idTimeOut });
     } else if (timeOutRecord[keyRecords]) {
       setLoading(false);

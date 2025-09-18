@@ -26,8 +26,8 @@ export const GlobalSearchTokenModalId = 'globalSearchToken';
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { activeModal, inactiveModal } = useContext(ModalContext);
-  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
-  const tokenGroupStructure = useTokenGroup(allowedChains, excludedTokens);
+  const { allowedChains } = useGetChainAndExcludedTokenByCurrentAccountProxy();
+  const tokenGroupStructure = useTokenGroup(allowedChains);
   const accountBalance = useAccountBalance(tokenGroupStructure.tokenGroupMap);
   const [isConfirmedTermGeneral, setIsConfirmedTermGeneral] = useLocalStorage(CONFIRM_GENERAL_TERM, 'nonConfirmed');
   const { pathname } = useLocation();

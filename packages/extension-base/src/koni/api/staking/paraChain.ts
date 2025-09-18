@@ -228,7 +228,7 @@ export async function getAmplitudeUnclaimedStakingReward (substrateApiMap: Recor
   const unclaimedRewardList: StakingRewardItem[] = [];
 
   await Promise.all(chains.map(async (chain) => {
-    if (_STAKING_CHAIN_GROUP.amplitude.includes(chain) && !_STAKING_CHAIN_GROUP.kilt.includes(chain) && !_STAKING_CHAIN_GROUP.krest_network.includes(chain)) {
+    if (_STAKING_CHAIN_GROUP.amplitude.includes(chain) && !_STAKING_CHAIN_GROUP.krest_network.includes(chain)) {
       const networkInfo = networks[chain];
       const apiProps = await substrateApiMap[chain].isReady;
 

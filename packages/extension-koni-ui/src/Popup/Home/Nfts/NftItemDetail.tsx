@@ -21,7 +21,7 @@ import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import { getAlphaColor } from '@subwallet/react-ui/lib/theme/themes/default/colorAlgorithm';
 import CN from 'classnames';
 import { CaretLeft, Info, PaperPlaneTilt } from 'phosphor-react';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
@@ -50,7 +50,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const navigate = useNavigate();
   const { goBack } = useDefaultNavigate();
-  const { token } = useTheme() as Theme;
+  const { extendToken, token } = useTheme() as Theme;
 
   const dataContext = useContext(DataContext);
   const { activeModal, inactiveModal } = useContext(ModalContext);
@@ -62,6 +62,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [, setStorage] = useLocalStorage<SendNftParams>(NFT_TRANSACTION, DEFAULT_NFT_PARAMS);
 
   useNavigateOnChangeAccount('/home/nfts/collections');
+
+  const nftDetailImageUrl = useMemo(() => nftItem.image || collectionInfo.image || extendToken.defaultImagePlaceholder, [nftItem.image, collectionInfo.image, extendToken.defaultImagePlaceholder]);
 
   const onClickSend = useCallback(() => {
     if (nftItem && nftItem.owner) {
@@ -213,7 +215,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               height={358}
               modelViewerProps={show3DModel ? { ...DEFAULT_MODEL_VIEWER_PROPS, ...CAMERA_CONTROLS_MODEL_VIEWER_PROPS } : undefined}
               onClick={onImageClick}
-              src={nftItem.image}
+              src={nftDetailImageUrl}
               width={ show3DModel ? 358 : undefined}
             />
           </div>

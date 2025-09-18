@@ -6,7 +6,7 @@ import BaseMigrationJob from '@subwallet/extension-base/services/migration-servi
 export default class DeleteEarningData extends BaseMigrationJob {
   public override async run (): Promise<void> {
     try {
-      await this.state.dbService.deleteYieldPoolInfo(['LcDOT___acala_euphrates_liquid_staking', 'xcDOT___moonwell_lending']);
+      await this.state.dbService.deleteYieldPoolInfo(['KILT___native_staking___kilt', 'PILT___native_staking___kilt_peregrine']);
     } catch (e) {
       console.error(e);
     }

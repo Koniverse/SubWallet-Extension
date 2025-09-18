@@ -142,8 +142,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [defaultPoolMap, chain]);
 
   const resultList = useMemo((): NominationPoolDataType[] => {
-    const recommendedSessionHeader: NominationPoolDataType = { address: '', bondedAmount: '', decimals: 0, id: -1, idStr: '-1', isProfitable: false, memberCounter: 0, roles: { bouncer: '', depositor: '', nominator: '', root: '' }, state: 'Open', symbol: '', name: 'Recommended', isSessionHeader: true, disabled: true };
-    const othersSessionHeader: NominationPoolDataType = { address: '', bondedAmount: '', decimals: 0, id: -2, idStr: '-2', isProfitable: false, memberCounter: 0, roles: { bouncer: '', depositor: '', nominator: '', root: '' }, state: 'Open', symbol: '', name: 'Others', isSessionHeader: true, disabled: true };
+    const recommendedSessionHeader: NominationPoolDataType = { address: '', bondedAmount: '', decimals: 0, id: -1, idStr: '-1', isProfitable: false, memberCounter: 0, roles: { bouncer: '', depositor: '', nominator: '', root: '' }, state: 'Open', symbol: '', name: 'Recommended', isSectionHeader: true, disabled: true };
+    const othersSessionHeader: NominationPoolDataType = { address: '', bondedAmount: '', decimals: 0, id: -2, idStr: '-2', isProfitable: false, memberCounter: 0, roles: { bouncer: '', depositor: '', nominator: '', root: '' }, state: 'Open', symbol: '', name: 'Others', isSectionHeader: true, disabled: true };
 
     const filteredItems = [...items]
       .filter((value) => {
@@ -242,10 +242,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [activeModal]);
 
   const renderItem = useCallback((item: NominationPoolDataType) => {
-    if (item.isSessionHeader) {
+    if (item.isSectionHeader) {
       return (
         <div
-          className={'__session-header'}
+          className={'__section-header'}
           key={item.name}
         >{item.name?.toUpperCase()}
           {item.name?.includes('Recommended')
@@ -518,7 +518,7 @@ const EarningPoolSelector = styled(forwardRef(Component))<Props>(({ theme: { tok
         paddingBottom: token.paddingXXS
       }
     },
-    '.__session-header': {
+    '.__section-header': {
       fontSize: token.fontSizeSM,
       color: token.colorTextSecondary,
       fontWeight: token.fontWeightStrong,

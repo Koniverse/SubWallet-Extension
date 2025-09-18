@@ -14,6 +14,8 @@ module.exports = {
 
 const path = require('path');
 const webpack = require('webpack');
+const chainListPkgJson = require('@subwallet/chain-list/package.json');
+const rootDir = path.resolve(__dirname, '../..');
 
 const CopyPlugin = require('copy-webpack-plugin');
 
@@ -43,8 +45,7 @@ const packages = [
   'extension-dapp',
   'extension-inject',
   'extension-koni',
-  'extension-web-ui',
-  'subwallet-api-sdk'
+  'extension-web-ui'
 ];
 
 const polkadotDevOptions = require('@polkadot/dev/config/babel-config-webpack.cjs');
@@ -135,6 +136,7 @@ const createConfig = (entry, alias = {}, useSplitChunk = false) => {
           NODE_ENV: JSON.stringify(mode),
           PKG_NAME: JSON.stringify(pkgJson.name),
           PKG_VERSION: JSON.stringify(pkgJson.version),
+          CHAIN_LIST_VERSION: JSON.stringify(chainListPkgJson.version),
           PKG_BUILD_NUMBER: JSON.stringify(pkgJson.buildNumber),
           TARGET_ENV: JSON.stringify('webapp'),
           BRANCH_NAME: JSON.stringify(process.env.BRANCH_NAME),
@@ -173,7 +175,8 @@ const createConfig = (entry, alias = {}, useSplitChunk = false) => {
         [`@subwallet/${p}`]: path.resolve(__dirname, `../${p}/src`)
       }), {
         ...alias,
-        'react/jsx-runtime': require.resolve('react/jsx-runtime')
+        'react/jsx-runtime': require.resolve('react/jsx-runtime'),
+        ethers: path.resolve(rootDir, 'node_modules/ethers/lib.esm/index.js')
       }),
       extensions: ['.js', '.mjs', '.jsx', '.ts', '.tsx'],
       fallback: {

@@ -23,6 +23,7 @@ export { default as useOneSignProcess } from './useOneSignProcess';
 export { default as usePreCheckAction } from './usePreCheckAction';
 export { default as useSetSelectedAccountTypes } from './useSetSelectedAccountTypes';
 export { default as useSetSelectedMnemonicType } from './useSetSelectedMnemonicType';
+export { default as useHandleLedgerAccountWarning } from './useHandleLedgerAccountWarning';
 
 export * from './useGetMantaPayConfig';
 export * from './useGetZkAddress';

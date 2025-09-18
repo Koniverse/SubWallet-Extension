@@ -281,7 +281,8 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
         ];
       case AccountChainType.BITCOIN:
         return [
-          ...BASE_TRANSFER_ACTIONS
+          ...BASE_TRANSFER_ACTIONS,
+          ExtrinsicType.SWAP
         ];
     }
   } else if (signMode === AccountSignMode.QR) {
@@ -331,8 +332,8 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...POOL_STAKE_ACTIONS,
           ...EARN_VDOT_ACTIONS,
           ...EARN_VMANTA_ACTIONS,
-          // ...EARN_LDOT_ACTIONS,
-          // ...EARN_SDOT_ACTIONS,
+          ...EARN_LDOT_ACTIONS,
+          ...EARN_SDOT_ACTIONS,
           // ...EARN_QDOT_ACTIONS,
           ...OTHER_ACTIONS
         ];
@@ -371,13 +372,13 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
       result.push(...EARN_VDOT_ACTIONS, ...EARN_VMANTA_ACTIONS);
     }
 
-    // if (specialNetwork === 'acala') {
-    //   result.push(...EARN_LDOT_ACTIONS);
-    // }
+    if (specialNetwork === 'acala') {
+      result.push(...EARN_LDOT_ACTIONS);
+    }
 
-    // if (specialNetwork === 'parallel') {
-    //   result.push(...EARN_SDOT_ACTIONS);
-    // }
+    if (specialNetwork === 'parallel') {
+      result.push(...EARN_SDOT_ACTIONS);
+    }
 
     // if (specialNetwork === 'interlay') {
     //   result.push(...EARN_QDOT_ACTIONS);

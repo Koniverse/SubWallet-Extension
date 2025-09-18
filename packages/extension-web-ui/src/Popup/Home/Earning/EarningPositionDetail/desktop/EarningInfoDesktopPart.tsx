@@ -5,11 +5,11 @@ import { YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/exte
 import { BaseModal, MetaInfo } from '@subwallet/extension-web-ui/components';
 import { EarningStatusUi, TRANSACTION_YIELD_UNSTAKE_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
-import { useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { useCreateGetSubnetStakingTokenName, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import Transaction from '@subwallet/extension-web-ui/Popup/Transaction/Transaction';
 import Unbond from '@subwallet/extension-web-ui/Popup/Transaction/variants/Unbond';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { Button, Icon, ModalContext } from '@subwallet/react-ui';
+import { Button, Icon, Logo, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { MinusCircle, PlusCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
@@ -44,6 +44,14 @@ function Component ({ className, compound, onEarnMore, onLeavePool,
     return false;
   }, [poolInfo.chain, poolInfo.type]);
 
+  const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
+
+  const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
+
+  const subnetToken = useMemo(() => {
+    return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.netuid || 0);
+  }, [getSubnetStakingTokenName, poolInfo.chain, poolInfo.metadata.subnetData?.netuid]);
+
   return (
     <>
       <div
@@ -60,11 +68,31 @@ function Component ({ className, compound, onEarnMore, onLeavePool,
             statusName={EarningStatusUi[compound.status].name}
             valueColorSchema={EarningStatusUi[compound.status].schema}
           />
-          <MetaInfo.Chain
-            chain={poolInfo.chain}
-            label={t('Network')}
-            valueColorSchema='gray'
-          />
+
+          {!isSubnetStaking
+            ? (
+              <MetaInfo.Chain
+                chain={poolInfo.chain}
+                label={t('Network')}
+                valueColorSchema='gray'
+              />
+            )
+            : (
+              <MetaInfo.Default
+                label={t('Subnet')}
+              >
+                <div className='__subnet-wrapper'>
+                  <Logo
+                    className='__item-logo'
+                    isShowSubLogo={false}
+                    network={poolInfo.chain}
+                    size={24}
+                    token={subnetToken}
+                  />
+                  <span className='chain-name'>{poolInfo.metadata.shortName}</span>
+                </div>
+              </MetaInfo.Default>
+            )}
         </MetaInfo>
         <div className='__separator' />
         <div className={'__earning-actions'}>
@@ -141,5 +169,12 @@ export const EarningInfoDesktopPart = styled(Component)<Props>(({ theme: { token
   '.__earning-actions': {
     display: 'flex',
     gap: token.sizeSM
+  },
+
+  '.__subnet-wrapper': {
+    display: 'flex',
+    alignItems: 'center',
+    gap: token.sizeXS,
+    minWidth: 0
   }
 }));
