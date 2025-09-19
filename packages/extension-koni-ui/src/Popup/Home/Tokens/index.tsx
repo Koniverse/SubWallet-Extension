@@ -4,7 +4,7 @@
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { AccountSelectorModal, AlertBox, CloseIcon, EmptyList, PageWrapper, ReceiveModal, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
+import { AccountSelectorModal, AlertBox, CloseIcon, EmptyList, NftCollectionModal, PageWrapper, ReceiveModal, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import BannerGenerator from '@subwallet/extension-koni-ui/components/StaticContent/BannerGenerator';
 import { TokenGroupBalanceItem } from '@subwallet/extension-koni-ui/components/TokenItem/TokenGroupBalanceItem';
@@ -47,6 +47,8 @@ export enum AssetsTab {
 export interface LocationState {
   assetTab?: AssetsTab;
 }
+
+const NFT_COLLECTION_MODAL_ID = 'nft_collection_modal_id';
 
 const Component = (): React.ReactElement => {
   useSetCurrentPage('/home/tokens');
@@ -392,9 +394,13 @@ const Component = (): React.ReactElement => {
     navigate('/settings/tokens/import-nft', { state: { assetsTab: AssetsTab.NFTS } });
   }, [navigate]);
 
-  const handleSearchNfts = useCallback(() => {
+  const onOpenNftModal = useCallback(() => {
+    activeModal(NFT_COLLECTION_MODAL_ID);
+  }, [activeModal]);
 
-  }, []);
+  const onCloseNftModal = useCallback(() => {
+    inactiveModal(NFT_COLLECTION_MODAL_ID);
+  }, [inactiveModal]);
 
   const getNftsByCollection = useCallback((nftCollection: NftCollection) => {
     const nftList: NftItem[] = [];
@@ -495,7 +501,7 @@ const Component = (): React.ReactElement => {
               phosphorIcon={MagnifyingGlass}
               size='sm'
             />}
-            onClick={onOpenSwap}
+            onClick={onOpenNftModal}
             size='sm'
             type='ghost'
           />
@@ -528,7 +534,7 @@ const Component = (): React.ReactElement => {
           menu={{
             items: [
               { key: 'import', label: t('Import NFT'), icon: <Icon phosphorIcon={Plus} />, onClick: handleImportNft },
-              { key: 'search', label: t('Search NFTs'), icon: <Icon phosphorIcon={MagnifyingGlass} />, onClick: handleSearchNfts },
+              { key: 'search', label: t('Search NFTs'), icon: <Icon phosphorIcon={MagnifyingGlass} />, onClick: onOpenNftModal },
               { key: 'reload', label: t('Reload NFT list'), icon: <Icon phosphorIcon={ArrowClockwise} />, onClick: onCronReloadNfts }
             ]
           }}
@@ -547,7 +553,7 @@ const Component = (): React.ReactElement => {
           />
         </Dropdown>
       )
-  ), [isShrink, onOpenSwap, handleImportNft, loading, onCronReloadNfts, t, handleSearchNfts]);
+  ), [isShrink, handleImportNft, loading, onCronReloadNfts, t, onOpenNftModal]);
 
   useEffect(() => {
     if (assetTab && Object.values(AssetsTab).includes(assetTab)) {
@@ -729,6 +735,13 @@ const Component = (): React.ReactElement => {
 
       <ReceiveModal
         {...receiveModalProps}
+      />
+
+      <NftCollectionModal
+        id={NFT_COLLECTION_MODAL_ID}
+        nftCollections={nftCollections}
+        nftItems={nftItems}
+        onCancel={onCloseNftModal}
       />
     </div>
   );
