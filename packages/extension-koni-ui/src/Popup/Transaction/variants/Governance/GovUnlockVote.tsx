@@ -140,7 +140,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       form.setFieldsValue({
         referendumIds: selectedLockInfo.summary.unlockable.unlockableReferenda,
         amount: selectedLockInfo.summary.unlockable.balance || '0',
-        tracks: selectedLockInfo.tracks.map((t) => t.trackId)
+        tracks: selectedLockInfo.summary.unlockable.trackIds
       });
 
       persistData({
@@ -148,7 +148,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         from: fromValue,
         referendumIds: selectedLockInfo.summary.unlockable.unlockableReferenda,
         amount: selectedLockInfo.summary.unlockable.balance || '0',
-        tracks: selectedLockInfo.tracks.map((t) => t.trackId)
+        tracks: selectedLockInfo.summary.unlockable.trackIds
       } as GovUnlockVoteParams);
     }
   }, [form, fromValue, selectedLockInfo, persistData, defaultData]);
