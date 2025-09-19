@@ -57,7 +57,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const showNotification = useNotification();
   const navigate = useNavigate();
-
   const dataContext = useContext(DataContext);
 
   const chainInfoMap = useGetNftContractSupportedChains();
@@ -81,7 +80,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const checkChain = useChainChecker();
 
   const goBack = useCallback(() => {
-    navigate('/home/nfts/collections');
+    navigate('/home/tokens', { state: { assetTab: 'nfts' } });
   }, [navigate]);
 
   const onFieldsChange: FormCallbacks<NftImportFormType>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {

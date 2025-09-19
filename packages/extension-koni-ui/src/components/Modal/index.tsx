@@ -26,6 +26,7 @@ export * from './Campaign';
 export * from './Customize/CustomizeModal';
 export * from './FilterModal';
 export * from './GlobalSearchTokenModal';
+export * from './GlobalSearchTokenGroupModal';
 export * from './Common';
 export * from './Announcement';
 export * from './Selector';

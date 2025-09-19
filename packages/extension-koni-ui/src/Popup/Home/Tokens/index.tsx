@@ -15,7 +15,7 @@ import { useCoreReceiveModalHelper, useDebouncedValue, useGetBannerByScreen, use
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { reloadCron } from '@subwallet/extension-koni-ui/messaging';
-import { GlobalSearchTokenModalId } from '@subwallet/extension-koni-ui/Popup/Home';
+import { GlobalSearchTokenGroupModalId } from '@subwallet/extension-koni-ui/Popup/Home';
 import { INftCollectionDetail } from '@subwallet/extension-koni-ui/Popup/Home/Nfts';
 import { NftGalleryWrapper } from '@subwallet/extension-koni-ui/Popup/Home/Nfts/component/NftGalleryWrapper';
 import { UpperBlock } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/UpperBlock';
@@ -44,7 +44,7 @@ export enum AssetsTab {
   NFTS = 'nfts'
 }
 
-interface LocationState {
+export interface LocationState {
   assetTab?: AssetsTab;
 }
 
@@ -369,7 +369,7 @@ const Component = (): React.ReactElement => {
       shape: 'circle',
       size: 'xs',
       onClick: () => {
-        navigate('/settings/tokens/import-nft', { state: { isExternalRequest: false } });
+        navigate('/settings/tokens/import-nft', { state: { assetsTab: AssetsTab.NFTS } });
       }
     };
   }, [navigate, t]);
@@ -389,8 +389,12 @@ const Component = (): React.ReactElement => {
   }, [navigate]);
 
   const handleImportNft = useCallback(() => {
-    navigate('/settings/tokens/import-nft', { state: { isExternalRequest: false } });
+    navigate('/settings/tokens/import-nft', { state: { assetsTab: AssetsTab.NFTS } });
   }, [navigate]);
+
+  const handleSearchNfts = useCallback(() => {
+
+  }, []);
 
   const getNftsByCollection = useCallback((nftCollection: NftCollection) => {
     const nftList: NftItem[] = [];
@@ -431,8 +435,8 @@ const Component = (): React.ReactElement => {
     );
   }, [getNftsByCollection, handleOnClickCollection]);
 
-  const onOpenGlobalSearchToken = useCallback(() => {
-    activeModal(GlobalSearchTokenModalId);
+  const onOpenGlobalSearchTokenGroup = useCallback(() => {
+    activeModal(GlobalSearchTokenGroupModalId);
   }, [activeModal]);
 
   const onOpenCustomizeModal = useCallback(() => {
@@ -464,7 +468,7 @@ const Component = (): React.ReactElement => {
           phosphorIcon={MagnifyingGlass}
           size='sm'
         />}
-        onClick={onOpenGlobalSearchToken}
+        onClick={onOpenGlobalSearchTokenGroup}
         size='sm'
         type='ghost'
       />
@@ -480,7 +484,7 @@ const Component = (): React.ReactElement => {
         type='ghost'
       />
     </>
-  ), [onOpenGlobalSearchToken, onOpenCustomizeModal, t]);
+  ), [onOpenCustomizeModal, onOpenGlobalSearchTokenGroup, t]);
 
   const nftActions = useMemo(() => (
     !isShrink
@@ -524,6 +528,7 @@ const Component = (): React.ReactElement => {
           menu={{
             items: [
               { key: 'import', label: t('Import NFT'), icon: <Icon phosphorIcon={Plus} />, onClick: handleImportNft },
+              { key: 'search', label: t('Search NFTs'), icon: <Icon phosphorIcon={MagnifyingGlass} />, onClick: handleSearchNfts },
               { key: 'reload', label: t('Reload NFT list'), icon: <Icon phosphorIcon={ArrowClockwise} />, onClick: onCronReloadNfts }
             ]
           }}
@@ -542,9 +547,7 @@ const Component = (): React.ReactElement => {
           />
         </Dropdown>
       )
-  ), [isShrink, loading, handleImportNft, onCronReloadNfts, onOpenSwap, t]);
-
-  console.log('selectedFilterTab', selectedFilterTab);
+  ), [isShrink, onOpenSwap, handleImportNft, loading, onCronReloadNfts, t, handleSearchNfts]);
 
   useEffect(() => {
     if (assetTab && Object.values(AssetsTab).includes(assetTab)) {
