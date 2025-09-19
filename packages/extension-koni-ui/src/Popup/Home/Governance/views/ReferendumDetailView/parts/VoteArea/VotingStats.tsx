@@ -40,9 +40,9 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
 
   const getModalData = useCallback(() => {
     const voteDataMap = {
-      [GovVoteType.AYE]: { voteData: votingData.Aye, title: t('Aye votes') },
-      [GovVoteType.NAY]: { voteData: votingData.Nay, title: t('Nay votes') },
-      [GovVoteType.ABSTAIN]: { voteData: votingData.Abstain, title: t('Abstain votes') }
+      [GovVoteType.AYE]: { voteData: votingData[GovVoteType.AYE], title: t('Aye votes') },
+      [GovVoteType.NAY]: { voteData: votingData[GovVoteType.NAY], title: t('Nay votes') },
+      [GovVoteType.ABSTAIN]: { voteData: votingData[GovVoteType.ABSTAIN], title: t('Abstain votes') }
     };
 
     return voteDataMap[currentVoteType];
@@ -71,7 +71,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
                   {t('Aye:')}
                 </div>
                 <div className='voting-stats__number'>
-                  {votingData.Aye.totalVotedAccounts}
+                  {votingData[GovVoteType.AYE].totalVotedAccounts}
                 </div>
               </>
             }
@@ -82,7 +82,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
                 decimalOpacity={0.45}
                 prefix={'~'}
                 suffix={symbol}
-                value={votingData.Aye.totalVotedAmount}
+                value={votingData[GovVoteType.AYE].totalVotedAmount}
               />
               <div onClick={handleOpenAye}>
                 <Icon
@@ -106,7 +106,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
                   {t('Nay:')}
                 </div>
                 <div className='voting-stats__number'>
-                  {votingData.Nay.totalVotedAccounts}
+                  {votingData[GovVoteType.NAY].totalVotedAccounts}
                 </div>
               </>
             }
@@ -117,7 +117,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
                 decimalOpacity={0.45}
                 prefix={'~'}
                 suffix={symbol}
-                value={votingData.Nay.totalVotedAmount}
+                value={votingData[GovVoteType.NAY].totalVotedAmount}
               />
               <div onClick={handleOpenNay}>
                 <Icon
@@ -142,7 +142,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
                   {t('Abstain:')}
                 </div>
                 <div className='voting-stats__number'>
-                  {votingData.Abstain.totalVotedAccounts}
+                  {votingData[GovVoteType.ABSTAIN].totalVotedAccounts}
                 </div>
               </>
             }
@@ -153,7 +153,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
                 decimalOpacity={0.45}
                 prefix={'~'}
                 suffix={symbol}
-                value={votingData.Abstain.totalVotedAmount}
+                value={votingData[GovVoteType.ABSTAIN].totalVotedAmount}
               />
               <div onClick={handleOpenAbstain}>
                 <Icon

@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export enum GovVoteType {
-  AYE = 'Aye',
-  NAY = 'Nay',
-  SPLIT = 'Split',
-  ABSTAIN = 'Abstain',
+  AYE = 'aye',
+  NAY = 'nay',
+  SPLIT = 'split',
+  ABSTAIN = 'abstain',
 }
 
 interface BaseVoteRequest {

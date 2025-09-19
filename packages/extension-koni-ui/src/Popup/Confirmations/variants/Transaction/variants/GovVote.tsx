@@ -3,7 +3,7 @@
 
 import { govConvictionOptions, GovVoteRequest, GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { MetaInfo, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Number } from '@subwallet/react-ui';
@@ -55,7 +55,10 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
   return (
     <div className={CN(className)}>
 
-      <div>{data.type}</div>
+      <VoteTypeLabel
+        type={data.type}
+      />
+
       <Number
         className={'__voted-amount'}
         decimal={decimals}
