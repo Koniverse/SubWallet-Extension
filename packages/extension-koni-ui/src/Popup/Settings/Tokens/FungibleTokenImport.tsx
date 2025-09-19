@@ -297,7 +297,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           showNotification({
             message: t('ui.SETTINGS.screen.Setting.Tokens.ImportFungible.importedTokenSuccessfully')
           });
-          goBack();
+          onGoback();
         } else {
           showNotification({
             message: t('ui.SETTINGS.screen.Setting.Tokens.ImportFungible.anErrorOccurredPleaseTryAgain')
@@ -312,7 +312,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       .finally(() => {
         setLoading(false);
       });
-  }, [chainNetworkPrefix, chainInfoMap, showNotification, t, goBack]);
+  }, [chainNetworkPrefix, chainInfoMap, showNotification, t, onGoback]);
 
   const onSubmitAssetId: FormCallbacks<TokenImportFormType>['onFinish'] = useCallback((formValues: TokenImportFormType) => {
     const { assetId, chain, decimals, priceId, symbol, tokenName, type } = formValues;
@@ -339,7 +339,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             showNotification({
               message: t('ui.SETTINGS.screen.Setting.Tokens.ImportFungible.importedTokenSuccessfully')
             });
-            goBack();
+            onGoback();
           } else {
             showNotification({
               message: t('ui.SETTINGS.screen.Setting.Tokens.ImportFungible.anErrorOccurredPleaseTryAgain')
@@ -355,7 +355,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           setLoading(false);
         });
     }
-  }, [chainInfoMap, showNotification, t, goBack]);
+  }, [chainInfoMap, showNotification, t, onGoback]);
 
   const tokenDecimalsPrefix = useCallback(() => {
     const contractAddress = form.getFieldValue('contractAddress') as string;
