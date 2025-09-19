@@ -26,17 +26,19 @@ interface TransferEvmProps extends TransactionFee {
   data?: string;
 }
 
-export async function getEVMTransactionObject ({ chain,
-  evmApi,
-  fallbackFee,
-  feeCustom: _feeCustom,
-  feeInfo: _feeInfo,
-  feeOption,
-  from,
-  to,
-  transferAll,
-  value,
-  data }: TransferEvmProps): Promise<[TransactionConfig, string, string]> {
+export async function getEVMTransactionObject (props: TransferEvmProps): Promise<[TransactionConfig, string, string]> {
+  const { chain,
+    data,
+    evmApi,
+    fallbackFee,
+    feeCustom: _feeCustom,
+    feeInfo: _feeInfo,
+    feeOption,
+    from,
+    to,
+    transferAll,
+    value } = props;
+
   const feeCustom = _feeCustom as EvmEIP1559FeeOption;
   const feeInfo = _feeInfo as EvmFeeInfo;
 
@@ -88,8 +90,8 @@ export async function getEVMTransactionObject ({ chain,
   return [transactionObject, transactionObject.value.toString(), errorOnEstimateFee];
 }
 
-export async function getERC20TransactionObject (
-  { assetAddress,
+export async function getERC20TransactionObject (props: TransferERC20Props): Promise<[TransactionConfig, string, string]> {
+  const { assetAddress,
     chain,
     evmApi,
     fallbackFee,
@@ -99,8 +101,8 @@ export async function getERC20TransactionObject (
     from,
     to,
     transferAll,
-    value }: TransferERC20Props
-): Promise<[TransactionConfig, string, string]> {
+    value } = props;
+
   const erc20Contract = getERC20Contract(assetAddress, evmApi);
   const feeCustom = _feeCustom as EvmEIP1559FeeOption;
 
