@@ -824,6 +824,25 @@ export class BalanceService implements StoppableServiceInterface {
     return needActiveTokens;
   }
 
+  public async evmDetectBalanceChain () {
+    const blockscoutChain = await subwalletApiSdk.balanceDetectionApi.getBlockscoutChainData();
+    const blockscoutChainId = Object.keys(blockscoutChain);
+
+    const evmDetectChain = Object.values(this.state.chainService.getChainInfoMap())
+      .filter((info) => !!info.evmInfo?.evmChainId && blockscoutChainId.includes(info.evmInfo?.evmChainId.toString()))
+      .map((chainInfo) => chainInfo.slug);
+
+    return evmDetectChain;
+  }
+
+  public substrateDetectBalanceChain () {
+    const substrateDetectChain = Object.values(this.state.chainService.getChainInfoMap())
+      .filter((info) => !!info.substrateInfo && !!info.extraInfo?.chainBalanceSlug)
+      .map((chainInfo) => chainInfo.slug);
+
+    return substrateDetectChain;
+  }
+
   /** optimize token area **/
 
   public enableOptimizeTokenPromise (): void {
@@ -841,17 +860,23 @@ export class BalanceService implements StoppableServiceInterface {
         this.substrateDetectBalanceToken(addresses)
       ]);
 
+      const substrateDetectChain = this.substrateDetectBalanceChain();
+      const evmDetectChain = await this.evmDetectBalanceChain();
+
       const updatedSettings = structuredClone(assetSettings);
 
       Object.entries(assetSettings).forEach(([tokenSlug, setting]) => {
         const isNonZeroBalanceToken = nonZeroBalanceEvmToken.includes(tokenSlug) || nonZeroBalanceSubstrateToken.includes(tokenSlug);
+        const assetInfo = assetMap[tokenSlug];
+        const isEvmDetectChain = evmDetectChain.includes(assetInfo.originChain);
+        const isSubstrateDetectChain = substrateDetectChain.includes(assetInfo.originChain);
 
         if (isNonZeroBalanceToken && !setting.visible) {
           // enable non-zero balance tokens
           updatedSettings[tokenSlug] = {
             visible: true
           };
-        } else if (!isNonZeroBalanceToken && setting.visible && !_isNativeToken(assetMap[tokenSlug]) && !_isCustomAsset(tokenSlug)) {
+        } else if (!isNonZeroBalanceToken && setting.visible && !_isNativeToken(assetInfo) && !_isCustomAsset(tokenSlug) && (isEvmDetectChain || isSubstrateDetectChain)) {
           // hide tokens with zero balance that aren't native or custom
           updatedSettings[tokenSlug] = {
             visible: false

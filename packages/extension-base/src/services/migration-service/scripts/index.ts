@@ -74,5 +74,5 @@ export default <Record<string, typeof BaseMigrationJob>>{
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
   '1.3.42-01': MigrateNewUnifiedAccount,
   '1.3.54-01': MigrateChainPatrol,
-  '1.3.56-01': OptimizeEnableToken
+  '1.3.58-01': OptimizeEnableToken
 };
