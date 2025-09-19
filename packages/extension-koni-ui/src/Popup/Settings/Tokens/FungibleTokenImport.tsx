@@ -16,6 +16,7 @@ import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import { PlusCircle } from 'phosphor-react';
 import { FieldData } from 'rc-field-form/lib/interface';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
@@ -62,13 +63,19 @@ function getTokenTypeSupported (chainInfo: _ChainInfo) {
   return result;
 }
 
+export interface LocationState {
+  isCustomizeModal?: boolean;
+}
+
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { goBack } = useDefaultNavigate();
   const dataContext = useContext(DataContext);
   const { token } = useTheme() as Theme;
   const showNotification = useNotification();
+  const location = useLocation() as unknown as { state?: LocationState };
 
+  const isCustomizeModal = location.state?.isCustomizeModal ?? '';
   const chainInfoMap = useGetFungibleContractSupportedChains();
 
   const [form] = Form.useForm<TokenImportFormType>();
@@ -97,6 +104,17 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const chainChecker = useChainChecker();
   const chainNetworkPrefix = useGetChainPrefixBySlug(selectedChain);
+  const onGoback = useCallback(() => {
+    if (isCustomizeModal) {
+      const urlToBack = '/home/tokens';
+
+      goBack(urlToBack, { from: 'tokenImport' });
+
+      return;
+    }
+
+    goBack();
+  }, [goBack, isCustomizeModal]);
 
   const tokenTypeOptions = useMemo(() => {
     return getTokenTypeSupported(chainInfoMap[selectedChain]);
@@ -364,7 +382,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       resolve={dataContext.awaitStores(['assetRegistry'])}
     >
       <Layout.WithSubHeaderOnly
-        onBack={goBack}
+        onBack={onGoback}
         rightFooterButton={{
           block: true,
           disabled: isDisabled,

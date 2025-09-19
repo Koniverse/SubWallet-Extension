@@ -151,7 +151,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       ),
       onClick: () => {
         onCancel();
-        navigate('/settings/chains/import', { state: { isExternalRequest: false } });
+        navigate('/settings/tokens/import-token', { state: { isExternalRequest: false, isCustomizeModal: true } });
       }
     };
   }, [navigate, onCancel]);

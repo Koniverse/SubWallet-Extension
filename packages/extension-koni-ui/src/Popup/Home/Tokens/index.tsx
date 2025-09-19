@@ -45,7 +45,7 @@ export enum AssetsTab {
 }
 
 export interface LocationState {
-  assetTab?: AssetsTab;
+  from?: string;
 }
 
 const NFT_COLLECTION_MODAL_ID = 'nft_collection_modal_id';
@@ -56,7 +56,7 @@ const Component = (): React.ReactElement => {
   const [isShrink, setIsShrink] = useState<boolean>(false);
   const navigate = useNavigate();
   const location = useLocation() as unknown as { state?: LocationState };
-  const assetTab = location.state?.assetTab ?? '';
+  const originScreen = location.state?.from ?? '';
   const containerRef = useRef<HTMLDivElement>(null);
   const topBlockRef = useRef<HTMLDivElement>(null);
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
@@ -556,10 +556,12 @@ const Component = (): React.ReactElement => {
   ), [isShrink, handleImportNft, loading, onCronReloadNfts, t, onOpenNftModal]);
 
   useEffect(() => {
-    if (assetTab && Object.values(AssetsTab).includes(assetTab)) {
-      setSelectedFilterTab(assetTab);
+    if (originScreen === 'nfts') {
+      setSelectedFilterTab(AssetsTab.NFTS);
+    } else if (originScreen === 'tokenImport') {
+      onOpenCustomizeModal();
     }
-  }, [assetTab]);
+  }, [onOpenCustomizeModal, originScreen]);
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);

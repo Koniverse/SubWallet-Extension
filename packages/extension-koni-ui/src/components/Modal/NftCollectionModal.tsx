@@ -191,7 +191,6 @@ const NftCollectionModal = styled(Component)<Props>(({ theme: { token } }: Props
     },
 
     '.__list-container': {
-      overflow: 'auto',
       flex: 1
     }
   });

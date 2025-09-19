@@ -80,7 +80,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const checkChain = useChainChecker();
 
   const goBack = useCallback(() => {
-    navigate('/home/tokens', { state: { assetTab: 'nfts' } });
+    navigate('/home/tokens', { state: { from: 'nfts' } });
   }, [navigate]);
 
   const onFieldsChange: FormCallbacks<NftImportFormType>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
