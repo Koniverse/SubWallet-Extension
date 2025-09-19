@@ -31,6 +31,7 @@ import MigrateTransactionHistory from './MigrateTransactionHistory';
 import MigrateTransactionHistoryBridge from './MigrateTransactionHistoryBridge';
 import MigrateTransactionHistoryBySymbol from './MigrateTransactionHistoryBySymbol';
 import MigrateWalletReference from './MigrateWalletReference';
+import OptimizeEnableToken from './OptimizeEnableToken';
 
 export const EVERYTIME = '__everytime__';
 
@@ -72,5 +73,6 @@ export default <Record<string, typeof BaseMigrationJob>>{
   // [`${EVERYTIME}-1.1.42-02`]: MigrateTransactionHistoryBySymbol
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
   '1.3.42-01': MigrateNewUnifiedAccount,
-  '1.3.54-01': MigrateChainPatrol
+  '1.3.54-01': MigrateChainPatrol,
+  '1.3.58-01': OptimizeEnableToken
 };

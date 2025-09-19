@@ -790,7 +790,6 @@ export class ChainService {
 
     await this.initApis();
     this.initAssetSettings();
-    await this.autoEnableTokens();
   }
 
   initAssetRefMap () {
