@@ -868,6 +868,10 @@ export class ChainService {
     }
   }
 
+  public resetPopularTokenList () {
+    this.priorityTokensSubject.next({ token: {}, tokenGroup: {} });
+  }
+
   async enablePopularTokens () {
     const assetSettings = this.assetSettingSubject.value;
     const chainStateMap = this.getChainStateMap();
