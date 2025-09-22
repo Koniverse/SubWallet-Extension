@@ -70,7 +70,7 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
         phosphorIcon: Wallet,
         weight: 'fill'
       },
-      label: t('Assets'),
+      label: t('ui.components.Layout.Base.assets'),
       key: 'tokens',
       url: '/home/tokens'
     },

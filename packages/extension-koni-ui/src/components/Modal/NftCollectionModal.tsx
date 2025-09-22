@@ -40,7 +40,7 @@ function Component ({ className = '', id, nftCollections, nftItems, onCancel }: 
           weight='fill'
         />
       ),
-      children: t('Import NFT'),
+      children: t('ui.NFT.Modal.NftsCollections.importNFT'),
       shape: 'circle',
       size: 'xs',
       onClick: () => {
@@ -53,8 +53,8 @@ function Component ({ className = '', id, nftCollections, nftItems, onCancel }: 
     return (
       <EmptyList
         buttonProps={emptyButtonProps}
-        emptyMessage={t('Click [+] on the top right corner to import your NFT')}
-        emptyTitle={t('ui.NFT.screen.NftsCollections.noNftsFound')}
+        emptyMessage={t('ui.NFT.Modal.NftsCollections.clickToImportNFT')}
+        emptyTitle={t('ui.NFT.Modal.NftsCollections.noNftsFound')}
       />
     );
   }, [emptyButtonProps, t]);
@@ -134,7 +134,7 @@ function Component ({ className = '', id, nftCollections, nftItems, onCancel }: 
       destroyOnClose={true}
       id={id}
       onCancel={onPressCancel}
-      title={t('Select NFT Collections')}
+      title={t('ui.NFT.Modal.NftsCollections.selectNFTCollections')}
     >
       <div className='__modal-body-wrapper'>
         <div className='__search-wrapper'>
@@ -142,7 +142,7 @@ function Component ({ className = '', id, nftCollections, nftItems, onCancel }: 
             autoFocus={true}
             className={'__search-box'}
             onSearch={handleSearch}
-            placeholder={t('Search collection name')}
+            placeholder={t('ui.NFT.Modal.NftsCollections.searchCollectionName')}
             searchValue={currentSearchText}
           />
         </div>
@@ -159,7 +159,7 @@ function Component ({ className = '', id, nftCollections, nftItems, onCancel }: 
             renderWhenEmpty={emptyNft}
             searchFunction={searchCollection}
             searchMinCharactersCount={2}
-            searchPlaceholder={t<string>('ui.NFT.screen.NftsCollections.searchCollectionName')}
+            searchPlaceholder={t<string>('ui.NFT.Modal.NftsCollections.searchCollectionName')}
           />
         </div>
       </div>

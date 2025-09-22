@@ -367,7 +367,7 @@ const Component = (): React.ReactElement => {
           weight='fill'
         />
       ),
-      children: t('Import NFT'),
+      children: t('ui.NFT.screen.NftsCollections.importNFT'),
       shape: 'circle',
       size: 'xs',
       onClick: () => {
@@ -380,7 +380,7 @@ const Component = (): React.ReactElement => {
     return (
       <EmptyList
         buttonProps={emptyButtonProps}
-        emptyMessage={t('Click [+] on the top right corner to import your NFT')}
+        emptyMessage={t('ui.NFT.screen.NftsCollections.clickToImportNFT')}
         emptyTitle={t('ui.NFT.screen.NftsCollections.noNftsFound')}
       />
     );
@@ -486,11 +486,10 @@ const Component = (): React.ReactElement => {
         />}
         onClick={onOpenCustomizeModal}
         size={'xs'}
-        tooltip={t('Customize networks')}
         type='ghost'
       />
     </>
-  ), [onOpenCustomizeModal, onOpenGlobalSearchTokenGroup, t]);
+  ), [onOpenCustomizeModal, onOpenGlobalSearchTokenGroup]);
 
   const nftActions = useMemo(() => (
     !isShrink
@@ -533,9 +532,9 @@ const Component = (): React.ReactElement => {
           arrow={false}
           menu={{
             items: [
-              { key: 'import', label: t('Import NFT'), icon: <Icon phosphorIcon={Plus} />, onClick: handleImportNft },
-              { key: 'search', label: t('Search NFTs'), icon: <Icon phosphorIcon={MagnifyingGlass} />, onClick: onOpenNftModal },
-              { key: 'reload', label: t('Reload NFT list'), icon: <Icon phosphorIcon={ArrowClockwise} />, onClick: onCronReloadNfts }
+              { key: 'import', label: t('ui.NFT.screen.NftsCollections.importNFT'), icon: <Icon phosphorIcon={Plus} />, onClick: handleImportNft },
+              { key: 'search', label: t('ui.NFT.screen.NftsCollections.searchNFT'), icon: <Icon phosphorIcon={MagnifyingGlass} />, onClick: onOpenNftModal },
+              { key: 'reload', label: t('ui.NFT.screen.NftsCollections.reloadNFT'), icon: <Icon phosphorIcon={ArrowClockwise} />, onClick: onCronReloadNfts }
             ]
           }}
           overlayClassName='sw-dropdown-menu'

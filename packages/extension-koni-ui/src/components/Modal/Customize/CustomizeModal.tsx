@@ -106,7 +106,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const filterSearchBox = useMemo(() => {
     return {
-      placeholder: t('Search network')
+      placeholder: t('ui.BALANCE.components.Modal.Customize.Modal.searchNetwork')
     };
   }, [t]);
 
@@ -164,7 +164,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         id={CUSTOMIZE_MODAL}
         onCancel={onCancel}
         rightIconProps={subHeaderButton}
-        title={t('Customize token display')}
+        title={t('ui.BALANCE.components.Modal.Customize.Modal.customizeTokenDisplay')}
       >
         <div className={'__group-content'}>
           <SettingItem
@@ -209,7 +209,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           className={'__search-box'}
           onClickActionBtn={openFilter}
           onSearch={handleSearch}
-          placeholder={t<string>('Enter token name or network name')}
+          placeholder={t<string>('ui.BALANCE.components.Modal.Customize.Modal.tokenOrNetworkName')}
           searchValue={currentSearchText}
           showActionBtn
         />
