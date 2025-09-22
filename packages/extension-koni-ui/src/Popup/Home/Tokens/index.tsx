@@ -336,11 +336,11 @@ const Component = (): React.ReactElement => {
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('Tokens'),
+        label: t('ui.NFT.screen.NftsCollections.Tab.tokens'),
         value: AssetsTab.TOKENS
       },
       {
-        label: t('NFTs'),
+        label: t('ui.NFT.screen.NftsCollections.Tab.nfts'),
         value: AssetsTab.NFTS
       }
     ];

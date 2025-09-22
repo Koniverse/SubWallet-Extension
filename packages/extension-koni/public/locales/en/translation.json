@@ -1359,6 +1359,8 @@
   "ui.NFT.screen.NftsCollections.clickToImportNFT": "Click [+] on the top right corner to import your NFT",
   "ui.NFT.Modal.NftsCollections.importNFT": "Import NFT",
   "ui.NFT.screen.NftsCollections.importNFT": "Import NFT",
+  "ui.NFT.screen.NftsCollections.Tab.tokens": "Tokens",
+  "ui.NFT.screen.NftsCollections.Tab.nfts": "NFTs",
   "ui.NFT.screen.NftsCollections.searchNFT": "Search NFTs",
   "ui.NFT.screen.NftsCollections.reloadNFT": "Reload NFT list",
   "ui.NFT.screen.NftsImport.failedToImportIncompatibleNft": "Failed to import. Incompatible NFT",

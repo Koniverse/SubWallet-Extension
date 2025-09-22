@@ -1360,6 +1360,8 @@
   "ui.NFT.screen.NftsCollections.clickToImportNFT": "",
   "ui.NFT.Modal.NftsCollections.importNFT": "",
   "ui.NFT.screen.NftsCollections.importNFT": "",
+  "ui.NFT.screen.NftsCollections.Tab.tokens": "",
+  "ui.NFT.screen.NftsCollections.Tab.nfts": "",
   "ui.NFT.screen.NftsCollections.searchNFT": "",
   "ui.NFT.screen.NftsCollections.reloadNFT": "",
   "ui.NFT.screen.NftsImport.failedToImportIncompatibleNft": "Failed to import. Incompatible NFT",
