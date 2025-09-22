@@ -380,6 +380,7 @@ const Component = (): React.ReactElement => {
     return (
       <EmptyList
         buttonProps={emptyButtonProps}
+        className={'empty-nft-list'}
         emptyMessage={t('ui.NFT.screen.NftsCollections.clickToImportNFT')}
         emptyTitle={t('ui.NFT.screen.NftsCollections.noNftsFound')}
       />
@@ -776,6 +777,12 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       marginTop: token.marginSM,
       marginBottom: token.marginSM
     },
+
+    '.empty-nft-list': {
+      marginTop: 40,
+      paddingTop: token.padding
+    },
+
     '.filter-tabs-container': {
       '.__tab-item-label': {
         paddingTop: 0,
