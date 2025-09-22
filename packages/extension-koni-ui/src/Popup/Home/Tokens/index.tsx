@@ -545,10 +545,10 @@ const Component = (): React.ReactElement => {
           <Button
             icon={<Icon
               phosphorIcon={DotsThree}
-              size='sm'
+              size='md'
               weight='bold'
             />}
-            size='sm'
+            size={'xs'}
             type='ghost'
           />
         </Dropdown>
@@ -571,9 +571,15 @@ const Component = (): React.ReactElement => {
     };
   }, [handleResize]);
 
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
+    }
+  }, [selectedFilterTab]);
+
   return (
     <div
-      className={'tokens-screen-container'}
+      className={'assets-screen-container'}
       onScroll={handleScroll}
       ref={containerRef}
     >
@@ -773,12 +779,12 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
     },
     '.filter-tabs-container': {
       '.__tab-item-label': {
-        paddingTop: 6,
-        paddingBottom: 3
+        paddingTop: 0,
+        paddingBottom: 8
       }
     },
 
-    '.tokens-screen-container': {
+    '.assets-screen-container': {
       height: '100%',
       color: token.colorTextLight1,
       fontSize: token.fontSizeLG,
@@ -808,7 +814,7 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       paddingBottom: 12,
       position: 'absolute',
       paddingTop: '32px',
-      height: 246,
+      height: 256,
       zIndex: 10,
       top: 0,
       left: 0,
@@ -836,6 +842,7 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
 
       '&.-is-shrink': {
         height: 144,
+        paddingBottom: 8,
 
         '&:before': {
           height: 80
@@ -847,7 +854,13 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       flex: 1,
       position: 'relative',
       zIndex: 5,
-      paddingBottom: 12
+      paddingBottom: 20
+    },
+
+    '.-is-shrink': {
+      '.tokens-upper-block': {
+        paddingBottom: 13
+      }
     },
 
     '.__scroll-footer': {
