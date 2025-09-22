@@ -472,20 +472,20 @@ const Component = (): React.ReactElement => {
       <Button
         icon={<Icon
           phosphorIcon={MagnifyingGlass}
-          size='sm'
+          size='md'
         />}
         onClick={onOpenGlobalSearchTokenGroup}
-        size='sm'
+        size={'xs'}
         type='ghost'
       />
       <Button
         icon={<Icon
           phosphorIcon={FadersHorizontal}
-          size='sm'
+          size='md'
           weight='bold'
         />}
         onClick={onOpenCustomizeModal}
-        size='sm'
+        size={'xs'}
         tooltip={t('Customize networks')}
         type='ghost'
       />
@@ -499,31 +499,31 @@ const Component = (): React.ReactElement => {
           <Button
             icon={<Icon
               phosphorIcon={MagnifyingGlass}
-              size='sm'
+              size='md'
             />}
             onClick={onOpenNftModal}
-            size='sm'
+            size={'xs'}
             type='ghost'
           />
           <Button
             icon={<Icon
               phosphorIcon={Plus}
-              size='sm'
+              size='md'
               weight='bold'
             />}
             onClick={handleImportNft}
-            size='sm'
+            size={'xs'}
             type='ghost'
           />
           <Button
             disabled={loading}
             icon={<Icon
               phosphorIcon={ArrowClockwise}
-              size='sm'
+              size='md'
               weight='bold'
             />}
             onClick={onCronReloadNfts}
-            size='sm'
+            size={'xs'}
             type='ghost'
           />
         </>
@@ -770,6 +770,12 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
     '.__empty-list': {
       marginTop: token.marginSM,
       marginBottom: token.marginSM
+    },
+    '.filter-tabs-container': {
+      '.__tab-item-label': {
+        paddingTop: 6,
+        paddingBottom: 3
+      }
     },
 
     '.tokens-screen-container': {
