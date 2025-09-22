@@ -38,7 +38,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [referendaItems, setReferendaItems] = useState<ReferendumWithVoting[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const govLockedInfos = useGetGovLockedInfos();
+  const govLockedInfos = useGetGovLockedInfos(chainSlug);
 
   const { data, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: [
@@ -142,10 +142,6 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
       const userVoting: UserVoting[] = [];
 
       (govLockedInfos || []).forEach((acc) => {
-        if (acc.chain !== chainSlug) {
-          return;
-        }
-
         const track = acc.tracks?.find((t) => Number(t.trackId) === trackId);
 
         if (!track) {
@@ -187,7 +183,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
     });
 
     setReferendaItems(filteredExtended);
-  }, [data?.pages, selectedReferendaCategory, govLockedInfos, chainSlug, isEnableVotedFilter, isEnableDelegatedFilter]);
+  }, [data?.pages, selectedReferendaCategory, govLockedInfos, isEnableVotedFilter, isEnableDelegatedFilter]);
 
   return (
     <div

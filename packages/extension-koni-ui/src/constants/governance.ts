@@ -1,16 +1,17 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { GovStatusKey } from '@subwallet/subsquare-api-sdk';
 import { ArrowsOutLineHorizontal, CheckCircle, CircleHalf, ClipboardText, ClockAfternoon, HourglassHigh, Prohibit, RocketLaunch, Scales, Skull, Stack, ThumbsDown, ThumbsUp, XCircle } from 'phosphor-react';
 
 import { GovStatusItem } from '../types';
 
 export const governanceVoteIconMap = {
-  aye: ThumbsUp,
-  nay: ThumbsDown,
-  abstain: CircleHalf,
-  split: ArrowsOutLineHorizontal
+  [GovVoteType.AYE]: ThumbsUp,
+  [GovVoteType.NAY]: ThumbsDown,
+  [GovVoteType.ABSTAIN]: CircleHalf,
+  [GovVoteType.SPLIT]: ArrowsOutLineHorizontal
 };
 
 export const govStatusDisplayMap: Record<GovStatusKey, GovStatusItem> = {

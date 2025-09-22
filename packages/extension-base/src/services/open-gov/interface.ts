@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export enum GovVoteType {
-  AYE = 'Aye',
-  NAY = 'Nay',
-  SPLIT = 'Split',
-  ABSTAIN = 'Abstain',
+  AYE = 'aye',
+  NAY = 'nay',
+  SPLIT = 'split',
+  ABSTAIN = 'abstain',
 }
 
 interface BaseVoteRequest {
@@ -40,10 +40,10 @@ export const govConvictionOptions = [
   { value: 0, label: '0.1x', description: 'No lockup' },
   { value: 1, label: '1x', description: '~7d' },
   { value: 2, label: '2x', description: '~14d' },
-  { value: 3, label: '3x', description: '~21d' },
-  { value: 4, label: '4x', description: '~28d' },
-  { value: 5, label: '5x', description: '~35d' },
-  { value: 6, label: '6x', description: '~42d' }
+  { value: 3, label: '3x', description: '~28d' },
+  { value: 4, label: '4x', description: '~56d' },
+  { value: 5, label: '5x', description: '~112d' },
+  { value: 6, label: '6x', description: '~224d' }
 ];
 
 export enum Conviction {
@@ -64,6 +64,16 @@ export const numberToConviction: Record<number, Conviction> = {
   4: Conviction.Locked4x,
   5: Conviction.Locked5x,
   6: Conviction.Locked6x
+};
+
+export const convictionToDays: Record<Conviction, number> = {
+  [Conviction.None]: 0,
+  [Conviction.Locked1x]: 7,
+  [Conviction.Locked2x]: 14,
+  [Conviction.Locked3x]: 28,
+  [Conviction.Locked4x]: 56,
+  [Conviction.Locked5x]: 112,
+  [Conviction.Locked6x]: 224
 };
 
 export interface RemoveVoteRequest {
@@ -132,14 +142,27 @@ export interface VotingFor {
   delegating?: Delegating;
 }
 
+export interface UnlockingReferendaData{
+  id: string;
+  balance: string;
+  timestamp: number;
+}
+
 export interface GovVotingInfo {
   chain: string;
   address: string;
   summary: {
     delegated: string;
     voted: string;
-    unlocking: string;
-    unlockable: string;
+    totalLocked: string;
+    unlocking: {
+      unlockingReferenda: UnlockingReferendaData[];
+    };
+    unlockable: {
+      balance: string;
+      trackIds: number[],
+      unlockableReferenda: string[]
+    };
   };
   tracks: GovTrackVoting[];
 }
@@ -164,4 +187,13 @@ export interface GovDelegationDetail {
   balance: string;
   target: string;
   conviction: Conviction;
+}
+
+// Unlock Vote
+export interface UnlockVoteRequest {
+  address: string;
+  chain: string;
+  trackIds: number[];
+  referendumIds?: string[];
+  amount: string;
 }

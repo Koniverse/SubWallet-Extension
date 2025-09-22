@@ -12,15 +12,6 @@ export enum GovernanceScreenView {
   UNLOCK_TOKEN= 'unlock-token'
 }
 
-export type GovernanceVoteType = 'aye' | 'nay' | 'abstain' | 'split';
-
-export enum GovernanceVoteOptions {
-  Aye = 'aye',
-  Nay = 'nay',
-  Abstain = 'abstain',
-  Split = 'split'
-}
-
 export interface GovStatusItem {
   key: GovStatusKey;
   label: string;

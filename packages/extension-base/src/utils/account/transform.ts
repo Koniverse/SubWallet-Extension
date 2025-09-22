@@ -240,7 +240,8 @@ const CLAIM_AVAIL_BRIDGE: ExtrinsicType[] = [
 
 const OPEN_GOV_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.GOV_VOTE,
-  ExtrinsicType.GOV_UNVOTE
+  ExtrinsicType.GOV_UNVOTE,
+  ExtrinsicType.GOV_UNLOCK_VOTE
 ];
 
 const OTHER_ACTIONS: ExtrinsicType[] = [

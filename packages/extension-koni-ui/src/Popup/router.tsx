@@ -129,6 +129,7 @@ const GovReferendumStandardVote = new LazyLoader('GovReferendumStandardVote', ()
 const GovReferendumAbstainVote = new LazyLoader('GovReferendumAbstainVote', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/ReferendumVote/ReferendumAbstainVote'));
 const GovReferendumSplitVote = new LazyLoader('GovReferendumSplitVote', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/ReferendumVote/ReferendumSplitVote'));
 const GovReferendumUnvote = new LazyLoader('GovReferendumUnvote', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/ReferendumUnvote'));
+const GovUnlockVote = new LazyLoader('GovUnlockVote', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/GovUnlockVote'));
 
 const MigrateAccount = new LazyLoader('MigrateAccount', () => import('@subwallet/extension-koni-ui/Popup/MigrateAccount'));
 
@@ -227,6 +228,7 @@ export const router = createHashRouter([
             ]
           },
           GovReferendumUnvote.generateRouterObject('gov-ref-unvote'),
+          GovUnlockVote.generateRouterObject('gov-unlock-vote'),
 
           {
             path: 'compound',

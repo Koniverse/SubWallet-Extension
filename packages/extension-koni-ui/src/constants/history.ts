@@ -48,6 +48,7 @@ export const TxTypeNameMap: Record<ExtrinsicType, string> = {
   [ExtrinsicType.CLAIM_BRIDGE]: detectTranslate('Claim token'),
   [ExtrinsicType.GOV_VOTE]: detectTranslate('Vote'),
   [ExtrinsicType.GOV_UNVOTE]: detectTranslate('Unvote'),
+  [ExtrinsicType.GOV_UNLOCK_VOTE]: detectTranslate('Unlock votes'),
   [ExtrinsicType.UNKNOWN]: detectTranslate('Unknown')
 };
 
