@@ -129,9 +129,9 @@ const calculateTimeLeft = (
   let timeLeft: string;
 
   if (days.gte(2)) {
-    timeLeft = `${days.toFixed()} days ${hours.toFixed()} hour${!hours.eq(1) ? 's' : ''}`;
+    timeLeft = `${days.toFixed()}d ${hours.toFixed()}hr${!hours.eq(1) ? 's' : ''}`;
   } else if (days.eq(1)) {
-    timeLeft = `1 day ${hours.toFixed()} hour${!hours.eq(1) ? 's' : ''}`;
+    timeLeft = `1d ${hours.toFixed()}hr${!hours.eq(1) ? 's' : ''}`;
   } else {
     timeLeft = `${hours.toFixed().padStart(2, '0')}:${minutes
       .toFixed()

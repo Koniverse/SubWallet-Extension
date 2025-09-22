@@ -5,6 +5,7 @@ import { NotificationType } from '@subwallet/extension-base/background/KoniTypes
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import GovAccountSelectoModal from '@subwallet/extension-koni-ui/components/Modal/Governance/GovAccountSelector';
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
@@ -12,10 +13,9 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
-import { Button, Icon, ModalContext, SwSubHeader } from '@subwallet/react-ui';
+import { Button, ModalContext, SwSubHeader } from '@subwallet/react-ui';
 import { useQuery } from '@tanstack/react-query';
-import { UploadSimple } from 'phosphor-react';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
@@ -47,6 +47,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
   const modalId = 'account-selector';
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
+  const { uiState: { setShowTabBar } } = useContext(HomeContext);
 
   const [, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const onBack = useCallback(() => {
@@ -118,6 +119,14 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
     inactiveModal(modalId);
   }, [inactiveModal]);
 
+  useEffect(() => {
+    setShowTabBar(false);
+
+    return () => {
+      setShowTabBar(true);
+    };
+  }, [setShowTabBar]);
+
   if (!data) {
     return <></>;
   }
@@ -132,83 +141,76 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
         className={'referendum-detail-header'}
         onBack={onBack}
         paddingVertical
-        rightButtons={[
-          {
-            icon: (
-              <Icon
-                customSize={'24px'}
-                phosphorIcon={UploadSimple}
-                type='phosphor'
-                weight={'bold'}
-              />
-            )
-          }
-        ]}
         showBackButton
-        title={t('Referenda {{id}}', { replace: { id: data.referendumIndex } })}
+        title={t('Referenda #{{id}}', { replace: { id: data.referendumIndex } })}
       />
 
-      <MetaArea
-        referendumDetail={data}
-      />
-
-      <div>
-        <VoteArea
-          chain={chainSlug}
-          onClickVote={onClickVote}
+      <div className={'referendum-detail-body'}>
+        <MetaArea
           referendumDetail={data}
-          sdkInstance={sdkInstance}
         />
 
-        { allSpends && (
-          <RequestedAmount
-            allSpend={allSpends}
+        <div>
+          <VoteArea
             chain={chainSlug}
+            onClickVote={onClickVote}
+            referendumDetail={data}
+            sdkInstance={sdkInstance}
           />
-        )}
-      </div>
 
-      <TabsContainer referendumDetail={data} />
-
-      <GovAccountSelectoModal
-        items={accountAddressItems}
-        modalId={modalId}
-        onCancel={onCancel}
-        onSelectItem={onSelectGovItem}
-      />
-
-      <div className={'referendum-detail-footer'}>
-        <Button
-          block={true}
-          className='ref-polkassambly-button'
-          icon={
-            <img
-              alt='Polkassembly'
-              className={'footer-button-logo'}
-              src={DefaultLogosMap.polkassembly}
+          { allSpends && (
+            <RequestedAmount
+              allSpend={allSpends}
+              chain={chainSlug}
             />
-          }
-          onClick={onViewPolkassembly}
-          schema='secondary'
-        >
-          {t('Polkassembly')}
-        </Button>
+          )}
+        </div>
 
-        <Button
-          block={true}
-          className={'ref-subsquare-button'}
-          icon={
-            <img
-              alt='Subsquare'
-              className={'footer-button-logo'}
-              src={DefaultLogosMap.subsquare}
-            />
-          }
-          onClick={onViewSubsquare}
-          schema='secondary'
-        >
-          {t('Subsquare')}
-        </Button>
+        <TabsContainer
+          chain={chainSlug}
+          referendumDetail={data}
+        />
+
+        <GovAccountSelectoModal
+          items={accountAddressItems}
+          modalId={modalId}
+          onCancel={onCancel}
+          onSelectItem={onSelectGovItem}
+        />
+
+        <div className={'referendum-detail-footer'}>
+          <Button
+            block={true}
+            className='ref-polkassambly-button'
+            icon={
+              <img
+                alt='Polkassembly'
+                className={'footer-button-logo'}
+                src={DefaultLogosMap.polkassembly}
+              />
+            }
+            onClick={onViewPolkassembly}
+            schema='secondary'
+          >
+            {t('Polkassembly')}
+          </Button>
+
+          <Button
+            block={true}
+            className={'ref-subsquare-button'}
+            icon={
+              <img
+                alt='Subsquare'
+                className={'footer-button-logo'}
+                src={DefaultLogosMap.subsquare}
+              />
+            }
+            onClick={onViewSubsquare}
+            schema='secondary'
+          >
+            {t('Subsquare')}
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -216,10 +218,29 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
 
 export const ReferendumDetailView = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
+    height: '100%',
     paddingInline: token.padding,
     display: 'flex',
     flexDirection: 'column',
-    gap: token.sizeMS,
+    gap: token.size,
+
+    '.referendum-detail-header': {
+      height: 40,
+      marginTop: token.marginXS,
+
+      '.ant-sw-header-left-part': {
+        marginLeft: -token.marginXS
+      }
+    },
+
+    '.referendum-detail-body': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: token.sizeMS,
+      overflowY: 'scroll',
+      flex: 1,
+      minHeight: 0
+    },
 
     '.referendum-detail-footer': {
       display: 'flex',

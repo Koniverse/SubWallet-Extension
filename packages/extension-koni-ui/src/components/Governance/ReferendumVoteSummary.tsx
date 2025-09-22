@@ -18,9 +18,10 @@ import NumberDisplay from '../NumberDisplay';
 type Props = ThemeProps & {
   userVoting?: UserVoting[];
   chain: string;
+  iconVoteStatSize?: string
 };
 
-const Component = ({ chain, className, userVoting }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { decimals } = useGetNativeTokenBasicInfo(chain);
 
@@ -33,7 +34,7 @@ const Component = ({ chain, className, userVoting }: Props): React.ReactElement<
         ? userVoting.length > 1
           ? (
             <div className='__i-vote-summary-label'>
-              {t('Voted/Delegated with {{count}} accounts', { count: userVoting.length })}
+              {t('Voted/Delegated with {{count}} accounts total', { count: userVoting.length })}
             </div>
           )
           : (
@@ -52,7 +53,7 @@ const Component = ({ chain, className, userVoting }: Props): React.ReactElement<
                       />
                       <Icon
                         className='__i-vote-stat-icon'
-                        customSize='12px'
+                        customSize={iconVoteStatSize}
                         phosphorIcon={ThumbsUp}
                         weight='fill'
                       />
@@ -68,7 +69,7 @@ const Component = ({ chain, className, userVoting }: Props): React.ReactElement<
                       />
                       <Icon
                         className='__i-vote-stat-icon'
-                        customSize='12px'
+                        customSize={iconVoteStatSize}
                         phosphorIcon={CircleHalf}
                         weight='fill'
                       />
@@ -84,7 +85,7 @@ const Component = ({ chain, className, userVoting }: Props): React.ReactElement<
                       />
                       <Icon
                         className='__i-vote-stat-icon'
-                        customSize='12px'
+                        customSize={iconVoteStatSize}
                         phosphorIcon={ThumbsDown}
                         weight='fill'
                       />
@@ -96,7 +97,7 @@ const Component = ({ chain, className, userVoting }: Props): React.ReactElement<
               {delegation && (
                 <>
                   <div className='__i-vote-summary-label'>
-                    {t('Delegated')}&nbsp;
+                    {t('Voted:')}&nbsp;
                   </div>
                   <NumberDisplay
                     className='__i-vote-stat-value'

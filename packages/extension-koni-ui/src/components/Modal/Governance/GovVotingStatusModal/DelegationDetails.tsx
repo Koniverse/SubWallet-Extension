@@ -17,12 +17,12 @@ type Props = ThemeProps & {
   nestedAccount: NestedAccount;
   decimals: number;
   symbol: string;
+  chain: string;
 };
 
 function Component (props: Props): React.ReactElement<Props> {
-  const { className, decimals, nestedAccount, onCancel, symbol } = props;
+  const { chain, className, decimals, nestedAccount, onCancel, symbol } = props;
   const { t } = useTranslation();
-
   const { inactiveModal } = useContext(ModalContext);
 
   const _onCancel = useCallback(() => {
@@ -43,26 +43,26 @@ function Component (props: Props): React.ReactElement<Props> {
         className='meta-block'
         hasBackgroundWrapper
         spaceSize={'xs'}
-        valueColorScheme={'gray'}
       >
         <MetaInfo.Number
+          className={'__delegation-item-votes'}
           decimals={decimals}
           label={t('Votes')}
           suffix={symbol}
           value={nestedAccount.accountInfo.votes || 0}
-          valueColorSchema={'even-odd'}
         />
         <MetaInfo.Default
+          className={'__delegation-item-votes'}
           label={t('Conviction')}
         >
           {nestedAccount.accountInfo.conviction}
         </MetaInfo.Default>
         <MetaInfo.Number
+          className={'__delegation-item-votes'}
           decimals={decimals}
           label={t('Capital')}
           suffix={symbol}
           value={nestedAccount.accountInfo.balance || 0}
-          valueColorSchema={'even-odd'}
         />
       </MetaInfo>
       <div className={'section-title'}>{t('DELEGATION VOTES')}</div>
@@ -70,33 +70,38 @@ function Component (props: Props): React.ReactElement<Props> {
         className='meta-block'
         hasBackgroundWrapper
         spaceSize={'xs'}
-        valueColorScheme={'gray'}
       >
         <MetaInfo.Number
+          className={'__delegation-item-votes'}
           decimals={decimals}
           label={t('Votes')}
           suffix={symbol}
           value={nestedAccount.accountInfo.delegations?.votes || 0}
-          valueColorSchema={'even-odd'}
         />
         <MetaInfo.Default
+          className={'__delegation-item-votes'}
           label={t('Delegators')}
         >
           {nestedAccount.totalDelegatedAccount}
         </MetaInfo.Default>
         <MetaInfo.Number
+          className={'__delegation-item-votes'}
           decimals={decimals}
           label={t('Capital')}
           suffix={symbol}
           value={nestedAccount.accountInfo.delegations?.capital || 0 }
-          valueColorSchema={'even-odd'}
         />
       </MetaInfo>
       {nestedAccount.totalDelegatedAccount > 0 && (
         <>
-          <div className={'section-title'}>{t(`DELEGATION LIST (${nestedAccount.totalDelegatedAccount})`)}</div>
+          <div className={'section-title'}>{t('DELEGATION LIST ')}
+            <span className={'__delegation-account-total'}>
+              ({nestedAccount.totalDelegatedAccount})
+            </span>
+          </div>
           <FlattenedVoteList
             accounts={nestedAccount.delegatedAccount}
+            chain={chain}
             decimal={decimals}
             symbol={symbol}
           />
@@ -121,7 +126,22 @@ const DelegationDetailsModal = styled(Component)<Props>(({ theme: { token } }: P
       fontSize: token.fontSizeSM,
       lineHeight: '20px',
       fontWeight: 600,
+      color: token.colorTextLight1,
       marginBottom: token.marginXS
+    },
+
+    '.__delegation-item-votes': {
+      '.__label': {
+        color: token.colorTextLight4
+      },
+
+      '.__value': {
+        color: token.colorTextLight1
+      }
+    },
+
+    '.__delegation-account-total': {
+      color: token.colorTextLight4
     },
 
     '.meta-block': {

@@ -14,6 +14,7 @@ import { TimelineTab } from './TimelineTab';
 
 type Props = ThemeProps & {
   referendumDetail: ReferendumDetail;
+  chain: string;
 };
 
 export enum Tab {
@@ -22,7 +23,7 @@ export enum Tab {
   TIMELINE= 'timeline',
 }
 
-const Component = ({ className, referendumDetail }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, referendumDetail }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const [selectedFilterTab, setSelectedFilterTab] = useState<string>(Tab.TIMELINE);
 
@@ -64,7 +65,10 @@ const Component = ({ className, referendumDetail }: Props): React.ReactElement<P
 
       {
         selectedFilterTab === Tab.DETAILS && (
-          <DetailsTab referendumDetail={referendumDetail} />
+          <DetailsTab
+            chain={chain}
+            referendumDetail={referendumDetail}
+          />
         )
       }
 

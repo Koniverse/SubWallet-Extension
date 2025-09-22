@@ -12,7 +12,7 @@ import { useAccountBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, us
 import { RemindBackUpSeedPhraseParamState, SessionStorage, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { isFirefox } from '@subwallet/extension-koni-ui/utils';
 import { ModalContext } from '@subwallet/react-ui';
-import React, { useCallback, useContext, useEffect, useRef } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Outlet } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
@@ -31,6 +31,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const location = useLocation();
   const accountBalance = useAccountBalance(tokenGroupStructure.tokenGroupMap);
   const [isConfirmedTermGeneral, setIsConfirmedTermGeneral] = useLocalStorage(CONFIRM_GENERAL_TERM, 'nonConfirmed');
+  const [showTabBar, setShowTabBar] = useState<boolean>(true);
   const { isNeedUpgradeVersion } = useUpgradeFireFoxVersion();
   const { showAppPopup } = useContext(AppOnlineContentContext);
 
@@ -106,7 +107,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     <>
       <HomeContext.Provider value={{
         tokenGroupStructure,
-        accountBalance
+        accountBalance,
+        uiState: { setShowTabBar }
       }}
       >
         <div className={`home home-container ${className}`}>
@@ -116,6 +118,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             showNotificationIcon
             showSearchToken
             showSidebarIcon
+            showTabBar={showTabBar}
           >
             <Outlet />
             <GeneralTermModal onOk={onAfterConfirmTermModal} />

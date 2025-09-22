@@ -55,7 +55,11 @@ const Component = (props: Props) => {
       )}
       id={modalId}
       onCancel={onCancel}
-      title={t(title)}
+      title={
+        (<span className={'__voting-status-title'}>
+          {t(title)} <span className={'__voting-status-count'}>({voteData.totalVotedAccounts})</span>
+        </span>)
+      }
     >
       <div className='__view-toggle'>
         <div
@@ -89,6 +93,7 @@ const Component = (props: Props) => {
           />
           : <FlattenedVoteList
             accounts={voteData.accounts.flattened}
+            chain={chain}
             decimal={decimal}
             symbol={symbol}
           />
@@ -126,8 +131,8 @@ const GovVotingStatusModal = styled(forwardRef(Component))<Props>(({ theme: { to
     '.__list-wrapper': {
       flex: 1,
       overflowY: 'auto',
-      paddingLeft: token.padding,
-      paddingRight: token.padding
+      paddingInline: token.padding,
+      paddingBottom: token.padding
     },
 
     '.__view-toggle-btn': {
@@ -149,6 +154,16 @@ const GovVotingStatusModal = styled(forwardRef(Component))<Props>(({ theme: { to
       borderRadius: '0.5rem',
       zIndex: 1,
       transition: 'left 0.3s ease-in-out, background 0.3s ease-in-out'
+    },
+
+    '.__voting-status-title': {
+      fontSize: token.fontSizeHeading4,
+      lineHeight: token.lineHeightHeading4,
+      fontWeight: token.headingFontWeight,
+
+      '.__voting-status-count': {
+        color: token.colorTextLight4
+      }
     }
   };
 });

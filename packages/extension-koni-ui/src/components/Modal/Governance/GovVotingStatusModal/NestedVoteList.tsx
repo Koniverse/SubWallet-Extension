@@ -1,18 +1,18 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { EmptyList } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyAvatar, EmptyList } from '@subwallet/extension-koni-ui/components';
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { GOV_DELEGATION_DETAILS_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { formatBalance, toShort } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, formatBalance, getAccountProxyTypeIcon, toShort } from '@subwallet/extension-koni-ui/utils';
 import { NestedAccount } from '@subwallet/extension-koni-ui/utils/gov/votingStats';
 import { Icon, ModalContext, SwList, Web3Block } from '@subwallet/react-ui';
-import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import CN from 'classnames';
 import { t } from 'i18next';
 import { CaretRight, Copy, ListChecks, UsersThree } from 'phosphor-react';
+import { IconWeight } from 'phosphor-react/src/lib';
 import React, { forwardRef, useCallback, useContext, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
@@ -26,12 +26,10 @@ interface Props extends ThemeProps {
 }
 
 const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
-  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
-
-  const networkPrefix = chainInfoMap[chain]?.substrateInfo?.addressPrefix;
+  const { accountProxies, accounts: accountsState } = useSelector((state) => state.accountState);
   const [searchText, setSearchText] = useState('');
   const [viewDetailItem, setViewDetailItem] = useState<NestedAccount | undefined>(undefined);
-
+  const notify = useNotification();
   const { activeModal } = useContext(ModalContext);
 
   const onClickMore = useCallback((item: NestedAccount) => {
@@ -41,11 +39,40 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
     };
   }, [activeModal]);
 
+  const _onClickCopyButton = useCallback((address: string) => {
+    return (e: React.SyntheticEvent) => {
+      e.stopPropagation();
+
+      navigator.clipboard.writeText(address)
+        .then(() => {
+          notify({
+            message: t<string>('Copied to clipboard')
+          });
+        })
+        .catch((err) => {
+          console.error('Failed to copy: ', err);
+          notify({
+            message: t<string>('Copy failed')
+          });
+        });
+    };
+  }, [notify]);
+
   const handleSearch = useCallback((value: string) => {
     setSearchText(value.trim().toLowerCase());
   }, []);
 
   const renderItem = useCallback((item: NestedAccount) => {
+    const account = findAccountByAddress(accountsState, item.accountInfo.account);
+    let accountProxy;
+
+    if (account) {
+      accountProxy = accountProxies.find((ap) => ap.id === account.proxyId);
+    }
+
+    const shortAddress = toShort(item.accountInfo.account);
+    const accountProxyTypeIconProps = accountProxy ? getAccountProxyTypeIcon(accountProxy) : null;
+
     return <div
       className={CN(className)}
       key={item.accountInfo.account}
@@ -53,17 +80,33 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
       <Web3Block
         className={'vote-item'}
         leftItem={
-          <SwAvatar
-            identPrefix={networkPrefix}
-            size={32}
-            value={item.accountInfo.account}
-          />
+          <div className='__item-avatar-wrapper'>
+            <AccountProxyAvatar
+              size={32}
+              value={accountProxy?.id || item.accountInfo.account}
+            />
+
+            {
+              !!accountProxyTypeIconProps && (
+                <div className={CN('__item-avatar-icon', accountProxyTypeIconProps.className, {
+                  '-is-derived': !!accountProxy?.parentId
+                })}
+                >
+                  <Icon
+                    customSize={'12px'}
+                    phosphorIcon={accountProxyTypeIconProps.value}
+                    weight={accountProxyTypeIconProps.weight as IconWeight}
+                  />
+                </div>
+              )
+            }
+          </div>
         }
         middleItem={
           <>
             <div className={'vote-item__address-wrapper'}>
               <div className={'vote-item__address'}>
-                {toShort(item.accountInfo.account)}
+                {account?.name || shortAddress}
               </div>
             </div>
 
@@ -93,11 +136,13 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
 
         rightItem={
           <div className={'vote-item__arrow-wrapper'}>
-            <Icon
-              className={'vote-item__arrow'}
-              phosphorIcon={Copy}
-              size={'sm'}
-            />
+            <div onClick={_onClickCopyButton(item.accountInfo.account)}>
+              <Icon
+                className={'vote-item__arrow'}
+                phosphorIcon={Copy}
+                size={'sm'}
+              />
+            </div>
             <Icon
               className={'vote-item__arrow'}
               phosphorIcon={CaretRight}
@@ -107,7 +152,7 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
         }
       />
     </div>;
-  }, [className, decimals, networkPrefix, onClickMore, symbol]);
+  }, [_onClickCopyButton, accountProxies, accountsState, className, decimals, onClickMore, symbol]);
 
   const renderEmpty = useCallback(() => {
     return (
@@ -150,6 +195,7 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
 
       {viewDetailItem && (
         <DelegationDetailsModal
+          chain={chain}
           decimals={decimals}
           nestedAccount={viewDetailItem}
           symbol={symbol}
@@ -190,9 +236,11 @@ export const NestedVoteList = styled(forwardRef(Component))<Props>(({ theme: { t
     },
 
     '.vote-item__address': {
-      fontSize: token.fontSizeLG,
-      lineHeight: token.lineHeightLG,
+      fontSize: token.fontSizeHeading6,
+      lineHeight: token.lineHeightHeading6,
+      fontWeight: token.headingFontWeight,
       paddingRight: token.paddingXXS,
+      color: token.colorTextLight1,
       textOverflow: 'ellipsis',
       overflow: 'hidden',
       whiteSpace: 'nowrap'
@@ -225,7 +273,7 @@ export const NestedVoteList = styled(forwardRef(Component))<Props>(({ theme: { t
     },
 
     '.vote-item__delegator-count': {
-      color: token.colorSuccess,
+      color: token['green-8'],
       display: 'flex',
       alignItems: 'center'
     },
@@ -240,6 +288,35 @@ export const NestedVoteList = styled(forwardRef(Component))<Props>(({ theme: { t
     '.vote-item__arrow': {
       paddingLeft: token.paddingSM - 2,
       paddingRight: token.paddingSM - 2
+    },
+
+    '.__item-avatar-wrapper': {
+      position: 'relative'
+    },
+    '.__item-avatar-icon': {
+      color: token.colorWhite,
+      width: 16,
+      height: 16,
+      position: 'absolute',
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.65)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: '100%',
+
+      '&.-is-unified': {
+        color: token.colorSuccess
+      },
+
+      '&.-is-solo': {
+        color: token['blue-9']
+      },
+
+      '&.-is-derived': {
+        color: token.colorWarning
+      }
     }
   };
 });

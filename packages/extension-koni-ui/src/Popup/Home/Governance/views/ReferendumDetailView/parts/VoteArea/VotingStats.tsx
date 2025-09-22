@@ -86,8 +86,8 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
               />
               <div onClick={handleOpenAye}>
                 <Icon
+                  customSize={'16px'}
                   phosphorIcon={Info}
-                  size='sm'
                 />
               </div>
             </div>
@@ -121,8 +121,8 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
               />
               <div onClick={handleOpenNay}>
                 <Icon
+                  customSize={'16px'}
                   phosphorIcon={Info}
-                  size={'sm'}
                 />
               </div>
             </div>
@@ -157,8 +157,8 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
               />
               <div onClick={handleOpenAbstain}>
                 <Icon
+                  customSize={'16px'}
                   phosphorIcon={Info}
-                  size={'sm'}
                 />
               </div>
             </div>
@@ -201,6 +201,11 @@ export const VotingStats = styled(Component)<Props>(({ theme: { token } }: Props
       '.__panel-body': {
         paddingLeft: token.paddingXS,
         paddingRight: token.paddingXS
+      },
+
+      '.__panel-icon': {
+        width: 30,
+        minWidth: 'unset'
       }
     },
 
@@ -239,7 +244,11 @@ export const VotingStats = styled(Component)<Props>(({ theme: { token } }: Props
       alignItems: 'center',
       gap: '4px',
       fontSize: 14,
-      color: token.colorText
+      color: token.colorText,
+
+      '.ant-number': {
+        whiteSpace: 'nowrap'
+      }
     },
     '.voting-stats__value svg': {
       opacity: 0.7,

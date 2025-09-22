@@ -69,7 +69,7 @@ const ReferendumVoteProgressBar = styled(Component)<Props>(({ theme: { token } }
       flex: 1,
       fontSize: token.fontSizeXS,
       lineHeight: token.lineHeightXS,
-      fontWeight: token.headingFontWeight,
+      fontWeight: 700,
       color: token.colorTextLight4
     },
 

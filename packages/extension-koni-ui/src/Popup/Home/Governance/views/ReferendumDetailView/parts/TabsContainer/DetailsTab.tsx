@@ -1,8 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { AccountProxyAvatar, MetaInfo, ReferendumTrackTag } from '@subwallet/extension-koni-ui/components';
-import { useGetAccountByAddress, useNotification } from '@subwallet/extension-koni-ui/hooks';
+import { useGetAccountByAddress, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon } from '@subwallet/react-ui';
@@ -10,11 +11,11 @@ import { ReferendumDetail } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
 import { ArrowSquareOut, Copy } from 'phosphor-react';
 import React, { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
   referendumDetail: ReferendumDetail;
+  chain: string;
 };
 
 const BLOCK_TIME_SEC = 6;
@@ -25,9 +26,11 @@ const blocksToDaysLabel = (blocks: number, blockTimeSec = BLOCK_TIME_SEC) => {
   return Number.isInteger(days) ? `${days} d` : `${days.toFixed(2)} d`;
 };
 
-const Component = ({ className, referendumDetail }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, referendumDetail }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const notify = useNotification();
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+
   const proposerAddress = referendumDetail.onchainData.info.submissionDeposit?.who;
   const decisionAddress = referendumDetail.onchainData.info.decisionDeposit?.who;
   const proposerAccount = useGetAccountByAddress(proposerAddress);
@@ -50,11 +53,16 @@ const Component = ({ className, referendumDetail }: Props): React.ReactElement<P
       });
   }, [notify, t, referendumDetail.onchainData.proposalHash]);
 
-  const _openExplorer = useCallback((address: string) => {
-    return () => {
-      window.open(`https://portfolio.subscan.io/account/${address}`, '_blank');
+  const _onClickViewOnExplorer = useCallback((address: string) => {
+    return (e: React.SyntheticEvent) => {
+      e.stopPropagation();
+      const chainInfo = chainInfoMap[chain];
+      const link = getExplorerLink(chainInfo, address, 'account');
+
+      console.log(link, chainInfo);
+      window.open(link, '_blank');
     };
-  }, []);
+  }, [chain, chainInfoMap]);
 
   return (
     <MetaInfo className={className}>
@@ -88,7 +96,7 @@ const Component = ({ className, referendumDetail }: Props): React.ReactElement<P
                     weight={'fill'}
                   />
                 }
-                onClick={_openExplorer(proposerAddress)}
+                onClick={_onClickViewOnExplorer(proposerAddress)}
                 size='xs'
                 style={{ minWidth: 'unset' }}
                 tooltip={t('View on explorer')}
@@ -124,7 +132,7 @@ const Component = ({ className, referendumDetail }: Props): React.ReactElement<P
                     weight={'fill'}
                   />
                 }
-                onClick={_openExplorer(decisionAddress)}
+                onClick={_onClickViewOnExplorer(decisionAddress)}
                 size='xs'
                 style={{ minWidth: 'unset' }}
                 tooltip={t('View on explorer')}

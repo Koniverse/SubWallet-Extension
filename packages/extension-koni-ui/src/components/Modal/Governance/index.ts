@@ -2,3 +2,4 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { default as GovAccountSelectorModal } from './GovAccountSelector';
+export { default as GovVotedAccountsModal } from './GovVotedAccountsModal';
