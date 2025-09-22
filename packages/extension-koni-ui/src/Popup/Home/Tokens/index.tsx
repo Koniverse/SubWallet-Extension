@@ -471,6 +471,7 @@ const Component = (): React.ReactElement => {
   const tokenActions = useMemo(() => (
     <>
       <Button
+        disabled={!tokenGroupBalanceItems.length}
         icon={<Icon
           phosphorIcon={MagnifyingGlass}
           size='md'
@@ -490,13 +491,14 @@ const Component = (): React.ReactElement => {
         type='ghost'
       />
     </>
-  ), [onOpenCustomizeModal, onOpenGlobalSearchTokenGroup]);
+  ), [onOpenCustomizeModal, onOpenGlobalSearchTokenGroup, tokenGroupBalanceItems.length]);
 
   const nftActions = useMemo(() => (
     !isShrink
       ? (
         <>
           <Button
+            disabled={!nftCollections.length}
             icon={<Icon
               phosphorIcon={MagnifyingGlass}
               size='md'
@@ -553,7 +555,7 @@ const Component = (): React.ReactElement => {
           />
         </Dropdown>
       )
-  ), [isShrink, handleImportNft, loading, onCronReloadNfts, t, onOpenNftModal]);
+  ), [isShrink, nftCollections.length, onOpenNftModal, handleImportNft, loading, onCronReloadNfts, t]);
 
   useEffect(() => {
     if (originScreen === 'nfts') {
