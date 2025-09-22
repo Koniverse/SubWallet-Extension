@@ -859,7 +859,9 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
 
     '.-is-shrink': {
       '.tokens-upper-block': {
-        paddingBottom: 13
+        paddingBottom: 13,
+        width: '100%',
+        alignItems: 'center'
       }
     },
 
