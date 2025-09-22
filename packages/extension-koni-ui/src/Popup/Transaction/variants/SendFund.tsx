@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _AssetRef, _AssetType, _ChainInfo, _ChainStatus } from '@subwallet/chain-list/types';
+import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _ChainStatus } from '@subwallet/chain-list/types';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
@@ -91,9 +91,28 @@ function getTokenAvailableDestinations (tokenSlug: string, xcmRefMap: Record<str
   return result;
 }
 
+const determineHideMaxButton = (chain: string, destChain: string, assetInfo: _ChainAsset, chainInfoMap: Record<string, _ChainInfo>) => {
+  const chainInfo = chainInfoMap[chain];
+
+  if (_isPolygonChainBridge(chain, destChain) || _isPosChainBridge(chain, destChain)) {
+    return true;
+  }
+
+  return (
+    !!chainInfo &&
+    !!assetInfo &&
+    destChain === chain &&
+    _isNativeToken(assetInfo) &&
+    (_isChainEvmCompatible(chainInfo) ||
+      _isChainCardanoCompatible(chainInfo) ||
+      _isChainBitcoinCompatible(chainInfo))
+  );
+};
+
 const hiddenFields: Array<keyof TransferParams> = ['chain', 'fromAccountProxy', 'defaultSlug'];
 const alertModalId = 'confirmation-alert-modal';
 const defaultAddressInputRenderKey = 'address-input-render-key';
+const defaultAmountInputRenderKey = 'amount-input-render-key';
 
 const FEE_SHOW_TYPES: Array<FeeChainType | undefined> = ['substrate', 'evm'];
 
@@ -152,13 +171,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [chainValue, destChainValue, getCurrentConfirmation]);
 
   const hideMaxButton = useMemo(() => {
-    const chainInfo = chainInfoMap[chainValue];
-
-    if (_isPolygonChainBridge(chainValue, destChainValue) || _isPosChainBridge(chainValue, destChainValue)) {
-      return true;
-    }
-
-    return !!chainInfo && !!assetInfo && destChainValue === chainValue && _isNativeToken(assetInfo) && (_isChainEvmCompatible(chainInfo) || _isChainCardanoCompatible(chainInfo) || _isChainBitcoinCompatible(chainInfo));
+    return determineHideMaxButton(chainValue, destChainValue, assetInfo, chainInfoMap);
   }, [chainInfoMap, chainValue, destChainValue, assetInfo]);
 
   const disabledToAddressInput = useMemo(() => {
@@ -170,10 +183,10 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
   // use this to reinit AddressInput component
   const [addressInputRenderKey, setAddressInputRenderKey] = useState<string>(defaultAddressInputRenderKey);
+  const [amountInputRenderKey, setAmountInputRenderKey] = useState<string>(defaultAmountInputRenderKey);
 
   const [, update] = useState({});
   const [isBalanceReady, setIsBalanceReady] = useState(true);
-  const [forceUpdateMaxValue, setForceUpdateMaxValue] = useState<object|undefined>(undefined);
   const [transferInfo, setTransferInfo] = useState<ResponseSubscribeTransfer | undefined>();
   const [isFetchingInfo, setIsFetchingInfo] = useState(false);
   const [isFetchingListFeeToken, setIsFetchingListFeeToken] = useState(false);
@@ -184,7 +197,6 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
   const handleWarning = useCallback((warnings: TransactionWarning[]) => {
     if (warnings.some((w) => w.warningType === BasicTxWarningCode.NOT_ENOUGH_EXISTENTIAL_DEPOSIT)) {
-      setForceUpdateMaxValue({});
       setIsTransferAll(true);
     }
   }, []);
@@ -436,6 +448,27 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     (part: Partial<TransferParams>, values: TransferParams) => {
       const validateField: Set<string> = new Set();
 
+      const timestamp = Date.now();
+
+      const resetValueField = () => {
+        setIsTransferAll(false);
+        form.setFieldValue('value', undefined);
+        setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${timestamp}`);
+      };
+
+      const resetToFieldErrors = () => {
+        form.setFields([{ name: 'to', errors: [] }]);
+      };
+
+      const resetValueFieldErrors = () => {
+        form.setFields([{ name: 'value', errors: [] }]);
+      };
+
+      const resetTransactionFee = () => {
+        setCurrentTokenPayFee(defaultTokenPayFee);
+        setSelectedTransactionFee(undefined);
+      };
+
       if (part.asset) {
         const chain = assetRegistry[part.asset].originChain;
 
@@ -444,45 +477,40 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           destChain: chain,
           to: ''
         });
+        const newAssetInfo = assetRegistry[part.asset];
+        const newHideMaxButton = determineHideMaxButton(chain, chain, newAssetInfo, chainInfoMap);
+
+        if (newHideMaxButton && isTransferAll) {
+          resetValueField();
+        }
 
         setAddressInputRenderKey(`${defaultAddressInputRenderKey}-${Date.now()}`);
-        setIsTransferAll(false);
-        setForceUpdateMaxValue(undefined);
         setSelectedTransactionFee(undefined);
         setCurrentTokenPayFee(values.chain === chain ? defaultTokenPayFee : undefined);
         setTransferInfo(undefined);
       }
 
-      if (part.destChain || part.chain || part.value || part.asset) {
-        form.setFields([
-          {
-            name: 'to',
-            errors: []
-          },
-          {
-            name: 'value',
-            errors: []
-          }
-        ]);
-      }
-
       if (part.destChain) {
+        const chain = values.chain;
+        const destChain = part.destChain;
+        const assetInfo = assetRegistry[values.asset];
+        const newHideMaxButton = determineHideMaxButton(chain, destChain, assetInfo, chainInfoMap);
+
+        if (newHideMaxButton && isTransferAll) {
+          resetValueField();
+        }
+
         form.resetFields(['to']);
-        setCurrentTokenPayFee(defaultTokenPayFee);
-        setSelectedTransactionFee(undefined);
+        resetTransactionFee();
       }
 
-      if (part.from || part.destChain) {
-        setForceUpdateMaxValue(isTransferAll ? {} : undefined);
+      if (part.destChain || part.chain || part.value || part.asset) {
+        resetToFieldErrors();
+        resetValueFieldErrors();
       }
 
       if (part.to) {
-        form.setFields([
-          {
-            name: 'to',
-            errors: []
-          }
-        ]);
+        resetToFieldErrors();
       }
 
       if (validateField.size) {
@@ -491,7 +519,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
       persistData(form.getFieldsValue());
     },
-    [defaultTokenPayFee, persistData, form, assetRegistry, isTransferAll]
+    [persistData, form, assetRegistry, chainInfoMap, isTransferAll, defaultTokenPayFee]
   );
 
   const isShowWarningOnSubmit = useCallback((values: TransferParams): boolean => {
@@ -897,6 +925,15 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue, isTransferAll]);
 
   useEffect(() => {
+    if (isTransferAll && transferInfo?.maxTransferable && !hideMaxButton) {
+      form.setFieldsValue({
+        value: transferInfo?.maxTransferable
+      });
+      setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${Date.now()}`);
+    }
+  }, [form, hideMaxButton, isTransferAll, transferInfo]);
+
+  useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');
     const bnMaxTransfer = new BN(transferInfo?.maxTransferable || '0');
 
@@ -1095,7 +1132,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             <AmountInput
               decimals={decimals}
               disabled={decimals === 0}
-              forceUpdateMaxValue={forceUpdateMaxValue}
+              key={amountInputRenderKey}
               maxValue={transferInfo?.maxTransferable || '0'}
               onSetMax={onSetMaxTransferable}
               showMaxButton={!hideMaxButton}
