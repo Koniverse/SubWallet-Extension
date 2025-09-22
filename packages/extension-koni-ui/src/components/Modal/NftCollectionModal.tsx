@@ -136,27 +136,33 @@ function Component ({ className = '', id, nftCollections, nftItems, onCancel }: 
       onCancel={onPressCancel}
       title={t('Select NFT Collections')}
     >
-      <Search
-        autoFocus={true}
-        className={'__search-box'}
-        onSearch={handleSearch}
-        placeholder={t('Search collection name')}
-        searchValue={currentSearchText}
-      />
-      <SwList
-        className={('nft_collection_list__container __list-container')}
-        displayGrid={true}
-        enableSearchInput={true}
-        gridGap={'14px'}
-        list={filteredNftCollections}
-        minColumnWidth={'160px'}
-        renderItem={renderNftCollection}
-        renderOnScroll={true}
-        renderWhenEmpty={emptyNft}
-        searchFunction={searchCollection}
-        searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('ui.NFT.screen.NftsCollections.searchCollectionName')}
-      />
+      <div className='__modal-body-wrapper'>
+        <div className='__search-wrapper'>
+          <Search
+            autoFocus={true}
+            className={'__search-box'}
+            onSearch={handleSearch}
+            placeholder={t('Search collection name')}
+            searchValue={currentSearchText}
+          />
+        </div>
+        <div className='__list-wrapper'>
+          <SwList
+            className={('nft_collection_list__container __list-container')}
+            displayGrid={true}
+            enableSearchInput={true}
+            gridGap={'14px'}
+            list={filteredNftCollections}
+            minColumnWidth={'160px'}
+            renderItem={renderNftCollection}
+            renderOnScroll={true}
+            renderWhenEmpty={emptyNft}
+            searchFunction={searchCollection}
+            searchMinCharactersCount={2}
+            searchPlaceholder={t<string>('ui.NFT.screen.NftsCollections.searchCollectionName')}
+          />
+        </div>
+      </div>
     </SwModal>
   );
 }
@@ -165,6 +171,23 @@ const NftCollectionModal = styled(Component)<Props>(({ theme: { token } }: Props
   return ({
     '.ant-sw-modal-content': {
       height: '100vh'
+    },
+
+    '.__modal-body-wrapper': {
+      display: 'flex',
+      flexDirection: 'column',
+      flex: 1,
+      height: '100%'
+    },
+
+    '.__search-wrapper': {
+      paddingBottom: token.paddingXS,
+      flex: '0 0 auto'
+    },
+
+    '.__list-wrapper': {
+      flex: 1,
+      overflow: 'auto'
     },
 
     '.ant-sw-modal-body': {
@@ -184,10 +207,6 @@ const NftCollectionModal = styled(Component)<Props>(({ theme: { token } }: Props
 
     '.ant-sw-list': {
       paddingBottom: 0
-    },
-
-    '.__search-box': {
-      marginBottom: token.marginXS
     },
 
     '.__list-container': {
