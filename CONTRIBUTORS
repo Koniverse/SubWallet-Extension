@@ -9,7 +9,7 @@
      394	tunghp2002                    	[Issue-4638] Fix typos and separate energy chain check from native staking logic
      355	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
      279	lw                            	[Issue-4462] refactor: Refactor logic related to amount input
-     252	PDTnhah                       	[Issue-4668] Update chainlist
+     256	PDTnhah                       	[Issue-4693] revert chainlist version
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
      185	Thiendekaco                   	[Issue-4501] fix(earning): update link guide
