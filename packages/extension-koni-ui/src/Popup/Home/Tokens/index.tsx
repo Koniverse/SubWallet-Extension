@@ -1,32 +1,30 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { AccountSelectorModal, AlertBox, CloseIcon, EmptyList, NftCollectionModal, PageWrapper, ReceiveModal, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
+import { AccountSelectorModal, AlertBox, CloseIcon, EmptyList, PageWrapper, ReceiveModal, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import BannerGenerator from '@subwallet/extension-koni-ui/components/StaticContent/BannerGenerator';
 import { TokenGroupBalanceItem } from '@subwallet/extension-koni-ui/components/TokenItem/TokenGroupBalanceItem';
 import { CUSTOMIZE_MODAL, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
-import { useCoreReceiveModalHelper, useDebouncedValue, useGetBannerByScreen, useGetChainAndExcludedTokenByCurrentAccountProxy, useGetNftByAccount, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreReceiveModalHelper, useDebouncedValue, useGetBannerByScreen, useGetChainAndExcludedTokenByCurrentAccountProxy, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { reloadCron } from '@subwallet/extension-koni-ui/messaging';
 import { GlobalSearchTokenGroupModalId } from '@subwallet/extension-koni-ui/Popup/Home';
-import { INftCollectionDetail } from '@subwallet/extension-koni-ui/Popup/Home/Nfts';
-import { NftGalleryWrapper } from '@subwallet/extension-koni-ui/Popup/Home/Nfts/component/NftGalleryWrapper';
+import NftCollectionList from '@subwallet/extension-koni-ui/Popup/Home/Nfts/NftCollectionList';
 import { UpperBlock } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/UpperBlock';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
 import { TokenBalanceItemType } from '@subwallet/extension-koni-ui/types/balance';
 import { getTransactionFromAccountProxyValue, isAccountAll, sortTokensByStandard } from '@subwallet/extension-koni-ui/utils';
 import { isTonAddress } from '@subwallet/keyring';
-import { ActivityIndicator, Button, ButtonProps, Dropdown, Icon, ModalContext, SwAlert, SwList } from '@subwallet/react-ui';
+import { ActivityIndicator, Button, Dropdown, Icon, ModalContext, SwAlert } from '@subwallet/react-ui';
 import classNames from 'classnames';
-import { ArrowClockwise, Coins, DotsThree, FadersHorizontal, MagnifyingGlass, Plus, PlusCircle } from 'phosphor-react';
+import { ArrowClockwise, Coins, DotsThree, FadersHorizontal, MagnifyingGlass, Plus } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -66,7 +64,6 @@ const Component = (): React.ReactElement => {
     totalBalanceInfo }, tokenGroupStructure: { tokenGroups } } = useContext(HomeContext);
   const notify = useNotification();
   const { onOpenReceive, receiveModalProps } = useCoreReceiveModalHelper();
-  const { nftCollections, nftItems } = useGetNftByAccount();
   const priorityTokens = useSelector((state: RootState) => state.chainStore.priorityTokens);
   const [loading, setLoading] = React.useState<boolean>(false);
   const isZkModeSyncing = useSelector((state: RootState) => state.mantaPay.isSyncing);
@@ -349,47 +346,13 @@ const Component = (): React.ReactElement => {
   const onSelectFilterTab = useCallback((value: string) => {
     setSelectedFilterTab(value);
   }, []);
+  const onOpenGlobalSearchTokenGroup = useCallback(() => {
+    activeModal(GlobalSearchTokenGroupModalId);
+  }, [activeModal]);
 
-  const searchCollection = useCallback((collection: NftCollection, searchText: string) => {
-    const searchTextLowerCase = searchText.toLowerCase();
-
-    return (
-      collection.collectionName?.toLowerCase().includes(searchTextLowerCase) ||
-      collection.collectionId.toLowerCase().includes(searchTextLowerCase)
-    );
-  }, []);
-
-  const emptyButtonProps = useMemo((): ButtonProps => {
-    return {
-      icon: (
-        <Icon
-          phosphorIcon={PlusCircle}
-          weight='fill'
-        />
-      ),
-      children: t('ui.NFT.screen.NftsCollections.importNFT'),
-      shape: 'circle',
-      size: 'xs',
-      onClick: () => {
-        navigate('/settings/tokens/import-nft', { state: { assetsTab: AssetsTab.NFTS } });
-      }
-    };
-  }, [navigate, t]);
-
-  const emptyNft = useCallback(() => {
-    return (
-      <EmptyList
-        buttonProps={emptyButtonProps}
-        className={'empty-nft-list'}
-        emptyMessage={t('ui.NFT.screen.NftsCollections.clickToImportNFT')}
-        emptyTitle={t('ui.NFT.screen.NftsCollections.noNftsFound')}
-      />
-    );
-  }, [emptyButtonProps, t]);
-
-  const handleOnClickCollection = useCallback((state: INftCollectionDetail) => {
-    navigate('/home/nfts/collection-detail', { state });
-  }, [navigate]);
+  const onOpenCustomizeModal = useCallback(() => {
+    activeModal(CUSTOMIZE_MODAL);
+  }, [activeModal]);
 
   const handleImportNft = useCallback(() => {
     navigate('/settings/tokens/import-nft', { state: { assetsTab: AssetsTab.NFTS } });
@@ -397,57 +360,6 @@ const Component = (): React.ReactElement => {
 
   const onOpenNftModal = useCallback(() => {
     activeModal(NFT_COLLECTION_MODAL_ID);
-  }, [activeModal]);
-
-  const onCloseNftModal = useCallback(() => {
-    inactiveModal(NFT_COLLECTION_MODAL_ID);
-  }, [inactiveModal]);
-
-  const getNftsByCollection = useCallback((nftCollection: NftCollection) => {
-    const nftList: NftItem[] = [];
-
-    nftItems.forEach((nftItem) => {
-      if (nftItem.collectionId === nftCollection.collectionId && nftItem.chain === nftCollection.chain) {
-        nftList.push(nftItem);
-      }
-    });
-
-    return nftList;
-  }, [nftItems]);
-
-  const renderNftCollection = useCallback((nftCollection: NftCollection) => {
-    const nftList = getNftsByCollection(nftCollection);
-
-    let fallbackImage: string | undefined;
-
-    for (const nft of nftList) { // fallback to any nft image
-      if (nft.image) {
-        fallbackImage = nft.image;
-        break;
-      }
-    }
-
-    const state: INftCollectionDetail = { collectionInfo: nftCollection, nftList };
-
-    return (
-      <NftGalleryWrapper
-        fallbackImage={fallbackImage}
-        handleOnClick={handleOnClickCollection}
-        image={nftCollection.image}
-        itemCount={nftList.length}
-        key={`${nftCollection.collectionId}_${nftCollection.chain}`}
-        routingParams={state}
-        title={nftCollection.collectionName || nftCollection.collectionId}
-      />
-    );
-  }, [getNftsByCollection, handleOnClickCollection]);
-
-  const onOpenGlobalSearchTokenGroup = useCallback(() => {
-    activeModal(GlobalSearchTokenGroupModalId);
-  }, [activeModal]);
-
-  const onOpenCustomizeModal = useCallback(() => {
-    activeModal(CUSTOMIZE_MODAL);
   }, [activeModal]);
 
   const onCronReloadNfts = useCallback(() => {
@@ -498,7 +410,6 @@ const Component = (): React.ReactElement => {
       ? (
         <>
           <Button
-            disabled={!nftCollections.length}
             icon={<Icon
               phosphorIcon={MagnifyingGlass}
               size='md'
@@ -537,7 +448,7 @@ const Component = (): React.ReactElement => {
             items: [
               { key: 'import', label: t('ui.NFT.screen.NftsCollections.importNFT'), icon: <Icon phosphorIcon={Plus} />, onClick: handleImportNft },
               { key: 'search', label: t('ui.NFT.screen.NftsCollections.searchNFT'), icon: <Icon phosphorIcon={MagnifyingGlass} />, onClick: onOpenNftModal },
-              { key: 'reload', label: t('ui.NFT.screen.NftsCollections.reloadNFT'), icon: <Icon phosphorIcon={ArrowClockwise} />, onClick: onCronReloadNfts }
+              { key: 'reload', label: t('ui.NFT.screen.NftsCollections.reloadNFT'), icon: <Icon phosphorIcon={ArrowClockwise} />, onClick: onOpenNftModal }
             ]
           }}
           overlayClassName='sw-dropdown-menu'
@@ -555,7 +466,7 @@ const Component = (): React.ReactElement => {
           />
         </Dropdown>
       )
-  ), [isShrink, nftCollections.length, onOpenNftModal, handleImportNft, loading, onCronReloadNfts, t]);
+  ), [isShrink, onOpenNftModal, handleImportNft, loading, onCronReloadNfts, t]);
 
   useEffect(() => {
     if (originScreen === 'nfts') {
@@ -725,35 +636,15 @@ const Component = (): React.ReactElement => {
         )}
 
         {selectedFilterTab === AssetsTab.NFTS && (
-          <>
-            <SwList
-              className={classNames('nft_collection_list__container')}
-              displayGrid={true}
-              enableSearchInput={true}
-              gridGap={'14px'}
-              list={nftCollections}
-              minColumnWidth={'160px'}
-              renderItem={renderNftCollection}
-              renderOnScroll={true}
-              renderWhenEmpty={emptyNft}
-              searchFunction={searchCollection}
-              searchMinCharactersCount={2}
-              searchPlaceholder={t<string>('ui.NFT.screen.NftsCollections.searchCollectionName')}
-            />
-          </>
+          <NftCollectionList
+            id={NFT_COLLECTION_MODAL_ID}
+          />
         )}
 
       </div>
 
       <ReceiveModal
         {...receiveModalProps}
-      />
-
-      <NftCollectionModal
-        id={NFT_COLLECTION_MODAL_ID}
-        nftCollections={nftCollections}
-        nftItems={nftItems}
-        onCancel={onCloseNftModal}
       />
     </div>
   );
