@@ -722,22 +722,16 @@ export class BalanceService implements StoppableServiceInterface {
     return getDefaultTransferProcess();
   }
 
+  // only evm addresses
   public async evmDetectBalanceToken (addresses: string[]) {
     const assetMap = this.state.chainService.getAssetRegistry();
     const evmPromiseList = addresses.map((address) => {
-      const type = getKeypairTypeByAddress(address);
-      const typeValid = [...EthereumKeypairTypes].includes(type);
+      return subwalletApiSdk.balanceDetectionApi.getSubWalletTokenBalance(address)
+        .catch((e) => {
+          console.error(e);
 
-      if (typeValid) {
-        return subwalletApiSdk.balanceDetectionApi.getSubWalletTokenBalance(address)
-          .catch((e) => {
-            console.error(e);
-
-            return null;
-          });
-      } else {
-        return null;
-      }
+          return null;
+        });
     });
 
     const needActiveTokens: string[] = [];
@@ -765,22 +759,16 @@ export class BalanceService implements StoppableServiceInterface {
     return needActiveTokens;
   }
 
+  // only for substrate addresses
   public async substrateDetectBalanceToken (addresses: string[]) {
     const assetMap = this.state.chainService.getAssetRegistry();
     const promiseList = addresses.map((address) => {
-      const type = getKeypairTypeByAddress(address);
-      const typeValid = [...SubstrateKeypairTypes, ...EthereumKeypairTypes].includes(type);
+      return this.state.subscanService.getMultiChainBalance(address)
+        .catch((e) => {
+          console.error(e);
 
-      if (typeValid) {
-        return this.state.subscanService.getMultiChainBalance(address)
-          .catch((e) => {
-            console.error(e);
-
-            return null;
-          });
-      } else {
-        return null;
-      }
+          return null;
+        });
     });
 
     const needActiveTokens: string[] = [];
@@ -853,11 +841,14 @@ export class BalanceService implements StoppableServiceInterface {
     try {
       const assetSettings = await this.state.chainService.getAssetSettings();
       const assetMap = this.state.chainService.getAssetRegistry();
+
       const addresses = keyring.getPairs().map((account) => account.address);
+      const evmAddresses = addresses.filter((address) => [...EthereumKeypairTypes].includes(getKeypairTypeByAddress(address)));
+      const substrateAddresses = addresses.filter((address) => [...SubstrateKeypairTypes].includes(getKeypairTypeByAddress(address)));
 
       const [nonZeroBalanceEvmToken, nonZeroBalanceSubstrateToken] = await Promise.all([
-        this.evmDetectBalanceToken(addresses),
-        this.substrateDetectBalanceToken(addresses)
+        this.evmDetectBalanceToken(evmAddresses),
+        this.substrateDetectBalanceToken(substrateAddresses)
       ]);
 
       const substrateDetectChain = this.substrateDetectBalanceChain();
