@@ -21,7 +21,7 @@ import { BehaviorSubject } from 'rxjs';
 import { EarningSlippageResult } from './handlers/native-staking/dtao';
 import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, SubnetTaoStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
 
-const fetchPoolsData = async () => {
+export const fetchPoolsData = async () => {
   const fetchData = await fetchStaticCache<{data: Record<string, YieldPoolInfo>}>('earning/yield-pools.json', { data: {} });
 
   return fetchData.data;
