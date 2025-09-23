@@ -104,7 +104,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const chainChecker = useChainChecker();
   const chainNetworkPrefix = useGetChainPrefixBySlug(selectedChain);
-  const onGoback = useCallback(() => {
+  const handleGoBack = useCallback(() => {
     if (isCustomizeModal) {
       const urlToBack = '/home/tokens';
 
@@ -297,7 +297,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           showNotification({
             message: t('ui.SETTINGS.screen.Setting.Tokens.ImportFungible.importedTokenSuccessfully')
           });
-          onGoback();
+          handleGoBack();
         } else {
           showNotification({
             message: t('ui.SETTINGS.screen.Setting.Tokens.ImportFungible.anErrorOccurredPleaseTryAgain')
@@ -312,7 +312,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       .finally(() => {
         setLoading(false);
       });
-  }, [chainNetworkPrefix, chainInfoMap, showNotification, t, onGoback]);
+  }, [chainNetworkPrefix, chainInfoMap, showNotification, t, handleGoBack]);
 
   const onSubmitAssetId: FormCallbacks<TokenImportFormType>['onFinish'] = useCallback((formValues: TokenImportFormType) => {
     const { assetId, chain, decimals, priceId, symbol, tokenName, type } = formValues;
@@ -339,7 +339,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             showNotification({
               message: t('ui.SETTINGS.screen.Setting.Tokens.ImportFungible.importedTokenSuccessfully')
             });
-            onGoback();
+            handleGoBack();
           } else {
             showNotification({
               message: t('ui.SETTINGS.screen.Setting.Tokens.ImportFungible.anErrorOccurredPleaseTryAgain')
@@ -355,7 +355,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           setLoading(false);
         });
     }
-  }, [chainInfoMap, showNotification, t, onGoback]);
+  }, [chainInfoMap, showNotification, t, handleGoBack]);
 
   const tokenDecimalsPrefix = useCallback(() => {
     const contractAddress = form.getFieldValue('contractAddress') as string;
@@ -382,7 +382,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       resolve={dataContext.awaitStores(['assetRegistry'])}
     >
       <Layout.WithSubHeaderOnly
-        onBack={onGoback}
+        onBack={handleGoBack}
         rightFooterButton={{
           block: true,
           disabled: isDisabled,

@@ -624,7 +624,9 @@ const Component = (): React.ReactElement => {
 
       </div>
       <div
-        className={'__scroll-container'}
+        className={classNames('__scroll-container', {
+          '-is-shrink': isShrink
+        })}
       >
         {
           isZkModeSyncing && (
@@ -814,7 +816,8 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
 
     '.__scroll-container': {
       paddingLeft: token.size,
-      paddingRight: token.size
+      paddingRight: token.size,
+      marginTop: 12
     },
 
     '.__upper-block-wrapper': {
@@ -871,6 +874,10 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
         width: '100%',
         alignItems: 'center'
       }
+    },
+
+    '.__scroll-container.-is-shrink': {
+      marginTop: 20
     },
 
     '.__scroll-footer': {

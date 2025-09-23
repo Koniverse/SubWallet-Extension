@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { BackIcon, FilterModal, NetworkEmptyList, OptionType, TokenToggleWithChainItem } from '@subwallet/extension-koni-ui/components';
+import { BackIcon, EmptyList, FilterModal, OptionType, TokenToggleWithChainItem } from '@subwallet/extension-koni-ui/components';
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { CUSTOMIZE_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { useChainInfoWithStateAndStatus, useFilterModal } from '@subwallet/extension-koni-ui/hooks';
@@ -13,14 +13,13 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { BackgroundIcon, Badge, ButtonProps, Icon, ModalContext, SettingItem, Switch, SwList, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { FadersHorizontal, Plus, Wallet } from 'phosphor-react';
+import { Coins, FadersHorizontal, Plus, Wallet } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
 type Props = ThemeProps;
-const renderEmpty = () => <NetworkEmptyList modalId={CUSTOMIZE_MODAL} />;
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
@@ -43,9 +42,21 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     setCurrentSearchText(value);
   }, []);
 
+  const emptyToken = useCallback(() => {
+    return (
+      <EmptyList
+        className='__empty-list'
+        emptyMessage={t('ui.BALANCE.screen.Tokens.trySearchingOrImporting')}
+        emptyTitle={t('ui.BALANCE.screen.Tokens.noTokensFound')}
+        phosphorIcon={Coins}
+      />
+    );
+  }, [t]);
+
   const onCancel = useCallback(() => {
     onResetFilter();
     inactiveModal(CUSTOMIZE_MODAL);
+    setCurrentSearchText('');
   }, [inactiveModal, onResetFilter]);
 
   const FILTER_OPTIONS = useMemo((): OptionType[] => {
@@ -217,7 +228,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           className={'__list-container'}
           list={listItems}
           renderItem={renderItem}
-          renderWhenEmpty={renderEmpty}
+          renderWhenEmpty={emptyToken}
           searchableMinCharactersCount={2}
         />
       </SwModal>
@@ -243,6 +254,11 @@ export const CustomizeModal = styled(Component)<Props>(({ theme: { token } }: Pr
       maxHeight: 586,
       height: 586,
       overflow: 'hidden'
+    },
+
+    '.__empty-list': {
+      marginTop: 56,
+      marginBottom: 16
     },
 
     '.-side-panel-mode & .ant-sw-modal-content': {
