@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.3.59
+Build date: Sep 23, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.116 (#4704):
+- Support HOLLAR mainnet (#4692)
+
+
 ## 1.3.58
 Build date: Sep 19, 2025.
 
