@@ -31,7 +31,7 @@ const Component = ({ className, type }: Props): React.ReactElement<Props> => {
         weight={'fill'}
       />
 
-      <div className='__label'>
+      <div className='__type-label'>
         {labelMap[type]}
       </div>
     </div>

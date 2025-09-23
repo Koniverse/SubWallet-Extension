@@ -251,7 +251,7 @@ export const VotingStats = styled(Component)<Props>(({ theme: { token } }: Props
       }
     },
     '.voting-stats__value svg': {
-      opacity: 0.7,
+      opacity: 0.529,
       cursor: 'pointer',
       transition: 'opacity 0.2s'
     },

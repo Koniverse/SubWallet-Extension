@@ -224,6 +224,7 @@ export const VoteArea = styled(Component)<Props>(({ theme: { token } }: Props) =
       '.__i-vote-summary-total-info': {
         cursor: 'pointer',
         transition: 'color 0.2s',
+        color: token.colorTextLight3,
 
         '&:hover': {
           color: token.colorTextLight1

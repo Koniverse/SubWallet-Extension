@@ -73,86 +73,82 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
     const shortAddress = toShort(item.accountInfo.account);
     const accountProxyTypeIconProps = accountProxy ? getAccountProxyTypeIcon(accountProxy) : null;
 
-    return <div
-      className={CN(className)}
+    return <Web3Block
+      className={'vote-item'}
       key={item.accountInfo.account}
-    >
-      <Web3Block
-        className={'vote-item'}
-        leftItem={
-          <div className='__item-avatar-wrapper'>
-            <AccountProxyAvatar
-              size={32}
-              value={accountProxy?.id || item.accountInfo.account}
-            />
+      leftItem={
+        <div className='__item-avatar-wrapper'>
+          <AccountProxyAvatar
+            size={32}
+            value={accountProxy?.id || item.accountInfo.account}
+          />
 
-            {
-              !!accountProxyTypeIconProps && (
-                <div className={CN('__item-avatar-icon', accountProxyTypeIconProps.className, {
-                  '-is-derived': !!accountProxy?.parentId
-                })}
-                >
-                  <Icon
-                    customSize={'12px'}
-                    phosphorIcon={accountProxyTypeIconProps.value}
-                    weight={accountProxyTypeIconProps.weight as IconWeight}
-                  />
-                </div>
-              )
-            }
+          {
+            !!accountProxyTypeIconProps && (
+              <div className={CN('__item-avatar-icon', accountProxyTypeIconProps.className, {
+                '-is-derived': !!accountProxy?.parentId
+              })}
+              >
+                <Icon
+                  customSize={'12px'}
+                  phosphorIcon={accountProxyTypeIconProps.value}
+                  weight={accountProxyTypeIconProps.weight as IconWeight}
+                />
+              </div>
+            )
+          }
+        </div>
+      }
+      middleItem={
+        <>
+          <div className={'vote-item__address-wrapper'}>
+            <div className={'vote-item__address'}>
+              {account?.name || shortAddress}
+            </div>
           </div>
-        }
-        middleItem={
-          <>
-            <div className={'vote-item__address-wrapper'}>
-              <div className={'vote-item__address'}>
-                {account?.name || shortAddress}
-              </div>
-            </div>
 
-            <div className={'vote-item__info'}>
-              <div className={'vote-item__delegation'}>
-                <div className={'vote-item__delegation-row'}>
-                  <span className='vote-item__delegated-votes'>
+          <div className={'vote-item__info'}>
+            <div className={'vote-item__delegation'}>
+              <div className={'vote-item__delegation-row'}>
+                <span className='vote-item__delegated-votes'>
                     ~{formatBalance(item.totalDelegatedVote, decimals)} {symbol}
-                  </span>
-                  <>
+                </span>
+                <>
                       |
-                    <div className='vote-item__delegator-count'>
-                      <Icon
-                        phosphorIcon={UsersThree}
-                        size='xs'
-                        weight='fill'
-                      />
+                  <div className='vote-item__delegator-count'>
+                    <Icon
+                      phosphorIcon={UsersThree}
+                      size='xs'
+                      weight='fill'
+                    />
                             &nbsp;: {`${item.totalDelegatedAccount}`}
-                    </div>
-                  </>
-                </div>
+                  </div>
+                </>
               </div>
             </div>
-          </>
-        }
-        onClick={onClickMore(item)}
+          </div>
+        </>
+      }
+      onClick={onClickMore(item)}
 
-        rightItem={
-          <div className={'vote-item__arrow-wrapper'}>
-            <div onClick={_onClickCopyButton(item.accountInfo.account)}>
-              <Icon
-                className={'vote-item__arrow'}
-                phosphorIcon={Copy}
-                size={'sm'}
-              />
-            </div>
+      rightItem={
+        <div className={'vote-item__arrow-wrapper'}>
+          <div onClick={_onClickCopyButton(item.accountInfo.account)}>
             <Icon
               className={'vote-item__arrow'}
-              phosphorIcon={CaretRight}
+              phosphorIcon={Copy}
               size={'sm'}
             />
           </div>
-        }
-      />
-    </div>;
-  }, [_onClickCopyButton, accountProxies, accountsState, className, decimals, onClickMore, symbol]);
+          <Icon
+            className={'vote-item__arrow'}
+            phosphorIcon={CaretRight}
+            size={'sm'}
+          />
+        </div>
+      }
+    />;
+  }, [_onClickCopyButton, accountProxies, accountsState, decimals, onClickMore, symbol]);
 
   const renderEmpty = useCallback(() => {
     return (
@@ -179,7 +175,7 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
   }, [accounts, searchText]);
 
   return (
-    <div>
+    <div className={CN(className, '__nested-vote-list')}>
       <Search
         autoFocus={true}
         className='__search-box'
@@ -188,6 +184,7 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
         searchValue={searchText}
       />
       <SwList
+        className={'list-items'}
         list={filteredAccounts}
         renderItem={renderItem}
         renderWhenEmpty={renderEmpty}
@@ -207,27 +204,25 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
 
 export const NestedVoteList = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
-    borderRadius: token.borderRadiusLG,
-    background: token.colorBgSecondary,
+    maxHeight: 480,
+    display: 'flex',
+    flexDirection: 'column',
+
+    '.list-items': {
+      overflowY: 'auto'
+    },
 
     '.vote-item': {
       borderRadius: token.borderRadiusLG,
+      background: token.colorBgSecondary,
       paddingBottom: token.paddingXS,
       paddingTop: token.paddingXS,
       marginBottom: token.marginXS
     },
 
     '.__search-box': {
-      position: 'sticky',
-      top: 0,
-      zIndex: 10,
-      background: token.colorBgSecondary,
       paddingTop: token.paddingXS,
       paddingBottom: token.paddingXS
-    },
-
-    '.vote-item:first-child': {
-      marginTop: token.marginXS
     },
 
     '.vote-item__address-wrapper': {
@@ -282,7 +277,8 @@ export const NestedVoteList = styled(forwardRef(Component))<Props>(({ theme: { t
       minWidth: '40px',
       display: 'flex',
       justifyContent: 'center',
-      marginLeft: token.marginXXS
+      marginLeft: token.marginXXS,
+      color: token.colorTextLight3
     },
 
     '.vote-item__arrow': {
