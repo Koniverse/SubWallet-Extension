@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 1.3.58
+Build date: Sep 19, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.115 (#4668)
+  - Add XCM support for teleporting KSM between encointer-kusama and asset-hub-kusama
+  - Add block explorer only for when users want to view transaction details
+  - Fixed bug do not show HOLLAR balance
+  - Remove USDC.wh token (Moonbeam)
+  - ...
+
+Bug fixes:
+- Fixed bug Show incorrect amount when transfer max (#4462)
+
+
 ## 1.3.57
 Build date: Sep 17, 2025.
 
