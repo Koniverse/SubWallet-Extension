@@ -707,13 +707,15 @@ export function getRelayEraRewardMap (eraRewardPointArray: Codec[], startEraForP
   return eraRewardMap;
 }
 
-export async function getRelayMaxNominations (substrateApi: _SubstrateApi) {
+export async function getRelayMaxNominations (substrateApi: _SubstrateApi, chain: string) {
   await substrateApi.isReady;
-  const maxNominations = substrateApi.api.consts.staking?.maxNominations?.toString() || '16';
-  const _maxNominationsByNominationQuota = await substrateApi.api.call.stakingApi?.nominationsQuota(0); // todo: review param. Currently return constant for all param.
+  const maxNominations = substrateApi.api.consts.staking?.maxNominations?.toString();
+  const _maxNominationsByNominationQuota = await substrateApi.api.call.stakingApi?.nominationsQuota(0);
   const maxNominationsByNominationQuota = _maxNominationsByNominationQuota?.toString();
 
-  return maxNominationsByNominationQuota || maxNominations;
+  const fallbackMaxNominations = ['zkverify_testnet', 'zkverify'].includes(chain) ? '10' : '16';
+
+  return maxNominationsByNominationQuota || maxNominations || fallbackMaxNominations;
 }
 
 export const getMinStakeErrorMessage = (chainInfo: _ChainInfo, bnMinStake: BN): string => {
