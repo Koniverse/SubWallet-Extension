@@ -10,14 +10,13 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, RequestEarningSlippage, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, RequestEarningSlippage, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
 import { BN, BN_ZERO } from '@polkadot/util';
 
-import { calculateReward } from '../../utils';
 import { BittensorCache, TaoStakeInfo } from './tao';
 
 export interface SubnetData {
@@ -35,10 +34,6 @@ interface TaoStakingStakeOption {
   amount: string;
   rate?: BigN;
   identity?: string
-}
-
-interface Hotkey {
-  ss58: string;
 }
 
 export interface RawDelegateState {
@@ -197,7 +192,8 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: false,
-    claimReward: false
+    claimReward: false,
+    changeValidator: true
   };
 
   constructor (state: KoniState, chain: string) {
@@ -596,38 +592,46 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     }) as unknown as ValidatorInfo);
   }
 
-  private async getMainnetPoolTargets (): Promise<ValidatorInfo[]> {
+  private async getMainnetPoolTargets (netuid: number): Promise<ValidatorInfo[]> {
     const _topValidator = await this.bittensorCache.get();
 
-    const topValidator = _topValidator as unknown as Record<string, Record<string, Record<string, string>>>;
+    const topValidator = _topValidator;
     const bnMinBond = new BigN(DEFAULT_DTAO_MINBOND);
     const validatorList = topValidator.data;
-    const validatorAddresses = Object.keys(validatorList);
+    const aprResponse = await this.bittensorCache.fetchApr(netuid);
+
+    const aprMap: Record<string, string> = {};
+
+    aprResponse.data.forEach((item) => {
+      aprMap[item.hotkey.ss58] = item.thirty_day_apy;
+    });
 
     const results = await Promise.all(
-      validatorAddresses.map((i) => {
-        const address = (validatorList[i].hotkey as unknown as Hotkey).ss58;
-        const bnTotalStake = new BigN(validatorList[i].stake);
-        const bnOwnStake = new BigN(validatorList[i].validator_stake);
-        const otherStake = bnTotalStake.minus(bnOwnStake);
-        const nominatorCount = validatorList[i].nominators;
-        const commission = validatorList[i].take;
+      validatorList.map((validator) => {
+        const address = validator.hotkey.ss58;
+        // With bittensor we use total weight, root weight and alpha staked insted of total stake, own stake and other stake
+        const bnTotalWeightStake = new BigN(validator.global_weighted_stake);
+        const bnRootWeightStake = new BigN(validator.weighted_root_stake);
+        const bnAlphaStake = new BigN(validator.global_alpha_stake_as_tao);
+
+        const nominatorCount = validator.global_nominators;
+        const commission = validator.take;
         const roundedCommission = (parseFloat(commission) * 100).toFixed(0);
 
-        const apr = ((parseFloat(validatorList[i].apr) / 10 ** 9) * 100).toFixed(2);
-        const apyCalculate = calculateReward(parseFloat(apr));
+        const apr = aprMap[address];
+        const expectedReturn = apr ? new BigN(apr).multipliedBy(100).toFixed(2) : '0';
 
-        const name = validatorList[i].name || address;
+        const name = validator.name || address;
 
         return {
           address: address,
-          totalStake: bnTotalStake.toString(),
-          ownStake: bnOwnStake.toString(),
-          otherStake: otherStake.toString(),
+          totalStake: bnTotalWeightStake.toString(),
+          ownStake: bnRootWeightStake.toString(),
+          otherStake: bnAlphaStake.toString(),
           minBond: bnMinBond.toString(),
           nominatorCount: nominatorCount,
           commission: roundedCommission,
-          expectedReturn: apyCalculate.apy,
+          expectedReturn: expectedReturn,
           blocked: false,
           isVerified: false,
           chain: this.chain,
@@ -636,15 +640,14 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
         } as unknown as ValidatorInfo;
       })
     );
-
     return results;
   }
 
-  async getPoolTargets (): Promise<ValidatorInfo[]> {
+  async getPoolTargets (netuid: number): Promise<ValidatorInfo[]> {
     await this.init();
 
     if (this.chain === 'bittensor') {
-      return this.getMainnetPoolTargets();
+      return this.getMainnetPoolTargets(netuid);
     } else {
       return this.getDevnetPoolTargets();
     }
@@ -656,6 +659,11 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
 
   async createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo, bondDest = 'Staked'): Promise<[TransactionData, YieldTokenBaseInfo]> {
     const { amount, selectedValidators: targetValidators, subnetData } = data;
+
+    if (!subnetData) {
+      throw new Error(BasicTxErrorType.INVALID_PARAMS);
+    }
+
     const { netuid, slippage } = subnetData;
 
     const chainApi = await this.substrateApi.isReady;
@@ -665,6 +673,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     const limitPrice = alphaToTaoPrice.multipliedBy(10 ** _getAssetDecimals(this.nativeToken)).multipliedBy(1 + (slippage || DEFAULT_BITTENSOR_SLIPPAGE));
 
     const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
+    // Bittensor only supports changing 1 validator at a time, not multiple
 
     const selectedValidatorInfo = targetValidators[0];
     const hotkey = selectedValidatorInfo.address;
@@ -674,6 +683,7 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
     return [extrinsic, { slug: this.nativeToken.slug, amount: '0' }];
   }
 
+  // Validate for case stake more
   public override async validateYieldJoin (data: SubmitJoinNativeStaking, path: OptimalYieldPath): Promise<TransactionError[]> {
     const baseErrors = await super.validateYieldJoin(data, path);
 
@@ -736,4 +746,48 @@ export default class SubnetTaoStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   /* Leave pool action */
+
+  /* Change validator */
+  override async handleChangeEarningValidator (data: SubmitBittensorChangeValidatorStaking): Promise<TransactionData> {
+    const chainApi = await this.substrateApi.isReady;
+    const { amount, maxAmount, metadata, originValidator, selectedValidators: targetValidators, subnetData } = data;
+
+    if (!subnetData || !originValidator) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
+    }
+
+    const { netuid } = subnetData;
+    const selectedValidatorInfo = targetValidators[0];
+    const destValidator = selectedValidatorInfo.address;
+
+    if (new BigN(amount).lte(0)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount must be greater than 0')));
+    }
+
+    if (originValidator === destValidator) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'From validator is the same with to validator'));
+    }
+
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid || 0));
+    const minUnstake = new BigN(DEFAULT_DTAO_MINBOND).dividedBy(alphaToTaoPrice);
+
+    const formattedMinUnstake = minUnstake.dividedBy(1000000).integerValue(BigN.ROUND_CEIL).dividedBy(1000);
+
+    const bnMinUnstake = formattedMinUnstake.multipliedBy(10 ** _getAssetDecimals(this.nativeToken));
+
+    if (new BigN(maxAmount).lt(bnMinUnstake)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t(`Amount too low. You need to move at least ${formattedMinUnstake.toString()} ${metadata?.subnetSymbol || ''}`)));
+    }
+
+    // Avoid remaining amount too low -> can't do anything with that amount
+    if (!(maxAmount === amount) && new BigN(maxAmount).minus(new BigN(amount)).lt(bnMinUnstake)) {
+      return Promise.reject(new TransactionError(StakingTxErrorType.REMAINING_AMOUNT_TOO_LOW,
+        t(`Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit "Move all" to move all ${formatNumber(maxAmount, _getAssetDecimals(this.nativeToken))} ${metadata?.subnetSymbol || ''} to the new validator, or "Cancel" and lower the amount, then try again`
+        )));
+    }
+
+    const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, netuid, netuid, amount);
+
+    return extrinsic;
+  }
 }

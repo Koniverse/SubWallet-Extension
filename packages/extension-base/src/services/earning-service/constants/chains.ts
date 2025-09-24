@@ -37,3 +37,4 @@ export const STAKING_IDENTITY_API_SLUG: Record<string, string> = {
   polkadot: 'polkadot_people',
   kusama: 'peopleKusama'
 };
+export const _SUPPORT_CHANGE_VALIDATOR_CHAIN = ['polkadot', 'kusama'];

@@ -177,8 +177,9 @@ const NATIVE_STAKE_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.STAKING_WITHDRAW,
   // ExtrinsicType.STAKING_COMPOUNDING,
   // ExtrinsicType.STAKING_CANCEL_COMPOUNDING,
-  ExtrinsicType.STAKING_CANCEL_UNSTAKE
-];
+  ExtrinsicType.STAKING_CANCEL_UNSTAKE,
+  ExtrinsicType.CHANGE_EARNING_VALIDATOR
+];;
 
 const POOL_STAKE_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.STAKING_JOIN_POOL,
@@ -519,9 +520,9 @@ export const convertAccountProxyType = (accountSignMode: AccountSignMode): Accou
       return AccountProxyType.ALL_ACCOUNT;
     case AccountSignMode.UNKNOWN:
       return AccountProxyType.UNKNOWN;
+    default:
+      return AccountProxyType.UNKNOWN;
   }
-
-  return AccountProxyType.UNKNOWN;
 };
 
 export const _combineAccounts = (accounts: AccountJson[], modifyPairs: ModifyPairStoreData, accountProxies: AccountProxyStoreData) => {
