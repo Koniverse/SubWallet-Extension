@@ -37,6 +37,10 @@ export default class NominationPoolHandler extends BasePoolHandler {
     changeValidator: false
   };
 
+  static generateSlug (symbol: string, chain: string): string {
+    return `${symbol}___nomination_pool___${chain}`;
+  }
+
   constructor (state: KoniState, chain: string) {
     super(state, chain);
 
