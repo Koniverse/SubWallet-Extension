@@ -914,6 +914,19 @@ export default class TransactionService {
         break;
       }
 
+      case ExtrinsicType.CHANGE_EARNING_VALIDATOR: {
+        const data = parseTransactionData<ExtrinsicType.CHANGE_EARNING_VALIDATOR>(transaction.data) as SubmitBittensorChangeValidatorStaking;
+
+        historyItem.additionalInfo = {
+          symbol: data.metadata?.subnetSymbol || ''
+        };
+
+        if (data.amount !== '0') {
+          historyItem.amount = { ...baseNativeAmount, value: data.amount };
+        }
+
+        break;
+      }
 
       case ExtrinsicType.EVM_EXECUTE: {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

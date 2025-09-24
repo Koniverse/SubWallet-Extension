@@ -13,17 +13,41 @@ import MythosNativeStakingPoolHandler from '@subwallet/extension-base/services/e
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
-import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningSlippage, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, SubmitChangeValidatorStaking, TransactionData, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import {
+  BasicTxErrorType,
+  EarningRewardHistoryItem,
+  EarningRewardItem,
+  EarningRewardJson,
+  HandleYieldStepData,
+  HandleYieldStepParams,
+  OptimalYieldPath,
+  OptimalYieldPathParams,
+  RequestEarlyValidateYield,
+  RequestEarningImpact,
+  RequestStakeCancelWithdrawal,
+  RequestStakeClaimReward,
+  RequestYieldLeave,
+  RequestYieldWithdrawal,
+  ResponseEarlyValidateYield,
+  SubmitChangeValidatorStaking,
+  TransactionData,
+  ValidateYieldProcessParams,
+  ValidatorInfo,
+  YieldPoolInfo,
+  YieldPoolTarget,
+  YieldPoolType,
+  YieldPositionInfo
+} from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 
-import { EarningSlippageResult } from './handlers/native-staking/dtao';
+import { EarningImpactResult } from './handlers/native-staking/dtao';
 import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, SubnetTaoStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
 
 type PoolTargetsFetchingCached = Record<string, Record<string, YieldPoolTarget>>;
 
-const fetchPoolsData = async () => {
+export const fetchPoolsData = async () => {
   const fetchData = await fetchStaticCache<{data: Record<string, YieldPoolInfo>}>('earning/yield-pools.json', { data: {} });
 
   return fetchData.data;
@@ -1183,14 +1207,14 @@ export default class EarningService implements StoppableServiceInterface, Persis
     }
   }
 
-  public async yieldGetEarningSlippage (params: RequestEarningSlippage): Promise<EarningSlippageResult> {
+  public async yieldGetEarningImpact (params: RequestEarningImpact): Promise<EarningImpactResult> {
     await this.eventService.waitChainReady;
 
     const { slug } = params;
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
-      return handler.getEarningSlippage(params);
+      return handler.getEarningImpact(params);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }

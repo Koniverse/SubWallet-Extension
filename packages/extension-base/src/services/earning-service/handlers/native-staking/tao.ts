@@ -18,7 +18,6 @@ import { t } from 'i18next';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 
 import { BN, BN_ZERO } from '@polkadot/util';
-import { TestnetBittensorDelegateInfo } from './dtao';
 
 import { fetchPoolsData } from '../../service';
 
@@ -568,11 +567,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       cancel = true;
       clearInterval(intervalId);
     };
-  }
-
-  // Because not have subscan api
-  override async checkAccountHaveStake (useAddresses: string[]): Promise<string[]> {
-    return Promise.resolve([]);
   }
 
   /* Subscribe pool position */
