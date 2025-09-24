@@ -5,14 +5,14 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { GovVoteType, RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
-import { AccountAddressSelector, HiddenInput } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useDefaultNavigate, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleRemoveVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { useGovReferendumVotes } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView/useGovReferendumVotes';
 import { FormCallbacks, FormFieldData, GovReferendumUnvoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
-import { Button, Form, Icon, Number } from '@subwallet/react-ui';
+import { Button, Form, Icon } from '@subwallet/react-ui';
 import BigNumber from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle, XCircle } from 'phosphor-react';
@@ -22,7 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { TransactionContent, TransactionFooter } from '../../parts';
+import { FreeBalance, TransactionContent, TransactionFooter } from '../../parts';
 
 type WrapperProps = ThemeProps;
 
@@ -47,6 +47,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const referendumId = defaultData.referendumId;
+  const [isBalanceReady, setIsBalanceReady] = useState(true);
 
   const onPreCheck = usePreCheckAction(fromValue);
   const { onError, onSuccess } = useHandleSubmitTransaction();
@@ -212,17 +213,27 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             />
           </Form.Item>
         </Form>
-        <div className='__total-amount-part'>
-          <div>{t('Amount')}
-          </div>
-          <div>
-            <Number
-              decimal={decimals}
-              suffix={symbol}
-              value={totalAmount}
-            />
-          </div>
-        </div>
+        <FreeBalance
+          address={fromValue}
+          chain={chainValue}
+          className={'free-balance'}
+          label={t('Available balance')}
+          onBalanceReady={setIsBalanceReady}
+        />
+        <MetaInfo
+          hasBackgroundWrapper={true}
+          labelColorScheme='gray'
+          labelFontWeight='regular'
+          spaceSize='sm'
+          valueColorScheme='light'
+        >
+          <MetaInfo.Number
+            decimals={decimals}
+            label={'Amount'}
+            suffix={symbol || undefined}
+            value={totalAmount || '0'}
+          />
+        </MetaInfo>
       </TransactionContent>
 
       <TransactionFooter className={`${className} -transaction-footer`}>
@@ -241,7 +252,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         </Button>
 
         <Button
-          disabled={isDisable}
+          disabled={isDisable || !isBalanceReady}
           icon={(
             <Icon
               phosphorIcon={CheckCircle}
@@ -299,15 +310,8 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
 const ReferendumUnvote = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return {
-    '.__total-amount-part': {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '0px 12px',
-      borderRadius: token.borderRadiusLG,
-      backgroundColor: token.colorBgSecondary,
-      marginTop: token.sizeSM,
-      fontSize: token.fontSizeHeading6
+    '.free-balance': {
+      marginBottom: 12
     }
   };
 });

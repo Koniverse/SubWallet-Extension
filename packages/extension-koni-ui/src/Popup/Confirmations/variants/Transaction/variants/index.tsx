@@ -20,6 +20,7 @@ export { default as SwapTransactionConfirmation } from './Swap';
 export { default as ChangeEarningValidatorTransactionConfirmation } from './ChangeEarningValidator';
 export { default as GovVoteTransactionConfirmation } from './GovVote';
 export { default as GovUnvoteTransactionConfirmation } from './GovUnvote';
+export { default as VoteMetaInfo } from './VoteMap';
 
 export * from './TransferBlock';
 export * from './Process';

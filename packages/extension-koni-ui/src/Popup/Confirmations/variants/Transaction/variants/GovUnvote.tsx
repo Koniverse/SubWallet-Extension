@@ -5,6 +5,7 @@ import { RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/i
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { VoteMetaInfo } from '@subwallet/extension-koni-ui/Popup/Confirmations/variants/Transaction/variants/index';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Number } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -30,7 +31,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
 
   return (
     <div className={CN(className)}>
-      <div>{data.type}</div>
+      <VoteMetaInfo type={data.type} />
       <Number
         className={'__voted-amount'}
         decimal={decimals}
