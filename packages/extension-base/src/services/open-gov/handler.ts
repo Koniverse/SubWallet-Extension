@@ -210,10 +210,6 @@ export default abstract class BaseOpenGovHandler {
 
     const bnBalance = new BigN(balance);
 
-    if (bnBalance.lte(0)) {
-      return new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0');
-    }
-
     if (bnBalance.gt(totalBalance.value)) {
       const chainAsset = this.state.chainService.getNativeTokenInfo(this.chain);
       const maxString = formatNumber(totalBalance.value, _getAssetDecimals(chainAsset));
@@ -249,10 +245,6 @@ export default abstract class BaseOpenGovHandler {
     }
 
     const total = values.reduce((acc, val) => acc.plus(val), new BigN(0));
-
-    if (total.lte(0)) {
-      return new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Total amount must be greater than 0');
-    }
 
     const transferableBalance = await this.state.balanceService.getTransferableBalance(address, this.chain);
 

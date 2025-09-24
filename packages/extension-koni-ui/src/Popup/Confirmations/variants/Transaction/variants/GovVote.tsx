@@ -3,7 +3,8 @@
 
 import { govConvictionOptions, GovVoteRequest, GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxyAvatar, MetaInfo, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyAvatar, MetaInfo, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
+import { VoteAmountDetailProps } from '@subwallet/extension-koni-ui/components/Governance/VoteAmountDetail';
 import { useGetAccountByAddress, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -20,12 +21,6 @@ export interface BaseTransactionConfirmationProps extends ThemeProps {
   transaction: SWTransactionResult;
   openAlert: (alertProps: AlertDialogProps) => void;
   closeAlert: VoidFunction;
-}
-
-interface AmountDetail {
-  abstainAmount?: string;
-  ayeAmount?: string;
-  nayAmount?: string;
 }
 
 const VoteAmountDetailModalId = 'vote-amount-detail-modal';
@@ -59,7 +54,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
     }
   }, [data]);
 
-  const amountDetail = useMemo<AmountDetail>(() => {
+  const amountDetail = useMemo<VoteAmountDetailProps>(() => {
     switch (data.type) {
       case GovVoteType.AYE:
         return { ayeAmount: data.amount };
@@ -242,73 +237,12 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         onCancel={onCancel}
         title={t('Vote amount details')}
       >
-        <MetaInfo
-          hasBackgroundWrapper
-        >
-          {
-            amountDetail.ayeAmount != null && (
-              <div className={'__amount-detail-item'}>
-                <VoteTypeLabel
-                  type={GovVoteType.AYE}
-                />
-                <Number
-                  className={'__vote-amount-value'}
-                  decimal={decimals}
-                  decimalOpacity={0.45}
-                  formatType={'balance'}
-                  intOpacity={0.85}
-                  size={14}
-                  suffix={symbol}
-                  unitOpacity={0.85}
-                  value={amountDetail.ayeAmount}
-                  weight={500}
-                />
-              </div>
-            )
-          }
-          {
-            amountDetail.nayAmount != null && (
-              <div className={'__amount-detail-item'}>
-                <VoteTypeLabel
-                  type={GovVoteType.NAY}
-                />
-                <Number
-                  className={'__vote-amount-value'}
-                  decimal={decimals}
-                  decimalOpacity={0.45}
-                  formatType={'balance'}
-                  intOpacity={0.85}
-                  size={14}
-                  suffix={symbol}
-                  unitOpacity={0.85}
-                  value={amountDetail.nayAmount}
-                  weight={500}
-                />
-              </div>
-            )
-          }
-          {
-            amountDetail.abstainAmount != null && (
-              <div className={'__amount-detail-item'}>
-                <VoteTypeLabel
-                  type={GovVoteType.ABSTAIN}
-                />
-                <Number
-                  className={'__vote-amount-value'}
-                  decimal={decimals}
-                  decimalOpacity={0.45}
-                  formatType={'balance'}
-                  intOpacity={0.85}
-                  size={14}
-                  suffix={symbol}
-                  unitOpacity={0.85}
-                  value={amountDetail.abstainAmount}
-                  weight={500}
-                />
-              </div>
-            )
-          }
-        </MetaInfo>
+        <VoteAmountDetail
+          amountDetail={amountDetail}
+          decimals={decimals}
+
+          symbol={symbol}
+        />
       </SwModal>
     </div>
   );
@@ -361,20 +295,6 @@ const GovVoteTransactionConfirmation = styled(Component)<BaseTransactionConfirma
 
     '.address-field': {
       whiteSpace: 'nowrap'
-    },
-
-    '.ant-sw-modal-body': {
-      '.meta-info-block': {
-        padding: 0
-      }
-    },
-
-    '.__amount-detail-item': {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingInline: token.paddingSM,
-      paddingBlock: token.paddingSM + 2
     }
   };
 });

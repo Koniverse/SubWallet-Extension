@@ -222,6 +222,8 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
         return '/home/earning';
       case 'send-nft':
         return '/home/nfts/collections';
+      case 'gov-ref-vote':
+        return '/home/governance';
       case 'send-fund':
       default:
         return '/home/tokens';

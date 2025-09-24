@@ -17,16 +17,14 @@ type WrapperProps = ThemeProps;
 type ComponentProps = {
   className?: string;
   assetInfo?: _ChainAsset;
-  govLockedValue: SwNumberProps['value'];
+  govLockedValue?: SwNumberProps['value'];
   allLockedValue?: SwNumberProps['value'];
   onReuseGovLockedValue?: (value: SwNumberProps['value']) => void;
   onReuseAllLockedValue?: (value: SwNumberProps['value']) => void;
 };
 
-const Component = ({ allLockedValue, assetInfo, className, govLockedValue, onReuseAllLockedValue, onReuseGovLockedValue }: ComponentProps): React.ReactElement<ComponentProps> => {
+const Component = ({ allLockedValue = 0, assetInfo, className, govLockedValue = 0, onReuseAllLockedValue, onReuseGovLockedValue }: ComponentProps): React.ReactElement<ComponentProps> => {
   const { t } = useTranslation();
-
-  const isAllLockedValueButtonVisible = !!(onReuseGovLockedValue && onReuseAllLockedValue);
 
   const reuseGovLockedValue = useCallback(() => {
     onReuseGovLockedValue?.(govLockedValue);
@@ -50,29 +48,27 @@ const Component = ({ allLockedValue, assetInfo, className, govLockedValue, onReu
           <NumberDisplay
             className={'__action-button-balance-value'}
             decimal={_getAssetDecimals(assetInfo)}
-            suffix={_getAssetSymbol(assetInfo) || 'DOT'}
-            value={govLockedValue || '0'}
+            suffix={_getAssetSymbol(assetInfo)}
+            value={govLockedValue}
           />
         </button>
 
         {
-          isAllLockedValueButtonVisible && (
-            <button
-              className={'__action-button __all-locked-value-button'}
-              onClick={reuseAllLockedValue}
-            >
-              <span className='__action-button-label'>
-                {t('Reuse all locks')}:
-              </span>
+          <button
+            className={'__action-button __all-locked-value-button'}
+            onClick={reuseAllLockedValue}
+          >
+            <span className='__action-button-label'>
+              {t('Reuse all locks')}:
+            </span>
 
-              <NumberDisplay
-                className={'__action-button-balance-value'}
-                decimal={_getAssetDecimals(assetInfo)}
-                suffix={_getAssetSymbol(assetInfo) || 'DOT'}
-                value={allLockedValue || '100'}
-              />
-            </button>
-          )
+            <NumberDisplay
+              className={'__action-button-balance-value'}
+              decimal={_getAssetDecimals(assetInfo)}
+              suffix={_getAssetSymbol(assetInfo)}
+              value={allLockedValue}
+            />
+          </button>
         }
       </ScrollContainer>
     </div>

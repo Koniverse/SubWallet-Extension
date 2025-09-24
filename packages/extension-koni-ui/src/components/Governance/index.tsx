@@ -5,5 +5,6 @@ export { default as ReferendumItem } from './ReferendumItem';
 export { default as ReferendumStatusTag } from './ReferendumStatusTag';
 export { default as ReferendumTrackTag } from './ReferendumTrackTag';
 export { default as ReferendumVoteProgressBar } from './ReferendumVoteProgressBar';
-export { default as VoteTypeLabel } from './VoteTypeLabel';
+export { default as VoteAmountDetail } from './VoteAmountDetail';
 export { default as ReferendumVoteSummary } from './ReferendumVoteSummary';
+export { default as VoteTypeLabel } from './VoteTypeLabel';
