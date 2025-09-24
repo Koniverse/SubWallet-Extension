@@ -25,7 +25,7 @@ import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { TransactionContent, TransactionFooter } from '../../../parts';
-import { VoteButton } from './parts/VoteButton';
+import { VoteButton } from '../parts/VoteButton';
 
 type WrapperProps = ThemeProps;
 
@@ -454,23 +454,23 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             disabled={isDisable}
             loading={loading}
             onClick={onPreCheck(handleClickNay, ExtrinsicType.GOV_VOTE)}
-            type={'nay'}
+            type={GovVoteType.NAY}
           />
           <VoteButton
             loading={loading}
             onClick={goRefAbstainVote}
-            type={'abstain'}
+            type={GovVoteType.ABSTAIN}
           />
           <VoteButton
             loading={loading}
             onClick={goRefSplitVote}
-            type={'split'}
+            type={GovVoteType.SPLIT}
           />
           <VoteButton
             disabled={isDisable}
             loading={loading}
             onClick={onPreCheck(handleClickAye, ExtrinsicType.GOV_VOTE)}
-            type={'aye'}
+            type={GovVoteType.AYE}
           />
         </div>
       </TransactionFooter>
