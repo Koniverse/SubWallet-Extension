@@ -240,6 +240,23 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
     return result;
   }, [t]);
 
+  const showHeader = useMemo(() => {
+    const pathName = location.pathname;
+    const action = pathName.split('/')[2] || '';
+
+    if (action === 'gov-ref-vote') {
+      const voteType = pathName.split('/')[3] || '';
+
+      if (voteType === 'abstain' || voteType === 'split') {
+        return false;
+      }
+    } else if (action === 'gov-ref-unvote') {
+      return false;
+    }
+
+    return true;
+  }, [location.pathname]);
+
   useNavigateOnChangeAccount(homePath);
 
   const goBack = useCallback(() => {
@@ -373,6 +390,7 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
       <Layout.Home
         isDisableHeader={isDisableHeader}
         showFaderIcon
+        showHeader={showHeader}
         showTabBar={false}
       >
         <TransactionContext.Provider value={contextValues}>
