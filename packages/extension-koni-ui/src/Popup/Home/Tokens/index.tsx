@@ -732,7 +732,7 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
         top: 0,
         left: 0,
         right: 0,
-        height: 180,
+        height: 256,
         backgroundImage: extendToken.tokensScreenSuccessBackgroundColor,
         display: 'block',
         zIndex: 1
@@ -747,7 +747,7 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
         paddingBottom: 8,
 
         '&:before': {
-          height: 80
+          height: 144
         }
       }
     },
