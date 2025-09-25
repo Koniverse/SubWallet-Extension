@@ -5,15 +5,10 @@ import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interfa
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import VoteTypeLabel from '@subwallet/extension-koni-ui/components/Governance/VoteTypeLabel';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
 import { Number } from '@subwallet/react-ui';
 import React from 'react';
 import styled from 'styled-components';
-
-export type VoteAmountDetailProps = {
-  abstainAmount?: string;
-  ayeAmount?: string;
-  nayAmount?: string;
-}
 
 type Props = ThemeProps & {
   amountDetail: VoteAmountDetailProps;

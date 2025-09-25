@@ -4,10 +4,10 @@
 import { govConvictionOptions, GovVoteRequest, GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxyAvatar, MetaInfo, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
-import { VoteAmountDetailProps } from '@subwallet/extension-koni-ui/components/Governance/VoteAmountDetail';
 import { useGetAccountByAddress, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext, Number, SwModal } from '@subwallet/react-ui';
 import BigNumber from 'bignumber.js';

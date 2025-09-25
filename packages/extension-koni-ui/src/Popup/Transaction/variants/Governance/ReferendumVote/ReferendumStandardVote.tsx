@@ -7,7 +7,6 @@ import { govConvictionOptions, GovVoteType, StandardVoteRequest } from '@subwall
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, GovAmountInput, GovVoteConvictionSlider, HiddenInput, MetaInfo, NumberDisplay, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
-import { VoteAmountDetailProps } from '@subwallet/extension-koni-ui/components/Governance/VoteAmountDetail';
 import { DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_UNVOTE_TRANSACTION, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useDefaultNavigate, useGetAccountTokenBalance, useGetGovLockedInfos, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
@@ -15,8 +14,9 @@ import { ReuseLockedBalance } from '@subwallet/extension-koni-ui/Popup/Transacti
 import { VoteButton } from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/parts/VoteButton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
+import { GovAccountAddressItemType, GovVoteStatus, PreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils';
+import { getPreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/utils/gov';
 import { ButtonProps, Form, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
 import BigN, { BigNumber } from 'bignumber.js';
@@ -37,8 +37,6 @@ type ComponentProps = {
   targetAccountProxy: AccountProxy;
   isAllAccount?: boolean
 };
-
-type PreviousVoteAmountDetail = VoteAmountDetailProps & { type: GovVoteType }
 
 const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId', 'fromAccountProxy', 'track'];
 
@@ -319,38 +317,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     return voteMap.get(fromValue.toLowerCase());
   }, [voteMap, fromValue]);
 
-  const previousVoteAmountDetail = useMemo<PreviousVoteAmountDetail | undefined>(() => {
-    if (voteInfo) {
-      if (voteInfo.isStandard) {
-        if (voteInfo.aye) {
-          return {
-            ayeAmount: voteInfo.balance,
-            type: GovVoteType.AYE
-          };
-        } else {
-          return {
-            nayAmount: voteInfo.balance,
-            type: GovVoteType.NAY
-          };
-        }
-      } else if (voteInfo.isSplit) {
-        return {
-          ayeAmount: voteInfo.ayeBalance,
-          nayAmount: voteInfo.nayBalance,
-          type: GovVoteType.SPLIT
-        };
-      } else {
-        return {
-          ayeAmount: voteInfo.ayeBalance,
-          nayAmount: voteInfo.nayBalance,
-          abstainAmount: voteInfo.abstainBalance,
-          type: GovVoteType.ABSTAIN
-        };
-      }
-    }
-
-    return undefined;
-  }, [voteInfo]);
+  const previousVoteAmountDetail = useMemo<PreviousVoteAmountDetail | undefined>(() => getPreviousVoteAmountDetail(voteInfo), [voteInfo]);
 
   useEffect(() => {
     if (voteInfo?.isStandard) {
@@ -497,7 +464,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               valueColorScheme={'light'}
             >
               <MetaInfo.Default
-                label={'Lock duration'}
+                label={t('Lock duration')}
               >
                 {voteInfo?.conviction !== undefined
                   ? (
@@ -521,7 +488,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
                         decimal={_getAssetDecimals(assetInfo)}
                         value={governanceLock.from}
                       />
-                      <span className={'governance-lock-trans'}>&nbsp;🡢&nbsp;</span>
+                      <span className={'governance-lock-trans'}>&nbsp;→&nbsp;</span>
                     </>
                   )
                 }
