@@ -167,8 +167,10 @@ function Component (): React.ReactElement {
 
     Object.values(tokens).forEach((item) => {
       if (!allowedChains.includes(item.network) || !slugs.includes(item.slug) || excludedTokens.includes(item.slug)) {
-        result.push(item);
+        return;
       }
+
+      result.push(item);
     });
 
     return result;
