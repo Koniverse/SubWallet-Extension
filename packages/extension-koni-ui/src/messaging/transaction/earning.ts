@@ -62,5 +62,5 @@ export async function yieldSubmitRedeem (data: RequestYieldFastWithdrawal) {
 // Calculate actual subnet slippage
 
 export async function getEarningSlippage (data: RequestEarningSlippage) {
-  return sendMessage('pri(yield.getEarningSlippage)', data);
+  return sendMessage('pri(yield.getEarningImpact)', data);
 }
