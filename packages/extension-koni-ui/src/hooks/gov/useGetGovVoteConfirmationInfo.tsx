@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getAssetDecimals, _getAssetPriceId, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
-import { balanceFormatter, BN_ZERO, formatNumber, isSameAddress } from '@subwallet/extension-base/utils';
+import { BN_ZERO, isSameAddress } from '@subwallet/extension-base/utils';
 import { useGetAccountByAddress, useGetAccountTokenBalance, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { getConvertedBalanceValue } from '@subwallet/extension-koni-ui/hooks/screen/home/useAccountBalance';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -10,8 +10,8 @@ import { BigNumber } from 'bignumber.js';
 import { useMemo } from 'react';
 
 interface BalanceChange {
-  from: string;
-  to?: string;
+  from?: BigNumber;
+  to: BigNumber;
 }
 
 interface GovLockedInfoConfirmation {
@@ -79,24 +79,27 @@ const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, trans
     const currentAllLocked = balanceInfo.locked.value.shiftedBy(decimals);
     const currentGovernanceLock = new BigNumber(currentGovInfo?.summary.totalLocked || 0);
 
-    const transferableFrom = formatNumber(currentTransferable, decimals, balanceFormatter);
-    const governanceLockFrom = formatNumber(currentGovernanceLock, decimals, balanceFormatter);
     const convertedAmount = getConvertedBalanceValue(amount.shiftedBy(-decimals), priceMap[priceId]).toString();
 
     const govLockedInfo: GovLockedInfoConfirmation = {
-      transferable: { from: transferableFrom },
-      governanceLock: { from: governanceLockFrom },
+      transferable: { to: currentTransferable, from: currentTransferable },
+      governanceLock: { to: currentGovernanceLock },
       convertedAmount
     };
 
     if (isUnVote) {
       // If it's an unvote and the amount to lock is greater than the current governance lock,
       // we need to set the governance lock to 0
-      govLockedInfo.governanceLock.to = formatNumber(BN_ZERO, decimals, balanceFormatter);
+      govLockedInfo.governanceLock.to = BN_ZERO;
+      govLockedInfo.governanceLock.from = currentGovernanceLock;
     } else if (amount.gt(currentGovernanceLock)) {
       // If the amount to lock is greater than the current governance lock,
       // we need to increase the governance lock to the amount
-      govLockedInfo.governanceLock.to = formatNumber(amount, decimals, balanceFormatter);
+      govLockedInfo.governanceLock.to = amount;
+
+      if (currentGovInfo && currentGovInfo.tracks.length > 0) {
+        govLockedInfo.governanceLock.from = currentGovernanceLock;
+      }
     }
 
     let transferableAfterLock = currentTransferable.minus(transactionFee || BN_ZERO);
@@ -112,10 +115,10 @@ const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, trans
       transferableAfterLock = transferableAfterLock.minus(difference);
     }
 
-    govLockedInfo.transferable.to = formatNumber(BigNumber.max(transferableAfterLock, BN_ZERO), decimals, balanceFormatter);
+    govLockedInfo.transferable.to = BigNumber.max(transferableAfterLock, BN_ZERO);
 
     return govLockedInfo;
-  }, [amount, assetInfo, balanceInfo, currentGovInfo?.summary.totalLocked, isUnVote, priceMap, transactionFee]);
+  }, [amount, assetInfo, balanceInfo, currentGovInfo, isUnVote, priceMap, transactionFee]);
 };
 
 export default useGetGovVoteConfirmationInfo;

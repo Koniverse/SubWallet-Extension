@@ -1,9 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { govConvictionOptions, GovVoteRequest, GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxyAvatar, MetaInfo, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyAvatar, MetaInfo, NumberDisplay, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -90,38 +91,6 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
     return govConvictionOptions.find((c) => c.value === data.conviction) || { label: '-', description: '-' };
   }, [data.conviction]);
 
-  const govTransferableContent = useMemo(() => {
-    if (govConfirmationInfo?.transferable) {
-      const { from, to } = govConfirmationInfo.transferable;
-
-      if (to) {
-        return `${from} → ${to}`;
-      }
-
-      return from;
-    }
-
-    return null;
-  }, [govConfirmationInfo?.transferable]);
-
-  const governanceLockContent = useMemo(() => {
-    if (govConfirmationInfo?.governanceLock) {
-      const { from, to } = govConfirmationInfo.governanceLock;
-
-      if (to) {
-        if (from === '0') {
-          return to;
-        }
-
-        return `${from} → ${to}`;
-      }
-
-      return from;
-    }
-
-    return null;
-  }, [govConfirmationInfo?.governanceLock]);
-
   const onCancel = useCallback(() => {
     inactiveModal(VoteAmountDetailModalId);
   }, [inactiveModal]);
@@ -206,18 +175,56 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         className={'__meta-info'}
         hasBackgroundWrapper
       >
-        {govTransferableContent &&
-          <MetaInfo.Default
-            label={t('Transferable')}
-          >
-            {govTransferableContent}
-          </MetaInfo.Default>
+        {govConfirmationInfo &&
+          <>
+            <MetaInfo.Default
+              className={'governance-value-info'}
+              label={t('Transferable')}
+            >
+              {
+                !!govConfirmationInfo?.transferable.from && (
+                  <>
+                    <NumberDisplay
+                      className={'governance-value-from'}
+                      decimal={decimals}
+                      value={govConfirmationInfo?.transferable.from}
+                    />
+                    <span className={'governance-trans'}>&nbsp;→&nbsp;</span>
+                  </>
+                )
+              }
+              <NumberDisplay
+                className={'governance-value-to'}
+                decimal={decimals}
+                suffix={symbol}
+                value={govConfirmationInfo.transferable.to}
+              />
+            </MetaInfo.Default>
+            <MetaInfo.Default
+              className={'governance-value-info'}
+              label={t('Governance lock')}
+            >
+              {
+                !!govConfirmationInfo?.governanceLock.from && (
+                  <>
+                    <NumberDisplay
+                      className={'governance-value-from'}
+                      decimal={decimals}
+                      value={govConfirmationInfo?.governanceLock.from}
+                    />
+                    <span className={'governance-trans'}>&nbsp;→&nbsp;</span>
+                  </>
+                )
+              }
+              <NumberDisplay
+                className={'governance-value-to'}
+                decimal={decimals}
+                suffix={symbol}
+                value={govConfirmationInfo.governanceLock.to}
+              />
+            </MetaInfo.Default>
+          </>
         }
-        {governanceLockContent && <MetaInfo.Default
-          label={t('Governance lock')}
-        >
-          {governanceLockContent}
-        </MetaInfo.Default>}
         <MetaInfo.Default
           label={t('Conviction')}
         >
@@ -295,6 +302,12 @@ const GovVoteTransactionConfirmation = styled(Component)<BaseTransactionConfirma
 
     '.address-field': {
       whiteSpace: 'nowrap'
+    },
+
+    '.governance-value-info': {
+      '.__value': {
+        display: 'inherit'
+      }
     }
   };
 });
