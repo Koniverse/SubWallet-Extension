@@ -231,73 +231,77 @@ export class OptimexHandler implements SwapBaseInterface {
       return Promise.resolve(undefined);
     }
 
-    if (originChainType === ChainType.EVM) {
-      const evmApi = this.chainService.getEvmApi(originChain.slug);
-      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(getId(), originChain.slug, 'evm') as EvmFeeInfo;
+    try {
+      if (originChainType === ChainType.EVM) {
+        const evmApi = this.chainService.getEvmApi(originChain.slug);
+        const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(getId(), originChain.slug, 'evm') as EvmFeeInfo;
 
-      let transactionConfig;
+        let transactionConfig;
 
-      if (_isNativeToken(originTokenInfo)) {
-        [transactionConfig] = await getEVMTransactionObject({
+        if (_isNativeToken(originTokenInfo)) {
+          [transactionConfig] = await getEVMTransactionObject({
+            chain: originChain.slug,
+            evmApi,
+            from: params.request.address,
+            to: depositAddress,
+            value: params.request.fromAmount,
+            feeInfo,
+            transferAll: false,
+            fallbackFee: true,
+            data: this.currentTradeMetadata?.payload
+          });
+        } else {
+          [transactionConfig] = await getERC20TransactionObject({
+            assetAddress: _getContractAddressOfToken(originTokenInfo),
+            chain: originChain.slug,
+            evmApi: this.chainService.getEvmApi(originChain.slug),
+            from: params.request.address,
+            to: depositAddress,
+            value: params.request.fromAmount,
+            feeInfo,
+            transferAll: false
+          });
+        }
+
+        networkFeeAmount = await estimateTxFee(transactionConfig, evmApi, feeInfo);
+      } else if (originChainType === ChainType.BITCOIN) {
+        const bitcoinApi = this.chainService.getBitcoinApi(originChain.slug);
+        const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(getId(), originChain.slug, 'bitcoin');
+        const network = originChain.isTestnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin;
+
+        const [transaction] = await createBitcoinTransaction({
+          bitcoinApi,
           chain: originChain.slug,
-          evmApi,
           from: params.request.address,
-          to: depositAddress,
-          value: params.request.fromAmount,
           feeInfo,
+          to: depositAddress,
           transferAll: false,
-          fallbackFee: true,
-          data: this.currentTradeMetadata?.payload
-        });
-      } else {
-        [transactionConfig] = await getERC20TransactionObject({
-          assetAddress: _getContractAddressOfToken(originTokenInfo),
-          chain: originChain.slug,
-          evmApi: this.chainService.getEvmApi(originChain.slug),
-          from: params.request.address,
-          to: depositAddress,
           value: params.request.fromAmount,
-          feeInfo,
-          transferAll: false
+          network
         });
+
+        const feeCombine = combineBitcoinFee(feeInfo as BitcoinFeeInfo, undefined, undefined); // todo: recheck when implement custom fee
+
+        const recipients: string[] = [];
+
+        for (const txOutput of transaction.txOutputs) {
+          txOutput.address && recipients.push(txOutput.address);
+        }
+
+        const sizeInfo = getSizeInfo({
+          inputLength: transaction.inputCount,
+          recipients: recipients,
+          sender: params.request.address
+        });
+
+        networkFeeAmount = Math.ceil(feeCombine.feeRate * sizeInfo.txVBytes).toString();
+      } else {
+        console.log('Unsupported swap from this chain type', originChainType);
+
+        return Promise.resolve(undefined);
       }
-
-      networkFeeAmount = await estimateTxFee(transactionConfig, evmApi, feeInfo);
-    } else if (originChainType === ChainType.BITCOIN) {
-      const bitcoinApi = this.chainService.getBitcoinApi(originChain.slug);
-      const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(getId(), originChain.slug, 'bitcoin');
-      const network = originChain.isTestnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin;
-
-      const [transaction] = await createBitcoinTransaction({
-        bitcoinApi,
-        chain: originChain.slug,
-        from: params.request.address,
-        feeInfo,
-        to: depositAddress,
-        transferAll: false,
-        value: params.request.fromAmount,
-        network
-      });
-
-      const feeCombine = combineBitcoinFee(feeInfo as BitcoinFeeInfo, undefined, undefined); // todo: recheck when implement custom fee
-
-      const recipients: string[] = [];
-
-      for (const txOutput of transaction.txOutputs) {
-        txOutput.address && recipients.push(txOutput.address);
-      }
-
-      const sizeInfo = getSizeInfo({
-        inputLength: transaction.inputCount,
-        recipients: recipients,
-        sender: params.request.address
-      });
-
-      networkFeeAmount = Math.ceil(feeCombine.feeRate * sizeInfo.txVBytes).toString();
-    } else {
-      console.log('Unsupported swap from this chain type', originChainType);
-
-      return Promise.resolve(undefined);
+    } catch (e) {
+      throw new Error((e as Error).message);
     }
 
     const networkFee: CommonFeeComponent = {

@@ -165,3 +165,9 @@ export function processStepsToPathActions (steps: CommonStepDetail[]): DynamicSw
 }
 
 export const DEFAULT_EXCESS_AMOUNT_WEIGHT = 1.04; // add 2%
+
+export const DetectedGenOptimalProcessErrMsg = {
+  AMOUNT_TOO_LOW: 'amount too low',
+  AMOUNT_TOO_HIGH: 'amount too high',
+  NOT_ENOUGHT_BITCOIN: 'for the transaction. lower your btc amount and try again' // todo: improve handle msg error
+};

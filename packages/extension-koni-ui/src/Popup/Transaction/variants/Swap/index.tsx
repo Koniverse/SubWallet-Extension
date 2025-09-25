@@ -6,10 +6,10 @@ import { SwapError } from '@subwallet/extension-base/background/errors/SwapError
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
-import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainName, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
+import { DetectedGenOptimalProcessErrMsg } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
@@ -463,6 +463,14 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
   const notifyTooHighAmount = useCallback(() => {
     notify({
       message: t('ui.TRANSACTION.screen.Transaction.Swap.amountTooHigh'),
+      type: 'error',
+      duration: 5
+    });
+  }, [notify, t]);
+
+  const notifyNotEnoughBitcoin = useCallback(() => {
+    notify({
+      message: t('ui.TRANSACTION.screen.Transaction.Swap.notEnoughBitcoin'),
       type: 'error',
       duration: 5
     });
@@ -944,12 +952,16 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
                 notifyNoQuote();
               }
 
-              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
+              if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_LOW)) {
                 notifyTooLowAmount();
               }
 
-              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
+              if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_HIGH)) {
                 notifyTooHighAmount();
+              }
+
+              if (e.message.toLowerCase().includes(DetectedGenOptimalProcessErrMsg.NOT_ENOUGHT_BITCOIN)) {
+                notifyNotEnoughBitcoin();
               }
 
               setHandleRequestLoading(false);
@@ -971,7 +983,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       sync = false;
       clearTimeout(timeout);
     };
-  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
+  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates, notifyNotEnoughBitcoin]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
@@ -995,12 +1007,16 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
             notifyNoQuote();
           }
 
-          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
+          if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_LOW)) {
             notifyTooLowAmount();
           }
 
-          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
+          if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_HIGH)) {
             notifyTooHighAmount();
+          }
+
+          if (e.message.toLowerCase().includes(DetectedGenOptimalProcessErrMsg.NOT_ENOUGHT_BITCOIN)) {
+            notifyNotEnoughBitcoin();
           }
         }).finally(() => {
           if (sync) {
@@ -1044,7 +1060,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       sync = false;
       clearInterval(timer);
     };
-  }, [currentQuoteRequest, hasInternalConfirmations, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
+  }, [currentQuoteRequest, hasInternalConfirmations, notifyNotEnoughBitcoin, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
 
   useEffect(() => {
     if (!confirmedTerm) {
