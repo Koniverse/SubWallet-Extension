@@ -193,6 +193,10 @@ export function _isNativeToken (tokenInfo: _ChainAsset) {
   return tokenInfo.assetType === _AssetType.NATIVE;
 }
 
+export function _isGigaToken (tokenInfo: _ChainAsset) {
+  return tokenInfo.metadata?.isGigaToken;
+}
+
 export function _isNativeTokenBySlug (tokenSlug: string) {
   return tokenSlug.includes(_AssetType.NATIVE as string);
 }
