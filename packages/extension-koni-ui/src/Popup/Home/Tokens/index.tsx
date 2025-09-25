@@ -448,7 +448,7 @@ const Component = (): React.ReactElement => {
             items: [
               { key: 'import', label: t('ui.NFT.screen.NftsCollections.importNFT'), icon: <Icon phosphorIcon={Plus} />, onClick: handleImportNft },
               { key: 'search', label: t('ui.NFT.screen.NftsCollections.searchNFT'), icon: <Icon phosphorIcon={MagnifyingGlass} />, onClick: onOpenNftModal },
-              { key: 'reload', label: t('ui.NFT.screen.NftsCollections.reloadNFT'), icon: <Icon phosphorIcon={ArrowClockwise} />, onClick: onOpenNftModal }
+              { key: 'reload', label: t('ui.NFT.screen.NftsCollections.reloadNFT'), icon: <Icon phosphorIcon={ArrowClockwise} />, onClick: onCronReloadNfts }
             ]
           }}
           overlayClassName='sw-dropdown-menu'

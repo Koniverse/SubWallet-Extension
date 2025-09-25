@@ -171,6 +171,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     <>
       <SwModal
         className={CN(className, '-modal-container')}
+        closeIcon={<BackIcon />}
         destroyOnClose={true}
         id={CUSTOMIZE_MODAL}
         onCancel={onCancel}
@@ -251,9 +252,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 export const CustomizeModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     '.ant-sw-modal-content': {
-      maxHeight: 586,
-      height: 586,
-      overflow: 'hidden'
+      maxHeight: 599,
+      height: '100%',
+      overflow: 'hidden',
+      borderRadius: 0
     },
 
     '.__empty-list': {
@@ -283,7 +285,7 @@ export const CustomizeModal = styled(Component)<Props>(({ theme: { token } }: Pr
     },
 
     '.__group-content': {
-      marginBottom: token.marginXS
+      marginBottom: token.margin
     },
 
     '.__setting-item .ant-setting-item-content': {
@@ -305,6 +307,10 @@ export const CustomizeModal = styled(Component)<Props>(({ theme: { token } }: Pr
       '.ant-sw-modal-content': {
         height: '100vh',
         paddingBottom: 0
+      },
+      '.ant-sw-modal-header': {
+        borderBottom: 0,
+        paddingBottom: 8
       },
 
       '.ant-sw-modal-body': {
