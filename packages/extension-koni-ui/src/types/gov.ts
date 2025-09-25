@@ -28,3 +28,11 @@ export interface UserVoting {
 export interface ReferendumWithVoting extends Referendum {
   userVoting?: UserVoting[];
 }
+
+export type VoteAmountDetailProps = {
+  abstainAmount?: string;
+  ayeAmount?: string;
+  nayAmount?: string;
+}
+
+export type PreviousVoteAmountDetail = VoteAmountDetailProps & { type: GovVoteType }

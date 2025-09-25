@@ -6,17 +6,18 @@ import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug } from '@s
 import { GovVoteType, SplitVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
-import { AccountAddressSelector, GovAmountInput, HiddenInput } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, AlertBox, GovAmountInput, HiddenInput, MetaInfo, NumberDisplay, VoteAmountDetail } from '@subwallet/extension-koni-ui/components';
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useDefaultNavigate, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { GovAccountAddressItemType } from '@subwallet/extension-koni-ui/types/gov';
-import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
-import { balanceFormatter, Button, Form, formatNumber, Icon } from '@subwallet/react-ui';
+import { GovAccountAddressItemType, PreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/types/gov';
+import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils';
+import { calculateTotalAmountVotes, getPreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/utils/gov';
+import { Button, Form, Icon } from '@subwallet/react-ui';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle, XCircle } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -25,7 +26,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { TransactionContent, TransactionFooter } from '../../../parts';
+import { FreeBalance, TransactionContent, TransactionFooter } from '../../../parts';
 
 type WrapperProps = ThemeProps;
 
@@ -36,6 +37,7 @@ type ComponentProps = {
 };
 
 const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId', 'conviction', 'fromAccountProxy', 'track'];
+const CONVICTION_DEFAULT = 0.1;
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   // @ts-ignore
@@ -48,12 +50,13 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const [form] = Form.useForm<GovReferendumVoteParams>();
   const splitRenderKey = 'split_vote_amount';
   const [splitAmountRenderKey, setSplitAmountRenderKey] = useState<string>(splitRenderKey);
-
+  const [isBalanceReady, setIsBalanceReady] = useState<boolean>(true);
   const [loading, setLoading] = useState(false);
-  const [isDisable, setIsDisable] = useState(true);
   const navigate = useNavigate();
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
+  const ayeAmount = useWatchTransaction('ayeAmount', form, formDefault);
+  const nayAmount = useWatchTransaction('nayAmount', form, formDefault);
 
   const { chainInfoMap } = useSelector((root) => root.chainStore);
   const onPreCheck = usePreCheckAction(fromValue);
@@ -73,6 +76,8 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     return voteMap.get(fromValue.toLowerCase());
   }, [voteMap, fromValue]);
 
+  const previousVoteAmountDetail = useMemo<PreviousVoteAmountDetail | undefined>(() => getPreviousVoteAmountDetail(voteInfo), [voteInfo]);
+
   useEffect(() => {
     if (voteInfo?.isSplit) {
       form.setFieldsValue({
@@ -89,21 +94,41 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     return assetRegistry[assetSlug];
   }, [assetRegistry, chainInfoMap, defaultData.chain]);
 
+  const totalAmount = useMemo<{ from?: BigNumber, to: BigNumber }>(() => {
+    const currentTotalAmount = calculateTotalAmountVotes({ ayeAmount, nayAmount });
+
+    if (previousVoteAmountDetail) {
+      const prevTotal = calculateTotalAmountVotes(previousVoteAmountDetail);
+
+      if (!prevTotal.isEqualTo(currentTotalAmount)) {
+        return { from: prevTotal, to: currentTotalAmount };
+      }
+    }
+
+    return { to: currentTotalAmount };
+  }, [ayeAmount, nayAmount, previousVoteAmountDetail]);
+
+  const totalVote = useMemo<{ from?: BigNumber, to: BigNumber }>(() => {
+    const currentTotalVote = totalAmount.to.multipliedBy(CONVICTION_DEFAULT);
+
+    if (voteInfo && previousVoteAmountDetail) {
+      const prevTotal = calculateTotalAmountVotes(previousVoteAmountDetail);
+      const prevConviction = voteInfo.conviction;
+      const prevTotalVote = prevTotal.multipliedBy(prevConviction);
+
+      if (!currentTotalVote.isEqualTo(prevTotalVote)) {
+        return { from: prevTotalVote, to: currentTotalVote };
+      }
+    }
+
+    return { to: currentTotalVote };
+  }, [previousVoteAmountDetail, totalAmount.to, voteInfo]);
+
   const onFieldsChange: FormCallbacks<GovReferendumVoteParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // // TODO: field change
-    const fieldsToCheck = allFields.filter(
-      (field) => ['chain', 'referendumId', 'from'].includes(String(Array.isArray(field.name) ? field.name[0] : field.name))
-    );
-
-    const { empty, error } = simpleCheckForm(fieldsToCheck);
 
     const values = convertFieldToObject<GovReferendumVoteParams>(allFields);
 
-    const hasAmount =
-  (values.ayeAmount && new BigNumber(values.ayeAmount).gt(0)) ||
-  (values.nayAmount && new BigNumber(values.nayAmount).gt(0));
-
-    setIsDisable(empty || error || !hasAmount);
     persistData(values);
   }, [persistData]);
 
@@ -186,50 +211,124 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         >
 
           <HiddenInput fields={hideFields} />
-          <Form.Item
-            name={'from'}
-          >
-            <AccountAddressSelector
-              isGovModal={true}
-              items={accountAddressItems}
-              label={`${t('From')}:`}
-              labelStyle={'horizontal'}
-            />
-          </Form.Item>
+          <div className={'form-group'}>
+            <Form.Item
+              name={'from'}
+            >
+              <AccountAddressSelector
+                isGovModal={true}
+                items={accountAddressItems}
+                label={`${t('From')}:`}
+                labelStyle={'horizontal'}
+              />
+            </Form.Item>
 
-          <Form.Item
-            name={'ayeAmount'}
-          >
-            <GovAmountInput
-              decimals={_getAssetDecimals(assetInfo)}
-              key={splitAmountRenderKey}
-              label={t('Aye amount')}
-              logoKey={assetInfo.slug.toLowerCase()}
-              tokenSymbol={_getAssetSymbol(assetInfo)}
-              topRightPart={'1231231'}
+            <FreeBalance
+              address={fromValue}
+              chain={chainValue}
+              className={'free-balance'}
+              label={t('Available balance')}
+              onBalanceReady={setIsBalanceReady}
             />
-          </Form.Item>
-
-          <Form.Item
-            name={'nayAmount'}
-          >
-            <GovAmountInput
-              decimals={_getAssetDecimals(assetInfo)}
-              key={splitAmountRenderKey}
-              label={t('Nay amount')}
-              logoKey={assetInfo.slug.toLowerCase()}
-              tokenSymbol={_getAssetSymbol(assetInfo)}
-              topRightPart={'1231231'}
-            />
-          </Form.Item>
-        </Form>
-        {voteInfo?.isSplit && (
-          <div className='mt-2 text-sm text-gray-500'>
-            {t('Already voted')}:
-            ({t('Aye')}: {formatNumber(voteInfo.ayeBalance || '0', _getAssetDecimals(assetInfo), balanceFormatter)} {assetInfo.symbol})
-            ({t('Nay')}:{formatNumber(voteInfo.nayBalance || '0', _getAssetDecimals(assetInfo), balanceFormatter)} {assetInfo.symbol})
           </div>
-        )}
+
+          <div className={'form-group'}>
+            <Form.Item
+              name={'ayeAmount'}
+            >
+              <GovAmountInput
+                decimals={_getAssetDecimals(assetInfo)}
+                key={splitAmountRenderKey}
+                label={t('Aye amount')}
+                logoKey={assetInfo.slug.toLowerCase()}
+                tokenSymbol={_getAssetSymbol(assetInfo)}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name={'nayAmount'}
+            >
+              <GovAmountInput
+                decimals={_getAssetDecimals(assetInfo)}
+                key={splitAmountRenderKey}
+                label={t('Nay amount')}
+                logoKey={assetInfo.slug.toLowerCase()}
+                tokenSymbol={_getAssetSymbol(assetInfo)}
+              />
+            </Form.Item>
+
+            <MetaInfo
+              className={'vote-metadata-info'}
+              labelColorScheme={'gray'}
+              labelFontWeight={'regular'}
+              spaceSize={'xs'}
+              valueColorScheme={'light'}
+            >
+              <MetaInfo.Default
+                className={'meta-value-info'}
+                label={t('Total amount')}
+              >
+                {
+                  !!totalAmount.from && (
+                    <>
+                      <NumberDisplay
+                        className={'meta-value-from'}
+                        decimal={_getAssetDecimals(assetInfo)}
+                        value={totalAmount.from}
+                      />
+                      <span className={'meta-value-trans'}>&nbsp;→&nbsp;</span>
+                    </>
+                  )
+                }
+                <NumberDisplay
+                  className={'meta-value-to'}
+                  decimal={_getAssetDecimals(assetInfo)}
+                  suffix={_getAssetSymbol(assetInfo)}
+                  value={totalAmount.to}
+                />
+              </MetaInfo.Default>
+              <MetaInfo.Default
+                className={'meta-value-info'}
+                label={t('Total vote')}
+              >
+                {
+                  !!totalVote.from && (
+                    <>
+                      <NumberDisplay
+                        className={'meta-value-from'}
+                        decimal={_getAssetDecimals(assetInfo)}
+                        value={totalVote.from}
+                      />
+                      <span className={'meta-value-trans'}>&nbsp;→&nbsp;</span>
+                    </>
+                  )
+                }
+                <NumberDisplay
+                  className={'meta-value-to'}
+                  decimal={_getAssetDecimals(assetInfo)}
+                  suffix={_getAssetSymbol(assetInfo)}
+                  value={totalVote.to}
+                />
+              </MetaInfo.Default>
+            </MetaInfo>
+          </div>
+        </Form>
+
+        <AlertBox
+          description={t('Split your voting power between Aye and Nay with a Conviction of 0.1x')}
+          type='info'
+        />
+
+        {previousVoteAmountDetail &&
+          <div className='previous-vote-amount-detail'>
+            <div className={'__label'}>{t('PREVIOUS VOTE')}</div>
+            <VoteAmountDetail
+              amountDetail={previousVoteAmountDetail}
+              decimals={_getAssetDecimals(assetInfo)}
+              symbol={_getAssetSymbol(assetInfo)}
+            />
+          </div>
+        }
       </TransactionContent>
 
       <TransactionFooter className={`${className} -transaction-footer`}>
@@ -248,7 +347,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         </Button>
 
         <Button
-          disabled={isDisable}
+          disabled={!isBalanceReady}
           icon={(
             <Icon
               phosphorIcon={CheckCircle}
@@ -306,7 +405,56 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
 const ReferendumSplitVote = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return {
+    '&.-transaction-content, .form-container': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: token.sizeSM
+    },
 
+    '.form-group': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: token.sizeXS,
+
+      '.ant-form-item': {
+        marginBottom: 0
+      }
+    },
+
+    '.alert-description': {
+      color: token['geekblue-6']
+    },
+
+    '.previous-vote-amount-detail': {
+      '.__label': {
+        fontSize: token.fontSizeSM,
+        lineHeight: token.lineHeightSM,
+        fontWeight: token.fontWeightStrong,
+        color: token.colorTextLight3,
+        marginBottom: token.marginXS
+      }
+    },
+
+    '.lock-meta-info': {
+      '.__value': {
+        color: token.colorTextLight1
+      }
+    },
+    '.vote-metadata-info': {
+      '.__value': {
+        color: token.colorTextLight1
+      }
+    },
+
+    '.meta-value-info': {
+      '.__value': {
+        display: 'inherit'
+      }
+    },
+
+    '.meta-value-from, .meta-value-trans': {
+      color: token.colorTextLight3
+    }
   };
 });
 

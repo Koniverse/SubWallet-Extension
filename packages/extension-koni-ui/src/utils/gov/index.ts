@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { GOV_ONGOING_STATES, GovStatusKey, Referendum, ReferendumDetail, Tally } from '@subwallet/subsquare-api-sdk';
+import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
+import { PreviousVoteAmountDetail, VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
+import { GOV_ONGOING_STATES, GovStatusKey, Referendum, ReferendumDetail, ReferendumVoteDetail, Tally } from '@subwallet/subsquare-api-sdk';
 import BigNumber from 'bignumber.js';
 
 export const GOV_QUERY_KEYS = {
@@ -155,4 +157,41 @@ export const getGovTokenLogoSlugBySymbol = (symbol: string, assetRegistry: _Chai
   const asset = assetRegistry.find((item) => item.symbol.toLowerCase() === lowerSymbol);
 
   return asset?.slug.toLowerCase();
+};
+
+export const getPreviousVoteAmountDetail = (voteInfo?: ReferendumVoteDetail): PreviousVoteAmountDetail | undefined => {
+  if (voteInfo) {
+    if (voteInfo.isStandard) {
+      if (voteInfo.aye) {
+        return {
+          ayeAmount: voteInfo.balance,
+          type: GovVoteType.AYE
+        };
+      } else {
+        return {
+          nayAmount: voteInfo.balance,
+          type: GovVoteType.NAY
+        };
+      }
+    } else if (voteInfo.isSplit) {
+      return {
+        ayeAmount: voteInfo.ayeBalance,
+        nayAmount: voteInfo.nayBalance,
+        type: GovVoteType.SPLIT
+      };
+    } else {
+      return {
+        ayeAmount: voteInfo.ayeBalance,
+        nayAmount: voteInfo.nayBalance,
+        abstainAmount: voteInfo.abstainBalance,
+        type: GovVoteType.ABSTAIN
+      };
+    }
+  }
+
+  return undefined;
+};
+
+export const calculateTotalAmountVotes = (details: VoteAmountDetailProps): BigNumber => {
+  return (['ayeAmount', 'nayAmount', 'abstainAmount'] as (keyof VoteAmountDetailProps)[]).reduce((sum, key) => sum.plus((details[key] as string) || 0), new BigNumber(0));
 };

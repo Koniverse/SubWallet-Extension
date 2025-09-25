@@ -1,16 +1,24 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _ChainAsset } from '@subwallet/chain-list/types';
+import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { govConvictionOptions } from '@subwallet/extension-base/services/open-gov/interface';
-import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components';
+import { BN_ZERO } from '@subwallet/extension-base/utils';
+import { BasicInputWrapper, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useForwardInputRef } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { InputRef, Slider } from '@subwallet/react-ui';
-import React, { ForwardedRef, forwardRef, useCallback, useEffect, useState } from 'react';
+import { Icon, InputRef, Slider } from '@subwallet/react-ui';
+import { BigNumber } from 'bignumber.js';
+import { Info } from 'phosphor-react';
+import React, { ForwardedRef, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-type Props = ThemeProps & BasicInputWrapper<number>;
+type Props = ThemeProps & BasicInputWrapper<number> & {
+  amount?: string;
+  assetInfo: _ChainAsset;
+};
 
 const sliderMax = Math.max(...govConvictionOptions.map((o) => o.value));
 const sliderMin = Math.min(...govConvictionOptions.map((o) => o.value));
@@ -28,7 +36,7 @@ const sanitizeValue = (value?: number): number => (
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> => {
   const { t } = useTranslation();
-  const { className = '', onChange, value: originValue } = props;
+  const { amount, assetInfo, className = '', onChange, value: originValue } = props;
   const [value, setValue] = useState<number>(() => sanitizeValue(originValue));
   const inputRef = useForwardInputRef(ref);
 
@@ -39,13 +47,44 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
   useEffect(() => {
     if (originValue !== undefined) {
       setValue(sanitizeValue(originValue));
+    } else {
+      setValue(sliderMin);
     }
   }, [originValue]);
+
+  const currentTotalVote = useMemo(() => {
+    if (amount && value !== null) {
+      let sanitizedConviction = sanitizeValue(value);
+
+      if (sanitizedConviction === 0) {
+        sanitizedConviction = 0.1;
+      }
+
+      return (new BigNumber(amount)).multipliedBy(sanitizedConviction);
+    } else {
+      return BN_ZERO;
+    }
+  }, [amount, value]);
 
   return (
     <div className={className}>
       <div className='__label-wrapper'>
-        <div className='__label'>{t('Conviction')}</div>
+        <div className={'__left-item'}>
+          <div className='__label'>{t('Conviction')}</div>
+          <Icon
+            className={'__i-info-icon'}
+            customSize={'16px'}
+            phosphorIcon={Info}
+          />
+        </div>
+
+        <NumberDisplay
+          decimal={_getAssetDecimals(assetInfo)}
+          size={14}
+          suffix={_getAssetSymbol(assetInfo)}
+          value={currentTotalVote}
+        />
+
       </div>
       <div className='__input-container'>
         <Slider
@@ -144,6 +183,36 @@ const GovVoteConvictionSlider = styled(forwardRef(Component))<Props>(({ theme: {
       '&:last-of-type': {
         transform: 'translateX(-100%) !important'
       }
+    },
+
+    '.__label': {
+      fontSize: token.fontSizeSM,
+      lineHeight: token.lineHeightSM,
+      color: token.colorTextLight4
+    },
+
+    '.__left-item': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.sizeXXS
+    },
+
+    '.__label-wrapper': {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    },
+
+    '.__i-info-icon': {
+      color: token.colorTextLight1,
+      opacity: 0.65,
+      cursor: 'pointer',
+      transition: 'opacity 0.1s',
+
+      '&:hover': {
+        opacity: 1
+      }
+
     }
   };
 });

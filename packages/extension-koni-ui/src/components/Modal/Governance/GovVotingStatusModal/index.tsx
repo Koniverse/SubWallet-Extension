@@ -129,8 +129,7 @@ const GovVotingStatusModal = styled(forwardRef(Component))<Props>(({ theme: { to
     },
 
     '.__list-wrapper': {
-      flex: 1,
-      overflowY: 'auto',
+      height: '100%',
       paddingInline: token.padding,
       paddingBottom: token.padding
     },

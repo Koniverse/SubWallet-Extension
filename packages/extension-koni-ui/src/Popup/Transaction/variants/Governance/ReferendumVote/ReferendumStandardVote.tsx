@@ -6,26 +6,29 @@ import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug } from '@s
 import { govConvictionOptions, GovVoteType, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
-import { AccountAddressSelector, GovAmountInput, GovVoteConvictionSlider, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, GovAmountInput, GovVoteConvictionSlider, HiddenInput, MetaInfo, NumberDisplay, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_UNVOTE_TRANSACTION, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useDefaultNavigate, useGetAccountTokenBalance, useGetGovLockedInfos, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
+import { ReuseLockedBalance } from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/parts/ReuseLockedBalance';
+import { VoteButton } from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/parts/VoteButton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
-import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
-import { balanceFormatter, Button, ButtonProps, Form, formatNumber } from '@subwallet/react-ui';
+import { GovAccountAddressItemType, GovVoteStatus, PreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/types/gov';
+import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils';
+import { getPreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/utils/gov';
+import { ButtonProps, Form, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
-import BigN from 'bignumber.js';
+import BigN, { BigNumber } from 'bignumber.js';
 import CN from 'classnames';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Info } from 'phosphor-react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { TransactionContent, TransactionFooter } from '../../../parts';
-import { VoteButton } from './parts/VoteButton';
+import { FreeBalance, TransactionContent, TransactionFooter } from '../../../parts';
 
 type WrapperProps = ThemeProps;
 
@@ -43,6 +46,8 @@ const getConvictionDescription = (value?: number): string => {
   return option?.description || '-';
 };
 
+const PreviousVoteDetailModalId = 'previous-vote-detail-modal';
+
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   const { className = '', targetAccountProxy } = props;
   const { t } = useTranslation();
@@ -50,14 +55,16 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const [govRefVoteStorage, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData, from: govRefVoteStorage.from, fromAccountProxy: govRefVoteStorage.fromAccountProxy }), [defaultData, govRefVoteStorage.from, govRefVoteStorage.fromAccountProxy]);
   const [, setGovRefUnvoteStorage] = useLocalStorage(GOV_REFERENDUM_UNVOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS);
+  const [isBalanceReady, setIsBalanceReady] = useState<boolean>(true);
   const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const [form] = Form.useForm<GovReferendumVoteParams>();
 
   const standardRenderKey = 'standard_vote_amount';
+  const { activeModal, inactiveModal } = useContext(ModalContext);
   const [standardAmountRenderKey, setStandardAmountRenderKey] = useState<string>(standardRenderKey);
 
   const [loading, setLoading] = useState(false);
-  const [isDisable, setIsDisable] = useState(true);
+  const [isDisable, setIsDisable] = useState(false);
   const [voteType, setVoteType] = useState<GovVoteType | null>(null);
 
   const [initialAccountType, setInitialAccountType] = useState<GovVoteStatus | null>(null);
@@ -122,6 +129,22 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
   const lockedValue = useMemo(() => balanceInfo?.locked.value ?? new BigN(0), [balanceInfo]);
 
+  const governanceLock = useMemo<{ from?: BigNumber, to: BigNumber }>(() => {
+    const amountBN = new BigNumber(amountValue || 0);
+
+    if (currentGovInfo?.summary.totalLocked) {
+      const totalLockedBN = new BigNumber(currentGovInfo.summary.totalLocked);
+
+      if (amountBN.gt(totalLockedBN)) {
+        return { from: totalLockedBN, to: amountBN };
+      } else {
+        return { to: totalLockedBN };
+      }
+    } else {
+      return { to: amountBN };
+    }
+  }, [amountValue, currentGovInfo?.summary.totalLocked]);
+
   const handleVoteClick = useCallback((type: GovVoteType) => {
     setVoteType(type);
 
@@ -131,13 +154,18 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const handleClickNay = useCallback(() => handleVoteClick(GovVoteType.NAY), [handleVoteClick]);
   const handleClickAye = useCallback(() => handleVoteClick(GovVoteType.AYE), [handleVoteClick]);
 
+  const onOpenDetailVoteModal = useCallback(() => {
+    activeModal(PreviousVoteDetailModalId);
+  }, [activeModal]);
+
+  const onCancelDetailVoteModal = useCallback(() => {
+    inactiveModal(PreviousVoteDetailModalId);
+  }, [inactiveModal]);
+
   const onFieldsChange: FormCallbacks<GovReferendumVoteParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // TODO: field change
-    const { empty, error } = simpleCheckForm(allFields, ['--asset', '--conviction', '--fromAccountProxy']);
-
     const values = convertFieldToObject<GovReferendumVoteParams>(allFields);
 
-    setIsDisable(empty || error);
     persistData(values);
   }, [persistData]);
 
@@ -193,25 +221,23 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   }, [defaultData.chain, defaultData.fromAccountProxy, defaultData.track, fromValue, navigate, referendumId, setGovRefVoteStorage]);
 
   const reUseGovernanceLock = useCallback(() => {
-    if (currentGovInfo?.summary.totalLocked) {
-      form.setFieldValue('amount', currentGovInfo.summary.totalLocked);
+    const totalLocked = currentGovInfo?.summary.totalLocked || '0';
 
-      setStandardAmountRenderKey(`${standardRenderKey}_${Date.now()}`);
-      setIsDisable(false);
-    }
+    form.setFieldValue('amount', totalLocked);
+
+    setStandardAmountRenderKey(`${standardRenderKey}_${Date.now()}`);
+    setIsDisable(false);
   }, [currentGovInfo, form]);
 
   const reUseAllLock = useCallback(() => {
-    if (lockedValue) {
-      const decimals = _getAssetDecimals(assetInfo);
+    const decimals = _getAssetDecimals(assetInfo);
 
-      const bnLockedValue = new BigN(lockedValue).multipliedBy(new BigN(10).pow(decimals)).toString();
+    const bnLockedValue = new BigN(lockedValue).multipliedBy(new BigN(10).pow(decimals)).toString();
 
-      form.setFieldValue('amount', bnLockedValue);
+    form.setFieldValue('amount', bnLockedValue);
 
-      setStandardAmountRenderKey(`${standardRenderKey}_${Date.now()}`);
-      setIsDisable(false);
-    }
+    setStandardAmountRenderKey(`${standardRenderKey}_${Date.now()}`);
+    setIsDisable(false);
   }, [lockedValue, form, standardRenderKey, assetInfo]);
 
   const getAccountVoteStatus = useCallback((address: string): GovVoteStatus => {
@@ -291,6 +317,8 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     return voteMap.get(fromValue.toLowerCase());
   }, [voteMap, fromValue]);
 
+  const previousVoteAmountDetail = useMemo<PreviousVoteAmountDetail | undefined>(() => getPreviousVoteAmountDetail(voteInfo), [voteInfo]);
+
   useEffect(() => {
     if (voteInfo?.isStandard) {
       form.setFieldsValue({
@@ -353,7 +381,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     <>
       <TransactionContent className={CN(`${className} -transaction-content`)}>
         <Form
-          className={'form-container form-space-sm'}
+          className={'form-container'}
           form={form}
           initialValues={formDefault}
           onFieldsChange={onFieldsChange}
@@ -361,97 +389,125 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         >
 
           <HiddenInput fields={hideFields} />
-          <Form.Item
-            name={'from'}
-          >
-            <AccountAddressSelector
-              isGovModal={true}
-              items={filteredAccountItems}
-              label={`${t('From')}:`}
-              labelStyle={'horizontal'}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name={'amount'}
-          >
-            <GovAmountInput
-              decimals={_getAssetDecimals(assetInfo)}
-              key={standardAmountRenderKey}
-              label={t('Amount')}
-              logoKey={assetInfo.slug.toLowerCase()}
-              tokenSymbol={_getAssetSymbol(assetInfo)}
-              topRightPart={
-                voteInfo?.isStandard
-                  ? (voteInfo?.aye ? GovVoteType.AYE : GovVoteType.NAY)
-                  : undefined
-              }
-            />
-          </Form.Item>
-
-          <div className='carousel-buttons-container'>
-            <Button
-              className='gov-locked-amount'
-              onClick={reUseGovernanceLock}
-              size='sm'
-              type='ghost'
+          <div className={CN('form-group', '-gap-xxs')}>
+            <Form.Item
+              name={'from'}
             >
-              {t('Reuse governance lock:')}{' '}
-              {currentGovInfo?.summary.totalLocked
-                ? `${formatNumber(currentGovInfo.summary.totalLocked, _getAssetDecimals(assetInfo), balanceFormatter)}`
-                : t('No lock')}
-            </Button>
+              <AccountAddressSelector
+                isGovModal={true}
+                items={filteredAccountItems}
+                label={`${t('From')}:`}
+                labelStyle={'horizontal'}
+              />
+            </Form.Item>
 
-            <Button
-              className='all-locked-amount'
-              onClick={reUseAllLock}
-              size='sm'
-              type='ghost'
-            >
-              {t('Reuse all lock:')} {lockedValue.toString()}
-            </Button>
+            <FreeBalance
+              address={fromValue}
+              chain={chainValue}
+              className={'free-balance'}
+              label={t('Available balance')}
+              onBalanceReady={setIsBalanceReady}
+            />
           </div>
 
-          <Form.Item
-            name={'conviction'}
-          >
-            <GovVoteConvictionSlider />
-          </Form.Item>
+          <div className={'form-group'}>
+            <Form.Item
+              name={'amount'}
+            >
+              <GovAmountInput
+                decimals={_getAssetDecimals(assetInfo)}
+                key={standardAmountRenderKey}
+                label={t('Amount')}
+                logoKey={assetInfo.slug.toLowerCase()}
+                tokenSymbol={_getAssetSymbol(assetInfo)}
+                topRightPart={
+                  (!!previousVoteAmountDetail && <span className={'previous-vote-info'}>
+                    {t('Previous vote')}
+                    <VoteTypeLabel type={previousVoteAmountDetail?.type} />
+                    <div onClick={onOpenDetailVoteModal}>
+                      <Icon
+                        className={'__i-info-icon'}
+                        customSize={'16px'}
+                        phosphorIcon={Info}
+                      />
+                    </div>
 
+                  </span>)
+                }
+              />
+            </Form.Item>
+
+            <ReuseLockedBalance
+              allLockedValue={lockedValue.shiftedBy(_getAssetDecimals(assetInfo))}
+              assetInfo={assetInfo}
+              govLockedValue={currentGovInfo?.summary.totalLocked}
+              onReuseAllLockedValue={reUseAllLock}
+              onReuseGovLockedValue={reUseGovernanceLock}
+            />
+          </div>
+
+          <div className={'form-group'}>
+            <Form.Item
+              name={'conviction'}
+            >
+              <GovVoteConvictionSlider
+                amount={amountValue}
+                assetInfo={assetInfo}
+              />
+            </Form.Item>
+
+            <MetaInfo
+              className={'lock-meta-info'}
+              labelColorScheme={'gray'}
+              labelFontWeight={'regular'}
+              spaceSize={'xs'}
+              valueColorScheme={'light'}
+            >
+              <MetaInfo.Default
+                label={t('Lock duration')}
+              >
+                {voteInfo?.conviction !== undefined
+                  ? (
+                    voteInfo.conviction === conviction
+                      ? getConvictionDescription(conviction)
+                      : `${getConvictionDescription(voteInfo.conviction)} 🡢 ${getConvictionDescription(conviction)}`
+                  )
+                  : (
+                    getConvictionDescription(conviction)
+                  )}
+              </MetaInfo.Default>
+              <MetaInfo.Default
+                className={'governance-lock-info'}
+                label={t('Governance lock')}
+              >
+                {
+                  !!governanceLock.from && (
+                    <>
+                      <NumberDisplay
+                        className={'governance-lock-from'}
+                        decimal={_getAssetDecimals(assetInfo)}
+                        value={governanceLock.from}
+                      />
+                      <span className={'governance-lock-trans'}>&nbsp;→&nbsp;</span>
+                    </>
+                  )
+                }
+                <NumberDisplay
+                  className={'governance-lock-to'}
+                  decimal={_getAssetDecimals(assetInfo)}
+                  suffix={_getAssetSymbol(assetInfo)}
+                  value={governanceLock.to}
+                />
+              </MetaInfo.Default>
+            </MetaInfo>
+          </div>
         </Form>
-        <MetaInfo>
-          <MetaInfo.Default
-            label={'Lock duration'}
-          >
-            {voteInfo?.conviction !== undefined
-              ? (
-                voteInfo.conviction === conviction
-                  ? getConvictionDescription(conviction)
-                  : `${getConvictionDescription(voteInfo.conviction)} 🡢 ${getConvictionDescription(conviction)}`
-              )
-              : (
-                getConvictionDescription(conviction)
-              )}
-          </MetaInfo.Default>
-          <MetaInfo.Default
-            label={t('Governance lock')}
-          >
-            {currentGovInfo?.summary.totalLocked
-              ? (
-                new BigN(amountValue || 0).gt(currentGovInfo.summary.totalLocked)
-                  ? `${formatNumber(currentGovInfo.summary.totalLocked, _getAssetDecimals(assetInfo), balanceFormatter)} 🡢 ${formatNumber(amountValue || '0', _getAssetDecimals(assetInfo), balanceFormatter)}`
-                  : formatNumber(currentGovInfo.summary.totalLocked, _getAssetDecimals(assetInfo), balanceFormatter)
-              )
-              : formatNumber(amountValue || '0', _getAssetDecimals(assetInfo), balanceFormatter)
-            }
-          </MetaInfo.Default>
-        </MetaInfo>
       </TransactionContent>
 
       <TransactionFooter className={`${className} -transaction-footer`}>
         <div className={'__vote-buttons-container'}>
           <VoteButton
-            disabled={isDisable}
+            disabled={isDisable || !isBalanceReady}
             loading={loading}
             onClick={onPreCheck(handleClickNay, ExtrinsicType.GOV_VOTE)}
             type={GovVoteType.NAY}
@@ -467,13 +523,27 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             type={GovVoteType.SPLIT}
           />
           <VoteButton
-            disabled={isDisable}
+            disabled={isDisable || !isBalanceReady}
             loading={loading}
             onClick={onPreCheck(handleClickAye, ExtrinsicType.GOV_VOTE)}
             type={GovVoteType.AYE}
           />
         </div>
       </TransactionFooter>
+
+      {!!previousVoteAmountDetail && <SwModal
+        className={CN(className, '__transaction-detail-modal')}
+        closable={true}
+        id={PreviousVoteDetailModalId}
+        onCancel={onCancelDetailVoteModal}
+        title={t('Previous vote')}
+      >
+        <VoteAmountDetail
+          amountDetail={previousVoteAmountDetail}
+          decimals={_getAssetDecimals(assetInfo)}
+          symbol={_getAssetSymbol(assetInfo)}
+        />
+      </SwModal>}
     </>
   );
 };
@@ -519,6 +589,32 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
 const ReferendumStandardVote = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return {
+    '.form-container': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: token.sizeSM
+    },
+
+    '.form-group': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: token.sizeXS,
+
+      '&.-gap-xxs': {
+        gap: token.sizeXXS
+      },
+
+      '.ant-form-item': {
+        marginBottom: 0
+      }
+    },
+
+    '.lock-meta-info': {
+      '.__value': {
+        color: token.colorTextLight1
+      }
+    },
+
     '.__vote-buttons-container': {
       display: 'flex',
       borderRadius: 34,
@@ -530,6 +626,37 @@ const ReferendumStandardVote = styled(Wrapper)<WrapperProps>(({ theme: { token }
 
       '.ant-btn': {
         flexGrow: 0
+      }
+    },
+
+    '.governance-lock-info': {
+      '.__value': {
+        display: 'inherit'
+      }
+    },
+
+    '.governance-lock-from, .governance-lock-trans': {
+      color: token.colorTextLight3
+    },
+
+    '.previous-vote-info': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.sizeXXS,
+      fontSize: token.fontSizeSM,
+      lineHeight: token.lineHeightSM,
+      color: token.colorTextLight4,
+
+      '.__i-info-icon': {
+        color: token.colorTextLight1,
+        opacity: 0.65,
+        cursor: 'pointer',
+        transition: 'opacity 0.1s',
+
+        '&:hover': {
+          opacity: 1
+        }
+
       }
     }
   };

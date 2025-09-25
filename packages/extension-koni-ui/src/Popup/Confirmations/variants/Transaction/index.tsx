@@ -178,7 +178,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <div className={CN(className, 'confirmation-content')}>
+      <div className={CN(className, 'confirmation-content', {
+        '-no-margin-top': [ExtrinsicType.GOV_VOTE, ExtrinsicType.GOV_UNVOTE].includes(transaction.extrinsicType)
+      })}
+      >
         {renderContent(transaction)}
         {isAddressFormatInfoBoxVisible && (
           <AlertBoxInstant
@@ -266,6 +269,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
 const TransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
+    '&.-no-margin-top': {
+      marginTop: 0
+    },
+
     '--content-gap': 0,
     marginTop: token.marginXS,
 

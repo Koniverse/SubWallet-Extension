@@ -7037,6 +7037,7 @@ __metadata:
     react-dom: ^18.2.0
     react-dropzone: ^11.5.1
     react-i18next: ^11.15.3
+    react-indiana-drag-scroll: 3.0.3-alpha
     react-infinite-scroll-component: ^6.1.0
     react-is: ^17.0.2
     react-lazy-load-image-component: ^1.5.6
@@ -25178,6 +25179,16 @@ __metadata:
     react: ">=16"
     react-dom: ">=16"
   checksum: 6faf3cfa87c9d65ae7a87078a2d82db5b821936a45565a98d69e7341e4b4acd5610b1f26cf1a6809b5551e4c30357f2ab5ce729c4c33751f66cb9ce6072dfb02
+  languageName: node
+  linkType: hard
+
+"react-indiana-drag-scroll@npm:3.0.3-alpha":
+  version: 3.0.3-alpha
+  resolution: "react-indiana-drag-scroll@npm:3.0.3-alpha"
+  peerDependencies:
+    react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: d41bb4d82e743d7ec7485d706edc9d1db92fa5d8089f3931b4922c3bcc4addc3b310e0f323266a70dac47f2cfd6a2d63e69bfdc35e2d8974ca16528e232f6751
   languageName: node
   linkType: hard
 

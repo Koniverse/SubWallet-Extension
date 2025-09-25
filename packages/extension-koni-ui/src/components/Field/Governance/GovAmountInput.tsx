@@ -74,13 +74,17 @@ const GovAmountInput = styled(forwardRef(Component))<Props>(({ theme: { token } 
 
     '.__top-right-part-wrapper': {
       position: 'absolute',
-      top: 0,
-      right: 0,
+      top: token.paddingXS,
+      right: token.paddingSM,
       zIndex: 3
     },
 
     '.__amount-input-inner': {
       zIndex: 1
+    },
+
+    '.ant-input-suffix': {
+      marginRight: 0
     }
   };
 });

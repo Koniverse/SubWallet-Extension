@@ -237,7 +237,6 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
 
       <ReferendaSearchModal
         chain={chainSlug}
-        items={referendaItems}
         onClickItem={onClickReferendumItem}
         sdkInstance={sdkInstance}
       />

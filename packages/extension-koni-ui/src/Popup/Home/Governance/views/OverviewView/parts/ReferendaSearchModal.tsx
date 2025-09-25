@@ -3,9 +3,10 @@
 
 import { BackIcon } from '@subwallet/extension-koni-ui/components';
 import Search from '@subwallet/extension-koni-ui/components/Search';
+import { useGetGovLockedInfos } from '@subwallet/extension-koni-ui/hooks';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ReferendumWithVoting } from '@subwallet/extension-koni-ui/types/gov';
+import { ReferendumWithVoting, UserVoting } from '@subwallet/extension-koni-ui/types/gov';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { ActivityIndicator, ModalContext, SwModal } from '@subwallet/react-ui';
 import { Referendum, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
@@ -20,7 +21,6 @@ import { ReferendaList } from './ReferendaList';
 type Props = ThemeProps & {
   onClickItem: (item: Referendum) => void;
   chain: string;
-  items: ReferendumWithVoting[];
   sdkInstance: SubsquareApiSdk | undefined;
 };
 
@@ -33,19 +33,34 @@ const filterItemBySearchText = (item: ReferendumWithVoting, searchText: string):
     item.referendumIndex?.toString().toLowerCase().includes(lowerCaseSearchText);
 };
 
-const Component = ({ chain, className, items, onClickItem, sdkInstance }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { inactiveModal } = useContext(ModalContext);
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const [searchValue, setSearchValue] = React.useState<string>('');
   const textRef = React.useRef<string>('');
+  const govLockedInfos = useGetGovLockedInfos(chain);
 
   const onCancel = useCallback(() => {
     setSearchValue('');
     inactiveModal(modalId);
   }, [inactiveModal]);
 
-  const { data, isFetching, refetch } = useQuery<{ openGovReferenda: Referendum[] }>({
+  const { data: refData } = useQuery({
+    queryKey: [
+      GOV_QUERY_KEYS.referendaList(chain),
+      {}
+    ],
+    queryFn: async () => {
+      return sdkInstance?.getReferenda({
+        page_size: 20,
+        simple: true
+      });
+    },
+    staleTime: 60 * 1000
+  });
+
+  const { data: searchData, isFetching, refetch } = useQuery<{ openGovReferenda: Referendum[] }>({
     queryKey: GOV_QUERY_KEYS.referendaList(chain),
     queryFn: async () => {
       if (!sdkInstance) {
@@ -62,15 +77,53 @@ const Component = ({ chain, className, items, onClickItem, sdkInstance }: Props)
     setSearchValue(value);
   }, []);
 
+  const items = useMemo<ReferendumWithVoting[]>(() => {
+    const items = (refData?.items || []);
+
+    return items.map((item) => {
+      const trackId = Number(item.trackInfo.id);
+
+      const userVoting: UserVoting[] = [];
+
+      (govLockedInfos || []).forEach((acc) => {
+        const track = acc.tracks?.find((t) => Number(t.trackId) === trackId);
+
+        if (!track) {
+          return;
+        }
+
+        const votesForThisRef = track.votes?.find(
+          (v) => Number(v.referendumIndex) === item.referendumIndex
+        );
+
+        const delegation = track.delegation ? { ...track.delegation } : undefined;
+
+        if (votesForThisRef || delegation) {
+          userVoting.push({
+            address: acc.address,
+            trackId,
+            votes: votesForThisRef,
+            delegation
+          });
+        }
+      });
+
+      return {
+        ...item,
+        userVoting: userVoting.length > 0 ? userVoting : undefined
+      };
+    });
+  }, [govLockedInfos, refData?.items]);
+
   const filteredItems = useMemo<ReferendumWithVoting[]>(() => {
     const itemsFiltered = items.filter((item) => filterItemBySearchText(item, searchValue));
 
-    if (data?.openGovReferenda.length && !itemsFiltered.length && searchValue.trim()) {
-      return data.openGovReferenda.filter((item) => filterItemBySearchText(item, searchValue));
+    if (searchData?.openGovReferenda.length && !itemsFiltered.length && searchValue.trim()) {
+      return searchData.openGovReferenda.filter((item) => filterItemBySearchText(item, searchValue));
     } else {
       return itemsFiltered;
     }
-  }, [data?.openGovReferenda, items, searchValue]);
+  }, [searchData?.openGovReferenda, items, searchValue]);
 
   useEffect(() => {
     if (!searchValue) {

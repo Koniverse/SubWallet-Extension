@@ -162,6 +162,9 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
 
 export const FlattenedVoteList = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
+    overflowY: 'auto',
+    maxHeight: 480,
+
     '.vote-item': {
       display: 'flex',
       alignItems: 'flex-start',
