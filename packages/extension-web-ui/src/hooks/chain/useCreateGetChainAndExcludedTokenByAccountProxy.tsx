@@ -6,7 +6,7 @@ import { useCoreCreateGetChainSlugsByAccountProxy } from '@subwallet/extension-w
 import { useGetExcludedTokens } from '@subwallet/extension-web-ui/hooks/assets';
 import { useCallback } from 'react';
 
-interface ChainAndExcludedTokenInfo {
+export interface ChainAndExcludedTokenInfo {
   allowedChains: string[];
   excludedTokens: string[];
 }

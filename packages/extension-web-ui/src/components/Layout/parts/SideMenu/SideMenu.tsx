@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { MenuItem, MenuItemType } from '@subwallet/extension-web-ui/components/Layout/parts/SideMenu/MenuItem';
 import { CONTACT_US, DEFAULT_SWAP_PARAMS, FAQS_URL, MISSIONS_POOL_LIVE_ID, SWAP_TRANSACTION, TERMS_OF_SERVICE_URL } from '@subwallet/extension-web-ui/constants';
 import { useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
@@ -29,7 +30,7 @@ function Component ({ className,
   const navigate = useNavigate();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const { t } = useTranslation();
-  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
+  const { accountProxies, currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
 
   const { missions } = useSelector((state: RootState) => state.missionPool);
@@ -49,6 +50,32 @@ function Component ({ className,
   const isCurrentAccountProxySoloTon = useMemo(() => {
     return isSoloTonAccountProxy(currentAccountProxy);
   }, [currentAccountProxy]);
+
+  const isSwapSupported = useMemo(() => {
+    const isSupportAccount = (currentAcc: AccountProxy) => {
+      const isReadOnlyAccount = currentAcc.accountType === AccountProxyType.READ_ONLY;
+      const isLedgerAccount = currentAcc.accountType === AccountProxyType.LEDGER;
+      const isSoloAccount = currentAcc.accountType === AccountProxyType.SOLO;
+      const validEcosystem = [AccountChainType.ETHEREUM, AccountChainType.SUBSTRATE, AccountChainType.BITCOIN].includes(currentAcc.chainTypes[0]);
+      const invalidSoloAccount = isSoloAccount && !validEcosystem;
+
+      return !invalidSoloAccount && !isLedgerAccount && !isReadOnlyAccount;
+    };
+
+    const isSupportAllAccount = (accountProxies: AccountProxy[]) => {
+      return accountProxies.filter((account) => account.accountType !== AccountProxyType.ALL_ACCOUNT).some((account) => isSupportAccount(account));
+    };
+
+    if (!currentAccountProxy || currentAccountProxy.chainTypes.length <= 0) {
+      return false;
+    }
+
+    if (isAllAccount) {
+      return isSupportAllAccount(accountProxies);
+    } else {
+      return isSupportAccount(currentAccountProxy);
+    }
+  }, [accountProxies, currentAccountProxy, isAllAccount]);
 
   usePreloadView([
     'Home',
@@ -88,7 +115,7 @@ function Component ({ className,
           phosphorIcon: ArrowsLeftRight,
           weight: 'fill'
         },
-        disabled: isCurrentAccountProxySoloTon
+        disabled: !isSwapSupported
       },
       {
         label: t('dApps'),
@@ -145,7 +172,7 @@ function Component ({ className,
         }
       }
     ];
-  }, [isCurrentAccountProxySoloTon, latestLiveMissionIds.length, t]);
+  }, [isCurrentAccountProxySoloTon, isSwapSupported, latestLiveMissionIds.length, t]);
 
   const staticMenuItems = useMemo<MenuItemType[]>(() => {
     return [

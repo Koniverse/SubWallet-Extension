@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
-import { useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { useCreateGetSubnetStakingTokenName, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, Logo } from '@subwallet/react-ui';
@@ -30,7 +30,11 @@ function Component ({ className, poolInfo }: Props) {
 
   const isMainSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type) && !poolInfo.slug.includes('testnet'), [poolInfo.slug, poolInfo.type]);
 
-  const subnetLogoNetwork = `subnet-${subnetId || 0}`;
+  const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
+
+  const subnetToken = useMemo(() => {
+    return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.netuid || 0);
+  }, [getSubnetStakingTokenName, poolInfo.chain, poolInfo.metadata.subnetData?.netuid]);
 
   return (
     <>
@@ -44,9 +48,10 @@ function Component ({ className, poolInfo }: Props) {
             <Logo
               className='__logo'
               isShowSubLogo={false}
-              network={subnetLogoNetwork}
+              network={poolInfo.chain}
               shape={'circle'}
               size={32}
+              token={subnetToken}
             />
 
             <div className='__name'>

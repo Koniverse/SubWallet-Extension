@@ -10,7 +10,7 @@ import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-web-ui/contexts/screen/HomeContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { BackgroundColorMap, WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext';
-import { useCoreReceiveModalHelper, useGetChainSlugsByAccount, useNotification, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { useCoreReceiveModalHelper, useGetChainAndExcludedTokenByCurrentAccountProxy, useNotification, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { reloadCron, saveShowBalance } from '@subwallet/extension-web-ui/messaging';
 import BuyTokens from '@subwallet/extension-web-ui/Popup/BuyTokens';
 import Transaction from '@subwallet/extension-web-ui/Popup/Transaction/Transaction';
@@ -45,7 +45,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const isShowBalance = useSelector((state: RootState) => state.settings.isShowBalance);
   const { currencyData } = useSelector((state: RootState) => state.price);
   const [reloading, setReloading] = useState(false);
-  const allowedChains = useGetChainSlugsByAccount();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
 
   const onChangeShowBalance = useCallback(() => {
     saveShowBalance(!isShowBalance).catch(console.error);
@@ -92,7 +92,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     const result: BuyTokenInfo[] = [];
 
     Object.values(tokens).forEach((item) => {
-      if (!allowedChains.includes(item.network) || !slugs.includes(item.slug)) {
+      if (!allowedChains.includes(item.network) || !slugs.includes(item.slug) || excludedTokens.includes(item.slug)) {
         return;
       }
 
@@ -100,7 +100,14 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     });
 
     return result;
-  }, [allowedChains, locationPathname, tokenGroupMap, tokenGroupSlug, tokens]);
+  }, [allowedChains, excludedTokens, locationPathname, tokenGroupMap, tokenGroupSlug, tokens]);
+
+  const isSupportSendFund = useMemo(() => {
+    const slug = tokenGroupSlug || '';
+    const slugs = tokenGroupMap[slug] ? tokenGroupMap[slug] : [slug];
+
+    return !excludedTokens.length || slugs.some((slug) => !excludedTokens.includes(slug));
+  }, [excludedTokens, tokenGroupMap, tokenGroupSlug]);
 
   const onOpenBuyTokens = useCallback(() => {
     let symbol = '';
@@ -189,7 +196,8 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       label: 'Send',
       type: 'send',
       icon: PaperPlaneTilt,
-      onClick: onOpenSendFund
+      onClick: onOpenSendFund,
+      disabled: !isSupportSendFund
     },
     {
       label: 'Buy & Sell',

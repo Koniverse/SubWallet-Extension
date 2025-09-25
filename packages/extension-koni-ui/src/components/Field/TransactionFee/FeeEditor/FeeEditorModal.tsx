@@ -4,7 +4,7 @@
 import { _SUPPORT_TOKEN_PAY_FEE_GROUP } from '@subwallet/extension-base/constants';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { EvmEIP1559FeeOption, FeeCustom, FeeDefaultOption, FeeDetail, FeeOptionKey, TransactionFee } from '@subwallet/extension-base/types';
-import { BN_ZERO, formatNumber } from '@subwallet/extension-base/utils';
+import { BN_ZERO, formatNumber, isEvmEIP1559FeeDetail } from '@subwallet/extension-base/utils';
 import { AmountInput, BasicInputEvent, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { FeeOptionItem } from '@subwallet/extension-koni-ui/components/Field/TransactionFee/FeeEditor/FeeOptionItem';
 import { BN_TEN, CHOOSE_FEE_TOKEN_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -85,7 +85,18 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
     }
 
     return undefined;
-  }, [feeOptionsInfo?.options, selectedFeeOption]);
+  }, [feeOptionsInfo, selectedFeeOption]);
+
+  const minRequiredMaxFeePerGas = useMemo(() => {
+    if (isEvmEIP1559FeeDetail(feeOptionsInfo)) {
+      const baseGasFee = new BigN(feeOptionsInfo.baseGasFee);
+      const priorityFee = feeOptionsInfo?.options?.slow?.maxPriorityFeePerGas || 0;
+
+      return baseGasFee.multipliedBy(1.5).plus(priorityFee).integerValue(BigN.ROUND_CEIL);
+    }
+
+    return undefined;
+  }, [feeOptionsInfo]);
 
   const formDefault = useMemo((): FormProps => {
     return {
@@ -194,6 +205,15 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
     return Promise.resolve();
   }, [t]);
 
+  /**
+   * Validators for fee inputs:
+   * - customPriorityValidator
+   * - customMaxFeeValidator
+   *
+   * These validations apply only to EVM chains using the EIP-1559 fee model.
+   * For legacy EVM or non-EVM fee types, the validations will be skipped
+   */
+
   const customPriorityValidator = useCallback((rule: Rule, value: string): Promise<void> => {
     if (!value) {
       return Promise.resolve();
@@ -203,35 +223,66 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
       return Promise.reject(t('The priority fee must be equal or greater than 0'));
     }
 
-    return Promise.resolve();
-  }, [t]);
+    if (isEvmEIP1559FeeDetail(feeOptionsInfo)) {
+      const fastOption = feeOptionsInfo?.options?.fast;
 
-  const customMaxFeeValidator = useCallback((rule: Rule, value: string): Promise<void> => {
-    if (!value) {
-      return Promise.reject(t('Amount is required'));
-    }
+      if (fastOption?.maxPriorityFeePerGas) {
+        const fastPriorityMax = new BigN(fastOption.maxPriorityFeePerGas).multipliedBy(2);
 
-    if (feeOptionsInfo && 'baseGasFee' in feeOptionsInfo) {
-      const baseGasFee = feeOptionsInfo.baseGasFee;
-      const minFee = new BigN(baseGasFee || 0).multipliedBy(1.5);
-
-      if (baseGasFee && value && new BigN(value).lte(minFee)) {
-        return Promise.reject(t('Max fee per gas must be higher than {{min}} GWEI', { replace: { min: formatNumber(minFee, 9, (s) => s) } }));
-      }
-
-      if ((new BigN(value)).lte(BN_ZERO)) {
-        return Promise.reject(t('The maximum fee must be greater than 0'));
+        if (new BigN(value).gt(fastPriorityMax)) {
+          return Promise.reject(t('Priority fee is higher than necessary. You may pay more than needed'));
+        }
       }
     }
 
     return Promise.resolve();
   }, [feeOptionsInfo, t]);
 
+  const customMaxFeeValidator = useCallback((rule: Rule, value: string): Promise<void> => {
+    if (!value) {
+      return Promise.reject(t('Amount is required'));
+    }
+
+    if ((new BigN(value)).lte(BN_ZERO)) {
+      return Promise.reject(t('The maximum fee must be greater than 0'));
+    }
+
+    const priorityFeeValue = form.getFieldValue('priorityFeeValue') as string;
+
+    if (priorityFeeValue && value && new BigN(value).lt(new BigN(priorityFeeValue))) {
+      return Promise.reject(t('Max fee cannot be lower than priority fee'));
+    }
+
+    if (isEvmEIP1559FeeDetail(feeOptionsInfo)) {
+      if (minRequiredMaxFeePerGas && value && new BigN(value).lt(minRequiredMaxFeePerGas)) {
+        return Promise.reject(t('Max fee per gas must be higher than {{min}} GWEI', { replace: { min: formatNumber(minRequiredMaxFeePerGas, 9, (s) => s) } }));
+      }
+
+      const fastOption = feeOptionsInfo?.options?.fast;
+
+      if (minRequiredMaxFeePerGas && fastOption?.maxFeePerGas) {
+        const fastMax = new BigN(fastOption.maxFeePerGas).multipliedBy(2);
+
+        if (new BigN(value).gt(fastMax) && fastMax.gt(minRequiredMaxFeePerGas)) {
+          return Promise.reject(t('Max fee is higher than necessary'));
+        }
+      }
+    }
+
+    return Promise.resolve();
+  }, [feeOptionsInfo, form, minRequiredMaxFeePerGas, t]);
+
   const onValuesChange: FormCallbacks<FormProps>['onValuesChange'] = useCallback(
     (part: Partial<FormProps>, values: FormProps) => {
       if (part.customValue) {
         form.setFieldsValue({
           customValue: part.customValue
+        });
+      }
+
+      if (part.priorityFeeValue) {
+        form.validateFields(['maxFeeValue']).catch((e) => {
+          console.log(e);
         });
       }
     },
@@ -314,7 +365,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
       >
         <AmountInput
           decimals={9}
-          defaultValue={feeDefaultValue?.maxFeePerGas}
+          defaultValue={formDefault.maxFeeValue}
           label='Max fee (GWEI)'
           maxValue={'0'}
           placeholder='Enter amount'
@@ -332,7 +383,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
       >
         <AmountInput
           decimals={9}
-          defaultValue={feeDefaultValue?.maxPriorityFeePerGas}
+          defaultValue={formDefault.priorityFeeValue}
           label='Priority fee (GWEI)'
           maxValue={'0'}
           placeholder='Enter amount'

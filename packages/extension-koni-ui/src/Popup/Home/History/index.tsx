@@ -328,6 +328,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.UNSTAKE_SDOT]: t('Unstake sDOT'),
     [ExtrinsicType.UNSTAKE_STDOT]: t('Unstake stDOT'),
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('Token approve'),
+    [ExtrinsicType.SET_FEE_TOKEN]: t('Fee token'),
     [ExtrinsicType.SWAP]: t('Swap'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token'),
     [ExtrinsicType.UNKNOWN]: t('Unknown')
@@ -374,6 +375,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.UNSTAKE_SDOT]: t('Unstake sDOT tranasction'),
     [ExtrinsicType.UNSTAKE_STDOT]: t('Unstake stDOT tranasction'),
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('Token approve transaction'),
+    [ExtrinsicType.SET_FEE_TOKEN]: t('Fee token'),
     [ExtrinsicType.SWAP]: t('Swap transaction'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('Claim token transaction'),
     [ExtrinsicType.UNKNOWN]: t('Unknown transaction')

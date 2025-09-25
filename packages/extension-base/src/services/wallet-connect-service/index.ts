@@ -6,15 +6,15 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import RequestService from '@subwallet/extension-base/services/request-service';
 import Eip155RequestHandler from '@subwallet/extension-base/services/wallet-connect-service/handler/Eip155RequestHandler';
 import { SWStorage } from '@subwallet/extension-base/storage';
+import { wait } from '@subwallet/extension-base/utils';
 import { IKeyValueStorage } from '@walletconnect/keyvaluestorage';
 import SignClient from '@walletconnect/sign-client';
 import { EngineTypes, SessionTypes, SignClientTypes } from '@walletconnect/types';
 import { getInternalError, getSdkError } from '@walletconnect/utils';
-import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
 import PolkadotRequestHandler from './handler/PolkadotRequestHandler';
-import { ALL_WALLET_CONNECT_EVENT, DEFAULT_WALLET_CONNECT_OPTIONS, RELAY_FALLBACK_URL, RELAY_URL, WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_SUPPORTED_METHODS } from './constants';
+import { ALL_WALLET_CONNECT_EVENT, DEFAULT_WALLET_CONNECT_OPTIONS, RELAY_FALLBACK_URL, RELAY_URL, WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_SESSION_TIMEOUT, WALLET_CONNECT_SUPPORTED_METHODS } from './constants';
 import { convertConnectRequest, convertNotSupportRequest, isSupportWalletConnectChain } from './helpers';
 import { EIP155_SIGNING_METHODS, POLKADOT_SIGNING_METHODS, ResultApproveWalletConnectSession, WalletConnectSigningMethod } from './types';
 
@@ -92,13 +92,9 @@ export default class WalletConnectService {
         if (this.#option.relayUrl === RELAY_URL) {
           this.#option = { ...this.#option, relayUrl: RELAY_FALLBACK_URL };
 
-          try {
-            this.#client = await SignClient.init(this.#option);
-          } catch (e) {
-            throw this.convertWCErrorMessage(e as Error);
-          }
+          this.#client = await SignClient.init(this.#option);
         } else {
-          throw this.convertWCErrorMessage(e as Error);
+          throw e;
         }
       }
     }
@@ -246,17 +242,19 @@ export default class WalletConnectService {
   }
 
   public async connect (uri: string) {
-    if (!(await this.haveData())) {
+    if (!(await this.haveData()) || !this.#client?.core.relayer.connected) {
       await this.initClient(true);
     }
 
     this.#checkClient();
 
-    try {
-      await this.#client?.pair({ uri });
-    } catch (e) {
-      throw this.convertWCErrorMessage(e as Error, true);
-    }
+    // The purpose of designing a timeout for pairing is to prevent the promise from not being resolved if there are issues during the pairing process.
+    await Promise.race([
+      this.#client?.pair({ uri }),
+      wait(WALLET_CONNECT_SESSION_TIMEOUT).then(() => {
+        throw new Error(getInternalError('EXPIRED').message);
+      })
+    ]);
   }
 
   public async approveSession (result: ResultApproveWalletConnectSession) {
@@ -345,30 +343,6 @@ export default class WalletConnectService {
     });
 
     this.#updateSessions();
-  }
-
-  public convertWCErrorMessage (e: Error, isConnect?: boolean) {
-    const message = e.message.toLowerCase();
-
-    console.error(e);
-
-    if (message.includes('socket hang up') || message.includes('stalled') || message.includes('interrupted')) {
-      return new Error(t('Connection unsuccessful. Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app'));
-    }
-
-    if (message.includes('failed for host')) {
-      return new Error(t('Connection unsuccessful. Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app'));
-    }
-
-    if (message.includes('pairing already exists')) {
-      return new Error(t('Connection already exists'));
-    }
-
-    if (isConnect) {
-      return new Error(t('Fail to add connection'));
-    }
-
-    return e;
   }
 
   private findMethodsMissing (methodRequire: (POLKADOT_SIGNING_METHODS | EIP155_SIGNING_METHODS) [], methods: string[]) {

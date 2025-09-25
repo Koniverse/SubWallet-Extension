@@ -8,8 +8,7 @@ export default class MigrateAssetSetting extends BaseMigrationJob {
   public override async run (): Promise<void> {
     try {
       const changeSlugsMap: Record<string, string> = {
-        'polygon-NATIVE-MATIC': 'polygon-NATIVE-POL',
-        '5irechain_mainnet-NATIVE-5IRE': '5irechain_mainnet-NATIVE-5ire'
+        'polygon-ERC20-USDT-0xc2132D05D31c914a87C6611C10748AEb04B58e8F': 'polygon-ERC20-USD₮0-0xc2132D05D31c914a87C6611C10748AEb04B58e8F'
       };
 
       const assetSetting = await this.state.chainService.getAssetSettings();

@@ -4,7 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { _chainInfoToChainType, findChainInfoByChainId, findChainInfoByHalfGenesisHash } from '@subwallet/extension-base/services/chain-service/utils';
 import { WALLET_CONNECT_EIP155_NAMESPACE, WALLET_CONNECT_POLKADOT_NAMESPACE } from '@subwallet/extension-base/services/wallet-connect-service/constants';
-import { AccountProxy } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy } from '@subwallet/extension-base/types';
 import { WalletConnectChainInfo } from '@subwallet/extension-web-ui/types';
 import { SessionTypes } from '@walletconnect/types';
 
@@ -19,7 +19,7 @@ export const chainsToWalletConnectChainInfos = (chainMap: Record<string, _ChainI
         chainInfo,
         slug: chainInfo?.slug || chain,
         supported: !!chainInfo,
-        accountType: chainInfo ? _chainInfoToChainType(chainInfo) : undefined,
+        accountType: AccountChainType.ETHEREUM,
         wcChain: chain
       };
     } else if (namespace === WALLET_CONNECT_POLKADOT_NAMESPACE) {

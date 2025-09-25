@@ -2,28 +2,30 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { NominationInfo, SubmitChangeValidatorStaking, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
-import { detectTranslate } from '@subwallet/extension-base/utils';
+import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
 import { BaseModal, StakingValidatorItem } from '@subwallet/extension-web-ui/components';
 import EmptyValidator from '@subwallet/extension-web-ui/components/Account/EmptyValidator';
 import { BasicInputWrapper } from '@subwallet/extension-web-ui/components/Field/Base';
 import { EarningValidatorDetailModal } from '@subwallet/extension-web-ui/components/Modal/Earning';
 import { FilterModal } from '@subwallet/extension-web-ui/components/Modal/FilterModal';
 import { SortingModal } from '@subwallet/extension-web-ui/components/Modal/SortingModal';
+import Search from '@subwallet/extension-web-ui/components/Search';
 import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-web-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useChainChecker, useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators } from '@subwallet/extension-web-ui/hooks';
 import { changeEarningValidator } from '@subwallet/extension-web-ui/messaging';
-import { ThemeProps, ValidatorDataType } from '@subwallet/extension-web-ui/types';
+import { Theme, ThemeProps, ValidatorDataType } from '@subwallet/extension-web-ui/types';
 import { getValidatorKey } from '@subwallet/extension-web-ui/utils/transaction/stake';
 import { Badge, Button, Icon, ModalContext, SwList, useExcludeModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import BigN from 'bignumber.js';
-import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending } from 'phosphor-react';
+import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending, ThumbsUp } from 'phosphor-react';
 import React, { forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 interface Props extends ThemeProps, BasicInputWrapper {
   modalId: string;
@@ -80,11 +82,14 @@ const Component = (props: Props) => {
     , isSingleSelect: _isSingleSelect = false,
     items, modalId, nominations
     , onCancel, onChange, setForceFetchValidator, slug } = props;
+  const { token } = useTheme() as Theme;
 
   const [submitLoading, setSubmitLoading] = useState(false);
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
   const [sortSelection, setSortSelection] = useState<SortKey>(SortKey.DEFAULT);
   const [selectedValidators, setSelectedValidators] = useState<ValidatorInfo[]>([]);
+  const [defaultValidatorMap, setDefaultValidatorMap] = useState<Record<string, ChainRecommendValidator>>({});
+  const [searchValue, setSearchValue] = useState<string>('');
 
   const { t } = useTranslation();
   const { activeModal, checkActive } = useContext(ModalContext);
@@ -216,6 +221,49 @@ const Component = (props: Props) => {
     });
   }, [items, sortSelection, sortValidator]);
 
+  const validatorResultList = useMemo(() => {
+    const recommendedHeader = {
+      isSectionHeader: true,
+      identity: 'Recommended'
+    };
+
+    const othersHeader = {
+      isSectionHeader: true,
+      identity: 'Others'
+    };
+
+    const recommendedAddresses = defaultValidatorMap[chain]?.preSelectValidators?.split(',') || [];
+
+    const validatorsWithRecommendation = resultList.map((item) => ({
+      ...item,
+      isRecommend: recommendedAddresses.includes(item.address)
+    }));
+
+    // Apply search
+    const filteredValidators = searchValue
+      ? validatorsWithRecommendation.filter((item) =>
+        item.identity?.toLowerCase().includes(searchValue.toLowerCase()) ||
+        item.address?.toLowerCase().includes(searchValue.toLowerCase())
+      )
+      : validatorsWithRecommendation;
+
+    const recommendedItems = filteredValidators.filter((v) => v.isRecommend);
+    const otherItems = filteredValidators.filter((v) => !v.isRecommend);
+
+    const finalList = [];
+
+    if (recommendedItems.length && otherItems.length) {
+      finalList.push(recommendedHeader, ...recommendedItems, othersHeader, ...otherItems);
+    } else if (recommendedItems.length) {
+      // If only recommended items exist, we still show the header
+      finalList.push(recommendedHeader, ...recommendedItems);
+    } else {
+      finalList.push(...recommendedItems, ...otherItems);
+    }
+
+    return finalList;
+  }, [resultList, defaultValidatorMap, chain, searchValue]);
+
   const filterFunction = useMemo<(item: ValidatorDataType) => boolean>(() => {
     return (item) => {
       if (!selectedFilters.length) {
@@ -237,6 +285,10 @@ const Component = (props: Props) => {
 
     return nominatorValueList.every((validator) => selectedSet.has(validator));
   }, [changeValidators, nominatorValueList]);
+
+  const handleSearch = useCallback((value: string) => {
+    setSearchValue(value);
+  }, []);
 
   const submit = useCallback((target: ValidatorInfo[]) => {
     const submitData: SubmitChangeValidatorStaking = {
@@ -316,6 +368,31 @@ const Component = (props: Props) => {
   }, [items.length, setForceFetchValidator, t]);
 
   const renderItem = useCallback((item: ValidatorDataType) => {
+    if (item.isSectionHeader) {
+      const isOthers = item.identity === 'Others';
+
+      return (
+        <div
+          className={'__section-header'}
+          key={item.identity}
+          style={{
+            marginTop: isOthers ? token.marginSM : 0
+          }}
+        >
+          {item.identity?.toUpperCase()}
+          {item.identity === 'Recommended' && (
+            <Icon
+              className={'__selected-icon'}
+              iconColor={token.colorSuccess}
+              phosphorIcon={ThumbsUp}
+              size='xs'
+              weight='fill'
+            />
+          )}
+        </div>
+      );
+    }
+
     const key = getValidatorKey(item.address, item.identity);
     const keyBase = key.split('___')[0];
 
@@ -331,32 +408,27 @@ const Component = (props: Props) => {
         key={key}
         onClick={onClickItem}
         onClickMoreBtn={onClickMore(item)}
-        prefixAddress = {networkPrefix}
+        prefixAddress={networkPrefix}
         validatorInfo={item}
       />
     );
-  }, [changeValidators, networkPrefix, nominatorValueList, onClickItem, onClickMore]);
+  }, [changeValidators, networkPrefix, nominatorValueList, onClickItem, onClickMore, token.colorSuccess, token.marginSM]);
 
   const onClickActionBtn = useCallback(() => {
     activeModal(FILTER_MODAL_ID);
   }, [activeModal]);
-
-  const searchFunction = useCallback((item: ValidatorDataType, searchText: string) => {
-    const searchTextLowerCase = searchText.toLowerCase();
-
-    return (
-      item.address.toLowerCase().includes(searchTextLowerCase) ||
-      (item.identity
-        ? item.identity.toLowerCase().includes(searchTextLowerCase)
-        : false)
-    );
-  }, []);
 
   const handleCancel = useCallback(() => {
     onCancelSelectValidator();
 
     onCancel?.();
   }, [onCancelSelectValidator, onCancel]);
+
+  useEffect(() => {
+    fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningValidatorRecommendation) => {
+      setDefaultValidatorMap(earningValidatorRecommendation);
+    }).catch(console.error);
+  }, []);
 
   useEffect(() => {
     const selected = changeValidators
@@ -438,18 +510,22 @@ const Component = (props: Props) => {
         }}
         title={t('Select validators')}
       >
+        <Search
+          autoFocus={true}
+          className={'__search-box'}
+          onSearch={handleSearch}
+          placeholder={t<string>('Search validator')}
+          searchValue={searchValue}
+          simpleLayout={true}
+        />
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
-          enableSearchInput={true}
           filterBy={filterFunction}
-          list={resultList}
+          list={validatorResultList}
           onClickActionBtn={onClickActionBtn}
           ref={sectionRef}
           renderItem={renderItem}
           renderWhenEmpty={renderEmpty}
-          searchFunction={searchFunction}
-          searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search validator')}
           // showActionBtn
         />
       </BaseModal>
@@ -515,6 +591,23 @@ const ChangeValidator = styled(forwardRef(Component))<Props>(({ theme: { token }
 
     '.pool-item:not(:last-child)': {
       marginBottom: token.marginXS
+    },
+
+    '.__section-header': {
+      fontSize: token.fontSizeSM,
+      color: token.colorTextSecondary,
+      fontWeight: token.fontWeightStrong,
+      marginBottom: token.marginXXS,
+      lineHeight: token.lineHeightSM
+    },
+
+    '.__selected-icon': {
+      paddingLeft: token.paddingXXS
+    },
+
+    '.__search-box': {
+      marginBottom: token.marginSM,
+      marginInline: token.margin
     }
   };
 });

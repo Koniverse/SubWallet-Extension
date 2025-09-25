@@ -3,10 +3,9 @@
 
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
-import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
 import { EarningTypeTag, Table } from '@subwallet/extension-web-ui/components';
 import { BN_TEN } from '@subwallet/extension-web-ui/constants';
-import { useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { useCreateGetSubnetStakingTokenName, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, Icon, Logo, Number } from '@subwallet/react-ui';
@@ -32,6 +31,7 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
   const { currencyData } = useSelector((state: RootState) => state.price);
   const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const priceMap = useSelector((state: RootState) => state.price.priceMap);
+  const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
 
   const columns = useMemo(() => {
     const tokenCol = {
@@ -40,11 +40,11 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
       className: '__table-token-col',
       render: (row: YieldPoolInfo) => {
         const isSubnetStaking = [YieldPoolType.SUBNET_STAKING].includes(row.type);
-        const subnetLogoNetwork = `subnet-${row.metadata.subnetData?.netuid || 0}`;
+        const subnetToken = getSubnetStakingTokenName(row.chain, row.metadata.subnetData?.netuid || 0);
 
         return (
           <div className={'__row-token-info-wrapper'}>
-            {!isSubnetStaking || !DefaultLogosMap[subnetLogoNetwork]
+            {!isSubnetStaking
               ? (
                 <Logo
                   className={'__item-logo'}
@@ -55,8 +55,9 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
                 <Logo
                   className='__item-logo'
                   isShowSubLogo={false}
-                  network={subnetLogoNetwork}
+                  network={row.metadata.logo || row.chain}
                   size={40}
+                  token={subnetToken}
                 />
               )}
             <div className={'__row-token-meta'}>
@@ -236,7 +237,7 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
       rewardsPerYearCol,
       detailActionCol
     ];
-  }, [assetRegistry, currencyData?.isPrefix, currencyData?.symbol, priceMap, t]);
+  }, [assetRegistry, currencyData?.isPrefix, currencyData?.symbol, getSubnetStakingTokenName, priceMap, t]);
 
   const getRowKey = useCallback((item: YieldPoolInfo) => {
     return item.slug;

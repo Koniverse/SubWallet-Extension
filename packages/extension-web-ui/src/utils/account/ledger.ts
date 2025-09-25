@@ -35,14 +35,30 @@ export const isSubstrateEcdsaAccountProxy = (accountProxy: AccountProxy) => {
   return getSignModeByAccountProxy(accountProxy) === AccountSignMode.ECDSA_SUBSTRATE_LEDGER;
 };
 
-export const hasOnlySubstrateEcdsaAccountProxy = (accountProxies: AccountProxy[]) => {
+// This function checks if the account proxies only contain Ledger Substrate ECDSA or Ledger EVM accounts
+export const checkIfAllAccountsAreSpecificLedgerTypes = (accountProxies: AccountProxy[]) => {
   const noAllAccountProxy = accountProxies.filter((accountProxy) => !isAccountAll(accountProxy.id));
 
-  return noAllAccountProxy.every((accountProxy) => {
+  let hasOnlyLedgerSubstrateEcdsa = true;
+  let hasOnlyLedgerEvm = true;
+
+  for (const accountProxy of noAllAccountProxy) {
     if (accountProxy.chainTypes.includes(AccountChainType.ETHEREUM)) {
-      return getSignModeByAccountProxy(accountProxy) === AccountSignMode.ECDSA_SUBSTRATE_LEDGER;
+      const signMode = getSignModeByAccountProxy(accountProxy);
+
+      if (signMode !== AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+        hasOnlyLedgerSubstrateEcdsa = false;
+      }
+
+      if (signMode !== AccountSignMode.GENERIC_LEDGER) {
+        hasOnlyLedgerEvm = false;
+      }
     }
 
-    return true;
-  });
+    if (!hasOnlyLedgerSubstrateEcdsa && !hasOnlyLedgerEvm) {
+      break; // Exit early if both conditions are false
+    }
+  }
+
+  return { hasOnlyLedgerSubstrateEcdsa, hasOnlyLedgerEvm };
 };

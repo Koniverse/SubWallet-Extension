@@ -4,9 +4,8 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { NormalYieldPoolStatistic, YieldCompoundingPeriod, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
-import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
 import { CollapsiblePanel, MetaInfo } from '@subwallet/extension-web-ui/components';
-import { useTranslation } from '@subwallet/extension-web-ui/hooks';
+import { useCreateGetSubnetStakingTokenName, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { getEarningTimeText } from '@subwallet/extension-web-ui/utils';
 import { Logo } from '@subwallet/react-ui';
@@ -40,11 +39,11 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
   }, [poolInfo.statistic]);
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
 
-  const networkKey = useMemo(() => {
-    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
+  const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
 
-    return DefaultLogosMap[`subnet-${netuid}`] ? `subnet-${netuid}` : 'subnet-0';
-  }, [poolInfo.metadata.subnetData?.netuid]);
+  const subnetToken = useMemo(() => {
+    return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.netuid || 0);
+  }, [getSubnetStakingTokenName, poolInfo.chain, poolInfo.metadata.subnetData?.netuid]);
 
   return (
     <CollapsiblePanel
@@ -72,9 +71,9 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
                 <Logo
                   className='__item-logo'
                   isShowSubLogo={false}
-                  network={networkKey}
-                  shape='circle'
+                  network={poolInfo.chain}
                   size={24}
+                  token={subnetToken}
                 />
                 <span className='chain-name'>{poolInfo.metadata.shortName}</span>
               </div>
