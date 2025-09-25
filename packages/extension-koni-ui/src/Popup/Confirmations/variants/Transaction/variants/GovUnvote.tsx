@@ -3,12 +3,13 @@
 
 import { RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Number } from '@subwallet/react-ui';
 import CN from 'classnames';
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 
 export interface BaseTransactionConfirmationProps extends ThemeProps {
@@ -69,7 +70,21 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
   );
 };
 
-const GovUnvoteTransactionConfirmation = styled(Component)<BaseTransactionConfirmationProps>(({ theme: { token } }: BaseTransactionConfirmationProps) => {
+const Wrapper = (props: BaseTransactionConfirmationProps) => {
+  const dataContext = useContext(DataContext);
+
+  return (
+    <PageWrapper
+      className={CN(props.className)}
+      hideLoading={true}
+      resolve={dataContext.awaitStores(['openGov', 'balance'])}
+    >
+      <Component {...props} />
+    </PageWrapper>
+  );
+};
+
+const GovUnvoteTransactionConfirmation = styled(Wrapper)<BaseTransactionConfirmationProps>(({ theme: { token } }: BaseTransactionConfirmationProps) => {
   return {
     '.address-field': {
       whiteSpace: 'nowrap'

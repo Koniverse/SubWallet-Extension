@@ -3,8 +3,9 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
-import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { AccountSelector, HiddenInput, MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, GOV_UNLOCK_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useDefaultNavigate, useGetGovLockedInfos, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleUnlockVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -14,7 +15,7 @@ import { Button, Form, Icon } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle, XCircle } from 'phosphor-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -237,6 +238,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const { defaultData } = useTransactionContext<GovUnlockVoteParams>();
   const { goHome } = useDefaultNavigate();
   const { isAllAccount } = useSelector((state) => state.accountState);
+  const dataContext = useContext(DataContext);
 
   const isNotAllowed = !defaultData.tracks || !defaultData.chain;
 
@@ -253,10 +255,15 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   }
 
   return (
-    <Component
-      className={className}
-      isAllAccount={isAllAccount}
-    />
+    <PageWrapper
+      resolve={dataContext.awaitStores(['openGov'])}
+    >
+      <Component
+        className={className}
+        isAllAccount={isAllAccount}
+      />
+    </PageWrapper>
+
   );
 };
 
