@@ -25,10 +25,11 @@ interface TransactionConfirmationInfo {
   chain: string;
   amount: BigNumber;
   transactionFee?: string;
+  isUnlock?: boolean;
   isUnVote?: boolean;
 }
 
-const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, transactionFee }: TransactionConfirmationInfo): GovLockedInfoConfirmation | null => {
+const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, isUnlock, transactionFee }: TransactionConfirmationInfo): GovLockedInfoConfirmation | null => {
   const account = useGetAccountByAddress(address);
   const govLockedInfos = useSelector((state) => state.openGov.govLockedInfos);
   const getAccountTokenBalance = useGetAccountTokenBalance();
@@ -87,11 +88,11 @@ const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, trans
       convertedAmount
     };
 
-    if (isUnVote) {
+    if (isUnlock) {
       // If it's an unvote, we need to decrease the governance lock by the amount
       govLockedInfo.governanceLock.to = BigNumber.max(currentGovernanceLock.minus(amount), BN_ZERO);
       govLockedInfo.governanceLock.from = currentGovernanceLock;
-    } else if (amount.gt(currentGovernanceLock)) {
+    } else if (amount.gt(currentGovernanceLock) && !isUnVote) {
       // If the amount to lock is greater than the current governance lock,
       // we need to increase the governance lock to the amount
       govLockedInfo.governanceLock.to = amount;
@@ -103,10 +104,10 @@ const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, trans
 
     let transferableAfterLock = currentTransferable.minus(transactionFee || BN_ZERO);
 
-    if (isUnVote) {
+    if (isUnlock) {
       // If it's an unvote, we need to add the amount to the transferable balance
       transferableAfterLock = transferableAfterLock.plus(amount);
-    } else if (amount.gt(currentAllLocked)) {
+    } else if (amount.gt(currentAllLocked) && !isUnVote) {
       // If the amount to lock is greater than the current total locked,
       // we need to minus the difference from the transferable balance
       const difference = amount.minus(currentAllLocked);
@@ -117,7 +118,7 @@ const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, trans
     govLockedInfo.transferable.to = BigNumber.max(transferableAfterLock, BN_ZERO);
 
     return govLockedInfo;
-  }, [amount, assetInfo, balanceInfo, currentGovInfo, isUnVote, priceMap, transactionFee]);
+  }, [amount, assetInfo, balanceInfo, currentGovInfo, isUnlock, isUnVote, priceMap, transactionFee]);
 };
 
 export default useGetGovVoteConfirmationInfo;

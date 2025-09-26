@@ -3,25 +3,26 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
-import { AccountSelector, HiddenInput, MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { isSameAddress } from '@subwallet/extension-base/utils';
+import { AccountAddressSelector, HiddenInput, MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, GOV_UNLOCK_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useDefaultNavigate, useGetGovLockedInfos, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleUnlockVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
-import { RootState } from '@subwallet/extension-koni-ui/stores';
+import { useGovReferendumVotes } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView/useGovReferendumVotes';
 import { FormCallbacks, FormFieldData, GovUnlockVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, funcSortByName, simpleCheckForm, toShort } from '@subwallet/extension-koni-ui/utils';
-import { Button, Form, Icon } from '@subwallet/react-ui';
+import { Button, Form, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { CheckCircle, XCircle } from 'phosphor-react';
+import { CheckCircle, Info, XCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { TransactionContent, TransactionFooter } from '../../parts';
+import { FreeBalance, TransactionContent, TransactionFooter } from '../../parts';
 
 type WrapperProps = ThemeProps;
 
@@ -31,6 +32,7 @@ type ComponentProps = {
 };
 
 const hideFields: Array<keyof GovUnlockVoteParams> = ['chain', 'amount', 'referendumIds', 'tracks'];
+const REFERENDA_VOTED_MODAL_ID = 'referenda-voted-modal';
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   const { className = '', isAllAccount } = props;
@@ -41,25 +43,24 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const [form] = Form.useForm<GovUnlockVoteParams>();
   const [loading, setLoading] = useState(false);
   const [isDisable, setIsDisable] = useState(false);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
   const navigate = useNavigate();
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
+  const [isBalanceReady, setIsBalanceReady] = useState<boolean>(true);
+  const { accountAddressItems } = useGovReferendumVotes({
+    chain: defaultData.chain,
+    referendumId: '',
+    fromAccountProxy: defaultData.fromAccountProxy
+  });
 
   const govLockInfo = useGetGovLockedInfos(chainValue);
 
-  const accounts = useSelector((state: RootState) => {
-    const accs = [...state.accountState.accounts];
+  const accountAddressFiltered = useMemo(() => accountAddressItems.filter((acc) => {
+    const votingInfo = govLockInfo.find((v) => isSameAddress(v.address, acc.address));
 
-    return accs.filter((acc) => {
-      const votingInfo = govLockInfo.find((v) => v.address === acc.address);
-
-      return votingInfo && votingInfo.summary.unlockable.trackIds.length > 0;
-    })
-      .sort(funcSortByName);
-  });
-
-  const { chainInfoMap } = useSelector((root) => root.chainStore);
-  const networkPrefix = chainInfoMap[chainValue].substrateInfo?.addressPrefix;
+    return votingInfo && votingInfo.summary.unlockable.trackIds.length > 0;
+  }).sort(funcSortByName), [accountAddressItems, govLockInfo]);
 
   const onPreCheck = usePreCheckAction(fromValue);
   const { onError, onSuccess } = useHandleSubmitTransaction();
@@ -74,6 +75,14 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     setIsDisable(empty || error);
     persistData(values);
   }, [persistData]);
+
+  const onCancelReferendaVotedModal = useCallback(() => {
+    inactiveModal(REFERENDA_VOTED_MODAL_ID);
+  }, [inactiveModal]);
+
+  const onOpenReferendaVotedModal = useCallback(() => {
+    activeModal(REFERENDA_VOTED_MODAL_ID);
+  }, [activeModal]);
 
   const onSubmit: FormCallbacks<GovUnlockVoteParams>['onFinish'] = useCallback((values: GovUnlockVoteParams) => {
     setLoading(true);
@@ -103,7 +112,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   }, [defaultData.chain, defaultData.fromAccountProxy, navigate, setGovUnlockVoteStorage]);
 
   const selectedLockInfo = useMemo(() => {
-    return govLockInfo.find((info) => info.address === fromValue);
+    return govLockInfo.find((info) => isSameAddress(info.address, fromValue));
   }, [govLockInfo, fromValue]);
 
   const unlockableReferenda = useMemo((): string[] => {
@@ -158,7 +167,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     <>
       <TransactionContent className={CN(`${className} -transaction-content`)}>
         <Form
-          className={'form-container form-space-sm'}
+          className={'form-container form-space-xxs'}
           form={form}
           initialValues={formDefault}
           onFieldsChange={onFieldsChange}
@@ -169,14 +178,22 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           <Form.Item
             name={'from'}
           >
-            <AccountSelector
-              addressPrefix={networkPrefix}
+            <AccountAddressSelector
               disabled={!isAllAccount}
-              doFilter={false}
-              externalAccounts={accounts}
+              isGovModal={true}
+              items={accountAddressFiltered}
+              label={`${t('From')}:`}
+              labelStyle={'horizontal'}
             />
           </Form.Item>
         </Form>
+        <FreeBalance
+          address={fromValue}
+          chain={chainValue}
+          className={'free-balance'}
+          label={t('Available balance')}
+          onBalanceReady={setIsBalanceReady}
+        />
         <MetaInfo
           className='custom-label'
           hasBackgroundWrapper={true}
@@ -194,7 +211,21 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
           {unlockableReferenda && unlockableReferenda.length > 0 && (
             <MetaInfo.Default label={t('Referenda voted')}>
-              {unlockableReferenda.length}
+
+              <span>
+                {unlockableReferenda.length}
+                <span
+                  className='referenda-voted-button'
+                  onClick={onOpenReferendaVotedModal}
+                >
+                        &nbsp;&nbsp;
+                  <Icon
+                    customSize={'18px'}
+                    phosphorIcon={Info}
+                    weight='bold'
+                  />
+                </span>
+              </span>
             </MetaInfo.Default>
           )}
         </MetaInfo>
@@ -216,7 +247,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         </Button>
 
         <Button
-          disabled={isDisable || accounts.length === 0}
+          disabled={isDisable || accountAddressFiltered.length === 0 || !isBalanceReady || !lockedAmount.gt(BN_ZERO)}
           icon={(
             <Icon
               phosphorIcon={CheckCircle}
@@ -229,6 +260,29 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           {t('Continue')}
         </Button>
       </TransactionFooter>
+      <SwModal
+        closable={true}
+        id={REFERENDA_VOTED_MODAL_ID}
+        onCancel={onCancelReferendaVotedModal}
+        title={t('Referenda voted')}
+      >
+        <MetaInfo
+          hasBackgroundWrapper
+        >
+          <MetaInfo.Data
+            valueColorSchema={'gray'}
+          >
+            {
+              unlockableReferenda.map((id, index) => (
+                <span key={id}>{`#${id}`}
+                  { index < unlockableReferenda.length - 1 ? ', ' : '' }
+                </span>
+              ))
+            }
+          </MetaInfo.Data>
+        </MetaInfo>
+      </SwModal>
+
     </>
   );
 };
@@ -256,10 +310,10 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
   return (
     <PageWrapper
-      resolve={dataContext.awaitStores(['openGov'])}
+      className={className}
+      resolve={dataContext.awaitStores(['openGov', 'balance'])}
     >
       <Component
-        className={className}
         isAllAccount={isAllAccount}
       />
     </PageWrapper>
@@ -269,6 +323,22 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
 const GovUnlockVote = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return {
+    display: 'flex',
+    flexDirection: 'column',
+
+    '.free-balance': {
+      marginBottom: token.marginSM
+    },
+
+    '.referenda-voted-button': {
+      cursor: 'pointer',
+      transition: 'all 0.3s',
+
+      '&:hover': {
+        color: token.colorTextLight1
+      }
+    },
+
     '.__total-amount-part': {
       display: 'flex',
       justifyContent: 'space-between',

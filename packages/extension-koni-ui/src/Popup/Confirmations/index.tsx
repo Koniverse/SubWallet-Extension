@@ -437,6 +437,9 @@ const Confirmations = styled(Component)<Props>(({ theme: { token } }: ThemeProps
     paddingBottom: token.sizeXS,
     backgroundColor: 'transparent',
     marginBottom: token.marginXS,
+    '.ant-sw-header-center-part': {
+      width: 'fit-content'
+    },
 
     h4: {
       marginBottom: 0

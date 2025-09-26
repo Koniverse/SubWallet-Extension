@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { GovVotingInfo, UnlockingReferendaData } from '@subwallet/extension-base/services/open-gov/interface';
+import { reformatAddress } from '@subwallet/extension-base/utils';
 import { Avatar, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, GOV_UNLOCK_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainPrefixBySlug, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -49,6 +50,22 @@ const PrevArrow = ({ currentSlide, slideCount, ...props }: CustomArrowProps) => 
     </div>
   </div>
 );
+
+const calculateTimeRemaining = (timestamp: number): string => {
+  const diffMs = timestamp - Date.now();
+  const diffSecs = Math.floor(diffMs / 1000);
+  const diffMins = Math.floor(diffSecs / 60);
+  const diffHrs = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHrs / 24);
+
+  return diffMs <= 0
+    ? ''
+    : diffDays > 0
+      ? `${diffDays}d ${diffHrs % 24}h`
+      : diffHrs > 0
+        ? `${diffHrs}h ${diffMins % 60}m`
+        : `${diffMins}m ${diffSecs % 60}s`;
+};
 
 const UNLOCKING_MODAL_ID = 'unlocking-modal';
 
@@ -114,7 +131,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
     return () => {
       setGovUnlockStorage({
         ...DEFAULT_GOV_UNLOCK_VOTE_PARAMS,
-        from: item.address,
+        from: reformatAddress(item.address, networkPrefix),
         fromAccountProxy,
         referendumIds: item.summary.unlockable.unlockableReferenda,
         tracks: item.summary.unlockable.trackIds,
@@ -123,7 +140,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
       });
       navigate('/transaction/gov-unlock-vote');
     };
-  }, [chain, fromAccountProxy, navigate, setGovUnlockStorage]);
+  }, [chain, fromAccountProxy, navigate, networkPrefix, setGovUnlockStorage]);
 
   const accountInfoItemsNode = useMemo(() => {
     return govLockedInfos
@@ -139,6 +156,8 @@ function Component ({ chain, className, govLockedInfos }: Props) {
             .reduce((max, cur) => (cur.gt(max) ? cur : max), BN_ZERO)
             .toString()
           : '0';
+
+        const lockedAmount = new BigN(item.summary?.unlockable?.balance || BN_ZERO);
 
         return (
           <MetaInfo
@@ -215,7 +234,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
               <Button
                 block={true}
                 className={'__unlock-button'}
-                disabled={item.summary.unlockable.trackIds.length === 0}
+                disabled={item.summary.unlockable.trackIds.length === 0 || !lockedAmount.gt(BN_ZERO)}
                 onClick={goUnlockVote(item)}
               >
                 <div className='__unlock-button-label'>
@@ -265,14 +284,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
           valueColorScheme='light'
         >
           {unlockingModalData.map((item, index) => {
-            const diffMs = item.timestamp - Date.now();
-            const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
-            const diffDays = Math.floor(diffHrs / 24);
-            const timeRemainingContent = diffMs <= 0
-              ? ''
-              : diffDays > 0
-                ? `${diffDays}d ${diffHrs % 24}h`
-                : `${diffHrs}h`;
+            const timeRemainingContent = calculateTimeRemaining(item.timestamp);
 
             return (
               <MetaInfo.Number
