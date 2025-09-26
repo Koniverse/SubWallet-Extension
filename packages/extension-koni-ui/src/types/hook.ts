@@ -6,8 +6,8 @@ import BigN from 'bignumber.js';
 
 export type TokenGroupHookType = {
   tokenGroupMap: Record<string, string[]>,
-  sortedTokenGroups: string[],
-  sortedTokenSlugs: string[],
+  tokenGroups: string[],
+  tokenSlugs: string[],
 }
 
 export type AccountBalanceHookType = {

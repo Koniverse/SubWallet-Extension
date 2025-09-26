@@ -8,7 +8,7 @@ import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-koni-ui/components';
 import { ServiceSelector } from '@subwallet/extension-koni-ui/components/Field/BuyTokens/ServiceSelector';
 import { TokenSelector } from '@subwallet/extension-koni-ui/components/Field/TokenSelector';
-import { useAssetChecker, useDefaultNavigate, useGetAccountTokenBalance, useGetChainSlugsByAccount, useNotification, useReformatAddress, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useAssetChecker, useCoreCreateReformatAddress, useDefaultNavigate, useGetAccountTokenBalance, useGetChainSlugsByCurrentAccountProxy, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
@@ -79,8 +79,8 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
   const getAccountTokenBalance = useGetAccountTokenBalance();
 
   const checkAsset = useAssetChecker();
-  const allowedChains = useGetChainSlugsByAccount();
-  const getReformatAddress = useReformatAddress();
+  const allowedChains = useGetChainSlugsByCurrentAccountProxy();
+  const getReformatAddress = useCoreCreateReformatAddress();
 
   const fixedTokenSlug = useMemo((): string | undefined => {
     if (currentSymbol) {

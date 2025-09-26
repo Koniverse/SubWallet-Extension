@@ -5,8 +5,9 @@ import { TokenBalanceSelectionItem, TokenEmptyList } from '@subwallet/extension-
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountBalanceHookType, ThemeProps, TokenBalanceItemType, TokenGroupHookType } from '@subwallet/extension-koni-ui/types';
-import { sortTokenByValue } from '@subwallet/extension-koni-ui/utils';
+import { sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { SwList, SwModal } from '@subwallet/react-ui';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -16,15 +17,15 @@ type Props = ThemeProps & {
   id: string,
   onCancel: () => void,
   tokenBalanceMap: AccountBalanceHookType['tokenBalanceMap'],
-  sortedTokenSlugs: TokenGroupHookType['sortedTokenSlugs'],
+  tokenSlugs: TokenGroupHookType['tokenSlugs'],
 }
 
 function getTokenBalances (
   tokenBalanceMap: AccountBalanceHookType['tokenBalanceMap'],
-  sortedTokenSlugs: TokenGroupHookType['sortedTokenSlugs']): TokenBalanceItemType[] {
+  tokenSlugs: TokenGroupHookType['tokenSlugs']): TokenBalanceItemType[] {
   const result: TokenBalanceItemType[] = [];
 
-  sortedTokenSlugs.forEach((tokenSlug) => {
+  tokenSlugs.forEach((tokenSlug) => {
     if (tokenBalanceMap[tokenSlug]) {
       result.push(tokenBalanceMap[tokenSlug]);
     }
@@ -33,18 +34,23 @@ function getTokenBalances (
   return result;
 }
 
-function Component ({ className = '', id, onCancel, sortedTokenSlugs, tokenBalanceMap }: Props): React.ReactElement<Props> {
+function Component ({ className = '', id, onCancel, tokenBalanceMap, tokenSlugs }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const { chainInfoMap } = useSelector((state) => state.chainStore);
   const { multiChainAssetMap } = useSelector((state) => state.assetRegistry);
   const assetRegistry = useChainAssets({ isActive: true }).chainAssetRegistry;
+  const priorityTokens = useSelector((state: RootState) => state.chainStore.priorityTokens);
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
 
   const tokenBalances = useMemo<TokenBalanceItemType[]>(() => {
-    return getTokenBalances(tokenBalanceMap, sortedTokenSlugs).sort(sortTokenByValue);
-  }, [tokenBalanceMap, sortedTokenSlugs]);
+    const result = getTokenBalances(tokenBalanceMap, tokenSlugs);
+
+    sortTokensByBalanceInSelector(result, priorityTokens);
+
+    return result;
+  }, [tokenBalanceMap, tokenSlugs, priorityTokens]);
 
   const onClickItem = useCallback((item: TokenBalanceItemType) => {
     return () => {
@@ -76,7 +82,7 @@ function Component ({ className = '', id, onCancel, sortedTokenSlugs, tokenBalan
   );
 
   const filteredItems = useMemo(() => {
-    const filteredTokenBalances = tokenBalances.filter((item) => {
+    return tokenBalances.filter((item) => {
       const searchTextLowerCase = currentSearchText.toLowerCase();
       const chainName = chainInfoMap[item.chain || '']?.name?.toLowerCase();
       const symbol = item.symbol.toLowerCase();
@@ -86,22 +92,6 @@ function Component ({ className = '', id, onCancel, sortedTokenSlugs, tokenBalan
         chainName.includes(searchTextLowerCase)
       );
     });
-
-    if (currentSearchText.toLowerCase() === 'ton') {
-      const tonItemIndex = filteredTokenBalances.findIndex((item) => item.slug === 'ton-NATIVE-TON');
-
-      if (tonItemIndex !== -1) {
-        const [tonItem] = filteredTokenBalances.splice(tonItemIndex, 1);
-
-        if (tonItem) {
-          filteredTokenBalances.unshift(tonItem);
-        }
-      }
-
-      return filteredTokenBalances;
-    } else {
-      return filteredTokenBalances;
-    }
   }, [chainInfoMap, currentSearchText, tokenBalances]);
 
   const renderEmpty = useCallback(() => {

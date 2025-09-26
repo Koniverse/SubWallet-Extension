@@ -10,6 +10,8 @@ export enum ServiceStatus {
   INITIALIZED = 'initialized',
   STARTED = 'started',
   STARTING = 'starting',
+  STARTED_FULL = 'started_full',
+  STARTING_FULL = 'starting_full',
   STOPPED = 'stopped',
   STOPPING = 'stopping',
 }

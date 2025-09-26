@@ -3,7 +3,7 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ExtrinsicDataTypeMap, ExtrinsicsDataResponse, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { _getBlockExplorerFromChain, _isChainTestNet, _isPureCardanoChain, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getBlockExplorerFromChain, _isChainTestNet, _isPureBitcoinChain, _isPureCardanoChain, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAIN_FLIP_MAINNET_EXPLORER, CHAIN_FLIP_TESTNET_EXPLORER, SIMPLE_SWAP_EXPLORER } from '@subwallet/extension-base/services/swap-service/utils';
 import { ChainflipSwapTxData, SimpleSwapTxData } from '@subwallet/extension-base/types/swap';
 import { SWApiResponse } from '@subwallet/subwallet-api-sdk/types';
@@ -39,8 +39,8 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return '#/accounts';
   }
 
-  if (explorerLink.includes('explorer.zkverify.io')) {
-    return 'account';
+  if (explorerLink.includes('explorer.gen6.app')) {
+    return '#/accounts';
   }
 
   if (explorerLink.includes('astral.autonomys')) {
@@ -55,7 +55,7 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
 }
 
 function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
-  if (_isPureEvmChain(chainInfo)) {
+  if (_isPureEvmChain(chainInfo) || _isPureBitcoinChain(chainInfo)) {
     return 'tx';
   }
 
@@ -65,6 +65,10 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
 
   if (['aventus', 'deeper_network'].includes(chainInfo.slug)) {
     return 'transaction';
+  }
+
+  if (['gen6_public'].includes(chainInfo.slug)) {
+    return '#/extrinsics';
   }
 
   const explorerLink = _getBlockExplorerFromChain(chainInfo);

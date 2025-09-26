@@ -250,7 +250,8 @@ export const _TRANSFER_CHAIN_GROUP = {
   avail: ['kate', 'goldberg_testnet'],
   pendulum: ['pendulum', 'amplitude', 'amplitude_test', 'hydradx_main', 'bifrost', 'bifrost_dot', 'jamton'],
   centrifuge: ['centrifuge'],
-  disable_transfer: ['crab', 'pangolin']
+  disable_transfer: ['crab', 'pangolin'],
+  truth: ['truth_network']
 };
 
 export const _BALANCE_PARSING_CHAIN_GROUP = {
@@ -301,9 +302,14 @@ export const LATEST_CHAIN_DATA_FETCHING_INTERVAL = 120000;
 // TODO: review
 const TARGET_BRANCH = process.env.NODE_ENV !== 'production' ? 'koni-dev' : 'master';
 
+export const _BITCOIN_CHAIN_SLUG = 'bitcoin';
+export const _BITCOIN_TESTNET_CHAIN_SLUG = 'bitcoinTestnet';
+export const _BITCOIN_NAME = 'Bitcoin';
+export const _BITCOIN_TESTNET_NAME = 'Bitcoin Testnet';
 export const _CHAIN_INFO_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/ChainInfo.json`;
 export const _CHAIN_ASSET_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/ChainAsset.json`;
 export const _ASSET_REF_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/AssetRef.json`;
 export const _MULTI_CHAIN_ASSET_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/MultiChainAsset.json`;
 export const _CHAIN_LOGO_MAP_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/ChainLogoMap.json`;
 export const _ASSET_LOGO_MAP_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/AssetLogoMap.json`;
+export const _BTC_SERVICE_TOKEN = process.env.BTC_SERVICE_TOKEN || '';

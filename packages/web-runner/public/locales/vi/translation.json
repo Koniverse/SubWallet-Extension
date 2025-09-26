@@ -1336,7 +1336,6 @@
   "Duplicate account name": "",
   "You have accounts with the same name. We have added characters to these account names to differentiate them. You can change account names later using": "",
   "Enter your account name or address": "",
-  "This seed phrase creates a unified account that can be used for Polkadot, Ethereum, Bitcoin and TON ecosystem. Keep in mind that for TON specifically, this seed phrase is not compatible with TON-native wallets.": "",
   "TON wallets have ": "",
   ", each with its own wallet address and balance. Select a version with the address you want to get": "",
   "Wallet address & version": "",
@@ -1524,5 +1523,15 @@
   "Swap fees": "",
   "Estimated total fee": "",
   "Transaction summary": "",
-  "Switched network successfully": ""
+  "Switched network successfully": "",
+  "SubWallet supports three Bitcoin address types for receiving and transferring assets. Make sure you choose the correct address type to avoid risks of fund loss. ": "",
+  "Select address type": "",
+  "This seed phrase creates a unified account that can be used for Polkadot, Ethereum, TON, Cardano & Bitcoin ecosystems. Keep in mind that for TON specifically, this seed phrase is not compatible with TON-native wallets.": "",
+  "BTC Transferable": "",
+  "BTC Rune (Locked)": "",
+  "BTC Inscription (Locked)": "",
+  "Sign PSBT request": "",
+  "Submitted time": "",
+  "Block time": "",
+  "{{symbol}} on {{chainName}} is not supported for swapping. Select another token and try again": ""
 }
