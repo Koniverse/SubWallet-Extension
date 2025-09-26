@@ -4,6 +4,7 @@
 import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
+import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
 import { useGetGovLockedInfos, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { getConvertedBalanceValue } from '@subwallet/extension-koni-ui/hooks/screen/home/useAccountBalance';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -12,7 +13,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon, Number } from '@subwallet/react-ui';
 import { BigNumber } from 'bignumber.js';
 import { CaretLeft } from 'phosphor-react';
-import React, { Context, useCallback, useContext, useMemo } from 'react';
+import React, { Context, useCallback, useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { ThemeContext } from 'styled-components';
 
@@ -33,7 +34,7 @@ const Component = ({ chainSlug, className, goOverview }: Props): React.ReactElem
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const { currencyData, priceMap } = useSelector((state: RootState) => state.price);
-
+  const { uiState: { setShowTabBar } } = useContext(HomeContext);
   const assetInfo = useMemo(() => {
     const assetSlug = _getChainNativeTokenSlug(chainInfoMap[chainSlug]);
 
@@ -54,6 +55,14 @@ const Component = ({ chainSlug, className, goOverview }: Props): React.ReactElem
 
     return getConvertedBalanceValue(totalLocked.shiftedBy(-decimals), priceMap[priceId] || 0).toString();
   }, [assetInfo, decimals, priceMap, totalLocked]);
+
+  useEffect(() => {
+    setShowTabBar(false);
+
+    return () => {
+      setShowTabBar(true);
+    };
+  }, [setShowTabBar]);
 
   return (
     <div className={className}>
