@@ -3,11 +3,12 @@
 
 import { PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
+import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
 import { useGovernanceView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView';
 import { UnlockTokenView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/views/UnlockToken';
 import { GovernanceScreenView } from '@subwallet/extension-koni-ui/types';
 import getSubsquareApi from '@subwallet/subsquare-api-sdk';
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 
 import { OverviewView } from './views/OverviewView';
 import { ReferendumDetailView } from './views/ReferendumDetailView';
@@ -19,10 +20,20 @@ const Component = () => {
     goOverview, goReferendumDetail, goUnlockToken, referendumId, setChain,
     view: currentScreenView } = useGovernanceView();
 
+  const { uiState: { setShowTabBar } } = useContext(HomeContext);
+
   const viewProps: ViewBaseType = useMemo(() => ({
     sdkInstance: chainSlugToSubsquareNetwork[currentChainSlug] ? getSubsquareApi(chainSlugToSubsquareNetwork[currentChainSlug]) : undefined,
     chainSlug: currentChainSlug
   }), [currentChainSlug]);
+
+  useEffect(() => {
+    setShowTabBar(false);
+
+    return () => {
+      setShowTabBar(true);
+    };
+  }, [setShowTabBar]);
 
   return (
     <>

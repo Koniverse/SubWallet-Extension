@@ -39,7 +39,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
   return (
     <PageWrapper
-      className={CN(className)}
+      className={CN(className, 'referendum-vote-wrapper')}
       resolve={dataContext.awaitStores(['openGov'])}
     >
       <Component />
@@ -50,6 +50,11 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
 const ReferendumVote = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
   return {
+    '&.referendum-vote-wrapper': {
+      overflow: 'auto',
+      display: 'flex',
+      flexDirection: 'column'
+    }
 
   };
 });
