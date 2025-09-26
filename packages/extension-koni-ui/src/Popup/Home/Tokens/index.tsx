@@ -53,8 +53,8 @@ const Component = (): React.ReactElement => {
   const { t } = useTranslation();
   const [isShrink, setIsShrink] = useState<boolean>(false);
   const navigate = useNavigate();
-  const location = useLocation() as unknown as { state?: LocationState };
-  const originScreen = location.state?.from ?? '';
+  const location = useLocation();
+  const originScreen = (location.state as { from?: string })?.from ?? '';
   const containerRef = useRef<HTMLDivElement>(null);
   const topBlockRef = useRef<HTMLDivElement>(null);
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
@@ -474,7 +474,9 @@ const Component = (): React.ReactElement => {
     } else if (originScreen === 'tokenImport') {
       onOpenCustomizeModal();
     }
-  }, [onOpenCustomizeModal, originScreen]);
+
+    navigate(location.pathname, { replace: true });
+  }, [location.pathname, navigate, onOpenCustomizeModal, originScreen]);
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);

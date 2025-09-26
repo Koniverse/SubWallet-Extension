@@ -114,6 +114,7 @@ function Component (props: Props): React.ReactElement<Props> {
         '-has-search-box': !!searchBox
       })}
       closeIcon={closeIcon}
+      destroyOnClose={true}
       footer={filterModalFooter}
       id={id}
       onCancel={onCancel}
