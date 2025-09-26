@@ -3,18 +3,16 @@
 
 import { RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { MetaInfo, NumberDisplay } from '@subwallet/extension-koni-ui/components';
+import { MetaInfo, NumberDisplay, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { VoteMetaInfo } from '@subwallet/extension-koni-ui/Popup/Confirmations/variants/Transaction/variants/index';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/components';
-import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Number } from '@subwallet/react-ui';
 import BigNumber from 'bignumber.js';
 import CN from 'classnames';
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 
 export interface BaseTransactionConfirmationProps extends ThemeProps {
