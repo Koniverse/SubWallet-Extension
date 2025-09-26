@@ -3,11 +3,13 @@
 
 import { RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { MetaInfo } from '@subwallet/extension-koni-ui/components';
-import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { MetaInfo, NumberDisplay } from '@subwallet/extension-koni-ui/components';
+import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { VoteMetaInfo } from '@subwallet/extension-koni-ui/Popup/Confirmations/variants/Transaction/variants/index';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Number } from '@subwallet/react-ui';
+import BigNumber from 'bignumber.js';
 import CN from 'classnames';
 import React from 'react';
 import styled from 'styled-components';
@@ -21,23 +23,43 @@ export interface BaseTransactionConfirmationProps extends ThemeProps {
 const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransactionConfirmationProps) => {
   const { className, transaction } = props;
   const data = transaction.data as RemoveVoteRequest;
-
   const { t } = useTranslation();
 
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
-
   const account = useGetAccountByAddress(transaction.address);
   const networkPrefix = useGetChainPrefixBySlug(transaction.chain);
+  const { currencyData } = useSelector((state: RootState) => state.price);
+
+  const govConfirmationInfo = useGetGovVoteConfirmationInfo({
+    address: transaction.address,
+    chain: transaction.chain,
+    amount: new BigNumber(data.totalAmount),
+    transactionFee: transaction.estimateFee?.value
+  });
+
+  console.log('govConfirmationInfo', govConfirmationInfo);
 
   return (
     <div className={CN(className)}>
-      <VoteMetaInfo type={data.type} />
-      <Number
-        className={'__voted-amount'}
-        decimal={decimals}
-        suffix={symbol}
-        value={data.totalAmount}
-      />
+      <div className={'overview-info-wrapper'}>
+        {data.type && (<VoteMetaInfo
+          type={data.type}
+        />)}
+        <Number
+          className={'__voted-amount'}
+          decimal={decimals}
+          size={30}
+          suffix={symbol}
+          value={data.totalAmount}
+        />
+        <Number
+          className={'__converted-unvoted-amount'}
+          decimal={0}
+          prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
+          suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+          value={govConfirmationInfo?.convertedAmount || '0'}
+        />
+      </div>
       <MetaInfo
         className={'meta-info'}
         hasBackgroundWrapper
@@ -61,6 +83,52 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         hasBackgroundWrapper
       >
         <MetaInfo.Default
+          className={'transferable-value-info'}
+          label={t('Transferable')}
+        >
+          {
+            !!govConfirmationInfo?.transferable.from && (
+              <>
+                <NumberDisplay
+                  className={'transferable-value-from'}
+                  decimal={decimals}
+                  value={govConfirmationInfo?.transferable.from}
+                />
+                <span className={'governance-trans'}>&nbsp;→&nbsp;</span>
+              </>
+            )
+          }
+          <NumberDisplay
+            className={'transferable-value-to'}
+            decimal={decimals}
+            suffix={symbol}
+            value={govConfirmationInfo?.transferable.to || '0'}
+          />
+        </MetaInfo.Default>
+        <MetaInfo.Default
+          className={'governance-lock'}
+          label={t('Governance lock')}
+        >
+          {
+            !!govConfirmationInfo?.governanceLock.from && (
+              <>
+                <NumberDisplay
+                  className={'transferable-value-from'}
+                  decimal={decimals}
+                  value={govConfirmationInfo?.governanceLock.from}
+                />
+                <span className={'governance-trans'}>&nbsp;→&nbsp;</span>
+              </>
+            )
+          }
+          <NumberDisplay
+            className={'transferable-value-to'}
+            decimal={decimals}
+            suffix={symbol}
+            value={govConfirmationInfo?.governanceLock.to || '0'}
+          />
+        </MetaInfo.Default>
+        <MetaInfo.Default
           label={t('Referenda')}
         >
           #{data.referendumIndex}
@@ -74,6 +142,25 @@ const GovUnvoteTransactionConfirmation = styled(Component)<BaseTransactionConfir
   return {
     '.address-field': {
       whiteSpace: 'nowrap'
+    },
+
+    '.__voted-amount': {
+      '.ant-number-suffix': {
+        color: `${token.colorTextSecondary} !important`,
+        fontSize: `${token.fontSizeHeading3}px !important`,
+        fontWeight: 'inherit !important',
+        lineHeight: token.lineHeightHeading3
+      }
+    },
+
+    '.transferable-value-info': {
+      '.__value-col .__value': {
+        display: 'flex'
+      }
+    },
+
+    '.overview-info-wrapper': {
+      paddingBottom: 24
     }
   };
 });
