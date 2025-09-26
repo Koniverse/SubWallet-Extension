@@ -63,7 +63,8 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const [standardAmountRenderKey, setStandardAmountRenderKey] = useState<string>(standardRenderKey);
 
-  const [loading, setLoading] = useState(false);
+  const [loadingButton, setLoadingButton] = useState<GovVoteType | null>(null);
+
   const [isDisable, setIsDisable] = useState(false);
   const [voteType, setVoteType] = useState<GovVoteType | null>(null);
 
@@ -147,7 +148,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
   const handleVoteClick = useCallback((type: GovVoteType) => {
     setVoteType(type);
-
+    setLoadingButton(type);
     form.submit();
   }, [form]);
 
@@ -174,8 +175,6 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       return;
     }
 
-    setLoading(true);
-
     if (voteType === GovVoteType.AYE || voteType === GovVoteType.NAY) {
       const voteRequest: StandardVoteRequest = {
         chain: chainValue,
@@ -192,7 +191,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           onSuccess(tx);
         })
         .catch(onError)
-        .finally(() => setLoading(false));
+        .finally(() => setLoadingButton(null));
     }
   }, [chainValue, conviction, referendumId, defaultData.track, onError, onSuccess, voteType]);
 
@@ -508,23 +507,23 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         <div className={'__vote-buttons-container'}>
           <VoteButton
             disabled={isDisable || !isBalanceReady}
-            loading={loading}
+            loading={loadingButton === GovVoteType.NAY}
             onClick={onPreCheck(handleClickNay, ExtrinsicType.GOV_VOTE)}
             type={GovVoteType.NAY}
           />
           <VoteButton
-            loading={loading}
+            loading={loadingButton === GovVoteType.ABSTAIN}
             onClick={goRefAbstainVote}
             type={GovVoteType.ABSTAIN}
           />
           <VoteButton
-            loading={loading}
+            loading={loadingButton === GovVoteType.SPLIT}
             onClick={goRefSplitVote}
             type={GovVoteType.SPLIT}
           />
           <VoteButton
             disabled={isDisable || !isBalanceReady}
-            loading={loading}
+            loading={loadingButton === GovVoteType.AYE}
             onClick={onPreCheck(handleClickAye, ExtrinsicType.GOV_VOTE)}
             type={GovVoteType.AYE}
           />
