@@ -702,7 +702,8 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
       paddingRight: token.padding,
       width: '100%',
       display: 'flex',
-      justifyContent: 'space-between'
+      justifyContent: 'space-between',
+      zIndex: 5
     },
 
     '.__scroll-container': {
