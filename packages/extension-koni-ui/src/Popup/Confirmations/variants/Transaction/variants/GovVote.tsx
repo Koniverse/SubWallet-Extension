@@ -1,10 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { govConvictionOptions, GovVoteRequest, GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxyAvatar, MetaInfo, NumberDisplay, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyAvatar, MetaInfo, NumberDisplay, PageWrapper, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
+import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useGetAccountByAddress, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -255,7 +255,21 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
   );
 };
 
-const GovVoteTransactionConfirmation = styled(Component)<BaseTransactionConfirmationProps>(({ theme: { token } }: BaseTransactionConfirmationProps) => {
+const Wrapper = (props: BaseTransactionConfirmationProps) => {
+  const dataContext = useContext(DataContext);
+
+  return (
+    <PageWrapper
+      className={CN(props.className)}
+      hideLoading={true}
+      resolve={dataContext.awaitStores(['openGov', 'balance'])}
+    >
+      <Component {...props} />
+    </PageWrapper>
+  );
+};
+
+const GovVoteTransactionConfirmation = styled(Wrapper)<BaseTransactionConfirmationProps>(({ theme: { token } }: BaseTransactionConfirmationProps) => {
   return {
     '.__vote-amount-wrapper': {
       display: 'flex',

@@ -5,8 +5,9 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { GovVoteType, RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
-import { AccountAddressSelector, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, HiddenInput, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useDefaultNavigate, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleRemoveVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { useGovReferendumVotes } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView/useGovReferendumVotes';
@@ -16,7 +17,7 @@ import { Button, Form, Icon } from '@subwallet/react-ui';
 import BigNumber from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle, XCircle } from 'phosphor-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -272,6 +273,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const { className } = props;
   const { defaultData } = useTransactionContext<GovReferendumUnvoteParams>();
+  const dataContext = useContext(DataContext);
   const { goHome } = useDefaultNavigate();
   const { accountProxies, isAllAccount } = useSelector((state) => state.accountState);
 
@@ -300,11 +302,16 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   }
 
   return (
-    <Component
-      className={className}
-      isAllAccount={isAllAccount}
-      targetAccountProxy={targetAccountProxy}
-    />
+    <PageWrapper
+      resolve={dataContext.awaitStores(['openGov'])}
+    >
+      <Component
+        className={className}
+        isAllAccount={isAllAccount}
+        targetAccountProxy={targetAccountProxy}
+      />
+    </PageWrapper>
+
   );
 };
 

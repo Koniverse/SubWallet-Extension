@@ -7,6 +7,9 @@ import { MetaInfo, NumberDisplay } from '@subwallet/extension-koni-ui/components
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { VoteMetaInfo } from '@subwallet/extension-koni-ui/Popup/Confirmations/variants/Transaction/variants/index';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
+import { MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
+import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Number } from '@subwallet/react-ui';
 import BigNumber from 'bignumber.js';
@@ -138,7 +141,21 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
   );
 };
 
-const GovUnvoteTransactionConfirmation = styled(Component)<BaseTransactionConfirmationProps>(({ theme: { token } }: BaseTransactionConfirmationProps) => {
+const Wrapper = (props: BaseTransactionConfirmationProps) => {
+  const dataContext = useContext(DataContext);
+
+  return (
+    <PageWrapper
+      className={CN(props.className)}
+      hideLoading={true}
+      resolve={dataContext.awaitStores(['openGov', 'balance'])}
+    >
+      <Component {...props} />
+    </PageWrapper>
+  );
+};
+
+const GovUnvoteTransactionConfirmation = styled(Wrapper)<BaseTransactionConfirmationProps>(({ theme: { token } }: BaseTransactionConfirmationProps) => {
   return {
     '.address-field': {
       whiteSpace: 'nowrap'
