@@ -430,6 +430,10 @@ const ReferendumAbstainVote = styled(Wrapper)<WrapperProps>(({ theme: { token } 
       gap: token.sizeSM
     },
 
+    '&.-transaction-footer': {
+      marginBottom: 4
+    },
+
     '.form-group': {
       display: 'flex',
       flexDirection: 'column',
