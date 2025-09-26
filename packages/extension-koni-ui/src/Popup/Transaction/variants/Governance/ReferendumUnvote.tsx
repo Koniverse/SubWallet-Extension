@@ -303,10 +303,10 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
 
   return (
     <PageWrapper
+      className={CN(className, 'referendum-unvote-wrapper')}
       resolve={dataContext.awaitStores(['openGov'])}
     >
       <Component
-        className={className}
         isAllAccount={isAllAccount}
         targetAccountProxy={targetAccountProxy}
       />
@@ -319,6 +319,11 @@ const ReferendumUnvote = styled(Wrapper)<WrapperProps>(({ theme: { token } }: Wr
   return {
     '.free-balance': {
       marginBottom: 12
+    },
+    '&.referendum-unvote-wrapper': {
+      overflow: 'auto',
+      display: 'flex',
+      flexDirection: 'column'
     }
   };
 });
