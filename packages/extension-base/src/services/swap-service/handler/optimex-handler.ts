@@ -24,7 +24,7 @@ import { hexStripPrefix, u8aToHex } from '@polkadot/util';
 
 interface OptimexQuoteMetadata {
   session_id: string;
-  best_quote: string,
+  best_quote_after_fees: string;
 }
 
 interface OptimexTradeRequest {
@@ -146,7 +146,7 @@ export class OptimexHandler implements SwapBaseInterface {
         user_refund_pubkey: sender, // Refund pubkey if trade fails, in btc is pubkey and in evm is address
         creator_public_key: sender, // Compressed public key, in btc is pubkey and in evm is address
         from_wallet_address: sender, // Creator address
-        min_amount_out: getAmountAfterSlippage(metadata.best_quote, slippage),
+        min_amount_out: getAmountAfterSlippage(metadata.best_quote_after_fees, slippage),
         affiliate_info: [swAffiliate]
       };
     } else if (fromChainType === ChainType.BITCOIN) {
@@ -161,7 +161,7 @@ export class OptimexHandler implements SwapBaseInterface {
         user_refund_pubkey: fromPublicKey,
         creator_public_key: fromPublicKey,
         from_wallet_address: sender,
-        min_amount_out: getAmountAfterSlippage(metadata.best_quote, slippage),
+        min_amount_out: getAmountAfterSlippage(metadata.best_quote_after_fees, slippage),
         affiliate_info: [swAffiliate]
       };
     } else {
