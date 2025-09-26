@@ -1,13 +1,20 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useGetGovLockedInfos } from '@subwallet/extension-koni-ui/hooks';
+import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
+import { BN_ZERO } from '@subwallet/extension-base/utils';
+import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
+import { useGetGovLockedInfos, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { getConvertedBalanceValue } from '@subwallet/extension-koni-ui/hooks/screen/home/useAccountBalance';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
+import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Button, Icon } from '@subwallet/react-ui';
+import { Button, Icon, Number } from '@subwallet/react-ui';
+import { BigNumber } from 'bignumber.js';
 import { CaretLeft } from 'phosphor-react';
-import React, { useCallback } from 'react';
+import React, { Context, useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import styled, { ThemeContext } from 'styled-components';
 
 import { ViewBaseType } from '../../types';
 import { LockedAccountInfoPart } from './LockedAccountInfoPart';
@@ -22,6 +29,31 @@ const Component = ({ chainSlug, className, goOverview }: Props): React.ReactElem
     goOverview();
   }, [goOverview]);
   const govLockedInfos = useGetGovLockedInfos(chainSlug);
+  const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+  const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
+  const { currencyData, priceMap } = useSelector((state: RootState) => state.price);
+
+  const assetInfo = useMemo(() => {
+    const assetSlug = _getChainNativeTokenSlug(chainInfoMap[chainSlug]);
+
+    return assetRegistry[assetSlug];
+  }, [assetRegistry, chainInfoMap, chainSlug]);
+
+  const decimals = _getAssetDecimals(assetInfo);
+  const symbol = _getAssetSymbol(assetInfo);
+
+  const totalLocked = useMemo(() => {
+    return govLockedInfos.reduce<BigNumber>((total, { summary: { totalLocked } }) => {
+      return total.plus(totalLocked);
+    }, BN_ZERO);
+  }, [govLockedInfos]);
+
+  const totalLockedConverted = useMemo(() => {
+    const priceId = _getAssetPriceId(assetInfo);
+
+    return getConvertedBalanceValue(totalLocked.shiftedBy(-decimals), priceMap[priceId]).toString();
+  }, [assetInfo, decimals, priceMap, totalLocked]);
 
   return (
     <div className={className}>
@@ -42,6 +74,35 @@ const Component = ({ chainSlug, className, goOverview }: Props): React.ReactElem
       </div>
 
       <div className='__middle-part'>
+        <div className={'__total-locked-container'}>
+          <div className={'__total-locked-label'}>
+            {t('Total locked')}
+          </div>
+          <NumberDisplay
+            className={'__total-locked-value'}
+            decimal={decimals}
+            decimalColor={token.colorTextLight1}
+            intColor={token.colorTextLight1}
+            size={30}
+            suffix={symbol}
+            unitColor={token.colorTextLight1}
+            value={totalLocked}
+            weight={600}
+          />
+
+          <Number
+            decimal={0}
+            decimalOpacity={0.45}
+            intOpacity={0.45}
+            prefix={(currencyData?.isPrefix && currencyData.symbol) || ''}
+            size={16}
+            suffix={(!currencyData?.isPrefix && currencyData?.symbol) || ''}
+            unitOpacity={0.45}
+            value={totalLockedConverted}
+            weight={500}
+          />
+        </div>
+
         <LockedAccountInfoPart
           chain={chainSlug}
           govLockedInfos={govLockedInfos}
@@ -88,6 +149,33 @@ export const UnlockTokenView = styled(Component)<Props>(({ theme: { token } }: P
 
     '.__middle-part': {
       paddingInline: token.padding
+    },
+
+    '.__total-locked-container': {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      marginBottom: token.marginMD,
+      backgroundColor: token.colorBgSecondary,
+      borderRadius: token.borderRadiusLG,
+      gap: token.sizeXS,
+      padding: token.padding,
+      paddingTop: token.paddingSM
+    },
+
+    '.__total-locked-label': {
+      fontSize: token.fontSizeSM,
+      lineHeight: token.lineHeightSM,
+      fontWeight: token.bodyFontWeight,
+      color: token.colorTextLight4
+    },
+
+    '.__total-locked-value': {
+      '.ant-number-suffix': {
+        fontSize: `${token.fontSizeHeading3}px !important`,
+        lineHeight: `${token.lineHeightHeading3} !important`,
+        color: `${token.colorTextLight3} !important`
+      }
     }
   };
 });
