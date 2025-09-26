@@ -35,10 +35,9 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
     address: transaction.address,
     chain: transaction.chain,
     amount: new BigNumber(data.totalAmount),
-    transactionFee: transaction.estimateFee?.value
+    transactionFee: transaction.estimateFee?.value,
+    isUnVote: true
   });
-
-  console.log('govConfirmationInfo', govConfirmationInfo);
 
   return (
     <div className={CN(className)}>
@@ -54,11 +53,15 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           value={data.totalAmount}
         />
         <Number
-          className={'__converted-unvoted-amount'}
           decimal={0}
-          prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
-          suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
-          value={govConfirmationInfo?.convertedAmount || '0'}
+          decimalOpacity={0.45}
+          intOpacity={0.45}
+          prefix={(currencyData?.isPrefix && currencyData.symbol) || ''}
+          size={16}
+          suffix={(!currencyData?.isPrefix && currencyData?.symbol) || ''}
+          unitOpacity={0.45}
+          value={govConfirmationInfo?.convertedAmount || 0}
+          weight={500}
         />
       </div>
       <MetaInfo
@@ -107,14 +110,14 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           />
         </MetaInfo.Default>
         <MetaInfo.Default
-          className={'governance-lock'}
+          className={'governance-lock-value-info'}
           label={t('Governance lock')}
         >
           {
             !!govConfirmationInfo?.governanceLock.from && (
               <>
                 <NumberDisplay
-                  className={'transferable-value-from'}
+                  className={'governance-lock-value-from'}
                   decimal={decimals}
                   value={govConfirmationInfo?.governanceLock.from}
                 />
@@ -123,7 +126,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
             )
           }
           <NumberDisplay
-            className={'transferable-value-to'}
+            className={'governance-lock-value-to'}
             decimal={decimals}
             suffix={symbol}
             value={govConfirmationInfo?.governanceLock.to || '0'}
@@ -168,7 +171,7 @@ const GovUnvoteTransactionConfirmation = styled(Wrapper)<BaseTransactionConfirma
       }
     },
 
-    '.transferable-value-info': {
+    '.transferable-value-info, .governance-lock-value-info': {
       '.__value-col .__value': {
         display: 'flex'
       }

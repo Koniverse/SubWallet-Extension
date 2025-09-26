@@ -52,7 +52,7 @@ const Component = ({ chainSlug, className, goOverview }: Props): React.ReactElem
   const totalLockedConverted = useMemo(() => {
     const priceId = _getAssetPriceId(assetInfo);
 
-    return getConvertedBalanceValue(totalLocked.shiftedBy(-decimals), priceMap[priceId]).toString();
+    return getConvertedBalanceValue(totalLocked.shiftedBy(-decimals), priceMap[priceId] || 0).toString();
   }, [assetInfo, decimals, priceMap, totalLocked]);
 
   return (

@@ -79,7 +79,7 @@ const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, trans
     const currentAllLocked = balanceInfo.locked.value.shiftedBy(decimals);
     const currentGovernanceLock = new BigNumber(currentGovInfo?.summary.totalLocked || 0);
 
-    const convertedAmount = getConvertedBalanceValue(amount.shiftedBy(-decimals), priceMap[priceId]).toString();
+    const convertedAmount = getConvertedBalanceValue(amount.shiftedBy(-decimals), priceMap[priceId] || 0).toString();
 
     const govLockedInfo: GovLockedInfoConfirmation = {
       transferable: { to: currentTransferable, from: currentTransferable },
@@ -88,9 +88,8 @@ const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, trans
     };
 
     if (isUnVote) {
-      // If it's an unvote and the amount to lock is greater than the current governance lock,
-      // we need to set the governance lock to 0
-      govLockedInfo.governanceLock.to = BN_ZERO;
+      // If it's an unvote, we need to decrease the governance lock by the amount
+      govLockedInfo.governanceLock.to = BigNumber.max(currentGovernanceLock.minus(amount), BN_ZERO);
       govLockedInfo.governanceLock.from = currentGovernanceLock;
     } else if (amount.gt(currentGovernanceLock)) {
       // If the amount to lock is greater than the current governance lock,
@@ -106,7 +105,7 @@ const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, trans
 
     if (isUnVote) {
       // If it's an unvote, we need to add the amount to the transferable balance
-      transferableAfterLock = transferableAfterLock.plus(currentGovernanceLock);
+      transferableAfterLock = transferableAfterLock.plus(amount);
     } else if (amount.gt(currentAllLocked)) {
       // If the amount to lock is greater than the current total locked,
       // we need to minus the difference from the transferable balance
