@@ -5,7 +5,7 @@ import { FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import { GovFilterModal } from '@subwallet/extension-koni-ui/components/Modal/Governance/GovFilterModal';
 import { ReferendaCategory } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Button, Icon, ModalContext } from '@subwallet/react-ui';
+import { Badge, Button, Icon, ModalContext } from '@subwallet/react-ui';
 import { GovStatusKey, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { FadersHorizontal, MagnifyingGlass } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
@@ -71,6 +71,8 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
     inactiveModal(GOV_FILTER_MODAL_ID);
   }, [inactiveModal]);
 
+  const hasAnyFilterValue = isEnableDelegatedFilter || isEnableTreasuryFilter || isEnableVotedFilter || (trackSelected !== 'All' || statusSelected !== 'All');
+
   return (
     <div className={className}>
       <FilterTabs
@@ -95,10 +97,15 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
 
         <Button
           icon={
-            <Icon
-              customSize='20px'
-              phosphorIcon={FadersHorizontal}
-            />
+            <Badge
+              className={'g-filter-badge'}
+              dot={hasAnyFilterValue}
+            >
+              <Icon
+                customSize='20px'
+                phosphorIcon={FadersHorizontal}
+              />
+            </Badge>
           }
           onClick={onOpenFilter}
           size='xs'
