@@ -422,8 +422,6 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
     const { address: selectedCollatorAddress } = selectedCollatorInfo;
     const onchainSelectedCollatorNominatorCount = onchainCollatorInfo.nominationCount;
 
-    console.log('checking', onchainCollatorInfo);
-
     const compoundResult = (
       extrinsic: SubmittableExtrinsic<'promise'>
     ): Promise<[TransactionData, YieldTokenBaseInfo]> => {
