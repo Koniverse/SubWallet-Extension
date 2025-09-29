@@ -178,7 +178,18 @@ export const ReferendaSearchModal = styled(Component)<Props>(({ theme: { token }
 
     '.ant-sw-modal-body': {
       height: '100%',
-      overflowY: 'hidden'
+      overflowY: 'hidden',
+      paddingTop: 0
+    },
+    '.ant-sw-modal-content': {
+      height: '100%',
+      minHeight: 599,
+      maxHeight: 599,
+      borderRadius: 0
+    },
+
+    '.ant-sw-modal-header': {
+      borderBottom: 0
     },
 
     '.referenda-list': {
