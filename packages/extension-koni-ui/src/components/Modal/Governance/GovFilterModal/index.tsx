@@ -163,14 +163,14 @@ function Component (props: Props): React.ReactElement<Props> {
       {/* </div> */}
       <div className='__status-selectors'>
         <GovStatusSelector
-          label='Status'
+          label={t('Status')}
           onChange={onSelectStatus}
           value={statusSelected}
         />
       </div>
       <GovTrackSelector
         chain={chain}
-        label='Track'
+        label={t('Track')}
         onChange={onSelectTrack}
         sdkInstance={sdkInstance}
         value={trackSelected}

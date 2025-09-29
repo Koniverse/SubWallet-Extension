@@ -31,19 +31,21 @@ const Component = ({ className, referendumStatus, timeline }: Props): React.Reac
     return undefined;
   }, [referendumStatus]);
 
+  const timelineItems = useMemo(() => {
+    return timeline.map((item, index) => (
+      <TimelineItem
+        datetime={item.indexer.blockTime}
+        isLastItem={index === timeline.length - 1}
+        key={item.name}
+        state={index === timeline.length - 1 ? lastItemState : undefined}
+        title={item.name}
+      />
+    ));
+  }, [timeline, lastItemState]);
+
   return (
     <div className={className}>
-      {
-        timeline.map((item, index) => (
-          <TimelineItem
-            datetime={item.indexer.blockTime}
-            isLastItem={index === timeline.length - 1}
-            key={item.name}
-            state={index === timeline.length - 1 ? lastItemState : undefined}
-            title={item.name}
-          />
-        ))
-      }
+      {timelineItems}
     </div>
   );
 };

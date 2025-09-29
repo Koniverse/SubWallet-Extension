@@ -21,19 +21,11 @@ interface BaseProps extends ThemeProps, BasicInputWrapper {
   autoSelectFirstItem?: boolean;
 }
 
-interface RegularProps extends BaseProps {
-  items: AccountAddressItemType[];
-  isGovModal?: false;
-  avatarSize: undefined;
-}
-
-interface GovProps extends BaseProps {
-  items: GovAccountAddressItemType[];
-  isGovModal: true;
+interface Props extends BaseProps {
+  items: AccountAddressItemType[] | GovAccountAddressItemType[];
+  isGovModal?: boolean;
   avatarSize?: number;
 }
-
-type Props = RegularProps | GovProps;
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> => {
   const { autoSelectFirstItem, avatarSize = 20, className = '', disabled
@@ -130,7 +122,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
         ? (
           <GovAccountSelectoModal
             autoSelectFirstItem={autoSelectFirstItem}
-            items={items}
+            items={items as GovAccountAddressItemType[]}
             modalId={id}
             onCancel={onCancelModal}
             onSelectItem={onSelectItem}

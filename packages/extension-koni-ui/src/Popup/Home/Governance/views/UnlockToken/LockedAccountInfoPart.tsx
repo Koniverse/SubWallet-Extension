@@ -247,6 +247,24 @@ function Component ({ chain, className, govLockedInfos }: Props) {
       });
   }, [govLockedInfos, renderAccount, t, decimals, symbol, onShowUnlockingModal, goUnlockVote]);
 
+  const unlockingModalContent = useMemo(() => {
+    return unlockingModalData.map((item, index) => {
+      const timeRemainingContent = calculateTimeRemaining(item.timestamp);
+
+      return (
+        <MetaInfo.Number
+          decimalOpacity={0.45}
+          decimals={decimals}
+          key={item.id}
+          label={t('Unlockable in {{date}}', { date: timeRemainingContent })}
+          suffix={symbol}
+          value={item.balance}
+          valueColorSchema='even-odd'
+        />
+      );
+    });
+  }, [unlockingModalData, decimals, symbol, t]);
+
   return (
     <div className={CN(className, {
       '-horizontal-mode': isAllAccount,
@@ -282,21 +300,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
           labelFontWeight='semibold'
           valueColorScheme='light'
         >
-          {unlockingModalData.map((item, index) => {
-            const timeRemainingContent = calculateTimeRemaining(item.timestamp);
-
-            return (
-              <MetaInfo.Number
-                decimalOpacity={0.45}
-                decimals={decimals}
-                key={item.id}
-                label={t('Unlockable in {{date}}', { date: timeRemainingContent })}
-                suffix={symbol}
-                value={item.balance}
-                valueColorSchema='even-odd'
-              />
-            );
-          })}
+          {unlockingModalContent}
         </MetaInfo>
       </SwModal>
     </div>

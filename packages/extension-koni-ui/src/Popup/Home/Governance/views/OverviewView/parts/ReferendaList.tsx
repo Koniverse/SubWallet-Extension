@@ -8,7 +8,7 @@ import { ReferendumWithVoting } from '@subwallet/extension-koni-ui/types/gov';
 import { Referendum } from '@subwallet/subsquare-api-sdk';
 import { t } from 'i18next';
 import { ListChecks } from 'phosphor-react';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -28,19 +28,23 @@ const Component = ({ chain, className, items, onClickItem }: Props): React.React
     };
   }, [onClickItem]);
 
+  const renderedItems = useMemo(() => {
+    return items.map((item) => (
+      <ReferendumItem
+        chain={chain}
+        className={'__referendum-item'}
+        item={item}
+        key={item.referendumIndex}
+        onClick={_onClickItem(item)}
+      />
+    ));
+  }, [items, chain, _onClickItem]);
+
   return (
     <div className={className}>
       {
         items.length > 0
-          ? items.map((item, index) => (
-            <ReferendumItem
-              chain={chain}
-              className={'__referendum-item'}
-              item={item}
-              key={item.referendumIndex}
-              onClick={_onClickItem(item)}
-            />
-          ))
+          ? renderedItems
           : <EmptyList
             className={'__emptyList'}
             emptyMessage={t('Explore ongoing referenda and cast your vote')}

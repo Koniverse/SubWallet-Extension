@@ -30,7 +30,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
 
   return (
     <div className={CN(className, '__i-vote-summary')}>
-      {userVoting && userVoting.length > 0
+      {!!userVoting && userVoting.length > 0
         ? userVoting.length > 1
           ? (
             <div className='__i-vote-summary-label'>
@@ -39,7 +39,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
           )
           : (
             <>
-              {vote && (
+              {!!vote && (
                 <>
                   <div className='__i-vote-summary-label'>
                     {t('Voted:')}&nbsp;
@@ -94,7 +94,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
                 </>
               )}
 
-              {delegation && (
+              {!!delegation && (
                 <>
                   <div className='__i-vote-summary-label'>
                     {t('Voted:')}&nbsp;

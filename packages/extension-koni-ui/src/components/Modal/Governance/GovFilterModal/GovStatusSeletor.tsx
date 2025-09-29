@@ -37,7 +37,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
     return (
       <div className={CN('__status-item', { '-selected': selected })}>
         <div className='__status-left'>
-          {StatusIcon && (
+          {!!StatusIcon && (
             <Icon
               customSize='20px'
               iconColor={color}

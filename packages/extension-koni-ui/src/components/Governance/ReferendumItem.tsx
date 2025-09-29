@@ -45,7 +45,7 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
         <div className='__i-ref-id'>#{item.referendumIndex}</div>
         <div className='__i-requested-amount-container'>
 
-          {item.allSpends && item.allSpends.length > 0 && (
+          {!!item.allSpends && item.allSpends.length > 0 && (
             <SpendSummary
               chain={chain}
               className='__i-requested-amount'
@@ -78,7 +78,7 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
             chain={chain}
             userVoting={item.userVoting}
           />
-          {timeLeft && (
+          {!!timeLeft && (
             <div className='__i-reject-time'>
               {t('{{status}} in {{time}}', {
                 status: ayesPercent > naysPercent ? t('Approve') : t('Reject'),

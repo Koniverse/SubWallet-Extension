@@ -3,10 +3,10 @@
 
 import { govConvictionOptions } from '@subwallet/extension-base/services/open-gov/interface';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
-import { AccountProxyAvatar, EmptyList } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyAvatar, EmptyList, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { findAccountByAddress, formatBalance, getAccountProxyTypeIcon, toShort } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, getAccountProxyTypeIcon, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, SwList, Web3Block } from '@subwallet/react-ui';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
@@ -103,7 +103,13 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
             <div className='vote-item__meta'>
               <div className='vote-item__meta-row'>
                 <span className='vote-item__label'>Votes</span>
-                {formatBalance(item.votes || 0, decimal)} {symbol}
+                <NumberDisplay
+                  decimal={decimal}
+                  formatType={'balance'}
+                  size={12}
+                  suffix={symbol}
+                  value={item.votes || 0}
+                />
               </div>
               <div className='vote-item__meta-row'>
                 <span className='vote-item__label'>Conviction</span>
@@ -111,7 +117,13 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
               </div>
               <div className='vote-item__meta-row'>
                 <span className='vote-item__label'>Capital</span>
-                {formatBalance(item.balance || 0, decimal)} {symbol}
+                <NumberDisplay
+                  decimal={decimal}
+                  formatType={'balance'}
+                  size={12}
+                  suffix={symbol}
+                  value={item.balance || 0}
+                />
               </div>
             </div>
           </div>
@@ -209,7 +221,7 @@ export const FlattenedVoteList = styled(forwardRef(Component))<Props>(({ theme: 
     '.vote-item__arrow-wrapper': {
       display: 'flex',
       alignItems: 'flex-start',
-      marginTop: '2px'
+      marginTop: '-8px'
     },
 
     '.__item-avatar-wrapper': {

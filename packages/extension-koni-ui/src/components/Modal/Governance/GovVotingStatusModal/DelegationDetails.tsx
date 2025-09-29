@@ -21,7 +21,7 @@ type Props = ThemeProps & {
 };
 
 function Component (props: Props): React.ReactElement<Props> {
-  const { chain, className, decimals, nestedAccount, onCancel, symbol } = props;
+  const { chain, className = '', decimals, nestedAccount, onCancel, symbol } = props;
   const { t } = useTranslation();
   const { inactiveModal } = useContext(ModalContext);
 
@@ -33,7 +33,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
   return (
     <SwModal
-      className={`${className ?? ''} modal-full`}
+      className={`${className} modal-full`}
       id={GOV_DELEGATION_DETAILS_MODAL}
       onCancel={_onCancel}
       title={t('Delegation details')}

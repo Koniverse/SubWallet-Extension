@@ -105,8 +105,8 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   return (
     <div className={className}>
       <div className={'__vote-title-box'}>
-        <div className={'__vote-title'}>Voting Summary</div>
-        {timeLeft && (
+        <div className={'__vote-title'}>{t('Voting Summary')}</div>
+        {!!timeLeft && (
           <div className={'__vote-remaining-time'}>
             <Icon
               customSize={'16px'}
@@ -114,7 +114,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
               weight={'fill'}
             />
             <div>
-              Reject in {timeLeft}
+              {t('Reject in {{timeLeft}}', { timeLeft })}
             </div>
           </div>
         )}
@@ -128,7 +128,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
           thresholdPercent={thresholdPercent}
         />
 
-        {userVotingInfo &&
+        {!!userVotingInfo &&
           <div className={'__i-vote-summary-total'}>
             <ReferendumVoteSummary
               chain={chain}
@@ -162,7 +162,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
         {t('Vote')}
       </Button>
 
-      {userVotingInfo && <GovVotedAccountsModal
+      {!!userVotingInfo && <GovVotedAccountsModal
         chain={chain}
         modalId={GovVotedAccountsModalId}
         usersVoted={userVotingInfo}
