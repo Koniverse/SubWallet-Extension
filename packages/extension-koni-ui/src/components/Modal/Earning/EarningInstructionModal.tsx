@@ -281,7 +281,7 @@ const Component: React.FC<Props> = (props: Props) => {
           }
 
           if (_STAKING_CHAIN_GROUP.bittensor.includes(poolInfo.chain)) {
-            return EARNING_DATA_RAW.BITTENOSR_STAKING.map((item) => {
+            return EARNING_DATA_RAW.BITTENSOR_STAKING.map((item) => {
               const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
 
               replaceEarningValue(_item, '{validatorNumber}', maxCandidatePerFarmer.toString());
@@ -297,6 +297,27 @@ const Component: React.FC<Props> = (props: Props) => {
 
               return _item;
             });
+          }
+
+          if (_STAKING_CHAIN_GROUP.energy.includes(poolInfo.chain)) {
+            return EARNING_DATA_RAW[YieldPoolType.NATIVE_STAKING]
+              .filter((item) => item.icon !== 'ThumbsUp')
+              .map((item) => {
+                const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
+
+                replaceEarningValue(_item, '{validatorNumber}', maxCandidatePerFarmer.toString());
+                replaceEarningValue(_item, '{validatorType}', label);
+                replaceEarningValue(_item, '{periodNumb}', unBondedTime);
+                replaceEarningValue(_item, '{maintainBalance}', maintainBalance);
+                replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
+
+                if (paidOut !== undefined) {
+                  replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());
+                  replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : paidOut === 1 ? 'hour' : 'minutes');
+                }
+
+                return _item;
+              });
           }
 
           return EARNING_DATA_RAW[YieldPoolType.NATIVE_STAKING].map((item) => {

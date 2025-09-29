@@ -44,7 +44,7 @@ function Component (props: Props): React.ReactElement<Props> {
   }, [chain]);
 
   const isParaChain = useMemo(() => {
-    return _STAKING_CHAIN_GROUP.para.includes(chain) || _STAKING_CHAIN_GROUP.amplitude.includes(chain);
+    return _STAKING_CHAIN_GROUP.para.includes(chain) || _STAKING_CHAIN_GROUP.amplitude.includes(chain) || _STAKING_CHAIN_GROUP.energy.includes(chain);
   }, [chain]);
 
   const isBittensorChain = useMemo(() => {

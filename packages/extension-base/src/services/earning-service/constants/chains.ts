@@ -16,6 +16,7 @@ export const _STAKING_CHAIN_GROUP = {
   krest_network: ['krest_network'],
   manta: ['manta_network'],
   bittensor: ['bittensor', 'bittensor_testnet'],
+  energy: ['energy_web_x_testnet', 'energy_web_x'],
   mythos: ['mythos', 'muse_testnet']
 };
 
