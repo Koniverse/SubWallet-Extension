@@ -10,7 +10,7 @@ import { getConvertedBalanceValue } from '@subwallet/extension-koni-ui/hooks/scr
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Button, Icon, Number } from '@subwallet/react-ui';
+import { Button, Icon } from '@subwallet/react-ui';
 import { BigNumber } from 'bignumber.js';
 import { CaretLeft } from 'phosphor-react';
 import React, { Context, useCallback, useContext, useEffect, useMemo } from 'react';
@@ -53,7 +53,7 @@ const Component = ({ chainSlug, className, goOverview }: Props): React.ReactElem
   const totalLockedConverted = useMemo(() => {
     const priceId = _getAssetPriceId(assetInfo);
 
-    return getConvertedBalanceValue(totalLocked.shiftedBy(-decimals), priceMap[priceId] || 0).toString();
+    return getConvertedBalanceValue(totalLocked.shiftedBy(-decimals), priceMap[priceId] || 0);
   }, [assetInfo, decimals, priceMap, totalLocked]);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ const Component = ({ chainSlug, className, goOverview }: Props): React.ReactElem
             weight={600}
           />
 
-          <Number
+          <NumberDisplay
             decimal={0}
             decimalOpacity={0.45}
             intOpacity={0.45}
