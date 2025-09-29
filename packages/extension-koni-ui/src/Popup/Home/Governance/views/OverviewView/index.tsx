@@ -202,6 +202,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
 
         <QuickActionsContainer
           className={className}
+          govLockedInfos={govLockedInfos}
           onGoUnlockToken={onGoUnlockToken}
         />
       </div>

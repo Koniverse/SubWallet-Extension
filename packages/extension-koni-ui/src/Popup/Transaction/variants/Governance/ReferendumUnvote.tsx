@@ -12,6 +12,7 @@ import { useDefaultNavigate, useGetNativeTokenBasicInfo, useHandleSubmitTransact
 import { handleRemoveVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { useGovReferendumVotes } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView/useGovReferendumVotes';
 import { FormCallbacks, FormFieldData, GovReferendumUnvoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import BigNumber from 'bignumber.js';
@@ -60,6 +61,10 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     referendumId: referendumId,
     fromAccountProxy: defaultData.fromAccountProxy
   });
+
+  const accountAddressFilteredItems = useMemo(() => {
+    return accountAddressItems.filter(({ govVoteStatus }) => govVoteStatus === GovVoteStatus.VOTED);
+  }, [accountAddressItems]);
 
   const fromVoteDetail = useMemo(() => {
     if (!fromValue) {
@@ -208,9 +213,9 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             name={'from'}
           >
             <AccountAddressSelector
-              items={accountAddressItems}
-              label={`${t('From')}:`}
-              labelStyle={'horizontal'}
+              avatarSize={24}
+              isGovModal
+              items={accountAddressFilteredItems}
             />
           </Form.Item>
         </Form>
@@ -237,7 +242,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         </MetaInfo>
       </TransactionContent>
 
-      <TransactionFooter className={`${className} -transaction-footer`}>
+      <TransactionFooter className={`${className} -transaction-footer -gov-transaction`}>
         <Button
           disabled={loading}
           icon={(

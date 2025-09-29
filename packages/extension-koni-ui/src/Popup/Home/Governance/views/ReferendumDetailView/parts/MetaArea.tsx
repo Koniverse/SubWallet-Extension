@@ -37,7 +37,6 @@ export const MetaArea = styled(Component)<Props>(({ theme: { token } }: Props) =
     },
 
     '.__tags': {
-      marginBottom: token.marginSM,
       display: 'flex',
       gap: token.sizeXXS
     }

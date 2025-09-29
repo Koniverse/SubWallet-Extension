@@ -8,7 +8,7 @@ import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { BasicInputWrapper, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useForwardInputRef } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Icon, InputRef, Slider } from '@subwallet/react-ui';
+import { Icon, InputRef, Slider, Tooltip } from '@subwallet/react-ui';
 import { BigNumber } from 'bignumber.js';
 import { Info } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
@@ -71,11 +71,18 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
       <div className='__label-wrapper'>
         <div className={'__left-item'}>
           <div className='__label'>{t('Conviction')}</div>
-          <Icon
-            className={'__i-info-icon'}
-            customSize={'16px'}
-            phosphorIcon={Info}
-          />
+          <Tooltip
+            placement={'top'}
+            title={t('Multiply your votes by increasing lock duration')}
+          >
+            <div>
+              <Icon
+                className={'__i-info-icon'}
+                customSize={'16px'}
+                phosphorIcon={Info}
+              />
+            </div>
+          </Tooltip>
         </div>
 
         <NumberDisplay

@@ -8,7 +8,7 @@ import { useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, formatBalance, getAccountProxyTypeIcon, toShort } from '@subwallet/extension-koni-ui/utils';
 import { NestedAccount } from '@subwallet/extension-koni-ui/utils/gov/votingStats';
-import { Icon, ModalContext, SwList, Web3Block } from '@subwallet/react-ui';
+import { Button, Icon, ModalContext, SwList, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { t } from 'i18next';
 import { CaretRight, Copy, ListChecks, UsersThree } from 'phosphor-react';
@@ -133,17 +133,29 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
 
       rightItem={
         <div className={'vote-item__arrow-wrapper'}>
-          <div onClick={_onClickCopyButton(item.accountInfo.account)}>
-            <Icon
-              className={'vote-item__arrow'}
-              phosphorIcon={Copy}
-              size={'sm'}
-            />
-          </div>
-          <Icon
-            className={'vote-item__arrow'}
-            phosphorIcon={CaretRight}
-            size={'sm'}
+          <Button
+            icon={
+              <Icon
+                className={'vote-item__arrow'}
+                phosphorIcon={Copy}
+                size={'sm'}
+              />
+            }
+            onClick={_onClickCopyButton(item.accountInfo.account)}
+            size={'xs'}
+            type={'ghost'}
+          />
+
+          <Button
+            icon={
+              <Icon
+                className={'vote-item__arrow'}
+                phosphorIcon={CaretRight}
+                size={'sm'}
+              />
+            }
+            size={'xs'}
+            type={'ghost'}
           />
         </div>
       }
@@ -279,11 +291,6 @@ export const NestedVoteList = styled(forwardRef(Component))<Props>(({ theme: { t
       justifyContent: 'center',
       marginLeft: token.marginXXS,
       color: token.colorTextLight3
-    },
-
-    '.vote-item__arrow': {
-      paddingLeft: token.paddingSM - 2,
-      paddingRight: token.paddingSM - 2
     },
 
     '.__item-avatar-wrapper': {
