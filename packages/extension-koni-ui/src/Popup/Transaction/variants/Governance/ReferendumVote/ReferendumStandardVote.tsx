@@ -324,6 +324,13 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     return { from: voteInfo.conviction, to: conviction };
   }, [conviction, voteInfo?.conviction]);
 
+  const getButtonProps = (type: GovVoteType) => {
+    return {
+      loading: loadingButton === type,
+      disabled: (loadingButton !== null && loadingButton !== type) || (isDisable || !isBalanceReady)
+    };
+  };
+
   const previousVoteAmountDetail = useMemo<PreviousVoteAmountDetail | undefined>(() => getPreviousVoteAmountDetail(voteInfo), [voteInfo]);
 
   useEffect(() => {
@@ -514,24 +521,22 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       <TransactionFooter className={`${className} -transaction-footer -gov-standard-transaction`}>
         <div className={'__vote-buttons-container'}>
           <VoteButton
-            disabled={isDisable || !isBalanceReady}
-            loading={loadingButton === GovVoteType.NAY}
+            {...getButtonProps(GovVoteType.NAY)}
             onClick={onPreCheck(handleClickNay, ExtrinsicType.GOV_VOTE)}
             type={GovVoteType.NAY}
           />
           <VoteButton
-            loading={loadingButton === GovVoteType.ABSTAIN}
+            {...getButtonProps(GovVoteType.ABSTAIN)}
             onClick={goRefAbstainVote}
             type={GovVoteType.ABSTAIN}
           />
           <VoteButton
-            loading={loadingButton === GovVoteType.SPLIT}
+            {...getButtonProps(GovVoteType.SPLIT)}
             onClick={goRefSplitVote}
             type={GovVoteType.SPLIT}
           />
           <VoteButton
-            disabled={isDisable || !isBalanceReady}
-            loading={loadingButton === GovVoteType.AYE}
+            {...getButtonProps(GovVoteType.AYE)}
             onClick={onPreCheck(handleClickAye, ExtrinsicType.GOV_VOTE)}
             type={GovVoteType.AYE}
           />
