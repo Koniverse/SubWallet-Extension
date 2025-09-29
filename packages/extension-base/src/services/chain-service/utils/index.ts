@@ -193,6 +193,10 @@ export function _isNativeToken (tokenInfo: _ChainAsset) {
   return tokenInfo.assetType === _AssetType.NATIVE;
 }
 
+export function _isGigaToken (tokenInfo: _ChainAsset) {
+  return tokenInfo.metadata?.isGigaToken;
+}
+
 export function _isNativeTokenBySlug (tokenSlug: string) {
   return tokenSlug.includes(_AssetType.NATIVE as string);
 }
@@ -746,10 +750,6 @@ export const _isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, acc
   if (accountChainType === AccountChainType.ETHEREUM) {
     if (accountSignMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
       return _isSubstrateEvmCompatibleChain(chainInfo) && EthereumKeypairTypes.includes(accountType);
-    }
-
-    if (accountSignMode === AccountSignMode.GENERIC_LEDGER) {
-      return _isChainCompatibleLedgerEvm(chainInfo) && EthereumKeypairTypes.includes(accountType);
     }
 
     return _isChainEvmCompatible(chainInfo) && EthereumKeypairTypes.includes(accountType);

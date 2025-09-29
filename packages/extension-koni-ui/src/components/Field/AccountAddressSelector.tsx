@@ -24,12 +24,12 @@ interface BaseProps extends ThemeProps, BasicInputWrapper {
 interface RegularProps extends BaseProps {
   items: AccountAddressItemType[];
   isGovModal?: false;
-  avatarSize: undefined;
+  avatarSize?: undefined;
 }
 
 interface GovProps extends BaseProps {
   items: GovAccountAddressItemType[];
-  isGovModal: true;
+  isGovModal?: true;
   avatarSize?: number;
 }
 
@@ -120,7 +120,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
           })}
           content={fieldContent}
           label={label}
-          placeholder={placeholder || t('Select account')}
+          placeholder={placeholder || t('ui.components.Field.AccountAddressSelector.selectAccount')}
           statusHelp={statusHelp}
           suffix={fieldSuffix}
           tooltip={tooltip}

@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import MigrateChainPatrol from '@subwallet/extension-base/services/migration-service/scripts/MigrateChainPatrol';
+
 import BaseMigrationJob from '../Base';
 import ClearMetadataDatabase from './databases/ClearMetadataDatabase';
 import ClearMetadataForMythos from './databases/ClearMetadataForMythos';
@@ -49,7 +51,7 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.1.7': DeleteChain,
   '1.1.13-01': MigrateTokenDecimals,
   // '1.1.13-02-2': EnableEarningChains,
-  '1.1.13-03': DeleteEarningData,
+  '1.3.55-03': DeleteEarningData,
   '1.1.17-01': MigratePioneerProvider,
   '1.1.17-03': EnableVaraChain,
   '1.1.24-01': MigrateProvidersV1M1P24,
@@ -58,8 +60,8 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.1.33-01': MigrateLedgerAccountV2,
   '1.1.41-01': DeleteChainStaking,
   // '1.1.46-01': AutoEnableSomeTokens,
-  '1.3.53-01': MigrateAssetSetting,
-  '1.3.53-02': MigrateTransactionHistoryBySymbol,
+  '1.3.55-01': MigrateAssetSetting,
+  '1.3.55-02': MigrateTransactionHistoryBySymbol,
   '1.2.69-01': MigrateRemoveGenesisHash,
   '1.2.13-01': ReloadMetadata,
   '1.2.32-01': MigratePairData,
@@ -69,5 +71,6 @@ export default <Record<string, typeof BaseMigrationJob>>{
   [MYTHOS_MIGRATION_KEY]: ClearMetadataForMythos,
   // [`${EVERYTIME}-1.1.42-02`]: MigrateTransactionHistoryBySymbol
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
-  '1.3.42-01': MigrateNewUnifiedAccount
+  '1.3.42-01': MigrateNewUnifiedAccount,
+  '1.3.54-01': MigrateChainPatrol
 };

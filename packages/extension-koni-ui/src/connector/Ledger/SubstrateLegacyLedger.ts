@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { wrapBytes } from '@subwallet/extension-dapp';
+import { BIP32_HARDENED_OFFSET } from '@subwallet/extension-koni-ui/constants';
 import { newSubstrateApp, SubstrateApp } from '@zondax/ledger-substrate';
 import { ResponseSign } from '@zondax/ledger-substrate/dist/common';
 
@@ -69,7 +71,7 @@ export class SubstrateLegacyLedger extends BaseLedger<SubstrateApp> {
   async signMessage (message: Uint8Array, accountOffset?: number, addressOffset?: number, accountOptions?: Partial<AccountOptions>): Promise<LedgerSignature> {
     return this.withApp(async (app: SubstrateApp): Promise<LedgerSignature> => {
       const { account, addressIndex, change } = this.serializeParameters(accountOffset, addressOffset, accountOptions);
-      const rs = await this.wrapError(app.signRaw(account, change, addressIndex, u8aToBuffer(message)));
+      const rs = await this.wrapError(app.signRaw(account, change, addressIndex, Buffer.from(wrapBytes(message))));
 
       const raw = rs.signature.toString('hex');
       const firstByte = raw.slice(0, 2);
@@ -142,9 +144,9 @@ export class SubstrateLegacyLedger extends BaseLedger<SubstrateApp> {
   }
 
   private serializeParameters (accountOffset = 0, addressOffset = 0, accountOptions?: Partial<AccountOptions>) {
-    const account = (accountOptions?.account || 0) + (accountOffset || 0);
-    const addressIndex = (accountOptions?.addressIndex || 0) + (addressOffset || 0);
-    const change = accountOptions?.change || 0;
+    const account = (accountOptions?.account || 0) + (accountOffset || 0) + BIP32_HARDENED_OFFSET;
+    const addressIndex = (accountOptions?.addressIndex || 0) + (addressOffset || 0) + BIP32_HARDENED_OFFSET;
+    const change = (accountOptions?.change || 0) + BIP32_HARDENED_OFFSET;
 
     return {
       account,

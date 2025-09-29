@@ -22,6 +22,10 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return 'accounts';
   }
 
+  if (explorerLink.includes('explorer.comstats.org')) {
+    return 'accounts';
+  }
+
   if (explorerLink.includes('edgscan.ink')) {
     return 'accounts';
   }
@@ -98,7 +102,7 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
     return '#/extrinsics';
   }
 
-  if (['edgeware'].includes(chainInfo.slug)) {
+  if (['edgeware', 'commune'].includes(chainInfo.slug)) {
     return 'extrinsics';
   }
 
@@ -146,6 +150,10 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
       return `${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${address}`;
     }
 
+    if (chainInfo.slug === 'xode') {
+      return undefined;
+    }
+
     return `${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${value}`;
   }
 
@@ -154,6 +162,10 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
 
     if (chainInfo.slug === 'tangle') {
       return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}extrinsic/${value}${route}/${value}`);
+    }
+
+    if (chainInfo.slug === 'xode') {
+      return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}polkadot-chain-transaction?search=${value}`);
     }
 
     if (chainInfo.slug === 'truth_network') {

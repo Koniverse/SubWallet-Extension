@@ -15,7 +15,7 @@ import { ActivityIndicator, Button, Icon, ModalContext, Number, Tooltip } from '
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { PencilSimpleLine } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -66,6 +66,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
   const priceMap = useSelector((state) => state.price.priceMap);
   const [feeEditorModalRenderKey, setFeeEditorModalRenderKey] = useState<string>(modalId);
   const { currencyData } = useSelector((state: RootState) => state.price);
+  const [stableIsDataReady, setStableIsDataReady] = useState(false);
 
   const tokenAsset = (() => {
     return assetRegistry[tokenPayFeeSlug] || undefined;
@@ -95,8 +96,17 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
 
   const isDataReady = !isLoadingFee && !isLoadingToken && !!feeOptionsInfo;
 
+  // Prevent flicker by stabilizing isDataReady
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setStableIsDataReady(isDataReady);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [isDataReady]);
+
   const convertedFeeValueToUSD = useMemo(() => {
-    if (!isDataReady) {
+    if (!stableIsDataReady) {
       return 0;
     }
 
@@ -104,7 +114,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
       .multipliedBy(priceNativeValue)
       .dividedBy(BN_TEN.pow(nativeTokenDecimals || 0))
       .toNumber();
-  }, [estimateFee, isDataReady, nativeTokenDecimals, priceNativeValue]);
+  }, [estimateFee, nativeTokenDecimals, priceNativeValue, stableIsDataReady]);
 
   const onClickEdit = useCallback(() => {
     if (chainValue && (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chainValue) || _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chainValue))) {
@@ -177,28 +187,11 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
       {
         customFieldNode || (
           <div className={CN(className, '__estimate-fee-wrapper')}>
-            <div className='__field-left-part'>
+            <div className='__field-line-1'>
               <div className='__field-label'>
-                {t('Estimated fee')}:
+                {t('ui.TRANSACTION.components.Field.FeeEditor.estimatedFee')}:
               </div>
-
-              <div>
-                {!isDataReady
-                  ? (
-                    <ActivityIndicator size={20} />
-                  )
-                  : (
-                    <Number
-                      className={'__fee-value'}
-                      decimal={isNativeTokenValue ? nativeTokenDecimals : decimals}
-                      suffix={isNativeTokenValue ? nativeTokenSymbol : symbol}
-                      value={isNativeTokenValue ? estimateFee : convertedEstimatedFee}
-                    />
-                  )}
-              </div>
-            </div>
-            {FEE_TYPES_CAN_SHOW.includes(feeType) && (
-              <div className='__field-right-part'>
+              {FEE_TYPES_CAN_SHOW.includes(feeType) && (
                 <div
                   className='__fee-editor-area'
                 >
@@ -214,12 +207,12 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
                     <Tooltip
                       className={'__not-editable'}
                       placement='topLeft'
-                      title={isEvmButNoCustomFeeSupport ? t("This fee can't be edited with the current RPC connection") : undefined}
+                      title={isEvmButNoCustomFeeSupport ? t('ui.TRANSACTION.components.Field.FeeEditor.feeNotEditableWithCurrentRpc') : undefined}
                     >
                       <div>
                         <Button
                           className={'__fee-editor-button'}
-                          disabled={!isDataReady || isEvmButNoCustomFeeSupport}
+                          disabled={!stableIsDataReady || isEvmButNoCustomFeeSupport}
                           icon={
                             <Icon
                               phosphorIcon={PencilSimpleLine}
@@ -235,8 +228,24 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
                     </Tooltip>
                   )}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+
+            <div className={CN('__field-line-2', { '-is-edit-button': isEditButton })}>
+              {!isDataReady
+                ? (
+                  <ActivityIndicator size={20} />
+                )
+                : (
+                  <Number
+                    className={'__fee-value'}
+                    decimal={isNativeTokenValue ? nativeTokenDecimals : decimals}
+                    prefix={'~ '}
+                    suffix={isNativeTokenValue ? nativeTokenSymbol : symbol}
+                    value={isNativeTokenValue ? estimateFee : convertedEstimatedFee}
+                  />
+                )}
+            </div>
           </div>
         )
       }
@@ -276,7 +285,6 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
 const FeeEditor = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     display: 'flex',
-    gap: token.sizeXS,
     minHeight: 24,
     alignItems: 'center',
 
@@ -293,24 +301,38 @@ const FeeEditor = styled(Component)<Props>(({ theme: { token } }: Props) => {
       backgroundColor: token.colorBgSecondary,
       padding: token.paddingSM,
       paddingRight: token.paddingXS,
-      height: token.sizeXXL,
       borderRadius: token.borderRadiusLG,
+      display: 'flex',
+      flexDirection: 'column',
       '.__edit-icon': {
         color: token['gray-5']
       }
     },
 
-    '.__field-left-part': {
+    '.__field-line-1': {
       flex: 1,
       display: 'flex',
       gap: token.sizeXXS,
       fontSize: token.fontSize,
       lineHeight: token.lineHeight,
-      color: token.colorTextLight4
+      color: token.colorTextLight4,
+      width: '100%',
+      justifyContent: 'space-between'
     },
 
-    '.__field-right-part': {
+    '.__field-line-2': {
+      width: '100%',
+      justifyContent: 'flex-end',
+      display: 'flex',
+      '.__fee-value': {
+        fontSize: `${token.fontSizeSM}px !important`,
+        lineHeight: '20px !important',
+        color: `${token.colorTextTertiary} !important`
+      }
+    },
 
+    '.-is-edit-button': {
+      paddingRight: '28px'
     },
 
     '.__fee-editor-area': {
@@ -324,7 +346,7 @@ const FeeEditor = styled(Component)<Props>(({ theme: { token } }: Props) => {
     '.__fee-editor-button.__fee-editor-button.__fee-editor-button': {
       minWidth: 28,
       width: 28,
-      height: 28
+      height: 22
     }
   });
 });

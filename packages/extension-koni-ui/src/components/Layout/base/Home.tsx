@@ -57,7 +57,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
     return [
       {
         key: '1',
-        label: t('Network display'),
+        label: t('ui.components.Layout.Home.networkDisplay'),
         icon: (
           <Icon phosphorIcon={FadersHorizontal} />
         ),
@@ -65,7 +65,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
       },
       {
         key: '2',
-        label: t('Search token'),
+        label: t('ui.components.Layout.Home.searchToken'),
         icon: (
           <Icon phosphorIcon={MagnifyingGlass} />
         ),
@@ -77,7 +77,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
   const sidebarMenu = useMemo(() => {
     const expandViewItem = {
       key: '1',
-      label: t('Expand view'),
+      label: t('ui.components.Layout.Home.expandView'),
       icon: (
         <Icon phosphorIcon={ArrowsOut} />
       ),
@@ -89,7 +89,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
 
     const openInSidebarItem = {
       key: '2',
-      label: t('Open in sidebar'),
+      label: t('ui.components.Layout.Home.openInSidebar'),
       icon: (
         <Icon phosphorIcon={SidebarSimple} />
       ),
@@ -102,7 +102,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
 
     const openInPopupItem = {
       key: '3',
-      label: t('Open in popup'),
+      label: t('ui.components.Layout.Home.openInPopup'),
       icon: (
         <Icon
           phosphorIcon={PuzzlePiece}
@@ -141,7 +141,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
 
         ),
         onClick: onOpenNotification,
-        tooltip: t('Notifications'),
+        tooltip: t('ui.components.Layout.Home.notifications'),
         tooltipPlacement: 'bottomRight'
       });
     }
@@ -176,7 +176,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
             />
           ),
           onClick: onOpenCustomizeModal,
-          tooltip: t('Customize your asset display'),
+          tooltip: t('ui.components.Layout.Home.customizeAssetDisplay'),
           tooltipPlacement: 'bottomRight'
         });
       }
@@ -193,7 +193,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
           ),
           disabled: !isSidePanelSupported,
           onClick: openSidePanel,
-          tooltip: t('Open in sidebar'),
+          tooltip: t('ui.components.Layout.Home.openInSidebar'),
           tooltipPlacement: 'bottomRight'
         });
       } else {

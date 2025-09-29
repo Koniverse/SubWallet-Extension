@@ -70,7 +70,7 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
         phosphorIcon: Wallet,
         weight: 'fill'
       },
-      label: t('Tokens'),
+      label: t('ui.components.Layout.Base.tokens'),
       key: 'tokens',
       url: '/home/tokens'
     },
@@ -90,7 +90,7 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
         phosphorIcon: Aperture,
         weight: 'fill'
       },
-      label: t('NFTs'),
+      label: t('ui.components.Layout.Base.nfts'),
       key: 'nfts',
       url: '/home/nfts/collections'
     },
@@ -100,7 +100,7 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
         phosphorIcon: Vault,
         weight: 'fill'
       },
-      label: t('Earning'),
+      label: t('ui.components.Layout.Base.earning'),
       key: 'earning',
       url: '/home/earning'
     },
@@ -118,7 +118,7 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
           </>
         )
       },
-      label: t('Missions'),
+      label: t('ui.components.Layout.Base.missions'),
       key: 'mission-pools',
       url: '/home/mission-pools'
     },
@@ -128,7 +128,7 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
         phosphorIcon: Clock,
         weight: 'fill'
       },
-      label: t('History'),
+      label: t('ui.components.Layout.Base.history'),
       key: 'history',
       url: '/home/history'
     }

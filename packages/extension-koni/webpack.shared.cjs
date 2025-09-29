@@ -9,6 +9,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const ManifestPlugin = require('webpack-extension-manifest-plugin');
 
 const pkgJson = require('./package.json');
+const chainListPkgJson = require('@subwallet/chain-list/package.json');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const args = process.argv.slice(2);
@@ -121,6 +122,7 @@ module.exports = (entry, alias = {}, isFirefox = false) => {
           NODE_ENV: JSON.stringify(mode),
           PKG_NAME: JSON.stringify(pkgJson.name),
           PKG_VERSION: JSON.stringify(pkgJson.version),
+          CHAIN_LIST_VERSION: JSON.stringify(chainListPkgJson.version),
           TARGET_ENV: JSON.stringify('extension'),
           BRANCH_NAME: JSON.stringify(process.env.BRANCH_NAME),
           ID_PREDIX: JSON.stringify('sw-ext-'),
