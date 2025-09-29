@@ -3,7 +3,7 @@
 
 import { GovVotingInfo, UnlockingReferendaData } from '@subwallet/extension-base/services/open-gov/interface';
 import { reformatAddress } from '@subwallet/extension-base/utils';
-import { Avatar, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyAvatar, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, GOV_UNLOCK_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainPrefixBySlug, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
@@ -113,10 +113,9 @@ function Component ({ chain, className, govLockedInfos }: Props) {
 
       return (
         <>
-          <Avatar
-            identPrefix={networkPrefix}
+          <AccountProxyAvatar
             size={24}
-            value={item.address}
+            value={account?.proxyId || ''}
           />
           <div className={'__account-name'}>
             {account?.name || toShort(item.address)}
@@ -124,7 +123,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
         </>
       );
     },
-    [accounts, networkPrefix]
+    [accounts]
   );
 
   const goUnlockVote = useCallback((item: GovVotingInfo) => {
