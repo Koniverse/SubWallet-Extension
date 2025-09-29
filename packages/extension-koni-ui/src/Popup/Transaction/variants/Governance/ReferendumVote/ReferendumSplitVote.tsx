@@ -216,10 +216,9 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               name={'from'}
             >
               <AccountAddressSelector
+                avatarSize={20}
                 isGovModal={true}
                 items={accountAddressItems}
-                label={`${t('From')}:`}
-                labelStyle={'horizontal'}
               />
             </Form.Item>
 
@@ -331,7 +330,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         }
       </TransactionContent>
 
-      <TransactionFooter className={`${className} -transaction-footer`}>
+      <TransactionFooter className={`${className} -transaction-footer -gov-transaction`}>
         <Button
           disabled={loading}
           icon={(
@@ -414,7 +413,6 @@ const ReferendumSplitVote = styled(Wrapper)<WrapperProps>(({ theme: { token } }:
     '&.-transaction-footer': {
       marginBottom: 4
     },
-
 
     '.form-group': {
       display: 'flex',

@@ -7,7 +7,7 @@ import { AccountProxyAvatar, EmptyList } from '@subwallet/extension-koni-ui/comp
 import { useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, formatBalance, getAccountProxyTypeIcon, toShort } from '@subwallet/extension-koni-ui/utils';
-import { Icon, SwList, Web3Block } from '@subwallet/react-ui';
+import { Button, Icon, SwList, Web3Block } from '@subwallet/react-ui';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
 import { t } from 'i18next';
@@ -118,21 +118,27 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
         }
         rightItem={
           <div className={'vote-item__arrow-wrapper'}>
-            <div onClick={_onClickCopyButton(item.account)}>
-              <Icon
+            <Button
+              icon={ <Icon
                 className={'vote-item__arrow'}
                 phosphorIcon={Copy}
                 size={'sm'}
-              />
-            </div>
+              />}
+              onClick={_onClickCopyButton(item.account)}
+              size={'xs'}
+              type={'ghost'}
+            />
 
-            <div onClick={_onClickViewOnExplorer(item.account)}>
-              <Icon
+            <Button
+              icon={ <Icon
                 className={'vote-item__arrow'}
                 phosphorIcon={ArrowSquareOut}
                 size={'sm'}
-              />
-            </div>
+              />}
+              onClick={_onClickViewOnExplorer(item.account)}
+              size={'xs'}
+              type={'ghost'}
+            />
 
           </div>
         }
@@ -206,10 +212,6 @@ export const FlattenedVoteList = styled(forwardRef(Component))<Props>(({ theme: 
       marginTop: '2px'
     },
 
-    '.vote-item__arrow': {
-      paddingLeft: token.paddingSM - 2,
-      paddingRight: token.paddingSM - 2
-    },
     '.__item-avatar-wrapper': {
       position: 'relative'
     },

@@ -477,6 +477,17 @@ const Transaction = styled(Component)(({ theme }) => {
 
       '.full-width': {
         minWidth: '100%'
+      },
+
+      '&.-gov-standard-transaction': {
+        padding: '16px 35px 20px 35px'
+      },
+
+      '&.-gov-transaction': {
+        gap: token.sizeSM,
+        marginBottom: 0,
+        padding: token.padding,
+        paddingBottom: token.paddingXL
       }
     }
   });

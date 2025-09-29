@@ -77,7 +77,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
             {t(groupItem.groupLabel)}
           </span>
           <span className={'list-item-group-label-count'}>
-          ({groupItem.listCount})
+          &nbsp;({groupItem.listCount})
           </span>
         </div>
       );
@@ -249,13 +249,13 @@ export const GovAccountSelectoModal = styled(Component)<Props>(({ theme: { token
     '.list-item-group-label': {
       textTransform: 'uppercase',
       fontSize: 11,
-      lineHeight: '18px',
+      lineHeight: '20px',
       fontWeight: token.headingFontWeight,
       color: token.colorWhite
     },
 
     '.list-item-group-label-count': {
-      color: token.colorTextLight3
+      color: token.colorTextLight4
     },
 
     '.__search-box': {

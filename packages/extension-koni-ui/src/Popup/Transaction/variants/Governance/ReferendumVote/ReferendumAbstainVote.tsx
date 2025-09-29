@@ -224,10 +224,9 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               name={'from'}
             >
               <AccountAddressSelector
-                isGovModal={true}
+                avatarSize={20}
+                isGovModal
                 items={accountAddressItems}
-                label={`${t('From')}:`}
-                labelStyle={'horizontal'}
               />
             </Form.Item>
 
@@ -350,7 +349,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         }
       </TransactionContent>
 
-      <TransactionFooter className={`${className} -transaction-footer`}>
+      <TransactionFooter className={`${className} -transaction-footer -gov-transaction`}>
         <Button
           disabled={loading}
           icon={(

@@ -92,7 +92,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
       return;
     }
 
-    if (!referendumId || !data?.track) {
+    if (referendumId == null || data?.track == null) {
       return;
     }
 

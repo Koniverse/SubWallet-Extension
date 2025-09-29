@@ -179,11 +179,10 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             name={'from'}
           >
             <AccountAddressSelector
+              avatarSize={24}
               disabled={!isAllAccount}
-              isGovModal={true}
+              isGovModal
               items={accountAddressFiltered}
-              label={`${t('From')}:`}
-              labelStyle={'horizontal'}
             />
           </Form.Item>
         </Form>
@@ -231,7 +230,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         </MetaInfo>
       </TransactionContent>
 
-      <TransactionFooter className={`${className} -transaction-footer`}>
+      <TransactionFooter className={`${className} -transaction-footer -gov-transaction`}>
         <Button
           disabled={loading}
           icon={(

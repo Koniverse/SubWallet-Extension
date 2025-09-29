@@ -316,6 +316,14 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     return voteMap.get(fromValue.toLowerCase());
   }, [voteMap, fromValue]);
 
+  const convictionDescription = useMemo<{ from?: number, to: number }>(() => {
+    if (voteInfo?.conviction == null || voteInfo.conviction === conviction) {
+      return { to: conviction };
+    }
+
+    return { from: voteInfo.conviction, to: conviction };
+  }, [conviction, voteInfo?.conviction]);
+
   const previousVoteAmountDetail = useMemo<PreviousVoteAmountDetail | undefined>(() => getPreviousVoteAmountDetail(voteInfo), [voteInfo]);
 
   useEffect(() => {
@@ -393,10 +401,9 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               name={'from'}
             >
               <AccountAddressSelector
-                isGovModal={true}
+                avatarSize={20}
+                isGovModal
                 items={filteredAccountItems}
-                label={`${t('From')}:`}
-                labelStyle={'horizontal'}
               />
             </Form.Item>
 
@@ -463,36 +470,37 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               valueColorScheme={'light'}
             >
               <MetaInfo.Default
+                className={'governance-value-info'}
                 label={t('Lock duration')}
               >
-                {voteInfo?.conviction !== undefined
-                  ? (
-                    voteInfo.conviction === conviction
-                      ? getConvictionDescription(conviction)
-                      : `${getConvictionDescription(voteInfo.conviction)} 🡢 ${getConvictionDescription(conviction)}`
+                {
+                  !!convictionDescription.from && (
+                    <>
+                      <span className={'governance-value-from'}>{getConvictionDescription(convictionDescription.from).replace('d', '')}</span>
+                      <span className={'governance-value-trans'}>&nbsp;→&nbsp;</span>
+                    </>
                   )
-                  : (
-                    getConvictionDescription(conviction)
-                  )}
+                }
+                <span className={'governance-value-to'}>{getConvictionDescription(convictionDescription.to)}</span>
               </MetaInfo.Default>
               <MetaInfo.Default
-                className={'governance-lock-info'}
+                className={'governance-value-info'}
                 label={t('Governance lock')}
               >
                 {
                   !!governanceLock.from && (
                     <>
                       <NumberDisplay
-                        className={'governance-lock-from'}
+                        className={'governance-value-from'}
                         decimal={_getAssetDecimals(assetInfo)}
                         value={governanceLock.from}
                       />
-                      <span className={'governance-lock-trans'}>&nbsp;→&nbsp;</span>
+                      <span className={'governance-value-trans'}>&nbsp;→&nbsp;</span>
                     </>
                   )
                 }
                 <NumberDisplay
-                  className={'governance-lock-to'}
+                  className={'governance-value-to'}
                   decimal={_getAssetDecimals(assetInfo)}
                   suffix={_getAssetSymbol(assetInfo)}
                   value={governanceLock.to}
@@ -503,7 +511,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         </Form>
       </TransactionContent>
 
-      <TransactionFooter className={`${className} -transaction-footer`}>
+      <TransactionFooter className={`${className} -transaction-footer -gov-standard-transaction`}>
         <div className={'__vote-buttons-container'}>
           <VoteButton
             disabled={isDisable || !isBalanceReady}
@@ -632,13 +640,13 @@ const ReferendumStandardVote = styled(Wrapper)<WrapperProps>(({ theme: { token }
       }
     },
 
-    '.governance-lock-info': {
+    '.governance-value-info': {
       '.__value': {
         display: 'inherit'
       }
     },
 
-    '.governance-lock-from, .governance-lock-trans': {
+    '.governance-value-from, .governance-value-trans': {
       color: token.colorTextLight3
     },
 
