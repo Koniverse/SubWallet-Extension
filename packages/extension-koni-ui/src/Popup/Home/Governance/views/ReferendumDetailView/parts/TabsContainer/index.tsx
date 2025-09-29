@@ -25,7 +25,7 @@ export enum Tab {
 
 const Component = ({ chain, className, referendumDetail }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
-  const [selectedFilterTab, setSelectedFilterTab] = useState<string>(Tab.TIMELINE);
+  const [selectedFilterTab, setSelectedFilterTab] = useState<string>(Tab.DESCRIPTION);
 
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
