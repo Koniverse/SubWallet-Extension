@@ -9,7 +9,6 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getGovTokenLogoSlugBySymbol } from '@subwallet/extension-koni-ui/utils/gov';
 import { Logo } from '@subwallet/react-ui';
 import { SpendItem } from '@subwallet/subsquare-api-sdk';
-import BigNumber from 'bignumber.js';
 import React, { Context, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import styled, { ThemeContext } from 'styled-components';
@@ -48,7 +47,7 @@ const Component = ({ allSpend, chain, className }: Props): React.ReactElement<Pr
                 decimalOpacity={0.45}
                 prefix={'~'}
                 size={token.fontSize}
-                value={new BigNumber(item.amount).toString()}
+                value={item.amount}
                 weight={token.fontWeightStrong}
               />
 

@@ -290,7 +290,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
                 decimalOpacity={0.45}
                 decimals={decimals}
                 key={item.id}
-                label={t('Unlockable {{date}}', { date: timeRemainingContent })}
+                label={t('Unlockable in {{date}}', { date: timeRemainingContent })}
                 suffix={symbol}
                 value={item.balance}
                 valueColorSchema='even-odd'
