@@ -83,6 +83,60 @@ export async function getEVMTransactionObject ({ chain,
   return [transactionObject, transactionObject.value.toString(), errorOnEstimateFee];
 }
 
+// only use for Energy Web Chain
+export async function getEVMTransactionObjectForEWC ({ chain,
+  evmApi,
+  fallbackFee,
+  feeCustom: _feeCustom,
+  feeInfo: _feeInfo,
+  feeOption,
+  from,
+  to,
+  transferAll,
+  value }: TransferEvmProps): Promise<[TransactionConfig, string, string]> {
+  const feeCustom = _feeCustom as EvmEIP1559FeeOption;
+  const feeInfo = _feeInfo as EvmFeeInfo;
+
+  const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
+
+  // hot fix for Energy Web Chain
+  feeCombine.maxFeePerGas = '10000000';
+
+  let errorOnEstimateFee = '';
+
+  const transactionObject = {
+    to: to,
+    value: value,
+    from: from,
+    ...feeCombine
+  } as TransactionConfig;
+
+  // hot fix for Energy Web Chain
+  const gasLimit = 4900000;
+
+  transactionObject.gas = gasLimit;
+
+  let estimateFee: BigN;
+
+  if (feeCombine.maxFeePerGas) {
+    const maxFee = new BigN(feeCombine.maxFeePerGas);
+
+    estimateFee = maxFee.multipliedBy(gasLimit);
+  } else {
+    estimateFee = new BigN(feeCombine.gasPrice || '0').multipliedBy(gasLimit);
+  }
+
+  transactionObject.value = transferAll ? new BigN(value).minus(estimateFee).toString() : value;
+
+  if (EVM_REFORMAT_DECIMALS.acala.includes(chain)) {
+    const numberReplace = 18 - 12;
+
+    transactionObject.value = transactionObject.value.substring(0, transactionObject.value.length - 6) + new Array(numberReplace).fill('0').join('');
+  }
+
+  return [transactionObject, transactionObject.value.toString(), errorOnEstimateFee];
+}
+
 export async function getERC20TransactionObject (
   { assetAddress,
     chain,
