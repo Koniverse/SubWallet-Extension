@@ -72,11 +72,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     }
 
     const minAmountPercent: Record<string, number> = {};
-    // const ahMigratedChainMap = await this.state.chainService.fetchAhMapChain(); // todo: need temp fixed data to update middleware service
-    const ahMigratedChainMap: Record<string, string> = {
-      westend: 'westend_assethub',
-      paseoTest: 'paseo_assethub'
-    };
+    const ahMigratedChainMap = await this.state.chainService.fetchAhMapChain();
     const ahMigratedChains = Object.values(ahMigratedChainMap);
 
     for (const chain of chains) {
