@@ -79,12 +79,18 @@ export async function getHydrationTokensCanPayFee (request: RequestHydrationToke
     return tokensList;
   }
 
-  const tokenInfos = Object.keys(tokensHasBalanceInfoMap).map((tokenSlug) => chainService.getAssetBySlug(tokenSlug)).filter((token) => (
-    token.originChain === substrateApi.chainSlug &&
-    token.assetType !== _AssetType.NATIVE &&
-    !!token.metadata &&
-    !!token.metadata.assetId
-  ));
+  const tokenInfos = Object.keys(tokensHasBalanceInfoMap).map((tokenSlug) => chainService.getAssetBySlug(tokenSlug)).filter((token) => {
+    if (!token) {
+      return false;
+    }
+
+    return (
+      token.originChain === substrateApi.chainSlug &&
+      token.assetType !== _AssetType.NATIVE &&
+      !!token.metadata &&
+      !!token.metadata.assetId
+    );
+  });
 
   await Promise.all(tokenInfos.map(async (tokenInfo) => {
     const priceId = _getAssetPriceId(tokenInfo);
