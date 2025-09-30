@@ -1492,7 +1492,7 @@ export default class KoniExtension {
           [
             transaction,
             transferAmount.value
-          ] = await getEVMTransactionObjectForEWC({
+          ] = getEVMTransactionObjectForEWC({
             chain,
             evmApi,
             feeCustom,
@@ -1502,7 +1502,7 @@ export default class KoniExtension {
             to,
             transferAll,
             value: txVal
-          })
+          });
         } else {
           [
             transaction,

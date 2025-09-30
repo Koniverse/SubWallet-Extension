@@ -84,7 +84,7 @@ export async function getEVMTransactionObject ({ chain,
 }
 
 // only use for Energy Web Chain
-export async function getEVMTransactionObjectForEWC ({ chain,
+export function getEVMTransactionObjectForEWC ({ chain,
   evmApi,
   fallbackFee,
   feeCustom: _feeCustom,
@@ -93,7 +93,7 @@ export async function getEVMTransactionObjectForEWC ({ chain,
   from,
   to,
   transferAll,
-  value }: TransferEvmProps): Promise<[TransactionConfig, string, string]> {
+  value }: TransferEvmProps): [TransactionConfig, string, string] {
   const feeCustom = _feeCustom as EvmEIP1559FeeOption;
   const feeInfo = _feeInfo as EvmFeeInfo;
 
@@ -101,8 +101,6 @@ export async function getEVMTransactionObjectForEWC ({ chain,
 
   // hot fix for Energy Web Chain
   feeCombine.maxFeePerGas = '10000000';
-
-  let errorOnEstimateFee = '';
 
   const transactionObject = {
     to: to,
@@ -134,7 +132,7 @@ export async function getEVMTransactionObjectForEWC ({ chain,
     transactionObject.value = transactionObject.value.substring(0, transactionObject.value.length - 6) + new Array(numberReplace).fill('0').join('');
   }
 
-  return [transactionObject, transactionObject.value.toString(), errorOnEstimateFee];
+  return [transactionObject, transactionObject.value.toString(), ''];
 }
 
 export async function getERC20TransactionObject (
