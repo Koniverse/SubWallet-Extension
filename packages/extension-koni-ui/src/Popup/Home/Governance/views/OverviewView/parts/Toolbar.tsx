@@ -152,6 +152,11 @@ export const Toolbar = styled(Component)<Props>(({ theme: { token } }: Props) =>
         lineHeight: token.lineHeight,
         paddingBottom: token.paddingXXS
       }
+    },
+
+    '.__buttons-wrapper': {
+      display: 'flex',
+      alignItems: 'center'
     }
   };
 });

@@ -59,7 +59,6 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
       const chainInfo = chainInfoMap[chain];
       const link = getExplorerLink(chainInfo, address, 'account');
 
-      console.log(link, chainInfo);
       window.open(link, '_blank');
     };
   }, [chain, chainInfoMap]);

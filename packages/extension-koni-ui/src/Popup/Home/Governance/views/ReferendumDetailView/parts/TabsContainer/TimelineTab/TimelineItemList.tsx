@@ -14,7 +14,9 @@ type Props = ThemeProps & {
   referendumStatus: GovStatusKey;
 };
 
-const Component = ({ className, referendumStatus, timeline }: Props): React.ReactElement<Props> => {
+const Component = (props: Props): React.ReactElement<Props> => {
+  const { className = '', referendumStatus, timeline } = props;
+
   const lastItemState = useMemo<ReferendumTimelineProcessState | undefined>(() => {
     if (GOV_ONGOING_STATES.includes(referendumStatus)) {
       return ReferendumTimelineProcessState.IN_PROGRESS;

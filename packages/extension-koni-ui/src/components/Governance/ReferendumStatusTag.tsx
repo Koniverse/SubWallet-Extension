@@ -51,10 +51,6 @@ const ReferendumStatusTag = styled(Component)<Props>(({ status, theme: { token }
     alignItems: 'center',
     paddingInline: token.sizeXS,
 
-    '.__icon': {
-
-    },
-
     '.__label': {
       fontSize: token.fontSizeXS,
       lineHeight: token.lineHeightXS,

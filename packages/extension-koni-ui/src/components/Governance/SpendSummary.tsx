@@ -1,13 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getGovTokenLogoSlugBySymbol } from '@subwallet/extension-koni-ui/utils/gov';
 import { Logo } from '@subwallet/react-ui';
 import { SpendItem } from '@subwallet/subsquare-api-sdk';
-import BigNumber from 'bignumber.js';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -24,6 +24,7 @@ const Component = ({ chain, className, spends }: Props): React.ReactElement<Prop
   const { decimals: nativeDecimals } = useGetNativeTokenBasicInfo(chain);
   const { assetRegistry } = useSelector((root: RootState) => root.assetRegistry);
   const assetList = useMemo(() => Object.values(assetRegistry), [assetRegistry]);
+  const totalRaw = useMemo(() => spends?.reduce((acc, s) => acc.plus(s.amount), BN_ZERO) || BN_ZERO, [spends]);
 
   if (!spends || spends.length === 0) {
     return null;
@@ -55,8 +56,6 @@ const Component = ({ chain, className, spends }: Props): React.ReactElement<Prop
   }
 
   const symbol = symbols[0];
-  const totalRaw = spends.reduce((acc, s) => acc.plus(s.amount), new BigNumber(0));
-
   const first = spends[0];
   const decimals = first.isSpendLocal
     ? (first.type === 'native' ? nativeDecimals : 6)
@@ -67,7 +66,7 @@ const Component = ({ chain, className, spends }: Props): React.ReactElement<Prop
       <NumberDisplay
         className='__i-requested-amount-value'
         decimal={decimals}
-        value={totalRaw.toString()}
+        value={totalRaw}
       />
       <span className='__i-requested-amount-symbol'>{symbol}</span>
     </div>

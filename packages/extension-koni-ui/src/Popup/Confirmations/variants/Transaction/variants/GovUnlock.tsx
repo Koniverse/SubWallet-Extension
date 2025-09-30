@@ -102,7 +102,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         className={'__meta-info'}
         hasBackgroundWrapper
       >
-        {govConfirmationInfo &&
+        {!!govConfirmationInfo &&
           <>
             <MetaInfo.Default
               className={'governance-value-info'}

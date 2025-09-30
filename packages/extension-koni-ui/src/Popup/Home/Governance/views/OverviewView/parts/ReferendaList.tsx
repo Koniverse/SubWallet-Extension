@@ -32,7 +32,7 @@ const Component = ({ chain, className, items, onClickItem }: Props): React.React
     <div className={className}>
       {
         items.length > 0
-          ? items.map((item, index) => (
+          ? items.map((item) => (
             <ReferendumItem
               chain={chain}
               className={'__referendum-item'}

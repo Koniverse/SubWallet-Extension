@@ -1,12 +1,12 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountProxyAvatar, EmptyList } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyAvatar, EmptyList, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { GOV_DELEGATION_DETAILS_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { findAccountByAddress, formatBalance, getAccountProxyTypeIcon, toShort } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, getAccountProxyTypeIcon, toShort } from '@subwallet/extension-koni-ui/utils';
 import { NestedAccount } from '@subwallet/extension-koni-ui/utils/gov/votingStats';
 import { Button, Icon, ModalContext, SwList, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -111,7 +111,17 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
             <div className={'vote-item__delegation'}>
               <div className={'vote-item__delegation-row'}>
                 <span className='vote-item__delegated-votes'>
-                    ~{formatBalance(item.totalDelegatedVote, decimals)} {symbol}
+                  <NumberDisplay
+                    decimal={decimals}
+                    decimalOpacity={0.45}
+                    formatType={'balance'}
+                    intOpacity={0.45}
+                    prefix={'~'}
+                    size={12}
+                    suffix={symbol}
+                    unitOpacity={0.45}
+                    value={item.totalDelegatedVote || 0}
+                  />
                 </span>
                 <>
                       |

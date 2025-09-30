@@ -31,6 +31,8 @@ type Props = ThemeProps & ViewBaseType & {
   goOverview: VoidFunction;
 };
 
+const modalId = 'account-selector';
+
 const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance }: Props): React.ReactElement<Props> => {
   const { currentAccountProxy } = useSelector((state) => state.accountState);
   const navigate = useNavigate();
@@ -44,7 +46,6 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
     fromAccountProxy
   });
 
-  const modalId = 'account-selector';
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
   const { uiState: { setShowTabBar } } = useContext(HomeContext);
@@ -113,7 +114,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
     } else if (accountAddressItems.length === 1) {
       onSelectGovItem(accountAddressItems[0]);
     }
-  }, [accountAddressItems, activeModal, modalId, onSelectGovItem]);
+  }, [accountAddressItems, activeModal, onSelectGovItem]);
 
   const onCancel = useCallback(() => {
     inactiveModal(modalId);

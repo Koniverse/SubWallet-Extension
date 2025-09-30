@@ -167,7 +167,7 @@ const GovVoteConvictionSlider = styled(forwardRef(Component))<Props>(({ theme: {
       width: 4,
       top: -3,
       borderRadius: 1,
-      backgroundColor: '#4D4D4D',
+      backgroundColor: token['gray-3'],
 
       '&.ant-slider-dot-active': {
         backgroundColor: token.colorWhite

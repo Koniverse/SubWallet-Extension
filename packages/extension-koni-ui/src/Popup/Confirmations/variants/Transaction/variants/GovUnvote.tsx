@@ -42,7 +42,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
   return (
     <div className={CN(className)}>
       <div className={'overview-info-wrapper'}>
-        {data.type && (<VoteMetaInfo
+        {!!data.type && (<VoteMetaInfo
           type={data.type}
         />)}
         <Number

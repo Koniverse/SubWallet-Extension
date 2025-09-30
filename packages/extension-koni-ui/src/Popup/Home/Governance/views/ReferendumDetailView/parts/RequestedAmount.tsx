@@ -24,48 +24,50 @@ const Component = ({ allSpend, chain, className }: Props): React.ReactElement<Pr
   const assetList = useMemo(() => Object.values(assetRegistry), [assetRegistry]);
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
 
+  const requestedItems = useMemo(() => {
+    return allSpend.map((item, index) => {
+      const { symbol, type } = item.isSpendLocal
+        ? { symbol: item.symbol, type: item.type }
+        : { symbol: item.assetKind.symbol, type: item.assetKind.type };
+
+      const tokenSlug = getGovTokenLogoSlugBySymbol(symbol, assetList) || '';
+      const decimals = type === 'native' ? nativeDecimals : 6;
+
+      return (
+        <div
+          className={'__requested-item'}
+          key={index}
+        >
+          <NumberDisplay
+            className={'__requested-item__value'}
+            decimal={decimals}
+            decimalOpacity={0.45}
+            prefix={'~'}
+            size={token.fontSize}
+            value={item.amount}
+            weight={token.fontWeightStrong}
+          />
+
+          <div className={'__requested-item__symbol-group'}>
+            <div className={'__requested-item__symbol'}>
+              {symbol}
+            </div>
+
+            <Logo
+              shape={'circle'}
+              size={token.sizeMD}
+              token={tokenSlug}
+            />
+          </div>
+        </div>
+      );
+    });
+  }, [allSpend, assetList, nativeDecimals, token]);
+
   return (
     <div className={className}>
       <div className={'__requested-label'}>Requested Amount</div>
-      <>
-        {allSpend.map((item, index) => {
-          const { symbol, type } = item.isSpendLocal
-            ? { symbol: item.symbol, type: item.type }
-            : { symbol: item.assetKind.symbol, type: item.assetKind.type };
-
-          const tokenSlug = getGovTokenLogoSlugBySymbol(symbol, assetList) || '';
-          const decimals = type === 'native' ? nativeDecimals : 6;
-
-          return (
-            <div
-              className={'__requested-item'}
-              key={index}
-            >
-              <NumberDisplay
-                className={'__requested-item__value'}
-                decimal={decimals}
-                decimalOpacity={0.45}
-                prefix={'~'}
-                size={token.fontSize}
-                value={item.amount}
-                weight={token.fontWeightStrong}
-              />
-
-              <div className={'__requested-item__symbol-group'}>
-                <div className={'__requested-item__symbol'}>
-                  {symbol}
-                </div>
-
-                <Logo
-                  shape={'circle'}
-                  size={token.sizeMD}
-                  token={tokenSlug}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </>
+      {requestedItems}
     </div>
   );
 };
