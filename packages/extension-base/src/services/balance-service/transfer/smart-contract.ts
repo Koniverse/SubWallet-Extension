@@ -26,10 +26,10 @@ interface TransferEvmProps extends TransactionFee {
 }
 
 // hot fix gas settings for Energy Web Chain
-const EWC_gas_settings = {
+const gasSettingsForEWC = {
   gasLimit: 4900000,
   maxFeePerGas: '10000000'
-}
+};
 
 export async function getEVMTransactionObject ({ chain,
   evmApi,
@@ -41,14 +41,14 @@ export async function getEVMTransactionObject ({ chain,
   to,
   transferAll,
   value }: TransferEvmProps): Promise<[TransactionConfig, string, string]> {
+  const isEnergyWebChain = chain === 'energy_web_chain'; // hot fix gas settings for Energy Web Chain
   const feeCustom = _feeCustom as EvmEIP1559FeeOption;
   const feeInfo = _feeInfo as EvmFeeInfo;
-
   const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
   let errorOnEstimateFee = '';
 
-  if (chain === 'energy_web_chain') {
-    feeCombine.maxFeePerGas = EWC_gas_settings.maxFeePerGas;
+  if (isEnergyWebChain) {
+    feeCombine.maxFeePerGas = gasSettingsForEWC.maxFeePerGas;
   }
 
   const transactionObject = {
@@ -60,8 +60,8 @@ export async function getEVMTransactionObject ({ chain,
 
   let gasLimit: number;
 
-  if (chain === 'energy_web_chain') {
-    gasLimit = EWC_gas_settings.gasLimit;
+  if (isEnergyWebChain) {
+    gasLimit = gasSettingsForEWC.gasLimit;
   } else {
     gasLimit = await evmApi.api.eth.estimateGas(transactionObject).catch((e: Error) => {
       console.log('Cannot estimate fee with native transfer on', chain, e);
@@ -136,7 +136,7 @@ export async function getERC20TransactionObject (
   let gasLimit: number;
 
   if (chain === 'energy_web_chain') {
-    gasLimit = EWC_gas_settings.gasLimit;
+    gasLimit = gasSettingsForEWC.gasLimit;
   } else {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     gasLimit = await (erc20Contract.methods.transfer(to, transferValue) as ContractSendMethod).estimateGas({ from })
@@ -157,7 +157,7 @@ export async function getERC20TransactionObject (
   const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
 
   if (chain === 'energy_web_chain') {
-    feeCombine.maxFeePerGas = EWC_gas_settings.maxFeePerGas;
+    feeCombine.maxFeePerGas = gasSettingsForEWC.maxFeePerGas;
   }
 
   const transactionObject = {
