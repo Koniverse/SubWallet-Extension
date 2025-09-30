@@ -25,6 +25,12 @@ interface TransferEvmProps extends TransactionFee {
   fallbackFee?: boolean;
 }
 
+// hot fix gas settings for Energy Web Chain
+const EWC_gas_settings = {
+  gasLimit: 4900000,
+  maxFeePerGas: '10000000'
+}
+
 export async function getEVMTransactionObject ({ chain,
   evmApi,
   fallbackFee,
@@ -41,6 +47,10 @@ export async function getEVMTransactionObject ({ chain,
   const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
   let errorOnEstimateFee = '';
 
+  if (chain === 'energy_web_chain') {
+    feeCombine.maxFeePerGas = EWC_gas_settings.maxFeePerGas;
+  }
+
   const transactionObject = {
     to: to,
     value: value,
@@ -48,17 +58,23 @@ export async function getEVMTransactionObject ({ chain,
     ...feeCombine
   } as TransactionConfig;
 
-  const gasLimit = await evmApi.api.eth.estimateGas(transactionObject).catch((e: Error) => {
-    console.log('Cannot estimate fee with native transfer on', chain, e);
+  let gasLimit: number;
 
-    if (fallbackFee) {
-      errorOnEstimateFee = e.message;
+  if (chain === 'energy_web_chain') {
+    gasLimit = EWC_gas_settings.gasLimit;
+  } else {
+    gasLimit = await evmApi.api.eth.estimateGas(transactionObject).catch((e: Error) => {
+      console.log('Cannot estimate fee with native transfer on', chain, e);
 
-      return 21000;
-    } else {
-      throw Error('Unable to estimate fee for this transaction. Edit fee and try again.');
-    }
-  });
+      if (fallbackFee) {
+        errorOnEstimateFee = e.message;
+
+        return 21000;
+      } else {
+        throw Error('Unable to estimate fee for this transaction. Edit fee and try again.');
+      }
+    });
+  }
 
   transactionObject.gas = gasLimit;
 
@@ -81,58 +97,6 @@ export async function getEVMTransactionObject ({ chain,
   }
 
   return [transactionObject, transactionObject.value.toString(), errorOnEstimateFee];
-}
-
-// only use for Energy Web Chain
-export function getEVMTransactionObjectForEWC ({ chain,
-  evmApi,
-  fallbackFee,
-  feeCustom: _feeCustom,
-  feeInfo: _feeInfo,
-  feeOption,
-  from,
-  to,
-  transferAll,
-  value }: TransferEvmProps): [TransactionConfig, string, string] {
-  const feeCustom = _feeCustom as EvmEIP1559FeeOption;
-  const feeInfo = _feeInfo as EvmFeeInfo;
-
-  const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
-
-  // hot fix for Energy Web Chain
-  feeCombine.maxFeePerGas = '10000000';
-
-  const transactionObject = {
-    to: to,
-    value: value,
-    from: from,
-    ...feeCombine
-  } as TransactionConfig;
-
-  // hot fix for Energy Web Chain
-  const gasLimit = 4900000;
-
-  transactionObject.gas = gasLimit;
-
-  let estimateFee: BigN;
-
-  if (feeCombine.maxFeePerGas) {
-    const maxFee = new BigN(feeCombine.maxFeePerGas);
-
-    estimateFee = maxFee.multipliedBy(gasLimit);
-  } else {
-    estimateFee = new BigN(feeCombine.gasPrice || '0').multipliedBy(gasLimit);
-  }
-
-  transactionObject.value = transferAll ? new BigN(value).minus(estimateFee).toString() : value;
-
-  if (EVM_REFORMAT_DECIMALS.acala.includes(chain)) {
-    const numberReplace = 18 - 12;
-
-    transactionObject.value = transactionObject.value.substring(0, transactionObject.value.length - 6) + new Array(numberReplace).fill('0').join('');
-  }
-
-  return [transactionObject, transactionObject.value.toString(), ''];
 }
 
 export async function getERC20TransactionObject (
@@ -169,21 +133,32 @@ export async function getERC20TransactionObject (
   }
 
   const transferData = generateTransferData(to, transferValue);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-  const gasLimit = await (erc20Contract.methods.transfer(to, transferValue) as ContractSendMethod).estimateGas({ from })
-    .catch((e: Error) => {
-      console.log('Cannot estimate fee with token contract', assetAddress, chain, e);
+  let gasLimit: number;
 
-      if (fallbackFee) {
-        errorOnEstimateFee = e.message;
+  if (chain === 'energy_web_chain') {
+    gasLimit = EWC_gas_settings.gasLimit;
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    gasLimit = await (erc20Contract.methods.transfer(to, transferValue) as ContractSendMethod).estimateGas({ from })
+      .catch((e: Error) => {
+        console.log('Cannot estimate fee with token contract', assetAddress, chain, e);
 
-        return 70000;
-      } else {
-        throw Error('Unable to estimate fee for this transaction. Edit fee and try again.');
-      }
-    });
+        if (fallbackFee) {
+          errorOnEstimateFee = e.message;
+
+          return 70000;
+        } else {
+          throw Error('Unable to estimate fee for this transaction. Edit fee and try again.');
+        }
+      });
+  }
+
   const feeInfo = _feeInfo as EvmFeeInfo;
   const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
+
+  if (chain === 'energy_web_chain') {
+    feeCombine.maxFeePerGas = EWC_gas_settings.maxFeePerGas;
+  }
 
   const transactionObject = {
     gas: gasLimit,

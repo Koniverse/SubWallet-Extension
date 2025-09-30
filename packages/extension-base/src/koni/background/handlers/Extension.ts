@@ -33,7 +33,7 @@ import { DEFAULT_CARDANO_TTL_OFFSET } from '@subwallet/extension-base/services/b
 import { isBounceableAddress } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
 import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
 import { createCardanoTransaction } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
-import { getERC20TransactionObject, getERC721Transaction, getEVMTransactionObject, getEVMTransactionObjectForEWC, getPSP34TransferExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
+import { getERC20TransactionObject, getERC721Transaction, getEVMTransactionObject, getPSP34TransferExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, dryRunXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
@@ -1478,21 +1478,6 @@ export default class KoniExtension {
             transferAmount.value
           ] = await getERC20TransactionObject({
             assetAddress: _getContractAddressOfToken(transferTokenInfo),
-            chain,
-            evmApi,
-            feeCustom,
-            feeInfo,
-            feeOption,
-            from,
-            to,
-            transferAll,
-            value: txVal
-          });
-        } else if (chain === 'energy_web_chain') {
-          [
-            transaction,
-            transferAmount.value
-          ] = getEVMTransactionObjectForEWC({
             chain,
             evmApi,
             feeCustom,
