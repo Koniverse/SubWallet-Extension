@@ -112,6 +112,7 @@ export async function getERC20TransactionObject (
     transferAll,
     value }: TransferERC20Props
 ): Promise<[TransactionConfig, string, string]> {
+  const isEnergyWebChain = chain === 'energy_web_chain'; // hot fix gas settings for Energy Web Chain
   const erc20Contract = getERC20Contract(assetAddress, evmApi);
   const feeCustom = _feeCustom as EvmEIP1559FeeOption;
 
@@ -135,7 +136,7 @@ export async function getERC20TransactionObject (
   const transferData = generateTransferData(to, transferValue);
   let gasLimit: number;
 
-  if (chain === 'energy_web_chain') {
+  if (isEnergyWebChain) {
     gasLimit = gasSettingsForEWC.gasLimit;
   } else {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
@@ -156,7 +157,7 @@ export async function getERC20TransactionObject (
   const feeInfo = _feeInfo as EvmFeeInfo;
   const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
 
-  if (chain === 'energy_web_chain') {
+  if (isEnergyWebChain) {
     feeCombine.maxFeePerGas = gasSettingsForEWC.maxFeePerGas;
   }
 
