@@ -320,7 +320,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
         {previousVoteAmountDetail &&
           <div className='previous-vote-amount-detail'>
-            <div className={'__label'}>{t('PREVIOUS VOTE')}</div>
+            <div className={'__label'}>{t('Previous vote')}</div>
             <VoteAmountDetail
               amountDetail={previousVoteAmountDetail}
               decimals={_getAssetDecimals(assetInfo)}
@@ -430,6 +430,7 @@ const ReferendumSplitVote = styled(Wrapper)<WrapperProps>(({ theme: { token } }:
 
     '.previous-vote-amount-detail': {
       '.__label': {
+        textTransform: 'uppercase',
         fontSize: token.fontSizeSM,
         lineHeight: token.lineHeightSM,
         fontWeight: token.fontWeightStrong,

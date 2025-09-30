@@ -10,10 +10,10 @@ import { findAccountByAddress, getAccountProxyTypeIcon, toShort } from '@subwall
 import { NestedAccount } from '@subwallet/extension-koni-ui/utils/gov/votingStats';
 import { Button, Icon, ModalContext, SwList, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { t } from 'i18next';
 import { CaretRight, Copy, ListChecks, UsersThree } from 'phosphor-react';
 import { IconWeight } from 'phosphor-react/src/lib';
 import React, { forwardRef, useCallback, useContext, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import DelegationDetailsModal from './DelegationDetails';
@@ -31,6 +31,7 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
   const [viewDetailItem, setViewDetailItem] = useState<NestedAccount | undefined>(undefined);
   const notify = useNotification();
   const { activeModal } = useContext(ModalContext);
+  const { t } = useTranslation();
 
   const onClickMore = useCallback((item: NestedAccount) => {
     return () => {
@@ -46,17 +47,17 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
       navigator.clipboard.writeText(address)
         .then(() => {
           notify({
-            message: t<string>('Copied to clipboard')
+            message: t('Copied to clipboard')
           });
         })
         .catch((err) => {
           console.error('Failed to copy: ', err);
           notify({
-            message: t<string>('Copy failed')
+            message: t('Copy failed')
           });
         });
     };
-  }, [notify]);
+  }, [notify, t]);
 
   const handleSearch = useCallback((value: string) => {
     setSearchText(value.trim().toLowerCase());
@@ -140,7 +141,6 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
         </>
       }
       onClick={onClickMore(item)}
-
       rightItem={
         <div className={'vote-item__arrow-wrapper'}>
           <Button
@@ -179,7 +179,7 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
         phosphorIcon={ListChecks}
       />
     );
-  }, []);
+  }, [t]);
 
   const filteredAccounts = useMemo(() => {
     if (!searchText) {
@@ -202,7 +202,7 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
         autoFocus={true}
         className='__search-box'
         onSearch={handleSearch}
-        placeholder={t<string>('Search address/identity')}
+        placeholder={t('Search address/identity')}
         searchValue={searchText}
       />
       <SwList

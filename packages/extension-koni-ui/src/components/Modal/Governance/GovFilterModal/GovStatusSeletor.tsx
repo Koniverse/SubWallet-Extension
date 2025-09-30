@@ -27,7 +27,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       return <div className='__loading-text'>{t('Loading ...')}</div>;
     }
 
-    return <div className='__selected-item'>{item.label}</div>;
+    return <div className='__selected-item'>{t(item.label)}</div>;
   }, [loading, t]);
 
   const renderItem = useCallback((item: GovStatusItem, selected: boolean) => {

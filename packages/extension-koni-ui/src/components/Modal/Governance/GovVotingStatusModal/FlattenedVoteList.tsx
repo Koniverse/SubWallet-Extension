@@ -10,10 +10,10 @@ import { findAccountByAddress, getAccountProxyTypeIcon, toShort } from '@subwall
 import { Button, Icon, SwList, Web3Block } from '@subwallet/react-ui';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
-import { t } from 'i18next';
 import { ArrowSquareOut, Copy, ListChecks } from 'phosphor-react';
 import { IconWeight } from 'phosphor-react/src/lib';
 import React, { forwardRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 interface Props extends ThemeProps {
@@ -27,6 +27,7 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
   const { accountProxies, accounts: accountsState } = useSelector((state) => state.accountState);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const notify = useNotification();
+  const { t } = useTranslation();
 
   const _onClickViewOnExplorer = useCallback((address: string) => {
     return (e: React.SyntheticEvent) => {
@@ -45,17 +46,17 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
       navigator.clipboard.writeText(address)
         .then(() => {
           notify({
-            message: t<string>('Copied to clipboard')
+            message: t('Copied to clipboard')
           });
         })
         .catch((err) => {
           console.error('Failed to copy: ', err);
           notify({
-            message: t<string>('Copy failed')
+            message: t('Copy failed')
           });
         });
     };
-  }, [notify]);
+  }, [notify, t]);
 
   const renderItem = useCallback((item: ReferendumVoteDetail) => {
     const convictionOption = govConvictionOptions.find((opt) => opt.value === item.conviction);
@@ -102,7 +103,7 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
             <div className='vote-item__address'>{account?.name || shortAddress}</div>
             <div className='vote-item__meta'>
               <div className='vote-item__meta-row'>
-                <span className='vote-item__label'>Votes</span>
+                <span className='vote-item__label'>{t('Votes')}</span>
                 <NumberDisplay
                   decimal={decimal}
                   formatType={'balance'}
@@ -112,11 +113,11 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
                 />
               </div>
               <div className='vote-item__meta-row'>
-                <span className='vote-item__label'>Conviction</span>
+                <span className='vote-item__label'>{t('Conviction')}</span>
                 <span>{convictionLabel}</span>
               </div>
               <div className='vote-item__meta-row'>
-                <span className='vote-item__label'>Capital</span>
+                <span className='vote-item__label'>{t('Capital')}</span>
                 <NumberDisplay
                   decimal={decimal}
                   formatType={'balance'}
@@ -156,7 +157,7 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
         }
       />
     );
-  }, [_onClickCopyButton, _onClickViewOnExplorer, accountProxies, accountsState, decimal, symbol]);
+  }, [_onClickCopyButton, _onClickViewOnExplorer, accountProxies, accountsState, decimal, symbol, t]);
 
   const renderEmpty = useCallback(() => {
     return (
@@ -165,7 +166,7 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
         phosphorIcon={ListChecks}
       />
     );
-  }, []);
+  }, [t]);
 
   return (
     <div className={`${className} __flattened-vote-list`}>

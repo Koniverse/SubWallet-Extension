@@ -74,7 +74,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
           key={groupItem.id}
         >
           <span>
-            {t(groupItem.groupLabel)}
+            {groupItem.groupLabel}
           </span>
           <span className={'list-item-group-label-count'}>
           &nbsp;({groupItem.listCount})
@@ -139,12 +139,12 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
       }
     };
 
-    addGroup(groupedItemMap.notVoted, 'NOT VOTED', 'not voted');
-    addGroup(groupedItemMap.voted, 'VOTED', 'voted');
-    addGroup(groupedItemMap.delegated, 'DELEGATED', 'delegated');
+    addGroup(groupedItemMap.notVoted, t('Not voted'), 'not voted');
+    addGroup(groupedItemMap.voted, t('Voted'), 'voted');
+    addGroup(groupedItemMap.delegated, t('Delegated'), 'delegated');
 
     return result;
-  }, [groupedItemMap, searchFunction, searchValue]);
+  }, [groupedItemMap.delegated, groupedItemMap.notVoted, groupedItemMap.voted, searchFunction, searchValue, t]);
 
   const handleSearch = useCallback((value: string) => {
     setSearchValue(value);
@@ -220,7 +220,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t<string>('Enter your account name or address')}
+        placeholder={t('Enter your account name or address')}
         searchValue={searchValue}
       />
       <SwList

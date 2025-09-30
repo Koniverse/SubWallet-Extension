@@ -79,11 +79,16 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
             userVoting={item.userVoting}
           />
           {!!timeLeft && (
-            <div className='__i-reject-time'>
-              {t('{{status}} in {{time}}', {
-                status: ayesPercent > naysPercent ? t('Approve') : t('Reject'),
-                time: timeLeft
-              })}
+            <div className='__i-time-left'>
+              {
+                ayesPercent > naysPercent
+                  ? t('Approve in {{time}}', {
+                    time: timeLeft
+                  })
+                  : t('Reject in {{time}}', {
+                    time: timeLeft
+                  })
+              }
             </div>
           )}
         </div>
@@ -161,7 +166,7 @@ const ReferendumItem = styled(Component)<Props>(({ theme: { token } }: Props) =>
       justifyContent: 'space-between'
     },
 
-    '.__i-reject-time': {
+    '.__i-time-left': {
       color: token.colorTextLight1,
       fontSize: token.fontSizeXS,
       lineHeight: token.lineHeightXS

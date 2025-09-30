@@ -68,7 +68,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
                   weight={'fill'}
                 />
                 <div className={CN('voting-stats__label', '-aye')}>
-                  {t('Aye:')}
+                  {t('Aye')}:
                 </div>
                 <div className='voting-stats__number'>
                   {votingData[GovVoteType.AYE].totalVotedAccounts}
@@ -103,7 +103,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
                   weight={'fill'}
                 />
                 <div className={CN('voting-stats__label', '-nay')}>
-                  {t('Nay:')}
+                  {t('Nay')}:
                 </div>
                 <div className='voting-stats__number'>
                   {votingData[GovVoteType.NAY].totalVotedAccounts}
@@ -139,7 +139,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
                 />
 
                 <div className={CN('voting-stats__label', '-abstain')}>
-                  {t('Abstain:')}
+                  {t('Abstain')}:
                 </div>
                 <div className='voting-stats__number'>
                   {votingData[GovVoteType.ABSTAIN].totalVotedAccounts}

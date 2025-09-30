@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
-import { useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
+import { useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -19,6 +19,7 @@ type Props = ThemeProps & {
 };
 
 const Component = ({ allSpend, chain, className }: Props): React.ReactElement<Props> => {
+  const { t } = useTranslation();
   const { decimals: nativeDecimals } = useGetNativeTokenBasicInfo(chain);
   const { assetRegistry } = useSelector((root: RootState) => root.assetRegistry);
   const assetList = useMemo(() => Object.values(assetRegistry), [assetRegistry]);
@@ -66,7 +67,7 @@ const Component = ({ allSpend, chain, className }: Props): React.ReactElement<Pr
 
   return (
     <div className={className}>
-      <div className={'__requested-label'}>Requested Amount</div>
+      <div className={'__requested-label'}>{t('Requested Amount')}</div>
       {requestedItems}
     </div>
   );

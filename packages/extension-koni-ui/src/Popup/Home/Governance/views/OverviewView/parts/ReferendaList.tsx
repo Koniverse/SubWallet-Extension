@@ -6,9 +6,9 @@ import { ReferendumItem } from '@subwallet/extension-koni-ui/components/Governan
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ReferendumWithVoting } from '@subwallet/extension-koni-ui/types/gov';
 import { Referendum } from '@subwallet/subsquare-api-sdk';
-import { t } from 'i18next';
 import { ListChecks } from 'phosphor-react';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -22,6 +22,8 @@ type WrapperProps = Omit<Props, 'items'> & {
 };
 
 const Component = ({ chain, className, items, onClickItem }: Props): React.ReactElement<Props> => {
+  const { t } = useTranslation();
+
   const _onClickItem = useCallback((item: Referendum) => {
     return () => {
       onClickItem(item);

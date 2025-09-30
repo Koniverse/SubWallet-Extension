@@ -98,7 +98,6 @@ const Component = (props: Props) => {
         renderItem={renderItem}
         rowGap='var(--row-gap)'
       />
-
     </SwModal>
   );
 };

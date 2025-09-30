@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { govStatusDisplayMap } from '@subwallet/extension-koni-ui/constants';
+import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertHexColorToRGBA } from '@subwallet/extension-koni-ui/utils';
 import { Icon } from '@subwallet/react-ui';
@@ -14,6 +15,7 @@ type Props = ThemeProps & {
 };
 
 const Component = ({ className, status }: Props): React.ReactElement<Props> => {
+  const { t } = useTranslation();
   const currentTagDisplayInfo = govStatusDisplayMap[status];
 
   return (
@@ -30,7 +32,7 @@ const Component = ({ className, status }: Props): React.ReactElement<Props> => {
       }
 
       <div className='__label'>
-        {currentTagDisplayInfo.label}
+        {t(currentTagDisplayInfo.label)}
       </div>
     </div>
   );

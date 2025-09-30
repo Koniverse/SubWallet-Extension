@@ -272,15 +272,16 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   }, [fromValue, getAccountVoteStatus]);
 
   const screenTitle = useMemo(() => {
-    let action = 'Vote';
-
     if (currentVoteStatus === GovVoteStatus.VOTED) {
-      action = 'Revote';
+      return t('Revote for #{{referendumId}}', {
+        replace: {
+          referendumId: referendumId
+        }
+      });
     }
 
-    return t('{{action}} for #{{referendumId}}', {
+    return t('Vote for #{{referendumId}}', {
       replace: {
-        action,
         referendumId: referendumId
       }
     });

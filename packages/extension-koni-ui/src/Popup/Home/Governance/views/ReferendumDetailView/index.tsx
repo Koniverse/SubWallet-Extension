@@ -81,7 +81,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
         title: t('Unable to vote'),
         type: NotificationType.ERROR,
         content: t(
-          'You\'re delegating votes for the referendum\'s track with account named "{{name}}". Ask your delegatee to vote or remove your delegated votes, then try again',
+          "You're delegating votes for the referendum's track with account named {{name}}. Ask your delegatee to vote or remove your delegated votes, then try again",
           { name: item.accountName }
         ),
         okButton: {
@@ -193,7 +193,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
             onClick={onViewPolkassembly}
             schema='secondary'
           >
-            {t('Polkassembly')}
+            Polkassembly
           </Button>
 
           <Button
@@ -209,7 +209,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
             onClick={onViewSubsquare}
             schema='secondary'
           >
-            {t('Subsquare')}
+            Subsquare
           </Button>
         </div>
       </div>

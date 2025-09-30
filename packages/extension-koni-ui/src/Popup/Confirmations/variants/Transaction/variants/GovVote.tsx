@@ -10,7 +10,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
-import { Icon, ModalContext, Number, SwModal } from '@subwallet/react-ui';
+import { Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import BigNumber from 'bignumber.js';
 import CN from 'classnames';
 import { Info } from 'phosphor-react';
@@ -116,7 +116,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           </div>}
         </div>
 
-        <Number
+        <NumberDisplay
           className={'__vote-amount'}
           decimal={decimals}
           formatType={'balance'}
@@ -126,7 +126,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           weight={600}
         />
 
-        <Number
+        <NumberDisplay
           decimal={0}
           decimalOpacity={0.45}
           intOpacity={0.45}
@@ -168,6 +168,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           decimals={decimals}
           label={t('Network fee')}
           suffix={symbol}
+          useNumberDisplay={true}
           value={transaction.estimateFee?.value || 0}
         />
       </MetaInfo>
@@ -247,7 +248,6 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         <VoteAmountDetail
           amountDetail={amountDetail}
           decimals={decimals}
-
           symbol={symbol}
         />
       </SwModal>

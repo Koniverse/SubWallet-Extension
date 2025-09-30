@@ -38,7 +38,7 @@ function Component (props: Props): React.ReactElement<Props> {
       onCancel={_onCancel}
       title={t('Delegation details')}
     >
-      <div className={'section-title'}>{t('SELF VOTES')}</div>
+      <div className={'section-title'}>{t('Self votes')}</div>
       <MetaInfo
         className='meta-block'
         hasBackgroundWrapper
@@ -65,7 +65,7 @@ function Component (props: Props): React.ReactElement<Props> {
           value={nestedAccount.accountInfo.balance || 0}
         />
       </MetaInfo>
-      <div className={'section-title'}>{t('DELEGATION VOTES')}</div>
+      <div className={'section-title'}>{t('Delegation votes')}</div>
       <MetaInfo
         className='meta-block'
         hasBackgroundWrapper
@@ -94,7 +94,7 @@ function Component (props: Props): React.ReactElement<Props> {
       </MetaInfo>
       {nestedAccount.totalDelegatedAccount > 0 && (
         <>
-          <div className={'section-title'}>{t('DELEGATION LIST ')}
+          <div className={'section-title'}>{t('Delegation list')}
             <span className={'__delegation-account-total'}>
               ({nestedAccount.totalDelegatedAccount})
             </span>
@@ -126,6 +126,7 @@ const DelegationDetailsModal = styled(Component)<Props>(({ theme: { token } }: P
       fontSize: token.fontSizeSM,
       lineHeight: '20px',
       fontWeight: 600,
+      textTransform: 'uppercase',
       color: token.colorTextLight1,
       marginBottom: token.marginXS
     },

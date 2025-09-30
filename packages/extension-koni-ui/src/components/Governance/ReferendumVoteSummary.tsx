@@ -42,7 +42,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
               {!!vote && (
                 <>
                   <div className='__i-vote-summary-label'>
-                    {t('Voted:')}&nbsp;
+                    {t('Voted')}:&nbsp;
                   </div>
                   {BigNumber(vote?.ayeAmount || 0).gt(0) && (
                     <div className='__i-vote-stat -aye'>
@@ -97,7 +97,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
               {!!delegation && (
                 <>
                   <div className='__i-vote-summary-label'>
-                    {t('Voted:')}&nbsp;
+                    {t('Voted')}:&nbsp;
                   </div>
                   <NumberDisplay
                     className='__i-vote-stat-value'

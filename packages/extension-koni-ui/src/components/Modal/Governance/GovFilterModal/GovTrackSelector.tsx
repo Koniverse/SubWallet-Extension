@@ -92,7 +92,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       renderSelected={renderSelected}
       searchFunction={searchFunction}
       searchMinCharactersCount={2}
-      searchPlaceholder={t<string>('Search track')}
+      searchPlaceholder={t('Search track')}
       selected={value ?? ALL_TRACK_ID}
       statusHelp={statusHelp}
       suffix={

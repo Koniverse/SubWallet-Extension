@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { GovStatusKey } from '@subwallet/subsquare-api-sdk';
 import { ArrowsOutLineHorizontal, CheckCircle, CircleHalf, ClipboardText, ClockAfternoon, HourglassHigh, Prohibit, RocketLaunch, Scales, Skull, Stack, ThumbsDown, ThumbsUp, XCircle } from 'phosphor-react';
 
@@ -15,17 +16,17 @@ export const governanceVoteIconMap = {
 };
 
 export const govStatusDisplayMap: Record<GovStatusKey, GovStatusItem> = {
-  [GovStatusKey.ALL]: { key: GovStatusKey.ALL, label: 'All status' },
-  [GovStatusKey.PREPARING]: { key: GovStatusKey.PREPARING, label: 'Preparing', icon: HourglassHigh, colorToken: 'gold-6' },
-  [GovStatusKey.DECIDING]: { key: GovStatusKey.DECIDING, label: 'Deciding', icon: Scales, colorToken: 'blue-7' },
-  [GovStatusKey.CONFIRMING]: { key: GovStatusKey.CONFIRMING, label: 'Confirming', icon: ClipboardText, colorToken: 'geekblue-7' },
-  [GovStatusKey.APPROVED]: { key: GovStatusKey.APPROVED, label: 'Approved', icon: CheckCircle, colorToken: 'lime-7' },
-  [GovStatusKey.QUEUEING]: { key: GovStatusKey.QUEUEING, label: 'Queueing', icon: Stack, colorToken: 'green-6' },
-  [GovStatusKey.EXECUTED]: { key: GovStatusKey.EXECUTED, label: 'Executed', icon: RocketLaunch, colorToken: 'colorSecondaryText' },
-  [GovStatusKey.REJECTED]: { key: GovStatusKey.REJECTED, label: 'Rejected', icon: Prohibit, colorToken: 'magenta-6' },
-  [GovStatusKey.TIMEDOUT]: { key: GovStatusKey.TIMEDOUT, label: 'TimedOut', icon: ClockAfternoon, colorToken: 'gray-6' },
-  [GovStatusKey.CANCELLED]: { key: GovStatusKey.CANCELLED, label: 'Cancelled', icon: XCircle, colorToken: 'orange-6' },
-  [GovStatusKey.KILLED]: { key: GovStatusKey.KILLED, label: 'Killed', icon: Skull, colorToken: 'red-6' }
+  [GovStatusKey.ALL]: { key: GovStatusKey.ALL, label: detectTranslate('All status') },
+  [GovStatusKey.PREPARING]: { key: GovStatusKey.PREPARING, label: detectTranslate('Preparing'), icon: HourglassHigh, colorToken: 'gold-6' },
+  [GovStatusKey.DECIDING]: { key: GovStatusKey.DECIDING, label: detectTranslate('Deciding'), icon: Scales, colorToken: 'blue-7' },
+  [GovStatusKey.CONFIRMING]: { key: GovStatusKey.CONFIRMING, label: detectTranslate('Confirming'), icon: ClipboardText, colorToken: 'geekblue-7' },
+  [GovStatusKey.APPROVED]: { key: GovStatusKey.APPROVED, label: detectTranslate('Approved'), icon: CheckCircle, colorToken: 'lime-7' },
+  [GovStatusKey.QUEUEING]: { key: GovStatusKey.QUEUEING, label: detectTranslate('Queueing'), icon: Stack, colorToken: 'green-6' },
+  [GovStatusKey.EXECUTED]: { key: GovStatusKey.EXECUTED, label: detectTranslate('Executed'), icon: RocketLaunch, colorToken: 'colorSecondaryText' },
+  [GovStatusKey.REJECTED]: { key: GovStatusKey.REJECTED, label: detectTranslate('Rejected'), icon: Prohibit, colorToken: 'magenta-6' },
+  [GovStatusKey.TIMEDOUT]: { key: GovStatusKey.TIMEDOUT, label: detectTranslate('TimedOut'), icon: ClockAfternoon, colorToken: 'gray-6' },
+  [GovStatusKey.CANCELLED]: { key: GovStatusKey.CANCELLED, label: detectTranslate('Cancelled'), icon: XCircle, colorToken: 'orange-6' },
+  [GovStatusKey.KILLED]: { key: GovStatusKey.KILLED, label: detectTranslate('Killed'), icon: Skull, colorToken: 'red-6' }
 };
 
 export const govStatusItems: GovStatusItem[] = [
