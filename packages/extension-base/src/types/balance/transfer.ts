@@ -23,7 +23,7 @@ export interface ResponseSubscribeTransfer {
   feeType: FeeChainType;
   feePercentageSpecialCase?: number;
   error?: string;
-  isRpcEvmError?: boolean
+  isEvmRpcError?: boolean
 }
 
 export interface RequestSubmitTransferWithId extends RequestSubmitTransfer{

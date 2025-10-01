@@ -113,7 +113,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
   let feeOptions: FeeDetail;
   let maxTransferable: BigN;
   let error: string | undefined;
-  let isRpcEvmError = false;
+  let isEvmRpcError = false;
 
   const fakeAddress = '5DRewsYzhJqZXU3SRaWy1FSt5iDr875ao91aw5fjrJmDG4Ap'; // todo: move this
   const substrateAddress = fakeAddress; // todo: move this
@@ -143,7 +143,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         });
 
         if (error) {
-          isRpcEvmError = true;
+          isEvmRpcError = true;
         }
       } else {
         [transaction, , error] = await getEVMTransactionObject({
@@ -160,7 +160,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         });
 
         if (error) {
-          isRpcEvmError = true;
+          isEvmRpcError = true;
         }
       }
     } else if (isTonAddress(address) && _isTokenTransferredByTon(srcToken)) {
@@ -353,7 +353,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
     feeType: feeChainType,
     id: id,
     error,
-    isRpcEvmError
+    isEvmRpcError: isEvmRpcError
   };
 };
 
