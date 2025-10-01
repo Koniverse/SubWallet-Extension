@@ -22,6 +22,7 @@ export interface ResponseSubscribeTransfer {
   feeOptions: FeeDetail;
   feeType: FeeChainType;
   feePercentageSpecialCase?: number;
+  // TODO: Need to manage errors separately between networks
   error?: string;
   isEvmRpcError?: boolean
 }
