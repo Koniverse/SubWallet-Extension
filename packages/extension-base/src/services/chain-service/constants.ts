@@ -110,7 +110,9 @@ export const _STAKING_ERA_LENGTH_MAP: Record<string, number> = { // in hours
   muse_testnet: 25 * 6 / 60 / 60, // 25 blocks per session
   mythos: 24,
   energy_web_x_testnet: 22 * 12 / 3600, // 22 blocks per era, 1 block per 12s
-  energy_web_x: 7200 * 12 / 3600 // 24 hours, 7200 blocks per era, 1 block per 12s
+  energy_web_x: 7200 * 12 / 3600, // 24 hours, 7200 blocks per era, 1 block per 12s,
+  zkverify_testnet: 6,
+  zkverify: 6
 };
 
 export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
@@ -146,7 +148,9 @@ export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
   muse_testnet: 6,
   mythos: 6,
   energy_web_x_testnet: 12,
-  energy_web_x: 12
+  energy_web_x: 12,
+  zkverify: 6,
+  zkverify_testnet: 6
 };
 
 export const _PARACHAIN_INFLATION_DISTRIBUTION: Record<string, Record<string, number>> = {
