@@ -114,7 +114,11 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
               weight={'fill'}
             />
             <div>
-              {t('Reject in {{timeLeft}}', { timeLeft })}
+              {
+                ayesPercent > naysPercent
+                  ? t('Approve in {{timeLeft}}', { timeLeft })
+                  : t('Reject in {{timeLeft}}', { timeLeft })
+              }
             </div>
           </div>
         )}

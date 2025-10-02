@@ -3,10 +3,9 @@
 
 import { RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { MetaInfo, NumberDisplay, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { MetaInfo, NumberDisplay, PageWrapper, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { VoteMetaInfo } from '@subwallet/extension-koni-ui/Popup/Confirmations/variants/Transaction/variants/index';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Number } from '@subwallet/react-ui';
@@ -42,7 +41,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
   return (
     <div className={CN(className)}>
       <div className={'overview-info-wrapper'}>
-        {!!data.type && (<VoteMetaInfo
+        {!!data.type && (<VoteTypeLabel
           type={data.type}
         />)}
         <Number

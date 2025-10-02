@@ -26,11 +26,23 @@ const Component = ({ chain, className, spends }: Props): React.ReactElement<Prop
   const assetList = useMemo(() => Object.values(assetRegistry), [assetRegistry]);
   const totalRaw = useMemo(() => spends?.reduce((acc, s) => acc.plus(s.amount), BN_ZERO) || BN_ZERO, [spends]);
 
-  if (!spends || spends.length === 0) {
+  const symbols = useMemo<string[]>(() => {
+    if (!spends || spends.length === 0) {
+      return [];
+    }
+
+    const symbolSetCollection = new Set<string>();
+
+    for (const s of spends) {
+      symbolSetCollection.add(s.isSpendLocal ? s.symbol : s.assetKind.symbol);
+    }
+
+    return [...symbolSetCollection];
+  }, [spends]);
+
+  if (!spends || symbols.length === 0) {
     return null;
   }
-
-  const symbols = [...new Set(spends.map((s) => s.isSpendLocal ? s.symbol : s.assetKind.symbol))];
 
   if (symbols.length > 1) {
     return (
@@ -57,9 +69,11 @@ const Component = ({ chain, className, spends }: Props): React.ReactElement<Prop
 
   const symbol = symbols[0];
   const first = spends[0];
-  const decimals = first.isSpendLocal
-    ? (first.type === 'native' ? nativeDecimals : 6)
-    : (first.assetKind.type === 'native' ? nativeDecimals : 6);
+  const isNative = first.isSpendLocal
+    ? first.type === 'native'
+    : first.assetKind.type === 'native';
+
+  const decimals = isNative ? nativeDecimals : 6;
 
   return (
     <div className={className}>

@@ -2,15 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
-import { CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { CollapsiblePanel, MetaInfo, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import GovVotingStatusModal from '@subwallet/extension-koni-ui/components/Modal/Governance/GovVotingStatusModal';
 import { useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovVoteSide } from '@subwallet/extension-koni-ui/types/gov';
 import { ReferendumVoteResult } from '@subwallet/extension-koni-ui/utils/gov/votingStats';
 import { Icon, ModalContext, Number } from '@subwallet/react-ui';
-import CN from 'classnames';
-import { CircleHalf, Info, ThumbsDown, ThumbsUp } from 'phosphor-react';
+import { Info } from 'phosphor-react';
 import React, { useCallback, useContext, useState } from 'react';
 import styled from 'styled-components';
 
@@ -61,15 +60,10 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
           <MetaInfo.Default
             label={
               <>
-                <Icon
-                  className={CN('voting-stats__icon', '-aye')}
-                  customSize={'16px'}
-                  phosphorIcon={ThumbsUp}
-                  weight={'fill'}
+                <VoteTypeLabel
+                  className={'voting-stats__icon'}
+                  type={GovVoteType.AYE}
                 />
-                <div className={CN('voting-stats__label', '-aye')}>
-                  {t('Aye')}:
-                </div>
                 <div className='voting-stats__number'>
                   {votingData[GovVoteType.AYE].totalVotedAccounts}
                 </div>
@@ -96,15 +90,10 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
           <MetaInfo.Default
             label={
               <>
-                <Icon
-                  className={CN('voting-stats__icon', '-nay')}
-                  customSize={'16px'}
-                  phosphorIcon={ThumbsDown}
-                  weight={'fill'}
+                <VoteTypeLabel
+                  className={'voting-stats__icon'}
+                  type={GovVoteType.NAY}
                 />
-                <div className={CN('voting-stats__label', '-nay')}>
-                  {t('Nay')}:
-                </div>
                 <div className='voting-stats__number'>
                   {votingData[GovVoteType.NAY].totalVotedAccounts}
                 </div>
@@ -131,16 +120,10 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
           <MetaInfo.Default
             label={
               <>
-                <Icon
-                  className={CN('voting-stats__icon', '-abstain')}
-                  customSize={'16px'}
-                  phosphorIcon={CircleHalf}
-                  weight={'fill'}
+                <VoteTypeLabel
+                  className={'voting-stats__icon'}
+                  type={GovVoteType.ABSTAIN}
                 />
-
-                <div className={CN('voting-stats__label', '-abstain')}>
-                  {t('Abstain')}:
-                </div>
                 <div className='voting-stats__number'>
                   {votingData[GovVoteType.ABSTAIN].totalVotedAccounts}
                 </div>
@@ -215,28 +198,16 @@ export const VotingStats = styled(Component)<Props>(({ theme: { token } }: Props
     },
 
     '.voting-stats__icon': {
-      marginRight: token.marginXXS
+      marginRight: token.marginXXS / 2
     },
 
-    '.voting-stats__label': {
-      marginRight: token.marginXXS / 2
+    '.__type-label::after': {
+      content: '":"'
     },
 
     '.voting-stats__number': {
       fontWeight: token.bodyFontWeight,
       color: token.colorTextLight4
-    },
-
-    '.-aye': {
-      color: token['green-7']
-    },
-
-    '.-nay': {
-      color: token['red-7']
-    },
-
-    '.-abstain': {
-      color: token.colorTextLight2
     },
 
     '.voting-stats__value': {

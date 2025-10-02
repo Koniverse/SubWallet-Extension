@@ -11,3 +11,13 @@ export const chainSlugToSubsquareNetwork: Record<string, string> = {
   paseo_assethub: 'paseo',
   vara_network: 'vara'
 };
+
+export const chainSlugToPolkassemblyNetwork: Record<string, string> = {
+  polkadot: 'polkadot',
+  hydradx_main: 'hydradx',
+  kusama: 'kusama',
+  basilisk: 'basilisk',
+  westend_assethub: 'westend',
+  paseo_assethub: 'paseo',
+  vara_network: 'vara'
+};
