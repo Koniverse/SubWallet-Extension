@@ -27,6 +27,27 @@ export const _PREDEFINED_SINGLE_MODES: Record<string, SingleModeJson> = {
 
 export const _PURE_EVM_CHAINS = ['binance', 'binance_test', 'ethereum', 'ethereum_goerli', 'astarEvm', 'shidenEvm', 'shibuyaEvm', 'crabEvm', 'pangolinEvm', 'cloverEvm', 'boba_rinkeby', 'boba', 'bobabase', 'bobabeam', 'watr_network_evm'];
 
+export const _GOVERNANCE_CHAIN_GROUP = {
+  polkadot: [
+    'polkadot', 'bifrost_dot', 'hydradx_main'
+  ],
+  kusama: [
+    'kusama', 'basilisk'
+  ],
+  westend_assethub: [
+    'westend_assethub'
+  ],
+  paseo: [
+    'paseo_assethub'
+  ],
+  solo: [
+    // 'vara_network'
+  ],
+  testnet: [
+
+  ]
+};
+
 // Get balance----------------------------------------------------------------------------------------------------------
 
 export const _BALANCE_CHAIN_GROUP = {

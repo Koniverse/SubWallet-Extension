@@ -3,6 +3,7 @@
 
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { EarningEntryView } from '@subwallet/extension-koni-ui/types/earning';
+import { GovernanceScreenView } from '@subwallet/extension-koni-ui/types/governance';
 
 // token
 
@@ -72,3 +73,10 @@ export type NotificationScreenParam = {
     triggerTime: string
   }
 };
+
+// Governance
+export type GovernanceParam = {
+  view: GovernanceScreenView;
+  referendumId?: string | null;
+  chainSlug: string;
+}

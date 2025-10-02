@@ -22,7 +22,9 @@
         "@subwallet/web-runner": ["web-runner/src"],
         "@subwallet/web-runner/*": ["web-runner/src/*"],
         "@subwallet/webapp": ["webapp/src"],
-        "@subwallet/webapp/*": ["webapp/src/*"]
+        "@subwallet/webapp/*": ["webapp/src/*"],
+        "@subwallet/subsquare-api-sdk": ["subsquare-api-sdk/src"],
+        "@subwallet/subsquare-api-sdk/*": ["subsquare-api-sdk/src/*"]
     },
     "skipLibCheck": true
 	}
