@@ -416,7 +416,11 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
     const apiPromise = await this.substrateApi.isReady;
     const binaryAmount = new BN(amount);
     const selectedCollatorInfo = selectedValidators[0];
-    const { address: selectedCollatorAddress, nominatorCount: selectedCollatorNominatorCount } = selectedCollatorInfo;
+
+    const onchainCollatorInfo = (await apiPromise.api.query.parachainStaking.candidateInfo(selectedValidators[0].address)).toPrimitive() as unknown as EnergyStakingCandidateMetadata;
+
+    const { address: selectedCollatorAddress } = selectedCollatorInfo;
+    const onchainSelectedCollatorNominatorCount = onchainCollatorInfo.nominationCount;
 
     const compoundResult = (
       extrinsic: SubmittableExtrinsic<'promise'>
@@ -425,7 +429,7 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
     };
 
     if (!positionInfo) {
-      const extrinsic = apiPromise.api.tx.parachainStaking.nominate(selectedCollatorAddress, binaryAmount, new BN(selectedCollatorNominatorCount), 0);
+      const extrinsic = apiPromise.api.tx.parachainStaking.nominate(selectedCollatorAddress, binaryAmount, new BN(onchainSelectedCollatorNominatorCount), 0);
 
       return compoundResult(extrinsic);
     }
@@ -434,7 +438,7 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
     const parsedSelectedCollatorAddress = reformatAddress(selectedCollatorInfo.address, 0);
 
     if (!bondedValidators.includes(parsedSelectedCollatorAddress)) {
-      const extrinsic = apiPromise.api.tx.parachainStaking.nominate(selectedCollatorAddress, binaryAmount, new BN(selectedCollatorNominatorCount), nominationCount);
+      const extrinsic = apiPromise.api.tx.parachainStaking.nominate(selectedCollatorAddress, binaryAmount, new BN(onchainSelectedCollatorNominatorCount), nominationCount);
 
       return compoundResult(extrinsic);
     } else {
