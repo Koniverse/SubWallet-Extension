@@ -519,7 +519,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         </Form>
       </TransactionContent>
 
-      <TransactionFooter className={`${className} -transaction-footer -gov-standard-transaction`}>
+      <TransactionFooter className={`${className} -transaction-footer`}>
         <div className={'__vote-buttons-container'}>
           <VoteButton
             {...getButtonProps(GovVoteType.NAY)}
@@ -609,7 +609,8 @@ const ReferendumStandardVote = styled(Wrapper)<WrapperProps>(({ theme: { token }
     },
 
     '&.-transaction-footer': {
-      marginBottom: 4
+      marginBottom: 0,
+      padding: '16px 35px 20px 35px'
     },
 
     '.form-group': {

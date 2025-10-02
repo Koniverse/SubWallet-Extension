@@ -330,7 +330,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         }
       </TransactionContent>
 
-      <TransactionFooter className={`${className} -transaction-footer -gov-transaction`}>
+      <TransactionFooter className={`${className} -transaction-footer`}>
         <Button
           disabled={loading}
           icon={(
@@ -411,7 +411,10 @@ const ReferendumSplitVote = styled(Wrapper)<WrapperProps>(({ theme: { token } }:
     },
 
     '&.-transaction-footer': {
-      marginBottom: 4
+      gap: token.sizeSM,
+      marginBottom: 0,
+      padding: token.padding,
+      paddingBottom: token.paddingXL
     },
 
     '.form-group': {

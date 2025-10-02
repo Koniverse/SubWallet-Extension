@@ -61,7 +61,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
             label={
               <>
                 <VoteTypeLabel
-                  className={'voting-stats__icon'}
+                  className={'voting-stats__label'}
                   type={GovVoteType.AYE}
                 />
                 <div className='voting-stats__number'>
@@ -91,7 +91,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
             label={
               <>
                 <VoteTypeLabel
-                  className={'voting-stats__icon'}
+                  className={'voting-stats__label'}
                   type={GovVoteType.NAY}
                 />
                 <div className='voting-stats__number'>
@@ -121,7 +121,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
             label={
               <>
                 <VoteTypeLabel
-                  className={'voting-stats__icon'}
+                  className={'voting-stats__label'}
                   type={GovVoteType.ABSTAIN}
                 />
                 <div className='voting-stats__number'>
@@ -197,12 +197,12 @@ export const VotingStats = styled(Component)<Props>(({ theme: { token } }: Props
       alignItems: 'center'
     },
 
-    '.voting-stats__icon': {
-      marginRight: token.marginXXS / 2
-    },
+    '.voting-stats__label': {
+      marginRight: token.marginXXS / 2,
 
-    '.__type-label::after': {
-      content: '":"'
+      '.__type-label::after': {
+        content: '":"'
+      }
     },
 
     '.voting-stats__number': {

@@ -230,7 +230,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         </MetaInfo>
       </TransactionContent>
 
-      <TransactionFooter className={`${className} -transaction-footer -gov-transaction`}>
+      <TransactionFooter className={`${className} -transaction-footer`}>
         <Button
           disabled={loading}
           icon={(
@@ -347,6 +347,13 @@ const GovUnlockVote = styled(Wrapper)<WrapperProps>(({ theme: { token } }: Wrapp
       backgroundColor: token.colorBgSecondary,
       marginTop: token.sizeSM,
       fontSize: token.fontSizeHeading6
+    },
+
+    '&.-transaction-footer': {
+      gap: token.sizeSM,
+      marginBottom: 0,
+      padding: token.padding,
+      paddingBottom: token.paddingXL
     }
   };
 });
