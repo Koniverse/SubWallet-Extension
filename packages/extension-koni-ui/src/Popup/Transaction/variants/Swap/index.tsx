@@ -6,10 +6,10 @@ import { SwapError } from '@subwallet/extension-base/background/errors/SwapError
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
-import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainName, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
+import { DetectedGenOptimalProcessErrMsg } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
@@ -140,6 +140,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
   const [preferredProvider, setPreferredProvider] = useState<SwapProviderId | undefined>(undefined);
 
   const [swapError, setSwapError] = useState<SwapError|undefined>(undefined);
+  const [customSwapErrorMessage, setCustomSwapErrorMessage] = useState<string|undefined>(undefined);
   const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false);
   const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalSwapPath | undefined>(undefined);
 
@@ -442,31 +443,27 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     setFeeOptions(rs.quote.optimalQuote?.feeInfo?.feeOptions || []);
     setCurrentFeeOption(rs.quote.optimalQuote?.feeInfo?.feeOptions?.[0]);
     setSwapError(rs.quote.error);
+    setCustomSwapErrorMessage(undefined);
   }, []);
 
-  const notifyNoQuote = useCallback(() => {
-    notify({
-      message: t('ui.TRANSACTION.screen.Transaction.Swap.swapPairNotSupportedTryAnother'),
-      type: 'error',
-      duration: 5
-    });
-  }, [notify, t]);
+  const ErrorMessageMap = useMemo(() => ({
+    NoQuote: t('ui.TRANSACTION.screen.Transaction.Swap.swapPairNotSupportedTryAnother'),
+    TooLowAmount: t('ui.TRANSACTION.screen.Transaction.Swap.amountTooLow'),
+    TooHighAmount: t('ui.TRANSACTION.screen.Transaction.Swap.amountTooHigh'),
+    NotEnoughBitcoin: t('ui.TRANSACTION.screen.Transaction.Swap.notEnoughBitcoin')
+  }), [t]);
 
-  const notifyTooLowAmount = useCallback(() => {
-    notify({
-      message: t('ui.TRANSACTION.screen.Transaction.Swap.amountTooLow'),
-      type: 'error',
-      duration: 5
-    });
-  }, [notify, t]);
+  const notifyErrorMessage = useCallback((message: string, setErrorState = true) => {
+    if (setErrorState) {
+      setCustomSwapErrorMessage(message);
+    }
 
-  const notifyTooHighAmount = useCallback(() => {
     notify({
-      message: t('ui.TRANSACTION.screen.Transaction.Swap.amountTooHigh'),
+      message,
       type: 'error',
       duration: 5
     });
-  }, [notify, t]);
+  }, [notify, setCustomSwapErrorMessage]);
 
   const onConfirmSelectedQuote = useCallback(
     async (quote: SwapQuote) => {
@@ -549,8 +546,14 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       return;
     }
 
+    if (customSwapErrorMessage) {
+      notifyErrorMessage(customSwapErrorMessage, false);
+
+      return;
+    }
+
     if (!currentQuote || !currentOptimalSwapPath) {
-      notifyNoQuote();
+      notifyErrorMessage(ErrorMessageMap.NoQuote, false);
 
       return;
     }
@@ -701,7 +704,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     } else {
       transactionBlockProcess();
     }
-  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, isChainConnected, notify, notifyNoQuote, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t]);
+  }, [ErrorMessageMap.NoQuote, accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, customSwapErrorMessage, isChainConnected, notify, notifyErrorMessage, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t]);
 
   const onAfterConfirmTermModal = useCallback(() => {
     return setConfirmedTerm('swap-term-confirmed');
@@ -941,15 +944,19 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
 
             if (sync) {
               if (e.message.toLowerCase().startsWith('swap pair is not found')) {
-                notifyNoQuote();
+                notifyErrorMessage(ErrorMessageMap.NoQuote);
               }
 
-              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
-                notifyTooLowAmount();
+              if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_LOW)) {
+                notifyErrorMessage(ErrorMessageMap.TooLowAmount);
               }
 
-              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
-                notifyTooHighAmount();
+              if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_HIGH)) {
+                notifyErrorMessage(ErrorMessageMap.TooHighAmount);
+              }
+
+              if (e.message.toLowerCase().includes(DetectedGenOptimalProcessErrMsg.NOT_ENOUGHT_BITCOIN)) {
+                notifyErrorMessage(ErrorMessageMap.NotEnoughBitcoin);
               }
 
               setHandleRequestLoading(false);
@@ -971,7 +978,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       sync = false;
       clearTimeout(timeout);
     };
-  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
+  }, [ErrorMessageMap, currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates, notifyErrorMessage]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
@@ -992,15 +999,19 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
           console.log('Error when doing refreshSwapRequestResult', e);
 
           if (e.message.toLowerCase().startsWith('swap pair is not found')) {
-            notifyNoQuote();
+            notifyErrorMessage(ErrorMessageMap.NoQuote);
           }
 
-          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
-            notifyTooLowAmount();
+          if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_LOW)) {
+            notifyErrorMessage(ErrorMessageMap.TooLowAmount);
           }
 
-          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
-            notifyTooHighAmount();
+          if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_HIGH)) {
+            notifyErrorMessage(ErrorMessageMap.TooHighAmount);
+          }
+
+          if (e.message.toLowerCase().includes(DetectedGenOptimalProcessErrMsg.NOT_ENOUGHT_BITCOIN)) {
+            notifyErrorMessage(ErrorMessageMap.NotEnoughBitcoin);
           }
         }).finally(() => {
           if (sync) {
@@ -1044,7 +1055,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       sync = false;
       clearInterval(timer);
     };
-  }, [currentQuoteRequest, hasInternalConfirmations, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
+  }, [ErrorMessageMap, currentQuoteRequest, hasInternalConfirmations, notifyErrorMessage, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
 
   useEffect(() => {
     if (!confirmedTerm) {

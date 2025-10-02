@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetRef, _AssetRefPath, _AssetType, _ChainAsset, _ChainInfo, _ChainStatus, _MultiChainAsset, _SubstrateChainType } from '@subwallet/chain-list/types';
-import { BasicTokenInfo } from '@subwallet/extension-base/background/KoniTypes';
+import { BasicTokenInfo, ChainType } from '@subwallet/extension-base/background/KoniTypes';
 import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainState, _CUSTOM_PREFIX, _DataMap, _SMART_CONTRACT_STANDARDS } from '@subwallet/extension-base/services/chain-service/types';
 import { IChain } from '@subwallet/extension-base/services/storage-service/databases';
@@ -697,7 +697,7 @@ export function updateLatestChainInfo (currentDataMap: _DataMap, latestChainInfo
   };
 }
 
-export const _chainInfoToChainType = (chainInfo: _ChainInfo): AccountChainType => {
+export const _chainInfoToAccountChainType = (chainInfo: _ChainInfo): AccountChainType => {
   if (_isPureSubstrateChain(chainInfo)) {
     return AccountChainType.SUBSTRATE;
   }
@@ -719,6 +719,30 @@ export const _chainInfoToChainType = (chainInfo: _ChainInfo): AccountChainType =
   }
 
   return AccountChainType.SUBSTRATE;
+};
+
+export const _chainInfoToChainType = (chainInfo: _ChainInfo): ChainType | undefined => {
+  if (_isChainSubstrateCompatible(chainInfo)) {
+    return ChainType.SUBSTRATE;
+  }
+
+  if (_isPureEvmChain(chainInfo)) {
+    return ChainType.EVM;
+  }
+
+  if (_isPureTonChain(chainInfo)) {
+    return ChainType.TON;
+  }
+
+  if (_isPureCardanoChain(chainInfo)) {
+    return ChainType.CARDANO;
+  }
+
+  if (_isPureBitcoinChain(chainInfo)) {
+    return ChainType.BITCOIN;
+  }
+
+  return undefined;
 };
 
 interface AccountInfo {
