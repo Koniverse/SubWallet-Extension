@@ -15,7 +15,7 @@ import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, Common
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, HiddenInput, LoadingScreen, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, EmptyList, HiddenInput, LoadingScreen, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { SwapFromField, SwapToField } from '@subwallet/extension-koni-ui/components/Field/Swap';
 import { ChooseFeeTokenModal, SlippageModal, SwapIdleWarningModal, SwapQuotesSelectorModal, SwapTermsOfServiceModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, BN_TEN, BN_ZERO, CONFIRM_SWAP_TERM, SWAP_ALL_QUOTES_MODAL, SWAP_CHOOSE_FEE_TOKEN_MODAL, SWAP_IDLE_WARNING_MODAL, SWAP_SLIPPAGE_MODAL, SWAP_TERMS_OF_SERVICE_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -35,7 +35,7 @@ import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowsDownUp, Book, CheckCircle } from 'phosphor-react';
+import { ArrowsDownUp, Book, CheckCircle, MagnifyingGlass } from 'phosphor-react';
 import { Rule } from 'rc-field-form/lib/interface';
 import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -746,6 +746,16 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     setSwapFromFieldRenderKey(`SwapFromField-${Date.now()}`);
   }, [currentFromTokenAvailableBalance, onChangeAmount]);
 
+  const renderWhenEmpty = useCallback(() => {
+    return (
+      <EmptyList
+        emptyMessage={t('No accounts are available for this swap pair. Select another pair and try again')}
+        emptyTitle={t('No accounts found')}
+        phosphorIcon={MagnifyingGlass}
+      />
+    );
+  }, [t]);
+
   const onClickHaftAmountButton = useCallback(() => {
     if (!currentFromTokenAvailableBalance) {
       return;
@@ -1251,6 +1261,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
                   items={accountAddressItems}
                   label={`${t('ui.TRANSACTION.screen.Transaction.Swap.from')}:`}
                   labelStyle={'horizontal'}
+                  renderWhenEmpty={renderWhenEmpty}
                 />
               </Form.Item>
 
