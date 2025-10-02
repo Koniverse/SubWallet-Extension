@@ -8,7 +8,7 @@ import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } f
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { chainSlugToPolkassemblyNetwork, chainSlugToSubsquareNetwork } from '@subwallet/extension-koni-ui/Popup/Home/Governance/shared';
+import { chainSlugToPolkassemblySite, chainSlugToSubsquareSite } from '@subwallet/extension-koni-ui/Popup/Home/Governance/shared';
 import { ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
@@ -69,11 +69,11 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
   });
 
   const onViewPolkassembly = useCallback(() => {
-    window.open(`https://${chainSlugToPolkassemblyNetwork[chainSlug]}.polkassembly.io/referenda/${data?.referendumIndex || ''}`, '_blank');
+    window.open(`https://${chainSlugToPolkassemblySite[chainSlug]}.polkassembly.io/referenda/${data?.referendumIndex || ''}`, '_blank');
   }, [chainSlug, data?.referendumIndex]);
 
   const onViewSubsquare = useCallback(() => {
-    window.open(`https://${chainSlugToSubsquareNetwork[chainSlug]}.subsquare.io/referenda/${data?.referendumIndex || ''}`, '_blank');
+    window.open(`https://${chainSlugToSubsquareSite[chainSlug]}.subsquare.io/referenda/${data?.referendumIndex || ''}`, '_blank');
   }, [chainSlug, data?.referendumIndex]);
 
   const onSelectGovItem = useCallback((item: GovAccountAddressItemType) => {
@@ -184,7 +184,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
           <Button
             block={true}
             className='ref-polkassambly-button'
-            disabled={!chainSlugToPolkassemblyNetwork[chainSlug]}
+            disabled={!chainSlugToPolkassemblySite[chainSlug]}
             icon={
               <img
                 alt='Polkassembly'
@@ -201,7 +201,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
           <Button
             block={true}
             className={'ref-subsquare-button'}
-            disabled={!chainSlugToSubsquareNetwork[chainSlug]}
+            disabled={!chainSlugToSubsquareSite[chainSlug]}
             icon={
               <img
                 alt='Subsquare'

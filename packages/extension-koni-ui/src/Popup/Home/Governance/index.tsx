@@ -11,7 +11,7 @@ import React, { useContext, useMemo } from 'react';
 
 import { OverviewView } from './views/OverviewView';
 import { ReferendumDetailView } from './views/ReferendumDetailView';
-import { chainSlugToSubsquareNetwork } from './shared';
+import { chainSlugToSubsquareApi } from './shared';
 import { ViewBaseType } from './types';
 
 const Component = () => {
@@ -20,7 +20,7 @@ const Component = () => {
     view: currentScreenView } = useGovernanceView();
 
   const viewProps: ViewBaseType = useMemo(() => ({
-    sdkInstance: chainSlugToSubsquareNetwork[currentChainSlug] ? getSubsquareApi(chainSlugToSubsquareNetwork[currentChainSlug]) : undefined,
+    sdkInstance: chainSlugToSubsquareApi[currentChainSlug] ? getSubsquareApi(chainSlugToSubsquareApi[currentChainSlug]) : undefined,
     chainSlug: currentChainSlug
   }), [currentChainSlug]);
 

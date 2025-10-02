@@ -32,7 +32,7 @@ export const _GOVERNANCE_CHAIN_GROUP = {
     'polkadot', 'bifrost_dot', 'hydradx_main'
   ],
   kusama: [
-    'kusama', 'basilisk'
+    'kusama', 'bifrost', 'basilisk'
   ],
   westend_assethub: [
     'westend_assethub'
@@ -41,10 +41,10 @@ export const _GOVERNANCE_CHAIN_GROUP = {
     'paseo_assethub'
   ],
   solo: [
-    // 'vara_network'
+    'vara_network', 'zkverify'
   ],
   testnet: [
-
+    'zkverify_testnet'
   ]
 };
 

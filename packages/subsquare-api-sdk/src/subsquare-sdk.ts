@@ -7,14 +7,18 @@ import { ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse,
 import { gov2ReferendumsApi, gov2TracksApi } from './url';
 import { ALL_TRACK, reformatTrackName } from './utils';
 
+const specialBaseUrls: Record<string, string> = {
+  vara: 'https://vara.subsquare.io/api'
+};
+
 export class SubsquareApiSdk {
   private client: AxiosInstance;
   private static instances: Map<string, SubsquareApiSdk> = new Map();
 
   private constructor (chain: string) {
-    this.client = axios.create({
-      baseURL: `https://${chain}-api.subsquare.io` || 'https://polkadot-api.subsquare.io'
-    });
+    const baseURL = specialBaseUrls[chain] || `https://${chain}-api.subsquare.io`;
+
+    this.client = axios.create({ baseURL });
   }
 
   static getInstance (chain: string): SubsquareApiSdk {
