@@ -70,6 +70,10 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return 'account';
   }
 
+  if (explorerLink.includes('node.xode.net')) {
+    return 'account';
+  }
+
   if (explorerLink.includes('tonviewer.com')) {
     return '';
   }
@@ -148,10 +152,6 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
       const address = u8aToHex(decodeAddress(value));
 
       return `${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${address}`;
-    }
-
-    if (chainInfo.slug === 'xode') {
-      return undefined;
     }
 
     return `${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${value}`;
