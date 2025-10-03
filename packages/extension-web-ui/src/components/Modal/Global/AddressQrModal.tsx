@@ -6,6 +6,7 @@ import type { ButtonProps } from '@subwallet/react-ui/es/button/button';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { AccountActions } from '@subwallet/extension-base/types';
 import { BaseModal, CloseIcon } from '@subwallet/extension-web-ui/components';
+import { RELAY_CHAINS_TO_MIGRATE } from '@subwallet/extension-web-ui/constants';
 import { ADDRESS_QR_MODAL } from '@subwallet/extension-web-ui/constants/modal';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useDefaultNavigate, useFetchChainInfo, useGetAccountByAddress } from '@subwallet/extension-web-ui/hooks';
@@ -43,6 +44,8 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
   const accountInfo = useGetAccountByAddress(initialAddress);
   const { tonWalletContractSelectorModal } = useContext(WalletModalContext);
   const goHome = useDefaultNavigate().goHome;
+
+  const isRelayChainToMigrate = useMemo(() => RELAY_CHAINS_TO_MIGRATE.includes(chainSlug), [chainSlug]);
 
   const showNavigationButtons = useMemo(() => {
     return accountTokenAddresses.length > 1;
@@ -212,7 +215,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
               />
             )}
             <SwQRCode
-              className='__qr-code'
+              className={CN('__qr-code', { '-is-relay-chain': isRelayChainToMigrate })}
               color='#000'
               errorLevel='H'
               icon={''}
@@ -266,7 +269,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
 
               <CopyToClipboard text={currentAddress}>
                 <Button
-                  className='__copy-button'
+                  className={CN('__copy-button', { '-is-relay-chain': isRelayChainToMigrate })}
                   icon={
                     <Icon
                       phosphorIcon={CopySimple}
@@ -312,6 +315,10 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
       '.__qr-code ': {
         marginLeft: 0,
         marginRight: 0
+      },
+
+      '& .-is-relay-chain': {
+        filter: 'blur(10px)'
       }
     },
 
@@ -385,6 +392,10 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
 
     '.__copy-button': {
       color: token.colorTextLight3,
+
+      '&.-is-relay-chain': {
+        display: 'none'
+      },
 
       '&:hover': {
         color: token.colorTextLight2
