@@ -3,7 +3,6 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountChainType, AccountSignMode, YieldPoolType } from '@subwallet/extension-base/types';
-import { detectTranslate } from '@subwallet/extension-base/utils';
 import { ALL_STAKING_ACTIONS, isLedgerCapable, isProductionMode, ledgerIncompatible, SubstrateLedgerSignModeSupport } from '@subwallet/extension-koni-ui/constants';
 import { useCallback } from 'react';
 
@@ -52,10 +51,10 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
         const mode = account.signMode;
         let block = false;
         let accountTitle = getAccountTypeTitle(mode);
-        let defaultMessage = detectTranslate('ui.ACCOUNT.hook.account.usePreCheckAction.featureNotAvailableForAccountType');
+        let defaultMessage = t('ui.ACCOUNT.hook.account.usePreCheckAction.featureNotAvailableForAccountType');
 
         if (ALL_STAKING_ACTIONS.includes(action)) {
-          defaultMessage = detectTranslate('ui.ACCOUNT.hook.account.usePreCheckAction.earningNotSupportedForAccountType');
+          defaultMessage = t('ui.ACCOUNT.hook.account.usePreCheckAction.earningNotSupportedForAccountType');
         }
 
         if (!account.transactionActions.includes(action) || (mode === AccountSignMode.QR && account.chainType === 'ethereum' && isProductionMode)) {
@@ -76,14 +75,14 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
             case AccountSignMode.LEGACY_LEDGER:
             case AccountSignMode.GENERIC_LEDGER:
             case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
-              defaultMessage = detectTranslate('Feature not supported for this account. Remove and re-import the account using seed phrase, then try again');
+              defaultMessage = t('ui.ACCOUNT.hook.account.usePreCheckAction.reImportSeedPhraseToUseFeature');
               break;
           }
         } else if (options) {
           if (mode === AccountSignMode.GENERIC_LEDGER && account.chainType === AccountChainType.ETHEREUM) {
             if (options.poolType && options.poolType !== YieldPoolType.LIQUID_STAKING) {
               block = true;
-              defaultMessage = detectTranslate('Feature not supported for this account. Remove and re-import the account using seed phrase, then try again');
+              defaultMessage = t('ui.ACCOUNT.hook.account.usePreCheckAction.reImportSeedPhraseToUseFeature');
             }
           }
         }

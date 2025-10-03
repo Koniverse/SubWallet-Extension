@@ -749,8 +749,8 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
   const renderWhenEmpty = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('No accounts are available for this swap pair. Select another pair and try again')}
-        emptyTitle={t('No accounts found')}
+        emptyMessage={t('ui.TRANSACTION.screen.Transaction.Swap.noAccountsForSwapPair')}
+        emptyTitle={t('ui.TRANSACTION.screen.Transaction.Swap.noAccountsFound')}
         phosphorIcon={MagnifyingGlass}
       />
     );
