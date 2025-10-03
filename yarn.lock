@@ -6242,13 +6242,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.105-mobile.1":
-  version: 0.2.105-mobile.1
-  resolution: "@subwallet/chain-list@npm:0.2.105-mobile.1"
+"@subwallet/chain-list@npm:0.2.105-mobile.2":
+  version: 0.2.105-mobile.2
+  resolution: "@subwallet/chain-list@npm:0.2.105-mobile.2"
   dependencies:
     "@polkadot/util": ^12.5.1
     ts-md5: ^1.3.1
-  checksum: 553207ff5e9e5bd8e5a0e2233a52de2f3f3a7ee15f0c0474fb9b5caad88aad541a1750cf698a6d1d6c8f2f07b3ed480debcb1fd6bcc264666150ac22cd45c8d7
+  checksum: e7815eb280e92c3703cfb23fbb912b38c547df9bea90c68e40d812644888537fdf6320644cba7cd7df396c31214f56bc44316417dbc7d34d0cc9d84e769d2a33
   languageName: node
   linkType: hard
 
@@ -6293,7 +6293,7 @@ __metadata:
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
     "@subwallet-monorepos/subwallet-services-sdk": ^0.1.8
-    "@subwallet/chain-list": 0.2.105-mobile.1
+    "@subwallet/chain-list": 0.2.105-mobile.2
     "@subwallet/extension-base": ^1.3.54-1
     "@subwallet/extension-chains": ^1.3.54-1
     "@subwallet/extension-dapp": ^1.3.54-1
@@ -6579,7 +6579,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.5.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.105-mobile.1
+    "@subwallet/chain-list": 0.2.105-mobile.2
     "@subwallet/extension-base": ^1.3.54-1
     "@subwallet/extension-chains": ^1.3.54-1
     "@subwallet/extension-dapp": ^1.3.54-1
@@ -6721,7 +6721,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.5.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.105-mobile.1
+    "@subwallet/chain-list": 0.2.105-mobile.2
     "@subwallet/extension-base": ^1.3.54-1
     "@subwallet/extension-chains": ^1.3.54-1
     "@subwallet/extension-dapp": ^1.3.54-1
@@ -6903,7 +6903,7 @@ __metadata:
   resolution: "@subwallet/subwallet-api-sdk@workspace:packages/subwallet-api-sdk"
   dependencies:
     "@polkadot/util": ^13.2.3
-    "@subwallet/chain-list": 0.2.105-mobile.1
+    "@subwallet/chain-list": 0.2.105-mobile.2
   languageName: unknown
   linkType: soft
 
