@@ -12,7 +12,17 @@ export const chainSlugToSubsquareApi: Record<string, string> = {
   paseo_assethub: 'paseo',
   vara_network: 'vara',
   zkverify: 'zkv',
-  zkverify_testnet: 'zkvt'
+  zkverify_testnet: 'zkvt',
+  ajuna: 'ajunaPolkadot',
+  astar: 'astar',
+  phala: 'phala',
+  heima: 'litentry',
+  acala: 'acala',
+  centrifuge: 'centrifuge',
+  interlay: 'interlay',
+  laos: 'laos',
+  karura: 'karura',
+  kintsugi: 'kintsugi'
 };
 
 export const chainSlugToSubsquareSite: Record<string, string> = {

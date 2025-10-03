@@ -4,20 +4,41 @@
 import axios, { AxiosInstance } from 'axios';
 
 import { ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, Referendum, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
-import { gov2ReferendumsApi, gov2TracksApi } from './url';
+import { gov1ReferendumsApi, gov2ReferendumsApi, gov2TracksApi } from './url';
 import { ALL_TRACK, reformatTrackName } from './utils';
 
 const specialBaseUrls: Record<string, string> = {
-  vara: 'https://vara.subsquare.io/api'
+  vara: 'https://vara.subsquare.io/api',
+  acala: 'https://acala.subsquare.io/api',
+  centrifuge: 'https://centrifuge.subsquare.io/api',
+  interlay: 'https://interlay.subsquare.io/api',
+  laos: 'https://laos.subsquare.io/api/',
+  karura: 'https://karura.subsquare.io/api',
+  kintsugi: 'https://kintsugi.subsquare.io/api'
 };
+
+const LegacyGovChains = [
+  'ajuna',
+  'astar',
+  'phala',
+  'heima',
+  'acala',
+  'centrifuge',
+  'interlay',
+  'laos',
+  'karura',
+  'kintsugi'
+];
 
 export class SubsquareApiSdk {
   private client: AxiosInstance;
   private static instances: Map<string, SubsquareApiSdk> = new Map();
+  public isLegacyGov = false;
 
   private constructor (chain: string) {
     const baseURL = specialBaseUrls[chain] || `https://${chain}-api.subsquare.io`;
 
+    this.isLegacyGov = LegacyGovChains.includes(chain);
     this.client = axios.create({ baseURL });
   }
 
@@ -30,8 +51,9 @@ export class SubsquareApiSdk {
   }
 
   async getReferenda (params?: ReferendaQueryParams): Promise<ReferendaResponse> {
+    const api = this.isLegacyGov ? gov1ReferendumsApi : gov2ReferendumsApi;
     const referendaRes = await this.client.get<ReferendaResponse>(
-      gov2ReferendumsApi,
+      api,
       { params }
     );
 
@@ -50,8 +72,9 @@ export class SubsquareApiSdk {
   }
 
   async getReferendaDetails (id: string): Promise<ReferendumDetail> {
+    const api = this.isLegacyGov ? gov1ReferendumsApi : gov2ReferendumsApi;
     const referendaRes = await this.client.get<ReferendumDetail>(
-      `${gov2ReferendumsApi}/${id}`
+      `${api}/${id}`
     );
 
     const ref = referendaRes.data;
@@ -97,8 +120,9 @@ export class SubsquareApiSdk {
   }
 
   async getReferendaVotes (id: string): Promise<ReferendumVoteDetail[]> {
+    const api = this.isLegacyGov ? gov1ReferendumsApi : gov2ReferendumsApi;
     const referendaVoteRes = await this.client.get<ReferendumVoteDetail[]>(
-      gov2ReferendumsApi + `/${id}/votes`
+      api + `/${id}/votes`
     );
 
     return referendaVoteRes.data;
