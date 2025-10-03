@@ -1,12 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { RELAY_CHAINS_TO_MIGRATE } from '@subwallet/extension-web-ui/constants';
 import { AccountTokenAddress, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { getBitcoinAccountDetails, toShort } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Copy, QrCode } from 'phosphor-react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -21,6 +22,9 @@ function Component (props: Props): React.ReactElement<Props> {
     item,
     onClick,
     onClickCopyButton, onClickQrButton } = props;
+
+  const isRelayChainToMigrate = useMemo(() => RELAY_CHAINS_TO_MIGRATE.includes(item.chainSlug), [item.chainSlug]);
+
   const _onClickCopyButton: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement> = React.useCallback((event) => {
     event.stopPropagation();
     onClickCopyButton?.();
@@ -70,6 +74,7 @@ function Component (props: Props): React.ReactElement<Props> {
             type='ghost'
           />
           <Button
+            disabled={isRelayChainToMigrate}
             icon={
               <Icon
                 phosphorIcon={Copy}

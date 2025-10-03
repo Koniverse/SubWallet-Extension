@@ -22,3 +22,4 @@ export * from './transaction';
 export * from './wallet';
 export * from './error';
 export * from './session';
+export * from './chain';
