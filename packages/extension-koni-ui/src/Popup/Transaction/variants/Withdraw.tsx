@@ -280,7 +280,7 @@ const Component = () => {
             />
           )}
           loading={loading}
-          onClick={onPreCheck(form.submit, exType)}
+          onClick={onPreCheck(form.submit, exType, { poolType: type })}
         >
           {t('ui.TRANSACTION.screen.Transaction.Withdraw.continue')}
         </Button>
