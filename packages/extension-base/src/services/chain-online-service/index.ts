@@ -308,11 +308,6 @@ export class ChainOnlineService {
 
           this.chainService.setAssetRegistry(assetRegistry);
           this.chainService.subscribeAssetRegistry().next(assetRegistry);
-          this.chainService.autoEnableTokens()
-            .then(() => {
-              this.eventService.emit('asset.updateState', '');
-            })
-            .catch(console.error);
 
           this.chainService.setChainStateMap(currentChainStateMap);
           this.chainService.subscribeChainStateMap().next(currentChainStateMap);

@@ -790,7 +790,6 @@ export class ChainService {
 
     await this.initApis();
     this.initAssetSettings();
-    await this.autoEnableTokens();
   }
 
   initAssetRefMap () {
@@ -867,6 +866,10 @@ export class ChainService {
         }
       }
     }
+  }
+
+  public resetPopularTokenList () {
+    this.priorityTokensSubject.next({ token: {}, tokenGroup: {} });
   }
 
   async enablePopularTokens () {
