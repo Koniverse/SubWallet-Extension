@@ -191,61 +191,61 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
               <div className='__field-label'>
                 {t('ui.TRANSACTION.components.Field.FeeEditor.estimatedFee')}:
               </div>
-              {FEE_TYPES_CAN_SHOW.includes(feeType) && (
-                <div
-                  className='__fee-editor-area'
-                >
-                  <Number
-                    className={'__fee-price-value'}
-                    decimal={0}
-                    prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
-                    suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
-                    value={convertedFeeValueToUSD}
-                  />
 
-                  {isEditButton && (
-                    <Tooltip
-                      className={'__not-editable'}
-                      placement='topLeft'
-                      title={isEvmButNoCustomFeeSupport ? t('ui.TRANSACTION.components.Field.FeeEditor.feeNotEditableWithCurrentRpc') : undefined}
-                    >
-                      <div>
-                        <Button
-                          className={'__fee-editor-button'}
-                          disabled={!stableIsDataReady || isEvmButNoCustomFeeSupport}
-                          icon={
-                            <Icon
-                              phosphorIcon={PencilSimpleLine}
-                              size='sm'
-                            />
-                          }
-                          loading={isLoadingToken}
-                          onClick={isEvmButNoCustomFeeSupport ? undefined : onClickEdit}
-                          size='xs'
-                          type='ghost'
-                        />
-                      </div>
-                    </Tooltip>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className={CN('__field-line-2', { '-is-edit-button': isEditButton })}>
               {!isDataReady
                 ? (
                   <ActivityIndicator size={20} />
                 )
-                : (
-                  <Number
-                    className={'__fee-value'}
-                    decimal={isNativeTokenValue ? nativeTokenDecimals : decimals}
-                    prefix={'~ '}
-                    suffix={isNativeTokenValue ? nativeTokenSymbol : symbol}
-                    value={isNativeTokenValue ? estimateFee : convertedEstimatedFee}
-                  />
-                )}
+                : (FEE_TYPES_CAN_SHOW.includes(feeType) && (
+                  <div
+                    className='__fee-editor-area'
+                  >
+                    <Number
+                      className={'__fee-price-value'}
+                      decimal={0}
+                      prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
+                      suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+                      value={convertedFeeValueToUSD}
+                    />
+
+                    {isEditButton && (
+                      <Tooltip
+                        className={'__not-editable'}
+                        placement='topLeft'
+                        title={isEvmButNoCustomFeeSupport ? t('ui.TRANSACTION.components.Field.FeeEditor.feeNotEditableWithCurrentRpc') : undefined}
+                      >
+                        <div>
+                          <Button
+                            className={'__fee-editor-button'}
+                            disabled={!stableIsDataReady || isEvmButNoCustomFeeSupport}
+                            icon={
+                              <Icon
+                                phosphorIcon={PencilSimpleLine}
+                                size='sm'
+                              />
+                            }
+                            loading={isLoadingToken}
+                            onClick={isEvmButNoCustomFeeSupport ? undefined : onClickEdit}
+                            size='xs'
+                            type='ghost'
+                          />
+                        </div>
+                      </Tooltip>
+                    )}
+                  </div>
+                ))}
             </div>
+            {isDataReady && (
+              <div className={CN('__field-line-2', { '-is-edit-button': isEditButton })}>
+                <Number
+                  className={'__fee-value'}
+                  decimal={isNativeTokenValue ? nativeTokenDecimals : decimals}
+                  prefix={'~ '}
+                  suffix={isNativeTokenValue ? nativeTokenSymbol : symbol}
+                  value={isNativeTokenValue ? estimateFee : convertedEstimatedFee}
+                />
+              </div>
+            )}
           </div>
         )
       }
