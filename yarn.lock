@@ -21584,6 +21584,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"p-limit@npm:^7.1.1":
+  version: 7.1.1
+  resolution: "p-limit@npm:7.1.1"
+  dependencies:
+    yocto-queue: ^1.2.1
+  checksum: 80b15159bc5dc1d1f48ba6809a7747b5338176862f137233518a488865fb9fa98b545106838e7f3797f95fb57eba4d7e3714ad2b1f1831a08aa995b5d0459653
+  languageName: node
+  linkType: hard
+
 "p-locate@npm:^3.0.0":
   version: 3.0.0
   resolution: "p-locate@npm:3.0.0"
@@ -24834,6 +24843,7 @@ __metadata:
     jest: ^29.5.0
     jest-environment-jsdom: ^29.5.0
     loglevel: ^1.8.1
+    p-limit: ^7.1.1
     patch-package: ^6.4.7
     postinstall-postinstall: ^2.1.0
     react-markdown: ^9.0.1
@@ -29161,6 +29171,13 @@ __metadata:
   version: 1.0.0
   resolution: "yocto-queue@npm:1.0.0"
   checksum: 2cac84540f65c64ccc1683c267edce396b26b1e931aa429660aefac8fbe0188167b7aee815a3c22fa59a28a58d898d1a2b1825048f834d8d629f4c2a5d443801
+  languageName: node
+  linkType: hard
+
+"yocto-queue@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "yocto-queue@npm:1.2.1"
+  checksum: 0843d6c2c0558e5c06e98edf9c17942f25c769e21b519303a5c2adefd5b738c9b2054204dc856ac0cd9d134b1bc27d928ce84fd23c9e2423b7e013d5a6f50577
   languageName: node
   linkType: hard
 
