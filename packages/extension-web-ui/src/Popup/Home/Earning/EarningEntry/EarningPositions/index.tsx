@@ -152,7 +152,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
       .sort((firstItem, secondItem) => {
         const getValue = (item: ExtraYieldPositionInfo): number => {
           return new BigN(item.totalStake)
-            .dividedBy(BN_TEN.pow(item.asset.decimals || 0))
+            .dividedBy(BN_TEN.pow(item.asset?.decimals || 0))
             .multipliedBy(item.price)
             .toNumber();
         };

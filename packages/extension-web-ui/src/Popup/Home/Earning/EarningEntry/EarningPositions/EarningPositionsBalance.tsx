@@ -45,7 +45,7 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
     let result = BN_ZERO;
 
     items.forEach((item) => {
-      result = result.plus((new BigN(item.unstakeBalance)).div(BN_TEN.pow(item.asset.decimals || 0)).multipliedBy(item.price));
+      result = result.plus((new BigN(item.unstakeBalance)).div(BN_TEN.pow(item.asset?.decimals || 0)).multipliedBy(item.price));
     });
 
     return result;
@@ -71,7 +71,7 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
         }
       }
 
-      result = result.plus((new BigN(item.activeStake)).multipliedBy(rate).div(BN_TEN.pow(item.asset.decimals || 0)).multipliedBy(item.price));
+      result = result.plus((new BigN(item.activeStake)).multipliedBy(rate).div(BN_TEN.pow(item.asset?.decimals || 0)).multipliedBy(item.price));
     });
 
     return result;
@@ -81,7 +81,7 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
     let result = BN_ZERO;
 
     items.forEach((item) => {
-      result = result.plus((new BigN(item.totalStake)).div(BN_TEN.pow(item.asset.decimals || 0)).multipliedBy(item.price));
+      result = result.plus((new BigN(item.totalStake)).div(BN_TEN.pow(item.asset?.decimals || 0)).multipliedBy(item.price));
     });
 
     return result;
@@ -108,7 +108,7 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
         const rewardItem = items.find((reward) => reward.slug === item.slug);
 
         if (rewardItem && item.unclaimedReward) {
-          result = result.plus((new BigN(item.unclaimedReward)).div(BN_TEN.pow(rewardItem.asset.decimals || 0)).multipliedBy(rewardItem.price));
+          result = result.plus((new BigN(item.unclaimedReward)).div(BN_TEN.pow(rewardItem.asset?.decimals || 0)).multipliedBy(rewardItem.price));
         }
       });
 
