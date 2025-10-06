@@ -65,6 +65,7 @@ export class OptimexHandler implements SwapBaseInterface {
   private readonly baseUrl: string;
   private currentTradeMetadata: OptimexTradeMetadata | undefined;
   private swapBaseHandler: SwapBaseHandler;
+  private isTestnet: boolean;
   providerSlug: SwapProviderId;
 
   constructor (chainService: ChainService, balanceService: BalanceService, feeService: FeeService, isTestnet = true) {
@@ -77,6 +78,7 @@ export class OptimexHandler implements SwapBaseInterface {
     });
     this.providerSlug = isTestnet ? SwapProviderId.OPTIMEX_TESTNET : SwapProviderId.OPTIMEX;
     this.baseUrl = isTestnet ? OptimexBaseUrl.testnet : OptimexBaseUrl.mainnet;
+    this.isTestnet = isTestnet;
   }
 
   get chainService () {
@@ -436,7 +438,7 @@ export class OptimexHandler implements SwapBaseInterface {
 
     // dont remove this log
     console.log('Optimex Trade metadata:', depositAddress);
-    console.log('Optimex Trade channel:', `https://provider-api-docs.vercel.app/swap/${tradeId}`); // todo: log for mainnet
+    console.log('Optimex Trade channel:', this.isTestnet ? `https://provider-api-docs.vercel.app/swap/${tradeId}` : 'add this'); // todo: log for mainnet
 
     if (chainType === ChainType.BITCOIN) {
       const bitcoinApi = this.chainService.getBitcoinApi(chainInfo.slug);
