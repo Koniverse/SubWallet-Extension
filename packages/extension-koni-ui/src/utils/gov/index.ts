@@ -4,7 +4,7 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { PreviousVoteAmountDetail, VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
-import { GOV_ONGOING_STATES, GovStatusKey, Referendum, ReferendumDetail, ReferendumVoteDetail, Tally } from '@subwallet/subsquare-api-sdk';
+import { DemocracyReferendum, GOV_ONGOING_STATES, GovStatusKey, OpenGovReferendum, Referendum, ReferendumDetail, ReferendumVoteDetail, Tally } from '@subwallet/subsquare-api-sdk';
 import BigNumber from 'bignumber.js';
 
 export const GOV_QUERY_KEYS = {
@@ -48,7 +48,58 @@ export function getTallyVotesBarPercent (tally: Tally) {
   };
 }
 
-export function getMinApprovalThreshold (referendumDetail: Referendum | ReferendumDetail): number {
+export function getMinApprovalThresholdGov1 (referendum: DemocracyReferendum): number {
+  const onchain = referendum?.onchainData;
+  const threshold = onchain?.info?.ongoing?.threshold;
+
+  if (!onchain || !threshold) {
+    return 0;
+  }
+
+  // Ưu tiên tally “live”; nếu không có thì fallback sang info.ongoing.tally
+  const t = onchain.tally ?? onchain.info?.ongoing?.tally;
+
+  if (!t) {
+    return 0;
+  }
+
+  const turnout = new BigNumber(t.turnout);
+  const electorate = new BigNumber(t.electorate);
+
+  if (electorate.lte(0)) {
+    return 0;
+  }
+
+  const sqrtT = turnout.sqrt();
+  const sqrtE = electorate.sqrt();
+
+  let pMin: BigNumber;
+
+  switch (threshold) {
+    case 'SuperMajorityApprove':
+      // p_min = sqrt(E) / (sqrt(E) + sqrt(T))
+      pMin = sqrtE.div(sqrtE.plus(sqrtT));
+      break;
+
+    case 'SuperMajorityAgainst':
+      // p_min = sqrt(T) / (sqrt(E) + sqrt(T))
+      pMin = sqrtT.div(sqrtE.plus(sqrtT));
+      break;
+
+    case 'SimpleMajority':
+      pMin = new BigNumber(0.5);
+      break;
+
+    default:
+      return 0;
+  }
+
+  const clamped = BigNumber.maximum(0, BigNumber.minimum(1, pMin));
+
+  return toPercentage(clamped.toNumber(), 1); // % (0..100)
+}
+
+function getMinApprovalThresholdGov2 (referendumDetail: OpenGovReferendum | ReferendumDetail): number {
   const { decisionPeriod, minApproval } = referendumDetail.trackInfo;
   const decidingSince = referendumDetail.onchainData?.info?.deciding?.since;
   const currentBlock = referendumDetail.onchainData?.state?.indexer?.blockHeight;
@@ -89,6 +140,14 @@ export function getMinApprovalThreshold (referendumDetail: Referendum | Referend
   }
 
   return 0;
+}
+
+export function getMinApprovalThreshold (referendum: Referendum | ReferendumDetail): number {
+  if (referendum.version === 1) {
+    return getMinApprovalThresholdGov1(referendum);
+  } else {
+    return getMinApprovalThresholdGov2(referendum);
+  }
 }
 
 const calculateTimeLeft = (
@@ -144,6 +203,15 @@ const calculateTimeLeft = (
 };
 
 export const getTimeLeft = (data: Referendum | ReferendumDetail): string | undefined => {
+  if (data.version === 1) {
+    return calculateTimeLeft(
+      data.onchainData.state.indexer.blockTime,
+      data.onchainData.state.indexer.blockHeight,
+      null,
+      data.state
+    ).timeLeft;
+  }
+
   return calculateTimeLeft(
     data.state.indexer.blockTime,
     data.state.indexer.blockHeight,

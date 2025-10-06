@@ -3,7 +3,7 @@
 
 import axios, { AxiosInstance } from 'axios';
 
-import { ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, Referendum, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
+import { DemocracyReferendum, OpenGovReferendum, ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, Referendum, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
 import { gov1ReferendumsApi, gov2ReferendumsApi, gov2TracksApi } from './url';
 import { ALL_TRACK, reformatTrackName } from './utils';
 
@@ -11,8 +11,8 @@ const specialBaseUrls: Record<string, string> = {
   vara: 'https://vara.subsquare.io/api',
   acala: 'https://acala.subsquare.io/api',
   centrifuge: 'https://centrifuge.subsquare.io/api',
-  interlay: 'https://interlay.subsquare.io/api',
   laos: 'https://laos.subsquare.io/api/',
+  interlay: 'https://interlay.subsquare.io/api',
   karura: 'https://karura.subsquare.io/api',
   kintsugi: 'https://kintsugi.subsquare.io/api'
 };
@@ -57,18 +57,27 @@ export class SubsquareApiSdk {
       { params }
     );
 
-    const formattedData = {
+    return {
       ...referendaRes.data,
-      items: referendaRes.data.items.map((ref) => ({
-        ...ref,
-        trackInfo: {
-          ...ref.trackInfo,
-          name: reformatTrackName(ref.trackInfo.name)
-        }
-      }))
-    };
+      items: referendaRes.data.items.map((ref) => {
+        if (this.isLegacyGov) {
+          const democracyRef = ref as DemocracyReferendum;
 
-    return formattedData;
+          return { ...democracyRef, version: 1 };
+        }
+
+        const ref2 = ref as OpenGovReferendum;
+
+        return {
+          ...ref2,
+          version: 2,
+          trackInfo: {
+            ...ref2.trackInfo,
+            name: reformatTrackName(ref2.trackInfo.name)
+          }
+        };
+      })
+    };
   }
 
   async getReferendaDetails (id: string): Promise<ReferendumDetail> {
@@ -105,18 +114,22 @@ export class SubsquareApiSdk {
       { params }
     );
 
-    const formattedData = {
+    return {
       ...referendaRes.data,
-      items: referendaRes.data.items.map((ref) => ({
-        ...ref,
-        trackInfo: {
-          ...ref.trackInfo,
-          name: reformatTrackName(ref.trackInfo.name)
+      items: referendaRes.data.items.map((ref) => {
+        if (ref.version === 1) {
+          return { ...ref };
         }
-      }))
-    };
 
-    return formattedData;
+        return {
+          ...ref,
+          trackInfo: {
+            ...ref.trackInfo,
+            name: reformatTrackName(ref.trackInfo.name)
+          }
+        };
+      })
+    };
   }
 
   async getReferendaVotes (id: string): Promise<ReferendumVoteDetail[]> {

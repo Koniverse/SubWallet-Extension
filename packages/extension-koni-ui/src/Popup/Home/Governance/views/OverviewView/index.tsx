@@ -9,7 +9,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ReferendumWithVoting, UserVoting } from '@subwallet/extension-koni-ui/types/gov';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { ActivityIndicator } from '@subwallet/react-ui';
-import { ALL_TRACK_ID, GOV_ONGOING_STATES, GovStatusKey, Referendum } from '@subwallet/subsquare-api-sdk';
+import { ALL_TRACK_ID, DemocracyReferendum, GOV_ONGOING_STATES, GovStatusKey, Referendum } from '@subwallet/subsquare-api-sdk';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import React, { Context, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -120,8 +120,8 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
   useEffect(() => {
     const items = (data?.pages.flatMap((page) => page?.items ?? []) || []);
 
-    const filterFunc = (item: Referendum) => {
-      const stateName = item.state.name;
+    const filterFunc = (item: Referendum | DemocracyReferendum) => {
+      const stateName = item.version === 2 ? item.state.name : item.state;
 
       if (selectedReferendaCategory === ReferendaCategory.ALL) {
         return true;
@@ -137,6 +137,13 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
     const filteredItems = items.filter(filterFunc);
 
     const extended: ReferendumWithVoting[] = filteredItems.map((item) => {
+      if (item.version === 1) {
+        return {
+          ...item,
+          userVoting: undefined
+        };
+      }
+
       const trackId = Number(item.trackInfo.id);
 
       const userVoting: UserVoting[] = [];

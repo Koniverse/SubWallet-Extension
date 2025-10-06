@@ -1,13 +1,17 @@
 // Copyright 2019-2022 @subwallet/subsquare-api-sdk authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-export interface Referendum {
+export interface ReferendumBase {
   _id: string;
   referendumIndex: number;
   proposer: string;
   title: string;
   content: string;
+  version: number;
+}
 
+export interface OpenGovReferendum extends ReferendumBase {
+  version: 2;
   decisionDeposit: {
     who: string;
   };
@@ -25,11 +29,66 @@ export interface Referendum {
   };
 
   state: OnchainState;
-  allSpends?: SpendItem[];
   onchainData: OnchainData;
+
+  allSpends?: SpendItem[];
 }
 
+export interface DemocracyReferendum extends ReferendumBase {
+  version: 1;
+  state: GovStatusKey;
+  onchainData: DemocracyOnchainData;
+}
+
+interface DemocracyMetadata {
+  end: number; // block number
+  threshold: number;
+  delay: number; // block number
+}
+
+export interface DemocracyOnChainInfo {
+  ongoing?: DemocracyReferendumOngoing ;
+  finished?: DemocracyReferendumFinished
+}
+
+export interface DemocracyReferendumOngoing {
+  end: number;
+  proposal: {
+    lookup: {
+      hash: string;
+      len: number;
+    };
+  };
+  threshold: 'SuperMajorityApprove' | 'SuperMajorityAgainst' | 'SimpleMajority';
+  delay: number;
+  tally: Tally;
+}
+
+export interface DemocracyReferendumFinished {
+  approved: boolean;
+  end: number;
+}
+
+interface DemocracyOnchainData {
+  timeline: RefTimelineItem[];
+  proposer: string;
+  hash: string;
+  call: {
+    args: ProposalArg[];
+    callIndex: string;
+    method: string;
+    section: string;
+  };
+  info: DemocracyOnChainInfo;
+  meta: DemocracyMetadata;
+  tally: Tally;
+  state: OnchainState;
+}
+
+export type Referendum = OpenGovReferendum | DemocracyReferendum;
+
 export interface ReferendumDetail {
+  version: null;
   _id: string;
   referendumIndex: number;
   indexer: Indexer;
@@ -122,6 +181,9 @@ export interface RefTimelineItem {
     eventIndex: number;
   };
   name: string; // "Submitted", "DecisionDepositPlaced", "DecisionStarted"
+
+  // for legacy democracy referenda
+  method: string;
   args: Record<string, unknown>;
 }
 
@@ -130,9 +192,10 @@ export interface Tally {
   nays: string;
   electorate: string;
   support: string;
+  turnout: string;
 }
 
-interface Proposal {
+export interface Proposal {
   call: {
     args: ProposalArg[];
     callIndex: string;
@@ -208,12 +271,13 @@ interface Indexer {
   index: number;
   blockTime: number;
 }
-interface OnchainState {
+
+export interface OnchainState {
   indexer: Indexer;
   name: GovStatusKey;
 }
 
-interface OnchainData {
+export interface OnchainData {
   proposalHash: string;
   timeline: RefTimelineItem[];
   tally: Tally;
@@ -223,7 +287,14 @@ interface OnchainData {
 }
 
 export interface ReferendaResponse {
-  items: Referendum[];
+  items: (Referendum | DemocracyReferendum)[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface DemocracyReferendaResponse {
+  items: DemocracyReferendum[];
   total: number;
   page: number;
   pageSize: number;
@@ -290,18 +361,24 @@ export enum GovStatusKey {
   CONFIRMING = 'Confirming',
   QUEUEING = 'Queueing',
   APPROVED = 'Approved',
-  EXECUTED = 'Executed',
+  EXECUTED = 'Executed', // gov-1, 2
   REJECTED = 'Rejected',
-  TIMEDOUT = 'TimedOut',
-  CANCELLED = 'Cancelled',
+  TIMEDOUT = 'TimedOut', // gov-1, 2
+  CANCELLED = 'Cancelled', // gov-1, 2
   KILLED = 'Killed',
+
+  // gov-1
+  STARTED = 'Started',
+  PASSED = 'Passed',
+  NOTPASSED = 'NotPassed'
 }
 
 export const GOV_ONGOING_STATES: GovStatusKey[] = [
   GovStatusKey.PREPARING,
   GovStatusKey.DECIDING,
   GovStatusKey.CONFIRMING,
-  GovStatusKey.QUEUEING
+  GovStatusKey.QUEUEING,
+  GovStatusKey.STARTED
 ];
 
 export const GOV_COMPLETED_STATES: GovStatusKey[] = [
@@ -310,19 +387,23 @@ export const GOV_COMPLETED_STATES: GovStatusKey[] = [
   GovStatusKey.REJECTED,
   GovStatusKey.TIMEDOUT,
   GovStatusKey.CANCELLED,
-  GovStatusKey.KILLED
+  GovStatusKey.KILLED,
+  GovStatusKey.PASSED,
+  GovStatusKey.NOTPASSED
 ];
 
 export const GOV_COMPLETED_SUCCESS_STATES: GovStatusKey[] = [
   GovStatusKey.APPROVED,
-  GovStatusKey.EXECUTED
+  GovStatusKey.EXECUTED,
+  GovStatusKey.PASSED
 ];
 
 export const GOV_COMPLETED_FAILED_STATES: GovStatusKey[] = [
   GovStatusKey.REJECTED,
   GovStatusKey.TIMEDOUT,
   GovStatusKey.CANCELLED,
-  GovStatusKey.KILLED
+  GovStatusKey.KILLED,
+  GovStatusKey.PASSED
 ];
 
 /* Gov Status */

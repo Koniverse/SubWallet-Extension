@@ -27,6 +27,7 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
   );
 
   const thresholdPercent = getMinApprovalThreshold(item);
+  const refStatus = item.version === 1 ? item.state : item.state.name;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -43,7 +44,7 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
     >
       <div className='__i-ref-id-and-requested-amount'>
         <div className='__i-ref-id'>#{item.referendumIndex}</div>
-        <div className='__i-requested-amount-container'>
+        {item.version === 2 && <div className='__i-requested-amount-container'>
 
           {!!item.allSpends && item.allSpends.length > 0 && (
             <SpendSummary
@@ -52,7 +53,7 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
               spends={item.allSpends}
             />
           )}
-        </div>
+        </div>}
       </div>
 
       <div className='__i-ref-title'>
@@ -60,8 +61,8 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
       </div>
 
       <div className='__i-tags'>
-        <ReferendumStatusTag status={item.state.name} />
-        <ReferendumTrackTag trackName={item.trackInfo.name} />
+        <ReferendumStatusTag status={refStatus} />
+        {item.version === 2 && <ReferendumTrackTag trackName={item.trackInfo.name} />}
       </div>
 
       <ReferendumVoteProgressBar

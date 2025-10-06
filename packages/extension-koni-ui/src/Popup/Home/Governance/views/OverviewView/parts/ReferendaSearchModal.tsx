@@ -81,6 +81,13 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
     const items = (refData?.items || []);
 
     return items.map((item) => {
+      if (item.version === 1) {
+        return {
+          ...item,
+          userVoting: undefined
+        };
+      }
+
       const trackId = Number(item.trackInfo.id);
 
       const userVoting: UserVoting[] = [];
