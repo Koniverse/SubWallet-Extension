@@ -62,6 +62,12 @@ export interface AbstractYieldPositionInfo extends BaseYieldPositionInfo {
     subnetShortName: string;
     originalTotalStake: string;
   };
+
+  metadata?: {
+    joiningStake?: string;
+    compoundingStake?: string;
+    manualStake?: string;
+  }
 }
 
 /**

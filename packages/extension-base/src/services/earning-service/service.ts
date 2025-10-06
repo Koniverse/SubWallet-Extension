@@ -19,6 +19,7 @@ import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCac
 import { BehaviorSubject, combineLatest } from 'rxjs';
 
 import { EarningImpactResult } from './handlers/native-staking/dtao';
+import TanssiNativeStakingPoolHandler from './handlers/native-staking/tanssi';
 import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, EnergyNativeStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, SubnetTaoStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
 
 type PoolTargetsFetchingCached = Record<string, Record<string, YieldPoolTarget>>;
@@ -47,7 +48,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
   private dbService: DatabaseService;
   private eventService: EventService;
-  private useOnlineCacheOnly = true;
+  private useOnlineCacheOnly = false;
   private validatorInfoCachingInterval: NodeJS.Timeout | undefined;
   private inactivePoolReady: PromiseHandler<void> = createPromiseHandler();
 
@@ -124,6 +125,10 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
       if (_STAKING_CHAIN_GROUP.energy.includes(chain)) {
         handlers.push(new EnergyNativeStakingPoolHandler(this.state, chain));
+      }
+
+      if (_STAKING_CHAIN_GROUP.tanssi.includes(chain)) {
+        handlers.push(new TanssiNativeStakingPoolHandler(this.state, chain));
       }
 
       if (_STAKING_CHAIN_GROUP.nominationPool.includes(chain)) {
