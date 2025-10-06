@@ -56,6 +56,11 @@ interface OptimexTradeMetadata {
   approve_payload: string;
 }
 
+const OptimexBaseUrl = {
+  mainnet: 'https://subwallet-provider.optimex.xyz',
+  testnet: 'https://provider-stg.bitdex.xyz'
+};
+
 export class OptimexHandler implements SwapBaseInterface {
   private readonly baseUrl: string;
   private currentTradeMetadata: OptimexTradeMetadata | undefined;
@@ -71,7 +76,7 @@ export class OptimexHandler implements SwapBaseInterface {
       providerSlug: isTestnet ? SwapProviderId.OPTIMEX_TESTNET : SwapProviderId.OPTIMEX
     });
     this.providerSlug = isTestnet ? SwapProviderId.OPTIMEX_TESTNET : SwapProviderId.OPTIMEX;
-    this.baseUrl = isTestnet ? 'https://provider-stg.bitdex.xyz' : 'https://api.optimex.xyz'; // todo: move to cloud worker
+    this.baseUrl = isTestnet ? OptimexBaseUrl.testnet : OptimexBaseUrl.mainnet;
   }
 
   get chainService () {
