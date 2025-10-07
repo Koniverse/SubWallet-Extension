@@ -2,8 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { _isAcrossBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { _getAssetDecimals, _getContractAddressOfToken, _getEvmChainId } from '@subwallet/extension-base/services/chain-service/utils';
+import { BasicTxErrorType } from '@subwallet/extension-base/types';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
+import BigN from 'bignumber.js';
 
 import { CreateXcmExtrinsicProps } from '..';
 
@@ -82,5 +87,83 @@ export const getAcrossQuote = async ({ destinationChain,
     }
 
     return Promise.reject(new Error((error as Error)?.message || 'Unable to perform this transaction at the moment. Try again later'));
+  }
+};
+
+const TESTNET_API_URL = 'https://testnet.across.to/api';
+const MAINNET_API_URL = 'https://app.across.to/api';
+
+// TODO: update logic after add across metadata for chainlist
+const acrossBridgeContractAddresses = {
+  mainnet: {
+    arbitrum_one: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
+    base_mainnet: '0x4200000000000000000000000000000000000006',
+    ethereum: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    optimism: '0x4200000000000000000000000000000000000006'
+  },
+  testnet: {
+    arbitrum_sepolia: '0x980B62Da83eFf3D4576C647993b0c1D7faf17c73',
+    base_sepolia: '0x4200000000000000000000000000000000000006',
+    sepolia_ethereum: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'
+  }
+};
+
+interface AcrossLimitsResponse {
+  minDeposit: string;
+  maxDeposit: string;
+}
+
+const acrossValueCache = new Map<string, string>();
+
+export const getAcrossSendingValue = async (originChain: _ChainInfo, originTokenInfo: _ChainAsset, destinationChain: _ChainInfo, _isAcrossTestnetBridge: boolean) => {
+  try {
+    const originChainId = _getEvmChainId(originChain);
+    const destinationChainId = _getEvmChainId(destinationChain);
+
+    if (!originChainId || !destinationChainId) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
+    }
+
+    const baseUrl = _isAcrossTestnetBridge ? TESTNET_API_URL : MAINNET_API_URL;
+    const contracts = _isAcrossTestnetBridge ? acrossBridgeContractAddresses.testnet : acrossBridgeContractAddresses.mainnet;
+    const fromContract = _getContractAddressOfToken(originTokenInfo) || contracts[originTokenInfo.originChain as keyof typeof contracts];
+
+    const cacheKey = `${originChainId}-${destinationChainId}-${fromContract}`;
+    const cached = acrossValueCache.get(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+    const url = `${baseUrl}/limits?originChainId=${originChainId}&destinationChainId=${destinationChainId}&token=${fromContract}`;
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch Across Bridge Limit. Please try again later');
+    }
+
+    const acrossBridgeLimit = (await res.json()) as AcrossLimitsResponse;
+
+    if (!acrossBridgeLimit.minDeposit || !acrossBridgeLimit.maxDeposit) {
+      throw new Error('Invalid Across Bridge response');
+    }
+
+    const min = new BigN(acrossBridgeLimit.minDeposit);
+    const max = new BigN(acrossBridgeLimit.maxDeposit);
+    const sendingValue = min.plus(max).div(2).toFixed(0);
+
+    acrossValueCache.set(cacheKey, sendingValue);
+
+    setTimeout(() => acrossValueCache.delete(cacheKey), 60 * 1000);
+
+    return sendingValue;
+  } catch (error) {
+    console.error('Across Bridge error:', error);
+
+    if (_isAcrossTestnetBridge) {
+      return new BigN(0.0037).shiftedBy(_getAssetDecimals(originTokenInfo)).toFixed(0, BigN.ROUND_FLOOR);
+    }
+
+    return new BigN(1).shiftedBy(_getAssetDecimals(originTokenInfo)).toFixed(0, BigN.ROUND_FLOOR);
   }
 };
