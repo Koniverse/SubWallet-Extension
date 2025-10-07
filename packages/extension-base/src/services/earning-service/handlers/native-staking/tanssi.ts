@@ -294,7 +294,7 @@ export default class TanssiNativeStakingPoolHandler extends BaseParaNativeStakin
           nominations,
           unstakings: [],
           metadata: {
-            joiningStake: bnJoiningStake.toString(),
+            pendingStake: bnJoiningStake.toString(),
             compoundingStake: bnCompoundingStake.toString(),
             manualStake: bnManualStake.toString()
           }

@@ -2280,5 +2280,11 @@
   " This address can only be used to receive compatible tokens. Sending incompatible tokens to this address will result in these tokens getting stuck (i.e., can’t be sent out or staked)": "",
   "Get address": "",
   "Cancel": "",
-  "Show warnings for phishing sites and protect your assets from scams": ""
+  "Show warnings for phishing sites and protect your assets from scams": "",
+  "ui.Earning.components.Modal.Earning.ActiveStakeDetails.close": "",
+  "ui.SWAP.components.Modal.Earning.ActiveStakeDetails.title": "",
+  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.manualStake": "",
+  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.compoundingStake": "",
+  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.pendingStakeTooltipTitle": "",
+  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.pendingStake": ""
 }

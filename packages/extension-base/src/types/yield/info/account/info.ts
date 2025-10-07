@@ -64,7 +64,7 @@ export interface AbstractYieldPositionInfo extends BaseYieldPositionInfo {
   };
 
   metadata?: {
-    joiningStake?: string;
+    pendingStake?: string;
     compoundingStake?: string;
     manualStake?: string;
   }
