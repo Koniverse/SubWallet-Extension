@@ -1,5 +1,51 @@
 # CHANGELOG
 
+## 1.3.61
+Build date: Oct 04, 2025.
+
+Features & Updates:
+- Hide copy/QR content for relay chain addresses (AssetHub migration) (#4735)
+- Re-check for Paseo after migrated (#4507)
+
+Bug fixes:
+- Fixed crash in EarningPositions when asset is undefined (read property 'decimals' of undefined) in case update version (#4731)
+
+## 1.3.60
+Build date: Oct 02, 2025.
+
+Features & Updates:
+- [zkVerify Mainnet] Add support for in-app VFY staking (#4688)
+- Update chain-list version v0.2.117 (#4693):
+   - [Xode] Add block explorer only for when users want to view transaction details SubWallet-ChainList
+   - Add group for VFY tokens
+
+Bug fixes:
+- Fixed error when performing EWC staking (#4694)
+
+
+## 1.3.59
+Build date: Sep 23, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.116 (#4704):
+- Support HOLLAR mainnet (#4692)
+
+
+## 1.3.58
+Build date: Sep 19, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.115 (#4668)
+  - Add XCM support for teleporting KSM between encointer-kusama and asset-hub-kusama
+  - Add block explorer only for when users want to view transaction details
+  - Fixed bug do not show HOLLAR balance
+  - Remove USDC.wh token (Moonbeam)
+  - ...
+
+Bug fixes:
+- Fixed bug Show incorrect amount when transfer max (#4462)
+
+
 ## 1.3.57
 Build date: Sep 17, 2025.
 

@@ -8,7 +8,7 @@ import { getWasmContractGasLimit } from '@subwallet/extension-base/koni/api/cont
 import { estimateTonTxFee } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
 import { _TRANSFER_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible, _isChainTonCompatible, _isNativeToken, _isTokenGearSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon, _isTokenWasmSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible, _isChainTonCompatible, _isGigaToken, _isNativeToken, _isTokenGearSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon, _isTokenWasmSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
 import { combineEthFee, getGRC20ContractPromise, getVFTContractPromise } from '@subwallet/extension-base/utils';
 import { keyring } from '@subwallet/ui-keyring';
@@ -75,6 +75,8 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
 
     transfer = transaction.extrinsic;
     transferAmount = value;
+  } else if (_isGigaToken(tokenInfo) && api.tx.currencies) {
+    transfer = api.tx.currencies.transfer(to, _getTokenOnChainAssetId(tokenInfo), value);
   } else if (_TRANSFER_CHAIN_GROUP.acala.includes(networkKey)) {
     if (!_isNativeToken(tokenInfo)) {
       if (isTxCurrenciesSupported) {
