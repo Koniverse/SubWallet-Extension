@@ -57,7 +57,7 @@
     "@sora-substrate/type-definitions": "^1.17.7",
     "@substrate/connect": "^0.8.9",
     "@subwallet-monorepos/subwallet-services-sdk": "^0.1.8",
-    "@subwallet/chain-list": "0.2.117",
+    "@subwallet/chain-list": "0.2.118-beta.1-pr-589-373ad585",
     "@subwallet/extension-base": "^1.3.61-0",
     "@subwallet/extension-chains": "^1.3.61-0",
     "@subwallet/extension-dapp": "^1.3.61-0",
