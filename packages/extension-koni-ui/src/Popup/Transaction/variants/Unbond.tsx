@@ -8,7 +8,7 @@ import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
 import { AccountJson, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, MetaInfo, NominationSelector } from '@subwallet/extension-koni-ui/components';
-import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
+import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA, UNSTAKE_TANSSI_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
@@ -469,9 +469,20 @@ const Component: React.FC = () => {
     return label !== 'dApp' ? label.toLowerCase() : label;
   }, [chainValue]);
 
-  const unstakeAlertData = poolChain === 'bifrost_dot'
-    ? UNSTAKE_BIFROST_ALERT_DATA
-    : poolChain.startsWith('bittensor') ? UNSTAKE_BITTENSOR_ALERT_DATA : UNSTAKE_ALERT_DATA;
+  const unstakeAlertData = useMemo(() => {
+    switch (true) {
+      case poolChain === 'bifrost_dot':
+        return UNSTAKE_BIFROST_ALERT_DATA;
+      case poolChain === 'bittensor':
+      case poolChain === 'bittensor_testnet':
+        return UNSTAKE_BITTENSOR_ALERT_DATA;
+      case poolChain === 'tanssi':
+      case poolChain === 'dancelight':
+        return UNSTAKE_TANSSI_ALERT_DATA;
+      default:
+        return UNSTAKE_ALERT_DATA;
+    }
+  }, [poolChain]);
 
   return (
     <>

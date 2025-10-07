@@ -270,3 +270,24 @@ export const UNSTAKE_BITTENSOR_ALERT_DATA = UNSTAKE_ALERT_DATA.filter((_, index)
   icon: 'Coins',
   iconColor: '#e6dc25'
 }));
+
+export const UNSTAKE_TANSSI_ALERT_DATA = [
+  {
+    title: 'Unstake order',
+    description: 'Your Manual stake will be unstaked first, then your Compounding stake',
+    icon: 'DownloadSimple',
+    iconColor: '#2595e6'
+  },
+  {
+    title: 'Wait time',
+    description: 'Once unstaked, the funds will be automatically withdrawn to your account after 12 hours maximum',
+    icon: 'ClockClockwise',
+    iconColor: '#2595e6'
+  },
+  {
+    title: 'No rewards',
+    description: 'During the unstaking period of {unBondedTime}, your tokens produce no rewards',
+    icon: 'Coins',
+    iconColor: '#e6dc25'
+  }
+];
