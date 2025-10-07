@@ -211,6 +211,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
           className={className}
           govLockedInfos={govLockedInfos}
           onGoUnlockToken={onGoUnlockToken}
+          sdkInstance={sdkInstance}
         />
       </div>
 

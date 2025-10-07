@@ -8,6 +8,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { noop } from '@subwallet/extension-koni-ui/utils';
 import { Icon } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
+import { SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { BigNumber } from 'bignumber.js';
 import CN from 'classnames';
 import { CaretRight, LockKey, UserCircleGear } from 'phosphor-react';
@@ -18,6 +19,7 @@ import styled from 'styled-components';
 type Props = ThemeProps & {
   onGoUnlockToken: VoidFunction;
   govLockedInfos: GovVotingInfo[];
+  sdkInstance: SubsquareApiSdk | undefined;
 };
 type ItemType = {
   icon: SwIconProps['phosphorIcon'];
@@ -27,7 +29,7 @@ type ItemType = {
   disabled?: boolean;
 }
 
-const Component = ({ className, govLockedInfos, onGoUnlockToken }: Props): React.ReactElement<Props> => {
+const Component = ({ className, govLockedInfos, onGoUnlockToken, sdkInstance }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const notify = useNotification();
   const hasUnlockableAccount = useMemo(() => {
@@ -40,21 +42,24 @@ const Component = ({ className, govLockedInfos, onGoUnlockToken }: Props): React
         icon: UserCircleGear,
         key: 'delegations',
         label: t('Delegations'),
-        onClick: () => {
-          notify({
-            message: t('Coming soon')
-          });
-        }
+        disabled: sdkInstance?.isLegacyGov,
+        onClick: !sdkInstance?.isLegacyGov
+          ? () => {
+            notify({
+              message: t('Coming soon')
+            });
+          }
+          : noop
       },
       {
         icon: LockKey,
         key: 'locked',
         label: t('Locked'),
         onClick: hasUnlockableAccount ? onGoUnlockToken : noop,
-        disabled: !hasUnlockableAccount
+        disabled: !hasUnlockableAccount || sdkInstance?.isLegacyGov
       }
     ];
-  }, [hasUnlockableAccount, notify, onGoUnlockToken, t]);
+  }, [hasUnlockableAccount, notify, onGoUnlockToken, sdkInstance?.isLegacyGov, t]);
 
   return (
     <div className={className}>

@@ -13,14 +13,14 @@ export const chainSlugToSubsquareApi: Record<string, string> = {
   vara_network: 'vara',
   zkverify: 'zkv',
   zkverify_testnet: 'zkvt',
-  ajuna: 'ajunaPolkadot',
+  ajunaPolkadot: 'ajuna',
   astar: 'astar',
   phala: 'phala',
-  heima: 'litentry',
+  litentry: 'heima',
   acala: 'acala',
   centrifuge: 'centrifuge',
   interlay: 'interlay',
-  laos: 'laos',
+  laos_network: 'laos',
   karura: 'karura',
   kintsugi: 'kintsugi'
 };
@@ -36,7 +36,17 @@ export const chainSlugToSubsquareSite: Record<string, string> = {
   paseo_assethub: 'paseo',
   vara_network: 'vara',
   zkverify: 'zkverify',
-  zkverify_testnet: 'zkverify-testnet'
+  zkverify_testnet: 'zkverify-testnet',
+  ajunaPolkadot: 'ajuna',
+  astar: 'astar',
+  phala: 'phala',
+  litentry: 'heima',
+  acala: 'acala',
+  centrifuge: 'centrifuge',
+  interlay: 'interlay',
+  laos_network: 'laos',
+  karura: 'karura',
+  kintsugi: 'kintsugi'
 };
 
 export const chainSlugToPolkassemblySite: Record<string, string> = {

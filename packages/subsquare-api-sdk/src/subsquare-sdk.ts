@@ -3,9 +3,9 @@
 
 import axios, { AxiosInstance } from 'axios';
 
-import { DemocracyReferendaResponse, DemocracyReferendum, OnchainData, Proposal, ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, Referendum, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
+import { DemocracyReferendaResponse, DemocracyReferendum, ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, Referendum, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
 import { gov1ReferendumsApi, gov2ReferendumsApi, gov2TracksApi } from './url';
-import { ALL_TRACK, reformatTrackName } from './utils';
+import { ALL_TRACK, castDemocracyReferendumToReferendum, reformatTrackName } from './utils';
 
 const specialBaseUrls: Record<string, string> = {
   vara: 'https://vara.subsquare.io/api',
@@ -29,56 +29,6 @@ const LegacyGovChains = [
   'karura',
   'kintsugi'
 ];
-
-const castDemocracyReferendumToReferendum = <T extends (Referendum | ReferendumDetail)>(ref: DemocracyReferendum): T => {
-  const { call, hash, info, meta, state } = ref.onchainData;
-  const enactmentAfter = (meta?.delay || 0) + (meta?.end || 0);
-  const enactment = {
-    after: enactmentAfter.toString()
-  };
-
-  const onChainData: OnchainData = {
-    ...ref.onchainData,
-    proposalHash: hash,
-    proposal: { call } as Proposal,
-    meta,
-    info: {
-      decisionDeposit: {
-        who: '',
-        amount: '0'
-      },
-      submissionDeposit: {
-        who: '',
-        amount: '0'
-      },
-      enactment,
-      alarm: [],
-      democracy: info
-    }
-  };
-
-  return ({
-    ...ref,
-    version: 1,
-    trackInfo: {
-      id: '-1',
-      name: 'Democracy',
-      decisionPeriod: 0,
-      confirmPeriod: 0
-    },
-    decisionDeposit: {
-      who: ''
-    },
-    enactment,
-    proposalHash: hash,
-    proposalCall: call,
-    state: {
-      ...state,
-      name: ref.state
-    },
-    onchainData: onChainData
-  }) as unknown as T;
-};
 
 export class SubsquareApiSdk {
   private client: AxiosInstance;
@@ -203,12 +153,18 @@ export class SubsquareApiSdk {
     return userVoteRes.data;
   }
 
-  async findReferendumByValue (text: string): Promise<{ openGovReferenda: Referendum[] }> {
-    const referendaRes = await this.client.get<{ openGovReferenda: Referendum[] }>(
+  async findReferendumByValue (text: string): Promise<{ govReferenda: Referendum[] }> {
+    const referendaRes = await this.client.get<{ openGovReferenda: Referendum[], democracyReferenda?: DemocracyReferendum[]}>(
       '/search',
       { params: { text } }
     );
 
-    return referendaRes.data;
+    if (referendaRes.data?.democracyReferenda) {
+      const democracyReferenda = referendaRes.data.democracyReferenda.map(castDemocracyReferendumToReferendum<Referendum>);
+
+      return { govReferenda: [...democracyReferenda] };
+    }
+
+    return { govReferenda: referendaRes.data.openGovReferenda };
   }
 }

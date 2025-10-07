@@ -155,12 +155,14 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
 
         <VotingStats
           chain={chain}
+          isLegacyGov={!!sdkInstance?.isLegacyGov}
           votingData={votingData}
         />
       </div>
 
       <Button
         block={true}
+        disabled={referendumDetail.version === 1}
         onClick={onClickVote}
       >
         {t('Vote')}

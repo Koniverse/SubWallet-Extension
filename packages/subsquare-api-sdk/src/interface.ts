@@ -107,6 +107,7 @@ interface DemocracyOnchainData {
   meta: DemocracyMetadata;
   tally: Tally;
   state: OnchainState;
+  preImage: Proposal
 }
 
 export interface ReferendumDetail {
@@ -428,7 +429,7 @@ export const GOV_COMPLETED_FAILED_STATES: GovStatusKey[] = [
   GovStatusKey.TIMEDOUT,
   GovStatusKey.CANCELLED,
   GovStatusKey.KILLED,
-  GovStatusKey.PASSED
+  GovStatusKey.NOTPASSED
 ];
 
 /* Gov Status */

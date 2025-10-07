@@ -69,12 +69,17 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
   });
 
   const onViewPolkassembly = useCallback(() => {
-    window.open(`https://${chainSlugToPolkassemblySite[chainSlug]}.polkassembly.io/referenda/${data?.referendumIndex || ''}`, '_blank');
+    const site = chainSlugToPolkassemblySite[chainSlug];
+
+    window.open(`https://${site}.polkassembly.io/referenda/${data?.referendumIndex ?? ''}`, '_blank');
   }, [chainSlug, data?.referendumIndex]);
 
   const onViewSubsquare = useCallback(() => {
-    window.open(`https://${chainSlugToSubsquareSite[chainSlug]}.subsquare.io/referenda/${data?.referendumIndex || ''}`, '_blank');
-  }, [chainSlug, data?.referendumIndex]);
+    const basePath = sdkInstance?.isLegacyGov ? 'democracy/' : '';
+    const referendumPath = data?.referendumIndex || '';
+
+    window.open(`https://${chainSlugToSubsquareSite[chainSlug]}.subsquare.io/${basePath}referenda/${referendumPath}`, '_blank');
+  }, [chainSlug, data?.referendumIndex, sdkInstance?.isLegacyGov]);
 
   const onSelectGovItem = useCallback((item: GovAccountAddressItemType) => {
     if (item.govVoteStatus === GovVoteStatus.DELEGATED) {
