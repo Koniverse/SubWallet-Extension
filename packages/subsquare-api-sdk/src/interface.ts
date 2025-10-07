@@ -42,7 +42,7 @@ export interface DemocracyReferendum extends ReferendumBase {
 
 interface DemocracyMetadata {
   end: number; // block number
-  threshold: number;
+  threshold: string;
   delay: number; // block number
 }
 

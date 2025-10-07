@@ -48,15 +48,35 @@ export function getTallyVotesBarPercent (tally: Tally) {
   };
 }
 
+/**
+ * Compute the minimum approval threshold (%) for a Gov1 (Democracy) referendum.
+ *
+ * This function reproduces the logic from Substrate's `vote_threshold.rs`
+ * for `SuperMajorityApprove`, `SuperMajorityAgainst`, and `SimpleMajority`.
+ *
+ * References:
+ * - https://github.com/paritytech/substrate/blob/master/frame/democracy/src/vote_threshold.rs
+ */
 export function getMinApprovalThresholdGov1 (referendum: DemocracyReferendum): number {
   const onchain = referendum?.onchainData;
-  const threshold = onchain?.info?.ongoing?.threshold;
+  const threshold = onchain?.meta?.threshold;
 
   if (!onchain || !threshold) {
     return 0;
   }
 
-  // Ưu tiên tally “live”; nếu không có thì fallback sang info.ongoing.tally
+  /**
+   * --- SimpleMajority ---
+   *
+   * Simple rule:
+   *   ayes > nays
+   *   => ayes / (ayes + nays) > 0.5
+   */
+  if (threshold === 'SimpleMajority') {
+    return toPercentage(0.5, 1); // 50.0%
+  }
+
+  // Retrieve the on-chain tally (ayes, nays, turnout, electorate)
   const t = onchain.tally ?? onchain.info?.ongoing?.tally;
 
   if (!t) {
@@ -66,37 +86,67 @@ export function getMinApprovalThresholdGov1 (referendum: DemocracyReferendum): n
   const turnout = new BigNumber(t.turnout);
   const electorate = new BigNumber(t.electorate);
 
-  if (electorate.lte(0)) {
+  // Avoid division by zero or invalid data
+  if (electorate.lte(0) || turnout.lte(0)) {
     return 0;
   }
 
-  const sqrtT = turnout.sqrt();
-  const sqrtE = electorate.sqrt();
+  const sqrtT = turnout.sqrt(); // √turnout
+  const sqrtE = electorate.sqrt(); // √electorate
 
   let pMin: BigNumber;
 
   switch (threshold) {
+    /**
+     * --- SuperMajorityApprove ---
+     *
+     * Substrate rule:
+     *   ayes / √electorate > nays / √turnout
+     *
+     * Let:
+     *   a = ayes / (ayes + nays)
+     *   (1 - a) = nays / (ayes + nays)
+     *
+     * Rearranging:
+     *   a / √electorate > (1 - a) / √turnout
+     *   => a > (1 - a) * (√electorate / √turnout)
+     *   => a * (1 + √electorate / √turnout) > √electorate / √turnout
+     *   => a > (√electorate / √turnout) / (1 + √electorate / √turnout)
+     *   => a > √electorate / (√turnout + √electorate)
+     *
+     * So, the approval fraction must exceed √E / (√T + √E)
+     */
     case 'SuperMajorityApprove':
-      // p_min = sqrt(E) / (sqrt(E) + sqrt(T))
-      pMin = sqrtE.div(sqrtE.plus(sqrtT));
+      pMin = sqrtE.div(sqrtT.plus(sqrtE));
       break;
 
+    /**
+     * --- SuperMajorityAgainst ---
+     *
+     * Substrate rule:
+     *   ayes / √turnout > nays / √electorate
+     *
+     * Similarly:
+     *   a / √turnout > (1 - a) / √electorate
+     *   => a > (1 - a) * (√turnout / √electorate)
+     *   => a * (1 + √turnout / √electorate) > √turnout / √electorate
+     *   => a > (√turnout / √electorate) / (1 + √turnout / √electorate)
+     *   => a > √turnout / (√turnout + √electorate)
+     *
+     * So, the approval fraction must exceed √T / (√T + √E)
+     */
     case 'SuperMajorityAgainst':
-      // p_min = sqrt(T) / (sqrt(E) + sqrt(T))
-      pMin = sqrtT.div(sqrtE.plus(sqrtT));
-      break;
-
-    case 'SimpleMajority':
-      pMin = new BigNumber(0.5);
+      pMin = sqrtT.div(sqrtT.plus(sqrtE));
       break;
 
     default:
       return 0;
   }
 
+  // Clamp to [0, 1] range and convert to percentage
   const clamped = BigNumber.maximum(0, BigNumber.minimum(1, pMin));
 
-  return toPercentage(clamped.toNumber(), 1); // % (0..100)
+  return toPercentage(clamped.toNumber(), 1); // return % between 0 and 100
 }
 
 function getMinApprovalThresholdGov2 (referendumDetail: OpenGovReferendum | ReferendumDetail): number {
