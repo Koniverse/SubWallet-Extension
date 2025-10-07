@@ -4,7 +4,7 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { PreviousVoteAmountDetail, VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
-import { DemocracyReferendum, GOV_ONGOING_STATES, GovStatusKey, OpenGovReferendum, Referendum, ReferendumDetail, ReferendumVoteDetail, Tally } from '@subwallet/subsquare-api-sdk';
+import { GOV_ONGOING_STATES, GovStatusKey, Referendum, ReferendumDetail, ReferendumVoteDetail, Tally } from '@subwallet/subsquare-api-sdk';
 import BigNumber from 'bignumber.js';
 
 export const GOV_QUERY_KEYS = {
@@ -57,7 +57,7 @@ export function getTallyVotesBarPercent (tally: Tally) {
  * References:
  * - https://github.com/paritytech/substrate/blob/master/frame/democracy/src/vote_threshold.rs
  */
-export function getMinApprovalThresholdGov1 (referendum: DemocracyReferendum): number {
+export function getMinApprovalThresholdGov1 (referendum: Referendum | ReferendumDetail): number {
   const onchain = referendum?.onchainData;
   const threshold = onchain?.meta?.threshold;
 
@@ -77,7 +77,7 @@ export function getMinApprovalThresholdGov1 (referendum: DemocracyReferendum): n
   }
 
   // Retrieve the on-chain tally (ayes, nays, turnout, electorate)
-  const t = onchain.tally ?? onchain.info?.ongoing?.tally;
+  const t = onchain.tally;
 
   if (!t) {
     return 0;
@@ -149,7 +149,7 @@ export function getMinApprovalThresholdGov1 (referendum: DemocracyReferendum): n
   return toPercentage(clamped.toNumber(), 1); // return % between 0 and 100
 }
 
-function getMinApprovalThresholdGov2 (referendumDetail: OpenGovReferendum | ReferendumDetail): number {
+function getMinApprovalThresholdGov2 (referendumDetail: Referendum | ReferendumDetail): number {
   const { decisionPeriod, minApproval } = referendumDetail.trackInfo;
   const decidingSince = referendumDetail.onchainData?.info?.deciding?.since;
   const currentBlock = referendumDetail.onchainData?.state?.indexer?.blockHeight;
@@ -253,15 +253,6 @@ const calculateTimeLeft = (
 };
 
 export const getTimeLeft = (data: Referendum | ReferendumDetail): string | undefined => {
-  if (data.version === 1) {
-    return calculateTimeLeft(
-      data.onchainData.state.indexer.blockTime,
-      data.onchainData.state.indexer.blockHeight,
-      null,
-      data.state
-    ).timeLeft;
-  }
-
   return calculateTimeLeft(
     data.state.indexer.blockTime,
     data.state.indexer.blockHeight,

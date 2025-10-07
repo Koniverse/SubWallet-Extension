@@ -3,7 +3,7 @@
 
 import axios, { AxiosInstance } from 'axios';
 
-import { DemocracyReferendum, OpenGovReferendum, ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, Referendum, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
+import { DemocracyReferendaResponse, DemocracyReferendum, OnchainData, Proposal, ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, Referendum, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
 import { gov1ReferendumsApi, gov2ReferendumsApi, gov2TracksApi } from './url';
 import { ALL_TRACK, reformatTrackName } from './utils';
 
@@ -30,6 +30,56 @@ const LegacyGovChains = [
   'kintsugi'
 ];
 
+const castDemocracyReferendumToReferendum = <T extends (Referendum | ReferendumDetail)>(ref: DemocracyReferendum): T => {
+  const { call, hash, info, meta, state } = ref.onchainData;
+  const enactmentAfter = (meta?.delay || 0) + (meta?.end || 0);
+  const enactment = {
+    after: enactmentAfter.toString()
+  };
+
+  const onChainData: OnchainData = {
+    ...ref.onchainData,
+    proposalHash: hash,
+    proposal: { call } as Proposal,
+    meta,
+    info: {
+      decisionDeposit: {
+        who: '',
+        amount: '0'
+      },
+      submissionDeposit: {
+        who: '',
+        amount: '0'
+      },
+      enactment,
+      alarm: [],
+      democracy: info
+    }
+  };
+
+  return ({
+    ...ref,
+    version: 1,
+    trackInfo: {
+      id: '-1',
+      name: 'Democracy',
+      decisionPeriod: 0,
+      confirmPeriod: 0
+    },
+    decisionDeposit: {
+      who: ''
+    },
+    enactment,
+    proposalHash: hash,
+    proposalCall: call,
+    state: {
+      ...state,
+      name: ref.state
+    },
+    onchainData: onChainData
+  }) as unknown as T;
+};
+
 export class SubsquareApiSdk {
   private client: AxiosInstance;
   private static instances: Map<string, SubsquareApiSdk> = new Map();
@@ -52,44 +102,47 @@ export class SubsquareApiSdk {
 
   async getReferenda (params?: ReferendaQueryParams): Promise<ReferendaResponse> {
     const api = this.isLegacyGov ? gov1ReferendumsApi : gov2ReferendumsApi;
-    const referendaRes = await this.client.get<ReferendaResponse>(
-      api,
-      { params }
-    );
+    const referendaRes = await this.client.get<ReferendaResponse | DemocracyReferendaResponse>(api, { params });
+
+    const data = referendaRes.data;
+
+    if (this.isLegacyGov) {
+      return {
+        ...data,
+        items: (data as DemocracyReferendaResponse).items.map(castDemocracyReferendumToReferendum<Referendum>)
+      };
+    }
 
     return {
-      ...referendaRes.data,
-      items: referendaRes.data.items.map((ref) => {
-        if (this.isLegacyGov) {
-          const democracyRef = ref as DemocracyReferendum;
-
-          return { ...democracyRef, version: 1 };
+      ...data,
+      items: (data as ReferendaResponse).items.map((ref) => ({
+        ...ref,
+        version: 2,
+        trackInfo: {
+          ...ref.trackInfo,
+          name: reformatTrackName(ref.trackInfo?.name || '')
         }
-
-        const ref2 = ref as OpenGovReferendum;
-
-        return {
-          ...ref2,
-          version: 2,
-          trackInfo: {
-            ...ref2.trackInfo,
-            name: reformatTrackName(ref2.trackInfo.name)
-          }
-        };
-      })
+      }))
     };
   }
 
   async getReferendaDetails (id: string): Promise<ReferendumDetail> {
     const api = this.isLegacyGov ? gov1ReferendumsApi : gov2ReferendumsApi;
-    const referendaRes = await this.client.get<ReferendumDetail>(
+    const referendaRes = await this.client.get<ReferendumDetail | DemocracyReferendum>(
       `${api}/${id}`
     );
 
-    const ref = referendaRes.data;
+    let ref = referendaRes.data;
+
+    if (this.isLegacyGov) {
+      return castDemocracyReferendumToReferendum<ReferendumDetail>(ref as DemocracyReferendum);
+    }
+
+    ref = ref as ReferendumDetail;
 
     return {
       ...ref,
+      version: 2,
       trackInfo: {
         ...ref.trackInfo,
         name: reformatTrackName(ref.trackInfo.name)

@@ -1,17 +1,14 @@
 // Copyright 2019-2022 @subwallet/subsquare-api-sdk authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-export interface ReferendumBase {
+export interface Referendum {
   _id: string;
   referendumIndex: number;
   proposer: string;
   title: string;
   content: string;
   version: number;
-}
 
-export interface OpenGovReferendum extends ReferendumBase {
-  version: 2;
   decisionDeposit: {
     who: string;
   };
@@ -29,12 +26,39 @@ export interface OpenGovReferendum extends ReferendumBase {
   };
 
   state: OnchainState;
-  onchainData: OnchainData;
-
   allSpends?: SpendItem[];
+  onchainData: OnchainData;
 }
 
-export interface DemocracyReferendum extends ReferendumBase {
+export interface DemocracyReferendum {
+  _id: string;
+  referendumIndex: number;
+  indexer: Indexer;
+  contentType: string;
+  track: number;
+  createdAt: string;
+  updatedAt: string;
+  lastActivityAt: string;
+  edited: boolean;
+  stateSort: number;
+  polkassemblyCommentsCount: number;
+  polkassemblyId: number;
+  polkassemblyPostType: string;
+  contentHash: string;
+  dataSource: string;
+  polkassemblyContentHtml: string;
+  contentSummary: Record<string, unknown>;
+  isBoundDiscussion: boolean;
+  isFinal: boolean;
+  refToPost: Record<string, unknown>;
+  rootPost: Record<string, unknown>;
+  author: Record<string, unknown>;
+  commentsCount: number;
+  authors: string[];
+  reactions: unknown[];
+  proposer: string;
+  title: string;
+  content: string;
   version: 1;
   state: GovStatusKey;
   onchainData: DemocracyOnchainData;
@@ -85,10 +109,8 @@ interface DemocracyOnchainData {
   state: OnchainState;
 }
 
-export type Referendum = OpenGovReferendum | DemocracyReferendum;
-
 export interface ReferendumDetail {
-  version: null;
+  version: number;
   _id: string;
   referendumIndex: number;
   indexer: Indexer;
@@ -262,7 +284,9 @@ interface OnchainInfo {
       blockHeight?: number;
     };
   };
-  alarm: number[]
+  alarm: number[];
+
+  democracy?: DemocracyOnChainInfo
 }
 
 interface Indexer {
@@ -284,10 +308,11 @@ export interface OnchainData {
   proposal: Proposal;
   info: OnchainInfo;
   state?: OnchainState;
+  meta?: DemocracyMetadata;
 }
 
 export interface ReferendaResponse {
-  items: (Referendum | DemocracyReferendum)[];
+  items: Referendum[];
   total: number;
   page: number;
   pageSize: number;
