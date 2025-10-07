@@ -35,12 +35,12 @@ const Component: FC<Props> = (props: Props) => {
           block={true}
           onClick={onCancel}
         >
-          {t('ui.Earning.components.Modal.Earning.ActiveStakeDetails.close')}
+          {t('ui.EARNING.components.Modal.Earning.ActiveStakeDetails.close')}
         </Button>
       )}
       id={modalId}
       onCancel={onCancel}
-      title={t('ui.SWAP.components.Modal.Earning.ActiveStakeDetails.title')}
+      title={t('ui.EARNING.components.Modal.Earning.ActiveStakeDetails.title')}
     >
       <MetaInfo
         className={'__active-stake-info-block'}

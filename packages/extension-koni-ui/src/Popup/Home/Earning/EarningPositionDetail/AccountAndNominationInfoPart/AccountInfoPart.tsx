@@ -6,8 +6,7 @@ import { SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionIn
 import { detectTranslate, isSameAddress } from '@subwallet/extension-base/utils';
 import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { InfoItemBase } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
-import { EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
-import EarningActiveStakeDetailsModal from '@subwallet/extension-koni-ui/components/Modal/Earning/EarningActiveStakeDetailsModal';
+import { EarningActiveStakeDetailsModal, EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
 import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/components/Modal/Earning/EarningValidatorSelectedModal';
 import { EARNING_ACITVE_STAKE_DETAILS_MODAL, EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -173,8 +172,8 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
   );
 
   const closeActiveStakeDetailsModal = useCallback(() => {
-    setIsShowActiveStakeDetailsModal(false);
     inactiveModal(EARNING_ACITVE_STAKE_DETAILS_MODAL);
+    setIsShowActiveStakeDetailsModal(false);
   }, [inactiveModal]);
 
   const accountInfoItemsNode = useMemo(() => {
@@ -183,7 +182,6 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
 
       const metaInfoNumber = (labelKey: string, value: string | number | BigN, asset = inputAsset) => ({ label: t(labelKey), value, decimals: asset?.decimals || 0, suffix: asset?.symbol });
 
-      console.log('item', item);
       const metaInfoItems = isSubnetStaking
         ? [
           metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.totalStake'), new BigN(item.totalStake)),
@@ -273,7 +271,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
 
           {metaInfoItems.map((item, index) => (
             <MetaInfo.Number
-              key={`${index}-${item.value.toString()}`}
+              key={`${index}`}
               {...item}
               valueColorSchema='even-odd'
             />
