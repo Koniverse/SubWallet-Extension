@@ -223,6 +223,14 @@ export function calculateAlephZeroValidatorReturn (chainStakedReturn: number, co
   return chainStakedReturn * (100 - commission) / 100;
 }
 
+export function calculateEnergyWebValidatorReturn (annualReward: number, collatorCommission: number, numberCollators: number, totalStake: string, decimals: number): number {
+  const annualRewardsPerCollator = new BigNumber(annualReward).shiftedBy(decimals);
+  const rewardForNominators = annualRewardsPerCollator.multipliedBy(1 - collatorCommission);
+  const rewardPerNominator = rewardForNominators.div(numberCollators);
+
+  return rewardPerNominator.div(totalStake).shiftedBy(2).toNumber();
+}
+
 export function calculateTernoaValidatorReturn (rewardPerValidator: number, validatorStake: number, commission: number) {
   const percentRewardForNominators = (100 - commission) / 100;
   const rewardForNominators = rewardPerValidator * percentRewardForNominators;
