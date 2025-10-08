@@ -68,7 +68,7 @@ export const getAcrossQuote = async ({ destinationChain,
   }
 
   try {
-    const data = await subwalletApiSdk.xcmApi.fetchXcmData({
+    const data = await subwalletApiSdk.bridgeApi.fetchBridgeData({
       address: sender,
       from: originTokenInfo.slug,
       to: destinationTokenInfo.slug,
@@ -90,9 +90,6 @@ export const getAcrossQuote = async ({ destinationChain,
   }
 };
 
-const TESTNET_API_URL = 'https://testnet.across.to/api';
-const MAINNET_API_URL = 'https://app.across.to/api';
-
 // TODO: update logic after add across metadata for chainlist
 const acrossNativeTokenAddresses = {
   mainnet: {
@@ -108,13 +105,6 @@ const acrossNativeTokenAddresses = {
   }
 };
 
-interface AcrossLimitsResponse {
-  minDeposit: string;
-  maxDeposit: string;
-}
-
-const acrossValueCache = new Map<string, string>();
-
 export const getAcrossSendingValue = async (originChain: _ChainInfo, originTokenInfo: _ChainAsset, destinationChain: _ChainInfo, isTestnet: boolean) => {
   try {
     const originChainId = _getEvmChainId(originChain);
@@ -124,25 +114,10 @@ export const getAcrossSendingValue = async (originChain: _ChainInfo, originToken
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
-    const baseUrl = isTestnet ? TESTNET_API_URL : MAINNET_API_URL;
     const contracts = isTestnet ? acrossNativeTokenAddresses.testnet : acrossNativeTokenAddresses.mainnet;
     const fromContract = _getContractAddressOfToken(originTokenInfo) || contracts[originTokenInfo.originChain as keyof typeof contracts];
 
-    const cacheKey = `${originChainId}-${destinationChainId}-${fromContract}`;
-    const cached = acrossValueCache.get(cacheKey);
-
-    if (cached) {
-      return cached;
-    }
-
-    const url = `${baseUrl}/limits?originChainId=${originChainId}&destinationChainId=${destinationChainId}&token=${fromContract}`;
-    const res = await fetch(url);
-
-    if (!res.ok) {
-      throw new Error('Failed to fetch Across Bridge Limit. Please try again later');
-    }
-
-    const acrossBridgeLimit = (await res.json()) as AcrossLimitsResponse;
+    const acrossBridgeLimit = await subwalletApiSdk.bridgeApi.getAcrossBridgeLimit(originChainId, destinationChainId, fromContract, isTestnet);
 
     if (!acrossBridgeLimit.minDeposit || !acrossBridgeLimit.maxDeposit) {
       throw new Error('Invalid Across Bridge response');
@@ -152,10 +127,6 @@ export const getAcrossSendingValue = async (originChain: _ChainInfo, originToken
     const max = new BigN(acrossBridgeLimit.maxDeposit);
     // Use the midpoint between minDeposit and maxDeposit as a balanced value used for estimating gas fee more accurately
     const sendingValue = min.plus(max).div(2).toFixed(0);
-
-    acrossValueCache.set(cacheKey, sendingValue);
-
-    setTimeout(() => acrossValueCache.delete(cacheKey), 60 * 1000);
 
     return sendingValue;
   } catch (error) {
