@@ -43,8 +43,14 @@ export const govStatusItems: GovStatusItem[] = [
   govStatusDisplayMap[GovStatusKey.REJECTED],
   govStatusDisplayMap[GovStatusKey.TIMEDOUT],
   govStatusDisplayMap[GovStatusKey.CANCELLED],
-  govStatusDisplayMap[GovStatusKey.KILLED],
+  govStatusDisplayMap[GovStatusKey.KILLED]
+];
+
+export const democracyGovStatusItems: GovStatusItem[] = [
   govStatusDisplayMap[GovStatusKey.STARTED],
   govStatusDisplayMap[GovStatusKey.PASSED],
-  govStatusDisplayMap[GovStatusKey.NOTPASSED]
+  govStatusDisplayMap[GovStatusKey.NOTPASSED],
+  govStatusDisplayMap[GovStatusKey.TIMEDOUT],
+  govStatusDisplayMap[GovStatusKey.CANCELLED],
+  govStatusDisplayMap[GovStatusKey.EXECUTED]
 ];
