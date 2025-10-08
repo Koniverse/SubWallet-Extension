@@ -9,7 +9,7 @@ import { _EXPECTED_BLOCK_TIME, _STAKING_ERA_LENGTH_MAP } from '@subwallet/extens
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { parseIdentity } from '@subwallet/extension-base/services/earning-service/utils';
 import { BaseYieldPositionInfo, BasicTxErrorType, CollatorExtraInfo, EarningStatus, NativeYieldPoolInfo, PalletParachainStakingDelegationInfo, PalletParachainStakingRequestType, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingStatus, ValidatorInfo, YieldPoolInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
-import {balanceFormatter, formatNumber, parseRawNumber, reformatAddress} from '@subwallet/extension-base/utils';
+import { balanceFormatter, formatNumber, parseRawNumber, reformatAddress } from '@subwallet/extension-base/utils';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
@@ -56,7 +56,7 @@ const DEFAULT_NETWORK_VALUES: Record<string, { annualReward: number, commission:
     annualReward: 2_000_000,
     commission: 0.1
   }
-}
+};
 
 export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakingPoolHandler {
   /* Subscribe pool info */
@@ -371,14 +371,15 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
         let expectedReturn;
 
         if (DEFAULT_NETWORK_VALUES[this.chain]) {
-           const { commission, annualReward } = DEFAULT_NETWORK_VALUES[this.chain];
-           expectedReturn = calculateEnergyWebValidatorReturn(
-             annualReward,
-             commission,
-             selectedCollatorsCount,
-             bnTotalStake.toString(),
-             this.nativeToken.decimals || 18
-           )
+          const { annualReward, commission } = DEFAULT_NETWORK_VALUES[this.chain];
+
+          expectedReturn = calculateEnergyWebValidatorReturn(
+            annualReward,
+            commission,
+            selectedCollatorsCount,
+            bnTotalStake.toString(),
+            this.nativeToken.decimals || 18
+          );
         }
 
         allCollators.push({
