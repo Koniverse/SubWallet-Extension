@@ -96,6 +96,7 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
         />
 
         <Button
+          disabled={sdkInstance?.isLegacyGov}
           icon={
             <Badge
               className={'g-filter-badge'}

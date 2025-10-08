@@ -60,11 +60,11 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
     staleTime: 60 * 1000
   });
 
-  const { data: searchData, isFetching, refetch } = useQuery<{ openGovReferenda: Referendum[] }>({
+  const { data: searchData, isFetching, refetch } = useQuery<{ govReferenda: Referendum[] }>({
     queryKey: GOV_QUERY_KEYS.referendaList(chain),
     queryFn: async () => {
       if (!sdkInstance) {
-        return { openGovReferenda: [] };
+        return { govReferenda: [] };
       }
 
       return await sdkInstance.findReferendumByValue(searchValue);
@@ -81,6 +81,13 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
     const items = (refData?.items || []);
 
     return items.map((item) => {
+      if (item.version === 1) {
+        return {
+          ...item,
+          userVoting: undefined
+        };
+      }
+
       const trackId = Number(item.trackInfo.id);
 
       const userVoting: UserVoting[] = [];
@@ -118,12 +125,12 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
   const filteredItems = useMemo<ReferendumWithVoting[]>(() => {
     const itemsFiltered = items.filter((item) => filterItemBySearchText(item, searchValue));
 
-    if (searchData?.openGovReferenda.length && !itemsFiltered.length && searchValue.trim()) {
-      return searchData.openGovReferenda.filter((item) => filterItemBySearchText(item, searchValue));
+    if (searchData?.govReferenda?.length && !itemsFiltered.length && searchValue.trim()) {
+      return searchData.govReferenda.filter((item) => filterItemBySearchText(item, searchValue));
     } else {
       return itemsFiltered;
     }
-  }, [searchData?.openGovReferenda, items, searchValue]);
+  }, [searchData?.govReferenda, items, searchValue]);
 
   useEffect(() => {
     if (!searchValue) {

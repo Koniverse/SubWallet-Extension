@@ -16,9 +16,10 @@ import styled from 'styled-components';
 type Props = ThemeProps & {
   votingData: ReferendumVoteResult;
   chain: string;
+  isLegacyGov: boolean;
 }
 
-const Component = ({ chain, className, votingData }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, isLegacyGov, votingData }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chain);
   const [isOpen, setIsOpen] = useState(false);
@@ -117,7 +118,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
             </div>
           </MetaInfo.Default>
 
-          <MetaInfo.Default
+          {!isLegacyGov && <MetaInfo.Default
             label={
               <>
                 <VoteTypeLabel
@@ -145,7 +146,7 @@ const Component = ({ chain, className, votingData }: Props): React.ReactElement<
                 />
               </div>
             </div>
-          </MetaInfo.Default>
+          </MetaInfo.Default>}
         </MetaInfo>
       </CollapsiblePanel>
 

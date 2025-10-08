@@ -3,6 +3,7 @@
 
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { AccountProxyAvatar, MetaInfo, ReferendumTrackTag } from '@subwallet/extension-koni-ui/components';
+import { BLOCK_TIME_SEC } from '@subwallet/extension-koni-ui/constants';
 import { useGetAccountByAddress, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
@@ -18,10 +19,10 @@ type Props = ThemeProps & {
   chain: string;
 };
 
-const BLOCK_TIME_SEC = 6;
+const BLOCK_TIME_DEFAULT = 6;
 
-const blocksToDaysLabel = (blocks: number, blockTimeSec = BLOCK_TIME_SEC) => {
-  const days = blocks / (86400 / blockTimeSec);
+const blocksToDaysLabel = (blocks: number, chainSlug: string) => {
+  const days = blocks / (86400 / (BLOCK_TIME_SEC[chainSlug] || BLOCK_TIME_DEFAULT));
 
   return Number.isInteger(days) ? `${days} d` : `${days.toFixed(2)} d`;
 };
@@ -31,7 +32,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
   const notify = useNotification();
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
-  const proposerAddress = referendumDetail.onchainData.info.submissionDeposit?.who;
+  const proposerAddress = referendumDetail.onchainData.info.submissionDeposit?.who || referendumDetail.proposer;
   const decisionAddress = referendumDetail.onchainData.info.decisionDeposit?.who;
   const proposerAccount = useGetAccountByAddress(proposerAddress);
   const decisionAccount = useGetAccountByAddress(decisionAddress);
@@ -108,7 +109,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
         {!!decisionAddress &&
           <MetaInfo.Default
             className={CN('referendum-detail-item', '-account-info')}
-            label={t('Proposer')}
+            label={t('Depositor')}
           >
             <div className='__account-item-wrapper'>
               <div className='__account-item'>
@@ -140,26 +141,50 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
               />
             </div>
           </MetaInfo.Default>}
-        <MetaInfo.Default
-          label={t('Track')}
-        >
-          {referendumDetail.trackInfo.name}
-        </MetaInfo.Default>
-        <MetaInfo.Default
-          label={t('Decision Period')}
-        >
-          {blocksToDaysLabel(referendumDetail.trackInfo.decisionPeriod)}
-        </MetaInfo.Default>
-        <MetaInfo.Default
-          label={t('Confirmation Period')}
-        >
-          {blocksToDaysLabel(referendumDetail.trackInfo.confirmPeriod)}
-        </MetaInfo.Default>
-        <MetaInfo.Default
-          label={t('Enact')}
-        >
-          After: {referendumDetail.onchainData.info.enactment.after}
-        </MetaInfo.Default>
+        {referendumDetail.version === 2 &&
+          (
+            <>
+              <MetaInfo.Default
+                label={t('Track')}
+              >
+                {referendumDetail.trackInfo.name}
+              </MetaInfo.Default>
+              <MetaInfo.Default
+                label={t('Decision Period')}
+              >
+                {blocksToDaysLabel(referendumDetail.trackInfo.decisionPeriod, chain)}
+              </MetaInfo.Default>
+              <MetaInfo.Default
+                label={t('Confirmation Period')}
+              >
+                {blocksToDaysLabel(referendumDetail.trackInfo.confirmPeriod, chain)}
+              </MetaInfo.Default>
+              <MetaInfo.Default
+                label={t('Enact')}
+              >
+              After: {referendumDetail.onchainData.info.enactment.after}
+              </MetaInfo.Default>
+            </>
+          )
+        }
+        {
+          referendumDetail.version === 1 && referendumDetail.onchainData.meta &&
+          (
+            <>
+              <MetaInfo.Default
+                label={t('Delay')}
+              >
+                {referendumDetail.onchainData.meta?.delay}
+              </MetaInfo.Default>
+
+              <MetaInfo.Default
+                label={t('End')}
+              >
+                {referendumDetail.onchainData.meta?.end}
+              </MetaInfo.Default>
+            </>
+          )
+        }
       </MetaInfo>
 
       <MetaInfo

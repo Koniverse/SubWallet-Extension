@@ -40,9 +40,9 @@ const Component = (props: Props): React.ReactElement<Props> => {
           <TimelineItem
             datetime={item.indexer.blockTime}
             isLastItem={index === timeline.length - 1}
-            key={item.name}
+            key={index}
             state={index === timeline.length - 1 ? lastItemState : undefined}
-            title={item.name}
+            title={item.name || item.method}
           />
         ))
       }

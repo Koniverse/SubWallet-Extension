@@ -26,7 +26,10 @@ export const govStatusDisplayMap: Record<GovStatusKey, GovStatusItem> = {
   [GovStatusKey.REJECTED]: { key: GovStatusKey.REJECTED, label: detectTranslate('Rejected'), icon: Prohibit, colorToken: 'magenta-6' },
   [GovStatusKey.TIMEDOUT]: { key: GovStatusKey.TIMEDOUT, label: detectTranslate('TimedOut'), icon: ClockAfternoon, colorToken: 'gray-6' },
   [GovStatusKey.CANCELLED]: { key: GovStatusKey.CANCELLED, label: detectTranslate('Cancelled'), icon: XCircle, colorToken: 'orange-6' },
-  [GovStatusKey.KILLED]: { key: GovStatusKey.KILLED, label: detectTranslate('Killed'), icon: Skull, colorToken: 'red-6' }
+  [GovStatusKey.KILLED]: { key: GovStatusKey.KILLED, label: detectTranslate('Killed'), icon: Skull, colorToken: 'red-6' },
+  [GovStatusKey.STARTED]: { key: GovStatusKey.STARTED, label: detectTranslate('Started'), icon: Scales, colorToken: 'blue-7' },
+  [GovStatusKey.PASSED]: { key: GovStatusKey.PASSED, label: detectTranslate('Passed'), icon: CheckCircle, colorToken: 'lime-7' },
+  [GovStatusKey.NOTPASSED]: { key: GovStatusKey.NOTPASSED, label: detectTranslate('NotPassed'), icon: XCircle, colorToken: 'magenta-6' }
 };
 
 export const govStatusItems: GovStatusItem[] = [
@@ -41,4 +44,13 @@ export const govStatusItems: GovStatusItem[] = [
   govStatusDisplayMap[GovStatusKey.TIMEDOUT],
   govStatusDisplayMap[GovStatusKey.CANCELLED],
   govStatusDisplayMap[GovStatusKey.KILLED]
+];
+
+export const democracyGovStatusItems: GovStatusItem[] = [
+  govStatusDisplayMap[GovStatusKey.STARTED],
+  govStatusDisplayMap[GovStatusKey.PASSED],
+  govStatusDisplayMap[GovStatusKey.NOTPASSED],
+  govStatusDisplayMap[GovStatusKey.TIMEDOUT],
+  govStatusDisplayMap[GovStatusKey.CANCELLED],
+  govStatusDisplayMap[GovStatusKey.EXECUTED]
 ];

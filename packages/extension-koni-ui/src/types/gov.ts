@@ -25,7 +25,7 @@ export interface UserVoting {
   delegation?: GovDelegationDetail;
 }
 
-export interface ReferendumWithVoting extends Referendum {
+export type ReferendumWithVoting = Referendum & {
   userVoting?: UserVoting[];
 }
 

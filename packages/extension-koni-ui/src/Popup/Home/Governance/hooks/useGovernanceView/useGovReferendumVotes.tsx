@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-import { chainSlugToSubsquareNetwork } from '../../shared';
+import { chainSlugToSubsquareApi } from '../../shared';
 
 type UseGovReferendumVotesParams = {
   chain: string;
@@ -39,7 +39,7 @@ export function useGovReferendumVotes ({ chain,
   }, [accountProxies, fromAccountProxy]);
 
   const sdkInstance: SubsquareApiSdk = useMemo(() => {
-    return getSubsquareApi(chainSlugToSubsquareNetwork[chain]);
+    return getSubsquareApi(chainSlugToSubsquareApi[chain]);
   }, [chain]);
 
   const { data: voteData } = useQuery({

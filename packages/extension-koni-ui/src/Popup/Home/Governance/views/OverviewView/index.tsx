@@ -137,6 +137,13 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
     const filteredItems = items.filter(filterFunc);
 
     const extended: ReferendumWithVoting[] = filteredItems.map((item) => {
+      if (item.version === 1) {
+        return {
+          ...item,
+          userVoting: undefined
+        };
+      }
+
       const trackId = Number(item.trackInfo.id);
 
       const userVoting: UserVoting[] = [];
@@ -204,6 +211,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
           className={className}
           govLockedInfos={govLockedInfos}
           onGoUnlockToken={onGoUnlockToken}
+          sdkInstance={sdkInstance}
         />
       </div>
 

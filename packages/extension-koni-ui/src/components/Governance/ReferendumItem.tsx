@@ -27,6 +27,7 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
   );
 
   const thresholdPercent = getMinApprovalThreshold(item);
+  const refStatus = item.state.name;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -60,7 +61,7 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
       </div>
 
       <div className='__i-tags'>
-        <ReferendumStatusTag status={item.state.name} />
+        <ReferendumStatusTag status={refStatus} />
         <ReferendumTrackTag trackName={item.trackInfo.name} />
       </div>
 
