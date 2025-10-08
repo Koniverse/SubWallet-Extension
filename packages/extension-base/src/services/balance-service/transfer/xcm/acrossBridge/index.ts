@@ -94,7 +94,7 @@ const TESTNET_API_URL = 'https://testnet.across.to/api';
 const MAINNET_API_URL = 'https://app.across.to/api';
 
 // TODO: update logic after add across metadata for chainlist
-const acrossBridgeContractAddresses = {
+const acrossNativeTokenAddresses = {
   mainnet: {
     arbitrum_one: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
     base_mainnet: '0x4200000000000000000000000000000000000006',
@@ -125,7 +125,7 @@ export const getAcrossSendingValue = async (originChain: _ChainInfo, originToken
     }
 
     const baseUrl = isTestnet ? TESTNET_API_URL : MAINNET_API_URL;
-    const contracts = isTestnet ? acrossBridgeContractAddresses.testnet : acrossBridgeContractAddresses.mainnet;
+    const contracts = isTestnet ? acrossNativeTokenAddresses.testnet : acrossNativeTokenAddresses.mainnet;
     const fromContract = _getContractAddressOfToken(originTokenInfo) || contracts[originTokenInfo.originChain as keyof typeof contracts];
 
     const cacheKey = `${originChainId}-${destinationChainId}-${fromContract}`;
@@ -150,6 +150,7 @@ export const getAcrossSendingValue = async (originChain: _ChainInfo, originToken
 
     const min = new BigN(acrossBridgeLimit.minDeposit);
     const max = new BigN(acrossBridgeLimit.maxDeposit);
+    // Use the midpoint between minDeposit and maxDeposit as a balanced value used for estimating gas fee more accurately
     const sendingValue = min.plus(max).div(2).toFixed(0);
 
     acrossValueCache.set(cacheKey, sendingValue);
@@ -160,9 +161,9 @@ export const getAcrossSendingValue = async (originChain: _ChainInfo, originToken
   } catch (error) {
     console.error('Across Bridge error:', error);
 
+    // fallback in case fetch API fail
     const defaultSendingAmount = isTestnet ? 0.0037 : 1;
 
-    // fallback in case fetch API fail
     return new BigN(defaultSendingAmount).shiftedBy(_getAssetDecimals(originTokenInfo)).toFixed(0, BigN.ROUND_FLOOR);
   }
 };
