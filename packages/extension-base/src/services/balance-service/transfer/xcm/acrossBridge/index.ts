@@ -115,7 +115,7 @@ interface AcrossLimitsResponse {
 
 const acrossValueCache = new Map<string, string>();
 
-export const getAcrossSendingValue = async (originChain: _ChainInfo, originTokenInfo: _ChainAsset, destinationChain: _ChainInfo, _isAcrossTestnetBridge: boolean) => {
+export const getAcrossSendingValue = async (originChain: _ChainInfo, originTokenInfo: _ChainAsset, destinationChain: _ChainInfo, isTestnet: boolean) => {
   try {
     const originChainId = _getEvmChainId(originChain);
     const destinationChainId = _getEvmChainId(destinationChain);
@@ -124,8 +124,8 @@ export const getAcrossSendingValue = async (originChain: _ChainInfo, originToken
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
-    const baseUrl = _isAcrossTestnetBridge ? TESTNET_API_URL : MAINNET_API_URL;
-    const contracts = _isAcrossTestnetBridge ? acrossBridgeContractAddresses.testnet : acrossBridgeContractAddresses.mainnet;
+    const baseUrl = isTestnet ? TESTNET_API_URL : MAINNET_API_URL;
+    const contracts = isTestnet ? acrossBridgeContractAddresses.testnet : acrossBridgeContractAddresses.mainnet;
     const fromContract = _getContractAddressOfToken(originTokenInfo) || contracts[originTokenInfo.originChain as keyof typeof contracts];
 
     const cacheKey = `${originChainId}-${destinationChainId}-${fromContract}`;
@@ -160,10 +160,9 @@ export const getAcrossSendingValue = async (originChain: _ChainInfo, originToken
   } catch (error) {
     console.error('Across Bridge error:', error);
 
-    if (_isAcrossTestnetBridge) {
-      return new BigN(0.0037).shiftedBy(_getAssetDecimals(originTokenInfo)).toFixed(0, BigN.ROUND_FLOOR);
-    }
+    const defaultSendingAmount = isTestnet ? 0.0037 : 1;
 
-    return new BigN(1).shiftedBy(_getAssetDecimals(originTokenInfo)).toFixed(0, BigN.ROUND_FLOOR);
+    // fallback in case fetch API fail
+    return new BigN(defaultSendingAmount).shiftedBy(_getAssetDecimals(originTokenInfo)).toFixed(0, BigN.ROUND_FLOOR);
   }
 };
