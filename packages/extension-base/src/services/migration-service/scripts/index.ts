@@ -51,7 +51,7 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.1.7': DeleteChain,
   '1.1.13-01': MigrateTokenDecimals,
   // '1.1.13-02-2': EnableEarningChains,
-  '1.3.55-03': DeleteEarningData,
+  '1.3.62-01': DeleteEarningData,
   '1.1.17-01': MigratePioneerProvider,
   '1.1.17-03': EnableVaraChain,
   '1.1.24-01': MigrateProvidersV1M1P24,
