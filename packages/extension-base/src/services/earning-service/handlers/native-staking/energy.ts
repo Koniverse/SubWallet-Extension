@@ -4,7 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType, NominationInfo, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { calculateEnergyWebValidatorReturn, getBondedValidators, getEarningStatusByNominations, isUnstakeAll } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { calculateEnergyWebCollatorReturn, getBondedValidators, getEarningStatusByNominations, isUnstakeAll } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _EXPECTED_BLOCK_TIME, _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { parseIdentity } from '@subwallet/extension-base/services/earning-service/utils';
@@ -14,7 +14,7 @@ import { balanceFormatter, formatNumber, parseRawNumber, reformatAddress } from 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
 import { Codec } from '@polkadot/types/types';
-import { BN, BN_ZERO } from '@polkadot/util';
+import {BN, BN_TEN, BN_ZERO} from '@polkadot/util';
 
 import BaseParaNativeStakingPoolHandler from './base-para';
 
@@ -45,17 +45,19 @@ interface PalletEnergyStakingNominator {
   status: number
 }
 
+interface PalletEnergyStakingCommissionInfo {
+  current: number;
+  scheduled?: any;
+}
+
 export interface PalletEnergyStakingNominationRequestsScheduledRequest {
   nominator: string,
   whenExecutable: number,
   action: Record<PalletParachainStakingRequestType, number>
 }
 
-const DEFAULT_NETWORK_VALUES: Record<string, { annualReward: number, commission: number }> = {
-  energy_web_x: {
-    annualReward: 2_000_000,
-    commission: 0.1
-  }
+const DEFAULT_ANNUAL_REWARD: Record<string, number> = {
+  energy_web_x: 2_000_000
 };
 
 export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakingPoolHandler {
@@ -352,6 +354,14 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
       apiProps.api.query.parachainStaking.selectedCandidates()
     ]);
 
+    let defaultCommission = 0;
+
+    if (apiProps.api.query.parachainStaking.defaultCollatorCommission) {
+      const _defaultCommission = await apiProps.api.query.parachainStaking.defaultCollatorCommission();
+      const { current } = _defaultCommission.toPrimitive() as unknown as PalletEnergyStakingCommissionInfo;
+      defaultCommission = current / 1_000_000_000
+    }
+
     const maxNominationPerCollator = apiProps.api.consts.parachainStaking.maxTopNominationsPerCandidate.toString();
     const selectedCollators = _selectedCandidates.toPrimitive() as string[];
     const selectedCollatorsCount = selectedCollators.length;
@@ -370,15 +380,14 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
       if (selectedCollators.includes(collatorAddress)) {
         let expectedReturn;
 
-        if (DEFAULT_NETWORK_VALUES[this.chain]) {
-          const { annualReward, commission } = DEFAULT_NETWORK_VALUES[this.chain];
+        if (DEFAULT_ANNUAL_REWARD[this.chain]) {
+          const annualReward = new BN(DEFAULT_ANNUAL_REWARD[this.chain]).mul(BN_TEN.pow(new BN(this.nativeToken.decimals || 0)));
 
-          expectedReturn = calculateEnergyWebValidatorReturn(
-            annualReward,
-            commission,
+          expectedReturn = calculateEnergyWebCollatorReturn(
+            annualReward.toString(),
+            defaultCommission,
             selectedCollatorsCount,
-            bnTotalStake.toString(),
-            this.nativeToken.decimals || 18
+            bnTotalStake.toString()
           );
         }
 
@@ -422,7 +431,7 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
       validator.blocked = !extraInfoMap[validator.address].active;
       validator.identity = extraInfoMap[validator.address].identity;
       validator.isVerified = extraInfoMap[validator.address].isVerified;
-      validator.commission = (DEFAULT_NETWORK_VALUES[this.chain]?.commission || 0) * 100;
+      validator.commission = defaultCommission * 100;
     }
 
     return allCollators;
