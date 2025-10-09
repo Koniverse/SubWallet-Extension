@@ -20,6 +20,11 @@ export const _STAKING_CHAIN_GROUP = {
   mythos: ['mythos', 'muse_testnet']
 };
 
+export const RELAY_HANDLER_DIRECT_STAKING_CHAINS = [
+  ..._STAKING_CHAIN_GROUP.relay,
+  ..._STAKING_CHAIN_GROUP.assetHub
+];
+
 export const TON_CHAINS = ['ton', 'ton_testnet'];
 
 export const MaxEraRewardPointsEras = 14;
