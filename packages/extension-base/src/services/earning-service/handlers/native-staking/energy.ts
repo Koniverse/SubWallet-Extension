@@ -14,7 +14,7 @@ import { balanceFormatter, formatNumber, parseRawNumber, reformatAddress } from 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
 import { Codec } from '@polkadot/types/types';
-import {BN, BN_TEN, BN_ZERO} from '@polkadot/util';
+import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import BaseParaNativeStakingPoolHandler from './base-para';
 
@@ -359,10 +359,12 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
     const currentRound = roundInfo.current;
 
     let defaultCommission = 0;
+
     if (apiProps.api.query.parachainStaking.defaultCollatorCommission) {
       const _defaultCommission = await apiProps.api.query.parachainStaking.defaultCollatorCommission();
       const { current } = _defaultCommission.toPrimitive() as unknown as PalletEnergyStakingCommissionInfo;
-      defaultCommission = current / 1_000_000_000
+
+      defaultCommission = current / 1_000_000_000;
     }
 
     const maxNominationPerCollator = apiProps.api.consts.parachainStaking.maxTopNominationsPerCandidate.toString();
@@ -404,31 +406,32 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
 
     // calculate expected return
     await Promise.all(allCollators.map(async (collator) => {
-        if (!selectedCollators.includes(collator.address) || annualReward.lte(BN_ZERO)) {
-          return;
-        }
+      if (!selectedCollators.includes(collator.address) || annualReward.lte(BN_ZERO)) {
+        return;
+      }
 
-        const _nominationScheduledRequests = await apiProps.api.query.parachainStaking.nominationScheduledRequests(collator.address);
-        const nominationScheduledRequests = _nominationScheduledRequests.toPrimitive() as unknown as PalletEnergyStakingNominationRequestsScheduledRequest[];
-        let bnTotalActiveStake = new BN(collator.totalStake);
+      const _nominationScheduledRequests = await apiProps.api.query.parachainStaking.nominationScheduledRequests(collator.address);
+      const nominationScheduledRequests = _nominationScheduledRequests.toPrimitive() as unknown as PalletEnergyStakingNominationRequestsScheduledRequest[];
+      let bnTotalActiveStake = new BN(collator.totalStake);
 
-        if (nominationScheduledRequests?.length) {
-          const bnTotalInactiveStake = nominationScheduledRequests.reduce((partialSum, { whenExecutable, action }) => {
-            if (whenExecutable - parseInt(currentRound) < 0 && action) {
-              return partialSum.add(new BN(Object.values(action)[0] || BN_ZERO));
-            }
-            return partialSum;
-          }, BN_ZERO);
+      if (nominationScheduledRequests?.length) {
+        const bnTotalInactiveStake = nominationScheduledRequests.reduce((partialSum, { action, whenExecutable }) => {
+          if (whenExecutable - parseInt(currentRound) < 0 && action) {
+            return partialSum.add(new BN(Object.values(action)[0] || BN_ZERO));
+          }
 
-          bnTotalActiveStake = bnTotalActiveStake.sub(bnTotalInactiveStake);
-        }
+          return partialSum;
+        }, BN_ZERO);
 
-        collator.expectedReturn = calculateEnergyWebCollatorReturn(
-          annualReward.toString(),
-          defaultCommission,
-          selectedCollatorsCount,
-          bnTotalActiveStake.toString()
-        );
+        bnTotalActiveStake = bnTotalActiveStake.sub(bnTotalInactiveStake);
+      }
+
+      collator.expectedReturn = calculateEnergyWebCollatorReturn(
+        annualReward.toString(),
+        defaultCommission,
+        selectedCollatorsCount,
+        bnTotalActiveStake.toString()
+      );
     }));
 
     const extraInfoMap: Record<string, CollatorExtraInfo> = {};
