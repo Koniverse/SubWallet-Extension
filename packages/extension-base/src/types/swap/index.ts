@@ -275,6 +275,7 @@ export interface PermitSwapData {
 
 export const CHAINFLIP_SLIPPAGE = 0.02; // Example: 0.01 for 1%
 export const SIMPLE_SWAP_SLIPPAGE = 0.05;
+export const OPTIMEX_SWAP_SLIPPAGE = 0.0075;
 
 export interface BaseSwapStepMetadata {
   sendingValue: string;
