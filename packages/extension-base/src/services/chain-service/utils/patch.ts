@@ -33,7 +33,7 @@ export async function fetchPatchData<T> () {
       const id = setTimeout(() => {
         clearTimeout(id);
         resolve(null);
-      }, 1000);
+      }, 2000);
     });
     const rs = await Promise.race([
       timeout,
