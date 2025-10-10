@@ -176,6 +176,13 @@ export class SwapService implements StoppableServiceInterface {
       throw new Error((e as Error).message);
     }
 
+    // override fee for quote because some cases need estimate network fee on Extension (i.e. Optimex)
+    if (swapQuoteResponse.optimalQuote) {
+      const swapIndex = optimalProcess.steps.findIndex((step) => step.type === SwapStepType.SWAP);
+
+      swapQuoteResponse.optimalQuote.feeInfo.feeComponent = optimalProcess.totalFee[swapIndex].feeComponent;
+    }
+
     if (swapQuoteResponse.error) {
       return {
         process: optimalProcess,
