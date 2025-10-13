@@ -437,8 +437,8 @@ export class OptimexHandler implements SwapBaseInterface {
     let extrinsic: SWTransaction['transaction'];
 
     // dont remove this log
-    console.log('Optimex Trade metadata:', depositAddress);
-    console.log('Optimex Trade channel:', this.isTestnet ? `https://provider-api-docs.vercel.app/swap/${tradeId}` : 'add this'); // todo: log for mainnet
+    console.log('Optimex Trade metadata:', this.currentTradeMetadata);
+    console.log('Optimex Trade channel:', this.isTestnet ? `https://provider-api-docs.vercel.app/swap/${tradeId}` : `https://provider-api-docs.vercel.app/swap/${tradeId}?env=sub_wallet`);
 
     if (chainType === ChainType.BITCOIN) {
       const bitcoinApi = this.chainService.getBitcoinApi(chainInfo.slug);
