@@ -288,6 +288,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 nftItem.properties && Object.entries(nftItem.properties).map(([attName, attValueObj], index) => {
                   const { value: attValue } = attValueObj as Record<string, string>;
 
+                  console.log('nftItem.properties', nftItem.properties);
+                  console.log('attValue', attValue);
+                  console.log('attName', attName);
+
                   return (
                     <Field
                       content={attValue.toString()}

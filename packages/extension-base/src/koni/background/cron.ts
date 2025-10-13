@@ -3,7 +3,7 @@
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { ApiMap, ServiceInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { CRON_REFRESH_CHAIN_STAKING_METADATA, CRON_REFRESH_MKT_CAMPAIGN_INTERVAL, CRON_REFRESH_NFT_INTERVAL, CRON_SYNC_MANTA_PAY } from '@subwallet/extension-base/constants';
+import { CRON_REFRESH_CHAIN_STAKING_METADATA, CRON_REFRESH_MKT_CAMPAIGN_INTERVAL, CRON_REFRESH_NFT_DETECT_INTERVAL, CRON_REFRESH_NFT_INTERVAL, CRON_SYNC_MANTA_PAY } from '@subwallet/extension-base/constants';
 import { KoniSubscription } from '@subwallet/extension-base/koni/background/subscription';
 import { _isChainSupportEvmNft, _isChainSupportNativeNft, _isChainSupportWasmNft } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
@@ -134,6 +134,7 @@ export class KoniCron {
       // NFT
       (commonReload || needUpdateNft) && this.resetNft(address);
       (commonReload || needUpdateNft) && this.removeCron('refreshNft');
+      (commonReload || needUpdateNft) && this.removeCron('detectNft');
       commonReload && this.removeCron('refreshPoolingStakingReward');
 
       if (mktCampaignNeedReload) {
@@ -150,6 +151,9 @@ export class KoniCron {
       // Chains
       if (this.checkNetworkAvailable(serviceInfo)) { // only add cron jobs if there's at least 1 active network
         (commonReload || needUpdateNft) && this.addCron('refreshNft', this.refreshNft(address, serviceInfo.chainApiMap, this.state.getSmartContractNfts(), this.state.getActiveChainInfoMap()), CRON_REFRESH_NFT_INTERVAL);
+
+        (commonReload || needUpdateNft) && this.addCron('detectNft', this.detectNft(address), CRON_REFRESH_NFT_DETECT_INTERVAL);
+
         reloadMantaPay && this.addCron('syncMantaPay', this.syncMantaPay, CRON_SYNC_MANTA_PAY);
       }
     };
@@ -167,11 +171,13 @@ export class KoniCron {
     if (Object.keys(this.state.getSubstrateApiMap()).length !== 0 || Object.keys(this.state.getEvmApiMap()).length !== 0) {
       this.resetNft(currentAccountInfo.proxyId);
       this.addCron('refreshNft', this.refreshNft(currentAccountInfo.proxyId, this.state.getApiMap(), this.state.getSmartContractNfts(), this.state.getActiveChainInfoMap()), CRON_REFRESH_NFT_INTERVAL);
+      this.addCron('detectNft', this.detectNft(currentAccountInfo.proxyId), CRON_REFRESH_NFT_DETECT_INTERVAL);
       // this.addCron('refreshStakingReward', this.refreshStakingReward(currentAccountInfo.address), CRON_REFRESH_STAKING_REWARD_INTERVAL);
       this.addCron('syncMantaPay', this.syncMantaPay, CRON_SYNC_MANTA_PAY);
     }
 
     this.status = 'running';
+    console.log('[Cron] Active cron jobs:', Object.keys(this.cronMap));
   };
 
   stop = async () => {
@@ -218,6 +224,7 @@ export class KoniCron {
 
   refreshNft = (address: string, apiMap: ApiMap, smartContractNfts: _ChainAsset[], chainInfoMap: Record<string, _ChainInfo>) => {
     return () => {
+      console.log(`[Cron] Running NFT refreshNft for ${address}`);
       this.subscriptions.subscribeNft(address, apiMap.substrate, apiMap.evm, smartContractNfts, chainInfoMap);
     };
   };
@@ -230,13 +237,23 @@ export class KoniCron {
     return Object.keys(serviceInfo.chainApiMap.substrate).length > 0 || Object.keys(serviceInfo.chainApiMap.evm).length > 0;
   };
 
+  detectNft = (address: string) => {
+    return () => {
+      console.log(`[Cron] Running NFT detection for ${address}`);
+      this.state.nftDetectionService.detectNft(address)
+        .catch((err) => console.warn(`[Cron] NFT detection failed for ${address}:`, err));
+    };
+  };
+
   public async reloadNft () {
     const address = this.state.keyringService.context.currentAccount.proxyId;
     const serviceInfo = this.state.getServiceInfo();
 
     this.resetNft(address);
     this.removeCron('refreshNft');
+    this.removeCron('detectNft');
     this.addCron('refreshNft', this.refreshNft(address, serviceInfo.chainApiMap, this.state.getSmartContractNfts(), this.state.getActiveChainInfoMap()), CRON_REFRESH_NFT_INTERVAL);
+    this.addCron('detectNft', this.detectNft(address), CRON_REFRESH_NFT_DETECT_INTERVAL);
 
     await waitTimeout(1800);
 

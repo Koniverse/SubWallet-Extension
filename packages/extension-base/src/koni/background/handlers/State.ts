@@ -32,6 +32,7 @@ import { KeyringService } from '@subwallet/extension-base/services/keyring-servi
 import MigrationService from '@subwallet/extension-base/services/migration-service';
 import MintCampaignService from '@subwallet/extension-base/services/mint-campaign-service';
 import MktCampaignService from '@subwallet/extension-base/services/mkt-campaign-service';
+import NftDetectionService from '@subwallet/extension-base/services/nft-service';
 import NotificationService from '@subwallet/extension-base/services/notification-service/NotificationService';
 import { PriceService } from '@subwallet/extension-base/services/price-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
@@ -135,6 +136,7 @@ export default class KoniState {
   readonly mintCampaignService: MintCampaignService;
   readonly campaignService: CampaignService;
   readonly mktCampaignService: MktCampaignService;
+  readonly nftDetectionService: NftDetectionService;
   readonly buyService: BuyService;
   readonly earningService: EarningService;
   readonly feeService: FeeService;
@@ -174,6 +176,7 @@ export default class KoniState {
 
     this.campaignService = new CampaignService(this);
     this.mktCampaignService = new MktCampaignService(this);
+    this.nftDetectionService = new NftDetectionService(this);
     this.buyService = new BuyService(this);
     this.earningService = new EarningService(this);
     this.swapService = new SwapService(this);
@@ -523,6 +526,72 @@ export default class KoniState {
 
   public deleteNftCollection (chain: string, collectionId: string) {
     return this.dbService.deleteNftCollection(chain, collectionId);
+  }
+
+  public async handleDetectedNfts (address: string, nftItems: NftItem[]) {
+    try {
+      const chainSlugs = this.activeChainSlugs;
+      const currentNfts = await this.dbService.getNft([address], chainSlugs);
+
+      // 1️⃣ Tìm NFT mới
+      const newNfts = nftItems.filter((n) => !currentNfts.some((c) => c.id === n.id));
+
+      console.log('newNfts', newNfts);
+
+      // 2️⃣ Lưu NFT mới
+      for (const nft of newNfts) {
+        this.updateNftData(nft.chain, nft, address);
+      }
+
+      // // 3️⃣ Tìm NFT đã mất
+      // const removedNfts = currentNfts.filter((c) => !nftItems.some((n) => n.id === c.id));
+      //
+      // if (removedNfts.length) {
+      //   const chain = removedNfts[0]?.chain || chainSlugs[0];
+      //
+      //   await this.dbService.cleanUpNft(chain, address, [], removedNfts.map((r) => r.id));
+      // }
+
+      // 4️⃣ Emit ra Subject để UI nhận update
+      // this.nftSubject.next({
+      //   nftList: nftItems,
+      //   total: nftItems.length
+      // });
+    } catch (e) {
+      this.logger.warn('handleDetectedNfts error:', e);
+    }
+  }
+
+  public async handleDetectedNftCollections (collections: NftCollection[]) {
+    try {
+      const chainSlugs = this.activeChainSlugs;
+      const currentCollections = await this.dbService.getAllNftCollection(chainSlugs);
+
+      // 1️⃣ Tìm collection mới (chưa tồn tại)
+      const newCollections = collections.filter(
+        (col) => !currentCollections.some(
+          (c) => c.collectionId === col.collectionId && c.chain === col.chain
+        )
+      );
+
+      // 2️⃣ Lưu collection mới
+      for (const col of newCollections) {
+        this.setNftCollection(col.chain, col);
+      }
+
+      // 3️⃣ (Tùy chọn) Xóa collection không còn tồn tại
+      // const removed = currentCollections.filter(
+      //   (c) => !collections.some((col) => col.collectionId === c.collectionId && col.chain === c.chain)
+      // );
+      // for (const col of removed) {
+      //   await this.deleteNftCollection(col.chain, col.collectionId);
+      // }
+
+      // 4️⃣ (Tùy chọn) Emit event cập nhật UI nếu bạn có Subject cho collection
+      // this.nftCollectionSubject?.next(collections);
+    } catch (e) {
+      this.logger.warn('handleDetectedNftCollections error:', e);
+    }
   }
 
   public cleanUpNfts (chain: string, owner: string, collectionId: string[], nftIds: string[], ownNothing?: boolean) {

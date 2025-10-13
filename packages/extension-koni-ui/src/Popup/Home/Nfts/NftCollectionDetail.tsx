@@ -36,6 +36,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const state = useLocation().state as INftCollectionDetail;
   const { collectionInfo, nftList } = state;
 
+  console.log('nftList', nftList);
+
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { goBack } = useDefaultNavigate();
