@@ -63,32 +63,31 @@ function mapSdkToNftItem (
   const properties: Record<string, string | number | boolean | null> = {};
 
   for (const attr of attributes) {
-    const key = attr.trait_type?.trim();
+    try {
+      const key = attr.trait_type?.trim();
 
-    if (!key) {
-      continue;
-    }
-
-    // Chuẩn hóa value
-    let value: string | number | boolean | null = attr.value;
-
-    // Convert boolean dạng chuỗi “true” / “false”
-    if (typeof value === 'string') {
-      const lower = value.toLowerCase();
-
-      if (lower === 'true') {
-        value = true;
-      } else if (lower === 'false') {
-        value = false;
+      if (!key) {
+        continue;
       }
-    }
 
-    // Gán vào properties
-    properties[key] = value;
+      let value = attr.value as unknown as string | number | boolean | null;
 
-    // Check rarity riêng
-    if (key.toLowerCase() === 'rarity') {
-      rarity = String(value);
+      if (typeof value === 'string') {
+        const lower = value.toLowerCase();
+
+        if (lower === 'true') {
+          value = true;
+        } else if (lower === 'false') {
+          value = false;
+        }
+      }
+
+      properties[key] = value;
+
+      if (key.toLowerCase() === 'rarity') {
+        rarity = String(value);
+      }
+    } catch {
     }
   }
 
@@ -98,7 +97,7 @@ function mapSdkToNftItem (
     id: rawInstance.id?.toString(),
     chain,
     collectionId,
-    owner: rawInstance.owner || owner, // fallback owner từ context
+    owner: rawInstance.owner || owner,
 
     originAsset: undefined,
     name: metadata.name || `#${rawInstance.id}`,
@@ -160,18 +159,13 @@ export default class NftDetectionService {
 
       const rawData: SdkCollectionsByChain = await nftDetectionApi.getEvmNftData(address);
 
-      console.log('rawNftsByChain', rawData);
-
       const allItems: NftItem[] = [];
       const allCollections: NftCollection[] = [];
 
-      // Lặp qua từng chain và map các NFT
       for (const [chain, collections] of Object.entries(rawData)) {
         if (!Array.isArray(collections)) {
           continue;
         }
-
-        console.log(`[NftDetectionService] Processing chain ${chain}, ${collections.length} collections`);
 
         for (const col of collections) {
           const mappedCollection = mapSdkToCollection(col, chain);
@@ -188,10 +182,6 @@ export default class NftDetectionService {
         }
       }
 
-      console.log(`[NftDetectionService] ${address}: Detected ${allItems.length} NFT items in ${allCollections.length} collections`);
-
-      console.log('allItems', allItems);
-      console.log('allCollections', allCollections);
       await this.state.handleDetectedNftCollections(allCollections);
       await this.state.handleDetectedNfts(address, allItems);
     } catch (err) {

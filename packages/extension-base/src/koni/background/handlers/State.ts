@@ -533,30 +533,11 @@ export default class KoniState {
       const chainSlugs = this.activeChainSlugs;
       const currentNfts = await this.dbService.getNft([address], chainSlugs);
 
-      // 1️⃣ Tìm NFT mới
       const newNfts = nftItems.filter((n) => !currentNfts.some((c) => c.id === n.id));
 
-      console.log('newNfts', newNfts);
-
-      // 2️⃣ Lưu NFT mới
       for (const nft of newNfts) {
         this.updateNftData(nft.chain, nft, address);
       }
-
-      // // 3️⃣ Tìm NFT đã mất
-      // const removedNfts = currentNfts.filter((c) => !nftItems.some((n) => n.id === c.id));
-      //
-      // if (removedNfts.length) {
-      //   const chain = removedNfts[0]?.chain || chainSlugs[0];
-      //
-      //   await this.dbService.cleanUpNft(chain, address, [], removedNfts.map((r) => r.id));
-      // }
-
-      // 4️⃣ Emit ra Subject để UI nhận update
-      // this.nftSubject.next({
-      //   nftList: nftItems,
-      //   total: nftItems.length
-      // });
     } catch (e) {
       this.logger.warn('handleDetectedNfts error:', e);
     }
@@ -564,31 +545,17 @@ export default class KoniState {
 
   public async handleDetectedNftCollections (collections: NftCollection[]) {
     try {
-      const chainSlugs = this.activeChainSlugs;
-      const currentCollections = await this.dbService.getAllNftCollection(chainSlugs);
+      const currentCollections = await this.getNftCollection();
 
-      // 1️⃣ Tìm collection mới (chưa tồn tại)
       const newCollections = collections.filter(
         (col) => !currentCollections.some(
           (c) => c.collectionId === col.collectionId && c.chain === col.chain
         )
       );
 
-      // 2️⃣ Lưu collection mới
       for (const col of newCollections) {
         this.setNftCollection(col.chain, col);
       }
-
-      // 3️⃣ (Tùy chọn) Xóa collection không còn tồn tại
-      // const removed = currentCollections.filter(
-      //   (c) => !collections.some((col) => col.collectionId === c.collectionId && col.chain === c.chain)
-      // );
-      // for (const col of removed) {
-      //   await this.deleteNftCollection(col.chain, col.collectionId);
-      // }
-
-      // 4️⃣ (Tùy chọn) Emit event cập nhật UI nếu bạn có Subject cho collection
-      // this.nftCollectionSubject?.next(collections);
     } catch (e) {
       this.logger.warn('handleDetectedNftCollections error:', e);
     }

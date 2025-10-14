@@ -285,19 +285,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               />
 
               {
-                nftItem.properties && Object.entries(nftItem.properties).map(([attName, attValueObj], index) => {
-                  const { value: attValue } = attValueObj as Record<string, string>;
-
-                  console.log('nftItem.properties', nftItem.properties);
-                  console.log('attValue', attValue);
-                  console.log('attName', attName);
+                nftItem.properties &&
+                Object.entries(nftItem.properties as Record<string, any>).map(([attName, attValueRaw], index) => {
+                  const attValue =
+                    typeof attValueRaw === 'object' && attValueRaw !== null && 'value' in attValueRaw
+                      ? String((attValueRaw as { value: string }).value)
+                      : String(attValueRaw);
 
                   return (
                     <Field
-                      content={attValue.toString()}
+                      content={attValue}
                       key={index}
                       label={attName}
-                      width={'fit-content'}
+                      width='fit-content'
                     />
                   );
                 })
