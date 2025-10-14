@@ -224,7 +224,6 @@ export class KoniCron {
 
   refreshNft = (address: string, apiMap: ApiMap, smartContractNfts: _ChainAsset[], chainInfoMap: Record<string, _ChainInfo>) => {
     return () => {
-      console.log(`[Cron] Running NFT refreshNft for ${address}`);
       this.subscriptions.subscribeNft(address, apiMap.substrate, apiMap.evm, smartContractNfts, chainInfoMap);
     };
   };
@@ -239,7 +238,6 @@ export class KoniCron {
 
   detectNft = (address: string) => {
     return () => {
-      console.log(`[Cron] Running NFT detection for ${address}`);
       this.state.nftDetectionService.detectNft(address)
         .catch((err) => console.warn(`[Cron] NFT detection failed for ${address}:`, err));
     };
