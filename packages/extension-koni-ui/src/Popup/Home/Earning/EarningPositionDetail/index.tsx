@@ -18,7 +18,7 @@ import { getTransactionFromAccountProxyValue, isAccountAll } from '@subwallet/ex
 import { Button, ButtonProps, Icon, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { MinusCircle, Plus, PlusCircle } from 'phosphor-react';
+import { CheckCircle, MinusCircle, Plus, PlusCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -113,9 +113,29 @@ function Component ({ compound,
     }
   }, [targetAddress, isAllAccount, poolInfo.slug, rewardHistories]);
 
+  const totalNominationStake = useMemo(() => {
+    let total = BN_ZERO;
+
+    if (!compound?.nominations?.length) {
+      return total;
+    }
+
+    for (const nomination of compound.nominations) {
+      const stake = new BigN(nomination.activeStake || 0);
+
+      total = total.plus(stake);
+    }
+
+    return total;
+  }, [compound.nominations]);
+
   const isActiveStakeZero = useMemo(() => {
     return BN_ZERO.eq(activeStake);
   }, [activeStake]);
+
+  const isTotalNominationStakeZero = useMemo(() => {
+    return BN_ZERO.eq(totalNominationStake);
+  }, [totalNominationStake]);
 
   const transactionFromValue = useMemo(() => {
     return targetAddress ? isAccountAll(targetAddress) ? '' : targetAddress : '';
@@ -140,6 +160,21 @@ function Component ({ compound,
       return;
     }
 
+    if (isTotalNominationStakeZero) {
+      openAlert({
+        title: t('ui.EARNING.screen.EarningPositionDetail.unstakeNotAvailable'),
+        type: NotificationType.ERROR,
+        content: t('ui.EARNING.screen.EarningPositionDetail.noStakedFunds'),
+        okButton: {
+          text: t('ui.EARNING.screen.EarningPositionDetail.iUnderstand'),
+          onClick: closeAlert,
+          icon: CheckCircle
+        }
+      });
+
+      return;
+    }
+
     setUnStakeStorage({
       ...DEFAULT_UN_STAKE_PARAMS,
       slug: poolInfo.slug,
@@ -147,7 +182,7 @@ function Component ({ compound,
       from: transactionFromValue
     });
     navigate('/transaction/unstake');
-  }, [isActiveStakeZero, setUnStakeStorage, poolInfo.slug, transactionChainValue, transactionFromValue, navigate, openAlert, t, closeAlert]);
+  }, [isActiveStakeZero, isTotalNominationStakeZero, setUnStakeStorage, poolInfo.slug, transactionChainValue, transactionFromValue, navigate, openAlert, t, closeAlert]);
 
   const onEarnMore = useCallback(() => {
     setEarnStorage({

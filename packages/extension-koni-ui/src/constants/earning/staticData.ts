@@ -224,6 +224,16 @@ export const EARNING_DATA_RAW = {
   [YieldPoolType.SINGLE_FARMING]: []
 };
 
+export const TANSSI_EARNING_DATA_RAW = EARNING_DATA_RAW[YieldPoolType.NATIVE_STAKING].map((item) =>
+  item.icon === 'Coins'
+    ? {
+      ...item,
+      description:
+        'Once staked, your funds will be locked. Unstake your funds anytime and they will be <strong>automatically withdrawn</strong> to your account <strong>within 12 hours</strong>. Keep in mind that the unstaking action will incur network fees.'
+    }
+    : item
+);
+
 export const STAKE_ALERT_DATA = {
   title: 'Pay attention!',
   description:
