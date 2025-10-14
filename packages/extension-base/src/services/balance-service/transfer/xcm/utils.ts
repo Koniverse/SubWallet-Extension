@@ -77,8 +77,9 @@ const version = '/v4';
 
 const paraSpellApi = {
   buildXcm: `${version}/x-transfer`,
+  feeXcm: `${version}/xcm-fee`,
   dryRunXcm: `${version}/dry-run`,
-  feeXcm: `${version}/xcm-fee`
+  dryRunPreviewXcm: `${version}/dry-run-preview`
 };
 
 function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> {
@@ -241,6 +242,54 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   return await response.json() as DryRunResult;
 }
 
+export async function dryRunPreviewXcm (request: CreateXcmExtrinsicProps) {
+  const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
+  const paraSpellChainMap = await fetchParaSpellChainMap();
+  const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
+
+  if (!paraSpellIdentifyV4) {
+    throw new Error('Token is not support XCM at this time');
+  }
+
+  const bodyData = {
+    senderAddress: sender,
+    address: recipient,
+    from: paraSpellChainMap[originChain.slug],
+    to: paraSpellChainMap[destinationChain.slug],
+    currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
+    options: {
+      abstractDecimals: false,
+      mintFeeAssets: true
+    }
+  };
+
+  const response = await fetchFromProxyService(
+    ProxyServiceRoute.PARASPELL,
+    paraSpellApi.dryRunPreviewXcm, // todo: add this to proxy service
+    {
+      method: 'POST',
+      body: JSON.stringify(bodyData),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json() as ParaSpellError; // todo: check interface
+
+    return {
+      origin: {
+        success: false,
+        failureReason: error.message
+      }
+    } as DryRunResult; // todo: check interface
+  }
+
+  return await response.json() as DryRunResult; // todo: check interface
+}
+
 export async function estimateXcmFee (request: GetXcmFeeRequest) {
   const { fromChainInfo, fromTokenInfo, recipient, sender, toChainInfo, value } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
@@ -286,8 +335,6 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
 }
 
 function createParaSpellCurrency (paraSpellIdentifyV4: Record<string, any>, amount: string): ParaSpellCurrency {
-  // todo: handle complex conditions for asset has same symbol in a chain: Id, Multi-location, ...
-  // todo: or update all asset to use multi-location
   return {
     ...paraSpellIdentifyV4,
     amount

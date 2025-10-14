@@ -459,11 +459,19 @@ export class SwapBaseHandler {
         feeInfo
       };
 
-      const isDryRunSuccess = await dryRunXcmExtrinsicV2(xcmRequest);
+      // todo: recheck for all cases
+      if (isFirstBridge) {
+        const isDryRunSuccess = await dryRunXcmExtrinsicV2(xcmRequest, false);
 
-      // temp skip dry-run for later step todo: wait for dry-run-predict
-      if (isFirstBridge && !isDryRunSuccess) {
-        return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again')];
+        if (!isDryRunSuccess) {
+          return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again')];
+        }
+      } else {
+        const isDryRunPreviewSuccess = await dryRunXcmExtrinsicV2(xcmRequest, true);
+
+        if (!isDryRunPreviewSuccess) {
+          return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again')]; // todo: recheck content suitable
+        }
       }
     }
 

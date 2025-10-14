@@ -6,7 +6,7 @@ import { _isAcrossBridgeXcm, _isPolygonBridgeXcm, _isPosBridgeXcm, _isSnowBridge
 import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
-import { buildXcm, dryRunXcm, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { buildXcm, dryRunPreviewXcm, dryRunXcm, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
@@ -134,9 +134,9 @@ export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
   }
 };
 
-export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<boolean> => {
+export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps, isPreview = false): Promise<boolean> => {
   try {
-    const dryRunResult = await dryRunXcm(request);
+    const dryRunResult = isPreview ? await dryRunPreviewXcm(request) : await dryRunXcm(request);
     const originDryRunRs = dryRunResult.origin;
 
     if (originDryRunRs.success) {
