@@ -5,7 +5,7 @@ import { ActionType } from '@subwallet/extension-base/core/types';
 import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountSignMode, AnalyzeAddress, AnalyzedGroup } from '@subwallet/extension-base/types';
 import { _reformatAddressWithChain, getAccountChainTypeForAddress } from '@subwallet/extension-base/utils';
-import { AddressSelectorItem, BackIcon } from '@subwallet/extension-koni-ui/components';
+import { AddressSelectorItem, BackIcon, EmptyList } from '@subwallet/extension-koni-ui/components';
 import { useChainInfo, useCoreCreateReformatAddress, useFilterModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { useGetExcludedTokens } from '@subwallet/extension-koni-ui/hooks/assets';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -14,12 +14,11 @@ import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { Badge, Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import CN from 'classnames';
-import { FadersHorizontal } from 'phosphor-react';
+import { FadersHorizontal, MagnifyingGlass } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { GeneralEmptyList } from '../../EmptyList';
 import { FilterModal } from '../FilterModal';
 
 interface Props extends ThemeProps {
@@ -35,8 +34,6 @@ interface FilterOption {
   label: string;
   value: AnalyzedGroup;
 }
-
-const renderEmpty = () => <GeneralEmptyList />;
 
 const getGroupPriority = (item: AnalyzeAddress): number => {
   switch (item.analyzedGroup) {
@@ -87,6 +84,26 @@ const Component: React.FC<Props> = (props: Props) => {
       value: AnalyzedGroup.RECENT
     }
   ]), [t]);
+
+  const renderEmpty = useCallback(() => {
+    let emptyMessage = '';
+
+    if (actionType === ActionType.SEND_NFT) {
+      emptyMessage = t('ui.components.Modal.AddressBook.noAvailableAccountsForNftSend');
+    } else if (actionType === ActionType.SEND_FUND) {
+      emptyMessage = t('ui.components.Modal.AddressBook.noAvailableAccountsForTokenTransfer');
+    } else if (actionType === ActionType.SWAP) {
+      emptyMessage = t('ui.components.Modal.AddressBook.noAvailableAccountsForSwapPair');
+    }
+
+    return (
+      <EmptyList
+        emptyMessage={emptyMessage}
+        emptyTitle={t('ui.components.Modal.AddressBook.noAccountsFound')}
+        phosphorIcon={MagnifyingGlass}
+      />
+    );
+  }, [actionType, t]);
 
   const items = useMemo((): AnalyzeAddress[] => {
     if (!chainInfo) {
