@@ -62,6 +62,7 @@ import { AccountChainType, AccountJson, AccountProxyMap, AccountSignMode, Accoun
 import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
+import { RequestGetProxyAccounts } from '@subwallet/extension-base/types/proxy';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
@@ -5207,6 +5208,10 @@ export default class KoniExtension {
   private pingSession (request: RequestPingSession): boolean {
     return this.#koniState.keyringService.context.pingSession(request);
   }
+
+  private getProxyAccounts (request: RequestGetProxyAccounts) {
+    return this.#koniState.proxyService.getProxyAccounts(request);
+  }
   /* Migrate Unified Account */
 
   // --------------------------------------------------------------
@@ -5880,6 +5885,11 @@ export default class KoniExtension {
         return this.migrateSoloAccount(request as RequestMigrateSoloAccount);
       case 'pri(migrate.pingSession)':
         return this.pingSession(request as RequestPingSession);
+
+      // Proxy
+      case 'pri(proxy.getProxyAccounts)':
+        return this.getProxyAccounts(request as RequestGetProxyAccounts);
+
       // Default
       default:
         throw new Error(`Unable to handle message of type ${type}`);
