@@ -177,7 +177,6 @@ export class KoniCron {
     }
 
     this.status = 'running';
-    console.log('[Cron] Active cron jobs:', Object.keys(this.cronMap));
   };
 
   stop = async () => {
