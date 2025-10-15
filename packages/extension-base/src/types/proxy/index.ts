@@ -10,9 +10,12 @@ export interface RequestGetProxyAccounts {
   selectedProxyAdress?: string[]
 }
 
+export type ProxyType = 'Any' | 'NonTransfer' | 'Governance' | 'Staking';
+
 export interface ProxyItem {
   proxyAddress: string;
-  proxyType: string;
+  proxyType: ProxyType
+  delay: number;
 }
 
 export interface ProxyAccounts {

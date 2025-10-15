@@ -1,14 +1,17 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { ProxyAccounts, ProxyItem, RequestGetProxyAccounts } from '@subwallet/extension-base/types/proxy';
+import { BasicTxErrorType } from '@subwallet/extension-base/types';
+import { ProxyAccounts, ProxyItem, ProxyType, RequestGetProxyAccounts } from '@subwallet/extension-base/types/proxy';
 
 import { _SubstrateApi } from '../chain-service/types';
+import { typeToProxyMap } from './constant';
 
 type PrimitiveProxyItem = {
   delegate: string;
-  proxyType: string;
+  proxyType: ProxyType;
   delay: number;
 };
 
@@ -24,19 +27,32 @@ export default class ProxyService {
   }
 
   async getProxyAccounts (request: RequestGetProxyAccounts): Promise<ProxyAccounts> {
-    const { address, chain } = request;
+    const { address, chain, selectedProxyAdress, type } = request;
     const substrateApi = this.getSubstrateApi(chain);
 
     await substrateApi.isReady;
 
     const result = await substrateApi.api.query.proxy.proxies(address);
 
-    const [entries, deposit] = result.toPrimitive() as [PrimitiveProxyItem[], string];
+    const [proxyAccounts, deposit] = result.toPrimitive() as [PrimitiveProxyItem[], string];
 
-    const proxies: ProxyItem[] = (entries || []).map((entry) => ({
-      proxyAddress: entry.delegate,
-      proxyType: entry.proxyType
+    let proxies: ProxyItem[] = (proxyAccounts || []).map((account) => ({
+      proxyAddress: account.delegate,
+      proxyType: account.proxyType,
+      delay: account.delay
     }));
+
+    if (type) {
+      const allowedSet = new Set([...(typeToProxyMap[type] || []), 'Any']);
+
+      proxies = proxies.filter((p) => allowedSet.has(p.proxyType));
+    }
+
+    if (selectedProxyAdress && selectedProxyAdress.length > 0) {
+      proxies = proxies.filter(
+        (p) => !selectedProxyAdress.includes(p.proxyAddress)
+      );
+    }
 
     return {
       proxies,
@@ -44,23 +60,40 @@ export default class ProxyService {
     };
   }
 
-  //   async calculateProxyDeposit (chain: string, currentCount = 0) {
-  //     const api = await this.getApi(chain);
-  //     const base = api.consts.proxy.proxyDepositBase.toBn();
-  //     const factor = api.consts.proxy.proxyDepositFactor.toBn();
+  async addProxyAccounts (chain: string, proxyAddress: string, proxyType: ProxyType) {
+    const substrateApi = this.getSubstrateApi(chain);
 
-  //     return base.add(factor.muln(currentCount));
-  //   }
+    await substrateApi.isReady;
 
-  //   async createAddProxyExtrinsic (chain: string, delegate: string, proxyType: string, delay: number) {
-  //     const api = await this.getApi(chain);
+    // Currently we not support delay time
+    return substrateApi.api.tx.proxy.addProxy(proxyAddress, proxyType, 0);
+  }
 
-  //     return api.tx.proxy.addProxy(delegate, proxyType, delay);
-  //   }
+  async removeProxyAccounts (chain: string, selectedProxyAccounts: ProxyItem[], isRemoveAll?: boolean) {
+    const substrateApi = this.getSubstrateApi(chain);
 
-  //   async createRemoveProxyExtrinsic (chain: string, delegate: string, proxyType: string, delay: number) {
-  //     const api = await this.getApi(chain);
+    await substrateApi.isReady;
 
-//     return api.tx.proxy.removeProxy(delegate, proxyType, delay);
-//   }
+    const api = substrateApi.api;
+
+    if (isRemoveAll) {
+      return api.tx.proxy.removeProxies();
+    }
+
+    if (!selectedProxyAccounts.length) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
+    }
+
+    if (selectedProxyAccounts.length === 1) {
+      const { delay, proxyAddress, proxyType } = selectedProxyAccounts[0];
+
+      return api.tx.proxy.removeProxy(proxyAddress, proxyType, delay);
+    }
+
+    const removeProxies = selectedProxyAccounts.map(({ delay, proxyAddress, proxyType }) =>
+      api.tx.proxy.removeProxy(proxyAddress, proxyType, delay)
+    );
+
+    return api.tx.utility.batchAll(removeProxies);
+  }
 }
