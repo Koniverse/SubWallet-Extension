@@ -2229,23 +2229,52 @@ export default class KoniExtension {
   private async validateERC721Token (data: _ChainAsset): Promise<boolean> {
     const evmApi = this.#koniState.getEvmApi(data.originChain);
     const contractAddress = data.metadata?.contractAddress;
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const tokenContract = new evmApi.api.eth.Contract(_ERC721_ABI, contractAddress);
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      await tokenContract.methods.tokenOfOwnerByIndex('0xB7fdD27a8Df011816205a6e3cAA097DC4D8C2C5d', 1).call();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const supports721 = await tokenContract.methods.supportsInterface('0x80ac58cd').call().catch(() => false);
 
-      return true;
+      if (supports721) {
+        return true;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const supports1155 = await tokenContract.methods.supportsInterface('0xd9b67a26').call().catch(() => false);
+
+      if (supports1155) {
+        return false;
+      }
+
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        await tokenContract.methods.ownerOf(1).call();
+
+        return true;
+      } catch (err: any) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        if (err.message?.includes('nonexistent token') || err.message?.includes('invalid token ID')) {
+          return true;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        await tokenContract.methods.balanceOf('0x0000000000000000000000000000000000000001').call();
+
+        return true;
+      }
     } catch (err) {
       const error = err as Error;
 
-      if (error.message.includes('index out of bounds')) {
-        return true;
-      } else {
+      if (
+        error.message.includes('ERC1155') ||
+        error.message.includes('function selector') ||
+        error.message.includes('execution reverted') ||
+        error.message.includes('invalid opcode')
+      ) {
         return false;
       }
+
+      return false;
     }
   }
 
