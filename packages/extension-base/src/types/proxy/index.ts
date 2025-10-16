@@ -7,7 +7,7 @@ export interface RequestGetProxyAccounts {
   chain: string;
   address: string;
   type?: ExtrinsicType
-  selectedProxyAdress?: string[]
+  selectedProxyAddress?: string[]
 }
 
 export type ProxyType = 'Any' | 'NonTransfer' | 'Governance' | 'Staking';

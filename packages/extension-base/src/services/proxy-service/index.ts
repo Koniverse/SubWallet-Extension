@@ -27,7 +27,7 @@ export default class ProxyService {
   }
 
   async getProxyAccounts (request: RequestGetProxyAccounts): Promise<ProxyAccounts> {
-    const { address, chain, selectedProxyAdress, type } = request;
+    const { address, chain, selectedProxyAddress, type } = request;
     const substrateApi = this.getSubstrateApi(chain);
 
     await substrateApi.isReady;
@@ -37,25 +37,25 @@ export default class ProxyService {
     const [proxyAccounts, deposit] = result.toPrimitive() as [PrimitiveProxyItem[], string];
 
     let proxies: ProxyItem[] = (proxyAccounts || []).map((account) => {
-    const proxyId = this.state.keyringService.context.belongUnifiedAccount(account.delegate);
+      const proxyId = this.state.keyringService.context.belongUnifiedAccount(account.delegate);
 
-    return {
+      return {
         proxyAddress: account.delegate,
         proxyType: account.proxyType,
         delay: account.delay,
         proxyId
       };
     });
-    
+
     if (type) {
       const allowedSet = new Set([...(typeToProxyMap[type] || []), 'Any']);
 
       proxies = proxies.filter((p) => allowedSet.has(p.proxyType));
     }
 
-    if (selectedProxyAdress && selectedProxyAdress.length > 0) {
+    if (selectedProxyAddress && selectedProxyAddress.length > 0) {
       proxies = proxies.filter(
-        (p) => !selectedProxyAdress.includes(p.proxyAddress)
+        (p) => !selectedProxyAddress.includes(p.proxyAddress)
       );
     }
 
