@@ -182,7 +182,7 @@ function Component ({ compound,
       from: transactionFromValue
     });
     navigate('/transaction/unstake');
-  }, [isActiveStakeZero, isTotalNominationStakeZero, setUnStakeStorage, poolInfo.slug, transactionChainValue, transactionFromValue, navigate, openAlert, t, closeAlert]);
+  }, [isTotalNominationStakeZero, isActiveStakeZero, poolInfo.metadata.availableMethod.withdraw, poolInfo.slug, setUnStakeStorage, transactionChainValue, transactionFromValue, navigate, openAlert, t, closeAlert]);
 
   const onEarnMore = useCallback(() => {
     setEarnStorage({
