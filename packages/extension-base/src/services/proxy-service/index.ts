@@ -36,12 +36,17 @@ export default class ProxyService {
 
     const [proxyAccounts, deposit] = result.toPrimitive() as [PrimitiveProxyItem[], string];
 
-    let proxies: ProxyItem[] = (proxyAccounts || []).map((account) => ({
-      proxyAddress: account.delegate,
-      proxyType: account.proxyType,
-      delay: account.delay
-    }));
+    let proxies: ProxyItem[] = (proxyAccounts || []).map((account) => {
+    const proxyId = this.state.keyringService.context.belongUnifiedAccount(account.delegate);
 
+    return {
+        proxyAddress: account.delegate,
+        proxyType: account.proxyType,
+        delay: account.delay,
+        proxyId
+      };
+    });
+    
     if (type) {
       const allowedSet = new Set([...(typeToProxyMap[type] || []), 'Any']);
 

@@ -4,8 +4,6 @@
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { ProxyType } from '@subwallet/extension-base/types/proxy';
 
-export const SUPPORTED_PROXY_CHAINS = ['statemine', 'statemint', 'westend_assethub'];
-
 const PROXY_EXTRINSIC_GROUPS: Record<string, ExtrinsicType[]> = {
   STAKING: [
     ExtrinsicType.STAKING_BOND,

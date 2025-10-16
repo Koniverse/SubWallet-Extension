@@ -16,6 +16,7 @@ export interface ProxyItem {
   proxyAddress: string;
   proxyType: ProxyType
   delay: number;
+  proxyId?: string;
 }
 
 export interface ProxyAccounts {
