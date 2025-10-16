@@ -1738,7 +1738,7 @@ export default class TransactionService {
     return emitter;
   }
 
-  private signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, signAfterCreate, step, tokenPayFeeSlug, transaction, url }: SWTransaction): TransactionEmitter {
+  private async signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, proxyAddress, signAfterCreate, step, tokenPayFeeSlug, transaction, url }: SWTransaction): Promise<TransactionEmitter> {
     const tip = (feeCustom as SubstrateTipInfo)?.tip || '0';
     const feeAssetId = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug) && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain) ? this.state.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.multilocation as Record<string, any> : undefined;
 
@@ -1751,14 +1751,26 @@ export default class TransactionService {
       processId: step?.processId
     };
 
-    const extrinsic = transaction as SubmittableExtrinsic;
+    let extrinsic = transaction as SubmittableExtrinsic;
+
+    let signer = address;
+
+    if (proxyAddress && proxyAddress !== address) {
+      const substrateApi = this.state.chainService.getSubstrateApi(chain);
+
+      await substrateApi.isReady;
+
+      signer = proxyAddress;
+      extrinsic = substrateApi.api.tx.proxy.proxy(address, null, transaction as SubmittableExtrinsic);
+    }
+
     // const registry = extrinsic.registry;
     // const signedExtensions = registry.signedExtensions;
 
     const signerOption: Partial<SignerOptions> = {
       signer: {
         signPayload: async (payload: SignerPayloadJSON) => {
-          const { signature, signedTransaction } = await this.state.requestService.signInternalTransaction(id, address, url || EXTENSION_REQUEST_URL, payload, signAfterCreate);
+          const { signature, signedTransaction } = await this.state.requestService.signInternalTransaction(id, signer, url || EXTENSION_REQUEST_URL, payload, signAfterCreate);
 
           return {
             id: (new Date()).getTime(),
@@ -1781,7 +1793,7 @@ export default class TransactionService {
     //   }
     // }
 
-    extrinsic.signAsync(address, signerOption).then(async (rs) => {
+    extrinsic.signAsync(signer, signerOption).then(async (rs) => {
       // Emit signed event
       emitter.emit('signed', eventData);
 

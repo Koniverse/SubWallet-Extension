@@ -21,7 +21,9 @@ import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balan
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { _reformatAddressWithChain, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenSelector } from '@subwallet/extension-koni-ui/components';
-import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
+import ProxyAccountSelectorModal from '@subwallet/extension-koni-ui/components/Modal/Proxy/ProxyAccountSelectorModal';
+import { useProxyAccounts } from '@subwallet/extension-koni-ui/components/Modal/Proxy/useProxyAccounts';
+import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, PROXY_ACCOUNT_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useAlert, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
@@ -32,7 +34,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ChainItemType, FormCallbacks, Theme, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
 import { findAccountByAddress, formatBalance, getSignModeByAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
-import { Button, Form, Icon } from '@subwallet/react-ui';
+import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -121,6 +123,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const { t } = useTranslation();
   const notification = useNotification();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
+  const { activeModal, inactiveModal } = useContext(ModalContext);
 
   const { defaultData, persistData } = useTransactionContext<TransferParams>();
   const { defaultSlug: sendFundSlug } = defaultData;
@@ -159,6 +162,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const getChainAndExcludedTokenByAccountProxy = useCreateGetChainAndExcludedTokenByAccountProxy();
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
+  const [proxyModalHandler, setProxyModalHandler] = useState<((selectedProxy: string | null) => void) | null>(null);
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('send-fund');
   const checkAction = usePreCheckAction(fromValue, true, t('ui.TRANSACTION.screen.Transaction.SendFund.cannotSendWithAccountType'));
 
@@ -253,6 +257,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       }
     }
   }, [chainValue, currentChainAsset, destChainValue]);
+
+  const proxyAccounts = useProxyAccounts(chainValue, fromValue, extrinsicType);
 
   const accountAddressItems = useMemo(() => {
     const chainInfo = chainValue ? chainInfoMap[chainValue] : undefined;
@@ -557,43 +563,94 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     return false;
   }, [accounts, assetRegistry, notification, t]);
 
-  const handleBasicSubmit = useCallback((values: TransferParams, options: TransferOptions): Promise<SWTransactionResponse> => {
-    const { asset, chain, destChain, from, to, value } = values;
-    let sendPromise: Promise<SWTransactionResponse>;
+  const closeProxyAccountSelectorModal = useCallback(() => {
+    inactiveModal(PROXY_ACCOUNT_SELECTOR_MODAL);
+  }, [inactiveModal]);
 
-    if (chain === destChain) {
-      // Transfer token or send fund
-      sendPromise = makeTransfer({
-        from,
-        chain,
-        to: to,
-        tokenSlug: asset,
-        value: value,
-        transferAll: options.isTransferAll,
-        transferBounceable: options.isTransferBounceable,
-        feeOption: selectedTransactionFee?.feeOption,
-        feeCustom: selectedTransactionFee?.feeCustom,
-        tokenPayFeeSlug: currentTokenPayFee
-      });
-    } else {
-      // Make cross chain transfer
-      sendPromise = makeCrossChainTransfer({
-        destinationNetworkKey: destChain,
-        from,
-        originNetworkKey: chain,
-        tokenSlug: asset,
-        to,
-        value,
-        transferAll: options.isTransferAll,
-        transferBounceable: options.isTransferBounceable,
-        feeOption: selectedTransactionFee?.feeOption,
-        feeCustom: selectedTransactionFee?.feeCustom,
-        tokenPayFeeSlug: undefined // todo: support pay local fee for xcm later
-      });
+  const handleProxyApply = useCallback((selectedProxy: string | null) => {
+    if (proxyModalHandler) {
+      proxyModalHandler(selectedProxy);
+      setProxyModalHandler(null);
     }
+  }, [proxyModalHandler]);
 
-    return sendPromise;
-  }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee]);
+  const handleProxyCancel = useCallback(() => {
+    closeProxyAccountSelectorModal();
+    setProxyModalHandler(null);
+    setLoading(false);
+  }, [closeProxyAccountSelectorModal]);
+
+  const handleBasicSubmit = useCallback(
+    (values: TransferParams, options: TransferOptions): Promise<SWTransactionResponse> => {
+      const { asset, chain, destChain, from, to, value } = values;
+
+      return new Promise<SWTransactionResponse>((resolve, reject) => {
+        if (proxyAccounts && proxyAccounts.length > 0) {
+          activeModal(PROXY_ACCOUNT_SELECTOR_MODAL);
+
+          const handleSelectProxy = (selectedProxy: string | null) => {
+            closeProxyAccountSelectorModal();
+
+            if (!selectedProxy) {
+              return reject(new Error('Proxy not selected'));
+            }
+
+            const baseParams = {
+              from,
+              chain,
+              to,
+              tokenSlug: asset,
+              value,
+              transferAll: options.isTransferAll,
+              transferBounceable: options.isTransferBounceable,
+              feeOption: selectedTransactionFee?.feeOption,
+              feeCustom: selectedTransactionFee?.feeCustom,
+              tokenPayFeeSlug: currentTokenPayFee,
+              proxyAddress: selectedProxy
+            };
+
+            const sendPromise =
+            chain === destChain
+              ? makeTransfer(baseParams)
+              : makeCrossChainTransfer({
+                ...baseParams,
+                destinationNetworkKey: destChain,
+                originNetworkKey: chain,
+                tokenPayFeeSlug: undefined // todo: support pay local fee for xcm later
+              });
+
+            sendPromise.then(resolve).catch(reject);
+          };
+
+          setProxyModalHandler(() => handleSelectProxy);
+        } else {
+          const baseParams = {
+            from,
+            chain,
+            to,
+            tokenSlug: asset,
+            value,
+            transferAll: options.isTransferAll,
+            transferBounceable: options.isTransferBounceable,
+            feeOption: selectedTransactionFee?.feeOption,
+            feeCustom: selectedTransactionFee?.feeCustom,
+            tokenPayFeeSlug: currentTokenPayFee
+          };
+
+          const sendPromise =
+          chain === destChain
+            ? makeTransfer(baseParams)
+            : makeCrossChainTransfer({
+              ...baseParams,
+              destinationNetworkKey: destChain,
+              originNetworkKey: chain,
+              tokenPayFeeSlug: undefined
+            });
+
+          sendPromise.then(resolve).catch(reject);
+        }
+      });
+    }, [proxyAccounts, activeModal, closeProxyAccountSelectorModal, selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee]);
 
   // todo: must refactor later, temporary solution to support SnowBridge
   const handleBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
@@ -1184,6 +1241,19 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             <AlertModal
               modalId={alertModalId}
               {...alertProps}
+            />
+          )
+        }
+        {
+          proxyAccounts.length > 0 &&
+          (
+            <ProxyAccountSelectorModal
+              address={fromValue}
+              chain={chainValue}
+              modalId={PROXY_ACCOUNT_SELECTOR_MODAL}
+              onApply={handleProxyApply}
+              onCancel={handleProxyCancel}
+              proxyItems={proxyAccounts}
             />
           )
         }
