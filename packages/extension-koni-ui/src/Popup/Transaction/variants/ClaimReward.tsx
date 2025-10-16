@@ -71,10 +71,11 @@ const filterAccount = (
     const isAstarNetwork = _STAKING_CHAIN_GROUP.astar.includes(_poolChain);
     const isMythosNetwork = _STAKING_CHAIN_GROUP.mythos.includes(_poolChain);
     const isAmplitudeNetwork = _STAKING_CHAIN_GROUP.amplitude.includes(_poolChain);
+    const isTanssiNetwork = _STAKING_CHAIN_GROUP.tanssi.includes(_poolChain);
     const bnUnclaimedReward = new BigN(reward?.unclaimedReward || '0');
 
     return (
-      ((poolType === YieldPoolType.NOMINATION_POOL || isAmplitudeNetwork || isMythosNetwork) && bnUnclaimedReward.gt(BN_ZERO)) ||
+      ((poolType === YieldPoolType.NOMINATION_POOL || isAmplitudeNetwork || isMythosNetwork || isTanssiNetwork) && bnUnclaimedReward.gt(BN_ZERO)) ||
       isAstarNetwork
     );
   };

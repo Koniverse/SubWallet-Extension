@@ -35,10 +35,24 @@ const filterAccount = (
   positionInfos: YieldPositionInfo[],
   chainInfoMap: Record<string, _ChainInfo>,
   poolType: YieldPoolType,
-  poolChain?: string
+  poolChain?: string,
+  canPoolWithdraw?: boolean
 ): ((account: AccountJson) => boolean) => {
   return (account: AccountJson): boolean => {
-    const nominator = positionInfos.find((item) => item.address.toLowerCase() === account.address.toLowerCase());
+    let stakedPositions = positionInfos;
+
+    if (!canPoolWithdraw) {
+      stakedPositions = positionInfos.filter((item) => {
+        const totalNominationStake =
+          item.nominations?.reduce((acc, n) => acc.plus(n.activeStake || 0), BN_ZERO) || BN_ZERO;
+
+        return totalNominationStake.gt(BN_ZERO);
+      });
+    }
+
+    const nominator = stakedPositions.find(
+      (item) => item.address.toLowerCase() === account.address.toLowerCase()
+    );
 
     return (
       new BigN(nominator?.activeStake || BN_ZERO).gt(BN_ZERO) &&
@@ -62,6 +76,7 @@ const Component: React.FC = () => {
   const poolInfo = poolInfoMap[slug];
   const poolType = poolInfo.type;
   const poolChain = poolInfo.chain;
+  const canPoolWithdraw = poolInfo.metadata.availableMethod.withdraw;
   const networkPrefix = chainInfoMap[poolChain]?.substrateInfo?.addressPrefix;
   const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolChain), [poolChain]);
 
@@ -378,8 +393,8 @@ const Component: React.FC = () => {
   useInitValidateTransaction(validateFields, form, defaultData);
 
   const accountList = useMemo(() => {
-    return accounts.filter(filterAccount(allPositions, chainInfoMap, poolType, poolChain));
-  }, [accounts, allPositions, chainInfoMap, poolChain, poolType]);
+    return accounts.filter(filterAccount(allPositions, chainInfoMap, poolType, poolChain, canPoolWithdraw));
+  }, [accounts, allPositions, canPoolWithdraw, chainInfoMap, poolChain, poolType]);
 
   const nominators = useMemo(() => {
     if (fromValue && positionInfo?.nominations && positionInfo.nominations.length) {
