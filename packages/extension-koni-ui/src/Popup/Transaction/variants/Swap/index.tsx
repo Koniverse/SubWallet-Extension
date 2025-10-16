@@ -11,7 +11,7 @@ import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainName
 import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
 import { DetectedGenOptimalProcessErrMsg } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, OPTIMEX_SWAP_SLIPPAGE, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -364,9 +364,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     const slippageMap = {
       [SwapProviderId.CHAIN_FLIP_MAINNET]: CHAINFLIP_SLIPPAGE,
       [SwapProviderId.CHAIN_FLIP_TESTNET]: CHAINFLIP_SLIPPAGE,
-      [SwapProviderId.SIMPLE_SWAP]: SIMPLE_SWAP_SLIPPAGE,
-      [SwapProviderId.OPTIMEX]: OPTIMEX_SWAP_SLIPPAGE,
-      [SwapProviderId.OPTIMEX_TESTNET]: OPTIMEX_SWAP_SLIPPAGE
+      [SwapProviderId.SIMPLE_SWAP]: SIMPLE_SWAP_SLIPPAGE
     };
 
     return providerId && providerId in slippageMap
