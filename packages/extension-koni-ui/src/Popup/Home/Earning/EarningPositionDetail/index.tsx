@@ -146,7 +146,7 @@ function Component ({ compound,
   }, [compound.chain, poolInfo.chain]);
 
   const onLeavePool = useCallback(() => {
-    if (isTotalNominationStakeZero && isActiveStakeZero && !poolInfo.metadata.availableMethod.withdraw) {
+    if (isTotalNominationStakeZero && !poolInfo.metadata.availableMethod.withdraw) {
       openAlert({
         title: t('ui.EARNING.screen.EarningPositionDetail.unstakeNotAvailable'),
         type: NotificationType.ERROR,
