@@ -146,21 +146,7 @@ function Component ({ compound,
   }, [compound.chain, poolInfo.chain]);
 
   const onLeavePool = useCallback(() => {
-    if (isActiveStakeZero) {
-      openAlert({
-        title: t('ui.EARNING.screen.EarningPositionDetail.unstakingNotAvailable'),
-        type: NotificationType.ERROR,
-        content: t('ui.EARNING.screen.EarningPositionDetail.noStakedFundsToUnstake'),
-        okButton: {
-          text: t('ui.EARNING.screen.EarningPositionDetail.ok'),
-          onClick: closeAlert
-        }
-      });
-
-      return;
-    }
-
-    if (isTotalNominationStakeZero) {
+    if (isTotalNominationStakeZero && isActiveStakeZero && !poolInfo.metadata.availableMethod.withdraw) {
       openAlert({
         title: t('ui.EARNING.screen.EarningPositionDetail.unstakeNotAvailable'),
         type: NotificationType.ERROR,
@@ -169,6 +155,20 @@ function Component ({ compound,
           text: t('ui.EARNING.screen.EarningPositionDetail.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
+        }
+      });
+
+      return;
+    }
+
+    if (isActiveStakeZero) {
+      openAlert({
+        title: t('ui.EARNING.screen.EarningPositionDetail.unstakingNotAvailable'),
+        type: NotificationType.ERROR,
+        content: t('ui.EARNING.screen.EarningPositionDetail.noStakedFundsToUnstake'),
+        okButton: {
+          text: t('ui.EARNING.screen.EarningPositionDetail.ok'),
+          onClick: closeAlert
         }
       });
 

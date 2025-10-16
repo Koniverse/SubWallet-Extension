@@ -199,7 +199,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
               label: (
                 <div className='__label-with-icon'>
                   {t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.activeStake')}
-                  {item.metadata && (
+                  {item.metadata && new BigN(item.activeStake).gt(0) && (
                     <span
                       className='__info-icon-wrapper'
                       onClick={openActiveStakeDetailsModal(item)}
