@@ -6,7 +6,7 @@ import { AmountData, ExtrinsicType, NominationInfo } from '@subwallet/extension-
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
-import { AccountJson, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, MetaInfo, NominationSelector } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA, UNSTAKE_TANSSI_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
@@ -34,12 +34,12 @@ type Props = ThemeProps;
 const filterAccount = (
   positionInfos: YieldPositionInfo[],
   chainInfoMap: Record<string, _ChainInfo>,
-  poolType: YieldPoolType,
-  poolChain?: string,
-  canPoolWithdraw?: boolean
+  poolInfo: YieldPoolInfo
 ): ((account: AccountJson) => boolean) => {
   return (account: AccountJson): boolean => {
     let stakedPositions = positionInfos;
+
+    const canPoolWithdraw = poolInfo.metadata.availableMethod.withdraw;
 
     if (!canPoolWithdraw) {
       stakedPositions = positionInfos.filter((item) => {
@@ -56,7 +56,7 @@ const filterAccount = (
 
     return (
       new BigN(nominator?.activeStake || BN_ZERO).gt(BN_ZERO) &&
-      accountFilterFunc(chainInfoMap, poolType, poolChain)(account)
+      accountFilterFunc(chainInfoMap, poolInfo.type, poolInfo.chain)(account)
     );
   };
 };
@@ -76,7 +76,6 @@ const Component: React.FC = () => {
   const poolInfo = poolInfoMap[slug];
   const poolType = poolInfo.type;
   const poolChain = poolInfo.chain;
-  const canPoolWithdraw = poolInfo.metadata.availableMethod.withdraw;
   const networkPrefix = chainInfoMap[poolChain]?.substrateInfo?.addressPrefix;
   const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolChain), [poolChain]);
 
@@ -393,8 +392,8 @@ const Component: React.FC = () => {
   useInitValidateTransaction(validateFields, form, defaultData);
 
   const accountList = useMemo(() => {
-    return accounts.filter(filterAccount(allPositions, chainInfoMap, poolType, poolChain, canPoolWithdraw));
-  }, [accounts, allPositions, canPoolWithdraw, chainInfoMap, poolChain, poolType]);
+    return accounts.filter(filterAccount(allPositions, chainInfoMap, poolInfo));
+  }, [accounts, allPositions, chainInfoMap, poolInfo]);
 
   const nominators = useMemo(() => {
     if (fromValue && positionInfo?.nominations && positionInfo.nominations.length) {
