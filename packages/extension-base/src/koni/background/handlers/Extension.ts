@@ -62,7 +62,7 @@ import { AccountChainType, AccountJson, AccountProxyMap, AccountSignMode, Accoun
 import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
-import { RequestGetProxyAccounts } from '@subwallet/extension-base/types/proxy';
+import { RequestAddProxy, RequestGetProxyAccounts, RequestRemoveProxy } from '@subwallet/extension-base/types/proxy';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
@@ -5213,6 +5213,43 @@ export default class KoniExtension {
   private getProxyAccounts (request: RequestGetProxyAccounts) {
     return this.#koniState.proxyService.getProxyAccounts(request);
   }
+
+  private async handleAddProxy (params: RequestAddProxy): Promise<SWTransactionResponse> {
+    const { address, chain } = params;
+    const validationErrors = await this.#koniState.proxyService.validateAddProxy(params);
+
+    if (validationErrors.length > 0) {
+      return this.#koniState.transactionService.generateBeforeHandleResponseErrors(validationErrors);
+    }
+
+    const extrinsic = await this.#koniState.proxyService.addProxyAccounts(params);
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address,
+      chain,
+      transaction: extrinsic,
+      data: params,
+      extrinsicType: ExtrinsicType.ADD_PROXY,
+      chainType: ChainType.SUBSTRATE
+    });
+  }
+
+  private async handleRemoveProxy (params: RequestRemoveProxy): Promise<SWTransactionResponse> {
+    const { address, chain, proxyAddress } = params;
+
+    const extrinsic = await this.#koniState.proxyService.removeProxyAccounts(params);
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address,
+      chain,
+      transaction: extrinsic,
+      data: params,
+      extrinsicType: ExtrinsicType.REMOVE_PROXY,
+      chainType: ChainType.SUBSTRATE,
+      proxyAddress
+    });
+  }
+
   /* Migrate Unified Account */
 
   // --------------------------------------------------------------
@@ -5890,7 +5927,10 @@ export default class KoniExtension {
       // Proxy
       case 'pri(proxy.getProxyAccounts)':
         return this.getProxyAccounts(request as RequestGetProxyAccounts);
-
+      case 'pri(proxy.addProxy)':
+        return this.handleAddProxy(request as RequestAddProxy);
+      case 'pri(proxy.removeProxy)':
+        return this.handleRemoveProxy(request as RequestRemoveProxy);
       // Default
       default:
         throw new Error(`Unable to handle message of type ${type}`);

@@ -3,8 +3,9 @@
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { BasicTxErrorType } from '@subwallet/extension-base/types';
-import { ProxyAccounts, ProxyItem, ProxyType, RequestGetProxyAccounts } from '@subwallet/extension-base/types/proxy';
+import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
+import { AddProxyParams, ProxyAccounts, ProxyItem, ProxyType, RemoveProxyParams, RequestGetProxyAccounts } from '@subwallet/extension-base/types/proxy';
+import BigN from 'bignumber.js';
 
 import { _SubstrateApi } from '../chain-service/types';
 import { typeToProxyMap } from './constant';
@@ -34,7 +35,7 @@ export default class ProxyService {
 
     const result = await substrateApi.api.query.proxy.proxies(address);
 
-    const [proxyAccounts, deposit] = result.toPrimitive() as [PrimitiveProxyItem[], string];
+    const [proxyAccounts, proxyDeposit] = result.toPrimitive() as [PrimitiveProxyItem[], string];
 
     let proxies: ProxyItem[] = (proxyAccounts || []).map((account) => {
       const proxyId = this.state.keyringService.context.belongUnifiedAccount(account.delegate);
@@ -59,13 +60,17 @@ export default class ProxyService {
       );
     }
 
+    const baseDeposit = substrateApi.api.consts.proxy.proxyDepositBase?.toString() || '0';
+
     return {
       proxies,
-      deposit: deposit.toString()
+      proxyDeposit: new BigN(proxyDeposit).gt(0) ? proxyDeposit.toString() : baseDeposit
     };
   }
 
-  async addProxyAccounts (chain: string, proxyAddress: string, proxyType: ProxyType) {
+  async addProxyAccounts (data: AddProxyParams): Promise<TransactionData> {
+    const { chain, proxyAddress, proxyType } = data;
+
     const substrateApi = this.getSubstrateApi(chain);
 
     await substrateApi.isReady;
@@ -74,7 +79,36 @@ export default class ProxyService {
     return substrateApi.api.tx.proxy.addProxy(proxyAddress, proxyType, 0);
   }
 
-  async removeProxyAccounts (chain: string, selectedProxyAccounts: ProxyItem[], isRemoveAll?: boolean) {
+  public async validateAddProxy (params: AddProxyParams): Promise<TransactionError[]> {
+    const { address, chain, proxyDeposit } = params;
+
+    const substrateApi = this.getSubstrateApi(chain);
+
+    await substrateApi.isReady;
+    const transferableBalance = await this.state.balanceService.getTransferableBalance(address, chain);
+    const bnTransferableBalance = new BigN(transferableBalance.value);
+
+    const feeInfo = await substrateApi.api.tx.proxy
+      .addProxy(params.proxyAddress, params.proxyType, 0)
+      .paymentInfo(address);
+
+    const estimatedFee = new BigN(feeInfo?.partialFee?.toString() || '0');
+    const factorDeposit = substrateApi.api.consts.proxy.proxyDepositFactor?.toString() || '0';
+
+    const totalRequired = new BigN(proxyDeposit).plus(estimatedFee).plus(factorDeposit);
+
+    const errors: TransactionError[] = [];
+
+    if (bnTransferableBalance.lt(totalRequired)) {
+      errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
+    }
+
+    return errors;
+  }
+
+  async removeProxyAccounts (data: RemoveProxyParams): Promise<TransactionData> {
+    const { chain, isRemoveAll, selectedProxyAccounts } = data;
+
     const substrateApi = this.getSubstrateApi(chain);
 
     await substrateApi.isReady;

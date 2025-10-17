@@ -39,7 +39,7 @@ import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
 import { EarningImpactResult } from '../services/earning-service/handlers/native-staking/dtao';
-import { ProxyAccounts, RequestGetProxyAccounts } from '../types/proxy';
+import { ProxyAccounts, RequestAddProxy, RequestGetProxyAccounts, RequestRemoveProxy } from '../types/proxy';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -581,6 +581,10 @@ export enum ExtrinsicType {
   // SET_FEE_TOKEN = 'set_fee-token',
 
   EVM_EXECUTE = 'evm.execute',
+
+  ADD_PROXY = 'proxy.add_proxy',
+  REMOVE_PROXY = 'proxy.remove_proxy',
+
   UNKNOWN = 'unknown'
 }
 
@@ -636,7 +640,11 @@ export interface ExtrinsicDataTypeMap {
 
   [ExtrinsicType.EVM_EXECUTE]: TransactionConfig,
   [ExtrinsicType.CROWDLOAN]: any,
-  [ExtrinsicType.SWAP]: SwapTxData
+  [ExtrinsicType.SWAP]: SwapTxData,
+
+  [ExtrinsicType.ADD_PROXY]: RequestAddProxy,
+  [ExtrinsicType.REMOVE_PROXY]: RequestRemoveProxy,
+
   [ExtrinsicType.UNKNOWN]: any
 }
 
@@ -2755,7 +2763,10 @@ export interface KoniRequestSignatures {
   'pri(migrate.pingSession)': [RequestPingSession, boolean];
 
   /* Proxy Account */
-  'pri(proxy.getProxyAccounts)': [RequestGetProxyAccounts, ProxyAccounts]
+  'pri(proxy.getProxyAccounts)': [RequestGetProxyAccounts, ProxyAccounts];
+  'pri(proxy.addProxy)': [RequestAddProxy, SWTransactionResponse];
+  'pri(proxy.removeProxy)': [RequestRemoveProxy, SWTransactionResponse];
+
 }
 
 export interface ApplicationMetadataType {
