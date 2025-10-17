@@ -146,7 +146,7 @@ function Component ({ compound,
   }, [compound.chain, poolInfo.chain]);
 
   const onLeavePool = useCallback(() => {
-    if ((!isAllAccount && isTotalNominationStakeZero) && !poolInfo.metadata.availableMethod.withdraw) {
+    if (isTotalNominationStakeZero && !poolInfo.metadata.availableMethod.withdraw) {
       openAlert({
         title: t('ui.EARNING.screen.EarningPositionDetail.unstakeNotAvailable'),
         type: NotificationType.ERROR,
@@ -182,7 +182,7 @@ function Component ({ compound,
       from: transactionFromValue
     });
     navigate('/transaction/unstake');
-  }, [isAllAccount, isTotalNominationStakeZero, poolInfo.metadata.availableMethod.withdraw, poolInfo.slug, isActiveStakeZero, setUnStakeStorage, transactionChainValue, transactionFromValue, navigate, openAlert, t, closeAlert]);
+  }, [isTotalNominationStakeZero, poolInfo.metadata.availableMethod.withdraw, poolInfo.slug, isActiveStakeZero, setUnStakeStorage, transactionChainValue, transactionFromValue, navigate, openAlert, t, closeAlert]);
 
   const onEarnMore = useCallback(() => {
     setEarnStorage({
