@@ -5,6 +5,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
 import { AddProxyParams, ProxyAccounts, ProxyItem, ProxyType, RemoveProxyParams, RequestGetProxyAccounts } from '@subwallet/extension-base/types/proxy';
+import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 import { _SubstrateApi } from '../chain-service/types';
@@ -23,10 +24,6 @@ export default class ProxyService {
     this.state = state;
   }
 
-  private getSubstrateApi (chain: string): _SubstrateApi {
-    return this.state.getSubstrateApi(chain);
-  }
-
   async getProxyAccounts (request: RequestGetProxyAccounts): Promise<ProxyAccounts> {
     const { address, chain, selectedProxyAddress, type } = request;
     const substrateApi = this.getSubstrateApi(chain);
@@ -38,7 +35,7 @@ export default class ProxyService {
     const [proxyAccounts, proxyDeposit] = result.toPrimitive() as [PrimitiveProxyItem[], string];
 
     let proxies: ProxyItem[] = (proxyAccounts || []).map((account) => {
-      const proxyId = this.state.keyringService.context.belongUnifiedAccount(account.delegate);
+      const proxyId = this.state.keyringService.context.belongUnifiedAccount(account.delegate) || reformatAddress(account.delegate);
 
       return {
         proxyAddress: account.delegate,
@@ -69,7 +66,11 @@ export default class ProxyService {
   }
 
   async addProxyAccounts (data: AddProxyParams): Promise<TransactionData> {
-    const { chain, proxyAddress, proxyType } = data;
+    const { address, chain, proxyAddress, proxyType } = data;
+
+    if (address === proxyAddress) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
+    }
 
     const substrateApi = this.getSubstrateApi(chain);
 
@@ -134,5 +135,9 @@ export default class ProxyService {
     );
 
     return api.tx.utility.batchAll(removeProxies);
+  }
+
+  private getSubstrateApi (chain: string): _SubstrateApi {
+    return this.state.getSubstrateApi(chain);
   }
 }
