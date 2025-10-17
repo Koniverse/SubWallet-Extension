@@ -94,7 +94,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
         onClick={onSelect(item as GovAccountAddressItemType)}
       />
     );
-  }, [onSelect, selectedValue, t]);
+  }, [onSelect, selectedValue]);
 
   const groupedItemMap = useMemo<GroupedItems>(() => {
     const result: GroupedItems = {
