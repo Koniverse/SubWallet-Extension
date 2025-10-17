@@ -2,22 +2,22 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ProxyItem } from '@subwallet/extension-base/types/proxy';
-import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { toShort } from '@subwallet/extension-koni-ui/utils';
-import { Button, Icon, SwList, SwModal, Web3Block } from '@subwallet/react-ui';
-import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
+import { ProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { Button, Icon, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import { CheckCircle, X, XCircle } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 
 interface Props extends ThemeProps {
   chain: string;
   modalId: string;
-  address: string
-  proxyItems: ProxyItem[]
-  onCancel: VoidFunction,
+  address: string;
+  proxyId: string;
+  proxyItems: ProxyItem[];
+  onCancel: VoidFunction;
   onApply: (selected: string | null) => void;
 }
 
@@ -26,72 +26,41 @@ interface ProxyItemExtended extends ProxyItem {
 }
 
 const Component = (props: Props, ref: ForwardedRef<any>) => {
-  const { address, className = '', modalId, onApply, onCancel, proxyItems } = props;
+  const { address, className = '', modalId, onApply, onCancel, proxyId, proxyItems } = props;
   const { t } = useTranslation();
-  const { token } = useTheme() as Theme;
   const sectionRef = useRef<SwListSectionRef>(null);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string>(address);
 
   const fullList = useMemo(() => {
     return [
       {
         isMain: true,
-        proxyAddress: address
+        proxyAddress: address,
+        proxyId
       },
       ...proxyItems
     ];
-  }, [address, proxyItems]);
+  }, [address, proxyId, proxyItems]);
 
-  const onSelect = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const address = (e.currentTarget.dataset.address as string) || '';
-
-    setSelected((old) => (old === address ? null : address));
+  const onSelect = useCallback((address: string) => {
+    return () => {
+      setSelected(address);
+    };
   }, []);
 
   const renderItem = useCallback((item: ProxyItemExtended) => {
     const isSelected = selected === item.proxyAddress;
-    const isMain = item.isMain;
 
     return (
-      <div
-        className='proxy-item-wrapper'
-        data-address={item.proxyAddress}
-        key={item.proxyAddress}
-        onClick={onSelect}
-      >
-        <Web3Block
-          className='proxy-item'
-          leftItem={
-            <SwAvatar
-              size={32}
-              theme='polkadot'
-              value={item.proxyAddress}
-            />
-          }
-          middleItem={
-            <div className='proxy-item__info'>
-              <div className='proxy-item__address'>{toShort(item.proxyAddress)}</div>
-              <div
-                className={`proxy-item__type ${isMain ? 'main' : ''}`}
-              >
-                {isMain ? 'Proxied account' : `Proxy type: ${item.proxyType}`}
-              </div>
-            </div>
-          }
-          rightItem={
-            <div className='proxy-item__check'>
-              <Icon
-                iconColor={isSelected ? token.colorSuccess : token.colorTextLight4}
-                phosphorIcon={CheckCircle}
-                size='sm'
-                weight='fill'
-              />
-            </div>
-          }
-        />
-      </div>
+      <ProxyAccountSelectorItem
+        className={'__proxy-account-item'}
+        isSelected={isSelected}
+        onClick={onSelect(item.proxyAddress)}
+        proxyAccount={item}
+        showUnselectIcon
+      />
     );
-  }, [selected, onSelect, token.colorSuccess, token.colorTextLight4]);
+  }, [selected, onSelect]);
 
   const onClickApply = useCallback(() => {
     onApply?.(selected);
@@ -138,11 +107,10 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
       }
       id={modalId}
       onCancel={onCancel}
-      title={t('Select proxy account')}
+      title={t('Select account')}
     >
       <div className='proxy-modal__description'>
-        You’re performing transactions from a proxied account.
-        Select the account you want to sign this transaction.
+        {t('You\'re performing transactions from a proxied account. Select the account you want to sign this transaction')}
       </div>
       <SwList.Section
         list={fullList}
@@ -183,41 +151,12 @@ const ProxyAccountSelectorModal = styled(forwardRef(Component))<Props>(({ theme:
       padding: 0
     },
 
-    '.proxy-item-wrapper:not(:last-child)': {
-      marginBottom: 8
+    '.__proxy-account-item': {
+      paddingBlock: token.paddingXS
     },
 
-    '.proxy-item': {
-      display: 'flex',
-      alignItems: 'center',
-      borderRadius: token.borderRadiusLG,
-      transition: 'background-color 0.2s ease',
-      color: token.colorTextLight1,
-      backgroundColor: token.colorBgSecondary
-    },
-
-    '.proxy-item__info': {
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden'
-    },
-
-    '.proxy-item__type': {
-      color: token['magenta-6'],
-      fontWeight: 500,
-      fontSize: token.fontSizeSM,
-      lineHeight: token.lineHeightSM,
-
-      '&.main': {
-        color: token['lime-6']
-      }
-    },
-
-    '.proxy-item__check': {
-      minWidth: '40px',
-      display: 'flex',
-      justifyContent: 'center',
-      marginLeft: token.marginXXS
+    '.__proxy-account-item + .__proxy-account-item': {
+      marginTop: token.marginXS
     },
 
     '.ant-sw-modal-footer': {
