@@ -57,7 +57,7 @@ function Component ({ accountProxy, className, proxyAccountsSelected, setProxyAc
     const result: ChainItemType[] = [];
 
     Object.values(chainInfoMap).forEach((c) => {
-      if (allowedChains.includes(c.slug) && !UNSUPPORTED_PROXY_NETWORKS.includes(c.slug)) {
+      if (c.substrateInfo !== null && allowedChains.includes(c.slug) && !UNSUPPORTED_PROXY_NETWORKS.includes(c.slug)) {
         result.push({
           name: c.name,
           slug: c.slug
