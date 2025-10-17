@@ -8,13 +8,14 @@ import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/comp
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useDefaultNavigate, useGetAccountProxyById, useNotification } from '@subwallet/extension-koni-ui/hooks';
 import { editAccount, forgetAccount, validateAccountName } from '@subwallet/extension-koni-ui/messaging';
+import { ProxyAccountList, ProxyItemSelector } from '@subwallet/extension-koni-ui/Popup/Account/AccountDetail/ProxyAccountList';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountDetailParam, ThemeProps, VoidFunction } from '@subwallet/extension-koni-ui/types';
 import { FormCallbacks, FormFieldData } from '@subwallet/extension-koni-ui/types/form';
 import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils/form/form';
 import { Button, Form, Icon, Input } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { Export, GitMerge, Trash } from 'phosphor-react';
+import { Export, GitMerge, Trash, TreeStructure, XCircle } from 'phosphor-react';
 import { RuleObject } from 'rc-field-form/lib/interface';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +30,7 @@ enum FilterTabType {
   ACCOUNT_ADDRESS = 'account-address',
   DERIVED_ACCOUNT = 'derived-account',
   DERIVATION_INFO = 'derivation-info',
+  MANAGE_PROXIES = 'manage-proxies'
 }
 
 type Props = ThemeProps;
@@ -56,7 +58,10 @@ interface DetailFormState {
   [FormFieldName.NAME]: string;
 }
 
-const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestViewDerivedAccountDetails, requestViewDerivedAccounts }: ComponentProps) => {
+const Component: React.FC<ComponentProps> = ({ accountProxy,
+  onBack,
+  requestViewDerivedAccountDetails,
+  requestViewDerivedAccounts }: ComponentProps) => {
   const showDerivedAccounts = !!accountProxy.children?.length;
 
   const { t } = useTranslation();
@@ -86,6 +91,8 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
   };
 
   const [selectedFilterTab, setSelectedFilterTab] = useState<string>(getDefaultFilterTab());
+
+  const [proxyAccountsSelected, setProxyAccountsSelected] = useState<Record<string, ProxyItemSelector>>({});
 
   const [form] = Form.useForm<DetailFormState>();
 
@@ -118,8 +125,37 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
       });
     }
 
+    result.push(
+      {
+        label: t('Manage proxies'),
+        value: FilterTabType.MANAGE_PROXIES
+      });
+
     return result;
   }, [showDerivationInfoTab, showDerivedAccounts, t]);
+
+  const onAddProxyAccount = useCallback(() => {
+    console.log('Add proxy account');
+  }, []);
+
+  const onRemoveProxyAccounts = useCallback(() => {
+    console.log('Remove proxy account');
+  }, []);
+
+  const onCancelRemoveProxyAccounts = useCallback(() => {
+    setProxyAccountsSelected((prevState) => {
+      const newState: Record<string, ProxyItemSelector> = {};
+
+      Object.keys(prevState).forEach((key) => {
+        newState[key] = {
+          ...prevState[key],
+          isSelected: false
+        };
+      });
+
+      return newState;
+    });
+  }, []);
 
   const onSelectFilterTab = useCallback((value: string) => {
     setSelectedFilterTab(value);
@@ -242,6 +278,70 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
   }, [accountProxy.id, accountProxy.name, form]);
 
   const footerNode = useMemo(() => {
+    if (selectedFilterTab === FilterTabType.MANAGE_PROXIES) {
+      const proxyAccounts = Object.values(proxyAccountsSelected);
+      const haveNoProxyAccounts = proxyAccounts.length === 0;
+
+      if (haveNoProxyAccounts) {
+        return <></>;
+      }
+
+      const isAnyProxyAccountSelected = Object.values(proxyAccountsSelected).some(({ isSelected }) => isSelected);
+
+      if (isAnyProxyAccountSelected) {
+        return (
+          <>
+            <Button
+              block={true}
+              className={CN('account-button')}
+              icon={(
+                <Icon
+                  phosphorIcon={XCircle}
+                  weight='fill'
+                />
+              )}
+              onClick={onCancelRemoveProxyAccounts}
+              schema='secondary'
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              block={true}
+              className={CN('account-button')}
+              icon={(
+                <Icon
+                  phosphorIcon={Trash}
+                  weight='fill'
+                />
+              )}
+              onClick={onRemoveProxyAccounts}
+              schema='error'
+            >
+              {t('Remove')}
+            </Button>
+          </>
+        );
+      }
+
+      return (
+        <Button
+          block={true}
+          className={CN('account-button')}
+          disabled={accountProxy.accountType === AccountProxyType.READ_ONLY}
+          icon={(
+            <Icon
+              phosphorIcon={TreeStructure}
+              weight='fill'
+            />
+          )}
+          onClick={onAddProxyAccount}
+          schema='primary'
+        >
+          {t('Add proxy')}
+        </Button>
+      );
+    }
+
     if (![AccountProxyType.UNIFIED, AccountProxyType.SOLO].includes(accountProxy.accountType)) {
       return (
         <Button
@@ -308,7 +408,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
         {t('ui.ACCOUNT.screen.Account.Detail.export')}
       </Button>
     </>;
-  }, [accountProxy, deleting, deriving, onDelete, onDerive, onExport, t]);
+  }, [accountProxy.accountActions, accountProxy.accountType, deleting, deriving, onAddProxyAccount, onCancelRemoveProxyAccounts, onDelete, onDerive, onExport, onRemoveProxyAccounts, proxyAccountsSelected, selectedFilterTab, t]);
 
   useEffect(() => {
     if (accountProxy) {
@@ -453,6 +553,16 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
           renderDetailDerivedAccount()
         )
       }
+      {
+        selectedFilterTab === FilterTabType.MANAGE_PROXIES && (
+          <ProxyAccountList
+            accountProxy={accountProxy}
+            className={'list-container'}
+            proxyAccountsSelected={proxyAccountsSelected}
+            setProxyAccountsSelected={setProxyAccountsSelected}
+          />
+        )
+      }
     </Layout.WithSubHeaderOnly>
   );
 };
@@ -561,16 +671,15 @@ const AccountDetail = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
     },
 
     '.filter-tabs-container': {
-      gap: 0,
-      paddingLeft: token.paddingXXS,
-      paddingRight: token.paddingXXS,
+      gap: token.sizeMD,
+      paddingInline: token.paddingXXS - 2,
+      marginInline: token.margin,
 
       '.__tab-item:after': {
         display: 'none'
       },
 
       '.__tab-item-label': {
-        padding: token.paddingSM,
         lineHeight: '20px',
         fontSize: '11px',
         textTransform: 'uppercase'
