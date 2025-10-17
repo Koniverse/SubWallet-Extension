@@ -21,5 +21,7 @@ export interface ProxyItem {
 
 export interface ProxyAccounts {
   proxies: ProxyItem[];
-  deposit: string;
+  proxyDeposit: string;
 }
+
+export * from './actions';
