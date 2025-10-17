@@ -70,7 +70,11 @@ export default class ProxyService {
   }
 
   async addProxyAccounts (data: AddProxyParams): Promise<TransactionData> {
-    const { chain, proxyAddress, proxyType } = data;
+    const { address, chain, proxyAddress, proxyType } = data;
+
+    if (address === proxyAddress) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
+    }
 
     const substrateApi = this.getSubstrateApi(chain);
 

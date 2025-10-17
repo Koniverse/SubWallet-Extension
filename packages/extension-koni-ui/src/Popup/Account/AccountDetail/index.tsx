@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountActions, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountActions, AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { AccountChainTypeLogos, AccountProxyTypeTag, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
@@ -80,6 +80,10 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
     }
   }, [accountProxies, accountProxy.parentId]);
 
+  const canManageProxies = useMemo(() => {
+    return  accountProxy.chainTypes.includes(AccountChainType.SUBSTRATE);
+  }, [accountProxy]);
+
   const getDefaultFilterTab = () => {
     if (requestViewDerivedAccounts && showDerivedAccounts) {
       return FilterTabType.DERIVED_ACCOUNT;
@@ -125,14 +129,16 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
       });
     }
 
-    result.push(
-      {
-        label: t('Manage proxies'),
-        value: FilterTabType.MANAGE_PROXIES
-      });
+    if (canManageProxies) {
+      result.push(
+        {
+          label: t('Manage proxies'),
+          value: FilterTabType.MANAGE_PROXIES
+        });
+    }
 
     return result;
-  }, [showDerivationInfoTab, showDerivedAccounts, t]);
+  }, [canManageProxies, showDerivationInfoTab, showDerivedAccounts, t]);
 
   const onAddProxyAccount = useCallback(() => {
     console.log('Add proxy account');
