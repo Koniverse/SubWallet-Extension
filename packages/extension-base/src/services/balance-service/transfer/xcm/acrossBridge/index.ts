@@ -19,7 +19,7 @@ const acrossPairsMap = new Map([
   ['base_mainnet', new Set([COMMON_CHAIN_SLUGS.ETHEREUM, 'optimism', 'arbitrum_one'])],
   ['arbitrum_one', new Set([COMMON_CHAIN_SLUGS.ETHEREUM, 'optimism', 'base_mainnet'])],
   [COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA, new Set(['base_sepolia', 'arbitrum_sepolia'])], // TESTNET START HERE
-  ['base_sepolia', new Set([COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA])],
+  ['base_sepolia', new Set([COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA, 'arbitrum_sepolia'])],
   ['arbitrum_sepolia', new Set([COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA, 'base_sepolia'])]
 ]);
 
@@ -117,7 +117,6 @@ export const getAcrossSendingValue = async (originChain: _ChainInfo, originToken
     const contracts = isTestnet ? acrossNativeTokenAddresses.testnet : acrossNativeTokenAddresses.mainnet;
     const fromContract = _getContractAddressOfToken(originTokenInfo) || contracts[originTokenInfo.originChain as keyof typeof contracts];
 
-    console.log('checking', [originChainId, destinationChainId, fromContract, isTestnet]);
     const acrossBridgeLimit = await subwalletApiSdk.bridgeApi.getAcrossBridgeLimit(originChainId, destinationChainId, fromContract, isTestnet);
 
     if (!acrossBridgeLimit.minDeposit || !acrossBridgeLimit.maxDeposit) {
