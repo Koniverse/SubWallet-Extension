@@ -1,5 +1,43 @@
 # CHANGELOG
 
+## 1.3.62
+Build date: Oct 10, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.118 (#4730):
+  - [Xode] Add XCM support for DOT & USDT
+
+Bug fixes:
+- Fixed missing "Edit Fee" button / Improve fee loading UI (#4652)
+- Fixed issue can not update patch and online resources (#4536)
+- Fixed some UI bugs for migrated chain after AHM on Earning features (#4754)
+- Fixed bug show Earning options for Kusama although AHM migrated (#4763)
+- Fixed bug don't show toast message validate in case input amount < 1 when transfer Cardano (#4706)
+
+
+## 1.3.61
+Build date: Oct 04, 2025.
+
+Features & Updates:
+- Hide copy/QR content for relay chain addresses (AssetHub migration) (#4735)
+- Re-check for Paseo after migrated (#4507)
+
+Bug fixes:
+- Fixed crash in EarningPositions when asset is undefined (read property 'decimals' of undefined) in case update version (#4731)
+
+## 1.3.60
+Build date: Oct 02, 2025.
+
+Features & Updates:
+- [zkVerify Mainnet] Add support for in-app VFY staking (#4688)
+- Update chain-list version v0.2.117 (#4693):
+   - [Xode] Add block explorer only for when users want to view transaction details SubWallet-ChainList
+   - Add group for VFY tokens
+
+Bug fixes:
+- Fixed error when performing EWC staking (#4694)
+
+
 ## 1.3.59
 Build date: Sep 23, 2025.
 

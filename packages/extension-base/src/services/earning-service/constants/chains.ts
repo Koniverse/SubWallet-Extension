@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const _STAKING_CHAIN_GROUP = {
-  relay: ['polkadot', 'kusama', 'aleph', 'polkadex', 'ternoa', 'alephTest', 'polkadexTest', 'westend', 'kate', 'edgeware', 'creditcoin', 'vara_network', 'goldberg_testnet', 'availTuringTest', 'avail_mainnet', 'vara_testnet', 'dentnet', 'cere', 'statemine', 'statemint', 'westend_assethub'],
-  assetHub: ['statemine', 'statemint', 'westend_assethub'],
+  relay: ['polkadot', 'kusama', 'aleph', 'polkadex', 'ternoa', 'alephTest', 'polkadexTest', 'westend', 'kate', 'edgeware', 'creditcoin', 'vara_network', 'goldberg_testnet', 'availTuringTest', 'avail_mainnet', 'vara_testnet', 'dentnet', 'cere', 'zkverify', 'zkverify_testnet', 'paseoTest'],
+  assetHub: ['statemine', 'statemint', 'westend_assethub', 'paseo_assethub'],
   para: ['moonbeam', 'moonriver', 'moonbase', 'turing', 'turingStaging', 'bifrost', 'bifrost_testnet', 'calamari_test', 'calamari', 'manta_network', 'polimec'],
   astar: ['astar', 'shiden', 'shibuya'],
   amplitude: ['amplitude', 'amplitude_test', 'pendulum', 'krest_network'], // amplitude and kilt only share some common logic
-  nominationPool: ['polkadot', 'kusama', 'westend', 'alephTest', 'aleph', 'kate', 'vara_network', 'goldberg_testnet', 'availTuringTest', 'avail_mainnet', 'vara_testnet', 'cere', 'analog_timechain'],
+  nominationPool: ['polkadot', 'kusama', 'westend', 'alephTest', 'aleph', 'kate', 'vara_network', 'goldberg_testnet', 'availTuringTest', 'avail_mainnet', 'vara_testnet', 'cere', 'analog_timechain', 'paseoTest'],
   bifrost: ['bifrost', 'bifrost_testnet'],
   aleph: ['aleph', 'alephTest'], // A0 has distinct tokenomics
   ternoa: ['ternoa'],
@@ -19,6 +19,11 @@ export const _STAKING_CHAIN_GROUP = {
   energy: ['energy_web_x_testnet', 'energy_web_x'],
   mythos: ['mythos', 'muse_testnet']
 };
+
+export const RELAY_HANDLER_DIRECT_STAKING_CHAINS = [
+  ..._STAKING_CHAIN_GROUP.relay,
+  ..._STAKING_CHAIN_GROUP.assetHub
+];
 
 export const TON_CHAINS = ['ton', 'ton_testnet'];
 
@@ -33,6 +38,9 @@ export const MANTA_MIN_DELEGATION = 500;
 export const CHANNEL_ID = 7;
 
 export const STAKING_IDENTITY_API_SLUG: Record<string, string> = {
+// @TODO: Remove polkadot then migrate
   polkadot: 'polkadot_people',
-  kusama: 'peopleKusama'
+
+  statemine: 'peopleKusama',
+  statemint: 'polkadot_people'
 };

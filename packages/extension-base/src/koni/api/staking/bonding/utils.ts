@@ -7,7 +7,7 @@ import { getAstarWithdrawable } from '@subwallet/extension-base/koni/api/staking
 import { _KNOWN_CHAIN_INFLATION_PARAMS, _SUBSTRATE_DEFAULT_INFLATION_PARAMS, _SubstrateInflationParams } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainNativeTokenBasicInfo } from '@subwallet/extension-base/services/chain-service/utils';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { _STAKING_CHAIN_GROUP, RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { EarningStatus, PalletStakingEraRewardPoints, PalletStakingValidatorPrefs, UnstakingStatus, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { detectTranslate, parseRawNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import { balanceFormatter, formatNumber } from '@subwallet/extension-base/utils/number';
@@ -578,7 +578,7 @@ export function getEarningStatusByNominations (bnTotalActiveStake: BN, nominatio
 export function getValidatorLabel (chain: string) {
   if (_STAKING_CHAIN_GROUP.astar.includes(chain)) {
     return 'dApp';
-  } else if (_STAKING_CHAIN_GROUP.relay.includes(chain) || _STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
+  } else if (RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(chain) || _STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
     return 'Validator';
   }
 
@@ -707,13 +707,15 @@ export function getRelayEraRewardMap (eraRewardPointArray: Codec[], startEraForP
   return eraRewardMap;
 }
 
-export async function getRelayMaxNominations (substrateApi: _SubstrateApi) {
+export async function getRelayMaxNominations (substrateApi: _SubstrateApi, chain: string) {
   await substrateApi.isReady;
-  const maxNominations = substrateApi.api.consts.staking?.maxNominations?.toString() || '16';
-  const _maxNominationsByNominationQuota = await substrateApi.api.call.stakingApi?.nominationsQuota(0); // todo: review param. Currently return constant for all param.
+  const maxNominations = substrateApi.api.consts.staking?.maxNominations?.toString();
+  const _maxNominationsByNominationQuota = await substrateApi.api.call.stakingApi?.nominationsQuota(0);
   const maxNominationsByNominationQuota = _maxNominationsByNominationQuota?.toString();
 
-  return maxNominationsByNominationQuota || maxNominations;
+  const fallbackMaxNominations = ['zkverify_testnet', 'zkverify'].includes(chain) ? '10' : '16';
+
+  return maxNominationsByNominationQuota || maxNominations || fallbackMaxNominations;
 }
 
 export const getMinStakeErrorMessage = (chainInfo: _ChainInfo, bnMinStake: BN): string => {
