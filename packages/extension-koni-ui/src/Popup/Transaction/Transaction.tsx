@@ -3,7 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@subwallet/extension-koni-ui/components';
-import { CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { ADD_PROXY_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_ADD_PROXY_PARAMS, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
 import { useAlert, useChainChecker, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -70,6 +70,8 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
         return ExtrinsicType.SWAP;
       case 'claim-bridge':
         return ExtrinsicType.CLAIM_BRIDGE;
+      case 'add-proxy':
+        return ExtrinsicType.ADD_PROXY;
       case 'send-fund':
       default:
         return ExtrinsicType.TRANSFER_BALANCE;
@@ -159,6 +161,13 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
       };
     }
 
+    if (storageKey === ADD_PROXY_TRANSACTION) {
+      return {
+        ...DEFAULT_ADD_PROXY_PARAMS,
+        fromAccountProxy
+      };
+    }
+
     return {
       ...DEFAULT_TRANSACTION_PARAMS,
       fromAccountProxy
@@ -210,6 +219,17 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
 
     return result;
   }, [t]);
+
+  const showHeader = useMemo(() => {
+    const pathName = location.pathname;
+    const action = pathName.split('/')[2] || '';
+
+    if (action === 'add-proxy' || action === 'remove-proxy') {
+      return false;
+    }
+
+    return true;
+  }, [location.pathname]);
 
   useNavigateOnChangeAccount(homePath);
 
@@ -344,6 +364,7 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
       <Layout.Home
         isDisableHeader={isDisableHeader}
         showFaderIcon
+        showHeader={showHeader}
         showTabBar={false}
       >
         <TransactionContext.Provider value={contextValues}>

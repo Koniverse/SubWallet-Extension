@@ -5,12 +5,13 @@ import { NotificationType } from '@subwallet/extension-base/background/KoniTypes
 import { AccountActions, AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { AccountChainTypeLogos, AccountProxyTypeTag, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
+import { ADD_PROXY_TRANSACTION, DEFAULT_ADD_PROXY_PARAMS } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useDefaultNavigate, useGetAccountProxyById, useNotification } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreCreateReformatAddress, useDefaultNavigate, useGetAccountProxyById, useNotification } from '@subwallet/extension-koni-ui/hooks';
 import { editAccount, forgetAccount, validateAccountName } from '@subwallet/extension-koni-ui/messaging';
 import { ProxyAccountList, ProxyItemSelector } from '@subwallet/extension-koni-ui/Popup/Account/AccountDetail/ProxyAccountList';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AccountDetailParam, ThemeProps, VoidFunction } from '@subwallet/extension-koni-ui/types';
+import { AccountDetailParam, AddProxyParams, ThemeProps, VoidFunction } from '@subwallet/extension-koni-ui/types';
 import { FormCallbacks, FormFieldData } from '@subwallet/extension-koni-ui/types/form';
 import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils/form/form';
 import { Button, Form, Icon, Input } from '@subwallet/react-ui';
@@ -22,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
 import { AccountAddressList } from './AccountAddressList';
 import { DerivedAccountList } from './DerivedAccountList';
@@ -47,16 +49,11 @@ enum FormFieldName {
   DERIVED_NAME = 'derived-name',
 }
 
-// @ts-ignore
-enum ActionType {
-  EXPORT = 'export',
-  DERIVE = 'derive',
-  DELETE = 'delete'
-}
-
 interface DetailFormState {
   [FormFieldName.NAME]: string;
 }
+
+const DEFAULT_CURRENT_CHAIN = 'polkadot';
 
 const Component: React.FC<ComponentProps> = ({ accountProxy,
   onBack,
@@ -71,7 +68,10 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   const navigate = useNavigate();
 
   const { alertModal, deriveModal: { open: openDeriveModal } } = useContext(WalletModalContext);
+  const [, setAddProxyParamsStorage] = useLocalStorage<AddProxyParams>(ADD_PROXY_TRANSACTION, DEFAULT_ADD_PROXY_PARAMS);
+  const getReformatAddress = useCoreCreateReformatAddress();
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
+  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const showDerivationInfoTab = useMemo((): boolean => {
     if (accountProxy.parentId) {
       return !!accountProxies.find((acc) => acc.id === accountProxy.parentId);
@@ -79,10 +79,6 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
       return false;
     }
   }, [accountProxies, accountProxy.parentId]);
-
-  const canManageProxies = useMemo(() => {
-    return  accountProxy.chainTypes.includes(AccountChainType.SUBSTRATE);
-  }, [accountProxy]);
 
   const getDefaultFilterTab = () => {
     if (requestViewDerivedAccounts && showDerivedAccounts) {
@@ -97,6 +93,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   const [selectedFilterTab, setSelectedFilterTab] = useState<string>(getDefaultFilterTab());
 
   const [proxyAccountsSelected, setProxyAccountsSelected] = useState<Record<string, ProxyItemSelector>>({});
+  const [networkSelected, setNetworkSelected] = useState<string>(DEFAULT_CURRENT_CHAIN);
 
   const [form] = Form.useForm<DetailFormState>();
 
@@ -106,6 +103,22 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   const [deleting, setDeleting] = useState(false);
   // @ts-ignore
   const [deriving, setDeriving] = useState(false);
+
+  const addressFormated = useMemo(() => {
+    const chainInfoSelected = chainInfoMap[networkSelected];
+
+    const accountSubstrate = accountProxy.accounts.find(({ chainType }) => chainType === AccountChainType.SUBSTRATE);
+
+    if (!accountSubstrate || !chainInfoSelected) {
+      return;
+    }
+
+    return getReformatAddress(accountSubstrate, chainInfoSelected);
+  }, [accountProxy.accounts, chainInfoMap, getReformatAddress, networkSelected]);
+
+  const canManageProxies = useMemo(() => {
+    return accountProxy.chainTypes.includes(AccountChainType.SUBSTRATE) && !!addressFormated;
+  }, [accountProxy.chainTypes, addressFormated]);
 
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     const result = [
@@ -141,8 +154,18 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   }, [canManageProxies, showDerivationInfoTab, showDerivedAccounts, t]);
 
   const onAddProxyAccount = useCallback(() => {
-    console.log('Add proxy account');
-  }, []);
+    if (!addressFormated) {
+      return;
+    }
+
+    setAddProxyParamsStorage({
+      ...DEFAULT_ADD_PROXY_PARAMS,
+      chain: networkSelected,
+      from: addressFormated
+    });
+
+    navigate('/transaction/add-proxy');
+  }, [addressFormated, navigate, networkSelected, setAddProxyParamsStorage]);
 
   const onRemoveProxyAccounts = useCallback(() => {
     console.log('Remove proxy account');
@@ -563,8 +586,11 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
         selectedFilterTab === FilterTabType.MANAGE_PROXIES && (
           <ProxyAccountList
             accountProxy={accountProxy}
+            address={addressFormated || ''}
             className={'list-container'}
+            networkSelected={networkSelected}
             proxyAccountsSelected={proxyAccountsSelected}
+            setNetworkSelected={setNetworkSelected}
             setProxyAccountsSelected={setProxyAccountsSelected}
           />
         )

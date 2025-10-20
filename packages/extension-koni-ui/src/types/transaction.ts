@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { StakingType } from '@subwallet/extension-base/background/KoniTypes';
+import { ProxyType } from '@subwallet/extension-base/types';
 
 export interface TransactionFormBaseProps {
   fromAccountProxy: string;
@@ -73,4 +74,10 @@ export interface SwapParams extends TransactionFormBaseProps {
 
 export interface ClaimBridgeParams extends TransactionFormBaseProps {
   notificationId: string;
+}
+
+export interface AddProxyParams extends TransactionFormBaseProps {
+  proxyAddress: string;
+  proxyType: ProxyType;
+  chain: string
 }

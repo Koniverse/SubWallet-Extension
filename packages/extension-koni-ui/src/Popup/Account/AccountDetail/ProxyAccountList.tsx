@@ -2,20 +2,23 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { UNSUPPORTED_PROXY_NETWORKS } from '@subwallet/extension-base/services/proxy-service/constant';
-import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { ProxyItem, ProxyType } from '@subwallet/extension-base/types/proxy';
 import { BasicInputEvent, ChainSelector, EmptyList, ProxyAccountSelectorItem, ProxyItemExtended } from '@subwallet/extension-koni-ui/components';
-import { useChainChecker, useCoreCreateReformatAddress, useGetChainAndExcludedTokenByCurrentAccountProxy, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { ADD_PROXY_TRANSACTION, DEFAULT_ADD_PROXY_PARAMS } from '@subwallet/extension-koni-ui/constants';
+import { useChainChecker, useGetChainAndExcludedTokenByCurrentAccountProxy, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { getProxyAccounts } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
-import { ChainItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AddProxyParams, ChainItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ActivityIndicator, Button, Icon, SwList } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ListChecks, TreeStructure } from 'phosphor-react';
 import React, { Context, Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import styled, { ThemeContext } from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
 export interface ProxyItemSelector extends ProxyItemExtended {
   isSelected: boolean;
@@ -23,35 +26,24 @@ export interface ProxyItemSelector extends ProxyItemExtended {
 
 type Props = ThemeProps & {
   accountProxy: AccountProxy;
+  address: string;
   setProxyAccountsSelected: Dispatch<SetStateAction<Record<string, ProxyItemSelector>>>;
   proxyAccountsSelected: Record<string, ProxyItemSelector>;
+  setNetworkSelected: Dispatch<SetStateAction<string>>;
+  networkSelected: string;
 };
-
-const DEFAULT_CURRENT_CHAIN = 'polkadot';
 
 const getKey = (address: string, proxyType: ProxyType) => address + '_' + proxyType;
 
-function Component ({ accountProxy, className, proxyAccountsSelected, setProxyAccountsSelected }: Props) {
+function Component ({ accountProxy, address: addressFormated, className, networkSelected, proxyAccountsSelected, setNetworkSelected, setProxyAccountsSelected }: Props) {
   const { t } = useTranslation();
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const { allowedChains } = useGetChainAndExcludedTokenByCurrentAccountProxy();
-  const getReformatAddress = useCoreCreateReformatAddress();
+  const [, setAddProxyParamsStorage] = useLocalStorage<AddProxyParams>(ADD_PROXY_TRANSACTION, DEFAULT_ADD_PROXY_PARAMS);
+  const navigate = useNavigate();
   const checkChain = useChainChecker();
-  const [networkSelected, setNetworkSelected] = useState<string>(DEFAULT_CURRENT_CHAIN);
   const [loading, setLoading] = useState(false);
-
-  const addressFormated = useMemo(() => {
-    const chainInfoSelected = chainInfoMap[networkSelected] || chainInfoMap[DEFAULT_CURRENT_CHAIN];
-
-    const accountSubstrate = accountProxy.accounts.find(({ chainType }) => chainType === AccountChainType.SUBSTRATE);
-
-    if (!accountSubstrate) {
-      return;
-    }
-
-    return getReformatAddress(accountSubstrate, chainInfoSelected);
-  }, [accountProxy.accounts, chainInfoMap, getReformatAddress, networkSelected]);
 
   const chainItems = useMemo<ChainItemType[]>(() => {
     const result: ChainItemType[] = [];
@@ -69,8 +61,18 @@ function Component ({ accountProxy, className, proxyAccountsSelected, setProxyAc
   }, [allowedChains, chainInfoMap]);
 
   const onAddProxyAccount = useCallback(() => {
-    console.log('Add proxy account');
-  }, []);
+    if (!addressFormated) {
+      return;
+    }
+
+    setAddProxyParamsStorage({
+      ...DEFAULT_ADD_PROXY_PARAMS,
+      chain: networkSelected,
+      from: addressFormated
+    });
+
+    navigate('/transaction/add-proxy');
+  }, [addressFormated, navigate, networkSelected, setAddProxyParamsStorage]);
 
   const renderEmpty = useCallback(() => {
     return (
@@ -122,7 +124,7 @@ function Component ({ accountProxy, className, proxyAccountsSelected, setProxyAc
         <ProxyAccountSelectorItem
           className={'__proxy-account-item'}
           isSelected={!!proxyAccountsSelected[key]?.isSelected}
-          key={item.proxyAddress}
+          key={key}
           onClick={onSelectProxyAccount(item)}
           proxyAccount={item}
           showCheckedIcon={accountProxy.accountType !== AccountProxyType.READ_ONLY}
@@ -147,7 +149,7 @@ function Component ({ accountProxy, className, proxyAccountsSelected, setProxyAc
         return prevState;
       }
     );
-  }, [checkChain, networkSelected, setProxyAccountsSelected]);
+  }, [checkChain, networkSelected, setNetworkSelected, setProxyAccountsSelected]);
 
   useEffect(() => {
     if (addressFormated) {

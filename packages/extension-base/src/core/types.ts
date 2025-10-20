@@ -21,7 +21,8 @@ export enum ValidationCondition {
 export enum ActionType {
   SEND_FUND = 'SEND_FUND',
   SEND_NFT = 'SEND_NFT',
-  SWAP = 'SWAP'
+  SWAP = 'SWAP',
+  PROXY = 'PROXY'
 }
 
 export interface ValidateRecipientParams {

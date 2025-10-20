@@ -23,10 +23,11 @@ interface Props extends ThemeProps {
   showNotificationIcon?: boolean;
   onClickSearchToken?: () => void;
   showTabBar?: boolean;
+  showHeader?: boolean;
   isDisableHeader?: boolean;
 }
 
-const Component = ({ children, className, isDisableHeader, onClickSearchToken, showFaderIcon, showNotificationIcon, showSearchToken, showSidebarIcon, showTabBar }: Props) => {
+const Component = ({ children, className, isDisableHeader, onClickSearchToken, showFaderIcon, showHeader = true, showNotificationIcon, showSearchToken, showSidebarIcon, showTabBar }: Props) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
@@ -234,7 +235,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
       headerOnClickLeft={onClickListIcon}
       headerPaddingVertical={true}
       isDisableHeader={isDisableHeader}
-      showHeader={true}
+      showHeader={showHeader}
       showLeftButton={true}
       showTabBar={showTabBar ?? true}
     >

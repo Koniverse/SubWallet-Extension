@@ -11,7 +11,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { isSubstrateAddress } from '@subwallet/keyring';
 import { useCallback, useEffect, useState } from 'react';
 
-export function useProxyAccounts (chain: string, address?: string, type?: ExtrinsicType, selectedProxyAddress?: string[]): ProxyItem[] {
+export function useGetProxyAccountsToSign (chain: string, address?: string, type?: ExtrinsicType, selectedProxyAddress?: string[]): ProxyItem[] {
   const [proxies, setProxies] = useState<ProxyItem[]>([]);
   const allAccounts = useSelector((state: RootState) => state.accountState.accounts);
 

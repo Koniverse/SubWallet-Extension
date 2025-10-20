@@ -3,7 +3,7 @@
 
 import { ExtrinsicType, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
+import { AddProxyParams, CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
 
 import { ALL_KEY } from './common';
 
@@ -55,7 +55,9 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.CLAIM_BRIDGE]: detectTranslate('ui.TRANSACTION.constant.transaction.claimTokens'),
 
   [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: detectTranslate('ui.TRANSACTION.constant.transaction.tokenApprove'),
-  [ExtrinsicType.SWAP]: detectTranslate('ui.TRANSACTION.constant.transaction.swap')
+  [ExtrinsicType.SWAP]: detectTranslate('ui.TRANSACTION.constant.transaction.swap'),
+  [ExtrinsicType.ADD_PROXY]: detectTranslate('Add proxy'),
+  [ExtrinsicType.REMOVE_PROXY]: detectTranslate('Remove proxy')
 };
 
 export const ALL_STAKING_ACTIONS: ExtrinsicType[] = [
@@ -156,4 +158,11 @@ export const DEFAULT_SWAP_PARAMS: SwapParams = {
 export const DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS: ClaimBridgeParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
   notificationId: ''
+};
+
+export const DEFAULT_ADD_PROXY_PARAMS: AddProxyParams = {
+  ...DEFAULT_TRANSACTION_PARAMS,
+  proxyAddress: '',
+  proxyType: 'Any',
+  chain: ''
 };

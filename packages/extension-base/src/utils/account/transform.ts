@@ -238,6 +238,11 @@ const CLAIM_AVAIL_BRIDGE: ExtrinsicType[] = [
   ExtrinsicType.CLAIM_BRIDGE
 ];
 
+const PROXY_ACTION: ExtrinsicType[] = [
+  ExtrinsicType.ADD_PROXY,
+  ExtrinsicType.REMOVE_PROXY
+];
+
 const OTHER_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.TRANSFER_XCM,
   ExtrinsicType.SEND_NFT,
@@ -259,6 +264,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_QDOT_ACTIONS,
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
+          ...PROXY_ACTION,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -298,6 +304,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_QDOT_ACTIONS,
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
+          ...PROXY_ACTION,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
