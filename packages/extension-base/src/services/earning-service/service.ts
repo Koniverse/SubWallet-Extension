@@ -48,7 +48,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
   private dbService: DatabaseService;
   private eventService: EventService;
-  private useOnlineCacheOnly = false;
+  private useOnlineCacheOnly = true;
   private validatorInfoCachingInterval: NodeJS.Timeout | undefined;
   private inactivePoolReady: PromiseHandler<void> = createPromiseHandler();
 
