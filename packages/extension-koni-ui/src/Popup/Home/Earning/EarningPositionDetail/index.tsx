@@ -4,6 +4,7 @@
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
+import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { EarningRewardHistoryItem, SpecialYieldPoolInfo, SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AlertModal, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { BN_TEN, BN_ZERO, DEFAULT_EARN_PARAMS, DEFAULT_UN_STAKE_PARAMS, EARN_TRANSACTION, UN_STAKE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
@@ -137,6 +138,8 @@ function Component ({ compound,
     return BN_ZERO.eq(totalNominationStake);
   }, [totalNominationStake]);
 
+  const isTanssiStaking = useMemo(() => _STAKING_CHAIN_GROUP.tanssi.includes(compound.chain), [compound.chain]);
+
   const transactionFromValue = useMemo(() => {
     return targetAddress ? isAccountAll(targetAddress) ? '' : targetAddress : '';
   }, [targetAddress]);
@@ -146,7 +149,7 @@ function Component ({ compound,
   }, [compound.chain, poolInfo.chain]);
 
   const onLeavePool = useCallback(() => {
-    if (((!isAllAccount && isTotalNominationStakeZero) || (isAllAccount && isActiveStakeZero)) && !poolInfo.metadata.availableMethod.withdraw) {
+    if (((!isAllAccount && isTotalNominationStakeZero) || (isAllAccount && isActiveStakeZero)) && isTanssiStaking) {
       openAlert({
         title: t('ui.EARNING.screen.EarningPositionDetail.unstakeNotAvailable'),
         type: NotificationType.ERROR,
@@ -182,7 +185,7 @@ function Component ({ compound,
       from: transactionFromValue
     });
     navigate('/transaction/unstake');
-  }, [isAllAccount, isTotalNominationStakeZero, isActiveStakeZero, poolInfo.metadata.availableMethod.withdraw, poolInfo.slug, setUnStakeStorage, transactionChainValue, transactionFromValue, navigate, openAlert, t, closeAlert]);
+  }, [isAllAccount, isTotalNominationStakeZero, isActiveStakeZero, isTanssiStaking, setUnStakeStorage, poolInfo.slug, transactionChainValue, transactionFromValue, navigate, openAlert, t, closeAlert]);
 
   const onEarnMore = useCallback(() => {
     setEarnStorage({

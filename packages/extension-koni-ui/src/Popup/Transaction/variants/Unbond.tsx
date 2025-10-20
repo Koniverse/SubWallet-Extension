@@ -39,9 +39,9 @@ const filterAccount = (
   return (account: AccountJson): boolean => {
     let stakedPositions = positionInfos;
 
-    const canPoolWithdraw = poolInfo.metadata.availableMethod.withdraw;
+    const isTanssiStaking = _STAKING_CHAIN_GROUP.tanssi.includes(poolInfo.chain);
 
-    if (!canPoolWithdraw) {
+    if (isTanssiStaking) {
       stakedPositions = positionInfos.filter((item) => {
         const totalNominationStake =
           item.nominations?.reduce((acc, n) => acc.plus(n.activeStake || 0), BN_ZERO) || BN_ZERO;
