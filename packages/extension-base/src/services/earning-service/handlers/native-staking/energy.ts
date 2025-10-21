@@ -57,7 +57,7 @@ export interface PalletEnergyStakingNominationRequestsScheduledRequest {
 }
 
 export interface PalletEnergyStakingTopNominations {
-  nominators: Array<{
+  nominations: Array<{
     owner: string;
     amount: string;
   }>;
@@ -363,7 +363,7 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
       apiProps.api.query.parachainStaking.delay()
     ]);
 
-    const delay = parseInt(unstakingDelay.toString());
+    const delay = parseInt(unstakingDelay.toString()); // in era unit
     const roundInfo = _eraInfo.toPrimitive() as unknown as PalletEnergyStakingEraInfo;
     const currentRound = roundInfo.current;
 
@@ -419,14 +419,14 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
         return;
       }
 
-      const [_topNomination, _nominationScheduledRequests] = await Promise.all([
-        apiProps.api.query.parachainStaking.topNomination(collator.address),
+      const [_topNominations, _nominationScheduledRequests] = await Promise.all([
+        apiProps.api.query.parachainStaking.topNominations(collator.address),
         apiProps.api.query.parachainStaking.nominationScheduledRequests(collator.address)
       ]);
       const nominationScheduledRequests = _nominationScheduledRequests.toPrimitive() as unknown as PalletEnergyStakingNominationRequestsScheduledRequest[];
-      const topNominations = _topNomination.toPrimitive() as unknown as PalletEnergyStakingTopNominations;
+      const topNominations = _topNominations.toPrimitive() as unknown as PalletEnergyStakingTopNominations;
 
-      const topNominatorsRecord = topNominations.nominators.reduce<Record<string, string>>((record, { amount, owner }) => {
+      const topNominationsRecord = topNominations.nominations.reduce<Record<string, string>>((record, { amount, owner }) => {
         record[owner] = amount || '0';
 
         return record;
@@ -436,7 +436,7 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
       if (nominationScheduledRequests?.length) {
         const bnTotalInactiveStake = nominationScheduledRequests.reduce((partialSum, { action, nominator, whenExecutable }) => {
           if ((whenExecutable + delay) - parseInt(currentRound) < 0 && action) {
-            return partialSum.add(new BN(topNominatorsRecord[nominator] || Object.values(action)[0] || BN_ZERO));
+            return partialSum.add(new BN(topNominationsRecord[nominator] || Object.values(action)[0] || BN_ZERO));
           }
 
           return partialSum;
