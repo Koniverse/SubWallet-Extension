@@ -146,7 +146,7 @@ function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): Submittable
 }
 
 export async function buildXcm (request: CreateXcmExtrinsicProps) {
-  const { destinationChain, originChain, originTokenInfo, recipient, sendingValue, substrateApi } = request;
+  const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue, substrateApi } = request;
 
   if (!substrateApi) {
     throw new Error('Substrate API is not available');
@@ -161,6 +161,7 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
   const paraSpellChainMap = await fetchParaSpellChainMap();
 
   const bodyData = {
+    senderAddress: sender,
     address: recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
@@ -277,17 +278,17 @@ export async function dryRunPreviewXcm (request: CreateXcmExtrinsicProps) {
   );
 
   if (!response.ok) {
-    const error = await response.json() as ParaSpellError; // todo: check interface
+    const error = await response.json() as ParaSpellError;
 
     return {
       origin: {
         success: false,
         failureReason: error.message
       }
-    } as DryRunResult; // todo: check interface
+    } as DryRunResult;
   }
 
-  return await response.json() as DryRunResult; // todo: check interface
+  return await response.json() as DryRunResult;
 }
 
 export async function estimateXcmFee (request: GetXcmFeeRequest) {

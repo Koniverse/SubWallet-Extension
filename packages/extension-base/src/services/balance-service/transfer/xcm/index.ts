@@ -167,6 +167,22 @@ export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps, isP
   }
 };
 
+export const getXcmOriginFee = async (request: CreateXcmExtrinsicProps, isPreview = false) => {
+  try {
+    const dryRunResult = isPreview ? await dryRunPreviewXcm(request) : await dryRunXcm(request);
+    const originDryRunRs = dryRunResult.origin;
+
+    if (!originDryRunRs.success) {
+      return undefined;
+    }
+
+    return originDryRunRs.fee;
+
+  } catch (e) {
+    return undefined;
+  }
+};
+
 export const createAcrossBridgeExtrinsic = async ({ destinationChain,
   destinationTokenInfo,
   evmApi,
