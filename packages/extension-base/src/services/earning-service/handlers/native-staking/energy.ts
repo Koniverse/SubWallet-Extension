@@ -424,9 +424,9 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
         apiProps.api.query.parachainStaking.nominationScheduledRequests(collator.address)
       ]);
       const nominationScheduledRequests = _nominationScheduledRequests.toPrimitive() as unknown as PalletEnergyStakingNominationRequestsScheduledRequest[];
-      const topNomination = _topNomination.toPrimitive() as unknown as PalletEnergyStakingTopNominations;
+      const topNominations = _topNomination.toPrimitive() as unknown as PalletEnergyStakingTopNominations;
 
-      const topNominationRecord = topNomination.nominators.reduce<Record<string, string>>((record, { amount, owner }) => {
+      const topNominatorsRecord = topNominations.nominators.reduce<Record<string, string>>((record, { amount, owner }) => {
         record[owner] = amount || '0';
 
         return record;
@@ -436,7 +436,7 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
       if (nominationScheduledRequests?.length) {
         const bnTotalInactiveStake = nominationScheduledRequests.reduce((partialSum, { action, nominator, whenExecutable }) => {
           if ((whenExecutable + delay) - parseInt(currentRound) < 0 && action) {
-            return partialSum.add(new BN(topNominationRecord[nominator] || Object.values(action)[0] || BN_ZERO));
+            return partialSum.add(new BN(topNominatorsRecord[nominator] || Object.values(action)[0] || BN_ZERO));
           }
 
           return partialSum;
