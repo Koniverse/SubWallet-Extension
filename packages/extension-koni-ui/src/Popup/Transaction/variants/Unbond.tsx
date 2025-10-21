@@ -6,9 +6,9 @@ import { AmountData, ExtrinsicType, NominationInfo } from '@subwallet/extension-
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
-import { AccountJson, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, MetaInfo, NominationSelector } from '@subwallet/extension-koni-ui/components';
-import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
+import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA, UNSTAKE_TANSSI_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
@@ -34,15 +34,29 @@ type Props = ThemeProps;
 const filterAccount = (
   positionInfos: YieldPositionInfo[],
   chainInfoMap: Record<string, _ChainInfo>,
-  poolType: YieldPoolType,
-  poolChain?: string
+  poolInfo: YieldPoolInfo
 ): ((account: AccountJson) => boolean) => {
   return (account: AccountJson): boolean => {
-    const nominator = positionInfos.find((item) => item.address.toLowerCase() === account.address.toLowerCase());
+    let stakedPositions = positionInfos;
+
+    const isTanssiStaking = _STAKING_CHAIN_GROUP.tanssi.includes(poolInfo.chain);
+
+    if (isTanssiStaking) {
+      stakedPositions = positionInfos.filter((item) => {
+        const totalNominationStake =
+          item.nominations?.reduce((acc, n) => acc.plus(n.activeStake || 0), BN_ZERO) || BN_ZERO;
+
+        return totalNominationStake.gt(BN_ZERO);
+      });
+    }
+
+    const nominator = stakedPositions.find(
+      (item) => item.address.toLowerCase() === account.address.toLowerCase()
+    );
 
     return (
       new BigN(nominator?.activeStake || BN_ZERO).gt(BN_ZERO) &&
-      accountFilterFunc(chainInfoMap, poolType, poolChain)(account)
+      accountFilterFunc(chainInfoMap, poolInfo.type, poolInfo.chain)(account)
     );
   };
 };
@@ -378,8 +392,8 @@ const Component: React.FC = () => {
   useInitValidateTransaction(validateFields, form, defaultData);
 
   const accountList = useMemo(() => {
-    return accounts.filter(filterAccount(allPositions, chainInfoMap, poolType, poolChain));
-  }, [accounts, allPositions, chainInfoMap, poolChain, poolType]);
+    return accounts.filter(filterAccount(allPositions, chainInfoMap, poolInfo));
+  }, [accounts, allPositions, chainInfoMap, poolInfo]);
 
   const nominators = useMemo(() => {
     if (fromValue && positionInfo?.nominations && positionInfo.nominations.length) {
@@ -469,9 +483,20 @@ const Component: React.FC = () => {
     return label !== 'dApp' ? label.toLowerCase() : label;
   }, [chainValue]);
 
-  const unstakeAlertData = poolChain === 'bifrost_dot'
-    ? UNSTAKE_BIFROST_ALERT_DATA
-    : poolChain.startsWith('bittensor') ? UNSTAKE_BITTENSOR_ALERT_DATA : UNSTAKE_ALERT_DATA;
+  const unstakeAlertData = useMemo(() => {
+    switch (true) {
+      case poolChain === 'bifrost_dot':
+        return UNSTAKE_BIFROST_ALERT_DATA;
+      case poolChain === 'bittensor':
+      case poolChain === 'bittensor_testnet':
+        return UNSTAKE_BITTENSOR_ALERT_DATA;
+      case poolChain === 'tanssi':
+      case poolChain === 'dancelight':
+        return UNSTAKE_TANSSI_ALERT_DATA;
+      default:
+        return UNSTAKE_ALERT_DATA;
+    }
+  }, [poolChain]);
 
   return (
     <>
