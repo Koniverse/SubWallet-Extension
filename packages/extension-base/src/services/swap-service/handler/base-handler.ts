@@ -69,7 +69,6 @@ interface ValidateBridgeStepRequest {
   bnFeeTokenBalance: BigN;
   bnBridgeDeliveryFee: BigN;
   isFirstBridge: boolean;
-  hasDoubleBridge?: boolean;
 }
 
 export class SwapBaseHandler {
@@ -409,7 +408,7 @@ export class SwapBaseHandler {
   }
 
   private async validateBridgeStep (request: ValidateBridgeStepRequest): Promise<TransactionError[]> {
-    const { bnBridgeAmount, bnBridgeDeliveryFee, bnBridgeFeeAmount, bnFeeTokenBalance, bnFromTokenBalance, bridgeFromTokenBalanceStr, fromChain, fromToken, hasDoubleBridge, isFirstBridge, receiver, selectedFeeToken, sender, toChain, toChainNativeToken, toToken } = request;
+    const { bnBridgeAmount, bnBridgeDeliveryFee, bnBridgeFeeAmount, bnFeeTokenBalance, bnFromTokenBalance, bridgeFromTokenBalanceStr, fromChain, fromToken, isFirstBridge, receiver, selectedFeeToken, sender, toChain, toChainNativeToken, toToken } = request;
 
     const minBridgeAmountRequired = new BigN(_getTokenMinAmount(toToken)).multipliedBy(FEE_RATE_MULTIPLIER.high);
     const spendingAndFeePaymentValidation = validateSpendingAndFeePayment(fromToken, selectedFeeToken, bnBridgeAmount, bnFromTokenBalance, bnBridgeFeeAmount, bnFeeTokenBalance);
@@ -467,9 +466,7 @@ export class SwapBaseHandler {
         if (!isDryRunSuccess) {
           return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again')];
         }
-      }
-
-      if (!isFirstBridge || hasDoubleBridge) {
+      } else {
         const isDryRunPreviewSuccess = await dryRunXcmExtrinsicV2(xcmRequest, true);
         const originFee = await getXcmOriginFee(xcmRequest, true);
 
@@ -898,8 +895,7 @@ export class SwapBaseHandler {
       bnBridgeFeeAmount,
       bnFeeTokenBalance: bnBridgeFeeTokenBalance,
       bnBridgeDeliveryFee,
-      isFirstBridge: true,
-      hasDoubleBridge: true
+      isFirstBridge: true
     });
 
     if (bridgeStepValidation.length > 0) {

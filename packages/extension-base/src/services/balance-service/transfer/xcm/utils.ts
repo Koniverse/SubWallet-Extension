@@ -266,7 +266,7 @@ export async function dryRunPreviewXcm (request: CreateXcmExtrinsicProps) {
 
   const response = await fetchFromProxyService(
     ProxyServiceRoute.PARASPELL,
-    paraSpellApi.dryRunPreviewXcm, // todo: add this to proxy service
+    paraSpellApi.dryRunPreviewXcm,
     {
       method: 'POST',
       body: JSON.stringify(bodyData),
