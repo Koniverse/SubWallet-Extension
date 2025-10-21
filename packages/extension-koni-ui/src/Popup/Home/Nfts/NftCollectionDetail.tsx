@@ -1,26 +1,26 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _isCustomAsset, _isSmartContractToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { SHOW_3D_MODELS_CHAIN } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useNavigateOnChangeAccount } from '@subwallet/extension-koni-ui/hooks';
+import { useGetNftByAccount, useNavigateOnChangeAccount, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import useConfirmModal from '@subwallet/extension-koni-ui/hooks/modal/useConfirmModal';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
 import useGetChainAssetInfo from '@subwallet/extension-koni-ui/hooks/screen/common/useGetChainAssetInfo';
-import { deleteCustomAssets } from '@subwallet/extension-koni-ui/messaging';
+import { deleteCustomAssets, getFullNftList } from '@subwallet/extension-koni-ui/messaging';
 import { NftGalleryWrapper } from '@subwallet/extension-koni-ui/Popup/Home/Nfts/component/NftGalleryWrapper';
-import { INftCollectionDetail, INftItemDetail } from '@subwallet/extension-koni-ui/Popup/Home/Nfts/utils';
+import { INftItemDetail } from '@subwallet/extension-koni-ui/Popup/Home/Nfts/utils';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ButtonProps, Icon, SwList } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Image, Trash } from 'phosphor-react';
-import React, { useCallback, useContext } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 type Props = ThemeProps
@@ -33,9 +33,10 @@ const subHeaderRightButton = <Icon
 />;
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
-  const state = useLocation().state as INftCollectionDetail;
-  const { collectionInfo, nftList } = state;
-
+  const [searchParams] = useSearchParams();
+  const chain = searchParams.get('chain');
+  const collectionId = searchParams.get('collectionId');
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { goBack } = useDefaultNavigate();
@@ -43,9 +44,36 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const dataContext = useContext(DataContext);
 
+  const { nftCollections, nftItems } = useGetNftByAccount();
+
   useNavigateOnChangeAccount('/home/nfts/collections');
 
-  const originAssetInfo = useGetChainAssetInfo(collectionInfo.originAsset);
+  const getNftsByCollection = useCallback((nftCollection: NftCollection) => {
+    const nftList: NftItem[] = [];
+
+    nftItems.forEach((nftItem) => {
+      if (nftItem.collectionId === nftCollection.collectionId && nftItem.chain === nftCollection.chain) {
+        nftList.push(nftItem);
+      }
+    });
+
+    return nftList;
+  }, [nftItems]);
+
+  const collectionInfo = useMemo(() => {
+    return (
+      nftCollections.find(
+        (nftCollection) =>
+          nftCollection.collectionId === collectionId && nftCollection.chain === chain
+      ) ?? ({} as NftCollection)
+    );
+  }, [nftCollections, collectionId, chain]);
+
+  const nftList = getNftsByCollection(collectionInfo);
+
+  const ownerAddress = nftList.find((item) => !!item.owner)?.owner;
+
+  const originAssetInfo = useGetChainAssetInfo(collectionInfo?.originAsset);
 
   const { handleSimpleConfirmModal } = useConfirmModal({
     title: t<string>('ui.NFT.screen.NftsCollectionDetail.deleteNft'),
@@ -67,7 +95,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, []);
 
   const handleOnClickNft = useCallback((state: INftItemDetail) => {
-    navigate('/home/nfts/item-detail', { state: { ...state, nftList } });
+    const { chain, collectionId } = state.collectionInfo;
+
+    navigate(`/home/nfts/item-detail?chain=${chain}&collectionId=${collectionId}`, { state: { ...state, nftList } });
   }, [navigate, nftList]);
 
   const renderNft = useCallback((nftItem: NftItem) => {
@@ -128,6 +158,20 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       disabled: !(originAssetInfo && _isSmartContractToken(originAssetInfo) && _isCustomAsset(originAssetInfo.slug))
     }
   ];
+
+  useEffect(() => {
+    if (!collectionInfo) {
+      return;
+    }
+
+    const isNeedGetFullList = (nftList.length < (collectionInfo?.itemCount ?? 0));
+
+    if (isNeedGetFullList) {
+      const chainInfo = chainInfoMap[collectionInfo.chain];
+
+      getFullNftList({ contractAddress: collectionInfo.collectionId, owner: ownerAddress || '', chainInfo: chainInfo }).catch(console.error);
+    }
+  }, [chainInfoMap, collectionInfo, nftList.length, ownerAddress]);
 
   return (
     <PageWrapper

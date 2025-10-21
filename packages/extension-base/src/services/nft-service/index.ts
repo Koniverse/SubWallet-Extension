@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetType } from '@subwallet/chain-list/types';
-import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import { NftCollection, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { _getEvmChainId } from '@subwallet/extension-base/services/chain-service/utils';
 import { baseParseIPFSUrl } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
+import { BlockscoutNftInstanceRaw } from '@subwallet-monorepos/subwallet-services-sdk/services/blockscout/types';
 
 /**
  * NFT detection service
@@ -20,35 +22,16 @@ interface SdkToken {
   icon_url?: string | null;
 }
 
-interface SdkTokenInstance {
-  id: string | number;
-  image_url?: string | null;
-  media_url?: string | null;
-  animation_url?: string | null;
-  external_app_url?: string | null;
-  is_unique?: boolean | null;
-  owner?: string | null;
-  token_type?: _AssetType.ERC721;
-  value?: string | null;
-  metadata?: {
-    name?: string;
-    description?: string;
-    image?: string;
-    external_url?: string;
-    attributes?: Array<{ trait_type: string; value: any }>;
-  };
-}
-
 interface SdkCollection {
   amount: string;
   token: SdkToken;
-  token_instances: SdkTokenInstance[];
+  token_instances: BlockscoutNftInstanceRaw[];
 }
 
 type SdkCollectionsByChain = Record<string, SdkCollection[]>;
 
 function mapSdkToNftItem (
-  rawInstance: SdkTokenInstance,
+  rawInstance: BlockscoutNftInstanceRaw,
   chain: string,
   collectionId: string,
   owner: string
@@ -102,12 +85,12 @@ function mapSdkToNftItem (
     originAsset: undefined,
     name: metadata.name || `#${rawInstance.id}`,
     image: baseParseIPFSUrl(image),
-    externalUrl: metadata.external_url || rawInstance.external_app_url || undefined,
+    externalUrl: rawInstance.external_app_url || undefined,
     rarity,
     description: metadata.description || undefined,
     properties: hasProperties ? properties : null,
 
-    type: rawInstance.token_type,
+    type: rawInstance.token_type as _AssetType.ERC721,
     rmrk_ver: undefined,
     onChainOption: undefined,
     assetHubType: undefined
@@ -151,13 +134,13 @@ export default class NftDetectionService {
     try {
       const nftDetectionApi = subwalletApiSdk.nftDetectionApi;
 
-      if (!nftDetectionApi?.getEvmNftData) {
+      if (!nftDetectionApi?.getEvmNftCollectionsByAddress) {
         console.warn('[NftDetectionService] NftDetectionApi not available');
 
         return;
       }
 
-      const rawData: SdkCollectionsByChain = await nftDetectionApi.getEvmNftData(address);
+      const rawData: SdkCollectionsByChain = await nftDetectionApi.getEvmNftCollectionsByAddress(address);
 
       const allItems: NftItem[] = [];
       const allCollections: NftCollection[] = [];
@@ -188,6 +171,52 @@ export default class NftDetectionService {
       console.warn(`[NftDetectionService] detect error for ${address}`, err);
     } finally {
       this.inProgress.delete(address);
+    }
+  }
+
+  async getFullNftInstancesByCollection (request: NftFullListRequest): Promise<boolean> {
+    const { chainInfo, contractAddress, owner } = request;
+    const chainId = _getEvmChainId(chainInfo);
+
+    if (!contractAddress || !owner || !chainId) {
+      console.warn('[NftDetectionService] missing params for getFullNftInstancesByCollection');
+
+      return false;
+    }
+
+    try {
+      const nftDetectionApi = subwalletApiSdk.nftDetectionApi;
+
+      if (!nftDetectionApi?.getAllNftInstances) {
+        console.warn('[NftDetectionService] getAllNftInstances not available');
+
+        return false;
+      }
+
+      const instances = await nftDetectionApi.getAllNftInstances(
+        contractAddress,
+        owner,
+        chainId.toString()
+      );
+
+      if (!Array.isArray(instances)) {
+        return false;
+      }
+
+      const nftList = instances.map((inst) =>
+        mapSdkToNftItem(inst, chainInfo.slug, contractAddress, owner)
+      );
+
+      await this.state.handleDetectedNfts(owner, nftList);
+
+      return true;
+    } catch (err) {
+      console.error(
+        `[NftDetectionService] getFullNftInstancesByCollection error for ${contractAddress}`,
+        err
+      );
+
+      return false;
     }
   }
 }
