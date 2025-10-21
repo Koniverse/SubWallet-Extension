@@ -2,29 +2,28 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RELAY_CHAINS_TO_MIGRATE } from '@subwallet/extension-koni-ui/constants';
-import { AccountChainAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { toShort } from '@subwallet/extension-koni-ui/utils';
+import { AccountTokenAddress, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { getBitcoinAccountDetails, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, Logo } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { Copy, Info, QrCode } from 'phosphor-react';
+import { Copy, QrCode } from 'phosphor-react';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
-  item: AccountChainAddress;
+  item: AccountTokenAddress;
   onClick?: VoidFunction;
   onClickCopyButton?: VoidFunction;
   onClickQrButton?: VoidFunction;
-  onClickInfoButton?: VoidFunction;
-  isShowInfoButton?: boolean;
 }
 
 function Component (props: Props): React.ReactElement<Props> {
-  const { className, isShowInfoButton,
+  const { className,
     item,
-    onClick, onClickCopyButton, onClickInfoButton, onClickQrButton } = props;
+    onClick,
+    onClickCopyButton, onClickQrButton } = props;
 
-  const isRelayChainToMigrate = useMemo(() => RELAY_CHAINS_TO_MIGRATE.includes(item.slug), [item.slug]);
+  const isRelayChainToMigrate = useMemo(() => RELAY_CHAINS_TO_MIGRATE.includes(item.chainSlug), [item.chainSlug]);
 
   const _onClickCopyButton: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement> = React.useCallback((event) => {
     event.stopPropagation();
@@ -36,11 +35,6 @@ function Component (props: Props): React.ReactElement<Props> {
     onClickQrButton?.();
   }, [onClickQrButton]);
 
-  const _onClickInfoButton: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement> = React.useCallback((event) => {
-    event.stopPropagation();
-    onClickInfoButton?.();
-  }, [onClickInfoButton]);
-
   return (
     <>
       <div
@@ -49,50 +43,36 @@ function Component (props: Props): React.ReactElement<Props> {
       >
         <div className='__item-left-part'>
           <Logo
-            network={item.slug}
-            shape={'circle'}
-            size={28}
+            isShowSubLogo={true}
+            shape={'squircle'}
+            size={40}
+            subLogoShape={'circle'}
+            subNetwork={item.chainSlug}
+            token={item.tokenSlug.toLowerCase()}
           />
         </div>
 
         <div className='__item-center-part'>
           <div className='__item-chain-name'>
-            {item.name}
+            {getBitcoinAccountDetails(item.accountInfo.type).name}
           </div>
           <div className='__item-address'>
-            {toShort(item.address, 4, 5)}
+            {toShort(item.accountInfo.address, 4, 5)}
           </div>
         </div>
 
         <div className='__item-right-part'>
-          {!isShowInfoButton
-            ? (<Button
-              icon={
-                <Icon
-                  phosphorIcon={QrCode}
-                  size='sm'
-                />
-              }
-              onClick={_onClickQrButton}
-              size='xs'
-              type='ghost'
-            />)
-            : (
-              <Button
-                icon={
-                  <Icon
-                    phosphorIcon={Info}
-                    size='sm'
-                    weight={'fill'}
-                  />
-                }
-                onClick={_onClickInfoButton}
-                size='xs'
-                tooltip={'This network has two address formats'}
-                tooltipPlacement={'topLeft'}
-                type='ghost'
+          <Button
+            icon={
+              <Icon
+                phosphorIcon={QrCode}
+                size='sm'
               />
-            )}
+            }
+            onClick={_onClickQrButton}
+            size='xs'
+            type='ghost'
+          />
           <Button
             disabled={isRelayChainToMigrate}
             icon={
@@ -111,20 +91,18 @@ function Component (props: Props): React.ReactElement<Props> {
   );
 }
 
-const AccountChainAddressItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const AccountTokenAddressItem = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     background: token.colorBgSecondary,
-    paddingLeft: token.paddingSM,
+    padding: token.paddingSM,
     paddingRight: token.paddingXXS,
-    paddingTop: 6,
-    paddingBottom: 6,
     borderRadius: token.borderRadiusLG,
     alignItems: 'center',
     display: 'flex',
     flexDirection: 'row',
     cursor: 'pointer',
     transition: `background ${token.motionDurationMid} ease-in-out`,
-    gap: token.sizeXXS,
+    gap: token.sizeXS,
     overflowX: 'hidden',
     minHeight: 52,
 
@@ -132,16 +110,16 @@ const AccountChainAddressItem = styled(Component)<Props>(({ theme: { token } }: 
       display: 'flex',
       overflowX: 'hidden',
       'white-space': 'nowrap',
-      gap: token.sizeXXS,
       flex: 1,
-      alignItems: 'flex-end'
+      flexDirection: 'column'
     },
 
     '.__item-chain-name': {
-      fontSize: token.fontSize,
-      lineHeight: token.lineHeight,
+      fontSize: token.fontSizeLG,
+      lineHeight: token.lineHeightLG,
       color: token.colorTextLight1,
       overflow: 'hidden',
+      'white-space': 'nowrap',
       textOverflow: 'ellipsis'
     },
 
@@ -177,4 +155,4 @@ const AccountChainAddressItem = styled(Component)<Props>(({ theme: { token } }: 
   };
 });
 
-export default AccountChainAddressItem;
+export default AccountTokenAddressItem;

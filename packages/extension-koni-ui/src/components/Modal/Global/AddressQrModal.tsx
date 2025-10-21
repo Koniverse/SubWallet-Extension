@@ -6,6 +6,7 @@ import type { ButtonProps } from '@subwallet/react-ui/es/button/button';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { AccountActions } from '@subwallet/extension-base/types';
 import { CloseIcon, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
+import { RELAY_CHAINS_TO_MIGRATE } from '@subwallet/extension-koni-ui/constants';
 import { ADDRESS_QR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { useDefaultNavigate, useFetchChainInfo, useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
@@ -42,6 +43,8 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat
   const accountInfo = useGetAccountByAddress(address);
   const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
   const goHome = useDefaultNavigate().goHome;
+
+  const isRelayChainToMigrate = useMemo(() => RELAY_CHAINS_TO_MIGRATE.includes(chainSlug), [chainSlug]);
 
   const scanExplorerAddressUrl = useMemo(() => {
     return getExplorerLink(chainInfo, address, 'account');
@@ -131,7 +134,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat
         <>
           <div className='__qr-code-wrapper'>
             <SwQRCode
-              className='__qr-code'
+              className={CN('__qr-code', { '-is-relay-chain': isRelayChainToMigrate })}
               color='#000'
               errorLevel='H'
               icon={''}
@@ -165,7 +168,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, isNewFormat
 
               <CopyToClipboard text={address}>
                 <Button
-                  className='__copy-button'
+                  className={CN('__copy-button', { '-is-relay-chain': isRelayChainToMigrate })}
                   icon={
                     <Icon
                       phosphorIcon={CopySimple}
@@ -234,7 +237,24 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
   return {
     '.__qr-code-wrapper': {
       paddingTop: token.padding,
-      paddingBottom: token.padding
+      paddingBottom: token.padding,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      '.__prev-button': {
+        marginLeft: -20
+      },
+      '.__next-button': {
+        marginRight: -20
+      },
+      '.__qr-code ': {
+        marginLeft: 0,
+        marginRight: 0
+      },
+
+      '& .-is-relay-chain': {
+        filter: 'blur(10px)'
+      }
     },
     '.ant-sw-sub-header-title': {
       fontSize: token.fontSizeXL,
@@ -288,6 +308,10 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
 
     '.__copy-button': {
       color: token.colorTextLight3,
+
+      '&.-is-relay-chain': {
+        display: 'none'
+      },
 
       '&:hover': {
         color: token.colorTextLight2
