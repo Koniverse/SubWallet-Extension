@@ -421,7 +421,6 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
       funcCreateExtrinsic = createAvailBridgeExtrinsicFromAvail;
     } else {
       funcCreateExtrinsic = createXcmExtrinsicV2;
-      params.sendingValue = '1';
     }
 
     const extrinsic = await funcCreateExtrinsic(params);
