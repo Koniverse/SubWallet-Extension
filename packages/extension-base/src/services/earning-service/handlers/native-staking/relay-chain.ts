@@ -88,9 +88,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
 
       const unlimitedNominatorRewarded = substrateApi.api.consts.staking.maxExposurePageSize !== undefined;
       const maxNominatorRewarded = substrateApi.api.consts.staking.maxNominatorRewardedPerValidator?.toString();
-      // hotfix for kusama asset hub migration
-      const kahMaxNominations = '24';
-      const maxNominations = chainInfo.slug === 'statemine' ? kahMaxNominations : await getRelayMaxNominations(substrateApi);
+      const maxNominations = await getRelayMaxNominations(substrateApi);
       const currentEra = _currentEra.toString();
       const maxUnlockingChunks = substrateApi.api.consts.staking.maxUnlockingChunks.toString();
       const unlockingEras = substrateApi.api.consts.staking.bondingDuration.toString();
