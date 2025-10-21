@@ -2251,17 +2251,17 @@ export default class KoniExtension {
       }
 
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-callsm,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         await tokenContract.methods.ownerOf(1).call();
 
         return true;
       } catch (err: any) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         if (err.message?.includes('nonexistent token') || err.message?.includes('invalid token ID')) {
           return true;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         await tokenContract.methods.balanceOf('0x0000000000000000000000000000000000000001').call();
 
         return true;
