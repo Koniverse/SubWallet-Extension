@@ -177,7 +177,6 @@ export const getXcmOriginFee = async (request: CreateXcmExtrinsicProps, isPrevie
     }
 
     return originDryRunRs.fee;
-
   } catch (e) {
     return undefined;
   }
