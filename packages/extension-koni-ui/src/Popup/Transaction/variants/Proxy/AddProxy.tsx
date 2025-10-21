@@ -7,7 +7,7 @@ import { ActionType } from '@subwallet/extension-base/core/types';
 import { UNSUPPORTED_PROXY_NETWORKS } from '@subwallet/extension-base/services/proxy-service/constant';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AddressInputNew, ChainSelector, HiddenInput, NumberDisplay } from '@subwallet/extension-koni-ui/components';
-import { useFocusFormItem, useGetBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useCreateGetChainAndExcludedTokenByAccountProxy, useFocusFormItem, useGetAccountProxyByAddress, useGetBalance, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { useGetProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/proxyAccount/useGetProxyAccountByAddress';
 import { handleAddProxy } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
@@ -38,7 +38,6 @@ const Component = (): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const [isBalanceReady, setIsBalanceReady] = useState(true);
   const [isDisable, setIsDisable] = useState(true);
-  const { allowedChains } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const [loading, setLoading] = useState(false);
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
@@ -55,6 +54,13 @@ const Component = (): React.ReactElement<Props> => {
   const onPreCheck = usePreCheckAction(fromValue);
   const proxyInfo = useGetProxyAccountsInfoByAddress(fromValue, chainValue);
   const nativeToken = useGetNativeTokenBasicInfo(chainValue);
+
+  const accountProxy = useGetAccountProxyByAddress(fromValue);
+  const getChainAndExcludedTokenByAccountProxy = useCreateGetChainAndExcludedTokenByAccountProxy();
+
+  const { allowedChains } = useMemo(() => {
+    return getChainAndExcludedTokenByAccountProxy(accountProxy);
+  }, [accountProxy, getChainAndExcludedTokenByAccountProxy]);
 
   const chainItems = useMemo<ChainItemType[]>(() => {
     const result: ChainItemType[] = [];
@@ -158,6 +164,7 @@ const Component = (): React.ReactElement<Props> => {
           </Form.Item>
 
           <Form.Item
+            dependencies={['proxyAddress']}
             name={'proxyAddress'}
             rules={[
               {

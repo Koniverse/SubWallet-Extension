@@ -41,5 +41,6 @@ export const UNSUPPORTED_PROXY_NETWORKS = [
   'krest_network',
   'auto_evm',
   'polymesh',
-  'sora_substrate'
+  'sora_substrate',
+  'nodle'
 ];

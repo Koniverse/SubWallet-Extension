@@ -32,6 +32,16 @@ const Component: React.FC<Props> = (props: Props) => {
     return undefined;
   }, [data.additionalInfo, data.type]);
 
+  const senderLabel = useMemo(() => {
+    switch (data.type) {
+      case ExtrinsicType.ADD_PROXY:
+      case ExtrinsicType.REMOVE_PROXY:
+        return t('ui.HISTORY.screen.HistoryDetail.Header.fromAccount');
+      default:
+        return undefined;
+    }
+  }, [data.type, t]);
+
   if (xcmInfo) {
     return (
       <MetaInfo.Transfer
@@ -87,6 +97,7 @@ const Component: React.FC<Props> = (props: Props) => {
         recipientAddress={data.to}
         recipientName={data.toName}
         senderAddress={data.from}
+        senderLabel={senderLabel}
         senderName={data.fromName}
       />
 

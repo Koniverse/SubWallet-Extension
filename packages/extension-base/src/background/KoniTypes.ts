@@ -776,6 +776,7 @@ export interface TransactionHistoryItem<ET extends ExtrinsicType = ExtrinsicType
   addressPrefix?: number,
   processId?: string;
   apiTxIndex?: number;
+  proxyAddress?: string[];
 }
 
 export interface SWWarning {

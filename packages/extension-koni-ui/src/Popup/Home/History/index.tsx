@@ -11,9 +11,9 @@ import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/extension-koni-ui/messaging';
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
-import { customFormatDate, formatHistoryDate, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
+import { customFormatDate, formatHistoryDate, isTypeProxy, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
-import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, Pencil, Rocket, Spinner } from 'phosphor-react';
+import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, Pencil, Rocket, Spinner, TreeStructure } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -34,7 +34,8 @@ const IconMap: Record<string, SwIconProps['phosphorIcon']> = {
   default: ClockCounterClockwise,
   timeout: ClockCounterClockwise,
   swap: ArrowsLeftRight,
-  nominate: Pencil
+  nominate: Pencil,
+  proxy: TreeStructure
 };
 
 function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
@@ -68,6 +69,10 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
 
   if (isTypeStaking(item.type)) {
     return IconMap.staking;
+  }
+
+  if (isTypeProxy(item.type)) {
+    return IconMap.proxy;
   }
 
   return IconMap.default;
@@ -330,6 +335,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('ui.HISTORY.screen.History.tokenApprove'),
     [ExtrinsicType.SWAP]: t('ui.HISTORY.screen.History.swap'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('ui.HISTORY.screen.History.claimToken'),
+    [ExtrinsicType.ADD_PROXY]: t('ui.HISTORY.screen.History.addProxy'),
+    [ExtrinsicType.REMOVE_PROXY]: t('ui.HISTORY.screen.History.removeProxy'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknown')
   }), [t]);
 
@@ -376,6 +383,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('ui.HISTORY.screen.History.tokenApproveTransaction'),
     [ExtrinsicType.SWAP]: t('ui.HISTORY.screen.History.swapTransaction'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('ui.HISTORY.screen.History.claimTokenTransaction'),
+    [ExtrinsicType.ADD_PROXY]: t('ui.HISTORY.screen.History.addProxyTransaction'),
+    [ExtrinsicType.REMOVE_PROXY]: t('ui.HISTORY.screen.History.removeProxyTransaction'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknownTransaction')
   }), [t]);
 
@@ -384,9 +393,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     const finalHistoryMap: Record<string, TransactionHistoryDisplayItem> = {};
 
     rawHistoryList.forEach((item: TransactionHistoryItem) => {
-      // Format display name for account by address
       const fromName = accountMap[quickFormatAddressToCompare(item.from) || ''];
-      const toName = accountMap[quickFormatAddressToCompare(item.to) || ''];
+      let toName = accountMap[quickFormatAddressToCompare(item.to) || ''];
+
+      if ((item.type === ExtrinsicType.ADD_PROXY || item.type === ExtrinsicType.REMOVE_PROXY) && item.proxyAddress?.length) {
+        toName = accountMap[quickFormatAddressToCompare(item.address) || ''];
+      }
+
       const key = getHistoryItemKey(item);
       const displayTime = item.blockTime || item.time;
 

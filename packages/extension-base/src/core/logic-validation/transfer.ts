@@ -454,9 +454,9 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
   return estimateFee;
 }
 
-export function checkSigningAccountForTransaction (validationResponse: SWTransactionResponse, chainInfoMap: Record<string, _ChainInfo>) {
-  const { address, chain, chainType, extrinsicType } = validationResponse;
-  const pair = keyring.getPair(address);
+export function checkSigningAccountForTransaction (validationResponse: SWTransactionResponse, chainInfoMap: Record<string, _ChainInfo>, signer: string) {
+  const { chain, chainType, extrinsicType } = validationResponse;
+  const pair = keyring.getPair(signer);
 
   if (!pair) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('bg.TRANSACTION.core.validation.transfer.unableToFindAccount')));

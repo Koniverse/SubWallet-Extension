@@ -46,6 +46,8 @@ export const TxTypeNameMap: Record<ExtrinsicType, string> = {
   [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: detectTranslate('ui.HISTORY.constant.history.tokenApprove'),
   [ExtrinsicType.SWAP]: detectTranslate('ui.HISTORY.constant.history.swap'),
   [ExtrinsicType.CLAIM_BRIDGE]: detectTranslate('ui.HISTORY.constant.history.claimToken'),
+  [ExtrinsicType.ADD_PROXY]: detectTranslate('ui.HISTORY.constant.history.claimToken'),
+  [ExtrinsicType.REMOVE_PROXY]: detectTranslate('ui.HISTORY.constant.history.claimToken'),
   [ExtrinsicType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.history.unknown')
 };
 

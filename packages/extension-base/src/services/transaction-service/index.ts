@@ -156,11 +156,13 @@ export default class TransactionService {
 
     const chainInfoMap = this.state.chainService.getChainInfoMap();
 
+    // Get signer account
+    const signer = transactionInput.proxyAddress || address;
+
     // Check account signing transaction
+    checkSigningAccountForTransaction(validationResponse, chainInfoMap, signer);
 
-    checkSigningAccountForTransaction(validationResponse, chainInfoMap);
-
-    const nativeTokenAvailable = await this.state.balanceService.getTransferableBalance(address, chain, nativeTokenInfo.slug, extrinsicType);
+    const nativeTokenAvailable = await this.state.balanceService.getTransferableBalance(signer, chain, nativeTokenInfo.slug, extrinsicType);
 
     // Check available balance against transaction fee
     checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable);
@@ -808,9 +810,11 @@ export default class TransactionService {
       blockHash: '', // Will be added in next step
       nonce: nonce ?? 0,
       startBlock: startBlock || 0,
-      processId: transaction.step?.processId
+      processId: transaction.step?.processId,
+      proxyAddress: []
     };
 
+    const proxyHistories: TransactionHistoryItem[] = [];
     const nativeAsset = _getChainNativeTokenBasicInfo(chainInfo);
     const baseNativeAmount = { value: '0', decimals: nativeAsset.decimals, symbol: nativeAsset.symbol };
 
@@ -1114,6 +1118,66 @@ export default class TransactionService {
         break;
       }
 
+      case ExtrinsicType.ADD_PROXY: {
+        const data = parseTransactionData<ExtrinsicType.ADD_PROXY>(transaction.data);
+
+        const proxyAddr = data.proxyAddress;
+
+        historyItem.proxyAddress = [proxyAddr];
+
+        proxyHistories.push({
+          ...historyItem,
+          proxyAddress: [proxyAddr]
+        });
+
+        try {
+          const proxyAccount = keyring.getPair(proxyAddr);
+
+          if (proxyAccount) {
+            proxyHistories.push({
+              ...historyItem,
+              address: proxyAccount.address,
+              direction: TransactionDirection.RECEIVED,
+              proxyAddress: [proxyAddr]
+            });
+          }
+        } catch {
+          // skip
+        }
+
+        break;
+      }
+
+      case ExtrinsicType.REMOVE_PROXY: {
+        const data = parseTransactionData<ExtrinsicType.REMOVE_PROXY>(transaction.data);
+
+        for (const proxyItem of data.selectedProxyAccounts || []) {
+          const proxyAddr = proxyItem.proxyAddress;
+
+          proxyHistories.push({
+            ...historyItem,
+            proxyAddress: [proxyAddr]
+          });
+
+          try {
+            const proxyAccount = keyring.getPair(proxyAddr);
+
+            if (proxyAccount) {
+              proxyHistories.push({
+                ...historyItem,
+                address: proxyAccount.address,
+                direction: TransactionDirection.RECEIVED,
+                proxyAddress: [proxyAddr]
+              });
+            }
+          } catch {
+            // skip
+          }
+        }
+
+        break;
+      }
+
       case ExtrinsicType.UNKNOWN:
         break;
     }
@@ -1147,7 +1211,7 @@ export default class TransactionService {
       console.warn(e);
     }
 
-    return [historyItem];
+    return [historyItem, ...proxyHistories];
   }
 
   private onSigned ({ id }: TransactionEventResponse) {

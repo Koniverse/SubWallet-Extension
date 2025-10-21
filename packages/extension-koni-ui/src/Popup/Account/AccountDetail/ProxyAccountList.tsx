@@ -6,7 +6,7 @@ import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types'
 import { ProxyItem, ProxyType } from '@subwallet/extension-base/types/proxy';
 import { BasicInputEvent, ChainSelector, EmptyList, ProxyAccountSelectorItem, ProxyItemExtended } from '@subwallet/extension-koni-ui/components';
 import { ADD_PROXY_TRANSACTION, DEFAULT_ADD_PROXY_PARAMS } from '@subwallet/extension-koni-ui/constants';
-import { useChainChecker, useGetChainAndExcludedTokenByCurrentAccountProxy, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useCreateGetChainAndExcludedTokenByAccountProxy, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { getProxyAccounts } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
@@ -39,11 +39,16 @@ function Component ({ accountProxy, address: addressFormated, className, network
   const { t } = useTranslation();
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
-  const { allowedChains } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const [, setAddProxyParamsStorage] = useLocalStorage<AddProxyParams>(ADD_PROXY_TRANSACTION, DEFAULT_ADD_PROXY_PARAMS);
   const navigate = useNavigate();
   const checkChain = useChainChecker();
   const [loading, setLoading] = useState(false);
+
+  const getChainAndExcludedTokenByAccountProxy = useCreateGetChainAndExcludedTokenByAccountProxy();
+
+  const { allowedChains } = useMemo(() => {
+    return getChainAndExcludedTokenByAccountProxy(accountProxy);
+  }, [accountProxy, getChainAndExcludedTokenByAccountProxy]);
 
   const chainItems = useMemo<ChainItemType[]>(() => {
     const result: ChainItemType[] = [];
