@@ -112,7 +112,8 @@ export default class NominationPoolHandler extends BasePoolHandler {
       const unlockingEras = substrateApi.api.consts.staking.bondingDuration.toString();
 
       const maxSupportedEras = substrateApi.api.consts.staking.historyDepth.toString();
-      const erasPerDay = 24 / _STAKING_ERA_LENGTH_MAP[chainInfo.slug]; // Can be exactly calculate from epochDuration, blockTime, sessionsPerEra
+      const eraInHours = _STAKING_ERA_LENGTH_MAP[chainInfo.slug] || _STAKING_ERA_LENGTH_MAP.default; // in hours
+      const erasPerDay = 24 / eraInHours; // Can be exactly calculate from epochDuration, blockTime, sessionsPerEra
 
       const supportedDays = getSupportedDaysByHistoryDepth(erasPerDay, parseInt(maxSupportedEras), parseInt(currentEra) / erasPerDay);
 

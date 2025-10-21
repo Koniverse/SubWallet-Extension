@@ -11,3 +11,4 @@ export const CARDANO_ACCOUNT_TYPE: KeypairType = 'cardano';
 
 export const DEFAULT_ACCOUNT_TYPES: KeypairType[] = [SUBSTRATE_ACCOUNT_TYPE, EVM_ACCOUNT_TYPE];
 export const DEFAULT_MNEMONIC_TYPE: MnemonicType = 'general';
+export const RELAY_CHAINS_TO_MIGRATE: string[] = ['polkadot', 'kusama', 'westend', 'paseoTest'];

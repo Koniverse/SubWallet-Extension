@@ -29,6 +29,8 @@ import MigrateTransactionHistory from './MigrateTransactionHistory';
 import MigrateTransactionHistoryBridge from './MigrateTransactionHistoryBridge';
 import MigrateTransactionHistoryBySymbol from './MigrateTransactionHistoryBySymbol';
 import MigrateWalletReference from './MigrateWalletReference';
+import DeleteEarningData20251010
+  from "@subwallet/extension-base/services/migration-service/scripts/DeleteEarningData20251010";
 
 export const EVERYTIME = '__everytime__';
 
@@ -69,5 +71,6 @@ export default <Record<string, typeof BaseMigrationJob>>{
   [MYTHOS_MIGRATION_KEY]: ClearMetadataForMythos,
   // [`${EVERYTIME}-1.1.42-02`]: MigrateTransactionHistoryBySymbol
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
-  '1.3.42-01': MigrateNewUnifiedAccount
+  '1.3.42-01': MigrateNewUnifiedAccount,
+  '1.3.62-01': DeleteEarningData20251010
 };
