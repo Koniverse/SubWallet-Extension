@@ -56,6 +56,13 @@ export interface PalletEnergyStakingNominationRequestsScheduledRequest {
   action: Record<PalletParachainStakingRequestType, number>
 }
 
+export interface PalletEnergyStakingTopNominations {
+  nominators: Array<{
+    owner: string;
+    amount: string;
+  }>;
+}
+
 const DEFAULT_ANNUAL_REWARD: Record<string, number> = {
   energy_web_x: 2_000_000
 };
@@ -349,12 +356,14 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
     const substrateIdentityApi = this.substrateIdentityApi;
     const allCollators: ValidatorInfo[] = [];
 
-    const [_allCollators, _selectedCandidates, _eraInfo] = await Promise.all([
+    const [_allCollators, _selectedCandidates, _eraInfo, unstakingDelay] = await Promise.all([
       apiProps.api.query.parachainStaking.candidateInfo.entries(),
       apiProps.api.query.parachainStaking.selectedCandidates(),
-      apiProps.api.query.parachainStaking.era()
+      apiProps.api.query.parachainStaking.era(),
+      apiProps.api.query.parachainStaking.delay()
     ]);
 
+    const delay = parseInt(unstakingDelay.toString());
     const roundInfo = _eraInfo.toPrimitive() as unknown as PalletEnergyStakingEraInfo;
     const currentRound = roundInfo.current;
 
@@ -410,14 +419,24 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
         return;
       }
 
-      const _nominationScheduledRequests = await apiProps.api.query.parachainStaking.nominationScheduledRequests(collator.address);
+      const [_topNomination, _nominationScheduledRequests] = await Promise.all([
+        apiProps.api.query.parachainStaking.topNomination(collator.address),
+        apiProps.api.query.parachainStaking.nominationScheduledRequests(collator.address)
+      ]);
       const nominationScheduledRequests = _nominationScheduledRequests.toPrimitive() as unknown as PalletEnergyStakingNominationRequestsScheduledRequest[];
+      const topNomination = _topNomination.toPrimitive() as unknown as PalletEnergyStakingTopNominations;
+
+      const topNominationRecord = topNomination.nominators.reduce<Record<string, string>>((record, { amount, owner }) => {
+        record[owner] = amount || '0';
+
+        return record;
+      }, {});
       let bnTotalActiveStake = new BN(collator.totalStake);
 
       if (nominationScheduledRequests?.length) {
-        const bnTotalInactiveStake = nominationScheduledRequests.reduce((partialSum, { action, whenExecutable }) => {
-          if (whenExecutable - parseInt(currentRound) < 0 && action) {
-            return partialSum.add(new BN(Object.values(action)[0] || BN_ZERO));
+        const bnTotalInactiveStake = nominationScheduledRequests.reduce((partialSum, { action, nominator, whenExecutable }) => {
+          if ((whenExecutable + delay) - parseInt(currentRound) < 0 && action) {
+            return partialSum.add(new BN(topNominationRecord[nominator] || Object.values(action)[0] || BN_ZERO));
           }
 
           return partialSum;
