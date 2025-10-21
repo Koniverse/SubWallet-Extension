@@ -7,7 +7,7 @@ import { _handleDisplayForEarningError, _handleDisplayInsufficientEarningError }
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
+import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, ProxyItem, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
@@ -17,6 +17,7 @@ import { EarningInstructionModal } from '@subwallet/extension-koni-ui/components
 import { SlippageModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, STAKE_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useChainConnection, useCoreCreateReformatAddress, useCreateGetSubnetStakingTokenName, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
@@ -24,7 +25,7 @@ import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, submitProces
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, getExtrinsicTypeByPoolInfo, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, getExtrinsicTypeByPoolInfo, noop, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -56,9 +57,9 @@ const Component = () => {
   const { closeSidePanel } = useSidePanelUtils();
   const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { closeAlert, defaultData, goBack, onDone,
-    openAlert, persistData,
-    setBackProps, setIsDisableHeader, setSubHeaderRightButtons } = useTransactionContext<EarnParams>();
+  const { closeAlert, defaultData, getProxyAccountsToSign, goBack,
+    onDone, openAlert,
+    persistData, setBackProps, setIsDisableHeader, setSubHeaderRightButtons } = useTransactionContext<EarnParams>();
 
   const { fromAccountProxy, slug } = defaultData;
 
@@ -73,6 +74,7 @@ const Component = () => {
   const [form] = Form.useForm<EarnParams>();
   const formDefault = useMemo((): EarnParams => ({ ...defaultData }), [defaultData]);
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('stake');
+  const { selectProxyAccountModal } = useContext(WalletModalContext);
   const fromValue = useWatchTransaction('from', form, defaultData);
   const amountValue = useWatchTransaction('value', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
@@ -110,6 +112,7 @@ const Component = () => {
   const [screenLoading, setScreenLoading] = useState(true);
   const [submitString, setSubmitString] = useState<string | undefined>();
   const [connectionError, setConnectionError] = useState<string>();
+  const [proxyAccounts, setProxyAccounts] = useState<ProxyItem[]>([]);
   // const [, setCanMint] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   // const [checkMintLoading, setCheckMintLoading] = useState(false);
@@ -461,12 +464,14 @@ const Component = () => {
     setSubmitLoading
   );
 
+  const exType = useMemo(() => getExtrinsicTypeByPoolInfo({ chain: chainValue, type: poolType, slug }), [poolType, chainValue, slug]);
+
   const netuid = useMemo(() => poolInfo.metadata.subnetData?.netuid, [poolInfo.metadata.subnetData]);
   const onSubmit: FormCallbacks<EarnParams>['onFinish'] = useCallback((values: EarnParams) => {
     const transactionBlockProcess = () => {
       setSubmitLoading(true);
       setIsDisableHeader(true);
-      const { from, slug, target, value: _currentAmount } = values;
+      const { chain, from, slug, target, value: _currentAmount } = values;
       let processId = processState.processId;
 
       const getData = (submitStep: number): SubmitYieldJoinData => {
@@ -565,14 +570,37 @@ const Component = () => {
 
               return true;
             } else {
-              const submitPromise: Promise<SWTransactionResponse> = submitJoinYieldPool({
-                path: path,
-                data: data,
-                currentStep: step
-              });
+              const submitPromise = async (proxyAddress?: string) => {
+                const rs = await submitJoinYieldPool({
+                  path: path,
+                  data,
+                  currentStep: step,
+                  proxyAddress
+                });
 
-              const rs = await submitPromise;
-              const success = onSuccess(isLastStep, needRollback)(rs);
+                success = onSuccess(isLastStep, needRollback)(rs);
+              };
+
+              let success = false;
+
+              if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
+                selectProxyAccountModal.open({
+                  address: from,
+                  chain,
+                  proxyItems: proxyAccounts
+                })
+                  .then(async (selected?: string) => {
+                    setSubmitLoading(true);
+
+                    await submitPromise(selected);
+                  })
+                  .catch(onError)
+                  .finally(() => {
+                    setSubmitLoading(false);
+                  });
+              } else {
+                await submitPromise();
+              }
 
               if (success) {
                 return await submitData(step + 1);
@@ -628,7 +656,7 @@ const Component = () => {
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, setSubmitLoading, stakingFee, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, proxyAccounts, selectProxyAccountModal, setIsDisableHeader, stakingFee, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {
@@ -897,8 +925,6 @@ const Component = () => {
 
   const onPreCheck = usePreCheckAction(fromValue);
 
-  const exType = useMemo(() => getExtrinsicTypeByPoolInfo({ chain: chainValue, type: poolType, slug }), [poolType, chainValue, slug]);
-
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);
 
@@ -1022,6 +1048,10 @@ const Component = () => {
   useEffect(() => {
     form.setFieldValue('asset', inputAsset.slug || '');
   }, [form, inputAsset.slug]);
+
+  useEffect(() => {
+    getProxyAccountsToSign(chainValue, fromValue, exType).then(setProxyAccounts).catch(noop);
+  }, [chainValue, fromValue, exType, getProxyAccountsToSign]);
 
   useEffect(() => {
     if (!fromValue && accountAddressItems.length === 1) {

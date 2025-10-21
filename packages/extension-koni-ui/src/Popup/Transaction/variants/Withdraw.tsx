@@ -5,16 +5,17 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { getAstarWithdrawable } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/astar';
-import { AccountJson, RequestYieldWithdrawal, UnstakingInfo, UnstakingStatus, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, ProxyItem, UnstakingInfo, UnstakingStatus, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useGetChainAssetInfo, useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { yieldSubmitStakingWithdrawal } from '@subwallet/extension-koni-ui/messaging';
 import { accountFilterFunc } from '@subwallet/extension-koni-ui/Popup/Transaction/helper';
 import { FormCallbacks, FormFieldData, ThemeProps, WithdrawParams } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, isAccountAll, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, isAccountAll, noop, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowCircleRight, XCircle } from 'phosphor-react';
@@ -51,18 +52,20 @@ const Component = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { defaultData, persistData } = useTransactionContext<WithdrawParams>();
+  const { defaultData, getProxyAccountsToSign, persistData } = useTransactionContext<WithdrawParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<WithdrawParams>();
   const formDefault = useMemo((): WithdrawParams => ({ ...defaultData }), [defaultData]);
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('withdraw');
+  const { selectProxyAccountModal } = useContext(WalletModalContext);
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
   const { chainInfoMap } = useSelector((state) => state.chainStore);
   const { poolInfoMap } = useSelector((state) => state.earning);
 
   const [isDisable, setIsDisable] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [proxyAccounts, setProxyAccounts] = useState<ProxyItem[]>([]);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
 
   const chainValue = useWatchTransaction('chain', form, defaultData);
@@ -137,21 +140,37 @@ const Component = () => {
       return;
     }
 
-    const params: RequestYieldWithdrawal = {
-      address: values.from,
-      slug: values.slug,
-      unstakingInfo: unstakingInfo
+    const sendPromise = (proxyAddress?: string) => {
+      return yieldSubmitStakingWithdrawal({
+        address: values.from,
+        slug: values.slug,
+        unstakingInfo: unstakingInfo,
+        proxyAddress
+      }).then(onSuccess);
+    };
+
+    const senPromiseWrapper = async () => {
+      if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
+        const proxyAddress = await selectProxyAccountModal.open({
+          address: values.from,
+          chain: values.chain,
+          proxyItems: proxyAccounts
+        });
+
+        return await sendPromise(proxyAddress);
+      }
+
+      return await sendPromise();
     };
 
     setTimeout(() => {
-      yieldSubmitStakingWithdrawal(params)
-        .then(onSuccess)
+      senPromiseWrapper()
         .catch(onError)
         .finally(() => {
           setLoading(false);
         });
     }, 300);
-  }, [onError, onSuccess, unstakingInfo]);
+  }, [onError, onSuccess, poolInfo.type, proxyAccounts, selectProxyAccountModal, unstakingInfo]);
 
   const onClickSubmit = useCallback((values: WithdrawParams) => {
     if (currentConfirmation) {
@@ -203,6 +222,10 @@ const Component = () => {
       form.setFieldValue('from', accountList[0].address);
     }
   }, [accountList, form, fromValue]);
+
+  useEffect(() => {
+    getProxyAccountsToSign(chainValue, fromValue, exType).then(setProxyAccounts).catch(noop);
+  }, [chainValue, exType, fromValue, getProxyAccountsToSign]);
 
   return (
     <>

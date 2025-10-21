@@ -4060,7 +4060,7 @@ export default class KoniExtension {
   }
 
   private async handleYieldStep (inputData: RequestYieldStepSubmit): Promise<SWTransactionResponse> {
-    const { data, errorOnTimeOut, isPassConfirmation, onSend, path, processId } = inputData;
+    const { data, errorOnTimeOut, isPassConfirmation, onSend, path, processId, proxyAddress } = inputData;
     const { address } = data;
 
     let step: BriefProcessStep | undefined;
@@ -4196,6 +4196,7 @@ export default class KoniExtension {
       extrinsicType, // change this depends on step
       chainType,
       resolveOnDone: !isLastStep,
+      proxyAddress,
       transferNativeAmount,
       skipFeeValidation: isMintingStep && isPoolSupportAlternativeFee,
       errorOnTimeOut,
@@ -4394,7 +4395,7 @@ export default class KoniExtension {
   }
 
   private async handleYieldChangeValidator (params: SubmitChangeValidatorStaking) {
-    const { address, slug } = params;
+    const { address, proxyAddress, slug } = params;
 
     const poolHandler = this.#koniState.earningService.getPoolHandler(slug);
 
@@ -4409,6 +4410,7 @@ export default class KoniExtension {
       chain: poolHandler.chain,
       transaction: extrinsic,
       data: params,
+      proxyAddress,
       extrinsicType: ExtrinsicType.CHANGE_EARNING_VALIDATOR,
       chainType: ChainType.SUBSTRATE
     });

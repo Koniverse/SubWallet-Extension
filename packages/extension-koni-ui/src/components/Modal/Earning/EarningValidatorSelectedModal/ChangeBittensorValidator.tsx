@@ -5,11 +5,11 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ExtrinsicType, NotificationType, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
-import { NominationInfo, SubmitBittensorChangeValidatorStaking, YieldPoolType } from '@subwallet/extension-base/types';
+import { NominationInfo, ProxyItem, YieldPoolType } from '@subwallet/extension-base/types';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useChainChecker, useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useGetProxyAccountsToSign, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
@@ -60,15 +60,16 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { checkActive } = useContext(ModalContext);
   const isActive = checkActive(modalId);
 
-  const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
+  const { alertModal: { close: closeAlert, open: openAlert }, selectProxyAccountModal } = useContext(WalletModalContext);
   const { defaultData } = useTransactionContext<ChangeValidatorParams>();
   const { onError, onSuccess } = useHandleSubmitTransaction();
-
+  const getProxyAccountsToSign = useGetProxyAccountsToSign();
   const account = findAccountByAddress(accounts, from);
   const [form] = Form.useForm<ChangeValidatorParams>();
   const originValidator = useWatchTransaction('originValidator', form, defaultData);
   const toTarget = useWatchTransaction('target', form, defaultData);
   const value = useWatchTransaction('value', form, defaultData);
+  const [proxyAccounts, setProxyAccounts] = useState<ProxyItem[]>([]);
 
   const poolInfo = poolInfoMap[slug];
 
@@ -287,12 +288,19 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       const send = (amount: string): void => {
         setSubmitLoading(true);
 
-        const submitData: SubmitBittensorChangeValidatorStaking = {
-          ...baseData,
-          amount
+        const sendPromise = (proxyAddress?: string) => {
+          return changeEarningValidator({
+            ...baseData,
+            amount,
+            proxyAddress
+          });
         };
 
-        (changeEarningValidator(submitData))
+        selectProxyAccountModal.open({
+          address: from,
+          chain: chain,
+          proxyItems: proxyAccounts
+        }).then(sendPromise)
           .then(onSuccess)
           .catch((error: TransactionError) => {
             if (error.message.includes('remaining')) {
@@ -327,7 +335,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
       send(isShowAmountChange ? value : bondedValue);
     },
-    [bondedValue, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, stakingFee, symbol, t]
+    [bondedValue, chain, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, proxyAccounts, selectProxyAccountModal, stakingFee, symbol, t]
   );
   const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
 
@@ -351,6 +359,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   useEffect(() => {
     chain && checkChain(chain);
   }, [chain, checkChain]);
+
+  useEffect(() => {
+    getProxyAccountsToSign(chain, from, ExtrinsicType.CHANGE_EARNING_VALIDATOR).then(setProxyAccounts).catch(noop);
+  }, [chain, from, getProxyAccountsToSign]);
 
   const onPreCheck = usePreCheckAction(from);
 

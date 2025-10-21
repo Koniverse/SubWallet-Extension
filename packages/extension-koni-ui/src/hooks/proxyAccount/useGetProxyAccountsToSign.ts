@@ -9,18 +9,17 @@ import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { getProxyAccounts } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { isSubstrateAddress } from '@subwallet/keyring';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
-export function useGetProxyAccountsToSign (chain: string, address?: string, type?: ExtrinsicType, selectedProxyAddress?: string[]): ProxyItem[] {
-  const [proxies, setProxies] = useState<ProxyItem[]>([]);
+export type GetProxyAccountsToSign = (chain: string, address?: string, type?: ExtrinsicType, selectedProxyAddress?: string[]) => Promise<ProxyItem[]>;
+
+export function useGetProxyAccountsToSign (): GetProxyAccountsToSign {
   const allAccounts = useSelector((state: RootState) => state.accountState.accounts);
 
-  const fetchProxyData = useCallback(async () => {
+  return useCallback(async (chain: string, address?: string, type?: ExtrinsicType, selectedProxyAddress?: string[]): Promise<ProxyItem[]> => {
     try {
       if (!address || !isSubstrateAddress(address)) {
-        setProxies([]);
-
-        return;
+        return [];
       }
 
       const request: RequestGetProxyAccounts = {
@@ -33,29 +32,20 @@ export function useGetProxyAccountsToSign (chain: string, address?: string, type
       const proxyAccounts = await getProxyAccounts(request);
 
       if (!proxyAccounts?.proxies?.length) {
-        setProxies([]);
-
-        return;
+        return [];
       }
 
       const validAccounts = allAccounts.filter(
         (acc) => acc.chainType === AccountChainType.SUBSTRATE && acc.signMode !== AccountSignMode.READ_ONLY
       );
 
-      const filtered = proxyAccounts.proxies.filter((proxy) =>
+      return proxyAccounts.proxies.filter((proxy) =>
         validAccounts.some((acc) => isSameAddress(acc.address, proxy.proxyAddress))
       );
-
-      setProxies(filtered);
     } catch (e) {
       console.error('Error fetching proxy accounts:', e);
-      setProxies([]);
+
+      return [];
     }
-  }, [address, chain, type, selectedProxyAddress, allAccounts]);
-
-  useEffect(() => {
-    fetchProxyData().catch(console.error);
-  }, [fetchProxyData]);
-
-  return proxies;
+  }, [allAccounts]);
 }

@@ -6,10 +6,11 @@ import { AmountData, ExtrinsicType, NominationInfo } from '@subwallet/extension-
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
-import { AccountJson, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, ProxyItem, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, MetaInfo, NominationSelector } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
@@ -53,7 +54,7 @@ const validateFields: Array<keyof UnStakeParams> = ['value'];
 const Component: React.FC = () => {
   const { t } = useTranslation();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { defaultData, persistData, setCustomScreenTitle } = useTransactionContext<UnStakeParams>();
+  const { defaultData, getProxyAccountsToSign, persistData, setCustomScreenTitle } = useTransactionContext<UnStakeParams>();
   const { slug } = defaultData;
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('unstake');
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
@@ -64,6 +65,7 @@ const Component: React.FC = () => {
   const poolChain = poolInfo.chain;
   const networkPrefix = chainInfoMap[poolChain]?.substrateInfo?.addressPrefix;
   const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolChain), [poolChain]);
+  const [proxyAccounts, setProxyAccounts] = useState<ProxyItem[]>([]);
 
   const [form] = Form.useForm<UnStakeParams>();
   const [isBalanceReady, setIsBalanceReady] = useState(true);
@@ -82,6 +84,7 @@ const Component: React.FC = () => {
   const amountValue = useWatchTransaction('value', form, defaultData);
 
   const { list: allPositions } = useYieldPositionDetail(slug);
+  const { selectProxyAccountModal } = useContext(WalletModalContext);
   const { compound: positionInfo } = useYieldPositionDetail(slug, fromValue);
 
   const bondedSlug = useMemo(() => {
@@ -266,6 +269,42 @@ const Component: React.FC = () => {
     [chainInfoMap, chainValue]
   );
 
+  const exType = useMemo(() => {
+    if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.SUBNET_STAKING) {
+      return ExtrinsicType.STAKING_UNBOND;
+    }
+
+    if (poolType === YieldPoolType.LIQUID_STAKING) {
+      if (chainValue === 'moonbeam') {
+        return ExtrinsicType.UNSTAKE_STDOT;
+      }
+
+      if (chainValue === 'bifrost_dot') {
+        if (slug === 'MANTA___liquid_staking___bifrost_dot') {
+          return ExtrinsicType.UNSTAKE_VMANTA;
+        }
+
+        return ExtrinsicType.UNSTAKE_VDOT;
+      }
+
+      if (chainValue === 'parallel') {
+        return ExtrinsicType.UNSTAKE_SDOT;
+      }
+
+      if (chainValue === 'acala') {
+        return ExtrinsicType.UNSTAKE_LDOT;
+      }
+    }
+
+    if (poolType === YieldPoolType.LENDING) {
+      if (chainValue === 'interlay') {
+        return ExtrinsicType.UNSTAKE_QDOT;
+      }
+    }
+
+    return ExtrinsicType.STAKING_UNBOND;
+  }, [poolType, chainValue, slug]);
+
   const { onError, onSuccess } = useHandleSubmitTransaction(undefined, handleDataForInsufficientAlert);
 
   const onValuesChange: FormCallbacks<UnStakeParams>['onValuesChange'] = useCallback((changes: Partial<UnStakeParams>, values: UnStakeParams) => {
@@ -311,7 +350,7 @@ const Component: React.FC = () => {
       return;
     }
 
-    const { fastLeave, from, slug, value } = values;
+    const { chain, fastLeave, from, slug, value } = values;
 
     const request: RequestYieldLeave = {
       address: from,
@@ -327,19 +366,37 @@ const Component: React.FC = () => {
       request.selectedTarget = currentValidator || '';
     }
 
-    const unbondingPromise = yieldSubmitLeavePool(request);
+    const sendPromise = (proxyAddress?: string) => {
+      return yieldSubmitLeavePool({
+        ...request,
+        proxyAddress
+      }).then(onSuccess);
+    };
+
+    const sendPromiseWrapper = async () => {
+      if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
+        const proxyAddress = await selectProxyAccountModal.open({
+          address: from,
+          chain,
+          proxyItems: proxyAccounts
+        });
+
+        return await sendPromise(proxyAddress);
+      }
+
+      return await sendPromise();
+    };
 
     setLoading(true);
 
     setTimeout(() => {
-      unbondingPromise
-        .then(onSuccess)
+      sendPromiseWrapper()
         .catch(onError)
         .finally(() => {
           setLoading(false);
         });
     }, 300);
-  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, stakingFee]);
+  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, proxyAccounts, selectProxyAccountModal, stakingFee]);
 
   const onClickSubmit = useCallback((values: UnStakeParams) => {
     if (currentConfirmation) {
@@ -412,6 +469,10 @@ const Component: React.FC = () => {
   }, [poolChain, form, isMythosStaking, bondedValue]);
 
   useEffect(() => {
+    getProxyAccountsToSign(chainValue, fromValue, exType).then(setProxyAccounts).catch(noop);
+  }, [chainValue, exType, fromValue, getProxyAccountsToSign]);
+
+  useEffect(() => {
     if (!fromValue && accountList.length === 1) {
       form.setFieldValue('from', accountList[0].address);
     }
@@ -426,42 +487,6 @@ const Component: React.FC = () => {
       setCustomScreenTitle(undefined);
     };
   }, [poolType, setCustomScreenTitle, t]);
-
-  const exType = useMemo(() => {
-    if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.SUBNET_STAKING) {
-      return ExtrinsicType.STAKING_UNBOND;
-    }
-
-    if (poolType === YieldPoolType.LIQUID_STAKING) {
-      if (chainValue === 'moonbeam') {
-        return ExtrinsicType.UNSTAKE_STDOT;
-      }
-
-      if (chainValue === 'bifrost_dot') {
-        if (slug === 'MANTA___liquid_staking___bifrost_dot') {
-          return ExtrinsicType.UNSTAKE_VMANTA;
-        }
-
-        return ExtrinsicType.UNSTAKE_VDOT;
-      }
-
-      if (chainValue === 'parallel') {
-        return ExtrinsicType.UNSTAKE_SDOT;
-      }
-
-      if (chainValue === 'acala') {
-        return ExtrinsicType.UNSTAKE_LDOT;
-      }
-    }
-
-    if (poolType === YieldPoolType.LENDING) {
-      if (chainValue === 'interlay') {
-        return ExtrinsicType.UNSTAKE_QDOT;
-      }
-    }
-
-    return ExtrinsicType.STAKING_UNBOND;
-  }, [poolType, chainValue, slug]);
 
   const handleValidatorLabel = useMemo(() => {
     const label = getValidatorLabel(chainValue);

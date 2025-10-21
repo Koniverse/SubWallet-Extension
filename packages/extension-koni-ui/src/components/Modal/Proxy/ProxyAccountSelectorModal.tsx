@@ -3,6 +3,8 @@
 
 import { ProxyItem } from '@subwallet/extension-base/types/proxy';
 import { ProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
+import { PROXY_ACCOUNT_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
@@ -11,36 +13,41 @@ import React, { ForwardedRef, forwardRef, useCallback, useMemo, useRef, useState
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-interface Props extends ThemeProps {
+export interface ProxyAccountSelectorModalProps {
   chain: string;
-  modalId: string;
   address: string;
-  proxyId: string;
   proxyItems: ProxyItem[];
   onCancel: VoidFunction;
-  onApply: (selected: string | null) => void;
+  onApply: (selected: string) => void;
 }
+
+export type ProxyAccountSelectorModalPropsValue = Omit<ProxyAccountSelectorModalProps, 'onCancel' | 'onApply'>;
+
+type Props = ThemeProps & ProxyAccountSelectorModalProps;
 
 interface ProxyItemExtended extends ProxyItem {
   isMain?: boolean;
 }
 
+const modalId = PROXY_ACCOUNT_SELECTOR_MODAL;
+
 const Component = (props: Props, ref: ForwardedRef<any>) => {
-  const { address, className = '', modalId, onApply, onCancel, proxyId, proxyItems } = props;
+  const { address, className = '', onApply, onCancel, proxyItems } = props;
   const { t } = useTranslation();
   const sectionRef = useRef<SwListSectionRef>(null);
   const [selected, setSelected] = useState<string>(address);
+  const account = useGetAccountByAddress(address);
 
   const fullList = useMemo(() => {
     return [
       {
         isMain: true,
         proxyAddress: address,
-        proxyId
+        proxyId: account?.proxyId
       },
       ...proxyItems
     ];
-  }, [address, proxyId, proxyItems]);
+  }, [account?.proxyId, address, proxyItems]);
 
   const onSelect = useCallback((address: string) => {
     return () => {

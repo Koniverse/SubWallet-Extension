@@ -4,7 +4,7 @@
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
-import { NominationInfo, SubmitChangeValidatorStaking, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { NominationInfo, ProxyItem, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
 import { StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
@@ -15,9 +15,10 @@ import { SortingModal } from '@subwallet/extension-koni-ui/components/Modal/Sort
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useChainChecker, useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useFilterModal, useGetProxyAccountsToSign, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { Theme, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
+import { noop } from '@subwallet/extension-koni-ui/utils';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Badge, Button, Icon, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
@@ -88,17 +89,19 @@ const Component = (props: Props) => {
   const [viewDetailItem, setViewDetailItem] = useState<ValidatorDataType | undefined>(undefined);
   const [sortSelection, setSortSelection] = useState<SortKey>(SortKey.DEFAULT);
   const [selectedValidators, setSelectedValidators] = useState<ValidatorInfo[]>([]);
+  const [proxyAccounts, setProxyAccounts] = useState<ProxyItem[]>([]);
   const [defaultValidatorMap, setDefaultValidatorMap] = useState<Record<string, ChainRecommendValidator>>({});
   const [searchValue, setSearchValue] = useState<string>('');
 
   const { t } = useTranslation();
   const { activeModal, checkActive } = useContext(ModalContext);
-  const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
+  const { alertModal: { close: closeAlert, open: openAlert }, selectProxyAccountModal } = useContext(WalletModalContext);
   const isActive = checkActive(modalId);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
   const onPreCheck = usePreCheckAction(from);
   const { onError, onSuccess } = useHandleSubmitTransaction();
+  const getProxyAccountsToSign = useGetProxyAccountsToSign();
 
   const sectionRef = useRef<SwListSectionRef>(null);
   const networkPrefix = chainInfoMap[chain]?.substrateInfo?.addressPrefix;
@@ -291,24 +294,31 @@ const Component = (props: Props) => {
   }, []);
 
   const submit = useCallback((target: ValidatorInfo[]) => {
-    const submitData: SubmitChangeValidatorStaking = {
-      slug: poolInfo.slug,
-      address: from,
-      amount: '0',
-      selectedValidators: target
+    const sendPromise = (proxyAddress?: string) => {
+      return changeEarningValidator({
+        slug: poolInfo.slug,
+        address: from,
+        amount: '0',
+        selectedValidators: target,
+        proxyAddress
+      });
     };
 
     setSubmitLoading(true);
 
     setTimeout(() => {
-      changeEarningValidator(submitData)
+      selectProxyAccountModal.open({
+        address: from,
+        chain: chain,
+        proxyItems: proxyAccounts
+      }).then(sendPromise)
         .then(onSuccess)
         .catch(onError)
         .finally(() => {
           setSubmitLoading(false);
         });
     }, 300);
-  }, [poolInfo.slug, from, onError, onSuccess]);
+  }, [poolInfo.slug, from, selectProxyAccountModal, chain, proxyAccounts, onSuccess, onError]);
 
   const onClickSubmit = useCallback((values: { target: ValidatorInfo[] }) => {
     const { target } = values;
@@ -463,6 +473,10 @@ const Component = (props: Props) => {
   useEffect(() => {
     chain && checkChain(chain);
   }, [chain, checkChain]);
+
+  useEffect(() => {
+    getProxyAccountsToSign(chain, from, ExtrinsicType.CHANGE_EARNING_VALIDATOR).then(setProxyAccounts).catch(noop);
+  }, [chain, from, getProxyAccountsToSign]);
 
   useExcludeModal(modalId);
 

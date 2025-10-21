@@ -5,19 +5,20 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getSubstrateGenesisHash, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import { AccountJson, EarningRewardItem, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, EarningRewardItem, ProxyItem, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useGetNativeTokenBasicInfo, useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { yieldSubmitStakingClaimReward } from '@subwallet/extension-koni-ui/messaging';
 import { ClaimRewardParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, isAccountAll, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, isAccountAll, noop, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowCircleRight, XCircle } from 'phosphor-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -83,12 +84,12 @@ const filterAccount = (
 const Component = () => {
   const navigate = useNavigate();
 
-  const { defaultData, persistData } = useTransactionContext<ClaimRewardParams>();
+  const { defaultData, getProxyAccountsToSign, persistData } = useTransactionContext<ClaimRewardParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<ClaimRewardParams>();
   const formDefault = useMemo((): ClaimRewardParams => ({ ...defaultData }), [defaultData]);
-
+  const { selectProxyAccountModal } = useContext(WalletModalContext);
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
   const { chainInfoMap } = useSelector((state) => state.chainStore);
   const { earningRewards, poolInfoMap } = useSelector((state) => state.earning);
@@ -103,6 +104,7 @@ const Component = () => {
 
   const { list: allPositions } = useYieldPositionDetail(slug);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chainValue);
+  const [proxyAccounts, setProxyAccounts] = useState<ProxyItem[]>([]);
 
   const [isDisable, setIsDisable] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -149,22 +151,36 @@ const Component = () => {
   const onSubmit: FormCallbacks<ClaimRewardParams>['onFinish'] = useCallback((values: ClaimRewardParams) => {
     setLoading(true);
 
-    const { bondReward, from, slug } = values;
+    const { bondReward, chain, from, slug } = values;
 
-    setTimeout(() => {
-      yieldSubmitStakingClaimReward({
+    const sendPromise = (proxyAddress?: string) => {
+      return yieldSubmitStakingClaimReward({
         address: from,
         bondReward: bondReward,
         slug,
-        unclaimedReward: reward?.unclaimedReward
-      })
-        .then(onSuccess)
-        .catch(onError)
-        .finally(() => {
-          setLoading(false);
+        unclaimedReward: reward?.unclaimedReward,
+        proxyAddress
+      }).then(onSuccess);
+    };
+
+    const senPromiseWrapper = async () => {
+      if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
+        const proxyAddress = await selectProxyAccountModal.open({
+          address: from,
+          chain,
+          proxyItems: proxyAccounts
         });
+
+        return await sendPromise(proxyAddress);
+      }
+
+      return await sendPromise();
+    };
+
+    setTimeout(() => {
+      senPromiseWrapper().catch(onError).finally(() => setLoading(false));
     }, 300);
-  }, [onError, onSuccess, reward?.unclaimedReward]);
+  }, [onError, onSuccess, poolInfo.type, proxyAccounts, reward?.unclaimedReward, selectProxyAccountModal]);
 
   const checkAction = usePreCheckAction(fromValue);
 
@@ -184,6 +200,10 @@ const Component = () => {
       form.setFieldValue('from', accountList[0].address);
     }
   }, [accountList, form, fromValue]);
+
+  useEffect(() => {
+    getProxyAccountsToSign(chainValue, fromValue, ExtrinsicType.STAKING_CLAIM_REWARD).then(setProxyAccounts).catch(noop);
+  }, [chainValue, fromValue, getProxyAccountsToSign]);
 
   return (
     <>

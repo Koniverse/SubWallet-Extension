@@ -7,13 +7,13 @@ import { useContext } from 'react';
 
 const useTransactionContext = <T extends TransactionFormBaseProps>() => {
   const { closeAlert,
-    closeRecheckChainConnectionModal, defaultData, goBack,
-    needPersistData, onDone, openAlert,
+    closeRecheckChainConnectionModal, defaultData, getProxyAccountsToSign,
+    goBack, needPersistData, onDone,
+    openAlert,
     openRecheckChainConnectionModal,
     persistData,
     setBackProps,
-    setCustomScreenTitle,
-    setIsDisableHeader, setSubHeaderRightButtons } = useContext(TransactionContext);
+    setCustomScreenTitle, setIsDisableHeader, setSubHeaderRightButtons } = useContext(TransactionContext);
 
   return {
     defaultData: defaultData as T,
@@ -28,7 +28,8 @@ const useTransactionContext = <T extends TransactionFormBaseProps>() => {
     closeRecheckChainConnectionModal,
     openAlert,
     openRecheckChainConnectionModal,
-    setCustomScreenTitle
+    setCustomScreenTitle,
+    getProxyAccountsToSign
   };
 };
 
