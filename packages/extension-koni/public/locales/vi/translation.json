@@ -1886,6 +1886,9 @@
   "ui.EARNING.screen.EarningPositionDetail.WithdrawInfo.cancelUnstaking": "Hủy unstake",
   "ui.EARNING.screen.EarningPositionDetail.unstakingNotAvailable": "Unstaking not available",
   "ui.EARNING.screen.EarningPositionDetail.noStakedFundsToUnstake": "You don't have any staked funds left to unstake. Check withdrawal status (how long left until the unstaking period ends) by checking the Withdraw info. Keep in mind that you need to withdraw manually.",
+  "ui.EARNING.screen.EarningPositionDetail.unstakeNotAvailable": "Unstake not available",
+  "ui.EARNING.screen.EarningPositionDetail.noStakedFunds": "You don't have any staked funds to unstake at the moment. Try again later",
+  "ui.EARNING.screen.EarningPositionDetail.iUnderstand": "I understand",
   "ui.EARNING.screen.EarningPositionDetail.ok": "OK",
   "ui.EARNING.screen.EarningPositionDetail.activeStake": "Active stake",
   "ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.activeStake": "Active stake",
@@ -2286,5 +2289,11 @@
   " This address can only be used to receive compatible tokens. Sending incompatible tokens to this address will result in these tokens getting stuck (i.e., can’t be sent out or staked)": "",
   "Get address": "",
   "Cancel": "",
-  "Show warnings for phishing sites and protect your assets from scams": ""
+  "Show warnings for phishing sites and protect your assets from scams": "",
+  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.close": "",
+  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.title": "",
+  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.manualStake": "",
+  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.compoundingStake": "",
+  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.pendingStakeTooltipTitle": "",
+  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.pendingStake": ""
 }

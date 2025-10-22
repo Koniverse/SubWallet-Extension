@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 1.3.62
+Build date: Oct 10, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.118 (#4730):
+  - [Xode] Add XCM support for DOT & USDT
+
+Bug fixes:
+- Fixed missing "Edit Fee" button / Improve fee loading UI (#4652)
+- Fixed issue can not update patch and online resources (#4536)
+- Fixed some UI bugs for migrated chain after AHM on Earning features (#4754)
+- Fixed bug show Earning options for Kusama although AHM migrated (#4763)
+- Fixed bug don't show toast message validate in case input amount < 1 when transfer Cardano (#4706)
+
+
 ## 1.3.61
 Build date: Oct 04, 2025.
 
