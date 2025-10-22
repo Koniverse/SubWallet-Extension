@@ -19,7 +19,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ButtonProps, Icon, SwList } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Image, Trash } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -43,6 +43,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const showNotification = useNotification();
 
   const dataContext = useContext(DataContext);
+  const [isFetching, setIsFetching] = useState(false);
 
   const { nftCollections, nftItems } = useGetNftByAccount();
 
@@ -62,14 +63,16 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const collectionInfo = useMemo(() => {
     return (
-      nftCollections.find(
+      nftCollections?.find(
         (nftCollection) =>
           nftCollection.collectionId === collectionId && nftCollection.chain === chain
-      ) ?? ({} as NftCollection)
+      )
     );
   }, [nftCollections, collectionId, chain]);
 
-  const nftList = getNftsByCollection(collectionInfo);
+  const nftList = useMemo(() => {
+    return collectionInfo ? getNftsByCollection(collectionInfo) : [];
+  }, [collectionInfo, getNftsByCollection]);
 
   const ownerAddress = nftList.find((item) => !!item.owner)?.owner;
 
@@ -105,7 +108,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     return (
       <NftGalleryWrapper
-        fallbackImage={collectionInfo.image}
+        fallbackImage={collectionInfo?.image}
         handleOnClick={handleOnClickNft}
         have3dViewer={SHOW_3D_MODELS_CHAIN.includes(nftItem.chain)}
         image={nftItem.image}
@@ -132,8 +135,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const handleDeleteNftCollection = useCallback(() => {
     handleSimpleConfirmModal().then(() => {
-      if (collectionInfo.originAsset) {
-        deleteCustomAssets(collectionInfo.originAsset)
+      if (collectionInfo?.originAsset) {
+        deleteCustomAssets(collectionInfo?.originAsset)
           .then((result) => {
             if (result) {
               goBack();
@@ -149,7 +152,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           .catch(console.log);
       }
     }).catch(console.log);
-  }, [collectionInfo.originAsset, goBack, handleSimpleConfirmModal, showNotification, t]);
+  }, [collectionInfo?.originAsset, goBack, handleSimpleConfirmModal, showNotification, t]);
 
   const subHeaderButton: ButtonProps[] = [
     {
@@ -160,18 +163,35 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   ];
 
   useEffect(() => {
-    if (!collectionInfo) {
+    let isMounted = true;
+
+    if (!collectionInfo || isFetching) {
       return;
     }
 
     const isNeedGetFullList = (nftList.length < (collectionInfo?.itemCount ?? 0));
 
     if (isNeedGetFullList) {
-      const chainInfo = chainInfoMap[collectionInfo.chain];
+      const chainInfo = chainInfoMap[collectionInfo?.chain];
 
-      getFullNftList({ contractAddress: collectionInfo.collectionId, owner: ownerAddress || '', chainInfo: chainInfo }).catch(console.error);
+      if (!chainInfo) {
+        return;
+      }
+
+      setIsFetching(true);
+      getFullNftList({ contractAddress: collectionInfo?.collectionId, owner: ownerAddress || '', chainInfo: chainInfo })
+        .catch(console.error)
+        .finally(() => {
+          if (isMounted) {
+            setIsFetching(false);
+          }
+        });
     }
-  }, [chainInfoMap, collectionInfo, nftList.length, ownerAddress]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [chainInfoMap, collectionInfo, isFetching, nftList.length, ownerAddress]);
 
   return (
     <PageWrapper
@@ -189,7 +209,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         title={(
           <div className={CN('header-content')}>
             <div className={CN('collection-name')}>
-              {collectionInfo.collectionName || collectionInfo.collectionId}
+              {collectionInfo?.collectionName || collectionInfo?.collectionId}
             </div>
             <div className={CN('collection-count')}>
               &nbsp;({nftList.length})
