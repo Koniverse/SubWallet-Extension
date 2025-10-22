@@ -2236,18 +2236,20 @@ export default class KoniExtension {
     const tokenContract = new evmApi.api.eth.Contract(_ERC721_ABI, contractAddress);
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-      const supports721 = await tokenContract.methods.supportsInterface('0x80ac58cd').call().catch(() => false);
-
-      if (supports721) {
-        return true;
-      }
-
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       const supports1155 = await tokenContract.methods.supportsInterface('0xd9b67a26').call().catch(() => false);
 
       if (supports1155) {
         return false;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+      const supports721 = await tokenContract.methods.supportsInterface('0x80ac58cd').call().catch(() => false);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+      const supportsMetadata = await tokenContract.methods.supportsInterface('0x5b5e139f').call().catch(() => false);
+
+      if (supports721 || supportsMetadata) {
+        return true;
       }
 
       try {
@@ -2260,25 +2262,27 @@ export default class KoniExtension {
         if (err.message?.includes('nonexistent token') || err.message?.includes('invalid token ID')) {
           return true;
         }
+      }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        await tokenContract.methods.balanceOf('0x0000000000000000000000000000000000000001').call();
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+        const balance = await tokenContract.methods.balanceOf('0x0000000000000000000000000000000000000001').call();
 
-        return true;
+        if (balance !== undefined && typeof balance === 'string') {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          if (tokenContract.methods.ownerOf) {
+            return true;
+          }
+        }
+
+        return false;
+      } catch {
+        return false;
       }
     } catch (err) {
       const error = err as Error;
 
-      if (
-        error.message.includes('ERC1155') ||
-        error.message.includes('function selector') ||
-        error.message.includes('execution reverted') ||
-        error.message.includes('invalid opcode')
-      ) {
-        return false;
-      }
-
-      return false;
+      return error.message.includes('index out of bounds');
     }
   }
 
