@@ -163,7 +163,7 @@ const Component = () => {
       }).then(onSuccess);
     };
 
-    const senPromiseWrapper = async () => {
+    const sendPromiseWrapper = async () => {
       if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
         const proxyAddress = await selectProxyAccountModal.open({
           address: from,
@@ -178,7 +178,7 @@ const Component = () => {
     };
 
     setTimeout(() => {
-      senPromiseWrapper().catch(onError).finally(() => setLoading(false));
+      sendPromiseWrapper().catch(onError).finally(() => setLoading(false));
     }, 300);
   }, [onError, onSuccess, poolInfo.type, proxyAccounts, reward?.unclaimedReward, selectProxyAccountModal]);
 
