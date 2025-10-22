@@ -510,7 +510,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
   } else {
     const bnProxyAccountNativeTokenAvailable = new BigN(proxyAccountNativeTokenAvailable.value);
 
-    if (bnNativeTokenTransferAmount.gt(bnNativeTokenAvailable) && (bnFee.gt(bnProxyAccountNativeTokenAvailable)) && (!isTransferAll || isChainNotSupportTransferAll)) {
+    if ((bnNativeTokenTransferAmount.gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) || (bnFee.gt(bnProxyAccountNativeTokenAvailable))) {
       validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
     }
   }
