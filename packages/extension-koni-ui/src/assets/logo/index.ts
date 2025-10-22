@@ -24,6 +24,7 @@ export const DefaultLogosMap: Record<string, string> = {
   simple_swap: '/images/projects/simple-swap.png',
   uniswap: '/images/projects/uniswap.png',
   kyber: '/images/projects/kyber.png',
+  optimex: '/images/projects/optimex.png',
   ordinal_rune: './images/projects/ordinal_rune.png',
   polkadot_assethub: '/images/projects/polkadot-asset-hub.png',
   kusama_assethub: '/images/projects/kusama-asset-hub.png',
