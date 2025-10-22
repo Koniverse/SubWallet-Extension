@@ -79,5 +79,8 @@ export interface ClaimBridgeParams extends TransactionFormBaseProps {
 export interface AddProxyParams extends TransactionFormBaseProps {
   proxyAddress: string;
   proxyType: ProxyType;
-  chain: string
+}
+
+export interface RemoveProxyParams extends TransactionFormBaseProps {
+  proxyAddressKeys: string[]; // proxyType:address
 }

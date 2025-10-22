@@ -1,0 +1,262 @@
+// Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ProxyItem, ProxyType } from '@subwallet/extension-base/types';
+import { MetaInfo, ProxyAccountSelectorItem, ProxyItemExtended } from '@subwallet/extension-koni-ui/components';
+import ProxyAccountListModal from '@subwallet/extension-koni-ui/components/Modal/Proxy/ProxyAccountListModal';
+import { PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
+import { useGetAccountProxyByAddress, useGetNativeTokenSlug, useHandleSubmitTransaction, usePreCheckAction, useSetCurrentPage, useTransactionContext } from '@subwallet/extension-koni-ui/hooks';
+import { useGetProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/proxyAccount/useGetProxyAccountsInfoByAddress';
+import { handleRemoveProxy } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
+import { RemoveProxyParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { noop } from '@subwallet/extension-koni-ui/utils';
+import { Button, Icon, ModalContext } from '@subwallet/react-ui';
+import CN from 'classnames';
+import { CheckCircle, Info, XCircle } from 'phosphor-react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+
+type Props = ThemeProps;
+
+const getKey = (address: string, proxyType: ProxyType) => proxyType + ':' + address;
+const modalId = PROXY_ACCOUNT_LIST_MODAL;
+
+interface ProxyAddressRemovedState {
+  keyUnique: ProxyItem[];
+  addressUnique: string[];
+}
+
+const Component = ({ className }: Props): React.ReactElement<Props> => {
+  useSetCurrentPage('/transaction/add-proxy');
+  const { defaultData: { chain, from, proxyAddressKeys }, getProxyAccountsToSign, goBack } = useTransactionContext<RemoveProxyParams>();
+  const { t } = useTranslation();
+  const [loading, setLoading] = useState(false);
+  const [isBalanceReady, setIsBalanceReady] = useState(true);
+  const nativeTokenSlug = useGetNativeTokenSlug(chain);
+  const { activeModal } = useContext(ModalContext);
+  const [proxyAccountsToSign, setProxyAccountsToSign] = useState<ProxyItemExtended[]>([]);
+  const { onError, onSuccess } = useHandleSubmitTransaction();
+  const { selectProxyAccountModal } = useContext(WalletModalContext);
+  const proxyAccountInfo = useGetProxyAccountsInfoByAddress(from, chain);
+
+  const proxyAddressRemovedFiltered = useMemo<ProxyAddressRemovedState>(() => {
+    const proxyItems: ProxyItem[] = [];
+    const addressUnique = new Set<string>();
+    const proxyAccountsRecord = proxyAccountInfo.proxies.reduce<Record<string, ProxyItem>>((acc, proxyAccount) => {
+      const key = getKey(proxyAccount.proxyAddress, proxyAccount.proxyType);
+
+      acc[key] = proxyAccount;
+
+      return acc;
+    }, {});
+
+    proxyAddressKeys.forEach((key) => {
+      if (proxyAccountsRecord[key]?.proxyAddress) {
+        proxyItems.push(proxyAccountsRecord[key]);
+        addressUnique.add(proxyAccountsRecord[key].proxyAddress);
+      }
+    });
+
+    return {
+      addressUnique: Array.from(addressUnique),
+      keyUnique: proxyItems
+    };
+  }, [proxyAccountInfo.proxies, proxyAddressKeys]);
+
+  const isRemoveAll = proxyAddressRemovedFiltered.keyUnique.length === proxyAccountInfo.proxies.length;
+
+  const onClickDetail = useCallback(() => {
+    activeModal(modalId);
+  }, [activeModal]);
+
+  const onClickSubmit = useCallback(() => {
+    const sendPromise = (proxyAddress?: string) => {
+      return handleRemoveProxy({
+        chain,
+        address: from,
+        selectedProxyAccounts: proxyAddressRemovedFiltered.keyUnique,
+        isRemoveAll,
+        proxyAddress
+      });
+    };
+
+    setLoading(true);
+    selectProxyAccountModal.open({
+      chain,
+      address: from,
+      proxyItems: proxyAccountsToSign
+    }).then(sendPromise)
+      .then(onSuccess)
+      .catch(onError)
+      .finally(() => setLoading(false));
+  }, [chain, from, isRemoveAll, onError, onSuccess, proxyAccountsToSign, proxyAddressRemovedFiltered, selectProxyAccountModal]);
+
+  const onCancelRemove = useCallback(() => {
+    goBack();
+  }, [goBack]);
+
+  const onPreCheck = usePreCheckAction(from);
+
+  const accountProxy = useGetAccountProxyByAddress(from);
+
+  const proxiedAccount = useMemo<ProxyItemExtended | null>(() => {
+    if (!accountProxy) {
+      return null;
+    }
+
+    return ({
+      proxyId: accountProxy.id,
+      proxyAddress: from,
+      proxyType: 'Any',
+      delay: 0,
+      isMain: true
+    });
+  }, [accountProxy, from]);
+
+  const addressCount = proxyAddressRemovedFiltered.addressUnique.length;
+
+  useEffect(() => {
+    getProxyAccountsToSign(chain, from, ExtrinsicType.STAKING_CANCEL_UNSTAKE, proxyAddressRemovedFiltered.addressUnique).then(setProxyAccountsToSign).catch(noop);
+  }, [chain, from, getProxyAccountsToSign, proxyAddressKeys, proxyAddressRemovedFiltered.addressUnique]);
+
+  if (!proxyAddressRemovedFiltered.keyUnique?.length) {
+    return <></>;
+  }
+
+  return (
+    <>
+      <TransactionContent className={CN(className, '-transaction-content')}>
+        <div>
+          {!!proxiedAccount && <ProxyAccountSelectorItem
+            className={'__proxy-account'}
+            proxyAccount={proxiedAccount}
+            showCheckedIcon={false}
+          />}
+
+          <FreeBalance
+            address={from}
+            chain={chain}
+            className={'free-balance-block'}
+            onBalanceReady={setIsBalanceReady}
+            tokenSlug={nativeTokenSlug}
+          />
+        </div>
+
+        <MetaInfo
+          className={'meta-info'}
+          hasBackgroundWrapper
+        >
+          {addressCount === 1
+            ? <MetaInfo.Account
+              address={from}
+              chainSlug={chain}
+              label={t('Proxy account')}
+              name={accountProxy?.name}
+            />
+            : <MetaInfo.Default
+              className={'proxy-address-removed'}
+              label={t('Proxy account')}
+            >
+              {addressCount} {t('accounts')}
+              <Button
+                className={'proxy-address-removed-info'}
+                icon={ <Icon
+                  className={'proxy-address-remove-detail'}
+                  customSize={'20px'}
+                  phosphorIcon={Info}
+                  weight={'bold'}
+                />}
+                onClick={onClickDetail}
+                size={'xs'}
+                type={'ghost'}
+              />
+            </MetaInfo.Default>}
+
+          <MetaInfo.Chain
+            chain={chain}
+            label={t('Network')}
+          />
+        </MetaInfo>
+
+      </TransactionContent>
+      <TransactionFooter className={CN(className, '-transaction-footer')}>
+        <Button
+          disabled={loading}
+          icon={(
+            <Icon
+              phosphorIcon={XCircle}
+              weight='fill'
+            />
+          )}
+          onClick={onCancelRemove}
+          schema={'secondary'}
+        >
+          {t('Cancel')}
+        </Button>
+
+        <Button
+          disabled={!isBalanceReady}
+          icon={(
+            <Icon
+              phosphorIcon={CheckCircle}
+              weight='fill'
+            />
+          )}
+          loading={loading}
+          onClick={onPreCheck(onClickSubmit, ExtrinsicType.REMOVE_PROXY)}
+        >
+          {t('Approve')}
+        </Button>
+      </TransactionFooter>
+
+      <ProxyAccountListModal proxyAddresses={proxyAddressRemovedFiltered.addressUnique} />
+    </>
+  );
+};
+
+const RemoveProxy = styled(Component)<Props>(({ theme: { token } }: Props) => {
+  return {
+
+    '&.-transaction-content': {
+      display: 'flex',
+      gap: token.sizeSM,
+      flexDirection: 'column'
+    },
+
+    '.proxy-address-removed': {
+      '.__value': {
+        display: 'flex',
+        alignItems: 'center'
+      },
+
+      '.proxy-address-removed-info': {
+        height: 'fit-content !important',
+        width: 'fit-content !important',
+        minWidth: 'unset',
+        color: token.colorTextLight4,
+        transform: 'all 0.3s ease-in-out',
+
+        '&:hover': {
+          color: token.colorTextLight2
+        }
+      }
+    },
+
+    '.free-balance-block': {
+      marginTop: token.marginXXS
+    },
+
+    '&.-transaction-footer': {
+      gap: token.sizeSM,
+      marginBottom: 0,
+      padding: token.padding,
+      paddingBottom: token.paddingXL
+    }
+  };
+});
+
+export default RemoveProxy;

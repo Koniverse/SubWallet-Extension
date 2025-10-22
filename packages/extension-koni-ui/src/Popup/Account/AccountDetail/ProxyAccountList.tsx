@@ -33,7 +33,7 @@ type Props = ThemeProps & {
   networkSelected: string;
 };
 
-const getKey = (address: string, proxyType: ProxyType) => address + '_' + proxyType;
+const getKey = (address: string, proxyType: ProxyType) => proxyType + ':' + address;
 
 function Component ({ accountProxy, address: addressFormated, className, networkSelected, proxyAccountsSelected, setNetworkSelected, setProxyAccountsSelected }: Props) {
   const { t } = useTranslation();

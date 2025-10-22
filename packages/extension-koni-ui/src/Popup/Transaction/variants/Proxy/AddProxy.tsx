@@ -22,7 +22,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 
-import { ProxyTypeSelector } from './part/ProxyTypeSelector';
+import { ProxyTypeSelector } from '../../parts/ProxyTypeSelector';
 
 type Props = ThemeProps;
 

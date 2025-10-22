@@ -3,7 +3,7 @@
 
 import { ExtrinsicType, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { AddProxyParams, CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
+import { AddProxyParams, CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, RemoveProxyParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
 
 import { ALL_KEY } from './common';
 
@@ -165,4 +165,10 @@ export const DEFAULT_ADD_PROXY_PARAMS: AddProxyParams = {
   proxyAddress: '',
   proxyType: 'Any',
   chain: ''
+};
+
+export const DEFAULT_REMOVE_PROXY_PARAMS: RemoveProxyParams = {
+  ...DEFAULT_TRANSACTION_PARAMS,
+  proxyAddresses: []
+
 };

@@ -5,13 +5,13 @@ import { NotificationType } from '@subwallet/extension-base/background/KoniTypes
 import { AccountActions, AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { AccountChainTypeLogos, AccountProxyTypeTag, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
-import { ADD_PROXY_TRANSACTION, DEFAULT_ADD_PROXY_PARAMS } from '@subwallet/extension-koni-ui/constants';
+import { ADD_PROXY_TRANSACTION, DEFAULT_ADD_PROXY_PARAMS, DEFAULT_REMOVE_PROXY_PARAMS, REMOVE_PROXY_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useCoreCreateReformatAddress, useDefaultNavigate, useGetAccountProxyById, useNotification } from '@subwallet/extension-koni-ui/hooks';
 import { editAccount, forgetAccount, validateAccountName } from '@subwallet/extension-koni-ui/messaging';
 import { ProxyAccountList, ProxyItemSelector } from '@subwallet/extension-koni-ui/Popup/Account/AccountDetail/ProxyAccountList';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AccountDetailParam, AddProxyParams, ThemeProps, VoidFunction } from '@subwallet/extension-koni-ui/types';
+import { AccountDetailParam, AddProxyParams, RemoveProxyParams, ThemeProps, VoidFunction } from '@subwallet/extension-koni-ui/types';
 import { FormCallbacks, FormFieldData } from '@subwallet/extension-koni-ui/types/form';
 import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils/form/form';
 import { Button, Form, Icon, Input } from '@subwallet/react-ui';
@@ -69,6 +69,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
 
   const { alertModal, deriveModal: { open: openDeriveModal } } = useContext(WalletModalContext);
   const [, setAddProxyParamsStorage] = useLocalStorage<AddProxyParams>(ADD_PROXY_TRANSACTION, DEFAULT_ADD_PROXY_PARAMS);
+  const [, setRemoveProxyParamsStorage] = useLocalStorage<RemoveProxyParams>(REMOVE_PROXY_TRANSACTION, DEFAULT_REMOVE_PROXY_PARAMS);
   const getReformatAddress = useCoreCreateReformatAddress();
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
@@ -168,8 +169,21 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   }, [addressFormated, navigate, networkSelected, setAddProxyParamsStorage]);
 
   const onRemoveProxyAccounts = useCallback(() => {
-    console.log('Remove proxy account');
-  }, []);
+    if (!addressFormated) {
+      return;
+    }
+
+    const proxyAddressKeys = Object.keys(proxyAccountsSelected).filter((key) => proxyAccountsSelected[key].isSelected);
+
+    setRemoveProxyParamsStorage({
+      ...DEFAULT_REMOVE_PROXY_PARAMS,
+      chain: networkSelected,
+      proxyAddressKeys,
+      from: addressFormated
+    });
+
+    navigate('/transaction/remove-proxy');
+  }, [addressFormated, navigate, networkSelected, proxyAccountsSelected, setRemoveProxyParamsStorage]);
 
   const onCancelRemoveProxyAccounts = useCallback(() => {
     setProxyAccountsSelected((prevState) => {
