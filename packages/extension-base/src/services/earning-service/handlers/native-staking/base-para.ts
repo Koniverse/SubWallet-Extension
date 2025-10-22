@@ -11,6 +11,8 @@ import { t } from 'i18next';
 
 import { BN, BN_ZERO } from '@polkadot/util';
 
+import { _STAKING_CHAIN_GROUP } from '../../constants';
+
 export default abstract class BaseParaNativeStakingPoolHandler extends BaseNativeStakingPoolHandler {
   /* Join pool action */
 
@@ -150,10 +152,13 @@ export default abstract class BaseParaNativeStakingPoolHandler extends BaseNativ
     const bnChainMinStake = new BN(poolInfo.statistic.earningThreshold.join || '0');
     const bnCollatorMinStake = new BN(targetNomination.validatorMinStake || '0');
     const bnMinStake = BN.max(bnCollatorMinStake, bnChainMinStake);
-    const existUnstakeErrorMessage = getExistUnstakeErrorMessage(this.chain, StakingType.NOMINATED);
 
-    if (targetNomination.hasUnstaking) {
-      errors.push(new TransactionError(StakingTxErrorType.EXIST_UNSTAKING_REQUEST, existUnstakeErrorMessage));
+    if (!_STAKING_CHAIN_GROUP.tanssi.includes(this.chain)) {
+      const existUnstakeErrorMessage = getExistUnstakeErrorMessage(this.chain, StakingType.NOMINATED);
+
+      if (targetNomination.hasUnstaking) {
+        errors.push(new TransactionError(StakingTxErrorType.EXIST_UNSTAKING_REQUEST, existUnstakeErrorMessage));
+      }
     }
 
     if (!(bnRemainingStake.isZero() || bnRemainingStake.gte(bnMinStake))) {
