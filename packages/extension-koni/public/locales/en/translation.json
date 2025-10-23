@@ -1915,6 +1915,7 @@
   "ui.TRANSACTION.screen.Transaction.Swap.tokenNotSupportedForSwap": "{{symbol}} on {{chainName}} is not supported for swapping. Select another token and try again",
   "ui.TRANSACTION.screen.Transaction.Swap.swapPairNotSupportedTryAnother": "Swap pair not supported. Select another pair and try again",
   "ui.TRANSACTION.screen.Transaction.Swap.amountTooHigh": "Amount too high. Lower your amount and try again",
+  "ui.TRANSACTION.screen.Transaction.Swap.notEnoughBitcoin": "Insufficient available balance to perform the swap. Increase available balance and try again",
   "ui.TRANSACTION.screen.Transaction.Swap.selectedNetworkMightLostConnection": "Your selected network might have lost connection. Try updating it by either re-enabling it or changing network provider",
   "ui.TRANSACTION.screen.Transaction.Swap.featureNotAvailableForLedger": "The account you are using is Ledger account, you cannot use this feature with it",
   "ui.TRANSACTION.screen.Transaction.Swap.highPriceImpact": "High price impact!",
