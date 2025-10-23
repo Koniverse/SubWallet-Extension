@@ -2,3 +2,4 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { default as ProxyAccountSelectorModal } from './ProxyAccountSelectorModal';
+export { default as ProxyAccountListModal } from './ProxyAccountListModal';

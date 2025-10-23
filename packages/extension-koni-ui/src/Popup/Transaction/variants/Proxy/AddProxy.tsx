@@ -20,6 +20,7 @@ import CN from 'classnames';
 import { ArrowCircleRight } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
 import { ProxyTypeSelector } from '../../parts/ProxyTypeSelector';
@@ -30,13 +31,14 @@ const hiddenFields: Array<keyof SendNftParams> = ['asset', 'fromAccountProxy', '
 
 const Component = (): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/add-proxy');
-  const { defaultData, persistData } = useTransactionContext<AddProxyParams>();
+  const { defaultData, persistData, setBackProps } = useTransactionContext<AddProxyParams>();
   const { token } = useTheme() as Theme;
   const { accounts } = useSelector((state: RootState) => state.accountState);
   const { chainInfoMap, ledgerGenericAllowNetworks } = useSelector((state) => state.chainStore);
   const [form] = Form.useForm<AddProxyParams>();
   const { t } = useTranslation();
   const [isBalanceReady, setIsBalanceReady] = useState(true);
+  const navigate = useNavigate();
   const [isDisable, setIsDisable] = useState(true);
   const [loading, setLoading] = useState(false);
   const { onError, onSuccess } = useHandleSubmitTransaction();
@@ -142,6 +144,24 @@ const Component = (): React.ReactElement<Props> => {
   useEffect(() => {
     setIsBalanceReady(!balanceLoading && !error);
   }, [error, balanceLoading]);
+
+  useEffect(() => {
+    if (accountProxy?.id) {
+      setBackProps((prevState) => ({
+        ...prevState,
+        onClick: () => {
+          navigate(`/accounts/detail/${accountProxy?.id}`);
+        }
+      }));
+    }
+
+    return () => {
+      setBackProps((prevState) => ({
+        ...prevState,
+        onClick: null
+      }));
+    };
+  }, [accountProxy?.id, navigate, setBackProps]);
 
   return (
     <>

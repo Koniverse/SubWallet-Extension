@@ -3,8 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { ProxyItem, ProxyType } from '@subwallet/extension-base/types';
-import { MetaInfo, ProxyAccountSelectorItem, ProxyItemExtended } from '@subwallet/extension-koni-ui/components';
-import ProxyAccountListModal from '@subwallet/extension-koni-ui/components/Modal/Proxy/ProxyAccountListModal';
+import { MetaInfo, ProxyAccountListModal, ProxyAccountSelectorItem, ProxyItemExtended } from '@subwallet/extension-koni-ui/components';
 import { PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useGetAccountProxyByAddress, useGetNativeTokenSlug, useHandleSubmitTransaction, usePreCheckAction, useSetCurrentPage, useTransactionContext } from '@subwallet/extension-koni-ui/hooks';
@@ -18,6 +17,7 @@ import CN from 'classnames';
 import { CheckCircle, Info, XCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 type Props = ThemeProps;
@@ -32,16 +32,20 @@ interface ProxyAddressRemovedState {
 
 const Component = ({ className }: Props): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/add-proxy');
-  const { defaultData: { chain, from, proxyAddressKeys }, getProxyAccountsToSign, goBack } = useTransactionContext<RemoveProxyParams>();
+  const { defaultData: { chain, from, proxyAddressKeys }, getProxyAccountsToSign, goBack, setBackProps } = useTransactionContext<RemoveProxyParams>();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
   const nativeTokenSlug = useGetNativeTokenSlug(chain);
   const { activeModal } = useContext(ModalContext);
+  const navigate = useNavigate();
   const [proxyAccountsToSign, setProxyAccountsToSign] = useState<ProxyItemExtended[]>([]);
   const { onError, onSuccess } = useHandleSubmitTransaction();
   const { selectProxyAccountModal } = useContext(WalletModalContext);
   const proxyAccountInfo = useGetProxyAccountsInfoByAddress(from, chain);
+  const onPreCheck = usePreCheckAction(from);
+
+  const accountProxy = useGetAccountProxyByAddress(from);
 
   const proxyAddressRemovedFiltered = useMemo<ProxyAddressRemovedState>(() => {
     const proxyItems: ProxyItem[] = [];
@@ -96,12 +100,12 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
   }, [chain, from, isRemoveAll, onError, onSuccess, proxyAccountsToSign, proxyAddressRemovedFiltered, selectProxyAccountModal]);
 
   const onCancelRemove = useCallback(() => {
-    goBack();
-  }, [goBack]);
-
-  const onPreCheck = usePreCheckAction(from);
-
-  const accountProxy = useGetAccountProxyByAddress(from);
+    if (accountProxy?.id) {
+      navigate(`/accounts/detail/${accountProxy?.id}`);
+    } else {
+      goBack();
+    }
+  }, [accountProxy?.id, goBack, navigate]);
 
   const proxiedAccount = useMemo<ProxyItemExtended | null>(() => {
     if (!accountProxy) {
@@ -122,6 +126,24 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
   useEffect(() => {
     getProxyAccountsToSign(chain, from, ExtrinsicType.STAKING_CANCEL_UNSTAKE, proxyAddressRemovedFiltered.addressUnique).then(setProxyAccountsToSign).catch(noop);
   }, [chain, from, getProxyAccountsToSign, proxyAddressKeys, proxyAddressRemovedFiltered.addressUnique]);
+
+  useEffect(() => {
+    if (accountProxy?.id) {
+      setBackProps((prevState) => ({
+        ...prevState,
+        onClick: () => {
+          navigate(`/accounts/detail/${accountProxy?.id}`);
+        }
+      }));
+    }
+
+    return () => {
+      setBackProps((prevState) => ({
+        ...prevState,
+        onClick: null
+      }));
+    };
+  }, [accountProxy?.id, navigate, setBackProps]);
 
   if (!proxyAddressRemovedFiltered.keyUnique?.length) {
     return <></>;
@@ -152,10 +174,9 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
         >
           {addressCount === 1
             ? <MetaInfo.Account
-              address={from}
+              address={proxyAddressRemovedFiltered.addressUnique[0]}
               chainSlug={chain}
               label={t('Proxy account')}
-              name={accountProxy?.name}
             />
             : <MetaInfo.Default
               className={'proxy-address-removed'}

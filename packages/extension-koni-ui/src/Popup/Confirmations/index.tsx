@@ -378,6 +378,10 @@ const Component = function ({ className }: Props) {
           return t('ui.Confirmations.swapConfirmation');
         case ExtrinsicType.CLAIM_BRIDGE:
           return t('ui.Confirmations.claimConfirmation');
+        case ExtrinsicType.ADD_PROXY:
+          return t('Add proxy confirmation');
+        case ExtrinsicType.REMOVE_PROXY:
+          return t('Remove proxy confirmation');
         case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.EVM_EXECUTE:
         case ExtrinsicType.UNKNOWN:
@@ -424,6 +428,10 @@ const Confirmations = styled(Component)<Props>(({ theme: { token } }: ThemeProps
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
+
+  '.ant-sw-header-center-part': {
+    width: 'fit-content'
+  },
 
   '.confirmation-header': {
     paddingTop: token.sizeXS,

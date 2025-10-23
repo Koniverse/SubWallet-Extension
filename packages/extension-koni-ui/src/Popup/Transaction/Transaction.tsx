@@ -200,7 +200,7 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
   const [defaultData, setDefaultData] = useState(storage);
   const { chain, from } = storage;
 
-  const homePath = useMemo((): string | number => {
+  const homePath = useMemo((): string => {
     const pathName = location.pathname;
     const action = pathName.split('/')[2] || '';
 
@@ -216,7 +216,6 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
         return '/home/nfts/collections';
       case 'add-proxy':
       case 'remove-proxy':
-        return -1;
       case 'send-fund':
       default:
         return '/home/tokens';
@@ -244,10 +243,10 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
     return true;
   }, [location.pathname]);
 
-  useNavigateOnChangeAccount(homePath as string);
+  useNavigateOnChangeAccount(homePath);
 
   const goBack = useCallback(() => {
-    navigate(homePath as string);
+    navigate(homePath);
   }, [homePath, navigate]);
 
   const [subHeaderRightButtons, setSubHeaderRightButtons] = useState<ButtonProps[] | undefined>();

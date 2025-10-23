@@ -18,6 +18,8 @@ export { default as JoinYieldPoolConfirmation } from './JoinYieldPool';
 export { default as TokenApproveConfirmation } from './TokenApprove';
 export { default as SwapTransactionConfirmation } from './Swap';
 export { default as ChangeEarningValidatorTransactionConfirmation } from './ChangeEarningValidator';
+export { default as AddProxyTransactionConfirmation } from './AddProxy';
+export { default as RemoveProxyTransactionConfirmation } from './RemoveProxy';
 
 export * from './TransferBlock';
 export * from './Process';
