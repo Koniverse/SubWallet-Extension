@@ -275,6 +275,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_STDOT_ACTIONS,
           ...OTHER_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
+          ...PROXY_ACTION,
           ...EVM_ACTIONS
         ];
       case AccountChainType.TON:

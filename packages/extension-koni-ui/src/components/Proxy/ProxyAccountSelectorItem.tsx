@@ -55,8 +55,11 @@ function Component (props: Props): React.ReactElement<Props> {
       </div>
       <div className='__item-middle-part'>
         <div className='__item-identity-part'>
-          <div className='__item-name'>
-            {accountProxy?.name || toShort(proxyAccount.proxyAddress, 4, 5)}
+          <div className={CN('__item-name', {
+            '-has-address': !!accountProxy?.name
+          })}
+          >
+            {accountProxy?.name || toShort(proxyAccount.proxyAddress, 9, 9)}
           </div>
           {!!accountProxy?.name && <div className='__item-address'>
             ({toShort(proxyAccount.proxyAddress, 4, 5)})
@@ -114,17 +117,22 @@ export const ProxyAccountSelectorItem = styled(Component)<Props>(({ theme }) => 
     '.__item-name': {
       fontSize: token.fontSize,
       lineHeight: token.lineHeight,
-      color: token.colorTextLight1,
+      color: token.colorTextLight4,
       'white-space': 'nowrap',
       overflow: 'hidden',
       fontWeight: token.headingFontWeight,
-      textOverflow: 'ellipsis'
+      textOverflow: 'ellipsis',
+
+      '&.-has-address': {
+        color: token.colorTextLight1
+      }
     },
 
     '.__item-address': {
       fontSize: token.fontSize,
       lineHeight: token.lineHeight,
-      color: token.colorTextLight4
+      color: token.colorTextLight4,
+      fontWeight: token.headingFontWeight
     },
 
     '.__proxy-type': {

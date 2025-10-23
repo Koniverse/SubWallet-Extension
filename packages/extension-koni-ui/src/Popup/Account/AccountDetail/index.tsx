@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { _chainInfoToAccountChainType } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountActions, AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { AccountChainTypeLogos, AccountProxyTypeTag, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
@@ -53,8 +54,6 @@ interface DetailFormState {
   [FormFieldName.NAME]: string;
 }
 
-const DEFAULT_CURRENT_CHAIN = 'polkadot';
-
 const Component: React.FC<ComponentProps> = ({ accountProxy,
   onBack,
   requestViewDerivedAccountDetails,
@@ -94,7 +93,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   const [selectedFilterTab, setSelectedFilterTab] = useState<string>(getDefaultFilterTab());
 
   const [proxyAccountsSelected, setProxyAccountsSelected] = useState<Record<string, ProxyItemSelector>>({});
-  const [networkSelected, setNetworkSelected] = useState<string>(DEFAULT_CURRENT_CHAIN);
+  const [networkSelected, setNetworkSelected] = useState<string>();
 
   const [form] = Form.useForm<DetailFormState>();
 
@@ -106,11 +105,20 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   const [deriving, setDeriving] = useState(false);
 
   const addressFormated = useMemo(() => {
+    if (!networkSelected) {
+      return;
+    }
+
     const chainInfoSelected = chainInfoMap[networkSelected];
 
-    const accountSubstrate = accountProxy.accounts.find(({ chainType }) => chainType === AccountChainType.SUBSTRATE);
+    if (!chainInfoSelected || !chainInfoSelected.substrateInfo) {
+      return;
+    }
 
-    if (!accountSubstrate || !chainInfoSelected) {
+    const compatibleChainTypes = _chainInfoToAccountChainType(chainInfoSelected);
+    const accountSubstrate = accountProxy.accounts.find(({ chainType }) => chainType === compatibleChainTypes);
+
+    if (!accountSubstrate) {
       return;
     }
 
@@ -118,8 +126,20 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   }, [accountProxy.accounts, chainInfoMap, getReformatAddress, networkSelected]);
 
   const canManageProxies = useMemo(() => {
-    return accountProxy.chainTypes.includes(AccountChainType.SUBSTRATE) && !!addressFormated;
-  }, [accountProxy.chainTypes, addressFormated]);
+    if (accountProxy?.chainTypes.includes(AccountChainType.SUBSTRATE)) {
+      return true;
+    }
+
+    if (accountProxy.chainTypes.includes(AccountChainType.ETHEREUM)) {
+      if (accountProxy.accountType === AccountProxyType.LEDGER) {
+        return accountProxy.accounts[0].isSubstrateECDSA;
+      }
+
+      return true;
+    }
+
+    return false;
+  }, [accountProxy]);
 
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     const result = [
@@ -155,7 +175,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   }, [canManageProxies, showDerivationInfoTab, showDerivedAccounts, t]);
 
   const onAddProxyAccount = useCallback(() => {
-    if (!addressFormated) {
+    if (!addressFormated || !networkSelected) {
       return;
     }
 
@@ -169,7 +189,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   }, [addressFormated, navigate, networkSelected, setAddProxyParamsStorage]);
 
   const onRemoveProxyAccounts = useCallback(() => {
-    if (!addressFormated) {
+    if (!addressFormated || !networkSelected) {
       return;
     }
 

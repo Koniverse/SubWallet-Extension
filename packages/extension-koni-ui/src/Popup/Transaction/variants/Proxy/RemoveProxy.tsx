@@ -230,7 +230,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
           loading={loading}
           onClick={onPreCheck(onClickSubmit, ExtrinsicType.REMOVE_PROXY)}
         >
-          {t('Approve')}
+          {t('Continue')}
         </Button>
       </TransactionFooter>
 

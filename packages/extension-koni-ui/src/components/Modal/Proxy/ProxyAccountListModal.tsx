@@ -33,6 +33,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
       <AccountItemWithProxyAvatar
         account={account}
         accountAddress={proxyAddress}
+        addressFallbackLength={9}
         className={'__account-item'}
       />
     );

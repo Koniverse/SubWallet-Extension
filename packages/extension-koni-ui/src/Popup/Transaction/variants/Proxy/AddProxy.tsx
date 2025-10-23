@@ -7,7 +7,7 @@ import { ActionType } from '@subwallet/extension-base/core/types';
 import { UNSUPPORTED_PROXY_NETWORKS } from '@subwallet/extension-base/services/proxy-service/constant';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AddressInputNew, ChainSelector, HiddenInput, NumberDisplay } from '@subwallet/extension-koni-ui/components';
-import { useCreateGetChainAndExcludedTokenByAccountProxy, useFocusFormItem, useGetAccountProxyByAddress, useGetBalance, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useCreateGetChainAndExcludedTokenByAccountProxy, useGetAccountProxyByAddress, useGetBalance, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { useGetProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/proxyAccount/useGetProxyAccountsInfoByAddress';
 import { handleAddProxy } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
@@ -17,7 +17,7 @@ import { convertFieldToObject, findAccountByAddress, simpleCheckForm } from '@su
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import CN from 'classnames';
-import { ArrowCircleRight } from 'phosphor-react';
+import { TreeStructure } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -117,7 +117,14 @@ const Component = (): React.ReactElement<Props> => {
       account,
       actionType: ActionType.PROXY,
       autoFormatValue: false,
-      allowLedgerGenerics: ledgerGenericAllowNetworks });
+      allowLedgerGenerics: ledgerGenericAllowNetworks })
+      .catch((err: unknown) => {
+        const msg = (err instanceof Error ? err.message : String(err ?? 'Unknown error'))
+          .replace(/recipient/gi, (m) => m[0] === m[0].toUpperCase() ? 'Proxy' : 'proxy')
+          .replace(/sender/gi, (m) => m[0] === m[0].toUpperCase() ? 'Proxied' : 'proxied');
+
+        throw new Error(msg);
+      });
   }, [accounts, chainInfoMap, form, ledgerGenericAllowNetworks]);
 
   const validateProxyType = useCallback(async (rule: Rule, _proxyType: string) => {
@@ -138,7 +145,6 @@ const Component = (): React.ReactElement<Props> => {
     return Promise.resolve();
   }, [form, proxyInfo.proxies, t]);
 
-  useFocusFormItem(form, 'proxyAddress');
   useRestoreTransaction(form);
 
   useEffect(() => {
@@ -216,7 +222,9 @@ const Component = (): React.ReactElement<Props> => {
             statusHelpAsTooltip={true}
             validateTrigger={false}
           >
-            <ProxyTypeSelector />
+            <ProxyTypeSelector
+              label={t('Proxy type')}
+            />
           </Form.Item>
         </Form>
         <div className={CN('proxy-deposit')}>
@@ -239,7 +247,7 @@ const Component = (): React.ReactElement<Props> => {
           disabled={!isBalanceReady || isDisable}
           icon={(
             <Icon
-              phosphorIcon={ArrowCircleRight}
+              phosphorIcon={TreeStructure}
               weight={'fill'}
             />
           )}

@@ -29,8 +29,8 @@ type Props = ThemeProps & {
   address: string;
   setProxyAccountsSelected: Dispatch<SetStateAction<Record<string, ProxyItemSelector>>>;
   proxyAccountsSelected: Record<string, ProxyItemSelector>;
-  setNetworkSelected: Dispatch<SetStateAction<string>>;
-  networkSelected: string;
+  setNetworkSelected: Dispatch<SetStateAction<string | undefined>>;
+  networkSelected?: string;
 };
 
 const getKey = (address: string, proxyType: ProxyType) => proxyType + ':' + address;
@@ -43,8 +43,10 @@ function Component ({ accountProxy, address: addressFormated, className, network
   const navigate = useNavigate();
   const checkChain = useChainChecker();
   const [loading, setLoading] = useState(false);
-
+  const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const getChainAndExcludedTokenByAccountProxy = useCreateGetChainAndExcludedTokenByAccountProxy();
+
+  const proxyIdSet = useMemo<Set<string>>(() => new Set<string>(accountProxies.map(({ id }) => id)), [accountProxies]);
 
   const { allowedChains } = useMemo(() => {
     return getChainAndExcludedTokenByAccountProxy(accountProxy);
@@ -65,8 +67,19 @@ function Component ({ accountProxy, address: addressFormated, className, network
     return result;
   }, [allowedChains, chainInfoMap]);
 
+  const proxyAccountSelectedSorted = useMemo<ProxyItemSelector[]>(() => {
+    const list = Object.values(proxyAccountsSelected);
+
+    return list.sort((a, b) => {
+      const aInProxyIdSet = proxyIdSet.has(a.proxyId || '') ? 1 : 0;
+      const bInProxyIdSet = proxyIdSet.has(b.proxyId || '') ? 1 : 0;
+
+      return bInProxyIdSet - aInProxyIdSet;
+    });
+  }, [proxyAccountsSelected, proxyIdSet]);
+
   const onAddProxyAccount = useCallback(() => {
-    if (!addressFormated) {
+    if (!addressFormated || !networkSelected) {
       return;
     }
 
@@ -145,7 +158,7 @@ function Component ({ accountProxy, address: addressFormated, className, network
     setNetworkSelected(
       (prevState) => {
         if (prevState !== newNetworkSelected) {
-          checkChain(networkSelected);
+          checkChain(newNetworkSelected);
           setProxyAccountsSelected({});
 
           return newNetworkSelected;
@@ -154,10 +167,10 @@ function Component ({ accountProxy, address: addressFormated, className, network
         return prevState;
       }
     );
-  }, [checkChain, networkSelected, setNetworkSelected, setProxyAccountsSelected]);
+  }, [checkChain, setNetworkSelected, setProxyAccountsSelected]);
 
   useEffect(() => {
-    if (addressFormated) {
+    if (addressFormated && networkSelected) {
       setLoading(true);
       getProxyAccounts({
         chain: networkSelected,
@@ -181,6 +194,12 @@ function Component ({ accountProxy, address: addressFormated, className, network
     }
   }, [addressFormated, networkSelected, setProxyAccountsSelected]);
 
+  useEffect(() => {
+    if (!networkSelected && chainItems[0]?.slug) {
+      setNetworkSelected(chainItems[0].slug);
+    }
+  }, [chainItems, networkSelected, setNetworkSelected]);
+
   return (
     <div className={className}>
       <ChainSelector
@@ -197,7 +216,7 @@ function Component ({ accountProxy, address: addressFormated, className, network
         : <SwList.Section
           className={CN('__proxy-account-list')}
           gap={token.sizeXL}
-          list={Object.values(proxyAccountsSelected)}
+          list={proxyAccountSelectedSorted}
           renderItem={renderItem}
           renderWhenEmpty={renderEmpty}
         />

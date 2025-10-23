@@ -84,7 +84,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       renderSelected={renderProxyTypeSelected}
       selected={value || ''}
       statusHelp={statusHelp}
-      title={title || label || placeholder || t('Select proxy type')}
+      title={title || placeholder || t('Select proxy type')}
       tooltip={tooltip}
     />
   );
