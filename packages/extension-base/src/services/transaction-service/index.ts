@@ -157,15 +157,23 @@ export default class TransactionService {
     const chainInfoMap = this.state.chainService.getChainInfoMap();
 
     // Get signer account
-    const signer = transactionInput.proxyAddress || address;
+    let signer = address;
+    const proxyAddress = transactionInput.proxyAddress;
+
+    let proxyAccountNativeTokenAvailable: AmountData | undefined;
+
+    if (proxyAddress && proxyAddress !== address) {
+      signer = proxyAddress;
+      proxyAccountNativeTokenAvailable = await this.state.balanceService.getTransferableBalance(proxyAddress, chain, nativeTokenInfo.slug, extrinsicType);
+    }
 
     // Check account signing transaction
     checkSigningAccountForTransaction(validationResponse, chainInfoMap, signer);
 
-    const nativeTokenAvailable = await this.state.balanceService.getTransferableBalance(signer, chain, nativeTokenInfo.slug, extrinsicType);
+    const nativeTokenAvailable = await this.state.balanceService.getTransferableBalance(address, chain, nativeTokenInfo.slug, extrinsicType);
 
     // Check available balance against transaction fee
-    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable);
+    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable, proxyAccountNativeTokenAvailable);
 
     // Warnings Ton address if bounceable and not active
     // if (transaction && isTonTransaction(transaction) && tonApi) {
