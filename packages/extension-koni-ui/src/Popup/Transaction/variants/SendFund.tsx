@@ -181,6 +181,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [chainValue, destChainValue]);
 
   const [loading, setLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+
   const [isTransferAll, setIsTransferAll] = useState(false);
   const [proxyAccounts, setProxyAccounts] = useState<ProxyItem[]>([]);
 
@@ -598,11 +600,12 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             proxyItems: proxyAccounts
           })
           .then((selectedProxy) => {
-            if (!selectedProxy) {
-              return reject(new Error('Proxy not selected'));
-            }
+            setSubmitLoading(true);
 
-            createSendPromise(createBaseParams(selectedProxy)).then(resolve).catch(reject);
+            createSendPromise(createBaseParams(selectedProxy))
+              .then(resolve)
+              .catch(reject)
+              .finally(() => setSubmitLoading(false));
           })
           .catch(onError)
           .finally(() => setLoading(false));
@@ -1219,7 +1222,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
               weight={'fill'}
             />
           )}
-          loading={loading}
+          loading={loading || submitLoading}
           onClick={checkAction(form.submit, extrinsicType)}
           schema={isTransferAll ? 'warning' : undefined}
         >
