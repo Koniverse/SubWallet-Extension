@@ -20,6 +20,7 @@ import MigratePolygonUSDCProvider from './tokens/MigratePolygonUSDCProvider';
 import DeleteChain from './DeleteChain';
 import DeleteChainStaking from './DeleteChainStaking';
 import DeleteEarningData from './DeleteEarningData';
+import DeleteEarningData20251010 from './DeleteEarningData20251010';
 import DisableZeroBalanceTokens from './DisableZeroBalanceTokens';
 import EnableVaraChain from './EnableVaraChain';
 import MigrateAuthUrls from './MigrateAuthUrls';
@@ -74,5 +75,6 @@ export default <Record<string, typeof BaseMigrationJob>>{
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
   '1.3.42-01': MigrateNewUnifiedAccount,
   '1.3.54-01': MigrateChainPatrol,
+  '1.3.62-01': DeleteEarningData20251010,
   '1.3.58-01': OptimizeEnableToken
 };
