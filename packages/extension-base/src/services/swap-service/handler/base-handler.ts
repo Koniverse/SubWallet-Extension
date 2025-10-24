@@ -475,8 +475,8 @@ export class SwapBaseHandler {
         const originFee = await getXcmOriginFee(xcmRequest, true);
 
         if (originFee) {
-          const bnOriginTokenEd = _getTokenMinAmount(fromToken);
-          const isBridgeTokenBalanceEnough = new BigN(bridgeFromTokenBalanceStr).minus(originFee).gte(bnOriginTokenEd);
+          const fromTokenMinAmount = _getTokenMinAmount(fromToken);
+          const isBridgeTokenBalanceEnough = new BigN(bridgeFromTokenBalanceStr).minus(originFee).gte(fromTokenMinAmount);
 
           if (!isBridgeTokenBalanceEnough) {
             return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again')];
@@ -499,6 +499,7 @@ export class SwapBaseHandler {
       return spendingAndFeePaymentValidation;
     }
 
+    // todo: check isSufficient token
     if (bnExpectedReceivingAmount.lte(_getTokenMinAmount(receivingToken))) {
       const atLeastStr = formatNumber(_getTokenMinAmount(receivingToken), _getAssetDecimals(receivingToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(receivingToken) || 6 });
 
