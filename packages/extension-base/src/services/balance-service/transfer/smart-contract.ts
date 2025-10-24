@@ -49,6 +49,10 @@ export async function getEVMTransactionObject ({ chain,
 
   if (isEnergyWebChain) {
     feeCombine.maxFeePerGas = gasSettingsForEWC.maxFeePerGas;
+
+    if (!feeCombine.maxPriorityFeePerGas || new BigN(feeCombine.maxPriorityFeePerGas).gt(feeCombine.maxFeePerGas)) {
+      feeCombine.maxPriorityFeePerGas = gasSettingsForEWC.maxFeePerGas;
+    }
   }
 
   const transactionObject = {
