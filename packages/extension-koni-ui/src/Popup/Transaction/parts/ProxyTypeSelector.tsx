@@ -25,7 +25,7 @@ const ProxyTypeItem: ProxyTypeExtended[] = [
   },
   {
     type: 'NonTransfer',
-    label: 'Non-transfer'
+    label: 'Non - transfer'
   },
   {
     type: 'Governance',
@@ -79,12 +79,12 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       items={ProxyTypeItem}
       label={label}
       onSelect={onSelect}
-      placeholder={placeholder || t('Select proxy type')}
+      placeholder={placeholder || t('ui.TRANSACTION.screen.Transaction.part.ProxyTypeSelector.selectProxyType')}
       renderItem={renderItem}
       renderSelected={renderProxyTypeSelected}
       selected={value || ''}
       statusHelp={statusHelp}
-      title={title || placeholder || t('Select proxy type')}
+      title={title || placeholder || t('ui.TRANSACTION.screen.Transaction.part.ProxyTypeSelector.selectProxyType')}
       tooltip={tooltip}
     />
   );

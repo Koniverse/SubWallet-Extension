@@ -5,7 +5,7 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { getAstarWithdrawable } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/astar';
-import { AccountJson, ProxyItem, UnstakingInfo, UnstakingStatus, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, UnstakingInfo, UnstakingStatus, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
@@ -15,7 +15,7 @@ import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campa
 import { yieldSubmitStakingWithdrawal } from '@subwallet/extension-koni-ui/messaging';
 import { accountFilterFunc } from '@subwallet/extension-koni-ui/Popup/Transaction/helper';
 import { FormCallbacks, FormFieldData, ThemeProps, WithdrawParams } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, isAccountAll, noop, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, isAccountAll, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowCircleRight, XCircle } from 'phosphor-react';
@@ -52,7 +52,7 @@ const Component = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { defaultData, getProxyAccountsToSign, persistData } = useTransactionContext<WithdrawParams>();
+  const { defaultData, persistData, proxyAccountsToSign, setProxyAccountsToSign } = useTransactionContext<WithdrawParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<WithdrawParams>();
@@ -65,7 +65,6 @@ const Component = () => {
 
   const [isDisable, setIsDisable] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [proxyAccounts, setProxyAccounts] = useState<ProxyItem[]>([]);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
 
   const chainValue = useWatchTransaction('chain', form, defaultData);
@@ -154,7 +153,7 @@ const Component = () => {
         const proxyAddress = await selectProxyAccountModal.open({
           address: values.from,
           chain: values.chain,
-          proxyItems: proxyAccounts
+          proxyItems: proxyAccountsToSign
         });
 
         return await sendPromise(proxyAddress);
@@ -170,7 +169,7 @@ const Component = () => {
           setLoading(false);
         });
     }, 300);
-  }, [onError, onSuccess, poolInfo.type, proxyAccounts, selectProxyAccountModal, unstakingInfo]);
+  }, [onError, onSuccess, poolInfo.type, proxyAccountsToSign, selectProxyAccountModal, unstakingInfo]);
 
   const onClickSubmit = useCallback((values: WithdrawParams) => {
     if (currentConfirmation) {
@@ -224,8 +223,8 @@ const Component = () => {
   }, [accountList, form, fromValue]);
 
   useEffect(() => {
-    getProxyAccountsToSign(chainValue, fromValue, exType).then(setProxyAccounts).catch(noop);
-  }, [chainValue, exType, fromValue, getProxyAccountsToSign]);
+    setProxyAccountsToSign(chainValue, fromValue, exType);
+  }, [chainValue, exType, fromValue, setProxyAccountsToSign]);
 
   return (
     <>

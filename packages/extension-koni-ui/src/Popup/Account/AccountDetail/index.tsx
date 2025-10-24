@@ -166,7 +166,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
     if (canManageProxies) {
       result.push(
         {
-          label: t('Manage proxies'),
+          label: t('ui.ACCOUNT.screen.Account.Detail.manageProxies'),
           value: FilterTabType.MANAGE_PROXIES
         });
     }
@@ -366,7 +366,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
               onClick={onCancelRemoveProxyAccounts}
               schema='secondary'
             >
-              {t('Cancel')}
+              {t('ui.ACCOUNT.screen.Account.Detail.cancelRemoveProxy')}
             </Button>
             <Button
               block={true}
@@ -380,7 +380,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
               onClick={onRemoveProxyAccounts}
               schema='error'
             >
-              {t('Remove')}
+              {t('ui.ACCOUNT.screen.Account.Detail.removeProxy')}
             </Button>
           </>
         );
@@ -400,7 +400,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
           onClick={onAddProxyAccount}
           schema='primary'
         >
-          {t('Add proxy')}
+          {t('ui.ACCOUNT.screen.Account.Detail.addProxy')}
         </Button>
       );
     }
@@ -737,7 +737,7 @@ const AccountDetail = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
     },
 
     '.filter-tabs-container': {
-      gap: token.sizeMD,
+      justifyContent: 'space-between',
       paddingInline: token.paddingXXS - 2,
       marginInline: token.margin,
 

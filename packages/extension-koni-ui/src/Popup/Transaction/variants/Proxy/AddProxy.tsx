@@ -139,7 +139,7 @@ const Component = (): React.ReactElement<Props> => {
     );
 
     if (isInvalidProxy) {
-      return Promise.reject(new Error(t('The selected proxy type is not authorized for the provided proxy address')));
+      return Promise.reject(new Error(t('ui.TRANSACTION.screen.Transaction.AddProxy.proxyTypeNotAuthorized')));
     }
 
     return Promise.resolve();
@@ -185,7 +185,7 @@ const Component = (): React.ReactElement<Props> => {
             <ChainSelector
               disabled={!isBalanceReady}
               items={chainItems}
-              label={t('Network')}
+              label={t('ui.TRANSACTION.screen.Transaction.AddProxy.network')}
             />
           </Form.Item>
 
@@ -204,8 +204,8 @@ const Component = (): React.ReactElement<Props> => {
               actionType={ActionType.PROXY}
               chainSlug={chainValue}
               dropdownHeight={227}
-              label={t('Proxy account')}
-              placeholder={t('Enter address')}
+              label={t('ui.TRANSACTION.screen.Transaction.AddProxy.proxyAccount')}
+              placeholder={t('ui.TRANSACTION.screen.Transaction.AddProxy.enterAddress')}
               saveAddress={true}
               showAddressBook={true}
               showScanner={true}
@@ -223,7 +223,7 @@ const Component = (): React.ReactElement<Props> => {
             validateTrigger={false}
           >
             <ProxyTypeSelector
-              label={t('Proxy type')}
+              label={t('ui.TRANSACTION.screen.Transaction.AddProxy.proxyType')}
             />
           </Form.Item>
         </Form>
@@ -232,7 +232,7 @@ const Component = (): React.ReactElement<Props> => {
             decimal={nativeToken?.decimals || 0}
             decimalOpacity={0.45}
             intOpacity={0.45}
-            prefix={t('Proxy deposit: ')}
+            prefix={t('ui.TRANSACTION.screen.Transaction.AddProxy.proxyDeposit') + ': '}
             size={token.fontSize}
             suffix={nativeToken?.symbol}
             unitOpacity={0.45}
@@ -254,7 +254,7 @@ const Component = (): React.ReactElement<Props> => {
           loading={balanceLoading || loading}
           onClick={onPreCheck(form.submit, ExtrinsicType.ADD_PROXY)}
         >
-          {t('Add proxy')}
+          {t('ui.TRANSACTION.screen.Transaction.AddProxy.addProxy')}
         </Button>
       </TransactionFooter>
     </>

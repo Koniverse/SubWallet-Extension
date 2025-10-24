@@ -96,8 +96,8 @@ function Component ({ accountProxy, address: addressFormated, className, network
     return (
       <div className={'__empty-proxy-account-list'}>
         <EmptyList
-          emptyMessage={t('Set up your proxy accounts now!')}
-          emptyTitle={t('No proxies found')}
+          emptyMessage={t('ui.ACCOUNT.screen.Account.Detail.ProxyList.setupProxyAccounts')}
+          emptyTitle={t('ui.ACCOUNT.screen.Account.Detail.ProxyList.noProxiesFound')}
           phosphorIcon={ListChecks}
         />
 
@@ -115,7 +115,7 @@ function Component ({ accountProxy, address: addressFormated, className, network
           schema='primary'
           shape={'round'}
         >
-          {t('Add proxy')}
+          {t('ui.ACCOUNT.screen.Account.Detail.ProxyList.addProxy')}
         </Button>
       </div>
 

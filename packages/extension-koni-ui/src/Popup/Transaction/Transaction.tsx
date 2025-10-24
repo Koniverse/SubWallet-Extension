@@ -6,7 +6,7 @@ import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@s
 import { ADD_PROXY_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_ADD_PROXY_PARAMS, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, REMOVE_PROXY_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
-import { useAlert, useChainChecker, useGetProxyAccountsToSign, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useChainChecker, useNavigateOnChangeAccount, useProxyAccountsToSign, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ManageChainsParam, Theme, ThemeProps, TransactionFormBaseProps } from '@subwallet/extension-koni-ui/types';
 import { detectTransactionPersistKey, getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
@@ -38,7 +38,7 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
   const dataContext = useContext(DataContext);
 
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
-  const getProxyAccountsToSign = useGetProxyAccountsToSign();
+  const [proxyAccountsToSign, setProxyAccountsToSign] = useProxyAccountsToSign();
 
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
   const [recheckingChain, setRecheckingChain] = useState<string | undefined>();
@@ -334,8 +334,9 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
     closeRecheckChainConnectionModal,
     modalId,
     setIsDisableHeader,
-    getProxyAccountsToSign
-  }), [closeAlert, closeRecheckChainConnectionModal, defaultData, getProxyAccountsToSign, goBack, modalId, needPersistData, onDone, openAlert, openRecheckChainConnectionModal, setStorage]);
+    setProxyAccountsToSign,
+    proxyAccountsToSign
+  }), [closeAlert, closeRecheckChainConnectionModal, defaultData, setProxyAccountsToSign, goBack, modalId, needPersistData, onDone, openAlert, openRecheckChainConnectionModal, proxyAccountsToSign, setStorage]);
 
   const recheckChainConnectionModalNode = (
     <>

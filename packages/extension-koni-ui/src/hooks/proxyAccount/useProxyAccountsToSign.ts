@@ -9,17 +9,20 @@ import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { getProxyAccounts } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { isSubstrateAddress } from '@subwallet/keyring';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
-export type GetProxyAccountsToSign = (chain: string, address?: string, type?: ExtrinsicType, selectedProxyAddress?: string[]) => Promise<ProxyItem[]>;
+export type SetProxyAccountsToSign = (chain: string, address?: string, type?: ExtrinsicType, selectedProxyAddress?: string[]) => void;
 
-export function useGetProxyAccountsToSign (): GetProxyAccountsToSign {
+export function useProxyAccountsToSign (): [ProxyItem[], SetProxyAccountsToSign] {
   const allAccounts = useSelector((state: RootState) => state.accountState.accounts);
+  const [proxies, setProxies] = useState<ProxyItem[]>([]);
 
-  return useCallback(async (chain: string, address?: string, type?: ExtrinsicType, selectedProxyAddress?: string[]): Promise<ProxyItem[]> => {
+  const fetchProxyAccountToSign = useCallback(async (chain: string, address?: string, type?: ExtrinsicType, selectedProxyAddress?: string[]): Promise<void> => {
     try {
       if (!address || !isSubstrateAddress(address)) {
-        return [];
+        setProxies([]);
+
+        return;
       }
 
       const request: RequestGetProxyAccounts = {
@@ -32,20 +35,24 @@ export function useGetProxyAccountsToSign (): GetProxyAccountsToSign {
       const proxyAccounts = await getProxyAccounts(request);
 
       if (!proxyAccounts?.proxies?.length) {
-        return [];
+        setProxies([]);
+
+        return;
       }
 
       const validAccounts = allAccounts.filter(
         (acc) => acc.chainType === AccountChainType.SUBSTRATE && acc.signMode !== AccountSignMode.READ_ONLY
       );
 
-      return proxyAccounts.proxies.filter((proxy) =>
+      setProxies(proxyAccounts.proxies.filter((proxy) =>
         validAccounts.some((acc) => isSameAddress(acc.address, proxy.proxyAddress))
-      );
+      ));
     } catch (e) {
       console.error('Error fetching proxy accounts:', e);
 
-      return [];
+      setProxies([]);
     }
   }, [allAccounts]);
+
+  return [proxies, fetchProxyAccountToSign];
 }

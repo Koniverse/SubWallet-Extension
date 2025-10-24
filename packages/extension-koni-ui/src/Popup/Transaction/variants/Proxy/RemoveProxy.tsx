@@ -11,7 +11,6 @@ import { useGetProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/h
 import { handleRemoveProxy } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { RemoveProxyParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { noop } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle, Info, XCircle } from 'phosphor-react';
@@ -32,14 +31,13 @@ interface ProxyAddressRemovedState {
 
 const Component = ({ className }: Props): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/add-proxy');
-  const { defaultData: { chain, from, proxyAddressKeys }, getProxyAccountsToSign, goBack, setBackProps } = useTransactionContext<RemoveProxyParams>();
+  const { defaultData: { chain, from, proxyAddressKeys }, goBack, proxyAccountsToSign, setBackProps, setProxyAccountsToSign } = useTransactionContext<RemoveProxyParams>();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
   const nativeTokenSlug = useGetNativeTokenSlug(chain);
   const { activeModal } = useContext(ModalContext);
   const navigate = useNavigate();
-  const [proxyAccountsToSign, setProxyAccountsToSign] = useState<ProxyItemExtended[]>([]);
   const { onError, onSuccess } = useHandleSubmitTransaction();
   const { selectProxyAccountModal } = useContext(WalletModalContext);
   const proxyAccountInfo = useGetProxyAccountsInfoByAddress(from, chain);
@@ -124,8 +122,8 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
   const addressCount = proxyAddressRemovedFiltered.addressUnique.length;
 
   useEffect(() => {
-    getProxyAccountsToSign(chain, from, ExtrinsicType.STAKING_CANCEL_UNSTAKE, proxyAddressRemovedFiltered.addressUnique).then(setProxyAccountsToSign).catch(noop);
-  }, [chain, from, getProxyAccountsToSign, proxyAddressKeys, proxyAddressRemovedFiltered.addressUnique]);
+    setProxyAccountsToSign(chain, from, ExtrinsicType.STAKING_CANCEL_UNSTAKE, proxyAddressRemovedFiltered.addressUnique);
+  }, [chain, from, setProxyAccountsToSign, proxyAddressKeys, proxyAddressRemovedFiltered.addressUnique]);
 
   useEffect(() => {
     if (accountProxy?.id) {
@@ -176,13 +174,13 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
             ? <MetaInfo.Account
               address={proxyAddressRemovedFiltered.addressUnique[0]}
               chainSlug={chain}
-              label={t('Proxy account')}
+              label={t('ui.TRANSACTION.screen.Transaction.removeProxy.proxyAccount')}
             />
             : <MetaInfo.Default
               className={'proxy-address-removed'}
-              label={t('Proxy account')}
+              label={t('ui.TRANSACTION.screen.Transaction.removeProxy.proxyAccount')}
             >
-              {addressCount} {t('accounts')}
+              {addressCount} {t('ui.TRANSACTION.screen.Transaction.removeProxy.numberAccounts')}
               <Button
                 className={'proxy-address-removed-info'}
                 icon={ <Icon
@@ -199,7 +197,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
 
           <MetaInfo.Chain
             chain={chain}
-            label={t('Network')}
+            label={t('ui.TRANSACTION.screen.Transaction.removeProxy.network')}
           />
         </MetaInfo>
 
@@ -216,7 +214,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
           onClick={onCancelRemove}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.TRANSACTION.screen.Transaction.removeProxy.cancel')}
         </Button>
 
         <Button
@@ -230,7 +228,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
           loading={loading}
           onClick={onPreCheck(onClickSubmit, ExtrinsicType.REMOVE_PROXY)}
         >
-          {t('Continue')}
+          {t('ui.TRANSACTION.screen.Transaction.removeProxy.continue')}
         </Button>
       </TransactionFooter>
 

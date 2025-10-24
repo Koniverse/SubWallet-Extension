@@ -16,7 +16,7 @@ import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, ProxyItem, TransactionFee } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee } from '@subwallet/extension-base/types';
 import { RequestSubmitTransfer, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { _reformatAddressWithChain, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
@@ -124,7 +124,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const notification = useNotification();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
 
-  const { defaultData, getProxyAccountsToSign, persistData } = useTransactionContext<TransferParams>();
+  const { defaultData, persistData, proxyAccountsToSign, setProxyAccountsToSign } = useTransactionContext<TransferParams>();
   const { defaultSlug: sendFundSlug } = defaultData;
   const isFirstRender = useIsFirstRender();
 
@@ -184,7 +184,6 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const [submitLoading, setSubmitLoading] = useState(false);
 
   const [isTransferAll, setIsTransferAll] = useState(false);
-  const [proxyAccounts, setProxyAccounts] = useState<ProxyItem[]>([]);
 
   // use this to reinit AddressInput component
   const [addressInputRenderKey, setAddressInputRenderKey] = useState<string>(defaultAddressInputRenderKey);
@@ -597,7 +596,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           .open({
             chain,
             address: from,
-            proxyItems: proxyAccounts
+            proxyItems: proxyAccountsToSign
           })
           .then((selectedProxy) => {
             setSubmitLoading(true);
@@ -611,7 +610,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           .finally(() => setLoading(false));
       });
     },
-    [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, proxyAccounts, selectProxyAccountModal, onError]
+    [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, selectProxyAccountModal, proxyAccountsToSign, onError]
   );
 
   // todo: must refactor later, temporary solution to support SnowBridge
@@ -953,8 +952,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [form, hideMaxButton, isTransferAll, transferInfo]);
 
   useEffect(() => {
-    getProxyAccountsToSign(chainValue, fromValue, extrinsicType).then(setProxyAccounts).catch(noop);
-  }, [chainValue, fromValue, getProxyAccountsToSign, extrinsicType]);
+    setProxyAccountsToSign(chainValue, fromValue, extrinsicType);
+  }, [chainValue, fromValue, setProxyAccountsToSign, extrinsicType]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');

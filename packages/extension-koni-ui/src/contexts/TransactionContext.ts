@@ -1,7 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { GetProxyAccountsToSign } from '@subwallet/extension-koni-ui/hooks';
+import { ProxyItem } from '@subwallet/extension-base/types';
+import { SetProxyAccountsToSign } from '@subwallet/extension-koni-ui/hooks';
 import { AlertDialogProps, TransactionFormBaseProps } from '@subwallet/extension-koni-ui/types';
 import { ButtonProps } from '@subwallet/react-ui';
 import React, { Dispatch, SetStateAction } from 'react';
@@ -24,7 +25,8 @@ export interface TransactionContextProps {
   closeAlert: VoidFunction;
   openRecheckChainConnectionModal: (chainName: string) => void;
   closeRecheckChainConnectionModal: VoidFunction;
-  getProxyAccountsToSign: GetProxyAccountsToSign
+  setProxyAccountsToSign: SetProxyAccountsToSign;
+  proxyAccountsToSign: ProxyItem[];
 }
 
 export const TransactionContext = React.createContext<TransactionContextProps>({
@@ -52,6 +54,7 @@ export const TransactionContext = React.createContext<TransactionContextProps>({
   openRecheckChainConnectionModal: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   closeRecheckChainConnectionModal: () => {},
-  // eslint-disable-next-line @typescript-eslint/require-await
-  getProxyAccountsToSign: async () => ([])
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  setProxyAccountsToSign: () => {},
+  proxyAccountsToSign: []
 });

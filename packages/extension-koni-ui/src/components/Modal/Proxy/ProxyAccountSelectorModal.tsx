@@ -94,7 +94,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
             onClick={onCancel}
             schema='secondary'
           >
-            {t('Cancel')}
+            {t('ui.PROXY.components.Modal.Proxy.ProxyAccountSelector.cancel')}
           </Button>
           <Button
             block
@@ -108,16 +108,16 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
             }
             onClick={onClickApply}
           >
-            {t('Continue')}
+            {t('ui.PROXY.components.Modal.Proxy.ProxyAccountSelector.continue')}
           </Button>
         </>
       }
       id={modalId}
       onCancel={onCancel}
-      title={t('Select account')}
+      title={t('ui.PROXY.components.Modal.Proxy.ProxyAccountSelector.selectAccount')}
     >
       <div className='proxy-modal__description'>
-        {t('You\'re performing transactions from a proxied account. Select the account you want to sign this transaction')}
+        {t('ui.PROXY.components.Modal.Proxy.ProxyAccountSelector.selectSigningAccount')}
       </div>
       <SwList.Section
         list={fullList}

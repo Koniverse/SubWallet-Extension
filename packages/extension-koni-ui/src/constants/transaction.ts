@@ -169,6 +169,6 @@ export const DEFAULT_ADD_PROXY_PARAMS: AddProxyParams = {
 
 export const DEFAULT_REMOVE_PROXY_PARAMS: RemoveProxyParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
-  proxyAddresses: []
+  proxyAddressKeys: []
 
 };

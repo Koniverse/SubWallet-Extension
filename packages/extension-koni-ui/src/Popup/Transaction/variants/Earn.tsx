@@ -7,7 +7,7 @@ import { _handleDisplayForEarningError, _handleDisplayInsufficientEarningError }
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, ProxyItem, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
+import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
@@ -25,7 +25,7 @@ import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, submitProces
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, getExtrinsicTypeByPoolInfo, noop, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, getExtrinsicTypeByPoolInfo, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -57,9 +57,9 @@ const Component = () => {
   const { closeSidePanel } = useSidePanelUtils();
   const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { closeAlert, defaultData, getProxyAccountsToSign, goBack,
-    onDone, openAlert,
-    persistData, setBackProps, setIsDisableHeader, setSubHeaderRightButtons } = useTransactionContext<EarnParams>();
+  const { closeAlert, defaultData, goBack, onDone, openAlert,
+    persistData, proxyAccountsToSign,
+    setBackProps, setIsDisableHeader, setProxyAccountsToSign, setSubHeaderRightButtons } = useTransactionContext<EarnParams>();
 
   const { fromAccountProxy, slug } = defaultData;
 
@@ -112,7 +112,6 @@ const Component = () => {
   const [screenLoading, setScreenLoading] = useState(true);
   const [submitString, setSubmitString] = useState<string | undefined>();
   const [connectionError, setConnectionError] = useState<string>();
-  const [proxyAccounts, setProxyAccounts] = useState<ProxyItem[]>([]);
   // const [, setCanMint] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   // const [checkMintLoading, setCheckMintLoading] = useState(false);
@@ -587,7 +586,7 @@ const Component = () => {
                 selectProxyAccountModal.open({
                   address: from,
                   chain,
-                  proxyItems: proxyAccounts
+                  proxyItems: proxyAccountsToSign
                 })
                   .then(async (selected?: string) => {
                     setSubmitLoading(true);
@@ -656,7 +655,7 @@ const Component = () => {
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, proxyAccounts, selectProxyAccountModal, setIsDisableHeader, stakingFee, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, proxyAccountsToSign, selectProxyAccountModal, setIsDisableHeader, stakingFee, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {
@@ -1050,8 +1049,8 @@ const Component = () => {
   }, [form, inputAsset.slug]);
 
   useEffect(() => {
-    getProxyAccountsToSign(chainValue, fromValue, exType).then(setProxyAccounts).catch(noop);
-  }, [chainValue, fromValue, exType, getProxyAccountsToSign]);
+    setProxyAccountsToSign(chainValue, fromValue, exType);
+  }, [chainValue, fromValue, exType, setProxyAccountsToSign]);
 
   useEffect(() => {
     if (!fromValue && accountAddressItems.length === 1) {

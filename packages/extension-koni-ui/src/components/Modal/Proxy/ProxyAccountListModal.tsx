@@ -53,7 +53,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
       />}
       id={modalId}
       onCancel={onCancel}
-      title={t('Proxy account')}
+      title={t('ui.PROXY.components.Modal.Proxy.ProxyAccountList.proxyAccount')}
     >
       <SwList.Section
         list={proxyAddresses}

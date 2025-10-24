@@ -70,7 +70,7 @@ function Component (props: Props): React.ReactElement<Props> {
         })}
         >
           {
-            proxyAccount.isMain ? t('Proxied account') : `${t('Proxy type')}: ${proxyAccount.proxyType}`
+            proxyAccount.isMain ? t('ui.PROXY.components.ProxyAccount.SelectorItem.proxiedAccount') : `${t('ui.PROXY.components.ProxyAccount.SelectorItem.proxyType')}: ${proxyAccount.proxyType}`
           }
         </div>
       </div>
