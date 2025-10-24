@@ -29,8 +29,10 @@ interface ProxyAddressRemovedState {
   addressUnique: string[];
 }
 
+const extrinsicType = ExtrinsicType.REMOVE_PROXY;
+
 const Component = ({ className }: Props): React.ReactElement<Props> => {
-  useSetCurrentPage('/transaction/add-proxy');
+  useSetCurrentPage('/transaction/remove-proxy');
   const { defaultData: { chain, from, proxyAddressKeys }, goBack, proxyAccountsToSign, setBackProps, setProxyAccountsToSign } = useTransactionContext<RemoveProxyParams>();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
@@ -122,7 +124,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
   const addressCount = proxyAddressRemovedFiltered.addressUnique.length;
 
   useEffect(() => {
-    setProxyAccountsToSign(chain, from, ExtrinsicType.STAKING_CANCEL_UNSTAKE, proxyAddressRemovedFiltered.addressUnique);
+    setProxyAccountsToSign(chain, from, extrinsicType, proxyAddressRemovedFiltered.addressUnique);
   }, [chain, from, setProxyAccountsToSign, proxyAddressKeys, proxyAddressRemovedFiltered.addressUnique]);
 
   useEffect(() => {
@@ -226,7 +228,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
             />
           )}
           loading={loading}
-          onClick={onPreCheck(onClickSubmit, ExtrinsicType.REMOVE_PROXY)}
+          onClick={onPreCheck(onClickSubmit, extrinsicType)}
         >
           {t('ui.TRANSACTION.screen.Transaction.removeProxy.continue')}
         </Button>

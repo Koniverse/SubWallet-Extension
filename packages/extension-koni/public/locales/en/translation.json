@@ -2239,7 +2239,7 @@
   "ui.TRANSACTION.screen.Transaction.removeProxy.cancel": "Cancel",
   "ui.TRANSACTION.screen.Transaction.removeProxy.continue": "Continue",
   "ui.PROXY.components.Modal.Proxy.ProxyAccountList.proxyAccount": "Proxy account",
-  "ui.PROXY.components.Modal.Proxy.ProxyAccountSelector.selectSigningAccount": "You\\'re performing transactions from a proxied account. Select the account you want to sign this transaction",
+  "ui.PROXY.components.Modal.Proxy.ProxyAccountSelector.selectSigningAccount": "You're performing transactions from a proxied account. Select the account you want to sign this transaction",
   "ui.PROXY.components.Modal.Proxy.ProxyAccountSelector.continue": "Continue",
   "ui.PROXY.components.Modal.Proxy.ProxyAccountSelector.cancel": "Cancel",
   "ui.PROXY.components.Modal.Proxy.ProxyAccountSelector.selectAccount": "Select account",

@@ -737,7 +737,6 @@ const AccountDetail = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
     },
 
     '.filter-tabs-container': {
-      justifyContent: 'space-between',
       paddingInline: token.paddingXXS - 2,
       marginInline: token.margin,
 

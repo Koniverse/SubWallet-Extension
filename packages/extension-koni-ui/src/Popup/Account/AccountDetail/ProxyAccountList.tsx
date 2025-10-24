@@ -275,8 +275,10 @@ export const ProxyAccountList = styled(Component)<Props>(({ theme: { token } }: 
   },
 
   '.__load-more-container': {
-    textAlign: 'center',
-    marginTop: token.marginXXL,
-    marginBottom: token.margin
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+    minHeight: 200
   }
 }));

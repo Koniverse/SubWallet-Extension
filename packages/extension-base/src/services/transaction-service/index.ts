@@ -1138,19 +1138,15 @@ export default class TransactionService {
           proxyAddress: [proxyAddr]
         });
 
-        try {
-          const proxyAccount = keyring.getPair(proxyAddr);
+        const proxyAccount = keyring.getPair(proxyAddr);
 
-          if (proxyAccount) {
-            proxyHistories.push({
-              ...historyItem,
-              address: proxyAccount.address,
-              direction: TransactionDirection.RECEIVED,
-              proxyAddress: [proxyAddr]
-            });
-          }
-        } catch {
-          // skip
+        if (proxyAccount) {
+          proxyHistories.push({
+            ...historyItem,
+            address: proxyAccount.address,
+            direction: TransactionDirection.RECEIVED,
+            proxyAddress: [proxyAddr]
+          });
         }
 
         break;
@@ -1167,19 +1163,15 @@ export default class TransactionService {
             proxyAddress: [proxyAddr]
           });
 
-          try {
-            const proxyAccount = keyring.getPair(proxyAddr);
+          const proxyAccount = keyring.getPair(proxyAddr);
 
-            if (proxyAccount) {
-              proxyHistories.push({
-                ...historyItem,
-                address: proxyAccount.address,
-                direction: TransactionDirection.RECEIVED,
-                proxyAddress: [proxyAddr]
-              });
-            }
-          } catch {
-            // skip
+          if (proxyAccount) {
+            proxyHistories.push({
+              ...historyItem,
+              address: proxyAccount.address,
+              direction: TransactionDirection.RECEIVED,
+              proxyAddress: [proxyAddr]
+            });
           }
         }
 
