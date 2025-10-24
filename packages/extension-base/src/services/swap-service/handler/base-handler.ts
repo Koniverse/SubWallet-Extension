@@ -468,7 +468,7 @@ export class SwapBaseHandler {
         const isDryRunSuccess = await dryRunXcmExtrinsicV2(xcmRequest, false);
 
         if (!isDryRunSuccess) {
-          return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again')];
+          return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Swap amount too small. Increase amount and try again')];
         }
       } else {
         const isDryRunPreviewSuccess = await dryRunXcmExtrinsicV2(xcmRequest, true);
@@ -479,12 +479,12 @@ export class SwapBaseHandler {
           const isBridgeTokenBalanceEnough = new BigN(bridgeFromTokenBalanceStr).minus(originFee).gte(fromTokenMinAmount);
 
           if (!isBridgeTokenBalanceEnough) {
-            return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again')];
+            return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Swap amount too small. Increase amount and try again')];
           }
         }
 
         if (!isDryRunPreviewSuccess) {
-          return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again')]; // todo: recheck content suitable
+          return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Swap amount too small. Increase amount and try again')];
         }
       }
     }
@@ -499,7 +499,6 @@ export class SwapBaseHandler {
       return spendingAndFeePaymentValidation;
     }
 
-    // todo: check isSufficient token
     if (bnExpectedReceivingAmount.lte(_getTokenMinAmount(receivingToken))) {
       const atLeastStr = formatNumber(_getTokenMinAmount(receivingToken), _getAssetDecimals(receivingToken), balanceFormatter, { maxNumberFormat: _getAssetDecimals(receivingToken) || 6 });
 
