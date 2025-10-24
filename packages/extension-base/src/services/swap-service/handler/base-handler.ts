@@ -472,7 +472,7 @@ export class SwapBaseHandler {
         }
       } else {
         const isDryRunPreviewSuccess = await dryRunXcmExtrinsicV2(xcmRequest, true);
-        const originFee = await getXcmOriginFee(xcmRequest, true);
+        const originFee = await getXcmOriginFee(xcmRequest);
 
         if (originFee) {
           const fromTokenMinAmount = _getTokenMinAmount(fromToken);

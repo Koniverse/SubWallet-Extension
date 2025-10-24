@@ -167,7 +167,7 @@ export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps, isP
   }
 };
 
-export const getXcmOriginFee = async (request: CreateXcmExtrinsicProps, isPreview = false) => {
+export const getXcmOriginFee = async (request: CreateXcmExtrinsicProps) => {
   try {
     const xcmFeeInfo = await estimateXcmFee({
       fromChainInfo: request.originChain,
