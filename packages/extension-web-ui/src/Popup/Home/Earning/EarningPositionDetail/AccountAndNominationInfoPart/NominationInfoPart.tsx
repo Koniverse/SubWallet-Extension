@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { SubnetYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-web-ui/components';
@@ -26,7 +26,7 @@ function Component ({ className, compound,
 
   const isAllAccount = useMemo(() => isAccountAll(compound.address), [compound.address]);
 
-  const isRelayChain = useMemo(() => _STAKING_CHAIN_GROUP.relay.includes(poolInfo.chain), [poolInfo.chain]);
+  const isRelayChain = useMemo(() => RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(poolInfo.chain), [poolInfo.chain]);
 
   const haveNomination = useMemo(() => {
     return [YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING].includes(poolInfo.type);

@@ -3,7 +3,7 @@
 
 import { _ChainAsset, _MultiChainAsset } from '@subwallet/chain-list/types';
 import { _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { BN_TEN, BN_ZERO } from '@subwallet/extension-web-ui/constants';
@@ -15,13 +15,13 @@ import { useMemo } from 'react';
 
 const isRelatedToRelayChain = (group: string, assetRegistry: Record<string, _ChainAsset>, multiChainAssetMap: Record<string, _MultiChainAsset>) => {
   if (assetRegistry[group]) {
-    return _STAKING_CHAIN_GROUP.relay.includes(_getAssetOriginChain(assetRegistry[group]));
+    return RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(_getAssetOriginChain(assetRegistry[group]));
   }
 
   if (multiChainAssetMap[group]) {
     const originChainAsset = multiChainAssetMap[group].originChainAsset;
 
-    return _STAKING_CHAIN_GROUP.relay.includes(_getAssetOriginChain(assetRegistry[originChainAsset]));
+    return RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(_getAssetOriginChain(assetRegistry[originChainAsset]));
   }
 
   return false;

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { SubnetYieldPositionInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { Avatar, BaseModal, MetaInfo } from '@subwallet/extension-web-ui/components';
 import { EARNING_NOMINATION_MODAL } from '@subwallet/extension-web-ui/constants';
@@ -22,7 +22,7 @@ type Props = ThemeProps & {
 function Component ({ className, inputAsset, item, onCancel }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
 
-  const isRelayChain = useMemo(() => _STAKING_CHAIN_GROUP.relay.includes(item?.chain || ''), [item?.chain]);
+  const isRelayChain = useMemo(() => RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(item?.chain || ''), [item?.chain]);
   const symbol = (item as SubnetYieldPositionInfo)?.subnetData?.subnetSymbol || inputAsset?.symbol || '';
 
   return (

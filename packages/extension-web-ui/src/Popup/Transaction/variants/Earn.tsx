@@ -6,7 +6,7 @@ import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/backg
 import { _handleDisplayInsufficientEarningError } from '@subwallet/extension-base/core/logic-validation/earning';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _getAssetDecimals, _getAssetSymbol, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { _STAKING_CHAIN_GROUP, RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { EarningStatus, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
@@ -582,7 +582,7 @@ const Component = ({ className }: ComponentProps) => {
         const maxCount = poolInfo?.statistic?.maxCandidatePerFarmer ?? 1;
         const userSelectedPoolCount = poolTargetValue?.split(',').length ?? 1;
         const label = getValidatorLabel(chainValue);
-        const isRelayChain = _STAKING_CHAIN_GROUP.relay.includes(chainValue);
+        const isRelayChain = RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(chainValue);
 
         if (isRelayChain && (userSelectedPoolCount < maxCount && label === 'Validator')) {
           openAlert({
