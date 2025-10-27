@@ -10,7 +10,7 @@ export default class MigrateTransactionHistoryBySymbol extends BaseMigrationJob 
 
     try {
       const changeSlugsMap: Record<string, string> = {
-        'polygon-ERC20-USDT-0xc2132D05D31c914a87C6611C10748AEb04B58e8F': 'polygon-ERC20-USD₮0-0xc2132D05D31c914a87C6611C10748AEb04B58e8F'
+        'moonriver-ERC20-GLMR.wb-0xFfFffFff1a49463978f19dfD6983f2fa1885C254': 'moonriver-ERC20-GLMR.mb-0xFfFffFff1a49463978f19dfD6983f2fa1885C254'
       };
 
       const allTxs: ITransactionHistoryItem[] = [];
