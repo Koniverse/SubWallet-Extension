@@ -32,6 +32,8 @@ import MigrateTransactionHistory from './MigrateTransactionHistory';
 import MigrateTransactionHistoryBridge from './MigrateTransactionHistoryBridge';
 import MigrateTransactionHistoryBySymbol from './MigrateTransactionHistoryBySymbol';
 import MigrateWalletReference from './MigrateWalletReference';
+import MigrateAssetSetting20251027 from './databases/MigrateAssetSetting20251027';
+import MigrateTransactionHistoryBySymbol20251027 from './MigrateTransactionHistoryBySymbol20251027';
 
 export const EVERYTIME = '__everytime__';
 
@@ -61,8 +63,8 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.1.33-01': MigrateLedgerAccountV2,
   '1.1.41-01': DeleteChainStaking,
   // '1.1.46-01': AutoEnableSomeTokens,
-  '1.3.64-01': MigrateAssetSetting,
-  '1.3.64-02': MigrateTransactionHistoryBySymbol,
+  '1.3.55-01': MigrateAssetSetting,
+  '1.3.55-02': MigrateTransactionHistoryBySymbol,
   '1.2.69-01': MigrateRemoveGenesisHash,
   '1.2.13-01': ReloadMetadata,
   '1.2.32-01': MigratePairData,
@@ -74,5 +76,7 @@ export default <Record<string, typeof BaseMigrationJob>>{
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
   '1.3.42-01': MigrateNewUnifiedAccount,
   '1.3.54-01': MigrateChainPatrol,
-  '1.3.62-01': DeleteEarningData20251010
+  '1.3.62-01': DeleteEarningData20251010,
+  '1.3.64-01': MigrateAssetSetting20251027,
+  '1.3.64-02': MigrateTransactionHistoryBySymbol20251027,
 };
