@@ -137,11 +137,19 @@ export async function getERC20TransactionObject (
     return erc20Contract.methods.transfer(to, transferValue).encodeABI() as string;
   }
 
+  const feeInfo = _feeInfo as EvmFeeInfo;
+  const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
+
   const transferData = generateTransferData(to, transferValue);
   let gasLimit: number;
 
   if (isEnergyWebChain) {
     gasLimit = gasSettingsForEWC.gasLimit;
+    feeCombine.maxFeePerGas = gasSettingsForEWC.maxFeePerGas;
+
+    if (!feeCombine.maxPriorityFeePerGas || new BigN(feeCombine.maxPriorityFeePerGas).gt(feeCombine.maxFeePerGas)) {
+      feeCombine.maxPriorityFeePerGas = gasSettingsForEWC.maxFeePerGas;
+    }
   } else {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     gasLimit = await (erc20Contract.methods.transfer(to, transferValue) as ContractSendMethod).estimateGas({ from })
@@ -156,13 +164,6 @@ export async function getERC20TransactionObject (
           throw Error('Unable to estimate fee for this transaction. Edit fee and try again.');
         }
       });
-  }
-
-  const feeInfo = _feeInfo as EvmFeeInfo;
-  const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
-
-  if (isEnergyWebChain) {
-    feeCombine.maxFeePerGas = gasSettingsForEWC.maxFeePerGas;
   }
 
   const transactionObject = {
