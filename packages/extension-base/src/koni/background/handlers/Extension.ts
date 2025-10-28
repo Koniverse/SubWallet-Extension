@@ -1841,6 +1841,7 @@ export default class KoniExtension {
 
           isSendingTokenSufficient = await _isSufficientToken(destinationTokenInfo, substrateApi, sufficientChain);
 
+          // todo: recheck case cannot get min xcm
           const mminXcmTransferableAmount = await getMinXcmTransferableAmount(params)
             .then((min) => min ? BigInt(min) : undefined);
 
