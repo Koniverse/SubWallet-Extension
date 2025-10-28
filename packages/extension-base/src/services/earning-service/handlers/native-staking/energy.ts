@@ -126,6 +126,15 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
       const minStake = '0';
       const minToHuman = formatNumber(minStake.toString(), nativeToken.decimals || 0, balanceFormatter);
 
+      const collators = await this.getPoolTargets();
+      let maxApy = 0;
+
+      for (const collator of collators) {
+        if (collator.expectedReturn && collator.expectedReturn > maxApy) {
+          maxApy = collator.expectedReturn;
+        }
+      }
+
       const data: NativeYieldPoolInfo = {
         ...this.baseInfo,
         type: this.type,
@@ -149,7 +158,7 @@ export default class EnergyNativeStakingPoolHandler extends BaseParaNativeStakin
           farmerCount: 0, // TODO recheck
           era,
           eraTime,
-          totalApy: undefined, // not have
+          totalApy: maxApy,
           tvl: totalStake.toString(),
           unstakingPeriod: unstakingPeriod
         },
