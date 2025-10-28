@@ -3,7 +3,7 @@
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData } from '@subwallet/extension-base/background/KoniTypes';
-import { _SUPPORT_TOKEN_PAY_FEE_GROUP, XCM_FEE_RATIO } from '@subwallet/extension-base/constants';
+import { _SUPPORT_TOKEN_PAY_FEE_GROUP } from '@subwallet/extension-base/constants';
 import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { DEFAULT_CARDANO_TTL_OFFSET } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/consts';
 import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
@@ -523,7 +523,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
 
   if (!destToken) {
     maxTransferable = BN_ZERO;
-  } else if (isTransferLocalTokenAndPayThatTokenAsFee && feeChainType === 'substrate') { // xcm local token & pay local token as fee
+  } else if (isTransferLocalTokenAndPayThatTokenAsFee && feeChainType === 'substrate') {
     if (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(srcChain.slug)) {
       const estimatedFeeNative = (BigInt(estimatedFee) * BigInt(FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE) / BigInt(100)).toString();
       const estimatedFeeLocal = await calculateToAmountByReservePool(substrateApi.api, nativeToken, srcToken, estimatedFeeNative);
@@ -542,16 +542,16 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     } else {
       throw new Error(`Unable to estimate fee for ${srcChain.slug}.`);
     }
-  } else if (isTransferNativeTokenAndPayLocalTokenAsFee) { // xcm native token & pay local token as fee
+  } else if (isTransferNativeTokenAndPayLocalTokenAsFee) {
     maxTransferable = bnFreeBalance;
   } else {
-    if (!_isNativeToken(srcToken)) { // xcm local token & pay native token as fee
+    if (!_isNativeToken(srcToken)) { // xcm local token & pay native token or other local token as fee
       maxTransferable = bnFreeBalance;
     } else { // xcm native token & pay native token as fee
-      const maxTransferableBySW = bnFreeBalance.minus(BigN(estimatedFee).multipliedBy(XCM_FEE_RATIO));
+      // const maxTransferableBySW = bnFreeBalance.minus(BigN(estimatedFee).multipliedBy(XCM_FEE_RATIO));
       const maxTransferableByPS = await getMaxXcmTransferableAmount(params);
 
-      maxTransferable = new BigN(maxTransferableByPS ?? maxTransferableBySW);
+      maxTransferable = new BigN(maxTransferableByPS);
     }
   }
 

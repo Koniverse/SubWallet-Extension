@@ -5,7 +5,7 @@ import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { _Address, AmountData, ExtrinsicDataTypeMap, ExtrinsicType, FeeData } from '@subwallet/extension-base/background/KoniTypes';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
-import { _SUPPORT_TOKEN_PAY_FEE_GROUP, LEDGER_SIGNING_COMPATIBLE_MAP, SIGNING_COMPATIBLE_MAP, XCM_MIN_AMOUNT_RATIO } from '@subwallet/extension-base/constants';
+import { _SUPPORT_TOKEN_PAY_FEE_GROUP, LEDGER_SIGNING_COMPATIBLE_MAP, SIGNING_COMPATIBLE_MAP } from '@subwallet/extension-base/constants';
 import { _canAccountBeReaped, _isAccountActive } from '@subwallet/extension-base/core/substrate/system-pallet';
 import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate/types';
 import { getCardanoAssetId } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
@@ -67,7 +67,7 @@ export function additionalValidateTransferForRecipient (
   minXcmTransferableAmount?: string
 ): [TransactionWarning[], TransactionError[]] {
   const sendingTokenMinAmount = BigInt(_getTokenMinAmount(sendingTokenInfo));
-  const minXcmAmount = minXcmTransferableAmount ?? new BigN(_getTokenMinAmount(sendingTokenInfo)).multipliedBy(XCM_MIN_AMOUNT_RATIO);
+  // const minXcmAmount = minXcmTransferableAmount ?? new BigN(_getTokenMinAmount(sendingTokenInfo)).multipliedBy(XCM_MIN_AMOUNT_RATIO);
   const nativeTokenMinAmount = _getTokenMinAmount(nativeTokenInfo);
 
   const warnings: TransactionWarning[] = [];
@@ -76,17 +76,24 @@ export function additionalValidateTransferForRecipient (
   const remainingSendingTokenOfSenderEnoughED = senderSendingTokenTransferable ? senderSendingTokenTransferable - transferAmount >= sendingTokenMinAmount : false;
   const isReceiverAliveByNativeToken = receiverSystemAccountInfo ? _isAccountActive(receiverSystemAccountInfo) : false;
   const isReceivingAmountPassED = receiverSendingTokenKeepAliveBalance + transferAmount >= sendingTokenMinAmount;
-  const enoughAmountForXCM = extrinsicType === ExtrinsicType.TRANSFER_XCM ? new BigN(transferAmount.toString()).gte(minXcmAmount) : true;
+  // const enoughAmountForXCM = extrinsicType === ExtrinsicType.TRANSFER_XCM ? new BigN(transferAmount.toString()).gte(minXcmTransferableAmount) : true;
 
-  if (!enoughAmountForXCM) {
-    const minXcmTransferableAmountStr = formatNumber(minXcmAmount.toString(), _getAssetDecimals(sendingTokenInfo), balanceFormatter, { maxNumberFormat: _getAssetDecimals(sendingTokenInfo) || 6 });
+  if (extrinsicType === ExtrinsicType.TRANSFER_XCM) {
+    if (minXcmTransferableAmount && new BigN(transferAmount.toString()).gte(minXcmTransferableAmount)) {
+      const minXcmTransferableAmountStr = formatNumber(minXcmTransferableAmount.toString(), _getAssetDecimals(sendingTokenInfo), balanceFormatter, { maxNumberFormat: _getAssetDecimals(sendingTokenInfo) || 6 });
 
-    const error = new TransactionError(
-      TransferTxErrorType.NOT_ENOUGH_VALUE,
-      t('bg.TRANSACTION.core.validation.transfer.transferMinimumToKeepAccountAlive', { replace: { amount: minXcmTransferableAmountStr, symbol: sendingTokenInfo.symbol } })
-    );
+      const error = new TransactionError(
+        TransferTxErrorType.NOT_ENOUGH_VALUE,
+        t('bg.TRANSACTION.core.validation.transfer.transferMinimumToKeepAccountAlive', {
+          replace: {
+            amount: minXcmTransferableAmountStr,
+            symbol: sendingTokenInfo.symbol
+          }
+        })
+      );
 
-    errors.push(error);
+      errors.push(error);
+    }
   }
 
   if (!_isNativeToken(sendingTokenInfo)) {
