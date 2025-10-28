@@ -288,7 +288,7 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   return await response.json() as GetXcmFeeResult;
 }
 
-export async function fetchMaxXcmTransferableAmount (request: CreateXcmExtrinsicProps) {
+export async function fetchMaxXcmTransferableAmount (request: CreateXcmExtrinsicProps): Promise<string> {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
   const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
@@ -330,7 +330,7 @@ export async function fetchMaxXcmTransferableAmount (request: CreateXcmExtrinsic
   return await response.json() as string;
 }
 
-export async function fetchMinXcmTransferableAmount (request: CreateXcmExtrinsicProps) {
+export async function fetchMinXcmTransferableAmount (request: CreateXcmExtrinsicProps): Promise<string> {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
   const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;

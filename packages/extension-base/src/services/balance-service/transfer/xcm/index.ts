@@ -172,7 +172,7 @@ export const getMaxXcmTransferableAmount = async (request: CreateXcmExtrinsicPro
   } catch (e) {
     return undefined;
   }
-}
+};
 
 export const getMinXcmTransferableAmount = async (request: CreateXcmExtrinsicProps): Promise<string | undefined> => {
   try {
@@ -180,7 +180,7 @@ export const getMinXcmTransferableAmount = async (request: CreateXcmExtrinsicPro
   } catch (e) {
     return undefined;
   }
-}
+};
 
 export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<boolean> => {
   try {
