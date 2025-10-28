@@ -1,0 +1,7 @@
+/*
+  # Security Headers
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none';
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
