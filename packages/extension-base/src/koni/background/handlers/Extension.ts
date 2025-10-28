@@ -1841,8 +1841,8 @@ export default class KoniExtension {
 
           isSendingTokenSufficient = await _isSufficientToken(destinationTokenInfo, substrateApi, sufficientChain);
 
-          const mminXcmTransferableAmount = await getMinXcmTransferableAmount(params)
-            .then((min) => min ? BigInt(min) : undefined);
+          // todo: recheck case cannot get min xcm
+          const minXcmTransferableAmount = await getMinXcmTransferableAmount(params);
 
           const [warning, error] = additionalValidateTransferForRecipient(
             destinationTokenInfo,
@@ -1853,7 +1853,7 @@ export default class KoniExtension {
             senderTransferable, // different from sendingTokenInfo being passed in
             receiverSystemAccountInfo,
             isSendingTokenSufficient,
-            mminXcmTransferableAmount
+            minXcmTransferableAmount
           );
 
           warning.length && inputTransaction.warnings.push(...warning);

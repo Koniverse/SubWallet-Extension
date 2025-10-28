@@ -400,8 +400,6 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     feeInfo: fee
   };
 
-  const maxTransferableAmountByPS = await getMaxXcmTransferableAmount(params);
-
   try {
     let funcCreateExtrinsic: FunctionCreateXcmExtrinsic;
 
@@ -550,7 +548,10 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     if (!_isNativeToken(srcToken)) { // xcm local token & pay native token as fee
       maxTransferable = bnFreeBalance;
     } else { // xcm native token & pay native token as fee
-      maxTransferable = maxTransferableAmountByPS ? new BigN(maxTransferableAmountByPS) : bnFreeBalance.minus(BigN(estimatedFee).multipliedBy(XCM_FEE_RATIO));
+      const maxTransferableBySW = bnFreeBalance.minus(BigN(estimatedFee).multipliedBy(XCM_FEE_RATIO));
+      const maxTransferableByPS = await getMaxXcmTransferableAmount(params);
+
+      maxTransferable = new BigN(maxTransferableByPS ?? maxTransferableBySW);
     }
   }
 

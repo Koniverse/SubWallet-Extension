@@ -64,10 +64,10 @@ export function additionalValidateTransferForRecipient (
   senderSendingTokenTransferable?: bigint,
   receiverSystemAccountInfo?: FrameSystemAccountInfo,
   isSendingTokenSufficient?: boolean,
-  minXcmTransferableAmount?: bigint
+  minXcmTransferableAmount?: string
 ): [TransactionWarning[], TransactionError[]] {
   const sendingTokenMinAmount = BigInt(_getTokenMinAmount(sendingTokenInfo));
-  const sendingTokenMinAmountXCM = new BigN(_getTokenMinAmount(sendingTokenInfo)).multipliedBy(XCM_MIN_AMOUNT_RATIO);
+  const minXcmAmount = minXcmTransferableAmount ?? new BigN(_getTokenMinAmount(sendingTokenInfo)).multipliedBy(XCM_MIN_AMOUNT_RATIO);
   const nativeTokenMinAmount = _getTokenMinAmount(nativeTokenInfo);
 
   const warnings: TransactionWarning[] = [];
@@ -76,30 +76,17 @@ export function additionalValidateTransferForRecipient (
   const remainingSendingTokenOfSenderEnoughED = senderSendingTokenTransferable ? senderSendingTokenTransferable - transferAmount >= sendingTokenMinAmount : false;
   const isReceiverAliveByNativeToken = receiverSystemAccountInfo ? _isAccountActive(receiverSystemAccountInfo) : false;
   const isReceivingAmountPassED = receiverSendingTokenKeepAliveBalance + transferAmount >= sendingTokenMinAmount;
-  const enoughAmountForXCM = extrinsicType === ExtrinsicType.TRANSFER_XCM ? new BigN(transferAmount.toString()).gte(sendingTokenMinAmountXCM) : true;
+  const enoughAmountForXCM = extrinsicType === ExtrinsicType.TRANSFER_XCM ? new BigN(transferAmount.toString()).gte(minXcmAmount) : true;
 
   if (!enoughAmountForXCM) {
-    const minXCMStr = formatNumber(sendingTokenMinAmountXCM.toString(), _getAssetDecimals(sendingTokenInfo), balanceFormatter, { maxNumberFormat: _getAssetDecimals(sendingTokenInfo) || 6 });
+    const minXcmTransferableAmountStr = formatNumber(minXcmAmount.toString(), _getAssetDecimals(sendingTokenInfo), balanceFormatter, { maxNumberFormat: _getAssetDecimals(sendingTokenInfo) || 6 });
 
     const error = new TransactionError(
       TransferTxErrorType.NOT_ENOUGH_VALUE,
-      t('bg.TRANSACTION.core.validation.transfer.transferMinimumToKeepAccountAlive', { replace: { amount: minXCMStr, symbol: sendingTokenInfo.symbol } })
+      t('bg.TRANSACTION.core.validation.transfer.transferMinimumToKeepAccountAlive', { replace: { amount: minXcmTransferableAmountStr, symbol: sendingTokenInfo.symbol } })
     );
 
     errors.push(error);
-  }
-
-  if (extrinsicType === ExtrinsicType.TRANSFER_XCM) {
-    if (minXcmTransferableAmount && transferAmount < minXcmTransferableAmount) {
-      const minXcmTransferableAmountStr = formatNumber(minXcmTransferableAmount.toString(), _getAssetDecimals(sendingTokenInfo), balanceFormatter, { maxNumberFormat: _getAssetDecimals(sendingTokenInfo) || 6 });
-
-      const error = new TransactionError(
-        TransferTxErrorType.NOT_ENOUGH_VALUE,
-        t('You must transfer at least {{amount}} {{symbol}}. Increase amount and try again', { replace: { amount: minXcmTransferableAmountStr, symbol: sendingTokenInfo.symbol } })
-      );
-
-      errors.push(error);
-    }
   }
 
   if (!_isNativeToken(sendingTokenInfo)) {

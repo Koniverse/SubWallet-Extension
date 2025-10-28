@@ -80,7 +80,7 @@ const paraSpellApi = {
   dryRunXcm: `${version}/dry-run`,
   feeXcm: `${version}/xcm-fee`,
   maxTransferable: `${version}/transferable-amount`,
-  minTransferable: `${version}/min-transferable-amount`,
+  minTransferable: `${version}/min-transferable-amount`
 };
 
 function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> {
