@@ -9,7 +9,7 @@ import { NominationInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useChainChecker, useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useProxyAccountsToSign, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useSubstrateProxyAccountsToSign, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
@@ -63,7 +63,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { alertModal: { close: closeAlert, open: openAlert }, selectProxyAccountModal } = useContext(WalletModalContext);
   const { defaultData } = useTransactionContext<ChangeValidatorParams>();
   const { onError, onSuccess } = useHandleSubmitTransaction();
-  const [proxyAccountToSign, setProxyAccountsToSign] = useProxyAccountsToSign();
+  const [proxyAccountToSign, setSubstrateProxyAccountsToSign] = useSubstrateProxyAccountsToSign();
   const account = findAccountByAddress(accounts, from);
   const [form] = Form.useForm<ChangeValidatorParams>();
   const originValidator = useWatchTransaction('originValidator', form, defaultData);
@@ -287,18 +287,18 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       const send = (amount: string): void => {
         setSubmitLoading(true);
 
-        const sendPromise = (proxyAddress?: string) => {
+        const sendPromise = (substrateProxyAddress?: string) => {
           return changeEarningValidator({
             ...baseData,
             amount,
-            proxyAddress
+            substrateProxyAddress
           });
         };
 
         selectProxyAccountModal.open({
           address: from,
           chain: chain,
-          proxyItems: proxyAccountToSign
+          substrateProxyItems: proxyAccountToSign
         }).then(sendPromise)
           .then(onSuccess)
           .catch((error: TransactionError) => {
@@ -360,8 +360,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [chain, checkChain]);
 
   useEffect(() => {
-    setProxyAccountsToSign(chain, from, ExtrinsicType.CHANGE_EARNING_VALIDATOR);
-  }, [chain, from, setProxyAccountsToSign]);
+    setSubstrateProxyAccountsToSign(chain, from, ExtrinsicType.CHANGE_EARNING_VALIDATOR);
+  }, [chain, from, setSubstrateProxyAccountsToSign]);
 
   const onPreCheck = usePreCheckAction(from);
 

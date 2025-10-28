@@ -11,9 +11,9 @@ const useTransactionContext = <T extends TransactionFormBaseProps>() => {
     needPersistData, onDone, openAlert,
     openRecheckChainConnectionModal,
     persistData,
-    proxyAccountsToSign,
     setBackProps,
-    setCustomScreenTitle, setIsDisableHeader, setProxyAccountsToSign, setSubHeaderRightButtons } = useContext(TransactionContext);
+    setCustomScreenTitle,
+    setIsDisableHeader, setSubHeaderRightButtons, setSubstrateProxyAccountsToSign, substrateProxyAccountsToSign } = useContext(TransactionContext);
 
   return {
     defaultData: defaultData as T,
@@ -29,8 +29,8 @@ const useTransactionContext = <T extends TransactionFormBaseProps>() => {
     openAlert,
     openRecheckChainConnectionModal,
     setCustomScreenTitle,
-    setProxyAccountsToSign,
-    proxyAccountsToSign
+    setSubstrateProxyAccountsToSign,
+    substrateProxyAccountsToSign
   };
 };
 

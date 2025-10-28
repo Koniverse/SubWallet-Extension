@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ProxyItem } from '@subwallet/extension-base/types/proxy';
+import { SubstrateProxyItem } from '@subwallet/extension-base/types';
 import { AccountProxyAvatar } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountProxyById, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
@@ -13,7 +13,7 @@ import { CheckCircle } from 'phosphor-react';
 import React, { Context, useContext } from 'react';
 import styled, { ThemeContext } from 'styled-components';
 
-export interface ProxyItemExtended extends ProxyItem {
+export interface ProxyItemExtended extends SubstrateProxyItem {
   isMain?: boolean;
 }
 
@@ -50,7 +50,7 @@ function Component (props: Props): React.ReactElement<Props> {
       <div className='__item-left-part'>
         <AccountProxyAvatar
           size={32}
-          value={proxyAccount.proxyId || proxyAccount.proxyAddress}
+          value={proxyAccount.proxyId || proxyAccount.substrateProxyAddress}
         />
       </div>
       <div className='__item-middle-part'>
@@ -59,10 +59,10 @@ function Component (props: Props): React.ReactElement<Props> {
             '-has-address': !!accountProxy?.name
           })}
           >
-            {accountProxy?.name || toShort(proxyAccount.proxyAddress, 9, 9)}
+            {accountProxy?.name || toShort(proxyAccount.substrateProxyAddress, 9, 9)}
           </div>
           {!!accountProxy?.name && <div className='__item-address'>
-            ({toShort(proxyAccount.proxyAddress, 4, 5)})
+            ({toShort(proxyAccount.substrateProxyAddress, 4, 5)})
           </div>}
         </div>
         <div className={CN('__proxy-type', {
@@ -70,7 +70,7 @@ function Component (props: Props): React.ReactElement<Props> {
         })}
         >
           {
-            proxyAccount.isMain ? t('ui.PROXY.components.ProxyAccount.SelectorItem.proxiedAccount') : `${t('ui.PROXY.components.ProxyAccount.SelectorItem.proxyType')}: ${proxyAccount.proxyType}`
+            proxyAccount.isMain ? t('ui.SUBSTRATEPROXY.components.SubstrateProxyAccount.SelectorItem.proxiedAccount') : `${t('ui.SUBSTRATEPROXY.components.SubstrateProxyAccount.SelectorItem.proxyType')}: ${proxyAccount.substrateProxyType}`
           }
         </div>
       </div>
@@ -81,7 +81,7 @@ function Component (props: Props): React.ReactElement<Props> {
   );
 }
 
-export const ProxyAccountSelectorItem = styled(Component)<Props>(({ theme }) => {
+export const SubstrateProxyAccountSelectorItem = styled(Component)<Props>(({ theme }) => {
   const { token } = theme as Theme;
 
   return {

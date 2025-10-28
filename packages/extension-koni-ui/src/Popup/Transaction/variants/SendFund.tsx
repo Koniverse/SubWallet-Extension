@@ -124,7 +124,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const notification = useNotification();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
 
-  const { defaultData, persistData, proxyAccountsToSign, setProxyAccountsToSign } = useTransactionContext<TransferParams>();
+  const { defaultData, persistData, setSubstrateProxyAccountsToSign, substrateProxyAccountsToSign } = useTransactionContext<TransferParams>();
   const { defaultSlug: sendFundSlug } = defaultData;
   const isFirstRender = useIsFirstRender();
 
@@ -567,7 +567,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     (values: TransferParams, options: TransferOptions): Promise<SWTransactionResponse> => {
       const { asset, chain, destChain, from, to, value } = values;
 
-      const createBaseParams = (proxyAddress?: string): RequestSubmitTransfer => ({
+      const createBaseParams = (substrateProxyAddress?: string): RequestSubmitTransfer => ({
         from,
         chain,
         to,
@@ -578,7 +578,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
         tokenPayFeeSlug: currentTokenPayFee,
-        proxyAddress
+        substrateProxyAddress
       });
 
       const createSendPromise = (params: RequestSubmitTransfer) =>
@@ -596,7 +596,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           .open({
             chain,
             address: from,
-            proxyItems: proxyAccountsToSign
+            substrateProxyItems: substrateProxyAccountsToSign
           })
           .then((selectedProxy) => {
             setSubmitLoading(true);
@@ -610,7 +610,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           .finally(() => setLoading(false));
       });
     },
-    [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, selectProxyAccountModal, proxyAccountsToSign, onError]
+    [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, selectProxyAccountModal, substrateProxyAccountsToSign, onError]
   );
 
   // todo: must refactor later, temporary solution to support SnowBridge
@@ -952,8 +952,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [form, hideMaxButton, isTransferAll, transferInfo]);
 
   useEffect(() => {
-    setProxyAccountsToSign(chainValue, fromValue, extrinsicType);
-  }, [chainValue, fromValue, setProxyAccountsToSign, extrinsicType]);
+    setSubstrateProxyAccountsToSign(chainValue, fromValue, extrinsicType);
+  }, [chainValue, fromValue, setSubstrateProxyAccountsToSign, extrinsicType]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');

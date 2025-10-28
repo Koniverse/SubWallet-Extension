@@ -53,7 +53,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
       />}
       id={modalId}
       onCancel={onCancel}
-      title={t('ui.PROXY.components.Modal.Proxy.ProxyAccountList.proxyAccount')}
+      title={t('ui.PROXY.components.Modal.SubstrateProxy.SubstrateProxyAccountList.proxyAccount')}
     >
       <SwList.Section
         list={proxyAddresses}
@@ -64,7 +64,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   );
 };
 
-const ProxyAccountListModal = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
+const SubstrateProxyAccountListModal = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
@@ -103,4 +103,4 @@ const ProxyAccountListModal = styled(forwardRef(Component))<Props>(({ theme: { t
   };
 });
 
-export default ProxyAccountListModal;
+export default SubstrateProxyAccountListModal;

@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { createPromiseHandler } from '@subwallet/extension-base/utils';
-import { AccountMigrationInProgressWarningModal, AccountTokenAddressModal, AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, ProxyAccountSelectorModal, RemindBackupSeedPhraseModal, RemindDuplicateAccountNameModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, SwitchNetworkAuthorizeModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-koni-ui/components';
+import { AccountMigrationInProgressWarningModal, AccountTokenAddressModal, AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RemindBackupSeedPhraseModal, RemindDuplicateAccountNameModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, SubstrateProxyAccountSelectorModal, SwitchNetworkAuthorizeModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-koni-ui/components';
 import { CustomizeModal } from '@subwallet/extension-koni-ui/components/Modal/Customize/CustomizeModal';
 import { AccountDeriveActionProps } from '@subwallet/extension-koni-ui/components/Modal/DeriveAccountActionModal';
 import { AccountTokenAddressModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/AccountTokenAddressModal';
 import { SelectAddressFormatModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/SelectAddressFormatModal';
-import { ProxyAccountSelectorModalProps, ProxyAccountSelectorModalPropsValue } from '@subwallet/extension-koni-ui/components/Modal/Proxy/ProxyAccountSelectorModal';
+import { ProxyAccountSelectorModalPropsValue, SubstrateProxyAccountSelectorModalProps } from '@subwallet/extension-koni-ui/components/Modal/SubstrateProxy/SubstrateProxyAccountSelectorModal';
 import SwapFeesModal, { SwapFeesModalProps } from '@subwallet/extension-koni-ui/components/Modal/Swap/SwapFeesModal';
 import { SwitchNetworkAuthorizeModalProps } from '@subwallet/extension-koni-ui/components/Modal/SwitchNetworkAuthorizeModal';
 import { TransactionStepsModalProps } from '@subwallet/extension-koni-ui/components/Modal/TransactionStepsModal';
@@ -194,7 +194,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   const [transactionProcessId, setTransactionProcessId] = useState('');
   const [transactionStepsModalProps, setTransactionStepsModalProps] = useState<TransactionStepsModalProps | undefined>(undefined);
   const [switchNetworkAuthorizeModalProps, setSwitchNetworkAuthorizeModalProps] = useState<SwitchNetworkAuthorizeModalProps | undefined>(undefined);
-  const [selectProxyAccountModalProps, setSelectProxyAccountModalProps] = useState<ProxyAccountSelectorModalProps | undefined>(undefined);
+  const [selectProxyAccountModalProps, setSelectProxyAccountModalProps] = useState<SubstrateProxyAccountSelectorModalProps | undefined>(undefined);
   const [swapFeesModalProps, setSwapFeesModalProps] = useState<SwapFeesModalProps | undefined>(undefined);
 
   const openAddressQrModal = useCallback((props: AddressQrModalProps) => {
@@ -305,7 +305,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   const openSelectProxyAccountModal = useCallback((props: ProxyAccountSelectorModalPropsValue) => {
     const { promise, reject, resolve } = createPromiseHandler<string>();
 
-    if (!props.proxyItems?.length) {
+    if (!props.substrateProxyItems?.length) {
       return Promise.resolve(undefined);
     }
 
@@ -481,7 +481,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
 
     {
       !!selectProxyAccountModalProps && (
-        <ProxyAccountSelectorModal
+        <SubstrateProxyAccountSelectorModal
           {...selectProxyAccountModalProps}
         />
       )

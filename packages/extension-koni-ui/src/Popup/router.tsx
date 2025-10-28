@@ -124,8 +124,8 @@ const ClaimReward = new LazyLoader('ClaimReward', () => import('@subwallet/exten
 const Withdraw = new LazyLoader('Withdraw', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Withdraw'));
 const ClaimBridge = new LazyLoader('ClaimBridge', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/ClaimBridge'));
 const MigrateAccount = new LazyLoader('MigrateAccount', () => import('@subwallet/extension-koni-ui/Popup/MigrateAccount'));
-const AddProxy = new LazyLoader('AddProxy', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Proxy/AddProxy'));
-const RemoveProxy = new LazyLoader('AddProxy', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Proxy/RemoveProxy'));
+const AddProxy = new LazyLoader('AddProxy', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/SubstrateProxy/AddSubstrateProxy'));
+const RemoveProxy = new LazyLoader('AddProxy', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/SubstrateProxy/RemoveSubstrateProxy'));
 // Earning
 
 const EarningEntry = new LazyLoader('EarningEntry', () => import('@subwallet/extension-koni-ui/Popup/Home/Earning/EarningEntry'));

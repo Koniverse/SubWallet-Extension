@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RequestAddProxy } from '@subwallet/extension-base/types';
+import { RequestAddSubstrateProxy } from '@subwallet/extension-base/types';
 import { AccountProxyAvatar } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
@@ -19,9 +19,9 @@ type Props = BaseTransactionConfirmationProps;
 const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
   const { t } = useTranslation();
-  const data = transaction.data as RequestAddProxy;
+  const data = transaction.data as RequestAddSubstrateProxy;
   const accountFrom = useGetAccountByAddress(transaction.address);
-  const proxyAccount = useGetAccountByAddress(data.proxyAddress);
+  const proxyAccount = useGetAccountByAddress(data.substrateProxyAddress);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
 
   return (
@@ -66,16 +66,16 @@ const Component: React.FC<Props> = (props: Props) => {
           <AccountProxyAvatar
             className={'__account-avatar'}
             size={24}
-            value={proxyAccount?.proxyId || data.proxyAddress}
+            value={proxyAccount?.proxyId || data.substrateProxyAddress}
           />
-          <div className={'__account-item-label'}>{proxyAccount?.name || toShort(data.proxyAddress)}</div>
+          <div className={'__account-item-label'}>{proxyAccount?.name || toShort(data.substrateProxyAddress)}</div>
         </MetaInfo.Default>
 
         {!!proxyAccount?.name && <MetaInfo.Default
           className={'__address-field'}
           label={t('Address')}
         >
-          {toShort(data.proxyAddress)}
+          {toShort(data.substrateProxyAddress)}
         </MetaInfo.Default>}
 
         <MetaInfo.Number
@@ -89,7 +89,7 @@ const Component: React.FC<Props> = (props: Props) => {
   );
 };
 
-const AddProxyTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const AddSubstrateProxyTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     '.__account-field .__value': {
       display: 'flex',
@@ -103,4 +103,4 @@ const AddProxyTransactionConfirmation = styled(Component)<Props>(({ theme: { tok
   };
 });
 
-export default AddProxyTransactionConfirmation;
+export default AddSubstrateProxyTransactionConfirmation;

@@ -52,7 +52,7 @@ const Component = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { defaultData, persistData, proxyAccountsToSign, setProxyAccountsToSign } = useTransactionContext<WithdrawParams>();
+  const { defaultData, persistData, setSubstrateProxyAccountsToSign, substrateProxyAccountsToSign } = useTransactionContext<WithdrawParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<WithdrawParams>();
@@ -139,12 +139,12 @@ const Component = () => {
       return;
     }
 
-    const sendPromise = (proxyAddress?: string) => {
+    const sendPromise = (substrateProxyAddress?: string) => {
       return yieldSubmitStakingWithdrawal({
         address: values.from,
         slug: values.slug,
         unstakingInfo: unstakingInfo,
-        proxyAddress
+        substrateProxyAddress
       }).then(onSuccess);
     };
 
@@ -153,7 +153,7 @@ const Component = () => {
         const proxyAddress = await selectProxyAccountModal.open({
           address: values.from,
           chain: values.chain,
-          proxyItems: proxyAccountsToSign
+          substrateProxyItems: substrateProxyAccountsToSign
         });
 
         return await sendPromise(proxyAddress);
@@ -169,7 +169,7 @@ const Component = () => {
           setLoading(false);
         });
     }, 300);
-  }, [onError, onSuccess, poolInfo.type, proxyAccountsToSign, selectProxyAccountModal, unstakingInfo]);
+  }, [onError, onSuccess, poolInfo.type, selectProxyAccountModal, substrateProxyAccountsToSign, unstakingInfo]);
 
   const onClickSubmit = useCallback((values: WithdrawParams) => {
     if (currentConfirmation) {
@@ -223,8 +223,8 @@ const Component = () => {
   }, [accountList, form, fromValue]);
 
   useEffect(() => {
-    setProxyAccountsToSign(chainValue, fromValue, exType);
-  }, [chainValue, exType, fromValue, setProxyAccountsToSign]);
+    setSubstrateProxyAccountsToSign(chainValue, fromValue, exType);
+  }, [chainValue, exType, fromValue, setSubstrateProxyAccountsToSign]);
 
   return (
     <>

@@ -477,7 +477,7 @@ export function checkSigningAccountForTransaction (validationResponse: SWTransac
   }
 }
 
-export function checkBalanceWithTransactionFee (validationResponse: SWTransactionResponse, transactionInput: SWTransactionInput, nativeTokenInfo: _ChainAsset, nativeTokenAvailable: AmountData, proxyAccountNativeTokenAvailable?: AmountData) {
+export function checkBalanceWithTransactionFee (validationResponse: SWTransactionResponse, transactionInput: SWTransactionInput, nativeTokenInfo: _ChainAsset, nativeTokenAvailable: AmountData, substrateProxyAccountNativeTokenAvailable?: AmountData) {
   if (!validationResponse.estimateFee) { // todo: estimateFee should be must-have, need to refactor interface
     return;
   }
@@ -503,14 +503,14 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
     ..._TRANSFER_CHAIN_GROUP.statemine
   ].includes(nativeTokenInfo.originChain);
 
-  if (!proxyAccountNativeTokenAvailable) {
+  if (!substrateProxyAccountNativeTokenAvailable) {
     if (bnNativeTokenTransferAmount.plus(bnFee).gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
       validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
     }
   } else {
-    const bnProxyAccountNativeTokenAvailable = new BigN(proxyAccountNativeTokenAvailable.value);
+    const bnSubstrateProxyAccountNativeTokenAvailable = new BigN(substrateProxyAccountNativeTokenAvailable.value);
 
-    if ((bnNativeTokenTransferAmount.gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) || (bnFee.gt(bnProxyAccountNativeTokenAvailable))) {
+    if ((bnNativeTokenTransferAmount.gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) || (bnFee.gt(bnSubstrateProxyAccountNativeTokenAvailable))) {
       validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
     }
   }

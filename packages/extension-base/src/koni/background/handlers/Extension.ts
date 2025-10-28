@@ -62,7 +62,7 @@ import { AccountChainType, AccountJson, AccountProxyMap, AccountSignMode, Accoun
 import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
-import { RequestAddProxy, RequestGetProxyAccounts, RequestRemoveProxy } from '@subwallet/extension-base/types/proxy';
+import { RequestAddSubstrateProxy, RequestGetSubstrateProxyAccounts, RequestRemoveSubstrateProxy } from '@subwallet/extension-base/types/substrate-proxy';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
@@ -1440,7 +1440,7 @@ export default class KoniExtension {
   }
 
   private async makeTransfer (inputData: RequestSubmitTransfer): Promise<SWTransactionResponse> {
-    const { chain, feeCustom, feeOption, from, proxyAddress, to, tokenPayFeeSlug, tokenSlug, transferAll, transferBounceable, value } = inputData;
+    const { chain, feeCustom, feeOption, from, substrateProxyAddress, to, tokenPayFeeSlug, tokenSlug, transferAll, transferBounceable, value } = inputData;
     const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(tokenSlug);
     const errors = validateTransferRequest(transferTokenInfo, from, to, value, transferAll);
     const warnings: TransactionWarning[] = [];
@@ -1676,7 +1676,7 @@ export default class KoniExtension {
       isTransferAll: isTransferNativeToken ? transferAll : false,
       isTransferLocalTokenAndPayThatTokenAsFee,
       edAsWarning: isTransferNativeToken,
-      proxyAddress,
+      substrateProxyAddress,
       additionalValidator: additionalValidator
     });
   }
@@ -4060,7 +4060,7 @@ export default class KoniExtension {
   }
 
   private async handleYieldStep (inputData: RequestYieldStepSubmit): Promise<SWTransactionResponse> {
-    const { data, errorOnTimeOut, isPassConfirmation, onSend, path, processId, proxyAddress } = inputData;
+    const { data, errorOnTimeOut, isPassConfirmation, onSend, path, processId, substrateProxyAddress } = inputData;
     const { address } = data;
 
     let step: BriefProcessStep | undefined;
@@ -4196,7 +4196,7 @@ export default class KoniExtension {
       extrinsicType, // change this depends on step
       chainType,
       resolveOnDone: !isLastStep,
-      proxyAddress,
+      substrateProxyAddress,
       transferNativeAmount,
       skipFeeValidation: isMintingStep && isPoolSupportAlternativeFee,
       errorOnTimeOut,
@@ -4207,7 +4207,7 @@ export default class KoniExtension {
   }
 
   private async handleYieldLeave (params: RequestYieldLeave): Promise<SWTransactionResponse> {
-    const { address, slug } = params;
+    const { address, slug, substrateProxyAddress } = params;
     const leaveValidation = await this.#koniState.earningService.validateYieldLeave(params);
 
     if (leaveValidation.length > 0) {
@@ -4223,6 +4223,7 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: params, // TODO
       extrinsicType,
+      substrateProxyAddress,
       chainType: handler?.transactionChainType || ChainType.SUBSTRATE
     });
   }
@@ -4320,7 +4321,7 @@ export default class KoniExtension {
   }
 
   private async yieldSubmitWithdrawal (params: RequestYieldWithdrawal): Promise<SWTransactionResponse> {
-    const { address, slug } = params;
+    const { address, slug, substrateProxyAddress } = params;
     const poolHandler = this.#koniState.earningService.getPoolHandler(slug);
 
     if (!poolHandler) {
@@ -4335,12 +4336,13 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: params,
       extrinsicType: ExtrinsicType.STAKING_WITHDRAW,
+      substrateProxyAddress,
       chainType: poolHandler?.transactionChainType || ChainType.SUBSTRATE
     });
   }
 
   private async yieldSubmitCancelWithdrawal (params: RequestStakeCancelWithdrawal): Promise<SWTransactionResponse> {
-    const { address, selectedUnstaking, slug } = params;
+    const { address, selectedUnstaking, slug, substrateProxyAddress } = params;
     const poolHandler = this.#koniState.earningService.getPoolHandler(slug);
 
     if (!poolHandler || !selectedUnstaking) {
@@ -4356,12 +4358,13 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: params,
       extrinsicType: ExtrinsicType.STAKING_CANCEL_UNSTAKE,
+      substrateProxyAddress,
       chainType: poolHandler?.transactionChainType || ChainType.SUBSTRATE
     });
   }
 
   private async yieldSubmitClaimReward (params: RequestStakeClaimReward): Promise<SWTransactionResponse> {
-    const { address, slug } = params;
+    const { address, slug, substrateProxyAddress } = params;
     const poolHandler = this.#koniState.earningService.getPoolHandler(slug);
 
     if (!address || !poolHandler) {
@@ -4375,6 +4378,7 @@ export default class KoniExtension {
       chain: poolHandler.chain,
       transaction: extrinsic,
       data: params,
+      substrateProxyAddress,
       extrinsicType: ExtrinsicType.STAKING_CLAIM_REWARD,
       chainType: poolHandler?.transactionChainType || ChainType.SUBSTRATE
     });
@@ -4395,7 +4399,7 @@ export default class KoniExtension {
   }
 
   private async handleYieldChangeValidator (params: SubmitChangeValidatorStaking) {
-    const { address, proxyAddress, slug } = params;
+    const { address, slug, substrateProxyAddress } = params;
 
     const poolHandler = this.#koniState.earningService.getPoolHandler(slug);
 
@@ -4410,7 +4414,7 @@ export default class KoniExtension {
       chain: poolHandler.chain,
       transaction: extrinsic,
       data: params,
-      proxyAddress,
+      substrateProxyAddress,
       extrinsicType: ExtrinsicType.CHANGE_EARNING_VALIDATOR,
       chainType: ChainType.SUBSTRATE
     });
@@ -5212,43 +5216,43 @@ export default class KoniExtension {
     return this.#koniState.keyringService.context.pingSession(request);
   }
 
-  private getProxyAccounts (request: RequestGetProxyAccounts) {
-    return this.#koniState.proxyService.getProxyAccounts(request);
+  private getSubstrateProxyAccounts (request: RequestGetSubstrateProxyAccounts) {
+    return this.#koniState.substrateProxyService.getSubstrateProxyAccounts(request);
   }
 
-  private async handleAddProxy (params: RequestAddProxy): Promise<SWTransactionResponse> {
+  private async handleAddSubstrateProxy (params: RequestAddSubstrateProxy): Promise<SWTransactionResponse> {
     const { address, chain } = params;
-    const validationErrors = await this.#koniState.proxyService.validateAddProxy(params);
+    const validationErrors = await this.#koniState.substrateProxyService.validateAddSubstrateProxy(params);
 
     if (validationErrors.length > 0) {
       return this.#koniState.transactionService.generateBeforeHandleResponseErrors(validationErrors);
     }
 
-    const extrinsic = await this.#koniState.proxyService.addProxyAccounts(params);
+    const extrinsic = await this.#koniState.substrateProxyService.addSubstrateProxyAccounts(params);
 
     return await this.#koniState.transactionService.handleTransaction({
       address,
       chain,
       transaction: extrinsic,
       data: params,
-      extrinsicType: ExtrinsicType.ADD_PROXY,
+      extrinsicType: ExtrinsicType.ADD_SUBSTRATE_PROXY,
       chainType: ChainType.SUBSTRATE
     });
   }
 
-  private async handleRemoveProxy (params: RequestRemoveProxy): Promise<SWTransactionResponse> {
-    const { address, chain, proxyAddress } = params;
+  private async handleRemoveSubstrateProxy (params: RequestRemoveSubstrateProxy): Promise<SWTransactionResponse> {
+    const { address, chain, substrateProxyAddress } = params;
 
-    const extrinsic = await this.#koniState.proxyService.removeProxyAccounts(params);
+    const extrinsic = await this.#koniState.substrateProxyService.removeSubstrateProxyAccounts(params);
 
     return await this.#koniState.transactionService.handleTransaction({
       address,
       chain,
       transaction: extrinsic,
       data: params,
-      extrinsicType: ExtrinsicType.REMOVE_PROXY,
+      extrinsicType: ExtrinsicType.REMOVE_SUBSTRATE_PROXY,
       chainType: ChainType.SUBSTRATE,
-      proxyAddress
+      substrateProxyAddress
     });
   }
 
@@ -5927,12 +5931,12 @@ export default class KoniExtension {
         return this.pingSession(request as RequestPingSession);
 
       // Proxy
-      case 'pri(proxy.getProxyAccounts)':
-        return this.getProxyAccounts(request as RequestGetProxyAccounts);
-      case 'pri(proxy.addProxy)':
-        return this.handleAddProxy(request as RequestAddProxy);
-      case 'pri(proxy.removeProxy)':
-        return this.handleRemoveProxy(request as RequestRemoveProxy);
+      case 'pri(proxy.getSubstrateProxyAccounts)':
+        return this.getSubstrateProxyAccounts(request as RequestGetSubstrateProxyAccounts);
+      case 'pri(proxy.addSubstrateProxy)':
+        return this.handleAddSubstrateProxy(request as RequestAddSubstrateProxy);
+      case 'pri(proxy.removeSubstrateProxy)':
+        return this.handleRemoveSubstrateProxy(request as RequestRemoveSubstrateProxy);
       // Default
       default:
         throw new Error(`Unable to handle message of type ${type}`);

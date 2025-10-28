@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ProxyType } from '@subwallet/extension-base/types';
+import { SubstrateProxyType } from '@subwallet/extension-base/types';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks/form/useSelectModalInputHelper';
@@ -14,7 +14,7 @@ import styled, { useTheme } from 'styled-components';
 interface Props extends ThemeProps, BasicInputWrapper {}
 
 interface ProxyTypeExtended {
-  type: ProxyType;
+  type: SubstrateProxyType;
   label: string;
 }
 
@@ -79,18 +79,18 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       items={ProxyTypeItem}
       label={label}
       onSelect={onSelect}
-      placeholder={placeholder || t('ui.TRANSACTION.screen.Transaction.part.ProxyTypeSelector.selectProxyType')}
+      placeholder={placeholder || t('ui.TRANSACTION.screen.Transaction.part.ProxyTypeSelector.selectSubstrateProxyType')}
       renderItem={renderItem}
       renderSelected={renderProxyTypeSelected}
       selected={value || ''}
       statusHelp={statusHelp}
-      title={title || placeholder || t('ui.TRANSACTION.screen.Transaction.part.ProxyTypeSelector.selectProxyType')}
+      title={title || placeholder || t('ui.TRANSACTION.screen.Transaction.part.ProxyTypeSelector.selectSubstrateProxyType')}
       tooltip={tooltip}
     />
   );
 }
 
-export const ProxyTypeSelector = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
+export const SubstrateProxyTypeSelector = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return ({
     '&.ant-select-modal-input-container .ant-select-modal-input-wrapper': {
       paddingLeft: 12,

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { ProxyType } from '@subwallet/extension-base/types/proxy';
+import { SubstrateProxyType } from '@subwallet/extension-base/types/substrate-proxy';
 
-const PROXY_EXTRINSIC_GROUPS: Record<string, ExtrinsicType[]> = {
+const SUBSTRATE_PROXY_EXTRINSIC_GROUPS: Record<string, ExtrinsicType[]> = {
   STAKING: [
     ExtrinsicType.STAKING_BOND,
     ExtrinsicType.STAKING_UNBOND,
@@ -14,11 +14,11 @@ const PROXY_EXTRINSIC_GROUPS: Record<string, ExtrinsicType[]> = {
   ]
 };
 
-export const typeToProxyMap: Partial<Record<ExtrinsicType, ProxyType[]>> = {
-  ...Object.fromEntries(PROXY_EXTRINSIC_GROUPS.STAKING.map((t) => [t, ['Staking', 'NonTransfer']]))
+export const txTypeToSubstrateProxyMap: Partial<Record<ExtrinsicType, SubstrateProxyType[]>> = {
+  ...Object.fromEntries(SUBSTRATE_PROXY_EXTRINSIC_GROUPS.STAKING.map((t) => [t, ['Staking', 'NonTransfer']]))
 };
 
-export const UNSUPPORTED_PROXY_NETWORKS = [
+export const UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS = [
   'bridgeHubPolkadot',
   'aventus',
   'xode',

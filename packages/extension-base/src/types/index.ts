@@ -28,4 +28,4 @@ export * from './transaction';
 export * from './yield';
 export * from './setting';
 export * from './bitcoin';
-export * from './proxy';
+export * from './substrate-proxy';

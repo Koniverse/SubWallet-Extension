@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ProxyItem } from '@subwallet/extension-base/types/proxy';
-import { ProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
+import { SubstrateProxyItem } from '@subwallet/extension-base/types';
+import { SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
 import { PROXY_ACCOUNT_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -13,26 +13,26 @@ import React, { ForwardedRef, forwardRef, useCallback, useMemo, useRef, useState
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-export interface ProxyAccountSelectorModalProps {
+export interface SubstrateProxyAccountSelectorModalProps {
   chain: string;
   address: string;
-  proxyItems: ProxyItem[];
+  substrateProxyItems: SubstrateProxyItem[];
   onCancel: VoidFunction;
   onApply: (selected: string) => void;
 }
 
-export type ProxyAccountSelectorModalPropsValue = Omit<ProxyAccountSelectorModalProps, 'onCancel' | 'onApply'>;
+export type ProxyAccountSelectorModalPropsValue = Omit<SubstrateProxyAccountSelectorModalProps, 'onCancel' | 'onApply'>;
 
-type Props = ThemeProps & ProxyAccountSelectorModalProps;
+type Props = ThemeProps & SubstrateProxyAccountSelectorModalProps;
 
-interface ProxyItemExtended extends ProxyItem {
+interface ProxyItemExtended extends SubstrateProxyItem {
   isMain?: boolean;
 }
 
 const modalId = PROXY_ACCOUNT_SELECTOR_MODAL;
 
 const Component = (props: Props, ref: ForwardedRef<any>) => {
-  const { address, className = '', onApply, onCancel, proxyItems } = props;
+  const { address, className = '', onApply, onCancel, substrateProxyItems } = props;
   const { t } = useTranslation();
   const sectionRef = useRef<SwListSectionRef>(null);
   const [selected, setSelected] = useState<string>(address);
@@ -42,12 +42,12 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
     return [
       {
         isMain: true,
-        proxyAddress: address,
+        substrateProxyAddress: address,
         proxyId: account?.proxyId
       },
-      ...proxyItems
+      ...substrateProxyItems
     ];
-  }, [account?.proxyId, address, proxyItems]);
+  }, [account?.proxyId, address, substrateProxyItems]);
 
   const onSelect = useCallback((address: string) => {
     return () => {
@@ -56,13 +56,13 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   }, []);
 
   const renderItem = useCallback((item: ProxyItemExtended) => {
-    const isSelected = selected === item.proxyAddress;
+    const isSelected = selected === item.substrateProxyAddress;
 
     return (
-      <ProxyAccountSelectorItem
+      <SubstrateProxyAccountSelectorItem
         className={'__proxy-account-item'}
         isSelected={isSelected}
-        onClick={onSelect(item.proxyAddress)}
+        onClick={onSelect(item.substrateProxyAddress)}
         proxyAccount={item}
         showUnselectIcon
       />
@@ -94,7 +94,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
             onClick={onCancel}
             schema='secondary'
           >
-            {t('ui.PROXY.components.Modal.Proxy.ProxyAccountSelector.cancel')}
+            {t('ui.PROXY.components.Modal.SubstrateProxy.SubstrateProxyAccountSelector.cancel')}
           </Button>
           <Button
             block
@@ -108,16 +108,16 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
             }
             onClick={onClickApply}
           >
-            {t('ui.PROXY.components.Modal.Proxy.ProxyAccountSelector.continue')}
+            {t('ui.PROXY.components.Modal.SubstrateProxy.SubstrateProxyAccountSelector.continue')}
           </Button>
         </>
       }
       id={modalId}
       onCancel={onCancel}
-      title={t('ui.PROXY.components.Modal.Proxy.ProxyAccountSelector.selectAccount')}
+      title={t('ui.PROXY.components.Modal.SubstrateProxy.SubstrateProxyAccountSelector.selectAccount')}
     >
       <div className='proxy-modal__description'>
-        {t('ui.PROXY.components.Modal.Proxy.ProxyAccountSelector.selectSigningAccount')}
+        {t('ui.PROXY.components.Modal.SubstrateProxy.SubstrateProxyAccountSelector.selectSigningAccount')}
       </div>
       <SwList.Section
         list={fullList}
@@ -128,7 +128,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   );
 };
 
-const ProxyAccountSelectorModal = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
+const SubstrateProxyAccountSelectorModal = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
@@ -174,4 +174,4 @@ const ProxyAccountSelectorModal = styled(forwardRef(Component))<Props>(({ theme:
   };
 });
 
-export default ProxyAccountSelectorModal;
+export default SubstrateProxyAccountSelectorModal;

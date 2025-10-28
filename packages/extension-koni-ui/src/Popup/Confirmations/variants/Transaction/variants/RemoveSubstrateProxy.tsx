@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RequestRemoveProxy } from '@subwallet/extension-base/types';
-import { AccountProxyAvatar, ProxyAccountListModal } from '@subwallet/extension-koni-ui/components';
+import { RequestRemoveSubstrateProxy } from '@subwallet/extension-base/types';
+import { AccountProxyAvatar, SubstrateProxyAccountListModal } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
@@ -23,19 +23,19 @@ const modalId = PROXY_ACCOUNT_LIST_MODAL;
 const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
   const { t } = useTranslation();
-  const data = transaction.data as RequestRemoveProxy;
+  const data = transaction.data as RequestRemoveSubstrateProxy;
   const accountFrom = useGetAccountByAddress(transaction.address);
-  const proxyAccount = useGetAccountByAddress(data.selectedProxyAccounts[0]?.proxyAddress);
+  const proxyAccount = useGetAccountByAddress(data.selectedSubstrateProxyAccounts[0]?.substrateProxyAddress);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const { activeModal } = useContext(ModalContext);
 
   const proxyAddresses = useMemo<string[]>(() => {
     return Array.from(
       new Set(
-        data.selectedProxyAccounts.map((item) => item.proxyAddress)
+        data.selectedSubstrateProxyAccounts.map((item) => item.substrateProxyAddress)
       )
     );
-  }, [data.selectedProxyAccounts]);
+  }, [data.selectedSubstrateProxyAccounts]);
 
   const onClickDetail = useCallback(() => {
     activeModal(modalId);
@@ -86,7 +86,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 <AccountProxyAvatar
                   className={'__account-avatar'}
                   size={24}
-                  value={proxyAccount?.proxyId || data.proxyAddress}
+                  value={proxyAccount?.proxyId || data.substrateProxyAddress}
                 />
                 <div className={'__account-item-label'}>{proxyAccount?.name || toShort(proxyAddresses[0])}</div>
               </MetaInfo.Default>
@@ -126,12 +126,12 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />
       </MetaInfo>
-      <ProxyAccountListModal proxyAddresses={proxyAddresses} />
+      <SubstrateProxyAccountListModal proxyAddresses={proxyAddresses} />
     </div>
   );
 };
 
-const RemoveProxyTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const RemoveSubstrateProxyTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     '.__account-field .__value': {
       display: 'flex',
@@ -164,4 +164,4 @@ const RemoveProxyTransactionConfirmation = styled(Component)<Props>(({ theme: { 
   };
 });
 
-export default RemoveProxyTransactionConfirmation;
+export default RemoveSubstrateProxyTransactionConfirmation;

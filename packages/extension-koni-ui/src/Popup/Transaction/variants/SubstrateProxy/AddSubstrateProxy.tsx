@@ -4,15 +4,15 @@
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
-import { UNSUPPORTED_PROXY_NETWORKS } from '@subwallet/extension-base/services/proxy-service/constant';
+import { UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS } from '@subwallet/extension-base/services/substrate-proxy-service/constant';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AddressInputNew, ChainSelector, HiddenInput, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useCreateGetChainAndExcludedTokenByAccountProxy, useGetAccountProxyByAddress, useGetBalance, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
-import { useGetProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/proxyAccount/useGetProxyAccountsInfoByAddress';
-import { handleAddProxy } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { useGetSubstrateProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/proxyAccount/useGetSubstrateProxyAccountsInfoByAddress';
+import { handleAddSubstrateProxy } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AddProxyParams, ChainItemType, FormCallbacks, FormFieldData, SendNftParams, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AddSubstrateProxyParams, ChainItemType, FormCallbacks, FormFieldData, SendNftParams, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, findAccountByAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
-import { ProxyTypeSelector } from '../../parts/ProxyTypeSelector';
+import { SubstrateProxyTypeSelector } from '../../parts/SubstrateProxyTypeSelector';
 
 type Props = ThemeProps;
 
@@ -31,11 +31,11 @@ const hiddenFields: Array<keyof SendNftParams> = ['asset', 'fromAccountProxy', '
 
 const Component = (): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/add-proxy');
-  const { defaultData, persistData, setBackProps } = useTransactionContext<AddProxyParams>();
+  const { defaultData, persistData, setBackProps } = useTransactionContext<AddSubstrateProxyParams>();
   const { token } = useTheme() as Theme;
   const { accounts } = useSelector((state: RootState) => state.accountState);
   const { chainInfoMap, ledgerGenericAllowNetworks } = useSelector((state) => state.chainStore);
-  const [form] = Form.useForm<AddProxyParams>();
+  const [form] = Form.useForm<AddSubstrateProxyParams>();
   const { t } = useTranslation();
   const [isBalanceReady, setIsBalanceReady] = useState(true);
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ const Component = (): React.ReactElement<Props> => {
   const [loading, setLoading] = useState(false);
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
-  const formDefault = useMemo<AddProxyParams>(() => {
+  const formDefault = useMemo<AddSubstrateProxyParams>(() => {
     return {
       ...defaultData
     };
@@ -54,7 +54,7 @@ const Component = (): React.ReactElement<Props> => {
 
   const { error, isLoading: balanceLoading } = useGetBalance(chainValue, fromValue);
   const onPreCheck = usePreCheckAction(fromValue);
-  const proxyInfo = useGetProxyAccountsInfoByAddress(fromValue, chainValue);
+  const proxyInfo = useGetSubstrateProxyAccountsInfoByAddress(fromValue, chainValue);
   const nativeToken = useGetNativeTokenBasicInfo(chainValue);
 
   const accountProxy = useGetAccountProxyByAddress(fromValue);
@@ -68,7 +68,7 @@ const Component = (): React.ReactElement<Props> => {
     const result: ChainItemType[] = [];
 
     Object.values(chainInfoMap).forEach((c) => {
-      if (c.substrateInfo !== null && allowedChains.includes(c.slug) && !UNSUPPORTED_PROXY_NETWORKS.includes(c.slug)) {
+      if (c.substrateInfo !== null && allowedChains.includes(c.slug) && !UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS.includes(c.slug)) {
         result.push({
           name: c.name,
           slug: c.slug
@@ -79,31 +79,31 @@ const Component = (): React.ReactElement<Props> => {
     return result;
   }, [allowedChains, chainInfoMap]);
 
-  const onFieldsChange: FormCallbacks<AddProxyParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
+  const onFieldsChange: FormCallbacks<AddSubstrateProxyParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     const { empty, error } = simpleCheckForm(allFields, ['--asset', '--fromAccountProxy']);
 
-    const values = convertFieldToObject<AddProxyParams>(allFields);
+    const values = convertFieldToObject<AddSubstrateProxyParams>(allFields);
 
     setIsDisable(empty || error);
     persistData(values);
   }, [persistData]);
 
-  const onSubmit: FormCallbacks<AddProxyParams>['onFinish'] = useCallback((values: AddProxyParams) => {
+  const onSubmit: FormCallbacks<AddSubstrateProxyParams>['onFinish'] = useCallback((values: AddSubstrateProxyParams) => {
     setLoading(true);
 
-    handleAddProxy({
+    handleAddSubstrateProxy({
       address: values.from,
       chain: values.chain,
-      proxyAddress: values.proxyAddress,
-      proxyType: values.proxyType,
-      proxyDeposit: proxyInfo.proxyDeposit
+      substrateProxyAddress: values.substrateProxyAddress,
+      substrateProxyType: values.substrateProxyType,
+      substrateProxyDeposit: proxyInfo.substrateProxyDeposit
     })
       .then(onSuccess)
       .catch(onError)
       .finally(() => {
         setLoading(false);
       });
-  }, [onError, onSuccess, proxyInfo.proxyDeposit]);
+  }, [onError, onSuccess, proxyInfo]);
 
   const validateProxyAddress = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
     const { chain, from } = form.getFieldsValue();
@@ -115,7 +115,7 @@ const Component = (): React.ReactElement<Props> => {
       fromAddress: from,
       toAddress: _recipientAddress,
       account,
-      actionType: ActionType.PROXY,
+      actionType: ActionType.SUBSTRATE_PROXY,
       autoFormatValue: false,
       allowLedgerGenerics: ledgerGenericAllowNetworks })
       .catch((err: unknown) => {
@@ -128,22 +128,22 @@ const Component = (): React.ReactElement<Props> => {
   }, [accounts, chainInfoMap, form, ledgerGenericAllowNetworks]);
 
   const validateProxyType = useCallback(async (rule: Rule, _proxyType: string) => {
-    const { proxyAddress } = form.getFieldsValue();
+    const { substrateProxyAddress } = form.getFieldsValue();
 
-    if (!proxyInfo.proxies.length) {
+    if (!proxyInfo.substrateProxies.length) {
       return Promise.resolve();
     }
 
-    const isInvalidProxy = proxyInfo.proxies.some(
-      (p) => isSameAddress(proxyAddress, p.proxyAddress) && p.proxyType === _proxyType
+    const isInvalidProxy = proxyInfo.substrateProxies.some(
+      (p) => isSameAddress(substrateProxyAddress, p.substrateProxyAddress) && p.substrateProxyType === _proxyType
     );
 
     if (isInvalidProxy) {
-      return Promise.reject(new Error(t('ui.TRANSACTION.screen.Transaction.AddProxy.proxyTypeNotAuthorized')));
+      return Promise.reject(new Error(t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.substrateProxyTypeNotAuthorized')));
     }
 
     return Promise.resolve();
-  }, [form, proxyInfo.proxies, t]);
+  }, [form, proxyInfo.substrateProxies, t]);
 
   useRestoreTransaction(form);
 
@@ -185,13 +185,13 @@ const Component = (): React.ReactElement<Props> => {
             <ChainSelector
               disabled={!isBalanceReady}
               items={chainItems}
-              label={t('ui.TRANSACTION.screen.Transaction.AddProxy.network')}
+              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.network')}
             />
           </Form.Item>
 
           <Form.Item
-            dependencies={['proxyAddress']}
-            name={'proxyAddress'}
+            dependencies={['substrateProxyAddress']}
+            name={'substrateProxyAddress'}
             rules={[
               {
                 validator: validateProxyAddress
@@ -201,11 +201,11 @@ const Component = (): React.ReactElement<Props> => {
             validateTrigger={false}
           >
             <AddressInputNew
-              actionType={ActionType.PROXY}
+              actionType={ActionType.SUBSTRATE_PROXY}
               chainSlug={chainValue}
               dropdownHeight={227}
-              label={t('ui.TRANSACTION.screen.Transaction.AddProxy.proxyAccount')}
-              placeholder={t('ui.TRANSACTION.screen.Transaction.AddProxy.enterAddress')}
+              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.proxyAccount')}
+              placeholder={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.enterAddress')}
               saveAddress={true}
               showAddressBook={true}
               showScanner={true}
@@ -213,7 +213,7 @@ const Component = (): React.ReactElement<Props> => {
           </Form.Item>
 
           <Form.Item
-            name={'proxyType'}
+            name={'substrateProxyType'}
             rules={[
               {
                 validator: validateProxyType
@@ -222,8 +222,8 @@ const Component = (): React.ReactElement<Props> => {
             statusHelpAsTooltip={true}
             validateTrigger={false}
           >
-            <ProxyTypeSelector
-              label={t('ui.TRANSACTION.screen.Transaction.AddProxy.proxyType')}
+            <SubstrateProxyTypeSelector
+              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.proxyType')}
             />
           </Form.Item>
         </Form>
@@ -232,11 +232,11 @@ const Component = (): React.ReactElement<Props> => {
             decimal={nativeToken?.decimals || 0}
             decimalOpacity={0.45}
             intOpacity={0.45}
-            prefix={t('ui.TRANSACTION.screen.Transaction.AddProxy.proxyDeposit') + ': '}
+            prefix={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.proxyDeposit') + ': '}
             size={token.fontSize}
             suffix={nativeToken?.symbol}
             unitOpacity={0.45}
-            value={proxyInfo.proxyDeposit}
+            value={proxyInfo.substrateProxyDeposit}
           />
         </div>
       </TransactionContent>
@@ -252,16 +252,16 @@ const Component = (): React.ReactElement<Props> => {
             />
           )}
           loading={balanceLoading || loading}
-          onClick={onPreCheck(form.submit, ExtrinsicType.ADD_PROXY)}
+          onClick={onPreCheck(form.submit, ExtrinsicType.ADD_SUBSTRATE_PROXY)}
         >
-          {t('ui.TRANSACTION.screen.Transaction.AddProxy.addProxy')}
+          {t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.addProxy')}
         </Button>
       </TransactionFooter>
     </>
   );
 };
 
-const AddProxy = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const AddSubstrateProxy = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     '.proxy-deposit': {
       fontSize: token.fontSize,
@@ -271,4 +271,4 @@ const AddProxy = styled(Component)<Props>(({ theme: { token } }: Props) => {
   };
 });
 
-export default AddProxy;
+export default AddSubstrateProxy;

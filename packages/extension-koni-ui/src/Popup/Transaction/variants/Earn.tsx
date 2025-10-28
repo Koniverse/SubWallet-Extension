@@ -58,8 +58,8 @@ const Component = () => {
   const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
   const { closeAlert, defaultData, goBack, onDone, openAlert,
-    persistData, proxyAccountsToSign,
-    setBackProps, setIsDisableHeader, setProxyAccountsToSign, setSubHeaderRightButtons } = useTransactionContext<EarnParams>();
+    persistData, setBackProps,
+    setIsDisableHeader, setSubHeaderRightButtons, setSubstrateProxyAccountsToSign, substrateProxyAccountsToSign } = useTransactionContext<EarnParams>();
 
   const { fromAccountProxy, slug } = defaultData;
 
@@ -569,12 +569,12 @@ const Component = () => {
 
               return true;
             } else {
-              const submitPromise = async (proxyAddress?: string) => {
+              const submitPromise = async (substrateProxyAddress?: string) => {
                 const rs = await submitJoinYieldPool({
                   path: path,
                   data,
                   currentStep: step,
-                  proxyAddress
+                  substrateProxyAddress
                 });
 
                 success = onSuccess(isLastStep, needRollback)(rs);
@@ -586,7 +586,7 @@ const Component = () => {
                 selectProxyAccountModal.open({
                   address: from,
                   chain,
-                  proxyItems: proxyAccountsToSign
+                  substrateProxyItems: substrateProxyAccountsToSign
                 })
                   .then(async (selected?: string) => {
                     setSubmitLoading(true);
@@ -655,7 +655,7 @@ const Component = () => {
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, proxyAccountsToSign, selectProxyAccountModal, setIsDisableHeader, stakingFee, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, selectProxyAccountModal, setIsDisableHeader, stakingFee, substrateProxyAccountsToSign, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {
@@ -1049,8 +1049,8 @@ const Component = () => {
   }, [form, inputAsset.slug]);
 
   useEffect(() => {
-    setProxyAccountsToSign(chainValue, fromValue, exType);
-  }, [chainValue, fromValue, exType, setProxyAccountsToSign]);
+    setSubstrateProxyAccountsToSign(chainValue, fromValue, exType);
+  }, [chainValue, fromValue, exType, setSubstrateProxyAccountsToSign]);
 
   useEffect(() => {
     if (!fromValue && accountAddressItems.length === 1) {

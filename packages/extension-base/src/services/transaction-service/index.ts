@@ -158,13 +158,13 @@ export default class TransactionService {
 
     // Get signer account
     let signer = address;
-    const proxyAddress = transactionInput.proxyAddress;
+    const substrateProxyAddress = transactionInput.substrateProxyAddress;
 
-    let proxyAccountNativeTokenAvailable: AmountData | undefined;
+    let substrateProxyAccountNativeTokenAvailable: AmountData | undefined;
 
-    if (proxyAddress && proxyAddress !== address) {
-      signer = proxyAddress;
-      proxyAccountNativeTokenAvailable = await this.state.balanceService.getTransferableBalance(proxyAddress, chain, nativeTokenInfo.slug, extrinsicType);
+    if (substrateProxyAddress && substrateProxyAddress !== address) {
+      signer = substrateProxyAddress;
+      substrateProxyAccountNativeTokenAvailable = await this.state.balanceService.getTransferableBalance(substrateProxyAddress, chain, nativeTokenInfo.slug, extrinsicType);
     }
 
     // Check account signing transaction
@@ -173,7 +173,7 @@ export default class TransactionService {
     const nativeTokenAvailable = await this.state.balanceService.getTransferableBalance(address, chain, nativeTokenInfo.slug, extrinsicType);
 
     // Check available balance against transaction fee
-    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable, proxyAccountNativeTokenAvailable);
+    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable, substrateProxyAccountNativeTokenAvailable);
 
     // Warnings Ton address if bounceable and not active
     // if (transaction && isTonTransaction(transaction) && tonApi) {
@@ -819,10 +819,10 @@ export default class TransactionService {
       nonce: nonce ?? 0,
       startBlock: startBlock || 0,
       processId: transaction.step?.processId,
-      proxyAddress: []
+      substrateProxyAddress: []
     };
 
-    const proxyHistories: TransactionHistoryItem[] = [];
+    const substrateProxyHistories: TransactionHistoryItem[] = [];
     const nativeAsset = _getChainNativeTokenBasicInfo(chainInfo);
     const baseNativeAmount = { value: '0', decimals: nativeAsset.decimals, symbol: nativeAsset.symbol };
 
@@ -1126,51 +1126,51 @@ export default class TransactionService {
         break;
       }
 
-      case ExtrinsicType.ADD_PROXY: {
-        const data = parseTransactionData<ExtrinsicType.ADD_PROXY>(transaction.data);
+      case ExtrinsicType.ADD_SUBSTRATE_PROXY: {
+        const data = parseTransactionData<ExtrinsicType.ADD_SUBSTRATE_PROXY>(transaction.data);
 
-        const proxyAddr = data.proxyAddress;
+        const proxyAddr = data.substrateProxyAddress;
 
-        historyItem.proxyAddress = [proxyAddr];
+        historyItem.substrateProxyAddress = [proxyAddr];
 
-        proxyHistories.push({
+        substrateProxyHistories.push({
           ...historyItem,
-          proxyAddress: [proxyAddr]
+          substrateProxyAddress: [proxyAddr]
         });
 
         const proxyAccount = keyring.getPair(proxyAddr);
 
         if (proxyAccount) {
-          proxyHistories.push({
+          substrateProxyHistories.push({
             ...historyItem,
             address: proxyAccount.address,
             direction: TransactionDirection.RECEIVED,
-            proxyAddress: [proxyAddr]
+            substrateProxyAddress: [proxyAddr]
           });
         }
 
         break;
       }
 
-      case ExtrinsicType.REMOVE_PROXY: {
-        const data = parseTransactionData<ExtrinsicType.REMOVE_PROXY>(transaction.data);
+      case ExtrinsicType.REMOVE_SUBSTRATE_PROXY: {
+        const data = parseTransactionData<ExtrinsicType.REMOVE_SUBSTRATE_PROXY>(transaction.data);
 
-        for (const proxyItem of data.selectedProxyAccounts || []) {
-          const proxyAddr = proxyItem.proxyAddress;
+        for (const proxyItem of data.selectedSubstrateProxyAccounts || []) {
+          const proxyAddr = proxyItem.substrateProxyAddress;
 
-          proxyHistories.push({
+          substrateProxyHistories.push({
             ...historyItem,
-            proxyAddress: [proxyAddr]
+            substrateProxyAddress: [proxyAddr]
           });
 
           const proxyAccount = keyring.getPair(proxyAddr);
 
           if (proxyAccount) {
-            proxyHistories.push({
+            substrateProxyHistories.push({
               ...historyItem,
               address: proxyAccount.address,
               direction: TransactionDirection.RECEIVED,
-              proxyAddress: [proxyAddr]
+              substrateProxyAddress: [proxyAddr]
             });
           }
         }
@@ -1211,7 +1211,7 @@ export default class TransactionService {
       console.warn(e);
     }
 
-    return [historyItem, ...proxyHistories];
+    return [historyItem, ...substrateProxyHistories];
   }
 
   private onSigned ({ id }: TransactionEventResponse) {
@@ -1802,7 +1802,7 @@ export default class TransactionService {
     return emitter;
   }
 
-  private async signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, proxyAddress, signAfterCreate, step, tokenPayFeeSlug, transaction, url }: SWTransaction): Promise<TransactionEmitter> {
+  private async signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, signAfterCreate, step, substrateProxyAddress, tokenPayFeeSlug, transaction, url }: SWTransaction): Promise<TransactionEmitter> {
     const tip = (feeCustom as SubstrateTipInfo)?.tip || '0';
     const feeAssetId = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug) && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain) ? this.state.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.multilocation as Record<string, any> : undefined;
 
@@ -1819,12 +1819,12 @@ export default class TransactionService {
 
     let signer = address;
 
-    if (proxyAddress && proxyAddress !== address) {
+    if (substrateProxyAddress && substrateProxyAddress !== address) {
       const substrateApi = this.state.chainService.getSubstrateApi(chain);
 
       await substrateApi.isReady;
 
-      signer = proxyAddress;
+      signer = substrateProxyAddress;
       extrinsic = substrateApi.api.tx.proxy.proxy(address, null, transaction as SubmittableExtrinsic);
     }
 

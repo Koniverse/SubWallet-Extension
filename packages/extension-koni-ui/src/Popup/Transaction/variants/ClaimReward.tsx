@@ -85,7 +85,7 @@ const filterAccount = (
 const Component = () => {
   const navigate = useNavigate();
 
-  const { defaultData, persistData, proxyAccountsToSign, setProxyAccountsToSign } = useTransactionContext<ClaimRewardParams>();
+  const { defaultData, persistData, setSubstrateProxyAccountsToSign, substrateProxyAccountsToSign } = useTransactionContext<ClaimRewardParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<ClaimRewardParams>();
@@ -153,13 +153,13 @@ const Component = () => {
 
     const { bondReward, chain, from, slug } = values;
 
-    const sendPromise = (proxyAddress?: string) => {
+    const sendPromise = (substrateProxyAddress?: string) => {
       return yieldSubmitStakingClaimReward({
         address: from,
         bondReward: bondReward,
         slug,
         unclaimedReward: reward?.unclaimedReward,
-        proxyAddress
+        substrateProxyAddress
       }).then(onSuccess);
     };
 
@@ -168,7 +168,7 @@ const Component = () => {
         const proxyAddress = await selectProxyAccountModal.open({
           address: from,
           chain,
-          proxyItems: proxyAccountsToSign
+          substrateProxyItems: substrateProxyAccountsToSign
         });
 
         return await sendPromise(proxyAddress);
@@ -180,7 +180,7 @@ const Component = () => {
     setTimeout(() => {
       sendPromiseWrapper().catch(onError).finally(() => setLoading(false));
     }, 300);
-  }, [onError, onSuccess, poolInfo.type, proxyAccountsToSign, reward?.unclaimedReward, selectProxyAccountModal]);
+  }, [onError, onSuccess, poolInfo.type, substrateProxyAccountsToSign, reward?.unclaimedReward, selectProxyAccountModal]);
 
   const checkAction = usePreCheckAction(fromValue);
 
@@ -202,8 +202,8 @@ const Component = () => {
   }, [accountList, form, fromValue]);
 
   useEffect(() => {
-    setProxyAccountsToSign(chainValue, fromValue, ExtrinsicType.STAKING_CLAIM_REWARD);
-  }, [chainValue, fromValue, setProxyAccountsToSign]);
+    setSubstrateProxyAccountsToSign(chainValue, fromValue, ExtrinsicType.STAKING_CLAIM_REWARD);
+  }, [chainValue, fromValue, setSubstrateProxyAccountsToSign]);
 
   return (
     <>

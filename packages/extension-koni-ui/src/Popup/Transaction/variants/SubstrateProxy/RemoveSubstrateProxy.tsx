@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { ProxyItem, ProxyType } from '@subwallet/extension-base/types';
-import { MetaInfo, ProxyAccountListModal, ProxyAccountSelectorItem, ProxyItemExtended } from '@subwallet/extension-koni-ui/components';
+import { SubstrateProxyItem, SubstrateProxyType } from '@subwallet/extension-base/types';
+import { MetaInfo, ProxyItemExtended, SubstrateProxyAccountListModal, SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
 import { PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useGetAccountProxyByAddress, useGetNativeTokenSlug, useHandleSubmitTransaction, usePreCheckAction, useSetCurrentPage, useTransactionContext } from '@subwallet/extension-koni-ui/hooks';
-import { useGetProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/proxyAccount/useGetProxyAccountsInfoByAddress';
-import { handleRemoveProxy } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { useGetSubstrateProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/proxyAccount/useGetSubstrateProxyAccountsInfoByAddress';
+import { handleRemoveSubstrateProxy } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
-import { RemoveProxyParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { RemoveSubstrateProxyParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle, Info, XCircle } from 'phosphor-react';
@@ -21,19 +21,19 @@ import styled from 'styled-components';
 
 type Props = ThemeProps;
 
-const getKey = (address: string, proxyType: ProxyType) => proxyType + ':' + address;
+const getKey = (address: string, proxyType: SubstrateProxyType) => proxyType + ':' + address;
 const modalId = PROXY_ACCOUNT_LIST_MODAL;
 
 interface ProxyAddressRemovedState {
-  keyUnique: ProxyItem[];
+  keyUnique: SubstrateProxyItem[];
   addressUnique: string[];
 }
 
-const extrinsicType = ExtrinsicType.REMOVE_PROXY;
+const extrinsicType = ExtrinsicType.REMOVE_SUBSTRATE_PROXY;
 
 const Component = ({ className }: Props): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/remove-proxy');
-  const { defaultData: { chain, from, proxyAddressKeys }, goBack, proxyAccountsToSign, setBackProps, setProxyAccountsToSign } = useTransactionContext<RemoveProxyParams>();
+  const { defaultData: { chain, from, substrateProxyAddressKeys }, goBack, setBackProps, setSubstrateProxyAccountsToSign, substrateProxyAccountsToSign } = useTransactionContext<RemoveSubstrateProxyParams>();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
@@ -42,26 +42,26 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
   const navigate = useNavigate();
   const { onError, onSuccess } = useHandleSubmitTransaction();
   const { selectProxyAccountModal } = useContext(WalletModalContext);
-  const proxyAccountInfo = useGetProxyAccountsInfoByAddress(from, chain);
+  const proxyAccountInfo = useGetSubstrateProxyAccountsInfoByAddress(from, chain);
   const onPreCheck = usePreCheckAction(from);
 
   const accountProxy = useGetAccountProxyByAddress(from);
 
   const proxyAddressRemovedFiltered = useMemo<ProxyAddressRemovedState>(() => {
-    const proxyItems: ProxyItem[] = [];
+    const proxyItems: SubstrateProxyItem[] = [];
     const addressUnique = new Set<string>();
-    const proxyAccountsRecord = proxyAccountInfo.proxies.reduce<Record<string, ProxyItem>>((acc, proxyAccount) => {
-      const key = getKey(proxyAccount.proxyAddress, proxyAccount.proxyType);
+    const proxyAccountsRecord = proxyAccountInfo.substrateProxies.reduce<Record<string, SubstrateProxyItem>>((acc, proxyAccount) => {
+      const key = getKey(proxyAccount.substrateProxyAddress, proxyAccount.substrateProxyType);
 
       acc[key] = proxyAccount;
 
       return acc;
     }, {});
 
-    proxyAddressKeys.forEach((key) => {
-      if (proxyAccountsRecord[key]?.proxyAddress) {
+    substrateProxyAddressKeys.forEach((key) => {
+      if (proxyAccountsRecord[key]?.substrateProxyAddress) {
         proxyItems.push(proxyAccountsRecord[key]);
-        addressUnique.add(proxyAccountsRecord[key].proxyAddress);
+        addressUnique.add(proxyAccountsRecord[key].substrateProxyAddress);
       }
     });
 
@@ -69,22 +69,22 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
       addressUnique: Array.from(addressUnique),
       keyUnique: proxyItems
     };
-  }, [proxyAccountInfo.proxies, proxyAddressKeys]);
+  }, [proxyAccountInfo.substrateProxies, substrateProxyAddressKeys]);
 
-  const isRemoveAll = proxyAddressRemovedFiltered.keyUnique.length === proxyAccountInfo.proxies.length;
+  const isRemoveAll = proxyAddressRemovedFiltered.keyUnique.length === proxyAccountInfo.substrateProxies.length;
 
   const onClickDetail = useCallback(() => {
     activeModal(modalId);
   }, [activeModal]);
 
   const onClickSubmit = useCallback(() => {
-    const sendPromise = (proxyAddress?: string) => {
-      return handleRemoveProxy({
+    const sendPromise = (substrateProxyAddress?: string) => {
+      return handleRemoveSubstrateProxy({
         chain,
         address: from,
-        selectedProxyAccounts: proxyAddressRemovedFiltered.keyUnique,
+        selectedSubstrateProxyAccounts: proxyAddressRemovedFiltered.keyUnique,
         isRemoveAll,
-        proxyAddress
+        substrateProxyAddress
       });
     };
 
@@ -92,12 +92,12 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
     selectProxyAccountModal.open({
       chain,
       address: from,
-      proxyItems: proxyAccountsToSign
+      substrateProxyItems: substrateProxyAccountsToSign
     }).then(sendPromise)
       .then(onSuccess)
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [chain, from, isRemoveAll, onError, onSuccess, proxyAccountsToSign, proxyAddressRemovedFiltered, selectProxyAccountModal]);
+  }, [chain, from, isRemoveAll, onError, onSuccess, substrateProxyAccountsToSign, proxyAddressRemovedFiltered, selectProxyAccountModal]);
 
   const onCancelRemove = useCallback(() => {
     if (accountProxy?.id) {
@@ -114,8 +114,8 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
 
     return ({
       proxyId: accountProxy.id,
-      proxyAddress: from,
-      proxyType: 'Any',
+      substrateProxyAddress: from,
+      substrateProxyType: 'Any',
       delay: 0,
       isMain: true
     });
@@ -124,8 +124,8 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
   const addressCount = proxyAddressRemovedFiltered.addressUnique.length;
 
   useEffect(() => {
-    setProxyAccountsToSign(chain, from, extrinsicType, proxyAddressRemovedFiltered.addressUnique);
-  }, [chain, from, setProxyAccountsToSign, proxyAddressKeys, proxyAddressRemovedFiltered.addressUnique]);
+    setSubstrateProxyAccountsToSign(chain, from, extrinsicType, proxyAddressRemovedFiltered.addressUnique);
+  }, [chain, from, setSubstrateProxyAccountsToSign, proxyAddressRemovedFiltered.addressUnique]);
 
   useEffect(() => {
     if (accountProxy?.id) {
@@ -153,7 +153,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
     <>
       <TransactionContent className={CN(className, '-transaction-content')}>
         <div>
-          {!!proxiedAccount && <ProxyAccountSelectorItem
+          {!!proxiedAccount && <SubstrateProxyAccountSelectorItem
             className={'__proxy-account'}
             proxyAccount={proxiedAccount}
             showCheckedIcon={false}
@@ -176,13 +176,13 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
             ? <MetaInfo.Account
               address={proxyAddressRemovedFiltered.addressUnique[0]}
               chainSlug={chain}
-              label={t('ui.TRANSACTION.screen.Transaction.removeProxy.proxyAccount')}
+              label={t('ui.TRANSACTION.screen.Transaction.removeSubstrateProxy.proxyAccount')}
             />
             : <MetaInfo.Default
               className={'proxy-address-removed'}
-              label={t('ui.TRANSACTION.screen.Transaction.removeProxy.proxyAccount')}
+              label={t('ui.TRANSACTION.screen.Transaction.removeSubstrateProxy.proxyAccount')}
             >
-              {addressCount} {t('ui.TRANSACTION.screen.Transaction.removeProxy.numberAccounts')}
+              {addressCount} {t('ui.TRANSACTION.screen.Transaction.removeSubstrateProxy.numberAccounts')}
               <Button
                 className={'proxy-address-removed-info'}
                 icon={ <Icon
@@ -199,7 +199,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
 
           <MetaInfo.Chain
             chain={chain}
-            label={t('ui.TRANSACTION.screen.Transaction.removeProxy.network')}
+            label={t('ui.TRANSACTION.screen.Transaction.removeSubstrateProxy.network')}
           />
         </MetaInfo>
 
@@ -216,7 +216,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
           onClick={onCancelRemove}
           schema={'secondary'}
         >
-          {t('ui.TRANSACTION.screen.Transaction.removeProxy.cancel')}
+          {t('ui.TRANSACTION.screen.Transaction.removeSubstrateProxy.cancel')}
         </Button>
 
         <Button
@@ -230,16 +230,16 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
           loading={loading}
           onClick={onPreCheck(onClickSubmit, extrinsicType)}
         >
-          {t('ui.TRANSACTION.screen.Transaction.removeProxy.continue')}
+          {t('ui.TRANSACTION.screen.Transaction.removeSubstrateProxy.continue')}
         </Button>
       </TransactionFooter>
 
-      <ProxyAccountListModal proxyAddresses={proxyAddressRemovedFiltered.addressUnique} />
+      <SubstrateProxyAccountListModal proxyAddresses={proxyAddressRemovedFiltered.addressUnique} />
     </>
   );
 };
 
-const RemoveProxy = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const RemoveSubstrateProxy = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
 
     '&.-transaction-content': {
@@ -280,4 +280,4 @@ const RemoveProxy = styled(Component)<Props>(({ theme: { token } }: Props) => {
   };
 });
 
-export default RemoveProxy;
+export default RemoveSubstrateProxy;

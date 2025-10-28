@@ -8,4 +8,4 @@ export { default as TransactionFooter } from './TransactionFooter';
 export { default as EarnOutlet } from './EarnOutlet';
 export { default as FreeBalanceToEarn } from './FreeBalanceToEarn';
 
-export * from './ProxyTypeSelector';
+export * from './SubstrateProxyTypeSelector';

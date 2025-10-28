@@ -335,8 +335,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('ui.HISTORY.screen.History.tokenApprove'),
     [ExtrinsicType.SWAP]: t('ui.HISTORY.screen.History.swap'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('ui.HISTORY.screen.History.claimToken'),
-    [ExtrinsicType.ADD_PROXY]: t('ui.HISTORY.screen.History.addProxy'),
-    [ExtrinsicType.REMOVE_PROXY]: t('ui.HISTORY.screen.History.removeProxy'),
+    [ExtrinsicType.ADD_SUBSTRATE_PROXY]: t('ui.HISTORY.screen.History.addSubstrateProxy'),
+    [ExtrinsicType.REMOVE_SUBSTRATE_PROXY]: t('ui.HISTORY.screen.History.removeSubstrateProxy'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknown')
   }), [t]);
 
@@ -383,8 +383,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('ui.HISTORY.screen.History.tokenApproveTransaction'),
     [ExtrinsicType.SWAP]: t('ui.HISTORY.screen.History.swapTransaction'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('ui.HISTORY.screen.History.claimTokenTransaction'),
-    [ExtrinsicType.ADD_PROXY]: t('ui.HISTORY.screen.History.addProxyTransaction'),
-    [ExtrinsicType.REMOVE_PROXY]: t('ui.HISTORY.screen.History.removeProxyTransaction'),
+    [ExtrinsicType.ADD_SUBSTRATE_PROXY]: t('ui.HISTORY.screen.History.addSubstrateProxyTransaction'),
+    [ExtrinsicType.REMOVE_SUBSTRATE_PROXY]: t('ui.HISTORY.screen.History.removeSubstrateProxyTransaction'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknownTransaction')
   }), [t]);
 
@@ -396,7 +396,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       const fromName = accountMap[quickFormatAddressToCompare(item.from) || ''];
       let toName = accountMap[quickFormatAddressToCompare(item.to) || ''];
 
-      if ((item.type === ExtrinsicType.ADD_PROXY || item.type === ExtrinsicType.REMOVE_PROXY) && item.proxyAddress?.length) {
+      if ((item.type === ExtrinsicType.ADD_SUBSTRATE_PROXY || item.type === ExtrinsicType.REMOVE_SUBSTRATE_PROXY) && item.substrateProxyAddress?.length) {
         toName = accountMap[quickFormatAddressToCompare(item.address) || ''];
       }
 

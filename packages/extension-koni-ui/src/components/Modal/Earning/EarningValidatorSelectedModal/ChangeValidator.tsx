@@ -15,7 +15,7 @@ import { SortingModal } from '@subwallet/extension-koni-ui/components/Modal/Sort
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useChainChecker, useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useProxyAccountsToSign, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators, useSubstrateProxyAccountsToSign } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { Theme, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
@@ -99,7 +99,7 @@ const Component = (props: Props) => {
 
   const onPreCheck = usePreCheckAction(from);
   const { onError, onSuccess } = useHandleSubmitTransaction();
-  const [proxyAccountsToSign, setProxyAccountsToSign] = useProxyAccountsToSign();
+  const [substrateProxyAccountsToSign, setSubstrateProxyAccountsToSign] = useSubstrateProxyAccountsToSign();
 
   const sectionRef = useRef<SwListSectionRef>(null);
   const networkPrefix = chainInfoMap[chain]?.substrateInfo?.addressPrefix;
@@ -292,13 +292,13 @@ const Component = (props: Props) => {
   }, []);
 
   const submit = useCallback((target: ValidatorInfo[]) => {
-    const sendPromise = (proxyAddress?: string) => {
+    const sendPromise = (substrateProxyAddress?: string) => {
       return changeEarningValidator({
         slug: poolInfo.slug,
         address: from,
         amount: '0',
         selectedValidators: target,
-        proxyAddress
+        substrateProxyAddress
       });
     };
 
@@ -308,7 +308,7 @@ const Component = (props: Props) => {
       selectProxyAccountModal.open({
         address: from,
         chain: chain,
-        proxyItems: proxyAccountsToSign
+        substrateProxyItems: substrateProxyAccountsToSign
       }).then(sendPromise)
         .then(onSuccess)
         .catch(onError)
@@ -316,7 +316,7 @@ const Component = (props: Props) => {
           setSubmitLoading(false);
         });
     }, 300);
-  }, [poolInfo.slug, from, selectProxyAccountModal, chain, proxyAccountsToSign, onSuccess, onError]);
+  }, [poolInfo.slug, from, selectProxyAccountModal, chain, substrateProxyAccountsToSign, onSuccess, onError]);
 
   const onClickSubmit = useCallback((values: { target: ValidatorInfo[] }) => {
     const { target } = values;
@@ -473,8 +473,8 @@ const Component = (props: Props) => {
   }, [chain, checkChain]);
 
   useEffect(() => {
-    setProxyAccountsToSign(chain, from, ExtrinsicType.CHANGE_EARNING_VALIDATOR);
-  }, [chain, from, setProxyAccountsToSign]);
+    setSubstrateProxyAccountsToSign(chain, from, ExtrinsicType.CHANGE_EARNING_VALIDATOR);
+  }, [chain, from, setSubstrateProxyAccountsToSign]);
 
   useExcludeModal(modalId);
 

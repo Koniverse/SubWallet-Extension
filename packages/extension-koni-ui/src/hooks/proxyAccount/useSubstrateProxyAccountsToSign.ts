@@ -2,22 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
-import { ProxyItem, RequestGetProxyAccounts } from '@subwallet/extension-base/types/proxy';
+import { AccountChainType, AccountSignMode, RequestGetSubstrateProxyAccounts, SubstrateProxyItem } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { getProxyAccounts } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { getSubstrateProxyAccounts } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { isSubstrateAddress } from '@subwallet/keyring';
 import { useCallback, useState } from 'react';
 
-export type SetProxyAccountsToSign = (chain: string, address?: string, type?: ExtrinsicType, selectedProxyAddress?: string[]) => void;
+export type SetSubstrateProxyAccountsToSign = (chain: string, address?: string, type?: ExtrinsicType, selectedProxyAddress?: string[]) => void;
 
-export function useProxyAccountsToSign (): [ProxyItem[], SetProxyAccountsToSign] {
+export function useSubstrateProxyAccountsToSign (): [SubstrateProxyItem[], SetSubstrateProxyAccountsToSign] {
   const allAccounts = useSelector((state: RootState) => state.accountState.accounts);
-  const [proxies, setProxies] = useState<ProxyItem[]>([]);
+  const [proxies, setProxies] = useState<SubstrateProxyItem[]>([]);
 
-  const fetchProxyAccountToSign = useCallback(async (chain: string, address?: string, type?: ExtrinsicType, selectedProxyAddress?: string[]): Promise<void> => {
+  const fetchProxyAccountToSign = useCallback(async (chain: string, address?: string, type?: ExtrinsicType, selectedSubstrateProxyAddress?: string[]): Promise<void> => {
     try {
       if (!address || !isSubstrateAddress(address)) {
         setProxies([]);
@@ -25,16 +24,16 @@ export function useProxyAccountsToSign (): [ProxyItem[], SetProxyAccountsToSign]
         return;
       }
 
-      const request: RequestGetProxyAccounts = {
+      const request: RequestGetSubstrateProxyAccounts = {
         chain,
         address,
         type,
-        selectedProxyAddress
+        selectedSubstrateProxyAddress
       };
 
-      const proxyAccounts = await getProxyAccounts(request);
+      const proxyAccounts = await getSubstrateProxyAccounts(request);
 
-      if (!proxyAccounts?.proxies?.length) {
+      if (!proxyAccounts?.substrateProxies?.length) {
         setProxies([]);
 
         return;
@@ -44,8 +43,8 @@ export function useProxyAccountsToSign (): [ProxyItem[], SetProxyAccountsToSign]
         (acc) => acc.chainType === AccountChainType.SUBSTRATE && acc.signMode !== AccountSignMode.READ_ONLY
       );
 
-      setProxies(proxyAccounts.proxies.filter((proxy) =>
-        validAccounts.some((acc) => isSameAddress(acc.address, proxy.proxyAddress))
+      setProxies(proxyAccounts.substrateProxies.filter((proxy) =>
+        validAccounts.some((acc) => isSameAddress(acc.address, proxy.substrateProxyAddress))
       ));
     } catch (e) {
       console.error('Error fetching proxy accounts:', e);

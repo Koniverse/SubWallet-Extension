@@ -1,16 +1,15 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { UNSUPPORTED_PROXY_NETWORKS } from '@subwallet/extension-base/services/proxy-service/constant';
-import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
-import { ProxyItem, ProxyType } from '@subwallet/extension-base/types/proxy';
-import { BasicInputEvent, ChainSelector, EmptyList, ProxyAccountSelectorItem, ProxyItemExtended } from '@subwallet/extension-koni-ui/components';
-import { ADD_PROXY_TRANSACTION, DEFAULT_ADD_PROXY_PARAMS } from '@subwallet/extension-koni-ui/constants';
+import { UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS } from '@subwallet/extension-base/services/substrate-proxy-service/constant';
+import { AccountProxy, AccountProxyType, SubstrateProxyItem, SubstrateProxyType } from '@subwallet/extension-base/types';
+import { BasicInputEvent, ChainSelector, EmptyList, ProxyItemExtended, SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
+import { ADD_SUBSTRATE_PROXY_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_PARAMS } from '@subwallet/extension-koni-ui/constants';
 import { useChainChecker, useCreateGetChainAndExcludedTokenByAccountProxy, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { getProxyAccounts } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { getSubstrateProxyAccounts } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
-import { AddProxyParams, ChainItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AddSubstrateProxyParams, ChainItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ActivityIndicator, Button, Icon, SwList } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ListChecks, TreeStructure } from 'phosphor-react';
@@ -33,13 +32,13 @@ type Props = ThemeProps & {
   networkSelected?: string;
 };
 
-const getKey = (address: string, proxyType: ProxyType) => proxyType + ':' + address;
+const getKey = (address: string, proxyType: SubstrateProxyType) => proxyType + ':' + address;
 
 function Component ({ accountProxy, address: addressFormated, className, networkSelected, proxyAccountsSelected, setNetworkSelected, setProxyAccountsSelected }: Props) {
   const { t } = useTranslation();
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
-  const [, setAddProxyParamsStorage] = useLocalStorage<AddProxyParams>(ADD_PROXY_TRANSACTION, DEFAULT_ADD_PROXY_PARAMS);
+  const [, setAddProxyParamsStorage] = useLocalStorage<AddSubstrateProxyParams>(ADD_SUBSTRATE_PROXY_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_PARAMS);
   const navigate = useNavigate();
   const checkChain = useChainChecker();
   const [loading, setLoading] = useState(false);
@@ -56,7 +55,7 @@ function Component ({ accountProxy, address: addressFormated, className, network
     const result: ChainItemType[] = [];
 
     Object.values(chainInfoMap).forEach((c) => {
-      if (c.substrateInfo !== null && allowedChains.includes(c.slug) && !UNSUPPORTED_PROXY_NETWORKS.includes(c.slug)) {
+      if (c.substrateInfo !== null && allowedChains.includes(c.slug) && !UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS.includes(c.slug)) {
         result.push({
           name: c.name,
           slug: c.slug
@@ -84,7 +83,7 @@ function Component ({ accountProxy, address: addressFormated, className, network
     }
 
     setAddProxyParamsStorage({
-      ...DEFAULT_ADD_PROXY_PARAMS,
+      ...DEFAULT_ADD_SUBSTRATE_PROXY_PARAMS,
       chain: networkSelected,
       from: addressFormated
     });
@@ -96,8 +95,8 @@ function Component ({ accountProxy, address: addressFormated, className, network
     return (
       <div className={'__empty-proxy-account-list'}>
         <EmptyList
-          emptyMessage={t('ui.ACCOUNT.screen.Account.Detail.ProxyList.setupProxyAccounts')}
-          emptyTitle={t('ui.ACCOUNT.screen.Account.Detail.ProxyList.noProxiesFound')}
+          emptyMessage={t('ui.ACCOUNT.screen.Account.Detail.SubstrateProxyList.setupProxyAccounts')}
+          emptyTitle={t('ui.ACCOUNT.screen.Account.Detail.SubstrateProxyList.noProxiesFound')}
           phosphorIcon={ListChecks}
         />
 
@@ -115,16 +114,16 @@ function Component ({ accountProxy, address: addressFormated, className, network
           schema='primary'
           shape={'round'}
         >
-          {t('ui.ACCOUNT.screen.Account.Detail.ProxyList.addProxy')}
+          {t('ui.ACCOUNT.screen.Account.Detail.SubstrateProxyList.addProxy')}
         </Button>
       </div>
 
     );
   }, [accountProxy.accountType, onAddProxyAccount, t]);
 
-  const onSelectProxyAccount = useCallback((item: ProxyItem) => {
+  const onSelectProxyAccount = useCallback((item: SubstrateProxyItem) => {
     return () => {
-      const key = getKey(item.proxyAddress, item.proxyType);
+      const key = getKey(item.substrateProxyAddress, item.substrateProxyType);
 
       setProxyAccountsSelected((prev) =>
         (
@@ -135,11 +134,11 @@ function Component ({ accountProxy, address: addressFormated, className, network
   }, [setProxyAccountsSelected]);
 
   const renderItem = useCallback(
-    (item: ProxyItem) => {
-      const key = getKey(item.proxyAddress, item.proxyType);
+    (item: SubstrateProxyItem) => {
+      const key = getKey(item.substrateProxyAddress, item.substrateProxyType);
 
       return (
-        <ProxyAccountSelectorItem
+        <SubstrateProxyAccountSelectorItem
           className={'__proxy-account-item'}
           isSelected={!!proxyAccountsSelected[key]?.isSelected}
           key={key}
@@ -172,16 +171,16 @@ function Component ({ accountProxy, address: addressFormated, className, network
   useEffect(() => {
     if (addressFormated && networkSelected) {
       setLoading(true);
-      getProxyAccounts({
+      getSubstrateProxyAccounts({
         chain: networkSelected,
         address: addressFormated
       })
-        .then(({ proxies }) => {
+        .then(({ substrateProxies }) => {
           setProxyAccountsSelected((prev) => {
             const newSelected: Record<string, ProxyItemSelector> = {};
 
-            proxies.forEach((p) => {
-              const key = getKey(p.proxyAddress, p.proxyType);
+            substrateProxies.forEach((p) => {
+              const key = getKey(p.substrateProxyAddress, p.substrateProxyType);
 
               newSelected[key] = { ...p, isSelected: !!prev[key]?.isSelected };
             });
@@ -225,7 +224,7 @@ function Component ({ accountProxy, address: addressFormated, className, network
   );
 }
 
-export const ProxyAccountList = styled(Component)<Props>(({ theme: { token } }: Props) => ({
+export const SubstrateProxyAccountList = styled(Component)<Props>(({ theme: { token } }: Props) => ({
   display: 'flex',
   overflow: 'hidden',
   flexDirection: 'column',

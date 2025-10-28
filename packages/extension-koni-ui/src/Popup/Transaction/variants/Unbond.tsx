@@ -68,7 +68,7 @@ const validateFields: Array<keyof UnStakeParams> = ['value'];
 const Component: React.FC = () => {
   const { t } = useTranslation();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { defaultData, persistData, proxyAccountsToSign, setCustomScreenTitle, setProxyAccountsToSign } = useTransactionContext<UnStakeParams>();
+  const { defaultData, persistData, setCustomScreenTitle, setSubstrateProxyAccountsToSign, substrateProxyAccountsToSign } = useTransactionContext<UnStakeParams>();
   const { slug } = defaultData;
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('unstake');
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
@@ -379,10 +379,10 @@ const Component: React.FC = () => {
       request.selectedTarget = currentValidator || '';
     }
 
-    const sendPromise = (proxyAddress?: string) => {
+    const sendPromise = (substrateProxyAddress?: string) => {
       return yieldSubmitLeavePool({
         ...request,
-        proxyAddress
+        substrateProxyAddress
       }).then(onSuccess);
     };
 
@@ -391,7 +391,7 @@ const Component: React.FC = () => {
         const proxyAddress = await selectProxyAccountModal.open({
           address: from,
           chain,
-          proxyItems: proxyAccountsToSign
+          substrateProxyItems: substrateProxyAccountsToSign
         });
 
         return await sendPromise(proxyAddress);
@@ -409,7 +409,7 @@ const Component: React.FC = () => {
           setLoading(false);
         });
     }, 300);
-  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, proxyAccountsToSign, selectProxyAccountModal, stakingFee]);
+  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, selectProxyAccountModal, stakingFee, substrateProxyAccountsToSign]);
 
   const onClickSubmit = useCallback((values: UnStakeParams) => {
     if (currentConfirmation) {
@@ -482,8 +482,8 @@ const Component: React.FC = () => {
   }, [poolChain, form, isMythosStaking, bondedValue]);
 
   useEffect(() => {
-    setProxyAccountsToSign(chainValue, fromValue, exType);
-  }, [chainValue, exType, fromValue, setProxyAccountsToSign]);
+    setSubstrateProxyAccountsToSign(chainValue, fromValue, exType);
+  }, [chainValue, exType, fromValue, setSubstrateProxyAccountsToSign]);
 
   useEffect(() => {
     if (!fromValue && accountList.length === 1) {
