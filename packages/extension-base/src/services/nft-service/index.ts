@@ -114,7 +114,7 @@ function mapSdkToCollection (raw: SdkCollection, chain: string): NftCollection {
   };
 }
 
-export default class NftDetectionService {
+export default class NftService {
   private inProgress = new Set<string>();
   private state: KoniState;
 
@@ -122,9 +122,9 @@ export default class NftDetectionService {
     this.state = state;
   }
 
-  async detectNft (address: string) {
+  async fetchEvmCollectionsWithPreview (address: string) {
     if (this.inProgress.has(address)) {
-      console.log(`[NftDetectionService] ${address} already running`);
+      console.log(`[NftService] ${address} already running`);
 
       return;
     }
@@ -135,7 +135,7 @@ export default class NftDetectionService {
       const nftDetectionApi = subwalletApiSdk.nftDetectionApi;
 
       if (!nftDetectionApi?.getEvmNftCollectionsByAddress) {
-        console.warn('[NftDetectionService] NftDetectionApi not available');
+        console.warn('[NftService] NftDetectionApi not available');
 
         return;
       }
@@ -168,7 +168,7 @@ export default class NftDetectionService {
       await this.state.handleDetectedNftCollections(allCollections);
       await this.state.handleDetectedNfts(address, allItems);
     } catch (err) {
-      console.warn(`[NftDetectionService] detect error for ${address}`, err);
+      console.warn(`[NftService] detect error for ${address}`, err);
     } finally {
       this.inProgress.delete(address);
     }
@@ -179,7 +179,7 @@ export default class NftDetectionService {
     const chainId = _getEvmChainId(chainInfo);
 
     if (!contractAddress || !owner || !chainId) {
-      console.warn('[NftDetectionService] missing params for getFullNftInstancesByCollection');
+      console.warn('[NftService] missing params for getFullNftInstancesByCollection');
 
       return false;
     }
@@ -188,7 +188,7 @@ export default class NftDetectionService {
       const nftDetectionApi = subwalletApiSdk.nftDetectionApi;
 
       if (!nftDetectionApi?.getAllNftInstances) {
-        console.warn('[NftDetectionService] getAllNftInstances not available');
+        console.warn('[NftService] getAllNftInstances not available');
 
         return false;
       }
