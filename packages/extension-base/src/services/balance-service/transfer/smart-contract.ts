@@ -23,6 +23,7 @@ interface TransferEvmProps extends TransactionFee {
   value: string;
   evmApi: _EvmApi;
   fallbackFee?: boolean;
+  data?: string;
 }
 
 // hot fix gas settings for Energy Web Chain
@@ -31,17 +32,21 @@ const gasSettingsForEWC = {
   maxFeePerGas: '10000000'
 };
 
-export async function getEVMTransactionObject ({ chain,
-  evmApi,
-  fallbackFee,
-  feeCustom: _feeCustom,
-  feeInfo: _feeInfo,
-  feeOption,
-  from,
-  to,
-  transferAll,
-  value }: TransferEvmProps): Promise<[TransactionConfig, string, string]> {
+export async function getEVMTransactionObject (props: TransferEvmProps): Promise<[TransactionConfig, string, string]> {
+  const { chain,
+    data,
+    evmApi,
+    fallbackFee,
+    feeCustom: _feeCustom,
+    feeInfo: _feeInfo,
+    feeOption,
+    from,
+    to,
+    transferAll,
+    value } = props;
+
   const isEnergyWebChain = chain === 'energy_web_chain'; // hot fix gas settings for Energy Web Chain
+
   const feeCustom = _feeCustom as EvmEIP1559FeeOption;
   const feeInfo = _feeInfo as EvmFeeInfo;
   const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
@@ -56,9 +61,10 @@ export async function getEVMTransactionObject ({ chain,
   }
 
   const transactionObject = {
-    to: to,
-    value: value,
-    from: from,
+    to,
+    value,
+    from,
+    data,
     ...feeCombine
   } as TransactionConfig;
 
@@ -67,7 +73,7 @@ export async function getEVMTransactionObject ({ chain,
   if (isEnergyWebChain) {
     gasLimit = gasSettingsForEWC.gasLimit;
   } else {
-    gasLimit = await evmApi.api.eth.estimateGas(transactionObject).catch((e: Error) => {
+    const gasEstimate = await evmApi.api.eth.estimateGas(transactionObject).catch((e: Error) => {
       console.log('Cannot estimate fee with native transfer on', chain, e);
 
       if (fallbackFee) {
@@ -78,6 +84,8 @@ export async function getEVMTransactionObject ({ chain,
         throw Error('Unable to estimate fee for this transaction. Edit fee and try again.');
       }
     });
+
+    gasLimit = Math.floor(gasEstimate * 1.1); // 10% buffer for fluctuations
   }
 
   transactionObject.gas = gasLimit;
@@ -103,8 +111,8 @@ export async function getEVMTransactionObject ({ chain,
   return [transactionObject, transactionObject.value.toString(), errorOnEstimateFee];
 }
 
-export async function getERC20TransactionObject (
-  { assetAddress,
+export async function getERC20TransactionObject (props: TransferERC20Props): Promise<[TransactionConfig, string, string]> {
+  const { assetAddress,
     chain,
     evmApi,
     fallbackFee,
@@ -114,9 +122,10 @@ export async function getERC20TransactionObject (
     from,
     to,
     transferAll,
-    value }: TransferERC20Props
-): Promise<[TransactionConfig, string, string]> {
+    value } = props;
+
   const isEnergyWebChain = chain === 'energy_web_chain'; // hot fix gas settings for Energy Web Chain
+
   const erc20Contract = getERC20Contract(assetAddress, evmApi);
   const feeCustom = _feeCustom as EvmEIP1559FeeOption;
 
