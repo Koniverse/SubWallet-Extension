@@ -56,11 +56,22 @@ export function reformatAddress (address: string, networkPrefix = 42, isEthereum
   }
 }
 
-export const _reformatAddressWithChain = (address: string, chainInfo: _ChainInfo): string => {
+export const _reformatAddressWithChain = (address: string, chainInfo: _ChainInfo, substrateAddress?: string): string => {
   const chainType = _chainInfoToAccountChainType(chainInfo);
 
   if (chainType === AccountChainType.SUBSTRATE) {
-    return reformatAddress(address, _getChainSubstrateAddressPrefix(chainInfo));
+    const addressPrefix = _getChainSubstrateAddressPrefix(chainInfo);
+
+    if (isEthereumAddress(address)) {
+      if (addressPrefix >= 0 && substrateAddress) {
+        // evm address -> substrate address
+        return reformatAddress(substrateAddress, addressPrefix);
+      }
+
+      return address;
+    }
+
+    return reformatAddress(address, addressPrefix);
   } else if (chainType === AccountChainType.TON || chainType === AccountChainType.CARDANO) {
     const isTestnet = chainInfo.isTestnet;
 

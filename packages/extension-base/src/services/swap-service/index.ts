@@ -177,7 +177,7 @@ export class SwapService implements StoppableServiceInterface {
     }
 
     // override fee for quote because some cases need estimate network fee on Extension (i.e. Optimex)
-    if (swapQuoteResponse.optimalQuote) {
+    if (swapQuoteResponse.optimalQuote && [SwapProviderId.OPTIMEX, SwapProviderId.OPTIMEX_TESTNET].includes(swapQuoteResponse.optimalQuote.provider.id)) {
       const swapIndex = optimalProcess.steps.findIndex((step) => step.type === SwapStepType.SWAP);
 
       swapQuoteResponse.optimalQuote.feeInfo.feeComponent = optimalProcess.totalFee[swapIndex].feeComponent;
@@ -229,7 +229,7 @@ export class SwapService implements StoppableServiceInterface {
 
     const directSwapRequest: SwapRequestV2 | undefined = swapAction
       ? { ...request,
-        address: _reformatAddressWithChain(request.address, this.chainService.getChainInfoByKey(_getAssetOriginChain(this.chainService.getAssetBySlug(swapAction.pair.from)))),
+        address: _reformatAddressWithChain(request.address, this.chainService.getChainInfoByKey(_getAssetOriginChain(this.chainService.getAssetBySlug(swapAction.pair.from))), request.substrateAddress),
         pair: swapAction.pair }
       : undefined;
 
