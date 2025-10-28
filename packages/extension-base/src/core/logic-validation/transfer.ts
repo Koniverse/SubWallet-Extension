@@ -63,7 +63,8 @@ export function additionalValidateTransferForRecipient (
   transferAmount: bigint,
   senderSendingTokenTransferable?: bigint,
   receiverSystemAccountInfo?: FrameSystemAccountInfo,
-  isSendingTokenSufficient?: boolean
+  isSendingTokenSufficient?: boolean,
+  minXcmTransferableAmount?: bigint
 ): [TransactionWarning[], TransactionError[]] {
   const sendingTokenMinAmount = BigInt(_getTokenMinAmount(sendingTokenInfo));
   const sendingTokenMinAmountXCM = new BigN(_getTokenMinAmount(sendingTokenInfo)).multipliedBy(XCM_MIN_AMOUNT_RATIO);
@@ -86,6 +87,19 @@ export function additionalValidateTransferForRecipient (
     );
 
     errors.push(error);
+  }
+
+  if (extrinsicType === ExtrinsicType.TRANSFER_XCM) {
+    if (minXcmTransferableAmount && transferAmount < minXcmTransferableAmount) {
+      const minXcmTransferableAmountStr = formatNumber(minXcmTransferableAmount.toString(), _getAssetDecimals(sendingTokenInfo), balanceFormatter, { maxNumberFormat: _getAssetDecimals(sendingTokenInfo) || 6 });
+
+      const error = new TransactionError(
+        TransferTxErrorType.NOT_ENOUGH_VALUE,
+        t('You must transfer at least {{amount}} {{symbol}}. Increase amount and try again', { replace: { amount: minXcmTransferableAmountStr, symbol: sendingTokenInfo.symbol } })
+      );
+
+      errors.push(error);
+    }
   }
 
   if (!_isNativeToken(sendingTokenInfo)) {
