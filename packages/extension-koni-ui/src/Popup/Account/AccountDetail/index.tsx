@@ -12,7 +12,7 @@ import { useCoreCreateReformatAddress, useDefaultNavigate, useGetAccountProxyByI
 import { editAccount, forgetAccount, validateAccountName } from '@subwallet/extension-koni-ui/messaging';
 import { ProxyItemSelector, SubstrateProxyAccountList } from '@subwallet/extension-koni-ui/Popup/Account/AccountDetail/SubstrateProxyAccountList';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AccountDetailParam, AddSubstrateProxyParams, RemoveSubstrateProxyParams, ThemeProps, VoidFunction } from '@subwallet/extension-koni-ui/types';
+import { AccountDetailParam, AddSubstrateProxyAccountParams, RemoveSubstrateProxyAccountParams, ThemeProps, VoidFunction } from '@subwallet/extension-koni-ui/types';
 import { FormCallbacks, FormFieldData } from '@subwallet/extension-koni-ui/types/form';
 import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils/form/form';
 import { Button, Form, Icon, Input } from '@subwallet/react-ui';
@@ -67,8 +67,8 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   const navigate = useNavigate();
 
   const { alertModal, deriveModal: { open: openDeriveModal } } = useContext(WalletModalContext);
-  const [, setAddSubstrateProxyParamsStorage] = useLocalStorage<AddSubstrateProxyParams>(ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS);
-  const [, setRemoveSubstrateProxyParamsStorage] = useLocalStorage<RemoveSubstrateProxyParams>(REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS);
+  const [, setAddSubstrateProxyParamsStorage] = useLocalStorage<AddSubstrateProxyAccountParams>(ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS);
+  const [, setRemoveSubstrateProxyParamsStorage] = useLocalStorage<RemoveSubstrateProxyAccountParams>(REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS);
   const getReformatAddress = useCoreCreateReformatAddress();
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
@@ -166,7 +166,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
     if (canManageSubstrateProxies) {
       result.push(
         {
-          label: t('ui.ACCOUNT.screen.Account.Detail.manageSubstrateProxies'),
+          label: t('ui.ACCOUNT.screen.Account.Detail.manageSubstrateProxyAccounts'),
           value: FilterTabType.MANAGE_PROXIES
         });
     }
@@ -205,7 +205,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
     navigate('/transaction/remove-proxy');
   }, [addressFormated, navigate, networkSelected, substrateProxyAccountsSelected, setRemoveSubstrateProxyParamsStorage]);
 
-  const onCancelRemoveProxyAccounts = useCallback(() => {
+  const onCancelRemoveSubstrateProxyAccounts = useCallback(() => {
     setSubstrateProxyAccountsSelected((prevState) => {
       const newState: Record<string, ProxyItemSelector> = {};
 
@@ -363,10 +363,10 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
                   weight='fill'
                 />
               )}
-              onClick={onCancelRemoveProxyAccounts}
+              onClick={onCancelRemoveSubstrateProxyAccounts}
               schema='secondary'
             >
-              {t('ui.ACCOUNT.screen.Account.Detail.cancelRemoveSubstrateProxy')}
+              {t('ui.ACCOUNT.screen.Account.Detail.cancelRemoveSubstrateProxyAccount')}
             </Button>
             <Button
               block={true}
@@ -380,7 +380,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
               onClick={onRemoveSubstrateProxyAccounts}
               schema='error'
             >
-              {t('ui.ACCOUNT.screen.Account.Detail.removeSubstrateProxy')}
+              {t('ui.ACCOUNT.screen.Account.Detail.removeSubstrateProxyAccount')}
             </Button>
           </>
         );
@@ -400,7 +400,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
           onClick={onAddSubstrateProxyAccount}
           schema='primary'
         >
-          {t('ui.ACCOUNT.screen.Account.Detail.addSubstrateProxy')}
+          {t('ui.ACCOUNT.screen.Account.Detail.addSubstrateProxyAccount')}
         </Button>
       );
     }
@@ -471,7 +471,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
         {t('ui.ACCOUNT.screen.Account.Detail.export')}
       </Button>
     </>;
-  }, [accountProxy.accountActions, accountProxy.accountType, deleting, deriving, onAddSubstrateProxyAccount, onCancelRemoveProxyAccounts, onDelete, onDerive, onExport, onRemoveSubstrateProxyAccounts, selectedFilterTab, substrateProxyAccountsSelected, t]);
+  }, [accountProxy.accountActions, accountProxy.accountType, deleting, deriving, onAddSubstrateProxyAccount, onCancelRemoveSubstrateProxyAccounts, onDelete, onDerive, onExport, onRemoveSubstrateProxyAccounts, selectedFilterTab, substrateProxyAccountsSelected, t]);
 
   useEffect(() => {
     if (accountProxy) {

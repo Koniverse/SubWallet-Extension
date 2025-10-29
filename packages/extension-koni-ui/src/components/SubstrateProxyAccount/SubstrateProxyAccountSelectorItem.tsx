@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { SubstrateProxyItem } from '@subwallet/extension-base/types';
+import { SubstrateProxyAccountItem } from '@subwallet/extension-base/types';
 import { AccountProxyAvatar } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountProxyById, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
@@ -13,7 +13,7 @@ import { CheckCircle } from 'phosphor-react';
 import React, { Context, useContext } from 'react';
 import styled, { ThemeContext } from 'styled-components';
 
-export interface ProxyItemExtended extends SubstrateProxyItem {
+export interface ProxyItemExtended extends SubstrateProxyAccountItem {
   isMain?: boolean;
 }
 
@@ -70,7 +70,7 @@ function Component (props: Props): React.ReactElement<Props> {
         })}
         >
           {
-            proxyAccount.isMain ? t('ui.SUBSTRATEPROXY.components.SubstrateProxyAccount.SelectorItem.proxiedAccount') : `${t('ui.SUBSTRATEPROXY.components.SubstrateProxyAccount.SelectorItem.proxyType')}: ${proxyAccount.substrateProxyType}`
+            proxyAccount.isMain ? t('ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.proxiedAccount') : `${t('ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.proxyType')}: ${proxyAccount.substrateProxyType}`
           }
         </div>
       </div>

@@ -21,7 +21,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const data = transaction.data as RequestAddSubstrateProxyAccount;
   const accountFrom = useGetAccountByAddress(transaction.address);
-  const proxyAccount = useGetAccountByAddress(data.substrateProxyAddress);
+  const substrateProxyAccount = useGetAccountByAddress(data.substrateProxyAddress);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
 
   return (
@@ -66,12 +66,12 @@ const Component: React.FC<Props> = (props: Props) => {
           <AccountProxyAvatar
             className={'__account-avatar'}
             size={24}
-            value={proxyAccount?.proxyId || data.substrateProxyAddress}
+            value={substrateProxyAccount?.proxyId || data.substrateProxyAddress}
           />
-          <div className={'__account-item-label'}>{proxyAccount?.name || toShort(data.substrateProxyAddress)}</div>
+          <div className={'__account-item-label'}>{substrateProxyAccount?.name || toShort(data.substrateProxyAddress)}</div>
         </MetaInfo.Default>
 
-        {!!proxyAccount?.name && <MetaInfo.Default
+        {!!substrateProxyAccount?.name && <MetaInfo.Default
           className={'__address-field'}
           label={t('Address')}
         >
@@ -89,7 +89,7 @@ const Component: React.FC<Props> = (props: Props) => {
   );
 };
 
-const AddSubstrateProxyTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const AddSubstrateProxyAccountTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     '.__account-field .__value': {
       display: 'flex',
@@ -103,4 +103,4 @@ const AddSubstrateProxyTransactionConfirmation = styled(Component)<Props>(({ the
   };
 });
 
-export default AddSubstrateProxyTransactionConfirmation;
+export default AddSubstrateProxyAccountTransactionConfirmation;

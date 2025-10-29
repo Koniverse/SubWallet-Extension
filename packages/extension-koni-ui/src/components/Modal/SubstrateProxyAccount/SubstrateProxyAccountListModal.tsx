@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountItemWithProxyAvatar } from '@subwallet/extension-koni-ui/components';
-import { PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress } from '@subwallet/extension-koni-ui/utils';
@@ -13,26 +13,26 @@ import React, { ForwardedRef, forwardRef, useCallback, useContext, useRef } from
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-export interface Props extends ThemeProps{
-  proxyAddresses: string[];
+export interface Props extends ThemeProps {
+  substrateProxyAddresses: string[];
 }
 
-const modalId = PROXY_ACCOUNT_LIST_MODAL;
+const modalId = SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL;
 
 const Component = (props: Props, ref: ForwardedRef<any>) => {
-  const { className = '', proxyAddresses } = props;
+  const { className = '', substrateProxyAddresses } = props;
   const { t } = useTranslation();
   const sectionRef = useRef<SwListSectionRef>(null);
   const { accounts } = useSelector((state) => state.accountState);
   const { inactiveModal } = useContext(ModalContext);
 
-  const renderItem = useCallback((proxyAddress: string) => {
-    const account = findAccountByAddress(accounts, proxyAddress);
+  const renderItem = useCallback((substrateProxyAddress: string) => {
+    const account = findAccountByAddress(accounts, substrateProxyAddress);
 
     return (
       <AccountItemWithProxyAvatar
         account={account}
-        accountAddress={proxyAddress}
+        accountAddress={substrateProxyAddress}
         addressFallbackLength={9}
         className={'__account-item'}
       />
@@ -53,10 +53,10 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
       />}
       id={modalId}
       onCancel={onCancel}
-      title={t('ui.PROXY.components.Modal.SubstrateProxy.SubstrateProxyAccountList.proxyAccount')}
+      title={t('ui.ACCOUNT.components.Modal.SubstrateProxyAccount.SubstrateProxyAccountList.substrateProxyAccount')}
     >
       <SwList.Section
-        list={proxyAddresses}
+        list={substrateProxyAddresses}
         ref={sectionRef}
         renderItem={renderItem}
       />

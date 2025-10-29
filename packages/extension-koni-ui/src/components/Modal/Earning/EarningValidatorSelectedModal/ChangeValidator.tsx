@@ -93,7 +93,7 @@ const Component = (props: Props) => {
 
   const { t } = useTranslation();
   const { activeModal, checkActive } = useContext(ModalContext);
-  const { alertModal: { close: closeAlert, open: openAlert }, selectProxyAccountModal } = useContext(WalletModalContext);
+  const { alertModal: { close: closeAlert, open: openAlert }, selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
   const isActive = checkActive(modalId);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
@@ -305,7 +305,7 @@ const Component = (props: Props) => {
     setSubmitLoading(true);
 
     setTimeout(() => {
-      selectProxyAccountModal.open({
+      selectSubstrateProxyAccountModal.open({
         address: from,
         chain: chain,
         substrateProxyItems: substrateProxyAccountsToSign
@@ -316,7 +316,7 @@ const Component = (props: Props) => {
           setSubmitLoading(false);
         });
     }, 300);
-  }, [poolInfo.slug, from, selectProxyAccountModal, chain, substrateProxyAccountsToSign, onSuccess, onError]);
+  }, [poolInfo.slug, from, selectSubstrateProxyAccountModal, chain, substrateProxyAccountsToSign, onSuccess, onError]);
 
   const onClickSubmit = useCallback((values: { target: ValidatorInfo[] }) => {
     const { target } = values;

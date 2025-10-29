@@ -12,7 +12,7 @@ export interface RequestGetSubstrateProxyAccountInfo {
 
 export type SubstrateProxyType = 'Any' | 'NonTransfer' | 'Governance' | 'Staking';
 
-export interface SubstrateProxyItem {
+export interface SubstrateProxyAccountItem {
   substrateProxyAddress: string;
   substrateProxyType: SubstrateProxyType
   delay: number;
@@ -20,7 +20,7 @@ export interface SubstrateProxyItem {
 }
 
 export interface SubstrateProxyAccountInfo {
-  substrateProxies: SubstrateProxyItem[];
+  substrateProxyAccounts: SubstrateProxyAccountItem[];
   substrateProxyDeposit: string;
 }
 

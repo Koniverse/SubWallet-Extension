@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { SubstrateProxyItem } from '@subwallet/extension-base/types';
+import { SubstrateProxyAccountItem } from '@subwallet/extension-base/types';
 import { SetSubstrateProxyAccountsToSign } from '@subwallet/extension-koni-ui/hooks';
 import { AlertDialogProps, TransactionFormBaseProps } from '@subwallet/extension-koni-ui/types';
 import { ButtonProps } from '@subwallet/react-ui';
@@ -26,7 +26,7 @@ export interface TransactionContextProps {
   openRecheckChainConnectionModal: (chainName: string) => void;
   closeRecheckChainConnectionModal: VoidFunction;
   setSubstrateProxyAccountsToSign: SetSubstrateProxyAccountsToSign;
-  substrateProxyAccountsToSign: SubstrateProxyItem[];
+  substrateProxyAccountsToSign: SubstrateProxyAccountItem[];
 }
 
 export const TransactionContext = React.createContext<TransactionContextProps>({

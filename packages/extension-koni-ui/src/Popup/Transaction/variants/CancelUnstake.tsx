@@ -67,7 +67,7 @@ const Component = () => {
 
   const { list: allPositionInfos } = useYieldPositionDetail(slug);
   const { compound: positionInfo } = useYieldPositionDetail(slug, fromValue);
-  const { selectProxyAccountModal } = useContext(WalletModalContext);
+  const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
   const [isDisable, setIsDisable] = useState(true);
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
@@ -124,21 +124,23 @@ const Component = () => {
 
     const sendPromiseWrapper = async () => {
       if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-        return await selectProxyAccountModal.open({
+        const substrateProxyAddress = await selectSubstrateProxyAccountModal.open({
           address: from,
           chain,
           substrateProxyItems: substrateProxyAccountsToSign
-        }).then(sendPromise);
-      } else {
-        return await sendPromise();
+        });
+
+        return await sendPromise(substrateProxyAddress);
       }
+
+      return await sendPromise();
     };
 
     setTimeout(() => {
       sendPromiseWrapper().catch(onError)
         .finally(() => setLoading(false));
     }, 300);
-  }, [onError, onSuccess, poolInfo.type, positionInfo, substrateProxyAccountsToSign, selectProxyAccountModal]);
+  }, [onError, onSuccess, poolInfo.type, positionInfo, substrateProxyAccountsToSign, selectSubstrateProxyAccountModal]);
 
   const onPreCheck = usePreCheckAction(fromValue);
 

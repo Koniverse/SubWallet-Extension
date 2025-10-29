@@ -4,7 +4,7 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
-import { AddSubstrateProxyAccountParams, RemoveSubstrateProxyAccountParams, RequestGetSubstrateProxyAccountInfo, SubstrateProxyAccountInfo, SubstrateProxyItem, SubstrateProxyType } from '@subwallet/extension-base/types/substrate-proxy';
+import { AddSubstrateProxyAccountParams, RemoveSubstrateProxyAccountParams, RequestGetSubstrateProxyAccountInfo, SubstrateProxyAccountInfo, SubstrateProxyAccountItem, SubstrateProxyType } from '@subwallet/extension-base/types/substrateProxyAccount';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
@@ -38,7 +38,7 @@ export default class SubstrateProxyAccountService {
 
     const [substrateProxyAccounts, substrateProxyDeposit] = result.toPrimitive() as [PrimitiveSubstrateProxyAccountItem[], string];
 
-    let substrateProxies: SubstrateProxyItem[] = (substrateProxyAccounts || []).map((account) => {
+    let substrateProxies: SubstrateProxyAccountItem[] = (substrateProxyAccounts || []).map((account) => {
       const proxyId = this.state.keyringService.context.belongUnifiedAccount(account.delegate) || reformatAddress(account.delegate);
 
       return {

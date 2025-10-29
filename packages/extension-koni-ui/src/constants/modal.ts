@@ -92,8 +92,8 @@ export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 /* Process */
 
 /* Proxy */
-export const PROXY_ACCOUNT_SELECTOR_MODAL = 'proxy-account-selector-modal';
-export const PROXY_ACCOUNT_LIST_MODAL = 'proxy-account-list-modal';
+export const SUBSTRATE_PROXY_ACCOUNT_SELECTOR_MODAL = 'substrateProxyAccount-account-selector-modal';
+export const SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL = 'substrateProxyAccount-account-list-modal';
 /* Proxy */
 
 /* Other */

@@ -97,7 +97,7 @@ const Component: React.FC = () => {
   const amountValue = useWatchTransaction('value', form, defaultData);
 
   const { list: allPositions } = useYieldPositionDetail(slug);
-  const { selectProxyAccountModal } = useContext(WalletModalContext);
+  const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
   const { compound: positionInfo } = useYieldPositionDetail(slug, fromValue);
 
   const bondedSlug = useMemo(() => {
@@ -388,13 +388,13 @@ const Component: React.FC = () => {
 
     const sendPromiseWrapper = async () => {
       if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-        const proxyAddress = await selectProxyAccountModal.open({
+        const substrateProxyAddress = await selectSubstrateProxyAccountModal.open({
           address: from,
           chain,
           substrateProxyItems: substrateProxyAccountsToSign
         });
 
-        return await sendPromise(proxyAddress);
+        return await sendPromise(substrateProxyAddress);
       }
 
       return await sendPromise();
@@ -409,7 +409,7 @@ const Component: React.FC = () => {
           setLoading(false);
         });
     }, 300);
-  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, selectProxyAccountModal, stakingFee, substrateProxyAccountsToSign]);
+  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, selectSubstrateProxyAccountModal, stakingFee, substrateProxyAccountsToSign]);
 
   const onClickSubmit = useCallback((values: UnStakeParams) => {
     if (currentConfirmation) {

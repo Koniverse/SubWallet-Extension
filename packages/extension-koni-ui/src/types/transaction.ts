@@ -76,11 +76,11 @@ export interface ClaimBridgeParams extends TransactionFormBaseProps {
   notificationId: string;
 }
 
-export interface AddSubstrateProxyParams extends TransactionFormBaseProps {
+export interface AddSubstrateProxyAccountParams extends TransactionFormBaseProps {
   substrateProxyAddress: string;
   substrateProxyType: SubstrateProxyType;
 }
 
-export interface RemoveSubstrateProxyParams extends TransactionFormBaseProps {
+export interface RemoveSubstrateProxyAccountParams extends TransactionFormBaseProps {
   substrateProxyAddressKeys: string[]; // proxyType:address
 }

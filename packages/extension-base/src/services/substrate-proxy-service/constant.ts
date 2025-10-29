@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { SubstrateProxyType } from '@subwallet/extension-base/types/substrate-proxy';
+import { SubstrateProxyType } from '@subwallet/extension-base/types/substrateProxyAccount';
 
 const SUBSTRATE_PROXY_ACCOUNT_EXTRINSIC_GROUPS: Record<string, ExtrinsicType[]> = {
   STAKING: [

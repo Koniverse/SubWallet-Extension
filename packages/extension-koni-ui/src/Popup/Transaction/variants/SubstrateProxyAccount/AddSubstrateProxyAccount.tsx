@@ -8,11 +8,11 @@ import { UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS } from '@subwallet/extension-base/
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AddressInputNew, ChainSelector, HiddenInput, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useCreateGetChainAndExcludedTokenByAccountProxy, useGetAccountProxyByAddress, useGetBalance, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
-import { useGetSubstrateProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/proxyAccount/useGetSubstrateProxyAccountsInfoByAddress';
+import { useGetSubstrateProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/substrateProxyAccount/useGetSubstrateProxyAccountsInfoByAddress';
 import { handleAddSubstrateProxyAccount } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AddSubstrateProxyParams, ChainItemType, FormCallbacks, FormFieldData, SendNftParams, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AddSubstrateProxyAccountParams, ChainItemType, FormCallbacks, FormFieldData, SendNftParams, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, findAccountByAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
@@ -31,11 +31,11 @@ const hiddenFields: Array<keyof SendNftParams> = ['asset', 'fromAccountProxy', '
 
 const Component = (): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/add-proxy');
-  const { defaultData, persistData, setBackProps } = useTransactionContext<AddSubstrateProxyParams>();
+  const { defaultData, persistData, setBackProps } = useTransactionContext<AddSubstrateProxyAccountParams>();
   const { token } = useTheme() as Theme;
   const { accounts } = useSelector((state: RootState) => state.accountState);
   const { chainInfoMap, ledgerGenericAllowNetworks } = useSelector((state) => state.chainStore);
-  const [form] = Form.useForm<AddSubstrateProxyParams>();
+  const [form] = Form.useForm<AddSubstrateProxyAccountParams>();
   const { t } = useTranslation();
   const [isBalanceReady, setIsBalanceReady] = useState(true);
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ const Component = (): React.ReactElement<Props> => {
   const [loading, setLoading] = useState(false);
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
-  const formDefault = useMemo<AddSubstrateProxyParams>(() => {
+  const formDefault = useMemo<AddSubstrateProxyAccountParams>(() => {
     return {
       ...defaultData
     };
@@ -79,16 +79,16 @@ const Component = (): React.ReactElement<Props> => {
     return result;
   }, [allowedChains, chainInfoMap]);
 
-  const onFieldsChange: FormCallbacks<AddSubstrateProxyParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
+  const onFieldsChange: FormCallbacks<AddSubstrateProxyAccountParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     const { empty, error } = simpleCheckForm(allFields, ['--asset', '--fromAccountProxy']);
 
-    const values = convertFieldToObject<AddSubstrateProxyParams>(allFields);
+    const values = convertFieldToObject<AddSubstrateProxyAccountParams>(allFields);
 
     setIsDisable(empty || error);
     persistData(values);
   }, [persistData]);
 
-  const onSubmit: FormCallbacks<AddSubstrateProxyParams>['onFinish'] = useCallback((values: AddSubstrateProxyParams) => {
+  const onSubmit: FormCallbacks<AddSubstrateProxyAccountParams>['onFinish'] = useCallback((values: AddSubstrateProxyAccountParams) => {
     setLoading(true);
 
     handleAddSubstrateProxyAccount({
@@ -130,20 +130,20 @@ const Component = (): React.ReactElement<Props> => {
   const validateProxyType = useCallback(async (rule: Rule, _proxyType: string) => {
     const { substrateProxyAddress } = form.getFieldsValue();
 
-    if (!proxyInfo.substrateProxies.length) {
+    if (!proxyInfo.substrateProxyAccounts.length) {
       return Promise.resolve();
     }
 
-    const isInvalidProxy = proxyInfo.substrateProxies.some(
+    const isInvalidProxy = proxyInfo.substrateProxyAccounts.some(
       (p) => isSameAddress(substrateProxyAddress, p.substrateProxyAddress) && p.substrateProxyType === _proxyType
     );
 
     if (isInvalidProxy) {
-      return Promise.reject(new Error(t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.substrateProxyTypeNotAuthorized')));
+      return Promise.reject(new Error(t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.substrateProxyTypeNotAuthorized')));
     }
 
     return Promise.resolve();
-  }, [form, proxyInfo.substrateProxies, t]);
+  }, [form, proxyInfo.substrateProxyAccounts, t]);
 
   useRestoreTransaction(form);
 
@@ -185,7 +185,7 @@ const Component = (): React.ReactElement<Props> => {
             <ChainSelector
               disabled={!isBalanceReady}
               items={chainItems}
-              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.network')}
+              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.network')}
             />
           </Form.Item>
 
@@ -204,8 +204,8 @@ const Component = (): React.ReactElement<Props> => {
               actionType={ActionType.SUBSTRATE_PROXY_ACCOUNT}
               chainSlug={chainValue}
               dropdownHeight={227}
-              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.proxyAccount')}
-              placeholder={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.enterAddress')}
+              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.substrateProxyAccount')}
+              placeholder={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.enterAddress')}
               saveAddress={true}
               showAddressBook={true}
               showScanner={true}
@@ -223,7 +223,7 @@ const Component = (): React.ReactElement<Props> => {
             validateTrigger={false}
           >
             <SubstrateProxyTypeSelector
-              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.proxyType')}
+              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.proxyType')}
             />
           </Form.Item>
         </Form>
@@ -232,7 +232,7 @@ const Component = (): React.ReactElement<Props> => {
             decimal={nativeToken?.decimals || 0}
             decimalOpacity={0.45}
             intOpacity={0.45}
-            prefix={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.proxyDeposit') + ': '}
+            prefix={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.proxyDeposit') + ': '}
             size={token.fontSize}
             suffix={nativeToken?.symbol}
             unitOpacity={0.45}
@@ -254,14 +254,14 @@ const Component = (): React.ReactElement<Props> => {
           loading={balanceLoading || loading}
           onClick={onPreCheck(form.submit, ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT)}
         >
-          {t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.addProxy')}
+          {t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.addProxy')}
         </Button>
       </TransactionFooter>
     </>
   );
 };
 
-const AddSubstrateProxy = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const AddSubstrateProxyAccount = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     '.proxy-deposit': {
       fontSize: token.fontSize,
@@ -271,4 +271,4 @@ const AddSubstrateProxy = styled(Component)<Props>(({ theme: { token } }: Props)
   };
 });
 
-export default AddSubstrateProxy;
+export default AddSubstrateProxyAccount;

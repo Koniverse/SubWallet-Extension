@@ -3,7 +3,7 @@
 
 import { ExtrinsicType, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { AddSubstrateProxyParams, CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, RemoveSubstrateProxyParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
+import { AddSubstrateProxyAccountParams, CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, RemoveSubstrateProxyAccountParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
 
 import { ALL_KEY } from './common';
 
@@ -160,14 +160,14 @@ export const DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS: ClaimBridgeParams = {
   notificationId: ''
 };
 
-export const DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS: AddSubstrateProxyParams = {
+export const DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS: AddSubstrateProxyAccountParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
   substrateProxyAddress: '',
   substrateProxyType: 'Any',
   chain: ''
 };
 
-export const DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS: RemoveSubstrateProxyParams = {
+export const DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS: RemoveSubstrateProxyAccountParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
   substrateProxyAddressKeys: []
 };

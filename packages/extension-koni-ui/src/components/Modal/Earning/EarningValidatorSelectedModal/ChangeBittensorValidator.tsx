@@ -60,10 +60,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { checkActive } = useContext(ModalContext);
   const isActive = checkActive(modalId);
 
-  const { alertModal: { close: closeAlert, open: openAlert }, selectProxyAccountModal } = useContext(WalletModalContext);
+  const { alertModal: { close: closeAlert, open: openAlert }, selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
   const { defaultData } = useTransactionContext<ChangeValidatorParams>();
   const { onError, onSuccess } = useHandleSubmitTransaction();
-  const [proxyAccountToSign, setSubstrateProxyAccountsToSign] = useSubstrateProxyAccountsToSign();
+  const [substrateProxyAccountsToSign, setSubstrateProxyAccountsToSign] = useSubstrateProxyAccountsToSign();
   const account = findAccountByAddress(accounts, from);
   const [form] = Form.useForm<ChangeValidatorParams>();
   const originValidator = useWatchTransaction('originValidator', form, defaultData);
@@ -295,10 +295,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           });
         };
 
-        selectProxyAccountModal.open({
+        selectSubstrateProxyAccountModal.open({
           address: from,
           chain: chain,
-          substrateProxyItems: proxyAccountToSign
+          substrateProxyItems: substrateProxyAccountsToSign
         }).then(sendPromise)
           .then(onSuccess)
           .catch((error: TransactionError) => {
@@ -334,7 +334,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
       send(isShowAmountChange ? value : bondedValue);
     },
-    [bondedValue, chain, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, proxyAccountToSign, selectProxyAccountModal, stakingFee, symbol, t]
+    [bondedValue, chain, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, selectSubstrateProxyAccountModal, stakingFee, substrateProxyAccountsToSign, symbol, t]
   );
   const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
 

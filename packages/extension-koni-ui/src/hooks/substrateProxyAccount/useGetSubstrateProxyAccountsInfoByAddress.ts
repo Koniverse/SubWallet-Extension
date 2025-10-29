@@ -7,16 +7,16 @@ import { isSubstrateAddress } from '@subwallet/keyring';
 import { useCallback, useEffect, useState } from 'react';
 
 const DEFAULT_PROXY_ACCOUNTS: SubstrateProxyAccountInfo = {
-  substrateProxies: [],
+  substrateProxyAccounts: [],
   substrateProxyDeposit: '0'
 };
 
 export function useGetSubstrateProxyAccountsInfoByAddress (address: string, chain: string): SubstrateProxyAccountInfo {
-  const [proxies, setProxies] = useState<SubstrateProxyAccountInfo>(DEFAULT_PROXY_ACCOUNTS);
+  const [substrateProxies, setSubstrateProxies] = useState<SubstrateProxyAccountInfo>(DEFAULT_PROXY_ACCOUNTS);
   const fetchProxyData = useCallback(async () => {
     try {
       if (!address || !isSubstrateAddress(address)) {
-        setProxies(DEFAULT_PROXY_ACCOUNTS);
+        setSubstrateProxies(DEFAULT_PROXY_ACCOUNTS);
 
         return;
       }
@@ -28,10 +28,10 @@ export function useGetSubstrateProxyAccountsInfoByAddress (address: string, chai
 
       const proxyInfo = await getSubstrateProxyAccountInfo(request);
 
-      setProxies(proxyInfo);
+      setSubstrateProxies(proxyInfo);
     } catch (e) {
       console.error('Error fetching proxy accounts:', e);
-      setProxies(DEFAULT_PROXY_ACCOUNTS);
+      setSubstrateProxies(DEFAULT_PROXY_ACCOUNTS);
     }
   }, [address, chain]);
 
@@ -39,5 +39,5 @@ export function useGetSubstrateProxyAccountsInfoByAddress (address: string, chai
     fetchProxyData().catch(console.error);
   }, [fetchProxyData]);
 
-  return proxies;
+  return substrateProxies;
 }

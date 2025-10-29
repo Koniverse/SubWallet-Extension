@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BaseRequestSign, InternalRequestSign } from '../../transaction';
-import { SubstrateProxyItem, SubstrateProxyType } from '..';
+import { SubstrateProxyAccountItem, SubstrateProxyType } from '..';
 
 export interface AddSubstrateProxyAccountParams extends BaseRequestSign {
   address: string;
@@ -17,7 +17,7 @@ export type RequestAddSubstrateProxyAccount = InternalRequestSign<AddSubstratePr
 export interface RemoveSubstrateProxyAccountParams extends BaseRequestSign {
   address: string;
   chain: string;
-  selectedSubstrateProxyAccounts: SubstrateProxyItem[]
+  selectedSubstrateProxyAccounts: SubstrateProxyAccountItem[]
   isRemoveAll?: boolean;
 }
 

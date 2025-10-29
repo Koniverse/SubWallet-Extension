@@ -4,7 +4,7 @@
 import { RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types';
 import { AccountProxyAvatar, SubstrateProxyAccountListModal } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
-import { PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
@@ -18,18 +18,17 @@ import styled from 'styled-components';
 import { BaseTransactionConfirmationProps } from './Base';
 
 type Props = BaseTransactionConfirmationProps;
-const modalId = PROXY_ACCOUNT_LIST_MODAL;
+const modalId = SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL;
 
 const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
   const { t } = useTranslation();
   const data = transaction.data as RequestRemoveSubstrateProxyAccount;
   const accountFrom = useGetAccountByAddress(transaction.address);
-  const proxyAccount = useGetAccountByAddress(data.selectedSubstrateProxyAccounts[0]?.substrateProxyAddress);
+  const firstSubstrateProxyAccount = useGetAccountByAddress(data.selectedSubstrateProxyAccounts[0]?.substrateProxyAddress);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const { activeModal } = useContext(ModalContext);
-
-  const proxyAddresses = useMemo<string[]>(() => {
+  const substrateProxyAddresses = useMemo<string[]>(() => {
     return Array.from(
       new Set(
         data.selectedSubstrateProxyAccounts.map((item) => item.substrateProxyAddress)
@@ -76,7 +75,7 @@ const Component: React.FC<Props> = (props: Props) => {
         hasBackgroundWrapper
       >
         {
-          proxyAddresses.length === 1
+          substrateProxyAddresses.length === 1
 
             ? <>
               <MetaInfo.Default
@@ -86,16 +85,18 @@ const Component: React.FC<Props> = (props: Props) => {
                 <AccountProxyAvatar
                   className={'__account-avatar'}
                   size={24}
-                  value={proxyAccount?.proxyId || data.substrateProxyAddress}
+                  value={firstSubstrateProxyAccount?.proxyId || data.substrateProxyAddress}
                 />
-                <div className={'__account-item-label'}>{proxyAccount?.name || toShort(proxyAddresses[0])}</div>
+                <div className={'__account-item-label'}>
+                  {firstSubstrateProxyAccount?.name || toShort(substrateProxyAddresses[0])}
+                </div>
               </MetaInfo.Default>
 
-              {!!proxyAccount?.name && <MetaInfo.Default
+              {!!firstSubstrateProxyAccount?.name && <MetaInfo.Default
                 className={'__address-field'}
                 label={t('Address')}
               >
-                {toShort(proxyAddresses[0])}
+                {toShort(substrateProxyAddresses[0])}
               </MetaInfo.Default>}
             </>
 
@@ -103,10 +104,10 @@ const Component: React.FC<Props> = (props: Props) => {
               className={'proxy-address-removed'}
               label={t('Proxy account')}
             >
-              {proxyAddresses.length} {t('accounts')}
+              {substrateProxyAddresses.length} {t('accounts')}
               <Button
                 className={'proxy-address-removed-info'}
-                icon={ <Icon
+                icon={<Icon
                   className={'proxy-address-remove-detail'}
                   customSize={'20px'}
                   phosphorIcon={Info}
@@ -125,13 +126,13 @@ const Component: React.FC<Props> = (props: Props) => {
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
-      </MetaInfo>
-      <SubstrateProxyAccountListModal proxyAddresses={proxyAddresses} />
+      </MetaInfo>SubstrateProxyAccountListModal
+      <SubstrateProxyAccountListModal substrateProxyAddresses={substrateProxyAddresses} />
     </div>
   );
 };
 
-const RemoveSubstrateProxyTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const RemoveSubstrateProxyAccountTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     '.__account-field .__value': {
       display: 'flex',
@@ -164,4 +165,4 @@ const RemoveSubstrateProxyTransactionConfirmation = styled(Component)<Props>(({ 
   };
 });
 
-export default RemoveSubstrateProxyTransactionConfirmation;
+export default RemoveSubstrateProxyAccountTransactionConfirmation;

@@ -30,4 +30,4 @@ export * from './Common';
 export * from './Announcement';
 export * from './Selector';
 export * from './NotificationDetailModal';
-export * from './SubstrateProxy';
+export * from './SubstrateProxyAccount';

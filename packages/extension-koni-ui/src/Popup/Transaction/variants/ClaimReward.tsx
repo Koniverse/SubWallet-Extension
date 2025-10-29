@@ -90,7 +90,7 @@ const Component = () => {
 
   const [form] = Form.useForm<ClaimRewardParams>();
   const formDefault = useMemo((): ClaimRewardParams => ({ ...defaultData }), [defaultData]);
-  const { selectProxyAccountModal } = useContext(WalletModalContext);
+  const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
   const { chainInfoMap } = useSelector((state) => state.chainStore);
   const { earningRewards, poolInfoMap } = useSelector((state) => state.earning);
@@ -165,13 +165,13 @@ const Component = () => {
 
     const sendPromiseWrapper = async () => {
       if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-        const proxyAddress = await selectProxyAccountModal.open({
+        const substrateProxyAddress = await selectSubstrateProxyAccountModal.open({
           address: from,
           chain,
           substrateProxyItems: substrateProxyAccountsToSign
         });
 
-        return await sendPromise(proxyAddress);
+        return await sendPromise(substrateProxyAddress);
       }
 
       return await sendPromise();
@@ -180,7 +180,7 @@ const Component = () => {
     setTimeout(() => {
       sendPromiseWrapper().catch(onError).finally(() => setLoading(false));
     }, 300);
-  }, [onError, onSuccess, poolInfo.type, substrateProxyAccountsToSign, reward?.unclaimedReward, selectProxyAccountModal]);
+  }, [onError, onSuccess, poolInfo.type, substrateProxyAccountsToSign, reward?.unclaimedReward, selectSubstrateProxyAccountModal]);
 
   const checkAction = usePreCheckAction(fromValue);
 

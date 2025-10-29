@@ -58,7 +58,7 @@ const Component = () => {
   const [form] = Form.useForm<WithdrawParams>();
   const formDefault = useMemo((): WithdrawParams => ({ ...defaultData }), [defaultData]);
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('withdraw');
-  const { selectProxyAccountModal } = useContext(WalletModalContext);
+  const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
   const { chainInfoMap } = useSelector((state) => state.chainStore);
   const { poolInfoMap } = useSelector((state) => state.earning);
@@ -150,13 +150,13 @@ const Component = () => {
 
     const sendPromiseWrapper = async () => {
       if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-        const proxyAddress = await selectProxyAccountModal.open({
+        const substrateProxyAddress = await selectSubstrateProxyAccountModal.open({
           address: values.from,
           chain: values.chain,
           substrateProxyItems: substrateProxyAccountsToSign
         });
 
-        return await sendPromise(proxyAddress);
+        return await sendPromise(substrateProxyAddress);
       }
 
       return await sendPromise();
@@ -169,7 +169,7 @@ const Component = () => {
           setLoading(false);
         });
     }, 300);
-  }, [onError, onSuccess, poolInfo.type, selectProxyAccountModal, substrateProxyAccountsToSign, unstakingInfo]);
+  }, [onError, onSuccess, poolInfo.type, selectSubstrateProxyAccountModal, substrateProxyAccountsToSign, unstakingInfo]);
 
   const onClickSubmit = useCallback((values: WithdrawParams) => {
     if (currentConfirmation) {

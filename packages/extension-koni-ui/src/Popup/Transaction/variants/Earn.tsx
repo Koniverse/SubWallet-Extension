@@ -74,7 +74,7 @@ const Component = () => {
   const [form] = Form.useForm<EarnParams>();
   const formDefault = useMemo((): EarnParams => ({ ...defaultData }), [defaultData]);
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('stake');
-  const { selectProxyAccountModal } = useContext(WalletModalContext);
+  const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
   const fromValue = useWatchTransaction('from', form, defaultData);
   const amountValue = useWatchTransaction('value', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
@@ -583,7 +583,7 @@ const Component = () => {
               let success = false;
 
               if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-                selectProxyAccountModal.open({
+                selectSubstrateProxyAccountModal.open({
                   address: from,
                   chain,
                   substrateProxyItems: substrateProxyAccountsToSign
@@ -655,7 +655,7 @@ const Component = () => {
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, selectProxyAccountModal, setIsDisableHeader, stakingFee, substrateProxyAccountsToSign, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, selectSubstrateProxyAccountModal, setIsDisableHeader, stakingFee, substrateProxyAccountsToSign, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {

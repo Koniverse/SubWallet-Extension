@@ -199,7 +199,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
   const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
 
-  const { selectProxyAccountModal } = useContext(WalletModalContext);
+  const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
 
   const handleWarning = useCallback((warnings: TransactionWarning[]) => {
     if (warnings.some((w) => w.warningType === BasicTxWarningCode.NOT_ENOUGH_EXISTENTIAL_DEPOSIT)) {
@@ -592,7 +592,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           });
 
       return new Promise<SWTransactionResponse>((resolve, reject) => {
-        selectProxyAccountModal
+        selectSubstrateProxyAccountModal
           .open({
             chain,
             address: from,
@@ -610,7 +610,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           .finally(() => setLoading(false));
       });
     },
-    [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, selectProxyAccountModal, substrateProxyAccountsToSign, onError]
+    [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, selectSubstrateProxyAccountModal, substrateProxyAccountsToSign, onError]
   );
 
   // todo: must refactor later, temporary solution to support SnowBridge

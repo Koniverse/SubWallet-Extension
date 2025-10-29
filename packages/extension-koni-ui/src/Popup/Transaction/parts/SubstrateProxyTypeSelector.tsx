@@ -13,12 +13,12 @@ import styled, { useTheme } from 'styled-components';
 
 interface Props extends ThemeProps, BasicInputWrapper {}
 
-interface ProxyTypeExtended {
+interface SubstrateProxyTypeExtended {
   type: SubstrateProxyType;
   label: string;
 }
 
-const ProxyTypeItem: ProxyTypeExtended[] = [
+const substrateProxyTypeItem: SubstrateProxyTypeExtended[] = [
   {
     type: 'Any',
     label: 'Any'
@@ -43,13 +43,13 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
   const { token } = useTheme() as Theme;
   const { onSelect } = useSelectModalInputHelper(props, ref);
 
-  const renderProxyTypeSelected = useCallback((item: ProxyTypeExtended) => {
+  const renderSubstrateProxyTypeSelected = useCallback((item: SubstrateProxyTypeExtended) => {
     return (
       <div className={'__selected-item'}>{item.label}</div>
     );
   }, []);
 
-  const renderItem = useCallback((item: ProxyTypeExtended, selected: boolean) => {
+  const renderItem = useCallback((item: SubstrateProxyTypeExtended, selected: boolean) => {
     return (
       <Web3Block
         className={'__proxy-type-item'}
@@ -76,15 +76,15 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       id={id}
       inputClassName={`${className} proxy-type-selector-input`}
       itemKey={'type'}
-      items={ProxyTypeItem}
+      items={substrateProxyTypeItem}
       label={label}
       onSelect={onSelect}
-      placeholder={placeholder || t('ui.TRANSACTION.screen.Transaction.part.ProxyTypeSelector.selectSubstrateProxyType')}
+      placeholder={placeholder || t('ui.TRANSACTION.screen.Transaction.part.SubstrateProxyTypeSelector.selectSubstrateProxyType')}
       renderItem={renderItem}
-      renderSelected={renderProxyTypeSelected}
+      renderSelected={renderSubstrateProxyTypeSelected}
       selected={value || ''}
       statusHelp={statusHelp}
-      title={title || placeholder || t('ui.TRANSACTION.screen.Transaction.part.ProxyTypeSelector.selectSubstrateProxyType')}
+      title={title || placeholder || t('ui.TRANSACTION.screen.Transaction.part.SubstrateProxyTypeSelector.selectSubstrateProxyType')}
       tooltip={tooltip}
     />
   );

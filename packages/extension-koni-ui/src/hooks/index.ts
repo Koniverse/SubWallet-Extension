@@ -20,4 +20,4 @@ export * from './history';
 export * from './earning';
 export * from './staticContent';
 export * from './browser';
-export * from './proxyAccount';
+export * from './substrateProxyAccount';
