@@ -36,9 +36,9 @@ export default class SubstrateProxyAccountService {
 
     const result = await substrateApi.api.query.proxy.proxies(address);
 
-    const [substrateProxyAccounts, substrateProxyDeposit] = result.toPrimitive() as [PrimitiveSubstrateProxyAccountItem[], string];
+    const [substrateProxyAccounts_, substrateProxyDeposit] = result.toPrimitive() as [PrimitiveSubstrateProxyAccountItem[], string];
 
-    let substrateProxies: SubstrateProxyAccountItem[] = (substrateProxyAccounts || []).map((account) => {
+    let substrateProxyAccounts: SubstrateProxyAccountItem[] = (substrateProxyAccounts_ || []).map((account) => {
       const proxyId = this.state.keyringService.context.belongUnifiedAccount(account.delegate) || reformatAddress(account.delegate);
 
       return {
@@ -52,11 +52,11 @@ export default class SubstrateProxyAccountService {
     if (type) {
       const allowedSet = new Set([...(txTypeToSubstrateProxyMap[type] || []), 'Any']);
 
-      substrateProxies = substrateProxies.filter((p) => allowedSet.has(p.substrateProxyType));
+      substrateProxyAccounts = substrateProxyAccounts.filter((p) => allowedSet.has(p.substrateProxyType));
     }
 
     if (selectedSubstrateProxyAddresses && selectedSubstrateProxyAddresses.length > 0) {
-      substrateProxies = substrateProxies.filter(
+      substrateProxyAccounts = substrateProxyAccounts.filter(
         (p) => !selectedSubstrateProxyAddresses.includes(p.substrateProxyAddress)
       );
     }
@@ -64,7 +64,7 @@ export default class SubstrateProxyAccountService {
     const baseDeposit = substrateApi.api.consts.proxy.proxyDepositBase?.toString() || '0';
 
     return {
-      substrateProxies,
+      substrateProxyAccounts,
       substrateProxyDeposit: new BigN(substrateProxyDeposit).gt(0) ? substrateProxyDeposit.toString() : baseDeposit
     };
   }
@@ -97,7 +97,7 @@ export default class SubstrateProxyAccountService {
       .addProxy(params.substrateProxyAddress, params.substrateProxyType, 0)
       .paymentInfo(address);
 
-    const estimatedFee = new BigN(feeInfo?.partialFee?.toString() || '0');
+    const estimatedFee = new BigN(feeInfo.partialFee.toString());
     const factorDeposit = substrateApi.api.consts.proxy.proxyDepositFactor?.toString() || '0';
 
     const totalRequired = new BigN(substrateProxyDeposit).plus(estimatedFee).plus(factorDeposit);

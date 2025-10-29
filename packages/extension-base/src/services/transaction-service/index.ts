@@ -1138,15 +1138,19 @@ export default class TransactionService {
           substrateProxyAddresses: [substrateProxyAddress]
         });
 
-        const substrateProxyAccount = keyring.getPair(substrateProxyAddress);
+        try {
+          const substrateProxyAccount = keyring.getPair(substrateProxyAddress);
 
-        if (substrateProxyAccount) {
-          substrateProxyHistories.push({
-            ...historyItem,
-            address: substrateProxyAccount.address,
-            direction: TransactionDirection.RECEIVED,
-            substrateProxyAddresses: [substrateProxyAddress]
-          });
+          if (substrateProxyAccount) {
+            substrateProxyHistories.push({
+              ...historyItem,
+              address: substrateProxyAccount.address,
+              direction: TransactionDirection.RECEIVED,
+              substrateProxyAddresses: [substrateProxyAddress]
+            });
+          }
+        } catch (e) {
+          // skip
         }
 
         break;
@@ -1163,15 +1167,19 @@ export default class TransactionService {
             substrateProxyAddresses: [substrateProxyAddress]
           });
 
-          const substrateProxyAccount = keyring.getPair(substrateProxyAddress);
+          try {
+            const substrateProxyAccount = keyring.getPair(substrateProxyAddress);
 
-          if (substrateProxyAccount) {
-            substrateProxyHistories.push({
-              ...historyItem,
-              address: substrateProxyAccount.address,
-              direction: TransactionDirection.RECEIVED,
-              substrateProxyAddresses: [substrateProxyAddress]
-            });
+            if (substrateProxyAccount) {
+              substrateProxyHistories.push({
+                ...historyItem,
+                address: substrateProxyAccount.address,
+                direction: TransactionDirection.RECEIVED,
+                substrateProxyAddresses: [substrateProxyAddress]
+              });
+            }
+          } catch (e) {
+            // skip
           }
         }
 

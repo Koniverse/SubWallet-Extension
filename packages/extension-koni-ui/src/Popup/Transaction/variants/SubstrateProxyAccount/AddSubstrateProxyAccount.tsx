@@ -185,7 +185,7 @@ const Component = (): React.ReactElement<Props> => {
             <ChainSelector
               disabled={!isBalanceReady}
               items={chainItems}
-              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.network')}
+              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.network')}
             />
           </Form.Item>
 
@@ -204,8 +204,8 @@ const Component = (): React.ReactElement<Props> => {
               actionType={ActionType.SUBSTRATE_PROXY_ACCOUNT}
               chainSlug={chainValue}
               dropdownHeight={227}
-              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.substrateProxyAccount')}
-              placeholder={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.enterAddress')}
+              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.substrateProxyAccount')}
+              placeholder={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.enterAddress')}
               saveAddress={true}
               showAddressBook={true}
               showScanner={true}
@@ -223,7 +223,7 @@ const Component = (): React.ReactElement<Props> => {
             validateTrigger={false}
           >
             <SubstrateProxyTypeSelector
-              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.proxyType')}
+              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.proxyType')}
             />
           </Form.Item>
         </Form>
@@ -232,7 +232,7 @@ const Component = (): React.ReactElement<Props> => {
             decimal={nativeToken?.decimals || 0}
             decimalOpacity={0.45}
             intOpacity={0.45}
-            prefix={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.proxyDeposit') + ': '}
+            prefix={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.proxyDeposit') + ': '}
             size={token.fontSize}
             suffix={nativeToken?.symbol}
             unitOpacity={0.45}
@@ -254,7 +254,7 @@ const Component = (): React.ReactElement<Props> => {
           loading={balanceLoading || loading}
           onClick={onPreCheck(form.submit, ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT)}
         >
-          {t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.addProxy')}
+          {t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.addProxy')}
         </Button>
       </TransactionFooter>
     </>
