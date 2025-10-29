@@ -74,7 +74,17 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return collectionInfo ? getNftsByCollection(collectionInfo) : [];
   }, [collectionInfo, getNftsByCollection]);
 
-  const ownerAddress = nftList.find((item) => !!item.owner)?.owner;
+  const ownerAddresses = useMemo(() => {
+    const ownerSet = new Set<string>();
+
+    for (const item of nftList) {
+      if (item.owner) {
+        ownerSet.add(item.owner);
+      }
+    }
+
+    return Array.from(ownerSet);
+  }, [nftList]);
 
   const originAssetInfo = useGetChainAssetInfo(collectionInfo?.originAsset);
 
@@ -169,29 +179,25 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       return;
     }
 
-    const isNeedGetFullList = (nftList.length < (collectionInfo?.itemCount ?? 0));
+    const chainInfo = chainInfoMap[collectionInfo?.chain];
 
-    if (isNeedGetFullList) {
-      const chainInfo = chainInfoMap[collectionInfo?.chain];
-
-      if (!chainInfo) {
-        return;
-      }
-
-      setIsFetching(true);
-      getFullNftList({ contractAddress: collectionInfo?.collectionId, owner: ownerAddress || '', chainInfo: chainInfo })
-        .catch(console.error)
-        .finally(() => {
-          if (isMounted) {
-            setIsFetching(false);
-          }
-        });
+    if (!chainInfo || ownerAddresses.length === 0) {
+      return;
     }
+
+    setIsFetching(true);
+    getFullNftList({ contractAddress: collectionInfo?.collectionId, owner: ownerAddresses, chainInfo: chainInfo })
+      .catch(console.error)
+      .finally(() => {
+        if (isMounted) {
+          setIsFetching(false);
+        }
+      });
 
     return () => {
       isMounted = false;
     };
-  }, [chainInfoMap, collectionInfo, isFetching, nftList.length, ownerAddress]);
+  }, [chainInfoMap, collectionInfo, isFetching, nftList.length, ownerAddresses]);
 
   return (
     <PageWrapper

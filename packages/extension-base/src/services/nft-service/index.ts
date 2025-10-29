@@ -202,21 +202,29 @@ export default class NftService {
         return false;
       }
 
-      const instances = await nftDetectionApi.getAllNftInstances(
-        contractAddress,
-        owner,
-        chainId.toString()
-      );
+      const ownerList = Array.isArray(owner) ? owner : [owner];
 
-      if (!Array.isArray(instances)) {
-        return false;
+      for (const eachOwner of ownerList) {
+        try {
+          const instances = await nftDetectionApi.getAllNftInstances(
+            contractAddress,
+            eachOwner,
+            chainId.toString()
+          );
+
+          if (!Array.isArray(instances)) {
+            continue;
+          }
+
+          const nftList = instances.map((inst) =>
+            mapSdkToNftItem(inst, chainInfo.slug, contractAddress, eachOwner)
+          );
+
+          await this.state.handleDetectedNfts(eachOwner, nftList);
+        } catch (innerErr) {
+          console.warn(`[NftService] getAllNftInstances failed for ${eachOwner}`, innerErr);
+        }
       }
-
-      const nftList = instances.map((inst) =>
-        mapSdkToNftItem(inst, chainInfo.slug, contractAddress, owner)
-      );
-
-      await this.state.handleDetectedNfts(owner, nftList);
 
       return true;
     } catch (err) {
