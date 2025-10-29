@@ -97,7 +97,7 @@ export default class SubstrateProxyAccountService {
       .addProxy(params.substrateProxyAddress, params.substrateProxyType, 0)
       .paymentInfo(address);
 
-    const estimatedFee = new BigN(feeInfo?.partialFee?.toString() || '0');
+    const estimatedFee = new BigN(feeInfo.partialFee.toString());
     const factorDeposit = substrateApi.api.consts.proxy.proxyDepositFactor?.toString() || '0';
 
     const totalRequired = new BigN(substrateProxyDeposit).plus(estimatedFee).plus(factorDeposit);
