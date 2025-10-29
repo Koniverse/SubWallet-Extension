@@ -3,7 +3,7 @@
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData } from '@subwallet/extension-base/background/KoniTypes';
-import { _SUPPORT_TOKEN_PAY_FEE_GROUP } from '@subwallet/extension-base/constants';
+import { _SUPPORT_TOKEN_PAY_FEE_GROUP, XCM_FEE_RATIO } from '@subwallet/extension-base/constants';
 import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { DEFAULT_CARDANO_TTL_OFFSET } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/consts';
 import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
@@ -548,10 +548,10 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     if (!_isNativeToken(srcToken)) { // xcm local token & pay native token or other local token as fee
       maxTransferable = bnFreeBalance;
     } else { // xcm native token & pay native token as fee
-      // const maxTransferableBySW = bnFreeBalance.minus(BigN(estimatedFee).multipliedBy(XCM_FEE_RATIO));
+      const maxTransferableBySW = bnFreeBalance.minus(BigN(estimatedFee).multipliedBy(XCM_FEE_RATIO));
       const maxTransferableByPS = await getMaxXcmTransferableAmount(params);
 
-      maxTransferable = new BigN(maxTransferableByPS);
+      maxTransferable = new BigN(maxTransferableByPS ?? maxTransferableBySW);
     }
   }
 

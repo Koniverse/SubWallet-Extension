@@ -1841,8 +1841,11 @@ export default class KoniExtension {
 
           isSendingTokenSufficient = await _isSufficientToken(destinationTokenInfo, substrateApi, sufficientChain);
 
-          // todo: recheck case cannot get min xcm
           const minXcmTransferableAmount = await getMinXcmTransferableAmount(params);
+
+          if (!minXcmTransferableAmount) {
+            inputTransaction.errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Missing XCM min transferable amount.')));
+          }
 
           const [warning, error] = additionalValidateTransferForRecipient(
             destinationTokenInfo,

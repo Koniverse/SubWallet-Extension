@@ -166,19 +166,19 @@ export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
   }
 };
 
-export const getMaxXcmTransferableAmount = async (request: CreateXcmExtrinsicProps): Promise<string> => {
+export const getMaxXcmTransferableAmount = async (request: CreateXcmExtrinsicProps): Promise<string | undefined> => {
   try {
     return await fetchMaxXcmTransferableAmount(request);
   } catch (e) {
-    throw new Error('Missing max xcm transferable amount');
+    return undefined;
   }
 };
 
-export const getMinXcmTransferableAmount = async (request: CreateXcmExtrinsicProps): Promise<string> => {
+export const getMinXcmTransferableAmount = async (request: CreateXcmExtrinsicProps): Promise<string | undefined> => {
   try {
     return await fetchMinXcmTransferableAmount(request);
   } catch (e) {
-    throw new Error('Missing min xcm transferable amount');
+    return undefined;
   }
 };
 
