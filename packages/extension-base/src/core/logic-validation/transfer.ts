@@ -79,7 +79,7 @@ export function additionalValidateTransferForRecipient (
   // const enoughAmountForXCM = extrinsicType === ExtrinsicType.TRANSFER_XCM ? new BigN(transferAmount.toString()).gte(minXcmTransferableAmount) : true;
 
   if (extrinsicType === ExtrinsicType.TRANSFER_XCM) {
-    if (minXcmTransferableAmount && new BigN(transferAmount.toString()).gte(minXcmTransferableAmount)) {
+    if (minXcmTransferableAmount && new BigN(transferAmount.toString()).lt(minXcmTransferableAmount)) {
       const minXcmTransferableAmountStr = formatNumber(minXcmTransferableAmount.toString(), _getAssetDecimals(sendingTokenInfo), balanceFormatter, { maxNumberFormat: _getAssetDecimals(sendingTokenInfo) || 6 });
 
       const error = new TransactionError(
