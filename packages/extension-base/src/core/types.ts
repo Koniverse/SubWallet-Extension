@@ -22,7 +22,7 @@ export enum ActionType {
   SEND_FUND = 'SEND_FUND',
   SEND_NFT = 'SEND_NFT',
   SWAP = 'SWAP',
-  SUBSTRATE_PROXY = 'SUBSTRATE_PROXY'
+  SUBSTRATE_PROXY_ACCOUNT = 'SUBSTRATE_PROXY_ACCOUNT'
 }
 
 export interface ValidateRecipientParams {

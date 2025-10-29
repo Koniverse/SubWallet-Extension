@@ -4,20 +4,20 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
-import { AddSubstrateProxyParams, RemoveSubstrateProxyParams, RequestGetSubstrateProxyAccounts, SubstrateProxyAccounts, SubstrateProxyItem, SubstrateProxyType } from '@subwallet/extension-base/types/substrate-proxy';
+import { AddSubstrateProxyAccountParams, RemoveSubstrateProxyAccountParams, RequestGetSubstrateProxyAccountInfo, SubstrateProxyAccountInfo, SubstrateProxyItem, SubstrateProxyType } from '@subwallet/extension-base/types/substrate-proxy';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 import { _SubstrateApi } from '../chain-service/types';
 import { txTypeToSubstrateProxyMap } from './constant';
 
-type PrimitiveProxyItem = {
+type PrimitiveSubstrateProxyAccountItem = {
   delegate: string;
-  proxyType: SubstrateProxyType;
+  proxyType: SubstrateProxyType; // type of proxy retrieved from on-chain data
   delay: number;
 };
 
-export default class SubstrateProxyService {
+export default class SubstrateProxyAccountService {
   protected readonly state: KoniState;
 
   constructor (state: KoniState) {
@@ -28,15 +28,15 @@ export default class SubstrateProxyService {
     return this.state.getSubstrateApi(chain);
   }
 
-  async getSubstrateProxyAccounts (request: RequestGetSubstrateProxyAccounts): Promise<SubstrateProxyAccounts> {
-    const { address, chain, selectedSubstrateProxyAddress, type } = request;
+  async getSubstrateProxyAccountInfo (request: RequestGetSubstrateProxyAccountInfo): Promise<SubstrateProxyAccountInfo> {
+    const { address, chain, selectedSubstrateProxyAddresses, type } = request;
     const substrateApi = this.getSubstrateApi(chain);
 
     await substrateApi.isReady;
 
     const result = await substrateApi.api.query.proxy.proxies(address);
 
-    const [substrateProxyAccounts, proxyDeposit] = result.toPrimitive() as [PrimitiveProxyItem[], string];
+    const [substrateProxyAccounts, substrateProxyDeposit] = result.toPrimitive() as [PrimitiveSubstrateProxyAccountItem[], string];
 
     let substrateProxies: SubstrateProxyItem[] = (substrateProxyAccounts || []).map((account) => {
       const proxyId = this.state.keyringService.context.belongUnifiedAccount(account.delegate) || reformatAddress(account.delegate);
@@ -55,9 +55,9 @@ export default class SubstrateProxyService {
       substrateProxies = substrateProxies.filter((p) => allowedSet.has(p.substrateProxyType));
     }
 
-    if (selectedSubstrateProxyAddress && selectedSubstrateProxyAddress.length > 0) {
+    if (selectedSubstrateProxyAddresses && selectedSubstrateProxyAddresses.length > 0) {
       substrateProxies = substrateProxies.filter(
-        (p) => !selectedSubstrateProxyAddress.includes(p.substrateProxyAddress)
+        (p) => !selectedSubstrateProxyAddresses.includes(p.substrateProxyAddress)
       );
     }
 
@@ -65,11 +65,11 @@ export default class SubstrateProxyService {
 
     return {
       substrateProxies,
-      substrateProxyDeposit: new BigN(proxyDeposit).gt(0) ? proxyDeposit.toString() : baseDeposit
+      substrateProxyDeposit: new BigN(substrateProxyDeposit).gt(0) ? substrateProxyDeposit.toString() : baseDeposit
     };
   }
 
-  async addSubstrateProxyAccounts (data: AddSubstrateProxyParams): Promise<TransactionData> {
+  async addSubstrateProxyAccounts (data: AddSubstrateProxyAccountParams): Promise<TransactionData> {
     const { address, chain, substrateProxyAddress, substrateProxyType } = data;
 
     if (address === substrateProxyAddress) {
@@ -84,7 +84,7 @@ export default class SubstrateProxyService {
     return substrateApi.api.tx.proxy.addProxy(substrateProxyAddress, substrateProxyType, 0);
   }
 
-  public async validateAddSubstrateProxy (params: AddSubstrateProxyParams): Promise<TransactionError[]> {
+  public async validateAddSubstrateProxyAccount (params: AddSubstrateProxyAccountParams): Promise<TransactionError[]> {
     const { address, chain, substrateProxyDeposit } = params;
 
     const substrateApi = this.getSubstrateApi(chain);
@@ -111,7 +111,7 @@ export default class SubstrateProxyService {
     return errors;
   }
 
-  async removeSubstrateProxyAccounts (data: RemoveSubstrateProxyParams): Promise<TransactionData> {
+  async removeSubstrateProxyAccounts (data: RemoveSubstrateProxyAccountParams): Promise<TransactionData> {
     const { chain, isRemoveAll, selectedSubstrateProxyAccounts } = data;
 
     const substrateApi = this.getSubstrateApi(chain);

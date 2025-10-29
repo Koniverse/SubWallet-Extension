@@ -34,8 +34,8 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const senderLabel = useMemo(() => {
     switch (data.type) {
-      case ExtrinsicType.ADD_SUBSTRATE_PROXY:
-      case ExtrinsicType.REMOVE_SUBSTRATE_PROXY:
+      case ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT:
+      case ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT:
         return t('ui.HISTORY.screen.HistoryDetail.Header.fromAccount');
       default:
         return undefined;

@@ -1,17 +1,17 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RequestAddSubstrateProxy, RequestGetSubstrateProxyAccounts, RequestRemoveSubstrateProxy } from '@subwallet/extension-base/types';
+import { RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountInfo, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types';
 import { sendMessage } from '@subwallet/extension-koni-ui/messaging';
 
-export async function getSubstrateProxyAccounts (request: RequestGetSubstrateProxyAccounts) {
-  return sendMessage('pri(proxy.getSubstrateProxyAccounts)', request);
+export async function getSubstrateProxyAccountInfo (request: RequestGetSubstrateProxyAccountInfo) {
+  return sendMessage('pri(substrateProxyAccount.geInfo)', request);
 }
 
-export async function handleAddSubstrateProxy (request: RequestAddSubstrateProxy) {
-  return sendMessage('pri(proxy.addSubstrateProxy)', request);
+export async function handleAddSubstrateProxyAccount (request: RequestAddSubstrateProxyAccount) {
+  return sendMessage('pri(substrateProxyAccount.add)', request);
 }
 
-export async function handleRemoveSubstrateProxy (request: RequestRemoveSubstrateProxy) {
-  return sendMessage('pri(proxy.removeSubstrateProxy)', request);
+export async function handleRemoveSubstrateProxyAccount (request: RequestRemoveSubstrateProxyAccount) {
+  return sendMessage('pri(substrateProxyAccount.remove)', request);
 }

@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountChainType, AccountSignMode, RequestGetSubstrateProxyAccounts, SubstrateProxyItem } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountSignMode, RequestGetSubstrateProxyAccountInfo, SubstrateProxyItem } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { getSubstrateProxyAccounts } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { getSubstrateProxyAccountInfo } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { isSubstrateAddress } from '@subwallet/keyring';
 import { useCallback, useState } from 'react';
@@ -24,14 +24,14 @@ export function useSubstrateProxyAccountsToSign (): [SubstrateProxyItem[], SetSu
         return;
       }
 
-      const request: RequestGetSubstrateProxyAccounts = {
+      const request: RequestGetSubstrateProxyAccountInfo = {
         chain,
         address,
         type,
-        selectedSubstrateProxyAddress
+        selectedSubstrateProxyAddresses: selectedSubstrateProxyAddress
       };
 
-      const proxyAccounts = await getSubstrateProxyAccounts(request);
+      const proxyAccounts = await getSubstrateProxyAccountInfo(request);
 
       if (!proxyAccounts?.substrateProxies?.length) {
         setProxies([]);

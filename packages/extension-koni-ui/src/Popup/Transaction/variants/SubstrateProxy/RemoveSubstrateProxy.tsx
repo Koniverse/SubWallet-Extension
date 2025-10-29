@@ -8,7 +8,7 @@ import { PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useGetAccountProxyByAddress, useGetNativeTokenSlug, useHandleSubmitTransaction, usePreCheckAction, useSetCurrentPage, useTransactionContext } from '@subwallet/extension-koni-ui/hooks';
 import { useGetSubstrateProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/proxyAccount/useGetSubstrateProxyAccountsInfoByAddress';
-import { handleRemoveSubstrateProxy } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { handleRemoveSubstrateProxyAccount } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { RemoveSubstrateProxyParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
@@ -29,7 +29,7 @@ interface ProxyAddressRemovedState {
   addressUnique: string[];
 }
 
-const extrinsicType = ExtrinsicType.REMOVE_SUBSTRATE_PROXY;
+const extrinsicType = ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT;
 
 const Component = ({ className }: Props): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/remove-proxy');
@@ -79,7 +79,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
 
   const onClickSubmit = useCallback(() => {
     const sendPromise = (substrateProxyAddress?: string) => {
-      return handleRemoveSubstrateProxy({
+      return handleRemoveSubstrateProxyAccount({
         chain,
         address: from,
         selectedSubstrateProxyAccounts: proxyAddressRemovedFiltered.keyUnique,

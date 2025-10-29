@@ -378,9 +378,9 @@ const Component = function ({ className }: Props) {
           return t('ui.Confirmations.swapConfirmation');
         case ExtrinsicType.CLAIM_BRIDGE:
           return t('ui.Confirmations.claimConfirmation');
-        case ExtrinsicType.ADD_SUBSTRATE_PROXY:
+        case ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT:
           return t('ui.Confirmations.addSubstrateProxyConfirmation');
-        case ExtrinsicType.REMOVE_SUBSTRATE_PROXY:
+        case ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT:
           return t('ui.Confirmations.removeSubstrateProxyConfirmation');
         case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.EVM_EXECUTE:

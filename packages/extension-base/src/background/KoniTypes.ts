@@ -39,7 +39,7 @@ import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
 import { EarningImpactResult } from '../services/earning-service/handlers/native-staking/dtao';
-import { RequestAddSubstrateProxy, RequestGetSubstrateProxyAccounts, RequestRemoveSubstrateProxy, SubstrateProxyAccounts } from '../types/substrate-proxy';
+import { RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountInfo, RequestRemoveSubstrateProxyAccount, SubstrateProxyAccountInfo } from '../types/substrate-proxy';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -582,8 +582,8 @@ export enum ExtrinsicType {
 
   EVM_EXECUTE = 'evm.execute',
 
-  ADD_SUBSTRATE_PROXY = 'proxy.add_substrate_proxy',
-  REMOVE_SUBSTRATE_PROXY = 'proxy.remove_substrate_proxy',
+  ADD_SUBSTRATE_PROXY_ACCOUNT = 'substrateProxyAccount.add',
+  REMOVE_SUBSTRATE_PROXY_ACCOUNT = 'substrateProxyAccount.remove',
 
   UNKNOWN = 'unknown'
 }
@@ -642,8 +642,8 @@ export interface ExtrinsicDataTypeMap {
   [ExtrinsicType.CROWDLOAN]: any,
   [ExtrinsicType.SWAP]: SwapTxData,
 
-  [ExtrinsicType.ADD_SUBSTRATE_PROXY]: RequestAddSubstrateProxy,
-  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY]: RequestRemoveSubstrateProxy,
+  [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: RequestAddSubstrateProxyAccount,
+  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: RequestRemoveSubstrateProxyAccount,
 
   [ExtrinsicType.UNKNOWN]: any
 }
@@ -776,7 +776,7 @@ export interface TransactionHistoryItem<ET extends ExtrinsicType = ExtrinsicType
   addressPrefix?: number,
   processId?: string;
   apiTxIndex?: number;
-  substrateProxyAddress?: string[];
+  substrateProxyAddresses?: string[];
 }
 
 export interface SWWarning {
@@ -2764,9 +2764,9 @@ export interface KoniRequestSignatures {
   'pri(migrate.pingSession)': [RequestPingSession, boolean];
 
   /* Proxy Account */
-  'pri(proxy.getSubstrateProxyAccounts)': [RequestGetSubstrateProxyAccounts, SubstrateProxyAccounts];
-  'pri(proxy.addSubstrateProxy)': [RequestAddSubstrateProxy, SWTransactionResponse];
-  'pri(proxy.removeSubstrateProxy)': [RequestRemoveSubstrateProxy, SWTransactionResponse];
+  'pri(substrateProxyAccount.geInfo)': [RequestGetSubstrateProxyAccountInfo, SubstrateProxyAccountInfo];
+  'pri(substrateProxyAccount.add)': [RequestAddSubstrateProxyAccount, SWTransactionResponse];
+  'pri(substrateProxyAccount.remove)': [RequestRemoveSubstrateProxyAccount, SWTransactionResponse];
 
 }
 

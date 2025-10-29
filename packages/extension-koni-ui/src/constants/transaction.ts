@@ -56,8 +56,8 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
 
   [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: detectTranslate('ui.TRANSACTION.constant.transaction.tokenApprove'),
   [ExtrinsicType.SWAP]: detectTranslate('ui.TRANSACTION.constant.transaction.swap'),
-  [ExtrinsicType.ADD_SUBSTRATE_PROXY]: detectTranslate('Add proxy'),
-  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY]: detectTranslate('Remove proxy')
+  [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('Add proxy'),
+  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('Remove proxy')
 };
 
 export const ALL_STAKING_ACTIONS: ExtrinsicType[] = [
@@ -160,14 +160,14 @@ export const DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS: ClaimBridgeParams = {
   notificationId: ''
 };
 
-export const DEFAULT_ADD_SUBSTRATE_PROXY_PARAMS: AddSubstrateProxyParams = {
+export const DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS: AddSubstrateProxyParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
   substrateProxyAddress: '',
   substrateProxyType: 'Any',
   chain: ''
 };
 
-export const DEFAULT_REMOVE_SUBSTRATE_PROXY_PARAMS: RemoveSubstrateProxyParams = {
+export const DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS: RemoveSubstrateProxyParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
   substrateProxyAddressKeys: []
 };

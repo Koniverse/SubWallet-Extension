@@ -41,7 +41,7 @@ import { AuthUrls, MetaRequest, SignRequest } from '@subwallet/extension-base/se
 import SettingService from '@subwallet/extension-base/services/setting-service/SettingService';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SubscanService } from '@subwallet/extension-base/services/subscan-service';
-import SubstrateProxyService from '@subwallet/extension-base/services/substrate-proxy-service';
+import SubstrateProxyAccountService from '@subwallet/extension-base/services/substrate-proxy-service';
 import { SwapService } from '@subwallet/extension-base/services/swap-service';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { TransactionEventResponse } from '@subwallet/extension-base/services/transaction-service/types';
@@ -142,7 +142,7 @@ export default class KoniState {
   readonly swapService: SwapService;
   readonly inappNotificationService: InappNotificationService;
   readonly chainOnlineService: ChainOnlineService;
-  readonly substrateProxyService: SubstrateProxyService;
+  readonly substrateProxyAccountService: SubstrateProxyAccountService;
 
   // Handle the general status of the extension
   private generalStatus: ServiceStatus = ServiceStatus.INITIALIZING;
@@ -181,7 +181,7 @@ export default class KoniState {
     this.swapService = new SwapService(this);
     this.inappNotificationService = new InappNotificationService(this.dbService, this.keyringService, this.eventService, this.chainService);
     this.chainOnlineService = new ChainOnlineService(this.chainService, this.settingService, this.eventService, this.dbService);
-    this.substrateProxyService = new SubstrateProxyService(this);
+    this.substrateProxyAccountService = new SubstrateProxyAccountService(this);
 
     this.subscription = new KoniSubscription(this, this.dbService);
     this.cron = new KoniCron(this, this.subscription, this.dbService);

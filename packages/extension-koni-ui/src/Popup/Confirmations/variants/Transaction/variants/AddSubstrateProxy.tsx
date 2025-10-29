@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RequestAddSubstrateProxy } from '@subwallet/extension-base/types';
+import { RequestAddSubstrateProxyAccount } from '@subwallet/extension-base/types';
 import { AccountProxyAvatar } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
@@ -19,7 +19,7 @@ type Props = BaseTransactionConfirmationProps;
 const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
   const { t } = useTranslation();
-  const data = transaction.data as RequestAddSubstrateProxy;
+  const data = transaction.data as RequestAddSubstrateProxyAccount;
   const accountFrom = useGetAccountByAddress(transaction.address);
   const proxyAccount = useGetAccountByAddress(data.substrateProxyAddress);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);

@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RequestRemoveSubstrateProxy } from '@subwallet/extension-base/types';
+import { RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types';
 import { AccountProxyAvatar, SubstrateProxyAccountListModal } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -23,7 +23,7 @@ const modalId = PROXY_ACCOUNT_LIST_MODAL;
 const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
   const { t } = useTranslation();
-  const data = transaction.data as RequestRemoveSubstrateProxy;
+  const data = transaction.data as RequestRemoveSubstrateProxyAccount;
   const accountFrom = useGetAccountByAddress(transaction.address);
   const proxyAccount = useGetAccountByAddress(data.selectedSubstrateProxyAccounts[0]?.substrateProxyAddress);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);

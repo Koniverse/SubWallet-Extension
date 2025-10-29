@@ -3,11 +3,11 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 
-export interface RequestGetSubstrateProxyAccounts {
+export interface RequestGetSubstrateProxyAccountInfo {
   chain: string;
   address: string;
   type?: ExtrinsicType
-  selectedSubstrateProxyAddress?: string[]
+  selectedSubstrateProxyAddresses?: string[]
 }
 
 export type SubstrateProxyType = 'Any' | 'NonTransfer' | 'Governance' | 'Staking';
@@ -16,10 +16,10 @@ export interface SubstrateProxyItem {
   substrateProxyAddress: string;
   substrateProxyType: SubstrateProxyType
   delay: number;
-  proxyId?: string;
+  proxyId?: string; // proxyId is the ID of the account proxy (including solo and unified accounts) managed in this wallet.
 }
 
-export interface SubstrateProxyAccounts {
+export interface SubstrateProxyAccountInfo {
   substrateProxies: SubstrateProxyItem[];
   substrateProxyDeposit: string;
 }

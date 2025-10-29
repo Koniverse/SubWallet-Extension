@@ -4,9 +4,9 @@
 import { UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS } from '@subwallet/extension-base/services/substrate-proxy-service/constant';
 import { AccountProxy, AccountProxyType, SubstrateProxyItem, SubstrateProxyType } from '@subwallet/extension-base/types';
 import { BasicInputEvent, ChainSelector, EmptyList, ProxyItemExtended, SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
-import { ADD_SUBSTRATE_PROXY_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_PARAMS } from '@subwallet/extension-koni-ui/constants';
+import { ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS } from '@subwallet/extension-koni-ui/constants';
 import { useChainChecker, useCreateGetChainAndExcludedTokenByAccountProxy, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { getSubstrateProxyAccounts } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { getSubstrateProxyAccountInfo } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { AddSubstrateProxyParams, ChainItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -26,19 +26,19 @@ export interface ProxyItemSelector extends ProxyItemExtended {
 type Props = ThemeProps & {
   accountProxy: AccountProxy;
   address: string;
-  setProxyAccountsSelected: Dispatch<SetStateAction<Record<string, ProxyItemSelector>>>;
-  proxyAccountsSelected: Record<string, ProxyItemSelector>;
+  setSubstrateProxyAccountsSelected: Dispatch<SetStateAction<Record<string, ProxyItemSelector>>>;
+  substrateProxyAccountsSelected: Record<string, ProxyItemSelector>;
   setNetworkSelected: Dispatch<SetStateAction<string | undefined>>;
   networkSelected?: string;
 };
 
 const getKey = (address: string, proxyType: SubstrateProxyType) => proxyType + ':' + address;
 
-function Component ({ accountProxy, address: addressFormated, className, networkSelected, proxyAccountsSelected, setNetworkSelected, setProxyAccountsSelected }: Props) {
+function Component ({ accountProxy, address: addressFormated, className, networkSelected, setNetworkSelected, setSubstrateProxyAccountsSelected, substrateProxyAccountsSelected }: Props) {
   const { t } = useTranslation();
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
-  const [, setAddProxyParamsStorage] = useLocalStorage<AddSubstrateProxyParams>(ADD_SUBSTRATE_PROXY_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_PARAMS);
+  const [, setAddSubstrateProxyParamsStorage] = useLocalStorage<AddSubstrateProxyParams>(ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS);
   const navigate = useNavigate();
   const checkChain = useChainChecker();
   const [loading, setLoading] = useState(false);
@@ -66,8 +66,8 @@ function Component ({ accountProxy, address: addressFormated, className, network
     return result;
   }, [allowedChains, chainInfoMap]);
 
-  const proxyAccountSelectedSorted = useMemo<ProxyItemSelector[]>(() => {
-    const list = Object.values(proxyAccountsSelected);
+  const substrateProxyAccountSelectedSorted = useMemo<ProxyItemSelector[]>(() => {
+    const list = Object.values(substrateProxyAccountsSelected);
 
     return list.sort((a, b) => {
       const aInProxyIdSet = proxyIdSet.has(a.proxyId || '') ? 1 : 0;
@@ -75,21 +75,21 @@ function Component ({ accountProxy, address: addressFormated, className, network
 
       return bInProxyIdSet - aInProxyIdSet;
     });
-  }, [proxyAccountsSelected, proxyIdSet]);
+  }, [substrateProxyAccountsSelected, proxyIdSet]);
 
-  const onAddProxyAccount = useCallback(() => {
+  const onAddSubstrateProxyAccount = useCallback(() => {
     if (!addressFormated || !networkSelected) {
       return;
     }
 
-    setAddProxyParamsStorage({
-      ...DEFAULT_ADD_SUBSTRATE_PROXY_PARAMS,
+    setAddSubstrateProxyParamsStorage({
+      ...DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS,
       chain: networkSelected,
       from: addressFormated
     });
 
     navigate('/transaction/add-proxy');
-  }, [addressFormated, navigate, networkSelected, setAddProxyParamsStorage]);
+  }, [addressFormated, navigate, networkSelected, setAddSubstrateProxyParamsStorage]);
 
   const renderEmpty = useCallback(() => {
     return (
@@ -110,7 +110,7 @@ function Component ({ accountProxy, address: addressFormated, className, network
               weight='fill'
             />
           )}
-          onClick={onAddProxyAccount}
+          onClick={onAddSubstrateProxyAccount}
           schema='primary'
           shape={'round'}
         >
@@ -119,19 +119,19 @@ function Component ({ accountProxy, address: addressFormated, className, network
       </div>
 
     );
-  }, [accountProxy.accountType, onAddProxyAccount, t]);
+  }, [accountProxy.accountType, onAddSubstrateProxyAccount, t]);
 
-  const onSelectProxyAccount = useCallback((item: SubstrateProxyItem) => {
+  const onSelectSubstrateProxyAccount = useCallback((item: SubstrateProxyItem) => {
     return () => {
       const key = getKey(item.substrateProxyAddress, item.substrateProxyType);
 
-      setProxyAccountsSelected((prev) =>
+      setSubstrateProxyAccountsSelected((prev) =>
         (
           { ...prev, [key]: { ...item, isSelected: !prev[key]?.isSelected } }
         )
       );
     };
-  }, [setProxyAccountsSelected]);
+  }, [setSubstrateProxyAccountsSelected]);
 
   const renderItem = useCallback(
     (item: SubstrateProxyItem) => {
@@ -140,16 +140,16 @@ function Component ({ accountProxy, address: addressFormated, className, network
       return (
         <SubstrateProxyAccountSelectorItem
           className={'__proxy-account-item'}
-          isSelected={!!proxyAccountsSelected[key]?.isSelected}
+          isSelected={!!substrateProxyAccountsSelected[key]?.isSelected}
           key={key}
-          onClick={onSelectProxyAccount(item)}
+          onClick={onSelectSubstrateProxyAccount(item)}
           proxyAccount={item}
           showCheckedIcon={accountProxy.accountType !== AccountProxyType.READ_ONLY}
           showUnselectIcon
         />
       );
     },
-    [accountProxy.accountType, onSelectProxyAccount, proxyAccountsSelected]);
+    [accountProxy.accountType, onSelectSubstrateProxyAccount, substrateProxyAccountsSelected]);
 
   const onSelectNetwork = useCallback((event: BasicInputEvent) => {
     const newNetworkSelected = event.target.value;
@@ -158,7 +158,7 @@ function Component ({ accountProxy, address: addressFormated, className, network
       (prevState) => {
         if (prevState !== newNetworkSelected) {
           checkChain(newNetworkSelected);
-          setProxyAccountsSelected({});
+          setSubstrateProxyAccountsSelected({});
 
           return newNetworkSelected;
         }
@@ -166,17 +166,17 @@ function Component ({ accountProxy, address: addressFormated, className, network
         return prevState;
       }
     );
-  }, [checkChain, setNetworkSelected, setProxyAccountsSelected]);
+  }, [checkChain, setNetworkSelected, setSubstrateProxyAccountsSelected]);
 
   useEffect(() => {
     if (addressFormated && networkSelected) {
       setLoading(true);
-      getSubstrateProxyAccounts({
+      getSubstrateProxyAccountInfo({
         chain: networkSelected,
         address: addressFormated
       })
         .then(({ substrateProxies }) => {
-          setProxyAccountsSelected((prev) => {
+          setSubstrateProxyAccountsSelected((prev) => {
             const newSelected: Record<string, ProxyItemSelector> = {};
 
             substrateProxies.forEach((p) => {
@@ -191,7 +191,7 @@ function Component ({ accountProxy, address: addressFormated, className, network
         .catch(console.error)
         .finally(() => setLoading(false));
     }
-  }, [addressFormated, networkSelected, setProxyAccountsSelected]);
+  }, [addressFormated, networkSelected, setSubstrateProxyAccountsSelected]);
 
   useEffect(() => {
     if (!networkSelected && chainItems[0]?.slug) {
@@ -215,7 +215,7 @@ function Component ({ accountProxy, address: addressFormated, className, network
         : <SwList.Section
           className={CN('__proxy-account-list')}
           gap={token.sizeXL}
-          list={proxyAccountSelectedSorted}
+          list={substrateProxyAccountSelectedSorted}
           renderItem={renderItem}
           renderWhenEmpty={renderEmpty}
         />

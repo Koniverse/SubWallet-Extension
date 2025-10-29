@@ -819,7 +819,7 @@ export default class TransactionService {
       nonce: nonce ?? 0,
       startBlock: startBlock || 0,
       processId: transaction.step?.processId,
-      substrateProxyAddress: []
+      substrateProxyAddresses: []
     };
 
     const substrateProxyHistories: TransactionHistoryItem[] = [];
@@ -1126,51 +1126,51 @@ export default class TransactionService {
         break;
       }
 
-      case ExtrinsicType.ADD_SUBSTRATE_PROXY: {
-        const data = parseTransactionData<ExtrinsicType.ADD_SUBSTRATE_PROXY>(transaction.data);
+      case ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT: {
+        const data = parseTransactionData<ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT>(transaction.data);
 
-        const proxyAddr = data.substrateProxyAddress;
+        const substrateProxyAddress = data.substrateProxyAddress;
 
-        historyItem.substrateProxyAddress = [proxyAddr];
+        historyItem.substrateProxyAddresses = [substrateProxyAddress];
 
         substrateProxyHistories.push({
           ...historyItem,
-          substrateProxyAddress: [proxyAddr]
+          substrateProxyAddresses: [substrateProxyAddress]
         });
 
-        const proxyAccount = keyring.getPair(proxyAddr);
+        const substrateProxyAccount = keyring.getPair(substrateProxyAddress);
 
-        if (proxyAccount) {
+        if (substrateProxyAccount) {
           substrateProxyHistories.push({
             ...historyItem,
-            address: proxyAccount.address,
+            address: substrateProxyAccount.address,
             direction: TransactionDirection.RECEIVED,
-            substrateProxyAddress: [proxyAddr]
+            substrateProxyAddresses: [substrateProxyAddress]
           });
         }
 
         break;
       }
 
-      case ExtrinsicType.REMOVE_SUBSTRATE_PROXY: {
-        const data = parseTransactionData<ExtrinsicType.REMOVE_SUBSTRATE_PROXY>(transaction.data);
+      case ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT: {
+        const data = parseTransactionData<ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT>(transaction.data);
 
-        for (const proxyItem of data.selectedSubstrateProxyAccounts || []) {
-          const proxyAddr = proxyItem.substrateProxyAddress;
+        for (const substrateProxyItem of data.selectedSubstrateProxyAccounts || []) {
+          const substrateProxyAddress = substrateProxyItem.substrateProxyAddress;
 
           substrateProxyHistories.push({
             ...historyItem,
-            substrateProxyAddress: [proxyAddr]
+            substrateProxyAddresses: [substrateProxyAddress]
           });
 
-          const proxyAccount = keyring.getPair(proxyAddr);
+          const substrateProxyAccount = keyring.getPair(substrateProxyAddress);
 
-          if (proxyAccount) {
+          if (substrateProxyAccount) {
             substrateProxyHistories.push({
               ...historyItem,
-              address: proxyAccount.address,
+              address: substrateProxyAccount.address,
               direction: TransactionDirection.RECEIVED,
-              substrateProxyAddress: [proxyAddr]
+              substrateProxyAddresses: [substrateProxyAddress]
             });
           }
         }

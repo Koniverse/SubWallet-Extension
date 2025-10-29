@@ -81,9 +81,9 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
       return SwapTransactionConfirmation;
     case ExtrinsicType.CLAIM_BRIDGE:
       return ClaimBridgeTransactionConfirmation;
-    case ExtrinsicType.ADD_SUBSTRATE_PROXY:
+    case ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT:
       return AddSubstrateProxyTransactionConfirmation;
-    case ExtrinsicType.REMOVE_SUBSTRATE_PROXY:
+    case ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT:
       return RemoveSubstrateProxyTransactionConfirmation;
     case ExtrinsicType.CROWDLOAN:
     case ExtrinsicType.STAKING_CANCEL_COMPOUNDING:

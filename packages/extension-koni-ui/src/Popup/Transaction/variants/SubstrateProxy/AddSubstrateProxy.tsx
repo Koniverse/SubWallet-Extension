@@ -9,7 +9,7 @@ import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AddressInputNew, ChainSelector, HiddenInput, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useCreateGetChainAndExcludedTokenByAccountProxy, useGetAccountProxyByAddress, useGetBalance, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { useGetSubstrateProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/proxyAccount/useGetSubstrateProxyAccountsInfoByAddress';
-import { handleAddSubstrateProxy } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { handleAddSubstrateProxyAccount } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AddSubstrateProxyParams, ChainItemType, FormCallbacks, FormFieldData, SendNftParams, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -91,7 +91,7 @@ const Component = (): React.ReactElement<Props> => {
   const onSubmit: FormCallbacks<AddSubstrateProxyParams>['onFinish'] = useCallback((values: AddSubstrateProxyParams) => {
     setLoading(true);
 
-    handleAddSubstrateProxy({
+    handleAddSubstrateProxyAccount({
       address: values.from,
       chain: values.chain,
       substrateProxyAddress: values.substrateProxyAddress,
@@ -115,7 +115,7 @@ const Component = (): React.ReactElement<Props> => {
       fromAddress: from,
       toAddress: _recipientAddress,
       account,
-      actionType: ActionType.SUBSTRATE_PROXY,
+      actionType: ActionType.SUBSTRATE_PROXY_ACCOUNT,
       autoFormatValue: false,
       allowLedgerGenerics: ledgerGenericAllowNetworks })
       .catch((err: unknown) => {
@@ -201,7 +201,7 @@ const Component = (): React.ReactElement<Props> => {
             validateTrigger={false}
           >
             <AddressInputNew
-              actionType={ActionType.SUBSTRATE_PROXY}
+              actionType={ActionType.SUBSTRATE_PROXY_ACCOUNT}
               chainSlug={chainValue}
               dropdownHeight={227}
               label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.proxyAccount')}
@@ -252,7 +252,7 @@ const Component = (): React.ReactElement<Props> => {
             />
           )}
           loading={balanceLoading || loading}
-          onClick={onPreCheck(form.submit, ExtrinsicType.ADD_SUBSTRATE_PROXY)}
+          onClick={onPreCheck(form.submit, ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT)}
         >
           {t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxy.addProxy')}
         </Button>

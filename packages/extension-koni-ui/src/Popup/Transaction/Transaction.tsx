@@ -3,7 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@subwallet/extension-koni-ui/components';
-import { ADD_SUBSTRATE_PROXY_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_PARAMS, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_REMOVE_SUBSTRATE_PROXY_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, REMOVE_SUBSTRATE_PROXY_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
 import { useAlert, useChainChecker, useNavigateOnChangeAccount, useSubstrateProxyAccountsToSign, useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -72,9 +72,9 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
       case 'claim-bridge':
         return ExtrinsicType.CLAIM_BRIDGE;
       case 'add-proxy':
-        return ExtrinsicType.ADD_SUBSTRATE_PROXY;
+        return ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT;
       case 'remove-proxy':
-        return ExtrinsicType.REMOVE_SUBSTRATE_PROXY;
+        return ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT;
       case 'send-fund':
       default:
         return ExtrinsicType.TRANSFER_BALANCE;
@@ -164,16 +164,16 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
       };
     }
 
-    if (storageKey === ADD_SUBSTRATE_PROXY_TRANSACTION) {
+    if (storageKey === ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION) {
       return {
-        ...DEFAULT_ADD_SUBSTRATE_PROXY_PARAMS,
+        ...DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS,
         fromAccountProxy
       };
     }
 
-    if (storageKey === REMOVE_SUBSTRATE_PROXY_TRANSACTION) {
+    if (storageKey === REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION) {
       return {
-        ...DEFAULT_REMOVE_SUBSTRATE_PROXY_PARAMS,
+        ...DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS,
         fromAccountProxy
       };
     }

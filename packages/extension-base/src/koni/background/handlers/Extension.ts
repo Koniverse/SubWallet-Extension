@@ -62,7 +62,7 @@ import { AccountChainType, AccountJson, AccountProxyMap, AccountSignMode, Accoun
 import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
-import { RequestAddSubstrateProxy, RequestGetSubstrateProxyAccounts, RequestRemoveSubstrateProxy } from '@subwallet/extension-base/types/substrate-proxy';
+import { RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountInfo, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types/substrate-proxy';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
@@ -5216,41 +5216,41 @@ export default class KoniExtension {
     return this.#koniState.keyringService.context.pingSession(request);
   }
 
-  private getSubstrateProxyAccounts (request: RequestGetSubstrateProxyAccounts) {
-    return this.#koniState.substrateProxyService.getSubstrateProxyAccounts(request);
+  private getSubstrateProxyAccountInfo (request: RequestGetSubstrateProxyAccountInfo) {
+    return this.#koniState.substrateProxyAccountService.getSubstrateProxyAccountInfo(request);
   }
 
-  private async handleAddSubstrateProxy (params: RequestAddSubstrateProxy): Promise<SWTransactionResponse> {
+  private async handleAddSubstrateProxyAccount (params: RequestAddSubstrateProxyAccount): Promise<SWTransactionResponse> {
     const { address, chain } = params;
-    const validationErrors = await this.#koniState.substrateProxyService.validateAddSubstrateProxy(params);
+    const validationErrors = await this.#koniState.substrateProxyAccountService.validateAddSubstrateProxyAccount(params);
 
     if (validationErrors.length > 0) {
       return this.#koniState.transactionService.generateBeforeHandleResponseErrors(validationErrors);
     }
 
-    const extrinsic = await this.#koniState.substrateProxyService.addSubstrateProxyAccounts(params);
+    const extrinsic = await this.#koniState.substrateProxyAccountService.addSubstrateProxyAccounts(params);
 
     return await this.#koniState.transactionService.handleTransaction({
       address,
       chain,
       transaction: extrinsic,
       data: params,
-      extrinsicType: ExtrinsicType.ADD_SUBSTRATE_PROXY,
+      extrinsicType: ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT,
       chainType: ChainType.SUBSTRATE
     });
   }
 
-  private async handleRemoveSubstrateProxy (params: RequestRemoveSubstrateProxy): Promise<SWTransactionResponse> {
+  private async handleRemoveSubstrateProxyAccount (params: RequestRemoveSubstrateProxyAccount): Promise<SWTransactionResponse> {
     const { address, chain, substrateProxyAddress } = params;
 
-    const extrinsic = await this.#koniState.substrateProxyService.removeSubstrateProxyAccounts(params);
+    const extrinsic = await this.#koniState.substrateProxyAccountService.removeSubstrateProxyAccounts(params);
 
     return await this.#koniState.transactionService.handleTransaction({
       address,
       chain,
       transaction: extrinsic,
       data: params,
-      extrinsicType: ExtrinsicType.REMOVE_SUBSTRATE_PROXY,
+      extrinsicType: ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT,
       chainType: ChainType.SUBSTRATE,
       substrateProxyAddress
     });
@@ -5931,12 +5931,12 @@ export default class KoniExtension {
         return this.pingSession(request as RequestPingSession);
 
       // Proxy
-      case 'pri(proxy.getSubstrateProxyAccounts)':
-        return this.getSubstrateProxyAccounts(request as RequestGetSubstrateProxyAccounts);
-      case 'pri(proxy.addSubstrateProxy)':
-        return this.handleAddSubstrateProxy(request as RequestAddSubstrateProxy);
-      case 'pri(proxy.removeSubstrateProxy)':
-        return this.handleRemoveSubstrateProxy(request as RequestRemoveSubstrateProxy);
+      case 'pri(substrateProxyAccount.geInfo)':
+        return this.getSubstrateProxyAccountInfo(request as RequestGetSubstrateProxyAccountInfo);
+      case 'pri(substrateProxyAccount.add)':
+        return this.handleAddSubstrateProxyAccount(request as RequestAddSubstrateProxyAccount);
+      case 'pri(substrateProxyAccount.remove)':
+        return this.handleRemoveSubstrateProxyAccount(request as RequestRemoveSubstrateProxyAccount);
       // Default
       default:
         throw new Error(`Unable to handle message of type ${type}`);

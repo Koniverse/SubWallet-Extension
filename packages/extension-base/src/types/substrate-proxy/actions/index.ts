@@ -4,7 +4,7 @@
 import { BaseRequestSign, InternalRequestSign } from '../../transaction';
 import { SubstrateProxyItem, SubstrateProxyType } from '..';
 
-export interface AddSubstrateProxyParams extends BaseRequestSign {
+export interface AddSubstrateProxyAccountParams extends BaseRequestSign {
   address: string;
   chain: string;
   substrateProxyAddress: string;
@@ -12,13 +12,13 @@ export interface AddSubstrateProxyParams extends BaseRequestSign {
   substrateProxyDeposit: string;
 }
 
-export type RequestAddSubstrateProxy = InternalRequestSign<AddSubstrateProxyParams>;
+export type RequestAddSubstrateProxyAccount = InternalRequestSign<AddSubstrateProxyAccountParams>;
 
-export interface RemoveSubstrateProxyParams extends BaseRequestSign {
+export interface RemoveSubstrateProxyAccountParams extends BaseRequestSign {
   address: string;
   chain: string;
   selectedSubstrateProxyAccounts: SubstrateProxyItem[]
   isRemoveAll?: boolean;
 }
 
-export type RequestRemoveSubstrateProxy = InternalRequestSign<RemoveSubstrateProxyParams>;
+export type RequestRemoveSubstrateProxyAccount = InternalRequestSign<RemoveSubstrateProxyAccountParams>;

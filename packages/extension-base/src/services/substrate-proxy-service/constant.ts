@@ -4,7 +4,7 @@
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { SubstrateProxyType } from '@subwallet/extension-base/types/substrate-proxy';
 
-const SUBSTRATE_PROXY_EXTRINSIC_GROUPS: Record<string, ExtrinsicType[]> = {
+const SUBSTRATE_PROXY_ACCOUNT_EXTRINSIC_GROUPS: Record<string, ExtrinsicType[]> = {
   STAKING: [
     ExtrinsicType.STAKING_BOND,
     ExtrinsicType.STAKING_UNBOND,
@@ -15,7 +15,7 @@ const SUBSTRATE_PROXY_EXTRINSIC_GROUPS: Record<string, ExtrinsicType[]> = {
 };
 
 export const txTypeToSubstrateProxyMap: Partial<Record<ExtrinsicType, SubstrateProxyType[]>> = {
-  ...Object.fromEntries(SUBSTRATE_PROXY_EXTRINSIC_GROUPS.STAKING.map((t) => [t, ['Staking', 'NonTransfer']]))
+  ...Object.fromEntries(SUBSTRATE_PROXY_ACCOUNT_EXTRINSIC_GROUPS.STAKING.map((t) => [t, ['Staking', 'NonTransfer']]))
 };
 
 export const UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS = [

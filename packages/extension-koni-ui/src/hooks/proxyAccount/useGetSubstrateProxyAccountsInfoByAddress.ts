@@ -1,18 +1,18 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RequestGetSubstrateProxyAccounts, SubstrateProxyAccounts } from '@subwallet/extension-base/types';
-import { getSubstrateProxyAccounts } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { RequestGetSubstrateProxyAccountInfo, SubstrateProxyAccountInfo } from '@subwallet/extension-base/types';
+import { getSubstrateProxyAccountInfo } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { isSubstrateAddress } from '@subwallet/keyring';
 import { useCallback, useEffect, useState } from 'react';
 
-const DEFAULT_PROXY_ACCOUNTS: SubstrateProxyAccounts = {
+const DEFAULT_PROXY_ACCOUNTS: SubstrateProxyAccountInfo = {
   substrateProxies: [],
   substrateProxyDeposit: '0'
 };
 
-export function useGetSubstrateProxyAccountsInfoByAddress (address: string, chain: string): SubstrateProxyAccounts {
-  const [proxies, setProxies] = useState<SubstrateProxyAccounts>(DEFAULT_PROXY_ACCOUNTS);
+export function useGetSubstrateProxyAccountsInfoByAddress (address: string, chain: string): SubstrateProxyAccountInfo {
+  const [proxies, setProxies] = useState<SubstrateProxyAccountInfo>(DEFAULT_PROXY_ACCOUNTS);
   const fetchProxyData = useCallback(async () => {
     try {
       if (!address || !isSubstrateAddress(address)) {
@@ -21,12 +21,12 @@ export function useGetSubstrateProxyAccountsInfoByAddress (address: string, chai
         return;
       }
 
-      const request: RequestGetSubstrateProxyAccounts = {
+      const request: RequestGetSubstrateProxyAccountInfo = {
         chain,
         address
       };
 
-      const proxyInfo = await getSubstrateProxyAccounts(request);
+      const proxyInfo = await getSubstrateProxyAccountInfo(request);
 
       setProxies(proxyInfo);
     } catch (e) {
