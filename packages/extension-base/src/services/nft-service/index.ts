@@ -6,6 +6,8 @@ import { NftCollection, NftFullListRequest, NftItem } from '@subwallet/extension
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getEvmChainId } from '@subwallet/extension-base/services/chain-service/utils';
 import { baseParseIPFSUrl } from '@subwallet/extension-base/utils';
+import { getKeypairTypeByAddress } from '@subwallet/keyring';
+import { EthereumKeypairTypes } from '@subwallet/keyring/types';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { BlockscoutNftInstanceRaw } from '@subwallet-monorepos/subwallet-services-sdk/services/blockscout/types';
 
@@ -114,7 +116,7 @@ function mapSdkToCollection (raw: SdkCollection, chain: string): NftCollection {
   };
 }
 
-export default class NftDetectionService {
+export default class NftService {
   private inProgress = new Set<string>();
   private state: KoniState;
 
@@ -122,64 +124,71 @@ export default class NftDetectionService {
     this.state = state;
   }
 
-  async detectNft (address: string) {
-    if (this.inProgress.has(address)) {
-      console.log(`[NftDetectionService] ${address} already running`);
+  async fetchEvmCollectionsWithPreview (addresses: string[]) {
+    for (const address of addresses) {
+      const type = getKeypairTypeByAddress(address);
+      const typeValid = [...EthereumKeypairTypes].includes(type);
 
-      return;
-    }
+      if (typeValid) {
+        if (this.inProgress.has(address)) {
+          console.log(`[NftService] ${address} already running`);
 
-    this.inProgress.add(address);
-
-    try {
-      const nftDetectionApi = subwalletApiSdk.nftDetectionApi;
-
-      if (!nftDetectionApi?.getEvmNftCollectionsByAddress) {
-        console.warn('[NftDetectionService] NftDetectionApi not available');
-
-        return;
-      }
-
-      const rawData: SdkCollectionsByChain = await nftDetectionApi.getEvmNftCollectionsByAddress(address);
-
-      const allItems: NftItem[] = [];
-      const allCollections: NftCollection[] = [];
-
-      for (const [chain, collections] of Object.entries(rawData)) {
-        if (!Array.isArray(collections)) {
           continue;
         }
 
-        for (const col of collections) {
-          const mappedCollection = mapSdkToCollection(col, chain);
+        this.inProgress.add(address);
 
-          allCollections.push(mappedCollection);
+        try {
+          const nftDetectionApi = subwalletApiSdk.nftDetectionApi;
 
-          if (Array.isArray(col.token_instances)) {
-            const items = col.token_instances.map((inst) =>
-              mapSdkToNftItem(inst, chain, mappedCollection.collectionId, address)
-            );
+          if (!nftDetectionApi?.getEvmNftCollectionsByAddress) {
+            console.warn('[NftService] NftDetectionApi not available');
 
-            allItems.push(...items);
+            continue;
           }
+
+          const rawData: SdkCollectionsByChain = await nftDetectionApi.getEvmNftCollectionsByAddress(address);
+
+          const allItems: NftItem[] = [];
+          const allCollections: NftCollection[] = [];
+
+          for (const [chain, collections] of Object.entries(rawData)) {
+            if (!Array.isArray(collections)) {
+              continue;
+            }
+
+            for (const col of collections) {
+              const mappedCollection = mapSdkToCollection(col, chain);
+
+              allCollections.push(mappedCollection);
+
+              if (Array.isArray(col.token_instances)) {
+                const items = col.token_instances.map((inst) =>
+                  mapSdkToNftItem(inst, chain, mappedCollection.collectionId, address)
+                );
+
+                allItems.push(...items);
+              }
+            }
+          }
+
+          await this.state.handleDetectedNftCollections(allCollections);
+          await this.state.handleDetectedNfts(address, allItems);
+        } catch (err) {
+          console.warn(`[NftService] detect error for ${address}`, err);
+        } finally {
+          this.inProgress.delete(address);
         }
       }
-
-      await this.state.handleDetectedNftCollections(allCollections);
-      await this.state.handleDetectedNfts(address, allItems);
-    } catch (err) {
-      console.warn(`[NftDetectionService] detect error for ${address}`, err);
-    } finally {
-      this.inProgress.delete(address);
     }
   }
 
   async getFullNftInstancesByCollection (request: NftFullListRequest): Promise<boolean> {
-    const { chainInfo, contractAddress, owner } = request;
+    const { chainInfo, contractAddress, owners } = request;
     const chainId = _getEvmChainId(chainInfo);
 
-    if (!contractAddress || !owner || !chainId) {
-      console.warn('[NftDetectionService] missing params for getFullNftInstancesByCollection');
+    if (!contractAddress || !owners || !chainId) {
+      console.warn('[NftService] missing params for getFullNftInstancesByCollection');
 
       return false;
     }
@@ -188,26 +197,34 @@ export default class NftDetectionService {
       const nftDetectionApi = subwalletApiSdk.nftDetectionApi;
 
       if (!nftDetectionApi?.getAllNftInstances) {
-        console.warn('[NftDetectionService] getAllNftInstances not available');
+        console.warn('[NftService] getAllNftInstances not available');
 
         return false;
       }
 
-      const instances = await nftDetectionApi.getAllNftInstances(
-        contractAddress,
-        owner,
-        chainId.toString()
-      );
+      const ownerList = Array.isArray(owners) ? owners : [owners];
 
-      if (!Array.isArray(instances)) {
-        return false;
+      for (const eachOwner of ownerList) {
+        try {
+          const instances = await nftDetectionApi.getAllNftInstances(
+            contractAddress,
+            eachOwner,
+            chainId.toString()
+          );
+
+          if (!Array.isArray(instances)) {
+            continue;
+          }
+
+          const nftList = instances.map((inst) =>
+            mapSdkToNftItem(inst, chainInfo.slug, contractAddress, eachOwner)
+          );
+
+          await this.state.handleDetectedNfts(eachOwner, nftList);
+        } catch (innerErr) {
+          console.warn(`[NftService] getAllNftInstances failed for ${eachOwner}`, innerErr);
+        }
       }
-
-      const nftList = instances.map((inst) =>
-        mapSdkToNftItem(inst, chainInfo.slug, contractAddress, owner)
-      );
-
-      await this.state.handleDetectedNfts(owner, nftList);
 
       return true;
     } catch (err) {

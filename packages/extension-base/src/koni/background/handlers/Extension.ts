@@ -2236,16 +2236,17 @@ export default class KoniExtension {
     const tokenContract = new evmApi.api.eth.Contract(_ERC721_ABI, contractAddress);
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-      const supports721 = await tokenContract.methods.supportsInterface('0x80ac58cd').call().catch(() => false);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-      const supportsMetadata = await tokenContract.methods.supportsInterface('0x5b5e139f').call().catch(() => false);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       const supports1155 = await tokenContract.methods.supportsInterface('0xd9b67a26').call().catch(() => false);
 
       if (supports1155) {
         return false;
       }
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+      const supports721 = await tokenContract.methods.supportsInterface('0x80ac58cd').call().catch(() => false);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+      const supportsMetadata = await tokenContract.methods.supportsInterface('0x5b5e139f').call().catch(() => false);
 
       if (supports721 || supportsMetadata) {
         return true;
