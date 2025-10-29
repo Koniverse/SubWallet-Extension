@@ -3,7 +3,7 @@
 
 import type { WindowOpenParams } from '@subwallet/extension-base/background/types';
 
-import { CronReloadRequest, CurrentTokenPrice, Notification, PriceChartTimeframe, RequestGetTransaction, RequestParseEvmContractInput, ResponseParseEvmContractInput, ResponseSubscribeCurrentTokenPrice, ResponseSubscribeHistory, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
+import { CronReloadRequest, CurrentTokenPrice, NftFullListRequest, Notification, PriceChartTimeframe, RequestGetTransaction, RequestParseEvmContractInput, ResponseParseEvmContractInput, ResponseSubscribeCurrentTokenPrice, ResponseSubscribeHistory, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { sendMessage } from '@subwallet/extension-koni-ui/messaging/base';
 
@@ -54,6 +54,10 @@ export async function canShowChart (priceId: string): Promise<boolean> {
 
 export async function subscribeCurrentTokenPrice (priceId: string, callback: (item: CurrentTokenPrice) => void): Promise<ResponseSubscribeCurrentTokenPrice> {
   return sendMessage('pri(price.subscribeCurrentTokenPrice)', priceId, callback);
+}
+
+export async function getFullNftList (request: NftFullListRequest): Promise<boolean> {
+  return sendMessage('pri(nft.getFullList)', request);
 }
 
 export * from './accounts';

@@ -225,7 +225,7 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
   }
 
   try {
-    const data = await subwalletApiSdk.xcmApi.fetchXcmData({
+    const data = await subwalletApiSdk.bridgeApi.fetchBridgeData({
       address: sender,
       from: originTokenInfo.slug,
       to: destinationTokenInfo.slug,

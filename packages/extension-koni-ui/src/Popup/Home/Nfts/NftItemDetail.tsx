@@ -23,7 +23,7 @@ import CN from 'classnames';
 import { CaretLeft, Info, PaperPlaneTilt } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -39,11 +39,13 @@ const modalCloseButton = <Icon
   type='phosphor'
   weight={'light'}
 />;
-const collectionNFTUrl = '/home/nfts/collection-detail';
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const state = useLocation().state as INftItemDetail;
   const { collectionInfo, nftItem } = state;
+  const [searchParams] = useSearchParams();
+  const chain = searchParams.get('chain');
+  const collectionId = searchParams.get('collectionId');
 
   const { t } = useTranslation();
   const notify = useNotification();
@@ -188,8 +190,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [nftItem.externalUrl]);
 
   const goBackToNFTCollection = useCallback(() => {
-    goBack(collectionNFTUrl, state);
-  }, [goBack, state]);
+    let targetUrl = '/home/nfts/collection-detail';
+
+    if (chain && collectionId) {
+      targetUrl = `/home/nfts/collection-detail?chain=${chain}&collectionId=${collectionId}`;
+    }
+
+    goBack(targetUrl, state);
+  }, [chain, collectionId, goBack, state]);
 
   const show3DModel = SHOW_3D_MODELS_CHAIN.includes(nftItem.chain);
 
@@ -285,15 +293,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               />
 
               {
-                nftItem.properties && Object.entries(nftItem.properties).map(([attName, attValueObj], index) => {
-                  const { value: attValue } = attValueObj as Record<string, string>;
+                nftItem.properties &&
+                Object.entries(nftItem.properties as Record<string, any>).map(([attName, attValueRaw], index) => {
+                  const attValue =
+                    typeof attValueRaw === 'object' && attValueRaw !== null && 'value' in attValueRaw
+                      ? String((attValueRaw as { value: string }).value)
+                      : String(attValueRaw);
 
                   return (
                     <Field
-                      content={attValue.toString()}
+                      content={attValue}
                       key={index}
                       label={attName}
-                      width={'fit-content'}
+                      width='fit-content'
                     />
                   );
                 })
