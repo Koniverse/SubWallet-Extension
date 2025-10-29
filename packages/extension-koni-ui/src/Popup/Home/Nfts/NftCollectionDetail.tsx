@@ -186,7 +186,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     }
 
     setIsFetching(true);
-    getFullNftList({ contractAddress: collectionInfo?.collectionId, owner: ownerAddresses, chainInfo: chainInfo })
+    getFullNftList({ contractAddress: collectionInfo?.collectionId, owners: ownerAddresses, chainInfo: chainInfo })
       .catch(console.error)
       .finally(() => {
         if (isMounted) {

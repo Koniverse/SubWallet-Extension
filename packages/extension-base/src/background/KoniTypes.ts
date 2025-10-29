@@ -1002,7 +1002,7 @@ export interface NftTransactionRequest {
 
 export interface NftFullListRequest {
   contractAddress: string;
-  owner: string[];
+  owners: string[];
   chainInfo: _ChainInfo
 }
 

@@ -184,10 +184,10 @@ export default class NftService {
   }
 
   async getFullNftInstancesByCollection (request: NftFullListRequest): Promise<boolean> {
-    const { chainInfo, contractAddress, owner } = request;
+    const { chainInfo, contractAddress, owners } = request;
     const chainId = _getEvmChainId(chainInfo);
 
-    if (!contractAddress || !owner || !chainId) {
+    if (!contractAddress || !owners || !chainId) {
       console.warn('[NftService] missing params for getFullNftInstancesByCollection');
 
       return false;
@@ -202,7 +202,7 @@ export default class NftService {
         return false;
       }
 
-      const ownerList = Array.isArray(owner) ? owner : [owner];
+      const ownerList = Array.isArray(owners) ? owners : [owners];
 
       for (const eachOwner of ownerList) {
         try {
