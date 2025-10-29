@@ -6,6 +6,8 @@ import { NftCollection, NftFullListRequest, NftItem } from '@subwallet/extension
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getEvmChainId } from '@subwallet/extension-base/services/chain-service/utils';
 import { baseParseIPFSUrl } from '@subwallet/extension-base/utils';
+import { getKeypairTypeByAddress } from '@subwallet/keyring';
+import { EthereumKeypairTypes } from '@subwallet/keyring/types';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { BlockscoutNftInstanceRaw } from '@subwallet-monorepos/subwallet-services-sdk/services/blockscout/types';
 
@@ -122,55 +124,62 @@ export default class NftService {
     this.state = state;
   }
 
-  async fetchEvmCollectionsWithPreview (address: string) {
-    if (this.inProgress.has(address)) {
-      console.log(`[NftService] ${address} already running`);
+  async fetchEvmCollectionsWithPreview (addresses: string[]) {
+    for (const address of addresses) {
+      const type = getKeypairTypeByAddress(address);
+      const typeValid = [...EthereumKeypairTypes].includes(type);
 
-      return;
-    }
+      if (typeValid) {
+        if (this.inProgress.has(address)) {
+          console.log(`[NftService] ${address} already running`);
 
-    this.inProgress.add(address);
-
-    try {
-      const nftDetectionApi = subwalletApiSdk.nftDetectionApi;
-
-      if (!nftDetectionApi?.getEvmNftCollectionsByAddress) {
-        console.warn('[NftService] NftDetectionApi not available');
-
-        return;
-      }
-
-      const rawData: SdkCollectionsByChain = await nftDetectionApi.getEvmNftCollectionsByAddress(address);
-
-      const allItems: NftItem[] = [];
-      const allCollections: NftCollection[] = [];
-
-      for (const [chain, collections] of Object.entries(rawData)) {
-        if (!Array.isArray(collections)) {
           continue;
         }
 
-        for (const col of collections) {
-          const mappedCollection = mapSdkToCollection(col, chain);
+        this.inProgress.add(address);
 
-          allCollections.push(mappedCollection);
+        try {
+          const nftDetectionApi = subwalletApiSdk.nftDetectionApi;
 
-          if (Array.isArray(col.token_instances)) {
-            const items = col.token_instances.map((inst) =>
-              mapSdkToNftItem(inst, chain, mappedCollection.collectionId, address)
-            );
+          if (!nftDetectionApi?.getEvmNftCollectionsByAddress) {
+            console.warn('[NftService] NftDetectionApi not available');
 
-            allItems.push(...items);
+            continue;
           }
+
+          const rawData: SdkCollectionsByChain = await nftDetectionApi.getEvmNftCollectionsByAddress(address);
+
+          const allItems: NftItem[] = [];
+          const allCollections: NftCollection[] = [];
+
+          for (const [chain, collections] of Object.entries(rawData)) {
+            if (!Array.isArray(collections)) {
+              continue;
+            }
+
+            for (const col of collections) {
+              const mappedCollection = mapSdkToCollection(col, chain);
+
+              allCollections.push(mappedCollection);
+
+              if (Array.isArray(col.token_instances)) {
+                const items = col.token_instances.map((inst) =>
+                  mapSdkToNftItem(inst, chain, mappedCollection.collectionId, address)
+                );
+
+                allItems.push(...items);
+              }
+            }
+          }
+
+          await this.state.handleDetectedNftCollections(allCollections);
+          await this.state.handleDetectedNfts(address, allItems);
+        } catch (err) {
+          console.warn(`[NftService] detect error for ${address}`, err);
+        } finally {
+          this.inProgress.delete(address);
         }
       }
-
-      await this.state.handleDetectedNftCollections(allCollections);
-      await this.state.handleDetectedNfts(address, allItems);
-    } catch (err) {
-      console.warn(`[NftService] detect error for ${address}`, err);
-    } finally {
-      this.inProgress.delete(address);
     }
   }
 

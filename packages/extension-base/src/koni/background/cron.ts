@@ -237,7 +237,17 @@ export class KoniCron {
 
   detectEvmCollectionNft = (address: string) => {
     return () => {
-      this.state.nftDetectionService.fetchEvmCollectionsWithPreview(address)
+      let addresses: string[] = [];
+
+      addresses = this.state.keyringService.context.getDecodedAddresses();
+
+      if (!addresses.length) {
+        console.warn('[Cron] No decoded addresses found for ALL_ACCOUNT_KEY');
+
+        return;
+      }
+
+      this.state.nftDetectionService.fetchEvmCollectionsWithPreview(addresses)
         .catch((err) => console.warn(`[Cron] NFT detection failed for ${address}:`, err));
     };
   };
