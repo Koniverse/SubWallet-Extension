@@ -5,7 +5,7 @@ import { RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, 
 import { sendMessage } from '@subwallet/extension-koni-ui/messaging';
 
 export async function getSubstrateProxyAccountGroup (request: RequestGetSubstrateProxyAccountGroup) {
-  return sendMessage('pri(substrateProxyAccount.geInfo)', request);
+  return sendMessage('pri(substrateProxyAccount.getGroupInfo)', request);
 }
 
 export async function handleAddSubstrateProxyAccount (request: RequestAddSubstrateProxyAccount) {

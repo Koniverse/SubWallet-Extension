@@ -2764,7 +2764,7 @@ export interface KoniRequestSignatures {
   'pri(migrate.pingSession)': [RequestPingSession, boolean];
 
   /* Proxy Account */
-  'pri(substrateProxyAccount.geInfo)': [RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountGroup];
+  'pri(substrateProxyAccount.getGroupInfo)': [RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountGroup];
   'pri(substrateProxyAccount.add)': [RequestAddSubstrateProxyAccount, SWTransactionResponse];
   'pri(substrateProxyAccount.remove)': [RequestRemoveSubstrateProxyAccount, SWTransactionResponse];
 

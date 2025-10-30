@@ -6,7 +6,7 @@ import { AccountChainType, AccountSignMode, RequestGetSubstrateProxyAccountGroup
 import { createPromiseHandler, isSameAddress } from '@subwallet/extension-base/utils';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { getSubstrateProxyAccountGroup } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { getSubstrateProxyAccountGroup } from '@subwallet/extension-koni-ui/messaging/transaction/substrateProxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { isSubstrateAddress } from '@subwallet/keyring';
 import { useCallback, useContext } from 'react';

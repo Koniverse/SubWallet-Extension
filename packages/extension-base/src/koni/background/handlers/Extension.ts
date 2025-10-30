@@ -5931,7 +5931,7 @@ export default class KoniExtension {
         return this.pingSession(request as RequestPingSession);
 
       // Proxy
-      case 'pri(substrateProxyAccount.geInfo)':
+      case 'pri(substrateProxyAccount.getGroupInfo)':
         return this.getSubstrateProxyAccountGroup(request as RequestGetSubstrateProxyAccountGroup);
       case 'pri(substrateProxyAccount.add)':
         return this.handleAddSubstrateProxyAccount(request as RequestAddSubstrateProxyAccount);

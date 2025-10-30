@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountGroup } from '@subwallet/extension-base/types';
-import { getSubstrateProxyAccountGroup } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { getSubstrateProxyAccountGroup } from '@subwallet/extension-koni-ui/messaging/transaction/substrateProxy';
 import { isSubstrateAddress } from '@subwallet/keyring';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -14,7 +14,7 @@ const DEFAULT_PROXY_ACCOUNTS: SubstrateProxyAccountGroup = {
 export function useGetSubstrateProxyAccountGroupByAddress (address: string, chain: string): SubstrateProxyAccountGroup {
   const [substrateProxyAccountGroup, setSubstrateProxyAccountGroup] = useState<SubstrateProxyAccountGroup>(DEFAULT_PROXY_ACCOUNTS);
 
-  const fetchProxyData = useCallback(async (isSync: boolean) => {
+  const fetchSubstrateProxyAccountData = useCallback(async (isSync: boolean) => {
     try {
       if (!address || !isSubstrateAddress(address)) {
         if (isSync) {
@@ -46,12 +46,12 @@ export function useGetSubstrateProxyAccountGroupByAddress (address: string, chai
   useEffect(() => {
     let isSync = true;
 
-    fetchProxyData(isSync).catch(console.error);
+    fetchSubstrateProxyAccountData(isSync).catch(console.error);
 
     return () => {
       isSync = false;
     };
-  }, [fetchProxyData]);
+  }, [fetchSubstrateProxyAccountData]);
 
   return substrateProxyAccountGroup;
 }

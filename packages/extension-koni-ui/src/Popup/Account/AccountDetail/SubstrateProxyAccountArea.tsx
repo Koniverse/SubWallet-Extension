@@ -7,7 +7,7 @@ import { AccountProxy, AccountProxyType, SubstrateProxyAccountItem, SubstratePro
 import { BasicInputEvent, ChainSelector, EmptyList, SubstrateProxyAccountItemExtended, SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
 import { ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS, REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useChainChecker, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { getSubstrateProxyAccountGroup } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { getSubstrateProxyAccountGroup } from '@subwallet/extension-koni-ui/messaging/transaction/substrateProxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { AddSubstrateProxyAccountParams, ChainItemType, RemoveSubstrateProxyAccountParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
