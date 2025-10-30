@@ -3,7 +3,7 @@
 
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { NominationInfo, SubmitChangeValidatorStaking, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
 import { BaseModal, StakingValidatorItem } from '@subwallet/extension-web-ui/components';
@@ -107,7 +107,7 @@ const Component = (props: Props) => {
   const poolInfo = poolInfoMap[slug];
   const maxCount = poolInfo?.statistic?.maxCandidatePerFarmer || 1;
 
-  const isRelayChain = useMemo(() => _STAKING_CHAIN_GROUP.relay.includes(chain), [chain]);
+  const isRelayChain = useMemo(() => RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(chain), [chain]);
   const isSingleSelect = useMemo(() => _isSingleSelect || !isRelayChain, [_isSingleSelect, isRelayChain]);
   const hasReturn = useMemo(() => items[0]?.expectedReturn !== undefined, [items]);
 
