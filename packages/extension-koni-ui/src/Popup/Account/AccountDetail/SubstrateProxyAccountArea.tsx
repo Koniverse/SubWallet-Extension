@@ -1,19 +1,20 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _chainInfoToAccountChainType } from '@subwallet/extension-base/services/chain-service/utils';
 import { UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS } from '@subwallet/extension-base/services/substrate-proxy-service/constant';
 import { AccountProxy, AccountProxyType, SubstrateProxyAccountItem, SubstrateProxyType } from '@subwallet/extension-base/types';
 import { BasicInputEvent, ChainSelector, EmptyList, ProxyItemExtended, SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
-import { ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS } from '@subwallet/extension-koni-ui/constants';
-import { useChainChecker, useCreateGetChainAndExcludedTokenByAccountProxy, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS, REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { useChainChecker, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { getSubstrateProxyAccountInfo } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
-import { AddSubstrateProxyAccountParams, ChainItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AddSubstrateProxyAccountParams, ChainItemType, RemoveSubstrateProxyAccountParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ActivityIndicator, Button, Icon, SwList } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ListChecks, TreeStructure } from 'phosphor-react';
-import React, { Context, Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { ListChecks, Trash, TreeStructure, XCircle } from 'phosphor-react';
+import React, { Context, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { ThemeContext } from 'styled-components';
@@ -25,25 +26,45 @@ export interface ProxyItemSelector extends ProxyItemExtended {
 
 type Props = ThemeProps & {
   accountProxy: AccountProxy;
-  address: string;
-  setSubstrateProxyAccountsSelected: Dispatch<SetStateAction<Record<string, ProxyItemSelector>>>;
-  substrateProxyAccountsSelected: Record<string, ProxyItemSelector>;
-  setNetworkSelected: Dispatch<SetStateAction<string | undefined>>;
-  networkSelected?: string;
 };
 
 const getKey = (address: string, proxyType: SubstrateProxyType) => proxyType + ':' + address;
 
-function Component ({ accountProxy, address: addressFormated, className, networkSelected, setNetworkSelected, setSubstrateProxyAccountsSelected, substrateProxyAccountsSelected }: Props) {
+function Component ({ accountProxy, className }: Props) {
   const { t } = useTranslation();
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const [, setAddSubstrateProxyParamsStorage] = useLocalStorage<AddSubstrateProxyAccountParams>(ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS);
+  const [, setRemoveSubstrateProxyParamsStorage] = useLocalStorage<RemoveSubstrateProxyAccountParams>(REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS);
   const navigate = useNavigate();
   const checkChain = useChainChecker();
+  const getReformatAddress = useCoreCreateReformatAddress();
+  const [substrateProxyAccountsSelected, setSubstrateProxyAccountsSelected] = useState<Record<string, ProxyItemSelector>>({});
+  const [networkSelected, setNetworkSelected] = useState<string>();
   const [loading, setLoading] = useState(false);
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const getChainAndExcludedTokenByAccountProxy = useCreateGetChainAndExcludedTokenByAccountProxy();
+
+  const addressFormated = useMemo(() => {
+    if (!networkSelected) {
+      return;
+    }
+
+    const chainInfoSelected = chainInfoMap[networkSelected];
+
+    if (!chainInfoSelected || !chainInfoSelected.substrateInfo) {
+      return;
+    }
+
+    const compatibleChainTypes = _chainInfoToAccountChainType(chainInfoSelected);
+    const accountSubstrate = accountProxy.accounts.find(({ chainType }) => chainType === compatibleChainTypes);
+
+    if (!accountSubstrate) {
+      return;
+    }
+
+    return getReformatAddress(accountSubstrate, chainInfoSelected);
+  }, [accountProxy.accounts, chainInfoMap, getReformatAddress, networkSelected]);
 
   const proxyIdSet = useMemo<Set<string>>(() => new Set<string>(accountProxies.map(({ id }) => id)), [accountProxies]);
 
@@ -91,12 +112,108 @@ function Component ({ accountProxy, address: addressFormated, className, network
     navigate('/transaction/add-proxy');
   }, [addressFormated, navigate, networkSelected, setAddSubstrateProxyParamsStorage]);
 
+  const onRemoveSubstrateProxyAccounts = useCallback(() => {
+    if (!addressFormated || !networkSelected) {
+      return;
+    }
+
+    const substrateProxyAddressKeys = Object.keys(substrateProxyAccountsSelected).filter((key) => substrateProxyAccountsSelected[key].isSelected);
+
+    setRemoveSubstrateProxyParamsStorage({
+      ...DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS,
+      chain: networkSelected,
+      substrateProxyAddressKeys,
+      from: addressFormated
+    });
+
+    navigate('/transaction/remove-proxy');
+  }, [addressFormated, navigate, networkSelected, substrateProxyAccountsSelected, setRemoveSubstrateProxyParamsStorage]);
+
+  const onCancelRemoveSubstrateProxyAccounts = useCallback(() => {
+    setSubstrateProxyAccountsSelected((prevState) => {
+      const newState: Record<string, ProxyItemSelector> = {};
+
+      Object.keys(prevState).forEach((key) => {
+        newState[key] = {
+          ...prevState[key],
+          isSelected: false
+        };
+      });
+
+      return newState;
+    });
+  }, []);
+
+  const footerNode = useMemo(() => {
+    const substrateProxyAccounts = Object.values(substrateProxyAccountsSelected);
+    const haveNoSubstrateProxyAccounts = substrateProxyAccounts.length === 0;
+
+    if (haveNoSubstrateProxyAccounts) {
+      return <></>;
+    }
+
+    const isAnySubstrateProxyAccountSelected = Object.values(substrateProxyAccountsSelected).some(({ isSelected }) => isSelected);
+
+    if (isAnySubstrateProxyAccountSelected) {
+      return (
+        <>
+          <Button
+            block={true}
+            className={CN('account-button')}
+            icon={(
+              <Icon
+                phosphorIcon={XCircle}
+                weight='fill'
+              />
+            )}
+            onClick={onCancelRemoveSubstrateProxyAccounts}
+            schema='secondary'
+          >
+            {t('ui.ACCOUNT.screen.Account.Detail.SubstrateProxyAccountArea.cancelRemoveSubstrateProxyAccount')}
+          </Button>
+          <Button
+            block={true}
+            className={CN('account-button')}
+            icon={(
+              <Icon
+                phosphorIcon={Trash}
+                weight='fill'
+              />
+            )}
+            onClick={onRemoveSubstrateProxyAccounts}
+            schema='error'
+          >
+            {t('ui.ACCOUNT.screen.Account.Detail.SubstrateProxyAccountArea.removeSubstrateProxyAccount')}
+          </Button>
+        </>
+      );
+    }
+
+    return (
+      <Button
+        block={true}
+        className={CN('account-button')}
+        disabled={accountProxy.accountType === AccountProxyType.READ_ONLY}
+        icon={(
+          <Icon
+            phosphorIcon={TreeStructure}
+            weight='fill'
+          />
+        )}
+        onClick={onAddSubstrateProxyAccount}
+        schema='primary'
+      >
+        {t('ui.ACCOUNT.screen.Account.Detail.SubstrateProxyAccountArea.addSubstrateProxyAccount')}
+      </Button>
+    );
+  }, [accountProxy.accountType, onAddSubstrateProxyAccount, onCancelRemoveSubstrateProxyAccounts, onRemoveSubstrateProxyAccounts, substrateProxyAccountsSelected, t]);
+
   const renderEmpty = useCallback(() => {
     return (
       <div className={'__empty-proxy-account-list'}>
         <EmptyList
-          emptyMessage={t('ui.ACCOUNT.screen.Account.Detail.SubstrateProxyAccountList.setupSubstrateProxyAccounts')}
-          emptyTitle={t('ui.ACCOUNT.screen.Account.Detail.SubstrateProxyAccountList.noSubstrateProxyAccountsFound')}
+          emptyMessage={t('ui.ACCOUNT.screen.Account.Detail.SubstrateProxyAccountArea.setupSubstrateProxyAccounts')}
+          emptyTitle={t('ui.ACCOUNT.screen.Account.Detail.SubstrateProxyAccountArea.noSubstrateProxyAccountsFound')}
           phosphorIcon={ListChecks}
         />
 
@@ -114,7 +231,7 @@ function Component ({ accountProxy, address: addressFormated, className, network
           schema='primary'
           shape={'round'}
         >
-          {t('ui.ACCOUNT.screen.Account.Detail.SubstrateProxyAccountList.addSubstrateProxyAccount')}
+          {t('ui.ACCOUNT.screen.Account.Detail.SubstrateProxyAccountArea.addSubstrateProxyAccount')}
         </Button>
       </div>
 
@@ -201,37 +318,50 @@ function Component ({ accountProxy, address: addressFormated, className, network
 
   return (
     <div className={className}>
-      <ChainSelector
-        items={chainItems}
-        onChange={onSelectNetwork}
-        value={networkSelected}
-      />
-
-      {loading
-        ? <div className='__load-more-container'>
-          <ActivityIndicator size={token.sizeXXL} />
-        </div>
-
-        : <SwList.Section
-          className={CN('__proxy-account-list')}
-          gap={token.sizeXL}
-          list={substrateProxyAccountSelectedSorted}
-          renderItem={renderItem}
-          renderWhenEmpty={renderEmpty}
+      <div className={'__proxy-account-list-container'}>
+        <ChainSelector
+          items={chainItems}
+          onChange={onSelectNetwork}
+          value={networkSelected}
         />
-      }
+
+        {loading
+          ? <div className='__load-more-container'>
+            <ActivityIndicator size={token.sizeXXL} />
+          </div>
+
+          : <SwList.Section
+            className={CN('__proxy-account-list')}
+            gap={token.sizeXL}
+            list={substrateProxyAccountSelectedSorted}
+            renderItem={renderItem}
+            renderWhenEmpty={renderEmpty}
+          />
+        }
+      </div>
+      <div className={'__proxy-account-area-footer'}>
+        {footerNode}
+      </div>
+
     </div>
   );
 }
 
-export const SubstrateProxyAccountList = styled(Component)<Props>(({ theme: { token } }: Props) => ({
+export const SubstrateProxyAccountArea = styled(Component)<Props>(({ theme: { token } }: Props) => ({
   display: 'flex',
-  overflow: 'hidden',
   flexDirection: 'column',
+  justifyContent: 'space-between',
+  height: '100%',
   paddingInline: token.padding,
 
-  '.ant-sw-list-section': {
-    flex: 1
+  '.__proxy-account-list-container': {
+    display: 'flex',
+    overflow: 'hidden',
+    flexDirection: 'column'
+  },
+
+  '.ant-sw-list-wrapper': {
+    flex: '1 1 263px'
   },
 
   '.__proxy-account-list': {
@@ -271,6 +401,13 @@ export const SubstrateProxyAccountList = styled(Component)<Props>(({ theme: { to
       fontSize: token.fontSize,
       listHeight: token.lineHeight
     }
+  },
+
+  '.__proxy-account-area-footer': {
+    paddingTop: token.paddingSM,
+    paddingBottom: token.paddingLG,
+    display: 'flex',
+    gap: token.sizeSM
   },
 
   '.__load-more-container': {

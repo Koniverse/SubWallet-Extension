@@ -126,7 +126,7 @@ const Component: React.FC<Props> = (props: Props) => {
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
-      </MetaInfo>SubstrateProxyAccountListModal
+      </MetaInfo>
       <SubstrateProxyAccountListModal substrateProxyAddresses={substrateProxyAddresses} />
     </div>
   );

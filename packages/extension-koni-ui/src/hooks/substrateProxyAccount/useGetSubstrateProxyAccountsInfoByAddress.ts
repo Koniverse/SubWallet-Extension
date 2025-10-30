@@ -13,10 +13,13 @@ const DEFAULT_PROXY_ACCOUNTS: SubstrateProxyAccountInfo = {
 
 export function useGetSubstrateProxyAccountsInfoByAddress (address: string, chain: string): SubstrateProxyAccountInfo {
   const [substrateProxies, setSubstrateProxies] = useState<SubstrateProxyAccountInfo>(DEFAULT_PROXY_ACCOUNTS);
-  const fetchProxyData = useCallback(async () => {
+
+  const fetchProxyData = useCallback(async (isSync: boolean) => {
     try {
       if (!address || !isSubstrateAddress(address)) {
-        setSubstrateProxies(DEFAULT_PROXY_ACCOUNTS);
+        if (isSync) {
+          setSubstrateProxies(DEFAULT_PROXY_ACCOUNTS);
+        }
 
         return;
       }
@@ -28,15 +31,26 @@ export function useGetSubstrateProxyAccountsInfoByAddress (address: string, chai
 
       const proxyInfo = await getSubstrateProxyAccountInfo(request);
 
-      setSubstrateProxies(proxyInfo);
+      if (isSync) {
+        setSubstrateProxies(proxyInfo);
+      }
     } catch (e) {
       console.error('Error fetching proxy accounts:', e);
-      setSubstrateProxies(DEFAULT_PROXY_ACCOUNTS);
+
+      if (isSync) {
+        setSubstrateProxies(DEFAULT_PROXY_ACCOUNTS);
+      }
     }
   }, [address, chain]);
 
   useEffect(() => {
-    fetchProxyData().catch(console.error);
+    let isSync = true;
+
+    fetchProxyData(isSync).catch(console.error);
+
+    return () => {
+      isSync = false;
+    };
   }, [fetchProxyData]);
 
   return substrateProxies;

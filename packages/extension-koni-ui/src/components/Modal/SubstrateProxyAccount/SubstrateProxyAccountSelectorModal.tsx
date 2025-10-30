@@ -94,7 +94,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
             onClick={onCancel}
             schema='secondary'
           >
-            {t('ui.ACCOUNT.components.Modal.SubstrateProxyAccountAccount.SubstrateProxyAccountSelector.cancel')}
+            {t('ui.ACCOUNT.components.Modal.SubstrateProxyAccount.SubstrateProxyAccountSelector.cancel')}
           </Button>
           <Button
             block
@@ -108,16 +108,16 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
             }
             onClick={onClickApply}
           >
-            {t('ui.ACCOUNT.components.Modal.SubstrateProxyAccountAccount.SubstrateProxyAccountSelector.continue')}
+            {t('ui.ACCOUNT.components.Modal.SubstrateProxyAccount.SubstrateProxyAccountSelector.continue')}
           </Button>
         </>
       }
       id={modalId}
       onCancel={onCancel}
-      title={t('ui.ACCOUNT.components.Modal.SubstrateProxyAccountAccount.SubstrateProxyAccountSelector.selectAccount')}
+      title={t('ui.ACCOUNT.components.Modal.SubstrateProxyAccount.SubstrateProxyAccountSelector.selectAccount')}
     >
       <div className='proxy-modal__description'>
-        {t('ui.ACCOUNT.components.Modal.SubstrateProxyAccountAccount.SubstrateProxyAccountSelector.selectSigningAccount')}
+        {t('ui.ACCOUNT.components.Modal.SubstrateProxyAccount.SubstrateProxyAccountSelector.selectSigningAccount')}
       </div>
       <SwList.Section
         list={fullList}

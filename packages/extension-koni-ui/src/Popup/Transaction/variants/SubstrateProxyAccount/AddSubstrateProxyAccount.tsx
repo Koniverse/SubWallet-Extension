@@ -139,7 +139,7 @@ const Component = (): React.ReactElement<Props> => {
     );
 
     if (isInvalidProxy) {
-      return Promise.reject(new Error(t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccountAccount.substrateProxyTypeNotAuthorized')));
+      return Promise.reject(new Error(t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.substrateProxyTypeNotAuthorized')));
     }
 
     return Promise.resolve();
