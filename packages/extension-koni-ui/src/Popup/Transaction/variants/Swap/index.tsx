@@ -118,7 +118,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
 
   const { activeModal, inactiveAll, inactiveModal } = useContext(ModalContext);
 
-  const { accountProxies, accounts, isAllAccount } = useSelector((state) => state.accountState);
+  const { accountProxies, accounts, isAllAccount, currentAccountProxy } = useSelector((state) => state.accountState);
   const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
   const { priceMap } = useSelector((state) => state.price);
   const { chainInfoMap, chainStateMap, ledgerGenericAllowNetworks } = useSelector((root) => root.chainStore);
@@ -823,6 +823,20 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     });
   }, [chainInfoMap, destChainValue, getReformatAddress, isRecipientFieldAllowed, targetAccountProxy.accountType, targetAccountProxy.accounts]);
 
+  const substrateAddress: string | undefined = useMemo(() => {
+    if (currentAccountProxy === null) {
+      return undefined;
+    }
+
+    const substrateAccount = currentAccountProxy.accounts.find((account) => account.chainType === AccountChainType.SUBSTRATE);
+
+    if (!substrateAccount) {
+      return undefined;
+    }
+
+    return substrateAccount.address;
+  }, [currentAccountProxy]);
+
   useEffect(() => {
     if (fromTokenSlugValue && toTokenSlugValue && isAddressInputReady) {
       const addressInputCurrent = addressInputRef.current;
@@ -913,6 +927,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
 
           const currentRequest: SwapRequestV2 = {
             address: fromValue,
+            substrateAddress,
             pair: {
               slug: _parseAssetRefKey(fromTokenSlugValue, toTokenSlugValue),
               from: fromTokenSlugValue,

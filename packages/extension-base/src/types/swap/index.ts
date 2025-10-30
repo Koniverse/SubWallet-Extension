@@ -182,6 +182,7 @@ export interface SwapRequest {
 
 export interface SwapRequestV2 {
   address: string;
+  substrateAddress?: string; // use for dynamic swap in case the address is evm address on substrate chain
   pair: SwapPair;
   fromAmount: string;
   slippage: number; // Example: 0.01 for 1%
