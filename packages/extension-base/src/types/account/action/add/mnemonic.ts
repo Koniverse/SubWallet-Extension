@@ -4,7 +4,7 @@
 import { SeedLengths } from '@subwallet/extension-base/background/types';
 import { KeypairType } from '@subwallet/keyring/types';
 
-export type MnemonicType = 'general' | 'ton';
+export type MnemonicType = 'general' | 'trust-wallet' | 'ton';
 
 /**
  * @interface RequestMnemonicCreateV2

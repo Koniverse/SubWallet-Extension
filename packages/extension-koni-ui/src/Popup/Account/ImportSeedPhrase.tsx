@@ -132,6 +132,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       checkUnlock()
         .then(() => {
           setSubmitting(true);
+          // todo: add UI to allow user select import from TrustWallet
           validateSeedV2(seed).then((response) => {
             setSeedValidationResponse(response);
 
