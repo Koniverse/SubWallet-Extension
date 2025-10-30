@@ -186,6 +186,15 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
 
   const [storage, setStorage] = useLocalStorage<TransactionFormBaseProps>(storageKey, { ...defaultTransactionStorageValue });
 
+  // TODO: Review needPersistData — may be outdated and misaligned with current logic
+  //  Temporarily set needPersistData to false to avoid unintended side effects
+
+  // const cacheStorage = useDeferredValue(storage);
+
+  // const needPersistData = useMemo(() => {
+  //   return JSON.stringify(cacheStorage) === JSON.stringify(DEFAULT_TRANSACTION_PARAMS);
+  // }, [cacheStorage]);
+
   const needPersistData = false;
 
   const [defaultData, setDefaultData] = useState(storage);
@@ -250,6 +259,7 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
 
   const chainChecker = useChainChecker();
 
+  // Navigate to finish page
   const onDone = useCallback(
     (extrinsicHash: string) => {
       navigate(`/transaction-done/${from}/${chain}/${extrinsicHash}`, { replace: true });
@@ -276,6 +286,13 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
     chain !== '' && chainChecker(chain);
   }, [chain, chainChecker]);
 
+  // TODO (Hotfix):
+  //  Temporary workaround for handling cases where a user opens a transaction screen via direct link.
+  //  This fixes the issue where form values are incorrectly restored from a previously cached transaction.
+  //  Expected direction:
+  //  - Allow external logic to override form values cleanly.
+  //  - fromAccountProxy should not be strictly tied to currentAccountProxy.
+  //  - Ensure direct link access to transaction screens works reliably and cleanly without stale form data.
   useEffect(() => {
     const doFunction = () => {
       if (![SWAP_TRANSACTION, TRANSFER_TRANSACTION, EARN_TRANSACTION].includes(storageKey)) {

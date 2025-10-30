@@ -39,7 +39,7 @@ import { SignerResult } from '@polkadot/types/types/extrinsic';
 import { HexString } from '@polkadot/util/types';
 
 import { EarningImpactResult } from '../services/earning-service/handlers/native-staking/dtao';
-import { RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountInfo, RequestRemoveSubstrateProxyAccount, SubstrateProxyAccountInfo } from '../types/substrateProxyAccount';
+import { RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount, SubstrateProxyAccountGroup } from '../types/substrateProxyAccount';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -2764,7 +2764,7 @@ export interface KoniRequestSignatures {
   'pri(migrate.pingSession)': [RequestPingSession, boolean];
 
   /* Proxy Account */
-  'pri(substrateProxyAccount.geInfo)': [RequestGetSubstrateProxyAccountInfo, SubstrateProxyAccountInfo];
+  'pri(substrateProxyAccount.geInfo)': [RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountGroup];
   'pri(substrateProxyAccount.add)': [RequestAddSubstrateProxyAccount, SWTransactionResponse];
   'pri(substrateProxyAccount.remove)': [RequestRemoveSubstrateProxyAccount, SWTransactionResponse];
 

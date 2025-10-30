@@ -35,7 +35,7 @@ const IconMap: Record<string, SwIconProps['phosphorIcon']> = {
   timeout: ClockCounterClockwise,
   swap: ArrowsLeftRight,
   nominate: Pencil,
-  proxy: TreeStructure
+  substrateProxy: TreeStructure
 };
 
 function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
@@ -72,7 +72,7 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
   }
 
   if (isTypeProxy(item.type)) {
-    return IconMap.proxy;
+    return IconMap.substrateProxy;
   }
 
   return IconMap.default;

@@ -4,10 +4,10 @@
 import { _chainInfoToAccountChainType } from '@subwallet/extension-base/services/chain-service/utils';
 import { UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS } from '@subwallet/extension-base/services/substrate-proxy-service/constant';
 import { AccountProxy, AccountProxyType, SubstrateProxyAccountItem, SubstrateProxyType } from '@subwallet/extension-base/types';
-import { BasicInputEvent, ChainSelector, EmptyList, ProxyItemExtended, SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
+import { BasicInputEvent, ChainSelector, EmptyList, SubstrateProxyAccountItemExtended, SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
 import { ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS, REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useChainChecker, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { getSubstrateProxyAccountInfo } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
+import { getSubstrateProxyAccountGroup } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { AddSubstrateProxyAccountParams, ChainItemType, RemoveSubstrateProxyAccountParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import styled, { ThemeContext } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-export interface ProxyItemSelector extends ProxyItemExtended {
+export interface SubstrateProxyItemSelector extends SubstrateProxyAccountItemExtended {
   isSelected: boolean;
 }
 
@@ -39,7 +39,7 @@ function Component ({ accountProxy, className }: Props) {
   const navigate = useNavigate();
   const checkChain = useChainChecker();
   const getReformatAddress = useCoreCreateReformatAddress();
-  const [substrateProxyAccountsSelected, setSubstrateProxyAccountsSelected] = useState<Record<string, ProxyItemSelector>>({});
+  const [substrateProxyAccountsSelected, setSubstrateProxyAccountsSelected] = useState<Record<string, SubstrateProxyItemSelector>>({});
   const [networkSelected, setNetworkSelected] = useState<string>();
   const [loading, setLoading] = useState(false);
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
@@ -87,7 +87,7 @@ function Component ({ accountProxy, className }: Props) {
     return result;
   }, [allowedChains, chainInfoMap]);
 
-  const substrateProxyAccountSelectedSorted = useMemo<ProxyItemSelector[]>(() => {
+  const substrateProxyAccountSelectedSorted = useMemo<SubstrateProxyItemSelector[]>(() => {
     const list = Object.values(substrateProxyAccountsSelected);
 
     return list.sort((a, b) => {
@@ -131,7 +131,7 @@ function Component ({ accountProxy, className }: Props) {
 
   const onCancelRemoveSubstrateProxyAccounts = useCallback(() => {
     setSubstrateProxyAccountsSelected((prevState) => {
-      const newState: Record<string, ProxyItemSelector> = {};
+      const newState: Record<string, SubstrateProxyItemSelector> = {};
 
       Object.keys(prevState).forEach((key) => {
         newState[key] = {
@@ -260,9 +260,9 @@ function Component ({ accountProxy, className }: Props) {
           isSelected={!!substrateProxyAccountsSelected[key]?.isSelected}
           key={key}
           onClick={onSelectSubstrateProxyAccount(item)}
-          proxyAccount={item}
           showCheckedIcon={accountProxy.accountType !== AccountProxyType.READ_ONLY}
           showUnselectIcon
+          substrateProxyAccount={item}
         />
       );
     },
@@ -288,13 +288,13 @@ function Component ({ accountProxy, className }: Props) {
   useEffect(() => {
     if (addressFormated && networkSelected) {
       setLoading(true);
-      getSubstrateProxyAccountInfo({
+      getSubstrateProxyAccountGroup({
         chain: networkSelected,
         address: addressFormated
       })
         .then(({ substrateProxyAccounts }) => {
           setSubstrateProxyAccountsSelected((prev) => {
-            const newSelected: Record<string, ProxyItemSelector> = {};
+            const newSelected: Record<string, SubstrateProxyItemSelector> = {};
 
             substrateProxyAccounts.forEach((p) => {
               const key = getKey(p.substrateProxyAddress, p.substrateProxyType);

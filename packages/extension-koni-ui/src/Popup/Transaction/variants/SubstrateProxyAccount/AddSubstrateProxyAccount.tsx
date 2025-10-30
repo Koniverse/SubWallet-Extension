@@ -8,7 +8,7 @@ import { UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS } from '@subwallet/extension-base/
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AddressInputNew, ChainSelector, HiddenInput, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useCreateGetChainAndExcludedTokenByAccountProxy, useGetAccountProxyByAddress, useGetBalance, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
-import { useGetSubstrateProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/substrateProxyAccount/useGetSubstrateProxyAccountsInfoByAddress';
+import { useGetSubstrateProxyAccountGroupByAddress } from '@subwallet/extension-koni-ui/hooks/substrateProxyAccount/useGetSubstrateProxyAccountGroupByAddress';
 import { handleAddSubstrateProxyAccount } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -54,7 +54,7 @@ const Component = (): React.ReactElement<Props> => {
 
   const { error, isLoading: balanceLoading } = useGetBalance(chainValue, fromValue);
   const onPreCheck = usePreCheckAction(fromValue);
-  const proxyInfo = useGetSubstrateProxyAccountsInfoByAddress(fromValue, chainValue);
+  const substrateProxyAccountGroup = useGetSubstrateProxyAccountGroupByAddress(fromValue, chainValue);
   const nativeToken = useGetNativeTokenBasicInfo(chainValue);
 
   const accountProxy = useGetAccountProxyByAddress(fromValue);
@@ -96,16 +96,16 @@ const Component = (): React.ReactElement<Props> => {
       chain: values.chain,
       substrateProxyAddress: values.substrateProxyAddress,
       substrateProxyType: values.substrateProxyType,
-      substrateProxyDeposit: proxyInfo.substrateProxyDeposit
+      substrateProxyDeposit: substrateProxyAccountGroup.substrateProxyDeposit
     })
       .then(onSuccess)
       .catch(onError)
       .finally(() => {
         setLoading(false);
       });
-  }, [onError, onSuccess, proxyInfo]);
+  }, [onError, onSuccess, substrateProxyAccountGroup]);
 
-  const validateProxyAddress = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
+  const validateSubstrateProxyAddress = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
     const { chain, from } = form.getFieldsValue();
     const destChainInfo = chainInfoMap[chain];
     const account = findAccountByAddress(accounts, _recipientAddress);
@@ -115,7 +115,7 @@ const Component = (): React.ReactElement<Props> => {
       fromAddress: from,
       toAddress: _recipientAddress,
       account,
-      actionType: ActionType.SUBSTRATE_PROXY_ACCOUNT,
+      actionType: ActionType.MANAGE_SUBSTRATE_PROXY_ACCOUNT,
       autoFormatValue: false,
       allowLedgerGenerics: ledgerGenericAllowNetworks })
       .catch((err: unknown) => {
@@ -127,14 +127,14 @@ const Component = (): React.ReactElement<Props> => {
       });
   }, [accounts, chainInfoMap, form, ledgerGenericAllowNetworks]);
 
-  const validateProxyType = useCallback(async (rule: Rule, _proxyType: string) => {
+  const validateSubstrateProxyType = useCallback(async (rule: Rule, _proxyType: string) => {
     const { substrateProxyAddress } = form.getFieldsValue();
 
-    if (!proxyInfo.substrateProxyAccounts.length) {
+    if (!substrateProxyAccountGroup.substrateProxyAccounts.length) {
       return Promise.resolve();
     }
 
-    const isInvalidProxy = proxyInfo.substrateProxyAccounts.some(
+    const isInvalidProxy = substrateProxyAccountGroup.substrateProxyAccounts.some(
       (p) => isSameAddress(substrateProxyAddress, p.substrateProxyAddress) && p.substrateProxyType === _proxyType
     );
 
@@ -143,7 +143,7 @@ const Component = (): React.ReactElement<Props> => {
     }
 
     return Promise.resolve();
-  }, [form, proxyInfo.substrateProxyAccounts, t]);
+  }, [form, substrateProxyAccountGroup.substrateProxyAccounts, t]);
 
   useRestoreTransaction(form);
 
@@ -194,14 +194,14 @@ const Component = (): React.ReactElement<Props> => {
             name={'substrateProxyAddress'}
             rules={[
               {
-                validator: validateProxyAddress
+                validator: validateSubstrateProxyAddress
               }
             ]}
             statusHelpAsTooltip={true}
             validateTrigger={false}
           >
             <AddressInputNew
-              actionType={ActionType.SUBSTRATE_PROXY_ACCOUNT}
+              actionType={ActionType.MANAGE_SUBSTRATE_PROXY_ACCOUNT}
               chainSlug={chainValue}
               dropdownHeight={227}
               label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.substrateProxyAccount')}
@@ -217,7 +217,7 @@ const Component = (): React.ReactElement<Props> => {
             name={'substrateProxyType'}
             rules={[
               {
-                validator: validateProxyType
+                validator: validateSubstrateProxyType
               }
             ]}
             statusHelpAsTooltip={true}
@@ -237,7 +237,7 @@ const Component = (): React.ReactElement<Props> => {
             size={token.fontSize}
             suffix={nativeToken?.symbol}
             unitOpacity={0.45}
-            value={proxyInfo.substrateProxyDeposit}
+            value={substrateProxyAccountGroup.substrateProxyDeposit}
           />
         </div>
       </TransactionContent>

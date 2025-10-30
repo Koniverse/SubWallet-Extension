@@ -16,7 +16,7 @@ import styled from 'styled-components';
 export interface SubstrateProxyAccountSelectorModalProps {
   chain: string;
   address: string;
-  substrateProxyItems: SubstrateProxyAccountItem[];
+  substrateProxyAccountItems: SubstrateProxyAccountItem[];
   onCancel: VoidFunction;
   onApply: (selected: string) => void;
 }
@@ -25,14 +25,14 @@ export type SubstrateProxyAccountSelectorModalPropsValue = Omit<SubstrateProxyAc
 
 type Props = ThemeProps & SubstrateProxyAccountSelectorModalProps;
 
-interface ProxyItemExtended extends SubstrateProxyAccountItem {
+interface SubstrateProxyItemExtended extends SubstrateProxyAccountItem {
   isMain?: boolean;
 }
 
 const modalId = SUBSTRATE_PROXY_ACCOUNT_SELECTOR_MODAL;
 
 const Component = (props: Props, ref: ForwardedRef<any>) => {
-  const { address, className = '', onApply, onCancel, substrateProxyItems } = props;
+  const { address, className = '', onApply, onCancel, substrateProxyAccountItems } = props;
   const { t } = useTranslation();
   const sectionRef = useRef<SwListSectionRef>(null);
   const [selected, setSelected] = useState<string>(address);
@@ -45,9 +45,9 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
         substrateProxyAddress: address,
         proxyId: account?.proxyId
       },
-      ...substrateProxyItems
+      ...substrateProxyAccountItems
     ];
-  }, [account?.proxyId, address, substrateProxyItems]);
+  }, [account?.proxyId, address, substrateProxyAccountItems]);
 
   const onSelect = useCallback((address: string) => {
     return () => {
@@ -55,7 +55,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
     };
   }, []);
 
-  const renderItem = useCallback((item: ProxyItemExtended) => {
+  const renderItem = useCallback((item: SubstrateProxyItemExtended) => {
     const isSelected = selected === item.substrateProxyAddress;
 
     return (
@@ -63,8 +63,8 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
         className={'__proxy-account-item'}
         isSelected={isSelected}
         onClick={onSelect(item.substrateProxyAddress)}
-        proxyAccount={item}
         showUnselectIcon
+        substrateProxyAccount={item}
       />
     );
   }, [selected, onSelect]);

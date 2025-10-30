@@ -4,7 +4,7 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
-import { AddSubstrateProxyAccountParams, RemoveSubstrateProxyAccountParams, RequestGetSubstrateProxyAccountInfo, SubstrateProxyAccountInfo, SubstrateProxyAccountItem, SubstrateProxyType } from '@subwallet/extension-base/types/substrateProxyAccount';
+import { AddSubstrateProxyAccountParams, RemoveSubstrateProxyAccountParams, RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountGroup, SubstrateProxyAccountItem, SubstrateProxyType } from '@subwallet/extension-base/types/substrateProxyAccount';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
@@ -28,7 +28,7 @@ export default class SubstrateProxyAccountService {
     return this.state.getSubstrateApi(chain);
   }
 
-  async getSubstrateProxyAccountInfo (request: RequestGetSubstrateProxyAccountInfo): Promise<SubstrateProxyAccountInfo> {
+  async getSubstrateProxyAccountGroup (request: RequestGetSubstrateProxyAccountGroup): Promise<SubstrateProxyAccountGroup> {
     const { address, chain, selectedSubstrateProxyAddresses, type } = request;
     const substrateApi = this.getSubstrateApi(chain);
 

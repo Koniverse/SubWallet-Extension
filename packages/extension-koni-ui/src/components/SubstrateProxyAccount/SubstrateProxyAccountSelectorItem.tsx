@@ -13,12 +13,12 @@ import { CheckCircle } from 'phosphor-react';
 import React, { Context, useContext } from 'react';
 import styled, { ThemeContext } from 'styled-components';
 
-export interface ProxyItemExtended extends SubstrateProxyAccountItem {
+export interface SubstrateProxyAccountItemExtended extends SubstrateProxyAccountItem {
   isMain?: boolean;
 }
 
 type Props = ThemeProps & {
-  proxyAccount: ProxyItemExtended
+  substrateProxyAccount: SubstrateProxyAccountItemExtended
   isSelected?: boolean;
   showUnselectIcon?: boolean;
   showCheckedIcon?: boolean;
@@ -26,10 +26,10 @@ type Props = ThemeProps & {
 };
 
 function Component (props: Props): React.ReactElement<Props> {
-  const { className, isSelected, onClick, proxyAccount, showCheckedIcon = true, showUnselectIcon } = props;
+  const { className, isSelected, onClick, showCheckedIcon = true, showUnselectIcon, substrateProxyAccount } = props;
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const { t } = useTranslation();
-  const accountProxy = useGetAccountProxyById(proxyAccount.proxyId);
+  const accountProxy = useGetAccountProxyById(substrateProxyAccount.proxyId);
 
   const checkedIconNode = ((showUnselectIcon || isSelected) && (
     <div className='__checked-icon-wrapper'>
@@ -50,7 +50,7 @@ function Component (props: Props): React.ReactElement<Props> {
       <div className='__item-left-part'>
         <AccountProxyAvatar
           size={32}
-          value={proxyAccount.proxyId || proxyAccount.substrateProxyAddress}
+          value={substrateProxyAccount.proxyId || substrateProxyAccount.substrateProxyAddress}
         />
       </div>
       <div className='__item-middle-part'>
@@ -59,18 +59,18 @@ function Component (props: Props): React.ReactElement<Props> {
             '-has-address': !!accountProxy?.name
           })}
           >
-            {accountProxy?.name || toShort(proxyAccount.substrateProxyAddress, 9, 9)}
+            {accountProxy?.name || toShort(substrateProxyAccount.substrateProxyAddress, 9, 9)}
           </div>
           {!!accountProxy?.name && <div className='__item-address'>
-            ({toShort(proxyAccount.substrateProxyAddress, 4, 5)})
+            ({toShort(substrateProxyAccount.substrateProxyAddress, 4, 5)})
           </div>}
         </div>
         <div className={CN('__proxy-type', {
-          '-is-main': proxyAccount.isMain
+          '-is-main': substrateProxyAccount.isMain
         })}
         >
           {
-            proxyAccount.isMain ? t('ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.proxiedAccount') : `${t('ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.proxyType')}: ${proxyAccount.substrateProxyType}`
+            substrateProxyAccount.isMain ? t('ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.proxiedAccount') : `${t('ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.proxyType')}: ${substrateProxyAccount.substrateProxyType}`
           }
         </div>
       </div>

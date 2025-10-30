@@ -11,7 +11,7 @@ import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 function getConditions (validateRecipientParams: ValidateRecipientParams): ValidationCondition[] {
   const { account, actionType, autoFormatValue, destChainInfo, srcChain, toAddress } = validateRecipientParams;
   const conditions: ValidationCondition[] = [];
-  const isSendAction = [ActionType.SEND_FUND, ActionType.SEND_NFT, ActionType.SUBSTRATE_PROXY_ACCOUNT].includes(actionType);
+  const isSendAction = [ActionType.SEND_FUND, ActionType.SEND_NFT, ActionType.MANAGE_SUBSTRATE_PROXY_ACCOUNT].includes(actionType);
 
   conditions.push(ValidationCondition.IS_NOT_NULL);
   conditions.push(ValidationCondition.IS_ADDRESS);

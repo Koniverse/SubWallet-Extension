@@ -3,10 +3,10 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { SubstrateProxyAccountItem, SubstrateProxyType } from '@subwallet/extension-base/types';
-import { MetaInfo, ProxyItemExtended, SubstrateProxyAccountListModal, SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
+import { MetaInfo, SubstrateProxyAccountItemExtended, SubstrateProxyAccountListModal, SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
 import { SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useGetAccountProxyByAddress, useGetNativeTokenSlug, useHandleSubmitTransaction, usePreCheckAction, useSetCurrentPage, useTransactionContext } from '@subwallet/extension-koni-ui/hooks';
-import { useGetSubstrateProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/substrateProxyAccount/useGetSubstrateProxyAccountsInfoByAddress';
+import { useGetSubstrateProxyAccountGroupByAddress } from '@subwallet/extension-koni-ui/hooks/substrateProxyAccount/useGetSubstrateProxyAccountGroupByAddress';
 import { handleRemoveSubstrateProxyAccount } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { RemoveSubstrateProxyAccountParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -23,7 +23,7 @@ type Props = ThemeProps;
 const getKey = (address: string, proxyType: SubstrateProxyType) => proxyType + ':' + address;
 const modalId = SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL;
 
-interface ProxyAddressRemovedState {
+interface SubstrateProxyAddressRemovedState {
   keyUnique: SubstrateProxyAccountItem[];
   addressUnique: string[];
 }
@@ -40,15 +40,15 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
   const { activeModal } = useContext(ModalContext);
   const navigate = useNavigate();
   const { onError, onSuccess } = useHandleSubmitTransaction();
-  const proxyAccountInfo = useGetSubstrateProxyAccountsInfoByAddress(from, chain);
+  const substrateProxyAccountGroup = useGetSubstrateProxyAccountGroupByAddress(from, chain);
   const onPreCheck = usePreCheckAction(from);
 
   const accountProxy = useGetAccountProxyByAddress(from);
 
-  const proxyAddressRemovedFiltered = useMemo<ProxyAddressRemovedState>(() => {
+  const substrateProxyAddressRemovedFiltered = useMemo<SubstrateProxyAddressRemovedState>(() => {
     const proxyItems: SubstrateProxyAccountItem[] = [];
     const addressUnique = new Set<string>();
-    const proxyAccountsRecord = proxyAccountInfo.substrateProxyAccounts.reduce<Record<string, SubstrateProxyAccountItem>>((acc, proxyAccount) => {
+    const proxyAccountsRecord = substrateProxyAccountGroup.substrateProxyAccounts.reduce<Record<string, SubstrateProxyAccountItem>>((acc, proxyAccount) => {
       const key = getKey(proxyAccount.substrateProxyAddress, proxyAccount.substrateProxyType);
 
       acc[key] = proxyAccount;
@@ -67,9 +67,9 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
       addressUnique: Array.from(addressUnique),
       keyUnique: proxyItems
     };
-  }, [proxyAccountInfo.substrateProxyAccounts, substrateProxyAddressKeys]);
+  }, [substrateProxyAccountGroup.substrateProxyAccounts, substrateProxyAddressKeys]);
 
-  const isRemoveAll = proxyAddressRemovedFiltered.keyUnique.length === proxyAccountInfo.substrateProxyAccounts.length;
+  const isRemoveAll = substrateProxyAddressRemovedFiltered.keyUnique.length === substrateProxyAccountGroup.substrateProxyAccounts.length;
 
   const onClickDetail = useCallback(() => {
     activeModal(modalId);
@@ -80,7 +80,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
       return handleRemoveSubstrateProxyAccount({
         chain,
         address: from,
-        selectedSubstrateProxyAccounts: proxyAddressRemovedFiltered.keyUnique,
+        selectedSubstrateProxyAccounts: substrateProxyAddressRemovedFiltered.keyUnique,
         isRemoveAll,
         substrateProxyAddress
       });
@@ -91,12 +91,12 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
       chain,
       address: from,
       type: extrinsicType,
-      selectedSubstrateProxyAddresses: proxyAddressRemovedFiltered.addressUnique
+      selectedSubstrateProxyAddresses: substrateProxyAddressRemovedFiltered.addressUnique
     }).then(sendPromise)
       .then(onSuccess)
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [selectSubstrateProxyAccountsToSign, chain, from, proxyAddressRemovedFiltered.addressUnique, proxyAddressRemovedFiltered.keyUnique, onSuccess, onError, isRemoveAll]);
+  }, [selectSubstrateProxyAccountsToSign, chain, from, substrateProxyAddressRemovedFiltered.addressUnique, substrateProxyAddressRemovedFiltered.keyUnique, onSuccess, onError, isRemoveAll]);
 
   const onCancelRemove = useCallback(() => {
     if (accountProxy?.id) {
@@ -106,7 +106,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
     }
   }, [accountProxy?.id, goBack, navigate]);
 
-  const proxiedAccount = useMemo<ProxyItemExtended | null>(() => {
+  const substrateProxiedAccount = useMemo<SubstrateProxyAccountItemExtended | null>(() => {
     if (!accountProxy) {
       return null;
     }
@@ -120,7 +120,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
     });
   }, [accountProxy, from]);
 
-  const addressCount = proxyAddressRemovedFiltered.addressUnique.length;
+  const substrateProxyAddressCount = substrateProxyAddressRemovedFiltered.addressUnique.length;
 
   useEffect(() => {
     if (accountProxy?.id) {
@@ -140,7 +140,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
     };
   }, [accountProxy?.id, navigate, setBackProps]);
 
-  if (!proxyAddressRemovedFiltered.keyUnique?.length) {
+  if (!substrateProxyAddressRemovedFiltered.keyUnique?.length) {
     return <></>;
   }
 
@@ -148,10 +148,10 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
     <>
       <TransactionContent className={CN(className, '-transaction-content')}>
         <div>
-          {!!proxiedAccount && <SubstrateProxyAccountSelectorItem
+          {!!substrateProxiedAccount && <SubstrateProxyAccountSelectorItem
             className={'__proxy-account'}
-            proxyAccount={proxiedAccount}
             showCheckedIcon={false}
+            substrateProxyAccount={substrateProxiedAccount}
           />}
 
           <FreeBalance
@@ -167,9 +167,9 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
           className={'meta-info'}
           hasBackgroundWrapper
         >
-          {addressCount === 1
+          {substrateProxyAddressCount === 1
             ? <MetaInfo.Account
-              address={proxyAddressRemovedFiltered.addressUnique[0]}
+              address={substrateProxyAddressRemovedFiltered.addressUnique[0]}
               chainSlug={chain}
               label={t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyAccount')}
             />
@@ -177,7 +177,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
               className={'proxy-address-removed'}
               label={t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyAccount')}
             >
-              {addressCount} {t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts')}
+              {substrateProxyAddressCount} {t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts')}
               <Button
                 className={'proxy-address-removed-info'}
                 icon={ <Icon
@@ -229,7 +229,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
         </Button>
       </TransactionFooter>
 
-      <SubstrateProxyAccountListModal substrateProxyAddresses={proxyAddressRemovedFiltered.addressUnique} />
+      <SubstrateProxyAccountListModal substrateProxyAddresses={substrateProxyAddressRemovedFiltered.addressUnique} />
     </>
   );
 };
