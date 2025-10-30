@@ -90,6 +90,20 @@ export default class SubstrateProxyAccountService {
     const substrateApi = this.getSubstrateApi(chain);
 
     await substrateApi.isReady;
+
+    if (!substrateApi.api.tx.proxy || !substrateApi.api.tx.proxy.addProxy) {
+      return [new TransactionError(BasicTxErrorType.UNSUPPORTED)];
+    }
+
+    const maxSubstrateProxies = substrateApi.api.consts.proxy.maxProxies?.toNumber?.() || 0;
+
+    const currentProxiesRaw = await substrateApi.api.query.proxy.proxies(address);
+    const [proxyList] = currentProxiesRaw.toPrimitive() as [PrimitiveSubstrateProxyAccountItem[], string];
+
+    if (proxyList.length >= maxSubstrateProxies) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, `Maximum number of proxies reached: ${maxSubstrateProxies}`)];
+    }
+
     const transferableBalance = await this.state.balanceService.getTransferableBalance(address, chain);
     const bnTransferableBalance = new BigN(transferableBalance.value);
 
@@ -102,13 +116,11 @@ export default class SubstrateProxyAccountService {
 
     const totalRequired = new BigN(substrateProxyDeposit).plus(estimatedFee).plus(factorDeposit);
 
-    const errors: TransactionError[] = [];
-
     if (bnTransferableBalance.lt(totalRequired)) {
-      errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
+      return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)];
     }
 
-    return errors;
+    return [];
   }
 
   async removeSubstrateProxyAccounts (data: RemoveSubstrateProxyAccountParams): Promise<TransactionData> {

@@ -213,6 +213,7 @@ const Component = (): React.ReactElement<Props> => {
           </Form.Item>
 
           <Form.Item
+            dependencies={['substrateProxyAddress', 'chain', 'substrateProxyType']}
             name={'substrateProxyType'}
             rules={[
               {
