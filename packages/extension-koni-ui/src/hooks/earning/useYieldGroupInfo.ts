@@ -1,9 +1,9 @@
 // Copyright 2019-2022 @polkadot/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _chainInfoToChainType } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
-import { AccountProxyType, YieldPoolType } from '@subwallet/extension-base/types';
-import { isAccountAll } from '@subwallet/extension-base/utils';
+import { YieldPoolType } from '@subwallet/extension-base/types';
 import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
 import { useAccountBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector, useTokenGroup } from '@subwallet/extension-koni-ui/hooks';
 import { BalanceValueInfo, YieldGroupInfo } from '@subwallet/extension-koni-ui/types';
@@ -19,7 +19,7 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
   const { tokenGroupMap } = useTokenGroup(allowedChains, excludedTokens);
   const { tokenBalanceMap } = useAccountBalance(tokenGroupMap, true);
 
-  const extrinsicTypeSupported = useMemo(() => {
+  const extrinsicTypeRecordSupported = useMemo(() => {
     if (!currentAccountProxy) {
       return null;
     }
@@ -27,33 +27,22 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
     return getTransactionActionsByAccountProxy(currentAccountProxy, accountProxies);
   }, [accountProxies, currentAccountProxy]);
 
-  const hasWatchOnlyAccount = useMemo(() => {
-    if (!currentAccountProxy) {
-      return false;
-    }
-
-    if (isAccountAll(currentAccountProxy.id)) {
-      return accountProxies.some((item) => item.accountType === AccountProxyType.READ_ONLY);
-    } else {
-      return currentAccountProxy.accountType === AccountProxyType.READ_ONLY;
-    }
-  }, [accountProxies, currentAccountProxy]);
-
   return useMemo(() => {
     const result: Record<string, YieldGroupInfo> = {};
 
     for (const pool of Object.values(poolInfoMap)) {
       const chain = pool.chain;
+      const chainInfo = chainInfoMap[chain];
+      const accountChainType = _chainInfoToChainType(chainInfo);
       const extrinsicType = getExtrinsicTypeByPoolInfo(pool);
 
-      if (!hasWatchOnlyAccount && extrinsicTypeSupported && !extrinsicTypeSupported.includes(extrinsicType)) {
+      if (extrinsicTypeRecordSupported && !extrinsicTypeRecordSupported[accountChainType]?.includes(extrinsicType)) {
         continue;
       }
 
       if (allowedChains.includes(chain)) {
         const group = pool.group;
         const exists = result[group];
-        const chainInfo = chainInfoMap[chain];
 
         if (exists) {
           let apy: undefined | number;
@@ -148,7 +137,7 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
     }
 
     return Object.values(result);
-  }, [poolInfoMap, hasWatchOnlyAccount, extrinsicTypeSupported, allowedChains, chainInfoMap, tokenBalanceMap, multiChainAssetMap, assetRegistry, excludedTokens]);
+  }, [poolInfoMap, chainInfoMap, extrinsicTypeRecordSupported, allowedChains, tokenBalanceMap, multiChainAssetMap, assetRegistry, excludedTokens]);
 };
 
 export default useYieldGroupInfo;

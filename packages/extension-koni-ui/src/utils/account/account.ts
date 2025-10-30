@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
-import { NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicType, NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { LedgerMustCheckType } from '@subwallet/extension-base/core/types';
 import { ledgerMustCheckNetwork } from '@subwallet/extension-base/core/utils';
 import { _getChainSubstrateAddressPrefix, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { AbstractAddressJson, AccountChainType, AccountJson, AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
-import { isAccountAll, reformatAddress, uniqueStringArray } from '@subwallet/extension-base/utils';
+import { getAccountTransactionActions, isAccountAll, reformatAddress, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { MODE_CAN_SIGN } from '@subwallet/extension-koni-ui/constants/signing';
 import { AccountAddressType, AccountType, BitcoinAccountInfo } from '@subwallet/extension-koni-ui/types';
@@ -74,22 +74,35 @@ export const getSignMode = (account: AccountJson | null | undefined): AccountSig
   }
 };
 
-export const getTransactionActionsByAccountProxy = (accountProxy: AccountProxy, accountProxies: AccountProxy[] = []): string[] => {
-  const transactionActionsSet = new Set<string>();
+export const getTransactionActionsByAccountProxy = (accountProxy: AccountProxy, accountProxies: AccountProxy[] = []): Record<AccountChainType, ExtrinsicType[]> => {
+  const transactionActionMap: Record<AccountChainType, ExtrinsicType[]> = {
+    [AccountChainType.SUBSTRATE]: [],
+    [AccountChainType.ETHEREUM]: [],
+    [AccountChainType.TON]: [],
+    [AccountChainType.CARDANO]: [],
+    [AccountChainType.BITCOIN]: []
+  };
+
+  const handleSingleAccountProxy = (proxy: AccountProxy) => {
+    if (proxy.accountType === AccountProxyType.READ_ONLY) {
+      const chainType = proxy.chainTypes[0];
+      const transactionActions = getAccountTransactionActions(AccountSignMode.PASSWORD, proxy.chainTypes[0]);
+
+      transactionActionMap[chainType] = transactionActionMap[chainType].concat(transactionActions);
+    } else {
+      proxy.accounts?.forEach(({ chainType, transactionActions }) => {
+        transactionActionMap[chainType] = transactionActionMap[chainType].concat(transactionActions);
+      });
+    }
+  };
 
   if (isAccountAll(accountProxy.id)) {
-    accountProxies.forEach((proxy) => {
-      proxy.accounts?.forEach(({ transactionActions }) => {
-        transactionActions?.forEach((action) => transactionActionsSet.add(action));
-      });
-    });
+    accountProxies.forEach(handleSingleAccountProxy);
   } else {
-    accountProxy.accounts.forEach(({ transactionActions }) => {
-      transactionActions?.forEach((action) => transactionActionsSet.add(action));
-    });
+    handleSingleAccountProxy(accountProxy);
   }
 
-  return Array.from(transactionActionsSet);
+  return transactionActionMap;
 };
 
 export const accountCanSign = (signMode: AccountSignMode): boolean => {
