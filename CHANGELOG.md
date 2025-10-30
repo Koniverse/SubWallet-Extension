@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 1.3.64
+Build date: Oct 23, 2025.
+
+Features & Updates:
+- [Energy Web X] Display APY for collators in collator list (#4739)
+- Polkadot Asset Hub Migration (#4790)
+- Update chain-list stable v0.2.120 (#4797):
+   - Add XCM support for MYTH from Mythos -> Polkadot Asset Hub
+   - Update symbol for GLMR.wb (Moonriver) (GLMR.wb -> GLMR.mb)
+   - Remove Polkadot & Kusama related XCM Ref
+   - [Hydration] Add support for ENA
+   - [Hydration] Add swap support for ENA
+
+
 ## 1.3.63
 Build date: Oct 23, 2025.
 
