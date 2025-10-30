@@ -3,55 +3,83 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountChainType, AccountSignMode, RequestGetSubstrateProxyAccountInfo, SubstrateProxyAccountItem } from '@subwallet/extension-base/types';
-import { isSameAddress } from '@subwallet/extension-base/utils';
+import { createPromiseHandler, isSameAddress } from '@subwallet/extension-base/utils';
+import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { getSubstrateProxyAccountInfo } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { isSubstrateAddress } from '@subwallet/keyring';
-import { useCallback, useState } from 'react';
+import { useCallback, useContext } from 'react';
 
-export type SetSubstrateProxyAccountsToSign = (chain: string, address?: string, type?: ExtrinsicType, selectedProxyAddress?: string[]) => void;
+export type SelectSubstrateProxyAccountsToSignParams = {
+  chain: string;
+  address?: string;
+  type?: ExtrinsicType;
+  selectedSubstrateProxyAddresses?: string[];
+};
 
-export function useSubstrateProxyAccountsToSign (): [SubstrateProxyAccountItem[], SetSubstrateProxyAccountsToSign] {
+export type SelectSubstrateProxyAccountsToSign = (params: SelectSubstrateProxyAccountsToSignParams) => Promise<string | undefined>;
+
+type GetSubstrateProxyAccountsToSign = (params: SelectSubstrateProxyAccountsToSignParams) => Promise<SubstrateProxyAccountItem[]>;
+
+export function useSubstrateProxyAccountsToSign (): SelectSubstrateProxyAccountsToSign {
   const allAccounts = useSelector((state: RootState) => state.accountState.accounts);
-  const [substrateProxies, setSubstrateProxies] = useState<SubstrateProxyAccountItem[]>([]);
+  const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
 
-  const fetchProxyAccountToSign = useCallback(async (chain: string, address?: string, type?: ExtrinsicType, selectedSubstrateProxyAddress?: string[]): Promise<void> => {
+  const getSubstrateProxyAccount = useCallback<GetSubstrateProxyAccountsToSign>(async ({ address, chain, selectedSubstrateProxyAddresses, type }) => {
     try {
       if (!address || !isSubstrateAddress(address)) {
-        setSubstrateProxies([]);
-
-        return;
+        return [];
       }
 
       const request: RequestGetSubstrateProxyAccountInfo = {
         chain,
         address,
         type,
-        selectedSubstrateProxyAddresses: selectedSubstrateProxyAddress
+        selectedSubstrateProxyAddresses
       };
 
       const proxyAccounts = await getSubstrateProxyAccountInfo(request);
 
       if (!proxyAccounts?.substrateProxyAccounts?.length) {
-        setSubstrateProxies([]);
-
-        return;
+        return [];
       }
 
       const validAccounts = allAccounts.filter(
         (acc) => acc.chainType === AccountChainType.SUBSTRATE && acc.signMode !== AccountSignMode.READ_ONLY
       );
 
-      setSubstrateProxies(proxyAccounts.substrateProxyAccounts.filter((proxy) =>
+      return proxyAccounts.substrateProxyAccounts.filter((proxy) =>
         validAccounts.some((acc) => isSameAddress(acc.address, proxy.substrateProxyAddress))
-      ));
+      );
     } catch (e) {
       console.error('Error fetching proxy accounts:', e);
 
-      setSubstrateProxies([]);
+      return [];
     }
   }, [allAccounts]);
 
-  return [substrateProxies, fetchProxyAccountToSign];
+  return useCallback(async (params: SelectSubstrateProxyAccountsToSignParams): Promise<string | undefined> => {
+    if (!params.address) {
+      return Promise.resolve(undefined);
+    }
+
+    const substrateProxyAccounts = await getSubstrateProxyAccount(params);
+
+    if (substrateProxyAccounts.length === 0) {
+      return Promise.resolve(undefined);
+    }
+
+    const { promise, reject, resolve } = createPromiseHandler<string>();
+
+    selectSubstrateProxyAccountModal.open({
+      chain: params.chain,
+      address: params.address,
+      substrateProxyItems: substrateProxyAccounts,
+      onApply: resolve,
+      onCancel: reject
+    });
+
+    return promise;
+  }, [getSubstrateProxyAccount, selectSubstrateProxyAccountModal]);
 }

@@ -93,13 +93,13 @@ const Component = (props: Props) => {
 
   const { t } = useTranslation();
   const { activeModal, checkActive } = useContext(ModalContext);
-  const { alertModal: { close: closeAlert, open: openAlert }, selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
+  const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
   const isActive = checkActive(modalId);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
   const onPreCheck = usePreCheckAction(from);
   const { onError, onSuccess } = useHandleSubmitTransaction();
-  const [substrateProxyAccountsToSign, setSubstrateProxyAccountsToSign] = useSubstrateProxyAccountsToSign();
+  const selectSubstrateProxyAccountsToSign = useSubstrateProxyAccountsToSign();
 
   const sectionRef = useRef<SwListSectionRef>(null);
   const networkPrefix = chainInfoMap[chain]?.substrateInfo?.addressPrefix;
@@ -305,10 +305,10 @@ const Component = (props: Props) => {
     setSubmitLoading(true);
 
     setTimeout(() => {
-      selectSubstrateProxyAccountModal.open({
+      selectSubstrateProxyAccountsToSign({
         address: from,
-        chain: chain,
-        substrateProxyItems: substrateProxyAccountsToSign
+        chain,
+        type: ExtrinsicType.CHANGE_EARNING_VALIDATOR
       }).then(sendPromise)
         .then(onSuccess)
         .catch(onError)
@@ -316,7 +316,7 @@ const Component = (props: Props) => {
           setSubmitLoading(false);
         });
     }, 300);
-  }, [poolInfo.slug, from, selectSubstrateProxyAccountModal, chain, substrateProxyAccountsToSign, onSuccess, onError]);
+  }, [poolInfo.slug, from, selectSubstrateProxyAccountsToSign, chain, onSuccess, onError]);
 
   const onClickSubmit = useCallback((values: { target: ValidatorInfo[] }) => {
     const { target } = values;
@@ -471,10 +471,6 @@ const Component = (props: Props) => {
   useEffect(() => {
     chain && checkChain(chain);
   }, [chain, checkChain]);
-
-  useEffect(() => {
-    setSubstrateProxyAccountsToSign(chain, from, ExtrinsicType.CHANGE_EARNING_VALIDATOR);
-  }, [chain, from, setSubstrateProxyAccountsToSign]);
 
   useExcludeModal(modalId);
 

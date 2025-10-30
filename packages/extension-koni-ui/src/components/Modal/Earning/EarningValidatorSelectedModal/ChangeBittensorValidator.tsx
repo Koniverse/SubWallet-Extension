@@ -60,10 +60,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { checkActive } = useContext(ModalContext);
   const isActive = checkActive(modalId);
 
-  const { alertModal: { close: closeAlert, open: openAlert }, selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
+  const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
   const { defaultData } = useTransactionContext<ChangeValidatorParams>();
   const { onError, onSuccess } = useHandleSubmitTransaction();
-  const [substrateProxyAccountsToSign, setSubstrateProxyAccountsToSign] = useSubstrateProxyAccountsToSign();
+  const selectSubstrateProxyAccountsToSign = useSubstrateProxyAccountsToSign();
   const account = findAccountByAddress(accounts, from);
   const [form] = Form.useForm<ChangeValidatorParams>();
   const originValidator = useWatchTransaction('originValidator', form, defaultData);
@@ -295,10 +295,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           });
         };
 
-        selectSubstrateProxyAccountModal.open({
+        selectSubstrateProxyAccountsToSign({
+          chain,
           address: from,
-          chain: chain,
-          substrateProxyItems: substrateProxyAccountsToSign
+          type: ExtrinsicType.CHANGE_EARNING_VALIDATOR
         }).then(sendPromise)
           .then(onSuccess)
           .catch((error: TransactionError) => {
@@ -334,7 +334,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
       send(isShowAmountChange ? value : bondedValue);
     },
-    [bondedValue, chain, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, selectSubstrateProxyAccountModal, stakingFee, substrateProxyAccountsToSign, symbol, t]
+    [bondedValue, chain, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, selectSubstrateProxyAccountsToSign, stakingFee, symbol, t]
   );
   const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
 
@@ -358,10 +358,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   useEffect(() => {
     chain && checkChain(chain);
   }, [chain, checkChain]);
-
-  useEffect(() => {
-    setSubstrateProxyAccountsToSign(chain, from, ExtrinsicType.CHANGE_EARNING_VALIDATOR);
-  }, [chain, from, setSubstrateProxyAccountsToSign]);
 
   const onPreCheck = usePreCheckAction(from);
 

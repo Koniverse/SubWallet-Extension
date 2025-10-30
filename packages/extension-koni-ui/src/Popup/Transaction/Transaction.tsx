@@ -38,7 +38,7 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
   const dataContext = useContext(DataContext);
 
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
-  const [substrateProxyAccountsToSign, setSubstrateProxyAccountsToSign] = useSubstrateProxyAccountsToSign();
+  const selectSubstrateProxyAccountsToSign = useSubstrateProxyAccountsToSign();
 
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
   const [recheckingChain, setRecheckingChain] = useState<string | undefined>();
@@ -317,9 +317,8 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
     closeRecheckChainConnectionModal,
     modalId,
     setIsDisableHeader,
-    setSubstrateProxyAccountsToSign,
-    substrateProxyAccountsToSign
-  }), [closeAlert, closeRecheckChainConnectionModal, defaultData, goBack, modalId, needPersistData, onDone, openAlert, openRecheckChainConnectionModal, substrateProxyAccountsToSign, setStorage, setSubstrateProxyAccountsToSign]);
+    selectSubstrateProxyAccountsToSign
+  }), [defaultData, needPersistData, setStorage, onDone, goBack, closeAlert, openAlert, openRecheckChainConnectionModal, closeRecheckChainConnectionModal, modalId, selectSubstrateProxyAccountsToSign]);
 
   const recheckChainConnectionModalNode = (
     <>

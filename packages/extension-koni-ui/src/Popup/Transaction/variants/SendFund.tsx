@@ -23,7 +23,6 @@ import { _reformatAddressWithChain, isAccountAll, isSubstrateEcdsaLedgerAssetSup
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenSelector } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useAlert, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import useLazyWatchTransaction from '@subwallet/extension-koni-ui/hooks/transaction/useWatchTransactionLazy';
@@ -124,7 +123,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const notification = useNotification();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
 
-  const { defaultData, persistData, setSubstrateProxyAccountsToSign, substrateProxyAccountsToSign } = useTransactionContext<TransferParams>();
+  const { defaultData, persistData, selectSubstrateProxyAccountsToSign } = useTransactionContext<TransferParams>();
   const { defaultSlug: sendFundSlug } = defaultData;
   const isFirstRender = useIsFirstRender();
 
@@ -198,8 +197,6 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const estimatedNativeFee = useMemo((): string => transferInfo?.feeOptions.estimatedFee || '0', [transferInfo]);
 
   const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
-
-  const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
 
   const handleWarning = useCallback((warnings: TransactionWarning[]) => {
     if (warnings.some((w) => w.warningType === BasicTxWarningCode.NOT_ENOUGH_EXISTENTIAL_DEPOSIT)) {
@@ -592,12 +589,11 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           });
 
       return new Promise<SWTransactionResponse>((resolve, reject) => {
-        selectSubstrateProxyAccountModal
-          .open({
-            chain,
-            address: from,
-            substrateProxyItems: substrateProxyAccountsToSign
-          })
+        selectSubstrateProxyAccountsToSign({
+          chain: chain,
+          address: from,
+          type: extrinsicType
+        })
           .then((selectedProxy) => {
             setSubmitLoading(true);
 
@@ -610,7 +606,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           .finally(() => setLoading(false));
       });
     },
-    [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, selectSubstrateProxyAccountModal, substrateProxyAccountsToSign, onError]
+    [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, selectSubstrateProxyAccountsToSign, extrinsicType, onError]
   );
 
   // todo: must refactor later, temporary solution to support SnowBridge
@@ -950,10 +946,6 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${Date.now()}`);
     }
   }, [form, hideMaxButton, isTransferAll, transferInfo]);
-
-  useEffect(() => {
-    setSubstrateProxyAccountsToSign(chainValue, fromValue, extrinsicType);
-  }, [chainValue, fromValue, setSubstrateProxyAccountsToSign, extrinsicType]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');

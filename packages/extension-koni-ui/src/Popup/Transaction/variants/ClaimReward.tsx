@@ -9,7 +9,6 @@ import { AccountJson, EarningRewardItem, YieldPoolType, YieldPositionInfo } from
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
-import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useGetNativeTokenBasicInfo, useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { yieldSubmitStakingClaimReward } from '@subwallet/extension-koni-ui/messaging';
 import { ClaimRewardParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -18,7 +17,7 @@ import { Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowCircleRight, XCircle } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -85,12 +84,11 @@ const filterAccount = (
 const Component = () => {
   const navigate = useNavigate();
 
-  const { defaultData, persistData, setSubstrateProxyAccountsToSign, substrateProxyAccountsToSign } = useTransactionContext<ClaimRewardParams>();
+  const { defaultData, persistData, selectSubstrateProxyAccountsToSign } = useTransactionContext<ClaimRewardParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<ClaimRewardParams>();
   const formDefault = useMemo((): ClaimRewardParams => ({ ...defaultData }), [defaultData]);
-  const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
   const { chainInfoMap } = useSelector((state) => state.chainStore);
   const { earningRewards, poolInfoMap } = useSelector((state) => state.earning);
@@ -165,10 +163,10 @@ const Component = () => {
 
     const sendPromiseWrapper = async () => {
       if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-        const substrateProxyAddress = await selectSubstrateProxyAccountModal.open({
-          address: from,
+        const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
           chain,
-          substrateProxyItems: substrateProxyAccountsToSign
+          address: from,
+          type: ExtrinsicType.STAKING_CLAIM_REWARD
         });
 
         return await sendPromise(substrateProxyAddress);
@@ -180,7 +178,7 @@ const Component = () => {
     setTimeout(() => {
       sendPromiseWrapper().catch(onError).finally(() => setLoading(false));
     }, 300);
-  }, [onError, onSuccess, poolInfo.type, substrateProxyAccountsToSign, reward?.unclaimedReward, selectSubstrateProxyAccountModal]);
+  }, [reward?.unclaimedReward, onSuccess, poolInfo.type, selectSubstrateProxyAccountsToSign, onError]);
 
   const checkAction = usePreCheckAction(fromValue);
 
@@ -200,10 +198,6 @@ const Component = () => {
       form.setFieldValue('from', accountList[0].address);
     }
   }, [accountList, form, fromValue]);
-
-  useEffect(() => {
-    setSubstrateProxyAccountsToSign(chainValue, fromValue, ExtrinsicType.STAKING_CLAIM_REWARD);
-  }, [chainValue, fromValue, setSubstrateProxyAccountsToSign]);
 
   return (
     <>

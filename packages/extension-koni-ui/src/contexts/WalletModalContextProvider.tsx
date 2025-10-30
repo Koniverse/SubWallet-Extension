@@ -1,13 +1,12 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { createPromiseHandler } from '@subwallet/extension-base/utils';
 import { AccountMigrationInProgressWarningModal, AccountTokenAddressModal, AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RemindBackupSeedPhraseModal, RemindDuplicateAccountNameModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, SubstrateProxyAccountSelectorModal, SwitchNetworkAuthorizeModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-koni-ui/components';
 import { CustomizeModal } from '@subwallet/extension-koni-ui/components/Modal/Customize/CustomizeModal';
 import { AccountDeriveActionProps } from '@subwallet/extension-koni-ui/components/Modal/DeriveAccountActionModal';
 import { AccountTokenAddressModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/AccountTokenAddressModal';
 import { SelectAddressFormatModalProps } from '@subwallet/extension-koni-ui/components/Modal/Global/SelectAddressFormatModal';
-import { SubstrateProxyAccountSelectorModalProps, SubstrateProxyAccountSelectorModalPropsValue } from '@subwallet/extension-koni-ui/components/Modal/SubstrateProxyAccount/SubstrateProxyAccountSelectorModal';
+import { SubstrateProxyAccountSelectorModalProps } from '@subwallet/extension-koni-ui/components/Modal/SubstrateProxyAccount/SubstrateProxyAccountSelectorModal';
 import SwapFeesModal, { SwapFeesModalProps } from '@subwallet/extension-koni-ui/components/Modal/Swap/SwapFeesModal';
 import { SwitchNetworkAuthorizeModalProps } from '@subwallet/extension-koni-ui/components/Modal/SwitchNetworkAuthorizeModal';
 import { TransactionStepsModalProps } from '@subwallet/extension-koni-ui/components/Modal/TransactionStepsModal';
@@ -100,7 +99,7 @@ export interface WalletModalContextType {
     open: (props: SwitchNetworkAuthorizeModalProps) => void
   },
   selectSubstrateProxyAccountModal: {
-    open: (props: SubstrateProxyAccountSelectorModalPropsValue) => Promise<string | undefined>;
+    open: (props: SubstrateProxyAccountSelectorModalProps) => void;
   }
 }
 
@@ -155,9 +154,7 @@ export const WalletModalContext = React.createContext<WalletModalContextType>({
   },
   selectSubstrateProxyAccountModal: {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    open: () => {
-      return Promise.resolve('');
-    }
+    open: () => {}
   }
 });
 
@@ -302,30 +299,22 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   /* Switch current network authorize modal */
 
   /* Select proxy account modal */
-  const openSelectSubstrateProxyAccountModal = useCallback((props: SubstrateProxyAccountSelectorModalPropsValue) => {
-    const { promise, reject, resolve } = createPromiseHandler<string>();
-
-    if (!props.substrateProxyItems?.length) {
-      return Promise.resolve(undefined);
-    }
-
+  const openSelectSubstrateProxyAccountModal = useCallback((props: SubstrateProxyAccountSelectorModalProps) => {
     setSelectSubstrateProxyAccountModalProps({
       ...props,
       onApply: (selected) => {
         setSelectSubstrateProxyAccountModalProps(undefined);
         inactiveModal(SUBSTRATE_PROXY_ACCOUNT_SELECTOR_MODAL);
-        resolve(selected);
+        props.onApply(selected);
       },
       onCancel: () => {
         setSelectSubstrateProxyAccountModalProps(undefined);
         inactiveModal(SUBSTRATE_PROXY_ACCOUNT_SELECTOR_MODAL);
-        reject(new Error('User rejected the request'));
+        props.onCancel();
       }
     });
 
     activeModal(SUBSTRATE_PROXY_ACCOUNT_SELECTOR_MODAL);
-
-    return promise;
   }, [activeModal, inactiveModal]);
   /* Select proxy account modal */
 

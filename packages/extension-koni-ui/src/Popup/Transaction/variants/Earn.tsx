@@ -17,7 +17,6 @@ import { EarningInstructionModal } from '@subwallet/extension-koni-ui/components
 import { SlippageModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, STAKE_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useChainConnection, useCoreCreateReformatAddress, useCreateGetSubnetStakingTokenName, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
@@ -58,8 +57,8 @@ const Component = () => {
   const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
   const { closeAlert, defaultData, goBack, onDone, openAlert,
-    persistData, setBackProps,
-    setIsDisableHeader, setSubHeaderRightButtons, setSubstrateProxyAccountsToSign, substrateProxyAccountsToSign } = useTransactionContext<EarnParams>();
+    persistData, selectSubstrateProxyAccountsToSign,
+    setBackProps, setIsDisableHeader, setSubHeaderRightButtons } = useTransactionContext<EarnParams>();
 
   const { fromAccountProxy, slug } = defaultData;
 
@@ -74,7 +73,6 @@ const Component = () => {
   const [form] = Form.useForm<EarnParams>();
   const formDefault = useMemo((): EarnParams => ({ ...defaultData }), [defaultData]);
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('stake');
-  const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
   const fromValue = useWatchTransaction('from', form, defaultData);
   const amountValue = useWatchTransaction('value', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
@@ -583,11 +581,13 @@ const Component = () => {
               let success = false;
 
               if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-                selectSubstrateProxyAccountModal.open({
-                  address: from,
-                  chain,
-                  substrateProxyItems: substrateProxyAccountsToSign
-                })
+                selectSubstrateProxyAccountsToSign(
+                  {
+                    chain,
+                    address: from,
+                    type: exType
+                  }
+                )
                   .then(async (selected?: string) => {
                     setSubmitLoading(true);
 
@@ -655,7 +655,7 @@ const Component = () => {
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, selectSubstrateProxyAccountModal, setIsDisableHeader, stakingFee, substrateProxyAccountsToSign, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, exType, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, selectSubstrateProxyAccountsToSign, setIsDisableHeader, stakingFee, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {
@@ -1047,10 +1047,6 @@ const Component = () => {
   useEffect(() => {
     form.setFieldValue('asset', inputAsset.slug || '');
   }, [form, inputAsset.slug]);
-
-  useEffect(() => {
-    setSubstrateProxyAccountsToSign(chainValue, fromValue, exType);
-  }, [chainValue, fromValue, exType, setSubstrateProxyAccountsToSign]);
 
   useEffect(() => {
     if (!fromValue && accountAddressItems.length === 1) {

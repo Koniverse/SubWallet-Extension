@@ -6,7 +6,6 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountJson, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountSelector, CancelUnstakeSelector, HiddenInput } from '@subwallet/extension-koni-ui/components';
-import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { yieldSubmitStakingCancelWithdrawal } from '@subwallet/extension-koni-ui/messaging';
 import { CancelUnStakeParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -14,7 +13,7 @@ import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowCircleRight, XCircle } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -47,7 +46,7 @@ const Component = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { defaultData, persistData, setSubstrateProxyAccountsToSign, substrateProxyAccountsToSign } = useTransactionContext<CancelUnStakeParams>();
+  const { defaultData, persistData, selectSubstrateProxyAccountsToSign } = useTransactionContext<CancelUnStakeParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<CancelUnStakeParams>();
@@ -67,7 +66,6 @@ const Component = () => {
 
   const { list: allPositionInfos } = useYieldPositionDetail(slug);
   const { compound: positionInfo } = useYieldPositionDetail(slug, fromValue);
-  const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
   const [isDisable, setIsDisable] = useState(true);
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
@@ -124,10 +122,10 @@ const Component = () => {
 
     const sendPromiseWrapper = async () => {
       if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-        const substrateProxyAddress = await selectSubstrateProxyAccountModal.open({
-          address: from,
+        const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
           chain,
-          substrateProxyItems: substrateProxyAccountsToSign
+          address: from,
+          type: ExtrinsicType.STAKING_CANCEL_UNSTAKE
         });
 
         return await sendPromise(substrateProxyAddress);
@@ -140,7 +138,7 @@ const Component = () => {
       sendPromiseWrapper().catch(onError)
         .finally(() => setLoading(false));
     }, 300);
-  }, [onError, onSuccess, poolInfo.type, positionInfo, substrateProxyAccountsToSign, selectSubstrateProxyAccountModal]);
+  }, [positionInfo, onSuccess, poolInfo.type, selectSubstrateProxyAccountsToSign, onError]);
 
   const onPreCheck = usePreCheckAction(fromValue);
 
@@ -160,10 +158,6 @@ const Component = () => {
       form.setFieldValue('from', accountList[0].address);
     }
   }, [accountList, form, fromValue]);
-
-  useEffect(() => {
-    setSubstrateProxyAccountsToSign(chainValue, fromValue, ExtrinsicType.STAKING_CANCEL_UNSTAKE);
-  }, [chainValue, fromValue, setSubstrateProxyAccountsToSign]);
 
   return (
     <>

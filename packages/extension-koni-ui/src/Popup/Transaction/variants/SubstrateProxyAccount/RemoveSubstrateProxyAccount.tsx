@@ -5,7 +5,6 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { SubstrateProxyAccountItem, SubstrateProxyType } from '@subwallet/extension-base/types';
 import { MetaInfo, ProxyItemExtended, SubstrateProxyAccountListModal, SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
 import { SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useGetAccountProxyByAddress, useGetNativeTokenSlug, useHandleSubmitTransaction, usePreCheckAction, useSetCurrentPage, useTransactionContext } from '@subwallet/extension-koni-ui/hooks';
 import { useGetSubstrateProxyAccountsInfoByAddress } from '@subwallet/extension-koni-ui/hooks/substrateProxyAccount/useGetSubstrateProxyAccountsInfoByAddress';
 import { handleRemoveSubstrateProxyAccount } from '@subwallet/extension-koni-ui/messaging/transaction/proxy';
@@ -33,7 +32,7 @@ const extrinsicType = ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT;
 
 const Component = ({ className }: Props): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/remove-proxy');
-  const { defaultData: { chain, from, substrateProxyAddressKeys }, goBack, setBackProps, setSubstrateProxyAccountsToSign, substrateProxyAccountsToSign } = useTransactionContext<RemoveSubstrateProxyAccountParams>();
+  const { defaultData: { chain, from, substrateProxyAddressKeys }, goBack, selectSubstrateProxyAccountsToSign, setBackProps } = useTransactionContext<RemoveSubstrateProxyAccountParams>();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
@@ -41,7 +40,6 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
   const { activeModal } = useContext(ModalContext);
   const navigate = useNavigate();
   const { onError, onSuccess } = useHandleSubmitTransaction();
-  const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
   const proxyAccountInfo = useGetSubstrateProxyAccountsInfoByAddress(from, chain);
   const onPreCheck = usePreCheckAction(from);
 
@@ -89,15 +87,16 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
     };
 
     setLoading(true);
-    selectSubstrateProxyAccountModal.open({
+    selectSubstrateProxyAccountsToSign({
       chain,
       address: from,
-      substrateProxyItems: substrateProxyAccountsToSign
+      type: extrinsicType,
+      selectedSubstrateProxyAddresses: proxyAddressRemovedFiltered.addressUnique
     }).then(sendPromise)
       .then(onSuccess)
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [chain, from, isRemoveAll, onError, onSuccess, substrateProxyAccountsToSign, proxyAddressRemovedFiltered, selectSubstrateProxyAccountModal]);
+  }, [selectSubstrateProxyAccountsToSign, chain, from, proxyAddressRemovedFiltered.addressUnique, proxyAddressRemovedFiltered.keyUnique, onSuccess, onError, isRemoveAll]);
 
   const onCancelRemove = useCallback(() => {
     if (accountProxy?.id) {
@@ -122,10 +121,6 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
   }, [accountProxy, from]);
 
   const addressCount = proxyAddressRemovedFiltered.addressUnique.length;
-
-  useEffect(() => {
-    setSubstrateProxyAccountsToSign(chain, from, extrinsicType, proxyAddressRemovedFiltered.addressUnique);
-  }, [chain, from, setSubstrateProxyAccountsToSign, proxyAddressRemovedFiltered.addressUnique]);
 
   useEffect(() => {
     if (accountProxy?.id) {

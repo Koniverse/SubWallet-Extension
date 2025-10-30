@@ -10,7 +10,6 @@ import { AccountJson, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata,
 import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, MetaInfo, NominationSelector } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA, UNSTAKE_TANSSI_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
@@ -68,7 +67,7 @@ const validateFields: Array<keyof UnStakeParams> = ['value'];
 const Component: React.FC = () => {
   const { t } = useTranslation();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { defaultData, persistData, setCustomScreenTitle, setSubstrateProxyAccountsToSign, substrateProxyAccountsToSign } = useTransactionContext<UnStakeParams>();
+  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setCustomScreenTitle } = useTransactionContext<UnStakeParams>();
   const { slug } = defaultData;
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('unstake');
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
@@ -97,7 +96,6 @@ const Component: React.FC = () => {
   const amountValue = useWatchTransaction('value', form, defaultData);
 
   const { list: allPositions } = useYieldPositionDetail(slug);
-  const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
   const { compound: positionInfo } = useYieldPositionDetail(slug, fromValue);
 
   const bondedSlug = useMemo(() => {
@@ -388,10 +386,10 @@ const Component: React.FC = () => {
 
     const sendPromiseWrapper = async () => {
       if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-        const substrateProxyAddress = await selectSubstrateProxyAccountModal.open({
-          address: from,
+        const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
           chain,
-          substrateProxyItems: substrateProxyAccountsToSign
+          address: from,
+          type: exType
         });
 
         return await sendPromise(substrateProxyAddress);
@@ -409,7 +407,7 @@ const Component: React.FC = () => {
           setLoading(false);
         });
     }, 300);
-  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, selectSubstrateProxyAccountModal, stakingFee, substrateProxyAccountsToSign]);
+  }, [currentValidator, exType, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, selectSubstrateProxyAccountsToSign, stakingFee]);
 
   const onClickSubmit = useCallback((values: UnStakeParams) => {
     if (currentConfirmation) {
@@ -480,10 +478,6 @@ const Component: React.FC = () => {
       form.setFieldValue('value', bondedValue);
     }
   }, [poolChain, form, isMythosStaking, bondedValue]);
-
-  useEffect(() => {
-    setSubstrateProxyAccountsToSign(chainValue, fromValue, exType);
-  }, [chainValue, exType, fromValue, setSubstrateProxyAccountsToSign]);
 
   useEffect(() => {
     if (!fromValue && accountList.length === 1) {

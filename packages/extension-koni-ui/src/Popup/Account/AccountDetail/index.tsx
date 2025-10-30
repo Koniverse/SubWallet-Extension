@@ -265,7 +265,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
 
   const footerNode = useMemo(() => {
     if (selectedFilterTab === FilterTabType.MANAGE_PROXIES) {
-      return <></>;
+      return null;
     }
 
     if (![AccountProxyType.UNIFIED, AccountProxyType.SOLO].includes(accountProxy.accountType)) {
@@ -392,9 +392,6 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
 
   return (
     <Layout.WithSubHeaderOnly
-      className={CN({
-        '-is-manage-substrate-proxy': selectedFilterTab === FilterTabType.MANAGE_PROXIES
-      })}
       disableBack={false}
       footer={footerNode}
       subHeaderIcons={[
@@ -543,10 +540,6 @@ const AccountDetail = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
     '.ant-sw-screen-layout-footer': {
       paddingTop: token.paddingSM,
       paddingBottom: 24
-    },
-
-    '.-is-manage-substrate-proxy .ant-sw-screen-layout-footer': {
-      display: 'none'
     },
 
     '.ant-sw-screen-layout-footer-content': {
