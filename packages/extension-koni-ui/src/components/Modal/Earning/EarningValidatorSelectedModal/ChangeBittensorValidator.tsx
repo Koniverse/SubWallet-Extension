@@ -9,7 +9,7 @@ import { NominationInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useChainChecker, useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useSubstrateProxyAccountsToSign, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
@@ -62,8 +62,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
   const { defaultData } = useTransactionContext<ChangeValidatorParams>();
-  const { onError, onSuccess } = useHandleSubmitTransaction();
-  const selectSubstrateProxyAccountsToSign = useSubstrateProxyAccountsToSign();
+  const { onError, onSuccess, selectSubstrateProxyAccountsToSign } = useHandleSubmitTransaction();
   const account = findAccountByAddress(accounts, from);
   const [form] = Form.useForm<ChangeValidatorParams>();
   const originValidator = useWatchTransaction('originValidator', form, defaultData);

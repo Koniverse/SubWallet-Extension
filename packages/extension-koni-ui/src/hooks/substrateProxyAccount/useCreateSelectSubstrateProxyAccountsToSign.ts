@@ -22,7 +22,7 @@ export type SelectSubstrateProxyAccountsToSign = (params: SelectSubstrateProxyAc
 
 type GetSubstrateProxyAccountsToSign = (params: SelectSubstrateProxyAccountsToSignParams) => Promise<SubstrateProxyAccountItem[]>;
 
-export function useSubstrateProxyAccountsToSign (): SelectSubstrateProxyAccountsToSign {
+export function useCreateSelectSubstrateProxyAccountsToSign (): SelectSubstrateProxyAccountsToSign {
   const allAccounts = useSelector((state: RootState) => state.accountState.accounts);
   const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
 

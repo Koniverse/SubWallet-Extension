@@ -15,7 +15,7 @@ import { SortingModal } from '@subwallet/extension-koni-ui/components/Modal/Sort
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useChainChecker, useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators, useSubstrateProxyAccountsToSign } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { Theme, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
@@ -98,8 +98,7 @@ const Component = (props: Props) => {
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
   const onPreCheck = usePreCheckAction(from);
-  const { onError, onSuccess } = useHandleSubmitTransaction();
-  const selectSubstrateProxyAccountsToSign = useSubstrateProxyAccountsToSign();
+  const { onError, onSuccess, selectSubstrateProxyAccountsToSign } = useHandleSubmitTransaction();
 
   const sectionRef = useRef<SwListSectionRef>(null);
   const networkPrefix = chainInfoMap[chain]?.substrateInfo?.addressPrefix;
