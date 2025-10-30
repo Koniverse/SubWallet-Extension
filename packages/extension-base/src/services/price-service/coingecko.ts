@@ -43,19 +43,18 @@ const DERIVATIVE_TOKEN_SLUG_LIST = ['susds', 'savings-dai'];
 let useBackupApi = false;
 
 const apiCacheDomain = isProductionMode ? 'https://api-cache.subwallet.app' : 'https://api-cache-dev.subwallet.app';
-const staticCacheDomain = isProductionMode ? 'https://static-cache.subwallet.app' : 'https://dev.sw-static-cache.pages.dev';
 
 export const getExchangeRateMap = async (): Promise<Record<CurrencyType, ExchangeRateJSON>> => {
   let response: Response | undefined;
 
   try {
     try {
-      response = await fetch(`${apiCacheDomain}/exchange-rate`);
+      response = await fetch('https://api-cache.subwallet.app/exchange-rate');
     } catch (e) {}
 
     if (response?.status !== 200) {
       try {
-        response = await fetch(`${staticCacheDomain}/exchange-rate/data.json`);
+        response = await fetch('https://static-cache.subwallet.app/exchange-rate/data.json');
       } catch (e) {}
     }
 
@@ -145,12 +144,12 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
       useBackupApi = true;
 
       try {
-        response = await fetch(`${apiCacheDomain}/api/price/get?ids=${idStr}`);
+        response = await fetch(`https://api-cache.subwallet.app/api/price/get?ids=${idStr}`);
       } catch (e) {}
 
       if (response?.status !== 200) {
         try {
-          response = await fetch(`${staticCacheDomain}/price/data.json`);
+          response = await fetch('https://static-cache.subwallet.app/price/data.json');
         } catch (e) {}
       }
     }
