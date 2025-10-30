@@ -67,7 +67,7 @@ const validateFields: Array<keyof UnStakeParams> = ['value'];
 const Component: React.FC = () => {
   const { t } = useTranslation();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { defaultData, persistData, setCustomScreenTitle } = useTransactionContext<UnStakeParams>();
+  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setCustomScreenTitle } = useTransactionContext<UnStakeParams>();
   const { slug } = defaultData;
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('unstake');
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
@@ -280,6 +280,42 @@ const Component: React.FC = () => {
     [chainInfoMap, chainValue]
   );
 
+  const exType = useMemo(() => {
+    if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.SUBNET_STAKING) {
+      return ExtrinsicType.STAKING_UNBOND;
+    }
+
+    if (poolType === YieldPoolType.LIQUID_STAKING) {
+      if (chainValue === 'moonbeam') {
+        return ExtrinsicType.UNSTAKE_STDOT;
+      }
+
+      if (chainValue === 'bifrost_dot') {
+        if (slug === 'MANTA___liquid_staking___bifrost_dot') {
+          return ExtrinsicType.UNSTAKE_VMANTA;
+        }
+
+        return ExtrinsicType.UNSTAKE_VDOT;
+      }
+
+      if (chainValue === 'parallel') {
+        return ExtrinsicType.UNSTAKE_SDOT;
+      }
+
+      if (chainValue === 'acala') {
+        return ExtrinsicType.UNSTAKE_LDOT;
+      }
+    }
+
+    if (poolType === YieldPoolType.LENDING) {
+      if (chainValue === 'interlay') {
+        return ExtrinsicType.UNSTAKE_QDOT;
+      }
+    }
+
+    return ExtrinsicType.STAKING_UNBOND;
+  }, [poolType, chainValue, slug]);
+
   const { onError, onSuccess } = useHandleSubmitTransaction(undefined, handleDataForInsufficientAlert);
 
   const onValuesChange: FormCallbacks<UnStakeParams>['onValuesChange'] = useCallback((changes: Partial<UnStakeParams>, values: UnStakeParams) => {
@@ -325,7 +361,7 @@ const Component: React.FC = () => {
       return;
     }
 
-    const { fastLeave, from, slug, value } = values;
+    const { chain, fastLeave, from, slug, value } = values;
 
     const request: RequestYieldLeave = {
       address: from,
@@ -341,19 +377,37 @@ const Component: React.FC = () => {
       request.selectedTarget = currentValidator || '';
     }
 
-    const unbondingPromise = yieldSubmitLeavePool(request);
+    const sendPromise = (substrateProxyAddress?: string) => {
+      return yieldSubmitLeavePool({
+        ...request,
+        substrateProxyAddress
+      }).then(onSuccess);
+    };
+
+    const sendPromiseWrapper = async () => {
+      if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
+        const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
+          chain,
+          address: from,
+          type: exType
+        });
+
+        return await sendPromise(substrateProxyAddress);
+      }
+
+      return await sendPromise();
+    };
 
     setLoading(true);
 
     setTimeout(() => {
-      unbondingPromise
-        .then(onSuccess)
+      sendPromiseWrapper()
         .catch(onError)
         .finally(() => {
           setLoading(false);
         });
     }, 300);
-  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, stakingFee]);
+  }, [currentValidator, exType, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, selectSubstrateProxyAccountsToSign, stakingFee]);
 
   const onClickSubmit = useCallback((values: UnStakeParams) => {
     if (currentConfirmation) {
@@ -440,42 +494,6 @@ const Component: React.FC = () => {
       setCustomScreenTitle(undefined);
     };
   }, [poolType, setCustomScreenTitle, t]);
-
-  const exType = useMemo(() => {
-    if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.SUBNET_STAKING) {
-      return ExtrinsicType.STAKING_UNBOND;
-    }
-
-    if (poolType === YieldPoolType.LIQUID_STAKING) {
-      if (chainValue === 'moonbeam') {
-        return ExtrinsicType.UNSTAKE_STDOT;
-      }
-
-      if (chainValue === 'bifrost_dot') {
-        if (slug === 'MANTA___liquid_staking___bifrost_dot') {
-          return ExtrinsicType.UNSTAKE_VMANTA;
-        }
-
-        return ExtrinsicType.UNSTAKE_VDOT;
-      }
-
-      if (chainValue === 'parallel') {
-        return ExtrinsicType.UNSTAKE_SDOT;
-      }
-
-      if (chainValue === 'acala') {
-        return ExtrinsicType.UNSTAKE_LDOT;
-      }
-    }
-
-    if (poolType === YieldPoolType.LENDING) {
-      if (chainValue === 'interlay') {
-        return ExtrinsicType.UNSTAKE_QDOT;
-      }
-    }
-
-    return ExtrinsicType.STAKING_UNBOND;
-  }, [poolType, chainValue, slug]);
 
   const handleValidatorLabel = useMemo(() => {
     const label = getValidatorLabel(chainValue);

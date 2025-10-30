@@ -5,7 +5,7 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { getAstarWithdrawable } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/astar';
-import { AccountJson, RequestYieldWithdrawal, UnstakingInfo, UnstakingStatus, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, UnstakingInfo, UnstakingStatus, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
@@ -51,7 +51,7 @@ const Component = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { defaultData, persistData } = useTransactionContext<WithdrawParams>();
+  const { defaultData, persistData, selectSubstrateProxyAccountsToSign } = useTransactionContext<WithdrawParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<WithdrawParams>();
@@ -89,6 +89,26 @@ const Component = () => {
       return undefined;
     }
   }, [getCurrentConfirmation, slug]);
+
+  const accountList = useMemo(() => {
+    return accounts.filter(filterAccount(chainInfoMap, allPositionInfos, poolInfo.type));
+  }, [accounts, allPositionInfos, chainInfoMap, poolInfo.type]);
+
+  const exType = useMemo(() => {
+    if (type === YieldPoolType.LIQUID_STAKING) {
+      if (chainValue === 'moonbeam') {
+        return ExtrinsicType.EVM_EXECUTE;
+      } else {
+        return ExtrinsicType.UNKNOWN;
+      }
+    }
+
+    if (type === YieldPoolType.LENDING) {
+      return ExtrinsicType.UNKNOWN;
+    }
+
+    return ExtrinsicType.STAKING_WITHDRAW;
+  }, [type, chainValue]);
 
   const goHome = useCallback(() => {
     navigate('/home/earning');
@@ -137,21 +157,37 @@ const Component = () => {
       return;
     }
 
-    const params: RequestYieldWithdrawal = {
-      address: values.from,
-      slug: values.slug,
-      unstakingInfo: unstakingInfo
+    const sendPromise = (substrateProxyAddress?: string) => {
+      return yieldSubmitStakingWithdrawal({
+        address: values.from,
+        slug: values.slug,
+        unstakingInfo: unstakingInfo,
+        substrateProxyAddress
+      }).then(onSuccess);
+    };
+
+    const sendPromiseWrapper = async () => {
+      if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
+        const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
+          address: values.from,
+          chain: values.chain,
+          type: exType
+        });
+
+        return await sendPromise(substrateProxyAddress);
+      }
+
+      return await sendPromise();
     };
 
     setTimeout(() => {
-      yieldSubmitStakingWithdrawal(params)
-        .then(onSuccess)
+      sendPromiseWrapper()
         .catch(onError)
         .finally(() => {
           setLoading(false);
         });
     }, 300);
-  }, [onError, onSuccess, unstakingInfo]);
+  }, [exType, onError, onSuccess, poolInfo.type, selectSubstrateProxyAccountsToSign, unstakingInfo]);
 
   const onClickSubmit = useCallback((values: WithdrawParams) => {
     if (currentConfirmation) {
@@ -177,26 +213,6 @@ const Component = () => {
   useEffect(() => {
     form.setFieldValue('chain', stakingChain);
   }, [form, stakingChain]);
-
-  const accountList = useMemo(() => {
-    return accounts.filter(filterAccount(chainInfoMap, allPositionInfos, poolInfo.type));
-  }, [accounts, allPositionInfos, chainInfoMap, poolInfo.type]);
-
-  const exType = useMemo(() => {
-    if (type === YieldPoolType.LIQUID_STAKING) {
-      if (chainValue === 'moonbeam') {
-        return ExtrinsicType.EVM_EXECUTE;
-      } else {
-        return ExtrinsicType.UNKNOWN;
-      }
-    }
-
-    if (type === YieldPoolType.LENDING) {
-      return ExtrinsicType.UNKNOWN;
-    }
-
-    return ExtrinsicType.STAKING_WITHDRAW;
-  }, [type, chainValue]);
 
   useEffect(() => {
     if (!fromValue && accountList.length === 1) {

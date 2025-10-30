@@ -44,3 +44,8 @@ export const isPoolLeave = (txType: ExtrinsicType) =>
     ExtrinsicType.UNSTAKE_VDOT,
     ExtrinsicType.UNSTAKE_VMANTA
   ].includes(txType);
+
+export const isTypeProxy = (txType: ExtrinsicType) => [
+  ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT,
+  ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT
+].includes(txType);

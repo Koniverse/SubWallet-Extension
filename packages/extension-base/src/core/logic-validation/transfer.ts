@@ -454,9 +454,9 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
   return estimateFee;
 }
 
-export function checkSigningAccountForTransaction (validationResponse: SWTransactionResponse, chainInfoMap: Record<string, _ChainInfo>) {
-  const { address, chain, chainType, extrinsicType } = validationResponse;
-  const pair = keyring.getPair(address);
+export function checkSigningAccountForTransaction (validationResponse: SWTransactionResponse, chainInfoMap: Record<string, _ChainInfo>, signer: string) {
+  const { chain, chainType, extrinsicType } = validationResponse;
+  const pair = keyring.getPair(signer);
 
   if (!pair) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('bg.TRANSACTION.core.validation.transfer.unableToFindAccount')));
@@ -477,7 +477,7 @@ export function checkSigningAccountForTransaction (validationResponse: SWTransac
   }
 }
 
-export function checkBalanceWithTransactionFee (validationResponse: SWTransactionResponse, transactionInput: SWTransactionInput, nativeTokenInfo: _ChainAsset, nativeTokenAvailable: AmountData) {
+export function checkBalanceWithTransactionFee (validationResponse: SWTransactionResponse, transactionInput: SWTransactionInput, nativeTokenInfo: _ChainAsset, nativeTokenAvailable: AmountData, substrateProxyAccountNativeTokenAvailable?: AmountData) {
   if (!validationResponse.estimateFee) { // todo: estimateFee should be must-have, need to refactor interface
     return;
   }
@@ -503,8 +503,16 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
     ..._TRANSFER_CHAIN_GROUP.statemine
   ].includes(nativeTokenInfo.originChain);
 
-  if (bnNativeTokenTransferAmount.plus(bnFee).gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
-    validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
+  if (!substrateProxyAccountNativeTokenAvailable) {
+    if (bnNativeTokenTransferAmount.plus(bnFee).gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
+      validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
+    }
+  } else {
+    const bnSubstrateProxyAccountNativeTokenAvailable = new BigN(substrateProxyAccountNativeTokenAvailable.value);
+
+    if ((bnNativeTokenTransferAmount.gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) || (bnFee.gt(bnSubstrateProxyAccountNativeTokenAvailable))) {
+      validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
+    }
   }
 
   // todo: only system.pallet has metadata, we should add for other pallets and mechanisms as well

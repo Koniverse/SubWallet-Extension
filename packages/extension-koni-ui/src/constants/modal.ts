@@ -91,6 +91,11 @@ export const TRANSACTION_PROCESS_DETAIL_MODAL = 'transaction-process-detail-moda
 export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 /* Process */
 
+/* Proxy */
+export const SUBSTRATE_PROXY_ACCOUNT_SELECTOR_MODAL = 'substrateProxyAccount-account-selector-modal';
+export const SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL = 'substrateProxyAccount-account-list-modal';
+/* Proxy */
+
 /* Other */
 export const EARNING_SLIPPAGE_MODAL = 'earning-slippage-modal';
 export const EARNING_SELECTED_VALIDATOR_MODAL = 'earning-selected-validator-modal';
