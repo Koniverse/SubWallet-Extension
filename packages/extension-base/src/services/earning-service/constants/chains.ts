@@ -20,6 +20,11 @@ export const _STAKING_CHAIN_GROUP = {
   mythos: ['mythos', 'muse_testnet']
 };
 
+export const RELAY_HANDLER_DIRECT_STAKING_CHAINS = [
+  ..._STAKING_CHAIN_GROUP.relay,
+  ..._STAKING_CHAIN_GROUP.assetHub
+];
+
 export const TON_CHAINS = ['ton', 'ton_testnet'];
 
 export const MaxEraRewardPointsEras = 14;
@@ -33,6 +38,9 @@ export const MANTA_MIN_DELEGATION = 500;
 export const CHANNEL_ID = 7;
 
 export const STAKING_IDENTITY_API_SLUG: Record<string, string> = {
+// @TODO: Remove polkadot then migrate
   polkadot: 'polkadot_people',
-  kusama: 'peopleKusama'
+
+  statemine: 'peopleKusama',
+  statemint: 'polkadot_people'
 };

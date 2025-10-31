@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
@@ -93,7 +93,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
         return;
       }
 
-      if (poolInfo.type === YieldPoolType.NATIVE_STAKING && _STAKING_CHAIN_GROUP.relay.includes(poolInfo.chain)) {
+      if (poolInfo.type === YieldPoolType.NATIVE_STAKING && RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(poolInfo.chain)) {
         let minJoinPool: string;
 
         if (poolInfo.statistic && !positionSlugs.includes(poolInfo.slug)) {

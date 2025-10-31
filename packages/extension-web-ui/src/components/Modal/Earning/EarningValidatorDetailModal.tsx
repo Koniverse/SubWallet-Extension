@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { _STAKING_CHAIN_GROUP, RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { BaseModal, MetaInfo } from '@subwallet/extension-web-ui/components';
 import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-web-ui/constants';
 import { useGetChainPrefixBySlug } from '@subwallet/extension-web-ui/hooks';
@@ -40,7 +40,7 @@ function Component (props: Props): React.ReactElement<Props> {
   const networkPrefix = useGetChainPrefixBySlug(chain);
 
   const isRelayChain = useMemo(() => {
-    return _STAKING_CHAIN_GROUP.relay.includes(chain);
+    return RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(chain);
   }, [chain]);
 
   const isParaChain = useMemo(() => {
