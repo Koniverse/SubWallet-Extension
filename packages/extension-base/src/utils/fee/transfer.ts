@@ -11,7 +11,7 @@ import { createCardanoTransaction } from '@subwallet/extension-base/services/bal
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, FunctionCreateXcmExtrinsic, getMaxXcmTransferableAmount } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { _isAcrossChainBridge, _isAcrossTestnetBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
@@ -384,23 +384,23 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     throw Error('Destination token is not available');
   }
 
-  try {
-    const params: CreateXcmExtrinsicProps = {
-      destinationTokenInfo: destToken,
-      originTokenInfo: srcToken,
-      // If value is 0, substrate will throw error when estimating fee
-      sendingValue: value,
-      sender: address,
-      recipient,
-      destinationChain: destChain,
-      originChain: srcChain,
-      substrateApi,
-      evmApi,
-      feeCustom,
-      feeOption,
-      feeInfo: fee
-    };
+  const params: CreateXcmExtrinsicProps = {
+    destinationTokenInfo: destToken,
+    originTokenInfo: srcToken,
+    // If value is 0, substrate will throw error when estimating fee
+    sendingValue: value,
+    sender: address,
+    recipient,
+    destinationChain: destChain,
+    originChain: srcChain,
+    substrateApi,
+    evmApi,
+    feeCustom,
+    feeOption,
+    feeInfo: fee
+  };
 
+  try {
     let funcCreateExtrinsic: FunctionCreateXcmExtrinsic;
 
     if (isPosBridgeTransfer || isPolygonBridgeTransfer) {
@@ -545,10 +545,13 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
   } else if (isTransferNativeTokenAndPayLocalTokenAsFee) {
     maxTransferable = bnFreeBalance;
   } else {
-    if (!_isNativeToken(srcToken)) {
+    if (!_isNativeToken(srcToken)) { // xcm local token & pay native token or other local token as fee
       maxTransferable = bnFreeBalance;
-    } else {
-      maxTransferable = bnFreeBalance.minus(BigN(estimatedFee).multipliedBy(XCM_FEE_RATIO));
+    } else { // xcm native token & pay native token as fee
+      const maxTransferableBySW = bnFreeBalance.minus(BigN(estimatedFee).multipliedBy(XCM_FEE_RATIO));
+      const maxTransferableByPS = await getMaxXcmTransferableAmount(params);
+
+      maxTransferable = new BigN(maxTransferableByPS ?? maxTransferableBySW);
     }
   }
 
