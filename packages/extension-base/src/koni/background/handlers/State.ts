@@ -33,6 +33,7 @@ import MigrationService from '@subwallet/extension-base/services/migration-servi
 import MintCampaignService from '@subwallet/extension-base/services/mint-campaign-service';
 import MktCampaignService from '@subwallet/extension-base/services/mkt-campaign-service';
 import NotificationService from '@subwallet/extension-base/services/notification-service/NotificationService';
+import OpenGovService from '@subwallet/extension-base/services/open-gov';
 import { PriceService } from '@subwallet/extension-base/services/price-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { openPopup } from '@subwallet/extension-base/services/request-service/handler/PopupHandler';
@@ -141,6 +142,7 @@ export default class KoniState {
   readonly swapService: SwapService;
   readonly inappNotificationService: InappNotificationService;
   readonly chainOnlineService: ChainOnlineService;
+  readonly openGovService: OpenGovService;
 
   // Handle the general status of the extension
   private generalStatus: ServiceStatus = ServiceStatus.INITIALIZING;
@@ -179,6 +181,7 @@ export default class KoniState {
     this.swapService = new SwapService(this);
     this.inappNotificationService = new InappNotificationService(this.dbService, this.keyringService, this.eventService, this.chainService);
     this.chainOnlineService = new ChainOnlineService(this.chainService, this.settingService, this.eventService, this.dbService);
+    this.openGovService = new OpenGovService(this);
 
     this.subscription = new KoniSubscription(this, this.dbService);
     this.cron = new KoniCron(this, this.subscription, this.dbService);
@@ -307,6 +310,7 @@ export default class KoniState {
     await this.earningService.init();
     await this.swapService.init();
     await this.inappNotificationService.init();
+    await this.openGovService.init();
 
     // this.onReady();
     this.onAccountAdd();
@@ -1986,7 +1990,7 @@ export default class KoniState {
     this.campaignService.stop();
     await Promise.all([this.cron.stop(), this.subscription.stop()]);
     await this.pauseAllNetworks(undefined, 'IDLE mode');
-    await Promise.all([this.historyService.stop(), this.priceService.stop(), this.balanceService.stop(), this.earningService.stop(), this.swapService.stop(), this.inappNotificationService.stop()]);
+    await Promise.all([this.historyService.stop(), this.priceService.stop(), this.balanceService.stop(), this.earningService.stop(), this.swapService.stop(), this.inappNotificationService.stop(), this.openGovService.stop()]);
 
     // Complete sleeping
     sleeping.resolve();
@@ -2050,7 +2054,7 @@ export default class KoniState {
 
     this.waitStartingFull = startingFull.promise;
 
-    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start()]);
+    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start(), this.openGovService.start()]);
     this.eventService.emit('general.start_full', true);
 
     this.waitStartingFull = null;

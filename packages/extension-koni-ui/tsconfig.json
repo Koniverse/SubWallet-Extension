@@ -10,6 +10,7 @@
     { "path": "../extension-chains" },
     { "path": "../extension-dapp" },
     { "path": "../extension-inject" },
-    { "path": "../extension-mocks" }
+    { "path": "../extension-mocks" },
+    { "path": "../subsquare-api-sdk" }
   ]
 }

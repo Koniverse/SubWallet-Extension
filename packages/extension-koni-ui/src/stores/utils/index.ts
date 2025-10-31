@@ -6,6 +6,7 @@ import { AddressBookInfo, AssetSetting, CampaignBanner, ChainStakingMetadata, Co
 import { AccountsContext, AuthorizeRequest, ConfirmationRequestBase, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _ChainApiStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
+import { GovVotingInfo } from '@subwallet/extension-base/services/open-gov/interface';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
@@ -572,3 +573,18 @@ export const updateAliveProcess = (data: ResponseSubscribeProcessAlive) => {
 
 export const subscribeAliveProcess = lazySubscribeMessage('pri(process.subscribe.alive)', null, updateAliveProcess, updateAliveProcess);
 /* Process multi steps */
+
+/* OpenGov */
+export const updateGovLockedInfo = (data: GovVotingInfo[]) => {
+  console.log('Dispatching govLockedInfo', data);
+  addLazy(
+    'updateGovLockedInfo',
+    () => {
+      store.dispatch({ type: 'openGov/updateGovLockedInfo', payload: data });
+    },
+    900
+  );
+};
+
+export const subscribeGovLockedInfo = lazySubscribeMessage('pri(openGov.subscribeGovLockedInfo)', null, updateGovLockedInfo, updateGovLockedInfo);
+/* OpenGov */
