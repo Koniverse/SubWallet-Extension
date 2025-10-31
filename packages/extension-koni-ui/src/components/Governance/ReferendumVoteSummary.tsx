@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { UserVoting } from '@subwallet/extension-koni-ui/types/gov';
@@ -44,7 +45,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
                   <div className='__i-vote-summary-label'>
                     {t('Voted')}:&nbsp;
                   </div>
-                  {BigNumber(vote?.ayeAmount || 0).gt(0) && (
+                  {(BigNumber(vote?.ayeAmount || 0).gt(0) || vote.type !== GovVoteType.NAY) && (
                     <div className='__i-vote-stat -aye'>
                       <NumberDisplay
                         className='__i-vote-stat-value'
@@ -60,7 +61,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
                     </div>
                   )}
 
-                  {BigNumber(vote?.abstainAmount || 0).gt(0) && (
+                  {(BigNumber(vote?.abstainAmount || 0).gt(0) || vote.type === GovVoteType.ABSTAIN) && (
                     <div className='__i-vote-stat -abstain'>
                       <NumberDisplay
                         className='__i-vote-stat-value'
@@ -76,7 +77,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
                     </div>
                   )}
 
-                  {BigNumber(vote?.nayAmount || 0).gt(0) && (
+                  {(BigNumber(vote?.nayAmount || 0).gt(0) || vote.type !== GovVoteType.AYE) && (
                     <div className='__i-vote-stat -nay'>
                       <NumberDisplay
                         className='__i-vote-stat-value'
@@ -110,7 +111,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
           )
         : (
           <div className='__i-vote-summary-label'>
-            {t('Not voted yet')}
+            {t('Not voted yet!')}
           </div>
         )
       }
