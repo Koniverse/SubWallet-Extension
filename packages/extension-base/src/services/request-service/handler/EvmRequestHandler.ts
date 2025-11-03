@@ -217,12 +217,12 @@ export default class EvmRequestHandler {
     const pair = keyring.getPair(from as string);
     const params = {
       ...transaction,
-      gas: anyNumberToBN(gas).toFixed(),
+      gas: anyNumberToBN(gas).toNumber(),
       value: anyNumberToBN(value).toFixed(),
-      gasPrice: anyNumberToBN(gasPrice).toFixed(),
-      gasLimit: anyNumberToBN(estimateGas).toFixed(),
-      maxFeePerGas: anyNumberToBN(maxFeePerGas).toFixed(),
-      maxPriorityFeePerGas: anyNumberToBN(maxPriorityFeePerGas).toFixed()
+      gasPrice: anyNumberToBN(gasPrice).toNumber(),
+      gasLimit: anyNumberToBN(estimateGas).toNumber(),
+      maxFeePerGas: anyNumberToBN(maxFeePerGas).toNumber(),
+      maxPriorityFeePerGas: anyNumberToBN(maxPriorityFeePerGas).toNumber()
       // nonce: await web3.eth.getTransactionCount(from) // Todo: fill this value from transaction service
     } as TransactionConfig;
 
