@@ -3,7 +3,7 @@
 
 import { _chainInfoToAccountChainType } from '@subwallet/extension-base/services/chain-service/utils';
 import { UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS } from '@subwallet/extension-base/services/substrate-proxy-service/constant';
-import { AccountProxy, AccountProxyType, SubstrateProxyAccountItem, SubstrateProxyType } from '@subwallet/extension-base/types';
+import { AccountProxy, AccountProxyType, SubstrateProxyAccountItem } from '@subwallet/extension-base/types';
 import { BasicInputEvent, ChainSelector, EmptyList, SubstrateProxyAccountItemExtended, SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
 import { ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS, REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useChainChecker, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -11,6 +11,7 @@ import { getSubstrateProxyAccountGroup } from '@subwallet/extension-koni-ui/mess
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { AddSubstrateProxyAccountParams, ChainItemType, RemoveSubstrateProxyAccountParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { getSubstrateProxyAddressKey } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, Button, Icon, SwList } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ListChecks, Trash, TreeStructure, XCircle } from 'phosphor-react';
@@ -27,8 +28,6 @@ export interface SubstrateProxyItemSelector extends SubstrateProxyAccountItemExt
 type Props = ThemeProps & {
   accountProxy: AccountProxy;
 };
-
-const getKey = (address: string, proxyType: SubstrateProxyType) => proxyType + ':' + address;
 
 function Component ({ accountProxy, className }: Props) {
   const { t } = useTranslation();
@@ -240,7 +239,7 @@ function Component ({ accountProxy, className }: Props) {
 
   const onSelectSubstrateProxyAccount = useCallback((item: SubstrateProxyAccountItem) => {
     return () => {
-      const key = getKey(item.substrateProxyAddress, item.substrateProxyType);
+      const key = getSubstrateProxyAddressKey(item.substrateProxyAddress, item.substrateProxyType);
 
       setSubstrateProxyAccountsSelected((prev) =>
         (
@@ -252,7 +251,7 @@ function Component ({ accountProxy, className }: Props) {
 
   const renderItem = useCallback(
     (item: SubstrateProxyAccountItem) => {
-      const key = getKey(item.substrateProxyAddress, item.substrateProxyType);
+      const key = getSubstrateProxyAddressKey(item.substrateProxyAddress, item.substrateProxyType);
 
       return (
         <SubstrateProxyAccountSelectorItem
@@ -297,7 +296,7 @@ function Component ({ accountProxy, className }: Props) {
             const newSelected: Record<string, SubstrateProxyItemSelector> = {};
 
             substrateProxyAccounts.forEach((p) => {
-              const key = getKey(p.substrateProxyAddress, p.substrateProxyType);
+              const key = getSubstrateProxyAddressKey(p.substrateProxyAddress, p.substrateProxyType);
 
               newSelected[key] = { ...p, isSelected: !!prev[key]?.isSelected };
             });

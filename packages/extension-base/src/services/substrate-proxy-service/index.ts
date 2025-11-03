@@ -29,7 +29,7 @@ export default class SubstrateProxyAccountService {
   }
 
   async getSubstrateProxyAccountGroup (request: RequestGetSubstrateProxyAccountGroup): Promise<SubstrateProxyAccountGroup> {
-    const { address, chain, selectedSubstrateProxyAddresses, type } = request;
+    const { address, chain, excludedSubstrateProxyAddresses, type } = request;
     const substrateApi = this.getSubstrateApi(chain);
 
     await substrateApi.isReady;
@@ -55,9 +55,9 @@ export default class SubstrateProxyAccountService {
       substrateProxyAccounts = substrateProxyAccounts.filter((p) => allowedSet.has(p.substrateProxyType));
     }
 
-    if (selectedSubstrateProxyAddresses && selectedSubstrateProxyAddresses.length > 0) {
+    if (excludedSubstrateProxyAddresses && excludedSubstrateProxyAddresses.length > 0) {
       substrateProxyAccounts = substrateProxyAccounts.filter(
-        (p) => !selectedSubstrateProxyAddresses.includes(p.substrateProxyAddress)
+        (p) => !excludedSubstrateProxyAddresses.includes(p.substrateProxyAddress)
       );
     }
 

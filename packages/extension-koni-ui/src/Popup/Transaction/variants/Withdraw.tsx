@@ -90,10 +90,6 @@ const Component = () => {
     }
   }, [getCurrentConfirmation, slug]);
 
-  const accountList = useMemo(() => {
-    return accounts.filter(filterAccount(chainInfoMap, allPositionInfos, poolInfo.type));
-  }, [accounts, allPositionInfos, chainInfoMap, poolInfo.type]);
-
   const exType = useMemo(() => {
     if (type === YieldPoolType.LIQUID_STAKING) {
       if (chainValue === 'moonbeam') {
@@ -213,6 +209,10 @@ const Component = () => {
   useEffect(() => {
     form.setFieldValue('chain', stakingChain);
   }, [form, stakingChain]);
+
+  const accountList = useMemo(() => {
+    return accounts.filter(filterAccount(chainInfoMap, allPositionInfos, poolInfo.type));
+  }, [accounts, allPositionInfos, chainInfoMap, poolInfo.type]);
 
   useEffect(() => {
     if (!fromValue && accountList.length === 1) {

@@ -7,7 +7,7 @@ export interface RequestGetSubstrateProxyAccountGroup {
   chain: string;
   address: string;
   type?: ExtrinsicType
-  selectedSubstrateProxyAddresses?: string[]
+  excludedSubstrateProxyAddresses?: string[]
 }
 
 export type SubstrateProxyType = 'Any' | 'NonTransfer' | 'Governance' | 'Staking';

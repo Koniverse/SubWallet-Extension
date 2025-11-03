@@ -15,7 +15,7 @@ export type SelectSubstrateProxyAccountsToSignParams = {
   chain: string;
   address?: string;
   type?: ExtrinsicType;
-  selectedSubstrateProxyAddresses?: string[];
+  excludedSubstrateProxyAddresses?: string[];
 };
 
 export type SelectSubstrateProxyAccountsToSign = (params: SelectSubstrateProxyAccountsToSignParams) => Promise<string | undefined>;
@@ -26,7 +26,7 @@ export function useCreateSelectSubstrateProxyAccountsToSign (): SelectSubstrateP
   const allAccounts = useSelector((state: RootState) => state.accountState.accounts);
   const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
 
-  const getSubstrateProxyAccount = useCallback<GetSubstrateProxyAccountsToSign>(async ({ address, chain, selectedSubstrateProxyAddresses, type }) => {
+  const getSubstrateProxyAccount = useCallback<GetSubstrateProxyAccountsToSign>(async ({ address, chain, excludedSubstrateProxyAddresses, type }) => {
     try {
       if (!address || !isSubstrateAddress(address)) {
         return [];
@@ -36,7 +36,7 @@ export function useCreateSelectSubstrateProxyAccountsToSign (): SelectSubstrateP
         chain,
         address,
         type,
-        selectedSubstrateProxyAddresses
+        excludedSubstrateProxyAddresses
       };
 
       const substrateProxyAccountGroup = await getSubstrateProxyAccountGroup(request);

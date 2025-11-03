@@ -82,5 +82,5 @@ export interface AddSubstrateProxyAccountParams extends TransactionFormBaseProps
 }
 
 export interface RemoveSubstrateProxyAccountParams extends TransactionFormBaseProps {
-  substrateProxyAddressKeys: string[]; // proxyType:address
+  substrateProxyAddressKeys: string[]; // key format is "substrateProxyType:address"
 }
