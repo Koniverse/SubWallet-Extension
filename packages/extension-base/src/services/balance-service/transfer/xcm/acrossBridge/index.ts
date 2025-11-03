@@ -31,11 +31,6 @@ export function _isAcrossTestnetBridge (srcChain: string): boolean {
   return srcChain === 'base_sepolia' || srcChain === 'arbitrum_sepolia' || srcChain === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA;
 }
 
-export const AcrossErrorMsg = {
-  AMOUNT_TOO_LOW: 'amount too low',
-  AMOUNT_TOO_HIGH: 'amount too high'
-};
-
 export interface AcrossQuote {
   outputAmount: string;
   rate: string;

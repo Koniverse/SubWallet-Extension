@@ -6,16 +6,16 @@ import { SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionIn
 import { detectTranslate, isSameAddress } from '@subwallet/extension-base/utils';
 import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { InfoItemBase } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
-import { EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
+import { EarningActiveStakeDetailsModal, EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
 import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/components/Modal/Earning/EarningValidatorSelectedModal';
-import { EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
+import { EARNING_ACITVE_STAKE_DETAILS_MODAL, EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { EarningTagType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { createEarningTypeTags, findAccountByAddress, isAccountAll, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowSquareOut, CaretLeft, CaretRight } from 'phosphor-react';
+import { ArrowSquareOut, CaretLeft, CaretRight, Info } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import Slider, { CustomArrowProps, Settings } from 'react-slick';
 import styled from 'styled-components';
@@ -64,6 +64,9 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
   const { assetRegistry } = useSelector((state) => state.assetRegistry);
   const { accounts } = useSelector((state) => state.accountState);
   const networkPrefix = useGetChainPrefixBySlug(poolInfo.chain);
+
+  const [isShowActiveStakeDetailsModal, setIsShowActiveStakeDetailsModal] = useState<boolean>(false);
+  const [selectedPositionInfo, setSelectedPositionInfo] = useState<YieldPositionInfo | undefined>();
 
   const sliderSettings: Settings = useMemo(() => {
     return {
@@ -157,6 +160,22 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
     };
   }, [activeModal]);
 
+  const openActiveStakeDetailsModal = useCallback(
+    (item: YieldPositionInfo) => {
+      return () => {
+        setSelectedPositionInfo(item);
+        setIsShowActiveStakeDetailsModal(true);
+        activeModal(EARNING_ACITVE_STAKE_DETAILS_MODAL);
+      };
+    },
+    [activeModal]
+  );
+
+  const closeActiveStakeDetailsModal = useCallback(() => {
+    inactiveModal(EARNING_ACITVE_STAKE_DETAILS_MODAL);
+    setIsShowActiveStakeDetailsModal(false);
+  }, [inactiveModal]);
+
   const accountInfoItemsNode = useMemo(() => {
     return list.map((item) => {
       const disableButton = !item.nominations.length;
@@ -176,7 +195,30 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         : !isSpecial
           ? [
             metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.totalStake'), new BigN(item.totalStake)),
-            metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.activeStake'), item.activeStake),
+            {
+              label: (
+                <div className='__label-with-icon'>
+                  {t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.activeStake')}
+                  {item.metadata && new BigN(item.activeStake).gt(0) && (
+                    <span
+                      className='__info-icon-wrapper'
+                      onClick={openActiveStakeDetailsModal(item)}
+                    >
+                      <Icon
+                        className='__info-icon'
+                        customSize={'16px'}
+                        phosphorIcon={Info}
+                        size='sm'
+                      />
+                    </span>
+                  )}
+                </div>
+              ),
+              value: item.activeStake,
+              decimals: inputAsset?.decimals || 0,
+              suffix: inputAsset?.symbol
+            },
+
             metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.unstaked'), item.unstakeBalance)
           ]
           : [
@@ -227,9 +269,9 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
             {earningTagType.label}
           </MetaInfo.Default>
 
-          {metaInfoItems.map((item) => (
+          {metaInfoItems.map((item, index) => (
             <MetaInfo.Number
-              key={item.label}
+              key={`${index}`}
               {...item}
               valueColorSchema='even-odd'
             />
@@ -263,10 +305,20 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
               </div>
             </>
           )}
+          {
+            isShowActiveStakeDetailsModal && selectedPositionInfo && (
+              <EarningActiveStakeDetailsModal
+                decimals={inputAsset.decimals || 0}
+                onCancel={closeActiveStakeDetailsModal}
+                positionInfo={selectedPositionInfo}
+                symbol={inputAsset.symbol}
+              />
+            )
+          }
         </MetaInfo>
       );
     });
-  }, [list, isSubnetStaking, t, inputAsset, isSpecial, deriveAsset?.decimals, deriveAsset?.symbol, isAllAccount, poolInfo.chain, networkPrefix, renderAccount, earningTagType.color, earningTagType.label, haveNomination, haveValidator, canChangeValidator, createOpenValidator, createOpenNomination]);
+  }, [list, isSubnetStaking, t, inputAsset, isSpecial, openActiveStakeDetailsModal, deriveAsset?.decimals, deriveAsset?.symbol, isAllAccount, poolInfo.chain, networkPrefix, renderAccount, earningTagType.color, earningTagType.label, haveNomination, haveValidator, canChangeValidator, createOpenValidator, createOpenNomination, isShowActiveStakeDetailsModal, closeActiveStakeDetailsModal, selectedPositionInfo]);
 
   return (
     <>
@@ -455,5 +507,27 @@ export const AccountInfoPart = styled(Component)<Props>(({ theme: { token } }: P
     '.__nomination-button-label': {
       color: 'inherit'
     }
+  },
+  '.__label-with-icon': {
+    display: 'inline-flex',
+    alignItems: 'center'
+  },
+
+  '.__info-icon-wrapper': {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    opacity: 0.6,
+    borderRadius: token.borderRadiusSM,
+    padding: 2,
+
+    '&:hover': {
+      opacity: 1
+    }
+  },
+
+  '.__info-icon': {
+    color: token.colorTextLight3
   }
 }));
