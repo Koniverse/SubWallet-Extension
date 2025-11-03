@@ -52,7 +52,7 @@ export const anyNumberToBN = (value?: string | number | BNEther): BigN => { // T
   } else if (typeof value === 'undefined') {
     return new BigN(0);
   } else {
-    return new BigN(value.toNumber());
+    return new BigN(value.toString());
   }
 };
 
