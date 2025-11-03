@@ -95,15 +95,13 @@ const Component = ({ className, index, stepName, stepStatus }: Props) => {
 
   return (
     <div className={className}>
-      {stepStatusIcon}
+      <div className='__icon-wrapper'>{stepStatusIcon}</div>
       <div className={CN('__step-title', stepTextClassName)}>
-        <span className={'__order'}>
+        <span className='__order'>
           {t('ui.EARNING.components.Earning.ProcessItem.stepNumber', { replace: { stepNumb: index + 1 } })}
         </span>
 
-        <span className={'__name'}>
-          {stepName}
-        </span>
+        <span className='__name'>{stepName}</span>
       </div>
     </div>
   );
@@ -122,7 +120,14 @@ const EarningProcessItem = styled(Component)<Props>(({ theme: { token } }: Props
       fontWeight: '600',
       color: token['gray-3'],
       fontSize: token.fontSize,
-      lineHeight: token.lineHeight
+      lineHeight: token.lineHeight,
+      flexWrap: 'wrap',
+      columnGap: 4,
+      rowGap: 2
+    },
+
+    '.__name': {
+      wordBreak: 'break-word'
     },
 
     '.__step-title.-processing': {
@@ -139,6 +144,11 @@ const EarningProcessItem = styled(Component)<Props>(({ theme: { token } }: Props
 
     '.__step-title.-submitting': {
       color: token['gold-6']
+    },
+
+    '.__order': {
+      whiteSpace: 'nowrap',
+      flexShrink: 0
     }
   };
 });
