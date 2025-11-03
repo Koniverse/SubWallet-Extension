@@ -15,14 +15,13 @@ type Props = ThemeProps & {
   onClickItem: (item: Referendum) => void;
   chain: string;
   items: ReferendumWithVoting[];
-  renderWhenEmpty?: React.ReactElement;
 };
 
 type WrapperProps = Omit<Props, 'items'> & {
   items?: Referendum[];
 };
 
-const Component = ({ chain, className, items, onClickItem, renderWhenEmpty }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, items, onClickItem }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
 
   const _onClickItem = useCallback((item: Referendum) => {
@@ -44,14 +43,12 @@ const Component = ({ chain, className, items, onClickItem, renderWhenEmpty }: Pr
               onClick={_onClickItem(item)}
             />
           ))
-          : (
-            renderWhenEmpty || <EmptyList
-              className={'__emptyList'}
-              emptyMessage={t('Explore ongoing referenda and cast your vote')}
-              emptyTitle={t('You haven’t voted yet!')}
-              phosphorIcon={ListChecks}
-            />
-          )
+          : <EmptyList
+            className={'__emptyList'}
+            emptyMessage={t('Explore ongoing referenda and cast your vote')}
+            emptyTitle={t('You haven’t voted yet!')}
+            phosphorIcon={ListChecks}
+          />
       }
     </div>
   );

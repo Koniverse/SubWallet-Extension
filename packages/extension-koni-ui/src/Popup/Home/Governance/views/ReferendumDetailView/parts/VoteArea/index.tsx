@@ -9,7 +9,7 @@ import { UserVoting } from '@subwallet/extension-koni-ui/types/gov';
 import { getMinApprovalThreshold, getTallyVotesBarPercent, getTimeLeft, GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { formatVoteResult } from '@subwallet/extension-koni-ui/utils/gov/votingStats';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
-import { GOV_PREPARING_STATES, ReferendumDetail, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
+import { ReferendumDetail, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { useQuery } from '@tanstack/react-query';
 import { Clock, Info } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -75,16 +75,6 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
     return userVoting.length > 0 ? userVoting : undefined;
   }, [chain, govLockedInfos, referendumDetail]);
 
-  const timeLeftContent = useMemo(() => {
-    const time = timeLeft ?? '';
-    const isPreparing = GOV_PREPARING_STATES.includes(referendumDetail.state.name);
-    const isAyeLeading = ayesPercent > naysPercent;
-
-    return isPreparing
-      ? (isAyeLeading ? t('Decision starts in {{time}}', { time }) : t('Time out in {{time}}', { time }))
-      : (isAyeLeading ? t('Approve in {{time}}', { time }) : t('Reject in {{time}}', { time }));
-  }, [ayesPercent, naysPercent, referendumDetail.state.name, t, timeLeft]);
-
   const { data } = useQuery({
     queryKey: GOV_QUERY_KEYS.referendumVotes(chain, referendumId),
     queryFn: async () => {
@@ -124,7 +114,11 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
               weight={'fill'}
             />
             <div>
-              {timeLeftContent}
+              {
+                ayesPercent > naysPercent
+                  ? t('Approve in {{timeLeft}}', { timeLeft })
+                  : t('Reject in {{timeLeft}}', { timeLeft })
+              }
             </div>
           </div>
         )}

@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BackIcon, EmptyList } from '@subwallet/extension-koni-ui/components';
+import { BackIcon } from '@subwallet/extension-koni-ui/components';
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { useGetGovLockedInfos } from '@subwallet/extension-koni-ui/hooks';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
@@ -12,7 +12,6 @@ import { ActivityIndicator, ModalContext, SwModal } from '@subwallet/react-ui';
 import { Referendum, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { useQuery } from '@tanstack/react-query';
 import CN from 'classnames';
-import { ListChecks } from 'phosphor-react';
 import React, { Context, useCallback, useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { ThemeContext } from 'styled-components';
@@ -133,16 +132,6 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
     }
   }, [searchData?.govReferenda, items, searchValue]);
 
-  const renderEmpty = useMemo(() => {
-    return (
-      <EmptyList
-        className={'__emptyList'}
-        emptyMessage={t('No referenda found')}
-        phosphorIcon={ListChecks}
-      />
-    );
-  }, [t]);
-
   useEffect(() => {
     if (!searchValue) {
       return;
@@ -150,11 +139,11 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
 
     const lowerCaseSearchValue = searchValue.toLowerCase();
 
-    if (!isFetching && (!textRef.current || lowerCaseSearchValue !== textRef.current)) {
+    if (filteredItems.length === 0 && !isFetching && (!textRef.current || !lowerCaseSearchValue.includes(textRef.current))) {
       refetch().catch(console.error);
       textRef.current = lowerCaseSearchValue;
     }
-  }, [isFetching, refetch, searchValue]);
+  }, [searchValue, filteredItems.length, isFetching, refetch]);
 
   return (
     <SwModal
@@ -185,7 +174,6 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
           className='referenda-list'
           items={filteredItems}
           onClickItem={onClickItem}
-          renderWhenEmpty={renderEmpty}
         />}
 
     </SwModal>

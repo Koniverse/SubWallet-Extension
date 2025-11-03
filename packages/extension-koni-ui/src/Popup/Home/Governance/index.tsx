@@ -1,19 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountChainType } from '@subwallet/extension-base/types';
 import { PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useNotification } from '@subwallet/extension-koni-ui/hooks';
 import { useGovernanceView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView';
 import { UnlockTokenView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/views/UnlockToken';
-import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { GovernanceScreenView } from '@subwallet/extension-koni-ui/types';
 import getSubsquareApi from '@subwallet/subsquare-api-sdk';
-import React, { useContext, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import React, { useContext, useMemo } from 'react';
 
 import { OverviewView } from './views/OverviewView';
 import { ReferendumDetailView } from './views/ReferendumDetailView';
@@ -24,27 +18,11 @@ const Component = () => {
   const { chainSlug: currentChainSlug,
     goOverview, goReferendumDetail, goUnlockToken, referendumId, setChain,
     view: currentScreenView } = useGovernanceView();
-  const navigate = useNavigate();
-  const notify = useNotification();
-  const { t } = useTranslation();
-  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
 
   const viewProps: ViewBaseType = useMemo(() => ({
     sdkInstance: chainSlugToSubsquareApi[currentChainSlug] ? getSubsquareApi(chainSlugToSubsquareApi[currentChainSlug]) : undefined,
     chainSlug: currentChainSlug
   }), [currentChainSlug]);
-
-  useEffect(() => {
-    if (!currentAccountProxy?.chainTypes.includes(AccountChainType.SUBSTRATE)) {
-      setTimeout(() => {
-        navigate('/home/tokens');
-        notify({
-          message: t('Feature available only on Polkadot-supported accounts'),
-          type: 'error'
-        });
-      }, 100);
-    }
-  }, [currentAccountProxy?.chainTypes, navigate, notify, t]);
 
   return (
     <>
@@ -86,7 +64,7 @@ const Governance = () => {
 
   return (
     <PageWrapper
-      resolve={dataContext.awaitStores(['openGov', 'balance', 'price', 'accountState'])}
+      resolve={dataContext.awaitStores(['openGov', 'balance', 'price'])}
     >
       <Component />
     </PageWrapper>

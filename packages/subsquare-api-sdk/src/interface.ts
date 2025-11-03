@@ -399,11 +399,6 @@ export enum GovStatusKey {
   NOTPASSED = 'NotPassed'
 }
 
-export const GOV_PREPARING_STATES: GovStatusKey[] = [
-  GovStatusKey.PREPARING,
-  GovStatusKey.QUEUEING
-];
-
 export const GOV_ONGOING_STATES: GovStatusKey[] = [
   GovStatusKey.PREPARING,
   GovStatusKey.DECIDING,

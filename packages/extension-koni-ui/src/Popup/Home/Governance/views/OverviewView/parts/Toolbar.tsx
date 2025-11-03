@@ -38,10 +38,6 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
   const { t } = useTranslation();
   const { activeModal, inactiveModal } = useContext(ModalContext);
 
-  const [trackSelectedState, setTrackSelectedState] = React.useState<string>(trackSelected);
-  const [statusSelectedState, setStatusSelectedState] = React.useState<GovStatusKey>(statusSelected);
-  const [isEnableTreasuryFilterState, setIsEnableTreasuryFilterState] = React.useState<boolean>(isEnableTreasuryFilter);
-
   const filterTabItems = useMemo(() => {
     return [
       {
@@ -65,10 +61,7 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
 
   const onCancelFilter = useCallback(() => {
     inactiveModal(GOV_FILTER_MODAL_ID);
-    setIsEnableTreasuryFilterState(isEnableTreasuryFilter);
-    setStatusSelectedState(statusSelected);
-    setTrackSelectedState(trackSelected);
-  }, [inactiveModal, isEnableTreasuryFilter, statusSelected, trackSelected]);
+  }, [inactiveModal]);
 
   const onSelectFilterTab = useCallback((value: string) => {
     onChangeCategory(value as ReferendaCategory);
@@ -76,10 +69,7 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
 
   const onApplyFilter = useCallback(() => {
     inactiveModal(GOV_FILTER_MODAL_ID);
-    setIsEnableTreasuryFilter(isEnableTreasuryFilterState);
-    setStatusSelected(statusSelectedState);
-    setTrackSelected(trackSelectedState);
-  }, [inactiveModal, isEnableTreasuryFilterState, setIsEnableTreasuryFilter, setStatusSelected, setTrackSelected, statusSelectedState, trackSelectedState]);
+  }, [inactiveModal]);
 
   const hasAnyFilterValue = isEnableDelegatedFilter || isEnableTreasuryFilter || isEnableVotedFilter || (trackSelected !== 'All' || statusSelected !== 'All');
 
@@ -127,19 +117,19 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
           chain={chain}
           id={GOV_FILTER_MODAL_ID}
           isEnableDelegatedFilter={isEnableDelegatedFilter}
-          isEnableTreasuryFilter={isEnableTreasuryFilterState}
+          isEnableTreasuryFilter={isEnableTreasuryFilter}
           isEnableVotedFilter={isEnableVotedFilter}
           onApplyFilter={onApplyFilter}
           onCancel={onCancelFilter}
           sdkInstance={sdkInstance}
           setIsEnableDelegatedFilter={setIsEnableDelegatedFilter}
-          setIsEnableTreasuryFilter={setIsEnableTreasuryFilterState}
+          setIsEnableTreasuryFilter={setIsEnableTreasuryFilter}
           setIsEnableVotedFilter={setIsEnableVotedFilter}
-          setStatusSelected={setStatusSelectedState}
-          setTrackSelected={setTrackSelectedState}
-          statusSelected={statusSelectedState}
+          setStatusSelected={setStatusSelected}
+          setTrackSelected={setTrackSelected}
+          statusSelected={statusSelected}
           title={t('Filter')}
-          trackSelected={trackSelectedState}
+          trackSelected={trackSelected}
         />
       </div>
     </div>

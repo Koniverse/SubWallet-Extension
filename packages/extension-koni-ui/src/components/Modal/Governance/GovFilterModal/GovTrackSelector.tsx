@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { EmptyList } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field';
 import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -10,7 +9,7 @@ import { Icon, InputRef, SelectModal } from '@subwallet/react-ui';
 import { ALL_TRACK_ID, SubsquareApiSdk, TrackInfo } from '@subwallet/subsquare-api-sdk';
 import { useQuery } from '@tanstack/react-query';
 import CN from 'classnames';
-import { CaretRight, CheckCircle, ListChecks } from 'phosphor-react';
+import { CaretRight, CheckCircle } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -56,16 +55,6 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
     return name.includes(keyword) || formatted.includes(keyword);
   }, []);
 
-  const renderEmpty = useCallback(() => {
-    return (
-      <EmptyList
-        className={'__emptyList'}
-        emptyMessage={t('No track found')}
-        phosphorIcon={ListChecks}
-      />
-    );
-  }, [t]);
-
   const renderItem = useCallback((item: TrackInfo, selected: boolean) => {
     return (
       <div className={CN('__status-item', { '-selected': selected })}>
@@ -101,7 +90,6 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       placeholder={placeholder || t('Select track')}
       renderItem={renderItem}
       renderSelected={renderSelected}
-      renderWhenEmpty={renderEmpty}
       searchFunction={searchFunction}
       searchMinCharactersCount={2}
       searchPlaceholder={t('Search track')}
