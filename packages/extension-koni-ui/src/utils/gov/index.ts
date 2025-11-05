@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
+import { _EXPECTED_BLOCK_TIME } from '@subwallet/extension-base/services/chain-service/constants';
 import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { PreviousVoteAmountDetail, VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
 import { GOV_ONGOING_STATES, GovStatusKey, Referendum, ReferendumDetail, ReferendumVoteDetail, Tally } from '@subwallet/subsquare-api-sdk';
@@ -200,31 +201,51 @@ export function getMinApprovalThreshold (referendum: Referendum | ReferendumDeta
   }
 }
 
+const _MIGRATION_BLOCK_OFFSET: Record<string, number> = {
+  kusama: 19310415
+};
+
 const calculateTimeLeft = (
   blockTime: number,
   currentBlock: number,
   alarmBlock: number | null,
   state: GovStatusKey,
-  blockDuration = 6
+  blockDuration = 6,
+  migrationBlockOffset: number,
+  decisionPeriod?: number,
+  decidingSince?: number
 ): { timeLeft?: string; endTime: number } => {
-  let endTime: BigNumber = new BigNumber(0);
+  let endBlock: number;
 
-  if (alarmBlock && GOV_ONGOING_STATES.includes(state) && currentBlock < alarmBlock) {
-    const blockTimeBN = new BigNumber(blockTime);
-    const blocksLeftBN = new BigNumber(alarmBlock).minus(currentBlock);
-    const blockDurationBN = new BigNumber(blockDuration);
-    const multiplier = new BigNumber(1000);
+  if (state === GovStatusKey.DECIDING && decisionPeriod && decidingSince) {
+    let adjustedSince = decidingSince;
 
-    endTime = blockTimeBN.plus(
-      blocksLeftBN.multipliedBy(blockDurationBN).multipliedBy(multiplier)
-    );
+    // migrate case
+    if (new BigNumber(decidingSince).minus(currentBlock).gt(1_000_000)) {
+      adjustedSince = decidingSince - migrationBlockOffset;
+    }
+
+    endBlock = adjustedSince + decisionPeriod;
+  } else if (alarmBlock && GOV_ONGOING_STATES.includes(state) && currentBlock < alarmBlock) {
+    endBlock = alarmBlock;
+  } else {
+    return { timeLeft: undefined, endTime: 0 };
   }
+
+  const blockTimeBN = new BigNumber(blockTime);
+  const blocksLeftBN = new BigNumber(endBlock).minus(currentBlock);
+  const blockDurationBN = new BigNumber(blockDuration);
+  const multiplier = new BigNumber(1000);
+
+  const endTime = blockTimeBN.plus(
+    blocksLeftBN.multipliedBy(blockDurationBN).multipliedBy(multiplier)
+  );
 
   const now = new BigNumber(Date.now());
   const timeLeftMs = endTime.minus(now);
 
   if (timeLeftMs.lte(0)) {
-    return { timeLeft: undefined, endTime: endTime.toNumber() }; // ⬅️ thay vì "Ended"
+    return { timeLeft: undefined, endTime: endTime.toNumber() };
   }
 
   const msInDay = new BigNumber(1000 * 60 * 60 * 24);
@@ -252,12 +273,16 @@ const calculateTimeLeft = (
   return { timeLeft, endTime: endTime.toNumber() };
 };
 
-export const getTimeLeft = (data: Referendum | ReferendumDetail): string | undefined => {
+export const getTimeLeft = (data: Referendum | ReferendumDetail, chain: string): string | undefined => {
   return calculateTimeLeft(
     data.state.indexer.blockTime,
     data.state.indexer.blockHeight,
     data.onchainData.info.alarm?.[0] || null,
-    data.state.name
+    data.state.name,
+    _EXPECTED_BLOCK_TIME[chain],
+    _MIGRATION_BLOCK_OFFSET[chain] || 0,
+    data.trackInfo?.decisionPeriod,
+    data.onchainData.info.deciding?.since
   ).timeLeft;
 };
 

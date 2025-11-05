@@ -28,7 +28,7 @@ export interface TokenBalanceItemType {
   locked: BalanceValueInfo;
   total: BalanceValueInfo;
   isReady: boolean;
-  symbol: string
+  symbol: string;
 }
 
 export interface BalanceItemWithAddressType extends BalanceItem {

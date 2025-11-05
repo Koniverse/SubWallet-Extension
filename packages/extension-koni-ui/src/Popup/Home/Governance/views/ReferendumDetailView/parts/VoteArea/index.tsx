@@ -34,7 +34,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   const govLockedInfos = useGetGovLockedInfos();
   const { activeModal } = useContext(ModalContext);
   const [timeLeft, setTimeLeft] = useState<string | undefined>(() =>
-    getTimeLeft(referendumDetail)
+    getTimeLeft(referendumDetail, chain)
   );
 
   const userVotingInfo = useMemo<UserVoting[] | undefined>(() => {
@@ -96,11 +96,11 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft(getTimeLeft(referendumDetail));
+      setTimeLeft(getTimeLeft(referendumDetail, chain));
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [referendumDetail]);
+  }, [chain, referendumDetail]);
 
   return (
     <div className={className}>

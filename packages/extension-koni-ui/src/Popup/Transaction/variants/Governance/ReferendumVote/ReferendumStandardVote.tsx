@@ -5,7 +5,7 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { govConvictionOptions, GovVoteType, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { AccountProxy } from '@subwallet/extension-base/types';
-import { isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
+import { balanceNoPrefixFormater, isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, GovAmountInput, GovVoteConvictionSlider, HiddenInput, MetaInfo, NumberDisplay, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_UNVOTE_TRANSACTION, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useDefaultNavigate, useGetAccountTokenBalance, useGetGovLockedInfos, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
@@ -17,7 +17,7 @@ import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } fro
 import { GovAccountAddressItemType, GovVoteStatus, PreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils';
 import { getPreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/utils/gov';
-import { ButtonProps, Form, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
+import { ButtonProps, Form, formatNumber, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
 import BigN, { BigNumber } from 'bignumber.js';
 import CN from 'classnames';
@@ -28,7 +28,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { FreeBalance, TransactionContent, TransactionFooter } from '../../../parts';
+import { SimpleBalance, TransactionContent, TransactionFooter } from '../../../parts';
 
 type WrapperProps = ThemeProps;
 
@@ -55,7 +55,6 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const [govRefVoteStorage, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData, from: govRefVoteStorage.from, fromAccountProxy: govRefVoteStorage.fromAccountProxy }), [defaultData, govRefVoteStorage.from, govRefVoteStorage.fromAccountProxy]);
   const [, setGovRefUnvoteStorage] = useLocalStorage(GOV_REFERENDUM_UNVOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS);
-  const [isBalanceReady, setIsBalanceReady] = useState<boolean>(true);
   const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const [form] = Form.useForm<GovReferendumVoteParams>();
 
@@ -129,6 +128,13 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   );
 
   const lockedValue = useMemo(() => balanceInfo?.locked.value ?? new BigN(0), [balanceInfo]);
+
+  const govAvailableBalance = useMemo(() => {
+    const free = balanceInfo?.free.value ?? new BigN(0);
+    const existentialDeposit = formatNumber(assetInfo.minAmount || '0', Number(assetInfo.decimals || 0), balanceNoPrefixFormater);
+
+    return free.plus(lockedValue).minus(existentialDeposit).toFixed();
+  }, [balanceInfo?.free.value, assetInfo.minAmount, assetInfo.decimals, lockedValue]);
 
   const governanceLock = useMemo<{ from?: BigNumber, to: BigNumber }>(() => {
     const amountBN = new BigNumber(amountValue || 0);
@@ -328,7 +334,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const getButtonProps = (type: GovVoteType) => {
     return {
       loading: loadingButton === type,
-      disabled: (loadingButton !== null && loadingButton !== type) || (isDisable || !isBalanceReady)
+      disabled: (loadingButton !== null && loadingButton !== type) || (isDisable)
     };
   };
 
@@ -415,12 +421,11 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               />
             </Form.Item>
 
-            <FreeBalance
-              address={fromValue}
-              chain={chainValue}
+            <SimpleBalance
               className={'free-balance'}
               label={t('Available balance')}
-              onBalanceReady={setIsBalanceReady}
+              symbol={assetInfo.symbol}
+              value={govAvailableBalance}
             />
           </div>
 

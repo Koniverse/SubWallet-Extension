@@ -23,7 +23,7 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
   const { t } = useTranslation();
   const { ayesPercent, naysPercent } = getTallyVotesBarPercent(item.onchainData.tally);
   const [timeLeft, setTimeLeft] = useState<string | undefined>(() =>
-    getTimeLeft(item)
+    getTimeLeft(item, chain)
   );
 
   const thresholdPercent = getMinApprovalThreshold(item);
@@ -31,11 +31,11 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft(getTimeLeft(item));
+      setTimeLeft(getTimeLeft(item, chain));
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [item]);
+  }, [chain, item]);
 
   return (
     <div

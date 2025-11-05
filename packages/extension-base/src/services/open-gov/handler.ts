@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainInfo } from '@subwallet/chain-list/types';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { BasicTxErrorType, BlockHeader, TransactionData } from '@subwallet/extension-base/types';
@@ -29,6 +29,10 @@ export default abstract class BaseOpenGovHandler {
 
   public get chainInfo (): _ChainInfo {
     return this.state.getChainInfo(this.chain);
+  }
+
+  protected get nativeToken (): _ChainAsset {
+    return this.state.getNativeTokenInfo(this.chain);
   }
 
   private lockPeriod (days: number): number {
@@ -95,7 +99,7 @@ export default abstract class BaseOpenGovHandler {
   private async handleSplitVote (request: SplitVoteRequest): Promise<TransactionData> {
     const substrateApi = await this.substrateApi.isReady;
 
-    const earlyError = await this.validateSplitAbstainAmount(request.address, request.ayeAmount, request.nayAmount);
+    const earlyError = await this.validateSplitAbstainAmount(request.address, false, request.ayeAmount, request.nayAmount);
 
     if (earlyError) {
       return Promise.reject(earlyError);
@@ -117,7 +121,7 @@ export default abstract class BaseOpenGovHandler {
   private async handleSplitAbstainVote (request: SplitAbstainVoteRequest): Promise<TransactionData> {
     const substrateApi = await this.substrateApi.isReady;
 
-    const earlyError = await this.validateSplitAbstainAmount(request.address, request.ayeAmount, request.nayAmount, request.abstainAmount);
+    const earlyError = await this.validateSplitAbstainAmount(request.address, true, request.ayeAmount, request.nayAmount, request.abstainAmount);
 
     if (earlyError) {
       return Promise.reject(earlyError);
@@ -202,34 +206,60 @@ export default abstract class BaseOpenGovHandler {
   }
 
   private async validateConvictionAndBalance (address: string, balance: string, conviction: number): Promise<TransactionError | null> {
-    const totalBalance = await this.state.balanceService.getTotalBalance(address, this.chain);
-
     if (!balance) {
       return new TransactionError(BasicTxErrorType.INVALID_PARAMS, ('Amount is required'));
-    }
-
-    const bnBalance = new BigN(balance);
-
-    if (bnBalance.gt(totalBalance.value)) {
-      const chainAsset = this.state.chainService.getNativeTokenInfo(this.chain);
-      const maxString = formatNumber(totalBalance.value, _getAssetDecimals(chainAsset));
-
-      const msg = maxString !== '0'
-        ? `Amount must be equal or less than ${maxString}`
-        : 'You need balance greater than 0 to continue';
-
-      return new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, msg);
     }
 
     if (conviction < 0 || conviction > 6) {
       return new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Invalid conviction');
     }
 
+    const totalBalance = await this.state.balanceService.getTotalBalance(address, this.chain);
+
+    if (new BigN(totalBalance.value).lte(0)) {
+      return new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, 'You need balance greater than 0 to continue');
+    }
+
+    const bnBalance = new BigN(balance);
+    const ed = new BigN(this.nativeToken.minAmount || '0');
+    const substrateApi = await this.substrateApi.isReady;
+
+    let estimatedFee = new BigN(0);
+
+    try {
+      const dummyTx = substrateApi.api.tx.convictionVoting.vote(0, {
+        Standard: {
+          vote: { aye: true, conviction },
+          balance: bnBalance.toString()
+        }
+      });
+      const paymentInfo = await dummyTx.paymentInfo(address);
+
+      estimatedFee = new BigN(paymentInfo.partialFee.toString());
+    } catch (e) {
+      console.warn('Cannot estimate fee, fallback to default', e);
+      const decimals = Number(_getAssetDecimals(this.nativeToken));
+
+      estimatedFee = new BigN(0.001).multipliedBy(new BigN(10).pow(decimals)); // fallback 0.001
+    }
+
+    const availableBalance = new BigN(totalBalance.value).minus(ed).minus(estimatedFee);
+
+    if (bnBalance.gt(availableBalance)) {
+      return new TransactionError(
+        BasicTxErrorType.NOT_ENOUGH_BALANCE,
+        `Amount must be equal or less than ${formatNumber(availableBalance, _getAssetDecimals(this.nativeToken))}`
+      );
+    }
+
+    console.log('Estimated fee:', estimatedFee.toString());
+
     return null;
   }
 
   private async validateSplitAbstainAmount (
     address: string,
+    isSplitAbstain = true,
     aye: string,
     nay: string,
     abstain?: string
@@ -240,19 +270,55 @@ export default abstract class BaseOpenGovHandler {
 
     const values = [new BigN(aye), new BigN(nay), new BigN(abstain ?? '0')];
 
-    if (values.some((v) => v.lt(0))) {
-      return new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'All values must be greater than 0');
-    }
-
     const total = values.reduce((acc, val) => acc.plus(val), new BigN(0));
 
-    const transferableBalance = await this.state.balanceService.getTransferableBalance(address, this.chain);
+    const totalBalance = await this.state.balanceService.getTotalBalance(address, this.chain);
 
-    if (total.gt(transferableBalance.value)) {
-      const chainAsset = this.state.chainService.getNativeTokenInfo(this.chain);
-      const maxString = formatNumber(transferableBalance.value, _getAssetDecimals(chainAsset));
+    const ed = this.nativeToken.minAmount || '0';
 
-      return new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, `Amount must be equal or less than ${maxString}`);
+    const substrateApi = await this.substrateApi.isReady;
+
+    let dummyTx;
+
+    try {
+      dummyTx = substrateApi.api.tx.convictionVoting.vote(
+        1, // dummy referendum id
+        isSplitAbstain
+          ? {
+            SplitAbstain: {
+              aye: 1,
+              nay: 1,
+              abstain: 1
+            }
+          }
+          : {
+            Split: {
+              aye: 1,
+              nay: 1
+            }
+          }
+      );
+    } catch (e) {
+      console.warn('Cannot build dummy tx for fee estimation', e);
+    }
+
+    let estimatedFee = new BigN(0);
+
+    if (dummyTx) {
+      try {
+        const paymentInfo = await dummyTx.paymentInfo(address);
+
+        estimatedFee = new BigN(paymentInfo.partialFee.toString());
+      } catch (e) {
+        console.warn('Cannot get payment info, fallback to default fee', e);
+        estimatedFee = new BigN(0.001 * (10 ** _getAssetDecimals(this.nativeToken))); // fallback 0.001
+      }
+    }
+
+    const availableBalance = new BigN(totalBalance.value).minus(ed).minus(estimatedFee);
+
+    if (total.gt(availableBalance)) {
+      return new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, `Amount must be equal or less than ${formatNumber(availableBalance, _getAssetDecimals(this.nativeToken))}`);
     }
 
     return null;
