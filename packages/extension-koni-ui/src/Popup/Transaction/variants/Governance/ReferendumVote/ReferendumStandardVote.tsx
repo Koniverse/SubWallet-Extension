@@ -5,7 +5,7 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { govConvictionOptions, GovVoteType, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { AccountProxy } from '@subwallet/extension-base/types';
-import { balanceNoPrefixFormater, isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
+import { isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, GovAmountInput, GovVoteConvictionSlider, HiddenInput, MetaInfo, NumberDisplay, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_UNVOTE_TRANSACTION, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useDefaultNavigate, useGetAccountTokenBalance, useGetGovLockedInfos, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
@@ -17,7 +17,7 @@ import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } fro
 import { GovAccountAddressItemType, GovVoteStatus, PreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils';
 import { getPreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/utils/gov';
-import { ButtonProps, Form, formatNumber, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
+import { ButtonProps, Form, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
 import BigN, { BigNumber } from 'bignumber.js';
 import CN from 'classnames';
@@ -131,10 +131,9 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
   const govAvailableBalance = useMemo(() => {
     const free = balanceInfo?.free.value ?? new BigN(0);
-    const existentialDeposit = formatNumber(assetInfo.minAmount || '0', Number(assetInfo.decimals || 0), balanceNoPrefixFormater);
 
-    return free.plus(lockedValue).minus(existentialDeposit).toFixed();
-  }, [balanceInfo?.free.value, assetInfo.minAmount, assetInfo.decimals, lockedValue]);
+    return free.plus(lockedValue).toFixed();
+  }, [balanceInfo?.free.value, lockedValue]);
 
   const governanceLock = useMemo<{ from?: BigNumber, to: BigNumber }>(() => {
     const amountBN = new BigNumber(amountValue || 0);

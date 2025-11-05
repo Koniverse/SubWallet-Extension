@@ -87,6 +87,31 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     [cmdFirefoxKey]: false
   });
 
+  const [, setIsComposing] = useState(false);
+
+  const onCompositionStart = useCallback(() => {
+    setIsComposing(true);
+  }, []);
+
+  const onCompositionEnd = useCallback((event: React.CompositionEvent<HTMLInputElement>) => {
+    setIsComposing(false);
+
+    let value = event.currentTarget.value;
+
+    value = value.replace(/[^0-9.]/g, '');
+
+    const firstDotIndex = value.indexOf('.');
+
+    if (firstDotIndex !== -1) {
+      value = value.slice(0, firstDotIndex + 1) + value.slice(firstDotIndex + 1).replace(/\./g, '');
+    }
+
+    setInputValue(value);
+    onChange && onChange({
+      target: { value: getOutputValuesFromString(value, decimals, defaultInvalidOutputValue) }
+    }, true);
+  }, [onChange, decimals, defaultInvalidOutputValue]);
+
   const _onClickMaxBtn = useCallback((e: SyntheticEvent) => {
     e.stopPropagation();
     inputRef.current?.focus();
@@ -248,6 +273,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       label={props.label}
       onBlur={props.onBlur}
       onChange={onChangeInput}
+      onCompositionEnd={onCompositionEnd}
+      onCompositionStart={onCompositionStart}
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
       onPaste={onPaste}

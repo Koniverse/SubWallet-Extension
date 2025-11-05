@@ -216,12 +216,7 @@ export default abstract class BaseOpenGovHandler {
 
     const totalBalance = await this.state.balanceService.getTotalBalance(address, this.chain);
 
-    if (new BigN(totalBalance.value).lte(0)) {
-      return new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, 'You need balance greater than 0 to continue');
-    }
-
     const bnBalance = new BigN(balance);
-    const ed = new BigN(this.nativeToken.minAmount || '0');
     const substrateApi = await this.substrateApi.isReady;
 
     let estimatedFee = new BigN(0);
@@ -243,7 +238,11 @@ export default abstract class BaseOpenGovHandler {
       estimatedFee = new BigN(0.001).multipliedBy(new BigN(10).pow(decimals)); // fallback 0.001
     }
 
-    const availableBalance = new BigN(totalBalance.value).minus(ed).minus(estimatedFee);
+    const availableBalance = new BigN(totalBalance.value).minus(estimatedFee);
+
+    if (availableBalance.lte(0)) {
+      return new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, "You don't have enough tokens to proceed");
+    }
 
     if (bnBalance.gt(availableBalance)) {
       return new TransactionError(
@@ -251,8 +250,6 @@ export default abstract class BaseOpenGovHandler {
         `Amount must be equal or less than ${formatNumber(availableBalance, _getAssetDecimals(this.nativeToken))}`
       );
     }
-
-    console.log('Estimated fee:', estimatedFee.toString());
 
     return null;
   }
@@ -273,8 +270,6 @@ export default abstract class BaseOpenGovHandler {
     const total = values.reduce((acc, val) => acc.plus(val), new BigN(0));
 
     const totalBalance = await this.state.balanceService.getTotalBalance(address, this.chain);
-
-    const ed = this.nativeToken.minAmount || '0';
 
     const substrateApi = await this.substrateApi.isReady;
 
@@ -315,7 +310,11 @@ export default abstract class BaseOpenGovHandler {
       }
     }
 
-    const availableBalance = new BigN(totalBalance.value).minus(ed).minus(estimatedFee);
+    const availableBalance = new BigN(totalBalance.value).minus(estimatedFee);
+
+    if (availableBalance.lte(0)) {
+      return new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, "You don't have enough tokens to proceed");
+    }
 
     if (total.gt(availableBalance)) {
       return new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, `Amount must be equal or less than ${formatNumber(availableBalance, _getAssetDecimals(this.nativeToken))}`);

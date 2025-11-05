@@ -5,7 +5,7 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { AccountProxy } from '@subwallet/extension-base/types';
-import { balanceNoPrefixFormater, isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
+import { isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, HiddenInput, MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, GOV_UNLOCK_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
@@ -15,7 +15,7 @@ import { useGovReferendumVotes } from '@subwallet/extension-koni-ui/Popup/Home/G
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { FormCallbacks, FormFieldData, GovUnlockVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, funcSortByName, simpleCheckForm, toShort } from '@subwallet/extension-koni-ui/utils';
-import { Button, Form, formatNumber, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
+import { Button, Form, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle, Info, XCircle } from 'phosphor-react';
@@ -91,10 +91,9 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
   const govAvailableBalance = useMemo(() => {
     const free = balanceInfo?.free.value ?? new BigN(0);
-    const existentialDeposit = formatNumber(assetInfo.minAmount || '0', Number(assetInfo.decimals || 0), balanceNoPrefixFormater);
 
-    return free.plus(lockedValue).minus(existentialDeposit).toFixed();
-  }, [balanceInfo?.free.value, assetInfo.minAmount, assetInfo.decimals, lockedValue]);
+    return free.plus(lockedValue).toFixed();
+  }, [balanceInfo?.free.value, lockedValue]);
 
   const govLockInfo = useGetGovLockedInfos(chainValue);
 
