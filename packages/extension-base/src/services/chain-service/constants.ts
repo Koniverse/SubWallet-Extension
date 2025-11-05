@@ -70,7 +70,7 @@ export const _STAKING_ERA_LENGTH_MAP: Record<string, number> = { // in hours
   aleph: 24,
   polkadot: 24,
   kusama: 6,
-  statemint: 6,
+  statemint: 24,
   statemine: 6,
   westend: 6,
   hydradx: 24,
