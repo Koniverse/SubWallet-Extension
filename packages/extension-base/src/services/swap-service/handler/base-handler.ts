@@ -63,7 +63,7 @@ interface ValidateBridgeStepRequest {
   selectedFeeToken: _ChainAsset;
   toChainNativeToken: _ChainAsset;
   bnBridgeAmount: BigN;
-  bridgeFromTokenBalanceStr: string,
+  bridgeFromTokenNativeBalanceStr: string,
   bnFromTokenBalance: BigN;
   bnBridgeFeeAmount: BigN;
   bnFeeTokenBalance: BigN;
@@ -412,7 +412,7 @@ export class SwapBaseHandler {
   }
 
   private async validateBridgeStep (request: ValidateBridgeStepRequest): Promise<TransactionError[]> {
-    const { bnBridgeAmount, bnBridgeDeliveryFee, bnBridgeFeeAmount, bnFeeTokenBalance, bnFromTokenBalance, bridgeFromTokenBalanceStr, fromChain, fromToken, isFirstBridge, receiver, selectedFeeToken, sender, toChain, toChainNativeToken, toToken } = request;
+    const { bnBridgeAmount, bnBridgeDeliveryFee, bnBridgeFeeAmount, bnFeeTokenBalance, bnFromTokenBalance, bridgeFromTokenNativeBalanceStr, fromChain, fromToken, isFirstBridge, receiver, selectedFeeToken, sender, toChain, toChainNativeToken, toToken } = request;
 
     const minBridgeAmountRequired = new BigN(_getTokenMinAmount(toToken)).multipliedBy(FEE_RATE_MULTIPLIER.high);
     const spendingAndFeePaymentValidation = validateSpendingAndFeePayment(fromToken, selectedFeeToken, bnBridgeAmount, bnFromTokenBalance, bnBridgeFeeAmount, bnFeeTokenBalance);
@@ -475,10 +475,9 @@ export class SwapBaseHandler {
         const originFee = await getXcmOriginFee(xcmRequest);
 
         if (originFee) {
-          const fromTokenMinAmount = _getTokenMinAmount(fromToken);
-          const isBridgeTokenBalanceEnough = new BigN(bridgeFromTokenBalanceStr).minus(originFee).gte(fromTokenMinAmount);
+          const isBridgeTokenNativeBalanceEnough = new BigN(bridgeFromTokenNativeBalanceStr).gte(originFee);
 
-          if (!isBridgeTokenBalanceEnough) {
+          if (!isBridgeTokenNativeBalanceEnough) {
             return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Swap amount too small. Increase amount and try again')];
           }
         }
@@ -596,6 +595,7 @@ export class SwapBaseHandler {
 
     const bnBridgeFeeAmount = BigN(bridgeFeeAmount);
     const bnBridgeAmount = new BigN(xcmMetadata.sendingValue);
+    const bridgeFromChainNativeToken = this.chainService.getNativeTokenInfo(bridgeFromToken.originChain);
     const bridgeToChainNativeToken = this.chainService.getNativeTokenInfo(bridgeToToken.originChain);
     const bridgeSelectedFeeToken = this.chainService.getAssetBySlug(currentFee.selectedFeeToken || currentFee.defaultFeeToken);
 
@@ -604,9 +604,10 @@ export class SwapBaseHandler {
     const bridgeSender = _reformatAddressWithChain(xcmMetadata.sender, this.chainService.getChainInfoByKey(bridgeFromToken.originChain));
     const bridgeReceiver = _reformatAddressWithChain(xcmMetadata.receiver ?? bridgeSender, this.chainService.getChainInfoByKey(bridgeToToken.originChain));
 
-    const [bridgeFromTokenBalance, bridgeFeeTokenBalance] = await Promise.all([
+    const [bridgeFromTokenBalance, bridgeFeeTokenBalance, bridgeFromTokenNativeBalance] = await Promise.all([
       this.balanceService.getTransferableBalance(bridgeSender, bridgeFromToken.originChain, bridgeFromToken.slug, ExtrinsicType.TRANSFER_XCM),
-      this.balanceService.getTransferableBalance(bridgeSender, bridgeFromToken.originChain, bridgeSelectedFeeToken.slug, ExtrinsicType.TRANSFER_XCM)
+      this.balanceService.getTransferableBalance(bridgeSender, bridgeFromToken.originChain, bridgeSelectedFeeToken.slug, ExtrinsicType.TRANSFER_XCM),
+      this.balanceService.getTransferableBalance(bridgeSender, bridgeFromChainNativeToken.originChain, bridgeFromChainNativeToken.slug, ExtrinsicType.TRANSFER_XCM)
     ]);
 
     // Native token balance has already accounted for ED aka strict mode
@@ -622,7 +623,7 @@ export class SwapBaseHandler {
       selectedFeeToken: bridgeSelectedFeeToken,
       toChainNativeToken: bridgeToChainNativeToken,
       bnBridgeAmount,
-      bridgeFromTokenBalanceStr: bridgeFromTokenBalance.value,
+      bridgeFromTokenNativeBalanceStr: bridgeFromTokenNativeBalance.value,
       bnFromTokenBalance: bnBridgeFromTokenBalance,
       bnBridgeFeeAmount,
       bnFeeTokenBalance: bnBridgeFeeTokenBalance,
@@ -800,6 +801,7 @@ export class SwapBaseHandler {
 
     const bnBridgeFeeAmount = BigN(bridgeFeeAmount);
     const bnBridgeAmount = new BigN(xcmMetadata.sendingValue);
+    const bridgeFromChainNativeToken = this.chainService.getNativeTokenInfo(bridgeFromToken.originChain);
     const bridgeToChainNativeToken = this.chainService.getNativeTokenInfo(bridgeToToken.originChain);
     const bridgeSelectedFeeToken = this.chainService.getAssetBySlug(currentFee.selectedFeeToken || currentFee.defaultFeeToken);
 
@@ -808,9 +810,10 @@ export class SwapBaseHandler {
     const bridgeSender = _reformatAddressWithChain(xcmMetadata.sender, this.chainService.getChainInfoByKey(bridgeFromToken.originChain));
     const bridgeReceiver = _reformatAddressWithChain(xcmMetadata.receiver ?? bridgeSender, this.chainService.getChainInfoByKey(bridgeToToken.originChain));
 
-    const [bridgeFromTokenBalance, bridgeFeeTokenBalance] = await Promise.all([
+    const [bridgeFromTokenBalance, bridgeFeeTokenBalance, bridgeFromTokenNativeBalance] = await Promise.all([
       this.balanceService.getTransferableBalance(bridgeSender, bridgeFromToken.originChain, bridgeFromToken.slug, ExtrinsicType.TRANSFER_XCM),
-      this.balanceService.getTransferableBalance(bridgeSender, bridgeFromToken.originChain, bridgeSelectedFeeToken.slug, ExtrinsicType.TRANSFER_XCM)
+      this.balanceService.getTransferableBalance(bridgeSender, bridgeFromToken.originChain, bridgeSelectedFeeToken.slug, ExtrinsicType.TRANSFER_XCM),
+      this.balanceService.getTransferableBalance(bridgeSender, bridgeFromChainNativeToken.originChain, bridgeFromChainNativeToken.slug, ExtrinsicType.TRANSFER_XCM)
     ]);
 
     // Native token balance has already accounted for ED aka strict mode
@@ -826,7 +829,7 @@ export class SwapBaseHandler {
       selectedFeeToken: bridgeSelectedFeeToken,
       toChainNativeToken: bridgeToChainNativeToken,
       bnBridgeAmount,
-      bridgeFromTokenBalanceStr: bridgeFromTokenBalance.value,
+      bridgeFromTokenNativeBalanceStr: bridgeFromTokenNativeBalance.value,
       bnFromTokenBalance: bnBridgeFromTokenBalance,
       bnBridgeFeeAmount,
       bnFeeTokenBalance: bnBridgeFeeTokenBalance,
@@ -868,6 +871,7 @@ export class SwapBaseHandler {
 
     const bnBridgeFeeAmount = BigN(bridgeFeeAmount);
     const bnBridgeAmount = new BigN(bridgeMetadata.sendingValue);
+    const bridgeFromChainNativeToken = this.chainService.getNativeTokenInfo(bridgeFromToken.originChain);
     const bridgeToChainNativeToken = this.chainService.getNativeTokenInfo(bridgeToToken.originChain);
     const bridgeSelectedFeeToken = this.chainService.getAssetBySlug(bridgeFee.selectedFeeToken || bridgeFee.defaultFeeToken);
 
@@ -876,9 +880,10 @@ export class SwapBaseHandler {
     const bridgeSender = _reformatAddressWithChain(bridgeMetadata.sender, this.chainService.getChainInfoByKey(bridgeFromToken.originChain));
     const bridgeReceiver = _reformatAddressWithChain(bridgeMetadata.receiver ?? bridgeSender, this.chainService.getChainInfoByKey(bridgeToToken.originChain));
 
-    const [bridgeFromTokenBalance, bridgeFeeTokenBalance] = await Promise.all([
+    const [bridgeFromTokenBalance, bridgeFeeTokenBalance, bridgeFromTokenNativeBalance] = await Promise.all([
       this.balanceService.getTransferableBalance(bridgeSender, bridgeFromToken.originChain, bridgeFromToken.slug, ExtrinsicType.TRANSFER_XCM),
-      this.balanceService.getTransferableBalance(bridgeSender, bridgeFromToken.originChain, bridgeSelectedFeeToken.slug, ExtrinsicType.TRANSFER_XCM)
+      this.balanceService.getTransferableBalance(bridgeSender, bridgeFromToken.originChain, bridgeSelectedFeeToken.slug, ExtrinsicType.TRANSFER_XCM),
+      this.balanceService.getTransferableBalance(bridgeSender, bridgeFromChainNativeToken.originChain, bridgeFromChainNativeToken.slug, ExtrinsicType.TRANSFER_XCM)
     ]);
 
     // Native token balance has already accounted for ED aka strict mode
@@ -894,7 +899,7 @@ export class SwapBaseHandler {
       selectedFeeToken: bridgeSelectedFeeToken,
       toChainNativeToken: bridgeToChainNativeToken,
       bnBridgeAmount,
-      bridgeFromTokenBalanceStr: bridgeFromTokenBalance.value,
+      bridgeFromTokenNativeBalanceStr: bridgeFromTokenNativeBalance.value,
       bnFromTokenBalance: bnBridgeFromTokenBalance,
       bnBridgeFeeAmount,
       bnFeeTokenBalance: bnBridgeFeeTokenBalance,
@@ -1002,6 +1007,7 @@ export class SwapBaseHandler {
 
     const bnTransitFeeAmount = BigN(transitFee);
     const bnTransitAmount = new BigN(transitMetadata.sendingValue);
+    const transitFromChainNativeToken = this.chainService.getNativeTokenInfo(transitFromToken.originChain);
     const transitToChainNativeToken = this.chainService.getNativeTokenInfo(transitToToken.originChain);
     const transitSelectedFeeToken = this.chainService.getAssetBySlug(transitTotalFee.selectedFeeToken || transitTotalFee.defaultFeeToken);
 
@@ -1010,9 +1016,10 @@ export class SwapBaseHandler {
     const transitSender = _reformatAddressWithChain(transitMetadata.sender, this.chainService.getChainInfoByKey(transitFromToken.originChain));
     const transitReceiver = _reformatAddressWithChain(transitMetadata.receiver ?? transitSender, this.chainService.getChainInfoByKey(transitToToken.originChain));
 
-    const [transitFromTokenBalance, transitFeeTokenBalance] = await Promise.all([
+    const [transitFromTokenBalance, transitFeeTokenBalance, transitFromTokenNativeBalance] = await Promise.all([
       this.balanceService.getTransferableBalance(transitSender, transitFromToken.originChain, transitFromToken.slug, ExtrinsicType.TRANSFER_XCM),
-      this.balanceService.getTransferableBalance(transitSender, transitFromToken.originChain, transitSelectedFeeToken.slug, ExtrinsicType.TRANSFER_XCM)
+      this.balanceService.getTransferableBalance(transitSender, transitFromToken.originChain, transitSelectedFeeToken.slug, ExtrinsicType.TRANSFER_XCM),
+      this.balanceService.getTransferableBalance(transitSender, transitFromChainNativeToken.originChain, transitFromChainNativeToken.slug, ExtrinsicType.TRANSFER_XCM)
     ]);
 
     // Native token balance has already accounted for ED aka strict mode
@@ -1027,7 +1034,7 @@ export class SwapBaseHandler {
       toToken: transitToToken,
       selectedFeeToken: transitSelectedFeeToken,
       toChainNativeToken: transitToChainNativeToken,
-      bridgeFromTokenBalanceStr: transitFromTokenBalance.value,
+      bridgeFromTokenNativeBalanceStr: transitFromTokenNativeBalance.value,
       bnBridgeAmount: bnTransitAmount,
       bnFromTokenBalance: bnTransitFromTokenBalance,
       bnBridgeFeeAmount: bnTransitFeeAmount,
