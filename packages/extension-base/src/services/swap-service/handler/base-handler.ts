@@ -390,26 +390,6 @@ export class SwapBaseHandler {
     } as SwapSubmitStepData;
   }
 
-  public async validateSetFeeTokenStep (params: ValidateSwapProcessParams, stepIndex: number): Promise<TransactionError[]> {
-    if (!params.selectedQuote) {
-      return Promise.resolve([new TransactionError(BasicTxErrorType.INTERNAL_ERROR)]);
-    }
-
-    const feeInfo = params.process.totalFee[stepIndex];
-    const feeAmount = feeInfo.feeComponent[0];
-    const feeTokenInfo = this.chainService.getAssetBySlug(feeInfo.defaultFeeToken);
-
-    const feeTokenBalance = await this.balanceService.getTransferableBalance(params.address, feeTokenInfo.originChain, feeTokenInfo.slug);
-    const bnFeeTokenBalance = new BigN(feeTokenBalance.value);
-    const bnFeeAmount = new BigN(feeAmount.amount);
-
-    if (bnFeeAmount.gte(bnFeeTokenBalance)) {
-      return Promise.resolve([new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)]);
-    }
-
-    return [];
-  }
-
   private async validateBridgeStep (request: ValidateBridgeStepRequest): Promise<TransactionError[]> {
     const { bnBridgeAmount, bnBridgeDeliveryFee, bnBridgeFeeAmount, bnFeeTokenBalance, bnFromTokenBalance, fromChain, fromToken, isFirstBridge, receiver, selectedFeeToken, sender, toChain, toChainNativeToken, toToken } = request;
 
