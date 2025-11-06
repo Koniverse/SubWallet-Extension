@@ -87,7 +87,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
   const onSelectGovItem = useCallback((item: GovAccountAddressItemType) => {
     if (item.govVoteStatus === GovVoteStatus.DELEGATED) {
       openAlert({
-        title: t('Unable to vote'),
+        title: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.unableToVote'),
         type: NotificationType.ERROR,
         content:
           <Trans
@@ -101,7 +101,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
             values={{ name: item.accountName }}
           />,
         okButton: {
-          text: t('I understand'),
+          text: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.iUnderstand'),
           onClick: closeAlert
         }
       });
@@ -159,7 +159,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
         onBack={onBack}
         paddingVertical
         showBackButton
-        title={t('Referenda #{{id}}', { replace: { id: data.referendumIndex } })}
+        title={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.referendaId', { replace: { id: data.referendumIndex } })}
       />
 
       <div className={'referendum-detail-body'}>

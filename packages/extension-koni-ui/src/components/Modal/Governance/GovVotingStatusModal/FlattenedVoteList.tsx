@@ -46,13 +46,13 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
       navigator.clipboard.writeText(address)
         .then(() => {
           notify({
-            message: t('Copied to clipboard')
+            message: t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.FlattenedVoteList.copiedToClipboard')
           });
         })
         .catch((err) => {
           console.error('Failed to copy: ', err);
           notify({
-            message: t('Copy failed')
+            message: t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.FlattenedVoteList.copyFailed')
           });
         });
     };
@@ -103,7 +103,7 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
             <div className='vote-item__address'>{account?.name || shortAddress}</div>
             <div className='vote-item__meta'>
               <div className='vote-item__meta-row'>
-                <span className='vote-item__label'>{t('Votes')}</span>
+                <span className='vote-item__label'>{t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.FlattenedVoteList.votes')}</span>
                 <NumberDisplay
                   decimal={decimal}
                   formatType={'balance'}
@@ -113,11 +113,11 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
                 />
               </div>
               <div className='vote-item__meta-row'>
-                <span className='vote-item__label'>{t('Conviction')}</span>
+                <span className='vote-item__label'>{t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.FlattenedVoteList.conviction')}</span>
                 <span>{convictionLabel}</span>
               </div>
               <div className='vote-item__meta-row'>
-                <span className='vote-item__label'>{t('Capital')}</span>
+                <span className='vote-item__label'>{t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.FlattenedVoteList.capital')}</span>
                 <NumberDisplay
                   decimal={decimal}
                   formatType={'balance'}
@@ -162,7 +162,7 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
   const renderEmpty = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('No nested data')}
+        emptyMessage={t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.FlattenedVoteList.noNestedData')}
         phosphorIcon={ListChecks}
       />
     );

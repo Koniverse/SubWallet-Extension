@@ -70,13 +70,13 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         <MetaInfo.Account
           address={account?.address || transaction.address}
           chainSlug={transaction.chain}
-          label={t('Account')}
+          label={t('ui.TRANSACTION.Confirmations.GovUnvote.account')}
           name={account?.name}
           networkPrefix={networkPrefix}
         />
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Network fee')}
+          label={t('ui.TRANSACTION.Confirmations.GovUnvote.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
@@ -87,7 +87,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
       >
         <MetaInfo.Default
           className={'transferable-value-info'}
-          label={t('Transferable')}
+          label={t('ui.TRANSACTION.Confirmations.GovUnvote.transferable')}
         >
           {
             !!govConfirmationInfo?.transferable.from && (
@@ -110,7 +110,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         </MetaInfo.Default>
         <MetaInfo.Default
           className={'governance-lock-value-info'}
-          label={t('Governance lock')}
+          label={t('ui.TRANSACTION.Confirmations.GovUnvote.governanceLock')}
         >
           {
             !!govConfirmationInfo?.governanceLock.from && (
@@ -132,7 +132,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           />
         </MetaInfo.Default>
         <MetaInfo.Default
-          label={t('Referenda')}
+          label={t('ui.TRANSACTION.Confirmations.GovUnvote.referenda')}
         >
           #{data.referendumIndex}
         </MetaInfo.Default>

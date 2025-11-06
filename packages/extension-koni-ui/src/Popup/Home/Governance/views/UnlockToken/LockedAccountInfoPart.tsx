@@ -171,14 +171,14 @@ function Component ({ chain, className, govLockedInfos }: Props) {
             {lockedAmount.gt(BN_ZERO) && <MetaInfo.Status
               className={'__meta-locked-status-item'}
               label={renderAccount(item)}
-              statusName={t('Unlockable')}
+              statusName={t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlockable')}
               valueColorSchema={'success'}
             />}
 
             <MetaInfo.Number
               decimalOpacity={0.45}
               decimals={decimals}
-              label={t('Delegated')}
+              label={t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.delegated')}
               suffix={symbol}
               value={item.summary.delegated}
               valueColorSchema='even-odd'
@@ -187,7 +187,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
             <MetaInfo.Number
               decimalOpacity={0.45}
               decimals={decimals}
-              label={t('Voted')}
+              label={t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.voted')}
               suffix={symbol}
               value={item.summary.voted}
               valueColorSchema='even-odd'
@@ -197,7 +197,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
               decimalOpacity={0.45}
               decimals={decimals}
               label={(
-                <span>{t('Unlocking')}
+                <span>{t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlocking')}
                   {
                     new BigNumber(maxUnlockingBalance).gt(BN_ZERO) && (
                       <span
@@ -223,7 +223,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
             <MetaInfo.Number
               decimalOpacity={0.45}
               decimals={decimals}
-              label={t('Unlockable')}
+              label={t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlockable')}
               suffix={symbol}
               value={lockedAmount}
               valueColorSchema='even-odd'
@@ -237,7 +237,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
                 onClick={goUnlockVote(item)}
               >
                 <div className='__unlock-button-label'>
-                  {t('Unlock')}
+                  {t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlock')}
                 </div>
               </Button>
             </div>
@@ -256,7 +256,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
           decimalOpacity={0.45}
           decimals={decimals}
           key={item.id}
-          label={t('Unlockable in {{date}}', { date: timeRemainingContent })}
+          label={t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlockableInDate', { date: timeRemainingContent })}
           suffix={symbol}
           value={item.balance}
           valueColorSchema='even-odd'
@@ -291,7 +291,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
         closable={true}
         id={UNLOCKING_MODAL_ID}
         onCancel={onCancelUnlockingModal}
-        title={t('Unlocking')}
+        title={t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlocking')}
       >
         <MetaInfo
           className={CN('__unlocking-modal-container')}

@@ -30,15 +30,15 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('Description'),
+        label: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.description'),
         value: Tab.DESCRIPTION
       },
       {
-        label: t('Details'),
+        label: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.details'),
         value: Tab.DETAILS
       },
       {
-        label: t('Timeline'),
+        label: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.timeline'),
         value: Tab.TIMELINE
       }
     ];

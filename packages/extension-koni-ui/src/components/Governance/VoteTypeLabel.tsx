@@ -17,10 +17,10 @@ type Props = ThemeProps & {
 const Component = ({ className, type }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const labelMap = useMemo(() => ({
-    [GovVoteType.AYE]: t('Aye'),
-    [GovVoteType.NAY]: t('Nay'),
-    [GovVoteType.ABSTAIN]: t('Abstain'),
-    [GovVoteType.SPLIT]: t('Split')
+    [GovVoteType.AYE]: t('ui.GOVERNANCE.components.Governance.VoteTypeLabel.aye'),
+    [GovVoteType.NAY]: t('ui.GOVERNANCE.components.Governance.VoteTypeLabel.nay'),
+    [GovVoteType.ABSTAIN]: t('ui.GOVERNANCE.components.Governance.VoteTypeLabel.abstain'),
+    [GovVoteType.SPLIT]: t('ui.GOVERNANCE.components.Governance.VoteTypeLabel.split')
   }), [t]);
 
   return (

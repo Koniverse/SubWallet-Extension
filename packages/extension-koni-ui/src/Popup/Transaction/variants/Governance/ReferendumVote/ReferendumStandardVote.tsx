@@ -248,14 +248,14 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
   const screenTitle = useMemo(() => {
     if (currentVoteStatus === GovVoteStatus.VOTED) {
-      return t('Revote for #{{referendumId}}', {
+      return t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumStandardVote.revoteForReferendumId', {
         replace: {
           referendumId: referendumId
         }
       });
     }
 
-    return t('Vote for #{{referendumId}}', {
+    return t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumStandardVote.voteForReferendumId', {
       replace: {
         referendumId: referendumId
       }
@@ -269,7 +269,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
     return [
       {
-        children: t('Unvote'),
+        children: t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumStandardVote.unvote'),
         onClick: () => {
           setGovRefUnvoteStorage({
             ...DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS,
@@ -402,7 +402,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               address={fromValue}
               chain={chainValue}
               className={'free-balance'}
-              label={t('Available balance')}
+              label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumStandardVote.availableBalance')}
               onBalanceReady={setIsBalanceReady}
             />
           </div>
@@ -414,12 +414,12 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               <GovAmountInput
                 decimals={_getAssetDecimals(assetInfo)}
                 key={standardAmountRenderKey}
-                label={t('Amount')}
+                label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumStandardVote.amount')}
                 logoKey={assetInfo.slug.toLowerCase()}
                 tokenSymbol={_getAssetSymbol(assetInfo)}
                 topRightPart={
                   (!!previousVoteAmountDetail && <span className={'previous-vote-info'}>
-                    {t('Previous vote')}
+                    {t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumStandardVote.previousVote')}
                     <VoteTypeLabel type={previousVoteAmountDetail?.type} />
                     <div onClick={onOpenDetailVoteModal}>
                       <Icon
@@ -462,7 +462,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             >
               <MetaInfo.Default
                 className={'governance-value-info'}
-                label={t('Lock duration')}
+                label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumStandardVote.lockDuration')}
               >
                 {
                   !!convictionDescription.from && (
@@ -476,7 +476,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               </MetaInfo.Default>
               <MetaInfo.Default
                 className={'governance-value-info'}
-                label={t('Governance lock')}
+                label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumStandardVote.governanceLock')}
               >
                 {
                   !!governanceLock.from && (
@@ -532,7 +532,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         closable={true}
         id={PreviousVoteDetailModalId}
         onCancel={onCancelDetailVoteModal}
-        title={t('Previous vote')}
+        title={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumStandardVote.previousVote')}
       >
         <VoteAmountDetail
           amountDetail={previousVoteAmountDetail}

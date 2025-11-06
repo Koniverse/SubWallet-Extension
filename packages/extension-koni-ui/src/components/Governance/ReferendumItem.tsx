@@ -36,8 +36,8 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
     const isAyeLeading = ayesPercent > naysPercent;
 
     return isPreparing
-      ? (isAyeLeading ? t('Decision starts in {{time}}', { time }) : t('Time out in {{time}}', { time }))
-      : (isAyeLeading ? t('Approve in {{time}}', { time }) : t('Reject in {{time}}', { time }));
+      ? (isAyeLeading ? t('ui.GOVERNANCE.components.Governance.ReferendumItem.decisionStartsIn', { time }) : t('ui.GOVERNANCE.components.Governance.ReferendumItem.timeOutIn', { time }))
+      : (isAyeLeading ? t('ui.GOVERNANCE.components.Governance.ReferendumItem.approveIn', { time }) : t('ui.GOVERNANCE.components.Governance.ReferendumItem.rejectIn', { time }));
   }, [ayesPercent, naysPercent, refStatus, t, timeLeft]);
 
   useEffect(() => {

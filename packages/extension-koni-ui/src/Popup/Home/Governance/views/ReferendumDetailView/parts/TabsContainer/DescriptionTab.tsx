@@ -67,7 +67,7 @@ const Component = ({ className, content }: Props): React.ReactElement<Props> => 
             shape={'circle'}
             size={'xs'}
           >
-            {t('Read more')}
+            {t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.Description.readMore')}
           </Button>
         </div>
       )}

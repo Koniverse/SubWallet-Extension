@@ -54,8 +54,8 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
     const isAyeLeading = ayesPercent > naysPercent;
 
     return isPreparing
-      ? (isAyeLeading ? t('Decision starts in {{time}}', { time }) : t('Time out in {{time}}', { time }))
-      : (isAyeLeading ? t('Approve in {{time}}', { time }) : t('Reject in {{time}}', { time }));
+      ? (isAyeLeading ? t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.decisionStartsIn', { time }) : t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.timeOutIn', { time }))
+      : (isAyeLeading ? t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.approveIn', { time }) : t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.rejectIn', { time }));
   }, [ayesPercent, naysPercent, referendumDetail.state.name, t, timeLeft]);
 
   const { data } = useQuery({
@@ -97,7 +97,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   return (
     <div className={className}>
       <div className={'__vote-title-box'}>
-        <div className={'__vote-title'}>{t('Voting Summary')}</div>
+        <div className={'__vote-title'}>{t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.votingSummary')}</div>
         {!!timeLeft && (
           <div className={'__vote-remaining-time'}>
             <Icon
@@ -149,7 +149,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
         block={true}
         onClick={onClickVote}
       >
-        {(userVotingInfo?.length === 1 && !!userVotingInfo[0].votes) ? t('Revote') : t('Vote')}
+        {(userVotingInfo?.length === 1 && !!userVotingInfo[0].votes) ? t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.revote') : t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.vote')}
       </Button>}
 
       {!!userVotingInfo && <GovVotedAccountsModal

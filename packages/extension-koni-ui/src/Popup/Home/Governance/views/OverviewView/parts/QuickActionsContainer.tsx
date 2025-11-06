@@ -41,12 +41,12 @@ const Component = ({ className, govLockedInfos, onGoUnlockToken, sdkInstance }: 
       {
         icon: UserCircleGear,
         key: 'delegations',
-        label: t('Delegations'),
+        label: t('ui.GOVERNANCE.screen.Governance.Overview.QuickActionsContainer.delegations'),
         disabled: sdkInstance?.isLegacyGov,
         onClick: !sdkInstance?.isLegacyGov
           ? () => {
             notify({
-              message: t('Coming soon')
+              message: t('ui.GOVERNANCE.screen.Governance.Overview.QuickActionsContainer.comingSoon')
             });
           }
           : noop
@@ -54,7 +54,7 @@ const Component = ({ className, govLockedInfos, onGoUnlockToken, sdkInstance }: 
       {
         icon: LockKey,
         key: 'locked',
-        label: t('Locked'),
+        label: t('ui.GOVERNANCE.screen.Governance.Overview.QuickActionsContainer.locked'),
         onClick: hasUnlockableAccount ? onGoUnlockToken : noop,
         disabled: !hasUnlockableAccount || sdkInstance?.isLegacyGov
       }

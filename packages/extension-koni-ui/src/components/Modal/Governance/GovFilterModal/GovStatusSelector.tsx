@@ -26,7 +26,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
 
   const renderSelected = useCallback((item: GovStatusItem) => {
     if (loading) {
-      return <div className='__loading-text'>{t('Loading ...')}</div>;
+      return <div className='__loading-text'>{t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.GovStatusSelector.loading')}</div>;
     }
 
     return <div className='__selected-item'>{t(item.label)}</div>;
@@ -50,7 +50,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
           <span
             className={'__status-label'}
             style={{ color }}
-          >{item.label}</span>
+          >{t(item.label)}</span>
         </div>
         {selected && (
           <div className='__check-icon'>
@@ -65,7 +65,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         )}
       </div>
     );
-  }, [token]);
+  }, [t, token]);
 
   return (
     <SelectModal
@@ -78,7 +78,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       label={label}
       loading={loading}
       onSelect={onSelect}
-      placeholder={placeholder || t('Select status')}
+      placeholder={placeholder || t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.GovStatusSelector.selectStatus')}
       renderItem={renderItem}
       renderSelected={renderSelected}
       selected={value || 'All'}
@@ -88,7 +88,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
           phosphorIcon={CaretRight}
         />
       }
-      title={title || label || placeholder || t('Select status')}
+      title={title || label || placeholder || t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.GovStatusSelector.selectStatus')}
       tooltip={tooltip}
     />
   );

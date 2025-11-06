@@ -83,7 +83,7 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
         phosphorIcon: NewspaperClipping,
         weight: 'fill'
       },
-      label: t('Governance'),
+      label: t('ui.components.Layout.Base.governance'),
       key: 'governance',
       url: '/home/governance'
     },
@@ -145,7 +145,7 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
 
       if (item.key === 'governance' && !currentAccountProxy?.chainTypes.includes(AccountChainType.SUBSTRATE)) {
         notify({
-          message: t('Feature available only on Polkadot-supported accounts'),
+          message: t('ui.components.Layout.Base.featurePolkadotSupportedAccounts'),
           type: 'error'
         });
 

@@ -12,7 +12,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import { GovStatusSelector } from './GovStatusSeletor';
+import { GovStatusSelector } from './GovStatusSelector';
 import { GovTrackSelector } from './GovTrackSelector';
 
 interface Props extends ThemeProps {
@@ -54,7 +54,7 @@ function Component (props: Props): React.ReactElement<Props> {
         }
         onClick={onApplyFilter}
       >
-        {applyFilterButtonTitle || t('Apply filter')}
+        {applyFilterButtonTitle || t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.applyFilter')}
       </Button>
     );
   }, [t, onApplyFilter, applyFilterButtonTitle]);
@@ -98,14 +98,14 @@ function Component (props: Props): React.ReactElement<Props> {
       footer={filterModalFooter}
       id={id}
       onCancel={onCancel}
-      title={title || t('Filter')}
+      title={title || t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.filter')}
     >
       <div className='__filter-part'>
         <Tooltip
           placement={'topLeft'}
-          title={t('Only shows referenda that requested treasury')}
+          title={t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.onlyShowsReferendaRequestedTreasury')}
         >
-          <div className='__filter-left-part'>{t('Treasury-related')}
+          <div className='__filter-left-part'>{t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.treasuryRelated')}
             <Icon
               customSize={'16px'}
               iconColor='white'
@@ -126,7 +126,7 @@ function Component (props: Props): React.ReactElement<Props> {
       {/*    placement={'topLeft'} */}
       {/*    title={t('Only shows referenda you\'ve voted directly in')} */}
       {/*  > */}
-      {/*    <div className='__filter-left-part'>{t('Voted')} */}
+      {/*    <div className='__filter-left-part'>{t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.voted')} */}
       {/*      <Icon */}
       {/*        customSize={'16px'} */}
       {/*        iconColor='white' */}
@@ -147,7 +147,7 @@ function Component (props: Props): React.ReactElement<Props> {
       {/*    placement={'topLeft'} */}
       {/*    title={t('Only shows referenda you\'ve voted through delegation')} */}
       {/*  > */}
-      {/*    <div className='__filter-left-part'>{t('Delegated')} */}
+      {/*    <div className='__filter-left-part'>{t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.delegated')} */}
       {/*      <Icon */}
       {/*        customSize={'16px'} */}
       {/*        iconColor='white' */}
@@ -165,7 +165,7 @@ function Component (props: Props): React.ReactElement<Props> {
       {/* </div> */}
       <div className='__status-selectors'>
         <GovStatusSelector
-          label={t('Status')}
+          label={t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.status')}
           onChange={onSelectStatus}
           selectedReferendaCategory={selectedReferendaCategory}
           value={statusSelected}
@@ -173,7 +173,7 @@ function Component (props: Props): React.ReactElement<Props> {
       </div>
       <GovTrackSelector
         chain={chain}
-        label={t('Track')}
+        label={t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.track')}
         onChange={onSelectTrack}
         sdkInstance={sdkInstance}
         value={trackSelected}

@@ -380,11 +380,11 @@ const Component = function ({ className }: Props) {
         case ExtrinsicType.CLAIM_BRIDGE:
           return t('ui.Confirmations.claimConfirmation');
         case ExtrinsicType.GOV_VOTE:
-          return t('Vote for #{{id}}', { id: (transaction.data as GovVoteRequest).referendumIndex });
+          return t('ui.Confirmations.voteForId', { id: (transaction.data as GovVoteRequest).referendumIndex });
         case ExtrinsicType.GOV_UNVOTE:
-          return t('Unvote confirmation');
+          return t('ui.Confirmations.unvoteConfirmation');
         case ExtrinsicType.GOV_UNLOCK_VOTE:
-          return t('Unlock votes confirmation');
+          return t('ui.Confirmations.unlockVotesConfirmation');
         case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.EVM_EXECUTE:
         case ExtrinsicType.UNKNOWN:

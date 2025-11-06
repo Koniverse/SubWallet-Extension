@@ -89,7 +89,7 @@ const Component = (props: Props) => {
       onCancel={onCancel}
       title={
         (<span className={'__account-vote-title'}>
-          {t('Voted accounts')} <span className={'__account-voted-count'}>({usersVoted.length})</span>
+          {t('ui.GOVERNANCE.components.Modal.Governance.GovVotedAccountsModal.votedAccounts')} <span className={'__account-voted-count'}>({usersVoted.length})</span>
         </span>)
       }
     >

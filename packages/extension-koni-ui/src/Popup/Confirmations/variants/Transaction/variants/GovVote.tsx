@@ -146,7 +146,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         {!!account?.name &&
           <MetaInfo.Default
             className={'__account-field'}
-            label={t('Account')}
+            label={t('ui.TRANSACTION.Confirmations.GovVote.account')}
           >
             <AccountProxyAvatar
               className={'__account-avatar'}
@@ -159,14 +159,14 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
 
         <MetaInfo.Default
           className={'__address-field'}
-          label={t('Address')}
+          label={t('ui.TRANSACTION.Confirmations.GovVote.address')}
         >
           {shortAddress}
         </MetaInfo.Default>
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Network fee')}
+          label={t('ui.TRANSACTION.Confirmations.GovVote.networkFee')}
           suffix={symbol}
           useNumberDisplay={true}
           value={transaction.estimateFee?.value || 0}
@@ -180,7 +180,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           <>
             <MetaInfo.Default
               className={'governance-value-info'}
-              label={t('Transferable')}
+              label={t('ui.TRANSACTION.Confirmations.GovVote.transferable')}
             >
               {
                 !!govConfirmationInfo?.transferable.from && (
@@ -203,7 +203,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
             </MetaInfo.Default>
             <MetaInfo.Default
               className={'governance-value-info'}
-              label={t('Governance lock')}
+              label={t('ui.TRANSACTION.Confirmations.GovVote.governanceLock')}
             >
               {
                 !!govConfirmationInfo?.governanceLock.from && (
@@ -227,12 +227,12 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           </>
         }
         <MetaInfo.Default
-          label={t('Conviction')}
+          label={t('ui.TRANSACTION.Confirmations.GovVote.conviction')}
         >
           {convictionInfo.label}
         </MetaInfo.Default>
         <MetaInfo.Default
-          label={t('Lock duration')}
+          label={t('ui.TRANSACTION.Confirmations.GovVote.lockDuration')}
         >
           {convictionInfo.description}
         </MetaInfo.Default>
@@ -243,7 +243,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         closable={true}
         id={VoteAmountDetailModalId}
         onCancel={onCancel}
-        title={t('Vote amount details')}
+        title={t('ui.TRANSACTION.Confirmations.GovVote.voteAmountDetails')}
       >
         <VoteAmountDetail
           amountDetail={amountDetail}

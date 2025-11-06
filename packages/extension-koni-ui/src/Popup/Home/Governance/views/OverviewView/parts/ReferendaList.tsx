@@ -47,8 +47,8 @@ const Component = ({ chain, className, items, onClickItem, renderWhenEmpty }: Pr
           : (
             renderWhenEmpty || <EmptyList
               className={'__emptyList'}
-              emptyMessage={t('Explore ongoing referenda and cast your vote')}
-              emptyTitle={t('No referenda found.')}
+              emptyMessage={t('ui.GOVERNANCE.screen.Governance.Overview.ReferendaList.exploreOngoingReferenda')}
+              emptyTitle={t('ui.GOVERNANCE.screen.Governance.Overview.ReferendaList.noReferendaFound')}
               phosphorIcon={ListChecks}
             />
           )

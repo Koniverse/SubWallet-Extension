@@ -38,7 +38,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
 
   const renderSelected = useCallback((item: TrackInfo) => {
     if (loading) {
-      return <div className='__loading-text'>{t('Loading ...')}</div>;
+      return <div className='__loading-text'>{t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.GovTrackSelector.loading')}</div>;
     }
 
     return <div className='__selected-item'>{item.name}</div>;
@@ -60,7 +60,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
     return (
       <EmptyList
         className={'__emptyList'}
-        emptyMessage={t('No track found')}
+        emptyMessage={t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.GovTrackSelector.noTrackFound')}
         phosphorIcon={ListChecks}
       />
     );
@@ -98,13 +98,13 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       label={label}
       loading={loading}
       onSelect={onSelect}
-      placeholder={placeholder || t('Select track')}
+      placeholder={placeholder || t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.GovTrackSelector.selectTrack')}
       renderItem={renderItem}
       renderSelected={renderSelected}
       renderWhenEmpty={renderEmpty}
       searchFunction={searchFunction}
       searchMinCharactersCount={2}
-      searchPlaceholder={t('Search track')}
+      searchPlaceholder={t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.GovTrackSelector.searchTrack')}
       selected={value ?? ALL_TRACK_ID}
       statusHelp={statusHelp}
       suffix={
@@ -112,7 +112,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
           phosphorIcon={CaretRight}
         />
       }
-      title={title || label || placeholder || t('Select track')}
+      title={title || label || placeholder || t('ui.GOVERNANCE.components.Modal.Governance.GovFilter.GovTrackSelector.selectTrack')}
       tooltip={tooltip}
     />
   );

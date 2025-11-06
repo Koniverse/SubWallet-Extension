@@ -23,19 +23,19 @@ const Component = ({ ayePercent,
       <div className='__legend-container'>
         <div className='__legend-part __legend-aye-part'>
           <span className={'__label'}>
-            {t('Aye')}:&nbsp;
+            {t('ui.GOVERNANCE.components.Governance.ReferendumVoteProgressBar.aye')}:&nbsp;
           </span>
           <span className={'__percent'}>{`${ayePercent}%`}</span>
         </div>
         <div className='__legend-part __legend-threshold-part'>
           <span className={'__label'}>
-            {t('Threshold')}:&nbsp;
+            {t('ui.GOVERNANCE.components.Governance.ReferendumVoteProgressBar.threshold')}:&nbsp;
           </span>
           <span className={'__percent'}>{`${thresholdPercent}%`}</span>
         </div>
         <div className='__legend-part __legend-nay-part'>
           <span className={'__label'}>
-            {t('Nay')}:&nbsp;
+            {t('ui.GOVERNANCE.components.Governance.ReferendumVoteProgressBar.nay')}:&nbsp;
           </span>
           <span className={'__percent'}>{`${nayPercent}%`}</span>
         </div>
