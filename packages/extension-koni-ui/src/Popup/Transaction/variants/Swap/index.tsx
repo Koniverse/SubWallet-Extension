@@ -118,7 +118,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
 
   const { activeModal, inactiveAll, inactiveModal } = useContext(ModalContext);
 
-  const { accountProxies, accounts, isAllAccount, currentAccountProxy } = useSelector((state) => state.accountState);
+  const { accountProxies, accounts, currentAccountProxy, isAllAccount } = useSelector((state) => state.accountState);
   const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
   const { priceMap } = useSelector((state) => state.price);
   const { chainInfoMap, chainStateMap, ledgerGenericAllowNetworks } = useSelector((root) => root.chainStore);
@@ -828,14 +828,26 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       return undefined;
     }
 
-    const substrateAccount = currentAccountProxy.accounts.find((account) => account.chainType === AccountChainType.SUBSTRATE);
+    let currentSelectAccountProxy: AccountProxy | undefined;
+
+    if (currentAccountProxy.accountType === AccountProxyType.ALL_ACCOUNT) {
+      currentSelectAccountProxy = accountProxies.find((account) => account.id === targetAccountProxyIdForGetBalance);
+    } else {
+      currentSelectAccountProxy = currentAccountProxy;
+    }
+
+    if (!currentSelectAccountProxy) {
+      return undefined;
+    }
+
+    const substrateAccount = currentSelectAccountProxy.accounts.find((account) => account.chainType === AccountChainType.SUBSTRATE);
 
     if (!substrateAccount) {
       return undefined;
     }
 
     return substrateAccount.address;
-  }, [currentAccountProxy]);
+  }, [accountProxies, currentAccountProxy, targetAccountProxyIdForGetBalance]);
 
   useEffect(() => {
     if (fromTokenSlugValue && toTokenSlugValue && isAddressInputReady) {
@@ -993,7 +1005,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       sync = false;
       clearTimeout(timeout);
     };
-  }, [ErrorMessageMap, currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates, notifyErrorMessage]);
+  }, [ErrorMessageMap, currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates, notifyErrorMessage, substrateAddress]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
