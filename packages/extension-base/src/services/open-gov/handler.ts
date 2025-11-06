@@ -497,6 +497,12 @@ export default abstract class BaseOpenGovHandler {
         const refIndex = refIndexes[i];
         const voteDetail = votes[i];
 
+        if (referendum.isKilled || referendum.isTimedOut || referendum.isCancelled) {
+          unlockableReferenda.add(refIndex.toString());
+
+          return;
+        }
+
         if (!referendum.isOngoing) {
           const referendumInfo = referendum.toJSON() as Record<string, unknown>;
 

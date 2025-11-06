@@ -233,7 +233,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
               <Button
                 block={true}
                 className={'__unlock-button'}
-                disabled={item.summary.unlockable.trackIds.length === 0 || !lockedAmount.gt(BN_ZERO)}
+                disabled={item.summary.unlockable.trackIds.length === 0 && item.summary.unlockable.unlockableReferenda.length === 0}
                 onClick={goUnlockVote(item)}
               >
                 <div className='__unlock-button-label'>
