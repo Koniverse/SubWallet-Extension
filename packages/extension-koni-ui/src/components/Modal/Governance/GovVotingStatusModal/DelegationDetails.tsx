@@ -43,9 +43,9 @@ function Component (props: Props): React.ReactElement<Props> {
       className={`${className} modal-full`}
       id={GOV_DELEGATION_DETAILS_MODAL}
       onCancel={_onCancel}
-      title={t('Delegation details')}
+      title={t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.DelegationDetails.delegationDetails')}
     >
-      <div className={'section-title'}>{t('Self votes')}</div>
+      <div className={'section-title'}>{t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.DelegationDetails.selfVotes')}</div>
       <MetaInfo
         className='meta-block'
         hasBackgroundWrapper
@@ -54,25 +54,25 @@ function Component (props: Props): React.ReactElement<Props> {
         <MetaInfo.Number
           className={'__delegation-item-votes'}
           decimals={decimals}
-          label={t('Votes')}
+          label={t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.DelegationDetails.votes')}
           suffix={symbol}
           value={nestedAccount.accountInfo.votes || 0}
         />
         <MetaInfo.Default
           className={'__delegation-item-votes'}
-          label={t('Conviction')}
+          label={t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.DelegationDetails.conviction')}
         >
           {convictionSelVotes}
         </MetaInfo.Default>
         <MetaInfo.Number
           className={'__delegation-item-votes'}
           decimals={decimals}
-          label={t('Capital')}
+          label={t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.DelegationDetails.capital')}
           suffix={symbol}
           value={nestedAccount.accountInfo.balance || 0}
         />
       </MetaInfo>
-      <div className={'section-title'}>{t('Delegation votes')}</div>
+      <div className={'section-title'}>{t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.DelegationDetails.delegationVotes')}</div>
       <MetaInfo
         className='meta-block'
         hasBackgroundWrapper
@@ -81,27 +81,27 @@ function Component (props: Props): React.ReactElement<Props> {
         <MetaInfo.Number
           className={'__delegation-item-votes'}
           decimals={decimals}
-          label={t('Votes')}
+          label={t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.DelegationDetails.votes')}
           suffix={symbol}
           value={nestedAccount.accountInfo.delegations?.votes || 0}
         />
         <MetaInfo.Default
           className={'__delegation-item-votes'}
-          label={t('Delegators')}
+          label={t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.DelegationDetails.delegators')}
         >
           {nestedAccount.totalDelegatedAccount}
         </MetaInfo.Default>
         <MetaInfo.Number
           className={'__delegation-item-votes'}
           decimals={decimals}
-          label={t('Capital')}
+          label={t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.DelegationDetails.capital')}
           suffix={symbol}
           value={nestedAccount.accountInfo.delegations?.capital || 0 }
         />
       </MetaInfo>
       {nestedAccount.totalDelegatedAccount > 0 && (
         <>
-          <div className={'section-title'}>{t('Delegation list')}
+          <div className={'section-title'}>{t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.DelegationDetails.delegationList')}
             <span className={'__delegation-account-total'}>
               ({nestedAccount.totalDelegatedAccount})
             </span>

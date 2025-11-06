@@ -49,13 +49,13 @@ const Component = ({ accounts, chain, className, containerModalId, decimals, sym
       navigator.clipboard.writeText(address)
         .then(() => {
           notify({
-            message: t('Copied to clipboard')
+            message: t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.NestedVoteList.copiedToClipboard')
           });
         })
         .catch((err) => {
           console.error('Failed to copy: ', err);
           notify({
-            message: t('Copy failed')
+            message: t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.NestedVoteList.copyFailed')
           });
         });
     };
@@ -177,7 +177,7 @@ const Component = ({ accounts, chain, className, containerModalId, decimals, sym
   const renderEmpty = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('No nested data')}
+        emptyMessage={t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.NestedVoteList.noNestedData')}
         phosphorIcon={ListChecks}
       />
     );
@@ -210,7 +210,7 @@ const Component = ({ accounts, chain, className, containerModalId, decimals, sym
         autoFocus={true}
         className='__search-box'
         onSearch={handleSearch}
-        placeholder={t('Search address/identity')}
+        placeholder={t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.NestedVoteList.searchAddressIdentity')}
         searchValue={searchText}
       />
       <SwList

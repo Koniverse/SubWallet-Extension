@@ -49,7 +49,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
       ? (
         <MetaInfo.Default
           className={'account-info-proposal-call'}
-          label={t('Call')}
+          label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.call')}
         >
           {trackNames.map((name) => (
             <ReferendumTrackTag
@@ -68,13 +68,13 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
     navigator.clipboard.writeText(referendumDetail.onchainData.proposalHash)
       .then(() => {
         notify({
-          message: t('Copied to clipboard')
+          message: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.copiedToClipboard')
         });
       })
       .catch((err) => {
         console.error('Failed to copy: ', err);
         notify({
-          message: t('Copy failed')
+          message: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.copyFailed')
         });
       });
   }, [notify, t, referendumDetail.onchainData.proposalHash]);
@@ -98,7 +98,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
         {!!proposerAddress &&
           <MetaInfo.Default
             className={CN('referendum-detail-item', '-account-info')}
-            label={t('Proposer')}
+            label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.proposer')}
           >
             <div className='__account-item-wrapper'>
               <div className='__account-item'>
@@ -124,7 +124,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
                 onClick={_onClickViewOnExplorer(proposerAddress)}
                 size='xs'
                 style={{ minWidth: 'unset' }}
-                tooltip={t('View on explorer')}
+                tooltip={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.viewOnExplorer')}
                 tooltipPlacement={'topRight'}
                 type='ghost'
               />
@@ -134,7 +134,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
         {!!decisionAddress &&
           <MetaInfo.Default
             className={CN('referendum-detail-item', '-account-info')}
-            label={t('Depositor')}
+            label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.depositor')}
           >
             <div className='__account-item-wrapper'>
               <div className='__account-item'>
@@ -160,7 +160,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
                 onClick={_onClickViewOnExplorer(decisionAddress)}
                 size='xs'
                 style={{ minWidth: 'unset' }}
-                tooltip={t('View on explorer')}
+                tooltip={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.viewOnExplorer')}
                 tooltipPlacement={'topRight'}
                 type='ghost'
               />
@@ -170,22 +170,22 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
           (
             <>
               <MetaInfo.Default
-                label={t('Track')}
+                label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.track')}
               >
                 {referendumDetail.trackInfo.name}
               </MetaInfo.Default>
               <MetaInfo.Default
-                label={t('Decision Period')}
+                label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.decisionPeriod')}
               >
                 {blocksToDaysLabel(referendumDetail.trackInfo.decisionPeriod, chain)}
               </MetaInfo.Default>
               <MetaInfo.Default
-                label={t('Confirmation Period')}
+                label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.confirmationPeriod')}
               >
                 {blocksToDaysLabel(referendumDetail.trackInfo.confirmPeriod, chain)}
               </MetaInfo.Default>
               <MetaInfo.Default
-                label={t('Enact')}
+                label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.enact')}
               >
               After: {referendumDetail.onchainData.info.enactment.after}
               </MetaInfo.Default>
@@ -197,13 +197,13 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
           (
             <>
               <MetaInfo.Default
-                label={t('Delay')}
+                label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.delay')}
               >
                 {referendumDetail.onchainData.meta?.delay}
               </MetaInfo.Default>
 
               <MetaInfo.Default
-                label={t('End')}
+                label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.end')}
               >
                 {referendumDetail.onchainData.meta?.end}
               </MetaInfo.Default>
@@ -218,7 +218,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
       >
         <MetaInfo.Default
           className={'account-info-proposal-hash'}
-          label={t('Proposer Hash')}
+          label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.proposerHash')}
         >
           <div>
             {toShort(referendumDetail.onchainData.proposalHash)}
@@ -233,7 +233,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
             onClick={_onClickCopyButton}
             size='xs'
             style={{ minWidth: 'unset' }}
-            tooltip={t('Copy proposal hash')}
+            tooltip={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.copyProposalHash')}
             tooltipPlacement={'topRight'}
             type='ghost'
           />

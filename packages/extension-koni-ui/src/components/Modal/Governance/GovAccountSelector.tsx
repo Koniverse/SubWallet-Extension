@@ -139,9 +139,9 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
       }
     };
 
-    addGroup(groupedItemMap.notVoted, t('Not voted'), 'not voted');
-    addGroup(groupedItemMap.voted, t('Voted'), 'voted');
-    addGroup(groupedItemMap.delegated, t('Delegated'), 'delegated');
+    addGroup(groupedItemMap.notVoted, t('ui.GOVERNANCE.components.Modal.Governance.GovAccountSelector.notVoted'), 'not voted');
+    addGroup(groupedItemMap.voted, t('ui.GOVERNANCE.components.Modal.Governance.GovAccountSelector.voted'), 'voted');
+    addGroup(groupedItemMap.delegated, t('ui.GOVERNANCE.components.Modal.Governance.GovAccountSelector.delegated'), 'delegated');
 
     return result;
   }, [groupedItemMap.delegated, groupedItemMap.notVoted, groupedItemMap.voted, searchFunction, searchValue, t]);
@@ -214,13 +214,13 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
           onClick: onCancel
         }
         : undefined}
-      title={t('Select account')}
+      title={t('ui.GOVERNANCE.components.Modal.Governance.GovAccountSelector.selectAccount')}
     >
       <Search
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t('Enter your account name or address')}
+        placeholder={t('ui.GOVERNANCE.components.Modal.Governance.GovAccountSelector.enterAccountNameOrAddress')}
         searchValue={searchValue}
       />
       <SwList

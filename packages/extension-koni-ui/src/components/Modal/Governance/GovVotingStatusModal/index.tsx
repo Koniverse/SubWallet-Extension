@@ -65,13 +65,13 @@ const Component = (props: Props) => {
           className={CN('__view-toggle-btn', { '-active': isNested })}
           onClick={handleSetNested}
         >
-          {t('Nested')} {`(${voteData.accounts.nested.length})`}
+          {t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.nested')} {`(${voteData.accounts.nested.length})`}
         </div>
         <div
           className={CN('__view-toggle-btn', { '-active': !isNested })}
           onClick={handleSetFlattened}
         >
-          {t('Flattened')} {`(${voteData.accounts.flattened.length})`}
+          {t('ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.flattened')} {`(${voteData.accounts.flattened.length})`}
         </div>
         <div
           className='__view-toggle-bg'

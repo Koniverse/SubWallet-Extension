@@ -156,7 +156,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   }, [defaultData.chain, defaultData.fromAccountProxy, referendumId, navigate, setGovRefVoteStorage]);
 
   useEffect(() => {
-    setCustomScreenTitle(t('Unvote for #{{referendumId}}', { replace: { referendumId: referendumId } }));
+    setCustomScreenTitle(t('ui.TRANSACTION.screen.Transaction.ReferendumUnvote.unvoteForReferendumId', { replace: { referendumId: referendumId } }));
 
     return () => {
       setCustomScreenTitle(undefined);
@@ -224,7 +224,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           address={fromValue}
           chain={chainValue}
           className={'free-balance'}
-          label={t('Available balance')}
+          label={t('ui.TRANSACTION.screen.Transaction.ReferendumUnvote.availableBalance')}
           onBalanceReady={setIsBalanceReady}
         />
         <MetaInfo
@@ -255,7 +255,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           onClick={goRefStandardVote}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.TRANSACTION.screen.Transaction.ReferendumUnvote.cancel')}
         </Button>
 
         <Button
@@ -269,7 +269,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           loading={loading}
           onClick={onPreCheck(form.submit, ExtrinsicType.GOV_UNVOTE)}
         >
-          {t('Continue')}
+          {t('ui.TRANSACTION.screen.Transaction.ReferendumUnvote.continue')}
         </Button>
       </TransactionFooter>
     </>

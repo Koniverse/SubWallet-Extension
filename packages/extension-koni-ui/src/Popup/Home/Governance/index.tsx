@@ -39,7 +39,7 @@ const Component = () => {
       setTimeout(() => {
         navigate('/home/tokens');
         notify({
-          message: t('Feature available only on Polkadot-supported accounts'),
+          message: t('ui.GOVERNANCE.screen.Governance.featurePolkadotSupportedAccounts'),
           type: 'error'
         });
       }, 100);

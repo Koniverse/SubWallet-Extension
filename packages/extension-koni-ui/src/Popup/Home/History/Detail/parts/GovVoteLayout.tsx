@@ -30,11 +30,11 @@ const Component: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <MetaInfo.Default label={t('Referenda ID')}>
+      <MetaInfo.Default label={t('ui.HISTORY.screen.HistoryDetail.GovVoteLayout.referendaID')}>
         {govVoteInfo.referendumIndex}
       </MetaInfo.Default>
       {data.type === ExtrinsicType.GOV_VOTE && (
-        <MetaInfo.Default label={t('Vote direction')}>
+        <MetaInfo.Default label={t('ui.HISTORY.screen.HistoryDetail.GovVoteLayout.voteDirection')}>
           {govVoteInfo.type}
         </MetaInfo.Default>
       )}

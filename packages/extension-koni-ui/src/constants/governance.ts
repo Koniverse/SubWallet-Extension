@@ -17,20 +17,20 @@ export const governanceVoteIconMap = {
 };
 
 export const govStatusDisplayMap: Record<GovStatusKey, GovStatusItem> = {
-  [GovStatusKey.ALL]: { key: GovStatusKey.ALL, label: detectTranslate('All status') },
-  [GovStatusKey.PREPARING]: { key: GovStatusKey.PREPARING, label: detectTranslate('Preparing'), icon: HourglassHigh, colorToken: 'gold-6' },
-  [GovStatusKey.DECIDING]: { key: GovStatusKey.DECIDING, label: detectTranslate('Deciding'), icon: Scales, colorToken: 'blue-7' },
-  [GovStatusKey.CONFIRMING]: { key: GovStatusKey.CONFIRMING, label: detectTranslate('Confirming'), icon: ClipboardText, colorToken: 'geekblue-7' },
-  [GovStatusKey.APPROVED]: { key: GovStatusKey.APPROVED, label: detectTranslate('Approved'), icon: CheckCircle, colorToken: 'lime-7' },
-  [GovStatusKey.QUEUEING]: { key: GovStatusKey.QUEUEING, label: detectTranslate('Queueing'), icon: Stack, colorToken: 'green-6' },
-  [GovStatusKey.EXECUTED]: { key: GovStatusKey.EXECUTED, label: detectTranslate('Executed'), icon: RocketLaunch, colorToken: 'colorSecondaryText' },
-  [GovStatusKey.REJECTED]: { key: GovStatusKey.REJECTED, label: detectTranslate('Rejected'), icon: Prohibit, colorToken: 'magenta-6' },
-  [GovStatusKey.TIMEDOUT]: { key: GovStatusKey.TIMEDOUT, label: detectTranslate('TimedOut'), icon: ClockAfternoon, colorToken: 'gray-6' },
-  [GovStatusKey.CANCELLED]: { key: GovStatusKey.CANCELLED, label: detectTranslate('Cancelled'), icon: XCircle, colorToken: 'orange-6' },
-  [GovStatusKey.KILLED]: { key: GovStatusKey.KILLED, label: detectTranslate('Killed'), icon: Skull, colorToken: 'red-6' },
-  [GovStatusKey.STARTED]: { key: GovStatusKey.STARTED, label: detectTranslate('Started'), icon: Scales, colorToken: 'blue-7' },
-  [GovStatusKey.PASSED]: { key: GovStatusKey.PASSED, label: detectTranslate('Passed'), icon: CheckCircle, colorToken: 'lime-7' },
-  [GovStatusKey.NOTPASSED]: { key: GovStatusKey.NOTPASSED, label: detectTranslate('NotPassed'), icon: XCircle, colorToken: 'magenta-6' }
+  [GovStatusKey.ALL]: { key: GovStatusKey.ALL, label: detectTranslate('ui.GOVERNANCE.constant.governance.allStatus') },
+  [GovStatusKey.PREPARING]: { key: GovStatusKey.PREPARING, label: detectTranslate('ui.GOVERNANCE.constant.governance.preparing'), icon: HourglassHigh, colorToken: 'gold-6' },
+  [GovStatusKey.DECIDING]: { key: GovStatusKey.DECIDING, label: detectTranslate('ui.GOVERNANCE.constant.governance.deciding'), icon: Scales, colorToken: 'blue-7' },
+  [GovStatusKey.CONFIRMING]: { key: GovStatusKey.CONFIRMING, label: detectTranslate('ui.GOVERNANCE.constant.governance.confirming'), icon: ClipboardText, colorToken: 'geekblue-7' },
+  [GovStatusKey.APPROVED]: { key: GovStatusKey.APPROVED, label: detectTranslate('ui.GOVERNANCE.constant.governance.approved'), icon: CheckCircle, colorToken: 'lime-7' },
+  [GovStatusKey.QUEUEING]: { key: GovStatusKey.QUEUEING, label: detectTranslate('ui.GOVERNANCE.constant.governance.queueing'), icon: Stack, colorToken: 'green-6' },
+  [GovStatusKey.EXECUTED]: { key: GovStatusKey.EXECUTED, label: detectTranslate('ui.GOVERNANCE.constant.governance.executed'), icon: RocketLaunch, colorToken: 'colorSecondaryText' },
+  [GovStatusKey.REJECTED]: { key: GovStatusKey.REJECTED, label: detectTranslate('ui.GOVERNANCE.constant.governance.rejected'), icon: Prohibit, colorToken: 'magenta-6' },
+  [GovStatusKey.TIMEDOUT]: { key: GovStatusKey.TIMEDOUT, label: detectTranslate('ui.GOVERNANCE.constant.governance.timedOut'), icon: ClockAfternoon, colorToken: 'gray-6' },
+  [GovStatusKey.CANCELLED]: { key: GovStatusKey.CANCELLED, label: detectTranslate('ui.GOVERNANCE.constant.governance.cancelled'), icon: XCircle, colorToken: 'orange-6' },
+  [GovStatusKey.KILLED]: { key: GovStatusKey.KILLED, label: detectTranslate('ui.GOVERNANCE.constant.governance.killed'), icon: Skull, colorToken: 'red-6' },
+  [GovStatusKey.STARTED]: { key: GovStatusKey.STARTED, label: detectTranslate('ui.GOVERNANCE.constant.governance.started'), icon: Scales, colorToken: 'blue-7' },
+  [GovStatusKey.PASSED]: { key: GovStatusKey.PASSED, label: detectTranslate('ui.GOVERNANCE.constant.governance.passed'), icon: CheckCircle, colorToken: 'lime-7' },
+  [GovStatusKey.NOTPASSED]: { key: GovStatusKey.NOTPASSED, label: detectTranslate('ui.GOVERNANCE.constant.governance.notPassed'), icon: XCircle, colorToken: 'magenta-6' }
 };
 
 export const govStatusItems: GovStatusItem[] = [

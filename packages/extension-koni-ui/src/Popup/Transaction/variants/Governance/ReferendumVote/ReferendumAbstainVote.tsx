@@ -166,7 +166,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   }, [voteInfo, form, govRefVoteStorage.from]);
 
   useEffect(() => {
-    setCustomScreenTitle(t('Abstain for #{{referendumId}}', { replace: { referendumId: defaultData.referendumId } }));
+    setCustomScreenTitle(t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumAbstainVote.abstainForReferendumId', { replace: { referendumId: defaultData.referendumId } }));
 
     return () => {
       setCustomScreenTitle(undefined);
@@ -235,7 +235,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               address={fromValue}
               chain={chainValue}
               className={'free-balance'}
-              label={t('Available balance')}
+              label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumAbstainVote.availableBalance')}
               onBalanceReady={setIsBalanceReady}
             />
           </div>
@@ -247,7 +247,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               <GovAmountInput
                 decimals={_getAssetDecimals(assetInfo)}
                 key={abstainAmountRenderKey}
-                label={t('Abstain amount')}
+                label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumAbstainVote.abstainAmount')}
                 logoKey={assetInfo.slug.toLowerCase()}
                 tokenSymbol={_getAssetSymbol(assetInfo)}
               />
@@ -259,7 +259,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               <GovAmountInput
                 decimals={_getAssetDecimals(assetInfo)}
                 key={abstainAmountRenderKey}
-                label={t('Aye amount')}
+                label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumAbstainVote.ayeAmount')}
                 logoKey={assetInfo.slug.toLowerCase()}
                 tokenSymbol={_getAssetSymbol(assetInfo)}
               />
@@ -271,7 +271,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               <GovAmountInput
                 decimals={assetDecimals}
                 key={abstainAmountRenderKey}
-                label={t('Nay amount')}
+                label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumAbstainVote.nayAmount')}
                 logoKey={assetInfo.slug.toLowerCase()}
                 tokenSymbol={_getAssetSymbol(assetInfo)}
               />
@@ -286,7 +286,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             >
               <MetaInfo.Default
                 className={'meta-value-info'}
-                label={t('Total amount')}
+                label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumAbstainVote.totalAmount')}
               >
                 {
                   !!totalAmount.from && (
@@ -309,7 +309,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               </MetaInfo.Default>
               <MetaInfo.Default
                 className={'meta-value-info'}
-                label={t('Total vote')}
+                label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumAbstainVote.totalVote')}
               >
                 {
                   !!totalVote.from && (
@@ -334,13 +334,13 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           </div>
         </Form>
         <AlertBox
-          description={t('Split your voting power between Aye, Nay and Abstain with a Conviction of 0.1x')}
+          description={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumAbstainVote.splitVotingPowerAyeNayAbstain')}
           type='info'
         />
 
         {previousVoteAmountDetail &&
           <div className='previous-vote-amount-detail'>
-            <div className={'__label'}>{t('Previous vote')}</div>
+            <div className={'__label'}>{t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumAbstainVote.previousVote')}</div>
             <VoteAmountDetail
               amountDetail={previousVoteAmountDetail}
               decimals={_getAssetDecimals(assetInfo)}
@@ -362,7 +362,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           onClick={goRefStandardVote}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumAbstainVote.cancel')}
         </Button>
 
         <Button
@@ -376,7 +376,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           loading={loading}
           onClick={onPreCheck(form.submit, ExtrinsicType.GOV_VOTE)}
         >
-          {t('Vote')}
+          {t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumAbstainVote.vote')}
         </Button>
       </TransactionFooter>
     </>

@@ -37,7 +37,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', isDependentOnA
         ? (isDependentOnAllAccount ? isAllAccount : userVoting.length > 1)
           ? (
             <div className='__i-vote-summary-label'>
-              {t('Voted/Delegated with {{count}} accounts total', { count: userVoting.length })}
+              {t('ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.votedDelegatedTotal', { count: userVoting.length })}
             </div>
           )
           : (
@@ -45,7 +45,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', isDependentOnA
               {!!vote && (
                 <>
                   <div className='__i-vote-summary-label'>
-                    {t('Voted')}:&nbsp;
+                    {t('ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.voted')}:&nbsp;
                   </div>
                   {(BigNumber(vote?.ayeAmount || 0).gt(0) || vote.type !== GovVoteType.NAY) && (
                     <div className='__i-vote-stat -aye'>
@@ -100,20 +100,20 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', isDependentOnA
               {!!delegation && (
                 <>
                   <div className='__i-vote-summary-label'>
-                    {t('Delegated')}:&nbsp;
+                    {t('ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.delegated')}:&nbsp;
                   </div>
                   <NumberDisplay
                     className='__i-vote-stat-value'
                     decimal={decimals}
                     value={delegation.balance || '0'}
-                  />&nbsp;{t('via {{target}}', { target: toShort(delegation.target) })}
+                  />&nbsp;{t('ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.viaTarget', { target: toShort(delegation.target) })}
                 </>
               )}
             </>
           )
         : (
           <div className='__i-vote-summary-label'>
-            {t('Not voted yet!')}
+            {t('ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.notVotedYet')}
           </div>
         )
       }

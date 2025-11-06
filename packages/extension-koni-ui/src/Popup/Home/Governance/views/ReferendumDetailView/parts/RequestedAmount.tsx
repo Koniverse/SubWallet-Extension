@@ -67,7 +67,7 @@ const Component = ({ allSpend, chain, className }: Props): React.ReactElement<Pr
 
   return (
     <div className={className}>
-      <div className={'__requested-label'}>{t('Requested Amount')}</div>
+      <div className={'__requested-label'}>{t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.RequestedAmount.requestedAmount')}</div>
       {requestedItems}
     </div>
   );

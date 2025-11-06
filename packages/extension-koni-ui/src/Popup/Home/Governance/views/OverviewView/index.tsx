@@ -167,7 +167,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
     >
       <div className='__view-header-area'>
         <div className='__view-title-area'>
-          <div className='__view-title'>{t('Governance')}</div>
+          <div className='__view-title'>{t('ui.GOVERNANCE.screen.Governance.Overview.governance')}</div>
           <ChainSelector
             onChangeChain={onChangeChain}
             selectedChain={chainSlug}

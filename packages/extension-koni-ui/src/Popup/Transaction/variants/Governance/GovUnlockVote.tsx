@@ -183,26 +183,26 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           address={fromValue}
           chain={chainValue}
           className={'free-balance'}
-          label={t('Available balance')}
+          label={t('ui.TRANSACTION.screen.Transaction.GovUnlockVote.availableBalance')}
           onBalanceReady={setIsBalanceReady}
         />
         <MetaInfo
           className='custom-label'
           hasBackgroundWrapper={true}
         >
-          <MetaInfo.Default label={t('Address')}>
+          <MetaInfo.Default label={t('ui.TRANSACTION.screen.Transaction.GovUnlockVote.address')}>
             {toShort(fromValue)}
           </MetaInfo.Default>
 
           <MetaInfo.Number
             decimals={decimals}
-            label={t('Amount')}
+            label={t('ui.TRANSACTION.screen.Transaction.GovUnlockVote.amount')}
             suffix={symbol}
             value={lockedAmount.toFixed()}
           />
 
           {unlockableReferenda && unlockableReferenda.length > 0 && (
-            <MetaInfo.Default label={t('Referenda voted')}>
+            <MetaInfo.Default label={t('ui.TRANSACTION.screen.Transaction.GovUnlockVote.referendaVoted')}>
 
               <span>
                 {unlockableReferenda.length}
@@ -235,7 +235,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           onClick={goBack}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.TRANSACTION.screen.Transaction.GovUnlockVote.cancel')}
         </Button>
 
         <Button
@@ -249,14 +249,14 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           loading={loading}
           onClick={onPreCheck(form.submit, ExtrinsicType.GOV_UNLOCK_VOTE)}
         >
-          {t('Continue')}
+          {t('ui.TRANSACTION.screen.Transaction.GovUnlockVote.continue')}
         </Button>
       </TransactionFooter>
       <SwModal
         closable={true}
         id={REFERENDA_VOTED_MODAL_ID}
         onCancel={onCancelReferendaVotedModal}
-        title={t('Referenda voted')}
+        title={t('ui.TRANSACTION.screen.Transaction.GovUnlockVote.referendaVoted')}
       >
         <MetaInfo
           hasBackgroundWrapper

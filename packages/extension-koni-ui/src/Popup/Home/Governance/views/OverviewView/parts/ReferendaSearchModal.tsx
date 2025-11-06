@@ -103,7 +103,7 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
     return (
       <EmptyList
         className={'__emptyList'}
-        emptyMessage={t('No referenda found')}
+        emptyMessage={t('ui.GOVERNANCE.screen.Governance.Overview.ReferendaSearchModal.noReferendaFound')}
         phosphorIcon={ListChecks}
       />
     );
@@ -130,13 +130,13 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
       id={modalId}
       maskClosable={false}
       onCancel={onCancel}
-      title={t('Referenda list')}
+      title={t('ui.GOVERNANCE.screen.Governance.Overview.ReferendaSearchModal.referendaList')}
     >
       <Search
         autoFocus={true}
         className='referenda-search-input'
         onSearch={handleSearchChange}
-        placeholder={t('Search referenda by title or ID')}
+        placeholder={t('ui.GOVERNANCE.screen.Governance.Overview.ReferendaSearchModal.searchReferendaByIdTitle')}
         searchValue={searchValue}
       />
 

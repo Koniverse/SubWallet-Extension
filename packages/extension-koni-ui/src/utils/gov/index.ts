@@ -333,60 +333,90 @@ export const calculateTotalAmountVotes = (details: VoteAmountDetailProps): BigNu
   return (['ayeAmount', 'nayAmount', 'abstainAmount'] as (keyof VoteAmountDetailProps)[]).reduce((sum, key) => sum.plus((details[key] as string) || 0), new BigNumber(0));
 };
 
+/**
+ * Parameters for retrieving user voting or delegation information
+ * related to a specific referendum track.
+ */
 interface GetUserVotingListForReferendumParams {
+  /** The referendum or its detailed object. */
   referendum: Referendum | ReferendumDetail;
+
+  /** Governance locked info for all user accounts. */
   govLockedInfos: ReturnType<typeof useGetGovLockedInfos>;
+
+  /** (Optional) Chain information, used for address formatting. */
   chainInfo?: _ChainInfo;
+
+  /** (Optional) Map of user address → referendum voting details. */
   voteMap?: Map<string, ReferendumVoteDetail>;
 }
 
-export const getUserVotingListForReferendum = ({ chainInfo, govLockedInfos, referendum, voteMap }: GetUserVotingListForReferendumParams): UserVoting[] | undefined => {
+/**
+ * Retrieves the list of users who have either voted directly
+ * or delegated their voting power for a specific referendum track.
+ *
+ * @returns A list of users who have voted or delegated for this referendum,
+ *          or undefined if no matching records are found.
+ */
+export const getUserVotingListForReferendum = ({ chainInfo,
+  govLockedInfos,
+  referendum,
+  voteMap }: GetUserVotingListForReferendumParams): UserVoting[] | undefined => {
+  // Skip invalid or legacy referendums (v1 has no delegation tracking)
   if (!referendum || referendum.version === 1) {
     return;
   }
 
+  // Extract the current track and referendum identifiers
   const trackId = Number(referendum.trackInfo.id);
   const refIndex = Number(referendum.referendumIndex);
   const userVoting: UserVoting[] = [];
 
-  for (const acc of (govLockedInfos || [])) {
-    const track = acc.tracks?.find((t) => Number(t.trackId) === trackId);
+  // Iterate through all governance-locked accounts
+  for (const account of govLockedInfos || []) {
+    // Find the track data that matches the referendum track
+    const track = account.tracks?.find((t) => Number(t.trackId) === trackId);
 
     if (!track) {
-      continue;
+      continue; // Skip accounts without the target track
     }
 
-    const votesForThisRef = track.votes?.find((v) => Number(v.referendumIndex) === refIndex);
+    // Find votes specifically related to this referendum index
+    const votesForThisRef = track.votes?.find(
+      (v) => Number(v.referendumIndex) === refIndex
+    );
 
-    // Skip if neither direct vote nor delegation present
+    // Skip if neither a direct vote nor a delegation is found
     if (!votesForThisRef && !track.delegation) {
       continue;
     }
 
-    if (track.delegation && voteMap) {
-      const target = track.delegation.target?.toLowerCase();
-      const delegationVote = target ? voteMap.get(target) : undefined;
+    // Self vote — check if the account itself voted on this referendum
+    if (!track.delegation && voteMap) {
+      const addressFormatted = reformatAddress(
+        account.address,
+        chainInfo?.substrateInfo?.addressPrefix
+      );
+      const selfVote = addressFormatted
+        ? voteMap.get(addressFormatted.toLowerCase())
+        : undefined;
 
-      if (!delegationVote || Number(delegationVote.referendumIndex) !== refIndex) {
-        continue;
-      }
-    } else if (!track.delegation && voteMap) {
-      const addressFormatted = reformatAddress(acc.address, chainInfo?.substrateInfo?.addressPrefix);
-      const selfVote = addressFormatted ? voteMap.get(addressFormatted.toLowerCase()) : undefined;
-
+      // Skip if no self-vote for this referendum
       if (!selfVote || Number(selfVote.referendumIndex) !== refIndex) {
         continue;
       }
     }
 
+    // Add the user’s voting info (either self or delegated)
     userVoting.push({
-      address: acc.address,
+      address: account.address,
       trackId,
       votes: votesForThisRef,
       delegation: track.delegation
     });
   }
 
+  // Return only if there are users with matching voting/delegation data
   return userVoting.length > 0 ? userVoting : undefined;
 };
 

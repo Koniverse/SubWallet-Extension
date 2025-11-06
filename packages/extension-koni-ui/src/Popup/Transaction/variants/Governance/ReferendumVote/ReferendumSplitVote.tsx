@@ -158,7 +158,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   }, [navigate]);
 
   useEffect(() => {
-    setCustomScreenTitle(t('Split for #{{referendumId}}', { replace: { referendumId: defaultData.referendumId } }));
+    setCustomScreenTitle(t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumSplitVote.splitForReferendumId', { replace: { referendumId: defaultData.referendumId } }));
 
     return () => {
       setCustomScreenTitle(undefined);
@@ -227,7 +227,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               address={fromValue}
               chain={chainValue}
               className={'free-balance'}
-              label={t('Available balance')}
+              label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumSplitVote.availableBalance')}
               onBalanceReady={setIsBalanceReady}
             />
           </div>
@@ -239,7 +239,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               <GovAmountInput
                 decimals={_getAssetDecimals(assetInfo)}
                 key={splitAmountRenderKey}
-                label={t('Aye amount')}
+                label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumSplitVote.ayeAmount')}
                 logoKey={assetInfo.slug.toLowerCase()}
                 tokenSymbol={_getAssetSymbol(assetInfo)}
               />
@@ -251,7 +251,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               <GovAmountInput
                 decimals={_getAssetDecimals(assetInfo)}
                 key={splitAmountRenderKey}
-                label={t('Nay amount')}
+                label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumSplitVote.nayAmount')}
                 logoKey={assetInfo.slug.toLowerCase()}
                 tokenSymbol={_getAssetSymbol(assetInfo)}
               />
@@ -266,7 +266,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             >
               <MetaInfo.Default
                 className={'meta-value-info'}
-                label={t('Total amount')}
+                label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumSplitVote.totalAmount')}
               >
                 {
                   !!totalAmount.from && (
@@ -289,7 +289,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               </MetaInfo.Default>
               <MetaInfo.Default
                 className={'meta-value-info'}
-                label={t('Total vote')}
+                label={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumSplitVote.totalVote')}
               >
                 {
                   !!totalVote.from && (
@@ -315,13 +315,13 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         </Form>
 
         <AlertBox
-          description={t('Split your voting power between Aye and Nay with a Conviction of 0.1x')}
+          description={t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumSplitVote.splitVotingPowerAyeNay')}
           type='info'
         />
 
         {previousVoteAmountDetail &&
           <div className='previous-vote-amount-detail'>
-            <div className={'__label'}>{t('Previous vote')}</div>
+            <div className={'__label'}>{t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumSplitVote.previousVote')}</div>
             <VoteAmountDetail
               amountDetail={previousVoteAmountDetail}
               decimals={_getAssetDecimals(assetInfo)}
@@ -343,7 +343,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           onClick={goRefStandardVote}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumSplitVote.cancel')}
         </Button>
 
         <Button
@@ -357,7 +357,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
           loading={loading}
           onClick={onPreCheck(form.submit, ExtrinsicType.GOV_VOTE)}
         >
-          {t('Vote')}
+          {t('ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumSplitVote.vote')}
         </Button>
       </TransactionFooter>
     </>

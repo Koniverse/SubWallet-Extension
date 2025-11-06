@@ -335,9 +335,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('ui.HISTORY.screen.History.tokenApprove'),
     [ExtrinsicType.SWAP]: t('ui.HISTORY.screen.History.swap'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('ui.HISTORY.screen.History.claimToken'),
-    [ExtrinsicType.GOV_VOTE]: t('Vote'),
-    [ExtrinsicType.GOV_UNVOTE]: t('Unvote'),
-    [ExtrinsicType.GOV_UNLOCK_VOTE]: t('Unlock votes'),
+    [ExtrinsicType.GOV_VOTE]: t('ui.HISTORY.screen.History.vote'),
+    [ExtrinsicType.GOV_UNVOTE]: t('ui.HISTORY.screen.History.unvote'),
+    [ExtrinsicType.GOV_UNLOCK_VOTE]: t('ui.HISTORY.screen.History.unlockVotes'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknown')
   }), [t]);
 
@@ -384,9 +384,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('ui.HISTORY.screen.History.tokenApproveTransaction'),
     [ExtrinsicType.SWAP]: t('ui.HISTORY.screen.History.swapTransaction'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('ui.HISTORY.screen.History.claimTokenTransaction'),
-    [ExtrinsicType.GOV_VOTE]: t('Vote transaction'),
-    [ExtrinsicType.GOV_UNVOTE]: t('Unvote transaction'),
-    [ExtrinsicType.GOV_UNLOCK_VOTE]: t('Unlock votes transaction'),
+    [ExtrinsicType.GOV_VOTE]: t('ui.HISTORY.screen.History.voteTransaction'),
+    [ExtrinsicType.GOV_UNVOTE]: t('ui.HISTORY.screen.History.unvoteTransaction'),
+    [ExtrinsicType.GOV_UNLOCK_VOTE]: t('ui.HISTORY.screen.History.unlockVotesTransaction'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknownTransaction')
   }), [t]);
 

@@ -57,9 +57,9 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: detectTranslate('ui.TRANSACTION.constant.transaction.tokenApprove'),
   [ExtrinsicType.SWAP]: detectTranslate('ui.TRANSACTION.constant.transaction.swap'),
 
-  [ExtrinsicType.GOV_VOTE]: detectTranslate('Vote'),
-  [ExtrinsicType.GOV_UNVOTE]: detectTranslate('Unvote'),
-  [ExtrinsicType.GOV_UNLOCK_VOTE]: detectTranslate('Unlock votes')
+  [ExtrinsicType.GOV_VOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.vote'),
+  [ExtrinsicType.GOV_UNVOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.unvote'),
+  [ExtrinsicType.GOV_UNLOCK_VOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.unlockVotes')
 };
 
 export const ALL_STAKING_ACTIONS: ExtrinsicType[] = [

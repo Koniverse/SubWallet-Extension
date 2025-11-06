@@ -73,7 +73,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         {!!account?.name &&
           <MetaInfo.Default
             className={'__account-field'}
-            label={t('Account')}
+            label={t('ui.TRANSACTION.Confirmations.GovUnlock.account')}
           >
             <AccountProxyAvatar
               className={'__account-avatar'}
@@ -86,14 +86,14 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
 
         <MetaInfo.Default
           className={'__address-field'}
-          label={t('Address')}
+          label={t('ui.TRANSACTION.Confirmations.GovUnlock.address')}
         >
           {shortAddress}
         </MetaInfo.Default>
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Network fee')}
+          label={t('ui.TRANSACTION.Confirmations.GovUnlock.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
@@ -106,7 +106,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           <>
             <MetaInfo.Default
               className={'governance-value-info'}
-              label={t('Transferable')}
+              label={t('ui.TRANSACTION.Confirmations.GovUnlock.transferable')}
             >
               {
                 !!govConfirmationInfo?.transferable.from && (
@@ -129,7 +129,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
             </MetaInfo.Default>
             <MetaInfo.Default
               className={'governance-value-info'}
-              label={t('Governance lock')}
+              label={t('ui.TRANSACTION.Confirmations.GovUnlock.governanceLock')}
             >
               {
                 !!govConfirmationInfo?.governanceLock.from && (

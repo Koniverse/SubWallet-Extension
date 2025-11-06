@@ -32,7 +32,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   const { ayesPercent, naysPercent } = getTallyVotesBarPercent(referendumDetail.onchainData.tally);
   const referendumId = referendumDetail?.referendumIndex;
   const thresholdPercent = getMinApprovalThreshold(referendumDetail);
-  const govLockedInfos = useGetGovLockedInfos();
+  const govLockedInfos = useGetGovLockedInfos(chain);
   const { activeModal } = useContext(ModalContext);
   const isAllAccount = useSelector((state) => state.accountState.isAllAccount);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
@@ -54,8 +54,8 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
     const isAyeLeading = ayesPercent > naysPercent;
 
     return isPreparing
-      ? (isAyeLeading ? t('Decision starts in {{time}}', { time }) : t('Time out in {{time}}', { time }))
-      : (isAyeLeading ? t('Approve in {{time}}', { time }) : t('Reject in {{time}}', { time }));
+      ? (isAyeLeading ? t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.decisionStartsIn', { time }) : t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.timeOutIn', { time }))
+      : (isAyeLeading ? t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.approveIn', { time }) : t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.rejectIn', { time }));
   }, [ayesPercent, naysPercent, referendumDetail.state.name, t, timeLeft]);
 
   const { data } = useQuery({
@@ -80,8 +80,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   const shouldShowVoteButton = useMemo(() => {
     const isVersion1 = referendumDetail.version === 1;
     const isCompleted = GOV_COMPLETED_STATES.includes(referendumDetail.state.name);
-    const hasDelegatedVote =
-      userVotingInfo?.length === 1 && !!userVotingInfo[0].delegation?.target;
+    const hasDelegatedVote = userVotingInfo?.every(({ delegation }) => !!delegation?.target);
 
     return !(isVersion1 || isCompleted || hasDelegatedVote);
   }, [referendumDetail.state.name, referendumDetail.version, userVotingInfo]);
@@ -97,7 +96,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   return (
     <div className={className}>
       <div className={'__vote-title-box'}>
-        <div className={'__vote-title'}>{t('Voting Summary')}</div>
+        <div className={'__vote-title'}>{t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.votingSummary')}</div>
         {!!timeLeft && (
           <div className={'__vote-remaining-time'}>
             <Icon
@@ -149,7 +148,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
         block={true}
         onClick={onClickVote}
       >
-        {(userVotingInfo?.length === 1 && !!userVotingInfo[0].votes) ? t('Revote') : t('Vote')}
+        {(userVotingInfo?.length === 1 && !!userVotingInfo[0].votes) ? t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.revote') : t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.vote')}
       </Button>}
 
       {!!userVotingInfo && <GovVotedAccountsModal

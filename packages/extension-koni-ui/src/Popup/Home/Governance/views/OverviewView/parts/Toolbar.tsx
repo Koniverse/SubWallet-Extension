@@ -45,11 +45,11 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
   const filterTabItems = useMemo(() => {
     return [
       {
-        label: t('All Referenda'),
+        label: t('ui.GOVERNANCE.screen.Governance.Overview.Toolbar.allReferenda'),
         value: ReferendaCategory.ALL
       },
       {
-        label: t('Ongoing'),
+        label: t('ui.GOVERNANCE.screen.Governance.Overview.Toolbar.ongoing'),
         value: ReferendaCategory.ONGOING
       }
     ];
@@ -139,7 +139,7 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
           setStatusSelected={setStatusSelectedState}
           setTrackSelected={setTrackSelectedState}
           statusSelected={statusSelectedState}
-          title={t('Filter')}
+          title={t('ui.GOVERNANCE.screen.Governance.Overview.Toolbar.filter')}
           trackSelected={trackSelectedState}
         />
       </div>

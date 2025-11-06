@@ -79,13 +79,13 @@ const Component = ({ chainSlug, className, goOverview }: Props): React.ReactElem
           size={'xs'}
           type={'ghost'}
         />
-        <div className={'__top-part-title'}>{t('Locked detail')}</div>
+        <div className={'__top-part-title'}>{t('ui.GOVERNANCE.screen.Governance.UnlockToken.lockedDetail')}</div>
       </div>
 
       <div className='__middle-part'>
         <div className={'__total-locked-container'}>
           <div className={'__total-locked-label'}>
-            {t('Total locked')}
+            {t('ui.GOVERNANCE.screen.Governance.UnlockToken.totalLocked')}
           </div>
           <NumberDisplay
             className={'__total-locked-value'}

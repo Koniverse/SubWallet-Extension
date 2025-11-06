@@ -70,10 +70,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
     <div className={className}>
       <div className='__label-wrapper'>
         <div className={'__left-item'}>
-          <div className='__label'>{t('Conviction')}</div>
+          <div className='__label'>{t('ui.GOVERNANCE.components.Field.Governance.GovVoteConvictionSlider.conviction')}</div>
           <Tooltip
             placement={'top'}
-            title={t('Multiply your votes by increasing lock duration')}
+            title={t('ui.GOVERNANCE.components.Field.Governance.GovVoteConvictionSlider.multiplyVotesLockDuration')}
           >
             <div>
               <Icon

@@ -2,15 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { detectTranslate } from '@subwallet/extension-base/utils';
+import { GovTrackVoting } from '@subwallet/extension-base/services/open-gov/interface';
+import { detectTranslate, reformatAddress } from '@subwallet/extension-base/utils';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
-import GovAccountSelectoModal from '@subwallet/extension-koni-ui/components/Modal/Governance/GovAccountSelector';
+import GovAccountSelectorModal from '@subwallet/extension-koni-ui/components/Modal/Governance/GovAccountSelector';
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetGovLockedInfos, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { chainSlugToPolkassemblySite, chainSlugToSubsquareSite } from '@subwallet/extension-koni-ui/Popup/Home/Governance/shared';
 import { ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
@@ -18,7 +20,7 @@ import { getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-u
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { Button, ModalContext, SwSubHeader } from '@subwallet/react-ui';
 import { useQuery } from '@tanstack/react-query';
-import React, { Context, useCallback, useContext, useEffect } from 'react';
+import React, { Context, useCallback, useContext, useEffect, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled, { ThemeContext } from 'styled-components';
@@ -43,6 +45,8 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const { t } = useTranslation();
   const fromAccountProxy = getTransactionFromAccountProxyValue(currentAccountProxy);
+  const govLockedInfos = useGetGovLockedInfos(chainSlug);
+  const { chainInfoMap } = useSelector((root: RootState) => root.chainStore);
 
   const { accountAddressItems, voteMap } = useGovReferendumVotes({
     chain: chainSlug,
@@ -71,6 +75,56 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
     staleTime: 60 * 1000
   });
 
+  /**
+   * Builds an extended account list that includes delegated voting status updates.
+   *
+   * - Splits accounts into `voted` and `notVoted`
+   * - Marks "not voted" accounts as delegated if they have delegation info
+   * - Merges them back into a single unified list
+   */
+  const extendedAccountAddressItems = useMemo(() => {
+    if (!data) {
+      return accountAddressItems;
+    }
+
+    const trackId = Number(data.trackInfo.id);
+    const chainInfo = chainInfoMap[chainSlug];
+
+    // Build a quick lookup record of account → track voting info
+    const govTrackByAddress = govLockedInfos.reduce<Record<string, GovTrackVoting>>((acc, info) => {
+      const track = info.tracks.find((t) => Number(t.trackId) === trackId);
+      const reformattedAddress = reformatAddress(info.address, chainInfo.substrateInfo?.addressPrefix);
+
+      if (track) {
+        acc[reformattedAddress] = track;
+      }
+
+      return acc;
+    }, {});
+
+    // Separate into voted and not voted while updating delegation info on the fly
+    const voted: GovAccountAddressItemType[] = [];
+    const notVoted: GovAccountAddressItemType[] = [];
+
+    for (const item of accountAddressItems) {
+      if (item.govVoteStatus === GovVoteStatus.NOT_VOTED) {
+        const govInfo = govTrackByAddress[item.address];
+        const isDelegated = !!govInfo?.delegation?.target;
+
+        notVoted.push(
+          isDelegated
+            ? { ...item, govVoteStatus: GovVoteStatus.DELEGATED }
+            : item
+        );
+      } else {
+        voted.push(item);
+      }
+    }
+
+    // Merge voted accounts first, then newly delegated / not voted ones
+    return [...voted, ...notVoted];
+  }, [accountAddressItems, chainInfoMap, chainSlug, data, govLockedInfos]);
+
   const onViewPolkassembly = useCallback(() => {
     const site = chainSlugToPolkassemblySite[chainSlug];
 
@@ -87,7 +141,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
   const onSelectGovItem = useCallback((item: GovAccountAddressItemType) => {
     if (item.govVoteStatus === GovVoteStatus.DELEGATED) {
       openAlert({
-        title: t('Unable to vote'),
+        title: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.unableToVote'),
         type: NotificationType.ERROR,
         content:
           <Trans
@@ -101,7 +155,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
             values={{ name: item.accountName }}
           />,
         okButton: {
-          text: t('I understand'),
+          text: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.iUnderstand'),
           onClick: closeAlert
         }
       });
@@ -159,7 +213,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
         onBack={onBack}
         paddingVertical
         showBackButton
-        title={t('Referenda #{{id}}', { replace: { id: data.referendumIndex } })}
+        title={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.referendaId', { replace: { id: data.referendumIndex } })}
       />
 
       <div className={'referendum-detail-body'}>
@@ -189,8 +243,8 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
           referendumDetail={data}
         />
 
-        <GovAccountSelectoModal
-          items={accountAddressItems}
+        <GovAccountSelectorModal
+          items={extendedAccountAddressItems}
           modalId={modalId}
           onCancel={onCancel}
           onSelectItem={onSelectGovItem}

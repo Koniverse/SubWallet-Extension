@@ -40,9 +40,9 @@ const Component = ({ chain, className, isLegacyGov, votingData }: Props): React.
 
   const getModalData = useCallback(() => {
     const voteDataMap = {
-      [GovVoteType.AYE]: { voteData: votingData[GovVoteType.AYE], title: t('Aye votes') },
-      [GovVoteType.NAY]: { voteData: votingData[GovVoteType.NAY], title: t('Nay votes') },
-      [GovVoteType.ABSTAIN]: { voteData: votingData[GovVoteType.ABSTAIN], title: t('Abstain votes') }
+      [GovVoteType.AYE]: { voteData: votingData[GovVoteType.AYE], title: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.ayeVotes') },
+      [GovVoteType.NAY]: { voteData: votingData[GovVoteType.NAY], title: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.nayVotes') },
+      [GovVoteType.ABSTAIN]: { voteData: votingData[GovVoteType.ABSTAIN], title: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.abstainVotes') }
     };
 
     return voteDataMap[currentVoteType];
@@ -55,7 +55,7 @@ const Component = ({ chain, className, isLegacyGov, votingData }: Props): React.
       <CollapsiblePanel
         className={'voting-stats-collapse'}
         onToggle={setIsOpen}
-        title={isOpen ? t('Hide voting stats') : t('Show voting stats')}
+        title={isOpen ? t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.hideVotingStats') : t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.showVotingStats')}
       >
         <MetaInfo>
           <MetaInfo.Default

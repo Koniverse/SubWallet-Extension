@@ -84,12 +84,12 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain, selectedC
       }
     };
 
-    addGroup(itemGroupMap.polkadot, t('Polkadot & Parachains'), 'polkadot');
-    addGroup(itemGroupMap.kusama, t('Kusama & Parachains'), 'kusama');
-    addGroup(itemGroupMap.westend, t('Westend and Parachains'), 'westend_assethub');
-    addGroup(itemGroupMap.paseo, t('Paseo'), 'paseo');
-    addGroup(itemGroupMap.solo, t('Solochains'), 'solo');
-    addGroup(itemGroupMap.testnet, t('Testnets'), 'testnet');
+    addGroup(itemGroupMap.polkadot, t('ui.GOVERNANCE.screen.Governance.Overview.ChainSelectorModal.polkadotParachains'), 'polkadot');
+    addGroup(itemGroupMap.kusama, t('ui.GOVERNANCE.screen.Governance.Overview.ChainSelectorModal.kusamaParachains'), 'kusama');
+    addGroup(itemGroupMap.westend, t('ui.GOVERNANCE.screen.Governance.Overview.ChainSelectorModal.westendParachains'), 'westend_assethub');
+    addGroup(itemGroupMap.paseo, t('ui.GOVERNANCE.screen.Governance.Overview.ChainSelectorModal.paseo'), 'paseo');
+    addGroup(itemGroupMap.solo, t('ui.GOVERNANCE.screen.Governance.Overview.ChainSelectorModal.solochains'), 'solo');
+    addGroup(itemGroupMap.testnet, t('ui.GOVERNANCE.screen.Governance.Overview.ChainSelectorModal.testnets'), 'testnet');
 
     return result;
   }, [itemGroupMap, searchFunction, searchValue, t]);
@@ -167,13 +167,13 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain, selectedC
       destroyOnClose={true}
       id={modalId}
       onCancel={_onCancel}
-      title={t('Select network')}
+      title={t('ui.GOVERNANCE.screen.Governance.Overview.ChainSelectorModal.selectNetwork')}
     >
       <Search
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t<string>('Enter network')}
+        placeholder={t<string>('ui.GOVERNANCE.screen.Governance.Overview.ChainSelectorModal.enterNetwork')}
         searchValue={searchValue}
       />
       <SwList
