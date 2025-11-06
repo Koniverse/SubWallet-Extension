@@ -204,8 +204,8 @@ export function getMinApprovalThreshold (referendum: Referendum | ReferendumDeta
 }
 
 const _MIGRATION_BLOCK_OFFSET: Record<string, number> = {
-  kusama: 19310415,
-  polkadot: 18237370
+  statemine: 19310415,
+  statemint: 18237370
 };
 
 const calculateTimeLeft = (

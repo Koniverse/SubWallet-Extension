@@ -77,8 +77,13 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
     activeModal(GovVotedAccountsModalId);
   }, [activeModal]);
 
-  const isDisabledVoteButton = useMemo(() => {
-    return referendumDetail.version === 1 || GOV_COMPLETED_STATES.includes(referendumDetail.state.name) || (userVotingInfo?.length === 1 && !!userVotingInfo[0].delegation?.target);
+  const shouldShowVoteButton = useMemo(() => {
+    const isVersion1 = referendumDetail.version === 1;
+    const isCompleted = GOV_COMPLETED_STATES.includes(referendumDetail.state.name);
+    const hasDelegatedVote =
+      userVotingInfo?.length === 1 && !!userVotingInfo[0].delegation?.target;
+
+    return !(isVersion1 || isCompleted || hasDelegatedVote);
   }, [referendumDetail.state.name, referendumDetail.version, userVotingInfo]);
 
   useEffect(() => {
@@ -140,13 +145,12 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
         />
       </div>
 
-      <Button
+      {shouldShowVoteButton && <Button
         block={true}
-        disabled={isDisabledVoteButton}
         onClick={onClickVote}
       >
         {(userVotingInfo?.length === 1 && !!userVotingInfo[0].votes) ? t('Revote') : t('Vote')}
-      </Button>
+      </Button>}
 
       {!!userVotingInfo && <GovVotedAccountsModal
         chain={chain}

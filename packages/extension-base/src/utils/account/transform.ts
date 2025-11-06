@@ -369,7 +369,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
     const result: ExtrinsicType[] = [];
     const specialNetwork = _specialNetwork || '';
 
-    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ...OPEN_GOV_ACTIONS, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
+    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
 
     // NFT
     if (!['astar', 'avail_mainnet'].includes(specialNetwork)) {

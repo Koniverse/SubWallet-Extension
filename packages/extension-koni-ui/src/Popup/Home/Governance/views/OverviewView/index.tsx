@@ -206,7 +206,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
       />}
 
       {isLoading && selectedReferendaCategory !== ReferendaCategory.VOTED && (
-        <div className={CN('__load-more-container', { '-isInitial-loading': true })}>
+        <div className={CN('__load-more-container', { '-isInitial-loading': isInitialLoading })}>
           <ActivityIndicator />
         </div>
       )}
