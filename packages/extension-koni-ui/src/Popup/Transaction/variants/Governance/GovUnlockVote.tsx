@@ -2,17 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
-import { AccountProxy } from '@subwallet/extension-base/types';
-import { isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, HiddenInput, MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, GOV_UNLOCK_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useDefaultNavigate, useGetAccountTokenBalance, useGetGovLockedInfos, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useDefaultNavigate, useGetGovLockedInfos, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleUnlockVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { useGovReferendumVotes } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView/useGovReferendumVotes';
-import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { FormCallbacks, FormFieldData, GovUnlockVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, funcSortByName, simpleCheckForm, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
@@ -25,21 +22,20 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { SimpleBalance, TransactionContent, TransactionFooter } from '../../parts';
+import { FreeBalance, TransactionContent, TransactionFooter } from '../../parts';
 
 type WrapperProps = ThemeProps;
 
 type ComponentProps = {
   className?: string;
   isAllAccount?: boolean
-  targetAccountProxy: AccountProxy;
 };
 
 const hideFields: Array<keyof GovUnlockVoteParams> = ['chain', 'amount', 'referendumIds', 'tracks'];
 const REFERENDA_VOTED_MODAL_ID = 'referenda-voted-modal';
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
-  const { className = '', isAllAccount, targetAccountProxy } = props;
+  const { className = '', isAllAccount } = props;
   const { t } = useTranslation();
   const { defaultData, persistData, setBackProps } = useTransactionContext<GovUnlockVoteParams>();
   const [, setGovUnlockVoteStorage] = useLocalStorage(GOV_UNLOCK_VOTE_TRANSACTION, DEFAULT_GOV_UNLOCK_VOTE_PARAMS);
@@ -51,49 +47,12 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const navigate = useNavigate();
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
+  const [isBalanceReady, setIsBalanceReady] = useState<boolean>(true);
   const { accountAddressItems } = useGovReferendumVotes({
     chain: defaultData.chain,
     referendumId: '',
     fromAccountProxy: defaultData.fromAccountProxy
   });
-
-  const { chainInfoMap } = useSelector((root) => root.chainStore);
-  const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
-  const assetInfo = useMemo(() => {
-    const assetSlug = _getChainNativeTokenSlug(chainInfoMap[defaultData.chain]);
-
-    return assetRegistry[assetSlug];
-  }, [assetRegistry, chainInfoMap, defaultData.chain]);
-
-  const getAccountTokenBalance = useGetAccountTokenBalance();
-
-  const targetAccountProxyIdForGetBalance = useMemo(() => {
-    if (!isAllAccount || !fromValue) {
-      return targetAccountProxy.id;
-    }
-
-    const accountProxyByFromValue = accountAddressItems.find((a) => a.address === fromValue);
-
-    return accountProxyByFromValue?.accountProxyId || targetAccountProxy.id;
-  }, [accountAddressItems, fromValue, isAllAccount, targetAccountProxy.id]);
-
-  const tokenBalanceMap = getAccountTokenBalance(
-    [assetInfo.slug],
-    targetAccountProxyIdForGetBalance
-  );
-
-  const balanceInfo = useMemo(
-    () => (chainValue ? tokenBalanceMap[assetInfo.slug] : undefined),
-    [assetInfo.slug, chainValue, tokenBalanceMap]
-  );
-
-  const lockedValue = useMemo(() => balanceInfo?.locked.value ?? new BigN(0), [balanceInfo]);
-
-  const govAvailableBalance = useMemo(() => {
-    const free = balanceInfo?.free.value ?? new BigN(0);
-
-    return free.plus(lockedValue).toFixed();
-  }, [balanceInfo?.free.value, lockedValue]);
 
   const govLockInfo = useGetGovLockedInfos(chainValue);
 
@@ -227,11 +186,12 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             />
           </Form.Item>
         </Form>
-        <SimpleBalance
+        <FreeBalance
+          address={fromValue}
+          chain={chainValue}
           className={'free-balance'}
           label={t('Available balance')}
-          symbol={assetInfo.symbol}
-          value={govAvailableBalance}
+          onBalanceReady={setIsBalanceReady}
         />
         <MetaInfo
           className='custom-label'
@@ -286,7 +246,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         </Button>
 
         <Button
-          disabled={isDisable || accountAddressFiltered.length === 0 || !lockedAmount.gt(BN_ZERO)}
+          disabled={isDisable || accountAddressFiltered.length === 0 || !isBalanceReady || !lockedAmount.gt(BN_ZERO)}
           icon={(
             <Icon
               phosphorIcon={CheckCircle}
@@ -330,20 +290,10 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const { className } = props;
   const { defaultData } = useTransactionContext<GovUnlockVoteParams>();
   const { goHome } = useDefaultNavigate();
-  const { accountProxies, isAllAccount } = useSelector((state) => state.accountState);
+  const { isAllAccount } = useSelector((state) => state.accountState);
   const dataContext = useContext(DataContext);
 
-  const targetAccountProxy = useMemo(() => {
-    return accountProxies.find((ap) => {
-      if (!defaultData.fromAccountProxy) {
-        return isAccountAll(ap.id);
-      }
-
-      return ap.id === defaultData.fromAccountProxy;
-    });
-  }, [accountProxies, defaultData.fromAccountProxy]);
-
-  const isNotAllowed = !defaultData.tracks || !defaultData.chain || !targetAccountProxy;
+  const isNotAllowed = !defaultData.tracks || !defaultData.chain;
 
   useEffect(() => {
     if (isNotAllowed) {
@@ -364,7 +314,6 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
     >
       <Component
         isAllAccount={isAllAccount}
-        targetAccountProxy={targetAccountProxy}
       />
     </PageWrapper>
 

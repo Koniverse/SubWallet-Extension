@@ -28,7 +28,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { SimpleBalance, TransactionContent, TransactionFooter } from '../../../parts';
+import { FreeBalance, TransactionContent, TransactionFooter } from '../../../parts';
 
 type WrapperProps = ThemeProps;
 
@@ -55,6 +55,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const [govRefVoteStorage, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData, from: govRefVoteStorage.from, fromAccountProxy: govRefVoteStorage.fromAccountProxy }), [defaultData, govRefVoteStorage.from, govRefVoteStorage.fromAccountProxy]);
   const [, setGovRefUnvoteStorage] = useLocalStorage(GOV_REFERENDUM_UNVOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS);
+  const [isBalanceReady, setIsBalanceReady] = useState<boolean>(true);
   const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const [form] = Form.useForm<GovReferendumVoteParams>();
 
@@ -128,12 +129,6 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   );
 
   const lockedValue = useMemo(() => balanceInfo?.locked.value ?? new BigN(0), [balanceInfo]);
-
-  const govAvailableBalance = useMemo(() => {
-    const free = balanceInfo?.free.value ?? new BigN(0);
-
-    return free.plus(lockedValue).toFixed();
-  }, [balanceInfo?.free.value, lockedValue]);
 
   const governanceLock = useMemo<{ from?: BigNumber, to: BigNumber }>(() => {
     const amountBN = new BigNumber(amountValue || 0);
@@ -333,7 +328,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const getButtonProps = (type: GovVoteType) => {
     return {
       loading: loadingButton === type,
-      disabled: (loadingButton !== null && loadingButton !== type) || (isDisable)
+      disabled: (loadingButton !== null && loadingButton !== type) || (isDisable || !isBalanceReady)
     };
   };
 
@@ -420,11 +415,12 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               />
             </Form.Item>
 
-            <SimpleBalance
+            <FreeBalance
+              address={fromValue}
+              chain={chainValue}
               className={'free-balance'}
               label={t('Available balance')}
-              symbol={assetInfo.symbol}
-              value={govAvailableBalance}
+              onBalanceReady={setIsBalanceReady}
             />
           </div>
 

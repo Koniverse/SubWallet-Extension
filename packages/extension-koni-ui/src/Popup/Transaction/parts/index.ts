@@ -7,4 +7,3 @@ export { default as TransactionContent } from './TransactionContent';
 export { default as TransactionFooter } from './TransactionFooter';
 export { default as EarnOutlet } from './EarnOutlet';
 export { default as FreeBalanceToEarn } from './FreeBalanceToEarn';
-export { default as SimpleBalance } from './SimpleBalance';
