@@ -13,6 +13,7 @@ import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import BaseLiquidStakingPoolHandler from './base';
 
+// TODO: disable earning and stake actions but keep showing existing earning positions (currently handle on UI)
 export default class ParallelLiquidStakingPoolHandler extends BaseLiquidStakingPoolHandler {
   public slug: string;
   protected readonly name: string;

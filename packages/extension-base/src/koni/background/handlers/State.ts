@@ -2199,6 +2199,7 @@ export default class KoniState {
       await this.priceService.setPriceCurrency(DEFAULT_CURRENCY);
       this.settingService.resetWallet();
       await this.priceService.setPriceCurrency(DEFAULT_CURRENCY);
+      this.chainService.resetPopularTokenList();
     }
 
     this.chainService.resetWallet(resetAll);
