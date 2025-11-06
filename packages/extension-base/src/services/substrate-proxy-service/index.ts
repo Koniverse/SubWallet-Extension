@@ -28,16 +28,20 @@ export default class SubstrateProxyAccountService {
     return this.state.getSubstrateApi(chain);
   }
 
+  // Get proxied accounts for a main account
+  // Get when view details or perform transaction
   async getSubstrateProxyAccountGroup (request: RequestGetSubstrateProxyAccountGroup): Promise<SubstrateProxyAccountGroup> {
     const { address, chain, excludedSubstrateProxyAddresses, type } = request;
     const substrateApi = this.getSubstrateApi(chain);
 
     await substrateApi.isReady;
 
+    // Get proxied accounts from on-chain data
     const result = await substrateApi.api.query.proxy.proxies(address);
 
     const [substrateProxyAccounts_, substrateProxyDeposit] = result.toPrimitive() as [PrimitiveSubstrateProxyAccountItem[], string];
 
+    // Mapping on-chain data to our defined type
     let substrateProxyAccounts: SubstrateProxyAccountItem[] = (substrateProxyAccounts_ || []).map((account) => {
       const proxyId = this.state.keyringService.context.belongUnifiedAccount(account.delegate) || reformatAddress(account.delegate);
 
@@ -69,6 +73,7 @@ export default class SubstrateProxyAccountService {
     };
   }
 
+  // Linking proxy account with main account
   async addSubstrateProxyAccounts (data: AddSubstrateProxyAccountParams): Promise<TransactionData> {
     const { address, chain, substrateProxyAddress, substrateProxyType } = data;
 
@@ -84,6 +89,7 @@ export default class SubstrateProxyAccountService {
     return substrateApi.api.tx.proxy.addProxy(substrateProxyAddress, substrateProxyType, 0);
   }
 
+  // Validate adding proxy account
   public async validateAddSubstrateProxyAccount (params: AddSubstrateProxyAccountParams): Promise<TransactionError[]> {
     const { address, chain, substrateProxyDeposit } = params;
 
@@ -95,6 +101,7 @@ export default class SubstrateProxyAccountService {
       return [new TransactionError(BasicTxErrorType.UNSUPPORTED)];
     }
 
+    // Validate max proxies accounts limit
     const maxSubstrateProxies = substrateApi.api.consts.proxy.maxProxies?.toNumber?.() || 0;
 
     const currentProxiesRaw = await substrateApi.api.query.proxy.proxies(address);
@@ -104,6 +111,7 @@ export default class SubstrateProxyAccountService {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, `Maximum number of proxies reached: ${maxSubstrateProxies}`)];
     }
 
+    // Ensure enough balance for deposit + fee
     const transferableBalance = await this.state.balanceService.getTransferableBalance(address, chain);
     const bnTransferableBalance = new BigN(transferableBalance.value);
 
@@ -123,6 +131,7 @@ export default class SubstrateProxyAccountService {
     return [];
   }
 
+  // Removing linked proxy accounts from main account
   async removeSubstrateProxyAccounts (data: RemoveSubstrateProxyAccountParams): Promise<TransactionData> {
     const { chain, isRemoveAll, selectedSubstrateProxyAccounts } = data;
 

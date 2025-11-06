@@ -14,6 +14,8 @@ const SUBSTRATE_PROXY_ACCOUNT_EXTRINSIC_GROUPS: Record<string, ExtrinsicType[]> 
   ]
 };
 
+// Map extrinsic type to possible substrate proxy types that can be used
+// The governance proxy type will be support later
 export const txTypeToSubstrateProxyMap: Partial<Record<ExtrinsicType, SubstrateProxyType[]>> = {
   ...Object.fromEntries(SUBSTRATE_PROXY_ACCOUNT_EXTRINSIC_GROUPS.STAKING.map((t) => [t, ['Staking', 'NonTransfer']]))
 };

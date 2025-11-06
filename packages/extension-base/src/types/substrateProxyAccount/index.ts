@@ -10,6 +10,8 @@ export interface RequestGetSubstrateProxyAccountGroup {
   excludedSubstrateProxyAddresses?: string[]
 }
 
+// All possible proxy types in Substrate in this article: https://wiki.polkadot.com/learn/learn-proxies/#proxy-types
+// Only support these 4 types for now
 export type SubstrateProxyType = 'Any' | 'NonTransfer' | 'Governance' | 'Staking';
 
 export interface SubstrateProxyAccountItem {

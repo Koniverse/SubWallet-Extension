@@ -74,6 +74,7 @@ function Component ({ accountProxy, className }: Props) {
   const chainItems = useMemo<ChainItemType[]>(() => {
     const result: ChainItemType[] = [];
 
+    // Filter chains that support substrate proxy and are in allowedChains
     Object.values(chainInfoMap).forEach((c) => {
       if (c.substrateInfo !== null && allowedChains.includes(c.slug) && !UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS.includes(c.slug)) {
         result.push({
