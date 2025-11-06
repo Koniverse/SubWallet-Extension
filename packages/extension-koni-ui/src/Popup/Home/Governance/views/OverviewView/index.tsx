@@ -4,16 +4,16 @@
 import { useGetGovLockedInfos } from '@subwallet/extension-koni-ui/hooks';
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ReferendaSearchModal } from '@subwallet/extension-koni-ui/Popup/Home/Governance/views/OverviewView/parts/ReferendaSearchModal';
-import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ReferendumWithVoting, UserVoting } from '@subwallet/extension-koni-ui/types/gov';
-import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
+import { ReferendumWithVoting } from '@subwallet/extension-koni-ui/types/gov';
+import { getUserVotingListForReferendum, GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { ActivityIndicator } from '@subwallet/react-ui';
 import { ALL_TRACK_ID, GOV_ONGOING_STATES, GovStatusKey, Referendum } from '@subwallet/subsquare-api-sdk';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import React, { Context, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import CN from 'classnames';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { ThemeContext } from 'styled-components';
+import styled from 'styled-components';
 
 import { ChainSelector } from './parts/ChainSelector';
 import { QuickActionsContainer } from './parts/QuickActionsContainer';
@@ -28,7 +28,6 @@ type Props = ThemeProps & ViewBaseType & {
 
 const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, onChangeChain, sdkInstance }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
-  const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const [selectedReferendaCategory, setSelectedReferendaCategory] = useState<ReferendaCategory>(ReferendaCategory.ALL);
   const [isEnableTreasuryFilter, setIsEnableTreasuryFilter] = useState(false);
   const [isEnableVotedFilter, setIsEnableVotedFilter] = useState(false);
@@ -40,7 +39,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
   const containerRef = useRef<HTMLDivElement>(null);
   const govLockedInfos = useGetGovLockedInfos(chainSlug);
 
-  const { data, fetchNextPage, hasNextPage } = useInfiniteQuery({
+  const { data, fetchNextPage, hasNextPage, isLoading: isInitialLoading } = useInfiniteQuery({
     queryKey: [
       GOV_QUERY_KEYS.referendaList(chainSlug),
       {
@@ -137,43 +136,9 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
     const filteredItems = items.filter(filterFunc);
 
     const extended: ReferendumWithVoting[] = filteredItems.map((item) => {
-      if (item.version === 1) {
-        return {
-          ...item,
-          userVoting: undefined
-        };
-      }
-
-      const trackId = Number(item.trackInfo.id);
-
-      const userVoting: UserVoting[] = [];
-
-      (govLockedInfos || []).forEach((acc) => {
-        const track = acc.tracks?.find((t) => Number(t.trackId) === trackId);
-
-        if (!track) {
-          return;
-        }
-
-        const votesForThisRef = track.votes?.find(
-          (v) => Number(v.referendumIndex) === item.referendumIndex
-        );
-
-        const delegation = track.delegation ? { ...track.delegation } : undefined;
-
-        if (votesForThisRef || delegation) {
-          userVoting.push({
-            address: acc.address,
-            trackId,
-            votes: votesForThisRef,
-            delegation
-          });
-        }
-      });
-
       return {
         ...item,
-        userVoting: userVoting.length > 0 ? userVoting : undefined
+        userVoting: getUserVotingListForReferendum({ referendum: item, govLockedInfos })
       };
     });
 
@@ -191,6 +156,8 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
 
     setReferendaItems(filteredExtended);
   }, [data?.pages, selectedReferendaCategory, govLockedInfos, isEnableVotedFilter, isEnableDelegatedFilter]);
+
+  const isLoading = isInitialLoading || isLoadingMore;
 
   return (
     <div
@@ -232,15 +199,15 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
         trackSelected={trackSelected}
       />
 
-      <ReferendaList
+      {!isInitialLoading && <ReferendaList
         chain={chainSlug}
         items={referendaItems}
         onClickItem={onClickReferendumItem}
-      />
+      />}
 
-      {isLoadingMore && selectedReferendaCategory !== ReferendaCategory.VOTED && (
-        <div className='__load-more-container'>
-          <ActivityIndicator size={token.sizeXL} />
+      {isLoading && selectedReferendaCategory !== ReferendaCategory.VOTED && (
+        <div className={CN('__load-more-container', { '-isInitial-loading': true })}>
+          <ActivityIndicator />
         </div>
       )}
 
@@ -286,7 +253,14 @@ export const OverviewView = styled(Component)<Props>(({ theme: { token } }: Prop
 
     '.__load-more-container': {
       textAlign: 'center',
-      marginBottom: token.margin
+      marginBottom: token.margin,
+      fontSize: token.sizeXL,
+
+      '&.-isInitial-loading': {
+        marginTop: token.marginXXL,
+        marginBottom: 0,
+        fontSize: token.sizeXXL
+      }
     }
   };
 });

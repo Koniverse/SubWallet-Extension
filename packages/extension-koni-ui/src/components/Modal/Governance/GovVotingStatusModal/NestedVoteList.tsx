@@ -12,7 +12,7 @@ import { Button, Icon, ModalContext, SwList, Web3Block } from '@subwallet/react-
 import CN from 'classnames';
 import { CaretRight, Copy, ListChecks, UsersThree } from 'phosphor-react';
 import { IconWeight } from 'phosphor-react/src/lib';
-import React, { forwardRef, useCallback, useContext, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -23,14 +23,16 @@ interface Props extends ThemeProps {
   chain: string;
   decimals: number;
   symbol: string;
+  containerModalId: string;
 }
 
-const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
+const Component = ({ accounts, chain, className, containerModalId, decimals, symbol }: Props) => {
   const { accountProxies, accounts: accountsState } = useSelector((state) => state.accountState);
   const [searchText, setSearchText] = useState('');
   const [viewDetailItem, setViewDetailItem] = useState<NestedAccount | undefined>(undefined);
   const notify = useNotification();
-  const { activeModal } = useContext(ModalContext);
+  const { activeModal, checkActive } = useContext(ModalContext);
+  const isModalActive = useMemo(() => checkActive(containerModalId), [checkActive, containerModalId]);
   const { t } = useTranslation();
 
   const onClickMore = useCallback((item: NestedAccount) => {
@@ -196,6 +198,12 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
     });
   }, [accounts, searchText]);
 
+  useEffect(() => {
+    if (!isModalActive) {
+      setSearchText('');
+    }
+  }, [isModalActive]);
+
   return (
     <div className={CN(className, '__nested-vote-list')}>
       <Search
@@ -226,7 +234,7 @@ const Component = ({ accounts, chain, className, decimals, symbol }: Props) => {
 
 export const NestedVoteList = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
-    maxHeight: 480,
+    maxHeight: '92%',
     display: 'flex',
     flexDirection: 'column',
 

@@ -25,9 +25,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
     label,
     logoKey,
     onChange,
-    tokenSymbol,
-    topRightPart,
-    value } = props;
+    statusHelp,
+    tokenSymbol, tooltip, topRightPart, value } = props;
 
   const inputRef = useForwardInputRef(ref);
 
@@ -57,11 +56,13 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
           />
         )}
         ref={inputRef}
+        statusHelp={statusHelp}
         suffix={ !!tokenSymbol && (
           <span className={'__symbol'}>
             {tokenSymbol}
           </span>
         )}
+        tooltip={tooltip}
         value={value}
       />
     </div>

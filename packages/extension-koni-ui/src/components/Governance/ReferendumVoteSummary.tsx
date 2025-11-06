@@ -1,7 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
+import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
+import { useGetNativeTokenBasicInfo, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { UserVoting } from '@subwallet/extension-koni-ui/types/gov';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
@@ -18,20 +20,21 @@ import NumberDisplay from '../NumberDisplay';
 type Props = ThemeProps & {
   userVoting?: UserVoting[];
   chain: string;
-  iconVoteStatSize?: string
+  iconVoteStatSize?: string;
+  isDependentOnAllAccount?: boolean;
 };
 
-const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, iconVoteStatSize = '12px', isDependentOnAllAccount = true, userVoting }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { decimals } = useGetNativeTokenBasicInfo(chain);
-
+  const isAllAccount = useSelector((state: RootState) => state.accountState.isAllAccount);
   const vote = userVoting?.[0].votes;
   const delegation = userVoting?.[0].delegation;
 
   return (
     <div className={CN(className, '__i-vote-summary')}>
       {!!userVoting && userVoting.length > 0
-        ? userVoting.length > 1
+        ? (isDependentOnAllAccount ? isAllAccount : userVoting.length > 1)
           ? (
             <div className='__i-vote-summary-label'>
               {t('Voted/Delegated with {{count}} accounts total', { count: userVoting.length })}
@@ -44,7 +47,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
                   <div className='__i-vote-summary-label'>
                     {t('Voted')}:&nbsp;
                   </div>
-                  {BigNumber(vote?.ayeAmount || 0).gt(0) && (
+                  {(BigNumber(vote?.ayeAmount || 0).gt(0) || vote.type !== GovVoteType.NAY) && (
                     <div className='__i-vote-stat -aye'>
                       <NumberDisplay
                         className='__i-vote-stat-value'
@@ -60,7 +63,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
                     </div>
                   )}
 
-                  {BigNumber(vote?.abstainAmount || 0).gt(0) && (
+                  {(BigNumber(vote?.abstainAmount || 0).gt(0) || vote.type === GovVoteType.ABSTAIN) && (
                     <div className='__i-vote-stat -abstain'>
                       <NumberDisplay
                         className='__i-vote-stat-value'
@@ -76,7 +79,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
                     </div>
                   )}
 
-                  {BigNumber(vote?.nayAmount || 0).gt(0) && (
+                  {(BigNumber(vote?.nayAmount || 0).gt(0) || vote.type !== GovVoteType.AYE) && (
                     <div className='__i-vote-stat -nay'>
                       <NumberDisplay
                         className='__i-vote-stat-value'
@@ -97,7 +100,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
               {!!delegation && (
                 <>
                   <div className='__i-vote-summary-label'>
-                    {t('Voted')}:&nbsp;
+                    {t('Delegated')}:&nbsp;
                   </div>
                   <NumberDisplay
                     className='__i-vote-stat-value'
@@ -110,7 +113,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', userVoting }: 
           )
         : (
           <div className='__i-vote-summary-label'>
-            {t('Not voted yet')}
+            {t('Not voted yet!')}
           </div>
         )
       }

@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field';
-import { govStatusItems } from '@subwallet/extension-koni-ui/constants';
+import { govStatusItemsByRefCategory } from '@subwallet/extension-koni-ui/constants';
 import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks';
+import { ReferendaCategory } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { GovStatusItem, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, InputRef, SelectModal } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -14,10 +15,11 @@ import styled, { useTheme } from 'styled-components';
 
 interface Props extends ThemeProps, BasicInputWrapper {
   loading?: boolean;
+  selectedReferendaCategory: ReferendaCategory;
 }
 
 function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> {
-  const { className = '', disabled, id = 'gov-status-input', label, loading, placeholder, statusHelp, title, tooltip, value } = props;
+  const { className = '', disabled, id = 'gov-status-input', label, loading, placeholder, selectedReferendaCategory, statusHelp, title, tooltip, value } = props;
   const { t } = useTranslation();
   const { token } = useTheme() as Theme;
   const { onSelect } = useSelectModalInputHelper(props, ref);
@@ -72,7 +74,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       id={id}
       inputClassName={`${className} gov-status-selector-input`}
       itemKey={'key'}
-      items={govStatusItems}
+      items={govStatusItemsByRefCategory[selectedReferendaCategory] || []}
       label={label}
       loading={loading}
       onSelect={onSelect}

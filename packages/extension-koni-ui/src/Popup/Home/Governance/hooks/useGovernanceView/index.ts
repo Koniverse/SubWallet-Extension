@@ -14,7 +14,7 @@ import { GovernanceViewContext, GovernanceViewEvent } from '../../types';
 import { safeView, transition } from './reduce';
 import { isValidView, parseUrlParams } from './url';
 
-const defaultChainSlug = 'polkadot';
+const defaultChainSlug = 'statemint';
 
 export const useGovernanceView = () => {
   const locationState = useLocation().state as GovernanceParam | undefined;

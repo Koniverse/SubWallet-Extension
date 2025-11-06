@@ -168,12 +168,12 @@ function Component ({ chain, className, govLockedInfos }: Props) {
             spaceSize='sm'
             valueColorScheme='light'
           >
-            <MetaInfo.Status
+            {lockedAmount.gt(BN_ZERO) && <MetaInfo.Status
               className={'__meta-locked-status-item'}
               label={renderAccount(item)}
               statusName={t('Unlockable')}
               valueColorSchema={'success'}
-            />
+            />}
 
             <MetaInfo.Number
               decimalOpacity={0.45}
@@ -225,7 +225,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
               decimals={decimals}
               label={t('Unlockable')}
               suffix={symbol}
-              value={item.summary.unlockable.balance}
+              value={lockedAmount}
               valueColorSchema='even-odd'
             />
 

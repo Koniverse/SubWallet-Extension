@@ -3,7 +3,7 @@
 
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { AccountProxyAvatar, MetaInfo, ReferendumTrackTag } from '@subwallet/extension-koni-ui/components';
-import { BLOCK_TIME_SEC } from '@subwallet/extension-koni-ui/constants';
+import { BLOCK_DURATION_SEC } from '@subwallet/extension-koni-ui/constants';
 import { useGetAccountByAddress, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
@@ -11,7 +11,7 @@ import { Button, Icon } from '@subwallet/react-ui';
 import { ReferendumDetail } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
 import { ArrowSquareOut, Copy } from 'phosphor-react';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -22,9 +22,13 @@ type Props = ThemeProps & {
 const BLOCK_TIME_DEFAULT = 6;
 
 const blocksToDaysLabel = (blocks: number, chainSlug: string) => {
-  const days = blocks / (86400 / (BLOCK_TIME_SEC[chainSlug] || BLOCK_TIME_DEFAULT));
+  const days = blocks / (86400 / (BLOCK_DURATION_SEC[chainSlug] || BLOCK_TIME_DEFAULT));
 
   return Number.isInteger(days) ? `${days} d` : `${days.toFixed(2)} d`;
+};
+
+const capitalize = (value: string): string => {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 };
 
 const Component = ({ chain, className, referendumDetail }: Props): React.ReactElement<Props> => {
@@ -36,6 +40,27 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
   const decisionAddress = referendumDetail.onchainData.info.decisionDeposit?.who;
   const proposerAccount = useGetAccountByAddress(proposerAddress);
   const decisionAccount = useGetAccountByAddress(decisionAddress);
+
+  const proposalCallContent = useMemo(() => {
+    const call = referendumDetail.onchainData?.proposal?.call;
+    const trackNames = [call?.section, call?.method].filter(Boolean);
+
+    return trackNames.length > 0
+      ? (
+        <MetaInfo.Default
+          className={'account-info-proposal-call'}
+          label={t('Call')}
+        >
+          {trackNames.map((name) => (
+            <ReferendumTrackTag
+              key={name}
+              trackName={capitalize(name)}
+            />
+          ))}
+        </MetaInfo.Default>
+      )
+      : null;
+  }, [referendumDetail.onchainData?.proposal?.call, t]);
 
   const _onClickCopyButton = useCallback((e: React.SyntheticEvent) => {
     e.stopPropagation();
@@ -213,13 +238,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
             type='ghost'
           />
         </MetaInfo.Default>
-        <MetaInfo.Default
-          label={t('Call')}
-        >
-          <ReferendumTrackTag
-            trackName={referendumDetail.onchainData.proposal.call.method}
-          />
-        </MetaInfo.Default>
+        {proposalCallContent}
       </MetaInfo>
     </MetaInfo>
   );
@@ -251,6 +270,12 @@ export const DetailsTab = styled(Component)<Props>(({ theme: { token } }: Props)
     '.account-info-proposal-hash .__value': {
       display: 'flex',
       alignItems: 'center'
+    },
+
+    '.account-info-proposal-call .__value': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.sizeXXS
     }
   };
 });

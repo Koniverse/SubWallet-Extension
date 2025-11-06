@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import GovAccountSelectoModal from '@subwallet/extension-koni-ui/components/Modal/Governance/GovAccountSelector';
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
@@ -10,15 +11,17 @@ import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/Wallet
 import { useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { chainSlugToPolkassemblySite, chainSlugToSubsquareSite } from '@subwallet/extension-koni-ui/Popup/Home/Governance/shared';
 import { ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
+import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { Button, ModalContext, SwSubHeader } from '@subwallet/react-ui';
 import { useQuery } from '@tanstack/react-query';
-import React, { useCallback, useContext, useEffect } from 'react';
+import React, { Context, useCallback, useContext, useEffect } from 'react';
+import { Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { ThemeContext } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { useGovReferendumVotes } from '../../hooks/useGovernanceView/useGovReferendumVotes';
@@ -37,11 +40,11 @@ const modalId = 'account-selector';
 const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance }: Props): React.ReactElement<Props> => {
   const { currentAccountProxy } = useSelector((state) => state.accountState);
   const navigate = useNavigate();
-
+  const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const { t } = useTranslation();
   const fromAccountProxy = getTransactionFromAccountProxyValue(currentAccountProxy);
 
-  const { accountAddressItems } = useGovReferendumVotes({
+  const { accountAddressItems, voteMap } = useGovReferendumVotes({
     chain: chainSlug,
     referendumId: referendumId,
     fromAccountProxy
@@ -86,10 +89,17 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
       openAlert({
         title: t('Unable to vote'),
         type: NotificationType.ERROR,
-        content: t(
-          "You're delegating votes for the referendum's track with account named {{name}}. Ask your delegatee to vote or remove your delegated votes, then try again",
-          { name: item.accountName }
-        ),
+        content:
+          <Trans
+            className={className}
+            components={{
+              highlight: (
+                <span style={{ color: token.colorTextLight2 }} />
+              )
+            }}
+            i18nKey={detectTranslate('You\'re delegating votes for the referendum\'s track with account named "<highlight>{{name}}</highlight>". Ask your delegatee to vote or remove your delegated votes, then try again')}
+            values={{ name: item.accountName }}
+          />,
         okButton: {
           text: t('I understand'),
           onClick: closeAlert
@@ -112,7 +122,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
       fromAccountProxy
     });
     navigate('/transaction/gov-ref-vote/standard');
-  }, [chainSlug, closeAlert, data?.track, fromAccountProxy, navigate, openAlert, referendumId, setGovRefVoteStorage, t]);
+  }, [chainSlug, className, closeAlert, data?.track, fromAccountProxy, navigate, openAlert, referendumId, setGovRefVoteStorage, t, token.colorTextLight2]);
 
   const onClickVote = useCallback(() => {
     if (accountAddressItems.length > 1) {
@@ -163,6 +173,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
             onClickVote={onClickVote}
             referendumDetail={data}
             sdkInstance={sdkInstance}
+            voteMap={voteMap}
           />
 
           { allSpends && (
@@ -255,6 +266,7 @@ export const ReferendumDetailView = styled(Component)<Props>(({ theme: { token }
       display: 'flex',
       gap: token.sizeSM,
       marginBottom: token.sizeXL,
+      marginTop: 'auto',
 
       '.footer-button-logo': {
         height: 28,

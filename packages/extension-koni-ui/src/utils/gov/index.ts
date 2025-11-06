@@ -1,10 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainAsset } from '@subwallet/chain-list/types';
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { _EXPECTED_BLOCK_TIME } from '@subwallet/extension-base/services/chain-service/constants';
 import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
-import { PreviousVoteAmountDetail, VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
+import { reformatAddress } from '@subwallet/extension-base/utils';
+import { useGetGovLockedInfos } from '@subwallet/extension-koni-ui/hooks';
+import { PreviousVoteAmountDetail, UserVoting, VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
 import { GOV_ONGOING_STATES, GovStatusKey, Referendum, ReferendumDetail, ReferendumVoteDetail, Tally } from '@subwallet/subsquare-api-sdk';
 import BigNumber from 'bignumber.js';
 
@@ -330,3 +332,62 @@ export const getPreviousVoteAmountDetail = (voteInfo?: ReferendumVoteDetail): Pr
 export const calculateTotalAmountVotes = (details: VoteAmountDetailProps): BigNumber => {
   return (['ayeAmount', 'nayAmount', 'abstainAmount'] as (keyof VoteAmountDetailProps)[]).reduce((sum, key) => sum.plus((details[key] as string) || 0), new BigNumber(0));
 };
+
+interface GetUserVotingListForReferendumParams {
+  referendum: Referendum | ReferendumDetail;
+  govLockedInfos: ReturnType<typeof useGetGovLockedInfos>;
+  chainInfo?: _ChainInfo;
+  voteMap?: Map<string, ReferendumVoteDetail>;
+}
+
+export const getUserVotingListForReferendum = ({ chainInfo, govLockedInfos, referendum, voteMap }: GetUserVotingListForReferendumParams): UserVoting[] | undefined => {
+  if (!referendum || referendum.version === 1) {
+    return;
+  }
+
+  const trackId = Number(referendum.trackInfo.id);
+  const refIndex = Number(referendum.referendumIndex);
+  const userVoting: UserVoting[] = [];
+
+  for (const acc of (govLockedInfos || [])) {
+    const track = acc.tracks?.find((t) => Number(t.trackId) === trackId);
+
+    if (!track) {
+      continue;
+    }
+
+    const votesForThisRef = track.votes?.find((v) => Number(v.referendumIndex) === refIndex);
+
+    // Skip if neither direct vote nor delegation present
+    if (!votesForThisRef && !track.delegation) {
+      continue;
+    }
+
+    if (track.delegation && voteMap) {
+      const target = track.delegation.target?.toLowerCase();
+      const delegationVote = target ? voteMap.get(target) : undefined;
+
+      if (!delegationVote || Number(delegationVote.referendumIndex) !== refIndex) {
+        continue;
+      }
+    } else if (!track.delegation && voteMap) {
+      const addressFormatted = reformatAddress(acc.address, chainInfo?.substrateInfo?.addressPrefix);
+      const selfVote = addressFormatted ? voteMap.get(addressFormatted.toLowerCase()) : undefined;
+
+      if (!selfVote || Number(selfVote.referendumIndex) !== refIndex) {
+        continue;
+      }
+    }
+
+    userVoting.push({
+      address: acc.address,
+      trackId,
+      votes: votesForThisRef,
+      delegation: track.delegation
+    });
+  }
+
+  return userVoting.length > 0 ? userVoting : undefined;
+};
+
+export * from './votingStats';

@@ -5,8 +5,9 @@ import { ReferendumStatusTag, ReferendumTrackTag, ReferendumVoteProgressBar } fr
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ReferendumWithVoting } from '@subwallet/extension-koni-ui/types/gov';
 import { getMinApprovalThreshold, getTallyVotesBarPercent, getTimeLeft } from '@subwallet/extension-koni-ui/utils/gov';
+import { GOV_COMPLETED_STATES, GOV_PREPARING_STATES } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -28,6 +29,16 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
 
   const thresholdPercent = getMinApprovalThreshold(item);
   const refStatus = item.state.name;
+
+  const timeLeftContent = useMemo(() => {
+    const time = timeLeft ?? '';
+    const isPreparing = GOV_PREPARING_STATES.includes(refStatus);
+    const isAyeLeading = ayesPercent > naysPercent;
+
+    return isPreparing
+      ? (isAyeLeading ? t('Decision starts in {{time}}', { time }) : t('Time out in {{time}}', { time }))
+      : (isAyeLeading ? t('Approve in {{time}}', { time }) : t('Reject in {{time}}', { time }));
+  }, [ayesPercent, naysPercent, refStatus, t, timeLeft]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -72,28 +83,23 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
         thresholdPercent={thresholdPercent}
       />
 
-      <>
-        <div className='__i-separator' />
-        <div className='__i-vote-summary-area'>
-          <ReferendumVoteSummary
-            chain={chain}
-            userVoting={item.userVoting}
-          />
-          {!!timeLeft && (
-            <div className='__i-time-left'>
-              {
-                ayesPercent > naysPercent
-                  ? t('Approve in {{time}}', {
-                    time: timeLeft
-                  })
-                  : t('Reject in {{time}}', {
-                    time: timeLeft
-                  })
-              }
-            </div>
-          )}
-        </div>
-      </>
+      {(!item.userVoting?.length && GOV_COMPLETED_STATES.includes(item.state.name))
+        ? <></>
+        : <>
+          <div className='__i-separator' />
+          <div className='__i-vote-summary-area'>
+            <ReferendumVoteSummary
+              chain={chain}
+              userVoting={item.userVoting}
+            />
+            {!!timeLeft && (
+              <div className='__i-time-left'>
+                {timeLeftContent}
+              </div>
+            )}
+          </div>
+        </>
+      }
     </div>
   );
 };

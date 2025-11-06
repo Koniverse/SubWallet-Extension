@@ -29,11 +29,11 @@ export const _PURE_EVM_CHAINS = ['binance', 'binance_test', 'ethereum', 'ethereu
 
 export const _GOVERNANCE_CHAIN_GROUP = {
   polkadot: [
-    'polkadot', 'bifrost_dot', 'hydradx_main', 'ajunaPolkadot', 'astar', 'phala',
+    'statemint', 'bifrost_dot', 'hydradx_main', 'ajunaPolkadot', 'astar', 'phala',
     'litentry', 'acala', 'centrifuge', 'interlay', 'laos_network'
   ],
   kusama: [
-    'kusama', 'bifrost', 'basilisk', 'karura', 'kintsugi'
+    'statemine', 'bifrost', 'basilisk', 'karura', 'kintsugi'
   ],
   westend_assethub: [
     'westend_assethub'

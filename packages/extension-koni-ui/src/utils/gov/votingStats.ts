@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
-import { GovVoteSide } from '@subwallet/extension-koni-ui/types/gov';
+import { GovVoteSide, GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
 import BigNumber from 'bignumber.js';
 
@@ -87,7 +87,7 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
   };
 
   const addFlattened = (side: GovVoteSide, sideEntry: ReferendumVoteDetail, amountBn: BigNumber) => {
-    if (amountBn.lte(0)) {
+    if (amountBn.lt(0)) {
       return;
     }
 
@@ -100,7 +100,7 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
     if (voter.isDelegating && voter.target) {
       const delegatorVotesBn = new BigNumber(voter.votes || 0);
 
-      if (delegatorVotesBn.gt(0)) {
+      if (delegatorVotesBn.gte(0)) {
         const target = voter.target;
 
         if (!nestedMap[target]) {
@@ -142,19 +142,19 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
       const nayBalanceBn = new BigNumber(voter.nayBalance || 0);
       const abstainBalanceBn = new BigNumber(voter.abstainBalance || 0);
 
-      if (ayeVotesBn.gt(0)) {
+      if (ayeVotesBn.gte(0)) {
         const sideEntry = buildSideEntry(voter, GovVoteType.AYE, ayeVotesBn, ayeBalanceBn);
 
         addFlattened(GovVoteType.AYE, sideEntry, ayeVotesBn);
       }
 
-      if (nayVotesBn.gt(0)) {
+      if (nayVotesBn.gte(0)) {
         const sideEntry = buildSideEntry(voter, GovVoteType.NAY, nayVotesBn, nayBalanceBn);
 
         addFlattened(GovVoteType.NAY, sideEntry, nayVotesBn);
       }
 
-      if (abstainVotesBn.gt(0)) {
+      if (abstainVotesBn.gte(0)) {
         const sideEntry = buildSideEntry(voter, GovVoteType.ABSTAIN, abstainVotesBn, abstainBalanceBn);
 
         addFlattened(GovVoteType.ABSTAIN, sideEntry, abstainVotesBn);
@@ -170,13 +170,13 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
       const ayeBalanceBn = new BigNumber(voter.ayeBalance || 0);
       const nayBalanceBn = new BigNumber(voter.nayBalance || 0);
 
-      if (ayeVotesBn.gt(0)) {
+      if (ayeVotesBn.gte(0)) {
         const sideEntry = buildSideEntry(voter, GovVoteType.AYE, ayeVotesBn, ayeBalanceBn);
 
         addFlattened(GovVoteType.AYE, sideEntry, ayeVotesBn);
       }
 
-      if (nayVotesBn.gt(0)) {
+      if (nayVotesBn.gte(0)) {
         const sideEntry = buildSideEntry(voter, GovVoteType.NAY, nayVotesBn, nayBalanceBn);
 
         addFlattened(GovVoteType.NAY, sideEntry, nayVotesBn);
@@ -196,7 +196,7 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
       let finalVotesBn = selfVotesBn;
       let finalBalanceBn = selfBalanceBn;
 
-      if (!hasDelegators && delegatedVotesBn.gt(0)) {
+      if (!hasDelegators && delegatedVotesBn.gte(0)) {
         finalVotesBn = selfVotesBn.plus(delegatedVotesBn);
         finalBalanceBn = selfBalanceBn.plus(delegatedCapitalBn);
 
@@ -214,7 +214,7 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
         }
       }
 
-      if (finalVotesBn.gt(0)) {
+      if (finalVotesBn.gte(0)) {
         const side = voter.aye === true ? GovVoteType.AYE : voter.aye === false ? GovVoteType.NAY : GovVoteType.AYE;
         const sideEntry = buildSideEntry(voter, side, finalVotesBn, finalBalanceBn);
 
@@ -248,3 +248,13 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
 
   return result;
 }
+
+export const getAccountVoteStatus = (address: string, voteMap: Map<string, ReferendumVoteDetail>): GovVoteStatus => {
+  const voteDetail = voteMap.get(address.toLowerCase());
+
+  if (!voteDetail) {
+    return GovVoteStatus.NOT_VOTED;
+  }
+
+  return voteDetail.isDelegating ? GovVoteStatus.DELEGATED : GovVoteStatus.VOTED;
+};

@@ -43,6 +43,6 @@ export function isValidView (v: any): v is GovernanceScreenView {
   return (
     v === GovernanceScreenView.OVERVIEW ||
     v === GovernanceScreenView.REFERENDUM_DETAIL ||
-    v === GovernanceScreenView.OVERVIEW
+    v === GovernanceScreenView.UNLOCK_TOKEN
   );
 }

@@ -3,6 +3,7 @@
 
 import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { detectTranslate } from '@subwallet/extension-base/utils';
+import { ReferendaCategory } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { GovStatusKey } from '@subwallet/subsquare-api-sdk';
 import { ArrowsOutLineHorizontal, CheckCircle, CircleHalf, ClipboardText, ClockAfternoon, HourglassHigh, Prohibit, RocketLaunch, Scales, Skull, Stack, ThumbsDown, ThumbsUp, XCircle } from 'phosphor-react';
 
@@ -45,6 +46,18 @@ export const govStatusItems: GovStatusItem[] = [
   govStatusDisplayMap[GovStatusKey.CANCELLED],
   govStatusDisplayMap[GovStatusKey.KILLED]
 ];
+
+export const ongoingGovStatusItems: GovStatusItem[] = [
+  govStatusDisplayMap[GovStatusKey.PREPARING],
+  govStatusDisplayMap[GovStatusKey.DECIDING],
+  govStatusDisplayMap[GovStatusKey.CONFIRMING],
+  govStatusDisplayMap[GovStatusKey.QUEUEING]
+];
+
+export const govStatusItemsByRefCategory: Record<string, GovStatusItem[]> = {
+  [ReferendaCategory.ALL]: govStatusItems,
+  [ReferendaCategory.ONGOING]: ongoingGovStatusItems
+};
 
 export const democracyGovStatusItems: GovStatusItem[] = [
   govStatusDisplayMap[GovStatusKey.STARTED],

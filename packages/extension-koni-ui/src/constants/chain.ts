@@ -3,10 +3,12 @@
 
 export const RELAY_CHAINS_TO_MIGRATE: string[] = ['polkadot', 'kusama', 'westend', 'paseoTest'];
 
-export const BLOCK_TIME_SEC: Record<string, number> = { // in seconds
+export const BLOCK_DURATION_SEC: Record<string, number> = { // in seconds
   polkadot: 6,
   kusama: 6,
   westend: 6,
+  statemine: 12,
+  statemint: 12,
   vara_network: 3,
   vara_testnet: 3,
   bifrost: 6,

@@ -1,13 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { govConvictionOptions } from '@subwallet/extension-base/services/open-gov/interface';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { GOV_DELEGATION_DETAILS_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { NestedAccount } from '@subwallet/extension-koni-ui/utils/gov/votingStats';
 import { ModalContext, SwModal } from '@subwallet/react-ui';
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 
 import { FlattenedVoteList } from './FlattenedVoteList';
@@ -30,6 +31,12 @@ function Component (props: Props): React.ReactElement<Props> {
 
     onCancel && onCancel();
   }, [inactiveModal, onCancel]);
+
+  const convictionSelVotes = useMemo(() => {
+    const convictionOption = govConvictionOptions.find((opt) => opt.value === nestedAccount.accountInfo.conviction);
+
+    return convictionOption ? convictionOption.label : `${nestedAccount.accountInfo.conviction}x`;
+  }, [nestedAccount.accountInfo.conviction]);
 
   return (
     <SwModal
@@ -55,7 +62,7 @@ function Component (props: Props): React.ReactElement<Props> {
           className={'__delegation-item-votes'}
           label={t('Conviction')}
         >
-          {nestedAccount.accountInfo.conviction}
+          {convictionSelVotes}
         </MetaInfo.Default>
         <MetaInfo.Number
           className={'__delegation-item-votes'}

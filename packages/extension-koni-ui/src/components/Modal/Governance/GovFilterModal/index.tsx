@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BasicInputEvent } from '@subwallet/extension-koni-ui/components';
+import { ReferendaCategory } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon, Switch, SwModal, Tooltip } from '@subwallet/react-ui';
 import { ALL_TRACK_ID, GovStatusKey, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
@@ -29,6 +30,7 @@ interface Props extends ThemeProps {
   setIsEnableVotedFilter: (value: boolean) => void;
   setIsEnableDelegatedFilter: (value: boolean) => void;
   statusSelected: GovStatusKey;
+  selectedReferendaCategory: ReferendaCategory;
   setStatusSelected: (value: GovStatusKey) => void;
   trackSelected: string;
   setTrackSelected: (value: string) => void;
@@ -37,7 +39,7 @@ interface Props extends ThemeProps {
 
 function Component (props: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
-  const { applyFilterButtonTitle, chain, className = '', closeIcon, id, isEnableTreasuryFilter, onApplyFilter, onCancel, sdkInstance, setIsEnableTreasuryFilter, setStatusSelected, setTrackSelected, statusSelected, title, trackSelected } = props;
+  const { applyFilterButtonTitle, chain, className = '', closeIcon, id, isEnableTreasuryFilter, onApplyFilter, onCancel, sdkInstance, selectedReferendaCategory, setIsEnableTreasuryFilter, setStatusSelected, setTrackSelected, statusSelected, title, trackSelected } = props;
 
   const filterModalFooter = useMemo(() => {
     return (
@@ -165,6 +167,7 @@ function Component (props: Props): React.ReactElement<Props> {
         <GovStatusSelector
           label={t('Status')}
           onChange={onSelectStatus}
+          selectedReferendaCategory={selectedReferendaCategory}
           value={statusSelected}
         />
       </div>

@@ -159,7 +159,7 @@ export class SubsquareApiSdk {
       { params: { text } }
     );
 
-    if (referendaRes.data?.democracyReferenda) {
+    if (referendaRes.data?.democracyReferenda?.length) {
       const democracyReferenda = referendaRes.data.democracyReferenda.map(castDemocracyReferendumToReferendum<Referendum>);
 
       return { govReferenda: [...democracyReferenda] };

@@ -6,8 +6,10 @@ import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useTransactionContext } from '@subwallet/extension-koni-ui/hooks';
 import { useGovReferendumVotes } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView/useGovReferendumVotes';
 import { GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
+import { getAccountVoteStatus } from '@subwallet/extension-koni-ui/utils';
 import CN from 'classnames';
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { Outlet } from 'react-router';
 import styled from 'styled-components';
 
@@ -26,9 +28,21 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     fromAccountProxy: defaultData.fromAccountProxy
   });
 
+  const filteredAccountItems = useMemo(() => {
+    if (!accountAddressItems.length) {
+      return accountAddressItems;
+    }
+
+    return accountAddressItems.filter((item) => {
+      const status = getAccountVoteStatus(item.address, voteMap);
+
+      return status !== GovVoteStatus.DELEGATED;
+    });
+  }, [accountAddressItems, voteMap]);
+
   return (
     <>
-      <Outlet context={{ voteMap, accountAddressItems }} />
+      <Outlet context={{ voteMap, accountAddressItems: filteredAccountItems }} />
     </>
   );
 };
@@ -54,8 +68,11 @@ const ReferendumVote = styled(Wrapper)<WrapperProps>(({ theme: { token } }: Wrap
       overflow: 'auto',
       display: 'flex',
       flexDirection: 'column'
-    }
+    },
 
+    '.free-balance': {
+      marginBottom: 0
+    }
   };
 });
 

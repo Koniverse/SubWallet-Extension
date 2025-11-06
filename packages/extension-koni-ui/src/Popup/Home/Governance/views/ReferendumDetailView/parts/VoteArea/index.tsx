@@ -3,13 +3,13 @@
 
 import { ReferendumVoteProgressBar, ReferendumVoteSummary } from '@subwallet/extension-koni-ui/components';
 import { GovVotedAccountsModal } from '@subwallet/extension-koni-ui/components/Modal';
-import { useGetGovLockedInfos, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetGovLockedInfos, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { UserVoting } from '@subwallet/extension-koni-ui/types/gov';
-import { getMinApprovalThreshold, getTallyVotesBarPercent, getTimeLeft, GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
+import { getMinApprovalThreshold, getTallyVotesBarPercent, getTimeLeft, getUserVotingListForReferendum, GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { formatVoteResult } from '@subwallet/extension-koni-ui/utils/gov/votingStats';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
-import { ReferendumDetail, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
+import { GOV_COMPLETED_STATES, GOV_PREPARING_STATES, ReferendumDetail, ReferendumVoteDetail, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { useQuery } from '@tanstack/react-query';
 import { Clock, Info } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -21,18 +21,21 @@ type Props = ThemeProps & {
   referendumDetail: ReferendumDetail,
   onClickVote: VoidFunction;
   chain: string
-  sdkInstance?: SubsquareApiSdk
+  sdkInstance?: SubsquareApiSdk;
+  voteMap?: Map<string, ReferendumVoteDetail>;
 };
 
 const GovVotedAccountsModalId = 'gov-voted-accounts-modal';
 
-const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstance }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstance, voteMap }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { ayesPercent, naysPercent } = getTallyVotesBarPercent(referendumDetail.onchainData.tally);
   const referendumId = referendumDetail?.referendumIndex;
   const thresholdPercent = getMinApprovalThreshold(referendumDetail);
   const govLockedInfos = useGetGovLockedInfos();
   const { activeModal } = useContext(ModalContext);
+  const isAllAccount = useSelector((state) => state.accountState.isAllAccount);
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const [timeLeft, setTimeLeft] = useState<string | undefined>(() =>
     getTimeLeft(referendumDetail, chain)
   );
@@ -42,38 +45,18 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
       return [];
     }
 
-    const userVoting: UserVoting[] = [];
-    const trackId = Number(referendumDetail.trackInfo.id);
+    return getUserVotingListForReferendum({ referendum: referendumDetail, govLockedInfos, voteMap, chainInfo: chainInfoMap[chain] });
+  }, [chain, chainInfoMap, govLockedInfos, referendumDetail, voteMap]);
 
-    (govLockedInfos || []).forEach((acc) => {
-      if (acc.chain !== chain) {
-        return;
-      }
+  const timeLeftContent = useMemo(() => {
+    const time = timeLeft ?? '';
+    const isPreparing = GOV_PREPARING_STATES.includes(referendumDetail.state.name);
+    const isAyeLeading = ayesPercent > naysPercent;
 
-      const track = acc.tracks?.find((t) => Number(t.trackId) === trackId);
-
-      if (!track) {
-        return;
-      }
-
-      const votesForThisRef = track.votes?.find(
-        (v) => Number(v.referendumIndex) === referendumDetail.referendumIndex
-      );
-
-      const delegation = track.delegation ? { ...track.delegation } : undefined;
-
-      if (votesForThisRef || delegation) {
-        userVoting.push({
-          address: acc.address,
-          trackId,
-          votes: votesForThisRef,
-          delegation
-        });
-      }
-    });
-
-    return userVoting.length > 0 ? userVoting : undefined;
-  }, [chain, govLockedInfos, referendumDetail]);
+    return isPreparing
+      ? (isAyeLeading ? t('Decision starts in {{time}}', { time }) : t('Time out in {{time}}', { time }))
+      : (isAyeLeading ? t('Approve in {{time}}', { time }) : t('Reject in {{time}}', { time }));
+  }, [ayesPercent, naysPercent, referendumDetail.state.name, t, timeLeft]);
 
   const { data } = useQuery({
     queryKey: GOV_QUERY_KEYS.referendumVotes(chain, referendumId),
@@ -93,6 +76,10 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   const openUserVotingInfo = useCallback(() => {
     activeModal(GovVotedAccountsModalId);
   }, [activeModal]);
+
+  const isDisabledVoteButton = useMemo(() => {
+    return referendumDetail.version === 1 || GOV_COMPLETED_STATES.includes(referendumDetail.state.name) || (userVotingInfo?.length === 1 && !!userVotingInfo[0].delegation?.target);
+  }, [referendumDetail.state.name, referendumDetail.version, userVotingInfo]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -114,11 +101,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
               weight={'fill'}
             />
             <div>
-              {
-                ayesPercent > naysPercent
-                  ? t('Approve in {{timeLeft}}', { timeLeft })
-                  : t('Reject in {{timeLeft}}', { timeLeft })
-              }
+              {timeLeftContent}
             </div>
           </div>
         )}
@@ -132,24 +115,21 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
           thresholdPercent={thresholdPercent}
         />
 
-        {!!userVotingInfo &&
+        {!!userVotingInfo?.length &&
           <div className={'__i-vote-summary-total'}>
             <ReferendumVoteSummary
               chain={chain}
               iconVoteStatSize={'16px'}
               userVoting={userVotingInfo}
             />
-
-            {userVotingInfo.length > 1 &&
-              <div onClick={openUserVotingInfo}>
-                <Icon
-                  className={'__i-vote-summary-total-info'}
-                  customSize={'16px'}
-                  phosphorIcon={Info}
-                  weight={'bold'}
-                />
-              </div>
-            }
+            {isAllAccount && <div onClick={openUserVotingInfo}>
+              <Icon
+                className={'__i-vote-summary-total-info'}
+                customSize={'16px'}
+                phosphorIcon={Info}
+                weight={'bold'}
+              />
+            </div>}
           </div>
         }
 
@@ -162,10 +142,10 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
 
       <Button
         block={true}
-        disabled={referendumDetail.version === 1}
+        disabled={isDisabledVoteButton}
         onClick={onClickVote}
       >
-        {t('Vote')}
+        {(userVotingInfo?.length === 1 && !!userVotingInfo[0].votes) ? t('Revote') : t('Vote')}
       </Button>
 
       {!!userVotingInfo && <GovVotedAccountsModal

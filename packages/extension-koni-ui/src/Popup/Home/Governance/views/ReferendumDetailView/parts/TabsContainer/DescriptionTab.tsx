@@ -84,7 +84,7 @@ export const DescriptionTab = styled(Component)<Props>(({ theme: { token } }: Pr
       bottom: 0,
       left: '50%',
       transform: 'translateX(-50%)',
-      width: '358px',
+      width: '100%',
       height: '78px',
       display: 'flex',
       justifyContent: 'center',

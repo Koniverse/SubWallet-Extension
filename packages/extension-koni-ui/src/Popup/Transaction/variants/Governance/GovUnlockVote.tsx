@@ -5,7 +5,7 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, HiddenInput, MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/components';
-import { BN_ZERO, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, GOV_UNLOCK_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useDefaultNavigate, useGetGovLockedInfos, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleUnlockVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
@@ -20,7 +20,6 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { useLocalStorage } from 'usehooks-ts';
 
 import { FreeBalance, TransactionContent, TransactionFooter } from '../../parts';
 
@@ -38,7 +37,6 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const { className = '', isAllAccount } = props;
   const { t } = useTranslation();
   const { defaultData, persistData, setBackProps } = useTransactionContext<GovUnlockVoteParams>();
-  const [, setGovUnlockVoteStorage] = useLocalStorage(GOV_UNLOCK_VOTE_TRANSACTION, DEFAULT_GOV_UNLOCK_VOTE_PARAMS);
   const formDefault = useMemo((): GovUnlockVoteParams => ({ ...defaultData }), [defaultData]);
   const [form] = Form.useForm<GovUnlockVoteParams>();
   const [loading, setLoading] = useState(false);
@@ -102,14 +100,9 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       .finally(() => setLoading(false));
   }, [chainValue, onError, onSuccess]);
 
-  const goHome = useCallback(() => {
-    setGovUnlockVoteStorage({
-      ...DEFAULT_GOV_UNLOCK_VOTE_PARAMS,
-      fromAccountProxy: defaultData.fromAccountProxy,
-      chain: defaultData.chain
-    });
-    navigate('/home/governance');
-  }, [defaultData.chain, defaultData.fromAccountProxy, navigate, setGovUnlockVoteStorage]);
+  const goBack = useCallback(() => {
+    navigate(`/home/governance?view=unlock-token&chainSlug=${chainValue}`);
+  }, [chainValue, navigate]);
 
   const selectedLockInfo = useMemo(() => {
     return govLockInfo.find((info) => isSameAddress(info.address, fromValue));
@@ -132,20 +125,6 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   }, [selectedLockInfo]);
 
   useEffect(() => {
-    setBackProps((prev) => ({
-      ...prev,
-      onClick: goHome
-    }));
-
-    return () => {
-      setBackProps((prev) => ({
-        ...prev,
-        onClick: null
-      }));
-    };
-  }, [goHome, setBackProps, setGovUnlockVoteStorage]);
-
-  useEffect(() => {
     if (selectedLockInfo) {
       form.setFieldsValue({
         referendumIds: selectedLockInfo.summary.unlockable.unlockableReferenda,
@@ -162,6 +141,20 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       } as GovUnlockVoteParams);
     }
   }, [form, fromValue, selectedLockInfo, persistData, defaultData]);
+
+  useEffect(() => {
+    setBackProps((prevState) => ({
+      ...prevState,
+      onClick: goBack
+    }));
+
+    return () => {
+      setBackProps((prevState) => ({
+        ...prevState,
+        onClick: null
+      }));
+    };
+  }, [chainValue, goBack, navigate, setBackProps]);
 
   return (
     <>
@@ -239,7 +232,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
               weight='fill'
             />
           )}
-          onClick={goHome}
+          onClick={goBack}
           schema={'secondary'}
         >
           {t('Cancel')}

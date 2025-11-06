@@ -15,8 +15,7 @@ import { VoteButton } from '@subwallet/extension-koni-ui/Popup/Transaction/varia
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovAccountAddressItemType, GovVoteStatus, PreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/types/gov';
-import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils';
-import { getPreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/utils/gov';
+import { convertFieldToObject, getAccountVoteStatus, getPreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Form, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
 import BigN, { BigNumber } from 'bignumber.js';
@@ -49,9 +48,9 @@ const getConvictionDescription = (value?: number): string => {
 const PreviousVoteDetailModalId = 'previous-vote-detail-modal';
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
-  const { className = '', targetAccountProxy } = props;
+  const { className = '', isAllAccount, targetAccountProxy } = props;
   const { t } = useTranslation();
-  const { defaultData, persistData, setCustomScreenTitle, setSubHeaderRightButtons } = useTransactionContext<GovReferendumVoteParams>();
+  const { defaultData, persistData, setBackProps, setCustomScreenTitle, setSubHeaderRightButtons } = useTransactionContext<GovReferendumVoteParams>();
   const [govRefVoteStorage, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData, from: govRefVoteStorage.from, fromAccountProxy: govRefVoteStorage.fromAccountProxy }), [defaultData, govRefVoteStorage.from, govRefVoteStorage.fromAccountProxy]);
   const [, setGovRefUnvoteStorage] = useLocalStorage(GOV_REFERENDUM_UNVOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS);
@@ -67,8 +66,6 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
   const [isDisable, setIsDisable] = useState(false);
   const [voteType, setVoteType] = useState<GovVoteType | null>(null);
-
-  const [initialAccountType, setInitialAccountType] = useState<GovVoteStatus | null>(null);
 
   const navigate = useNavigate();
   const fromValue = useWatchTransaction('from', form, defaultData);
@@ -148,7 +145,6 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
   const handleVoteClick = useCallback((type: GovVoteType) => {
     setVoteType(type);
-    setLoadingButton(type);
     form.submit();
   }, [form]);
 
@@ -174,6 +170,8 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     if (!voteType) {
       return;
     }
+
+    setLoadingButton(voteType);
 
     if (voteType === GovVoteType.AYE || voteType === GovVoteType.NAY) {
       const voteRequest: StandardVoteRequest = {
@@ -239,37 +237,14 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     setIsDisable(false);
   }, [lockedValue, form, standardRenderKey, assetInfo]);
 
-  const getAccountVoteStatus = useCallback((address: string): GovVoteStatus => {
-    const voteDetail = voteMap.get(address.toLowerCase());
-
-    if (!voteDetail) {
-      return GovVoteStatus.NOT_VOTED;
-    }
-
-    return voteDetail.isDelegating ? GovVoteStatus.DELEGATED : GovVoteStatus.VOTED;
-  }, [voteMap]);
-
-  // Filter accounts based on initial account type
-  const filteredAccountItems = useMemo(() => {
-    if (!initialAccountType || !accountAddressItems.length) {
-      return accountAddressItems;
-    }
-
-    return accountAddressItems.filter((item) => {
-      const status = getAccountVoteStatus(item.address);
-
-      return status === initialAccountType;
-    });
-  }, [accountAddressItems, initialAccountType, getAccountVoteStatus]);
-
   // Determine current vote status for title
   const currentVoteStatus = useMemo(() => {
     if (!fromValue) {
       return null;
     }
 
-    return getAccountVoteStatus(fromValue);
-  }, [fromValue, getAccountVoteStatus]);
+    return getAccountVoteStatus(fromValue, voteMap);
+  }, [fromValue, voteMap]);
 
   const screenTitle = useMemo(() => {
     if (currentVoteStatus === GovVoteStatus.VOTED) {
@@ -362,6 +337,22 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   }, [setSubHeaderRightButtons, subHeaderButtons]);
 
   useEffect(() => {
+    setBackProps((prevState) => ({
+      ...prevState,
+      onClick: () => {
+        navigate(`/home/governance?view=referendum-detail&chainSlug=${chainValue}&referendumId=${referendumId}`);
+      }
+    }));
+
+    return () => {
+      setBackProps((prevState) => ({
+        ...prevState,
+        onClick: null
+      }));
+    };
+  }, [chainValue, navigate, referendumId, setBackProps]);
+
+  useEffect(() => {
     const updateFromValue = () => {
       if (!accountAddressItems.length) {
         return;
@@ -372,25 +363,16 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
         if (!fromValue || singleAccount.address !== fromValue) {
           form.setFieldValue('from', singleAccount.address);
-
-          const status = getAccountVoteStatus(singleAccount.address);
-
-          setInitialAccountType(status);
         }
       } else {
         if (fromValue && !accountAddressItems.some((i) => i.address === fromValue)) {
           form.setFieldValue('from', '');
-          setInitialAccountType(null);
-        } else if (fromValue && !initialAccountType) {
-          const status = getAccountVoteStatus(fromValue);
-
-          setInitialAccountType(status);
         }
       }
     };
 
     updateFromValue();
-  }, [accountAddressItems, form, fromValue, getAccountVoteStatus, initialAccountType]);
+  }, [accountAddressItems, form, fromValue]);
 
   return (
     <>
@@ -410,8 +392,9 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             >
               <AccountAddressSelector
                 avatarSize={20}
+                disabled={!isAllAccount}
                 isGovModal
-                items={filteredAccountItems}
+                items={accountAddressItems}
               />
             </Form.Item>
 

@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const chainSlugToSubsquareApi: Record<string, string> = {
-  polkadot: 'polkadot',
+  statemint: 'polkadot',
   bifrost_dot: 'bifrost',
   hydradx_main: 'hydration',
-  kusama: 'kusama',
+  statemine: 'kusama',
   bifrost: 'bifrostk',
   basilisk: 'basilisk',
   westend_assethub: 'westend',
@@ -26,10 +26,10 @@ export const chainSlugToSubsquareApi: Record<string, string> = {
 };
 
 export const chainSlugToSubsquareSite: Record<string, string> = {
-  polkadot: 'polkadot',
+  statemint: 'polkadot',
   bifrost_dot: 'bifrost',
   hydradx_main: 'hydration',
-  kusama: 'kusama',
+  statemine: 'kusama',
   bifrost: 'bifrost-kusama',
   basilisk: 'basilisk',
   westend_assethub: 'westend',
@@ -50,9 +50,9 @@ export const chainSlugToSubsquareSite: Record<string, string> = {
 };
 
 export const chainSlugToPolkassemblySite: Record<string, string> = {
-  polkadot: 'polkadot',
+  statemint: 'polkadot',
   hydradx_main: 'hydradx',
-  kusama: 'kusama',
+  statemine: 'kusama',
   basilisk: 'basilisk',
   westend_assethub: 'westend',
   paseo_assethub: 'paseo',

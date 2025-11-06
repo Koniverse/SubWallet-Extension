@@ -29,7 +29,6 @@ const Component = (props: Props) => {
   const { t } = useTranslation();
   const { inactiveModal } = useContext(ModalContext);
   const { token } = useTheme() as Theme;
-
   const [isNested, setIsNested] = useState(true);
 
   const onCancel = useCallback(() => {
@@ -88,6 +87,7 @@ const Component = (props: Props) => {
           ? <NestedVoteList
             accounts={voteData.accounts.nested}
             chain={chain}
+            containerModalId={modalId}
             decimals={decimal}
             symbol={symbol}
           />

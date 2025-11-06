@@ -74,6 +74,7 @@ const Component = (props: Props) => {
           <ReferendumVoteSummary
             chain={chain}
             iconVoteStatSize={'16px'}
+            isDependentOnAllAccount={false}
             userVoting={[userVoting]}
           />
         </div>
@@ -113,7 +114,8 @@ const GovVotedAccountsModal = styled(forwardRef(Component))<Props>(({ theme: { t
       overflow: 'hidden',
       display: 'flex',
       flexDirection: 'column',
-      height: 544
+      height: 544,
+      overflowY: 'scroll'
     },
 
     '.__account-voted-list': {

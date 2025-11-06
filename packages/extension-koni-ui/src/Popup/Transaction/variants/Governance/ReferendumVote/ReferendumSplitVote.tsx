@@ -41,7 +41,7 @@ const CONVICTION_DEFAULT = 0.1;
 
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   // @ts-ignore
-  const { className = '' } = props;
+  const { className = '', isAllAccount } = props;
   const { t } = useTranslation();
   const { defaultData, persistData, setBackProps, setCustomScreenTitle } = useTransactionContext<GovReferendumVoteParams>();
   const [govRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
@@ -217,6 +217,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
             >
               <AccountAddressSelector
                 avatarSize={20}
+                disabled={!isAllAccount}
                 isGovModal={true}
                 items={accountAddressItems}
               />

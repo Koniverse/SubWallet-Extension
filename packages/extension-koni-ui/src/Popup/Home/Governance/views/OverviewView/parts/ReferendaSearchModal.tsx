@@ -1,17 +1,18 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BackIcon } from '@subwallet/extension-koni-ui/components';
+import { BackIcon, EmptyList } from '@subwallet/extension-koni-ui/components';
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { useGetGovLockedInfos } from '@subwallet/extension-koni-ui/hooks';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ReferendumWithVoting, UserVoting } from '@subwallet/extension-koni-ui/types/gov';
-import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
+import { ReferendumWithVoting } from '@subwallet/extension-koni-ui/types/gov';
+import { getUserVotingListForReferendum, GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { ActivityIndicator, ModalContext, SwModal } from '@subwallet/react-ui';
 import { Referendum, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { useQuery } from '@tanstack/react-query';
 import CN from 'classnames';
+import { ListChecks } from 'phosphor-react';
 import React, { Context, useCallback, useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { ThemeContext } from 'styled-components';
@@ -81,43 +82,9 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
     const items = (refData?.items || []);
 
     return items.map((item) => {
-      if (item.version === 1) {
-        return {
-          ...item,
-          userVoting: undefined
-        };
-      }
-
-      const trackId = Number(item.trackInfo.id);
-
-      const userVoting: UserVoting[] = [];
-
-      (govLockedInfos || []).forEach((acc) => {
-        const track = acc.tracks?.find((t) => Number(t.trackId) === trackId);
-
-        if (!track) {
-          return;
-        }
-
-        const votesForThisRef = track.votes?.find(
-          (v) => Number(v.referendumIndex) === item.referendumIndex
-        );
-
-        const delegation = track.delegation ? { ...track.delegation } : undefined;
-
-        if (votesForThisRef || delegation) {
-          userVoting.push({
-            address: acc.address,
-            trackId,
-            votes: votesForThisRef,
-            delegation
-          });
-        }
-      });
-
       return {
         ...item,
-        userVoting: userVoting.length > 0 ? userVoting : undefined
+        userVoting: getUserVotingListForReferendum({ referendum: item, govLockedInfos })
       };
     });
   }, [govLockedInfos, refData?.items]);
@@ -132,6 +99,16 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
     }
   }, [searchData?.govReferenda, items, searchValue]);
 
+  const renderEmpty = useMemo(() => {
+    return (
+      <EmptyList
+        className={'__emptyList'}
+        emptyMessage={t('No referenda found')}
+        phosphorIcon={ListChecks}
+      />
+    );
+  }, [t]);
+
   useEffect(() => {
     if (!searchValue) {
       return;
@@ -139,11 +116,11 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
 
     const lowerCaseSearchValue = searchValue.toLowerCase();
 
-    if (filteredItems.length === 0 && !isFetching && (!textRef.current || !lowerCaseSearchValue.includes(textRef.current))) {
+    if (!isFetching && (!textRef.current || lowerCaseSearchValue !== textRef.current)) {
       refetch().catch(console.error);
       textRef.current = lowerCaseSearchValue;
     }
-  }, [searchValue, filteredItems.length, isFetching, refetch]);
+  }, [isFetching, refetch, searchValue]);
 
   return (
     <SwModal
@@ -174,6 +151,7 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
           className='referenda-list'
           items={filteredItems}
           onClickItem={onClickItem}
+          renderWhenEmpty={renderEmpty}
         />}
 
     </SwModal>
