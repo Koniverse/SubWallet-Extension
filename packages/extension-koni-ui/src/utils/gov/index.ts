@@ -220,17 +220,19 @@ const calculateTimeLeft = (
 ): { timeLeft?: string; endTime: number } => {
   let endBlock: number;
 
-  if (state === GovStatusKey.DECIDING && decisionPeriod && decidingSince) {
-    let adjustedSince = decidingSince;
+  if (GOV_ONGOING_STATES.includes(state)) {
+    // Apply migration offset for all ongoing states
+    const adjustedCurrent = currentBlock - migrationBlockOffset;
+    const adjustedAlarm = alarmBlock ? alarmBlock - migrationBlockOffset : null;
+    const adjustedSince = decidingSince ? decidingSince - migrationBlockOffset : undefined;
 
-    // migrate case
-    if (new BigNumber(decidingSince).minus(currentBlock).gt(1_000_000)) {
-      adjustedSince = decidingSince - migrationBlockOffset;
+    if (state === GovStatusKey.DECIDING && decisionPeriod && adjustedSince) {
+      endBlock = adjustedSince + decisionPeriod;
+    } else if (adjustedAlarm && adjustedCurrent < adjustedAlarm) {
+      endBlock = adjustedAlarm;
+    } else {
+      return { timeLeft: undefined, endTime: 0 };
     }
-
-    endBlock = adjustedSince + decisionPeriod;
-  } else if (alarmBlock && GOV_ONGOING_STATES.includes(state) && currentBlock < alarmBlock) {
-    endBlock = alarmBlock;
   } else {
     return { timeLeft: undefined, endTime: 0 };
   }

@@ -7,7 +7,7 @@ import { VoteBucket } from '@subwallet/extension-koni-ui/utils/gov/votingStats';
 import { Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretLeft } from 'phosphor-react';
-import React, { forwardRef, useCallback, useContext, useState } from 'react';
+import React, { forwardRef, useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 
@@ -30,6 +30,24 @@ const Component = (props: Props) => {
   const { inactiveModal } = useContext(ModalContext);
   const { token } = useTheme() as Theme;
   const [isNested, setIsNested] = useState(true);
+
+  const sortedNestedAccounts = useMemo(() => {
+    return [...voteData.accounts.nested].sort((a, b) => {
+      const aVotes = parseFloat(a.accountInfo.votes || '0');
+      const bVotes = parseFloat(b.accountInfo.votes || '0');
+
+      return bVotes - aVotes;
+    });
+  }, [voteData.accounts.nested]);
+
+  const sortedFlattenedAccounts = useMemo(() => {
+    return [...voteData.accounts.flattened].sort((a, b) => {
+      const aVotes = parseFloat(a.votes || '0');
+      const bVotes = parseFloat(b.votes || '0');
+
+      return bVotes - aVotes;
+    });
+  }, [voteData.accounts.flattened]);
 
   const onCancel = useCallback(() => {
     inactiveModal(modalId);
@@ -85,14 +103,14 @@ const Component = (props: Props) => {
       <div className='__list-wrapper'>
         {isNested
           ? <NestedVoteList
-            accounts={voteData.accounts.nested}
+            accounts={sortedNestedAccounts}
             chain={chain}
             containerModalId={modalId}
             decimals={decimal}
             symbol={symbol}
           />
           : <FlattenedVoteList
-            accounts={voteData.accounts.flattened}
+            accounts={sortedFlattenedAccounts}
             chain={chain}
             decimal={decimal}
             symbol={symbol}

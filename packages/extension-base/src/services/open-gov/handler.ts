@@ -345,6 +345,7 @@ export default abstract class BaseOpenGovHandler {
           const trackPriorBlocks = new Map<number, BigN>();
           let totalLocked = new BigN(0);
 
+          // --- Collect locked balances per track ---
           const classLocksArray = classLocks.toPrimitive() as [number, string][];
 
           for (const [trackId, balance] of classLocksArray) {
@@ -357,21 +358,43 @@ export default abstract class BaseOpenGovHandler {
           const currentBlockInfo = await substrateApi.api.rpc.chain.getHeader();
           const currentBlockNumber = (currentBlockInfo.toPrimitive() as unknown as BlockHeader).number;
 
+          // --- Handle each voting entry per track ---
           for (const [key, voting] of votingEntries) {
             const trackId = key.args[1].toPrimitive() as number;
             const v = voting.toPrimitive() as VotingFor;
 
             if (v.delegating) {
+              // Track is delegating → store delegation info
               trackStates.set(trackId, 'delegating');
+              const { balance, conviction, target } = v.delegating;
+
               const delegation: GovDelegationDetail = {
-                balance: v.delegating.balance.toString(),
-                target: v.delegating.target,
-                conviction: v.delegating.conviction
+                balance: balance.toString(),
+                target,
+                conviction
               };
 
               tracks.push({ trackId, delegation });
             } else if (v.casting) {
               trackStates.set(trackId, 'casting');
+              const priorBlock = new BigN(v.casting.prior[0]);
+              const priorBalance = new BigN(v.casting.prior[1]);
+              const current = new BigN(currentBlockNumber);
+
+              if (!current.gte(priorBlock)) {
+                // --- Still locked → estimate unlock timestamp ---
+                const blockTimeSec = _EXPECTED_BLOCK_TIME[this.chain] ?? 6;
+                const remainingBlocks = priorBlock.minus(current);
+                const timestamp = Date.now() + remainingBlocks.multipliedBy(blockTimeSec * 1000).toNumber();
+
+                unlockingReferenda.push({
+                  id: `track_prior_${trackId}`,
+                  balance: priorBalance.toFixed(),
+                  timestamp
+                });
+              }
+
+              // --- Parse votes and check if referenda are finished ---
               const { unlockingReferenda: trackUnlocking, votes } = await this.parseVotesAndCheckFinished(
                 v.casting.votes || [],
                 unlockableReferenda,
@@ -382,6 +405,7 @@ export default abstract class BaseOpenGovHandler {
               unlockingReferenda.push(...trackUnlocking);
               trackVotes.set(trackId, votes);
 
+              // --- Calculate total voted amount per track ---
               const totalCast = votes.reduce((sum, vote) => {
                 return sum
                   .plus(new BigN(vote.ayeAmount || '0'))
@@ -399,6 +423,7 @@ export default abstract class BaseOpenGovHandler {
             }
           }
 
+          // --- Compute unlockable amounts across all tracks ---
           const { totalUnlockable, unlockableTrackIds } = this.calculateUnlockAmounts(
             trackBalances,
             trackStates,
@@ -408,6 +433,7 @@ export default abstract class BaseOpenGovHandler {
             new BigN(currentBlockNumber)
           );
 
+          // --- Determine total delegated and voted locked balances ---
           for (const [trackId, lockedBalance] of trackBalances) {
             const state = trackStates.get(trackId) || 'empty';
 
@@ -457,6 +483,7 @@ export default abstract class BaseOpenGovHandler {
     const votes: GovVoteDetail[] = [];
     const unlockingReferenda: UnlockingReferendaData[] = [];
 
+    // --- Parse all vote types: standard / split / splitAbstain and normalize data
     for (const [refIndex, vote] of votesData) {
       if ('standard' in vote) {
         const isAye = vote.standard.vote.aye === true;
@@ -506,13 +533,14 @@ export default abstract class BaseOpenGovHandler {
         if (!referendum.isOngoing) {
           const referendumInfo = referendum.toJSON() as Record<string, unknown>;
 
-          // 0x can unlock immediately
+          // 0x conviction (no lock) → unlock immediately
           if (voteDetail.conviction === Conviction.None) {
             unlockableReferenda.add(refIndex.toString());
 
             return;
           }
 
+          // --- Determine unlock block based on conviction ---
           const statusKey = Object.keys(referendumInfo)[0];
           const statusVal = referendumInfo[statusKey] as unknown[];
           const endBlock = statusVal[0] as string | number;
@@ -522,6 +550,7 @@ export default abstract class BaseOpenGovHandler {
             const unlockBlock = new BigN(endBlock).plus(lockBlocks);
             const canUnlock = new BigN(currentBlockNumber).gte(unlockBlock);
 
+            // Referendum ended → check if vote side allows unlock
             const shouldUnlock = referendum.isApproved
               ? (voteDetail.type === GovVoteType.NAY || canUnlock)
               : (voteDetail.type === GovVoteType.AYE || canUnlock);
@@ -529,6 +558,7 @@ export default abstract class BaseOpenGovHandler {
             if (shouldUnlock) {
               unlockableReferenda.add(refIndex.toString());
             } else {
+              // Can't unlock → calculate remaining lock time
               const balance =
               new BigN(voteDetail.ayeAmount || '0')
                 .plus(new BigN(voteDetail.nayAmount || '0'))
@@ -562,6 +592,11 @@ export default abstract class BaseOpenGovHandler {
   ) {
     const unlockableTrackIds: number[] = [];
 
+    // Determine which tracks are unlockable:
+    // - all votes finished
+    // - prior block passed
+    // - state is empty
+    // Calculate total unlockable amount = max(unlockable balance) - highest still locked balance
     for (const [trackId, balance] of trackBalances) {
       const state = trackStates.get(trackId) || 'empty';
       const votes = trackVotes.get(trackId) || [];

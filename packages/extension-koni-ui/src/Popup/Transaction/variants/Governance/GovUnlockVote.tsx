@@ -116,6 +116,14 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     return selectedLockInfo.summary.unlockable.unlockableReferenda || [];
   }, [selectedLockInfo]);
 
+  const unlockableTracks = useMemo((): number[] => {
+    if (!selectedLockInfo) {
+      return [];
+    }
+
+    return selectedLockInfo.summary.unlockable.trackIds || [];
+  }, [selectedLockInfo]);
+
   const lockedAmount = useMemo(() => {
     if (!selectedLockInfo) {
       return BN_ZERO;
@@ -239,7 +247,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         </Button>
 
         <Button
-          disabled={isDisable || accountAddressFiltered.length === 0 || !isBalanceReady || !lockedAmount.gt(BN_ZERO)}
+          disabled={isDisable || accountAddressFiltered.length === 0 || !isBalanceReady || !(unlockableReferenda.length > 0) || !(unlockableTracks.length > 0)}
           icon={(
             <Icon
               phosphorIcon={CheckCircle}

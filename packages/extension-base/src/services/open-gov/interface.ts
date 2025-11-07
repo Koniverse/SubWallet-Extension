@@ -143,7 +143,7 @@ export interface VotingFor {
 }
 
 export interface UnlockingReferendaData{
-  id: string;
+  id?: string;
   balance: string;
   timestamp: number;
 }
