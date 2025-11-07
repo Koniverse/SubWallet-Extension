@@ -6,11 +6,12 @@ import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { YIELD_POOL_STAT_REFRESH_INTERVAL } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2, getMinXcmTransferableAmount } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetName, _getAssetSymbol, _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { MIN_XCM_LIQUID_STAKING_AMOUNT } from '@subwallet/extension-base/services/earning-service/constants';
 import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitChangeValidatorStaking, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
-import { createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
+import { balanceFormatter, createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -570,10 +571,20 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       throw new Error('Error handling XCM extrinsic');
     }
 
+    let minXcmTransferableAmount: string | undefined;
+
+    minXcmTransferableAmount = await getMinXcmTransferableAmount(xcmRequest);
+
+    if (!minXcmTransferableAmount) {
+      minXcmTransferableAmount = formatNumber(MIN_XCM_LIQUID_STAKING_AMOUNT.toString(), _getAssetDecimals(destinationTokenInfo), balanceFormatter, { maxNumberFormat: _getAssetDecimals(destinationTokenInfo) || 6 });
+    }
+
+    const minXcmTransferableAmountStr = formatNumber(minXcmTransferableAmount.toString(), _getAssetDecimals(destinationTokenInfo), balanceFormatter, { maxNumberFormat: _getAssetDecimals(destinationTokenInfo) || 6 });
+
     const isDryRunSuccess = await dryRunXcmExtrinsicV2(xcmRequest);
 
     if (!isDryRunSuccess) {
-      throw new Error('Unable to perform transaction. Select another token or destination chain and try again');
+      throw new Error(`Stake amount too low. Increase amount to more than ${minXcmTransferableAmountStr} ${originTokenInfo.symbol} and try again`);
     }
 
     const xcmData: RequestCrossChainTransfer = {
