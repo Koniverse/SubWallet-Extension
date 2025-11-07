@@ -4,9 +4,12 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { APIItemState, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import { BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, NominationInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolTarget, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { formatNumber } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
+import { ApiPromise } from '@polkadot/api';
 import { AnyJson } from '@polkadot/types/types';
 
 import { parseIdentity } from '../../utils';
@@ -15,6 +18,16 @@ import BaseParaNativeStakingPoolHandler from './base-para';
 interface SortedEligibleCandidate {
   candidate: string;
   stake: string;
+}
+
+interface ChainsToReward {
+  paraIds: number[];
+  rewardsPerChain: string;
+}
+
+interface ActiveCollatorContainerChain {
+  orchestratorChain: string[];
+  containerChains: Record<string, string[]>;
 }
 
 interface CandidateSummary {
@@ -33,6 +46,35 @@ interface OwnStakeInfo {
 
 interface CollatorActiveConfig {
   maxCollators: number;
+}
+
+// Constants
+const sequencersPerAppchain = new BigN(5);
+const rewardsForStakers = new BigN(0.8);
+const blocksPerYear = new BigN(5_256_000); // 6 seconds block time hence 365 * 24 * 60 * 60 / 6 (5.256.000) blocks per year
+
+function calculateCollatorApy (rewardsPerBlock: string, totalStake: BigN, nativeTokenDecimals: number): BigN {
+  const rewardsPerChainPerYear = new BigN(rewardsPerBlock).times(blocksPerYear);
+  const rewardsPerSequencerPerYear = rewardsPerChainPerYear.div(sequencersPerAppchain);
+  const rewardsForStakersPerSequencerPerYear = rewardsPerSequencerPerYear.times(rewardsForStakers);
+
+  const formattedTotalStake = formatNumber(totalStake.toString(), nativeTokenDecimals);
+
+  if (formattedTotalStake === '0') {
+    return new BigN(0);
+  }
+
+  return rewardsForStakersPerSequencerPerYear.times(100).div(formattedTotalStake);
+}
+
+async function getActiveCollators (api: ApiPromise): Promise<string[]> {
+  const collatorAssignment = await api.query.tanssiCollatorAssignment.collatorContainerChain();
+
+  const activeCollatorContainerChain = collatorAssignment.toPrimitive() as unknown as ActiveCollatorContainerChain;
+
+  const activeCollators = Object.values(activeCollatorContainerChain.containerChains || {}).flat().map((c) => c.toString());
+
+  return activeCollators;
 }
 
 function perbillToPercentBn (perbill: AnyJson): number {
@@ -144,10 +186,24 @@ export default class TanssiNativeStakingPoolHandler extends BaseParaNativeStakin
     let cancel = false;
 
     const defaultCallback = async () => {
-      const api = await this.substrateApi.isReady;
-      const activeConfig = (await api.api.query.collatorConfiguration.activeConfig()).toPrimitive() as unknown as CollatorActiveConfig;
-
+      const chainApi = await this.substrateApi.isReady;
+      const activeConfig = (await chainApi.api.query.collatorConfiguration.activeConfig()).toPrimitive() as unknown as CollatorActiveConfig;
       const maxCollators = activeConfig.maxCollators;
+
+      const chainsToRewardOpt = await chainApi.api.query.inflationRewards.chainsToReward();
+      const chainsToReward = chainsToRewardOpt.toPrimitive() as unknown as ChainsToReward;
+      const rewardsPerBlock = chainsToReward.rewardsPerChain;
+
+      const formatRewardsPerBlock = formatNumber(rewardsPerBlock, _getAssetDecimals(this.nativeToken));
+
+      const candidates = await chainApi.api.query.pooledStaking.sortedEligibleCandidates() as unknown as SortedEligibleCandidate[];
+      const activeCollators = await getActiveCollators(chainApi.api);
+      const decimals = _getAssetDecimals(this.nativeToken);
+
+      const apyList = candidates.filter((c) => activeCollators.includes(c.candidate.toString()))
+        .map((c) => calculateCollatorApy(formatRewardsPerBlock, new BigN(c.stake.toString()), decimals));
+
+      const totalApy = apyList.length ? BigN.max(...apyList).toNumber() : 0;
 
       const data: NativeYieldPoolInfo = {
         ...this.baseInfo,
@@ -171,7 +227,8 @@ export default class TanssiNativeStakingPoolHandler extends BaseParaNativeStakin
           },
           era: 0,
           eraTime: 6 / 3600,
-          unstakingPeriod: 12
+          unstakingPeriod: 12,
+          totalApy
         }
       };
 
@@ -195,12 +252,11 @@ export default class TanssiNativeStakingPoolHandler extends BaseParaNativeStakin
     useAddresses: string[],
     onUpdate: (rs: YieldPositionInfo) => void
   ): Promise<VoidFunction> {
-    const substrateApi = this.substrateApi;
-
-    await substrateApi.isReady;
+    const substrateApi = await this.substrateApi.isReady;
 
     let cancel = false;
     const intervalIds: NodeJS.Timer[] = [];
+    const activeCollators = await getActiveCollators(substrateApi.api);
 
     for (const delegator of useAddresses) {
       const fetchAndUpdate = async () => {
@@ -279,6 +335,24 @@ export default class TanssiNativeStakingPoolHandler extends BaseParaNativeStakin
           });
         }
 
+        let status: EarningStatus;
+
+        if (nominations.length === 0) {
+          status = EarningStatus.NOT_STAKING;
+        } else {
+          const activeCount = nominations.filter((n) =>
+            activeCollators.includes(n.validatorAddress)
+          ).length;
+
+          if (activeCount === 0) {
+            status = EarningStatus.WAITING;
+          } else if (activeCount < nominations.length) {
+            status = EarningStatus.PARTIALLY_EARNING;
+          } else {
+            status = EarningStatus.EARNING_REWARD;
+          }
+        }
+
         onUpdate({
           ...this.baseInfo,
           type: this.type,
@@ -287,9 +361,7 @@ export default class TanssiNativeStakingPoolHandler extends BaseParaNativeStakin
           totalStake: bnTotalStake.toString(),
           activeStake: bnActiveStake.toString(),
           unstakeBalance: bnUnstakeBalance.toString(),
-          status: nominations.length > 0
-            ? EarningStatus.EARNING_REWARD
-            : EarningStatus.NOT_STAKING,
+          status,
           isBondedBefore: nominations.length > 0,
           nominations,
           unstakings: [],
@@ -343,7 +415,6 @@ export default class TanssiNativeStakingPoolHandler extends BaseParaNativeStakin
 
   public override async getPoolTargets (): Promise<YieldPoolTarget[]> {
     const chainApi = await this.substrateApi.isReady;
-
     const commissionRaw = chainApi.api.consts.pooledStaking.rewardsCollatorCommission.toJSON();
     const commission = perbillToPercentBn(commissionRaw);
 
@@ -359,6 +430,12 @@ export default class TanssiNativeStakingPoolHandler extends BaseParaNativeStakin
     });
 
     const candidateAddresses = candidates.map((c) => c.candidate.toString());
+    const activeCollators = await getActiveCollators(chainApi.api);
+
+    const chainsToRewardOpt = await chainApi.api.query.inflationRewards.chainsToReward();
+    const chainsToReward = chainsToRewardOpt.toPrimitive() as unknown as ChainsToReward;
+    const rewardsPerBlock = chainsToReward.rewardsPerChain;
+    const formatRewardsPerBlock = formatNumber(rewardsPerBlock, _getAssetDecimals(this.nativeToken));
 
     const targets: YieldPoolTarget[] = await Promise.all(
       candidates.map(async (c) => {
@@ -378,6 +455,12 @@ export default class TanssiNativeStakingPoolHandler extends BaseParaNativeStakin
 
         const [identity, isReasonable] = await parseIdentity(this.substrateApi, address);
 
+        let apy = new BigN(0);
+
+        if (activeCollators.includes(address)) {
+          apy = calculateCollatorApy(formatRewardsPerBlock, totalStake, _getAssetDecimals(this.nativeToken));
+        }
+
         const validator: ValidatorInfo = {
           address,
           chain: this.chain,
@@ -390,6 +473,7 @@ export default class TanssiNativeStakingPoolHandler extends BaseParaNativeStakin
           blocked: false,
           isVerified: isReasonable,
           isCrowded: false,
+          expectedReturn: apy.toNumber(),
           identity
         };
 
