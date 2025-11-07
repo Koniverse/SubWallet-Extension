@@ -31,7 +31,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   const { t } = useTranslation();
   const { ayesPercent, naysPercent } = getTallyVotesBarPercent(referendumDetail.onchainData.tally);
   const referendumId = referendumDetail?.referendumIndex;
-  const thresholdPercent = getMinApprovalThreshold(referendumDetail);
+  const thresholdPercent = getMinApprovalThreshold(referendumDetail, chain);
   const govLockedInfos = useGetGovLockedInfos(chain);
   const { activeModal } = useContext(ModalContext);
   const isAllAccount = useSelector((state) => state.accountState.isAllAccount);
