@@ -4768,6 +4768,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@polkadot/keyring@npm:13.5.6":
+  version: 13.5.6
+  resolution: "@polkadot/keyring@npm:13.5.6"
+  dependencies:
+    "@polkadot/util": 13.5.6
+    "@polkadot/util-crypto": 13.5.6
+    tslib: ^2.8.0
+  peerDependencies:
+    "@polkadot/util": 13.5.6
+    "@polkadot/util-crypto": 13.5.6
+  checksum: 902e817bbac82fe36e9429187d5c7f16d2594b4b0868d74e108f0b34b163e33fd13794b80f2728ad3abed5b3bad0f76f63b3e3d79de8470499b637b49f1a9a77
+  languageName: node
+  linkType: hard
+
 "@polkadot/keyring@npm:^12.6.1":
   version: 12.6.1
   resolution: "@polkadot/keyring@npm:12.6.1"
@@ -4782,7 +4796,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/keyring@npm:^13.4.4, @polkadot/keyring@npm:^13.5.5":
+"@polkadot/keyring@npm:^13.5.5":
   version: 13.5.5
   resolution: "@polkadot/keyring@npm:13.5.5"
   dependencies:
@@ -6066,21 +6080,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@snowbridge/api@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "@snowbridge/api@npm:0.2.0"
+"@snowbridge/api@npm:^0.2.13":
+  version: 0.2.13
+  resolution: "@snowbridge/api@npm:0.2.13"
   dependencies:
-    "@polkadot/api": ^15.10.2
-    "@polkadot/keyring": ^13.4.4
-    "@polkadot/types": ^15.10.2
-    "@polkadot/util": ^13.4.4
-    "@polkadot/util-crypto": ^13.4.4
-    "@snowbridge/base-types": 0.2.0
-    "@snowbridge/contract-types": 0.2.0
-    "@typechain/ethers-v6": ^0.5.1
-    ethers: ^6.13.5
-    rxjs: ^7.8.1
-  checksum: aed0ce1a2f0e87f61ad237b999cb77976a8c0b7a241293ac69a807f07dd3c9689a83a3fe41322a4f47ef90432779971a00e73988b86f0be1a932cc2fe444839a
+    "@polkadot/api": 16.4.8
+    "@polkadot/keyring": 13.5.6
+    "@polkadot/types": 16.4.8
+    "@polkadot/util": 13.5.6
+    "@polkadot/util-crypto": 13.5.6
+    "@snowbridge/base-types": 0.2.13
+    "@snowbridge/contract-types": 0.2.13
+    ethers: 6.15.0
+  checksum: 88abe5fd92fa8c021c62da6af3bcac4c6b1d3e7857c4cfdedbd003d718155ae0b5b0c7f865627cdd8da9b0dbdcaebad13f186f110936f5d015218f83a6fc6d8a
   languageName: node
   linkType: hard
 
@@ -6091,20 +6103,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@snowbridge/contract-types@npm:0.2.0":
-  version: 0.2.0
-  resolution: "@snowbridge/contract-types@npm:0.2.0"
-  dependencies:
-    "@snowbridge/contracts": 0.2.0
-    ethers: ^6.13.5
-  checksum: 48fe93ca60485bf3ce132d85357e7c93b492435d1a392333ce21718e509460f4a53a1f79a1588db3ad8fee6bd8c1dae477a7d6cc6f9659c8593fd71a01ea97cc
+"@snowbridge/base-types@npm:0.2.13":
+  version: 0.2.13
+  resolution: "@snowbridge/base-types@npm:0.2.13"
+  checksum: fab0b8381288dd111635fd1af471512ef645c77bb31a13550bb07142b25cb19444335cd91748cc8dde9fee31389508b6dd0d00265e0f21725ff77247dd24d54c
   languageName: node
   linkType: hard
 
-"@snowbridge/contracts@npm:0.2.0":
-  version: 0.2.0
-  resolution: "@snowbridge/contracts@npm:0.2.0"
-  checksum: a496d5016acec2a70557a0ca8c18fbb08b39b019cdd9b1f34acab623fe4af5108b745e6c2a36e7a420d1c64bdb474406becb62fd66e5761c38971e3e98f210c3
+"@snowbridge/contract-types@npm:0.2.13":
+  version: 0.2.13
+  resolution: "@snowbridge/contract-types@npm:0.2.13"
+  dependencies:
+    "@snowbridge/contracts": 0.2.13
+    ethers: 6.15.0
+  checksum: c52fb90c0610247edd2606f41a79b67f6d5cbf941129fd269b0e32be872c42ff502b75bc630b2783c0042212dcc8435a1824b77597600b0621e11c79706103c8
+  languageName: node
+  linkType: hard
+
+"@snowbridge/contracts@npm:0.2.13":
+  version: 0.2.13
+  resolution: "@snowbridge/contracts@npm:0.2.13"
+  checksum: dec97d5bc69192b3bccf6d1f9fedb40c0f6956740cbeefd3a832c4ecb2e5411132470eee720c0a31f0dab08b51b8b3027323bbe41ccd624b5c7fd13188d6e445
   languageName: node
   linkType: hard
 
@@ -6298,7 +6317,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.5.3
     "@polkadot/x-global": ^13.5.3
     "@reduxjs/toolkit": ^1.9.1
-    "@snowbridge/api": ^0.2.0
+    "@snowbridge/api": ^0.2.13
     "@snowbridge/registry": ^0.2.0
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
@@ -6935,20 +6954,6 @@ __metadata:
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
   checksum: ad87447820dd3f24825d2d947ebc03072b20a42bfc96cbafec16bff8bbda6c1a81fcb0be56d5b21968560c5359a0af4038a68ba150c3e1694fe4c109a063bed8
-  languageName: node
-  linkType: hard
-
-"@typechain/ethers-v6@npm:^0.5.1":
-  version: 0.5.1
-  resolution: "@typechain/ethers-v6@npm:0.5.1"
-  dependencies:
-    lodash: ^4.17.15
-    ts-essentials: ^7.0.1
-  peerDependencies:
-    ethers: 6.x
-    typechain: ^8.3.2
-    typescript: ">=4.7.0"
-  checksum: 44e7970ce95eeb1a02019f8a53bbe30dcb87664e1df15fe436ae48eea1bf91ca72b5b230eac1bdf9cbe9b55bc488b54c6273e6f77155eaeff885fb34cfcd1108
   languageName: node
   linkType: hard
 
@@ -14416,7 +14421,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^6.13.5":
+"ethers@npm:6.15.0":
   version: 6.15.0
   resolution: "ethers@npm:6.15.0"
   dependencies:
@@ -27034,15 +27039,6 @@ __metadata:
   version: 3.3.1
   resolution: "ts-custom-error@npm:3.3.1"
   checksum: 50a1e825fced68d70049bd8d282379a635e43aa023a370fa8e736b12a6edba7f18a2d731fa194ac35303a8b625be56e121bdb31d8a0318250d1a8b277059fce3
-  languageName: node
-  linkType: hard
-
-"ts-essentials@npm:^7.0.1":
-  version: 7.0.3
-  resolution: "ts-essentials@npm:7.0.3"
-  peerDependencies:
-    typescript: ">=3.7.0"
-  checksum: 74d75868acf7f8b95e447d8b3b7442ca21738c6894e576df9917a352423fde5eb43c5651da5f78997da6061458160ae1f6b279150b42f47ccc58b73e55acaa2f
   languageName: node
   linkType: hard
 
