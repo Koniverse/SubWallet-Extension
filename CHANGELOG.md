@@ -1,7 +1,19 @@
 # CHANGELOG
 
+## 1.3.65
+Build date: Nov 06, 2025.
+
+Features & Updates:
+- Improve detect assets & optimize enabled tokens on EVM chains (#4542)
+- Improve estimate fee through Across Bridge (#4310)
+- Check buy options for DOT & KSM token (#4815)
+- Add Collator's APY for Tanssi Staking (#4795)
+- Some updates after Polkadot Asset Hub Migration (#4819)
+- Update altinputasset for some liquid staking (#4813)
+
+
 ## 1.3.64
-Build date: Oct 23, 2025.
+Build date: Oct 30, 2025.
 
 Features & Updates:
 - [Energy Web X] Display APY for collators in collator list (#4739)
