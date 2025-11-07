@@ -156,6 +156,7 @@ export class SwapService implements StoppableServiceInterface {
     console.log('path', path);
     console.log('swapQuoteResponse', swapQuoteResponse);
 
+    // Just to log routing type for Uniswap Quote
     if (swapQuoteResponse.optimalQuote && swapQuoteResponse.optimalQuote.metadata) {
       const routing = (swapQuoteResponse.optimalQuote.metadata as UniswapMetadata).routing;
 
