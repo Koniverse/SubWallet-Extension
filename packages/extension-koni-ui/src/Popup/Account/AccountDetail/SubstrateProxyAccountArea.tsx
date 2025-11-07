@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _chainInfoToAccountChainType } from '@subwallet/extension-base/services/chain-service/utils';
-import { UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS } from '@subwallet/extension-base/services/substrate-proxy-service/constant';
 import { AccountProxy, AccountProxyType, SubstrateProxyAccountItem } from '@subwallet/extension-base/types';
 import { BasicInputEvent, ChainSelector, EmptyList, SubstrateProxyAccountItemExtended, SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
 import { ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS, REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
@@ -76,7 +75,7 @@ function Component ({ accountProxy, className }: Props) {
 
     // Filter chains that support substrate proxy and are in allowedChains
     Object.values(chainInfoMap).forEach((c) => {
-      if (c.substrateInfo !== null && allowedChains.includes(c.slug) && !UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS.includes(c.slug)) {
+      if (c.substrateInfo?.supportProxy && allowedChains.includes(c.slug)) {
         result.push({
           name: c.name,
           slug: c.slug
@@ -87,6 +86,7 @@ function Component ({ accountProxy, className }: Props) {
     return result;
   }, [allowedChains, chainInfoMap]);
 
+  // Sort selected Substrate proxy accounts, those managed by the current wallet appear on top
   const substrateProxyAccountSelectedSorted = useMemo<SubstrateProxyItemSelector[]>(() => {
     const list = Object.values(substrateProxyAccountsSelected);
 
@@ -285,6 +285,7 @@ function Component ({ accountProxy, className }: Props) {
     );
   }, [checkChain, setNetworkSelected, setSubstrateProxyAccountsSelected]);
 
+  // Fetch substrate proxy accounts when address or network changes
   useEffect(() => {
     if (addressFormated && networkSelected) {
       setLoading(true);

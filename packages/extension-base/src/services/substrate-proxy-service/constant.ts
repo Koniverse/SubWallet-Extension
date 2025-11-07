@@ -19,30 +19,3 @@ const SUBSTRATE_PROXY_ACCOUNT_EXTRINSIC_GROUPS: Record<string, ExtrinsicType[]> 
 export const txTypeToSubstrateProxyMap: Partial<Record<ExtrinsicType, SubstrateProxyType[]>> = {
   ...Object.fromEntries(SUBSTRATE_PROXY_ACCOUNT_EXTRINSIC_GROUPS.STAKING.map((t) => [t, ['Staking', 'NonTransfer']]))
 };
-
-export const UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS = [
-  'bridgeHubPolkadot',
-  'aventus',
-  'xode',
-  'autonomys_taurus',
-  'ternoa',
-  'jamton',
-  'robonomics',
-  'bridgeHubKusama',
-  'mandalaTest',
-  'commune',
-  'torus',
-  'logion',
-  'sora_ksm',
-  'acurast',
-  'autonomys',
-  'humanode',
-  'quantum_fusion',
-  'manta_network',
-  'unique_network',
-  'krest_network',
-  'auto_evm',
-  'polymesh',
-  'sora_substrate',
-  'nodle'
-];

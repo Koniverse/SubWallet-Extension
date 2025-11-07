@@ -94,6 +94,13 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   // @ts-ignore
   const [deriving, setDeriving] = useState(false);
 
+  // Determine whether this accountProxy can manage Substrate proxy accounts.
+  // Rules:
+  //  - If the account supports SUBSTRATE chain type, it can manage Substrate proxies.
+  //  - If it supports ETHEREUM:
+  //      * For LEDGER account type, allow only when the underlying account is Substrate ECDSA (`isSubstrateECDSA`).
+  //      * For other Ethereum-based account types, allow them (assuming ECDSA compatibility, e.g. Moonbeam, Mythos, etc.).
+  //  - Otherwise, management of Substrate proxies is not allowed.
   const canManageSubstrateProxyAccounts = useMemo(() => {
     if (accountProxy?.chainTypes.includes(AccountChainType.SUBSTRATE)) {
       return true;

@@ -286,6 +286,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       const send = (amount: string): void => {
         setSubmitLoading(true);
 
+        // send change earning validator transaction
         const sendPromise = (substrateProxyAddress?: string) => {
           return changeEarningValidator({
             ...baseData,
@@ -294,6 +295,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           });
         };
 
+        // select proxy account if available
         selectSubstrateProxyAccountsToSign({
           chain,
           address: from,

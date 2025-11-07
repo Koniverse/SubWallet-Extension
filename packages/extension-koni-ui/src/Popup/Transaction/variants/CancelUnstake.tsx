@@ -111,6 +111,7 @@ const Component = () => {
 
     const selectedUnstaking = positionInfo.unstakings[parseInt(unstakeIndex)];
 
+    // send cancel unstake transaction
     const sendPromise = (substrateProxyAddress?: string) => {
       return yieldSubmitStakingCancelWithdrawal({
         address: from,
@@ -120,6 +121,9 @@ const Component = () => {
       }).then(onSuccess);
     };
 
+    // wrap proxy selection
+    // for the Liquid Staking feature with multiple steps,
+    // only the root account is allowed to sign transactions, even if a valid proxy account is available to sign on its behalf.
     const sendPromiseWrapper = async () => {
       if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
         const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
@@ -134,6 +138,7 @@ const Component = () => {
       return await sendPromise();
     };
 
+    // delay for better loading UX
     setTimeout(() => {
       sendPromiseWrapper().catch(onError)
         .finally(() => setLoading(false));

@@ -38,6 +38,8 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
   const dataContext = useContext(DataContext);
 
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
+
+  // Select function to choose substrate proxy accounts for signing and will be controlled by TransactionContext
   const selectSubstrateProxyAccountsToSign = useCreateSelectSubstrateProxyAccountsToSign();
 
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);

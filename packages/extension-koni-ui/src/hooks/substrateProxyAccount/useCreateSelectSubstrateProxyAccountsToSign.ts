@@ -22,12 +22,33 @@ export type SelectSubstrateProxyAccountsToSign = (params: SelectSubstrateProxyAc
 
 type GetSubstrateProxyAccountsToSign = (params: SelectSubstrateProxyAccountsToSignParams) => Promise<SubstrateProxyAccountItem[]>;
 
+/**
+ * Hook that handles selecting a valid Substrate proxy account to sign transactions.
+ *
+ * This is used when the sender account is a proxied account that has one or more valid proxy accounts
+ * capable of signing on its behalf.
+ *
+ * ### Supported feature groups
+ * - **Transfer**
+ * - **Earning** (except when staking method = *Liquid staking*)
+ * - **Governance**
+ *
+ * ⚠️ Requirements & limitations:
+ * - Input address must be a **Substrate address**.
+ *   (The wallet currently handles mixed network accounts, and EVM-based accounts are excluded for safety.)
+ * - Not supported for:
+ *   1. **dApps** — Substrate extrinsics vary by pallet/method, often nested and chain-dependent, making reliable parsing unsafe.
+ *   2. **Liquid staking** and **Swap** — These features involve multi-step transactions and require the original account to sign directly.
+ */
+
 export function useCreateSelectSubstrateProxyAccountsToSign (): SelectSubstrateProxyAccountsToSign {
   const allAccounts = useSelector((state: RootState) => state.accountState.accounts);
   const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
 
   const getSubstrateProxyAccount = useCallback<GetSubstrateProxyAccountsToSign>(async ({ address, chain, excludedSubstrateProxyAddresses, type }) => {
     try {
+      // Address is required to get proxy accounts
+      // and it must be a valid substrate address
       if (!address || !isSubstrateAddress(address)) {
         return [];
       }
@@ -45,10 +66,12 @@ export function useCreateSelectSubstrateProxyAccountsToSign (): SelectSubstrateP
         return [];
       }
 
+      // filter only valid accounts that can sign transactions
       const validAccounts = allAccounts.filter(
         (acc) => acc.chainType === AccountChainType.SUBSTRATE && acc.signMode !== AccountSignMode.READ_ONLY
       );
 
+      // filter proxy accounts that are in valid accounts
       return substrateProxyAccountGroup.substrateProxyAccounts.filter((proxy) =>
         validAccounts.some((acc) => isSameAddress(acc.address, proxy.substrateProxyAddress))
       );
@@ -59,6 +82,9 @@ export function useCreateSelectSubstrateProxyAccountsToSign (): SelectSubstrateP
     }
   }, [allAccounts]);
 
+  // function to select proxy account to sign transaction
+  // then open modal to let user select
+  // return selected proxy address or undefined
   return useCallback(async (params: SelectSubstrateProxyAccountsToSignParams): Promise<string | undefined> => {
     if (!params.address) {
       return Promise.resolve(undefined);

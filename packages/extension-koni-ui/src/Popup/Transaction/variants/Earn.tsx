@@ -567,6 +567,7 @@ const Component = () => {
 
               return true;
             } else {
+              // send submit transaction
               const submitPromise = async (substrateProxyAddress?: string) => {
                 const rs = await submitJoinYieldPool({
                   path: path,
@@ -580,7 +581,10 @@ const Component = () => {
 
               let success = false;
 
-              if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
+              // wrap proxy selection
+              // for the Liquid Staking feature with multiple steps,
+              // only the root account is allowed to sign transactions, even if a valid proxy account is available to sign on its behalf.
+              if (poolInfo.type !== YieldPoolType.LIQUID_STAKING && path.steps.length <= 2) {
                 selectSubstrateProxyAccountsToSign(
                   {
                     chain,

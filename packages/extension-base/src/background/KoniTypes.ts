@@ -1004,6 +1004,7 @@ export interface NftTransactionRequest {
   networkKey: string,
   senderAddress: string,
   recipientAddress: string,
+  substrateProxyAddress?: string;
 
   nftItemName?: string, // Use for confirmation view only
   params: Record<string, any>,

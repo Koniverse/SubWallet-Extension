@@ -4,7 +4,6 @@
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
-import { UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS } from '@subwallet/extension-base/services/substrate-proxy-service/constant';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AddressInputNew, ChainSelector, HiddenInput, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useCreateGetChainAndExcludedTokenByAccountProxy, useGetAccountProxyByAddress, useGetBalance, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
@@ -64,11 +63,12 @@ const Component = (): React.ReactElement<Props> => {
     return getChainAndExcludedTokenByAccountProxy(accountProxy);
   }, [accountProxy, getChainAndExcludedTokenByAccountProxy]);
 
+  // Filter chains that support substrate proxy and are in allowedChains
   const chainItems = useMemo<ChainItemType[]>(() => {
     const result: ChainItemType[] = [];
 
     Object.values(chainInfoMap).forEach((c) => {
-      if (c.substrateInfo !== null && allowedChains.includes(c.slug) && !UNSUPPORTED_SUBSTRATE_PROXY_NETWORKS.includes(c.slug)) {
+      if (c.substrateInfo?.supportProxy && allowedChains.includes(c.slug)) {
         result.push({
           name: c.name,
           slug: c.slug
@@ -105,6 +105,7 @@ const Component = (): React.ReactElement<Props> => {
       });
   }, [onError, onSuccess, substrateProxyAccountGroup]);
 
+  // Validate substrate proxy address
   const validateSubstrateProxyAddress = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
     const { chain, from } = form.getFieldsValue();
     const destChainInfo = chainInfoMap[chain];
@@ -127,6 +128,7 @@ const Component = (): React.ReactElement<Props> => {
       });
   }, [accounts, chainInfoMap, form, ledgerGenericAllowNetworks]);
 
+  // Validate substrate proxy type, ensure the same proxy type is not added for the same proxy address
   const validateSubstrateProxyType = useCallback(async (rule: Rule, _proxyType: string) => {
     const { substrateProxyAddress } = form.getFieldsValue();
 

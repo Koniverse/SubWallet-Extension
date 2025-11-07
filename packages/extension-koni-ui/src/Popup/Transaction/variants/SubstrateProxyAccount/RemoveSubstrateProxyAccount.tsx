@@ -45,6 +45,17 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
 
   const accountProxy = useGetAccountProxyByAddress(from);
 
+  /**
+   * Builds a filtered, deduplicated list of Substrate proxy accounts.
+   *
+   * - Matches accounts from `substrateProxyAccountGroup` with `substrateProxyAddressKeys`.
+   * - Removes duplicates by proxy address.
+   * - Returns unique proxy addresses (for signing exclusion)
+   *   and corresponding account items (for removal processing).
+   *
+   * Memoized to prevent unnecessary recomputation.
+   */
+
   const substrateProxyAddressRemovedFiltered = useMemo<SubstrateProxyAddressRemovedState>(() => {
     const substrateProxyItems: SubstrateProxyAccountItem[] = [];
     const uniqueAddresses = new Set<string>();
@@ -76,6 +87,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
   }, [activeModal]);
 
   const onClickSubmit = useCallback(() => {
+    // Function to send the remove substrate proxy account transaction
     const sendPromise = (substrateProxyAddress?: string) => {
       return handleRemoveSubstrateProxyAccount({
         chain,
@@ -87,6 +99,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
     };
 
     setLoading(true);
+    // Select substrate proxy account to sign the transaction
     selectSubstrateProxyAccountsToSign({
       chain,
       address: from,
@@ -122,6 +135,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
 
   const substrateProxyAddressCount = substrateProxyAddressRemovedFiltered.uniqueAddresses.length;
 
+  // Set up back button to navigate to account detail page
   useEffect(() => {
     if (accountProxy?.id) {
       setBackProps((prevState) => ({

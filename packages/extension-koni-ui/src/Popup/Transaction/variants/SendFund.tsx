@@ -564,6 +564,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     (values: TransferParams, options: TransferOptions): Promise<SWTransactionResponse> => {
       const { asset, chain, destChain, from, to, value } = values;
 
+      // prepare params
       const createBaseParams = (substrateProxyAddress?: string): RequestSubmitTransfer => ({
         from,
         chain,
@@ -578,6 +579,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         substrateProxyAddress
       });
 
+      // create send promise
       const createSendPromise = (params: RequestSubmitTransfer) =>
         chain === destChain
           ? makeTransfer(params)
@@ -588,6 +590,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             tokenPayFeeSlug: undefined // todo: support pay local fee for xcm later
           });
 
+      // submit logic
       return new Promise<SWTransactionResponse>((resolve, reject) => {
         selectSubstrateProxyAccountsToSign({
           chain: chain,

@@ -290,6 +290,7 @@ const Component = (props: Props) => {
     setSearchValue(value);
   }, []);
 
+  // submit action
   const submit = useCallback((target: ValidatorInfo[]) => {
     const sendPromise = (substrateProxyAddress?: string) => {
       return changeEarningValidator({
@@ -304,6 +305,7 @@ const Component = (props: Props) => {
     setSubmitLoading(true);
 
     setTimeout(() => {
+      // select proxy and send transaction, then handle result
       selectSubstrateProxyAccountsToSign({
         address: from,
         chain,

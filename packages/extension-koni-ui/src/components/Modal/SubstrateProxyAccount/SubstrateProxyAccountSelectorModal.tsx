@@ -38,6 +38,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   const [selected, setSelected] = useState<string>(address);
   const account = useGetAccountByAddress(address);
 
+  // Combine main account and proxy accounts
   const fullList = useMemo(() => {
     return [
       {
