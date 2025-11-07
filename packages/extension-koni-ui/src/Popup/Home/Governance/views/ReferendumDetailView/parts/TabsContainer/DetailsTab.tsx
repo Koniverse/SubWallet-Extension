@@ -53,6 +53,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
         >
           {trackNames.map((name) => (
             <ReferendumTrackTag
+              className={'referendum-tag'}
               key={name}
               trackName={capitalize(name)}
             />
@@ -272,10 +273,21 @@ export const DetailsTab = styled(Component)<Props>(({ theme: { token } }: Props)
       alignItems: 'center'
     },
 
-    '.account-info-proposal-call .__value': {
-      display: 'flex',
-      alignItems: 'center',
-      gap: token.sizeXXS
+    '.account-info-proposal-call': {
+      '.referendum-tag': {
+        marginLeft: 'auto'
+      },
+
+      '& .__value-col': {
+        overflow: 'unset'
+      },
+
+      '& .__value': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: token.sizeXXS,
+        flexWrap: 'wrap'
+      }
     }
   };
 });
