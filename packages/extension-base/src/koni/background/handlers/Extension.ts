@@ -62,7 +62,7 @@ import { AccountChainType, AccountJson, AccountProxyMap, AccountSignMode, Accoun
 import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
-import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { SwapPair, SwapQuoteResponse, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -4645,7 +4645,10 @@ export default class KoniExtension {
     return this.#koniState.swapService.getSwapPairs();
   }
 
-  private async handleSwapRequest (request: SwapRequest): Promise<SwapRequestResult> {
+  /**
+   * @deprecated Use function `handleSwapRequestV2` instead.
+   */
+  private async handleSwapRequest (request: SwapRequestV2): Promise<SwapRequestResult> {
     // @ts-ignore
     return Promise.resolve(null);
   }
@@ -4654,7 +4657,7 @@ export default class KoniExtension {
     return this.#koniState.swapService.handleSwapRequestV2(request);
   }
 
-  private async getLatestSwapQuote (swapRequest: SwapRequest): Promise<SwapQuoteResponse> {
+  private async getLatestSwapQuote (swapRequest: SwapRequestV2): Promise<SwapQuoteResponse> {
     const { swapQuoteResponse } = await this.#koniState.swapService.getLatestQuoteFromSwapRequest(swapRequest);
 
     return swapQuoteResponse;
@@ -5818,11 +5821,11 @@ export default class KoniExtension {
       case 'pri(swapService.subscribePairs)':
         return this.subscribeSwapPairs(id, port);
       case 'pri(swapService.handleSwapRequest)':
-        return this.handleSwapRequest(request as SwapRequest);
+        return this.handleSwapRequest(request as SwapRequestV2);
       case 'pri(swapService.handleSwapRequestV2)':
-        return this.handleSwapRequestV2(request as SwapRequest);
+        return this.handleSwapRequestV2(request as SwapRequestV2);
       case 'pri(swapService.getLatestQuote)':
-        return this.getLatestSwapQuote(request as SwapRequest);
+        return this.getLatestSwapQuote(request as SwapRequestV2);
       case 'pri(swapService.validateSwapProcess)':
         return this.validateSwapProcess(request as ValidateSwapProcessParams);
       case 'pri(swapService.handleSwapStep)':

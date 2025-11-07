@@ -170,6 +170,9 @@ export interface ProcessedQuoteAskResponse {
   error?: SwapError;
 }
 
+/**
+ * @deprecated Use interface `SwapRequestV2` instead.
+ */
 export interface SwapRequest {
   address: string;
   pair: SwapPair;
@@ -242,7 +245,7 @@ export const enum BridgeStepPosition {
 }
 
 export interface OptimalSwapPathParamsV2 {
-  request: SwapRequest;
+  request: SwapRequestV2;
   selectedQuote?: SwapQuote;
   path: DynamicSwapAction[];
 }
