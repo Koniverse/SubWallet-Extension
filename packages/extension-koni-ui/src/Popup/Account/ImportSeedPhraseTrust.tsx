@@ -132,7 +132,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       checkUnlock()
         .then(() => {
           setSubmitting(true);
-          validateSeedV2(seed).then((response) => {
+          validateSeedV2({
+            mnemonic: seed,
+            mnemonicType: 'trust-wallet'
+          }).then((response) => {
             setSeedValidationResponse(response);
 
             if (response.mnemonicTypes === 'general') {

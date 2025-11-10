@@ -4,7 +4,7 @@
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountProxyType, ResponseMnemonicValidateV2 } from '@subwallet/extension-base/types';
 import { AccountNameModal, CloseIcon, Layout, PageWrapper, PhraseNumberSelector, SeedPhraseInput } from '@subwallet/extension-koni-ui/components';
-import { ACCOUNT_NAME_MODAL, IMPORT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { ACCOUNT_NAME_MODAL, DEFAULT_MNEMONIC_TYPE, IMPORT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useDefaultNavigate, useFocusFormItem, useGoBackFromCreateAccount, useNotification, useTranslation, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
 import { createAccountSuriV2, validateSeedV2 } from '@subwallet/extension-koni-ui/messaging';
@@ -132,7 +132,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       checkUnlock()
         .then(() => {
           setSubmitting(true);
-          validateSeedV2(seed).then((response) => {
+          validateSeedV2({
+            mnemonic: seed,
+            mnemonicType: DEFAULT_MNEMONIC_TYPE
+          }).then((response) => {
             setSeedValidationResponse(response);
 
             if (response.mnemonicTypes === 'general') {
