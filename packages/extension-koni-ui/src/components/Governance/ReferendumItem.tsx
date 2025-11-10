@@ -27,7 +27,7 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
     getTimeLeft(item, chain)
   );
 
-  const thresholdPercent = getMinApprovalThreshold(item);
+  const thresholdPercent = getMinApprovalThreshold(item, chain);
   const refStatus = item.state.name;
 
   const timeLeftContent = useMemo(() => {
