@@ -255,9 +255,19 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
     return transactionConfig;
   } catch (error) {
     if (error instanceof SyntaxError) {
-      return Promise.reject(new Error('Unable to perform this transaction at the moment. Try again later'));
+      return Promise.reject(
+        new Error('Unable to perform this transaction at the moment. Try again later')
+      );
     }
 
-    return Promise.reject(new Error((error as Error)?.message || 'Unable to perform this transaction at the moment. Try again later'));
+    const message = (error as Error)?.message?.toLowerCase?.() || '';
+
+    if (!message.includes('amount')) {
+      return Promise.reject(
+        new Error('Unable to perform this transaction at the moment. Try again later')
+      );
+    }
+
+    return Promise.reject(new Error((error as Error)?.message));
   }
 };
