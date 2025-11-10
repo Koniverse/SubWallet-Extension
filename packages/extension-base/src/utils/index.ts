@@ -330,14 +330,36 @@ export const stripUrl = (url: string): string => {
 };
 
 export const baseParseIPFSUrl = (input: string, customDomain?: string): string | undefined => {
-  const selectedDomain = customDomain || getRandomIpfsGateway();
-
   if (!input || input.length === 0) {
     return undefined;
   }
 
-  if (isUrl(input)) {
+  // Case 1: Return as-is for inline data URLs (e.g. base64-encoded images)
+  if (input.startsWith('data:')) {
     return input;
+  }
+
+  const selectedDomain = customDomain || getRandomIpfsGateway();
+
+  // Case 2: Replace Pinata private gateways with a public IPFS gateway
+  // Pinata private gateways (mypinata.cloud / gateway.pinata.cloud) can return 403 for public access,
+  // so we replace them with a selectedDomain.
+  // EX: https://ikzttp.mypinata.cloud/ipfs/QmYDvPAXtiJg7s8JdRBSLWdgSphQdac8j1YuQNNxcGE1hg/9586.png
+  if (input.includes('mypinata.cloud') || input.includes('gateway.pinata.cloud')) {
+    return input.replace(/https?:\/\/[^/]*pinata\.cloud\/ipfs\//, `${selectedDomain}/ipfs/`);
+  }
+
+  // Case 3: Handle NFT.storage subdomain links (e.g. https://<cid>.ipfs.nftstorage.link/...)
+  // Always redirect to selectedDomain to avoid SSL version/cipher mismatch errors
+  // EX: https://bafybeias6as7k66hkghst3w4jwk6x5dkfk56oglqh44x6jmok6n7kcvg7m.ipfs.nftstorage.link/0.gif?ext=gif
+  const nftStorageMatch = input.match(/^https?:\/\/([a-zA-Z0-9]+)\.ipfs\.nftstorage\.link\/(.*)$/);
+
+  if (nftStorageMatch) {
+    const cid = nftStorageMatch[1];
+    const pathAndQuery = nftStorageMatch[2] || '';
+
+    // **Luôn dùng gateway IPFS chính để tránh lỗi SSL**
+    return `${selectedDomain}/ipfs/${cid}/${pathAndQuery}`;
   }
 
   if (isUrl(input) || input.includes('https://') || input.includes('http')) {

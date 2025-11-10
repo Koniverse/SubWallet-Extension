@@ -2252,33 +2252,22 @@ export default class KoniExtension {
         return true;
       }
 
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        await tokenContract.methods.ownerOf(1).call();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (tokenContract.methods.ownerOf) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+          await tokenContract.methods.ownerOf(1).call();
 
-        return true;
-      } catch (err: any) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        if (err.message?.includes('nonexistent token') || err.message?.includes('invalid token ID')) {
           return true;
-        }
-      }
-
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
-        const balance = await tokenContract.methods.balanceOf('0x0000000000000000000000000000000000000001').call();
-
-        if (balance !== undefined && typeof balance === 'string') {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          if (tokenContract.methods.ownerOf) {
+        } catch (err: any) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+          if (err.message?.includes('nonexistent token') || err.message?.includes('invalid token ID')) {
             return true;
           }
         }
-
-        return false;
-      } catch {
-        return false;
       }
+
+      return false;
     } catch (err) {
       const error = err as Error;
 

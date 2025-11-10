@@ -77,6 +77,7 @@ function mapSdkToNftItem (
   }
 
   const hasProperties = Object.keys(properties).length > 0;
+  const normalizedType = rawInstance.token_type?.replace('-', '')?.toUpperCase();
 
   return {
     id: rawInstance.id?.toString(),
@@ -92,7 +93,7 @@ function mapSdkToNftItem (
     description: metadata.description || undefined,
     properties: hasProperties ? properties : null,
 
-    type: rawInstance.token_type as _AssetType.ERC721,
+    type: normalizedType === 'ERC721' ? _AssetType.ERC721 : _AssetType.ERC721, // currently only support ERC721
     rmrk_ver: undefined,
     onChainOption: undefined,
     assetHubType: undefined
