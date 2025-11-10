@@ -48,6 +48,7 @@ export const govStatusItems: GovStatusItem[] = [
 ];
 
 export const ongoingGovStatusItems: GovStatusItem[] = [
+  govStatusDisplayMap[GovStatusKey.ALL],
   govStatusDisplayMap[GovStatusKey.PREPARING],
   govStatusDisplayMap[GovStatusKey.DECIDING],
   govStatusDisplayMap[GovStatusKey.CONFIRMING],
