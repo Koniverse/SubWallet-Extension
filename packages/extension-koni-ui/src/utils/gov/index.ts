@@ -152,14 +152,16 @@ export function getMinApprovalThresholdGov1 (referendum: Referendum | Referendum
   return toPercentage(clamped.toNumber(), 1); // return % between 0 and 100
 }
 
-function getMinApprovalThresholdGov2 (referendumDetail: Referendum | ReferendumDetail): number {
+function getMinApprovalThresholdGov2 (referendumDetail: Referendum | ReferendumDetail, chain: string, migrationBlockOffset: number): number {
   const { decisionPeriod, minApproval } = referendumDetail.trackInfo;
   const decidingSince = referendumDetail.onchainData?.info?.deciding?.since;
-  const currentBlock = referendumDetail.onchainData?.state?.indexer?.blockHeight;
+  let currentBlock = referendumDetail.onchainData?.state?.indexer?.blockHeight;
 
   if (!minApproval || !decidingSince || !currentBlock) {
     return 0;
   }
+
+  currentBlock = new BigNumber(currentBlock).plus(migrationBlockOffset).toNumber();
 
   const gone = new BigNumber(currentBlock).minus(decidingSince);
   const percentage = gone.div(decisionPeriod);
@@ -174,8 +176,9 @@ function getMinApprovalThresholdGov2 (referendumDetail: Referendum | ReferendumD
       .multipliedBy(1e9);
 
     const calcValue = v.plus(yOffset).div(1e9);
+    const result = Math.max(calcValue.toNumber(), 0);
 
-    return toPercentage(Math.max(calcValue.toNumber(), 0), 1);
+    return toPercentage(result, 1);
   }
 
   // Case 2: linear
@@ -188,25 +191,21 @@ function getMinApprovalThresholdGov2 (referendumDetail: Referendum | ReferendumD
     const perbill = new BigNumber(ceil).minus(deducted);
 
     const calcValue = perbill.div(1e9);
+    const result = Math.max(calcValue.toNumber(), 0);
 
-    return toPercentage(Math.max(calcValue.toNumber(), 0), 1);
+    return toPercentage(result, 1);
   }
 
   return 0;
 }
 
-export function getMinApprovalThreshold (referendum: Referendum | ReferendumDetail): number {
+export function getMinApprovalThreshold (referendum: Referendum | ReferendumDetail, chain: string, migrationBlockOffset: number): number {
   if (referendum.version === 1) {
     return getMinApprovalThresholdGov1(referendum);
   } else {
-    return getMinApprovalThresholdGov2(referendum);
+    return getMinApprovalThresholdGov2(referendum, chain, migrationBlockOffset);
   }
 }
-
-const _MIGRATION_BLOCK_OFFSET: Record<string, number> = {
-  statemine: 19310415,
-  statemint: 18237370
-};
 
 const calculateTimeLeft = (
   blockTime: number,
@@ -278,14 +277,14 @@ const calculateTimeLeft = (
   return { timeLeft, endTime: endTime.toNumber() };
 };
 
-export const getTimeLeft = (data: Referendum | ReferendumDetail, chain: string): string | undefined => {
+export const getTimeLeft = (data: Referendum | ReferendumDetail, chain: string, migrationBlockOffset: number): string | undefined => {
   return calculateTimeLeft(
     data.state.indexer.blockTime,
     data.state.indexer.blockHeight,
     data.onchainData.info.alarm?.[0] || null,
     data.state.name,
     _EXPECTED_BLOCK_TIME[chain],
-    _MIGRATION_BLOCK_OFFSET[chain] || 0,
+    migrationBlockOffset,
     data.trackInfo?.decisionPeriod,
     data.onchainData.info.deciding?.since
   ).timeLeft;

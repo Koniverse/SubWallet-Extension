@@ -2767,7 +2767,7 @@ export interface KoniRequestSignatures {
   'pri(openGov.vote)': [GovVoteRequest, SWTransactionResponse];
   'pri(openGov.unvote)': [RemoveVoteRequest, SWTransactionResponse]
   'pri(openGov.subscribeGovLockedInfo)': [null, GovVotingInfo[], GovVotingInfo[]];
-  'pri(openGov.unlockVote)': [UnlockVoteRequest, SWTransactionResponse]
+  'pri(openGov.unlockVote)': [UnlockVoteRequest, SWTransactionResponse];
 }
 
 export interface ApplicationMetadataType {
