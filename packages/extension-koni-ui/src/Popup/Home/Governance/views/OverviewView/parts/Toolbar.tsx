@@ -6,7 +6,7 @@ import { GovFilterModal } from '@subwallet/extension-koni-ui/components/Modal/Go
 import { ReferendaCategory } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Badge, Button, Icon, ModalContext } from '@subwallet/react-ui';
-import { GovStatusKey, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
+import { ALL_TRACK_ID, GovStatusKey, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { FadersHorizontal, MagnifyingGlass } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -86,7 +86,13 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
   useEffect(() => {
     setStatusSelected(GovStatusKey.ALL);
     setStatusSelectedState(GovStatusKey.ALL);
-  }, [selectedReferendaCategory, setStatusSelected]);
+    setTrackSelected(ALL_TRACK_ID);
+    setTrackSelectedState(ALL_TRACK_ID);
+    setIsEnableTreasuryFilterState(false);
+    setIsEnableTreasuryFilter(false);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedReferendaCategory]);
 
   return (
     <div className={className}>
