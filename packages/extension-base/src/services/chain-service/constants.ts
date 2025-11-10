@@ -147,6 +147,8 @@ export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
   statemint: 6,
   statemine: 6,
   polkadex: 12,
+  westend_assethub: 6,
+  paseo_assethub: 6,
   ternoa: 6,
   ternoa_alphanet: 6,
   westend: 6,

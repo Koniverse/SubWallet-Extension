@@ -7,7 +7,9 @@ import { useQuery } from '@tanstack/react-query';
 
 const MIGRATED_CHAINS = [
   'statemine',
-  'statemint'
+  'statemint',
+  'paseo_assethub',
+  'westend_assethub'
 ];
 
 const CACHE_TTL = 20 * 60 * 1000;
