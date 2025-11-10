@@ -81,10 +81,9 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   const shouldShowVoteButton = useMemo(() => {
     const isVersion1 = referendumDetail.version === 1;
     const isCompleted = GOV_COMPLETED_STATES.includes(referendumDetail.state.name);
-    const hasDelegatedVote = userVotingInfo?.every(({ delegation }) => !!delegation?.target);
 
-    return !(isVersion1 || isCompleted || hasDelegatedVote);
-  }, [referendumDetail.state.name, referendumDetail.version, userVotingInfo]);
+    return !(isVersion1 || isCompleted);
+  }, [referendumDetail.state.name, referendumDetail.version]);
 
   useEffect(() => {
     const updateTime = () => setTimeLeft(getTimeLeft(referendumDetail, chain, migrationBlockOffset));

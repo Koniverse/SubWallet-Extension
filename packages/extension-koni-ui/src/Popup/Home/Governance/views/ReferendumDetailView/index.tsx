@@ -179,12 +179,12 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
   }, [chainSlug, className, closeAlert, data?.track, fromAccountProxy, navigate, openAlert, referendumId, setGovRefVoteStorage, t, token.colorTextLight2]);
 
   const onClickVote = useCallback(() => {
-    if (accountAddressItems.length > 1) {
+    if (extendedAccountAddressItems.length > 1) {
       activeModal(modalId);
-    } else if (accountAddressItems.length === 1) {
-      onSelectGovItem(accountAddressItems[0]);
+    } else if (extendedAccountAddressItems.length === 1) {
+      onSelectGovItem(extendedAccountAddressItems[0]);
     }
-  }, [accountAddressItems, activeModal, onSelectGovItem]);
+  }, [extendedAccountAddressItems, activeModal, onSelectGovItem]);
 
   const onCancel = useCallback(() => {
     inactiveModal(modalId);

@@ -165,7 +165,7 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
 
 export const ReferendaSearchModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-
+    height: '100%',
     '.ant-sw-modal-body': {
       height: '100%',
       overflowY: 'hidden',
@@ -173,8 +173,7 @@ export const ReferendaSearchModal = styled(Component)<Props>(({ theme: { token }
     },
     '.ant-sw-modal-content': {
       height: '100%',
-      minHeight: 599,
-      maxHeight: 599,
+      maxHeight: 'unset !important',
       borderRadius: 0
     },
 
@@ -184,7 +183,7 @@ export const ReferendaSearchModal = styled(Component)<Props>(({ theme: { token }
 
     '.referenda-list': {
       paddingInline: 0,
-      height: 412,
+      height: '95%',
       overflowY: 'scroll'
     },
 
@@ -196,7 +195,7 @@ export const ReferendaSearchModal = styled(Component)<Props>(({ theme: { token }
       margin: 'auto',
       width: 'fit-content',
       marginTop: 100,
-      height: 412
+      height: '95%'
     }
   };
 });

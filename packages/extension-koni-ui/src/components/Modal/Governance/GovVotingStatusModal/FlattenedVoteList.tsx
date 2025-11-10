@@ -59,8 +59,13 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
   }, [notify, t]);
 
   const renderItem = useCallback((item: ReferendumVoteDetail) => {
+    let convictionLabel = 'N/A';
     const convictionOption = govConvictionOptions.find((opt) => opt.value === item.conviction);
-    const convictionLabel = convictionOption ? convictionOption.label : `${item.conviction}x`;
+
+    if (convictionOption || item.conviction) {
+      convictionLabel = convictionOption ? convictionOption.label : `${item.conviction}x`;
+    }
+
     const account = findAccountByAddress(accountsState, item.account);
     let accountProxy;
 

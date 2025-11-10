@@ -33,6 +33,10 @@ function Component (props: Props): React.ReactElement<Props> {
   }, [inactiveModal, onCancel]);
 
   const convictionSelVotes = useMemo(() => {
+    if (!nestedAccount.accountInfo.conviction == null) {
+      return 'N/A';
+    }
+
     const convictionOption = govConvictionOptions.find((opt) => opt.value === nestedAccount.accountInfo.conviction);
 
     return convictionOption ? convictionOption.label : `${nestedAccount.accountInfo.conviction}x`;
