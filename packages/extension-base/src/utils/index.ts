@@ -346,7 +346,7 @@ export const baseParseIPFSUrl = (input: string, customDomain?: string): string |
   // so we replace them with a selectedDomain.
   // EX: https://ikzttp.mypinata.cloud/ipfs/QmYDvPAXtiJg7s8JdRBSLWdgSphQdac8j1YuQNNxcGE1hg/9586.png
   if (input.includes('mypinata.cloud') || input.includes('gateway.pinata.cloud')) {
-    return input.replace(/https?:\/\/[^/]*pinata\.cloud\/ipfs\//, `${selectedDomain}/ipfs/`);
+    return input.replace(/https?:\/\/[^/]*pinata\.cloud\/ipfs\//, `${selectedDomain}`);
   }
 
   // Case 3: Handle NFT.storage subdomain links (e.g. https://<cid>.ipfs.nftstorage.link/...)
@@ -358,8 +358,7 @@ export const baseParseIPFSUrl = (input: string, customDomain?: string): string |
     const cid = nftStorageMatch[1];
     const pathAndQuery = nftStorageMatch[2] || '';
 
-    // **Luôn dùng gateway IPFS chính để tránh lỗi SSL**
-    return `${selectedDomain}/ipfs/${cid}/${pathAndQuery}`;
+    return `${selectedDomain}${cid}/${pathAndQuery}`;
   }
 
   if (isUrl(input) || input.includes('https://') || input.includes('http')) {
