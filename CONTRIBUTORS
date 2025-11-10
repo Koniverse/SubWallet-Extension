@@ -1,16 +1,16 @@
-    3224	AnhMTV                        	Release version 1.3.63
+    3243	AnhMTV                        	Release version 1.3.66
     2671	Nam Phạm                      	disable block explorer for truth network
     2599	S2kael                        	[Issue-4521] Update stable version for chain-list
-     997	bluezdot                      	
+    1010	bluezdot                      	
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
      575	nguyentiendung                	
      550	Frenkie Nguyen                	[Issue-4462] update styling for background phishing page
      465	Jaco                          	0.42.5 (#969)
-     418	tunghp2002                    	[Issue-4666] turn off middleware
+     434	tunghp2002                    	
      355	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
+     291	PDTnhah                       	Revert "[Issue-4822] feat: remove polkadot <> manta atlantic xcm pair"
      279	lw                            	[Issue-4462] refactor: Refactor logic related to amount input
-     261	PDTnhah                       	[Issue-4536] Force build for testing
-     189	Thiendekaco                   	[Issue-4754] fix: show identity for native staking
+     199	Thiendekaco                   	[Issue-4739] chore: resolve comment after review pr
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
      170	lw-cdm                        	
