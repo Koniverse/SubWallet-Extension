@@ -5214,18 +5214,10 @@ export default class KoniExtension {
 
   private async handleVote (request: GovVoteRequest): Promise<SWTransactionResponse> {
     const extrinsic = await this.#koniState.openGovService.handleVote(request);
-    const { abstainAmount, amount, ayeAmount, nayAmount } = request as Partial<Record<'amount' | 'ayeAmount' | 'nayAmount' | 'abstainAmount', string>>;
-
-    const transferNativeAmount = new BigN(amount || 0)
-      .plus(ayeAmount || 0)
-      .plus(nayAmount || 0)
-      .plus(abstainAmount || 0)
-      .toString();
 
     return await this.#koniState.transactionService.handleTransaction({
       address: request.address,
       chain: request.chain,
-      transferNativeAmount,
       transaction: extrinsic,
       data: request,
       extrinsicType: ExtrinsicType.GOV_VOTE,

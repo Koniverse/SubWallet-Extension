@@ -45,6 +45,7 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
     [GovVoteType.ABSTAIN]: initBucket()
   };
 
+  // Build a map for quick lookup: account -> voter detail
   const votersByAccount = new Map<string, ReferendumVoteDetail>();
 
   for (const v of rawVotes) {
@@ -53,6 +54,7 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
 
   const nestedMap: Record<string, NestedAccount> = {};
 
+  // Helper to construct a vote entry for a side (AYE/NAY/ABSTAIN)
   const buildSideEntry = (
     voter: ReferendumVoteDetail,
     side: GovVoteType,
@@ -86,20 +88,27 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
     return entry as ReferendumVoteDetail;
   };
 
-  const addFlattened = (side: GovVoteSide, sideEntry: ReferendumVoteDetail, amountBn: BigNumber) => {
+  // Add a voter to flattened list and update totals
+  const addFlattened = (side: GovVoteSide, sideEntry: ReferendumVoteDetail, amountBn: BigNumber, countToTotal = true) => {
     if (amountBn.lt(0)) {
       return;
     }
 
     result[side].accounts.flattened.push(sideEntry);
     result[side].totalVotedAccounts++;
-    result[side].totalVotedAmount = new BigNumber(result[side].totalVotedAmount).plus(amountBn).toString();
+
+    if (countToTotal) {
+      result[side].totalVotedAmount = new BigNumber(result[side].totalVotedAmount)
+        .plus(amountBn)
+        .toString();
+    }
   };
 
   for (const voter of rawVotes) {
     if (voter.isDelegating && voter.target) {
       const delegatorVotesBn = new BigNumber(voter.votes || 0);
 
+      // Update nested map for the target account
       if (delegatorVotesBn.gt(0)) {
         const target = voter.target;
 
@@ -119,20 +128,23 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
           .toString();
       }
 
+      // If not split, also add delegator to flattened (self-vote for display)
       if (!voter.isSplit && !voter.isSplitAbstain) {
         const side = voter.aye === true ? GovVoteType.AYE : voter.aye === false ? GovVoteType.NAY : GovVoteType.AYE;
         const sideEntry = buildSideEntry(voter, side, delegatorVotesBn, new BigNumber(voter.balance || 0));
 
-        addFlattened(side, sideEntry, delegatorVotesBn);
+        addFlattened(side, sideEntry, delegatorVotesBn, false);
       }
     }
   }
 
+  // Handle non-delegating voters
   for (const voter of rawVotes) {
     if (voter.isDelegating && voter.target) {
       continue;
     }
 
+    // Split-abstain voters: distribute votes to AYE/NAY/ABSTAIN
     if (voter.isSplitAbstain) {
       const ayeVotesBn = new BigNumber(voter.ayeVotes || 0);
       const nayVotesBn = new BigNumber(voter.nayVotes || 0);
@@ -163,6 +175,7 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
       continue;
     }
 
+    // Split voters: distribute votes between AYE/NAY
     if (voter.isSplit) {
       const ayeVotesBn = new BigNumber(voter.ayeVotes || 0);
       const nayVotesBn = new BigNumber(voter.nayVotes || 0);
@@ -185,50 +198,39 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
       continue;
     }
 
+    // Standard voters (single choice)
     if (voter.isStandard) {
       const selfVotesBn = new BigNumber(voter.votes || 0);
       const delegatedVotesBn = new BigNumber(voter.delegations?.votes || 0);
-      const delegatedCapitalBn = new BigNumber(voter.delegations?.capital || 0);
+
       const selfBalanceBn = new BigNumber(voter.balance || 0);
 
-      let finalVotesBn = selfVotesBn;
-      let finalBalanceBn = selfBalanceBn;
+      // Only add self votes to flattened list
+      if (selfVotesBn.gt(0) || delegatedVotesBn.gt(0)) {
+        const side = voter.aye === true
+          ? GovVoteType.AYE
+          : voter.aye === false
+            ? GovVoteType.NAY
+            : GovVoteType.AYE;
 
-      if (delegatedVotesBn.gt(0)) {
-        finalVotesBn = selfVotesBn.plus(delegatedVotesBn);
-        finalBalanceBn = selfBalanceBn.plus(delegatedCapitalBn);
+        const sideEntry = buildSideEntry(voter, side, selfVotesBn, selfBalanceBn);
 
-        if (!nestedMap[voter.account]) {
-          nestedMap[voter.account] = {
-            accountInfo: votersByAccount.get(voter.account) ?? ({ account: voter.account } as ReferendumVoteDetail),
-            totalDelegatedAccount: 0,
-            totalDelegatedVote: delegatedVotesBn.toString(),
-            delegatedAccount: []
-          };
-        } else {
-          nestedMap[voter.account].totalDelegatedVote = new BigNumber(nestedMap[voter.account].totalDelegatedVote)
-            .plus(delegatedVotesBn)
-            .toString();
-        }
-      }
-
-      if (finalVotesBn.gt(0)) {
-        const side = voter.aye === true ? GovVoteType.AYE : voter.aye === false ? GovVoteType.NAY : GovVoteType.AYE;
-        const sideEntry = buildSideEntry(voter, side, finalVotesBn, finalBalanceBn);
-
-        addFlattened(side, sideEntry, finalVotesBn);
+        addFlattened(side, sideEntry, selfVotesBn);
       }
     }
   }
 
+  // Aggregate nested votes for all accounts
   Object.values(nestedMap).forEach((nested) => {
     const targetEntry = nested.accountInfo;
     const selfVotesBn = new BigNumber(targetEntry?.votes || 0);
 
+    // Add self votes to totalDelegatedVote
     if (selfVotesBn.gt(0)) {
       nested.totalDelegatedVote = new BigNumber(nested.totalDelegatedVote).plus(selfVotesBn).toString();
     }
 
+    // Determine side for nested entry based on target or first delegator
     let side = GovVoteType.AYE;
 
     if (targetEntry.aye !== undefined) {
@@ -247,6 +249,7 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
   return result;
 }
 
+// Get voting status for a given account
 export const getAccountVoteStatus = (address: string, voteMap: Map<string, ReferendumVoteDetail>): GovVoteStatus => {
   const voteDetail = voteMap.get(address.toLowerCase());
 
