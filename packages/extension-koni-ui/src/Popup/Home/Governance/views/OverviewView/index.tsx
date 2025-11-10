@@ -15,6 +15,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import { useMigrationOffset } from '../../hooks/useGovernanceView/useMigrationOffset';
 import { ChainSelector } from './parts/ChainSelector';
 import { QuickActionsContainer } from './parts/QuickActionsContainer';
 import { ReferendaList } from './parts/ReferendaList';
@@ -89,6 +90,8 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
     staleTime: 60 * 1000
   });
 
+  const { data: migrationBlockOffset = 0, isLoading: migrationBlockOffsetLoading } = useMigrationOffset(chainSlug, sdkInstance);
+
   const onClickReferendumItem = useCallback((item: Referendum) => {
     goReferendumDetail(`${item.referendumIndex}`);
   }, [goReferendumDetail]);
@@ -157,7 +160,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
     setReferendaItems(filteredExtended);
   }, [data?.pages, selectedReferendaCategory, govLockedInfos, isEnableVotedFilter, isEnableDelegatedFilter]);
 
-  const isLoading = isInitialLoading || isLoadingMore;
+  const isLoading = isInitialLoading || isLoadingMore || migrationBlockOffsetLoading;
 
   return (
     <div
@@ -202,6 +205,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
       {!isInitialLoading && <ReferendaList
         chain={chainSlug}
         items={referendaItems}
+        migrationBlockOffset={migrationBlockOffset}
         onClickItem={onClickReferendumItem}
       />}
 

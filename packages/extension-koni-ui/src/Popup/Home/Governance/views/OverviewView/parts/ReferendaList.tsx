@@ -16,13 +16,14 @@ type Props = ThemeProps & {
   chain: string;
   items: ReferendumWithVoting[];
   renderWhenEmpty?: React.ReactElement;
+  migrationBlockOffset: number;
 };
 
 type WrapperProps = Omit<Props, 'items'> & {
   items?: Referendum[];
 };
 
-const Component = ({ chain, className, items, onClickItem, renderWhenEmpty }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, items, migrationBlockOffset, onClickItem, renderWhenEmpty }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
 
   const _onClickItem = useCallback((item: Referendum) => {
@@ -41,6 +42,7 @@ const Component = ({ chain, className, items, onClickItem, renderWhenEmpty }: Pr
               className={'__referendum-item'}
               item={item}
               key={item.referendumIndex}
+              migrationBlockOffset={migrationBlockOffset}
               onClick={_onClickItem(item)}
             />
           ))
