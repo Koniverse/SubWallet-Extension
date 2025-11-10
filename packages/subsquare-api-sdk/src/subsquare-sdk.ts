@@ -3,7 +3,7 @@
 
 import axios, { AxiosInstance } from 'axios';
 
-import { DemocracyReferendaResponse, DemocracyReferendum, ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, Referendum, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
+import { DemocracyReferendaResponse, DemocracyReferendum, ReadableStreamReadResult, ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, Referendum, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
 import { gov1ReferendumsApi, gov2ReferendumsApi, gov2TracksApi } from './url';
 import { ALL_TRACK, castDemocracyReferendumToReferendum, reformatTrackName } from './utils';
 
@@ -34,12 +34,13 @@ export class SubsquareApiSdk {
   private client: AxiosInstance;
   private static instances: Map<string, SubsquareApiSdk> = new Map();
   public isLegacyGov = false;
-
+  private chain: string;
   private constructor (chain: string) {
     const baseURL = specialBaseUrls[chain] || `https://${chain}-api.subsquare.io`;
 
     this.isLegacyGov = LegacyGovChains.includes(chain);
     this.client = axios.create({ baseURL });
+    this.chain = chain;
   }
 
   static getInstance (chain: string): SubsquareApiSdk {
@@ -48,6 +49,51 @@ export class SubsquareApiSdk {
     }
 
     return this.instances.get(chain) as SubsquareApiSdk;
+  }
+
+  async getMigrationBlockOffset (blockTime: number): Promise<number | null> {
+    try {
+      const urls = [
+        `/stream/relay-chain-height?interval=${blockTime * 1000}`,
+        `/stream/scan-height?interval=${blockTime * 1000}`
+      ];
+
+      const results = await Promise.all(
+        urls.map(async (url) => {
+          const res = await fetch(new URL(url, this.client.defaults.baseURL));
+
+          if (!res.body) {
+            throw new Error('Response body is null');
+          }
+
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+
+          // @ts-ignore
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const readResult: ReadableStreamReadResult<Uint8Array> = await reader.read();
+          const { done, value } = readResult;
+
+          if (done || !value) {
+            throw new Error('No data from stream');
+          }
+
+          const text = decoder.decode(value);
+
+          const data = JSON.parse(text) as { value: number };
+
+          return data.value;
+        })
+      );
+
+      const [relayHeight, scanHeight] = results;
+
+      return relayHeight - scanHeight;
+    } catch (err) {
+      console.error(`Failed to get migration block offset for ${this.chain}:`, err);
+
+      return null;
+    }
   }
 
   async getReferenda (params?: ReferendaQueryParams): Promise<ReferendaResponse> {

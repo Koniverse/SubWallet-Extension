@@ -438,3 +438,5 @@ export const GOV_COMPLETED_FAILED_STATES: GovStatusKey[] = [
 ];
 
 /* Gov Status */
+
+export type ReadableStreamReadResult<T> = | { done: false; value: T } | { done: true; value?: undefined }

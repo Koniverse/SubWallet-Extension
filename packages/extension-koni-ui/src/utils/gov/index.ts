@@ -152,7 +152,7 @@ export function getMinApprovalThresholdGov1 (referendum: Referendum | Referendum
   return toPercentage(clamped.toNumber(), 1); // return % between 0 and 100
 }
 
-function getMinApprovalThresholdGov2 (referendumDetail: Referendum | ReferendumDetail, chain: string): number {
+function getMinApprovalThresholdGov2 (referendumDetail: Referendum | ReferendumDetail, chain: string, migrationBlockOffset: number): number {
   const { decisionPeriod, minApproval } = referendumDetail.trackInfo;
   const decidingSince = referendumDetail.onchainData?.info?.deciding?.since;
   let currentBlock = referendumDetail.onchainData?.state?.indexer?.blockHeight;
@@ -161,9 +161,7 @@ function getMinApprovalThresholdGov2 (referendumDetail: Referendum | ReferendumD
     return 0;
   }
 
-  const offset = _MIGRATION_BLOCK_OFFSET[chain] || 0;
-
-  currentBlock = new BigNumber(currentBlock).plus(offset).toNumber();
+  currentBlock = new BigNumber(currentBlock).plus(migrationBlockOffset).toNumber();
 
   const gone = new BigNumber(currentBlock).minus(decidingSince);
   const percentage = gone.div(decisionPeriod);
@@ -201,18 +199,13 @@ function getMinApprovalThresholdGov2 (referendumDetail: Referendum | ReferendumD
   return 0;
 }
 
-export function getMinApprovalThreshold (referendum: Referendum | ReferendumDetail, chain: string): number {
+export function getMinApprovalThreshold (referendum: Referendum | ReferendumDetail, chain: string, migrationBlockOffset: number): number {
   if (referendum.version === 1) {
     return getMinApprovalThresholdGov1(referendum);
   } else {
-    return getMinApprovalThresholdGov2(referendum, chain);
+    return getMinApprovalThresholdGov2(referendum, chain, migrationBlockOffset);
   }
 }
-
-const _MIGRATION_BLOCK_OFFSET: Record<string, number> = {
-  statemine: 19313204,
-  statemint: 18238804
-};
 
 const calculateTimeLeft = (
   blockTime: number,
@@ -284,14 +277,14 @@ const calculateTimeLeft = (
   return { timeLeft, endTime: endTime.toNumber() };
 };
 
-export const getTimeLeft = (data: Referendum | ReferendumDetail, chain: string): string | undefined => {
+export const getTimeLeft = (data: Referendum | ReferendumDetail, chain: string, migrationBlockOffset: number): string | undefined => {
   return calculateTimeLeft(
     data.state.indexer.blockTime,
     data.state.indexer.blockHeight,
     data.onchainData.info.alarm?.[0] || null,
     data.state.name,
     _EXPECTED_BLOCK_TIME[chain],
-    _MIGRATION_BLOCK_OFFSET[chain] || 0,
+    migrationBlockOffset,
     data.trackInfo?.decisionPeriod,
     data.onchainData.info.deciding?.since
   ).timeLeft;

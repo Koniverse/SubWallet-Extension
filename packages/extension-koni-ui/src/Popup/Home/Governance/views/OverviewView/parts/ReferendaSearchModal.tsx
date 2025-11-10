@@ -17,6 +17,7 @@ import React, { Context, useCallback, useContext, useEffect, useMemo } from 'rea
 import { useTranslation } from 'react-i18next';
 import styled, { ThemeContext } from 'styled-components';
 
+import { useMigrationOffset } from '../../../hooks/useGovernanceView/useMigrationOffset';
 import { ReferendaList } from './ReferendaList';
 
 type Props = ThemeProps & {
@@ -60,6 +61,8 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
     },
     staleTime: 60 * 1000
   });
+
+  const { data: migrationBlockOffset = 0 } = useMigrationOffset(chain, sdkInstance);
 
   const { data: searchData, isFetching, refetch } = useQuery<{ govReferenda: Referendum[] }>({
     queryKey: GOV_QUERY_KEYS.referendaList(chain),
@@ -150,9 +153,11 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
           chain={chain}
           className='referenda-list'
           items={filteredItems}
+          migrationBlockOffset={migrationBlockOffset}
           onClickItem={onClickItem}
           renderWhenEmpty={renderEmpty}
-        />}
+        />
+      }
 
     </SwModal>
   );

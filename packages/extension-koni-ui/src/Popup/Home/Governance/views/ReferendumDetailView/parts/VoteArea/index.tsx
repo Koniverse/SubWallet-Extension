@@ -15,6 +15,7 @@ import { Clock, Info } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
+import { useMigrationOffset } from '../../../../hooks/useGovernanceView/useMigrationOffset';
 import { VotingStats } from './VotingStats';
 
 type Props = ThemeProps & {
@@ -30,15 +31,15 @@ const GovVotedAccountsModalId = 'gov-voted-accounts-modal';
 const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstance, voteMap }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { ayesPercent, naysPercent } = getTallyVotesBarPercent(referendumDetail.onchainData.tally);
+  const { data: migrationBlockOffset = 0 } = useMigrationOffset(chain, sdkInstance);
+
   const referendumId = referendumDetail?.referendumIndex;
-  const thresholdPercent = getMinApprovalThreshold(referendumDetail, chain);
+  const thresholdPercent = getMinApprovalThreshold(referendumDetail, chain, migrationBlockOffset);
   const govLockedInfos = useGetGovLockedInfos(chain);
   const { activeModal } = useContext(ModalContext);
   const isAllAccount = useSelector((state) => state.accountState.isAllAccount);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
-  const [timeLeft, setTimeLeft] = useState<string | undefined>(() =>
-    getTimeLeft(referendumDetail, chain)
-  );
+  const [timeLeft, setTimeLeft] = useState<string | undefined>();
 
   const userVotingInfo = useMemo<UserVoting[] | undefined>(() => {
     if (!referendumDetail) {
@@ -86,12 +87,13 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   }, [referendumDetail.state.name, referendumDetail.version, userVotingInfo]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeLeft(getTimeLeft(referendumDetail, chain));
-    }, 1000);
+    const updateTime = () => setTimeLeft(getTimeLeft(referendumDetail, chain, migrationBlockOffset));
+
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
 
     return () => clearInterval(interval);
-  }, [chain, referendumDetail]);
+  }, [referendumDetail, chain, migrationBlockOffset]);
 
   return (
     <div className={className}>

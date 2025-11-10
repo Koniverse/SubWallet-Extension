@@ -8,7 +8,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Badge, Button, Icon, ModalContext } from '@subwallet/react-ui';
 import { GovStatusKey, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { FadersHorizontal, MagnifyingGlass } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -82,6 +82,11 @@ const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasury
   }, [inactiveModal, isEnableTreasuryFilterState, setIsEnableTreasuryFilter, setStatusSelected, setTrackSelected, statusSelectedState, trackSelectedState]);
 
   const hasAnyFilterValue = isEnableDelegatedFilter || isEnableTreasuryFilter || isEnableVotedFilter || (trackSelected !== 'All' || statusSelected !== 'All');
+
+  useEffect(() => {
+    setStatusSelected(GovStatusKey.ALL);
+    setStatusSelectedState(GovStatusKey.ALL);
+  }, [selectedReferendaCategory, setStatusSelected]);
 
   return (
     <div className={className}>

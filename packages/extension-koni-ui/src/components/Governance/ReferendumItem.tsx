@@ -18,16 +18,15 @@ type Props = ThemeProps & {
   onClick?: VoidFunction;
   item: ReferendumWithVoting;
   chain: string;
+  migrationBlockOffset: number;
 };
 
-const Component = ({ chain, className, item, onClick }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, item, migrationBlockOffset, onClick }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { ayesPercent, naysPercent } = getTallyVotesBarPercent(item.onchainData.tally);
-  const [timeLeft, setTimeLeft] = useState<string | undefined>(() =>
-    getTimeLeft(item, chain)
-  );
+  const [timeLeft, setTimeLeft] = useState<string | undefined>();
 
-  const thresholdPercent = getMinApprovalThreshold(item, chain);
+  const thresholdPercent = getMinApprovalThreshold(item, chain, migrationBlockOffset);
   const refStatus = item.state.name;
 
   const timeLeftContent = useMemo(() => {
@@ -41,12 +40,13 @@ const Component = ({ chain, className, item, onClick }: Props): React.ReactEleme
   }, [ayesPercent, naysPercent, refStatus, t, timeLeft]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeLeft(getTimeLeft(item, chain));
-    }, 1000);
+    const updateTime = () => setTimeLeft(getTimeLeft(item, chain, migrationBlockOffset));
+
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
 
     return () => clearInterval(interval);
-  }, [chain, item]);
+  }, [item, chain, migrationBlockOffset]);
 
   return (
     <div
