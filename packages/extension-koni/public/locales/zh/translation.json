@@ -399,6 +399,7 @@
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.import": "导入",
   "ui.NFT.screen.NftsImport.import": "导入",
   "ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhrase": "从助记词导入",
+  "ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhraseTrust": "Import from Trust Wallet",
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.enterSeedPhraseToImport": "如需导入已存在的钱包，\n请输入助记词.",
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.hideSeedPhrase": "显示助记词",
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.showSeedPhrase": "显示助记词",

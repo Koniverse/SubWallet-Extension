@@ -399,6 +399,7 @@
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.import": "Импорт",
   "ui.NFT.screen.NftsImport.import": "Импорт",
   "ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhrase": "Импорт из сид-фразы",
+  "ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhraseTrust": "Import from Trust Wallet",
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.enterSeedPhraseToImport": "Чтобы импорт существующий аккаунт,\n введите сид-фразу.",
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.hideSeedPhrase": "Hide seed phrase",
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.showSeedPhrase": "Show seed phrase",

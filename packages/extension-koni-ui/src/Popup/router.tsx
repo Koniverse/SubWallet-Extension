@@ -94,6 +94,7 @@ const ManageWebsiteAccessDetail = new LazyLoader('ManageWebsiteAccessDetail', ()
 
 const NewSeedPhrase = new LazyLoader('NewSeedPhrase', () => import('@subwallet/extension-koni-ui/Popup/Account/NewSeedPhrase'));
 const ImportSeedPhrase = new LazyLoader('ImportSeedPhrase', () => import('@subwallet/extension-koni-ui/Popup/Account/ImportSeedPhrase'));
+const ImportSeedPhraseTrust = new LazyLoader('ImportSeedPhraseTrust', () => import('@subwallet/extension-koni-ui/Popup/Account/ImportSeedPhraseTrust'));
 const ImportPrivateKey = new LazyLoader('ImportPrivateKey', () => import('@subwallet/extension-koni-ui/Popup/Account/ImportPrivateKey'));
 const RestoreJson = new LazyLoader('RestoreJson', () => import('@subwallet/extension-koni-ui/Popup/Account/RestoreJson'));
 const ImportQrCode = new LazyLoader('ImportQrCode', () => import('@subwallet/extension-koni-ui/Popup/Account/ImportQrCode'));
@@ -274,6 +275,7 @@ export const router = createHashRouter([
         children: [
           NewSeedPhrase.generateRouterObject('new-seed-phrase'),
           ImportSeedPhrase.generateRouterObject('import-seed-phrase'),
+          ImportSeedPhraseTrust.generateRouterObject('import-seed-phrase-trust'),
           ImportPrivateKey.generateRouterObject('import-private-key'),
           RestoreJson.generateRouterObject('restore-json'),
           ImportQrCode.generateRouterObject('import-by-qr'),

@@ -399,6 +399,7 @@
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.import": "インポート",
   "ui.NFT.screen.NftsImport.import": "インポート",
   "ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhrase": "シードフレーズからのインポート",
+  "ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhraseTrust": "Import from Trust Wallet",
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.enterSeedPhraseToImport": "既存のアカウントをインポートするには、\nシードフレーズを入力してください.",
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.hideSeedPhrase": "Hide seed phrase",
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.showSeedPhrase": "Show seed phrase",

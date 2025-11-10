@@ -399,6 +399,7 @@
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.import": "Nhập",
   "ui.NFT.screen.NftsImport.import": "Nhập",
   "ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhrase": "Nhập từ seed phrase",
+  "ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhraseTrust": "Import from Trust Wallet",
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.enterSeedPhraseToImport": "Để nhập một tài khoản có sẵn,\n vui lòng nhập seed phrase.",
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.hideSeedPhrase": "Ẩn seed phrase",
   "ui.ACCOUNT.screen.Account.ImportSeedPhrase.showSeedPhrase": "Hiện seed phrase",

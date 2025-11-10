@@ -116,8 +116,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           style={{ width: '160%', height: '160%', objectFit: 'contain', display: 'block' }}
         />
       ),
-      key: 'restore-json',
-      label: t('Import from Trust Wallet'),
+      key: 'import-seed-phrase-trust',
+      label: t('ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhraseTrust'),
       onClick: onClickSeedTrust
     }
   ], [token, t, onClickSeed, onClickJson, onClickItem, onClickSeedTrust]);
