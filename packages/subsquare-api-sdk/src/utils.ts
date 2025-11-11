@@ -48,6 +48,7 @@ export const castDemocracyReferendumToReferendum = <T extends (Referendum | Refe
       },
       enactment,
       alarm: [],
+      submitted: 0,
       democracy: info
     }
   };

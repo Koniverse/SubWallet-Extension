@@ -3,8 +3,8 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { GovTrackVoting } from '@subwallet/extension-base/services/open-gov/interface';
-import { AccountProxyType } from '@subwallet/extension-base/types';
-import { detectTranslate, reformatAddress } from '@subwallet/extension-base/utils';
+import { AccountChainType, AccountProxyType } from '@subwallet/extension-base/types';
+import { detectTranslate, isAccountAll, reformatAddress } from '@subwallet/extension-base/utils';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import GovAccountSelectorModal from '@subwallet/extension-koni-ui/components/Modal/Governance/GovAccountSelector';
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
@@ -41,7 +41,7 @@ type Props = ThemeProps & ViewBaseType & {
 const modalId = 'account-selector';
 
 const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance }: Props): React.ReactElement<Props> => {
-  const { currentAccountProxy } = useSelector((state) => state.accountState);
+  const { accountProxies, currentAccountProxy } = useSelector((state) => state.accountState);
   const navigate = useNavigate();
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const { t } = useTranslation();
@@ -54,6 +54,16 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
     referendumId: referendumId,
     fromAccountProxy
   });
+
+  const isOnlyReadOnlyAccount = useMemo(() => {
+    const substrateAccountProxies = accountProxies.filter((ap) => ap.chainTypes.includes(AccountChainType.SUBSTRATE) && !isAccountAll(ap.id));
+
+    if (substrateAccountProxies.length === 0) {
+      return false;
+    }
+
+    return substrateAccountProxies.every((ap) => ap.accountType === AccountProxyType.READ_ONLY);
+  }, [accountProxies]);
 
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
@@ -193,8 +203,13 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
       activeModal(modalId);
     } else if (extendedAccountAddressItems.length === 1) {
       onSelectGovItem(extendedAccountAddressItems[0]);
+    } else if (isOnlyReadOnlyAccount) {
+      notify({
+        message: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.watchOnlyAccountFeatureRestriction'),
+        type: 'info'
+      });
     }
-  }, [extendedAccountAddressItems, activeModal, onSelectGovItem]);
+  }, [extendedAccountAddressItems, isOnlyReadOnlyAccount, activeModal, onSelectGovItem, notify, t]);
 
   const onCancel = useCallback(() => {
     inactiveModal(modalId);
