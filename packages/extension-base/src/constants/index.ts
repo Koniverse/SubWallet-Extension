@@ -36,7 +36,7 @@ export const ALL_ACCOUNT_AUTH_TYPES: AccountAuthType[] = ['evm', 'substrate', 't
 
 export const IGNORE_QR_SIGNER: string[] = [];
 
-export const XCM_MIN_AMOUNT_RATIO = 1.2;
+export const XCM_MIN_AMOUNT_RATIO = 1.2; // todo: remove
 export const XCM_FEE_RATIO = 2;
 
 export const GAS_PRICE_RATIO = 1 + (2 / 100);
