@@ -54,7 +54,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           direction: 'vertical',
           duration: 1.8,
           closable: false,
-          message: t('Reloading')
+          message: t('ui.NFT.screen.NftsCollections.reloading')
         });
 
         reloadCron({ data: 'nft' })
@@ -132,7 +132,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           weight='fill'
         />
       ),
-      children: t('Add NFT'),
+      children: t('ui.NFT.screen.NftsCollections.addNft'),
       shape: 'circle',
       size: 'xs',
       onClick: () => {
@@ -145,8 +145,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return (
       <EmptyList
         buttonProps={emptyButtonProps}
-        emptyMessage={t('Try adding one manually')}
-        emptyTitle={t('No NFTs found')}
+        emptyMessage={t('ui.NFT.screen.NftsCollections.tryAddingOneManually')}
+        emptyTitle={t('ui.NFT.screen.NftsCollections.noNftsFound')}
         phosphorIcon={Image}
       />
     );
@@ -163,7 +163,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={false}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Your collections')}
+        title={t<string>('ui.NFT.screen.NftsCollections.yourCollections')}
       >
         <>
           {!!banners.length && (
@@ -187,7 +187,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             renderWhenEmpty={emptyNft}
             searchFunction={searchCollection}
             searchMinCharactersCount={2}
-            searchPlaceholder={t<string>('Search collection name')}
+            searchPlaceholder={t<string>('ui.NFT.screen.NftsCollections.searchCollectionName')}
           />
         </>
       </Layout.Base>

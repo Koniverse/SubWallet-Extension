@@ -364,6 +364,27 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
     };
   }
 
+  async checkAccountHaveStake (useAddresses: string[]): Promise<string[]> {
+    const result: string[] = [];
+    const substrateApi = await this.substrateApi.isReady;
+    const ledgers = await substrateApi.api.query.parachainStaking?.delegatorState?.multi?.(useAddresses);
+
+    if (!ledgers) {
+      return [];
+    }
+
+    for (let i = 0; i < useAddresses.length; i++) {
+      const owner = useAddresses[i];
+      const delegatorState = ledgers[i].toPrimitive() as unknown as PalletParachainStakingDelegator;
+
+      if (delegatorState && delegatorState.total > 0) {
+        result.push(owner);
+      }
+    }
+
+    return result;
+  }
+
   /* Subscribe pool position */
 
   /* Get pool targets */

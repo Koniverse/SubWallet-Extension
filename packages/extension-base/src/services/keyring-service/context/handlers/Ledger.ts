@@ -3,7 +3,7 @@
 
 import { RequestAccountCreateHardwareMultiple, RequestAccountCreateHardwareV2 } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { KeyringPair, KeyringPair$Meta } from '@subwallet/keyring/types';
+import { KeypairType, KeyringPair, KeyringPair$Meta } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { t } from 'i18next';
 
@@ -25,7 +25,7 @@ export class AccountLedgerHandler extends AccountBaseHandler {
 
     const exists = this.state.checkAddressExists([address]);
 
-    assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || address } }));
+    assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Ledger.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || address } }));
 
     const baseMeta: KeyringPair$Meta = {
       name,
@@ -74,19 +74,19 @@ export class AccountLedgerHandler extends AccountBaseHandler {
     const addresses: string[] = [];
 
     if (!accounts.length) {
-      throw new Error(t('Can\'t find an account. Please try again'));
+      throw new Error(t('bg.ACCOUNT.services.keyring.handler.Ledger.cantFindAccountTryAgain'));
     }
 
     const exists = this.state.checkAddressExists(accounts.map((account) => account.address));
 
-    assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || '' } }));
+    assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Ledger.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
 
     const slugMap: Record<string, string> = {};
     const modifyPairs = this.state.modifyPairs;
     const pairs: KeyringPair[] = [];
 
     for (const account of accounts) {
-      const { accountIndex, address, addressOffset, genesisHash, hardwareType, isEthereum, isGeneric, isLedgerRecovery, name, originGenesisHash } = account;
+      const { accountIndex, address, addressOffset, genesisHash, hardwareType, isEthereum, isGeneric, isLedgerRecovery, isSubstrateECDSA, name, originGenesisHash } = account;
 
       const baseMeta: KeyringPair$Meta = {
         name,
@@ -96,10 +96,16 @@ export class AccountLedgerHandler extends AccountBaseHandler {
         genesisHash,
         originGenesisHash,
         isGeneric,
-        isLedgerRecovery
+        isLedgerRecovery,
+        isSubstrateECDSA
       };
 
-      const type = isEthereum ? 'ethereum' : 'sr25519';
+      let type: KeypairType = 'sr25519';
+
+      if (isEthereum || isSubstrateECDSA) {
+        type = 'ethereum';
+      }
+
       const pair = keyring.keyring.createFromAddress(
         address,
         {

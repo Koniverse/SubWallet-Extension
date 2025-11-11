@@ -1,17 +1,16 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountAuthType, AuthorizeRequest } from '@subwallet/extension-base/background/types';
+import { AuthorizeRequest } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_AUTH_TYPES, ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { AccountChainType } from '@subwallet/extension-base/types';
 import { AccountProxyItem, AccountProxySelectorAllItem, ConfirmationGeneralInfo } from '@subwallet/extension-koni-ui/components';
-import { CARDANO_ACCOUNT_TYPE, DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-koni-ui/constants';
+import { DEFAULT_ACCOUNT_TYPES } from '@subwallet/extension-koni-ui/constants';
 import { useSetSelectedAccountTypes } from '@subwallet/extension-koni-ui/hooks';
 import { approveAuthRequestV2, cancelAuthRequestV2, rejectAuthRequestV2 } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAccountAll } from '@subwallet/extension-koni-ui/utils';
-import { KeypairType } from '@subwallet/keyring/types';
 import { Button, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { PlusCircle, ShieldSlash, XCircle } from 'phosphor-react';
@@ -40,7 +39,7 @@ async function handleBlock ({ id }: AuthorizeRequest) {
 function Component ({ className, request }: Props) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const { accountAuthTypes, allowedAccounts } = request.request;
+  const { accountAuthTypes, allowedAccounts, canConnectSubstrateEcdsa } = request.request;
   const { accountProxies, accounts } = useSelector((state: RootState) => state.accountState);
   const navigate = useNavigate();
 
@@ -48,8 +47,10 @@ function Component ({ className, request }: Props) {
   const setSelectedAccountTypes = useSetSelectedAccountTypes(true);
 
   // List all of all accounts by auth type
-  const visibleAccountProxies = useMemo(() => (filterAuthorizeAccountProxies(accountProxies, accountAuthTypes || ALL_ACCOUNT_AUTH_TYPES)),
-    [accountAuthTypes, accountProxies]);
+  const visibleAccountProxies = useMemo(() => (filterAuthorizeAccountProxies(accountProxies, {
+    accountAuthTypes: accountAuthTypes || ALL_ACCOUNT_AUTH_TYPES, canConnectSubstrateEcdsa
+  })),
+  [accountAuthTypes, accountProxies, canConnectSubstrateEcdsa]);
 
   // Selected map with default values is map of all accounts
   const [selectedMap, setSelectedMap] = useState<Record<string, boolean>>({});
@@ -62,30 +63,36 @@ function Component ({ className, request }: Props) {
     if (accountAuthTypes && accountAuthTypes.length === 1) {
       switch (accountAuthTypes[0]) {
         case 'substrate':
-          return t('No available Substrate account');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableSubstrateAccount');
         case 'evm':
-          return t('No available EVM account');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableEvmAccount');
         case 'ton':
-          return t('No available TON account');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableTonAccount');
         case 'cardano':
-          return t('No available Cardano account');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableCardanoAccount');
+        case 'bitcoin':
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableBitcoinAccount');
       }
     }
 
-    return t('No available account');
+    return t('ui.DAPP.Confirmations.Authorize.noAvailableAccount');
   }, [accountAuthTypes, t]);
 
   const noAvailableDescription = useMemo(() => {
     if (accountAuthTypes && accountAuthTypes.length === 1) {
       switch (accountAuthTypes[0]) {
         case 'substrate':
-          return t("You don't have any Substrate account to connect. Please create one or skip this step by hitting Cancel.");
+          return t('ui.DAPP.Confirmations.Authorize.noSubstrateAccountToConnect');
         case 'evm':
-          return t("You don't have any EVM account to connect. Please create one or skip this step by hitting Cancel.");
+          return t('ui.DAPP.Confirmations.Authorize.noEvmAccountToConnect');
+        case 'cardano':
+          return t('ui.DAPP.Confirmations.Authorize.noCardanoAccountToConnect');
+        case 'bitcoin':
+          return t('ui.DAPP.Confirmations.Authorize.noBitcoinAccountToConnect');
       }
     }
 
-    return t("You don't have any account to connect. Please create one or skip this step by hitting Cancel.");
+    return t('ui.DAPP.Confirmations.Authorize.noAccountToConnect');
   }, [accountAuthTypes, t]);
 
   // Handle buttons actions
@@ -113,6 +120,7 @@ function Component ({ className, request }: Props) {
           case AccountChainType.ETHEREUM: return accountAuthTypes?.includes('evm');
           case AccountChainType.TON: return accountAuthTypes?.includes('ton');
           case AccountChainType.CARDANO: return accountAuthTypes?.includes('cardano');
+          case AccountChainType.BITCOIN: return accountAuthTypes?.includes('bitcoin');
         }
       }
 
@@ -125,24 +133,9 @@ function Component ({ className, request }: Props) {
   }, [accountAuthTypes, accounts, request, selectedMap]);
 
   const onAddAccount = useCallback(() => {
-    let types: KeypairType[];
-
-    const addAccountType: Record<AccountAuthType, KeypairType> = {
-      evm: EVM_ACCOUNT_TYPE,
-      substrate: SUBSTRATE_ACCOUNT_TYPE,
-      ton: TON_ACCOUNT_TYPE,
-      cardano: CARDANO_ACCOUNT_TYPE
-    };
-
-    if (accountAuthTypes) {
-      types = accountAuthTypes.map((type) => addAccountType[type]);
-    } else {
-      types = DEFAULT_ACCOUNT_TYPES;
-    }
-
-    setSelectedAccountTypes(types);
+    setSelectedAccountTypes(DEFAULT_ACCOUNT_TYPES);
     navigate('/accounts/new-seed-phrase', { state: { useGoBack: true } });
-  }, [accountAuthTypes, navigate, setSelectedAccountTypes]);
+  }, [navigate, setSelectedAccountTypes]);
 
   const onAccountSelect = useCallback((proxyId: string) => {
     const isAll = isAccountAll(proxyId);
@@ -191,6 +184,8 @@ function Component ({ className, request }: Props) {
                   return accountAuthTypes?.includes('ton');
                 case AccountChainType.CARDANO:
                   return accountAuthTypes?.includes('cardano');
+                case AccountChainType.BITCOIN:
+                  return accountAuthTypes?.includes('bitcoin');
               }
             }
 
@@ -220,7 +215,7 @@ function Component ({ className, request }: Props) {
           {
             visibleAccountProxies.length === 0
               ? noAvailableTitle
-              : t('Choose the account(s) you’d like to connect')
+              : t('ui.DAPP.Confirmations.Authorize.chooseAccountsToConnect')
           }
         </div>
         {
@@ -256,7 +251,7 @@ function Component ({ className, request }: Props) {
           {
             visibleAccountProxies.length === 0
               ? noAvailableDescription
-              : t('Make sure you trust this site before connecting')
+              : t('ui.DAPP.Confirmations.Authorize.trustSiteBeforeConnecting')
           }
         </div>
       </div>
@@ -277,14 +272,14 @@ function Component ({ className, request }: Props) {
                 onClick={onCancel}
                 schema={'secondary'}
               >
-                {t('Cancel')}
+                {t('ui.DAPP.Confirmations.Authorize.cancel')}
               </Button>
               <Button
                 disabled={isDisableConnect}
                 loading={loading}
                 onClick={onConfirm}
               >
-                {t('Connect')}
+                {t('ui.DAPP.Confirmations.Authorize.connect')}
               </Button>
             </>
           )
@@ -304,7 +299,7 @@ function Component ({ className, request }: Props) {
                   onClick={onCancel}
                   schema={'secondary'}
                 >
-                  {t('Cancel')}
+                  {t('ui.DAPP.Confirmations.Authorize.cancel')}
                 </Button>
                 <Button
                   disabled={loading}
@@ -316,7 +311,7 @@ function Component ({ className, request }: Props) {
                   )}
                   onClick={onAddAccount}
                 >
-                  {t('Create one')}
+                  {t('ui.DAPP.Confirmations.Authorize.createOne')}
                 </Button>
               </>
             )

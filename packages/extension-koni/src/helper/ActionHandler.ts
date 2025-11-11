@@ -123,6 +123,7 @@ export class ActionHandler {
       if (Object.keys(this.connectionMap).length === 0) {
         console.debug('Every port is disconnected, set timeout to sleep');
         this.isActive = false;
+        this.isFullActive = false;
         this.sleepTimeout && clearTimeout(this.sleepTimeout);
         this.sleepTimeout = setTimeout(() => {
           // Reset active status

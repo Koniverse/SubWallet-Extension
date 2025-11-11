@@ -50,7 +50,7 @@ const Component: React.FC<AccountInfoItem> = (props: AccountInfoItem) => {
                     className={'__account-avatar'}
                   />
                   <div className={'__account-name ml-xs'}>
-                    {accounts ? t('{{number}} accounts', { replace: { number: accounts.length } }) : t('All accounts')}
+                    {accounts ? t('ui.components.MetaInfo.AccountItem.numberAccounts', { replace: { number: accounts.length } }) : t('ui.components.MetaInfo.AccountItem.allAccounts')}
                   </div>
                 </>
               )

@@ -12,7 +12,7 @@ import { TokenBalanceDetailItem } from '@subwallet/extension-koni-ui/components/
 import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
-import { useCoreReceiveModalHelper, useDefaultNavigate, useGetBannerByScreen, useGetChainSlugsByCurrentAccountProxy, useNavigateOnChangeAccount, useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreReceiveModalHelper, useDefaultNavigate, useGetBannerByScreen, useGetChainAndExcludedTokenByCurrentAccountProxy, useNavigateOnChangeAccount, useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { canShowChart } from '@subwallet/extension-koni-ui/messaging';
 import { DetailModal } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/DetailModal';
 import { DetailUpperBlock } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/DetailUpperBlock';
@@ -76,7 +76,7 @@ function Component (): React.ReactElement {
   const [, setStorage] = useLocalStorage(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
   const { banners, dismissBanner, onClickBanner } = useGetBannerByScreen('token_detail', tokenGroupSlug);
-  const allowedChains = useGetChainSlugsByCurrentAccountProxy();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
   const [isShowTonWarning, setIsShowTonWarning] = useLocalStorage(IS_SHOW_TON_CONTRACT_VERSION_WARNING, true);
   const tonAddress = useMemo(() => {
@@ -146,7 +146,7 @@ function Component (): React.ReactElement {
     const result: BuyTokenInfo[] = [];
 
     Object.values(tokens).forEach((item) => {
-      if (!allowedChains.includes(item.network) || !slugs.includes(item.slug)) {
+      if (!allowedChains.includes(item.network) || !slugs.includes(item.slug) || excludedTokens.includes(item.slug)) {
         return;
       }
 
@@ -154,7 +154,7 @@ function Component (): React.ReactElement {
     });
 
     return result;
-  }, [allowedChains, tokenGroupMap, tokenGroupSlug, tokens]);
+  }, [allowedChains, excludedTokens, tokenGroupMap, tokenGroupSlug, tokens]);
 
   const tokenBalanceValue = useMemo<SwNumberProps['value']>(() => {
     if (tokenGroupSlug) {
@@ -203,6 +203,36 @@ function Component (): React.ReactElement {
       return accountProxies.filter((a) => a.accountType !== AccountProxyType.ALL_ACCOUNT).every((acc) => checkValidAcc(acc));
     } else {
       return currentAccountProxy && checkValidAcc(currentAccountProxy);
+    }
+  }, [accountProxies, currentAccountProxy, isAllAccount]);
+
+  const isSupportSendFund = useMemo(() => {
+    return !excludedTokens.length || tokenBalanceItems.some(({ slug }) => !excludedTokens.includes(slug));
+  }, [excludedTokens, tokenBalanceItems]);
+
+  const isSwapSupported = useMemo(() => {
+    const isSupportAccount = (currentAcc: AccountProxy) => {
+      const isReadOnlyAccount = currentAcc.accountType === AccountProxyType.READ_ONLY;
+      const isLedgerAccount = currentAcc.accountType === AccountProxyType.LEDGER;
+      const isSoloAccount = currentAcc.accountType === AccountProxyType.SOLO;
+      const validEcosystem = [AccountChainType.ETHEREUM, AccountChainType.SUBSTRATE, AccountChainType.BITCOIN].includes(currentAcc.chainTypes[0]);
+      const invalidSoloAccount = isSoloAccount && !validEcosystem;
+
+      return !invalidSoloAccount && !isLedgerAccount && !isReadOnlyAccount;
+    };
+
+    const isSupportAllAccount = (accountProxies: AccountProxy[]) => {
+      return accountProxies.filter((account) => account.accountType !== AccountProxyType.ALL_ACCOUNT).some((account) => isSupportAccount(account));
+    };
+
+    if (!currentAccountProxy || currentAccountProxy.chainTypes.length <= 0) {
+      return false;
+    }
+
+    if (isAllAccount) {
+      return isSupportAllAccount(accountProxies);
+    } else {
+      return isSupportAccount(currentAccountProxy);
     }
   }, [accountProxies, currentAccountProxy, isAllAccount]);
 
@@ -311,7 +341,7 @@ function Component (): React.ReactElement {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.BALANCE.screen.Tokens.DetailList.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -353,7 +383,7 @@ function Component (): React.ReactElement {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.BALANCE.screen.Tokens.DetailList.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -493,7 +523,8 @@ function Component (): React.ReactElement {
           isChartSupported={isChartSupported}
           isShrink={isShrink}
           isSupportBuyTokens={!!buyInfos.length}
-          isSupportSwap={true}
+          isSupportSendFund={isSupportSendFund}
+          isSupportSwap={isSwapSupported}
           onClickBack={goHome}
           onOpenBuyTokens={onOpenBuyTokens}
           onOpenReceive={onOpenReceive}
@@ -539,9 +570,9 @@ function Component (): React.ReactElement {
                       />
                     )
                   }}
-                  i18nKey={detectTranslate("TON wallets have multiple versions, each with its own wallet address and balance. <highlight>Change versions</highlight> if you don't see balances")}
+                  i18nKey={detectTranslate('ui.BALANCE.screen.Tokens.DetailList.tonWalletVersionInfo')}
                 />}
-                title={t('Change wallet address & version')}
+                title={t('ui.BALANCE.screen.Tokens.DetailList.changeWalletAddressAndVersion')}
                 type={'warning'}
               />
               {!!filteredAccountList.length && (

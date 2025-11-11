@@ -6,7 +6,7 @@ import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/
 import { _getAssetDecimals, _getAssetPriceId, _getTokenOnChainAssetId } from '@subwallet/extension-base/services/chain-service/utils';
 import { RequestAssetHubTokensCanPayFee, RequestHydrationTokensCanPayFee, TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { checkLiquidityForPool, estimateTokensForPool, getReserveForPool } from '@subwallet/extension-base/services/swap-service/handler/asset-hub/utils';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
@@ -156,21 +156,29 @@ export function batchExtrinsicSetFeeHydration (substrateApi: _SubstrateApi, tx: 
 }
 
 export async function getHydrationRate (address: string, hdx: _ChainAsset, desToken: _ChainAsset) {
-  const quoteRate = await subwalletApiSdk.swapApi?.getHydrationRate({
-    address,
-    pair: {
-      slug: `${hdx.slug}___${desToken.slug}`,
-      from: hdx.slug,
-      to: desToken.slug
-    }
-  });
+  let quoteRate: number | undefined;
 
-  if (!quoteRate) {
-    return undefined;
-  } else {
+  try {
+    const quote = await subwalletApiSdk.swapApi.getHydrationRate({
+      address,
+      pair: {
+        slug: `${hdx.slug}___${desToken.slug}`,
+        from: hdx.slug,
+        to: desToken.slug
+      }
+    });
+
+    quoteRate = quote.rate;
+  } catch (error) {
+    console.error(`Failed to fetch swap quote: ${(error as Error).message}`);
+  }
+
+  if (quoteRate) {
     const hdxDecimal = _getAssetDecimals(hdx);
     const desTokenDecimal = _getAssetDecimals(desToken);
 
     return new BigN(quoteRate).multipliedBy(10 ** (desTokenDecimal - hdxDecimal)).toFixed();
   }
+
+  return undefined;
 }

@@ -144,13 +144,14 @@ export interface TransportRequestMessage<TMessageType extends MessageTypes> {
   request: RequestTypes[TMessageType];
 }
 
-export type AccountAuthType = 'substrate' | 'evm' | 'ton' | 'cardano';
+export type AccountAuthType = 'substrate' | 'evm' | 'ton' | 'cardano' | 'bitcoin';
 
 export interface RequestAuthorizeTab {
   origin: string;
   accountAuthTypes?: AccountAuthType[];
-  allowedAccounts?: string[]
-  reConfirm?: boolean
+  allowedAccounts?: string[];
+  reConfirm?: boolean;
+  canConnectSubstrateEcdsa?: boolean;
 }
 
 export interface RequestAuthorizeApprove {
@@ -245,7 +246,8 @@ export interface RequestAccountBatchExport {
 
 export interface RequestAccountList {
   anyType?: boolean;
-  accountAuthType?: AccountAuthType
+  accountAuthType?: AccountAuthType;
+  isSubstrateConnector?: boolean;
 }
 
 export interface RequestAccountSubscribe {

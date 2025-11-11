@@ -17,17 +17,6 @@ export enum AccountAddressType {
   UNKNOWN = 'unknown',
 }
 
-export enum AccountSignMode {
-  PASSWORD = 'password',
-  QR = 'qr',
-  LEGACY_LEDGER = 'legacy-ledger',
-  GENERIC_LEDGER = 'generic-ledger',
-  READ_ONLY = 'readonly',
-  ALL_ACCOUNT = 'all',
-  INJECTED = 'injected',
-  UNKNOWN = 'unknown'
-}
-
 export type AccountChainAddress = {
   name: string;
   slug: string;

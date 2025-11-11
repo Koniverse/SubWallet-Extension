@@ -8,35 +8,35 @@ import { t } from 'i18next';
 
 const defaultErrorMap: Record<EvmProviderErrorType, { message: string, code?: number }> = {
   USER_REJECTED_REQUEST: {
-    message: detectTranslate('User Rejected Request'),
+    message: detectTranslate('bg.DAPP.background.error.EvmProvider.userRejectedRequest'),
     code: 4001
   },
   UNAUTHORIZED: {
-    message: detectTranslate('Failed to sign'),
+    message: detectTranslate('bg.DAPP.background.error.EvmProvider.failedToSign'),
     code: 4100
   },
   UNSUPPORTED_METHOD: {
-    message: detectTranslate('Unsupported Method'),
+    message: detectTranslate('bg.DAPP.background.error.EvmProvider.unsupportedMethod'),
     code: 4200
   },
   DISCONNECTED: {
-    message: detectTranslate('Network is disconnected'),
+    message: detectTranslate('bg.DAPP.background.error.EvmProvider.networkIsDisconnected'),
     code: 4900
   },
   CHAIN_DISCONNECTED: {
-    message: detectTranslate('Network is disconnected'),
+    message: detectTranslate('bg.DAPP.background.error.EvmProvider.networkIsDisconnected'),
     code: 4901
   },
   NETWORK_NOT_SUPPORTED: {
-    message: detectTranslate('This network is currently not supported'),
+    message: detectTranslate('bg.DAPP.background.error.EvmProvider.networkCurrentlyNotSupported'),
     code: 4902
   },
   INVALID_PARAMS: {
-    message: detectTranslate('Undefined error. Please contact SubWallet support'),
+    message: detectTranslate('bg.DAPP.background.error.EvmProvider.undefinedErrorContactSupport'),
     code: -32602
   },
   INTERNAL_ERROR: {
-    message: detectTranslate('Undefined error. Please contact SubWallet support'),
+    message: detectTranslate('bg.DAPP.background.error.EvmProvider.undefinedErrorContactSupport'),
     code: -32603
   }
 };

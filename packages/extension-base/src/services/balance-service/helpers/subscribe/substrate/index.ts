@@ -363,18 +363,16 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
   const tokenTypes = includeNativeToken ? [_AssetType.NATIVE, _AssetType.LOCAL] : [_AssetType.LOCAL];
   const tokenMap = filterAssetsByChainAndType(assetMap, chainInfo.slug, tokenTypes);
 
-  // Hotfix balance for gdot
-  const getGdotBalance = async () => {
-    const gdotBalances = await queryGdotBalance(substrateApi, addresses, assetMap[gdotSlug], extrinsicType);
-
-    callback(gdotBalances);
-  };
-
   const unsubList = await Promise.all(Object.values(tokenMap).map((tokenInfo) => {
-    // Hotfix balance for gdot
-    if (tokenInfo.slug === gdotSlug) {
+    if (tokenInfo.metadata?.isGigaToken) {
       return timer(0, CRON_REFRESH_PRICE_INTERVAL).subscribe(() => {
-        getGdotBalance().catch(console.error);
+        const getGigaTokenBalance = async () => {
+          const gigaTokenBalances = await queryGigaTokenBalance(substrateApi, addresses, assetMap[tokenInfo.slug], extrinsicType);
+
+          callback(gigaTokenBalances);
+        };
+
+        getGigaTokenBalance().catch(console.error);
       });
     }
 
@@ -602,11 +600,7 @@ const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chain
   };
 };
 
-// Hot fix for gdot balance
-
-const gdotSlug = 'hydradx_main-LOCAL-GDOT';
-
-async function queryGdotBalance (substrateApi: _SubstrateApi, addresses: string[], tokenInfo: _ChainAsset, extrinsicType: ExtrinsicType | undefined): Promise<BalanceItem[]> {
+async function queryGigaTokenBalance (substrateApi: _SubstrateApi, addresses: string[], tokenInfo: _ChainAsset, extrinsicType: ExtrinsicType | undefined): Promise<BalanceItem[]> {
   return await Promise.all(addresses.map(async (address) => {
     const _balanceInfo = await substrateApi.api.call.currenciesApi.account(_getTokenOnChainAssetId(tokenInfo), address);
     const balanceInfo = _balanceInfo.toPrimitive() as OrmlTokensAccountData;

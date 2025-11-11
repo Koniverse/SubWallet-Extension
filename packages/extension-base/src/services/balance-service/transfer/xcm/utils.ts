@@ -27,11 +27,16 @@ export type DryRunNodeSuccess = {
 
 export type DryRunNodeResult = DryRunNodeSuccess | DryRunNodeFailure;
 
+export type THopInfo = {
+  result: DryRunNodeResult & { currency?: string }
+}
+
 export type DryRunResult = {
   origin: DryRunNodeResult
   destination?: DryRunNodeResult
   assetHub?: DryRunNodeResult
   bridgeHub?: DryRunNodeResult
+  hops: THopInfo[]
 }
 
 interface GetXcmFeeRequest {

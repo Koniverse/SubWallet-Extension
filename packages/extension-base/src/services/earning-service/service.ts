@@ -13,53 +13,13 @@ import MythosNativeStakingPoolHandler from '@subwallet/extension-base/services/e
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
-import {
-  BasicTxErrorType,
-  EarningRewardHistoryItem,
-  EarningRewardItem,
-  EarningRewardJson,
-  HandleYieldStepData,
-  HandleYieldStepParams,
-  OptimalYieldPath,
-  OptimalYieldPathParams,
-  RequestEarlyValidateYield,
-  RequestEarningImpact,
-  RequestStakeCancelWithdrawal,
-  RequestStakeClaimReward,
-  RequestYieldLeave,
-  RequestYieldWithdrawal,
-  ResponseEarlyValidateYield,
-  SubmitChangeValidatorStaking,
-  TransactionData,
-  ValidateYieldProcessParams,
-  ValidatorInfo,
-  YieldPoolInfo,
-  YieldPoolTarget,
-  YieldPoolType,
-  YieldPositionInfo
-} from '@subwallet/extension-base/types';
+import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningImpact, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, SubmitChangeValidatorStaking, TransactionData, ValidateYieldProcessParams, ValidatorInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 
 import { EarningImpactResult } from './handlers/native-staking/dtao';
-import {
-  AcalaLiquidStakingPoolHandler,
-  AmplitudeNativeStakingPoolHandler,
-  AstarNativeStakingPoolHandler,
-  BasePoolHandler,
-  BifrostLiquidStakingPoolHandler,
-  BifrostMantaLiquidStakingPoolHandler,
-  EnergyNativeStakingPoolHandler,
-  InterlayLendingPoolHandler,
-  NominationPoolHandler,
-  ParallelLiquidStakingPoolHandler,
-  ParaNativeStakingPoolHandler,
-  RelayNativeStakingPoolHandler,
-  StellaSwapLiquidStakingPoolHandler,
-  SubnetTaoStakingPoolHandler,
-  TaoNativeStakingPoolHandler
-} from './handlers';
+import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, EnergyNativeStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, SubnetTaoStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
 
 type PoolTargetsFetchingCached = Record<string, Record<string, YieldPoolTarget>>;
 
@@ -112,8 +72,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     }
 
     const minAmountPercent: Record<string, number> = {};
-    const ahMigratedChainMap = await this.state.chainService.fetchAhMapChain();
-    const ahMigratedChains = Object.values(ahMigratedChainMap);
+    const ahMapChain = await this.state.chainService.fetchAhMapChain();
 
     for (const chain of chains) {
       const handlers: BasePoolHandler[] = [];
@@ -121,21 +80,20 @@ export default class EarningService implements StoppableServiceInterface, Persis
       const symbol = _getChainSubstrateTokenSymbol(chainInfo);
 
       if (_STAKING_CHAIN_GROUP.relay.includes(chain)) {
-        const ahMigratedChain = ahMigratedChainMap[chain];
+        if (_STAKING_CHAIN_GROUP.assetHub.includes(chain)) {
+          continue;
+        }
 
-        if (ahMigratedChain) {
+        const ahChain = ahMapChain[chain];
+
+        if (ahChain) {
+          handlers.push(new RelayNativeStakingPoolHandler(this.state, ahChain));
+
           const relaySlug = RelayNativeStakingPoolHandler.generateSlug(symbol, chain);
 
           this.inactivePoolSlug.add(relaySlug);
         } else {
           handlers.push(new RelayNativeStakingPoolHandler(this.state, chain));
-        }
-      }
-
-      if (_STAKING_CHAIN_GROUP.assetHub.includes(chain)) { // define list of migrating asset hub
-        if (ahMigratedChains.includes(chain)) { // check if chain migrate with online data
-          handlers.push(new RelayNativeStakingPoolHandler(this.state, chain));
-          handlers.push(new NominationPoolHandler(this.state, chain));
         }
       }
 
@@ -167,9 +125,11 @@ export default class EarningService implements StoppableServiceInterface, Persis
       }
 
       if (_STAKING_CHAIN_GROUP.nominationPool.includes(chain)) {
-        const ahMigratedChain = ahMigratedChainMap[chain];
+        const ahChain = ahMapChain[chain];
 
-        if (ahMigratedChain) {
+        if (ahChain) {
+          handlers.push(new NominationPoolHandler(this.state, ahChain));
+
           const relaySlug = NominationPoolHandler.generateSlug(symbol, chain);
 
           this.inactivePoolSlug.add(relaySlug);
@@ -250,7 +210,9 @@ export default class EarningService implements StoppableServiceInterface, Persis
           activePositions.forEach((item) => {
             const handler = this.getPoolHandler(item.slug);
 
-            if (handler?.canOverrideIdentity) {
+            if (
+              handler?.canOverrideIdentity
+            ) {
               const hasValidatorIdentity = item.nominations.some((validator) => !!validator.validatorIdentity);
 
               if (!hasValidatorIdentity) {
@@ -485,10 +447,10 @@ export default class EarningService implements StoppableServiceInterface, Persis
     for (const handler of Object.values(this.handlers)) {
       // Force subscribe onchain data
       const forceSubscribe =
-        handler.type === YieldPoolType.LIQUID_STAKING ||
-        handler.type === YieldPoolType.LENDING ||
-        // Skip subscribing for subnet staking handlers because subnet staking slugs are not included in the online cache (only slugs with netuid are cached)
-        (!onlineData[handler.slug] && handler.type !== YieldPoolType.SUBNET_STAKING);
+      handler.type === YieldPoolType.LIQUID_STAKING ||
+      handler.type === YieldPoolType.LENDING ||
+      // Skip subscribing for subnet staking handlers because subnet staking slugs are not included in the online cache (only slugs with netuid are cached)
+      (!onlineData[handler.slug] && handler.type !== YieldPoolType.SUBNET_STAKING);
 
       if (!this.useOnlineCacheOnly || forceSubscribe) {
         handler.subscribePoolInfo(callback)
@@ -1162,7 +1124,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
 
     const { slug } = params;
-    console.log('slug', slug);
+
     const handler = this.getPoolHandler(slug);
 
     if (handler) {

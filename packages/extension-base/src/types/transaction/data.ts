@@ -5,6 +5,7 @@ import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 
+// todo: recheck type and usage
 export type TransactionData = SubmittableExtrinsic<'promise'> | TransactionConfig;
 
 export interface Web3TransactionBase {

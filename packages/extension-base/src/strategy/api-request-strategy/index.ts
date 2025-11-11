@@ -70,6 +70,8 @@ export abstract class BaseApiRequestStrategy implements ApiRequestStrategy {
         request.status = 'running';
         request.run().then((rs) => {
           request.resolve(rs);
+
+          delete this.requestMap[request.id];
         }).catch((e: Error) => {
           const isRateLimited = this.isRateLimited(e);
 

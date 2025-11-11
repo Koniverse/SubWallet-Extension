@@ -4,21 +4,15 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ChainType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import {
-  _chainInfoToChainType, _getChainSubstrateAddressPrefix, _getSubstrateGenesisHash, _isChainBitcoinCompatible,
-  _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isSubstrateEvmCompatibleChain
-} from '@subwallet/extension-base/services/chain-service/utils';
-import {AccountChainType, AccountJson} from '@subwallet/extension-base/types';
-import {
-  getAccountChainTypeFromKeypairType,
-  pairToAccount
-} from '@subwallet/extension-base/utils';
+import { _chainInfoToChainType, _getChainSubstrateAddressPrefix, _getSubstrateGenesisHash, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { AccountChainType, AccountJson } from '@subwallet/extension-base/types';
+import { getAccountChainTypeFromKeypairType, pairToAccount } from '@subwallet/extension-base/utils';
 import { decodeAddress, encodeAddress, getKeypairTypeByAddress, isAddress, isBitcoinAddress, isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { KeypairType } from '@subwallet/keyring/types';
 import { getBitcoinAddressInfo } from '@subwallet/keyring/utils/address/validate';
+import { keyring } from '@subwallet/ui-keyring';
 
 import { ethereumEncode, isEthereumAddress } from '@polkadot/util-crypto';
-import {keyring} from "@subwallet/ui-keyring";
 
 export function isAccountAll (address?: string): boolean {
   return address === ALL_ACCOUNT_KEY;
@@ -71,7 +65,7 @@ export const _reformatAddressWithChain = (address: string, chainInfo: _ChainInfo
     const isTestnet = chainInfo.isTestnet;
 
     return reformatAddress(address, isTestnet ? 0 : 1);
-  } else {
+  } else { // EVM, Bitcoin
     return address;
   }
 };
