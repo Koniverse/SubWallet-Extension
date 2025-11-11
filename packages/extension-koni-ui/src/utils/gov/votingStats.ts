@@ -89,7 +89,7 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
   };
 
   // Add a voter to flattened list and update totals
-  const addFlattened = (side: GovVoteSide, sideEntry: ReferendumVoteDetail, amountBn: BigNumber, countToTotal = true) => {
+  const addFlattened = (side: GovVoteSide, sideEntry: ReferendumVoteDetail, amountBn: BigNumber) => {
     if (amountBn.lt(0)) {
       return;
     }
@@ -97,11 +97,9 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
     result[side].accounts.flattened.push(sideEntry);
     result[side].totalVotedAccounts++;
 
-    if (countToTotal) {
-      result[side].totalVotedAmount = new BigNumber(result[side].totalVotedAmount)
-        .plus(amountBn)
-        .toString();
-    }
+    result[side].totalVotedAmount = new BigNumber(result[side].totalVotedAmount)
+      .plus(amountBn)
+      .toString();
   };
 
   for (const voter of rawVotes) {
@@ -133,7 +131,7 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
         const side = voter.aye === true ? GovVoteType.AYE : voter.aye === false ? GovVoteType.NAY : GovVoteType.AYE;
         const sideEntry = buildSideEntry(voter, side, delegatorVotesBn, new BigNumber(voter.balance || 0));
 
-        addFlattened(side, sideEntry, delegatorVotesBn, false);
+        addFlattened(side, sideEntry, delegatorVotesBn);
       }
     }
   }
