@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { govConvictionOptions } from '@subwallet/extension-base/services/open-gov/interface';
+import { getGovConvictionOptions } from '@subwallet/extension-base/services/open-gov/utils';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { AccountProxyAvatar, EmptyList, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -12,7 +12,7 @@ import { ReferendumVoteDetail } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
 import { ArrowSquareOut, Copy, ListChecks } from 'phosphor-react';
 import { IconWeight } from 'phosphor-react/src/lib';
-import React, { forwardRef, useCallback } from 'react';
+import React, { forwardRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -57,6 +57,10 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
         });
     };
   }, [notify, t]);
+
+  const govConvictionOptions = useMemo(() => {
+    return getGovConvictionOptions(chain);
+  }, [chain]);
 
   const renderItem = useCallback((item: ReferendumVoteDetail) => {
     let convictionLabel = 'N/A';
@@ -162,7 +166,7 @@ const Component = ({ accounts, chain, className = '', decimal, symbol }: Props) 
         }
       />
     );
-  }, [_onClickCopyButton, _onClickViewOnExplorer, accountProxies, accountsState, decimal, symbol, t]);
+  }, [_onClickCopyButton, _onClickViewOnExplorer, accountProxies, accountsState, decimal, govConvictionOptions, symbol, t]);
 
   const renderEmpty = useCallback(() => {
     return (

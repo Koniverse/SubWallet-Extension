@@ -5,7 +5,7 @@ import { ReferendumStatusTag, ReferendumTrackTag, ReferendumVoteProgressBar } fr
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ReferendumWithVoting } from '@subwallet/extension-koni-ui/types/gov';
 import { getMinApprovalThreshold, getTallyVotesBarPercent, getTimeLeft } from '@subwallet/extension-koni-ui/utils/gov';
-import { GOV_COMPLETED_STATES, GOV_PREPARING_STATES } from '@subwallet/subsquare-api-sdk';
+import { GOV_COMPLETED_STATES, GOV_PREPARING_STATES, MigrationBlockOffset } from '@subwallet/subsquare-api-sdk';
 import CN from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +18,7 @@ type Props = ThemeProps & {
   onClick?: VoidFunction;
   item: ReferendumWithVoting;
   chain: string;
-  migrationBlockOffset: number;
+  migrationBlockOffset?: MigrationBlockOffset;
 };
 
 const Component = ({ chain, className, item, migrationBlockOffset, onClick }: Props): React.ReactElement<Props> => {
@@ -26,8 +26,12 @@ const Component = ({ chain, className, item, migrationBlockOffset, onClick }: Pr
   const { ayesPercent, naysPercent } = getTallyVotesBarPercent(item.onchainData.tally);
   const [timeLeft, setTimeLeft] = useState<string | undefined>();
 
-  const thresholdPercent = getMinApprovalThreshold(item, chain, migrationBlockOffset);
   const refStatus = item.state.name;
+
+  const thresholdPercent = useMemo(
+    () => getMinApprovalThreshold(item, chain, migrationBlockOffset?.offset || 0),
+    [item, chain, migrationBlockOffset?.offset]
+  );
 
   const timeLeftContent = useMemo(() => {
     const time = timeLeft ?? '';

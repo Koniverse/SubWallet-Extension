@@ -7,7 +7,7 @@ import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interfa
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { useGetGovLockedInfos } from '@subwallet/extension-koni-ui/hooks';
 import { PreviousVoteAmountDetail, UserVoting, VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
-import { GOV_ONGOING_STATES, GovStatusKey, Referendum, ReferendumDetail, ReferendumVoteDetail, Tally } from '@subwallet/subsquare-api-sdk';
+import { GOV_ONGOING_STATES, GovStatusKey, MigrationBlockOffset, Referendum, ReferendumDetail, ReferendumVoteDetail, Tally } from '@subwallet/subsquare-api-sdk';
 import BigNumber from 'bignumber.js';
 
 export const GOV_QUERY_KEYS = {
@@ -207,23 +207,61 @@ export function getMinApprovalThreshold (referendum: Referendum | ReferendumDeta
   }
 }
 
+function formatTimeLeft (timeLeftMs: BigNumber): string {
+  const msInDay = new BigNumber(1000 * 60 * 60 * 24);
+  const msInHour = new BigNumber(1000 * 60 * 60);
+  const msInMinute = new BigNumber(1000 * 60);
+  const msInSecond = new BigNumber(1000);
+
+  const days = timeLeftMs.dividedToIntegerBy(msInDay);
+  const hours = timeLeftMs.modulo(msInDay).dividedToIntegerBy(msInHour);
+  const minutes = timeLeftMs.modulo(msInHour).dividedToIntegerBy(msInMinute);
+  const seconds = timeLeftMs.modulo(msInMinute).dividedToIntegerBy(msInSecond);
+
+  if (days.gte(2)) {
+    return `${days.toFixed()}d ${hours.toFixed()}hr${!hours.eq(1) ? 's' : ''}`;
+  } else if (days.eq(1)) {
+    return `1d ${hours.toFixed()}hr${!hours.eq(1) ? 's' : ''}`;
+  }
+
+  return `${hours.toFixed().padStart(2, '0')}:${minutes
+    .toFixed()
+    .padStart(2, '0')}:${seconds.toFixed().padStart(2, '0')}`;
+}
+
+function calculatePreparingTimeLeft (
+  currentHeight: number,
+  alarmBlock: number,
+  blockDuration = 6
+): { timeLeft?: string; endTimeMs: number } {
+  const remainingBlocks = alarmBlock - currentHeight;
+  const totalMs = remainingBlocks * blockDuration * 1000;
+  const endTimeMs = Date.now() + totalMs;
+
+  return {
+    timeLeft: formatTimeLeft(new BigNumber(totalMs)),
+    endTimeMs
+  };
+}
+
 const calculateTimeLeft = (
   blockTime: number,
   currentBlock: number,
   alarmBlock: number | null,
   state: GovStatusKey,
   blockDuration = 6,
-  migrationBlockOffset: number,
+  migrationBlockOffset?: MigrationBlockOffset,
   decisionPeriod?: number,
   decidingSince?: number
 ): { timeLeft?: string; endTime: number } => {
   let endBlock: number;
+  const offset = migrationBlockOffset?.offset || 0;
 
   if (GOV_ONGOING_STATES.includes(state)) {
     // Apply migration offset for all ongoing states
-    const adjustedCurrent = currentBlock - migrationBlockOffset;
-    const adjustedAlarm = alarmBlock ? alarmBlock - migrationBlockOffset : null;
-    const adjustedSince = decidingSince ? decidingSince - migrationBlockOffset : undefined;
+    const adjustedCurrent = currentBlock - offset;
+    const adjustedAlarm = alarmBlock ? alarmBlock - offset : null;
+    const adjustedSince = decidingSince ? decidingSince - offset : undefined;
 
     if (state === GovStatusKey.DECIDING && decisionPeriod && adjustedSince) {
       endBlock = adjustedSince + decisionPeriod;
@@ -249,41 +287,42 @@ const calculateTimeLeft = (
   const timeLeftMs = endTime.minus(now);
 
   if (timeLeftMs.lte(0)) {
-    return { timeLeft: undefined, endTime: endTime.toNumber() };
+    return { timeLeft: undefined, endTime: endBlock };
   }
 
-  const msInDay = new BigNumber(1000 * 60 * 60 * 24);
-  const msInHour = new BigNumber(1000 * 60 * 60);
-  const msInMinute = new BigNumber(1000 * 60);
-  const msInSecond = new BigNumber(1000);
+  const formatted = formatTimeLeft(timeLeftMs);
 
-  const days = timeLeftMs.dividedToIntegerBy(msInDay);
-  const hours = timeLeftMs.modulo(msInDay).dividedToIntegerBy(msInHour);
-  const minutes = timeLeftMs.modulo(msInHour).dividedToIntegerBy(msInMinute);
-  const seconds = timeLeftMs.modulo(msInMinute).dividedToIntegerBy(msInSecond);
-
-  let timeLeft: string;
-
-  if (days.gte(2)) {
-    timeLeft = `${days.toFixed()}d ${hours.toFixed()}hr${!hours.eq(1) ? 's' : ''}`;
-  } else if (days.eq(1)) {
-    timeLeft = `1d ${hours.toFixed()}hr${!hours.eq(1) ? 's' : ''}`;
-  } else {
-    timeLeft = `${hours.toFixed().padStart(2, '0')}:${minutes
-      .toFixed()
-      .padStart(2, '0')}:${seconds.toFixed().padStart(2, '0')}`;
-  }
-
-  return { timeLeft, endTime: endTime.toNumber() };
+  return { timeLeft: formatted, endTime: endBlock };
 };
 
-export const getTimeLeft = (data: Referendum | ReferendumDetail, chain: string, migrationBlockOffset: number): string | undefined => {
+export const getTimeLeft = (data: Referendum | ReferendumDetail, chain: string, migrationBlockOffset?: MigrationBlockOffset): string | undefined => {
+  const state = data.state?.name;
+  const blocktime = data.state.indexer.blockTime;
+  const blockDuration = _EXPECTED_BLOCK_TIME[chain];
+
+  if (state === GovStatusKey.PREPARING) {
+    const currentRelayHeight = migrationBlockOffset?.relayHeight || 0;
+    const alarmBlock = data.onchainData.info.alarm?.[0];
+
+    if (!alarmBlock) {
+      return;
+    }
+
+    const prep = calculatePreparingTimeLeft(
+      currentRelayHeight,
+      alarmBlock,
+      blockDuration
+    );
+
+    return prep.timeLeft;
+  }
+
   return calculateTimeLeft(
-    data.state.indexer.blockTime,
+    blocktime,
     data.state.indexer.blockHeight,
     data.onchainData.info.alarm?.[0] || null,
-    data.state.name,
-    _EXPECTED_BLOCK_TIME[chain],
+    state,
+    blockDuration,
     migrationBlockOffset,
     data.trackInfo?.decisionPeriod,
     data.onchainData.info.deciding?.since

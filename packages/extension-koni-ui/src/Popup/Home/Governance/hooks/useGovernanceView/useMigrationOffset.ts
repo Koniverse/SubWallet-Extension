@@ -2,32 +2,36 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _EXPECTED_BLOCK_TIME } from '@subwallet/extension-base/services/chain-service/constants';
+import { MIGRATED_CHAINS } from '@subwallet/extension-base/services/open-gov/utils';
 import { SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
 import { useQuery } from '@tanstack/react-query';
-
-const MIGRATED_CHAINS = [
-  'statemine',
-  'statemint',
-  'paseo_assethub',
-  'westend_assethub'
-];
 
 const CACHE_TTL = 20 * 60 * 1000;
 
 export function useMigrationOffset (chain: string, sdk: SubsquareApiSdk | undefined) {
   const enabled = MIGRATED_CHAINS.includes(chain);
 
-  return useQuery({ queryKey: ['migrationOffset', chain],
+  return useQuery({
+    queryKey: ['migrationOffset', chain],
     queryFn: async () => {
       if (!enabled || !sdk) {
-        return 0;
+        return {
+          offset: 0,
+          relayHeight: 0,
+          scanHeight: 0
+        };
       }
 
-      const offset = await sdk.getMigrationBlockOffset(_EXPECTED_BLOCK_TIME[chain]);
+      const { offset, relayHeight, scanHeight } = await sdk.getMigrationBlockOffset(_EXPECTED_BLOCK_TIME[chain]);
 
-      return offset ?? 0;
+      return {
+        offset: offset ?? 0,
+        relayHeight: relayHeight ?? 0,
+        scanHeight: scanHeight ?? 0
+      };
     },
     enabled,
     staleTime: CACHE_TTL,
-    gcTime: CACHE_TTL });
+    gcTime: CACHE_TTL
+  });
 }

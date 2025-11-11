@@ -12,7 +12,8 @@ import { combineLatest, merge, mergeMap } from 'rxjs';
 import { _EXPECTED_BLOCK_TIME } from '../chain-service/constants';
 import { _SubstrateApi } from '../chain-service/types';
 import { _getAssetDecimals } from '../chain-service/utils';
-import { Conviction, convictionToDays, GovDelegationDetail, GovTrackVoting, GovVoteDetail, GovVoteRequest, GovVoteType, GovVotingInfo, numberToConviction, RemoveVoteRequest, SplitAbstainVoteRequest, SplitVoteRequest, StandardVoteRequest, UnlockingReferendaData, UnlockVoteRequest, Vote, VotingFor } from './interface';
+import { Conviction, GovDelegationDetail, GovTrackVoting, GovVoteDetail, GovVoteRequest, GovVoteType, GovVotingInfo, RemoveVoteRequest, SplitAbstainVoteRequest, SplitVoteRequest, StandardVoteRequest, UnlockingReferendaData, UnlockVoteRequest, Vote, VotingFor } from './interface';
+import { getConvictionDays, MIGRATED_CHAINS, numberToConviction } from './utils';
 
 export default abstract class BaseOpenGovHandler {
   protected readonly state: KoniState;
@@ -355,8 +356,25 @@ export default abstract class BaseOpenGovHandler {
             totalLocked = BigN.max(totalLocked, bnBalance);
           }
 
-          const currentBlockInfo = await substrateApi.api.rpc.chain.getHeader();
-          const currentBlockNumber = (currentBlockInfo.toPrimitive() as unknown as BlockHeader).number;
+          let currentBlock: BigN;
+
+          if (MIGRATED_CHAINS.includes(this.chain) && substrateApi.api.query.remoteProxyRelayChain && substrateApi.api.query.remoteProxyRelayChain.blockToRoot) {
+            const blockRootsRaw = await substrateApi.api.query.remoteProxyRelayChain.blockToRoot();
+            const blockRoots = blockRootsRaw?.toPrimitive() as Array<[number, string]> | undefined;
+
+            if (blockRoots && blockRoots.length > 0) {
+              currentBlock = new BigN(blockRoots[blockRoots.length - 1][0]);
+            } else {
+              const currentBlockInfo = await substrateApi.api.rpc.chain.getHeader();
+
+              currentBlock = new BigN((currentBlockInfo.toPrimitive() as unknown as BlockHeader).number);
+            }
+          } else {
+            // fallback
+            const currentBlockInfo = await substrateApi.api.rpc.chain.getHeader();
+
+            currentBlock = new BigN((currentBlockInfo.toPrimitive() as unknown as BlockHeader).number);
+          }
 
           // --- Handle each voting entry per track ---
           for (const [key, voting] of votingEntries) {
@@ -379,12 +397,11 @@ export default abstract class BaseOpenGovHandler {
               trackStates.set(trackId, 'casting');
               const priorBlock = new BigN(v.casting.prior[0]);
               const priorBalance = new BigN(v.casting.prior[1]);
-              const current = new BigN(currentBlockNumber);
 
-              if (!current.gte(priorBlock)) {
+              if (!currentBlock.gte(priorBlock)) {
                 // --- Still locked → estimate unlock timestamp ---
                 const blockTimeSec = _EXPECTED_BLOCK_TIME[this.chain] ?? 6;
-                const remainingBlocks = priorBlock.minus(current);
+                const remainingBlocks = priorBlock.minus(currentBlock);
                 const timestamp = Date.now() + remainingBlocks.multipliedBy(blockTimeSec * 1000).toNumber();
 
                 unlockingReferenda.push({
@@ -398,7 +415,7 @@ export default abstract class BaseOpenGovHandler {
               const { unlockingReferenda: trackUnlocking, votes } = await this.parseVotesAndCheckFinished(
                 v.casting.votes || [],
                 unlockableReferenda,
-                currentBlockNumber,
+                currentBlock.toNumber(),
                 substrateApi
               );
 
@@ -430,7 +447,7 @@ export default abstract class BaseOpenGovHandler {
             unlockableReferenda,
             trackVotes,
             trackPriorBlocks,
-            new BigN(currentBlockNumber)
+            currentBlock
           );
 
           // --- Determine total delegated and voted locked balances ---
@@ -464,6 +481,8 @@ export default abstract class BaseOpenGovHandler {
             },
             tracks
           };
+
+          console.log('result', result);
 
           return result;
         })
@@ -546,7 +565,8 @@ export default abstract class BaseOpenGovHandler {
           const endBlock = statusVal[0] as string | number;
 
           if (endBlock) {
-            const lockBlocks = this.lockPeriod(convictionToDays[voteDetail.conviction]);
+            const days = getConvictionDays(this.chain, voteDetail.conviction);
+            const lockBlocks = this.lockPeriod(days);
             const unlockBlock = new BigN(endBlock).plus(lockBlocks);
             const canUnlock = new BigN(currentBlockNumber).gte(unlockBlock);
 

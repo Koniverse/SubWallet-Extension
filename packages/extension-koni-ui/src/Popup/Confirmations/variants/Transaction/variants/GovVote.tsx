@@ -1,7 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { govConvictionOptions, GovVoteRequest, GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
+import { GovVoteRequest, GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
+import { getGovConvictionOptions } from '@subwallet/extension-base/services/open-gov/utils';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxyAvatar, MetaInfo, NumberDisplay, PageWrapper, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
@@ -87,9 +88,13 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
     transactionFee: transaction.estimateFee?.value
   });
 
+  const govConvictionOptions = useMemo(() => {
+    return getGovConvictionOptions(transaction.chain);
+  }, [transaction.chain]);
+
   const convictionInfo = useMemo(() => {
     return govConvictionOptions.find((c) => c.value === data.conviction) || { label: '-', description: '-' };
-  }, [data.conviction]);
+  }, [data.conviction, govConvictionOptions]);
 
   const onCancel = useCallback(() => {
     inactiveModal(VoteAmountDetailModalId);

@@ -62,7 +62,7 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
     staleTime: 60 * 1000
   });
 
-  const { data: migrationBlockOffset = 0 } = useMigrationOffset(chain, sdkInstance);
+  const { data: migrationBlockOffset } = useMigrationOffset(chain, sdkInstance);
 
   const { data: searchData, isFetching, refetch } = useQuery<{ govReferenda: Referendum[] }>({
     queryKey: GOV_QUERY_KEYS.referendaList(chain),

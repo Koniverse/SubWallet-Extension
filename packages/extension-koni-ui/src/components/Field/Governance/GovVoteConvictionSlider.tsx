@@ -3,7 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
-import { govConvictionOptions } from '@subwallet/extension-base/services/open-gov/interface';
+import { getGovConvictionOptions } from '@subwallet/extension-base/services/open-gov/utils';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { BasicInputWrapper, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useForwardInputRef } from '@subwallet/extension-koni-ui/hooks';
@@ -20,26 +20,33 @@ type Props = ThemeProps & BasicInputWrapper<number> & {
   assetInfo: _ChainAsset;
 };
 
-const sliderMax = Math.max(...govConvictionOptions.map((o) => o.value));
-const sliderMin = Math.min(...govConvictionOptions.map((o) => o.value));
-const marks = govConvictionOptions.reduce((acc, opts) => {
-  acc[opts.value] = opts.label;
-
-  return acc;
-}, {} as Record<number, string>);
-
-const sanitizeValue = (value?: number): number => (
-  value && govConvictionOptions.some((o) => o.value === value)
-    ? value
-    : sliderMin
-);
-
 const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { amount, assetInfo, className = '', onChange, value: originValue } = props;
-  const [value, setValue] = useState<number>(() => sanitizeValue(originValue));
+
   const inputRef = useForwardInputRef(ref);
 
+  const chain = assetInfo.originChain || assetInfo.slug || '';
+
+  const convictionOptions = useMemo(() => getGovConvictionOptions(chain), [chain]);
+
+  const sliderMax = useMemo(() => Math.max(...convictionOptions.map((o) => o.value)), [convictionOptions]);
+  const sliderMin = useMemo(() => Math.min(...convictionOptions.map((o) => o.value)), [convictionOptions]);
+  const marks = useMemo(() => {
+    return convictionOptions.reduce((acc, opts) => {
+      acc[opts.value] = opts.label;
+
+      return acc;
+    }, {} as Record<number, string>);
+  }, [convictionOptions]);
+
+  const sanitizeValue = useCallback((value?: number): number => (
+    value && convictionOptions.some((o) => o.value === value)
+      ? value
+      : sliderMin
+  ), [convictionOptions, sliderMin]);
+
+  const [value, setValue] = useState<number>(() => sanitizeValue(originValue));
   const handleChange = useCallback((val: number) => {
     onChange?.({ target: { value: val } });
   }, [onChange]);
@@ -50,7 +57,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
     } else {
       setValue(sliderMin);
     }
-  }, [originValue]);
+  }, [originValue, sanitizeValue, sliderMin]);
 
   const currentTotalVote = useMemo(() => {
     if (amount && value !== null) {
@@ -64,7 +71,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
     } else {
       return BN_ZERO;
     }
-  }, [amount, value]);
+  }, [amount, sanitizeValue, value]);
 
   return (
     <div className={className}>

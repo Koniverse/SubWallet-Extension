@@ -31,10 +31,10 @@ const GovVotedAccountsModalId = 'gov-voted-accounts-modal';
 const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstance, voteMap }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { ayesPercent, naysPercent } = getTallyVotesBarPercent(referendumDetail.onchainData.tally);
-  const { data: migrationBlockOffset = 0 } = useMigrationOffset(chain, sdkInstance);
+  const { data: migrationBlockOffset } = useMigrationOffset(chain, sdkInstance);
 
   const referendumId = referendumDetail?.referendumIndex;
-  const thresholdPercent = getMinApprovalThreshold(referendumDetail, chain, migrationBlockOffset);
+
   const govLockedInfos = useGetGovLockedInfos(chain);
   const { activeModal } = useContext(ModalContext);
   const isAllAccount = useSelector((state) => state.accountState.isAllAccount);
@@ -48,6 +48,11 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
 
     return getUserVotingListForReferendum({ referendum: referendumDetail, govLockedInfos, voteMap, chainInfo: chainInfoMap[chain] });
   }, [chain, chainInfoMap, govLockedInfos, referendumDetail, voteMap]);
+
+  const thresholdPercent = useMemo(
+    () => getMinApprovalThreshold(referendumDetail, chain, migrationBlockOffset?.offset || 0),
+    [referendumDetail, chain, migrationBlockOffset?.offset]
+  );
 
   const timeLeftContent = useMemo(() => {
     const time = timeLeft ?? '';
