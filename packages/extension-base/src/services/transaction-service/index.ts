@@ -1455,7 +1455,7 @@ export default class TransactionService {
       maxPriorityFeePerGas: anyNumberToBN(payload.maxPriorityFeePerGas).toNumber(),
       gasLimit: anyNumberToBN(payload.gas).toNumber(),
       to: payload.to,
-      value: anyNumberToBN(payload.value).toNumber(),
+      value: anyNumberToBN(payload.value).toFixed(),
       data: payload.data,
       chainId: payload.chainId
     };
