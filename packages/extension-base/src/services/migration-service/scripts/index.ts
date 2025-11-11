@@ -1,7 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import MigrateAssetSetting20251107 from '@subwallet/extension-base/services/migration-service/scripts/databases/MigrateAssetSetting20251107';
 import MigrateChainPatrol from '@subwallet/extension-base/services/migration-service/scripts/MigrateChainPatrol';
+import MigrateTransactionHistoryBySymbol20251107 from '@subwallet/extension-base/services/migration-service/scripts/MigrateTransactionHistoryBySymbol20251107';
 
 import BaseMigrationJob from '../Base';
 import ClearMetadataDatabase from './databases/ClearMetadataDatabase';
@@ -82,5 +84,7 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.3.58-01': OptimizeEnableToken,
   '1.3.64-01': MigrateAssetSetting20251027,
   '1.3.64-02': MigrateTransactionHistoryBySymbol20251027,
-  '1.3.65-01': DeleteEarningData20251105
+  '1.3.65-01': DeleteEarningData20251105,
+  '1.3.66-01': MigrateAssetSetting20251107,
+  '1.3.66-02': MigrateTransactionHistoryBySymbol20251107
 };
