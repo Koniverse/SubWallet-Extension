@@ -434,7 +434,7 @@ export class SwapBaseHandler {
       const xcmRequest = {
         originTokenInfo: fromToken,
         destinationTokenInfo: toToken,
-        sendingValue: bnBridgeAmount.toString(),
+        sendingValue: bnBridgeAmount.toFixed(),
         recipient: receiver,
         substrateApi: substrateApi,
         sender: sender,
