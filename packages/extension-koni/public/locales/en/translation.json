@@ -2443,6 +2443,7 @@
   "ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumStandardVote.lockDuration": "Lock duration",
   "ui.TRANSACTION.Confirmations.GovVote.voteAmountDetails": "Vote amount details",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.unableToVote": "Unable to vote",
+  "ui.GOVERNANCE.screen.Governance.ReferendumDetail.watchOnlyAccountFeatureRestriction": "The account you are using is Watch-only account, you cannot use this feature with it",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.delegatingVotesWarning": "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.iUnderstand": "I understand",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.referendaId": "Referenda #{{id}}",

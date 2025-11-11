@@ -2506,6 +2506,7 @@
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.proposerHash": "Proposer Hash",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.copyProposalHash": "Copy proposal hash",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.description": "Description",
+  "ui.GOVERNANCE.screen.Governance.ReferendumDetail.watchOnlyAccountFeatureRestriction": "The account you are using is Watch-only account, you cannot use this feature with it",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.details": "Details",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.timeline": "Timeline",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.votingSummary": "Voting Summary",

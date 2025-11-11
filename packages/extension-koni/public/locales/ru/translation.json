@@ -2391,6 +2391,7 @@
   "ui.GOVERNANCE.components.Modal.Governance.GovFilter.status": "Status",
   "ui.GOVERNANCE.components.Modal.Governance.GovFilter.track": "Track",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.track": "Track",
+  "ui.GOVERNANCE.screen.Governance.ReferendumDetail.watchOnlyAccountFeatureRestriction": "The account you are using is Watch-only account, you cannot use this feature with it",
   "ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.DelegationDetails.delegationDetails": "Delegation details",
   "ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.DelegationDetails.selfVotes": "Self votes",
   "ui.GOVERNANCE.components.Modal.Governance.GovVotingStatusModal.DelegationDetails.votes": "Votes",
