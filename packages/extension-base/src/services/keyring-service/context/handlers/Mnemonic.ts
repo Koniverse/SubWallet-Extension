@@ -59,7 +59,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
 
         if (mnemonicType === 'trust-wallet') {
           mnemonicTypes = 'trust-wallet';
-          pairTypes = ['ed25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
+          pairTypes = ['ed25519-tw', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
         } else {
           mnemonicTypes = 'general';
           pairTypes = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
@@ -79,13 +79,10 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
     };
 
     pairTypes.forEach((type) => {
-      // todo: handle createFromUri with type `ed25519-tw`
       rs.addressMap[type] = keyring.createFromUri(getSuri(mnemonic, type), {}, type).address;
     });
 
-    // todo: assure the rs.addressMap create exactly in case import Trust Wallet seed
-
-    const exists = this.state.checkAddressExists(Object.values(rs.addressMap));
+    const exists = this.state.checkAddressExists(Object.values(rs.addressMap)); // todo: discuss more about import trust seed and import normal seed make duplicate account
 
     assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
 

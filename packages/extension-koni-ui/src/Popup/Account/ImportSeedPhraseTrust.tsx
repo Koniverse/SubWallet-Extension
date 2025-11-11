@@ -330,7 +330,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       </Layout.WithSubHeaderOnly>
       <AccountNameModal
         accountType={seedValidationResponse
-          ? seedValidationResponse.mnemonicTypes === 'general' ? AccountProxyType.UNIFIED : AccountProxyType.SOLO
+          ? ['general', 'trust-wallet'].includes(seedValidationResponse.mnemonicTypes) ? AccountProxyType.UNIFIED : AccountProxyType.SOLO
           : undefined}
         isLoading={accountCreating}
         onSubmit={onCreateAccount}
