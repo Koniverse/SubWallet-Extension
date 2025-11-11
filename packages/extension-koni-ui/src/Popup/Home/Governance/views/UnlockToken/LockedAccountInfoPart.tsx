@@ -168,12 +168,12 @@ function Component ({ chain, className, govLockedInfos }: Props) {
             spaceSize='sm'
             valueColorScheme='light'
           >
-            {lockedAmount.gt(BN_ZERO) && <MetaInfo.Status
+            <MetaInfo.Status
               className={'__meta-locked-status-item'}
               label={renderAccount(item)}
-              statusName={t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlockable')}
+              statusName={lockedAmount.gt(BN_ZERO) ? t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlockable') : ''}
               valueColorSchema={'success'}
-            />}
+            />
 
             <MetaInfo.Number
               decimalOpacity={0.45}
@@ -248,21 +248,23 @@ function Component ({ chain, className, govLockedInfos }: Props) {
   }, [govLockedInfos, renderAccount, t, decimals, symbol, onShowUnlockingModal, goUnlockVote]);
 
   const unlockingModalContent = useMemo(() => {
-    return unlockingModalData.map((item, index) => {
-      const timeRemainingContent = calculateTimeRemaining(item.timestamp);
+    return [...unlockingModalData]
+      .sort((a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0))
+      .map((item, index) => {
+        const timeRemainingContent = calculateTimeRemaining(item.timestamp);
 
-      return (
-        <MetaInfo.Number
-          decimalOpacity={0.45}
-          decimals={decimals}
-          key={item.id}
-          label={t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlockableInDate', { date: timeRemainingContent })}
-          suffix={symbol}
-          value={item.balance}
-          valueColorSchema='even-odd'
-        />
-      );
-    });
+        return (
+          <MetaInfo.Number
+            decimalOpacity={0.45}
+            decimals={decimals}
+            key={item.id}
+            label={t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlockableInDate', { date: timeRemainingContent })}
+            suffix={symbol}
+            value={item.balance}
+            valueColorSchema='even-odd'
+          />
+        );
+      });
   }, [unlockingModalData, decimals, symbol, t]);
 
   return (

@@ -286,7 +286,7 @@ interface OnchainInfo {
     };
   };
   alarm: number[];
-
+  submitted: number;
   democracy?: DemocracyOnChainInfo
 }
 
@@ -440,3 +440,9 @@ export const GOV_COMPLETED_FAILED_STATES: GovStatusKey[] = [
 /* Gov Status */
 
 export type ReadableStreamReadResult<T> = | { done: false; value: T } | { done: true; value?: undefined }
+
+export interface MigrationBlockOffset {
+  offset: number | null;
+  relayHeight: number | null;
+  scanHeight: number | null;
+}

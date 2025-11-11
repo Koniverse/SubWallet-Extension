@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { govConvictionOptions } from '@subwallet/extension-base/services/open-gov/interface';
+import { getGovConvictionOptions } from '@subwallet/extension-base/services/open-gov/utils';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { GOV_DELEGATION_DETAILS_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
@@ -32,11 +32,19 @@ function Component (props: Props): React.ReactElement<Props> {
     onCancel && onCancel();
   }, [inactiveModal, onCancel]);
 
+  const govConvictionOptions = useMemo(() => {
+    return getGovConvictionOptions(chain);
+  }, [chain]);
+
   const convictionSelVotes = useMemo(() => {
+    if (!nestedAccount.accountInfo.conviction == null) {
+      return 'N/A';
+    }
+
     const convictionOption = govConvictionOptions.find((opt) => opt.value === nestedAccount.accountInfo.conviction);
 
     return convictionOption ? convictionOption.label : `${nestedAccount.accountInfo.conviction}x`;
-  }, [nestedAccount.accountInfo.conviction]);
+  }, [govConvictionOptions, nestedAccount.accountInfo.conviction]);
 
   return (
     <SwModal

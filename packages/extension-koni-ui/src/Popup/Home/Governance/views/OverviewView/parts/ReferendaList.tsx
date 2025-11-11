@@ -5,7 +5,7 @@ import { EmptyList } from '@subwallet/extension-koni-ui/components';
 import { ReferendumItem } from '@subwallet/extension-koni-ui/components/Governance';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ReferendumWithVoting } from '@subwallet/extension-koni-ui/types/gov';
-import { Referendum } from '@subwallet/subsquare-api-sdk';
+import { MigrationBlockOffset, Referendum } from '@subwallet/subsquare-api-sdk';
 import { ListChecks } from 'phosphor-react';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +16,7 @@ type Props = ThemeProps & {
   chain: string;
   items: ReferendumWithVoting[];
   renderWhenEmpty?: React.ReactElement;
-  migrationBlockOffset: number;
+  migrationBlockOffset?: MigrationBlockOffset;
 };
 
 type WrapperProps = Omit<Props, 'items'> & {

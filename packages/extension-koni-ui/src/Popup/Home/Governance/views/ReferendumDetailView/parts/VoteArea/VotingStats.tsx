@@ -60,15 +60,10 @@ const Component = ({ chain, className, isLegacyGov, votingData }: Props): React.
         <MetaInfo>
           <MetaInfo.Default
             label={
-              <>
-                <VoteTypeLabel
-                  className={'voting-stats__label'}
-                  type={GovVoteType.AYE}
-                />
-                <div className='voting-stats__number'>
-                  {votingData[GovVoteType.AYE].totalVotedAccounts}
-                </div>
-              </>
+              <VoteTypeLabel
+                className={'voting-stats__label'}
+                type={GovVoteType.AYE}
+              />
             }
           >
             <div className='voting-stats__value'>
@@ -90,15 +85,10 @@ const Component = ({ chain, className, isLegacyGov, votingData }: Props): React.
 
           <MetaInfo.Default
             label={
-              <>
-                <VoteTypeLabel
-                  className={'voting-stats__label'}
-                  type={GovVoteType.NAY}
-                />
-                <div className='voting-stats__number'>
-                  {votingData[GovVoteType.NAY].totalVotedAccounts}
-                </div>
-              </>
+              <VoteTypeLabel
+                className={'voting-stats__label'}
+                type={GovVoteType.NAY}
+              />
             }
           >
             <div className='voting-stats__value'>
@@ -120,15 +110,11 @@ const Component = ({ chain, className, isLegacyGov, votingData }: Props): React.
 
           {!isLegacyGov && <MetaInfo.Default
             label={
-              <>
-                <VoteTypeLabel
-                  className={'voting-stats__label'}
-                  type={GovVoteType.ABSTAIN}
-                />
-                <div className='voting-stats__number'>
-                  {votingData[GovVoteType.ABSTAIN].totalVotedAccounts}
-                </div>
-              </>
+              <VoteTypeLabel
+                className={'voting-stats__label'}
+                type={GovVoteType.ABSTAIN}
+              />
+
             }
           >
             <div className='voting-stats__value'>
@@ -199,11 +185,7 @@ export const VotingStats = styled(Component)<Props>(({ theme: { token } }: Props
     },
 
     '.voting-stats__label': {
-      marginRight: token.marginXXS / 2,
-
-      '.__type-label::after': {
-        content: '":"'
-      }
+      marginRight: token.marginXXS / 2
     },
 
     '.voting-stats__number': {

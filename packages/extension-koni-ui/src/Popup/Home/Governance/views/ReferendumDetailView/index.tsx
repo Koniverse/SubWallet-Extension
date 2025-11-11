@@ -3,13 +3,14 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { GovTrackVoting } from '@subwallet/extension-base/services/open-gov/interface';
+import { AccountProxyType } from '@subwallet/extension-base/types';
 import { detectTranslate, reformatAddress } from '@subwallet/extension-base/utils';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import GovAccountSelectorModal from '@subwallet/extension-koni-ui/components/Modal/Governance/GovAccountSelector';
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetGovLockedInfos, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetGovLockedInfos, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { chainSlugToPolkassemblySite, chainSlugToSubsquareSite } from '@subwallet/extension-koni-ui/Popup/Home/Governance/shared';
 import { ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -47,7 +48,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
   const fromAccountProxy = getTransactionFromAccountProxyValue(currentAccountProxy);
   const govLockedInfos = useGetGovLockedInfos(chainSlug);
   const { chainInfoMap } = useSelector((root: RootState) => root.chainStore);
-
+  const notify = useNotification();
   const { accountAddressItems, voteMap } = useGovReferendumVotes({
     chain: chainSlug,
     referendumId: referendumId,
@@ -139,6 +140,15 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
   }, [chainSlug, data?.referendumIndex, sdkInstance?.isLegacyGov]);
 
   const onSelectGovItem = useCallback((item: GovAccountAddressItemType) => {
+    if (item.accountProxyType === AccountProxyType.READ_ONLY) {
+      notify({
+        message: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.watchOnlyAccountFeatureRestriction'),
+        type: 'info'
+      });
+
+      return;
+    }
+
     if (item.govVoteStatus === GovVoteStatus.DELEGATED) {
       openAlert({
         title: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.unableToVote'),
@@ -176,15 +186,15 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
       fromAccountProxy
     });
     navigate('/transaction/gov-ref-vote/standard');
-  }, [chainSlug, className, closeAlert, data?.track, fromAccountProxy, navigate, openAlert, referendumId, setGovRefVoteStorage, t, token.colorTextLight2]);
+  }, [chainSlug, className, closeAlert, data?.track, fromAccountProxy, navigate, notify, openAlert, referendumId, setGovRefVoteStorage, t, token.colorTextLight2]);
 
   const onClickVote = useCallback(() => {
-    if (accountAddressItems.length > 1) {
+    if (extendedAccountAddressItems.length > 1) {
       activeModal(modalId);
-    } else if (accountAddressItems.length === 1) {
-      onSelectGovItem(accountAddressItems[0]);
+    } else if (extendedAccountAddressItems.length === 1) {
+      onSelectGovItem(extendedAccountAddressItems[0]);
     }
-  }, [accountAddressItems, activeModal, onSelectGovItem]);
+  }, [extendedAccountAddressItems, activeModal, onSelectGovItem]);
 
   const onCancel = useCallback(() => {
     inactiveModal(modalId);

@@ -2311,6 +2311,7 @@
   "ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumAbstainVote.vote": "Vote",
   "ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumSplitVote.vote": "Vote",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.vote": "Vote",
+  "ui.GOVERNANCE.screen.Governance.ReferendumDetail.watchOnlyAccountFeatureRestriction": "The account you are using is Watch-only account, you cannot use this feature with it",
   "ui.HISTORY.constant.history.unvote": "Unvote",
   "ui.TRANSACTION.constant.transaction.unvote": "Unvote",
   "ui.HISTORY.screen.History.unvote": "Unvote",

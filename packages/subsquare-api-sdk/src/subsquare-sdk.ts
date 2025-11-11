@@ -3,7 +3,7 @@
 
 import axios, { AxiosInstance } from 'axios';
 
-import { DemocracyReferendaResponse, DemocracyReferendum, ReadableStreamReadResult, ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, Referendum, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
+import { DemocracyReferendaResponse, DemocracyReferendum, MigrationBlockOffset, ReadableStreamReadResult, ReferendaQueryParams, ReferendaQueryParamsWithTrack, ReferendaResponse, Referendum, ReferendumDetail, ReferendumVoteDetail, TrackInfo, UserVotesParams } from './interface';
 import { gov1ReferendumsApi, gov2ReferendumsApi, gov2TracksApi } from './url';
 import { ALL_TRACK, castDemocracyReferendumToReferendum, reformatTrackName } from './utils';
 
@@ -51,7 +51,7 @@ export class SubsquareApiSdk {
     return this.instances.get(chain) as SubsquareApiSdk;
   }
 
-  async getMigrationBlockOffset (blockTime: number): Promise<number | null> {
+  async getMigrationBlockOffset (blockTime: number): Promise<MigrationBlockOffset> {
     try {
       const urls = [
         `/stream/relay-chain-height?interval=${blockTime * 1000}`,
@@ -87,12 +87,17 @@ export class SubsquareApiSdk {
       );
 
       const [relayHeight, scanHeight] = results;
+      const offset = relayHeight - scanHeight;
 
-      return relayHeight - scanHeight;
+      return { offset, relayHeight, scanHeight };
     } catch (err) {
       console.error(`Failed to get migration block offset for ${this.chain}:`, err);
 
-      return null;
+      return {
+        offset: null,
+        relayHeight: null,
+        scanHeight: null
+      };
     }
   }
 

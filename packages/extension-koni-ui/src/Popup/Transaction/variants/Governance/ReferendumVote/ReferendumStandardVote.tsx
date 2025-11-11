@@ -3,7 +3,8 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
-import { govConvictionOptions, GovVoteType, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
+import { GovVoteType, StandardVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
+import { getGovConvictionOptions } from '@subwallet/extension-base/services/open-gov/utils';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, GovAmountInput, GovVoteConvictionSlider, HiddenInput, MetaInfo, NumberDisplay, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
@@ -38,12 +39,6 @@ type ComponentProps = {
 };
 
 const hideFields: Array<keyof GovReferendumVoteParams> = ['chain', 'referendumId', 'fromAccountProxy', 'track'];
-
-const getConvictionDescription = (value?: number): string => {
-  const option = govConvictionOptions.find((o) => o.value === value);
-
-  return option?.description || '-';
-};
 
 const PreviousVoteDetailModalId = 'previous-vote-detail-modal';
 
@@ -142,6 +137,13 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       return { to: amountBN };
     }
   }, [amountValue, currentGovInfo?.summary.totalLocked]);
+  const convictionOptions = useMemo(() => getGovConvictionOptions(chainValue), [chainValue]);
+
+  const getConvictionDescription = useCallback((value?: number): string => {
+    const option = convictionOptions.find((o) => o.value === value);
+
+    return option?.description || '-';
+  }, [convictionOptions]);
 
   const handleVoteClick = useCallback((type: GovVoteType) => {
     setVoteType(type);

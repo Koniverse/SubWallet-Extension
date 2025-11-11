@@ -36,46 +36,6 @@ export interface SplitAbstainVoteRequest extends BaseVoteRequest {
 
 export type GovVoteRequest = StandardVoteRequest | SplitVoteRequest | SplitAbstainVoteRequest;
 
-export const govConvictionOptions = [
-  { value: 0, label: '0.1x', description: 'No lockup' },
-  { value: 1, label: '1x', description: '~7d' },
-  { value: 2, label: '2x', description: '~14d' },
-  { value: 3, label: '3x', description: '~28d' },
-  { value: 4, label: '4x', description: '~56d' },
-  { value: 5, label: '5x', description: '~112d' },
-  { value: 6, label: '6x', description: '~224d' }
-];
-
-export enum Conviction {
-  None = 'None',
-  Locked1x = 'Locked1x',
-  Locked2x = 'Locked2x',
-  Locked3x = 'Locked3x',
-  Locked4x = 'Locked4x',
-  Locked5x = 'Locked5x',
-  Locked6x = 'Locked6x'
-}
-
-export const numberToConviction: Record<number, Conviction> = {
-  0: Conviction.None,
-  1: Conviction.Locked1x,
-  2: Conviction.Locked2x,
-  3: Conviction.Locked3x,
-  4: Conviction.Locked4x,
-  5: Conviction.Locked5x,
-  6: Conviction.Locked6x
-};
-
-export const convictionToDays: Record<Conviction, number> = {
-  [Conviction.None]: 0,
-  [Conviction.Locked1x]: 7,
-  [Conviction.Locked2x]: 14,
-  [Conviction.Locked3x]: 28,
-  [Conviction.Locked4x]: 56,
-  [Conviction.Locked5x]: 112,
-  [Conviction.Locked6x]: 224
-};
-
 export interface RemoveVoteRequest {
   address: string;
   chain: string;
@@ -90,6 +50,15 @@ export interface RemoveVoteRequest {
 }
 
 /* Lock inteface */
+export enum Conviction {
+  None = 'None',
+  Locked1x = 'Locked1x',
+  Locked2x = 'Locked2x',
+  Locked3x = 'Locked3x',
+  Locked4x = 'Locked4x',
+  Locked5x = 'Locked5x',
+  Locked6x = 'Locked6x'
+}
 
 export interface StandardVote {
   standard: {
