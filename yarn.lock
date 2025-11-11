@@ -6257,13 +6257,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.107":
-  version: 0.2.107
-  resolution: "@subwallet/chain-list@npm:0.2.107"
+"@subwallet/chain-list@npm:0.2.107-mobile.1":
+  version: 0.2.107-mobile.1
+  resolution: "@subwallet/chain-list@npm:0.2.107-mobile.1"
   dependencies:
     "@polkadot/util": ^12.5.1
     ts-md5: ^1.3.1
-  checksum: a3535986ceedc166e832d06c45e2db47c8bafabe0a4ae9f041097acf8e86b698ac5f1a82a0f4cf2d2d76f24e4243e50b75c9b086304f85804387cf801572ffb3
+  checksum: 2575bc5b519861e829441baf7748f815e755f2820da24ccebd81c3b5b64924c8f6f14933306314bc778b7102ac7971ca66959375d0dbbb5b9c1e0dd248855371
   languageName: node
   linkType: hard
 
@@ -6308,7 +6308,7 @@ __metadata:
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
     "@subwallet-monorepos/subwallet-services-sdk": ^0.1.8
-    "@subwallet/chain-list": 0.2.107
+    "@subwallet/chain-list": 0.2.107-mobile.1
     "@subwallet/extension-base": ^1.3.54-1
     "@subwallet/extension-chains": ^1.3.54-1
     "@subwallet/extension-dapp": ^1.3.54-1
@@ -6594,7 +6594,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.5.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.107
+    "@subwallet/chain-list": 0.2.107-mobile.1
     "@subwallet/extension-base": ^1.3.54-1
     "@subwallet/extension-chains": ^1.3.54-1
     "@subwallet/extension-dapp": ^1.3.54-1
@@ -6736,7 +6736,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.5.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.107
+    "@subwallet/chain-list": 0.2.107-mobile.1
     "@subwallet/extension-base": ^1.3.54-1
     "@subwallet/extension-chains": ^1.3.54-1
     "@subwallet/extension-dapp": ^1.3.54-1
@@ -6918,7 +6918,7 @@ __metadata:
   resolution: "@subwallet/subwallet-api-sdk@workspace:packages/subwallet-api-sdk"
   dependencies:
     "@polkadot/util": ^13.2.3
-    "@subwallet/chain-list": 0.2.107
+    "@subwallet/chain-list": 0.2.107-mobile.1
   languageName: unknown
   linkType: soft
 
