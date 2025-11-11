@@ -1844,7 +1844,7 @@ export default class KoniExtension {
           const minXcmTransferableAmount = await getMinXcmTransferableAmount(params);
 
           if (!minXcmTransferableAmount) {
-            inputTransaction.errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Missing XCM min transferable amount.')));
+            inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNSUPPORTED, t('Feature unavailable at the moment. Try again later.')));
           }
 
           const [warning, error] = additionalValidateTransferForRecipient(
