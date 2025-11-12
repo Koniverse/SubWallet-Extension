@@ -358,12 +358,12 @@ export default abstract class BaseOpenGovHandler {
 
           let currentBlock: BigN;
 
-          if (MIGRATED_CHAINS.includes(this.chain) && substrateApi.api.query.remoteProxyRelayChain && substrateApi.api.query.remoteProxyRelayChain.blockToRoot) {
-            const blockRootsRaw = await substrateApi.api.query.remoteProxyRelayChain.blockToRoot();
-            const blockRoots = blockRootsRaw?.toPrimitive() as Array<[number, string]> | undefined;
+          if (MIGRATED_CHAINS.includes(this.chain) && substrateApi.api.query.parachainSystem && substrateApi.api.query.parachainSystem.lastRelayChainBlockNumber) {
+            const blockRootsRaw = await substrateApi.api.query.parachainSystem.lastRelayChainBlockNumber();
+            const blockRoots = blockRootsRaw?.toPrimitive() as number;
 
-            if (blockRoots && blockRoots.length > 0) {
-              currentBlock = new BigN(blockRoots[blockRoots.length - 1][0]);
+            if (blockRoots) {
+              currentBlock = new BigN(blockRoots);
             } else {
               const currentBlockInfo = await substrateApi.api.rpc.chain.getHeader();
 
