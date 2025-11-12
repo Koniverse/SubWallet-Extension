@@ -295,6 +295,7 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   const { fromChainInfo, fromTokenInfo, recipient, sender, toChainInfo, value } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
   const paraSpellIdentifyV4 = fromTokenInfo.metadata?.paraSpellIdentifyV4;
+  const requestValue = BigInt(value) > 0n ? value : '1'; // avoid bug in-case estimate fee sendingValue <= 0;
 
   if (!paraSpellIdentifyV4) {
     console.error('Lack of paraspell metadata');
@@ -307,7 +308,7 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
     address: recipient,
     from: paraSpellChainMap[fromChainInfo.slug],
     to: paraSpellChainMap[toChainInfo.slug],
-    currency: createParaSpellCurrency(paraSpellIdentifyV4, value),
+    currency: createParaSpellCurrency(paraSpellIdentifyV4, requestValue),
     options: {
       abstractDecimals: false
     }
