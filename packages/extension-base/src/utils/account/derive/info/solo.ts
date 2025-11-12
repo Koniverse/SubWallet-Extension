@@ -329,7 +329,11 @@ export const derivePair = (parentPair: KeyringPair, name: string, suri: string, 
 };
 
 export const getSuri = (seed: string, type?: KeypairType): string => {
-  const extraPath = type ? getDerivePath(type)(0) : '';
+  if (!type) {
+    return seed;
+  }
+
+  const extraPath = getDerivePath(type)(0);
 
   return seed + (extraPath ? '/' + extraPath : '');
 };

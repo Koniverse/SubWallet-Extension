@@ -6678,7 +6678,7 @@ __metadata:
 
 "@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.1.12
-  resolution: "@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build#../SubWallet-Base/packages/keyring/build::hash=5a4d1f&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build#../SubWallet-Base/packages/keyring/build::hash=2e539d&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@emurgo/cardano-message-signing-browser": ^1.1.0
     "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
@@ -6701,7 +6701,7 @@ __metadata:
     rxjs: ^7.5.6
     tiny-secp256k1: ^2.2.3
     tslib: ^2.6.2
-  checksum: ed5f2f6f8617093c0a3df02cfd23c317d5f7fba70a705cc3fc5ef8b629c329e5b3d63738a497fcf8d6e6b4eea878015e12aab03b621d07191c4ff0c93a83b907
+  checksum: 7977758cc80cc9e41e156afbc2cad8ded2780974c89fa9d8987855bf474927782575cfbc9220bb568b6f1450ee40b991d5df236aa1183b52f39aa75a685ca772
   languageName: node
   linkType: hard
 
@@ -6785,7 +6785,7 @@ __metadata:
 
 "@subwallet/ui-keyring@file:../SubWallet-Base/packages/ui-keyring/build/::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.1.12
-  resolution: "@subwallet/ui-keyring@file:../SubWallet-Base/packages/ui-keyring/build/#../SubWallet-Base/packages/ui-keyring/build/::hash=c4c113&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@subwallet/ui-keyring@file:../SubWallet-Base/packages/ui-keyring/build/#../SubWallet-Base/packages/ui-keyring/build/::hash=80f4d6&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@babel/runtime": ^7.20.1
     "@polkadot/ui-settings": ^3.15.2
@@ -6796,7 +6796,7 @@ __metadata:
     mkdirp: ^1.0.4
     rxjs: ^7.5.7
     store: ^2.0.12
-  checksum: ecaeb47c4e348af99066372e452f18c4bce6c0bbee4bb8236ccc676b7cd0f18a5a5c4d35c3e9a16efb42e9a479fbbfb9c809f7a58bbace86057c28c763da88a9
+  checksum: 2c749152a3275707b5ad3f62995e4eeab0ef26cd3120a0181c807aac8c5f4120bc9cbdca233d51c8aa9000fcb8452eb7f3c8701a1cf6a442cb0c2548823f9b6b
   languageName: node
   linkType: hard
 
