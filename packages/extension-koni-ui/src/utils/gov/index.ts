@@ -8,7 +8,7 @@ import { MIGRATED_CHAINS } from '@subwallet/extension-base/services/open-gov/uti
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { useGetGovLockedInfos } from '@subwallet/extension-koni-ui/hooks';
 import { PreviousVoteAmountDetail, UserVoting, VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
-import { GOV_ONGOING_STATES, GovStatusKey, MigrationBlockOffset, Referendum, ReferendumDetail, ReferendumVoteDetail, Tally } from '@subwallet/subsquare-api-sdk';
+import { GOV_COMPLETED_STATES, GOV_ONGOING_STATES, GovStatusKey, MigrationBlockOffset, Referendum, ReferendumDetail, ReferendumVoteDetail, Tally } from '@subwallet/subsquare-api-sdk';
 import BigNumber from 'bignumber.js';
 
 export const GOV_QUERY_KEYS = {
@@ -156,9 +156,20 @@ export function getMinApprovalThresholdGov1 (referendum: Referendum | Referendum
 function getMinApprovalThresholdGov2 (referendumDetail: Referendum | ReferendumDetail, chain: string, migrationBlockOffset: number): number {
   const { decisionPeriod, minApproval } = referendumDetail.trackInfo;
   const decidingSince = referendumDetail.onchainData?.info?.deciding?.since;
+
+  const stateName = referendumDetail.state?.name;
+
+  if (GOV_COMPLETED_STATES.includes(stateName)) {
+    return 50;
+  }
+
+  if (!decidingSince) {
+    return 100;
+  }
+
   let currentBlock = referendumDetail.onchainData?.state?.indexer?.blockHeight;
 
-  if (!minApproval || !decidingSince || !currentBlock) {
+  if (!minApproval || !currentBlock) {
     return 0;
   }
 
