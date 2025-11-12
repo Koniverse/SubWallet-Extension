@@ -12,7 +12,7 @@ import { gasSettingsForEWC, getERC20TransactionObject, getEVMTransactionObject }
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
-import { _isAcrossChainBridge, _isAcrossTestnetBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { _isAcrossChainBridge, _isAcrossTestnetBridge, getAcrossSendingValue } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
@@ -413,11 +413,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     } else if (isAcrossBridgeTransfer) {
       funcCreateExtrinsic = createAcrossBridgeExtrinsic;
 
-      if (_isAcrossTestnetBridge(srcChain.slug)) {
-        params.sendingValue = BigN(0.0037).shiftedBy(_getAssetDecimals(srcToken)).toFixed(0, 1);
-      } else {
-        params.sendingValue = BigN(1).shiftedBy(_getAssetDecimals(srcToken)).toFixed(0, 1);
-      }
+      params.sendingValue = await getAcrossSendingValue(srcChain, srcToken, destChain, _isAcrossTestnetBridge(srcChain.slug));
     } else if (isSnowBridgeEvmTransfer) {
       funcCreateExtrinsic = createSnowBridgeExtrinsic;
     } else if (isAvailBridgeFromEvm) {
