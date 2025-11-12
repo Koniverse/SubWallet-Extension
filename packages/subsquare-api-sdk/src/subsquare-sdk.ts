@@ -58,7 +58,7 @@ export class SubsquareApiSdk {
         `/stream/scan-height?interval=${blockTime * 1000}`
       ];
 
-      const results = await Promise.all(
+      const results = await Promise.allSettled(
         urls.map(async (url) => {
           const res = await fetch(new URL(url, this.client.defaults.baseURL));
 
@@ -79,25 +79,30 @@ export class SubsquareApiSdk {
           }
 
           const text = decoder.decode(value);
-
           const data = JSON.parse(text) as { value: number };
 
           return data.value;
         })
       );
 
-      const [relayHeight, scanHeight] = results;
-      const offset = relayHeight - scanHeight;
+      const [relayResult, scanResult] = results;
+
+      const relayHeight = relayResult.status === 'fulfilled' ? relayResult.value : null;
+      const scanHeight = scanResult.status === 'fulfilled' ? scanResult.value : null;
+
+      let offset: number;
+
+      if (relayHeight !== null && scanHeight !== null) {
+        offset = relayHeight - scanHeight > 0 ? relayHeight - scanHeight : 0;
+      } else {
+        offset = scanHeight ?? 0;
+      }
 
       return { offset, relayHeight, scanHeight };
     } catch (err) {
       console.error(`Failed to get migration block offset for ${this.chain}:`, err);
 
-      return {
-        offset: null,
-        relayHeight: null,
-        scanHeight: null
-      };
+      return { offset: null, relayHeight: null, scanHeight: null };
     }
   }
 

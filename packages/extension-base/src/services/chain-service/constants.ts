@@ -159,7 +159,7 @@ export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
   vara_testnet: 3,
   goldberg_testnet: 20,
   polimec: 12,
-  bifrost: 13, // expect 12 but actual 13
+  bifrost: 6, // bifrost kusama
   moonbeam: 12,
   moonriver: 12,
   moonbase: 6,
