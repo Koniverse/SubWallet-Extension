@@ -6,6 +6,7 @@ import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/para
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService } from '@subwallet/extension-base/utils';
+import BigNumber from 'bignumber.js';
 
 import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -295,7 +296,7 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   const { fromChainInfo, fromTokenInfo, recipient, sender, toChainInfo, value } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
   const paraSpellIdentifyV4 = fromTokenInfo.metadata?.paraSpellIdentifyV4;
-  const requestValue = BigInt(value) > 0n ? value : '1'; // avoid bug in-case estimate fee sendingValue <= 0;
+  const requestValue = BigNumber(value).gt(0) ? value : '1'; // avoid bug in-case estimate fee sendingValue <= 0;
 
   if (!paraSpellIdentifyV4) {
     console.error('Lack of paraspell metadata');
