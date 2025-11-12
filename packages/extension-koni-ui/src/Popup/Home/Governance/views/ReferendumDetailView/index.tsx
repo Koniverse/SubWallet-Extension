@@ -201,15 +201,13 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
   const onClickVote = useCallback(() => {
     if (extendedAccountAddressItems.length >= 1) {
       activeModal(modalId);
-    } else {
-      onSelectGovItem(extendedAccountAddressItems[0]);
     } else if (isOnlyReadOnlyAccount) {
       notify({
         message: t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.watchOnlyAccountFeatureRestriction'),
         type: 'info'
       });
     }
-  }, [extendedAccountAddressItems, isOnlyReadOnlyAccount, activeModal, onSelectGovItem, notify, t]);
+  }, [extendedAccountAddressItems.length, isOnlyReadOnlyAccount, activeModal, notify, t]);
 
   const onCancel = useCallback(() => {
     inactiveModal(modalId);
