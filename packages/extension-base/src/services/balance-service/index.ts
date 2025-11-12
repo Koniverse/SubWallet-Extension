@@ -14,7 +14,7 @@ import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAc
 import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
-import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
+import { EthereumKeypairTypes, AllSubstrateKeypairTypes } from '@subwallet/keyring/types';
 import keyring from '@subwallet/ui-keyring';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
@@ -515,7 +515,7 @@ export class BalanceService implements StoppableServiceInterface {
     const assetMap = this.state.chainService.getAssetRegistry();
     const promiseList = addresses.map((address) => {
       const type = getKeypairTypeByAddress(address);
-      const typeValid = [...SubstrateKeypairTypes, ...EthereumKeypairTypes].includes(type);
+      const typeValid = [...AllSubstrateKeypairTypes, ...EthereumKeypairTypes].includes(type);
 
       if (typeValid) {
         return this.state.subscanService.getMultiChainBalance(address)
@@ -844,7 +844,7 @@ export class BalanceService implements StoppableServiceInterface {
 
       const addresses = keyring.getPairs().map((account) => account.address);
       const evmAddresses = addresses.filter((address) => [...EthereumKeypairTypes].includes(getKeypairTypeByAddress(address)));
-      const substrateAddresses = addresses.filter((address) => [...SubstrateKeypairTypes].includes(getKeypairTypeByAddress(address)));
+      const substrateAddresses = addresses.filter((address) => [...AllSubstrateKeypairTypes].includes(getKeypairTypeByAddress(address)));
 
       const [nonZeroBalanceEvmToken, nonZeroBalanceSubstrateToken] = await Promise.all([
         this.evmDetectBalanceToken(evmAddresses),

@@ -10,6 +10,7 @@ import { createAccountSuriV2, createSeedV2, windowOpen } from '@subwallet/extens
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { SeedPhraseTermStorage, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { isFirefox, isNoAccount } from '@subwallet/extension-koni-ui/utils';
+import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
@@ -80,11 +81,21 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   }, [activeModal, checkUnlock, seedPhrase]);
 
   const onSubmit = useCallback((accountName: string) => {
+    let types: KeypairType[];
+
+    if (selectedMnemonicType === 'ton') {
+      types = ['ton-native'];
+    } else if (selectedMnemonicType === 'trust-wallet') {
+      types = ['ed25519-tw', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
+    } else {
+      types = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
+    }
+
     setLoading(true);
     createAccountSuriV2({
       name: accountName,
       suri: seedPhrase,
-      type: selectedMnemonicType === 'ton' ? 'ton-native' : undefined,
+      types,
       isAllowed: true
     })
       .then(() => {

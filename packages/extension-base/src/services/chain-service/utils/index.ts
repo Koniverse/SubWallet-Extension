@@ -7,7 +7,7 @@ import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-ba
 import { _ChainState, _CUSTOM_PREFIX, _DataMap, _SMART_CONTRACT_STANDARDS } from '@subwallet/extension-base/services/chain-service/types';
 import { IChain } from '@subwallet/extension-base/services/storage-service/databases';
 import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
-import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { AllSubstrateKeypairTypes, BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType, TonKeypairTypes } from '@subwallet/keyring/types';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
@@ -755,7 +755,7 @@ export const _isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, acc
   const { chainType: accountChainType, signMode: accountSignMode, type: accountType } = accountInfo;
 
   if (accountChainType === AccountChainType.SUBSTRATE) {
-    return _isPureSubstrateChain(chainInfo) && SubstrateKeypairTypes.includes(accountType);
+    return _isPureSubstrateChain(chainInfo) && AllSubstrateKeypairTypes.includes(accountType);
   }
 
   if (accountChainType === AccountChainType.ETHEREUM) {

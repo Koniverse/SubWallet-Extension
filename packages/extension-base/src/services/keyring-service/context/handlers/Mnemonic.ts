@@ -91,11 +91,10 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
 
   /* Add accounts from mnemonic */
   public accountsCreateSuriV2 (request: RequestAccountCreateSuriV2): ResponseAccountCreateSuriV2 {
-    const { isAllowed, name, password, suri: _suri, type } = request;
+    const { isAllowed, name, password, suri: _suri, types } = request;
     const addressDict = {} as Record<KeypairType, string>;
     let changedAccount = false;
     const hasMasterPassword = keyring.keyring.hasMasterPassword;
-    const types: KeypairType[] = type ? [type] : ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
 
     if (!hasMasterPassword) {
       if (!password) {

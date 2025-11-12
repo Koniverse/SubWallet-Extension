@@ -6676,9 +6676,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/keyring@npm:^0.1.13":
-  version: 0.1.13
-  resolution: "@subwallet/keyring@npm:0.1.13"
+"@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build::locator=root-workspace-0b6124%40workspace%3A.":
+  version: 0.1.12
+  resolution: "@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build#../SubWallet-Base/packages/keyring/build::hash=5a4d1f&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@emurgo/cardano-message-signing-browser": ^1.1.0
     "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
@@ -6696,11 +6696,12 @@ __metadata:
     bitcoinjs-lib: ^6.1.5
     bitcoinjs-message: ^2.2.0
     ecpair: ^2.1.0
+    ed25519-hd-key: ^1.3.0
     eventemitter3: ^4.0.7
     rxjs: ^7.5.6
     tiny-secp256k1: ^2.2.3
     tslib: ^2.6.2
-  checksum: fedcacb62c2474224fd7bd3cb9ed8c6ac884192fe8b26627fe6c83adfc3b4a0e237dffce921c3c694f005966ba86077600bef2bf2359956862eec4d28a82a8c9
+  checksum: ed5f2f6f8617093c0a3df02cfd23c317d5f7fba70a705cc3fc5ef8b629c329e5b3d63738a497fcf8d6e6b4eea878015e12aab03b621d07191c4ff0c93a83b907
   languageName: node
   linkType: hard
 
@@ -6782,19 +6783,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/ui-keyring@npm:^0.1.13":
-  version: 0.1.13
-  resolution: "@subwallet/ui-keyring@npm:0.1.13"
+"@subwallet/ui-keyring@file:../SubWallet-Base/packages/ui-keyring/build/::locator=root-workspace-0b6124%40workspace%3A.":
+  version: 0.1.12
+  resolution: "@subwallet/ui-keyring@file:../SubWallet-Base/packages/ui-keyring/build/#../SubWallet-Base/packages/ui-keyring/build/::hash=c4c113&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@babel/runtime": ^7.20.1
     "@polkadot/ui-settings": ^3.15.2
     "@polkadot/util": ^13.5.3
     "@polkadot/util-crypto": ^13.5.3
-    "@subwallet/keyring": ^0.1.13
+    "@subwallet/keyring": ^0.1.12
+    ed25519-hd-key: ^1.3.0
     mkdirp: ^1.0.4
     rxjs: ^7.5.7
     store: ^2.0.12
-  checksum: bcccd5fdddf7cb0db06d63e299a5b7c955085fdb3e56417eece2d9aa3033780d48e9fc62b0efd803a11ba83f9507563c3a76e454d369099280031ccf047feba4
+  checksum: ecaeb47c4e348af99066372e452f18c4bce6c0bbee4bb8236ccc676b7cd0f18a5a5c4d35c3e9a16efb42e9a479fbbfb9c809f7a58bbace86057c28c763da88a9
   languageName: node
   linkType: hard
 
@@ -12066,7 +12068,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"create-hmac@npm:^1.1.0, create-hmac@npm:^1.1.4, create-hmac@npm:^1.1.7":
+"create-hmac@npm:1.1.7, create-hmac@npm:^1.1.0, create-hmac@npm:^1.1.4, create-hmac@npm:^1.1.7":
   version: 1.1.7
   resolution: "create-hmac@npm:1.1.7"
   dependencies:
@@ -13216,6 +13218,16 @@ __metadata:
     typeforce: ^1.18.0
     wif: ^2.0.6
   checksum: 924a776808f91d2fdd33a7033f84e3bbfe668ae98c0b9764c7b923e018accd8de57012bf20e419e0a5ef73ec3ec3738a654e71abe12f537b2fd7bcf02b93659f
+  languageName: node
+  linkType: hard
+
+"ed25519-hd-key@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "ed25519-hd-key@npm:1.3.0"
+  dependencies:
+    create-hmac: 1.1.7
+    tweetnacl: 1.0.3
+  checksum: 65dcf405f948ca592adc1e81d750627ce65887310ba0e1b430a6ae0dcc13e9e67a81cb855252c8d64cc0303da2b84ddad810db3098d24c808a5ae89e79fe58cf
   languageName: node
   linkType: hard
 

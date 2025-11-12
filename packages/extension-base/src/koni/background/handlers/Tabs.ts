@@ -26,7 +26,7 @@ import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/reques
 import { DEFAULT_CHAIN_PATROL_ENABLE } from '@subwallet/extension-base/services/setting-service/constants';
 import { convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
 import { InjectedMetadataKnown, MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
-import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, AllSubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { getBitcoinAddressInfo } from '@subwallet/keyring/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import { SingleAddress, SubjectInfo } from '@subwallet/ui-keyring/observable/types';
@@ -66,7 +66,7 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
 
       const validTypes = {
         evm: EthereumKeypairTypes,
-        substrate: SubstrateKeypairTypes,
+        substrate: AllSubstrateKeypairTypes,
         ton: TonKeypairTypes,
         cardano: CardanoKeypairTypes,
         bitcoin: BitcoinKeypairTypes

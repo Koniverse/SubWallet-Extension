@@ -411,6 +411,7 @@ export const getAccountTokenTypes = (type: KeypairType): _AssetType[] => {
       return [_AssetType.NATIVE, _AssetType.LOCAL, _AssetType.ERC20, _AssetType.ERC721];
     case 'sr25519':
     case 'ed25519':
+    case 'ed25519-tw':
     case 'ecdsa':
       return [_AssetType.NATIVE, _AssetType.LOCAL, _AssetType.PSP22, _AssetType.PSP34, _AssetType.GRC20, _AssetType.ERC721, _AssetType.VFT];
     case 'ton':

@@ -77,7 +77,7 @@ export interface RequestAccountCreateSuriV2 {
   name: string;
   password?: string;
   suri: string;
-  type?: KeypairType;
+  types: KeypairType[];
   isAllowed: boolean;
 }
 
