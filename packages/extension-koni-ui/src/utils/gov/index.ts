@@ -4,6 +4,7 @@
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { _EXPECTED_BLOCK_TIME } from '@subwallet/extension-base/services/chain-service/constants';
 import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
+import { MIGRATED_CHAINS } from '@subwallet/extension-base/services/open-gov/utils';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { useGetGovLockedInfos } from '@subwallet/extension-koni-ui/hooks';
 import { PreviousVoteAmountDetail, UserVoting, VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
@@ -301,7 +302,7 @@ export const getTimeLeft = (data: Referendum | ReferendumDetail, chain: string, 
   const blockDuration = _EXPECTED_BLOCK_TIME[chain];
 
   if (state === GovStatusKey.PREPARING) {
-    const currentRelayHeight = migrationBlockOffset?.relayHeight || 0;
+    const currentHeight = MIGRATED_CHAINS.includes(chain) ? (migrationBlockOffset?.relayHeight || 0) : (migrationBlockOffset?.scanHeight || 0);
     const alarmBlock = data.onchainData.info.alarm?.[0];
 
     if (!alarmBlock) {
@@ -309,7 +310,7 @@ export const getTimeLeft = (data: Referendum | ReferendumDetail, chain: string, 
     }
 
     const prep = calculatePreparingTimeLeft(
-      currentRelayHeight,
+      currentHeight,
       alarmBlock,
       blockDuration
     );
