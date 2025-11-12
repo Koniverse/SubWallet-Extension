@@ -152,19 +152,19 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
       const nayBalanceBn = new BigNumber(voter.nayBalance || 0);
       const abstainBalanceBn = new BigNumber(voter.abstainBalance || 0);
 
-      if (ayeVotesBn.gt(0)) {
+      if (ayeVotesBn.gte(0)) {
         const sideEntry = buildSideEntry(voter, GovVoteType.AYE, ayeVotesBn, ayeBalanceBn);
 
         addFlattened(GovVoteType.AYE, sideEntry, ayeVotesBn);
       }
 
-      if (nayVotesBn.gt(0)) {
+      if (nayVotesBn.gte(0)) {
         const sideEntry = buildSideEntry(voter, GovVoteType.NAY, nayVotesBn, nayBalanceBn);
 
         addFlattened(GovVoteType.NAY, sideEntry, nayVotesBn);
       }
 
-      if (abstainVotesBn.gt(0)) {
+      if (abstainVotesBn.gte(0)) {
         const sideEntry = buildSideEntry(voter, GovVoteType.ABSTAIN, abstainVotesBn, abstainBalanceBn);
 
         addFlattened(GovVoteType.ABSTAIN, sideEntry, abstainVotesBn);
@@ -181,13 +181,13 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
       const ayeBalanceBn = new BigNumber(voter.ayeBalance || 0);
       const nayBalanceBn = new BigNumber(voter.nayBalance || 0);
 
-      if (ayeVotesBn.gt(0)) {
+      if (ayeVotesBn.gte(0)) {
         const sideEntry = buildSideEntry(voter, GovVoteType.AYE, ayeVotesBn, ayeBalanceBn);
 
         addFlattened(GovVoteType.AYE, sideEntry, ayeVotesBn);
       }
 
-      if (nayVotesBn.gt(0)) {
+      if (nayVotesBn.gte(0)) {
         const sideEntry = buildSideEntry(voter, GovVoteType.NAY, nayVotesBn, nayBalanceBn);
 
         addFlattened(GovVoteType.NAY, sideEntry, nayVotesBn);
@@ -204,7 +204,7 @@ export function formatVoteResult (rawVotes: ReferendumVoteDetail[]): ReferendumV
       const selfBalanceBn = new BigNumber(voter.balance || 0);
 
       // Only add self votes to flattened list
-      if (selfVotesBn.gt(0) || delegatedVotesBn.gt(0)) {
+      if (selfVotesBn.gte(0) || delegatedVotesBn.gt(0)) {
         const side = voter.aye === true
           ? GovVoteType.AYE
           : voter.aye === false
