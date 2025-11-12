@@ -189,9 +189,9 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
   }, [chainSlug, className, closeAlert, data?.track, fromAccountProxy, navigate, notify, openAlert, referendumId, setGovRefVoteStorage, t, token.colorTextLight2]);
 
   const onClickVote = useCallback(() => {
-    if (extendedAccountAddressItems.length > 1) {
+    if (extendedAccountAddressItems.length >= 1) {
       activeModal(modalId);
-    } else if (extendedAccountAddressItems.length === 1) {
+    } else {
       onSelectGovItem(extendedAccountAddressItems[0]);
     }
   }, [extendedAccountAddressItems, activeModal, onSelectGovItem]);
