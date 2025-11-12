@@ -27,7 +27,7 @@ interface TransferEvmProps extends TransactionFee {
 }
 
 // hot fix gas settings for Energy Web Chain
-const gasSettingsForEWC = {
+export const gasSettingsForEWC = {
   gasLimit: 4900000,
   maxFeePerGas: '10000000'
 };
