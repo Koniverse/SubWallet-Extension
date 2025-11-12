@@ -10,15 +10,15 @@ import { _getTotalStakeInNominationPool } from '@subwallet/extension-base/core/s
 import { _getOrmlTokensPalletLockedBalance, _getOrmlTokensPalletTransferable } from '@subwallet/extension-base/core/substrate/ormlTokens-pallet';
 import { _getSystemPalletTotalBalance, _getSystemPalletTransferable } from '@subwallet/extension-base/core/substrate/system-pallet';
 import { _getTokensPalletLocked, _getTokensPalletTransferable } from '@subwallet/extension-base/core/substrate/tokens-pallet';
-import { FrameSystemAccountInfo, OrmlTokensAccountData, PalletAssetsAssetAccount, PalletAssetsAssetAccountWithStatus, PalletNominationPoolsPoolMember } from '@subwallet/extension-base/core/substrate/types';
+import { FrameBalancesHoldsInfo, FrameBalancesLocksInfo, FrameSystemAccountInfo, OrmlTokensAccountData, PalletAssetsAssetAccount, PalletAssetsAssetAccountWithStatus, PalletNominationPoolsPoolMember } from '@subwallet/extension-base/core/substrate/types';
 import { _adaptX1Interior } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/contract-handler/wasm';
 import { getDefaultWeightV2 } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
-import { _BALANCE_CHAIN_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
+import { _BALANCE_CHAIN_GROUP, _BALANCE_LOCKED_ID_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _checkSmartContractSupportByChain, _getAssetExistentialDeposit, _getAssetNetuid, _getChainExistentialDeposit, _getChainNativeTokenSlug, _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getTokenTypesSupportedByChain, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
-import { BalanceItem, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
+import { BalanceItem, LockedDetails, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
 import { filterAlphaAssetsByChain, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { timer } from 'rxjs';
@@ -123,6 +123,20 @@ export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: 
 };
 
 // handler according to different logic
+const extractId = (id: string | Record<string, unknown> | undefined): string => {
+  if (!id) {
+    return '';
+  }
+
+  if (typeof id === 'string') {
+    return id;
+  }
+
+  const keys = Object.keys(id);
+
+  return keys.length ? keys[0] : '';
+};
+
 // eslint-disable-next-line @typescript-eslint/require-await
 const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo, extrinsicType, substrateApi }: SubscribeSubstratePalletBalance) => {
   const systemAccountKey = 'query_system_account';
@@ -161,38 +175,102 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
       const rawData = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(addresses);
       const values: Array<[string, TaoStakeInfo[]]> = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
 
-      bittensorStakingBalances = values.map(([, stakes]) => {
-        return stakes.filter((i) => i.netuid === 0).reduce((previousValue, currentValue) => previousValue.plus(currentValue.stake), BigN(0));
-      });
+      bittensorStakingBalances = values.map(([, stakes]) =>
+        stakes.filter((i) => i.netuid === 0).reduce((prev, curr) => prev.plus(curr.stake), BigN(0))
+      );
     }
 
-    const items: BalanceItem[] = balances.map((_balance, index) => {
+    // Precompute totalLockedFromTransfer for each account to decide if need fetch locks/holds
+    const preItems = balances.map((_balance, index) => {
       const balanceInfo = _balance as unknown as FrameSystemAccountInfo;
-
       const transferableBalance = _getSystemPalletTransferable(balanceInfo, _getChainExistentialDeposit(chainInfo), extrinsicType);
       const totalBalance = _getSystemPalletTotalBalance(balanceInfo);
       let totalLockedFromTransfer = totalBalance - transferableBalance;
 
       if (!isNominationPoolMigrated) {
         const poolMemberInfo = poolMemberInfos[index] as unknown as PalletNominationPoolsPoolMember;
-
         const nominationPoolBalance = poolMemberInfo ? _getTotalStakeInNominationPool(poolMemberInfo) : BigInt(0);
 
         totalLockedFromTransfer += nominationPoolBalance;
       }
 
-      const stakeValue = BigInt(bittensorStakingBalances[index].toString());
+      totalLockedFromTransfer += BigInt(bittensorStakingBalances[index].toString());
 
-      totalLockedFromTransfer += stakeValue;
+      return { index, totalLockedFromTransfer, balanceInfo };
+    });
 
-      return ({
+    // Filter account's locked > 0
+    const accountsWithLocks = preItems.filter((i) => i.totalLockedFromTransfer > 0).map((i) => addresses[i.index]);
+
+    let locks: FrameBalancesLocksInfo[][] = [];
+    let holds: FrameBalancesHoldsInfo[][] = [];
+
+    // Fetch locks/holds only for accounts that have locked balances
+    if (accountsWithLocks.length > 0) {
+      // Fetch locks
+      const rawLocks = await substrateApi.api.query.balances.locks.multi(accountsWithLocks);
+
+      locks = rawLocks.map((lockArr) =>
+        (lockArr).map((l) => ({
+          id: (l.id).toPrimitive(),
+          amount: l.amount.toString()
+        }))
+      ) as FrameBalancesLocksInfo[][];
+
+      // Fetch holds
+      const rawHolds = await substrateApi.api.query.balances.holds.multi(accountsWithLocks);
+
+      holds = rawHolds.map((holdArr) =>
+        (holdArr).map((h) => ({
+          id: (h.id).toPrimitive(),
+          amount: h.amount.toString()
+        }))
+      ) as FrameBalancesHoldsInfo[][];
+    }
+
+    // Map locks/holds back to original index
+    const items: BalanceItem[] = preItems.map(({ balanceInfo, index, totalLockedFromTransfer }) => {
+      const lockIndex = accountsWithLocks.indexOf(addresses[index]);
+      const lockItems = lockIndex >= 0 ? locks[lockIndex] || [] : [];
+      const holdItems = lockIndex >= 0 ? holds[lockIndex] || [] : [];
+
+      let stakingBalance = new BigN(bittensorStakingBalances[index].toString());
+      let govBalance = new BigN(0);
+
+      const allLockEntries = [...lockItems, ...holdItems];
+
+      for (const entry of allLockEntries) {
+        const id = extractId(entry.id);
+        const amount = new BigN(String(entry.amount || 0));
+
+        if (_BALANCE_LOCKED_ID_GROUP.staking.includes(id)) {
+          stakingBalance = stakingBalance.plus(amount);
+        } else if (_BALANCE_LOCKED_ID_GROUP.gov.includes(id)) {
+          govBalance = govBalance.plus(amount);
+        }
+      }
+
+      // others = total locked - max(staking, governance)
+      const maxMainLock = stakingBalance.gt(govBalance) ? stakingBalance : govBalance;
+      const othersLockedBalance = new BigN(totalLockedFromTransfer.toString()).minus(maxMainLock);
+
+      const lockedDetails: LockedDetails = {
+        staking: stakingBalance.toFixed(),
+        governance: govBalance.toFixed(),
+        others: othersLockedBalance.gt(0) ? othersLockedBalance.toFixed() : '0'
+      };
+
+      const transferableBalance = _getSystemPalletTransferable(balanceInfo, _getChainExistentialDeposit(chainInfo), extrinsicType);
+
+      return {
         address: addresses[index],
         tokenSlug: _getChainNativeTokenSlug(chainInfo),
         free: transferableBalance.toString(),
         locked: totalLockedFromTransfer.toString(),
         state: APIItemState.READY,
+        lockedDetails,
         metadata: balanceInfo
-      });
+      };
     });
 
     callback(items);

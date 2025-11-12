@@ -15,11 +15,18 @@ import BigN from 'bignumber.js';
 export const groupBalance = (items: BalanceItem[], address: string, token: string): BalanceItem => {
   const states = items.map((item) => item.state);
 
+  const sum = (selector: (i: BalanceItem) => string) => BigN.sum.apply(null, items.map(selector)).toFixed();
+
   return {
     address,
     tokenSlug: token,
-    free: BigN.sum.apply(null, items.map((item) => item.free)).toFixed(),
-    locked: BigN.sum.apply(null, items.map((item) => item.locked)).toFixed(),
+    free: sum((i) => i.free),
+    locked: sum((i) => i.locked),
+    lockedDetails: {
+      staking: sum((i) => i.lockedDetails?.staking ?? '0'),
+      governance: sum((i) => i.lockedDetails?.governance ?? '0'),
+      others: sum((i) => i.lockedDetails?.others ?? '0')
+    },
     state: states.every((item) => item === APIItemState.NOT_SUPPORT)
       ? APIItemState.NOT_SUPPORT
       : states.some((item) => item === APIItemState.READY)

@@ -2290,5 +2290,14 @@
   "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.manualStake": "Manual stake",
   "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.compoundingStake": "Compounding stake",
   "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.pendingStakeTooltipTitle": "Amount added to Manual or/and Compounding stake once pending transactions are executed",
-  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.pendingStake": "Pending"
+  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.pendingStake": "Pending",
+  "ui.BALANCE.screen.Tokens.DetailModal.staking": "Staking",
+  "ui.BALANCE.screen.Tokens.DetailModal.governance": "Governance",
+  "ui.BALANCE.screen.Tokens.DetailModal.othersTooltipTitle": "Balances locked via multisig, proxy deposits, reserved, etc.",
+  "ui.BALANCE.screen.Tokens.DetailModal.others": "Others",
+  "ui.BALANCE.screen.Tokens.LockedDetailModal.staking": "Staking",
+  "ui.BALANCE.screen.Tokens.LockedDetailModal.governance": "Governance",
+  "ui.BALANCE.screen.Tokens.LockedDetailModal.others": "Others",
+  "ui.BALANCE.screen.Tokens.LockedDetailModal.lockedDetails": "Locked details",
+  "ui.BALANCE.screen.Tokens.LockedDetailModal.othersTooltipTitle": "Balances locked via multisig, proxy deposits, reserved, etc."
 }

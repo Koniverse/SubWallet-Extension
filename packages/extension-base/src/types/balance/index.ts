@@ -23,6 +23,13 @@ export interface TokenBalanceRaw {
  * @property {string} locked - Locked balance, cannot be transferred, locked here is only meaningful in the context of token transfer
  * @property {metadata} [metadata] - Could be anything, supposed to be generic to handle various contexts
  */
+
+export interface LockedDetails {
+  staking: string;
+  governance: string;
+  others: string;
+}
+
 export interface BalanceItem {
   // metadata
   address: string;
@@ -33,6 +40,8 @@ export interface BalanceItem {
   // must-have, total = transferable + locked
   free: string;
   locked: string;
+
+  lockedDetails?: LockedDetails;
 
   // substrate fields
   metadata?: _BalanceMetadata;

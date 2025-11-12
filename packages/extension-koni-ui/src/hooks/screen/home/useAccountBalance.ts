@@ -169,6 +169,13 @@ function getAccountBalance (
         }
 
         tokenGroupBalance.total.value = tokenGroupBalance.total.value.plus(tokenBalance.total.value);
+        tokenBalance.lockedDetails = balanceItem?.lockedDetails
+          ? {
+            staking: getBalanceValue(balanceItem.lockedDetails.staking || '0', decimals).toString(),
+            governance: getBalanceValue(balanceItem.lockedDetails.governance || '0', decimals).toString(),
+            others: getBalanceValue(balanceItem.lockedDetails.others || '0', decimals).toString()
+          }
+          : { staking: '0', governance: '0', others: '0' };
       }
 
       const priceId = _getAssetPriceId(chainAsset);

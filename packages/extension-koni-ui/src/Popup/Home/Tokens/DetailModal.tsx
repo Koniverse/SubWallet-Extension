@@ -1,8 +1,10 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _ChainAsset } from '@subwallet/chain-list/types';
 import { APIItemState } from '@subwallet/extension-base/background/KoniTypes';
 import { _isChainBitcoinCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { LockedDetails } from '@subwallet/extension-base/types';
 import { AccountTokenBalanceItem, EmptyList, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
@@ -11,12 +13,14 @@ import { BalanceItemWithAddressType, ThemeProps } from '@subwallet/extension-kon
 import { TokenBalanceItemType } from '@subwallet/extension-koni-ui/types/balance';
 import { getBitcoinAccountDetails, getBitcoinKeypairAttributes, isAccountAll } from '@subwallet/extension-koni-ui/utils';
 import { getKeypairTypeByAddress, isBitcoinAddress } from '@subwallet/keyring';
-import { Form, Icon, ModalContext, Number, SwModal } from '@subwallet/react-ui';
+import { Form, Icon, ModalContext, Number, SwModal, Tooltip, useExcludeModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowCircleLeft, Coins } from 'phosphor-react';
-import React, { useContext, useEffect, useMemo } from 'react';
+import { ArrowCircleLeft, CaretDown, CaretUp, Coins, Info } from 'phosphor-react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
+
+import { LockedDetailModal } from './LockedDetailModal';
 
 type Props = ThemeProps & {
   id: string,
@@ -49,11 +53,14 @@ interface FormState {
   view: ViewValue
 }
 
+const lockedDetailsModalId = 'locked-details-modal';
+
 // todo: need to recheck account balance logic again
 function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalanceMap }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
+  const [showLockedDetails, setShowLockedDetails] = useState(false);
 
-  const { checkActive } = useContext(ModalContext);
+  const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
 
   const isActive = checkActive(id);
 
@@ -62,6 +69,15 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const [form] = Form.useForm<FormState>();
   const viewValue = Form.useWatch('view', form);
+  const { assetRegistry } = useSelector((state) => state.assetRegistry);
+
+  const tokenInfo = useMemo((): _ChainAsset | undefined => {
+    if (!currentTokenInfo) {
+      return undefined;
+    }
+
+    return assetRegistry[currentTokenInfo.slug];
+  }, [assetRegistry, currentTokenInfo]);
 
   const balanceInfo = useMemo(
     () => (currentTokenInfo ? tokenBalanceMap[currentTokenInfo.slug] : undefined),
@@ -197,102 +213,214 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
 
   const symbol = currentTokenInfo?.symbol || '';
 
+  const renderLockedDetails = (lockedDetails: LockedDetails, symbol: string) => {
+    if (!lockedDetails) {
+      return null;
+    }
+
+    const { governance, others, staking } = lockedDetails;
+
+    const items = [
+      { label: t('ui.BALANCE.screen.Tokens.DetailModal.staking'), value: staking },
+      { label: t('ui.BALANCE.screen.Tokens.DetailModal.governance'), value: governance },
+      {
+        label: (
+          <Tooltip
+            placement='topLeft'
+            title={t('ui.BALANCE.screen.Tokens.DetailModal.othersTooltipTitle')}
+          >
+            <span className='__locked-others'>
+              {t('ui.BALANCE.screen.Tokens.DetailModal.others')}
+              <Icon
+                className='__locked-others-icon'
+                phosphorIcon={Info}
+                size='xs'
+              />
+            </span>
+          </Tooltip>
+        ),
+        value: others
+      }
+    ];
+
+    return (
+      <div className='__locked-details'>
+        {items
+          .filter(({ value }) => new BigN(value || 0).gt(0))
+          .map(({ label, value }, index) => (
+            <div
+              className='__row'
+              key={index}
+            >
+              <div className='__label text-accent'>{label}</div>
+              <div className='__balance'>
+                <Number
+                  className='__value'
+                  decimal={0}
+                  decimalOpacity={0.45}
+                  intOpacity={0.85}
+                  size={14}
+                  suffix={symbol}
+                  unitOpacity={0.85}
+                  value={new BigN(value || 0)}
+                />
+              </div>
+            </div>
+          ))}
+      </div>
+    );
+  };
+
+  const handleShowLockedDetails = useCallback(() => {
+    setShowLockedDetails((prev) => !prev);
+  }, []);
+
+  const [lockedDetailsModalVisible, setLockedDetailsModalVisible] = useState(false);
+  const [selectedAccountLockedDetails, setSelectedAccountLockedDetails] = useState<LockedDetails | null>(null);
+
+  const handleOpenLockedDetailsModal = useCallback(
+    (details: LockedDetails) => () => {
+      setSelectedAccountLockedDetails(details);
+      setLockedDetailsModalVisible(true);
+      activeModal(lockedDetailsModalId);
+    },
+    [activeModal]
+  );
+
+  const handleCloseLockedDetailsModal = useCallback(() => {
+    setLockedDetailsModalVisible(false);
+    inactiveModal(lockedDetailsModalId);
+  }, [inactiveModal]);
+
   useEffect(() => {
     if (!isActive) {
       form?.resetFields();
     }
   }, [form, isActive]);
 
-  return (
-    <SwModal
-      className={CN(className, { 'fix-height': isAllAccount })}
-      id={id}
-      onCancel={onCancel}
-      title={(isAllAccount && isBitcoinChain) ? t('ui.BALANCE.screen.Tokens.DetailModal.accountDetailsTitle') : t('ui.BALANCE.screen.Tokens.DetailModal.tokenDetails')}
-    >
-      <Form
-        form={form}
-        initialValues={defaultValues}
-        name='token-detail-form'
-      >
-        <Form.Item
-          hidden={!isAllAccount || isBitcoinChain}
-          name='view'
-        >
-          <RadioGroup
-            optionType='button'
-            options={viewOptions}
-          />
-        </Form.Item>
-      </Form>
-      <div className='content-container'>
-        {
-          currentView === ViewValue.OVERVIEW && (
-            <>
-              <div className={'__container'}>
-                {overviewItems.map((item) => (
-                  <div
-                    className={'__row'}
-                    key={item.key}
-                  >
-                    <div className={'__label'}>{item.label}</div>
+  useExcludeModal(id);
 
-                    <Number
-                      className={'__value'}
-                      decimal={0}
-                      decimalOpacity={0.45}
-                      intOpacity={0.85}
-                      size={14}
-                      suffix={item.symbol}
-                      unitOpacity={0.85}
-                      value={item.value}
+  return (
+    <>
+      <SwModal
+        className={CN(className, { 'fix-height': isAllAccount })}
+        id={id}
+        onCancel={onCancel}
+        title={(isAllAccount && isBitcoinChain) ? t('ui.BALANCE.screen.Tokens.DetailModal.accountDetailsTitle') : t('ui.BALANCE.screen.Tokens.DetailModal.tokenDetails')}
+      >
+        <Form
+          form={form}
+          initialValues={defaultValues}
+          name='token-detail-form'
+        >
+          <Form.Item
+            hidden={!isAllAccount || isBitcoinChain}
+            name='view'
+          >
+            <RadioGroup
+              optionType='button'
+              options={viewOptions}
+            />
+          </Form.Item>
+        </Form>
+        <div className='content-container'>
+          {
+            currentView === ViewValue.OVERVIEW && (
+              <>
+                <div className={'__container'}>
+                  {overviewItems.map((item) => (
+                    <React.Fragment key={item.key}>
+                      <div className='__row'>
+                        <div className='__label'>{item.label}</div>
+
+                        <div className='__balance'>
+                          <Number
+                            className='__value'
+                            decimal={0}
+                            decimalOpacity={0.45}
+                            intOpacity={0.85}
+                            size={14}
+                            suffix={item.symbol}
+                            unitOpacity={0.85}
+                            value={item.value}
+                          />
+                          {item.key === 'locked' && new BigN(balanceInfo?.locked.value || 0).gt(0) && (
+                            <div
+                              className='__locked-balance-details-icon'
+                              onClick={handleShowLockedDetails}
+                            >
+                              <Icon
+                                phosphorIcon={showLockedDetails ? CaretUp : CaretDown}
+                                size='md'
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {item.key === 'locked' && showLockedDetails && balanceInfo?.lockedDetails && (
+                        <div className='ml-6 mt-1'>{renderLockedDetails(balanceInfo.lockedDetails, item.symbol)}</div>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </>
+            )
+          }
+          {
+            currentView === ViewValue.DETAIL && (
+              <>
+                {detailItems.length
+                  ? (detailItems.map((item) => (
+                    <AccountTokenBalanceItem
+                      item={item}
+                      key={item.address}
+                      onShowLockedDetailsModal={
+                        item.lockedDetails ? handleOpenLockedDetailsModal(item.lockedDetails) : undefined
+                      }
                     />
-                  </div>
-                ))}
-              </div>
-            </>
-          )
-        }
-        {
-          currentView === ViewValue.DETAIL && (
-            <>
-              {detailItems.length
-                ? (detailItems.map((item) => (
-                  <AccountTokenBalanceItem
-                    item={item}
-                    key={item.address}
-                  />
-                )))
-                : (
-                  <>
-                    <EmptyList
-                      buttonProps={{
-                        icon: <Icon
-                          phosphorIcon={ArrowCircleLeft}
-                          weight={'fill'}
-                        />,
-                        onClick: onCancel,
-                        size: 'xs',
-                        shape: 'circle',
-                        children: t('ui.BALANCE.screen.Tokens.DetailModal.backToHome')
-                      }}
-                      className='__empty-list'
-                      emptyMessage={t('ui.BALANCE.screen.Tokens.DetailModal.switchTokenToSeeBalance')}
-                      emptyTitle={t('ui.BALANCE.screen.Tokens.DetailModal.noAccountWithSymbolBalance', {
-                        replace: {
-                          symbol: symbol
-                        }
-                      })}
-                      key='empty-list'
-                      phosphorIcon={Coins}
-                    />
-                  </>
-                )}
-            </>
-          )
-        }
-      </div>
-    </SwModal>
+                  )))
+                  : (
+                    <>
+                      <EmptyList
+                        buttonProps={{
+                          icon: <Icon
+                            phosphorIcon={ArrowCircleLeft}
+                            weight={'fill'}
+                          />,
+                          onClick: onCancel,
+                          size: 'xs',
+                          shape: 'circle',
+                          children: t('ui.BALANCE.screen.Tokens.DetailModal.backToHome')
+                        }}
+                        className='__empty-list'
+                        emptyMessage={t('ui.BALANCE.screen.Tokens.DetailModal.switchTokenToSeeBalance')}
+                        emptyTitle={t('ui.BALANCE.screen.Tokens.DetailModal.noAccountWithSymbolBalance', {
+                          replace: {
+                            symbol: symbol
+                          }
+                        })}
+                        key='empty-list'
+                        phosphorIcon={Coins}
+                      />
+                    </>
+                  )}
+              </>
+            )
+          }
+        </div>
+      </SwModal>
+
+      {lockedDetailsModalVisible && selectedAccountLockedDetails && (
+        <LockedDetailModal
+          decimal={tokenInfo?.decimals || 0}
+          id={lockedDetailsModalId}
+          lockedDetails={selectedAccountLockedDetails}
+          onCancel={handleCloseLockedDetailsModal}
+          symbol={currentTokenInfo?.symbol || ''}
+        />
+      )}
+    </>
   );
 }
 
@@ -333,6 +461,34 @@ export const DetailModal = styled(Component)<Props>(({ theme: { token } }: Props
 
     '.__label': {
       paddingRight: token.paddingSM
+    },
+
+    '.__locked-details': {
+      marginTop: 4,
+
+      '.__label': {
+        color: token.colorTextLight3
+      },
+
+      '.__locked-others': {
+        cursor: 'pointer'
+      },
+
+      '.__locked-others-icon': {
+        color: token.colorTextLight3,
+        marginLeft: token.marginXXS
+      }
+    },
+
+    '.__balance': {
+      display: 'flex',
+      justifyContent: 'center'
+    },
+
+    '.__locked-balance-details-icon': {
+      color: token.colorTextLight3,
+      cursor: 'pointer',
+      marginLeft: token.marginXXS
     }
   });
 });
