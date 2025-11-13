@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
-import { IMPORT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { IMPORT_ACCOUNT_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { useClickOutSide, useExtensionDisplayModes, useGoBackSelectAccount, useSetSessionLatest, useSidePanelUtils, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
@@ -75,7 +75,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const onClickSeedTrust = useCallback(() => {
     inactiveModal(modalId);
-    navigate('/accounts/import-seed-phrase-trust');
+    navigate(`/accounts/import-seed-phrase?type=${TRUST_WALLET_MNEMONIC_TYPE}`);
   }, [inactiveModal, navigate]);
 
   const items = useMemo((): ImportAccountItem[] => [

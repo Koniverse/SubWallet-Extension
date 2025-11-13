@@ -4,7 +4,7 @@
 import { AccountProxyType } from '@subwallet/extension-base/types';
 import { AccountNameModal, CloseIcon, Layout, PageWrapper, WordPhrase } from '@subwallet/extension-koni-ui/components';
 import { SeedPhraseTermModal } from '@subwallet/extension-koni-ui/components/Modal/TermsAndConditions/SeedPhraseTermModal';
-import { ACCOUNT_NAME_MODAL, CONFIRM_TERM_SEED_PHRASE, CREATE_ACCOUNT_MODAL, DEFAULT_MNEMONIC_TYPE, DEFAULT_ROUTER_PATH, SEED_PREVENT_MODAL, SELECTED_MNEMONIC_TYPE, TERM_AND_CONDITION_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { ACCOUNT_NAME_MODAL, CONFIRM_TERM_SEED_PHRASE, CREATE_ACCOUNT_MODAL, DEFAULT_MNEMONIC_TYPE, DEFAULT_ROUTER_PATH, SEED_PREVENT_MODAL, SELECTED_MNEMONIC_TYPE, TERM_AND_CONDITION_SEED_PHRASE_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useDefaultNavigate, useExtensionDisplayModes, useNotification, useTranslation, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
 import { createAccountSuriV2, createSeedV2, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -85,7 +85,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
     if (selectedMnemonicType === 'ton') {
       types = ['ton-native'];
-    } else if (selectedMnemonicType === 'trust-wallet') {
+    } else if (selectedMnemonicType === TRUST_WALLET_MNEMONIC_TYPE) {
       types = ['ed25519-tw', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
     } else {
       types = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
@@ -195,7 +195,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       </Layout.WithSubHeaderOnly>
       <SeedPhraseTermModal />
       <AccountNameModal
-        accountType={['general', 'trust-wallet'].includes(selectedMnemonicType) ? AccountProxyType.UNIFIED : AccountProxyType.SOLO}
+        accountType={[DEFAULT_MNEMONIC_TYPE, TRUST_WALLET_MNEMONIC_TYPE].includes(selectedMnemonicType) ? AccountProxyType.UNIFIED : AccountProxyType.SOLO}
         isLoading={loading}
         onSubmit={onSubmit}
       />

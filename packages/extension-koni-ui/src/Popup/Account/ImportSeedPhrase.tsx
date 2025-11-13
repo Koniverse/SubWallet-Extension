@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import {AccountProxyType, MnemonicType, ResponseMnemonicValidateV2} from '@subwallet/extension-base/types';
+import { AccountProxyType, MnemonicType, ResponseMnemonicValidateV2 } from '@subwallet/extension-base/types';
 import { AccountNameModal, CloseIcon, Layout, PageWrapper, PhraseNumberSelector, SeedPhraseInput } from '@subwallet/extension-koni-ui/components';
-import { ACCOUNT_NAME_MODAL, DEFAULT_MNEMONIC_TYPE, IMPORT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { ACCOUNT_NAME_MODAL, DEFAULT_MNEMONIC_TYPE, IMPORT_ACCOUNT_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useDefaultNavigate, useFocusFormItem, useGoBackFromCreateAccount, useNotification, useTranslation, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
 import { createAccountSuriV2, validateSeedV2 } from '@subwallet/extension-koni-ui/messaging';
@@ -16,6 +16,7 @@ import { wordlists } from 'bip39';
 import CN from 'classnames';
 import { CheckCircle, Eye, EyeSlash, FileArrowDown, XCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 interface ImportSeedPhraseProps extends ThemeProps {
@@ -32,7 +33,11 @@ const FooterIcon = (
 );
 
 const defaultFormName = 'import-seed-phrase-form';
+const trustWalletFormName = 'import-seed-phrase-trust-form';
+
 const defaultPhraseNumberOptions = [12, 15, 24];
+const trustWalletPhraseNumberOptions = [12];
+
 const fieldNamePrefix = 'seed-phrase-';
 const accountNameModalId = ACCOUNT_NAME_MODAL;
 
@@ -43,12 +48,19 @@ interface FormState extends Record<`seed-phrase-${number}`, string> {
 
 const words = wordlists.english;
 
-const Component: React.FC<ImportSeedPhraseProps> = ({ className, phraseNumberOptions = defaultPhraseNumberOptions, mnemonicType = DEFAULT_MNEMONIC_TYPE, formName = defaultFormName }: ImportSeedPhraseProps) => {
+const Component: React.FC<ImportSeedPhraseProps> = ({ className }: ImportSeedPhraseProps) => {
   useAutoNavigateToCreatePassword();
 
   const { t } = useTranslation();
   const { goHome } = useDefaultNavigate();
   const notify = useNotification();
+  const [searchParams] = useSearchParams();
+
+  const importType = searchParams.get('type') || '';
+  const isTrustWallet = importType === TRUST_WALLET_MNEMONIC_TYPE;
+  const formName = isTrustWallet ? trustWalletFormName : defaultFormName;
+  const mnemonicType = isTrustWallet ? TRUST_WALLET_MNEMONIC_TYPE : DEFAULT_MNEMONIC_TYPE;
+  const phraseNumberOptions = isTrustWallet ? trustWalletPhraseNumberOptions : defaultPhraseNumberOptions;
 
   const onComplete = useCompleteCreateAccount();
   const onBack = useGoBackFromCreateAccount(IMPORT_ACCOUNT_MODAL);
@@ -210,7 +222,7 @@ const Component: React.FC<ImportSeedPhraseProps> = ({ className, phraseNumberOpt
 
     if (seedValidationResponse.mnemonicTypes === 'ton') {
       types = ['ton-native'];
-    } else if (seedValidationResponse.mnemonicTypes === 'trust-wallet') {
+    } else if (seedValidationResponse.mnemonicTypes === TRUST_WALLET_MNEMONIC_TYPE) {
       types = ['ed25519-tw', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
     } else {
       types = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
@@ -345,7 +357,7 @@ const Component: React.FC<ImportSeedPhraseProps> = ({ className, phraseNumberOpt
       </Layout.WithSubHeaderOnly>
       <AccountNameModal
         accountType={seedValidationResponse
-          ? ['general', 'trust-wallet'].includes(seedValidationResponse.mnemonicTypes) ? AccountProxyType.UNIFIED : AccountProxyType.SOLO
+          ? [DEFAULT_MNEMONIC_TYPE, TRUST_WALLET_MNEMONIC_TYPE].includes(seedValidationResponse.mnemonicTypes) ? AccountProxyType.UNIFIED : AccountProxyType.SOLO
           : undefined}
         isLoading={accountCreating}
         onSubmit={onCreateAccount}
