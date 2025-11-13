@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountProxyType, ResponseMnemonicValidateV2 } from '@subwallet/extension-base/types';
+import {AccountProxyType, MnemonicType, ResponseMnemonicValidateV2} from '@subwallet/extension-base/types';
 import { AccountNameModal, CloseIcon, Layout, PageWrapper, PhraseNumberSelector, SeedPhraseInput } from '@subwallet/extension-koni-ui/components';
 import { ACCOUNT_NAME_MODAL, DEFAULT_MNEMONIC_TYPE, IMPORT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
@@ -18,7 +18,11 @@ import { CheckCircle, Eye, EyeSlash, FileArrowDown, XCircle } from 'phosphor-rea
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-type Props = ThemeProps;
+interface ImportSeedPhraseProps extends ThemeProps {
+  phraseNumberOptions?: number[];
+  mnemonicType?: string;
+  formName?: string;
+}
 
 const FooterIcon = (
   <Icon
@@ -27,7 +31,8 @@ const FooterIcon = (
   />
 );
 
-const formName = 'import-seed-phrase-form';
+const defaultFormName = 'import-seed-phrase-form';
+const defaultPhraseNumberOptions = [12, 15, 24];
 const fieldNamePrefix = 'seed-phrase-';
 const accountNameModalId = ACCOUNT_NAME_MODAL;
 
@@ -37,9 +42,8 @@ interface FormState extends Record<`seed-phrase-${number}`, string> {
 }
 
 const words = wordlists.english;
-const phraseNumberOptions = [12, 15, 24];
 
-const Component: React.FC<Props> = ({ className }: Props) => {
+const Component: React.FC<ImportSeedPhraseProps> = ({ className, phraseNumberOptions = defaultPhraseNumberOptions, mnemonicType = DEFAULT_MNEMONIC_TYPE, formName = defaultFormName }: ImportSeedPhraseProps) => {
   useAutoNavigateToCreatePassword();
 
   const { t } = useTranslation();
@@ -135,7 +139,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           setSubmitting(true);
           validateSeedV2({
             mnemonic: seed,
-            mnemonicType: DEFAULT_MNEMONIC_TYPE
+            mnemonicType: mnemonicType as MnemonicType
           }).then((response) => {
             setSeedValidationResponse(response);
 
@@ -195,7 +199,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           // Unlock is cancelled
         });
     }
-  }, [t, checkUnlock, alertModal, activeModal, notify]);
+  }, [t, checkUnlock, alertModal, activeModal, notify, mnemonicType]);
 
   const onCreateAccount = useCallback((accountName: string) => {
     if (!seedValidationResponse) {
@@ -350,7 +354,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   );
 };
 
-const ImportSeedPhrase = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const ImportSeedPhrase = styled(Component)<ImportSeedPhraseProps>(({ theme: { token } }: ImportSeedPhraseProps) => {
   return {
     '.container': {
       padding: token.padding
