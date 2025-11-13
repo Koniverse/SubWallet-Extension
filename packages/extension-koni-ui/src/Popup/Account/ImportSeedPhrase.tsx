@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountProxyType, MnemonicType, ResponseMnemonicValidateV2 } from '@subwallet/extension-base/types';
+import { AccountProxyType, ResponseMnemonicValidateV2 } from '@subwallet/extension-base/types';
 import { AccountNameModal, CloseIcon, Layout, PageWrapper, PhraseNumberSelector, SeedPhraseInput } from '@subwallet/extension-koni-ui/components';
 import { ACCOUNT_NAME_MODAL, DEFAULT_MNEMONIC_TYPE, IMPORT_ACCOUNT_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
@@ -81,12 +81,12 @@ const Component: React.FC<ImportSeedPhraseProps> = ({ className }: ImportSeedPhr
   const phraseNumberItems = useMemo(() => phraseNumberOptions.map((value) => ({
     label: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.numberWords', { replace: { number: value } }),
     value: `${value}`
-  })), [t]);
+  })), [t, phraseNumberOptions]);
 
   const formDefault: FormState = useMemo(() => ({
     phraseNumber: `${phraseNumberOptions[0]}`,
     trigger: 'trigger'
-  }), []);
+  }), [phraseNumberOptions]);
 
   const onFieldsChange: FormCallbacks<FormState>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     const { empty, error } = simpleCheckForm(allFields);
@@ -122,7 +122,7 @@ const Component: React.FC<ImportSeedPhraseProps> = ({ className }: ImportSeedPhr
         console.error('Error updating phraseNumber field:', error);
       }
     }
-  }, [form]);
+  }, [form, phraseNumberOptions]);
 
   const onSubmit: FormCallbacks<FormState>['onFinish'] = useCallback((values: FormState) => {
     const { phraseNumber: _phraseNumber } = values;
@@ -151,7 +151,7 @@ const Component: React.FC<ImportSeedPhraseProps> = ({ className }: ImportSeedPhr
           setSubmitting(true);
           validateSeedV2({
             mnemonic: seed,
-            mnemonicType: mnemonicType as MnemonicType
+            mnemonicType: mnemonicType
           }).then((response) => {
             setSeedValidationResponse(response);
 
