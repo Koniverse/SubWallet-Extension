@@ -138,13 +138,14 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
 
   const onViewPolkassembly = useCallback(() => {
     const site = chainSlugToPolkassemblySite[chainSlug];
+    const referendumPath = data?.referendumIndex == null ? '' : `${data.referendumIndex}`;
 
-    window.open(`https://${site}.polkassembly.io/referenda/${data?.referendumIndex ?? ''}`, '_blank');
+    window.open(`https://${site}.polkassembly.io/referenda/${referendumPath}`, '_blank');
   }, [chainSlug, data?.referendumIndex]);
 
   const onViewSubsquare = useCallback(() => {
     const basePath = sdkInstance?.isLegacyGov ? 'democracy/' : '';
-    const referendumPath = data?.referendumIndex || '';
+    const referendumPath = data?.referendumIndex == null ? '' : `${data.referendumIndex}`;
 
     window.open(`https://${chainSlugToSubsquareSite[chainSlug]}.subsquare.io/${basePath}referenda/${referendumPath}`, '_blank');
   }, [chainSlug, data?.referendumIndex, sdkInstance?.isLegacyGov]);
