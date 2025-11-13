@@ -223,7 +223,11 @@ export function getMinApprovalThreshold (referendum: Referendum | ReferendumDeta
   }
 }
 
-function formatTimeLeft (timeLeftMs: BigNumber): string {
+function formatTimeLeft (timeLeftMs: BigNumber): string | undefined {
+  if (timeLeftMs.lte(0)) {
+    return undefined;
+  }
+
   const msInDay = new BigNumber(1000 * 60 * 60 * 24);
   const msInHour = new BigNumber(1000 * 60 * 60);
   const msInMinute = new BigNumber(1000 * 60);
