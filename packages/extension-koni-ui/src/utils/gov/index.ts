@@ -63,7 +63,7 @@ export function getTallyVotesBarPercent (tally: Tally) {
  */
 export function getMinApprovalThresholdGov1 (referendum: Referendum | ReferendumDetail): number {
   const onchain = referendum?.onchainData;
-  const threshold = onchain?.meta?.threshold;
+  const threshold = onchain?.meta?.threshold || onchain?.status?.threshold || onchain?.info?.democracy?.ongoing?.threshold;
 
   if (!onchain || !threshold) {
     return 0;
@@ -89,6 +89,8 @@ export function getMinApprovalThresholdGov1 (referendum: Referendum | Referendum
 
   const turnout = new BigNumber(t.turnout);
   const electorate = new BigNumber(t.electorate);
+
+  console.log('threshold', [threshold, turnout.toFixed(), electorate.toFixed()]);
 
   // Avoid division by zero or invalid data
   if (electorate.lte(0) || turnout.lte(0)) {
@@ -157,12 +159,6 @@ function getMinApprovalThresholdGov2 (referendumDetail: Referendum | ReferendumD
   const { decisionPeriod, minApproval } = referendumDetail.trackInfo;
   const decidingSince = referendumDetail.onchainData?.info?.deciding?.since;
 
-  const stateName = referendumDetail.state?.name;
-
-  if (GOV_COMPLETED_STATES.includes(stateName)) {
-    return 50;
-  }
-
   if (!decidingSince) {
     return 100;
   }
@@ -212,9 +208,17 @@ function getMinApprovalThresholdGov2 (referendumDetail: Referendum | ReferendumD
 }
 
 export function getMinApprovalThreshold (referendum: Referendum | ReferendumDetail, chain: string, migrationBlockOffset: number): number {
-  if (referendum.version === 1) {
+  // interlay and kintsugi is v1 but not have version data
+  if (referendum.version === 1 || chain === 'interlay' || chain === 'kintsugi') {
     return getMinApprovalThresholdGov1(referendum);
   } else {
+    const stateName = referendum.state?.name;
+
+    // Vara uses a different logic for completed referenda.
+    if (GOV_COMPLETED_STATES.includes(stateName) && chain !== 'vara_network') {
+      return 50;
+    }
+
     return getMinApprovalThresholdGov2(referendum, chain, migrationBlockOffset);
   }
 }

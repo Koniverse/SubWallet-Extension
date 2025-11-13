@@ -41,7 +41,7 @@ type Props = ThemeProps & ViewBaseType & {
 const modalId = 'account-selector';
 
 const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance }: Props): React.ReactElement<Props> => {
-  const { accountProxies, currentAccountProxy } = useSelector((state) => state.accountState);
+  const { accountProxies, currentAccountProxy, isAllAccount } = useSelector((state) => state.accountState);
   const navigate = useNavigate();
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const { t } = useTranslation();
@@ -200,7 +200,9 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
   }, [chainSlug, className, closeAlert, data?.track, fromAccountProxy, navigate, notify, openAlert, referendumId, setGovRefVoteStorage, t, token.colorTextLight2]);
 
   const onClickVote = useCallback(() => {
-    if (extendedAccountAddressItems.length >= 1) {
+    if (!isAllAccount) {
+      onSelectGovItem(extendedAccountAddressItems[0]);
+    } else if (extendedAccountAddressItems.length >= 1) {
       activeModal(modalId);
     } else if (isOnlyReadOnlyAccount) {
       notify({
@@ -208,7 +210,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
         type: 'info'
       });
     }
-  }, [extendedAccountAddressItems, isOnlyReadOnlyAccount, activeModal, notify, t]);
+  }, [isAllAccount, extendedAccountAddressItems, isOnlyReadOnlyAccount, onSelectGovItem, activeModal, notify, t]);
 
   const onCancel = useCallback(() => {
     inactiveModal(modalId);
