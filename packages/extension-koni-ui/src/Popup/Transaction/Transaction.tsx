@@ -3,10 +3,10 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@subwallet/extension-koni-ui/components';
-import { CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
-import { useAlert, useChainChecker, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useChainChecker, useCreateSelectSubstrateProxyAccountsToSign, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ManageChainsParam, Theme, ThemeProps, TransactionFormBaseProps } from '@subwallet/extension-koni-ui/types';
 import { detectTransactionPersistKey, getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
@@ -39,6 +39,9 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
 
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
 
+  // Select function to choose substrate proxy accounts for signing and will be controlled by TransactionContext
+  const selectSubstrateProxyAccountsToSign = useCreateSelectSubstrateProxyAccountsToSign();
+
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
   const [recheckingChain, setRecheckingChain] = useState<string | undefined>();
   const [forceRerenderKey, setForceRerenderKey] = useState('ForceRerenderKey');
@@ -70,6 +73,10 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
         return ExtrinsicType.SWAP;
       case 'claim-bridge':
         return ExtrinsicType.CLAIM_BRIDGE;
+      case 'add-proxy':
+        return ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT;
+      case 'remove-proxy':
+        return ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT;
       case 'send-fund':
       default:
         return ExtrinsicType.TRANSFER_BALANCE;
@@ -159,6 +166,20 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
       };
     }
 
+    if (storageKey === ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION) {
+      return {
+        ...DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION) {
+      return {
+        ...DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS,
+        fromAccountProxy
+      };
+    }
+
     return {
       ...DEFAULT_TRANSACTION_PARAMS,
       fromAccountProxy
@@ -195,6 +216,8 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
         return '/home/earning';
       case 'send-nft':
         return '/home/nfts/collections';
+      case 'add-proxy':
+      case 'remove-proxy':
       case 'send-fund':
       default:
         return '/home/tokens';
@@ -210,6 +233,17 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
 
     return result;
   }, [t]);
+
+  const showHeader = useMemo(() => {
+    const pathName = location.pathname;
+    const action = pathName.split('/')[2] || '';
+
+    if (action === 'add-proxy' || action === 'remove-proxy') {
+      return false;
+    }
+
+    return true;
+  }, [location.pathname]);
 
   useNavigateOnChangeAccount(homePath);
 
@@ -301,8 +335,9 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
     openRecheckChainConnectionModal,
     closeRecheckChainConnectionModal,
     modalId,
-    setIsDisableHeader
-  }), [closeAlert, closeRecheckChainConnectionModal, defaultData, goBack, modalId, needPersistData, onDone, openAlert, openRecheckChainConnectionModal, setStorage]);
+    setIsDisableHeader,
+    selectSubstrateProxyAccountsToSign
+  }), [defaultData, needPersistData, setStorage, onDone, goBack, closeAlert, openAlert, openRecheckChainConnectionModal, closeRecheckChainConnectionModal, modalId, selectSubstrateProxyAccountsToSign]);
 
   const recheckChainConnectionModalNode = (
     <>
@@ -344,6 +379,7 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
       <Layout.Home
         isDisableHeader={isDisableHeader}
         showFaderIcon
+        showHeader={showHeader}
         showTabBar={false}
       >
         <TransactionContext.Provider value={contextValues}>

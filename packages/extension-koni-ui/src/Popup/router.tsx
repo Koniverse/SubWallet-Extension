@@ -124,7 +124,8 @@ const ClaimReward = new LazyLoader('ClaimReward', () => import('@subwallet/exten
 const Withdraw = new LazyLoader('Withdraw', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Withdraw'));
 const ClaimBridge = new LazyLoader('ClaimBridge', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/ClaimBridge'));
 const MigrateAccount = new LazyLoader('MigrateAccount', () => import('@subwallet/extension-koni-ui/Popup/MigrateAccount'));
-
+const AddSubstrateProxyAccount = new LazyLoader('AddProxy', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/SubstrateProxyAccount/AddSubstrateProxyAccount'));
+const RemoveSubstrateProxyAccount = new LazyLoader('AddProxy', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/SubstrateProxyAccount/RemoveSubstrateProxyAccount'));
 // Earning
 
 const EarningEntry = new LazyLoader('EarningEntry', () => import('@subwallet/extension-koni-ui/Popup/Home/Earning/EarningEntry'));
@@ -210,6 +211,8 @@ export const router = createHashRouter([
           ClaimReward.generateRouterObject('claim-reward'),
           Withdraw.generateRouterObject('withdraw'),
           ClaimBridge.generateRouterObject('claim-bridge'),
+          AddSubstrateProxyAccount.generateRouterObject('add-proxy'),
+          RemoveSubstrateProxyAccount.generateRouterObject('remove-proxy'),
           {
             path: 'compound',
             element: <Example />
