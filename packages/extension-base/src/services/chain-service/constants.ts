@@ -47,6 +47,11 @@ export const _BALANCE_TOKEN_GROUP = {
   bitcountry: ['BIT']
 };
 
+export const _BALANCE_LOCKED_ID_GROUP = {
+  staking: ['staking', 'delegatedStaking', 'pooledStaking'],
+  gov: ['pyconvot']
+};
+
 export const _NFT_CHAIN_GROUP = {
   acala: ['acala'],
   karura: ['karura'], // TODO: karura and acala should be the same
