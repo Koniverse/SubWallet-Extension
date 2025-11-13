@@ -21,10 +21,21 @@ type Props = ThemeProps & {
 
 const BLOCK_TIME_DEFAULT = 6;
 
-const blocksToDaysLabel = (blocks: number, chainSlug: string) => {
-  const days = blocks / (86400 / (BLOCK_DURATION_SEC[chainSlug] || BLOCK_TIME_DEFAULT));
+const blocksToTimeLabel = (blocks: number, chainSlug: string) => {
+  const blockDuration = BLOCK_DURATION_SEC[chainSlug] || BLOCK_TIME_DEFAULT;
+  const totalSeconds = blocks * blockDuration;
 
-  return Number.isInteger(days) ? `${days} d` : `${days.toFixed(2)} d`;
+  const days = Math.floor(totalSeconds / (24 * 60 * 60));
+  const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
+  const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+
+  if (days > 0) {
+    return `${days} d${hours ? ` ${hours} h` : ''}`;
+  } else if (hours > 0) {
+    return `${hours} h${minutes ? ` ${minutes} m` : ''}`;
+  } else {
+    return `${minutes} m`;
+  }
 };
 
 const capitalize = (value: string): string => {
@@ -178,12 +189,12 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
               <MetaInfo.Default
                 label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.decisionPeriod')}
               >
-                {blocksToDaysLabel(referendumDetail.trackInfo.decisionPeriod, chain)}
+                {blocksToTimeLabel(referendumDetail.trackInfo.decisionPeriod, chain)}
               </MetaInfo.Default>
               <MetaInfo.Default
                 label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.confirmationPeriod')}
               >
-                {blocksToDaysLabel(referendumDetail.trackInfo.confirmPeriod, chain)}
+                {blocksToTimeLabel(referendumDetail.trackInfo.confirmPeriod, chain)}
               </MetaInfo.Default>
               <MetaInfo.Default
                 label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.enact')}
