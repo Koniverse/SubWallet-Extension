@@ -1,16 +1,16 @@
-    3208	AnhMTV                        	Release version 1.3.61
+    3243	AnhMTV                        	Release version 1.3.66
     2671	Nam Phạm                      	disable block explorer for truth network
     2599	S2kael                        	[Issue-4521] Update stable version for chain-list
-     961	bluezdot                      	[Issue-4731] fix: fix bug crash app, filter undefined asset
+    1010	bluezdot                      	
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
-     568	nguyentiendung                	[Issue-3553] [Issue-3553] Refactor code and add recipient to swap history.
+     575	nguyentiendung                	
      550	Frenkie Nguyen                	[Issue-4462] update styling for background phishing page
      465	Jaco                          	0.42.5 (#969)
-     402	tunghp2002                    	[Issue-4688] Turn on middleware
+     434	tunghp2002                    	
      355	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
+     291	PDTnhah                       	Revert "[Issue-4822] feat: remove polkadot <> manta atlantic xcm pair"
      279	lw                            	[Issue-4462] refactor: Refactor logic related to amount input
-     257	PDTnhah                       	[Issue-4693] feat: adjust 'xode' chain explorer logic
-     187	Thiendekaco                   	[Issue-4735] fix: hide copy/QR content for relay chain addresses (AssetHub migration) #2
+     199	Thiendekaco                   	[Issue-4739] chore: resolve comment after review pr
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
      170	lw-cdm                        	
@@ -30,6 +30,7 @@
        9	Minh Le                       	
        9	minhld1029                    	[#115] [ForgetAccount] catch exception refList undefined
        7	Ivan Rukhavets                	Mention derivation in FAQ (#334)
+       6	bluezdot                      	[Issue-4787] feat: add senderAddress config
        6	thiendekaco                   	
        6	unknown                       	refactor code
        5	anhnhu                        	[issue-2231]: add condition branch_name webapp-dev auto increase run scripts change build number
@@ -37,7 +38,6 @@
        4	namph                         	update UI for nft
        4	Quangdm-cdm                   	
        3	Antoine Estienne              	Add eth test for extension signature (#909)
-       3	bluezdot                      	[Issue-4606] chores: migrate to remove cached earning options
        3	quangdm                       	Update style for Auth Transaction Screen, Export Screen, Derive Screen
        2	Axel Chalon                   	Add typings to messages (#130)
        2	Bartłomiej Rutkowski          	Allow account creation by derivation from existing one (#296)
