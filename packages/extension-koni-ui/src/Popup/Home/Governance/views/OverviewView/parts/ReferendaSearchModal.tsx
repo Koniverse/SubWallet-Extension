@@ -95,12 +95,29 @@ const Component = ({ chain, className, onClickItem, sdkInstance }: Props): React
   const filteredItems = useMemo<ReferendumWithVoting[]>(() => {
     const itemsFiltered = items.filter((item) => filterItemBySearchText(item, searchValue));
 
-    if (searchData?.govReferenda?.length && !itemsFiltered.length && searchValue.trim()) {
-      return searchData.govReferenda.filter((item) => filterItemBySearchText(item, searchValue));
+    if (searchValue.trim() && searchData?.govReferenda?.length) {
+      const mappedSearch = searchData.govReferenda
+        .filter((item) => filterItemBySearchText(item, searchValue))
+        .map((r) => ({
+          ...r,
+          userVoting: getUserVotingListForReferendum({ referendum: r, govLockedInfos })
+        }));
+
+      const map = new Map<string | number, ReferendumWithVoting>();
+
+      mappedSearch.forEach((it) => {
+        map.set(it.referendumIndex as string | number, it);
+      });
+
+      itemsFiltered.forEach((it) => {
+        map.set(it.referendumIndex as string | number, it);
+      });
+
+      return Array.from(map.values());
     } else {
       return itemsFiltered;
     }
-  }, [searchData?.govReferenda, items, searchValue]);
+  }, [searchData?.govReferenda, items, searchValue, govLockedInfos]);
 
   const renderEmpty = useMemo(() => {
     return (
@@ -183,7 +200,7 @@ export const ReferendaSearchModal = styled(Component)<Props>(({ theme: { token }
 
     '.referenda-list': {
       paddingInline: 0,
-      height: '95%',
+      height: '90%',
       overflowY: 'scroll'
     },
 

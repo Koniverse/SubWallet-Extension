@@ -105,6 +105,9 @@ interface DemocracyOnchainData {
   };
   info: DemocracyOnChainInfo;
   meta: DemocracyMetadata;
+  status?: {
+    threshold?: string;
+  }
   tally: Tally;
   state: OnchainState;
   preImage: Proposal
@@ -300,6 +303,7 @@ interface Indexer {
 export interface OnchainState {
   indexer: Indexer;
   name: GovStatusKey;
+  threshold?: string
 }
 
 export interface OnchainData {
@@ -310,6 +314,13 @@ export interface OnchainData {
   info: OnchainInfo;
   state?: OnchainState;
   meta?: DemocracyMetadata;
+  status?: {
+    threshold?: string;
+  };
+  treasuryInfo?: {
+    amount: string;
+    beneficiary: string;
+  }
 }
 
 export interface ReferendaResponse {

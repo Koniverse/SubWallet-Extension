@@ -41,7 +41,7 @@ type Props = ThemeProps & ViewBaseType & {
 const modalId = 'account-selector';
 
 const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance }: Props): React.ReactElement<Props> => {
-  const { accountProxies, currentAccountProxy } = useSelector((state) => state.accountState);
+  const { accountProxies, currentAccountProxy, isAllAccount } = useSelector((state) => state.accountState);
   const navigate = useNavigate();
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const { t } = useTranslation();
@@ -138,13 +138,14 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
 
   const onViewPolkassembly = useCallback(() => {
     const site = chainSlugToPolkassemblySite[chainSlug];
+    const referendumPath = data?.referendumIndex == null ? '' : `${data.referendumIndex}`;
 
-    window.open(`https://${site}.polkassembly.io/referenda/${data?.referendumIndex ?? ''}`, '_blank');
+    window.open(`https://${site}.polkassembly.io/referenda/${referendumPath}`, '_blank');
   }, [chainSlug, data?.referendumIndex]);
 
   const onViewSubsquare = useCallback(() => {
     const basePath = sdkInstance?.isLegacyGov ? 'democracy/' : '';
-    const referendumPath = data?.referendumIndex || '';
+    const referendumPath = data?.referendumIndex == null ? '' : `${data.referendumIndex}`;
 
     window.open(`https://${chainSlugToSubsquareSite[chainSlug]}.subsquare.io/${basePath}referenda/${referendumPath}`, '_blank');
   }, [chainSlug, data?.referendumIndex, sdkInstance?.isLegacyGov]);
@@ -199,7 +200,9 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
   }, [chainSlug, className, closeAlert, data?.track, fromAccountProxy, navigate, notify, openAlert, referendumId, setGovRefVoteStorage, t, token.colorTextLight2]);
 
   const onClickVote = useCallback(() => {
-    if (extendedAccountAddressItems.length >= 1) {
+    if (!isAllAccount) {
+      onSelectGovItem(extendedAccountAddressItems[0]);
+    } else if (extendedAccountAddressItems.length >= 1) {
       activeModal(modalId);
     } else if (isOnlyReadOnlyAccount) {
       notify({
@@ -207,7 +210,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
         type: 'info'
       });
     }
-  }, [extendedAccountAddressItems.length, isOnlyReadOnlyAccount, activeModal, notify, t]);
+  }, [activeModal, extendedAccountAddressItems, isAllAccount, isOnlyReadOnlyAccount, notify, onSelectGovItem, t]);
 
   const onCancel = useCallback(() => {
     inactiveModal(modalId);
