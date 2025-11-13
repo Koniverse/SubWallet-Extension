@@ -6676,9 +6676,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build::locator=root-workspace-0b6124%40workspace%3A.":
-  version: 0.1.12
-  resolution: "@subwallet/keyring@file:../SubWallet-Base/packages/keyring/build#../SubWallet-Base/packages/keyring/build::hash=2e539d&locator=root-workspace-0b6124%40workspace%3A."
+"@subwallet/keyring@npm:0.1.14-beta.0":
+  version: 0.1.14-beta.0
+  resolution: "@subwallet/keyring@npm:0.1.14-beta.0"
   dependencies:
     "@emurgo/cardano-message-signing-browser": ^1.1.0
     "@emurgo/cardano-serialization-lib-nodejs": ^13.2.0
@@ -6701,7 +6701,7 @@ __metadata:
     rxjs: ^7.5.6
     tiny-secp256k1: ^2.2.3
     tslib: ^2.6.2
-  checksum: 7977758cc80cc9e41e156afbc2cad8ded2780974c89fa9d8987855bf474927782575cfbc9220bb568b6f1450ee40b991d5df236aa1183b52f39aa75a685ca772
+  checksum: d2b07d6a111de23aa1d8bdfa3fdb1dc611f78940d5658164d43e4ecd9eea33347f54bd9de6846bb4e29dab49ef015f350d1e228cc64758406f49fb19c76a0367
   languageName: node
   linkType: hard
 
@@ -6783,20 +6783,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/ui-keyring@file:../SubWallet-Base/packages/ui-keyring/build/::locator=root-workspace-0b6124%40workspace%3A.":
-  version: 0.1.12
-  resolution: "@subwallet/ui-keyring@file:../SubWallet-Base/packages/ui-keyring/build/#../SubWallet-Base/packages/ui-keyring/build/::hash=80f4d6&locator=root-workspace-0b6124%40workspace%3A."
+"@subwallet/ui-keyring@npm:0.1.14-beta.0":
+  version: 0.1.14-beta.0
+  resolution: "@subwallet/ui-keyring@npm:0.1.14-beta.0"
   dependencies:
     "@babel/runtime": ^7.20.1
     "@polkadot/ui-settings": ^3.15.2
     "@polkadot/util": ^13.5.3
     "@polkadot/util-crypto": ^13.5.3
-    "@subwallet/keyring": ^0.1.12
+    "@subwallet/keyring": ^0.1.14-beta.0
     ed25519-hd-key: ^1.3.0
     mkdirp: ^1.0.4
     rxjs: ^7.5.7
     store: ^2.0.12
-  checksum: 2c749152a3275707b5ad3f62995e4eeab0ef26cd3120a0181c807aac8c5f4120bc9cbdca233d51c8aa9000fcb8452eb7f3c8701a1cf6a442cb0c2548823f9b6b
+  checksum: ac6f4118824e2b9c630290bfaa426c5e3b5813bc9c4621b8c3656550441b8284ffe1ec0033e8fb1e31d53979aa9af6d640ad4fe304453212966ca31b802b32e1
   languageName: node
   linkType: hard
 
