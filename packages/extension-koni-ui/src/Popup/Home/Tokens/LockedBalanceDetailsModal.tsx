@@ -3,10 +3,11 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { LockedBalanceDetails } from '@subwallet/extension-base/types';
+import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Icon, Number, SwModal, Tooltip } from '@subwallet/react-ui';
+import { Icon, SwModal, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { Info } from 'phosphor-react';
@@ -27,7 +28,7 @@ function Component ({ className = '', currentTokenInfo, id, lockedDetails, onCan
   const { t } = useTranslation();
 
   const { governance, others, staking } = lockedDetails;
-  const { assetRegistry } = useSelector((state) => state.assetRegistry);
+  const assetRegistry = useSelector((state) => state.assetRegistry.assetRegistry);
 
   const tokenInfo = useMemo((): _ChainAsset | undefined => {
     if (!currentTokenInfo) {
@@ -79,7 +80,7 @@ function Component ({ className = '', currentTokenInfo, id, lockedDetails, onCan
           >
             <div className='__label'>{item.label}</div>
             <div className='__balance'>
-              <Number
+              <NumberDisplay
                 className='__value'
                 decimal={tokenInfo?.decimals || 0}
                 decimalOpacity={0.45}
@@ -87,7 +88,7 @@ function Component ({ className = '', currentTokenInfo, id, lockedDetails, onCan
                 size={14}
                 suffix={currentTokenInfo.symbol}
                 unitOpacity={0.85}
-                value={new BigN(item.value || 0)}
+                value={item.value || 0}
               />
             </div>
           </div>
