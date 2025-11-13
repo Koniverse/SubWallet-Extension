@@ -18,7 +18,7 @@ import { _BALANCE_CHAIN_GROUP, _BALANCE_LOCKED_ID_GROUP, _MANTA_ZK_CHAIN_GROUP, 
 import { _EvmApi, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _checkSmartContractSupportByChain, _getAssetExistentialDeposit, _getAssetNetuid, _getChainExistentialDeposit, _getChainNativeTokenSlug, _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getTokenTypesSupportedByChain, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
-import { BalanceItem, LockedDetails, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
+import { BalanceItem, LockedBalanceDetails, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
 import { filterAlphaAssetsByChain, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { timer } from 'rxjs';
@@ -254,7 +254,7 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
       const maxMainLock = stakingBalance.gt(govBalance) ? stakingBalance : govBalance;
       const othersLockedBalance = new BigN(totalLockedFromTransfer.toString()).minus(maxMainLock);
 
-      const lockedDetails: LockedDetails = {
+      const lockedDetails: LockedBalanceDetails = {
         staking: stakingBalance.toFixed(),
         governance: govBalance.toFixed(),
         others: othersLockedBalance.gt(0) ? othersLockedBalance.toFixed() : '0'

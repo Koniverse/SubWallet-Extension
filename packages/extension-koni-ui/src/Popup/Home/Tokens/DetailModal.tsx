@@ -1,11 +1,10 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainAsset } from '@subwallet/chain-list/types';
 import { APIItemState } from '@subwallet/extension-base/background/KoniTypes';
 import { _isChainBitcoinCompatible } from '@subwallet/extension-base/services/chain-service/utils';
-import { LockedDetails } from '@subwallet/extension-base/types';
-import { AccountTokenBalanceItem, EmptyList, RadioGroup } from '@subwallet/extension-koni-ui/components';
+import { LockedBalanceDetails } from '@subwallet/extension-base/types';
+import { AccountTokenBalanceItem, EmptyList, NumberDisplay, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -20,7 +19,7 @@ import { ArrowCircleLeft, CaretDown, CaretUp, Coins, Info } from 'phosphor-react
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-import { LockedDetailModal } from './LockedDetailModal';
+import { LockedBalanceDetailsModal } from './LockedBalanceDetailsModal';
 
 type Props = ThemeProps & {
   id: string,
@@ -69,15 +68,6 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const [form] = Form.useForm<FormState>();
   const viewValue = Form.useWatch('view', form);
-  const { assetRegistry } = useSelector((state) => state.assetRegistry);
-
-  const tokenInfo = useMemo((): _ChainAsset | undefined => {
-    if (!currentTokenInfo) {
-      return undefined;
-    }
-
-    return assetRegistry[currentTokenInfo.slug];
-  }, [assetRegistry, currentTokenInfo]);
 
   const balanceInfo = useMemo(
     () => (currentTokenInfo ? tokenBalanceMap[currentTokenInfo.slug] : undefined),
@@ -213,7 +203,8 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
 
   const symbol = currentTokenInfo?.symbol || '';
 
-  const renderLockedDetails = (lockedDetails: LockedDetails, symbol: string) => {
+  // renderLockedDetails: Renders locked balance as a collapsible section under the main "Locked" balance row.
+  const renderLockedDetails = (lockedDetails: LockedBalanceDetails, symbol: string) => {
     if (!lockedDetails) {
       return null;
     }
@@ -254,7 +245,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
             >
               <div className='__label text-accent'>{label}</div>
               <div className='__balance'>
-                <Number
+                <NumberDisplay
                   className='__value'
                   decimal={0}
                   decimalOpacity={0.45}
@@ -262,7 +253,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
                   size={14}
                   suffix={symbol}
                   unitOpacity={0.85}
-                  value={new BigN(value || 0)}
+                  value={value || 0}
                 />
               </div>
             </div>
@@ -271,15 +262,16 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
     );
   };
 
+  // Locked Balance Details Modal handlers
   const handleShowLockedDetails = useCallback(() => {
     setShowLockedDetails((prev) => !prev);
   }, []);
 
   const [lockedDetailsModalVisible, setLockedDetailsModalVisible] = useState(false);
-  const [selectedAccountLockedDetails, setSelectedAccountLockedDetails] = useState<LockedDetails | null>(null);
+  const [selectedAccountLockedDetails, setSelectedAccountLockedDetails] = useState<LockedBalanceDetails | null>(null);
 
   const handleOpenLockedDetailsModal = useCallback(
-    (details: LockedDetails) => () => {
+    (details: LockedBalanceDetails) => () => {
       setSelectedAccountLockedDetails(details);
       setLockedDetailsModalVisible(true);
       activeModal(lockedDetailsModalId);
@@ -359,7 +351,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
                       </div>
 
                       {item.key === 'locked' && showLockedDetails && balanceInfo?.lockedDetails && (
-                        <div className='ml-6 mt-1'>{renderLockedDetails(balanceInfo.lockedDetails, item.symbol)}</div>
+                        renderLockedDetails(balanceInfo.lockedDetails, item.symbol)
                       )}
                     </React.Fragment>
                   ))}
@@ -411,13 +403,12 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
         </div>
       </SwModal>
 
-      {lockedDetailsModalVisible && selectedAccountLockedDetails && (
-        <LockedDetailModal
-          decimal={tokenInfo?.decimals || 0}
+      {!!(lockedDetailsModalVisible && currentTokenInfo && selectedAccountLockedDetails) && (
+        <LockedBalanceDetailsModal
+          currentTokenInfo={currentTokenInfo}
           id={lockedDetailsModalId}
           lockedDetails={selectedAccountLockedDetails}
           onCancel={handleCloseLockedDetailsModal}
-          symbol={currentTokenInfo?.symbol || ''}
         />
       )}
     </>

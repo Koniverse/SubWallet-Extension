@@ -2295,9 +2295,9 @@
   "ui.BALANCE.screen.Tokens.DetailModal.governance": "",
   "ui.BALANCE.screen.Tokens.DetailModal.othersTooltipTitle": "",
   "ui.BALANCE.screen.Tokens.DetailModal.others": "",
-  "ui.BALANCE.screen.Tokens.LockedDetailModal.staking": "",
-  "ui.BALANCE.screen.Tokens.LockedDetailModal.governance": "",
-  "ui.BALANCE.screen.Tokens.LockedDetailModal.others": "",
-  "ui.BALANCE.screen.Tokens.LockedDetailModal.lockedDetails": "",
-  "ui.BALANCE.screen.Tokens.LockedDetailModal.othersTooltipTitle": ""
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.staking": "",
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.governance": "",
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.others": "",
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.othersTooltipTitle": "",
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.lockedDetails": ""
 }

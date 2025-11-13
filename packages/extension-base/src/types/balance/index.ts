@@ -24,7 +24,7 @@ export interface TokenBalanceRaw {
  * @property {metadata} [metadata] - Could be anything, supposed to be generic to handle various contexts
  */
 
-export interface LockedDetails {
+export interface LockedBalanceDetails {
   staking: string;
   governance: string;
   others: string;
@@ -41,7 +41,7 @@ export interface BalanceItem {
   free: string;
   locked: string;
 
-  lockedDetails?: LockedDetails;
+  lockedDetails?: LockedBalanceDetails;
 
   // substrate fields
   metadata?: _BalanceMetadata;

@@ -5,12 +5,12 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _BalanceMetadata, BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { _isChainBitcoinCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
-import { AccountProxyAvatar, InfoItemBase } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyAvatar, InfoItemBase, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { BalanceItemWithAddressType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { reformatAddress, toShort } from '@subwallet/extension-koni-ui/utils';
-import { Button, Icon, Number } from '@subwallet/react-ui';
+import { Button, Icon } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowSquareOut, CaretRight } from 'phosphor-react';
@@ -96,12 +96,12 @@ const Component: React.FC<Props> = (props: Props) => {
         >
           <div className='__label'>{label}</div>
           <div className='__value-wrapper'>
-            <Number
+            <NumberDisplay
               className='__value'
               decimal={decimals}
               size={14}
               suffix={symbol}
-              value={new BigN(value || 0)}
+              value={value || 0}
             />
             {isLocked && value !== '0' && (
               <div
