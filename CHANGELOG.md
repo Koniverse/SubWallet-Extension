@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 1.3.66
+Build date: Nov 07, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.121 (#4812):
+  - Add multichain asset for ANLOG token
+  - Update alpha token netuid 71: ( name: Fa -> Leadpoet , symbol: ف -> ㄴ, priceId: dtao-71 -> kora )
+- Re-enable Cross-chain transfer related to Relay-chain (#4822)
+- Rounded value parameter send in EVM transaction request (#3632)
+
+
 ## 1.3.65
 Build date: Nov 06, 2025.
 
