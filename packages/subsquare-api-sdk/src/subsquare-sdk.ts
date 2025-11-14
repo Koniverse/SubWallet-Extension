@@ -215,7 +215,7 @@ export class SubsquareApiSdk {
       { params: { text } }
     );
 
-    if (referendaRes.data?.democracyReferenda?.length) {
+    if (referendaRes.data?.democracyReferenda?.length && this.isLegacyGov) {
       const democracyReferenda = referendaRes.data.democracyReferenda.map(castDemocracyReferendumToReferendum<Referendum>);
 
       return { govReferenda: [...democracyReferenda] };
