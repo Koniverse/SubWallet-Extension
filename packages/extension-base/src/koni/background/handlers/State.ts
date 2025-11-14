@@ -32,7 +32,7 @@ import { KeyringService } from '@subwallet/extension-base/services/keyring-servi
 import MigrationService from '@subwallet/extension-base/services/migration-service';
 import MintCampaignService from '@subwallet/extension-base/services/mint-campaign-service';
 import MktCampaignService from '@subwallet/extension-base/services/mkt-campaign-service';
-import NftService from '@subwallet/extension-base/services/nft-service';
+import { NftService } from '@subwallet/extension-base/services/nft-service';
 import NotificationService from '@subwallet/extension-base/services/notification-service/NotificationService';
 import { PriceService } from '@subwallet/extension-base/services/price-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
@@ -136,7 +136,7 @@ export default class KoniState {
   readonly mintCampaignService: MintCampaignService;
   readonly campaignService: CampaignService;
   readonly mktCampaignService: MktCampaignService;
-  readonly nftDetectionService: NftService;
+  readonly nftService: NftService;
   readonly buyService: BuyService;
   readonly earningService: EarningService;
   readonly feeService: FeeService;
@@ -176,7 +176,7 @@ export default class KoniState {
 
     this.campaignService = new CampaignService(this);
     this.mktCampaignService = new MktCampaignService(this);
-    this.nftDetectionService = new NftService(this);
+    this.nftService = new NftService(this);
     this.buyService = new BuyService(this);
     this.earningService = new EarningService(this);
     this.swapService = new SwapService(this);

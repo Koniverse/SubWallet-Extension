@@ -247,7 +247,7 @@ export class KoniCron {
         return;
       }
 
-      this.state.nftDetectionService.fetchEvmCollectionsWithPreview(addresses)
+      this.state.nftService.syncPreview(address)
         .catch((err) => console.warn(`[Cron] NFT detection failed for ${address}:`, err));
     };
   };
