@@ -6,7 +6,6 @@ Build date: Nov 13, 2025.
 Features & Updates:
 - Improve Swap validation by Dry-run-preview API from ParaSpell (#4671)
 - Configure gas limit & max gas fee for Energy Web Chain (#4716)
-- Standardize the Module Price History according to the new standard (#4784)
 
 
 ## 1.3.66
