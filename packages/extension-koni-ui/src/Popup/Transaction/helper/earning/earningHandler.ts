@@ -45,9 +45,9 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
   } else {
     const remainingTimeHr = remainingTimestampMs / 1000 / 60 / 60;
 
-    // Formatted waitting time without round up
+    // Example of _formattedWaitingTime: ...
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
-    const _formattedWaitingTime = humanizeDuration(remainingTimestampMs, {
+    const _formattedWaitingTime = humanizeDuration(82799000, {
       units: remainingTimeHr >= 24 ? ['d', 'h'] : ['h', 'm'],
       round: false,
       delimiter: ' ',
@@ -66,29 +66,38 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
       } // TODO: should not be shorten
     }) as string;
 
-    // Formatted waitting time with round up
-    const formattedWaitingTime = _formattedWaitingTime.split(' ').reduce<string[]>((acc, segment, index, arr) => {
-      if (index % 2 === 0) {
-        const roundedUnit = Math.ceil(parseFloat(segment));
-        const unit = arr[index + 1];
+    // Example of timeArray: ...
+    const timeArray = _formattedWaitingTime.split(' ');
 
-        if (unit === 'm' && roundedUnit === 60) {
-          const prevHourIndex = acc.length - 2;
+    // Formatted waiting time with round up
+    const formattedWaitingTime = timeArray.reduce<string[]>((result, rawValue, index, array) => {
+      if (index % 2 === 0) { // even index element hold the value, odd index element hold the unit
+        const value = Math.ceil(parseFloat(rawValue));
+        const unit = array[index + 1];
+
+        if (unit === 'm' && value === 60) {
+          const prevHourIndex = result.length - 2;
 
           if (prevHourIndex >= 0) {
-            acc[prevHourIndex] = (parseInt(acc[prevHourIndex]) + 1).toString();
+            result[prevHourIndex] = (parseInt(result[prevHourIndex]) + 1).toString();
           } else {
-            acc.push('1', 'hr');
+            result.push('1', 'hr');
           }
-        } else if (unit === 'm' && roundedUnit === 0) {
-          return acc;
+        } else if (unit === 'hr' && value === 24) {
+          const prevDayIndex = result.length - 2;
+
+          if (prevDayIndex >= 0) {
+            result[prevDayIndex] = (parseInt(result[prevDayIndex]) + 1).toString();
+          } else {
+            result.push('1', 'd');
+          }
         } else {
-          acc.push(roundedUnit.toString(), unit);
+          result.push(value.toString(), unit);
         }
 
-        return acc;
+        return result;
       } else {
-        return acc;
+        return result;
       }
     }, []).join(' ');
 
