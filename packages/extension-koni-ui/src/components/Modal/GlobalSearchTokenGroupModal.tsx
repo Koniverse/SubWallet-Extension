@@ -1,13 +1,12 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { TokenBalanceSelectionItem, TokenEmptyList } from '@subwallet/extension-koni-ui/components';
+import { TokenEmptyList, TokenGroupBalanceItem } from '@subwallet/extension-koni-ui/components';
 import Search from '@subwallet/extension-koni-ui/components/Search';
-import { useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
+import { useDebouncedValue, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountBalanceHookType, ThemeProps, TokenBalanceItemType, TokenGroupHookType } from '@subwallet/extension-koni-ui/types';
-import { sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { sortTokensByStandard } from '@subwallet/extension-koni-ui/utils';
 import { SwList, SwModal } from '@subwallet/react-ui';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -16,41 +15,16 @@ import styled from 'styled-components';
 type Props = ThemeProps & {
   id: string,
   onCancel: () => void,
-  tokenBalanceMap: AccountBalanceHookType['tokenBalanceMap'],
-  tokenSlugs: TokenGroupHookType['tokenSlugs'],
+  tokenGroupBalanceMap: AccountBalanceHookType['tokenGroupBalanceMap'],
+  tokenGroups: TokenGroupHookType['tokenGroups']
 }
 
-function getTokenBalances (
-  tokenBalanceMap: AccountBalanceHookType['tokenBalanceMap'],
-  tokenSlugs: TokenGroupHookType['tokenSlugs']): TokenBalanceItemType[] {
-  const result: TokenBalanceItemType[] = [];
-
-  tokenSlugs.forEach((tokenSlug) => {
-    if (tokenBalanceMap[tokenSlug]) {
-      result.push(tokenBalanceMap[tokenSlug]);
-    }
-  });
-
-  return result;
-}
-
-function Component ({ className = '', id, onCancel, tokenBalanceMap, tokenSlugs }: Props): React.ReactElement<Props> {
+function Component ({ className = '', id, onCancel, tokenGroupBalanceMap, tokenGroups }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
   const { chainInfoMap } = useSelector((state) => state.chainStore);
-  const { multiChainAssetMap } = useSelector((state) => state.assetRegistry);
-  const assetRegistry = useChainAssets({ isActive: true }).chainAssetRegistry;
   const priorityTokens = useSelector((state: RootState) => state.chainStore.priorityTokens);
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
-
-  const tokenBalances = useMemo<TokenBalanceItemType[]>(() => {
-    const result = getTokenBalances(tokenBalanceMap, tokenSlugs);
-
-    sortTokensByBalanceInSelector(result, priorityTokens);
-
-    return result;
-  }, [tokenBalanceMap, tokenSlugs, priorityTokens]);
 
   const onClickItem = useCallback((item: TokenBalanceItemType) => {
     return () => {
@@ -64,35 +38,44 @@ function Component ({ className = '', id, onCancel, tokenBalanceMap, tokenSlugs 
     setCurrentSearchText(value);
   }, []);
 
-  const renderItem = useCallback(
-    (tokenBalance: TokenBalanceItemType) => {
-      const slug = tokenBalance.slug;
-      const tokenName = assetRegistry[slug]?.name || multiChainAssetMap[slug]?.name || '';
+  const renderItem = useCallback((tokenBalance: TokenBalanceItemType) => {
+    return (
+      <TokenGroupBalanceItem
+        key={tokenBalance.slug}
+        {...tokenBalance}
+        onPressItem={onClickItem(tokenBalance)}
+      />
+    );
+  }, [onClickItem]);
 
-      return (
-        <TokenBalanceSelectionItem
-          key={slug}
-          tokenName={tokenName}
-          {...tokenBalance}
-          onPressItem={onClickItem(tokenBalance)}
-        />
-      );
-    },
-    [assetRegistry, multiChainAssetMap, onClickItem]
-  );
+  const debouncedTokenGroupBalanceMap = useDebouncedValue<Record<string, TokenBalanceItemType>>(tokenGroupBalanceMap, 300);
+
+  const tokenGroupBalanceItems = useMemo((): TokenBalanceItemType[] => {
+    const result: TokenBalanceItemType[] = [];
+
+    tokenGroups.forEach((tokenGroupSlug) => {
+      if (debouncedTokenGroupBalanceMap[tokenGroupSlug]) {
+        result.push(debouncedTokenGroupBalanceMap[tokenGroupSlug]);
+      }
+    });
+
+    sortTokensByStandard(result, priorityTokens, true);
+
+    return result;
+  }, [tokenGroups, debouncedTokenGroupBalanceMap, priorityTokens]);
 
   const filteredItems = useMemo(() => {
-    return tokenBalances.filter((item) => {
+    return tokenGroupBalanceItems.filter((item) => {
       const searchTextLowerCase = currentSearchText.toLowerCase();
-      const chainName = chainInfoMap[item.chain || '']?.name?.toLowerCase();
-      const symbol = item.symbol.toLowerCase();
+      const chainName = (chainInfoMap[item.chain || '']?.name || '').toLowerCase();
+      const symbol = (item.symbol || '').toLowerCase();
 
       return (
         symbol.includes(searchTextLowerCase) ||
         chainName.includes(searchTextLowerCase)
       );
     });
-  }, [chainInfoMap, currentSearchText, tokenBalances]);
+  }, [chainInfoMap, currentSearchText, tokenGroupBalanceItems]);
 
   const renderEmpty = useCallback(() => {
     return (<TokenEmptyList modalId={id} />);
@@ -115,7 +98,7 @@ function Component ({ className = '', id, onCancel, tokenBalanceMap, tokenSlugs 
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t('ui.BALANCE.components.Modal.GlobalSearchToken.tokenName')}
+        placeholder={t<string>('ui.BALANCE.components.Modal.GlobalSearchToken.tokenName')}
         searchValue={currentSearchText}
       />
       <SwList
@@ -131,7 +114,7 @@ function Component ({ className = '', id, onCancel, tokenBalanceMap, tokenSlugs 
   );
 }
 
-export const GlobalSearchTokenModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
+export const GlobalSearchTokenGroupModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     '.ant-sw-modal-content': {
       height: '100vh'
