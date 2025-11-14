@@ -105,9 +105,7 @@ interface DemocracyOnchainData {
   };
   info: DemocracyOnChainInfo;
   meta: DemocracyMetadata;
-  status?: {
-    threshold?: string;
-  }
+  status?: DemocracyMetadata
   tally: Tally;
   state: OnchainState;
   preImage: Proposal
@@ -314,9 +312,7 @@ export interface OnchainData {
   info: OnchainInfo;
   state?: OnchainState;
   meta?: DemocracyMetadata;
-  status?: {
-    threshold?: string;
-  };
+  status?: DemocracyMetadata;
   treasuryInfo?: {
     amount: string;
     beneficiary: string;

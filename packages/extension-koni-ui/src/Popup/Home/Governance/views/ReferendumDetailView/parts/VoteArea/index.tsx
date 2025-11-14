@@ -67,13 +67,13 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   const { data } = useQuery({
     queryKey: GOV_QUERY_KEYS.referendumVotes(chain, referendumId),
     queryFn: async () => {
-      if (!referendumId || !sdkInstance) {
+      if (referendumId === null || referendumId === undefined || !sdkInstance) {
         return undefined;
       }
 
       return await sdkInstance.getReferendaVotes(`${referendumId}`);
     },
-    enabled: !!referendumId && !!chain,
+    enabled: !!chain,
     staleTime: 60 * 1000
   });
 

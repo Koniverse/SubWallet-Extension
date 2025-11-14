@@ -90,8 +90,6 @@ export function getMinApprovalThresholdGov1 (referendum: Referendum | Referendum
   const turnout = new BigNumber(t.turnout);
   const electorate = new BigNumber(t.electorate);
 
-  console.log('threshold', [threshold, turnout.toFixed(), electorate.toFixed()]);
-
   // Avoid division by zero or invalid data
   if (electorate.lte(0) || turnout.lte(0)) {
     return 0;

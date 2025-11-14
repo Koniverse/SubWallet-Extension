@@ -10,7 +10,7 @@ import GovAccountSelectorModal from '@subwallet/extension-koni-ui/components/Mod
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetGovLockedInfos, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetGovLockedInfos, useGetNativeTokenBasicInfo, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { chainSlugToPolkassemblySite, chainSlugToSubsquareSite } from '@subwallet/extension-koni-ui/Popup/Home/Governance/shared';
 import { ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -20,6 +20,7 @@ import { GovAccountAddressItemType, GovVoteStatus } from '@subwallet/extension-k
 import { getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
 import { GOV_QUERY_KEYS } from '@subwallet/extension-koni-ui/utils/gov';
 import { Button, ModalContext, SwSubHeader } from '@subwallet/react-ui';
+import { SpendItem } from '@subwallet/subsquare-api-sdk';
 import { useQuery } from '@tanstack/react-query';
 import React, { Context, useCallback, useContext, useEffect, useMemo } from 'react';
 import { Trans } from 'react-i18next';
@@ -93,6 +94,28 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
    * - Marks "not voted" accounts as delegated if they have delegation info
    * - Merges them back into a single unified list
    */
+
+  const { symbol } = useGetNativeTokenBasicInfo(chainSlug);
+
+  const spends = useMemo(() => {
+    if (data?.allSpends?.length) {
+      return data.allSpends;
+    }
+
+    const treasuryInfo = data?.onchainData.treasuryInfo;
+
+    if (treasuryInfo) {
+      return [{
+        amount: treasuryInfo.amount,
+        symbol,
+        isSpendLocal: true,
+        type: 'native'
+      }] as SpendItem[];
+    }
+
+    return [];
+  }, [data?.allSpends, data?.onchainData.treasuryInfo, symbol]);
+
   const extendedAccountAddressItems = useMemo(() => {
     if (!data) {
       return accountAddressItems;
@@ -228,8 +251,6 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
     return <></>;
   }
 
-  const allSpends = data.allSpends;
-
   return (
     <div className={className}>
       <SwSubHeader
@@ -256,9 +277,9 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
             voteMap={voteMap}
           />
 
-          { allSpends && (
+          { spends && (
             <RequestedAmount
-              allSpend={allSpends}
+              allSpend={spends}
               chain={chainSlug}
             />
           )}
