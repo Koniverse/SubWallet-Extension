@@ -199,7 +199,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
               <MetaInfo.Default
                 label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.enact')}
               >
-              After: {referendumDetail.onchainData.info.enactment.after}
+              After: {referendumDetail.onchainData.info.enactment.after || referendumDetail.onchainData.info.enactment.at}
               </MetaInfo.Default>
             </>
           )

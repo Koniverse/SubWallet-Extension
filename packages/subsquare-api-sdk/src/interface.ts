@@ -16,7 +16,8 @@ export interface Referendum {
   trackInfo: TrackInfo;
 
   enactment: {
-    after: string; // block
+    after?: string; // block
+    at?: string; // block
   }
 
   proposalHash: string;
@@ -276,7 +277,8 @@ interface OnchainInfo {
     who: string;
   };
   enactment: {
-    after: string;
+    after?: string; // block
+    at?: string; // block
   };
   deciding?: {
     since: number;
