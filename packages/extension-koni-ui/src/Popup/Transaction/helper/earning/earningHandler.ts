@@ -43,9 +43,16 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
   if (remainingTimestampMs <= 0) {
     return t('ui.TRANSACTION.screen.Transaction.helper.earningHandler.availableForWithdrawal');
   } else {
-    const remainingTimeHr = remainingTimestampMs / 1000 / 60 / 60;
+    // Test cases:
+    //  - 3599000 ms   → 59 min 59s
+    //  - 3600000 ms   → 60 min
+    //  - 82799000 ms  → 23h
+    //  - 86399900 ms  → 23h 59m
+    //  - 86400000 ms  → 24h
+    //  - 172800000 ms → 48h
+    const remainingTimeHr = 82799000 / 1000 / 60 / 60;
 
-    // Example of _formattedWaitingTime: ...
+    // Example of _formattedWaitingTime: 22 hr 59.833333333333336 m
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
     const _formattedWaitingTime = humanizeDuration(82799000, {
       units: remainingTimeHr >= 24 ? ['d', 'h'] : ['h', 'm'],
@@ -66,7 +73,7 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
       } // TODO: should not be shorten
     }) as string;
 
-    // Example of timeArray: ...
+    // Example of timeArray: ['23', 'hr', '59.833333333333336', 'm']
     const timeArray = _formattedWaitingTime.split(' ');
 
     // Formatted waiting time with round up
@@ -75,6 +82,7 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
         const value = Math.ceil(parseFloat(rawValue));
         const unit = array[index + 1];
 
+        // Case 1: 60 minutes → convert to +1 hour
         if (unit === 'm' && value === 60) {
           const prevHourIndex = result.length - 2;
 
@@ -83,6 +91,7 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
           } else {
             result.push('1', 'hr');
           }
+          // Case 2: 24 hours → convert to +1 day
         } else if (unit === 'hr' && value === 24) {
           const prevDayIndex = result.length - 2;
 
@@ -91,6 +100,7 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
           } else {
             result.push('1', 'd');
           }
+          // Default: push rounded value and its unit normally
         } else {
           result.push(value.toString(), unit);
         }
