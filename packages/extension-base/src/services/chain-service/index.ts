@@ -1647,6 +1647,15 @@ export class ChainService {
       // Enable chain if not before
       if (!targetChainState.active) {
         targetChainState.active = true;
+
+        // enable native token
+        const nativeAsset = this.getNativeTokenInfo(chainSlug);
+        const currentAssetSettings = await this.getAssetSettings();
+
+        if (!currentAssetSettings[nativeAsset.slug].visible) {
+          currentAssetSettings[nativeAsset.slug] = { visible: true };
+          this.setAssetSettings(currentAssetSettings);
+        }
       }
 
       // It auto detects the change of api url to create new instance or reuse existed one

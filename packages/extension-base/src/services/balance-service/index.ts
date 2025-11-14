@@ -545,10 +545,28 @@ export class BalanceService implements StoppableServiceInterface {
       }
     });
 
+    // todo: merge this with promiseList
+    const substratePromiseList = addresses.map((address) => {
+      const type = getKeypairTypeByAddress(address);
+      const typeValid = [...EthereumKeypairTypes].includes(type);
+
+      if (typeValid) {
+        return subwalletApiSdk.balanceDetectionApi.getSWSubscanTokenBalance(address)
+          .catch((e) => {
+            console.error(e);
+
+            return null;
+          });
+      } else {
+        return null;
+      }
+    });
+
     const needEnableChains: string[] = [];
     const needActiveTokens: string[] = [];
     const balanceDataList = await Promise.all(promiseList);
     const evmBalanceDataList = await Promise.all(evmPromiseList);
+    const substrateBalanceDataList = await Promise.all(substratePromiseList);
     const currentAssetSettings = await this.state.chainService.getAssetSettings();
     const chainInfoMap = this.state.chainService.getChainInfoMap();
     const detectBalanceChainSlugMap = this.state.chainService.detectBalanceChainSlugMap;
@@ -591,6 +609,28 @@ export class BalanceService implements StoppableServiceInterface {
     }
 
     for (const balanceData of evmBalanceDataList) {
+      if (balanceData) {
+        for (const tokenSlug of balanceData) {
+          const chainSlug = tokenSlug.split('-')[0];
+          const chainState = this.state.chainService.getChainStateByKey(chainSlug);
+          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === tokenSlug.toLowerCase());
+
+          // Cancel if chain is turned off by user
+          if (chainState && chainState.manualTurnOff) {
+            continue;
+          }
+
+          if (existedKey && !currentAssetSettings[existedKey]?.visible) {
+            needEnableChains.push(chainSlug);
+            needActiveTokens.push(existedKey);
+            currentAssetSettings[existedKey] = { visible: true };
+          }
+        }
+      }
+    }
+
+    // todo: remove this loop
+    for (const balanceData of substrateBalanceDataList) {
       if (balanceData) {
         for (const tokenSlug of balanceData) {
           const chainSlug = tokenSlug.split('-')[0];
