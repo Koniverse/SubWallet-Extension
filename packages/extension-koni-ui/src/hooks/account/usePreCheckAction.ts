@@ -2,15 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
-import { detectTranslate } from '@subwallet/extension-base/utils';
+import { AccountChainType, AccountSignMode, YieldPoolType } from '@subwallet/extension-base/types';
 import { ALL_STAKING_ACTIONS, isLedgerCapable, isProductionMode, ledgerIncompatible, SubstrateLedgerSignModeSupport } from '@subwallet/extension-koni-ui/constants';
 import { useCallback } from 'react';
 
 import { useNotification, useTranslation } from '../common';
 import useGetAccountByAddress from './useGetAccountByAddress';
 
-const usePreCheckAction = (address?: string, blockAllAccount = true, message?: string): ((onClick: VoidFunction, action: ExtrinsicType) => VoidFunction) => {
+interface PrecheckActionOptionProps {
+  poolType?: YieldPoolType
+}
+
+const usePreCheckAction = (address?: string, blockAllAccount = true, message?: string): ((onClick: VoidFunction, action: ExtrinsicType, options?: PrecheckActionOptionProps) => VoidFunction) => {
   const notify = useNotification();
   const { t } = useTranslation();
 
@@ -36,7 +39,7 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
     }
   }, [t]);
 
-  return useCallback((onClick: VoidFunction, action: ExtrinsicType) => {
+  return useCallback((onClick: VoidFunction, action: ExtrinsicType, options?: PrecheckActionOptionProps) => {
     return () => {
       if (!account) {
         notify({
@@ -48,10 +51,10 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
         const mode = account.signMode;
         let block = false;
         let accountTitle = getAccountTypeTitle(mode);
-        let defaultMessage = detectTranslate('ui.ACCOUNT.hook.account.usePreCheckAction.featureNotAvailableForAccountType');
+        let defaultMessage = t('ui.ACCOUNT.hook.account.usePreCheckAction.featureNotAvailableForAccountType');
 
         if (ALL_STAKING_ACTIONS.includes(action)) {
-          defaultMessage = detectTranslate('ui.ACCOUNT.hook.account.usePreCheckAction.earningNotSupportedForAccountType');
+          defaultMessage = t('ui.ACCOUNT.hook.account.usePreCheckAction.earningNotSupportedForAccountType');
         }
 
         if (!account.transactionActions.includes(action) || (mode === AccountSignMode.QR && account.chainType === 'ethereum' && isProductionMode)) {
@@ -71,16 +74,16 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
 
             case AccountSignMode.LEGACY_LEDGER:
             case AccountSignMode.GENERIC_LEDGER:
-              if (account.chainType === AccountChainType.ETHEREUM) {
-                accountTitle = t('ui.ACCOUNT.hook.account.usePreCheckAction.ledgerEvmAccount');
-              } else if (account.chainType === AccountChainType.SUBSTRATE) {
-                accountTitle = t('ui.ACCOUNT.hook.account.usePreCheckAction.ledgerSubstrateAccount');
-              }
-
-              break;
             case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
-              accountTitle = t('ui.ACCOUNT.hook.account.usePreCheckAction.ledgerPolkadotEvmAccount');
+              defaultMessage = t('ui.ACCOUNT.hook.account.usePreCheckAction.reImportSeedPhraseToUseFeature');
               break;
+          }
+        } else if (options) {
+          if (mode === AccountSignMode.GENERIC_LEDGER && account.chainType === AccountChainType.ETHEREUM) {
+            if (options.poolType && options.poolType !== YieldPoolType.LIQUID_STAKING) {
+              block = true;
+              defaultMessage = t('ui.ACCOUNT.hook.account.usePreCheckAction.reImportSeedPhraseToUseFeature');
+            }
           }
         }
 

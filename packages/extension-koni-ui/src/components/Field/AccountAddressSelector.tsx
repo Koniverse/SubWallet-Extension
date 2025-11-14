@@ -8,7 +8,7 @@ import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Field, Icon, InputRef, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretDown } from 'phosphor-react';
-import React, { ForwardedRef, forwardRef, useCallback, useContext, useMemo } from 'react';
+import React, { ForwardedRef, forwardRef, ReactNode, useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 
 import { AccountSelectorModal } from '../Modal';
@@ -17,12 +17,13 @@ interface Props extends ThemeProps, BasicInputWrapper {
   items: AccountAddressItemType[];
   labelStyle?: 'horizontal' | 'vertical';
   autoSelectFirstItem?: boolean;
+  renderWhenEmpty?: ReactNode | (() => JSX.Element);
 }
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> => {
   const { autoSelectFirstItem, className = '', disabled, id = 'account-selector'
     , items, label, labelStyle
-    , placeholder, readOnly, statusHelp, tooltip, value } = props;
+    , placeholder, readOnly, renderWhenEmpty, statusHelp, tooltip, value } = props;
 
   const { t } = useTranslation();
   const { onSelect } = useSelectModalInputHelper(props, ref);
@@ -108,6 +109,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
         modalId={id}
         onCancel={onCancelModal}
         onSelectItem={onSelectItem}
+        renderWhenEmpty={renderWhenEmpty}
         selectedValue={value}
       />
     </>

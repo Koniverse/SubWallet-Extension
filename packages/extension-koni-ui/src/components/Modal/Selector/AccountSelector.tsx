@@ -12,7 +12,7 @@ import { isBitcoinAddress } from '@subwallet/keyring';
 import { Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretLeft } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 type ListItemGroupLabel = {
@@ -39,6 +39,7 @@ interface Props extends ThemeProps {
   onBack?: VoidFunction;
   selectedValue?: string;
   autoSelectFirstItem?: boolean;
+  renderWhenEmpty?: ReactNode | (() => JSX.Element);
 }
 
 const renderEmpty = () => <GeneralEmptyList />;
@@ -47,7 +48,7 @@ function isAccountAddressItem (item: ListItem): item is AccountAddressItemType {
   return 'address' in item && 'accountProxyId' in item && 'accountName' in item && !('groupLabel' in item);
 }
 
-function Component ({ autoSelectFirstItem, className = '', items, modalId, onBack, onCancel, onSelectItem, selectedValue }: Props): React.ReactElement<Props> {
+function Component ({ autoSelectFirstItem, className = '', items, modalId, onBack, onCancel, onSelectItem, renderWhenEmpty, selectedValue }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { checkActive } = useContext(ModalContext);
 
@@ -261,7 +262,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
         className={'__list-container'}
         list={listItems}
         renderItem={renderItem}
-        renderWhenEmpty={renderEmpty}
+        renderWhenEmpty={renderWhenEmpty || renderEmpty}
       />
     </SwModal>
   );
