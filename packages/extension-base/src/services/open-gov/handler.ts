@@ -482,8 +482,6 @@ export default abstract class BaseOpenGovHandler {
             tracks
           };
 
-          console.log('result', result);
-
           return result;
         })
       );
