@@ -1830,6 +1830,7 @@
   "bg.ACCOUNT.services.keyring.handler.Json.accountAlreadyExistsWithName": "Account already exists under the name {{name}}",
   "bg.ACCOUNT.services.keyring.handler.Ledger.accountAlreadyExistsWithName": "Account already exists under the name {{name}}",
   "bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName": "Account already exists under the name {{name}}",
+  "bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsViaImportType": "This seed phrase is already imported via {{type}} with the account named {{name}}",
   "bg.ACCOUNT.services.keyring.handler.Secret.accountAlreadyExistsWithName": "Account already exists under the name {{name}}",
   "bg.ACCOUNT.types.error.account.derive.invalidDerivationPath": "Invalid derivation path",
   "bg.ACCOUNT.types.error.account.derive.derivationPathNotSupported": "Derivation path not supported",
