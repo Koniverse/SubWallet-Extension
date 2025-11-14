@@ -10,3 +10,4 @@ export const TON_ACCOUNT_TYPE: KeypairType = 'ton';
 
 export const DEFAULT_ACCOUNT_TYPES: KeypairType[] = [SUBSTRATE_ACCOUNT_TYPE, EVM_ACCOUNT_TYPE];
 export const DEFAULT_MNEMONIC_TYPE: MnemonicType = 'general';
+export const TRUST_WALLET_MNEMONIC_TYPE: MnemonicType = 'trust-wallet';
