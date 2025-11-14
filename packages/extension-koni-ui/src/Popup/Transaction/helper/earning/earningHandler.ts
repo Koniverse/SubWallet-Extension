@@ -50,12 +50,12 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
     //  - 86399900 ms  → 23h 59m
     //  - 86400000 ms  → 24h
     //  - 172800000 ms → 48h
-    const remainingTimeHr = 82799000 / 1000 / 60 / 60;
+    const MS_PER_HOUR = 60 * 60 * 1000; // 3600000
 
     // Example of _formattedWaitingTime: 22 hr 59.833333333333336 m
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
-    const _formattedWaitingTime = humanizeDuration(82799000, {
-      units: remainingTimeHr >= 24 ? ['d', 'h'] : ['h', 'm'],
+    const _formattedWaitingTime = humanizeDuration(remainingTimestampMs, {
+      units: remainingTimestampMs >= MS_PER_HOUR ? ['d', 'h'] : ['h', 'm'],
       round: false,
       delimiter: ' ',
       language: 'shortEn',
@@ -100,8 +100,8 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
           } else {
             result.push('1', 'd');
           }
-          // Default: push rounded value and its unit normally
         } else {
+          // Default: push rounded value and its unit normally
           result.push(value.toString(), unit);
         }
 
