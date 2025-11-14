@@ -199,28 +199,27 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
               <MetaInfo.Default
                 label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.enact')}
               >
-              After: {referendumDetail.onchainData.info.enactment.after}
+              After: {referendumDetail.onchainData.info.enactment.after || referendumDetail.onchainData.info.enactment.at}
               </MetaInfo.Default>
             </>
           )
         }
-        {
-          referendumDetail.version === 1 && referendumDetail.onchainData.meta &&
-          (
-            <>
-              <MetaInfo.Default
-                label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.delay')}
-              >
-                {referendumDetail.onchainData.meta?.delay}
-              </MetaInfo.Default>
+        { ((referendumDetail.version === 1 && referendumDetail.onchainData.meta) || referendumDetail.onchainData.status || referendumDetail.onchainData.info.democracy?.ongoing) &&
+        (
+          <>
+            <MetaInfo.Default
+              label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.delay')}
+            >
+              {referendumDetail.onchainData.meta?.delay || referendumDetail.onchainData.status?.delay || referendumDetail.onchainData.info.democracy?.ongoing?.delay}
+            </MetaInfo.Default>
 
-              <MetaInfo.Default
-                label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.end')}
-              >
-                {referendumDetail.onchainData.meta?.end}
-              </MetaInfo.Default>
-            </>
-          )
+            <MetaInfo.Default
+              label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.end')}
+            >
+              {referendumDetail.onchainData.meta?.end || referendumDetail.onchainData.status?.end || referendumDetail.onchainData.info.democracy?.ongoing?.end}
+            </MetaInfo.Default>
+          </>
+        )
         }
       </MetaInfo>
 

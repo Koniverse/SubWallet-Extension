@@ -16,7 +16,8 @@ export interface Referendum {
   trackInfo: TrackInfo;
 
   enactment: {
-    after: string; // block
+    after?: string; // block
+    at?: string; // block
   }
 
   proposalHash: string;
@@ -105,9 +106,7 @@ interface DemocracyOnchainData {
   };
   info: DemocracyOnChainInfo;
   meta: DemocracyMetadata;
-  status?: {
-    threshold?: string;
-  }
+  status?: DemocracyMetadata
   tally: Tally;
   state: OnchainState;
   preImage: Proposal
@@ -278,7 +277,8 @@ interface OnchainInfo {
     who: string;
   };
   enactment: {
-    after: string;
+    after?: string; // block
+    at?: string; // block
   };
   deciding?: {
     since: number;
@@ -314,9 +314,7 @@ export interface OnchainData {
   info: OnchainInfo;
   state?: OnchainState;
   meta?: DemocracyMetadata;
-  status?: {
-    threshold?: string;
-  };
+  status?: DemocracyMetadata;
   treasuryInfo?: {
     amount: string;
     beneficiary: string;

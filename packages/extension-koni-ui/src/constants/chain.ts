@@ -27,7 +27,7 @@ export const BLOCK_DURATION_SEC: Record<string, number> = { // in seconds
   karura: 12,
   kintsugi: 12,
   westend_assethub: 6,
-  paseo_assethub: 12,
+  paseo_assethub: 6,
   zkverify: 6,
   zkverify_testnet: 6
 };

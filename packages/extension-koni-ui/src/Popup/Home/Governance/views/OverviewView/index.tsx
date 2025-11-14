@@ -90,7 +90,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
     staleTime: 60 * 1000
   });
 
-  const { data: migrationBlockOffset = 0, isLoading: migrationBlockOffsetLoading } = useMigrationOffset(chainSlug, sdkInstance);
+  const { data: migrationBlockOffset, isLoading: migrationBlockOffsetLoading } = useMigrationOffset(chainSlug, sdkInstance);
 
   const onClickReferendumItem = useCallback((item: Referendum) => {
     goReferendumDetail(`${item.referendumIndex}`);
