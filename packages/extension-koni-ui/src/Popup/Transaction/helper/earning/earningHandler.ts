@@ -67,13 +67,30 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
     }) as string;
 
     // Formatted waitting time with round up
-    const formattedWaitingTime = _formattedWaitingTime.split(' ').map((segment, index) => {
+    const formattedWaitingTime = _formattedWaitingTime.split(' ').reduce<string[]>((acc, segment, index, arr) => {
       if (index % 2 === 0) {
-        return Math.ceil(parseFloat(segment)).toString();
-      }
+        const roundedUnit = Math.ceil(parseFloat(segment));
+        const unit = arr[index + 1];
 
-      return segment;
-    }).join(' ');
+        if (unit === 'm' && roundedUnit === 60) {
+          const prevHourIndex = acc.length - 2;
+
+          if (prevHourIndex >= 0) {
+            acc[prevHourIndex] = (parseInt(acc[prevHourIndex]) + 1).toString();
+          } else {
+            acc.push('1', 'hr');
+          }
+        } else if (unit === 'm' && roundedUnit === 0) {
+          return acc;
+        } else {
+          acc.push(roundedUnit.toString(), unit);
+        }
+
+        return acc;
+      } else {
+        return acc;
+      }
+    }, []).join(' ');
 
     return t('ui.TRANSACTION.screen.Transaction.helper.earningHandler.withdrawableInTime', { replace: { time: formattedWaitingTime } });
   }
