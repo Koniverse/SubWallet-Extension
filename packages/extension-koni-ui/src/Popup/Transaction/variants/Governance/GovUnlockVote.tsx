@@ -247,7 +247,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         </Button>
 
         <Button
-          disabled={isDisable || accountAddressFiltered.length === 0 || !isBalanceReady || !(unlockableReferenda.length > 0) || !(unlockableTracks.length > 0)}
+          disabled={isDisable || accountAddressFiltered.length === 0 || !isBalanceReady || (!(unlockableReferenda.length > 0) && !(unlockableTracks.length > 0))}
           icon={(
             <Icon
               phosphorIcon={CheckCircle}
