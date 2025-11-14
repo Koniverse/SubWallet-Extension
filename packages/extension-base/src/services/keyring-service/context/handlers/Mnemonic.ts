@@ -88,8 +88,8 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
     const isExistTrustSeed = exists?.relatedToUnifiedAccountTypes?.includes('ed25519-tw');
 
     if (mnemonicTypes === 'trust-wallet' || mnemonicTypes === 'general') {
-      assert(isExistNormalSeed, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsViaImportType', { replace: { type: 'Import from seed phrase', name: exists?.name || exists?.address || '' } }));
-      assert(isExistTrustSeed, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsViaImportType', { replace: { type: 'Import from Trust Wallet', name: exists?.name || exists?.address || '' } }));
+      assert(!isExistNormalSeed, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsViaImportType', { replace: { type: 'Import from seed phrase', name: exists?.name || exists?.address || '' } }));
+      assert(!isExistTrustSeed, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsViaImportType', { replace: { type: 'Import from Trust Wallet', name: exists?.name || exists?.address || '' } }));
     }
 
     assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
