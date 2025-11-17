@@ -894,6 +894,9 @@ export default class KoniState {
   };
 
   public async disableChain (chainSlug: string): Promise<boolean> {
+    const assetSettings = structuredClone(await this.chainService.getAssetSettings());
+
+    this.chainService.setTemporarySettings(assetSettings);
     await this.chainService.updateAssetSettingByChain(chainSlug, false);
 
     if (_MANTA_ZK_CHAIN_GROUP.includes(chainSlug)) {

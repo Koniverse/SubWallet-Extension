@@ -119,6 +119,8 @@ export class ChainService {
 
   private logger: Logger;
 
+  private temporaryAssetSetting: Record<string, AssetSetting> | undefined;
+
   constructor (dbService: DatabaseService, eventService: EventService) {
     this.dbService = dbService;
     this.eventService = eventService;
@@ -2195,6 +2197,10 @@ export class ChainService {
     return this.assetSettingSubject.value;
   }
 
+  public setTemporarySettings (assetSettings: Record<string, AssetSetting>) {
+    this.temporaryAssetSetting = assetSettings;
+  }
+
   public async updateAssetSetting (assetSlug: string, assetSetting: AssetSetting, autoEnableNativeToken?: boolean): Promise<boolean | undefined> {
     const currentAssetSettings = await this.getAssetSettings();
 
@@ -2241,6 +2247,7 @@ export class ChainService {
     const currentAssetSettings = await this.getAssetSettings();
     const assetsByChain = this.getFungibleTokensByChain(chainSlug);
     const priorityTokensMap = this.priorityTokensSubject.value || {};
+    const temporaryAssetSettings = this.temporaryAssetSetting;
 
     const priorityTokensList = priorityTokensMap.token && typeof priorityTokensMap.token === 'object'
       ? Object.keys(priorityTokensMap.token)
@@ -2249,6 +2256,12 @@ export class ChainService {
     for (const asset of Object.values(assetsByChain)) {
       if (visible) {
         const isPriorityToken = priorityTokensList.includes(asset.slug);
+
+        if (temporaryAssetSettings) {
+          if (Object.keys(temporaryAssetSettings).includes(asset.slug) && temporaryAssetSettings[asset.slug].visible) {
+            currentAssetSettings[asset.slug] = { visible: true };
+          }
+        }
 
         if (isPriorityToken || _isNativeToken(asset)) {
           currentAssetSettings[asset.slug] = { visible: true };

@@ -545,32 +545,12 @@ export class BalanceService implements StoppableServiceInterface {
       }
     });
 
-    // todo: merge with promiseList
-    const substratePromiseList = addresses.map((address) => {
-      const type = getKeypairTypeByAddress(address);
-      const typeValid = [...SubstrateKeypairTypes, ...EthereumKeypairTypes].includes(type);
-
-      if (typeValid) {
-        return subwalletApiSdk.balanceDetectionApi.getSWSubscanTokenBalance(address)
-          .catch((e) => {
-            console.error(e);
-
-            return null;
-          });
-      } else {
-        return null;
-      }
-    });
-
     const tonPromiseList = addresses.map((address) => {
       const type = getKeypairTypeByAddress(address);
       const typeValid = [...TonKeypairTypes].includes(type);
 
       if (typeValid) {
-        const chainSlug = 'ton';
-        const tonApi = this.state.chainService.getTonApi(chainSlug);
-
-        return tonApi.getTonTokenBalanceSlug(address)
+        return subwalletApiSdk.balanceDetectionApi.getTonTokenBalanceSlug(address)
           .catch((e) => {
             console.error(e);
 
@@ -586,11 +566,9 @@ export class BalanceService implements StoppableServiceInterface {
 
     const balanceDataList = await Promise.all(promiseList);
     const evmBalanceDataList = await Promise.all(evmPromiseList);
-    const substrateBalanceDataList = await Promise.all(substratePromiseList);
     const tonBalanceDataList = await Promise.all(tonPromiseList);
     const allBalanceDataLists = [
       ...evmBalanceDataList,
-      ...substrateBalanceDataList,
       ...tonBalanceDataList
     ];
 

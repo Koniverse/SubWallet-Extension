@@ -6261,13 +6261,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet-monorepos/subwallet-services-sdk@npm:0.1.13-beta.2":
-  version: 0.1.13-beta.2
-  resolution: "@subwallet-monorepos/subwallet-services-sdk@npm:0.1.13-beta.2"
+"@subwallet-monorepos/subwallet-services-sdk@npm:0.1.13-beta.3":
+  version: 0.1.13-beta.3
+  resolution: "@subwallet-monorepos/subwallet-services-sdk@npm:0.1.13-beta.3"
   dependencies:
     "@koniverse/utils": ^0.0.9
     "@subwallet/chain-list": 0.2.121
-  checksum: 20f7d92473ad0df598e5129ff6f8254c8dbcc37cd3e2ede71270f7ec006e62e1752244df9b157b73af5402eb2a74089cd9a5413eee8b0ef26c4b1353671fdc29
+    "@ton/core": ^0.56.3
+    "@ton/crypto": ^3.2.0
+    "@ton/ton": ^15.0.0
+  checksum: 78e1b6ddc6776761c9af3b9fc4064330042645bba0246f3d6e850a1316c33df8ed8024c3297c188abbe3125f810ab55f92917ec2499bd9a53a5a7ef284b50c07
   languageName: node
   linkType: hard
 
@@ -6321,7 +6324,7 @@ __metadata:
     "@snowbridge/registry": ^0.2.0
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
-    "@subwallet-monorepos/subwallet-services-sdk": 0.1.13-beta.2
+    "@subwallet-monorepos/subwallet-services-sdk": 0.1.13-beta.3
     "@subwallet/chain-list": 0.2.121
     "@subwallet/extension-base": ^1.3.66-0
     "@subwallet/extension-chains": ^1.3.66-0
