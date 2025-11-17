@@ -14,7 +14,7 @@ import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAc
 import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
-import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
+import { EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import keyring from '@subwallet/ui-keyring';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
@@ -545,10 +545,10 @@ export class BalanceService implements StoppableServiceInterface {
       }
     });
 
-    // todo: merge this with promiseList
+    // todo: merge with promiseList
     const substratePromiseList = addresses.map((address) => {
       const type = getKeypairTypeByAddress(address);
-      const typeValid = [...EthereumKeypairTypes].includes(type);
+      const typeValid = [...SubstrateKeypairTypes, ...EthereumKeypairTypes].includes(type);
 
       if (typeValid) {
         return subwalletApiSdk.balanceDetectionApi.getSWSubscanTokenBalance(address)
@@ -562,11 +562,38 @@ export class BalanceService implements StoppableServiceInterface {
       }
     });
 
+    const tonPromiseList = addresses.map((address) => {
+      const type = getKeypairTypeByAddress(address);
+      const typeValid = [...TonKeypairTypes].includes(type);
+
+      if (typeValid) {
+        const chainSlug = 'ton';
+        const tonApi = this.state.chainService.getTonApi(chainSlug);
+
+        return tonApi.getTonTokenBalanceSlug(address)
+          .catch((e) => {
+            console.error(e);
+
+            return null;
+          });
+      } else {
+        return null;
+      }
+    });
+
     const needEnableChains: string[] = [];
     const needActiveTokens: string[] = [];
+
     const balanceDataList = await Promise.all(promiseList);
     const evmBalanceDataList = await Promise.all(evmPromiseList);
     const substrateBalanceDataList = await Promise.all(substratePromiseList);
+    const tonBalanceDataList = await Promise.all(tonPromiseList);
+    const allBalanceDataLists = [
+      ...evmBalanceDataList,
+      ...substrateBalanceDataList,
+      ...tonBalanceDataList
+    ];
+
     const currentAssetSettings = await this.state.chainService.getAssetSettings();
     const chainInfoMap = this.state.chainService.getChainInfoMap();
     const detectBalanceChainSlugMap = this.state.chainService.detectBalanceChainSlugMap;
@@ -608,39 +635,17 @@ export class BalanceService implements StoppableServiceInterface {
       }
     }
 
-    for (const balanceData of evmBalanceDataList) {
+    for (const balanceData of allBalanceDataLists) {
       if (balanceData) {
         for (const tokenSlug of balanceData) {
           const chainSlug = tokenSlug.split('-')[0];
           const chainState = this.state.chainService.getChainStateByKey(chainSlug);
-          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === tokenSlug.toLowerCase());
 
-          // Cancel if chain is turned off by user
-          if (chainState && chainState.manualTurnOff) {
+          if (chainState?.manualTurnOff) {
             continue;
           }
 
-          if (existedKey && !currentAssetSettings[existedKey]?.visible) {
-            needEnableChains.push(chainSlug);
-            needActiveTokens.push(existedKey);
-            currentAssetSettings[existedKey] = { visible: true };
-          }
-        }
-      }
-    }
-
-    // todo: remove this loop
-    for (const balanceData of substrateBalanceDataList) {
-      if (balanceData) {
-        for (const tokenSlug of balanceData) {
-          const chainSlug = tokenSlug.split('-')[0];
-          const chainState = this.state.chainService.getChainStateByKey(chainSlug);
           const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === tokenSlug.toLowerCase());
-
-          // Cancel if chain is turned off by user
-          if (chainState && chainState.manualTurnOff) {
-            continue;
-          }
 
           if (existedKey && !currentAssetSettings[existedKey]?.visible) {
             needEnableChains.push(chainSlug);
