@@ -26,7 +26,7 @@ interface Props extends ThemeProps {
   isDisableHeader?: boolean;
 }
 
-const Component = ({ children, className, isDisableHeader, showNotificationIcon, showSidebarIcon, showTabBar, showHeader = true }: Props) => {
+const Component = ({ children, className, isDisableHeader, showHeader = true, showNotificationIcon, showSidebarIcon, showTabBar }: Props) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { unreadNotificationCountMap } = useSelector((state: RootState) => state.notification);
