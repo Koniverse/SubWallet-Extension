@@ -81,7 +81,6 @@ function mapSdkToNftItem (
 
   // Only support ERC721
   if (normalizedType !== 'ERC721') {
-    console.log('rawInstance', rawInstance);
     return null;
   }
 
