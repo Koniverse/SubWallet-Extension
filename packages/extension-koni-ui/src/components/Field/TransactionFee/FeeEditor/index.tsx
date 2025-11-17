@@ -153,19 +153,23 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
     return chainValue && destChainValue && chainValue !== destChainValue;
   }, [chainValue, destChainValue]);
 
+  const isEnergyWebChain = useMemo(() => {
+    return chainValue === 'energy_web_chain';
+  }, [chainValue]);
+
   const { isEditButton, isEvmButNoCustomFeeSupport } = useMemo(() => {
     const isSubstrateSupport = !!(chainValue && feeType === 'substrate' && listTokensCanPayFee.length && (isChainSupportTokenPayFee(chainValue)));
     const isEvmSupport = !!(chainValue && feeType === 'evm');
     const isEvmCustomFeeEditable = isEvmSupport && !!feeOptionsInfo && 'options' in feeOptionsInfo && feeOptionsInfo.options != null;
 
     const isEvmButNoCustomFeeSupport = isEvmSupport && !isEvmCustomFeeEditable;
-    const isEditButton = (isSubstrateSupport || isEvmSupport) && !isXcm;
+    const isEditButton = (isSubstrateSupport || isEvmSupport) && !isXcm && !isEnergyWebChain;
 
     return {
       isEvmButNoCustomFeeSupport,
       isEditButton
     };
-  }, [chainValue, feeType, listTokensCanPayFee.length, feeOptionsInfo, isXcm]);
+  }, [chainValue, feeType, listTokensCanPayFee.length, feeOptionsInfo, isXcm, isEnergyWebChain]);
 
   const rateValue = useMemo(() => {
     const selectedToken = listTokensCanPayFee.find((item) => item.slug === tokenPayFeeSlug);
