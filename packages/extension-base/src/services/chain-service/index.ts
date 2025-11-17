@@ -2197,8 +2197,24 @@ export class ChainService {
     return this.assetSettingSubject.value;
   }
 
-  public setTemporarySettings (assetSettings: Record<string, AssetSetting>) {
-    this.temporaryAssetSetting = assetSettings;
+  public getTemporarySettings (): Record<string, AssetSetting> | undefined {
+    return this.temporaryAssetSetting;
+  }
+
+  public updateTemporarySettings (assetSettings: Record<string, AssetSetting>) {
+    if (!this.temporaryAssetSetting) {
+      this.temporaryAssetSetting = {};
+    }
+
+    this.temporaryAssetSetting = { ...this.temporaryAssetSetting, ...assetSettings };
+  }
+
+  public clearTemporarySettings (assetSlug: string) {
+    if (!this.temporaryAssetSetting) {
+      return;
+    }
+
+    delete this.temporaryAssetSetting[assetSlug];
   }
 
   public async updateAssetSetting (assetSlug: string, assetSetting: AssetSetting, autoEnableNativeToken?: boolean): Promise<boolean | undefined> {
@@ -2247,7 +2263,7 @@ export class ChainService {
     const currentAssetSettings = await this.getAssetSettings();
     const assetsByChain = this.getFungibleTokensByChain(chainSlug);
     const priorityTokensMap = this.priorityTokensSubject.value || {};
-    const temporaryAssetSettings = this.temporaryAssetSetting;
+    const temporaryAssetSettings = this.getTemporarySettings();
 
     const priorityTokensList = priorityTokensMap.token && typeof priorityTokensMap.token === 'object'
       ? Object.keys(priorityTokensMap.token)
