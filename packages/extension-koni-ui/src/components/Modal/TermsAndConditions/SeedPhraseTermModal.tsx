@@ -42,10 +42,10 @@ const Component = ({ className }: Props) => {
   const { token } = useTheme() as Theme;
 
   const ListTermSeedPhrase: Record<TermSeedPhrase, string> = useMemo(() => ({
-    [TermSeedPhrase.TERM_1]: t('SubWallet doesn\'t keep any copy of your seed phrase and other backup methods such as JSON file or private key.'),
-    [TermSeedPhrase.TERM_2]: t('SubWallet can\'t help you recover your account once your seed phrase, JSON file or private key is lost.'),
-    [TermSeedPhrase.TERM_3]: t('You must write down your seed phrase in the correct order. It is recommended that you store it in a secure offline location.'),
-    [TermSeedPhrase.TERM_4]: t('You are NOT recommended to download and store your seed phrase in a digital device.')
+    [TermSeedPhrase.TERM_1]: t('ui.TERM.components.Modal.Terms.SeedPhrase.subwalletDoesNotKeepSeed'),
+    [TermSeedPhrase.TERM_2]: t('ui.TERM.components.Modal.Terms.SeedPhrase.subwalletCannotRecoverAccount'),
+    [TermSeedPhrase.TERM_3]: t('ui.TERM.components.Modal.Terms.SeedPhrase.writeSeedPhraseInOrder'),
+    [TermSeedPhrase.TERM_4]: t('ui.TERM.components.Modal.Terms.SeedPhrase.doNotStoreSeedDigitally')
   }), [t]);
 
   const ListTermItem: TermSeedPhrase[] = useMemo(() => [TermSeedPhrase.TERM_1, TermSeedPhrase.TERM_2, TermSeedPhrase.TERM_3, TermSeedPhrase.TERM_4], []);
@@ -99,7 +99,9 @@ const Component = ({ className }: Props) => {
   }, [inactiveModal, isCheckDontShow, setConfirmTermSeedPhrase]);
 
   const subTitle = useMemo(() => {
-    return useDefaultContent ? t('Tap on all checkboxes to confirm you understand the importance of your seed phrase') : t('This seed phrase creates a unified account that can be used for Polkadot, Ethereum, Bitcoin and TON ecosystem. Keep in mind that for TON specifically, this seed phrase is not compatible with TON-native wallets.');
+    return useDefaultContent
+      ? t('ui.TERM.components.Modal.Terms.SeedPhrase.confirmSeedPhraseImportance')
+      : t('ui.TERM.components.Modal.Terms.SeedPhrase.seedPhraseAccount');
   }, [useDefaultContent, t]);
 
   return (
@@ -107,7 +109,7 @@ const Component = ({ className }: Props) => {
       className={CN(className)}
       closable={false}
       id={modalId}
-      title={t('Keep your seed phrase safe')}
+      title={t('ui.TERM.components.Modal.Terms.SeedPhrase.keepYourSeedPhraseSafe')}
     >
       <div
         className={'term-body'}
@@ -127,7 +129,7 @@ const Component = ({ className }: Props) => {
           checked={isCheckDontShow}
           className={'term-footer-checkbox'}
           onChange={onCheckedInput}
-        >{t('Don’t show again')}</Checkbox>
+        >{t('ui.TERM.components.Modal.Terms.SeedPhrase.dontShowAgain')}</Checkbox>
         <Button
           block={true}
           className={'term-footer-button'}
@@ -140,7 +142,7 @@ const Component = ({ className }: Props) => {
           )}
           onClick={onConfirm}
         >
-          {t('Continue')}
+          {t('ui.TERM.components.Modal.Terms.SeedPhrase.continue')}
         </Button>
       </div>
     </SwModal>

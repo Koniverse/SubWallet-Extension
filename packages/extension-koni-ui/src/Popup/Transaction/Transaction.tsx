@@ -3,28 +3,33 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@subwallet/extension-koni-ui/components';
-import { DEFAULT_TRANSACTION_PARAMS, TRANSACTION_TITLE_MAP } from '@subwallet/extension-koni-ui/constants';
+import { CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { TransactionContext } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
+import { TransactionContext, TransactionContextProps } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
 import { useAlert, useChainChecker, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ManageChainsParam, Theme, ThemeProps, TransactionFormBaseProps } from '@subwallet/extension-koni-ui/types';
-import { detectTransactionPersistKey } from '@subwallet/extension-koni-ui/utils';
+import { detectTransactionPersistKey, getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, ModalContext, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
-import React, { useCallback, useContext, useDeferredValue, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
 interface Props extends ThemeProps {
-  title: string,
-  transactionType: string
+  title?: string,
+  transactionType?: ExtrinsicType
+  children?: React.ReactNode;
+  modalContent?: boolean;
+  modalId?: string;
 }
 
 const recheckChainConnectionModalId = 'recheck-chain-connection-modal-id';
 const alertModalId = 'transaction-alert-modal-id';
 
-function Component ({ className }: Props) {
+function Component ({ children, className, modalContent, modalId, transactionType: transactionTypeProps }: Props) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,10 +37,17 @@ function Component ({ className }: Props) {
 
   const dataContext = useContext(DataContext);
 
+  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
+
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
   const [recheckingChain, setRecheckingChain] = useState<string | undefined>();
+  const [forceRerenderKey, setForceRerenderKey] = useState('ForceRerenderKey');
 
   const transactionType = useMemo((): ExtrinsicType => {
+    if (transactionTypeProps) {
+      return transactionTypeProps;
+    }
+
     const pathName = location.pathname;
     const action = pathName.split('/')[2] || '';
 
@@ -62,19 +74,111 @@ function Component ({ className }: Props) {
       default:
         return ExtrinsicType.TRANSFER_BALANCE;
     }
-  }, [location.pathname]);
+  }, [location.pathname, transactionTypeProps]);
 
   const storageKey = useMemo((): string => detectTransactionPersistKey(transactionType), [transactionType]);
 
-  const [storage, setStorage] = useLocalStorage<TransactionFormBaseProps>(storageKey, DEFAULT_TRANSACTION_PARAMS);
+  const defaultTransactionStorageValue = useMemo(() => {
+    const fromAccountProxy = getTransactionFromAccountProxyValue(currentAccountProxy);
 
-  const cacheStorage = useDeferredValue(storage);
+    if (storageKey === NFT_TRANSACTION) {
+      return {
+        ...DEFAULT_NFT_PARAMS,
+        fromAccountProxy
+      };
+    }
 
-  const needPersistData = useMemo(() => {
-    return JSON.stringify(cacheStorage) === JSON.stringify(DEFAULT_TRANSACTION_PARAMS);
-  }, [cacheStorage]);
+    if (storageKey === TRANSFER_TRANSACTION) {
+      return {
+        ...DEFAULT_TRANSFER_PARAMS,
+        fromAccountProxy
+      };
+    }
 
-  const [defaultData] = useState(storage);
+    // STAKE_TRANSACTION current is deprecated
+    // if (storageKey === STAKE_TRANSACTION) {
+    //   return {
+    //     ...DEFAULT_STAKE_PARAMS,
+    //     fromAccountProxy
+    //   };
+    // }
+
+    if (storageKey === EARN_TRANSACTION) {
+      return {
+        ...DEFAULT_EARN_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === UN_STAKE_TRANSACTION) {
+      return {
+        ...DEFAULT_UN_STAKE_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === CANCEL_UN_STAKE_TRANSACTION) {
+      return {
+        ...DEFAULT_CANCEL_UN_STAKE_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === WITHDRAW_TRANSACTION) {
+      return {
+        ...DEFAULT_WITHDRAW_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === CLAIM_REWARD_TRANSACTION) {
+      return {
+        ...DEFAULT_CLAIM_REWARD_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === SWAP_TRANSACTION) {
+      return {
+        ...DEFAULT_SWAP_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === CLAIM_BRIDGE_TRANSACTION) {
+      return {
+        ...DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === CHANGE_VALIDATOR_TRANSACTION) {
+      return {
+        ...DEFAULT_CHANGE_VALIDATOR_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    return {
+      ...DEFAULT_TRANSACTION_PARAMS,
+      fromAccountProxy
+    };
+  }, [currentAccountProxy, storageKey]);
+
+  const [storage, setStorage] = useLocalStorage<TransactionFormBaseProps>(storageKey, { ...defaultTransactionStorageValue });
+
+  // TODO: Review needPersistData — may be outdated and misaligned with current logic
+  //  Temporarily set needPersistData to false to avoid unintended side effects
+
+  // const cacheStorage = useDeferredValue(storage);
+
+  // const needPersistData = useMemo(() => {
+  //   return JSON.stringify(cacheStorage) === JSON.stringify(DEFAULT_TRANSACTION_PARAMS);
+  // }, [cacheStorage]);
+
+  const needPersistData = false;
+
+  const [defaultData, setDefaultData] = useState(storage);
   const { chain, from } = storage;
 
   const homePath = useMemo((): string => {
@@ -128,7 +232,7 @@ function Component ({ className }: Props) {
     (extrinsicHash: string) => {
       navigate(`/transaction-done/${from}/${chain}/${extrinsicHash}`, { replace: true });
     },
-    [from, chain, navigate]
+    [navigate, from, chain]
   );
 
   const openRecheckChainConnectionModal = useCallback((chainName: string) => {
@@ -150,6 +254,91 @@ function Component ({ className }: Props) {
     chain !== '' && chainChecker(chain);
   }, [chain, chainChecker]);
 
+  // TODO (Hotfix):
+  //  Temporary workaround for handling cases where a user opens a transaction screen via direct link.
+  //  This fixes the issue where form values are incorrectly restored from a previously cached transaction.
+  //  Expected direction:
+  //  - Allow external logic to override form values cleanly.
+  //  - fromAccountProxy should not be strictly tied to currentAccountProxy.
+  //  - Ensure direct link access to transaction screens works reliably and cleanly without stale form data.
+  useEffect(() => {
+    const doFunction = () => {
+      if (![SWAP_TRANSACTION, TRANSFER_TRANSACTION, EARN_TRANSACTION].includes(storageKey)) {
+        return;
+      }
+
+      if (!currentAccountProxy) {
+        return;
+      }
+
+      if (getTransactionFromAccountProxyValue(currentAccountProxy) === storage.fromAccountProxy) {
+        return;
+      }
+
+      setStorage({
+        ...defaultTransactionStorageValue
+      });
+      setDefaultData({
+        ...defaultTransactionStorageValue
+      });
+      setForceRerenderKey(`${Date.now()}_ForceRerenderKey`);
+    };
+
+    doFunction();
+  }, [currentAccountProxy, defaultTransactionStorageValue, setStorage, storage.fromAccountProxy, storageKey]);
+
+  const contextValues = useMemo<TransactionContextProps>(() => ({
+    defaultData,
+    needPersistData,
+    persistData: setStorage,
+    onDone,
+    setSubHeaderRightButtons,
+    setCustomScreenTitle,
+    goBack,
+    setBackProps,
+    closeAlert,
+    openAlert,
+    openRecheckChainConnectionModal,
+    closeRecheckChainConnectionModal,
+    modalId,
+    setIsDisableHeader
+  }), [closeAlert, closeRecheckChainConnectionModal, defaultData, goBack, modalId, needPersistData, onDone, openAlert, openRecheckChainConnectionModal, setStorage]);
+
+  const recheckChainConnectionModalNode = (
+    <>
+      <RecheckChainConnectionModal
+        modalId={recheckChainConnectionModalId}
+        onCancel={closeRecheckChainConnectionModal}
+        onClickConfirm={onClickConfirmOnRecheckChainConnectionModal}
+      />
+
+      {
+        !!alertProps && (
+          <AlertModal
+            modalId={alertModalId}
+            {...alertProps}
+          />
+        )
+      }
+    </>
+  );
+
+  if (modalContent) {
+    return (
+      <>
+        <TransactionContext.Provider value={contextValues}>
+          <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance'])}>
+            <div className={CN(className, 'transaction-wrapper __modal-content')}>
+              {children}
+            </div>
+          </PageWrapper>
+        </TransactionContext.Provider>
+
+        {recheckChainConnectionModalNode}
+      </>
+    );
+  }
+
   return (
     <>
       <Layout.Home
@@ -157,24 +346,12 @@ function Component ({ className }: Props) {
         showFaderIcon
         showTabBar={false}
       >
-        <TransactionContext.Provider value={{
-          defaultData,
-          needPersistData,
-          persistData: setStorage,
-          onDone,
-          setSubHeaderRightButtons,
-          setIsDisableHeader,
-          setCustomScreenTitle,
-          goBack,
-          setBackProps,
-          closeAlert,
-          openAlert,
-          openRecheckChainConnectionModal,
-          closeRecheckChainConnectionModal
-        }}
-        >
+        <TransactionContext.Provider value={contextValues}>
           <PageWrapper resolve={dataContext.awaitStores(['chainStore', 'assetRegistry', 'balance', 'price'])}>
-            <div className={CN(className, 'transaction-wrapper')}>
+            <div
+              className={CN(className, 'transaction-wrapper')}
+              key={forceRerenderKey}
+            >
               <SwSubHeader
                 background={'transparent'}
                 center

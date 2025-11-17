@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _NetworkUpsertParams } from '@subwallet/extension-base/services/chain-service/types';
-import { _getBlockExplorerFromChain, _getChainNativeTokenBasicInfo, _getChainSubstrateAddressPrefix, _getCrowdloanUrlFromChain, _getEvmChainId, _getSubstrateParaId, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomChain, _isPureEvmChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getBlockExplorerFromChain, _getChainNativeTokenBasicInfo, _getChainSubstrateAddressPrefix, _getCrowdloanUrlFromChain, _getEvmChainId, _getSubstrateParaId, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible, _isCustomChain, _isPureEvmChain, _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { isUrl } from '@subwallet/extension-base/utils';
 import { Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { ProviderSelector } from '@subwallet/extension-koni-ui/components/Field/ProviderSelector';
@@ -38,13 +38,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const showNotification = useNotification();
   const [form] = Form.useForm<ChainDetailForm>();
   const { handleSimpleConfirmModal } = useConfirmModal({
-    title: t<string>('Delete network'),
+    title: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.deleteNetwork'),
     maskClosable: true,
     closable: true,
     type: 'error',
-    subTitle: t<string>('You are about to delete this network'),
-    content: t<string>('Confirm delete this network'),
-    okText: t<string>('Remove')
+    subTitle: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.aboutToDeleteNetwork'),
+    content: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.confirmDeleteNetwork'),
+    okText: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.remove')
   });
 
   const [isChanged, setIsChanged] = useState(false);
@@ -61,14 +61,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const [chainInfo] = useState(_chainInfo);
   const [chainState] = useState(_chainState);
-
-  const isPureTonChain = useMemo(() => {
-    return chainInfo && _isPureTonChain(chainInfo);
-  }, [chainInfo]);
-
-  const isPureEvmChain = useMemo(() => {
-    return chainInfo && _isPureEvmChain(chainInfo);
-  }, [chainInfo]);
 
   const { decimals, symbol } = useMemo(() => {
     return _getChainNativeTokenBasicInfo(chainInfo);
@@ -103,18 +95,18 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             if (result) {
               navigate(-1);
               showNotification({
-                message: t('Deleted network successfully')
+                message: t('ui.SETTINGS.screen.Setting.Chains.Detail.deletedNetworkSuccessfully')
               });
             } else {
               showNotification({
-                message: t('Error. Please try again')
+                message: t('ui.SETTINGS.screen.Setting.Chains.Detail.errorPleaseTryAgain')
               });
               setIsDeleting(false);
             }
           })
           .catch(() => {
             showNotification({
-              message: t('Error. Please try again')
+              message: t('ui.SETTINGS.screen.Setting.Chains.Detail.errorPleaseTryAgain')
             });
             setIsDeleting(false);
           });
@@ -134,8 +126,16 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       types.push('EVM');
     }
 
-    if (chainInfo.slug === 'ton') {
-      types.push('TON');
+    if (_isChainTonCompatible(chainInfo)) {
+      types.push('Ton');
+    }
+
+    if (_isChainCardanoCompatible(chainInfo)) {
+      types.push('Cardano');
+    }
+
+    if (_isChainBitcoinCompatible(chainInfo)) {
+      types.push('Bitcoin');
     }
 
     for (let i = 0; i < types.length; i++) {
@@ -202,19 +202,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
         if (result) {
           showNotification({
-            message: t('Updated network successfully')
+            message: t('ui.SETTINGS.screen.Setting.Chains.Detail.updatedNetworkSuccessfully')
           });
           navigate(-1);
         } else {
           showNotification({
-            message: t('An error occurred, please try again')
+            message: t('ui.SETTINGS.screen.Setting.Chains.Detail.anErrorOccurredPleaseTryAgain')
           });
         }
       })
       .catch(() => {
         setLoading(false);
         showNotification({
-          message: t('An error occurred, please try again')
+          message: t('ui.SETTINGS.screen.Setting.Chains.Detail.anErrorOccurredPleaseTryAgain')
         });
       });
   }, [chainInfo.providers, chainInfo.slug, form, navigate, showNotification, t]);
@@ -254,7 +254,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (value.length === 0 || isUrl(value)) {
         resolve();
       } else {
-        reject(new Error(t('Crowdloan URL must be a valid URL')));
+        reject(new Error(t('ui.SETTINGS.screen.Setting.Chains.Detail.crowdloanUrlMustBeValid')));
       }
     });
   }, [t]);
@@ -264,10 +264,37 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (value.length === 0 || isUrl(value)) {
         resolve();
       } else {
-        reject(new Error(t('Block explorer must be a valid URL')));
+        reject(new Error(t('ui.SETTINGS.screen.Setting.Chains.Detail.blockExplorerMustBeValid')));
       }
     });
   }, [t]);
+
+  const { isAddressPrefixVisible,
+    isChainIdVisible,
+    isCrowdloanURLVisible,
+    isParaIdVisible } = useMemo(() => {
+    if (!chainInfo) {
+      return {
+        isParaIdVisible: false,
+        isChainIdVisible: false,
+        isAddressPrefixVisible: false,
+        isCrowdloanURLVisible: false
+      };
+    }
+
+    const isPureSubstrateChain = _isPureSubstrateChain(chainInfo);
+    const isPureEvmChain = _isPureEvmChain(chainInfo);
+    // const isPureTonChain = _isPureTonChain(chainInfo);
+    // const isPureCardanoChain = _isPureCardanoChain(chainInfo);
+    // const isPureBitcoinChain = _isPureBitcoinChain(chainInfo);
+
+    return {
+      isParaIdVisible: isPureSubstrateChain,
+      isChainIdVisible: isPureEvmChain,
+      isAddressPrefixVisible: isPureSubstrateChain,
+      isCrowdloanURLVisible: isPureSubstrateChain
+    };
+  }, [chainInfo]);
 
   return (
     <PageWrapper
@@ -288,7 +315,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           ),
           loading: loading,
           onClick: onSubmit,
-          children: t('Save')
+          children: t('ui.SETTINGS.screen.Setting.Chains.Detail.save')
         }}
         showBackButton={true}
         showSubHeader={true}
@@ -296,7 +323,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Network detail')}
+        title={t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.networkDetail')}
       >
         <div className={'chain_detail__container'}>
           <Form
@@ -320,7 +347,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   : <Field
                     className={'chain_detail__provider_url'}
                     content={currentProviderUrl}
-                    placeholder={t('Provider URL')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.providerUrl')}
                     prefix={<Icon
                       customSize={'24px'}
                       iconColor={token['gray-4']}
@@ -336,7 +363,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col span={16}>
                   <Field
                     content={chainInfo.name}
-                    placeholder={t('Network name')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.networkName')}
                     prefix={<Icon
                       customSize={'24px'}
                       iconColor={token['gray-4']}
@@ -344,91 +371,77 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                       type={'phosphor'}
                       weight={'bold'}
                     />}
-                    tooltip={t('Network name')}
+                    tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.networkName')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
                 <Col span={8}>
                   <Field
                     content={symbol}
-                    placeholder={t('Symbol')}
-                    tooltip={t('Symbol')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.symbol')}
+                    tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.symbol')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
               </Row>
 
-              <Row gutter={token.paddingSM}>
-                <Col span={12}>
+              <Row className={'auto-sizing-col-container'}>
+                <Col>
                   <Field
                     content={decimals}
-                    placeholder={t('Decimals')}
-                    tooltip={t('Decimals')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.decimals')}
+                    tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.decimals')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
 
                 {
-                  !isPureTonChain &&
-                <Col span={12}>
-                  {
-                    !isPureEvmChain
-                      ? (
-                        <Field
-                          content={paraId > -1 ? paraId : undefined}
-                          placeholder={t('ParaId')}
-                          tooltip={t('ParaId')}
-                          tooltipPlacement={'topLeft'}
-                        />
-                      )
-                      : (
-                        <Field
-                          content={chainId > -1 ? chainId : 'None'}
-                          placeholder={t('Chain ID')}
-                          tooltip={t('Chain ID')}
-                          tooltipPlacement={'topLeft'}
-                        />
-                      )
-                  }
+                  isParaIdVisible && (
+                    <Col>
+                      <Field
+                        content={paraId > -1 ? paraId : undefined}
+                        placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.paraId')}
+                        tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.paraId')}
+                        tooltipPlacement={'topLeft'}
+                      />
+                    </Col>
+                  )
+                }
+
+                {
+                  isChainIdVisible && (
+                    <Col>
+                      <Field
+                        content={chainId > -1 ? chainId : 'None'}
+                        placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.chainId')}
+                        tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.chainId')}
+                        tooltipPlacement={'topLeft'}
+                      />
+                    </Col>
+                  )
+                }
+
+                {
+                  isAddressPrefixVisible && (
+                    <Col>
+                      <Field
+                        content={addressPrefix.toString()}
+                        placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.addressPrefix')}
+                        tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.addressPrefix')}
+                        tooltipPlacement={'topLeft'}
+                      />
+                    </Col>
+                  )
+                }
+
+                <Col>
+                  <Field
+                    content={chainTypeString()}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.networkType')}
+                    tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.networkType')}
+                    tooltipPlacement={'topLeft'}
+                  />
                 </Col>
-                }
-                {
-                  isPureTonChain &&
-                  <Col span={!isPureEvmChain ? 12 : 24}>
-                    <Field
-                      content={chainTypeString()}
-                      placeholder={t('Network type')}
-                      tooltip={t('Network type')}
-                      tooltipPlacement={'topLeft'}
-                    />
-                  </Col>
-                }
-              </Row>
-
-              <Row gutter={token.paddingSM}>
-                {
-                  (!isPureEvmChain && !isPureTonChain) &&
-                  <Col span={12}>
-                    <Field
-                      content={addressPrefix.toString()}
-                      placeholder={t('Address prefix')}
-                      tooltip={t('Address prefix')}
-                      tooltipPlacement={'topLeft'}
-                    />
-                  </Col>
-                }
-
-                {
-                  !isPureTonChain &&
-                  <Col span={!isPureEvmChain ? 12 : 24}>
-                    <Field
-                      content={chainTypeString()}
-                      placeholder={t('Network type')}
-                      tooltip={t('Network type')}
-                      tooltipPlacement={'topLeft'}
-                    />
-                  </Col>
-                }
               </Row>
 
               <Form.Item
@@ -437,21 +450,21 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 statusHelpAsTooltip={true}
               >
                 <Input
-                  placeholder={t('Block explorer')}
-                  tooltip={t('Block explorer')}
+                  placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.blockExplorer')}
+                  tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.blockExplorer')}
                   tooltipPlacement={'topLeft'}
                 />
               </Form.Item>
 
               {
-                (!_isPureEvmChain(chainInfo) && !isPureTonChain) && <Form.Item
+                isCrowdloanURLVisible && <Form.Item
                   name={'crowdloanUrl'}
                   rules={[{ validator: crowdloanUrlValidator }]}
                   statusHelpAsTooltip={true}
                 >
                   <Input
-                    placeholder={t('Crowdloan URL')}
-                    tooltip={t('Crowdloan URL')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.crowdloanUrl')}
+                    tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.crowdloanUrl')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Form.Item>
@@ -470,6 +483,21 @@ const ChainDetail = styled(Component)<Props>(({ theme: { token } }: Props) => {
       marginTop: 22,
       marginRight: token.margin,
       marginLeft: token.margin
+    },
+
+    '.ant-field-wrapper.ant-field-wrapper': {
+      paddingLeft: token.paddingSM,
+      paddingRight: token.paddingSM
+    },
+
+    '.auto-sizing-col-container': {
+      flexWrap: 'wrap',
+      gap: token.sizeSM,
+
+      '.ant-col': {
+        flexGrow: 1,
+        flexBasis: '35%'
+      }
     },
 
     '.chain_detail__attributes_container': {

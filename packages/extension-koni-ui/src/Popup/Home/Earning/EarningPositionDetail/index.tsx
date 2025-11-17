@@ -4,6 +4,7 @@
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
+import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { EarningRewardHistoryItem, SpecialYieldPoolInfo, SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AlertModal, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { BN_TEN, BN_ZERO, DEFAULT_EARN_PARAMS, DEFAULT_UN_STAKE_PARAMS, EARN_TRANSACTION, UN_STAKE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
@@ -18,7 +19,7 @@ import { getTransactionFromAccountProxyValue, isAccountAll } from '@subwallet/ex
 import { Button, ButtonProps, Icon, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { MinusCircle, Plus, PlusCircle } from 'phosphor-react';
+import { CheckCircle, MinusCircle, Plus, PlusCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -53,11 +54,11 @@ function Component ({ compound,
       return ALL_ACCOUNT_KEY;
     }
 
-    const accountAddress = currentAccountProxy?.accounts.find(({ chainType, type: accountType }) => {
+    const accountAddress = currentAccountProxy?.accounts.find((accountInfo) => {
       if (chainInfoMap[poolInfo.chain]) {
         const chainInfo = chainInfoMap[poolInfo.chain];
 
-        return _isChainInfoCompatibleWithAccountInfo(chainInfo, chainType, accountType);
+        return _isChainInfoCompatibleWithAccountInfo(chainInfo, accountInfo);
       }
 
       return false;
@@ -113,9 +114,31 @@ function Component ({ compound,
     }
   }, [targetAddress, isAllAccount, poolInfo.slug, rewardHistories]);
 
+  const totalNominationStake = useMemo(() => {
+    let total = BN_ZERO;
+
+    if (!compound?.nominations?.length) {
+      return total;
+    }
+
+    for (const nomination of compound.nominations) {
+      const stake = new BigN(nomination.activeStake || 0);
+
+      total = total.plus(stake);
+    }
+
+    return total;
+  }, [compound.nominations]);
+
   const isActiveStakeZero = useMemo(() => {
     return BN_ZERO.eq(activeStake);
   }, [activeStake]);
+
+  const isTotalNominationStakeZero = useMemo(() => {
+    return BN_ZERO.eq(totalNominationStake);
+  }, [totalNominationStake]);
+
+  const isTanssiStaking = useMemo(() => _STAKING_CHAIN_GROUP.tanssi.includes(compound.chain), [compound.chain]);
 
   const transactionFromValue = useMemo(() => {
     return targetAddress ? isAccountAll(targetAddress) ? '' : targetAddress : '';
@@ -126,13 +149,28 @@ function Component ({ compound,
   }, [compound.chain, poolInfo.chain]);
 
   const onLeavePool = useCallback(() => {
+    if (((!isAllAccount && isTotalNominationStakeZero) || (isAllAccount && isActiveStakeZero)) && isTanssiStaking) {
+      openAlert({
+        title: t('ui.EARNING.screen.EarningPositionDetail.unstakeNotAvailable'),
+        type: NotificationType.ERROR,
+        content: t('ui.EARNING.screen.EarningPositionDetail.noStakedFunds'),
+        okButton: {
+          text: t('ui.EARNING.screen.EarningPositionDetail.iUnderstand'),
+          onClick: closeAlert,
+          icon: CheckCircle
+        }
+      });
+
+      return;
+    }
+
     if (isActiveStakeZero) {
       openAlert({
-        title: t('Unstaking not available'),
+        title: t('ui.EARNING.screen.EarningPositionDetail.unstakingNotAvailable'),
         type: NotificationType.ERROR,
-        content: t("You don't have any staked funds left to unstake. Check withdrawal status (how long left until the unstaking period ends) by checking the Withdraw info. Keep in mind that you need to withdraw manually."),
+        content: t('ui.EARNING.screen.EarningPositionDetail.noStakedFundsToUnstake'),
         okButton: {
-          text: t('OK'),
+          text: t('ui.EARNING.screen.EarningPositionDetail.ok'),
           onClick: closeAlert
         }
       });
@@ -147,7 +185,7 @@ function Component ({ compound,
       from: transactionFromValue
     });
     navigate('/transaction/unstake');
-  }, [isActiveStakeZero, setUnStakeStorage, poolInfo.slug, transactionChainValue, transactionFromValue, navigate, openAlert, t, closeAlert]);
+  }, [isAllAccount, isTotalNominationStakeZero, isActiveStakeZero, isTanssiStaking, setUnStakeStorage, poolInfo.slug, transactionChainValue, transactionFromValue, navigate, openAlert, t, closeAlert]);
 
   const onEarnMore = useCallback(() => {
     setEarnStorage({
@@ -204,10 +242,10 @@ function Component ({ compound,
         subHeaderCenter={false}
         subHeaderIcons={subHeaderButtons}
         subHeaderPaddingVertical={true}
-        title={t<string>('Earning position details')}
+        title={t<string>('ui.EARNING.screen.EarningPositionDetail.earningPositionDetails')}
       >
         <div className={'__active-stake-info-area'}>
-          <div className={'__active-stake-title'}>{t('Active stake')}</div>
+          <div className={'__active-stake-title'}>{t('ui.EARNING.screen.EarningPositionDetail.activeStake')}</div>
           <Number
             className={'__active-stake-value'}
             decimal={inputAsset?.decimals || 0}
@@ -251,7 +289,7 @@ function Component ({ compound,
             onClick={onLeavePool}
             schema='secondary'
           >
-            {poolInfo.type === YieldPoolType.LENDING ? t('Withdraw') : t('Unstake')}
+            {poolInfo.type === YieldPoolType.LENDING ? t('ui.EARNING.screen.EarningPositionDetail.withdraw') : t('ui.EARNING.screen.EarningPositionDetail.unstake')}
           </Button>
 
           <Button
@@ -266,7 +304,7 @@ function Component ({ compound,
             onClick={onEarnMore}
             schema='secondary'
           >
-            {poolInfo.type === YieldPoolType.LENDING ? t('Supply more') : t('Stake more')}
+            {poolInfo.type === YieldPoolType.LENDING ? t('ui.EARNING.screen.EarningPositionDetail.supplyMore') : t('ui.EARNING.screen.EarningPositionDetail.stakeMore')}
           </Button>
         </div>
 

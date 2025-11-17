@@ -62,6 +62,12 @@ export interface AbstractYieldPositionInfo extends BaseYieldPositionInfo {
     subnetShortName: string;
     originalTotalStake: string;
   };
+
+  metadata?: {
+    pendingStake?: string;
+    compoundingStake?: string;
+    manualStake?: string;
+  }
 }
 
 /**
@@ -118,6 +124,7 @@ export interface SubnetYieldPositionInfo extends AbstractYieldPositionInfo {
     subnetSymbol: string;
     subnetShortName: string;
     originalTotalStake: string;
+    netuid?: number;
   };
 }
 

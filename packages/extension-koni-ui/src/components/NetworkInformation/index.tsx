@@ -47,7 +47,7 @@ function Component ({ activeNominators,
       rightIconProps={{
         icon: <InfoIcon />
       }}
-      title={t('Network details')}
+      title={t('ui.NETWORK.components.NetworkInformation.networkDetails')}
     >
       <MetaInfo
         hasBackgroundWrapper
@@ -58,7 +58,7 @@ function Component ({ activeNominators,
           stakingType === StakingType.NOMINATED && (
             <>
               <MetaInfo.Number
-                label={t('Max nomination')}
+                label={t('ui.NETWORK.components.NetworkInformation.maxNomination')}
                 value={maxValidatorPerNominator}
                 valueColorSchema={'even-odd'}
               />
@@ -66,7 +66,7 @@ function Component ({ activeNominators,
               {
                 !!activeNominators &&
                 (
-                  <MetaInfo.Default label={t('Total nominators')}>
+                  <MetaInfo.Default label={t('ui.NETWORK.components.NetworkInformation.totalNominators')}>
                     <div className={'__active-nominators-value'}>
                       <Number
                         className={'__current-nominator-count'}
@@ -86,7 +86,7 @@ function Component ({ activeNominators,
 
         {!!estimatedEarning && !!inflation &&
           <MetaInfo.Default
-            label={t('Estimated earnings')}
+            label={t('ui.NETWORK.components.NetworkInformation.estimatedEarnings')}
             labelAlign={'top'}
           >
             <div className={'__active-nominators-value'}>
@@ -109,20 +109,20 @@ function Component ({ activeNominators,
                 unitOpacity={1}
                 value={new BigNumber(estimatedEarning).minus(inflation)}
               />
-              <span className={'__inflation'}>{t('after inflation')}</span>
+              <span className={'__inflation'}>{t('ui.NETWORK.components.NetworkInformation.afterInflation')}</span>
             </div>
           </MetaInfo.Default>
         }
 
         <MetaInfo.Number
           decimals={minimumActive.decimals}
-          label={t('Minimum active')}
+          label={t('ui.NETWORK.components.NetworkInformation.minimumActive')}
           suffix={minimumActive.symbol}
           value={minimumActive.value}
           valueColorSchema={'success'}
         />
 
-        {!!unstakingPeriod && <MetaInfo.Default label={t('Unstaking period')}>
+        {!!unstakingPeriod && <MetaInfo.Default label={t('ui.NETWORK.components.NetworkInformation.unstakingPeriod')}>
           <span>{getUnstakingPeriod(t, unstakingPeriod)}</span>
         </MetaInfo.Default>}
       </MetaInfo>

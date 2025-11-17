@@ -107,7 +107,8 @@ export function determineUtxosForSpendAll ({ feeRate,
     inputs: filteredUtxos,
     outputs,
     size: sizeInfo.txVBytes,
-    fee
+    fee,
+    isCustomFeeRate: false
   };
 }
 
@@ -192,26 +193,24 @@ export function determineUtxosForSpend ({ amount,
     outputs.push({ value: amountLeft.toNumber(), address: sender });
   } else {
     // Todo: This solution for improve later, current throw error
-
-    // console.warn(
-    //   `Change output of ${amountLeft.toString()} satoshis is below dust limit (${dustLimit} satoshis for ${senderAddressInfo.type}). Omitting change output and adding to fee.`
-    // );
     // // Increase the fee to use the remaining balance
-    // const newFee = sum.minus(amount).toNumber();
-    //
-    // return {
-    //   filteredUtxos,
-    //   inputs: neededUtxos,
-    //   outputs,
-    //   size: sizeInfo.txVBytes,
-    //   fee: newFee
-    // };
-
-    // const atLeastStr = formatNumber(dustLimit, 8, balanceFormatter, { maxNumberFormat: 8, minNumberFormat: 8 });
-    // throw new TransactionError(TransferTxErrorType.NOT_ENOUGH_VALUE, `You must transfer at least ${atLeastStr} BTC`);
-
-    // Do nothing with the remaining balance (amountLeft < dustLimit)
     console.warn(`Change output of ${amountLeft.toString()} satoshis is below dust limit (${dustLimit} satoshis for ${senderAddressInfo.type}). Omitting change output.`);
+    //
+    sizeInfo = getSizeInfo({
+      inputLength: neededUtxos.length,
+      sender,
+      recipients: recipients.slice(0, 1)
+    });
+    const newFee = sum.minus(amount).toNumber();
+
+    return {
+      filteredUtxos,
+      inputs: neededUtxos,
+      outputs,
+      size: sizeInfo.txVBytes,
+      fee: newFee,
+      isCustomFeeRate: true
+    };
   }
 
   return {
@@ -219,7 +218,8 @@ export function determineUtxosForSpend ({ amount,
     inputs: neededUtxos,
     outputs,
     size: sizeInfo.txVBytes,
-    fee
+    fee,
+    isCustomFeeRate: false
   };
 }
 

@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountChainType } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { ALL_STAKING_ACTIONS, isLedgerCapable, isProductionMode, ledgerIncompatible } from '@subwallet/extension-koni-ui/constants';
-// TODO: Use AccountSignMode from the background for consistency.
-import { AccountSignMode } from '@subwallet/extension-koni-ui/types';
+import { ALL_STAKING_ACTIONS, isLedgerCapable, isProductionMode, ledgerIncompatible, SubstrateLedgerSignModeSupport } from '@subwallet/extension-koni-ui/constants';
 import { useCallback } from 'react';
 
 import { useNotification, useTranslation } from '../common';
@@ -22,18 +20,19 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
     switch (signMode) {
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
-        return t('Ledger account');
+      case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
+        return t('ui.ACCOUNT.hook.account.usePreCheckAction.ledgerAccount');
       case AccountSignMode.ALL_ACCOUNT:
-        return t('All account');
+        return t('ui.ACCOUNT.hook.account.usePreCheckAction.allAccount');
       case AccountSignMode.PASSWORD:
-        return t('Normal account');
+        return t('ui.ACCOUNT.hook.account.usePreCheckAction.normalAccount');
       case AccountSignMode.QR:
-        return t('QR signer account');
+        return t('ui.ACCOUNT.hook.account.usePreCheckAction.qrSignerAccount');
       case AccountSignMode.READ_ONLY:
-        return t('Watch-only account');
+        return t('ui.ACCOUNT.hook.account.usePreCheckAction.watchOnlyAccount');
       case AccountSignMode.UNKNOWN:
       default:
-        return t('Unknown account');
+        return t('ui.ACCOUNT.hook.account.usePreCheckAction.unknownAccount');
     }
   }, [t]);
 
@@ -41,7 +40,7 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
     return () => {
       if (!account) {
         notify({
-          message: t('Account not exists'),
+          message: t('ui.ACCOUNT.hook.account.usePreCheckAction.accountNotExists'),
           type: 'info',
           duration: 1.5
         });
@@ -49,10 +48,10 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
         const mode = account.signMode;
         let block = false;
         let accountTitle = getAccountTypeTitle(mode);
-        let defaultMessage = detectTranslate('The account you are using is {{accountTitle}}, you cannot use this feature with it');
+        let defaultMessage = detectTranslate('ui.ACCOUNT.hook.account.usePreCheckAction.featureNotAvailableForAccountType');
 
         if (ALL_STAKING_ACTIONS.includes(action)) {
-          defaultMessage = detectTranslate('You are using a {{accountTitle}}. Earning is not supported with this account type');
+          defaultMessage = detectTranslate('ui.ACCOUNT.hook.account.usePreCheckAction.earningNotSupportedForAccountType');
         }
 
         if (!account.transactionActions.includes(action) || (mode === AccountSignMode.QR && account.chainType === 'ethereum' && isProductionMode)) {
@@ -67,22 +66,25 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
               break;
 
             case AccountSignMode.QR:
-              accountTitle = t('EVM QR signer account');
+              accountTitle = t('ui.ACCOUNT.hook.account.usePreCheckAction.evmQrSignerAccount');
               break;
 
             case AccountSignMode.LEGACY_LEDGER:
             case AccountSignMode.GENERIC_LEDGER:
               if (account.chainType === AccountChainType.ETHEREUM) {
-                accountTitle = t('Ledger - EVM account');
+                accountTitle = t('ui.ACCOUNT.hook.account.usePreCheckAction.ledgerEvmAccount');
               } else if (account.chainType === AccountChainType.SUBSTRATE) {
-                accountTitle = t('Ledger - Substrate account');
+                accountTitle = t('ui.ACCOUNT.hook.account.usePreCheckAction.ledgerSubstrateAccount');
               }
 
+              break;
+            case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
+              accountTitle = t('ui.ACCOUNT.hook.account.usePreCheckAction.ledgerPolkadotEvmAccount');
               break;
           }
         }
 
-        if (mode === AccountSignMode.LEGACY_LEDGER || mode === AccountSignMode.GENERIC_LEDGER) {
+        if (SubstrateLedgerSignModeSupport.includes(mode)) {
           if (!isLedgerCapable) {
             notify({
               message: t(ledgerIncompatible),
@@ -99,7 +101,7 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
         } else {
           notify({
             message: t(
-              message ?? defaultMessage,
+              message ?? t(defaultMessage),
               { replace: { accountTitle: accountTitle } }
             ),
             type: 'info',

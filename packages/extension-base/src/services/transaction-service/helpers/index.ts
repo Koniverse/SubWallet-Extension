@@ -39,7 +39,7 @@ export const isCardanoTransaction = (tx: SWTransactionBase['transaction']): tx i
 
 // TODO: [Review] this function
 export const isBitcoinTransaction = (tx: SWTransaction['transaction']): tx is Psbt => {
-  return 'data' in tx && Array.isArray((tx as Psbt).data.inputs);
+  return 'data' in tx && Array.isArray((tx as Psbt).data?.inputs);
 };
 
 const typeName = (type: SWTransactionBase['extrinsicType']) => {
@@ -76,6 +76,8 @@ const typeName = (type: SWTransactionBase['extrinsicType']) => {
       return 'Withdraw pool';
     case ExtrinsicType.JOIN_YIELD_POOL:
       return 'Start earning';
+    case ExtrinsicType.CHANGE_EARNING_VALIDATOR:
+      return 'Change validator';
     case ExtrinsicType.UNKNOWN:
     default:
       return 'unknown';

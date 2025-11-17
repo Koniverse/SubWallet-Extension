@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ConfirmationDefinitions, ConfirmationResult, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountSignMode } from '@subwallet/extension-base/types';
 import { CONFIRMATION_QR_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { useGetAccountByAddress, useNotification } from '@subwallet/extension-koni-ui/hooks';
 import useUnlockChecker from '@subwallet/extension-koni-ui/hooks/common/useUnlockChecker';
 import { completeConfirmation } from '@subwallet/extension-koni-ui/messaging';
 import { PhosphorIcon, SubmitApiType, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { AccountSignMode } from '@subwallet/extension-koni-ui/types/account';
 import { getSignMode, removeTransactionPersist } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -91,7 +91,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
       if (currentTime >= txExpirationTime) {
         notify({
-          message: t('Transaction expired'),
+          message: t('ui.Confirmations.SubmitApiArea.transactionExpired'),
           type: 'error'
         });
         onCancel();
@@ -141,7 +141,7 @@ const Component: React.FC<Props> = (props: Props) => {
         onClick={onCancel}
         schema={'secondary'}
       >
-        {t('Cancel')}
+        {t('ui.Confirmations.SubmitApiArea.cancel')}
       </Button>
       <Button
         disabled={showQuoteExpired}
@@ -154,7 +154,7 @@ const Component: React.FC<Props> = (props: Props) => {
         loading={loading}
         onClick={onConfirm}
       >
-        {t('Approve')}
+        {t('ui.Confirmations.SubmitApiArea.approve')}
       </Button>
     </div>
   );

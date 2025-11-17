@@ -5,11 +5,11 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { CrowdloanParaState, NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { getRandomIpfsGateway, SUBWALLET_IPFS } from '@subwallet/extension-base/koni/api/nft/config';
-import { _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainEvmCompatible, _isPureBitcoinChain, _isPureCardanoChain, _isPureSubstrateChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils/account';
-import { decodeAddress, encodeAddress, isCardanoAddress, isTonAddress } from '@subwallet/keyring';
-import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
+import { decodeAddress, encodeAddress, getKeypairTypeByAddress, isTonAddress } from '@subwallet/keyring';
+import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { t } from 'i18next';
 
 import { assert, BN, hexToU8a, isHex } from '@polkadot/util';
@@ -303,11 +303,12 @@ export function isSameAddressType (address1: string, address2: string) {
 }
 
 export function isAddressAndChainCompatible (address: string, chain: _ChainInfo) {
-  const isEvmCompatible = isEthereumAddress(address) && _isChainEvmCompatible(chain);
-  const isTonCompatible = isTonAddress(address) && _isChainTonCompatible(chain);
-  const isSubstrateCompatible = !isEthereumAddress(address) && !isTonAddress(address) && _isChainSubstrateCompatible(chain); // todo: need isSubstrateAddress util function to check exactly
-  const isCardanoCompatible = isCardanoAddress(address) && _isChainCardanoCompatible(chain);
-  const isBitcoinCompatible = isBitcoinAddress(address) && _isChainBitcoinCompatible(chain);
+  const keypairType = getKeypairTypeByAddress(address);
+  const isEvmCompatible = _isChainEvmCompatible(chain) && EthereumKeypairTypes.includes(keypairType); // some chains compatible to substrate and evm, and use evm-address
+  const isTonCompatible = _isPureTonChain(chain) && TonKeypairTypes.includes(keypairType);
+  const isSubstrateCompatible = _isPureSubstrateChain(chain) && SubstrateKeypairTypes.includes(keypairType);
+  const isCardanoCompatible = _isPureCardanoChain(chain) && CardanoKeypairTypes.includes(keypairType);
+  const isBitcoinCompatible = _isPureBitcoinChain(chain) && BitcoinKeypairTypes.includes(keypairType);
 
   return isEvmCompatible || isSubstrateCompatible || isTonCompatible || isCardanoCompatible || isBitcoinCompatible;
 }
@@ -321,7 +322,7 @@ export async function waitTimeout (ms: number) {
 }
 
 export const stripUrl = (url: string): string => {
-  assert(url && (url.startsWith('http:') || url.startsWith('https:') || url.startsWith('ipfs:') || url.startsWith('ipns:')), t('Invalid URL for provider'));
+  assert(url && (url.startsWith('http:') || url.startsWith('https:') || url.startsWith('ipfs:') || url.startsWith('ipns:')), t('bg.utils.invalidUrlForProvider'));
 
   const parts = url.split('/');
 
@@ -413,3 +414,4 @@ export * from './registry';
 export * from './swap';
 export * from './translate';
 export * from './bitcoin';
+export * from './setup-api-sdk';

@@ -34,12 +34,13 @@ export const _BALANCE_CHAIN_GROUP = {
   kintsugi: ['kintsugi', 'interlay', 'kintsugi_test', 'mangatax_para'],
   genshiro: ['genshiro_testnet', 'genshiro'],
   equilibrium_parachain: ['equilibrium_parachain'],
-  bifrost: ['bifrost', 'acala', 'karura', 'acala_testnet', 'pioneer', 'bitcountry', 'bifrost_dot', 'hydradx_main', 'hydradx_rococo', 'pendulum', 'amplitude', 'continuum_network', 'truth_network', 'jamton'],
-  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'moonbeam', 'moonbase', 'moonriver', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain', 'westend_assethub'],
+  bifrost: ['bifrost', 'acala', 'karura', 'acala_testnet', 'pioneer', 'bitcountry', 'bifrost_dot', 'hydradx_main', 'hydradx_rococo', 'pendulum', 'amplitude', 'continuum_network', 'truth_network', 'jamton', 'hydradx_hollarnet'],
+  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'origintrail', 'xode', 'paseo_assethub'],
   kusama: ['kusama', 'kintsugi', 'kintsugi_test', 'interlay', 'acala', 'statemint', 'karura', 'bifrost'], // perhaps there are some runtime updates
   centrifuge: ['centrifuge'],
   supportBridged: ['rococo_assethub', 'statemint', 'statemine', 'polimec'],
-  bittensor: ['bittensor', 'bittensor_testnet']
+  bittensor: ['bittensor', 'bittensor_testnet'],
+  moonbeam: ['moonbeam', 'moonriver', 'moonbase']
 };
 
 export const _BALANCE_TOKEN_GROUP = {
@@ -70,6 +71,8 @@ export const _STAKING_ERA_LENGTH_MAP: Record<string, number> = { // in hours
   aleph: 24,
   polkadot: 24,
   kusama: 6,
+  statemint: 24,
+  statemine: 6,
   westend: 6,
   hydradx: 24,
   default: 24,
@@ -108,7 +111,11 @@ export const _STAKING_ERA_LENGTH_MAP: Record<string, number> = { // in hours
   cere: 24,
   analog_timechain: 12,
   muse_testnet: 25 * 6 / 60 / 60, // 25 blocks per session
-  mythos: 24
+  mythos: 24,
+  energy_web_x_testnet: 22 * 12 / 3600, // 22 blocks per era, 1 block per 12s
+  energy_web_x: 7200 * 12 / 3600, // 24 hours, 7200 blocks per era, 1 block per 12s,
+  zkverify_testnet: 6,
+  zkverify: 6
 };
 
 export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
@@ -116,6 +123,8 @@ export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
   aleph: 1,
   polkadot: 6,
   kusama: 6,
+  statemint: 6,
+  statemine: 6,
   polkadex: 12,
   ternoa: 6,
   ternoa_alphanet: 6,
@@ -142,7 +151,11 @@ export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
   avail_mainnet: 20,
   dentnet: 3,
   muse_testnet: 6,
-  mythos: 6
+  mythos: 6,
+  energy_web_x_testnet: 12,
+  energy_web_x: 12,
+  zkverify: 6,
+  zkverify_testnet: 6
 };
 
 export const _PARACHAIN_INFLATION_DISTRIBUTION: Record<string, Record<string, number>> = {
@@ -221,9 +234,11 @@ export const _KNOWN_CHAIN_INFLATION_PARAMS: Record<string, _SubstrateInflationPa
   alephTest: _ALEPH_DEFAULT_UNIFORM_ERA_PAYOUT_PARAMS,
   dock_pos: { ..._SUBSTRATE_DEFAULT_INFLATION_PARAMS, stakeTarget: 0.75 },
   kusama: { ..._SUBSTRATE_DEFAULT_INFLATION_PARAMS, auctionAdjust: (0.3 / 60), auctionMax: 60, stakeTarget: 0.75 },
+  statemine: { ..._SUBSTRATE_DEFAULT_INFLATION_PARAMS, auctionAdjust: (0.3 / 60), auctionMax: 60, stakeTarget: 0.75 }, // todo: recheck
   neatcoin: { ..._SUBSTRATE_DEFAULT_INFLATION_PARAMS, stakeTarget: 0.75 },
   nft_mart: { ..._SUBSTRATE_DEFAULT_INFLATION_PARAMS, falloff: 0.04, stakeTarget: 0.60 },
   polkadot: { ..._SUBSTRATE_DEFAULT_INFLATION_PARAMS, stakeTarget: 0.75 },
+  statemint: { ..._SUBSTRATE_DEFAULT_INFLATION_PARAMS, stakeTarget: 0.75 }, // todo: recheck
   vara_network: { ..._SUBSTRATE_DEFAULT_INFLATION_PARAMS, stakeTarget: 0.8 },
   vara_testnet: { ..._SUBSTRATE_DEFAULT_INFLATION_PARAMS, stakeTarget: 0.8 },
   avail_mainnet: { ..._SUBSTRATE_DEFAULT_INFLATION_PARAMS, maxInflation: 0.05, minInflation: 0.01 },
@@ -240,13 +255,14 @@ export const _TRANSFER_CHAIN_GROUP = {
   genshiro: ['genshiro_testnet', 'genshiro', 'equilibrium_parachain'],
   // crab: ['crab', 'pangolin'],
   bitcountry: ['pioneer', 'bitcountry'],
-  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain', 'westend_assethub'],
+  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'origintrail', 'xode', 'paseo_assethub'],
   riochain: ['riochain'],
   sora_substrate: ['sora_substrate'],
   avail: ['kate', 'goldberg_testnet'],
-  pendulum: ['pendulum', 'amplitude', 'amplitude_test', 'hydradx_main', 'bifrost', 'bifrost_dot', 'jamton'],
+  pendulum: ['pendulum', 'amplitude', 'amplitude_test', 'hydradx_main', 'bifrost', 'bifrost_dot', 'jamton', 'hydradx_hollarnet'],
   centrifuge: ['centrifuge'],
-  disable_transfer: ['crab', 'pangolin']
+  disable_transfer: ['crab', 'pangolin'],
+  truth: ['truth_network']
 };
 
 export const _BALANCE_PARSING_CHAIN_GROUP = {

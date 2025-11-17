@@ -37,7 +37,7 @@ function convertDerivativeToken (amount: BN, exchangeRate: number, decimals: num
 export default class AcalaLiquidStakingPoolHandler extends BaseLiquidStakingPoolHandler {
   protected readonly name: string;
   protected readonly shortName: string;
-  protected readonly altInputAsset: string = 'polkadot-NATIVE-DOT';
+  protected readonly altInputAsset: string = 'statemint-NATIVE-DOT';
   protected readonly derivativeAssets: string[] = ['acala-LOCAL-LDOT'];
   protected readonly inputAsset: string = 'acala-LOCAL-DOT';
   protected readonly rewardAssets: string[] = ['acala-LOCAL-DOT'];
@@ -45,13 +45,14 @@ export default class AcalaLiquidStakingPoolHandler extends BaseLiquidStakingPool
   public override readonly minAmountPercent = 0.98;
   protected readonly rateDecimals = 10;
 
-  protected readonly availableMethod: YieldPoolMethodInfo = {
+  public readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: true,
     cancelUnstake: false,
     withdraw: true,
-    claimReward: false
+    claimReward: false,
+    changeValidator: false
   };
 
   public slug: string;

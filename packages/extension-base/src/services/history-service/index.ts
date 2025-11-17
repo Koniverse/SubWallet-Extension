@@ -94,7 +94,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
   /**
    * @todo: Must improve performance of this function
    * */
-  private fetchSubscanTransactionHistory (chain: string, addresses: string[]) {
+  private fetchSubscanTransactionHistory (chain: string, addresses: string[], groupId: number) {
     if (!this.subscanService.checkSupportedSubscanChain(chain) || !addresses.length) {
       return;
     }
@@ -111,7 +111,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     // However, fetchAllPossibleTransferItems-sent must run after fetchAllPossibleExtrinsicItems,
     // to avoid "duplicate Extrinsic Hash between items" problem
 
-    this.subscanService.fetchAllPossibleExtrinsicItems(chain, address, (extrinsicItems) => {
+    this.subscanService.fetchAllPossibleExtrinsicItems(groupId, chain, address, (extrinsicItems) => {
       const result: TransactionHistoryItem[] = [];
 
       extrinsicItems.forEach((x) => {
@@ -134,7 +134,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
         }
       });
 
-      this.subscanService.fetchAllPossibleTransferItems(chain, address, 'sent').then((rsMap) => {
+      this.subscanService.fetchAllPossibleTransferItems(groupId, chain, address, 'sent').then((rsMap) => {
         const result: TransactionHistoryItem[] = [];
 
         Object.keys(rsMap).forEach((hash) => {
@@ -158,7 +158,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
       console.log('fetchAllPossibleExtrinsicItems error', e);
     });
 
-    this.subscanService.fetchAllPossibleTransferItems(chain, address, 'received').then((rsMap) => {
+    this.subscanService.fetchAllPossibleTransferItems(groupId, chain, address, 'received').then((rsMap) => {
       const result: TransactionHistoryItem[] = [];
 
       Object.keys(rsMap).forEach((hash) => {
@@ -180,6 +180,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     });
   }
 
+  // Only 1 address is passed in
   private async fetchBitcoinTransactionHistory (chain: string, addresses: string[]) {
     const chainInfo = this.chainService.getChainInfoByKey(chain);
     const chainState = this.chainService.getChainStateByKey(chain);
@@ -192,15 +193,12 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     const allParsedItems: TransactionHistoryItem[] = [];
 
     for (const address of addresses) {
-      const existingItems = await this.dbService.getHistories({ address, chain });
-      const maxIndex = existingItems.length > 0 ? Math.max(...existingItems.map((item) => item.apiTxIndex || -1)) : -1;
-
       const transferItems = await bitcoinApi.api.getAddressTransaction(address);
 
       const parsedItems = transferItems.map((item, index) => {
         const parsedItem = parseBitcoinTransferData(address, item, chainInfo);
 
-        return { ...parsedItem, apiTxIndex: maxIndex + index + 1 };
+        return { ...parsedItem, apiTxIndex: index };
       });
 
       allParsedItems.push(...parsedItems);
@@ -215,16 +213,22 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     const evmAddresses = getAddressesByChainType(addresses, [ChainType.EVM]);
     const substrateAddresses = getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
     const bitcoinAddresses = getAddressesByChainType(addresses, [ChainType.BITCOIN], chainInfo);
+    const groupId = this.subscanService.getGroupId();
 
     const subscription = this.historySubject.subscribe((items) => {
       cb(items.filter(filterHistoryItemByAddressAndChain(chain, addresses)));
     });
 
+    const unsubscribe = () => {
+      subscription.unsubscribe();
+      this.subscanService.cancelGroupRequest(groupId);
+    };
+
     if (_isChainSubstrateCompatible(chainInfo)) {
       if (_isChainEvmCompatible(chainInfo)) {
-        this.fetchSubscanTransactionHistory(chain, evmAddresses);
+        this.fetchSubscanTransactionHistory(chain, evmAddresses, groupId);
       } else {
-        this.fetchSubscanTransactionHistory(chain, substrateAddresses);
+        this.fetchSubscanTransactionHistory(chain, substrateAddresses, groupId);
       }
     } else if (_isChainBitcoinCompatible(chainInfo)) {
       this.fetchBitcoinTransactionHistory(chain, bitcoinAddresses).catch((e) => {
@@ -233,7 +237,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     }
 
     return {
-      unsubscribe: subscription.unsubscribe,
+      unsubscribe,
       value: this.historySubject.getValue().filter(filterHistoryItemByAddressAndChain(chain, addresses))
     };
   }
@@ -269,7 +273,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
         (item_) => item_.extrinsicHash === item.extrinsicHash && item.chain === item_.chain && item.address === item_.address);
 
       if (needUpdateItem) {
-        updateRecords.push({ ...needUpdateItem, status: item.status });
+        updateRecords.push({ ...needUpdateItem, status: item.status, apiTxIndex: item.apiTxIndex });
 
         return;
       }

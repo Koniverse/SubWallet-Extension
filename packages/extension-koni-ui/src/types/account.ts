@@ -17,17 +17,6 @@ export enum AccountAddressType {
   UNKNOWN = 'unknown',
 }
 
-export enum AccountSignMode {
-  PASSWORD = 'password',
-  QR = 'qr',
-  LEGACY_LEDGER = 'legacy-ledger',
-  GENERIC_LEDGER = 'generic-ledger',
-  READ_ONLY = 'readonly',
-  ALL_ACCOUNT = 'all',
-  INJECTED = 'injected',
-  UNKNOWN = 'unknown'
-}
-
 export type AccountChainAddress = {
   name: string;
   slug: string;
@@ -60,5 +49,11 @@ export type AccountAddressItemType = {
   accountProxyType: AccountProxyType;
   accountType: KeypairType;
   address: string;
-  accountActions?: AccountActions[]
+  accountActions?: AccountActions[];
+
+  /**
+   * Alternative display version of the address (for UI only).
+   * The original `address` remains the source of truth for identity, selection, and comparison.
+   */
+  displayAddress?: string;
 }

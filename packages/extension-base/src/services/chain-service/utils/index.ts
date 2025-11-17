@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetRef, _AssetRefPath, _AssetType, _ChainAsset, _ChainInfo, _ChainStatus, _MultiChainAsset, _SubstrateChainType } from '@subwallet/chain-list/types';
-import { BasicTokenInfo } from '@subwallet/extension-base/background/KoniTypes';
+import { BasicTokenInfo, ChainType } from '@subwallet/extension-base/background/KoniTypes';
 import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainState, _CUSTOM_PREFIX, _DataMap, _SMART_CONTRACT_STANDARDS } from '@subwallet/extension-base/services/chain-service/types';
 import { IChain } from '@subwallet/extension-base/services/storage-service/databases';
-import { AccountChainType } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
 import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
@@ -169,6 +169,14 @@ export function _isChainEvmCompatible (chainInfo: _ChainInfo) {
   return !!chainInfo.evmInfo;
 }
 
+export function _isChainCompatibleLedgerEvm (chainInfo: _ChainInfo) {
+  return !!chainInfo.evmInfo && chainInfo.evmInfo.evmChainId > 0;
+}
+
+export function _isSubstrateEvmCompatibleChain (chainInfo: _ChainInfo) {
+  return !!chainInfo.evmInfo && !!chainInfo.substrateInfo;
+}
+
 export function _isChainBitcoinCompatible (chainInfo: _ChainInfo) {
   return !!chainInfo.bitcoinInfo;
 }
@@ -183,6 +191,10 @@ export function _isChainCardanoCompatible (chainInfo: _ChainInfo) {
 
 export function _isNativeToken (tokenInfo: _ChainAsset) {
   return tokenInfo.assetType === _AssetType.NATIVE;
+}
+
+export function _isGigaToken (tokenInfo: _ChainAsset) {
+  return tokenInfo.metadata?.isGigaToken;
 }
 
 export function _isNativeTokenBySlug (tokenSlug: string) {
@@ -363,6 +375,14 @@ export function _getChainNativeTokenSlug (chainInfo: _ChainInfo) {
   return `${chainInfo.slug}-${_AssetType.NATIVE}-${_getChainNativeTokenBasicInfo(chainInfo).symbol}`;
 }
 
+export function _getChainSubstrateTokenSymbol (chainInfo: _ChainInfo) {
+  if (chainInfo.substrateInfo) {
+    return chainInfo.substrateInfo.symbol || '';
+  } else {
+    return '';
+  }
+}
+
 export function _isLocalToken (tokenInfo: _ChainAsset) {
   return tokenInfo.assetType === _AssetType.LOCAL;
 }
@@ -490,6 +510,8 @@ export function _getBlockExplorerFromChain (chainInfo: _ChainInfo): string | und
     blockExplorer = chainInfo?.cardanoInfo?.blockExplorer;
   } else if (_isPureBitcoinChain(chainInfo)) {
     blockExplorer = chainInfo?.bitcoinInfo?.blockExplorer;
+  } else if (_isPureTonChain(chainInfo)) {
+    blockExplorer = chainInfo?.tonInfo?.blockExplorer;
   } else {
     blockExplorer = chainInfo?.substrateInfo?.blockExplorer;
   }
@@ -675,7 +697,7 @@ export function updateLatestChainInfo (currentDataMap: _DataMap, latestChainInfo
   };
 }
 
-export const _chainInfoToChainType = (chainInfo: _ChainInfo): AccountChainType => {
+export const _chainInfoToAccountChainType = (chainInfo: _ChainInfo): AccountChainType => {
   if (_isPureSubstrateChain(chainInfo)) {
     return AccountChainType.SUBSTRATE;
   }
@@ -699,12 +721,48 @@ export const _chainInfoToChainType = (chainInfo: _ChainInfo): AccountChainType =
   return AccountChainType.SUBSTRATE;
 };
 
-export const _isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, accountChainType: AccountChainType, accountType: KeypairType): boolean => {
+export const _chainInfoToChainType = (chainInfo: _ChainInfo): ChainType | undefined => {
+  if (_isChainSubstrateCompatible(chainInfo)) {
+    return ChainType.SUBSTRATE;
+  }
+
+  if (_isPureEvmChain(chainInfo)) {
+    return ChainType.EVM;
+  }
+
+  if (_isPureTonChain(chainInfo)) {
+    return ChainType.TON;
+  }
+
+  if (_isPureCardanoChain(chainInfo)) {
+    return ChainType.CARDANO;
+  }
+
+  if (_isPureBitcoinChain(chainInfo)) {
+    return ChainType.BITCOIN;
+  }
+
+  return undefined;
+};
+
+interface AccountInfo {
+  chainType: AccountChainType;
+  type: KeypairType;
+  signMode?: AccountSignMode;
+}
+
+export const _isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, accountInfo: AccountInfo): boolean => {
+  const { chainType: accountChainType, signMode: accountSignMode, type: accountType } = accountInfo;
+
   if (accountChainType === AccountChainType.SUBSTRATE) {
     return _isPureSubstrateChain(chainInfo) && SubstrateKeypairTypes.includes(accountType);
   }
 
   if (accountChainType === AccountChainType.ETHEREUM) {
+    if (accountSignMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+      return _isSubstrateEvmCompatibleChain(chainInfo) && EthereumKeypairTypes.includes(accountType);
+    }
+
     return _isChainEvmCompatible(chainInfo) && EthereumKeypairTypes.includes(accountType);
   }
 

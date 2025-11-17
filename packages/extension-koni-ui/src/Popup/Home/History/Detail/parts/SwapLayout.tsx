@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetName, _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetOriginChain, _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
@@ -27,6 +27,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { currencyData, priceMap } = useSelector((state) => state.price);
   const swapInfo = data.additionalInfo as SwapTxData | undefined;
   const { accounts } = useSelector((state) => state.accountState);
+  const { chainInfoMap } = useSelector((state: RootState) => state.chainStore);
 
   const estimatedFeeValue = useMemo(() => {
     let totalBalance = BN_ZERO;
@@ -55,6 +56,8 @@ const Component: React.FC<Props> = (props: Props) => {
   const assetTo = assetRegistryMap[swapInfo.quote.pair.to];
   const recipientAddress = data.to || swapInfo.recipient || data.from;
   const account = findAccountByAddress(accounts, recipientAddress);
+  const destChainSlug = _getAssetOriginChain(assetTo);
+  const originChainSlug = _getAssetOriginChain(assetFrom);
 
   return (
     <MetaInfo className={CN(className)}>
@@ -66,12 +69,12 @@ const Component: React.FC<Props> = (props: Props) => {
       />
       <MetaInfo.Transfer
         destinationChain={{
-          slug: _getAssetOriginChain(assetTo),
-          name: _getAssetName(assetTo)
+          slug: destChainSlug,
+          name: _getChainName(chainInfoMap[destChainSlug])
         }}
         originChain={{
-          slug: _getAssetOriginChain(assetFrom),
-          name: _getAssetName(assetFrom)
+          slug: originChainSlug,
+          name: _getChainName(chainInfoMap[originChainSlug])
         }}
         recipientAddress={recipientAddress}
         recipientName={account?.name}
@@ -81,16 +84,16 @@ const Component: React.FC<Props> = (props: Props) => {
       {(assetTo.originChain === assetFrom.originChain) && (
         <MetaInfo.Chain
           chain={data.chain}
-          label={t('Network')}
+          label={t('ui.HISTORY.screen.HistoryDetail.SwapLayout.network')}
         />
       )}
       <MetaInfo.DisplayType
-        label={t('Transaction type')}
+        label={t('ui.HISTORY.screen.HistoryDetail.SwapLayout.transactionType')}
         typeName={t(TxTypeNameMap[data.type])}
       />
       <MetaInfo.Status
         className={CN('__transaction-status')}
-        label={t('Transaction status')}
+        label={t('ui.HISTORY.screen.HistoryDetail.SwapLayout.transactionStatus')}
         statusIcon={HistoryStatusMap[data.status].icon}
         statusName={t(HistoryStatusMap[data.status].name)}
         valueColorSchema={HistoryStatusMap[data.status].schema}
@@ -99,15 +102,15 @@ const Component: React.FC<Props> = (props: Props) => {
         <MetaInfo.Number
           className={'__estimate-transaction-fee'}
           decimals={0}
-          label={'Estimated fee'}
+          label={t('ui.HISTORY.screen.HistoryDetail.SwapLayout.estimatedFee')}
           prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
           suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
           value={estimatedFeeValue}
         />
         <AlertBox
           className={'__swap-quote-warning'}
-          description={t('You can view your swap process and details by clicking View on explorer')}
-          title={t('Helpful tip')}
+          description={t('ui.HISTORY.screen.HistoryDetail.SwapLayout.viewSwapOnExplorer')}
+          title={t('ui.HISTORY.screen.HistoryDetail.SwapLayout.helpfulTip')}
           type='info'
         />
       </>

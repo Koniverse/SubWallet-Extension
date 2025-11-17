@@ -93,12 +93,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return [
       {
         desc: false,
-        label: t('Lowest total member'),
+        label: t('ui.EARNING.components.Field.Earning.PoolSelector.lowestTotalMember'),
         value: SortKey.MEMBER
       },
       {
         desc: true,
-        label: t('Highest total staked'),
+        label: t('ui.EARNING.components.Field.Earning.PoolSelector.highestTotalStaked'),
         value: SortKey.TOTAL_POOLED
       }
     ];
@@ -106,19 +106,19 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const filterOptions: FilterOption[] = useMemo(() => ([
     {
-      label: t('Open'),
+      label: t('ui.EARNING.components.Field.Earning.PoolSelector.open'),
       value: 'Open'
     },
     {
-      label: t('Locked'),
+      label: t('ui.EARNING.components.Field.Earning.PoolSelector.locked'),
       value: 'Locked'
     },
     {
-      label: t('Destroying'),
+      label: t('ui.EARNING.components.Field.Earning.PoolSelector.destroying'),
       value: 'Destroying'
     },
     {
-      label: t('Blocked'),
+      label: t('ui.EARNING.components.Field.Earning.PoolSelector.blocked'),
       value: 'Blocked'
     }
   ]), [t]);
@@ -143,8 +143,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [defaultPoolMap, chain]);
 
   const resultList = useMemo((): NominationPoolDataType[] => {
-    const recommendedSessionHeader: NominationPoolDataType = { address: '', bondedAmount: '', decimals: 0, id: -1, idStr: '-1', isProfitable: false, memberCounter: 0, roles: { bouncer: '', depositor: '', nominator: '', root: '' }, state: 'Open', symbol: '', name: 'Recommended', isSessionHeader: true, disabled: true };
-    const othersSessionHeader: NominationPoolDataType = { address: '', bondedAmount: '', decimals: 0, id: -2, idStr: '-2', isProfitable: false, memberCounter: 0, roles: { bouncer: '', depositor: '', nominator: '', root: '' }, state: 'Open', symbol: '', name: 'Others', isSessionHeader: true, disabled: true };
+    const recommendedSessionHeader: NominationPoolDataType = { address: '', bondedAmount: '', decimals: 0, id: -1, idStr: '-1', isProfitable: false, memberCounter: 0, roles: { bouncer: '', depositor: '', nominator: '', root: '' }, state: 'Open', symbol: '', name: 'Recommended', isSectionHeader: true, disabled: true };
+    const othersSessionHeader: NominationPoolDataType = { address: '', bondedAmount: '', decimals: 0, id: -2, idStr: '-2', isProfitable: false, memberCounter: 0, roles: { bouncer: '', depositor: '', nominator: '', root: '' }, state: 'Open', symbol: '', name: 'Others', isSectionHeader: true, disabled: true };
 
     const filteredItems = [...items]
       .filter((value) => {
@@ -247,10 +247,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [activeModal]);
 
   const renderItem = useCallback((item: NominationPoolDataType) => {
-    if (item.isSessionHeader) {
+    if (item.isSectionHeader) {
       return (
         <div
-          className={'__session-header'}
+          className={'__section-header'}
           key={item.name}
         >{item.name?.toUpperCase()}
           {item.name?.includes('Recommended')
@@ -274,7 +274,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           <Tooltip
             key={item.id}
             placement={'top'}
-            title={t('This pool has reached the maximum number of members. Select another to continue')}
+            title={t('ui.EARNING.components.Field.Earning.PoolSelector.poolMaxMembers')}
           >
             <div
               className={'__pool-item-wrapper'}
@@ -295,7 +295,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
               <Tooltip
                 key={item.id}
                 placement={'top'}
-                title={t('This pool is blocked. Select another to continue')}
+                title={t('ui.EARNING.components.Field.Earning.PoolSelector.poolIsBlocked')}
               >
                 <div
                   className={'__pool-item-wrapper'}
@@ -422,7 +422,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         loading={loading}
         onClickActionBtn={onClickActionBtn}
         onSelect={_onSelectItem}
-        placeholder={placeholder || t('Select pool')}
+        placeholder={placeholder || t('ui.EARNING.components.Field.Earning.PoolSelector.selectPool')}
         prefix={(
           <Avatar
             identPrefix={networkPrefix}
@@ -448,7 +448,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         }}
         searchFunction={searchFunction}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('Search validator')}
+        searchPlaceholder={t<string>('ui.EARNING.components.Field.Earning.PoolSelector.searchValidator')}
         selected={value || ''}
         showActionBtn
         statusHelp={statusHelp}
@@ -474,7 +474,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
               />
             </div>
           )}
-        title={t('Select pool')}
+        title={t('ui.EARNING.components.Field.Earning.PoolSelector.selectPool')}
       />
 
       <FilterModal
@@ -508,14 +508,14 @@ const EarningPoolSelector = styled(forwardRef(Component))<Props>(({ theme: { tok
   return {
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
-      paddingBottom: token.paddingLG
+      paddingBottom: token.paddingSM
     },
 
     '.ant-sw-modal-content': {
       paddingBottom: token.padding
     },
 
-    '.__session-header': {
+    '.__section-header': {
       fontSize: token.fontSizeSM,
       color: token.colorTextSecondary,
       fontWeight: token.fontWeightStrong,

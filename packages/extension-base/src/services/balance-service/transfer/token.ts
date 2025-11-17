@@ -8,7 +8,7 @@ import { getWasmContractGasLimit } from '@subwallet/extension-base/koni/api/cont
 import { estimateTonTxFee } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
 import { _TRANSFER_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible, _isChainTonCompatible, _isNativeToken, _isTokenGearSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon, _isTokenWasmSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible, _isChainTonCompatible, _isGigaToken, _isNativeToken, _isTokenGearSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon, _isTokenWasmSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
 import { combineEthFee, getGRC20ContractPromise, getVFTContractPromise } from '@subwallet/extension-base/utils';
 import { keyring } from '@subwallet/ui-keyring';
@@ -68,14 +68,15 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
     const contractPromise = tokenInfo.assetType === _AssetType.GRC20
       ? getGRC20ContractPromise(api, _getContractAddressOfToken(tokenInfo))
       : getVFTContractPromise(api, _getContractAddressOfToken(tokenInfo));
-    const transaction = await contractPromise
-      .service
+    const transaction = await contractPromise.service
       .transfer(u8aToHex(decodeAddress(to)), value) // Create transfer transaction
       .withAccount(from) // Set sender account
       .calculateGas(); // Add account arg to extrinsic
 
     transfer = transaction.extrinsic;
     transferAmount = value;
+  } else if (_isGigaToken(tokenInfo) && api.tx.currencies) {
+    transfer = api.tx.currencies.transfer(to, _getTokenOnChainAssetId(tokenInfo), value);
   } else if (_TRANSFER_CHAIN_GROUP.acala.includes(networkKey)) {
     if (!_isNativeToken(tokenInfo)) {
       if (isTxCurrenciesSupported) {
@@ -120,6 +121,8 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
         transfer = api.tx.balances.transfer(to, new BN(value));
       }
     }
+  } else if (_TRANSFER_CHAIN_GROUP.truth.includes(networkKey)) {
+    transfer = api.tx.assetManager.transfer(to, _getTokenOnChainInfo(tokenInfo), value);
   }
 
   return [transfer, transferAmount || value];

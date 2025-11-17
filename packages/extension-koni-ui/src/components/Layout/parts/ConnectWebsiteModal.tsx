@@ -4,17 +4,18 @@
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
-import { AccountProxyItem } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyItem, DAppConfigurationModal } from '@subwallet/extension-koni-ui/components';
 import ConfirmationGeneralInfo from '@subwallet/extension-koni-ui/components/Confirmation/ConfirmationGeneralInfo';
+import { DAPP_CONFIGURATION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { changeAuthorizationBlock, changeAuthorizationPerSite } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { updateAuthUrls } from '@subwallet/extension-koni-ui/stores/utils';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertAuthorizeTypeToChainTypes, filterAuthorizeAccountProxies, isAddressAllowedWithAuthType } from '@subwallet/extension-koni-ui/utils';
-import { Button, Icon, NetworkItem, SwModal } from '@subwallet/react-ui';
+import { Button, Icon, ModalContext, NetworkItem, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CaretRight, CheckCircle, GlobeHemisphereWest, ShieldCheck, ShieldSlash, XCircle } from 'phosphor-react';
+import { CaretRight, CheckCircle, GearSix, GlobeHemisphereWest, ShieldCheck, ShieldSlash, XCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -34,9 +35,12 @@ type ConnectIcon = {
   linkIconBg?: string;
 };
 
+const dAppConfigurationModalId = DAPP_CONFIGURATION_MODAL;
+
 function Component ({ authInfo, className = '', id, isBlocked = true, isNotConnected = false, onCancel, url }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { switchNetworkAuthorizeModal } = useContext(WalletModalContext);
+  const { activeModal } = useContext(ModalContext);
   const [allowedMap, setAllowedMap] = useState<Record<string, boolean>>(authInfo?.isAllowedMap || {});
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
@@ -47,23 +51,25 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
   const _isNotConnected = isNotConnected || !authInfo;
   const isEvmAuthorize = useMemo(() => !!authInfo?.accountAuthTypes.includes('evm'), [authInfo?.accountAuthTypes]);
   const currentEvmNetworkInfo = useMemo(() => authInfo?.currentNetworkMap?.evm && chainInfoMap[authInfo?.currentNetworkMap.evm], [authInfo?.currentNetworkMap?.evm, chainInfoMap]);
-
   const handlerUpdateMap = useCallback((accountProxy: AccountProxy, oldValue: boolean) => {
     return () => {
       setAllowedMap((values) => {
         const newValues = { ...values };
-        const listAddress = accountProxy.accounts.map(({ address }) => address);
+        const listAddress = accountProxy.accounts
+          .filter(({ address }) => isAddressAllowedWithAuthType(address, authInfo?.accountAuthTypes || []));
 
-        listAddress.forEach((address) => {
-          const addressIsValid = isAddressAllowedWithAuthType(address, authInfo?.accountAuthTypes || []);
-
-          addressIsValid && (newValues[address] = !oldValue);
+        listAddress.forEach(({ address }) => {
+          newValues[address] = !oldValue;
         });
 
         return newValues;
       });
     };
   }, [authInfo?.accountAuthTypes]);
+
+  const onOpenDAppConfigurationModal = useCallback(() => {
+    activeModal(dAppConfigurationModalId);
+  }, [activeModal]);
 
   const openSwitchNetworkAuthorizeModal = useCallback(() => {
     authInfo && switchNetworkAuthorizeModal.open(
@@ -143,7 +149,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
             loading={isSubmit}
             onClick={onCancel}
           >
-            {t('Close')}
+            {t('ui.components.Layout.ConnectWebsiteModal.close')}
           </Button>
         </>
       );
@@ -164,7 +170,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
             onClick={onCancel}
             schema={'secondary'}
           >
-            {t('Cancel')}
+            {t('ui.components.Layout.ConnectWebsiteModal.cancel')}
           </Button>
           <Button
             block
@@ -177,7 +183,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
             loading={isSubmit}
             onClick={handlerUnblock}
           >
-            {t('Unblock')}
+            {t('ui.components.Layout.ConnectWebsiteModal.unblock')}
           </Button>
         </>
       );
@@ -197,7 +203,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.components.Layout.ConnectWebsiteModal.cancel')}
         </Button>
         <Button
           block
@@ -210,7 +216,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
           loading={isSubmit}
           onClick={handlerSubmit}
         >
-          {t('Confirm')}
+          {t('ui.components.Layout.ConnectWebsiteModal.confirm')}
         </Button>
       </>
     );
@@ -246,9 +252,9 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
     if (_isNotConnected) {
       return (
         <>
-          <div className={'__content-heading'}>{t('Not connected to this site')}</div>
+          <div className={'__content-heading'}>{t('ui.components.Layout.ConnectWebsiteModal.notConnectedToThisSite')}</div>
           <div className={'text-tertiary __content-text'}>
-            {t('SubWallet is not connected to this site. Please find and click in the website the "Connect Wallet" button to connect.')}
+            {t('ui.components.Layout.ConnectWebsiteModal.notConnectedConnectFromSite')}
           </div>
         </>
       );
@@ -257,15 +263,18 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
     if (isBlocked) {
       return (
         <>
-          <div className={'__content-heading'}>{t('This site has been blocked')}</div>
+          <div className={'__content-heading'}>{t('ui.components.Layout.ConnectWebsiteModal.thisSiteHasBeenBlocked')}</div>
           <div className={'text-tertiary __content-text'}>
-            {t('This site has been previously blocked. Do you wish to unblock and grant access to it?')}
+            {t('ui.components.Layout.ConnectWebsiteModal.confirmUnblockSite')}
           </div>
         </>
       );
     }
 
-    const listAccountProxy = filterAuthorizeAccountProxies(accountProxies, authInfo?.accountAuthTypes || []).map((proxy) => {
+    const listAccountProxy = filterAuthorizeAccountProxies(accountProxies, {
+      accountAuthTypes: authInfo?.accountAuthTypes || [],
+      canConnectSubstrateEcdsa: authInfo?.canConnectSubstrateEcdsa
+    }).map((proxy) => {
       const value = proxy.accounts.some(({ address }) => allowedMap[address]);
 
       return {
@@ -285,7 +294,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
     return (
       <>
         <div className={CN('__number-of-select-text')}>
-          {t('Your following account(s) are connected to this site')}
+          {t('ui.components.Layout.ConnectWebsiteModal.yourAccountsConnectedToSite')}
         </div>
 
         <div className={'__account-item-container'}>
@@ -318,43 +327,67 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
   };
 
   return (
-    <SwModal
-      className={className}
-      footer={actionButtons}
-      id={id}
-      onCancel={onCancel}
-      title={t('Connect website')}
-    >
-      {isEvmAuthorize && !!currentEvmNetworkInfo && <div className={'__switch-network-authorize-item'}>
-        <div className={'__switch-network-authorize-label'}>
-          {t('Switch network')}
-        </div>
-        <NetworkItem
-          name={currentEvmNetworkInfo.name}
-          networkKey={currentEvmNetworkInfo.slug}
-          networkMainLogoShape='circle'
-          networkMainLogoSize={20}
-          onPressItem={openSwitchNetworkAuthorizeModal}
-          rightItem={<div className={'__check-icon'}>
-            <Icon
-              className='__right-icon'
-              customSize={'16px'}
-              phosphorIcon={CaretRight}
-              type='phosphor'
-            />
-          </div>}
-        />
-      </div>}
+    <>
+      <SwModal
+        className={className}
+        footer={actionButtons}
+        id={id}
+        onCancel={onCancel}
+        rightIconProps={
+          authInfo
+            ? {
+              icon: (
+                <Icon
+                  phosphorIcon={GearSix}
+                  size='md'
+                  type='phosphor'
+                  weight='bold'
+                />
+              ),
+              onClick: onOpenDAppConfigurationModal
+            }
+            : undefined
+        }
+        title={t('ui.components.Layout.ConnectWebsiteModal.connectWebsite')}
+      >
+        {isEvmAuthorize && !!currentEvmNetworkInfo && <div className={'__switch-network-authorize-item'}>
+          <div className={'__switch-network-authorize-label'}>
+            {t('ui.components.Layout.ConnectWebsiteModal.switchNetwork')}
+          </div>
+          <NetworkItem
+            name={currentEvmNetworkInfo.name}
+            networkKey={currentEvmNetworkInfo.slug}
+            networkMainLogoShape='circle'
+            networkMainLogoSize={20}
+            onPressItem={openSwitchNetworkAuthorizeModal}
+            rightItem={<div className={'__check-icon'}>
+              <Icon
+                className='__right-icon'
+                customSize={'16px'}
+                phosphorIcon={CaretRight}
+                type='phosphor'
+              />
+            </div>}
+          />
+        </div>}
 
-      <ConfirmationGeneralInfo
-        request={{
-          id: url,
-          url: url
-        }}
-        {...connectIconProps}
-      />
-      {renderContent()}
-    </SwModal>
+        <ConfirmationGeneralInfo
+          request={{
+            id: url,
+            url: url
+          }}
+          {...connectIconProps}
+        />
+        {renderContent()}
+      </SwModal>
+      {
+        !!authInfo && (
+          <DAppConfigurationModal
+            authInfo={authInfo}
+          />
+        )
+      }
+    </>
   );
 }
 

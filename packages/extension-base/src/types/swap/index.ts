@@ -68,6 +68,7 @@ export enum SwapStepType {
   PERMIT = 'PERMIT'
 }
 
+// todo: export this to use from sdk
 export enum SwapProviderId {
   CHAIN_FLIP_TESTNET = 'CHAIN_FLIP_TESTNET',
   CHAIN_FLIP_MAINNET = 'CHAIN_FLIP_MAINNET',
@@ -79,21 +80,23 @@ export enum SwapProviderId {
   WESTEND_ASSET_HUB = 'WESTEND_ASSET_HUB',
   SIMPLE_SWAP = 'SIMPLE_SWAP',
   UNISWAP = 'UNISWAP',
-  KYBER = 'KYBER'
+  KYBER = 'KYBER',
+  OPTIMEX = 'OPTIMEX',
+  OPTIMEX_TESTNET = 'OPTIMEX_TESTNET'
 }
 
+// todo: export this to use from sdk
 export const _SUPPORTED_SWAP_PROVIDERS: SwapProviderId[] = [
   SwapProviderId.CHAIN_FLIP_TESTNET,
   SwapProviderId.CHAIN_FLIP_MAINNET,
   SwapProviderId.HYDRADX_MAINNET,
-  // SwapProviderId.HYDRADX_TESTNET,
   SwapProviderId.POLKADOT_ASSET_HUB,
   SwapProviderId.KUSAMA_ASSET_HUB,
-  // SwapProviderId.ROCOCO_ASSET_HUB,
-  // SwapProviderId.WESTEND_ASSET_HUB,
   SwapProviderId.SIMPLE_SWAP,
   SwapProviderId.UNISWAP,
-  SwapProviderId.KYBER
+  SwapProviderId.KYBER,
+  SwapProviderId.OPTIMEX,
+  SwapProviderId.OPTIMEX_TESTNET
 ];
 
 export interface SwapProvider {
@@ -162,7 +165,7 @@ export interface SimpleSwapValidationMetadata{
   chain: _ChainInfo;
 }
 
-export interface QuoteAskResponse {
+export interface ProcessedQuoteAskResponse {
   quote?: SwapQuote;
   error?: SwapError;
 }
@@ -289,5 +292,7 @@ export interface HydrationSwapStepMetadata extends BaseSwapStepMetadata {
 
 export interface ChainFlipSwapStepMetadata extends BaseSwapStepMetadata {
   srcChain: string,
-  destChain: string
+  destChain: string,
+  fromAssetId: string,
+  toAssetId: string
 }

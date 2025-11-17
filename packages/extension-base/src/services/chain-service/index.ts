@@ -790,7 +790,6 @@ export class ChainService {
 
     await this.initApis();
     this.initAssetSettings();
-    await this.autoEnableTokens();
   }
 
   initAssetRefMap () {
@@ -869,6 +868,10 @@ export class ChainService {
     }
   }
 
+  public resetPopularTokenList () {
+    this.priorityTokensSubject.next({ token: {}, tokenGroup: {} });
+  }
+
   async enablePopularTokens () {
     const assetSettings = this.assetSettingSubject.value;
     const chainStateMap = this.getChainStateMap();
@@ -879,14 +882,19 @@ export class ChainService {
       : [];
 
     for (const assetSlug of priorityTokensList) {
-      const assetState = assetSettings[assetSlug];
       const assetInfo = this.getAssetBySlug(assetSlug);
 
+      // This can occur if the assetSlug is not present in the current chainlist version
+      if (!assetInfo) {
+        continue;
+      }
+
+      const assetState = assetSettings[assetSlug];
       const chainState = chainStateMap[assetInfo.originChain];
 
       if (!assetState) { // If this asset not has asset setting, this token is not enabled before (not turned off before)
         if (!chainState || !chainState.manualTurnOff) {
-          await this.updateAssetSetting(assetSlug, { visible: true }, true);
+          await this.updateAssetSetting(assetSlug, { visible: true }, false);
         }
       }
     }
@@ -1283,6 +1291,10 @@ export class ChainService {
     return await fetchStaticData<SufficientChainsDetails>('chains/supported-sufficient-chains') || [];
   }
 
+  public async fetchAhMapChain () {
+    return await fetchStaticData<Record<string, string>>('asset-hub-staking-map');
+  }
+
   private async initChains () {
     const storedChainSettings = await this.dbService.getAllChainStore();
     const defaultChainInfoMap = filterChainInfoMap(ChainInfoMap, ignoredList);
@@ -1501,11 +1513,14 @@ export class ChainService {
   private async initAssetRegistry (deprecatedCustomChainMap: Record<string, string>) {
     const storedAssetRegistry = await this.dbService.getAllAssetStore();
     const latestAssetRegistry = filterAssetInfoMap(this.getChainInfoMap(), ChainAssetMap);
+    const assetSetting = await this.getAssetSettings();
     const availableChains = Object.values(this.dataMap.chainInfoMap)
       .filter((info) => (info.chainStatus === _ChainStatus.ACTIVE))
       .map((chainInfo) => chainInfo.slug);
+    const customChains = Object.keys(deprecatedCustomChainMap).filter((chain) => _isCustomChain(chain));
 
     let finalAssetRegistry: Record<string, _ChainAsset> = {};
+    const migratedAssetSetting: Record<string, AssetSetting> = {};
 
     if (storedAssetRegistry.length === 0) {
       finalAssetRegistry = latestAssetRegistry;
@@ -1517,15 +1532,17 @@ export class ChainService {
 
       // Update custom assets of merged custom chains
       Object.values(storedAssetRegistry).forEach((storedAsset) => {
-        if (_isCustomAsset(storedAsset.slug) && Object.keys(deprecatedCustomChainMap).includes(storedAsset.originChain)) {
+        const isFromCustomChain = customChains ? customChains.includes(storedAsset.originChain) : false;
+
+        // If the stored asset is a custom asset, from a deprecated custom chain, and has a contract address.
+        if (_isCustomAsset(storedAsset.slug) && isFromCustomChain && storedAsset.metadata?.contractAddress) {
           const newOriginChain = deprecatedCustomChainMap[storedAsset.originChain];
-          const newSlug = this.generateSlugForSmartContractAsset(newOriginChain, storedAsset.assetType, storedAsset.symbol, storedAsset.metadata?.contractAddress as string);
+          // const newSlug = this.generateSlugForSmartContractAsset(newOriginChain, storedAsset.assetType, storedAsset.symbol, storedAsset.metadata?.contractAddress);
 
           deprecatedAssets.push(storedAsset.slug);
-          parsedStoredAssetRegistry[newSlug] = {
+          parsedStoredAssetRegistry[storedAsset.slug] = {
             ...storedAsset,
-            originChain: newOriginChain,
-            slug: newSlug
+            originChain: newOriginChain
           };
         } else {
           parsedStoredAssetRegistry[storedAsset.slug] = storedAsset;
@@ -1535,29 +1552,49 @@ export class ChainService {
       for (const storedAssetInfo of Object.values(parsedStoredAssetRegistry)) {
         let duplicated = false;
         let deprecated = false;
+        let defaultSlugForMigration: string | undefined;
 
         for (const defaultChainAsset of Object.values(latestAssetRegistry)) {
-          // case merge custom asset with default asset
+          // Case: The stored asset is the same to a smart contract asset from new stable chainlist
           if (_isEqualSmartContractAsset(storedAssetInfo, defaultChainAsset)) {
             duplicated = true;
+            defaultSlugForMigration = defaultChainAsset.slug;
             break;
           }
 
+          // Case: If the origin chain of the stored asset is no longer active. (custom chain is deprecated)
           if (availableChains.indexOf(storedAssetInfo.originChain) === -1) {
             deprecated = true;
+            defaultSlugForMigration = defaultChainAsset.slug;
             break;
           }
 
+          // Case: If a default asset already exists with the same slug as the stored asset (from patch)
           if (defaultChainAsset.slug === storedAssetInfo.slug) {
             duplicated = true;
+            defaultSlugForMigration = defaultChainAsset.slug;
             break;
           }
         }
 
-        if (!duplicated && !deprecated) {
-          mergedAssetRegistry[storedAssetInfo.slug] = storedAssetInfo;
-        } else {
+        // If the stored asset is a duplicate of a default asset or its origin chain is deprecated.
+        if (duplicated || deprecated) {
+          if (Object.keys(assetSetting).includes(storedAssetInfo.slug)) {
+            const isVisible = assetSetting[storedAssetInfo.slug].visible;
+
+            // Migrate assetSetting from custom token to new default token
+            if (defaultSlugForMigration) {
+              migratedAssetSetting[defaultSlugForMigration] = { visible: isVisible };
+              delete assetSetting[storedAssetInfo.slug];
+            }
+          }
+
+          delete mergedAssetRegistry[storedAssetInfo.slug];
+
           deprecatedAssets.push(storedAssetInfo.slug);
+        } else {
+          // If the stored asset is not a duplicate and its origin chain is active, keep it in the merged registry.
+          mergedAssetRegistry[storedAssetInfo.slug] = storedAssetInfo;
         }
       }
 

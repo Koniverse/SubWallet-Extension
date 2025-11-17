@@ -44,14 +44,14 @@ function getTokenGroup (assetRegistryMap: AssetRegistryStore['assetRegistry'], f
   return result;
 }
 
-export default function useTokenGroup (filteredChains?: string[]): TokenGroupHookType {
+export default function useTokenGroup (filteredChains?: string[], excludedAssetsByAccount?: string[]): TokenGroupHookType {
   const assetRegistryMap = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
   const assetSettingMap = useSelector((state: RootState) => state.assetRegistry.assetSettingMap);
   const chainStateMap = useSelector((state: RootState) => state.chainStore.chainStateMap);
   const isMantaEnabled = useIsMantaPayEnabled();
 
   const excludedAssets = useMemo(() => {
-    const excludedAssets: string[] = [];
+    const excludedAssets: string[] = excludedAssetsByAccount || [];
 
     // exclude zkAssets if not enabled
     if (!isMantaEnabled) {
@@ -63,7 +63,7 @@ export default function useTokenGroup (filteredChains?: string[]): TokenGroupHoo
     }
 
     return excludedAssets;
-  }, [assetRegistryMap, isMantaEnabled]);
+  }, [assetRegistryMap, excludedAssetsByAccount, isMantaEnabled]);
 
   // only get fungible tokens of active chains which has visibility = 0
   const filteredAssetRegistryMap = useMemo(() => {

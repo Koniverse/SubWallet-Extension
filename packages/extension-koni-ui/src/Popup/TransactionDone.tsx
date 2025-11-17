@@ -41,15 +41,15 @@ const Component: React.FC<Props> = (props: Props) => {
         leftFooterButton={{
           block: true,
           onClick: viewInHistory,
-          children: t('View transaction')
+          children: t('ui.TRANSACTION.screen.TransactionDone.viewTransaction')
         }}
         rightFooterButton={{
           block: true,
           onClick: goHome,
-          children: t('Back to home')
+          children: t('ui.TRANSACTION.screen.TransactionDone.backToHome')
         }}
         subHeaderLeft={<CloseIcon />}
-        title={t('Submitted')}
+        title={t('ui.TRANSACTION.screen.TransactionDone.submitted')}
       >
         <div className='container'>
           <div className='page-icon'>
@@ -62,10 +62,10 @@ const Component: React.FC<Props> = (props: Props) => {
             />
           </div>
           <div className='title'>
-            {t('Transaction submitted!')}
+            {t('ui.TRANSACTION.screen.TransactionDone.transactionSubmitted')}
           </div>
           <div className='description'>
-            {t('Track transaction progress in the History tab or go back to home')}
+            {t('ui.TRANSACTION.screen.TransactionDone.trackTransactionInHistory')}
           </div>
         </div>
       </Layout.WithSubHeaderOnly>

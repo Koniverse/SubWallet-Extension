@@ -10,7 +10,6 @@ import { SWTransactionResponse } from '@subwallet/extension-base/services/transa
 import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { EarningProcessItem } from '@subwallet/extension-koni-ui/components/Earning';
 import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
@@ -18,13 +17,14 @@ import { EarningInstructionModal } from '@subwallet/extension-koni-ui/components
 import { SlippageModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
 import { EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, STAKE_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { useChainConnection, useCoreCreateReformatAddress, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useChainConnection, useCoreCreateReformatAddress, useCreateGetSubnetStakingTokenName, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
-import { fetchPoolTarget, getEarningSlippage, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
+import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
+import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, getExtrinsicTypeByPoolInfo, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -78,6 +78,7 @@ const Component = () => {
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const poolTargetValue = useWatchTransaction('target', form, defaultData);
 
+  const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
   const oneSign = useOneSignProcess(fromValue);
   const nativeTokenSlug = useGetNativeTokenSlug(chainValue);
   const getReformatAddress = useCoreCreateReformatAddress();
@@ -319,9 +320,15 @@ const Component = () => {
 
     const values = convertFieldToObject<EarnParams>(allFields);
 
+    const isFromChanged = changedFields.some((field) => field.name.toString() === 'from');
+
+    if (isFromChanged && (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING)) {
+      form.resetFields(['target']);
+    }
+
     setIsFormInvalid(empty || error);
     persistData(values);
-  }, [persistData]);
+  }, [form, persistData, poolType]);
 
   const handleDataForInsufficientAlert = useCallback(() => {
     const _assetDecimals = nativeAsset?.decimals || 0;
@@ -345,7 +352,7 @@ const Component = () => {
           type: NotificationType.ERROR,
           content: t(balanceDisplayInfo.message, { replace: { minJoinPool, symbol, chain } }),
           okButton: {
-            text: t('I understand'),
+            text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
             onClick: closeAlert,
             icon: CheckCircle
           }
@@ -359,11 +366,11 @@ const Component = () => {
         return;
       } else if (insufficientXCMMessages.some((v) => error.message.includes(v))) {
         openAlert({
-          title: t('Insufficient balance'),
+          title: t('ui.TRANSACTION.screen.Transaction.Earn.insufficientBalance'),
           type: NotificationType.ERROR,
           content: error.message,
           okButton: {
-            text: t('I understand'),
+            text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
             onClick: closeAlert,
             icon: CheckCircle
           }
@@ -445,6 +452,15 @@ const Component = () => {
     [notify, onDone, onError, onHandleOneSignConfirmation, t]
   );
 
+  const { earningRate, earningSlippage, stakingFee } = useTaoStakingFee(
+    poolInfo,
+    amountValue,
+    assetDecimals,
+    poolInfo.metadata.subnetData?.netuid || 0,
+    ExtrinsicType.STAKING_BOND,
+    setSubmitLoading
+  );
+
   const netuid = useMemo(() => poolInfo.metadata.subnetData?.netuid, [poolInfo.metadata.subnetData]);
   const onSubmit: FormCallbacks<EarnParams>['onFinish'] = useCallback((values: EarnParams) => {
     const transactionBlockProcess = () => {
@@ -475,7 +491,8 @@ const Component = () => {
               selectedValidators: targets,
               subnetData: {
                 netuid: netuid,
-                slippage: maxSlippage?.slippage.toNumber()
+                slippage: maxSlippage?.slippage.toNumber(),
+                stakingFee: stakingFee
               }
             } as SubmitJoinNativeStaking;
           }
@@ -592,26 +609,26 @@ const Component = () => {
         content:
           (<>
             <div className={'earning-alert-content'}>
-              {t(`You're currently staking ${symbol} via direct nomination. Due to ${originChain}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)`)}
+              {t('ui.TRANSACTION.screen.Transaction.Earn.dualStakingFreezeWarning', { replace: { symbol: symbol, originChain: originChain } })}
             </div>
           </>),
-        title: t('Continue staking?'),
+        title: t('ui.TRANSACTION.screen.Transaction.Earn.continueStaking'),
         okButton: {
-          text: t('Continue'),
+          text: t('ui.TRANSACTION.screen.Transaction.Earn.continue'),
           onClick: () => {
             closeAlert();
             transactionBlockProcess();
           }
         },
         cancelButton: {
-          text: t('Cancel'),
+          text: t('ui.TRANSACTION.screen.Transaction.Earn.cancel'),
           onClick: closeAlert
         }
       });
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, setSubmitLoading, stakingFee, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {
@@ -630,17 +647,11 @@ const Component = () => {
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
-
-  const networkKey = useMemo(() => {
-    const netuid = poolInfo.metadata.subnetData?.netuid || 0;
-
-    return DefaultLogosMap[`subnet-${netuid}`] ? `subnet-${netuid}` : 'subnet-0';
-  }, [poolInfo.metadata.subnetData?.netuid]);
+  const subnetToken = useMemo(() => {
+    return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.netuid || 0);
+  }, [getSubnetStakingTokenName, poolInfo.chain, poolInfo.metadata.subnetData?.netuid]);
 
   // For subnet staking
-
-  const [earningSlippage, setEarningSlippage] = useState<number>(0);
-  const [earningRate, setEarningRate] = useState<number>(0);
   const [isSlippageModalVisible, setIsSlippageModalVisible] = useState<boolean>(false);
 
   const isDisabledSubnetContent = useMemo(
@@ -651,51 +662,8 @@ const Component = () => {
 
     [isSubnetStaking, amountValue, mustChooseTarget, poolTargetValue]
   );
-
   const alertBoxRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState<boolean>(false);
-  const debounce = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (isDisabledSubnetContent) {
-      return;
-    }
-
-    setSubmitLoading(true);
-
-    if (debounce.current) {
-      clearTimeout(debounce.current);
-    }
-
-    debounce.current = setTimeout(() => {
-      const netuid = poolInfo.metadata.subnetData?.netuid || 0;
-      const data = {
-        slug: poolInfo.slug,
-        value: amountValue,
-        netuid: netuid,
-        type: ExtrinsicType.STAKING_BOND
-      };
-
-      getEarningSlippage(data)
-        .then((result) => {
-          console.log('Actual stake slippage:', result.slippage * 100);
-          setEarningSlippage(result.slippage);
-          setEarningRate(result.rate);
-        })
-        .catch((error) => {
-          console.error('Error fetching earning slippage:', error);
-        })
-        .finally(() => {
-          setSubmitLoading(false);
-        });
-    }, 200);
-
-    return () => {
-      if (debounce.current) {
-        clearTimeout(debounce.current);
-      }
-    };
-  }, [amountValue, isDisabledSubnetContent, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
 
   const isSlippageAcceptable = useMemo(() => {
     if (earningSlippage === null || !amountValue) {
@@ -731,15 +699,16 @@ const Component = () => {
       <>
         <MetaInfo.Default
           className='__label-bottom'
-          label={t('Subnet')}
+          label={t('ui.TRANSACTION.screen.Transaction.Earn.subnet')}
         >
           <div className='__subnet-wrapper'>
             <Logo
               className='__item-logo'
               isShowSubLogo={false}
-              network={networkKey}
+              network={poolChain}
               shape='circle'
               size={24}
+              token={subnetToken}
             />
             <span
               className='chain-name'
@@ -755,13 +724,13 @@ const Component = () => {
             <MetaInfo.Number
               className='__label-bottom'
               decimals={assetDecimals}
-              label={t('Expected alpha amount')}
+              label={t('ui.TRANSACTION.screen.Transaction.Earn.expectedAlphaAmount')}
               suffix={poolInfo.metadata?.subnetData?.subnetSymbol || ''}
               value={BigN(amountValue).multipliedBy(1 / earningRate)}
             />
             <MetaInfo.Default
               className='__label-bottom'
-              label={t('Conversion rate')}
+              label={t('ui.TRANSACTION.screen.Transaction.Earn.conversionRate')}
             >
               <div className='__subnet-rate'>
                 <span
@@ -788,7 +757,7 @@ const Component = () => {
               title={'Transaction will not be executed if the price changes more than this slippage'}
             >
               <div className={'__max-slippage'}>
-                <div className='__label-bottom'>{t('Slippage')}</div>
+                <div className='__label-bottom'>{t('ui.TRANSACTION.screen.Transaction.Earn.slippage')}</div>
                 <Icon
                   className='__label-bottom'
                   customSize={'16px'}
@@ -820,7 +789,7 @@ const Component = () => {
         </MetaInfo.Default>
       </>
     );
-  }, [amountValue, assetDecimals, earningRate, inputAsset.symbol, isDisabledSubnetContent, isSlippageAcceptable, maxSlippage.slippage, networkKey, onOpenSlippageModal, poolInfo.metadata.shortName, poolInfo.metadata?.subnetData?.subnetSymbol, t]);
+  }, [amountValue, assetDecimals, earningRate, inputAsset.symbol, isDisabledSubnetContent, isSlippageAcceptable, maxSlippage.slippage, onOpenSlippageModal, poolChain, poolInfo.metadata.shortName, poolInfo.metadata?.subnetData?.subnetSymbol, subnetToken, t]);
 
   // For subnet staking
 
@@ -887,7 +856,7 @@ const Component = () => {
               <MetaInfo.Number
                 decimals={0}
                 key={item.slug}
-                label={t("You'll receive")}
+                label={t('ui.TRANSACTION.screen.Transaction.Earn.youllReceive')}
                 suffix={_getAssetSymbol(derivativeAssetInfo)}
                 value={value / item.exchangeRate}
               />
@@ -897,7 +866,7 @@ const Component = () => {
           <MetaInfo.Number
             className='__label-bottom'
             decimals={assetDecimals}
-            label={t('Minimum active stake')}
+            label={t('ui.TRANSACTION.screen.Transaction.Earn.minimumActiveStake')}
             suffix={assetSymbol}
             value={minJoinPool || 0}
           />
@@ -907,7 +876,7 @@ const Component = () => {
           ? (
             <MetaInfo.Chain
               chain={chainValue}
-              label={t('Network')}
+              label={t('ui.TRANSACTION.screen.Transaction.Earn.network')}
             />
           )
           : (renderSubnetStaking())
@@ -916,7 +885,7 @@ const Component = () => {
           <MetaInfo.Number
             className='__label-bottom'
             decimals={0}
-            label={t('Estimated fee')}
+            label={t('ui.TRANSACTION.screen.Transaction.Earn.estimatedFee')}
             prefix={(currencyData?.isPrefix && currencyData.symbol) || ''}
             suffix={(!currencyData?.isPrefix && currencyData?.symbol) || ''}
             value={estimatedFee}
@@ -928,25 +897,7 @@ const Component = () => {
 
   const onPreCheck = usePreCheckAction(fromValue);
 
-  const exType = useMemo(() => {
-    if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING) {
-      return ExtrinsicType.STAKING_BOND;
-    }
-
-    if (poolType === YieldPoolType.LIQUID_STAKING) {
-      if (chainValue === 'moonbeam') {
-        return ExtrinsicType.MINT_STDOT;
-      }
-
-      return ExtrinsicType.MINT_LDOT;
-    }
-
-    if (poolType === YieldPoolType.LENDING) {
-      return ExtrinsicType.MINT_LDOT;
-    }
-
-    return ExtrinsicType.STAKING_BOND;
-  }, [poolType, chainValue]);
+  const exType = useMemo(() => getExtrinsicTypeByPoolInfo({ chain: chainValue, type: poolType, slug }), [poolType, chainValue, slug]);
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);
@@ -956,16 +907,16 @@ const Component = () => {
       goBack();
     } else {
       openAlert({
-        title: t('Cancel earning process?'),
+        title: t('ui.TRANSACTION.screen.Transaction.Earn.cancelEarningProcess'),
         type: NotificationType.WARNING,
-        content: t('Going back will cancel the current earning process. Do you wish to cancel?'),
+        content: t('ui.TRANSACTION.screen.Transaction.Earn.confirmCancelEarningProcess'),
         okButton: {
-          text: t('Cancel earning'),
+          text: t('ui.TRANSACTION.screen.Transaction.Earn.cancelEarning'),
           onClick: goBack,
           schema: 'warning'
         },
         cancelButton: {
-          text: t('Not now'),
+          text: t('ui.TRANSACTION.screen.Transaction.Earn.notNow'),
           onClick: closeAlert
         }
       });
@@ -1047,13 +998,13 @@ const Component = () => {
         if (!isConnectingChainSuccess) {
           setIsLoadingChainConnection(false);
           openAlert({
-            title: t('Connection lost'),
+            title: t('ui.TRANSACTION.screen.Transaction.Earn.connectionLost'),
             type: NotificationType.ERROR,
             content: altChain
-              ? t(`${poolChainName} network or ${altChainName} network has lost connection. Re-enable the network and try again`)
-              : t(`${poolChainName} network has lost connection. Re-enable the network and try again`),
+              ? t('ui.TRANSACTION.screen.Transaction.Earn.dualNetworkConnectionLost', { replace: { poolChainName: poolChainName, altChainName: altChainName } })
+              : t('ui.TRANSACTION.screen.Transaction.Earn.networkConnectionLost', { replace: { poolChainName: poolChainName } }),
             okButton: {
-              text: t('I understand'),
+              text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
               onClick: closeAlert,
               icon: CheckCircle
             }
@@ -1278,7 +1229,7 @@ const Component = () => {
                   <FreeBalanceToEarn
                     address={fromValue}
                     hidden={submitStepType !== YieldStepType.XCM}
-                    label={`${t('Available balance')}`}
+                    label={`${t('ui.TRANSACTION.screen.Transaction.Earn.availableBalance')}`}
                     onBalanceReady={setIsBalanceReady}
                     tokens={balanceTokens}
                   />
@@ -1288,7 +1239,7 @@ const Component = () => {
                     chain={poolInfo.chain}
                     hidden={[YieldStepType.XCM].includes(submitStepType)}
                     isSubscribe={true}
-                    label={`${t('Available balance')}:`}
+                    label={`${t('ui.TRANSACTION.screen.Transaction.Earn.availableBalance')}:`}
                     tokenSlug={inputAsset.slug}
                   />
                 </div>
@@ -1322,7 +1273,7 @@ const Component = () => {
                       defaultValue={defaultData.target}
                       disabled={submitLoading}
                       from={fromValue}
-                      label={t('Pool')}
+                      label={t('ui.TRANSACTION.screen.Transaction.Earn.pool')}
                       loading={targetLoading}
                       setForceFetchValidator={setForceFetchValidator}
                       slug={slug}
@@ -1359,7 +1310,7 @@ const Component = () => {
                 <div ref={alertBoxRef}>
                   <AlertBox
                     className='__alert-box'
-                    description={`Unable to stake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again`}
+                    description={t('ui.TRANSACTION.screen.Transaction.Earn.stakeSlippageExceeded', { replace: { slippage: (earningSlippage * 100).toFixed(2) } })}
                     title='Slippage too high!'
                     type='error'
                   />
@@ -1378,7 +1329,7 @@ const Component = () => {
                 loading={submitLoading}
                 onClick={onPreCheck(form.submit, exType)}
               >
-                {t('Stake')}
+                {t('ui.TRANSACTION.screen.Transaction.Earn.stake')}
               </Button>
             </TransactionFooter>
           </>

@@ -6,13 +6,14 @@ import { AmountData, ExtrinsicType, NominationInfo } from '@subwallet/extension-
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
-import { AccountJson, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, MetaInfo, NominationSelector } from '@subwallet/extension-koni-ui/components';
-import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
+import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA, UNSTAKE_TANSSI_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
-import { getEarningSlippage, yieldSubmitLeavePool } from '@subwallet/extension-koni-ui/messaging';
+import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
+import { yieldSubmitLeavePool } from '@subwallet/extension-koni-ui/messaging';
 import { FormCallbacks, FormFieldData, ThemeProps, UnStakeParams } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, getBannerButtonIcon, getEarningTimeText, noop, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { BackgroundIcon, Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
@@ -33,15 +34,29 @@ type Props = ThemeProps;
 const filterAccount = (
   positionInfos: YieldPositionInfo[],
   chainInfoMap: Record<string, _ChainInfo>,
-  poolType: YieldPoolType,
-  poolChain?: string
+  poolInfo: YieldPoolInfo
 ): ((account: AccountJson) => boolean) => {
   return (account: AccountJson): boolean => {
-    const nominator = positionInfos.find((item) => item.address.toLowerCase() === account.address.toLowerCase());
+    let stakedPositions = positionInfos;
+
+    const isTanssiStaking = _STAKING_CHAIN_GROUP.tanssi.includes(poolInfo.chain);
+
+    if (isTanssiStaking) {
+      stakedPositions = positionInfos.filter((item) => {
+        const totalNominationStake =
+          item.nominations?.reduce((acc, n) => acc.plus(n.activeStake || 0), BN_ZERO) || BN_ZERO;
+
+        return totalNominationStake.gt(BN_ZERO);
+      });
+    }
+
+    const nominator = stakedPositions.find(
+      (item) => item.address.toLowerCase() === account.address.toLowerCase()
+    );
 
     return (
       new BigN(nominator?.activeStake || BN_ZERO).gt(BN_ZERO) &&
-      accountFilterFunc(chainInfoMap, poolType, poolChain)(account)
+      accountFilterFunc(chainInfoMap, poolInfo.type, poolInfo.chain)(account)
     );
   };
 };
@@ -67,6 +82,8 @@ const Component: React.FC = () => {
   const [form] = Form.useForm<UnStakeParams>();
   const [isBalanceReady, setIsBalanceReady] = useState(true);
   const [amountChange, setAmountChange] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isDisable, setIsDisable] = useState(true);
 
   const formDefault = useMemo((): UnStakeParams => ({
     ...defaultData
@@ -102,10 +119,7 @@ const Component: React.FC = () => {
   // For subnet staking
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
-  const [earningSlippage, setEarningSlippage] = useState<number>(0);
   const [maxSlippage, setMaxSlippage] = useState<SlippageType>({ slippage: new BigN(0.005), isCustomType: true });
-  const [earningRate, setEarningRate] = useState<number>(0);
-  const debounce = useRef<NodeJS.Timeout | null>(null);
 
   const isDisabledSubnetContent = useMemo(
     () =>
@@ -114,48 +128,14 @@ const Component: React.FC = () => {
 
     [isSubnetStaking, amountValue]
   );
-
-  useEffect(() => {
-    if (isDisabledSubnetContent) {
-      return;
-    }
-
-    setLoading(true);
-
-    if (debounce.current) {
-      clearTimeout(debounce.current);
-    }
-
-    debounce.current = setTimeout(() => {
-      const netuid = poolInfo.metadata.subnetData?.netuid || 0;
-      const data = {
-        slug: poolInfo.slug,
-        value: amountValue,
-        netuid: netuid,
-        type: ExtrinsicType.STAKING_UNBOND
-      };
-
-      getEarningSlippage(data)
-        .then((result) => {
-          console.log('Actual stake slippage:', result.slippage * 100);
-          setEarningSlippage(result.slippage);
-          setEarningRate(result.rate);
-        })
-        .catch((error) => {
-          console.error('Error fetching earning slippage:', error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }, 200);
-
-    return () => {
-      if (debounce.current) {
-        clearTimeout(debounce.current);
-      }
-    };
-  }, [amountValue, isDisabledSubnetContent, poolInfo.metadata.subnetData?.netuid, poolInfo.slug]);
-
+  const { earningRate, earningSlippage, stakingFee } = useTaoStakingFee(
+    poolInfo,
+    amountValue,
+    decimals,
+    poolInfo.metadata.subnetData?.netuid || 0,
+    ExtrinsicType.STAKING_UNBOND,
+    setLoading
+  );
   const isSlippageAcceptable = useMemo(() => {
     if (earningSlippage === null || !amountValue) {
       return true;
@@ -185,13 +165,13 @@ const Component: React.FC = () => {
         <MetaInfo.Number
           className='__label-bottom'
           decimals={decimals}
-          label={t('Expected TAO to receive')}
+          label={t('ui.TRANSACTION.screen.Transaction.Unbond.expectedTaoToReceive')}
           suffix={bondedAsset?.symbol || ''}
           value={BigNumber(amountValue).multipliedBy(earningRate)}
         />
         <MetaInfo.Default
           className='__label-bottom'
-          label={t('Conversion rate')}
+          label={t('ui.TRANSACTION.screen.Transaction.Unbond.conversionRate')}
         >
           <div className='__subnet-rate'>
             <span
@@ -276,9 +256,9 @@ const Component: React.FC = () => {
     ) {
       const time = poolInfo.statistic.unstakingPeriod;
 
-      return getEarningTimeText(time);
+      return getEarningTimeText(t, time);
     } else {
-      return t('unknown time');
+      return t('ui.TRANSACTION.screen.Transaction.Unbond.unknownTime');
     }
   }, [poolInfo.statistic, t]);
 
@@ -300,8 +280,6 @@ const Component: React.FC = () => {
     [chainInfoMap, chainValue]
   );
 
-  const [loading, setLoading] = useState(false);
-  const [isDisable, setIsDisable] = useState(true);
   const { onError, onSuccess } = useHandleSubmitTransaction(undefined, handleDataForInsufficientAlert);
 
   const onValuesChange: FormCallbacks<UnStakeParams>['onValuesChange'] = useCallback((changes: Partial<UnStakeParams>, values: UnStakeParams) => {
@@ -355,7 +333,8 @@ const Component: React.FC = () => {
       fastLeave,
       slug,
       poolInfo: poolInfo,
-      slippage: maxSlippage.slippage.toNumber()
+      slippage: maxSlippage.slippage.toNumber(),
+      stakingFee: stakingFee
     };
 
     if (mustChooseValidator) {
@@ -374,7 +353,7 @@ const Component: React.FC = () => {
           setLoading(false);
         });
     }, 300);
-  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo]);
+  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, stakingFee]);
 
   const onClickSubmit = useCallback((values: UnStakeParams) => {
     if (currentConfirmation) {
@@ -413,8 +392,8 @@ const Component: React.FC = () => {
   useInitValidateTransaction(validateFields, form, defaultData);
 
   const accountList = useMemo(() => {
-    return accounts.filter(filterAccount(allPositions, chainInfoMap, poolType, poolChain));
-  }, [accounts, allPositions, chainInfoMap, poolChain, poolType]);
+    return accounts.filter(filterAccount(allPositions, chainInfoMap, poolInfo));
+  }, [accounts, allPositions, chainInfoMap, poolInfo]);
 
   const nominators = useMemo(() => {
     if (fromValue && positionInfo?.nominations && positionInfo.nominations.length) {
@@ -454,7 +433,7 @@ const Component: React.FC = () => {
 
   useEffect(() => {
     if (poolType === YieldPoolType.LENDING) {
-      setCustomScreenTitle(t('Withdraw'));
+      setCustomScreenTitle(t('ui.TRANSACTION.screen.Transaction.Unbond.withdraw'));
     }
 
     return () => {
@@ -472,15 +451,31 @@ const Component: React.FC = () => {
         return ExtrinsicType.UNSTAKE_STDOT;
       }
 
-      return ExtrinsicType.UNSTAKE_LDOT;
+      if (chainValue === 'bifrost_dot') {
+        if (slug === 'MANTA___liquid_staking___bifrost_dot') {
+          return ExtrinsicType.UNSTAKE_VMANTA;
+        }
+
+        return ExtrinsicType.UNSTAKE_VDOT;
+      }
+
+      if (chainValue === 'parallel') {
+        return ExtrinsicType.UNSTAKE_SDOT;
+      }
+
+      if (chainValue === 'acala') {
+        return ExtrinsicType.UNSTAKE_LDOT;
+      }
     }
 
     if (poolType === YieldPoolType.LENDING) {
-      return ExtrinsicType.UNSTAKE_LDOT;
+      if (chainValue === 'interlay') {
+        return ExtrinsicType.UNSTAKE_QDOT;
+      }
     }
 
     return ExtrinsicType.STAKING_UNBOND;
-  }, [poolType, chainValue]);
+  }, [poolType, chainValue, slug]);
 
   const handleValidatorLabel = useMemo(() => {
     const label = getValidatorLabel(chainValue);
@@ -488,9 +483,20 @@ const Component: React.FC = () => {
     return label !== 'dApp' ? label.toLowerCase() : label;
   }, [chainValue]);
 
-  const unstakeAlertData = poolChain === 'bifrost_dot'
-    ? UNSTAKE_BIFROST_ALERT_DATA
-    : poolChain.startsWith('bittensor') ? UNSTAKE_BITTENSOR_ALERT_DATA : UNSTAKE_ALERT_DATA;
+  const unstakeAlertData = useMemo(() => {
+    switch (true) {
+      case poolChain === 'bifrost_dot':
+        return UNSTAKE_BIFROST_ALERT_DATA;
+      case poolChain === 'bittensor':
+      case poolChain === 'bittensor_testnet':
+        return UNSTAKE_BITTENSOR_ALERT_DATA;
+      case poolChain === 'tanssi':
+      case poolChain === 'dancelight':
+        return UNSTAKE_TANSSI_ALERT_DATA;
+      default:
+        return UNSTAKE_ALERT_DATA;
+    }
+  }, [poolChain]);
 
   return (
     <>
@@ -513,14 +519,14 @@ const Component: React.FC = () => {
               disabled={!isAllAccount}
               doFilter={false}
               externalAccounts={accountList}
-              label={poolInfo.type === YieldPoolType.LENDING ? t('Withdraw from account') : t('Unstake from account')}
+              label={poolInfo.type === YieldPoolType.LENDING ? t('ui.TRANSACTION.screen.Transaction.Unbond.withdrawFromAccount') : t('ui.TRANSACTION.screen.Transaction.Unbond.unstakeFromAccount')}
             />
           </Form.Item>
           <FreeBalance
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('Available balance')}
+            label={t('ui.TRANSACTION.screen.Transaction.Unbond.availableBalance')}
             onBalanceReady={setIsBalanceReady}
           />
 
@@ -532,7 +538,7 @@ const Component: React.FC = () => {
               chain={chainValue}
               defaultValue={persistValidator}
               disabled={!fromValue}
-              label={t(`Select ${handleValidatorLabel}`)}
+              label={t('ui.TRANSACTION.screen.Transaction.Unbond.selectValidatorLabel', { replace: { handleValidatorLabel: handleValidatorLabel } })}
               networkPrefix={networkPrefix}
               nominators={nominators}
               poolInfo={poolInfo}
@@ -575,7 +581,7 @@ const Component: React.FC = () => {
             valuePropName='checked'
           >
             <Checkbox>
-              <span className={'__option-label'}>{t('Fast unstake')}</span>
+              <span className={'__option-label'}>{t('ui.TRANSACTION.screen.Transaction.Unbond.fastUnstake')}</span>
             </Checkbox>
           </Form.Item>
 
@@ -612,7 +618,7 @@ const Component: React.FC = () => {
                           ref={alertBoxRef}
                         >
                           <AlertBox
-                            description={`Unable to unstake due to a slippage of ${(earningSlippage * 100).toFixed(2)}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again`}
+                            description={t('ui.TRANSACTION.screen.Transaction.Unbond.unstakeSlippageExceeded', { replace: { slippage: (earningSlippage * 100).toFixed(2) } })}
                             title='Slippage too high!'
                             type='error'
                           />
@@ -622,8 +628,8 @@ const Component: React.FC = () => {
                   )
                   : (
                     <AlertBox
-                      description={t('You can withdraw your supplied funds immediately')}
-                      title={t('Withdraw')}
+                      description={t('ui.TRANSACTION.screen.Transaction.Unbond.withdrawSuppliedFundsImmediately')}
+                      title={t('ui.TRANSACTION.screen.Transaction.Unbond.withdraw')}
                       type={'info'}
                     />
                   )
@@ -631,9 +637,9 @@ const Component: React.FC = () => {
               : (
                 <AlertBox
                   description={poolChain === 'bifrost_dot'
-                    ? t(`In this mode, ${symbol} will be directly exchanged for ${altSymbol} at the market price without waiting for the unstaking period`)
-                    : t('With fast unstake, you will receive your funds immediately with a higher fee')}
-                  title={t('Fast unstake')}
+                    ? t('ui.TRANSACTION.screen.Transaction.Unbond.fastExchangeModeDescription', { replace: { symbol: symbol, altSymbol: altSymbol } })
+                    : t('ui.TRANSACTION.screen.Transaction.Unbond.fastUnstakeInfo')}
+                  title={t('ui.TRANSACTION.screen.Transaction.Unbond.fastUnstake')}
                   type={'info'}
                 />
               )}
@@ -653,7 +659,7 @@ const Component: React.FC = () => {
           loading={loading}
           onClick={onPreCheck(form.submit, exType)}
         >
-          {poolInfo.type === YieldPoolType.LENDING ? t('Withdraw') : t('Unstake')}
+          {poolInfo.type === YieldPoolType.LENDING ? t('ui.TRANSACTION.screen.Transaction.Unbond.withdraw') : t('ui.TRANSACTION.screen.Transaction.Unbond.unstake')}
         </Button>
       </TransactionFooter>
     </>

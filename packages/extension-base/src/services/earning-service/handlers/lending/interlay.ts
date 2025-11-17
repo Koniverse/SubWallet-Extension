@@ -12,6 +12,7 @@ import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 import { fakeAddress } from '../../constants';
 import BaseLendingPoolHandler from './base';
 
+// TODO: disable earning and stake actions but keep showing existing earning positions (currently handle on UI)
 export default class InterlayLendingPoolHandler extends BaseLendingPoolHandler {
   public slug: string;
   protected readonly name: string;
@@ -21,13 +22,14 @@ export default class InterlayLendingPoolHandler extends BaseLendingPoolHandler {
   protected readonly inputAsset: string = 'interlay-LOCAL-DOT';
   protected readonly rewardAssets: string[] = ['interlay-LOCAL-DOT'];
   protected readonly feeAssets: string[] = ['interlay-NATIVE-INTR', 'interlay-LOCAL-DOT'];
-  protected readonly availableMethod: YieldPoolMethodInfo = {
+  public readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: false,
     fastUnstake: true,
     cancelUnstake: false,
     withdraw: false,
-    claimReward: false
+    claimReward: false,
+    changeValidator: false
   };
 
   protected readonly rateDecimals = 18;

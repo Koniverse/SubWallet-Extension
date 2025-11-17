@@ -4,6 +4,7 @@
 import { TransactionFormBaseProps } from '@subwallet/extension-koni-ui/types';
 import { noop } from '@subwallet/extension-koni-ui/utils';
 import { Form, FormInstance } from '@subwallet/react-ui';
+import { NamePath } from '@subwallet/react-ui/es/form/interface';
 import { useEffect, useState } from 'react';
 import { useIsFirstRender } from 'usehooks-ts';
 
@@ -11,10 +12,32 @@ const useLazyWatchTransaction = <T extends TransactionFormBaseProps, K extends k
   const isFirstRender = useIsFirstRender();
   const watch = Form.useWatch(key, form);
   const [value, setValue] = useState<T[K]>(defaultData[key]);
+  const [isBlur, setIsBlur] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const formObject = form.getFieldInstance(key as NamePath);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const inputElement = formObject?.input as HTMLInputElement;
+
+    if (inputElement) {
+      inputElement.onfocus = () => {
+        setIsBlur(false);
+      };
+
+      inputElement.onblur = () => {
+        setIsBlur(true);
+      };
+    }
+  }, [form, key]);
 
   useEffect(() => {
     if (isFirstRender) {
       setValue(defaultData[key]);
+
+      return noop;
+    } else if (isBlur) {
+      setValue(watch);
 
       return noop;
     } else {
@@ -24,7 +47,7 @@ const useLazyWatchTransaction = <T extends TransactionFormBaseProps, K extends k
 
       return () => clearTimeout(timer);
     }
-  }, [defaultData, isFirstRender, key, lazyTime, watch]);
+  }, [defaultData, isBlur, isFirstRender, key, lazyTime, watch]);
 
   return value;
 };

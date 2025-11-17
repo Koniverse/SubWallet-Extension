@@ -9,6 +9,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const ManifestPlugin = require('webpack-extension-manifest-plugin');
 
 const pkgJson = require('./package.json');
+const chainListPkgJson = require('@subwallet/chain-list/package.json');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const args = process.argv.slice(2);
@@ -35,8 +36,7 @@ const packages = [
   'extension-dapp',
   'extension-inject',
   'extension-koni',
-  'extension-koni-ui',
-  'subwallet-api-sdk'
+  'extension-koni-ui'
 ];
 
 const _additionalEnv = {
@@ -47,28 +47,12 @@ const _additionalEnv = {
   BANXA_TEST_MODE: JSON.stringify(false),
   INFURA_API_KEY: JSON.stringify(process.env.INFURA_API_KEY),
   INFURA_API_KEY_SECRET: JSON.stringify(process.env.INFURA_API_KEY_SECRET),
-  CHAINFLIP_BROKER_API: JSON.stringify(process.env.CHAINFLIP_BROKER_API),
-  BITTENSOR_API_KEY_1: JSON.stringify(process.env.BITTENSOR_API_KEY_1),
-  BITTENSOR_API_KEY_2: JSON.stringify(process.env.BITTENSOR_API_KEY_2),
-  BITTENSOR_API_KEY_3: JSON.stringify(process.env.BITTENSOR_API_KEY_3),
-  BITTENSOR_API_KEY_4: JSON.stringify(process.env.BITTENSOR_API_KEY_4),
-  BITTENSOR_API_KEY_5: JSON.stringify(process.env.BITTENSOR_API_KEY_5),
-  BITTENSOR_API_KEY_6: JSON.stringify(process.env.BITTENSOR_API_KEY_6),
-  BITTENSOR_API_KEY_7: JSON.stringify(process.env.BITTENSOR_API_KEY_7),
-  BITTENSOR_API_KEY_8: JSON.stringify(process.env.BITTENSOR_API_KEY_8),
-  BITTENSOR_API_KEY_9: JSON.stringify(process.env.BITTENSOR_API_KEY_9),
-  BITTENSOR_API_KEY_10: JSON.stringify(process.env.BITTENSOR_API_KEY_10),
-  SIMPLE_SWAP_API_KEY: JSON.stringify(process.env.SIMPLE_SWAP_API_KEY),
-  UNISWAP_API_KEY: JSON.stringify(process.env.UNISWAP_API_KEY),
-  KYBER_CLIENT_ID: JSON.stringify(process.env.KYBER_CLIENT_ID),
   SUBWALLET_API: JSON.stringify(process.env.SUBWALLET_API),
-  BLOCKFROST_API_KEY_MAIN: JSON.stringify(process.env.BLOCKFROST_API_KEY_MAIN),
-  BLOCKFROST_API_KEY_PREP: JSON.stringify(process.env.BLOCKFROST_API_KEY_PREP),
-  MELD_API_KEY: JSON.stringify(process.env.MELD_API_KEY),
+  SW_EXTERNAL_SERVICES_API: JSON.stringify(process.env.SW_EXTERNAL_SERVICES_API),
   MELD_WIZARD_KEY: JSON.stringify(process.env.MELD_WIZARD_KEY),
   MELD_TEST_MODE: JSON.stringify(false),
-  PARASPELL_API_KEY: JSON.stringify(process.env.PARASPELL_API_KEY),
-  BTC_SERVICE_TOKEN: JSON.stringify(process.env.BTC_SERVICE_TOKEN)
+  BTC_SERVICE_TOKEN: JSON.stringify(process.env.BTC_SERVICE_TOKEN),
+  PATCH_CHAIN_LIST_URL: JSON.stringify(process.env.PATCH_CHAIN_LIST_URL)
 };
 
 const additionalEnvDict = {
@@ -137,6 +121,7 @@ module.exports = (entry, alias = {}, isFirefox = false) => {
           NODE_ENV: JSON.stringify(mode),
           PKG_NAME: JSON.stringify(pkgJson.name),
           PKG_VERSION: JSON.stringify(pkgJson.version),
+          CHAIN_LIST_VERSION: JSON.stringify(chainListPkgJson.version),
           TARGET_ENV: JSON.stringify('extension'),
           BRANCH_NAME: JSON.stringify(process.env.BRANCH_NAME),
           ID_PREDIX: JSON.stringify('sw-ext-'),

@@ -5,16 +5,18 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
+import { LedgerMustCheckType } from '@subwallet/extension-base/core/types';
+import { ledgerMustCheckNetwork } from '@subwallet/extension-base/core/utils';
 import { _getChainSubstrateAddressPrefix, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
-import { AbstractAddressJson, AccountChainType, AccountJson, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AbstractAddressJson, AccountChainType, AccountJson, AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
 import { isAccountAll, reformatAddress, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { MODE_CAN_SIGN } from '@subwallet/extension-koni-ui/constants/signing';
-import { AccountAddressType, AccountSignMode, AccountType, BitcoinAccountInfo } from '@subwallet/extension-koni-ui/types';
+import { AccountAddressType, AccountType, BitcoinAccountInfo } from '@subwallet/extension-koni-ui/types';
 import { getNetworkKeyByGenesisHash } from '@subwallet/extension-koni-ui/utils/chain/getNetworkJsonByGenesisHash';
 import { AccountInfoByNetwork } from '@subwallet/extension-koni-ui/utils/types';
-import { isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
-import { BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
+import { isAddress, isBitcoinAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
+import { KeypairType } from '@subwallet/keyring/types';
 import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
 import { decodeAddress, encodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
@@ -60,12 +62,34 @@ export const findAccountByAddress = (accounts: AccountJson[], address?: string):
   }
 };
 
+export const getSignModeByAccountProxy = (accountProxy: AccountProxy | null | undefined): AccountSignMode => {
+  return getSignMode(accountProxy?.accounts[0]);
+};
+
 export const getSignMode = (account: AccountJson | null | undefined): AccountSignMode => {
   if (!account) {
     return AccountSignMode.UNKNOWN;
   } else {
     return account.signMode;
   }
+};
+
+export const getTransactionActionsByAccountProxy = (accountProxy: AccountProxy, accountProxies: AccountProxy[] = []): string[] => {
+  const transactionActionsSet = new Set<string>();
+
+  if (isAccountAll(accountProxy.id)) {
+    accountProxies.forEach((proxy) => {
+      proxy.accounts?.forEach(({ transactionActions }) => {
+        transactionActions?.forEach((action) => transactionActionsSet.add(action));
+      });
+    });
+  } else {
+    accountProxy.accounts.forEach(({ transactionActions }) => {
+      transactionActions?.forEach((action) => transactionActionsSet.add(action));
+    });
+  }
+
+  return Array.from(transactionActionsSet);
 };
 
 export const accountCanSign = (signMode: AccountSignMode): boolean => {
@@ -223,7 +247,7 @@ export function getReformatedAddressRelatedToChain (accountJson: AccountJson, ch
     return undefined;
   }
 
-  if (!_isChainInfoCompatibleWithAccountInfo(chainInfo, accountJson.chainType, accountJson.type)) {
+  if (!_isChainInfoCompatibleWithAccountInfo(chainInfo, accountJson)) {
     return undefined;
   }
 
@@ -236,36 +260,24 @@ export function getReformatedAddressRelatedToChain (accountJson: AccountJson, ch
   } else if (accountJson.chainType === AccountChainType.CARDANO && chainInfo.cardanoInfo) {
     return reformatAddress(accountJson.address, chainInfo.isTestnet ? 0 : 1);
   } else if (accountJson.chainType === AccountChainType.BITCOIN && chainInfo.bitcoinInfo) {
-    const isTestnet = chainInfo.isTestnet;
-    const isBitcoinTestnet = BitcoinTestnetKeypairTypes.includes(accountJson.type);
-
-    // Both must be testnet or both must be mainnet
-    if (isTestnet !== isBitcoinTestnet) {
-      return undefined;
-    }
-
     return accountJson.address;
   }
 
   return undefined;
 }
 
-type LedgerMustCheckType = 'polkadot' | 'migration' | 'unnecessary'
-
-export const ledgerMustCheckNetwork = (account: AccountJson | null | undefined): LedgerMustCheckType => {
-  if (account && account.isHardware && account.isGeneric && !isEthereumAddress(account.address)) {
-    return account.originGenesisHash ? 'migration' : 'polkadot';
-  } else {
-    return 'unnecessary';
-  }
-};
-
 export const ledgerGenericAccountProblemCheck = (accountProxy: AccountProxy | null | undefined): LedgerMustCheckType => {
-  if (accountProxy && accountProxy.accountType === AccountProxyType.LEDGER && accountProxy.chainTypes.includes(AccountChainType.SUBSTRATE) && !accountProxy.specialChain) {
-    return ledgerMustCheckNetwork(accountProxy.accounts[0]);
-  } else {
-    return 'unnecessary';
+  if (accountProxy && accountProxy.accountType === AccountProxyType.LEDGER && !accountProxy.specialChain) {
+    if (accountProxy.chainTypes.includes(AccountChainType.SUBSTRATE)) {
+      return ledgerMustCheckNetwork(accountProxy.accounts[0]);
+    }
+
+    if (accountProxy.chainTypes.includes(AccountChainType.ETHEREUM) && accountProxy.accounts[0].isSubstrateECDSA) {
+      return ledgerMustCheckNetwork(accountProxy.accounts[0]);
+    }
   }
+
+  return 'unnecessary';
 };
 
 export const isAddressAllowedWithAuthType = (address: string, authAccountTypes?: AccountAuthType[]) => {
@@ -285,6 +297,10 @@ export const isAddressAllowedWithAuthType = (address: string, authAccountTypes?:
     return true;
   }
 
+  if (isBitcoinAddress(address) && authAccountTypes?.includes('bitcoin')) {
+    return true;
+  }
+
   return false;
 };
 
@@ -294,7 +310,8 @@ export function getChainTypeLogoMap (logoMap: Web3LogoMap): Record<string, strin
     [AccountChainType.ETHEREUM]: logoMap.network.ethereum as string,
     [AccountChainType.BITCOIN]: logoMap.network.bitcoin as string,
     [AccountChainType.TON]: logoMap.network.ton as string,
-    [AccountChainType.CARDANO]: logoMap.network.cardano as string
+    [AccountChainType.CARDANO]: logoMap.network.cardano as string,
+    [AccountChainType.BITCOIN]: logoMap.network.bitcoin as string
   };
 }
 

@@ -28,9 +28,10 @@ export interface SubmitJoinNativeStaking extends AbstractSubmitYieldJoinData {
     mindBond: string
   }
   selectedValidators: ValidatorInfo[];
-  subnetData: {
+  subnetData?: {
     netuid: number,
     slippage: number
+    stakingFee?: string;
   }
 }
 
@@ -98,6 +99,21 @@ export interface BondingSubmitParams extends BaseRequestSign {
   address: string,
   selectedValidators: ValidatorInfo[],
   lockPeriod?: number // in month
+  subnetData?: {
+    netuid: number,
+    slippage: number
+  }
 }
 
 export type RequestBondingSubmit = InternalRequestSign<BondingSubmitParams>;
+
+export type SubmitChangeValidatorStaking = SubmitBittensorChangeValidatorStaking | SubmitJoinNativeStaking;
+
+export interface SubmitBittensorChangeValidatorStaking extends SubmitJoinNativeStaking {
+  originValidator: string;
+  maxAmount: string;
+  isMovePartialStake: boolean;
+  metadata: {
+    subnetSymbol: string;
+  }
+}

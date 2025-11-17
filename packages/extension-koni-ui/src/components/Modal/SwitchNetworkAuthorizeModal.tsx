@@ -14,6 +14,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
+import useNotification from '../../hooks/common/useNotification';
+
 export interface SwitchNetworkAuthorizeModalProps {
   authUrlInfo: AuthUrlInfo;
   onComplete: (authInfo: AuthUrls) => void;
@@ -33,6 +35,7 @@ function Component ({ authUrlInfo, className, needsTabAuthCheck, onCancel, onCom
   const [networkSelected, setNetworkSelected] = useState(authUrlInfo.currentNetworkMap[networkTypeSupported] || '');
   const chainInfoMap = useSelector((root: RootState) => root.chainStore.chainInfoMap);
   const currentAuthByActiveTab = useGetCurrentAuth();
+  const showNotification = useNotification();
 
   const networkItems = useMemo(() => {
     return Object.values(chainInfoMap)
@@ -60,6 +63,9 @@ function Component ({ authUrlInfo, className, needsTabAuthCheck, onCancel, onCom
       }
 
       switchCurrentNetworkAuthorization({ networkKey: networkSelected, authSwitchNetworkType: networkTypeSupported, url }).then(({ list }) => {
+        showNotification({
+          message: t('ui.DAPP.components.Modal.SwitchNetworkAuthorize.switchedNetworkSuccessfully')
+        });
         onComplete(list);
       }).catch(console.error).finally(() => {
         onCancel();
@@ -74,7 +80,7 @@ function Component ({ authUrlInfo, className, needsTabAuthCheck, onCancel, onCom
     return () => {
       isSync = false;
     };
-  }, [authUrlInfo, networkSelected, onCancel, onComplete]);
+  }, [authUrlInfo, networkSelected, onCancel, onComplete, showNotification, t]);
 
   useEffect(() => {
     if (needsTabAuthCheck && currentAuthByActiveTab && currentAuthByActiveTab.id !== authUrlInfo.id) {
@@ -89,7 +95,7 @@ function Component ({ authUrlInfo, className, needsTabAuthCheck, onCancel, onCom
       items={networkItems}
       loading={loading}
       onChange={onSelectNetwork}
-      title={t('Select network')}
+      title={t('ui.DAPP.components.Modal.SwitchNetworkAuthorize.selectNetwork')}
       value={networkSelected}
     />
   );
