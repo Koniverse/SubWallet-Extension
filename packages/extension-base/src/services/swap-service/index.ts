@@ -130,7 +130,7 @@ export class SwapService implements StoppableServiceInterface {
     if (!params.selectedQuote) {
       return this.getDefaultProcessV2(params);
     } else {
-      const providerId = params.request.currentQuote?.id || params.selectedQuote.provider.id;
+      const providerId = params.selectedQuote.provider.id;
       const handler = this.handlers[providerId];
 
       if (handler) {
