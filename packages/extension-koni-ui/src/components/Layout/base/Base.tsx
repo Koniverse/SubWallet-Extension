@@ -14,7 +14,7 @@ import { computeStatus } from '@subwallet/extension-koni-ui/utils';
 import { Icon, SwScreenLayout } from '@subwallet/react-ui';
 import { SwTabBarItem } from '@subwallet/react-ui/es/sw-tab-bar';
 import CN from 'classnames';
-import { Aperture, Clock, NewspaperClipping, Parachute, Vault, Wallet } from 'phosphor-react';
+import { Clock, NewspaperClipping, Parachute, Vault, Wallet } from 'phosphor-react';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -73,7 +73,7 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
         phosphorIcon: Wallet,
         weight: 'fill'
       },
-      label: t('ui.components.Layout.Base.tokens'),
+      label: t('ui.components.Layout.Base.assets'),
       key: 'tokens',
       url: '/home/tokens'
     },
@@ -86,16 +86,6 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
       label: t('ui.components.Layout.Base.governance'),
       key: 'governance',
       url: '/home/governance'
-    },
-    {
-      icon: {
-        type: 'phosphor',
-        phosphorIcon: Aperture,
-        weight: 'fill'
-      },
-      label: t('ui.components.Layout.Base.nfts'),
-      key: 'nfts',
-      url: '/home/nfts/collections'
     },
     {
       icon: {

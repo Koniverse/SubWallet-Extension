@@ -1,8 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Layout } from '@subwallet/extension-koni-ui/components';
-import { GlobalSearchTokenModal } from '@subwallet/extension-koni-ui/components/Modal/GlobalSearchTokenModal';
+import { GlobalSearchTokenGroupModal, Layout } from '@subwallet/extension-koni-ui/components';
 import RemindUpgradeFirefoxVersion from '@subwallet/extension-koni-ui/components/Modal/RemindUpgradeFirefoxVersion';
 import { GeneralTermModal } from '@subwallet/extension-koni-ui/components/Modal/TermsAndConditions/GeneralTermModal';
 import { CONFIRM_GENERAL_TERM, DEFAULT_SESSION_VALUE, GENERAL_TERM_AND_CONDITION_MODAL, HOME_CAMPAIGN_BANNER_MODAL, LATEST_SESSION, REMIND_BACKUP_SEED_PHRASE_MODAL, REMIND_UPGRADE_FIREFOX_VERSION } from '@subwallet/extension-koni-ui/constants';
@@ -21,6 +20,7 @@ import { useLocalStorage } from 'usehooks-ts';
 type Props = ThemeProps;
 
 export const GlobalSearchTokenModalId = 'globalSearchToken';
+export const GlobalSearchTokenGroupModalId = 'GlobalSearchTokenGroupModalId';
 const historyPageIgnoreRemind = 'ignoreRemind';
 const historyPageIgnoreBanner = 'ignoreBanner';
 
@@ -44,8 +44,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     activeModal(GlobalSearchTokenModalId);
   }, [activeModal]);
 
-  const onCloseGlobalSearchToken = useCallback(() => {
-    inactiveModal(GlobalSearchTokenModalId);
+  const onCloseGlobalSearchTokenGroup = useCallback(() => {
+    inactiveModal(GlobalSearchTokenGroupModalId);
   }, [inactiveModal]);
 
   const onAfterConfirmTermModal = useCallback(() => {
@@ -127,11 +127,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         </div>
       </HomeContext.Provider>
 
-      <GlobalSearchTokenModal
-        id={GlobalSearchTokenModalId}
-        onCancel={onCloseGlobalSearchToken}
-        tokenBalanceMap={accountBalance.tokenBalanceMap}
-        tokenSlugs={tokenGroupStructure.tokenSlugs}
+      <GlobalSearchTokenGroupModal
+        id={GlobalSearchTokenGroupModalId}
+        onCancel={onCloseGlobalSearchTokenGroup}
+        tokenGroupBalanceMap={accountBalance.tokenGroupBalanceMap}
+        tokenGroups={tokenGroupStructure.tokenGroups}
       />
     </>
   );
