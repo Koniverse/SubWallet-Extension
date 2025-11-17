@@ -154,7 +154,6 @@ export class SwapBaseHandler {
     if (stepIndex === 0) {
       recipientAddress = _reformatAddressWithChain(address, toChainInfo, substrateAddress);
     } else { // bridge after swap
-      // todo: Check recipientAddress in case Bridge Swap Bridge from a Substrate Address Chain -> EVM Address Chain
       recipientAddress = _reformatAddressWithChain(recipient || address, toChainInfo, substrateAddress);
     }
 

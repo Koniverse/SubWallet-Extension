@@ -205,7 +205,6 @@ export class HydradxHandler implements SwapBaseInterface {
       const overrideQuote = quoteAskResponse.quote as SwapQuote;
 
       txHex = overrideQuote.metadata as string;
-      // todo: Check recipientAddress in case Bridge Swap Bridge from a Substrate Address Chain -> EVM Address Chain
       receiver = _reformatAddressWithChain(address, destinationChain, substrateAddress);
     }
 
