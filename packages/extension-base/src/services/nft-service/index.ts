@@ -37,7 +37,7 @@ function mapSdkToNftItem (
   chain: string,
   collectionId: string,
   owner: string
-): NftItem {
+): NftItem | null {
   const metadata = rawInstance.metadata || {};
 
   const image = metadata.image || rawInstance.image_url || rawInstance.media_url || '';
@@ -78,6 +78,12 @@ function mapSdkToNftItem (
 
   const hasProperties = Object.keys(properties).length > 0;
   const normalizedType = rawInstance.token_type?.replace('-', '')?.toUpperCase();
+
+  // Only support ERC721
+  if (normalizedType !== 'ERC721') {
+    console.log('rawInstance', rawInstance);
+    return null;
+  }
 
   return {
     id: rawInstance.id?.toString(),
@@ -166,7 +172,7 @@ export default class NftService {
               if (Array.isArray(col.token_instances)) {
                 const items = col.token_instances.map((inst) =>
                   mapSdkToNftItem(inst, chain, mappedCollection.collectionId, address)
-                );
+                ).filter((i): i is NftItem => Boolean(i));
 
                 allItems.push(...items);
               }
@@ -219,7 +225,7 @@ export default class NftService {
 
           const nftList = instances.map((inst) =>
             mapSdkToNftItem(inst, chainInfo.slug, contractAddress, eachOwner)
-          );
+          ).filter((i): i is NftItem => Boolean(i));
 
           await this.state.handleDetectedNfts(eachOwner, nftList);
         } catch (innerErr) {
