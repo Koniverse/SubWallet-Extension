@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { GovVotingInfo, UnlockingReferendaData } from '@subwallet/extension-base/services/open-gov/interface';
+import { AccountSignMode } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { AccountProxyAvatar, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, GOV_UNLOCK_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
-import { useGetChainPrefixBySlug, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetChainPrefixBySlug, useGetNativeTokenBasicInfo, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { findAccountByAddress, getTransactionFromAccountProxyValue, toShort } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, getSignMode, getTransactionFromAccountProxyValue, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import BigN, { BigNumber } from 'bignumber.js';
 import CN from 'classnames';
@@ -79,6 +80,7 @@ function Component ({ chain, className, govLockedInfos }: Props) {
   const fromAccountProxy = getTransactionFromAccountProxyValue(currentAccountProxy);
   const [, setGovUnlockStorage] = useLocalStorage(GOV_UNLOCK_VOTE_TRANSACTION, DEFAULT_GOV_UNLOCK_VOTE_PARAMS);
   const { activeModal, inactiveModal } = useContext(ModalContext);
+  const notify = useNotification();
   const [unlockingModalData, setUnlockingModalData] = React.useState<UnlockingReferendaData[]>([]);
   const navigate = useNavigate();
 
@@ -128,6 +130,27 @@ function Component ({ chain, className, govLockedInfos }: Props) {
 
   const goUnlockVote = useCallback((item: GovVotingInfo) => {
     return () => {
+      const account = findAccountByAddress(accounts, item.address);
+      const signMode = getSignMode(account);
+
+      if (signMode === AccountSignMode.READ_ONLY) {
+        notify({
+          message: t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.watchOnlyAccountFeatureRestriction'),
+          type: 'info'
+        });
+
+        return;
+      }
+
+      if (signMode === AccountSignMode.UNKNOWN) {
+        notify({
+          message: t('ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unknownAccountFeatureRestriction'),
+          type: 'info'
+        });
+
+        return;
+      }
+
       setGovUnlockStorage({
         ...DEFAULT_GOV_UNLOCK_VOTE_PARAMS,
         from: reformatAddress(item.address, networkPrefix),
@@ -137,9 +160,10 @@ function Component ({ chain, className, govLockedInfos }: Props) {
         chain: chain,
         amount: item.summary.unlockable.balance
       });
+
       navigate('/transaction/gov-unlock-vote');
     };
-  }, [chain, fromAccountProxy, navigate, networkPrefix, setGovUnlockStorage]);
+  }, [accounts, chain, fromAccountProxy, navigate, networkPrefix, notify, setGovUnlockStorage, t]);
 
   const accountInfoItemsNode = useMemo(() => {
     return govLockedInfos

@@ -277,7 +277,7 @@ const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance
             voteMap={voteMap}
           />
 
-          { spends && (
+          { !!spends?.length && (
             <RequestedAmount
               allSpend={spends}
               chain={chainSlug}

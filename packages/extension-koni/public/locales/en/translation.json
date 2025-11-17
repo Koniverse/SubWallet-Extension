@@ -2450,6 +2450,8 @@
   "ui.GOVERNANCE.screen.Governance.UnlockToken.lockedDetail": "Locked detail",
   "ui.GOVERNANCE.screen.Governance.UnlockToken.totalLocked": "Total locked",
   "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlockable": "Unlockable",
+  "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.watchOnlyAccountFeatureRestriction": "The account you are using is Watch-only account, you cannot use this feature with it",
+  "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unknowAccountFeatureRestriction": "The account you are using is Unknown account, you cannot use this feature with it",
   "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlocking": "Unlocking",
   "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlock": "Unlock",
   "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unlockableInDate": "Unlockable in {{date}}",

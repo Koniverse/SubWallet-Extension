@@ -2515,5 +2515,7 @@
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.nayVotes": "Nay votes",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.abstainVotes": "Abstain votes",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.hideVotingStats": "Hide voting stats",
-  "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.showVotingStats": "Show voting stats"
+  "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.showVotingStats": "Show voting stats",
+  "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.watchOnlyAccountFeatureRestriction": "The account you are using is Watch-only account, you cannot use this feature with it",
+  "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unknowAccountFeatureRestriction": "The account you are using is Unknown account, you cannot use this feature with it"
 }
