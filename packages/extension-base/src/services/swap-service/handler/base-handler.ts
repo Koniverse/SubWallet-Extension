@@ -123,7 +123,7 @@ export class SwapBaseHandler {
 
   async getBridgeStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     // only xcm on substrate for now
-    const { path, request: { address, fromAmount, recipient, substrateAddress }, selectedQuote } = params;
+    const { path, request: { address, fromAmount, recipient, alternativeAddress }, selectedQuote } = params;
 
     if (stepIndex < 0 || stepIndex > params.path.length - 1) {
       return undefined;
@@ -149,12 +149,12 @@ export class SwapBaseHandler {
     }
 
     let recipientAddress;
-    const senderAddress = _reformatAddressWithChain(address, fromChainInfo, substrateAddress);
+    const senderAddress = _reformatAddressWithChain(address, fromChainInfo, alternativeAddress);
 
     if (stepIndex === 0) {
-      recipientAddress = _reformatAddressWithChain(address, toChainInfo, substrateAddress);
+      recipientAddress = _reformatAddressWithChain(address, toChainInfo, alternativeAddress);
     } else { // bridge after swap
-      recipientAddress = _reformatAddressWithChain(recipient || address, toChainInfo, substrateAddress);
+      recipientAddress = _reformatAddressWithChain(recipient || address, toChainInfo, alternativeAddress);
     }
 
     if (!_isXcmWithinSameConsensus(fromChainInfo, toChainInfo) || _isSnowBridgeXcm(fromChainInfo, toChainInfo) || _isAcrossBridgeXcm(fromChainInfo, toChainInfo)) {

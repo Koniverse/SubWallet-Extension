@@ -140,7 +140,7 @@ export class HydradxHandler implements SwapBaseInterface {
   }
 
   async getSubmitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    const { path, request: { address, fromAmount, recipient, slippage, substrateAddress }, selectedQuote } = params;
+    const { path, request: { address, fromAmount, recipient, slippage, alternativeAddress }, selectedQuote } = params;
     const stepData = path[stepIndex];
 
     if (stepData.action !== DynamicSwapType.SWAP) {
@@ -162,7 +162,7 @@ export class HydradxHandler implements SwapBaseInterface {
     const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
     const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
 
-    const sender = _reformatAddressWithChain(address, originChain, substrateAddress);
+    const sender = _reformatAddressWithChain(address, originChain, alternativeAddress);
     let receiver = _reformatAddressWithChain(recipient || address, destinationChain);
 
     const actionList = JSON.stringify(path.map((step) => step.action));
@@ -205,7 +205,7 @@ export class HydradxHandler implements SwapBaseInterface {
       const overrideQuote = quoteAskResponse.quote as SwapQuote;
 
       txHex = overrideQuote.metadata as string;
-      receiver = _reformatAddressWithChain(address, destinationChain, substrateAddress);
+      receiver = _reformatAddressWithChain(address, destinationChain, alternativeAddress);
     }
 
     if (!txHex || !isHex(txHex)) {

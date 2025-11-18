@@ -939,7 +939,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
 
           const currentRequest: SwapRequestV2 = {
             address: fromValue,
-            substrateAddress,
+            alternativeAddress: substrateAddress,
             pair: {
               slug: _parseAssetRefKey(fromTokenSlugValue, toTokenSlugValue),
               from: fromTokenSlugValue,

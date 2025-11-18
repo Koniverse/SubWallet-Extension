@@ -230,7 +230,7 @@ export class SwapService implements StoppableServiceInterface {
 
     const directSwapRequest: SwapRequestV2 | undefined = swapAction
       ? { ...request,
-        address: _reformatAddressWithChain(request.address, this.chainService.getChainInfoByKey(_getAssetOriginChain(this.chainService.getAssetBySlug(swapAction.pair.from))), request.substrateAddress),
+        address: _reformatAddressWithChain(request.address, this.chainService.getChainInfoByKey(_getAssetOriginChain(this.chainService.getAssetBySlug(swapAction.pair.from))), request.alternativeAddress),
         pair: swapAction.pair }
       : undefined;
 
