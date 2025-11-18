@@ -1,28 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import {SWError} from '@subwallet/extension-base/background/errors/SWError';
-import {
-  BitcoinAddressSummaryInfo,
-  BitcoinApiStrategy,
-  BitcoinTransactionEventMap,
-  BlockStreamBlock,
-  BlockStreamFeeEstimates,
-  BlockStreamTransactionDetail,
-  BlockStreamTransactionStatus,
-  BlockStreamUtxo,
-  Inscription,
-  InscriptionFetchedData,
-  RecommendedFeeEstimates,
-  RunesInfoByAddress,
-  RunesInfoByAddressFetchedData,
-} from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
-import {HiroService} from '@subwallet/extension-base/services/hiro-service';
-import {RunesService} from '@subwallet/extension-base/services/rune-service';
-import {BaseApiRequestStrategy} from '@subwallet/extension-base/strategy/api-request-strategy';
-import {BaseApiRequestContext} from '@subwallet/extension-base/strategy/api-request-strategy/context/base';
-import {getRequest, postRequest} from '@subwallet/extension-base/strategy/api-request-strategy/utils';
-import {BitcoinFeeInfo, BitcoinTx, UtxoResponseItem} from '@subwallet/extension-base/types';
+import { SWError } from '@subwallet/extension-base/background/errors/SWError';
+import { BitcoinAddressSummaryInfo, BitcoinApiStrategy, BitcoinTransactionEventMap, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, BlockStreamUtxo, Inscription, InscriptionFetchedData, RecommendedFeeEstimates, RunesInfoByAddress, RunesInfoByAddressFetchedData } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
+import { HiroService } from '@subwallet/extension-base/services/hiro-service';
+import { RunesService } from '@subwallet/extension-base/services/rune-service';
+import { BaseApiRequestStrategy } from '@subwallet/extension-base/strategy/api-request-strategy';
+import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-request-strategy/context/base';
+import { getRequest, postRequest } from '@subwallet/extension-base/strategy/api-request-strategy/utils';
+import { BitcoinFeeInfo, BitcoinTx, UtxoResponseItem } from '@subwallet/extension-base/types';
 import BigN from 'bignumber.js';
 import EventEmitter from 'eventemitter3';
 
@@ -61,7 +47,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
         }
       });
 
-      const blocks = rsRaw
+      const blocks = rsRaw;
       const length = blocks.length;
       const sortedBlocks = blocks.sort((a, b) => b.timestamp - a.timestamp);
       const time = (sortedBlocks[0].timestamp - sortedBlocks[length - 1].timestamp) * 1000;
@@ -104,7 +90,6 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
         }
       });
 
-      // const rsRaw = response.result;
       const chainBalance = rsRaw.chain_stats.funded_txo_sum - rsRaw.chain_stats.spent_txo_sum;
       const pendingLocked = rsRaw.mempool_stats.spent_txo_sum; // Only consider spent UTXOs in mempool
       const mempoolReceived = rsRaw.mempool_stats.funded_txo_sum; // Funds received in mempool (e.g., change)
@@ -139,14 +124,14 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
   getAddressTransaction (address: string, limit = 100): Promise<BitcoinTx[]> {
     return this.addRequest(async () => {
       const response = await getRequest<BitcoinTx[]>(this.getUrl(`address/${address}/txs`), {
-        params: {limit: `${limit}`},
+        params: { limit: `${limit}` },
         headers: this.headers,
         onError: () => {
           throw new SWError('BlockStreamTestnetRequestStrategy.getAddressTransaction', 'Failed to fetch transactions');
         }
-    });
+      });
 
-      return response
+      return response;
     }, 1);
   }
 
@@ -160,7 +145,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
       });
 
       // Blockstream API trả về object thô
-      const data = response
+      const data = response;
 
       return {
         confirmed: data.confirmed || false,
@@ -195,7 +180,6 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
           throw new SWError('BlockStreamRequestStrategy.getFeeRate', 'Failed to fetch fee estimates');
         }
       });
-
 
       const result = response;
 
@@ -258,8 +242,6 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
 
           return Math.max(adjustedFee, 1.5);
         };
-
-        console.log('result', result);
 
         return {
           type: 'bitcoin',
@@ -346,7 +328,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
         onError: () => {
           throw new SWError('BlockStreamRequestStrategy.simpleSendRawTransaction', 'Failed to broadcast transaction');
         }
-    });
+      });
 
       return response;
     }, 0);
@@ -438,7 +420,6 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
           throw new SWError('BlockStreamRequestStrategy.getTxHex', 'Failed to fetch transaction hex');
         }
       });
-
 
       return response;
     }, 0);

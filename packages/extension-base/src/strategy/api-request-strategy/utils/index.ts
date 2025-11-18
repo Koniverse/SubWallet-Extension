@@ -37,7 +37,6 @@ export async function getRequest<T> (url: string, { headers, onError, params }: 
   const q = new URLSearchParams(params);
 
   const _url = `${url}?${q.toString()}`;
-  console.log('_url', _url);
   const cacheData = cacheMap[_url] as T | undefined;
 
   if (cacheData) {
