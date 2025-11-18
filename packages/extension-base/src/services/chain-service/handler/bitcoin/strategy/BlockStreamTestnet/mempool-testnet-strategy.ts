@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
-import { BitcoinAddressSummaryInfo, BitcoinApiStrategy, BitcoinTransactionEventMap, BlockstreamAddressResponse, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, BlockStreamUtxo, Inscription, InscriptionFetchedData, RecommendedFeeEstimates, RunesInfoByAddress, RunesInfoByAddressFetchedData } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
+import { BitcoinAddressSummaryInfo, BitcoinApiStrategy, BitcoinTransactionEventMap, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, BlockStreamUtxo, Inscription, InscriptionFetchedData, RecommendedFeeEstimates, RunesInfoByAddress, RunesInfoByAddressFetchedData } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { HiroService } from '@subwallet/extension-base/services/hiro-service';
 import { RunesService } from '@subwallet/extension-base/services/rune-service';
 import { BaseApiRequestStrategy } from '@subwallet/extension-base/strategy/api-request-strategy';
@@ -40,13 +40,12 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
   getBlockTime (): Promise<number> {
     return this.addRequest<number>(async () => {
-      const response = await getRequest(this.getUrl('blocks'), undefined, this.headers);
-      const blocks = await response.json() as BlockStreamBlock[];
-
-      if (!response.ok) {
-        throw new SWError('BlockStreamTestnetRequestStrategy.getBlockTime', 'Failed to fetch blocks');
-      }
-
+      const blocks = await getRequest<BlockStreamBlock[]>(this.getUrl('blocks'), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamTestnetRequestStrategy.getBlockTime', 'Failed to fetch blocks');
+        }
+      });
       const length = blocks.length;
       const sortedBlocks = blocks.sort((a, b) => b.timestamp - a.timestamp);
       const time = (sortedBlocks[0].timestamp - sortedBlocks[length - 1].timestamp) * 1000;
@@ -82,13 +81,13 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
   getAddressSummaryInfo (address: string): Promise<BitcoinAddressSummaryInfo> {
     return this.addRequest(async () => {
-      const response = await getRequest(this.getUrl(`address/${address}`), undefined, this.headers);
+      const rsRaw = await getRequest<BitcoinAddressSummaryInfo>(this.getUrl(`address/${address}`), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getAddressSummaryInfo', 'Failed to fetch address info');
+        }
+      });
 
-      if (!response.ok) {
-        throw new SWError('BlockStreamTestnetRequestStrategy.getAddressSummaryInfo', 'Failed to fetch address info');
-      }
-
-      const rsRaw = await response.json() as BlockstreamAddressResponse;
       const chainBalance = rsRaw.chain_stats.funded_txo_sum - rsRaw.chain_stats.spent_txo_sum;
       const pendingLocked = rsRaw.mempool_stats.spent_txo_sum; // Only consider spent UTXOs in mempool
       const mempoolReceived = rsRaw.mempool_stats.funded_txo_sum; // Funds received in mempool (e.g., change)
@@ -122,28 +121,27 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
   getAddressTransaction (address: string, limit = 100): Promise<BitcoinTx[]> {
     return this.addRequest(async () => {
-      const response = await getRequest(this.getUrl(`address/${address}/txs`), { limit: `${limit}` }, this.headers);
-
-      if (!response.ok) {
-        throw new SWError('BlockStreamTestnetRequestStrategy.getAddressTransaction', 'Failed to fetch transactions');
-      }
-
-      return await response.json() as BitcoinTx[];
+      return await getRequest<BitcoinTx[]>(this.getUrl(`address/${address}/txs`), {
+        params: { limit: `${limit}` },
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamTestnetRequestStrategy.getAddressTransaction', 'Failed to fetch transactions');
+        }
+      });
     }, 1);
   }
 
   getTransactionStatus (txHash: string): Promise<BlockStreamTransactionStatus> {
     return this.addRequest(async () => {
-      const response = await getRequest(this.getUrl(`tx/${txHash}/status`), undefined, {});
-
-      if (!response.ok) {
-        const errorText = await response.text();
-
-        throw new SWError('BlockStreamTestnetRequestStrategy.getTransactionStatus', `Failed to fetch transaction status: ${errorText}`);
-      }
+      const response = await getRequest<BlockStreamTransactionStatus>(this.getUrl(`tx/${txHash}/status`), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamTestnetRequestStrategy.getTransactionStatus', 'Failed to fetch transaction status');
+        }
+      });
 
       // Blockstream API trả về object thô
-      const data = await response.json() as BlockStreamTransactionStatus;
+      const data = response;
 
       return {
         confirmed: data.confirmed || false,
@@ -156,13 +154,12 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
   getTransactionDetail (txHash: string): Promise<BlockStreamTransactionDetail> {
     return this.addRequest(async () => {
-      const response = await getRequest(this.getUrl(`tx/${txHash}`), undefined, this.headers);
-
-      if (!response.ok) {
-        throw new SWError('BlockStreamTestnetRequestStrategy.getTransactionDetail', 'Failed to fetch transaction detail');
-      }
-
-      return await response.json() as BlockStreamTransactionDetail;
+      return await getRequest<BlockStreamTransactionDetail>(this.getUrl(`tx/${txHash}`), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getTransactionDetail', 'Failed to fetch transaction detail');
+        }
+      });
     }, 1);
   }
 
@@ -171,12 +168,12 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
     const blockTime = await this.computeBlockTime();
 
     return await this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
-      const response = await getRequest(this.getUrl('fee-estimates'), undefined, this.headers);
-      const estimates = await response.json() as BlockStreamFeeEstimates;
-
-      if (!response.ok) {
-        throw new SWError('BlockStreamTestnetRequestStrategy.getFeeRate', 'Failed to fetch fee estimates');
-      }
+      const result = await getRequest<BlockStreamFeeEstimates>(this.getUrl('fee-estimates'), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getFeeRate', 'Failed to fetch fee estimates');
+        }
+      });
 
       const low = 6;
       const average = 3;
@@ -188,9 +185,9 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
         type: 'bitcoin',
         busyNetwork: false,
         options: {
-          slow: { feeRate: convertFee(estimates[low] || 10), time: blockTime * low },
-          average: { feeRate: convertFee(estimates[average || 12]), time: blockTime * average },
-          fast: { feeRate: convertFee(estimates[fast] || 15), time: blockTime * fast },
+          slow: { feeRate: convertFee(result[low] || 10), time: blockTime * low },
+          average: { feeRate: convertFee(result[average || 12]), time: blockTime * average },
+          fast: { feeRate: convertFee(result[fast] || 15), time: blockTime * fast },
           default: 'slow'
         }
       };
@@ -217,15 +214,12 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
       };
 
       try {
-        const response = await getRequest(this.getUrl('v1/fees/recommended'), undefined, this.headers);
-
-        if (!response.ok) {
-          console.warn(`Failed to fetch fee estimates: ${response.statusText}`);
-
-          return defaultFeeInfo;
-        }
-
-        const estimates = await response.json() as RecommendedFeeEstimates;
+        const result = await getRequest<RecommendedFeeEstimates>(this.getUrl('v1/fees/recommended'), {
+          headers: this.headers,
+          onError: () => {
+            throw new SWError('BlockStreamRequestStrategy.getRecommendedFeeRate', 'Failed to fetch recommended fee estimates');
+          }
+        });
 
         const convertFee = (fee: number) => {
           const adjustedFee = parseInt(new BigN(fee).toFixed(), 10);
@@ -237,9 +231,9 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
           type: 'bitcoin',
           busyNetwork: false,
           options: {
-            slow: { feeRate: convertFee(estimates.hourFee || 1), time: convertTimeMilisec.hourFee },
-            average: { feeRate: convertFee(estimates.halfHourFee || 1), time: convertTimeMilisec.halfHourFee },
-            fast: { feeRate: convertFee(estimates.fastestFee || 1), time: convertTimeMilisec.fastestFee },
+            slow: { feeRate: convertFee(result.hourFee || 1), time: convertTimeMilisec.hourFee },
+            average: { feeRate: convertFee(result.halfHourFee || 1), time: convertTimeMilisec.halfHourFee },
+            fast: { feeRate: convertFee(result.fastestFee || 1), time: convertTimeMilisec.fastestFee },
             default: 'slow'
           }
         };
@@ -251,14 +245,12 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
   getUtxos (address: string): Promise<UtxoResponseItem[]> {
     return this.addRequest<UtxoResponseItem[]>(async (): Promise<UtxoResponseItem[]> => {
-      const response = await getRequest(this.getUrl(`address/${address}/utxo`), undefined, {});
-      const rs = await response.json() as BlockStreamUtxo[];
-
-      if (!response.ok) {
-        const errorText = await response.text();
-
-        throw new SWError('BlockStreamTestnetRequestStrategy.getUtxos', `Failed to fetch UTXOs: ${errorText}`);
-      }
+      const rs = await getRequest<BlockStreamUtxo[]>(this.getUrl(`address/${address}/utxo`), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getUtxos', 'Failed to fetch UTXOs');
+        }
+      });
 
       return rs.map((item: BlockStreamUtxo) => ({
         txid: item.txid,
@@ -273,20 +265,16 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
     const eventEmitter = new EventEmitter<BitcoinTransactionEventMap>();
 
     this.addRequest<string>(async (): Promise<string> => {
-      const response = await postRequest(
-        this.getUrl('tx'),
-        rawTransaction,
-        { 'Content-Type': 'text/plain' },
-        false
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-
-        throw new SWError('BlockStreamTestnetRequestStrategy.sendRawTransaction', `Failed to broadcast transaction: ${errorText}`);
+      return await postRequest<string>(this.getUrl('tx'), {
+        body: rawTransaction,
+        headers: this.headers,
+        isJsonResponse: true,
+        isJson: false,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.sendRawTransaction', 'Failed to broadcast transaction');
+        }
       }
-
-      return await response.text();
+      );
     }, 0)
       .then((extrinsicHash) => {
         eventEmitter.emit('extrinsicHash', extrinsicHash);
@@ -313,15 +301,15 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
   simpleSendRawTransaction (rawTransaction: string) {
     return this.addRequest<string>(async (): Promise<string> => {
-      const response = await postRequest(this.getUrl('tx'), rawTransaction, { 'Content-Type': 'text/plain' }, false);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-
-        throw new SWError('BlockStreamTestnetRequestStrategy.simpleSendRawTransaction', `Failed to broadcast transaction: ${errorText}`);
-      }
-
-      return await response.text();
+      return await postRequest<string>(this.getUrl('tx'), {
+        body: rawTransaction,
+        headers: this.headers,
+        isJson: false,
+        isJsonResponse: true,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.simpleSendRawTransaction', 'Failed to broadcast transaction');
+        }
+      });
     }, 0);
   }
 
@@ -405,15 +393,12 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
   getTxHex (txHash: string): Promise<string> {
     return this.addRequest<string>(async (): Promise<string> => {
-      const response = await getRequest(this.getUrl(`tx/${txHash}/hex`), undefined, this.headers);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-
-        throw new SWError('BlockStreamTestnetRequestStrategy.getTxHex', `Failed to fetch transaction hex: ${errorText}`);
-      }
-
-      return await response.text();
+      return await getRequest<string>(this.getUrl(`tx/${txHash}/hex`), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getTxHex', 'Failed to fetch transaction hex');
+        }
+      });
     }, 0);
   }
 }

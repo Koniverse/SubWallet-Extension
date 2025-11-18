@@ -38,12 +38,13 @@ export class RunesService extends BaseApiRequestStrategy {
 
   getAddressRunesInfo (address: string, params: Record<string, string>): Promise<RunesInfoByAddressFetchedData> {
     return this.addRequest(async () => {
-      const _rs = await getRequest(this.getUrl(`rune/address/${address}`), params, this.headers);
-      const rs = await _rs.json() as OBResponse<RunesInfoByAddressFetchedData>;
-
-      if (rs.status_code !== 200) {
-        throw new SWError('RuneScanService.getAddressRunesInfo', rs.message);
-      }
+      const rs = await getRequest<OBResponse<RunesInfoByAddressFetchedData>>(this.getUrl(`rune/address/${address}`), {
+        params,
+        headers: this.headers,
+        onError: (res) => {
+          throw new SWError('RuneScanService.getAddressRunesInfo', `Failed to fetch runes info: ${res?.statusText || 'Unknown error'}`);
+        }
+      });
 
       return rs.result;
     }, 1);
@@ -53,7 +54,13 @@ export class RunesService extends BaseApiRequestStrategy {
   getRuneCollectionsByBatch (params: Record<string, string>): Promise<RunesCollectionInfoResponse> {
     return this.addRequest(async () => {
       const url = this.getUrl('rune');
-      const rs = await getRequest(url, params);
+      const rs = await getRequest<Response>(url, {
+        params,
+        headers: this.headers,
+        onError: (res) => {
+          throw new SWError('RuneScanService.getRuneCollectionsByBatch', `Failed to fetch rune collections: ${res?.statusText || 'Unknown error'}`);
+        }
+      });
 
       if (rs.status !== 200) {
         throw new SWError('RuneScanService.getRuneCollectionsByBatch', await rs.text());
@@ -67,24 +74,25 @@ export class RunesService extends BaseApiRequestStrategy {
   getAddressRuneTxs (address: string, params: Record<string, string>): Promise<RuneTxsResponse> {
     return this.addRequest(async () => {
       const url = this.getUrl(`address/${address}/txs`);
-      const rs = await getRequest(url, params);
 
-      if (rs.status !== 200) {
-        throw new SWError('RuneScanService.getAddressRuneTxs', await rs.text());
-      }
-
-      return (await rs.json()) as RuneTxsResponse;
+      return await getRequest<RuneTxsResponse>(url, {
+        params,
+        headers: this.headers,
+        onError: (res) => {
+          throw new SWError('RuneScanService.getAddressRuneTxs', `Failed to fetch rune txs: ${res?.statusText || 'Unknown error'}`);
+        }
+      });
     }, 0);
   }
 
   getRuneMetadata (runeid: string): Promise<RuneMetadata> {
     return this.addRequest(async () => {
-      const _rs = await getRequest(this.getUrl(`rune/metadata/${runeid}`), undefined, this.headers);
-      const rs = await _rs.json() as OBResponse<RuneMetadata>;
-
-      if (rs.status_code !== 200) {
-        throw new SWError('RuneScanService.getRuneMetadata', rs.message);
-      }
+      const rs = await getRequest<OBResponse<RuneMetadata>>(this.getUrl(`rune/metadata/${runeid}`), {
+        headers: this.headers,
+        onError: (res) => {
+          throw new SWError('RuneScanService.getRuneMetadata', `Failed to fetch rune metadata: ${res?.statusText || 'Unknown error'}`);
+        }
+      });
 
       return rs.result;
     }, 0);
@@ -92,13 +100,12 @@ export class RunesService extends BaseApiRequestStrategy {
 
   getAddressRuneUtxos (address: string): Promise<RuneUtxoResponse> {
     return this.addRequest(async () => {
-      const _rs = await getRequest(this.getUrl(`rune/address/${address}/rune/utxo`), undefined, this.headers);
-
-      const rs = await _rs.json() as OBRuneResponse<RuneUtxoResponse>;
-
-      if (rs.status_code !== 200) {
-        throw new SWError('RuneScanService.getAddressRuneUtxos', rs.message);
-      }
+      const rs = await getRequest<OBRuneResponse<RuneUtxoResponse>>(this.getUrl(`rune/address/${address}/rune/utxo`), {
+        headers: this.headers,
+        onError: (res) => {
+          throw new SWError('RuneScanService.getAddressRuneUtxos', `Failed to fetch rune utxos: ${res?.statusText || 'Unknown error'}`);
+        }
+      });
 
       return rs.result;
     }, 0);

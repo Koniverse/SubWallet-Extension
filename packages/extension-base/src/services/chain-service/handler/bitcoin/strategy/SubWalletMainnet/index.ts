@@ -43,8 +43,12 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
 
   getBlockTime (): Promise<number> {
     return this.addRequest<number>(async () => {
-      const _rs = await getRequest(this.getUrl('blocks'), undefined, this.headers);
-      const rs = await _rs.json() as OBResponse<BlockStreamBlock[]>;
+      const rs = await getRequest<OBResponse<BlockStreamBlock[]>>(this.getUrl('blocks'), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getBlockTime', 'Failed to fetch blocks');
+        }
+      });
 
       if (rs.status_code !== 200) {
         throw new SWError('BlockStreamRequestStrategy.getBlockTime', rs.message);
@@ -86,8 +90,12 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
 
   getAddressSummaryInfo (address: string): Promise<BitcoinAddressSummaryInfo> {
     return this.addRequest(async () => {
-      const _rs = await getRequest(this.getUrl(`address/${address}`), undefined, this.headers);
-      const rs = await _rs.json() as OBResponse<BitcoinAddressSummaryInfo>;
+      const rs = await getRequest<OBResponse<BitcoinAddressSummaryInfo>>(this.getUrl(`address/${address}`), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getAddressSummaryInfo', 'Failed to fetch address info');
+        }
+      });
 
       if (rs.status_code !== 200) {
         throw new SWError('BlockStreamRequestStrategy.getAddressSummaryInfo', rs.message);
@@ -99,8 +107,13 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
 
   getAddressTransaction (address: string, limit = 100): Promise<BitcoinTx[]> {
     return this.addRequest(async () => {
-      const _rs = await getRequest(this.getUrl(`address/${address}/txs`), { limit: `${limit}` }, this.headers);
-      const rs = await _rs.json() as OBResponse<BitcoinTx[]>;
+      const rs = await getRequest<OBResponse<BitcoinTx[]>>(this.getUrl(`address/${address}/txs`), {
+        headers: this.headers,
+        params: { limit: `${limit}` },
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getAddressTransaction', 'Failed to fetch transactions');
+        }
+      });
 
       if (rs.status_code !== 200) {
         throw new SWError('BlockStreamRequestStrategy.getAddressTransaction', rs.message);
@@ -112,8 +125,12 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
 
   getTransactionStatus (txHash: string): Promise<BlockStreamTransactionStatus> {
     return this.addRequest(async () => {
-      const _rs = await getRequest(this.getUrl(`tx/${txHash}/status`), undefined, this.headers);
-      const rs = await _rs.json() as OBResponse<BlockStreamTransactionStatus>;
+      const rs = await getRequest<OBResponse<BlockStreamTransactionStatus>>(this.getUrl(`tx/${txHash}/status`), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getTransactionStatus', 'Failed to fetch transaction status');
+        }
+      });
 
       if (rs.status_code !== 200) {
         throw new SWError('BlockStreamRequestStrategy.getTransactionStatus', rs.message);
@@ -125,8 +142,12 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
 
   getTransactionDetail (txHash: string): Promise<BlockStreamTransactionDetail> {
     return this.addRequest(async () => {
-      const _rs = await getRequest(this.getUrl(`tx/${txHash}`), undefined, this.headers);
-      const rs = await _rs.json() as OBResponse<BlockStreamTransactionDetail>;
+      const rs = await getRequest<OBResponse<BlockStreamTransactionDetail>>(this.getUrl(`tx/${txHash}`), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getTransactionDetail', 'Failed to fetch transaction detail');
+        }
+      });
 
       if (rs.status_code !== 200) {
         throw new SWError('BlockStreamRequestStrategy.getTransactionDetail', rs.message);
@@ -140,8 +161,12 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
     const timePerBlock = await this.computeBlockTime();
 
     return await this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
-      const _rs = await getRequest(this.getUrl('fee-estimates'), undefined, this.headers);
-      const rs = await _rs.json() as OBResponse<BlockStreamFeeEstimates>;
+      const rs = await getRequest<OBResponse<BlockStreamFeeEstimates>>(this.getUrl('fee-estimates'), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getFeeRate', 'Failed to fetch fee estimates');
+        }
+      });
 
       if (rs.status_code !== 200) {
         throw new SWError('BlockStreamRequestStrategy.getFeeRate', rs.message);
@@ -170,8 +195,12 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
 
   getRecommendedFeeRate (): Promise<BitcoinFeeInfo> {
     return this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
-      const _rs = await getRequest(this.getUrl('fee-estimates/recommended'), undefined, this.headers);
-      const rs = await _rs.json() as OBResponse<RecommendedFeeEstimates>;
+      const rs = await getRequest<OBResponse<RecommendedFeeEstimates>>(this.getUrl('fee-estimates/recommended'), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getRecommendedFeeRate', 'Failed to fetch recommended fee estimates');
+        }
+      });
 
       if (rs.status_code !== 200) {
         throw new SWError('BlockStreamRequestStrategy.getRecommendedFeeRate', rs.message);
@@ -202,8 +231,12 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
 
   getUtxos (address: string): Promise<UtxoResponseItem[]> {
     return this.addRequest<UtxoResponseItem[]>(async (): Promise<UtxoResponseItem[]> => {
-      const _rs = await getRequest(this.getUrl(`address/${address}/utxo`), undefined, this.headers);
-      const rs = await _rs.json() as OBResponse<UpdateOpenBitUtxo>;
+      const rs = await getRequest<OBResponse<UpdateOpenBitUtxo>>(this.getUrl(`address/${address}/utxo`), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getUtxos', 'Failed to fetch UTXOs');
+        }
+      });
 
       if (rs.status_code !== 200) {
         throw new SWError('BlockStreamRequestStrategy.getUtxos', rs.message);
@@ -217,12 +250,15 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
     const eventEmitter = new EventEmitter<BitcoinTransactionEventMap>();
 
     this.addRequest<string>(async (): Promise<string> => {
-      const _rs = await postRequest(this.getUrl('tx'), rawTransaction, this.headers, false);
-      const rs = await _rs.json() as OBResponse<string>;
-
-      if (rs.status_code !== 200) {
-        throw new SWError('BlockStreamRequestStrategy.sendRawTransaction', rs.message);
-      }
+      const rs = await postRequest<OBResponse<string>>(this.getUrl('tx'), {
+        body: rawTransaction,
+        headers: this.headers,
+        isJsonResponse: true,
+        isJson: false,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.sendRawTransaction', 'Failed to broadcast transaction');
+        }
+      });
 
       return rs.result;
     }, 0)
@@ -251,12 +287,15 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
 
   simpleSendRawTransaction (rawTransaction: string) {
     return this.addRequest<string>(async (): Promise<string> => {
-      const _rs = await postRequest(this.getUrl('tx'), rawTransaction, this.headers, false);
-      const rs = await _rs.json() as OBResponse<string>;
-
-      if (rs.status_code !== 200) {
-        throw new SWError('BlockStreamRequestStrategy.simpleSendRawTransaction', rs.message);
-      }
+      const rs = await postRequest<OBResponse<string>>(this.getUrl('tx'), {
+        body: rawTransaction,
+        headers: this.headers,
+        isJson: false,
+        isJsonResponse: true,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.simpleSendRawTransaction', 'Failed to broadcast transaction');
+        }
+      });
 
       return rs.result;
     }, 0);
@@ -340,8 +379,12 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
 
   getTxHex (txHash: string): Promise<string> {
     return this.addRequest<string>(async (): Promise<string> => {
-      const _rs = await getRequest(this.getUrl(`tx/${txHash}/hex`), undefined, this.headers);
-      const rs = await _rs.json() as OBResponse<string>;
+      const rs = await getRequest<OBResponse<string>>(this.getUrl(`tx/${txHash}/hex`), {
+        headers: this.headers,
+        onError: () => {
+          throw new SWError('BlockStreamRequestStrategy.getTxHex', 'Failed to fetch transaction hex');
+        }
+      });
 
       if (rs.status_code !== 200) {
         throw new SWError('BlockStreamRequestStrategy.getTxHex', rs.message);
