@@ -40,14 +40,12 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
   getBlockTime (): Promise<number> {
     return this.addRequest<number>(async () => {
-      const rsRaw = await getRequest<BlockStreamBlock[]>(this.getUrl('blocks'), {
+      const blocks = await getRequest<BlockStreamBlock[]>(this.getUrl('blocks'), {
         headers: this.headers,
         onError: () => {
           throw new SWError('BlockStreamTestnetRequestStrategy.getBlockTime', 'Failed to fetch blocks');
         }
       });
-
-      const blocks = rsRaw;
       const length = blocks.length;
       const sortedBlocks = blocks.sort((a, b) => b.timestamp - a.timestamp);
       const time = (sortedBlocks[0].timestamp - sortedBlocks[length - 1].timestamp) * 1000;
@@ -123,15 +121,13 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
   getAddressTransaction (address: string, limit = 100): Promise<BitcoinTx[]> {
     return this.addRequest(async () => {
-      const response = await getRequest<BitcoinTx[]>(this.getUrl(`address/${address}/txs`), {
+      return await getRequest<BitcoinTx[]>(this.getUrl(`address/${address}/txs`), {
         params: { limit: `${limit}` },
         headers: this.headers,
         onError: () => {
           throw new SWError('BlockStreamTestnetRequestStrategy.getAddressTransaction', 'Failed to fetch transactions');
         }
       });
-
-      return response;
     }, 1);
   }
 
@@ -158,14 +154,12 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
   getTransactionDetail (txHash: string): Promise<BlockStreamTransactionDetail> {
     return this.addRequest(async () => {
-      const response = await getRequest<BlockStreamTransactionDetail>(this.getUrl(`tx/${txHash}`), {
+      return await getRequest<BlockStreamTransactionDetail>(this.getUrl(`tx/${txHash}`), {
         headers: this.headers,
         onError: () => {
           throw new SWError('BlockStreamRequestStrategy.getTransactionDetail', 'Failed to fetch transaction detail');
         }
       });
-
-      return response;
     }, 1);
   }
 
@@ -174,14 +168,12 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
     const blockTime = await this.computeBlockTime();
 
     return await this.addRequest<BitcoinFeeInfo>(async (): Promise<BitcoinFeeInfo> => {
-      const response = await getRequest<BlockStreamFeeEstimates>(this.getUrl('fee-estimates'), {
+      const result = await getRequest<BlockStreamFeeEstimates>(this.getUrl('fee-estimates'), {
         headers: this.headers,
         onError: () => {
           throw new SWError('BlockStreamRequestStrategy.getFeeRate', 'Failed to fetch fee estimates');
         }
       });
-
-      const result = response;
 
       const low = 6;
       const average = 3;
@@ -222,14 +214,12 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
       };
 
       try {
-        const response = await getRequest<RecommendedFeeEstimates>(this.getUrl('v1/fees/recommended'), {
+        const result = await getRequest<RecommendedFeeEstimates>(this.getUrl('v1/fees/recommended'), {
           headers: this.headers,
           onError: () => {
             throw new SWError('BlockStreamRequestStrategy.getRecommendedFeeRate', 'Failed to fetch recommended fee estimates');
           }
         });
-
-        const result = response;
 
         const convertFee = (fee: number) => {
           const adjustedFee = parseInt(new BigN(fee).toFixed(), 10);
@@ -255,14 +245,12 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
   getUtxos (address: string): Promise<UtxoResponseItem[]> {
     return this.addRequest<UtxoResponseItem[]>(async (): Promise<UtxoResponseItem[]> => {
-      const response = await getRequest<BlockStreamUtxo[]>(this.getUrl(`address/${address}/utxo`), {
+      const rs = await getRequest<BlockStreamUtxo[]>(this.getUrl(`address/${address}/utxo`), {
         headers: this.headers,
         onError: () => {
           throw new SWError('BlockStreamRequestStrategy.getUtxos', 'Failed to fetch UTXOs');
         }
       });
-
-      const rs = response;
 
       return rs.map((item: BlockStreamUtxo) => ({
         txid: item.txid,
@@ -277,7 +265,7 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
     const eventEmitter = new EventEmitter<BitcoinTransactionEventMap>();
 
     this.addRequest<string>(async (): Promise<string> => {
-      const response = await postRequest<string>(this.getUrl('tx'), {
+      return await postRequest<string>(this.getUrl('tx'), {
         body: rawTransaction,
         headers: this.headers,
         isJsonResponse: true,
@@ -287,8 +275,6 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
         }
       }
       );
-
-      return response;
     }, 0)
       .then((extrinsicHash) => {
         eventEmitter.emit('extrinsicHash', extrinsicHash);
@@ -315,7 +301,7 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
   simpleSendRawTransaction (rawTransaction: string) {
     return this.addRequest<string>(async (): Promise<string> => {
-      const response = await postRequest<string>(this.getUrl('tx'), {
+      return await postRequest<string>(this.getUrl('tx'), {
         body: rawTransaction,
         headers: this.headers,
         isJson: false,
@@ -324,8 +310,6 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
           throw new SWError('BlockStreamRequestStrategy.simpleSendRawTransaction', 'Failed to broadcast transaction');
         }
       });
-
-      return response;
     }, 0);
   }
 
@@ -409,14 +393,12 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
   getTxHex (txHash: string): Promise<string> {
     return this.addRequest<string>(async (): Promise<string> => {
-      const response = await getRequest<string>(this.getUrl(`tx/${txHash}/hex`), {
+      return await getRequest<string>(this.getUrl(`tx/${txHash}/hex`), {
         headers: this.headers,
         onError: () => {
           throw new SWError('BlockStreamRequestStrategy.getTxHex', 'Failed to fetch transaction hex');
         }
       });
-
-      return response;
     }, 0);
   }
 }
