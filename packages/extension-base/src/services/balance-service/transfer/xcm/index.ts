@@ -4,15 +4,10 @@
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { _isAcrossBridgeXcm, _isPolygonBridgeXcm, _isPosBridgeXcm, _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
-import { getExtrinsicByPolkadotXcmPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polkadotXcm';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
-import { buildXcm, dryRunXcm, fetchMinXcmTransferableAmount, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
-import { getExtrinsicByXcmPalletPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xcmPallet';
-import { getExtrinsicByXtokensPallet } from '@subwallet/extension-base/services/balance-service/transfer/xcm/xTokens';
-import { _XCM_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
+import { buildXcm, dryRunPreviewXcm, dryRunXcm, fetchMinXcmTransferableAmount, estimateXcmFee, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
@@ -61,33 +56,6 @@ export const createSnowBridgeExtrinsic = async ({ destinationChain,
   }
 
   return getSnowBridgeEvmTransfer(originTokenInfo, originChain, destinationChain, sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
-};
-
-// deprecated
-export const createXcmExtrinsic = async ({ destinationChain,
-  originChain,
-  originTokenInfo,
-  recipient,
-  sendingValue,
-  substrateApi }: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'>> => {
-  if (!substrateApi) {
-    throw Error('Substrate API is not available');
-  }
-
-  const chainApi = await substrateApi.isReady;
-  const api = chainApi.api;
-
-  const polkadotXcmSpecialCases = _XCM_CHAIN_GROUP.polkadotXcmSpecialCases.includes(originChain.slug) && _isNativeToken(originTokenInfo);
-
-  if (_XCM_CHAIN_GROUP.polkadotXcm.includes(originTokenInfo.originChain) || polkadotXcmSpecialCases) {
-    return getExtrinsicByPolkadotXcmPallet(originTokenInfo, originChain, destinationChain, recipient, sendingValue, api);
-  }
-
-  if (_XCM_CHAIN_GROUP.xcmPallet.includes(originTokenInfo.originChain)) {
-    return getExtrinsicByXcmPalletPallet(originTokenInfo, originChain, destinationChain, recipient, sendingValue, api);
-  }
-
-  return getExtrinsicByXtokensPallet(originTokenInfo, originChain, destinationChain, recipient, sendingValue, api);
 };
 
 export const createAvailBridgeTxFromEth = ({ evmApi,
@@ -174,9 +142,9 @@ export const getMinXcmTransferableAmount = async (request: CreateXcmExtrinsicPro
   }
 };
 
-export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Promise<boolean> => {
+export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps, isPreview = false): Promise<boolean> => {
   try {
-    const dryRunResult = await dryRunXcm(request);
+    const dryRunResult = isPreview ? await dryRunPreviewXcm(request) : await dryRunXcm(request);
     const originDryRunRs = dryRunResult.origin;
 
     if (originDryRunRs.success) {
@@ -204,6 +172,23 @@ export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
     return isChainNotSupportDryRun(originDryRunRs.failureReason) || isChainNotSupportPolkadotApi(originDryRunRs.failureReason);
   } catch (e) {
     return false;
+  }
+};
+
+export const getXcmOriginFee = async (request: CreateXcmExtrinsicProps) => {
+  try {
+    const xcmFeeInfo = await estimateXcmFee({
+      fromChainInfo: request.originChain,
+      fromTokenInfo: request.originTokenInfo,
+      toChainInfo: request.destinationChain,
+      recipient: request.recipient,
+      sender: request.sender,
+      value: request.sendingValue
+    });
+
+    return xcmFeeInfo?.origin.fee;
+  } catch (e) {
+    return undefined;
   }
 };
 

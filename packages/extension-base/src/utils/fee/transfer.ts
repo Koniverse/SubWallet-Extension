@@ -8,7 +8,7 @@ import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-p
 import { DEFAULT_CARDANO_TTL_OFFSET } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/consts';
 import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
 import { createCardanoTransaction } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
-import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
+import { gasSettingsForEWC, getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
@@ -214,10 +214,15 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
       // Calculate fee for evm transaction
       const tx = transaction as TransactionConfig;
 
-      const gasLimit = tx.gas?.toString() || (await evmApi.api.eth.estimateGas(tx)).toString();
+      let gasLimit = tx.gas?.toString() || (await evmApi.api.eth.estimateGas(tx)).toString();
 
       const _feeCustom = feeCustom as EvmEIP1559FeeOption;
       const combineFee = combineEthFee(fee, feeOption, _feeCustom);
+
+      if (srcChain.slug === 'energy_web_chain') {
+        gasLimit = gasSettingsForEWC.gasLimit.toString();
+        combineFee.maxFeePerGas = gasSettingsForEWC.maxFeePerGas;
+      }
 
       if (combineFee.maxFeePerGas) {
         estimatedFee = new BigN(combineFee.maxFeePerGas).multipliedBy(gasLimit).toFixed(0);
@@ -417,7 +422,6 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
       funcCreateExtrinsic = createAvailBridgeExtrinsicFromAvail;
     } else {
       funcCreateExtrinsic = createXcmExtrinsicV2;
-      params.sendingValue = '1';
     }
 
     const extrinsic = await funcCreateExtrinsic(params);

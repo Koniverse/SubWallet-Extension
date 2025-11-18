@@ -6,6 +6,7 @@ import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/para
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService } from '@subwallet/extension-base/utils';
+import BigNumber from 'bignumber.js';
 
 import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -77,8 +78,9 @@ const version = '/v4';
 
 const paraSpellApi = {
   buildXcm: `${version}/x-transfer`,
-  dryRunXcm: `${version}/dry-run`,
   feeXcm: `${version}/xcm-fee`,
+  dryRunXcm: `${version}/dry-run`,
+  dryRunPreviewXcm: `${version}/dry-run-preview`,
   maxTransferable: `${version}/transferable-amount`,
   minTransferable: `${version}/min-transferable-amount`
 };
@@ -244,10 +246,59 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   return await response.json() as DryRunResult;
 }
 
+export async function dryRunPreviewXcm (request: CreateXcmExtrinsicProps) {
+  const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
+  const paraSpellChainMap = await fetchParaSpellChainMap();
+  const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
+
+  if (!paraSpellIdentifyV4) {
+    throw new Error('Token is not support XCM at this time');
+  }
+
+  const bodyData = {
+    senderAddress: sender,
+    address: recipient,
+    from: paraSpellChainMap[originChain.slug],
+    to: paraSpellChainMap[destinationChain.slug],
+    currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
+    options: {
+      abstractDecimals: false,
+      mintFeeAssets: true
+    }
+  };
+
+  const response = await fetchFromProxyService(
+    ProxyServiceRoute.PARASPELL,
+    paraSpellApi.dryRunPreviewXcm,
+    {
+      method: 'POST',
+      body: JSON.stringify(bodyData),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json() as ParaSpellError;
+
+    return {
+      origin: {
+        success: false,
+        failureReason: error.message
+      }
+    } as DryRunResult;
+  }
+
+  return await response.json() as DryRunResult;
+}
+
 export async function estimateXcmFee (request: GetXcmFeeRequest) {
   const { fromChainInfo, fromTokenInfo, recipient, sender, toChainInfo, value } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
   const paraSpellIdentifyV4 = fromTokenInfo.metadata?.paraSpellIdentifyV4;
+  const requestValue = BigNumber(value).gt(0) ? value : '1'; // avoid bug in-case estimate fee sendingValue <= 0;
 
   if (!paraSpellIdentifyV4) {
     console.error('Lack of paraspell metadata');
@@ -260,7 +311,7 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
     address: recipient,
     from: paraSpellChainMap[fromChainInfo.slug],
     to: paraSpellChainMap[toChainInfo.slug],
-    currency: createParaSpellCurrency(paraSpellIdentifyV4, value),
+    currency: createParaSpellCurrency(paraSpellIdentifyV4, requestValue),
     options: {
       abstractDecimals: false
     }
@@ -331,8 +382,6 @@ export async function fetchMinXcmTransferableAmount (request: CreateXcmExtrinsic
 }
 
 function createParaSpellCurrency (paraSpellIdentifyV4: Record<string, any>, amount: string): ParaSpellCurrency {
-  // todo: handle complex conditions for asset has same symbol in a chain: Id, Multi-location, ...
-  // todo: or update all asset to use multi-location
   return {
     ...paraSpellIdentifyV4,
     amount
@@ -349,26 +398,4 @@ export function isChainNotSupportDryRun (str: string): boolean {
   const regex = /(?=.*DryRunApi)(?=.*not available).*/i; // Example: DryRunApi is not available on node Acala
 
   return regex.test(str);
-}
-
-// todo: remove
-export const STABLE_XCM_VERSION = 3;
-
-// todo: remove
-export function isUseTeleportProtocol (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo, tokenSlug?: string) {
-  const relayChainToSystemChain =
-    (['polkadot'].includes(originChainInfo.slug) && ['statemint'].includes(destChainInfo.slug)) ||
-    (['kusama'].includes(originChainInfo.slug) && ['statemine'].includes(destChainInfo.slug)) ||
-    (['rococo'].includes(originChainInfo.slug) && ['rococo_assethub'].includes(destChainInfo.slug)) ||
-    (['westend'].includes(originChainInfo.slug) && ['westend_assethub'].includes(destChainInfo.slug));
-  const systemChainToRelayChain =
-    (['polkadot'].includes(destChainInfo.slug) && ['statemint'].includes(originChainInfo.slug)) ||
-    (['kusama'].includes(destChainInfo.slug) && ['statemine'].includes(originChainInfo.slug)) ||
-    (['rococo'].includes(destChainInfo.slug) && ['rococo_assethub'].includes(originChainInfo.slug)) ||
-    (['westend'].includes(destChainInfo.slug) && ['westend_assethub'].includes(originChainInfo.slug));
-  const isXcmMythos =
-    (originChainInfo.slug === 'mythos' && destChainInfo.slug === 'statemint' && tokenSlug === 'mythos-NATIVE-MYTH') ||
-    (originChainInfo.slug === 'statemint' && destChainInfo.slug === 'mythos' && tokenSlug === 'statemint-LOCAL-MYTH');
-
-  return relayChainToSystemChain || systemChainToRelayChain || isXcmMythos;
 }
