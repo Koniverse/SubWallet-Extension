@@ -128,7 +128,7 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
     const { accountHotKey, isEnableTransferSubnet } = await getAccountNetuidTokenInfo(from, tokenInfo, substrateApi);
     const tokenNetuid = tokenInfo.metadata?.netuid;
 
-    if (isEnableTransferSubnet) {
+    if (isEnableTransferSubnet && accountHotKey) {
       transfer = api.tx.subtensorModule.transferStake(from, accountHotKey, tokenNetuid, tokenNetuid, value);
     } else {
       return [null, value];
@@ -198,22 +198,21 @@ export const getTransferMockTxFee = async (address: string, chainInfo: _ChainInf
   }
 };
 
-export const getAccountNetuidTokenInfo = async (address: string, tokenInfo: _ChainAsset, substrateApi: _SubstrateApi): Promise<{isEnableTransferSubnet: boolean, accountHotKey: string}> => {
+export const getAccountNetuidTokenInfo = async (address: string, tokenInfo: _ChainAsset, substrateApi: _SubstrateApi): Promise<{isEnableTransferSubnet: boolean, accountHotKey: string | undefined}> => {
   const tokenNetuid = tokenInfo.metadata?.netuid;
 
-  const isTransferToggle = await substrateApi.api.query.subtensorModule.transferToggle(tokenNetuid);
+  if (!tokenNetuid) {
+    return { isEnableTransferSubnet: false, accountHotKey: undefined };
+  }
+
+  const [isTransferToggle, rawStakeInfoForColdKey] = await Promise.all([
+    substrateApi.api.query.subtensorModule.transferToggle(tokenNetuid),
+    substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)
+  ]);
+
   const isEnableTransferSubnet = isTransferToggle.toPrimitive() as boolean;
+  const taoStakeInfos = rawStakeInfoForColdKey.toPrimitive() as unknown as TaoStakeInfo[];
+  const accountHotKey = taoStakeInfos.find((value) => value.netuid === tokenNetuid);
 
-  const rawData = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address);
-  const values = rawData.toPrimitive() as unknown as TaoStakeInfo[];
-
-  let accountHotKey = '';
-
-  values.forEach((value) => {
-    if (tokenNetuid && value.netuid === tokenNetuid) {
-      accountHotKey = value.hotkey;
-    }
-  });
-
-  return { isEnableTransferSubnet, accountHotKey };
+  return { isEnableTransferSubnet, accountHotKey: accountHotKey?.hotkey };
 };
