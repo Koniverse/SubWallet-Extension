@@ -823,7 +823,14 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     });
   }, [chainInfoMap, destChainValue, getReformatAddress, isRecipientFieldAllowed, targetAccountProxy.accountType, targetAccountProxy.accounts]);
 
-  const substrateAddress: string | undefined = useMemo(() => {
+  /**
+   * Retrieve the Substrate address associated with the current account proxy, or a selected account proxy in case All Account mode.
+   *
+   * The logic follows these steps:
+   * 1. Determine the AccountProxy, correspond to `currentSelectAccountProxy`.
+   * 2. Retrieve substrate address if it's available.
+   */
+  const alternativeAddress: string | undefined = useMemo(() => {
     if (currentAccountProxy === null) {
       return undefined;
     }
@@ -831,6 +838,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     let currentSelectAccountProxy: AccountProxy | undefined;
 
     if (currentAccountProxy.accountType === AccountProxyType.ALL_ACCOUNT) {
+      // If in all account mode, find the selected from account by `targetAccountProxyIdForGetBalance`
       currentSelectAccountProxy = accountProxies.find((account) => account.id === targetAccountProxyIdForGetBalance);
     } else {
       currentSelectAccountProxy = currentAccountProxy;
@@ -939,7 +947,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
 
           const currentRequest: SwapRequestV2 = {
             address: fromValue,
-            alternativeAddress: substrateAddress,
+            alternativeAddress: alternativeAddress,
             pair: {
               slug: _parseAssetRefKey(fromTokenSlugValue, toTokenSlugValue),
               from: fromTokenSlugValue,
@@ -1005,7 +1013,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       sync = false;
       clearTimeout(timeout);
     };
-  }, [ErrorMessageMap, currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates, notifyErrorMessage, substrateAddress]);
+  }, [ErrorMessageMap, currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates, notifyErrorMessage, alternativeAddress]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
