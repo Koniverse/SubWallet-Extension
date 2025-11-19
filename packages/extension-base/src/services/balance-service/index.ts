@@ -14,7 +14,7 @@ import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAc
 import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
-import { EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
 import keyring from '@subwallet/ui-keyring';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
@@ -534,23 +534,7 @@ export class BalanceService implements StoppableServiceInterface {
       const typeValid = [...EthereumKeypairTypes].includes(type);
 
       if (typeValid) {
-        return subwalletApiSdk.balanceDetectionApi.getSubWalletTokenBalance(address)
-          .catch((e) => {
-            console.error(e);
-
-            return null;
-          });
-      } else {
-        return null;
-      }
-    });
-
-    const tonPromiseList = addresses.map((address) => {
-      const type = getKeypairTypeByAddress(address);
-      const typeValid = [...TonKeypairTypes].includes(type);
-
-      if (typeValid) {
-        return subwalletApiSdk.balanceDetectionApi.getTonTokenBalanceSlug(address)
+        return subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalance(address)
           .catch((e) => {
             console.error(e);
 
@@ -563,15 +547,8 @@ export class BalanceService implements StoppableServiceInterface {
 
     const needEnableChains: string[] = [];
     const needActiveTokens: string[] = [];
-
     const balanceDataList = await Promise.all(promiseList);
     const evmBalanceDataList = await Promise.all(evmPromiseList);
-    const tonBalanceDataList = await Promise.all(tonPromiseList);
-    const allBalanceDataLists = [
-      ...evmBalanceDataList,
-      ...tonBalanceDataList
-    ];
-
     const currentAssetSettings = await this.state.chainService.getAssetSettings();
     const chainInfoMap = this.state.chainService.getChainInfoMap();
     const detectBalanceChainSlugMap = this.state.chainService.detectBalanceChainSlugMap;
@@ -613,7 +590,7 @@ export class BalanceService implements StoppableServiceInterface {
       }
     }
 
-    for (const balanceData of allBalanceDataLists) {
+    for (const balanceData of evmBalanceDataList) {
       if (balanceData) {
         for (const tokenSlug of balanceData) {
           const chainSlug = tokenSlug.split('-')[0];
@@ -749,7 +726,7 @@ export class BalanceService implements StoppableServiceInterface {
   public async evmDetectBalanceToken (addresses: string[]) {
     const assetMap = this.state.chainService.getAssetRegistry();
     const evmPromiseList = addresses.map((address) => {
-      return subwalletApiSdk.balanceDetectionApi.getSubWalletTokenBalance(address)
+      return subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalance(address)
         .catch((e) => {
           console.error(e);
 

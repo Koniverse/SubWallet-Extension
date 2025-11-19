@@ -15,14 +15,19 @@ import { SubstrateChainHandler } from '@subwallet/extension-base/services/chain-
 import { TonChainHandler } from '@subwallet/extension-base/services/chain-service/handler/TonChainHandler';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _CUSTOM_PREFIX, _DataMap, _EvmApi, _NetworkUpsertParams, _NFT_CONTRACT_STANDARDS, _SMART_CONTRACT_STANDARDS, _SmartContractTokenInfo, _SubstrateApi, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetOriginChain, _getTokenOnChainAssetId, _isAssetAutoEnable, _isAssetCanPayTxFee, _isAssetFungibleToken, _isChainBitcoinCompatible, _isChainEnabled, _isCustomAsset, _isCustomChain, _isCustomProvider, _isEqualContractAddress, _isEqualSmartContractAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isPureBitcoinChain, _isPureEvmChain, _isPureSubstrateChain, _parseAssetRefKey, randomizeProvider, updateLatestChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetOriginChain, _getTokenOnChainAssetId, _isAssetAutoEnable, _isAssetCanPayTxFee, _isAssetFungibleToken, _isChainBitcoinCompatible, _isChainEnabled, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isCustomChain, _isCustomProvider, _isEqualContractAddress, _isEqualSmartContractAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isPureEvmChain, _isPureSubstrateChain, _parseAssetRefKey, randomizeProvider, updateLatestChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
+import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import { MYTHOS_MIGRATION_KEY } from '@subwallet/extension-base/services/migration-service/scripts';
 import { convertUtxoRawToUtxo } from '@subwallet/extension-base/services/request-service/helper';
 import { IChain, IMetadataItem, IMetadataV15Item } from '@subwallet/extension-base/services/storage-service/databases';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
+import { SubscanService } from '@subwallet/extension-base/services/subscan-service';
 import AssetSettingStore from '@subwallet/extension-base/stores/AssetSetting';
 import { addLazy, calculateMetadataHash, fetchStaticData, filterAssetsByChainAndType, getShortMetadata, MODULE_SUPPORT, reformatAddress } from '@subwallet/extension-base/utils';
+import { getKeypairTypeByAddress } from '@subwallet/keyring';
+import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { BehaviorSubject, Subject } from 'rxjs';
 import Web3 from 'web3';
 
@@ -83,6 +88,8 @@ export class ChainService {
 
   private dbService: DatabaseService; // to save chain, token settings from user
   private eventService: EventService;
+  private keyringService: KeyringService;
+  subscanService: SubscanService;
 
   private lockChainInfoMap = false; // prevent unwanted changes (edit, enable, disable) to chainInfoMap
 
@@ -119,11 +126,11 @@ export class ChainService {
 
   private logger: Logger;
 
-  private temporaryAssetSetting: Record<string, AssetSetting> | undefined;
-
-  constructor (dbService: DatabaseService, eventService: EventService) {
+  constructor (dbService: DatabaseService, eventService: EventService, keyringService: KeyringService) {
     this.dbService = dbService;
     this.eventService = eventService;
+    this.keyringService = keyringService;
+    this.subscanService = SubscanService.getInstance();
 
     this.chainInfoMapSubject.next(this.dataMap.chainInfoMap);
     this.chainStateMapSubject.next(this.dataMap.chainStateMap);
@@ -2197,26 +2204,6 @@ export class ChainService {
     return this.assetSettingSubject.value;
   }
 
-  public getTemporarySettings (): Record<string, AssetSetting> | undefined {
-    return this.temporaryAssetSetting;
-  }
-
-  public updateTemporarySettings (assetSettings: Record<string, AssetSetting>) {
-    if (!this.temporaryAssetSetting) {
-      this.temporaryAssetSetting = {};
-    }
-
-    this.temporaryAssetSetting = { ...this.temporaryAssetSetting, ...assetSettings };
-  }
-
-  public clearTemporarySettings (assetSlug: string) {
-    if (!this.temporaryAssetSetting) {
-      return;
-    }
-
-    delete this.temporaryAssetSetting[assetSlug];
-  }
-
   public async updateAssetSetting (assetSlug: string, assetSetting: AssetSetting, autoEnableNativeToken?: boolean): Promise<boolean | undefined> {
     const currentAssetSettings = await this.getAssetSettings();
 
@@ -2259,11 +2246,92 @@ export class ChainService {
     this.setAssetSettings(assetSettings);
   }
 
+  private async getEvmTokensWithBalance (address: string, chainSlug: string): Promise<string[]> {
+    const tokenBalanceSlugs = await subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalanceByChain(address, chainSlug);
+
+    return tokenBalanceSlugs;
+  }
+
+  private async getSubstrateTokensWithBalance (address: string, chainSlug: string, assetsByChain: Record<string, _ChainAsset>): Promise<string[]> {
+    const tokenBalanceSlugs: string[] = [];
+
+    const balanceData = await this.subscanService.getMultiChainBalance(address);
+
+    if (!balanceData) {
+      return [];
+    }
+
+    for (const datum of balanceData) {
+      const { balance, bonded, category, locked, network, symbol } = datum;
+      const chain = this.detectBalanceChainSlugMap[network];
+
+      if (chain !== chainSlug) {
+        continue;
+      }
+
+      const isBalanceEmpty = (!balance || balance === '0') && (!locked || locked === '0') && (!bonded || bonded === '0');
+
+      if (isBalanceEmpty) {
+        continue;
+      }
+
+      const tokenKey = `${chain}-${category === 'native' ? 'NATIVE' : 'LOCAL'}-${symbol.toUpperCase()}`;
+      const existedKey = Object.keys(assetsByChain).find((v) => v.toLowerCase() === tokenKey.toLowerCase());
+
+      if (existedKey) {
+        tokenBalanceSlugs.push(existedKey);
+      }
+    }
+
+    return tokenBalanceSlugs;
+  }
+
+  private getCurrentAccountAddressByChain (chainInfo: _ChainInfo, proxyId: string): string | undefined {
+    const addresses = this.keyringService.context.addressesByProxyId(proxyId);
+
+    if (_isChainEvmCompatible(chainInfo)) {
+      addresses.forEach((address) => {
+        if ([...EthereumKeypairTypes].includes(getKeypairTypeByAddress(address))) {
+          return address;
+        } else {
+          return undefined;
+        }
+      });
+    } else if (_isChainSubstrateCompatible(chainInfo)) {
+      addresses.forEach((address) => {
+        if ([...SubstrateKeypairTypes].includes(getKeypairTypeByAddress(address))) {
+          return address;
+        } else {
+          return undefined;
+        }
+      });
+    }
+
+    return undefined;
+  }
+
   public async updatePriorityAssetsByChain (chainSlug: string, visible: boolean) {
     const currentAssetSettings = await this.getAssetSettings();
     const assetsByChain = this.getFungibleTokensByChain(chainSlug);
     const priorityTokensMap = this.priorityTokensSubject.value || {};
-    const temporaryAssetSettings = this.getTemporarySettings();
+    const chainInfo = this.getChainInfoByKey(chainSlug);
+
+    const currentAccountProxyId = this.keyringService.context.currentAccount.proxyId;
+    const address = this.getCurrentAccountAddressByChain(chainInfo, currentAccountProxyId);
+
+    const tokenSlugsWithBalance: string[] = [];
+
+    if (address) {
+      if (_isChainEvmCompatible(chainInfo)) {
+        tokenSlugsWithBalance.push(...await this.getEvmTokensWithBalance(address, chainSlug));
+      } else if (_isChainSubstrateCompatible(chainInfo)) {
+        tokenSlugsWithBalance.push(...await this.getSubstrateTokensWithBalance(address, chainSlug, assetsByChain));
+      }
+    }
+
+    tokenSlugsWithBalance.forEach((tokenSlug) => {
+      currentAssetSettings[tokenSlug] = { visible: true };
+    });
 
     const priorityTokensList = priorityTokensMap.token && typeof priorityTokensMap.token === 'object'
       ? Object.keys(priorityTokensMap.token)
@@ -2271,13 +2339,7 @@ export class ChainService {
 
     for (const asset of Object.values(assetsByChain)) {
       if (visible) {
-        const isPriorityToken = priorityTokensList.includes(asset.slug);
-
-        if (temporaryAssetSettings) {
-          if (Object.keys(temporaryAssetSettings).includes(asset.slug) && temporaryAssetSettings[asset.slug].visible) {
-            currentAssetSettings[asset.slug] = { visible: true };
-          }
-        }
+        const isPriorityToken = priorityTokensList.includes(asset.slug) || _isCustomAsset(asset.slug);
 
         if (isPriorityToken || _isNativeToken(asset)) {
           currentAssetSettings[asset.slug] = { visible: true };

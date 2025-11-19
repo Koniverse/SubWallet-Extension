@@ -1,20 +1,16 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ChainAssetMap, ChainInfoMap } from '@subwallet/chain-list';
-import { _AssetType } from '@subwallet/chain-list/types';
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { TON_CENTER_API_KEY, TON_OPCODES } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/consts';
-import { AccountState, TonApiAccountResponse, TonApiJettonResponse, TxByMsgResponse } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/types';
+import { AccountState, TxByMsgResponse } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/types';
 import { getJettonTxStatus, retryTonTxStatus } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
 import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainConnectionStatus, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
 import { TonWalletContract } from '@subwallet/keyring/types';
 import { Cell } from '@ton/core';
 import { Address, Contract, OpenedContract, TonClient } from '@ton/ton';
-import BigN from 'bignumber.js';
 import { BehaviorSubject } from 'rxjs';
 
 export class TonApi implements _TonApi {
@@ -257,46 +253,5 @@ export class TonApi implements _TonApi {
     }
 
     return 'unknown';
-  }
-
-  async getTonTokenBalanceSlug (address: string): Promise<string[]> {
-    const tokenList = Object.values(ChainAssetMap).filter((asset) => asset.assetType === _AssetType.TEP74);
-    const chainInfo = ChainInfoMap[this.chainSlug];
-
-    const userFriendlyAddress = Address.parse(address).toString();
-    const tokenApiUrl = `https://tonapi.io/v2/accounts/${userFriendlyAddress}/jettons`;
-    const accountApiUrl = `https://tonapi.io/v2/accounts/${userFriendlyAddress}`;
-
-    try {
-      const [tokenDataResponse, accountDataResponse] = await Promise.all([
-        fetch(tokenApiUrl),
-        fetch(accountApiUrl)]
-      );
-
-      if (!tokenDataResponse.ok) {
-        return [];
-      }
-
-      const tokenData = await tokenDataResponse.json() as TonApiJettonResponse;
-      const accountData = await accountDataResponse.json() as TonApiAccountResponse;
-
-      const items = tokenData.balances.map((jettonBalance) => {
-        const tokenInfo = Object.values(tokenList).find((asset) => asset.metadata?.contractAddress === Address.parse(jettonBalance.jetton.address).toString());
-
-        if (!tokenInfo) {
-          return null;
-        }
-
-        return tokenInfo?.slug;
-      }).filter((item) => !!item) as string[];
-
-      if (new BigN(accountData.balance).gt(0)) {
-        items.push(_getChainNativeTokenSlug(chainInfo));
-      }
-
-      return items;
-    } catch (e) {
-      return [];
-    }
   }
 }
