@@ -228,7 +228,7 @@ export default class NftService {
             mapSdkToNftItem(inst, chainInfo.slug, contractAddress, eachOwner)
           ).filter((i): i is NftItem => Boolean(i));
 
-          console.log('FOR TESTER (after)', nftList)
+          console.log('FOR TESTER (after)', nftList);
 
           await this.state.handleDetectedNfts(eachOwner, nftList);
         } catch (innerErr) {
