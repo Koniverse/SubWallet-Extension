@@ -4655,6 +4655,7 @@ export default class KoniExtension {
   }
 
   private async getLatestSwapQuote (swapRequest: SwapRequest): Promise<SwapQuoteResponse> {
+    // TODO (Issue-4791): this function must know previous picked quote to re-call that quote only.
     const { swapQuoteResponse } = await this.#koniState.swapService.getLatestQuoteFromSwapRequest(swapRequest);
 
     return swapQuoteResponse;
