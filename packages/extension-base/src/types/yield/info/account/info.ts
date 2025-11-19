@@ -63,12 +63,21 @@ export interface AbstractYieldPositionInfo extends BaseYieldPositionInfo {
     originalTotalStake: string;
   };
 
-  metadata?: {
-    pendingStake?: string;
-    compoundingStake?: string;
-    manualStake?: string;
-  }
+  metadata?: TanssiStakingMetadata | BittensorStakingMetadata;
 }
+
+export interface TanssiStakingMetadata {
+  isShowActiveStakeDetails?: boolean;
+  pendingStake?: string;
+  compoundingStake?: string;
+  manualStake?: string;
+}
+
+export interface BittensorStakingMetadata {
+  rootClaimType?: BittensorRootClaimType;
+}
+
+export type BittensorRootClaimType = 'Swap' | 'Keep';
 
 /**
  * @interface SpecialYieldPositionInfo

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { SpecialYieldPositionInfo, TanssiStakingMetadata, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { detectTranslate, isSameAddress } from '@subwallet/extension-base/utils';
 import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { InfoItemBase } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
@@ -199,7 +199,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
               label: (
                 <div className='__label-with-icon'>
                   {t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.activeStake')}
-                  {item.metadata && new BigN(item.activeStake).gt(0) && (
+                  {(item?.metadata as TanssiStakingMetadata)?.isShowActiveStakeDetails && new BigN(item.activeStake).gt(0) && (
                     <span
                       className='__info-icon-wrapper'
                       onClick={openActiveStakeDetailsModal(item)}

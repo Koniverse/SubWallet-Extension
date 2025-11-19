@@ -12,12 +12,10 @@ function useCreateGetSubnetStakingTokenName () {
     const mapping: Record<string, string> = {};
 
     for (const asset of Object.values(assetRegistryMap)) {
-      if (asset.originChain === 'bittensor' && asset.assetType === 'LOCAL') {
-        const key = asset.priceId;
+      if (asset.originChain === 'bittensor' && asset.assetType === 'LOCAL' && asset.metadata?.netuid !== null && asset.metadata?.netuid !== undefined) {
+        const netuid = asset.metadata.netuid;
 
-        if (key) {
-          mapping[key] = asset.slug.toLowerCase();
-        }
+        mapping[netuid] = asset.slug.toLowerCase();
       }
     }
 
@@ -26,7 +24,7 @@ function useCreateGetSubnetStakingTokenName () {
 
   return useCallback((chain: string, netuid: number): string | undefined => {
     if (chain === 'bittensor') {
-      return bittensorMapping[`dtao-${netuid}`];
+      return bittensorMapping[netuid];
     }
 
     return undefined;

@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { YieldPositionInfo } from '@subwallet/extension-base/types';
+import { TanssiStakingMetadata, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { EARNING_ACITVE_STAKE_DETAILS_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -23,7 +23,7 @@ const modalId = EARNING_ACITVE_STAKE_DETAILS_MODAL;
 
 const Component: FC<Props> = (props: Props) => {
   const { className, decimals, onCancel, positionInfo, symbol } = props;
-
+  const metadata = positionInfo.metadata as TanssiStakingMetadata;
   const { t } = useTranslation();
 
   return (
@@ -51,27 +51,27 @@ const Component: FC<Props> = (props: Props) => {
         valueColorScheme={'light'}
       >
         {
-          !!positionInfo.metadata?.manualStake && new BigN(positionInfo.metadata?.manualStake).gt(0) &&
+          !!metadata?.manualStake && new BigN(metadata?.manualStake).gt(0) &&
           <MetaInfo.Number
             decimals={decimals}
             label={t('ui.EARNING.components.Modal.Earning.ActiveStakeDetails.manualStake')}
             suffix={symbol}
-            value={positionInfo.metadata?.manualStake}
+            value={metadata?.manualStake}
             valueColorSchema={'even-odd'}
           />
         }
         {
-          !!positionInfo.metadata?.compoundingStake && new BigN(positionInfo.metadata?.compoundingStake).gt(0) &&
+          !!metadata?.compoundingStake && new BigN(metadata?.compoundingStake).gt(0) &&
           <MetaInfo.Number
             decimals={decimals}
             label={t('ui.EARNING.components.Modal.Earning.ActiveStakeDetails.compoundingStake')}
             suffix={symbol}
-            value={positionInfo.metadata?.compoundingStake}
+            value={metadata?.compoundingStake}
             valueColorSchema={'even-odd'}
           />
         }
         {
-          !!positionInfo.metadata?.pendingStake && new BigN(positionInfo.metadata?.pendingStake).gt(0) &&
+          !!metadata?.pendingStake && new BigN(metadata?.pendingStake).gt(0) &&
           <MetaInfo.Number
             decimals={decimals}
             label={
@@ -93,7 +93,7 @@ const Component: FC<Props> = (props: Props) => {
               </Tooltip>
             }
             suffix={symbol}
-            value={positionInfo.metadata?.pendingStake}
+            value={metadata?.pendingStake}
             valueColorSchema={'even-odd'}
           />
         }

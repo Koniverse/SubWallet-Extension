@@ -4,7 +4,7 @@
 import { _Address, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 
 import { BaseProcessRequestSign, BaseRequestSign, InternalRequestSign, TransactionData } from '../../../transaction';
-import { NominationPoolInfo, ValidatorInfo, YieldPoolType, YieldPositionInfo } from '../../info';
+import { BittensorRootClaimType, NominationPoolInfo, ValidatorInfo, YieldPoolType, YieldPositionInfo } from '../../info';
 import { OptimalYieldPath } from './step';
 
 // Result after create extrinsic
@@ -117,3 +117,12 @@ export interface SubmitBittensorChangeValidatorStaking extends SubmitJoinNativeS
     subnetSymbol: string;
   }
 }
+
+export interface ChangeBittensorRootClaimTypeParams extends BaseRequestSign {
+  slug: string;
+  address: string;
+  chain: string;
+  rootClaimType: BittensorRootClaimType;
+}
+
+export type RequestChangeBittensorRootClaimType = InternalRequestSign<ChangeBittensorRootClaimTypeParams>;
