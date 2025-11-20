@@ -9,5 +9,6 @@ export { default as DeriveAccountListModal } from './DeriveAccountListModal';
 export { default as ImportAccountModal } from './ImportAccountModal';
 export { default as ImportSeedModal } from './ImportSeedModal';
 export { default as NewSeedModal } from './NewSeedModal';
+export { default as NewMultisigModal } from './NewMultisigModal';
 export { default as AccountChainAddressesModal } from './AccountChainAddressesModal';
 export { default as AccountNameModal } from './AccountNameModal';
