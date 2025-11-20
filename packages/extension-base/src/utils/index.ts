@@ -342,16 +342,20 @@ export const baseParseIPFSUrl = (input: string, customDomain?: string): string |
   const selectedDomain = customDomain || getRandomIpfsGateway();
 
   // Case 2: Replace Pinata private gateways with a public IPFS gateway
-  // Pinata private gateways (mypinata.cloud / gateway.pinata.cloud) can return 403 for public access,
-  // so we replace them with a selectedDomain.
-  // EX: https://ikzttp.mypinata.cloud/ipfs/QmYDvPAXtiJg7s8JdRBSLWdgSphQdac8j1YuQNNxcGE1hg/9586.png
-  if (input.includes('mypinata.cloud') || input.includes('gateway.pinata.cloud')) {
-    return input.replace(/https?:\/\/[^/]*pinata\.cloud\/ipfs\//, `${selectedDomain}`);
+  // ==== EX: https://ikzttp.mypinata.cloud/ipfs/QmYDvPAXtiJg7s8JdRBSLWdgSphQdac8j1YuQNNxcGE1hg/9586.png
+  // Case 2b: Blockscout IPFS debug gateway -> rewrite to public gateway
+  // ==== EX: http://ipfs-debug.node.blockscout.com/ipfs/QmX2qHy1o27KgmHJSG2wKj2qLiv1gMCJCTn4nxzEVtTdgF
+  // Case 2c: http://ipfs.node.blockscout.com/ipfs/QmeTETrnJcG3iowfT3tXtz2jKmyeYbeag3AeYfDk5pBjGg
+
+  const privateGatewayPattern = /https?:\/\/([^/]*pinata\.cloud|[^/]*\.node\.blockscout\.com)\/ipfs\//;
+
+  if (privateGatewayPattern.test(input)) {
+    return input.replace(privateGatewayPattern, selectedDomain);
   }
 
   // Case 3: Handle NFT.storage subdomain links (e.g. https://<cid>.ipfs.nftstorage.link/...)
   // Always redirect to selectedDomain to avoid SSL version/cipher mismatch errors
-  // EX: https://bafybeias6as7k66hkghst3w4jwk6x5dkfk56oglqh44x6jmok6n7kcvg7m.ipfs.nftstorage.link/0.gif?ext=gif
+  // ==== EX: https://bafybeias6as7k66hkghst3w4jwk6x5dkfk56oglqh44x6jmok6n7kcvg7m.ipfs.nftstorage.link/0.gif?ext=gif
   const nftStorageMatch = input.match(/^https?:\/\/([a-zA-Z0-9]+)\.ipfs\.nftstorage\.link\/(.*)$/);
 
   if (nftStorageMatch) {
