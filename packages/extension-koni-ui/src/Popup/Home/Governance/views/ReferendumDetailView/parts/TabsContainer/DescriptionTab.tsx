@@ -16,35 +16,75 @@ type Props = ThemeProps & {
   content: string;
 };
 
-const MAX_HEIGHT = 184;
+const DEFAULT_MAX_HEIGHT = 184;
+const SCREEN_RATIO = 0.25; // 40%
 
 const Component = ({ className, content }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
+  const [maxHeight, setMaxHeight] = useState<number>(DEFAULT_MAX_HEIGHT);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const _onClick = useCallback(() => {
-    setIsExpanded(!isExpanded);
-  }, [isExpanded]);
+    setIsExpanded((prev) => !prev);
+  }, []);
 
   useEffect(() => {
-    if (contentRef.current) {
-      const el = contentRef.current;
-
-      if (el.scrollHeight > MAX_HEIGHT) {
-        setIsOverflowing(true);
-      } else {
-        setIsOverflowing(false);
-      }
+    if (typeof window === 'undefined') {
+      return;
     }
-  }, [content]);
+
+    const calcMaxHeight = () => {
+      const screenHeight = window.innerHeight || DEFAULT_MAX_HEIGHT * 2;
+      const dynamicHeight = screenHeight * SCREEN_RATIO;
+
+      setMaxHeight(Math.max(DEFAULT_MAX_HEIGHT, dynamicHeight));
+    };
+
+    calcMaxHeight();
+
+    window.addEventListener('resize', calcMaxHeight);
+
+    return () => {
+      window.removeEventListener('resize', calcMaxHeight);
+    };
+  }, []);
+
+  useEffect(() => {
+    const descriptionCurrent = contentRef.current;
+
+    if (!descriptionCurrent) {
+      return;
+    }
+
+    const checkOverflow = () => {
+      setIsOverflowing(descriptionCurrent.scrollHeight > maxHeight);
+    };
+
+    checkOverflow();
+
+    let observer: ResizeObserver | undefined;
+
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(() => {
+        checkOverflow();
+      });
+
+      observer.observe(descriptionCurrent);
+    }
+
+    return () => {
+      observer?.disconnect();
+    };
+  }, [content, maxHeight]);
 
   return (
     <div className={className}>
       <div
         className={CN('__description-content', { '-expanded': isExpanded })}
         ref={contentRef}
+        style={{ maxHeight: isExpanded ? 'unset' : maxHeight }}
       >
         <Markdown
           rehypePlugins={[rehypeRaw]}
@@ -60,12 +100,12 @@ const Component = ({ className, content }: Props): React.ReactElement<Props> => 
             icon={(
               <Icon
                 phosphorIcon={CaretDoubleDown}
-                size={'sm'}
+                size='sm'
               />
             )}
             onClick={_onClick}
-            shape={'circle'}
-            size={'xs'}
+            shape='circle'
+            size='xs'
           >
             {t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.Description.readMore')}
           </Button>
@@ -100,7 +140,6 @@ export const DescriptionTab = styled(Component)<Props>(({ theme: { token } }: Pr
 
     '.__description-content': {
       overflow: 'hidden',
-      maxHeight: MAX_HEIGHT,
       transition: 'max-height 0.3s ease',
       position: 'relative',
 
@@ -127,10 +166,6 @@ export const DescriptionTab = styled(Component)<Props>(({ theme: { token } }: Pr
 
       img: {
         maxWidth: '100%'
-      },
-
-      '&.-expanded': {
-        maxHeight: 'unset'
       }
     }
   };

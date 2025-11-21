@@ -195,13 +195,15 @@ const ReferendumItem = styled(Component)<Props>(({ theme: { token } }: Props) =>
 
     '.__i-vote-summary-area': {
       display: 'flex',
-      justifyContent: 'space-between'
+      justifyContent: 'space-between',
+      gap: token.sizeXS
     },
 
     '.__i-time-left': {
       color: token.colorTextLight1,
       fontSize: token.fontSizeXS,
-      lineHeight: token.lineHeightXS
+      lineHeight: token.lineHeightXS,
+      flexShrink: 0
     }
   };
 });

@@ -154,7 +154,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
         block={true}
         onClick={onClickVote}
       >
-        {(userVotingInfo?.length === 1 && !!userVotingInfo[0].votes) ? t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.revote') : t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.vote')}
+        {(!isAllAccount && (userVotingInfo?.length === 1 && !!userVotingInfo[0].votes)) ? t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.revote') : t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.vote')}
       </Button>}
 
       {!!userVotingInfo && <GovVotedAccountsModal

@@ -11,9 +11,9 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon } from '@subwallet/react-ui';
-import { BigNumber } from 'bignumber.js';
+import BigN, { BigNumber } from 'bignumber.js';
 import { CaretLeft } from 'phosphor-react';
-import React, { Context, useCallback, useContext, useEffect, useMemo } from 'react';
+import React, { Context, useCallback, useContext, useEffect, useLayoutEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { ThemeContext } from 'styled-components';
 
@@ -55,6 +55,20 @@ const Component = ({ chainSlug, className, goOverview }: Props): React.ReactElem
 
     return getConvertedBalanceValue(totalLocked.shiftedBy(-decimals), priceMap[priceId] || 0);
   }, [assetInfo, decimals, priceMap, totalLocked]);
+
+  const isNoGovLocked = useMemo(() => {
+    return govLockedInfos
+      .every((item) =>
+        new BigN(item.summary.totalLocked).eq(BN_ZERO)
+
+      );
+  }, [govLockedInfos]);
+
+  useLayoutEffect(() => {
+    if (isNoGovLocked) {
+      onBack();
+    }
+  }, [isNoGovLocked, onBack]);
 
   useEffect(() => {
     setShowTabBar(false);
