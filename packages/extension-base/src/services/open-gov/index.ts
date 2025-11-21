@@ -103,6 +103,10 @@ export default class OpenGovService {
           }
         }
 
+        if (removeChains.length || removedAddresses.length) {
+          await this.removeGovLockedInfos(removeChains, removedAddresses);
+        }
+
         if (eventTypes.includes('account.updateCurrent') ||
           eventTypes.includes('account.remove') ||
           eventTypes.includes('chain.updateState') ||
@@ -122,6 +126,42 @@ export default class OpenGovService {
         }
       })().catch(console.error);
     });
+  }
+
+  async removeGovLockedInfos (chains?: string[], addresses?: string[]) {
+    const current = this.govLockedInfoSubject.getValue();
+    const removeKeys: string[] = [];
+
+    if (chains && chains.length > 0) {
+      for (const [key, value] of Object.entries(current)) {
+        if (chains.includes(value.chain)) {
+          removeKeys.push(key);
+        }
+      }
+    }
+
+    if (addresses && addresses.length > 0) {
+      for (const [key, value] of Object.entries(current)) {
+        if (addresses.includes(value.address)) {
+          removeKeys.push(key);
+        }
+      }
+    }
+
+    for (const key of removeKeys) {
+      delete current[key];
+    }
+
+    this.govLockedInfoSubject.next(current);
+    this.govLockedInfoListSubject.next(Object.values(current));
+
+    if (addresses && addresses.length > 0) {
+      await this.dbService.removeGovLockedInfosByAddresses(addresses);
+    }
+
+    if (chains && chains.length > 0) {
+      await this.dbService.removeGovLockedInfosByChains(chains);
+    }
   }
 
   private async initHandlers (): Promise<void> {
