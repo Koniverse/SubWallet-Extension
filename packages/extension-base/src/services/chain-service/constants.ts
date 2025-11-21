@@ -48,8 +48,9 @@ export const _BALANCE_TOKEN_GROUP = {
 };
 
 export const _BALANCE_LOCKED_ID_GROUP = {
-  staking: ['staking', 'delegatedStaking', 'pooledStaking'],
-  gov: ['pyconvot']
+  staking: ['staking', 'delegatedStaking', 'pooledStaking', 'stkngdel', 'stk_stks', 'dappStaking', 'parachainStaking'],
+  gov: ['pyconvot'],
+  democracy: ['democrac']
 };
 
 export const _NFT_CHAIN_GROUP = {

@@ -209,11 +209,12 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
       return null;
     }
 
-    const { governance, others, staking } = lockedDetails;
+    const { democracy, governance, others, staking } = lockedDetails;
 
     const items = [
       { label: t('ui.BALANCE.screen.Tokens.DetailModal.staking'), value: staking },
       { label: t('ui.BALANCE.screen.Tokens.DetailModal.governance'), value: governance },
+      { label: t('ui.BALANCE.screen.Tokens.DetailModal.democracy'), value: democracy },
       {
         label: (
           <Tooltip
@@ -336,7 +337,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
                             unitOpacity={0.85}
                             value={item.value}
                           />
-                          {item.key === 'locked' && new BigN(balanceInfo?.locked.value || 0).gt(0) && (
+                          {item.key === 'locked' && !!(balanceInfo?.lockedDetails) && (
                             <div
                               className='__locked-balance-details-icon'
                               onClick={handleShowLockedDetails}

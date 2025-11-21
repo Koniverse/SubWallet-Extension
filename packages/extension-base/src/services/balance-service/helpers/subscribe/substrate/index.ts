@@ -10,7 +10,7 @@ import { _getTotalStakeInNominationPool } from '@subwallet/extension-base/core/s
 import { _getOrmlTokensPalletLockedBalance, _getOrmlTokensPalletTransferable } from '@subwallet/extension-base/core/substrate/ormlTokens-pallet';
 import { _getSystemPalletTotalBalance, _getSystemPalletTransferable } from '@subwallet/extension-base/core/substrate/system-pallet';
 import { _getTokensPalletLocked, _getTokensPalletTransferable } from '@subwallet/extension-base/core/substrate/tokens-pallet';
-import { FrameBalancesHoldsInfo, FrameBalancesLocksInfo, FrameSystemAccountInfo, OrmlTokensAccountData, PalletAssetsAssetAccount, PalletAssetsAssetAccountWithStatus, PalletNominationPoolsPoolMember } from '@subwallet/extension-base/core/substrate/types';
+import { FrameBalancesFreezesInfo, FrameBalancesHoldsInfo, FrameBalancesLocksInfo, FrameSystemAccountInfo, OrmlTokensAccountData, PalletAssetsAssetAccount, PalletAssetsAssetAccountWithStatus, PalletNominationPoolsPoolMember } from '@subwallet/extension-base/core/substrate/types';
 import { _adaptX1Interior } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/contract-handler/wasm';
 import { getDefaultWeightV2 } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
@@ -129,7 +129,7 @@ const extractId = (id: string | Record<string, unknown> | undefined): string => 
   }
 
   if (typeof id === 'string') {
-    return id;
+    return id.replace(/\0/g, '').trim();
   }
 
   const keys = Object.keys(id);
@@ -166,6 +166,10 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const subscription = substrateApi.subscribeDataWithMulti(params, async (rs) => {
+    // TEMP FIX: Delay to allow locks/holds to sync with system.account
+    // TODO: Replace this with a proper sync mechanism
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     const balances = rs[systemAccountKey];
     const poolMemberInfos = rs[poolMembersKey];
 
@@ -204,6 +208,7 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
 
     let locks: FrameBalancesLocksInfo[][] = [];
     let holds: FrameBalancesHoldsInfo[][] = [];
+    let freezes: FrameBalancesFreezesInfo[][] = [];
 
     // Fetch locks/holds only for accounts that have locked balances
     if (accountsWithLocks.length > 0) {
@@ -226,6 +231,15 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
           amount: h.amount.toString()
         }))
       ) as FrameBalancesHoldsInfo[][];
+
+      const rawFreezes = (await substrateApi.api.query.balances.freezes.multi(accountsWithLocks));
+
+      freezes = rawFreezes.map((freezeArr) =>
+        freezeArr.map((f) => ({
+          id: f.id.toPrimitive(),
+          amount: f.amount.toString()
+        }))
+      ) as FrameBalancesFreezesInfo[][];
     }
 
     // Map locks/holds back to original index
@@ -233,11 +247,13 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
       const lockIndex = accountsWithLocks.indexOf(addresses[index]);
       const lockItems = lockIndex >= 0 ? locks[lockIndex] || [] : [];
       const holdItems = lockIndex >= 0 ? holds[lockIndex] || [] : [];
+      const freezeItems = lockIndex >= 0 ? freezes[lockIndex] || [] : [];
 
       let stakingBalance = new BigN(bittensorStakingBalances[index].toString());
       let govBalance = new BigN(0);
+      let democracyBalance = new BigN(0);
 
-      const allLockEntries = [...lockItems, ...holdItems];
+      const allLockEntries = [...lockItems, ...holdItems, ...freezeItems];
 
       for (const entry of allLockEntries) {
         const id = extractId(entry.id);
@@ -247,16 +263,19 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
           stakingBalance = stakingBalance.plus(amount);
         } else if (_BALANCE_LOCKED_ID_GROUP.gov.includes(id)) {
           govBalance = govBalance.plus(amount);
+        } else if (_BALANCE_LOCKED_ID_GROUP.democracy.includes(id)) {
+          democracyBalance = democracyBalance.plus(amount);
         }
       }
 
-      // others = total locked - max(staking, governance)
-      const maxMainLock = stakingBalance.gt(govBalance) ? stakingBalance : govBalance;
+      // others = total locked - max(staking, governance, democracy)
+      const maxMainLock = BigN.max(stakingBalance, govBalance, democracyBalance);
       const othersLockedBalance = new BigN(totalLockedFromTransfer.toString()).minus(maxMainLock);
 
       const lockedDetails: LockedBalanceDetails = {
         staking: stakingBalance.toFixed(),
         governance: govBalance.toFixed(),
+        democracy: democracyBalance.toFixed(),
         others: othersLockedBalance.gt(0) ? othersLockedBalance.toFixed() : '0'
       };
 

@@ -27,7 +27,7 @@ type Props = ThemeProps & {
 function Component ({ className = '', currentTokenInfo, id, lockedDetails, onCancel }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
 
-  const { governance, others, staking } = lockedDetails;
+  const { democracy, governance, others, staking } = lockedDetails;
   const assetRegistry = useSelector((state) => state.assetRegistry.assetRegistry);
 
   const tokenInfo = useMemo((): _ChainAsset | undefined => {
@@ -41,6 +41,7 @@ function Component ({ className = '', currentTokenInfo, id, lockedDetails, onCan
   const items = useMemo(() => [
     { label: t('ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.staking'), value: staking },
     { label: t('ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.governance'), value: governance },
+    { label: t('ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.democracy'), value: democracy },
     {
       label: (
         <Tooltip
@@ -59,7 +60,7 @@ function Component ({ className = '', currentTokenInfo, id, lockedDetails, onCan
       ),
       value: others
     }
-  ], [t, staking, governance, others]);
+  ], [t, staking, governance, democracy, others]);
 
   const visibleItems = useMemo(() =>
     items.filter(({ value }) => new BigN(value || 0).gt(0)),

@@ -17,16 +17,21 @@ export const groupBalance = (items: BalanceItem[], address: string, token: strin
 
   const sum = (selector: (i: BalanceItem) => string) => BigN.sum.apply(null, items.map(selector)).toFixed();
 
+  const staking = sum((i) => i.lockedDetails?.staking ?? '0');
+  const governance = sum((i) => i.lockedDetails?.governance ?? '0');
+  const democracy = sum((i) => i.lockedDetails?.democracy ?? '0');
+  const others = sum((i) => i.lockedDetails?.others ?? '0');
+
+  const hasLockedDetails = new BigN(staking).gt(0) || new BigN(governance).gt(0) || new BigN(democracy).gt(0) || new BigN(others).gt(0);
+
   return {
     address,
     tokenSlug: token,
     free: sum((i) => i.free),
     locked: sum((i) => i.locked),
-    lockedDetails: {
-      staking: sum((i) => i.lockedDetails?.staking ?? '0'),
-      governance: sum((i) => i.lockedDetails?.governance ?? '0'),
-      others: sum((i) => i.lockedDetails?.others ?? '0')
-    },
+    lockedDetails: hasLockedDetails
+      ? { staking, governance, democracy, others }
+      : undefined,
     state: states.every((item) => item === APIItemState.NOT_SUPPORT)
       ? APIItemState.NOT_SUPPORT
       : states.some((item) => item === APIItemState.READY)

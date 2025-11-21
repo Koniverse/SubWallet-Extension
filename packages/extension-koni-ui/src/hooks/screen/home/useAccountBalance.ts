@@ -173,9 +173,10 @@ function getAccountBalance (
           ? {
             staking: getBalanceValue(balanceItem.lockedDetails.staking || '0', decimals).toFixed(),
             governance: getBalanceValue(balanceItem.lockedDetails.governance || '0', decimals).toFixed(),
+            democracy: getBalanceValue(balanceItem.lockedDetails.democracy || '0', decimals).toFixed(),
             others: getBalanceValue(balanceItem.lockedDetails.others || '0', decimals).toFixed()
           }
-          : { staking: '0', governance: '0', others: '0' };
+          : undefined;
       }
 
       const priceId = _getAssetPriceId(chainAsset);

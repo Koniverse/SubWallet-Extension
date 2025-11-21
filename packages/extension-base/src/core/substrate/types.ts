@@ -37,6 +37,11 @@ export interface FrameBalancesHoldsInfo {
   reason?: string;
 }
 
+export interface FrameBalancesFreezesInfo {
+  id: string | Record<string, unknown>;
+  amount: string;
+}
+
 export type FrameSystemAccountInfo = FrameSystemAccountInfoV1 | FrameSystemAccountInfoV2;
 
 export type OrmlTokensAccountData = {

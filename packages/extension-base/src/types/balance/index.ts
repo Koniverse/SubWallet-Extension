@@ -27,6 +27,7 @@ export interface TokenBalanceRaw {
 export interface LockedBalanceDetails {
   staking: string;
   governance: string;
+  democracy: string;
   others: string;
 }
 
