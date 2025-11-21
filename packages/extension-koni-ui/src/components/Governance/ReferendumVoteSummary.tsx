@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
-import { useGetNativeTokenBasicInfo, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetAccountByAddress, useGetNativeTokenBasicInfo, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { UserVoting } from '@subwallet/extension-koni-ui/types/gov';
@@ -30,6 +30,8 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', isDependentOnA
   const isAllAccount = useSelector((state: RootState) => state.accountState.isAllAccount);
   const vote = userVoting?.[0].votes;
   const delegation = userVoting?.[0].delegation;
+  const delegatedAccount = useGetAccountByAddress(delegation?.target);
+  const delegateTargetName = delegatedAccount?.name || toShort(delegation?.target || '');
 
   return (
     <div className={CN(className, '__i-vote-summary')}>
@@ -37,7 +39,7 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', isDependentOnA
         ? (isDependentOnAllAccount ? isAllAccount : userVoting.length > 1)
           ? (
             <div className='__i-vote-summary-label'>
-              {t('ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.votedDelegatedTotal', { count: userVoting.length })}
+              {t('ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.votedDelegatedTotal', { count: userVoting.length, account: userVoting.length > 1 ? t('ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.accounts') : t('ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.account') })}
             </div>
           )
           : (
@@ -98,16 +100,13 @@ const Component = ({ chain, className, iconVoteStatSize = '12px', isDependentOnA
               )}
 
               {!!delegation && (
-                <>
-                  <div className='__i-vote-summary-label'>
-                    {t('ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.delegated')}:&nbsp;
-                  </div>
-                  <NumberDisplay
-                    className='__i-vote-stat-value'
-                    decimal={decimals}
-                    value={delegation.balance || '0'}
-                  />&nbsp;{t('ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.viaTarget', { target: toShort(delegation.target) })}
-                </>
+                <NumberDisplay
+                  className='__i-vote-stat-value'
+                  decimal={decimals}
+                  prefix={`${t('ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.delegated')}: `}
+                  suffix={t('ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.viaTarget', { target: delegateTargetName })}
+                  value={delegation.balance || '0'}
+                />
               )}
             </>
           )
@@ -125,6 +124,7 @@ const ReferendumVoteSummary = styled(Component)<Props>(({ theme: { token } }: Pr
   return {
     display: 'flex',
     flex: 1,
+    minWidth: 0,
     color: token.colorTextLight4,
     fontSize: token.fontSizeXS,
     lineHeight: token.lineHeightXS,
@@ -151,6 +151,14 @@ const ReferendumVoteSummary = styled(Component)<Props>(({ theme: { token } }: Pr
 
     '.__i-vote-stat-icon': {
       marginLeft: 2
+    },
+
+    '.__i-vote-stat-value': {
+      flex: 1,
+      minWidth: 0,
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis'
     }
   };
 });

@@ -46,6 +46,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
         defaultInvalidOutputValue={defaultInvalidOutputValue}
         label={label}
         onChange={onChange}
+        placeholder={'0'}
         prefix={!!logoKey && (
           <Logo
             className={'__logo'}

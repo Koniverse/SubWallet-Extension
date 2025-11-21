@@ -35,7 +35,7 @@ const Component: React.FC<Props> = (props: Props) => {
       </MetaInfo.Default>
       {data.type === ExtrinsicType.GOV_VOTE && (
         <MetaInfo.Default label={t('ui.HISTORY.screen.HistoryDetail.GovVoteLayout.voteDirection')}>
-          {govVoteInfo.type}
+          {String(govVoteInfo.type).charAt(0).toUpperCase() + String(govVoteInfo.type).slice(1)}
         </MetaInfo.Default>
       )}
     </>

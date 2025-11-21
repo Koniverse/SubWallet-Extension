@@ -8,7 +8,7 @@ import { useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovVoteSide } from '@subwallet/extension-koni-ui/types/gov';
 import { ReferendumVoteResult } from '@subwallet/extension-koni-ui/utils/gov/votingStats';
-import { Icon, ModalContext, Number } from '@subwallet/react-ui';
+import { Button, Icon, ModalContext, Number } from '@subwallet/react-ui';
 import { Info } from 'phosphor-react';
 import React, { useCallback, useContext, useState } from 'react';
 import styled from 'styled-components';
@@ -74,12 +74,17 @@ const Component = ({ chain, className, isLegacyGov, votingData }: Props): React.
                 suffix={symbol}
                 value={votingData[GovVoteType.AYE].totalVotedAmount}
               />
-              <div onClick={handleOpenAye}>
-                <Icon
+              <Button
+                block={false}
+                className={'voting-stats__value-info-button'}
+                disabled={votingData[GovVoteType.AYE].totalVotedAccounts === 0}
+                icon={ <Icon
                   customSize={'16px'}
                   phosphorIcon={Info}
-                />
-              </div>
+                />}
+                onClick={handleOpenAye}
+                type={'ghost'}
+              />
             </div>
           </MetaInfo.Default>
 
@@ -99,12 +104,17 @@ const Component = ({ chain, className, isLegacyGov, votingData }: Props): React.
                 suffix={symbol}
                 value={votingData[GovVoteType.NAY].totalVotedAmount}
               />
-              <div onClick={handleOpenNay}>
-                <Icon
+              <Button
+                block={false}
+                className={'voting-stats__value-info-button'}
+                disabled={votingData[GovVoteType.NAY].totalVotedAccounts === 0}
+                icon={ <Icon
                   customSize={'16px'}
                   phosphorIcon={Info}
-                />
-              </div>
+                />}
+                onClick={handleOpenNay}
+                type={'ghost'}
+              />
             </div>
           </MetaInfo.Default>
 
@@ -125,12 +135,16 @@ const Component = ({ chain, className, isLegacyGov, votingData }: Props): React.
                 suffix={symbol}
                 value={votingData[GovVoteType.ABSTAIN].totalVotedAmount}
               />
-              <div onClick={handleOpenAbstain}>
-                <Icon
+              <Button
+                className={'voting-stats__value-info-button'}
+                disabled={votingData[GovVoteType.ABSTAIN].totalVotedAccounts === 0}
+                icon={ <Icon
                   customSize={'16px'}
                   phosphorIcon={Info}
-                />
-              </div>
+                />}
+                onClick={handleOpenAbstain}
+                type={'ghost'}
+              />
             </div>
           </MetaInfo.Default>}
         </MetaInfo>
@@ -204,13 +218,14 @@ export const VotingStats = styled(Component)<Props>(({ theme: { token } }: Props
         whiteSpace: 'nowrap'
       }
     },
-    '.voting-stats__value svg': {
-      opacity: 0.529,
-      cursor: 'pointer',
-      transition: 'opacity 0.2s'
-    },
-    '.voting-stats__value svg:hover': {
-      opacity: 1
+
+    '.voting-stats__value-info-button': {
+      minWidth: 'unset !important',
+      height: 'fit-content',
+
+      '.anticon': {
+        width: 'fit-content'
+      }
     }
   };
 });

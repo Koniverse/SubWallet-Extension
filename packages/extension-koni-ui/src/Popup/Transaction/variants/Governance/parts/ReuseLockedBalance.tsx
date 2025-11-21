@@ -40,6 +40,7 @@ const Component = ({ allLockedValue = 0, assetInfo, className, govLockedValue = 
         <button
           className={'__action-button __gov-locked-value-button'}
           onClick={reuseGovLockedValue}
+          type={'button'}
         >
           <span className='__action-button-label'>
             {t('ui.TRANSACTION.screen.Transaction.ReuseLockedBalance.reuseGovernanceLock')}:
@@ -57,9 +58,10 @@ const Component = ({ allLockedValue = 0, assetInfo, className, govLockedValue = 
           <button
             className={'__action-button __all-locked-value-button'}
             onClick={reuseAllLockedValue}
+            type={'button'}
           >
             <span className='__action-button-label'>
-              {t('ui.TRANSACTION.screen.Transaction.ReuseLockedBalance.reuseAllLocks')}:
+              {t('ui.TRANSACTION.screen.Transaction.ReuseLockedBalance.reuseAllLock')}:
             </span>
 
             <NumberDisplay

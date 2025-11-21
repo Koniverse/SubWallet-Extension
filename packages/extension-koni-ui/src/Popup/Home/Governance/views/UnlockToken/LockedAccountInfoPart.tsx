@@ -349,6 +349,22 @@ export const LockedAccountInfoPart = styled(Component)<Props>(({ theme: { token 
     }
   },
 
+  '.__account-info-item': {
+    padding: token.padding,
+    paddingBottom: token.paddingMD,
+
+    '.__unlock-button-label': {
+      fontSize: token.fontSizeHeading5,
+      lineHeight: token.lineHeightHeading5,
+      fontWeight: token.headingFontWeight
+    }
+  },
+
+  '&.-horizontal-mode .__account-info-item': {
+    padding: token.paddingSM,
+    paddingBottom: token.padding
+  },
+
   '&.-horizontal-mode.-has-one-item': {
     '.__account-info-item.-box-mode': {
       flex: 1

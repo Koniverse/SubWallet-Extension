@@ -197,7 +197,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
                 {blocksToTimeLabel(referendumDetail.trackInfo.confirmPeriod, chain)}
               </MetaInfo.Default>
               <MetaInfo.Default
-                label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.enact')}
+                label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.enactDelay')}
               >
               After: {referendumDetail.onchainData.info.enactment.after || referendumDetail.onchainData.info.enactment.at}
               </MetaInfo.Default>
@@ -229,7 +229,7 @@ const Component = ({ chain, className, referendumDetail }: Props): React.ReactEl
       >
         <MetaInfo.Default
           className={'account-info-proposal-hash'}
-          label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.proposerHash')}
+          label={t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.TabsContainer.DetailsTab.proposalHash')}
         >
           <div>
             {toShort(referendumDetail.onchainData.proposalHash)}
