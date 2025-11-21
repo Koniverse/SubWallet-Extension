@@ -30,22 +30,3 @@ interface Msg {
   bounced: boolean,
   opcode: string
 }
-
-interface TonApiJettonBalance {
-  balance: string;
-  jetton: {
-    address: string;
-    name: string;
-    symbol: string;
-    decimals: number;
-  };
-}
-
-export interface TonApiJettonResponse {
-  balances: TonApiJettonBalance[];
-}
-
-export interface TonApiAccountResponse {
-  address: string;
-  balance: number;
-}

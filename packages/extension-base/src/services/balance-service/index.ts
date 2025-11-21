@@ -884,13 +884,13 @@ export class BalanceService implements StoppableServiceInterface {
 
   /** optimize token area **/
 
-  public async getEvmTokensWithBalance (address: string, chainSlug: string): Promise<string[]> {
+  public async getEvmTokensBalanceByChain (address: string, chainSlug: string): Promise<string[]> {
     const tokenBalanceSlugs = await subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalanceByChain(address, chainSlug);
 
     return tokenBalanceSlugs;
   }
 
-  public async getSubstrateTokensWithBalance (address: string, chainSlug: string, assetsByChain: Record<string, _ChainAsset>): Promise<string[]> {
+  public async getSubstrateTokensBalanceByChain (address: string, chainSlug: string, assetsByChain: Record<string, _ChainAsset>): Promise<string[]> {
     const tokenBalanceSlugs: string[] = [];
 
     const balanceData = await this.state.subscanService.getMultiChainBalance(address);
@@ -968,9 +968,9 @@ export class BalanceService implements StoppableServiceInterface {
 
     if (address) {
       if (_isChainEvmCompatible(chainInfo)) {
-        tokenSlugsWithBalance.push(...await this.getEvmTokensWithBalance(address, chainSlug));
+        tokenSlugsWithBalance.push(...await this.getEvmTokensBalanceByChain(address, chainSlug));
       } else if (_isChainSubstrateCompatible(chainInfo)) {
-        tokenSlugsWithBalance.push(...await this.getSubstrateTokensWithBalance(address, chainSlug, assetsByChain));
+        tokenSlugsWithBalance.push(...await this.getSubstrateTokensBalanceByChain(address, chainSlug, assetsByChain));
       }
     }
 
