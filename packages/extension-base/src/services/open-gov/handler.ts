@@ -684,7 +684,7 @@ export default abstract class BaseOpenGovHandler {
 
     if (unlockableTrackIds.length > 0) {
       const unlockableBalances = unlockableTrackIds
-        .map((trackId) => trackBalances.get(trackId) || new BigN(0))
+        .map((trackId) => actualTrackBalances.get(trackId) || new BigN(0))
         .sort((a, b) => b.comparedTo(a));
 
       const maxUnlockableBalance = unlockableBalances[0];

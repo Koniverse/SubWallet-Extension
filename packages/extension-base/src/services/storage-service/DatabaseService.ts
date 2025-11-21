@@ -768,6 +768,14 @@ export default class DatabaseService {
     return this.stores.govLockedInfo.upsertMany(infos);
   }
 
+  removeGovLockedInfosByAddresses (addresses: string[]) {
+    return this.stores.govLockedInfo.removeByAddresses(addresses);
+  }
+
+  removeGovLockedInfosByChains (chains: string[]) {
+    return this.stores.govLockedInfo.removeByChains(chains);
+  }
+
   async exportDB () {
     const blob = await exportDB(this._db, {
       filter: (table, value, key) => {
