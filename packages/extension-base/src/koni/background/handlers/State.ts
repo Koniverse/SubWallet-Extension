@@ -161,7 +161,7 @@ export default class KoniState {
     this.transactionService = new TransactionService(this);
 
     this.notificationService = new NotificationService();
-    this.chainService = new ChainService(this.dbService, this.eventService, this.keyringService);
+    this.chainService = new ChainService(this.dbService, this.eventService);
     this.subscanService = SubscanService.getInstance();
     this.settingService = new SettingService();
     this.requestService = new RequestService(this.chainService, this.settingService, this.keyringService, this.transactionService);
@@ -917,7 +917,7 @@ export default class KoniState {
 
   public async enableChainWithPriorityAssets (chainSlug: string, enableTokens = true): Promise<boolean> {
     if (enableTokens) {
-      await this.chainService.updatePriorityAssetsByChain(chainSlug, true);
+      await this.balanceService.updatePriorityAssetsByChain(chainSlug, true);
     }
 
     return this.chainService.enableChain(chainSlug);
