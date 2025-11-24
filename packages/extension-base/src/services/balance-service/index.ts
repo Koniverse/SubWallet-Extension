@@ -9,7 +9,7 @@ import { _isXcmWithinSameConsensus } from '@subwallet/extension-base/core/substr
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { getAcrossbridgeTransferProcessFromEvm, getDefaultTransferProcess, getSnowbridgeTransferProcessFromEvm, RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
-import { _getChainNativeTokenSlug, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isNativeToken, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getChainNativeTokenSlug, _isChainSubstrateCompatible, _isCustomAsset, _isNativeToken, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
 import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
@@ -882,14 +882,14 @@ export class BalanceService implements StoppableServiceInterface {
     }
   }
 
-  /** optimize token area **/
-
+  /** Return token slugs with balance in evm chain - only work with evm addresses & pure evm chains  **/
   public async getEvmTokensBalanceByChain (address: string, chainSlug: string): Promise<string[]> {
     const tokenBalanceSlugs = await subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalanceByChain(address, chainSlug);
 
     return tokenBalanceSlugs;
   }
 
+  /** Return token slugs with balance in substrate chain - only work with substrate chains that have subscanSlug **/
   public async getSubstrateTokensBalanceByChain (address: string, chainSlug: string, assetsByChain: Record<string, _ChainAsset>): Promise<string[]> {
     const tokenBalanceSlugs: string[] = [];
 
@@ -928,7 +928,7 @@ export class BalanceService implements StoppableServiceInterface {
     const proxyId = this.state.keyringService.context.currentAccount.proxyId;
     const addresses = this.state.keyringService.context.addressesByProxyId(proxyId);
 
-    if (_isChainEvmCompatible(chainInfo)) {
+    if (_isPureEvmChain(chainInfo)) {
       const evmAddress = addresses.find((address) => {
         const type = getKeypairTypeByAddress(address);
 
@@ -944,7 +944,7 @@ export class BalanceService implements StoppableServiceInterface {
       const substrateAddress = addresses.find((address) => {
         const type = getKeypairTypeByAddress(address);
 
-        return [...SubstrateKeypairTypes].includes(type);
+        return [...SubstrateKeypairTypes, ...EthereumKeypairTypes].includes(type);
       });
 
       if (substrateAddress) {
@@ -967,7 +967,7 @@ export class BalanceService implements StoppableServiceInterface {
     const tokenSlugsWithBalance: string[] = [];
 
     if (address) {
-      if (_isChainEvmCompatible(chainInfo)) {
+      if (_isPureEvmChain(chainInfo)) {
         tokenSlugsWithBalance.push(...await this.getEvmTokensBalanceByChain(address, chainSlug));
       } else if (_isChainSubstrateCompatible(chainInfo)) {
         tokenSlugsWithBalance.push(...await this.getSubstrateTokensBalanceByChain(address, chainSlug, assetsByChain));
