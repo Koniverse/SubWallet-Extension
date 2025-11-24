@@ -688,6 +688,7 @@ export interface AmountData extends BasicTokenInfo {
 
 export interface FeeData extends AmountData {
   tooHigh?: boolean;
+  crossChainFee?: string;
 }
 
 export interface AmountDataWithId extends AmountData {

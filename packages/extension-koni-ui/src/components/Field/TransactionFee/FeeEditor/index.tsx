@@ -42,6 +42,7 @@ type Props = ThemeProps & {
   feePercentageSpecialCase?: number
   feeOptionsInfo?: FeeDetail;
   estimateFee: string;
+  crossChainFee: string;
   renderFieldNode?: (params: RenderFieldNodeParams) => React.ReactNode;
   feeType?: FeeChainType;
   listTokensCanPayFee: TokenHasBalanceInfo[];
@@ -58,7 +59,7 @@ const modalId = 'FeeEditorModalId';
 
 const FEE_TYPES_CAN_SHOW: Array<FeeChainType | undefined> = ['substrate', 'evm', 'bitcoin'];
 
-const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, estimateFee, feeOptionsInfo, feePercentageSpecialCase, feeType, isLoadingFee = false, isLoadingToken, listTokensCanPayFee, nativeTokenSlug, onSelect, onSetTokenPayFee, renderFieldNode, selectedFeeOption, tokenPayFeeSlug, tokenSlug }: Props): React.ReactElement<Props> => {
+const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, destChainValue, estimateFee, feeOptionsInfo, feePercentageSpecialCase, feeType, isLoadingFee = false, isLoadingToken, listTokensCanPayFee, nativeTokenSlug, onSelect, onSetTokenPayFee, renderFieldNode, selectedFeeOption, tokenPayFeeSlug, tokenSlug }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
   const assetRegistry = useSelector((root) => root.assetRegistry.assetRegistry);
@@ -68,23 +69,32 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
   const { currencyData } = useSelector((state: RootState) => state.price);
   const [stableIsDataReady, setStableIsDataReady] = useState(false);
 
-  const tokenAsset = (() => {
+  const tokenPayFeeAsset = (() => {
     return assetRegistry[tokenPayFeeSlug] || undefined;
+  })();
+
+  const transferTokenAsset = (() => {
+    return assetRegistry[tokenSlug] || undefined;
   })();
 
   const nativeAsset = (() => {
     return assetRegistry[nativeTokenSlug] || undefined;
   })();
 
-  const decimals = _getAssetDecimals(tokenAsset);
-  // @ts-ignore
-  const priceId = _getAssetPriceId(tokenAsset);
+  const decimals = _getAssetDecimals(tokenPayFeeAsset);
+  const priceId = _getAssetPriceId(tokenPayFeeAsset);
   const priceValue = priceMap[priceId] || 0;
-  const symbol = _getAssetSymbol(tokenAsset);
+  const symbol = _getAssetSymbol(tokenPayFeeAsset);
+
   const priceNativeId = _getAssetPriceId(nativeAsset);
   const priceNativeValue = priceMap[priceNativeId] || 0;
   const nativeTokenSymbol = _getAssetSymbol(nativeAsset);
   const nativeTokenDecimals = _getAssetDecimals(nativeAsset);
+
+  const transferTokenSymbol = _getAssetSymbol(transferTokenAsset);
+  const transferTokenDecimals = _getAssetDecimals(transferTokenAsset);
+  const transferTokenPriceId = _getAssetPriceId(transferTokenAsset);
+  const transferTokenPriceValue = priceMap[transferTokenPriceId] || 0;
 
   const feeValue = useMemo(() => {
     return BN_ZERO;
@@ -115,6 +125,17 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
       .dividedBy(BN_TEN.pow(nativeTokenDecimals || 0))
       .toNumber();
   }, [estimateFee, nativeTokenDecimals, priceNativeValue, stableIsDataReady]);
+
+  const convertedCrossChainFeeValueToUSD = useMemo(() => {
+    if (!stableIsDataReady) {
+      return 0;
+    }
+
+    return new BigN(crossChainFee)
+      .multipliedBy(transferTokenPriceValue)
+      .dividedBy(BN_TEN.pow(transferTokenDecimals || 0))
+      .toNumber();
+  }, [crossChainFee, transferTokenDecimals, transferTokenPriceValue, stableIsDataReady]);
 
   const onClickEdit = useCallback(() => {
     if (chainValue && (_SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chainValue) || _SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chainValue))) {
@@ -177,12 +198,22 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
     return selectedToken?.rate || 1;
   }, [listTokensCanPayFee, tokenPayFeeSlug]);
 
+  const rateDestValue = useMemo(() => {
+    const selectedToken = listTokensCanPayFee.find((item) => item.slug === tokenSlug);
+
+    return selectedToken?.rate || 1;
+  }, [listTokensCanPayFee, tokenSlug]);
+
   const convertedEstimatedFee = useMemo(() => {
     const rs = new BigN(estimateFee).multipliedBy(rateValue);
     const isTransferLocalTokenAndPayThatTokenAsFee = !_isNativeTokenBySlug(tokenSlug) && !_isNativeTokenBySlug(tokenPayFeeSlug) && tokenPayFeeSlug === tokenSlug;
 
     return isTransferLocalTokenAndPayThatTokenAsFee ? rs.multipliedBy(feePercentageSpecialCase || 100).div(100) : rs;
   }, [estimateFee, rateValue, tokenSlug, tokenPayFeeSlug, feePercentageSpecialCase]);
+
+  const convertedCrossChainFee = useMemo(() => {
+    return new BigN(crossChainFee).multipliedBy(rateDestValue);
+  }, [crossChainFee, rateDestValue]);
 
   const isNativeTokenValue = !!(!isEditButton && isXcm);
 
@@ -193,7 +224,9 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
           <div className={CN(className, '__estimate-fee-wrapper')}>
             <div className='__field-line-1'>
               <div className='__field-label'>
-                {t('ui.TRANSACTION.components.Field.FeeEditor.estimatedFee')}:
+                {!isXcm
+                  ? t('ui.TRANSACTION.components.Field.FeeEditor.estimatedFee')
+                  : t('Network fee')}
               </div>
 
               {!isDataReady
@@ -247,6 +280,45 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
                   prefix={'~ '}
                   suffix={isNativeTokenValue ? nativeTokenSymbol : symbol}
                   value={isNativeTokenValue ? estimateFee : convertedEstimatedFee}
+                />
+              </div>
+            )}
+          </div>
+        )
+      }
+
+      {
+        isXcm && (
+          <div className={CN(className, '__estimate-fee-wrapper')}>
+            <div className='__field-line-1'>
+              <div className='__field-label'>
+                {t('Cross-chain fee')}:
+              </div>
+
+              {!isDataReady
+                ? (
+                  <ActivityIndicator size={20} />
+                )
+                : (FEE_TYPES_CAN_SHOW.includes(feeType) && (
+                  <div className='__fee-editor-area'>
+                    <Number
+                      className={'__fee-price-value'}
+                      decimal={0}
+                      prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
+                      suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+                      value={convertedCrossChainFeeValueToUSD}
+                    />
+                  </div>
+                ))}
+            </div>
+            {isDataReady && (
+              <div className={CN('__field-line-2')}>
+                <Number
+                  className={'__fee-value'}
+                  decimal={transferTokenDecimals}
+                  prefix={'~ '}
+                  suffix={transferTokenSymbol}
+                  value={isNativeTokenValue ? crossChainFee : convertedCrossChainFee}
                 />
               </div>
             )}

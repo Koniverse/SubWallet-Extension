@@ -360,7 +360,8 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
     symbol: '',
     decimals: 0,
     value: '0',
-    tooHigh: false
+    tooHigh: false,
+    crossChainFee: '0'
   };
   const { decimals, symbol } = _getChainNativeTokenBasicInfo(chainInfo);
 
@@ -372,6 +373,7 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
     try {
       if (isSubstrateTransaction(transaction)) {
         estimateFee.value = validationResponse.xcmFeeDryRun ?? (await transaction.paymentInfo(validationResponse.address)).partialFee.toString();
+        estimateFee.crossChainFee = validationResponse.xcmDestinationFee;
       } else if (isTonTransaction(transaction)) {
         estimateFee.value = transaction.estimateFee; // todo: might need to update logic estimate fee inside for future actions excluding normal transfer Ton and Jetton
       } else if (isCardanoTransaction(transaction)) {
