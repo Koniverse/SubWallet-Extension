@@ -162,7 +162,7 @@ export interface GovDelegationDetail {
 export interface UnlockVoteRequest {
   address: string;
   chain: string;
-  trackIds: number[];
+  trackIds?: number[];
   referendumIds?: string[];
   amount: string;
 }
