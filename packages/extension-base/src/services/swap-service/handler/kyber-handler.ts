@@ -83,8 +83,6 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
   const { recipient, sender, slippageTolerance } = params;
   let routeSummary = params.routeSummary;
 
-  console.log('routeSummary1', routeSummary);
-
   if (!routeSummary || !routeSummary.tokenIn || !routeSummary.tokenOut || !routeSummary.amountIn) {
     return {
       error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Invalid Route Summary')

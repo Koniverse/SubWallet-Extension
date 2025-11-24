@@ -5,7 +5,7 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { CrowdloanParaState, NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { getRandomIpfsGateway, SUBWALLET_IPFS } from '@subwallet/extension-base/koni/api/nft/config';
-import { _isChainEvmCompatible, _isPureCardanoChain, _isPureSubstrateChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainEvmCompatible, _isPureBitcoinChain, _isPureCardanoChain, _isPureSubstrateChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils/account';
 import { decodeAddress, encodeAddress, getKeypairTypeByAddress, isTonAddress } from '@subwallet/keyring';
@@ -13,7 +13,7 @@ import { t } from 'i18next';
 
 import { assert, BN, hexToU8a, isHex } from '@polkadot/util';
 import { ethereumEncode, isEthereumAddress } from '@polkadot/util-crypto';
-import { CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from "@subwallet/keyring/types";
+import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from "@subwallet/keyring/types";
 
 export * from './mv3';
 export * from './fetch';
@@ -308,8 +308,9 @@ export function isAddressAndChainCompatible (address: string, chain: _ChainInfo)
   const isTonCompatible = _isPureTonChain(chain) && TonKeypairTypes.includes(keypairType);
   const isSubstrateCompatible = _isPureSubstrateChain(chain) && SubstrateKeypairTypes.includes(keypairType);
   const isCardanoCompatible = _isPureCardanoChain(chain) && CardanoKeypairTypes.includes(keypairType);
+  const isBitcoinCompatible = _isPureBitcoinChain(chain) && BitcoinKeypairTypes.includes(keypairType);
 
-  return isEvmCompatible || isSubstrateCompatible || isTonCompatible || isCardanoCompatible;
+  return isEvmCompatible || isSubstrateCompatible || isTonCompatible || isCardanoCompatible || isBitcoinCompatible;
 }
 
 export function getDomainFromUrl (url: string): string {
@@ -413,3 +414,4 @@ export * from './registry';
 export * from './swap';
 export * from './translate';
 export * from './setup-api-sdk';
+export * from './bitcoin';

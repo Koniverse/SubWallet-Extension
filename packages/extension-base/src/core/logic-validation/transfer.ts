@@ -14,10 +14,10 @@ import { _TRANSFER_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-
 import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getTokenMinAmount, _isCIP26Token, _isNativeToken, _isNativeTokenBySlug, _isTokenEvmSmartContract, _isTokenTonSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
-import { isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
+import { isBitcoinTransaction, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { OptionalSWTransaction, SWTransactionInput, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountSignMode, BasicTxErrorType, BasicTxWarningCode, EvmEIP1559FeeOption, EvmFeeInfo, TransferTxErrorType } from '@subwallet/extension-base/types';
-import { balanceFormatter, combineEthFee, formatNumber, pairToAccount } from '@subwallet/extension-base/utils';
+import { AccountSignMode, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeInfo, BitcoinFeeRate, EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransferTxErrorType } from '@subwallet/extension-base/types';
+import { balanceFormatter, combineBitcoinFee, combineEthFee, formatNumber, getSizeInfo, pairToAccount } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
@@ -355,7 +355,7 @@ export function checkSupportForTransaction (validationResponse: SWTransactionRes
   }
 }
 
-export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, priceMap: Record<string, number>, feeInfo: EvmFeeInfo, nativeTokenInfo: _ChainAsset, nonNativeTokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined): Promise<FeeData> {
+export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, priceMap: Record<string, number>, feeInfo: FeeInfo, nativeTokenInfo: _ChainAsset, nonNativeTokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined): Promise<FeeData> {
   const estimateFee: FeeData = {
     symbol: '',
     decimals: 0,
@@ -366,6 +366,7 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
 
   estimateFee.decimals = decimals;
   estimateFee.symbol = symbol;
+  const { address, feeCustom, feeOption } = validationResponse;
 
   if (transaction) {
     try {
@@ -375,15 +376,33 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
         estimateFee.value = transaction.estimateFee; // todo: might need to update logic estimate fee inside for future actions excluding normal transfer Ton and Jetton
       } else if (isCardanoTransaction(transaction)) {
         estimateFee.value = transaction.estimateCardanoFee;
+      } else if (isBitcoinTransaction(transaction)) {
+        const feeCombine = combineBitcoinFee(feeInfo as BitcoinFeeInfo, feeOption, feeCustom as BitcoinFeeRate);
+
+        const recipients: string[] = [];
+
+        for (const txOutput of transaction.txOutputs) {
+          txOutput.address && recipients.push(txOutput.address);
+        }
+
+        // TODO: Need review
+        const sizeInfo = getSizeInfo({
+          inputLength: transaction.inputCount,
+          recipients: recipients,
+          sender: address
+        });
+
+        estimateFee.value = Math.ceil(feeCombine.feeRate * sizeInfo.txVBytes).toString();
       } else {
-        const gasLimit = transaction.gas || await evmApi.api.eth.estimateGas(transaction);
+        const _transaction = transaction;
+        const gasLimit = _transaction.gas || await evmApi.api.eth.estimateGas(_transaction);
 
-        const feeCombine = combineEthFee(feeInfo, validationResponse.feeOption, validationResponse.feeCustom as EvmEIP1559FeeOption);
+        const feeCombine = combineEthFee(feeInfo as EvmFeeInfo, validationResponse.feeOption, validationResponse.feeCustom as EvmEIP1559FeeOption);
 
-        if (transaction.maxFeePerGas) {
-          estimateFee.value = new BigN(transaction.maxFeePerGas.toString()).multipliedBy(gasLimit).toFixed(0);
-        } else if (transaction.gasPrice) {
-          estimateFee.value = new BigN(transaction.gasPrice.toString()).multipliedBy(gasLimit).toFixed(0);
+        if (_transaction.maxFeePerGas) {
+          estimateFee.value = new BigN(_transaction.maxFeePerGas.toString()).multipliedBy(gasLimit).toFixed(0);
+        } else if (_transaction.gasPrice) {
+          estimateFee.value = new BigN(_transaction.gasPrice.toString()).multipliedBy(gasLimit).toFixed(0);
         } else {
           if (feeCombine.maxFeePerGas) {
             const maxFee = new BigN(feeCombine.maxFeePerGas); // TODO: Need review

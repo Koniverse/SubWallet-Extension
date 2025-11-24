@@ -53,6 +53,8 @@ Promise.all([cryptoWaitReady(), checkRestore()])
     koniState.init().catch((err) => console.warn(err));
 
     responseMessage({ id: '0', response: { status: 'crypto_ready' } } as PageStatus);
+    // wake mobile up
+    SWHandler.instance.state.wakeup(true).catch((err) => console.warn(err));
 
     console.log('[Mobile] initialization completed');
   })
