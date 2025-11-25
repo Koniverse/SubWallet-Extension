@@ -199,7 +199,7 @@ export class InappNotificationService implements CronServiceInterface {
 
       if (isAvailClaim) {
         const availClaimMetadata = candidateNotification.metadata as ClaimAvailBridgeNotificationMetadata;
-        const availClaimStatus = availClaimMetadata && availClaimMetadata.status;
+        const availClaimStatus = availClaimMetadata?.status;
 
         if (availClaimStatus !== BridgeTransactionStatus.READY_TO_CLAIM) {
           const exists = comparedNotifications.filter((old) => {
@@ -228,11 +228,10 @@ export class InappNotificationService implements CronServiceInterface {
       }
       // -- update avail claimed notifications
 
-      candidateNotification.title = candidateNotification.title.replace('{{accountName}}', accountName);
-
       if (this.passValidateNotification(candidateNotification, comparedNotifications, remindTimeConfig)) {
         passNotifications.push({
           ...candidateNotification,
+          title: candidateNotification.title.replace('{{accountName}}', accountName),
           proxyId
         });
       }
