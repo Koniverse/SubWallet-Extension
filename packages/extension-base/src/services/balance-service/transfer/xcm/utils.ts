@@ -372,12 +372,6 @@ export async function fetchMinXcmTransferableAmount (request: CreateXcmExtrinsic
     }
   );
 
-  if (!response.ok) {
-    const error = await response.json() as ParaSpellError;
-
-    throw new Error(error.message);
-  }
-
   return await response.json() as string;
 }
 

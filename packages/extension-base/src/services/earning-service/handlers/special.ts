@@ -565,14 +565,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       feeInfo
     };
 
-    let minXcmTransferableAmount: string | undefined;
-
-    try {
-      minXcmTransferableAmount = await getMinXcmTransferableAmount(xcmRequest) ?? MIN_XCM_LIQUID_STAKING_DOT;
-    } catch (e) {
-      throw new Error('Feature unavailable at the moment. Try again later');
-    }
-
+    const minXcmTransferableAmount = await getMinXcmTransferableAmount(xcmRequest) ?? MIN_XCM_LIQUID_STAKING_DOT;
     const minXcmTransferableAmountStr = formatNumber(minXcmTransferableAmount.toString(), _getAssetDecimals(destinationTokenInfo), balanceFormatter, { maxNumberFormat: _getAssetDecimals(destinationTokenInfo) });
     const isEnoughSendingValue = new BigN(minXcmTransferableAmount).lte(xcmRequest.sendingValue);
 
