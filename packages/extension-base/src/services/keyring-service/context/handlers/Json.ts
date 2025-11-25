@@ -80,8 +80,10 @@ export class AccountJsonHandler extends AccountBaseHandler {
         const nameExists = this.state.checkNameExists(name as string);
         // Note: Show accountName of account exists to support user to know which account is existed
         const accountName = accountExists ? accountExists.name : account.name || account.address;
+        console.log('accountName', accountName);
 
-        if (![AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON].includes(account.chainType)) {
+        if (![AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON, AccountChainType.BITCOIN].includes(account.chainType)) {
+          console.log('run to this');
           throw new Error('Invalid JSON file');
         }
 
@@ -173,8 +175,8 @@ export class AccountJsonHandler extends AccountBaseHandler {
         const result = Object.values(accountProxyMap).map((proxy): AccountProxyExtra => {
           const rs: AccountProxyExtra = {
             ...proxy,
-            accounts: proxy.accounts.filter((acc) =>  [AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON].includes(acc.chainType)),
-            chainTypes: proxy.chainTypes.filter(cType => [AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON].includes(cType)),
+            accounts: proxy.accounts.filter((acc) =>  [AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON, AccountChainType.BITCOIN].includes(acc.chainType)),
+            chainTypes: proxy.chainTypes.filter(cType => [AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON, AccountChainType.BITCOIN].includes(cType)),
             isExistAccount: false,
             isExistName: false
           };
@@ -235,7 +237,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
           })
         );
 
-        const addresses = Object.values(filteredAccountProxies).flatMap((proxy) => proxy.accounts.filter((acc) =>  [AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON].includes(acc.chainType)).map((account) => account.address));
+        const addresses = Object.values(filteredAccountProxies).flatMap((proxy) => proxy.accounts.filter((acc) =>  [AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON, AccountChainType.BITCOIN].includes(acc.chainType)).map((account) => account.address));
         const proxyIds = Object.values(filteredAccountProxies).flatMap((proxy) => proxy.id);
 
         if (!addresses.length) {
