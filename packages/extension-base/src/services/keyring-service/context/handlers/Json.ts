@@ -80,10 +80,8 @@ export class AccountJsonHandler extends AccountBaseHandler {
         const nameExists = this.state.checkNameExists(name as string);
         // Note: Show accountName of account exists to support user to know which account is existed
         const accountName = accountExists ? accountExists.name : account.name || account.address;
-        console.log('accountName', accountName);
 
         if (![AccountChainType.SUBSTRATE, AccountChainType.ETHEREUM, AccountChainType.TON, AccountChainType.BITCOIN].includes(account.chainType)) {
-          console.log('run to this');
           throw new Error('Invalid JSON file');
         }
 
