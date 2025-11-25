@@ -43,4 +43,4 @@ export const STAKING_IDENTITY_API_SLUG: Record<string, string> = {
   statemint: 'polkadot_people'
 };
 
-export const MIN_XCM_LIQUID_STAKING_AMOUNT = '15000000000';
+export const MIN_XCM_LIQUID_STAKING_DOT = '15000000000';
