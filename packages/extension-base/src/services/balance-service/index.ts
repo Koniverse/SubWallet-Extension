@@ -534,7 +534,7 @@ export class BalanceService implements StoppableServiceInterface {
       const typeValid = [...EthereumKeypairTypes].includes(type);
 
       if (typeValid) {
-        return subwalletApiSdk.balanceDetectionApi.getSubWalletTokenBalance(address)
+        return subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalance(address)
           .catch((e) => {
             console.error(e);
 
@@ -726,7 +726,7 @@ export class BalanceService implements StoppableServiceInterface {
   public async evmDetectBalanceToken (addresses: string[]) {
     const assetMap = this.state.chainService.getAssetRegistry();
     const evmPromiseList = addresses.map((address) => {
-      return subwalletApiSdk.balanceDetectionApi.getSubWalletTokenBalance(address)
+      return subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalance(address)
         .catch((e) => {
           console.error(e);
 
