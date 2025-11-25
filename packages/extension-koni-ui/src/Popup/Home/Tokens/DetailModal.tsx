@@ -337,7 +337,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
                             unitOpacity={0.85}
                             value={item.value}
                           />
-                          {item.key === 'locked' && !!(balanceInfo?.lockedDetails) && (
+                          {item.key === 'locked' && !!(balanceInfo?.lockedDetails) && (new BigN(balanceInfo.locked.value).gt(0)) && (
                             <div
                               className='__locked-balance-details-icon'
                               onClick={handleShowLockedDetails}
