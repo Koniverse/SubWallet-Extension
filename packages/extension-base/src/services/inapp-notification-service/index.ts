@@ -238,10 +238,6 @@ export class InappNotificationService implements CronServiceInterface {
       }
     }
 
-    if (address === '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t') {
-      console.log('needUpdateNotifications', needUpdateNotifications);
-    }
-
     await this.dbService.upsertNotifications([...passNotifications, ...needUpdateNotifications]);
   }
 
