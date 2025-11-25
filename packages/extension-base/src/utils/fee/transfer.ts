@@ -18,7 +18,23 @@ import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balanc
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _BitcoinApi, _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getContractAddressOfToken, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isLocalToken, _isNativeToken, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByBitcoin, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
+import {
+  _getAssetDecimals,
+  _getAssetExistentialDeposit,
+  _getContractAddressOfToken,
+  _isChainBitcoinCompatible,
+  _isChainCardanoCompatible,
+  _isChainEvmCompatible,
+  _isChainTonCompatible,
+  _isLocalToken,
+  _isNativeToken,
+  _isPureEvmChain,
+  _isTokenEvmSmartContract,
+  _isTokenTransferredByBitcoin,
+  _isTokenTransferredByCardano,
+  _isTokenTransferredByEvm,
+  _isTokenTransferredByTon
+} from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
 import { getHydrationRate } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { isCardanoTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
@@ -544,10 +560,13 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     if (!_isNativeToken(srcToken)) { // xcm local token & pay native token or other local token as fee
       maxTransferable = bnFreeBalance;
     } else { // xcm native token & pay native token as fee
-      const maxTransferableBySW = bnFreeBalance.minus(BigN(estimatedFee).multipliedBy(XCM_FEE_RATIO));
+      const bnMaxTransferableBySW = bnFreeBalance.minus(BigN(estimatedFee).multipliedBy(XCM_FEE_RATIO));
       const maxTransferableByPS = await getMaxXcmTransferableAmount(params);
+      const bnMaxTransferableByPS = maxTransferableByPS
+        ? new BigN(maxTransferableByPS).minus(_getAssetExistentialDeposit(srcToken))
+        : undefined;
 
-      maxTransferable = new BigN(maxTransferableByPS ?? maxTransferableBySW);
+      maxTransferable = bnMaxTransferableByPS ?? bnMaxTransferableBySW;
     }
   }
 
