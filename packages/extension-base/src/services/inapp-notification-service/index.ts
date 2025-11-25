@@ -11,8 +11,8 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { NotificationDescriptionMap, NotificationTitleMap, ONE_DAY_MILLISECOND } from '@subwallet/extension-base/services/inapp-notification-service/consts';
-import { _BaseNotificationInfo, _NotificationInfo, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
-import { AvailBridgeSourceChain, AvailBridgeTransaction, fetchAllAvailBridgeClaimable, fetchPolygonBridgeTransactions, hrsToMillisecond, PolygonTransaction } from '@subwallet/extension-base/services/inapp-notification-service/utils';
+import { _BaseNotificationInfo, _NotificationInfo, BridgeTransactionStatus, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { AvailBridgeSourceChain, AvailBridgeTransaction, fetchAllAvailBridgeTransactions, fetchPolygonBridgeTransactions, hrsToMillisecond, PolygonTransaction } from '@subwallet/extension-base/services/inapp-notification-service/utils';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
@@ -185,12 +185,49 @@ export class InappNotificationService implements CronServiceInterface {
     const proxyId = this.keyringService.context.belongUnifiedAccount(address) || address;
     const accountName = this.keyringService.context.getCurrentAccountProxyName(proxyId);
     const passNotifications: _NotificationInfo[] = [];
+    const needUpdateNotifications: _NotificationInfo[] = [];
     const [comparedNotifications, remindTimeConfig] = await Promise.all([
       this.fetchNotificationsByParams({ notificationTab: NotificationTab.ALL, proxyId }),
       await fetchLatestRemindNotificationTime()
     ]);
 
     for (const candidateNotification of notifications) {
+      // -- update avail claimed notifications
+      // todo: bring this logic to a pure function
+      const availActionType = candidateNotification.actionType;
+      const isAvailClaim = [NotificationActionType.CLAIM_AVAIL_BRIDGE_ON_ETHEREUM, NotificationActionType.CLAIM_AVAIL_BRIDGE_ON_AVAIL].includes(availActionType);
+
+      if (isAvailClaim) {
+        const availClaimMetadata = candidateNotification.metadata as ClaimAvailBridgeNotificationMetadata;
+        const availClaimStatus = availClaimMetadata && availClaimMetadata.status;
+
+        if (availClaimStatus !== BridgeTransactionStatus.READY_TO_CLAIM) {
+          const exists = comparedNotifications.filter((old) => {
+            if (availActionType !== old.actionType) {
+              return false;
+            }
+
+            const oldMetadata = old.metadata as ClaimAvailBridgeNotificationMetadata;
+
+            return old.address === address && oldMetadata.messageId === availClaimMetadata.messageId && oldMetadata.status === BridgeTransactionStatus.READY_TO_CLAIM;
+          });
+
+          const updatedExists: _NotificationInfo[] = exists.map((exist) => {
+            const newMetadata = {
+              ...(exist.metadata as ClaimAvailBridgeNotificationMetadata),
+              status: availClaimStatus
+            };
+
+            return { ...exist, metadata: newMetadata };
+          });
+
+          needUpdateNotifications.push(...updatedExists);
+
+          continue;
+        }
+      }
+      // -- update avail claimed notifications
+
       candidateNotification.title = candidateNotification.title.replace('{{accountName}}', accountName);
 
       if (this.passValidateNotification(candidateNotification, comparedNotifications, remindTimeConfig)) {
@@ -201,7 +238,11 @@ export class InappNotificationService implements CronServiceInterface {
       }
     }
 
-    await this.dbService.upsertNotifications(passNotifications);
+    if (address === '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t') {
+      console.log('needUpdateNotifications', needUpdateNotifications);
+    }
+
+    await this.dbService.upsertNotifications([...passNotifications, ...needUpdateNotifications]);
   }
 
   cronCreateBridgeClaimNotification () {
@@ -259,21 +300,21 @@ export class InappNotificationService implements CronServiceInterface {
     }, {} as Record<ASSET_TYPE, _ChainAsset>);
 
     substrateAddresses.forEach((address) => {
-      fetchAllAvailBridgeClaimable(address, AvailBridgeSourceChain.ETHEREUM, true)
+      fetchAllAvailBridgeTransactions(address, AvailBridgeSourceChain.ETHEREUM, true)
         .then(async (transactions) => await this.processWriteAvailBridgeClaim(address, transactions, chainAssetMap[ASSET_TYPE.TEST_SUBSTRATE]))
         .catch(console.error);
 
-      fetchAllAvailBridgeClaimable(address, AvailBridgeSourceChain.ETHEREUM, false)
+      fetchAllAvailBridgeTransactions(address, AvailBridgeSourceChain.ETHEREUM, false)
         .then(async (transactions) => await this.processWriteAvailBridgeClaim(address, transactions, chainAssetMap[ASSET_TYPE.MAIN_SUBSTRATE]))
         .catch(console.error);
     });
 
     evmAddresses.forEach((address) => {
-      fetchAllAvailBridgeClaimable(address, AvailBridgeSourceChain.AVAIL, true)
+      fetchAllAvailBridgeTransactions(address, AvailBridgeSourceChain.AVAIL, true)
         .then(async (transactions) => await this.processWriteAvailBridgeClaim(address, transactions, chainAssetMap[ASSET_TYPE.TEST_EVM]))
         .catch(console.error);
 
-      fetchAllAvailBridgeClaimable(address, AvailBridgeSourceChain.AVAIL, false)
+      fetchAllAvailBridgeTransactions(address, AvailBridgeSourceChain.AVAIL, false)
         .then(async (transactions) => await this.processWriteAvailBridgeClaim(address, transactions, chainAssetMap[ASSET_TYPE.MAIN_EVM]))
         .catch(console.error);
     });
