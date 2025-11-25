@@ -188,7 +188,7 @@ export class InappNotificationService implements CronServiceInterface {
     const needUpdateNotifications: _NotificationInfo[] = [];
     const [comparedNotifications, remindTimeConfig] = await Promise.all([
       this.fetchNotificationsByParams({ notificationTab: NotificationTab.ALL, proxyId }),
-      await fetchLatestRemindNotificationTime()
+      fetchLatestRemindNotificationTime()
     ]);
 
     for (const candidateNotification of notifications) {
