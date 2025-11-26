@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetRef, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
-import { AuthUrls } from '@subwallet/extension-base/background/handlers/State';
+import { AuthUrls } from "@subwallet/extension-base/services/request-service/types";
 import { AddressBookInfo, AssetSetting, CampaignBanner, ChainStakingMetadata, ConfirmationsQueue, CrowdloanJson, KeyringState, MantaPayConfig, MantaPaySyncState, NftCollection, NftJson, NominatorMetadata, PriceJson, StakingJson, StakingRewardJson, TransactionHistoryItem, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountsContext, AuthorizeRequest, ConfirmationRequestBase, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _ChainApiStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
@@ -10,13 +10,14 @@ import { SWTransactionResult } from '@subwallet/extension-base/services/transact
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { AccountJson, AccountsWithCurrentAddress, BalanceJson, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardJson, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { SwapPair } from '@subwallet/extension-base/types/swap';
-import { addLazy, fetchStaticData, isEmptyObject } from '@subwallet/extension-base/utils';
+import { addLazy, isEmptyObject } from '@subwallet/extension-base/utils';
 import { lazySubscribeMessage } from '@subwallet/extension-web-ui/messaging';
 import { store } from '@subwallet/extension-web-ui/stores';
 import { DAppCategory, DAppInfo } from '@subwallet/extension-web-ui/types/dapp';
 import { MissionInfo } from '@subwallet/extension-web-ui/types/missionPool';
 import { buildHierarchy } from '@subwallet/extension-web-ui/utils/account/buildHierarchy';
 import { SessionTypes } from '@walletconnect/types';
+import subwalletApiSdk from "@subwallet-monorepos/subwallet-services-sdk";
 
 // Setup redux stores
 
@@ -346,8 +347,8 @@ export const getDAppsData = (() => {
     promise,
     start: () => {
       Promise.all([
-        fetchStaticData<DAppInfo[]>('dapps'),
-        fetchStaticData<DAppCategory[]>('categories')
+        subwalletApiSdk.staticContentApi.fetchDAppInfo(),
+        subwalletApiSdk.staticContentApi.fetchDAppCategory()
       ])
         .then((data) => {
           handler.resolve?.(data);
@@ -384,7 +385,7 @@ export const getMissionPoolData = (() => {
   const rs = {
     promise,
     start: () => {
-      fetchStaticData<MissionInfo[]>('airdrop-campaigns')
+      subwalletApiSdk.staticContentApi.fetchAirdropCampaigns()
         .then((data) => {
           handler.resolve?.(data || []);
         })

@@ -3,9 +3,8 @@
 
 import { CampaignData, CampaignDataType, ShowCampaignPopupRequest } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { ListCampaignResponse } from '@subwallet/extension-base/services/campaign-service/types';
 import { TARGET_ENV } from '@subwallet/extension-base/utils';
-import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { BehaviorSubject } from 'rxjs';
 
 import { runCampaign } from './helpers';
@@ -34,7 +33,7 @@ export default class CampaignService {
   }
 
   private async fetchCampaign () {
-    const respData = await fetchStaticData<ListCampaignResponse>('marketing-campaigns');
+    const respData = await subwalletApiSdk.staticContentApi.fetchCampaignList();
 
     const campaigns: CampaignData[] = [];
 

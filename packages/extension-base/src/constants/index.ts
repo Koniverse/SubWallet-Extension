@@ -72,5 +72,4 @@ export * from './environment';
 export * from './signing';
 export * from './staking';
 export * from './storage';
-export * from './remind-notification-time';
 export * from './bitcoin';

@@ -3,7 +3,6 @@
 
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { YieldPoolType } from '@subwallet/extension-base/types';
-import { fetchStaticData } from '@subwallet/extension-base/utils';
 import { BaseSelectModal, StakingPoolItem } from '@subwallet/extension-web-ui/components';
 import EmptyValidator from '@subwallet/extension-web-ui/components/Account/EmptyValidator';
 import { Avatar } from '@subwallet/extension-web-ui/components/Avatar';
@@ -22,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+import subwalletApiSdk from "@subwallet-monorepos/subwallet-services-sdk";
 
 interface Props extends ThemeProps, BasicInputWrapper {
   slug: string;
@@ -356,7 +356,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [inactiveModal]);
 
   useEffect(() => {
-    fetchStaticData<Record<string, number[]>>('nomination-pool-recommendation').then((earningPoolRecommendation) => {
+    subwalletApiSdk.staticContentApi.fetchNominationPoolRecommendations().then((earningPoolRecommendation) => {
       setDefaultPoolMap(earningPoolRecommendation);
     }).catch(console.error);
   }, []);

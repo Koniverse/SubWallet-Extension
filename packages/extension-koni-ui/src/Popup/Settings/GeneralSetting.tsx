@@ -3,7 +3,6 @@
 
 import { BrowserConfirmationType, CurrencyJson, CurrencyType, LanguageType, ThemeNames } from '@subwallet/extension-base/background/KoniTypes';
 import { ENABLE_LANGUAGES, languageOptions } from '@subwallet/extension-base/constants/i18n';
-import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { GeneralEmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
@@ -14,6 +13,7 @@ import { PhosphorIcon, Theme, ThemeProps } from '@subwallet/extension-koni-ui/ty
 import { noop } from '@subwallet/extension-koni-ui/utils';
 import { getCurrencySymbol } from '@subwallet/extension-koni-ui/utils/currency';
 import { BackgroundIcon, Icon, Image, SelectModal, SettingItem, SwIconProps } from '@subwallet/react-ui';
+import { staticData, StaticKey } from '@subwallet-monorepos/subwallet-services-sdk/services';
 import CN from 'classnames';
 import { ArrowSquareUpRight, BellSimpleRinging, CaretRight, CheckCircle, CornersOut, CurrencyCircleDollar, GlobeHemisphereEast, Layout as LayoutIcon, MoonStars, Sun } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';

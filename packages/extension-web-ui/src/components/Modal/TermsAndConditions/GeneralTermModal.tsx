@@ -1,8 +1,5 @@
-// [object Object]
+// Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
-// eslint-disable-next-line header/header
-import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
 import { BaseModal } from '@subwallet/extension-web-ui/components';
 import { GENERAL_TERM_AND_CONDITION_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
@@ -15,6 +12,7 @@ import { ArrowCircleRight, CaretDown } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import styled from 'styled-components';
+import subwalletApiSdk from "@subwallet-monorepos/subwallet-services-sdk";
 
 interface Props extends ThemeProps {
   onOk: () => void
@@ -36,7 +34,7 @@ const Component = ({ className, onOk }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchStaticData('term-and-condition', 'index.md')
+    subwalletApiSdk.staticContentApi.fetchTermAndCondition()
       .then((md) => setStaticData({ md: md as string }))
       .catch((e) => console.log('fetch _termAndCondition error:', e));
   }, []);

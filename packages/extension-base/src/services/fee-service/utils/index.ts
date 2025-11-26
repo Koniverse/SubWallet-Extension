@@ -7,6 +7,7 @@ import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types'
 import { estimateTokensForPool, getReserveForPool } from '@subwallet/extension-base/services/swap-service/handler/asset-hub/utils';
 import { EvmEIP1559FeeOption, EvmFeeInfo, EvmFeeInfoCache, InfuraFeeInfo, InfuraThresholdInfo } from '@subwallet/extension-base/types';
 import { BN_WEI, BN_ZERO } from '@subwallet/extension-base/utils';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 
 import { ApiPromise } from '@polkadot/api';
@@ -87,18 +88,9 @@ export const fetchInfuraFeeData = async (chainId: number, infuraAuth?: string): 
 
 export const fetchSubWalletFeeData = async (chainId: number, networkKey: string): Promise<EvmFeeInfo | null> => {
   return await new Promise<EvmFeeInfo | null>((resolve) => {
-    const baseUrl = 'https://api-cache.subwallet.app/sw-evm-gas/{{chain}}';
-    const url = baseUrl.replaceAll('{{chain}}', networkKey);
-
     // TODO: Update the logo to follow the new estimateFee format or move the logic to the backend
-    fetch(url,
-      {
-        method: 'GET'
-      })
-      .then((rs) => {
-        return rs.json();
-      })
-      .then((info: EvmFeeInfoCache) => {
+    subwalletApiSdk.externalCacheClientApi.fetchSubWalletFeeData(networkKey)
+      .then((info: EvmFeeInfoCache | null) => {
         resolve(info);
       })
       .catch((e) => {

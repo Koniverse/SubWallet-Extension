@@ -4,7 +4,7 @@
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { AmountData, BitcoinSignatureRequest, ChainType, EvmProviderErrorType, EvmSendTransactionRequest, EvmSignatureRequest, ExtrinsicStatus, ExtrinsicType, NotificationType, TransactionAdditionalInfo, TransactionDirection, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
-import { _SUPPORT_TOKEN_PAY_FEE_GROUP, ALL_ACCOUNT_KEY, fetchBlockedConfigObjects, fetchLatestBlockedActionsAndFeatures, getPassConfigId } from '@subwallet/extension-base/constants';
+import { _SUPPORT_TOKEN_PAY_FEE_GROUP, ALL_ACCOUNT_KEY, getPassConfigId } from '@subwallet/extension-base/constants';
 import { checkBalanceWithTransactionFee, checkSigningAccountForTransaction, checkSupportForAction, checkSupportForFeature, checkSupportForTransaction, estimateFeeForTransaction } from '@subwallet/extension-base/core/logic-validation/transfer';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { cellToBase64Str, externalMessage, getTransferCellPromise } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
@@ -26,6 +26,7 @@ import { isContractAddress, parseContractInput } from '@subwallet/extension-base
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { BN_ZERO } from '@subwallet/extension-base/utils/number';
 import keyring from '@subwallet/ui-keyring';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { Cell } from '@ton/core';
 import BigN from 'bignumber.js';
 import { Psbt } from 'bitcoinjs-lib';
@@ -98,12 +99,12 @@ export default class TransactionService {
     const { additionalValidator, address, chain, chainType, extrinsicType } = validationResponse;
     const chainInfo = this.state.chainService.getChainInfoByKey(chain);
 
-    const blockedConfigObjects = await fetchBlockedConfigObjects();
+    const blockedConfigObjects = await subwalletApiSdk.staticContentApi.fetchBlockedConfigObjects();
     const currentConfig = this.state.settingService.getEnvironmentSetting();
 
     const passBlockedConfigId = getPassConfigId(currentConfig, blockedConfigObjects);
 
-    const blockedActionsFeaturesMaps = await fetchLatestBlockedActionsAndFeatures(passBlockedConfigId);
+    const blockedActionsFeaturesMaps = await subwalletApiSdk.staticContentApi.fetchLatestBlockedActionsAndFeatures(passBlockedConfigId);
 
     for (const blockedActionsFeaturesMap of blockedActionsFeaturesMaps) {
       const { blockedActionsMap, blockedFeaturesList } = blockedActionsFeaturesMap;

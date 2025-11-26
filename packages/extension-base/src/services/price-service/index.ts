@@ -12,7 +12,7 @@ import { SWStorage } from '@subwallet/extension-base/storage';
 import { CurrentCurrencyStore } from '@subwallet/extension-base/stores';
 import { getTokenPriceHistoryId, TIME_INTERVAL, wait } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
-import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
+import { staticData, StaticKey } from '@subwallet-monorepos/subwallet-services-sdk/services';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Subject } from 'rxjs';
 
 const DEFAULT_CURRENCY: CurrencyType = 'USD';

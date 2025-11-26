@@ -22,7 +22,8 @@ import { convertUtxoRawToUtxo } from '@subwallet/extension-base/services/request
 import { IChain, IMetadataItem, IMetadataV15Item } from '@subwallet/extension-base/services/storage-service/databases';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import AssetSettingStore from '@subwallet/extension-base/stores/AssetSetting';
-import { addLazy, calculateMetadataHash, fetchStaticData, filterAssetsByChainAndType, getShortMetadata, MODULE_SUPPORT, reformatAddress } from '@subwallet/extension-base/utils';
+import { addLazy, calculateMetadataHash, filterAssetsByChainAndType, getShortMetadata, MODULE_SUPPORT, reformatAddress } from '@subwallet/extension-base/utils';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { BehaviorSubject, Subject } from 'rxjs';
 import Web3 from 'web3';
 
@@ -1234,7 +1235,7 @@ export class ChainService {
   }
 
   private async fetchLatestChainData () {
-    return await fetchStaticData<_ChainInfo[]>('chains');
+    return subwalletApiSdk.staticContentApi.fetchLatestChainData();
     // try {
     //   const timeout = new Promise((resolve) => {
     //     const id = setTimeout(() => {
@@ -1273,26 +1274,23 @@ export class ChainService {
 
   // @ts-ignore
   private async fetchLatestPriceIdsData () {
-    return await fetchStaticData<Record<string, string | null>>('chain-assets/price-map');
+    return await subwalletApiSdk.staticContentApi.fetchLatestPriceIdsData();
   }
 
   private async fetchLatestLedgerGenericAllowChains () {
-    return await fetchStaticData<string[]>('chains/ledger-generic-allow-chains') || [];
+    return await subwalletApiSdk.staticContentApi.fetchLatestLedgerGenericAllowChains();
   }
 
   private async fetchLatestPriorityTokens () {
-    return await fetchStaticData<TokenPriorityDetails>('chain-assets/priority-tokens') || {
-      tokenGroup: {},
-      token: {}
-    };
+    return await subwalletApiSdk.staticContentApi.fetchLatestPriorityTokens();
   }
 
   private async fetchLatestSufficientChains () {
-    return await fetchStaticData<SufficientChainsDetails>('chains/supported-sufficient-chains') || [];
+    return await subwalletApiSdk.staticContentApi.fetchLatestSufficientChains();
   }
 
   public async fetchAhMapChain () {
-    return await fetchStaticData<Record<string, string>>('asset-hub-staking-map');
+    return await subwalletApiSdk.staticContentApi.fetchAhMapChain();
   }
 
   private async initChains () {

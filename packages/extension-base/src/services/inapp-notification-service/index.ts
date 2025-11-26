@@ -5,7 +5,6 @@ import { COMMON_ASSETS, COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { CRON_LISTEN_AVAIL_BRIDGE_CLAIM } from '@subwallet/extension-base/constants';
-import { fetchLatestRemindNotificationTime } from '@subwallet/extension-base/constants/remind-notification-time';
 import { CronServiceInterface, ServiceStatus } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
@@ -20,6 +19,7 @@ import { ProcessTransactionData, ProcessType, SummaryEarningProcessData, SwapBas
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { formatNumber, getAddressesByChainType, reformatAddress } from '@subwallet/extension-base/utils';
 import { isSubstrateAddress } from '@subwallet/keyring';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 
 export class InappNotificationService implements CronServiceInterface {
   status: ServiceStatus;
@@ -187,7 +187,7 @@ export class InappNotificationService implements CronServiceInterface {
     const passNotifications: _NotificationInfo[] = [];
     const [comparedNotifications, remindTimeConfig] = await Promise.all([
       this.fetchNotificationsByParams({ notificationTab: NotificationTab.ALL, proxyId }),
-      await fetchLatestRemindNotificationTime()
+      await subwalletApiSdk.staticContentApi.fetchLatestRemindNotificationTime()
     ]);
 
     for (const candidateNotification of notifications) {

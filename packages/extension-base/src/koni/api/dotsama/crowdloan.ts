@@ -8,7 +8,7 @@ import { ACALA_REFRESH_CROWDLOAN_INTERVAL } from '@subwallet/extension-base/cons
 import registry from '@subwallet/extension-base/koni/api/dotsama/typeRegistry';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { fetchJson, getAddressesByChainType, reformatAddress } from '@subwallet/extension-base/utils';
-import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 
 import { DeriveOwnContributions } from '@polkadot/api-derive/types';
 import { BN } from '@polkadot/util';
@@ -36,9 +36,9 @@ function getChainInfoMap (chainInfoList: _ChainInfo[]): Record<string, _ChainInf
   return result;
 }
 
-const getOnlineFundList = fetchStaticData<CrowdloanFundInfo[]>('crowdloan-funds');
+const getOnlineFundList = subwalletApiSdk.staticContentApi.fetchCrowdloanFundList();
 const getOnlineChainInfoMap = (async () => {
-  const chainInfoList = await fetchStaticData<_ChainInfo[]>('chains');
+  const chainInfoList = await subwalletApiSdk.staticContentApi.fetchLatestChainData();
 
   return getChainInfoMap(chainInfoList);
 })();
