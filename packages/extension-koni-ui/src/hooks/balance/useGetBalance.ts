@@ -16,7 +16,6 @@ const DEFAULT_BALANCE = { value: '0', symbol: '', decimals: 18 };
 const useGetBalance = (chain = '', address = '', tokenSlug = '', isSubscribe = false, extrinsicType?: ExtrinsicType, balanceType?: BalanceType) => {
   const { t } = useTranslation();
 
-  console.log('balanceType', balanceType);
   const { chainInfoMap, chainStateMap } = useSelector((state) => state.chainStore);
   const { assetRegistry, assetSettingMap } = useSelector((state) => state.assetRegistry);
 
