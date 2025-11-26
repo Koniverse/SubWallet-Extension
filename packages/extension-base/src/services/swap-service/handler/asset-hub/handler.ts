@@ -83,7 +83,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
   }
 
   async getSubmitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    const { path, request: { address, fromAmount, recipient, alternativeAddress }, selectedQuote } = params;
+    const { path, request: { address, alternativeAddress, fromAmount, recipient }, selectedQuote } = params;
     const stepData = path[stepIndex];
 
     if (stepData.action !== DynamicSwapType.SWAP) {

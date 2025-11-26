@@ -140,7 +140,7 @@ export class HydradxHandler implements SwapBaseInterface {
   }
 
   async getSubmitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    const { path, request: { address, fromAmount, recipient, slippage, alternativeAddress }, selectedQuote } = params;
+    const { path, request: { address, alternativeAddress, fromAmount, recipient, slippage }, selectedQuote } = params;
     const stepData = path[stepIndex];
 
     if (stepData.action !== DynamicSwapType.SWAP) {
