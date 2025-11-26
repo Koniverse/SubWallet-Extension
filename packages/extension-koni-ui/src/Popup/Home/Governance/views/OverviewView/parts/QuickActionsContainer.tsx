@@ -33,7 +33,7 @@ const Component = ({ className, govLockedInfos, onGoUnlockToken, sdkInstance }: 
   const { t } = useTranslation();
   const notify = useNotification();
   const hasUnlockableAccount = useMemo(() => {
-    return govLockedInfos.some((lockInfo) => new BigNumber(lockInfo.summary.totalLocked).gt(BN_ZERO));
+    return govLockedInfos.some((lockInfo) => new BigNumber(lockInfo.summary.totalLocked).plus(lockInfo.summary.delegated).gt(BN_ZERO));
   }, [govLockedInfos]);
 
   const items = useMemo<ItemType[]>(() => {

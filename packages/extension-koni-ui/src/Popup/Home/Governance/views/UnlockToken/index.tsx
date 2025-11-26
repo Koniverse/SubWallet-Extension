@@ -59,8 +59,7 @@ const Component = ({ chainSlug, className, goOverview }: Props): React.ReactElem
   const isNoGovLocked = useMemo(() => {
     return govLockedInfos
       .every((item) =>
-        new BigN(item.summary.totalLocked).eq(BN_ZERO)
-
+        new BigN(item.summary.totalLocked).plus(item.summary.delegated).eq(BN_ZERO)
       );
   }, [govLockedInfos]);
 
