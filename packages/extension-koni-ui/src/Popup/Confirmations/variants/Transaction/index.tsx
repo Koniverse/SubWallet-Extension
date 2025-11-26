@@ -20,7 +20,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { BitcoinSignArea, EvmSignArea, SubstrateSignArea } from '../../parts/Sign';
-import { BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
+import { BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ChangeEarningValidatorTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
 
 interface Props extends ThemeProps {
   confirmation: ConfirmationQueueItem;
@@ -45,6 +45,8 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
       return BondTransactionConfirmation;
     case ExtrinsicType.STAKING_UNBOND:
       return UnbondTransactionConfirmation;
+    case ExtrinsicType.CHANGE_EARNING_VALIDATOR:
+      return ChangeEarningValidatorTransactionConfirmation;
     case ExtrinsicType.STAKING_WITHDRAW:
     case ExtrinsicType.STAKING_POOL_WITHDRAW:
       return WithdrawTransactionConfirmation;
@@ -183,8 +185,8 @@ const Component: React.FC<Props> = (props: Props) => {
         {!!transaction.estimateFee?.tooHigh && (
           <AlertBox
             className='network-box'
-            description={t('Gas fees on {{networkName}} are high due to high demands, so gas estimates are less accurate.', { replace: { networkName: network?.name } })}
-            title={t('Pay attention!')}
+            description={t('ui.TRANSACTION.Confirmations.highGasFeeWarning', { replace: { networkName: network?.name } })}
+            title={t('ui.TRANSACTION.Confirmations.payAttentionExclamation')}
             type='warning'
           />
         )}

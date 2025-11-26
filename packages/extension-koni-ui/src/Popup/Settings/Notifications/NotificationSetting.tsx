@@ -41,19 +41,19 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
   const notificationOptions = useMemo((): ShowNoticeOption[] => {
     return [
       {
-        label: t('Claim tokens'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.claimTokens'),
         value: 'earningClaim'
       },
       {
-        label: t('Withdraw tokens'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.withdrawTokens'),
         value: 'earningWithdraw'
       },
       {
-        label: t('Claim AVAIL bridge'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.claimAvailBridge'),
         value: 'availBridgeClaim'
       },
       {
-        label: t('Claim POLYGON bridge'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.claimPolygonBridge'),
         value: 'polygonBridgeClaim'
       }
     ];
@@ -62,15 +62,15 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
   // const timeSetup = useMemo((): ViewOption[] => {
   //   return [
   //     {
-  //       label: t('Today'),
+  //       label: t('ui.SETTINGS.screen.Setting.Notifications.today'),
   //       value: NotificationTimePeriod.TODAY
   //     },
   //     {
-  //       label: t('This week'),
+  //       label: t('ui.SETTINGS.screen.Setting.Notifications.thisWeek'),
   //       value: NotificationTimePeriod.THIS_WEEK
   //     },
   //     {
-  //       label: t('This month'),
+  //       label: t('ui.SETTINGS.screen.Setting.Notifications.thisMonth'),
   //       value: NotificationTimePeriod.THIS_MONTH
   //     }
   //   ];
@@ -121,7 +121,7 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
         onBack={goBack}
         paddingVertical
         showBackButton
-        title={t('Notification settings')}
+        title={t('ui.SETTINGS.screen.Setting.Notifications.notificationSettings')}
       />
 
       <div className={'body-container'}>
@@ -137,7 +137,7 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
                 weight='fill'
               />
             )}
-            name={t('Enable notifications')}
+            name={t('ui.SETTINGS.screen.Setting.Notifications.enableNotifications')}
             rightItem={(
               <Switch
                 checked={currentNotificationSetting.isEnabled}
@@ -147,7 +147,7 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
           />
           {currentNotificationSetting.isEnabled && <div className={'content-wrapper'}>
             <div className={'options-container'}>
-              <div className={'option-title'}>{t('Show notifications about')}</div>
+              <div className={'option-title'}>{t('ui.SETTINGS.screen.Setting.Notifications.showNotificationsAbout')}</div>
               {
                 notificationOptions.map((option) => (
                   <div
@@ -175,7 +175,7 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
           // todo: handle params for notification setup
           onClick={onSaveNotificationSetup(currentNotificationSetting)}
         >
-          {t('Save settings')}
+          {t('ui.SETTINGS.screen.Setting.Notifications.saveSettings')}
         </Button>
       </div>
     </PageWrapper>

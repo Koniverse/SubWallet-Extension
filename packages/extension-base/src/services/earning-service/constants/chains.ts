@@ -41,6 +41,7 @@ export const CHANNEL_ID = 7;
 export const STAKING_IDENTITY_API_SLUG: Record<string, string> = {
   polkadot: 'polkadot_people',
   statemine: 'peopleKusama',
-  statemint: 'polkadot_people'
+  statemint: 'polkadot_people',
+  kusama: 'peopleKusama'
 };
 export const _SUPPORT_CHANGE_VALIDATOR_CHAIN = ['polkadot', 'kusama'];

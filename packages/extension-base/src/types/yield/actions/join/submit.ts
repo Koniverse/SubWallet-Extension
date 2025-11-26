@@ -98,7 +98,7 @@ export interface BondingSubmitParams extends BaseRequestSign {
   amount: string,
   address: string,
   selectedValidators: ValidatorInfo[],
-  lockPeriod?: number, // in month
+  lockPeriod?: number // in month
   subnetData?: {
     netuid: number,
     slippage: number

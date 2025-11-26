@@ -3,14 +3,15 @@
 
 import { ConfirmationDefinitions, ConfirmationResult } from '@subwallet/extension-base/background/KoniTypes';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
-import { ConfirmationGeneralInfo } from '@subwallet/extension-koni-ui/components';
+import { detectTranslate } from '@subwallet/extension-base/utils';
+import { AlertBox, ConfirmationGeneralInfo } from '@subwallet/extension-koni-ui/components';
 import { completeConfirmation } from '@subwallet/extension-koni-ui/messaging';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ActivityIndicator, Button, Col, Field, Icon, Row } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle, Globe, ShareNetwork, WifiHigh, WifiSlash, XCircle } from 'phosphor-react';
 import React, { useCallback, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 
 interface Props extends ThemeProps {
@@ -25,6 +26,8 @@ const handleCancel = async ({ id }: ConfirmationDefinitions['addNetworkRequest']
   return await completeConfirmation('addNetworkRequest', { id, isApproved: false } as ConfirmationResult<null>);
 };
 
+const IMPORTED_NETWORK_GUIDE_URL = 'https://docs.subwallet.app/main/extension-user-guide/network-management/customize-your-networks/import-custom-networks';
+
 const Component: React.FC<Props> = (props: Props) => {
   const { className, request } = props;
   const { payload: { chainEditInfo, chainSpec, mode, providerError, unconfirmed } } = request;
@@ -35,6 +38,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const [loading, setLoading] = useState(false);
 
+  const isUnsupportedChain = useMemo(() => {
+    return providerError === _CHAIN_VALIDATION_ERROR.UNSUPPORTED_CHAIN_CANNOT_ADD;
+  }, [providerError]);
+
   const handleErrorMessage = useCallback((errorCode?: _CHAIN_VALIDATION_ERROR) => {
     if (!errorCode) {
       return '';
@@ -42,13 +49,13 @@ const Component: React.FC<Props> = (props: Props) => {
 
     switch (errorCode) {
       case _CHAIN_VALIDATION_ERROR.CONNECTION_FAILURE:
-        return t('Cannot connect to this provider');
+        return t('ui.DAPP.Confirmations.AddNetwork.cannotConnectToProvider');
       case _CHAIN_VALIDATION_ERROR.EXISTED_PROVIDER:
-        return t('This provider has already been added');
+        return t('ui.DAPP.Confirmations.AddNetwork.providerAlreadyAdded');
       case _CHAIN_VALIDATION_ERROR.EXISTED_CHAIN:
-        return t('This chain has already been added');
+        return t('ui.DAPP.Confirmations.AddNetwork.chainAlreadyAdded');
       default:
-        return t('Error validating this provider');
+        return t('ui.DAPP.Confirmations.AddNetwork.errorValidatingProvider');
     }
   }, [t]);
 
@@ -102,7 +109,7 @@ const Component: React.FC<Props> = (props: Props) => {
         <ConfirmationGeneralInfo request={request} />
         <Field
           content={chainEditInfo.providers[chainEditInfo.currentProvider]}
-          placeholder={t<string>('Provider URL')}
+          placeholder={t<string>('ui.DAPP.Confirmations.AddNetwork.providerUrl')}
           prefix={(
             <Icon
               customSize={'24px'}
@@ -115,14 +122,14 @@ const Component: React.FC<Props> = (props: Props) => {
           status={providerError ? 'error' : ''}
           statusHelp={handleErrorMessage(providerError)}
           suffix={providerSuffix}
-          tooltip={t<string>('Provider URL')}
+          tooltip={t<string>('ui.DAPP.Confirmations.AddNetwork.providerUrl')}
           tooltipPlacement='topLeft'
         />
         <Row gutter={token.paddingSM}>
           <Col span={16}>
             <Field
               content={chainEditInfo.name || ''}
-              placeholder={t('Network name')}
+              placeholder={t('ui.DAPP.Confirmations.AddNetwork.networkName')}
               prefix={(
                 <Icon
                   customSize={'24px'}
@@ -132,15 +139,15 @@ const Component: React.FC<Props> = (props: Props) => {
                   weight={'bold'}
                 />
               )}
-              tooltip={t<string>('Network name')}
+              tooltip={t<string>('ui.DAPP.Confirmations.AddNetwork.networkName')}
               tooltipPlacement='topLeft'
             />
           </Col>
           <Col span={8}>
             <Field
               content={chainEditInfo.symbol || ''}
-              placeholder={t('Symbol')}
-              tooltip={t<string>('Symbol')}
+              placeholder={t('ui.DAPP.Confirmations.AddNetwork.symbol')}
+              tooltip={t<string>('ui.DAPP.Confirmations.AddNetwork.symbol')}
               tooltipPlacement='topLeft'
             />
           </Col>
@@ -149,57 +156,93 @@ const Component: React.FC<Props> = (props: Props) => {
           <Col span={12}>
             <Field
               content={chainSpec?.decimals || 0}
-              placeholder={t('Decimals')}
-              tooltip={t<string>('Decimals')}
+              placeholder={t('ui.DAPP.Confirmations.AddNetwork.decimals')}
+              tooltip={t<string>('ui.DAPP.Confirmations.AddNetwork.decimals')}
               tooltipPlacement='topLeft'
             />
           </Col>
           <Col span={12}>
             <Field
               content={chainSpec?.evmChainId || 0}
-              placeholder={t('Chain ID')}
-              tooltip={t<string>('Chain ID')}
+              placeholder={t('ui.DAPP.Confirmations.AddNetwork.chainId')}
+              tooltip={t<string>('ui.DAPP.Confirmations.AddNetwork.chainId')}
               tooltipPlacement='topLeft'
             />
           </Col>
         </Row>
         <Field
           content={chainEditInfo.chainType}
-          placeholder={t('Network type')}
-          tooltip={t<string>('Network type')}
+          placeholder={t('ui.DAPP.Confirmations.AddNetwork.networkType')}
+          tooltip={t<string>('ui.DAPP.Confirmations.AddNetwork.networkType')}
           tooltipPlacement='topLeft'
         />
         <Field
           content={chainEditInfo.blockExplorer}
-          placeholder={t('Block explorer')}
-          tooltip={t<string>('Block explorer')}
+          placeholder={t('ui.DAPP.Confirmations.AddNetwork.blockExplorer')}
+          tooltip={t<string>('ui.DAPP.Confirmations.AddNetwork.blockExplorer')}
           tooltipPlacement='topLeft'
         />
         <Field
           content={chainEditInfo.crowdloanUrl}
-          placeholder={t('Crowdloan URL')}
-          tooltip={t<string>('Crowdloan URL')}
+          placeholder={t('ui.DAPP.Confirmations.AddNetwork.crowdloanUrl')}
+          tooltip={t<string>('ui.DAPP.Confirmations.AddNetwork.crowdloanUrl')}
           tooltipPlacement='topLeft'
         />
       </div>
       <div className='confirmation-footer'>
         {mode === 'update' && (<div className={'warning-message'}>
-          {t('The network already exists')}
+          {t('ui.DAPP.Confirmations.AddNetwork.networkAlreadyExists')}
         </div>)}
-        <Button
-          disabled={loading}
-          icon={(
-            <Icon
-              phosphorIcon={XCircle}
-              weight='fill'
+        {
+          isUnsupportedChain && (
+            <AlertBox
+              className={'alert-box'}
+              description={(
+                <Trans
+                  components={{
+                    highlight: (
+                      <a
+                        className='link'
+                        href={IMPORTED_NETWORK_GUIDE_URL}
+                        target='__blank'
+                      />
+                    )
+                  }}
+                  i18nKey={detectTranslate('ui.DAPP.Confirmations.AddNetwork.networkNotSupportedImport')}
+                />
+              )
+
+              }
+              title={t('ui.DAPP.Confirmations.AddNetwork.networkNotSupported')}
+              type={'error'}
             />
-          )}
-          onClick={onCancel}
-          schema={'secondary'}
-        >
-          {t('Cancel')}
-        </Button>
-        <Button
+          )
+        }
+        {
+          isUnsupportedChain
+            ? <Button
+              disabled={loading}
+              onClick={onCancel}
+              schema={'primary'}
+            >
+              {t('ui.DAPP.Confirmations.AddNetwork.iUnderstand')}
+            </Button>
+            : <Button
+              disabled={loading}
+              icon={(
+                <Icon
+                  phosphorIcon={XCircle}
+                  weight='fill'
+                />
+              )}
+              onClick={onCancel}
+              schema={'secondary'}
+            >
+              {t('ui.DAPP.Confirmations.AddNetwork.cancel')}
+            </Button>
+        }
+
+        {!isUnsupportedChain && <Button
           disabled={mode === 'update' || unconfirmed || !!providerError}
           icon={(
             <Icon
@@ -210,8 +253,8 @@ const Component: React.FC<Props> = (props: Props) => {
           loading={loading}
           onClick={onApprove}
         >
-          {t('Approve')}
-        </Button>
+          {t('ui.DAPP.Confirmations.AddNetwork.approve')}
+        </Button>}
       </div>
     </>
   );

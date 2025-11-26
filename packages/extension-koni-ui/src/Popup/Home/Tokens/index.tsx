@@ -9,7 +9,7 @@ import { TokenGroupBalanceItem } from '@subwallet/extension-koni-ui/components/T
 import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
-import { useCoreReceiveModalHelper, useDebouncedValue, useGetBannerByScreen, useGetChainSlugsByCurrentAccountProxy, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreReceiveModalHelper, useDebouncedValue, useGetBannerByScreen, useGetChainAndExcludedTokenByCurrentAccountProxy, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { UpperBlock } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/UpperBlock';
@@ -54,7 +54,7 @@ const Component = (): React.ReactElement => {
   const [, setStorage] = useLocalStorage<TransferParams>(TRANSFER_TRANSACTION, DEFAULT_TRANSFER_PARAMS);
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
   const { banners, dismissBanner, onClickBanner } = useGetBannerByScreen('token');
-  const allowedChains = useGetChainSlugsByCurrentAccountProxy();
+  const { allowedChains } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const buyTokenInfos = useSelector((state: RootState) => state.buyService.tokens);
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
   const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
@@ -154,6 +154,32 @@ const Component = (): React.ReactElement => {
     }
   }, [accountProxies, currentAccountProxy, isAllAccount]);
 
+  const isSwapSupported = useMemo(() => {
+    const isSupportAccount = (currentAcc: AccountProxy) => {
+      const isReadOnlyAccount = currentAcc.accountType === AccountProxyType.READ_ONLY;
+      const isLedgerAccount = currentAcc.accountType === AccountProxyType.LEDGER;
+      const isSoloAccount = currentAcc.accountType === AccountProxyType.SOLO;
+      const validEcosystem = [AccountChainType.ETHEREUM, AccountChainType.SUBSTRATE, AccountChainType.BITCOIN].includes(currentAcc.chainTypes[0]);
+      const invalidSoloAccount = isSoloAccount && !validEcosystem;
+
+      return !invalidSoloAccount && !isLedgerAccount && !isReadOnlyAccount;
+    };
+
+    const isSupportAllAccount = (accountProxies: AccountProxy[]) => {
+      return accountProxies.filter((account) => account.accountType !== AccountProxyType.ALL_ACCOUNT).some((account) => isSupportAccount(account));
+    };
+
+    if (!currentAccountProxy || currentAccountProxy.chainTypes.length <= 0) {
+      return false;
+    }
+
+    if (isAllAccount) {
+      return isSupportAllAccount(accountProxies);
+    } else {
+      return isSupportAccount(currentAccountProxy);
+    }
+  }, [accountProxies, currentAccountProxy, isAllAccount]);
+
   const tonAccountList: AccountAddressItemType[] = useMemo(() => {
     return accountProxies.filter((acc) => acc?.accountType === AccountProxyType.SOLO && acc?.chainTypes.includes(AccountChainType.TON)).map((item) => ({
       accountName: item.name,
@@ -213,7 +239,7 @@ const Component = (): React.ReactElement => {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.BALANCE.screen.Tokens.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -243,7 +269,7 @@ const Component = (): React.ReactElement => {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.BALANCE.screen.Tokens.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -314,7 +340,7 @@ const Component = (): React.ReactElement => {
           isPriceDecrease={isTotalBalanceDecrease}
           isShrink={isShrink}
           isSupportBuyTokens={isSupportBuyTokens}
-          isSupportSwap={true}
+          isSupportSwap={isSwapSupported}
           onOpenBuyTokens={onOpenBuyTokens}
           onOpenReceive={onOpenReceive}
           onOpenSendFund={onOpenSendFund}
@@ -331,8 +357,8 @@ const Component = (): React.ReactElement => {
           isZkModeSyncing && (
             <SwAlert
               className={classNames('zk-mode-alert-area')}
-              description={t('This may take a few minutes. Please keep the app open')}
-              title={t('Zk mode is syncing: {{percent}}%', { replace: { percent: zkModeSyncProgress || '0' } })}
+              description={t('ui.BALANCE.screen.Tokens.refreshBalanceInfo')}
+              title={t('ui.BALANCE.screen.Tokens.zkModeSyncing', { replace: { percent: zkModeSyncProgress || '0' } })}
               type={'warning'}
             />
           )
@@ -351,9 +377,9 @@ const Component = (): React.ReactElement => {
                       />
                     )
                   }}
-                  i18nKey={detectTranslate("TON wallets have multiple versions, each with its own wallet address and balance. <highlight>Change versions</highlight> if you don't see balances")}
+                  i18nKey={detectTranslate('ui.BALANCE.screen.Tokens.tonWalletVersionInfo')}
                 />}
-                title={t('Change wallet address & version')}
+                title={t('ui.BALANCE.screen.Tokens.changeWalletAddressAndVersion')}
                 type={'warning'}
               />
               <AccountSelectorModal
@@ -403,8 +429,8 @@ const Component = (): React.ReactElement => {
           !tokenGroupBalanceItems.length && (
             <EmptyList
               className={'__empty-list'}
-              emptyMessage={t('Try searching or importing one')}
-              emptyTitle={t('No tokens found')}
+              emptyMessage={t('ui.BALANCE.screen.Tokens.trySearchingOrImporting')}
+              emptyTitle={t('ui.BALANCE.screen.Tokens.noTokensFound')}
               phosphorIcon={Coins}
             />
           )
@@ -416,7 +442,7 @@ const Component = (): React.ReactElement => {
             size={'xs'}
             type={'ghost'}
           >
-            {t('Manage tokens')}
+            {t('ui.BALANCE.screen.Tokens.manageTokens')}
           </Button>
         </div>
       </div>

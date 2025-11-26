@@ -11,7 +11,7 @@ import React, { useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
 
-type HookType = (accountType: KeypairType, processFunction: VoidFunction) => void;
+type HookType = (accountType: KeypairType, processFunction: VoidFunction) => boolean;
 const GeneralTermLocalDefault: SeedPhraseTermStorage = { state: 'nonConfirmed', useDefaultContent: false };
 
 export default function useHandleTonAccountWarning (): HookType {
@@ -25,17 +25,17 @@ export default function useHandleTonAccountWarning (): HookType {
     if (accountType === 'ton') {
       alertModal.open({
         closable: false,
-        title: t('Incompatible seed phrase'),
+        title: t('ui.ACCOUNT.hook.account.useHandleTonWarning.incompatibleSeedPhrase'),
         type: NotificationType.WARNING,
         content: (
           <>
             <div>
-              {t('This address\'s seed phrase is not compatible with TON-native wallets. Continue using this address or create a new account that can be used on both SubWallet and TON-native wallets')}
+              {t('ui.ACCOUNT.hook.account.useHandleTonWarning.tonIncompatibleSeedPhraseAction')}
             </div>
           </>
         ),
         okButton: {
-          text: t('Get address'),
+          text: t('ui.ACCOUNT.hook.account.useHandleTonWarning.getAddress'),
           onClick: () => {
             alertModal.close();
             processFunction();
@@ -43,7 +43,7 @@ export default function useHandleTonAccountWarning (): HookType {
           schema: 'primary'
         },
         cancelButton: {
-          text: t('Create new'),
+          text: t('ui.ACCOUNT.hook.account.useHandleTonWarning.createNew'),
           onClick: () => {
             setSelectedMnemonicType('ton');
             setConfirmedTermSeedPhrase((prevState: string | SeedPhraseTermStorage) => {
@@ -62,9 +62,9 @@ export default function useHandleTonAccountWarning (): HookType {
         }
       });
 
-      return;
+      return true;
     }
 
-    processFunction();
+    return false;
   }, [alertModal, navigate, setConfirmedTermSeedPhrase, setSelectedMnemonicType, t]);
 }

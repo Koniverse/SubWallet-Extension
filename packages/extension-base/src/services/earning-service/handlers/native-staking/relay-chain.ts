@@ -384,6 +384,26 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     };
   }
 
+  async checkAccountHaveStake (useAddresses: string[]): Promise<string[]> {
+    const result: string[] = [];
+    const substrateApi = await this.substrateApi.isReady;
+
+    const ledgers = await substrateApi.api.query.staking?.ledger?.multi?.(useAddresses);
+
+    if (ledgers) {
+      for (let i = 0; i < useAddresses.length; i++) {
+        const address = useAddresses[i];
+        const _ledger = ledgers[i].toPrimitive() as unknown as PalletStakingStakingLedger;
+
+        if (_ledger && _ledger.total > 0) {
+          result.push(address);
+        }
+      }
+    }
+
+    return result;
+  }
+
   /* Subscribe pool position */
 
   /* Get pool targets */
@@ -759,7 +779,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     const bnAmount = new BN(amount);
 
     if (bnAmount.lte(BN_ZERO)) {
-      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount must be greater than 0')));
+      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStakingRelay.amountMustBeGreaterThanZero')));
     }
 
     const bnActiveStake = new BN(poolPosition.activeStake);
@@ -772,7 +792,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     }
 
     if (poolPosition.unstakings.length > maxUnstake) {
-      errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('You cannot unstake more than {{number}} times', { replace: { number: maxUnstake } })));
+      errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('bg.EARNING.services.service.earning.nativeStakingRelay.maxUnstakeTimes', { replace: { number: maxUnstake } })));
     }
 
     return Promise.resolve(errors);
@@ -848,6 +868,5 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
 
     return nominateTx;
   }
-
   /* Other actions */
 }

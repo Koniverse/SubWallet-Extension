@@ -162,7 +162,7 @@ export interface SimpleSwapValidationMetadata{
   chain: _ChainInfo;
 }
 
-export interface QuoteAskResponse {
+export interface ProcessedQuoteAskResponse {
   quote?: SwapQuote;
   error?: SwapError;
 }
@@ -289,5 +289,7 @@ export interface HydrationSwapStepMetadata extends BaseSwapStepMetadata {
 
 export interface ChainFlipSwapStepMetadata extends BaseSwapStepMetadata {
   srcChain: string,
-  destChain: string
+  destChain: string,
+  fromAssetId: string,
+  toAssetId: string
 }

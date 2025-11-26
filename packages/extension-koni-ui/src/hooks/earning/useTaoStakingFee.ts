@@ -8,13 +8,13 @@ import { getEarningImpact } from '@subwallet/extension-koni-ui/messaging';
 import { formatNumber } from '@subwallet/react-ui';
 import { useEffect, useMemo, useState } from 'react';
 
-const useTaoStakingFee = (
+export const useTaoStakingFee = (
   poolInfo: YieldPoolInfo,
   amount: string,
   decimals: number,
   netuid: number,
   type: ExtrinsicType,
-  setLoadingExternal?: (loading: boolean) => void,
+  setLoadingExternal?: (loading: boolean) => void
 ) => {
   const [stakingFee, setStakingFee] = useState<string | undefined>();
   const [earningSlippage, setEarningSlippage] = useState<number>(0);
@@ -36,9 +36,9 @@ const useTaoStakingFee = (
         slug: poolInfo.slug,
         value: amount,
         netuid,
-        type,
+        type
       })
-        .then(impact => {
+        .then((impact) => {
           if (!isSync) {
             return;
           }
@@ -47,7 +47,7 @@ const useTaoStakingFee = (
           setEarningSlippage(impact.slippage);
           setEarningRate(impact.rate);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Failed to get earning impact:', error);
         })
         .finally(() => {
@@ -65,5 +65,3 @@ const useTaoStakingFee = (
 
   return { stakingFee, earningRate, earningSlippage };
 };
-
-export default useTaoStakingFee;

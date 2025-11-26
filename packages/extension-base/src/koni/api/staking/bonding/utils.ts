@@ -723,35 +723,35 @@ export const getMinStakeErrorMessage = (chainInfo: _ChainInfo, bnMinStake: BN): 
   const tokenInfo = _getChainNativeTokenBasicInfo(chainInfo);
   const number = formatNumber(bnMinStake.toString(), tokenInfo.decimals || 0, balanceFormatter);
 
-  return t('Insufficient stake. You need to stake at least {{number}} {{tokenSymbol}} to earn rewards', { replace: { tokenSymbol: tokenInfo.symbol, number } });
+  return t('bg.EARNING.koni.api.staking.bonding.utils.insufficientStakeToEarn', { replace: { tokenSymbol: tokenInfo.symbol, number } });
 };
 
 export const getMaxValidatorErrorMessage = (chainInfo: _ChainInfo, max: number): string => {
-  let message = detectTranslate('You cannot select more than {{number}} validators for this network');
+  let message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxValidatorsSelection');
   const label = getValidatorLabel(chainInfo.slug);
 
   if (max > 1) {
     switch (label) {
       case 'dApp':
-        message = detectTranslate('You cannot select more than {{number}} dApps for this network');
+        message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxDappsSelection');
         break;
       case 'Collator':
-        message = detectTranslate('You cannot select more than {{number}} collators for this network');
+        message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxCollatorsSelection');
         break;
       case 'Validator':
-        message = detectTranslate('You cannot select more than {{number}} validators for this network');
+        message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxValidatorsSelection');
         break;
     }
   } else {
     switch (label) {
       case 'dApp':
-        message = detectTranslate('You cannot select more than {{number}} dApp for this network');
+        message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxOneDappSelection');
         break;
       case 'Collator':
-        message = detectTranslate('You cannot select more than {{number}} collator for this network');
+        message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxOneCollatorSelection');
         break;
       case 'Validator':
-        message = detectTranslate('You cannot select more than {{number}} validator for this network');
+        message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxOneValidatorSelection');
         break;
     }
   }
@@ -765,31 +765,31 @@ export const getExistUnstakeErrorMessage = (chain: string, type?: StakingType, i
   if (!isStakeMore) {
     switch (label) {
       case 'dApp':
-        return t('You can unstake from a dApp once');
+        return t('bg.EARNING.koni.api.staking.bonding.utils.unstakeFromDappOnce');
       case 'Collator':
-        return t('You can unstake from a collator once');
+        return t('bg.EARNING.koni.api.staking.bonding.utils.unstakeFromCollatorOnce');
 
       case 'Validator': {
         if (type === StakingType.POOLED) {
-          return t('You can unstake from a pool once');
+          return t('bg.EARNING.koni.api.staking.bonding.utils.unstakeFromPoolOnce');
         }
 
-        return t('You can unstake from a validator once');
+        return t('bg.EARNING.koni.api.staking.bonding.utils.unstakeFromValidatorOnce');
       }
     }
   } else {
     switch (label) {
       case 'dApp':
-        return t('You cannot stake more for a dApp you are unstaking from');
+        return t('bg.EARNING.koni.api.staking.bonding.utils.cannotStakeMoreOnUnstakingDapp');
       case 'Collator':
-        return t('You cannot stake more for a collator you are unstaking from');
+        return t('bg.EARNING.koni.api.staking.bonding.utils.cannotStakeMoreOnUnstakingCollator');
 
       case 'Validator': {
         if (type === StakingType.POOLED) {
-          return t('You cannot stake more for a pool you are unstaking from');
+          return t('bg.EARNING.koni.api.staking.bonding.utils.cannotStakeMoreOnUnstakingPool');
         }
 
-        return t('You cannot stake more for a validator you are unstaking from');
+        return t('bg.EARNING.koni.api.staking.bonding.utils.cannotStakeMoreOnUnstakingValidator');
       }
     }
   }

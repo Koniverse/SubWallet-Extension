@@ -347,6 +347,29 @@ export default class AstarNativeStakingPoolHandler extends BaseParaNativeStaking
     };
   }
 
+  async checkAccountHaveStake (useAddresses: string[]): Promise<Array<string>> {
+    const result: string[] = [];
+    const substrateApi = await this.substrateApi.isReady;
+
+    const ledgers = await substrateApi.api.query.dappsStaking?.ledger?.multi?.(useAddresses);
+
+    if (!ledgers) {
+      return [];
+    }
+
+    for (let i = 0; i < useAddresses.length; i++) {
+      const owner = useAddresses[i];
+      const _ledger = ledgers[i];
+      const ledger = _ledger.toPrimitive() as unknown as PalletDappsStakingAccountLedger;
+
+      if (ledger && ledger.locked > 0) {
+        result.push(owner);
+      }
+    }
+
+    return result;
+  }
+
   /* Subscribe pool position */
 
   /* Get pool targets */

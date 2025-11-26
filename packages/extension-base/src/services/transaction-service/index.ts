@@ -19,27 +19,7 @@ import { getBaseTransactionInfo, getTransactionId, isBitcoinTransaction, isCarda
 import { OptionalSWTransaction, SWDutchTransaction, SWDutchTransactionInput, SWPermitTransaction, SWPermitTransactionInput, SWTransaction, SWTransactionBase, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
-import {
-  AccountJson,
-  BaseStepType,
-  BasicTxErrorType,
-  BasicTxWarningCode,
-  BriefProcessStep,
-  LeavePoolAdditionalData,
-  PermitSwapData,
-  ProcessStep,
-  ProcessTransactionData,
-  RequestStakePoolingBonding,
-  RequestYieldStepSubmit,
-  SpecialYieldPoolInfo,
-  StepStatus,
-  SubmitBittensorChangeValidatorStaking,
-  SubmitJoinNominationPool,
-  SubstrateTipInfo,
-  TransactionErrorType,
-  Web3Transaction,
-  YieldPoolType
-} from '@subwallet/extension-base/types';
+import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitBittensorChangeValidatorStaking, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
 import { anyNumberToBN, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
 import { mergeTransactionAndSignature } from '@subwallet/extension-base/utils/eth/mergeTransactionAndSignature';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
@@ -142,7 +122,7 @@ export default class TransactionService {
     checkSupportForTransaction(validationResponse, transaction);
 
     if (!chainInfo) {
-      validationResponse.errors.push(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('Cannot find network')));
+      validationResponse.errors.push(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('bg.TRANSACTION_SERVICE.services.service.transaction.cannotFindNetwork')));
     }
 
     const substrateApi = this.state.chainService.getSubstrateApi(chainInfo.slug);
@@ -170,7 +150,9 @@ export default class TransactionService {
     const nonNativeTokenPayFeeInfo = isNonNativeTokenPayFee ? this.state.chainService.getAssetBySlug(tokenPayFeeSlug) : undefined;
     const priceMap = (await this.state.priceService.getPrice()).priceMap;
 
-    validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee);
+    if (!transactionInput.skipFeeRecalculation) {
+      validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee);
+    }
 
     const chainInfoMap = this.state.chainService.getChainInfoMap();
 
@@ -381,6 +363,74 @@ export default class TransactionService {
     'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
 
     return validatedTransaction;
+  }
+
+  public async handleTransactionAfterConfirmation (transaction: SWTransactionInput): Promise<SWTransactionResponse> {
+    const validatedTransaction = await this.validateTransaction(transaction);
+
+    const stopByErrors = validatedTransaction.errors.length > 0;
+    const stopByWarnings = validatedTransaction.warnings.length > 0 && !validatedTransaction.ignoreWarnings;
+
+    if (stopByErrors || stopByWarnings) {
+      // @ts-ignore
+      'transaction' in validatedTransaction && delete validatedTransaction.transaction;
+      'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
+      'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
+
+      return validatedTransaction;
+    }
+
+    validatedTransaction.warnings = [];
+
+    const transactionsSubject = this.transactions;
+    const emitter = new EventEmitter<TransactionEventMap>();
+
+    // Fill transaction default info
+    const transactionUpdated = this.fillTransactionDefaultInfo(validatedTransaction);
+
+    // Add Transaction
+    transactionsSubject[transactionUpdated.id] = { ...transactionUpdated, emitterTransaction: emitter };
+    this.transactionSubject.next({ ...transactionsSubject });
+
+    emitter.on('success', (data: TransactionEventResponse) => {
+      validatedTransaction.id = data.id;
+      validatedTransaction.extrinsicHash = data.extrinsicHash;
+      this.handlePostProcessing(data.id);
+      this.onSuccess(data);
+    });
+
+    emitter.on('signed', (data: TransactionEventResponse) => {
+      validatedTransaction.id = data.id;
+      validatedTransaction.extrinsicHash = data.extrinsicHash;
+      this.onSigned(data);
+    });
+
+    emitter.on('error', (data: TransactionEventResponse) => {
+      if (data.errors.length > 0) {
+        validatedTransaction.errors.push(...data.errors);
+      }
+
+      this.onFailed({ ...data, errors: [...data.errors, new TransactionError(BasicTxErrorType.INTERNAL_ERROR)] });
+    });
+
+    emitter.on('send', (data: TransactionEventResponse) => {
+      this.onSend(data);
+    });
+
+    emitter.on('extrinsicHash', (data: TransactionEventResponse) => {
+      this.onHasTransactionHash(data);
+    });
+
+    emitter.on('timeout', (data: TransactionEventResponse) => {
+      this.onTimeOut({ ...data, errors: [...data.errors, new TransactionError(BasicTxErrorType.TIMEOUT)] });
+    });
+
+    // @ts-ignore
+    'transaction' in validatedTransaction && delete validatedTransaction.transaction;
+    'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
+    'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
+
+    return { ...validatedTransaction };
   }
 
   public async handlePermitTransaction (transaction: SWPermitTransactionInput): Promise<SWTransactionResponse> {
@@ -1223,8 +1273,8 @@ export default class TransactionService {
 
     this.state.notificationService.notify({
       type: NotificationType.SUCCESS,
-      title: t('Transaction completed'),
-      message: t('Transaction {{info}} completed', { replace: { info } }),
+      title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionCompleted'),
+      message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoCompleted', { replace: { info } }),
       action: { url: this.getTransactionLink(id) },
       notifyViaBrowser: true
     });
@@ -1251,8 +1301,8 @@ export default class TransactionService {
 
       this.state.notificationService.notify({
         type: NotificationType.ERROR,
-        title: t('Transaction failed'),
-        message: t('Transaction {{info}} failed', { replace: { info } }),
+        title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionFailed'),
+        message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoFailed', { replace: { info } }),
         action: { url: this.getTransactionLink(id) },
         notifyViaBrowser: true
       });
@@ -1279,8 +1329,8 @@ export default class TransactionService {
 
       this.state.notificationService.notify({
         type: NotificationType.ERROR,
-        title: t('Transaction timed out'),
-        message: t('Transaction {{info}} timed out', { replace: { info } }),
+        title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionTimedOut'),
+        message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoTimedOut', { replace: { info } }),
         action: { url: this.getTransactionLink(id) },
         notifyViaBrowser: true
       });
@@ -1497,7 +1547,7 @@ export default class TransactionService {
             let signedTransaction: string | undefined;
 
             if (!payload) {
-              throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('Failed to sign'));
+              throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('bg.TRANSACTION_SERVICE.services.service.transaction.failedToSign'));
             }
 
             const web3Api = this.state.chainService.getEvmApi(chain).api;
@@ -1510,7 +1560,7 @@ export default class TransactionService {
               const recover = web3Api.eth.accounts.recoverTransaction(signed);
 
               if (recover.toLowerCase() !== account.address.toLowerCase()) {
-                throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('Wrong signature. Please sign with the account you use in dApp'));
+                throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('bg.TRANSACTION_SERVICE.services.service.transaction.wrongSignatureSignWithDappAccount'));
               }
 
               signedTransaction = signed;
@@ -1593,7 +1643,7 @@ export default class TransactionService {
           emitter.emit('send', eventData); // This event is needed after sending transaction with queue
 
           if (!signature) {
-            throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('Failed to sign'));
+            throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('bg.TRANSACTION_SERVICE.services.service.transaction.failedToSign'));
           }
 
           eventData.extrinsicHash = signature;
@@ -1646,7 +1696,7 @@ export default class TransactionService {
           transaction.submitSwapOrder()
             .then((isSendSuccess) => {
               if (!isSendSuccess) {
-                throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('Failed to sign'));
+                throw new EvmProviderError(EvmProviderErrorType.UNAUTHORIZED, t('bg.TRANSACTION_SERVICE.services.service.transaction.failedToSign'));
               }
 
               this.handleTransactionTimeout(emitter, eventData);
@@ -2008,7 +2058,7 @@ export default class TransactionService {
     const payload: BitcoinSignatureRequest = {
       payload: undefined,
       payloadJson: undefined,
-      account,
+      address,
       canSign: true,
       hashPayload: tx.toHex(),
       id
@@ -2080,7 +2130,7 @@ export default class TransactionService {
       const transaction = this.getTransaction(eventData.id);
 
       if (transaction.status !== ExtrinsicStatus.SUCCESS && transaction.status !== ExtrinsicStatus.FAIL) {
-        eventData.errors.push(new TransactionError(BasicTxErrorType.TIMEOUT, t('Transaction timeout')));
+        eventData.errors.push(new TransactionError(BasicTxErrorType.TIMEOUT, t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionTimeout')));
         emitter.emit('timeout', eventData);
         clearTimeout(timeout);
       }

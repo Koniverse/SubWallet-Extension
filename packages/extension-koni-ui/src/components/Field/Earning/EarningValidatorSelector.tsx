@@ -29,6 +29,7 @@ interface Props extends ThemeProps, BasicInputWrapper {
   chain: string;
   from: string;
   slug: string;
+  originValidator?: string;
   onClickBookButton?: (e: SyntheticEvent) => void;
   onClickLightningButton?: (e: SyntheticEvent) => void;
   isSingleSelect?: boolean;
@@ -77,7 +78,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { chain, className = '', defaultValue, from
     , id = defaultModalId, isSingleSelect: _isSingleSelect = false,
     loading, onChange, setForceFetchValidator
-    , slug, value } = props;
+    , slug, value, originValidator, label } = props;
   const { t } = useTranslation();
   const { activeModal, checkActive } = useContext(ModalContext);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
@@ -118,7 +119,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     const result: SortOption[] = [
       {
         desc: false,
-        label: t('Lowest commission'),
+        label: t('ui.EARNING.components.Field.Earning.ValidatorSelector.lowestCommission'),
         value: SortKey.COMMISSION
       }
     ];
@@ -126,7 +127,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     if (hasReturn) {
       result.push({
         desc: true,
-        label: t('Highest annual return'),
+        label: t('ui.EARNING.components.Field.Earning.ValidatorSelector.highestAnnualReturn'),
         value: SortKey.RETURN
       });
     }
@@ -134,14 +135,14 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     if (nominations && nominations.length > 0) {
       result.push({
         desc: true,
-        label: t('Nomination'),
+        label: t('ui.EARNING.components.Field.Earning.ValidatorSelector.nomination'),
         value: SortKey.NOMINATING
       });
     }
 
     result.push({
       desc: false,
-      label: t('Lowest min active stake'),
+      label: t('ui.EARNING.components.Field.Earning.ValidatorSelector.lowestMinActiveStake'),
       value: SortKey.MIN_STAKE
     });
 
@@ -167,20 +168,20 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     if (!fewValidators) {
       switch (label) {
         case 'dApp':
-          return detectTranslate('Apply {{number}} dApp');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyOneDapp');
         case 'Collator':
-          return detectTranslate('Apply {{number}} collator');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyOneCollator');
         case 'Validator':
-          return detectTranslate('Apply {{number}} validator');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyOneValidator');
       }
     } else {
       switch (label) {
         case 'dApp':
-          return detectTranslate('Apply {{number}} dApps');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyNumberDapps');
         case 'Collator':
-          return detectTranslate('Apply {{number}} collators');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyNumberCollators');
         case 'Validator':
-          return detectTranslate('Apply {{number}} validators');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyNumberValidators');
       }
     }
   }, [chain, fewValidators]);
@@ -277,6 +278,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [handleValidatorLabel, items.length, setForceFetchValidator, t]);
 
   const renderItem = useCallback((item: ValidatorDataType) => {
+    if (item.address === originValidator) {
+      return null;
+    }
+
     const key = getValidatorKey(item.address, item.identity);
     const keyBase = key.split('___')[0];
 
@@ -296,7 +301,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         validatorInfo={item}
       />
     );
-  }, [changeValidators, networkPrefix, nominatorValueList, onClickItem, onClickMore]);
+  }, [changeValidators, networkPrefix, nominatorValueList, onClickItem, onClickMore, originValidator]);
 
   const onClickActionBtn = useCallback(() => {
     activeModal(FILTER_MODAL_ID);
@@ -379,7 +384,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     onChange && onChange({ target: { value: selected } });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nominations, onInitValidators, isSingleSelect, autoValidator]);
+  }, [nominations, onInitValidators, isSingleSelect, autoValidator, originValidator]);
 
   useEffect(() => {
     if (!isActive) {
@@ -402,7 +407,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         chain={chain}
         disabled={!chain || !from}
         identPrefix={networkPrefix}
-        label={t('Select') + ' ' + t(handleValidatorLabel)}
+        label={label || t('ui.EARNING.components.Field.Earning.ValidatorSelector.select') + ' ' + t(handleValidatorLabel)}
         loading={loading}
         onClick={onActiveValidatorSelector}
         value={value || ''}
@@ -445,7 +450,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             activeModal(SORTING_MODAL_ID);
           }
         }}
-        title={t('Select') + ' ' + t(handleValidatorLabel)}
+        title={t('ui.EARNING.components.Field.Earning.ValidatorSelector.select') + ' ' + t(handleValidatorLabel)}
       >
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
@@ -495,8 +500,13 @@ const EarningValidatorSelector = styled(forwardRef(Component))<Props>(({ theme: 
   return {
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
-      paddingBottom: token.paddingLG
+      paddingBottom: token.paddingSM
     },
+
+    '.ant-sw-list-search-input': {
+      paddingBottom: token.paddingSM
+    },
+
     '.__pool-item-wrapper': {
       marginBottom: token.marginXS
     },

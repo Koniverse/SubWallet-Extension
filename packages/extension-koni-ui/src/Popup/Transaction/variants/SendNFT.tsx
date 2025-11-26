@@ -44,6 +44,7 @@ const DEFAULT_ITEM: NftItem = {
 const hiddenFields: Array<keyof SendNftParams> = ['from', 'chain', 'asset', 'itemId', 'collectionId', 'fromAccountProxy'];
 const validateFields: Array<keyof SendNftParams> = ['to'];
 
+// Todo: Recheck send NFT with Ledger in each ecosystem
 const Component: React.FC = () => {
   useSetCurrentPage('/transaction/send-nft');
   const { t } = useTranslation();
@@ -228,10 +229,11 @@ const Component: React.FC = () => {
             validateTrigger={false}
           >
             <AddressInputNew
+              actionType={ActionType.SEND_NFT}
               chainSlug={chain}
               dropdownHeight={227}
-              label={t('Send to')}
-              placeholder={t('Account address')}
+              label={t('ui.TRANSACTION.screen.Transaction.SendNFT.sendTo')}
+              placeholder={t('ui.TRANSACTION.screen.Transaction.SendNFT.accountAddress')}
               saveAddress={true}
               showAddressBook={true}
               showScanner={true}
@@ -242,7 +244,7 @@ const Component: React.FC = () => {
             <ChainSelector
               disabled={true}
               items={chainInfo ? [{ name: chainInfo.name, slug: chainInfo.slug }] : []}
-              label={t('Network')}
+              label={t('ui.TRANSACTION.screen.Transaction.SendNFT.network')}
               value={collectionInfo.chain}
             />
           </Form.Item>
@@ -251,7 +253,7 @@ const Component: React.FC = () => {
         <FreeBalance
           address={from}
           chain={chain}
-          label={t('Sender transferable balance')}
+          label={t('ui.TRANSACTION.screen.Transaction.SendNFT.senderTransferableBalance')}
           onBalanceReady={setIsBalanceReady}
         />
       </TransactionContent>
@@ -269,7 +271,7 @@ const Component: React.FC = () => {
           loading={loading}
           onClick={checkAction(form.submit, ExtrinsicType.SEND_NFT)}
         >
-          {t('Next')}
+          {t('ui.TRANSACTION.screen.Transaction.SendNFT.next')}
         </Button>
       </TransactionFooter>
     </>

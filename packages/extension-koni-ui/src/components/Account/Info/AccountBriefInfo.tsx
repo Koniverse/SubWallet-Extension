@@ -29,7 +29,7 @@ const Component: React.FC<Props> = ({ account, className }: Props) => {
         className='account-name'
         ellipsis={true}
       >
-        { isAll ? t('All accounts') : account.name}
+        { isAll ? t('ui.ACCOUNT.components.Account.Info.Brief.allAccounts') : account.name}
       </Typography.Text>
       {!isAll && <div className='account-address'>(...{address.slice(-3)})</div>}
     </div>

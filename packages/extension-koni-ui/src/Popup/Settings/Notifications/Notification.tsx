@@ -15,7 +15,7 @@ import Search from '@subwallet/extension-koni-ui/components/Search';
 import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, NOTIFICATION_DETAIL_MODAL, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useAlert, useDefaultNavigate, useGetChainSlugsByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useDefaultNavigate, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { enableChain, saveNotificationSetup } from '@subwallet/extension-koni-ui/messaging';
 import { fetchInappNotifications, getIsClaimNotificationStatus, markAllReadNotification, switchReadNotificationStatus } from '@subwallet/extension-koni-ui/messaging/transaction/notification';
@@ -79,7 +79,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { goHome } = useDefaultNavigate();
   const { token } = useTheme() as Theme;
   const { alertProps, closeAlert, openAlert, updateAlertProps } = useAlert(alertModalId);
-  const chainsByAccountType = useGetChainSlugsByCurrentAccountProxy();
+  const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
 
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
   const [, setWithdrawStorage] = useLocalStorage(WITHDRAW_TRANSACTION, DEFAULT_WITHDRAW_PARAMS);
@@ -93,15 +93,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('All'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.all'),
         value: NotificationTab.ALL
       },
       {
-        label: t('Unread'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.unread'),
         value: NotificationTab.UNREAD
       },
       {
-        label: t('Read'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.read'),
         value: NotificationTab.READ
       }
     ];
@@ -240,11 +240,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     const chainInfo = chainInfoMap[chainSlug];
 
     const content = action === NotificationActionType.WITHDRAW
-      ? detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start withdrawing your funds')
-      : detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start claiming your funds');
+      ? detectTranslate('ui.SETTINGS.screen.Setting.Notifications.enableNetworkToWithdraw')
+      : detectTranslate('ui.SETTINGS.screen.Setting.Notifications.enableNetworkToClaim');
 
     openAlert({
-      title: t('Enable network'),
+      title: t('ui.SETTINGS.screen.Setting.Notifications.enableNetwork'),
       type: NotificationType.WARNING,
       content: t(content, { replace: { networkName: chainInfo?.name || chainSlug } }),
       closable: false,
@@ -253,23 +253,23 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         icon: XCircle,
         onClick: closeAlert,
         schema: 'secondary',
-        text: t('Cancel')
+        text: t('ui.SETTINGS.screen.Setting.Notifications.cancel')
       },
       okButton: {
         icon: CheckCircle,
         onClick: onOk,
-        text: t('Enable')
+        text: t('ui.SETTINGS.screen.Setting.Notifications.enable')
       }
     });
   }, [closeAlert, openAlert, t, updateAlertProps, chainInfoMap]);
 
   const showWarningModal = useCallback((action: string) => {
     openAlert({
-      title: t('You’ve {{action}} tokens', { replace: { action: action } }),
+      title: t('ui.SETTINGS.screen.Setting.Notifications.youveActionTokens', { replace: { action: action } }),
       type: NotificationType.INFO,
-      content: t('You’ve already {{action}} your tokens. Check for unread notifications to stay updated on any important', { replace: { action: action } }),
+      content: t('ui.SETTINGS.screen.Setting.Notifications.alreadyActionedTokens', { replace: { action: action } }),
       okButton: {
-        text: t('I understand'),
+        text: t('ui.SETTINGS.screen.Setting.Notifications.iUnderstand'),
         onClick: closeAlert,
         icon: CheckCircle
       }
@@ -279,7 +279,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const onClickItem = useCallback((item: NotificationInfoItem) => {
     return () => {
       const slug = (item.metadata as WithdrawClaimNotificationMetadata).stakingSlug;
-      const totalWithdrawable = getTotalWidrawable(slug, poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, chainsByAccountType, currentTimestampMs);
+      const totalWithdrawable = getTotalWidrawable(slug, poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, allowedChains, excludedTokens, currentTimestampMs);
       const switchStatusParams: RequestSwitchStatusParams = {
         id: item.id,
         isRead: false
@@ -325,7 +325,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         }
 
         case NotificationActionType.CLAIM: {
-          const unclaimedReward = getYieldRewardTotal(slug, earningRewards, poolInfoMap, accounts, isAllAccount, currentAccountProxy, chainsByAccountType);
+          const unclaimedReward = getYieldRewardTotal(slug, earningRewards, poolInfoMap, accounts, isAllAccount, currentAccountProxy, allowedChains, excludedTokens);
           const metadata = item.metadata as WithdrawClaimNotificationMetadata;
           const chainSlug = metadata.stakingSlug.split('___')[2];
 
@@ -435,7 +435,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           });
       }
     };
-  }, [accounts, showActiveChainModal, chainStateMap, chainsByAccountType, currentAccountProxy, currentTimestampMs, earningRewards, isAllAccount, isTrigger, navigate, poolInfoMap, setClaimAvailBridgeStorage, setClaimRewardStorage, setWithdrawStorage, showWarningModal, yieldPositions, openTransactionProcessModal]);
+  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, allowedChains, excludedTokens, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, setClaimAvailBridgeStorage, openTransactionProcessModal, isTrigger]);
 
   const renderItem = useCallback((item: NotificationInfoItem) => {
     return (
@@ -463,8 +463,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Your notifications will appear here')}
-        emptyTitle={t('No notifications yet')}
+        emptyMessage={t('ui.SETTINGS.screen.Setting.Notifications.yourNotificationsWillAppearHere')}
+        emptyTitle={t('ui.SETTINGS.screen.Setting.Notifications.noNotificationsYet')}
         phosphorIcon={ListBullets}
       />
     );
@@ -483,10 +483,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           loading: loadingNotification,
           size: 'xs',
           shape: 'circle',
-          children: t('Enable notifications')
+          children: t('ui.SETTINGS.screen.Setting.Notifications.enableNotifications')
         }}
-        emptyMessage={t('Enable notifications now to not miss anything!')}
-        emptyTitle={t('Notifications are disabled')}
+        emptyMessage={t('ui.SETTINGS.screen.Setting.Notifications.enableNotificationsPrompt')}
+        emptyTitle={t('ui.SETTINGS.screen.Setting.Notifications.notificationsAreDisabled')}
         phosphorIcon={BellSimpleSlash}
       />
     );
@@ -558,7 +558,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           }
         ]}
         showBackButton
-        title={t('Notifications')}
+        title={t('ui.SETTINGS.screen.Setting.Notifications.notifications')}
       />
 
       <div className={'tool-area'}>
@@ -580,7 +580,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           size='xs'
           type='ghost'
         >
-          {t('Mark all as read')}
+          {t('ui.SETTINGS.screen.Setting.Notifications.markAllAsRead')}
         </Button>
       </div>
 
@@ -592,7 +592,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
                 className={'__search-box'}
                 onSearch={handleSearch}
-                placeholder={t<string>('Search notification')}
+                placeholder={t<string>('ui.SETTINGS.screen.Setting.Notifications.searchNotification')}
                 searchValue={currentSearchText}
               />
               {loading
