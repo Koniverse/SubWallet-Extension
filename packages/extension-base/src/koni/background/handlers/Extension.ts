@@ -4428,7 +4428,7 @@ export default class KoniExtension {
       chain: poolHandler.chain,
       transaction: extrinsic,
       data: params,
-      extrinsicType: ExtrinsicType.CHANGE_EARNING_VALIDATOR,
+      extrinsicType: ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE,
       chainType: ChainType.SUBSTRATE
     });
   }

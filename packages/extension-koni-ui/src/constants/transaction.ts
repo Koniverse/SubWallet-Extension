@@ -18,6 +18,7 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('ui.TRANSACTION.constant.transaction.unstake'),
   [ExtrinsicType.STAKING_UNBOND]: detectTranslate('ui.TRANSACTION.constant.transaction.unstake'),
   [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: detectTranslate('ui.TRANSACTION.constant.transaction.changeValidator'),
+  [ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE]: detectTranslate('ui.TRANSACTION.constant.transaction.changeClaimType'),
   [ExtrinsicType.STAKING_WITHDRAW]: detectTranslate('ui.TRANSACTION.constant.transaction.withdraw'),
   [ExtrinsicType.STAKING_POOL_WITHDRAW]: detectTranslate('ui.TRANSACTION.constant.transaction.withdraw'),
   [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: detectTranslate('ui.TRANSACTION.constant.transaction.cancelUnstake'),

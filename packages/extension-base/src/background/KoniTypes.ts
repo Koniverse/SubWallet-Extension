@@ -549,6 +549,7 @@ export enum ExtrinsicType {
 
   JOIN_YIELD_POOL = 'earn.join_pool', // TODO: review this
   CHANGE_EARNING_VALIDATOR = 'earn.nominate',
+  CHANGE_BITTENSOR_ROOT_CLAIM_TYPE = 'earn.change_bittensor_root_claim_type',
 
   MINT_VDOT = 'earn.mint_vdot',
   MINT_LDOT = 'earn.mint_ldot',
@@ -604,6 +605,7 @@ export interface ExtrinsicDataTypeMap {
   [ExtrinsicType.STAKING_CANCEL_COMPOUNDING]: RequestTuringCancelStakeCompound,
   [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: RequestStakeCancelWithdrawal,
   [ExtrinsicType.STAKING_POOL_WITHDRAW]: any,
+  [ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE]: RequestChangeBittensorRootClaimType,
 
   // Yield
   [ExtrinsicType.JOIN_YIELD_POOL]: RequestYieldStepSubmit,
