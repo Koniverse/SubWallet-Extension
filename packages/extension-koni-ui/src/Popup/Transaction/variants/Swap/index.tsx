@@ -118,7 +118,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
 
   const { activeModal, inactiveAll, inactiveModal } = useContext(ModalContext);
 
-  const { accountProxies, accounts, isAllAccount } = useSelector((state) => state.accountState);
+  const { accountProxies, accounts, currentAccountProxy, isAllAccount } = useSelector((state) => state.accountState);
   const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
   const { priceMap } = useSelector((state) => state.price);
   const { chainInfoMap, chainStateMap, ledgerGenericAllowNetworks } = useSelector((root) => root.chainStore);
@@ -823,6 +823,40 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     });
   }, [chainInfoMap, destChainValue, getReformatAddress, isRecipientFieldAllowed, targetAccountProxy.accountType, targetAccountProxy.accounts]);
 
+  /**
+   * Retrieve the Substrate address associated with the current account proxy, or a selected account proxy in case All Account mode.
+   *
+   * The logic follows these steps:
+   * 1. Determine the AccountProxy, correspond to `currentSelectAccountProxy`.
+   * 2. Retrieve substrate address if it's available.
+   */
+  const alternativeAddress: string | undefined = useMemo(() => {
+    if (currentAccountProxy === null) {
+      return undefined;
+    }
+
+    let currentSelectAccountProxy: AccountProxy | undefined;
+
+    if (currentAccountProxy.accountType === AccountProxyType.ALL_ACCOUNT) {
+      // If in all account mode, find the selected from account by `targetAccountProxyIdForGetBalance`
+      currentSelectAccountProxy = accountProxies.find((account) => account.id === targetAccountProxyIdForGetBalance);
+    } else {
+      currentSelectAccountProxy = currentAccountProxy;
+    }
+
+    if (!currentSelectAccountProxy) {
+      return undefined;
+    }
+
+    const substrateAccount = currentSelectAccountProxy.accounts.find((account) => account.chainType === AccountChainType.SUBSTRATE);
+
+    if (!substrateAccount) {
+      return undefined;
+    }
+
+    return substrateAccount.address;
+  }, [accountProxies, currentAccountProxy, targetAccountProxyIdForGetBalance]);
+
   useEffect(() => {
     if (fromTokenSlugValue && toTokenSlugValue && isAddressInputReady) {
       const addressInputCurrent = addressInputRef.current;
@@ -913,6 +947,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
 
           const currentRequest: SwapRequestV2 = {
             address: fromValue,
+            alternativeAddress: alternativeAddress,
             pair: {
               slug: _parseAssetRefKey(fromTokenSlugValue, toTokenSlugValue),
               from: fromTokenSlugValue,
@@ -978,7 +1013,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       sync = false;
       clearTimeout(timeout);
     };
-  }, [ErrorMessageMap, currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates, notifyErrorMessage]);
+  }, [ErrorMessageMap, currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates, notifyErrorMessage, alternativeAddress]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const

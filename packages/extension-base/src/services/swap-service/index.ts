@@ -130,7 +130,7 @@ export class SwapService implements StoppableServiceInterface {
     if (!params.selectedQuote) {
       return this.getDefaultProcessV2(params);
     } else {
-      const providerId = params.request.currentQuote?.id || params.selectedQuote.provider.id;
+      const providerId = params.selectedQuote.provider.id;
       const handler = this.handlers[providerId];
 
       if (handler) {
@@ -156,6 +156,7 @@ export class SwapService implements StoppableServiceInterface {
     console.log('path', path);
     console.log('swapQuoteResponse', swapQuoteResponse);
 
+    // Just to log routing type for Uniswap Quote
     if (swapQuoteResponse.optimalQuote && swapQuoteResponse.optimalQuote.metadata) {
       const routing = (swapQuoteResponse.optimalQuote.metadata as UniswapMetadata).routing;
 
@@ -177,7 +178,7 @@ export class SwapService implements StoppableServiceInterface {
     }
 
     // override fee for quote because some cases need estimate network fee on Extension (i.e. Optimex)
-    if (swapQuoteResponse.optimalQuote) {
+    if (swapQuoteResponse.optimalQuote && [SwapProviderId.OPTIMEX, SwapProviderId.OPTIMEX_TESTNET].includes(swapQuoteResponse.optimalQuote.provider.id)) {
       const swapIndex = optimalProcess.steps.findIndex((step) => step.type === SwapStepType.SWAP);
 
       swapQuoteResponse.optimalQuote.feeInfo.feeComponent = optimalProcess.totalFee[swapIndex].feeComponent;
@@ -229,7 +230,7 @@ export class SwapService implements StoppableServiceInterface {
 
     const directSwapRequest: SwapRequestV2 | undefined = swapAction
       ? { ...request,
-        address: _reformatAddressWithChain(request.address, this.chainService.getChainInfoByKey(_getAssetOriginChain(this.chainService.getAssetBySlug(swapAction.pair.from)))),
+        address: _reformatAddressWithChain(request.address, this.chainService.getChainInfoByKey(_getAssetOriginChain(this.chainService.getAssetBySlug(swapAction.pair.from))), request.alternativeAddress),
         pair: swapAction.pair }
       : undefined;
 

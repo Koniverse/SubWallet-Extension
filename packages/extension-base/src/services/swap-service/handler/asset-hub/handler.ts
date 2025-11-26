@@ -83,7 +83,7 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
   }
 
   async getSubmitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    const { path, request: { fromAmount }, selectedQuote } = params;
+    const { path, request: { address, alternativeAddress, fromAmount, recipient }, selectedQuote } = params;
     const stepData = path[stepIndex];
 
     if (stepData.action !== DynamicSwapType.SWAP) {
@@ -108,13 +108,13 @@ export class AssetHubSwapHandler implements SwapBaseInterface {
 
     let bnSendingValue = BigN(fromAmount);
     let bnExpectedReceive = BigN(selectedQuote.toAmount);
-    const sender = _reformatAddressWithChain(params.request.address, originChain);
-    let receiver = _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain);
+    const sender = _reformatAddressWithChain(address, originChain, alternativeAddress);
+    let receiver = _reformatAddressWithChain(recipient || address, destinationChain);
 
     if (needModifyData) {
       bnSendingValue = bnSendingValue.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
       bnExpectedReceive = bnExpectedReceive.multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT);
-      receiver = _reformatAddressWithChain(params.request.address, destinationChain);
+      receiver = _reformatAddressWithChain(address, destinationChain, alternativeAddress);
     }
 
     const submitStep: BaseStepDetail = {

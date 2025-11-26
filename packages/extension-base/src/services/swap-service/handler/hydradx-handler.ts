@@ -140,7 +140,7 @@ export class HydradxHandler implements SwapBaseInterface {
   }
 
   async getSubmitStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
-    const { path, request: { fromAmount }, selectedQuote } = params;
+    const { path, request: { address, alternativeAddress, fromAmount, recipient, slippage }, selectedQuote } = params;
     const stepData = path[stepIndex];
 
     if (stepData.action !== DynamicSwapType.SWAP) {
@@ -162,8 +162,8 @@ export class HydradxHandler implements SwapBaseInterface {
     const originChain = this.chainService.getChainInfoByKey(originTokenInfo.originChain);
     const destinationChain = this.chainService.getChainInfoByKey(destinationTokenInfo.originChain);
 
-    const sender = _reformatAddressWithChain(params.request.address, originChain);
-    let receiver = _reformatAddressWithChain(params.request.recipient || params.request.address, destinationChain);
+    const sender = _reformatAddressWithChain(address, originChain, alternativeAddress);
+    let receiver = _reformatAddressWithChain(recipient || address, destinationChain);
 
     const actionList = JSON.stringify(path.map((step) => step.action));
     const xcmSwapXcm = actionList === JSON.stringify([DynamicSwapType.BRIDGE, DynamicSwapType.SWAP, DynamicSwapType.BRIDGE]);
@@ -190,7 +190,7 @@ export class HydradxHandler implements SwapBaseInterface {
             slug: swapPairInfo.slug
           },
           fromAmount: bnSendingValue.toFixed(0, 1),
-          slippage: params.request.slippage
+          slippage: slippage
         });
       } catch (error) {
         throw new Error(`Failed to fetch swap quote: ${(error as Error).message}`);
@@ -205,7 +205,7 @@ export class HydradxHandler implements SwapBaseInterface {
       const overrideQuote = quoteAskResponse.quote as SwapQuote;
 
       txHex = overrideQuote.metadata as string;
-      receiver = _reformatAddressWithChain(params.request.address, destinationChain);
+      receiver = _reformatAddressWithChain(address, destinationChain, alternativeAddress);
     }
 
     if (!txHex || !isHex(txHex)) {
