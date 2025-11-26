@@ -209,12 +209,13 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
       return null;
     }
 
-    const { democracy, governance, others, staking } = lockedDetails;
+    const { democracy, governance, others, reserved, staking } = lockedDetails;
 
     const items = [
       { label: t('ui.BALANCE.screen.Tokens.DetailModal.staking'), value: staking },
       { label: t('ui.BALANCE.screen.Tokens.DetailModal.governance'), value: governance },
       { label: t('ui.BALANCE.screen.Tokens.DetailModal.democracy'), value: democracy },
+      { label: t('ui.BALANCE.screen.Tokens.DetailModal.reserved'), value: reserved },
       {
         label: (
           <Tooltip

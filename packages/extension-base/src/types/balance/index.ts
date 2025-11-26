@@ -13,6 +13,13 @@ export interface TokenBalanceRaw {
   free: BN
 }
 
+export enum BalanceType {
+  TRANSFERABLE = 'transferable', // free
+  TOTAL = 'total', // free + locked
+  TOTAL_MINUS_RESERVED = 'totalMinusReserved', // free + locked - reserved
+  KEEP_ALIVE = 'keepAlive'
+}
+
 /**
  * Balance info of a token on an address
  * @property {string} address - Address
@@ -28,6 +35,7 @@ export interface LockedBalanceDetails {
   staking: string;
   governance: string;
   democracy: string;
+  reserved: string;
   others: string;
 }
 

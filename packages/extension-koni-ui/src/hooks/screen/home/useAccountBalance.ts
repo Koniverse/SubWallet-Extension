@@ -174,6 +174,7 @@ function getAccountBalance (
             staking: getBalanceValue(balanceItem.lockedDetails.staking || '0', decimals).toFixed(),
             governance: getBalanceValue(balanceItem.lockedDetails.governance || '0', decimals).toFixed(),
             democracy: getBalanceValue(balanceItem.lockedDetails.democracy || '0', decimals).toFixed(),
+            reserved: getBalanceValue(balanceItem.lockedDetails.reserved || '0', decimals).toFixed(),
             others: getBalanceValue(balanceItem.lockedDetails.others || '0', decimals).toFixed()
           }
           : undefined;

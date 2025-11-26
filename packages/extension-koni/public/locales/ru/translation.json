@@ -2294,11 +2294,13 @@
   "ui.BALANCE.screen.Tokens.DetailModal.staking": "",
   "ui.BALANCE.screen.Tokens.DetailModal.governance": "",
   "ui.BALANCE.screen.Tokens.DetailModal.democracy": "",
+  "ui.BALANCE.screen.Tokens.DetailModal.reserved": "",
   "ui.BALANCE.screen.Tokens.DetailModal.othersTooltipTitle": "",
   "ui.BALANCE.screen.Tokens.DetailModal.others": "",
   "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.staking": "",
   "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.governance": "",
   "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.democracy": "",
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.reserved": "",
   "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.others": "",
   "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.othersTooltipTitle": "",
   "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.lockedDetails": ""

@@ -8,7 +8,7 @@ import { _getAssetsPalletLocked, _getAssetsPalletTransferable } from '@subwallet
 import { _getForeignAssetPalletLockedBalance, _getForeignAssetPalletTransferable } from '@subwallet/extension-base/core/substrate/foreign-asset-pallet';
 import { _getTotalStakeInNominationPool } from '@subwallet/extension-base/core/substrate/nominationpools-pallet';
 import { _getOrmlTokensPalletLockedBalance, _getOrmlTokensPalletTransferable } from '@subwallet/extension-base/core/substrate/ormlTokens-pallet';
-import { _getSystemPalletTotalBalance, _getSystemPalletTransferable } from '@subwallet/extension-base/core/substrate/system-pallet';
+import { _getSystemPalletReservedBalance, _getSystemPalletTotalBalance, _getSystemPalletTransferable } from '@subwallet/extension-base/core/substrate/system-pallet';
 import { _getTokensPalletLocked, _getTokensPalletTransferable } from '@subwallet/extension-base/core/substrate/tokens-pallet';
 import { FrameBalancesFreezesInfo, FrameBalancesHoldsInfo, FrameBalancesLocksInfo, FrameSystemAccountInfo, OrmlTokensAccountData, PalletAssetsAssetAccount, PalletAssetsAssetAccountWithStatus, PalletNominationPoolsPoolMember } from '@subwallet/extension-base/core/substrate/types';
 import { _adaptX1Interior } from '@subwallet/extension-base/core/substrate/xcm-parser';
@@ -269,13 +269,17 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
       }
 
       // others = total locked - max(staking, governance, democracy)
-      const maxMainLock = BigN.max(stakingBalance, govBalance, democracyBalance);
+      const reservedBalance = _getSystemPalletReservedBalance(balanceInfo);
+      const reservedBalanceBN = new BigN(reservedBalance.toString());
+
+      const maxMainLock = BigN.max(stakingBalance, govBalance, democracyBalance, reservedBalanceBN);
       const othersLockedBalance = new BigN(totalLockedFromTransfer.toString()).minus(maxMainLock);
 
       const lockedDetails: LockedBalanceDetails = {
         staking: stakingBalance.toFixed(),
         governance: govBalance.toFixed(),
         democracy: democracyBalance.toFixed(),
+        reserved: reservedBalanceBN.toFixed(),
         others: othersLockedBalance.gt(0) ? othersLockedBalance.toFixed() : '0'
       };
 
