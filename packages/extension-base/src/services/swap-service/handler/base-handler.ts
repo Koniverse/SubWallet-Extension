@@ -123,7 +123,7 @@ export class SwapBaseHandler {
 
   async getBridgeStep (params: OptimalSwapPathParamsV2, stepIndex: number): Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined> {
     // only xcm on substrate for now
-    const { path, request: { address, fromAmount, recipient, alternativeAddress }, selectedQuote } = params;
+    const { path, request: { address, alternativeAddress, fromAmount, recipient }, selectedQuote } = params;
 
     if (stepIndex < 0 || stepIndex > params.path.length - 1) {
       return undefined;
