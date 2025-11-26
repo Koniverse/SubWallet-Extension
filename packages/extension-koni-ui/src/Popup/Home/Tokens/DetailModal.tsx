@@ -344,7 +344,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
                             >
                               <Icon
                                 phosphorIcon={showLockedDetails ? CaretUp : CaretDown}
-                                size='md'
+                                size='sm'
                               />
                             </div>
                           )}
@@ -459,7 +459,7 @@ export const DetailModal = styled(Component)<Props>(({ theme: { token } }: Props
       marginTop: 4,
 
       '.__label': {
-        color: token.colorTextLight3
+        color: token.colorTextTertiary
       },
 
       '.__locked-others': {
