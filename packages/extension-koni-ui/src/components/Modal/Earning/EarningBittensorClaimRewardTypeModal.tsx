@@ -3,10 +3,8 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BittensorRootClaimType, RequestChangeBittensorRootClaimType } from '@subwallet/extension-base/types';
-import { TransactionContext } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
 import { useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
 import { changeBittensorRootClaimType } from '@subwallet/extension-koni-ui/messaging';
-import Transaction from '@subwallet/extension-koni-ui/Popup/Transaction/Transaction';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { BackgroundIcon, Button, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import { ArrowClockwise, ArrowsLeftRight, CheckCircle, IconProps, LockKey, X } from 'phosphor-react';
@@ -94,8 +92,6 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
       slug,
       rootClaimType: rootClaimType === 'Swap' ? 'Keep' : 'Swap'
     };
-
-    console.log('submitData', submitData);
 
     changeBittensorRootClaimType(submitData)
       .then((res) => {
