@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
-import { NominationInfo, NominatorMetadata, StakingType, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { getAstarWithdrawable } from '@subwallet/extension-base/koni/api/staking/bonding/astar';
+import { NominationInfo, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { _KNOWN_CHAIN_INFLATION_PARAMS, _SUBSTRATE_DEFAULT_INFLATION_PARAMS, _SubstrateInflationParams } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainNativeTokenBasicInfo } from '@subwallet/extension-base/services/chain-service/utils';
@@ -16,35 +15,7 @@ import { t } from 'i18next';
 
 import { ApiPromise } from '@polkadot/api';
 import { Codec } from '@polkadot/types/types';
-import { BN, BN_BILLION, BN_HUNDRED, BN_MILLION, BN_THOUSAND, BN_ZERO, bnToU8a, stringToU8a, u8aConcat } from '@polkadot/util';
-
-export interface PalletDappsStakingDappInfo {
-  address: string,
-  name: string,
-  gitHubUrl: string,
-  tags: string[],
-  url: string,
-  imagesUrl: string[]
-}
-
-export interface PalletDappsStakingUnlockingChunk {
-  amount: number,
-  unlockEra: number
-}
-
-export interface PalletDappsStakingAccountLedger {
-  locked: number,
-  unbondingInfo: {
-    unlockingChunks: PalletDappsStakingUnlockingChunk[]
-  }
-}
-
-export interface BlockHeader {
-  parentHash: string,
-  number: number,
-  stateRoot: string,
-  extrinsicsRoot: string
-}
+import { BN, BN_BILLION, BN_HUNDRED, BN_MILLION, BN_THOUSAND, bnToU8a, stringToU8a, u8aConcat } from '@polkadot/util';
 
 export interface ParachainStakingStakeOption {
   owner: string,
@@ -54,39 +25,6 @@ export interface ParachainStakingStakeOption {
 export interface KrestDelegateState {
   delegations: ParachainStakingStakeOption[],
   total: string
-}
-
-export interface ParachainStakingCandidateMetadata {
-  bond: string,
-  delegationCount: number,
-  totalCounted: string,
-  lowestTopDelegationAmount: string,
-  status: any | 'Active'
-}
-
-export enum PalletParachainStakingRequestType {
-  REVOKE = 'revoke',
-  DECREASE = 'decrease',
-  BOND_LESS = 'bondLess'
-}
-
-export interface PalletParachainStakingDelegationRequestsScheduledRequest {
-  delegator: string,
-  whenExecutable: number,
-  action: Record<PalletParachainStakingRequestType, number>
-}
-
-export interface PalletParachainStakingDelegationInfo {
-  owner: string,
-  amount: number
-}
-
-export interface PalletParachainStakingDelegator {
-  id: string,
-  delegations: PalletParachainStakingDelegationInfo[],
-  total: number,
-  lessTotal: number,
-  status: number
 }
 
 export interface PalletIdentityRegistration {
@@ -110,11 +48,6 @@ export interface PalletIdentityRegistration {
 
 export type PalletIdentitySuper = [string, { Raw: string }]
 
-export interface Unlocking {
-  remainingEras: BN;
-  value: BN;
-}
-
 export function parsePoolStashAddress (api: ApiPromise, index: number, poolId: number, poolsPalletId: string) {
   const ModPrefix = stringToU8a('modl');
   const U32Opts = { bitLength: 32, isLe: true };
@@ -132,10 +65,6 @@ export function parsePoolStashAddress (api: ApiPromise, index: number, poolId: n
       )
     )
     .toString();
-}
-
-export function transformPoolName (input: string): string {
-  return input.replace(/[^\x20-\x7E]/g, '');
 }
 
 export function getInflationParams (networkKey: string): _SubstrateInflationParams {
@@ -176,18 +105,6 @@ export function calculateInflation (totalEraStake: BN, totalIssuance: BN, numAuc
         : (((idealInterest * idealStake) - minInflation) * Math.pow(2, (idealStake - stakedFraction) / falloff))
     ));
   }
-}
-
-export function calculateChainStakedReturn (inflation: number, totalEraStake: BN, totalIssuance: BN, networkKey: string) {
-  const stakedFraction = totalEraStake.mul(BN_MILLION).div(totalIssuance).toNumber() / BN_MILLION.toNumber();
-
-  let stakedReturn = inflation / stakedFraction;
-
-  if (_STAKING_CHAIN_GROUP.aleph.includes(networkKey)) {
-    stakedReturn *= 0.9; // 10% goes to treasury
-  }
-
-  return stakedReturn;
 }
 
 export async function calculateChainStakedReturnV2 (chainInfo: _ChainInfo, totalIssuance: string, erasPerDay: number, lastTotalStaked: string, validatorEraReward: BigNumber, inflation: BigNumber, isCompound?: boolean) {
@@ -320,24 +237,6 @@ export function getParaCurrentInflation (totalStaked: number, inflationConfig: I
   return parseFloat(inflationString);
 }
 
-export interface TuringOptimalCompoundFormat {
-  period: string; // in days
-  apy: string;
-}
-
-// validations and check conditions
-export function isShowNominationByValidator (chain: string): 'showByValue' | 'showByValidator' | 'mixed' {
-  if (_STAKING_CHAIN_GROUP.amplitude.includes(chain)) {
-    return 'showByValue';
-  } else if (_STAKING_CHAIN_GROUP.astar.includes(chain)) {
-    return 'mixed';
-  } else if (_STAKING_CHAIN_GROUP.para.includes(chain)) {
-    return 'showByValidator';
-  }
-
-  return 'showByValue';
-}
-
 export function getBondedValidators (nominations: NominationInfo[]) {
   const bondedValidators: string[] = [];
   let nominationCount = 0;
@@ -462,97 +361,6 @@ export function getYieldAvailableActionsByPosition (yieldPosition: YieldPosition
   } else {
     result.push(YieldAction.START_EARNING);
     result.push(YieldAction.WITHDRAW_EARNING); // TODO
-  }
-
-  return result;
-}
-
-export enum StakingAction {
-  STAKE = 'STAKE',
-  UNSTAKE = 'UNSTAKE',
-  WITHDRAW = 'WITHDRAW',
-  CLAIM_REWARD = 'CLAIM_REWARD',
-  CANCEL_UNSTAKE = 'CANCEL_UNSTAKE'
-}
-
-export function getStakingAvailableActionsByChain (chain: string, type: StakingType): StakingAction[] {
-  if (type === StakingType.POOLED) {
-    return [StakingAction.STAKE, StakingAction.UNSTAKE, StakingAction.WITHDRAW, StakingAction.CLAIM_REWARD];
-  }
-
-  if (_STAKING_CHAIN_GROUP.para.includes(chain)) {
-    return [StakingAction.STAKE, StakingAction.UNSTAKE, StakingAction.WITHDRAW, StakingAction.CANCEL_UNSTAKE];
-  } else if (_STAKING_CHAIN_GROUP.astar.includes(chain)) {
-    return [StakingAction.STAKE, StakingAction.UNSTAKE, StakingAction.WITHDRAW, StakingAction.CLAIM_REWARD];
-  } else if (_STAKING_CHAIN_GROUP.amplitude.includes(chain)) {
-    return [StakingAction.STAKE, StakingAction.UNSTAKE, StakingAction.WITHDRAW];
-  }
-
-  return [StakingAction.STAKE, StakingAction.UNSTAKE, StakingAction.WITHDRAW, StakingAction.CANCEL_UNSTAKE];
-}
-
-export function getStakingAvailableActionsByNominator (nominatorMetadata: NominatorMetadata, unclaimedReward?: string): StakingAction[] {
-  const result: StakingAction[] = [StakingAction.STAKE];
-
-  const bnActiveStake = new BN(nominatorMetadata.activeStake);
-
-  if (nominatorMetadata.activeStake && bnActiveStake.gt(BN_ZERO)) {
-    result.push(StakingAction.UNSTAKE);
-
-    const isAstarNetwork = _STAKING_CHAIN_GROUP.astar.includes(nominatorMetadata.chain);
-    const isAmplitudeNetwork = _STAKING_CHAIN_GROUP.amplitude.includes(nominatorMetadata.chain);
-    const bnUnclaimedReward = new BN(unclaimedReward || '0');
-
-    if (
-      ((nominatorMetadata.type === StakingType.POOLED || isAmplitudeNetwork) && bnUnclaimedReward.gt(BN_ZERO)) ||
-      isAstarNetwork
-    ) {
-      result.push(StakingAction.CLAIM_REWARD);
-    }
-  }
-
-  if (nominatorMetadata.unstakings.length > 0) {
-    result.push(StakingAction.CANCEL_UNSTAKE);
-    const hasClaimable = nominatorMetadata.unstakings.some((unstaking) => unstaking.status === UnstakingStatus.CLAIMABLE);
-
-    if (hasClaimable) {
-      result.push(StakingAction.WITHDRAW);
-    }
-  }
-
-  return result;
-}
-
-export function isActionFromValidator (stakingType: StakingType, chain: string) {
-  if (stakingType === StakingType.POOLED || stakingType === StakingType.LIQUID_STAKING) {
-    return false;
-  }
-
-  if (_STAKING_CHAIN_GROUP.astar.includes(chain)) {
-    return true;
-  } else if (_STAKING_CHAIN_GROUP.amplitude.includes(chain)) {
-    return true;
-  } else if (_STAKING_CHAIN_GROUP.para.includes(chain)) {
-    return true;
-  }
-
-  return false;
-}
-
-export function getWithdrawalInfo (nominatorMetadata: NominatorMetadata) {
-  const unstakings = nominatorMetadata.unstakings;
-
-  let result: UnstakingInfo | undefined;
-
-  if (_STAKING_CHAIN_GROUP.astar.includes(nominatorMetadata.chain)) {
-    return getAstarWithdrawable(nominatorMetadata);
-  }
-
-  for (const unstaking of unstakings) {
-    if (unstaking.status === UnstakingStatus.CLAIMABLE) {
-      result = unstaking; // only get the first withdrawal
-      break;
-    }
   }
 
   return result;

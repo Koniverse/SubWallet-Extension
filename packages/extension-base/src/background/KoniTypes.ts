@@ -2301,18 +2301,8 @@ export interface AddressBalanceResult {
 // Use stringify to communicate, pure boolean value will error with case 'false' value
 export interface KoniRequestSignatures {
   // Bonding functions
-  'pri(staking.submitTuringCancelCompound)': [RequestTuringCancelStakeCompound, SWTransactionResponse];
-  'pri(staking.submitTuringCompound)': [RequestTuringStakeCompound, SWTransactionResponse];
-  'pri(staking.submitClaimReward)': [RequestStakeClaimReward, SWTransactionResponse];
-  'pri(staking.submitCancelWithdrawal)': [RequestStakeCancelWithdrawal, SWTransactionResponse];
-  'pri(unbonding.submitTransaction)': [RequestUnbondingSubmit, SWTransactionResponse];
-  'pri(bonding.submitBondingTransaction)': [RequestBondingSubmit, SWTransactionResponse];
   'pri(bonding.subscribeChainStakingMetadata)': [null, ChainStakingMetadata[], ChainStakingMetadata[]];
   'pri(bonding.subscribeNominatorMetadata)': [null, NominatorMetadata[], NominatorMetadata[]];
-  'pri(bonding.getBondingOptions)': [BondingOptionParams, ValidatorInfo[]];
-  'pri(bonding.getNominationPoolOptions)': [string, NominationPoolInfo[]];
-  'pri(bonding.nominationPool.submitBonding)': [RequestYieldStepSubmit, SWTransactionResponse];
-  'pri(bonding.nominationPool.submitUnbonding)': [RequestStakePoolingUnbonding, SWTransactionResponse];
 
   // Chains, assets functions
   'pri(chainService.subscribeChainInfoMap)': [null, Record<string, any>, Record<string, any>];
