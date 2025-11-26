@@ -164,7 +164,7 @@ const useGetBalance = (chain = '', address = '', tokenSlug = '', isSubscribe = f
         cancelSubscription(id).catch(console.error);
       });
     };
-  }, [isRefresh, address, assetRegistry, chain, chainInfo?.name, isChainActive, isSubscribe, isTokenActive, nativeTokenActive, nativeTokenSlug, t, tokenSlug, extrinsicType]);
+  }, [isRefresh, address, assetRegistry, chain, chainInfo?.name, isChainActive, isSubscribe, isTokenActive, nativeTokenActive, nativeTokenSlug, t, tokenSlug, extrinsicType, balanceType]);
 
   return { refreshBalance, tokenBalance, nativeTokenBalance, nativeTokenSlug, isLoading, error };
 };

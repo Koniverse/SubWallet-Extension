@@ -2383,7 +2383,7 @@ export default class KoniExtension {
 
     const [unsubBalance, freeBalance] = await (async () => {
       try {
-        return await this.#koniState.balanceService.subscribeBalance(address, chain, token, 'transferable', extrinsicType, (data) => {
+        return await this.#koniState.balanceService.subscribeBalance(address, chain, token, BalanceType.TRANSFERABLE, extrinsicType, (data) => {
           freeBalanceSubject.next(data); // Must be called after subscription
         });
       } catch (e) {
@@ -2541,7 +2541,7 @@ export default class KoniExtension {
         }
       });
 
-    const [unsubBalance, freeBalance] = await this.#koniState.balanceService.subscribeBalance(address, chain, token, 'transferable', ExtrinsicType.TRANSFER_BALANCE, (data) => {
+    const [unsubBalance, freeBalance] = await this.#koniState.balanceService.subscribeBalance(address, chain, token, BalanceType.TRANSFERABLE, ExtrinsicType.TRANSFER_BALANCE, (data) => {
       freeBalanceSubject.next(data); // Must be called after subscription
     });
 
