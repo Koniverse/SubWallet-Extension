@@ -33,8 +33,8 @@ export const _BALANCE_CHAIN_GROUP = {
   kintsugi: ['kintsugi', 'interlay', 'kintsugi_test', 'mangatax_para'],
   genshiro: ['genshiro_testnet', 'genshiro'],
   equilibrium_parachain: ['equilibrium_parachain'],
-  bifrost: ['bifrost', 'acala', 'karura', 'acala_testnet', 'pioneer', 'bitcountry', 'bifrost_dot', 'hydradx_main', 'hydradx_rococo', 'pendulum', 'amplitude', 'continuum_network', 'truth_network', 'jamton'],
-  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'paseo_assethub', 'origintrail'],
+  bifrost: ['bifrost', 'acala', 'karura', 'acala_testnet', 'pioneer', 'bitcountry', 'bifrost_dot', 'hydradx_main', 'hydradx_rococo', 'pendulum', 'amplitude', 'continuum_network', 'truth_network', 'jamton', 'hydradx_hollarnet'],
+  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'origintrail', 'xode', 'paseo_assethub'],
   kusama: ['kusama', 'kintsugi', 'kintsugi_test', 'interlay', 'acala', 'statemint', 'karura', 'bifrost'], // perhaps there are some runtime updates
   centrifuge: ['centrifuge'],
   supportBridged: ['rococo_assethub', 'statemint', 'statemine', 'polimec'],
@@ -112,7 +112,9 @@ export const _STAKING_ERA_LENGTH_MAP: Record<string, number> = { // in hours
   muse_testnet: 25 * 6 / 60 / 60, // 25 blocks per session
   mythos: 24,
   energy_web_x_testnet: 22 * 12 / 3600, // 22 blocks per era, 1 block per 12s
-  energy_web_x: 7200 * 12 / 3600 // 24 hours, 7200 blocks per era, 1 block per 12s
+  energy_web_x: 7200 * 12 / 3600, // 24 hours, 7200 blocks per era, 1 block per 12s,
+  zkverify_testnet: 6,
+  zkverify: 6
 };
 
 export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
@@ -150,7 +152,9 @@ export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
   muse_testnet: 6,
   mythos: 6,
   energy_web_x_testnet: 12,
-  energy_web_x: 12
+  energy_web_x: 12,
+  zkverify: 6,
+  zkverify_testnet: 6
 };
 
 export const _PARACHAIN_INFLATION_DISTRIBUTION: Record<string, Record<string, number>> = {
@@ -250,11 +254,11 @@ export const _TRANSFER_CHAIN_GROUP = {
   genshiro: ['genshiro_testnet', 'genshiro', 'equilibrium_parachain'],
   // crab: ['crab', 'pangolin'],
   bitcountry: ['pioneer', 'bitcountry'],
-  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'paseo_assethub', 'origintrail'],
+  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'origintrail', 'xode', 'paseo_assethub'],
   riochain: ['riochain'],
   sora_substrate: ['sora_substrate'],
   avail: ['kate', 'goldberg_testnet'],
-  pendulum: ['pendulum', 'amplitude', 'amplitude_test', 'hydradx_main', 'bifrost', 'bifrost_dot', 'jamton'],
+  pendulum: ['pendulum', 'amplitude', 'amplitude_test', 'hydradx_main', 'bifrost', 'bifrost_dot', 'jamton', 'hydradx_hollarnet'],
   centrifuge: ['centrifuge'],
   disable_transfer: ['crab', 'pangolin'],
   truth: ['truth_network']

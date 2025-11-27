@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { COMMON_ASSETS } from '@subwallet/chain-list';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
@@ -9,7 +8,7 @@ import { createBitcoinTransaction } from '@subwallet/extension-base/services/bal
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken, _isPureBitcoinChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _chainInfoToChainType, _getContractAddressOfToken, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
@@ -22,9 +21,6 @@ import * as bitcoin from 'bitcoinjs-lib';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 
 import { SWTransaction } from '../../transaction-service/types';
-
-const INTERMEDIARY_MAINNET_ASSET_SLUG = COMMON_ASSETS.USDC_ETHEREUM;
-const INTERMEDIARY_TESTNET_ASSET_SLUG = COMMON_ASSETS.USDC_SEPOLIA;
 
 interface DepositAddressResponse {
   id: number;
@@ -59,8 +55,6 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
   private readonly isTestnet: boolean;
   private swapBaseHandler: SwapBaseHandler;
   providerSlug: SwapProviderId;
-  // private baseUrl: string;
-  // private assetsUrl: string;
 
   constructor (chainService: ChainService, balanceService: BalanceService, feeService: FeeService, isTestnet = true) {
     this.swapBaseHandler = new SwapBaseHandler({
@@ -72,8 +66,6 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     });
     this.isTestnet = isTestnet;
     this.providerSlug = isTestnet ? SwapProviderId.CHAIN_FLIP_TESTNET : SwapProviderId.CHAIN_FLIP_MAINNET;
-    // this.baseUrl = getChainflipSwap(isTestnet);
-    // this.assetsUrl = getAssetsUrl(isTestnet);
   }
 
   get chainService () {
@@ -96,14 +88,6 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     return this.swapBaseHandler.slug;
   }
 
-  get intermediaryAssetSlug () {
-    if (this.isTestnet) {
-      return INTERMEDIARY_TESTNET_ASSET_SLUG;
-    } else {
-      return INTERMEDIARY_MAINNET_ASSET_SLUG;
-    }
-  }
-
   public async handleSubmitStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
     const { address, currentStep, process, quote, recipient, slippage } = params;
 
@@ -111,7 +95,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
     const fromAsset = this.chainService.getAssetBySlug(pair.from);
     const chainInfo = this.chainService.getChainInfoByKey(fromAsset.originChain);
     const toChainInfo = this.chainService.getChainInfoByKey(fromAsset.originChain);
-    const chainType = _isChainSubstrateCompatible(chainInfo) ? ChainType.SUBSTRATE : _isPureBitcoinChain(chainInfo) ? ChainType.BITCOIN : ChainType.EVM; // todo: improve throw error for unknown chain
+    const chainType = _chainInfoToChainType(chainInfo);
     const receiver = _reformatAddressWithChain(recipient ?? address, toChainInfo);
 
     const minReceive = new BigNumber(quote.rate).times(1 - slippage).toString();
