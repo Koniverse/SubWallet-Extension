@@ -10,7 +10,7 @@ import { LockedBalanceDetails } from '@subwallet/extension-base/types';
 import BigN from 'bignumber.js';
 
 export async function getSpecialStakingBalances (chainInfo: _ChainInfo, addresses: string[], substrateApi: _SubstrateApi): Promise<BigN[]> {
-  // Default: 0 cho tất cả address
+  // Default: 0 for all addresses
   let balances = new Array<BigN>(addresses.length).fill(new BigN(0));
 
   // --- Bittensor ----------------------------------------------------------------
