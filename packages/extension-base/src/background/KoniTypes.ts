@@ -2561,7 +2561,7 @@ export interface KoniRequestSignatures {
   'pri(freeBalance.get)': [RequestFreeBalance, AmountData];
   'pri(freeBalance.subscribe)': [RequestFreeBalance, AmountDataWithId, AmountDataWithId];
   'pri(availableBalance.getBalanceByType)': [RequestAvailableBalanceByType, AmountData];
-  'pri(availableBalance.subscribeBalanceByType)': [RequestFreeBalance, AmountDataWithId, AmountDataWithId];
+  'pri(availableBalance.subscribeBalanceByType)': [RequestAvailableBalanceByType, AmountDataWithId, AmountDataWithId];
   // Transfer
   'pri(accounts.checkTransfer)': [RequestCheckTransfer, ValidateTransactionResponse];
   'pri(accounts.transfer)': [RequestSubmitTransfer, SWTransactionResponse];
