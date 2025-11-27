@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BlockStreamTestnetRequestStrategy, MempoolTestnetRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/BlockStreamTestnet';
 import { SubWalletMainnetRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/SubWalletMainnet';
 import { BitcoinApiStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils/promise';
@@ -11,7 +10,7 @@ import { _ApiOptions } from '../../handler/types';
 import { _BitcoinApi, _ChainConnectionStatus } from '../../types';
 
 // const isBlockStreamProvider = (apiUrl: string): boolean => apiUrl === 'https://blockstream-testnet.openbit.app' || apiUrl === 'https://electrs.openbit.app';
-// const BLOCKSTREAM_TESTNET_API_URL = 'https://blockstream.info/testnet/api/';
+const BLOCKSTREAM_TESTNET_API_URL = 'https://blockstream-testnet-v3.koni.studio';
 // const MEMPOOL_TESTNET_V4_API_URL = 'https://mempool.space/testnet4/api/';
 
 export class BitcoinApi implements _BitcoinApi {
@@ -44,12 +43,9 @@ export class BitcoinApi implements _BitcoinApi {
 
   private createApiStrategy (apiUrl: string): BitcoinApiStrategy {
     const isTestnet = apiUrl.includes('testnet');
-    const isBlockstreamUrl = apiUrl.includes('blockstream');
 
     if (isTestnet) {
-      return isBlockstreamUrl
-        ? new BlockStreamTestnetRequestStrategy(apiUrl)
-        : new MempoolTestnetRequestStrategy(apiUrl);
+      return new SubWalletMainnetRequestStrategy(BLOCKSTREAM_TESTNET_API_URL);
     }
 
     return new SubWalletMainnetRequestStrategy(apiUrl);
