@@ -1857,7 +1857,7 @@ export default class KoniExtension {
         }
 
         if (isSubstrateXcm) {
-          const isDryRunSuccess = await dryRunXcmExtrinsicV2(params);
+          const isDryRunSuccess = await dryRunXcmExtrinsicV2(params, false);
 
           if (!isDryRunSuccess) {
             inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again'));

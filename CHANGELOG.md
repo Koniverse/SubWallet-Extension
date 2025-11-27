@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.3.67
+Build date: Nov 13, 2025.
+
+Features & Updates:
+- Improve Swap validation by Dry-run-preview API from ParaSpell (#4671)
+- Configure gas limit & max gas fee for Energy Web Chain (#4716)
+
+
 ## 1.3.66
 Build date: Nov 07, 2025.
 
