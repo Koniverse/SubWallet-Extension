@@ -25,7 +25,7 @@ export function setupApiSDK () {
     baseUrl: STATIC_CONTENT_API_URL
   });
 
-  subwalletApiSdk.externalCacheClientApi.updateConfig({
+  subwalletApiSdk.dynamicCacheApi.updateConfig({
     baseUrl: CACHED_API_URL
   });
 }

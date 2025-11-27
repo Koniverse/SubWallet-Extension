@@ -1,9 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CurrencyJson, CurrencyType, ExchangeRateJSON, HistoryTokenPriceJSON, PriceChartTimeframe, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
+import { CurrencyType, ExchangeRateJSON, HistoryTokenPriceJSON, PriceChartTimeframe, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
+import { CURRENCY_SYMBOL_RECORD } from '@subwallet/extension-base/constants';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
-import { DerivativeTokenPrice, ExchangeRateItem, GeckoItem, staticData, StaticKey } from '@subwallet-monorepos/subwallet-services-sdk/services';
+import { DerivativeTokenPrice, ExchangeRateItem, GeckoItem } from '@subwallet-monorepos/subwallet-services-sdk/services';
 
 const DEFAULT_CURRENCY = 'USD';
 const DERIVATIVE_TOKEN_SLUG_LIST = ['susds', 'savings-dai'];
@@ -15,7 +16,7 @@ export const getExchangeRateMap = async (): Promise<Record<CurrencyType, Exchang
 
   try {
     try {
-      responseDataExchangeRate = await subwalletApiSdk.externalCacheClientApi.fetchLastedExchangeRate();
+      responseDataExchangeRate = await subwalletApiSdk.dynamicCacheApi.fetchLastedExchangeRate();
     } catch (e) {}
 
     if (!responseDataExchangeRate) {
@@ -30,7 +31,7 @@ export const getExchangeRateMap = async (): Promise<Record<CurrencyType, Exchang
 
     return Object.keys(responseDataExchangeRate.conversion_rates)
       .reduce((map, exchangeKey) => {
-        const staticCurrencyData = staticData[StaticKey.CURRENCY_SYMBOL];
+        const staticCurrencyData = CURRENCY_SYMBOL_RECORD;
 
         if (!staticCurrencyData[exchangeKey]) {
           return map;
@@ -38,7 +39,7 @@ export const getExchangeRateMap = async (): Promise<Record<CurrencyType, Exchang
 
         map[exchangeKey as CurrencyType] = {
           exchange: responseDataExchangeRate?.conversion_rates[exchangeKey] || 0,
-          label: (staticCurrencyData[exchangeKey] as CurrencyJson).label
+          label: (staticCurrencyData[exchangeKey]).label
         };
 
         return map;
@@ -50,7 +51,7 @@ export const getExchangeRateMap = async (): Promise<Record<CurrencyType, Exchang
 
 const fetchDerivativeTokenSlugs = async () => {
   try {
-    const data = await subwalletApiSdk.externalCacheClientApi.fetchDerivationTokenSlugs();
+    const data = await subwalletApiSdk.dynamicCacheApi.fetchDerivationTokenSlugs();
     const apiSlugs: string[] = Array.isArray(data) && data.every((item) => typeof item === 'string')
       ? (data)
       : [];
@@ -75,7 +76,7 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
 
     if (!skipDerivativePrice) {
       try {
-        const generateDerivativePriceRaw = await subwalletApiSdk.externalCacheClientApi.fetchDerivativeTokens();
+        const generateDerivativePriceRaw = await subwalletApiSdk.dynamicCacheApi.fetchDerivativeTokens();
 
         if (Array.isArray(generateDerivativePriceRaw)) {
           generateDerivativePriceRaw.forEach((token: DerivativeTokenPrice) => {
@@ -107,7 +108,7 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
       useBackupApi = true;
 
       try {
-        responseDataPrice = await subwalletApiSdk.externalCacheClientApi.fetchLastedPriceList(idStr);
+        responseDataPrice = await subwalletApiSdk.dynamicCacheApi.fetchLastedPriceList(Array.from(priceIds));
       } catch (e) {}
 
       if (!response) {
@@ -117,7 +118,7 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
       }
     }
 
-    const currencyData = staticData[StaticKey.CURRENCY_SYMBOL][currency || DEFAULT_CURRENCY] as CurrencyJson;
+    const currencyData = CURRENCY_SYMBOL_RECORD[currency || DEFAULT_CURRENCY];
     const priceMap: Record<string, number> = {};
     const price24hMap: Record<string, number> = {};
     const priceCoinGeckoSupported: string[] = [];

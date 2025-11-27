@@ -89,7 +89,7 @@ export const fetchInfuraFeeData = async (chainId: number, infuraAuth?: string): 
 export const fetchSubWalletFeeData = async (chainId: number, networkKey: string): Promise<EvmFeeInfo | null> => {
   return await new Promise<EvmFeeInfo | null>((resolve) => {
     // TODO: Update the logo to follow the new estimateFee format or move the logic to the backend
-    subwalletApiSdk.externalCacheClientApi.fetchSubWalletFeeData(networkKey)
+    subwalletApiSdk.dynamicCacheApi.fetchSubWalletFeeData(networkKey)
       .then((info: EvmFeeInfoCache | null) => {
         resolve(info);
       })

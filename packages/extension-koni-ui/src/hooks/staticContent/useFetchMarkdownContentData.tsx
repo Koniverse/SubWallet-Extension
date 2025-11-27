@@ -20,7 +20,7 @@ const useFetchMarkdownContentData = () => {
   return useCallback(<T = unknown>(folder: string, supportedLanguages: LanguageType[], fallbackLanguage: LanguageType = 'en') => {
     const jsonFile = getJsonFile(supportedLanguages, fallbackLanguage);
 
-    return subwalletApiSdk.staticContentApi.fetchMarkdownContent<T>(jsonFile);
+    return subwalletApiSdk.staticContentApi.fetchMarkdownContent<T>(folder, jsonFile);
   }, [getJsonFile]);
 };
 
