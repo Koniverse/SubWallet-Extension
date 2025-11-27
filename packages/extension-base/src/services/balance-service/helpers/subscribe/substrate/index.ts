@@ -14,11 +14,11 @@ import { FrameBalancesFreezesInfo, FrameBalancesHoldsInfo, FrameBalancesLocksInf
 import { _adaptX1Interior } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/contract-handler/wasm';
 import { getDefaultWeightV2 } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
-import { _BALANCE_CHAIN_GROUP, _BALANCE_LOCKED_ID_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
+import { _BALANCE_CHAIN_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _checkSmartContractSupportByChain, _getAssetExistentialDeposit, _getAssetNetuid, _getChainExistentialDeposit, _getChainNativeTokenSlug, _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getTokenTypesSupportedByChain, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
-import { BalanceItem, LockedBalanceDetails, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
+import { BalanceItem, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
 import { filterAlphaAssetsByChain, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { timer } from 'rxjs';
@@ -28,6 +28,7 @@ import { ContractPromise } from '@polkadot/api-contract';
 import { subscribeERC20Interval } from '../evm';
 import { subscribeEquilibriumTokenBalance } from './equilibrium';
 import { subscribeGRC20Balance, subscribeVftBalance } from './gear';
+import { buildLockedDetails, getSpecialStakingBalances } from './utils';
 
 export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: _ChainInfo, assetMap: Record<string, _ChainAsset>, substrateApi: _SubstrateApi, evmApi: _EvmApi, callback: (rs: BalanceItem[]) => void, extrinsicType?: ExtrinsicType) => {
   let unsubNativeToken: () => void;
@@ -122,21 +123,6 @@ export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: 
   };
 };
 
-// handler according to different logic
-const extractId = (id: string | Record<string, unknown> | undefined): string => {
-  if (!id) {
-    return '';
-  }
-
-  if (typeof id === 'string') {
-    return id.replace(/\0/g, '').trim();
-  }
-
-  const keys = Object.keys(id);
-
-  return keys.length ? keys[0] : '';
-};
-
 // eslint-disable-next-line @typescript-eslint/require-await
 const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo, extrinsicType, substrateApi }: SubscribeSubstratePalletBalance) => {
   const systemAccountKey = 'query_system_account';
@@ -166,23 +152,10 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const subscription = substrateApi.subscribeDataWithMulti(params, async (rs) => {
-    // TEMP FIX: Delay to allow locks/holds to sync with system.account
-    // TODO: Replace this with a proper sync mechanism
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
     const balances = rs[systemAccountKey];
     const poolMemberInfos = rs[poolMembersKey];
 
-    let bittensorStakingBalances: BigN[] = new Array<BigN>(addresses.length).fill(new BigN(0));
-
-    if (_BALANCE_CHAIN_GROUP.bittensor.includes(chainInfo.slug)) {
-      const rawData = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(addresses);
-      const values: Array<[string, TaoStakeInfo[]]> = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
-
-      bittensorStakingBalances = values.map(([, stakes]) =>
-        stakes.filter((i) => i.netuid === 0).reduce((prev, curr) => prev.plus(curr.stake), BigN(0))
-      );
-    }
+    const bittensorStakingBalances = await getSpecialStakingBalances(chainInfo, addresses, substrateApi);
 
     // Precompute totalLockedFromTransfer for each account to decide if need fetch locks/holds
     const preItems = balances.map((_balance, index) => {
@@ -212,27 +185,25 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
 
     // Fetch locks/holds only for accounts that have locked balances
     if (accountsWithLocks.length > 0) {
-      // Fetch locks
-      const rawLocks = await substrateApi.api.query.balances.locks.multi(accountsWithLocks);
+      const [rawLocks, rawHolds, rawFreezes] = await Promise.all([
+        substrateApi.api.query.balances.locks.multi(accountsWithLocks),
+        substrateApi.api.query.balances.holds.multi(accountsWithLocks),
+        substrateApi.api.query.balances.freezes.multi(accountsWithLocks)
+      ]);
 
       locks = rawLocks.map((lockArr) =>
-        (lockArr).map((l) => ({
-          id: (l.id).toPrimitive(),
+        lockArr.map((l) => ({
+          id: l.id.toPrimitive(),
           amount: l.amount.toString()
         }))
       ) as FrameBalancesLocksInfo[][];
 
-      // Fetch holds
-      const rawHolds = await substrateApi.api.query.balances.holds.multi(accountsWithLocks);
-
       holds = rawHolds.map((holdArr) =>
-        (holdArr).map((h) => ({
-          id: (h.id).toPrimitive(),
+        holdArr.map((h) => ({
+          id: h.id.toPrimitive(),
           amount: h.amount.toString()
         }))
       ) as FrameBalancesHoldsInfo[][];
-
-      const rawFreezes = (await substrateApi.api.query.balances.freezes.multi(accountsWithLocks));
 
       freezes = rawFreezes.map((freezeArr) =>
         freezeArr.map((f) => ({
@@ -249,39 +220,13 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
       const holdItems = lockIndex >= 0 ? holds[lockIndex] || [] : [];
       const freezeItems = lockIndex >= 0 ? freezes[lockIndex] || [] : [];
 
-      let stakingBalance = new BigN(bittensorStakingBalances[index].toString());
-      let govBalance = new BigN(0);
-      let democracyBalance = new BigN(0);
-
       const allLockEntries = [...lockItems, ...holdItems, ...freezeItems];
 
-      for (const entry of allLockEntries) {
-        const id = extractId(entry.id);
-        const amount = new BigN(String(entry.amount || 0));
-
-        if (_BALANCE_LOCKED_ID_GROUP.staking.includes(id)) {
-          stakingBalance = stakingBalance.plus(amount);
-        } else if (_BALANCE_LOCKED_ID_GROUP.gov.includes(id)) {
-          govBalance = govBalance.plus(amount);
-        } else if (_BALANCE_LOCKED_ID_GROUP.democracy.includes(id)) {
-          democracyBalance = democracyBalance.plus(amount);
-        }
-      }
-
-      // others = total locked - max(staking, governance, democracy)
-      const reservedBalance = _getSystemPalletReservedBalance(balanceInfo);
-      const reservedBalanceBN = new BigN(reservedBalance.toString());
-
-      const maxMainLock = BigN.max(stakingBalance, govBalance, democracyBalance, reservedBalanceBN);
-      const othersLockedBalance = new BigN(totalLockedFromTransfer.toString()).minus(maxMainLock);
-
-      const lockedDetails: LockedBalanceDetails = {
-        staking: stakingBalance.toFixed(),
-        governance: govBalance.toFixed(),
-        democracy: democracyBalance.toFixed(),
-        reserved: reservedBalanceBN.toFixed(),
-        others: othersLockedBalance.gt(0) ? othersLockedBalance.toFixed() : '0'
-      };
+      const lockedDetails = buildLockedDetails(
+        allLockEntries,
+        totalLockedFromTransfer,
+        _getSystemPalletReservedBalance(balanceInfo)
+      );
 
       const transferableBalance = _getSystemPalletTransferable(balanceInfo, _getChainExistentialDeposit(chainInfo), extrinsicType);
 

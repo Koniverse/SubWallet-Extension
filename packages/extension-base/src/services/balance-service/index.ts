@@ -23,6 +23,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { noop } from '@polkadot/util';
 
+import { _BALANCE_CHAIN_GROUP } from '../chain-service/constants';
 import { CreateXcmExtrinsicProps } from './transfer/xcm';
 import { _isAcrossChainBridge, getAcrossQuote } from './transfer/xcm/acrossBridge';
 import { BalanceMapImpl } from './BalanceMapImpl';
@@ -239,7 +240,6 @@ export class BalanceService implements StoppableServiceInterface {
 
       unsub = subscribeBalance([address], [chain], [tSlug], assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, cardanoApiMap, bitcoinApiMap, (result) => {
         const rs = result[0];
-
         let value: string;
 
         switch (balanceType) {
@@ -247,7 +247,23 @@ export class BalanceService implements StoppableServiceInterface {
             value = new BigN(rs.free).plus(new BigN(rs.locked)).toFixed();
             break;
           case BalanceType.TOTAL_MINUS_RESERVED:
-            value = new BigN(rs.free).plus(new BigN(rs.locked)).minus(rs.lockedDetails?.reserved || 0).toFixed();
+            if (_BALANCE_CHAIN_GROUP.vara.includes(chainInfo.slug)) {
+              // TODO: Currently Vara staking from nomination pools is not fully supported.
+              // Return `free` to avoid incorrect TOTAL_MINUS_RESERVED calculation.
+              // Improve later when full staking breakdown is available.
+              value = rs.free;
+            } else {
+              value = new BigN(rs.free)
+                .plus(new BigN(rs.locked))
+                .minus(
+                  BigN.max(
+                    new BigN(rs.lockedDetails?.reserved || 0),
+                    new BigN(rs.lockedDetails?.staking || 0)
+                  )
+                )
+                .toFixed();
+            }
+
             break;
           default:
             value = rs.free;

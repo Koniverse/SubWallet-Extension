@@ -79,17 +79,5 @@ function _getSystemPalletTotalBalanceV1 (accountInfo: FrameSystemAccountInfoV1):
 }
 
 export function _getSystemPalletReservedBalance (accountInfo: FrameSystemAccountInfo): bigint {
-  if (isV1(accountInfo)) {
-    return _getSystemPalletReservedBalanceV1(accountInfo);
-  } else {
-    return _getSystemPalletReservedBalanceV2(accountInfo);
-  }
-}
-
-function _getSystemPalletReservedBalanceV1 (accountInfo: FrameSystemAccountInfoV1): bigint {
-  return BigInt(accountInfo.data.reserved);
-}
-
-function _getSystemPalletReservedBalanceV2 (accountInfo: FrameSystemAccountInfoV2): bigint {
   return BigInt(accountInfo.data.reserved);
 }

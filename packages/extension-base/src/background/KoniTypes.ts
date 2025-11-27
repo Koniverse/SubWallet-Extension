@@ -2560,7 +2560,7 @@ export interface KoniRequestSignatures {
   'pri(subscription.cancel)': [string, boolean];
   'pri(freeBalance.get)': [RequestFreeBalance, AmountData];
   'pri(freeBalance.subscribe)': [RequestFreeBalance, AmountDataWithId, AmountDataWithId];
-  'pri(availableBalance.getBalanceByType)': [RequestFreeBalance, AmountData];
+  'pri(availableBalance.getBalanceByType)': [RequestAvailableBalanceByType, AmountData];
   'pri(availableBalance.subscribeBalanceByType)': [RequestFreeBalance, AmountDataWithId, AmountDataWithId];
   // Transfer
   'pri(accounts.checkTransfer)': [RequestCheckTransfer, ValidateTransactionResponse];

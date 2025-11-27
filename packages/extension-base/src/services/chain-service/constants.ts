@@ -37,7 +37,8 @@ export const _BALANCE_CHAIN_GROUP = {
   centrifuge: ['centrifuge'],
   supportBridged: ['rococo_assethub', 'statemint', 'statemine', 'polimec'],
   bittensor: ['bittensor', 'bittensor_testnet'],
-  moonbeam: ['moonbeam', 'moonriver', 'moonbase']
+  moonbeam: ['moonbeam', 'moonriver', 'moonbase'],
+  vara: ['vara_network', 'vara_testnet']
 };
 
 export const _BALANCE_LOCKED_ID_GROUP = {
