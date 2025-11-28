@@ -515,7 +515,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
                   ...nominatorMetadata,
                   address: owner,
                   metadata: {
-                    rootClaimType: rootClaimForAddress
+                    bittensorRootClaimType: rootClaimForAddress
                   },
                   type: this.type
                 });

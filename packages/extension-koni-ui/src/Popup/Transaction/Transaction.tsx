@@ -24,12 +24,14 @@ interface Props extends ThemeProps {
   children?: React.ReactNode;
   modalContent?: boolean;
   modalId?: string;
+  address?: string;
+  fromChain?: string;
 }
 
 const recheckChainConnectionModalId = 'recheck-chain-connection-modal-id';
 const alertModalId = 'transaction-alert-modal-id';
 
-function Component ({ children, className, modalContent, modalId, transactionType: transactionTypeProps }: Props) {
+function Component ({ address, children, className, fromChain, modalContent, modalId, transactionType: transactionTypeProps }: Props) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -179,7 +181,8 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
   const needPersistData = false;
 
   const [defaultData, setDefaultData] = useState(storage);
-  const { chain, from } = storage;
+  const from = address || storage.from;
+  const chain = fromChain || storage.chain;
 
   const homePath = useMemo((): string => {
     const pathName = location.pathname;

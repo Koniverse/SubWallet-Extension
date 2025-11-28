@@ -5,83 +5,77 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BittensorRootClaimType, RequestChangeBittensorRootClaimType } from '@subwallet/extension-base/types';
 import { useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
 import { changeBittensorRootClaimType } from '@subwallet/extension-koni-ui/messaging';
+import Transaction from '@subwallet/extension-koni-ui/Popup/Transaction/Transaction';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { BackgroundIcon, Button, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
+import { GlobalToken } from '@subwallet/react-ui/es/theme/interface';
 import { ArrowClockwise, ArrowsLeftRight, CheckCircle, IconProps, LockKey, X } from 'phosphor-react';
 import React, { Context, ForwardedRef, forwardRef, useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import styled, { ThemeContext } from 'styled-components';
 
 type Props = ThemeProps & {
   modalId: string;
-  rootClaimType: BittensorRootClaimType;
-  slug: string;
+  bittensorRootClaimType: BittensorRootClaimType;
+  poolSlug: string;
   address: string;
   chain: string;
 };
 
+const ClaimOptionCard = ({ description, isIconFilled = false, phosphorIcon, showCheck = false, title, token }:
+{ title: string;
+  description: React.ReactNode;
+  phosphorIcon: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<SVGSVGElement>
+  >;
+  token: GlobalToken;
+  showCheck?: boolean;
+  isIconFilled?: boolean
+}) => {
+  return (
+    <div className={`claim-option-item ${showCheck ? 'active' : ''}`}>
+      <div className='claim-option-icon'>
+        <BackgroundIcon
+          backgroundColor={showCheck ? '#2DA73F' : token['geekblue-6']}
+          iconColor={token.colorWhite}
+          phosphorIcon={phosphorIcon}
+          size={'sm'}
+          weight={isIconFilled ? 'fill' : 'regular'}
+        />
+      </div>
+
+      <div className='claim-option-content'>
+        <div className='claim-option-header'>
+          <span className='claim-option-title'>{title}</span>
+
+          {showCheck && (
+            <Icon
+              className='claim-option-check'
+              phosphorIcon={CheckCircle}
+              size='sm'
+              weight='fill'
+            />
+          )}
+        </div>
+
+        <div className='claim-option-description'>{description}</div>
+      </div>
+    </div>
+  );
+};
+
 const Component = (props: Props, ref: ForwardedRef<any>) => {
-  const { address, chain, className = '', modalId, rootClaimType, slug } = props;
+  const { address, bittensorRootClaimType, chain, className = '', modalId, poolSlug } = props;
   const { t } = useTranslation();
   const { inactiveModal } = useContext(ModalContext);
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
-  const isSwapOptions = useMemo(() => rootClaimType === 'Swap', [rootClaimType]);
+  const isSwapOptions = useMemo(() => bittensorRootClaimType === 'Swap', [bittensorRootClaimType]);
   const [submitLoading, setSubmitLoading] = useState(false);
   const { onError, onSuccess } = useHandleSubmitTransaction();
   const onPreCheck = usePreCheckAction(address);
-  const navigate = useNavigate();
-
-  const ClaimOptionCard = ({ description, isIconFilled = false, phosphorIcon, showCheck = false, title }:
-  { title: string;
-    description: React.ReactNode;
-    phosphorIcon: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<SVGSVGElement>
-    >;
-    showCheck?: boolean;
-    isIconFilled?: boolean
-  }) => {
-    return (
-      <div className={`claim-option-item ${showCheck ? 'active' : ''}`}>
-        <div className='claim-option-icon'>
-          <BackgroundIcon
-            backgroundColor={showCheck ? '#2DA73F' : token['geekblue-6']}
-            iconColor={token.colorWhite}
-            phosphorIcon={phosphorIcon}
-            size={'sm'}
-            weight={isIconFilled ? 'fill' : 'regular'}
-          />
-        </div>
-
-        <div className='claim-option-content'>
-          <div className='claim-option-header'>
-            <span className='claim-option-title'>{title}</span>
-
-            {showCheck && (
-              <Icon
-                className='claim-option-check'
-                phosphorIcon={CheckCircle}
-                size='sm'
-                weight='fill'
-              />
-            )}
-          </div>
-
-          <div className='claim-option-description'>{description}</div>
-        </div>
-      </div>
-    );
-  };
 
   const onCancel = useCallback(() => {
     inactiveModal(modalId);
   }, [inactiveModal, modalId]);
-
-  const onDone = useCallback(
-    (extrinsicHash: string) => {
-      navigate(`/transaction-done/${address}/${chain}/${extrinsicHash}`, { replace: true });
-    },
-    [navigate, address, chain]
-  );
 
   const onChangeRootClaimType = useCallback(() => {
     setSubmitLoading(true);
@@ -89,25 +83,18 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
     const submitData: RequestChangeBittensorRootClaimType = {
       chain,
       address,
-      slug,
-      rootClaimType: rootClaimType === 'Swap' ? 'Keep' : 'Swap'
+      slug: poolSlug,
+      bittensorRootClaimType: bittensorRootClaimType === 'Swap' ? 'Keep' : 'Swap'
     };
 
     changeBittensorRootClaimType(submitData)
-      .then((res) => {
-        onSuccess(res);
-        const hash = res?.extrinsicHash;
-
-        if (hash) {
-          onDone(hash);
-        }
-      })
+      .then(onSuccess)
       .catch(onError)
       .finally(() => {
         setSubmitLoading(false);
         inactiveModal(modalId);
       });
-  }, [chain, address, slug, rootClaimType, onError, onSuccess, onDone, inactiveModal, modalId]);
+  }, [chain, address, poolSlug, bittensorRootClaimType, onError, onSuccess, inactiveModal, modalId]);
 
   return (
     <SwModal
@@ -147,6 +134,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
           phosphorIcon={ArrowsLeftRight}
           showCheck={isSwapOptions}
           title='Swap'
+          token={token}
         />
 
         <ClaimOptionCard
@@ -155,13 +143,31 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
           phosphorIcon={LockKey}
           showCheck={!isSwapOptions}
           title='Keep'
+          token={token}
         />
       </div>
     </SwModal>
   );
 };
 
-const EarningBittensorClaimRewardTypeModal = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
+const Wrapper = (props: Props, ref: ForwardedRef<any>) => {
+  return (
+    <Transaction
+      address={props.address}
+      fromChain={props.chain}
+      modalContent={true}
+      modalId={props.modalId}
+      transactionType={ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE}
+    >
+      <Component
+        {...props}
+      />
+
+    </Transaction>
+  );
+};
+
+const EarningBittensorClaimRewardTypeModal = styled(forwardRef(Wrapper))<Props>(({ theme: { token } }: Props) => {
   return {
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,

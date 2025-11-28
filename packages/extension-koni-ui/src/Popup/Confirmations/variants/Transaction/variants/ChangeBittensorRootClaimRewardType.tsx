@@ -23,7 +23,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
 
   const { decimals, symbol } = useGetNativeTokenBasicInfo(data.chain);
-  const isKeepClaim = useMemo(() => data.rootClaimType === 'Keep', [data.rootClaimType]);
+  const isKeepClaim = useMemo(() => data.bittensorRootClaimType === 'Keep', [data.bittensorRootClaimType]);
 
   return (
     <div className={CN(className)}>
@@ -36,7 +36,7 @@ const Component: React.FC<Props> = (props: Props) => {
         hasBackgroundWrapper
       >
         <MetaInfo.Default label={t('ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.claimRewardsType')}>
-          {data.rootClaimType}
+          {data.bittensorRootClaimType}
         </MetaInfo.Default>
         <MetaInfo.Number
           decimals={decimals}

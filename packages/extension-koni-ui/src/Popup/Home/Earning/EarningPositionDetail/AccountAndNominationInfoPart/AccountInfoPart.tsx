@@ -56,7 +56,7 @@ const PrevArrow = ({ currentSlide, slideCount, ...props }: CustomArrowProps) => 
 );
 
 function isBittensorMetadata (metadata: TanssiStakingMetadata | BittensorStakingMetadata | undefined): metadata is BittensorStakingMetadata {
-  return !!metadata && 'rootClaimType' in metadata;
+  return !!metadata && 'bittensorRootClaimType' in metadata;
 }
 
 function Component ({ className, compound, inputAsset, list, poolInfo }: Props) {
@@ -210,7 +210,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
               label: (
                 <div className='__label-with-icon'>
                   {t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.activeStake')}
-                  {(item?.metadata as TanssiStakingMetadata)?.isShowActiveStakeDetails && new BigN(item.activeStake).gt(0) && (
+                  {!!(item?.metadata as TanssiStakingMetadata)?.isShowActiveStakeDetails && new BigN(item.activeStake).gt(0) && (
                     <span
                       className='__info-icon-wrapper'
                       onClick={openActiveStakeDetailsModal(item)}
@@ -285,14 +285,14 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
               label={t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.claimRewardsType')}
             >
               <div className='__root-claim-type'>
-                {item.metadata.rootClaimType}
+                {item.metadata.bittensorRootClaimType}
                 <div
                   className='__root-claim-type-icon'
                   onClick={openEarningBittensorClaimRewardTypeModal(item)}
                 >
                   <Icon
+                    customSize={'18px'}
                     phosphorIcon={PencilSimpleLine}
-                    size='xs'
                   />
                 </div>
               </div>
@@ -346,14 +346,14 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
             )
           }
 
-          {selectedItem && isBittensorMetadata(selectedItem.metadata) && selectedItem.metadata.rootClaimType && (
+          {!!selectedItem && isBittensorMetadata(selectedItem.metadata) && selectedItem.metadata.bittensorRootClaimType && (
             <EarningBittensorClaimRewardTypeModal
               address={selectedItem.address}
+              bittensorRootClaimType={selectedItem.metadata.bittensorRootClaimType}
               chain={selectedItem.chain}
               className={className}
               modalId={EARNING_BITTENSOR_ROOT_CLAIM_TYPE_MODAL}
-              rootClaimType={selectedItem.metadata.rootClaimType}
-              slug={selectedItem.slug}
+              poolSlug={selectedItem.slug}
             />
           )}
         </MetaInfo>
@@ -394,7 +394,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         item={selectedItem}
         onCancel={onCloseNominationModal}
       />
-      {selectedItem && (
+      {!!selectedItem && (
         <EarningValidatorSelectedModal
           chain={poolInfo.chain}
           compound={compound}

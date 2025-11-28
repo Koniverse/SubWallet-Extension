@@ -122,7 +122,7 @@ export interface ChangeBittensorRootClaimTypeParams extends BaseRequestSign {
   slug: string;
   address: string;
   chain: string;
-  rootClaimType: BittensorRootClaimType;
+  bittensorRootClaimType: BittensorRootClaimType;
 }
 
 export type RequestChangeBittensorRootClaimType = InternalRequestSign<ChangeBittensorRootClaimTypeParams>;

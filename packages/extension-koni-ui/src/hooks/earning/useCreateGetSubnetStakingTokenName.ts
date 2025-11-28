@@ -12,7 +12,7 @@ function useCreateGetSubnetStakingTokenName () {
     const mapping: Record<string, string> = {};
 
     for (const asset of Object.values(assetRegistryMap)) {
-      if (asset.originChain === 'bittensor' && asset.assetType === 'LOCAL' && asset.metadata?.netuid !== null && asset.metadata?.netuid !== undefined) {
+      if (asset.originChain === 'bittensor' && asset.assetType === 'LOCAL' && !!asset.metadata?.netuid) {
         const netuid = asset.metadata.netuid;
 
         mapping[netuid] = asset.slug.toLowerCase();

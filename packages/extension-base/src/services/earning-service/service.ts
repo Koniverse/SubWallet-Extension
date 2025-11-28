@@ -1222,7 +1222,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
   public async handleChangeRootClaimType (params: RequestChangeBittensorRootClaimType): Promise<TransactionData> {
     await this.eventService.waitChainReady;
 
-    const { chain, rootClaimType, slug } = params;
+    const { bittensorRootClaimType, chain, slug } = params;
 
     if (!_STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
       return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
@@ -1231,7 +1231,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     const handler = this.getPoolHandler(slug) as TaoNativeStakingPoolHandler;
 
     if (handler) {
-      return handler.handleChangeRootClaimType(rootClaimType);
+      return handler.handleChangeRootClaimType(bittensorRootClaimType);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }

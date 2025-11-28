@@ -74,7 +74,7 @@ export interface TanssiStakingMetadata {
 }
 
 export interface BittensorStakingMetadata {
-  rootClaimType?: BittensorRootClaimType;
+  bittensorRootClaimType?: BittensorRootClaimType;
 }
 
 export type BittensorRootClaimType = 'Swap' | 'Keep';
