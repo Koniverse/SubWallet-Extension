@@ -41,6 +41,18 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const [timeLeft, setTimeLeft] = useState<string | undefined>();
 
+  const hasUserVoted = useMemo(() => {
+    if (!govLockedInfos?.length || referendumId === undefined || referendumId === null) {
+      return false;
+    }
+
+    return govLockedInfos.some((info) =>
+      info.tracks?.some((track) =>
+        track.votes?.some((v) => v.referendumIndex.toString() === referendumId.toString())
+      )
+    );
+  }, [govLockedInfos, referendumId]);
+
   const userVotingInfo = useMemo<UserVoting[] | undefined>(() => {
     if (!referendumDetail) {
       return [];
@@ -154,7 +166,7 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
         block={true}
         onClick={onClickVote}
       >
-        {(!isAllAccount && (userVotingInfo?.length === 1 && !!userVotingInfo[0].votes)) ? t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.revote') : t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.vote')}
+        {(!isAllAccount && hasUserVoted) ? t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.revote') : t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.vote')}
       </Button>}
 
       {!!userVotingInfo && <GovVotedAccountsModal

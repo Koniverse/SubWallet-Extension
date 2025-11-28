@@ -51,8 +51,6 @@ export function getConvictionDays (chain: string, conviction: Conviction): numbe
 }
 
 export function getGovConvictionOptions (chain: string) {
-  console.log('chain', chain);
-
   return Object.entries(numberToConviction).map(([value, conviction]) => {
     const days = getConvictionDays(chain, conviction);
 

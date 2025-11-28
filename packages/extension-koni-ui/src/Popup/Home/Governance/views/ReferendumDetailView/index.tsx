@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { GovTrackVoting } from '@subwallet/extension-base/services/open-gov/interface';
+import { GovTrackVoting, GovVotingInfo } from '@subwallet/extension-base/services/open-gov/interface';
 import { AccountChainType, AccountProxyType } from '@subwallet/extension-base/types';
 import { detectTranslate, isAccountAll, reformatAddress } from '@subwallet/extension-base/utils';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
@@ -10,7 +10,7 @@ import GovAccountSelectorModal from '@subwallet/extension-koni-ui/components/Mod
 import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useGetGovLockedInfos, useGetNativeTokenBasicInfo, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetNativeTokenBasicInfo, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { chainSlugToPolkassemblySite, chainSlugToSubsquareSite } from '@subwallet/extension-koni-ui/Popup/Home/Governance/shared';
 import { ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -36,18 +36,18 @@ import { VoteArea } from './parts/VoteArea';
 
 type Props = ThemeProps & ViewBaseType & {
   referendumId: string;
+  govLockedInfos: GovVotingInfo[];
   goOverview: VoidFunction;
 };
 
 const modalId = 'account-selector';
 
-const Component = ({ chainSlug, className, goOverview, referendumId, sdkInstance }: Props): React.ReactElement<Props> => {
+const Component = ({ chainSlug, className, goOverview, govLockedInfos, referendumId, sdkInstance }: Props): React.ReactElement<Props> => {
   const { accountProxies, currentAccountProxy, isAllAccount } = useSelector((state) => state.accountState);
   const navigate = useNavigate();
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const { t } = useTranslation();
   const fromAccountProxy = getTransactionFromAccountProxyValue(currentAccountProxy);
-  const govLockedInfos = useGetGovLockedInfos(chainSlug);
   const { chainInfoMap } = useSelector((root: RootState) => root.chainStore);
   const notify = useNotification();
   const { accountAddressItems, voteMap } = useGovReferendumVotes({

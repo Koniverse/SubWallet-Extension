@@ -9,6 +9,9 @@ import { formatNumber } from '@subwallet/extension-base/utils/number';
 import BigN from 'bignumber.js';
 import { combineLatest, merge, mergeMap } from 'rxjs';
 
+import { SubmittableExtrinsic } from '@polkadot/api-base/types';
+import { ISubmittableResult } from '@polkadot/types/types';
+
 import { _EXPECTED_BLOCK_TIME } from '../chain-service/constants';
 import { _SubstrateApi } from '../chain-service/types';
 import { _getAssetDecimals } from '../chain-service/utils';
@@ -43,13 +46,15 @@ export default abstract class BaseOpenGovHandler {
     return baseLockedPeriod / blockTime;
   }
 
+  private refToTrackMap: Map<string, number> = new Map();
+
   /* Referendum related actions */
 
   public async handleVote (request: GovVoteRequest): Promise<TransactionData> {
-    const delegateError = await this.validateNotDelegating(request.address, request.trackId);
+    const earlyError = await this.earlyValidateVoting(request);
 
-    if (delegateError) {
-      return Promise.reject(delegateError);
+    if (earlyError) {
+      return Promise.reject(earlyError);
     }
 
     switch (request.type) {
@@ -156,40 +161,41 @@ export default abstract class BaseOpenGovHandler {
   public async handleUnlockVote (request: UnlockVoteRequest): Promise<TransactionData> {
     const substrateApi = await this.substrateApi.isReady;
 
-    if (request.referendumIds && request.referendumIds.length > 0) {
-      const extrinsics = request.trackIds.flatMap((trackId, index) => {
-        const referendumIndex = request.referendumIds?.[index];
+    const { address, referendumIds, trackIds } = request;
 
-        return referendumIndex !== undefined
-          ? [
-            substrateApi.api.tx.convictionVoting.removeVote(trackId, referendumIndex),
-            substrateApi.api.tx.convictionVoting.unlock(trackId, request.address)
-          ]
-          : substrateApi.api.tx.convictionVoting.unlock(trackId, request.address);
-      });
+    const extrinsics: SubmittableExtrinsic<'promise', ISubmittableResult>[] = [];
 
-      return substrateApi.api.tx.utility.batchAll(extrinsics);
+    // 1.  Unlock all refs
+    for (const refIndex of referendumIds ?? []) {
+      const trackId = this.refToTrackMap.get(refIndex);
+
+      extrinsics.push(substrateApi.api.tx.convictionVoting.removeVote(trackId ?? null, refIndex));
     }
 
-    if (request.trackIds.length > 1) {
-      const extrinsics = request.trackIds.map((id) =>
-        substrateApi.api.tx.convictionVoting.unlock(id, request.address)
-      );
-
-      return substrateApi.api.tx.utility.batchAll(extrinsics);
+    // 2. Unlock all tracks
+    for (const trackId of trackIds ?? []) {
+      extrinsics.push(substrateApi.api.tx.convictionVoting.unlock(trackId, address));
     }
 
-    return substrateApi.api.tx.convictionVoting.unlock(request.trackIds[0], request.address);
+    // 3. Decide whether to batch or not
+    if (extrinsics.length === 1) {
+      return extrinsics[0];
+    }
+
+    if (extrinsics.length === 0) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
+    }
+
+    return substrateApi.api.tx.utility.batchAll(extrinsics);
   }
 
   /* Validate OpengGov Action */
 
-  private async validateNotDelegating (
-    address: string,
-    trackId: number
+  private async earlyValidateVoting (
+    request: GovVoteRequest
   ): Promise<TransactionError | null> {
     const substrateApi = await this.substrateApi.isReady;
-
+    const { address, referendumIndex, trackId, type } = request;
     const locked = (await substrateApi.api.query.convictionVoting.votingFor(address, trackId)).toPrimitive() as VotingFor;
 
     if (!locked) {
@@ -201,6 +207,59 @@ export default abstract class BaseOpenGovHandler {
         BasicTxErrorType.INVALID_PARAMS,
         `Already delegating on track ${trackId}`
       );
+    }
+
+    if (!locked?.casting?.votes?.length) {
+      return null;
+    }
+
+    const found = locked.casting.votes.find(([refIndex]) => refIndex.toString() === referendumIndex.toString());
+
+    if (!found) {
+      return null;
+    }
+
+    const [, voteData] = found;
+
+    // --- Standard vote ---
+    if (type === GovVoteType.AYE || type === GovVoteType.NAY) {
+      if ('standard' in voteData) {
+        const standardVote = voteData.standard;
+        const sameDirection = standardVote.vote.aye === (type === GovVoteType.AYE);
+        const sameAmount = new BigN(standardVote.balance).eq((request).amount);
+        const sameConviction = standardVote.vote.conviction === numberToConviction[request.conviction];
+
+        if (sameDirection && sameAmount && sameConviction) {
+          return new TransactionError(BasicTxErrorType.DUPLICATE_TRANSACTION, 'Another transaction is in queue');
+        }
+      }
+    }
+
+    // --- Split vote ---
+    if (type === GovVoteType.SPLIT) {
+      if ('split' in voteData) {
+        const splitVote = voteData.split;
+        const sameAye = new BigN(splitVote.aye).eq((request).ayeAmount);
+        const sameNay = new BigN(splitVote.nay).eq((request).nayAmount);
+
+        if (sameAye && sameNay) {
+          return new TransactionError(BasicTxErrorType.DUPLICATE_TRANSACTION, 'Another transaction is in queue');
+        }
+      }
+    }
+
+    // --- SplitAbstain vote ---
+    if (type === GovVoteType.ABSTAIN) {
+      if ('splitAbstain' in voteData) {
+        const splitAbstainVote = voteData.splitAbstain;
+        const sameAye = new BigN(splitAbstainVote.aye).eq((request).ayeAmount);
+        const sameNay = new BigN(splitAbstainVote.nay).eq((request).nayAmount);
+        const sameAbstain = new BigN(splitAbstainVote.abstain).eq((request).abstainAmount);
+
+        if (sameAye && sameNay && sameAbstain) {
+          return new TransactionError(BasicTxErrorType.DUPLICATE_TRANSACTION, 'Another transaction is in queue');
+        }
+      }
     }
 
     return null;
@@ -422,6 +481,10 @@ export default abstract class BaseOpenGovHandler {
               unlockingReferenda.push(...trackUnlocking);
               trackVotes.set(trackId, votes);
 
+              for (const vote of votes) {
+                this.refToTrackMap.set(vote.referendumIndex.toString(), trackId);
+              }
+
               // --- Calculate total voted amount per track ---
               const totalCast = votes.reduce((sum, vote) => {
                 return sum
@@ -481,6 +544,8 @@ export default abstract class BaseOpenGovHandler {
             },
             tracks
           };
+
+          console.log('resultInfos', result);
 
           return result;
         })
