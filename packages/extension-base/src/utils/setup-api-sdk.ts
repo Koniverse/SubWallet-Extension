@@ -8,13 +8,34 @@ import { TARGET_ENV } from './environment';
 
 const CHAIN_LIST_VERSION = process.env.CHAIN_LIST_VERSION as string;
 
+const staticContentFallbackLoader = async <T>(slug: string): Promise<T | undefined> => {
+  const safe = slug.replace(/\//g, '_');
+
+  try {
+    const mod = await import(
+      `@subwallet-monorepos/subwallet-services-sdk/data/staticData/staticContent/${safe}.json`
+    ) as { default?: T } | T;
+
+    if (mod && typeof mod === 'object' && 'default' in mod) {
+      return (mod as { default?: T }).default as T;
+    }
+
+    return mod as T;
+  } catch (e) {
+    return undefined;
+  }
+};
+
 export function setupApiSDK () {
   subwalletApiSdk.updateConfig({
     appVersion: APP_VERSION,
     baseUrl: BACKEND_API_URL,
     platform: TARGET_ENV,
     chainListVersion: CHAIN_LIST_VERSION,
-    isProduction: isProductionMode
+    isProduction: isProductionMode,
+    fallbackLoader: {
+      staticContent: staticContentFallbackLoader
+    }
   });
 
   subwalletApiSdk.staticDataCacheApi.updateConfig({
