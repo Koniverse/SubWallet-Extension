@@ -4,7 +4,7 @@
 import { AccountChainType } from '@subwallet/extension-base/types';
 import { PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useNotification } from '@subwallet/extension-koni-ui/hooks';
+import { useGetGovLockedInfos, useNotification } from '@subwallet/extension-koni-ui/hooks';
 import { useGovernanceView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView';
 import { UnlockTokenView } from '@subwallet/extension-koni-ui/Popup/Home/Governance/views/UnlockToken';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -46,6 +46,8 @@ const Component = () => {
     }
   }, [currentAccountProxy?.chainTypes, navigate, notify, t]);
 
+  const govLockedInfos = useGetGovLockedInfos(currentChainSlug);
+
   return (
     <>
       {
@@ -54,6 +56,7 @@ const Component = () => {
             {...viewProps}
             goReferendumDetail={goReferendumDetail}
             goUnlockToken={goUnlockToken}
+            govLockedInfos={govLockedInfos}
             onChangeChain={setChain}
           />
         )
@@ -64,6 +67,7 @@ const Component = () => {
           <ReferendumDetailView
             {...viewProps}
             goOverview={goOverview}
+            govLockedInfos={govLockedInfos}
             referendumId={referendumId}
           />
         )
@@ -74,6 +78,7 @@ const Component = () => {
           <UnlockTokenView
             {...viewProps}
             goOverview={goOverview}
+            govLockedInfos={govLockedInfos}
           />
         )
       }

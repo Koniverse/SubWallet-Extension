@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useGetGovLockedInfos } from '@subwallet/extension-koni-ui/hooks';
+import { GovVotingInfo } from '@subwallet/extension-base/services/open-gov/interface';
 import { ReferendaCategory, ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { ReferendaSearchModal } from '@subwallet/extension-koni-ui/Popup/Home/Governance/views/OverviewView/parts/ReferendaSearchModal';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -22,12 +22,13 @@ import { ReferendaList } from './parts/ReferendaList';
 import { Toolbar } from './parts/Toolbar';
 
 type Props = ThemeProps & ViewBaseType & {
+  govLockedInfos: GovVotingInfo[];
   onChangeChain: (chainSlug: string) => void;
   goReferendumDetail: (id: string) => void;
   goUnlockToken: () => void;
 };
 
-const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, onChangeChain, sdkInstance }: Props): React.ReactElement<Props> => {
+const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, govLockedInfos, onChangeChain, sdkInstance }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const [selectedReferendaCategory, setSelectedReferendaCategory] = useState<ReferendaCategory>(ReferendaCategory.ALL);
   const [isEnableTreasuryFilter, setIsEnableTreasuryFilter] = useState(false);
@@ -38,7 +39,6 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [referendaItems, setReferendaItems] = useState<ReferendumWithVoting[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const govLockedInfos = useGetGovLockedInfos(chainSlug);
 
   const { data, fetchNextPage, hasNextPage, isLoading: isInitialLoading } = useInfiniteQuery({
     queryKey: [
@@ -158,7 +158,7 @@ const Component = ({ chainSlug, className, goReferendumDetail, goUnlockToken, on
     });
 
     setReferendaItems(filteredExtended);
-  }, [data?.pages, selectedReferendaCategory, govLockedInfos, isEnableVotedFilter, isEnableDelegatedFilter]);
+  }, [data?.pages, selectedReferendaCategory, isEnableVotedFilter, isEnableDelegatedFilter, govLockedInfos]);
 
   const isLoading = isInitialLoading || isLoadingMore || migrationBlockOffsetLoading;
 

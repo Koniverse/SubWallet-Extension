@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
+import { GovVotingInfo } from '@subwallet/extension-base/services/open-gov/interface';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
-import { useGetGovLockedInfos, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { getConvertedBalanceValue } from '@subwallet/extension-koni-ui/hooks/screen/home/useAccountBalance';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
@@ -21,15 +22,15 @@ import { ViewBaseType } from '../../types';
 import { LockedAccountInfoPart } from './LockedAccountInfoPart';
 
 type Props = ThemeProps & ViewBaseType & {
+  govLockedInfos: GovVotingInfo[];
   goOverview: VoidFunction;
 };
 
-const Component = ({ chainSlug, className, goOverview }: Props): React.ReactElement<Props> => {
+const Component = ({ chainSlug, className, goOverview, govLockedInfos }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const onBack = useCallback(() => {
     goOverview();
   }, [goOverview]);
-  const govLockedInfos = useGetGovLockedInfos(chainSlug);
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
