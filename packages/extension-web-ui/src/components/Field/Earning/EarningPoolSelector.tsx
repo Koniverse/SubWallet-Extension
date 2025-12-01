@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { YieldPoolType } from '@subwallet/extension-base/types';
 import { fetchStaticData } from '@subwallet/extension-base/utils';
 import { BaseSelectModal, StakingPoolItem } from '@subwallet/extension-web-ui/components';
@@ -22,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+import {getValidatorLabel} from "@subwallet/extension-base/services/earning-service/utils";
 
 interface Props extends ThemeProps, BasicInputWrapper {
   slug: string;

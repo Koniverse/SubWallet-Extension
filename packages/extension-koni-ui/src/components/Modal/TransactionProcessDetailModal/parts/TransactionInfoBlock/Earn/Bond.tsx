@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RequestBondingSubmit, StakingType } from '@subwallet/extension-base/background/KoniTypes';
-import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { CommonFeeComponent, SummaryEarningProcessData } from '@subwallet/extension-base/types';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
@@ -15,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { TransactionInfoBlockProps } from '../types';
+import {getValidatorLabel} from "@subwallet/extension-base/services/earning-service/utils";
 
 type Props = TransactionInfoBlockProps;
 

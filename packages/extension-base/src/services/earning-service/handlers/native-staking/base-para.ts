@@ -3,7 +3,6 @@
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { NominationInfo, StakingType } from '@subwallet/extension-base/background/KoniTypes';
-import { getBondedValidators, getExistUnstakeErrorMessage, getMaxValidatorErrorMessage, getMinStakeErrorMessage } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import BaseNativeStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base';
 import { BasicTxErrorType, EarningStatus, OptimalYieldPath, StakingTxErrorType, SubmitJoinNativeStaking, SubmitYieldJoinData, YieldStepBaseInfo, YieldStepType } from '@subwallet/extension-base/types';
 import { isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
@@ -12,6 +11,10 @@ import { t } from 'i18next';
 import { BN, BN_ZERO } from '@polkadot/util';
 
 import { _STAKING_CHAIN_GROUP } from '../../constants';
+import {
+  getBondedValidators,
+  getExistUnstakeErrorMessage, getMaxValidatorErrorMessage, getMinStakeErrorMessage
+} from "@subwallet/extension-base/services/earning-service/utils";
 
 export default abstract class BaseParaNativeStakingPoolHandler extends BaseNativeStakingPoolHandler {
   /* Join pool action */

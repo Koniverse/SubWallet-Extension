@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
-import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { YieldPoolType } from '@subwallet/extension-base/types';
 import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
@@ -24,6 +23,7 @@ import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending } from 'phospho
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import {getValidatorLabel} from "@subwallet/extension-base/services/earning-service/utils";
 
 interface Props extends ThemeProps, BasicInputWrapper {
   chain: string;

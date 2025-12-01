@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP, RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -12,6 +11,7 @@ import { Icon, ModalContext, Number, SwModal, Tooltip } from '@subwallet/react-u
 import { Info } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
+import {getValidatorLabel} from "@subwallet/extension-base/services/earning-service/utils";
 
 type Props = ThemeProps & {
   onCancel?: () => void;

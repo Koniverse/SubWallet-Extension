@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import AvatarGroup, { BaseAccountInfo } from '@subwallet/extension-koni-ui/components/Account/Info/AvatarGroup';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
@@ -13,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+import {getValidatorLabel} from "@subwallet/extension-base/services/earning-service/utils";
 
 type Props = ThemeProps & {
   label: string;

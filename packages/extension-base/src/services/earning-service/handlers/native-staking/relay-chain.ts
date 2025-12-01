@@ -4,15 +4,53 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType, NominationInfo, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { calculateAlephZeroValidatorReturn, calculateChainStakedReturnV2, calculateInflation, calculateTernoaValidatorReturn, calculateValidatorStakedReturn, getAvgValidatorEraReward, getCommission, getMaxValidatorErrorMessage, getMinStakeErrorMessage, getRelayBlockedValidatorList, getRelayEraRewardMap, getRelayMaxNominations, getRelayTopValidatorByPoints, getRelayValidatorPointsMap, getRelayWaitingValidatorList, getSupportedDaysByHistoryDepth } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
 import { _STAKING_CHAIN_GROUP, MaxEraRewardPointsEras } from '@subwallet/extension-base/services/earning-service/constants';
-import { applyDecimal, parseIdentity } from '@subwallet/extension-base/services/earning-service/utils';
-import { AllValidatorInfo, BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, PalletStakingActiveEraInfo, PalletStakingExposure, PalletStakingExposureItem, PalletStakingNominations, PalletStakingStakingLedger, SpStakingExposurePage, SpStakingPagedExposureMetadata, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, SubmitYieldJoinData, TernoaStakingRewardsStakingRewardsData, TransactionData, UnstakingStatus, ValidatorExtraInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import {
+  applyDecimal,
+  calculateAlephZeroValidatorReturn,
+  calculateChainStakedReturnV2,
+  calculateInflation,
+  calculateTernoaValidatorReturn,
+  calculateValidatorStakedReturn, getAvgValidatorEraReward,
+  getCommission,
+  getMaxValidatorErrorMessage, getMinStakeErrorMessage, getSupportedDaysByHistoryDepth,
+  parseIdentity
+} from '@subwallet/extension-base/services/earning-service/utils';
+import {
+  AllValidatorInfo,
+  BaseYieldPositionInfo,
+  BasicTxErrorType,
+  EarningStatus,
+  NativeYieldPoolInfo,
+  OptimalYieldPath,
+  PalletStakingActiveEraInfo,
+  PalletStakingEraRewardPoints,
+  PalletStakingExposure,
+  PalletStakingExposureItem,
+  PalletStakingNominations,
+  PalletStakingStakingLedger, PalletStakingValidatorPrefs,
+  SpStakingExposurePage,
+  SpStakingPagedExposureMetadata,
+  StakeCancelWithdrawalParams,
+  StakingTxErrorType,
+  SubmitChangeValidatorStaking,
+  SubmitJoinNativeStaking,
+  SubmitYieldJoinData,
+  TernoaStakingRewardsStakingRewardsData,
+  TransactionData,
+  UnstakingStatus,
+  ValidatorExtraInfo,
+  ValidatorInfo,
+  YieldPoolInfo,
+  YieldPoolMethodInfo,
+  YieldPositionInfo,
+  YieldTokenBaseInfo
+} from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
-import BigN from 'bignumber.js';
+import BigN, { BigNumber } from 'bignumber.js';
 import { t } from 'i18next';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -857,4 +895,104 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     return nominateTx;
   }
   /* Other actions */
+}
+
+function getRelayValidatorPointsMap (eraRewardMap: Record<string, PalletStakingEraRewardPoints>) {
+  // mapping store validator and totalPoints
+  const validatorTotalPointsMap: Record<string, BigNumber> = {};
+
+  Object.values(eraRewardMap).forEach((info) => {
+    const individual = info.individual;
+
+    Object.entries(individual).forEach(([validator, points]) => {
+      if (!validatorTotalPointsMap[validator]) {
+        validatorTotalPointsMap[validator] = new BigNumber(points);
+      } else {
+        validatorTotalPointsMap[validator] = validatorTotalPointsMap[validator].plus(points);
+      }
+    });
+  });
+
+  return validatorTotalPointsMap;
+}
+
+function getRelayTopValidatorByPoints (validatorPointsList: Record<string, BigNumber>) {
+  const sortValidatorPointsList = Object.fromEntries(
+    Object.entries(validatorPointsList)
+      .sort(
+        (
+          a: [string, BigNumber],
+          b: [string, BigNumber]
+        ) => a[1].minus(b[1]).toNumber()
+      )
+      .reverse()
+  );
+
+  // keep 50% first validator
+  const entries = Object.entries(sortValidatorPointsList);
+  const endIndex = Math.ceil(entries.length / 2);
+  const top50PercentEntries = entries.slice(0, endIndex);
+  const top50PercentRecord = Object.fromEntries(top50PercentEntries);
+
+  return Object.keys(top50PercentRecord);
+}
+
+function getRelayBlockedValidatorList (validators: any[]) {
+  const blockValidatorList: string[] = [];
+
+  for (const validator of validators) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    const validatorAddress = validator[0].toHuman()[0] as string;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    const validatorPrefs = validator[1].toHuman() as unknown as PalletStakingValidatorPrefs;
+
+    const isBlocked = validatorPrefs.blocked;
+
+    if (isBlocked) {
+      blockValidatorList.push(validatorAddress);
+    }
+  }
+
+  return blockValidatorList;
+}
+
+function getRelayWaitingValidatorList (validators: any[]) {
+  const waitingValidators: string[] = [];
+
+  for (const validator of validators) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    const validatorAddress = validator[0].toHuman()[0] as string;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    const validatorPrefs = validator[1].toHuman() as unknown as PalletStakingValidatorPrefs;
+
+    const isBlocked = validatorPrefs.blocked;
+
+    if (!isBlocked) {
+      waitingValidators.push(validatorAddress);
+    }
+  }
+
+  return waitingValidators;
+}
+
+function getRelayEraRewardMap (eraRewardPointArray: Codec[], startEraForPoints: number) {
+  const eraRewardMap: Record<string, PalletStakingEraRewardPoints> = {};
+
+  for (const item of eraRewardPointArray) {
+    eraRewardMap[startEraForPoints] = item.toPrimitive() as unknown as PalletStakingEraRewardPoints;
+    startEraForPoints++;
+  }
+
+  return eraRewardMap;
+}
+
+async function getRelayMaxNominations (substrateApi: _SubstrateApi, chain: string) {
+  await substrateApi.isReady;
+  const maxNominations = substrateApi.api.consts.staking?.maxNominations?.toString();
+  const _maxNominationsByNominationQuota = await substrateApi.api.call.stakingApi?.nominationsQuota(0);
+  const maxNominationsByNominationQuota = _maxNominationsByNominationQuota?.toString();
+
+  const fallbackMaxNominations = ['zkverify_testnet', 'zkverify'].includes(chain) ? '10' : '16';
+
+  return maxNominationsByNominationQuota || maxNominations || fallbackMaxNominations;
 }

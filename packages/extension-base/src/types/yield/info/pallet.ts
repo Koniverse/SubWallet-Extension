@@ -1,8 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { BN } from '@polkadot/util';
-
 export interface PalletStakingExposureItem {
   who: string,
   value: number
@@ -38,18 +36,6 @@ export interface PalletDappsStakingAccountLedger {
   unbondingInfo: {
     unlockingChunks: PalletDappsStakingUnlockingChunk[]
   }
-}
-
-export interface BlockHeader {
-  parentHash: string,
-  number: number,
-  stateRoot: string,
-  extrinsicsRoot: string
-}
-
-export interface ParachainStakingStakeOption {
-  owner: string,
-  amount: number
 }
 
 export interface ParachainStakingCandidateMetadata {
@@ -105,11 +91,6 @@ export interface PalletIdentityRegistration {
 }
 
 export type PalletIdentitySuper = [string, { Raw: string }]
-
-export interface Unlocking {
-  remainingEras: BN;
-  value: BN;
-}
 
 export interface TernoaStakingRewardsStakingRewardsData {
   sessionEraPayout: string,
@@ -183,4 +164,23 @@ export interface SpStakingPagedExposureMetadata {
   own: number,
   nominatorCount: number,
   pageCount: number
+}
+
+export interface PalletIdentityRegistration {
+  judgements: any[],
+  deposit: number,
+  info: {
+    display: {
+      Raw: string
+    },
+    web: {
+      Raw: string
+    },
+    twitter: {
+      Raw: string
+    },
+    riot: {
+      Raw: string
+    }
+  }
 }

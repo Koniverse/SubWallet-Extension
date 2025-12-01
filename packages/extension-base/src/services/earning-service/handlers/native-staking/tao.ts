@@ -5,7 +5,6 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
-import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
@@ -21,6 +20,7 @@ import { BehaviorSubject, combineLatest } from 'rxjs';
 import { BN, BN_ZERO } from '@polkadot/util';
 
 import { fetchPoolsData } from '../../service';
+import {getEarningStatusByNominations} from "@subwallet/extension-base/services/earning-service/utils";
 
 type Nominators = [Array<[number, number]>]
 

@@ -1,10 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import {ExtrinsicType} from '@subwallet/extension-base/background/KoniTypes';
 
-import { BaseRequestSign, InternalRequestSign } from '../../transaction';
-import { BasePoolInfo, UnstakingInfo, YieldPoolInfo } from '../info';
+import {BaseRequestSign, InternalRequestSign} from '../../transaction';
+import {BasePoolInfo, UnstakingInfo, YieldPoolInfo} from '../info';
 
 /**
  * @interface YieldLeaveParams
@@ -111,4 +111,16 @@ export interface RequestEarningImpact {
   value: string;
   netuid: number;
   type: ExtrinsicType;
+}
+
+export enum YieldAction {
+  STAKE = 'STAKE',
+  UNSTAKE = 'UNSTAKE',
+  WITHDRAW = 'WITHDRAW',
+  CLAIM_REWARD = 'CLAIM_REWARD',
+  CANCEL_UNSTAKE = 'CANCEL_UNSTAKE',
+
+  START_EARNING = 'EARN',
+  WITHDRAW_EARNING = 'WITHDRAW_EARNING',
+  CUSTOM_ACTION = 'CUSTOM_ACTION'
 }

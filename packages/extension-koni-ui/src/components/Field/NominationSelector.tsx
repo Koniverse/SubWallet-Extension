@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { YieldPoolInfo } from '@subwallet/extension-base/types';
 import { StakingNominationItem } from '@subwallet/extension-koni-ui/components';
 import { Avatar } from '@subwallet/extension-koni-ui/components/Avatar';
@@ -19,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { GeneralEmptyList } from '../EmptyList';
+import {getValidatorLabel} from "@subwallet/extension-base/services/earning-service/utils";
 
 interface Props extends ThemeProps, BasicInputWrapper {
   nominators: NominationInfo[];
