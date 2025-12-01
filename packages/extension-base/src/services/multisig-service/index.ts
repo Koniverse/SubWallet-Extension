@@ -3,19 +3,17 @@
 
 import { CRON_REFRESH_MULTISIG_PENDING_TX_INTERVAL } from '@subwallet/extension-base/constants';
 import { CronServiceInterface, ServiceStatus } from '@subwallet/extension-base/services/base/types';
+import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { EventService } from '@subwallet/extension-base/services/event-service';
-import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
-import {ChainService} from "@subwallet/extension-base/services/chain-service";
 
 // todo: deploy online
-const MULTISIG_SUPPORTED_CHAINS = ['statemint', 'statemine', 'paseo_assethub', "paseoTest"];
+const MULTISIG_SUPPORTED_CHAINS = ['statemint', 'statemine', 'paseo_assethub', 'paseoTest'];
 
 export class MultisigService implements CronServiceInterface {
   status: ServiceStatus;
   private refreshPendingMultisigTimeout: NodeJS.Timeout | undefined;
 
   constructor (
-    private readonly keyringService: KeyringService,
     private readonly eventService: EventService,
     private readonly chainService: ChainService,
     private readonly cronInterval: number = CRON_REFRESH_MULTISIG_PENDING_TX_INTERVAL
@@ -43,7 +41,7 @@ export class MultisigService implements CronServiceInterface {
       await this.startCron();
       this.status = ServiceStatus.STARTED;
     } catch (error) {
-      console.error('Failed to start MultisigService', error);
+      console.error('Failed to start Multisig Service', error);
     }
   }
 
@@ -59,7 +57,7 @@ export class MultisigService implements CronServiceInterface {
       await this.stopCron();
       this.status = ServiceStatus.STOPPED;
     } catch (error) {
-      console.error('Failed to stop MultisigService', error);
+      console.error('Failed to stop Multisig Service', error);
     }
   }
 
@@ -71,7 +69,7 @@ export class MultisigService implements CronServiceInterface {
 
   async fetchPendingMultisigTxs (): Promise<void> {
     // TODO: implement blockchain fetch logic
-    const multisigAddresses: string[] = ["1627ti7gKnn5aTp7a7SUVsgnM9wE6BCNw6CgCzKiVeJz5DDA"]; // todo: getAllMultisigAddresses this.keyringService.context.getAllMultisigAddresses();
+    const multisigAddresses: string[] = ['1627ti7gKnn5aTp7a7SUVsgnM9wE6BCNw6CgCzKiVeJz5DDA']; // todo: getAllMultisigAddresses this.keyringService.context.getAllMultisigAddresses();
 
     if (!multisigAddresses.length) {
       return;
@@ -81,9 +79,9 @@ export class MultisigService implements CronServiceInterface {
     const multisigAddress = multisigAddresses[0];
 
     for (const chain of MULTISIG_SUPPORTED_CHAINS) {
-      const substrateApi = await this.chainService.getSubstrateApi(chain).isReady();
+      const substrateApi = await this.chainService.getSubstrateApi(chain).isReady;
 
-      const mt = await substrateApi.multisig.multisigs.entries(address)
+      const mt = await substrateApi.api.query.multisig.multisigs.entries(multisigAddress);
     }
 
     return Promise.resolve();
@@ -92,7 +90,7 @@ export class MultisigService implements CronServiceInterface {
   private cronFetchPendingMultisigTransactions () {
     clearTimeout(this.refreshPendingMultisigTimeout);
 
-    this.fetchPendingMultisigTxs().catch((e) => console.error('Failed to fetch pending multisig transactions', e))
+    this.fetchPendingMultisigTxs().catch((e) => console.error('Failed to fetch pending multisig transactions', e));
     this.refreshPendingMultisigTimeout = setTimeout(this.cronFetchPendingMultisigTransactions.bind(this), this.cronInterval);
   }
 }
