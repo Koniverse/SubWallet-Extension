@@ -6,7 +6,7 @@ import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/backg
 import { _handleDisplayInsufficientEarningError } from '@subwallet/extension-base/core/logic-validation/earning';
 import { _getAssetDecimals, _getAssetSymbol, _getSubstrateGenesisHash, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import {getValidatorLabel, isLendingPool, isLiquidPool} from '@subwallet/extension-base/services/earning-service/utils';
+import { getValidatorLabel, isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { EarningStatus, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy } from '@subwallet/extension-base/utils';

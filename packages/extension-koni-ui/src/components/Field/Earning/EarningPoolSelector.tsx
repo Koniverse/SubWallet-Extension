@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { getValidatorLabel } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolType } from '@subwallet/extension-base/types';
 import { fetchStaticData } from '@subwallet/extension-base/utils';
 import { StakingPoolItem } from '@subwallet/extension-koni-ui/components';
@@ -19,7 +20,6 @@ import { Book, CaretLeft, FadersHorizontal, SortAscending, ThumbsUp } from 'phos
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import {getValidatorLabel} from "@subwallet/extension-base/services/earning-service/utils";
 
 interface Props extends ThemeProps, BasicInputWrapper {
   slug: string;

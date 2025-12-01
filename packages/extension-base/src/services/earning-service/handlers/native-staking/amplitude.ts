@@ -7,11 +7,7 @@ import { APIItemState, ExtrinsicType, NominationInfo, UnstakingInfo } from '@sub
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
-import {
-  getBondedValidators, getEarningStatusByNominations,
-  isUnstakeAll,
-  parseIdentity
-} from '@subwallet/extension-base/services/earning-service/utils';
+import { getBondedValidators, getEarningStatusByNominations, isUnstakeAll, parseIdentity } from '@subwallet/extension-base/services/earning-service/utils';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingStatus, ValidatorInfo, YieldPoolInfo, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, parseRawNumber, reformatAddress } from '@subwallet/extension-base/utils';
 

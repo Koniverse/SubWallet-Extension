@@ -165,22 +165,3 @@ export interface SpStakingPagedExposureMetadata {
   nominatorCount: number,
   pageCount: number
 }
-
-export interface PalletIdentityRegistration {
-  judgements: any[],
-  deposit: number,
-  info: {
-    display: {
-      Raw: string
-    },
-    web: {
-      Raw: string
-    },
-    twitter: {
-      Raw: string
-    },
-    riot: {
-      Raw: string
-    }
-  }
-}

@@ -7,6 +7,7 @@ import { APIItemState, ExtrinsicType, NominationInfo } from '@subwallet/extensio
 import { _EXPECTED_BLOCK_TIME, _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
+import { getCommission } from '@subwallet/extension-base/services/earning-service/utils';
 import { BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, UnstakingStatus, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
@@ -14,7 +15,6 @@ import BigN from 'bignumber.js';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
 import { Codec } from '@polkadot/types/types';
-import {getCommission} from "@subwallet/extension-base/services/earning-service/utils";
 
 interface PalletCollatorStakingCandidateInfo {
   stake: string,

@@ -3,6 +3,7 @@
 
 import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { _STAKING_CHAIN_GROUP, RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
+import { getValidatorLabel } from '@subwallet/extension-base/services/earning-service/utils';
 import { NominationInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
 import { SelectValidatorInput, StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
@@ -23,7 +24,6 @@ import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending } from 'phospho
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import {getValidatorLabel} from "@subwallet/extension-base/services/earning-service/utils";
 
 interface Props extends ThemeProps, BasicInputWrapper {
   chain: string;

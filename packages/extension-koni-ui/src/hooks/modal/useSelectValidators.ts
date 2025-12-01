@@ -1,12 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { getValidatorLabel } from '@subwallet/extension-base/services/earning-service/utils';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { BasicOnChangeFunction } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks/common';
 import { ModalContext } from '@subwallet/react-ui';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import {getValidatorLabel} from "@subwallet/extension-base/services/earning-service/utils";
 
 export function useSelectValidators (modalId: string, chain: string, maxCount: number, onChange?: BasicOnChangeFunction, isSingleSelect?: boolean) {
   const notify = useNotification();

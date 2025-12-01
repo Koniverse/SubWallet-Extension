@@ -6,6 +6,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ExtrinsicType, NominationInfo, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
+import { getEarningStatusByNominations } from '@subwallet/extension-base/services/earning-service/utils';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, PalletDappsStakingAccountLedger, PalletDappsStakingDappInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingStatus, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, isUrl, parseRawNumber, reformatAddress } from '@subwallet/extension-base/utils';
 
@@ -16,7 +17,6 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import BaseParaNativeStakingPoolHandler from './base-para';
-import {getEarningStatusByNominations} from "@subwallet/extension-base/services/earning-service/utils";
 
 const convertAddress = (address: string) => {
   return isEthereumAddress(address) ? address.toLowerCase() : address;

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
+import { getValidatorLabel } from '@subwallet/extension-base/services/earning-service/utils';
 import { StakingNominationItem } from '@subwallet/extension-web-ui/components';
 import { Avatar } from '@subwallet/extension-web-ui/components/Avatar';
 import { BasicInputWrapper } from '@subwallet/extension-web-ui/components/Field/Base';
@@ -17,7 +18,6 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { GeneralEmptyList } from '../EmptyList';
-import {getValidatorLabel} from "@subwallet/extension-base/services/earning-service/utils";
 
 interface Props extends ThemeProps, BasicInputWrapper {
   nominators: NominationInfo[];

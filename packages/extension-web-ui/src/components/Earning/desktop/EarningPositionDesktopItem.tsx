@@ -1,7 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {YieldAction, YieldPoolInfo, YieldPoolType} from '@subwallet/extension-base/types';
+import { getYieldAvailableActionsByPosition, getYieldAvailableActionsByType } from '@subwallet/extension-base/services/earning-service/utils';
+import { YieldAction, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { BN_TEN } from '@subwallet/extension-base/utils';
 import { MetaInfo } from '@subwallet/extension-web-ui/components';
 import EarningTypeTag from '@subwallet/extension-web-ui/components/Earning/EarningTypeTag';
@@ -16,10 +17,6 @@ import CN from 'classnames';
 import { MinusCircle, PlusCircle, Question, StopCircle, Wallet } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
-import {
-  getYieldAvailableActionsByPosition,
-  getYieldAvailableActionsByType
-} from "@subwallet/extension-base/services/earning-service/utils";
 
 interface Props extends ThemeProps {
   onClickCancelUnStakeButton: () => void;

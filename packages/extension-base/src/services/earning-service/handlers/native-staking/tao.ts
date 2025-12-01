@@ -9,6 +9,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
+import { getEarningStatusByNominations } from '@subwallet/extension-base/services/earning-service/utils';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
@@ -20,7 +21,6 @@ import { BehaviorSubject, combineLatest } from 'rxjs';
 import { BN, BN_ZERO } from '@polkadot/util';
 
 import { fetchPoolsData } from '../../service';
-import {getEarningStatusByNominations} from "@subwallet/extension-base/services/earning-service/utils";
 
 type Nominators = [Array<[number, number]>]
 

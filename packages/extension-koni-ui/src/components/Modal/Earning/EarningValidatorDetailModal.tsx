@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _STAKING_CHAIN_GROUP, RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
+import { getValidatorLabel } from '@subwallet/extension-base/services/earning-service/utils';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainPrefixBySlug } from '@subwallet/extension-koni-ui/hooks';
@@ -11,7 +12,6 @@ import { Icon, ModalContext, Number, SwModal, Tooltip } from '@subwallet/react-u
 import { Info } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
-import {getValidatorLabel} from "@subwallet/extension-base/services/earning-service/utils";
 
 type Props = ThemeProps & {
   onCancel?: () => void;

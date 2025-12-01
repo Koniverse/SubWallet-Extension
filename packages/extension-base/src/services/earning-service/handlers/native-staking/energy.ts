@@ -6,10 +6,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ExtrinsicType, NominationInfo, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { _EXPECTED_BLOCK_TIME, _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import {
-  calculateEnergyWebCollatorReturn, getBondedValidators, getEarningStatusByNominations, isUnstakeAll,
-  parseIdentity
-} from '@subwallet/extension-base/services/earning-service/utils';
+import { calculateEnergyWebCollatorReturn, getBondedValidators, getEarningStatusByNominations, isUnstakeAll, parseIdentity } from '@subwallet/extension-base/services/earning-service/utils';
 import { BaseYieldPositionInfo, BasicTxErrorType, CollatorExtraInfo, EarningStatus, NativeYieldPoolInfo, PalletParachainStakingDelegationInfo, PalletParachainStakingRequestType, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingStatus, ValidatorInfo, YieldPoolInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, parseRawNumber, reformatAddress } from '@subwallet/extension-base/utils';
 

@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { getValidatorLabel } from '@subwallet/extension-base/services/earning-service/utils';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { BasicOnChangeFunction } from '@subwallet/extension-web-ui/components/Field/Base';
 import { useNotification, useTranslation } from '@subwallet/extension-web-ui/hooks/common';
@@ -8,7 +9,6 @@ import { ValidatorDataType } from '@subwallet/extension-web-ui/types';
 import { autoSelectValidatorOptimally, getValidatorKey } from '@subwallet/extension-web-ui/utils';
 import { ModalContext } from '@subwallet/react-ui';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import {getValidatorLabel} from "@subwallet/extension-base/services/earning-service/utils";
 
 export function useSelectValidators (validatorList: ValidatorDataType[], modalId: string, chain: string, maxCount: number, onChange?: BasicOnChangeFunction, isSingleSelect?: boolean) {
   const notify = useNotification();

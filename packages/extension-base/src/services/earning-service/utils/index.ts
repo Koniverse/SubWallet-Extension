@@ -1,40 +1,19 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import {_SubstrateApi} from '@subwallet/extension-base/services/chain-service/types';
-import {
-  _STAKING_CHAIN_GROUP,
-  RELAY_HANDLER_DIRECT_STAKING_CHAINS
-} from '@subwallet/extension-base/services/earning-service/constants';
-import {
-  EarningStatus,
-  LendingYieldPoolInfo,
-  LiquidYieldPoolInfo,
-  NativeYieldPoolInfo,
-  NominationYieldPoolInfo,
-  PalletIdentityRegistration,
-  PalletIdentitySuper,
-  UnstakingStatus, YieldAction,
-  YieldAssetExpectedEarning,
-  YieldCompoundingPeriod,
-  YieldPoolInfo,
-  YieldPoolType,
-  YieldPositionInfo
-} from '@subwallet/extension-base/types';
-
-import {BN, BN_BILLION, BN_HUNDRED, BN_MILLION, BN_THOUSAND, hexToString, isHex} from '@polkadot/util';
-import {
-  _KNOWN_CHAIN_INFLATION_PARAMS,
-  _SUBSTRATE_DEFAULT_INFLATION_PARAMS,
-  _SubstrateInflationParams
-} from "@subwallet/extension-base/services/chain-service/constants";
-import {_getChainNativeTokenBasicInfo} from "@subwallet/extension-base/services/chain-service/utils";
+import { _ChainInfo } from '@subwallet/chain-list/types';
+import { NominationInfo, StakingType } from '@subwallet/extension-base/background/KoniTypes';
+import { _KNOWN_CHAIN_INFLATION_PARAMS, _SUBSTRATE_DEFAULT_INFLATION_PARAMS, _SubstrateInflationParams } from '@subwallet/extension-base/services/chain-service/constants';
+import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
+import { _getChainNativeTokenBasicInfo } from '@subwallet/extension-base/services/chain-service/utils';
+import { _STAKING_CHAIN_GROUP, RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
+import { EarningStatus, LendingYieldPoolInfo, LiquidYieldPoolInfo, NativeYieldPoolInfo, NominationYieldPoolInfo, PalletIdentityRegistration, PalletIdentitySuper, UnstakingStatus, YieldAction, YieldAssetExpectedEarning, YieldCompoundingPeriod, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { balanceFormatter, detectTranslate, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
-import {_ChainInfo} from '@subwallet/chain-list/types';
-import {NominationInfo, StakingType} from "@subwallet/extension-base/background/KoniTypes";
-import {balanceFormatter, detectTranslate, formatNumber, reformatAddress} from "@subwallet/extension-base/utils";
 import { t } from 'i18next';
+
 import { Codec } from '@polkadot/types/types';
+import { BN, BN_BILLION, BN_HUNDRED, BN_MILLION, BN_THOUSAND, hexToString, isHex } from '@polkadot/util';
 
 export function calculateReward (apr: number, amount = 0, compoundingPeriod = YieldCompoundingPeriod.YEARLY, isApy = false): YieldAssetExpectedEarning {
   if (!apr) {
@@ -229,13 +208,13 @@ export function calculateInflation (totalEraStake: BN, totalIssuance: BN, numAuc
   }
 }
 
-export async function calculateChainStakedReturnV2(chainInfo: _ChainInfo, totalIssuance: string, erasPerDay: number, lastTotalStaked: string, validatorEraReward: BigNumber, inflation: BigNumber, isCompound?: boolean) {
+export async function calculateChainStakedReturnV2 (chainInfo: _ChainInfo, totalIssuance: string, erasPerDay: number, lastTotalStaked: string, validatorEraReward: BigNumber, inflation: BigNumber, isCompound?: boolean) {
   if (chainInfo.slug === 'analog_timechain') {
     return await calculateAnalogChainStakedReturn();
   }
 
   const DAYS_PER_YEAR = 365;
-  const {decimals} = _getChainNativeTokenBasicInfo(chainInfo);
+  const { decimals } = _getChainNativeTokenBasicInfo(chainInfo);
 
   const lastTotalStakedUnit = (new BigNumber(lastTotalStaked)).dividedBy(new BigNumber(10 ** decimals));
   const totalIssuanceUnit = (new BigNumber(totalIssuance)).dividedBy(new BigNumber(10 ** decimals));
@@ -258,18 +237,18 @@ export async function calculateChainStakedReturnV2(chainInfo: _ChainInfo, totalI
   return averageRewardRate.toNumber();
 }
 
-export function calculateAlephZeroValidatorReturn(chainStakedReturn: number, commission: number) {
+export function calculateAlephZeroValidatorReturn (chainStakedReturn: number, commission: number) {
   return chainStakedReturn * (100 - commission) / 100;
 }
 
-export function calculateEnergyWebCollatorReturn(annualReward: string, collatorCommission: number, numberCollators: number, totalStake: string): number {
+export function calculateEnergyWebCollatorReturn (annualReward: string, collatorCommission: number, numberCollators: number, totalStake: string): number {
   const rewardForNominators = new BigNumber(annualReward).multipliedBy(1 - collatorCommission);
   const rewardPerNominator = rewardForNominators.div(numberCollators);
 
   return rewardPerNominator.div(totalStake).shiftedBy(2).toNumber();
 }
 
-export function calculateTernoaValidatorReturn(rewardPerValidator: number, validatorStake: number, commission: number) {
+export function calculateTernoaValidatorReturn (rewardPerValidator: number, validatorStake: number, commission: number) {
   const percentRewardForNominators = (100 - commission) / 100;
   const rewardForNominators = rewardPerValidator * percentRewardForNominators;
 
@@ -278,7 +257,7 @@ export function calculateTernoaValidatorReturn(rewardPerValidator: number, valid
   return stakeRatio * 365 * 100;
 }
 
-export async function calculateAnalogChainStakedReturn(): Promise<number | undefined> {
+export async function calculateAnalogChainStakedReturn (): Promise<number | undefined> {
   const url = 'https://explorer-api.analog.one/api/nominations?projection=apy,rewardsClaimed,eraEndsTime';
 
   try {
@@ -309,7 +288,7 @@ export async function calculateAnalogChainStakedReturn(): Promise<number | undef
   }
 }
 
-export function calculateValidatorStakedReturn(chainStakedReturn: number, totalValidatorStake: BN, avgStake: BN, commission: number) {
+export function calculateValidatorStakedReturn (chainStakedReturn: number, totalValidatorStake: BN, avgStake: BN, commission: number) {
   const bnAdjusted = avgStake.mul(BN_HUNDRED).div(totalValidatorStake);
   const adjusted = bnAdjusted.toNumber() * chainStakedReturn;
   // todo: should calculated in bignumber instead number?
@@ -380,7 +359,7 @@ export function getEarningStatusByNominations (bnTotalActiveStake: BN, nominatio
   return stakingStatus;
 }
 
-export function getAvgValidatorEraReward(supportedDays: number, eraRewardHistory: Codec[]) {
+export function getAvgValidatorEraReward (supportedDays: number, eraRewardHistory: Codec[]) {
   let sumEraReward = new BigNumber(0);
   let failEra = 0;
 
@@ -399,7 +378,7 @@ export function getAvgValidatorEraReward(supportedDays: number, eraRewardHistory
   return sumEraReward.dividedBy(new BigNumber(supportedDays - failEra));
 }
 
-export function getSupportedDaysByHistoryDepth(erasPerDay: number, maxSupportedEras: number, liveDay?: number) {
+export function getSupportedDaysByHistoryDepth (erasPerDay: number, maxSupportedEras: number, liveDay?: number) {
   const maxSupportDay = Math.floor(maxSupportedEras / erasPerDay);
 
   if (liveDay && liveDay <= 30) {
@@ -425,7 +404,7 @@ export const getMinStakeErrorMessage = (chainInfo: _ChainInfo, bnMinStake: BN): 
   });
 };
 
-export function getYieldAvailableActionsByType(yieldPoolInfo: YieldPoolInfo): YieldAction[] {
+export function getYieldAvailableActionsByType (yieldPoolInfo: YieldPoolInfo): YieldAction[] {
   if ([YieldPoolType.NATIVE_STAKING, YieldPoolType.NOMINATION_POOL].includes(yieldPoolInfo.type)) {
     if (yieldPoolInfo.type === YieldPoolType.NOMINATION_POOL) {
       return [YieldAction.STAKE, YieldAction.CLAIM_REWARD, YieldAction.UNSTAKE, YieldAction.WITHDRAW];
@@ -453,7 +432,7 @@ export function getYieldAvailableActionsByType(yieldPoolInfo: YieldPoolInfo): Yi
   return [YieldAction.STAKE, YieldAction.UNSTAKE, YieldAction.WITHDRAW, YieldAction.CANCEL_UNSTAKE];
 }
 
-export function getYieldAvailableActionsByPosition(yieldPosition: YieldPositionInfo, yieldPoolInfo: YieldPoolInfo, unclaimedReward?: string): YieldAction[] {
+export function getYieldAvailableActionsByPosition (yieldPosition: YieldPositionInfo, yieldPoolInfo: YieldPoolInfo, unclaimedReward?: string): YieldAction[] {
   const result: YieldAction[] = [];
 
   if ([YieldPoolType.NATIVE_STAKING, YieldPoolType.NOMINATION_POOL].includes(yieldPoolInfo.type)) {
@@ -508,7 +487,7 @@ export function getYieldAvailableActionsByPosition(yieldPosition: YieldPositionI
   return result;
 }
 
-export function getValidatorLabel(chain: string) {
+export function getValidatorLabel (chain: string) {
   if (_STAKING_CHAIN_GROUP.astar.includes(chain)) {
     return 'dApp';
   } else if (RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(chain) || _STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
@@ -548,8 +527,9 @@ export const getMaxValidatorErrorMessage = (chainInfo: _ChainInfo, max: number):
     }
   }
 
-  return t(message, {replace: {number: max}});
+  return t(message, { replace: { number: max } });
 };
+
 export const getExistUnstakeErrorMessage = (chain: string, type?: StakingType, isStakeMore?: boolean): string => {
   const label = getValidatorLabel(chain);
 

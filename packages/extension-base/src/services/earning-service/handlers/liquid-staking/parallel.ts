@@ -12,11 +12,6 @@ import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import BaseLiquidStakingPoolHandler from './base';
 
-interface UnlockingChunk {
-  value: number,
-  era: number
-}
-
 interface PalletStakingStakingLedger {
   stash: string,
   total: number,
