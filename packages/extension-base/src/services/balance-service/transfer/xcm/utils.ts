@@ -40,7 +40,7 @@ export type DryRunResult = {
   hops: THopInfo[]
 }
 
-interface GetXcmFeeRequest {
+export interface GetXcmFeeRequest {
   sender: string,
   recipient: string,
   value: string,
@@ -339,8 +339,8 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   return await response.json() as GetXcmFeeResult;
 }
 
-export async function fetchMinXcmTransferableAmount (request: CreateXcmExtrinsicProps) {
-  const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
+export async function fetchMinXcmTransferableAmount (request: GetXcmFeeRequest) {
+  const { fromChainInfo: originChain, fromTokenInfo: originTokenInfo, recipient, sender, toChainInfo: destinationChain, value: sendingValue } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
   const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
 
