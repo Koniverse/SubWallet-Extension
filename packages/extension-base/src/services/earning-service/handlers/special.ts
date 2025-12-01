@@ -6,11 +6,11 @@ import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/
 import { ALL_ACCOUNT_KEY, XCM_FEE_RATIO } from '@subwallet/extension-base/constants';
 import { YIELD_POOL_STAT_REFRESH_INTERVAL } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2, getMinXcmTransferableAmount } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { CreateXcmExtrinsicProps, createXcmExtrinsicV2, dryRunXcmExtrinsicV2, getMinXcmTransferableAmount } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetName, _getAssetSymbol, _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { MIN_XCM_LIQUID_STAKING_DOT } from '@subwallet/extension-base/services/earning-service/constants';
-import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitChangeValidatorStaking, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
+import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, MetadataXcmStep, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitChangeValidatorStaking, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
 import { balanceFormatter, createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN from 'bignumber.js';
@@ -279,6 +279,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
           const altChainInfo = this.state.getChainInfo(altInputTokenInfo.originChain);
           const symbol = altInputTokenInfo.symbol;
           const networkName = altChainInfo.name;
+          const substrateApi = this.state.getSubstrateApi(altChainInfo.slug);
 
           // TODO: calculate fee for destination chain
           const xcmFeeInfo = await estimateXcmFee({
@@ -309,12 +310,42 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
             bnTransferAmount = bnTransferAmount.add(bnXcmFee);
           }
 
+          let transferMinXcmAmount = false;
+
+          const id = getId();
+          const feeInfo = await this.state.feeService.subscribeChainFee(id, altChainInfo.slug, 'substrate');
+          const xcmRequest: CreateXcmExtrinsicProps = {
+            destinationTokenInfo: inputTokenInfo,
+            originTokenInfo: altInputTokenInfo,
+            recipient: address,
+            sendingValue: bnTransferAmount.toString(),
+            substrateApi,
+            sender: address,
+            originChain: altChainInfo,
+            destinationChain: this.chainInfo,
+            feeInfo
+          };
+
+          const minXcmTransferableAmount = await getMinXcmTransferableAmount(xcmRequest) ?? MIN_XCM_LIQUID_STAKING_DOT;
+          const isEnoughSendingValue = new BigN(minXcmTransferableAmount).lte(xcmRequest.sendingValue);
+
+          if (!isEnoughSendingValue) {
+            xcmRequest.sendingValue = minXcmTransferableAmount;
+            transferMinXcmAmount = true;
+          }
+
+          const metadata: MetadataXcmStep = {
+            sendingValue: xcmRequest.sendingValue,
+            originTokenInfo: altInputTokenInfo,
+            destinationTokenInfo: inputTokenInfo,
+            inputTokenBalance: inputTokenBalance,
+            altInputTokenBalance: altInputTokenBalance,
+            minXcmTransferableAmount,
+            transferMinXcmAmount
+          };
+
           const step: BaseYieldStepDetail = {
-            metadata: {
-              sendingValue: bnTransferAmount.toString(),
-              originTokenInfo: altInputTokenInfo,
-              destinationTokenInfo: inputTokenInfo
-            },
+            metadata: metadata as unknown as Record<string, unknown>,
             name: `Transfer ${symbol} from ${networkName}`,
             type: YieldStepType.XCM
           };
@@ -366,23 +397,24 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
     return Promise.resolve([new TransactionError(BasicTxErrorType.UNSUPPORTED)]);
   }
 
-  protected async validateXcmStep (params: OptimalYieldPathParams, path: OptimalYieldPath, bnInputTokenBalance: BN): Promise<TransactionError[]> {
+  protected validateXcmStep (params: OptimalYieldPathParams, path: OptimalYieldPath): TransactionError[] {
     const processValidation: YieldProcessValidation = {
       ok: true,
       status: YieldValidationStatus.OK
     };
+    const metadata = path.steps[1].metadata as unknown as MetadataXcmStep;
+    const { altInputTokenBalance, inputTokenBalance, sendingValue, transferMinXcmAmount } = metadata;
 
     const bnStakeAmount = new BN(params.amount);
 
     const altInputTokenSlug = this.altInputAsset || '';
     const altInputTokenInfo = this.state.getAssetBySlug(altInputTokenSlug);
     const inputTokenInfo = this.state.getAssetBySlug(this.inputAsset);
-    const altInputTokenBalance = await this.state.balanceService.getTransferableBalance(params.address, altInputTokenInfo.originChain, altInputTokenSlug);
-
-    const missingAmount = bnStakeAmount.sub(bnInputTokenBalance); // TODO: what if input token is not LOCAL ??
-    const doubleOriginFee = new BN(path.totalFee[1].amount || '0').mul(new BN(XCM_FEE_RATIO));
-
+    const bnInputTokenBalance = new BN(inputTokenBalance.value || '0');
     const bnAltInputTokenBalance = new BN(altInputTokenBalance.value || '0');
+
+    const missingAmount = transferMinXcmAmount ? new BN(sendingValue) : bnStakeAmount.sub(bnInputTokenBalance);
+    const doubleOriginFee = transferMinXcmAmount ? new BN(path.totalFee[1].amount || '0') : new BN(path.totalFee[1].amount || '0').mul(new BN(XCM_FEE_RATIO));
 
     if (!bnAltInputTokenBalance.sub(missingAmount).sub(doubleOriginFee).gt(BN_ZERO)) {
       processValidation.failedStep = path.steps[1];
@@ -503,7 +535,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
           case YieldStepType.DEFAULT:
             return Promise.resolve([]);
           case YieldStepType.XCM:
-            return this.validateXcmStep(params, path, bnInputTokenBalance);
+            return this.validateXcmStep(params, path);
           case YieldStepType.TOKEN_APPROVAL:
             return this.validateTokenApproveStep(params, path);
           default:
@@ -531,25 +563,14 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
     return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
   }
 
-  async handleXcmStep (data: SubmitYieldJoinData, path: OptimalYieldPath, xcmFee: string): Promise<HandleYieldStepData> {
-    const { address, amount } = data as SubmitYieldStepData;
+  async handleXcmStep (data: SubmitYieldJoinData, path: OptimalYieldPath): Promise<HandleYieldStepData> {
+    const { address } = data as SubmitYieldStepData;
+    const metadata = path.steps[1].metadata as unknown as MetadataXcmStep;
+    const { destinationTokenInfo, minXcmTransferableAmount, originTokenInfo, sendingValue } = metadata;
 
-    const destinationTokenSlug = this.inputAsset;
-    const altInputTokenSlug = this.altInputAsset || '';
-    const altInputTokenInfo = this.state.getAssetBySlug(altInputTokenSlug);
-    const originChainInfo = this.state.getChainInfo(altInputTokenInfo.originChain);
+    const originChainInfo = this.state.getChainInfo(originTokenInfo.originChain);
     const originTokenSlug = _getChainNativeTokenSlug(originChainInfo);
-    const originTokenInfo = this.state.getAssetBySlug(originTokenSlug);
-    const destinationTokenInfo = this.state.getAssetBySlug(destinationTokenSlug);
     const substrateApi = this.state.getSubstrateApi(originChainInfo.slug);
-
-    const inputTokenBalance = await this.state.balanceService.getTransferableBalance(address, destinationTokenInfo.originChain, destinationTokenSlug);
-    const bnInputTokenBalance = new BN(inputTokenBalance.value);
-
-    const bnXcmFee = new BN(xcmFee);
-    const bnStakeAmount = new BN(amount);
-
-    const bnTotalAmount = bnStakeAmount.sub(bnInputTokenBalance).add(bnXcmFee);
 
     const id = getId();
     const feeInfo = await this.state.feeService.subscribeChainFee(id, originChainInfo.slug, 'substrate');
@@ -557,7 +578,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       destinationTokenInfo,
       originTokenInfo,
       recipient: address,
-      sendingValue: bnTotalAmount.toString(),
+      sendingValue,
       substrateApi,
       sender: address,
       originChain: originChainInfo,
@@ -565,13 +586,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       feeInfo
     };
 
-    const minXcmTransferableAmount = await getMinXcmTransferableAmount(xcmRequest) ?? MIN_XCM_LIQUID_STAKING_DOT;
     const minXcmTransferableAmountStr = formatNumber(minXcmTransferableAmount.toString(), _getAssetDecimals(destinationTokenInfo), balanceFormatter, { maxNumberFormat: _getAssetDecimals(destinationTokenInfo) });
-    const isEnoughSendingValue = new BigN(minXcmTransferableAmount).lte(xcmRequest.sendingValue);
-
-    if (!isEnoughSendingValue) {
-      xcmRequest.sendingValue = minXcmTransferableAmount;
-    }
 
     const extrinsic = await createXcmExtrinsicV2(xcmRequest);
 
@@ -590,7 +605,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       destinationNetworkKey: destinationTokenInfo.originChain,
       from: address,
       to: address,
-      value: xcmRequest.sendingValue,
+      value: sendingValue,
       tokenSlug: originTokenSlug,
       showExtraWarning: true
     };
@@ -600,7 +615,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       extrinsicType: ExtrinsicType.TRANSFER_XCM,
       extrinsic,
       txData: xcmData,
-      transferNativeAmount: xcmRequest.sendingValue,
+      transferNativeAmount: sendingValue,
       chainType: ChainType.SUBSTRATE
     };
   }
@@ -617,9 +632,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
         return this.handleTokenApproveStep(data, path);
 
       case YieldStepType.XCM: {
-        const xcmFee = path.totalFee[currentStep].amount || '0';
-
-        return this.handleXcmStep(data, path, xcmFee);
+        return this.handleXcmStep(data, path);
       }
 
       default:
