@@ -531,6 +531,7 @@ export const getMaxValidatorErrorMessage = (chainInfo: _ChainInfo, max: number):
 };
 
 export const getExistUnstakeErrorMessage = (chain: string, type?: StakingType, isStakeMore?: boolean): string => {
+  // todo: update all .staking.bonding translate key
   const label = getValidatorLabel(chain);
 
   if (!isStakeMore) {
