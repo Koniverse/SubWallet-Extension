@@ -13,7 +13,7 @@ import MythosNativeStakingPoolHandler from '@subwallet/extension-base/services/e
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
-import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningImpact, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, SubmitChangeValidatorStaking, TransactionData, ValidateYieldProcessParams, ValidatorInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestChangeBittensorRootClaimType, RequestEarlyValidateYield, RequestEarningImpact, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, SubmitChangeValidatorStaking, TransactionData, ValidateYieldProcessParams, ValidatorInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject, combineLatest } from 'rxjs';
@@ -113,8 +113,6 @@ export default class EarningService implements StoppableServiceInterface, Persis
       }
 
       if (_STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
-        // todo: check support for testnet
-        // Mainnet only
         handlers.push(new TaoNativeStakingPoolHandler(this.state, chain));
         handlers.push(new SubnetTaoStakingPoolHandler(this.state, chain));
       }
@@ -1216,6 +1214,24 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     if (handler) {
       return handler.handleChangeEarningValidator(params);
+    } else {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
+    }
+  }
+
+  public async handleChangeRootClaimType (params: RequestChangeBittensorRootClaimType): Promise<TransactionData> {
+    await this.eventService.waitChainReady;
+
+    const { bittensorRootClaimType, chain, slug } = params;
+
+    if (!_STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+    }
+
+    const handler = this.getPoolHandler(slug) as TaoNativeStakingPoolHandler;
+
+    if (handler) {
+      return handler.handleChangeRootClaimType(bittensorRootClaimType);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }

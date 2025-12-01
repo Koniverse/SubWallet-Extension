@@ -61,6 +61,7 @@ export const TERM_AND_CONDITION_SEED_PHRASE_MODAL = 'term-and-condition-seed-phr
 export const EARNING_INSTRUCTION_MODAL = 'earning-instruction-modal';
 export const EARNING_NOMINATION_MODAL = 'earning-nomination-modal';
 export const EARNING_ACITVE_STAKE_DETAILS_MODAL = 'earning-active-stake-details-modal';
+export const EARNING_BITTENSOR_ROOT_CLAIM_TYPE_MODAL = 'earning-bittensor-root-claim-type-modal';
 
 /* Swap */
 export const SWAP_SLIPPAGE_MODAL = 'swap-slippage-modal';
