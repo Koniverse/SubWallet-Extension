@@ -768,6 +768,7 @@ export interface TransactionHistoryItem<ET extends ExtrinsicType = ExtrinsicType
   addressPrefix?: number,
   processId?: string;
   apiTxIndex?: number;
+  crossChainFee?: string
 }
 
 export interface SWWarning {

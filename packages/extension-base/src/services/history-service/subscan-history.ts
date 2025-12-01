@@ -5,7 +5,7 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ChainType, ExtrinsicStatus, ExtrinsicType, TransactionDirection, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
 import { getExtrinsicParserKey, subscanExtrinsicParserMap, supportedExtrinsicParser } from '@subwallet/extension-base/services/history-service/helpers/subscan-extrinsic-parser-helper';
-import { ExtrinsicItem, TransferItem } from '@subwallet/extension-base/services/subscan-service/types';
+import { EventParam, ExtrinsicItem, TransferItem } from '@subwallet/extension-base/services/subscan-service/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 
 export function parseSubscanExtrinsicData (address: string, extrinsicItem: ExtrinsicItem, chainInfo: _ChainInfo): TransactionHistoryItem | null {
@@ -13,6 +13,18 @@ export function parseSubscanExtrinsicData (address: string, extrinsicItem: Extri
 
   if (!supportedExtrinsicParser.includes(extrinsicParserKey)) {
     return null;
+  }
+
+  let crossChainFee = '0';
+
+  if (extrinsicItem.events) {
+    extrinsicItem.events.forEach((event) => {
+      if (event.module_id === 'balances' && event.event_id === 'Burned') {
+        const dataParams = JSON.parse(event.params) as unknown as EventParam[];
+
+        crossChainFee = dataParams.find((data) => data.name === 'amount')?.value || '0';
+      }
+    });
   }
 
   const chainType = chainInfo.substrateInfo ? ChainType.SUBSTRATE : ChainType.EVM;
@@ -48,7 +60,8 @@ export function parseSubscanExtrinsicData (address: string, extrinsicItem: Extri
     },
     status: extrinsicItem.success ? ExtrinsicStatus.SUCCESS : ExtrinsicStatus.FAIL,
     nonce: extrinsicItem.nonce,
-    addressPrefix: networkPrefix
+    addressPrefix: networkPrefix,
+    crossChainFee
   };
 
   try {
@@ -67,6 +80,18 @@ export function parseSubscanTransferData (address: string, transferItem: Transfe
 
   if (!transferItem.from_account_display || !transferItem.to_account_display) {
     return null;
+  }
+
+  let crossChainFee = '0';
+
+  if (transferItem.events) {
+    transferItem.events.forEach((event) => {
+      if (event.module_id === 'balances' && event.event_id === 'Burned') {
+        const dataParams = JSON.parse(event.params) as unknown as EventParam[];
+
+        crossChainFee = dataParams.find((data) => data.name === 'amount')?.value || '0';
+      }
+    });
   }
 
   return {
@@ -95,6 +120,7 @@ export function parseSubscanTransferData (address: string, transferItem: Transfe
       symbol: nativeSymbol
     },
     status: transferItem.success ? ExtrinsicStatus.SUCCESS : ExtrinsicStatus.FAIL,
-    nonce: transferItem.nonce
+    nonce: transferItem.nonce,
+    crossChainFee
   };
 }

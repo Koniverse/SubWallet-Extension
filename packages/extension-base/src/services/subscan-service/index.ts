@@ -4,7 +4,7 @@
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { BASE_FETCH_ORDINAL_EVENT_DATA } from '@subwallet/extension-base/koni/api/nft/ordinal_nft/constants';
 import { SUBSCAN_API_CHAIN_MAP } from '@subwallet/extension-base/services/subscan-service/subscan-chain-map';
-import { CrowdloanContributionsResponse, ExtrinsicItem, ExtrinsicsListResponse, IMultiChainBalance, RequestBlockRange, RewardHistoryListResponse, SubscanResponse, TransferItem, TransfersListResponse } from '@subwallet/extension-base/services/subscan-service/types';
+import { CrowdloanContributionsResponse, ExtrinsicDetail, ExtrinsicItem, ExtrinsicsListResponse, IMultiChainBalance, RequestBlockRange, RewardHistoryListResponse, SubscanResponse, TransferItem, TransfersListResponse } from '@subwallet/extension-base/services/subscan-service/types';
 import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-request-strategy/context/base';
 import { ApiRequestContextProps } from '@subwallet/extension-base/strategy/api-request-strategy/types';
 import { BaseApiRequestStrategyV2 } from '@subwallet/extension-base/strategy/api-request-strategy-v2';
@@ -122,6 +122,22 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
     }, 0, groupId);
   }
 
+  public getExtrinsicDetail (chain: string, extrinsicIndex: string): Promise<ExtrinsicDetail> {
+    return this.addRequest<ExtrinsicDetail>(async () => {
+      const rs = await this.postRequest(this.getApiUrl(chain, 'api/scan/extrinsic'), {
+        extrinsic_index: extrinsicIndex
+      });
+
+      if (rs.status !== 200) {
+        throw new SWError('SubscanService.getExtrinsicDetail', await rs.text());
+      }
+
+      const jsonData = (await rs.json()) as SubscanResponse<ExtrinsicDetail>;
+
+      return jsonData.data;
+    }, 0, undefined);
+  }
+
   public async fetchAllPossibleExtrinsicItems (
     groupId: number,
     chain: string,
@@ -159,9 +175,14 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
         const { extrinsic_index: extrinsicIndex, params } = data;
 
         const extrinsic = extrinsics.find((item) => item.extrinsic_index === extrinsicIndex);
+        const extrinsicDetail = await this.getExtrinsicDetail(chain, extrinsicIndex);
 
         if (extrinsic) {
           extrinsic.params = JSON.stringify(params);
+
+          if (extrinsic.call_module === 'polkadotxcm' && extrinsic.call_module_function === 'limited_teleport_assets') {
+            extrinsic.events = extrinsicDetail.event;
+          }
         }
       }
 
@@ -246,13 +267,18 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
       }
 
       cbAfterEachRequest?.(res.transfers);
-      res.transfers.forEach((item) => {
+
+      for (const item of res.transfers) {
+        const extrinsicDetail = await this.getExtrinsicDetail(chain, item.extrinsic_index);
+
+        item.events = extrinsicDetail.event;
+
         if (!resultMap[item.hash]) {
           resultMap[item.hash] = [item];
         } else {
           resultMap[item.hash].push(item);
         }
-      });
+      }
 
       currentCount += res.transfers.length;
 

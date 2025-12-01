@@ -393,6 +393,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       finalHistoryMap[key] = { ...item, fromName, toName, displayData: getDisplayData(item, typeNameMap, typeTitleMap), displayTime };
     });
 
+    console.log(finalHistoryMap);
+
     return finalHistoryMap;
   }, [accountMap, rawHistoryList, typeNameMap, typeTitleMap]);
 
@@ -483,8 +485,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     }
   }, [currentAccountProxyid, currentAccountProxy?.id, inactiveModal]);
 
-  const { accountAddressItems, chainItems, selectedAddress, selectedChain, setSelectedAddress,
-    setSelectedChain } = useHistorySelection();
+  const { accountAddressItems, chainItems, selectedAddress, selectedChain, setSelectedAddress, setSelectedChain } = useHistorySelection();
 
   const emptyList = useCallback(() => {
     return (
