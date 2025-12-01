@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { PalletStakingStakingLedger } from '@subwallet/extension-base/koni/api/staking/bonding/relayChain';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _getTokenOnChainAssetId } from '@subwallet/extension-base/services/chain-service/utils';
@@ -12,6 +11,14 @@ import { BaseYieldStepDetail, EarningStatus, HandleYieldStepData, LiquidYieldPoo
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import BaseLiquidStakingPoolHandler from './base';
+
+interface PalletStakingStakingLedger {
+  stash: string,
+  total: number,
+  active: number,
+  unlocking: UnlockingChunk[],
+  claimedRewards: number[]
+}
 
 // TODO: disable earning and stake actions but keep showing existing earning positions (currently handle on UI)
 export default class ParallelLiquidStakingPoolHandler extends BaseLiquidStakingPoolHandler {

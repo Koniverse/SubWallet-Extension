@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { getValidatorLabel } from '@subwallet/extension-base/services/earning-service/utils';
 import AvatarGroup, { BaseAccountInfo } from '@subwallet/extension-web-ui/components/Account/Info/AvatarGroup';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { toShort } from '@subwallet/extension-web-ui/utils';

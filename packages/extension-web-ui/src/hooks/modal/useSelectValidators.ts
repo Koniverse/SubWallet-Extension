@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { getValidatorLabel } from '@subwallet/extension-base/services/earning-service/utils';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { BasicOnChangeFunction } from '@subwallet/extension-web-ui/components/Field/Base';
 import { useNotification, useTranslation } from '@subwallet/extension-web-ui/hooks/common';

@@ -3,8 +3,8 @@
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { NominationInfo, StakingType } from '@subwallet/extension-base/background/KoniTypes';
-import { getBondedValidators, getExistUnstakeErrorMessage, getMaxValidatorErrorMessage, getMinStakeErrorMessage } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import BaseNativeStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base';
+import { getBondedValidators, getExistUnstakeErrorMessage, getMaxValidatorErrorMessage, getMinStakeErrorMessage } from '@subwallet/extension-base/services/earning-service/utils';
 import { BasicTxErrorType, EarningStatus, OptimalYieldPath, StakingTxErrorType, SubmitJoinNativeStaking, SubmitYieldJoinData, YieldStepBaseInfo, YieldStepType } from '@subwallet/extension-base/types';
 import { isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
 import { t } from 'i18next';

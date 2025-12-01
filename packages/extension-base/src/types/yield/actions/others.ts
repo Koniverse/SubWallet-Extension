@@ -112,3 +112,15 @@ export interface RequestEarningImpact {
   netuid: number;
   type: ExtrinsicType;
 }
+
+export enum YieldAction {
+  STAKE = 'STAKE',
+  UNSTAKE = 'UNSTAKE',
+  WITHDRAW = 'WITHDRAW',
+  CLAIM_REWARD = 'CLAIM_REWARD',
+  CANCEL_UNSTAKE = 'CANCEL_UNSTAKE',
+
+  START_EARNING = 'EARN',
+  WITHDRAW_EARNING = 'WITHDRAW_EARNING',
+  CUSTOM_ACTION = 'CUSTOM_ACTION'
+}

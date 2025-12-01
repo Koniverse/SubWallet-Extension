@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { getValidatorLabel } from '@subwallet/extension-base/services/earning-service/utils';
 import { BaseModal, MetaInfo } from '@subwallet/extension-web-ui/components';
 import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-web-ui/constants';
 import { useGetChainPrefixBySlug } from '@subwallet/extension-web-ui/hooks';

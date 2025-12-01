@@ -4,11 +4,10 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType, NominationInfo, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { getBondedValidators, getEarningStatusByNominations, getParaCurrentInflation, InflationConfig, isUnstakeAll } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _EXPECTED_BLOCK_TIME, _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _STAKING_CHAIN_GROUP, MANTA_MIN_DELEGATION, MANTA_VALIDATOR_POINTS_PER_BLOCK } from '@subwallet/extension-base/services/earning-service/constants';
-import { parseIdentity } from '@subwallet/extension-base/services/earning-service/utils';
+import { getBondedValidators, getEarningStatusByNominations, isUnstakeAll, parseIdentity } from '@subwallet/extension-base/services/earning-service/utils';
 import { BaseYieldPositionInfo, BasicTxErrorType, CollatorExtraInfo, EarningStatus, NativeYieldPoolInfo, PalletParachainStakingDelegationRequestsScheduledRequest, PalletParachainStakingDelegator, ParachainStakingCandidateMetadata, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingStatus, ValidatorInfo, YieldPoolInfo, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, parseRawNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
@@ -46,6 +45,25 @@ interface InflationInfo {
 interface AutoCompoundingDelegation {
   delegator: string,
   value: string
+}
+
+function getParaCurrentInflation (totalStaked: number, inflationConfig: PalletParachainStakingInflationInflationInfo) { // read more at https://hackmd.io/@sbAqOuXkRvyiZPOB3Ryn6Q/Sypr3ZJh5
+  const expectMin = parseRawNumber(inflationConfig.expect.min);
+  const expectMax = parseRawNumber(inflationConfig.expect.max);
+
+  if (totalStaked < expectMin) {
+    const inflationString = inflationConfig.annual.min.split('%')[0];
+
+    return parseFloat(inflationString);
+  } else if (totalStaked > expectMax) {
+    const inflationString = inflationConfig.annual.max.split('%')[0];
+
+    return parseFloat(inflationString);
+  }
+
+  const inflationString = inflationConfig.annual.ideal.split('%')[0];
+
+  return parseFloat(inflationString);
 }
 
 function calculateMantaNominatorReturn (decimal: number, commission: number, totalActiveCollators: number, bnAnnualInflation: BigN, blocksPreviousRound: number, bnCollatorExpectedBlocksPerRound: BigN, bnCollatorTotalStaked: BigN, isCountCommission: boolean) {
@@ -148,7 +166,7 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
         totalIssuance.add(unvestedAllocation); // for Turing network, read more at https://hackmd.io/@sbAqOuXkRvyiZPOB3Ryn6Q/Sypr3ZJh5
       }
 
-      const inflationConfig = _inflation.toHuman() as unknown as InflationConfig;
+      const inflationConfig = _inflation.toHuman() as unknown as PalletParachainStakingInflationInflationInfo;
       const inflation = getParaCurrentInflation(parseRawNumber(totalStake.toString()), inflationConfig);
       const eraTime = _STAKING_ERA_LENGTH_MAP[this.chain] || _STAKING_ERA_LENGTH_MAP.default; // in hours
       const unstakingPeriod = parseInt(unstakingDelay) * eraTime;
