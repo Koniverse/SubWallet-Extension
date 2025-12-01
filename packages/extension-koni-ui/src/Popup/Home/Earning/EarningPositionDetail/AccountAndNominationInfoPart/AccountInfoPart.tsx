@@ -8,10 +8,11 @@ import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui
 import { InfoItemBase } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
 import { EarningActiveStakeDetailsModal, EarningBittensorClaimRewardTypeModal, EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
 import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/components/Modal/Earning/EarningValidatorSelectedModal';
-import { EARNING_ACITVE_STAKE_DETAILS_MODAL, EARNING_BITTENSOR_ROOT_CLAIM_TYPE_MODAL, EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
+import { CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION, DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS, EARNING_ACITVE_STAKE_DETAILS_MODAL, EARNING_BITTENSOR_ROOT_CLAIM_TYPE_MODAL, EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { EarningTagType, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { createEarningTypeTags, findAccountByAddress, isAccountAll, toShort } from '@subwallet/extension-koni-ui/utils';
+import { createEarningTypeTags, findAccountByAddress, getTransactionFromAccountProxyValue, isAccountAll, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -19,6 +20,7 @@ import { ArrowSquareOut, CaretLeft, CaretRight, Info, PencilSimpleLine } from 'p
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import Slider, { CustomArrowProps, Settings } from 'react-slick';
 import styled from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
 type Props = ThemeProps & {
   compound: YieldPositionInfo;
@@ -71,6 +73,8 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
 
   const [isShowActiveStakeDetailsModal, setIsShowActiveStakeDetailsModal] = useState<boolean>(false);
   const [selectedPositionInfo, setSelectedPositionInfo] = useState<YieldPositionInfo | undefined>();
+  const [, setClaimAvailBridgeStorage] = useLocalStorage(CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION, DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS);
+  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
 
   const sliderSettings: Settings = useMemo(() => {
     return {
@@ -183,9 +187,18 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
   const openEarningBittensorClaimRewardTypeModal = useCallback((item: YieldPositionInfo) => {
     return () => {
       setSelectedAddress(item.address);
+      setClaimAvailBridgeStorage({
+        ...DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS,
+        fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy),
+        chain: item.chain,
+        from: item.address,
+        asset: inputAsset?.slug || '',
+        bittensorRootClaimType: (item.metadata as BittensorStakingMetadata)?.bittensorRootClaimType || ''
+      });
+
       activeModal(EARNING_BITTENSOR_ROOT_CLAIM_TYPE_MODAL);
     };
-  }, [activeModal]);
+  }, [activeModal, currentAccountProxy, inputAsset?.slug, setClaimAvailBridgeStorage]);
 
   const accountInfoItemsNode = useMemo(() => {
     return list.map((item) => {
@@ -346,7 +359,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
             )
           }
 
-          {!!selectedItem && isBittensorMetadata(selectedItem.metadata) && selectedItem.metadata.bittensorRootClaimType && (
+          {!!(selectedItem && isBittensorMetadata(selectedItem.metadata) && selectedItem.metadata.bittensorRootClaimType) && (
             <EarningBittensorClaimRewardTypeModal
               address={selectedItem.address}
               bittensorRootClaimType={selectedItem.metadata.bittensorRootClaimType}

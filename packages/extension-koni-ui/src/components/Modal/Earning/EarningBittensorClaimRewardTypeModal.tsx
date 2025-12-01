@@ -3,6 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BittensorRootClaimType, RequestChangeBittensorRootClaimType } from '@subwallet/extension-base/types';
+import { CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION, DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS } from '@subwallet/extension-koni-ui/constants';
 import { useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
 import { changeBittensorRootClaimType } from '@subwallet/extension-koni-ui/messaging';
 import Transaction from '@subwallet/extension-koni-ui/Popup/Transaction/Transaction';
@@ -13,6 +14,7 @@ import { ArrowClockwise, ArrowsLeftRight, CheckCircle, IconProps, LockKey, X } f
 import React, { Context, ForwardedRef, forwardRef, useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { ThemeContext } from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
 type Props = ThemeProps & {
   modalId: string;
@@ -70,12 +72,14 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const isSwapOptions = useMemo(() => bittensorRootClaimType === 'Swap', [bittensorRootClaimType]);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [, setClaimAvailBridgeStorage] = useLocalStorage(CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION, DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS);
   const { onError, onSuccess } = useHandleSubmitTransaction();
   const onPreCheck = usePreCheckAction(address);
 
   const onCancel = useCallback(() => {
+    setClaimAvailBridgeStorage(DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS);
     inactiveModal(modalId);
-  }, [inactiveModal, modalId]);
+  }, [inactiveModal, modalId, setClaimAvailBridgeStorage]);
 
   const onChangeRootClaimType = useCallback(() => {
     setSubmitLoading(true);
@@ -153,8 +157,6 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
 const Wrapper = (props: Props, ref: ForwardedRef<any>) => {
   return (
     <Transaction
-      address={props.address}
-      fromChain={props.chain}
       modalContent={true}
       modalId={props.modalId}
       transactionType={ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE}
@@ -162,7 +164,6 @@ const Wrapper = (props: Props, ref: ForwardedRef<any>) => {
       <Component
         {...props}
       />
-
     </Transaction>
   );
 };
