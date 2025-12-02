@@ -148,7 +148,7 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
   if (explorerLink && type === 'account') {
     const route = getBlockExplorerAccountRoute(explorerLink);
 
-    if (['truth_network', 'aventus'].includes(chainInfo.slug)) {
+    if (chainInfo.slug === 'truth_network') {
       const address = u8aToHex(decodeAddress(value));
 
       return `${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${address}`;
