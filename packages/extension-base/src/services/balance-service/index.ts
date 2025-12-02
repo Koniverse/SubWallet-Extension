@@ -247,8 +247,8 @@ export class BalanceService implements StoppableServiceInterface {
             value = new BigN(rs.free).plus(new BigN(rs.locked)).toFixed();
             break;
           case BalanceType.TOTAL_MINUS_RESERVED:
-            if (_BALANCE_CHAIN_GROUP.vara.includes(chainInfo.slug)) {
-              // TODO: Currently Vara staking from nomination pools is not fully supported.
+            if (_BALANCE_CHAIN_GROUP.notSupportGetBalanceByType.includes(chainInfo.slug)) {
+              // TODO: Currently Vara and Avail staking from nomination pools is not fully supported.
               // Return `free` to avoid incorrect TOTAL_MINUS_RESERVED calculation.
               // Improve later when full staking breakdown is available.
               value = rs.free;

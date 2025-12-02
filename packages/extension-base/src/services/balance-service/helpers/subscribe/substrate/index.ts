@@ -225,7 +225,8 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
       const lockedDetails = buildLockedDetails(
         allLockEntries,
         totalLockedFromTransfer,
-        _getSystemPalletReservedBalance(balanceInfo)
+        _getSystemPalletReservedBalance(balanceInfo),
+        bittensorStakingBalances[index]
       );
 
       const transferableBalance = _getSystemPalletTransferable(balanceInfo, _getChainExistentialDeposit(chainInfo), extrinsicType);

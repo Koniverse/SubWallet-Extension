@@ -135,7 +135,7 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
           }
 
           if (balanceItem) {
-            if (_BALANCE_CHAIN_GROUP.vara.includes(chainInfo.slug)) {
+            if (_BALANCE_CHAIN_GROUP.notSupportGetBalanceByType.includes(chainInfo.slug)) {
               freeBalance.value = freeBalance.value.plus(balanceItem.free.value);
             } else {
               const reserved = new BigN(balanceItem.lockedDetails?.reserved || 0);

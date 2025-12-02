@@ -45,8 +45,8 @@ const extractId = (id: string | Record<string, unknown> | undefined): string => 
   return keys.length ? keys[0] : '';
 };
 
-export function buildLockedDetails (item: (FrameBalancesLocksInfo | FrameBalancesHoldsInfo | FrameBalancesFreezesInfo)[], totalLockedFromTransfer: bigint, reserved: bigint): LockedBalanceDetails {
-  let stakingBalance = new BigN(0);
+export function buildLockedDetails (item: (FrameBalancesLocksInfo | FrameBalancesHoldsInfo | FrameBalancesFreezesInfo)[], totalLockedFromTransfer: bigint, reserved: bigint, externalStaking?: BigN): LockedBalanceDetails {
+  let stakingBalance = externalStaking || new BigN(0);
   let govBalance = new BigN(0);
   let democracyBalance = new BigN(0);
   const reservedBN = new BigN(reserved.toString());
