@@ -488,7 +488,7 @@ export class InappNotificationService implements CronServiceInterface {
       await this.startCron();
       this.status = ServiceStatus.STARTED;
     } catch (e) {
-
+      console.error('Failed to start InappNotificationService', e);
     }
   }
 
@@ -506,7 +506,7 @@ export class InappNotificationService implements CronServiceInterface {
       await this.stopCron();
       this.status = ServiceStatus.STOPPED;
     } catch (e) {
-
+      console.error('Failed to stop InappNotificationService', e);
     }
   }
 
