@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { CurrencyJson } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 
 export const BASE_SECOND_INTERVAL = 1000;
@@ -54,6 +55,18 @@ export const _SUPPORT_TOKEN_PAY_FEE_GROUP = {
   hydration: ['hydradx_main', 'hydradx_rococo']
 };
 
+export const CURRENCY_SYMBOL_RECORD: Record<string, CurrencyJson> = {
+  USD: { label: 'United States Dollar', symbol: '$', isPrefix: true },
+  BRL: { label: 'Brazilian Real', symbol: 'R$', isPrefix: true },
+  CNY: { label: 'Chinese Yuan', symbol: 'C¥', isPrefix: true },
+  EUR: { label: 'Euro', symbol: '€', isPrefix: true },
+  GBP: { label: 'British Pound Sterling', symbol: '£', isPrefix: true },
+  HKD: { label: 'Hong Kong Dollar', symbol: 'H$', isPrefix: true },
+  JPY: { label: 'Japanese Yen', symbol: '¥', isPrefix: true },
+  RUB: { label: 'Russian Ruble', symbol: '₽', isPrefix: true },
+  VND: { label: 'Vietnamese Dong', symbol: '₫', isPrefix: true }
+};
+
 export const getSupportTokenPayFeeChain = () => {
   return Object.values(_SUPPORT_TOKEN_PAY_FEE_GROUP).flat();
 };
@@ -73,5 +86,4 @@ export * from './environment';
 export * from './signing';
 export * from './staking';
 export * from './storage';
-export * from './remind-notification-time';
 export * from './bitcoin';

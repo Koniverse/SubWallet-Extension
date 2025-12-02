@@ -4,13 +4,13 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { APIItemState, CrowdloanItem, CurrencyJson } from '@subwallet/extension-base/background/KoniTypes';
 import { _getChainNativeTokenBasicInfo, _getSubstrateRelayParent } from '@subwallet/extension-base/services/chain-service/utils';
-import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
 import { BN_ZERO } from '@subwallet/extension-web-ui/constants';
 import { getBalanceValue, getConvertedBalanceValue } from '@subwallet/extension-web-ui/hooks/screen/home/useAccountBalance';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { _CrowdloanItemType } from '@subwallet/extension-web-ui/types/crowdloan';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import subwalletApiSdk from "@subwallet-monorepos/subwallet-services-sdk";
 
 function getCrowdloanContributeList (
   crowdloanMap: Record<string, CrowdloanItem>,
@@ -85,7 +85,7 @@ export default function useGetCrowdloanList () {
   const { currencyData, priceMap } = useSelector((state: RootState) => state.price);
 
   useEffect(() => {
-    fetchStaticData<_ChainInfo[]>('chains').then((rs) => {
+    subwalletApiSdk.staticContentApi.fetchLatestChainData().then((rs) => {
       const result: Record<string, _ChainInfo> = {};
 
       rs.forEach((ci) => {

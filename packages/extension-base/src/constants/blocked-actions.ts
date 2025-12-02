@@ -2,52 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { packageInfo } from '@subwallet/extension-base';
-import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { fetchStaticData } from '@subwallet/extension-base/utils';
-import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
-
-export interface BlockedActionsFeaturesMap {
-  blockedActionsMap: Record<ExtrinsicType, string[]>,
-  blockedFeaturesList: string[]
-}
+import { BlockedConfigObjects, EnvConfig } from '@subwallet-monorepos/subwallet-services-sdk/services';
 
 export const APP_ENV = process.env.TARGET_ENV as string;
 export const APP_VER = packageInfo.version;
-
-const PRODUCTION_BRANCHES = ['master', 'webapp', 'webapp-dev'];
-const branchName = process.env.BRANCH_NAME || 'koni-dev';
-const targetFolder = PRODUCTION_BRANCHES.indexOf(branchName) > -1 ? 'list' : 'preview';
-
-export interface EnvConfig {
-  appConfig?: AppConfig,
-  browserConfig?: BrowserConfig,
-  osConfig?: OSConfig
-}
-
-// todo: check if can check exactly App Environment, Browser Type, OS Type
-
-export interface AppConfig {
-  environment: string,
-  version?: string,
-}
-
-export interface BrowserConfig {
-  type: string,
-  version?: string
-}
-
-export interface OSConfig {
-  type: string,
-  version?: string
-}
-
-type BlockedConfigObjects = Record<string, EnvConfig>
-
-export async function fetchBlockedConfigObjects (): Promise<BlockedConfigObjects> {
-  const targetFile = `${targetFolder}/envConfig.json`;
-
-  return await fetchStaticData<BlockedConfigObjects>('blocked-actions', targetFile);
-}
 
 export function getPassConfigId (currentConfig: EnvConfig, blockedConfigObjects: BlockedConfigObjects) {
   const passList: string[] = [];
@@ -141,14 +99,4 @@ function isPassVersion (versionStr: string, versionCondition?: string) { // todo
   const versionConditionStr = versionCondition.trim();
 
   return versionStr === versionConditionStr;
-}
-
-export async function fetchLatestBlockedActionsAndFeatures (ids: string[]) {
-  if (ids.length === 0) {
-    return [staticData[StaticKey.BLOCKED_ACTIONS_FEATURES]];
-  }
-
-  const targetFiles = ids.map((id) => `${targetFolder}/${id}.json`);
-
-  return await Promise.all(targetFiles.map((targetFile) => fetchStaticData<BlockedActionsFeaturesMap>('blocked-actions', targetFile)));
 }

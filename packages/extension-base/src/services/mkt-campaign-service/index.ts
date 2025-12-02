@@ -4,8 +4,9 @@
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals, _getChainNativeTokenBasicInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { AppBannerData, AppBasicInfoData, AppCommonData, AppConfirmationData, AppPopupData, ConditionBalanceType, ConditionCrowdloanType, ConditionEarningType, ConditionHasMoneyType, ConditionNftType, ConditionType, MktCampaignCondition, MktCampaignConditionTypeValue } from '@subwallet/extension-base/services/mkt-campaign-service/types';
-import { fetchStaticData, TARGET_ENV, wait } from '@subwallet/extension-base/utils';
+import { TARGET_ENV, wait } from '@subwallet/extension-base/utils';
 import { keyring } from '@subwallet/ui-keyring';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 import { BehaviorSubject } from 'rxjs';
 
@@ -50,21 +51,21 @@ export default class MktCampaignService {
   }
 
   public async fetchPopupData () {
-    const respAppPopupData = await fetchStaticData<AppPopupData[]>('app-popups');
+    const respAppPopupData = await subwalletApiSdk.staticContentApi.fetchPopupData();
     const result = await this.handleMktCampaignData<AppPopupData>(respAppPopupData);
 
     this.appPopupSubject.next(result);
   }
 
   public async fetchBannerData () {
-    const respAppBannerData = await fetchStaticData<AppBannerData[]>('app-banners');
+    const respAppBannerData = await subwalletApiSdk.staticContentApi.fetchBannerData();
     const result = await this.handleMktCampaignData<AppBannerData>(respAppBannerData);
 
     this.appBannerSubject.next(result);
   }
 
   public async fetchConfirmationData () {
-    const respAppConfirmationData = await fetchStaticData<AppConfirmationData[]>('app-confirmations');
+    const respAppConfirmationData = await subwalletApiSdk.staticContentApi.fetchConfirmationData();
 
     const result = await this.handleMktCampaignData<AppConfirmationData>(respAppConfirmationData);
 
