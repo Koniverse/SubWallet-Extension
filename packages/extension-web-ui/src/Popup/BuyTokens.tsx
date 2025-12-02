@@ -442,7 +442,8 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
             console.error(e);
 
             notify({
-              message: t('Create buy order fail')
+              message: t('Unable to redirect you to the selected supplier at the moment. Try again later'),
+              type: 'error',
             });
           }
         })
