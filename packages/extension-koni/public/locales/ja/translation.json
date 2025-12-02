@@ -1,5 +1,5 @@
 {
-  "ui.BUY.screen.BuyTokens.createBuyOrderFail": "Create buy order fail",
+    "ui.BUY.screen.BuyTokens.createBuyOrderFail": "Unable to redirect you to the selected supplier at the moment. Try again later",
   "ui.BUY.screen.BuyTokens.buyToken": "トークンを購入",
   "ui.BALANCE.screen.Tokens.DetailUpperBlock.buyToken": "トークンを購入",
   "ui.BALANCE.screen.Tokens.UpperBlock.buyToken": "トークンを購入",
