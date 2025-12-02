@@ -1814,6 +1814,7 @@
   "bg.koni.handler.State.networkNotMatchOutputAddress": "Current network is not match with output address",
   "bg.koni.handler.State.notFoundOwnerKeyHash": "Not found owner key hash",
   "bg.BALANCE.services.service.balance.transfer.smartContract.nftNotSupportedOnRecipient": "Unable to send. NFT not supported on recipient address",
+  "bg.BALANCE.services.service.balance.transfer.smartContract.temporarilyNontransferableNFT": "",
   "bg.EARNING.services.service.earning.specialHandler.maximumInputExceeded": "You can only enter a maximum of {{maxValue}} {{symbol}}, which is {{currentValue}} {{symbol}} ({{inputNetworkName}}) and {{maxXCMValue}} {{symbol}} ({{altNetworkName}}). Lower your amount and try again.",
   "bg.EARNING.services.service.earning.specialHandler.balanceGreaterThanZeroRequired": "You need balance greater than 0 to continue",
   "bg.DAPP.services.service.request.EvmHandler.duplicateRequest": "Duplicate request",
