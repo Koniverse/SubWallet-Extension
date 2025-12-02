@@ -2,12 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _DEFAULT_CHAINS } from '@subwallet/chain-list';
-import { _SubstrateChainType } from '@subwallet/chain-list/types';
 import { SingleModeJson, ThemeNames } from '@subwallet/extension-base/background/KoniTypes';
 
 export const API_AUTO_CONNECT_MS = 3000;
 export const API_CONNECT_TIMEOUT = 30000;
-export const API_MAX_RETRY = 2;
 
 export const _API_OPTIONS_CHAIN_GROUP = {
   acala: ['acala', 'karura', 'origintrail', 'kintsugi'],
@@ -39,12 +37,14 @@ export const _BALANCE_CHAIN_GROUP = {
   centrifuge: ['centrifuge'],
   supportBridged: ['rococo_assethub', 'statemint', 'statemine', 'polimec'],
   bittensor: ['bittensor', 'bittensor_testnet'],
-  moonbeam: ['moonbeam', 'moonriver', 'moonbase']
+  moonbeam: ['moonbeam', 'moonriver', 'moonbase'],
+  notSupportGetBalanceByType: ['vara_network', 'vara_testnet', 'availTuringTest', 'avail_mainnet']
 };
 
-export const _BALANCE_TOKEN_GROUP = {
-  crab: ['CKTON', 'PKTON'],
-  bitcountry: ['BIT']
+export const _BALANCE_LOCKED_ID_GROUP = {
+  staking: ['staking', 'delegatedStaking', 'pooledStaking', 'stkngdel', 'stk_stks', 'dappStaking', 'parachainStaking', 'appstakeappstake', 'collatorStaking'],
+  gov: ['pyconvot'],
+  democracy: ['democrac']
 };
 
 export const _NFT_CHAIN_GROUP = {
@@ -246,13 +246,10 @@ export const _KNOWN_CHAIN_INFLATION_PARAMS: Record<string, _SubstrateInflationPa
 
 // Send fund------------------------------------------------------------------------------------------------------------
 
-export const _TRANSFER_NOT_SUPPORTED_CHAINS = ['subspace_gemini_3a', 'kulupu', 'joystream', 'equilibrium_parachain', 'genshiro_testnet', 'genshiro'];
-
 export const _TRANSFER_CHAIN_GROUP = {
   acala: ['karura', 'acala', 'acala_testnet'],
   kintsugi: ['kintsugi', 'kintsugi_test', 'interlay', 'mangatax_para'],
   genshiro: ['genshiro_testnet', 'genshiro', 'equilibrium_parachain'],
-  // crab: ['crab', 'pangolin'],
   bitcountry: ['pioneer', 'bitcountry'],
   statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'origintrail', 'xode', 'paseo_assethub'],
   riochain: ['riochain'],
@@ -264,10 +261,6 @@ export const _TRANSFER_CHAIN_GROUP = {
   truth: ['truth_network']
 };
 
-export const _BALANCE_PARSING_CHAIN_GROUP = {
-  bobabeam: ['bobabeam', 'bobabase']
-};
-
 export const _MANTA_ZK_CHAIN_GROUP = ['calamari'];
 
 export const _ZK_ASSET_PREFIX = 'zk';
@@ -275,19 +268,6 @@ export const _ZK_ASSET_PREFIX = 'zk';
 export const _DEFAULT_MANTA_ZK_CHAIN = 'calamari';
 
 // XCM------------------------------------------------------------------------------------------------------------------
-
-export const _XCM_CHAIN_GROUP = {
-  polkadotXcm: ['statemine', 'statemint', 'equilibrium_parachain', 'rococo_assethub', 'mythos', 'westend_assethub'],
-  polkadotXcmSpecialCases: ['astar', 'shiden'],
-  xcmPallet: ['polkadot', 'kusama', 'rococo', 'westend']
-  // default is xTokens pallet
-};
-
-export const _XCM_TYPE = {
-  RP: `${_SubstrateChainType.RELAYCHAIN}-${_SubstrateChainType.PARACHAIN}`, // DMP
-  PP: `${_SubstrateChainType.PARACHAIN}-${_SubstrateChainType.PARACHAIN}`, // HRMP
-  PR: `${_SubstrateChainType.PARACHAIN}-${_SubstrateChainType.RELAYCHAIN}` // UMP
-};
 
 export const _DEFAULT_ACTIVE_CHAINS = [
   ..._DEFAULT_CHAINS,
@@ -309,17 +289,8 @@ export const EVM_REFORMAT_DECIMALS = {
 
 export const LATEST_CHAIN_DATA_FETCHING_INTERVAL = 120000;
 
-// TODO: review
-const TARGET_BRANCH = process.env.NODE_ENV !== 'production' ? 'koni-dev' : 'master';
-
 export const _BITCOIN_CHAIN_SLUG = 'bitcoin';
 export const _BITCOIN_TESTNET_CHAIN_SLUG = 'bitcoinTestnet';
 export const _BITCOIN_NAME = 'Bitcoin';
 export const _BITCOIN_TESTNET_NAME = 'Bitcoin Testnet';
-export const _CHAIN_INFO_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/ChainInfo.json`;
-export const _CHAIN_ASSET_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/ChainAsset.json`;
-export const _ASSET_REF_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/AssetRef.json`;
-export const _MULTI_CHAIN_ASSET_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/MultiChainAsset.json`;
-export const _CHAIN_LOGO_MAP_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/ChainLogoMap.json`;
-export const _ASSET_LOGO_MAP_SRC = `https://raw.githubusercontent.com/Koniverse/SubWallet-Chain/${TARGET_BRANCH}/packages/chain-list/src/data/AssetLogoMap.json`;
 export const _BTC_SERVICE_TOKEN = process.env.BTC_SERVICE_TOKEN || '';

@@ -2291,5 +2291,18 @@
   "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.manualStake": "Manual stake",
   "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.compoundingStake": "Compounding stake",
   "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.pendingStakeTooltipTitle": "Amount added to Manual or/and Compounding stake once pending transactions are executed",
-  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.pendingStake": "Pending"
+  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.pendingStake": "Pending",
+  "ui.BALANCE.screen.Tokens.DetailModal.staking": "Staking",
+  "ui.BALANCE.screen.Tokens.DetailModal.governance": "Governance",
+  "ui.BALANCE.screen.Tokens.DetailModal.democracy": "Democracy",
+  "ui.BALANCE.screen.Tokens.DetailModal.reserved": "Reserved",
+  "ui.BALANCE.screen.Tokens.DetailModal.othersTooltipTitle": "Balances locked due to unique on-chain actions on the network",
+  "ui.BALANCE.screen.Tokens.DetailModal.others": "Others",
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.staking": "Staking",
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.governance": "Governance",
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.democracy": "Democracy",
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.reserved": "Reserved",
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.others": "Others",
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.othersTooltipTitle": "Balances locked due to unique on-chain actions on the network",
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.lockedDetails": "Locked details"
 }
