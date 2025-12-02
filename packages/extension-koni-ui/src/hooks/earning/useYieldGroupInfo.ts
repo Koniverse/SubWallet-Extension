@@ -91,7 +91,15 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
             const balanceItem = tokenBalanceMap[inputAsset];
 
             if (balanceItem) {
-              exists.balance.value = exists.balance.value.plus(balanceItem.free.value);
+              const reserved = new BigN(balanceItem.lockedDetails?.reserved || 0);
+              const staking = new BigN(balanceItem.lockedDetails?.staking || 0);
+              const subtractAmount = BigN.max(reserved, staking);
+
+              exists.balance.value = exists.balance.value
+                .plus(balanceItem.free.value)
+                .plus(balanceItem.locked.value)
+                .minus(subtractAmount);
+
               exists.balance.convertedValue = exists.balance.convertedValue.plus(balanceItem.free.convertedValue);
               exists.balance.pastConvertedValue = exists.balance.pastConvertedValue.plus(balanceItem.free.pastConvertedValue);
             }
