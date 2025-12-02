@@ -42,7 +42,7 @@ export const _BALANCE_CHAIN_GROUP = {
 };
 
 export const _BALANCE_LOCKED_ID_GROUP = {
-  staking: ['staking', 'delegatedStaking', 'pooledStaking', 'stkngdel', 'stk_stks', 'dappStaking', 'parachainStaking', 'appstakeappstake'],
+  staking: ['staking', 'delegatedStaking', 'pooledStaking', 'stkngdel', 'stk_stks', 'dappStaking', 'parachainStaking', 'appstakeappstake', 'collatorStaking'],
   gov: ['pyconvot'],
   democracy: ['democrac']
 };
