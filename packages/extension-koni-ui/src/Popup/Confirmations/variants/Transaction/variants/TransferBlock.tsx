@@ -4,7 +4,6 @@
 import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
-import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import QuoteRateDisplay from '@subwallet/extension-koni-ui/components/Swap/QuoteRateDisplay';
 import { BN_TEN } from '@subwallet/extension-koni-ui/constants';
@@ -12,7 +11,6 @@ import { useGetAccountByAddress, useGetNativeTokenBasicInfo } from '@subwallet/e
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
-import CN from 'classnames';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -44,11 +42,6 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
     return tokenInfo;
   }, [isAcrossBridge, xcmData.metadata?.destChainSlug, tokenInfo, assetRegistryMap]);
 
-  const chainInfo = useMemo(
-    () => chainInfoMap[transaction.chain],
-    [chainInfoMap, transaction.chain]
-  );
-
   const fromAccount = useGetAccountByAddress(data.from);
   const toAccount = useGetAccountByAddress(data.to);
   const fromAccountName = fromAccount?.name;
@@ -57,16 +50,23 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
   const { decimals: nativeTokenDecimals, symbol: nativeTokenSymbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const feeInfo = transaction.estimateFee;
 
-  const nativeTokenSlug = `${transaction.chain}-NATIVE-${nativeTokenSymbol}`;
-  const nativeTokenInfo = assetRegistryMap[nativeTokenSlug];
+  const priceNativeValue = useMemo(() => {
+    const nativeTokenSlug = `${transaction.chain}-NATIVE-${nativeTokenSymbol}`;
+    const nativeTokenInfo = assetRegistryMap[nativeTokenSlug];
 
-  const priceNativeId = _getAssetPriceId(nativeTokenInfo);
-  const priceNativeValue = priceMap[priceNativeId] || 0;
+    const priceNativeId = _getAssetPriceId(nativeTokenInfo);
+
+    return priceMap[priceNativeId] || 0;
+  }, [assetRegistryMap, nativeTokenSymbol, priceMap, transaction.chain]);
 
   const transferTokenSymbol = _getAssetSymbol(tokenInfo);
   const transferTokenDecimals = _getAssetDecimals(tokenInfo);
-  const transferTokenPriceId = _getAssetPriceId(tokenInfo);
-  const transferTokenValue = priceMap[transferTokenPriceId] || 0;
+
+  const transferTokenValue = useMemo(() => {
+    const transferTokenPriceId = _getAssetPriceId(tokenInfo);
+
+    return priceMap[transferTokenPriceId] || 0;
+  }, [priceMap, tokenInfo]);
 
   const convertedFeeValueToUSD = useMemo(() => {
     if (!feeInfo?.value) {
@@ -90,55 +90,36 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
       .toNumber();
   }, [feeInfo, tokenInfo, transferTokenValue]);
 
-  const renderParticipants = () => {
-    if (transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM) {
-      return (
-        <MetaInfo.Transfer
-          destinationChain={{
-            slug: xcmData.destinationNetworkKey,
-            name: _getChainName(chainInfoMap[xcmData.destinationNetworkKey])
-          }}
-          originChain={{
-            slug: xcmData.originNetworkKey,
-            name: _getChainName(chainInfoMap[xcmData.originNetworkKey])
-          }}
-          recipientAddress={data.to}
-          recipientName={toAccountName}
-          senderAddress={data.from}
-          senderName={fromAccountName}
-        />
-      );
-    }
-
-    return (
-      <>
-        <MetaInfo.Account
-          address={data.from}
-          label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendFrom')}
-        />
-
-        {chainInfo && (
-          <MetaInfo.Chain
-            chain={chainInfo.slug}
-            label={t('ui.TRANSACTION.Confirmations.TransferBlock.network')}
-          />
-        )}
-
-        <MetaInfo.Account
-          address={data.to}
-          label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendTo')}
-        />
-      </>
-    );
-  };
+  const destinationChainSlug = xcmData?.destinationNetworkKey || transaction.chain;
+  const originChainSlug = xcmData?.originNetworkKey || transaction.chain;
 
   return (
-    <>
+    <div className={className}>
       <MetaInfo hasBackgroundWrapper>
-        {renderParticipants()}
+        <MetaInfo.Transfer
+          alwaysShowChain
+          destinationChain={{
+            slug: destinationChainSlug,
+            name: _getChainName(chainInfoMap[destinationChainSlug])
+          }}
+          originChain={{
+            slug: originChainSlug,
+            name: _getChainName(chainInfoMap[originChainSlug])
+          }}
+          recipientAddress={data.to}
+          recipientLabel={t('Send to')}
+          recipientName={toAccountName}
+          senderAddress={data.from}
+          senderLabel={t('Send from')}
+          senderName={fromAccountName}
+        />
       </MetaInfo>
 
-      <MetaInfo hasBackgroundWrapper>
+      <MetaInfo
+        hasBackgroundWrapper
+        labelColorScheme={'gray'}
+        valueColorScheme={'light'}
+      >
         {isAcrossBridge && xcmData.metadata
           ? <>
             <MetaInfo.Default
@@ -147,7 +128,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
               <QuoteRateDisplay
                 className={'__quote-estimate-swap-value'}
                 fromAssetInfo={tokenInfo}
-                rateValue={Number(xcmData.metadata.rate)}
+                rateValue={parseFloat(xcmData.metadata.rate)}
                 toAssetInfo={destTokenInfo}
               />
             </MetaInfo.Default>
@@ -168,7 +149,9 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
             />
           )}
 
-        <MetaInfo.Default label={t('Network fee')}>
+        <MetaInfo.Default
+          label={t('Network fee')}
+        >
           <div className='__fee-editor-area'>
             <Number
               decimal={feeInfo ? feeInfo.decimals : nativeTokenDecimals}
@@ -177,6 +160,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
             />
 
             <Number
+              className={'__fee-price-value'}
               decimal={0}
               prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
               suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
@@ -195,6 +179,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
               />
 
               <Number
+                className={'__fee-price-value'}
                 decimal={0}
                 prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
                 suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
@@ -204,25 +189,16 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
           </MetaInfo.Default>
         )}
       </MetaInfo>
-      {
-        transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM &&
-        (
-          <AlertBox
-            className={CN(className, 'alert-area')}
-            description={t('ui.TRANSACTION.Confirmations.TransferBlock.crossChainAdditionalFee')}
-            title={t('ui.TRANSACTION.Confirmations.TransferBlock.payAttentionExclamation')}
-            type='warning'
-          />
-        )
-      }
-    </>
+    </div>
   );
 };
 
 export const TransferBlock = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-    '&.alert-area': {
-      marginTop: token.marginSM
+    '.__fee-price-value': {
+      fontSize: `${token.fontSizeSM}px !important`,
+      lineHeight: '20px !important',
+      color: `${token.colorTextTertiary} !important`
     }
   };
 });

@@ -224,9 +224,7 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
           <div className={CN(className, '__estimate-fee-wrapper')}>
             <div className='__field-line-1'>
               <div className='__field-label'>
-                {!isXcm
-                  ? t('ui.TRANSACTION.components.Field.FeeEditor.estimatedFee')
-                  : t('Network fee')}
+                {t('Network fee')}
               </div>
 
               {!isDataReady
@@ -238,11 +236,11 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
                     className='__fee-editor-area'
                   >
                     <Number
-                      className={'__fee-price-value'}
-                      decimal={0}
-                      prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
-                      suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
-                      value={convertedFeeValueToUSD}
+                      className={'__fee-value'}
+                      decimal={isNativeTokenValue ? nativeTokenDecimals : decimals}
+                      prefix={'~ '}
+                      suffix={isNativeTokenValue ? nativeTokenSymbol : symbol}
+                      value={isNativeTokenValue ? estimateFee : convertedEstimatedFee}
                     />
 
                     {isEditButton && (
@@ -275,11 +273,11 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
             {isDataReady && (
               <div className={CN('__field-line-2', { '-is-edit-button': isEditButton })}>
                 <Number
-                  className={'__fee-value'}
-                  decimal={isNativeTokenValue ? nativeTokenDecimals : decimals}
-                  prefix={'~ '}
-                  suffix={isNativeTokenValue ? nativeTokenSymbol : symbol}
-                  value={isNativeTokenValue ? estimateFee : convertedEstimatedFee}
+                  className={'__fee-price-value'}
+                  decimal={0}
+                  prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
+                  suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+                  value={convertedFeeValueToUSD}
                 />
               </div>
             )}
@@ -289,10 +287,10 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
 
       {
         isXcm && (
-          <div className={CN(className, '__estimate-fee-wrapper')}>
+          <div className={CN(className, '__cross-chain-fee-wrapper')}>
             <div className='__field-line-1'>
               <div className='__field-label'>
-                {t('Cross-chain fee')}:
+                {t('Cross-chain fee')}
               </div>
 
               {!isDataReady
@@ -302,11 +300,11 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
                 : (FEE_TYPES_CAN_SHOW.includes(feeType) && (
                   <div className='__fee-editor-area'>
                     <Number
-                      className={'__fee-price-value'}
-                      decimal={0}
-                      prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
-                      suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
-                      value={convertedCrossChainFeeValueToUSD}
+                      className={'__fee-value'}
+                      decimal={transferTokenDecimals}
+                      prefix={'~ '}
+                      suffix={transferTokenSymbol}
+                      value={isNativeTokenValue ? crossChainFee : convertedCrossChainFee}
                     />
                   </div>
                 ))}
@@ -314,11 +312,11 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
             {isDataReady && (
               <div className={CN('__field-line-2')}>
                 <Number
-                  className={'__fee-value'}
-                  decimal={transferTokenDecimals}
-                  prefix={'~ '}
-                  suffix={transferTokenSymbol}
-                  value={isNativeTokenValue ? crossChainFee : convertedCrossChainFee}
+                  className={'__fee-price-value'}
+                  decimal={0}
+                  prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
+                  suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+                  value={convertedCrossChainFeeValueToUSD}
                 />
               </div>
             )}
@@ -373,7 +371,7 @@ const FeeEditor = styled(Component)<Props>(({ theme: { token } }: Props) => {
       }
     },
 
-    '&.__estimate-fee-wrapper': {
+    '&.__estimate-fee-wrapper, &.__cross-chain-fee-wrapper': {
       backgroundColor: token.colorBgSecondary,
       padding: token.paddingSM,
       paddingRight: token.paddingXS,
@@ -383,6 +381,10 @@ const FeeEditor = styled(Component)<Props>(({ theme: { token } }: Props) => {
       '.__edit-icon': {
         color: token['gray-5']
       }
+    },
+
+    '&.__cross-chain-fee-wrapper': {
+      marginTop: token.marginSM
     },
 
     '.__field-line-1': {
@@ -400,7 +402,7 @@ const FeeEditor = styled(Component)<Props>(({ theme: { token } }: Props) => {
       width: '100%',
       justifyContent: 'flex-end',
       display: 'flex',
-      '.__fee-value': {
+      '.__fee-price-value': {
         fontSize: `${token.fontSizeSM}px !important`,
         lineHeight: '20px !important',
         color: `${token.colorTextTertiary} !important`

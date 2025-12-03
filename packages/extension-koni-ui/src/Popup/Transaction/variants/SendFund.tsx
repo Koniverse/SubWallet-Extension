@@ -1268,7 +1268,7 @@ const SendFund = styled(Wrapper)(({ theme }) => {
     },
 
     '.__warning_message_cross_chain': {
-      marginTop: token.marginXS
+      marginTop: token.marginSM
     },
 
     '.free-balance-block': {
