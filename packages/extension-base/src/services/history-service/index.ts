@@ -273,7 +273,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
         (item_) => item_.extrinsicHash === item.extrinsicHash && item.chain === item_.chain && item.address === item_.address);
 
       if (needUpdateItem) {
-        updateRecords.push({ ...needUpdateItem, status: item.status, apiTxIndex: item.apiTxIndex });
+        updateRecords.push({ ...needUpdateItem, status: item.status, apiTxIndex: item.apiTxIndex, crossChainFee: item.crossChainFee, fee: item.fee });
 
         return;
       }

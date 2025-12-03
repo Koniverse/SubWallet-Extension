@@ -82,18 +82,6 @@ export function parseSubscanTransferData (address: string, transferItem: Transfe
     return null;
   }
 
-  let crossChainFee = '0';
-
-  if (transferItem.events) {
-    transferItem.events.forEach((event) => {
-      if (event.module_id === 'balances' && event.event_id === 'Burned') {
-        const dataParams = JSON.parse(event.params) as unknown as EventParam[];
-
-        crossChainFee = dataParams.find((data) => data.name === 'amount')?.value || '0';
-      }
-    });
-  }
-
   return {
     address,
     origin: 'subscan',
@@ -120,7 +108,6 @@ export function parseSubscanTransferData (address: string, transferItem: Transfe
       symbol: nativeSymbol
     },
     status: transferItem.success ? ExtrinsicStatus.SUCCESS : ExtrinsicStatus.FAIL,
-    nonce: transferItem.nonce,
-    crossChainFee
+    nonce: transferItem.nonce
   };
 }

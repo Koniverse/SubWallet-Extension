@@ -5366,8 +5366,6 @@ export default class KoniExtension {
       case 'pri(transaction.history.getSubscription)':
         return await this.subscribeHistory(id, port);
       case 'pri(transaction.history.subscribe)':
-        console.log('histories', this.subscribeHistoryByChainAndAddress(request as RequestSubscribeHistory, id, port));
-
         return this.subscribeHistoryByChainAndAddress(request as RequestSubscribeHistory, id, port);
 
         /* Earning */

@@ -808,7 +808,8 @@ export default class TransactionService {
       blockHash: '', // Will be added in next step
       nonce: nonce ?? 0,
       startBlock: startBlock || 0,
-      processId: transaction.step?.processId
+      processId: transaction.step?.processId,
+      crossChainFee: transaction.estimateFee?.crossChainFee
     };
 
     const nativeAsset = _getChainNativeTokenBasicInfo(chainInfo);
