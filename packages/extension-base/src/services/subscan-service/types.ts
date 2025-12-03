@@ -81,9 +81,7 @@ export interface ExtrinsicItem {
   finalized: boolean,
   account_display: {
     address: string
-  },
-  /** Need be called from another api */
-  events?: ExtrinsicDetailEvent[]
+  }
 }
 
 export interface ExtrinsicsListResponse {
@@ -188,9 +186,7 @@ export interface TransferItem {
     address: string,
     display?: string
   },
-  event_idx: 0,
-  /** Need be called from another api */
-  events?: ExtrinsicDetailEvent[]
+  event_idx: 0
 }
 
 export interface TransfersListResponse {
@@ -223,11 +219,4 @@ export interface RewardHistoryItem {
 export interface RewardHistoryListResponse {
   count: number,
   list: null | RewardHistoryItem[]
-}
-
-export interface EventParam {
-  type: string,
-  type_name: string,
-  value: string
-  name: string,
 }

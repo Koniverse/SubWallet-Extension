@@ -38,9 +38,9 @@ const Component: React.FC<Props> = (props: Props) => {
         />
 
         {xcmInfo.fee && <MetaInfo.Number
-          decimals={xcmInfo.fee?.decimals || undefined}
+          decimals={xcmInfo.sendingTokenInfo?.decimals || undefined}
           label={('Destination fee')}
-          suffix={xcmInfo.fee?.symbol || undefined}
+          suffix={xcmInfo.sendingTokenInfo?.symbol || undefined}
           value={crossChainFee}
         />}
       </>

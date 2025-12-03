@@ -171,22 +171,15 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
       const extrinsicIndexes = extrinsics.map((item) => item.extrinsic_index);
       const extrinsicParams = await this.getExtrinsicParams(groupId, chain, extrinsicIndexes, 0);
 
-      const detailPromises = extrinsicParams.map(async (data) => {
+      for (const data of extrinsicParams) {
         const { extrinsic_index: extrinsicIndex, params } = data;
+
         const extrinsic = extrinsics.find((item) => item.extrinsic_index === extrinsicIndex);
 
         if (extrinsic) {
           extrinsic.params = JSON.stringify(params);
-
-          if (extrinsic.call_module === 'polkadotxcm' && extrinsic.call_module_function === 'limited_teleport_assets') {
-            const extrinsicDetail = await this.getExtrinsicDetail(groupId, chain, extrinsicIndex);
-
-            extrinsic.events = extrinsicDetail.event;
-          }
         }
-      });
-
-      await Promise.all(detailPromises);
+      }
 
       // Call callback after each request, for parse data
       cbAfterEachRequest?.(extrinsics);
@@ -270,17 +263,13 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
 
       cbAfterEachRequest?.(res.transfers);
 
-      for (const item of res.transfers) {
-        const extrinsicDetail = await this.getExtrinsicDetail(groupId, chain, item.extrinsic_index);
-
-        item.events = extrinsicDetail.event;
-
+      res.transfers.forEach((item) => {
         if (!resultMap[item.hash]) {
           resultMap[item.hash] = [item];
         } else {
           resultMap[item.hash].push(item);
         }
-      }
+      });
 
       currentCount += res.transfers.length;
 

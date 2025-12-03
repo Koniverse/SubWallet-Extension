@@ -55,39 +55,11 @@ function balanceTransferParserFunction (item: TransactionHistoryItem): Transacti
   return item;
 }
 
-function crossChainTransferParserFunction (item: TransactionHistoryItem): TransactionHistoryItem | null {
-  const params: ExtrinsicParam[] = paramJsonParse(item);
-
-  params.forEach((p) => {
-    if (p.name === 'beneficiary') {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const toPublicKey = p.value.V5.interior.X1[0].AccountId32.id as string;
-
-      if (toPublicKey) {
-        item.to = encodeAddress(autoAddPublicKeyPrefix(toPublicKey), item?.addressPrefix);
-      }
-    } else if (p.name === 'assets') {
-      if (item.amount) {
-        item.amount.value = p.value.V5[0].fun.Fungible as string;
-      }
-    }
-  });
-
-  item.type = ExtrinsicType.TRANSFER_XCM;
-
-  if (!item.to) {
-    return null;
-  }
-
-  return item;
-}
-
 // todo: will support other type later
 export const subscanExtrinsicParserMap: Record<string, ExtrinsicParserFunction> = {
   'balances.transfer': balanceTransferParserFunction,
   'balances.transfer_keep_alive': balanceTransferParserFunction,
-  'balances.transfer_allow_death': balanceTransferParserFunction,
-  'polkadotxcm.limited_teleport_assets': crossChainTransferParserFunction
+  'balances.transfer_allow_death': balanceTransferParserFunction
 };
 
 export const supportedExtrinsicParser = Object.keys(subscanExtrinsicParserMap);

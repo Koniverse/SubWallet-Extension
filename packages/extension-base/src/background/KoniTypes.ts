@@ -698,7 +698,8 @@ export interface AmountDataWithId extends AmountData {
 export interface XCMTransactionAdditionalInfo {
   destinationChain: string,
   originalChain: string,
-  fee?: AmountData
+  fee?: AmountData,
+  sendingTokenInfo?: _ChainAsset
 }
 
 export interface NFTTransactionAdditionalInfo {
