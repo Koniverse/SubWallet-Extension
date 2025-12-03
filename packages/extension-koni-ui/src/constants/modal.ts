@@ -9,6 +9,7 @@ export const IMPORT_ACCOUNT_MODAL = 'import-account-modal';
 export const ATTACH_ACCOUNT_MODAL = 'attach-account-modal';
 export const NEW_SEED_MODAL = 'new-seed-modal';
 export const IMPORT_SEED_MODAL = 'import-seed-modal';
+export const IMPORT_SEED_TRUST_MODAL = 'import-seed-trust-modal';
 export const REQUEST_CREATE_PASSWORD_MODAL = 'request-create-password-modal';
 export const CONFIRMATION_DETAIL_MODAL = 'confirmation-detail-modal';
 export const CONFIRMATION_QR_MODAL = 'confirmation-qr-modal';

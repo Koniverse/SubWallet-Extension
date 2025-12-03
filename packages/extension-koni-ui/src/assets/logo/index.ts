@@ -36,7 +36,8 @@ export const DefaultLogosMap: Record<string, string> = {
   [SUBSTRATE_GENERIC_KEY]: './images/projects/polkadot.png',
   [SUBSTRATE_MIGRATION_KEY]: './images/projects/polkadot-migration.png',
   ton: './images/projects/ton.png',
-  meld: './images/projects/meld.png'
+  meld: './images/projects/meld.png',
+  trust: './images/projects/trust.png'
 };
 
 export const IconMap = {

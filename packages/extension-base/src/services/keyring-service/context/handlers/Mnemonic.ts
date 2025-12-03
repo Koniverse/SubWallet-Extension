@@ -42,7 +42,8 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
   }
 
   /* Validate seed */
-  public mnemonicValidateV2 ({ mnemonic }: RequestMnemonicValidateV2): ResponseMnemonicValidateV2 {
+  public mnemonicValidateV2 (request: RequestMnemonicValidateV2): ResponseMnemonicValidateV2 {
+    const { mnemonic, mnemonicType } = request;
     const { phrase } = keyExtractSuri(mnemonic);
     let mnemonicTypes: MnemonicType = 'general';
     let pairTypes: KeypairType[] = [];
@@ -56,8 +57,13 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
       try {
         assert(mnemonicValidate(phrase), t('bg.ACCOUNT.services.keyring.handler.Mnemonic.invalidSeedPhraseTryAgain'));
 
-        mnemonicTypes = 'general';
-        pairTypes = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
+        if (mnemonicType === 'trust-wallet') {
+          mnemonicTypes = 'trust-wallet';
+          pairTypes = ['ed25519-tw', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
+        } else {
+          mnemonicTypes = 'general';
+          pairTypes = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
+        }
       } catch (e) {
         assert(tonMnemonicValidate(phrase), t('bg.ACCOUNT.services.keyring.handler.Mnemonic.invalidSeedPhraseTryAgain'));
         mnemonicTypes = 'ton';
@@ -76,7 +82,15 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
       rs.addressMap[type] = keyring.createFromUri(getSuri(mnemonic, type), {}, type).address;
     });
 
-    const exists = this.state.checkAddressExists(Object.values(rs.addressMap));
+    const exists = this.state.checkAddressExists(Object.values(rs.addressMap)); // todo: discuss more about import trust seed and import normal seed make duplicate account
+
+    const isExistNormalSeed = exists?.relatedToUnifiedAccountTypes?.includes('sr25519');
+    const isExistTrustSeed = exists?.relatedToUnifiedAccountTypes?.includes('ed25519-tw');
+
+    if (mnemonicTypes === 'trust-wallet' || mnemonicTypes === 'general') {
+      assert(!isExistNormalSeed, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsViaImportType', { replace: { type: 'Import from seed phrase', name: exists?.name || exists?.address || '' } }));
+      assert(!isExistTrustSeed, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsViaImportType', { replace: { type: 'Import from Trust Wallet', name: exists?.name || exists?.address || '' } }));
+    }
 
     assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
 
@@ -85,11 +99,10 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
 
   /* Add accounts from mnemonic */
   public accountsCreateSuriV2 (request: RequestAccountCreateSuriV2): ResponseAccountCreateSuriV2 {
-    const { isAllowed, name, password, suri: _suri, type } = request;
+    const { isAllowed, name, password, suri: _suri, types } = request;
     const addressDict = {} as Record<KeypairType, string>;
     let changedAccount = false;
     const hasMasterPassword = keyring.keyring.hasMasterPassword;
-    const types: KeypairType[] = type ? [type] : ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
 
     if (!hasMasterPassword) {
       if (!password) {
