@@ -58,20 +58,17 @@ function balanceTransferParserFunction (item: TransactionHistoryItem): Transacti
 function crossChainTransferParserFunction (item: TransactionHistoryItem): TransactionHistoryItem | null {
   const params: ExtrinsicParam[] = paramJsonParse(item);
 
-  console.log('params', params);
-
   params.forEach((p) => {
     if (p.name === 'beneficiary') {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const toPublicKey = p.value['V5']['interior']['X1'][0]['AccountId32'].id as string;
-      console.log('toPublicKey', toPublicKey);
+      const toPublicKey = p.value.V5.interior.X1[0].AccountId32.id as string;
 
       if (toPublicKey) {
         item.to = encodeAddress(autoAddPublicKeyPrefix(toPublicKey), item?.addressPrefix);
       }
     } else if (p.name === 'assets') {
       if (item.amount) {
-        item.amount.value = p.value['V5'][0].fun['Fungible'] as string;
+        item.amount.value = p.value.V5[0].fun.Fungible as string;
       }
     }
   });

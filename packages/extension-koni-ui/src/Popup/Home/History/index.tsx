@@ -393,8 +393,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       finalHistoryMap[key] = { ...item, fromName, toName, displayData: getDisplayData(item, typeNameMap, typeTitleMap), displayTime };
     });
 
-    console.log(finalHistoryMap);
-
     return finalHistoryMap;
   }, [accountMap, rawHistoryList, typeNameMap, typeTitleMap]);
 

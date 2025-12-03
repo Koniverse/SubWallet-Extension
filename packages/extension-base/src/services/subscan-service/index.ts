@@ -122,7 +122,7 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
     }, 0, groupId);
   }
 
-  public getExtrinsicDetail (groupId: number,chain: string, extrinsicIndex: string): Promise<ExtrinsicDetail> {
+  public getExtrinsicDetail (groupId: number, chain: string, extrinsicIndex: string): Promise<ExtrinsicDetail> {
     return this.addRequest<ExtrinsicDetail>(async () => {
       const rs = await this.postRequest(this.getApiUrl(chain, 'api/scan/extrinsic'), {
         extrinsic_index: extrinsicIndex
@@ -180,6 +180,7 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
 
           if (extrinsic.call_module === 'polkadotxcm' && extrinsic.call_module_function === 'limited_teleport_assets') {
             const extrinsicDetail = await this.getExtrinsicDetail(groupId, chain, extrinsicIndex);
+
             extrinsic.events = extrinsicDetail.event;
           }
         }
