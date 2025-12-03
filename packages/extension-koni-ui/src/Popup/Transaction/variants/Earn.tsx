@@ -7,7 +7,7 @@ import { _handleDisplayForEarningError, _handleDisplayInsufficientEarningError }
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
+import { BalanceType, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
@@ -145,6 +145,14 @@ const Component = () => {
     () => [YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING, YieldPoolType.NOMINATION_POOL].includes(poolType),
     [poolType]
   );
+
+  const balanceTypeForPool = useMemo(() => {
+    if ([YieldPoolType.NATIVE_STAKING, YieldPoolType.NOMINATION_POOL].includes(poolType)) {
+      return BalanceType.TOTAL_MINUS_RESERVED;
+    }
+
+    return undefined;
+  }, [poolType]);
 
   const chainStakingBoth = useMemo(() => {
     const hasNativeStaking = (chain: string) => specificList.some((item) => item.chain === chain && item.type === YieldPoolType.NATIVE_STAKING);
@@ -1228,6 +1236,7 @@ const Component = () => {
                 <div className={'__balance-display-area'}>
                   <FreeBalanceToEarn
                     address={fromValue}
+                    balanceType={balanceTypeForPool}
                     hidden={submitStepType !== YieldStepType.XCM}
                     label={`${t('ui.TRANSACTION.screen.Transaction.Earn.availableBalance')}`}
                     onBalanceReady={setIsBalanceReady}
@@ -1236,6 +1245,7 @@ const Component = () => {
 
                   <FreeBalance
                     address={fromValue}
+                    balanceType={balanceTypeForPool}
                     chain={poolInfo.chain}
                     hidden={[YieldStepType.XCM].includes(submitStepType)}
                     isSubscribe={true}

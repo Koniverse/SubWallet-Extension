@@ -64,7 +64,7 @@ function roundFraction (raw: string, digits: number): string {
     rounded = original.decimalPlaces(digits, BigN.ROUND_DOWN);
   }
 
-  return rounded.toFixed(digits).split('.')[1];
+  return rounded.toFixed(digits).split('.')[1].replace(/0+$/, '');
 }
 
 type DecimalParts = {
