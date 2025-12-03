@@ -11,7 +11,7 @@ import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-b
 import { _getChainNativeTokenSlug, _isCustomAsset, _isNativeToken, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
-import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
+import { BalanceItem, BalanceJson, BalanceType, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
@@ -23,6 +23,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { noop } from '@polkadot/util';
 
+import { _BALANCE_CHAIN_GROUP } from '../chain-service/constants';
 import { CreateXcmExtrinsicProps } from './transfer/xcm';
 import { _isAcrossChainBridge, getAcrossQuote } from './transfer/xcm/acrossBridge';
 import { BalanceMapImpl } from './BalanceMapImpl';
@@ -206,7 +207,7 @@ export class BalanceService implements StoppableServiceInterface {
     address: string,
     chain: string,
     tokenSlug: string | undefined,
-    balanceType: 'transferable' | 'total' | 'keepAlive' = 'transferable',
+    balanceType: BalanceType = BalanceType.TRANSFERABLE,
     extrinsicType?: ExtrinsicType,
     callback?: (rs: AmountData) => void
   ): Promise<[() => void, AmountData]> {
@@ -239,12 +240,30 @@ export class BalanceService implements StoppableServiceInterface {
 
       unsub = subscribeBalance([address], [chain], [tSlug], assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, cardanoApiMap, bitcoinApiMap, (result) => {
         const rs = result[0];
-
         let value: string;
 
         switch (balanceType) {
-          case 'total':
+          case BalanceType.TOTAL:
             value = new BigN(rs.free).plus(new BigN(rs.locked)).toFixed();
+            break;
+          case BalanceType.TOTAL_MINUS_RESERVED:
+            if (_BALANCE_CHAIN_GROUP.notSupportGetBalanceByType.includes(chainInfo.slug)) {
+              // TODO: Currently Vara and Avail staking from nomination pools is not fully supported.
+              // Return `free` to avoid incorrect TOTAL_MINUS_RESERVED calculation.
+              // Improve later when full staking breakdown is available.
+              value = rs.free;
+            } else {
+              value = new BigN(rs.free)
+                .plus(new BigN(rs.locked))
+                .minus(
+                  BigN.max(
+                    new BigN(rs.lockedDetails?.reserved || 0),
+                    new BigN(rs.lockedDetails?.staking || 0)
+                  )
+                )
+                .toFixed();
+            }
+
             break;
           default:
             value = rs.free;
@@ -280,11 +299,15 @@ export class BalanceService implements StoppableServiceInterface {
   }
 
   public async subscribeTransferableBalance (address: string, chain: string, tokenSlug: string | undefined, extrinsicType?: ExtrinsicType, callback?: (rs: AmountData) => void): Promise<[() => void, AmountData]> {
-    return this.subscribeBalance(address, chain, tokenSlug, 'transferable', extrinsicType, callback);
+    return this.subscribeBalance(address, chain, tokenSlug, BalanceType.TRANSFERABLE, extrinsicType, callback);
   }
 
   public async subscribeTotalBalance (address: string, chain: string, tokenSlug: string | undefined, extrinsicType?: ExtrinsicType, callback?: (rs: AmountData) => void): Promise<[() => void, AmountData]> {
-    return this.subscribeBalance(address, chain, tokenSlug, 'total', extrinsicType, callback);
+    return this.subscribeBalance(address, chain, tokenSlug, BalanceType.TOTAL, extrinsicType, callback);
+  }
+
+  public async subscribeBalanceByType (address: string, chain: string, tokenSlug: string | undefined, balanceType: BalanceType = BalanceType.TRANSFERABLE, extrinsicType?: ExtrinsicType, callback?: (rs: AmountData) => void): Promise<[() => void, AmountData]> {
+    return this.subscribeBalance(address, chain, tokenSlug, balanceType, extrinsicType, callback);
   }
 
   /**
@@ -306,6 +329,12 @@ export class BalanceService implements StoppableServiceInterface {
 
   public async getTotalBalance (address: string, chain: string, tokenSlug?: string, extrinsicType?: ExtrinsicType): Promise<AmountData> {
     const [, balance] = await this.subscribeTotalBalance(address, chain, tokenSlug, extrinsicType);
+
+    return balance;
+  }
+
+  public async getBalanceByType (address: string, chain: string, tokenSlug?: string, balanceType: BalanceType = BalanceType.TRANSFERABLE, extrinsicType?: ExtrinsicType) {
+    const [, balance] = await this.subscribeBalanceByType(address, chain, tokenSlug, balanceType, extrinsicType);
 
     return balance;
   }
@@ -534,7 +563,7 @@ export class BalanceService implements StoppableServiceInterface {
       const typeValid = [...EthereumKeypairTypes].includes(type);
 
       if (typeValid) {
-        return subwalletApiSdk.balanceDetectionApi.getSubWalletTokenBalance(address)
+        return subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalance(address)
           .catch((e) => {
             console.error(e);
 
@@ -726,7 +755,7 @@ export class BalanceService implements StoppableServiceInterface {
   public async evmDetectBalanceToken (addresses: string[]) {
     const assetMap = this.state.chainService.getAssetRegistry();
     const evmPromiseList = addresses.map((address) => {
-      return subwalletApiSdk.balanceDetectionApi.getSubWalletTokenBalance(address)
+      return subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalance(address)
         .catch((e) => {
           console.error(e);
 
