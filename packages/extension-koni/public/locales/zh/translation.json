@@ -2536,8 +2536,7 @@
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.hideVotingStats": "Hide voting stats",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.showVotingStats": "Show voting stats",
   "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.watchOnlyAccountFeatureRestriction": "The account you are using is Watch-only account, you cannot use this feature with it",
-  "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unknowAccountFeatureRestriction": "The account you are using is Unknown account, you cannot use this feature with it"
-  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.pendingStake": "",
+  "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unknowAccountFeatureRestriction": "The account you are using is Unknown account, you cannot use this feature with it",
   "ui.BALANCE.screen.Tokens.DetailModal.staking": "",
   "ui.BALANCE.screen.Tokens.DetailModal.governance": "",
   "ui.BALANCE.screen.Tokens.DetailModal.democracy": "",

@@ -2536,8 +2536,7 @@
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.nayVotes": "Nay votes",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.abstainVotes": "Abstain votes",
   "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.hideVotingStats": "Hide voting stats",
-  "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.showVotingStats": "Show voting stats"
-  "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.pendingStake": "Pending",
+  "ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.VotingStats.showVotingStats": "Show voting stats",
   "ui.BALANCE.screen.Tokens.DetailModal.staking": "Staking",
   "ui.BALANCE.screen.Tokens.DetailModal.governance": "Governance",
   "ui.BALANCE.screen.Tokens.DetailModal.democracy": "Democracy",
