@@ -168,7 +168,7 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
       return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}polkadot-chain-transaction?search=${value}`);
     }
 
-    if (chainInfo.slug === 'truth_network') {
+    if (['truth_network', 'aventus'].includes(chainInfo.slug)) {
       // getTransactionId(value)
       //   .then((transactionId) => {
       //     return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${transactionId}`);
