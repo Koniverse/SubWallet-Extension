@@ -224,7 +224,7 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
           <div className={CN(className, '__estimate-fee-wrapper')}>
             <div className='__field-line-1'>
               <div className='__field-label'>
-                {t('Network fee')}
+                {t('ui.TRANSACTION.components.Field.FeeEditor.networkFee')}
               </div>
 
               {!isDataReady
@@ -290,7 +290,7 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
           <div className={CN(className, '__cross-chain-fee-wrapper')}>
             <div className='__field-line-1'>
               <div className='__field-label'>
-                {t('Cross-chain fee')}
+                {t('ui.TRANSACTION.components.Field.FeeEditor.crossChainFee')}
               </div>
 
               {!isDataReady

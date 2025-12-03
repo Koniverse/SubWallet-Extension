@@ -107,10 +107,10 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
             name: _getChainName(chainInfoMap[originChainSlug])
           }}
           recipientAddress={data.to}
-          recipientLabel={t('Send to')}
+          recipientLabel={t('ui.TRANSACTION.Confirmations.TransferBlock.sendTo')}
           recipientName={toAccountName}
           senderAddress={data.from}
-          senderLabel={t('Send from')}
+          senderLabel={t('ui.TRANSACTION.Confirmations.TransferBlock.sendFrom')}
           senderName={fromAccountName}
         />
       </MetaInfo>
@@ -150,7 +150,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
           )}
 
         <MetaInfo.Default
-          label={t('Network fee')}
+          label={t('ui.TRANSACTION.Confirmations.TransferBlock.networkFee')}
         >
           <div className='__fee-editor-area'>
             <Number
@@ -170,7 +170,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
         </MetaInfo.Default>
 
         {transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM && feeInfo?.crossChainFee && (
-          <MetaInfo.Default label={t('Cross-chain fee')}>
+          <MetaInfo.Default label={t('ui.TRANSACTION.Confirmations.TransferBlock.crossChainFee')}>
             <div className={'__value-col-wrapper'}>
               <Number
                 decimal={transferTokenDecimals}
