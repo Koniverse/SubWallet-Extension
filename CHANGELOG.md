@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 1.3.68
+Build date: Dec 03, 2025.
+
+Features & Updates:
+- Standardize the Module Price History according to the new standard (#4784)
+- Locked Balance Display (#4708)
+- Update Transak Widget URL (#4835)
+
+Bug fixes:
+- Unable to import NFT ERC-721 on Rari chain (#4625)
+- Support show NFT haven't method tokenOfOwnerByIndex (#4568)
+
+
 ## 1.3.67
 Build date: Nov 13, 2025.
 
