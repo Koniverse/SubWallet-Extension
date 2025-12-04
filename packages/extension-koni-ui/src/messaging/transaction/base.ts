@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AmountData, AmountDataWithId, RequestFreeBalance } from '@subwallet/extension-base/background/KoniTypes';
+import { AmountData, AmountDataWithId, RequestAvailableBalanceByType, RequestFreeBalance } from '@subwallet/extension-base/background/KoniTypes';
 
 import { sendMessage } from '../base';
 
@@ -11,4 +11,12 @@ export async function getFreeBalance (request: RequestFreeBalance): Promise<Amou
 
 export async function subscribeFreeBalance (request: RequestFreeBalance, callback: (balance: AmountDataWithId) => void): Promise<AmountDataWithId> {
   return sendMessage('pri(freeBalance.subscribe)', request, callback);
+}
+
+export async function getAvailableBalanceByType (request: RequestAvailableBalanceByType): Promise<AmountData> {
+  return sendMessage('pri(availableBalance.getBalanceByType)', request);
+}
+
+export async function subscribeAvailableBalanceByType (request: RequestAvailableBalanceByType, callback: (balance: AmountDataWithId) => void): Promise<AmountDataWithId> {
+  return sendMessage('pri(availableBalance.subscribeBalanceByType)', request, callback);
 }

@@ -5,7 +5,7 @@ import { ChainType, ExtrinsicDataTypeMap, ExtrinsicStatus, ExtrinsicType, FeeDat
 import { SignTypedDataMessageV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { UniswapOrderInfo } from '@subwallet/extension-base/services/swap-service/handler/uniswap-handler';
-import { BaseRequestSign, BriefProcessStep, ProcessTransactionData, TransactionFee } from '@subwallet/extension-base/types';
+import { BalanceType, BaseRequestSign, BriefProcessStep, ProcessTransactionData, TransactionFee } from '@subwallet/extension-base/types';
 import { Psbt } from 'bitcoinjs-lib';
 import EventEmitter from 'eventemitter3';
 import { TransactionConfig } from 'web3-core';
@@ -75,6 +75,7 @@ export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransact
   resolveOnDone?: boolean;
   skipFeeValidation?: boolean;
   skipFeeRecalculation?: boolean;
+  balanceType?: BalanceType;
 }
 
 export interface SWPermitTransactionInput extends Omit<SWTransactionInput, 'transaction'> {
