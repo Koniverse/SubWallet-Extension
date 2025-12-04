@@ -317,9 +317,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
   public override get maintainBalance (): string {
     const ed = new BigN(this.nativeToken.minAmount || '0');
-    const calculateMaintainBalance = new BigN(15).multipliedBy(ed).dividedBy(10);
-
-    const maintainBalance = calculateMaintainBalance;
+    const maintainBalance = new BigN(15).multipliedBy(ed).dividedBy(10);
 
     return maintainBalance.toString();
   }
@@ -593,9 +591,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   }
 
   private async getMainnetPoolTargets (netuid: number): Promise<ValidatorInfo[]> {
-    const _topValidator = await this.bittensorCache.get();
-
-    const topValidator = _topValidator;
+    const topValidator = await this.bittensorCache.get();
     const bnMinBond = await this.getMinBond();
     const validatorList = topValidator.data;
 
@@ -606,7 +602,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       aprMap[item.hotkey.ss58] = item.thirty_day_apy;
     });
 
-    const results = await Promise.all(
+    return await Promise.all(
       validatorList.map((validator) => {
         const address = validator.hotkey.ss58;
         // With bittensor we use total weight, root weight and alpha staked insted of total stake, own stake and other stake
@@ -640,8 +636,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         } as unknown as ValidatorInfo;
       })
     );
-
-    return results;
   }
 
   async getPoolTargets (netuid?: number): Promise<ValidatorInfo[]> {
@@ -805,9 +799,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         t('bg.EARNING.services.service.earning.nativeStaking.tao.remainingStakeBelowMinimumWarning', { replace: { maxAmount: formatNumber(maxAmount, _getAssetDecimals(this.nativeToken)), subnetSymbol: metadata?.subnetSymbol || _getAssetSymbol(this.nativeToken) } })));
     }
 
-    const extrinsic = chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, netuid, netuid, amount);
-
-    return extrinsic;
+    return chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, netuid, netuid, amount);
   }
 
   /* Others function  */
@@ -818,9 +810,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
-    const extrinsic = chainApi.api.tx.subtensorModule.setRootClaimType(type);
-
-    return extrinsic;
+    return chainApi.api.tx.subtensorModule.setRootClaimType(type);
   }
   /* Others function  */
 
