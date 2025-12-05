@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountExternalError, RequestAccountCreateExternalV2, RequestAccountCreateHardwareMultiple, RequestAccountCreateHardwareV2, RequestAccountCreateWithSecretKey, ResponseAccountCreateWithSecretKey } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountExternalError, RequestAccountCreateExternalV2, RequestAccountCreateHardwareMultiple, RequestAccountCreateHardwareV2, RequestAccountCreateMultisig, RequestAccountCreateWithSecretKey, ResponseAccountCreateWithSecretKey } from '@subwallet/extension-base/background/KoniTypes';
 import { SeedLengths } from '@subwallet/extension-base/background/types';
 import { MnemonicType, RequestAccountCreateSuriV2, ResponseAccountCreateSuriV2, ResponseMnemonicCreateV2 } from '@subwallet/extension-base/types';
 import { sendMessage } from '@subwallet/extension-koni-ui/messaging/base';
@@ -36,4 +36,10 @@ export async function createAccountHardwareV2 (request: RequestAccountCreateHard
 
 export async function createAccountHardwareMultiple (request: RequestAccountCreateHardwareMultiple): Promise<boolean> {
   return sendMessage('pri(accounts.create.hardwareMultiple)', request);
+}
+
+// Multisig
+
+export async function createAccountMultisig (request: RequestAccountCreateMultisig): Promise<boolean> {
+  return sendMessage('pri(accounts.create.multisig)', request);
 }
