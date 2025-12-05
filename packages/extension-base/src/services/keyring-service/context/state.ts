@@ -22,6 +22,12 @@ interface ExistsAccount {
 }
 
 export class AccountState {
+  // todo: function to get all multisig addresses
+  // todo: resetWallet need ensure clear multisig account
+
+  // todo: remove account (có thể là ở account-context hoặc modifyHandler)
+  // todo: cần có 1 hàm để getSupportedMultisigChains (có thể ở trong chain-service)
+
   // Current account
   private readonly _currentAccount = new CurrentAccountStoreSubject();
 
