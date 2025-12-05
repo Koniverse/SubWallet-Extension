@@ -809,7 +809,7 @@ export default class TransactionService {
       nonce: nonce ?? 0,
       startBlock: startBlock || 0,
       processId: transaction.step?.processId,
-      crossChainFee: transaction.estimateFee?.crossChainFee
+      crossChainFeeInfo: transaction?.xcmDestinationFee
     };
 
     const nativeAsset = _getChainNativeTokenBasicInfo(chainInfo);
@@ -848,7 +848,7 @@ export default class TransactionService {
         historyItem.amount = { value: inputData.value || '0', decimals: sendingTokenInfo.decimals || 0, symbol: sendingTokenInfo.symbol };
 
         // @ts-ignore
-        historyItem.additionalInfo = { destinationChain: inputData?.destinationNetworkKey || '', originalChain: inputData.originNetworkKey || '', fee: transaction.estimateFee, sendingTokenInfo };
+        historyItem.additionalInfo = { destinationChain: inputData?.destinationNetworkKey || '', originalChain: inputData.originNetworkKey || '', fee: transaction.estimateFee };
         eventLogs && parseXcmEventLogs(historyItem, eventLogs, transaction.chain, sendingTokenInfo, chainInfo);
       }
 

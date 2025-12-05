@@ -49,6 +49,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
 
   const { decimals: nativeTokenDecimals, symbol: nativeTokenSymbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const feeInfo = transaction.estimateFee;
+  const crossChainFeeInfo = transaction?.xcmDestinationFee;
 
   const priceNativeValue = useMemo(() => {
     const nativeTokenSlug = `${transaction.chain}-NATIVE-${nativeTokenSymbol}`;
@@ -80,15 +81,15 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
   }, [feeInfo, nativeTokenDecimals, priceNativeValue]);
 
   const convertedCrossChainFeeValueToUSD = useMemo(() => {
-    if (!feeInfo?.crossChainFee) {
+    if (!crossChainFeeInfo?.value) {
       return 0;
     }
 
-    return new BigN(feeInfo?.crossChainFee)
+    return new BigN(crossChainFeeInfo?.value)
       .multipliedBy(transferTokenValue)
       .dividedBy(BN_TEN.pow(tokenInfo.decimals || 0))
       .toNumber();
-  }, [feeInfo, tokenInfo, transferTokenValue]);
+  }, [crossChainFeeInfo, tokenInfo, transferTokenValue]);
 
   const destinationChainSlug = xcmData?.destinationNetworkKey || transaction.chain;
   const originChainSlug = xcmData?.originNetworkKey || transaction.chain;
@@ -169,13 +170,13 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
           </div>
         </MetaInfo.Default>
 
-        {transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM && feeInfo?.crossChainFee && (
+        {transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM && crossChainFeeInfo?.value && (
           <MetaInfo.Default label={t('ui.TRANSACTION.Confirmations.TransferBlock.crossChainFee')}>
             <div className={'__value-col-wrapper'}>
               <Number
                 decimal={transferTokenDecimals}
                 suffix={transferTokenSymbol}
-                value={feeInfo ? feeInfo.crossChainFee : 0}
+                value={crossChainFeeInfo ? crossChainFeeInfo?.value : 0}
               />
 
               <Number
