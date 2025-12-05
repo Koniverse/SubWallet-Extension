@@ -62,7 +62,7 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return 'account';
   }
 
-  if (explorerLink.includes('taostats.io')) {
+  if (explorerLink.includes('/taostats.io')) {
     return 'account';
   }
 
