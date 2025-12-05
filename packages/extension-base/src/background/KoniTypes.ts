@@ -697,7 +697,8 @@ export interface AmountDataWithId extends AmountData {
 export interface XCMTransactionAdditionalInfo {
   destinationChain: string,
   originalChain: string,
-  fee?: AmountData
+  fee?: AmountData,
+  sendingTokenInfo?: _ChainAsset
 }
 
 export interface NFTTransactionAdditionalInfo {
@@ -767,6 +768,7 @@ export interface TransactionHistoryItem<ET extends ExtrinsicType = ExtrinsicType
   addressPrefix?: number,
   processId?: string;
   apiTxIndex?: number;
+  crossChainFeeInfo?: AmountData
 }
 
 export interface SWWarning {

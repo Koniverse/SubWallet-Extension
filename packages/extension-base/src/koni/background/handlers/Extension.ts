@@ -1713,6 +1713,11 @@ export default class KoniExtension {
     const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNative && tokenSlug === tokenPayFeeSlug;
 
     let xcmFeeDryRun: string | undefined;
+    const xcmDestinationFee: AmountData = {
+      symbol: destinationTokenInfo?.symbol || '',
+      decimals: destinationTokenInfo?.decimals || 0,
+      value: '0'
+    };
 
     let additionalValidator: undefined | ((inputTransaction: SWTransactionResponse) => Promise<void>);
     let eventsHandler: undefined | ((eventEmitter: TransactionEmitter) => void);
@@ -1774,6 +1779,7 @@ export default class KoniExtension {
         });
 
         xcmFeeDryRun = xcmFeeInfo?.origin.fee || '0';
+        xcmDestinationFee.value = xcmFeeInfo?.destination.fee || '0';
       }
 
       if (isAcrossBridgeTransfer) {
@@ -1912,6 +1918,7 @@ export default class KoniExtension {
       isTransferLocalTokenAndPayThatTokenAsFee,
       isPassConfirmation,
       xcmFeeDryRun,
+      xcmDestinationFee,
       errors,
       additionalValidator: additionalValidator,
       eventsHandler: eventsHandler

@@ -366,6 +366,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
   const { address, destChain, destToken, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, value } = request;
   const feeChainType = fee.type;
   let estimatedFee = '0';
+  let crossChainFee = '0';
   let feeOptions: FeeDetail;
   let maxTransferable: BigN;
   let error: string | undefined;
@@ -460,6 +461,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
         });
 
         estimatedFee = xcmFeeInfo?.origin.fee || '0';
+        crossChainFee = xcmFeeInfo?.destination?.fee || '0';
       } else {
         try {
           const paymentInfo = await (extrinsic as SubmittableExtrinsic<'promise'>).paymentInfo(address);
@@ -478,7 +480,8 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
 
       feeOptions = {
         ...fee,
-        estimatedFee
+        estimatedFee,
+        crossChainFee
       };
     } else if (feeChainType === 'bitcoin') {
       feeOptions = {
