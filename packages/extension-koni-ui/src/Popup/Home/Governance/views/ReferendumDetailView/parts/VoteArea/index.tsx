@@ -24,11 +24,12 @@ type Props = ThemeProps & {
   chain: string
   sdkInstance?: SubsquareApiSdk;
   voteMap?: Map<string, ReferendumVoteDetail>;
+  isVoteButtonLoading?: boolean;
 };
 
 const GovVotedAccountsModalId = 'gov-voted-accounts-modal';
 
-const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstance, voteMap }: Props): React.ReactElement<Props> => {
+const Component = ({ chain, className, isVoteButtonLoading, onClickVote, referendumDetail, sdkInstance, voteMap }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
   const { ayesPercent, naysPercent } = getTallyVotesBarPercent(referendumDetail.onchainData.tally);
   const { data: migrationBlockOffset } = useMigrationOffset(chain, sdkInstance);
@@ -164,6 +165,8 @@ const Component = ({ chain, className, onClickVote, referendumDetail, sdkInstanc
 
       {shouldShowVoteButton && <Button
         block={true}
+        disabled={isVoteButtonLoading}
+        loading={isVoteButtonLoading}
         onClick={onClickVote}
       >
         {(!isAllAccount && hasUserVoted) ? t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.revote') : t('ui.GOVERNANCE.screen.Governance.ReferendumDetail.VoteArea.vote')}

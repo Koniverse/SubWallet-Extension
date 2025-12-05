@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { GovTrackVoting, GovVotingInfo } from '@subwallet/extension-base/services/open-gov/interface';
+import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { GovTrackVoting, GovVoteRequest, GovVotingInfo } from '@subwallet/extension-base/services/open-gov/interface';
 import { AccountChainType, AccountProxyType } from '@subwallet/extension-base/types';
 import { detectTranslate, isAccountAll, reformatAddress } from '@subwallet/extension-base/utils';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
@@ -11,6 +11,7 @@ import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } f
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useGetNativeTokenBasicInfo, useNotification, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import useGetPendingTransaction from '@subwallet/extension-koni-ui/hooks/history/useGetPendingTransaction';
 import { chainSlugToPolkassemblySite, chainSlugToSubsquareSite } from '@subwallet/extension-koni-ui/Popup/Home/Governance/shared';
 import { ViewBaseType } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -49,6 +50,8 @@ const Component = ({ chainSlug, className, goOverview, govLockedInfos, referendu
   const { t } = useTranslation();
   const fromAccountProxy = getTransactionFromAccountProxyValue(currentAccountProxy);
   const { chainInfoMap } = useSelector((root: RootState) => root.chainStore);
+  const { currentAccount } = useSelector((root) => root.accountState);
+  const chainInfo = chainInfoMap[chainSlug];
   const notify = useNotification();
   const { accountAddressItems, voteMap } = useGovReferendumVotes({
     chain: chainSlug,
@@ -122,7 +125,6 @@ const Component = ({ chainSlug, className, goOverview, govLockedInfos, referendu
     }
 
     const trackId = Number(data.trackInfo.id);
-    const chainInfo = chainInfoMap[chainSlug];
 
     // Build a quick lookup record of account → track voting info
     const govTrackByAddress = govLockedInfos.reduce<Record<string, GovTrackVoting>>((acc, info) => {
@@ -157,7 +159,31 @@ const Component = ({ chainSlug, className, goOverview, govLockedInfos, referendu
 
     // Merge voted accounts first, then newly delegated / not voted ones
     return [...voted, ...notVoted];
-  }, [accountAddressItems, chainInfoMap, chainSlug, data, govLockedInfos]);
+  }, [accountAddressItems, chainInfo.substrateInfo?.addressPrefix, data, govLockedInfos]);
+
+  const { loading: pendingLoading, pendingTx } = useGetPendingTransaction(
+    currentAccount?.address || '',
+    chainSlug,
+    ExtrinsicType.GOV_VOTE
+  );
+
+  const isVoteButtonLoading = useMemo(() => {
+    if (pendingLoading) {
+      return true;
+    }
+
+    if (!pendingTx.length || isAllAccount) {
+      return false;
+    }
+
+    return pendingTx.some((tx) => {
+      const additionalInfo = tx.additionalInfo as GovVoteRequest;
+      const refMatch =
+        additionalInfo?.referendumIndex?.toString() === referendumId?.toString();
+
+      return refMatch;
+    });
+  }, [pendingLoading, pendingTx, isAllAccount, referendumId]);
 
   const onViewPolkassembly = useCallback(() => {
     const site = chainSlugToPolkassemblySite[chainSlug];
@@ -271,13 +297,14 @@ const Component = ({ chainSlug, className, goOverview, govLockedInfos, referendu
         <div>
           <VoteArea
             chain={chainSlug}
+            isVoteButtonLoading={isVoteButtonLoading}
             onClickVote={onClickVote}
             referendumDetail={data}
             sdkInstance={sdkInstance}
             voteMap={voteMap}
           />
 
-          { !!spends?.length && (
+          {!!spends?.length && (
             <RequestedAmount
               allSpend={spends}
               chain={chainSlug}
