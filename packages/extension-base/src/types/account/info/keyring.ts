@@ -161,9 +161,9 @@ export enum AccountActions {
  */
 export interface AccountActionData {
   chainType: AccountChainType;
-  accountActions: AccountActions[];
-  transactionActions: ExtrinsicType[];
-  signMode: AccountSignMode;
+  accountActions: AccountActions[]; // todo: Multisig no action
+  transactionActions: ExtrinsicType[]; // todo: Multisig no extrinsic
+  signMode: AccountSignMode; // todo: add MULTISIG or use READ_ONLY.
   specialChain?: string;
   tokenTypes: _AssetType[];
   proxyId?: string;
