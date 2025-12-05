@@ -358,7 +358,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   );
 }
 
-const NftItemDetail = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const NftBundleItemDetail = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     '.nft_item_detail__container': {
       marginTop: token.marginSM,
@@ -488,4 +488,4 @@ const NftItemDetail = styled(Component)<Props>(({ theme: { token } }: Props) => 
   });
 });
 
-export default NftItemDetail;
+export default NftBundleItemDetail;
