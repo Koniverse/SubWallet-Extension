@@ -184,23 +184,6 @@ export const getXcmOriginFee = async (request: CreateXcmExtrinsicProps) => {
   }
 };
 
-export const getXcmDestinationFee = async (request: CreateXcmExtrinsicProps) => {
-  try {
-    const xcmFeeInfo = await estimateXcmFee({
-      fromChainInfo: request.originChain,
-      fromTokenInfo: request.originTokenInfo,
-      toChainInfo: request.destinationChain,
-      recipient: request.recipient,
-      sender: request.sender,
-      value: request.sendingValue
-    });
-
-    return xcmFeeInfo?.destination?.fee;
-  } catch (e) {
-    return undefined;
-  }
-};
-
 export const createAcrossBridgeExtrinsic = async ({ destinationChain,
   destinationTokenInfo,
   evmApi,

@@ -4,7 +4,7 @@
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { BASE_FETCH_ORDINAL_EVENT_DATA } from '@subwallet/extension-base/koni/api/nft/ordinal_nft/constants';
 import { SUBSCAN_API_CHAIN_MAP } from '@subwallet/extension-base/services/subscan-service/subscan-chain-map';
-import { CrowdloanContributionsResponse, ExtrinsicDetail, ExtrinsicItem, ExtrinsicsListResponse, IMultiChainBalance, RequestBlockRange, RewardHistoryListResponse, SubscanResponse, TransferItem, TransfersListResponse } from '@subwallet/extension-base/services/subscan-service/types';
+import { CrowdloanContributionsResponse, ExtrinsicItem, ExtrinsicsListResponse, IMultiChainBalance, RequestBlockRange, RewardHistoryListResponse, SubscanResponse, TransferItem, TransfersListResponse } from '@subwallet/extension-base/services/subscan-service/types';
 import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-request-strategy/context/base';
 import { ApiRequestContextProps } from '@subwallet/extension-base/strategy/api-request-strategy/types';
 import { BaseApiRequestStrategyV2 } from '@subwallet/extension-base/strategy/api-request-strategy-v2';
@@ -117,22 +117,6 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
       }
 
       const jsonData = (await rs.json()) as SubscanResponse<ExtrinsicsListResponse>;
-
-      return jsonData.data;
-    }, 0, groupId);
-  }
-
-  public getExtrinsicDetail (groupId: number, chain: string, extrinsicIndex: string): Promise<ExtrinsicDetail> {
-    return this.addRequest<ExtrinsicDetail>(async () => {
-      const rs = await this.postRequest(this.getApiUrl(chain, 'api/scan/extrinsic'), {
-        extrinsic_index: extrinsicIndex
-      });
-
-      if (rs.status !== 200) {
-        throw new SWError('SubscanService.getExtrinsicDetail', await rs.text());
-      }
-
-      const jsonData = (await rs.json()) as SubscanResponse<ExtrinsicDetail>;
 
       return jsonData.data;
     }, 0, groupId);

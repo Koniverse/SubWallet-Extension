@@ -360,8 +360,7 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
     symbol: '',
     decimals: 0,
     value: '0',
-    tooHigh: false,
-    crossChainFee: '0'
+    tooHigh: false
   };
   const { decimals, symbol } = _getChainNativeTokenBasicInfo(chainInfo);
 

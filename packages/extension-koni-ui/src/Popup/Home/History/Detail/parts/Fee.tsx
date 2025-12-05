@@ -27,7 +27,7 @@ const Component: React.FC<Props> = (props: Props) => {
     return undefined;
   }, [data.additionalInfo, data.type]);
 
-  if (xcmInfo && crossChainFee) {
+  if (xcmInfo) {
     return (
       <>
         <MetaInfo.Number
@@ -37,7 +37,7 @@ const Component: React.FC<Props> = (props: Props) => {
           value={fee?.value || '0'}
         />
 
-        {xcmInfo.fee && <MetaInfo.Number
+        {crossChainFee && <MetaInfo.Number
           decimals={xcmInfo.sendingTokenInfo?.decimals || undefined}
           label={('Destination fee')}
           suffix={xcmInfo.sendingTokenInfo?.symbol || undefined}
