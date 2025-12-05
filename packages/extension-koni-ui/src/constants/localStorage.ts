@@ -20,6 +20,9 @@ export const WITHDRAW_TRANSACTION = 'transaction.withdraw';
 export const CLAIM_REWARD_TRANSACTION = 'transaction.claim-reward';
 export const CLAIM_BRIDGE_TRANSACTION = 'transaction.claim-bridge';
 export const CHANGE_VALIDATOR_TRANSACTION = 'transaction.change-validator';
+export const GOV_REFERENDUM_VOTE_TRANSACTION = 'transaction.gov-referendum-vote';
+export const GOV_REFERENDUM_UNVOTE_TRANSACTION = 'transaction.gov-referendum-unvote';
+export const GOV_UNLOCK_VOTE_TRANSACTION = 'transaction.gov-unlock-vote';
 
 export const TRANSACTION_STORAGES = [TRANSFER_TRANSACTION, NFT_TRANSACTION, EARN_TRANSACTION, UN_STAKE_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION, CLAIM_REWARD_TRANSACTION, SWAP_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION];
 
@@ -40,5 +43,5 @@ export const SHOW_APP_POPUP = 'static.show-app-popup';
 export const LATEST_SESSION = 'general.latest-session';
 export const UPGRADE_FIREFOX_VERSION = 'general.updated-version-firefox';
 export const UPGRADE_DUPLICATE_ACCOUNT_NAME = 'general.upgrade-duplicate-account-name';
-
+export const CURRENT_CHAIN_GOV = 'gov.current-chain-gov';
 export const ADDRESS_INPUT_AUTO_FORMAT_VALUE = 'component.address-input.auto-format-value'; // value: boolean
