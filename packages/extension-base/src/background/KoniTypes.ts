@@ -264,6 +264,10 @@ export interface NftItem extends NftItemExtraInfo {
   rarity?: string;
   description?: string;
   properties?: Record<any, any> | null;
+  isBundle?: boolean;
+  nestingLevel?: number;
+  nestingTokens?: NftItem[]
+  parent?: NftItem;
 }
 
 interface NftItemExtraInfo {

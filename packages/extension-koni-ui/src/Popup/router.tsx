@@ -63,6 +63,8 @@ const Tokens = new LazyLoader('Tokens', () => import('@subwallet/extension-koni-
 const TokenDetailList = new LazyLoader('TokenDetailList', () => import('@subwallet/extension-koni-ui/Popup/Home/Tokens/DetailList'));
 
 const NftItemDetail = new LazyLoader('NftItemDetail', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftItemDetail'));
+const NftBundleItemDetail = new LazyLoader('NftBundleItemDetail', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/nested-nft/NftDetailBase'));
+const NftViewStructure = new LazyLoader('NftViewStructure', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/nested-nft/NftViewStructure'));
 const NftCollections = new LazyLoader('NftCollections', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftCollections'));
 const NftCollectionDetail = new LazyLoader('NftCollectionDetail', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftCollectionDetail'));
 const NftImport = new LazyLoader('NftImport', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftImport'));
@@ -180,7 +182,9 @@ export const router = createHashRouter([
             children: [
               NftCollections.generateRouterObject('collections'),
               NftCollectionDetail.generateRouterObject('collection-detail'),
-              NftItemDetail.generateRouterObject('item-detail')
+              NftItemDetail.generateRouterObject('item-detail'),
+              NftBundleItemDetail.generateRouterObject('bundle-item-detail'),
+              NftViewStructure.generateRouterObject('view-structure')
             ]
           },
           // Staking.generateRouterObject('staking'),
