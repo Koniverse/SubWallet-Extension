@@ -69,6 +69,12 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
     return priceMap[transferTokenPriceId] || 0;
   }, [priceMap, tokenInfo]);
 
+  const destTransferTokenValue = useMemo(() => {
+    const destTransferTokenPriceId = _getAssetPriceId(destTokenInfo);
+
+    return priceMap[destTransferTokenPriceId] || 0;
+  }, [destTokenInfo, priceMap]);
+
   const convertedFeeValueToUSD = useMemo(() => {
     if (!feeInfo?.value) {
       return 0;
@@ -90,6 +96,28 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
       .dividedBy(BN_TEN.pow(tokenInfo.decimals || 0))
       .toNumber();
   }, [crossChainFeeInfo, tokenInfo, transferTokenValue]);
+
+  const convertedAmountValueToUSD = useMemo(() => {
+    if (!data.value) {
+      return 0;
+    }
+
+    return new BigN(data.value)
+      .multipliedBy(transferTokenValue)
+      .dividedBy(BN_TEN.pow(tokenInfo.decimals || 0))
+      .toNumber();
+  }, [data.value, tokenInfo.decimals, transferTokenValue]);
+
+  const convertedXcmDestTokenValueToUSD = useMemo(() => {
+    if (!isAcrossBridge || !xcmData.metadata?.amountOut) {
+      return 0;
+    }
+
+    return new BigN(xcmData.metadata?.amountOut)
+      .multipliedBy(destTransferTokenValue)
+      .dividedBy(BN_TEN.pow(destTokenInfo.decimals || 0))
+      .toNumber();
+  }, [destTokenInfo.decimals, destTransferTokenValue, isAcrossBridge, xcmData.metadata?.amountOut]);
 
   const destinationChainSlug = xcmData?.destinationNetworkKey || transaction.chain;
   const originChainSlug = xcmData?.originNetworkKey || transaction.chain;
@@ -133,21 +161,38 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
                 toAssetInfo={destTokenInfo}
               />
             </MetaInfo.Default>
-            <MetaInfo.Number
-              decimals={destTokenInfo.decimals || 0}
-              label={t('ui.TRANSACTION.Confirmations.TransferBlock.expectedAmount')}
-              suffix={destTokenInfo.symbol}
-              value={xcmData.metadata.amountOut}
-            />
+            <MetaInfo.Default label={t('ui.TRANSACTION.Confirmations.TransferBlock.expectedAmount')}>
+              <Number
+                decimal={destTokenInfo.decimals || 0}
+                suffix={destTokenInfo.symbol}
+                value={xcmData.metadata.amountOut}
+              />
+              <Number
+                className={'__amount-price-value'}
+                decimal={0}
+                prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
+                suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+                value={convertedXcmDestTokenValueToUSD}
+              />
+            </MetaInfo.Default>
           </>
           : (
-            <MetaInfo.Number
-              className={'__transfer-block-amount'}
-              decimals={tokenInfo.decimals || 0}
+            <MetaInfo.Default
               label={t('ui.TRANSACTION.Confirmations.TransferBlock.amount')}
-              suffix={tokenInfo.symbol}
-              value={data.value || 0}
-            />
+            >
+              <Number
+                decimal={tokenInfo.decimals || 0}
+                suffix={tokenInfo.symbol}
+                value={data.value || 0}
+              />
+              <Number
+                className={'__amount-price-value'}
+                decimal={0}
+                prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
+                suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+                value={convertedAmountValueToUSD}
+              />
+            </MetaInfo.Default>
           )}
 
         <MetaInfo.Default
@@ -196,7 +241,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
 
 export const TransferBlock = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-    '.__fee-price-value': {
+    '.__fee-price-value, .__amount-price-value': {
       fontSize: `${token.fontSizeSM}px !important`,
       lineHeight: '20px !important',
       color: `${token.colorTextTertiary} !important`
