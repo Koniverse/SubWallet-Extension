@@ -1,6 +1,14 @@
 # CHANGELOG
 
 ## 1.3.68
+Build date: Dec 08, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.122 (#4827)
+- Turn off "Advanced phishing detection" feature (#4891)
+
+
+## 1.3.68
 Build date: Dec 03, 2025.
 
 Features & Updates:
