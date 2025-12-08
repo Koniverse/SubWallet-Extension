@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _SUPPORT_TOKEN_PAY_FEE_GROUP, isChainSupportTokenPayFee } from '@subwallet/extension-base/constants';
-import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _isNativeTokenBySlug } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
+import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
+import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
+import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _isNativeTokenBySlug, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { FeeChainType, FeeDetail, TransactionFee } from '@subwallet/extension-base/types';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
@@ -63,11 +68,20 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
   const assetRegistry = useSelector((root) => root.assetRegistry.assetRegistry);
+  const chainInfoMap = useSelector((root) => root.chainStore.chainInfoMap);
   // @ts-ignore
   const priceMap = useSelector((state) => state.price.priceMap);
   const [feeEditorModalRenderKey, setFeeEditorModalRenderKey] = useState<string>(modalId);
   const { currencyData } = useSelector((state: RootState) => state.price);
   const [stableIsDataReady, setStableIsDataReady] = useState(false);
+
+  const originChainInfo = (() => {
+    return chainValue ? chainInfoMap[chainValue] : undefined;
+  })();
+
+  const destinationChainInfo = (() => {
+    return destChainValue ? chainInfoMap[destChainValue] : undefined;
+  })();
 
   const tokenPayFeeAsset = (() => {
     return assetRegistry[tokenPayFeeSlug] || undefined;
@@ -173,6 +187,38 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
   const isXcm = useMemo(() => {
     return chainValue && destChainValue && chainValue !== destChainValue;
   }, [chainValue, destChainValue]);
+
+  const isSubstrateXcm = useMemo(() => {
+    if (!originChainInfo || !destinationChainInfo || originChainInfo.slug === destinationChainInfo.slug) {
+      return false;
+    }
+
+    if (_isPureEvmChain(originChainInfo) && isAvailChainBridge(destinationChainInfo.slug)) {
+      return false;
+    }
+
+    if (isAvailChainBridge(originChainInfo.slug) && _isPureEvmChain(destinationChainInfo)) {
+      return false;
+    }
+
+    if (_isPureEvmChain(originChainInfo) && _isSnowBridgeXcm(originChainInfo, destinationChainInfo)) {
+      return false;
+    }
+
+    if (_isPolygonChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
+      return false;
+    }
+
+    if (_isPosChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
+      return false;
+    }
+
+    if (_isAcrossChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
+      return false;
+    }
+
+    return true;
+  }, [originChainInfo, destinationChainInfo]);
 
   const isEnergyWebChain = useMemo(() => {
     return chainValue === 'energy_web_chain';
@@ -286,7 +332,7 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
       }
 
       {
-        isXcm && (
+        isSubstrateXcm && (
           <div className={CN(className, '__cross-chain-fee-wrapper')}>
             <div className='__field-line-1'>
               <div className='__field-label'>
