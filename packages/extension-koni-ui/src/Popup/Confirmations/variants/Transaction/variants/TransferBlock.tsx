@@ -2,12 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
-import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
-import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
-import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainName, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { isSubstrateCrossChain } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import QuoteRateDisplay from '@subwallet/extension-koni-ui/components/Swap/QuoteRateDisplay';
 import { BN_TEN } from '@subwallet/extension-koni-ui/constants';
@@ -130,35 +127,11 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
     const originChainInfo = chainInfoMap[originChainSlug];
     const destinationChainInfo = chainInfoMap[destinationChainSlug];
 
-    if (!originChainInfo || !destinationChainInfo || originChainInfo.slug === destinationChainInfo.slug) {
+    if (!originChainInfo || !destinationChainInfo) {
       return false;
     }
 
-    if (_isPureEvmChain(originChainInfo) && isAvailChainBridge(destinationChainInfo.slug)) {
-      return false;
-    }
-
-    if (isAvailChainBridge(originChainInfo.slug) && _isPureEvmChain(destinationChainInfo)) {
-      return false;
-    }
-
-    if (_isPureEvmChain(originChainInfo) && _isSnowBridgeXcm(originChainInfo, destinationChainInfo)) {
-      return false;
-    }
-
-    if (_isPolygonChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
-      return false;
-    }
-
-    if (_isPosChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
-      return false;
-    }
-
-    if (_isAcrossChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
-      return false;
-    }
-
-    return true;
+    return isSubstrateCrossChain(originChainInfo, destinationChainInfo);
   }, [destinationChainSlug, originChainSlug, chainInfoMap]);
 
   return (

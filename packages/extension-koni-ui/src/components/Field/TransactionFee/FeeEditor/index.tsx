@@ -2,12 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _SUPPORT_TOKEN_PAY_FEE_GROUP, isChainSupportTokenPayFee } from '@subwallet/extension-base/constants';
-import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
-import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
-import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
-import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
-import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _isNativeTokenBySlug, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { isSubstrateCrossChain } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _isNativeTokenBySlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { FeeChainType, FeeDetail, TransactionFee } from '@subwallet/extension-base/types';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
@@ -189,35 +185,11 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
   }, [chainValue, destChainValue]);
 
   const isSubstrateXcm = useMemo(() => {
-    if (!originChainInfo || !destinationChainInfo || originChainInfo.slug === destinationChainInfo.slug) {
+    if (!originChainInfo || !destinationChainInfo) {
       return false;
     }
 
-    if (_isPureEvmChain(originChainInfo) && isAvailChainBridge(destinationChainInfo.slug)) {
-      return false;
-    }
-
-    if (isAvailChainBridge(originChainInfo.slug) && _isPureEvmChain(destinationChainInfo)) {
-      return false;
-    }
-
-    if (_isPureEvmChain(originChainInfo) && _isSnowBridgeXcm(originChainInfo, destinationChainInfo)) {
-      return false;
-    }
-
-    if (_isPolygonChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
-      return false;
-    }
-
-    if (_isPosChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
-      return false;
-    }
-
-    if (_isAcrossChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
-      return false;
-    }
-
-    return true;
+    return isSubstrateCrossChain(originChainInfo, destinationChainInfo);
   }, [originChainInfo, destinationChainInfo]);
 
   const isEnergyWebChain = useMemo(() => {
