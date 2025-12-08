@@ -1,14 +1,14 @@
-    3257	AnhMTV                        	Release version 1.3.68
+    3262	AnhMTV                        	
     2671	Nam Phạm                      	disable block explorer for truth network
     2599	S2kael                        	[Issue-4521] Update stable version for chain-list
-    1020	bluezdot                      	[Issue-4708] chores: remove unused code
+    1022	bluezdot                      	[Issue-4708] chores: remove unused code
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
-     605	nguyentiendung                	[Issue-4451] fix: resolve mirror bugs and update content
+     606	nguyentiendung                	[Issue-4889] feat: temporarily disable Advanced Phishing Detection (UI & background)
      550	Frenkie Nguyen                	[Issue-4462] update styling for background phishing page
      465	Jaco                          	0.42.5 (#969)
      458	tunghp2002                    	[Issue-4835] Revert env
      355	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
-     310	PDTnhah                       	
+     320	PDTnhah                       	[Issue-4827] fix: improve get explorer link for subtensor evm
      279	lw                            	[Issue-4462] refactor: Refactor logic related to amount input
      200	Thiendekaco                   	[Issue-4739] chore: resolve comment after review pr
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
