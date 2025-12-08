@@ -1778,6 +1778,8 @@ export default class KoniExtension {
           value: params.sendingValue
         });
 
+        // todo: refactor name
+        // todo: check to use full interface to has full AmountData, include symbol, decimal
         xcmFeeDryRun = xcmFeeInfo?.origin.fee || '0';
         xcmDestinationFee.value = xcmFeeInfo?.destination.fee || '0';
       }

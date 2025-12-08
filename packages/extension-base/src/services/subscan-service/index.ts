@@ -246,7 +246,6 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
       }
 
       cbAfterEachRequest?.(res.transfers);
-
       res.transfers.forEach((item) => {
         if (!resultMap[item.hash]) {
           resultMap[item.hash] = [item];
