@@ -57,6 +57,7 @@ export interface AbstractYieldPositionInfo extends BaseYieldPositionInfo {
   unstakings: UnstakingInfo[];
 
   /* Special info */
+  // TODO: merge with metadata
   subnetData?: {
     subnetSymbol: string;
     subnetShortName: string;
