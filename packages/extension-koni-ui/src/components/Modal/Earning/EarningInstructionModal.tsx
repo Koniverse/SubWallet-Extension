@@ -11,7 +11,7 @@ import { YieldPoolType } from '@subwallet/extension-base/types';
 import { balanceFormatter, detectTranslate, formatNumber } from '@subwallet/extension-base/utils';
 import { InstructionItem } from '@subwallet/extension-koni-ui/components';
 import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
-import { EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL, TANSSI_EARNING_DATA_RAW } from '@subwallet/extension-koni-ui/constants';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { earlyValidateJoin } from '@subwallet/extension-koni-ui/messaging';
 import { AlertDialogProps, PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -64,11 +64,11 @@ const Component: React.FC<Props> = (props: Props) => {
       return ALL_ACCOUNT_KEY;
     }
 
-    const accountAddress = currentAccountProxy?.accounts.find(({ chainType, type: accountType }) => {
+    const accountAddress = currentAccountProxy?.accounts.find((accountInfo) => {
       if (chainInfoMap[poolInfo.chain]) {
         const chainInfo = chainInfoMap[poolInfo.chain];
 
-        return _isChainInfoCompatibleWithAccountInfo(chainInfo, chainType, accountType);
+        return _isChainInfoCompatibleWithAccountInfo(chainInfo, accountInfo);
       }
 
       return false;
@@ -199,8 +199,8 @@ const Component: React.FC<Props> = (props: Props) => {
       time = poolInfo.statistic.unstakingPeriod;
     }
 
-    return getEarningTimeText(time);
-  }, [poolInfo.statistic]);
+    return getEarningTimeText(t, time);
+  }, [poolInfo.statistic, t]);
 
   const data: BoxProps[] = useMemo(() => {
     if (!poolInfo) {
@@ -281,7 +281,47 @@ const Component: React.FC<Props> = (props: Props) => {
           }
 
           if (_STAKING_CHAIN_GROUP.bittensor.includes(poolInfo.chain)) {
-            return EARNING_DATA_RAW.BITTENOSR_STAKING.map((item) => {
+            return EARNING_DATA_RAW.BITTENSOR_STAKING.map((item) => {
+              const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
+
+              replaceEarningValue(_item, '{validatorNumber}', maxCandidatePerFarmer.toString());
+              replaceEarningValue(_item, '{validatorType}', label);
+              replaceEarningValue(_item, '{periodNumb}', unBondedTime);
+              replaceEarningValue(_item, '{maintainBalance}', maintainBalance);
+              replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
+
+              if (paidOut !== undefined) {
+                replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());
+                replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : paidOut === 1 ? 'hour' : 'minutes');
+              }
+
+              return _item;
+            });
+          }
+
+          if (_STAKING_CHAIN_GROUP.energy.includes(poolInfo.chain)) {
+            return EARNING_DATA_RAW[YieldPoolType.NATIVE_STAKING]
+              .filter((item) => item.icon !== 'ThumbsUp')
+              .map((item) => {
+                const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
+
+                replaceEarningValue(_item, '{validatorNumber}', maxCandidatePerFarmer.toString());
+                replaceEarningValue(_item, '{validatorType}', label);
+                replaceEarningValue(_item, '{periodNumb}', unBondedTime);
+                replaceEarningValue(_item, '{maintainBalance}', maintainBalance);
+                replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
+
+                if (paidOut !== undefined) {
+                  replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());
+                  replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : paidOut === 1 ? 'hour' : 'minutes');
+                }
+
+                return _item;
+              });
+          }
+
+          if (_STAKING_CHAIN_GROUP.tanssi.includes(poolInfo.chain)) {
+            return TANSSI_EARNING_DATA_RAW.map((item) => {
               const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
 
               replaceEarningValue(_item, '{validatorNumber}', maxCandidatePerFarmer.toString());
@@ -441,11 +481,11 @@ const Component: React.FC<Props> = (props: Props) => {
 
     const onError = (message: string) => {
       openAlert({
-        title: t('Pay attention!'),
+        title: t('ui.EARNING.components.Modal.Earning.Instruction.payAttentionExclamation'),
         type: NotificationType.ERROR,
         content: message,
         okButton: {
-          text: t('I understand'),
+          text: t('ui.EARNING.components.Modal.Earning.Instruction.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
         }
@@ -529,7 +569,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={detectTranslate('For more information and staking instructions, read <highlight>this FAQ</highlight>')}
+            i18nKey={detectTranslate('ui.EARNING.components.Modal.Earning.Instruction.readFaqForStakingInfo')}
           />
         </div>
 
@@ -556,7 +596,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={closeModal}
           schema={'secondary'}
         >
-          {isShowStakeMoreButton ? t('Back') : t('Close')}
+          {isShowStakeMoreButton ? t('ui.EARNING.components.Modal.Earning.Instruction.back') : t('ui.EARNING.components.Modal.Earning.Instruction.close')}
         </Button>
 
         {isShowStakeMoreButton && (

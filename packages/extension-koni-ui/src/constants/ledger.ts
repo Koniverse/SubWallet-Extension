@@ -3,6 +3,7 @@
 
 import { ChainInfoMap } from '@subwallet/chain-list';
 import { LedgerNetwork, MigrationLedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountSignMode } from '@subwallet/extension-base/types';
 
 export const SUBSTRATE_GENERIC_KEY = 'substrate_generic';
 export const SUBSTRATE_MIGRATION_KEY = 'substrate_migration';
@@ -251,6 +252,7 @@ export const PredefinedLedgerNetwork: LedgerNetwork[] = [
     isEthereum: false,
     slip44: 799
   }
+
   // {
   //   displayName: 'Centrifuge',
   //   genesisHash: '0xb3db41421702df9a7fcac62b53ffeac85f7853cc4e689e0b93aeb3db18c09d82',
@@ -511,7 +513,6 @@ export const PredefinedMigrationLedgerNetwork: MigrationLedgerNetwork[] = [
   //   ss58_addr_type: 7391
   // }
 ];
-
 export const isLedgerCapable = !!(window as unknown as { USB?: unknown }).USB;
 
 export const PolkadotDerivationPathGens: string[] = [POLKADOT_KEY].map((slug) => ChainInfoMap[slug].substrateInfo?.genesisHash || '');
@@ -522,3 +523,5 @@ export const StandardDerivationPathGens: string[] = Object.values(PredefinedLedg
   .map(({ genesisHash }) => genesisHash);
 
 export const NotNeedMigrationGens: string[] = [...PolkadotDerivationPathGens, ...StandardDerivationPathGens];
+export const SubstrateLedgerSignModeSupport: AccountSignMode[] = [AccountSignMode.LEGACY_LEDGER, AccountSignMode.GENERIC_LEDGER, AccountSignMode.ECDSA_SUBSTRATE_LEDGER];
+export const BIP32_HARDENED_OFFSET = 0x80000000;

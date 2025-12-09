@@ -55,19 +55,20 @@ export default class BifrostLiquidStakingPoolHandler extends BaseLiquidStakingPo
   public slug: string;
   protected name: string;
   protected shortName: string;
-  protected readonly altInputAsset: string = 'polkadot-NATIVE-DOT';
+  protected readonly altInputAsset: string = 'statemint-NATIVE-DOT';
   protected readonly derivativeAssets: string[] = ['bifrost_dot-LOCAL-vDOT'];
   protected readonly inputAsset: string = 'bifrost_dot-LOCAL-DOT';
   protected readonly rewardAssets: string[] = ['bifrost_dot-LOCAL-DOT'];
   protected readonly feeAssets: string[] = ['bifrost_dot-NATIVE-BNC', 'bifrost_dot-LOCAL-DOT'];
   public override readonly minAmountPercent: number = 0.99;
-  protected readonly availableMethod: YieldPoolMethodInfo = {
+  public readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: true,
     cancelUnstake: false,
     withdraw: false,
-    claimReward: false
+    claimReward: false,
+    changeValidator: false
   };
 
   protected readonly rateDecimals = 0;

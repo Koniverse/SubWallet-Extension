@@ -51,6 +51,8 @@ const editUnlockTypeModalId = EDIT_UNLOCK_TYPE_MODAL;
 
 const timeOptions = [5, 10, 15, 30, 60];
 
+const showChainPatrol = false;
+
 const Component: React.FC<Props> = (props: Props) => {
   const { className } = props;
 
@@ -73,17 +75,17 @@ const Component: React.FC<Props> = (props: Props) => {
     if (value > 0) {
       return {
         value: value,
-        label: t('{{time}} minutes', { replace: { time: value } })
+        label: t('ui.SETTINGS.screen.Setting.Security.timeMinutes', { replace: { time: value } })
       };
     } else if (value < 0) {
       return {
         value: value,
-        label: t('Required once')
+        label: t('ui.SETTINGS.screen.Setting.Security.requiredOnce')
       };
     } else {
       return {
         value: value,
-        label: t('Always require')
+        label: t('ui.SETTINGS.screen.Setting.Security.alwaysRequire')
       };
     }
   }), [t]);
@@ -92,21 +94,21 @@ const Component: React.FC<Props> = (props: Props) => {
     {
       icon: Key,
       key: SecurityType.WALLET_PASSWORD,
-      title: t('Change wallet password'),
+      title: t('ui.SETTINGS.screen.Setting.Security.changeWalletPassword'),
       url: '/keyring/change-password',
       disabled: noAccount
     },
     {
       icon: LockLaminated,
       key: SecurityType.AUTO_LOCK,
-      title: t('Extension auto lock'),
+      title: t('ui.SETTINGS.screen.Setting.Security.extensionAutoLock'),
       url: '',
       disabled: false
     },
     {
       icon: LockKeyOpen,
       key: SecurityType.UNLOCK_TYPE,
-      title: t('Authenticate with password'),
+      title: t('ui.SETTINGS.screen.Setting.Security.authenticateWithPassword'),
       url: '',
       disabled: false
     }
@@ -278,35 +280,41 @@ const Component: React.FC<Props> = (props: Props) => {
     <PageWrapper className={CN(className)}>
       <Layout.WithSubHeaderOnly
         onBack={onBack}
-        title={t('Security settings')}
+        title={t('ui.SETTINGS.screen.Setting.Security.securitySettings')}
       >
         <div className='body-container'>
           <div className='items-container'>
             {items.map(onRenderItem)}
           </div>
           <div className='setting-config-container'>
-            <div className='items-container'>
-              <SettingItem
-                className={CN('security-item', `security-type-${SecurityType.CHAIN_PATROL_SERVICE}`)}
-                leftItemIcon={(
-                  <BackgroundIcon
-                    backgroundColor={'var(--icon-bg-color)'}
-                    phosphorIcon={ShieldStar}
-                    size='sm'
-                    type='phosphor'
-                    weight='fill'
-                  />
-                )}
-                name={t('Advanced phishing detection')}
-                rightItem={(
-                  <Switch
-                    checked={enableChainPatrol}
-                    loading={loadingChainPatrol}
-                    onClick={updateChainPatrolEnable(enableChainPatrol)}
-                  />
-                )}
-              />
-            </div>
+            {showChainPatrol && (<div
+              className={CN('security-item', 'custom-security-item', `security-type-${SecurityType.CHAIN_PATROL_SERVICE}`)}
+            >
+              <div className='__item-left-part'>
+                <BackgroundIcon
+                  backgroundColor={'var(--icon-bg-color)'}
+                  phosphorIcon={ShieldStar}
+                  size='sm'
+                  type='phosphor'
+                  weight='fill'
+                />
+              </div>
+              <div className='__item-center-part'>
+                <div className='__item-title'>
+                  {t('ui.SETTINGS.screen.Setting.Security.advancedPhishingDetection')}
+                </div>
+                <div className='__item-description'>
+                  {t('Show warnings for phishing sites and protect your assets from scams')}
+                </div>
+              </div>
+              <div className='__item-right-part'>
+                <Switch
+                  checked={enableChainPatrol}
+                  loading={loadingChainPatrol}
+                  onClick={updateChainPatrolEnable(enableChainPatrol)}
+                />
+              </div>
+            </div>)}
             <SettingItem
               className={CN('security-item', `security-type-${SecurityType.CAMERA_ACCESS}`)}
               leftItemIcon={(
@@ -318,7 +326,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   weight='fill'
                 />
               )}
-              name={t('Camera access for QR')}
+              name={t('ui.SETTINGS.screen.Setting.Security.cameraAccessForQr')}
               rightItem={(
                 <Switch
                   checked={camera}
@@ -339,10 +347,10 @@ const Component: React.FC<Props> = (props: Props) => {
               </div>
               <div className='__item-center-part'>
                 <div className='__item-title'>
-                  {t('Sign for multiple transactions')}
+                  {t('ui.SETTINGS.screen.Setting.Security.signForMultipleTransactions')}
                 </div>
                 <div className='__item-description'>
-                  {t('Allow signing once for multiple transactions')}
+                  {t('ui.SETTINGS.screen.Setting.Security.allowSignOnceForMultiple')}
                 </div>
               </div>
               <div className='__item-right-part'>
@@ -359,7 +367,7 @@ const Component: React.FC<Props> = (props: Props) => {
           className={className}
           id={editAutoLockTimeModalId}
           onCancel={onCloseAutoLockTimeModal}
-          title={t('Auto lock')}
+          title={t('ui.SETTINGS.screen.Setting.Security.autoLock')}
         >
           <div className='modal-body-container'>
             {
@@ -396,13 +404,13 @@ const Component: React.FC<Props> = (props: Props) => {
           className={className}
           id={editUnlockTypeModalId}
           onCancel={onCloseUnlockTypeModal}
-          title={t('Authenticate with password')}
+          title={t('ui.SETTINGS.screen.Setting.Security.authenticateWithPassword')}
         >
           <div className='modal-body-container'>
             <SettingItem
               className={CN('__selection-item')}
               key={WalletUnlockType.ALWAYS_REQUIRED}
-              name={t('Always required')}
+              name={t('ui.SETTINGS.screen.Setting.Security.alwaysRequired')}
               onPressItem={onSetUnlockType(WalletUnlockType.ALWAYS_REQUIRED)}
               rightItem={
                 unlockType === WalletUnlockType.ALWAYS_REQUIRED
@@ -422,7 +430,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <SettingItem
               className={CN('__selection-item')}
               key={WalletUnlockType.WHEN_NEEDED}
-              name={t('When needed')}
+              name={t('ui.SETTINGS.screen.Setting.Security.whenNeeded')}
               onPressItem={onSetUnlockType(WalletUnlockType.WHEN_NEEDED)}
               rightItem={
                 unlockType === WalletUnlockType.WHEN_NEEDED

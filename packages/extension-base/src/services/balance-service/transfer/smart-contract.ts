@@ -23,42 +23,70 @@ interface TransferEvmProps extends TransactionFee {
   value: string;
   evmApi: _EvmApi;
   fallbackFee?: boolean;
+  data?: string;
 }
 
-export async function getEVMTransactionObject ({ chain,
-  evmApi,
-  fallbackFee,
-  feeCustom: _feeCustom,
-  feeInfo: _feeInfo,
-  feeOption,
-  from,
-  to,
-  transferAll,
-  value }: TransferEvmProps): Promise<[TransactionConfig, string, string]> {
+// hot fix gas settings for Energy Web Chain
+export const gasSettingsForEWC = {
+  gasLimit: 4900000,
+  maxFeePerGas: '10000000'
+};
+
+export async function getEVMTransactionObject (props: TransferEvmProps): Promise<[TransactionConfig, string, string]> {
+  const { chain,
+    data,
+    evmApi,
+    fallbackFee,
+    feeCustom: _feeCustom,
+    feeInfo: _feeInfo,
+    feeOption,
+    from,
+    to,
+    transferAll,
+    value } = props;
+
+  const isEnergyWebChain = chain === 'energy_web_chain'; // hot fix gas settings for Energy Web Chain
+
   const feeCustom = _feeCustom as EvmEIP1559FeeOption;
   const feeInfo = _feeInfo as EvmFeeInfo;
-
   const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
   let errorOnEstimateFee = '';
 
+  if (isEnergyWebChain) {
+    feeCombine.maxFeePerGas = gasSettingsForEWC.maxFeePerGas;
+
+    if (!feeCombine.maxPriorityFeePerGas || new BigN(feeCombine.maxPriorityFeePerGas).gt(feeCombine.maxFeePerGas)) {
+      feeCombine.maxPriorityFeePerGas = gasSettingsForEWC.maxFeePerGas;
+    }
+  }
+
   const transactionObject = {
-    to: to,
-    value: value,
-    from: from,
+    to,
+    value,
+    from,
+    data,
     ...feeCombine
   } as TransactionConfig;
 
-  const gasLimit = await evmApi.api.eth.estimateGas(transactionObject).catch((e: Error) => {
-    console.log('Cannot estimate fee with native transfer on', chain, e);
+  let gasLimit: number;
 
-    if (fallbackFee) {
-      errorOnEstimateFee = e.message;
+  if (isEnergyWebChain) {
+    gasLimit = gasSettingsForEWC.gasLimit;
+  } else {
+    const gasEstimate = await evmApi.api.eth.estimateGas(transactionObject).catch((e: Error) => {
+      console.log('Cannot estimate fee with native transfer on', chain, e);
 
-      return 21000;
-    } else {
-      throw Error('Unable to estimate fee for this transaction. Edit fee and try again.');
-    }
-  });
+      if (fallbackFee) {
+        errorOnEstimateFee = e.message;
+
+        return 21000;
+      } else {
+        throw Error('Unable to estimate fee for this transaction. Edit fee and try again.');
+      }
+    });
+
+    gasLimit = Math.floor(gasEstimate * 1.1); // 10% buffer for fluctuations
+  }
 
   transactionObject.gas = gasLimit;
 
@@ -83,8 +111,8 @@ export async function getEVMTransactionObject ({ chain,
   return [transactionObject, transactionObject.value.toString(), errorOnEstimateFee];
 }
 
-export async function getERC20TransactionObject (
-  { assetAddress,
+export async function getERC20TransactionObject (props: TransferERC20Props): Promise<[TransactionConfig, string, string]> {
+  const { assetAddress,
     chain,
     evmApi,
     fallbackFee,
@@ -94,8 +122,10 @@ export async function getERC20TransactionObject (
     from,
     to,
     transferAll,
-    value }: TransferERC20Props
-): Promise<[TransactionConfig, string, string]> {
+    value } = props;
+
+  const isEnergyWebChain = chain === 'energy_web_chain'; // hot fix gas settings for Energy Web Chain
+
   const erc20Contract = getERC20Contract(assetAddress, evmApi);
   const feeCustom = _feeCustom as EvmEIP1559FeeOption;
 
@@ -116,22 +146,34 @@ export async function getERC20TransactionObject (
     return erc20Contract.methods.transfer(to, transferValue).encodeABI() as string;
   }
 
-  const transferData = generateTransferData(to, transferValue);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-  const gasLimit = await (erc20Contract.methods.transfer(to, transferValue) as ContractSendMethod).estimateGas({ from })
-    .catch((e: Error) => {
-      console.log('Cannot estimate fee with token contract', assetAddress, chain, e);
-
-      if (fallbackFee) {
-        errorOnEstimateFee = e.message;
-
-        return 70000;
-      } else {
-        throw Error('Unable to estimate fee for this transaction. Edit fee and try again.');
-      }
-    });
   const feeInfo = _feeInfo as EvmFeeInfo;
   const feeCombine = combineEthFee(feeInfo, feeOption, feeCustom);
+
+  const transferData = generateTransferData(to, transferValue);
+  let gasLimit: number;
+
+  if (isEnergyWebChain) {
+    gasLimit = gasSettingsForEWC.gasLimit;
+    feeCombine.maxFeePerGas = gasSettingsForEWC.maxFeePerGas;
+
+    if (!feeCombine.maxPriorityFeePerGas || new BigN(feeCombine.maxPriorityFeePerGas).gt(feeCombine.maxFeePerGas)) {
+      feeCombine.maxPriorityFeePerGas = gasSettingsForEWC.maxFeePerGas;
+    }
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    gasLimit = await (erc20Contract.methods.transfer(to, transferValue) as ContractSendMethod).estimateGas({ from })
+      .catch((e: Error) => {
+        console.log('Cannot estimate fee with token contract', assetAddress, chain, e);
+
+        if (fallbackFee) {
+          errorOnEstimateFee = e.message;
+
+          return 70000;
+        } else {
+          throw Error('Unable to estimate fee for this transaction. Edit fee and try again.');
+        }
+      });
+  }
 
   const transactionObject = {
     gas: gasLimit,
@@ -184,8 +226,11 @@ export async function getERC721Transaction (
     const error = e as Error;
 
     if (error.message.includes('transfer to non ERC721Receiver implementer')) {
-      error.message = t('Unable to send. NFT not supported on recipient address');
+      error.message = t('bg.BALANCE.services.service.balance.transfer.smartContract.nftNotSupportedOnRecipient');
+      throw error;
     }
+
+    error.message = t('bg.BALANCE.services.service.balance.transfer.smartContract.temporarilyNontransferableNFT');
 
     throw error;
   }

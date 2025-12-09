@@ -6,7 +6,7 @@ import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/
 import { _getAssetDecimals, _getAssetPriceId, _getTokenOnChainAssetId } from '@subwallet/extension-base/services/chain-service/utils';
 import { RequestAssetHubTokensCanPayFee, RequestHydrationTokensCanPayFee, TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { checkLiquidityForPool, estimateTokensForPool, getReserveForPool } from '@subwallet/extension-base/services/swap-service/handler/asset-hub/utils';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
@@ -21,12 +21,28 @@ export async function getAssetHubTokensCanPayFee (request: RequestAssetHubTokens
 
   // ensure nativeTokenInfo and localTokenInfo have multi-location metadata beforehand to improve performance.
   const tokensHasBalanceSlug = Object.keys(tokensHasBalanceInfoMap);
-  const tokenInfos = tokensHasBalanceSlug.map((tokenSlug) => chainService.getAssetBySlug(tokenSlug)).filter((token) => (
-    token.originChain === substrateApi.chainSlug &&
-    token.assetType !== _AssetType.NATIVE &&
-    token.metadata &&
-    token.metadata.multilocation
-  ));
+  const tokenInfos = tokensHasBalanceSlug
+    .map((tokenSlug) => {
+      const token = chainService.getAssetBySlug(tokenSlug);
+
+      if (!token) {
+        console.error(`[getAssetHubTokensCanPayFee] Token not found for slug: ${tokenSlug}`);
+      }
+
+      return token;
+    })
+    .filter((token) => {
+      if (!token) {
+        return false;
+      }
+
+      return (
+        token.originChain === substrateApi.chainSlug &&
+        token.assetType !== _AssetType.NATIVE &&
+        token.metadata &&
+        token.metadata.multilocation
+      );
+    });
 
   await Promise.all(tokenInfos.map(async (tokenInfo) => {
     try {
@@ -79,12 +95,27 @@ export async function getHydrationTokensCanPayFee (request: RequestHydrationToke
     return tokensList;
   }
 
-  const tokenInfos = Object.keys(tokensHasBalanceInfoMap).map((tokenSlug) => chainService.getAssetBySlug(tokenSlug)).filter((token) => (
-    token.originChain === substrateApi.chainSlug &&
-    token.assetType !== _AssetType.NATIVE &&
-    !!token.metadata &&
-    !!token.metadata.assetId
-  ));
+  const tokenInfos = Object.keys(tokensHasBalanceInfoMap)
+    .map((tokenSlug) => {
+      const token = chainService.getAssetBySlug(tokenSlug);
+
+      if (!token) {
+        console.error(`[getHydrationTokensCanPayFee] Token not found for slug: ${tokenSlug}`);
+      }
+
+      return token;
+    })
+    .filter((token) => {
+      if (!token) {
+        return false;
+      }
+
+      return (
+        token.originChain === substrateApi.chainSlug &&
+        token.assetType !== _AssetType.NATIVE &&
+        !!token.metadata?.assetId
+      );
+    });
 
   await Promise.all(tokenInfos.map(async (tokenInfo) => {
     const priceId = _getAssetPriceId(tokenInfo);
@@ -156,21 +187,29 @@ export function batchExtrinsicSetFeeHydration (substrateApi: _SubstrateApi, tx: 
 }
 
 export async function getHydrationRate (address: string, hdx: _ChainAsset, desToken: _ChainAsset) {
-  const quoteRate = await subwalletApiSdk.swapApi?.getHydrationRate({
-    address,
-    pair: {
-      slug: `${hdx.slug}___${desToken.slug}`,
-      from: hdx.slug,
-      to: desToken.slug
-    }
-  });
+  let quoteRate: number | undefined;
 
-  if (!quoteRate) {
-    return undefined;
-  } else {
+  try {
+    const quote = await subwalletApiSdk.swapApi.getHydrationRate({
+      address,
+      pair: {
+        slug: `${hdx.slug}___${desToken.slug}`,
+        from: hdx.slug,
+        to: desToken.slug
+      }
+    });
+
+    quoteRate = quote.rate;
+  } catch (error) {
+    console.error(`Failed to fetch swap quote: ${(error as Error).message}`);
+  }
+
+  if (quoteRate) {
     const hdxDecimal = _getAssetDecimals(hdx);
     const desTokenDecimal = _getAssetDecimals(desToken);
 
     return new BigN(quoteRate).multipliedBy(10 ** (desTokenDecimal - hdxDecimal)).toFixed();
   }
+
+  return undefined;
 }

@@ -104,7 +104,7 @@ function Component (props: Props): React.ReactElement<Props> {
       className={className}
       id={NOTIFICATION_DETAIL_MODAL}
       onCancel={_onCancel}
-      title={t('Actions')}
+      title={t('ui.components.Modal.NotificationDetail.actions')}
     >
       <div className={'__button-container'}>
         <div
@@ -133,7 +133,7 @@ function Component (props: Props): React.ReactElement<Props> {
               weight='fill'
             />
           </div>
-          <div className={'__right-part'}>{readNotification ? t('Mark as unread') : t('Mark as read')}</div>
+          <div className={'__right-part'}>{readNotification ? t('ui.components.Modal.NotificationDetail.markAsUnread') : t('ui.components.Modal.NotificationDetail.markAsRead')}</div>
         </div>
       </div>
 

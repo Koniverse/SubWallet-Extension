@@ -60,6 +60,7 @@ export const TERM_AND_CONDITION_SEED_PHRASE_MODAL = 'term-and-condition-seed-phr
 
 export const EARNING_INSTRUCTION_MODAL = 'earning-instruction-modal';
 export const EARNING_NOMINATION_MODAL = 'earning-nomination-modal';
+export const EARNING_ACITVE_STAKE_DETAILS_MODAL = 'earning-active-stake-details-modal';
 
 /* Swap */
 export const SWAP_SLIPPAGE_MODAL = 'swap-slippage-modal';
@@ -92,6 +93,8 @@ export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 
 /* Other */
 export const EARNING_SLIPPAGE_MODAL = 'earning-slippage-modal';
+export const EARNING_SELECTED_VALIDATOR_MODAL = 'earning-selected-validator-modal';
+
 export const DAPP_CONFIGURATION_MODAL = 'dApp-configuration-modal';
 export const SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL = 'switch-current-network-authorize-modal';
 /* Other */

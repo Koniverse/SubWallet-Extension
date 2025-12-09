@@ -5,11 +5,11 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { CrowdloanParaState, NetworkJson } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { getRandomIpfsGateway, SUBWALLET_IPFS } from '@subwallet/extension-base/koni/api/nft/config';
-import { _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainEvmCompatible, _isPureBitcoinChain, _isPureCardanoChain, _isPureSubstrateChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils/account';
-import { decodeAddress, encodeAddress, isCardanoAddress, isTonAddress } from '@subwallet/keyring';
-import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
+import { decodeAddress, encodeAddress, getKeypairTypeByAddress, isTonAddress } from '@subwallet/keyring';
+import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { t } from 'i18next';
 
 import { assert, BN, hexToU8a, isHex } from '@polkadot/util';
@@ -303,11 +303,12 @@ export function isSameAddressType (address1: string, address2: string) {
 }
 
 export function isAddressAndChainCompatible (address: string, chain: _ChainInfo) {
-  const isEvmCompatible = isEthereumAddress(address) && _isChainEvmCompatible(chain);
-  const isTonCompatible = isTonAddress(address) && _isChainTonCompatible(chain);
-  const isSubstrateCompatible = !isEthereumAddress(address) && !isTonAddress(address) && _isChainSubstrateCompatible(chain); // todo: need isSubstrateAddress util function to check exactly
-  const isCardanoCompatible = isCardanoAddress(address) && _isChainCardanoCompatible(chain);
-  const isBitcoinCompatible = isBitcoinAddress(address) && _isChainBitcoinCompatible(chain);
+  const keypairType = getKeypairTypeByAddress(address);
+  const isEvmCompatible = _isChainEvmCompatible(chain) && EthereumKeypairTypes.includes(keypairType); // some chains compatible to substrate and evm, and use evm-address
+  const isTonCompatible = _isPureTonChain(chain) && TonKeypairTypes.includes(keypairType);
+  const isSubstrateCompatible = _isPureSubstrateChain(chain) && SubstrateKeypairTypes.includes(keypairType);
+  const isCardanoCompatible = _isPureCardanoChain(chain) && CardanoKeypairTypes.includes(keypairType);
+  const isBitcoinCompatible = _isPureBitcoinChain(chain) && BitcoinKeypairTypes.includes(keypairType);
 
   return isEvmCompatible || isSubstrateCompatible || isTonCompatible || isCardanoCompatible || isBitcoinCompatible;
 }
@@ -321,7 +322,7 @@ export async function waitTimeout (ms: number) {
 }
 
 export const stripUrl = (url: string): string => {
-  assert(url && (url.startsWith('http:') || url.startsWith('https:') || url.startsWith('ipfs:') || url.startsWith('ipns:')), t('Invalid URL for provider'));
+  assert(url && (url.startsWith('http:') || url.startsWith('https:') || url.startsWith('ipfs:') || url.startsWith('ipns:')), t('bg.utils.invalidUrlForProvider'));
 
   const parts = url.split('/');
 
@@ -329,14 +330,39 @@ export const stripUrl = (url: string): string => {
 };
 
 export const baseParseIPFSUrl = (input: string, customDomain?: string): string | undefined => {
-  const selectedDomain = customDomain || getRandomIpfsGateway();
-
   if (!input || input.length === 0) {
     return undefined;
   }
 
-  if (isUrl(input)) {
+  // Case 1: Return as-is for inline data URLs (e.g. base64-encoded images)
+  if (input.startsWith('data:')) {
     return input;
+  }
+
+  const selectedDomain = customDomain || getRandomIpfsGateway();
+
+  // Case 2: Replace Pinata private gateways with a public IPFS gateway
+  // ==== EX: https://ikzttp.mypinata.cloud/ipfs/QmYDvPAXtiJg7s8JdRBSLWdgSphQdac8j1YuQNNxcGE1hg/9586.png
+  // Case 2b: Blockscout IPFS debug gateway -> rewrite to public gateway
+  // ==== EX: http://ipfs-debug.node.blockscout.com/ipfs/QmX2qHy1o27KgmHJSG2wKj2qLiv1gMCJCTn4nxzEVtTdgF
+  // Case 2c: http://ipfs.node.blockscout.com/ipfs/QmeTETrnJcG3iowfT3tXtz2jKmyeYbeag3AeYfDk5pBjGg
+
+  const privateGatewayPattern = /https?:\/\/([^/]*pinata\.cloud|[^/]*\.node\.blockscout\.com)\/ipfs\//;
+
+  if (privateGatewayPattern.test(input)) {
+    return input.replace(privateGatewayPattern, selectedDomain);
+  }
+
+  // Case 3: Handle NFT.storage subdomain links (e.g. https://<cid>.ipfs.nftstorage.link/...)
+  // Always redirect to selectedDomain to avoid SSL version/cipher mismatch errors
+  // ==== EX: https://bafybeias6as7k66hkghst3w4jwk6x5dkfk56oglqh44x6jmok6n7kcvg7m.ipfs.nftstorage.link/0.gif?ext=gif
+  const nftStorageMatch = input.match(/^https?:\/\/([a-zA-Z0-9]+)\.ipfs\.nftstorage\.link\/(.*)$/);
+
+  if (nftStorageMatch) {
+    const cid = nftStorageMatch[1];
+    const pathAndQuery = nftStorageMatch[2] || '';
+
+    return `${selectedDomain}${cid}/${pathAndQuery}`;
   }
 
   if (isUrl(input) || input.includes('https://') || input.includes('http')) {
@@ -413,3 +439,4 @@ export * from './registry';
 export * from './swap';
 export * from './translate';
 export * from './bitcoin';
+export * from './setup-api-sdk';

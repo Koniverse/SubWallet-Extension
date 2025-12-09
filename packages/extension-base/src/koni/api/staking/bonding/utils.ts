@@ -7,7 +7,7 @@ import { getAstarWithdrawable } from '@subwallet/extension-base/koni/api/staking
 import { _KNOWN_CHAIN_INFLATION_PARAMS, _SUBSTRATE_DEFAULT_INFLATION_PARAMS, _SubstrateInflationParams } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainNativeTokenBasicInfo } from '@subwallet/extension-base/services/chain-service/utils';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { _STAKING_CHAIN_GROUP, RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { EarningStatus, PalletStakingEraRewardPoints, PalletStakingValidatorPrefs, UnstakingStatus, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { detectTranslate, parseRawNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import { balanceFormatter, formatNumber } from '@subwallet/extension-base/utils/number';
@@ -223,6 +223,13 @@ export function calculateAlephZeroValidatorReturn (chainStakedReturn: number, co
   return chainStakedReturn * (100 - commission) / 100;
 }
 
+export function calculateEnergyWebCollatorReturn (annualReward: string, collatorCommission: number, numberCollators: number, totalStake: string): number {
+  const rewardForNominators = new BigNumber(annualReward).multipliedBy(1 - collatorCommission);
+  const rewardPerNominator = rewardForNominators.div(numberCollators);
+
+  return rewardPerNominator.div(totalStake).shiftedBy(2).toNumber();
+}
+
 export function calculateTernoaValidatorReturn (rewardPerValidator: number, validatorStake: number, commission: number) {
   const percentRewardForNominators = (100 - commission) / 100;
   const rewardForNominators = rewardPerValidator * percentRewardForNominators;
@@ -386,6 +393,8 @@ export function getYieldAvailableActionsByType (yieldPoolInfo: YieldPoolInfo): Y
     const chain = yieldPoolInfo.chain;
 
     if (_STAKING_CHAIN_GROUP.para.includes(chain)) {
+      return [YieldAction.STAKE, YieldAction.UNSTAKE, YieldAction.WITHDRAW, YieldAction.CANCEL_UNSTAKE];
+    } else if (_STAKING_CHAIN_GROUP.energy.includes(chain)) {
       return [YieldAction.STAKE, YieldAction.UNSTAKE, YieldAction.WITHDRAW, YieldAction.CANCEL_UNSTAKE];
     } else if (_STAKING_CHAIN_GROUP.astar.includes(chain)) {
       return [YieldAction.STAKE, YieldAction.CLAIM_REWARD, YieldAction.UNSTAKE, YieldAction.WITHDRAW];
@@ -576,7 +585,7 @@ export function getEarningStatusByNominations (bnTotalActiveStake: BN, nominatio
 export function getValidatorLabel (chain: string) {
   if (_STAKING_CHAIN_GROUP.astar.includes(chain)) {
     return 'dApp';
-  } else if (_STAKING_CHAIN_GROUP.relay.includes(chain) || _STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
+  } else if (RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(chain) || _STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
     return 'Validator';
   }
 
@@ -705,48 +714,50 @@ export function getRelayEraRewardMap (eraRewardPointArray: Codec[], startEraForP
   return eraRewardMap;
 }
 
-export async function getRelayMaxNominations (substrateApi: _SubstrateApi) {
+export async function getRelayMaxNominations (substrateApi: _SubstrateApi, chain: string) {
   await substrateApi.isReady;
-  const maxNominations = substrateApi.api.consts.staking?.maxNominations?.toString() || '16';
-  const _maxNominationsByNominationQuota = await substrateApi.api.call.stakingApi?.nominationsQuota(0); // todo: review param. Currently return constant for all param.
+  const maxNominations = substrateApi.api.consts.staking?.maxNominations?.toString();
+  const _maxNominationsByNominationQuota = await substrateApi.api.call.stakingApi?.nominationsQuota(0);
   const maxNominationsByNominationQuota = _maxNominationsByNominationQuota?.toString();
 
-  return maxNominationsByNominationQuota || maxNominations;
+  const fallbackMaxNominations = ['zkverify_testnet', 'zkverify'].includes(chain) ? '10' : '16';
+
+  return maxNominationsByNominationQuota || maxNominations || fallbackMaxNominations;
 }
 
 export const getMinStakeErrorMessage = (chainInfo: _ChainInfo, bnMinStake: BN): string => {
   const tokenInfo = _getChainNativeTokenBasicInfo(chainInfo);
   const number = formatNumber(bnMinStake.toString(), tokenInfo.decimals || 0, balanceFormatter);
 
-  return t('Insufficient stake. You need to stake at least {{number}} {{tokenSymbol}} to earn rewards', { replace: { tokenSymbol: tokenInfo.symbol, number } });
+  return t('bg.EARNING.koni.api.staking.bonding.utils.insufficientStakeToEarn', { replace: { tokenSymbol: tokenInfo.symbol, number } });
 };
 
 export const getMaxValidatorErrorMessage = (chainInfo: _ChainInfo, max: number): string => {
-  let message = detectTranslate('You cannot select more than {{number}} validators for this network');
+  let message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxValidatorsSelection');
   const label = getValidatorLabel(chainInfo.slug);
 
   if (max > 1) {
     switch (label) {
       case 'dApp':
-        message = detectTranslate('You cannot select more than {{number}} dApps for this network');
+        message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxDappsSelection');
         break;
       case 'Collator':
-        message = detectTranslate('You cannot select more than {{number}} collators for this network');
+        message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxCollatorsSelection');
         break;
       case 'Validator':
-        message = detectTranslate('You cannot select more than {{number}} validators for this network');
+        message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxValidatorsSelection');
         break;
     }
   } else {
     switch (label) {
       case 'dApp':
-        message = detectTranslate('You cannot select more than {{number}} dApp for this network');
+        message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxOneDappSelection');
         break;
       case 'Collator':
-        message = detectTranslate('You cannot select more than {{number}} collator for this network');
+        message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxOneCollatorSelection');
         break;
       case 'Validator':
-        message = detectTranslate('You cannot select more than {{number}} validator for this network');
+        message = detectTranslate('bg.EARNING.koni.api.staking.bonding.utils.maxOneValidatorSelection');
         break;
     }
   }
@@ -760,31 +771,31 @@ export const getExistUnstakeErrorMessage = (chain: string, type?: StakingType, i
   if (!isStakeMore) {
     switch (label) {
       case 'dApp':
-        return t('You can unstake from a dApp once');
+        return t('bg.EARNING.koni.api.staking.bonding.utils.unstakeFromDappOnce');
       case 'Collator':
-        return t('You can unstake from a collator once');
+        return t('bg.EARNING.koni.api.staking.bonding.utils.unstakeFromCollatorOnce');
 
       case 'Validator': {
         if (type === StakingType.POOLED) {
-          return t('You can unstake from a pool once');
+          return t('bg.EARNING.koni.api.staking.bonding.utils.unstakeFromPoolOnce');
         }
 
-        return t('You can unstake from a validator once');
+        return t('bg.EARNING.koni.api.staking.bonding.utils.unstakeFromValidatorOnce');
       }
     }
   } else {
     switch (label) {
       case 'dApp':
-        return t('You cannot stake more for a dApp you are unstaking from');
+        return t('bg.EARNING.koni.api.staking.bonding.utils.cannotStakeMoreOnUnstakingDapp');
       case 'Collator':
-        return t('You cannot stake more for a collator you are unstaking from');
+        return t('bg.EARNING.koni.api.staking.bonding.utils.cannotStakeMoreOnUnstakingCollator');
 
       case 'Validator': {
         if (type === StakingType.POOLED) {
-          return t('You cannot stake more for a pool you are unstaking from');
+          return t('bg.EARNING.koni.api.staking.bonding.utils.cannotStakeMoreOnUnstakingPool');
         }
 
-        return t('You cannot stake more for a validator you are unstaking from');
+        return t('bg.EARNING.koni.api.staking.bonding.utils.cannotStakeMoreOnUnstakingValidator');
       }
     }
   }

@@ -19,6 +19,7 @@ export const CRON_REFRESH_STAKING_REWARD_FAST_INTERVAL = 90000;
 export const CRON_REFRESH_HISTORY_INTERVAL = 900000;
 export const CRON_GET_API_MAP_STATUS = 10000;
 export const CRON_REFRESH_CHAIN_STAKING_METADATA = 90000;
+export const CRON_NFT_DETECT_INTERVAL = 7500000;
 export const CRON_REFRESH_CHAIN_NOMINATOR_METADATA = 1800000;
 export const CRON_RECOVER_HISTORY_INTERVAL = 30000;
 export const CRON_SYNC_MANTA_PAY = 300000;
@@ -33,7 +34,6 @@ export const ALL_ACCOUNT_KEY = 'ALL';
 export const ALL_NETWORK_KEY = 'all';
 export const ALL_GENESIS_HASH = null;
 export const IGNORE_GET_SUBSTRATE_FEATURES_LIST: string[] = ['astarEvm', 'ethereum', 'ethereum_goerli', 'binance', 'binance_test', 'boba_rinkeby', 'boba', 'bobabase', 'bobabeam'];
-
 export const ALL_ACCOUNT_AUTH_TYPES: AccountAuthType[] = ['evm', 'substrate', 'ton'];
 
 export const IGNORE_QR_SIGNER: string[] = [];

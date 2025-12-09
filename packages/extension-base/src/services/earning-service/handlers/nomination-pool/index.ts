@@ -9,14 +9,13 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningStatus, HandleYieldStepData, NominationPoolInfo, NominationYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, PalletNominationPoolsBondedPoolInner, PalletStakingActiveEraInfo, PalletStakingExposure, PalletStakingExposureItem, PalletStakingNominations, RequestYieldStepSubmit, SpStakingExposurePage, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitJoinNominationPool, SubmitYieldJoinData, TransactionData, UnstakingStatus, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningStatus, HandleYieldStepData, NominationPoolInfo, NominationYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, PalletNominationPoolsBondedPoolInner, PalletStakingActiveEraInfo, PalletStakingExposure, PalletStakingExposureItem, PalletStakingNominations, RequestYieldStepSubmit, SpStakingExposurePage, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitChangeValidatorStaking, SubmitJoinNominationPool, SubmitYieldJoinData, TransactionData, UnstakingStatus, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
-import { DeriveSessionProgress } from '@polkadot/api-derive/types';
 import { Codec } from '@polkadot/types/types';
 import { BN, BN_ZERO, hexToString, isHex, noop } from '@polkadot/util';
 
@@ -27,14 +26,19 @@ export default class NominationPoolHandler extends BasePoolHandler {
   protected readonly name: string;
   protected readonly shortName: string;
   public slug: string;
-  protected readonly availableMethod: YieldPoolMethodInfo = {
+  public readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
     defaultUnstake: true,
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: true,
-    claimReward: true
+    claimReward: true,
+    changeValidator: false
   };
+
+  static generateSlug (symbol: string, chain: string): string {
+    return `${symbol}___nomination_pool___${chain}`;
+  }
 
   constructor (state: KoniState, chain: string) {
     super(state, chain);
@@ -108,7 +112,8 @@ export default class NominationPoolHandler extends BasePoolHandler {
       const unlockingEras = substrateApi.api.consts.staking.bondingDuration.toString();
 
       const maxSupportedEras = substrateApi.api.consts.staking.historyDepth.toString();
-      const erasPerDay = 24 / _STAKING_ERA_LENGTH_MAP[chainInfo.slug]; // Can be exactly calculate from epochDuration, blockTime, sessionsPerEra
+      const eraInHours = _STAKING_ERA_LENGTH_MAP[chainInfo.slug] || _STAKING_ERA_LENGTH_MAP.default; // in hours
+      const erasPerDay = 24 / eraInHours; // Can be exactly calculate from epochDuration, blockTime, sessionsPerEra
 
       const supportedDays = getSupportedDaysByHistoryDepth(erasPerDay, parseInt(maxSupportedEras), parseInt(currentEra) / erasPerDay);
 
@@ -189,7 +194,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
 
   /* Subscribe pool position */
 
-  async parsePoolMemberMetadata (substrateApi: _SubstrateApi, poolMemberInfo: PalletNominationPoolsPoolMember, currentEra: string, _deriveSessionProgress: DeriveSessionProgress, address: string): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
+  async parsePoolMemberMetadata (substrateApi: _SubstrateApi, poolMemberInfo: PalletNominationPoolsPoolMember, currentEra: string, address: string): Promise<Omit<YieldPositionInfo, keyof BaseYieldPositionInfo>> {
     const chainInfo = this.chainInfo;
     const unlimitedNominatorRewarded = substrateApi.api.consts.staking.maxExposurePageSize !== undefined;
     const _maxNominatorRewardedPerValidator = (substrateApi.api.consts.staking.maxNominatorRewardedPerValidator || 0).toString();
@@ -313,10 +318,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
       }
 
       if (ledgers) {
-        const [_currentEra, _deriveSessionProgress] = await Promise.all([
-          substrateApi.api.query.staking.currentEra(),
-          substrateApi.api.derive?.session?.progress()
-        ]);
+        const _currentEra = await substrateApi.api.query.staking.currentEra();
 
         const currentEra = _currentEra.toString();
 
@@ -325,7 +327,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
           const owner = reformatAddress(useAddresses[i], 42);
 
           if (poolMemberInfo) {
-            const nominatorMetadata = await this.parsePoolMemberMetadata(substrateApi, poolMemberInfo, currentEra, _deriveSessionProgress, owner);
+            const nominatorMetadata = await this.parsePoolMemberMetadata(substrateApi, poolMemberInfo, currentEra, owner);
 
             resultCallback({
               ...defaultInfo,
@@ -622,7 +624,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
     const bnAmount = new BN(amount);
 
     if (bnAmount.lte(BN_ZERO)) {
-      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount must be greater than 0')));
+      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nominationPool.amountMustBeGreaterThanZero')));
     }
 
     const bnActiveStake = new BN(poolPosition.activeStake);
@@ -635,7 +637,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
     }
 
     if (poolPosition.unstakings.length > maxUnstake) {
-      errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('You cannot unstake more than {{number}} times', { replace: { number: maxUnstake } })));
+      errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('bg.EARNING.services.service.earning.nominationPool.maxUnstakeTimes', { replace: { number: maxUnstake } })));
     }
 
     return Promise.resolve(errors);
@@ -680,8 +682,14 @@ export default class NominationPoolHandler extends BasePoolHandler {
     const chainApi = await this.substrateApi.isReady;
 
     if (chainApi.api.tx.nominationPools.withdrawUnbonded.meta.args.length === 2) {
-      const _slashingSpans = (await chainApi.api.query.staking.slashingSpans(address)).toHuman() as Record<string, any>;
-      const slashingSpanCount = _slashingSpans !== null ? _slashingSpans.spanIndex as string : '0';
+      let slashingSpanCount: string | number;
+
+      if (chainApi.api.call?.nominationPoolsApi?.memberPendingSlash) {
+        slashingSpanCount = await chainApi.api.call.nominationPoolsApi.memberPendingSlash(address);
+      } else {
+        // Incase api call not exists
+        slashingSpanCount = chainApi.api.consts.staking.historyDepth.toPrimitive();
+      }
 
       return chainApi.api.tx.nominationPools.withdrawUnbonded({ Id: address }, slashingSpanCount);
     } else {
@@ -690,5 +698,8 @@ export default class NominationPoolHandler extends BasePoolHandler {
     }
   }
 
+  public override handleChangeEarningValidator (data: SubmitChangeValidatorStaking): Promise<TransactionData> {
+    return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+  }
   /* Other actions */
 }

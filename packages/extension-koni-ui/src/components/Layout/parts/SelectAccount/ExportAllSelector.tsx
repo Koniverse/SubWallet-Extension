@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
 import { AccountExportPasswordModal, AccountProxySelectorAllItem, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import ExportAllSelectItem from '@subwallet/extension-koni-ui/components/Layout/parts/SelectAccount/ExportAllSelectItem';
@@ -10,11 +10,11 @@ import { FilterModal } from '@subwallet/extension-koni-ui/components/Modal/Filte
 import { EXPORT_ACCOUNTS_PASSWORD_MODAL, SELECT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useFilterModal, useGoBackSelectAccount } from '@subwallet/extension-koni-ui/hooks';
 import { useSelectAccount } from '@subwallet/extension-koni-ui/hooks/modal/useSelectAccount';
-import { AccountSignMode, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { isAccountAll, searchAccountProxyFunction } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, InputRef, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
-import { CaretLeft, Export, FadersHorizontal } from 'phosphor-react';
+import { CaretLeft, Export, FadersHorizontal, Info } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -36,10 +36,6 @@ const filterOptions = [
   {
     label: 'QR signer account',
     value: AccountProxyType.QR
-  },
-  {
-    label: 'Ledger account',
-    value: AccountProxyType.LEDGER
   },
   {
     label: 'Watch-only account',
@@ -99,8 +95,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           return true;
         } else if (filter === AccountProxyType.READ_ONLY && accountType === AccountProxyType.READ_ONLY) {
           return true;
-        } else if (filter === AccountProxyType.LEDGER && accountType === AccountProxyType.LEDGER) {
-          return true;
         }
       }
 
@@ -125,6 +119,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     if (currentAccountIsAll) {
       return (
         <AccountProxySelectorAllItem
+          accountProxies={items}
           className='all-account-selection'
           isSelected={selected}
           key={item.id}
@@ -144,7 +139,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         showUnSelectedIcon
       />
     );
-  }, [changeAccounts, className, onAccountSelect, onClickItem]);
+  }, [changeAccounts, className, onAccountSelect, onClickItem, items]);
 
   const onClickFilterButton = useCallback(
     (e?: SyntheticEvent) => {
@@ -211,12 +206,20 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             )}
             onClick={exportAllAccounts}
           >
-            {getNumberAccount > 1 ? t(`Export ${getNumberAccount} accounts`) : t(`Export ${getNumberAccount} account`)}
+            {getNumberAccount > 1 ? t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportMultipleAccounts', { replace: { getNumberAccount: getNumberAccount } }) : t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportSingleAccount', { replace: { getNumberAccount: getNumberAccount } })}
           </Button>
         )}
         id={id}
         onCancel={onBack}
-        title={t('Export account')}
+        rightIconProps={{
+          icon: <Icon
+            phosphorIcon={Info}
+            weight={'fill'}
+          />,
+          tooltipPlacement: 'bottomRight',
+          tooltip: t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportLedgerNotSupported')
+        }}
+        title={t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportAccount')}
       >
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
@@ -229,7 +232,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchAccountProxyFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Account name')}
+          searchPlaceholder={t<string>('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.accountName')}
           showActionBtn
         />
       </SwModal>

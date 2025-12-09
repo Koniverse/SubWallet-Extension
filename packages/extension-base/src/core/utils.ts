@@ -4,12 +4,12 @@
 import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
 import { ExtrinsicType, SufficientChainsDetails, SufficientMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { BalanceAccountType } from '@subwallet/extension-base/core/substrate/types';
-import { LedgerMustCheckType, ValidateRecipientParams } from '@subwallet/extension-base/core/types';
+import { ActionType, LedgerMustCheckType, ValidateRecipientParams } from '@subwallet/extension-base/core/types';
 import { tonAddressInfo } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
 import { _SubstrateAdapterQueryArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getTokenOnChainAssetId, _getXcmAssetMultilocation, _isBridgedToken, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
-import { AccountJson } from '@subwallet/extension-base/types';
-import { isAddressAndChainCompatible, isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
+import { _getTokenOnChainAssetId, _getXcmAssetMultilocation, _isBridgedToken, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainCompatibleLedgerEvm, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible, _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { AccountChainType, AccountJson, AccountSignMode } from '@subwallet/extension-base/types';
+import { isAddressAndChainCompatible, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, reformatAddress } from '@subwallet/extension-base/utils';
 import { isAddress, isCardanoTestnetAddress, isTonAddress } from '@subwallet/keyring';
 import { getBitcoinAddressInfo, validateBitcoinAddress } from '@subwallet/keyring/utils';
 
@@ -33,11 +33,15 @@ export function getMaxBigInt (a: bigint, b: bigint): bigint {
 }
 
 export function ledgerMustCheckNetwork (account: AccountJson | null): LedgerMustCheckType {
-  if (account && account.isHardware && account.isGeneric && !isEthereumAddress(account.address)) {
-    return account.originGenesisHash ? 'migration' : 'polkadot';
-  } else {
-    return 'unnecessary';
+  if (account && account.isHardware && account.isGeneric) {
+    if (!isEthereumAddress(account.address)) {
+      return account.originGenesisHash ? 'migration' : 'polkadot';
+    } else if (account.isSubstrateECDSA) {
+      return 'polkadot_ecdsa';
+    }
   }
+
+  return 'unnecessary';
 }
 
 // --- recipient address validation --- //
@@ -71,7 +75,7 @@ export function _isValidAddressForEcosystem (validateRecipientParams: ValidateRe
       _isChainTonCompatible(destChainInfo) ||
       _isChainCardanoCompatible(destChainInfo) ||
       _isChainBitcoinCompatible(destChainInfo)) {
-      return 'Recipient address must be the same type as sender address';
+      return `Recipient address must be a valid ${destChainInfo.name} address`;
     }
 
     return 'Unknown chain type';
@@ -84,9 +88,9 @@ export function _isValidSubstrateAddressFormat (validateRecipientParams: Validat
   const { destChainInfo, toAddress } = validateRecipientParams;
 
   const addressPrefix = destChainInfo?.substrateInfo?.addressPrefix ?? 42;
-  const toAddressFormatted = reformatAddress(toAddress, addressPrefix);
+  const toAddressFormatted = reformatAddress(toAddress, addressPrefix, undefined, false);
 
-  if (toAddressFormatted !== toAddress) {
+  if (toAddressFormatted && toAddressFormatted !== toAddress) {
     return `Recipient address must be a valid ${destChainInfo.name} address`;
   }
 
@@ -136,7 +140,7 @@ export function _isNotDuplicateAddress (validateRecipientParams: ValidateRecipie
 }
 
 export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipientParams): string {
-  const { account, allowLedgerGenerics, destChainInfo } = validateRecipientParams;
+  const { account, actionType, allowLedgerGenerics, assetInfo, destChainInfo } = validateRecipientParams;
 
   if (account?.isHardware) {
     if (!account.isGeneric) {
@@ -148,11 +152,38 @@ export function _isSupportLedgerAccount (validateRecipientParams: ValidateRecipi
         return 'Your Ledger account is not supported by {{network}} network.'.replace('{{network}}', destChainName);
       }
     } else {
+      if (account.chainType === AccountChainType.ETHEREUM) {
+        // For ecdsa substrate account in polkadot ledger app
+        if (account.signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+          if (actionType === ActionType.SEND_NFT) {
+            return 'Ledger Polkadot (EVM) address is not supported for NFT transfer';
+          }
+
+          if (!_isSubstrateEvmCompatibleChain(destChainInfo)) {
+            return 'Ledger Polkadot (EVM) address is not supported for this transfer';
+          } else if (assetInfo && !isSubstrateEcdsaLedgerAssetSupported(assetInfo, destChainInfo)) {
+            return 'Ledger Polkadot (EVM) address is not supported for this transfer';
+          }
+        } else {
+          if (!_isChainCompatibleLedgerEvm(destChainInfo)) {
+            return 'Ledger EVM address is not supported for this transfer';
+          }
+        }
+      }
+
       // For ledger generic
       const ledgerCheck = ledgerMustCheckNetwork(account);
 
       if (ledgerCheck !== 'unnecessary' && !allowLedgerGenerics.includes(destChainInfo.slug)) {
-        return `Ledger ${ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration'} address is not supported for this transfer`;
+        let ledgerTypeLabel = 'Migration';
+
+        if (ledgerCheck === 'polkadot') {
+          ledgerTypeLabel = 'Polkadot';
+        } else if (ledgerCheck === 'polkadot_ecdsa') {
+          ledgerTypeLabel = 'Polkadot (EVM)';
+        }
+
+        return `Ledger ${ledgerTypeLabel} address is not supported for this transfer`;
       }
     }
   }
