@@ -98,6 +98,8 @@ export const getAccountSignMode = (address: string, _meta?: KeyringPair$Meta): A
           }
         } else if (meta.isReadOnly) {
           return AccountSignMode.READ_ONLY;
+        // } else if (meta.isMultisig) { // todo
+        //   return AccountSignMode.MULTISIG;
         } else {
           return AccountSignMode.QR;
         }
