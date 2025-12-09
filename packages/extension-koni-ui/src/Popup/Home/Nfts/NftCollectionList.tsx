@@ -70,7 +70,7 @@ function Component ({ className = '', id }: Props): React.ReactElement<Props> {
   }, [emptyButtonProps, t]);
 
   const handleOnClickCollection = useCallback((state: INftCollectionDetail) => {
-    navigate('/home/nfts/collection-detail', { state });
+    navigate(`/home/nfts/collection-detail?chain=${state.collectionInfo.chain}&collectionId=${state.collectionInfo.collectionId}`);
   }, [navigate]);
 
   const renderNftCollection = useCallback((nftCollection: NftCollection) => {
