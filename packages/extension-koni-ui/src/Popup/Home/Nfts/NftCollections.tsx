@@ -94,7 +94,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [nftItems]);
 
   const handleOnClickCollection = useCallback((state: INftCollectionDetail) => {
-    navigate('/home/nfts/collection-detail', { state });
+    const { chain, collectionId } = state.collectionInfo;
+
+    navigate(`/home/nfts/collection-detail?chain=${chain}&collectionId=${collectionId}`);
   }, [navigate]);
 
   const renderNftCollection = useCallback((nftCollection: NftCollection) => {
