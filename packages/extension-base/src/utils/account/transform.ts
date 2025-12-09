@@ -98,8 +98,8 @@ export const getAccountSignMode = (address: string, _meta?: KeyringPair$Meta): A
           }
         } else if (meta.isReadOnly) {
           return AccountSignMode.READ_ONLY;
-        // } else if (meta.isMultisig) { // todo
-        //   return AccountSignMode.MULTISIG;
+        } else if (meta.isMultisig) {
+          return AccountSignMode.MULTISIG;
         } else {
           return AccountSignMode.QR;
         }
@@ -532,6 +532,8 @@ export const convertAccountProxyType = (accountSignMode: AccountSignMode): Accou
       return AccountProxyType.LEDGER;
     case AccountSignMode.QR:
       return AccountProxyType.QR;
+    case AccountSignMode.MULTISIG:
+      return AccountProxyType.MULTISIG;
     case AccountSignMode.READ_ONLY:
       return AccountProxyType.READ_ONLY;
     case AccountSignMode.INJECTED:

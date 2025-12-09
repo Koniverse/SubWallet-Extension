@@ -3,9 +3,13 @@
 
 import { AccountMultisigError, AccountMultisigErrorCode, RequestAccountCreateMultisig } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountBaseHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Base';
+import { reformatAddress } from '@subwallet/extension-base/utils';
+import { encodeAddress } from '@subwallet/keyring';
 import { KeyringPair$Meta } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { t } from 'i18next';
+
+import { createKeyMulti } from '@polkadot/util-crypto';
 
 /**
  * @class AccountMultisigHandler
@@ -16,16 +20,18 @@ export class AccountMultisigHandler extends AccountBaseHandler {
   public async accountsCreateMultisig (request: RequestAccountCreateMultisig): Promise<AccountMultisigError[]> {
     const { name, signers, threshold } = request;
 
-    // todo: a function to generate multisig address
-    const multisigAddress = '1627ti7gKnn5aTp7a7SUVsgnM9wE6BCNw6CgCzKiVeJz5DDA';
+    const multisigKey = createKeyMulti(signers, threshold);
+    const multisigAddress = encodeAddress(multisigKey);
 
     try {
       try {
-        if (keyring.getPair(multisigAddress).address === multisigAddress) { // todo: check this condition
+        const exists = keyring.getPair(multisigAddress);
+
+        if (exists?.address === reformatAddress(multisigAddress)) {
           return [{ code: AccountMultisigErrorCode.INVALID_ADDRESS, message: t('bg.ACCOUNT.services.keyring.handler.Secret.accountExists') }];
         }
       } catch (e) {
-        console.log('Error get keyring pair', e);
+
       }
 
       if (this.state.checkNameExists(name)) {

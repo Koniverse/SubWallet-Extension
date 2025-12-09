@@ -96,6 +96,15 @@ export interface AccountDeriveData {
 }
 
 /**
+ * @interface AccountMultisigData
+ * @prop {boolean} [isMultisig] - Is multisig account
+ * */
+export interface AccountMultisigData {
+  /** Is multisig account */
+  isMultisig?: boolean;
+}
+
+/**
  * Represents the comprehensive metadata associated with an account, combining various aspects of account data.
  * This interface extends from multiple specific metadata interfaces to provide a unified view of an account's metadata.
  * It includes external, ledger, injected, and derived account data, offering a detailed perspective on the account's characteristics and origins.
@@ -108,7 +117,7 @@ export interface AccountDeriveData {
  * @extends AccountInjectData - Covers data related to injected accounts, including the source of the injection.
  * @extends AccountDeriveData - Holds information about derived accounts, including the parent address and derivation path (suri).
  */
-export interface AccountMetadataData extends AccountExternalData, AccountLedgerData, AccountInjectData, AccountDeriveData {}
+export interface AccountMetadataData extends AccountExternalData, AccountLedgerData, AccountInjectData, AccountDeriveData, AccountMultisigData {}
 
 export enum AccountSignMode {
   PASSWORD = 'password',
@@ -162,9 +171,9 @@ export enum AccountActions {
  */
 export interface AccountActionData {
   chainType: AccountChainType;
-  accountActions: AccountActions[]; // todo: Multisig no action
-  transactionActions: ExtrinsicType[]; // todo: Multisig no extrinsic
-  signMode: AccountSignMode; // todo: add MULTISIG or use READ_ONLY.
+  accountActions: AccountActions[];
+  transactionActions: ExtrinsicType[];
+  signMode: AccountSignMode;
   specialChain?: string;
   tokenTypes: _AssetType[];
   proxyId?: string;
