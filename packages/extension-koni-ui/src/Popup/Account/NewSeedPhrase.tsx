@@ -6,7 +6,7 @@ import { AccountNameModal, CloseIcon, Layout, PageWrapper, WordPhrase } from '@s
 import { SeedPhraseTermModal } from '@subwallet/extension-koni-ui/components/Modal/TermsAndConditions/SeedPhraseTermModal';
 import { ACCOUNT_NAME_MODAL, CONFIRM_TERM_SEED_PHRASE, CREATE_ACCOUNT_MODAL, DEFAULT_MNEMONIC_TYPE, DEFAULT_ROUTER_PATH, SEED_PREVENT_MODAL, SELECTED_MNEMONIC_TYPE, TERM_AND_CONDITION_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useDefaultNavigate, useExtensionDisplayModes, useNotification, useTranslation, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
-import { createAccountSuriV2, createSeedV2, windowOpen } from '@subwallet/extension-koni-ui/messaging';
+import { createAccountMultisig, createSeedV2, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { SeedPhraseTermStorage, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { isFirefox, isNoAccount } from '@subwallet/extension-koni-ui/utils';
@@ -81,11 +81,30 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const onSubmit = useCallback((accountName: string) => {
     setLoading(true);
-    createAccountSuriV2({
-      name: accountName,
-      suri: seedPhrase,
-      type: selectedMnemonicType === 'ton' ? 'ton-native' : undefined,
-      isAllowed: true
+    // createAccountSuriV2({
+    //   name: accountName,
+    //   suri: seedPhrase,
+    //   type: selectedMnemonicType === 'ton' ? 'ton-native' : undefined,
+    //   isAllowed: true
+    // })
+    //   .then(() => {
+    //     onComplete();
+    //   })
+    //   .catch((error: Error): void => {
+    //     notify({
+    //       message: error.message,
+    //       type: 'error'
+    //     });
+    //   })
+    //   .finally(() => {
+    //     setLoading(false);
+    //     inactiveModal(accountNameModalId);
+    //   });
+
+    createAccountMultisig({
+      signers: ['1P8B9aHLLUcPrgVo1EfmvJ2yNm9Uac9RkSiNQyVxVp6yons', '1BzDB5n2rfSJwvuCW9deKY9XnUyys8Gy44SoX8tRNDCFBhx', '16QBEoG2jAVJEyepEyerw1sJzVqctCQc3JaqFnMD1LyYcMY7'],
+      threshold: 3,
+      name: 'vjppro'
     })
       .then(() => {
         onComplete();
@@ -100,7 +119,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         setLoading(false);
         inactiveModal(accountNameModalId);
       });
-  }, [inactiveModal, notify, onComplete, seedPhrase, selectedMnemonicType]);
+  }, [inactiveModal, notify, onComplete]);
 
   useEffect(() => {
     // Note: This useEffect checks if the data in localStorage has already been migrated from the old "string" structure to the new structure in "SeedPhraseTermStorage".
