@@ -101,6 +101,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     //     inactiveModal(accountNameModalId);
     //   });
 
+    // todo: remove this test
     createAccountMultisig({
       signers: ['1P8B9aHLLUcPrgVo1EfmvJ2yNm9Uac9RkSiNQyVxVp6yons', '1BzDB5n2rfSJwvuCW9deKY9XnUyys8Gy44SoX8tRNDCFBhx', '16QBEoG2jAVJEyepEyerw1sJzVqctCQc3JaqFnMD1LyYcMY7'],
       threshold: 3,
