@@ -32,6 +32,7 @@ import { KeyringService } from '@subwallet/extension-base/services/keyring-servi
 import MigrationService from '@subwallet/extension-base/services/migration-service';
 import MintCampaignService from '@subwallet/extension-base/services/mint-campaign-service';
 import MktCampaignService from '@subwallet/extension-base/services/mkt-campaign-service';
+import { MultisigService } from '@subwallet/extension-base/services/multisig-service';
 import NftService from '@subwallet/extension-base/services/nft-service';
 import NotificationService from '@subwallet/extension-base/services/notification-service/NotificationService';
 import { PriceService } from '@subwallet/extension-base/services/price-service';
@@ -67,7 +68,6 @@ import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { KoniCron } from '../cron';
 import { KoniSubscription } from '../subscription';
-import { MultisigService } from "@subwallet/extension-base/services/multisig-service";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 const passworder = require('browser-passworder');

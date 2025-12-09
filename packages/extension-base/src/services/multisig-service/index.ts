@@ -8,7 +8,6 @@ import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandle
 import { BehaviorSubject } from 'rxjs';
 
 import { EventItem, EventType } from '../event-service/types';
-import { KeyringService } from '../keyring-service';
 
 // todo: deploy online
 const MULTISIG_SUPPORTED_CHAINS = ['statemint', 'statemine', 'paseo_assethub', 'paseoTest', 'westend_assethub'];
