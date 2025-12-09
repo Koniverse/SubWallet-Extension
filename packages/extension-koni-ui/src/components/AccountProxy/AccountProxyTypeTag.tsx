@@ -8,7 +8,7 @@ import { Icon, Tag } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import { TagProps } from '@subwallet/react-ui/es/tag';
 import CN from 'classnames';
-import { CirclesThreePlus, Eye, GitCommit, Needle, QrCode, Question, Strategy, Swatches } from 'phosphor-react';
+import { CirclesThreePlus, Eye, GitCommit, Needle, QrCode, Question, Strategy, Swatches, UserSwitch } from 'phosphor-react';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -53,6 +53,9 @@ const Component: React.FC<Props> = ({ className, type }: Props) => {
     } else if (type === AccountProxyType.QR) {
       result.label = t('ui.ACCOUNT.components.AccountProxy.TypeTag.qrSignerAccount');
       result.icon.phosphorIcon = QrCode;
+    } else if (type === AccountProxyType.MULTISIG) {
+      result.label = t('ui.ACCOUNT.components.AccountProxy.TypeTag.multisigAccount');
+      result.icon.phosphorIcon = UserSwitch;
     } else if (type === AccountProxyType.LEDGER) {
       result.label = t('ui.ACCOUNT.components.AccountProxy.TypeTag.ledgerAccount');
       result.icon.phosphorIcon = Swatches;

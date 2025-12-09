@@ -90,6 +90,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     const result: ListItem[] = [];
     const masterAccounts: AccountAddressItemType[] = [];
     const qrSignerAccounts: ListItem[] = [];
+    const multisigAccounts: ListItem[] = [];
     const watchOnlyAccounts: ListItem[] = [];
     const ledgerAccounts: ListItem[] = [];
     const injectedAccounts: ListItem[] = [];
@@ -104,6 +105,8 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
         masterAccounts.push(item);
       } else if (item.accountProxyType === AccountProxyType.QR) {
         qrSignerAccounts.push(item);
+      } else if (item.accountProxyType === AccountProxyType.MULTISIG) {
+        multisigAccounts.push(item);
       } else if (item.accountProxyType === AccountProxyType.READ_ONLY) {
         watchOnlyAccounts.push(item);
       } else if (item.accountProxyType === AccountProxyType.LEDGER) {
@@ -126,6 +129,15 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
       });
 
       result.push(...qrSignerAccounts);
+    }
+
+    if (multisigAccounts.length) {
+      multisigAccounts.unshift({
+        id: 'multisig',
+        groupLabel: t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.multisigAccount')
+      });
+
+      result.push(...multisigAccounts);
     }
 
     if (watchOnlyAccounts.length) {
