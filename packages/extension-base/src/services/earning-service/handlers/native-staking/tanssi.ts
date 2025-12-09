@@ -368,7 +368,8 @@ export default class TanssiNativeStakingPoolHandler extends BaseParaNativeStakin
           metadata: {
             pendingStake: bnJoiningStake.toString(),
             compoundingStake: bnCompoundingStake.toString(),
-            manualStake: bnManualStake.toString()
+            manualStake: bnManualStake.toString(),
+            isShowActiveStakeDetails: bnJoiningStake.gt(0) || bnCompoundingStake.gt(0) || !bnManualStake.gt(0)
           }
         });
       };

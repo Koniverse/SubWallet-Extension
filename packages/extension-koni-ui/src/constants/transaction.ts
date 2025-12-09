@@ -3,7 +3,7 @@
 
 import { ExtrinsicType, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
+import { CancelUnStakeParams, ChangeBittensorRootClaimType, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
 
 import { ALL_KEY } from './common';
 
@@ -18,6 +18,7 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('ui.TRANSACTION.constant.transaction.unstake'),
   [ExtrinsicType.STAKING_UNBOND]: detectTranslate('ui.TRANSACTION.constant.transaction.unstake'),
   [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: detectTranslate('ui.TRANSACTION.constant.transaction.changeValidator'),
+  [ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE]: detectTranslate('ui.TRANSACTION.constant.transaction.changeClaimType'),
   [ExtrinsicType.STAKING_WITHDRAW]: detectTranslate('ui.TRANSACTION.constant.transaction.withdraw'),
   [ExtrinsicType.STAKING_POOL_WITHDRAW]: detectTranslate('ui.TRANSACTION.constant.transaction.withdraw'),
   [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: detectTranslate('ui.TRANSACTION.constant.transaction.cancelUnstake'),
@@ -156,4 +157,9 @@ export const DEFAULT_SWAP_PARAMS: SwapParams = {
 export const DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS: ClaimBridgeParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
   notificationId: ''
+};
+
+export const DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS: ChangeBittensorRootClaimType = {
+  ...DEFAULT_TRANSACTION_PARAMS,
+  bittensorRootClaimType: ''
 };

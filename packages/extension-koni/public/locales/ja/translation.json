@@ -2304,5 +2304,21 @@
   "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.reserved": "",
   "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.others": "",
   "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.othersTooltipTitle": "",
-  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.lockedDetails": ""
+  "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.lockedDetails": "",
+  "ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.claimRewardsType": "",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.submit": "",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.title": "",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.description": "",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.swapCardDescription": "",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.keepCardDescription": "",
+  "ui.TRANSACTION.constant.transaction.changeClaimType": "",
+  "ui.HISTORY.screen.History.changeRewards": "",
+  "ui.Confirmations.changeClaimTypeConfirm": "",
+  "ui.HISTORY.constant.history.changeRewards": "",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.claimRewardsType": "",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.estimatedFee": "",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.alphaClaimDescription": "Y",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.alphaClaimTitle": "",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.TAOClaimDescription": "",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.TAOClaimTitle": ""
 }
