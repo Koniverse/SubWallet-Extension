@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 1.3.68
+## 1.3.69
 Build date: Dec 08, 2025.
 
 Features & Updates:
