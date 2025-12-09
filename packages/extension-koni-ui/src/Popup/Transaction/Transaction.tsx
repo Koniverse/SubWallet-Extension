@@ -18,6 +18,8 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
+import { AssetsTab } from '../Home/Tokens';
+
 interface Props extends ThemeProps {
   title?: string,
   transactionType?: ExtrinsicType
@@ -260,7 +262,13 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
   useNavigateOnChangeAccount(homePath);
 
   const goBack = useCallback(() => {
-    navigate(homePath);
+    if (homePath === '/home/nfts/collections') {
+      navigate('/home/tokens', {
+        state: { switchToTab: AssetsTab.NFTS }
+      });
+    } else {
+      navigate(homePath);
+    }
   }, [homePath, navigate]);
 
   const [subHeaderRightButtons, setSubHeaderRightButtons] = useState<ButtonProps[] | undefined>();

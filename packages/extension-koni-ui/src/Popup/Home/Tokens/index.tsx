@@ -491,7 +491,14 @@ const Component = (): React.ReactElement => {
       containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
     }
   }, [selectedFilterTab]);
+  useEffect(() => {
+    const state = location.state as { switchToTab?: string } | undefined;
 
+    if (state?.switchToTab) {
+      setSelectedFilterTab(state.switchToTab);
+    }
+  }, [location.state]);
+  
   return (
     <div
       className={'assets-screen-container'}
