@@ -195,7 +195,7 @@ export default abstract class BaseOpenGovHandler {
     request: GovVoteRequest
   ): Promise<TransactionError | null> {
     const substrateApi = await this.substrateApi.isReady;
-    const { address, referendumIndex, trackId, type } = request;
+    const { address, trackId } = request;
     const locked = (await substrateApi.api.query.convictionVoting.votingFor(address, trackId)).toPrimitive() as VotingFor;
 
     if (!locked) {
@@ -207,59 +207,6 @@ export default abstract class BaseOpenGovHandler {
         BasicTxErrorType.INVALID_PARAMS,
         `Already delegating on track ${trackId}`
       );
-    }
-
-    if (!locked?.casting?.votes?.length) {
-      return null;
-    }
-
-    const found = locked.casting.votes.find(([refIndex]) => refIndex.toString() === referendumIndex.toString());
-
-    if (!found) {
-      return null;
-    }
-
-    const [, voteData] = found;
-
-    // --- Standard vote ---
-    if (type === GovVoteType.AYE || type === GovVoteType.NAY) {
-      if ('standard' in voteData) {
-        const standardVote = voteData.standard;
-        const sameDirection = standardVote.vote.aye === (type === GovVoteType.AYE);
-        const sameAmount = new BigN(standardVote.balance).eq((request).amount);
-        const sameConviction = standardVote.vote.conviction === numberToConviction[request.conviction];
-
-        if (sameDirection && sameAmount && sameConviction) {
-          return new TransactionError(BasicTxErrorType.DUPLICATE_TRANSACTION, 'Another transaction is in queue');
-        }
-      }
-    }
-
-    // --- Split vote ---
-    if (type === GovVoteType.SPLIT) {
-      if ('split' in voteData) {
-        const splitVote = voteData.split;
-        const sameAye = new BigN(splitVote.aye).eq((request).ayeAmount);
-        const sameNay = new BigN(splitVote.nay).eq((request).nayAmount);
-
-        if (sameAye && sameNay) {
-          return new TransactionError(BasicTxErrorType.DUPLICATE_TRANSACTION, 'Another transaction is in queue');
-        }
-      }
-    }
-
-    // --- SplitAbstain vote ---
-    if (type === GovVoteType.ABSTAIN) {
-      if ('splitAbstain' in voteData) {
-        const splitAbstainVote = voteData.splitAbstain;
-        const sameAye = new BigN(splitAbstainVote.aye).eq((request).ayeAmount);
-        const sameNay = new BigN(splitAbstainVote.nay).eq((request).nayAmount);
-        const sameAbstain = new BigN(splitAbstainVote.abstain).eq((request).abstainAmount);
-
-        if (sameAye && sameNay && sameAbstain) {
-          return new TransactionError(BasicTxErrorType.DUPLICATE_TRANSACTION, 'Another transaction is in queue');
-        }
-      }
     }
 
     return null;
