@@ -4,6 +4,7 @@
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { EventService } from '@subwallet/extension-base/services/event-service';
+import { decodeCallData, getCallData } from '@subwallet/extension-base/services/multisig-service/utils';
 import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
 import { BehaviorSubject } from 'rxjs';
 
@@ -12,27 +13,39 @@ import { EventItem, EventType } from '../event-service/types';
 // todo: deploy online
 const MULTISIG_SUPPORTED_CHAINS = ['statemint', 'statemine', 'paseo_assethub', 'paseoTest', 'westend_assethub'];
 
+interface PalletMultisigMultisig {
+  when: {
+    height: number,
+    index: number
+  },
+  deposit: number,
+  depositor: string,
+  approvals: string[]
+}
+
 interface PendingMultisigTx {
   chain: string;
   multisigAddress: string;
-  callHash: string;
-  when: { height: number; index: number };
-  deposit: string;
-  depositor: string;
-  approvals: string[];
+  depositor: string,
+  callHash: string,
+  blockHeight: number,
+  extrinsicIndex: number,
+  depositAmount: number,
+  approvals: string[]
   // missingApprovals: string[]; TODO: Init logic get missing approvals
+  callData?: string;
   timestamp?: number;
 }
 
-type MultisigMap = Record<string, PendingMultisigTx[]>;
+type PendingMultisigTxMap = Record<string, PendingMultisigTx[]>;
 
 export class MultisigService implements StoppableServiceInterface {
   status: ServiceStatus = ServiceStatus.NOT_INITIALIZED;
   startPromiseHandler: PromiseHandler<void> = createPromiseHandler();
   stopPromiseHandler: PromiseHandler<void> = createPromiseHandler();
 
-  private multisigMap: Record<string, PendingMultisigTx[]> = {};
-  private readonly multisigSubject: BehaviorSubject<MultisigMap> = new BehaviorSubject<MultisigMap>({});
+  private pendingMultisigTxMap: Record<string, PendingMultisigTx[]> = {};
+  private readonly pendingMultisigTxSubject: BehaviorSubject<PendingMultisigTxMap> = new BehaviorSubject<PendingMultisigTxMap>({});
   private unsubscribers: Map<string, VoidFunction> = new Map();
 
   get isStarted (): boolean {
@@ -85,7 +98,7 @@ export class MultisigService implements StoppableServiceInterface {
   loadData () {
     // TODO: Load pending multisig txs from db if needed
 
-    this.multisigSubject.next(this.multisigMap);
+    this.pendingMultisigTxSubject.next(this.pendingMultisigTxMap);
   }
 
   async init (): Promise<void> {
@@ -115,11 +128,7 @@ export class MultisigService implements StoppableServiceInterface {
     let lazyTime = 2000;
 
     // Account changed or chain changed
-    if (
-      eventTypes.includes('account.updateCurrent') ||
-      eventTypes.includes('account.add') ||
-      eventTypes.includes('chain.updateState')
-    ) {
+    if (eventTypes.includes('account.updateCurrent') || eventTypes.includes('account.add') || eventTypes.includes('chain.updateState')) {
       needReload = true;
 
       if (eventTypes.includes('account.updateCurrent')) {
@@ -132,38 +141,23 @@ export class MultisigService implements StoppableServiceInterface {
       if (event.type === 'account.remove') {
         const address = event.data[0] as string;
 
-        delete this.multisigMap[address];
+        delete this.pendingMultisigTxMap[address]; // todo: fix key
         needReload = true;
       }
     });
 
     if (needReload) {
-      addLazy(
-        'reloadMultisigByEvents',
-        () => {
-          if (this.isStarted) {
-            this.runSubscribeMultisigs().catch(console.error);
-          }
-        },
-        lazyTime,
-        undefined,
-        true
-      );
+      addLazy('reloadMultisigByEvents', () => {
+        if (this.isStarted) {
+          this.runSubscribeMultisigs().catch(console.error);
+        }
+      }, lazyTime, undefined, true);
     }
   }
 
   /**
    * Subscribe to multisig changes for all multisig addresses
    */
-  public get activeNetworks () {
-    return this.chainService.getActiveChainInfos();
-  }
-
-  public get activeChainSlugs () {
-    return Object.values(this.activeNetworks).map((chainInfo) => {
-      return chainInfo.slug;
-    });
-  }
 
   private async runSubscribeMultisigs (): Promise<void> {
     await Promise.all([
@@ -183,11 +177,11 @@ export class MultisigService implements StoppableServiceInterface {
       return;
     }
 
-    const activeChains = this.activeChainSlugs;
+    const activeChains = this.chainService.getActiveChains();
+    const supportedActiveChains = MULTISIG_SUPPORTED_CHAINS.filter((chain) => activeChains.includes(chain));
 
     await Promise.all(
-      MULTISIG_SUPPORTED_CHAINS
-        .filter((chain) => activeChains.includes(chain))
+      supportedActiveChains
         .flatMap((chain) => {
           const chainInfo = this.chainService.getChainInfoByKey(chain);
 
@@ -203,10 +197,7 @@ export class MultisigService implements StoppableServiceInterface {
   /**
    * Subscribe to a specific multisig address on a chain
    */
-  private async subscribeMultisigAddress (
-    chain: string,
-    multisigAddress: string
-  ): Promise<void> {
+  private async subscribeMultisigAddress (chain: string, multisigAddress: string): Promise<void> {
     try {
       const substrateApi = await this.chainService.getSubstrateApi(chain).isReady;
       const key = `${chain}-${multisigAddress}`;
@@ -214,15 +205,31 @@ export class MultisigService implements StoppableServiceInterface {
       const keys = await substrateApi.api.query.multisig.multisigs.keys(multisigAddress);
 
       // Subscribe to multi storage
-      const unsub = await substrateApi.api.query.multisig.multisigs.multi(keys.map((key) => key.args), (multisigEntries) => {
+      const unsub = await substrateApi.api.query.multisig.multisigs.multi(keys.map((key) => key.args), (pendingMultisigEntries) => {
         const pendingTxs: PendingMultisigTx[] = [];
 
-        multisigEntries.forEach((_multisigInfo, index) => {
-          const multisigInfo = _multisigInfo.toPrimitive() as PendingMultisigTx | null;
-
+        pendingMultisigEntries.forEach((_multisigInfo, index) => {
+          const pendingMultisigInfo = _multisigInfo.toPrimitive() as unknown as PalletMultisigMultisig;
+          const blockHeight = pendingMultisigInfo.when.height;
+          const extrinsicIndex = pendingMultisigInfo.when.index;
           const callHash = keys[index].args[1].toHex();
 
-          if (!multisigInfo) {
+          const callData = await getCallData({
+            api: substrateApi.api,
+            callHash,
+            blockHeight,
+            extrinsicIndex
+          });
+
+          const decodedCallData = decodeCallData({
+            api: substrateApi.api,
+            callData
+          });
+
+          console.log('callData', callData);
+          console.log('decodedCallData', decodedCallData);
+
+          if (!pendingMultisigInfo) {
             return;
           }
 
@@ -230,19 +237,19 @@ export class MultisigService implements StoppableServiceInterface {
             chain,
             multisigAddress,
             callHash,
-            when: multisigInfo.when,
-            deposit: multisigInfo.deposit,
-            depositor: multisigInfo.depositor,
-            approvals: multisigInfo.approvals,
-            timestamp: Date.now()
+            callData,
+            blockHeight,
+            extrinsicIndex,
+            depositAmount: pendingMultisigInfo.deposit,
+            depositor: pendingMultisigInfo.depositor,
+            approvals: pendingMultisigInfo.approvals,
+            timestamp: Date.now() // todo
           });
         });
 
-        this.updateMultisigMap(multisigAddress, pendingTxs);
-      }
-      );
+        this.updateMultisigMap(key, pendingTxs);
+      });
 
-      console.log('multisigMap', this.multisigMap);
       this.unsubscribers.set(key, unsub);
     } catch (e) {
       console.error('Failed to subscribe pending multisig transactions', e);
@@ -263,9 +270,9 @@ export class MultisigService implements StoppableServiceInterface {
   /**
    * Update multisig map and notify subscribers
    */
-  private updateMultisigMap (multisigAddress: string, pendingTxs: PendingMultisigTx[]): void {
-    this.multisigMap[multisigAddress] = pendingTxs;
-    this.multisigSubject.next({ ...this.multisigMap });
+  private updateMultisigMap (key: string, pendingTxs: PendingMultisigTx[]): void {
+    this.pendingMultisigTxMap[key] = pendingTxs;
+    this.pendingMultisigTxSubject.next({ ...this.pendingMultisigTxMap });
 
     // Store to db
     addLazy(
@@ -282,27 +289,27 @@ export class MultisigService implements StoppableServiceInterface {
     // TODO: implement db store logic
   }
 
-  public subscribeMultisigMap (): BehaviorSubject<MultisigMap> {
-    return this.multisigSubject;
+  public subscribeMultisigMap (): BehaviorSubject<PendingMultisigTxMap> {
+    return this.pendingMultisigTxSubject;
   }
 
-  public getMultisigMap (): MultisigMap {
-    return { ...this.multisigMap };
+  public getMultisigMap (): PendingMultisigTxMap {
+    return { ...this.pendingMultisigTxMap };
   }
 
   /**
    * Get pending transactions for a specific multisig address
    */
   public getPendingTxsForAddress (multisigAddress: string): PendingMultisigTx[] {
-    return this.multisigMap[multisigAddress] || [];
+    return this.pendingMultisigTxMap[multisigAddress] || []; // todo: fix this
   }
 
   /**
    * Reload all multisig data
    */
   public async reloadMultisigs (): Promise<void> {
-    this.multisigMap = {};
-    this.multisigSubject.next({});
+    this.pendingMultisigTxMap = {};
+    this.pendingMultisigTxSubject.next({});
     await this.runSubscribeMultisigs();
   }
 }
