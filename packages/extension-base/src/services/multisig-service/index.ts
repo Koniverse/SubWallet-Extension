@@ -4,7 +4,7 @@
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { EventService } from '@subwallet/extension-base/services/event-service';
-import { decodeCallData, getCallData } from '@subwallet/extension-base/services/multisig-service/utils';
+import { decodeCallData, DecodeCallDataResponse, genMultisigKey, getCallData } from '@subwallet/extension-base/services/multisig-service/utils';
 import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
 import { BehaviorSubject } from 'rxjs';
 
@@ -24,6 +24,7 @@ interface PalletMultisigMultisig {
 }
 
 interface PendingMultisigTx {
+  // todo: create an extend interface for those data calculated after base data retrieving (callData, missingApprovals, ...)
   chain: string;
   multisigAddress: string;
   depositor: string,
@@ -34,6 +35,7 @@ interface PendingMultisigTx {
   approvals: string[]
   // missingApprovals: string[]; TODO: Init logic get missing approvals
   callData?: string;
+  decodedCallData?: DecodeCallDataResponse;
   timestamp?: number;
 }
 
@@ -168,6 +170,7 @@ export class MultisigService implements StoppableServiceInterface {
     // Clear old subscribers before resubscribe
     this.runUnsubscribeMultisigs();
 
+    // todo: getAllMultisigAddresses this.keyringService.context.getAllMultisigAddresses();
     const multisigAddresses: string[] = [
       '5DbqdtTkqGExdLKHDC7ea9DoQ3MaiaVpxC7Le1QgnVd5oJbK',
       '1627ti7gKnn5aTp7a7SUVsgnM9wE6BCNw6CgCzKiVeJz5DDA'
@@ -200,19 +203,29 @@ export class MultisigService implements StoppableServiceInterface {
   private async subscribeMultisigAddress (chain: string, multisigAddress: string): Promise<void> {
     try {
       const substrateApi = await this.chainService.getSubstrateApi(chain).isReady;
-      const key = `${chain}-${multisigAddress}`;
+      const key = genMultisigKey(chain, multisigAddress);
 
-      const keys = await substrateApi.api.query.multisig.multisigs.keys(multisigAddress);
+      const rawKeys = await substrateApi.api.query.multisig.multisigs.keys(multisigAddress);
 
       // Subscribe to multi storage
-      const unsub = await substrateApi.api.query.multisig.multisigs.multi(keys.map((key) => key.args), (pendingMultisigEntries) => {
+      const unsub = await substrateApi.api.query.multisig.multisigs.multi(rawKeys.map((rawKey) => rawKey.args), async (pendingMultisigEntries) => {
         const pendingTxs: PendingMultisigTx[] = [];
 
-        pendingMultisigEntries.forEach((_multisigInfo, index) => {
+        await Promise.all(pendingMultisigEntries.map(async (_multisigInfo, index) => {
           const pendingMultisigInfo = _multisigInfo.toPrimitive() as unknown as PalletMultisigMultisig;
+
+          if (!pendingMultisigInfo) {
+            return;
+          }
+
           const blockHeight = pendingMultisigInfo.when.height;
           const extrinsicIndex = pendingMultisigInfo.when.index;
-          const callHash = keys[index].args[1].toHex();
+          const callHash = rawKeys[index].args[1].toHex();
+
+          const blockHash = await substrateApi.api.rpc.chain.getBlockHash(blockHeight);
+          const apiAt = await substrateApi.api.at(blockHash);
+          const rawTimestamp = await apiAt.query.timestamp.now();
+          const timestampMs = rawTimestamp.toNumber();
 
           const callData = await getCallData({
             api: substrateApi.api,
@@ -226,26 +239,20 @@ export class MultisigService implements StoppableServiceInterface {
             callData
           });
 
-          console.log('callData', callData);
-          console.log('decodedCallData', decodedCallData);
-
-          if (!pendingMultisigInfo) {
-            return;
-          }
-
           pendingTxs.push({
             chain,
             multisigAddress,
             callHash,
             callData,
+            decodedCallData,
             blockHeight,
             extrinsicIndex,
             depositAmount: pendingMultisigInfo.deposit,
             depositor: pendingMultisigInfo.depositor,
             approvals: pendingMultisigInfo.approvals,
-            timestamp: Date.now() // todo
+            timestamp: timestampMs
           });
-        });
+        }));
 
         this.updateMultisigMap(key, pendingTxs);
       });
@@ -300,8 +307,10 @@ export class MultisigService implements StoppableServiceInterface {
   /**
    * Get pending transactions for a specific multisig address
    */
-  public getPendingTxsForAddress (multisigAddress: string): PendingMultisigTx[] {
-    return this.pendingMultisigTxMap[multisigAddress] || []; // todo: fix this
+  public getPendingTxsForAddress (chain: string, multisigAddress: string): PendingMultisigTx[] {
+    const key = genMultisigKey(chain, multisigAddress);
+
+    return this.pendingMultisigTxMap[key] || [];
   }
 
   /**
