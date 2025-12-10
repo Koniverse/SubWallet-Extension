@@ -3,7 +3,8 @@
 
 import { ApiPromise } from '@polkadot/api';
 import { GenericExtrinsic } from '@polkadot/types';
-import { AnyJson, AnyTuple } from '@polkadot/types/types';
+import { Call } from '@polkadot/types/interfaces';
+import { AnyJson, AnyTuple, Codec } from '@polkadot/types/types';
 import { HexString } from '@polkadot/util/types';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
@@ -40,19 +41,19 @@ export async function getCallData ({ api, blockHeight, callHash, extrinsicIndex 
     const { block } = await api.rpc.chain.getBlock(blockHash);
     const extrinsic = block.extrinsics[extrinsicIndex];
 
-    if (nullable(extrinsic)) {
+    if (!extrinsic) {
       return undefined;
     }
 
     const innerCall = findInnerExtrinsicCall(extrinsic);
 
-    if (nullable(innerCall)) {
+    if (!innerCall) {
       return undefined;
     }
 
     const callData = innerCall?.toHex();
 
-    if (!callData || !validateCallData(callData, callHash)) {
+    if (!callData || !(blake2AsHex(callData) === callHash)) {
       return undefined;
     }
 
@@ -64,48 +65,50 @@ export async function getCallData ({ api, blockHeight, callHash, extrinsicIndex 
   }
 }
 
-function nonNullable<T> (val: T | null | undefined): val is T {
-  return val !== null && val !== undefined;
+function isCall (codec: Codec): codec is Call {
+  return 'args' in codec && 'method' in codec && 'section' in codec;
 }
 
-function nullable<T> (val: T | null | undefined): val is null | undefined {
-  return val === null || val === undefined;
-}
-
-function validateCallData (callData: string, callHash: string): boolean {
-  const hash = blake2AsHex(callData);
-
-  return hash === callHash;
-}
-
-function findInnerExtrinsicCall (extrinsic: GenericExtrinsic<AnyTuple>) {
-  const findAsMulti = (method: any): any => {
+function findInnerExtrinsicCall (extrinsic: GenericExtrinsic<AnyTuple>): Call | null {
+  const findAsMulti = (method: Call | null | undefined): Call | null => {
     if (!method) {
       return null;
     }
 
-    if (method.toHuman().method === 'asMulti' && method.toHuman().section === 'multisig') {
-      return method.args[MULTISIG_EXTRINSIC_CALL_INDEX];
+    const { method: callMethod, section } = method.toHuman();
+
+    if (callMethod === 'asMulti' && section === 'multisig') {
+      const arg = method.args[MULTISIG_EXTRINSIC_CALL_INDEX];
+
+      return isCall(arg) ? arg : null;
     }
 
-    if (method.toHuman().method === 'batchAll') {
-      for (const arg of method.args[0]) {
-        const result = findAsMulti(arg);
+    if (callMethod === 'batchAll' && method.args.length > 0) {
+      const firstArg = method.args[0];
 
-        if (nonNullable(result)) {
-          return result;
+      for (const item of firstArg as unknown as Iterable<Codec>) {
+        if (isCall(item)) {
+          const result = findAsMulti(item);
+
+          if (result) {
+            return result;
+          }
         }
       }
     }
 
-    if (method.args) {
-      return findAsMulti(method.args[WRAP_EXTRINSIC_CALL_INDEX]);
+    if (method.args && method.args.length > WRAP_EXTRINSIC_CALL_INDEX) {
+      const wrappedArg = method.args[WRAP_EXTRINSIC_CALL_INDEX];
+
+      if (isCall(wrappedArg)) {
+        return findAsMulti(wrappedArg);
+      }
     }
 
     return null;
   };
 
-  return findAsMulti(extrinsic.method);
+  return findAsMulti(extrinsic.method as Call);
 }
 
 export function decodeCallData ({ api, callData }: DecodeCallDataRequest): DecodeCallDataResponse | undefined {
@@ -114,4 +117,8 @@ export function decodeCallData ({ api, callData }: DecodeCallDataRequest): Decod
   }
 
   return undefined;
+}
+
+export function genMultisigKey (chainSlug: string, multisigAddress: string) {
+  return `${chainSlug}___${multisigAddress}`;
 }
