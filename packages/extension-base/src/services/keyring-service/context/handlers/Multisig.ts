@@ -35,7 +35,7 @@ export class AccountMultisigHandler extends AccountBaseHandler {
       }
 
       if (this.state.checkNameExists(name)) {
-        return [{ code: AccountMultisigErrorCode.INVALID_NAME, message: t('bg.ACCOUNT.services.keyring.handler.Secret.accountNameAlreadyExists') }]; // todo: create INVALID_NAME code
+        return [{ code: AccountMultisigErrorCode.INVALID_NAME, message: t('bg.ACCOUNT.services.keyring.handler.Secret.accountNameAlreadyExists') }];
       }
 
       const meta: KeyringPair$Meta = {

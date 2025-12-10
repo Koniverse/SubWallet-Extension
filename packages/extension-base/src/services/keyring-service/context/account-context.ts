@@ -297,6 +297,14 @@ export class AccountContext {
 
   /* Migration */
 
+  /* Multisig */
+
+  public getMultisigAccounts () {
+    this.state.getMultisigAccounts();
+  }
+
+  /* Multisig */
+
   /* Others */
 
   public removeNoneHardwareGenesisHash () {

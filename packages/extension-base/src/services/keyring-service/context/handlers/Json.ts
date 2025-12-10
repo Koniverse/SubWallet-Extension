@@ -22,8 +22,6 @@ import { AccountBaseHandler } from './Base';
  * @description Handler for account's JSON
  * */
 export class AccountJsonHandler extends AccountBaseHandler {
-  // todo: handle export import multisig account
-
   private decodeAddress = (key: string | Uint8Array, ignoreChecksum?: boolean, ss58Format?: Prefix): Uint8Array => {
     return keyring.decodeAddress(key, ignoreChecksum, ss58Format);
   };
