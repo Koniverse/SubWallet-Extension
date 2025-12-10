@@ -8,6 +8,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { createSubscription } from '@subwallet/extension-base/background/handlers/subscriptions';
 import { AccountExternalError, AccountMultisigError, AddressBookInfo, AmountData, AmountDataWithId, AssetSetting, AssetSettingUpdateReq, BondingOptionParams, BrowserConfirmationType, CampaignBanner, CampaignData, CampaignDataType, ChainType, CronReloadRequest, CrowdloanJson, ExternalRequestPromiseStatus, ExtrinsicType, FeeData, HistoryTokenPriceJSON, KeyringState, MantaPayEnableMessage, MantaPayEnableParams, MantaPayEnableResponse, MantaPaySyncState, NftCollection, NftFullListRequest, NftJson, NftTransactionRequest, NftTransactionResponse, PriceJson, RequestAccountCreateExternalV2, RequestAccountCreateHardwareMultiple, RequestAccountCreateHardwareV2, RequestAccountCreateMultisig, RequestAccountCreateWithSecretKey, RequestAccountExportPrivateKey, RequestAddInjectedAccounts, RequestApproveConnectWalletSession, RequestApproveWalletConnectNotSupport, RequestAuthorization, RequestAuthorizationBlock, RequestAuthorizationPerAccount, RequestAuthorizationPerSite, RequestAuthorizeApproveV2, RequestAvailableBalanceByType, RequestBondingSubmit, RequestCameraSettings, RequestCampaignBannerComplete, RequestChangeEnableChainPatrol, RequestChangeLanguage, RequestChangeMasterPassword, RequestChangePriceCurrency, RequestChangeShowBalance, RequestChangeShowZeroBalance, RequestChangeTimeAutoLock, RequestConfirmationComplete, RequestConfirmationCompleteBitcoin, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestConnectWalletConnect, RequestCrowdloanContributions, RequestDeleteContactAccount, RequestDisconnectWalletConnectSession, RequestEditContactAccount, RequestFindRawMetadata, RequestForgetSite, RequestFreeBalance, RequestGetHistoryTokenPriceData, RequestGetTransaction, RequestKeyringExportMnemonic, RequestMigratePassword, RequestMigrateSoloAccount, RequestMigrateUnifiedAndFetchEligibleSoloAccounts, RequestParseEvmContractInput, RequestParseTransactionSubstrate, RequestPassPhishingPage, RequestPingSession, RequestQrParseRLP, RequestQrSignEvm, RequestQrSignSubstrate, RequestRejectConnectWalletSession, RequestRejectExternalRequest, RequestRejectWalletConnectNotSupport, RequestRemoveInjectedAccounts, RequestResetWallet, RequestResolveExternalRequest, RequestSaveAppConfig, RequestSaveBrowserConfig, RequestSaveMigrationAcknowledgedStatus, RequestSaveOSConfig, RequestSaveRecentAccount, RequestSaveUnifiedAccountMigrationInProgress, RequestSettingsType, RequestSigningApprovePasswordV2, RequestStakePoolingBonding, RequestStakePoolingUnbonding, RequestSubscribeHistory, RequestSubstrateNftSubmitTransaction, RequestSwitchCurrentNetworkAuthorization, RequestTuringCancelStakeCompound, RequestTuringStakeCompound, RequestUnbondingSubmit, RequestUnlockKeyring, RequestUnlockType, ResolveAddressToDomainRequest, ResolveDomainRequest, ResponseAccountCreateWithSecretKey, ResponseAccountExportPrivateKey, ResponseChangeMasterPassword, ResponseFindRawMetadata, ResponseKeyringExportMnemonic, ResponseMigratePassword, ResponseMigrateSoloAccount, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts, ResponseNftImport, ResponseParseEvmContractInput, ResponseParseTransactionSubstrate, ResponseQrParseRLP, ResponseQrSignEvm, ResponseQrSignSubstrate, ResponseRejectExternalRequest, ResponseResetWallet, ResponseResolveExternalRequest, ResponseSubscribeCurrentTokenPrice, ResponseSubscribeHistory, ResponseUnlockKeyring, ShowCampaignPopupRequest, StakingJson, StakingRewardJson, StakingType, ThemeNames, TokenPriorityDetails, TransactionHistoryItem, TransactionResponse, UiSettings, ValidateNetworkRequest, ValidateNetworkResponse, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
+import { ApprovePendingTxRequest, ExecutePendingTxRequest } from '@subwallet/extension-base/types/multisig';
 import { AccountAuthType, AuthorizeRequest, MessageTypes, MetadataRequest, RequestAccountExport, RequestAuthorizeCancel, RequestAuthorizeReject, RequestCurrentAccountAddress, RequestMetadataApprove, RequestMetadataReject, RequestSigningApproveSignature, RequestSigningCancel, RequestTypes, ResponseAccountExport, ResponseAuthorizeList, ResponseType, SigningRequest, WindowOpenParams } from '@subwallet/extension-base/background/types';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
 import { _SUPPORT_TOKEN_PAY_FEE_GROUP, ALL_ACCOUNT_KEY, BTC_DUST_AMOUNT, LATEST_SESSION } from '@subwallet/extension-base/constants';
@@ -3187,6 +3188,103 @@ export default class KoniExtension {
     });
   }
 
+  // Multisig handlers
+  private async approvePendingTx (inputData: ApprovePendingTxRequest): Promise<boolean> {
+    const { address, chain, threshold, otherSignatories, timepoint, callHash, maxWeight } = inputData;
+
+    if (!address || !chain || !threshold || !otherSignatories || !callHash) {
+      return false;
+    }
+
+    try {
+      const substrateApi = this.#koniState.getSubstrateApi(chain);
+      const api = substrateApi.api;
+
+      if (!api || !api.tx || !api.tx.multisig) {
+        return false;
+      }
+
+      // Create approveAsMulti extrinsic
+      // callHash can be hex string or U8a
+      const callHashU8a = isHex(callHash) ? hexToU8a(callHash) : callHash;
+      const maybeTimepoint = timepoint ? api.createType('Timepoint', timepoint) : null;
+      const maxWeightOption = maxWeight ? api.createType('Weight', maxWeight) : null;
+
+      const extrinsic = api.tx.multisig.approveAsMulti(
+        threshold,
+        otherSignatories,
+        maybeTimepoint,
+        callHashU8a,
+        maxWeightOption
+      );
+
+      // Handle transaction
+      await this.#koniState.transactionService.handleTransaction({
+        address,
+        chain,
+        chainType: ChainType.SUBSTRATE,
+        data: inputData,
+        extrinsicType: ExtrinsicType.UNKNOWN,
+        transaction: extrinsic,
+        url: EXTENSION_REQUEST_URL
+      });
+
+      return true;
+    } catch (e) {
+      console.error('Error approving pending multisig transaction:', e);
+      return false;
+    }
+  }
+
+  private async executePendingTx (inputData: ExecutePendingTxRequest): Promise<boolean> {
+    const { address, chain, threshold, otherSignatories, timepoint, call, maxWeight } = inputData;
+
+    if (!address || !chain || !threshold || !otherSignatories || !timepoint || !call) {
+      return false;
+    }
+
+    try {
+      const substrateApi = this.#koniState.getSubstrateApi(chain);
+      const api = substrateApi.api;
+
+      if (!api || !api.tx || !api.tx.multisig) {
+        return false;
+      }
+
+      // Create asMulti extrinsic
+      const timepointType = api.createType('Timepoint', timepoint);
+      // call can be Call, hex string, or U8a
+      const callType = typeof call === 'string' && isHex(call)
+        ? api.createType('Call', hexToU8a(call))
+        : api.createType('Call', call);
+      const maxWeightOption = maxWeight ? api.createType('Weight', maxWeight) : null;
+
+      const extrinsic = api.tx.multisig.asMulti(
+        threshold,
+        otherSignatories,
+        timepointType,
+        callType,
+        maxWeightOption
+      );
+
+      // Handle transaction
+      await this.#koniState.transactionService.handleTransaction({
+        address,
+        chain,
+        chainType: ChainType.SUBSTRATE,
+        data: inputData,
+        extrinsicType: ExtrinsicType.UNKNOWN,
+        transaction: extrinsic,
+        url: EXTENSION_REQUEST_URL
+      });
+
+      return true;
+    } catch (e) {
+      console.error('Error executing pending multisig transaction:', e);
+      return false;
+    }
+  }
+
   // EVM Transaction
   private async parseContractInput ({ chainId,
     contract,
@@ -5963,6 +6061,15 @@ export default class KoniExtension {
         return this.migrateSoloAccount(request as RequestMigrateSoloAccount);
       case 'pri(migrate.pingSession)':
         return this.pingSession(request as RequestPingSession);
+      /* Migrate Unified Account */
+
+      /* Multisig Account */
+      case 'pri(multisig.approvePendingTx)':
+        return await this.approvePendingTx(request as ApprovePendingTxRequest);
+      case 'pri(multisig.executePendingTx)':
+        return await this.executePendingTx(request as ExecutePendingTxRequest);
+      /* Multisig Account */
+
       // Default
       default:
         throw new Error(`Unable to handle message of type ${type}`);

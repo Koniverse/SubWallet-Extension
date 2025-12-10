@@ -40,6 +40,10 @@ import { HexString } from '@polkadot/util/types';
 
 import { EarningImpactResult } from '../services/earning-service/handlers/native-staking/dtao';
 import { TransactionWarning } from './warnings/TransactionWarning';
+import {
+  ApprovePendingTxRequest,
+  ExecutePendingTxRequest
+} from "@subwallet/extension-base/types/multisig";
 
 export enum RuntimeEnvironment {
   Web = 'Web',
@@ -2782,6 +2786,12 @@ export interface KoniRequestSignatures {
   'pri(migrate.migrateUnifiedAndFetchEligibleSoloAccounts)': [RequestMigrateUnifiedAndFetchEligibleSoloAccounts, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts];
   'pri(migrate.migrateSoloAccount)': [RequestMigrateSoloAccount, ResponseMigrateSoloAccount];
   'pri(migrate.pingSession)': [RequestPingSession, boolean];
+  /* Migrate Unified Account */
+
+  /* Multisig Account */
+  'pri(multisig.approvePendingTx)': [ApprovePendingTxRequest, boolean];
+  'pri(multisig.executePendingTx)': [ExecutePendingTxRequest, boolean];
+  /* Multisig Account */
 }
 
 export interface ApplicationMetadataType {
