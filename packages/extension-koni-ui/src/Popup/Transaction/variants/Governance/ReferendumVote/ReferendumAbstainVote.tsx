@@ -142,7 +142,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
 
     if (voteInfo && previousVoteAmountDetail) {
       const prevTotal = calculateTotalAmountVotes(previousVoteAmountDetail);
-      const prevConviction = voteInfo.conviction;
+      const prevConviction = voteInfo.conviction || CONVICTION_DEFAULT;
       const prevTotalVote = prevTotal.multipliedBy(prevConviction);
 
       if (!currentTotalVote.isEqualTo(prevTotalVote)) {
