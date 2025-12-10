@@ -52,7 +52,7 @@ export function useGovReferendumVotes ({ chain,
       return await sdkInstance.getReferendaVotes(`${referendumId}`);
     },
     enabled: !!referendumId && !!chain,
-    staleTime: 60 * 1000
+    staleTime: 10000
   });
 
   const voteMap = useMemo(() => {

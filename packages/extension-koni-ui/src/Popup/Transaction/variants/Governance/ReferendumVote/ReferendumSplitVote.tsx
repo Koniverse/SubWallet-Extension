@@ -85,9 +85,9 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         nayAmount: voteInfo.nayBalance
       });
 
-      setSplitAmountRenderKey(`${splitAmountRenderKey}_${Date.now()}`);
+      setSplitAmountRenderKey(`${splitRenderKey}_${Date.now()}`);
     }
-  }, [voteInfo, form, splitAmountRenderKey, govRefVoteStorage.from]);
+  }, [voteInfo, form, govRefVoteStorage.from]);
   const assetInfo = useMemo(() => {
     const assetSlug = _getChainNativeTokenSlug(chainInfoMap[defaultData.chain]);
 

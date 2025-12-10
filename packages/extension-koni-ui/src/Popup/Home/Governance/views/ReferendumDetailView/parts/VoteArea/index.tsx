@@ -87,7 +87,7 @@ const Component = ({ chain, className, isVoteButtonLoading, onClickVote, referen
       return await sdkInstance.getReferendaVotes(`${referendumId}`);
     },
     enabled: !!chain,
-    staleTime: 60 * 1000
+    staleTime: 10000
   });
 
   const votingData = useMemo(() => formatVoteResult(data || []), [data]);
