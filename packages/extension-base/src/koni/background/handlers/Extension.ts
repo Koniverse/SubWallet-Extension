@@ -61,6 +61,7 @@ import { AccountsStore } from '@subwallet/extension-base/stores';
 import { AccountChainType, AccountJson, AccountProxyMap, AccountSignMode, AccountsWithCurrentAddress, BalanceJson, BalanceType, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeDetail, BitcoinFeeInfo, BitcoinFeeRate, BriefProcessStep, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CommonStepFeeInfo, CommonStepType, EarningProcessType, EarningRewardJson, EvmFeeInfo, FeeChainType, FeeCustom, FeeDetail, FeeInfo, FeeOption, HandleYieldStepData, NominationPoolInfo, OptimalYieldPathParams, ProcessStep, ProcessTransactionData, ProcessType, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckPublicAndSecretKey, RequestClaimBridge, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningImpact, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StakingTxErrorType, StepStatus, StorageDataInterface, SubmitChangeValidatorStaking, SummaryEarningProcessData, SwapBaseTxData, SwapFeeType, SwapRequestV2, TokenSpendingApprovalParams, ValidateYieldProcessParams, YieldPoolType, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
+import { ApprovePendingTxRequest, ExecutePendingTxRequest } from '@subwallet/extension-base/types/multisig';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
@@ -3187,6 +3188,63 @@ export default class KoniExtension {
     });
   }
 
+  // Multisig transaction
+
+  private async approvePendingTx (request: ApprovePendingTxRequest) {
+    const { callHash, chain, maxWeight, maybeTimepoint, multisigAddress, signers, threshold } = request;
+
+    const substrateApi = this.#koniState.getSubstrateApi(chain);
+    const api = await substrateApi.api.isReady;
+    const _maybeTimepoint = maybeTimepoint ?? { height: 0, index: 0 }; // todo;
+
+    const extrinsic = api.tx.multisig.approveAsMulti(
+      threshold,
+      signers,
+      _maybeTimepoint,
+      callHash,
+      maxWeight
+    );
+
+    // Handle transaction
+    return await this.#koniState.transactionService.handleTransaction({
+      address: multisigAddress,
+      chain,
+      chainType: ChainType.SUBSTRATE,
+      data: request,
+      extrinsicType: ExtrinsicType.MULTISIG_APPROVE,
+      transaction: extrinsic,
+      url: EXTENSION_REQUEST_URL
+    });
+  }
+
+  private async executePendingTx (inputData: ExecutePendingTxRequest) {
+    const { callData, chain, maxWeight, maybeTimepoint, multisigAddress, signers, threshold } = inputData;
+
+    const substrateApi = this.#koniState.getSubstrateApi(chain);
+    const api = await substrateApi.api.isReady;
+    const _maybeTimepoint = maybeTimepoint ?? { height: 0, index: 0 }; // todo;
+
+    const extrinsic = api.tx.multisig.asMulti(
+      threshold,
+      signers,
+      _maybeTimepoint,
+      callData,
+      maxWeight
+    );
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address: multisigAddress,
+      chain,
+      chainType: ChainType.SUBSTRATE,
+      data: inputData,
+      extrinsicType: ExtrinsicType.MULTISIG_EXECUTE,
+      transaction: extrinsic,
+      url: EXTENSION_REQUEST_URL
+    });
+  }
+
+  // Multisig transaction
+
   // EVM Transaction
   private async parseContractInput ({ chainId,
     contract,
@@ -5963,6 +6021,15 @@ export default class KoniExtension {
         return this.migrateSoloAccount(request as RequestMigrateSoloAccount);
       case 'pri(migrate.pingSession)':
         return this.pingSession(request as RequestPingSession);
+        /* Migrate Unified Account */
+
+      /* Multisig Account */
+      case 'pri(multisig.approvePendingTx)':
+        return await this.approvePendingTx(request as ApprovePendingTxRequest);
+      case 'pri(multisig.executePendingTx)':
+        return await this.executePendingTx(request as ExecutePendingTxRequest);
+        /* Multisig Account */
+
       // Default
       default:
         throw new Error(`Unable to handle message of type ${type}`);
