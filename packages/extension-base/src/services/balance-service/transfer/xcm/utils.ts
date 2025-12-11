@@ -3,7 +3,13 @@
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/paraspell-chain-map';
+import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
+import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
+import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
+import { _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
@@ -354,4 +360,42 @@ export function isChainNotSupportDryRun (str: string): boolean {
   const regex = /(?=.*DryRunApi)(?=.*not available).*/i; // Example: DryRunApi is not available on node Acala
 
   return regex.test(str);
+}
+
+export function isSubstrateCrossChain (originChainInfo: _ChainInfo, destinationChainInfo: _ChainInfo) {
+  if (originChainInfo.slug === destinationChainInfo.slug) {
+    return false;
+  }
+
+  // isAvailBridgeFromEvm
+  if (_isPureEvmChain(originChainInfo) && isAvailChainBridge(destinationChainInfo.slug)) {
+    return false;
+  }
+
+  // isAvailBridgeFromAvail
+  if (isAvailChainBridge(originChainInfo.slug) && _isPureEvmChain(destinationChainInfo)) {
+    return false;
+  }
+
+  // isSnowBridgeEvmTransfer
+  if (_isPureEvmChain(originChainInfo) && _isSnowBridgeXcm(originChainInfo, destinationChainInfo)) {
+    return false;
+  }
+
+  // isPolygonBridgeTransfer
+  if (_isPolygonChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
+    return false;
+  }
+
+  // isPosBridgeTransfer
+  if (_isPosChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
+    return false;
+  }
+
+  // isAcrossBridgeTransfer
+  if (_isAcrossChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
+    return false;
+  }
+
+  return true;
 }
