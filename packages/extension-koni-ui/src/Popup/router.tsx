@@ -183,8 +183,7 @@ export const router = createHashRouter([
               NftCollections.generateRouterObject('collections'),
               NftCollectionDetail.generateRouterObject('collection-detail'),
               NftItemDetail.generateRouterObject('item-detail'),
-              NftBundleItemDetail.generateRouterObject('bundle-item-detail'),
-              NftViewStructure.generateRouterObject('view-structure')
+              NftBundleItemDetail.generateRouterObject('bundle-item-detail')
             ]
           },
           // Staking.generateRouterObject('staking'),
@@ -226,6 +225,7 @@ export const router = createHashRouter([
       {
         ...TransactionDone.generateRouterObject('transaction-done/:address/:chain/:transactionId')
       },
+      { ...NftViewStructure.generateRouterObject('nft-view-structure') },
       {
         path: '/keyring',
         element: <Outlet />,

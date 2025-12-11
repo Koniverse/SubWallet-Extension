@@ -23,7 +23,7 @@ import CN from 'classnames';
 import { CaretLeft, CaretRight, Info, PaperPlaneTilt, TreeStructure } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -41,9 +41,6 @@ const modalCloseButton = <Icon
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const state = useLocation().state as INftItemDetail;
   const { collectionInfo, nftItem } = state;
-  const [searchParams] = useSearchParams();
-  const chain = searchParams.get('chain');
-  const collectionId = searchParams.get('collectionId');
 
   const { t } = useTranslation();
   const notify = useNotification();
@@ -94,7 +91,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [accounts, currentAccountProxy, navigate, nftItem, notify, setStorage, t]);
 
   const onShowNFTStructure = useCallback(() => {
-    navigate('/home/nfts/view-structure', {
+    navigate('/nft-view-structure', {
       state: {
         nftItem: nftItem,
         collectionInfo
@@ -117,10 +114,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [navigate, nftItem, collectionInfo]);
 
   const handleShowChild = useCallback(
-    (childNft: NftItem) => () => {
+    (childNft: NftItem, parentNft: NftItem) => () => {
+      const newChildNft = { ...childNft, parent: parentNft };
+
       navigate('/home/nfts/bundle-item-detail', {
         state: {
-          nftItem: childNft,
+          nftItem: newChildNft,
           collectionInfo
         }
       });
@@ -188,14 +187,25 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [nftItem.externalUrl]);
 
   const goBackToNFTCollection = useCallback(() => {
+    if (nftItem.parent) {
+      navigate('/home/nfts/bundle-item-detail', {
+        state: {
+          nftItem: nftItem.parent,
+          collectionInfo: collectionInfo
+        }
+      });
+
+      return;
+    }
+
     let targetUrl = '/home/nfts/collection-detail';
 
-    if (chain && collectionId) {
-      targetUrl = `/home/nfts/collection-detail?chain=${chain}&collectionId=${collectionId}`;
+    if (collectionInfo.chain && collectionInfo.collectionId) {
+      targetUrl = `/home/nfts/collection-detail?chain=${collectionInfo.chain}&collectionId=${collectionInfo.collectionId}`;
     }
 
     goBack(targetUrl, state);
-  }, [chain, collectionId, goBack, state]);
+  }, [collectionInfo, goBack, navigate, nftItem.parent, state]);
 
   const show3DModel = SHOW_3D_MODELS_CHAIN.includes(nftItem.chain);
 
@@ -369,7 +379,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                           phosphorIcon={CaretRight}
                           type='phosphor'
                         />}
-                        onClick={handleShowChild(nestingItem)}
+                        onClick={handleShowChild(nestingItem, nftItem)}
                         size={'small'}
                         type={'ghost'}
                       >

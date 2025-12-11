@@ -21,10 +21,8 @@ interface LocationState {
   collectionInfo: any;
 }
 
-// Hàm tiện ích: Tìm NFT gốc (Root) bằng cách leo ngược lên parent
 const findRootNft = (item: NftItem): NftItem => {
   let current = item;
-  // Giới hạn loop để tránh treo nếu dữ liệu bị lỗi circular reference vô tận
   let safeGuard = 0;
 
   while (current.parent && safeGuard < 10) {
@@ -35,17 +33,15 @@ const findRootNft = (item: NftItem): NftItem => {
   return current;
 };
 
-// ==========================================
-// COMPONENT: TREE NODE (Đệ quy)
-// ==========================================
 interface TreeNodeProps {
   item: NftItem;
+  parent?: NftItem;
   selectedId: string;
   depth?: number;
   isLastChild?: boolean;
 }
 
-const TreeNode = ({ depth = 0, isLastChild = false, item, selectedId }: TreeNodeProps) => {
+const TreeNode = ({ depth = 0, isLastChild = false, item, parent, selectedId }: TreeNodeProps) => {
   const { token } = useTheme() as Theme;
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -53,7 +49,6 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, selectedId }: TreeNode
   const isSelected = item.id === selectedId;
   const childrenCount = item.nestingTokens?.length || 0;
 
-  // Toggle mở rộng/thu gọn
   const toggleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsExpanded(!isExpanded);
@@ -61,29 +56,25 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, selectedId }: TreeNode
 
   return (
     <div className={CN('tree-node-wrapper', { 'is-last-child': isLastChild })}>
-      {/* 1. Phần hiển thị Card của Node hiện tại */}
       <div className='node-content-row'>
-        {/* Đường kẻ ngang nối từ trục dọc vào Card (chỉ hiện với item con) */}
         {depth > 0 && <div className='connector-line-horizontal' />}
 
-        {/* Nút toggle expand (chỉ hiện nếu có con) */}
         <div
           className='expand-icon-wrapper'
           onClick={hasChildren ? toggleExpand : undefined}
         >
-          {hasChildren ? (
-            <Icon
-              iconColor={token.colorTextLight4}
-              phosphorIcon={isExpanded ? CaretDown : CaretRight}
-              size='sm'
-            />
-          ) : (
-            // Nếu không có con thì hiển thị chấm tròn nhỏ hoặc khoảng trắng
-            <div className='dot-placeholder' />
-          )}
+          {hasChildren
+            ? (
+              <Icon
+                phosphorIcon={isExpanded ? CaretDown : CaretRight}
+                size='sm'
+              />
+            )
+            : (
+              <div className='dot-placeholder' />
+            )}
         </div>
 
-        {/* NFT CARD */}
         <div className={CN('nft-tree-card', { selected: isSelected })}>
           <Image
             className='nft-thumb'
@@ -100,7 +91,6 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, selectedId }: TreeNode
             </div>
           </div>
 
-          {/* Badge hoặc Checkmark */}
           {isSelected
             ? (
               <Icon
@@ -120,18 +110,17 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, selectedId }: TreeNode
         </div>
       </div>
 
-      {/* 2. Phần render con (Đệ quy) */}
       {hasChildren && isExpanded && (
         <div className='children-container'>
-          {/* Đường kẻ dọc nối các con với nhau */}
           <div className='vertical-line-guide' />
 
-          {item.nestingTokens!.map((child, index) => (
+          {item.nestingTokens?.map((child, index) => (
             <TreeNode
               depth={depth + 1}
-              isLastChild={index === item.nestingTokens!.length - 1}
+              isLastChild={index === ((item.nestingTokens?.length ?? 0) - 1)}
               item={child}
               key={child.id}
+              parent={item.parent}
               selectedId={selectedId}
             />
           ))}
@@ -141,20 +130,15 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, selectedId }: TreeNode
   );
 };
 
-// ==========================================
-// COMPONENT: MAIN SCREEN
-// ==========================================
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const location = useLocation();
   const state = location.state as LocationState;
-  const { nftItem } = state || {}; // NFT đang được chọn ban đầu
+  const { nftItem } = state || {};
 
   const { t } = useTranslation();
   const { goBack } = useDefaultNavigate();
   const dataContext = useContext(DataContext);
-  const { token } = useTheme() as Theme;
 
-  // Logic: Tìm ra Root của cây từ NFT hiện tại
   const rootNft = useMemo(() => {
     if (!nftItem) {
       return null;
@@ -163,7 +147,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return findRootNft(nftItem);
   }, [nftItem]);
 
-  // Đếm tổng số lượng (Optional)
   const countTotalNodes = useCallback((node: NftItem): number => {
     let count = 1;
 
@@ -180,7 +163,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   return (
     <PageWrapper
-      className={`${className}`}
+      className={`nft-structure ${className}`}
       resolve={dataContext.awaitStores(['nft'])}
     >
       <Layout.Base
@@ -190,7 +173,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderBackground={'transparent'}
         subHeaderCenter={true}
         subHeaderPaddingVertical={true}
-        title={`${t('NFT Structure')} (${totalCount})`} // Hiển thị số lượng
+        title={`${t('NFT Structure')} (${totalCount})`}
       >
         <div className='tree-structure-container'>
           {rootNft
@@ -210,9 +193,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   );
 }
 
-// ==========================================
-// STYLES
-// ==========================================
 const NftStructureScreen = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     '.tree-structure-container': {
@@ -230,22 +210,20 @@ const NftStructureScreen = styled(Component)<Props>(({ theme: { token } }: Props
     '.node-content-row': {
       display: 'flex',
       alignItems: 'center',
-      marginBottom: 8, // Khoảng cách giữa các row
-      position: 'relative',
+      marginBottom: 8,
       zIndex: 2
     },
 
-    // --- Line Styles (Vẽ đường kẻ) ---
     '.children-container': {
-      paddingLeft: 24, // Thụt đầu dòng cho cấp con
+      paddingLeft: 24,
       position: 'relative'
     },
 
     '.vertical-line-guide': {
       position: 'absolute',
-      left: 11, // Căn giữa icon mở rộng (khoảng 24px/2)
+      left: 11,
       top: 0,
-      bottom: 16, // Không kéo dài hết xuống dưới cùng
+      bottom: 16,
       width: 1,
       backgroundColor: token.colorTextLight4,
       opacity: 0.3,
@@ -254,7 +232,7 @@ const NftStructureScreen = styled(Component)<Props>(({ theme: { token } }: Props
 
     '.connector-line-horizontal': {
       position: 'absolute',
-      left: -13, // Nối từ đường dọc cha vào
+      left: -13,
       width: 12,
       height: 1,
       backgroundColor: token.colorTextLight4,
@@ -262,13 +240,9 @@ const NftStructureScreen = styled(Component)<Props>(({ theme: { token } }: Props
       top: '50%'
     },
 
-    // Ẩn đường dọc thừa ở item cuối cùng trong nhóm
     '.is-last-child > .node-content-row .connector-line-vertical-overlay': {
-      // Logic xử lý đường line ở item cuối phức tạp,
-      // ở đây dùng position absolute của vertical-line-guide trong children-container sẽ dễ hơn.
     },
 
-    // --- Expand Icon ---
     '.expand-icon-wrapper': {
       width: 24,
       height: 24,
@@ -287,25 +261,25 @@ const NftStructureScreen = styled(Component)<Props>(({ theme: { token } }: Props
       backgroundColor: token.colorTextLight4
     },
 
-    // --- Card Styles ---
     '.nft-tree-card': {
       flex: 1,
       display: 'flex',
       alignItems: 'center',
       padding: '8px 12px',
       backgroundColor: token.colorBgSecondary,
-      borderRadius: 12, // Bo tròn nhiều hơn
+      borderRadius: 12,
       border: '1px solid transparent',
       transition: 'all 0.2s ease',
       cursor: 'default',
+      overflow: 'hidden',
 
       '&:hover': {
-        backgroundColor: token.colorBgInput // Sáng hơn xíu khi hover
+        backgroundColor: token.colorBgInput
       },
 
       '&.selected': {
-        borderColor: token.colorSuccess, // Viền xanh lá
-        backgroundColor: token.colorBgSecondary // Giữ nền tối
+        borderColor: token.colorSuccess,
+        backgroundColor: token.colorBgSecondary
       }
     },
 

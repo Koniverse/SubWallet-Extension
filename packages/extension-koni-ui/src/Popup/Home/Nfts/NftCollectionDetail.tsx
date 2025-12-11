@@ -107,6 +107,20 @@ export const nftItemsFake: NftItem = {
                       isBundle: false,
                       nestingLevel: 5,
                       nestingTokens: [] // Hết (Leaf node)
+                    },
+                    {
+                      // --- LEVEL 5 ---
+                      id: 'nft-level-05-1',
+                      name: 'Fusion Core Gem Fusion Core Gem (2)',
+                      chain: 'unique_network',
+                      collectionId: '3856',
+                      owner: '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t',
+                      image: 'https://robohash.org/gem?set=set2&bg=set1',
+                      description: 'Power source for the suit. (Level 5)',
+                      rarity: 'Mythic',
+                      isBundle: false,
+                      nestingLevel: 5,
+                      nestingTokens: [] // Hết (Leaf node)
                     }
                   ]
                 },
@@ -122,6 +136,20 @@ export const nftItemsFake: NftItem = {
                   isBundle: false,
                   nestingLevel: 4,
                   nestingTokens: []
+                },
+                {
+                  // --- LEVEL 5 ---
+                  id: 'nft-level-04-c',
+                  name: 'Fusion Core Gem (3)',
+                  chain: 'unique_network',
+                  collectionId: '3856',
+                  owner: '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t',
+                  image: 'https://robohash.org/gem?set=set2&bg=set1',
+                  description: 'Power source for the suit. (Level 5)',
+                  rarity: 'Mythic',
+                  isBundle: false,
+                  nestingLevel: 4,
+                  nestingTokens: [] // Hết (Leaf node)
                 }
               ]
             }
@@ -161,7 +189,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   nftItems.push(nftItemsFake);
   // const nftItems = [...nftItems, nftItemsFake]
-  console.log('nftItems', nftItems);
 
   useNavigateOnChangeAccount('/home/nfts/collections');
 
@@ -230,8 +257,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     const base = `/home/nfts/${isBundle ? 'bundle-item-detail' : 'item-detail'}`;
     const url = `${base}?chain=${chain}&collectionId=${collectionId}&tokenId=${tokenId}`;
-
-    console.log('url', url);
 
     navigate(url, { state: { ...state, nftList } });
   }, [navigate, nftList]);
