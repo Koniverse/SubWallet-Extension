@@ -288,12 +288,17 @@ export default class KoniTabs {
       return this.checkPassList(url);
     }
 
-    if (this.#chainPatrolService) {
-      const isInChainPatrolDenyList = await chainPatrolCheckUrl(url);
+    // TODO: Temporarily disable the "Advanced phishing detection" feature
+    // because it produces incorrect results. It incorrectly flags
+    // YouTube, Facebook, and other social media platforms as phishing.
 
-      if (isInChainPatrolDenyList) {
-        return this.checkPassList(url);
-      }
+    if (this.#chainPatrolService) {
+      // const isInChainPatrolDenyList = await chainPatrolCheckUrl(url);
+      //
+      // if (isInChainPatrolDenyList) {
+      //   return this.checkPassList(url);
+      // }
+      return false;
     }
 
     return false;
