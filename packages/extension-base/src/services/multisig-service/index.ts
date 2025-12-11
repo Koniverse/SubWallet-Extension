@@ -13,6 +13,7 @@ import { EventItem, EventType } from '../event-service/types';
 // todo: deploy online
 const MULTISIG_SUPPORTED_CHAINS = ['statemint', 'statemine', 'paseo_assethub', 'paseoTest', 'westend_assethub'];
 
+// todo: move interface
 interface PalletMultisigMultisig {
   when: {
     height: number,
@@ -23,7 +24,7 @@ interface PalletMultisigMultisig {
   approvals: string[]
 }
 
-interface PendingMultisigTx {
+export interface PendingMultisigTx {
   // todo: create an extend interface for those data calculated after base data retrieving (callData, missingApprovals, ...)
   chain: string;
   multisigAddress: string;
@@ -39,7 +40,11 @@ interface PendingMultisigTx {
   timestamp?: number;
 }
 
-type PendingMultisigTxMap = Record<string, PendingMultisigTx[]>;
+export type PendingMultisigTxMap = Record<string, PendingMultisigTx[]>;
+
+export interface RequestGetPendingTxs {
+  multisigAddress: string
+}
 
 export class MultisigService implements StoppableServiceInterface {
   status: ServiceStatus = ServiceStatus.NOT_INITIALIZED;
@@ -49,10 +54,6 @@ export class MultisigService implements StoppableServiceInterface {
   private pendingMultisigTxMap: Record<string, PendingMultisigTx[]> = {};
   private readonly pendingMultisigTxSubject: BehaviorSubject<PendingMultisigTxMap> = new BehaviorSubject<PendingMultisigTxMap>({});
   private unsubscribers: Map<string, VoidFunction> = new Map();
-
-  get isStarted (): boolean {
-    return this.status === ServiceStatus.STARTED;
-  }
 
   constructor (
     private readonly eventService: EventService,
@@ -150,7 +151,7 @@ export class MultisigService implements StoppableServiceInterface {
 
     if (needReload) {
       addLazy('reloadMultisigByEvents', () => {
-        if (this.isStarted) {
+        if (this.status === ServiceStatus.STARTED) {
           this.runSubscribeMultisigs().catch(console.error);
         }
       }, lazyTime, undefined, true);
@@ -222,6 +223,7 @@ export class MultisigService implements StoppableServiceInterface {
           const extrinsicIndex = pendingMultisigInfo.when.index;
           const callHash = rawKeys[index].args[1].toHex();
 
+          // todo: improve performance in this subscribe function
           const blockHash = await substrateApi.api.rpc.chain.getBlockHash(blockHeight);
           const apiAt = await substrateApi.api.at(blockHash);
           const rawTimestamp = await apiAt.query.timestamp.now();
@@ -254,7 +256,7 @@ export class MultisigService implements StoppableServiceInterface {
           });
         }));
 
-        this.updateMultisigMap(key, pendingTxs);
+        this.updatePendingMultisigTxSubject(key, pendingTxs);
       });
 
       this.unsubscribers.set(key, unsub);
@@ -277,7 +279,7 @@ export class MultisigService implements StoppableServiceInterface {
   /**
    * Update multisig map and notify subscribers
    */
-  private updateMultisigMap (key: string, pendingTxs: PendingMultisigTx[]): void {
+  private updatePendingMultisigTxSubject (key: string, pendingTxs: PendingMultisigTx[]): void {
     this.pendingMultisigTxMap[key] = pendingTxs;
     this.pendingMultisigTxSubject.next({ ...this.pendingMultisigTxMap });
 
@@ -296,21 +298,36 @@ export class MultisigService implements StoppableServiceInterface {
     // TODO: implement db store logic
   }
 
-  public subscribeMultisigMap (): BehaviorSubject<PendingMultisigTxMap> {
+  public subscribePendingMultisigTx (): BehaviorSubject<PendingMultisigTxMap> {
     return this.pendingMultisigTxSubject;
   }
 
-  public getMultisigMap (): PendingMultisigTxMap {
+  public getPendingMultisigTx (): PendingMultisigTxMap {
+    // todo: wait multisig ready
     return { ...this.pendingMultisigTxMap };
   }
 
   /**
    * Get pending transactions for a specific multisig address
    */
-  public getPendingTxsForAddress (chain: string, multisigAddress: string): PendingMultisigTx[] {
-    const key = genMultisigKey(chain, multisigAddress);
+  public getPendingTxsForMultisigAddress (request: RequestGetPendingTxs, chain?: string): PendingMultisigTx[] {
+    // todo: wait multisig ready
+    const multisigAddress = request.multisigAddress;
+    const pendingMultisigTxs: PendingMultisigTx[] = [];
 
-    return this.pendingMultisigTxMap[key] || [];
+    if (chain) {
+      const key = genMultisigKey(chain, multisigAddress);
+
+      return this.pendingMultisigTxMap[key] || [];
+    }
+
+    for (const chain of MULTISIG_SUPPORTED_CHAINS) {
+      const key = genMultisigKey(chain, multisigAddress);
+
+      pendingMultisigTxs.push(...(this.pendingMultisigTxMap[key] || []));
+    }
+
+    return pendingMultisigTxs;
   }
 
   /**
