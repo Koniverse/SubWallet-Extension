@@ -574,6 +574,14 @@ export class AccountState {
    * Account ref
    * */
 
+  /* Multisig */
+
+  public getMultisigAccounts () {
+    return Object.values(this.accounts).filter((acc) => acc.accountType === AccountProxyType.MULTISIG);
+  }
+
+  /* Multisig */
+
   /* Others */
 
   public removeNoneHardwareGenesisHash () {

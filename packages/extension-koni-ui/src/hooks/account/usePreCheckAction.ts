@@ -28,6 +28,8 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
         return t('ui.ACCOUNT.hook.account.usePreCheckAction.normalAccount');
       case AccountSignMode.QR:
         return t('ui.ACCOUNT.hook.account.usePreCheckAction.qrSignerAccount');
+      case AccountSignMode.MULTISIG:
+        return t('ui.ACCOUNT.hook.account.usePreCheckAction.multisigAccount');
       case AccountSignMode.READ_ONLY:
         return t('ui.ACCOUNT.hook.account.usePreCheckAction.watchOnlyAccount');
       case AccountSignMode.UNKNOWN:
