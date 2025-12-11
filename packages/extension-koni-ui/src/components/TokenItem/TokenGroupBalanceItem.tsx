@@ -17,6 +17,7 @@ type Props = TokenBalanceItemType & ThemeProps & {
 function Component (
   { className = '',
     currency,
+    displaySymbol,
     isReady,
     logoKey,
     onPressItem,
@@ -42,7 +43,7 @@ function Component (
         convertedBalanceValue={total.convertedValue}
         decimal={0}
         displayToken={symbol}
-        name={symbol}
+        name={displaySymbol || symbol}
         networkMainLogoShape={'squircle'}
         onPressItem={onPressItem}
         prefix={(currency?.isPrefix && currency.symbol) || ''}

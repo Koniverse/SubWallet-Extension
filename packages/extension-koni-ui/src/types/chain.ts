@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _AssetType } from '@subwallet/chain-list/types';
+import { _AssetType, _ChainAsset } from '@subwallet/chain-list/types';
 
 export type ChainInfo = {
   slug: string;
@@ -17,4 +17,8 @@ export interface ChainItemType {
 export interface TokenTypeItem {
   label: string;
   value: _AssetType;
+}
+
+export interface ChainAssetDisplay extends _ChainAsset {
+  displaySymbol: string;
 }

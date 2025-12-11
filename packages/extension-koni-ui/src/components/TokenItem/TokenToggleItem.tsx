@@ -1,10 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainAsset } from '@subwallet/chain-list/types';
 import { AssetSetting } from '@subwallet/extension-base/background/KoniTypes';
 import TokenItemFooter from '@subwallet/extension-koni-ui/Popup/Settings/Tokens/component/TokenItemFooter';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ChainAssetDisplay, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import TokenItem from '@subwallet/react-ui/es/web3-block/token-item';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -12,14 +11,14 @@ import styled from 'styled-components';
 
 type Props = ThemeProps & {
   assetSettingMap: Record<string, AssetSetting>,
-  tokenInfo: _ChainAsset
+  tokenInfo: ChainAssetDisplay
 }
 
 const Component: React.FC<Props> = (props: Props) => {
   const { assetSettingMap, className, tokenInfo } = props;
   const navigate = useNavigate();
 
-  const renderTokenRightItem = useCallback((tokenInfo: _ChainAsset) => {
+  const renderTokenRightItem = useCallback((tokenInfo: ChainAssetDisplay) => {
     const assetSetting = assetSettingMap[tokenInfo.slug];
 
     return (
@@ -37,7 +36,7 @@ const Component: React.FC<Props> = (props: Props) => {
       dividerPadding={56}
       isShowSubLogo={true}
       key={tokenInfo.slug}
-      name={tokenInfo.symbol}
+      name={tokenInfo.displaySymbol}
       rightItem={renderTokenRightItem(tokenInfo)}
       subName={''}
       subNetworkKey={tokenInfo.originChain}

@@ -89,8 +89,10 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
     const searchTextLowerCase = searchText.toLowerCase();
     const chainName = chainInfoMap[item.originChain]?.name?.toLowerCase();
     const symbol = item.symbol.toLowerCase();
+    const symbolDisplay = item.displaySymbol.toLowerCase();
 
     return (
+      symbolDisplay.includes(searchTextLowerCase) ||
       symbol.includes(searchTextLowerCase) ||
       chainName.includes(searchTextLowerCase)
     );
@@ -107,7 +109,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         key={item.slug}
         showBalance={true}
         tokenSlug={item.slug}
-        tokenSymbol={item.symbol}
+        tokenSymbol={item.displaySymbol}
       />
     );
   }, [chainInfoMap]);

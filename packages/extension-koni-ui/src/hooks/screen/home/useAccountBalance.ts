@@ -8,6 +8,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AssetRegistryStore, BalanceStore, ChainStore, PriceStore } from '@subwallet/extension-koni-ui/stores/types';
 import { TokenBalanceItemType } from '@subwallet/extension-koni-ui/types/balance';
 import { AccountBalanceHookType } from '@subwallet/extension-koni-ui/types/hook';
+import { getAssetDisplay } from '@subwallet/extension-koni-ui/utils';
 import BigN from 'bignumber.js';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -29,6 +30,7 @@ function getDefaultBalanceItem (
   slug: string,
   symbol: string,
   logoKey: string,
+  displaySymbol?: string,
   currency?: CurrencyJson
 ): TokenBalanceItemType {
   return {
@@ -55,7 +57,8 @@ function getDefaultBalanceItem (
     logoKey,
     slug,
     currency: currency || defaultCurrency,
-    symbol
+    symbol,
+    displaySymbol
   };
 }
 
@@ -67,6 +70,7 @@ function getDefaultTokenGroupBalance (
 ): TokenBalanceItemType {
   let symbol: string;
   let logoKey: string;
+  let displaySymbol: string | undefined;
 
   // note: tokenGroupKey is either multiChainAsset or a tokenSlug
   // Thus, multiChainAsset may be undefined
@@ -77,10 +81,11 @@ function getDefaultTokenGroupBalance (
     const asset = assetRegistryMap[tokenGroupKey];
 
     symbol = _getAssetSymbol(asset);
+    displaySymbol = getAssetDisplay(asset);
     logoKey = asset.slug;
   }
 
-  return getDefaultBalanceItem(tokenGroupKey, symbol, logoKey.toLowerCase(), currency);
+  return getDefaultBalanceItem(tokenGroupKey, symbol, logoKey.toLowerCase(), displaySymbol, currency);
 }
 
 function getDefaultTokenBalance (
@@ -89,8 +94,9 @@ function getDefaultTokenBalance (
   currency?: CurrencyJson
 ): TokenBalanceItemType {
   const symbol = _getAssetSymbol(chainAsset);
+  const displaySymbol = getAssetDisplay(chainAsset);
 
-  return getDefaultBalanceItem(tokenSlug, symbol, chainAsset.slug.toLowerCase(), currency);
+  return getDefaultBalanceItem(tokenSlug, symbol, chainAsset.slug.toLowerCase(), displaySymbol, currency);
 }
 
 function getAccountBalance (

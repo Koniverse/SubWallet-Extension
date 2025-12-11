@@ -9,6 +9,7 @@ export type TokenSelectorItemType = {
   slug: string;
   symbol: string;
   originChain: string;
+  displaySymbol: string;
   balanceInfo?: {
     isReady: boolean;
     isNotSupport: boolean;
