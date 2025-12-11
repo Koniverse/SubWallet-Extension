@@ -150,6 +150,9 @@ export class SwapService implements StoppableServiceInterface {
     * 4. Generate optimal process for that quote
     * */
 
+    // TODO (Issue-4791): There are 2 ways:
+    //  1. find best quote and path, the logic here will remain same as before.
+    //  2. return all available (path, swapQuoteResponse). Need to update all affected uses of these two data.
     const { path, swapQuoteResponse } = await this.getLatestQuoteFromSwapRequest(request);
 
     console.group('Swap Logger');
@@ -207,6 +210,7 @@ export class SwapService implements StoppableServiceInterface {
     let availablePath: SwapPath | undefined;
 
     try {
+      // TODO (Issue-4791): findAvailablePath return SwapPath[] instead of SwapPath
       availablePath = await subwalletApiSdk.swapApi.findAvailablePath(request);
     } catch (e) {
       console.log('Error findAvailablePath', e);
@@ -241,8 +245,12 @@ export class SwapService implements StoppableServiceInterface {
       directSwapRequest.isCrossChain = true;
     }
 
+    // TODO (Issue-4791): this function used to find all quotes and also the best quote of a path.
+    //  In case we have many paths, we can also try finding best quote of all paths.
     const swapQuoteResponse = await this.getLatestDirectQuotes(directSwapRequest);
 
+    // TODO (Issue-4791): return complex data include many (path, swapQuoteResponse) object.
+    //  In fact, the current swapQuoteResponse included all quotes belong to the path.
     return {
       path,
       swapQuoteResponse
