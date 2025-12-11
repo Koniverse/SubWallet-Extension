@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
-import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
 import { PageWrapper } from '@subwallet/extension-web-ui/components';
 import { CROWDLOAN_UNLOCK_TIME } from '@subwallet/extension-web-ui/constants';
 import { DEFAULT_CROWDLOAN_UNLOCK_TIME } from '@subwallet/extension-web-ui/constants/event';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { updateChainLogoMaps } from '@subwallet/extension-web-ui/stores/utils';
-import { CrowdloanFundInfo, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { ThemeProps } from '@subwallet/extension-web-ui/types';
+import { CrowdloanFundInfo } from "@subwallet/extension-base/koni/api/dotsama/crowdloan";
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import CN from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
@@ -16,11 +17,6 @@ import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
 type Props = ThemeProps;
-
-type PeriodTimeInfo = {
-  polkadot: Record<string, number>;
-  kusama: Record<string, number>;
-}
 
 function crowdloanFundsToMap (crowdloanFunds: CrowdloanFundInfo[]): Record<string, CrowdloanFundInfo> {
   const result: Record<string, CrowdloanFundInfo> = {};
@@ -68,9 +64,9 @@ const Component: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     Promise.all([
-      fetchStaticData<CrowdloanFundInfo[]>('crowdloan-funds'),
-      fetchStaticData<_ChainInfo[]>('chains'),
-      fetchStaticData<PeriodTimeInfo>('events', 'period-time.json')
+      subwalletApiSdk.staticContentApi.fetchCrowdloanFundList(),
+      subwalletApiSdk.staticContentApi.fetchLatestChainData(),
+      subwalletApiSdk.staticContentApi.fetchPeriodTimeInfo()
     ]).then(([crowdloanFunds, chainInfoItems, periodTimeInfo]) => {
       setCrowdloanFundInfoMap(crowdloanFundsToMap(crowdloanFunds));
       setChainInfoMap(chainInfoItemsToMap(chainInfoItems));

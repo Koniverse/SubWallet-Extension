@@ -1,11 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP, RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { NominationInfo, YieldPoolType } from '@subwallet/extension-base/types';
-import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { SelectValidatorInput, StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
@@ -19,6 +18,8 @@ import { autoSelectValidatorOptimally } from '@subwallet/extension-koni-ui/utils
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Badge, Button, Icon, InputRef, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
+import { ChainRecommendValidator } from '@subwallet-monorepos/subwallet-services-sdk/services';
 import BigN from 'bignumber.js';
 import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -348,7 +349,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   // }, [cachedNominations]);
 
   useEffect(() => {
-    fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningPoolRecommendation) => {
+    subwalletApiSdk.staticContentApi.fetchValidatorRecommendations().then((earningPoolRecommendation) => {
       setDefaultPoolMap(earningPoolRecommendation);
     }).catch(console.error);
   }, []);
