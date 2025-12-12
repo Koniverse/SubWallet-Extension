@@ -125,6 +125,7 @@ export interface _SubstrateAdapterSubscriptionArgs extends Omit<Required<_Substr
 export interface _SubstrateApiAdapter {
   makeRpcQuery<T extends AnyJson | `0x${string}` | Registry | RuntimeVersion>(params: _SubstrateAdapterQueryArgs): Promise<T>,
   subscribeDataWithMulti(params: _SubstrateAdapterSubscriptionArgs[], callback: (rs: Record<string, AnyJson[]>) => void): Subscription
+  // subscribeSingleData(params: _SubstrateAdapterSubscriptionArgs[], callback: (rs: Record<string, AnyJson>) => void): Subscription
 }
 
 export interface _EvmApi extends _ChainBaseApi {

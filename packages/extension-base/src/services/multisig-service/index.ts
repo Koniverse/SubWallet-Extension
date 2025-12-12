@@ -3,6 +3,7 @@
 
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
+import { _SubstrateAdapterSubscriptionArgs } from '@subwallet/extension-base/services/chain-service/types';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { decodeCallData, DecodeCallDataResponse, genMultisigKey, getCallData } from '@subwallet/extension-base/services/multisig-service/utils';
 import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
@@ -55,7 +56,7 @@ export class MultisigService implements StoppableServiceInterface {
 
   private pendingMultisigTxMap: Record<string, PendingMultisigTx[]> = {};
   private readonly pendingMultisigTxSubject: BehaviorSubject<PendingMultisigTxMap> = new BehaviorSubject<PendingMultisigTxMap>({});
-  private unsubscribers: Map<string, VoidFunction> = new Map();
+  private unsubscriber: VoidFunction | undefined;
 
   constructor (
     private readonly eventService: EventService,
@@ -183,112 +184,129 @@ export class MultisigService implements StoppableServiceInterface {
       return;
     }
 
+    let cancel = false;
+    const unsubList: Array<() => void> = [];
     const activeChains = this.chainService.getActiveChains();
     const supportedActiveChains = MULTISIG_SUPPORTED_CHAINS.filter((chain) => activeChains.includes(chain));
 
-    await Promise.all(
-      supportedActiveChains
-        .flatMap((chain) => {
-          const chainInfo = this.chainService.getChainInfoByKey(chain);
+    for (const chain of supportedActiveChains) {
+      const chainInfo = this.chainService.getChainInfoByKey(chain);
 
-          return multisigAddresses.map((address) => {
-            const reformatAddress = _reformatAddressWithChain(address, chainInfo);
+      for (const address of multisigAddresses) {
+        const reformatAddress = _reformatAddressWithChain(address, chainInfo);
+        const key = genMultisigKey(chain, reformatAddress);
 
-            return this.subscribePendingMultisigTxs(chain, reformatAddress);
-          });
-        })
-    );
+        const unsub = this.subscribePendingMultisigTxs(chain, reformatAddress, (rs) => {
+          !cancel && this.updatePendingMultisigTxSubject(key, rs);
+        });
+
+        unsubList.push(unsub);
+      }
+    }
+
+    this.unsubscriber = () => {
+      cancel = true;
+      unsubList.forEach((unsub) => {
+        unsub?.();
+      })
+    }
   }
 
   /**
    * Subscribe to a specific multisig address on a chain
    */
-  private async subscribePendingMultisigTxs (chain: string, multisigAddress: string): Promise<void> {
-    try {
-      const substrateApi = await this.chainService.getSubstrateApi(chain).isReady;
-      const key = genMultisigKey(chain, multisigAddress);
 
-      const rawKeys = await substrateApi.api.query.multisig.multisigs.keys(multisigAddress);
+  private async subscribePendingMultisigTxsPromise (chain: string, multisigAddress: string, callback: (rs: PendingMultisigTx[]) => void) {
+    const substrateApi = await this.chainService.getSubstrateApi(chain).isReady;
 
-      // Subscribe to multi storage
-      const unsub = await substrateApi.api.query.multisig.multisigs.multi(rawKeys.map((rawKey) => rawKey.args), async (pendingMultisigEntries) => {
-        const pendingTxs: PendingMultisigTx[] = [];
+    const keyQuery = 'query_multisig_multisigs';
+    const rawKeys = await substrateApi.api.query.multisig.multisigs.keys(multisigAddress);
+    const rawKeysArgs = rawKeys.map((rawKey) => rawKey.args);
 
-        await Promise.all(pendingMultisigEntries.map(async (_multisigInfo, index) => {
-          const pendingMultisigInfo = _multisigInfo.toPrimitive() as unknown as PalletMultisigMultisig;
+    const params: _SubstrateAdapterSubscriptionArgs[] = [{
+      section: 'query',
+      module: keyQuery.split('_')[1],
+      method: keyQuery.split('_')[2],
+      args: rawKeysArgs
+    }];
 
-          if (!pendingMultisigInfo) {
-            return;
-          }
+    const subscription = substrateApi.subscribeDataWithMulti(params, async (rs) => {
+      const items: PendingMultisigTx[] = [];
+      const pendingMultisigEntries = rs[keyQuery];
 
-          const blockHeight = pendingMultisigInfo.when.height;
-          const extrinsicIndex = pendingMultisigInfo.when.index;
-          const callHash = rawKeys[index].args[1].toHex();
+      await Promise.all(pendingMultisigEntries.map(async (_pendingMultisigInfo, index) => {
+        const pendingMultisigInfo = _pendingMultisigInfo as unknown as PalletMultisigMultisig;
 
-          // todo: improve performance in this subscribe function
-          const blockHash = await substrateApi.api.rpc.chain.getBlockHash(blockHeight);
-          const apiAt = await substrateApi.api.at(blockHash);
-          const rawTimestamp = await apiAt.query.timestamp.now();
-          const timestampMs = rawTimestamp.toNumber();
+        if (!pendingMultisigInfo) {
+          return;
+        }
 
-          const signedBlock = await substrateApi.api.rpc.chain.getBlock(blockHash);
-          const extrinsicHash = signedBlock.block.extrinsics[extrinsicIndex].hash.toHex();
+        const blockHeight = pendingMultisigInfo.when.height;
+        const extrinsicIndex = pendingMultisigInfo.when.index;
+        const callHash = rawKeysArgs[index][1].toHex();
 
-          const callData = await getCallData({
-            api: substrateApi.api,
-            callHash,
-            blockHeight,
-            extrinsicIndex
-          });
+        // todo: improve performance in this subscribe function
+        const blockHash = await substrateApi.api.rpc.chain.getBlockHash(blockHeight);
+        const apiAt = await substrateApi.api.at(blockHash);
+        const rawTimestamp = await apiAt.query.timestamp.now();
+        const timestampMs = rawTimestamp.toNumber();
 
-          const decodedCallData = decodeCallData({
-            api: substrateApi.api,
-            callData
-          });
+        const signedBlock = await substrateApi.api.rpc.chain.getBlock(blockHash);
+        const extrinsicHash = signedBlock.block.extrinsics[extrinsicIndex].hash.toHex();
 
-          pendingTxs.push({
-            chain,
-            multisigAddress,
-            callHash,
-            callData,
-            decodedCallData,
-            blockHeight,
-            extrinsicIndex,
-            extrinsicHash,
-            depositAmount: pendingMultisigInfo.deposit,
-            depositor: pendingMultisigInfo.depositor,
-            approvals: pendingMultisigInfo.approvals,
-            timestamp: timestampMs
-          });
-        }));
+        const callData = await getCallData({
+          api: substrateApi.api,
+          callHash,
+          blockHeight,
+          extrinsicIndex
+        });
 
-        this.updatePendingMultisigTxSubject(key, pendingTxs);
-      });
+        const decodedCallData = decodeCallData({
+          api: substrateApi.api,
+          callData
+        });
 
-      this.unsubscribers.set(key, unsub);
-    } catch (e) {
-      console.error('Failed to subscribe pending multisig transactions', e);
-    }
+        items.push({
+          chain,
+          multisigAddress,
+          callHash,
+          callData,
+          decodedCallData,
+          blockHeight,
+          extrinsicIndex,
+          extrinsicHash,
+          depositAmount: pendingMultisigInfo.deposit,
+          depositor: pendingMultisigInfo.depositor,
+          approvals: pendingMultisigInfo.approvals,
+          timestamp: timestampMs
+        });
+      }))
+
+      callback(items);
+    });
+
+    return () => subscription.unsubscribe();
+  }
+
+  private subscribePendingMultisigTxs (chain: string, multisigAddress: string, callback: (rs: PendingMultisigTx[]) => void) {
+    const unsubPromise = this.subscribePendingMultisigTxsPromise(chain, multisigAddress, callback);
+
+    return () => {
+      unsubPromise.then((unsub) => {
+        unsub?.();
+      }).catch(console.error);
+    };
   }
 
   private runUnsubscribePendingMultisigTxs (): void {
-    this.unsubscribers.forEach((unsub) => {
-      try {
-        unsub();
-      } catch (error) {
-        console.error('Failed to unsubscribe:', error);
-      }
-    });
-    this.unsubscribers.clear();
+    this.unsubscriber && this.unsubscriber();
+    this.unsubscriber = undefined;
   }
 
   /**
    * Update multisig map and notify subscribers
    */
   private updatePendingMultisigTxSubject (key: string, pendingTxs: PendingMultisigTx[]): void {
-    console.log('key', key);
-    console.log('pendingTxs', pendingTxs);
-
     this.pendingMultisigTxMap[key] = pendingTxs;
     this.pendingMultisigTxSubject.next({ ...this.pendingMultisigTxMap });
 
