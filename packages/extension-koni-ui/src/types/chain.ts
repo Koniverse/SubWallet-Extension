@@ -20,5 +20,5 @@ export interface TokenTypeItem {
 }
 
 export interface ChainAssetDisplay extends _ChainAsset {
-  displaySymbol: string;
+  displayName: string;
 }

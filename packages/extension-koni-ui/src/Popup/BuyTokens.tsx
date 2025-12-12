@@ -180,7 +180,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
 
       return {
         name: assetRegistry[info.slug]?.name || info.symbol,
-        displaySymbol: getAssetDisplayName(assetRegistry[info.slug], info.symbol),
+        displayName: getAssetDisplayName(assetRegistry[info.slug], info.symbol),
         slug: info.slug,
         symbol: info.symbol,
         originChain: info.network,

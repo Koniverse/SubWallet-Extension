@@ -100,7 +100,7 @@ function getTokenSelectorItem (
       symbol: asset.symbol,
       name: asset.name,
       balanceInfo,
-      displaySymbol: getAssetDisplayName(asset, asset.symbol),
+      displayName: getAssetDisplayName(asset, asset.symbol),
       showBalance: true,
       total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
     });

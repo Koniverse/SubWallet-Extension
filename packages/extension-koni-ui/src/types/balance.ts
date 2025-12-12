@@ -29,7 +29,7 @@ export interface TokenBalanceItemType {
   total: BalanceValueInfo;
   isReady: boolean;
   symbol: string;
-  displaySymbol?: string;
+  displayName?: string;
   lockedDetails?: LockedBalanceDetails;
 }
 

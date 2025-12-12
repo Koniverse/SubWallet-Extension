@@ -345,7 +345,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             slug: chainAsset.slug,
             name: _getAssetName(chainAsset),
             symbol: _getAssetSymbol(chainAsset),
-            displaySymbol: getAssetDisplayName(chainAsset, chainAsset.symbol),
+            displayName: getAssetDisplayName(chainAsset, chainAsset.symbol),
             originChain
           });
         }

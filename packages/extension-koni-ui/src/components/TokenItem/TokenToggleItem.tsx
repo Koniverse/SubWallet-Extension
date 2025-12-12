@@ -36,7 +36,7 @@ const Component: React.FC<Props> = (props: Props) => {
       dividerPadding={56}
       isShowSubLogo={true}
       key={tokenInfo.slug}
-      name={tokenInfo.displaySymbol}
+      name={tokenInfo.displayName}
       rightItem={renderTokenRightItem(tokenInfo)}
       subName={''}
       subNetworkKey={tokenInfo.originChain}

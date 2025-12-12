@@ -30,7 +30,7 @@ function getDefaultBalanceItem (
   slug: string,
   symbol: string,
   logoKey: string,
-  displaySymbol?: string,
+  displayName?: string,
   currency?: CurrencyJson
 ): TokenBalanceItemType {
   return {
@@ -58,7 +58,7 @@ function getDefaultBalanceItem (
     slug,
     currency: currency || defaultCurrency,
     symbol,
-    displaySymbol
+    displayName
   };
 }
 
@@ -70,7 +70,7 @@ function getDefaultTokenGroupBalance (
 ): TokenBalanceItemType {
   let symbol: string;
   let logoKey: string;
-  let displaySymbol: string | undefined;
+  let displayName: string | undefined;
 
   // note: tokenGroupKey is either multiChainAsset or a tokenSlug
   // Thus, multiChainAsset may be undefined
@@ -81,11 +81,11 @@ function getDefaultTokenGroupBalance (
     const asset = assetRegistryMap[tokenGroupKey];
 
     symbol = _getAssetSymbol(asset);
-    displaySymbol = getAssetDisplayName(asset);
+    displayName = getAssetDisplayName(asset);
     logoKey = asset.slug;
   }
 
-  return getDefaultBalanceItem(tokenGroupKey, symbol, logoKey.toLowerCase(), displaySymbol, currency);
+  return getDefaultBalanceItem(tokenGroupKey, symbol, logoKey.toLowerCase(), displayName, currency);
 }
 
 function getDefaultTokenBalance (
@@ -94,9 +94,9 @@ function getDefaultTokenBalance (
   currency?: CurrencyJson
 ): TokenBalanceItemType {
   const symbol = _getAssetSymbol(chainAsset);
-  const displaySymbol = getAssetDisplayName(chainAsset);
+  const displayName = getAssetDisplayName(chainAsset);
 
-  return getDefaultBalanceItem(tokenSlug, symbol, chainAsset.slug.toLowerCase(), displaySymbol, currency);
+  return getDefaultBalanceItem(tokenSlug, symbol, chainAsset.slug.toLowerCase(), displayName, currency);
 }
 
 function getAccountBalance (

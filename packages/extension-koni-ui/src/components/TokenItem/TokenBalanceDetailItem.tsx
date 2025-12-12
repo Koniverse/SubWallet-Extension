@@ -20,7 +20,7 @@ function Component (
     chainDisplayName = '',
     className = '',
     currency,
-    displaySymbol,
+    displayName,
     isReady,
     logoKey,
     onClick,
@@ -44,14 +44,14 @@ function Component (
         middleItem={
           (
             <>
-              <div className={'ant-balance-item-name'}>{displaySymbol || symbol}</div>
+              <div className={'ant-balance-item-name'}>{displayName || symbol}</div>
               <div className={'__chain-name'}>
                 {chainDisplayName?.replace(' Relay Chain', '')}
               </div>
             </>
           )
         }
-        name={displaySymbol || symbol}
+        name={displayName || symbol}
         networkMainLogoShape={'squircle'}
         onPressItem={onClick}
         prefix={(currency?.isPrefix && currency.symbol) || ''}

@@ -42,7 +42,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const assetDisplayItems: ChainAssetDisplay[] = useMemo(() => {
     return assetItems.map((asset) => ({
       ...asset,
-      displaySymbol: getAssetDisplayName(asset, asset.symbol)
+      displayName: getAssetDisplayName(asset, asset.symbol)
     }));
   }, [assetItems]);
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
@@ -82,7 +82,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     const searchTextLowerCase = searchText.toLowerCase();
 
     return (
-      token.displaySymbol.toLowerCase().includes(searchTextLowerCase) ||
+      token.displayName.toLowerCase().includes(searchTextLowerCase) ||
+      token.symbol.toLowerCase().includes(searchTextLowerCase) ||
       token.name.toLowerCase().includes(searchTextLowerCase)
     );
   }, []);

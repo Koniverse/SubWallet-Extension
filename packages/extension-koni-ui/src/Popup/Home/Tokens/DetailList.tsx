@@ -112,7 +112,7 @@ function Component (): React.ReactElement {
 
   useNavigateOnChangeAccount('/home/tokens');
 
-  const displaySymbol = useMemo<string>(() => {
+  const displayName = useMemo<string>(() => {
     if (tokenGroupSlug) {
       if (multiChainAssetMap[tokenGroupSlug]) {
         return multiChainAssetMap[tokenGroupSlug].symbol;
@@ -531,7 +531,7 @@ function Component (): React.ReactElement {
           onOpenSendFund={onOpenSendFund}
           onOpenSwap={onOpenSwap}
           priceId={priceId}
-          symbol={displaySymbol}
+          symbol={displayName}
         />
       </div>
       <div

@@ -34,7 +34,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
   const { token } = useTheme() as Theme;
   const goBack = useDefaultNavigate().goBack;
   const showNotification = useNotification();
-  const displaySymbol = getAssetDisplayName(tokenInfo, tokenInfo.symbol);
+  const displayName = getAssetDisplayName(tokenInfo, tokenInfo.symbol);
 
   const originChainInfo = useFetchChainInfo(tokenInfo.originChain);
 
@@ -227,7 +227,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
             </div>
 
             <div className={'token_detail__header_text_container'}>
-              {displaySymbol}
+              {displayName}
             </div>
           </div>
 

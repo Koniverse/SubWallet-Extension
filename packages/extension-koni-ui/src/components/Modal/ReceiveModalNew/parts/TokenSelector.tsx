@@ -35,11 +35,13 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
   const isModalInactive = useIsModalInactive(modalId);
 
   const listItems = useMemo(() => {
-    const filteredList = items.map((asset) => ({ ...asset, displaySymbol: getAssetDisplayName(asset, asset.symbol) }))
+    const filteredList = items.map((asset) => ({ ...asset, displayName: getAssetDisplayName(asset, asset.symbol) }))
       .filter((item) => {
         const chainName = _getChainName(chainInfoMap[item.originChain]);
 
-        return item.displaySymbol.toLowerCase().includes(currentSearchText.toLowerCase()) || chainName.toLowerCase().includes(currentSearchText.toLowerCase());
+        return item.displayName.toLowerCase().includes(currentSearchText.toLowerCase()) ||
+          item.symbol.toLowerCase().includes(currentSearchText.toLowerCase()) ||
+          chainName.toLowerCase().includes(currentSearchText.toLowerCase());
       });
 
     sortTokensByStandard(filteredList, priorityTokens);
@@ -65,8 +67,9 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
         className={'token-selector-item'}
         key={item.slug}
         onClick={onSelect(item)}
+        tokenDisplayName={item.displayName}
         tokenSlug={item.slug}
-        tokenSymbol={item.displaySymbol}
+        tokenSymbol={item.symbol}
       />
     );
   }, [chainInfoMap, onSelect]);
