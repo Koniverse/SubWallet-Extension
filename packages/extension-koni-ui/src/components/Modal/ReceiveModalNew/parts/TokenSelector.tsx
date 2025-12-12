@@ -9,8 +9,8 @@ import Search from '@subwallet/extension-koni-ui/components/Search';
 import { RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
 import { useIsModalInactive, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { sortTokensByStandard } from '@subwallet/extension-koni-ui/utils';
+import { ChainAssetDisplay, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { getAssetDisplayName, sortTokensByStandard } from '@subwallet/extension-koni-ui/utils';
 import { SwList, SwModal } from '@subwallet/react-ui';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
@@ -35,11 +35,14 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
   const isModalInactive = useIsModalInactive(modalId);
 
   const listItems = useMemo(() => {
-    const filteredList = items.filter((item) => {
-      const chainName = _getChainName(chainInfoMap[item.originChain]);
+    const filteredList = items.map((asset) => ({ ...asset, displayName: getAssetDisplayName(asset, asset.symbol) }))
+      .filter((item) => {
+        const chainName = _getChainName(chainInfoMap[item.originChain]);
 
-      return item.symbol.toLowerCase().includes(currentSearchText.toLowerCase()) || chainName.toLowerCase().includes(currentSearchText.toLowerCase());
-    });
+        return item.displayName.toLowerCase().includes(currentSearchText.toLowerCase()) ||
+          item.symbol.toLowerCase().includes(currentSearchText.toLowerCase()) ||
+          chainName.toLowerCase().includes(currentSearchText.toLowerCase());
+      });
 
     sortTokensByStandard(filteredList, priorityTokens);
 
@@ -50,13 +53,13 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
     setCurrentSearchText(value);
   }, []);
 
-  const onSelect = useCallback((item: _ChainAsset) => {
+  const onSelect = useCallback((item: ChainAssetDisplay) => {
     return () => {
       onSelectItem?.(item);
     };
   }, [onSelectItem]);
 
-  const renderItem = useCallback((item: _ChainAsset) => {
+  const renderItem = useCallback((item: ChainAssetDisplay) => {
     return (
       <TokenSelectorItem
         chainName={_getChainName(chainInfoMap[item.originChain])}
@@ -64,6 +67,7 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
         className={'token-selector-item'}
         key={item.slug}
         onClick={onSelect(item)}
+        tokenDisplayName={item.displayName}
         tokenSlug={item.slug}
         tokenSymbol={item.symbol}
       />
