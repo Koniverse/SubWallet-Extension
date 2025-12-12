@@ -62,9 +62,9 @@ export function getExcludedTokensForLedgerEvm (chainAssets: _ChainAsset[], chain
 }
 
 // Get display string for asset
-export function getAssetDisplay (assetInfo?: _ChainAsset, defaultDisplay?: string): string | undefined {
+export function getAssetDisplayName (assetInfo?: _ChainAsset, defaultDisplay?: string): string {
   if (!assetInfo) {
-    return defaultDisplay;
+    return defaultDisplay || '';
   }
 
   // Is subnet token asset of bittensor chain
@@ -72,5 +72,5 @@ export function getAssetDisplay (assetInfo?: _ChainAsset, defaultDisplay?: strin
     return `SN${assetInfo.metadata?.netuid} | ${assetInfo.name} ${assetInfo.symbol}`;
   }
 
-  return defaultDisplay;
+  return defaultDisplay || '';
 }

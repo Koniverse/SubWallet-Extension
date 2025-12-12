@@ -79,7 +79,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
   const renderTokenSelected = useCallback((item: TokenSelectorItemType) => {
     return (
       <div className={'__selected-item'}>
-        {item.symbol}
+        {item.displaySymbol}
         {showChainInSelected}
       </div>
     );
@@ -88,12 +88,10 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
   const searchFunction = useCallback((item: TokenSelectorItemType, searchText: string) => {
     const searchTextLowerCase = searchText.toLowerCase();
     const chainName = chainInfoMap[item.originChain]?.name?.toLowerCase();
-    const symbol = item.symbol.toLowerCase();
     const symbolDisplay = item.displaySymbol.toLowerCase();
 
     return (
       symbolDisplay.includes(searchTextLowerCase) ||
-      symbol.includes(searchTextLowerCase) ||
       chainName.includes(searchTextLowerCase)
     );
   }, [chainInfoMap]);

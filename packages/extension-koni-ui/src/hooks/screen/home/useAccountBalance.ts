@@ -8,7 +8,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AssetRegistryStore, BalanceStore, ChainStore, PriceStore } from '@subwallet/extension-koni-ui/stores/types';
 import { TokenBalanceItemType } from '@subwallet/extension-koni-ui/types/balance';
 import { AccountBalanceHookType } from '@subwallet/extension-koni-ui/types/hook';
-import { getAssetDisplay } from '@subwallet/extension-koni-ui/utils';
+import { getAssetDisplayName } from '@subwallet/extension-koni-ui/utils';
 import BigN from 'bignumber.js';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -81,7 +81,7 @@ function getDefaultTokenGroupBalance (
     const asset = assetRegistryMap[tokenGroupKey];
 
     symbol = _getAssetSymbol(asset);
-    displaySymbol = getAssetDisplay(asset);
+    displaySymbol = getAssetDisplayName(asset);
     logoKey = asset.slug;
   }
 
@@ -94,7 +94,7 @@ function getDefaultTokenBalance (
   currency?: CurrencyJson
 ): TokenBalanceItemType {
   const symbol = _getAssetSymbol(chainAsset);
-  const displaySymbol = getAssetDisplay(chainAsset);
+  const displaySymbol = getAssetDisplayName(chainAsset);
 
   return getDefaultBalanceItem(tokenSlug, symbol, chainAsset.slug.toLowerCase(), displaySymbol, currency);
 }

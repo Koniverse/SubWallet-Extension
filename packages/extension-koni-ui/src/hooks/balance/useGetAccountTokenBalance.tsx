@@ -7,7 +7,7 @@ import { _getAssetDecimals, _getAssetOriginChain, _getAssetPriceId, _getAssetSym
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AssetRegistryStore, BalanceStore, ChainStore, PriceStore } from '@subwallet/extension-koni-ui/stores/types';
 import { TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
-import { getAssetDisplay } from '@subwallet/extension-koni-ui/utils';
+import { getAssetDisplayName } from '@subwallet/extension-koni-ui/utils';
 import BigN from 'bignumber.js';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
@@ -70,7 +70,7 @@ function getDefaultTokenBalance (
   currency?: CurrencyJson
 ): TokenBalanceItemType {
   const symbol = _getAssetSymbol(chainAsset);
-  const displaySymbol = getAssetDisplay(chainAsset);
+  const displaySymbol = getAssetDisplayName(chainAsset);
 
   return getDefaultBalanceItem(tokenSlug, symbol, chainAsset.slug.toLowerCase(), displaySymbol, currency);
 }

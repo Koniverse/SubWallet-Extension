@@ -144,12 +144,10 @@ const Component = (props: Props) => {
   const searchFunction = useCallback((item: TokenSelectorItemType, searchText: string) => {
     const searchTextLowerCase = searchText.toLowerCase();
     const chainName = chainInfoMap[item.originChain]?.name?.toLowerCase();
-    const symbol = item.symbol.toLowerCase();
     const displaySymbol = item.displaySymbol.toLowerCase();
 
     return (
       displaySymbol.includes(searchTextLowerCase) ||
-      symbol.includes(searchTextLowerCase) ||
       chainName.includes(searchTextLowerCase)
     );
   }, [chainInfoMap]);

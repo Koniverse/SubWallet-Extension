@@ -9,7 +9,7 @@ import { useDefaultNavigate, useFilterModal, useTranslation } from '@subwallet/e
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ChainAssetDisplay, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getAssetDisplay } from '@subwallet/extension-koni-ui/utils';
+import { getAssetDisplayName } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Icon, ModalContext, SwList } from '@subwallet/react-ui';
 import { FadersHorizontal, Plus } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useMemo } from 'react';
@@ -42,7 +42,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const assetDisplayItems: ChainAssetDisplay[] = useMemo(() => {
     return assetItems.map((asset) => ({
       ...asset,
-      displaySymbol: getAssetDisplay(asset, asset.symbol)
+      displaySymbol: getAssetDisplayName(asset, asset.symbol)
     }));
   }, [assetItems]);
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
@@ -83,8 +83,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     return (
       token.displaySymbol.toLowerCase().includes(searchTextLowerCase) ||
-      token.name.toLowerCase().includes(searchTextLowerCase) ||
-      token.symbol.toLowerCase().includes(searchTextLowerCase)
+      token.name.toLowerCase().includes(searchTextLowerCase)
     );
   }, []);
 

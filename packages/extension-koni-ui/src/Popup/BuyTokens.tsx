@@ -13,7 +13,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
 import { BuyTokensParam } from '@subwallet/extension-koni-ui/types/navigation';
-import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, getAssetDisplay, getSignModeByAccountProxy, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, getAssetDisplayName, getSignModeByAccountProxy, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import reformatAddress from '@subwallet/extension-koni-ui/utils/account/reformatAddress';
 import { Button, Form, Icon, ModalContext, SwModal, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -180,7 +180,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
 
       return {
         name: assetRegistry[info.slug]?.name || info.symbol,
-        displaySymbol: getAssetDisplay(assetRegistry[info.slug], info.symbol),
+        displaySymbol: getAssetDisplayName(assetRegistry[info.slug], info.symbol),
         slug: info.slug,
         symbol: info.symbol,
         originChain: info.network,

@@ -78,6 +78,10 @@ const TokenToggleItem = styled(Component)<Props>(({ theme: { token } }: Props) =
 
     '.ant-divider': {
       borderBlockStartColor: token.colorBgDivider
+    },
+
+    '.ant-network-item-name-wrapper': {
+      marginRight: token.marginXXS
     }
   };
 });

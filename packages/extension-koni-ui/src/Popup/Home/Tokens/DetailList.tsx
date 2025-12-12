@@ -19,7 +19,7 @@ import { DetailUpperBlock } from '@subwallet/extension-koni-ui/Popup/Home/Tokens
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { TokenBalanceItemType } from '@subwallet/extension-koni-ui/types/balance';
-import { getTransactionFromAccountProxyValue, isAccountAll, sortTokensByStandard } from '@subwallet/extension-koni-ui/utils';
+import { getAssetDisplayName, getTransactionFromAccountProxyValue, isAccountAll, sortTokensByStandard } from '@subwallet/extension-koni-ui/utils';
 import { isTonAddress } from '@subwallet/keyring';
 import { KeypairType } from '@subwallet/keyring/types';
 import { ModalContext } from '@subwallet/react-ui';
@@ -112,14 +112,14 @@ function Component (): React.ReactElement {
 
   useNavigateOnChangeAccount('/home/tokens');
 
-  const symbol = useMemo<string>(() => {
+  const displaySymbol = useMemo<string>(() => {
     if (tokenGroupSlug) {
       if (multiChainAssetMap[tokenGroupSlug]) {
         return multiChainAssetMap[tokenGroupSlug].symbol;
       }
 
       if (assetRegistryMap[tokenGroupSlug]) {
-        return assetRegistryMap[tokenGroupSlug].symbol;
+        return getAssetDisplayName(assetRegistryMap[tokenGroupSlug], assetRegistryMap[tokenGroupSlug].symbol);
       }
     }
 
@@ -531,7 +531,7 @@ function Component (): React.ReactElement {
           onOpenSendFund={onOpenSendFund}
           onOpenSwap={onOpenSwap}
           priceId={priceId}
-          symbol={symbol}
+          symbol={displaySymbol}
         />
       </div>
       <div

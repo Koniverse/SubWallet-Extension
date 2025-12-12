@@ -13,6 +13,7 @@ import useFetchChainInfo from '@subwallet/extension-koni-ui/hooks/screen/common/
 import useGetChainAssetInfo from '@subwallet/extension-koni-ui/hooks/screen/common/useGetChainAssetInfo';
 import { deleteCustomAssets, upsertCustomToken } from '@subwallet/extension-koni-ui/messaging';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { getAssetDisplayName } from '@subwallet/extension-koni-ui/utils';
 import { Button, ButtonProps, Col, Field, Icon, Input, Logo, Row, Tooltip } from '@subwallet/react-ui';
 import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import { CheckCircle, Copy, Trash } from 'phosphor-react';
@@ -33,6 +34,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
   const { token } = useTheme() as Theme;
   const goBack = useDefaultNavigate().goBack;
   const showNotification = useNotification();
+  const displaySymbol = getAssetDisplayName(tokenInfo, tokenInfo.symbol);
 
   const originChainInfo = useFetchChainInfo(tokenInfo.originChain);
 
@@ -225,7 +227,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
             </div>
 
             <div className={'token_detail__header_text_container'}>
-              {tokenInfo.symbol}
+              {displaySymbol}
             </div>
           </div>
 
