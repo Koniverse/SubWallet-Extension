@@ -14,7 +14,7 @@ import { FrameBalancesFreezesInfo, FrameBalancesHoldsInfo, FrameBalancesLocksInf
 import { _adaptX1Interior } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/contract-handler/wasm';
 import { getDefaultWeightV2 } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
-import { _BALANCE_CHAIN_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
+import { _BALANCE_CHAIN_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX, USE_MULTILOCATION_INDEX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _checkSmartContractSupportByChain, _getAssetExistentialDeposit, _getAssetNetuid, _getChainExistentialDeposit, _getChainNativeTokenSlug, _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getTokenTypesSupportedByChain, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
@@ -480,16 +480,21 @@ const subscribeAssetsAccountPallet = async ({ addresses, assetMap, callback, cha
     try {
       const assetIndex = _getTokenOnChainAssetId(tokenInfo);
 
-      if (assetIndex === '-1') {
+      if (assetIndex === '-1' && !USE_MULTILOCATION_INDEX.includes(chainInfo.slug)) {
         return undefined;
       }
+
+      const version: number = ['statemint', 'statemine', 'westend_assethub'].includes(chainInfo.slug) ? 4 : 3;
+      const multilocationIndex = _adaptX1Interior(_getXcmAssetMultilocation(tokenInfo), version);
+
+      const index = USE_MULTILOCATION_INDEX.includes(chainInfo.slug) ? multilocationIndex : assetIndex;
 
       const params: _SubstrateAdapterSubscriptionArgs[] = [
         {
           section: 'query',
           module: assetsAccountKey.split('_')[1],
           method: assetsAccountKey.split('_')[2],
-          args: addresses.map((address) => [assetIndex, address])
+          args: addresses.map((address) => [index, address])
         }
       ];
 
