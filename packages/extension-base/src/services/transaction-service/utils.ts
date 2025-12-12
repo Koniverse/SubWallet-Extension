@@ -34,6 +34,10 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return 'accounts';
   }
 
+  if (explorerLink.includes('mainnet-gw2.mosaicchain.io')) {
+    return 'accounts';
+  }
+
   if (explorerLink.includes('statescan.io')) {
     return '#/accounts';
   }
@@ -110,7 +114,7 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
     return 'extrinsics';
   }
 
-  if (['mosaicTest', 'polkadex'].includes(chainInfo.slug)) {
+  if (['mosaicTest', 'polkadex', 'mosaic'].includes(chainInfo.slug)) {
     return 'transactions';
   }
 
