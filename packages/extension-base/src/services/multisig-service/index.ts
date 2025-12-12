@@ -208,8 +208,8 @@ export class MultisigService implements StoppableServiceInterface {
       cancel = true;
       unsubList.forEach((unsub) => {
         unsub?.();
-      })
-    }
+      });
+    };
   }
 
   /**
@@ -280,7 +280,7 @@ export class MultisigService implements StoppableServiceInterface {
           approvals: pendingMultisigInfo.approvals,
           timestamp: timestampMs
         });
-      }))
+      }));
 
       callback(items);
     });
