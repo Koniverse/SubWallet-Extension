@@ -51,6 +51,8 @@ const editUnlockTypeModalId = EDIT_UNLOCK_TYPE_MODAL;
 
 const timeOptions = [5, 10, 15, 30, 60];
 
+const showChainPatrol = false;
+
 const Component: React.FC<Props> = (props: Props) => {
   const { className } = props;
 
@@ -285,7 +287,9 @@ const Component: React.FC<Props> = (props: Props) => {
             {items.map(onRenderItem)}
           </div>
           <div className='setting-config-container'>
-            <div className={CN('security-item', 'custom-security-item', `security-type-${SecurityType.CHAIN_PATROL_SERVICE}`)}>
+            {showChainPatrol && (<div
+              className={CN('security-item', 'custom-security-item', `security-type-${SecurityType.CHAIN_PATROL_SERVICE}`)}
+            >
               <div className='__item-left-part'>
                 <BackgroundIcon
                   backgroundColor={'var(--icon-bg-color)'}
@@ -300,7 +304,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   {t('ui.SETTINGS.screen.Setting.Security.advancedPhishingDetection')}
                 </div>
                 <div className='__item-description'>
-                  {t('Show warnings for phishing sites and protect your assets from scams')}
+                  {t('ui.SETTINGS.screen.Setting.Security.showPhishingWarningsProtectAssets')}
                 </div>
               </div>
               <div className='__item-right-part'>
@@ -310,7 +314,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   onClick={updateChainPatrolEnable(enableChainPatrol)}
                 />
               </div>
-            </div>
+            </div>)}
             <SettingItem
               className={CN('security-item', `security-type-${SecurityType.CAMERA_ACCESS}`)}
               leftItemIcon={(
