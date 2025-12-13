@@ -4,7 +4,7 @@
 import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
 import SwLogosMap from '@subwallet/extension-web-ui/assets/subwallet';
 import { BaseModal, PageWrapper } from '@subwallet/extension-web-ui/components';
-import { EXTENSION_VERSION, SUPPORT_MAIL, TERMS_OF_SERVICE_URL, TWITTER_URL, WEB_BUILD_NUMBER, WEBSITE_URL, WIKI_URL } from '@subwallet/extension-web-ui/constants/common';
+import { EXTENSION_VERSION, SUPPORT_MAIL, CONTACT_SUPPORT_URL, TERMS_OF_SERVICE_URL, TWITTER_URL, WEB_BUILD_NUMBER, WEBSITE_URL, WIKI_URL } from '@subwallet/extension-web-ui/constants/common';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
@@ -193,7 +193,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           rightIcon: ArrowSquareOut,
           title: t('Contact support'),
           onClick: () => {
-            window.open(`${SUPPORT_MAIL}?subject=[WebApp - In-app support]`, '_self');
+            window.open(CONTACT_SUPPORT_URL, '_blank');
           }
         },
         {
