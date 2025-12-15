@@ -13,7 +13,7 @@ import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/ha
 import { _ChainConnectionStatus, _SubstrateAdapterQueryArgs, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { goldbergRpc, goldbergTypes, spec as availSpec } from 'avail-js-sdk';
-import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, map, Observable, of, Subscription } from 'rxjs';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { ApiOptions } from '@polkadot/api/types';
@@ -394,13 +394,57 @@ export class SubstrateApi implements _SubstrateApi {
         observables[key] = apiRx[section][module][method]
           .multi(args)
           .pipe(
+            // tap((codecs) => console.log('raw data', key, codecs)), // this line is used to debug data before transformation
             map((codecs) => codecs.map(
               (codec) => codec.toPrimitive()
-            ))
+            )),
+            catchError((error, caught) => {
+              console.error(`RxJS pipe() error for key ${key}`, error);
+
+              return of([]);
+            })
           );
       }
     });
 
     return combineLatest(observables).subscribe(callback);
   }
+
+  // subscribeSingleData (params: _SubstrateAdapterSubscriptionArgs[], callback: (rs: Record<string, AnyJson>) => void): Subscription {
+  //   const apiRx = this.api.rx;
+  //   const observables: Record<string, Observable<AnyJson>> = {};
+  //
+  //   const param = params[0];
+  //   const { args, method, module, section } = param;
+  //   const key = `${section}_${module}_${method}`;
+  //
+  //   console.log('apiRx[section][module][method]', apiRx[section][module][method]);
+  //
+  //   return apiRx[section][module][method](args[0], '0x08429781e0c5600a6e89d75df1634a830e70610887e023d3cad2c6bd881d1845')
+  //     // .pipe(map((codec) => {
+  //     //   console.log('codec', codec)
+  //     //   console.log('codec', codec.toPrimitive())
+  //     //
+  //     //   return codec.toPrimitive()
+  //     // }))
+  //     .subscribe((e) => console.log(e));
+  //
+  //   // params.forEach((queryParams) => {
+  //   //   const { args, method, module, section } = queryParams;
+  //   //   const key = `${section}_${module}_${method}`;
+  //   //
+  //   //   if (!this.api[section][module] || !this.api[section][module][method]) { // if method not found, returns an empty observable
+  //   //     observables[key] = new Observable<AnyJson[]>((subscriber) => {
+  //   //       subscriber.next([]);
+  //   //     });
+  //   //   } else {
+  //   //     observables[key] = apiRx[section][module][method](args[0])
+  //   //       .pipe(
+  //   //         map((codec ) => codec.toPrimitive())
+  //   //       );
+  //   //   }
+  //   // });
+  //   //
+  //   // return combineLatest(observables).subscribe(callback);
+  // }
 }
