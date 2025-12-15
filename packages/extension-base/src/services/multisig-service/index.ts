@@ -59,6 +59,7 @@ export class MultisigService implements StoppableServiceInterface {
   private pendingMultisigTxMap: Record<string, PendingMultisigTx[]> = {};
   private readonly pendingMultisigTxSubject: BehaviorSubject<PendingMultisigTxMap> = new BehaviorSubject<PendingMultisigTxMap>({});
   private unsubscriber: VoidFunction | undefined;
+  private subscribePromise: Promise<void> | undefined; // to check if the subscription logic is running
 
   constructor (
     private readonly eventService: EventService,
@@ -155,11 +156,16 @@ export class MultisigService implements StoppableServiceInterface {
     });
 
     if (needReload) {
-      addLazy('reloadPendingMultisigTxsByEvents', () => { // todo: check trạng thái service
-        if (this.status === ServiceStatus.STARTED) {
-          this.runSubscribePendingMultisigTxs().catch(console.error);
-        }
-      }, lazyTime, undefined, true);
+      addLazy(
+        'reloadPendingMultisigTxsByEvents',
+        () => {
+          if (this.status === ServiceStatus.STARTED) {
+            this.runSubscribePendingMultisigTxs().catch(console.error);
+          }
+        },
+        lazyTime,
+        undefined,
+        true);
     }
   }
 
@@ -168,50 +174,66 @@ export class MultisigService implements StoppableServiceInterface {
    */
 
   private async runSubscribePendingMultisigTxs (): Promise<void> {
-    await Promise.all([
-      this.eventService.waitKeyringReady,
-      this.eventService.waitChainReady
-    ]);
-
-    // Clear old subscribers before resubscribe
-    this.runUnsubscribePendingMultisigTxs();
-
-    // todo: getAllMultisigAddresses this.keyringService.context.getAllMultisigAddresses();
-    const multisigAddresses: string[] = [
-      '5DbqdtTkqGExdLKHDC7ea9DoQ3MaiaVpxC7Le1QgnVd5oJbK',
-      '1627ti7gKnn5aTp7a7SUVsgnM9wE6BCNw6CgCzKiVeJz5DDA'
-    ];
-
-    if (!multisigAddresses.length) {
+    if (this.status === ServiceStatus.STOPPING || this.status === ServiceStatus.STOPPED) {
       return;
     }
 
-    let cancel = false;
-    const unsubList: Array<() => void> = [];
-    const activeChains = this.chainService.getActiveChains();
-    const supportedActiveChains = MULTISIG_SUPPORTED_CHAINS.filter((chain) => activeChains.includes(chain));
-
-    for (const chain of supportedActiveChains) {
-      const chainInfo = this.chainService.getChainInfoByKey(chain);
-
-      for (const address of multisigAddresses) {
-        const reformatAddress = _reformatAddressWithChain(address, chainInfo);
-        const key = genMultisigKey(chain, reformatAddress);
-
-        const unsub = this.subscribePendingMultisigTxs(chain, reformatAddress, (rs) => {
-          !cancel && this.updatePendingMultisigTxSubject(key, rs);
-        });
-
-        unsubList.push(unsub);
-      }
+    if (this.subscribePromise) {
+      return this.subscribePromise;
     }
 
-    this.unsubscriber = () => {
-      cancel = true;
-      unsubList.forEach((unsub) => {
-        unsub?.();
-      });
-    };
+    this.subscribePromise = (async () => {
+      await Promise.all([
+        this.eventService.waitKeyringReady,
+        this.eventService.waitChainReady
+      ]);
+
+      // Clear old subscribers before resubscribe
+      this.runUnsubscribePendingMultisigTxs();
+
+      // todo: getAllMultisigAddresses this.keyringService.context.getAllMultisigAddresses();
+      const multisigAddresses: string[] = [
+        '5DbqdtTkqGExdLKHDC7ea9DoQ3MaiaVpxC7Le1QgnVd5oJbK',
+        '1627ti7gKnn5aTp7a7SUVsgnM9wE6BCNw6CgCzKiVeJz5DDA'
+      ];
+
+      if (!multisigAddresses.length) {
+        return;
+      }
+
+      let cancel = false;
+      const unsubList: Array<() => void> = [];
+      const activeChains = this.chainService.getActiveChains();
+      const supportedActiveChains = MULTISIG_SUPPORTED_CHAINS.filter((chain) => activeChains.includes(chain));
+
+      for (const chain of supportedActiveChains) {
+        const chainInfo = this.chainService.getChainInfoByKey(chain);
+
+        for (const address of multisigAddresses) {
+          const reformatAddress = _reformatAddressWithChain(address, chainInfo);
+          const key = genMultisigKey(chain, reformatAddress);
+
+          const unsub = this.subscribePendingMultisigTxs(chain, reformatAddress, (rs) => {
+            !cancel && this.updatePendingMultisigTxSubject(key, rs);
+          });
+
+          unsubList.push(unsub);
+        }
+      }
+
+      this.unsubscriber = () => {
+        cancel = true;
+        unsubList.forEach((unsub) => {
+          unsub?.();
+        });
+      };
+    })();
+
+    try {
+      await this.subscribePromise;
+    } finally {
+      this.subscribePromise = undefined;
+    }
   }
 
   /**
@@ -219,7 +241,6 @@ export class MultisigService implements StoppableServiceInterface {
    */
 
   private async subscribePendingMultisigTxsPromise (chain: string, multisigAddress: string, callback: (rs: PendingMultisigTx[]) => void) {
-    // todo: xử lí thoát khi logic trong subscription lỗi nếu cần
     const substrateApi = await this.chainService.getSubstrateApi(chain).isReady;
 
     const keyQuery = 'query_multisig_multisigs';
@@ -234,66 +255,82 @@ export class MultisigService implements StoppableServiceInterface {
     }];
 
     const subscription = substrateApi.subscribeDataWithMulti(params, async (rs) => {
-      const items: PendingMultisigTx[] = [];
-      const pendingMultisigEntries = rs[keyQuery];
-      const blockCache: Record<number, {
-        blockHash: BlockHash,
-        signedBlock: SignedBlock,
-        timestamp: number
-      }> = {};
+      try {
+        const items: PendingMultisigTx[] = [];
+        const pendingMultisigEntries = rs[keyQuery];
+        const blockCache: Record<number, {
+          blockHash: BlockHash,
+          signedBlock: SignedBlock,
+          timestamp: number
+        }> = {};
 
-      await Promise.all(pendingMultisigEntries.map(async (_pendingMultisigInfo, index) => {
-        const pendingMultisigInfo = _pendingMultisigInfo as unknown as PalletMultisigMultisig;
+        await Promise.all(pendingMultisigEntries.map(async (_pendingMultisigInfo, index) => {
+          const pendingMultisigInfo = _pendingMultisigInfo as unknown as PalletMultisigMultisig;
 
-        if (!pendingMultisigInfo) {
-          return;
-        }
+          if (!pendingMultisigInfo) {
+            return;
+          }
 
-        const blockHeight = pendingMultisigInfo.when.height;
-        const extrinsicIndex = pendingMultisigInfo.when.index;
-        const callHash = rawKeysArgs[index][1].toHex();
+          const blockHeight = pendingMultisigInfo.when.height;
+          const extrinsicIndex = pendingMultisigInfo.when.index;
+          const callHash = rawKeysArgs[index][1].toHex();
 
-        // Cache block-level data to avoid many RPC calls
-        let blockInfo = blockCache[blockHeight];
+          // Cache block-level data to avoid many RPC calls
+          let blockInfo = blockCache[blockHeight];
 
-        if (!blockInfo) {
-          const blockHash = await substrateApi.api.rpc.chain.getBlockHash(blockHeight);
-          const signedBlock = await substrateApi.api.rpc.chain.getBlock(blockHash);
-          const apiAt = await substrateApi.api.at(blockHash);
-          const timestamp = (await apiAt.query.timestamp.now()).toNumber();
+          if (!blockInfo) {
+            const blockHash = await substrateApi.api.rpc.chain.getBlockHash(blockHeight);
+            const signedBlock = await substrateApi.api.rpc.chain.getBlock(blockHash);
+            const apiAt = await substrateApi.api.at(blockHash);
+            const timestamp = (await apiAt.query.timestamp.now()).toNumber();
 
-          blockInfo = { blockHash, signedBlock, timestamp };
-          blockCache[blockHeight] = blockInfo;
-        }
+            blockInfo = { blockHash, signedBlock, timestamp };
+            blockCache[blockHeight] = blockInfo;
+          }
 
-        const extrinsicHash = blockInfo.signedBlock.block.extrinsics[extrinsicIndex].hash.toHex();
+          const extrinsicHash = blockInfo.signedBlock.block.extrinsics[extrinsicIndex].hash.toHex();
 
-        const callData = blockInfo.blockHash.toHex() === DEFAULT_BLOCK_HASH
-          ? undefined
-          : getCallData({ callHash, extrinsicIndex, block: blockInfo.signedBlock.block });
+          const callData = blockInfo.blockHash.toHex() === DEFAULT_BLOCK_HASH
+            ? undefined
+            : getCallData({ callHash, extrinsicIndex, block: blockInfo.signedBlock.block });
 
-        const decodedCallData = decodeCallData({
-          api: substrateApi.api,
-          callData
-        });
+          const decodedCallData = decodeCallData({
+            api: substrateApi.api,
+            callData
+          });
 
-        items.push({
-          chain,
-          multisigAddress,
-          callHash,
-          callData, // todo: recheck case undefined
-          decodedCallData,
-          blockHeight,
-          extrinsicIndex,
-          extrinsicHash,
-          depositAmount: pendingMultisigInfo.deposit,
-          depositor: pendingMultisigInfo.depositor,
-          approvals: pendingMultisigInfo.approvals,
-          timestamp: blockInfo.timestamp
-        });
-      }));
+          items.push({
+            chain,
+            multisigAddress,
+            callHash,
+            callData, // todo: recheck case undefined
+            decodedCallData,
+            blockHeight,
+            extrinsicIndex,
+            extrinsicHash,
+            depositAmount: pendingMultisigInfo.deposit,
+            depositor: pendingMultisigInfo.depositor,
+            approvals: pendingMultisigInfo.approvals,
+            timestamp: blockInfo.timestamp
+          });
+        }));
 
-      callback(items);
+        callback(items);
+      } catch (error) {
+        console.error(`Multisig Service subscription error ${chain}/${multisigAddress}`, error);
+
+        addLazy(
+          `resubscribeMultisig_${chain}_${multisigAddress}`,
+          () => {
+            if (this.status === ServiceStatus.STARTED) {
+              this.runSubscribePendingMultisigTxs().catch(console.error);
+            }
+          },
+          1000,
+          4000,
+          true
+        );
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -322,10 +359,12 @@ export class MultisigService implements StoppableServiceInterface {
     this.pendingMultisigTxSubject.next({ ...this.pendingMultisigTxMap });
 
     // Store to db
-    addLazy( // todo: check trạng thái service
+    addLazy(
       'updateMultisigStore',
       () => {
-        this.updateMultisigStore().catch(console.error);
+        if (this.status === ServiceStatus.STARTED) {
+          this.updateMultisigStore().catch(console.error);
+        }
       },
       300,
       1800
