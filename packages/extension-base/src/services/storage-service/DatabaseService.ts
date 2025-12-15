@@ -27,6 +27,9 @@ import { DexieExportJsonStructure, exportDB } from 'dexie-export-import';
 import { logger as createLogger } from '@polkadot/util';
 import { Logger } from '@polkadot/util/types';
 
+import { GovVotingInfo } from '../open-gov/interface';
+import GovLockedInfoStore from './db-stores/GovLockedInfoStore';
+
 export const DEXIE_BACKUP_TABLES = ['chain', 'asset', 'migrations', 'transactions', 'campaign'];
 
 export default class DatabaseService {
@@ -76,8 +79,10 @@ export default class DatabaseService {
       inappNotification: new InappNotificationStore(this._db.inappNotification),
 
       // process transaction
-      processTransactions: new ProcessTransactionStore(this._db.processTransactions)
+      processTransactions: new ProcessTransactionStore(this._db.processTransactions),
 
+      // gov
+      govLockedInfo: new GovLockedInfoStore(this._db.govLockedInfos)
     };
   }
 
@@ -751,6 +756,24 @@ export default class DatabaseService {
 
   public updateNotificationProxyId (proxyIds: string[], newProxyId: string, newName: string) {
     return this.stores.inappNotification.updateNotificationProxyId(proxyIds, newProxyId, newName);
+  }
+
+  /* Gov */
+
+  async getGovLockedInfos (addresses: string[], chains: string[]) {
+    return this.stores.govLockedInfo.getByAddressesAndChains(addresses, chains);
+  }
+
+  async updateGovLockedInfos (infos: GovVotingInfo[]) {
+    return this.stores.govLockedInfo.upsertMany(infos);
+  }
+
+  removeGovLockedInfosByAddresses (addresses: string[]) {
+    return this.stores.govLockedInfo.removeByAddresses(addresses);
+  }
+
+  removeGovLockedInfosByChains (chains: string[]) {
+    return this.stores.govLockedInfo.removeByChains(chains);
   }
 
   async exportDB () {
