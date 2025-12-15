@@ -227,7 +227,10 @@ export async function getERC721Transaction (
 
     if (error.message.includes('transfer to non ERC721Receiver implementer')) {
       error.message = t('bg.BALANCE.services.service.balance.transfer.smartContract.nftNotSupportedOnRecipient');
+      throw error;
     }
+
+    error.message = t('bg.BALANCE.services.service.balance.transfer.smartContract.temporarilyNontransferableNFT');
 
     throw error;
   }
