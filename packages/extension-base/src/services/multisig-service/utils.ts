@@ -8,18 +8,15 @@ import { AnyJson, AnyTuple, Codec } from '@polkadot/types/types';
 import { HexString } from '@polkadot/util/types';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
-const MULTISIG_EXTRINSIC_CALL_INDEX = 3;
-const WRAP_EXTRINSIC_CALL_INDEX = 2;
-
 export const DEFAULT_BLOCK_HASH = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
-export interface GetCallDataRequest {
+interface GetCallDataRequest {
   callHash: HexString;
   extrinsicIndex: number;
   block: Block;
 }
 
-export interface DecodeCallDataRequest {
+interface DecodeCallDataRequest {
   api: ApiPromise;
   callData?: HexString;
 }
@@ -58,6 +55,9 @@ function isCall (codec: Codec): codec is Call {
 
 function findInnerExtrinsicCall (extrinsic: GenericExtrinsic<AnyTuple>): Call | null {
   const findAsMulti = (method: Call | null | undefined): Call | null => {
+    const MULTISIG_EXTRINSIC_CALL_INDEX = 3;
+    const WRAP_EXTRINSIC_CALL_INDEX = 2;
+
     if (!method) {
       return null;
     }

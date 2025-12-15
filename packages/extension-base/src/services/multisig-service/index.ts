@@ -14,7 +14,6 @@ import { EventItem, EventType } from '../event-service/types';
 // todo: deploy online
 const MULTISIG_SUPPORTED_CHAINS = ['statemint', 'statemine', 'paseo_assethub', 'paseoTest', 'westend_assethub'];
 
-// todo: move interface
 interface PalletMultisigMultisig {
   when: {
     height: number,
@@ -25,7 +24,7 @@ interface PalletMultisigMultisig {
   approvals: string[]
 }
 
-export interface PendingMultisigTx {
+export interface PendingMultisigTx extends ExtendedPendingMultisigTx {
   chain: string;
   multisigAddress: string;
   depositor: string,
@@ -34,8 +33,9 @@ export interface PendingMultisigTx {
   extrinsicIndex: number,
   depositAmount: number,
   approvals: string[]
+}
 
-  // todo: create an extend interface for those data calculated after base data retrieving (callData, missingApprovals, ...)
+interface ExtendedPendingMultisigTx {
   // signers?: string[]; TODO: add signers field, get from keyring service by multisig address
   extrinsicHash?: string;
   callData?: string; // todo: handle case callData and decodedCallData undefined
