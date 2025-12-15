@@ -3,20 +3,20 @@
 
 import { ApiPromise } from '@polkadot/api';
 import { GenericExtrinsic } from '@polkadot/types';
-import { Call } from '@polkadot/types/interfaces';
+import { Block, Call } from '@polkadot/types/interfaces';
 import { AnyJson, AnyTuple, Codec } from '@polkadot/types/types';
 import { HexString } from '@polkadot/util/types';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 const MULTISIG_EXTRINSIC_CALL_INDEX = 3;
 const WRAP_EXTRINSIC_CALL_INDEX = 2;
-const DEFAULT_BLOCK_HASH = '0x0000000000000000000000000000000000000000000000000000000000000000';
+
+export const DEFAULT_BLOCK_HASH = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 export interface GetCallDataRequest {
-  api: ApiPromise;
   callHash: HexString;
-  blockHeight: number;
   extrinsicIndex: number;
+  block: Block;
 }
 
 export interface DecodeCallDataRequest {
@@ -30,39 +30,26 @@ export interface DecodeCallDataResponse {
   args: AnyJson
 }
 
-export async function getCallData ({ api, blockHeight, callHash, extrinsicIndex }: GetCallDataRequest): Promise<HexString | undefined> {
-  try {
-    const blockHash = await api.rpc.chain.getBlockHash(blockHeight);
+export function getCallData ({ block, callHash, extrinsicIndex }: GetCallDataRequest): HexString | undefined {
+  const extrinsic = block.extrinsics[extrinsicIndex];
 
-    if (blockHash.toHex() === DEFAULT_BLOCK_HASH) {
-      return undefined;
-    }
-
-    const { block } = await api.rpc.chain.getBlock(blockHash);
-    const extrinsic = block.extrinsics[extrinsicIndex];
-
-    if (!extrinsic) {
-      return undefined;
-    }
-
-    const innerCall = findInnerExtrinsicCall(extrinsic);
-
-    if (!innerCall) {
-      return undefined;
-    }
-
-    const callData = innerCall?.toHex();
-
-    if (!callData || !(blake2AsHex(callData) === callHash)) {
-      return undefined;
-    }
-
-    return callData;
-  } catch (e) {
-    console.warn('Error getCallData()', e);
-
+  if (!extrinsic) {
     return undefined;
   }
+
+  const innerCall = findInnerExtrinsicCall(extrinsic);
+
+  if (!innerCall) {
+    return undefined;
+  }
+
+  const callData = innerCall?.toHex();
+
+  if (!callData || !(blake2AsHex(callData) === callHash)) {
+    return undefined;
+  }
+
+  return callData;
 }
 
 function isCall (codec: Codec): codec is Call {

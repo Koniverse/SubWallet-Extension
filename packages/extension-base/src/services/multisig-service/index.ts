@@ -5,7 +5,7 @@ import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-b
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _SubstrateAdapterSubscriptionArgs } from '@subwallet/extension-base/services/chain-service/types';
 import { EventService } from '@subwallet/extension-base/services/event-service';
-import { decodeCallData, DecodeCallDataResponse, genMultisigKey, getCallData } from '@subwallet/extension-base/services/multisig-service/utils';
+import { decodeCallData, DecodeCallDataResponse, DEFAULT_BLOCK_HASH, genMultisigKey, getCallData } from '@subwallet/extension-base/services/multisig-service/utils';
 import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
 import { BehaviorSubject } from 'rxjs';
 
@@ -147,7 +147,7 @@ export class MultisigService implements StoppableServiceInterface {
       if (event.type === 'account.remove') {
         const address = event.data[0] as string;
 
-        delete this.pendingMultisigTxMap[address]; // todo: fix key
+        delete this.pendingMultisigTxMap[address]; // todo: recheck logic account.add and account.remove
         needReload = true;
       }
     });
@@ -248,18 +248,14 @@ export class MultisigService implements StoppableServiceInterface {
         // todo: improve performance in this subscribe function
         const blockHash = await substrateApi.api.rpc.chain.getBlockHash(blockHeight);
         const apiAt = await substrateApi.api.at(blockHash);
-        const rawTimestamp = await apiAt.query.timestamp.now();
-        const timestampMs = rawTimestamp.toNumber();
+        const timestamp = (await apiAt.query.timestamp.now()).toNumber();
 
         const signedBlock = await substrateApi.api.rpc.chain.getBlock(blockHash);
         const extrinsicHash = signedBlock.block.extrinsics[extrinsicIndex].hash.toHex();
 
-        const callData = await getCallData({
-          api: substrateApi.api,
-          callHash,
-          blockHeight,
-          extrinsicIndex
-        });
+        const callData = blockHash.toHex() === DEFAULT_BLOCK_HASH
+          ? undefined
+          : getCallData({ callHash, extrinsicIndex, block: signedBlock.block });
 
         const decodedCallData = decodeCallData({
           api: substrateApi.api,
@@ -270,7 +266,7 @@ export class MultisigService implements StoppableServiceInterface {
           chain,
           multisigAddress,
           callHash,
-          callData,
+          callData, // todo: recheck case undefined
           decodedCallData,
           blockHeight,
           extrinsicIndex,
@@ -278,7 +274,7 @@ export class MultisigService implements StoppableServiceInterface {
           depositAmount: pendingMultisigInfo.deposit,
           depositor: pendingMultisigInfo.depositor,
           approvals: pendingMultisigInfo.approvals,
-          timestamp: timestampMs
+          timestamp
         });
       }));
 
