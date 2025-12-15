@@ -9,7 +9,7 @@ import { _isXcmWithinSameConsensus } from '@subwallet/extension-base/core/substr
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { getAcrossbridgeTransferProcessFromEvm, getDefaultTransferProcess, getSnowbridgeTransferProcessFromEvm, RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
-import { _getChainNativeTokenSlug, _isChainSubstrateCompatible, _isCustomAsset, _isNativeToken, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getChainNativeTokenSlug, _isChainSubstrateCompatible, _isCustomAsset, _isCustomChain, _isNativeToken, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
 import { BalanceItem, BalanceJson, BalanceType, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
@@ -995,7 +995,7 @@ export class BalanceService implements StoppableServiceInterface {
 
     const tokenSlugsWithBalance: string[] = [];
 
-    if (address) {
+    if (address && !_isCustomChain(chainInfo.slug)) {
       if (_isPureEvmChain(chainInfo)) {
         tokenSlugsWithBalance.push(...await this.getEvmTokensBalanceByChain(address, chainSlug));
       } else if (_isChainSubstrateCompatible(chainInfo)) {
