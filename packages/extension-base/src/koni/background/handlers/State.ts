@@ -187,7 +187,7 @@ export default class KoniState {
     this.inappNotificationService = new InappNotificationService(this.dbService, this.keyringService, this.eventService, this.chainService);
     this.chainOnlineService = new ChainOnlineService(this.chainService, this.settingService, this.eventService, this.dbService);
     this.openGovService = new OpenGovService(this);
-    this.multisigService = new MultisigService(this.eventService, this.chainService);
+    this.multisigService = new MultisigService(this.eventService, this.chainService, this.keyringService);
 
     this.subscription = new KoniSubscription(this, this.dbService);
     this.cron = new KoniCron(this, this.subscription, this.dbService);

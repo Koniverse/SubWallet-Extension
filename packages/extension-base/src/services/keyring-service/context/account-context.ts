@@ -300,7 +300,11 @@ export class AccountContext {
   /* Multisig */
 
   public getMultisigAccounts () {
-    this.state.getMultisigAccounts();
+    return this.state.getMultisigAccounts();
+  }
+
+  public getMultisigAddresses () {
+    return this.state.getMultisigAddresses();
   }
 
   /* Multisig */

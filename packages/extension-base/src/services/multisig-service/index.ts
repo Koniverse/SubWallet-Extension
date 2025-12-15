@@ -5,6 +5,7 @@ import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-b
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _SubstrateAdapterSubscriptionArgs } from '@subwallet/extension-base/services/chain-service/types';
 import { EventService } from '@subwallet/extension-base/services/event-service';
+import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import { decodeCallData, DecodeCallDataResponse, DEFAULT_BLOCK_HASH, genMultisigKey, getCallData } from '@subwallet/extension-base/services/multisig-service/utils';
 import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
 import { BehaviorSubject } from 'rxjs';
@@ -63,7 +64,8 @@ export class MultisigService implements StoppableServiceInterface {
 
   constructor (
     private readonly eventService: EventService,
-    private readonly chainService: ChainService
+    private readonly chainService: ChainService,
+    private readonly keyringService: KeyringService
   ) {
     this.status = ServiceStatus.NOT_INITIALIZED;
   }
@@ -191,11 +193,7 @@ export class MultisigService implements StoppableServiceInterface {
       // Clear old subscribers before resubscribe
       this.runUnsubscribePendingMultisigTxs();
 
-      // todo: getAllMultisigAddresses this.keyringService.context.getAllMultisigAddresses();
-      const multisigAddresses: string[] = [
-        '5DbqdtTkqGExdLKHDC7ea9DoQ3MaiaVpxC7Le1QgnVd5oJbK',
-        '1627ti7gKnn5aTp7a7SUVsgnM9wE6BCNw6CgCzKiVeJz5DDA'
-      ];
+      const multisigAddresses = this.keyringService.context.getMultisigAddresses();
 
       if (!multisigAddresses.length) {
         return;
