@@ -9,6 +9,8 @@ import { decodeCallData, DecodeCallDataResponse, DEFAULT_BLOCK_HASH, genMultisig
 import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
 import { BehaviorSubject } from 'rxjs';
 
+import { BlockHash, SignedBlock } from '@polkadot/types/interfaces';
+
 import { EventItem, EventType } from '../event-service/types';
 
 // todo: deploy online
@@ -153,7 +155,7 @@ export class MultisigService implements StoppableServiceInterface {
     });
 
     if (needReload) {
-      addLazy('reloadPendingMultisigTxsByEvents', () => {
+      addLazy('reloadPendingMultisigTxsByEvents', () => { // todo: check trạng thái service
         if (this.status === ServiceStatus.STARTED) {
           this.runSubscribePendingMultisigTxs().catch(console.error);
         }
@@ -217,6 +219,7 @@ export class MultisigService implements StoppableServiceInterface {
    */
 
   private async subscribePendingMultisigTxsPromise (chain: string, multisigAddress: string, callback: (rs: PendingMultisigTx[]) => void) {
+    // todo: xử lí thoát khi logic trong subscription lỗi nếu cần
     const substrateApi = await this.chainService.getSubstrateApi(chain).isReady;
 
     const keyQuery = 'query_multisig_multisigs';
@@ -233,6 +236,11 @@ export class MultisigService implements StoppableServiceInterface {
     const subscription = substrateApi.subscribeDataWithMulti(params, async (rs) => {
       const items: PendingMultisigTx[] = [];
       const pendingMultisigEntries = rs[keyQuery];
+      const blockCache: Record<number, {
+        blockHash: BlockHash,
+        signedBlock: SignedBlock,
+        timestamp: number
+      }> = {};
 
       await Promise.all(pendingMultisigEntries.map(async (_pendingMultisigInfo, index) => {
         const pendingMultisigInfo = _pendingMultisigInfo as unknown as PalletMultisigMultisig;
@@ -245,17 +253,24 @@ export class MultisigService implements StoppableServiceInterface {
         const extrinsicIndex = pendingMultisigInfo.when.index;
         const callHash = rawKeysArgs[index][1].toHex();
 
-        // todo: improve performance in this subscribe function
-        const blockHash = await substrateApi.api.rpc.chain.getBlockHash(blockHeight);
-        const apiAt = await substrateApi.api.at(blockHash);
-        const timestamp = (await apiAt.query.timestamp.now()).toNumber();
+        // Cache block-level data to avoid many RPC calls
+        let blockInfo = blockCache[blockHeight];
 
-        const signedBlock = await substrateApi.api.rpc.chain.getBlock(blockHash);
-        const extrinsicHash = signedBlock.block.extrinsics[extrinsicIndex].hash.toHex();
+        if (!blockInfo) {
+          const blockHash = await substrateApi.api.rpc.chain.getBlockHash(blockHeight);
+          const signedBlock = await substrateApi.api.rpc.chain.getBlock(blockHash);
+          const apiAt = await substrateApi.api.at(blockHash);
+          const timestamp = (await apiAt.query.timestamp.now()).toNumber();
 
-        const callData = blockHash.toHex() === DEFAULT_BLOCK_HASH
+          blockInfo = { blockHash, signedBlock, timestamp };
+          blockCache[blockHeight] = blockInfo;
+        }
+
+        const extrinsicHash = blockInfo.signedBlock.block.extrinsics[extrinsicIndex].hash.toHex();
+
+        const callData = blockInfo.blockHash.toHex() === DEFAULT_BLOCK_HASH
           ? undefined
-          : getCallData({ callHash, extrinsicIndex, block: signedBlock.block });
+          : getCallData({ callHash, extrinsicIndex, block: blockInfo.signedBlock.block });
 
         const decodedCallData = decodeCallData({
           api: substrateApi.api,
@@ -274,7 +289,7 @@ export class MultisigService implements StoppableServiceInterface {
           depositAmount: pendingMultisigInfo.deposit,
           depositor: pendingMultisigInfo.depositor,
           approvals: pendingMultisigInfo.approvals,
-          timestamp
+          timestamp: blockInfo.timestamp
         });
       }));
 
@@ -307,7 +322,7 @@ export class MultisigService implements StoppableServiceInterface {
     this.pendingMultisigTxSubject.next({ ...this.pendingMultisigTxMap });
 
     // Store to db
-    addLazy(
+    addLazy( // todo: check trạng thái service
       'updateMultisigStore',
       () => {
         this.updateMultisigStore().catch(console.error);
