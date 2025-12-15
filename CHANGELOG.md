@@ -1,5 +1,41 @@
 # CHANGELOG
 
+## 1.3.70
+Build date: Dec 11, 2025.
+
+Features & Updates:
+- Support OpenGov (Phase 1) (#4678)
+
+
+## 1.3.69
+Build date: Dec 08, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.122 (#4827)
+- Turn off "Advanced phishing detection" feature (#4891)
+
+
+## 1.3.68
+Build date: Dec 03, 2025.
+
+Features & Updates:
+- Standardize the Module Price History according to the new standard (#4784)
+- Locked Balance Display (#4708)
+- Update Transak Widget URL (#4835)
+
+Bug fixes:
+- Unable to import NFT ERC-721 on Rari chain (#4625)
+- Support show NFT haven't method tokenOfOwnerByIndex (#4568)
+
+
+## 1.3.67
+Build date: Nov 13, 2025.
+
+Features & Updates:
+- Improve Swap validation by Dry-run-preview API from ParaSpell (#4671)
+- Configure gas limit & max gas fee for Energy Web Chain (#4716)
+
+
 ## 1.3.66
 Build date: Nov 07, 2025.
 

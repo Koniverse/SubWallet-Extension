@@ -20,6 +20,9 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { BitcoinSignArea, EvmSignArea, SubstrateSignArea } from '../../parts/Sign';
+import GovUnlockTransactionConfirmation from './variants/GovUnlock';
+import GovUnvoteTransactionConfirmation from './variants/GovUnvote';
+import GovVoteTransactionConfirmation from './variants/GovVote';
 import { AddSubstrateProxyAccountTransactionConfirmation, BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ChangeEarningValidatorTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, RemoveSubstrateProxyAccountTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
 
 interface Props extends ThemeProps {
@@ -81,6 +84,12 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
       return SwapTransactionConfirmation;
     case ExtrinsicType.CLAIM_BRIDGE:
       return ClaimBridgeTransactionConfirmation;
+    case ExtrinsicType.GOV_VOTE:
+      return GovVoteTransactionConfirmation;
+    case ExtrinsicType.GOV_UNVOTE:
+      return GovUnvoteTransactionConfirmation;
+    case ExtrinsicType.GOV_UNLOCK_VOTE:
+      return GovUnlockTransactionConfirmation;
     case ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT:
       return AddSubstrateProxyAccountTransactionConfirmation;
     case ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT:
@@ -178,7 +187,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <div className={CN(className, 'confirmation-content')}>
+      <div className={CN(className, 'confirmation-content', {
+        '-no-margin-top': [ExtrinsicType.GOV_VOTE, ExtrinsicType.GOV_UNVOTE].includes(transaction.extrinsicType)
+      })}
+      >
         {renderContent(transaction)}
         {isAddressFormatInfoBoxVisible && (
           <AlertBoxInstant
@@ -266,6 +278,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
 const TransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
+    '&.-no-margin-top': {
+      marginTop: 0
+    },
+
     '--content-gap': 0,
     marginTop: token.marginXS,
 

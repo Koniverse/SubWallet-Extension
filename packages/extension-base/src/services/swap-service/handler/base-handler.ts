@@ -10,7 +10,7 @@ import { FrameSystemAccountInfo } from '@subwallet/extension-base/core/substrate
 import { _isAcrossBridgeXcm, _isSnowBridgeXcm, _isXcmWithinSameConsensus } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { _isSufficientToken } from '@subwallet/extension-base/core/utils';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
-import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2, getXcmOriginFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
@@ -390,26 +390,6 @@ export class SwapBaseHandler {
     } as SwapSubmitStepData;
   }
 
-  public async validateSetFeeTokenStep (params: ValidateSwapProcessParams, stepIndex: number): Promise<TransactionError[]> {
-    if (!params.selectedQuote) {
-      return Promise.resolve([new TransactionError(BasicTxErrorType.INTERNAL_ERROR)]);
-    }
-
-    const feeInfo = params.process.totalFee[stepIndex];
-    const feeAmount = feeInfo.feeComponent[0];
-    const feeTokenInfo = this.chainService.getAssetBySlug(feeInfo.defaultFeeToken);
-
-    const feeTokenBalance = await this.balanceService.getTransferableBalance(params.address, feeTokenInfo.originChain, feeTokenInfo.slug);
-    const bnFeeTokenBalance = new BigN(feeTokenBalance.value);
-    const bnFeeAmount = new BigN(feeAmount.amount);
-
-    if (bnFeeAmount.gte(bnFeeTokenBalance)) {
-      return Promise.resolve([new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)]);
-    }
-
-    return [];
-  }
-
   private async validateBridgeStep (request: ValidateBridgeStepRequest): Promise<TransactionError[]> {
     const { bnBridgeAmount, bnBridgeDeliveryFee, bnBridgeFeeAmount, bnFeeTokenBalance, bnFromTokenBalance, fromChain, fromToken, isFirstBridge, receiver, selectedFeeToken, sender, toChain, toChainNativeToken, toToken } = request;
 
@@ -454,7 +434,7 @@ export class SwapBaseHandler {
       const xcmRequest = {
         originTokenInfo: fromToken,
         destinationTokenInfo: toToken,
-        sendingValue: bnBridgeAmount.toString(),
+        sendingValue: bnBridgeAmount.toFixed(),
         recipient: receiver,
         substrateApi: substrateApi,
         sender: sender,
@@ -463,11 +443,27 @@ export class SwapBaseHandler {
         feeInfo
       };
 
-      const isDryRunSuccess = await dryRunXcmExtrinsicV2(xcmRequest);
+      if (isFirstBridge) {
+        const isDryRunSuccess = await dryRunXcmExtrinsicV2(xcmRequest, false);
 
-      // temp skip dry-run for later step todo: wait for dry-run-predict
-      if (isFirstBridge && !isDryRunSuccess) {
-        return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Unable to perform transaction. Select another token or destination chain and try again')];
+        if (!isDryRunSuccess) {
+          return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Swap amount too small. Increase amount and try again')];
+        }
+      } else {
+        const isDryRunPreviewSuccess = await dryRunXcmExtrinsicV2(xcmRequest, true);
+        const originFee = await getXcmOriginFee(xcmRequest);
+
+        if (originFee) {
+          const isBridgeTokenNativeBalanceEnough = bnFeeTokenBalance.gte(originFee);
+
+          if (!isBridgeTokenNativeBalanceEnough) {
+            return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Swap amount too small. Increase amount and try again')];
+          }
+        }
+
+        if (!isDryRunPreviewSuccess) {
+          return [new TransactionError(BasicTxErrorType.UNABLE_TO_SEND, 'Swap amount too small. Increase amount and try again')];
+        }
       }
     }
 

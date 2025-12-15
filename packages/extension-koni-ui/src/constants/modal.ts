@@ -91,6 +91,10 @@ export const TRANSACTION_PROCESS_DETAIL_MODAL = 'transaction-process-detail-moda
 export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 /* Process */
 
+/* OpenGov */
+export const GOV_DELEGATION_DETAILS_MODAL = 'gov-delegation-details-modal';
+/* OpenGov */
+
 /* Proxy */
 export const SUBSTRATE_PROXY_ACCOUNT_SELECTOR_MODAL = 'substrateProxyAccount-account-selector-modal';
 export const SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL = 'substrateProxyAccount-account-list-modal';

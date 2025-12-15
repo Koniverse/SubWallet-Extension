@@ -38,4 +38,5 @@ export * from './TokenItem';
 export * from './WalletConnect';
 export * from './Crowdloan';
 export * from './TransactionProcess';
+export * from './Governance';
 export * from './SubstrateProxyAccount';

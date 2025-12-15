@@ -238,6 +238,12 @@ const CLAIM_AVAIL_BRIDGE: ExtrinsicType[] = [
   ExtrinsicType.CLAIM_BRIDGE
 ];
 
+const OPEN_GOV_ACTIONS: ExtrinsicType[] = [
+  ExtrinsicType.GOV_VOTE,
+  ExtrinsicType.GOV_UNVOTE,
+  ExtrinsicType.GOV_UNLOCK_VOTE
+];
+
 const SUBSTRATE_PROXY_ACTION: ExtrinsicType[] = [
   ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT,
   ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT
@@ -264,6 +270,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_QDOT_ACTIONS,
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
+          ...OPEN_GOV_ACTIONS,
           ...SUBSTRATE_PROXY_ACTION,
           ...OTHER_ACTIONS
         ];
@@ -305,6 +312,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_QDOT_ACTIONS,
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
+          ...OPEN_GOV_ACTIONS,
           ...SUBSTRATE_PROXY_ACTION,
           ...OTHER_ACTIONS
         ];
@@ -343,6 +351,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_LDOT_ACTIONS,
           ...EARN_SDOT_ACTIONS,
           // ...EARN_QDOT_ACTIONS,
+          ...OPEN_GOV_ACTIONS,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -405,7 +414,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
   } else if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) { // Only for account substrate with ECDSA scheme format
     const result: ExtrinsicType[] = [];
 
-    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ExtrinsicType.TRANSFER_XCM, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
+    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ...OPEN_GOV_ACTIONS, ExtrinsicType.TRANSFER_XCM, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
 
     return result;
   }
