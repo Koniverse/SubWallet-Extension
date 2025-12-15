@@ -9,3 +9,4 @@ export { default as useYieldPositionDetail } from './useYieldPositionDetail';
 export { default as useGetYieldPositionForSpecificAccount } from './useGetYieldPositionForSpecificAccount';
 export { default as useYieldRewardTotal } from './useYieldRewardTotal';
 export { default as useCreateGetSubnetStakingTokenName } from './useCreateGetSubnetStakingTokenName';
+export { default as useGetSubnetPoolPositionDetailByNetuid } from './useGetSubnetPoolPositionDetailByNetuid';

@@ -44,6 +44,11 @@ export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
   value: string;
   transferBounceable?: boolean;
   isSubstrateECDSATransaction?: boolean;
+  metadata?: {
+    netuid: number;
+    fromValidator: string;
+    toValidator: string;
+  }
 }
 
 export interface RequestSubmitSignPsbtTransfer extends BaseRequestSign {

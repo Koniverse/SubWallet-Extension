@@ -42,7 +42,7 @@ import { getClaimTxOnAvail, getClaimTxOnEthereum, isAvailChainBridge } from '@su
 import { _isPolygonChainBridge, getClaimPolygonBridge, isClaimedPolygonBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, getClaimPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
-import { _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
+import { _BALANCE_CHAIN_GROUP, _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _NetworkUpsertParams, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _isAssetSmartContractNft, _isChainBitcoinCompatible, _isChainCompatibleLedgerEvm, _isChainEnabled, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isNativeTokenBySlug, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByBitcoin, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
 import { TokenHasBalanceInfo, TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
@@ -1445,6 +1445,9 @@ export default class KoniExtension {
 
   private async makeTransfer (inputData: RequestSubmitTransfer): Promise<SWTransactionResponse> {
     const { chain, feeCustom, feeOption, from, to, tokenPayFeeSlug, tokenSlug, transferAll, transferBounceable, value } = inputData;
+    const isAlphaTokenTransfer = _BALANCE_CHAIN_GROUP.bittensor.includes(chain) && !!inputData.metadata;
+
+    console.log('checking', [isAlphaTokenTransfer, inputData]);
     const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(tokenSlug);
     const errors = validateTransferRequest(transferTokenInfo, from, to, value, transferAll);
     const warnings: TransactionWarning[] = [];
@@ -1574,6 +1577,17 @@ export default class KoniExtension {
         }
 
         console.log('PSPT transaction', transaction.toHex());
+      } else if (isAlphaTokenTransfer && !!inputData.metadata) {
+        const substrateApi = this.#koniState.getSubstrateApi(chain);
+        const metadata = inputData.metadata;
+
+        transaction = substrateApi.api.tx.subtensorModule.moveStake(
+          to,
+          metadata.fromValidator,
+          metadata.netuid,
+          metadata.netuid,
+          value
+        );
       } else {
         const substrateApi = this.#koniState.getSubstrateApi(chain);
 
