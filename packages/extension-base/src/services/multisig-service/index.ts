@@ -39,7 +39,7 @@ export interface PendingMultisigTx extends ExtendedPendingMultisigTx {
 }
 
 interface ExtendedPendingMultisigTx {
-  // signers?: string[]; TODO: add signers field, get from keyring service by multisig address
+  signers?: string[];
   extrinsicHash?: string;
   callData?: string; // todo: handle case callData and decodedCallData undefined
   decodedCallData?: DecodeCallDataResponse;
@@ -193,9 +193,9 @@ export class MultisigService implements StoppableServiceInterface {
       // Clear old subscribers before resubscribe
       this.runUnsubscribePendingMultisigTxs();
 
-      const multisigAddresses = this.keyringService.context.getMultisigAddresses();
+      const multisigAccounts = this.keyringService.context.getMultisigAccounts();
 
-      if (!multisigAddresses.length) {
+      if (!multisigAccounts.length) {
         return;
       }
 
@@ -207,11 +207,13 @@ export class MultisigService implements StoppableServiceInterface {
       for (const chain of supportedActiveChains) {
         const chainInfo = this.chainService.getChainInfoByKey(chain);
 
-        for (const address of multisigAddresses) {
-          const reformatAddress = _reformatAddressWithChain(address, chainInfo);
+        for (const account of multisigAccounts) {
+          const multisigAddress = account.id;
+          const reformatAddress = _reformatAddressWithChain(multisigAddress, chainInfo);
           const key = genMultisigKey(chain, reformatAddress);
+          const signers = account.accounts[0].signers as string[];
 
-          const unsub = this.subscribePendingMultisigTxs(chain, reformatAddress, (rs) => {
+          const unsub = this.subscribePendingMultisigTxs(chain, reformatAddress, signers, (rs) => {
             !cancel && this.updatePendingMultisigTxSubject(key, rs);
           });
 
@@ -238,7 +240,7 @@ export class MultisigService implements StoppableServiceInterface {
    * Subscribe to a specific multisig address on a chain
    */
 
-  private async subscribePendingMultisigTxsPromise (chain: string, multisigAddress: string, callback: (rs: PendingMultisigTx[]) => void) {
+  private async subscribePendingMultisigTxsPromise (chain: string, multisigAddress: string, signers: string[], callback: (rs: PendingMultisigTx[]) => void) {
     const substrateApi = await this.chainService.getSubstrateApi(chain).isReady;
 
     const keyQuery = 'query_multisig_multisigs';
@@ -306,6 +308,7 @@ export class MultisigService implements StoppableServiceInterface {
             blockHeight,
             extrinsicIndex,
             extrinsicHash,
+            signers,
             depositAmount: pendingMultisigInfo.deposit,
             depositor: pendingMultisigInfo.depositor,
             approvals: pendingMultisigInfo.approvals,
@@ -334,8 +337,8 @@ export class MultisigService implements StoppableServiceInterface {
     return () => subscription.unsubscribe();
   }
 
-  private subscribePendingMultisigTxs (chain: string, multisigAddress: string, callback: (rs: PendingMultisigTx[]) => void) {
-    const unsubPromise = this.subscribePendingMultisigTxsPromise(chain, multisigAddress, callback);
+  private subscribePendingMultisigTxs (chain: string, multisigAddress: string, signers: string[], callback: (rs: PendingMultisigTx[]) => void) {
+    const unsubPromise = this.subscribePendingMultisigTxsPromise(chain, multisigAddress, signers, callback);
 
     return () => {
       unsubPromise.then((unsub) => {
