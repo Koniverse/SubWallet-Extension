@@ -1,15 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import { NftCollection, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { NFT_HANDLER_REGISTRY, NftHandlerDescriptor } from '@subwallet/extension-base/services/nft-service-v2/nft-handlers/registry';
 
 import { BaseNftHandler, NftHandlerResult } from './nft-handlers/base-nft-handler';
-
-interface FetchOptions {
-  mode: 'preview' | 'full';
-}
 
 export class MultiChainNftFetcher {
   private readonly state: KoniState;
@@ -23,10 +19,6 @@ export class MultiChainNftFetcher {
     const key = `${chain}:${desc.id}`;
 
     let handler = this.handlerCache.get(key);
-
-    // if (!this.handlerCache.has(key)) {
-    //   this.handlerCache.set(key, desc.create(chain, this.state));
-    // }
 
     if (!handler) {
       handler = desc.create(chain, this.state);
@@ -50,8 +42,7 @@ export class MultiChainNftFetcher {
 
   public async fetch (
     addresses: string[],
-    chainSlugs: string[],
-    options: FetchOptions = { mode: 'preview' }
+    chainSlugs: string[]
   ): Promise<NftHandlerResult> {
     const allItems: NftItem[] = [];
     const allCollections: NftCollection[] = [];
@@ -67,10 +58,7 @@ export class MultiChainNftFetcher {
 
       for (const handler of handlers) {
         const handlerAddresses = handler.filterAddresses(addresses);
-        const task = (options.mode === 'full'
-          ? handler.fetchFull(handlerAddresses)
-          : handler.fetchPreview(handlerAddresses)
-        )
+        const task = handler.fetchPreview(handlerAddresses)
           .then((result: NftHandlerResult) => {
             allItems.push(...result.items);
             allCollections.push(...result.collections);
@@ -111,5 +99,38 @@ export class MultiChainNftFetcher {
       items: uniqueItems,
       collections: uniqueCollections
     };
+  }
+
+  public async fetchFullListNftOfaCollection (request: NftFullListRequest): Promise<NftHandlerResult> {
+    const { chainInfo, contractAddress, owners } = request;
+    const items: NftItem[] = [];
+    const collections: NftCollection[] = [];
+
+    const handlers = this.getHandlersForChain(chainInfo.slug);
+
+    for (const handler of handlers) {
+      // if (!handler.supportFechFullList) { => todo: improve cau hinh
+      //   continue;
+      // }
+
+      const handlerOwners = handler.filterAddresses(owners);
+
+      try {
+        const result = await handler.fetchFullListNftOfaCollection(
+          {
+            contractAddress: contractAddress,
+            owners: handlerOwners,
+            chainInfo
+          }
+        );
+
+        items.push(...result.items);
+        collections.push(...result.collections);
+      } catch (e) {
+        console.error('[NftFetcher] fetchCollection failed', e);
+      }
+    }
+
+    return { items, collections };
   }
 }

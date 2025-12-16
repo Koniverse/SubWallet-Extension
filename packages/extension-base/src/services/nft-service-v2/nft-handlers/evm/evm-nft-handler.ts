@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetType } from '@subwallet/chain-list/types';
-import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
-import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { NftCollection, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _getEvmChainId } from '@subwallet/extension-base/services/chain-service/utils';
 import { baseParseIPFSUrl } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
@@ -28,12 +27,9 @@ interface SdkCollection {
 type SdkCollectionsByChain = Record<string, SdkCollection[]>;
 
 export class EvmNftHandler extends BaseNftHandler {
-  private readonly state: KoniState;
-
-  constructor (chain: string, state: KoniState) {
-    super(chain);
-    this.state = state;
-  }
+  // constructor (chain: string) {
+  //   super(chain);
+  // }
 
   filterAddresses (addresses: string[]): string[] {
     return addresses;
@@ -171,54 +167,63 @@ export class EvmNftHandler extends BaseNftHandler {
   }
 
   // ==================== 2. FULL – Dùng khi user vào collection ====================
-  async fetchFull (addresses: string[]): Promise<NftHandlerResult> {
+  async fetchFullListNftOfaCollection (request: NftFullListRequest): Promise<NftHandlerResult> {
     const items: NftItem[] = [];
     const collections: NftCollection[] = [];
+    const { chainInfo, contractAddress, owners } = request;
+    const chainId = _getEvmChainId(chainInfo);
 
-    const api = subwalletApiSdk.nftDetectionApi;
+    if (!contractAddress || !owners || !chainId) {
+      console.warn('[NftService] missing params for getFullNftInstancesByCollection');
 
-    if (!api?.getAllNftInstances) {
-      console.warn('[EvmNftHandler] Full API not available');
-
-      return this.fetchPreview(addresses); // fallback về preview
+      return { items, collections };
     }
 
-    // Lấy preview trước để biết collection nào cần fetch full
-    const previewResult = await this.fetchPreview(addresses);
+    try {
+      const nftDetectionApi = subwalletApiSdk.nftDetectionApi;
 
-    collections.push(...previewResult.collections);
+      if (!nftDetectionApi?.getAllNftInstances) {
+        console.warn('[NftService] getAllNftInstances not available');
 
-    for (const address of addresses) {
-      for (const col of previewResult.collections) {
+        return { items, collections };
+      }
+
+      const ownerList = Array.isArray(owners) ? owners : [owners];
+
+      for (const eachOwner of ownerList) {
         try {
-          const chainInfo = this.state.chainService.getChainInfoByKey(this.chain);
-          const chainId = _getEvmChainId(chainInfo);
-
-          if (!chainId) {
-            continue;
-          }
-
-          const instances = await api.getAllNftInstances(
-            col.collectionId,
-            address,
+          const instances = await nftDetectionApi.getAllNftInstances(
+            contractAddress,
+            eachOwner,
             chainId.toString()
           );
 
-          if (Array.isArray(instances)) {
-            const fullItems = instances
-              .map((inst) => this.mapSdkToNftItem(inst, col.collectionId, address))
-              .filter((i): i is NftItem => i !== null);
-
-            items.push(...fullItems);
+          if (!Array.isArray(instances)) {
+            continue;
           }
-        } catch (error) {
-          console.warn(`[EvmNftHandler] Full fetch failed for ${col.collectionId}`, error);
+
+          console.log('FOR TESTER (before)', instances);
+
+          const mappedItems = instances.map((inst) =>
+            this.mapSdkToNftItem(inst, contractAddress, eachOwner)
+          ).filter((i): i is NftItem => Boolean(i));
+
+          items.push(...mappedItems);
+        } catch (innerErr) {
+          console.warn(`[NftService] getAllNftInstances failed for ${eachOwner}`, innerErr);
         }
       }
+    } catch (err) {
+      console.error(
+        `[NftDetectionService] getFullNftInstancesByCollection error for ${contractAddress}`,
+        err
+      );
+
+      return { items: [], collections: [] };
     }
 
     return {
-      items: this.normalizeItems([...previewResult.items, ...items]),
+      items: this.normalizeItems(items),
       collections: this.normalizeCollections(collections)
     };
   }

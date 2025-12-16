@@ -10,6 +10,7 @@ import { EvmNftHandler } from '@subwallet/extension-base/services/nft-service-v2
 export interface NftHandlerDescriptor {
   id: string;
   supports(chainInfo: _ChainInfo): boolean;
+  supportFechFullList: boolean;
   create(chainSlug: string, state: KoniState): BaseNftHandler;
 }
 
@@ -32,7 +33,8 @@ export const NFT_HANDLER_REGISTRY: NftHandlerDescriptor[] = [
   {
     id: 'evm',
     supports: (chainInfo) => _isChainSupportEvmNft(chainInfo),
-    create: (chain, state) => new EvmNftHandler(chain, state)
+    supportFechFullList: true,
+    create: (chain) => new EvmNftHandler(chain)
   }
   // {
   //   id: 'unique',

@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NftCollection, NftItem, NftJson } from '@subwallet/extension-base/background/KoniTypes';
+import { NftCollection, NftFullListRequest, NftItem, NftJson } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
@@ -30,8 +30,6 @@ export class NftServiceV2 implements StoppableServiceInterface {
 
   private readonly nftStateSubject = new BehaviorSubject<NftState>(INITIAL_NFT_STATE);
   public readonly nftState$ = this.nftStateSubject.asObservable();
-
-  private fetchMode: 'preview' | 'full' = 'preview';
   private isReloading = false;
 
   startPromiseHandler: PromiseHandler<void> = createPromiseHandler();
@@ -156,10 +154,26 @@ export class NftServiceV2 implements StoppableServiceInterface {
     }, 300);
   }
 
-  /** Public API – Load full metadata */
-  public loadFullMetadata (): void {
-    this.fetchMode = 'full';
-    this.manualRefresh();
+  public async fetchFullListNftOfaCollection (request: NftFullListRequest): Promise<boolean> {
+    if (this.isReloading) {
+      return false;
+    }
+
+    try {
+      const result = await this.multiChainFetcher.fetchFullListNftOfaCollection(request);
+
+      // Persist vào DB
+      await this.persistNftData({
+        items: result.items,
+        collections: result.collections
+      });
+
+      return true;
+    } catch (e) {
+      console.error('[NftServiceV2] fetchFullListNftOfaCollection failed', e);
+
+      return false;
+    }
   }
 
   private startScanNft () {
@@ -240,12 +254,7 @@ export class NftServiceV2 implements StoppableServiceInterface {
       // Bắt đầu loading
       this.nftStateSubject.next({ ...this.nftStateSubject.getValue(), isLoading: true });
 
-      const result = await this.multiChainFetcher.fetch(addresses, activeChains, {
-        mode: this.fetchMode
-      });
-
-      console.log('result', result);
-      console.log('this.fetchMode', this.fetchMode);
+      const result = await this.multiChainFetcher.fetch(addresses, activeChains);
 
       // Persist vào DB – dùng đúng hàm hiện có
       await this.persistNftData(result);
@@ -264,7 +273,6 @@ export class NftServiceV2 implements StoppableServiceInterface {
       this.nftStateSubject.next({ ...this.nftStateSubject.getValue(), isLoading: false });
     } finally {
       this.isReloading = false;
-      this.fetchMode = 'preview'; // reset mode
     }
   }
 

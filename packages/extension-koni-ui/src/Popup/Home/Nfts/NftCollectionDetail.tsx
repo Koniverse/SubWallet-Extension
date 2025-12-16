@@ -36,7 +36,7 @@ export const nftItemsFake: NftItem = {
   id: 'nft-root-00',
   name: 'Space Station Alpha',
   chain: 'unique_network',
-  collectionId: '3856',
+  collectionId: '3857',
   owner: '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t',
   image: 'https://robohash.org/station?set=set2&bg=set1',
   description: 'The main headquarters floating in space. (Level 0)',
@@ -49,7 +49,7 @@ export const nftItemsFake: NftItem = {
       id: 'nft-level-01',
       name: 'Hangar Bay 7',
       chain: 'unique_network',
-      collectionId: '3856',
+      collectionId: '3857',
       owner: '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t',
       image: 'https://robohash.org/hangar?set=set2&bg=set1',
       description: 'A secure area for starships. (Level 1)',
@@ -61,7 +61,7 @@ export const nftItemsFake: NftItem = {
           id: 'nft-level-02',
           name: 'Starship "Voyager"',
           chain: 'unique_network',
-          collectionId: '3856',
+          collectionId: '3857',
           owner: '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t',
           image: 'https://robohash.org/starship?set=set2&bg=set1',
           description: 'Interstellar travel vehicle. (Level 2)',
@@ -74,7 +74,7 @@ export const nftItemsFake: NftItem = {
               id: 'nft-level-03',
               name: 'Captain Koni',
               chain: 'unique_network',
-              collectionId: '3856',
+              collectionId: '3857',
               owner: '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t',
               image: 'https://robohash.org/captain?set=set4&bg=set1',
               description: 'The pilot of the ship. (Level 3)',
@@ -87,7 +87,7 @@ export const nftItemsFake: NftItem = {
                   id: 'nft-level-04-a',
                   name: 'Exo-Suit Mk.IV',
                   chain: 'unique_network',
-                  collectionId: '3856',
+                  collectionId: '3857',
                   owner: '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t',
                   image: 'https://robohash.org/suit?set=set2&bg=set1',
                   description: 'Heavy armor for the captain. (Level 4)',
@@ -99,7 +99,7 @@ export const nftItemsFake: NftItem = {
                       id: 'nft-level-05',
                       name: 'Fusion Core Gem',
                       chain: 'unique_network',
-                      collectionId: '3856',
+                      collectionId: '3857',
                       owner: '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t',
                       image: 'https://robohash.org/gem?set=set2&bg=set1',
                       description: 'Power source for the suit. (Level 5)',
@@ -113,7 +113,7 @@ export const nftItemsFake: NftItem = {
                       id: 'nft-level-05-1',
                       name: 'Fusion Core Gem Fusion Core Gem (2)',
                       chain: 'unique_network',
-                      collectionId: '3856',
+                      collectionId: '3857',
                       owner: '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t',
                       image: 'https://robohash.org/gem?set=set2&bg=set1',
                       description: 'Power source for the suit. (Level 5)',
@@ -129,7 +129,7 @@ export const nftItemsFake: NftItem = {
                   id: 'nft-level-04-b',
                   name: 'Plasma Rifle',
                   chain: 'unique_network',
-                  collectionId: '3856',
+                  collectionId: '3857',
                   owner: '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t',
                   image: 'https://robohash.org/gun?set=set2&bg=set1',
                   description: 'Standard issue weapon. (Level 4)',
@@ -142,7 +142,7 @@ export const nftItemsFake: NftItem = {
                   id: 'nft-level-04-c',
                   name: 'Fusion Core Gem (3)',
                   chain: 'unique_network',
-                  collectionId: '3856',
+                  collectionId: '3857',
                   owner: '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t',
                   image: 'https://robohash.org/gem?set=set2&bg=set1',
                   description: 'Power source for the suit. (Level 5)',
@@ -162,7 +162,7 @@ export const nftItemsFake: NftItem = {
       id: 'nft-level-01-b',
       name: 'Maintenance Droid',
       chain: 'unique_network',
-      collectionId: '3856',
+      collectionId: '3857',
       owner: '5CFh4qpiB5PxsQvPEs6dWAhzgAVLHZa8tZKxeE9XsHBg4n9t',
       image: 'https://robohash.org/droid?set=set1&bg=set1',
       description: 'Nested directly in Station. (Level 1)',
@@ -170,6 +170,12 @@ export const nftItemsFake: NftItem = {
       nestingTokens: []
     }
   ]
+};
+const fakeCollection = {
+  collectionId: '3857',
+  chain: 'unique_network',
+  collectionName: 'The Duck Dynasty',
+  image: 'https://robohash.org/droid?set=set1&bg=set1'
 };
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
@@ -188,6 +194,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { nftCollections, nftItems } = useGetNftByAccount();
 
   nftItems.push(nftItemsFake);
+  const isExisted = nftCollections.some((collection) => {
+    return collection.collectionId === fakeCollection.collectionId;
+  });
+
+  if (!isExisted) {
+    nftCollections.push(fakeCollection);
+  }
   // const nftItems = [...nftItems, nftItemsFake]
 
   useNavigateOnChangeAccount('/home/nfts/collections');
