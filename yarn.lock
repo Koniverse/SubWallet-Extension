@@ -6494,27 +6494,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet-monorepos/subwallet-services-sdk@npm:0.1.13":
-  version: 0.1.13
-  resolution: "@subwallet-monorepos/subwallet-services-sdk@npm:0.1.13"
+"@subwallet-monorepos/subwallet-services-sdk@npm:0.1.14":
+  version: 0.1.14
+  resolution: "@subwallet-monorepos/subwallet-services-sdk@npm:0.1.14"
   dependencies:
     "@koniverse/utils": ^0.0.9
-    "@subwallet/chain-list": 0.2.120
-  checksum: 4a8cd823b055179a1795d6214d96c09be0118b668a6d62fb7677f9dbd175d0699694ce84867ce52984bf02629afefe2461140dcb40e805303c7c71dae78eb571
+    "@subwallet/chain-list": 0.2.121
+  checksum: 7168911545267b7fcab3cec591c46d8a37f12cbeb41f721e7900c0b881d369f4d9dd583230b76f155c382a98fec82a10d9e306be44fd99d0bd3f931913447158
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.121":
-  version: 0.2.121
-  resolution: "@subwallet/chain-list@npm:0.2.121"
+"@subwallet/chain-list@npm:0.2.122":
+  version: 0.2.122
+  resolution: "@subwallet/chain-list@npm:0.2.122"
   dependencies:
     "@polkadot/util": ^13.5.5
     ts-md5: ^1.3.1
-  checksum: 478b5dbd1f53ecde8bebaf72f83548bbda7091be844a69b3d27b5bee34f3963107a742f5d530eca1c7dddd66d6052b66335435800d8de91f1108fdc5b60b4d80
+  checksum: 306c95077b4352883450316e266122c0c2441c32c78098b849587e4bca90a90f503f535297078a35c24ffb1972eb111724ec8186f1445a1871bd27d9833198c7
   languageName: node
   linkType: hard
 
-"@subwallet/extension-base@^1.3.67-0, @subwallet/extension-base@workspace:packages/extension-base":
+"@subwallet/extension-base@^1.3.69-0, @subwallet/extension-base@workspace:packages/extension-base":
   version: 0.0.0-use.local
   resolution: "@subwallet/extension-base@workspace:packages/extension-base"
   dependencies:
@@ -6554,13 +6554,13 @@ __metadata:
     "@snowbridge/registry": ^0.2.0
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
-    "@subwallet-monorepos/subwallet-services-sdk": 0.1.13
-    "@subwallet/chain-list": 0.2.121
-    "@subwallet/extension-base": ^1.3.67-0
-    "@subwallet/extension-chains": ^1.3.67-0
-    "@subwallet/extension-dapp": ^1.3.67-0
-    "@subwallet/extension-inject": ^1.3.67-0
-    "@subwallet/extension-mocks": ^1.3.67-0
+    "@subwallet-monorepos/subwallet-services-sdk": 0.1.14
+    "@subwallet/chain-list": 0.2.122
+    "@subwallet/extension-base": ^1.3.69-0
+    "@subwallet/extension-chains": ^1.3.69-0
+    "@subwallet/extension-dapp": ^1.3.69-0
+    "@subwallet/extension-inject": ^1.3.69-0
+    "@subwallet/extension-mocks": ^1.3.69-0
     "@subwallet/keyring": ^0.1.13
     "@subwallet/ui-keyring": ^0.1.13
     "@ton/core": ^0.56.3
@@ -6609,7 +6609,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/extension-chains@^1.3.67-0, @subwallet/extension-chains@workspace:packages/extension-chains":
+"@subwallet/extension-chains@^1.3.69-0, @subwallet/extension-chains@workspace:packages/extension-chains":
   version: 0.0.0-use.local
   resolution: "@subwallet/extension-chains@workspace:packages/extension-chains"
   dependencies:
@@ -6617,7 +6617,7 @@ __metadata:
     "@polkadot/networks": ^13.5.3
     "@polkadot/util": ^13.5.3
     "@polkadot/util-crypto": ^13.5.3
-    "@subwallet/extension-inject": ^1.3.67-0
+    "@subwallet/extension-inject": ^1.3.69-0
   peerDependencies:
     "@polkadot/api": "*"
     "@polkadot/types": "*"
@@ -6639,14 +6639,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/extension-dapp@^1.3.67-0, @subwallet/extension-dapp@workspace:packages/extension-dapp":
+"@subwallet/extension-dapp@^1.3.69-0, @subwallet/extension-dapp@workspace:packages/extension-dapp":
   version: 0.0.0-use.local
   resolution: "@subwallet/extension-dapp@workspace:packages/extension-dapp"
   dependencies:
     "@babel/runtime": ^7.28.4
     "@polkadot/util": ^13.5.3
     "@polkadot/util-crypto": ^13.5.3
-    "@subwallet/extension-inject": ^1.3.67-0
+    "@subwallet/extension-inject": ^1.3.69-0
   peerDependencies:
     "@polkadot/api": "*"
     "@polkadot/util": "*"
@@ -6654,7 +6654,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/extension-inject@^1.3.67-0, @subwallet/extension-inject@workspace:packages/extension-inject":
+"@subwallet/extension-inject@^1.3.69-0, @subwallet/extension-inject@workspace:packages/extension-inject":
   version: 0.0.0-use.local
   resolution: "@subwallet/extension-inject@workspace:packages/extension-inject"
   dependencies:
@@ -6673,7 +6673,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/extension-koni-ui@^1.3.67-0, @subwallet/extension-koni-ui@workspace:packages/extension-koni-ui":
+"@subwallet/extension-koni-ui@^1.3.69-0, @subwallet/extension-koni-ui@workspace:packages/extension-koni-ui":
   version: 0.0.0-use.local
   resolution: "@subwallet/extension-koni-ui@workspace:packages/extension-koni-ui"
   dependencies:
@@ -6695,12 +6695,12 @@ __metadata:
     "@polkadot/util-crypto": ^13.5.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.121
-    "@subwallet/extension-base": ^1.3.67-0
-    "@subwallet/extension-chains": ^1.3.67-0
-    "@subwallet/extension-dapp": ^1.3.67-0
-    "@subwallet/extension-inject": ^1.3.67-0
-    "@subwallet/extension-mocks": ^1.3.67-0
+    "@subwallet/chain-list": 0.2.122
+    "@subwallet/extension-base": ^1.3.69-0
+    "@subwallet/extension-chains": ^1.3.69-0
+    "@subwallet/extension-dapp": ^1.3.69-0
+    "@subwallet/extension-inject": ^1.3.69-0
+    "@subwallet/extension-mocks": ^1.3.69-0
     "@subwallet/keyring": ^0.1.13
     "@subwallet/react-ui": 5.1.2-b77
     "@subwallet/ui-keyring": ^0.1.13
@@ -6775,9 +6775,9 @@ __metadata:
     "@babel/runtime": ^7.28.4
     "@emurgo/cardano-serialization-lib-browser": ^13.2.0
     "@polkadot/dev": ^0.65.23
-    "@subwallet/extension-base": ^1.3.67-0
-    "@subwallet/extension-inject": ^1.3.67-0
-    "@subwallet/extension-koni-ui": ^1.3.67-0
+    "@subwallet/extension-base": ^1.3.69-0
+    "@subwallet/extension-inject": ^1.3.69-0
+    "@subwallet/extension-koni-ui": ^1.3.69-0
     "@types/chrome": ^0.0.254
     "@types/serviceworker": ^0.0.80
     assert: ^2.0.0
@@ -6805,7 +6805,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/extension-mocks@^1.3.67-0, @subwallet/extension-mocks@workspace:packages/extension-mocks":
+"@subwallet/extension-mocks@^1.3.69-0, @subwallet/extension-mocks@workspace:packages/extension-mocks":
   version: 0.0.0-use.local
   resolution: "@subwallet/extension-mocks@workspace:packages/extension-mocks"
   dependencies:
@@ -6814,7 +6814,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subwallet/extension-web-ui@^1.3.67-0, @subwallet/extension-web-ui@workspace:packages/extension-web-ui":
+"@subwallet/extension-web-ui@^1.3.69-0, @subwallet/extension-web-ui@workspace:packages/extension-web-ui":
   version: 0.0.0-use.local
   resolution: "@subwallet/extension-web-ui@workspace:packages/extension-web-ui"
   dependencies:
@@ -6837,12 +6837,12 @@ __metadata:
     "@polkadot/util-crypto": ^13.5.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.121
-    "@subwallet/extension-base": ^1.3.67-0
-    "@subwallet/extension-chains": ^1.3.67-0
-    "@subwallet/extension-dapp": ^1.3.67-0
-    "@subwallet/extension-inject": ^1.3.67-0
-    "@subwallet/extension-mocks": ^1.3.67-0
+    "@subwallet/chain-list": 0.2.122
+    "@subwallet/extension-base": ^1.3.69-0
+    "@subwallet/extension-chains": ^1.3.69-0
+    "@subwallet/extension-dapp": ^1.3.69-0
+    "@subwallet/extension-inject": ^1.3.69-0
+    "@subwallet/extension-mocks": ^1.3.69-0
     "@subwallet/keyring": ^0.1.13
     "@subwallet/react-ui": ^5.1.2-b77
     "@subwallet/ui-keyring": ^0.1.13
@@ -7037,9 +7037,9 @@ __metadata:
     "@babel/runtime": ^7.28.4
     "@emurgo/cardano-serialization-lib-browser": ^13.2.0
     "@polkadot/dev": ^0.65.23
-    "@subwallet/extension-base": ^1.3.67-0
-    "@subwallet/extension-inject": ^1.3.67-0
-    "@subwallet/extension-koni-ui": ^1.3.67-0
+    "@subwallet/extension-base": ^1.3.69-0
+    "@subwallet/extension-inject": ^1.3.69-0
+    "@subwallet/extension-koni-ui": ^1.3.69-0
     assert: ^2.0.0
     babel-loader: ^9.1.3
     browser-resolve: ^2.0.0
@@ -7071,9 +7071,9 @@ __metadata:
     "@babel/runtime": ^7.28.4
     "@emurgo/cardano-serialization-lib-browser": ^13.2.0
     "@polkadot/dev": ^0.65.23
-    "@subwallet/extension-base": ^1.3.67-0
-    "@subwallet/extension-inject": ^1.3.67-0
-    "@subwallet/extension-web-ui": ^1.3.67-0
+    "@subwallet/extension-base": ^1.3.69-0
+    "@subwallet/extension-inject": ^1.3.69-0
+    "@subwallet/extension-web-ui": ^1.3.69-0
     assert: ^2.0.0
     babel-loader: ^9.1.3
     browser-resolve: ^2.0.0
@@ -9648,6 +9648,20 @@ __metadata:
   version: 3.0.0
   resolution: "ast-module-types@npm:3.0.0"
   checksum: c6ef35d9b286f84c7942aeb0e2b50e389e0b6f44ee3b6d2c46aeed4852dbca0681dde8c3c0ec1d456dad5dbc84fced2e1c607b10b4b4c3b065b901b40f45bbe7
+  languageName: node
+  linkType: hard
+
+"async-function@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "async-function@npm:1.0.0"
+  checksum: 9102e246d1ed9b37ac36f57f0a6ca55226876553251a31fc80677e71471f463a54c872dc78d5d7f80740c8ba624395cccbe8b60f7b690c4418f487d8e9fd1106
+  languageName: node
+  linkType: hard
+
+"async-generator-function@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "async-generator-function@npm:1.0.0"
+  checksum: 74a71a4a2dd7afd06ebb612f6d612c7f4766a351bedffde466023bf6dae629e46b0d2cd38786239e0fbf245de0c7df76035465e16d1213774a0efb22fec0d713
   languageName: node
   linkType: hard
 
@@ -15600,20 +15614,23 @@ __metadata:
   linkType: hard
 
 "get-intrinsic@npm:^1.2.6":
-  version: 1.3.0
-  resolution: "get-intrinsic@npm:1.3.0"
+  version: 1.3.1
+  resolution: "get-intrinsic@npm:1.3.1"
   dependencies:
+    async-function: ^1.0.0
+    async-generator-function: ^1.0.0
     call-bind-apply-helpers: ^1.0.2
     es-define-property: ^1.0.1
     es-errors: ^1.3.0
     es-object-atoms: ^1.1.1
     function-bind: ^1.1.2
+    generator-function: ^2.0.0
     get-proto: ^1.0.1
     gopd: ^1.2.0
     has-symbols: ^1.1.0
     hasown: ^2.0.2
     math-intrinsics: ^1.1.0
-  checksum: 301008e4482bb9a9cb49e132b88fee093bff373b4e6def8ba219b1e96b60158a6084f273ef5cafe832e42cd93462f4accb46a618d35fe59a2b507f2388c5b79d
+  checksum: c02b3b6a445f9cd53e14896303794ac60f9751f58a69099127248abdb0251957174c6524245fc68579dc8e6a35161d3d94c93e665f808274716f4248b269436a
   languageName: node
   linkType: hard
 

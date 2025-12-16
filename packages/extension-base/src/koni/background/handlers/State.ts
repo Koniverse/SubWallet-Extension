@@ -32,6 +32,7 @@ import { KeyringService } from '@subwallet/extension-base/services/keyring-servi
 import MigrationService from '@subwallet/extension-base/services/migration-service';
 import MintCampaignService from '@subwallet/extension-base/services/mint-campaign-service';
 import MktCampaignService from '@subwallet/extension-base/services/mkt-campaign-service';
+import NftService from '@subwallet/extension-base/services/nft-service';
 import NotificationService from '@subwallet/extension-base/services/notification-service/NotificationService';
 import { PriceService } from '@subwallet/extension-base/services/price-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
@@ -135,6 +136,7 @@ export default class KoniState {
   readonly mintCampaignService: MintCampaignService;
   readonly campaignService: CampaignService;
   readonly mktCampaignService: MktCampaignService;
+  readonly nftDetectionService: NftService;
   readonly buyService: BuyService;
   readonly earningService: EarningService;
   readonly feeService: FeeService;
@@ -174,6 +176,7 @@ export default class KoniState {
 
     this.campaignService = new CampaignService(this);
     this.mktCampaignService = new MktCampaignService(this);
+    this.nftDetectionService = new NftService(this);
     this.buyService = new BuyService(this);
     this.earningService = new EarningService(this);
     this.swapService = new SwapService(this);
@@ -523,6 +526,39 @@ export default class KoniState {
 
   public deleteNftCollection (chain: string, collectionId: string) {
     return this.dbService.deleteNftCollection(chain, collectionId);
+  }
+
+  public async handleDetectedNfts (address: string, nftItems: NftItem[]) {
+    try {
+      const chainSlugs = this.activeChainSlugs;
+      const currentNfts = await this.dbService.getNft([address], chainSlugs);
+
+      const newNfts = nftItems.filter((n) => !currentNfts.some((c) => c.id === n.id));
+
+      for (const nft of newNfts) {
+        this.updateNftData(nft.chain, nft, address);
+      }
+    } catch (e) {
+      this.logger.warn('handleDetectedNfts error:', e);
+    }
+  }
+
+  public async handleDetectedNftCollections (collections: NftCollection[]) {
+    try {
+      const currentCollections = await this.getNftCollection();
+
+      const newCollections = collections.filter(
+        (col) => !currentCollections.some(
+          (c) => c.collectionId === col.collectionId && c.chain === col.chain
+        )
+      );
+
+      for (const col of newCollections) {
+        this.setNftCollection(col.chain, col);
+      }
+    } catch (e) {
+      this.logger.warn('handleDetectedNftCollections error:', e);
+    }
   }
 
   public cleanUpNfts (chain: string, owner: string, collectionId: string[], nftIds: string[], ownNothing?: boolean) {
