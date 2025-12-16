@@ -4,16 +4,17 @@
 import type { SwScreenLayoutProps } from '@subwallet/react-ui';
 
 import { LanguageType } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountChainType } from '@subwallet/extension-base/types';
 import SelectAccount from '@subwallet/extension-koni-ui/components/Layout/parts/SelectAccount';
 import { MISSIONS_POOL_LIVE_ID } from '@subwallet/extension-koni-ui/constants';
-import { useDefaultNavigate, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useDefaultNavigate, useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { computeStatus } from '@subwallet/extension-koni-ui/utils';
 import { Icon, SwScreenLayout } from '@subwallet/react-ui';
 import { SwTabBarItem } from '@subwallet/react-ui/es/sw-tab-bar';
 import CN from 'classnames';
-import { Aperture, Clock, Parachute, Vault, Wallet } from 'phosphor-react';
+import { Clock, NewspaperClipping, Parachute, Vault, Wallet } from 'phosphor-react';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -37,6 +38,8 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
   const { t } = useTranslation();
   const { language } = useSelector((state) => state.settings);
   const { missions } = useSelector((state: RootState) => state.missionPool);
+  const notify = useNotification();
+  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
 
   const [storedLiveMissionIds, setStoredLiveMissionIds] = useLocalStorage<number[]>(MISSIONS_POOL_LIVE_ID, []);
 
@@ -70,19 +73,19 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
         phosphorIcon: Wallet,
         weight: 'fill'
       },
-      label: t('ui.components.Layout.Base.tokens'),
+      label: t('ui.components.Layout.Base.assets'),
       key: 'tokens',
       url: '/home/tokens'
     },
     {
       icon: {
         type: 'phosphor',
-        phosphorIcon: Aperture,
+        phosphorIcon: NewspaperClipping,
         weight: 'fill'
       },
-      label: t('ui.components.Layout.Base.nfts'),
-      key: 'nfts',
-      url: '/home/nfts/collections'
+      label: t('ui.components.Layout.Base.governance'),
+      key: 'governance',
+      url: '/home/governance'
     },
     {
       icon: {
@@ -130,9 +133,18 @@ const Component = ({ children, className, headerIcons, isDisableHeader, onBack, 
         setStoredLiveMissionIds(liveMissionIds);
       }
 
+      if (item.key === 'governance' && !currentAccountProxy?.chainTypes.includes(AccountChainType.SUBSTRATE)) {
+        notify({
+          message: t('ui.components.Layout.Base.featurePolkadotSupportedAccounts'),
+          type: 'error'
+        });
+
+        return;
+      }
+
       navigate(item.url);
     },
-    [latestLiveMissionIds.length, navigate, setStoredLiveMissionIds, liveMissionIds]
+    [latestLiveMissionIds.length, currentAccountProxy?.chainTypes, navigate, setStoredLiveMissionIds, liveMissionIds, notify, t]
   );
 
   const defaultOnBack = useCallback(() => {

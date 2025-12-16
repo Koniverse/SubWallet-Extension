@@ -25,6 +25,28 @@ export const _PREDEFINED_SINGLE_MODES: Record<string, SingleModeJson> = {
 
 export const _PURE_EVM_CHAINS = ['binance', 'binance_test', 'ethereum', 'ethereum_goerli', 'astarEvm', 'shidenEvm', 'shibuyaEvm', 'crabEvm', 'pangolinEvm', 'cloverEvm', 'boba_rinkeby', 'boba', 'bobabase', 'bobabeam', 'watr_network_evm'];
 
+export const _GOVERNANCE_CHAIN_GROUP = {
+  polkadot: [
+    'statemint', 'bifrost_dot', 'hydradx_main', 'ajunaPolkadot', 'astar', 'phala',
+    'litentry', 'acala', 'centrifuge', 'interlay', 'laos_network'
+  ],
+  kusama: [
+    'statemine', 'bifrost', 'basilisk', 'karura', 'kintsugi'
+  ],
+  westend_assethub: [
+    'westend_assethub'
+  ],
+  paseo: [
+    'paseo_assethub'
+  ],
+  solo: [
+    'vara_network', 'zkverify'
+  ],
+  testnet: [
+    'zkverify_testnet'
+  ]
+};
+
 // Get balance----------------------------------------------------------------------------------------------------------
 
 export const _BALANCE_CHAIN_GROUP = {
@@ -125,6 +147,8 @@ export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
   statemint: 6,
   statemine: 6,
   polkadex: 12,
+  westend_assethub: 6,
+  paseo_assethub: 6,
   ternoa: 6,
   ternoa_alphanet: 6,
   westend: 6,
@@ -135,7 +159,7 @@ export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
   vara_testnet: 3,
   goldberg_testnet: 20,
   polimec: 12,
-  bifrost: 13, // expect 12 but actual 13
+  bifrost: 6, // bifrost kusama
   moonbeam: 12,
   moonriver: 12,
   moonbase: 6,
