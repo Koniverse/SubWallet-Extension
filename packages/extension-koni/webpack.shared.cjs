@@ -36,7 +36,8 @@ const packages = [
   'extension-dapp',
   'extension-inject',
   'extension-koni',
-  'extension-koni-ui'
+  'extension-koni-ui',
+  'subsquare-api-sdk'
 ];
 
 const _additionalEnv = {
