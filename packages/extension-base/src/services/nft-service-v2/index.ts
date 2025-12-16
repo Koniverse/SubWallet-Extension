@@ -25,6 +25,8 @@ const INITIAL_NFT_STATE: NftState = {
 export class NftServiceV2 implements StoppableServiceInterface {
   private readonly state: KoniState;
   private readonly multiChainFetcher: MultiChainNftFetcher;
+  private _intervalFetchNft: NodeJS.Timer | undefined;
+  private readonly NFT_INTERVAL_TIME = 2 * 60 * 60 * 1000; // 2 hours
 
   private readonly nftStateSubject = new BehaviorSubject<NftState>(INITIAL_NFT_STATE);
   public readonly nftState$ = this.nftStateSubject.asObservable();
@@ -50,14 +52,11 @@ export class NftServiceV2 implements StoppableServiceInterface {
 
     await this.state.eventService.waitKeyringReady;
     await this.state.eventService.waitChainReady;
-    console.log('loading.... cache....');
 
-    // Load cached NFT từ DB lúc khởi động
     await this.loadCachedData();
 
     this.status = ServiceStatus.INITIALIZED;
 
-    // Register events
     this.state.eventService.onLazy(this.handleEvents.bind(this));
   }
 
@@ -75,14 +74,6 @@ export class NftServiceV2 implements StoppableServiceInterface {
   }
 
   async start (): Promise<void> {
-    console.log('nft service started....');
-
-    // if (this.status === 'running') {
-    //   return;
-    // }
-
-    // await Promise.all([this.state.eventService.waitKeyringReady, this.state.eventService.waitAssetReady]);
-
     if (this.status === ServiceStatus.STOPPING) {
       await this.waitForStopped();
     }
@@ -93,11 +84,11 @@ export class NftServiceV2 implements StoppableServiceInterface {
 
     this.status = ServiceStatus.STARTING;
 
-    // Bắt đầu fetch lần đầu
     await this.refreshNftData();
 
     this.status = ServiceStatus.STARTED;
     this.startPromiseHandler.resolve();
+    this.startScanNft();
   }
 
   async stop (): Promise<void> {
@@ -110,6 +101,8 @@ export class NftServiceV2 implements StoppableServiceInterface {
     }
 
     this.status = ServiceStatus.STOPPING;
+
+    this.stopScanNft();
     this.stopPromiseHandler.resolve();
   }
 
@@ -129,17 +122,23 @@ export class NftServiceV2 implements StoppableServiceInterface {
       eventTypes.includes('account.updateCurrent') ||
       eventTypes.includes('account.add') ||
       eventTypes.includes('account.remove') ||
-      eventTypes.includes('chain.updateState') ||
+      eventTypes.includes('chain.add') ||
       eventTypes.includes('asset.updateState')
     ) {
       needReload = true;
       lazyTime = 1000;
     }
 
-    if (eventTypes.includes('transaction.transferNft')) {
-      needReload = true;
-      lazyTime = 300;
-    }
+    // if (eventTypes.includes('chain.updateState')) {
+    //   needReload = true;
+    //   lazyTime = 300;
+    // }
+
+    // TODO: Need recheck to improve
+    // if (eventTypes.includes('transaction.transferNft')) {
+    //   needReload = true;
+    //   lazyTime = 300;
+    // }
 
     if (needReload) {
       addLazy('nft.refresh', () => {
@@ -163,13 +162,32 @@ export class NftServiceV2 implements StoppableServiceInterface {
     this.manualRefresh();
   }
 
-  // Thay thế hoàn toàn đoạn persist cũ bằng đoạn này
+  private startScanNft () {
+    this.stopScanNft();
+
+    const scanNft = () => {
+      if (!this.isStarted || this.isReloading) {
+        return;
+      }
+
+      console.log('[NftServiceV2] periodic nft refresh');
+      this.refreshNftData().catch(console.error);
+    };
+
+    this._intervalFetchNft = setInterval(scanNft, this.NFT_INTERVAL_TIME);
+  }
+
+  private stopScanNft () {
+    this._intervalFetchNft && clearInterval(this._intervalFetchNft);
+    this._intervalFetchNft = undefined;
+  }
+
   private async persistNftData (result: { items: NftItem[]; collections: NftCollection[] }) {
     const addresses = this.state.keyringService.context.getDecodedAddresses();
     const activeChainSlugs = Object.keys(this.state.getActiveChainInfoMap());
 
     try {
-      // === 1. Persist NFT Items (chỉ thêm mới) ===
+      // === 1. Persist NFT Items
       const currentItems = await this.state.dbService.getNft(addresses, activeChainSlugs);
 
       const currentItemIds = new Set(currentItems.map((i) => i.id));
@@ -182,7 +200,7 @@ export class NftServiceV2 implements StoppableServiceInterface {
         this.state.updateNftData(item.chain, item, addresses[0]);
       }
 
-      // === 2. Persist NFT Collections (chỉ thêm mới) ===
+      // === 2. Persist NFT Collections
       const currentCollections = await this.state.getNftCollection();
 
       const currentCollectionKeys = new Set(
@@ -198,7 +216,6 @@ export class NftServiceV2 implements StoppableServiceInterface {
       }
     } catch (error) {
       console.error('[NftServiceV2] Persist failed:', error);
-      // Không throw → vẫn emit state để UI không bị treo
     }
   }
 
@@ -213,9 +230,6 @@ export class NftServiceV2 implements StoppableServiceInterface {
     try {
       const addresses = this.state.keyringService.context.getDecodedAddresses();
       const activeChains = Object.keys(this.state.getActiveChainInfoMap());
-
-      console.log('addresses', addresses);
-      console.log('activeChains', activeChains);
 
       if (addresses.length === 0 || activeChains.length === 0) {
         this.nftStateSubject.next(INITIAL_NFT_STATE);
