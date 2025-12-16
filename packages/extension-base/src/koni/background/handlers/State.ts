@@ -2180,10 +2180,14 @@ export default class KoniState {
 
     await this.dbService.removeNftsByAddress(currentAddress);
 
-    return await this.cron.reloadNft();
+    await this.cron.reloadNft();
+    await this.reloadNftV2();
+
+    return true;
   }
 
   public async reloadNftV2 () {
+    // TODO: Recheck: Uncomment this block when migration is complete
     // const currentAddress = this.keyringService.context.currentAccount.proxyId;
     //
     // await this.dbService.removeNftsByAddress(currentAddress);

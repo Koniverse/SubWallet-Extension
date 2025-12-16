@@ -147,13 +147,6 @@ export class NftServiceV2 implements StoppableServiceInterface {
     }
   }
 
-  /** Public API – Manual refresh */
-  public manualRefresh (): void {
-    addLazy('nft.manualRefresh', () => {
-      this.refreshNftData().catch(console.error);
-    }, 300);
-  }
-
   public async fetchFullListNftOfaCollection (request: NftFullListRequest): Promise<boolean> {
     if (this.isReloading) {
       return false;
@@ -162,7 +155,7 @@ export class NftServiceV2 implements StoppableServiceInterface {
     try {
       const result = await this.multiChainFetcher.fetchFullListNftOfaCollection(request);
 
-      // Persist vào DB
+      // Persist DB
       await this.persistNftData({
         items: result.items,
         collections: result.collections
@@ -287,16 +280,11 @@ export class NftServiceV2 implements StoppableServiceInterface {
     return this.state.dbService.stores.nftCollection.subscribeNftCollection(getChains);
   }
 
-  /** Reload full (reset + fetch lại) */
+  // TODO: Move NFT reset logic to this function after migration is complete
   public async forceReload () {
     this.isReloading = true;
-    const currentAddress = this.state.keyringService.context.currentAccount.proxyId;
-
-    await this.state.dbService.removeNftsByAddress(currentAddress);
-
-    // Todo: Review function resetNft
-    this.state.resetNft(currentAddress);
     await waitTimeout(1800);
     this.isReloading = false;
+    await this.refreshNftData().catch(console.error);
   }
 }
