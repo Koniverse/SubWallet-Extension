@@ -281,11 +281,15 @@ const Component: React.FC<ImportSeedPhraseProps> = ({ className }: ImportSeedPhr
             onClick: goHome
           }
         ]}
-        title={t<string>('ui.ACCOUNT.screen.Account.ImportSeedPhrase.importFromSeedPhrase')}
+        title={ isTrustWallet
+          ? t<string>('ui.ACCOUNT.screen.Account.ImportSeedPhrase.importFromTrustWallet')
+          : t<string>('ui.ACCOUNT.screen.Account.ImportSeedPhrase.importFromSeedPhrase')}
       >
         <div className='container'>
           <div className='description'>
-            {t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.enterSeedPhraseToImport')}
+            { isTrustWallet
+              ? t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.enterTrustSeedToImport')
+              : t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.enterSeedPhraseToImport')}
           </div>
           <Form
             className='form-container form-space-xs'

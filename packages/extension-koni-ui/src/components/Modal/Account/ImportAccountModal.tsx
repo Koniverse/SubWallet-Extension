@@ -113,7 +113,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         <img
           alt=''
           src={DefaultLogosMap.trust}
-          style={{ width: '160%', height: '160%', objectFit: 'contain', display: 'block' }}
+          style={{ width: '24px', height: '24px', objectFit: 'contain', display: 'block', borderRadius: '50%' }}
         />
       ),
       key: 'import-seed-phrase-trust',
