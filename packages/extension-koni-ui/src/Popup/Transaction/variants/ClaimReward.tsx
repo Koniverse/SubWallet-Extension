@@ -152,13 +152,13 @@ const Component = () => {
     const { bondReward, chain, from, slug } = values;
 
     // send submit claim reward transaction
-    const sendPromise = (substrateProxyAddress?: string) => {
+    const sendPromise = (signerSubstrateProxyAddress?: string) => {
       return yieldSubmitStakingClaimReward({
         address: from,
         bondReward: bondReward,
         slug,
         unclaimedReward: reward?.unclaimedReward,
-        substrateProxyAddress
+        signerSubstrateProxyAddress
       }).then(onSuccess);
     };
 

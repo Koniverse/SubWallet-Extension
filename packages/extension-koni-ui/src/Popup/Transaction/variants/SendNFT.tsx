@@ -132,7 +132,7 @@ const Component: React.FC = () => {
 
       const params = nftParamsHandler(nftItem, chain);
 
-      const sendPromise = (substrateProxyAddress?: string): Promise<SWTransactionResponse> => {
+      const sendPromise = (signerSubstrateProxyAddress?: string): Promise<SWTransactionResponse> => {
         if (isEthereumInterface) {
           // Send NFT with EVM interface
           return evmNftSubmitTransaction({
@@ -150,7 +150,7 @@ const Component: React.FC = () => {
             recipientAddress: to,
             senderAddress: from,
             nftItemName: nftItem?.name,
-            substrateProxyAddress,
+            signerSubstrateProxyAddress,
             params,
             nftItem
           });
@@ -162,7 +162,7 @@ const Component: React.FC = () => {
       // wrap proxy selection
       // don't need to select proxy for EVM interface
       const sendPromiseWrapper = async () => {
-        if (isEthereumInterface) {
+        if (!isEthereumInterface) {
           const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
             chain,
             address: from,

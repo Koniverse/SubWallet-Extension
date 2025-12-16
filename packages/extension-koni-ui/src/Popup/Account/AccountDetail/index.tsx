@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountActions, AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountActions, AccountChainType, AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
 import { AccountChainTypeLogos, AccountProxyTypeTag, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
@@ -39,6 +39,7 @@ type ComponentProps = {
   onBack: VoidFunction;
   requestViewDerivedAccountDetails?: boolean;
   requestViewDerivedAccounts?: boolean;
+  requestViewManageProxiesTab?: boolean
 };
 
 enum FormFieldName {
@@ -54,7 +55,8 @@ interface DetailFormState {
 const Component: React.FC<ComponentProps> = ({ accountProxy,
   onBack,
   requestViewDerivedAccountDetails,
-  requestViewDerivedAccounts }: ComponentProps) => {
+  requestViewDerivedAccounts,
+  requestViewManageProxiesTab }: ComponentProps) => {
   const showDerivedAccounts = !!accountProxy.children?.length;
 
   const { t } = useTranslation();
@@ -78,6 +80,8 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
       return FilterTabType.DERIVED_ACCOUNT;
     } else if (requestViewDerivedAccountDetails) {
       return FilterTabType.DERIVATION_INFO;
+    } else if (requestViewManageProxiesTab) {
+      return FilterTabType.MANAGE_PROXIES;
     } else {
       return FilterTabType.ACCOUNT_ADDRESS;
     }
@@ -103,6 +107,10 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   //  - Otherwise, management of Substrate proxies is not allowed.
   const canManageSubstrateProxyAccounts = useMemo(() => {
     if (accountProxy?.chainTypes.includes(AccountChainType.SUBSTRATE)) {
+      if (accountProxy.accounts[0].signMode === AccountSignMode.LEGACY_LEDGER) {
+        return false;
+      }
+
       return true;
     }
 
@@ -354,10 +362,12 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
       setSelectedFilterTab(FilterTabType.DERIVED_ACCOUNT);
     } else if (requestViewDerivedAccountDetails) {
       setSelectedFilterTab(FilterTabType.DERIVATION_INFO);
+    } else if (requestViewManageProxiesTab && canManageSubstrateProxyAccounts) {
+      setSelectedFilterTab(FilterTabType.MANAGE_PROXIES);
     } else {
       setSelectedFilterTab(FilterTabType.ACCOUNT_ADDRESS);
     }
-  }, [requestViewDerivedAccountDetails, requestViewDerivedAccounts, showDerivedAccounts]);
+  }, [canManageSubstrateProxyAccounts, requestViewDerivedAccountDetails, requestViewDerivedAccounts, requestViewManageProxiesTab, showDerivedAccounts]);
 
   const renderDetailDerivedAccount = () => {
     return (
@@ -524,6 +534,7 @@ const Wrapper = ({ className }: Props) => {
         onBack={goHome}
         requestViewDerivedAccountDetails={locationState?.requestViewDerivedAccountDetails}
         requestViewDerivedAccounts={locationState?.requestViewDerivedAccounts}
+        requestViewManageProxiesTab={locationState?.requestViewManageProxiesTab}
       />
     </PageWrapper>
   );

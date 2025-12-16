@@ -154,12 +154,12 @@ const Component = () => {
     }
 
     // submit withdraw
-    const sendPromise = (substrateProxyAddress?: string) => {
+    const sendPromise = (signerSubstrateProxyAddress?: string) => {
       return yieldSubmitStakingWithdrawal({
         address: values.from,
         slug: values.slug,
         unstakingInfo: unstakingInfo,
-        substrateProxyAddress
+        signerSubstrateProxyAddress
       }).then(onSuccess);
     };
 

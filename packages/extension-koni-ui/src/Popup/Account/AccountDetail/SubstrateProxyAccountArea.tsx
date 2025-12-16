@@ -4,7 +4,7 @@
 import { _chainInfoToAccountChainType } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountProxy, AccountProxyType, SubstrateProxyAccountItem } from '@subwallet/extension-base/types';
 import { BasicInputEvent, ChainSelector, EmptyList, SubstrateProxyAccountItemExtended, SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
-import { ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS, REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, CURRENT_CHAIN_SUBSTRATE_PROXY, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS, REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { useChainChecker, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { getSubstrateProxyAccountGroup } from '@subwallet/extension-koni-ui/messaging/transaction/substrateProxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -38,7 +38,7 @@ function Component ({ accountProxy, className }: Props) {
   const checkChain = useChainChecker();
   const getReformatAddress = useCoreCreateReformatAddress();
   const [substrateProxyAccountsSelected, setSubstrateProxyAccountsSelected] = useState<Record<string, SubstrateProxyItemSelector>>({});
-  const [networkSelected, setNetworkSelected] = useState<string>();
+  const [networkSelected, setNetworkSelected] = useLocalStorage<string>(CURRENT_CHAIN_SUBSTRATE_PROXY, '');
   const [loading, setLoading] = useState(false);
   const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
   const getChainAndExcludedTokenByAccountProxy = useCreateGetChainAndExcludedTokenByAccountProxy();

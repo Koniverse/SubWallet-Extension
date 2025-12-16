@@ -287,11 +287,11 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         setSubmitLoading(true);
 
         // send change earning validator transaction
-        const sendPromise = (substrateProxyAddress?: string) => {
+        const sendPromise = (signerSubstrateProxyAddress?: string) => {
           return changeEarningValidator({
             ...baseData,
             amount,
-            substrateProxyAddress
+            signerSubstrateProxyAddress
           });
         };
 

@@ -6,6 +6,7 @@ import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-v
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AddressInputNew, ChainSelector, HiddenInput, NumberDisplay } from '@subwallet/extension-koni-ui/components';
+import { CURRENT_CHAIN_SUBSTRATE_PROXY } from '@subwallet/extension-koni-ui/constants';
 import { useCreateGetChainAndExcludedTokenByAccountProxy, useGetAccountProxyByAddress, useGetBalance, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { useGetSubstrateProxyAccountGroupByAddress } from '@subwallet/extension-koni-ui/hooks/substrateProxyAccount/useGetSubstrateProxyAccountGroupByAddress';
 import { handleAddSubstrateProxyAccount } from '@subwallet/extension-koni-ui/messaging/transaction/substrateProxy';
@@ -21,6 +22,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
 import { SubstrateProxyTypeSelector } from '../../parts/SubstrateProxyTypeSelector';
 
@@ -30,7 +32,7 @@ const hiddenFields: Array<keyof SendNftParams> = ['asset', 'fromAccountProxy', '
 
 const Component = (): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/add-proxy');
-  const { defaultData, persistData, setBackProps } = useTransactionContext<AddSubstrateProxyAccountParams>();
+  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setBackProps } = useTransactionContext<AddSubstrateProxyAccountParams>();
   const { token } = useTheme() as Theme;
   const { accounts } = useSelector((state: RootState) => state.accountState);
   const { chainInfoMap, ledgerGenericAllowNetworks } = useSelector((state) => state.chainStore);
@@ -41,7 +43,7 @@ const Component = (): React.ReactElement<Props> => {
   const [isDisable, setIsDisable] = useState(true);
   const [loading, setLoading] = useState(false);
   const { onError, onSuccess } = useHandleSubmitTransaction();
-
+  const [, setCurrentChainSubstrateProxy] = useLocalStorage<string>(CURRENT_CHAIN_SUBSTRATE_PROXY, '');
   const formDefault = useMemo<AddSubstrateProxyAccountParams>(() => {
     return {
       ...defaultData
@@ -86,24 +88,37 @@ const Component = (): React.ReactElement<Props> => {
 
     setIsDisable(empty || error);
     persistData(values);
-  }, [persistData]);
+
+    if (values.chain) {
+      setCurrentChainSubstrateProxy(values.chain);
+    }
+  }, [persistData, setCurrentChainSubstrateProxy]);
 
   const onSubmit: FormCallbacks<AddSubstrateProxyAccountParams>['onFinish'] = useCallback((values: AddSubstrateProxyAccountParams) => {
     setLoading(true);
 
-    handleAddSubstrateProxyAccount({
-      address: values.from,
+    const sendPromise = (signerSubstrateProxyAddress?: string) => {
+      return handleAddSubstrateProxyAccount({
+        address: values.from,
+        chain: values.chain,
+        substrateProxyAddress: values.substrateProxyAddress,
+        substrateProxyType: values.substrateProxyType,
+        substrateProxyDeposit: substrateProxyAccountGroup.substrateProxyDeposit,
+        signerSubstrateProxyAddress
+      });
+    };
+
+    selectSubstrateProxyAccountsToSign({
       chain: values.chain,
-      substrateProxyAddress: values.substrateProxyAddress,
-      substrateProxyType: values.substrateProxyType,
-      substrateProxyDeposit: substrateProxyAccountGroup.substrateProxyDeposit
-    })
+      address: values.from,
+      type: ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT
+    }).then(sendPromise)
       .then(onSuccess)
       .catch(onError)
       .finally(() => {
         setLoading(false);
       });
-  }, [onError, onSuccess, substrateProxyAccountGroup]);
+  }, [onError, onSuccess, selectSubstrateProxyAccountsToSign, substrateProxyAccountGroup.substrateProxyDeposit]);
 
   // Validate substrate proxy address
   const validateSubstrateProxyAddress = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
@@ -158,7 +173,9 @@ const Component = (): React.ReactElement<Props> => {
       setBackProps((prevState) => ({
         ...prevState,
         onClick: () => {
-          navigate(`/accounts/detail/${accountProxy?.id}`);
+          navigate(`/accounts/detail/${accountProxy?.id}`, {
+            state: { requestViewManageProxiesTab: true }
+          });
         }
       }));
     }

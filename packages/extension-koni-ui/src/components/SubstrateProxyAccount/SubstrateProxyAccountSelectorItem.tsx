@@ -30,7 +30,6 @@ function Component (props: Props): React.ReactElement<Props> {
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const { t } = useTranslation();
   const accountProxy = useGetAccountProxyById(substrateProxyAccount.proxyId);
-
   const checkedIconNode = ((showUnselectIcon || isSelected) && (
     <div className='__checked-icon-wrapper'>
       <Icon
@@ -44,8 +43,11 @@ function Component (props: Props): React.ReactElement<Props> {
 
   return (
     <div
-      className={CN(className)}
-      onClick={onClick}
+      className={CN(className, {
+        '-readonly': !showCheckedIcon
+      })}
+      key={substrateProxyAccount.substrateProxyAddress}
+      onClick={showCheckedIcon ? onClick : undefined}
     >
       <div className='__item-left-part'>
         <AccountProxyAvatar
@@ -168,6 +170,10 @@ export const SubstrateProxyAccountSelectorItem = styled(Component)<Props>(({ the
       '.-show-on-hover': {
         opacity: 1
       }
+    },
+
+    '&.-readonly': {
+      cursor: 'default'
     }
   };
 });

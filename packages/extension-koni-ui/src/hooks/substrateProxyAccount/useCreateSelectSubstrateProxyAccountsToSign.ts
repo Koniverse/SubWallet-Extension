@@ -2,20 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountChainType, AccountSignMode, RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountItem } from '@subwallet/extension-base/types';
+import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
+import { AccountChainType, AccountSignMode, ExcludedSubstrateProxyAccounts, RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountItem } from '@subwallet/extension-base/types';
 import { createPromiseHandler, isSameAddress } from '@subwallet/extension-base/utils';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { getSubstrateProxyAccountGroup } from '@subwallet/extension-koni-ui/messaging/transaction/substrateProxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { isSubstrateAddress } from '@subwallet/keyring';
 import { useCallback, useContext } from 'react';
 
 export type SelectSubstrateProxyAccountsToSignParams = {
   chain: string;
   address?: string;
   type?: ExtrinsicType;
-  excludedSubstrateProxyAddresses?: string[];
+  excludedSubstrateProxyAccounts?: ExcludedSubstrateProxyAccounts[];
 };
 
 export type SelectSubstrateProxyAccountsToSign = (params: SelectSubstrateProxyAccountsToSignParams) => Promise<string | undefined>;
@@ -43,13 +43,16 @@ type GetSubstrateProxyAccountsToSign = (params: SelectSubstrateProxyAccountsToSi
 
 export function useCreateSelectSubstrateProxyAccountsToSign (): SelectSubstrateProxyAccountsToSign {
   const allAccounts = useSelector((state: RootState) => state.accountState.accounts);
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
   const { selectSubstrateProxyAccountModal } = useContext(WalletModalContext);
 
-  const getSubstrateProxyAccount = useCallback<GetSubstrateProxyAccountsToSign>(async ({ address, chain, excludedSubstrateProxyAddresses, type }) => {
+  const getSubstrateProxyAccount = useCallback<GetSubstrateProxyAccountsToSign>(async ({ address, chain, excludedSubstrateProxyAccounts, type }) => {
     try {
+      const chainInfo = chainInfoMap[chain];
       // Address is required to get proxy accounts
-      // and it must be a valid substrate address
-      if (!address || !isSubstrateAddress(address)) {
+      // and chain must support proxy
+
+      if (!address || !chainInfo.substrateInfo?.supportProxy) {
         return [];
       }
 
@@ -57,7 +60,7 @@ export function useCreateSelectSubstrateProxyAccountsToSign (): SelectSubstrateP
         chain,
         address,
         type,
-        excludedSubstrateProxyAddresses
+        excludedSubstrateProxyAccounts
       };
 
       const substrateProxyAccountGroup = await getSubstrateProxyAccountGroup(request);
@@ -67,9 +70,13 @@ export function useCreateSelectSubstrateProxyAccountsToSign (): SelectSubstrateP
       }
 
       // filter only valid accounts that can sign transactions
-      const validAccounts = allAccounts.filter(
-        (acc) => acc.chainType === AccountChainType.SUBSTRATE && acc.signMode !== AccountSignMode.READ_ONLY
-      );
+      const validAccounts = allAccounts.filter((acc) => {
+        if (_BALANCE_CHAIN_GROUP.moonbeam.includes(chain)) {
+          return acc.signMode !== AccountSignMode.READ_ONLY;
+        }
+
+        return acc.chainType === AccountChainType.SUBSTRATE && acc.signMode !== AccountSignMode.READ_ONLY;
+      });
 
       // filter proxy accounts that are in valid accounts
       return substrateProxyAccountGroup.substrateProxyAccounts.filter((proxy) =>
@@ -80,7 +87,7 @@ export function useCreateSelectSubstrateProxyAccountsToSign (): SelectSubstrateP
 
       return [];
     }
-  }, [allAccounts]);
+  }, [allAccounts, chainInfoMap]);
 
   // function to select proxy account to sign transaction
   // then open modal to let user select

@@ -576,12 +576,12 @@ const Component = () => {
               return true;
             } else {
               // send submit transaction
-              const submitPromise = async (substrateProxyAddress?: string) => {
+              const submitPromise = async (signerSubstrateProxyAddress?: string) => {
                 const rs = await submitJoinYieldPool({
                   path: path,
                   data,
                   currentStep: step,
-                  substrateProxyAddress
+                  signerSubstrateProxyAddress
                 });
 
                 success = onSuccess(isLastStep, needRollback)(rs);

@@ -31,15 +31,18 @@ export default class SubstrateProxyAccountService {
   // Get proxied accounts for a main account
   // Get when view details or perform transaction
   async getSubstrateProxyAccountGroup (request: RequestGetSubstrateProxyAccountGroup): Promise<SubstrateProxyAccountGroup> {
-    const { address, chain, excludedSubstrateProxyAddresses, type } = request;
+    const { address, chain, excludedSubstrateProxyAccounts, type } = request;
     const substrateApi = this.getSubstrateApi(chain);
 
     await substrateApi.isReady;
 
     // Get proxied accounts from on-chain data
     const result = await substrateApi.api.query.proxy.proxies(address);
+    const baseDeposit = substrateApi.api.consts.proxy.proxyDepositBase?.toString() || '0';
+    const factorDeposit = substrateApi.api.consts.proxy.proxyDepositFactor?.toString() || '0';
+    const deposit = new BigN(baseDeposit).plus(factorDeposit);
 
-    const [substrateProxyAccounts_, substrateProxyDeposit] = result.toPrimitive() as [PrimitiveSubstrateProxyAccountItem[], string];
+    const [substrateProxyAccounts_, currentSubstrateProxyDeposit] = result.toPrimitive() as [PrimitiveSubstrateProxyAccountItem[], string];
 
     // Mapping on-chain data to our defined type
     let substrateProxyAccounts: SubstrateProxyAccountItem[] = (substrateProxyAccounts_ || []).map((account) => {
@@ -59,17 +62,19 @@ export default class SubstrateProxyAccountService {
       substrateProxyAccounts = substrateProxyAccounts.filter((p) => allowedSet.has(p.substrateProxyType));
     }
 
-    if (excludedSubstrateProxyAddresses && excludedSubstrateProxyAddresses.length > 0) {
-      substrateProxyAccounts = substrateProxyAccounts.filter(
-        (p) => !excludedSubstrateProxyAddresses.includes(p.substrateProxyAddress)
-      );
+    if (excludedSubstrateProxyAccounts && excludedSubstrateProxyAccounts.length > 0) {
+      substrateProxyAccounts = substrateProxyAccounts.filter((p) => {
+        return !excludedSubstrateProxyAccounts.some(
+          (excluded) => excluded.address === p.substrateProxyAddress && excluded.substrateProxyType === p.substrateProxyType
+        );
+      });
     }
 
-    const baseDeposit = substrateApi.api.consts.proxy.proxyDepositBase?.toString() || '0';
+    const estimateSubstrateProxyDeposit = new BigN(currentSubstrateProxyDeposit).plus(factorDeposit);
 
     return {
       substrateProxyAccounts,
-      substrateProxyDeposit: new BigN(substrateProxyDeposit).gt(0) ? substrateProxyDeposit.toString() : baseDeposit
+      substrateProxyDeposit: new BigN(currentSubstrateProxyDeposit).gt(0) ? estimateSubstrateProxyDeposit.toFixed() : deposit.toFixed()
     };
   }
 
@@ -120,9 +125,8 @@ export default class SubstrateProxyAccountService {
       .paymentInfo(address);
 
     const estimatedFee = new BigN(feeInfo.partialFee.toString());
-    const factorDeposit = substrateApi.api.consts.proxy.proxyDepositFactor?.toString() || '0';
 
-    const totalRequired = new BigN(substrateProxyDeposit).plus(estimatedFee).plus(factorDeposit);
+    const totalRequired = new BigN(substrateProxyDeposit).plus(estimatedFee);
 
     if (bnTransferableBalance.lt(totalRequired)) {
       return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)];

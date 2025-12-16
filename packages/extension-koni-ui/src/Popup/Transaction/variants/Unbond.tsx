@@ -378,10 +378,10 @@ const Component: React.FC = () => {
     }
 
     // send unstake transaction
-    const sendPromise = (substrateProxyAddress?: string) => {
+    const sendPromise = (signerSubstrateProxyAddress?: string) => {
       return yieldSubmitLeavePool({
         ...request,
-        substrateProxyAddress
+        signerSubstrateProxyAddress
       }).then(onSuccess);
     };
 

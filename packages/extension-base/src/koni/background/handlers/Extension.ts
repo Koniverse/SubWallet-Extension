@@ -1445,7 +1445,7 @@ export default class KoniExtension {
   }
 
   private async makeTransfer (inputData: RequestSubmitTransfer): Promise<SWTransactionResponse> {
-    const { chain, feeCustom, feeOption, from, substrateProxyAddress, to, tokenPayFeeSlug, tokenSlug, transferAll, transferBounceable, value } = inputData;
+    const { chain, feeCustom, feeOption, from, signerSubstrateProxyAddress, to, tokenPayFeeSlug, tokenSlug, transferAll, transferBounceable, value } = inputData;
     const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(tokenSlug);
     const errors = validateTransferRequest(transferTokenInfo, from, to, value, transferAll);
     const warnings: TransactionWarning[] = [];
@@ -1681,7 +1681,7 @@ export default class KoniExtension {
       isTransferAll: isTransferNativeToken ? transferAll : false,
       isTransferLocalTokenAndPayThatTokenAsFee,
       edAsWarning: isTransferNativeToken,
-      substrateProxyAddress,
+      signerSubstrateProxyAddress,
       additionalValidator: additionalValidator
     });
   }
@@ -2649,7 +2649,7 @@ export default class KoniExtension {
   }
 
   private async substrateNftSubmitTransaction (inputData: RequestSubstrateNftSubmitTransaction): Promise<NftTransactionResponse> {
-    const { params, recipientAddress, senderAddress } = inputData;
+    const { params, recipientAddress, senderAddress, signerSubstrateProxyAddress } = inputData;
     const isSendingSelf = isRecipientSelf(senderAddress, recipientAddress);
 
     // TODO: do better to detect tokenType
@@ -2669,7 +2669,8 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: { ...inputData, isSendingSelf },
       extrinsicType: ExtrinsicType.SEND_NFT,
-      chainType: ChainType.SUBSTRATE
+      chainType: ChainType.SUBSTRATE,
+      signerSubstrateProxyAddress
     });
 
     return { ...rs, isSendingSelf };
@@ -4125,7 +4126,7 @@ export default class KoniExtension {
   }
 
   private async handleYieldStep (inputData: RequestYieldStepSubmit): Promise<SWTransactionResponse> {
-    const { data, errorOnTimeOut, isPassConfirmation, onSend, path, processId, substrateProxyAddress } = inputData;
+    const { data, errorOnTimeOut, isPassConfirmation, onSend, path, processId, signerSubstrateProxyAddress } = inputData;
     const { address } = data;
 
     let step: BriefProcessStep | undefined;
@@ -4267,7 +4268,7 @@ export default class KoniExtension {
       extrinsicType, // change this depends on step
       chainType,
       resolveOnDone: !isLastStep,
-      substrateProxyAddress,
+      signerSubstrateProxyAddress,
       transferNativeAmount,
       balanceType: balanceTypeForPool,
       skipFeeValidation: isMintingStep && isPoolSupportAlternativeFee,
@@ -4279,7 +4280,7 @@ export default class KoniExtension {
   }
 
   private async handleYieldLeave (params: RequestYieldLeave): Promise<SWTransactionResponse> {
-    const { address, slug, substrateProxyAddress } = params;
+    const { address, signerSubstrateProxyAddress, slug } = params;
     const leaveValidation = await this.#koniState.earningService.validateYieldLeave(params);
 
     if (leaveValidation.length > 0) {
@@ -4295,7 +4296,7 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: params, // TODO
       extrinsicType,
-      substrateProxyAddress,
+      signerSubstrateProxyAddress,
       chainType: handler?.transactionChainType || ChainType.SUBSTRATE
     });
   }
@@ -4393,7 +4394,7 @@ export default class KoniExtension {
   }
 
   private async yieldSubmitWithdrawal (params: RequestYieldWithdrawal): Promise<SWTransactionResponse> {
-    const { address, slug, substrateProxyAddress } = params;
+    const { address, signerSubstrateProxyAddress, slug } = params;
     const poolHandler = this.#koniState.earningService.getPoolHandler(slug);
 
     if (!poolHandler) {
@@ -4408,13 +4409,13 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: params,
       extrinsicType: ExtrinsicType.STAKING_WITHDRAW,
-      substrateProxyAddress,
+      signerSubstrateProxyAddress,
       chainType: poolHandler?.transactionChainType || ChainType.SUBSTRATE
     });
   }
 
   private async yieldSubmitCancelWithdrawal (params: RequestStakeCancelWithdrawal): Promise<SWTransactionResponse> {
-    const { address, selectedUnstaking, slug, substrateProxyAddress } = params;
+    const { address, selectedUnstaking, signerSubstrateProxyAddress, slug } = params;
     const poolHandler = this.#koniState.earningService.getPoolHandler(slug);
 
     if (!poolHandler || !selectedUnstaking) {
@@ -4430,13 +4431,13 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: params,
       extrinsicType: ExtrinsicType.STAKING_CANCEL_UNSTAKE,
-      substrateProxyAddress,
+      signerSubstrateProxyAddress,
       chainType: poolHandler?.transactionChainType || ChainType.SUBSTRATE
     });
   }
 
   private async yieldSubmitClaimReward (params: RequestStakeClaimReward): Promise<SWTransactionResponse> {
-    const { address, slug, substrateProxyAddress } = params;
+    const { address, signerSubstrateProxyAddress, slug } = params;
     const poolHandler = this.#koniState.earningService.getPoolHandler(slug);
 
     if (!address || !poolHandler) {
@@ -4450,7 +4451,7 @@ export default class KoniExtension {
       chain: poolHandler.chain,
       transaction: extrinsic,
       data: params,
-      substrateProxyAddress,
+      signerSubstrateProxyAddress,
       extrinsicType: ExtrinsicType.STAKING_CLAIM_REWARD,
       chainType: poolHandler?.transactionChainType || ChainType.SUBSTRATE
     });
@@ -4471,7 +4472,7 @@ export default class KoniExtension {
   }
 
   private async handleYieldChangeValidator (params: SubmitChangeValidatorStaking) {
-    const { address, slug, substrateProxyAddress } = params;
+    const { address, signerSubstrateProxyAddress, slug } = params;
 
     const poolHandler = this.#koniState.earningService.getPoolHandler(slug);
 
@@ -4486,7 +4487,7 @@ export default class KoniExtension {
       chain: poolHandler.chain,
       transaction: extrinsic,
       data: params,
-      substrateProxyAddress,
+      signerSubstrateProxyAddress,
       extrinsicType: ExtrinsicType.CHANGE_EARNING_VALIDATOR,
       chainType: ChainType.SUBSTRATE
     });
@@ -5293,7 +5294,7 @@ export default class KoniExtension {
   }
 
   private async handleAddSubstrateProxyAccount (params: RequestAddSubstrateProxyAccount): Promise<SWTransactionResponse> {
-    const { address, chain } = params;
+    const { address, chain, signerSubstrateProxyAddress } = params;
     const validationErrors = await this.#koniState.substrateProxyAccountService.validateAddSubstrateProxyAccount(params);
 
     if (validationErrors.length > 0) {
@@ -5308,12 +5309,13 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: params,
       extrinsicType: ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT,
-      chainType: ChainType.SUBSTRATE
+      chainType: ChainType.SUBSTRATE,
+      signerSubstrateProxyAddress
     });
   }
 
   private async handleRemoveSubstrateProxyAccount (params: RequestRemoveSubstrateProxyAccount): Promise<SWTransactionResponse> {
-    const { address, chain, substrateProxyAddress } = params;
+    const { address, chain, signerSubstrateProxyAddress } = params;
 
     const extrinsic = await this.#koniState.substrateProxyAccountService.removeSubstrateProxyAccounts(params);
 
@@ -5324,7 +5326,7 @@ export default class KoniExtension {
       data: params,
       extrinsicType: ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT,
       chainType: ChainType.SUBSTRATE,
-      substrateProxyAddress
+      signerSubstrateProxyAddress
     });
   }
 
@@ -5341,7 +5343,8 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: request,
       extrinsicType: ExtrinsicType.GOV_VOTE,
-      chainType: ChainType.SUBSTRATE
+      chainType: ChainType.SUBSTRATE,
+      signerSubstrateProxyAddress: request.signerSubstrateProxyAddress
     });
   }
 
@@ -5354,7 +5357,8 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: request,
       extrinsicType: ExtrinsicType.GOV_UNVOTE,
-      chainType: ChainType.SUBSTRATE
+      chainType: ChainType.SUBSTRATE,
+      signerSubstrateProxyAddress: request.signerSubstrateProxyAddress
     });
   }
 
@@ -5367,7 +5371,8 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: request,
       extrinsicType: ExtrinsicType.GOV_UNLOCK_VOTE,
-      chainType: ChainType.SUBSTRATE
+      chainType: ChainType.SUBSTRATE,
+      signerSubstrateProxyAddress: request.signerSubstrateProxyAddress
     });
   }
 

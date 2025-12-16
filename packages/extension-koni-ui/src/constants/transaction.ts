@@ -61,8 +61,8 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.GOV_UNVOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.unvote'),
   [ExtrinsicType.GOV_UNLOCK_VOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.unlockVotes'),
 
-  [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('Add proxy'),
-  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('Remove proxy')
+  [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.TRANSACTION.constant.transaction.addProxy'),
+  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.TRANSACTION.constant.transaction.removeProxy')
 };
 
 export const ALL_STAKING_ACTIONS: ExtrinsicType[] = [

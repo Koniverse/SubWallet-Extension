@@ -88,15 +88,22 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
 
   const onClickSubmit = useCallback(() => {
     // Function to send the remove substrate proxy account transaction
-    const sendPromise = (substrateProxyAddress?: string) => {
+    const sendPromise = (signerSubstrateProxyAddress?: string) => {
       return handleRemoveSubstrateProxyAccount({
         chain,
         address: from,
         selectedSubstrateProxyAccounts: substrateProxyAddressRemovedFiltered.substrateProxyItems,
         isRemoveAll,
-        substrateProxyAddress
+        signerSubstrateProxyAddress
       });
     };
+
+    const excludedSubstrateProxyAccounts = substrateProxyAddressRemovedFiltered.substrateProxyItems.map(
+      (item) => ({
+        address: item.substrateProxyAddress,
+        substrateProxyType: item.substrateProxyType
+      })
+    );
 
     setLoading(true);
     // Select substrate proxy account to sign the transaction
@@ -104,16 +111,18 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
       chain,
       address: from,
       type: extrinsicType,
-      excludedSubstrateProxyAddresses: substrateProxyAddressRemovedFiltered.uniqueAddresses
+      excludedSubstrateProxyAccounts
     }).then(sendPromise)
       .then(onSuccess)
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [selectSubstrateProxyAccountsToSign, chain, from, substrateProxyAddressRemovedFiltered.uniqueAddresses, substrateProxyAddressRemovedFiltered.substrateProxyItems, onSuccess, onError, isRemoveAll]);
+  }, [selectSubstrateProxyAccountsToSign, chain, from, substrateProxyAddressRemovedFiltered.substrateProxyItems, onSuccess, onError, isRemoveAll]);
 
   const onCancelRemove = useCallback(() => {
     if (accountProxy?.id) {
-      navigate(`/accounts/detail/${accountProxy?.id}`);
+      navigate(`/accounts/detail/${accountProxy?.id}`, {
+        state: { requestViewManageProxiesTab: true }
+      });
     } else {
       goBack();
     }
@@ -141,7 +150,9 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
       setBackProps((prevState) => ({
         ...prevState,
         onClick: () => {
-          navigate(`/accounts/detail/${accountProxy?.id}`);
+          navigate(`/accounts/detail/${accountProxy?.id}`, {
+            state: { requestViewManageProxiesTab: true }
+          });
         }
       }));
     }

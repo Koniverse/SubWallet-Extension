@@ -160,13 +160,13 @@ export default class TransactionService {
 
     // Get signer account
     let signer = address;
-    const substrateProxyAddress = transactionInput.substrateProxyAddress;
+    const signerSubstrateProxyAddress = transactionInput.signerSubstrateProxyAddress;
 
     let substrateProxyAccountNativeTokenAvailable: AmountData | undefined;
 
-    if (substrateProxyAddress && substrateProxyAddress !== address) {
-      signer = substrateProxyAddress;
-      substrateProxyAccountNativeTokenAvailable = await this.state.balanceService.getTransferableBalance(substrateProxyAddress, chain, nativeTokenInfo.slug, extrinsicType);
+    if (signerSubstrateProxyAddress && signerSubstrateProxyAddress !== address) {
+      signer = signerSubstrateProxyAddress;
+      substrateProxyAccountNativeTokenAvailable = await this.state.balanceService.getTransferableBalance(signerSubstrateProxyAddress, chain, nativeTokenInfo.slug, extrinsicType);
     }
 
     // Check account signing transaction
@@ -1860,7 +1860,7 @@ export default class TransactionService {
     return emitter;
   }
 
-  private async signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, signAfterCreate, step, substrateProxyAddress, tokenPayFeeSlug, transaction, url }: SWTransaction): Promise<TransactionEmitter> {
+  private async signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, signAfterCreate, signerSubstrateProxyAddress, step, tokenPayFeeSlug, transaction, url }: SWTransaction): Promise<TransactionEmitter> {
     const tip = (feeCustom as SubstrateTipInfo)?.tip || '0';
     const feeAssetId = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug) && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain) ? this.state.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.multilocation as Record<string, any> : undefined;
 
@@ -1877,12 +1877,12 @@ export default class TransactionService {
 
     let signer = address;
 
-    if (substrateProxyAddress && substrateProxyAddress !== address) {
+    if (signerSubstrateProxyAddress && signerSubstrateProxyAddress !== address) {
       const substrateApi = this.state.chainService.getSubstrateApi(chain);
 
       await substrateApi.isReady;
 
-      signer = substrateProxyAddress;
+      signer = signerSubstrateProxyAddress;
       extrinsic = substrateApi.api.tx.proxy.proxy(address, null, transaction as SubmittableExtrinsic);
     }
 

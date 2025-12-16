@@ -292,13 +292,13 @@ const Component = (props: Props) => {
 
   // submit action
   const submit = useCallback((target: ValidatorInfo[]) => {
-    const sendPromise = (substrateProxyAddress?: string) => {
+    const sendPromise = (signerSubstrateProxyAddress?: string) => {
       return changeEarningValidator({
         slug: poolInfo.slug,
         address: from,
         amount: '0',
         selectedValidators: target,
-        substrateProxyAddress
+        signerSubstrateProxyAddress
       });
     };
 

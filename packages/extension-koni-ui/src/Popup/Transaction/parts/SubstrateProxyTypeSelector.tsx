@@ -111,6 +111,10 @@ export const SubstrateProxyTypeSelector = styled(forwardRef(Component))<Props>((
       }
     },
 
+    '.ant-sw-list-wrapper': {
+      flex: 'unset'
+    },
+
     '.chain-logo': {
       margin: '-1px 0'
     },

@@ -48,7 +48,7 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <MetaInfo.Default
           className={'__account-field'}
-          label={t('Account')}
+          label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.account')}
         >
           <AccountProxyAvatar
             className={'__account-avatar'}
@@ -60,14 +60,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
         {!!accountFrom?.name && <MetaInfo.Default
           className={'__address-field'}
-          label={t('Address')}
+          label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.address')}
         >
           {toShort(transaction.address)}
         </MetaInfo.Default>}
 
         <MetaInfo.Chain
           chain={transaction.chain}
-          label={t('Network')}
+          label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.network')}
         />
       </MetaInfo>
       <MetaInfo
@@ -80,12 +80,12 @@ const Component: React.FC<Props> = (props: Props) => {
             ? <>
               <MetaInfo.Default
                 className={'__account-field'}
-                label={t('Proxy account')}
+                label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyAccount')}
               >
                 <AccountProxyAvatar
                   className={'__account-avatar'}
                   size={24}
-                  value={firstSubstrateProxyAccount?.proxyId || data.substrateProxyAddress}
+                  value={firstSubstrateProxyAccount?.proxyId || data.signerSubstrateProxyAddress}
                 />
                 <div className={'__account-item-label'}>
                   {firstSubstrateProxyAccount?.name || toShort(substrateProxyAddresses[0])}
@@ -94,7 +94,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
               {!!firstSubstrateProxyAccount?.name && <MetaInfo.Default
                 className={'__address-field'}
-                label={t('Address')}
+                label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.address')}
               >
                 {toShort(substrateProxyAddresses[0])}
               </MetaInfo.Default>}
@@ -102,9 +102,9 @@ const Component: React.FC<Props> = (props: Props) => {
 
             : <MetaInfo.Default
               className={'proxy-address-removed'}
-              label={t('Proxy account')}
+              label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyAccount')}
             >
-              {substrateProxyAddresses.length} {t('accounts')}
+              {substrateProxyAddresses.length} {t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.accounts')}
               <Button
                 className={'proxy-address-removed-info'}
                 icon={<Icon
@@ -122,7 +122,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Estimated fee')}
+          label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.estimatedFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />

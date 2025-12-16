@@ -565,7 +565,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       const { asset, chain, destChain, from, to, value } = values;
 
       // prepare params
-      const createBaseParams = (substrateProxyAddress?: string): RequestSubmitTransfer => ({
+      const createBaseParams = (signerSubstrateProxyAddress?: string): RequestSubmitTransfer => ({
         from,
         chain,
         to,
@@ -576,7 +576,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
         tokenPayFeeSlug: currentTokenPayFee,
-        substrateProxyAddress
+        signerSubstrateProxyAddress
       });
 
       // create send promise

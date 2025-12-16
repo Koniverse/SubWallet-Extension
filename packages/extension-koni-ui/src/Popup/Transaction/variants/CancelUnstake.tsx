@@ -112,12 +112,12 @@ const Component = () => {
     const selectedUnstaking = positionInfo.unstakings[parseInt(unstakeIndex)];
 
     // send cancel unstake transaction
-    const sendPromise = (substrateProxyAddress?: string) => {
+    const sendPromise = (signerSubstrateProxyAddress?: string) => {
       return yieldSubmitStakingCancelWithdrawal({
         address: from,
         slug,
         selectedUnstaking,
-        substrateProxyAddress
+        signerSubstrateProxyAddress
       }).then(onSuccess);
     };
 

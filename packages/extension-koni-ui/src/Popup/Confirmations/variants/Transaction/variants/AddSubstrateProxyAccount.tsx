@@ -32,7 +32,7 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <MetaInfo.Default
           className={'__account-field'}
-          label={t('Account')}
+          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.account')}
         >
           <AccountProxyAvatar
             className={'__account-avatar'}
@@ -44,14 +44,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
         {!!accountFrom?.name && <MetaInfo.Default
           className={'__address-field'}
-          label={t('Address')}
+          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.address')}
         >
           {toShort(transaction.address)}
         </MetaInfo.Default>}
 
         <MetaInfo.Chain
           chain={transaction.chain}
-          label={t('Network')}
+          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.network')}
         />
       </MetaInfo>
       <MetaInfo
@@ -61,7 +61,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Default
           className={'__account-field'}
-          label={t('Proxy account')}
+          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyAccount')}
         >
           <AccountProxyAvatar
             className={'__account-avatar'}
@@ -73,14 +73,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
         {!!substrateProxyAccount?.name && <MetaInfo.Default
           className={'__address-field'}
-          label={t('Address')}
+          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.address')}
         >
           {toShort(data.substrateProxyAddress)}
         </MetaInfo.Default>}
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Estimated fee')}
+          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.estimatedFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />

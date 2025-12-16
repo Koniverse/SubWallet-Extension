@@ -3,11 +3,15 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 
+export interface ExcludedSubstrateProxyAccounts {
+  address: string
+  substrateProxyType: SubstrateProxyType
+}
 export interface RequestGetSubstrateProxyAccountGroup {
   chain: string;
   address: string;
   type?: ExtrinsicType
-  excludedSubstrateProxyAddresses?: string[]
+  excludedSubstrateProxyAccounts?: ExcludedSubstrateProxyAccounts[]
 }
 
 // All possible proxy types in Substrate in this article: https://wiki.polkadot.com/learn/learn-proxies/#proxy-types
