@@ -39,8 +39,6 @@ function createSubstrateNftApi (chain: string, substrateApi: _SubstrateApi | nul
     return [new AssetHubUniquesPalletApi(substrateApi, substrateAddresses, chain), new AssetHubNftsPalletApi(substrateApi, substrateAddresses, chain)];
   } else if (_NFT_CHAIN_GROUP.statemint.includes(chain)) {
     return [new AssetHubUniquesPalletApi(substrateApi, substrateAddresses, chain), new AssetHubNftsPalletApi(substrateApi, substrateAddresses, chain)];
-  } else if (_NFT_CHAIN_GROUP.unique_network.includes(chain)) {
-    return [new UniqueNftApi(chain, substrateAddresses)];
   } else if (_NFT_CHAIN_GROUP.unique_evm.includes(chain)) {
     return [new UniqueNftApi(chain, evmAddresses)];
   } else if (_NFT_CHAIN_GROUP.bitcountry.includes(chain)) {

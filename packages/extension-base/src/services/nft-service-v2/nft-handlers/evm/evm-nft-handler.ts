@@ -161,13 +161,13 @@ export class EvmNftHandler extends BaseNftHandler {
     }
 
     return {
-      items: this.normalizeItems(items),
-      collections: this.normalizeCollections(collections)
+      items: items,
+      collections: collections
     };
   }
 
   // ==================== 2. FULL – Dùng khi user vào collection ====================
-  async fetchFullListNftOfaCollection (request: NftFullListRequest): Promise<NftHandlerResult> {
+  override async fetchFullListNftOfaCollection (request: NftFullListRequest): Promise<NftHandlerResult> {
     const items: NftItem[] = [];
     const collections: NftCollection[] = [];
     const { chainInfo, contractAddress, owners } = request;
@@ -223,8 +223,8 @@ export class EvmNftHandler extends BaseNftHandler {
     }
 
     return {
-      items: this.normalizeItems(items),
-      collections: this.normalizeCollections(collections)
+      items: items,
+      collections: collections
     };
   }
 }

@@ -17,24 +17,10 @@ export abstract class BaseNftHandler {
 
   abstract fetchPreview(addresses: string[]): Promise<NftHandlerResult>;
 
-  abstract fetchFullListNftOfaCollection(request: NftFullListRequest): Promise<NftHandlerResult>;
+  // Optional method - subclasses can choose to implement or not
+  fetchFullListNftOfaCollection (_request: NftFullListRequest): Promise<NftHandlerResult> {
+    return Promise.resolve({ items: [], collections: [] });
+  }
 
   abstract filterAddresses(addresses: string[]): string[];
-
-  /** Helper: chuẩn hóa item với chain */
-  protected normalizeItems (items: NftItem[]): NftItem[] {
-    return items.map((item) => ({
-      ...item,
-      chain: this.chain,
-      id: item.id
-    }));
-  }
-
-  protected normalizeCollections (collections: NftCollection[]): NftCollection[] {
-    return collections.map((col) => ({
-      ...col,
-      chain: this.chain,
-      collectionId: col.collectionId
-    }));
-  }
 }

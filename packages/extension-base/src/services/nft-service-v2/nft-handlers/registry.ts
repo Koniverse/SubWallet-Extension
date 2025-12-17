@@ -3,9 +3,11 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { NFT_CHAIN_GROUPS_MIGRATED } from '@subwallet/extension-base/services/chain-service/constants';
 import { _isChainSupportEvmNft } from '@subwallet/extension-base/services/chain-service/utils';
 import { BaseNftHandler } from '@subwallet/extension-base/services/nft-service-v2/nft-handlers/base-nft-handler';
 import { EvmNftHandler } from '@subwallet/extension-base/services/nft-service-v2/nft-handlers/evm/evm-nft-handler';
+import { UniqueNftHandler } from '@subwallet/extension-base/services/nft-service-v2/nft-handlers/unique/unique-nft-handler';
 
 export interface NftHandlerDescriptor {
   id: string;
@@ -35,12 +37,13 @@ export const NFT_HANDLER_REGISTRY: NftHandlerDescriptor[] = [
     supports: (chainInfo) => _isChainSupportEvmNft(chainInfo),
     supportFechFullList: true,
     create: (chain) => new EvmNftHandler(chain)
+  },
+  {
+    id: 'unique_network',
+    supports: (chainInfo) => NFT_CHAIN_GROUPS_MIGRATED.unique_network[0].includes(chainInfo.slug),
+    supportFechFullList: true,
+    create: (chain) => new UniqueNftHandler(chain)
   }
-  // {
-  //   id: 'unique',
-  //   supports: (chainInfo) => chainInfo.slug.startsWith('unique'),
-  //   create: (chain, state) => new UniqueNftHandler(chain, state)
-  // },
   // {
   //   id: 'ordinal',
   //   supports: (chainInfo) => _isSupportOrdinal(chainInfo.slug),
