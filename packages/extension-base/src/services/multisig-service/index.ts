@@ -6,7 +6,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _SubstrateAdapterSubscriptionArgs } from '@subwallet/extension-base/services/chain-service/types';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
-import { decodeCallData, DecodeCallDataResponse, DEFAULT_BLOCK_HASH, getCallData } from '@subwallet/extension-base/services/multisig-service/utils';
+import { decodeCallData, DecodeCallDataResponse, DEFAULT_BLOCK_HASH, getCallData, getMultisigTxType } from '@subwallet/extension-base/services/multisig-service/utils';
 import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
 import { BehaviorSubject } from 'rxjs';
 
@@ -44,6 +44,7 @@ interface ExtendedPendingMultisigTx {
   callData?: string; // todo: handle case callData and decodedCallData undefined
   decodedCallData?: DecodeCallDataResponse;
   timestamp?: number;
+  multisigTxType?: MultisigTxType
 }
 
 export type PendingMultisigTxMap = Record<string, PendingMultisigTx[]>;
@@ -51,6 +52,17 @@ export type PendingMultisigTxMap = Record<string, PendingMultisigTx[]>;
 export interface RequestGetPendingTxs {
   multisigAddress: string
 }
+
+export enum MultisigTxType {
+  TRANSFER = 'Transfer',
+  STAKING = 'Staking',
+  UNKNOWN = 'Unknown'
+}
+
+export const MULTISIG_TX_TYPE_MAP: Record<string, string[]> = {
+  transfer: ['balances_transferAll', 'balances_transferKeepAlive', 'balances_transfer', 'foreignAssets_transfer', 'foreignAssets_transferKeepAlive', 'currencies_transfer', 'nft_transfer', 'uniques_transfer'],
+  staking: ['homa_mint', 'vtokenMinting_mint', 'liquidStaking_', 'parachainStaking.joinDelegators', 'parachainStaking.delegatorStakeMore'] // todo: add more later
+};
 
 export class MultisigService implements StoppableServiceInterface {
   status: ServiceStatus = ServiceStatus.NOT_INITIALIZED;
@@ -312,7 +324,8 @@ export class MultisigService implements StoppableServiceInterface {
             depositAmount: pendingMultisigInfo.deposit,
             depositor: pendingMultisigInfo.depositor,
             approvals: pendingMultisigInfo.approvals,
-            timestamp: blockInfo.timestamp
+            timestamp: blockInfo.timestamp,
+            multisigTxType: getMultisigTxType(decodedCallData)
           });
         }));
 

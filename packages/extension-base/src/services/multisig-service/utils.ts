@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { MULTISIG_TX_TYPE_MAP, MultisigTxType } from '@subwallet/extension-base/services/multisig-service/index';
+
 import { ApiPromise } from '@polkadot/api';
 import { GenericExtrinsic } from '@polkadot/types';
 import { Block, Call } from '@polkadot/types/interfaces';
@@ -104,4 +106,22 @@ export function decodeCallData ({ api, callData }: DecodeCallDataRequest): Decod
   }
 
   return undefined;
+}
+
+export function getMultisigTxType (decodedCallData: DecodeCallDataResponse | undefined) {
+  if (!decodedCallData) {
+    return MultisigTxType.UNKNOWN;
+  }
+
+  const sectionMethod = `${decodedCallData.section}.${decodedCallData.method}`;
+
+  if (MULTISIG_TX_TYPE_MAP.transfer.includes(sectionMethod)) {
+    return MultisigTxType.TRANSFER;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.staking.includes(sectionMethod)) {
+    return MultisigTxType.STAKING;
+  }
+
+  return MultisigTxType.UNKNOWN;
 }
