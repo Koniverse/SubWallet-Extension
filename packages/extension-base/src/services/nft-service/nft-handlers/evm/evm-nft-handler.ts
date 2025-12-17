@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetType } from '@subwallet/chain-list/types';
-import { NftCollection, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import { ChainType, NftCollection, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _getEvmChainId } from '@subwallet/extension-base/services/chain-service/utils';
-import { baseParseIPFSUrl } from '@subwallet/extension-base/utils';
+import { baseParseIPFSUrl, getAddressesByChainType } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { BlockscoutNftInstanceRaw } from '@subwallet-monorepos/subwallet-services-sdk/services/blockscout/types';
 
@@ -27,12 +27,8 @@ interface SdkCollection {
 type SdkCollectionsByChain = Record<string, SdkCollection[]>;
 
 export class EvmNftHandler extends BaseNftHandler {
-  // constructor (chain: string) {
-  //   super(chain);
-  // }
-
   filterAddresses (addresses: string[]): string[] {
-    return addresses;
+    return getAddressesByChainType(addresses, [ChainType.EVM]);
   }
 
   private mapSdkToNftItem (

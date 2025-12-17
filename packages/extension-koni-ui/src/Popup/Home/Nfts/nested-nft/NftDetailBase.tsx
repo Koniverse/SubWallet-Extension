@@ -97,7 +97,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         collectionInfo
       }
     });
-    console.log('NFT Structure');
   }, [collectionInfo, navigate, nftItem]);
 
   const onGoToParentNFT = useCallback(() => {
@@ -527,8 +526,8 @@ const NftDetailBase = styled(Component)<Props>(({ theme: { token } }: Props) => 
       display: 'flex',
       alignItems: 'center',
       gap: '8px',
-      flex: 1, /* Cho phép content chiếm hết phần còn lại */
-      minWidth: 0 /* Quan trọng để text-overflow hoạt động */
+      flex: 1,
+      minWidth: 0
     },
 
     '.nft_item_detail__description_content': {

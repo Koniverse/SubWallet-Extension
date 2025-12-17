@@ -199,9 +199,6 @@ export class NftService implements StoppableServiceInterface {
       const currentItemIds = new Set(currentItems.map((i) => i.id));
       const newItems = result.items.filter((item) => !currentItemIds.has(item.id));
 
-      console.log('newItems', newItems);
-      console.log('currentItems', currentItems);
-
       for (const item of newItems) {
         this.state.updateNftData(item.chain, item, addresses[0]);
       }

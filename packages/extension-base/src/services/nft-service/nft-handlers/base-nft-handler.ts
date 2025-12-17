@@ -8,6 +8,11 @@ export interface NftHandlerResult {
   collections: NftCollection[];
 }
 
+const EMPTY_NFT_RESULT: NftHandlerResult = {
+  items: [],
+  collections: []
+};
+
 export abstract class BaseNftHandler {
   protected readonly chain: string;
 
@@ -16,11 +21,10 @@ export abstract class BaseNftHandler {
   }
 
   abstract fetchPreview(addresses: string[]): Promise<NftHandlerResult>;
+  abstract filterAddresses(addresses: string[]): string[];
 
   // Optional method - subclasses can choose to implement or not
   fetchFullListNftOfaCollection (_request: NftFullListRequest): Promise<NftHandlerResult> {
-    return Promise.resolve({ items: [], collections: [] });
+    return Promise.resolve(EMPTY_NFT_RESULT);
   }
-
-  abstract filterAddresses(addresses: string[]): string[];
 }

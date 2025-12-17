@@ -1,7 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import { ChainType, NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import { getAddressesByChainType } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { UniqueCollectionInstance, UniqueNftInstance } from '@subwallet-monorepos/subwallet-services-sdk/services';
 
@@ -14,7 +15,7 @@ type IndexedNft = NftItem & {
 
 export class UniqueNftHandler extends BaseNftHandler {
   override filterAddresses (addresses: string[]): string[] {
-    return addresses;
+    return getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
   }
 
   private mapUniqueCollections (raws: UniqueCollectionInstance): NftCollection {
@@ -33,7 +34,7 @@ export class UniqueNftHandler extends BaseNftHandler {
     topmostOwner: string
   ): IndexedNft {
     return {
-      id: raw.id,
+      id: raw.tokenId.toString(),
       chain: this.chain,
       collectionId: String(raw.collectionId),
       name: raw.name,
@@ -52,6 +53,19 @@ export class UniqueNftHandler extends BaseNftHandler {
       __tokenAddress: raw.tokenAddress,
       __rawOwner: raw.owner
     };
+  }
+
+  private sanitizeNft (item: IndexedNft): NftItem {
+    const { __rawOwner, __tokenAddress, nestingTokens, ...rest } = item;
+
+    const cleanChildren = (nestingTokens as IndexedNft[] || []).map((child) =>
+      this.sanitizeNft(child)
+    );
+
+    return {
+      ...rest,
+      nestingTokens: cleanChildren.length > 0 ? cleanChildren : undefined
+    } as NftItem;
   }
 
   private buildUniqueNftTree (
@@ -119,8 +133,11 @@ export class UniqueNftHandler extends BaseNftHandler {
         // 3. Build Tree
         const { roots } = this.buildUniqueNftTree(sdkNfts, address);
 
+        // 4. Sanitize data
+        const cleanRoots = roots.map((root) => this.sanitizeNft(root));
+
         // Output like this: [Root1 { nestingTokens: [Child1, Child2] }, Root2...]
-        items.push(...roots);
+        items.push(...cleanRoots);
       }));
     } catch (e) {
       console.error(`[UniqueNftHandler] Failed to fetch for ${this.chain}`, e);
