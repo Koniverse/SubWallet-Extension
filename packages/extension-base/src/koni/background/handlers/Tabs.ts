@@ -1,104 +1,45 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type {InjectedAccount} from '@subwallet/extension-inject/types';
-import {InjectedMetadataKnown, MetadataDef, ProviderMeta} from '@subwallet/extension-inject/types';
+import type { InjectedAccount } from '@subwallet/extension-inject/types';
 
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
-import {_AssetType} from '@subwallet/chain-list/types';
-import {BitcoinProviderError} from '@subwallet/extension-base/background/errors/BitcoinProviderError';
-import {CardanoProviderError} from '@subwallet/extension-base/background/errors/CardanoProviderError';
-import {EvmProviderError} from '@subwallet/extension-base/background/errors/EvmProviderError';
-import {withErrorLog} from '@subwallet/extension-base/background/handlers/helpers';
-import {createSubscription, unsubscribe} from '@subwallet/extension-base/background/handlers/subscriptions';
-import {
-  AddNetworkRequestExternal,
-  AddTokenRequestExternal,
-  BitcoinDAppAddress,
-  BitcoinProviderErrorType,
-  BitcoinRequestGetAddressesResult,
-  BitcoinSendTransactionParams,
-  BitcoinSendTransactionResult,
-  BitcoinSignMessageParams,
-  BitcoinSignMessageResult,
-  BitcoinSignPsbtParams,
-  BitcoinSignPsbtResult,
-  CardanoProviderErrorType,
-  Cbor,
-  EvmAppState,
-  EvmEventType,
-  EvmProviderErrorType,
-  EvmSendTransactionParams,
-  PassPhishing,
-  RequestAddPspToken,
-  RequestCardanoGetCollateral,
-  RequestCardanoGetUtxos,
-  RequestCardanoSignData,
-  RequestCardanoSignTransaction,
-  RequestEvmProviderSend,
-  RequestSettingsType,
-  ResponseCardanoSignData,
-  ResponseCardanoSignTransaction,
-  ValidateNetworkResponse
-} from '@subwallet/extension-base/background/KoniTypes';
+import { _AssetType } from '@subwallet/chain-list/types';
+import { BitcoinProviderError } from '@subwallet/extension-base/background/errors/BitcoinProviderError';
+import { CardanoProviderError } from '@subwallet/extension-base/background/errors/CardanoProviderError';
+import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
+import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
+import { createSubscription, unsubscribe } from '@subwallet/extension-base/background/handlers/subscriptions';
+import { AddNetworkRequestExternal, AddTokenRequestExternal, BitcoinDAppAddress, BitcoinProviderErrorType, BitcoinRequestGetAddressesResult, BitcoinSendTransactionParams, BitcoinSendTransactionResult, BitcoinSignMessageParams, BitcoinSignMessageResult, BitcoinSignPsbtParams, BitcoinSignPsbtResult, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetCollateral, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import RequestBytesSign from '@subwallet/extension-base/background/RequestBytesSign';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
-import {
-  AccountAuthType,
-  MessageTypes,
-  RequestAccountList,
-  RequestAccountSubscribe,
-  RequestAccountUnsubscribe,
-  RequestAuthorizeTab,
-  RequestRpcSend,
-  RequestRpcSubscribe,
-  RequestRpcUnsubscribe,
-  RequestTypes,
-  ResponseRpcListProviders,
-  ResponseSigning,
-  ResponseTypes,
-  SubscriptionMessageTypes
-} from '@subwallet/extension-base/background/types';
-import {
-  ALL_ACCOUNT_KEY,
-  CRON_GET_API_MAP_STATUS,
-  MAX_COLLATERAL_AMOUNT,
-  PERMISSIONS_TO_REVOKE
-} from '@subwallet/extension-base/constants';
-import {
-  generateValidationProcess,
-  PayloadValidated,
-  validationAuthMiddleware
-} from '@subwallet/extension-base/core/logic-validation';
-import {PHISHING_PAGE_REDIRECT} from '@subwallet/extension-base/defaults';
+import { AccountAuthType, MessageTypes, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestTypes, ResponseRpcListProviders, ResponseSigning, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
+import { ALL_ACCOUNT_KEY, CRON_GET_API_MAP_STATUS, MAX_COLLATERAL_AMOUNT, PERMISSIONS_TO_REVOKE } from '@subwallet/extension-base/constants';
+import { generateValidationProcess, PayloadValidated, validationAuthMiddleware } from '@subwallet/extension-base/core/logic-validation';
+import { PHISHING_PAGE_REDIRECT } from '@subwallet/extension-base/defaults';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import {_CHAIN_VALIDATION_ERROR} from '@subwallet/extension-base/services/chain-service/handler/types';
-import {_NetworkUpsertParams} from '@subwallet/extension-base/services/chain-service/types';
-import {_generateCustomProviderKey} from '@subwallet/extension-base/services/chain-service/utils';
-import {hasSufficientCardanoValue} from '@subwallet/extension-base/services/request-service/helper';
-import {AuthUrlInfo, AuthUrls} from '@subwallet/extension-base/services/request-service/types';
-import {DEFAULT_CHAIN_PATROL_ENABLE} from '@subwallet/extension-base/services/setting-service/constants';
-import {convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl} from '@subwallet/extension-base/utils';
-import {
-  AllSubstrateKeypairTypes,
-  BitcoinKeypairTypes,
-  CardanoKeypairTypes,
-  EthereumKeypairTypes,
-  TonKeypairTypes
-} from '@subwallet/keyring/types';
-import {getBitcoinAddressInfo} from '@subwallet/keyring/utils';
-import {keyring} from '@subwallet/ui-keyring';
-import {SingleAddress, SubjectInfo} from '@subwallet/ui-keyring/observable/types';
-import {Subscription} from 'rxjs';
+import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
+import { _NetworkUpsertParams } from '@subwallet/extension-base/services/chain-service/types';
+import { _generateCustomProviderKey } from '@subwallet/extension-base/services/chain-service/utils';
+import { hasSufficientCardanoValue } from '@subwallet/extension-base/services/request-service/helper';
+import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/request-service/types';
+import { DEFAULT_CHAIN_PATROL_ENABLE } from '@subwallet/extension-base/services/setting-service/constants';
+import { convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
+import { InjectedMetadataKnown, MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
+import { AllSubstrateKeypairTypes, BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { getBitcoinAddressInfo } from '@subwallet/keyring/utils';
+import { keyring } from '@subwallet/ui-keyring';
+import { SingleAddress, SubjectInfo } from '@subwallet/ui-keyring/observable/types';
+import { Subscription } from 'rxjs';
 import Web3 from 'web3';
-import {HttpProvider, RequestArguments, WebsocketProvider} from 'web3-core';
-import {JsonRpcPayload} from 'web3-core-helpers';
+import { HttpProvider, RequestArguments, WebsocketProvider } from 'web3-core';
+import { JsonRpcPayload } from 'web3-core-helpers';
 
-import {checkIfDenied} from '@polkadot/phishing';
-import {JsonRpcResponse} from '@polkadot/rpc-provider/types';
-import {SignerPayloadJSON, SignerPayloadRaw} from '@polkadot/types/types';
-import {hexStripPrefix, isArray, isNumber, u8aToHex} from '@polkadot/util';
-import {isEthereumAddress} from '@polkadot/util-crypto';
+import { checkIfDenied } from '@polkadot/phishing';
+import { JsonRpcResponse } from '@polkadot/rpc-provider/types';
+import { SignerPayloadJSON, SignerPayloadRaw } from '@polkadot/types/types';
+import { hexStripPrefix, isArray, isNumber, u8aToHex } from '@polkadot/util';
+import { isEthereumAddress } from '@polkadot/util-crypto';
 
 interface AccountSub {
   subscription: Subscription;
@@ -168,13 +109,12 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
       type
     }));
 
-
   return injectedAccounts.map((acc) => {
     if (acc.type === 'ed25519-tw') {
       acc.type = 'ed25519';
     }
 
-    return acc
+    return acc;
   });
 }
 
@@ -424,7 +364,7 @@ export default class KoniTabs {
       }
     }
 
-    return transformAccountsV2(this.#koniState.keyringService.context.pairs, anyType, authInfo, accountAuthTypes, isSubstrateConnector)
+    return transformAccountsV2(this.#koniState.keyringService.context.pairs, anyType, authInfo, accountAuthTypes, isSubstrateConnector);
   }
 
   // TODO: Update logic
