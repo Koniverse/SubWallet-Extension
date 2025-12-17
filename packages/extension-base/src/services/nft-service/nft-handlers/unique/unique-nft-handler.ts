@@ -68,7 +68,6 @@ export class UniqueNftHandler extends BaseNftHandler {
 
       const nft = this.mapUniqueSdkToNftItem(raw, topmostOwner);
 
-      // Key mapping là địa chỉ Token của NFT đó
       index.set(nft.__tokenAddress, nft);
       allItems.push(nft);
     }
@@ -80,10 +79,9 @@ export class UniqueNftHandler extends BaseNftHandler {
       const parent = index.get(nft.__rawOwner);
 
       if (parent) {
-        // 1. Gán reference cha (nếu cần UI hiển thị breadcrumb)
-        // nft.parent = parent; // (Optional tùy interface NftItem của bạn)
+        // nft.parent = parent; // (Optional)
 
-        // 2. Tăng level
+        // 2. Increase level
         nft.nestingLevel = (parent.nestingLevel ?? 0) + 1;
 
         parent.nestingTokens = parent.nestingTokens || [];
@@ -121,8 +119,7 @@ export class UniqueNftHandler extends BaseNftHandler {
         // 3. Build Tree
         const { roots } = this.buildUniqueNftTree(sdkNfts, address);
 
-        // QUAN TRỌNG: Chỉ push roots vào kết quả trả về
-        // Output sẽ có dạng: [Root1 { nestingTokens: [Child1, Child2] }, Root2...]
+        // Output like this: [Root1 { nestingTokens: [Child1, Child2] }, Root2...]
         items.push(...roots);
       }));
     } catch (e) {

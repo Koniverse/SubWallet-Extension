@@ -35,7 +35,6 @@ export class EvmNftHandler extends BaseNftHandler {
     return addresses;
   }
 
-  // ==================== MAPPING HELPER (giữ nguyên từ code cũ) ====================
   private mapSdkToNftItem (
     rawInstance: BlockscoutNftInstanceRaw,
     collectionId: string,
@@ -119,7 +118,7 @@ export class EvmNftHandler extends BaseNftHandler {
     };
   }
 
-  // ==================== 1. PREVIEW – Dùng cho cron / background ====================
+  // ==================== 1. PREVIEW – Used for cron / background ====================
   async fetchPreview (addresses: string[]): Promise<NftHandlerResult> {
     const items: NftItem[] = [];
     const collections: NftCollection[] = [];
@@ -166,7 +165,7 @@ export class EvmNftHandler extends BaseNftHandler {
     };
   }
 
-  // ==================== 2. FULL – Dùng khi user vào collection ====================
+  // ==================== 2. FULL – At collection details screen ====================
   override async fetchFullListNftOfaCollection (request: NftFullListRequest): Promise<NftHandlerResult> {
     const items: NftItem[] = [];
     const collections: NftCollection[] = [];
@@ -201,8 +200,6 @@ export class EvmNftHandler extends BaseNftHandler {
           if (!Array.isArray(instances)) {
             continue;
           }
-
-          console.log('FOR TESTER (before)', instances);
 
           const mappedItems = instances.map((inst) =>
             this.mapSdkToNftItem(inst, contractAddress, eachOwner)

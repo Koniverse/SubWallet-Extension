@@ -41,7 +41,7 @@ export const NFT_HANDLER_REGISTRY: NftHandlerDescriptor[] = [
   {
     id: 'unique_network',
     supports: (chainInfo) => NFT_CHAIN_GROUPS_MIGRATED.unique_network[0].includes(chainInfo.slug),
-    supportFechFullList: true,
+    supportFechFullList: false,
     create: (chain) => new UniqueNftHandler(chain)
   }
   // {

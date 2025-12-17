@@ -177,7 +177,6 @@ export class NftService implements StoppableServiceInterface {
         return;
       }
 
-      console.log('[NftServiceV2] periodic nft refresh');
       this.refreshNftData().catch(console.error);
     };
 
@@ -244,15 +243,12 @@ export class NftService implements StoppableServiceInterface {
         return;
       }
 
-      // Bắt đầu loading
       this.nftStateSubject.next({ ...this.nftStateSubject.getValue(), isLoading: true });
 
       const result = await this.multiChainFetcher.fetch(addresses, activeChains);
 
-      // Persist vào DB – dùng đúng hàm hiện có
       await this.persistNftData(result);
 
-      // Emit state mới – chỉ next 1 lần
       this.nftStateSubject.next({
         nftData: {
           total: result.items.length,

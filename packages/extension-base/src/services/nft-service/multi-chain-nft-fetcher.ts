@@ -73,7 +73,7 @@ export class MultiChainNftFetcher {
 
     await Promise.all(tasks);
 
-    // DEDUPLICATE – BẮT BUỘC, nếu không NFT bị nhân 2-10 lần
+    // DEDUPLICATE
     const seenItemIds = new Set<string>();
     const seenCollectionKeys = new Set<string>();
     const uniqueItems: NftItem[] = [];
@@ -109,7 +109,7 @@ export class MultiChainNftFetcher {
     const handlers = this.getHandlersForChain(chainInfo.slug);
 
     for (const handler of handlers) {
-      // if (!handler.supportFechFullList) { => todo: improve cau hinh
+      // if (!handler.supportFechFullList) { => todo: improve config
       //   continue;
       // }
 
