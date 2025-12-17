@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.3.70
+Build date: Dec 11, 2025.
+
+Features & Updates:
+- Support OpenGov (Phase 1) (#4678)
+
+
 ## 1.3.69
 Build date: Dec 08, 2025.
 
