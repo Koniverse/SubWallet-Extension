@@ -6,7 +6,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _SubstrateAdapterSubscriptionArgs } from '@subwallet/extension-base/services/chain-service/types';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
-import { decodeCallData, DecodeCallDataResponse, DEFAULT_BLOCK_HASH, genMultisigKey, getCallData } from '@subwallet/extension-base/services/multisig-service/utils';
+import { decodeCallData, DecodeCallDataResponse, DEFAULT_BLOCK_HASH, getCallData } from '@subwallet/extension-base/services/multisig-service/utils';
 import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
 import { BehaviorSubject } from 'rxjs';
 
@@ -210,11 +210,10 @@ export class MultisigService implements StoppableServiceInterface {
         for (const account of multisigAccounts) {
           const multisigAddress = account.id;
           const reformatAddress = _reformatAddressWithChain(multisigAddress, chainInfo);
-          const key = genMultisigKey(chain, reformatAddress);
           const signers = account.accounts[0].signers as string[];
 
           const unsub = this.subscribePendingMultisigTxs(chain, reformatAddress, signers, (rs) => {
-            !cancel && this.updatePendingMultisigTxSubject(key, rs);
+            !cancel && this.updatePendingMultisigTxSubject(reformatAddress, chain, rs);
           });
 
           unsubList.push(unsub);
@@ -355,8 +354,11 @@ export class MultisigService implements StoppableServiceInterface {
   /**
    * Update multisig map and notify subscribers
    */
-  private updatePendingMultisigTxSubject (key: string, pendingTxs: PendingMultisigTx[]): void {
-    this.pendingMultisigTxMap[key] = pendingTxs;
+  private updatePendingMultisigTxSubject (address: string, chain: string, pendingTxs: PendingMultisigTx[]): void {
+    const existed = this.pendingMultisigTxMap[address] || [];
+    const filtered = existed.filter((item) => item.chain !== chain);
+
+    this.pendingMultisigTxMap[address] = [...filtered, ...pendingTxs];
     this.pendingMultisigTxSubject.next({ ...this.pendingMultisigTxMap });
 
     // Store to db
@@ -391,18 +393,10 @@ export class MultisigService implements StoppableServiceInterface {
   public getPendingTxsForMultisigAddress (request: RequestGetPendingTxs, chain?: string): PendingMultisigTx[] {
     // todo: wait multisig ready
     const multisigAddress = request.multisigAddress;
-    const pendingMultisigTxs: PendingMultisigTx[] = [];
+    const pendingMultisigTxs = this.pendingMultisigTxMap[multisigAddress] || [];
 
     if (chain) {
-      const key = genMultisigKey(chain, multisigAddress);
-
-      return this.pendingMultisigTxMap[key] || [];
-    }
-
-    for (const chain of MULTISIG_SUPPORTED_CHAINS) {
-      const key = genMultisigKey(chain, multisigAddress);
-
-      pendingMultisigTxs.push(...(this.pendingMultisigTxMap[key] || []));
+      return pendingMultisigTxs.filter((item) => item.chain === chain);
     }
 
     return pendingMultisigTxs;

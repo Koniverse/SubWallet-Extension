@@ -105,7 +105,3 @@ export function decodeCallData ({ api, callData }: DecodeCallDataRequest): Decod
 
   return undefined;
 }
-
-export function genMultisigKey (chainSlug: string, multisigAddress: string) {
-  return `${chainSlug}___${multisigAddress}`;
-}
