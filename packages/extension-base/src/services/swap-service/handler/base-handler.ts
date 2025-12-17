@@ -14,7 +14,18 @@ import { createXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance
 import { _isAcrossChainBridge, AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getTokenMinAmount, _isChainEvmCompatible, _isNativeToken, _isPureEvmChain, _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
+import {
+  _getAssetDecimals,
+  _getAssetOriginChain,
+  _getAssetSymbol,
+  _getChainNativeTokenSlug,
+  _getTokenMinAmount,
+  _isChainEvmCompatible,
+  _isNativeToken,
+  _isPureBitcoinChain,
+  _isPureEvmChain,
+  _isPureSubstrateChain
+} from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { DEFAULT_EXCESS_AMOUNT_WEIGHT, FEE_RATE_MULTIPLIER } from '@subwallet/extension-base/services/swap-service/utils';
 import { BaseSwapStepMetadata, BasicTxErrorType, GenSwapStepFuncV2, OptimalSwapPathParamsV2, RequestCrossChainTransfer, SwapStepType, TransferTxErrorType } from '@subwallet/extension-base/types';
@@ -28,6 +39,7 @@ import { t } from 'i18next';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { createAcrossBridgeExtrinsic } from '../../balance-service/transfer/xcm';
+import {isBitcoinAddress} from "@subwallet/keyring/utils/address/validate";
 
 export interface SwapBaseInterface {
   providerSlug: SwapProviderId;
@@ -445,7 +457,10 @@ export class SwapBaseHandler {
       const isEvmAddress = isEthereumAddress(recipient);
       const isEvmDestChain = _isChainEvmCompatible(swapToChain);
 
-      if (isEvmAddress !== isEvmDestChain) { // todo: update condition if support swap chain # EVM or Substrate
+      const isBtcAddress = isBitcoinAddress(recipient);
+      const isBtcDestChain = _isPureBitcoinChain(swapToChain);
+
+      if (isEvmAddress !== isEvmDestChain || isBtcAddress !== isBtcDestChain) { // todo: update condition if support swap chain # EVM or Substrate
         return [new TransactionError(SwapErrorType.INVALID_RECIPIENT)];
       }
     }

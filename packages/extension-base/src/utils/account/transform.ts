@@ -277,7 +277,8 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
         ];
       case AccountChainType.BITCOIN:
         return [
-          ...BASE_TRANSFER_ACTIONS
+          ...BASE_TRANSFER_ACTIONS,
+          ExtrinsicType.SWAP
         ];
     }
   } else if (signMode === AccountSignMode.QR) {
