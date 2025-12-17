@@ -57,7 +57,6 @@ export class MultisigService implements StoppableServiceInterface {
   startPromiseHandler: PromiseHandler<void> = createPromiseHandler();
   stopPromiseHandler: PromiseHandler<void> = createPromiseHandler();
 
-  private pendingMultisigTxMap: Record<string, PendingMultisigTx[]> = {};
   private readonly pendingMultisigTxSubject: BehaviorSubject<PendingMultisigTxMap> = new BehaviorSubject<PendingMultisigTxMap>({});
   private unsubscriber: VoidFunction | undefined;
   private subscribePromise: Promise<void> | undefined; // to check if the subscription logic is running
@@ -108,8 +107,6 @@ export class MultisigService implements StoppableServiceInterface {
 
   loadData () {
     // TODO: Load pending multisig txs from db if needed
-
-    this.pendingMultisigTxSubject.next(this.pendingMultisigTxMap);
   }
 
   async init (): Promise<void> {
@@ -150,9 +147,13 @@ export class MultisigService implements StoppableServiceInterface {
     // Handle account removal
     events.forEach((event) => {
       if (event.type === 'account.remove') {
-        const address = event.data[0] as string;
-
-        delete this.pendingMultisigTxMap[address]; // todo: recheck logic account.add and account.remove
+        // todo: recheck with real data account.add & account.remove
+        // const address = event.data[0] as string;
+        // const currentMap = this.pendingMultisigTxSubject.getValue();
+        //
+        // delete currentMap[address];
+        //
+        // this.pendingMultisigTxSubject.next(currentMap);
         needReload = true;
       }
     });
@@ -355,11 +356,14 @@ export class MultisigService implements StoppableServiceInterface {
    * Update multisig map and notify subscribers
    */
   private updatePendingMultisigTxSubject (address: string, chain: string, pendingTxs: PendingMultisigTx[]): void {
-    const existed = this.pendingMultisigTxMap[address] || [];
+    const currentMap = this.getPendingMultisigTxMap();
+    const existed = currentMap[address] || [];
     const filtered = existed.filter((item) => item.chain !== chain);
 
-    this.pendingMultisigTxMap[address] = [...filtered, ...pendingTxs];
-    this.pendingMultisigTxSubject.next({ ...this.pendingMultisigTxMap });
+    this.pendingMultisigTxSubject.next({
+      ...currentMap,
+      [address]: [...filtered, ...pendingTxs]
+    });
 
     // Store to db
     addLazy(
@@ -378,13 +382,13 @@ export class MultisigService implements StoppableServiceInterface {
     // TODO: implement db store logic
   }
 
-  public subscribePendingMultisigTx (): BehaviorSubject<PendingMultisigTxMap> {
+  public subscribePendingMultisigTxMap (): BehaviorSubject<PendingMultisigTxMap> {
     return this.pendingMultisigTxSubject;
   }
 
-  public getPendingMultisigTx (): PendingMultisigTxMap {
+  public getPendingMultisigTxMap (): PendingMultisigTxMap {
     // todo: wait multisig ready
-    return { ...this.pendingMultisigTxMap };
+    return { ...this.pendingMultisigTxSubject.getValue() };
   }
 
   /**
@@ -393,7 +397,8 @@ export class MultisigService implements StoppableServiceInterface {
   public getPendingTxsForMultisigAddress (request: RequestGetPendingTxs, chain?: string): PendingMultisigTx[] {
     // todo: wait multisig ready
     const multisigAddress = request.multisigAddress;
-    const pendingMultisigTxs = this.pendingMultisigTxMap[multisigAddress] || [];
+    const currentMap = this.getPendingMultisigTxMap();
+    const pendingMultisigTxs = currentMap[multisigAddress] || [];
 
     if (chain) {
       return pendingMultisigTxs.filter((item) => item.chain === chain);
@@ -406,7 +411,6 @@ export class MultisigService implements StoppableServiceInterface {
    * Reload all multisig data
    */
   public async reloadMultisigs (): Promise<void> {
-    this.pendingMultisigTxMap = {};
     this.pendingMultisigTxSubject.next({});
     await this.runSubscribePendingMultisigTxs();
   }

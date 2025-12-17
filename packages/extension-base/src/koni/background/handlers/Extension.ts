@@ -5354,7 +5354,7 @@ export default class KoniExtension {
     const cb = createSubscription<'pri(multisig.subscribePendingMultisigTxs)'>(id, port);
 
     await this.#koniState.multisigService.waitForStarted();
-    const pendingTxSubscription = this.#koniState.multisigService.subscribePendingMultisigTx().subscribe({
+    const pendingTxSubscription = this.#koniState.multisigService.subscribePendingMultisigTxMap().subscribe({
       next: (rs) => {
         cb(rs);
       }
@@ -5366,7 +5366,7 @@ export default class KoniExtension {
       this.cancelSubscription(id);
     });
 
-    return this.#koniState.multisigService.getPendingMultisigTx();
+    return this.#koniState.multisigService.getPendingMultisigTxMap();
   }
 
   /* Multisig Acocunt */
