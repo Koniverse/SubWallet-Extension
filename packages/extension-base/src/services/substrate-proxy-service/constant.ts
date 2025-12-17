@@ -15,7 +15,7 @@ const SUBSTRATE_PROXY_ACCOUNT_EXTRINSIC_GROUPS: Record<string, ExtrinsicType[]> 
   GOV: [
     ExtrinsicType.GOV_VOTE,
     ExtrinsicType.GOV_UNVOTE,
-    ExtrinsicType.GOV_UNVOTE
+    ExtrinsicType.GOV_UNLOCK_VOTE
   ],
   PROXY: [
     // only type any can add proxy

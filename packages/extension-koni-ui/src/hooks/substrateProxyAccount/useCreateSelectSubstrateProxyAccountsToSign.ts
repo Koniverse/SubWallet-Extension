@@ -52,7 +52,7 @@ export function useCreateSelectSubstrateProxyAccountsToSign (): SelectSubstrateP
       // Address is required to get proxy accounts
       // and chain must support proxy
 
-      if (!address || !chainInfo.substrateInfo?.supportProxy) {
+      if (!address || !chainInfo?.substrateInfo?.supportProxy) {
         return [];
       }
 
@@ -71,10 +71,6 @@ export function useCreateSelectSubstrateProxyAccountsToSign (): SelectSubstrateP
 
       // filter only valid accounts that can sign transactions
       const validAccounts = allAccounts.filter((acc) => {
-        if (_BALANCE_CHAIN_GROUP.moonbeam.includes(chain)) {
-          return acc.signMode !== AccountSignMode.READ_ONLY;
-        }
-
         return acc.chainType === AccountChainType.SUBSTRATE && acc.signMode !== AccountSignMode.READ_ONLY;
       });
 

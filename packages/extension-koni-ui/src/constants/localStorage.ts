@@ -47,4 +47,5 @@ export const UPGRADE_FIREFOX_VERSION = 'general.updated-version-firefox';
 export const UPGRADE_DUPLICATE_ACCOUNT_NAME = 'general.upgrade-duplicate-account-name';
 export const CURRENT_CHAIN_GOV = 'gov.current-chain-gov';
 export const ADDRESS_INPUT_AUTO_FORMAT_VALUE = 'component.address-input.auto-format-value'; // value: boolean
+// storage key to persist the currently selected chain in the account details screen's manage proxies tab
 export const CURRENT_CHAIN_SUBSTRATE_PROXY = 'substrateProxy.current-chain-management';
