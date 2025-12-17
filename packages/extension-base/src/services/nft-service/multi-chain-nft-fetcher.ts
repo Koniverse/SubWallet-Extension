@@ -3,7 +3,7 @@
 
 import { NftCollection, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { NFT_HANDLER_REGISTRY, NftHandlerDescriptor } from '@subwallet/extension-base/services/nft-service-v2/nft-handlers/registry';
+import { NFT_HANDLER_REGISTRY, NftHandlerDescriptor } from '@subwallet/extension-base/services/nft-service/nft-handlers/registry';
 
 import { BaseNftHandler, NftHandlerResult } from './nft-handlers/base-nft-handler';
 

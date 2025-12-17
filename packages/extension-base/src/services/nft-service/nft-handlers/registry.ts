@@ -5,9 +5,9 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { NFT_CHAIN_GROUPS_MIGRATED } from '@subwallet/extension-base/services/chain-service/constants';
 import { _isChainSupportEvmNft } from '@subwallet/extension-base/services/chain-service/utils';
-import { BaseNftHandler } from '@subwallet/extension-base/services/nft-service-v2/nft-handlers/base-nft-handler';
-import { EvmNftHandler } from '@subwallet/extension-base/services/nft-service-v2/nft-handlers/evm/evm-nft-handler';
-import { UniqueNftHandler } from '@subwallet/extension-base/services/nft-service-v2/nft-handlers/unique/unique-nft-handler';
+import { BaseNftHandler } from '@subwallet/extension-base/services/nft-service/nft-handlers/base-nft-handler';
+import { EvmNftHandler } from '@subwallet/extension-base/services/nft-service/nft-handlers/evm/evm-nft-handler';
+import { UniqueNftHandler } from '@subwallet/extension-base/services/nft-service/nft-handlers/unique/unique-nft-handler';
 
 export interface NftHandlerDescriptor {
   id: string;

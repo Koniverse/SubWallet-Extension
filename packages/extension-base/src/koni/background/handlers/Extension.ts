@@ -50,7 +50,7 @@ import { calculateToAmountByReservePool } from '@subwallet/extension-base/servic
 import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { ClaimPolygonBridgeNotificationMetadata, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
-import { isV2ChainSource, NFT_HANDLER_REGISTRY } from '@subwallet/extension-base/services/nft-service-v2/nft-handlers/registry';
+import { isV2ChainSource, NFT_HANDLER_REGISTRY } from '@subwallet/extension-base/services/nft-service/nft-handlers/registry';
 import { GovVoteRequest, RemoveVoteRequest, UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
@@ -1309,7 +1309,7 @@ export default class KoniExtension {
 
   private subscribeNftUnified () {
     const v1$ = this.#koniState.subscribeNft(); // Observable<NftJson>
-    const v2$ = this.#koniState.nftServiceV2.subscribeNftItem(); // Observable<NftState>
+    const v2$ = this.#koniState.nftService.subscribeNftItem(); // Observable<NftState>
 
     return combineLatest([v1$, v2$]).pipe(
       map(([v1, v2]) => {
@@ -1352,7 +1352,7 @@ export default class KoniExtension {
   }
 
   private async handleGetNftFullList (request: NftFullListRequest): Promise <boolean> {
-    return this.#koniState.nftServiceV2.fetchFullListNftOfaCollection(request);
+    return this.#koniState.nftService.fetchFullListNftOfaCollection(request);
   }
 
   private getStakingReward (): Promise<StakingRewardJson> {

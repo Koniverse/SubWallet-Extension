@@ -134,7 +134,6 @@ export class KoniCron {
       // NFT
       (commonReload || needUpdateNft) && this.resetNft(address);
       (commonReload || needUpdateNft) && this.removeCron('refreshNft');
-      (commonReload || needUpdateNft) && this.removeCron('detectNft');
       commonReload && this.removeCron('refreshPoolingStakingReward');
 
       if (mktCampaignNeedReload) {
@@ -151,9 +150,6 @@ export class KoniCron {
       // Chains
       if (this.checkNetworkAvailable(serviceInfo)) { // only add cron jobs if there's at least 1 active network
         (commonReload || needUpdateNft) && this.addCron('refreshNft', this.refreshNft(address, serviceInfo.chainApiMap, this.state.getSmartContractNfts(), this.state.getActiveChainInfoMap()), CRON_REFRESH_NFT_INTERVAL);
-
-        // (commonReload || needUpdateNft) && this.addCron('detectNft', this.detectEvmCollectionNft(address), CRON_NFT_DETECT_INTERVAL);
-
         reloadMantaPay && this.addCron('syncMantaPay', this.syncMantaPay, CRON_SYNC_MANTA_PAY);
       }
     };
@@ -171,8 +167,6 @@ export class KoniCron {
     if (Object.keys(this.state.getSubstrateApiMap()).length !== 0 || Object.keys(this.state.getEvmApiMap()).length !== 0) {
       this.resetNft(currentAccountInfo.proxyId);
       this.addCron('refreshNft', this.refreshNft(currentAccountInfo.proxyId, this.state.getApiMap(), this.state.getSmartContractNfts(), this.state.getActiveChainInfoMap()), CRON_REFRESH_NFT_INTERVAL);
-      // this.addCron('detectNft', this.detectEvmCollectionNft(currentAccountInfo.proxyId), CRON_NFT_DETECT_INTERVAL);
-      // this.addCron('refreshStakingReward', this.refreshStakingReward(currentAccountInfo.address), CRON_REFRESH_STAKING_REWARD_INTERVAL);
       this.addCron('syncMantaPay', this.syncMantaPay, CRON_SYNC_MANTA_PAY);
     }
 
@@ -235,32 +229,13 @@ export class KoniCron {
     return Object.keys(serviceInfo.chainApiMap.substrate).length > 0 || Object.keys(serviceInfo.chainApiMap.evm).length > 0;
   };
 
-  detectEvmCollectionNft = (address: string) => {
-    return () => {
-      let addresses: string[] = [];
-
-      addresses = this.state.keyringService.context.getDecodedAddresses();
-
-      if (!addresses.length) {
-        console.warn('[Cron] No decoded addresses found for ALL_ACCOUNT_KEY');
-
-        return;
-      }
-
-      this.state.nftDetectionService.fetchEvmCollectionsWithPreview(addresses)
-        .catch((err) => console.warn(`[Cron] NFT detection failed for ${address}:`, err));
-    };
-  };
-
   public async reloadNft () {
     const address = this.state.keyringService.context.currentAccount.proxyId;
     const serviceInfo = this.state.getServiceInfo();
 
     this.resetNft(address);
     this.removeCron('refreshNft');
-    this.removeCron('detectNft');
     this.addCron('refreshNft', this.refreshNft(address, serviceInfo.chainApiMap, this.state.getSmartContractNfts(), this.state.getActiveChainInfoMap()), CRON_REFRESH_NFT_INTERVAL);
-    // this.addCron('detectNft', this.detectEvmCollectionNft(address), CRON_NFT_DETECT_INTERVAL);
 
     await waitTimeout(1800);
 

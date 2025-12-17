@@ -1,249 +1,290 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _AssetType } from '@subwallet/chain-list/types';
-import { NftCollection, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import { NftCollection, NftFullListRequest, NftItem, NftJson } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { _getEvmChainId } from '@subwallet/extension-base/services/chain-service/utils';
-import { baseParseIPFSUrl } from '@subwallet/extension-base/utils';
-import { getKeypairTypeByAddress } from '@subwallet/keyring';
-import { EthereumKeypairTypes } from '@subwallet/keyring/types';
-import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
-import { BlockscoutNftInstanceRaw } from '@subwallet-monorepos/subwallet-services-sdk/services/blockscout/types';
+import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
+import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
+import { addLazy, createPromiseHandler, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
+import { BehaviorSubject } from 'rxjs';
 
-/**
- * NFT detection service
- * Responsible for managing NFT detection jobs per address
- */
+import { MultiChainNftFetcher } from './multi-chain-nft-fetcher';
 
-interface SdkToken {
-  address_hash: string;
-  name?: string | null;
-  symbol?: string | null;
-  type?: _AssetType.ERC721;
-  icon_url?: string | null;
+export interface NftState {
+  nftData: NftJson;
+  nftCollections: NftCollection[];
+  isLoading: boolean;
 }
 
-interface SdkCollection {
-  amount: string;
-  token: SdkToken;
-  token_instances: BlockscoutNftInstanceRaw[];
-}
+const INITIAL_NFT_STATE: NftState = {
+  nftData: { total: 0, nftList: [] },
+  nftCollections: [],
+  isLoading: false
+};
 
-type SdkCollectionsByChain = Record<string, SdkCollection[]>;
+export class NftService implements StoppableServiceInterface {
+  private readonly state: KoniState;
+  private readonly multiChainFetcher: MultiChainNftFetcher;
+  private _intervalFetchNft: NodeJS.Timer | undefined;
+  private readonly NFT_INTERVAL_TIME = 2 * 60 * 60 * 1000; // 2 hours
 
-function mapSdkToNftItem (
-  rawInstance: BlockscoutNftInstanceRaw,
-  chain: string,
-  collectionId: string,
-  owner: string
-): NftItem | null {
-  const metadata = rawInstance.metadata || {};
+  private readonly nftStateSubject = new BehaviorSubject<NftState>(INITIAL_NFT_STATE);
+  public readonly nftState$ = this.nftStateSubject.asObservable();
+  private isReloading = false;
 
-  const image = metadata.image || rawInstance.image_url || rawInstance.media_url || '';
+  startPromiseHandler: PromiseHandler<void> = createPromiseHandler();
+  stopPromiseHandler: PromiseHandler<void> = createPromiseHandler();
+  status: ServiceStatus = ServiceStatus.NOT_INITIALIZED;
 
-  const attributes = Array.isArray(metadata.attributes) ? metadata.attributes : [];
-
-  let rarity: string | undefined;
-  const properties: Record<string, string | number | boolean | null> = {};
-
-  for (const attr of attributes) {
-    try {
-      const key = attr.trait_type?.trim();
-
-      if (!key) {
-        continue;
-      }
-
-      let value = attr.value as unknown as string | number | boolean | null;
-
-      if (typeof value === 'string') {
-        const lower = value.toLowerCase();
-
-        if (lower === 'true') {
-          value = true;
-        } else if (lower === 'false') {
-          value = false;
-        }
-      }
-
-      properties[key] = value;
-
-      if (key.toLowerCase() === 'rarity') {
-        rarity = String(value);
-      }
-    } catch {
-    }
+  get isStarted (): boolean {
+    return this.status === ServiceStatus.STARTED;
   }
-
-  const hasProperties = Object.keys(properties).length > 0;
-  const normalizedType = rawInstance.token_type?.replace('-', '')?.toUpperCase();
-
-  // Only support ERC721
-  if (normalizedType !== 'ERC721') {
-    return null;
-  }
-
-  return {
-    id: rawInstance.id?.toString(),
-    chain,
-    collectionId,
-    owner: rawInstance.owner || owner,
-
-    originAsset: undefined,
-    name: metadata.name || `#${rawInstance.id}`,
-    image: baseParseIPFSUrl(image),
-    externalUrl: rawInstance.external_app_url || undefined,
-    rarity,
-    description: metadata.description || undefined,
-    properties: hasProperties ? properties : null,
-
-    type: normalizedType === 'ERC721' ? _AssetType.ERC721 : _AssetType.ERC721, // currently only support ERC721
-    rmrk_ver: undefined,
-    onChainOption: undefined,
-    assetHubType: undefined
-  };
-}
-
-function mapSdkToCollection (raw: SdkCollection, chain: string): NftCollection {
-  const token = raw.token || {};
-
-  return {
-    // must-have
-    collectionId: token.address_hash,
-    chain,
-    originAsset: undefined,
-
-    // optional
-    collectionName: token.name || token.symbol || 'Unknown Collection',
-    image: token.icon_url || undefined,
-    itemCount: Number(raw.amount) || raw.token_instances?.length || 0,
-    externalUrl: undefined
-  };
-}
-
-export default class NftService {
-  private inProgress = new Set<string>();
-  private state: KoniState;
 
   constructor (state: KoniState) {
     this.state = state;
+    this.multiChainFetcher = new MultiChainNftFetcher(state);
   }
 
-  async fetchEvmCollectionsWithPreview (addresses: string[]) {
-    for (const address of addresses) {
-      const type = getKeypairTypeByAddress(address);
-      const typeValid = [...EthereumKeypairTypes].includes(type);
+  async init (): Promise<void> {
+    this.status = ServiceStatus.INITIALIZING;
 
-      if (typeValid) {
-        if (this.inProgress.has(address)) {
-          console.log(`[NftService] ${address} already running`);
+    await this.state.eventService.waitKeyringReady;
+    await this.state.eventService.waitChainReady;
 
-          continue;
+    await this.loadCachedData();
+
+    this.status = ServiceStatus.INITIALIZED;
+
+    this.state.eventService.onLazy(this.handleEvents.bind(this));
+  }
+
+  private async loadCachedData () {
+    const [nftData, collections] = await Promise.all([
+      this.state.getNft(),
+      this.state.getNftCollection()
+    ]);
+
+    this.nftStateSubject.next({
+      nftData: nftData || { total: 0, nftList: [] },
+      nftCollections: collections || [],
+      isLoading: false
+    });
+  }
+
+  async start (): Promise<void> {
+    if (this.status === ServiceStatus.STOPPING) {
+      await this.waitForStopped();
+    }
+
+    if (this.isStarted || this.status === ServiceStatus.STARTING) {
+      return this.waitForStarted();
+    }
+
+    this.status = ServiceStatus.STARTING;
+
+    await this.refreshNftData();
+
+    this.status = ServiceStatus.STARTED;
+    this.startPromiseHandler.resolve();
+    this.startScanNft();
+  }
+
+  async stop (): Promise<void> {
+    if (this.status === ServiceStatus.STARTING) {
+      await this.waitForStarted();
+    }
+
+    if (this.status === ServiceStatus.STOPPED || this.status === ServiceStatus.STOPPING) {
+      return this.waitForStopped();
+    }
+
+    this.status = ServiceStatus.STOPPING;
+
+    this.stopScanNft();
+    this.stopPromiseHandler.resolve();
+  }
+
+  waitForStarted (): Promise<void> {
+    return this.startPromiseHandler.promise;
+  }
+
+  waitForStopped (): Promise<void> {
+    return this.stopPromiseHandler.promise;
+  }
+
+  private handleEvents (events: EventItem<EventType>[], eventTypes: EventType[]) {
+    let needReload = false;
+    let lazyTime = 2000;
+
+    if (
+      eventTypes.includes('account.updateCurrent') ||
+      eventTypes.includes('account.add') ||
+      eventTypes.includes('account.remove') ||
+      eventTypes.includes('chain.add') ||
+      eventTypes.includes('asset.updateState')
+    ) {
+      needReload = true;
+      lazyTime = 1000;
+    }
+
+    // if (eventTypes.includes('chain.updateState')) {
+    //   needReload = true;
+    //   lazyTime = 300;
+    // }
+
+    // TODO: Need recheck to improve
+    // if (eventTypes.includes('transaction.transferNft')) {
+    //   needReload = true;
+    //   lazyTime = 300;
+    // }
+
+    if (needReload) {
+      addLazy('nft.refresh', () => {
+        if (!this.isReloading && this.isStarted) {
+          this.refreshNftData().catch(console.error);
         }
-
-        this.inProgress.add(address);
-
-        try {
-          const nftDetectionApi = subwalletApiSdk.nftDetectionApi;
-
-          if (!nftDetectionApi?.getEvmNftCollectionsByAddress) {
-            console.warn('[NftService] NftDetectionApi not available');
-
-            continue;
-          }
-
-          const rawData: SdkCollectionsByChain = await nftDetectionApi.getEvmNftCollectionsByAddress(address);
-
-          const allItems: NftItem[] = [];
-          const allCollections: NftCollection[] = [];
-
-          for (const [chain, collections] of Object.entries(rawData)) {
-            if (!Array.isArray(collections)) {
-              continue;
-            }
-
-            for (const col of collections) {
-              const mappedCollection = mapSdkToCollection(col, chain);
-
-              allCollections.push(mappedCollection);
-
-              if (Array.isArray(col.token_instances)) {
-                const items = col.token_instances.map((inst) =>
-                  mapSdkToNftItem(inst, chain, mappedCollection.collectionId, address)
-                ).filter((i): i is NftItem => Boolean(i));
-
-                allItems.push(...items);
-              }
-            }
-          }
-
-          await this.state.handleDetectedNftCollections(allCollections);
-          await this.state.handleDetectedNfts(address, allItems);
-        } catch (err) {
-          console.warn(`[NftService] detect error for ${address}`, err);
-        } finally {
-          this.inProgress.delete(address);
-        }
-      }
+      }, lazyTime, undefined, true);
     }
   }
 
-  async getFullNftInstancesByCollection (request: NftFullListRequest): Promise<boolean> {
-    const { chainInfo, contractAddress, owners } = request;
-    const chainId = _getEvmChainId(chainInfo);
-
-    if (!contractAddress || !owners || !chainId) {
-      console.warn('[NftService] missing params for getFullNftInstancesByCollection');
-
+  public async fetchFullListNftOfaCollection (request: NftFullListRequest): Promise<boolean> {
+    if (this.isReloading) {
       return false;
     }
 
     try {
-      const nftDetectionApi = subwalletApiSdk.nftDetectionApi;
+      const result = await this.multiChainFetcher.fetchFullListNftOfaCollection(request);
 
-      if (!nftDetectionApi?.getAllNftInstances) {
-        console.warn('[NftService] getAllNftInstances not available');
-
-        return false;
-      }
-
-      const ownerList = Array.isArray(owners) ? owners : [owners];
-
-      for (const eachOwner of ownerList) {
-        try {
-          const instances = await nftDetectionApi.getAllNftInstances(
-            contractAddress,
-            eachOwner,
-            chainId.toString()
-          );
-
-          if (!Array.isArray(instances)) {
-            continue;
-          }
-
-          console.log('FOR TESTER (before)', instances);
-
-          const nftList = instances.map((inst) =>
-            mapSdkToNftItem(inst, chainInfo.slug, contractAddress, eachOwner)
-          ).filter((i): i is NftItem => Boolean(i));
-
-          console.log('FOR TESTER (after)', nftList);
-
-          await this.state.handleDetectedNfts(eachOwner, nftList);
-        } catch (innerErr) {
-          console.warn(`[NftService] getAllNftInstances failed for ${eachOwner}`, innerErr);
-        }
-      }
+      // Persist DB
+      await this.persistNftData({
+        items: result.items,
+        collections: result.collections
+      });
 
       return true;
-    } catch (err) {
-      console.error(
-        `[NftDetectionService] getFullNftInstancesByCollection error for ${contractAddress}`,
-        err
-      );
+    } catch (e) {
+      console.error('[NftServiceV2] fetchFullListNftOfaCollection failed', e);
 
       return false;
     }
+  }
+
+  private startScanNft () {
+    this.stopScanNft();
+
+    const scanNft = () => {
+      if (!this.isStarted || this.isReloading) {
+        return;
+      }
+
+      console.log('[NftServiceV2] periodic nft refresh');
+      this.refreshNftData().catch(console.error);
+    };
+
+    this._intervalFetchNft = setInterval(scanNft, this.NFT_INTERVAL_TIME);
+  }
+
+  private stopScanNft () {
+    this._intervalFetchNft && clearInterval(this._intervalFetchNft);
+    this._intervalFetchNft = undefined;
+  }
+
+  private async persistNftData (result: { items: NftItem[]; collections: NftCollection[] }) {
+    const addresses = this.state.keyringService.context.getDecodedAddresses();
+    const activeChainSlugs = Object.keys(this.state.getActiveChainInfoMap());
+
+    try {
+      // === 1. Persist NFT Items
+      const currentItems = await this.state.dbService.getNft(addresses, activeChainSlugs);
+
+      const currentItemIds = new Set(currentItems.map((i) => i.id));
+      const newItems = result.items.filter((item) => !currentItemIds.has(item.id));
+
+      console.log('newItems', newItems);
+      console.log('currentItems', currentItems);
+
+      for (const item of newItems) {
+        this.state.updateNftData(item.chain, item, addresses[0]);
+      }
+
+      // === 2. Persist NFT Collections
+      const currentCollections = await this.state.getNftCollection();
+
+      const currentCollectionKeys = new Set(
+        currentCollections.map((c) => `${c.chain}:${c.collectionId}`)
+      );
+
+      const newCollections = result.collections.filter((col) =>
+        !currentCollectionKeys.has(`${col.chain}:${col.collectionId}`)
+      );
+
+      for (const col of newCollections) {
+        this.state.setNftCollection(col.chain, col);
+      }
+    } catch (error) {
+      console.error('[NftServiceV2] Persist failed:', error);
+    }
+  }
+
+  /** Core refresh logic – chỉ gọi đúng 1 hàm fetch */
+  private async refreshNftData (): Promise<void> {
+    if (this.isReloading) {
+      return;
+    }
+
+    this.isReloading = true;
+
+    try {
+      const addresses = this.state.keyringService.context.getDecodedAddresses();
+      const activeChains = Object.keys(this.state.getActiveChainInfoMap());
+
+      if (addresses.length === 0 || activeChains.length === 0) {
+        this.nftStateSubject.next(INITIAL_NFT_STATE);
+
+        return;
+      }
+
+      // Bắt đầu loading
+      this.nftStateSubject.next({ ...this.nftStateSubject.getValue(), isLoading: true });
+
+      const result = await this.multiChainFetcher.fetch(addresses, activeChains);
+
+      // Persist vào DB – dùng đúng hàm hiện có
+      await this.persistNftData(result);
+
+      // Emit state mới – chỉ next 1 lần
+      this.nftStateSubject.next({
+        nftData: {
+          total: result.items.length,
+          nftList: result.items
+        },
+        nftCollections: result.collections,
+        isLoading: false
+      });
+    } catch (error) {
+      console.error('[NftService] Refresh failed:', error);
+      this.nftStateSubject.next({ ...this.nftStateSubject.getValue(), isLoading: false });
+    } finally {
+      this.isReloading = false;
+    }
+  }
+
+  /** Subscribe NFT state */
+  public subscribeNftItem () {
+    return this.nftState$;
+  }
+
+  public subscribeNftCollection () {
+    const getChains = () => this.state.activeChainSlugs;
+
+    return this.state.dbService.stores.nftCollection.subscribeNftCollection(getChains);
+  }
+
+  // TODO: Move NFT reset logic to this function after migration is complete
+  public async forceReload () {
+    this.isReloading = true;
+    await waitTimeout(1800);
+    this.isReloading = false;
+    await this.refreshNftData().catch(console.error);
   }
 }

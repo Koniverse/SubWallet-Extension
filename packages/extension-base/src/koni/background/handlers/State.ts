@@ -32,8 +32,7 @@ import { KeyringService } from '@subwallet/extension-base/services/keyring-servi
 import MigrationService from '@subwallet/extension-base/services/migration-service';
 import MintCampaignService from '@subwallet/extension-base/services/mint-campaign-service';
 import MktCampaignService from '@subwallet/extension-base/services/mkt-campaign-service';
-import NftService from '@subwallet/extension-base/services/nft-service';
-import { NftServiceV2 } from '@subwallet/extension-base/services/nft-service-v2';
+import { NftService } from '@subwallet/extension-base/services/nft-service';
 import NotificationService from '@subwallet/extension-base/services/notification-service/NotificationService';
 import OpenGovService from '@subwallet/extension-base/services/open-gov';
 import { PriceService } from '@subwallet/extension-base/services/price-service';
@@ -143,8 +142,7 @@ export default class KoniState {
   readonly mintCampaignService: MintCampaignService;
   readonly campaignService: CampaignService;
   readonly mktCampaignService: MktCampaignService;
-  readonly nftDetectionService: NftService;
-  readonly nftServiceV2: NftServiceV2;
+  readonly nftService: NftService;
   readonly buyService: BuyService;
   readonly earningService: EarningService;
   readonly feeService: FeeService;
@@ -178,7 +176,7 @@ export default class KoniState {
     this.requestService = new RequestService(this.chainService, this.settingService, this.keyringService, this.transactionService);
     this.priceService = new PriceService(this.dbService, this.eventService, this.chainService);
     this.balanceService = new BalanceService(this);
-    this.nftServiceV2 = new NftServiceV2(this);
+    this.nftService = new NftService(this);
     this.historyService = new HistoryService(this.dbService, this.chainService, this.eventService, this.keyringService, this.subscanService);
     this.mintCampaignService = new MintCampaignService(this);
     this.walletConnectService = new WalletConnectService(this, this.requestService);
@@ -186,7 +184,6 @@ export default class KoniState {
 
     this.campaignService = new CampaignService(this);
     this.mktCampaignService = new MktCampaignService(this);
-    this.nftDetectionService = new NftService(this);
     this.buyService = new BuyService(this);
     this.earningService = new EarningService(this);
     this.swapService = new SwapService(this);
@@ -318,7 +315,7 @@ export default class KoniState {
     this.eventService.emit('chain.ready', true);
 
     await this.balanceService.init();
-    await this.nftServiceV2.init();
+    await this.nftService.init();
     await this.earningService.init();
     await this.swapService.init();
     await this.inappNotificationService.init();
@@ -2035,7 +2032,7 @@ export default class KoniState {
     this.campaignService.stop();
     await Promise.all([this.cron.stop(), this.subscription.stop()]);
     await this.pauseAllNetworks(undefined, 'IDLE mode');
-    await Promise.all([this.historyService.stop(), this.priceService.stop(), this.balanceService.stop(), this.nftServiceV2.stop(), this.earningService.stop(), this.swapService.stop(), this.inappNotificationService.stop(), this.openGovService.stop()]);
+    await Promise.all([this.historyService.stop(), this.priceService.stop(), this.balanceService.stop(), this.nftService.stop(), this.earningService.stop(), this.swapService.stop(), this.inappNotificationService.stop(), this.openGovService.stop()]);
 
     // Complete sleeping
     sleeping.resolve();
@@ -2099,7 +2096,7 @@ export default class KoniState {
 
     this.waitStartingFull = startingFull.promise;
 
-    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.nftServiceV2.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start(), this.openGovService.start()]);
+    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.nftService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start(), this.openGovService.start()]);
     this.eventService.emit('general.start_full', true);
 
     this.waitStartingFull = null;
@@ -2193,7 +2190,7 @@ export default class KoniState {
     // await this.dbService.removeNftsByAddress(currentAddress);
     //
     // return await this.cron.reloadNft();
-    await this.nftServiceV2.forceReload();
+    await this.nftService.forceReload();
   }
 
   public async reloadStaking () {
