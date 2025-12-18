@@ -35,7 +35,7 @@
     "@polkadot/util-crypto": "^13.5.3",
     "@ramonak/react-progress-bar": "^5.0.3",
     "@reduxjs/toolkit": "^1.9.1",
-    "@subwallet/chain-list": "0.2.123-beta.0-pr-612-cc6870af",
+    "@subwallet/chain-list": "0.2.123-beta.5-pr-612-83ea51f0",
     "@subwallet/extension-base": "^1.3.70-2",
     "@subwallet/extension-chains": "^1.3.70-2",
     "@subwallet/extension-dapp": "^1.3.70-2",

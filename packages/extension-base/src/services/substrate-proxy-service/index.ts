@@ -42,10 +42,10 @@ export default class SubstrateProxyAccountService {
     const factorDeposit = substrateApi.api.consts.proxy.proxyDepositFactor?.toString() || '0';
     const deposit = new BigN(baseDeposit).plus(factorDeposit);
 
-    const [substrateProxyAccounts_, currentSubstrateProxyDeposit] = result.toPrimitive() as [PrimitiveSubstrateProxyAccountItem[], string];
+    const [_substrateProxyAccounts, currentSubstrateProxyDeposit] = result.toPrimitive() as [PrimitiveSubstrateProxyAccountItem[], string];
 
     // Mapping on-chain data to our defined type
-    let substrateProxyAccounts: SubstrateProxyAccountItem[] = (substrateProxyAccounts_ || []).map((account) => {
+    let substrateProxyAccounts: SubstrateProxyAccountItem[] = (_substrateProxyAccounts || []).map((account) => {
       const proxyId = this.state.keyringService.context.belongUnifiedAccount(account.delegate) || reformatAddress(account.delegate);
 
       return {

@@ -584,7 +584,7 @@ export enum ExtrinsicType {
   // OPEN GOV
   GOV_VOTE = 'gov.vote',
   GOV_UNVOTE= 'gov.unvote',
-  GOV_UNLOCK_VOTE='gov.unlock-vote',
+  GOV_UNLOCK_VOTE='gov.unlock_vote',
 
   EVM_EXECUTE = 'evm.execute',
 
