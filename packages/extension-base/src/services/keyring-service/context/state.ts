@@ -19,7 +19,7 @@ import { BehaviorSubject, combineLatest, filter, first } from 'rxjs';
 interface ExistsAccount {
   address: string;
   name: string;
-  relatedToUnifiedAccountTypes?: KeypairType[];
+  relatedAccountTypes: KeypairType[];
 }
 
 export class AccountState {
@@ -324,12 +324,13 @@ export class AccountState {
             return {
               address,
               name: accountProxy.name,
-              relatedToUnifiedAccountTypes: allAccountTypes
+              relatedAccountTypes: allAccountTypes
             };
           } else {
             return {
               address,
-              name: pair.meta?.name as string || address
+              name: pair.meta?.name as string || address,
+              relatedAccountTypes: [pair.type]
             };
           }
         }

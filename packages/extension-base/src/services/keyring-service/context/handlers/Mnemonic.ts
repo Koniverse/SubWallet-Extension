@@ -82,10 +82,20 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
       rs.addressMap[type] = keyring.createFromUri(getSuri(mnemonic, type), {}, type).address;
     });
 
-    const exists = this.state.checkAddressExists(Object.values(rs.addressMap)); // todo: discuss more about import trust seed and import normal seed make duplicate account
+    const validatedAddresses: string[] = Object.values(rs.addressMap);
 
-    const isExistNormalSeed = exists?.relatedToUnifiedAccountTypes?.includes('sr25519');
-    const isExistTrustSeed = exists?.relatedToUnifiedAccountTypes?.includes('ed25519-tw');
+    if (pairTypes.includes('sr25519')) {
+      validatedAddresses.push(keyring.createFromUri(getSuri(mnemonic, 'ed25519-tw')).address);
+    }
+
+    if (pairTypes.includes('ed25519-tw')) {
+      validatedAddresses.push(keyring.createFromUri(getSuri(mnemonic, 'sr25519')).address);
+    }
+
+    const exists = this.state.checkAddressExists(validatedAddresses);
+
+    const isExistNormalSeed = exists?.relatedAccountTypes?.includes('sr25519');
+    const isExistTrustSeed = exists?.relatedAccountTypes?.includes('ed25519-tw');
 
     if (mnemonicTypes === 'trust-wallet' || mnemonicTypes === 'general') {
       assert(!isExistNormalSeed, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsViaImportType', { replace: { type: 'Import from seed phrase', name: exists?.name || exists?.address || '' } }));
