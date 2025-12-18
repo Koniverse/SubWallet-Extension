@@ -20,7 +20,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { BitcoinSignArea, EvmSignArea, SubstrateSignArea } from '../../parts/Sign';
-import { BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ChangeBittensorRootClaimRewardTypeTransactionConfirmation, ChangeEarningValidatorTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
+import { BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ChangeBittensorRootClaimRewardTypeTransactionConfirmation, ChangeEarningValidatorTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, GovUnlockTransactionConfirmation, GovUnvoteTransactionConfirmation, GovVoteTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
 
 interface Props extends ThemeProps {
   confirmation: ConfirmationQueueItem;
@@ -83,6 +83,12 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
       return SwapTransactionConfirmation;
     case ExtrinsicType.CLAIM_BRIDGE:
       return ClaimBridgeTransactionConfirmation;
+    case ExtrinsicType.GOV_VOTE:
+      return GovVoteTransactionConfirmation;
+    case ExtrinsicType.GOV_UNVOTE:
+      return GovUnvoteTransactionConfirmation;
+    case ExtrinsicType.GOV_UNLOCK_VOTE:
+      return GovUnlockTransactionConfirmation;
     case ExtrinsicType.CROWDLOAN:
     case ExtrinsicType.STAKING_CANCEL_COMPOUNDING:
     case ExtrinsicType.STAKING_COMPOUNDING:
@@ -176,7 +182,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <div className={CN(className, 'confirmation-content')}>
+      <div className={CN(className, 'confirmation-content', {
+        '-no-margin-top': [ExtrinsicType.GOV_VOTE, ExtrinsicType.GOV_UNVOTE].includes(transaction.extrinsicType)
+      })}
+      >
         {renderContent(transaction)}
         {isAddressFormatInfoBoxVisible && (
           <AlertBoxInstant
@@ -264,6 +273,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
 const TransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
+    '&.-no-margin-top': {
+      marginTop: 0
+    },
+
     '--content-gap': 0,
     marginTop: token.marginXS,
 

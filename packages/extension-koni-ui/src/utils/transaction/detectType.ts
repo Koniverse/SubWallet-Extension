@@ -16,7 +16,8 @@ export const isTypeStaking = (txType: ExtrinsicType) => [
   ExtrinsicType.STAKING_UNBOND,
   ExtrinsicType.STAKING_WITHDRAW,
   ExtrinsicType.STAKING_COMPOUNDING,
-  ExtrinsicType.STAKING_CANCEL_UNSTAKE
+  ExtrinsicType.STAKING_CANCEL_UNSTAKE,
+  ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE
 ].includes(txType);
 
 export const isTypeMint = (txType: ExtrinsicType) =>
@@ -44,3 +45,9 @@ export const isPoolLeave = (txType: ExtrinsicType) =>
     ExtrinsicType.UNSTAKE_VDOT,
     ExtrinsicType.UNSTAKE_VMANTA
   ].includes(txType);
+
+export const isTypeGov = (txType: ExtrinsicType) => [
+  ExtrinsicType.GOV_VOTE,
+  ExtrinsicType.GOV_UNVOTE,
+  ExtrinsicType.GOV_UNLOCK_VOTE
+].includes(txType);

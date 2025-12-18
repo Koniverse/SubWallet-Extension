@@ -75,6 +75,27 @@ export interface ClaimBridgeParams extends TransactionFormBaseProps {
   notificationId: string;
 }
 
+export interface GovReferendumVoteParams extends TransactionFormBaseProps {
+  amount?: string;
+  abstainAmount?: string;
+  ayeAmount?: string;
+  nayAmount?: string;
+  conviction: number;
+  referendumId: string;
+  track: number;
+}
+
+export interface GovReferendumUnvoteParams extends TransactionFormBaseProps {
+  referendumId: string;
+  track: number;
+}
+
+export interface GovUnlockVoteParams extends TransactionFormBaseProps {
+  amount: string;
+  referendumIds?: string[];
+  tracks: number[];
+}
+
 export interface ChangeBittensorRootClaimType extends TransactionFormBaseProps {
   bittensorRootClaimType: string;
 }

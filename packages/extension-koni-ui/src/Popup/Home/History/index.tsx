@@ -11,9 +11,9 @@ import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/extension-koni-ui/messaging';
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
-import { customFormatDate, formatHistoryDate, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
+import { customFormatDate, formatHistoryDate, isTypeGov, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
-import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, Pencil, Rocket, Spinner } from 'phosphor-react';
+import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, NewspaperClipping, Pencil, Rocket, Spinner } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -34,7 +34,8 @@ const IconMap: Record<string, SwIconProps['phosphorIcon']> = {
   default: ClockCounterClockwise,
   timeout: ClockCounterClockwise,
   swap: ArrowsLeftRight,
-  nominate: Pencil
+  nominate: Pencil,
+  gov: NewspaperClipping
 };
 
 function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
@@ -68,6 +69,10 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
 
   if (isTypeStaking(item.type)) {
     return IconMap.staking;
+  }
+
+  if (isTypeGov(item.type)) {
+    return IconMap.gov;
   }
 
   return IconMap.default;
@@ -331,6 +336,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('ui.HISTORY.screen.History.tokenApprove'),
     [ExtrinsicType.SWAP]: t('ui.HISTORY.screen.History.swap'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('ui.HISTORY.screen.History.claimToken'),
+    [ExtrinsicType.GOV_VOTE]: t('ui.HISTORY.screen.History.vote'),
+    [ExtrinsicType.GOV_UNVOTE]: t('ui.HISTORY.screen.History.unvote'),
+    [ExtrinsicType.GOV_UNLOCK_VOTE]: t('ui.HISTORY.screen.History.unlockVotes'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknown')
   }), [t]);
 
@@ -378,6 +386,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('ui.HISTORY.screen.History.tokenApproveTransaction'),
     [ExtrinsicType.SWAP]: t('ui.HISTORY.screen.History.swapTransaction'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('ui.HISTORY.screen.History.claimTokenTransaction'),
+    [ExtrinsicType.GOV_VOTE]: t('ui.HISTORY.screen.History.voteTransaction'),
+    [ExtrinsicType.GOV_UNVOTE]: t('ui.HISTORY.screen.History.unvoteTransaction'),
+    [ExtrinsicType.GOV_UNLOCK_VOTE]: t('ui.HISTORY.screen.History.unlockVotesTransaction'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknownTransaction')
   }), [t]);
 

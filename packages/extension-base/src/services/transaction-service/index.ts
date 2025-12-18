@@ -43,6 +43,8 @@ import { SignerPayloadJSON } from '@polkadot/types/types/extrinsic';
 import { hexToU8a, isHex } from '@polkadot/util';
 import { HexString } from '@polkadot/util/types';
 
+import { GovVoteType } from '../open-gov/interface';
+
 export default class TransactionService {
   private readonly state: KoniState;
 
@@ -1111,6 +1113,54 @@ export default class TransactionService {
         historyItem.amount = { value: metadata.amount, symbol: _getAssetSymbol(claimAsset), decimals: _getAssetDecimals(claimAsset) };
         historyItem.additionalInfo = data;
 
+        break;
+      }
+
+      case ExtrinsicType.GOV_VOTE: {
+        const data = parseTransactionData<ExtrinsicType.GOV_VOTE>(transaction.data);
+        let totalAmount = new BigN(0);
+
+        switch (data.type) {
+          case GovVoteType.AYE:
+          case GovVoteType.NAY:
+            totalAmount = new BigN(data.amount || '0');
+            break;
+
+          case GovVoteType.SPLIT:
+            totalAmount = new BigN(data.ayeAmount || '0').plus(data.nayAmount || '0');
+            break;
+
+          case GovVoteType.ABSTAIN:
+            totalAmount = new BigN(data.ayeAmount || '0')
+              .plus(data.nayAmount || '0')
+              .plus(data.abstainAmount || '0');
+            break;
+        }
+
+        historyItem.amount = { ...baseNativeAmount, value: totalAmount.toString() };
+        historyItem.additionalInfo = data;
+
+        break;
+      }
+
+      case ExtrinsicType.GOV_UNVOTE: {
+        const data = parseTransactionData<ExtrinsicType.GOV_UNVOTE>(transaction.data);
+
+        historyItem.amount = { ...baseNativeAmount,
+          value: new BigN(data.ayeAmount || '0')
+            .plus(data.nayAmount || '0')
+            .plus(data.abstainAmount || '0')
+            .plus(data.amount || 0).toString() };
+
+        historyItem.additionalInfo = data;
+
+        break;
+      }
+
+      case ExtrinsicType.GOV_UNLOCK_VOTE: {
+        const data = parseTransactionData<ExtrinsicType.GOV_UNLOCK_VOTE>(transaction.data);
+
+        historyItem.amount = { ...baseNativeAmount, value: data.amount };
         break;
       }
 

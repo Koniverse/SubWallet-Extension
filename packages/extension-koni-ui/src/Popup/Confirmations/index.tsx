@@ -4,6 +4,7 @@
 import { ConfirmationDefinitions, ConfirmationDefinitionsBitcoin, ConfirmationDefinitionsCardano, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { GovVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { AccountJson, AccountSignMode, ProcessType, SubmitBittensorChangeValidatorStaking } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
@@ -380,6 +381,12 @@ const Component = function ({ className }: Props) {
           return t('ui.Confirmations.swapConfirmation');
         case ExtrinsicType.CLAIM_BRIDGE:
           return t('ui.Confirmations.claimConfirmation');
+        case ExtrinsicType.GOV_VOTE:
+          return t('ui.Confirmations.voteForId', { id: (transaction.data as GovVoteRequest).referendumIndex });
+        case ExtrinsicType.GOV_UNVOTE:
+          return t('ui.Confirmations.unvoteConfirmation');
+        case ExtrinsicType.GOV_UNLOCK_VOTE:
+          return t('ui.Confirmations.unlockVotesConfirmation');
         case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.EVM_EXECUTE:
         case ExtrinsicType.UNKNOWN:
@@ -432,6 +439,9 @@ const Confirmations = styled(Component)<Props>(({ theme: { token } }: ThemeProps
     paddingBottom: token.sizeXS,
     backgroundColor: 'transparent',
     marginBottom: token.marginXS,
+    '.ant-sw-header-center-part': {
+      width: 'fit-content'
+    },
 
     h4: {
       marginBottom: 0
