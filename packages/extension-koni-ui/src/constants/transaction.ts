@@ -3,7 +3,6 @@
 
 import { ExtrinsicType, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-
 import { CancelUnStakeParams, ChangeBittensorRootClaimType, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, GovReferendumUnvoteParams, GovReferendumVoteParams, GovUnlockVoteParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
 
 import { ALL_KEY } from './common';
@@ -164,9 +163,6 @@ export const DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS: ClaimBridgeParams = {
   notificationId: ''
 };
 
-
-
-
 export const DEFAULT_GOV_REFERENDUM_VOTE_PARAMS: GovReferendumVoteParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
   conviction: 0,
@@ -190,4 +186,4 @@ export const DEFAULT_GOV_UNLOCK_VOTE_PARAMS: GovUnlockVoteParams = {
 export const DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS: ChangeBittensorRootClaimType = {
   ...DEFAULT_TRANSACTION_PARAMS,
   bittensorRootClaimType: ''
-}
+};
