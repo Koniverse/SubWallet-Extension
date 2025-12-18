@@ -111,9 +111,9 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
 
       // @ts-ignore
       transfer = api.tx.assets.transfer(multilocationIndex, to, value);
+    } else {
+      transfer = api.tx.assets.transfer(_getTokenOnChainAssetId(tokenInfo), to, value);
     }
-
-    transfer = api.tx.assets.transfer(_getTokenOnChainAssetId(tokenInfo), to, value);
   } else if (_TRANSFER_CHAIN_GROUP.sora_substrate.includes(networkKey) && isTxAssetsSupported) {
     transfer = api.tx.assets.transfer(_getTokenOnChainAssetId(tokenInfo), to, value);
   } else if (isTxBalancesSupported && _isNativeToken(tokenInfo)) {
