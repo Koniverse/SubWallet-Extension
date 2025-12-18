@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 import { useSelector } from '../common';
 
 interface Result {
-  compound: SubnetYieldPositionInfo | undefined;
+  positions: SubnetYieldPositionInfo[];
   poolInfo: YieldPoolInfo | undefined;
 }
 
@@ -61,14 +61,14 @@ const useGetSubnetPoolPositionDetailByNetuid = (netuid?: number, address?: strin
 
     if (!matchedPositions.length) {
       return {
-        compound: undefined,
+        positions: [],
         poolInfo: undefined
       };
     }
 
     const poolInfo = poolInfoMap[matchedPositions[0].slug];
 
-    // --- All account & no address → merge positions
+    // --- All account & no address → merge into 1 virtual position
     if (isAllAccount && !address) {
       const base: SubnetYieldPositionInfo = {
         ...matchedPositions[0],
@@ -111,14 +111,13 @@ const useGetSubnetPoolPositionDetailByNetuid = (netuid?: number, address?: strin
       }
 
       return {
-        compound: base,
+        positions: [base],
         poolInfo
       };
     }
 
-    // --- Normal case
     return {
-      compound: matchedPositions[0],
+      positions: matchedPositions,
       poolInfo
     };
   }, [netuid, address, isAllAccount, currentAccountProxy?.accounts, yieldPositions, poolInfoMap]);

@@ -17,14 +17,14 @@ import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee, YieldPoolType } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee } from '@subwallet/extension-base/types';
 import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
 import { _reformatAddressWithChain, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
-import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, EarningValidatorSelector, FeeEditor, HiddenInput, NominationSelector, TokenSelector } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenSelector } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { useAlert, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useGetChainPrefixBySlug, useGetSubnetPoolPositionDetailByNetuid, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useGetSubnetPoolPositionDetailByNetuid, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import useLazyWatchTransaction from '@subwallet/extension-koni-ui/hooks/transaction/useWatchTransactionLazy';
 import { approveSpending, cancelSubscription, getOptimalTransferProcess, getTokensCanPayFee, isTonBounceableAddress, makeCrossChainTransfer, makeTransfer, subscribeMaxTransfer } from '@subwallet/extension-koni-ui/messaging';
@@ -141,6 +141,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const assetValue = useWatchTransaction('asset', form, defaultData);
+  const fromValidator = useWatchTransaction('fromValidator', form, defaultData);
+  const toValidator = useWatchTransaction('toValidator', form, defaultData);
 
   const { nativeTokenBalance } = useGetBalance(chainValue, fromValue);
   const assetInfo = useFetchChainAssetInfo(assetValue);
@@ -191,6 +193,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const [isBalanceReady, setIsBalanceReady] = useState(true);
   const [transferInfo, setTransferInfo] = useState<ResponseSubscribeTransfer | undefined>();
   const [isFetchingInfo, setIsFetchingInfo] = useState(false);
+  const [targetLoading, setTargetLoading] = useState(false);
   const [isFetchingListFeeToken, setIsFetchingListFeeToken] = useState(false);
   const chainStatus = useMemo(() => chainStatusMap[chainValue]?.connectionStatus, [chainValue, chainStatusMap]);
   const estimatedNativeFee = useMemo((): string => transferInfo?.feeOptions.estimatedFee || '0', [transferInfo]);
@@ -560,7 +563,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [accounts, assetRegistry, notification, t]);
 
   const isAlphaTokenTransfer = useMemo(() => {
-    return _BALANCE_CHAIN_GROUP.bittensor.includes(chainValue) && !_isNativeToken(assetInfo);
+    return _BALANCE_CHAIN_GROUP.bittensor.includes(chainValue) && !_isNativeToken(assetInfo) && !!assetInfo?.metadata?.netuid;
   }, [assetInfo, chainValue]);
 
   const netuid = useMemo(() => {
@@ -593,7 +596,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             metadata: {
               netuid,
               fromValidator,
-              toValidator
+              toValidator: toValidator
             }
           }
           : {})
@@ -862,7 +865,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
-  const isDataReady = !isFetchingInfo && !isFetchingListFeeToken && !!transferInfo?.feeOptions;
+  const isDataReady = !isFetchingInfo && !isFetchingListFeeToken && !!transferInfo?.feeOptions && (!isAlphaTokenTransfer || !targetLoading);
 
   useEffect(() => {
     const updateFromValue = () => {
@@ -916,7 +919,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       }
     };
 
-    if (fromValue && assetValue) {
+    if (fromValue && assetValue && (!isAlphaTokenTransfer || !!(fromValidator && toValidator))) {
       subscribeMaxTransfer({
         address: fromValue,
         to: toValue,
@@ -945,16 +948,16 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       cancel = true;
       id && cancelSubscription(id).catch(console.error);
     };
-  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue, isTransferAll]);
+  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue, isTransferAll, isAlphaTokenTransfer, fromValidator, toValidator]);
 
   useEffect(() => {
-    if (isTransferAll && transferInfo?.maxTransferable && !hideMaxButton) {
+    if (isTransferAll && transferInfo?.maxTransferable && !hideMaxButton && !isAlphaTokenTransfer) {
       form.setFieldsValue({
         value: transferInfo?.maxTransferable
       });
       setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${Date.now()}`);
     }
-  }, [form, hideMaxButton, isTransferAll, transferInfo]);
+  }, [form, hideMaxButton, isAlphaTokenTransfer, isTransferAll, transferInfo]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');
@@ -1048,11 +1051,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   useEffect(() => {
     console.log('transferInfo', transferInfo);
   }, [transferInfo]);
-
   const poolPositionDetail = useGetSubnetPoolPositionDetailByNetuid(netuid, fromValue);
-  const [targetLoading, setTargetLoading] = useState(false);
 
-  console.log('Checking', [isAlphaTokenTransfer, poolPositionDetail]);
   useRestoreTransaction(form);
 
   return (
@@ -1098,7 +1098,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             </Form.Item>
           </div>
 
-          {isAlphaTokenTransfer && !!poolPositionDetail?.poolInfo && !!poolPositionDetail?.compound && poolPositionDetail.compound.nominations.length > 0
+          {isAlphaTokenTransfer && !!poolPositionDetail?.poolInfo && !!poolPositionDetail?.positions && poolPositionDetail?.positions.length > 0
             ? (
               <AlphaTokenTransferSection
                 accountAddressItems={accountAddressItems}
@@ -1107,6 +1107,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
                 amountInputRenderKey={amountInputRenderKey}
                 assetInfo={assetInfo}
                 chainValue={chainValue}
+                className={'alpha-token-transfer-section'}
                 decimals={decimals}
                 defaultData={defaultData}
                 destAssetInfo={destAssetInfo}
@@ -1115,8 +1116,9 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
                 form={form}
                 fromValue={fromValue}
                 isNotShowAccountSelector={isNotShowAccountSelector}
+                onBalanceReady={setIsBalanceReady}
                 poolInfo={poolPositionDetail?.poolInfo}
-                positionInfo={poolPositionDetail?.compound}
+                positionInfo={poolPositionDetail?.positions}
                 setIsTransferAll={setIsTransferAll}
                 setTargetLoading={setTargetLoading}
                 validateRecipient={validateRecipient}

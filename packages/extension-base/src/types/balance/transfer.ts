@@ -35,6 +35,12 @@ export interface ResponseSubscribeTransferConfirmation extends Omit<ResponseSubs
   error?: string;
 }
 
+export interface AlphaTokenTransferMetadata {
+  netuid: number;
+  fromValidator: string;
+  toValidator: string;
+}
+
 export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
   chain: string;
   from: string;
@@ -44,11 +50,7 @@ export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
   value: string;
   transferBounceable?: boolean;
   isSubstrateECDSATransaction?: boolean;
-  metadata?: {
-    netuid: number;
-    fromValidator: string;
-    toValidator: string;
-  }
+  metadata?: AlphaTokenTransferMetadata
 }
 
 export interface RequestSubmitSignPsbtTransfer extends BaseRequestSign {

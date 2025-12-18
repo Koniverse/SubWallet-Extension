@@ -2535,5 +2535,13 @@
   "Only shows referenda you've voted directly in": "",
   "Only shows referenda you've voted through delegation": "",
   "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": "",
-  "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unknownAccountFeatureRestriction": ""
+  "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unknownAccountFeatureRestriction": "",
+  "ui.TRANSACTION.screen.Transaction.AlphaTokenTransferSection.from": "",
+  "ui.TRANSACTION.screen.Transaction.AlphaTokenTransferSection.selectFromValidator": "",
+  "ui.TRANSACTION.screen.Transaction.AlphaTokenTransferSection.to": "",
+  "ui.TRANSACTION.screen.Transaction.AlphaTokenTransferSection.enterAddress": "",
+  "ui.TRANSACTION.screen.Transaction.AlphaTokenTransferSection.selectToValidator": "",
+  "ui.TRANSACTION.screen.Transaction.part.AlphaTokenTransferSection.and": "",
+  "ui.TRANSACTION.screen.Transaction.AlphaTokenTransferSection.amount": "",
+  "ui.TRANSACTION.screen.Transaction.part.AlphaTokenTransferSection.availableBalance": ""
 }

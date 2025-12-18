@@ -24,7 +24,7 @@ import { getHydrationRate } from '@subwallet/extension-base/services/fee-service
 import { isCardanoTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { EvmEIP1559FeeDetail, EvmEIP1559FeeOption, FeeChainType, FeeDetail, FeeInfo, SubstrateTipInfo, TransactionFee } from '@subwallet/extension-base/types';
-import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
+import { AlphaTokenTransferMetadata, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
@@ -55,6 +55,7 @@ export interface CalculateMaxTransferable extends TransactionFee {
   isTransferNativeTokenAndPayLocalTokenAsFee: boolean;
   nativeToken: _ChainAsset;
   transferAll?: boolean;
+  metadata?: AlphaTokenTransferMetadata
 }
 
 export const detectTransferTxType = (srcToken: _ChainAsset, srcChain: _ChainInfo, destChain: _ChainInfo): FeeChainType => {
@@ -107,7 +108,7 @@ export const calculateMaxTransferable = async (id: string, request: CalculateMax
 };
 
 export const calculateTransferMaxTransferable = async (id: string, request: CalculateMaxTransferable, freeBalance: AmountData, fee: FeeInfo): Promise<ResponseSubscribeTransfer> => {
-  const { address, bitcoinApi, cardanoApi, destChain, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, to, tonApi, transferAll, value } = request;
+  const { address, bitcoinApi, cardanoApi, destChain, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, metadata, nativeToken, srcChain, srcToken, substrateApi, to, tonApi, transferAll, value } = request;
   const feeChainType = fee.type;
   let estimatedFee: string;
   let feeOptions: FeeDetail;
@@ -206,7 +207,8 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         networkKey: srcChain.slug,
         tokenInfo: srcToken,
         to: recipient,
-        substrateApi
+        substrateApi,
+        metadata
       });
     }
 
