@@ -3,7 +3,6 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@subwallet/extension-koni-ui/components';
-
 import { CANCEL_UN_STAKE_TRANSACTION, CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, GOV_REFERENDUM_UNVOTE_TRANSACTION, GOV_REFERENDUM_VOTE_TRANSACTION, GOV_UNLOCK_VOTE_TRANSACTION, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
@@ -168,7 +167,6 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
       };
     }
 
-
     if (storageKey === GOV_REFERENDUM_VOTE_TRANSACTION) {
       return {
         ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
@@ -190,14 +188,13 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
       };
     }
 
-
     if (storageKey === CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION) {
       return {
         ...DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS,
         fromAccountProxy
-      }
+      };
     }
-    
+
     return {
       ...DEFAULT_TRANSACTION_PARAMS,
       fromAccountProxy
