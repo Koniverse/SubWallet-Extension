@@ -1,36 +1,44 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountProxyType, AnalyzeAddress } from '@subwallet/extension-base/types';
-import { AccountNameModal, AccountProxyAvatar, AddressBookModal, CloseIcon, EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountNameModal, AccountProxyAvatar, AddressSelectorItem, CloseIcon, EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import AddSignerMultisigModal from '@subwallet/extension-koni-ui/components/Modal/AddressBook/AddSignerMultisigModal';
-import { SeedPhraseTermModal } from '@subwallet/extension-koni-ui/components/Modal/TermsAndConditions/SeedPhraseTermModal';
-import { ACCOUNT_NAME_MODAL, CONFIRM_TERM_SEED_PHRASE, CREATE_ACCOUNT_MODAL, DEFAULT_MNEMONIC_TYPE, DEFAULT_ROUTER_PATH, SEED_PREVENT_MODAL, SELECTED_MNEMONIC_TYPE, TERM_AND_CONDITION_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useDefaultNavigate, useExtensionDisplayModes, useNotification, useTranslation, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
-import { createAccountMultisig, createSeedV2, windowOpen } from '@subwallet/extension-koni-ui/messaging';
+import { ACCOUNT_NAME_MODAL, CONFIRM_TERM_SEED_PHRASE, CREATE_ACCOUNT_MODAL, DEFAULT_ROUTER_PATH, MULTISIG_SIGNERS, SEED_PREVENT_MODAL, TERM_AND_CONDITION_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useDefaultNavigate, useNotification, useTranslation, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
+import { createAccountMultisig } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { SeedPhraseTermStorage, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { isFirefox, isNoAccount } from '@subwallet/extension-koni-ui/utils';
+import { isNoAccount } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, Input, ModalContext } from '@subwallet/react-ui';
+import { Rule } from '@subwallet/react-ui/es/form';
 import CN from 'classnames';
 import { Book, ListChecks, PlusCircle } from 'phosphor-react';
-import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
+import { isAddress, isEthereumAddress } from '@polkadot/util-crypto';
+
 type Props = ThemeProps;
 
 const accountNameModalId = ACCOUNT_NAME_MODAL;
 const GeneralTermLocalDefault: SeedPhraseTermStorage = { state: 'nonConfirmed', useDefaultContent: false };
-const isEmpty = true;
-const threshold = 10;
 
 interface MultisigParams {
   signerAddress: string;
   thresshold: string;
 }
+
+export interface SignerData {
+  address: string;
+  displayName?: string;
+  proxyId?: string;
+  formatedAddress: string;
+}
+
 const addressBookId = 'input-multisig-account-address-book-modal';
 
 const Component: React.FC<Props> = ({ className }: Props) => {
@@ -43,7 +51,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const checkUnlock = useUnlockChecker();
   const [form] = Form.useForm<MultisigParams>();
-  const [signers, setSigners] = useState<string[]>([]);
+  const [signers, setSigners] = useLocalStorage<SignerData[]>(MULTISIG_SIGNERS, []);
 
   const formDefault = useMemo<MultisigParams>(() => {
     return {
@@ -56,22 +64,28 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const thresholdValue = Form.useWatch('thresshold', form);
 
   const onComplete = useCompleteCreateAccount();
-  const { isPopupMode } = useExtensionDisplayModes();
 
-  const { accounts, hasMasterPassword } = useSelector((state: RootState) => state.accountState);
+  const { accounts } = useSelector((state: RootState) => state.accountState);
 
-  const isOpenWindowRef = useRef(false);
-
-  const [selectedMnemonicType] = useLocalStorage(SELECTED_MNEMONIC_TYPE, DEFAULT_MNEMONIC_TYPE);
   const [preventModalStorage] = useLocalStorage(SEED_PREVENT_MODAL, false);
   const [preventModal] = useState(preventModalStorage);
 
-  const [seedPhrase, setSeedPhrase] = useState('');
   const [loading, setLoading] = useState(false);
 
   const noAccount = useMemo(() => isNoAccount(accounts), [accounts]);
 
+  const signerAddresses = useMemo(
+    () => signers.map((s) => s.address),
+    [signers]
+  );
+
+  const resetMultisigDraft = useCallback(() => {
+    setSigners([]);
+    form.resetFields();
+  }, [setSigners, form]);
+
   const onBack = useCallback(() => {
+    resetMultisigDraft();
     navigate(DEFAULT_ROUTER_PATH);
 
     if (!preventModal) {
@@ -79,34 +93,61 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         activeModal(CREATE_ACCOUNT_MODAL);
       }
     }
-  }, [preventModal, navigate, noAccount, activeModal]);
+  }, [resetMultisigDraft, navigate, preventModal, noAccount, activeModal]);
+
+  const onGoHome = useCallback(() => {
+    resetMultisigDraft();
+    goHome();
+  }, [resetMultisigDraft, goHome]);
+
+  const onDeleteSigner = useCallback((addressToDelete: string) => () => {
+    setSigners((prev) => prev.filter((item) => item.address !== addressToDelete));
+  }, [setSigners]);
 
   const onConfirmSignatory = useCallback(() => {
-    if (!seedPhrase) {
-      return;
-    }
-
     checkUnlock().then(() => {
       activeModal(accountNameModalId);
     }).catch(() => {
       // User cancel unlock
     });
-  }, [activeModal, checkUnlock, seedPhrase]);
-
-  const onAddSigner = useCallback(() => {
-    setSigners([...signers, signerAddressValue]);
-
-    form.resetFields(['signerAddress']);
-  }, [form, signerAddressValue, signers]);
+  }, [activeModal, checkUnlock]);
 
   const onOpenAddressBook = useCallback((e?: SyntheticEvent) => {
     e && e.stopPropagation();
     activeModal(addressBookId);
   }, [activeModal]);
 
-  const onSelectAddressBook = useCallback((_value: string, item: AnalyzeAddress) => {
+  const onConfirmSelectSigners = useCallback((selectedItems: SignerData[]) => {
+    setSigners((prev) => {
+      const existingAddresses = prev.map((s) => s.address);
 
-  }, []);
+      const newItems: SignerData[] = selectedItems
+        .filter((item) => !existingAddresses.includes(item.address))
+        .map((item) => ({
+          address: item.address,
+          displayName: item.displayName,
+          proxyId: item.proxyId,
+          formatedAddress: item.formatedAddress
+        }));
+
+      return [...prev, ...newItems];
+    });
+  }, [setSigners]);
+
+  const onAddManualSigner = useCallback(() => {
+    const address = form.getFieldValue('signerAddress') as string;
+
+    setSigners((prev) => [
+      ...prev,
+      {
+        address: address,
+        proxyId: address,
+        formatedAddress: address
+      }
+    ]);
+
+    form.resetFields(['signerAddress']);
+  }, [form, setSigners]);
 
   const emptyList = useCallback(() => {
     return (
@@ -119,10 +160,47 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     );
   }, [t]);
 
+  const validateSignerAddress = useCallback((rule: Rule): Promise<void> => {
+    const { signerAddress } = form.getFieldsValue();
+
+    if (!isAddress(signerAddress) || isEthereumAddress(signerAddress)) {
+      return Promise.reject(t('Invalid recipient address'));
+    }
+
+    return Promise.resolve();
+  }, [form, t]);
+
+  const validateThresshold = useCallback(
+    async (_: Rule, value?: string) => {
+      if (!value) {
+        return Promise.reject(t('Threshold is required'));
+      }
+
+      const threshold = Number(value);
+
+      if (!Number.isInteger(threshold)) {
+        return Promise.reject(t('Threshold must be a natural number'));
+      }
+
+      if (threshold <= 0) {
+        return Promise.reject(t('Threshold must be greater than 0'));
+      }
+
+      if (threshold > signers.length) {
+        return Promise.reject(
+          t('Threshold cannot be greater than number of signers')
+        );
+      }
+
+      return Promise.resolve();
+    },
+    [signers.length, t]
+  );
+
   const onSubmit = useCallback((accountName: string) => {
     setLoading(true);
     createAccountMultisig({
-      signers: signers,
+      signers: signerAddresses,
       threshold: parseInt(thresholdValue),
       name: accountName
     })
@@ -139,7 +217,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         setLoading(false);
         inactiveModal(accountNameModalId);
       });
-  }, [inactiveModal, notify, onComplete, signers, thresholdValue]);
+  }, [inactiveModal, notify, onComplete, signerAddresses, thresholdValue]);
 
   useEffect(() => {
     // Note: This useEffect checks if the data in localStorage has already been migrated from the old "string" structure to the new structure in "SeedPhraseTermStorage".
@@ -160,51 +238,23 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     }
   }, [confirmedTermSeedPhrase.state, activeModal, inactiveModal, setConfirmedTermSeedPhrase]);
 
-  useEffect(() => {
-    createSeedV2(undefined, undefined, selectedMnemonicType)
-      .then((response): void => {
-        const phrase = response.mnemonic;
-
-        setSeedPhrase(phrase);
-      })
-      .catch((e: Error) => {
-        console.error(e);
-      });
-  }, [selectedMnemonicType]);
-
-  useEffect(() => {
-    if (isPopupMode && isFirefox() && hasMasterPassword && !isOpenWindowRef.current) {
-      isOpenWindowRef.current = true;
-      windowOpen({ allowedPath: '/accounts/new-seed-phrase' }).then(window.close).catch(console.log);
-    }
-  }, [isPopupMode, hasMasterPassword]);
-
-  const waitReady = useMemo(() => {
-    return new Promise((resolve) => {
-      if (seedPhrase) {
-        resolve(true);
-      }
-    });
-  }, [seedPhrase]);
-
   return (
     <PageWrapper
       className={CN(className)}
-      resolve={waitReady}
     >
       <Layout.WithSubHeaderOnly
-        onBack={preventModal ? goHome : onBack}
+        onBack={preventModal ? onGoHome : onBack}
         rightFooterButton={{
           children: t('Continue'),
           onClick: onConfirmSignatory,
-          disabled: signers.length === 0 && !thresholdValue
+          disabled: signers.length === 0 || !thresholdValue
         }}
         subHeaderIcons={preventModal
           ? undefined
           : [
             {
               icon: <CloseIcon />,
-              onClick: goHome
+              onClick: onGoHome
             }
           ]}
         subHeaderLeft={preventModal ? <CloseIcon /> : undefined }
@@ -221,7 +271,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 <Form.Item
                   className={'signatory-form-address'}
                   name='signerAddress'
-                  rules={[]} // todo: add validate for address
+                  rules={[
+                    {
+                      validator: validateSignerAddress
+                    }
+                  ]}
                   statusHelpAsTooltip={true}
                 >
                   <Input
@@ -255,33 +309,62 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   disabled={!signerAddressValue}
                   icon={(
                     <Icon
-                      className={'icon-submit'}
+                      className={'icon-remove'}
                       customSize={'28px'}
                       phosphorIcon={PlusCircle}
-                      weight='fill'
                     />
                   )}
-                  onClick={onAddSigner}
+                  onClick={onAddManualSigner}
                   schema='secondary'
                   size={'sm'}
                 >
                 </Button>
               </div>
             </div>
-            <div className={'signatory-list'}>
-              {isEmpty && emptyList()}
-            </div>
-            <div className={'threshold-label'}>{'Set approval thresold'.toUpperCase()}</div>
-            <div className={'threshold-form-wrapper'}>
-              <Form.Item
-                name={'thresshold'}
-              >
-                <Input
-                  className={'threshold-form-input'}
-                  placeholder={'Enter threshold'}
-                  suffix={`/ ${threshold}`}
-                />
-              </Form.Item>
+            <div className={CN('signatory-list-wrapper', { '-is-sinatory-empty': signers.length === 0 })}>
+              {signers.length === 0
+                ? emptyList()
+                : (
+                  <>
+                    <div className={'signatories-label'}>{'Signatories'.toUpperCase()}</div>
+                    <div className='signatory-list-content'>
+                      {signers.map((signer) => (
+                        <div
+                          className='signatory-item-wrapper'
+                          key={signer.address}
+                        >
+                          <AddressSelectorItem
+                            address={signer.formatedAddress}
+                            avatarValue={signer.proxyId}
+                            className={CN('__list-selected-item')}
+                            isSelected={false}
+                            key={signer.address}
+                            name={signer.displayName}
+                            onRemoveItem={onDeleteSigner(signer.address)}
+                            showRemoveIcon={true}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <div className={'threshold-label'}>{'Set approval thresold'.toUpperCase()}</div>
+                    <div className={'threshold-form-wrapper'}>
+                      <Form.Item
+                        name={'thresshold'}
+                        rules={[
+                          {
+                            validator: validateThresshold
+                          }
+                        ]}
+                      >
+                        <Input
+                          className={'threshold-form-input'}
+                          placeholder={'Enter threshold'}
+                          suffix={`/ ${signers.length > 0 ? signers.length : ''}`}
+                        />
+                      </Form.Item>
+                    </div>
+                  </>
+                )}
             </div>
           </Form>
         </div>
@@ -289,11 +372,12 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       <AddSignerMultisigModal
         chainSlug={'polkadot'}
         id={addressBookId}
-        onSelect={onSelectAddressBook}
+        onConfirm={onConfirmSelectSigners}
+        selectedSigners={signers}
         tokenSlug={'polkadot'}
       />
       <AccountNameModal
-        accountType={selectedMnemonicType === 'general' ? AccountProxyType.UNIFIED : AccountProxyType.SOLO}
+        accountType={AccountProxyType.MULTISIG}
         isLoading={loading}
         onSubmit={onSubmit}
       />
@@ -323,7 +407,7 @@ const NewMultisigAccount = styled(Component)<Props>(({ theme: { token } }: Props
       marginBottom: token.marginSM
     },
 
-    '.signatory-label, .threshold-label': {
+    '.signatory-label, .threshold-label, .signatories-label': {
       display: 'flex',
       marginBottom: token.marginSM
     },
@@ -335,7 +419,7 @@ const NewMultisigAccount = styled(Component)<Props>(({ theme: { token } }: Props
       }
     },
 
-    '.signatory-list': {
+    '.-is-sinatory-empty': {
       backgroundColor: token.colorBgSecondary,
       marginBottom: token.marginSM
     },
@@ -348,6 +432,25 @@ const NewMultisigAccount = styled(Component)<Props>(({ theme: { token } }: Props
     '.threshold-form-input': {
       '.ant-input-suffix': {
         paddingRight: token.paddingSM
+      }
+    },
+
+    '.signatory-list-content': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 8,
+      marginBottom: token.marginSM
+    },
+
+    '.signatory-item-wrapper': {
+      flexDirection: 'row',
+      display: 'flex'
+    },
+
+    '.__list-selected-item': {
+      flex: 1,
+      '.__address': {
+        display: 'flex'
       }
     }
   };

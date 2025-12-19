@@ -56,6 +56,7 @@ const Component: React.FC<Props> = ({ className, type }: Props) => {
     } else if (type === AccountProxyType.MULTISIG) {
       result.label = t('ui.ACCOUNT.components.AccountProxy.TypeTag.multisigAccount');
       result.icon.phosphorIcon = UserSwitch;
+      result.color = 'geekblue';
     } else if (type === AccountProxyType.LEDGER) {
       result.label = t('ui.ACCOUNT.components.AccountProxy.TypeTag.ledgerAccount');
       result.icon.phosphorIcon = Swatches;

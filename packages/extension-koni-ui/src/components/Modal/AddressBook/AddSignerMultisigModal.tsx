@@ -8,6 +8,7 @@ import { _reformatAddressWithChain, getAccountChainTypeForAddress } from '@subwa
 import { AddressSelectorItem } from '@subwallet/extension-koni-ui/components';
 import { useChainInfo, useCoreCreateReformatAddress, useFilterModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { useGetExcludedTokens } from '@subwallet/extension-koni-ui/hooks/assets';
+import { SignerData } from '@subwallet/extension-koni-ui/Popup/Account/NewMultisigAccount';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getSignModeByAccountProxy, isAccountAll, sortFuncAnalyzeAddress } from '@subwallet/extension-koni-ui/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
@@ -15,7 +16,7 @@ import { Button, Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import CN from 'classnames';
 import { PlusCircle, XCircle } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -27,19 +28,22 @@ interface Props extends ThemeProps {
   chainSlug?: string;
   tokenSlug?: string;
   actionType?: ActionType;
-  selectedSigners?: string[]
-  onConfirm: (addresses: string[]) => void;
+  selectedSigners?: SignerData[]
+  onConfirm: (selectedItems: SignerData[]) => void;
 }
 
 const renderEmpty = () => <GeneralEmptyList />;
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { actionType, chainSlug, className, id, onConfirm, selectedSigners = [], tokenSlug = '', value = '' } = props;
-  const [checkedAddresses, setCheckedAddresses] = React.useState<string[]>([]);
+  const { actionType, chainSlug, className, id, onConfirm, selectedSigners = [], tokenSlug = '' } = props;
+  const [checkedSigners, setCheckedSigners] = useState<SignerData[]>([]);
+  const disabledAddressList = useMemo(() => {
+    return selectedSigners.map((s) => s.address);
+  }, [selectedSigners]);
 
   const { t } = useTranslation();
 
-  const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
+  const { checkActive, inactiveModal } = useContext(ModalContext);
 
   const isActive = checkActive(id);
 
@@ -138,44 +142,84 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [id, inactiveModal, onResetFilter]);
 
   const onAddSigner = useCallback(() => {
-    onConfirm(checkedAddresses);
+    onConfirm(checkedSigners);
     inactiveModal(id);
-  }, [checkedAddresses, onConfirm, inactiveModal, id]);
+  }, [checkedSigners, onConfirm, inactiveModal, id]);
 
   const onClickItem = useCallback((item: AnalyzeAddress) => {
     return () => {
-      // Nếu address đã có trong danh sách selectedSigners (đã add vào form rồi) thì bỏ qua
-      if (selectedSigners.includes(item.address)) {
+      if (disabledAddressList.includes(item.address)) {
         return;
       }
 
-      setCheckedAddresses((prev) => {
-        if (prev.includes(item.address)) {
-          return prev.filter((addr) => addr !== item.address); // Bỏ chọn
+      setCheckedSigners((prev) => {
+        const isExists = prev.some((s) => s.address === item.address);
+
+        if (isExists) {
+          return prev.filter((s) => s.address !== item.address);
         } else {
-          return [...prev, item.address]; // Chọn thêm
+          const newSigner: SignerData = {
+            address: item.address,
+            displayName: item.displayName,
+            proxyId: item.proxyId,
+            formatedAddress: item.formatedAddress
+          };
+
+          return [...prev, newSigner];
         }
       });
     };
-  }, [selectedSigners]);
+  }, [disabledAddressList]);
 
   const renderItem = useCallback((item: AnalyzeAddress) => {
-    // Item được coi là selected nếu nó nằm trong state local HOẶC đã có sẵn ở form cha
-    const isChecked = checkedAddresses.includes(item.address);
-    const isDisabled = selectedSigners.includes(item.address);
+    const isChecked = checkedSigners.some((s) => s.address === item.address);
+    const isDisabled = disabledAddressList.includes(item.address);
 
     return (
       <AddressSelectorItem
-        address={item.address}
+        address={item.formatedAddress}
+        avatarValue={item.proxyId}
         className={CN('__list-item', { '-disabled': isDisabled })}
-        isSelected={isChecked || isDisabled} // Hiển thị tick xanh
+        isSelected={isChecked || isDisabled}
         key={item.address}
         name={item.displayName}
         onClick={onClickItem(item)}
-        // isSelected={true} // Props giả định để hiện icon check
+        showUnselectIcon={true}
       />
     );
-  }, [checkedAddresses, selectedSigners, onClickItem]);
+  }, [checkedSigners, disabledAddressList, onClickItem]);
+
+  const footerModal = useMemo(() => {
+    return (
+      <div className={'footer-button-wrapper'}>
+        <Button
+          block
+          icon={(
+            <Icon
+              phosphorIcon={XCircle}
+              weight={'fill'}
+            />
+          )}
+          onClick={onClose}
+          schema='secondary'
+        >
+          {'Cancel'}
+        </Button>
+        <Button
+          block
+          icon={(
+            <Icon
+              phosphorIcon={PlusCircle}
+              weight={'fill'}
+            />
+          )}
+          onClick={onAddSigner}
+        >
+          {'Add signer'}
+        </Button>
+      </div>
+    );
+  }, [onAddSigner, onClose]);
 
   useEffect(() => {
     if (!isActive) {
@@ -187,7 +231,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     if (isActive) {
-      setCheckedAddresses([]);
+      setCheckedSigners([]);
     }
   }, [isActive]);
 
@@ -195,35 +239,7 @@ const Component: React.FC<Props> = (props: Props) => {
     <>
       <SwModal
         className={CN(className, 'add-signer-multisig-modal')}
-        footer={(
-          <div className={'footer-button-wrapper'}>
-            <Button
-              block
-              icon={(
-                <Icon
-                  phosphorIcon={XCircle}
-                  weight={'fill'}
-                />
-              )}
-              onClick={onClose}
-              schema='secondary'
-            >
-              {'Cancel'}
-            </Button>
-            <Button
-              block
-              icon={(
-                <Icon
-                  phosphorIcon={PlusCircle}
-                  weight={'fill'}
-                />
-              )}
-              onClick={onAddSigner}
-            >
-              {'Add signer'}
-            </Button>
-          </div>
-        )}
+        footer={footerModal}
         id={id}
         onCancel={onClose}
         title={t('Select account')}
@@ -242,7 +258,8 @@ const Component: React.FC<Props> = (props: Props) => {
 const AddSignerMultisigModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     '.ant-sw-modal-body': {
-      display: 'flex'
+      display: 'flex',
+      paddingBottom: 0
     },
 
     '.ant-sw-list-section': {
