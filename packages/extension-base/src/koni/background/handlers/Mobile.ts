@@ -124,7 +124,7 @@ export default class Mobile {
   }
 
   public restartCronServices (services: CronServiceType[]): void {
-    console.log('stopCronServices');
+    console.log('restartCronServices');
   }
 
   public startSubscriptionServices (services: SubscriptionServiceType[]): void {
