@@ -1652,7 +1652,7 @@ export class ChainService {
         const nativeAsset = this.getNativeTokenInfo(chainSlug);
         const currentAssetSettings = await this.getAssetSettings();
 
-        if (!currentAssetSettings[nativeAsset.slug].visible) {
+        if (!currentAssetSettings[nativeAsset.slug]?.visible) {
           currentAssetSettings[nativeAsset.slug] = { visible: true };
           this.setAssetSettings(currentAssetSettings);
         }
