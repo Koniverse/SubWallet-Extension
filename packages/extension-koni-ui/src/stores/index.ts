@@ -18,6 +18,7 @@ import AssetRegistryReducer from './feature/common/AssetRegistry';
 import ChainStoreReducer from './feature/common/ChainStore';
 import CrowdloanReducer from './feature/Crowdloan';
 import EarningReducer from './feature/Earning';
+import GovernanceReducer from './feature/Governance';
 import MantaPayReducer from './feature/MantaPay';
 import MissionPoolReducer from './feature/MissionPool';
 import NftReducer from './feature/Nft';
@@ -77,7 +78,10 @@ const rootReducers = combineReducers({
   missionPool: MissionPoolReducer,
 
   // inapp notification
-  notification: NotificationReducer
+  notification: NotificationReducer,
+
+  // opengov
+  openGov: GovernanceReducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducers);
