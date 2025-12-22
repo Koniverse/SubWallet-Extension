@@ -326,7 +326,7 @@ export default class KoniState {
     await this.dbService.stores.crowdloan.removeEndedCrowdloans();
 
     await this.startSubscription();
-    this.chainOnlineService.checkLatestData();
+    // this.chainOnlineService.checkLatestData();
     this.chainService.checkLatestData();
     this.chainService.subscribeChainInfoMap().subscribe(() => {
       this.afterChainServiceInit();
@@ -1047,7 +1047,7 @@ export default class KoniState {
   }
 
   async resumeAllNetworks () {
-    this.chainOnlineService.checkLatestData();
+    // this.chainOnlineService.checkLatestData();
 
     return this.chainService.resumeAllChainApis();
   }
@@ -2003,7 +2003,7 @@ export default class KoniState {
     await this.walletConnectService.resetWallet(resetAll);
 
     await this.chainService.init();
-    this.chainOnlineService.checkLatestData();
+    // this.chainOnlineService.checkLatestData();
     this.chainService.checkLatestData();
     this.chainService.subscribeChainInfoMap().subscribe(() => {
       this.afterChainServiceInit();
