@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { AccountProxyType, YieldPoolType } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
@@ -8,6 +9,7 @@ import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
 import { useAccountBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector, useTokenGroup } from '@subwallet/extension-koni-ui/hooks';
 import { BalanceValueInfo, YieldGroupInfo } from '@subwallet/extension-koni-ui/types';
 import { getExtrinsicTypeByPoolInfo, getTransactionActionsByAccountProxy } from '@subwallet/extension-koni-ui/utils';
+import BigN from 'bignumber.js';
 import { useMemo } from 'react';
 
 const useYieldGroupInfo = (): YieldGroupInfo[] => {
@@ -89,7 +91,15 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
             const balanceItem = tokenBalanceMap[inputAsset];
 
             if (balanceItem) {
-              exists.balance.value = exists.balance.value.plus(balanceItem.free.value);
+              const reserved = new BigN(balanceItem.lockedDetails?.reserved || 0);
+              const staking = new BigN(balanceItem.lockedDetails?.staking || 0);
+              const subtractAmount = BigN.max(reserved, staking);
+
+              exists.balance.value = exists.balance.value
+                .plus(balanceItem.free.value)
+                .plus(balanceItem.locked.value)
+                .minus(subtractAmount);
+
               exists.balance.convertedValue = exists.balance.convertedValue.plus(balanceItem.free.convertedValue);
               exists.balance.pastConvertedValue = exists.balance.pastConvertedValue.plus(balanceItem.free.pastConvertedValue);
             }
@@ -125,7 +135,19 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
           }
 
           if (balanceItem) {
-            freeBalance.value = freeBalance.value.plus(balanceItem.free.value);
+            if (_BALANCE_CHAIN_GROUP.notSupportGetBalanceByType.includes(chainInfo.slug)) {
+              freeBalance.value = freeBalance.value.plus(balanceItem.free.value);
+            } else {
+              const reserved = new BigN(balanceItem.lockedDetails?.reserved || 0);
+              const staking = new BigN(balanceItem.lockedDetails?.staking || 0);
+              const subtractAmount = BigN.max(reserved, staking);
+
+              freeBalance.value = freeBalance.value
+                .plus(balanceItem.free.value)
+                .plus(balanceItem.locked.value)
+                .minus(subtractAmount);
+            }
+
             freeBalance.convertedValue = freeBalance.convertedValue.plus(balanceItem.free.convertedValue);
             freeBalance.pastConvertedValue = freeBalance.pastConvertedValue.plus(balanceItem.free.pastConvertedValue);
           }
