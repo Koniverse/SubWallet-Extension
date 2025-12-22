@@ -3,7 +3,7 @@
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { AccountProxyExtra, AccountProxyStoreData, AccountProxyType, KeyringPairs$JsonV2, ModifyPairStoreData, RequestAccountBatchExportV2, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestJsonGetAccountInfo, RequestJsonRestoreV2, ResponseAccountBatchExportV2, ResponseBatchJsonGetAccountInfo, ResponseJsonGetAccountInfo } from '@subwallet/extension-base/types';
-import { combineAccountsWithKeyPair, convertAccountProxyType, createPromiseHandler, transformAccount } from '@subwallet/extension-base/utils';
+import { combineAccountsWithKeyPair, convertAccountProxyType, createAccountProxyId, createPromiseHandler, getSuri, transformAccount } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
 import { createPair } from '@subwallet/keyring';
 import { KeypairType, KeyringPair, KeyringPair$Json } from '@subwallet/keyring/types';
@@ -59,13 +59,42 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
     if (isPasswordValidated) {
       try {
-        const { address, meta, type } = keyring.createFromJson(json);
+        const { address, meta, type, exportMnemonic } = keyring.createFromJson(json);
+        const mnemonic = exportMnemonic(password); // todo: handle case no mnemonic
+
+        const validatedAddresses: string[] = [address];
+
+        if (type === 'sr25519') {
+          validatedAddresses.push(keyring.createFromUri(getSuri(mnemonic, 'ed25519-tw')).address);
+        }
+
+        if (type === 'ed25519-tw') {
+          validatedAddresses.push(keyring.createFromUri(getSuri(mnemonic, 'sr25519')).address);
+        }
+
         const { name } = meta;
-        const account = transformAccount(address, type, meta);
-        const accountExists = this.state.checkAddressExists([address]);
         const nameExists = this.state.checkNameExists(name as string);
-        // Note: Show accountName of account exists to support user to know which account is existed
-        const accountName = accountExists ? accountExists.name : account.name || account.address;
+        const account = transformAccount(address, type, meta);
+
+        const addressExist = this.state.checkAddressExists(validatedAddresses);
+        let accountName = account.name || account.address; // Note: Check and show accountName of account exists to support user to know which account is existed
+        let isExistAccount = false;
+
+        if (addressExist) {
+          isExistAccount = true;
+          accountName = addressExist.name || addressExist.address;
+        } else {
+          const proxyId = createAccountProxyId(mnemonic);
+          const existingProxy = this.state.accounts[proxyId];
+
+          if (existingProxy) {
+            isExistAccount = true;
+            accountName = existingProxy.name || existingProxy.id;
+          }
+        }
+
+
+        // const accountName = isExistAccount ? existAccountName : account.name || account.address;
 
         const proxy: AccountProxyExtra = {
           id: address,
@@ -77,7 +106,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
           suri: account.suri,
           tokenTypes: account.tokenTypes,
           accountActions: [],
-          isExistAccount: !!accountExists,
+          isExistAccount,
           isExistName: nameExists
         };
 
@@ -172,6 +201,20 @@ export class AccountJsonHandler extends AccountBaseHandler {
             isExistAccount: false,
             isExistName: false
           };
+
+          // const [validatedAddresses, validatedTypes] = proxy.accounts.map((account) => [account.address, account.type]);
+          //
+          // if (validatedTypes.includes('ed25519-tw')) {
+          //   const address = keyring.createFromUri(getSuri(mnemonic, 'ed25519-tw')).address
+          //
+          //   validatedAddresses.push
+          // }
+          //
+          // if (validatedTypes.includes('sr25519')) {
+          //   const address = keyring.createFromUri(getSuri(mnemonic, 'ed25519-tw')).address
+          //
+          //   validatedAddresses.push
+          // }
 
           const accountExists = this.state.checkAddressExists(proxy.accounts.map((account) => account.address));
           const nameExists = this.state.checkNameExists(proxy.name);
