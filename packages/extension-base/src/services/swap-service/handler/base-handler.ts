@@ -303,13 +303,15 @@ export class SwapBaseHandler {
     const substrateApi = this.chainService.getSubstrateApi(originAsset.originChain);
     const chainApi = await substrateApi.isReady;
     const feeInfo = await this.feeService.subscribeChainFee(getId(), originAsset.originChain, 'substrate');
+    const sender = _reformatAddressWithChain(briefXcmStep.sender, originChain);
+    const recipient = _reformatAddressWithChain(briefXcmStep.receiver, destinationChain);
     const xcmRequest = {
       originTokenInfo: originAsset,
       destinationTokenInfo: destinationAsset,
       sendingValue: briefXcmStep.sendingValue,
-      recipient: briefXcmStep.receiver,
+      recipient: recipient,
       substrateApi: chainApi,
-      sender: briefXcmStep.sender,
+      sender: sender,
       destinationChain,
       originChain,
       feeInfo
@@ -324,8 +326,8 @@ export class SwapBaseHandler {
     const xcmData: RequestCrossChainTransfer = {
       originNetworkKey: originAsset.originChain,
       destinationNetworkKey: destinationAsset.originChain,
-      from: briefXcmStep.sender,
-      to: briefXcmStep.receiver,
+      from: sender,
+      to: recipient,
       value: briefXcmStep.sendingValue,
       tokenSlug: originAsset.slug,
       showExtraWarning: true
@@ -355,8 +357,8 @@ export class SwapBaseHandler {
     const evmApi = await this.chainService.getEvmApi(originTokenInfo.originChain).isReady;
     const feeInfo = await this.feeService.subscribeChainFee(getId(), originTokenInfo.originChain, 'evm');
     const sendingValue = bridgeStep.sendingValue;
-    const sender = bridgeStep.sender;
-    const recipient = bridgeStep.receiver;
+    const sender = _reformatAddressWithChain(bridgeStep.sender, originChain);
+    const recipient = _reformatAddressWithChain(bridgeStep.receiver, destinationChain);
 
     const tx = await createAcrossBridgeExtrinsic({
       originTokenInfo,

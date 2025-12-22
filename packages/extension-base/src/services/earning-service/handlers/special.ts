@@ -10,7 +10,7 @@ import { createXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance
 import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetName, _getAssetSymbol, _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitChangeValidatorStaking, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
-import { createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -541,6 +541,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
     const originTokenInfo = this.state.getAssetBySlug(originTokenSlug);
     const destinationTokenInfo = this.state.getAssetBySlug(destinationTokenSlug);
     const substrateApi = this.state.getSubstrateApi(originChainInfo.slug);
+    const fromAddress = _reformatAddressWithChain(address, originChainInfo);
 
     const inputTokenBalance = await this.state.balanceService.getTransferableBalance(address, destinationTokenInfo.originChain, destinationTokenSlug);
     const bnInputTokenBalance = new BN(inputTokenBalance.value);
@@ -558,7 +559,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       recipient: address,
       sendingValue: bnTotalAmount.toString(),
       substrateApi,
-      sender: address,
+      sender: fromAddress,
       originChain: originChainInfo,
       destinationChain: this.chainInfo,
       feeInfo
@@ -573,7 +574,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
     const xcmData: RequestCrossChainTransfer = {
       originNetworkKey: originChainInfo.slug,
       destinationNetworkKey: destinationTokenInfo.originChain,
-      from: address,
+      from: fromAddress,
       to: address,
       value: bnTotalAmount.toString(),
       tokenSlug: originTokenSlug,
