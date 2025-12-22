@@ -64,12 +64,6 @@ function createWasmNftApi (chain: string, apiProps: _SubstrateApi | null, addres
   return new WasmNftApi(apiProps, substrateAddresses, chain);
 }
 
-// function createWeb3NftApi (chain: string, evmApi: _EvmApi | null, addresses: string[]): BaseNftApi | null {
-//   const evmAddresses = getAddressesByChainType(addresses, [ChainType.EVM]);
-//
-//   return new EvmNftApi(evmApi, evmAddresses, chain);
-// }
-
 const createOrdinalApi = (chain: string, subscanChain: string, addresses: string[]) => {
   return new OrdinalNftApi(addresses, chain, subscanChain);
 };
@@ -152,16 +146,6 @@ export class NftHandler {
               }
             }
           }
-
-          // if (_isChainSupportEvmNft(chainInfo)) {
-          //   if (this.evmApiMap[chain]) {
-          //     const handler = createWeb3NftApi(chain, this.evmApiMap[chain], evmAddresses);
-          //
-          //     if (handler) {
-          //       this.handlers.push(handler);
-          //     }
-          //   }
-          // }
 
           if (chain === 'unique_evm') {
             const handlers = createSubstrateNftApi(chain, null, evmAddresses);

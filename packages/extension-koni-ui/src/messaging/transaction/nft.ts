@@ -6,19 +6,6 @@ import { SWTransactionResponse } from '@subwallet/extension-base/services/transa
 
 import { sendMessage } from '../base';
 
-// export async function getNft (account: string): Promise<NftJson> {
-//   // @ts-ignore
-//   return sendMessage('pri(nft.getNft)', account);
-// }
-
-// export async function subscribeNft (request: RequestSubscribeNft, callback: (nftData: NftJson) => void): Promise<NftJson> {
-//   return sendMessage('pri(nft.getSubscription)', request, callback);
-// }
-
-// export async function subscribeNftCollection (callback: (data: NftCollection[]) => void): Promise<NftCollection[]> {
-//   return sendMessage('pri(nftCollection.getSubscription)', null, callback);
-// }
-
 export async function evmNftSubmitTransaction (request: NftTransactionRequest): Promise<SWTransactionResponse> {
   return sendMessage('pri(evmNft.submitTransaction)', request);
 }

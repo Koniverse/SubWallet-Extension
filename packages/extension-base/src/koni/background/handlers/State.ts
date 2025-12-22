@@ -2188,8 +2188,6 @@ export default class KoniState {
     // const currentAddress = this.keyringService.context.currentAccount.proxyId;
     //
     // await this.dbService.removeNftsByAddress(currentAddress);
-    //
-    // return await this.cron.reloadNft();
     await this.nftService.forceReload();
   }
 
