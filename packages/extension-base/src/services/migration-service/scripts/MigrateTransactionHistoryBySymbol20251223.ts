@@ -4,7 +4,7 @@
 import BaseMigrationJob from '@subwallet/extension-base/services/migration-service/Base';
 import { ITransactionHistoryItem } from '@subwallet/extension-base/services/storage-service/databases';
 
-export default class MigrateTransactionHistoryBySymbol20251107 extends BaseMigrationJob {
+export default class MigrateTransactionHistoryBySymbol20251223 extends BaseMigrationJob {
   public override async run (): Promise<void> {
     const state = this.state;
 

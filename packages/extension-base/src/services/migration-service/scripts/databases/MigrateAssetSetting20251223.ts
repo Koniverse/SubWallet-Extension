@@ -4,7 +4,7 @@
 import { AssetSetting } from '@subwallet/extension-base/background/KoniTypes';
 import BaseMigrationJob from '@subwallet/extension-base/services/migration-service/Base';
 
-export default class MigrateAssetSetting20251107 extends BaseMigrationJob {
+export default class MigrateAssetSetting20251223 extends BaseMigrationJob {
   public override async run (): Promise<void> {
     try {
       const changeSlugsMap: Record<string, string> = {
