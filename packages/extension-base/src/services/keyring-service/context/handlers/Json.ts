@@ -3,7 +3,7 @@
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { AccountProxyExtra, AccountProxyStoreData, AccountProxyType, KeyringPairs$JsonV2, ModifyPairStoreData, RequestAccountBatchExportV2, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestJsonGetAccountInfo, RequestJsonRestoreV2, ResponseAccountBatchExportV2, ResponseBatchJsonGetAccountInfo, ResponseJsonGetAccountInfo } from '@subwallet/extension-base/types';
-import { combineAccountsWithKeyPair, convertAccountProxyType, createAccountProxyId, createPromiseHandler, transformAccount } from '@subwallet/extension-base/utils';
+import { combineAccountsWithKeyPair, convertAccountProxyType, createPromiseHandler, transformAccount } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
 import { createPair } from '@subwallet/keyring';
 import { KeypairType, KeyringPair, KeyringPair$Json } from '@subwallet/keyring/types';
@@ -59,29 +59,31 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
     if (isPasswordValidated) {
       try {
-        const { address, exportMnemonic, meta, type } = keyring.createFromJson(json);
-        const mnemonic = exportMnemonic(password); // todo: handle case no mnemonic
+        const { address, meta, type } = keyring.createFromJson(json);
 
         const { name } = meta;
-        const nameExists = this.state.checkNameExists(name as string);
         const account = transformAccount(address, type, meta);
+        const accountExists = this.state.checkAddressExists([address]);
+        const nameExists = this.state.checkNameExists(name as string);
+        // Note: Show accountName of account exists to support user to know which account is existed
+        const accountName = accountExists ? accountExists.name : account.name || account.address;
 
-        const addressExist = this.state.checkAddressExists([address]);
-        let accountName = account.name || account.address; // Note: Check and show accountName of account exists to support user to know which account is existed
-        let isExistAccount = false;
-
-        if (addressExist) {
-          isExistAccount = true;
-          accountName = addressExist.name || addressExist.address;
-        } else {
-          const proxyId = createAccountProxyId(mnemonic);
-          const existingProxy = this.state.accounts[proxyId];
-
-          if (existingProxy) {
-            isExistAccount = true;
-            accountName = existingProxy.name || existingProxy.id;
-          }
-        }
+        // const addressExist = this.state.checkAddressExists([address]);
+        // let accountName = account.name || account.address; // Note: Check and show accountName of account exists to support user to know which account is existed
+        // let isExistAccount = false;
+        //
+        // if (addressExist) {
+        //   isExistAccount = true;
+        //   accountName = addressExist.name || addressExist.address;
+        // } else {
+        //   const proxyId = createAccountProxyId(mnemonic);
+        //   const existingProxy = this.state.accounts[proxyId];
+        //
+        //   if (existingProxy) {
+        //     isExistAccount = true;
+        //     accountName = existingProxy.name || existingProxy.id;
+        //   }
+        // }
 
         const proxy: AccountProxyExtra = {
           id: address,
@@ -93,7 +95,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
           suri: account.suri,
           tokenTypes: account.tokenTypes,
           accountActions: [],
-          isExistAccount,
+          isExistAccount: !!accountExists,
           isExistName: nameExists
         };
 
