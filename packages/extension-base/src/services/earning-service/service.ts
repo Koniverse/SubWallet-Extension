@@ -1162,7 +1162,6 @@ export default class EarningService implements StoppableServiceInterface, Persis
     await this.eventService.waitChainReady;
 
     const { slug } = params;
-    console.log('slug', slug);
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
