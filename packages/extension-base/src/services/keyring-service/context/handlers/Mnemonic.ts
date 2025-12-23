@@ -59,7 +59,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
 
         if (mnemonicType === 'trust-wallet') {
           mnemonicTypes = 'trust-wallet';
-          pairTypes = ['ed25519-tw', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
+          pairTypes = ['ed25519-tw'];
         } else {
           mnemonicTypes = 'general';
           pairTypes = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];

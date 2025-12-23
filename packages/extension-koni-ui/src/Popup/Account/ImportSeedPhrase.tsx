@@ -10,7 +10,6 @@ import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useDefaultNa
 import { createAccountSuriV2, validateSeedV2 } from '@subwallet/extension-koni-ui/messaging';
 import { FormCallbacks, FormFieldData, FormRule, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, noop, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
-import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { Button, Form, Icon, Input, ModalContext } from '@subwallet/react-ui';
 import { wordlists } from 'bip39';
 import CN from 'classnames';
@@ -218,21 +217,11 @@ const Component: React.FC<ImportSeedPhraseProps> = ({ className }: ImportSeedPhr
       return;
     }
 
-    let types: KeypairType[];
-
-    if (seedValidationResponse.mnemonicTypes === 'ton') {
-      types = ['ton-native'];
-    } else if (seedValidationResponse.mnemonicTypes === TRUST_WALLET_MNEMONIC_TYPE) {
-      types = ['ed25519-tw', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
-    } else {
-      types = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
-    }
-
     setAccountCreating(true);
     createAccountSuriV2({
       name: accountName,
       suri: seedValidationResponse.mnemonic,
-      types,
+      types: seedValidationResponse.pairTypes,
       isAllowed: true
     })
       .then(() => {
@@ -361,7 +350,7 @@ const Component: React.FC<ImportSeedPhraseProps> = ({ className }: ImportSeedPhr
       </Layout.WithSubHeaderOnly>
       <AccountNameModal
         accountType={seedValidationResponse
-          ? [DEFAULT_MNEMONIC_TYPE, TRUST_WALLET_MNEMONIC_TYPE].includes(seedValidationResponse.mnemonicTypes) ? AccountProxyType.UNIFIED : AccountProxyType.SOLO
+          ? seedValidationResponse.mnemonicTypes === 'general' ? AccountProxyType.UNIFIED : AccountProxyType.SOLO
           : undefined}
         isLoading={accountCreating}
         onSubmit={onCreateAccount}

@@ -86,7 +86,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (selectedMnemonicType === 'ton') {
       types = ['ton-native'];
     } else if (selectedMnemonicType === TRUST_WALLET_MNEMONIC_TYPE) {
-      types = ['ed25519-tw', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
+      types = ['ed25519-tw'];
     } else {
       types = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
     }
@@ -195,7 +195,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       </Layout.WithSubHeaderOnly>
       <SeedPhraseTermModal />
       <AccountNameModal
-        accountType={[DEFAULT_MNEMONIC_TYPE, TRUST_WALLET_MNEMONIC_TYPE].includes(selectedMnemonicType) ? AccountProxyType.UNIFIED : AccountProxyType.SOLO}
+        accountType={selectedMnemonicType === 'general' ? AccountProxyType.UNIFIED : AccountProxyType.SOLO}
         isLoading={loading}
         onSubmit={onSubmit}
       />
