@@ -35,8 +35,12 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   const { address, className = '', onApply, onCancel, substrateProxyAccountItems } = props;
   const { t } = useTranslation();
   const sectionRef = useRef<SwListSectionRef>(null);
-  const [selected, setSelected] = useState<string>(address);
   const account = useGetAccountByAddress(address);
+  const [selected, setSelected] = useState<SubstrateProxyItemExtended>(() => ({
+    isMain: true,
+    substrateProxyAddress: address,
+    proxyId: account?.proxyId
+  } as SubstrateProxyItemExtended));
 
   // Combine main account and proxy accounts
   const fullList = useMemo(() => {
@@ -50,20 +54,20 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
     ];
   }, [account?.proxyId, address, substrateProxyAccountItems]);
 
-  const onSelect = useCallback((address: string) => {
+  const onSelect = useCallback((item: SubstrateProxyItemExtended) => {
     return () => {
-      setSelected(address);
+      setSelected(item);
     };
   }, []);
 
   const renderItem = useCallback((item: SubstrateProxyItemExtended) => {
-    const isSelected = selected === item.substrateProxyAddress;
+    const isSelected = selected?.substrateProxyAddress === item.substrateProxyAddress && selected?.substrateProxyType === item.substrateProxyType;
 
     return (
       <SubstrateProxyAccountSelectorItem
         className={'__proxy-account-item'}
         isSelected={isSelected}
-        onClick={onSelect(item.substrateProxyAddress)}
+        onClick={onSelect(item)}
         showUnselectIcon
         substrateProxyAccount={item}
       />
@@ -71,7 +75,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   }, [selected, onSelect]);
 
   const onClickApply = useCallback(() => {
-    onApply?.(selected);
+    onApply?.(selected.substrateProxyAddress);
   }, [onApply, selected]);
 
   return (
@@ -137,9 +141,6 @@ const SubstrateProxyAccountSelectorModal = styled(forwardRef(Component))<Props>(
     },
 
     '.ant-sw-modal-body': {
-      overflow: 'hidden',
-      display: 'flex',
-      flexDirection: 'column',
       paddingBottom: 0
     },
 
@@ -152,7 +153,8 @@ const SubstrateProxyAccountSelectorModal = styled(forwardRef(Component))<Props>(
 
     '.ant-sw-list-wrapper': {
       flex: 1,
-      marginTop: token.margin
+      marginTop: token.margin,
+      overflowY: 'auto'
     },
 
     '.ant-sw-list-wrapper .ant-sw-list': {

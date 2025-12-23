@@ -352,6 +352,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_SDOT_ACTIONS,
           // ...EARN_QDOT_ACTIONS,
           ...OPEN_GOV_ACTIONS,
+          ...SUBSTRATE_PROXY_ACTION,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:

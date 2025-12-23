@@ -80,7 +80,8 @@ const SubstrateProxyAccountListModal = styled(forwardRef(Component))<Props>(({ t
 
     '.ant-sw-list-wrapper': {
       flex: 1,
-      marginTop: token.margin
+      marginTop: token.margin,
+      overflowY: 'auto'
     },
 
     '.ant-sw-list-wrapper .ant-sw-list': {

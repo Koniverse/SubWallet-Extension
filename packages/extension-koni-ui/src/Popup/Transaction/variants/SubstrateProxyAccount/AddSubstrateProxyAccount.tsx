@@ -244,6 +244,7 @@ const Component = (): React.ReactElement<Props> => {
           >
             <SubstrateProxyTypeSelector
               label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.proxyType')}
+              chain={chainValue}
             />
           </Form.Item>
         </Form>

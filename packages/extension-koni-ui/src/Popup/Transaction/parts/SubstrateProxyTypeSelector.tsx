@@ -8,14 +8,17 @@ import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks/fo
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, InputRef, SelectModal, Web3Block } from '@subwallet/react-ui';
 import { CheckCircle } from 'phosphor-react';
-import React, { ForwardedRef, forwardRef, useCallback } from 'react';
+import React, { ForwardedRef, forwardRef, useCallback, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
 
-interface Props extends ThemeProps, BasicInputWrapper {}
+interface Props extends ThemeProps, BasicInputWrapper {
+  chain: string;
+}
 
 interface SubstrateProxyTypeExtended {
   type: SubstrateProxyType;
   label: string;
+  unSupportedChains?: string[]
 }
 
 const substrateProxyTypeItem: SubstrateProxyTypeExtended[] = [
@@ -33,12 +36,13 @@ const substrateProxyTypeItem: SubstrateProxyTypeExtended[] = [
   },
   {
     type: 'Staking',
-    label: 'Staking'
+    label: 'Staking',
+    unSupportedChains: ['astar'] // TODO: can improve to get all support type onchain, need improve later
   }
 ];
 
-function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> {
-  const { className = '', disabled, id = 'address-input', label, placeholder, statusHelp, title, tooltip, value } = props;
+function Component(props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> {
+  const { className = '', disabled, id = 'address-input', label, placeholder, statusHelp, title, tooltip, value, chain } = props;
   const { t } = useTranslation();
   const { token } = useTheme() as Theme;
   const { onSelect } = useSelectModalInputHelper(props, ref);
@@ -69,6 +73,20 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
     );
   }, [token.colorSuccess]);
 
+  const filteredProxyTypes = useMemo(() => {
+    if (!chain) {
+      return substrateProxyTypeItem;
+    }
+
+    return substrateProxyTypeItem.filter((item) => {
+      if (!item.unSupportedChains?.length) {
+        return true;
+      }
+
+      return !item.unSupportedChains.includes(chain);
+    });
+  }, [chain]);
+
   return (
     <SelectModal
       className={`${className} proxy-type-selector-modal selector-${id}-modal`}
@@ -76,7 +94,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       id={id}
       inputClassName={`${className} proxy-type-selector-input`}
       itemKey={'type'}
-      items={substrateProxyTypeItem}
+      items={filteredProxyTypes}
       label={label}
       onSelect={onSelect}
       placeholder={placeholder || t('ui.TRANSACTION.screen.Transaction.part.SubstrateProxyTypeSelector.selectSubstrateProxyType')}

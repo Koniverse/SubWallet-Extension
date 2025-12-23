@@ -353,17 +353,20 @@ export const SubstrateProxyAccountArea = styled(Component)<Props>(({ theme: { to
   flexDirection: 'column',
   justifyContent: 'space-between',
   height: '100%',
+  minHeight: 0,
   paddingInline: token.padding,
 
-  '.__proxy-account-list-container': {
-    display: 'flex',
-    overflow: 'hidden',
-    flexDirection: 'column'
-  },
+   '.__proxy-account-list-container': {
+      display: 'flex',
+      flexDirection: 'column',
+      flex: 1,
+      overflow: 'hidden'
+    },
 
-  '.ant-sw-list-wrapper': {
-    flex: '1 1 263px'
-  },
+    '.ant-sw-list-wrapper': {
+      flex: 1,
+      overflow: 'hidden',
+    },
 
   '.__proxy-account-list': {
     marginTop: token.marginSM,
@@ -405,6 +408,7 @@ export const SubstrateProxyAccountArea = styled(Component)<Props>(({ theme: { to
   },
 
   '.__proxy-account-area-footer': {
+    flexShrink: 0,
     paddingTop: token.paddingSM,
     paddingBottom: token.paddingLG,
     display: 'flex',

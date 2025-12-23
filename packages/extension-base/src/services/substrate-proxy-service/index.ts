@@ -10,6 +10,7 @@ import BigN from 'bignumber.js';
 
 import { _SubstrateApi } from '../chain-service/types';
 import { txTypeToSubstrateProxyMap } from './constant';
+import { Enum } from '@polkadot/types';
 
 type PrimitiveSubstrateProxyAccountItem = {
   delegate: string;
@@ -20,17 +21,17 @@ type PrimitiveSubstrateProxyAccountItem = {
 export default class SubstrateProxyAccountService {
   protected readonly state: KoniState;
 
-  constructor (state: KoniState) {
+  constructor(state: KoniState) {
     this.state = state;
   }
 
-  private getSubstrateApi (chain: string): _SubstrateApi {
+  private getSubstrateApi(chain: string): _SubstrateApi {
     return this.state.getSubstrateApi(chain);
   }
 
   // Get proxied accounts for a main account
   // Get when view details or perform transaction
-  async getSubstrateProxyAccountGroup (request: RequestGetSubstrateProxyAccountGroup): Promise<SubstrateProxyAccountGroup> {
+  async getSubstrateProxyAccountGroup(request: RequestGetSubstrateProxyAccountGroup): Promise<SubstrateProxyAccountGroup> {
     const { address, chain, excludedSubstrateProxyAccounts, type } = request;
     const substrateApi = this.getSubstrateApi(chain);
 
@@ -79,7 +80,7 @@ export default class SubstrateProxyAccountService {
   }
 
   // Linking proxy account with main account
-  async addSubstrateProxyAccounts (data: AddSubstrateProxyAccountParams): Promise<TransactionData> {
+  async addSubstrateProxyAccounts(data: AddSubstrateProxyAccountParams): Promise<TransactionData> {
     const { address, chain, substrateProxyAddress, substrateProxyType } = data;
 
     if (address === substrateProxyAddress) {
@@ -95,12 +96,24 @@ export default class SubstrateProxyAccountService {
   }
 
   // Validate adding proxy account
-  public async validateAddSubstrateProxyAccount (params: AddSubstrateProxyAccountParams): Promise<TransactionError[]> {
-    const { address, chain, substrateProxyDeposit } = params;
+  public async validateAddSubstrateProxyAccount(params: AddSubstrateProxyAccountParams): Promise<TransactionError[]> {
+    const { address, chain, substrateProxyType } = params;
 
     const substrateApi = this.getSubstrateApi(chain);
 
     await substrateApi.isReady;
+    const addProxyTx = substrateApi.api.tx.proxy.addProxy;
+    const proxyTypeArg = addProxyTx.meta.args.find(arg => arg.name.toString() === 'proxyType');
+
+    if (!!proxyTypeArg) {
+      const typeName = proxyTypeArg.type.toString();
+      const proxyTypeEnum = substrateApi.api.registry.createType(typeName) as Enum;
+      const variants: string[] = proxyTypeEnum.defKeys;
+
+      if (!variants.includes(substrateProxyType)) {
+        return [new TransactionError(BasicTxErrorType.UNSUPPORTED, 'This proxy type is not supported on the chosen network. Select another one and try again')];
+      }
+    }
 
     if (!substrateApi.api.tx.proxy || !substrateApi.api.tx.proxy.addProxy) {
       return [new TransactionError(BasicTxErrorType.UNSUPPORTED)];
@@ -125,8 +138,11 @@ export default class SubstrateProxyAccountService {
       .paymentInfo(address);
 
     const estimatedFee = new BigN(feeInfo.partialFee.toString());
+    const baseDeposit = substrateApi.api.consts.proxy.proxyDepositBase?.toString() || '0';
+    const factorDeposit = substrateApi.api.consts.proxy.proxyDepositFactor?.toString() || '0';
+    const requiredDeposit = proxyList.length === 0 ? new BigN(baseDeposit).plus(factorDeposit) : new BigN(factorDeposit);
 
-    const totalRequired = new BigN(substrateProxyDeposit).plus(estimatedFee);
+    const totalRequired = new BigN(requiredDeposit).plus(estimatedFee);
 
     if (bnTransferableBalance.lt(totalRequired)) {
       return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)];
@@ -136,7 +152,7 @@ export default class SubstrateProxyAccountService {
   }
 
   // Removing linked proxy accounts from main account
-  async removeSubstrateProxyAccounts (data: RemoveSubstrateProxyAccountParams): Promise<TransactionData> {
+  async removeSubstrateProxyAccounts(data: RemoveSubstrateProxyAccountParams): Promise<TransactionData> {
     const { chain, isRemoveAll, selectedSubstrateProxyAccounts } = data;
 
     const substrateApi = this.getSubstrateApi(chain);
