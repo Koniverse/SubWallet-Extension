@@ -41,8 +41,8 @@ const substrateProxyTypeItem: SubstrateProxyTypeExtended[] = [
   }
 ];
 
-function Component(props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> {
-  const { className = '', disabled, id = 'address-input', label, placeholder, statusHelp, title, tooltip, value, chain } = props;
+function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> {
+  const { chain, className = '', disabled, id = 'address-input', label, placeholder, statusHelp, title, tooltip, value } = props;
   const { t } = useTranslation();
   const { token } = useTheme() as Theme;
   const { onSelect } = useSelectModalInputHelper(props, ref);

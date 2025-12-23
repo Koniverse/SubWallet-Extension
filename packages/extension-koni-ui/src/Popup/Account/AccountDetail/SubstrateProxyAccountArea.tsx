@@ -356,17 +356,17 @@ export const SubstrateProxyAccountArea = styled(Component)<Props>(({ theme: { to
   minHeight: 0,
   paddingInline: token.padding,
 
-   '.__proxy-account-list-container': {
-      display: 'flex',
-      flexDirection: 'column',
-      flex: 1,
-      overflow: 'hidden'
-    },
+  '.__proxy-account-list-container': {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    overflow: 'hidden'
+  },
 
-    '.ant-sw-list-wrapper': {
-      flex: 1,
-      overflow: 'hidden',
-    },
+  '.ant-sw-list-wrapper': {
+    flex: 1,
+    overflow: 'hidden'
+  },
 
   '.__proxy-account-list': {
     marginTop: token.marginSM,
