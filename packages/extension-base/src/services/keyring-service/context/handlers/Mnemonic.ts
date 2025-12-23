@@ -83,6 +83,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
     });
 
     const existingAccount = this.state.checkAddressExists(Object.values(rs.addressMap));
+
     assert(!existingAccount, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: existingAccount?.name || existingAccount?.address || '' } }));
 
     return rs;

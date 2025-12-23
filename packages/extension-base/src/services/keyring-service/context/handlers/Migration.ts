@@ -3,12 +3,7 @@
 
 import { RequestMigrateSoloAccount, RequestMigrateUnifiedAndFetchEligibleSoloAccounts, RequestPingSession, ResponseMigrateSoloAccount, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts, SoloAccountToBeMigrated } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountBaseHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Base';
-import {
-  AccountChainType,
-  AccountProxy,
-  AccountProxyType,
-  SUPPORTED_ACCOUNT_CHAIN_TYPES
-} from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType, SUPPORTED_ACCOUNT_CHAIN_TYPES } from '@subwallet/extension-base/types';
 import { createAccountProxyId, getDefaultKeypairTypeFromAccountChainType, getSuri } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
 import { keyring } from '@subwallet/ui-keyring';
@@ -46,8 +41,8 @@ export class AccountMigrationHandler extends AccountBaseHandler {
   public async migrateUnifiedAndFetchEligibleSoloAccounts (request: RequestMigrateUnifiedAndFetchEligibleSoloAccounts, setMigratingModeFn: () => void): Promise<ResponseMigrateUnifiedAndFetchEligibleSoloAccounts> {
     // Migrate unified -> unified
     const password = request.password;
-    let allAccountProxies = Object.values(this.state.accounts)
-    allAccountProxies = allAccountProxies.filter((acc) => acc.suri !== "m/44'/354'/0'/0'/0'" && acc.accountType === AccountProxyType.SOLO && acc.accounts[0].type === 'ed25519-tw'); // filter out TW solo account
+    const _allAccountProxies = Object.values(this.state.accounts);
+    const allAccountProxies = _allAccountProxies.filter((acc) => acc.suri !== "m/44'/354'/0'/0'/0'" && acc.accountType === AccountProxyType.SOLO && acc.accounts[0].type === 'ed25519-tw'); // filter out TW solo account
     const UACanBeMigrated = this.getUACanBeMigrated(allAccountProxies);
     const UACanBeMigratedSortedByParent = this.sortUAByParent(UACanBeMigrated); // master account must be migrated before derived account
     const migratedUnifiedAccountIds = await this.migrateUnifiedToUnifiedAccount(password, UACanBeMigratedSortedByParent, setMigratingModeFn);
