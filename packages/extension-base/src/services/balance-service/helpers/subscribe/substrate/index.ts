@@ -485,9 +485,8 @@ const subscribeAssetsAccountPallet = async ({ addresses, assetMap, callback, cha
       }
 
       const version: number = ['statemint', 'statemine', 'westend_assethub'].includes(chainInfo.slug) ? 4 : 3;
-      const multilocationIndex = _adaptX1Interior(_getXcmAssetMultilocation(tokenInfo), version);
 
-      const index = USE_MULTILOCATION_INDEX.includes(chainInfo.slug) ? multilocationIndex : assetIndex;
+      const index = USE_MULTILOCATION_INDEX.includes(chainInfo.slug) ? _adaptX1Interior(_getXcmAssetMultilocation(tokenInfo), version) : assetIndex;
 
       const params: _SubstrateAdapterSubscriptionArgs[] = [
         {
