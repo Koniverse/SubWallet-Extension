@@ -94,18 +94,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
       throw new SWCommonAccountError(CommonAccountErrorType.ACCOUNT_EXISTED, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: existingProxy.name || proxyId } }));
     }
 
-    const validatedAddresses: string[] = Object.values(rs.addressMap);
-
-    // if (pairTypes.includes('sr25519')) {
-    //   validatedAddresses.push(keyring.createFromUri(getSuri(mnemonic, 'ed25519-tw')).address);
-    // }
-    //
-    // if (pairTypes.includes('ed25519-tw')) {
-    //   validatedAddresses.push(keyring.createFromUri(getSuri(mnemonic, 'sr25519')).address);
-    // }
-
-    const exists = this.state.checkAddressExists(validatedAddresses);
-
+    const exists = this.state.checkAddressExists(Object.values(rs.addressMap));
     const isExistNormalSeed = exists?.relatedAccountTypes?.includes('sr25519');
     const isExistTrustSeed = exists?.relatedAccountTypes?.includes('ed25519-tw');
 

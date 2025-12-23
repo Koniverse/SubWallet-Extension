@@ -62,21 +62,11 @@ export class AccountJsonHandler extends AccountBaseHandler {
         const { address, exportMnemonic, meta, type } = keyring.createFromJson(json);
         const mnemonic = exportMnemonic(password); // todo: handle case no mnemonic
 
-        const validatedAddresses: string[] = [address];
-
-        // if (type === 'sr25519') {
-        //   validatedAddresses.push(keyring.createFromUri(getSuri(mnemonic, 'ed25519-tw')).address);
-        // }
-        //
-        // if (type === 'ed25519-tw') {
-        //   validatedAddresses.push(keyring.createFromUri(getSuri(mnemonic, 'sr25519')).address);
-        // }
-
         const { name } = meta;
         const nameExists = this.state.checkNameExists(name as string);
         const account = transformAccount(address, type, meta);
 
-        const addressExist = this.state.checkAddressExists(validatedAddresses);
+        const addressExist = this.state.checkAddressExists([address]);
         let accountName = account.name || account.address; // Note: Check and show accountName of account exists to support user to know which account is existed
         let isExistAccount = false;
 
@@ -92,9 +82,6 @@ export class AccountJsonHandler extends AccountBaseHandler {
             accountName = existingProxy.name || existingProxy.id;
           }
         }
-
-
-        // const accountName = isExistAccount ? existAccountName : account.name || account.address;
 
         const proxy: AccountProxyExtra = {
           id: address,
