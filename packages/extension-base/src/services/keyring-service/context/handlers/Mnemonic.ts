@@ -82,29 +82,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
       rs.addressMap[type] = keyring.createFromUri(getSuri(mnemonic, type), {}, type).address;
     });
 
-    // const proxyId = createAccountProxyId(mnemonic);
-    // const existingProxy = this.state.accounts[proxyId];
-    //
-    // assert(!existingProxy, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: existingProxy?.name || existingProxy?.id || '' } }));
-
-    // if (existingProxy) {
-    //   const types = existingProxy.accounts.map((acc) => acc.type);
-    //
-    //   assert(!types.includes('sr25519'), t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsViaImportType', { replace: { type: 'Import from seed phrase', name: existingProxy?.name || proxyId || '' } }));
-    //   assert(!types.includes('ed25519-tw'), t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsViaImportType', { replace: { type: 'Import from Trust Wallet', name: existingProxy?.name || proxyId || '' } }));
-    //
-    //   throw new SWCommonAccountError(CommonAccountErrorType.ACCOUNT_EXISTED, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: existingProxy.name || proxyId } }));
-    // }
-
     const existingAccount = this.state.checkAddressExists(Object.values(rs.addressMap));
-    // const isExistNormalSeed = existingAccount?.relatedAccountTypes?.includes('sr25519');
-    // const isExistTrustSeed = existingAccount?.relatedAccountTypes?.includes('ed25519-tw');
-
-    // if (mnemonicTypes === 'trust-wallet' || mnemonicTypes === 'general') {
-    //   assert(!isExistNormalSeed, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsViaImportType', { replace: { type: 'Import from seed phrase', name: existingAccount?.name || existingAccount?.address || '' } }));
-    //   assert(!isExistTrustSeed, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsViaImportType', { replace: { type: 'Import from Trust Wallet', name: existingAccount?.name || existingAccount?.address || '' } }));
-    // }
-
     assert(!existingAccount, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: existingAccount?.name || existingAccount?.address || '' } }));
 
     return rs;

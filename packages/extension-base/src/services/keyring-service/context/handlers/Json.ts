@@ -68,23 +68,6 @@ export class AccountJsonHandler extends AccountBaseHandler {
         // Note: Show accountName of account exists to support user to know which account is existed
         const accountName = accountExists ? accountExists.name : account.name || account.address;
 
-        // const addressExist = this.state.checkAddressExists([address]);
-        // let accountName = account.name || account.address; // Note: Check and show accountName of account exists to support user to know which account is existed
-        // let isExistAccount = false;
-        //
-        // if (addressExist) {
-        //   isExistAccount = true;
-        //   accountName = addressExist.name || addressExist.address;
-        // } else {
-        //   const proxyId = createAccountProxyId(mnemonic);
-        //   const existingProxy = this.state.accounts[proxyId];
-        //
-        //   if (existingProxy) {
-        //     isExistAccount = true;
-        //     accountName = existingProxy.name || existingProxy.id;
-        //   }
-        // }
-
         const proxy: AccountProxyExtra = {
           id: address,
           accountType: convertAccountProxyType(account.signMode),
@@ -190,20 +173,6 @@ export class AccountJsonHandler extends AccountBaseHandler {
             isExistAccount: false,
             isExistName: false
           };
-
-          // const [validatedAddresses, validatedTypes] = proxy.accounts.map((account) => [account.address, account.type]);
-          //
-          // if (validatedTypes.includes('ed25519-tw')) {
-          //   const address = keyring.createFromUri(getSuri(mnemonic, 'ed25519-tw')).address
-          //
-          //   validatedAddresses.push
-          // }
-          //
-          // if (validatedTypes.includes('sr25519')) {
-          //   const address = keyring.createFromUri(getSuri(mnemonic, 'ed25519-tw')).address
-          //
-          //   validatedAddresses.push
-          // }
 
           const accountExists = this.state.checkAddressExists(proxy.accounts.map((account) => account.address));
           const nameExists = this.state.checkNameExists(proxy.name);
