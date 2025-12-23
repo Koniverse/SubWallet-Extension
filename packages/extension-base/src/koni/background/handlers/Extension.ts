@@ -50,7 +50,6 @@ import { calculateToAmountByReservePool } from '@subwallet/extension-base/servic
 import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { ClaimPolygonBridgeNotificationMetadata, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
-import { isV2ChainSource, NFT_HANDLER_REGISTRY } from '@subwallet/extension-base/services/nft-service/nft-handlers/registry';
 import { GovVoteRequest, RemoveVoteRequest, UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
@@ -83,7 +82,7 @@ import BigN from 'bignumber.js';
 import * as bitcoin from 'bitcoinjs-lib';
 import { Psbt } from 'bitcoinjs-lib';
 import { t } from 'i18next';
-import { combineLatest, map, Subject } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -1307,42 +1306,15 @@ export default class KoniExtension {
     return this.#koniState.getNft();
   }
 
-  private subscribeNftUnified () {
-    const v1$ = this.#koniState.subscribeNft(); // Observable<NftJson>
-    const v2$ = this.#koniState.nftService.subscribeNftItem(); // Observable<NftState>
-
-    return combineLatest([v1$, v2$]).pipe(
-      map(([v1, v2]) => {
-        const merged = [
-          ...v1.nftList.filter((item) => {
-            const chainInfo = this.#koniState.chainService.getChainInfoByKey(item.chain);
-
-            return chainInfo && !isV2ChainSource(chainInfo, NFT_HANDLER_REGISTRY);
-          }),
-          ...v2.nftData.nftList.filter((item) => {
-            const chainInfo = this.#koniState.chainService.getChainInfoByKey(item.chain);
-
-            return chainInfo && isV2ChainSource(chainInfo, NFT_HANDLER_REGISTRY);
-          })
-        ];
-
-        return {
-          total: merged.length,
-          nftList: merged
-        };
-      })
-    );
-  }
-
   private async subscribeNft (id: string, port: chrome.runtime.Port): Promise<NftJson | null | undefined> {
     const cb = createSubscription<'pri(nft.getSubscription)'>(id, port);
-    const sub = this.subscribeNftUnified().subscribe({
+    const nftSubscription = this.#koniState.subscribeNft().subscribe({
       next: (rs) => {
         cb(rs);
       }
     });
 
-    this.createUnsubscriptionHandle(id, sub.unsubscribe);
+    this.createUnsubscriptionHandle(id, nftSubscription.unsubscribe);
 
     port.onDisconnect.addListener((): void => {
       this.cancelSubscription(id);

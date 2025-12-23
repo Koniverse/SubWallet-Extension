@@ -1,17 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ChainType, NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
-import { getAddressesByChainType } from '@subwallet/extension-base/utils';
+import {ChainType, NftCollection, NftItem} from '@subwallet/extension-base/background/KoniTypes';
+import {getAddressesByChainType} from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
-import { UniqueCollectionInstance, UniqueNftInstance } from '@subwallet-monorepos/subwallet-services-sdk/services';
+import {UniqueBundleTree, UniqueCollectionInstance,} from '@subwallet-monorepos/subwallet-services-sdk/services';
 
-import { BaseNftHandler, NftHandlerResult } from '../base-nft-handler';
-
-type IndexedNft = NftItem & {
-  __tokenAddress: string;
-  __rawOwner: string;
-};
+import {BaseNftHandler, NftHandlerResult} from '../base-nft-handler';
 
 export class UniqueNftHandler extends BaseNftHandler {
   override filterAddresses (addresses: string[]): string[] {
@@ -29,84 +24,44 @@ export class UniqueNftHandler extends BaseNftHandler {
     };
   }
 
-  private mapUniqueSdkToNftItem (
-    raw: UniqueNftInstance,
-    topmostOwner: string
-  ): IndexedNft {
+  private mapBundleTreeToNftItem(
+    node: UniqueBundleTree,
+    topmostOwner: string,
+    level = 0
+  ): NftItem {
     return {
-      id: raw.tokenId.toString(),
+      id: node.tokenId.toString(),
       chain: this.chain,
-      collectionId: String(raw.collectionId),
-      name: raw.name,
-      image: raw.image || undefined,
-      description: raw.description,
+      collectionId: node.collectionId.toString(),
+      name: node.name || `#${node.tokenId}`,
+      image: node.image || undefined,
+      description: '',
 
       owner: topmostOwner,
-
-      isBundle: false,
+      isBundle: node.nested && node.nested.length > 0,
       properties: null,
 
-      nestingTokens: [],
-      nestingLevel: 0,
-
-      // Internal fields for Tree Logic
-      __tokenAddress: raw.tokenAddress,
-      __rawOwner: raw.owner
+      nestingLevel: level,
+      nestingTokens: node.nested && node.nested.length > 0
+        ? node.nested.map((child) => this.mapBundleTreeToNftItem(child, topmostOwner, level + 1))
+        : undefined
     };
   }
 
-  private sanitizeNft (item: IndexedNft): NftItem {
-    const { __rawOwner, __tokenAddress, nestingTokens, ...rest } = item;
+  async fetchNftBundle(collectionId: number | string, tokenId: number, topmostOwner: string): Promise<NftItem | null> {
+    const api = subwalletApiSdk.uniqueNftDetectionApi;
+    if (!api) return null;
 
-    const cleanChildren = (nestingTokens as IndexedNft[] || []).map((child) =>
-      this.sanitizeNft(child)
-    );
+    try {
+      const treeData = await api.getNftBundleTree(collectionId, tokenId);
 
-    return {
-      ...rest,
-      nestingTokens: cleanChildren.length > 0 ? cleanChildren : undefined
-    } as NftItem;
-  }
+      if (!treeData) return null;
 
-  private buildUniqueNftTree (
-    raws: UniqueNftInstance[],
-    topmostOwner: string
-  ): { roots: IndexedNft[] } {
-    const index = new Map<string, IndexedNft>();
-    const allItems: IndexedNft[] = [];
-
-    for (const raw of raws) {
-      if (!raw.tokenAddress) {
-        continue;
-      }
-
-      const nft = this.mapUniqueSdkToNftItem(raw, topmostOwner);
-
-      index.set(nft.__tokenAddress, nft);
-      allItems.push(nft);
+      return this.mapBundleTreeToNftItem(treeData, topmostOwner);
+    } catch (e) {
+      console.error(`[UniqueNftHandler] Failed to fetch bundle tree`, e);
+      return null;
     }
-
-    const roots: IndexedNft[] = [];
-
-    // Step 2: (Linking)
-    for (const nft of allItems) {
-      const parent = index.get(nft.__rawOwner);
-
-      if (parent) {
-        // nft.parent = parent; // (Optional)
-
-        // 2. Increase level
-        nft.nestingLevel = (parent.nestingLevel ?? 0) + 1;
-
-        parent.nestingTokens = parent.nestingTokens || [];
-        parent.nestingTokens.push(nft);
-        parent.isBundle = true;
-      } else {
-        roots.push(nft);
-      }
-    }
-
-    return { roots };
   }
 
   // ==================== MAIN HANDLER ====================
@@ -123,21 +78,27 @@ export class UniqueNftHandler extends BaseNftHandler {
     try {
       await Promise.all(addresses.map(async (address) => {
         // 1. Collections
-        const sdkCollections = await api.getUniqueCollectionsByOwnerIn(address);
+        const sdkCollections = await api.getUniqueCollectionsByTokenOwner(address);
+        // 2. Get Collection Info
+        for (const col of sdkCollections) {
+          const colInfo = await api.getUniqueCollectionsInfo(col.collectionId);
+          if (!colInfo) {
+            continue;
+          }
+          const collection = this.mapUniqueCollections(colInfo);
+          collections.push(collection);
+        }
 
-        sdkCollections.forEach((col) => collections.push(this.mapUniqueCollections(col)));
+        // 3. NFTs
+        const sdkNfts = await api.getAllUniqueRootNfts({owner: address});
 
-        // 2. NFTs
-        const sdkNfts = await api.getAllUniqueNftsByTopmostOwnerIn(address);
+        for (const rootNft of sdkNfts) {
+          const fullTree = await this.fetchNftBundle(rootNft.collectionId, rootNft.tokenId, address);
+          if (fullTree) {
+            items.push(fullTree);
+          }
+        }
 
-        // 3. Build Tree
-        const { roots } = this.buildUniqueNftTree(sdkNfts, address);
-
-        // 4. Sanitize data
-        const cleanRoots = roots.map((root) => this.sanitizeNft(root));
-
-        // Output like this: [Root1 { nestingTokens: [Child1, Child2] }, Root2...]
-        items.push(...cleanRoots);
       }));
     } catch (e) {
       console.error(`[UniqueNftHandler] Failed to fetch for ${this.chain}`, e);

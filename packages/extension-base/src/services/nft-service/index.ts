@@ -13,14 +13,25 @@ import { MultiChainNftFetcher } from './multi-chain-nft-fetcher';
 export interface NftState {
   nftData: NftJson;
   nftCollections: NftCollection[];
-  isLoading: boolean;
 }
 
 const INITIAL_NFT_STATE: NftState = {
   nftData: { total: 0, nftList: [] },
   nftCollections: [],
-  isLoading: false
 };
+
+// HIGH PRIORITY – no lazy
+const IMMEDIATE_EVENTS: EventType[] = [
+  'account.updateCurrent',
+  'account.add',
+  'account.remove'
+];
+
+// LOW PRIORITY – lazy
+const LAZY_EVENTS: EventType[] = [
+  'asset.updateState',
+  'chain.add'
+];
 
 export class NftService implements StoppableServiceInterface {
   private readonly state: KoniState;
@@ -67,7 +78,6 @@ export class NftService implements StoppableServiceInterface {
     this.nftStateSubject.next({
       nftData: nftData || { total: 0, nftList: [] },
       nftCollections: collections || [],
-      isLoading: false
     });
   }
 
@@ -113,19 +123,16 @@ export class NftService implements StoppableServiceInterface {
   }
 
   private handleEvents (events: EventItem<EventType>[], eventTypes: EventType[]) {
-    let needReload = false;
-    let lazyTime = 2000;
+    let lazyTime = 500;
+    const address = this.state.keyringService.context.currentAccount.proxyId;
 
-    if (
-      eventTypes.includes('account.updateCurrent') ||
-      eventTypes.includes('account.add') ||
-      eventTypes.includes('account.remove') ||
-      eventTypes.includes('chain.add') ||
-      eventTypes.includes('asset.updateState')
-    ) {
-      needReload = true;
-      lazyTime = 1000;
+    // 1. Immediate
+    if (IMMEDIATE_EVENTS.some((e) => eventTypes.includes(e))) {
+      this.state.resetNft(address)
+      this.refreshNftData().catch(console.error);
+      return;
     }
+
 
     // if (eventTypes.includes('chain.updateState')) {
     //   needReload = true;
@@ -138,7 +145,7 @@ export class NftService implements StoppableServiceInterface {
     //   lazyTime = 300;
     // }
 
-    if (needReload) {
+    if (LAZY_EVENTS.some((e) => eventTypes.includes(e))) {
       addLazy('nft.refresh', () => {
         if (!this.isReloading && this.isStarted) {
           this.refreshNftData().catch(console.error);
@@ -222,7 +229,6 @@ export class NftService implements StoppableServiceInterface {
     }
   }
 
-  /** Core refresh logic – chỉ gọi đúng 1 hàm fetch */
   private async refreshNftData (): Promise<void> {
     if (this.isReloading) {
       return;
@@ -240,8 +246,6 @@ export class NftService implements StoppableServiceInterface {
         return;
       }
 
-      this.nftStateSubject.next({ ...this.nftStateSubject.getValue(), isLoading: true });
-
       const result = await this.multiChainFetcher.fetch(addresses, activeChains);
 
       await this.persistNftData(result);
@@ -252,11 +256,10 @@ export class NftService implements StoppableServiceInterface {
           nftList: result.items
         },
         nftCollections: result.collections,
-        isLoading: false
       });
     } catch (error) {
       console.error('[NftService] Refresh failed:', error);
-      this.nftStateSubject.next({ ...this.nftStateSubject.getValue(), isLoading: false });
+      this.nftStateSubject.next({ ...this.nftStateSubject.getValue()});
     } finally {
       this.isReloading = false;
     }

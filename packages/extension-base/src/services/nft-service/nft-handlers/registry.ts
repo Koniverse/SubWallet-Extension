@@ -12,21 +12,16 @@ import { UniqueNftHandler } from '@subwallet/extension-base/services/nft-service
 export interface NftHandlerDescriptor {
   id: string;
   supports(chainInfo: _ChainInfo): boolean;
-  supportFechFullList: boolean;
+  supportsFetchFullNftList: boolean;
   create(chainSlug: string, state: KoniState): BaseNftHandler;
 }
 
-const NFT_V2_DOMAINS = new Set<string>([
-  'ethereum',
-  'unique_network'
-]);
-
-export function isV2ChainSource (
+export function isNftV2Chain (
   chainInfo: _ChainInfo,
   registry: NftHandlerDescriptor[]
 ): boolean {
   return registry.some((desc) =>
-    NFT_V2_DOMAINS.has(desc.id) && desc.supports(chainInfo)
+    desc.supports(chainInfo)
   );
 }
 
@@ -35,13 +30,13 @@ export const NFT_HANDLER_REGISTRY: NftHandlerDescriptor[] = [
   {
     id: 'evm',
     supports: (chainInfo) => _isChainSupportEvmNft(chainInfo),
-    supportFechFullList: true,
+    supportsFetchFullNftList: true,
     create: (chain) => new EvmNftHandler(chain)
   },
   {
     id: 'unique_network',
     supports: (chainInfo) => NFT_CHAIN_GROUPS_MIGRATED.unique_network[0].includes(chainInfo.slug),
-    supportFechFullList: false,
+    supportsFetchFullNftList: false,
     create: (chain) => new UniqueNftHandler(chain)
   }
   // {
