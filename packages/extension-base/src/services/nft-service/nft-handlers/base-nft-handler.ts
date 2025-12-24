@@ -24,7 +24,7 @@ export abstract class BaseNftHandler {
   abstract filterAddresses(addresses: string[]): string[];
 
   // Optional method - subclasses can choose to implement or not
-  fetchFullListNftOfaCollection (_request: NftFullListRequest): Promise<NftHandlerResult> {
+  fetchFullListNftOfACollection (_request: NftFullListRequest): Promise<NftHandlerResult> {
     return Promise.resolve(EMPTY_NFT_RESULT);
   }
 }

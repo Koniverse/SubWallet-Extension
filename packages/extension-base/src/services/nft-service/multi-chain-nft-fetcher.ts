@@ -101,7 +101,7 @@ export class MultiChainNftFetcher {
     };
   }
 
-  public async fetchFullListNftOfaCollection (request: NftFullListRequest): Promise<NftHandlerResult> {
+  public async fetchFullListNftOfACollection (request: NftFullListRequest): Promise<NftHandlerResult> {
     const { chainInfo, contractAddress, owners } = request;
     const items: NftItem[] = [];
     const collections: NftCollection[] = [];
@@ -109,14 +109,15 @@ export class MultiChainNftFetcher {
     const handlers = this.getHandlersForChain(chainInfo.slug);
 
     for (const handler of handlers) {
-      // if (!handler.supportFechFullList) { => todo: improve config
+      // Todo: Improve the full-list fetch feature
+      // if (!handler.supportsFetchFullNftList) {
       //   continue;
       // }
 
       const handlerOwners = handler.filterAddresses(owners);
 
       try {
-        const result = await handler.fetchFullListNftOfaCollection(
+        const result = await handler.fetchFullListNftOfACollection(
           {
             contractAddress: contractAddress,
             owners: handlerOwners,

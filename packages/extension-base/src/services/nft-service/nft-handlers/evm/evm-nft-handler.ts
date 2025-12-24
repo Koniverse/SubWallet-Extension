@@ -162,7 +162,7 @@ export class EvmNftHandler extends BaseNftHandler {
   }
 
   // ==================== 2. FULL – At collection details screen ====================
-  override async fetchFullListNftOfaCollection (request: NftFullListRequest): Promise<NftHandlerResult> {
+  override async fetchFullListNftOfACollection (request: NftFullListRequest): Promise<NftHandlerResult> {
     const items: NftItem[] = [];
     const collections: NftCollection[] = [];
     const { chainInfo, contractAddress, owners } = request;

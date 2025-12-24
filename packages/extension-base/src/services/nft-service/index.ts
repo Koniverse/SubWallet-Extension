@@ -200,7 +200,7 @@ export class NftService implements StoppableServiceInterface {
     }
 
     try {
-      const result = await this.multiChainFetcher.fetchFullListNftOfaCollection(request);
+      const result = await this.multiChainFetcher.fetchFullListNftOfACollection(request);
 
       // Persist DB
       this.persistNftData({
