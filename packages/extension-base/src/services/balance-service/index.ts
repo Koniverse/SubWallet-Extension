@@ -973,7 +973,7 @@ export class BalanceService implements StoppableServiceInterface {
       const substrateAddress = addresses.find((address) => {
         const type = getKeypairTypeByAddress(address);
 
-        return [...SubstrateKeypairTypes, ...EthereumKeypairTypes].includes(type);
+        return [...AllSubstrateKeypairTypes, ...EthereumKeypairTypes].includes(type);
       });
 
       if (substrateAddress) {

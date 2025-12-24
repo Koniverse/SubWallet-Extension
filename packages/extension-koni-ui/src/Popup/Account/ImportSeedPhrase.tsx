@@ -3,6 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountProxyType, ResponseMnemonicValidateV2 } from '@subwallet/extension-base/types';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountNameModal, CloseIcon, Layout, PageWrapper, PhraseNumberSelector, SeedPhraseInput } from '@subwallet/extension-koni-ui/components';
 import { ACCOUNT_NAME_MODAL, DEFAULT_MNEMONIC_TYPE, IMPORT_ACCOUNT_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
@@ -15,6 +16,7 @@ import { wordlists } from 'bip39';
 import CN from 'classnames';
 import { CheckCircle, Eye, EyeSlash, FileArrowDown, XCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { Trans } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -154,7 +156,7 @@ const Component: React.FC<ImportSeedPhraseProps> = ({ className }: ImportSeedPhr
           }).then((response) => {
             setSeedValidationResponse(response);
 
-            if (response.mnemonicTypes === 'general') {
+            if (response.mnemonicTypes === DEFAULT_MNEMONIC_TYPE) {
               alertModal.open({
                 closable: false,
                 title: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.incompatibleSeedPhrase'),
@@ -167,6 +169,46 @@ const Component: React.FC<ImportSeedPhraseProps> = ({ className }: ImportSeedPhr
                     <br />
                     <div>
                       {t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.tonIncompatibleSeedPhraseWarning')}
+                    </div>
+                  </>
+                ),
+                cancelButton: {
+                  text: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.goBack'),
+                  icon: XCircle,
+                  iconWeight: 'fill',
+                  onClick: () => {
+                    alertModal.close();
+                    setSubmitting(false);
+                  },
+                  schema: 'secondary'
+                },
+                okButton: {
+                  text: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.import'),
+                  icon: CheckCircle,
+                  iconWeight: 'fill',
+                  onClick: () => {
+                    activeModal(accountNameModalId);
+                    alertModal.close();
+                  },
+                  schema: 'primary'
+                }
+              });
+            } else if (response.mnemonicTypes === TRUST_WALLET_MNEMONIC_TYPE) {
+              alertModal.open({
+                closable: false,
+                title: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.trustSeedPhraseWarningTitle'),
+                type: NotificationType.WARNING,
+                content: (
+                  <>
+                    <div>
+                      <Trans
+                        components={{ highlight: <strong /> }}
+                        i18nKey={detectTranslate('ui.ACCOUNT.screen.Account.ImportSeedPhrase.trustSeedPhraseImportInfo')}
+                      />
+                    </div>
+                    <br />
+                    <div>
+                      {t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.trustSeedPhraseImportWarning')}
                     </div>
                   </>
                 ),
