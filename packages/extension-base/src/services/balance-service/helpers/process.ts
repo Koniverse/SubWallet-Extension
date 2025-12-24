@@ -9,6 +9,7 @@ import { getSnowBridgeGatewayContract } from '@subwallet/extension-base/koni/api
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { CommonOptimalTransferPath, CommonStepType, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
+import BigN from "bignumber.js";
 
 export interface RequestOptimalTransferProcess {
   originChain: string,
@@ -45,18 +46,23 @@ export async function getSnowbridgeTransferProcessFromEvm (address: string, evmA
   try {
     const allowance = await getERC20Allowance(getSnowBridgeGatewayContract(evmApi.chainSlug), address, _getContractAddressOfToken(tokenInfo), evmApi);
 
-    if (!allowance || BigInt(allowance) < BigInt(amount)) {
+    if (!allowance || new BigN(allowance).lt(amount)) {
       result.steps.push({
         id: result.steps.length,
         type: CommonStepType.TOKEN_APPROVAL,
         name: 'Approve spending'
       });
       result.totalFee.push(MOCK_STEP_FEE);
-    } else {
-      return Promise.reject(new Error('Unable to perform this transaction at the moment. Try again later'));
     }
   } catch (e) {
-    return Promise.reject(new Error('Unable to perform this transaction at the moment. Try again later'));
+    console.error(e);
+
+    result.steps.push({
+      id: result.steps.length,
+      type: CommonStepType.TOKEN_APPROVAL,
+      name: 'Approve spending'
+    });
+    result.totalFee.push(MOCK_STEP_FEE);
   }
 
   result.steps.push({
@@ -80,7 +86,7 @@ export async function getAcrossbridgeTransferProcessFromEvm (SpokePoolAddress: s
 
     console.log('allowance', allowance, !allowance, !allowance || BigInt(allowance) < BigInt(amount));
 
-    if (!allowance || BigInt(allowance) < BigInt(amount)) {
+    if (!allowance || new BigN(allowance).lt(amount)) {
       result.steps.push({
         id: result.steps.length,
         type: CommonStepType.TOKEN_APPROVAL,
@@ -88,11 +94,17 @@ export async function getAcrossbridgeTransferProcessFromEvm (SpokePoolAddress: s
         metadata: { SpokePoolAddress }
       });
       result.totalFee.push(MOCK_STEP_FEE);
-    } else {
-      return Promise.reject(new Error('Unable to perform this transaction at the moment. Try again later'));
     }
   } catch (e) {
-    return Promise.reject(new Error('Unable to perform this transaction at the moment. Try again later'));
+    console.error(e);
+
+    result.steps.push({
+      id: result.steps.length,
+      type: CommonStepType.TOKEN_APPROVAL,
+      name: 'Approve spending',
+      metadata: { SpokePoolAddress }
+    });
+    result.totalFee.push(MOCK_STEP_FEE);
   }
 
   result.steps.push({
