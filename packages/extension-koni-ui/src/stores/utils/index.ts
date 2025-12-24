@@ -17,6 +17,7 @@ import { lazySubscribeMessage } from '@subwallet/extension-koni-ui/messaging';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { MissionInfo } from '@subwallet/extension-koni-ui/types';
 import { SessionTypes } from '@walletconnect/types';
+import { WalletConnectSessionsSubscription } from "@subwallet/extension-koni-ui/stores/types";
 
 // Setup redux stores
 
@@ -390,7 +391,7 @@ export const updateWalletConnectSessions = (data: SessionTypes.Struct[]) => {
   store.dispatch({ type: 'walletConnect/updateSessions', payload: payload });
 };
 
-export const subscribeWalletConnectSessions = lazySubscribeMessage('pri(walletConnect.session.subscribe)', null, updateWalletConnectSessions, updateWalletConnectSessions);
+export const subscribeWalletConnectSessions: WalletConnectSessionsSubscription = lazySubscribeMessage('pri(walletConnect.session.subscribe)', null, updateWalletConnectSessions, updateWalletConnectSessions);
 
 export const updateWCNotSupportRequests = (data: WalletConnectNotSupportRequest[]) => {
   // Convert data to object with key as id
