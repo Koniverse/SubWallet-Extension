@@ -380,7 +380,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
   const isBittensorBridgeTransfer = _isBittensorChainBridge(srcChain.slug, destChain.slug);
   const isSubtensorEvmBridgeTransfer = _isSubtensorEvmChainBridge(srcChain.slug, destChain.slug);
 
-  const isSubstrateXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer);
+  const isSubstrateParaspellXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer || isBittensorBridgeTransfer || isSubtensorEvmBridgeTransfer);
 
   const fakeAddress = '5DRewsYzhJqZXU3SRaWy1FSt5iDr875ao91aw5fjrJmDG4Ap'; // todo: move this
   const substrateAddress = fakeAddress; // todo: move this
@@ -458,7 +458,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
       };
     } else if (feeChainType === 'substrate') {
       // Calculate fee for substrate transaction
-      if (isSubstrateXcm) {
+      if (isSubstrateParaspellXcm) {
         const xcmFeeInfo = await estimateXcmFee({
           fromChainInfo: params.originChain,
           fromTokenInfo: params.originTokenInfo,

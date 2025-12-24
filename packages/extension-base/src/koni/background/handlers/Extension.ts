@@ -1712,7 +1712,7 @@ export default class KoniExtension {
     const isSubtensorEvmBridgeTransfer = _isSubtensorEvmChainBridge(originNetworkKey, destinationNetworkKey);
 
     const extrinsicType = ExtrinsicType.TRANSFER_XCM;
-    const isSubstrateXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer || isBittensorBridgeTransfer || isSubtensorEvmBridgeTransfer);
+    const isSubstrateParaspellXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer || isBittensorBridgeTransfer || isSubtensorEvmBridgeTransfer);
 
     const isTransferNative = this.#koniState.getNativeTokenInfo(originNetworkKey).slug === tokenSlug;
     const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNative && tokenSlug === tokenPayFeeSlug;
@@ -1775,7 +1775,7 @@ export default class KoniExtension {
 
       extrinsic = await funcCreateExtrinsic(params);
 
-      if (isSubstrateXcm) {
+      if (isSubstrateParaspellXcm) {
         const xcmFeeInfo = await estimateXcmFee({
           fromChainInfo: params.originChain,
           fromTokenInfo: params.originTokenInfo,
@@ -1872,7 +1872,7 @@ export default class KoniExtension {
           error.length && inputTransaction.errors.push(...error);
         }
 
-        if (isSubstrateXcm) {
+        if (isSubstrateParaspellXcm) {
           const isDryRunSuccess = await dryRunXcmExtrinsicV2(params, false);
 
           if (!isDryRunSuccess) {
