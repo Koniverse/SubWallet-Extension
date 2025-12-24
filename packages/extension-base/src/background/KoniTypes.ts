@@ -877,6 +877,23 @@ export interface RequestAccountCreateHardwareMultiple {
   accounts: CreateHardwareAccountItem[];
 }
 
+export interface RequestAccountCreateMultisig {
+  signers: string[];
+  threshold: number;
+  name: string;
+}
+
+export enum AccountMultisigErrorCode {
+  INVALID_ADDRESS = 'invalidToAccount',
+  INVALID_NAME = 'invalidName',
+  KEYRING_ERROR = 'keyringError'
+}
+
+export interface AccountMultisigError {
+  code: AccountMultisigErrorCode;
+  message: string;
+}
+
 // Restore account with public and secret key
 
 export interface RequestAccountCreateWithSecretKey {
@@ -2430,6 +2447,7 @@ export interface KoniRequestSignatures {
   'pri(accounts.create.hardwareV2)': [RequestAccountCreateHardwareV2, boolean];
   'pri(accounts.create.hardwareMultiple)': [RequestAccountCreateHardwareMultiple, boolean];
   'pri(accounts.create.withSecret)': [RequestAccountCreateWithSecretKey, ResponseAccountCreateWithSecretKey];
+  'pri(accounts.create.multisig)': [RequestAccountCreateMultisig, AccountMultisigError[]];
 
   // Inject account
   'pri(accounts.inject.add)': [RequestAddInjectedAccounts, boolean];

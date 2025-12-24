@@ -115,6 +115,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     const result: ListItem[] = [];
     const masterAccounts: AccountProxy[] = [];
     const qrSignerAccounts: ListItem[] = [];
+    const multisigAccounts: ListItem[] = [];
     const watchOnlyAccounts: ListItem[] = [];
     const ledgerAccounts: ListItem[] = [];
     const injectedAccounts: ListItem[] = [];
@@ -137,6 +138,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         masterAccounts.push(ap);
       } else if (ap.accountType === AccountProxyType.QR) {
         qrSignerAccounts.push(ap);
+      } else if (ap.accountType === AccountProxyType.MULTISIG) {
+        multisigAccounts.push(ap);
       } else if (ap.accountType === AccountProxyType.READ_ONLY) {
         watchOnlyAccounts.push(ap);
       } else if (ap.accountType === AccountProxyType.LEDGER) {
@@ -159,6 +162,15 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       });
 
       result.push(...qrSignerAccounts);
+    }
+
+    if (multisigAccounts.length) {
+      multisigAccounts.unshift({
+        id: 'multisig',
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.multisigAccount')
+      });
+
+      result.push(...multisigAccounts);
     }
 
     if (watchOnlyAccounts.length) {
