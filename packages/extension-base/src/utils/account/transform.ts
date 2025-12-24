@@ -266,7 +266,8 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
           ...OPEN_GOV_ACTIONS,
-          ...OTHER_ACTIONS
+          ...OTHER_ACTIONS,
+          ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE
         ];
       case AccountChainType.ETHEREUM:
         return [
@@ -306,7 +307,8 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
           ...OPEN_GOV_ACTIONS,
-          ...OTHER_ACTIONS
+          ...OTHER_ACTIONS,
+          ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE
         ];
       case AccountChainType.ETHEREUM:
         return [
@@ -344,7 +346,8 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_SDOT_ACTIONS,
           // ...EARN_QDOT_ACTIONS,
           ...OPEN_GOV_ACTIONS,
-          ...OTHER_ACTIONS
+          ...OTHER_ACTIONS,
+          ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE
         ];
       case AccountChainType.ETHEREUM:
         return [

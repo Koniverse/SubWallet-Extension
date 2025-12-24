@@ -95,3 +95,7 @@ export interface GovUnlockVoteParams extends TransactionFormBaseProps {
   referendumIds?: string[];
   tracks: number[];
 }
+
+export interface ChangeBittensorRootClaimType extends TransactionFormBaseProps {
+  bittensorRootClaimType: string;
+}

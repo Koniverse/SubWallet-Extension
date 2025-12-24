@@ -21,6 +21,7 @@ export { default as ChangeEarningValidatorTransactionConfirmation } from './Chan
 export { default as GovVoteTransactionConfirmation } from './GovVote';
 export { default as GovUnvoteTransactionConfirmation } from './GovUnvote';
 export { default as GovUnlockTransactionConfirmation } from './GovUnlock';
+export { default as ChangeBittensorRootClaimRewardTypeTransactionConfirmation } from './ChangeBittensorRootClaimRewardType';
 
 export * from './TransferBlock';
 export * from './Process';
