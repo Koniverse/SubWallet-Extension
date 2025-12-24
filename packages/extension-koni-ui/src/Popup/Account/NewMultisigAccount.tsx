@@ -306,7 +306,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               <div className={'signatory-form-right'}>
                 <Button
                   block={true}
-                  disabled={!signerAddressValue}
+                  disabled={!signerAddressValue || !isAddress(signerAddressValue) || isEthereumAddress(signerAddressValue)}
                   icon={(
                     <Icon
                       className={'icon-remove'}
