@@ -11,9 +11,10 @@ import { createCardanoTransaction } from '@subwallet/extension-base/services/bal
 import { gasSettingsForEWC, getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createBittensorToSubtensorEvmExtrinsic, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, createSubtensorEvmToBittensorExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { _isAcrossChainBridge, _isAcrossTestnetBridge, getAcrossSendingValue } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
+import { _isBittensorChainBridge, _isSubtensorEvmChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/bittensorBridge/nativeTokenBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
@@ -363,7 +364,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
 };
 
 export const calculateXcmMaxTransferable = async (id: string, request: CalculateMaxTransferable, freeBalance: AmountData, fee: FeeInfo): Promise<ResponseSubscribeTransfer> => {
-  const { address, destChain, destToken, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, value } = request;
+  const { address, destChain, destToken, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, transferAll, value } = request;
   const feeChainType = fee.type;
   let estimatedFee = '0';
   let feeOptions: FeeDetail;
@@ -376,6 +377,9 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
   const isPolygonBridgeTransfer = _isPolygonChainBridge(srcChain.slug, destChain.slug);
   const isPosBridgeTransfer = _isPosChainBridge(srcChain.slug, destChain.slug);
   const isAcrossBridgeTransfer = _isAcrossChainBridge(srcChain.slug, destChain.slug);
+  const isBittensorBridgeTransfer = _isBittensorChainBridge(srcChain.slug, destChain.slug);
+  const isSubtensorEvmBridgeTransfer = _isSubtensorEvmChainBridge(srcChain.slug, destChain.slug);
+
   const isSubstrateXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer);
 
   const fakeAddress = '5DRewsYzhJqZXU3SRaWy1FSt5iDr875ao91aw5fjrJmDG4Ap'; // todo: move this
@@ -403,7 +407,8 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
       evmApi,
       feeCustom,
       feeOption,
-      feeInfo: fee
+      feeInfo: fee,
+      transferAll
     };
 
     let funcCreateExtrinsic: FunctionCreateXcmExtrinsic;
@@ -414,6 +419,10 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
       funcCreateExtrinsic = createAcrossBridgeExtrinsic;
 
       params.sendingValue = await getAcrossSendingValue(srcChain, srcToken, destChain, _isAcrossTestnetBridge(srcChain.slug));
+    } else if (isBittensorBridgeTransfer) {
+      funcCreateExtrinsic = createBittensorToSubtensorEvmExtrinsic;
+    } else if (isSubtensorEvmBridgeTransfer) {
+      funcCreateExtrinsic = createSubtensorEvmToBittensorExtrinsic;
     } else if (isSnowBridgeEvmTransfer) {
       funcCreateExtrinsic = createSnowBridgeExtrinsic;
     } else if (isAvailBridgeFromEvm) {

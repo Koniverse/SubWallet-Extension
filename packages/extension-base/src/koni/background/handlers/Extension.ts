@@ -36,9 +36,10 @@ import { createCardanoTransaction } from '@subwallet/extension-base/services/bal
 import { getERC20TransactionObject, getERC721Transaction, getEVMTransactionObject, getPSP34TransferExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, dryRunXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createBittensorToSubtensorEvmExtrinsic, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, createSubtensorEvmToBittensorExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, dryRunXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { _isAcrossChainBridge, AcrossQuote, getAcrossQuote } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { getClaimTxOnAvail, getClaimTxOnEthereum, isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
+import { _isBittensorChainBridge, _isSubtensorEvmChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/bittensorBridge/nativeTokenBridge';
 import { _isPolygonChainBridge, getClaimPolygonBridge, isClaimedPolygonBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, getClaimPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
@@ -1707,8 +1708,11 @@ export default class KoniExtension {
     const isPolygonBridgeTransfer = _isPolygonChainBridge(originNetworkKey, destinationNetworkKey);
     const isPosBridgeTransfer = _isPosChainBridge(originNetworkKey, destinationNetworkKey);
     const isAcrossBridgeTransfer = _isAcrossChainBridge(originNetworkKey, destinationNetworkKey);
+    const isBittensorBridgeTransfer = _isBittensorChainBridge(originNetworkKey, destinationNetworkKey);
+    const isSubtensorEvmBridgeTransfer = _isSubtensorEvmChainBridge(originNetworkKey, destinationNetworkKey);
+
     const extrinsicType = ExtrinsicType.TRANSFER_XCM;
-    const isSubstrateXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer);
+    const isSubstrateXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer || isBittensorBridgeTransfer || isSubtensorEvmBridgeTransfer);
 
     const isTransferNative = this.#koniState.getNativeTokenInfo(originNetworkKey).slug === tokenSlug;
     const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNative && tokenSlug === tokenPayFeeSlug;
@@ -1728,6 +1732,9 @@ export default class KoniExtension {
       if (isPosBridgeTransfer || isPolygonBridgeTransfer) {
         funcCreateExtrinsic = createPolygonBridgeExtrinsic;
         type = 'evm';
+      } else if (isSubtensorEvmBridgeTransfer) {
+        funcCreateExtrinsic = createSubtensorEvmToBittensorExtrinsic;
+        type = 'evm';
       } else if (isAcrossBridgeTransfer) {
         funcCreateExtrinsic = createAcrossBridgeExtrinsic;
         type = 'evm';
@@ -1737,6 +1744,9 @@ export default class KoniExtension {
       } else if (isAvailBridgeFromEvm) {
         funcCreateExtrinsic = createAvailBridgeTxFromEth;
         type = 'evm';
+      } else if (isBittensorBridgeTransfer) {
+        funcCreateExtrinsic = createBittensorToSubtensorEvmExtrinsic;
+        type = 'substrate';
       } else if (isAvailBridgeFromAvail) {
         funcCreateExtrinsic = createAvailBridgeExtrinsicFromAvail;
         type = 'substrate';
@@ -1759,7 +1769,8 @@ export default class KoniExtension {
         evmApi,
         feeCustom,
         feeOption,
-        feeInfo
+        feeInfo,
+        transferAll
       };
 
       extrinsic = await funcCreateExtrinsic(params);
@@ -1905,7 +1916,7 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: inputData,
       extrinsicType,
-      chainType: !isSnowBridgeEvmTransfer && !isAvailBridgeFromEvm && !isPolygonBridgeTransfer && !isPosBridgeTransfer && !isAcrossBridgeTransfer ? ChainType.SUBSTRATE : ChainType.EVM,
+      chainType: !isSnowBridgeEvmTransfer && !isAvailBridgeFromEvm && !isPolygonBridgeTransfer && !isPosBridgeTransfer && !isAcrossBridgeTransfer && !isSubtensorEvmBridgeTransfer ? ChainType.SUBSTRATE : ChainType.EVM,
       transferNativeAmount: _isNativeToken(originTokenInfo) ? value : '0',
       ignoreWarnings,
       tokenPayFeeSlug,
@@ -2393,7 +2404,7 @@ export default class KoniExtension {
       isTransferLocalTokenAndPayThatTokenAsFee,
       isTransferNativeTokenAndPayLocalTokenAsFee,
       nativeToken,
-      transferAll: transferAll
+      transferAll
     };
 
     const subscription = combineLatest({

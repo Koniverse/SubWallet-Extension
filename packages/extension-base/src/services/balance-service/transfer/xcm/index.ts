@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
-import { _isAcrossBridgeXcm, _isPolygonBridgeXcm, _isPosBridgeXcm, _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { _isAcrossBridgeXcm, _isBittensorToSubtensorEvmBridge, _isPolygonBridgeXcm, _isPosBridgeXcm, _isSnowBridgeXcm, _isSubtensorEvmtoBittensorBridge } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
@@ -15,6 +15,7 @@ import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 
+import { getBittensorToSubtensorEvmExtrinsic, getSubtensorEvmtoBittensorExtrinsic } from './bittensorBridge/nativeTokenBridge';
 import { _createPosBridgeL1toL2Extrinsic, _createPosBridgeL2toL1Extrinsic } from './posBridge';
 
 export type CreateXcmExtrinsicProps = {
@@ -28,6 +29,7 @@ export type CreateXcmExtrinsicProps = {
   sendingValue: string;
   substrateApi?: _SubstrateApi;
   feeInfo: FeeInfo;
+  transferAll?: boolean;
 } & TransactionFee;
 
 export type FunctionCreateXcmExtrinsic = (props: CreateXcmExtrinsicProps) => Promise<SubmittableExtrinsic<'promise'> | TransactionConfig | undefined>;
@@ -255,4 +257,34 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
 
     return Promise.reject(new Error((error as Error)?.message));
   }
+};
+
+// Native bittensor <-> subtensor EVM bridge
+
+export const createBittensorToSubtensorEvmExtrinsic = async ({ destinationChain, originChain, recipient, sender, sendingValue, substrateApi, transferAll }: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'>> => {
+  if (!_isBittensorToSubtensorEvmBridge(originChain, destinationChain)) {
+    throw new Error('This is not a valid Bittensor bridge transfer');
+  }
+
+  if (!substrateApi) {
+    throw Error('Substrate API is not available');
+  }
+
+  return getBittensorToSubtensorEvmExtrinsic(recipient, sendingValue, substrateApi, transferAll);
+};
+
+export const createSubtensorEvmToBittensorExtrinsic = async ({ destinationChain, evmApi, feeCustom, feeInfo, feeOption, originChain, recipient, sender, sendingValue }: CreateXcmExtrinsicProps): Promise<TransactionConfig> => {
+  if (!_isSubtensorEvmtoBittensorBridge(originChain, destinationChain)) {
+    throw new Error('This is not a valid Subtensor EVM bridge transfer');
+  }
+
+  if (!evmApi) {
+    throw Error('Evm API is not available');
+  }
+
+  if (!sender) {
+    throw Error('Sender is required');
+  }
+
+  return getSubtensorEvmtoBittensorExtrinsic(sender, recipient, sendingValue, evmApi, feeInfo, feeCustom, feeOption);
 };
