@@ -20,4 +20,4 @@ export const isTWAccount = (account: AccountProxy) => {
   const isTWKeyPairType = account.accounts[0].type === 'ed25519-tw';
 
   return isTWDerivation && isTWSolo && isTWKeyPairType;
-}
+};
