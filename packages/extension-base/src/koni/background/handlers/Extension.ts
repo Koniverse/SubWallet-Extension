@@ -1324,7 +1324,7 @@ export default class KoniExtension {
   }
 
   private async handleGetNftFullList (request: NftFullListRequest): Promise <boolean> {
-    return this.#koniState.nftService.fetchFullListNftOfaCollection(request);
+    return this.#koniState.nftService.fetchFullListNftOfACollection(request);
   }
 
   private getStakingReward (): Promise<StakingRewardJson> {

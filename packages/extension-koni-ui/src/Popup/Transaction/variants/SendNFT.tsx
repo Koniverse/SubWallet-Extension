@@ -133,8 +133,6 @@ const Component: React.FC = () => {
       const params = nftParamsHandler(nftItem, chain);
       let sendPromise: Promise<SWTransactionResponse>;
 
-      const { nestingTokens, ...cleanNftItem } = nftItem;
-
       if (isEthereumInterface) {
         // Send NFT with EVM interface
         sendPromise = evmNftSubmitTransaction({
@@ -143,7 +141,7 @@ const Component: React.FC = () => {
           recipientAddress: to,
           nftItemName: nftItem?.name,
           params,
-          nftItem: cleanNftItem
+          nftItem
         });
       } else {
         // Send NFT with substrate interface
@@ -153,7 +151,7 @@ const Component: React.FC = () => {
           senderAddress: from,
           nftItemName: nftItem?.name,
           params,
-          nftItem: cleanNftItem
+          nftItem
         });
       }
 
