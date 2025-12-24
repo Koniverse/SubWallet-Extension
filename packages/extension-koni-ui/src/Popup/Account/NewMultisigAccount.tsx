@@ -29,7 +29,7 @@ const GeneralTermLocalDefault: SeedPhraseTermStorage = { state: 'nonConfirmed', 
 
 interface MultisigParams {
   signerAddress: string;
-  thresshold: string;
+  threshold: string;
 }
 
 export interface SignerData {
@@ -56,12 +56,12 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const formDefault = useMemo<MultisigParams>(() => {
     return {
       signerAddress: '',
-      thresshold: ''
+      threshold: ''
     };
   }, []);
 
   const signerAddressValue = Form.useWatch('signerAddress', form);
-  const thresholdValue = Form.useWatch('thresshold', form);
+  const thresholdValue = Form.useWatch('threshold', form);
 
   const onComplete = useCompleteCreateAccount();
 
@@ -170,7 +170,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     return Promise.resolve();
   }, [form, t]);
 
-  const validateThresshold = useCallback(
+  const validateThreshold = useCallback(
     async (_: Rule, value?: string) => {
       if (!value) {
         return Promise.reject(t('Threshold is required'));
@@ -182,8 +182,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         return Promise.reject(t('Threshold must be a natural number'));
       }
 
-      if (threshold <= 0) {
-        return Promise.reject(t('Threshold must be greater than 0'));
+      if (threshold <= 1) {
+        return Promise.reject(t('Threshold must be greater than 1'));
       }
 
       if (threshold > signers.length) {
@@ -247,7 +247,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         rightFooterButton={{
           children: t('Continue'),
           onClick: onConfirmSignatory,
-          disabled: signers.length === 0 || !thresholdValue
+          disabled: signers.length === 0 || !thresholdValue || thresholdValue === '1'
         }}
         subHeaderIcons={preventModal
           ? undefined
@@ -349,10 +349,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                     <div className={'threshold-label'}>{'Set approval thresold'.toUpperCase()}</div>
                     <div className={'threshold-form-wrapper'}>
                       <Form.Item
-                        name={'thresshold'}
+                        name={'threshold'}
                         rules={[
                           {
-                            validator: validateThresshold
+                            validator: validateThreshold
                           }
                         ]}
                       >
