@@ -15,9 +15,9 @@ import { SwapPair } from '@subwallet/extension-base/types/swap';
 import { addLazy, fetchStaticData } from '@subwallet/extension-base/utils';
 import { lazySubscribeMessage } from '@subwallet/extension-koni-ui/messaging';
 import { store } from '@subwallet/extension-koni-ui/stores';
+import { WalletConnectSessionsSubscription } from '@subwallet/extension-koni-ui/stores/types';
 import { MissionInfo } from '@subwallet/extension-koni-ui/types';
 import { SessionTypes } from '@walletconnect/types';
-import { WalletConnectSessionsSubscription } from "@subwallet/extension-koni-ui/stores/types";
 
 // Setup redux stores
 
