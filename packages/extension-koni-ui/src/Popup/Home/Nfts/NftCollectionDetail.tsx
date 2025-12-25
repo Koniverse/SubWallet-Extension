@@ -115,7 +115,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     const isBundle = state.nftItem?.isBundle;
 
     const base = `/home/nfts/${isBundle ? 'bundle-item-detail' : 'item-detail'}`;
-    const url = `${base}?chain=${chain}&collectionId=${collectionId}&tokenId=${tokenId}&rootTokenId=${tokenId}`;
+    const url = `${base}?chain=${chain}&collectionId=${collectionId}&tokenId=${tokenId}`;
 
     if (isBundle) {
       setRootTokenId(tokenId);
