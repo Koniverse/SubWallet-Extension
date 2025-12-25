@@ -6,20 +6,16 @@ import { Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
+import { INftItemDetail } from '@subwallet/extension-koni-ui/Popup/Home/Nfts';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, Image } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretDown, CaretRight, CheckCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
 type Props = ThemeProps;
-
-interface LocationState {
-  nftItem: NftItem;
-  collectionInfo: any;
-}
 
 const findRootNft = (item: NftItem): NftItem => {
   let current = item;
@@ -39,9 +35,10 @@ interface TreeNodeProps {
   selectedId: string;
   depth?: number;
   isLastChild?: boolean;
+  onClick: (item: NftItem) => void;
 }
 
-const TreeNode = ({ depth = 0, isLastChild = false, item, parent, selectedId }: TreeNodeProps) => {
+const TreeNode = ({ depth = 0, isLastChild = false, item, onClick, parent, selectedId }: TreeNodeProps) => {
   const { token } = useTheme() as Theme;
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -53,6 +50,11 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, parent, selectedId }: 
     e.stopPropagation();
     setIsExpanded(!isExpanded);
   };
+
+  const handleItemClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onClick(item);
+  }, [item, onClick]);
 
   return (
     <div className={CN('tree-node-wrapper', { 'is-last-child': isLastChild })}>
@@ -75,7 +77,10 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, parent, selectedId }: 
             )}
         </div>
 
-        <div className={CN('nft-tree-card', { selected: isSelected })}>
+        <div
+          className={CN('nft-tree-card', { selected: isSelected })}
+          onClick={handleItemClick}
+        >
           <Image
             className='nft-thumb'
             height={40}
@@ -120,6 +125,7 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, parent, selectedId }: 
               isLastChild={index === ((item.nestingTokens?.length ?? 0) - 1)}
               item={child}
               key={child.id}
+              onClick={onClick}
               parent={item.parent}
               selectedId={selectedId}
             />
@@ -132,8 +138,10 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, parent, selectedId }: 
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const location = useLocation();
-  const state = location.state as LocationState;
-  const { nftItem } = state || {};
+  const state = location.state as INftItemDetail;
+
+  const navigate = useNavigate();
+  const { collectionInfo, nftItem } = state || {};
 
   const { t } = useTranslation();
   const { goBack } = useDefaultNavigate();
@@ -161,6 +169,20 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const totalCount = useMemo(() => rootNft ? countTotalNodes(rootNft) : 0, [rootNft, countTotalNodes]);
 
+  const handleOnClickNft = useCallback((clickedItem: NftItem) => {
+    const { chain, collectionId } = collectionInfo;
+    const tokenId = clickedItem.id;
+    const base = '/home/nfts/item-detail';
+    const url = `${base}?chain=${chain}&collectionId=${collectionId}&tokenId=${tokenId}`;
+
+    navigate(url, {
+      state: {
+        nftItem: clickedItem,
+        collectionInfo: collectionInfo
+      }
+    });
+  }, [collectionInfo, navigate]);
+
   return (
     <PageWrapper
       className={`nft-structure ${className}`}
@@ -181,6 +203,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               <TreeNode
                 depth={0}
                 item={rootNft}
+                onClick={handleOnClickNft}
                 selectedId={nftItem?.id || ''}
               />
             )
