@@ -27,9 +27,10 @@ export class UniqueNftHandler extends BaseNftHandler {
   private mapBundleTreeToNftItem (
     node: UniqueBundleTree,
     topmostOwner: string,
-    level = 0
+    level = 0,
+    parentId?: string
   ): NftItem {
-    return {
+    const item: NftItem = {
       id: node.tokenId.toString(),
       chain: this.chain,
       collectionId: node.collectionId.toString(),
@@ -42,10 +43,16 @@ export class UniqueNftHandler extends BaseNftHandler {
       properties: null,
 
       nestingLevel: level,
-      nestingTokens: node.nested && node.nested.length > 0
-        ? node.nested.map((child) => this.mapBundleTreeToNftItem(child, topmostOwner, level + 1))
-        : undefined
+      parent: parentId
     };
+
+    if (node.nested && node.nested.length > 0) {
+      item.nestingTokens = node.nested.map((child) =>
+        this.mapBundleTreeToNftItem(child, topmostOwner, level + 1, item.id)
+      );
+    }
+
+    return item;
   }
 
   async fetchNftBundle (collectionId: number | string, tokenId: number, topmostOwner: string): Promise<NftItem | null> {

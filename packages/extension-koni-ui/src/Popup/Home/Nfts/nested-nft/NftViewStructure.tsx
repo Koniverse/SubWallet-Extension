@@ -3,7 +3,9 @@
 
 import { NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { ROOT_NFT_TOKEN_ID } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
+import { useGetNftByAccount } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
 import { INftItemDetail } from '@subwallet/extension-koni-ui/Popup/Home/Nfts';
@@ -14,20 +16,9 @@ import { CaretDown, CaretRight, CheckCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
 type Props = ThemeProps;
-
-const findRootNft = (item: NftItem): NftItem => {
-  let current = item;
-  let safeGuard = 0;
-
-  while (current.parent && safeGuard < 10) {
-    current = current.parent;
-    safeGuard++;
-  }
-
-  return current;
-};
 
 interface TreeNodeProps {
   item: NftItem;
@@ -61,7 +52,7 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, onClick, parent, selec
       <div className='node-content-row'>
         {depth > 0 && <div className='connector-line-horizontal' />}
 
-        <div
+        {depth > 0 && <div
           className='expand-icon-wrapper'
           onClick={hasChildren ? toggleExpand : undefined}
         >
@@ -75,7 +66,7 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, onClick, parent, selec
             : (
               <div className='dot-placeholder' />
             )}
-        </div>
+        </div>}
 
         <div
           className={CN('nft-tree-card', { selected: isSelected })}
@@ -92,7 +83,7 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, onClick, parent, selec
           <div className='nft-info'>
             <div className='nft-title'>{item.name || item.id}</div>
             <div className='nft-subtitle'>
-              {depth === 0 ? 'Parent' : 'Nested in parent'}
+              {depth === 0 ? 'Parent' : `Nested in ${parent?.name || parent?.id || ''}`}
             </div>
           </div>
 
@@ -126,7 +117,7 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, onClick, parent, selec
               item={child}
               key={child.id}
               onClick={onClick}
-              parent={item.parent}
+              parent={item}
               selectedId={selectedId}
             />
           ))}
@@ -138,7 +129,8 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, onClick, parent, selec
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const location = useLocation();
-  const state = location.state as INftItemDetail;
+  const state = location.state as INftItemDetail & { rootTokenId?: string };
+  const [rootTokenId] = useLocalStorage(ROOT_NFT_TOKEN_ID, '');
 
   const navigate = useNavigate();
   const { collectionInfo, nftItem } = state || {};
@@ -146,14 +138,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { goBack } = useDefaultNavigate();
   const dataContext = useContext(DataContext);
+  const { nftItems } = useGetNftByAccount();
 
   const rootNft = useMemo(() => {
-    if (!nftItem) {
+    if (!rootTokenId || !nftItems.length) {
       return null;
     }
 
-    return findRootNft(nftItem);
-  }, [nftItem]);
+    return nftItems.find((n) =>
+      n.id === rootTokenId &&
+      n.collectionId === collectionInfo.collectionId &&
+      n.chain === collectionInfo.chain
+    );
+  }, [rootTokenId, collectionInfo, nftItems]);
 
   const countTotalNodes = useCallback((node: NftItem): number => {
     let count = 1;
@@ -336,7 +333,10 @@ const NftStructureScreen = styled(Component)<Props>(({ theme: { token } }: Props
     '.nft-subtitle': {
       color: token.colorTextLight4,
       fontSize: token.fontSizeSM,
-      marginTop: 2
+      marginTop: 2,
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap'
     },
 
     '.badge-count': {

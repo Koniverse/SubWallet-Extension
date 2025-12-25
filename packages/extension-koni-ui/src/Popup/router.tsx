@@ -63,7 +63,7 @@ const Tokens = new LazyLoader('Tokens', () => import('@subwallet/extension-koni-
 const TokenDetailList = new LazyLoader('TokenDetailList', () => import('@subwallet/extension-koni-ui/Popup/Home/Tokens/DetailList'));
 
 const NftItemDetail = new LazyLoader('NftItemDetail', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftItemDetail'));
-const NftBundleItemDetail = new LazyLoader('NftBundleItemDetail', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/nested-nft/NftDetailBase'));
+const NftBundleItemDetail = new LazyLoader('NftBundleItemDetail', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/nested-nft/NftBundleItemDetail'));
 const NftViewStructure = new LazyLoader('NftViewStructure', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/nested-nft/NftViewStructure'));
 const NftCollections = new LazyLoader('NftCollections', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftCollections'));
 const NftCollectionDetail = new LazyLoader('NftCollectionDetail', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftCollectionDetail'));
