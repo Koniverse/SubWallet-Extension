@@ -15,7 +15,7 @@ import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 
-import { getBittensorToSubtensorEvmExtrinsic, getSubtensorEvmtoBittensorExtrinsic } from './bittensorBridge/nativeTokenBridge';
+import { evmToSs58, getSubtensorEvmtoBittensorExtrinsic } from './bittensorBridge';
 import { _createPosBridgeL1toL2Extrinsic, _createPosBridgeL2toL1Extrinsic } from './posBridge';
 
 export type CreateXcmExtrinsicProps = {
@@ -261,7 +261,7 @@ export const createAcrossBridgeExtrinsic = async ({ destinationChain,
 
 // Native bittensor <-> subtensor EVM bridge
 
-export const createBittensorToSubtensorEvmExtrinsic = async ({ destinationChain, originChain, recipient, sender, sendingValue, substrateApi, transferAll }: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'>> => {
+export const createBittensorToSubtensorEvmExtrinsic = async ({ destinationChain, originChain, recipient, sendingValue, substrateApi, transferAll }: CreateXcmExtrinsicProps): Promise<SubmittableExtrinsic<'promise'>> => {
   if (!_isBittensorToSubtensorEvmBridge(originChain, destinationChain)) {
     throw new Error('This is not a valid Bittensor bridge transfer');
   }
@@ -270,7 +270,17 @@ export const createBittensorToSubtensorEvmExtrinsic = async ({ destinationChain,
     throw Error('Substrate API is not available');
   }
 
-  return getBittensorToSubtensorEvmExtrinsic(recipient, sendingValue, substrateApi, transferAll);
+  const api = substrateApi.api;
+
+  await api.isReady;
+
+  const subtensorEvmAddress = evmToSs58(recipient);
+
+  if (transferAll) {
+    return api.tx.balances.transferAll(subtensorEvmAddress, false);
+  }
+
+  return api.tx.balances.transferKeepAlive(subtensorEvmAddress, sendingValue);
 };
 
 export const createSubtensorEvmToBittensorExtrinsic = async ({ destinationChain, evmApi, feeCustom, feeInfo, feeOption, originChain, recipient, sender, sendingValue }: CreateXcmExtrinsicProps): Promise<TransactionConfig> => {

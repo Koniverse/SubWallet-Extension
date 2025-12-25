@@ -14,7 +14,7 @@ import { createTonTransaction } from '@subwallet/extension-base/services/balance
 import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createBittensorToSubtensorEvmExtrinsic, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, createSubtensorEvmToBittensorExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { _isAcrossChainBridge, _isAcrossTestnetBridge, getAcrossSendingValue } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
-import { _isBittensorChainBridge, _isSubtensorEvmChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/bittensorBridge/nativeTokenBridge';
+import { _isBittensorToSubtensorBridge, _isSubtensorToBittensorBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/bittensorBridge/nativeTokenBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
@@ -377,8 +377,8 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
   const isPolygonBridgeTransfer = _isPolygonChainBridge(srcChain.slug, destChain.slug);
   const isPosBridgeTransfer = _isPosChainBridge(srcChain.slug, destChain.slug);
   const isAcrossBridgeTransfer = _isAcrossChainBridge(srcChain.slug, destChain.slug);
-  const isBittensorBridgeTransfer = _isBittensorChainBridge(srcChain.slug, destChain.slug);
-  const isSubtensorEvmBridgeTransfer = _isSubtensorEvmChainBridge(srcChain.slug, destChain.slug);
+  const isBittensorBridgeTransfer = _isBittensorToSubtensorBridge(srcChain.slug, destChain.slug);
+  const isSubtensorEvmBridgeTransfer = _isSubtensorToBittensorBridge(srcChain.slug, destChain.slug);
 
   const isSubstrateParaspellXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer || isBittensorBridgeTransfer || isSubtensorEvmBridgeTransfer);
 

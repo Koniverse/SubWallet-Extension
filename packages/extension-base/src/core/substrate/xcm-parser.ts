@@ -5,7 +5,7 @@ import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
-import { _isBittensorChainBridge, _isSubtensorEvmChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/bittensorBridge/nativeTokenBridge';
+import { _isBittensorToSubtensorBridge, _isSubtensorToBittensorBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/bittensorBridge/nativeTokenBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { _getSubstrateRelayParent, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
@@ -113,11 +113,11 @@ export function _isAcrossBridgeXcm (originChainInfo: _ChainInfo, destChainInfo: 
 }
 
 export function _isBittensorToSubtensorEvmBridge (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo): boolean {
-  return _isBittensorChainBridge(originChainInfo.slug, destChainInfo.slug);
+  return _isBittensorToSubtensorBridge(originChainInfo.slug, destChainInfo.slug);
 }
 
 export function _isSubtensorEvmtoBittensorBridge (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo): boolean {
-  return _isSubtensorEvmChainBridge(originChainInfo.slug, destChainInfo.slug);
+  return _isSubtensorToBittensorBridge(originChainInfo.slug, destChainInfo.slug);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
