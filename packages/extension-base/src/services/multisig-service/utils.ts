@@ -125,3 +125,7 @@ export function getMultisigTxType (decodedCallData: DecodeCallDataResponse | und
 
   return MultisigTxType.UNKNOWN;
 }
+
+export function genPendingMultisigTxKey (chain: string, multisigAddress: string, signerAddress: string, extrinsicHash: string) {
+  return `${chain}___${multisigAddress}___${signerAddress}______${extrinsicHash}`;
+}
