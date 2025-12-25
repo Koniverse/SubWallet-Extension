@@ -59,8 +59,8 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, onClick, parent, selec
           {hasChildren
             ? (
               <Icon
+                customSize={'16px'}
                 phosphorIcon={isExpanded ? CaretDown : CaretRight}
-                size='sm'
               />
             )
             : (
@@ -230,7 +230,7 @@ const NftStructureScreen = styled(Component)<Props>(({ theme: { token } }: Props
     '.node-content-row': {
       display: 'flex',
       alignItems: 'center',
-      marginBottom: 8,
+      marginBottom: 12,
       zIndex: 2
     },
 
@@ -241,31 +241,31 @@ const NftStructureScreen = styled(Component)<Props>(({ theme: { token } }: Props
 
     '.vertical-line-guide': {
       position: 'absolute',
-      left: 11,
+      left: 7,
       top: 0,
-      bottom: 16,
+      bottom: 2,
       width: 1,
       backgroundColor: token.colorTextLight4,
       opacity: 0.3,
       zIndex: 1
     },
 
-    '.connector-line-horizontal': {
-      position: 'absolute',
-      left: -13,
-      width: 12,
-      height: 1,
-      backgroundColor: token.colorTextLight4,
-      opacity: 0.3,
-      top: '50%'
-    },
+    // '.connector-line-horizontal': {
+    //   position: 'absolute',
+    //   left: -13,
+    //   width: 12,
+    //   height: 1,
+    //   backgroundColor: token.colorTextLight4,
+    //   opacity: 0.3,
+    //   top: '50%'
+    // },
 
     '.is-last-child > .node-content-row .connector-line-vertical-overlay': {
     },
 
     '.expand-icon-wrapper': {
-      width: 24,
-      height: 24,
+      width: 16,
+      height: 16,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -285,9 +285,9 @@ const NftStructureScreen = styled(Component)<Props>(({ theme: { token } }: Props
       flex: 1,
       display: 'flex',
       alignItems: 'center',
-      padding: '8px 12px',
+      padding: '8px 10px',
       backgroundColor: token.colorBgSecondary,
-      borderRadius: 12,
+      borderRadius: 8,
       border: '1px solid transparent',
       transition: 'all 0.2s ease',
       cursor: 'default',
@@ -305,7 +305,7 @@ const NftStructureScreen = styled(Component)<Props>(({ theme: { token } }: Props
 
     '.nft-thumb': {
       borderRadius: 8,
-      marginRight: 12,
+      marginRight: 8,
       objectFit: 'cover',
 
       '.ant-image-img': {
@@ -327,16 +327,17 @@ const NftStructureScreen = styled(Component)<Props>(({ theme: { token } }: Props
       fontSize: token.fontSize,
       whiteSpace: 'nowrap',
       overflow: 'hidden',
-      textOverflow: 'ellipsis'
+      textOverflow: 'ellipsis',
+      lineHeight: token.lineHeight
     },
 
     '.nft-subtitle': {
       color: token.colorTextLight4,
       fontSize: token.fontSizeSM,
-      marginTop: 2,
       textOverflow: 'ellipsis',
       overflow: 'hidden',
-      whiteSpace: 'nowrap'
+      whiteSpace: 'nowrap',
+      lineHeight: token.lineHeightSM
     },
 
     '.badge-count': {

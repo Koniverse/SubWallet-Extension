@@ -375,7 +375,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   <div className={'nft-child-item-right'}>
                     <div className={'nft-child-item-right-block-1'}>
                       <div className={'nft-child-item-right-block-1-line-1'}>{nestingItem.name}</div>
-                      <div className={'nft-child-item-right-block-1-line-2'}>{`Nested in: ${nftItem?.name || ''} - ${nestingItem?.nestingTokens?.length || 0} items`}</div>
+                      <div className={'nft-child-item-right-block-1-line-2'}>
+                        <span className={'nft-child-item-right-block-1-label'}>{`Nested in: ${nftItem?.name || ''} - `}</span>
+                        <span className={'nft-child-item-right-block-1-value'}>{`${nestingItem?.nestingTokens?.length || 0} ${
+                          (nestingItem?.nestingTokens?.length || 0) > 1 ? 'items' : 'item'
+                        }`}</span>
+                      </div>
                     </div>
                     <div className={'nft-child-item-right-block-2'}>
                       <Button
@@ -663,7 +668,8 @@ const NftBundleItemDetail = styled(Component)<Props>(({ theme: { token } }: Prop
     '.nft-child-item-right': {
       display: 'flex',
       flex: 1,
-      justifyContent: 'space-between'
+      justifyContent: 'space-between',
+      overflow: 'hidden'
     },
 
     '.nft-child-item-wrapper': {
@@ -690,11 +696,22 @@ const NftBundleItemDetail = styled(Component)<Props>(({ theme: { token } }: Prop
       lineHeight: token.lineHeight
     },
 
+    '.nft-child-item-right-block-1': {
+      overflow: 'hidden'
+    },
+
+    '.nft-child-item-right-block-1-value': {
+      color: token.colorSuccess
+    },
+
     '.nft-child-item-right-block-1-line-2': {
       fontWeight: token.bodyFontWeight,
       fontSize: token.fontSizeSM,
       lineHeight: token.lineHeightSM,
-      color: token.colorTextDescription
+      color: token.colorTextDescription,
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap'
     },
 
     '.nft-item-level-label': {
