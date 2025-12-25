@@ -157,33 +157,8 @@ export class MultisigService implements StoppableServiceInterface {
   }
 
   handleEvents (events: EventItem<EventType>[], eventTypes: EventType[]): void {
-    let needReload = false;
-    let lazyTime = 2000;
-
-    // Account changed or chain changed
-    if (eventTypes.includes('account.updateCurrent') || eventTypes.includes('account.add') || eventTypes.includes('chain.updateState')) {
-      needReload = true;
-
-      if (eventTypes.includes('account.updateCurrent')) {
-        lazyTime = 1000;
-      }
-    }
-
-    // Handle account removal
-    events.forEach((event) => {
-      if (event.type === 'account.remove') {
-        // todo: recheck with real data account.add & account.remove
-        // const address = event.data[0] as string;
-        // const currentMap = this.pendingMultisigTxSubject.getValue();
-        //
-        // delete currentMap[address];
-        //
-        // this.pendingMultisigTxSubject.next(currentMap);
-        needReload = true;
-      }
-    });
-
-    if (needReload) {
+    // todo: improve by reload only when related chains update
+    if (eventTypes.includes('account.add') || eventTypes.includes('account.remove') || eventTypes.includes('chain.updateState')) {
       addLazy(
         'reloadPendingMultisigTxsByEvents',
         () => {
@@ -191,7 +166,7 @@ export class MultisigService implements StoppableServiceInterface {
             this.runSubscribePendingMultisigTxs().catch(console.error);
           }
         },
-        lazyTime,
+        2000,
         undefined,
         true);
     }
