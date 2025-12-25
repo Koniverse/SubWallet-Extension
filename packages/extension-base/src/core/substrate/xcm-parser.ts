@@ -5,12 +5,18 @@ import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
+import { _isBittensorToSubtensorBridge, _isSubtensorToBittensorBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/bittensorBridge/nativeTokenBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { _getSubstrateRelayParent, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 
 export function _isXcmTransferUnstable (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo, assetSlug: string): boolean {
-  return !_isXcmWithinSameConsensus(originChainInfo, destChainInfo) || _isMythosFromHydrationToMythos(originChainInfo, destChainInfo, assetSlug) || _isPolygonBridgeXcm(originChainInfo, destChainInfo) || _isPosBridgeXcm(originChainInfo, destChainInfo);
+  return (
+    !_isBittensorToSubtensorEvmBridge(originChainInfo, destChainInfo) && !_isSubtensorEvmtoBittensorBridge(originChainInfo, destChainInfo) &&
+    (!_isXcmWithinSameConsensus(originChainInfo, destChainInfo) ||
+    _isMythosFromHydrationToMythos(originChainInfo, destChainInfo, assetSlug) ||
+     _isPolygonBridgeXcm(originChainInfo, destChainInfo) ||
+     _isPosBridgeXcm(originChainInfo, destChainInfo)));
 }
 
 function getAssetHubBridgeUnstableWarning (originChainInfo: _ChainInfo): string {
@@ -105,6 +111,15 @@ export function _isPosBridgeXcm (originChainInfo: _ChainInfo, destChainInfo: _Ch
 export function _isAcrossBridgeXcm (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo): boolean {
   return _isAcrossChainBridge(originChainInfo.slug, destChainInfo.slug);
 }
+
+export function _isBittensorToSubtensorEvmBridge (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo): boolean {
+  return _isBittensorToSubtensorBridge(originChainInfo.slug, destChainInfo.slug);
+}
+
+export function _isSubtensorEvmtoBittensorBridge (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo): boolean {
+  return _isSubtensorToBittensorBridge(originChainInfo.slug, destChainInfo.slug);
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 export function _adaptX1Interior (_assetIdentifier: Record<string, any>, version: number): Record<string, any> {
