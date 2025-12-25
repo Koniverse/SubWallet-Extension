@@ -70,7 +70,7 @@ export class MultisigService implements StoppableServiceInterface {
   stopPromiseHandler: PromiseHandler<void> = createPromiseHandler();
 
   private readonly pendingMultisigTxSubject: BehaviorSubject<PendingMultisigTxMap> = new BehaviorSubject<PendingMultisigTxMap>({});
-  private unsubscriber: VoidFunction | undefined;
+  private unsubscribes: VoidFunction | undefined;
   private subscribePromise: Promise<void> | undefined; // to check if the subscription logic is running
 
   constructor (
@@ -233,7 +233,7 @@ export class MultisigService implements StoppableServiceInterface {
         }
       }
 
-      this.unsubscriber = () => {
+      this.unsubscribes = () => {
         cancel = true;
         unsubList.forEach((unsub) => {
           unsub?.();
@@ -361,8 +361,8 @@ export class MultisigService implements StoppableServiceInterface {
   }
 
   private runUnsubscribePendingMultisigTxs (): void {
-    this.unsubscriber && this.unsubscriber();
-    this.unsubscriber = undefined;
+    this.unsubscribes && this.unsubscribes();
+    this.unsubscribes = undefined;
   }
 
   /**
