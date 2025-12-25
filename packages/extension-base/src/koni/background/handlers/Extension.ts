@@ -51,6 +51,8 @@ import { calculateToAmountByReservePool } from '@subwallet/extension-base/servic
 import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydrationTokensCanPayFee } from '@subwallet/extension-base/services/fee-service/utils/tokenPayFee';
 import { ClaimPolygonBridgeNotificationMetadata, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
+import { RequestGetPendingTxs } from '@subwallet/extension-base/services/multisig-service';
+import { GovVoteRequest, RemoveVoteRequest, UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
@@ -5382,6 +5384,91 @@ export default class KoniExtension {
   }
   /* Migrate Unified Account */
 
+  /* Open Gov */
+
+  private async handleVote (request: GovVoteRequest): Promise<SWTransactionResponse> {
+    const extrinsic = await this.#koniState.openGovService.handleVote(request);
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address: request.address,
+      chain: request.chain,
+      transaction: extrinsic,
+      data: request,
+      extrinsicType: ExtrinsicType.GOV_VOTE,
+      chainType: ChainType.SUBSTRATE
+    });
+  }
+
+  private async handleRemoveVote (request: RemoveVoteRequest): Promise<SWTransactionResponse> {
+    const extrinsic = await this.#koniState.openGovService.handleRemoveVote(request);
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address: request.address,
+      chain: request.chain,
+      transaction: extrinsic,
+      data: request,
+      extrinsicType: ExtrinsicType.GOV_UNVOTE,
+      chainType: ChainType.SUBSTRATE
+    });
+  }
+
+  private async handleUnlockVote (request: UnlockVoteRequest): Promise<SWTransactionResponse> {
+    const extrinsic = await this.#koniState.openGovService.handleUnlockVote(request);
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address: request.address,
+      chain: request.chain,
+      transaction: extrinsic,
+      data: request,
+      extrinsicType: ExtrinsicType.GOV_UNLOCK_VOTE,
+      chainType: ChainType.SUBSTRATE
+    });
+  }
+
+  private async subscribeGovLockedInfo (id: string, port: chrome.runtime.Port) {
+    const cb = createSubscription<'pri(openGov.subscribeGovLockedInfo)'>(id, port);
+
+    await this.#koniState.openGovService.waitForStarted();
+    const govLockedInfoSubscription = this.#koniState.openGovService.subscribeGovLockedInfoSubject().subscribe({
+      next: (rs) => {
+        cb(rs);
+      }
+    });
+
+    this.createUnsubscriptionHandle(id, govLockedInfoSubscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return await this.#koniState.openGovService.getGovLockedInfoInfo();
+  }
+
+  /* Open Gov */
+
+  /* Multisig Acocunt */
+
+  private async subscribePendingMultisigTx (id: string, port: chrome.runtime.Port) {
+    const cb = createSubscription<'pri(multisig.subscribePendingMultisigTxs)'>(id, port);
+
+    await this.#koniState.multisigService.waitForStarted();
+    const pendingTxSubscription = this.#koniState.multisigService.subscribePendingMultisigTxMap().subscribe({
+      next: (rs) => {
+        cb(rs);
+      }
+    });
+
+    this.createUnsubscriptionHandle(id, pendingTxSubscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return this.#koniState.multisigService.getPendingMultisigTxMap();
+  }
+
+  /* Multisig Acocunt */
+
   // --------------------------------------------------------------
   // eslint-disable-next-line @typescript-eslint/require-await
   public async handle<TMessageType extends MessageTypes> (id: string, type: TMessageType, request: RequestTypes[TMessageType], port: chrome.runtime.Port): Promise<ResponseType<TMessageType>> {
@@ -6061,14 +6148,29 @@ export default class KoniExtension {
         return this.migrateSoloAccount(request as RequestMigrateSoloAccount);
       case 'pri(migrate.pingSession)':
         return this.pingSession(request as RequestPingSession);
-      /* Migrate Unified Account */
+        /* Migrate Unified Account */
 
-      /* Multisig Account */
+        /* Gov */
+      case 'pri(openGov.vote)':
+        return this.handleVote(request as GovVoteRequest);
+      case 'pri(openGov.unvote)':
+        return this.handleRemoveVote(request as RemoveVoteRequest);
+      case 'pri(openGov.unlockVote)':
+        return this.handleUnlockVote(request as UnlockVoteRequest);
+      case 'pri(openGov.subscribeGovLockedInfo)':
+        return this.subscribeGovLockedInfo(id, port);
+        /* Gov */
+
+        /* Multisig Account */
+      case 'pri(multisig.subscribePendingMultisigTxs)':
+        return await this.subscribePendingMultisigTx(id, port);
+      case 'pri(multisig.getPendingMultisigTxs)':
+        return this.#koniState.multisigService.getPendingTxsForMultisigAddress(request as RequestGetPendingTxs);
       case 'pri(multisig.approvePendingTx)':
         return await this.approvePendingTx(request as ApprovePendingTxRequest);
       case 'pri(multisig.executePendingTx)':
         return await this.executePendingTx(request as ExecutePendingTxRequest);
-      /* Multisig Account */
+        /* Multisig Account */
 
       // Default
       default:

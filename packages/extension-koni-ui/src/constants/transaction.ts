@@ -3,7 +3,7 @@
 
 import { ExtrinsicType, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
+import { CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, GovReferendumUnvoteParams, GovReferendumVoteParams, GovUnlockVoteParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
 
 import { ALL_KEY } from './common';
 
@@ -55,7 +55,11 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.CLAIM_BRIDGE]: detectTranslate('ui.TRANSACTION.constant.transaction.claimTokens'),
 
   [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: detectTranslate('ui.TRANSACTION.constant.transaction.tokenApprove'),
-  [ExtrinsicType.SWAP]: detectTranslate('ui.TRANSACTION.constant.transaction.swap')
+  [ExtrinsicType.SWAP]: detectTranslate('ui.TRANSACTION.constant.transaction.swap'),
+
+  [ExtrinsicType.GOV_VOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.vote'),
+  [ExtrinsicType.GOV_UNVOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.unvote'),
+  [ExtrinsicType.GOV_UNLOCK_VOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.unlockVotes')
 };
 
 export const ALL_STAKING_ACTIONS: ExtrinsicType[] = [
@@ -156,4 +160,24 @@ export const DEFAULT_SWAP_PARAMS: SwapParams = {
 export const DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS: ClaimBridgeParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
   notificationId: ''
+};
+
+export const DEFAULT_GOV_REFERENDUM_VOTE_PARAMS: GovReferendumVoteParams = {
+  ...DEFAULT_TRANSACTION_PARAMS,
+  conviction: 0,
+  referendumId: '',
+  track: -1
+};
+
+export const DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS: GovReferendumUnvoteParams = {
+  ...DEFAULT_TRANSACTION_PARAMS,
+  referendumId: '',
+  track: -1
+};
+
+export const DEFAULT_GOV_UNLOCK_VOTE_PARAMS: GovUnlockVoteParams = {
+  ...DEFAULT_TRANSACTION_PARAMS,
+  referendumIds: [],
+  tracks: [],
+  amount: ''
 };
