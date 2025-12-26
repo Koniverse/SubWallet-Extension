@@ -133,7 +133,9 @@ export const getAccountActions = (signMode: AccountSignMode, networkType: Accoun
   // QR
   if (signMode === AccountSignMode.PASSWORD) {
     if (networkType === AccountChainType.ETHEREUM || networkType === AccountChainType.SUBSTRATE) {
-      result.push(AccountActions.EXPORT_QR);
+      if (type !== 'ed25519-tw') { // todo: recheck if can export this account type
+        result.push(AccountActions.EXPORT_QR);
+      }
     }
   }
 
