@@ -17,6 +17,7 @@ import { hexAddPrefix, isHex } from '@polkadot/util';
 
 import HistoryDetailAmount from './Amount';
 import HistoryDetailFee from './Fee';
+import { GovVoteLayout } from './GovVoteLayout';
 import HistoryDetailHeader from './Header';
 
 interface Props extends ThemeProps {
@@ -58,6 +59,8 @@ const Component: React.FC<Props> = (props: Props) => {
       <MetaInfo.Default label={t('ui.HISTORY.screen.HistoryDetail.Layout.extrinsicHash')}>{extrinsicHash}</MetaInfo.Default>
       {!!data.time && (<MetaInfo.Default label={t('ui.HISTORY.screen.HistoryDetail.Layout.submittedTime')}>{formatHistoryDate(data.time, language, 'detail')}</MetaInfo.Default>)}
       {!!data.blockTime && (<MetaInfo.Default label={t('ui.HISTORY.screen.HistoryDetail.Layout.blockTime')}>{formatHistoryDate(data.blockTime, language, 'detail')}</MetaInfo.Default>)}
+
+      <GovVoteLayout data={data} />
       <HistoryDetailAmount data={data} />
 
       {

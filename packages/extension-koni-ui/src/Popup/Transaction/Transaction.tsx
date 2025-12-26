@@ -3,7 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@subwallet/extension-koni-ui/components';
-import { CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, GOV_REFERENDUM_UNVOTE_TRANSACTION, GOV_REFERENDUM_VOTE_TRANSACTION, GOV_UNLOCK_VOTE_TRANSACTION, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
 import { useAlert, useChainChecker, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -17,6 +17,8 @@ import { useSelector } from 'react-redux';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
+
+import { AssetsTab } from '../Home/Tokens';
 
 interface Props extends ThemeProps {
   title?: string,
@@ -70,6 +72,12 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
         return ExtrinsicType.SWAP;
       case 'claim-bridge':
         return ExtrinsicType.CLAIM_BRIDGE;
+      case 'gov-ref-vote':
+        return ExtrinsicType.GOV_VOTE;
+      case 'gov-ref-unvote':
+        return ExtrinsicType.GOV_UNVOTE;
+      case 'gov-unlock-vote':
+        return ExtrinsicType.GOV_UNLOCK_VOTE;
       case 'send-fund':
       default:
         return ExtrinsicType.TRANSFER_BALANCE;
@@ -159,6 +167,27 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
       };
     }
 
+    if (storageKey === GOV_REFERENDUM_VOTE_TRANSACTION) {
+      return {
+        ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === GOV_REFERENDUM_UNVOTE_TRANSACTION) {
+      return {
+        ...DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS,
+        fromAccountProxy
+      };
+    }
+
+    if (storageKey === GOV_UNLOCK_VOTE_TRANSACTION) {
+      return {
+        ...DEFAULT_GOV_UNLOCK_VOTE_PARAMS,
+        fromAccountProxy
+      };
+    }
+
     return {
       ...DEFAULT_TRANSACTION_PARAMS,
       fromAccountProxy
@@ -195,6 +224,8 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
         return '/home/earning';
       case 'send-nft':
         return '/home/nfts/collections';
+      case 'gov-ref-vote':
+        return '/home/governance';
       case 'send-fund':
       default:
         return '/home/tokens';
@@ -211,10 +242,33 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
     return result;
   }, [t]);
 
+  const showHeader = useMemo(() => {
+    const pathName = location.pathname;
+    const action = pathName.split('/')[2] || '';
+
+    if (action === 'gov-ref-vote') {
+      const voteType = pathName.split('/')[3] || '';
+
+      if (voteType === 'abstain' || voteType === 'split') {
+        return false;
+      }
+    } else if (action === 'gov-ref-unvote') {
+      return false;
+    }
+
+    return true;
+  }, [location.pathname]);
+
   useNavigateOnChangeAccount(homePath);
 
   const goBack = useCallback(() => {
-    navigate(homePath);
+    if (homePath === '/home/nfts/collections') {
+      navigate('/home/tokens', {
+        state: { switchToTab: AssetsTab.NFTS }
+      });
+    } else {
+      navigate(homePath);
+    }
   }, [homePath, navigate]);
 
   const [subHeaderRightButtons, setSubHeaderRightButtons] = useState<ButtonProps[] | undefined>();
@@ -344,6 +398,7 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
       <Layout.Home
         isDisableHeader={isDisableHeader}
         showFaderIcon
+        showHeader={showHeader}
         showTabBar={false}
       >
         <TransactionContext.Provider value={contextValues}>

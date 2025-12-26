@@ -77,3 +77,7 @@ function _getSystemPalletTransferableV1 (accountInfo: FrameSystemAccountInfoV1, 
 function _getSystemPalletTotalBalanceV1 (accountInfo: FrameSystemAccountInfoV1): bigint {
   return BigInt(accountInfo.data.free) + BigInt(accountInfo.data.reserved);
 }
+
+export function _getSystemPalletReservedBalance (accountInfo: FrameSystemAccountInfo): bigint {
+  return BigInt(accountInfo.data.reserved);
+}
