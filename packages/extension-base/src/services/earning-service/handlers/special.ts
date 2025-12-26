@@ -8,7 +8,7 @@ import { YIELD_POOL_STAT_REFRESH_INTERVAL } from '@subwallet/extension-base/koni
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { createXcmExtrinsicV2, dryRunXcmExtrinsicV2, getMinXcmTransferableAmount } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
-import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetName, _getAssetSymbol, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetSymbol, _getChainName, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { MIN_XCM_LIQUID_STAKING_DOT } from '@subwallet/extension-base/services/earning-service/constants';
 import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitChangeValidatorStaking, SubmitYieldJoinData, TransactionData, UnstakingInfo, XcmStepMetadataForLiqStaking, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
 import { createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
@@ -400,7 +400,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       const symbol = _getAssetSymbol(originTokenInfo);
 
       const inputNetworkName = this.chainInfo.name;
-      const altNetworkName = _getAssetName(originTokenInfo);
+      const altNetworkName = _getChainName(originChainInfo);
       const currentValue = formatNumber(bnInputTokenBalance.toString(), destinationTokenDecimal);
 
       processValidation.message = t('bg.EARNING.services.service.earning.specialHandler.maximumInputExceeded', {
