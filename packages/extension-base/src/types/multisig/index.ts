@@ -28,3 +28,15 @@ export interface ExecutePendingTxRequest extends BaseRequestSign {
   call: any; // Call data to execute
   maxWeight?: string | number; // Optional max weight for the call
 }
+
+export interface CancelPendingTxRequest extends BaseRequestSign {
+  address: string;
+  chain: string;
+  threshold: number;
+  otherSignatories: string[];
+  timepoint?: {
+    height: number;
+    index: number;
+  };
+  callHash: string;
+}
