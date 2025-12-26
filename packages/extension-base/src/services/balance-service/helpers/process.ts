@@ -82,7 +82,7 @@ export async function getAcrossbridgeTransferProcessFromEvm (SpokePoolAddress: s
   };
 
   try {
-    const allowance = await getERC20Allowance(getSnowBridgeGatewayContract(evmApi.chainSlug), address, _getContractAddressOfToken(tokenInfo), evmApi);
+    const allowance = await getERC20Allowance(SpokePoolAddress, address, _getContractAddressOfToken(tokenInfo), evmApi);
 
     if (!allowance || new BigN(allowance).lt(amount)) {
       result.steps.push({
