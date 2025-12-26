@@ -426,6 +426,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [filterFunction, historyMap]);
 
   const [historyItems, setHistoryItems] = useState<TransactionHistoryDisplayItem[]>(getHistoryItems(DEFAULT_ITEMS_COUNT));
+  console.log('historyItems', historyItems);
 
   const [currentAccountProxyid] = useState(currentAccountProxy?.id);
 
