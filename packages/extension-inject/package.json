@@ -23,7 +23,7 @@
     "@polkadot/util": "^13.5.3",
     "@polkadot/util-crypto": "^13.5.3",
     "@polkadot/x-global": "^13.5.3",
-    "@subwallet/keyring": "^0.1.13",
+    "@subwallet/keyring": "^0.1.14",
     "web3-core": "^1.10.4"
   },
   "devDependencies": {
