@@ -9,7 +9,7 @@ import { getSnowBridgeGatewayContract } from '@subwallet/extension-base/koni/api
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { CommonOptimalTransferPath, CommonStepType, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
-import BigN from "bignumber.js";
+import BigN from 'bignumber.js';
 
 export interface RequestOptimalTransferProcess {
   originChain: string,
@@ -83,8 +83,6 @@ export async function getAcrossbridgeTransferProcessFromEvm (SpokePoolAddress: s
 
   try {
     const allowance = await getERC20Allowance(getSnowBridgeGatewayContract(evmApi.chainSlug), address, _getContractAddressOfToken(tokenInfo), evmApi);
-
-    console.log('allowance', allowance, !allowance, !allowance || BigInt(allowance) < BigInt(amount));
 
     if (!allowance || new BigN(allowance).lt(amount)) {
       result.steps.push({
