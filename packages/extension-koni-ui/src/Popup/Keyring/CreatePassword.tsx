@@ -54,7 +54,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const { t } = useTranslation();
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
   const navigate = useNavigate();
-  const previousInfo = useLocation().state as { prevPathname: string, prevState: any };
+  const previousInfo = useLocation().state as { prevPathname: string, prevSearch?: string, prevState: any };
 
   const { accounts } = useSelector((state: RootState) => state.accountState);
 
@@ -78,11 +78,13 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const onComplete = useCallback(() => {
     if (previousInfo?.prevPathname) {
-      navigate(previousInfo.prevPathname, { state: previousInfo.prevState as unknown });
+      const searchParams = previousInfo.prevSearch ? `?${previousInfo.prevSearch}` : '';
+
+      navigate(`${previousInfo.prevPathname}${searchParams}`, { state: previousInfo.prevState as unknown });
     } else {
       navigate(DEFAULT_ROUTER_PATH);
     }
-  }, [navigate, previousInfo?.prevPathname, previousInfo?.prevState]);
+  }, [navigate, previousInfo?.prevPathname, previousInfo?.prevSearch, previousInfo?.prevState]);
 
   const onSubmit: Callbacks<CreatePasswordFormState>['onFinish'] = useCallback((values: CreatePasswordFormState) => {
     const password = values[FormFieldName.PASSWORD];

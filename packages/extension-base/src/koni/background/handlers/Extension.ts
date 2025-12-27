@@ -69,7 +69,7 @@ import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { MetadataDef } from '@subwallet/extension-inject/types';
 import { getKeypairTypeByAddress, isAddress, isCardanoAddress, isSubstrateAddress, isTonAddress } from '@subwallet/keyring';
-import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { AllSubstrateKeypairTypes, BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { getBitcoinAddressInfo } from '@subwallet/keyring/utils';
 import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 import { keyring } from '@subwallet/ui-keyring';
@@ -677,7 +677,7 @@ export default class KoniExtension {
 
     const validTypes = {
       evm: EthereumKeypairTypes,
-      substrate: SubstrateKeypairTypes,
+      substrate: AllSubstrateKeypairTypes,
       ton: TonKeypairTypes,
       cardano: CardanoKeypairTypes,
       bitcoin: BitcoinKeypairTypes
