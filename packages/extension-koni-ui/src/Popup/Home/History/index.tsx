@@ -5,14 +5,14 @@ import { ExtrinsicStatus, ExtrinsicType, TransactionDirection, TransactionHistor
 import { YIELD_EXTRINSIC_TYPES } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
-import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/extension-koni-ui/messaging';
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, formatHistoryDate, isTypeGov, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
-import { ButtonProps, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
+import {ButtonProps, Form, Icon, ModalContext, SwIconProps, SwList, SwSubHeader} from '@subwallet/react-ui';
 import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, NewspaperClipping, Pencil, Rocket, Spinner } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,9 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { HistoryDetailModal } from './Detail';
+import {RootState} from "@subwallet/extension-koni-ui/stores";
+import {PendingMultisigTx} from "@subwallet/extension-base/services/multisig-service";
+import {MultisigHistoryItem} from "@subwallet/extension-koni-ui/components/History/MultisigHistoryItem";
 
 type Props = ThemeProps
 
@@ -199,17 +202,70 @@ const remindSeedPhraseModalId = REMIND_BACKUP_SEED_PHRASE_MODAL;
 const DEFAULT_ITEMS_COUNT = 20;
 const NEXT_ITEMS_COUNT = 10;
 
+enum ViewValue {
+  TRANSACTION = 'Transaction',
+  MULTISIG = 'Multisig'
+}
+
+interface FormState {
+  view: ViewValue
+}
+
+interface ViewOption {
+  label: string;
+  value: ViewValue;
+}
+
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   useSetCurrentPage('/home/history');
   const dataContext = useContext(DataContext);
   const { t } = useTranslation();
+  const [form] = Form.useForm<FormState>();
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
   const { accounts, currentAccountProxy, isAllAccount } = useSelector((root) => root.accountState);
   const { chainInfoMap } = useSelector((root) => root.chainStore);
   const { language } = useSelector((root) => root.settings);
+  const {  pendingMultisigTxs} = useSelector((root: RootState) => root.multisig);
   const [loading, setLoading] = useState<boolean>(true);
   const [rawHistoryList, setRawHistoryList] = useState<TransactionHistoryItem[]>([]);
   const isActive = checkActive(modalId);
+
+  const defaultValues = useMemo((): FormState => ({
+    view:  ViewValue.TRANSACTION
+  }), []);
+
+  const viewOptions = useMemo((): ViewOption[] => {
+    return [
+      {
+        label: t('Transaction'),
+        value: ViewValue.TRANSACTION
+      },
+      {
+        label: t('Multisig'),
+        value: ViewValue.MULTISIG
+      }
+    ];
+  }, [t]);
+
+  const viewValue = Form.useWatch('view', form);
+
+  const multisigList = useMemo(() => {
+    const fullList = Object.values(pendingMultisigTxs);
+
+    const uniqueMap = new Map<string, PendingMultisigTx>();
+
+    fullList.forEach((tx) => {
+      const key = tx.extrinsicHash || tx.callHash;
+      if (!uniqueMap.has(key)) {
+        uniqueMap.set(key, tx);
+      }
+    });
+
+    return Array.from(uniqueMap.values());
+  }, [pendingMultisigTxs]);
+
+  console.log('multisigList', multisigList);
+  console.log('pendingMultisigTxs', pendingMultisigTxs);
 
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
@@ -426,6 +482,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [filterFunction, historyMap]);
 
   const [historyItems, setHistoryItems] = useState<TransactionHistoryDisplayItem[]>(getHistoryItems(DEFAULT_ITEMS_COUNT));
+
   console.log('historyItems', historyItems);
 
   const [currentAccountProxyid] = useState(currentAccountProxy?.id);
@@ -439,6 +496,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return () => {
       setSelectedItem(item);
       activeModal(modalId);
+    };
+  }, [activeModal]);
+
+  const onOpenMultisigInfo = useCallback((item: PendingMultisigTx) => {
+    return () => {
+      // setSelectedItem(item);
+      // activeModal(modalId);
+      console.log('onOpenMultisigInfo', item);
     };
   }, [activeModal]);
 
@@ -521,12 +586,31 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [onOpenDetail]
   );
 
-  const groupBy = useCallback((item: TransactionHistoryDisplayItem) => {
-    if (PROCESSING_STATUSES.includes(item.status)) {
-      return t('ui.HISTORY.screen.History.processing');
+  const renderMultisigItem = useCallback(
+    (item: PendingMultisigTx) => {
+      return (
+        <MultisigHistoryItem
+          key={item.extrinsicHash || item.callHash}
+          item={item}
+          onClick={() => onOpenMultisigInfo(item)}
+        />
+      );
+    },
+    [onOpenDetail]
+  );
+
+  const groupBy = useCallback((item: TransactionHistoryDisplayItem | PendingMultisigTx) => {
+
+    if ('status' in item) {
+      if (PROCESSING_STATUSES.includes(item.status)) {
+        return t('ui.HISTORY.screen.History.processing');
+      }
+      return formatHistoryDate(item.displayTime, language, 'list');
     }
 
-    return formatHistoryDate(item.displayTime, language, 'list');
+    return item.timestamp
+      ? formatHistoryDate(item.timestamp, language, 'list')
+      : t('Pending Multisig');
   }, [language, t]);
 
   const groupSeparator = useCallback((group: TransactionHistoryItem[], idx: number, groupLabel: string) => {
@@ -547,27 +631,48 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const historySelectorsNode = (
     <>
-      <ChainSelector
-        className={'__history-chain-selector'}
-        disabled={isChainSelectorEmpty}
-        items={chainItems}
-        loading={loading}
-        onChange={onSelectChain}
-        title={t('ui.HISTORY.screen.History.selectChain')}
-        value={selectedChain}
-      />
-
-      {
-        (isAllAccount || accountAddressItems.length > 1) && (
-          <AccountAddressSelector
-            autoSelectFirstItem={true}
-            className={'__history-address-selector'}
-            items={accountAddressItems}
-            onChange={onSelectAccount}
-            value={selectedAddress}
+      <div className={'history-header-wrapper'}>
+        <div className={'history-line-1'}>
+          <Form
+            form={form}
+            initialValues={defaultValues}
+            name='token-detail-form'
+          >
+            <Form.Item
+              hidden={!isAllAccount}
+              name='view'
+            >
+              <RadioGroup
+                optionType='button'
+                options={viewOptions}
+              />
+            </Form.Item>
+          </Form>
+        </div>
+        <div className={'history-line-2'}>
+          <ChainSelector
+            className={'__history-chain-selector'}
+            disabled={isChainSelectorEmpty}
+            items={chainItems}
+            loading={loading}
+            onChange={onSelectChain}
+            title={t('ui.HISTORY.screen.History.selectChain')}
+            value={selectedChain}
           />
-        )
-      }
+
+          {
+            (isAllAccount || accountAddressItems.length > 1) && (
+              <AccountAddressSelector
+                autoSelectFirstItem={true}
+                className={'__history-address-selector'}
+                items={accountAddressItems}
+                onChange={onSelectAccount}
+                value={selectedAddress}
+              />
+            )
+          }
+        </div>
+      </div>
     </>
   );
 
@@ -608,6 +713,20 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       </div>
     </>
   ), [emptyList, groupBy, groupSeparator, hasMoreItems, historyItems, onLoadMoreItems, renderItem]);
+
+  const listMultisigSection = useMemo(() => (
+    <div className={'__page-list-area'}>
+      <SwList
+        list={multisigList}
+        renderItem={renderMultisigItem}
+
+        groupBy={groupBy}
+        groupSeparator={groupSeparator}
+        renderOnScroll={false}
+        renderWhenEmpty={emptyList}
+      />
+    </div>
+  ), [emptyList, groupBy, groupSeparator, multisigList, renderMultisigItem]);
 
   const headerIcons = useMemo<ButtonProps[]>(() => {
     return [
@@ -702,7 +821,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             {historySelectorsNode}
           </div>
 
-          {listSection}
+          {viewValue === ViewValue.TRANSACTION && listSection}
+          {viewValue === ViewValue.MULTISIG && listMultisigSection}
         </Layout.Base>
       </PageWrapper>
 
@@ -741,6 +861,26 @@ const History = styled(Component)<Props>(({ theme: { token } }: Props) => {
         right: 0,
         position: 'absolute',
         background: 'linear-gradient(180deg, rgba(76, 234, 172, 0.10) 0%, rgba(76, 234, 172, 0.00) 94.17%)'
+      }
+    },
+    '.history-header-wrapper': {
+      flex: 1
+    },
+
+    '.history-line-2': {
+      display: 'flex',
+      gap: 12
+    },
+
+    '.history-line-1': {
+      '.ant-form-item': {
+        marginBottom: 28
+      }
+    },
+
+    '.history-multisig-tag': {
+      '.ant-form-item': {
+        marginBottom: 0
       }
     },
 

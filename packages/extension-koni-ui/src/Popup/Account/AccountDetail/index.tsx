@@ -3,14 +3,7 @@
 
 import {NotificationType} from '@subwallet/extension-base/background/KoniTypes';
 import {AccountActions, AccountProxy, AccountProxyType} from '@subwallet/extension-base/types';
-import {
-  AccountChainTypeLogos,
-  AccountProxyTypeTag,
-  AddressSelectorItem,
-  CloseIcon,
-  Layout,
-  PageWrapper
-} from '@subwallet/extension-koni-ui/components';
+import { AccountChainTypeLogos, AccountProxyTypeTag, AddressSelectorItem, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import {FilterTabItemType, FilterTabs} from '@subwallet/extension-koni-ui/components/FilterTabs';
 import {WalletModalContext} from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import {useDefaultNavigate, useGetAccountProxyById, useNotification} from '@subwallet/extension-koni-ui/hooks';

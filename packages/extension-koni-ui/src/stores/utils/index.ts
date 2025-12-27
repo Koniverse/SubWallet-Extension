@@ -591,12 +591,6 @@ export const subscribeGovLockedInfo = lazySubscribeMessage('pri(openGov.subscrib
 
 /* Multisig Account */
 export const updatePendingMultisigTxs = (data: PendingMultisigTxMap) => {
-  addLazy(
-    'updatePendingMultisigTxs',
-    () => {
-      store.dispatch({ type: 'multisig/updatePendingMultisigTxs', payload: data });
-    },
-    900
-  );
+  store.dispatch({ type: 'multisig/updatePendingMultisigTxs', payload: data });
 };
 export const subscribePendingMultisigTxs = lazySubscribeMessage('pri(multisig.subscribePendingMultisigTxs)', null, updatePendingMultisigTxs, updatePendingMultisigTxs);
