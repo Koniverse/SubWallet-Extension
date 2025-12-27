@@ -4,29 +4,35 @@
 import { BaseRequestSign } from '@subwallet/extension-base/types';
 
 export interface ApprovePendingTxRequest extends BaseRequestSign {
-  address: string; // Multisig address
-  chain: string; // Chain slug
-  threshold: number; // Number of required signatures
-  otherSignatories: string[]; // List of other signers (excluding the caller)
+  address: string;
+  chain: string;
+  threshold: number;
+  otherSignatories: string[];
   timepoint?: {
     height: number;
     index: number;
-  }; // Optional timepoint for existing call
-  callHash: string; // Hash of the call to approve
-  maxWeight?: string | number; // Optional max weight for the call
+  };
+  callHash: string;
+  maxWeight: {
+    refTime: number, // todo
+    proofSize: number // todo
+  };
 }
 
 export interface ExecutePendingTxRequest extends BaseRequestSign {
-  address: string; // Multisig address
-  chain: string; // Chain slug
-  threshold: number; // Number of required signatures
-  otherSignatories: string[]; // List of other signers
-  timepoint: {
+  address: string;
+  chain: string;
+  threshold: number;
+  otherSignatories: string[];
+  timepoint?: {
     height: number;
     index: number;
-  }; // Timepoint of the approved call
-  call: any; // Call data to execute
-  maxWeight?: string | number; // Optional max weight for the call
+  };
+  call: string;
+  maxWeight: {
+    refTime: number, // todo
+    proofSize: number // todo
+  };
 }
 
 export interface CancelPendingTxRequest extends BaseRequestSign {
@@ -34,7 +40,7 @@ export interface CancelPendingTxRequest extends BaseRequestSign {
   chain: string;
   threshold: number;
   otherSignatories: string[];
-  timepoint?: {
+  timepoint: {
     height: number;
     index: number;
   };

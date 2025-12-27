@@ -1164,6 +1164,21 @@ export default class TransactionService {
         break;
       }
 
+      case ExtrinsicType.MULTISIG_APPROVE_TX: // todo
+        historyItem.additionalInfo = parseTransactionData<ExtrinsicType.MULTISIG_APPROVE_TX>(transaction.data);
+
+        break;
+
+      case ExtrinsicType.MULTISIG_EXECUTE_TX: // todo
+        historyItem.additionalInfo = parseTransactionData<ExtrinsicType.MULTISIG_EXECUTE_TX>(transaction.data);
+
+        break;
+
+      case ExtrinsicType.MULTISIG_CANCEL_TX: // todo
+        historyItem.additionalInfo = parseTransactionData<ExtrinsicType.MULTISIG_CANCEL_TX>(transaction.data);
+
+        break;
+
       case ExtrinsicType.UNKNOWN:
         break;
     }

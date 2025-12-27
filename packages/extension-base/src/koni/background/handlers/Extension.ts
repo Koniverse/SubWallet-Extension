@@ -3198,6 +3198,10 @@ export default class KoniExtension {
       return false;
     }
 
+    if (!timepoint) {
+      return false; // todo: request with no timepoint
+    }
+
     try {
       const substrateApi = this.#koniState.getSubstrateApi(chain);
       const api = substrateApi.api;
@@ -3206,26 +3210,20 @@ export default class KoniExtension {
         return false;
       }
 
-      // Create approveAsMulti extrinsic
-      const callHashU8a = isHex(callHash) ? hexToU8a(callHash) : callHash;
-      const maybeTimepoint = timepoint ? api.createType('Timepoint', timepoint) : null; // todo: try using raw timepoint and weight
-      const maxWeightOption = maxWeight ? api.createType('Weight', maxWeight) : null;
-
       const extrinsic = api.tx.multisig.approveAsMulti(
         threshold,
-        otherSignatories,
-        maybeTimepoint,
-        callHashU8a,
-        maxWeightOption
+        otherSignatories.sort().reverse(),
+        timepoint,
+        callHash,
+        maxWeight
       );
 
-      // Handle transaction
       await this.#koniState.transactionService.handleTransaction({
         address,
         chain,
         chainType: ChainType.SUBSTRATE,
         data: inputData,
-        extrinsicType: ExtrinsicType.UNKNOWN,
+        extrinsicType: ExtrinsicType.MULTISIG_APPROVE_TX,
         transaction: extrinsic,
         url: EXTENSION_REQUEST_URL
       });
@@ -3253,28 +3251,20 @@ export default class KoniExtension {
         return false;
       }
 
-      // Create asMulti extrinsic
-      const timepointType = api.createType('Timepoint', timepoint); // todo: try using raw timepoint and call
-      const callType = typeof call === 'string' && isHex(call)
-        ? api.createType('Call', hexToU8a(call))
-        : api.createType('Call', call);
-      const maxWeightOption = maxWeight ? api.createType('Weight', maxWeight) : null;
-
       const extrinsic = api.tx.multisig.asMulti(
         threshold,
-        otherSignatories,
-        timepointType,
-        callType,
-        maxWeightOption
+        otherSignatories.sort().reverse(),
+        timepoint,
+        call,
+        maxWeight
       );
 
-      // Handle transaction
       await this.#koniState.transactionService.handleTransaction({
         address,
         chain,
         chainType: ChainType.SUBSTRATE,
         data: inputData,
-        extrinsicType: ExtrinsicType.UNKNOWN,
+        extrinsicType: ExtrinsicType.MULTISIG_EXECUTE_TX,
         transaction: extrinsic,
         url: EXTENSION_REQUEST_URL
       });
@@ -3302,31 +3292,26 @@ export default class KoniExtension {
         return false;
       }
 
-      // Create cancelAsMulti extrinsic
-      const callHashU8a = isHex(callHash) ? hexToU8a(callHash) : callHash;
-      const maybeTimepoint = timepoint ? api.createType('Timepoint', timepoint) : null; // todo: try using raw timepoint
-
       const extrinsic = api.tx.multisig.cancelAsMulti(
         threshold,
-        otherSignatories,
-        maybeTimepoint,
-        callHashU8a
+        otherSignatories.sort().reverse(),
+        timepoint,
+        callHash
       );
 
-      // Handle transaction
       await this.#koniState.transactionService.handleTransaction({
         address,
         chain,
         chainType: ChainType.SUBSTRATE,
         data: inputData,
-        extrinsicType: ExtrinsicType.UNKNOWN,
+        extrinsicType: ExtrinsicType.MULTISIG_CANCEL_TX,
         transaction: extrinsic,
         url: EXTENSION_REQUEST_URL
       });
 
       return true;
     } catch (e) {
-      console.error('Error approving pending multisig transaction:', e);
+      console.error('Error cancelling pending multisig transaction:', e);
 
       return false;
     }

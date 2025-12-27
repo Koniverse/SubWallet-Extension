@@ -580,12 +580,17 @@ export enum ExtrinsicType {
 
   CLAIM_BRIDGE = 'claim.claim_bridge',
 
-  // SET_FEE_TOKEN = 'set_fee-token',
-
   // OPEN GOV
   GOV_VOTE = 'gov.vote',
-  GOV_UNVOTE= 'gov.unvote',
-  GOV_UNLOCK_VOTE='gov.unlock-vote',
+  GOV_UNVOTE = 'gov.unvote',
+  GOV_UNLOCK_VOTE = 'gov.unlock-vote',
+  // OPEN GOV
+
+  // MULTISIG
+  MULTISIG_APPROVE_TX = 'multisig.approve_unstake',
+  MULTISIG_CANCEL_TX = 'multisig.cancel_unstake',
+  MULTISIG_EXECUTE_TX = 'multisig.execute_unstake',
+  // MULTISIG
 
   EVM_EXECUTE = 'evm.execute',
   UNKNOWN = 'unknown'
@@ -643,9 +648,18 @@ export interface ExtrinsicDataTypeMap {
 
   [ExtrinsicType.EVM_EXECUTE]: TransactionConfig,
   [ExtrinsicType.CROWDLOAN]: any,
+
+  // GOV
   [ExtrinsicType.GOV_VOTE]: GovVoteRequest,
   [ExtrinsicType.GOV_UNVOTE]: RemoveVoteRequest,
   [ExtrinsicType.GOV_UNLOCK_VOTE]: UnlockVoteRequest,
+  // GOV
+
+  // MULTISIG
+  [ExtrinsicType.MULTISIG_APPROVE_TX]: ApprovePendingTxRequest,
+  [ExtrinsicType.MULTISIG_EXECUTE_TX]: ExecutePendingTxRequest,
+  [ExtrinsicType.MULTISIG_CANCEL_TX]: CancelPendingTxRequest,
+  // MULTISIG
 
   [ExtrinsicType.SWAP]: SwapTxData
   [ExtrinsicType.UNKNOWN]: any
