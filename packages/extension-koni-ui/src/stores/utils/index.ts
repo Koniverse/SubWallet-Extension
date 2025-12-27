@@ -17,6 +17,7 @@ import { lazySubscribeMessage } from '@subwallet/extension-koni-ui/messaging';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { MissionInfo } from '@subwallet/extension-koni-ui/types';
 import { SessionTypes } from '@walletconnect/types';
+import {PendingMultisigTxMap} from "@subwallet/extension-base/services/multisig-service";
 
 // Setup redux stores
 
@@ -587,4 +588,15 @@ export const updateGovLockedInfo = (data: GovVotingInfo[]) => {
 };
 
 export const subscribeGovLockedInfo = lazySubscribeMessage('pri(openGov.subscribeGovLockedInfo)', null, updateGovLockedInfo, updateGovLockedInfo);
-/* OpenGov */
+
+/* Multisig Account */
+export const updatePendingMultisigTxs = (data: PendingMultisigTxMap) => {
+  addLazy(
+    'updatePendingMultisigTxs',
+    () => {
+      store.dispatch({ type: 'multisig/updatePendingMultisigTxs', payload: data });
+    },
+    900
+  );
+};
+export const subscribePendingMultisigTxs = lazySubscribeMessage('pri(multisig.subscribePendingMultisigTxs)', null, updatePendingMultisigTxs, updatePendingMultisigTxs);
