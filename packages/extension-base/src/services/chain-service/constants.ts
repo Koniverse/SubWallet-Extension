@@ -283,7 +283,7 @@ export const _TRANSFER_CHAIN_GROUP = {
   centrifuge: ['centrifuge'],
   disable_transfer: ['crab', 'pangolin'],
   truth: ['truth_network'],
-  bittensor: ['bittensor']
+  bittensor: ['bittensor', 'bittensor_testnet']
 };
 
 export const _MANTA_ZK_CHAIN_GROUP = ['calamari'];
