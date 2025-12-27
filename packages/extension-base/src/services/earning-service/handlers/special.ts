@@ -556,6 +556,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
 
   async handleXcmStep (data: SubmitYieldJoinData, path: OptimalYieldPath): Promise<HandleYieldStepData> {
     const metadata = path.steps[1].metadata as unknown as XcmStepMetadataForLiqStaking;
+    const xcmStepFee = path.totalFee[1].amount;
 
     const address = data.address;
     const { destinationTokenInfo, originTokenInfo, sendingValue } = metadata;
@@ -599,7 +600,8 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       extrinsic,
       txData: xcmData,
       transferNativeAmount: sendingValue,
-      chainType: ChainType.SUBSTRATE
+      chainType: ChainType.SUBSTRATE,
+      xcmStepFee
     };
   }
 
