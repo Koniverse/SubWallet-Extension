@@ -68,7 +68,6 @@ const NftCollectionDetail = new LazyLoader('NftCollectionDetail', () => import('
 const NftImport = new LazyLoader('NftImport', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftImport'));
 
 const History = new LazyLoader('History', () => import('@subwallet/extension-koni-ui/Popup/Home/History'));
-const Crowdloans = new LazyLoader('Crowdloans', () => import('@subwallet/extension-koni-ui/Popup/Home/Crowdloans'));
 const Home = new LazyLoader('Home', () => import('@subwallet/extension-koni-ui/Popup/Home'));
 
 const Settings = new LazyLoader('Settings', () => import('@subwallet/extension-koni-ui/Popup/Settings'));
@@ -239,7 +238,6 @@ export const router = createHashRouter([
           Settings.generateRouterObject('list'),
           GeneralSetting.generateRouterObject('general'),
           AccountSettings.generateRouterObject('account-settings'),
-          Crowdloans.generateRouterObject('crowdloans'),
           ManageAddressBook.generateRouterObject('address-book'),
           SecurityList.generateRouterObject('security'),
           ManageWebsiteAccess.generateRouterObject('dapp-access'),
