@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit/dist';
+import { PendingMultisigTxMap } from '@subwallet/extension-base/services/multisig-service';
 import { MultisigStore, ReduxStatus } from '@subwallet/extension-koni-ui/stores/types';
-import {PendingMultisigTxMap} from "@subwallet/extension-base/services/multisig-service";
 
 const initialState: MultisigStore = {
   reduxStatus: ReduxStatus.INIT,

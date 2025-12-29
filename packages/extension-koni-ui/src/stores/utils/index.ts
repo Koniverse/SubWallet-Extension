@@ -6,6 +6,7 @@ import { AddressBookInfo, AssetSetting, CampaignBanner, ChainStakingMetadata, Co
 import { AccountsContext, AuthorizeRequest, ConfirmationRequestBase, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _ChainApiStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
+import { PendingMultisigTxMap } from '@subwallet/extension-base/services/multisig-service';
 import { GovVotingInfo } from '@subwallet/extension-base/services/open-gov/interface';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
@@ -17,7 +18,6 @@ import { lazySubscribeMessage } from '@subwallet/extension-koni-ui/messaging';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { MissionInfo } from '@subwallet/extension-koni-ui/types';
 import { SessionTypes } from '@walletconnect/types';
-import {PendingMultisigTxMap} from "@subwallet/extension-base/services/multisig-service";
 
 // Setup redux stores
 
@@ -593,4 +593,5 @@ export const subscribeGovLockedInfo = lazySubscribeMessage('pri(openGov.subscrib
 export const updatePendingMultisigTxs = (data: PendingMultisigTxMap) => {
   store.dispatch({ type: 'multisig/updatePendingMultisigTxs', payload: data });
 };
+
 export const subscribePendingMultisigTxs = lazySubscribeMessage('pri(multisig.subscribePendingMultisigTxs)', null, updatePendingMultisigTxs, updatePendingMultisigTxs);

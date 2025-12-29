@@ -1,13 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { MultisigTxType, PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, Logo, Number, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowUpRight, HardDrives, Question } from 'phosphor-react';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
-import {MultisigTxType, PendingMultisigTx} from "@subwallet/extension-base/services/multisig-service";
 
 type Props = ThemeProps & {
   item: PendingMultisigTx;
@@ -17,12 +17,15 @@ type Props = ThemeProps & {
 const Component = ({ className = '', item, onClick }: Props) => {
   const txInfo = useMemo(() => {
     const method = item.decodedCallData?.method || '';
+
     if (item.multisigTxType === MultisigTxType.TRANSFER || method.includes('transfer')) {
       return { icon: ArrowUpRight, name: 'Send' };
     }
+
     if (item.multisigTxType === MultisigTxType.STAKING) {
       return { icon: HardDrives, name: 'Stake' };
     }
+
     return { icon: Question, name: 'Unknown' };
   }, [item]);
 
@@ -36,18 +39,25 @@ const Component = ({ className = '', item, onClick }: Props) => {
   return (
     <Web3Block
       className={CN('multisig-item', className)}
-      onClick={onClick}
       middleItem={
         <div className={'__container'}>
           {/* Header Section */}
           <div className={'__header'}>
             <div className={'__icon-wrapper'}>
-              <Icon className={'__main-icon'} phosphorIcon={txInfo.icon} size={'md'} />
-              <Logo className={'__chain-logo'} network={item.chain} size={16} />
+              <Icon
+                className={'__main-icon'}
+                phosphorIcon={txInfo.icon}
+                size={'md'}
+              />
+              <Logo
+                className={'__chain-logo'}
+                network={item.chain}
+                size={16}
+              />
             </div>
             <div className={'__info'}>
               <div className={'__account-name'}>
-                {${item.multisigAddress}}
+                {`${item.multisigAddress}`}
               </div>
               <div className={'__meta'}>
                 {`${txInfo.name} - ${item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : 'Processing'}`}
@@ -56,15 +66,15 @@ const Component = ({ className = '', item, onClick }: Props) => {
             <div className={'__value-group'}>
               <Number
                 className={'__value'}
-                value={amountValue}
                 decimal={10}
                 suffix={item.chain.includes('paseo') ? 'PAS' : 'DOT'}
+                value={amountValue}
               />
               <Number
                 className={'__fee'}
-                value={item.depositAmount}
                 decimal={10}
                 suffix={'UNIT'}
+                value={item.depositAmount}
               />
             </div>
           </div>
@@ -76,7 +86,10 @@ const Component = ({ className = '', item, onClick }: Props) => {
               <span className={'__count'}>{`${currentApprovals}/${totalSigners} Approval`}</span>
             </div>
             <div className={'__bar-track'}>
-              <div className={'__bar-fill'} style={{ width: `${percent}%` }} />
+              <div
+                className={'__bar-fill'}
+                style={{ width: `${percent}%` }}
+              />
             </div>
           </div>
 
@@ -89,11 +102,12 @@ const Component = ({ className = '', item, onClick }: Props) => {
           </div>
         </div>
       }
+      onClick={onClick}
     />
   );
 };
 
-export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } }) => ({
+export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } }: Props) => ({
   backgroundColor: token.colorBgSecondary,
   borderRadius: token.borderRadiusLG,
   padding: '12px 16px',
@@ -102,13 +116,13 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
   transition: 'background-color 0.2s ease',
 
   '&:hover': {
-    backgroundColor: token.colorBgInput,
+    backgroundColor: token.colorBgInput
   },
 
   '.__container': {
     display: 'flex',
     flexDirection: 'column',
-    gap: 12,
+    gap: 12
   },
 
   '.__header': {
@@ -123,18 +137,18 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: 'rgba(74, 201, 155, 0.1)', // Màu xanh mờ cho icon
+      backgroundColor: 'rgba(74, 201, 155, 0.1)',
       borderRadius: '50%',
 
       '.__main-icon': {
-        color: token.colorSuccess,
+        color: token.colorSuccess
       }
     },
 
     '.__chain-logo': {
       position: 'absolute',
       right: -2,
-      bottom: -2,
+      bottom: -2
     },
 
     '.__info': {
@@ -145,11 +159,11 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
         fontSize: token.fontSizeHeading5,
         fontWeight: token.headingFontWeight,
         textOverflow: 'ellipsis',
-        overflow: 'hidden',
+        overflow: 'hidden'
       },
       '.__meta': {
         color: token.colorTextLight4,
-        fontSize: token.fontSizeSM,
+        fontSize: token.fontSizeSM
       }
     },
 
@@ -173,12 +187,12 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
       height: 6,
       backgroundColor: token.colorBgInput,
       borderRadius: 10,
-      overflow: 'hidden',
+      overflow: 'hidden'
     },
     '.__bar-fill': {
       height: '100%',
       backgroundColor: token.colorPrimary,
-      borderRadius: 10,
+      borderRadius: 10
     }
   },
 

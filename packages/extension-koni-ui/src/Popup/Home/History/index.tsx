@@ -4,15 +4,17 @@
 import { ExtrinsicStatus, ExtrinsicType, TransactionDirection, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { YIELD_EXTRINSIC_TYPES } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper, RadioGroup } from '@subwallet/extension-koni-ui/components';
+import { MultisigHistoryItem } from '@subwallet/extension-koni-ui/components/History/MultisigHistoryItem';
 import { DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/extension-koni-ui/messaging';
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, formatHistoryDate, isTypeGov, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
-import {ButtonProps, Form, Icon, ModalContext, SwIconProps, SwList, SwSubHeader} from '@subwallet/react-ui';
+import { ButtonProps, Form, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
 import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, NewspaperClipping, Pencil, Rocket, Spinner } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,9 +22,6 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { HistoryDetailModal } from './Detail';
-import {RootState} from "@subwallet/extension-koni-ui/stores";
-import {PendingMultisigTx} from "@subwallet/extension-base/services/multisig-service";
-import {MultisigHistoryItem} from "@subwallet/extension-koni-ui/components/History/MultisigHistoryItem";
 
 type Props = ThemeProps
 
@@ -225,13 +224,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { accounts, currentAccountProxy, isAllAccount } = useSelector((root) => root.accountState);
   const { chainInfoMap } = useSelector((root) => root.chainStore);
   const { language } = useSelector((root) => root.settings);
-  const {  pendingMultisigTxs} = useSelector((root: RootState) => root.multisig);
+  const { pendingMultisigTxs } = useSelector((root) => root.multisig);
   const [loading, setLoading] = useState<boolean>(true);
   const [rawHistoryList, setRawHistoryList] = useState<TransactionHistoryItem[]>([]);
   const isActive = checkActive(modalId);
 
   const defaultValues = useMemo((): FormState => ({
-    view:  ViewValue.TRANSACTION
+    view: ViewValue.TRANSACTION
   }), []);
 
   const viewOptions = useMemo((): ViewOption[] => {
@@ -256,6 +255,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     fullList.forEach((tx) => {
       const key = tx.extrinsicHash || tx.callHash;
+
       if (!uniqueMap.has(key)) {
         uniqueMap.set(key, tx);
       }
@@ -483,8 +483,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const [historyItems, setHistoryItems] = useState<TransactionHistoryDisplayItem[]>(getHistoryItems(DEFAULT_ITEMS_COUNT));
 
-  console.log('historyItems', historyItems);
-
   const [currentAccountProxyid] = useState(currentAccountProxy?.id);
 
   // Handle detail modal
@@ -505,7 +503,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       // activeModal(modalId);
       console.log('onOpenMultisigInfo', item);
     };
-  }, [activeModal]);
+  }, []);
 
   const onCloseDetail = useCallback(() => {
     const infoSession = Date.now();
@@ -590,21 +588,21 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     (item: PendingMultisigTx) => {
       return (
         <MultisigHistoryItem
-          key={item.extrinsicHash || item.callHash}
           item={item}
-          onClick={() => onOpenMultisigInfo(item)}
+          key={item.extrinsicHash || item.callHash}
+          onClick={onOpenMultisigInfo(item)}
         />
       );
     },
-    [onOpenDetail]
+    [onOpenMultisigInfo]
   );
 
   const groupBy = useCallback((item: TransactionHistoryDisplayItem | PendingMultisigTx) => {
-
     if ('status' in item) {
       if (PROCESSING_STATUSES.includes(item.status)) {
         return t('ui.HISTORY.screen.History.processing');
       }
+
       return formatHistoryDate(item.displayTime, language, 'list');
     }
 
@@ -717,11 +715,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const listMultisigSection = useMemo(() => (
     <div className={'__page-list-area'}>
       <SwList
-        list={multisigList}
-        renderItem={renderMultisigItem}
-
         groupBy={groupBy}
         groupSeparator={groupSeparator}
+
+        list={multisigList}
+        renderItem={renderMultisigItem}
         renderOnScroll={false}
         renderWhenEmpty={emptyList}
       />
@@ -802,7 +800,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     <>
       <PageWrapper
         className={`history ${className}`}
-        resolve={dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance', 'mantaPay'])}
+        resolve={dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance', 'mantaPay', 'multisig'])}
       >
         <Layout.Base>
           <SwSubHeader
