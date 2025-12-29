@@ -60,6 +60,12 @@ export class AccountJsonHandler extends AccountBaseHandler {
     if (isPasswordValidated) {
       try {
         const { address, meta, type } = keyring.createFromJson(json);
+
+        // Skip cardano accounts on mobile
+        if (type === 'cardano') {
+          throw new Error('Cardano accounts are not supported');
+        }
+
         const { name } = meta;
         const account = transformAccount(address, type, meta);
         const accountExists = this.state.checkAddressExists([address]);
@@ -104,6 +110,12 @@ export class AccountJsonHandler extends AccountBaseHandler {
     if (isPasswordValidated) {
       try {
         const _pair = keyring.createFromJson(file);
+
+        // Skip cardano accounts on mobile
+        if (_pair.type === 'cardano') {
+          throw new Error('Cardano accounts are not supported');
+        }
+
         const exists = this.state.checkAddressExists([_pair.address]);
 
         assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Json.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || _pair.address } }));
@@ -154,9 +166,16 @@ export class AccountJsonHandler extends AccountBaseHandler {
       try {
         const { accountProxies, modifyPairs } = json;
 
-        const pairs = jsons.reduce<KeyringPair[]>((rs, pair) => {
+        const pairs = jsons.reduce<KeyringPair[]>((rs, pairJson) => {
           try {
-            rs.push(keyring.createFromJson(pair));
+            const pair = keyring.createFromJson(pairJson)
+
+            if (pair.type === 'cardano') {
+              // Skip cardano accounts on mobile
+              return rs;
+            }
+
+            rs.push(pair);
           } catch (e) {
             console.error(e);
           }
@@ -212,6 +231,11 @@ export class AccountJsonHandler extends AccountBaseHandler {
         const pairs = jsons.reduce<KeyringPair[]>((rs, pairJson) => {
           try {
             const pair = keyring.createFromJson(pairJson);
+
+            if (pair.type === 'cardano') {
+              // Skip cardano accounts on mobile
+              return rs;
+            }
 
             if (modifyPairsRestored?.[pair.address]) {
               modifyPairs[pair.address] = modifyPairsRestored[pair.address];
