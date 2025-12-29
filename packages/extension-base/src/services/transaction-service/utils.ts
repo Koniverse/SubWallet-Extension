@@ -6,11 +6,11 @@ import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/b
 import { _getBlockExplorerFromChain, _isChainTestNet, _isPureBitcoinChain, _isPureCardanoChain, _isPureEvmChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAIN_FLIP_MAINNET_EXPLORER, CHAIN_FLIP_TESTNET_EXPLORER, SIMPLE_SWAP_EXPLORER } from '@subwallet/extension-base/services/swap-service/utils';
 import { ChainflipSwapTxData, SimpleSwapTxData } from '@subwallet/extension-base/types/swap';
+import { fetchStaticData } from '@subwallet/extension-base/utils';
+import { blockExplorerRouteMap } from '@subwallet/extension-base/utils/staticData';
 
 import { hexAddPrefix, isHex, u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
-import { fetchStaticData } from "@subwallet/extension-base/utils";
-import { blockExplorerRouteMap } from "@subwallet/extension-base/utils/staticData";
 
 interface ExplorerRouteMap {
   default: string;
@@ -30,8 +30,8 @@ export function parseTransactionData<T extends ExtrinsicType> (data: unknown): E
   return data as ExtrinsicDataTypeMap[T];
 }
 
-export function getLatestExplorerRouteMap(): ExplorerRoute {
-  let cachedExplorerRouteMap= blockExplorerRouteMap;
+export function getLatestExplorerRouteMap (): ExplorerRoute {
+  let cachedExplorerRouteMap = blockExplorerRouteMap;
 
   fetchStaticData<ExplorerRoute>('chains/block-explorer-route-map')
     .then((data) => {
@@ -39,6 +39,9 @@ export function getLatestExplorerRouteMap(): ExplorerRoute {
         cachedExplorerRouteMap = data;
       }
     })
+    .catch((e) => {
+      console.error(e);
+    });
 
   return cachedExplorerRouteMap;
 }
@@ -55,7 +58,7 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
   return blockExplorerAccountRoute.default;
 }
 
-function getBlockExplorerTxRoute(chainInfo: _ChainInfo) {
+function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
   const blockExplorerExtrinsicRoute = getLatestExplorerRouteMap().extrinsic;
 
   if (_isPureEvmChain(chainInfo) || _isPureBitcoinChain(chainInfo)) {
@@ -75,6 +78,7 @@ function getBlockExplorerTxRoute(chainInfo: _ChainInfo) {
   }
 
   const explorerLink = _getBlockExplorerFromChain(chainInfo);
+
   if (explorerLink) {
     for (const [domain, route] of Object.entries(blockExplorerExtrinsicRoute.domains)) {
       if (explorerLink.includes(domain)) {

@@ -5,7 +5,7 @@
 import { ChainInfoMap } from '@subwallet/chain-list';
 import { BlockedActionsFeaturesMap, EnvConfig } from '@subwallet/extension-base/constants';
 import { NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
-import { ExplorerRoute } from "@subwallet/extension-base/services/transaction-service/utils";
+import { ExplorerRoute } from '@subwallet/extension-base/services/transaction-service/utils';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-var-requires
 export const buyServiceInfos: Record<string, unknown>[] = require('./buyServiceInfos.json');
