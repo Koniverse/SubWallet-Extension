@@ -28,6 +28,7 @@ export const TRANSACTION_STORAGES = [TRANSFER_TRANSACTION, NFT_TRANSACTION, EARN
 
 export const SELECTED_ACCOUNT_TYPE = 'account.selected-type';
 export const SELECTED_MNEMONIC_TYPE = 'account.selected-mnemonic-type';
+export const ROOT_NFT_TOKEN_ID = 'nft.root-token-id';
 export const SEED_PREVENT_MODAL = 'seed.prevent-modal';
 export const IS_SHOW_TON_CONTRACT_VERSION_WARNING = 'account.is-show-ton-contract-version-warning';
 export const CONFIRM_GENERAL_TERM = 'general.term-and-condition';

@@ -265,6 +265,10 @@ export interface NftItem extends NftItemExtraInfo {
   rarity?: string;
   description?: string;
   properties?: Record<any, any> | null;
+  isBundle?: boolean;
+  nestingLevel?: number;
+  nestingTokens?: NftItem[]
+  parent?: string;
 }
 
 interface NftItemExtraInfo {
@@ -2365,9 +2369,7 @@ export interface KoniRequestSignatures {
   'pri(evmNft.getTransaction)': [NftTransactionRequest, EvmNftTransaction];
   'pri(substrateNft.submitTransaction)': [NftTransactionRequest, SWTransactionResponse];
   'pri(substrateNft.getTransaction)': [NftTransactionRequest, SubstrateNftTransaction];
-  'pri(nft.getNft)': [null, NftJson];
   'pri(nft.getSubscription)': [RequestSubscribeNft, NftJson, NftJson];
-  'pri(nftCollection.getNftCollection)': [null, NftCollectionJson];
   'pri(nftCollection.getSubscription)': [null, NftCollection[], NftCollection[]];
   'pri(nft.getFullList)': [NftFullListRequest, boolean];
 
