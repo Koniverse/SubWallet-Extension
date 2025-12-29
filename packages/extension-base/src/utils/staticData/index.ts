@@ -5,6 +5,7 @@
 import { ChainInfoMap } from '@subwallet/chain-list';
 import { BlockedActionsFeaturesMap, EnvConfig } from '@subwallet/extension-base/constants';
 import { NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { ExplorerRoute } from "@subwallet/extension-base/services/transaction-service/utils";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-var-requires
 export const buyServiceInfos: Record<string, unknown>[] = require('./buyServiceInfos.json');
@@ -30,6 +31,8 @@ export const oldChainPrefix: Record<string, EnvConfig> = require('./oldChainPref
 export const paraSpellChainMap: Record<string, EnvConfig> = require('./paraSpellChainMap.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 export const assetHubStakingMap: Record<string, EnvConfig> = require('./assetHubStaking.json');
+// eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
+export const blockExplorerRouteMap: ExplorerRoute = require('./blockExplorerRouteMap.json');
 
 export enum StaticKey {
   BUY_SERVICE_INFOS = 'buy-service-infos',
@@ -45,6 +48,7 @@ export enum StaticKey {
   OLD_CHAIN_PREFIX = 'old-chain-prefix',
   PARASPELL_CHAIN_MAP= 'paraspell-chain-map',
   ASSET_HUB_STAKING_MAP= 'asset-hub-staking-map',
+  BLOCK_EXPLORER_ROUTE_MAP ='chains/block-explorer-route-map'
 }
 
 export const staticData = {
@@ -60,5 +64,6 @@ export const staticData = {
   [StaticKey.BLOCKED_ACTIONS]: blockedActions,
   [StaticKey.OLD_CHAIN_PREFIX]: oldChainPrefix,
   [StaticKey.PARASPELL_CHAIN_MAP]: paraSpellChainMap,
-  [StaticKey.ASSET_HUB_STAKING_MAP]: assetHubStakingMap
+  [StaticKey.ASSET_HUB_STAKING_MAP]: assetHubStakingMap,
+  [StaticKey.BLOCK_EXPLORER_ROUTE_MAP]: blockExplorerRouteMap
 };

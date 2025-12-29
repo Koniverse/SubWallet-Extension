@@ -1,0 +1,41 @@
+{
+  "account": {
+    "default": "address",
+    "domains": {
+      "explorer.subspace.network": "accounts",
+      "explorer.comstats.org": "accounts",
+      "edgscan.ink": "accounts",
+      "devnet-explorer.mosaicchain.io": "accounts",
+      "statescan.io": "#/accounts",
+      "explorer.joystream.org": "#/accounts",
+      "explorer.gen6.app": "#/accounts",
+      "deeperscan.io": "account",
+      "subscan.io": "account",
+      "3dpscan.io": "account",
+      "main.dentnet.io": "account",
+      "/taostats.io": "account",
+      "uniquescan.io": "account",
+      "node.xode.net": "account",
+      "tonviewer.com": "",
+      "pdexmon.com": "holders"
+    }
+  },
+  "extrinsic": {
+    "default": "extrinsic",
+    "domains": {
+      "statescan.io": "#/extrinsics"
+    },
+    "slugs": {
+      "moonbeam": "tx",
+      "crabParachain": "tx",
+      "aventus": "transaction",
+      "deeper_network": "transaction",
+      "gen6_public": "#/extrinsics",
+      "joystream": "#/extrinsics",
+      "edgeware": "extrinsics",
+      "commune": "extrinsics",
+      "mosaicTest": "transactions",
+      "polkadex": "transactions"
+    }
+  }
+}
