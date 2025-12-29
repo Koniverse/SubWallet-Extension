@@ -119,16 +119,6 @@ const Component = ({ children, className, footer, headerIcons, isSetTitleContext
     {
       icon: {
         type: 'phosphor',
-        phosphorIcon: Rocket,
-        weight: 'fill'
-      },
-      label: t('Crowdloans'),
-      key: 'crowdloans',
-      url: '/home/crowdloans'
-    },
-    {
-      icon: {
-        type: 'phosphor',
         phosphorIcon: Clock,
         weight: 'fill'
       },

@@ -75,7 +75,6 @@ const InscriptionItems = new LazyLoader('InscriptionItems', () => import('@subwa
 const InscriptionItemDetail = new LazyLoader('InscriptionItemDetail', () => import('@subwallet/extension-web-ui/Popup/Home/Inscriptions/InscriptionItemDetail'));
 
 const History = new LazyLoader('History', () => import('@subwallet/extension-web-ui/Popup/Home/History'));
-const Crowdloans = new LazyLoader('Crowdloans', () => import('@subwallet/extension-web-ui/Popup/Home/Crowdloans'));
 const Home = new LazyLoader('Home', () => import('@subwallet/extension-web-ui/Popup/Home'));
 const Statistics = new LazyLoader('Statistics', () => import('@subwallet/extension-web-ui/Popup/Home/Statistics'));
 
@@ -208,7 +207,6 @@ export const router = createBrowserRouter([
               InscriptionItemDetail.generateRouterObject('item-detail')
             ]
           },
-          Crowdloans.generateRouterObject('crowdloans'),
           {
             path: 'earning',
             element: <Outlet />,
