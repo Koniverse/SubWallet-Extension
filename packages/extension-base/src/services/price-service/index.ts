@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { CurrencyJson, CurrencyType, CurrentTokenPrice, ExchangeRateJSON, HistoryTokenPriceJSON, PriceChartPoint, PriceChartTimeframe, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
-import { CRON_REFRESH_PRICE_INTERVAL, CURRENCY } from '@subwallet/extension-base/constants';
+import { CurrencyType, CurrentTokenPrice, ExchangeRateJSON, HistoryTokenPriceJSON, PriceChartPoint, PriceChartTimeframe, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
+import { CRON_REFRESH_PRICE_INTERVAL, CURRENCY, CURRENCY_SYMBOL_RECORD } from '@subwallet/extension-base/constants';
 import { CronServiceInterface, PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { EventService } from '@subwallet/extension-base/services/event-service';
@@ -12,7 +12,6 @@ import { SWStorage } from '@subwallet/extension-base/storage';
 import { CurrentCurrencyStore } from '@subwallet/extension-base/stores';
 import { getTokenPriceHistoryId, TIME_INTERVAL, wait } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
-import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Subject } from 'rxjs';
 
 const DEFAULT_CURRENCY: CurrencyType = 'USD';
@@ -148,7 +147,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
       currency: currencyKey,
       exchangeRateMap: exchangeRateData,
       priceCoinGeckoSupported,
-      currencyData: staticData[StaticKey.CURRENCY_SYMBOL][currencyKey || DEFAULT_CURRENCY] as CurrencyJson,
+      currencyData: CURRENCY_SYMBOL_RECORD[currencyKey || DEFAULT_CURRENCY],
       lastUpdatedMap: { ...lastUpdatedMap }
     };
 

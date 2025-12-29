@@ -12,11 +12,12 @@ import { SWTransactionResult } from '@subwallet/extension-base/services/transact
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { AccountJson, AccountProxy, AccountsWithCurrentAddress, BalanceJson, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardJson, ResponseSubscribeProcessAlive, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { SwapPair } from '@subwallet/extension-base/types/swap';
-import { addLazy, fetchStaticData } from '@subwallet/extension-base/utils';
+import { addLazy } from '@subwallet/extension-base/utils';
 import { lazySubscribeMessage } from '@subwallet/extension-koni-ui/messaging';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { WalletConnectSessionsSubscription } from '@subwallet/extension-koni-ui/stores/types';
 import { MissionInfo } from '@subwallet/extension-koni-ui/types';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { SessionTypes } from '@walletconnect/types';
 
 // Setup redux stores
@@ -66,7 +67,7 @@ export const getMissionPoolData = (() => {
   const rs = {
     promise,
     start: () => {
-      fetchStaticData<MissionInfo[]>('airdrop-campaigns')
+      subwalletApiSdk.staticContentApi.fetchAirdropCampaigns()
         .then((data) => {
           handler.resolve?.(data || []);
         })
@@ -102,7 +103,7 @@ export const getOldChainPrefixData = (() => {
   const rs = {
     promise,
     start: () => {
-      fetchStaticData<Record<string, number>>('old-chain-prefix')
+      subwalletApiSdk.staticContentApi.fetchOldChainPrefix()
         .then((data) => {
           handler.resolve?.(data);
         })

@@ -13,7 +13,8 @@ import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earni
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
-import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
+import { DTaoValidator } from '@subwallet-monorepos/subwallet-services-sdk/services';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject, combineLatest } from 'rxjs';
@@ -53,26 +54,8 @@ export interface RawDelegateState {
     stake: string;
   }>;
 }
-
 interface ValidatorResponse {
-  data: Validator[];
-}
-
-interface Validator {
-  hotkey: {
-    ss58: string;
-  };
-  name: string;
-  global_nominators: number;
-  validator_return_per_day: string;
-  nominator_return_per_day: string;
-  stake: string;
-  validator_stake: string;
-  take: string;
-  root_stake: string;
-  global_weighted_stake: string;
-  weighted_root_stake: string;
-  global_alpha_stake_as_tao: string;
+  data: DTaoValidator[];
 }
 
 interface ValidatorAprResponse {
@@ -141,12 +124,9 @@ export class BittensorCache {
 
   private async fetchData (): Promise<ValidatorResponse> {
     try {
-      const fetchData = await fetchStaticCache<{ data: Record<string, Validator> }>(
-        'earning/dtao/validator.json',
-        { data: {} }
-      );
+      const fetchData = await subwalletApiSdk.staticDataCacheApi.fetchDTaoValidatorList();
 
-      const validators = Object.values(fetchData.data);
+      const validators = Object.values(fetchData);
 
       const data = {
         data: validators.filter((validator) => parseFloat(validator.root_stake) > 0)
