@@ -1,13 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {ChainType, NftCollection, NftItem} from '@subwallet/extension-base/background/KoniTypes';
+import { ChainType, NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { getAddressesByChainType } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { UniqueBundleTree } from '@subwallet-monorepos/subwallet-services-sdk/services';
+import { UniqueCollectionByTokenOwnerRaw } from '@subwallet-monorepos/subwallet-services-sdk/services/nft/unique-nft';
 
 import { BaseNftHandler, NftHandlerResult } from '../base-nft-handler';
-import {UniqueCollectionByTokenOwnerRaw} from "@subwallet-monorepos/subwallet-services-sdk/services/nft/unique-nft";
 
 export class UniqueNftHandler extends BaseNftHandler {
   override filterAddresses (addresses: string[]): string[] {
@@ -95,13 +95,11 @@ export class UniqueNftHandler extends BaseNftHandler {
         const sdkCollections = await api.getUniqueCollectionsByTokenOwner(address);
 
         for (const col of sdkCollections) {
-
           const collection = this.mapUniqueCollections(col);
 
           if (!collectionsMap.has(collection.collectionId)) {
             collectionsMap.set(collection.collectionId, collection);
           }
-
         }
 
         // 3. NFTs
