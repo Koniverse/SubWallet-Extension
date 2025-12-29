@@ -293,6 +293,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
             throw new Error('Error estimating XCM fee');
           }
 
+          // todo: calculate fee exactly
           const xcmFee = BigN(xcmFeeInfo.origin.fee).multipliedBy(XCM_MIN_AMOUNT_RATIO).toFixed(0, 1);
 
           const fee: YieldTokenBaseInfo = {
