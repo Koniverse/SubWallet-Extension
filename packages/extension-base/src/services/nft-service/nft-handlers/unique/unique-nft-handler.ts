@@ -4,21 +4,22 @@
 import { ChainType, NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { getAddressesByChainType } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
-import { UniqueBundleTree, UniqueCollectionInstance } from '@subwallet-monorepos/subwallet-services-sdk/services';
+import { UniqueBundleTree } from '@subwallet-monorepos/subwallet-services-sdk/services';
 
 import { BaseNftHandler, NftHandlerResult } from '../base-nft-handler';
+import {UniqueCollectionByTokenOwnerRaw} from "@subwallet-monorepos/subwallet-services-sdk/services/nft/unique-nft";
 
 export class UniqueNftHandler extends BaseNftHandler {
   override filterAddresses (addresses: string[]): string[] {
     return getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
   }
 
-  private mapUniqueCollections (raws: UniqueCollectionInstance): NftCollection {
+  private mapUniqueCollections (raws: UniqueCollectionByTokenOwnerRaw): NftCollection {
     return {
       collectionId: raws.collectionId.toString(),
       chain: this.chain,
       collectionName: raws.collectionName || 'Unknown Collection',
-      image: raws.image || undefined,
+      image: raws.collectionCover?.url || undefined,
       externalUrl: undefined,
       originAsset: undefined
     };
@@ -82,6 +83,7 @@ export class UniqueNftHandler extends BaseNftHandler {
   override async fetchPreview (addresses: string[]): Promise<NftHandlerResult> {
     const items: NftItem[] = [];
     const collections: NftCollection[] = [];
+    const collectionsMap = new Map<string, NftCollection>();
     const api = subwalletApiSdk.uniqueNftDetectionApi;
 
     if (!api) {
@@ -93,15 +95,13 @@ export class UniqueNftHandler extends BaseNftHandler {
         // 1. Collections
         const sdkCollections = await api.getUniqueCollectionsByTokenOwner(address);
 
-        // 2. Get Collection Info
         for (const col of sdkCollections) {
-          const colInfo = await api.getUniqueCollectionsInfo(col.collectionId);
 
-          if (!colInfo) {
-            continue;
+          const collection = this.mapUniqueCollections(col);
+
+          if (!collectionsMap.has(collection.collectionId)) {
+            collectionsMap.set(collection.collectionId, collection);
           }
-
-          const collection = this.mapUniqueCollections(colInfo);
 
           collections.push(collection);
         }
@@ -121,6 +121,6 @@ export class UniqueNftHandler extends BaseNftHandler {
       console.error(`[UniqueNftHandler] Failed to fetch for ${this.chain}`, e);
     }
 
-    return { items, collections };
+    return { items, collections: Array.from(collectionsMap.values()) };
   }
 }

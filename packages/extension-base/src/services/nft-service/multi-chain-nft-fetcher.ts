@@ -74,6 +74,7 @@ export class MultiChainNftFetcher {
     await Promise.all(tasks);
 
     // DEDUPLICATE
+    // Todo: Move logic DEDUPLICATE to each handler
     const seenItemIds = new Set<string>();
     const seenCollectionKeys = new Set<string>();
     const uniqueItems: NftItem[] = [];
