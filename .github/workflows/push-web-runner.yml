@@ -4,10 +4,12 @@ on:
     branches:
       - web-runner
       - web-runner-demo
+      - web-runner-old
   push:
     branches:
       - web-runner
       - web-runner-demo
+      - web-runner-old
 
 jobs:
   master:

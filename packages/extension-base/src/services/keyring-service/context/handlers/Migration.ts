@@ -11,10 +11,12 @@ import { keyring } from '@subwallet/ui-keyring';
 import { keyExtractSuri } from '@polkadot/util-crypto';
 
 export const SESSION_TIMEOUT = 10000;
+const APPROVE_HARD_TIMEOUT = 2 * 60 * 1000;
 
 interface SessionInfo {
   password: string,
-  timeoutId: NodeJS.Timeout
+  timeoutId: NodeJS.Timeout;
+  inApprove?: boolean;
 }
 
 interface UnifiedAccountGroup {
@@ -26,16 +28,56 @@ export class AccountMigrationHandler extends AccountBaseHandler {
   private sessionIdToPassword: Record<string, SessionInfo> = {};
 
   public pingSession ({ sessionId }: RequestPingSession) {
-    if (!this.sessionIdToPassword[sessionId]) { // todo: if no persistent sessionId, should we jump to enter password again?
+    const session = this.sessionIdToPassword[sessionId];
+
+    if (!session) {
       throw Error(`Session ID ${sessionId} not found.`);
     }
 
-    clearTimeout(this.sessionIdToPassword[sessionId].timeoutId);
-    this.sessionIdToPassword[sessionId].timeoutId = setTimeout(() => {
-      delete this.sessionIdToPassword[sessionId];
-    }, SESSION_TIMEOUT);
+    // If approval is in progress, don't refresh TTL (background may be blocked)
+    if (session.inApprove) {
+      return true;
+    }
+
+    clearTimeout(session.timeoutId);
+    session.timeoutId = setTimeout(() => delete this.sessionIdToPassword[sessionId], SESSION_TIMEOUT);
 
     return true;
+  }
+
+  public freezeSessionForApprove (sessionId: string) {
+    const session = this.sessionIdToPassword[sessionId];
+
+    if (!session) {
+      throw Error(`Session ID ${sessionId} not found.`);
+    }
+
+    session.inApprove = true;
+    clearTimeout(session.timeoutId); // prevent the expiry timer from firing during approve
+
+    // Hard cap expiry
+    session.timeoutId = setTimeout(() => {
+      delete this.sessionIdToPassword[sessionId];
+    }, APPROVE_HARD_TIMEOUT);
+  }
+
+  public unfreezeSessionAfterApprove (sessionId: string, keepAlive = false) {
+    const session = this.sessionIdToPassword[sessionId];
+
+    if (!session) {
+      return;
+    }
+
+    session.inApprove = false;
+    clearTimeout(session.timeoutId);
+
+    if (!keepAlive) {
+      delete this.sessionIdToPassword[sessionId];
+
+      return;
+    }
+
+    session.timeoutId = setTimeout(() => delete this.sessionIdToPassword[sessionId], SESSION_TIMEOUT);
   }
 
   public async migrateUnifiedAndFetchEligibleSoloAccounts (request: RequestMigrateUnifiedAndFetchEligibleSoloAccounts, setMigratingModeFn: () => void): Promise<ResponseMigrateUnifiedAndFetchEligibleSoloAccounts> {
@@ -196,10 +238,17 @@ export class AccountMigrationHandler extends AccountBaseHandler {
 
   public migrateSoloToUnifiedAccount (request: RequestMigrateSoloAccount): ResponseMigrateSoloAccount {
     const { accountName, sessionId, soloAccounts } = request;
-    const password = this.sessionIdToPassword[sessionId].password;
+    const session = this.sessionIdToPassword[sessionId];
+
+    if (!session) {
+      throw Error(`Session ID ${sessionId} not found.`);
+    }
+
+    const password = session.password;
 
     keyring.unlockKeyring(password);
     this.parentService.updateKeyringState();
+    this.freezeSessionForApprove(sessionId);
     const modifiedPairs = structuredClone(this.state.modifyPairs);
     const firstAccountInfo = soloAccounts[0];
     const upcomingProxyId = firstAccountInfo.upcomingProxyId;
@@ -260,6 +309,7 @@ export class AccountMigrationHandler extends AccountBaseHandler {
     } finally {
       keyring.lockAll(false);
       this.parentService.updateKeyringState();
+      this.unfreezeSessionAfterApprove(sessionId, true);
     }
 
     return {
