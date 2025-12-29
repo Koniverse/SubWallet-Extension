@@ -1,0 +1,336 @@
+// Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+import { NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import { Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
+import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
+import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
+import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { Icon, Image } from '@subwallet/react-ui';
+import CN from 'classnames';
+import { CaretDown, CaretRight, CheckCircle } from 'phosphor-react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import styled, { useTheme } from 'styled-components';
+
+type Props = ThemeProps;
+
+interface LocationState {
+  nftItem: NftItem;
+  collectionInfo: any;
+}
+
+const findRootNft = (item: NftItem): NftItem => {
+  let current = item;
+  let safeGuard = 0;
+
+  while (current.parent && safeGuard < 10) {
+    current = current.parent;
+    safeGuard++;
+  }
+
+  return current;
+};
+
+interface TreeNodeProps {
+  item: NftItem;
+  parent?: NftItem;
+  selectedId: string;
+  depth?: number;
+  isLastChild?: boolean;
+}
+
+const TreeNode = ({ depth = 0, isLastChild = false, item, parent, selectedId }: TreeNodeProps) => {
+  const { token } = useTheme() as Theme;
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const hasChildren = item.nestingTokens && item.nestingTokens.length > 0;
+  const isSelected = item.id === selectedId;
+  const childrenCount = item.nestingTokens?.length || 0;
+
+  const toggleExpand = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsExpanded(!isExpanded);
+  };
+
+  return (
+    <div className={CN('tree-node-wrapper', { 'is-last-child': isLastChild })}>
+      <div className='node-content-row'>
+        {depth > 0 && <div className='connector-line-horizontal' />}
+
+        <div
+          className='expand-icon-wrapper'
+          onClick={hasChildren ? toggleExpand : undefined}
+        >
+          {hasChildren
+            ? (
+              <Icon
+                phosphorIcon={isExpanded ? CaretDown : CaretRight}
+                size='sm'
+              />
+            )
+            : (
+              <div className='dot-placeholder' />
+            )}
+        </div>
+
+        <div className={CN('nft-tree-card', { selected: isSelected })}>
+          <Image
+            className='nft-thumb'
+            height={40}
+            shape='square'
+            src={item.image || ''}
+            width={40}
+          />
+
+          <div className='nft-info'>
+            <div className='nft-title'>{item.name || item.id}</div>
+            <div className='nft-subtitle'>
+              {depth === 0 ? 'Parent' : 'Nested in parent'}
+            </div>
+          </div>
+
+          {isSelected
+            ? (
+              <Icon
+                iconColor={token.colorSuccess}
+                phosphorIcon={CheckCircle}
+                size='md'
+                weight='fill'
+              />
+            )
+            : (
+              childrenCount > 0 && (
+                <div className='badge-count'>
+                  {childrenCount.toString().padStart(2, '0')}
+                </div>
+              )
+            )}
+        </div>
+      </div>
+
+      {hasChildren && isExpanded && (
+        <div className='children-container'>
+          <div className='vertical-line-guide' />
+
+          {item.nestingTokens?.map((child, index) => (
+            <TreeNode
+              depth={depth + 1}
+              isLastChild={index === ((item.nestingTokens?.length ?? 0) - 1)}
+              item={child}
+              key={child.id}
+              parent={item.parent}
+              selectedId={selectedId}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+function Component ({ className = '' }: Props): React.ReactElement<Props> {
+  const location = useLocation();
+  const state = location.state as LocationState;
+  const { nftItem } = state || {};
+
+  const { t } = useTranslation();
+  const { goBack } = useDefaultNavigate();
+  const dataContext = useContext(DataContext);
+
+  const rootNft = useMemo(() => {
+    if (!nftItem) {
+      return null;
+    }
+
+    return findRootNft(nftItem);
+  }, [nftItem]);
+
+  const countTotalNodes = useCallback((node: NftItem): number => {
+    let count = 1;
+
+    if (node.nestingTokens) {
+      node.nestingTokens.forEach((child) => {
+        count += countTotalNodes(child);
+      });
+    }
+
+    return count;
+  }, []);
+
+  const totalCount = useMemo(() => rootNft ? countTotalNodes(rootNft) : 0, [rootNft, countTotalNodes]);
+
+  return (
+    <PageWrapper
+      className={`nft-structure ${className}`}
+      resolve={dataContext.awaitStores(['nft'])}
+    >
+      <Layout.Base
+        onBack={goBack}
+        showBackButton={true}
+        showSubHeader={true}
+        subHeaderBackground={'transparent'}
+        subHeaderCenter={true}
+        subHeaderPaddingVertical={true}
+        title={`${t('NFT Structure')} (${totalCount})`}
+      >
+        <div className='tree-structure-container'>
+          {rootNft
+            ? (
+              <TreeNode
+                depth={0}
+                item={rootNft}
+                selectedId={nftItem?.id || ''}
+              />
+            )
+            : (
+              <div className='empty-state'>{t('No structure data found')}</div>
+            )}
+        </div>
+      </Layout.Base>
+    </PageWrapper>
+  );
+}
+
+const NftStructureScreen = styled(Component)<Props>(({ theme: { token } }: Props) => {
+  return ({
+    '.tree-structure-container': {
+      padding: token.padding,
+      paddingBottom: token.paddingLG,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 8
+    },
+
+    '.tree-node-wrapper': {
+      position: 'relative'
+    },
+
+    '.node-content-row': {
+      display: 'flex',
+      alignItems: 'center',
+      marginBottom: 8,
+      zIndex: 2
+    },
+
+    '.children-container': {
+      paddingLeft: 24,
+      position: 'relative'
+    },
+
+    '.vertical-line-guide': {
+      position: 'absolute',
+      left: 11,
+      top: 0,
+      bottom: 16,
+      width: 1,
+      backgroundColor: token.colorTextLight4,
+      opacity: 0.3,
+      zIndex: 1
+    },
+
+    '.connector-line-horizontal': {
+      position: 'absolute',
+      left: -13,
+      width: 12,
+      height: 1,
+      backgroundColor: token.colorTextLight4,
+      opacity: 0.3,
+      top: '50%'
+    },
+
+    '.is-last-child > .node-content-row .connector-line-vertical-overlay': {
+    },
+
+    '.expand-icon-wrapper': {
+      width: 24,
+      height: 24,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 8,
+      cursor: 'pointer',
+      zIndex: 5
+    },
+
+    '.dot-placeholder': {
+      width: 4,
+      height: 4,
+      borderRadius: '50%',
+      backgroundColor: token.colorTextLight4
+    },
+
+    '.nft-tree-card': {
+      flex: 1,
+      display: 'flex',
+      alignItems: 'center',
+      padding: '8px 12px',
+      backgroundColor: token.colorBgSecondary,
+      borderRadius: 12,
+      border: '1px solid transparent',
+      transition: 'all 0.2s ease',
+      cursor: 'default',
+      overflow: 'hidden',
+
+      '&:hover': {
+        backgroundColor: token.colorBgInput
+      },
+
+      '&.selected': {
+        borderColor: token.colorSuccess,
+        backgroundColor: token.colorBgSecondary
+      }
+    },
+
+    '.nft-thumb': {
+      borderRadius: 8,
+      marginRight: 12,
+      objectFit: 'cover',
+
+      '.ant-image-img': {
+        borderRadius: 8
+      }
+    },
+
+    '.nft-info': {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      overflow: 'hidden'
+    },
+
+    '.nft-title': {
+      color: token.colorTextLight1,
+      fontWeight: token.headingFontWeight,
+      fontSize: token.fontSize,
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis'
+    },
+
+    '.nft-subtitle': {
+      color: token.colorTextLight4,
+      fontSize: token.fontSizeSM,
+      marginTop: 2
+    },
+
+    '.badge-count': {
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      padding: '2px 8px',
+      borderRadius: 10,
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: token.colorTextLight3
+    },
+
+    '.empty-state': {
+      textAlign: 'center',
+      color: token.colorTextLight4,
+      marginTop: 32
+    }
+  });
+});
+
+export default NftStructureScreen;
