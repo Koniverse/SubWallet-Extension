@@ -7,7 +7,7 @@ import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-ba
 import { _ChainState, _CUSTOM_PREFIX, _DataMap, _SMART_CONTRACT_STANDARDS } from '@subwallet/extension-base/services/chain-service/types';
 import { IChain } from '@subwallet/extension-base/services/storage-service/databases';
 import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
-import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { AllSubstrateKeypairTypes, BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType, TonKeypairTypes } from '@subwallet/keyring/types';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
@@ -328,7 +328,7 @@ export function _getTokenTypesSupportedByChain (chainInfo: _ChainInfo): _AssetTy
 }
 
 export function _getChainNativeTokenBasicInfo (chainInfo: _ChainInfo): BasicTokenInfo {
-  const defaultTokenInfo = {
+  const defaultTokenInfo: BasicTokenInfo = {
     symbol: '',
     decimals: -1
   };
@@ -337,28 +337,41 @@ export function _getChainNativeTokenBasicInfo (chainInfo: _ChainInfo): BasicToke
     return defaultTokenInfo;
   }
 
-  if (chainInfo.substrateInfo) { // substrate by default
+  if (chainInfo.substrateInfo) {
     return {
+      ...defaultTokenInfo,
       symbol: chainInfo.substrateInfo.symbol,
       decimals: chainInfo.substrateInfo.decimals
     };
-  } else if (chainInfo.evmInfo) {
+  }
+
+  if (chainInfo.evmInfo) {
     return {
+      ...defaultTokenInfo,
       symbol: chainInfo.evmInfo.symbol,
       decimals: chainInfo.evmInfo.decimals
     };
-  } else if (chainInfo.tonInfo) {
+  }
+
+  if (chainInfo.tonInfo) {
     return {
+      ...defaultTokenInfo,
       symbol: chainInfo.tonInfo.symbol,
       decimals: chainInfo.tonInfo.decimals
     };
-  } else if (chainInfo.cardanoInfo) {
+  }
+
+  if (chainInfo.cardanoInfo) {
     return {
+      ...defaultTokenInfo,
       symbol: chainInfo.cardanoInfo.symbol,
       decimals: chainInfo.cardanoInfo.decimals
     };
-  } else if (chainInfo.bitcoinInfo) {
+  }
+
+  if (chainInfo.bitcoinInfo) {
     return {
+      ...defaultTokenInfo,
       symbol: chainInfo.bitcoinInfo.symbol,
       decimals: chainInfo.bitcoinInfo.decimals
     };
@@ -755,7 +768,7 @@ export const _isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, acc
   const { chainType: accountChainType, signMode: accountSignMode, type: accountType } = accountInfo;
 
   if (accountChainType === AccountChainType.SUBSTRATE) {
-    return _isPureSubstrateChain(chainInfo) && SubstrateKeypairTypes.includes(accountType);
+    return _isPureSubstrateChain(chainInfo) && AllSubstrateKeypairTypes.includes(accountType);
   }
 
   if (accountChainType === AccountChainType.ETHEREUM) {

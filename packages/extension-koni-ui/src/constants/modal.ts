@@ -9,6 +9,7 @@ export const IMPORT_ACCOUNT_MODAL = 'import-account-modal';
 export const ATTACH_ACCOUNT_MODAL = 'attach-account-modal';
 export const NEW_SEED_MODAL = 'new-seed-modal';
 export const IMPORT_SEED_MODAL = 'import-seed-modal';
+export const IMPORT_SEED_TRUST_MODAL = 'import-seed-trust-modal';
 export const REQUEST_CREATE_PASSWORD_MODAL = 'request-create-password-modal';
 export const CONFIRMATION_DETAIL_MODAL = 'confirmation-detail-modal';
 export const CONFIRMATION_QR_MODAL = 'confirmation-qr-modal';
@@ -90,6 +91,10 @@ export const DERIVE_ACCOUNT_ACTION_MODAL = 'derive-account-action-modal';
 export const TRANSACTION_PROCESS_DETAIL_MODAL = 'transaction-process-detail-modal';
 export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 /* Process */
+
+/* OpenGov */
+export const GOV_DELEGATION_DETAILS_MODAL = 'gov-delegation-details-modal';
+/* OpenGov */
 
 /* Other */
 export const EARNING_SLIPPAGE_MODAL = 'earning-slippage-modal';

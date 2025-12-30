@@ -1,9 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { AccountProxyAvatar } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { useSelectModalInputHelper, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AccountAddressItemType, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { GovAccountAddressItemType } from '@subwallet/extension-koni-ui/types/gov';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Field, Icon, InputRef, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -12,17 +14,23 @@ import React, { ForwardedRef, forwardRef, useCallback, useContext, useMemo } fro
 import styled from 'styled-components';
 
 import { AccountSelectorModal } from '../Modal';
+import GovAccountSelectoModal from '../Modal/Governance/GovAccountSelector';
 
-interface Props extends ThemeProps, BasicInputWrapper {
-  items: AccountAddressItemType[];
+interface BaseProps extends ThemeProps, BasicInputWrapper {
   labelStyle?: 'horizontal' | 'vertical';
   autoSelectFirstItem?: boolean;
 }
 
+interface Props extends BaseProps {
+  items: AccountAddressItemType[] | GovAccountAddressItemType[];
+  isGovModal?: boolean;
+  avatarSize?: number;
+}
+
 const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> => {
-  const { autoSelectFirstItem, className = '', disabled, id = 'account-selector'
-    , items, label, labelStyle
-    , placeholder, readOnly, statusHelp, tooltip, value } = props;
+  const { autoSelectFirstItem, avatarSize = 20, className = '', disabled
+    , id = 'account-selector', isGovModal, items, label
+    , labelStyle, placeholder, readOnly, statusHelp, tooltip, value } = props;
 
   const { t } = useTranslation();
   const { onSelect } = useSelectModalInputHelper(props, ref);
@@ -60,6 +68,14 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
 
     return (
       <div className={'__selected-item'}>
+        {
+          isGovModal &&
+          <AccountProxyAvatar
+            className={'__selected-item-avatar'}
+            size={avatarSize}
+            value={selectedItem.accountProxyId}
+          />
+        }
         <div className={'__selected-item-name common-text'}>
           {selectedItem.accountName}
         </div>
@@ -69,7 +85,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
         </div>
       </div>
     );
-  }, [selectedItem]);
+  }, [avatarSize, isGovModal, selectedItem]);
 
   const fieldSuffix = useMemo(() => {
     return (
@@ -102,14 +118,27 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
           tooltip={tooltip}
         />
       </div>
-      <AccountSelectorModal
-        autoSelectFirstItem={autoSelectFirstItem}
-        items={items}
-        modalId={id}
-        onCancel={onCancelModal}
-        onSelectItem={onSelectItem}
-        selectedValue={value}
-      />
+      {isGovModal
+        ? (
+          <GovAccountSelectoModal
+            autoSelectFirstItem={autoSelectFirstItem}
+            items={items as GovAccountAddressItemType[]}
+            modalId={id}
+            onCancel={onCancelModal}
+            onSelectItem={onSelectItem}
+            selectedValue={value}
+          />
+        )
+        : (
+          <AccountSelectorModal
+            autoSelectFirstItem={autoSelectFirstItem}
+            items={items}
+            modalId={id}
+            onCancel={onCancelModal}
+            onSelectItem={onSelectItem}
+            selectedValue={value}
+          />
+        )}
     </>
   );
 };
@@ -121,7 +150,8 @@ const AccountAddressSelector = styled(forwardRef(Component))<Props>(({ theme: { 
       fontWeight: token.headingFontWeight,
       color: token.colorTextLight1,
       whiteSpace: 'nowrap',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      alignItems: 'center'
     },
 
     '.ant-field-container .ant-field-content.ant-field-content.ant-field-content': {
@@ -136,6 +166,10 @@ const AccountAddressSelector = styled(forwardRef(Component))<Props>(({ theme: { 
 
     '.__selected-item-address': {
       color: token.colorTextLight4
+    },
+
+    '.__selected-item-avatar': {
+      marginRight: token.marginXS
     },
 
     '.__caret-icon': {
