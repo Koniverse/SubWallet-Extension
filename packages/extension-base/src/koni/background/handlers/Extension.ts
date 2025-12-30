@@ -51,6 +51,7 @@ import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydration
 import { ClaimPolygonBridgeNotificationMetadata, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
 import { GovVoteRequest, RemoveVoteRequest, UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
+import { RequestGetPendingTxs } from '@subwallet/extension-base/services/multisig-service';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
@@ -5343,6 +5344,29 @@ export default class KoniExtension {
 
   /* Open Gov */
 
+  /* Multisig Acocunt */
+
+  private async subscribePendingMultisigTx (id: string, port: chrome.runtime.Port) {
+    const cb = createSubscription<'pri(multisig.subscribePendingMultisigTxs)'>(id, port);
+
+    await this.#koniState.multisigService.waitForStarted();
+    const pendingTxSubscription = this.#koniState.multisigService.subscribePendingMultisigTx().subscribe({
+      next: (rs) => {
+        cb(rs);
+      }
+    });
+
+    this.createUnsubscriptionHandle(id, pendingTxSubscription.unsubscribe);
+
+    port.onDisconnect.addListener((): void => {
+      this.cancelSubscription(id);
+    });
+
+    return this.#koniState.multisigService.getPendingMultisigTx();
+  }
+
+  /* Multisig Acocunt */
+
   // --------------------------------------------------------------
   // eslint-disable-next-line @typescript-eslint/require-await
   public async handle<TMessageType extends MessageTypes> (id: string, type: TMessageType, request: RequestTypes[TMessageType], port: chrome.runtime.Port): Promise<ResponseType<TMessageType>> {
@@ -6020,6 +6044,7 @@ export default class KoniExtension {
         return this.migrateSoloAccount(request as RequestMigrateSoloAccount);
       case 'pri(migrate.pingSession)':
         return this.pingSession(request as RequestPingSession);
+        /* Migrate Unified Account */
 
         /* Gov */
       case 'pri(openGov.vote)':
@@ -6030,6 +6055,14 @@ export default class KoniExtension {
         return this.handleUnlockVote(request as UnlockVoteRequest);
       case 'pri(openGov.subscribeGovLockedInfo)':
         return this.subscribeGovLockedInfo(id, port);
+        /* Gov */
+
+        /* Multisig Account */
+      case 'pri(multisig.subscribePendingMultisigTxs)':
+        return await this.subscribePendingMultisigTx(id, port);
+      case 'pri(multisig.getPendingMultisigTxs)':
+        return this.#koniState.multisigService.getPendingTxsForMultisigAddress(request as RequestGetPendingTxs);
+        /* Multisig Account */
       // Default
       default:
         throw new Error(`Unable to handle message of type ${type}`);

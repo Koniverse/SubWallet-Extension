@@ -15,6 +15,7 @@ import { _ChainState, _EvmApi, _NetworkUpsertParams, _SubstrateApi, _ValidateCus
 import { TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { _NotificationInfo, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
+import { PendingMultisigTx, PendingMultisigTxMap, RequestGetPendingTxs } from '@subwallet/extension-base/services/multisig-service';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { CrowdloanContributionsResponse } from '@subwallet/extension-base/services/subscan-service/types';
 import { BitcoinTransactionData, SWTransactionResponse, SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
@@ -2774,12 +2775,19 @@ export interface KoniRequestSignatures {
   'pri(migrate.migrateUnifiedAndFetchEligibleSoloAccounts)': [RequestMigrateUnifiedAndFetchEligibleSoloAccounts, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts];
   'pri(migrate.migrateSoloAccount)': [RequestMigrateSoloAccount, ResponseMigrateSoloAccount];
   'pri(migrate.pingSession)': [RequestPingSession, boolean];
+  /* Migrate Unified Account */
 
   /* Gov */
   'pri(openGov.vote)': [GovVoteRequest, SWTransactionResponse];
   'pri(openGov.unvote)': [RemoveVoteRequest, SWTransactionResponse]
   'pri(openGov.subscribeGovLockedInfo)': [null, GovVotingInfo[], GovVotingInfo[]];
   'pri(openGov.unlockVote)': [UnlockVoteRequest, SWTransactionResponse];
+  /* Gov */
+
+  /* Multisig Account */
+  'pri(multisig.subscribePendingMultisigTxs)': [null, PendingMultisigTxMap, PendingMultisigTxMap];
+  'pri(multisig.getPendingMultisigTxs)': [RequestGetPendingTxs, PendingMultisigTx[]]
+  /* Multisig Account */
 }
 
 export interface ApplicationMetadataType {
