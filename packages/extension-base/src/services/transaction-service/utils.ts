@@ -6,9 +6,22 @@ import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/b
 import { _getBlockExplorerFromChain, _isChainTestNet, _isPureBitcoinChain, _isPureCardanoChain, _isPureEvmChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHAIN_FLIP_MAINNET_EXPLORER, CHAIN_FLIP_TESTNET_EXPLORER, SIMPLE_SWAP_EXPLORER } from '@subwallet/extension-base/services/swap-service/utils';
 import { ChainflipSwapTxData, SimpleSwapTxData } from '@subwallet/extension-base/types/swap';
+import { fetchStaticData } from '@subwallet/extension-base/utils';
+import { blockExplorerRouteMap } from '@subwallet/extension-base/utils/staticData';
 
 import { hexAddPrefix, isHex, u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
+
+interface ExplorerRouteMap {
+  default: string;
+  domains: Record<string, string>;
+  slugs?: Record<string, string>;
+}
+
+export interface ExplorerRoute {
+  account: ExplorerRouteMap;
+  extrinsic: ExplorerRouteMap;
+}
 
 // @ts-ignore
 export function parseTransactionData<T extends ExtrinsicType> (data: unknown): ExtrinsicDataTypeMap[T] {
@@ -17,80 +30,38 @@ export function parseTransactionData<T extends ExtrinsicType> (data: unknown): E
   return data as ExtrinsicDataTypeMap[T];
 }
 
+export function getLatestExplorerRouteMap (): ExplorerRoute {
+  let cachedExplorerRouteMap = blockExplorerRouteMap;
+
+  fetchStaticData<ExplorerRoute>('chains/block-explorer-route-map')
+    .then((data) => {
+      if (data) {
+        cachedExplorerRouteMap = data;
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+    });
+
+  return cachedExplorerRouteMap;
+}
+
 function getBlockExplorerAccountRoute (explorerLink: string) {
-  if (explorerLink.includes('explorer.subspace.network')) {
-    return 'accounts';
+  const blockExplorerAccountRoute = getLatestExplorerRouteMap().account;
+
+  for (const [domain, route] of Object.entries(blockExplorerAccountRoute.domains)) {
+    if (explorerLink.includes(domain)) {
+      return route;
+    }
   }
 
-  if (explorerLink.includes('explorer.comstats.org')) {
-    return 'accounts';
-  }
-
-  if (explorerLink.includes('edgscan.ink')) {
-    return 'accounts';
-  }
-
-  if (explorerLink.includes('devnet-explorer.mosaicchain.io')) {
-    return 'accounts';
-  }
-
-  if (explorerLink.includes('statescan.io')) {
-    return '#/accounts';
-  }
-
-  if (explorerLink.includes('explorer.joystream.org')) {
-    return '#/accounts';
-  }
-
-  if (explorerLink.includes('explorer.gen6.app')) {
-    return '#/accounts';
-  }
-
-  if (explorerLink.includes('deeperscan.io')) {
-    return 'account';
-  }
-
-  if (explorerLink.includes('subscan.io')) {
-    return 'account';
-  }
-
-  if (explorerLink.includes('3dpscan.io')) {
-    return 'account';
-  }
-
-  if (explorerLink.includes('main.dentnet.io')) {
-    return 'account';
-  }
-
-  if (explorerLink.includes('/taostats.io')) {
-    return 'account';
-  }
-
-  if (explorerLink.includes('uniquescan.io')) {
-    return 'account';
-  }
-
-  if (explorerLink.includes('node.xode.net')) {
-    return 'account';
-  }
-
-  if (explorerLink.includes('tonviewer.com')) {
-    return '';
-  }
-
-  if (explorerLink.includes('pdexmon.com')) {
-    return 'holders';
-  }
-
-  return 'address';
+  return blockExplorerAccountRoute.default;
 }
 
 function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
-  if (_isPureEvmChain(chainInfo) || _isPureBitcoinChain(chainInfo)) {
-    return 'tx';
-  }
+  const blockExplorerExtrinsicRoute = getLatestExplorerRouteMap().extrinsic;
 
-  if (['moonbeam', 'crabParachain'].includes(chainInfo.slug)) {
+  if (_isPureEvmChain(chainInfo) || _isPureBitcoinChain(chainInfo)) {
     return 'tx';
   }
 
@@ -98,49 +69,26 @@ function getBlockExplorerTxRoute (chainInfo: _ChainInfo) {
     return 'transaction';
   }
 
-  if (['aventus', 'deeper_network'].includes(chainInfo.slug)) {
-    return 'transaction';
-  }
+  if (blockExplorerExtrinsicRoute.slugs) {
+    const slugRoute = blockExplorerExtrinsicRoute.slugs[chainInfo.slug];
 
-  if (['gen6_public', 'joystream'].includes(chainInfo.slug)) {
-    return '#/extrinsics';
-  }
-
-  if (['edgeware', 'commune'].includes(chainInfo.slug)) {
-    return 'extrinsics';
-  }
-
-  if (['mosaicTest', 'polkadex'].includes(chainInfo.slug)) {
-    return 'transactions';
+    if (slugRoute) {
+      return slugRoute;
+    }
   }
 
   const explorerLink = _getBlockExplorerFromChain(chainInfo);
 
-  if (explorerLink && explorerLink.includes('statescan.io')) {
-    return '#/extrinsics';
+  if (explorerLink) {
+    for (const [domain, route] of Object.entries(blockExplorerExtrinsicRoute.domains)) {
+      if (explorerLink.includes(domain)) {
+        return route;
+      }
+    }
   }
 
-  return 'extrinsic';
+  return blockExplorerExtrinsicRoute.default;
 }
-
-// export function getTransactionId (value: string): Promise<string> {
-//   const query = `
-//     query ExtrinsicQuery {
-//       extrinsics(where: {hash_eq: ${value}}, limit: 1) {
-//         id
-//       }
-//     }`;
-//
-//   const apiUrl = 'https://archive-explorer.truth-network.io/graphql';
-//
-//   return fetch(apiUrl, {
-//     method: 'POST',
-//     headers: { 'Content-Type': 'application/json' },
-//     body: JSON.stringify({ query })
-//   })
-//     .then((response) => response.json())
-//     .then((result: SWApiResponse<ExtrinsicsDataResponse>) => result.data.extrinsics[0].id);
-// }
 
 export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'account' | 'tx'): string | undefined {
   const explorerLink = _getBlockExplorerFromChain(chainInfo);
@@ -169,14 +117,6 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
     }
 
     if (['truth_network', 'aventus'].includes(chainInfo.slug)) {
-      // getTransactionId(value)
-      //   .then((transactionId) => {
-      //     return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${transactionId}`);
-      //   })
-      //   .catch((err) => {
-      //     console.error(err);
-      //   });
-
       return undefined;
     }
 
