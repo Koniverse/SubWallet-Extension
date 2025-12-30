@@ -7,10 +7,13 @@ import { _PSP22_ABI } from '@subwallet/extension-base/koni/api/contract-handler/
 import { getDefaultWeightV2 } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import BigN from 'bignumber.js';
 
 import { ApiPromise } from '@polkadot/api';
 import { ContractPromise } from '@polkadot/api-contract';
+
+const assetInfoLogger = createLogger('AssetInfo');
 
 const BN_TEN = new BigN(10);
 
@@ -412,9 +415,9 @@ export const validateAsset = (
   const chainlistDecimals = chainlistAsset.decimals || 0;
   const chainlistSymbol = chainlistAsset.symbol;
 
-  console.log(`[i] minAmount: current - ${chainlistMinAmount}, onchain - ${minAmount}`);
-  console.log(`[i] decimals: current - ${chainlistDecimals}, onchain - ${decimals}`);
-  console.log(`[i] symbol: current - ${chainlistSymbol}, onchain - ${symbol}`);
+  assetInfoLogger.info(`[i] minAmount: current - ${chainlistMinAmount}, onchain - ${minAmount}`);
+  assetInfoLogger.info(`[i] decimals: current - ${chainlistDecimals}, onchain - ${decimals}`);
+  assetInfoLogger.info(`[i] symbol: current - ${chainlistSymbol}, onchain - ${symbol}`);
 
   const isValidSymbol = symbol === chainlistSymbol ? true : 'zk' + symbol === chainlistSymbol;
   const isValidMinAmount = minAmount === chainlistMinAmount;

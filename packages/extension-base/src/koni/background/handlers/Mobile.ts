@@ -8,7 +8,10 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { isSupportWindow, listMerge } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { DexieExportJsonStructure } from 'dexie-export-import';
+
+const mobileHandlerLogger = createLogger('MobileHandler');
 
 export function isLocalStorageReset (): boolean {
   if (isSupportWindow && window?.localStorage) {
@@ -62,14 +65,14 @@ export default class Mobile {
     if (!isLocalStorageReset()) {
       swStorage.copy().then((data) => {
         this.lastRestoreData.storage = data;
-      }).catch(console.error);
+      }).catch((e) => mobileHandlerLogger.error('Error copying storage', e));
     }
 
     (async () => {
       if (!(await isIndexedDBReset())) {
         this.lastRestoreData.indexedDB = await state.dbService.getExportJson();
       }
-    })().catch(console.error);
+    })().catch((e) => mobileHandlerLogger.error('Error getting export JSON', e));
   }
 
   public ping (): string {
@@ -79,7 +82,7 @@ export default class Mobile {
   public initCronAndSubscription (
     { cron: { activeServices: activeCronServices, intervalMap: cronIntervalMap },
       subscription: { activeServices: activeSubscriptionServices } }: RequestInitCronAndSubscription): ActiveCronAndSubscriptionMap {
-    console.log('initCronAndSubscription');
+    mobileHandlerLogger.debug('initCronAndSubscription');
 
     return {
       subscription: {
@@ -104,39 +107,39 @@ export default class Mobile {
   }
 
   public startCronAndSubscriptionServices ({ cronServices, subscriptionServices }: RequestCronAndSubscriptionAction): void {
-    console.log('startCronAndSubscriptionServices');
+    mobileHandlerLogger.debug('startCronAndSubscriptionServices');
   }
 
   public stopCronAndSubscriptionServices ({ cronServices, subscriptionServices }: RequestCronAndSubscriptionAction): void {
-    console.log('stopCronAndSubscriptionServices');
+    mobileHandlerLogger.debug('stopCronAndSubscriptionServices');
   }
 
   public restartCronAndSubscriptionServices ({ cronServices, subscriptionServices }: RequestCronAndSubscriptionAction): void {
-    console.log('restartCronAndSubscriptionServices');
+    mobileHandlerLogger.debug('restartCronAndSubscriptionServices');
   }
 
   public startCronServices (services: CronServiceType[]): void {
-    console.log('startCronServices');
+    mobileHandlerLogger.debug('startCronServices');
   }
 
   public stopCronServices (services: CronServiceType[]): void {
-    console.log('stopCronServices');
+    mobileHandlerLogger.debug('stopCronServices');
   }
 
   public restartCronServices (services: CronServiceType[]): void {
-    console.log('stopCronServices');
+    mobileHandlerLogger.debug('stopCronServices');
   }
 
   public startSubscriptionServices (services: SubscriptionServiceType[]): void {
-    console.log('startSubscriptionServices');
+    mobileHandlerLogger.debug('startSubscriptionServices');
   }
 
   public stopSubscriptionServices (services: SubscriptionServiceType[]): void {
-    console.log('stopSubscriptionServices');
+    mobileHandlerLogger.debug('stopSubscriptionServices');
   }
 
   public restartSubscriptionServices (services: SubscriptionServiceType[]): void {
-    console.log('restartSubscriptionServices');
+    mobileHandlerLogger.debug('restartSubscriptionServices');
   }
 
   private async _getLocalStorageExportData (): Promise<string> {

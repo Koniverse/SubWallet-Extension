@@ -13,8 +13,10 @@ import { CurrentCurrencyStore } from '@subwallet/extension-base/stores';
 import { getTokenPriceHistoryId, TIME_INTERVAL, wait } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Subject } from 'rxjs';
 
+const priceServiceLogger = createLogger('PriceService');
 const DEFAULT_CURRENCY: CurrencyType = 'USD';
 const DEFAULT_PRICE_SUBJECT: PriceJson = {
   currency: DEFAULT_CURRENCY,
@@ -58,12 +60,12 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
       SWStorage.instance.getItem(CURRENCY)
         .then((currency) => {
           this.setCurrentCurrency(currency as CurrencyType || currentCurrency || DEFAULT_CURRENCY);
-        }).catch(console.error);
+        }).catch((error) => priceServiceLogger.error('Error getting currency', error));
     };
 
     this.init().then(
       () => this.getCurrentCurrency(updateCurrency)
-    ).catch(console.error);
+    ).catch((error) => priceServiceLogger.error('Error initializing price service', error));
   }
 
   private async getTokenPrice (priceIds: Set<string>, currency?: CurrencyType, resolve?: (rs: boolean) => void, reject?: (e: boolean) => void) {
@@ -115,7 +117,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
           this.priceSubject.next(newPriceMap);
         }
       } catch (e) {
-        console.error(e);
+        priceServiceLogger.error('Error in price service', e);
       } finally {
         this.refreshPromise = null;
       }
@@ -203,7 +205,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
         this.refreshPriceMapByAction();
       })
       .catch((e) => {
-        console.error(e);
+        priceServiceLogger.error('Error in price service', e);
       });
 
     this.refreshTimeout = setTimeout(this.refreshPriceData.bind(this), CRON_REFRESH_PRICE_INTERVAL);
@@ -309,7 +311,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
         if (data) {
           this.priceSubject.next(data);
         }
-      }).catch(console.error);
+      }).catch((error) => priceServiceLogger.error('Error calculating price map', error));
     });
 
     this.status = ServiceStatus.INITIALIZED;
@@ -334,7 +336,7 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
   }
 
   async persistData (): Promise<void> {
-    await this.dbService.updatePriceStore(this.priceSubject.value).catch(console.error);
+    await this.dbService.updatePriceStore(this.priceSubject.value).catch((error) => priceServiceLogger.error('Error updating price store', error));
   }
 
   startPromiseHandler = createPromiseHandler<void>();

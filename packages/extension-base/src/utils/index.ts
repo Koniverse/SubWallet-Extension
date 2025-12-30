@@ -440,3 +440,4 @@ export * from './swap';
 export * from './translate';
 export * from './bitcoin';
 export * from './setup-api-sdk';
+export * from './logger';

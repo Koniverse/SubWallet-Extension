@@ -11,9 +11,12 @@ import SettingService from '@subwallet/extension-base/services/setting-service/S
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { MetadataDef } from '@subwallet/extension-inject/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BehaviorSubject } from 'rxjs';
 
 import { SignerPayloadJSON } from '@polkadot/types/types/extrinsic';
+
+const requestServiceLogger = createLogger('RequestService');
 
 import TonRequestHandler from './handler/TonRequestHandler';
 import { AuthRequestHandler, ConnectWCRequestHandler, EvmRequestHandler, MetadataRequestHandler, NotSupportWCRequestHandler, PopupHandler, SubstrateRequestHandler } from './handler';
@@ -83,7 +86,7 @@ export default class RequestService {
     const popupList = this.#popupHandler.popup;
 
     if (popupList && popupList.length > 0) {
-      chrome.windows.update(popupList[0], { focused: true })?.catch(console.error);
+      chrome.windows.update(popupList[0], { focused: true })?.catch((error) => requestServiceLogger.error('Error updating popup window', error));
     } else {
       this.#popupHandler.popupOpen();
     }

@@ -14,8 +14,11 @@ import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN, { BigNumber } from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { BalanceService } from '../../balance-service';
+
+const simpleSwapHandlerLogger = createLogger('SimpleSwapHandler');
 import { getERC20TransactionObject, getEVMTransactionObject } from '../../balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '../../balance-service/transfer/token';
 import { ChainService } from '../../chain-service';
@@ -101,7 +104,7 @@ const buildTxForSimpleSwap = async (params: BuildSimpleSwapTxParams): Promise<Bu
 
     const result = depositAddressResponse.result;
 
-    console.log('simpleswapID', result.id);
+    simpleSwapHandlerLogger.debug('simpleswapID', result.id);
 
     if (!result?.id || !result.addressFrom || !result.amountTo) {
       return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR) };
@@ -115,7 +118,7 @@ const buildTxForSimpleSwap = async (params: BuildSimpleSwapTxParams): Promise<Bu
       }
     };
   } catch (err) {
-    console.error('Error:', err);
+    simpleSwapHandlerLogger.error('Error in SimpleSwap handler', err);
 
     return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR) };
   }
@@ -234,7 +237,7 @@ export class SimpleSwapHandler implements SwapBaseInterface {
     });
 
     if (result.error) {
-      console.error('Simple swap error:', result.error);
+      simpleSwapHandlerLogger.error('Simple swap error', result.error);
 
       throw result.error;
     }

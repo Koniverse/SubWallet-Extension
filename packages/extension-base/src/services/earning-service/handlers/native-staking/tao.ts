@@ -19,8 +19,11 @@ import { t } from 'i18next';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 
 import { BN, BN_ZERO } from '@polkadot/util';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { fetchPoolsData } from '../../service';
+
+const taoStakingLogger = createLogger('TaoStaking');
 
 type Nominators = [Array<[number, number]>]
 
@@ -166,12 +169,12 @@ export class BittensorCache {
               this.cache = newData;
             }
           })
-          .catch(console.error);
+          .catch((error) => taoStakingLogger.error('Error fetching delegate state', error));
       }, 60 * 1000); // Cache 1 minute
 
       return data;
     } catch (error) {
-      console.error(error);
+      taoStakingLogger.error('Error fetching delegate state', error);
       this.promise = null;
 
       return this.cache || { data: [] };
@@ -190,7 +193,7 @@ export class BittensorCache {
       // Some subnets not return data, ensure the structure is consistent by returning an empty array
       return Array.isArray(rawData.data) ? rawData : { data: [] };
     } catch (error) {
-      console.error(error);
+      taoStakingLogger.error('Error fetching delegate state by subnet', error);
 
       return { data: [] };
     }
@@ -213,7 +216,7 @@ export class BittensorCache {
 
       return subnet?.fee_rate ?? '0.0005';
     } catch (error) {
-      console.error(error);
+      taoStakingLogger.error('Error fetching subnet fee rate', error);
 
       return '0.0005'; // Default fee rate if fetch fails
     }
@@ -352,14 +355,14 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
         aprSubject.next(apr);
       } catch (e) {
-        console.error('Fetch APR error:', e);
+        taoStakingLogger.error('Fetch APR error:', e);
       }
     };
 
     await fetchAPR();
 
     const interval = setInterval(() => {
-      fetchAPR().catch(console.error);
+      fetchAPR().catch((error) => taoStakingLogger.error('Error fetching APR', error));
     }, BITTENSOR_REFRESH_STAKE_APY);
 
     const rxSubnetTAO = substrateApi.api.rx.query.subtensorModule.subnetTAO(0);
@@ -403,7 +406,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
           callback(data);
         } catch (err) {
-          console.error(err);
+          taoStakingLogger.error('Error in getStakingPositionInterval', err);
         }
       }
     });
@@ -527,7 +530,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
                   type: this.type
                 });
               })
-              .catch(console.error);
+              .catch((error) => taoStakingLogger.error('Error fetching nominator metadata', error));
           } else {
             rsCallback({
               ...defaultInfo,
@@ -555,10 +558,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       await getPoolPosition();
     };
 
-    getStakingPositionInterval().catch(console.error);
+    getStakingPositionInterval().catch((error) => taoStakingLogger.error('Error in getStakingPositionInterval', error));
 
     const intervalId = setInterval(() => {
-      getStakingPositionInterval().catch(console.error);
+      getStakingPositionInterval().catch((error) => taoStakingLogger.error('Error in getStakingPositionInterval', error));
     }, BITTENSOR_REFRESH_STAKE_INFO);
 
     return () => {

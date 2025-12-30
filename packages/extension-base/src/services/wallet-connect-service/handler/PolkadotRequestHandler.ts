@@ -8,10 +8,13 @@ import RequestService from '@subwallet/extension-base/services/request-service';
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { getWCId, parseRequestParams } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { POLKADOT_SIGNING_METHODS } from '@subwallet/extension-base/services/wallet-connect-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import keyring from '@subwallet/ui-keyring';
 import { SignClientTypes } from '@walletconnect/types';
 import { getSdkError } from '@walletconnect/utils';
+
+const polkadotRequestHandlerLogger = createLogger('PolkadotRequestHandler');
 
 export default class PolkadotRequestHandler {
   readonly #walletConnectService: WalletConnectService;
@@ -38,7 +41,7 @@ export default class PolkadotRequestHandler {
     this.#walletConnectService.responseRequest({
       topic: topic,
       response: formatJsonRpcError(id, message)
-    }).catch(console.error);
+    }).catch((error) => polkadotRequestHandlerLogger.error('Error responding to wallet connect request', error));
   }
 
   public handleRequest (requestEvent: SignClientTypes.EventArguments['session_request']) {

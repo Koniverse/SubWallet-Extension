@@ -60,7 +60,7 @@ export default class DisableZeroBalanceTokens extends BaseMigrationJob {
 
       state.chainService.setAssetSettings(updatedSettings);
     } catch (error) {
-      console.error(error);
+      this.logger.error(error);
     }
   }
 }

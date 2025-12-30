@@ -6,8 +6,11 @@ import { OPAL_SCAN_ENDPOINT, QUARTZ_SCAN_ENDPOINT, UNIQUE_IPFS_GATEWAY, UNIQUE_S
 import { BaseNftApi, HandleNftParams } from '@subwallet/extension-base/koni/api/nft/nft';
 import { _NFT_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { baseParseIPFSUrl } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+
+const uniqueNetworkNftLogger = createLogger('UniqueNetworkNft');
 
 interface NftAttribute {
   trait_type: string;
@@ -160,7 +163,7 @@ export class UniqueNftApi extends BaseNftApi {
         }
       }));
     } catch (e) {
-      console.error(`Failed to fetch ${this.chain} nft`, e);
+      uniqueNetworkNftLogger.error(`Failed to fetch ${this.chain} nft`, e);
     }
   }
 

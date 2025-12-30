@@ -5,6 +5,9 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { AbstractChainHandler } from '@subwallet/extension-base/services/chain-service/handler/AbstractChainHandler';
 import { CardanoApi } from '@subwallet/extension-base/services/chain-service/handler/CardanoApi';
 import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/handler/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const cardanoChainHandlerLogger = createLogger('CardanoChainHandler');
 
 export class CardanoChainHandler extends AbstractChainHandler {
   private cardanoApiMap: Record<string, CardanoApi> = {};
@@ -37,7 +40,7 @@ export class CardanoChainHandler extends AbstractChainHandler {
       existed.connect();
 
       if (apiUrl !== existed.apiUrl) {
-        existed.updateApiUrl(apiUrl).catch(console.error);
+        existed.updateApiUrl(apiUrl).catch((error) => cardanoChainHandlerLogger.error('Error updating Cardano API URL', error));
       }
 
       return existed;
@@ -55,7 +58,7 @@ export class CardanoChainHandler extends AbstractChainHandler {
     const existed = this.getCardanoApiByChain(chain);
 
     if (existed && !existed.isApiReadyOnce) {
-      console.log(`Reconnect ${existed.providerName || existed.chainSlug} at ${existed.apiUrl}`);
+      cardanoChainHandlerLogger.info(`Reconnect ${existed.providerName || existed.chainSlug} at ${existed.apiUrl}`);
 
       return existed.recoverConnect();
     }
@@ -64,7 +67,7 @@ export class CardanoChainHandler extends AbstractChainHandler {
   destroyCardanoApi (chain: string) {
     const cardanoApi = this.getCardanoApiByChain(chain);
 
-    cardanoApi?.destroy().catch(console.error);
+    cardanoApi?.destroy().catch((error) => cardanoChainHandlerLogger.error('Error destroying Cardano API', error));
   }
 
   async sleep () {
@@ -72,7 +75,7 @@ export class CardanoChainHandler extends AbstractChainHandler {
     this.cancelAllRecover();
 
     await Promise.all(Object.values(this.getCardanoApiMap()).map((cardanoApi) => {
-      return cardanoApi.disconnect().catch(console.error);
+      return cardanoApi.disconnect().catch((error) => cardanoChainHandlerLogger.error('Error disconnecting Cardano API', error));
     }));
 
     return Promise.resolve();

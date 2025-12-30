@@ -8,6 +8,7 @@ import { _AVAIL_BRIDGE_GATEWAY_ABI, _AVAIL_TEST_BRIDGE_GATEWAY_ABI, getAvailBrid
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _NotificationInfo, ClaimAvailBridgeNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AVAIL_BRIDGE_API } from '@subwallet/extension-base/services/inapp-notification-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { EvmEIP1559FeeOption, EvmFeeInfo, FeeCustom, FeeInfo, FeeOption } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
 import { decodeAddress } from '@subwallet/keyring';
@@ -16,6 +17,8 @@ import { TransactionConfig } from 'web3-core';
 import { ContractSendMethod } from 'web3-eth-contract';
 
 import { u8aToHex } from '@polkadot/util';
+
+const availBridgeLogger = createLogger('AvailBridge');
 
 export const AvailBridgeConfig = {
   ASSET_ID: '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -120,7 +123,7 @@ async function getLatestEthHeadSlot (chainSlug: string) {
 
     return response.slot;
   } catch (e) {
-    console.error(e);
+      availBridgeLogger.error('Error in AvailBridge operation', e);
     throw e;
   }
 }
@@ -133,7 +136,7 @@ async function getLatestBlockHash (chainSlug: string, slot: number) {
 
     return response.blockHash;
   } catch (e) {
-    console.error(e);
+      availBridgeLogger.error('Error in AvailBridge operation', e);
     throw e;
   }
 }
@@ -145,7 +148,7 @@ async function getClaimProofOnAvail (chainSlug: string, blockHash: string, messa
 
     return await rawResponse.json() as { accountProof: PrefixedHexString[], storageProof: PrefixedHexString[] };
   } catch (e) {
-    console.error(e);
+      availBridgeLogger.error('Error in AvailBridge operation', e);
     throw e;
   }
 }
@@ -157,7 +160,7 @@ async function getClaimProofOnEthereum (chainSlug: string, blockHash: string, tr
 
     return await rawResponse.json() as merkleProof;
   } catch (e) {
-    console.error(e);
+      availBridgeLogger.error('Error in AvailBridge operation', e);
     throw e;
   }
 }

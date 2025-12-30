@@ -6,11 +6,14 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _getTokenOnChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { fakeAddress } from '@subwallet/extension-base/services/earning-service/constants';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BaseYieldStepDetail, EarningStatus, HandleYieldStepData, LiquidYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, RuntimeDispatchInfo, SubmitYieldJoinData, TokenBalanceRaw, TransactionData, UnstakingInfo, UnstakingStatus, YieldPoolMethodInfo, YieldPositionInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 
 import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import BaseLiquidStakingPoolHandler from './base';
+
+const acalaLiquidStakingLogger = createLogger('AcalaLiquidStaking');
 
 interface AcalaLiquidStakingMetaItem {
   exchangeRate: string,
@@ -87,7 +90,7 @@ export default class AcalaLiquidStakingPoolHandler extends BaseLiquidStakingPool
         })
       }).then((res) => {
         resolve(res.json());
-      }).catch(console.error);
+      }).catch((error) => acalaLiquidStakingLogger.error('Error in acala liquid staking', error));
     });
 
     const [_toBondPool, _totalStakingBonded, _stakingMeta] = await Promise.all([

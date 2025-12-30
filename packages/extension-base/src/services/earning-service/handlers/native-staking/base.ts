@@ -5,11 +5,14 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { STAKING_IDENTITY_API_SLUG } from '@subwallet/extension-base/services/earning-service/constants';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestBondingSubmit, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, SubmitYieldJoinData, TransactionData, ValidatorInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 
 import { noop } from '@polkadot/util';
 
 import BasePoolHandler from '../base';
+
+const baseNativeStakingLogger = createLogger('BaseNativeStaking');
 
 export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandler {
   public readonly type = YieldPoolType.NATIVE_STAKING;
@@ -105,14 +108,14 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
                   }
                 }
               })
-              .catch(console.error);
+              .catch((error) => baseNativeStakingLogger.error('Error in base native staking', error));
           }
         })
-        .catch(console.error);
+        .catch((error) => baseNativeStakingLogger.error('Error in base native staking', error));
     }
 
     return Promise.resolve(() => {
-      console.log('Cancel get pool reward history', requestGroupId);
+      baseNativeStakingLogger.debug('Cancel get pool reward history', requestGroupId);
       cancel = false;
       this.state.subscanService.cancelGroupRequest(requestGroupId);
     });

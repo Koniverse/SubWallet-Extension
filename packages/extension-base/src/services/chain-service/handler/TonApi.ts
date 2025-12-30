@@ -11,7 +11,10 @@ import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/
 import { TonWalletContract } from '@subwallet/keyring/types';
 import { Cell } from '@ton/core';
 import { Address, Contract, OpenedContract, TonClient } from '@ton/ton';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BehaviorSubject } from 'rxjs';
+
+const tonApiLogger = createLogger('TonApi');
 
 export class TonApi implements _TonApi {
   chainSlug: string;
@@ -112,7 +115,7 @@ export class TonApi implements _TonApi {
 
   onConnect (): void {
     if (!this.isApiConnected) {
-      console.log(`Connected to ${this.chainSlug} at ${this.apiUrl}`);
+      tonApiLogger.info(`Connected to ${this.chainSlug} at ${this.apiUrl}`);
       this.isApiReady = true;
 
       if (this.isApiReadyOnce) {
@@ -127,7 +130,7 @@ export class TonApi implements _TonApi {
     this.updateConnectionStatus(_ChainConnectionStatus.DISCONNECTED);
 
     if (this.isApiConnected) {
-      console.warn(`Disconnected from ${this.chainSlug} of ${this.apiUrl}`);
+      tonApiLogger.warn(`Disconnected from ${this.chainSlug} of ${this.apiUrl}`);
       this.isApiReady = false;
       this.isReadyHandler = createPromiseHandler<_TonApi>();
     }
@@ -179,7 +182,7 @@ export class TonApi implements _TonApi {
 
       return extMsgInfo.result.hash;
     } catch (error) {
-      console.error('Failed to send transaction with boc', boc);
+      tonApiLogger.error('Failed to send transaction with boc', boc);
       throw error;
     }
   }

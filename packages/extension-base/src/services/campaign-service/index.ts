@@ -4,11 +4,14 @@
 import { CampaignData, CampaignDataType, ShowCampaignPopupRequest } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { ListCampaignResponse } from '@subwallet/extension-base/services/campaign-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { TARGET_ENV } from '@subwallet/extension-base/utils';
 import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
 import { BehaviorSubject } from 'rxjs';
 
 import { runCampaign } from './helpers';
+
+const campaignServiceLogger = createLogger('CampaignService');
 
 const targetEnvs = ['extension', 'mobile'];
 
@@ -23,12 +26,12 @@ export default class CampaignService {
     if (targetEnvs.includes(TARGET_ENV)) {
       this.fetchCampaign()
         .catch((e) => {
-          console.error('Error on fetch campaigns', e);
+          campaignServiceLogger.error('Error on fetch campaigns', e);
         });
 
       this.runCampaign()
         .catch((e) => {
-          console.error('Error on run campaigns', e);
+          campaignServiceLogger.error('Error on run campaigns', e);
         });
     }
   }
@@ -146,7 +149,7 @@ export default class CampaignService {
       const onComplete = () => {
         this.completeCampaignNotification(slug)
           .catch((e) => {
-            console.error('Error when complete campaign', slug, e);
+            campaignServiceLogger.error('Error when complete campaign', slug, e);
           });
       };
 
@@ -162,7 +165,7 @@ export default class CampaignService {
             throw new Error('Missing handle campaign');
         }
       } catch (e) {
-        console.error('Error on running campaigns', slug, e);
+        campaignServiceLogger.error('Error on running campaigns', slug, e);
       }
     });
   }

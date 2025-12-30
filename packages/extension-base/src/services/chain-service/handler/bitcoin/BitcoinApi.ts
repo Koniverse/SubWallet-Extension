@@ -5,10 +5,13 @@ import { BlockStreamTestnetRequestStrategy, MempoolTestnetRequestStrategy } from
 import { SubWalletMainnetRequestStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/SubWalletMainnet';
 import { BitcoinApiStrategy } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils/promise';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BehaviorSubject } from 'rxjs';
 
 import { _ApiOptions } from '../../handler/types';
 import { _BitcoinApi, _ChainConnectionStatus } from '../../types';
+
+const bitcoinApiLogger = createLogger('BitcoinApi');
 
 // const isBlockStreamProvider = (apiUrl: string): boolean => apiUrl === 'https://blockstream-testnet.openbit.app' || apiUrl === 'https://electrs.openbit.app';
 // const BLOCKSTREAM_TESTNET_API_URL = 'https://blockstream.info/testnet/api/';
@@ -113,7 +116,7 @@ export class BitcoinApi implements _BitcoinApi {
 
   onConnect (): void {
     if (!this.isApiConnected) {
-      console.log(`Connected to ${this.chainSlug} at ${this.apiUrl}`);
+      bitcoinApiLogger.info(`Connected to ${this.chainSlug} at ${this.apiUrl}`);
       this.isApiReady = true;
 
       if (this.isApiReadyOnce) {
@@ -128,7 +131,7 @@ export class BitcoinApi implements _BitcoinApi {
     this.updateConnectionStatus(_ChainConnectionStatus.DISCONNECTED);
 
     if (this.isApiConnected) {
-      console.warn(`Disconnected from ${this.chainSlug} of ${this.apiUrl}`);
+      bitcoinApiLogger.warn(`Disconnected from ${this.chainSlug} of ${this.apiUrl}`);
       this.isApiReady = false;
       this.isReadyHandler = createPromiseHandler<_BitcoinApi>();
     }

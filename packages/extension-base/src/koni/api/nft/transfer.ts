@@ -5,6 +5,9 @@ import { AssetHubNftType } from '@subwallet/extension-base/background/KoniTypes'
 import { SUPPORTED_TRANSFER_SUBSTRATE_CHAIN_NAME } from '@subwallet/extension-base/koni/api/nft/config';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const nftTransferLogger = createLogger('NftTransfer');
 
 interface CollectionInfo {
   limits: {
@@ -23,7 +26,7 @@ export function acalaGetExtrinsic (substrateApi: _SubstrateApi, senderAddress: s
 
     return substrateApi.api.tx.nft.transfer(recipientAddress, [collectionId, itemId]);
   } catch (e) {
-    console.error(e);
+    nftTransferLogger.error('Error in acalaGetExtrinsic', e);
 
     return null;
   }
@@ -44,7 +47,7 @@ export function rmrkGetExtrinsic (substrateApi: _SubstrateApi, senderAddress: st
 
     return substrateApi.api.tx.system.remark(parsedRemark);
   } catch (e) {
-    console.error(e);
+    nftTransferLogger.error('Error in rmrkGetExtrinsic', e);
 
     return null;
   }
@@ -67,7 +70,7 @@ export async function uniqueGetExtrinsic (substrateApi: _SubstrateApi, senderAdd
       return null;
     }
   } catch (e) {
-    console.error(e);
+    nftTransferLogger.error('Error in uniqueGetExtrinsic', e);
 
     return null;
   }
@@ -87,7 +90,7 @@ export function assetHubGetExtrinsic (substrateApi: _SubstrateApi, senderAddress
 
     return null;
   } catch (e) {
-    console.error(e);
+    nftTransferLogger.error('Error in assetHubGetExtrinsic', e);
 
     return null;
   }

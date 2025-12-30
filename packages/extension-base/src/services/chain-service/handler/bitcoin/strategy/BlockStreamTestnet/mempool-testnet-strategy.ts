@@ -3,6 +3,7 @@
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { BitcoinAddressSummaryInfo, BitcoinApiStrategy, BitcoinTransactionEventMap, BlockstreamAddressResponse, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, BlockStreamUtxo, Inscription, InscriptionFetchedData, RecommendedFeeEstimates, RunesInfoByAddress, RunesInfoByAddressFetchedData } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { HiroService } from '@subwallet/extension-base/services/hiro-service';
 import { RunesService } from '@subwallet/extension-base/services/rune-service';
 import { BaseApiRequestStrategy } from '@subwallet/extension-base/strategy/api-request-strategy';
@@ -11,6 +12,8 @@ import { getRequest, postRequest } from '@subwallet/extension-base/strategy/api-
 import { BitcoinFeeInfo, BitcoinTx, UtxoResponseItem } from '@subwallet/extension-base/types';
 import BigN from 'bignumber.js';
 import EventEmitter from 'eventemitter3';
+
+const mempoolTestnetLogger = createLogger('MempoolTestnetStrategy');
 
 export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implements BitcoinApiStrategy {
   private readonly baseUrl: string;
@@ -67,7 +70,7 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
       this.timePerBlock = blockTime;
     } catch (e) {
-      console.error('Failed to compute block time', e);
+      mempoolTestnetLogger.error('Failed to compute block time', e);
 
       blockTime = (this.isTestnet ? 5 * 60 : 10 * 60) * 1000; // Default to 10 minutes if failed
     }
@@ -220,7 +223,7 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
         const response = await getRequest(this.getUrl('v1/fees/recommended'), undefined, this.headers);
 
         if (!response.ok) {
-          console.warn(`Failed to fetch fee estimates: ${response.statusText}`);
+          mempoolTestnetLogger.warn(`Failed to fetch fee estimates: ${response.statusText}`);
 
           return defaultFeeInfo;
         }
@@ -300,7 +303,7 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
                 eventEmitter.emit('success', transactionStatus);
               }
             })
-            .catch(console.error);
+            .catch((error) => mempoolTestnetLogger.error('Error in mempool testnet strategy', error));
         }, 30000);
       })
       .catch((error: Error) => {
@@ -351,7 +354,7 @@ export class MempoolTestnetRequestStrategy extends BaseApiRequestStrategy implem
 
       return runesFullList;
     } catch (error) {
-      console.error(`Failed to get ${address} balances`, error);
+      mempoolTestnetLogger.error(`Failed to get ${address} balances`, error);
       throw error;
     }
   }

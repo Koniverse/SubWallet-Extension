@@ -5,6 +5,9 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { AbstractChainHandler } from '@subwallet/extension-base/services/chain-service/handler/AbstractChainHandler';
 import { TonApi } from '@subwallet/extension-base/services/chain-service/handler/TonApi';
 import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/handler/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const tonChainHandlerLogger = createLogger('TonChainHandler');
 
 export class TonChainHandler extends AbstractChainHandler {
   private tonApiMap: Record<string, TonApi> = {};
@@ -37,7 +40,7 @@ export class TonChainHandler extends AbstractChainHandler {
       existed.connect();
 
       if (apiUrl !== existed.apiUrl) {
-        existed.updateApiUrl(apiUrl).catch(console.error);
+        existed.updateApiUrl(apiUrl).catch((error) => tonChainHandlerLogger.error('Error updating TON API URL', error));
       }
 
       return existed;
@@ -55,7 +58,7 @@ export class TonChainHandler extends AbstractChainHandler {
     const existed = this.getTonApiByChain(chain);
 
     if (existed && !existed.isApiReadyOnce) {
-      console.log(`Reconnect ${existed.providerName || existed.chainSlug} at ${existed.apiUrl}`);
+      tonChainHandlerLogger.info(`Reconnect ${existed.providerName || existed.chainSlug} at ${existed.apiUrl}`);
 
       return existed.recoverConnect();
     }
@@ -64,7 +67,7 @@ export class TonChainHandler extends AbstractChainHandler {
   destroyTonApi (chain: string) {
     const tonApi = this.getTonApiByChain(chain);
 
-    tonApi?.destroy().catch(console.error);
+    tonApi?.destroy().catch((error) => tonChainHandlerLogger.error('Error destroying TON API', error));
   }
 
   async sleep () {
@@ -72,7 +75,7 @@ export class TonChainHandler extends AbstractChainHandler {
     this.cancelAllRecover();
 
     await Promise.all(Object.values(this.getTonApiMap()).map((tonApi) => {
-      return tonApi.disconnect().catch(console.error);
+      return tonApi.disconnect().catch((error) => tonChainHandlerLogger.error('Error disconnecting TON API', error));
     }));
 
     return Promise.resolve();

@@ -3,8 +3,11 @@
 
 import { MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState } from '@subwallet/extension-base/background/KoniTypes';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BaseWallet, interfaces, MantaPayWallet } from 'manta-extension-sdk';
 import { Subject } from 'rxjs';
+
+const mantaPrivateHandlerLogger = createLogger('MantaPrivateHandler');
 
 export class MantaPrivateHandler {
   private dbService: DatabaseService;
@@ -85,7 +88,7 @@ export class MantaPrivateHandler {
         ...data
       });
     } catch (e) {
-      console.error('manta-pay', e);
+      mantaPrivateHandlerLogger.error('manta-pay error', e);
 
       return false;
     }
@@ -102,7 +105,7 @@ export class MantaPrivateHandler {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       result = await this.dbService.getMantaPayData(`storage_state_${palletName}_${network}${suffix}`);
     } catch (e) {
-      console.error(e);
+      mantaPrivateHandlerLogger.error('Error in MantaPrivateHandler', e);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -167,7 +170,7 @@ export class MantaPrivateHandler {
 
         this.syncStateSubject.next(this.syncState);
       })
-        .catch(console.error);
+        .catch((error) => mantaPrivateHandlerLogger.error('Error in MantaPrivateHandler operation', error));
     }, 1000);
 
     return () => {

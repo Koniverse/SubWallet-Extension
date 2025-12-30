@@ -5,17 +5,16 @@ import { FixedTransaction, TransactionWitnessSet, Vkeywitnesses } from '@emurgo/
 import { ConfirmationDefinitionsCardano, ConfirmationsQueueCardano, ConfirmationsQueueItemOptions, ConfirmationTypeCardano, RequestConfirmationCompleteCardano, ResponseCardanoSignData } from '@subwallet/extension-base/background/KoniTypes';
 import { ConfirmationRequestBase, Resolver } from '@subwallet/extension-base/background/types';
 import RequestService from '@subwallet/extension-base/services/request-service';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { isInternalRequest } from '@subwallet/extension-base/utils/request';
 import { keyring } from '@subwallet/ui-keyring';
 import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
-import { logger as createLogger } from '@polkadot/util/logger';
-import { Logger } from '@polkadot/util/types';
+const cardanoRequestHandlerLogger = createLogger('CardanoRequestHandler');
 
 export default class CardanoRequestHandler {
   readonly #requestService: RequestService;
-  readonly #logger: Logger;
 
   private readonly confirmationsQueueSubjectCardano = new BehaviorSubject<ConfirmationsQueueCardano>({
     cardanoSignatureRequest: {},
@@ -28,7 +27,6 @@ export default class CardanoRequestHandler {
 
   constructor (requestService: RequestService) {
     this.#requestService = requestService;
-    this.#logger = createLogger('CardanoRequestHandler');
   }
 
   public get numCardanoRequests (): number {
@@ -115,7 +113,7 @@ export default class CardanoRequestHandler {
       const confirmation = confirmations[type][id];
 
       if (!resolver || !confirmation) {
-        this.#logger.error(t('bg.DAPP.services.service.request.CardanoHandler.unableToProceed'), type, id);
+        cardanoRequestHandlerLogger.error(t('bg.DAPP.services.service.request.CardanoHandler.unableToProceed'), type, id);
         throw new Error(t('bg.DAPP.services.service.request.CardanoHandler.unableToProceed'));
       }
 
@@ -222,7 +220,7 @@ export default class CardanoRequestHandler {
         const { resolver } = this.confirmationsPromiseMap[id];
 
         if (!resolver || !confirmation) {
-          console.error('Not found confirmation', type, id);
+          cardanoRequestHandlerLogger.error('Not found confirmation', type, id);
         } else {
           resolver.reject(new Error('Reset wallet'));
         }

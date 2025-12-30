@@ -18,6 +18,7 @@ export default class MigrateImportedToken extends BaseMigrationJob {
     const state = this.state;
 
     return new Promise((resolve, reject) => {
+      const self = this;
       chrome.storage.local.get('EvmToken', function (items) {
         if (items && items.EvmToken) {
           const tokenMap = items.EvmToken as Record<string, OldTokenType[]>;
@@ -42,7 +43,7 @@ export default class MigrateImportedToken extends BaseMigrationJob {
                   icon: ''
                 });
               } catch (e) {
-                console.log(e);
+                self.logger.warn('Error migrating imported token', e);
               }
             });
           });

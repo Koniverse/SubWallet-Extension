@@ -28,7 +28,7 @@ export default class MigrateAssetSetting20251027 extends BaseMigrationJob {
         ...migratedAssetSetting
       });
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
   }
 }

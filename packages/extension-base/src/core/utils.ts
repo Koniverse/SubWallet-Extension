@@ -16,6 +16,10 @@ import { getBitcoinAddressInfo, validateBitcoinAddress } from '@subwallet/keyrin
 import { AnyJson } from '@polkadot/types/types';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const coreUtilsLogger = createLogger('CoreUtils');
+
 export function getStrictMode (type: string, extrinsicType?: ExtrinsicType) {
   if (type === BalanceAccountType.FrameSystemAccountInfo) {
     return !extrinsicType || ![ExtrinsicType.TRANSFER_BALANCE].includes(extrinsicType);
@@ -235,7 +239,7 @@ export const _isSufficientToken = async (tokenInfo: _ChainAsset, substrateApi: _
         }
       }
     } catch (e) {
-      console.error(e);
+      coreUtilsLogger.error('Error in core utils', e);
     }
   }
 

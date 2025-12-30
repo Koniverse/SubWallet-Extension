@@ -10,13 +10,13 @@ export default class MigrateRemoveGenesisHash extends BaseMigrationJob {
         try {
           this.state.keyringService.context.removeNoneHardwareGenesisHash();
         } catch (e) {
-          console.error(e);
+          this.logger.error(e);
         }
 
         resolve();
       });
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
   }
 }

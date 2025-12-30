@@ -9,6 +9,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { createXcmExtrinsicV2 } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetName, _getAssetSymbol, _getChainNativeTokenSlug, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitChangeValidatorStaking, SubmitYieldJoinData, SubmitYieldStepData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
 import { createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -18,6 +19,8 @@ import { t } from 'i18next';
 import { BN, BN_TEN, BN_ZERO, noop } from '@polkadot/util';
 
 import BasePoolHandler from './base';
+
+const specialEarningLogger = createLogger('SpecialEarning');
 
 export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHandler {
   protected abstract altInputAsset: string;
@@ -194,7 +197,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
 
     const getStatInterval = () => {
       if (!this.isActive) {
-        defaultCallback().catch(console.error);
+        defaultCallback().catch((error) => specialEarningLogger.error('Error in default callback', error));
       } else {
         defaultCallback()
           .then(() => {
@@ -203,7 +206,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
           .then((rs) => {
             _callback(rs);
           })
-          .catch(console.error);
+          .catch((error) => specialEarningLogger.error('Error in special earning handler', error));
       }
     };
 

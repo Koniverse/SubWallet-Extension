@@ -4,6 +4,7 @@
 import { AssetLogoMap, ChainLogoMap } from '@subwallet/chain-list';
 import { _AssetType, _ChainAsset, _ChainInfo, _ChainStatus } from '@subwallet/chain-list/types';
 import { AssetSetting } from '@subwallet/extension-base/background/KoniTypes';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { LATEST_CHAIN_PATCH_FETCHING_INTERVAL, md5HashChainAsset, md5HashChainInfo } from '@subwallet/extension-base/services/chain-online-service/constants';
 import { ChainService, filterAssetInfoMap } from '@subwallet/extension-base/services/chain-service';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
@@ -12,6 +13,8 @@ import { EventService } from '@subwallet/extension-base/services/event-service';
 import SettingService from '@subwallet/extension-base/services/setting-service/SettingService';
 import { IChain } from '@subwallet/extension-base/services/storage-service/databases';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
+
+const chainOnlineServiceLogger = createLogger('ChainOnlineService');
 
 export class ChainOnlineService {
   private chainService: ChainService;
@@ -359,7 +362,7 @@ export class ChainOnlineService {
         }
       }
     } catch (e) {
-      console.error('Error fetching latest patch data');
+      chainOnlineServiceLogger.error('Error fetching latest patch data');
     }
   }
 
@@ -379,12 +382,12 @@ export class ChainOnlineService {
                   .then(() => this.chainService.setLockChainInfoMap(false))
                   .catch((e) => {
                     this.chainService.setLockChainInfoMap(false);
-                    console.error('Error update latest patch', e);
+                    chainOnlineServiceLogger.error('Error update latest patch', e);
                   })
                   .finally(resolve);
               })
               .catch((e) => {
-                console.error('Asset fail to ready', e);
+                chainOnlineServiceLogger.error('Asset fail to ready', e);
                 resolve();
               });
           } else {
@@ -392,7 +395,7 @@ export class ChainOnlineService {
           }
         });
       }).catch((e) => {
-        console.error('Error get latest patch or data map is locking', e);
+        chainOnlineServiceLogger.error('Error get latest patch or data map is locking', e);
       }).finally(() => {
         this.eventService.emit('asset.online.ready', true);
       });

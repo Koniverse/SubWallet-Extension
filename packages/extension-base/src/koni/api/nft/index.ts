@@ -19,8 +19,11 @@ import { _NFT_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-servi
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _isChainSupportEvmNft, _isChainSupportNativeNft, _isChainSupportWasmNft, _isSupportOrdinal } from '@subwallet/extension-base/services/chain-service/utils';
 import { getAddressesByChainType, targetIsWeb } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import AssetHubNftsPalletApi from './assethub_nft';
+
+const nftApiLogger = createLogger('NftApi');
 import { RariNftApi } from './rari';
 import { OdysseyNftApi } from './story_odyssey_nft';
 import { TernoaNftApi } from './ternoa_nft';
@@ -223,7 +226,7 @@ export class NftHandler {
         this.needSetupApi = false;
       }
     } catch (e) {
-      console.error(e);
+      nftApiLogger.error('Error in NftHandler', e);
     }
   }
 

@@ -9,8 +9,11 @@ import registry from '@subwallet/extension-base/koni/api/dotsama/typeRegistry';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { fetchJson, getAddressesByChainType, reformatAddress } from '@subwallet/extension-base/utils';
 import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { DeriveOwnContributions } from '@polkadot/api-derive/types';
+
+const crowdloanLogger = createLogger('Crowdloan');
 import { BN } from '@polkadot/util';
 
 const STATUS_MAP: Record<_FundStatus, CrowdloanParaState> = {
@@ -74,7 +77,7 @@ function getRPCCrowdloan (parentAPI: _SubstrateApi, fundInfo: _CrowdloanFund, he
       .then((unsub) => {
         unsub();
       })
-      .catch(console.error);
+      .catch((e) => crowdloanLogger.error('Error unsubscribing from crowdloan', e));
   };
 }
 
@@ -109,7 +112,7 @@ export const subscribeAcalaContributeInterval = (polkadotAddresses: string[], fu
       };
 
       callback(rs);
-    }).catch(console.error);
+    }).catch((e) => crowdloanLogger.error('Error fetching Acala contribution info', e));
   };
 
   getContributeInfo();
