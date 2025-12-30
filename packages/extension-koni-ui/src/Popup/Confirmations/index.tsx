@@ -389,6 +389,12 @@ const Component = function ({ className }: Props) {
         case ExtrinsicType.EVM_EXECUTE:
         case ExtrinsicType.UNKNOWN:
           return t('ui.Confirmations.transactionConfirm');
+        case ExtrinsicType.MULTISIG_APPROVE_TX:
+          return t('Multisig approve unstake');
+        case ExtrinsicType.MULTISIG_CANCEL_TX:
+          return t('Multisig cancel unstake');
+        case ExtrinsicType.MULTISIG_EXECUTE_TX:
+          return t('Multisig execute unstake');
       }
     } else {
       return t(titleMap[confirmation.type] || '');

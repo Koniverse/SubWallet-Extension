@@ -49,7 +49,10 @@ export const TxTypeNameMap: Record<ExtrinsicType, string> = {
   [ExtrinsicType.GOV_VOTE]: detectTranslate('ui.HISTORY.constant.history.vote'),
   [ExtrinsicType.GOV_UNVOTE]: detectTranslate('ui.HISTORY.constant.history.unvote'),
   [ExtrinsicType.GOV_UNLOCK_VOTE]: detectTranslate('ui.HISTORY.constant.history.unlockVotes'),
-  [ExtrinsicType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.history.unknown')
+  [ExtrinsicType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.history.unknown'),
+  [ExtrinsicType.MULTISIG_APPROVE_TX]: detectTranslate('Multisig approve unstake'),
+  [ExtrinsicType.MULTISIG_CANCEL_TX]: detectTranslate('Multisig cancel unstake'),
+  [ExtrinsicType.MULTISIG_EXECUTE_TX]: detectTranslate('Multisig execute unstake')
 };
 
 export const StakingTypeNameMap: Record<string, string> = {

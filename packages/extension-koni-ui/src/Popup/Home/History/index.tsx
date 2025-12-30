@@ -15,6 +15,7 @@ import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/exte
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, formatHistoryDate, isTypeGov, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Form, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
+import CN from 'classnames';
 import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, NewspaperClipping, Pencil, Rocket, Spinner } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -254,6 +255,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     const uniqueMap = new Map<string, PendingMultisigTx>();
 
     fullList.forEach((tx) => {
+      // Todo: Recheck conditional
       const key = tx.extrinsicHash || tx.callHash;
 
       if (!uniqueMap.has(key)) {
@@ -394,7 +396,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.GOV_VOTE]: t('ui.HISTORY.screen.History.vote'),
     [ExtrinsicType.GOV_UNVOTE]: t('ui.HISTORY.screen.History.unvote'),
     [ExtrinsicType.GOV_UNLOCK_VOTE]: t('ui.HISTORY.screen.History.unlockVotes'),
-    [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknown')
+    [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknown'),
+    [ExtrinsicType.MULTISIG_APPROVE_TX]: t('Multisig approve unstake'),
+    [ExtrinsicType.MULTISIG_CANCEL_TX]: t('Multisig cancel unstake'),
+    [ExtrinsicType.MULTISIG_EXECUTE_TX]: t('Multisig execute unstake')
   }), [t]);
 
   const typeTitleMap: Record<string, string> = useMemo((): Record<ExtrinsicType | 'default' | 'send' | 'received', string> => ({
@@ -443,7 +448,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.GOV_VOTE]: t('ui.HISTORY.screen.History.voteTransaction'),
     [ExtrinsicType.GOV_UNVOTE]: t('ui.HISTORY.screen.History.unvoteTransaction'),
     [ExtrinsicType.GOV_UNLOCK_VOTE]: t('ui.HISTORY.screen.History.unlockVotesTransaction'),
-    [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknownTransaction')
+    [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknownTransaction'),
+    [ExtrinsicType.MULTISIG_APPROVE_TX]: t('Multisig approve unstake'),
+    [ExtrinsicType.MULTISIG_CANCEL_TX]: t('Multisig cancel unstake'),
+    [ExtrinsicType.MULTISIG_EXECUTE_TX]: t('Multisig execute unstake')
   }), [t]);
 
   // Fill display data to history list
@@ -630,7 +638,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const historySelectorsNode = (
     <>
       <div className={'history-header-wrapper'}>
-        <div className={'history-line-1'}>
+        <div className={CN('history-line-1', { '-is-multisig-tab': viewValue === ViewValue.MULTISIG })}>
           <Form
             form={form}
             initialValues={defaultValues}
@@ -647,7 +655,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             </Form.Item>
           </Form>
         </div>
-        <div className={'history-line-2'}>
+        {viewValue === ViewValue.TRANSACTION && <div className={'history-line-2'}>
           <ChainSelector
             className={'__history-chain-selector'}
             disabled={isChainSelectorEmpty}
@@ -669,7 +677,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               />
             )
           }
-        </div>
+        </div>}
       </div>
     </>
   );
@@ -873,6 +881,12 @@ const History = styled(Component)<Props>(({ theme: { token } }: Props) => {
     '.history-line-1': {
       '.ant-form-item': {
         marginBottom: 28
+      },
+
+      '&.-is-multisig-tab': {
+        '.ant-form-item': {
+          marginBottom: 0
+        }
       }
     },
 

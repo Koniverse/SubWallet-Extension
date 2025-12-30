@@ -3,6 +3,7 @@
 
 import { MultisigTxType, PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { customFormatDate, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Logo, Number, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowUpRight, HardDrives, Question } from 'phosphor-react';
@@ -57,10 +58,10 @@ const Component = ({ className = '', item, onClick }: Props) => {
             </div>
             <div className={'__info'}>
               <div className={'__account-name'}>
-                {`${item.multisigAddress}`}
+                {`${toShort(item.multisigAddress)}`}
               </div>
               <div className={'__meta'}>
-                {`${txInfo.name} - ${item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : 'Processing'}`}
+                {`${txInfo.name} - ${item.timestamp ? customFormatDate(item.timestamp, '#hhhh#:#mm#') : 'Processing'}`}
               </div>
             </div>
             <div className={'__value-group'}>
@@ -92,7 +93,7 @@ const Component = ({ className = '', item, onClick }: Props) => {
               />
             </div>
           </div>
-
+          <div className={'__divider-line'}></div>
           {/* Status Section */}
           <div className={'__status-row'}>
             <span>Signatory approval</span>
@@ -109,9 +110,9 @@ const Component = ({ className = '', item, onClick }: Props) => {
 
 export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } }: Props) => ({
   backgroundColor: token.colorBgSecondary,
-  borderRadius: token.borderRadiusLG,
-  padding: '12px 16px',
-  marginBottom: token.sizeXS,
+  borderRadius: 12,
+  padding: '12px 12px 16px 12px',
+  marginBottom: token.marginSM,
   cursor: 'pointer',
   transition: 'background-color 0.2s ease',
 
@@ -121,14 +122,13 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
 
   '.__container': {
     display: 'flex',
-    flexDirection: 'column',
-    gap: 12
+    flexDirection: 'column'
   },
 
   '.__header': {
     display: 'flex',
     alignItems: 'center',
-    gap: 12,
+    marginBottom: token.marginXS,
 
     '.__icon-wrapper': {
       position: 'relative',
@@ -139,6 +139,7 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
       justifyContent: 'center',
       backgroundColor: 'rgba(74, 201, 155, 0.1)',
       borderRadius: '50%',
+      marginRight: 14,
 
       '.__main-icon': {
         color: token.colorSuccess
@@ -154,6 +155,7 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
     '.__info': {
       flex: 1,
       overflow: 'hidden',
+      marginRight: 6,
       '.__account-name': {
         color: token.colorTextLight1,
         fontSize: token.fontSizeHeading5,
@@ -163,7 +165,8 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
       },
       '.__meta': {
         color: token.colorTextLight4,
-        fontSize: token.fontSizeSM
+        fontSize: token.fontSizeSM,
+        lineHeight: token.lineHeightSM
       }
     },
 
@@ -175,18 +178,26 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
   },
 
   '.__progress-section': {
+    backgroundColor: token.colorTextDark1,
+    paddingTop: token.paddingXS,
+    paddingBottom: token.paddingSM,
+    paddingLeft: token.paddingXS,
+    paddingRight: token.paddingXS,
+    borderRadius: token.borderRadiusLG,
+    marginBottom: 12,
     '.__label-row': {
       display: 'flex',
       justifyContent: 'space-between',
       fontSize: token.fontSizeSM,
-      marginBottom: 6,
+      marginBottom: 8,
       color: token.colorTextLight4,
-      '.__count': { color: token.colorWarning }
+      lineHeight: token.lineHeightSM,
+      '.__count': { color: token.colorWarningText }
     },
     '.__bar-track': {
-      height: 6,
+      height: 8,
       backgroundColor: token.colorBgInput,
-      borderRadius: 10,
+      borderRadius: token.borderRadiusSM,
       overflow: 'hidden'
     },
     '.__bar-fill': {
@@ -196,16 +207,25 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
     }
   },
 
+  '.__divider-line': {
+    border: '2px solid',
+    borderColor: token.colorBgDivider,
+    marginBottom: 10
+  },
+
   '.__status-row': {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     fontSize: token.fontSizeSM,
     color: token.colorTextLight4,
+    lineHeight: token.lineHeightSM,
     '.__status-text': {
-      fontWeight: 600,
-      '&.-waiting': { color: token.colorWarning },
-      '&.-approved': { color: token.colorSuccess }
+      fontWeight: 700,
+      padding: '2px 8px',
+      borderRadius: token.borderRadiusLG,
+      '&.-waiting': { color: token.colorWarningText, backgroundColor: token['colorWarning-2'] },
+      '&.-approved': { color: token.colorSuccess, backgroundColor: token['cyan-2'] }
     }
   }
 }));
