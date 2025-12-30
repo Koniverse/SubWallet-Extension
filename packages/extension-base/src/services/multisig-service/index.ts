@@ -45,7 +45,7 @@ export interface RawPendingMultisigTx extends ExtendedPendingMultisigTx {
 interface ExtendedPendingMultisigTx {
   signerAddresses?: string[];
   extrinsicHash?: string;
-  callData?: string; // todo: handle case callData and decodedCallData undefined
+  callData?: string; // todo: handle case callData and decodedCallData undefined, maybe required user input calldata to execute?
   decodedCallData?: DecodeCallDataResponse;
   timestamp?: number;
   multisigTxType?: MultisigTxType
@@ -63,12 +63,27 @@ export interface RequestGetPendingTxs {
 export enum MultisigTxType {
   TRANSFER = 'Transfer',
   STAKING = 'Staking',
+  LENDING = 'Lending',
+  SET_TOKEM_PAY_FEE = 'SetTokenPayFee',
+  GOV = 'Governance',
+  SWAP = 'Swap',
   UNKNOWN = 'Unknown'
 }
 
 export const MULTISIG_TX_TYPE_MAP: Record<string, string[]> = {
-  transfer: ['balances_transferAll', 'balances_transferKeepAlive', 'balances_transfer', 'foreignAssets_transfer', 'foreignAssets_transferKeepAlive', 'currencies_transfer', 'nft_transfer', 'uniques_transfer'],
-  staking: ['homa_mint', 'vtokenMinting_mint', 'liquidStaking_', 'parachainStaking.joinDelegators', 'parachainStaking.delegatorStakeMore'] // todo: add more later
+  transfer: ['balances.transferAll', 'balances.transferKeepAlive', 'balances.transfer', 'foreignAssets.transfer', 'foreignAssets.transferKeepAlive', 'currencies.transfer', 'tokens.transferAll', 'tokens.transfer', 'assets.transfer', 'assetManager.transfer', 'subtensorModule.transferStake'],
+  transfer_nft: ['nft.transfer', 'nfts.transfer', 'unique.transfer', 'uniques.transfer'],
+  staking: ['homa.mint', 'vtokenMinting.mint', 'liquidStaking.stake', 'parachainStaking.joinDelegators', 'parachainStaking.delegatorStakeMore', 'dappsStaking.bondAndStake', 'parachainStaking.nominate', 'parachainStaking.bondExtra', 'collatorStaking.lock', 'collatorStaking.stake', 'parachainStaking.delegate', 'parachainStaking.delegateWithAutoCompound', 'parachainStaking.delegatorBondMore', 'staking.bond', 'pooledStaking.requestDelegate', 'subtensorModule.addStakeLimit', 'nominationPools.bondExtra', 'nominationPools.join'],
+  redeem: ['aggregatedDex.swapWithExactSupply', 'stablePool.swap', 'ammRoute.swapExactTokensForTokens'],
+  unstake: ['homa.requestRedeem', 'vtokenMinting.redeem', 'liquidStaking.unstake', 'parachainStaking.delegatorStakeLess', 'parachainStaking.leaveDelegators', 'dappsStaking.unbondAndUnstake', 'parachainStaking.scheduleNominatorUnbond', 'parachainStaking.scheduleRevokeNomination', 'collatorStaking.unstakeFrom && collatorStaking.unlock', 'parachainStaking.scheduleDelegatorBondLess', 'parachainStaking.scheduleRevokeDelegation', 'staking.unbond', 'pooledStaking.requestUndelegate', 'subtensorModule.removeStakeLimit', 'nominationPools.unbond'],
+  withdraw: ['homa.claimRedemption', 'parachainStaking.unlockUnstaked', 'dappsStaking.withdrawUnbonded', 'parachainStaking.executeNominationRequest', 'collatorStaking.release', 'parachainStaking.executeDelegationRequest', 'staking.withdrawUnbonded', 'nominationPools.withdrawUnbonded'],
+  cancelUnstake: ['parachainStaking.cancelLeaveCandidates', 'parachainStaking.cancelNominationRequest', 'parachainStaking.cancelDelegationRequest', 'staking.rebond'],
+  claim: ['parachainStaking.incrementDelegatorRewards', 'parachainStaking.claimRewards', 'dappsStaking.claimStaker', 'collatorStaking.claimRewards', 'pooledStaking.claimManualRewards', 'nominationPools.claimPayout'],
+  nominate: ['staking.nominate', 'subtensorModule.moveStake'],
+  lending: ['loans.mint', 'loans.redeem', 'loans.redeemAll'], // consider remove
+  swap: ['assetConversion.swapExactTokensForTokens'],
+  setTokenPayFee: ['multiTransactionPayment.setCurrency'],
+  gov: ['convictionVoting.vote', 'convictionVoting.removeVote', 'convictionVoting.unlock']
 };
 
 export class MultisigService implements StoppableServiceInterface {
@@ -125,7 +140,7 @@ export class MultisigService implements StoppableServiceInterface {
   }
 
   loadData () {
-    // TODO: Load pending multisig txs from db if needed
+    // todo: Load pending multisig txs from db if needed
   }
 
   async init (): Promise<void> {
@@ -151,33 +166,8 @@ export class MultisigService implements StoppableServiceInterface {
   }
 
   handleEvents (events: EventItem<EventType>[], eventTypes: EventType[]): void {
-    let needReload = false;
-    let lazyTime = 2000;
-
-    // Account changed or chain changed
-    if (eventTypes.includes('account.updateCurrent') || eventTypes.includes('account.add') || eventTypes.includes('chain.updateState')) {
-      needReload = true;
-
-      if (eventTypes.includes('account.updateCurrent')) {
-        lazyTime = 1000;
-      }
-    }
-
-    // Handle account removal
-    events.forEach((event) => {
-      if (event.type === 'account.remove') {
-        // todo: recheck with real data account.add & account.remove
-        // const address = event.data[0] as string;
-        // const currentMap = this.pendingMultisigTxSubject.getValue();
-        //
-        // delete currentMap[address];
-        //
-        // this.pendingMultisigTxSubject.next(currentMap);
-        needReload = true;
-      }
-    });
-
-    if (needReload) {
+    // todo: improve by reload only when related chains update
+    if (eventTypes.includes('account.add') || eventTypes.includes('account.remove') || eventTypes.includes('chain.updateState')) {
       addLazy(
         'reloadPendingMultisigTxsByEvents',
         () => {
@@ -185,7 +175,7 @@ export class MultisigService implements StoppableServiceInterface {
             this.runSubscribePendingMultisigTxs().catch(console.error);
           }
         },
-        lazyTime,
+        2000,
         undefined,
         true);
     }
@@ -322,7 +312,7 @@ export class MultisigService implements StoppableServiceInterface {
             chain,
             multisigAddress,
             callHash,
-            callData, // todo: recheck case undefined
+            callData,
             decodedCallData,
             blockHeight,
             extrinsicIndex,

@@ -119,8 +119,52 @@ export function getMultisigTxType (decodedCallData: DecodeCallDataResponse | und
     return MultisigTxType.TRANSFER;
   }
 
+  if (MULTISIG_TX_TYPE_MAP.transfer_nft.includes(sectionMethod)) {
+    return MultisigTxType.TRANSFER;
+  }
+
   if (MULTISIG_TX_TYPE_MAP.staking.includes(sectionMethod)) {
     return MultisigTxType.STAKING;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.redeem.includes(sectionMethod)) {
+    return MultisigTxType.STAKING;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.unstake.includes(sectionMethod)) {
+    return MultisigTxType.STAKING;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.withdraw.includes(sectionMethod)) {
+    return MultisigTxType.STAKING;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.cancelUnstake.includes(sectionMethod)) {
+    return MultisigTxType.STAKING;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.claim.includes(sectionMethod)) {
+    return MultisigTxType.STAKING;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.nominate.includes(sectionMethod)) {
+    return MultisigTxType.STAKING;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.lending.includes(sectionMethod)) {
+    return MultisigTxType.LENDING;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.gov.includes(sectionMethod)) {
+    return MultisigTxType.GOV;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.swap.includes(sectionMethod)) {
+    return MultisigTxType.SWAP;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.setTokenPayFee.includes(sectionMethod)) {
+    return MultisigTxType.SET_TOKEM_PAY_FEE;
   }
 
   return MultisigTxType.UNKNOWN;
