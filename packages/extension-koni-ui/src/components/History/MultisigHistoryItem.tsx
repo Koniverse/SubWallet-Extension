@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MultisigTxType, PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
+import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Logo, Number, Web3Block } from '@subwallet/react-ui';
@@ -16,6 +18,8 @@ type Props = ThemeProps & {
 };
 
 const Component = ({ className = '', item, onClick }: Props) => {
+  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
+
   const txInfo = useMemo(() => {
     const method = item.decodedCallData?.method || '';
 
@@ -35,7 +39,9 @@ const Component = ({ className = '', item, onClick }: Props) => {
   const percent = totalSigners > 0 ? (currentApprovals / totalSigners) * 100 : 0;
   const isApproved = currentApprovals === totalSigners;
 
-  const amountValue = item.decodedCallData?.args?.value?.toString().replace(/,/g, '') || '0';
+  const chainInfo = useMemo(() => {
+    return chainInfoMap[item.chain];
+  }, [chainInfoMap, item.chain]);
 
   return (
     <Web3Block
@@ -65,16 +71,16 @@ const Component = ({ className = '', item, onClick }: Props) => {
               </div>
             </div>
             <div className={'__value-group'}>
+              {/* <Number */}
+              {/*  className={'__value'} */}
+              {/*  decimal={10} */}
+              {/*  suffix={item.chain.includes('paseo') ? 'PAS' : 'DOT'} */}
+              {/*  value={amountValue} */}
+              {/* /> */}
               <Number
-                className={'__value'}
-                decimal={10}
-                suffix={item.chain.includes('paseo') ? 'PAS' : 'DOT'}
-                value={amountValue}
-              />
-              <Number
-                className={'__fee'}
-                decimal={10}
-                suffix={'UNIT'}
+                className={'__deposit-amount'}
+                decimal={chainInfo?.substrateInfo?.decimals || 0}
+                suffix={chainInfo?.substrateInfo?.symbol || ''}
                 value={item.depositAmount}
               />
             </div>
@@ -173,7 +179,7 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
     '.__value-group': {
       textAlign: 'right',
       '.__value': { color: token.colorTextLight1, fontSize: token.fontSizeHeading5 },
-      '.__fee': { color: token.colorTextLight4, fontSize: token.fontSizeSM, opacity: 0.45 }
+      '.__deposit-amount': { color: token.colorTextLight4, fontSize: token.fontSizeSM, opacity: 0.45 }
     }
   },
 
