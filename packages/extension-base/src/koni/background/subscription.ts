@@ -112,7 +112,7 @@ export class KoniSubscription {
 
     this.state.resetCrowdloanMap(address).then(() => {
       this.updateSubscription('crowdloan', this.initCrowdloanSubscription(addresses, substrateApiMap, onlyRunOnFirstTime));
-    }).catch(console.error);
+    }).catch((e) => this.logger.error('Error resetting crowdloan map', e));
   }
 
   initCrowdloanSubscription (addresses: string[], substrateApiMap: Record<string, _SubstrateApi>, onlyRunOnFirstTime?: boolean) {

@@ -4,11 +4,14 @@
 import { TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 
 import { Vec } from '@polkadot/types';
 import { EventRecord } from '@polkadot/types/interfaces';
 import { isHex } from '@polkadot/util';
+
+const recoverHistoryStatusLogger = createLogger('RecoverHistoryStatus');
 
 export enum HistoryRecoverStatus {
   SUCCESS = 'SUCCESS',
@@ -45,7 +48,7 @@ const substrateRecover = async (history: TransactionHistoryItem, chainService: C
 
       if (!blockHash) {
         if (nonce === undefined || startBlock === undefined) {
-          console.log(`Fail to find extrinsic for ${address} on ${chain}: With nonce ${nonce || 'undefined'} from block ${startBlock || 'undefined'}`);
+          recoverHistoryStatusLogger.debug(`Fail to find extrinsic for ${address} on ${chain}: With nonce ${nonce || 'undefined'} from block ${startBlock || 'undefined'}`);
 
           return { status: HistoryRecoverStatus.LACK_INFO };
         }
@@ -103,7 +106,7 @@ const substrateRecover = async (history: TransactionHistoryItem, chainService: C
         }
 
         if (index === undefined) {
-          console.log(`Fail to find extrinsic ${extrinsicHash} on ${chain}`);
+          recoverHistoryStatusLogger.debug(`Fail to find extrinsic ${extrinsicHash} on ${chain}`);
 
           return { status: HistoryRecoverStatus.FAIL_DETECT };
         }
@@ -125,12 +128,12 @@ const substrateRecover = async (history: TransactionHistoryItem, chainService: C
 
       return { status: HistoryRecoverStatus.FAIL_DETECT };
     } else {
-      console.error(`Fail to update history ${chain}-${extrinsicHash}: Api not active`);
+      recoverHistoryStatusLogger.error(`Fail to update history ${chain}-${extrinsicHash}: Api not active`);
 
       return { status: HistoryRecoverStatus.API_INACTIVE };
     }
   } catch (e) {
-    console.error(`Fail to update history ${chain}-${extrinsicHash}:`, (e as Error).message);
+    recoverHistoryStatusLogger.error(`Fail to update history ${chain}-${extrinsicHash}:`, (e as Error).message);
 
     return { status: HistoryRecoverStatus.UNKNOWN };
   }
@@ -174,7 +177,7 @@ const evmRecover = async (history: TransactionHistoryItem, chainService: ChainSe
         return { ...result, status: transactionReceipt.status ? HistoryRecoverStatus.SUCCESS : HistoryRecoverStatus.FAILED };
       } else {
         if (nonce === undefined || startBlock === undefined) {
-          console.log(`Fail to find extrinsic for ${address} on ${chain}: With nonce ${nonce || 'undefined'} from block ${startBlock || 'undefined'}`);
+          recoverHistoryStatusLogger.debug(`Fail to find extrinsic for ${address} on ${chain}: With nonce ${nonce || 'undefined'} from block ${startBlock || 'undefined'}`);
 
           return { ...result, status: HistoryRecoverStatus.LACK_INFO };
         }
@@ -204,12 +207,12 @@ const evmRecover = async (history: TransactionHistoryItem, chainService: ChainSe
 
       return { status: HistoryRecoverStatus.FAIL_DETECT };
     } else {
-      console.error(`Fail to update history ${chain}-${extrinsicHash}: Api not active`);
+      recoverHistoryStatusLogger.error(`Fail to update history ${chain}-${extrinsicHash}: Api not active`);
 
       return { status: HistoryRecoverStatus.API_INACTIVE };
     }
   } catch (e) {
-    console.error(`Fail to update history ${chain}-${extrinsicHash}:`, (e as Error).message);
+    recoverHistoryStatusLogger.error(`Fail to update history ${chain}-${extrinsicHash}:`, (e as Error).message);
 
     return { status: HistoryRecoverStatus.UNKNOWN };
   }
@@ -265,12 +268,12 @@ const bitcoinRecover = async (history: TransactionHistoryItem, chainService: Cha
 
       return { status: HistoryRecoverStatus.FAIL_DETECT };
     } else {
-      console.error(`Fail to update history ${chain}-${extrinsicHash}: Api not active`);
+      recoverHistoryStatusLogger.error(`Fail to update history ${chain}-${extrinsicHash}: Api not active`);
 
       return { status: HistoryRecoverStatus.API_INACTIVE };
     }
   } catch (e) {
-    console.error(`Fail to update history ${chain}-${extrinsicHash}:`, (e as Error).message);
+    recoverHistoryStatusLogger.error(`Fail to update history ${chain}-${extrinsicHash}:`, (e as Error).message);
 
     return { status: HistoryRecoverStatus.UNKNOWN };
   }
@@ -295,7 +298,7 @@ export const historyRecover = async (history: TransactionHistoryItem, chainServi
   const checkFunction = recoverFunctions[chainType];
 
   if (!checkFunction) {
-    console.warn(`Chain type ${chainType} is not supported for recoverHistory`);
+    recoverHistoryStatusLogger.warn(`Chain type ${chainType} is not supported for recoverHistory`);
 
     return { status: HistoryRecoverStatus.UNKNOWN };
   }
@@ -303,7 +306,7 @@ export const historyRecover = async (history: TransactionHistoryItem, chainServi
   try {
     return await checkFunction(history, chainService);
   } catch (error) {
-    console.error(`Failed to recover history for chain type ${chainType}:`, error);
+    recoverHistoryStatusLogger.error(`Failed to recover history for chain type ${chainType}:`, error);
 
     return { status: HistoryRecoverStatus.FAILED };
   }

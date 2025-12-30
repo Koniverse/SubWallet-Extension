@@ -41,6 +41,10 @@ import { SignerPayloadJSON, SignerPayloadRaw } from '@polkadot/types/types';
 import { hexStripPrefix, isArray, isNumber, u8aToHex } from '@polkadot/util';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const tabsHandlerLogger = createLogger('TabsHandler');
+
 interface AccountSub {
   subscription: Subscription;
   url: string;
@@ -381,7 +385,7 @@ export default class KoniTabs {
 
             return cb(transformAccountsV2(accounts, false, authInfo, accountAuthTypes, true));
           })
-          .catch(console.error);
+          .catch((e) => tabsHandlerLogger.error('Error transforming accounts', e));
       }),
       url
     };
@@ -461,7 +465,7 @@ export default class KoniTabs {
         }
 
         resolve(accounts);
-      }).catch(console.error);
+      }).catch((e) => tabsHandlerLogger.error('Error getting current account', e));
     });
   }
 
@@ -495,7 +499,7 @@ export default class KoniTabs {
 
       if (web3?.currentProvider instanceof Web3.providers.WebsocketProvider) {
         if (!web3.currentProvider.connected) {
-          console.log(`${slug} is disconnected, trying to connect...`);
+          tabsHandlerLogger.debug(`${slug} is disconnected, trying to connect...`);
           this.#koniState.refreshWeb3Api(slug);
           let checkingNum = 0;
 
@@ -503,15 +507,15 @@ export default class KoniTabs {
             checkingNum += 1;
 
             if ((web3.currentProvider as WebsocketProvider).connected) {
-              console.log(`${slug} is connected.`);
+              tabsHandlerLogger.debug(`${slug} is connected.`);
               resolve(true);
             } else {
-              console.log(`Connecting to network [${slug}]`);
+              tabsHandlerLogger.debug(`Connecting to network [${slug}]`);
 
               if (checkingNum < 10) {
                 setTimeout(() => poll(resolve), 900);
               } else {
-                console.log(`Max retry, stop checking [${slug}]`);
+                tabsHandlerLogger.debug(`Max retry, stop checking [${slug}]`);
                 resolve(false);
               }
             }
@@ -902,7 +906,7 @@ export default class KoniTabs {
 
     const accountListSubscription = this.#koniState.keyringService.context.observable.currentAccount
       .subscribe(() => {
-        onCurrentAccountChanged().catch(console.error);
+        onCurrentAccountChanged().catch((e) => tabsHandlerLogger.error('Error on current account changed', e));
       });
 
     // Detect network chain
@@ -931,7 +935,7 @@ export default class KoniTabs {
 
     const authUrlSubscription = this.#koniState.subscribeEvmChainChange()
       .subscribe((rs) => {
-        _onAuthChanged().catch(console.error);
+        _onAuthChanged().catch((e) => tabsHandlerLogger.error('Error on auth changed', e));
       });
 
     // Detect network connection
@@ -947,8 +951,8 @@ export default class KoniTabs {
 
             isConnected = connecting;
           })
-          .catch(console.error);
-      }).catch(console.error);
+          .catch((e) => tabsHandlerLogger.error('Error checking network connection', e));
+      }).catch((e) => tabsHandlerLogger.error('Error in network check', e));
     };
 
     const networkCheckInterval = setInterval(networkCheck, CRON_GET_API_MAP_STATUS);
@@ -1134,7 +1138,7 @@ export default class KoniTabs {
       if (e.code) {
         throw e;
       } else {
-        console.error(e);
+        tabsHandlerLogger.error('Error in performWeb3Method', e);
         throw new EvmProviderError(EvmProviderErrorType.INTERNAL_ERROR, e?.toString());
       }
     }
@@ -1612,7 +1616,7 @@ export default class KoniTabs {
       if (e.code) {
         throw e;
       } else {
-        console.error(e);
+        tabsHandlerLogger.error('Error in performBitcoinMethod', e);
         throw new BitcoinProviderError(BitcoinProviderErrorType.INTERNAL_ERROR, e?.toString());
       }
     }

@@ -3,6 +3,7 @@
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { AccountProxyExtra, AccountProxyStoreData, AccountProxyType, KeyringPairs$JsonV2, ModifyPairStoreData, RequestAccountBatchExportV2, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestJsonGetAccountInfo, RequestJsonRestoreV2, ResponseAccountBatchExportV2, ResponseBatchJsonGetAccountInfo, ResponseJsonGetAccountInfo } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { combineAccountsWithKeyPair, convertAccountProxyType, createPromiseHandler, transformAccount } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
 import { createPair } from '@subwallet/keyring';
@@ -15,6 +16,8 @@ import { base64Decode, jsonDecrypt } from '@polkadot/util-crypto';
 import { EncryptedJson, Prefix } from '@polkadot/util-crypto/types';
 
 import { AccountBaseHandler } from './Base';
+
+const accountJsonHandlerLogger = createLogger('AccountJsonHandler');
 
 /**
  * @class AccountJsonHandler
@@ -48,7 +51,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
       return true;
     } catch (e) {
-      console.error(e);
+      accountJsonHandlerLogger.error('Error validating password', e);
 
       return false;
     }
@@ -85,7 +88,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
           accountProxy: proxy
         };
       } catch (e) {
-        console.error(e);
+        accountJsonHandlerLogger.error('Error parsing single JSON account info', e);
         throw new Error((e as Error).message);
       }
     } else {
@@ -154,7 +157,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
           try {
             rs.push(keyring.createFromJson(pair));
           } catch (e) {
-            console.error(e);
+            accountJsonHandlerLogger.error('Error creating pair from JSON', e);
           }
 
           return rs;
@@ -187,7 +190,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
           accountProxies: result
         };
       } catch (e) {
-        console.error(e);
+        accountJsonHandlerLogger.error('Error parsing multi JSON account info', e);
         throw new Error((e as Error).message);
       }
     } else {
@@ -213,7 +216,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
             rs.push(pair);
           } catch (e) {
-            console.error(e);
+            accountJsonHandlerLogger.error('Error creating pair from JSON', e);
           }
 
           return rs;
@@ -317,7 +320,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
               rs.push(address);
             }
           } catch (error) {
-            console.log(error);
+            accountJsonHandlerLogger.warn('Error getting pair during batch restore', error);
           }
 
           return rs;

@@ -8,7 +8,7 @@ export default class DeleteEarningData20251010 extends BaseMigrationJob {
     try {
       await this.state.dbService.deleteYieldPoolInfo(['KSM___native_staking___kusama', 'KSM___nomination_pool___kusama']);
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
   }
 }

@@ -1,13 +1,17 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const promiseUtilsLogger = createLogger('PromiseUtils');
+
 export function createPromiseHandler<T> () {
   let _resolve: (value: T) => void = () => {
-    console.warn('This promise handler is not implemented');
+    promiseUtilsLogger.warn('This promise handler is not implemented');
   };
 
   let _reject: (reason?: unknown) => void = () => {
-    console.warn('This promise handler is not implemented');
+    promiseUtilsLogger.warn('This promise handler is not implemented');
   };
 
   const promise = new Promise<T>((resolve, reject) => {

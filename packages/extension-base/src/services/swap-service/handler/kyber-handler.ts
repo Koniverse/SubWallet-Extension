@@ -12,8 +12,11 @@ import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BalanceService } from '../../balance-service';
 import { ChainService } from '../../chain-service';
+
+const kyberHandlerLogger = createLogger('KyberHandler');
 import { _getChainNativeTokenSlug, _getContractAddressOfToken, _isNativeToken } from '../../chain-service/utils';
 import FeeService from '../../fee-service/service';
 import { calculateGasFeeParams } from '../../fee-service/utils';
@@ -83,7 +86,7 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
   const { recipient, sender, slippageTolerance } = params;
   let routeSummary = params.routeSummary;
 
-  console.log('routeSummary1', routeSummary);
+  kyberHandlerLogger.debug('routeSummary1', routeSummary);
 
   if (!routeSummary || !routeSummary.tokenIn || !routeSummary.tokenOut || !routeSummary.amountIn) {
     return {
@@ -125,7 +128,7 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
 
     routeSummary = routeData.data.routeSummary;
   } catch (error) {
-    console.error('Error:', error);
+    kyberHandlerLogger.error('Error in Kyber handler', error);
 
     return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR, 'Unable to build Kyber swap transaction') };
   }
@@ -139,7 +142,7 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
     enableGasEstimation: true
   };
 
-  console.log('routeSummary2', routeSummary);
+  kyberHandlerLogger.debug('routeSummary2', routeSummary);
 
   try {
     const res = await fetchFromProxyService(ProxyServiceRoute.KYBER, `/${chain}/api/v1/route/build`, {
@@ -179,7 +182,7 @@ async function buildTxForKyberSwap (params: BuildTxForSwapParams, chain: string)
       }
     };
   } catch (error) {
-    console.error('Kyber error:', error);
+    kyberHandlerLogger.error('Kyber error', error);
 
     return { error: new TransactionError(BasicTxErrorType.INTERNAL_ERROR) };
   }
@@ -391,7 +394,7 @@ export class KyberHandler implements SwapBaseInterface {
     const rawTx = await buildTxForKyberSwap({ routeSummary: metadata.routeSummary, sender: params.address, recipient, slippageTolerance }, metadata.network);
 
     if (rawTx.error) {
-      console.error('Kyber error:', rawTx.error);
+      kyberHandlerLogger.error('Kyber error', rawTx.error);
       throw rawTx.error;
     }
 

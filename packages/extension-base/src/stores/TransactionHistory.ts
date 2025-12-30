@@ -4,12 +4,15 @@
 import { TxHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { EXTENSION_PREFIX } from '@subwallet/extension-base/defaults';
 import SubscribableStore from '@subwallet/extension-base/stores/SubscribableStore';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const transactionHistoryStoreLogger = createLogger('TransactionHistoryStore');
 
 const lastError = (type: string): void => {
   const error = chrome.runtime.lastError;
 
   if (error) {
-    console.error(`TransactionHistoryStore.${type}:: runtime.lastError:`, error);
+    transactionHistoryStoreLogger.error(`TransactionHistoryStore.${type}:: runtime.lastError`, error);
   }
 };
 

@@ -2,9 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import Web3 from 'web3';
 
 import { WsProvider } from '@polkadot/api';
+
+const healthCheckLogger = createLogger('HealthCheck');
 
 export async function checkSubstrateEndpoint (endpoint: string, timeout: number): Promise<boolean> {
   const wsProvider = new WsProvider(endpoint, false, undefined, timeout);
@@ -16,11 +19,11 @@ export async function checkSubstrateEndpoint (endpoint: string, timeout: number)
       wsProvider.on('connected', () => {
         wsProvider.send('system_health', []).then((systemHealth) => {
           resolve(true);
-        }).catch(console.log);
+        }).catch((error) => healthCheckLogger.debug('Error checking system health', error));
       });
     });
   } catch (error) {
-    console.log(`${endpoint}: fail to check health`);
+    healthCheckLogger.warn(`${endpoint}: fail to check health`);
 
     return false; // if there is an error, return false
   } finally {
@@ -36,7 +39,7 @@ export async function checkEvmEndpoint (endpoint: string, timeout: number): Prom
 
     return !!blockNumber;
   } catch (error) {
-    console.log(error);
+    healthCheckLogger.error('Error checking EVM endpoint', error);
 
     return false;
   }

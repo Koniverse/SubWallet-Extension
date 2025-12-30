@@ -28,6 +28,7 @@ import { getTuringCancelCompoundingExtrinsic, getTuringCompoundExtrinsic } from 
 import { getPoolingBondingExtrinsic, getPoolingUnbondingExtrinsic, validatePoolBondingCondition, validateRelayUnbondingCondition } from '@subwallet/extension-base/koni/api/staking/bonding/relayChain';
 import { YIELD_EXTRINSIC_TYPES } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
 import { DEFAULT_CARDANO_TTL_OFFSET } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/consts';
 import { isBounceableAddress } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
@@ -96,6 +97,8 @@ export function isJsonPayload (value: SignerPayloadJSON | SignerPayloadRaw): val
   return (value as SignerPayloadJSON).genesisHash !== undefined;
 }
 
+const logger = createLogger('KoniExtension');
+
 export default class KoniExtension {
   #lockTimeOut: NodeJS.Timer | undefined = undefined;
   readonly #koniState: KoniState;
@@ -141,7 +144,7 @@ export default class KoniExtension {
     };
 
     const updateLatestSession = (time: number) => {
-      SWStorage.instance.setItem(LATEST_SESSION, JSON.stringify({ remind: true, timeCalculate: time })).catch(console.error);
+      SWStorage.instance.setItem(LATEST_SESSION, JSON.stringify({ remind: true, timeCalculate: time })).catch((error) => logger.error('Failed to update latest session', error));
     };
 
     this.#koniState.settingService.getSettings(updateTimeAutoLock);
@@ -275,7 +278,7 @@ export default class KoniExtension {
     const url = `${chrome.runtime.getURL('index.html')}#${path}${subPath || ''}${paramString}`;
 
     if (!ALLOWED_PATH.includes(path)) {
-      console.error('Not allowed to open the url:', url);
+      logger.error('Not allowed to open the url:', url);
 
       return false;
     }
@@ -395,7 +398,7 @@ export default class KoniExtension {
     const subscription = combineLatest({ chainInfoMap: chainInfoMapObservable, tokenInfoMap: tokenInfoMapObservable, accountProxies: accountObservable, contacts: contactObservable }).subscribe(({ accountProxies, chainInfoMap, contacts, tokenInfoMap }) => {
       combineFunction(chainInfoMap, tokenInfoMap, accountProxies, contacts)
         .then((rs) => cb(rs))
-        .catch(console.error);
+        .catch((error) => logger.error('Error combining chain info map', error));
     });
 
     this.createUnsubscriptionHandle(id, () => {
@@ -1090,7 +1093,7 @@ export default class KoniExtension {
 
       return true;
     } catch (e) {
-      console.error(e);
+      logger.error('Error in validation', e);
 
       return false;
     }
@@ -1572,7 +1575,7 @@ export default class KoniExtension {
           inputData.value = transferAmount.value;
         }
 
-        console.log('PSPT transaction', transaction.toHex());
+        logger.info('PSPT transaction', transaction.toHex());
       } else {
         const substrateApi = this.#koniState.getSubstrateApi(chain);
 
@@ -1879,7 +1882,7 @@ export default class KoniExtension {
                 autoEnableNativeToken: false,
                 tokenSlug: destinationTokenInfo.slug,
                 assetSetting: { visible: true }
-              }).catch(console.error);
+              }).catch((error) => logger.error('Error enabling token', error));
             }
           } catch (e) {
           }
@@ -2185,7 +2188,7 @@ export default class KoniExtension {
     try {
       return await this.#koniState.upsertChainInfo(data);
     } catch (e) {
-      console.error(e);
+      logger.error('Error upserting chain info', e);
 
       return false;
     }
@@ -2224,7 +2227,7 @@ export default class KoniExtension {
     try {
       return this.#koniState.refreshSubstrateApi(networkKey);
     } catch (e) {
-      console.error(e);
+      logger.error('Error refreshing substrate API', e);
 
       return false;
     }
@@ -2295,7 +2298,7 @@ export default class KoniExtension {
         error: ''
       };
     } catch (e) {
-      console.error(e);
+      logger.error('Error in request handler', e);
 
       return {
         success: false,
@@ -2403,7 +2406,7 @@ export default class KoniExtension {
         next: ({ fee, freeBalance }) => {
           calculateMaxTransferable(id, _request, freeBalance, fee)
             .then(cb)
-            .catch(console.error);
+            .catch((error) => logger.error('Error calculating max transferable', error));
         }
       });
 
@@ -2544,7 +2547,7 @@ export default class KoniExtension {
         };
 
         error = (e as Error).message || e as string;
-        console.warn('Unable to estimate fee', e);
+        logger.warn('Unable to estimate fee', e);
       }
 
       return {
@@ -2563,7 +2566,7 @@ export default class KoniExtension {
         next: ({ fee, freeBalance }) => {
           convertData(freeBalance, fee, _feeOptions, feeCustom)
             .then(cb)
-            .catch(console.error);
+            .catch((error) => logger.error('Error converting data', error));
         }
       });
 
@@ -3907,17 +3910,17 @@ export default class KoniExtension {
       await this.saveCurrentAccountProxy({ address });
       const unsubSyncProgress = await this.#koniState.chainService?.mantaPay?.subscribeSyncProgress();
 
-      console.debug('Start initial sync for MantaPay');
+      logger.debug('Start initial sync for MantaPay');
 
       this.#koniState.initialSyncMantaPay(address)
         .then(() => {
-          console.debug('Finished initial sync for MantaPay');
+          logger.debug('Finished initial sync for MantaPay');
 
           this.#skipAutoLock = false;
           unsubSyncProgress && unsubSyncProgress();
         })
         .catch((e) => {
-          console.error('Error syncing MantaPay', e);
+          logger.error('Error syncing MantaPay', e);
 
           this.#skipAutoLock = false;
           unsubSyncProgress && unsubSyncProgress();
@@ -3953,11 +3956,11 @@ export default class KoniExtension {
     await this.saveCurrentAccountProxy({ address });
     const unsubSyncProgress = await this.#koniState.chainService?.mantaPay?.subscribeSyncProgress();
 
-    console.debug('Start initial sync for MantaPay');
+    logger.debug('Start initial sync for MantaPay');
 
     this.#koniState.initialSyncMantaPay(address)
       .then(() => {
-        console.debug('Finished initial sync for MantaPay');
+        logger.debug('Finished initial sync for MantaPay');
 
         this.#skipAutoLock = false;
         unsubSyncProgress && unsubSyncProgress();
@@ -3968,7 +3971,7 @@ export default class KoniExtension {
         });
       })
       .catch((e) => {
-        console.error('Error syncing MantaPay', e);
+        logger.error('Error syncing MantaPay', e);
 
         this.#skipAutoLock = false;
         unsubSyncProgress && unsubSyncProgress();
@@ -3993,7 +3996,7 @@ export default class KoniExtension {
 
       return !isActive && isBounceable;
     } catch (error) {
-      console.error(`Failed to validate address ${address} on chain ${chain}:`, error);
+      logger.error(`Failed to validate address ${address} on chain ${chain}:`, error);
 
       return false;
     }
@@ -4779,7 +4782,7 @@ export default class KoniExtension {
         this.#koniState.transactionService.updateProcessStepStatus(step, { status: StepStatus.FAILED });
       }
 
-      console.log('Error handling process step', e);
+      logger.error('Error handling process step', e);
 
       throw e;
     }
@@ -5167,7 +5170,7 @@ export default class KoniExtension {
                       unsub = _unsub;
                       onRs(rs);
                     })
-                    .catch(console.error);
+                    .catch((error) => logger.error('Error in subscription', error));
                 }
               });
             }
@@ -5190,7 +5193,7 @@ export default class KoniExtension {
       return {
         isPassConfirmation: true,
         signAfterCreate: (id: string) => {
-          this.signingApprovePasswordV2({ id }).catch(console.log);
+          this.signingApprovePasswordV2({ id }).catch((error) => logger.error('Error signing after create', error));
         }
       };
     } else {
@@ -5269,7 +5272,7 @@ export default class KoniExtension {
     try {
       this.#koniState.inappNotificationService.migrateNotificationProxyId(proxyIds, newProxyId, newName);
     } catch (error) {
-      console.error('Error on migrating notification for unified account migration', error);
+      logger.error('Error on migrating notification for unified account migration', error);
     }
 
     return response;

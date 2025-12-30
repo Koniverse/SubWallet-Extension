@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { BaseNftApi, HandleNftParams } from '../nft';
+
+const rariNftLogger = createLogger('RariNft');
 
 const options = {
   method: 'GET',
@@ -63,7 +66,7 @@ export class RariNftApi extends BaseNftApi {
         )
           .then((response) => response.json())
           .catch((err) => {
-            console.error(err);
+            rariNftLogger.error('Error fetching Rari NFT', err);
 
             return null;
           }) as NftResponse;

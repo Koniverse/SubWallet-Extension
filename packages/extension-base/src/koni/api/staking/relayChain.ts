@@ -14,6 +14,10 @@ import { Codec } from '@polkadot/types/types';
 import { BN } from '@polkadot/util';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const relayChainStakingLogger = createLogger('RelayChainStaking');
+
 export function getRelayStakingOnChain (substrateApi: _SubstrateApi, useAddresses: string[], chainInfoMap: Record<string, _ChainInfo>, chain: string, stakingCallback: (networkKey: string, rs: StakingItem) => void, nominatorStateCallback: (rs: NominatorMetadata) => void) {
   const { symbol } = _getChainNativeTokenBasicInfo(chainInfoMap[chain]);
 
@@ -178,6 +182,6 @@ export async function getNominationPoolReward (addresses: string[], chainInfoMap
       }
     }));
   } catch (e) {
-    console.debug(e);
+    relayChainStakingLogger.debug('Error in getRelayStakingOnChain', e);
   }
 }

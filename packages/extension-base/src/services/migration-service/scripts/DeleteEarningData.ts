@@ -8,7 +8,7 @@ export default class DeleteEarningData extends BaseMigrationJob {
     try {
       await this.state.dbService.deleteYieldPoolInfo(['KILT___native_staking___kilt', 'PILT___native_staking___kilt_peregrine']);
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
   }
 }

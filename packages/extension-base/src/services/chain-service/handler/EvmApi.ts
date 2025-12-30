@@ -7,9 +7,12 @@ import { EVM_PASS_CONNECT_STATUS } from '@subwallet/extension-base/services/chai
 import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainConnectionStatus, _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils/promise';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BehaviorSubject } from 'rxjs';
 import Web3 from 'web3';
 import { HttpProvider, WebsocketProvider } from 'web3-core';
+
+const evmApiLogger = createLogger('EvmApi');
 
 export class EvmApi implements _EvmApi {
   chainSlug: string;
@@ -132,7 +135,7 @@ export class EvmApi implements _EvmApi {
         this.isApiReady = false;
         this.isReadyHandler.reject(error);
         this.updateConnectionStatus(_ChainConnectionStatus.DISCONNECTED);
-        console.warn(`Can not connect to ${this.chainSlug} (EVM) at ${this.apiUrl}`);
+        evmApiLogger.warn(`Can not connect to ${this.chainSlug} (EVM) at ${this.apiUrl}`);
       });
 
     // Interval to check connecting status
@@ -162,7 +165,7 @@ export class EvmApi implements _EvmApi {
     this.isReadyHandler.resolve(this);
 
     if (!this.isApiConnected) {
-      console.log(`Connected to ${this.chainSlug} at ${this.apiUrl}`);
+      evmApiLogger.info(`Connected to ${this.chainSlug} at ${this.apiUrl}`);
       this.isApiReady = true;
     }
 
@@ -173,7 +176,7 @@ export class EvmApi implements _EvmApi {
     this.updateConnectionStatus(_ChainConnectionStatus.DISCONNECTED);
 
     if (this.isApiConnected) {
-      console.warn(`Disconnected from ${this.chainSlug} of ${this.apiUrl} (EVM)`);
+      evmApiLogger.warn(`Disconnected from ${this.chainSlug} of ${this.apiUrl} (EVM)`);
       this.isApiReady = false;
       this.isReadyHandler = createPromiseHandler<_EvmApi>();
     }

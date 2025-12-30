@@ -2,9 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Stateless service handle runtime event on background
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { EventItem, EventRegistry, EventType } from '@subwallet/extension-base/services/event-service/types';
 import { TARGET_ENV } from '@subwallet/extension-base/utils';
 import EventEmitter from 'eventemitter3';
+
+const eventServiceLogger = createLogger('EventService');
 
 const DEFAULT_LAZY_TIME = 300;
 const LONG_LAZY_TIME = 900;
@@ -90,7 +93,7 @@ export class EventService extends EventEmitter<EventRegistry> {
     try {
       this.lazyEmitter.emit('lazy', this.pendingEvents, this.pendingEvents.map((e) => e.type));
     } catch (e) {
-      console.error('Get error in some listener of lazy event', e);
+      eventServiceLogger.error('Get error in some listener of lazy event', e);
     }
 
     this.pendingEvents = [];
@@ -110,7 +113,7 @@ export class EventService extends EventEmitter<EventRegistry> {
   }
 
   public override emit<T extends EventType> (eventType: T, ...args: EventEmitter.EventArgs<EventRegistry, T>): boolean {
-    console.debug('Emit event: ', eventType, ...args);
+    eventServiceLogger.debug('Emit event', eventType, ...args);
     this.pendingEvents.push({ type: eventType, data: args as EventRegistry[T] });
     this.setLazyTimeout(eventType);
 

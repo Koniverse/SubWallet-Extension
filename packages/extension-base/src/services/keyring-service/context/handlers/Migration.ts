@@ -3,10 +3,13 @@
 
 import { RequestMigrateSoloAccount, RequestMigrateUnifiedAndFetchEligibleSoloAccounts, RequestPingSession, ResponseMigrateSoloAccount, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts, SoloAccountToBeMigrated } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountBaseHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Base';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { AccountChainType, AccountProxy, SUPPORTED_ACCOUNT_CHAIN_TYPES } from '@subwallet/extension-base/types';
 import { createAccountProxyId, getDefaultKeypairTypeFromAccountChainType, getSuri } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
 import { keyring } from '@subwallet/ui-keyring';
+
+const accountMigrationHandlerLogger = createLogger('AccountMigrationHandler');
 
 import { keyExtractSuri } from '@polkadot/util-crypto';
 
@@ -132,7 +135,7 @@ export class AccountMigrationHandler extends AccountBaseHandler {
         unifiedAccountIds.push(unifiedAccount.id);
       }
     } catch (error) {
-      console.error('Migration unified account failed with error:', error);
+      accountMigrationHandlerLogger.error('Migration unified account failed with error', error);
     } finally {
       keyring.lockAll(false);
       this.parentService.updateKeyringState();
@@ -256,7 +259,7 @@ export class AccountMigrationHandler extends AccountBaseHandler {
         this.state.saveCurrentAccountProxyId(upcomingProxyId);
       }
     } catch (error) {
-      console.error('Migration solo account failed with error', error);
+      accountMigrationHandlerLogger.error('Migration solo account failed with error', error);
     } finally {
       keyring.lockAll(false);
       this.parentService.updateKeyringState();

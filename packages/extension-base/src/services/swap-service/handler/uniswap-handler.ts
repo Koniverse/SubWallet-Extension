@@ -16,8 +16,11 @@ import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BalanceService } from '../../balance-service';
 import { ChainService } from '../../chain-service';
+
+const uniswapHandlerLogger = createLogger('UniswapHandler');
 import { _getAssetOriginChain, _getChainNativeTokenSlug, _getContractAddressOfToken, _getEvmChainId, _isNativeToken } from '../../chain-service/utils';
 import FeeService from '../../fee-service/service';
 import { calculateGasFeeParams } from '../../fee-service/utils';
@@ -595,8 +598,8 @@ export class UniswapHandler implements SwapBaseInterface {
         return undefined;
       }
 
-      console.log('[i] estimatedBridgeFee', estimatedBridgeFee);
-      console.log('[i] estimatedDestinationFee', estimatedDestinationFee);
+      uniswapHandlerLogger.debug('estimatedBridgeFee', estimatedBridgeFee);
+      uniswapHandlerLogger.debug('estimatedDestinationFee', estimatedDestinationFee);
 
       const fee: CommonStepFeeInfo = {
         feeComponent: [{
@@ -624,7 +627,7 @@ export class UniswapHandler implements SwapBaseInterface {
 
       return [step, fee];
     } catch (e) {
-      console.error('Error creating bridge step', e);
+      uniswapHandlerLogger.error('Error creating bridge step', e);
 
       throw new Error((e as Error).message);
     }
@@ -839,7 +842,7 @@ export class UniswapHandler implements SwapBaseInterface {
 
           return res.ok;
         } catch (e) {
-          console.log(e);
+          uniswapHandlerLogger.error('Error in Uniswap handler', e);
 
           return false;
         }
@@ -866,7 +869,7 @@ export class UniswapHandler implements SwapBaseInterface {
           }
         }
 
-        console.error('UniswapX order timeout', lastError); // throw only last error, in case no successful result from fn()
+        uniswapHandlerLogger.error('UniswapX order timeout', lastError); // throw only last error, in case no successful result from fn()
 
         return undefined;
       };

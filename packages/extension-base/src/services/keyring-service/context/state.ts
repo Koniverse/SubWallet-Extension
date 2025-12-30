@@ -6,6 +6,7 @@ import { ALL_ACCOUNT_KEY, UPGRADE_DUPLICATE_ACCOUNT_NAME } from '@subwallet/exte
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { AccountProxyStoreSubject, CurrentAccountStoreSubject, ModifyPairStoreSubject } from '@subwallet/extension-base/services/keyring-service/context/stores';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { AccountRefStore } from '@subwallet/extension-base/stores';
 import { AccountMetadataData, AccountProxy, AccountProxyData, AccountProxyMap, AccountProxyStoreData, AccountProxyType, CurrentAccountInfo, ModifyPairStoreData } from '@subwallet/extension-base/types';
@@ -15,6 +16,8 @@ import { EthereumKeypairTypes } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 import { BehaviorSubject, combineLatest, filter, first } from 'rxjs';
+
+const accountStateLogger = createLogger('AccountState');
 
 interface ExistsAccount {
   address: string;
@@ -55,9 +58,9 @@ export class AccountState {
         this._modifyPair.init();
         // Load account proxies
         this._accountProxy.init();
-        this.subscribeAccounts().catch(console.error);
+        this.subscribeAccounts().catch((error) => accountStateLogger.error('Error subscribing accounts', error));
       })
-      .catch(console.error);
+      .catch((error) => accountStateLogger.error('Error initializing account state', error));
   }
 
   private async subscribeAccounts () {
@@ -120,7 +123,7 @@ export class AccountState {
         const accountNameDuplicates = this.getDuplicateAccountNames(transformedAccounts);
 
         if (accountNameDuplicates.length > 0) {
-          SWStorage.instance.setItem(UPGRADE_DUPLICATE_ACCOUNT_NAME, 'true').catch(console.error);
+          SWStorage.instance.setItem(UPGRADE_DUPLICATE_ACCOUNT_NAME, 'true').catch((error) => accountStateLogger.error('Error setting upgrade duplicate account name', error));
 
           for (const accountProxy of transformedAccounts) {
             if (accountNameDuplicates.includes(accountProxy.name)) {
@@ -706,11 +709,11 @@ export class AccountState {
   }
 
   public enableChain (slug: string) {
-    this.koniState.enableChain(slug, true).catch(console.error);
+    this.koniState.enableChain(slug, true).catch((error) => accountStateLogger.error('Error enabling chain', error));
   }
 
   public enableChainWithPriorityAssets (slug: string) {
-    this.koniState.enableChainWithPriorityAssets(slug, true).catch(console.error);
+    this.koniState.enableChainWithPriorityAssets(slug, true).catch((error) => accountStateLogger.error('Error enabling chain with priority assets', error));
   }
 
   /* Others */

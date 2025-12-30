@@ -5,8 +5,11 @@ import { _AssetType } from '@subwallet/chain-list/types';
 import { AddressBalanceResult, APIItemState, BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { BITCOIN_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/constants';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BalanceItem, SusbcribeBitcoinPalletBalance } from '@subwallet/extension-base/types';
 import { filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
+
+const balanceSubscribeBitcoinLogger = createLogger('BalanceSubscribeBitcoin');
 
 function getDefaultBalanceResult (): AddressBalanceResult {
   return {
@@ -41,7 +44,7 @@ async function getBitcoinBalance (bitcoinApi: _BitcoinApi, addresses: string[]) 
         bitcoinBalanceMetadata: bitcoinBalanceMetadata
       };
     } catch (error) {
-      console.log('Error while fetching Bitcoin balances', error);
+      balanceSubscribeBitcoinLogger.error('Error while fetching Bitcoin balances', error);
 
       return getDefaultBalanceResult();
     }
@@ -72,7 +75,7 @@ export function subscribeBitcoinBalance (params: SusbcribeBitcoinPalletBalance):
         });
       })
       .catch((e) => {
-        console.error('Error on get Bitcoin balance with token bitcoin', e);
+        balanceSubscribeBitcoinLogger.error('Error on get Bitcoin balance with token bitcoin', e);
 
         return addresses.map((address): BalanceItem => {
           return {
@@ -87,7 +90,7 @@ export function subscribeBitcoinBalance (params: SusbcribeBitcoinPalletBalance):
       .then((items) => {
         callback(items);
       })
-      .catch(console.error);
+      .catch((error) => balanceSubscribeBitcoinLogger.error('Error in Bitcoin balance subscription', error));
   };
 
   const interval = setInterval(getBalance, BITCOIN_REFRESH_BALANCE_INTERVAL);

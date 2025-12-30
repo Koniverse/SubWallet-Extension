@@ -3,10 +3,13 @@
 
 import { CurrencyJson, CurrencyType, ExchangeRateJSON, HistoryTokenPriceJSON, PriceChartTimeframe, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
 import { isProductionMode } from '@subwallet/extension-base/constants';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 
 import { isArray } from '@polkadot/util';
+
+const priceServiceLogger = createLogger('PriceService');
 
 interface GeckoItem {
   id: string,
@@ -95,7 +98,7 @@ const fetchDerivativeTokenSlugs = async () => {
 
     return new Set(apiSlugs.length > 0 ? apiSlugs : DERIVATIVE_TOKEN_SLUG_LIST);
   } catch (error) {
-    console.error('Error fetching derivative token slugs from API:', error);
+    priceServiceLogger.error('Error fetching derivative token slugs from API:', error);
 
     return new Set(DERIVATIVE_TOKEN_SLUG_LIST);
   }
@@ -123,11 +126,11 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
             }
           });
         } else {
-          console.warn('Invalid data from derivative API:', generateDerivativePriceRaw);
+          priceServiceLogger.warn('Invalid data from derivative API:', generateDerivativePriceRaw);
           derivativeApiError = true;
         }
       } catch (error) {
-        console.error('Error fetching derivative API:', error);
+        priceServiceLogger.error('Error fetching derivative API:', error);
         derivativeApiError = true;
       }
     }
@@ -207,7 +210,7 @@ export const getHistoryPrice = async (priceId: string, type: PriceChartTimeframe
       return response;
     }
   } catch (e) {
-    console.error('Error fetching price history:', e);
+    priceServiceLogger.error('Error fetching price history:', e);
   }
 
   return { history: [] };

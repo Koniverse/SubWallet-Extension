@@ -18,6 +18,10 @@ import { ApiPromise } from '@polkadot/api';
 import { Codec } from '@polkadot/types/types';
 import { BN, BN_BILLION, BN_HUNDRED, BN_MILLION, BN_THOUSAND, BN_ZERO, bnToU8a, stringToU8a, u8aConcat } from '@polkadot/util';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const stakingBondingUtilsLogger = createLogger('StakingBondingUtils');
+
 export interface PalletDappsStakingDappInfo {
   address: string,
   name: string,
@@ -264,7 +268,7 @@ export async function calculateAnalogChainStakedReturn (): Promise<number | unde
 
     return apyInfo?.data?.apy as number | undefined;
   } catch (e) {
-    console.error('Fetch error:', e);
+    stakingBondingUtilsLogger.error('Fetch error in getApy', e);
 
     return undefined;
   }

@@ -10,6 +10,7 @@ import { _TRANSFER_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-
 import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible, _isChainTonCompatible, _isGigaToken, _isNativeToken, _isTokenGearSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon, _isTokenWasmSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { combineEthFee, getGRC20ContractPromise, getVFTContractPromise } from '@subwallet/extension-base/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import { internal } from '@ton/core';
@@ -18,6 +19,8 @@ import BigN from 'bignumber.js';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
+
+const tokenTransferLogger = createLogger('TokenTransfer');
 import { BN, u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
 
@@ -182,7 +185,7 @@ export const getTransferMockTxFee = async (address: string, chainInfo: _ChainInf
 
     return estimatedFee;
   } catch (e) {
-    console.error('error mocking tx fee', e);
+    tokenTransferLogger.error('error mocking tx fee', e);
 
     return new BigN(0);
   }

@@ -27,6 +27,9 @@ import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const swapBaseHandlerLogger = createLogger('SwapBaseHandler');
 
 import { createAcrossBridgeExtrinsic } from '../../balance-service/transfer/xcm';
 
@@ -246,7 +249,7 @@ export class SwapBaseHandler {
         if (needEditAmount) {
           bnSendingValue = BigN(selectedQuote.toAmount).multipliedBy(DEFAULT_EXCESS_AMOUNT_WEIGHT); // need to round
         } else { // todo: remove
-          console.log('The code cannot run into here, if it runs into here, pls ask dev to check');
+          swapBaseHandlerLogger.warn('The code cannot run into here, if it runs into here, pls ask dev to check');
           bnSendingValue = BigN(selectedQuote.toAmount);
         }
       }
@@ -271,7 +274,7 @@ export class SwapBaseHandler {
 
       return [step, fee];
     } catch (e) {
-      console.error('Error creating xcm step', e);
+      swapBaseHandlerLogger.error('Error creating xcm step', e);
 
       return undefined;
     }

@@ -9,6 +9,10 @@ import isBuffer from 'is-buffer';
 // @ts-ignore
 import { _jsonInterfaceMethodToString, AbiInput, AbiItem, keccak256 } from 'web3-utils';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const parseTransactionLogger = createLogger('ParseTransaction');
+
 export interface InputData {
   method: string | null;
   methodName: string | null;
@@ -275,7 +279,7 @@ export class InputDataDecoder {
           };
         }
       } catch (err) {
-        console.log(err);
+        parseTransactionLogger.error('Error parsing transaction', err);
       }
     }
 

@@ -10,7 +10,10 @@ import EventEmitter from 'eventemitter3';
 
 import { isUndefined, logger } from '@polkadot/util';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
 const l = logger('PostMessageProvider');
+const postMessageProviderLogger = createLogger('PostMessageProvider');
 
 type CallbackHandler = (error?: null | Error, value?: unknown) => void;
 
@@ -64,7 +67,7 @@ export default class PostMessageProvider implements InjectedProvider {
   // eslint-disable-next-line @typescript-eslint/require-await
   public async connect (): Promise<void> {
     // FIXME This should see if the extension's state's provider can disconnect
-    console.error('PostMessageProvider.disconnect() is not implemented.');
+    postMessageProviderLogger.error('PostMessageProvider.connect() is not implemented.');
   }
 
   /**
@@ -73,7 +76,7 @@ export default class PostMessageProvider implements InjectedProvider {
   // eslint-disable-next-line @typescript-eslint/require-await
   public async disconnect (): Promise<void> {
     // FIXME This should see if the extension's state's provider can disconnect
-    console.error('PostMessageProvider.disconnect() is not implemented.');
+    postMessageProviderLogger.error('PostMessageProvider.disconnect() is not implemented.');
   }
 
   /**

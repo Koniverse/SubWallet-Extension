@@ -6,8 +6,11 @@ import { APIItemState, StakingRewardItem, StakingType } from '@subwallet/extensi
 import { INDEXER_SUPPORTED_STAKING_CHAINS, SUBSQUID_ENDPOINTS } from '@subwallet/extension-base/koni/api/staking/config';
 import { _getChainSubstrateAddressPrefix, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { fetchJson, reformatAddress } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+
+const subsquidStakingLogger = createLogger('SubsquidStaking');
 
 interface RewardResponseItem {
   amount: string,
@@ -85,7 +88,7 @@ const getSubsquidStaking = async (accounts: string[], chain: string, chainInfoMa
             }
           }
         } catch (e) {
-          console.error(e);
+          subsquidStakingLogger.error('Error processing staking reward item', e);
         }
 
         if (stakingRewardItem.totalReward && parseFloat(stakingRewardItem.totalReward) > 0) {
@@ -94,7 +97,7 @@ const getSubsquidStaking = async (accounts: string[], chain: string, chainInfoMa
       }
     }));
   } catch (e) {
-    console.debug(e);
+    subsquidStakingLogger.debug('Error in getSubsquidStaking', e);
   }
 };
 
@@ -112,6 +115,6 @@ export const getAllSubsquidStaking = async (accounts: string[], chainInfoMap: Re
       await getSubsquidStaking(accounts, network, chainInfoMap, callback);
     }));
   } catch (e) {
-    console.debug(e);
+    subsquidStakingLogger.debug('Error in getAllSubsquidStaking', e);
   }
 };

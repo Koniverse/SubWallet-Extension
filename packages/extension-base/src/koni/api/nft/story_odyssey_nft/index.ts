@@ -2,9 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { ODYSSEY_ENDPOINT } from '../config';
 import { BaseNftApi, HandleNftParams } from '../nft';
+
+const storyOdysseyNftLogger = createLogger('StoryOdysseyNft');
 
 interface OdysseyTokenMetadata {
   name: string;
@@ -92,7 +95,7 @@ export class OdysseyNftApi extends BaseNftApi {
 
       return result.data.odyssey.erc721_token;
     } catch (err) {
-      console.error('Error:', err);
+      storyOdysseyNftLogger.error('Error fetching Odyssey NFT', err);
 
       return null;
     }
@@ -104,7 +107,7 @@ export class OdysseyNftApi extends BaseNftApi {
 
       return (await response.json()) as UrlMetadata;
     } catch (err) {
-      console.error('Error:', err);
+      storyOdysseyNftLogger.error('Error fetching URL metadata', err);
 
       return null;
     }

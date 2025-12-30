@@ -8,6 +8,10 @@ import { ApiPromise } from '@polkadot/api';
 import { TypeRegistry } from '@polkadot/types';
 import { getSpecExtensions, getSpecTypes } from '@polkadot/types-known';
 import { formatBalance, isNumber, u8aToHex } from '@polkadot/util';
+
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const metadataUtilsLogger = createLogger('MetadataUtils');
 import { HexString } from '@polkadot/util/types';
 import { defaults as addressDefaults } from '@polkadot/util-crypto/address/defaults';
 import { ExtraInfo, merkleizeMetadata } from '@polkadot-api/merkleize-metadata';
@@ -64,11 +68,11 @@ const updateMetadataV15 = async (chain: string, api: ApiPromise, chainService?: 
           hexV15
         };
 
-        chainService?.upsertMetadataV15(chain, { ...updateMetadata }).catch(console.error);
+        chainService?.upsertMetadataV15(chain, { ...updateMetadata }).catch((e) => metadataUtilsLogger.error('Error upserting metadata V15', e));
       }
     }
   } catch (err) {
-    console.error('Error:', err);
+    metadataUtilsLogger.error('Error in updateMetadataV15', err);
   }
 };
 
@@ -110,7 +114,7 @@ const updateMetadata = async (
     tokenInfo
   };
 
-  chainService?.upsertMetadata(chain, { ...updateMetadata }).catch(console.error);
+  chainService?.upsertMetadata(chain, { ...updateMetadata }).catch((e) => metadataUtilsLogger.error('Error upserting metadata', e));
 };
 
 export const cacheMetadata = (
@@ -120,7 +124,7 @@ export const cacheMetadata = (
 ): void => {
   // Update metadata to database with async methods
   substrateApi.api.isReady.then((api) => {
-    updateMetadata(chain, api, chainService).catch(console.error);
-    updateMetadataV15(chain, api, chainService).catch(console.error);
-  }).catch(console.error);
+    updateMetadata(chain, api, chainService).catch((e) => metadataUtilsLogger.error('Error updating metadata', e));
+    updateMetadataV15(chain, api, chainService).catch((e) => metadataUtilsLogger.error('Error updating metadata V15', e));
+  }).catch((e) => metadataUtilsLogger.error('Error in cacheMetadata', e));
 };

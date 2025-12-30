@@ -22,8 +22,11 @@ import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
 import { noop } from '@polkadot/util';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { _BALANCE_CHAIN_GROUP } from '../chain-service/constants';
+
+const balanceServiceLogger = createLogger('BalanceService');
 import { CreateXcmExtrinsicProps } from './transfer/xcm';
 import { _isAcrossChainBridge, getAcrossQuote } from './transfer/xcm/acrossBridge';
 import { BalanceMapImpl } from './BalanceMapImpl';
@@ -178,7 +181,7 @@ export class BalanceService implements StoppableServiceInterface {
     if (needReload) {
       addLazy('reloadBalanceByEvents', () => {
         if (!this.isReload && this.isStarted) {
-          this.runSubscribeBalances().catch(console.error);
+          this.runSubscribeBalances().catch((error) => balanceServiceLogger.error('Error running subscribe balances', error));
         }
       }, lazyTime, undefined, true);
     }
@@ -424,7 +427,7 @@ export class BalanceService implements StoppableServiceInterface {
    * Store balance map to db
    * */
   private updateBalanceStore (items: BalanceItem[]) {
-    this.state.dbService.updateBulkBalanceStore(items).catch(console.warn);
+    this.state.dbService.updateBulkBalanceStore(items).catch((error) => balanceServiceLogger.warn('Error updating bulk balance store', error));
   }
 
   /**
@@ -486,7 +489,7 @@ export class BalanceService implements StoppableServiceInterface {
     const chainInfoMap = this.state.chainService.getChainInfoMap();
 
     if (!chainInfoMap[chain]) {
-      console.warn(`Chain ${chain} is not supported`);
+      balanceServiceLogger.warn(`Chain ${chain} is not supported`);
 
       return;
     }
@@ -549,7 +552,7 @@ export class BalanceService implements StoppableServiceInterface {
       if (typeValid) {
         return this.state.subscanService.getMultiChainBalance(address)
           .catch((e) => {
-            console.error(e);
+            balanceServiceLogger.error('Error in balance service operation', e);
 
             return null;
           });
@@ -565,7 +568,7 @@ export class BalanceService implements StoppableServiceInterface {
       if (typeValid) {
         return subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalance(address)
           .catch((e) => {
-            console.error(e);
+            balanceServiceLogger.error('Error in balance service operation', e);
 
             return null;
           });
@@ -757,7 +760,7 @@ export class BalanceService implements StoppableServiceInterface {
     const evmPromiseList = addresses.map((address) => {
       return subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalance(address)
         .catch((e) => {
-          console.error(e);
+          balanceServiceLogger.error('Error detecting EVM balance token', e);
 
           return null;
         });
@@ -794,7 +797,7 @@ export class BalanceService implements StoppableServiceInterface {
     const promiseList = addresses.map((address) => {
       return this.state.subscanService.getMultiChainBalance(address)
         .catch((e) => {
-          console.error(e);
+          balanceServiceLogger.error('Error detecting substrate balance token', e);
 
           return null;
         });
@@ -906,7 +909,7 @@ export class BalanceService implements StoppableServiceInterface {
 
       this.state.chainService.setAssetSettings(updatedSettings);
     } catch (e) {
-      console.error(e);
+      balanceServiceLogger.error('Error updating asset settings', e);
     }
   }
 

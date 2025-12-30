@@ -5,6 +5,7 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { GAS_PRICE_RATIO, NETWORK_MULTI_GAS_FEE } from '@subwallet/extension-base/constants';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { estimateTokensForPool, getReserveForPool } from '@subwallet/extension-base/services/swap-service/handler/asset-hub/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { EvmEIP1559FeeOption, EvmFeeInfo, EvmFeeInfoCache, InfuraFeeInfo, InfuraThresholdInfo } from '@subwallet/extension-base/types';
 import { BN_WEI, BN_ZERO } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
@@ -12,6 +13,8 @@ import BigN from 'bignumber.js';
 import { ApiPromise } from '@polkadot/api';
 
 import { gasStation, POLYGON_GAS_INDEXER } from '../../balance-service/transfer/xcm/polygonBridge';
+
+const feeServiceUtilsLogger = createLogger('FeeServiceUtils');
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY || '';
 const INFURA_API_KEY_SECRET = process.env.INFURA_API_KEY_SECRET || '';
@@ -79,7 +82,7 @@ export const fetchInfuraFeeData = async (chainId: number, infuraAuth?: string): 
 
     return parseInfuraFee(feeInfo, thresholdInfo);
   } catch (e) {
-    console.warn(e);
+    feeServiceUtilsLogger.warn('Error in fee service utils', e);
 
     return null;
   }
@@ -102,7 +105,7 @@ export const fetchSubWalletFeeData = async (chainId: number, networkKey: string)
         resolve(info);
       })
       .catch((e) => {
-        console.warn(e);
+        feeServiceUtilsLogger.warn('Error in fee service utils', e);
         resolve(null);
       });
   });
@@ -117,7 +120,7 @@ export const fetchOnlineFeeData = async (chainId: number, networkKey: string, us
         resolve(info);
       })
       .catch((e) => {
-        console.warn(e);
+        feeServiceUtilsLogger.warn('Error in fee service utils', e);
         resolve(null);
       });
   });

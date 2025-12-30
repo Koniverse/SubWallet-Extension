@@ -3,6 +3,7 @@
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { AccountJson, AccountProxyData, CommonAccountErrorType, CreateDeriveAccountInfo, DeriveAccountInfo, DeriveErrorType, NextDerivePair, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, ResponseDeriveValidateV2, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, SWCommonAccountError, SWDeriveError } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { createAccountProxyId, derivePair, findSoloNextDerive, findUnifiedNextDerive, getSoloDerivationInfo, parseUnifiedSuriToDerivationPath, validateDerivationPath } from '@subwallet/extension-base/utils';
 import { BitcoinKeypairTypes, EthereumKeypairTypes, KeypairType, KeyringPair, KeyringPair$Meta, SubstrateKeypairTypes } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
@@ -11,6 +12,8 @@ import { t } from 'i18next';
 import { assert } from '@polkadot/util';
 
 import { AccountBaseHandler } from './Base';
+
+const accountDeriveHandlerLogger = createLogger('AccountDeriveHandler');
 
 const validDeriveKeypairTypes: KeypairType[] = [...SubstrateKeypairTypes, ...EthereumKeypairTypes, 'ton', 'cardano', ...BitcoinKeypairTypes];
 
@@ -81,7 +84,7 @@ export class AccountDeriveHandler extends AccountBaseHandler {
         this.state._addAddressToAuthList(address, isAllowed);
         result.push(childPair);
       } catch (e) {
-        console.log(e);
+        accountDeriveHandlerLogger.warn('Error creating derived account', e);
       }
     }
 
