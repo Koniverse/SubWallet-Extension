@@ -53,7 +53,7 @@ export interface PendingMultisigTx extends RawPendingMultisigTx {
 /**
  * Interface representing raw pending multisig extrinsic data from the chain
  */
-export interface RawPendingMultisigTx extends ExtendedPendingMultisigTx {
+export interface RawPendingMultisigTx {
   /** Chain identifier where the extrinsic exists */
   chain: string;
   /** Multisig address */
@@ -69,25 +69,19 @@ export interface RawPendingMultisigTx extends ExtendedPendingMultisigTx {
   /** Amount deposited for the multisig */
   depositAmount: number,
   /** List of addresses that have approved the extrinsic */
-  approvals: string[]
-}
-
-/**
- * Extended fields for pending multisig extrinsic
- */
-interface ExtendedPendingMultisigTx {
+  approvals: string[],
   /** List of signer addresses for the multisig */
-  signerAddresses?: string[];
+  signerAddresses: string[];
   /** Hash of the extrinsic */
-  extrinsicHash?: string;
+  extrinsicHash: string;
+  /** Timestamp when the extrinsic was created */
+  timestamp: number;
+  /** Type of multisig extrinsic */
+  multisigTxType: MultisigTxType
   /** Encoded call data */
   callData?: string;
   /** Decoded call data with method and arguments */
   decodedCallData?: DecodeCallDataResponse;
-  /** Timestamp when the extrinsic was created */
-  timestamp?: number;
-  /** Type of multisig extrinsic */
-  multisigTxType?: MultisigTxType
 }
 
 /**
