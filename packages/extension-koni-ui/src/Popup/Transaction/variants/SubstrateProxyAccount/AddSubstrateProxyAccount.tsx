@@ -156,7 +156,7 @@ const Component = (): React.ReactElement<Props> => {
     );
 
     if (isInvalidProxy) {
-      return Promise.reject(new Error(t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.substrateProxyTypeNotAuthorized')));
+      return Promise.reject(new Error(t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.substrateProxyAlreadyExists')));
     }
 
     return Promise.resolve();
@@ -243,8 +243,8 @@ const Component = (): React.ReactElement<Props> => {
             validateTrigger={false}
           >
             <SubstrateProxyTypeSelector
-              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.proxyType')}
               chain={chainValue}
+              label={t('ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.proxyType')}
             />
           </Form.Item>
         </Form>

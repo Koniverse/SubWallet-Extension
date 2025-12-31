@@ -33,6 +33,14 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
+
+        {!!transaction.signerSubstrateProxyAddress &&
+          <MetaInfo.Account
+            address={transaction.signerSubstrateProxyAddress}
+            chainSlug={transaction.chain}
+            label={t('ui.TRANSACTION.Confirmations.CancelUnstake.signWith')}
+          />
+        }
         <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.CancelUnstake.amount')}

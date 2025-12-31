@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RequestAddSubstrateProxyAccount } from '@subwallet/extension-base/types';
-import { AccountProxyAvatar } from '@subwallet/extension-koni-ui/components';
+import { CommonTransactionInfo } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
-import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
-import { toShort } from '@subwallet/extension-koni-ui/utils';
 import CN from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,67 +18,43 @@ const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
   const { t } = useTranslation();
   const data = transaction.data as RequestAddSubstrateProxyAccount;
-  const accountFrom = useGetAccountByAddress(transaction.address);
-  const substrateProxyAccount = useGetAccountByAddress(data.substrateProxyAddress);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
 
   return (
     <div className={CN(className)}>
+      <CommonTransactionInfo
+        address={transaction.address}
+        network={transaction.chain}
+      />
       <MetaInfo
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        <MetaInfo.Default
-          className={'__account-field'}
-          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.account')}
-        >
-          <AccountProxyAvatar
-            className={'__account-avatar'}
-            size={24}
-            value={accountFrom?.proxyId || transaction.address}
+        {!!transaction.signerSubstrateProxyAddress &&
+          <MetaInfo.Account
+            address={transaction.signerSubstrateProxyAddress}
+            chainSlug={transaction.chain}
+            label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.signWith')}
           />
-          <div className={'__account-item-label'}>{accountFrom?.name || toShort(transaction.address)}</div>
-        </MetaInfo.Default>
-
-        {!!accountFrom?.name && <MetaInfo.Default
-          className={'__address-field'}
-          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.address')}
-        >
-          {toShort(transaction.address)}
-        </MetaInfo.Default>}
-
-        <MetaInfo.Chain
-          chain={transaction.chain}
-          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.network')}
-        />
-      </MetaInfo>
-      <MetaInfo
-        className={'meta-info'}
-        hasBackgroundWrapper
-      >
-
-        <MetaInfo.Default
-          className={'__account-field'}
+        }
+        <MetaInfo.Account
+          address={data.substrateProxyAddress}
+          chainSlug={transaction.chain}
           label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyAccount')}
-        >
-          <AccountProxyAvatar
-            className={'__account-avatar'}
-            size={24}
-            value={substrateProxyAccount?.proxyId || data.substrateProxyAddress}
-          />
-          <div className={'__account-item-label'}>{substrateProxyAccount?.name || toShort(data.substrateProxyAddress)}</div>
-        </MetaInfo.Default>
+        />
 
-        {!!substrateProxyAccount?.name && <MetaInfo.Default
-          className={'__address-field'}
-          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.address')}
+        <MetaInfo.Default
+          className={CN('__validator-address', className)}
+          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyType')}
         >
-          {toShort(data.substrateProxyAddress)}
-        </MetaInfo.Default>}
+          <span className='__selected-validator-address'>
+            {data.substrateProxyType}
+          </span>
+        </MetaInfo.Default>
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />

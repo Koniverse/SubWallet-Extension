@@ -114,14 +114,6 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
       return true;
     }
 
-    if (accountProxy.chainTypes.includes(AccountChainType.ETHEREUM)) {
-      if (accountProxy.accountType === AccountProxyType.LEDGER) {
-        return accountProxy.accounts[0].isSubstrateECDSA;
-      }
-
-      return true;
-    }
-
     return false;
   }, [accountProxy]);
 

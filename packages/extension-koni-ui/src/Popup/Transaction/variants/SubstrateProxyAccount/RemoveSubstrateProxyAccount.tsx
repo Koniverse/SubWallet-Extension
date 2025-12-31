@@ -142,7 +142,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
     });
   }, [accountProxy, from]);
 
-  const substrateProxyAddressCount = substrateProxyAddressRemovedFiltered.uniqueAddresses.length;
+  const substrateProxyAddressCount = substrateProxyAddressRemovedFiltered.substrateProxyItems.length;
 
   // Set up back button to navigate to account detail page
   useEffect(() => {
@@ -192,30 +192,24 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
           className={'meta-info'}
           hasBackgroundWrapper
         >
-          {substrateProxyAddressCount === 1
-            ? <MetaInfo.Account
-              address={substrateProxyAddressRemovedFiltered.uniqueAddresses[0]}
-              chainSlug={chain}
-              label={t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyAccount')}
+          <MetaInfo.Default
+            className={'proxy-address-removed'}
+            label={t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyAccount')}
+          >
+            {substrateProxyAddressCount} {t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts')}
+            <Button
+              className={'proxy-address-removed-info'}
+              icon={ <Icon
+                className={'proxy-address-remove-detail'}
+                customSize={'20px'}
+                phosphorIcon={Info}
+                weight={'bold'}
+              />}
+              onClick={onClickDetail}
+              size={'xs'}
+              type={'ghost'}
             />
-            : <MetaInfo.Default
-              className={'proxy-address-removed'}
-              label={t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyAccount')}
-            >
-              {substrateProxyAddressCount} {t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts')}
-              <Button
-                className={'proxy-address-removed-info'}
-                icon={ <Icon
-                  className={'proxy-address-remove-detail'}
-                  customSize={'20px'}
-                  phosphorIcon={Info}
-                  weight={'bold'}
-                />}
-                onClick={onClickDetail}
-                size={'xs'}
-                type={'ghost'}
-              />
-            </MetaInfo.Default>}
+          </MetaInfo.Default>
 
           <MetaInfo.Chain
             chain={chain}
@@ -254,7 +248,9 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
         </Button>
       </TransactionFooter>
 
-      <SubstrateProxyAccountListModal substrateProxyAddresses={substrateProxyAddressRemovedFiltered.uniqueAddresses} />
+      <SubstrateProxyAccountListModal
+        substrateProxyAccounts={substrateProxyAddressRemovedFiltered.substrateProxyItems}
+      />
     </>
   );
 };
