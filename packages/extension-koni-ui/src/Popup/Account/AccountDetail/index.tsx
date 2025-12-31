@@ -3,7 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountActions, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
-import { AccountChainTypeLogos, AccountProxyTypeTag, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { AccountChainTypeLogos, AccountProxyTypeTag, AddressSelectorItem, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useDefaultNavigate, useGetAccountProxyById, useNotification } from '@subwallet/extension-koni-ui/hooks';
@@ -11,6 +11,7 @@ import { editAccount, forgetAccount, validateAccountName } from '@subwallet/exte
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountDetailParam, ThemeProps, VoidFunction } from '@subwallet/extension-koni-ui/types';
 import { FormCallbacks, FormFieldData } from '@subwallet/extension-koni-ui/types/form';
+import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
 import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils/form/form';
 import { Button, Form, Icon, Input } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -29,6 +30,7 @@ enum FilterTabType {
   ACCOUNT_ADDRESS = 'account-address',
   DERIVED_ACCOUNT = 'derived-account',
   DERIVATION_INFO = 'derivation-info',
+  MULTISIG_INFO = 'multisig-info',
 }
 
 type Props = ThemeProps;
@@ -75,11 +77,33 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
     }
   }, [accountProxies, accountProxy.parentId]);
 
+  const multisigAccount = useMemo(() => {
+    if (accountProxy.accountType === AccountProxyType.MULTISIG) {
+      return accountProxy.accounts.find(
+        (account) => account.isMultisig === true
+      );
+    }
+
+    return undefined;
+  }, [accountProxy.accountType, accountProxy.accounts]);
+
+  const signers = multisigAccount?.signers;
+  const isMultisig = multisigAccount?.isMultisig;
+  const showMultisigAccountInfoTab = useMemo((): boolean => {
+    if (Array.isArray(signers) && signers.every((item) => typeof item === 'string')) {
+      return signers.length > 0;
+    }
+
+    return false;
+  }, [signers]);
+
   const getDefaultFilterTab = () => {
     if (requestViewDerivedAccounts && showDerivedAccounts) {
       return FilterTabType.DERIVED_ACCOUNT;
     } else if (requestViewDerivedAccountDetails) {
       return FilterTabType.DERIVATION_INFO;
+    } else if (showMultisigAccountInfoTab) {
+      return FilterTabType.MULTISIG_INFO;
     } else {
       return FilterTabType.ACCOUNT_ADDRESS;
     }
@@ -118,8 +142,15 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
       });
     }
 
+    if (showMultisigAccountInfoTab) {
+      result.push({
+        label: t('Multisig members'),
+        value: FilterTabType.MULTISIG_INFO
+      });
+    }
+
     return result;
-  }, [showDerivationInfoTab, showDerivedAccounts, t]);
+  }, [showDerivationInfoTab, showDerivedAccounts, showMultisigAccountInfoTab, t]);
 
   const onSelectFilterTab = useCallback((value: string) => {
     setSelectedFilterTab(value);
@@ -142,21 +173,36 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
       });
   }, [accountProxy.id, goHome, notify]);
 
+  // Todo: Recheck with pending transaction
   const onDelete = useCallback(() => {
     alertModal.open({
-      title: t('ui.ACCOUNT.screen.Account.Detail.confirmation'),
-      type: NotificationType.WARNING,
-      content: t('ui.ACCOUNT.screen.Account.Detail.removeAccountAccessWarning'),
+      title: isMultisig
+        ? t('Remove multisig account')
+        : t('ui.ACCOUNT.screen.Account.Detail.confirmation'),
+      type: isMultisig ? NotificationType.ERROR : NotificationType.WARNING,
+      content: isMultisig
+        ? (
+          <>
+            <div className='description-alert-modal'>
+            This account has pending multisig transactions. Removing the account now
+            means you’ll have to re-import it later to complete these transactions
+            </div>
+          </>
+        )
+        : (
+          t('ui.ACCOUNT.screen.Account.Detail.removeAccountAccessWarning')
+        ),
+      subtitle: isMultisig ? 'Are you sure you want to remove this account?' : undefined,
       okButton: {
         text: t('ui.ACCOUNT.screen.Account.Detail.remove'),
+        schema: 'error',
         onClick: () => {
           doDelete();
           alertModal.close();
-        },
-        schema: 'error'
+        }
       }
     });
-  }, [alertModal, doDelete, t]);
+  }, [alertModal, doDelete, isMultisig, t]);
 
   const onDerive = useCallback(() => {
     if (accountProxy) {
@@ -172,11 +218,13 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
     }
   }, [accountProxy?.id, navigate]);
 
-  // @ts-ignore
-  const onCopyAddress = useCallback(() => {
-    notify({
-      message: t('ui.ACCOUNT.screen.Account.Detail.copiedToClipboard')
-    });
+  const onCopyAddress = useCallback((signer: string) => {
+    return () => {
+      copyToClipboard(signer || '');
+      notify({
+        message: t('ui.ACCOUNT.screen.Account.Detail.copiedToClipboard')
+      });
+    };
   }, [notify, t]);
 
   const parentDerivedAccountProxy = useMemo(() => {
@@ -242,25 +290,27 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
   }, [accountProxy.id, accountProxy.name, form]);
 
   const footerNode = useMemo(() => {
-    if (![AccountProxyType.UNIFIED, AccountProxyType.SOLO].includes(accountProxy.accountType)) {
-      return (
-        <Button
-          block={true}
-          className={CN('account-button')}
-          disabled={false}
-          icon={(
-            <Icon
-              phosphorIcon={Trash}
-              weight='fill'
-            />
-          )}
-          loading={deleting}
-          onClick={onDelete}
-          schema='error'
-        >
-          {t('ui.ACCOUNT.screen.Account.Detail.deleteAccount')}
-        </Button>
-      );
+    const { accountType } = accountProxy;
+    const isMultisig = accountType === AccountProxyType.MULTISIG;
+
+    const deleteButton = (
+      <Button
+        block={isMultisig || ![AccountProxyType.UNIFIED, AccountProxyType.SOLO].includes(accountType)}
+        className={CN('account-button')}
+        icon={<Icon
+          phosphorIcon={Trash}
+          weight='fill'
+        />}
+        loading={deleting}
+        onClick={onDelete}
+        schema='error'
+      >
+        {isMultisig ? 'Remove' : t('ui.ACCOUNT.screen.Account.Detail.deleteAccount')}
+      </Button>
+    );
+
+    if (isMultisig || ![AccountProxyType.UNIFIED, AccountProxyType.SOLO].includes(accountType)) {
+      return deleteButton;
     }
 
     return <>
@@ -321,10 +371,12 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
       setSelectedFilterTab(FilterTabType.DERIVED_ACCOUNT);
     } else if (requestViewDerivedAccountDetails) {
       setSelectedFilterTab(FilterTabType.DERIVATION_INFO);
+    } else if (showMultisigAccountInfoTab) {
+      setSelectedFilterTab(FilterTabType.MULTISIG_INFO);
     } else {
       setSelectedFilterTab(FilterTabType.ACCOUNT_ADDRESS);
     }
-  }, [requestViewDerivedAccountDetails, requestViewDerivedAccounts, showDerivedAccounts]);
+  }, [requestViewDerivedAccountDetails, requestViewDerivedAccounts, showDerivedAccounts, showMultisigAccountInfoTab]);
 
   const renderDetailDerivedAccount = () => {
     return (
@@ -361,6 +413,34 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
           </Form.Item>}
         </Form>
       </>
+    );
+  };
+
+  const renderSignerAddress = () => {
+    if (!Array.isArray(signers)) {
+      return null;
+    }
+
+    return (
+      <div className={'signatory-item-wrapper'}>
+        {signers.map((signer) => (
+          <div
+            className='signatory-item'
+            key={signer.address}
+          >
+            <AddressSelectorItem
+              address={signer}
+              avatarValue={signer}
+              className={CN('__list-selected-item')}
+              isSelected={false}
+              key={signer}
+              onCopyItem={onCopyAddress(signer)}
+              showCopyIcon={true}
+              showRemoveIcon={false}
+            />
+          </div>
+        ))}
+      </div>
     );
   };
 
@@ -453,6 +533,11 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
           renderDetailDerivedAccount()
         )
       }
+      {
+        selectedFilterTab === FilterTabType.MULTISIG_INFO && (
+          renderSignerAddress()
+        )
+      }
     </Layout.WithSubHeaderOnly>
   );
 };
@@ -524,6 +609,14 @@ const AccountDetail = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
       paddingTop: token.padding,
       paddingLeft: token.padding,
       paddingRight: token.padding
+    },
+
+    '.signatory-item-wrapper': {
+      display: 'flex',
+      gap: 8,
+      flexDirection: 'column',
+      padding: token.padding,
+      paddingTop: 12
     },
 
     '.account-detail-form .ant-form-item': {

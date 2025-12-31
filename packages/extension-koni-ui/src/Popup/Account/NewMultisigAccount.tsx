@@ -370,7 +370,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         </div>
       </Layout.WithSubHeaderOnly>
       <AddSignerMultisigModal
-        chainSlug={'polkadot'}
+        chainSlug={'polkadot'}  // Todo: Replace hardcoded value with dynamic configuration
         id={addressBookId}
         onConfirm={onConfirmSelectSigners}
         selectedSigners={signers}

@@ -4,13 +4,14 @@
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getBitcoinKeypairAttributes, toShort } from '@subwallet/extension-koni-ui/utils';
 import { getKeypairTypeByAddress, isBitcoinAddress } from '@subwallet/keyring';
-import { Icon } from '@subwallet/react-ui';
+import {Button, Icon} from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CheckCircle, Trash } from 'phosphor-react';
+import {CheckCircle, Copy, Trash} from 'phosphor-react';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import AccountProxyAvatar from './AccountProxyAvatar';
+import {useTranslation} from "@subwallet/extension-koni-ui/hooks";
 
 type Props = ThemeProps & {
   name?: string;
@@ -21,11 +22,15 @@ type Props = ThemeProps & {
   showUnselectIcon?: boolean;
   showRemoveIcon?: boolean
   onRemoveItem?: VoidFunction;
+  showCopyIcon?: boolean;
+  onCopyItem?: VoidFunction;
 }
 
 function Component (props: Props): React.ReactElement<Props> {
   const { address,
     avatarValue,
+    onCopyItem,
+    showCopyIcon,
     className, isSelected, name, onClick, onRemoveItem, showRemoveIcon, showUnselectIcon } = props;
 
   const bitcoinAttributes = useMemo(() => {
@@ -37,6 +42,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
     return undefined;
   }, [address]);
+  const { t } = useTranslation();
 
   return (
     <div
@@ -108,17 +114,35 @@ function Component (props: Props): React.ReactElement<Props> {
           </div>
         )}
         {(showRemoveIcon) && (
-          <div
-            className={CN('__remove-icon-wrapper', {
-            })}
+          <Button
+            className={'__remove-icon-wrapper'}
+            icon={
+              <Icon
+                phosphorIcon={Trash}
+                size='sm'
+                weight='fill'
+              />
+            }
             onClick={onRemoveItem}
-          >
-            <Icon
-              phosphorIcon={Trash}
-              size='sm'
-              weight='fill'
-            />
-          </div>
+            size='xs'
+            type='ghost'
+          />
+        )}
+        {(showCopyIcon) && (
+          <Button
+            className={'__copy-icon-wrapper'}
+            icon={
+              <Icon
+                phosphorIcon={Copy}
+                size='sm'
+              />
+            }
+            onClick={onCopyItem}
+            size='xs'
+            tooltip={t('ui.ACCOUNT.components.AccountProxy.SelectorItem.copyAddress')}
+            type='ghost'
+          />
+
         )}
       </div>
     </div>
@@ -173,7 +197,7 @@ const AddressSelectorItem = styled(Component)<Props>(({ theme: { token } }: Prop
       display: 'flex'
     },
 
-    '.__checked-icon-wrapper, .__remove-icon-wrapper': {
+    '.__checked-icon-wrapper, .__remove-icon-wrapper, .__copy-icon-wrapper': {
       display: 'flex',
       justifyContent: 'center',
       minWidth: 40,
