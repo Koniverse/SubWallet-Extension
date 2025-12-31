@@ -18,7 +18,12 @@ import { EventItem, EventType } from '../event-service/types';
  * List of chains that support multisig functionality
  * @todo deploy online
  */
-const MULTISIG_SUPPORTED_CHAINS = ['statemint', 'statemine', 'paseo_assethub', 'paseoTest', 'westend_assethub'];
+const MULTISIG_SUPPORTED_CHAINS: readonly string[] = ['statemint', 'statemine', 'paseo_assethub', 'paseoTest', 'westend_assethub'];
+
+/**
+ * Query key for multisig multisigs subscription
+ */
+const MULTISIG_QUERY_KEY = 'query_multisig_multisigs';
 
 /**
  * Interface representing multisig extrinsic data from the Substrate pallet
@@ -173,47 +178,58 @@ export class MultisigService implements StoppableServiceInterface {
   /**
    * Starts the multisig service
    * Subscribes to pending multisig extrinsics for all multisig accounts
-   * @returns Promise that resolves when the service has started
+   * @returns Promise that resolves when the service has started, or rejects on error
    */
   async start (): Promise<void> {
-    if (this.status === ServiceStatus.STOPPING) {
-      await this.waitForStopped();
+    try {
+      if (this.status === ServiceStatus.STOPPING) {
+        await this.waitForStopped();
+      }
+
+      if (this.status === ServiceStatus.STARTED || this.status === ServiceStatus.STARTING) {
+        return await this.waitForStarted();
+      }
+
+      this.status = ServiceStatus.STARTING;
+
+      await this.runSubscribePendingMultisigTxs();
+
+      this.stopPromiseHandler = createPromiseHandler();
+      this.status = ServiceStatus.STARTED;
+      this.startPromiseHandler.resolve();
+    } catch (error) {
+      this.status = ServiceStatus.NOT_INITIALIZED;
+      this.startPromiseHandler.reject(error);
+      throw error;
     }
-
-    if (this.status === ServiceStatus.STARTED || this.status === ServiceStatus.STARTING) {
-      return await this.waitForStarted();
-    }
-
-    this.status = ServiceStatus.STARTING;
-
-    await this.runSubscribePendingMultisigTxs();
-
-    this.stopPromiseHandler = createPromiseHandler();
-    this.status = ServiceStatus.STARTED;
-    this.startPromiseHandler.resolve();
   }
 
   /**
    * Stops the multisig service
    * Unsubscribes from all active subscriptions
-   * @returns Promise that resolves when the service has stopped
+   * @returns Promise that resolves when the service has stopped, or rejects on error
    */
   async stop (): Promise<void> {
-    if (this.status === ServiceStatus.STARTING) {
-      await this.waitForStarted();
+    try {
+      if (this.status === ServiceStatus.STARTING) {
+        await this.waitForStarted();
+      }
+
+      if (this.status === ServiceStatus.STOPPED || this.status === ServiceStatus.STOPPING) {
+        return await this.waitForStopped();
+      }
+
+      this.status = ServiceStatus.STOPPING;
+
+      this.runUnsubscribePendingMultisigTxs();
+
+      this.startPromiseHandler = createPromiseHandler();
+      this.status = ServiceStatus.STOPPED;
+      this.stopPromiseHandler.resolve();
+    } catch (error) {
+      this.stopPromiseHandler.reject(error);
+      throw error;
     }
-
-    if (this.status === ServiceStatus.STOPPED || this.status === ServiceStatus.STOPPING) {
-      return await this.waitForStopped();
-    }
-
-    this.status = ServiceStatus.STOPPING;
-
-    this.runUnsubscribePendingMultisigTxs();
-
-    this.startPromiseHandler = createPromiseHandler();
-    this.stopPromiseHandler.resolve();
-    this.status = ServiceStatus.STOPPED;
   }
 
   /**
@@ -364,7 +380,9 @@ export class MultisigService implements StoppableServiceInterface {
   private async subscribePendingMultisigTxsPromise (chain: string, multisigAddress: string, signers: string[], callback: (rs: RawPendingMultisigTx[]) => void) {
     const substrateApi = await this.chainService.getSubstrateApi(chain).isReady;
 
-    const keyQuery = 'query_multisig_multisigs';
+    // todo: validate substrateApi has multisig.multisigs
+
+    const keyQuery = MULTISIG_QUERY_KEY;
     const rawKeys = await substrateApi.api.query.multisig.multisigs.keys(multisigAddress);
     const rawKeysArgs = rawKeys.map((rawKey) => rawKey.args);
 
