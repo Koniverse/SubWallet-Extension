@@ -286,36 +286,81 @@ function Component ({ accountProxy, className }: Props) {
   }, [checkChain, setNetworkSelected, setSubstrateProxyAccountsSelected]);
 
   // Fetch substrate proxy accounts when address or network changes
+  const fetchProxyAccounts = useCallback(
+    async (showLoading: boolean) => {
+      if (!addressFormated || !networkSelected) {
+        return;
+      }
+
+      if (showLoading) {
+        setLoading(true);
+      }
+
+      try {
+        const { substrateProxyAccounts } = await getSubstrateProxyAccountGroup({
+          chain: networkSelected,
+          address: addressFormated
+        });
+
+        setSubstrateProxyAccountsSelected((prev) => {
+          const next: Record<string, SubstrateProxyItemSelector> = {};
+
+          substrateProxyAccounts.forEach((p) => {
+            const key = getSubstrateProxyAddressKey(p.substrateProxyAddress, p.substrateProxyType);
+
+            next[key] = { ...p, isSelected: !!prev[key]?.isSelected };
+          });
+
+          const prevKeys = Object.keys(prev);
+          const nextKeys = Object.keys(next);
+
+          if (prevKeys.length !== nextKeys.length) {
+            return next;
+          }
+
+          for (const k of nextKeys) {
+            if (!prev[k]) {
+              return next;
+            }
+          }
+
+          return prev;
+        });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (showLoading) {
+          setLoading(false);
+        }
+      }
+    },
+    [addressFormated, networkSelected]
+  );
+
   useEffect(() => {
     if (addressFormated && networkSelected) {
-      setLoading(true);
-      getSubstrateProxyAccountGroup({
-        chain: networkSelected,
-        address: addressFormated
-      })
-        .then(({ substrateProxyAccounts }) => {
-          setSubstrateProxyAccountsSelected((prev) => {
-            const newSelected: Record<string, SubstrateProxyItemSelector> = {};
-
-            substrateProxyAccounts.forEach((p) => {
-              const key = getSubstrateProxyAddressKey(p.substrateProxyAddress, p.substrateProxyType);
-
-              newSelected[key] = { ...p, isSelected: !!prev[key]?.isSelected };
-            });
-
-            return newSelected;
-          });
-        })
-        .catch(console.error)
-        .finally(() => setLoading(false));
+      fetchProxyAccounts(true);
     }
-  }, [addressFormated, networkSelected, setSubstrateProxyAccountsSelected]);
+  }, [addressFormated, networkSelected, fetchProxyAccounts]);
 
   useEffect(() => {
     if (!networkSelected && chainItems[0]?.slug) {
       setNetworkSelected(chainItems[0].slug);
     }
   }, [chainItems, networkSelected, setNetworkSelected]);
+
+  // Auto-refresh proxy accounts every 10 seconds
+  useEffect(() => {
+    if (!addressFormated || !networkSelected) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      fetchProxyAccounts(false);
+    }, 10_000);
+
+    return () => clearInterval(interval);
+  }, [addressFormated, networkSelected, fetchProxyAccounts]);
 
   return (
     <div className={className}>
