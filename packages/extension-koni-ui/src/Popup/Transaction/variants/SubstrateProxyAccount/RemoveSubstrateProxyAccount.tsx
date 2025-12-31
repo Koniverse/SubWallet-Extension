@@ -183,6 +183,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
             address={from}
             chain={chain}
             className={'free-balance-block'}
+            label={t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance')}
             onBalanceReady={setIsBalanceReady}
             tokenSlug={nativeTokenSlug}
           />

@@ -30,13 +30,6 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        {!!transaction.signerSubstrateProxyAddress &&
-          <MetaInfo.Account
-            address={transaction.signerSubstrateProxyAddress}
-            chainSlug={transaction.chain}
-            label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.signWith')}
-          />
-        }
         <MetaInfo.Account
           address={data.substrateProxyAddress}
           chainSlug={transaction.chain}
@@ -47,7 +40,7 @@ const Component: React.FC<Props> = (props: Props) => {
           className={CN('__validator-address', className)}
           label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyType')}
         >
-          <span className='__selected-validator-address'>
+          <span className='__selected-validator-type'>
             {data.substrateProxyType}
           </span>
         </MetaInfo.Default>
@@ -58,6 +51,18 @@ const Component: React.FC<Props> = (props: Props) => {
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
+      </MetaInfo>
+      <MetaInfo
+        className={'meta-info'}
+        hasBackgroundWrapper
+      >
+        {!!transaction.signerSubstrateProxyAddress &&
+          <MetaInfo.Account
+            address={transaction.signerSubstrateProxyAddress}
+            chainSlug={transaction.chain}
+            label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.signWith')}
+          />
+        }
       </MetaInfo>
     </div>
   );
@@ -73,6 +78,10 @@ const AddSubstrateProxyAccountTransactionConfirmation = styled(Component)<Props>
 
     '.address-field': {
       whiteSpace: 'nowrap'
+    },
+
+    '.__selected-validator-type': {
+      color: token['magenta-6']
     }
   };
 });

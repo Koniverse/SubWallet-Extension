@@ -2598,5 +2598,6 @@
   "ui.TRANSACTION.Confirmations.SendNft.signWith": "Sign with",
   "ui.TRANSACTION.Confirmations.TransferBlock.signWith": "Sign with",
   "ui.TRANSACTION.Confirmations.Unbond.signWith": "Sign with",
-  "ui.TRANSACTION.Confirmations.Withdraw.signWith": "Sign with"
+  "ui.TRANSACTION.Confirmations.Withdraw.signWith": "Sign with",
+  "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "Available balance"
 }
