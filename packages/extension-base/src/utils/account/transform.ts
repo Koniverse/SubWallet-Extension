@@ -98,6 +98,8 @@ export const getAccountSignMode = (address: string, _meta?: KeyringPair$Meta): A
           }
         } else if (meta.isReadOnly) {
           return AccountSignMode.READ_ONLY;
+        } else if (meta.isMultisig) {
+          return AccountSignMode.MULTISIG;
         } else {
           return AccountSignMode.QR;
         }
@@ -246,6 +248,12 @@ const OPEN_GOV_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.GOV_UNLOCK_VOTE
 ];
 
+const MULTISIG_ACTIONS: ExtrinsicType[] = [
+  ExtrinsicType.MULTISIG_APPROVE_TX,
+  ExtrinsicType.MULTISIG_EXECUTE_TX,
+  ExtrinsicType.MULTISIG_CANCEL_TX
+];
+
 const OTHER_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.TRANSFER_XCM,
   ExtrinsicType.SEND_NFT,
@@ -268,6 +276,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
           ...OPEN_GOV_ACTIONS,
+          ...MULTISIG_ACTIONS,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -308,6 +317,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
           ...OPEN_GOV_ACTIONS,
+          ...MULTISIG_ACTIONS,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -346,6 +356,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_SDOT_ACTIONS,
           // ...EARN_QDOT_ACTIONS,
           ...OPEN_GOV_ACTIONS,
+          ...MULTISIG_ACTIONS,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -542,6 +553,8 @@ export const convertAccountProxyType = (accountSignMode: AccountSignMode): Accou
       return AccountProxyType.LEDGER;
     case AccountSignMode.QR:
       return AccountProxyType.QR;
+    case AccountSignMode.MULTISIG:
+      return AccountProxyType.MULTISIG;
     case AccountSignMode.READ_ONLY:
       return AccountProxyType.READ_ONLY;
     case AccountSignMode.INJECTED:

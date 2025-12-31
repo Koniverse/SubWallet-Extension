@@ -596,6 +596,20 @@ export class AccountState {
    * Account ref
    * */
 
+  /* Multisig */
+
+  public getMultisigAccounts () {
+    return Object.values(this.accounts).filter((acc) => acc.accountType === AccountProxyType.MULTISIG);
+  }
+
+  public getMultisigAddresses () {
+    const allAccounts = this.getMultisigAccounts();
+
+    return allAccounts.map((acc) => acc.id);
+  }
+
+  /* Multisig */
+
   /* Others */
 
   public removeNoneHardwareGenesisHash () {

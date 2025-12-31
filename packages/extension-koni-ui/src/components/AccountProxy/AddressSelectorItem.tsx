@@ -6,7 +6,7 @@ import { getBitcoinKeypairAttributes, toShort } from '@subwallet/extension-koni-
 import { getKeypairTypeByAddress, isBitcoinAddress } from '@subwallet/keyring';
 import { Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CheckCircle } from 'phosphor-react';
+import { CheckCircle, Trash } from 'phosphor-react';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -19,12 +19,14 @@ type Props = ThemeProps & {
   onClick?: VoidFunction;
   isSelected?: boolean;
   showUnselectIcon?: boolean;
+  showRemoveIcon?: boolean
+  onRemoveItem?: VoidFunction;
 }
 
 function Component (props: Props): React.ReactElement<Props> {
   const { address,
     avatarValue,
-    className, isSelected, name, onClick, showUnselectIcon } = props;
+    className, isSelected, name, onClick, onRemoveItem, showRemoveIcon, showUnselectIcon } = props;
 
   const bitcoinAttributes = useMemo(() => {
     if (isBitcoinAddress(address)) {
@@ -105,6 +107,19 @@ function Component (props: Props): React.ReactElement<Props> {
             />
           </div>
         )}
+        {(showRemoveIcon) && (
+          <div
+            className={CN('__remove-icon-wrapper', {
+            })}
+            onClick={onRemoveItem}
+          >
+            <Icon
+              phosphorIcon={Trash}
+              size='sm'
+              weight='fill'
+            />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -158,7 +173,7 @@ const AddressSelectorItem = styled(Component)<Props>(({ theme: { token } }: Prop
       display: 'flex'
     },
 
-    '.__checked-icon-wrapper': {
+    '.__checked-icon-wrapper, .__remove-icon-wrapper': {
       display: 'flex',
       justifyContent: 'center',
       minWidth: 40,
@@ -168,6 +183,10 @@ const AddressSelectorItem = styled(Component)<Props>(({ theme: { token } }: Prop
       '&.-selected': {
         color: token.colorSuccess
       }
+    },
+
+    '.__remove-icon-wrapper': {
+      minHeight: 40
     },
 
     '.__name': {

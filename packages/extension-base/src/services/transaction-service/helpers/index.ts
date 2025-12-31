@@ -84,6 +84,12 @@ const typeName = (type: SWTransactionBase['extrinsicType']) => {
       return 'Unlock votes';
     case ExtrinsicType.CHANGE_EARNING_VALIDATOR:
       return 'Change validator';
+    case ExtrinsicType.MULTISIG_APPROVE_TX:
+      return 'Approve multisig transaction';
+    case ExtrinsicType.MULTISIG_EXECUTE_TX:
+      return 'Execute multisig transaction';
+    case ExtrinsicType.MULTISIG_CANCEL_TX:
+      return 'Cancel multisig transaction';
     case ExtrinsicType.UNKNOWN:
     default:
       return 'unknown';

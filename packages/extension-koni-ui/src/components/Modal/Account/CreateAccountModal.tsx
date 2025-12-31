@@ -16,7 +16,7 @@ import { PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { renderModalSelector } from '@subwallet/extension-koni-ui/utils/common/dom';
 import { BackgroundIcon, ModalContext, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { Leaf, ShareNetwork } from 'phosphor-react';
+import { Leaf, ShareNetwork, UserSwitch } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -94,6 +94,17 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       onClick: () => {
         inactiveModal(modalId);
         activeModal(DERIVE_ACCOUNT_LIST_MODAL);
+      }
+    },
+    {
+      backgroundColor: token['geekblue-7'],
+      disabled: false,
+      icon: UserSwitch,
+      key: 'multisig-account',
+      label: t('Create multisig account'),
+      onClick: () => {
+        inactiveModal(modalId);
+        navigate('/accounts/new-multisig');
       }
     }
   ]), [token, t, disableDerive, inactiveModal, setSelectedMnemonicType, navigate, activeModal]);

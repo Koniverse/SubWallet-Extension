@@ -27,6 +27,7 @@ import { useAlert, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTok
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import useLazyWatchTransaction from '@subwallet/extension-koni-ui/hooks/transaction/useWatchTransactionLazy';
 import { approveSpending, cancelSubscription, getOptimalTransferProcess, getTokensCanPayFee, isTonBounceableAddress, makeCrossChainTransfer, makeTransfer, subscribeMaxTransfer } from '@subwallet/extension-koni-ui/messaging';
+import { cancelPendingTx } from '@subwallet/extension-koni-ui/messaging/transaction/multisig';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ChainItemType, FormCallbacks, Theme, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
@@ -1025,6 +1026,28 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   useEffect(() => {
     console.log('transferInfo', transferInfo);
   }, [transferInfo]);
+
+  // todo: remove after test cancel
+  useEffect(() => {
+    console.log('Test cancel');
+
+    cancelPendingTx({
+      address: '1BzDB5n2rfSJwvuCW9deKY9XnUyys8Gy44SoX8tRNDCFBhx',
+      chain: 'paseoTest',
+      threshold: 3,
+      otherSignatories: [
+        '1P8B9aHLLUcPrgVo1EfmvJ2yNm9Uac9RkSiNQyVxVp6yons',
+        '16QBEoG2jAVJEyepEyerw1sJzVqctCQc3JaqFnMD1LyYcMY7'
+      ],
+      timepoint: {
+        height: 8706752,
+        index: 2
+      },
+      callHash: '0x08429781e0c5600a6e89d75df1634a830e70610887e023d3cad2c6bd881d1845'
+    })
+      .then((rs) => console.log('rs', rs))
+      .catch(console.error);
+  }, []);
 
   useRestoreTransaction(form);
 
