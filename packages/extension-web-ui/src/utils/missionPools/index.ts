@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { MissionCategoryType } from '@subwallet/extension-web-ui/Popup/MissionPool/predefined';
 import { MissionInfo } from '@subwallet/extension-web-ui/types';
 
@@ -16,7 +17,7 @@ export function computeStatus (item: MissionInfo): MissionCategoryType {
       }
     }
   } catch (error) {
-    console.error(error);
+    defaultLogger.error(error);
   }
 
   try {
@@ -28,7 +29,7 @@ export function computeStatus (item: MissionInfo): MissionCategoryType {
       }
     }
   } catch (error) {
-    console.error(error);
+    defaultLogger.error(error);
   }
 
   return MissionCategoryType.LIVE;

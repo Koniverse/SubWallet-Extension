@@ -3,6 +3,7 @@
 
 import { RequestSignatures, TransportRequestMessage, TransportResponseMessage } from '@subwallet/extension-base/background/types';
 import { createPromiseHandler } from '@subwallet/extension-base/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import EventEmitter from 'eventemitter3';
 
 export interface VirtualEvent {
@@ -43,7 +44,7 @@ export class BGMessageCenter {
 
     this.readyHandler.promise.then(() => {
       this.emitter.on(event, cb);
-    }).catch(console.error);
+    }).catch((error) => defaultLogger.error('Failed to add event listener', error));
   }
 
   postMessage (data: TransportResponseMessage<keyof RequestSignatures>) {
@@ -61,7 +62,7 @@ export class BGMessageCenter {
         id: _data.id,
         data: _data
       });
-    }).catch(console.error);
+    }).catch((error) => defaultLogger.error('Failed to post message', error));
   }
 }
 
@@ -81,7 +82,7 @@ export class UIMessageCenter {
       await this.bg?.isReady;
       await new Promise((resolve) => setTimeout(resolve, 99));
       this.readyHandler.resolve();
-    })().catch(console.error);
+    })().catch((error) => defaultLogger.error('Failed to set ready', error));
   }
 
   setBg (bg: BGMessageCenter) {
@@ -93,7 +94,7 @@ export class UIMessageCenter {
 
     this.readyHandler.promise.then(() => {
       this.emitter.on(event, cb);
-    }).catch(console.error);
+    }).catch((error) => defaultLogger.error('Failed to add event listener', error));
   }
 
   postMessage (data: any) {
@@ -113,7 +114,7 @@ export class UIMessageCenter {
         data: _data,
         message: _data.message
       });
-    }).catch(console.error);
+    }).catch((error) => defaultLogger.error('Failed to post message', error));
   }
 }
 

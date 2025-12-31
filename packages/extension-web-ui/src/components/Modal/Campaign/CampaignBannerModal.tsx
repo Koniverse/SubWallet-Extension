@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { CampaignBanner, CampaignButton } from '@subwallet/extension-base/background/KoniTypes';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { BaseModal } from '@subwallet/extension-web-ui/components';
 import { HOME_CAMPAIGN_BANNER_MODAL } from '@subwallet/extension-web-ui/constants';
 import { completeBannerCampaign } from '@subwallet/extension-web-ui/messaging/campaigns';
@@ -30,7 +31,7 @@ const Component: React.FC<Props> = (props: Props) => {
     completeBannerCampaign({
       slug: banner.slug
     })
-      .catch((console.error));
+      .catch((error) => defaultLogger.error('Failed to complete banner campaign', error));
   }, [banner.slug, inactiveModal]);
 
   const onClickButton = useCallback((item: CampaignButton) => {

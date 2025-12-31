@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { CloseIcon, Layout, QrScannerErrorNotice, WalletConnect } from '@subwallet/extension-web-ui/components';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
 import { WALLET_CONNECT_CREATE_MODAL } from '@subwallet/extension-web-ui/constants';
@@ -73,7 +74,7 @@ const Component: React.FC<Props> = (props: Props) => {
         form.resetFields();
       })
       .catch((e) => {
-        console.error(e);
+        defaultLogger.error(e);
         const errMessage = (e as Error).message;
         const message = errMessage.includes('Pairing already exists') ? t('Connection already exists') : t('Fail to add connection');
 
@@ -121,7 +122,7 @@ const Component: React.FC<Props> = (props: Props) => {
   }, []);
 
   const onScanError = useCallback((error: string) => {
-    console.log(error);
+    defaultLogger.debug(error);
     setScanError(error);
   }, []);
 

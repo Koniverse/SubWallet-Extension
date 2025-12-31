@@ -2,9 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Transport from '@ledgerhq/hw-transport';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { LedgerTypes } from '@subwallet/extension-koni-ui/types';
 
 import { transports } from '@polkadot/hw-ledger-transports';
+
+const logger = createLogger('LedgerTransportManager');
 
 export class LedgerTransportManager {
   private static instance: LedgerTransportManager;
@@ -39,7 +42,7 @@ export class LedgerTransportManager {
 
     this.transport.on?.('disconnect', () => {
       this.transport = null;
-      console.warn('[Ledger] Disconnected');
+      logger.warn('[Ledger] Disconnected');
     });
 
     return this.transport;

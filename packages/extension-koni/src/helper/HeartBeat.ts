@@ -3,6 +3,8 @@
 
 // These code from https://developer.chrome.com/docs/extensions/develop/migrate/to-service-workers#keep-sw-alive
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
 /**
  * Tracks when a service worker was last alive and extends the service worker
  * lifetime by writing the current time to extension storage every 20 seconds.
@@ -10,6 +12,8 @@
  * extension process crashes or your extension is manually stopped at
  * chrome://serviceworker-internals.
  */
+
+const logger = createLogger('HeartBeat');
 
 let heartbeatInterval: NodeJS.Timer | undefined;
 
@@ -31,9 +35,9 @@ export function startHeartbeat () {
   runHeartbeat().then(() => {
     // Then again every 20 seconds.
     heartbeatInterval = setInterval(() => {
-      runHeartbeat().catch(console.error);
+      runHeartbeat().catch((error) => logger.error('Failed to run heartbeat', error));
     }, 20 * 1000);
-  }).catch(console.error);
+  }).catch((error) => logger.error('Failed to start heartbeat', error));
 }
 
 export function stopHeartbeat () {

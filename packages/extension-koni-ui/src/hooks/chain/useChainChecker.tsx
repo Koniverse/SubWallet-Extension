@@ -3,6 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { _ChainConnectionStatus } from '@subwallet/extension-base/services/chain-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { enableChain } from '@subwallet/extension-koni-ui/messaging';
@@ -10,6 +11,8 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Button } from '@subwallet/react-ui';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+
+const logger = createLogger('useChainChecker');
 
 export default function useChainChecker () {
   const { t } = useTranslation();
@@ -41,7 +44,7 @@ export default function useChainChecker () {
 
             setConnectingChain(chain);
             notify({ message: t('ui.NETWORK.hook.chain.useChainChecker.chainIsConnecting', { replace: { name: chainInfo?.name } }), duration: 1.5, type: 'warning' });
-          }).catch(console.error);
+          }).catch((error) => logger.error('Failed to enable chain', error));
         };
 
         const btn = <Button

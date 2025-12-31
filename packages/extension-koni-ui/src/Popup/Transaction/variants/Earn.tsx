@@ -8,6 +8,7 @@ import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/se
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { BalanceType, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { addLazy } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
@@ -28,6 +29,8 @@ import { convertFieldToObject, getExtrinsicTypeByPoolInfo, parseNominations, ref
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
+
+const logger = createLogger('Earn');
 import { CheckCircle, Info, PencilSimpleLine, PlusCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -125,7 +128,7 @@ const Component = () => {
         params: {
           'transaction-process-id': transactionProcessId
         }
-      }).then(window.close).catch(console.log);
+      }).then(window.close).catch((error) => logger.error('Failed to open window', error));
 
       isSidePanelMode && closeSidePanel();
     } else {
@@ -1082,7 +1085,7 @@ const Component = () => {
 
                 setConnectionError(errorNetwork);
               })
-              .catch(console.error)
+              .catch((error) => logger.error('Failed to validate yield process', error))
               .finally(() => setStepLoading(false));
           },
           1000,
@@ -1124,7 +1127,7 @@ const Component = () => {
             store.dispatch({ type: 'earning/updatePoolTargets', payload: result });
           }
         })
-        .catch(console.error)
+        .catch((error) => logger.error('Failed to fetch pool target', error))
         .finally(() => {
           if (!unmount) {
             setTargetLoading(false);

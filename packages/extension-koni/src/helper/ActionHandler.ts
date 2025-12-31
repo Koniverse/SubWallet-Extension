@@ -4,10 +4,13 @@
 import { MessageTypes, RequestSignatures, TransportRequestMessage } from '@subwallet/extension-base/background/types';
 import { PORT_CONTENT, PORT_EXTENSION } from '@subwallet/extension-base/defaults';
 import { SWHandler } from '@subwallet/extension-base/koni/background/handlers';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { startHeartbeat, stopHeartbeat } from '@subwallet/extension-koni/helper/HeartBeat';
 
 import { assert } from '@polkadot/util';
+
+const logger = createLogger('ActionHandler');
 
 export type HandlerMethod = <TMessageType extends MessageTypes> ({ id, message, request }: TransportRequestMessage<TMessageType>, port: chrome.runtime.Port) => void;
 
@@ -36,7 +39,7 @@ export class ActionHandler {
   }
 
   constructor () {
-    console.log('ActionHandler init');
+    logger.info('ActionHandler init');
   }
 
   setHandler (handler: SWHandler): void {
@@ -50,7 +53,7 @@ export class ActionHandler {
       const handler = await this.waitMainHandler.promise;
 
       handler.state.onInstallOrUpdate(details);
-    })().catch(console.error);
+    })().catch((error) => logger.error('Failed to handle onInstalled', error));
   }
 
   private _getPortId (port: chrome.runtime.Port): string {
@@ -90,7 +93,7 @@ export class ActionHandler {
         const needFullActive = !this.isFullActive && requireFullActive;
 
         if (this.sleepTimeout) {
-          console.debug('Clearing sleep timeout');
+          logger.debug('Clearing sleep timeout');
           clearTimeout(this.sleepTimeout);
           this.sleepTimeout = undefined;
         }
@@ -121,13 +124,13 @@ export class ActionHandler {
 
       // Set timeout to sleep
       if (Object.keys(this.connectionMap).length === 0) {
-        console.debug('Every port is disconnected, set timeout to sleep');
+        logger.debug('Every port is disconnected, set timeout to sleep');
         this.isActive = false;
         this.isFullActive = false;
         this.sleepTimeout && clearTimeout(this.sleepTimeout);
         this.sleepTimeout = setTimeout(() => {
           // Reset active status
-          this.mainHandler && this.mainHandler.state.sleep().catch(console.error);
+          this.mainHandler && this.mainHandler.state.sleep().catch((error) => logger.error('Failed to sleep state', error));
         }, SLEEP_TIMEOUT);
       }
     }
@@ -139,7 +142,7 @@ export class ActionHandler {
     // console.debug('Handling port', portId);
 
     port.onMessage.addListener((data: TransportRequestMessage<keyof RequestSignatures>) => {
-      this._onPortMessage(port, data, portId).catch(console.error);
+      this._onPortMessage(port, data, portId).catch((error) => logger.error('Failed to handle port message', error));
     });
 
     port.onDisconnect.addListener(() => {

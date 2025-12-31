@@ -4,6 +4,7 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getOriginChainOfAsset, _isChainEvmCompatible, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { getSwapAlternativeAsset } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
@@ -352,7 +353,7 @@ const Component = () => {
       form.validateFields(['from', 'recipient']).then(() => {
         setIsFormInvalid(false);
       }).catch((e) => {
-        console.log('Error when validating', e);
+        defaultLogger.debug('Error when validating', e);
         setIsFormInvalid(true);
       });
     }
@@ -893,7 +894,7 @@ const Component = () => {
   useEffect(() => {
     if (recipientValue && toAssetInfo) {
       form.validateFields(['recipient']).catch((e) => {
-        console.log('Error when validating', e);
+        defaultLogger.debug('Error when validating', e);
       });
     }
   }, [form, recipientValue, toAssetInfo]);
@@ -977,14 +978,14 @@ const Component = () => {
               setHandleRequestLoading(false);
             }
           }).catch((e) => {
-            console.log('handleSwapRequest error', e);
+            defaultLogger.error('handleSwapRequest error', e);
 
             if (sync) {
               setHandleRequestLoading(false);
             }
           });
         }).catch((e) => {
-          console.log('Error when validating', e);
+          defaultLogger.debug('Error when validating', e);
 
           if (sync) {
             setIsFormInvalid(true);
@@ -1017,7 +1018,7 @@ const Component = () => {
             setQuoteAliveUntil(rs.aliveUntil);
           }
         }).catch((e) => {
-          console.log('Error when getLatestSwapQuote', e);
+          defaultLogger.error('Error when getLatestSwapQuote', e);
         }).finally(() => {
           if (sync) {
             setHandleRequestLoading(false);

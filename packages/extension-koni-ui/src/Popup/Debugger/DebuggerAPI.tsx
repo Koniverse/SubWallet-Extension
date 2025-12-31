@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MessageTypesWithSubscriptions } from '@subwallet/extension-base/background/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { subscribeMessage } from '@subwallet/extension-koni-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Form, Input, Select } from '@subwallet/react-ui';
@@ -227,7 +228,7 @@ const Component = ({ className }: ComponentProps) => {
       const request = JSON.parse(formValues?.payload || 'null');
 
       const callback = (response: any) => {
-        console.debug(formValues?.api, response);
+        defaultLogger.debug(formValues?.api || 'unknown', response);
         setResponse(JSON.stringify(response, null, 2));
       };
 
@@ -236,7 +237,7 @@ const Component = ({ className }: ComponentProps) => {
 
       unsub = subscription.unsub;
     }).catch((e) => {
-      console.error(e);
+      defaultLogger.error('Failed to subscribe message', e);
     });
   }, []);
 

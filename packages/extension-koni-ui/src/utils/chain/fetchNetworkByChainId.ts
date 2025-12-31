@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AddNetworkToRequestConnect } from '@subwallet/extension-base/background/KoniTypes';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { OnlineEvmChainInfo } from '@subwallet/extension-base/utils';
+
+const logger = createLogger('FetchNetworkByChainId');
 
 const urlChainNetwork = 'https://chainid.network/chains.json';
 const onlineMap: Record<number, OnlineEvmChainInfo> = {};
@@ -18,7 +21,7 @@ const getListEVMChainInfo = async () => {
       });
     }
   } catch (error) {
-    console.log(error);
+    logger.error('Failed to fetch EVM chain info', error);
   }
 
   return onlineMap;
@@ -45,7 +48,7 @@ export const fetchChainInfo = async (chainIdList: string[]) => {
       });
     }
   } catch (e) {
-    console.error(e);
+    logger.error('Failed to fetch chain info', e);
   }
 
   return chainData;

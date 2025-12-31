@@ -4,6 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, AmountDataWithId, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { cancelSubscription, getFreeBalance, subscribeFreeBalance, updateAssetSetting } from '@subwallet/extension-web-ui/messaging';
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
@@ -91,7 +92,7 @@ const useGetBalance = (chain = '', address = '', tokenSlug = '', isSubscribe = f
             return (e: Error) => {
               !cancel && setError(t('Unable to get balance. Please re-enable the network'));
               !cancel && setter(DEFAULT_BALANCE);
-              console.error(e);
+              defaultLogger.error('Unable to get balance', e);
             };
           };
 
@@ -158,7 +159,7 @@ const useGetBalance = (chain = '', address = '', tokenSlug = '', isSubscribe = f
       setIsLoading(true);
       setError(null);
       Object.keys(idMap).forEach((id) => {
-        cancelSubscription(id).catch(console.error);
+        cancelSubscription(id).catch((error) => defaultLogger.error('Failed to cancel subscription', error));
       });
     };
   }, [isRefresh, address, assetRegistry, chain, chainInfo?.name, isChainActive, isSubscribe, isTokenActive, nativeTokenActive, nativeTokenSlug, t, tokenSlug, extrinsicType]);

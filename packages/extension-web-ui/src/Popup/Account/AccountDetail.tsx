@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { CloseIcon, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import AccountAvatar from '@subwallet/extension-web-ui/components/Account/AccountAvatar';
 import InstructionContainer, { InstructionContentType } from '@subwallet/extension-web-ui/components/InstructionContainer';
@@ -223,7 +224,7 @@ const Component: React.FC<Props> = (props: Props) => {
     }
 
     editAccount(account.address, name.trim())
-      .catch(console.error)
+      .catch((error) => defaultLogger.error('Failed to edit account', error))
       .finally(() => {
         setSaving(false);
       });

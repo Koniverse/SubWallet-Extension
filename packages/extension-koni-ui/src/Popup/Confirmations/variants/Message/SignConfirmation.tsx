@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SigningRequest } from '@subwallet/extension-base/background/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { AccountItemWithProxyAvatar, ConfirmationGeneralInfo, ViewDetailIcon } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useMetadata, useOpenDetailModal, useParseSubstrateRequestPayload } from '@subwallet/extension-koni-ui/hooks';
 import { enableChain } from '@subwallet/extension-koni-ui/messaging';
@@ -14,6 +15,8 @@ import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+
+const logger = createLogger('SignConfirmation');
 
 import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 import { SignerPayloadJSON } from '@polkadot/types/types';
@@ -53,7 +56,7 @@ function Component ({ className, request }: Props) {
 
       !chainState.active && enableChain(chainInfo.slug, false)
         .then(noop)
-        .catch(console.error);
+        .catch((error) => logger.error('Failed to enable chain', error));
     }
   }, [chainStateMap, chainInfo, isMessage]);
 

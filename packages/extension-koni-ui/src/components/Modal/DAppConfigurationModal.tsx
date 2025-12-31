@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { ActionItemType, ActionModal } from '@subwallet/extension-koni-ui/components';
 import { DAPP_CONFIGURATION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
@@ -13,6 +14,8 @@ import { ArrowsLeftRight, Plugs, PlugsConnected, ShieldCheck, ShieldSlash, X } f
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
+
+const logger = createLogger('DAppConfigurationModal');
 
 type Props = ThemeProps & {
   authInfo: AuthUrlInfo;
@@ -45,7 +48,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
             .then(({ list }) => {
               updateAuthUrls(list);
             })
-            .catch(console.error);
+            .catch((error) => logger.error('Failed to toggle authorization', error));
           onCloseActionModal();
         }
       },
@@ -55,7 +58,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
         iconBackgroundColor: token.colorWarning,
         title: t('ui.DAPP.components.Modal.DAppConfiguration.forgetThisSite'),
         onClick: () => {
-          forgetSite(authInfo.id, updateAuthUrls).catch(console.error);
+          forgetSite(authInfo.id, updateAuthUrls).catch((error) => logger.error('Failed to forget site', error));
           onCloseActionModal();
         }
       }
@@ -69,7 +72,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
           iconBackgroundColor: token['gray-3'],
           title: t('ui.DAPP.components.Modal.DAppConfiguration.disconnectAllAccounts'),
           onClick: () => {
-            changeAuthorization(false, authInfo.id, updateAuthUrls).catch(console.error);
+            changeAuthorization(false, authInfo.id, updateAuthUrls).catch((error) => logger.error('Failed to change authorization (disconnect)', error));
             onCloseActionModal();
           }
         },
@@ -79,7 +82,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
           iconBackgroundColor: token['green-6'],
           title: t('ui.DAPP.components.Modal.DAppConfiguration.connectAllAccounts'),
           onClick: () => {
-            changeAuthorization(true, authInfo.id, updateAuthUrls).catch(console.error);
+            changeAuthorization(true, authInfo.id, updateAuthUrls).catch((error) => logger.error('Failed to change authorization (connect)', error));
             onCloseActionModal();
           }
         }

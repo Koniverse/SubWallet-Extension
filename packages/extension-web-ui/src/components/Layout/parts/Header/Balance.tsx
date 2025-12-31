@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { balanceNoPrefixFormater, formatNumber } from '@subwallet/extension-base/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { ReceiveQrModal, TokensSelectorModal } from '@subwallet/extension-web-ui/components/Modal';
 import { AccountSelectorModal } from '@subwallet/extension-web-ui/components/Modal/AccountSelectorModal';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
@@ -47,7 +48,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const [reloading, setReloading] = useState(false);
 
   const onChangeShowBalance = useCallback(() => {
-    saveShowBalance(!isShowBalance).catch(console.error);
+    saveShowBalance(!isShowBalance).catch((error) => defaultLogger.error('Failed to save show balance', error));
   }, [isShowBalance]);
 
   const _tokenGroupSlug = useMemo(() => {
@@ -133,7 +134,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   }, [activeModal, buyInfos]);
 
   useEffect(() => {
-    dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance']).catch(console.error);
+    dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance']).catch((error) => defaultLogger.error('Failed to await stores', error));
   }, [dataContext]);
 
   const onOpenSendFund = useCallback(() => {
@@ -191,7 +192,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const reloadBalance = useCallback(() => {
     setReloading(true);
     reloadCron({ data: 'balance' })
-      .catch(console.error)
+      .catch((error) => defaultLogger.error('Failed to reload balance', error))
       .finally(() => {
         setReloading(false);
       });

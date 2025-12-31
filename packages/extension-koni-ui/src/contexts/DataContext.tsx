@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { ping } from '@subwallet/extension-koni-ui/messaging';
 import { persistor, store, StoreName } from '@subwallet/extension-koni-ui/stores';
 import { getMissionPoolData, getOldChainPrefixData, subscribeAccountsData, subscribeAddressBook, subscribeAliveProcess, subscribeAssetLogoMaps, subscribeAssetRegistry, subscribeAssetSettings, subscribeAuthorizeRequests, subscribeAuthUrls, subscribeBalance, subscribeBuyServices, subscribeBuyTokens, subscribeCampaignBannerData, subscribeCampaignConfirmationData, subscribeCampaignPopupData, subscribeCampaignPopupVisibility, subscribeChainInfoMap, subscribeChainLogoMaps, subscribeChainStakingMetadata, subscribeChainStateMap, subscribeChainStatusMap, subscribeConfirmationRequests, subscribeConfirmationRequestsBitcoin, subscribeConfirmationRequestsCardano, subscribeConfirmationRequestsTon, subscribeConnectWCRequests, subscribeCrowdloan, subscribeKeyringState, subscribeLedgerGenericAllowNetworks, subscribeMantaPayConfig, subscribeMantaPaySyncingState, subscribeMetadataRequests, subscribeMultiChainAssetMap, subscribeNftCollections, subscribeNftItems, subscribePrice, subscribePriorityTokens, subscribeProcessingCampaign, subscribeRewardHistory, subscribeSigningRequests, subscribeStaking, subscribeStakingNominatorMetadata, subscribeStakingReward, subscribeSwapPairs, subscribeTransactionRequests, subscribeTxHistory, subscribeUiSettings, subscribeUnreadNotificationCount, subscribeWalletConnectSessions, subscribeWCNotSupportRequests, subscribeXcmRefMap, subscribeYieldMinAmountPercent, subscribeYieldPoolInfo, subscribeYieldPositionInfo, subscribeYieldReward } from '@subwallet/extension-koni-ui/stores/utils';
@@ -8,6 +9,8 @@ import Bowser from 'bowser';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
+
+const logger = createLogger('DataContext');
 
 interface DataContextProviderProps {
   children?: React.ReactElement;
@@ -185,7 +188,7 @@ export function initBasicData () {
 export const DataContext = React.createContext(_DataContext);
 
 export const DataContextProvider = ({ children }: DataContextProviderProps) => {
-  ping().catch(console.error);
+  ping().catch((error) => logger.error('Failed to ping', error));
 
   // Init basic data
   initBasicData();

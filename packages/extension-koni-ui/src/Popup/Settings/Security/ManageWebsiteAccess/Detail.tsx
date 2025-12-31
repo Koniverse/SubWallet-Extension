@@ -4,6 +4,7 @@
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { AccountChainType, AccountJson, AccountProxy, AccountSignMode } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { AccountProxyItem, DAppConfigurationModal, EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DAPP_CONFIGURATION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
@@ -97,7 +98,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
       });
 
       changeAuthorizationPerSite({ values: newAllowedMap, id: authInfo.id })
-        .catch(console.log)
+        .catch((error) => defaultLogger.debug('Failed to change authorization per site', error))
         .finally(() => {
           setPendingMap((prevMap) => {
             const newMap = { ...prevMap };

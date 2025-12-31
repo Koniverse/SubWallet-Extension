@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ResponseJsonGetAccountInfo } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { AlertBox, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import AvatarGroup from '@subwallet/extension-web-ui/components/Account/Info/AvatarGroup';
 import CloseIcon from '@subwallet/extension-web-ui/components/Icon/CloseIcon';
@@ -221,7 +222,7 @@ function Component ({ className }: Props): JSX.Element {
               })
               .catch((e: Error) => {
                 setRequirePassword(false);
-                console.error(e);
+                defaultLogger.error('Invalid JSON file', e);
                 setFileValidateState({
                   status: 'error',
                   message: t<string>('Invalid JSON file')

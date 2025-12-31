@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { BasicInputWrapper } from '@subwallet/extension-web-ui/components';
 import { FormInstance, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Input, InputRef } from '@subwallet/react-ui';
@@ -60,7 +61,7 @@ const Component: React.ForwardRefRenderFunction<InputRef, Props> = (props: Props
       }
     }
 
-    form.validateFields(validates).catch(console.error);
+    form.validateFields(validates).catch((error) => defaultLogger.error('Failed to validate fields', error));
   }, [form, formName, index, prefix]);
 
   const onPaste: ClipboardEventHandler<HTMLInputElement> = useCallback((event) => {
@@ -90,7 +91,7 @@ const Component: React.ForwardRefRenderFunction<InputRef, Props> = (props: Props
 
     form.setFieldsValue(result);
 
-    form.validateFields(validates).catch(console.error);
+    form.validateFields(validates).catch((error) => defaultLogger.error('Failed to validate fields', error));
   }, [form, prefix]);
 
   const _onFocus: FocusEventHandler<HTMLInputElement> = useCallback((event) => {

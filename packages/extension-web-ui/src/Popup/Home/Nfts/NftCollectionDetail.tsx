@@ -3,6 +3,7 @@
 
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _isCustomAsset, _isSmartContractToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { EmptyList, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import NoContent, { PAGE_TYPE } from '@subwallet/extension-web-ui/components/NoContent';
 import { SHOW_3D_MODELS_CHAIN } from '@subwallet/extension-web-ui/constants';
@@ -138,9 +139,9 @@ function Component ({ className = '', collectionInfo, nftList }: Props): React.R
               });
             }
           })
-          .catch(console.log);
+          .catch((error) => defaultLogger.debug('Failed to fetch NFT collection detail', error));
       }
-    }).catch(console.log);
+    }).catch((error) => defaultLogger.error('Failed to fetch NFT collection detail', error));
   }, [collectionInfo.originAsset, goBack, handleSimpleConfirmModal, showNotification, t]);
 
   const subHeaderButton: ButtonProps[] = [

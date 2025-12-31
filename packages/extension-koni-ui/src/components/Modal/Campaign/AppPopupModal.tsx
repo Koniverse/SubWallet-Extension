@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { YieldPoolType } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import AppInstructionModal from '@subwallet/extension-koni-ui/components/Modal/Campaign/AppInstructionModal';
 import ContentGenerator from '@subwallet/extension-koni-ui/components/StaticContent/ContentGenerator';
 import { APP_INSTRUCTION_DATA, APP_INSTRUCTION_MODAL, APP_POPUP_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -45,7 +46,7 @@ const Component: React.FC<Props> = (props: Props) => {
     try {
       return JSON.parse(appInstructionData || '[]') as StaticDataProps[];
     } catch (e) {
-      console.error(e);
+      defaultLogger.error('Failed to parse app instruction data', e);
 
       return [];
     }
@@ -91,7 +92,7 @@ const Component: React.FC<Props> = (props: Props) => {
         } else {
           onAccept(url);
         }
-      }).catch((e) => console.log(e));
+      }).catch((e) => defaultLogger.debug('Failed to toggle campaign popup', e));
     },
     [currentInstructionData, instructionButton, onAccept, activeModal]
   );

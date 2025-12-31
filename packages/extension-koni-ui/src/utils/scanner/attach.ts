@@ -1,12 +1,15 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { ETHEREUM_PREFIX, SCAN_TYPE, SECRET_PREFIX, SUBSTRATE_PREFIX } from '@subwallet/extension-koni-ui/constants';
 import { QrAccount } from '@subwallet/extension-koni-ui/types';
 
 import { isHex } from '@polkadot/util';
 import { isEthereumAddress } from '@polkadot/util-crypto';
+
+const logger = createLogger('ScannerAttach');
 
 export const qrSignerScan = (data: string): QrAccount | null => {
   const arr: string[] = data.split(':');
@@ -95,7 +98,7 @@ export const readOnlyScan = (data: string): QrAccount | null => {
       isReadOnly: true
     };
   } catch (e) {
-    console.log(e);
+    logger.error('Failed to read only scan', e);
 
     return null;
   }

@@ -5,6 +5,7 @@ import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/backg
 import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { NominationInfo, SubmitChangeValidatorStaking, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
 import { StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
@@ -26,6 +27,8 @@ import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending, ThumbsUp } fro
 import React, { forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
+
+const logger = createLogger('ChangeValidator');
 
 interface Props extends ThemeProps, BasicInputWrapper {
   modalId: string;
@@ -427,7 +430,7 @@ const Component = (props: Props) => {
   useEffect(() => {
     fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningValidatorRecommendation) => {
       setDefaultValidatorMap(earningValidatorRecommendation);
-    }).catch(console.error);
+    }).catch((error) => logger.error('Failed to fetch static data for direct nomination validator', error));
   }, []);
 
   useEffect(() => {

@@ -3,6 +3,7 @@
 
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/request-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { stripUrl } from '@subwallet/extension-base/utils';
 import { BasicInputEvent, ChainSelector } from '@subwallet/extension-koni-ui/components';
 import { AUTHORIZE_TYPE_SUPPORTS_NETWORK_SWITCH, SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -15,6 +16,8 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import useNotification from '../../hooks/common/useNotification';
+
+const logger = createLogger('SwitchNetworkAuthorizeModal');
 
 export interface SwitchNetworkAuthorizeModalProps {
   authUrlInfo: AuthUrlInfo;
@@ -67,7 +70,7 @@ function Component ({ authUrlInfo, className, needsTabAuthCheck, onCancel, onCom
           message: t('ui.DAPP.components.Modal.SwitchNetworkAuthorize.switchedNetworkSuccessfully')
         });
         onComplete(list);
-      }).catch(console.error).finally(() => {
+      }).catch((error) => logger.error('Failed to switch current network authorization', error)).finally(() => {
         onCancel();
 
         if (isSync) {

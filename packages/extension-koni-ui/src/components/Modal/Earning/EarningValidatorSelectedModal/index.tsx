@@ -5,6 +5,7 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { NominationInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { StakingNominationItem, StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
@@ -24,6 +25,8 @@ import React, { forwardRef, SyntheticEvent, useCallback, useContext, useEffect, 
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
+
+const logger = createLogger('EarningValidatorSelectedModal');
 
 import ChangeBittensorValidator from './ChangeBittensorValidator';
 import ChangeValidator from './ChangeValidator';
@@ -275,7 +278,7 @@ const Component = (props: Props) => {
             store.dispatch({ type: 'earning/updatePoolTargets', payload: result });
           }
         })
-        .catch(console.error)
+        .catch((error) => logger.error('Failed to fetch pool target', error))
         .finally(() => {
           if (!unmount) {
             setTargetLoading(false);

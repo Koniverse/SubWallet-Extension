@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SWStorage } from '@subwallet/extension-base/storage';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const logger = createLogger('Fallback');
 
 const storage = SWStorage.instance;
 
@@ -74,7 +77,7 @@ global.chrome.storage = {
         }));
 
         return rs;
-      })().then((callback)).catch(console.error);
+      })().then((callback)).catch((error) => logger.error('Failed to get storage', error));
     },
     // @ts-ignore
     set: (input: object, callback?: () => void) => {
@@ -82,13 +85,13 @@ global.chrome.storage = {
         await storage.setItem(k, JSON.stringify(v));
       })).then(() => {
         callback && callback();
-      }).catch(console.error);
+      }).catch((error) => logger.error('Failed to set storage', error));
     },
     // @ts-ignore
     remove: (key: string, value: any, callback?: () => void) => {
       storage.removeItem(key).then(() => {
         callback && callback();
-      }).catch(console.error);
+      }).catch((error) => logger.error('Failed to remove storage item', error));
     }
   }
 };

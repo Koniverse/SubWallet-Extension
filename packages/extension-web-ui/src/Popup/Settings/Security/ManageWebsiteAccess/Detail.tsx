@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AuthUrlInfo } from '@subwallet/extension-base/background/handlers/State';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { AccountJson } from '@subwallet/extension-base/types';
 import { AccountItemWithName, EmptyList, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { ActionItemType, ActionModal } from '@subwallet/extension-web-ui/components/Modal/ActionModal';
@@ -71,7 +72,7 @@ function Component ({ accountAuthType, authInfo, className = '', goBack, origin,
             .then(({ list }) => {
               updateAuthUrls(list);
             })
-            .catch(console.error);
+            .catch((error) => defaultLogger.error('Failed to toggle authorization', error));
           onCloseActionModal();
         }
       },
@@ -81,7 +82,7 @@ function Component ({ accountAuthType, authInfo, className = '', goBack, origin,
         iconBackgroundColor: token.colorWarning,
         title: t('Forget this site'),
         onClick: () => {
-          forgetSite(origin, updateAuthUrls).catch(console.error);
+          forgetSite(origin, updateAuthUrls).catch((error) => defaultLogger.error('Failed to forget site', error));
           onCloseActionModal();
         }
       }
@@ -95,7 +96,7 @@ function Component ({ accountAuthType, authInfo, className = '', goBack, origin,
           iconBackgroundColor: token['gray-3'],
           title: t('Disconnect all accounts'),
           onClick: () => {
-            changeAuthorization(false, origin, updateAuthUrls).catch(console.error);
+            changeAuthorization(false, origin, updateAuthUrls).catch((error) => defaultLogger.error('Failed to disconnect all accounts', error));
             onCloseActionModal();
           }
         },
@@ -105,7 +106,7 @@ function Component ({ accountAuthType, authInfo, className = '', goBack, origin,
           iconBackgroundColor: token['green-6'],
           title: t('Connect all accounts'),
           onClick: () => {
-            changeAuthorization(true, origin, updateAuthUrls).catch(console.error);
+            changeAuthorization(true, origin, updateAuthUrls).catch((error) => defaultLogger.error('Failed to connect all accounts', error));
             onCloseActionModal();
           }
         }
@@ -126,7 +127,7 @@ function Component ({ accountAuthType, authInfo, className = '', goBack, origin,
         };
       });
       changeAuthorizationPerAccount(item.address, !isEnabled, origin, updateAuthUrls)
-        .catch(console.log)
+        .catch((error) => defaultLogger.error('Failed to change authorization per account', error))
         .finally(() => {
           setPendingMap((prevMap) => {
             const newMap = { ...prevMap };

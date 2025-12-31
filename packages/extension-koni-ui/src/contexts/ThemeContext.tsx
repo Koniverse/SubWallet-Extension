@@ -3,6 +3,7 @@
 
 import type { ThemeProps } from '../types';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { GLOBAL_ALERT_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useExtensionDisplayModes } from '@subwallet/extension-koni-ui/hooks';
@@ -15,6 +16,8 @@ import { useSelector } from 'react-redux';
 import styled, { createGlobalStyle, ThemeProvider as StyledComponentThemeProvider } from 'styled-components';
 
 import { Theme } from '../types';
+
+const logger = createLogger('ThemeContext');
 
 interface Props {
   children: React.ReactNode;
@@ -486,7 +489,7 @@ export function ThemeProvider ({ children }: ThemeProviderProps): React.ReactEle
   useEffect(() => {
     dataContext.awaitStores(['settings']).then(() => {
       setThemeReady(true);
-    }).catch(console.error);
+    }).catch((error) => logger.error('Failed to await stores', error));
   }, [dataContext]);
 
   // Reduce number of re-rendering

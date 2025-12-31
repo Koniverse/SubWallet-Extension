@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { parseUri } from '@walletconnect/utils';
 import { TFunction } from 'i18next';
 
@@ -17,7 +18,7 @@ export const validWalletConnectUri = (data: string, t: TFunction): string | null
       return t('Invalid URI');
     }
   } catch (e) {
-    console.error({ error: e });
+    defaultLogger.error({ error: e });
 
     return (e as Error).message;
   }

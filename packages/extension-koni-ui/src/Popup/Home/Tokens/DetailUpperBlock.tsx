@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { balanceNoPrefixFormater, formatNumber } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { saveShowBalance } from '@subwallet/extension-koni-ui/messaging';
@@ -15,6 +16,8 @@ import { ArrowsLeftRight, CaretLeft, CopySimple, PaperPlaneTilt, ShoppingCartSim
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+
+const logger = createLogger('DetailUpperBlock');
 
 import { ActionButtonsContainer } from './ActionButtonsContainer';
 
@@ -53,7 +56,7 @@ function Component (
   const { isShowBalance } = useSelector((state: RootState) => state.settings);
   const { currencyData } = useSelector((state: RootState) => state.price);
   const onChangeShowBalance = useCallback(() => {
-    saveShowBalance(!isShowBalance).catch(console.error);
+    saveShowBalance(!isShowBalance).catch((error) => logger.error('Failed to save show balance setting', error));
   }, [isShowBalance]);
 
   return (

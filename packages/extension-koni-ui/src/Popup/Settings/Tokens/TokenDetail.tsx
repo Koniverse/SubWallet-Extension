@@ -3,6 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _getContractAddressOfToken, _isAssetHubToken, _isCustomAsset, _isSmartContractToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
@@ -21,6 +22,8 @@ import { useLocation } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+
+const logger = createLogger('TokenDetail');
 
 type WrapperProps = ThemeProps;
 
@@ -69,7 +72,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
             message: t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.deletedTokenUnsuccessfully')
           });
         });
-    }).catch(console.log);
+    }).catch((error) => logger.error('Failed to handle delete token', error));
   }, [goBack, handleSimpleConfirmModal, showNotification, t, tokenInfo.slug]);
 
   const subHeaderButton: ButtonProps[] = useMemo(() => {
@@ -112,7 +115,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
   const handleCopyContractAddress = useCallback(() => {
     const contractAddress = _getContractAddressOfToken(tokenInfo);
 
-    navigator.clipboard.writeText(contractAddress).then().catch(console.error);
+    navigator.clipboard.writeText(contractAddress).then().catch((error) => logger.error('Failed to copy contract address to clipboard', error));
 
     showNotification({
       message: t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.copiedToClipboard')
@@ -343,7 +346,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
       if (sync && !tokenInfo) {
         goBack();
       }
-    }).catch(console.error);
+    }).catch((error) => logger.error('Failed to load token info', error));
 
     return () => {
       sync = false;

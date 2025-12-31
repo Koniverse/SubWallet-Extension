@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { detectTranslate } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { pingUnifiedAccountMigrationDone } from '@subwallet/extension-koni-ui/messaging';
 import { ResultAccountProxyItem, ResultAccountProxyItemType } from '@subwallet/extension-koni-ui/Popup/MigrateAccount/SummaryView/ResultAccountProxyItem';
@@ -15,6 +16,8 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { Trans } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+
+const logger = createLogger('SummaryView');
 
 type Props = ThemeProps & {
   resultProxyIds: string[];
@@ -68,7 +71,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
 
   useEffect(() => {
     // notice to background that account migration is done
-    pingUnifiedAccountMigrationDone().catch(console.error);
+    pingUnifiedAccountMigrationDone().catch((error) => logger.error('Failed to ping unified account migration done', error));
   }, []);
 
   return (

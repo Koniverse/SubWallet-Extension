@@ -4,6 +4,7 @@
 import { MessageTypes, MessageTypesWithNoSubscriptions, MessageTypesWithNullRequest, MessageTypesWithSubscriptions, RequestTypes, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
 import { Message } from '@subwallet/extension-base/types';
 import { getId } from '@subwallet/extension-base/utils/getId';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 
 import { VirtualMessageCenter } from './VirtualMessageCenter';
 
@@ -119,7 +120,7 @@ export function lazySendMessage<TMessageType extends MessageTypesWithNoSubscript
 
   rs.promise.then((data) => {
     callback(data);
-  }).catch(console.error);
+  }).catch((error) => defaultLogger.error('Failed to handle lazy send message promise', error));
 
   return rs;
 }
@@ -150,7 +151,7 @@ export function lazySubscribeMessage<TMessageType extends MessageTypesWithSubscr
 
   rs.promise.then((data) => {
     !cancel && callback(data);
-  }).catch(console.error);
+  }).catch((error) => defaultLogger.error('Failed to handle lazy subscribe message promise', error));
 
   return rs;
 }

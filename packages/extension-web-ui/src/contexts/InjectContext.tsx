@@ -3,6 +3,7 @@
 
 import SubWalletEvmProvider from "@subwallet/extension-base/page/evm";
 import { addLazy, createPromiseHandler } from '@subwallet/extension-base/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { Injected, InjectedAccountWithMeta, Unsubcall } from '@subwallet/extension-inject/types';
 import { DisconnectExtensionModal } from '@subwallet/extension-web-ui/components';
 import { AutoConnect, ENABLE_INJECT, PREDEFINED_WALLETS, SELECT_EXTENSION_MODAL, win } from '@subwallet/extension-web-ui/constants';
@@ -151,7 +152,7 @@ class InjectHandler {
   onLoaded (callback?: VoidFunction) {
     this.loadingPromiseHandler.promise
       .then(callback)
-      .catch(console.error);
+      .catch((error) => defaultLogger.error('Failed to load inject handler', error));
   }
 
   async enable (walletKey: string) {
@@ -218,7 +219,7 @@ class InjectHandler {
             }
           });
       } catch (e) {
-        console.error(e);
+        defaultLogger.error('Failed to enable wallet', e);
       } finally {
         setTimeout(() => {
           this.loadingSubject.next(false);
@@ -313,7 +314,7 @@ class InjectHandler {
 
     if (this.evmWallet) {
       // Some wallet not fire event on first time
-      this.evmWallet.request<string[]>({ method: 'eth_accounts' }).then(listener).catch(console.warn);
+      this.evmWallet.request<string[]>({ method: 'eth_accounts' }).then(listener).catch((error) => defaultLogger.warn('Failed to request eth_accounts', error));
       this.evmWallet.on('accountsChanged', listener);
     }
 
@@ -418,7 +419,7 @@ export const InjectContextProvider: React.FC<Props> = ({ children }: Props) => {
 
       if (installedWallet) {
         injectHandler.enable(installedWallet.key).catch((e) => {
-          console.error(e);
+          defaultLogger.error('Failed to enable installed wallet', e);
           activeModal(SELECT_EXTENSION_MODAL);
         });
 
@@ -430,7 +431,7 @@ export const InjectContextProvider: React.FC<Props> = ({ children }: Props) => {
   }, [activeModal]);
 
   const enableInject = useCallback((walletKey: string) => {
-    injectHandler.enable(walletKey).catch(console.error);
+    injectHandler.enable(walletKey).catch((error) => defaultLogger.error('Failed to enable inject', error));
   }, []);
 
   const disableInject = useCallback(() => {

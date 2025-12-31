@@ -4,6 +4,7 @@
 import type { Chain } from '@subwallet/extension-chains/types';
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { getMetadata, getMetadataRaw } from '@subwallet/extension-web-ui/messaging';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -37,7 +38,7 @@ export default function useMetadata (genesisHash?: string | null, isPartial?: bo
         getMetadata(genesisHash, isPartial)
           .then(setChain)
           .catch((error): void => {
-            console.error(error);
+            defaultLogger.error('Failed to get metadata', error);
             setChain(null);
           })
           .finally(() => {
@@ -55,7 +56,7 @@ export default function useMetadata (genesisHash?: string | null, isPartial?: bo
           }
         })
         .catch((e) => {
-          console.error(e);
+          defaultLogger.error('Failed to get metadata raw', e);
           getChainByMetaStore();
         });
     } else {

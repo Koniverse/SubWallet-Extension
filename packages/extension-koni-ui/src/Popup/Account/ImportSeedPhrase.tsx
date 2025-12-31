@@ -3,6 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountProxyType, ResponseMnemonicValidateV2 } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { AccountNameModal, CloseIcon, Layout, PageWrapper, PhraseNumberSelector, SeedPhraseInput } from '@subwallet/extension-koni-ui/components';
 import { ACCOUNT_NAME_MODAL, IMPORT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
@@ -102,7 +103,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       try {
         form.setFieldValue('phraseNumber', `${words.length}`);
       } catch (error) {
-        console.error('Error updating phraseNumber field:', error);
+        defaultLogger.error('Error updating phraseNumber field', error);
       }
     }
   }, [form]);

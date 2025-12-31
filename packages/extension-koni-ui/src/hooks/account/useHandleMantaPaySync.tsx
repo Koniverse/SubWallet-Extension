@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { initSyncMantaPay, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { Button } from '@subwallet/react-ui';
@@ -10,6 +11,8 @@ import { useNavigate } from 'react-router-dom';
 
 import useNotification from '../common/useNotification';
 import useIsPopup from '../dom/useIsPopup';
+
+const logger = createLogger('useHandleMantaPaySync');
 
 export default function useHandleMantaPaySync () {
   const notify = useNotification();
@@ -27,14 +30,14 @@ export default function useHandleMantaPaySync () {
   return useCallback((address: string) => {
     const onOk = () => {
       initSyncMantaPay(address)
-        .catch(console.error);
+        .catch((error) => logger.error('Failed to init sync MantaPay', error));
 
       if (isPopup) {
         windowOpen({
           allowedPath: '/accounts/detail',
           subPath: `/${address}`
         })
-          .catch(console.warn);
+          .catch((error) => logger.warn('Failed to open window', error));
       } else {
         navigate(`/accounts/detail/${address}`);
       }

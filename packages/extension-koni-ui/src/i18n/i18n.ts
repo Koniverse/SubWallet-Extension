@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DEFAULT_LANGUAGE, LANGUAGE } from '@subwallet/extension-base/constants';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import Backend from './Backend';
+
+const logger = createLogger('i18n');
 
 i18next
   .use(initReactI18next)
@@ -25,7 +28,7 @@ i18next
     returnNull: false
   })
   .catch((error: Error): void =>
-    console.log('i18n: failure', error)
+    logger.error('i18n: failure', error)
   );
 
 export default i18next;

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WalletUnlockType } from '@subwallet/extension-base/background/KoniTypes';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
 import { EDIT_AUTO_LOCK_TIME_MODAL, EDIT_UNLOCK_TYPE_MODAL } from '@subwallet/extension-web-ui/constants';
@@ -155,11 +156,11 @@ const Component: React.FC<Props> = (props: Props) => {
           if (openNewTab) {
             windowOpen({ allowedPath: '/settings/security' })
               .catch((e: Error) => {
-                console.log(e);
+                defaultLogger.error('Failed to open window for security settings', e);
               });
           }
         })
-        .catch(console.error)
+        .catch((error) => defaultLogger.error('Failed to save camera setting', error))
         .finally(() => {
           setLoadingCamera(false);
         });
@@ -171,7 +172,7 @@ const Component: React.FC<Props> = (props: Props) => {
       setLoadingChainPatrol(true);
 
       saveEnableChainPatrol(!currentValue)
-        .catch(console.error)
+        .catch((error) => defaultLogger.error('Failed to save enable chain patrol', error))
         .finally(() => {
           setLoadingChainPatrol(false);
         });
@@ -266,7 +267,7 @@ const Component: React.FC<Props> = (props: Props) => {
             track.stop();
           });
         })
-        .catch(console.error);
+        .catch((error) => defaultLogger.error('Failed to stop camera track', error));
     }
   }, [camera, isCheckCamera, navigate]);
 

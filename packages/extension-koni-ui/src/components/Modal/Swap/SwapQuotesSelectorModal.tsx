@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SwapQuote } from '@subwallet/extension-base/types/swap';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import SwapQuotesItem from '@subwallet/extension-koni-ui/components/Field/Swap/SwapQuotesItem';
 import { QuoteResetTime } from '@subwallet/extension-koni-ui/components/Swap';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -40,7 +41,7 @@ const Component: React.FC<Props> = (props: Props) => {
     if (quoteResult) {
       setLoading(true);
       applyQuote(quoteResult).catch((error) => {
-        console.error('Error when confirm swap quote:', error);
+        defaultLogger.error('Error when confirm swap quote', error);
       }).finally(() => {
         onCancel();
         setLoading(false);

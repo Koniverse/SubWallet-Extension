@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
 import SwLogosMap from '@subwallet/extension-web-ui/assets/subwallet';
 import { BaseModal, PageWrapper } from '@subwallet/extension-web-ui/components';
@@ -120,7 +121,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           rightIcon: ArrowsOut,
           title: t('Expand view'),
           onClick: () => {
-            windowOpen({ allowedPath: '/' }).catch(console.error);
+            windowOpen({ allowedPath: '/' }).catch((error) => defaultLogger.error('Failed to open window for expand view', error));
           },
           isHidden: !isPopup
         },

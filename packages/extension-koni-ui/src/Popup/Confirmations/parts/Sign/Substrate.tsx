@@ -4,6 +4,7 @@
 import { ExtrinsicType, NotificationType, POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestSign } from '@subwallet/extension-base/background/types';
 import { AccountSignMode } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox, AlertModal } from '@subwallet/extension-koni-ui/components';
 import { CONFIRMATION_QR_MODAL, NotNeedMigrationGens, SUBSTRATE_GENERIC_KEY, SUBSTRATE_MIGRATION_KEY, SubstrateLedgerSignModeSupport } from '@subwallet/extension-koni-ui/constants';
@@ -302,7 +303,7 @@ const Component: React.FC<Props> = (props: Props) => {
     setTimeout(() => {
       handleConfirm(id)
         .catch((e) => {
-          console.log(e);
+          defaultLogger.debug('Confirm error', e);
         })
         .finally(() => {
           setLoading(false);
@@ -316,7 +317,7 @@ const Component: React.FC<Props> = (props: Props) => {
     setTimeout(() => {
       handleSignature(id, signature)
         .catch((e) => {
-          console.log(e);
+          defaultLogger.debug('Signature error', e);
         })
         .finally(() => {
           setLoading(false);
@@ -349,7 +350,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
           onApproveSignature({ signature });
         } catch (e) {
-          console.error(e);
+          defaultLogger.error('Failed to approve signature', e);
         }
 
         setLoading(false);
@@ -394,7 +395,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onApproveSignature({ signature });
           }
         } catch (e) {
-          console.error(e);
+          defaultLogger.error('Failed to approve signature', e);
         }
 
         setLoading(false);
@@ -432,7 +433,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onApproveSignature({ signature, signedTransaction });
         })
         .catch((e) => {
-          console.error(e);
+          defaultLogger.error('Failed to approve signature', e);
         })
         .finally(() => {
           setLoading(false);

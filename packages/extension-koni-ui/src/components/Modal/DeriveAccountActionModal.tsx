@@ -4,6 +4,7 @@
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountChainType, AccountProxyType, DerivePathInfo } from '@subwallet/extension-base/types';
 import { addLazy, detectTranslate, getAccountChainTypeFromKeypairType } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { DERIVE_ACCOUNT_ACTION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useCompleteCreateAccount, useGetAccountProxyById, useTranslation, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
@@ -19,6 +20,8 @@ import { RuleObject } from 'rc-field-form/lib/interface';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 import styled from 'styled-components';
+
+const logger = createLogger('DeriveAccountActionModal');
 
 import { AccountChainTypeLogos, AccountProxyTypeTag } from '../AccountProxy';
 
@@ -232,7 +235,7 @@ const Component: React.FC<Props> = (props: Props) => {
             }
           }
         })
-        .catch(console.error);
+        .catch((error) => logger.error('Failed to derive suggest', error));
     }
 
     return () => {

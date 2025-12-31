@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { initSyncMantaPay, windowOpen } from '@subwallet/extension-web-ui/messaging';
 import { Button } from '@subwallet/react-ui';
@@ -27,14 +28,14 @@ export default function useHandleMantaPaySync () {
   return useCallback((address: string) => {
     const onOk = () => {
       initSyncMantaPay(address)
-        .catch(console.error);
+        .catch((error) => defaultLogger.error('Failed to init sync MantaPay', error));
 
       if (isPopup) {
         windowOpen({
           allowedPath: '/accounts/detail',
           subPath: `/${address}`
         })
-          .catch(console.warn);
+          .catch((error) => defaultLogger.warn('Failed to open window for MantaPay sync', error));
       } else {
         navigate(`/accounts/detail/${address}`);
       }

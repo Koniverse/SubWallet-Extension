@@ -4,6 +4,7 @@
 import { ExtrinsicStatus, ExtrinsicType, TransactionDirection, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { YIELD_EXTRINSIC_TYPES } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -18,6 +19,8 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
+
+const logger = createLogger('History');
 
 import { HistoryDetailModal } from './Detail';
 
@@ -648,17 +651,17 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (isSubscribed) {
         setRawHistoryList(isSelectedChainEvm ? filterDuplicateItems(res.items) : res.items);
       } else {
-        cancelSubscription(id).catch(console.log);
+        cancelSubscription(id).catch((error) => logger.error('Failed to cancel subscription', error));
       }
     }).catch((e) => {
-      console.log('subscribeTransactionHistory error:', e);
+      logger.error('subscribeTransactionHistory error', e);
     });
 
     return () => {
       isSubscribed = false;
 
       if (id) {
-        cancelSubscription(id).catch(console.log);
+        cancelSubscription(id).catch((error) => logger.error('Failed to cancel subscription on cleanup', error));
       }
     };
   }, [isSelectedChainEvm, selectedAddress, selectedChain]);

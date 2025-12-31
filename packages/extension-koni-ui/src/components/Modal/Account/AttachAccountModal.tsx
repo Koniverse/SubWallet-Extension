@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import BackIcon from '@subwallet/extension-koni-ui/components/Icon/BackIcon';
 import CloseIcon from '@subwallet/extension-koni-ui/components/Icon/CloseIcon';
 import { SettingItemSelection } from '@subwallet/extension-koni-ui/components/Setting/SettingItemSelection';
@@ -19,6 +20,8 @@ import { DeviceTabletCamera, Eye, QrCode, Swatches } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+
+const logger = createLogger('AttachAccountModal');
 
 type Props = ThemeProps;
 
@@ -77,7 +80,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     setStateSelectAccount(true);
 
     if (!isExpanseMode) {
-      windowOpen({ allowedPath: '/accounts/connect-ledger' }).catch(console.error);
+      windowOpen({ allowedPath: '/accounts/connect-ledger' }).catch((error) => logger.error('Failed to open window', error));
       isSidePanelMode && closeSidePanel();
     } else {
       navigate('accounts/connect-ledger');

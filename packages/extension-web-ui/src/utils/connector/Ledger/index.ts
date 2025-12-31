@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { ConvertLedgerError } from '@subwallet/extension-web-ui/types';
 import { TFunction } from 'i18next';
 
@@ -95,7 +96,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
     };
   }
 
-  console.warn('Unknown ledger error', { error });
+  defaultLogger.warn('Unknown ledger error', { error });
 
   if (expandError) {
     return {

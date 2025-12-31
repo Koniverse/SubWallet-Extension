@@ -3,6 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { balanceNoPrefixFormater } from '@subwallet/extension-base/utils';
 import { getEarningImpact } from '@subwallet/extension-koni-ui/messaging';
 import { formatNumber } from '@subwallet/react-ui';
@@ -48,7 +49,7 @@ export const useTaoStakingFee = (
           setEarningRate(impact.rate);
         })
         .catch((error) => {
-          console.error('Failed to get earning impact:', error);
+          defaultLogger.error('Failed to get earning impact', error);
         })
         .finally(() => {
           if (isSync) {

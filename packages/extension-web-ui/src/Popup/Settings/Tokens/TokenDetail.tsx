@@ -3,6 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _getContractAddressOfToken, _isCustomAsset, _isSmartContractToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
@@ -84,7 +85,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             message: t('Deleted token unsuccessfully')
           });
         });
-    }).catch(console.log);
+    }).catch((error) => defaultLogger.error('Failed to delete token', error));
   }, [goBack, handleSimpleConfirmModal, showNotification, t, tokenInfo?.slug]);
 
   const subHeaderButton: ButtonProps[] = useMemo(() => {
@@ -128,7 +129,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const handleCopyContractAddress = useCallback(() => {
     const contractAddress = _getContractAddressOfToken(tokenInfo);
 
-    navigator?.clipboard?.writeText(contractAddress).then().catch(console.error);
+    navigator?.clipboard?.writeText(contractAddress).then().catch((error) => defaultLogger.error('Failed to copy contract address', error));
 
     showNotification({
       message: t('Copied to clipboard')

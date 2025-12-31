@@ -3,6 +3,7 @@
 
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _isCustomAsset, _isSmartContractToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { SHOW_3D_MODELS_CHAIN } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
@@ -22,6 +23,8 @@ import { Image, Trash } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
+
+const logger = createLogger('NftCollectionDetail');
 
 type Props = ThemeProps
 
@@ -159,9 +162,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               });
             }
           })
-          .catch(console.log);
+          .catch((error) => logger.error('Failed to delete custom asset', error));
       }
-    }).catch(console.log);
+    }).catch((error) => logger.error('Failed to handle delete NFT collection', error));
   }, [collectionInfo?.originAsset, goBack, handleSimpleConfirmModal, showNotification, t]);
 
   const subHeaderButton: ButtonProps[] = [
@@ -187,7 +190,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     setIsFetching(true);
     getFullNftList({ contractAddress: collectionInfo?.collectionId, owners: ownerAddresses, chainInfo: chainInfo })
-      .catch(console.error)
+      .catch((error) => logger.error('Failed to get full NFT list', error))
       .finally(() => {
         if (isMounted) {
           setIsFetching(false);

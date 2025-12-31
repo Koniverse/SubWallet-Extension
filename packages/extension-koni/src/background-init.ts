@@ -2,15 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { ActionHandler } from '@subwallet/extension-koni/helper/ActionHandler';
 
 import { xglobal } from '@polkadot/x-global';
+
+const logger = createLogger('BackgroundInit');
 
 const actionHandler = ActionHandler.instance;
 
 xglobal.addEventListener('fetch', function (event: FetchEvent) {
   if (event.request.url.endsWith('popup.html')) {
-    console.log('Open popup tab');
+    logger.info('Open popup tab');
     event.respondWith(new Response('OKs'));
   }
 });

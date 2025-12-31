@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { lazyLoaderMap } from '@subwallet/extension-web-ui/Popup/router';
 import { useEffect } from 'react';
 
@@ -9,7 +10,7 @@ export default function usePreloadView (paths: string[]) {
     paths.forEach((path) => {
       const loader = lazyLoaderMap[path];
 
-      loader?.loadElement().catch(console.error);
+      loader?.loadElement().catch((error) => defaultLogger.error('Failed to preload view', error));
     });
   }, [paths]);
 }

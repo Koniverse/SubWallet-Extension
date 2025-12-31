@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { useIsPopup } from '@subwallet/extension-web-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { convertHexColorToRGBA, openInNewTab } from '@subwallet/extension-web-ui/utils';
@@ -29,7 +30,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const isShowFooter = useMemo(() => {
     const pathName = location.pathname;
 
-    console.log(pathName);
+    defaultLogger.debug('pathName', pathName);
 
     return !['/create-done'].includes(pathName);
   }, [location.pathname]);

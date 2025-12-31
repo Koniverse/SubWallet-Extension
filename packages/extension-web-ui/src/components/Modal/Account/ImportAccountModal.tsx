@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
 import { IMPORT_ACCOUNT_MODAL, IMPORT_SEED_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
@@ -66,7 +67,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const onClickJson = useCallback(() => {
     if (isPopup) {
-      windowOpen({ allowedPath: '/accounts/restore-json' }).catch(console.error);
+      windowOpen({ allowedPath: '/accounts/restore-json' }).catch((error) => defaultLogger.error('Failed to open window for restore JSON', error));
     } else {
       inactiveModal(modalId);
       navigate('/accounts/restore-json');

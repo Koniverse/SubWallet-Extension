@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AuthUrlInfo } from '@subwallet/extension-base/background/handlers/State';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { ActionItemType, ActionModal, EmptyList, FilterModal, Layout, PageWrapper, WebsiteAccessItem } from '@subwallet/extension-web-ui/components';
 import { useDefaultNavigate, useFilterModal } from '@subwallet/extension-web-ui/hooks';
 import { changeAuthorizationAll, forgetAllSite } from '@subwallet/extension-web-ui/messaging';
@@ -119,7 +120,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         iconBackgroundColor: token.colorWarning,
         title: t('Forget all'),
         onClick: () => {
-          forgetAllSite(updateAuthUrls).catch(console.error);
+          forgetAllSite(updateAuthUrls).catch((error) => defaultLogger.error('Failed to forget all sites', error));
           onCloseActionModal();
         }
       },
@@ -129,7 +130,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         iconBackgroundColor: token['gray-3'],
         title: t('Disconnect all'),
         onClick: () => {
-          changeAuthorizationAll(false, updateAuthUrls).catch(console.error);
+          changeAuthorizationAll(false, updateAuthUrls).catch((error) => defaultLogger.error('Failed to disconnect all', error));
           onCloseActionModal();
         }
       },
@@ -139,7 +140,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         iconBackgroundColor: token['green-6'],
         title: t('Connect all'),
         onClick: () => {
-          changeAuthorizationAll(true, updateAuthUrls).catch(console.error);
+          changeAuthorizationAll(true, updateAuthUrls).catch((error) => defaultLogger.error('Failed to connect all', error));
           onCloseActionModal();
         }
       }

@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { LoadingScreen } from '@subwallet/extension-koni-ui/components';
 import ContentGenerator from '@subwallet/extension-koni-ui/components/StaticContent/ContentGenerator';
 import { useFetchMarkdownContentData } from '@subwallet/extension-koni-ui/hooks';
@@ -46,7 +47,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
             setIsFetchingBriefContent(false);
           }
         })
-        .catch((e) => console.log('fetch unified_account_migration_content error:', e));
+        .catch((e) => defaultLogger.error('fetch unified_account_migration_content error', e));
     }
 
     return () => {

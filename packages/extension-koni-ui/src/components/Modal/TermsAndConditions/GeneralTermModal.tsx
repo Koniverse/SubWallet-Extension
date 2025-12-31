@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
 import { GENERAL_TERM_AND_CONDITION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
@@ -35,7 +36,7 @@ const Component = ({ className, onOk }: Props) => {
   useEffect(() => {
     fetchStaticData<string>('term-and-condition', 'index.md', false)
       .then((md) => setStaticData({ md }))
-      .catch((e) => console.log('fetch _termAndCondition error:', e));
+      .catch((e) => defaultLogger.error('fetch _termAndCondition error', e));
   }, []);
 
   const onCheckedInput = useCallback((e: CheckboxChangeEvent) => {

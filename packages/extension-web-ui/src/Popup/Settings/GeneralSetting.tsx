@@ -3,6 +3,7 @@
 
 import { BrowserConfirmationType, CurrencyJson, CurrencyType, LanguageType, ThemeNames } from '@subwallet/extension-base/background/KoniTypes';
 import { ENABLE_LANGUAGES, languageOptions } from '@subwallet/extension-base/constants/i18n';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
 import { GeneralEmptyList, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
@@ -257,7 +258,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     }));
     saveBrowserConfirmationType(value as BrowserConfirmationType)
       .catch((e) => {
-        console.log('saveBrowserConfirmationType error', e);
+        defaultLogger.error('saveBrowserConfirmationType error', e);
       })
       .finally(() => {
         setLoadingMap((prev) => ({

@@ -4,6 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
 import { AlertModal, EmptyList, FilterModal, Layout } from '@subwallet/extension-koni-ui/components';
 import { EarningPositionItem } from '@subwallet/extension-koni-ui/components/Earning';
@@ -23,6 +24,8 @@ import { Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
+
+const logger = createLogger('EarningPositions');
 
 type Props = ThemeProps & {
   earningPositions: YieldPositionInfo[];
@@ -318,7 +321,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
         onClick: () => {
           setLoading(true);
           reloadCron({ data: 'staking' })
-            .catch(console.error).finally(() => {
+            .catch((error) => logger.error('Failed to reload staking cron', error)).finally(() => {
               setTimeout(() => {
                 setLoading(false);
               }, 1000);

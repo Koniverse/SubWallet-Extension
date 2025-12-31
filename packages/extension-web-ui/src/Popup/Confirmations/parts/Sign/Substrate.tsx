@@ -3,6 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestSign } from '@subwallet/extension-base/background/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { AccountJson } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox } from '@subwallet/extension-web-ui/components';
@@ -261,7 +262,7 @@ const Component: React.FC<Props> = (props: Props) => {
     setTimeout(() => {
       handleConfirm(id)
         .catch((e) => {
-          console.log(e);
+          defaultLogger.error('Failed to handle confirm', e);
         })
         .finally(() => {
           setLoading(false);
@@ -275,7 +276,7 @@ const Component: React.FC<Props> = (props: Props) => {
     setTimeout(() => {
       handleSignature(id, signature)
         .catch((e) => {
-          console.log(e);
+          defaultLogger.error('Failed to handle confirm', e);
         })
         .finally(() => {
           setLoading(false);
@@ -308,7 +309,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
           onApproveSignature({ signature });
         } catch (e) {
-          console.error(e);
+          defaultLogger.error('Failed to sign with ledger', e);
         }
 
         setLoading(false);
@@ -353,7 +354,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onApproveSignature({ signature });
           }
         } catch (e) {
-          console.error(e);
+          defaultLogger.error('Failed to sign with ledger', e);
         }
 
         setLoading(false);
@@ -391,7 +392,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onApproveSignature({ signature, signedTransaction });
         })
         .catch((e: Error) => {
-          console.error(e);
+          defaultLogger.error('Failed to sign with ledger', e);
           notify({
             message: convertErrorMessage(e),
             type: 'error',

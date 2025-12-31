@@ -3,6 +3,7 @@
 
 import { ConfirmationDefinitions, ConfirmationResult, EvmSendTransactionRequest, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountSignMode } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import { CONFIRMATION_QR_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { InjectContext } from '@subwallet/extension-koni-ui/contexts/InjectContext';
@@ -126,7 +127,7 @@ const Component: React.FC<Props> = (props: Props) => {
     setTimeout(() => {
       handleSignature(type, id, signature.signature)
         .catch((e) => {
-          console.log(e);
+          defaultLogger.debug('Signature error', e);
         })
         .finally(() => {
           setLoading(false);
@@ -161,7 +162,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onApproveSignature({ signature });
         })
         .catch((e: Error) => {
-          console.log(e);
+          defaultLogger.debug('Sign error', e);
           setLoading(false);
         });
     });
@@ -198,7 +199,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onApproveSignature({ signature });
         })
         .catch((e) => {
-          console.error(e);
+          defaultLogger.error('Failed to sign', e);
         })
         .finally(() => {
           setLoading(false);

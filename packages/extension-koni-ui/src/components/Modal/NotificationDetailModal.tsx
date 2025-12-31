@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { NOTIFICATION_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { switchReadNotificationStatus } from '@subwallet/extension-koni-ui/messaging/transaction/notification';
 import { NotificationInfoItem } from '@subwallet/extension-koni-ui/Popup/Settings/Notifications/Notification';
@@ -12,6 +13,8 @@ import { Checks, Coins, DownloadSimple, Eye, Gift, X } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
+
+const logger = createLogger('NotificationDetailModal');
 
 type Props = ThemeProps & {
   onCancel?: () => void;
@@ -92,7 +95,7 @@ function Component (props: Props): React.ReactElement<Props> {
       id: notificationItem.id,
       isRead: notificationItem.isRead
     })
-      .catch(console.error)
+      .catch((error) => logger.error('Failed to switch read notification status', error))
       .finally(() => {
         _onCancel();
         setTrigger(!isTrigger);

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { CAMERA_CONTROLS_MODEL_VIEWER_PROPS, DEFAULT_MODEL_VIEWER_PROPS, DEFAULT_NFT_PARAMS, NFT_TRANSACTION, SHOW_3D_MODELS_CHAIN } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
@@ -28,6 +29,8 @@ import styled, { useTheme } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+
+const logger = createLogger('NftItemDetail');
 
 type Props = ThemeProps
 
@@ -140,18 +143,18 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const handleClickExternalAccountInfo = useCallback(() => {
     try {
       // eslint-disable-next-line no-void
-      void chrome.tabs.create({ url: accountExternalUrl, active: true }).then(() => console.log('redirecting'));
+      void chrome.tabs.create({ url: accountExternalUrl, active: true }).then(() => logger.info('redirecting to external account info'));
     } catch (e) {
-      console.log('error redirecting to a new tab');
+      logger.error('error redirecting to a new tab', e);
     }
   }, [accountExternalUrl]);
 
   const handleClickExternalCollectionInfo = useCallback(() => {
     try {
       // eslint-disable-next-line no-void
-      void chrome.tabs.create({ url: nftItem.externalUrl, active: true }).then(() => console.log('redirecting'));
+      void chrome.tabs.create({ url: nftItem.externalUrl, active: true }).then(() => logger.info('redirecting to external collection info'));
     } catch (e) {
-      console.log('error redirecting to a new tab');
+      logger.error('error redirecting to a new tab', e);
     }
   }, [nftItem.externalUrl]);
 
@@ -184,8 +187,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const onImageClick = useCallback(() => {
     if (nftItem.externalUrl) {
       chrome.tabs.create({ url: nftItem.externalUrl, active: true })
-        .then(() => console.log('redirecting'))
-        .catch(console.error);
+        .then(() => logger.info('redirecting to external NFT URL'))
+        .catch((error) => logger.error('Failed to open external NFT URL', error));
     }
   }, [nftItem.externalUrl]);
 

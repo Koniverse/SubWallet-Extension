@@ -3,6 +3,7 @@
 
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _NetworkUpsertParams } from '@subwallet/extension-base/services/chain-service/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { _generateCustomProviderKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { isUrl } from '@subwallet/extension-base/utils';
 import { Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
@@ -75,7 +76,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [existentialDeposit, setExistentialDeposit] = useState('0');
 
   const handleClickSubheaderButton = useCallback(() => {
-    console.log('click subheader');
+    defaultLogger.debug('click subheader');
   }, []);
 
   const onBack = useCallback(() => {
@@ -314,7 +315,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               }, 300);
             }
           }
-        }).catch(console.error);
+        }).catch((error) => defaultLogger.error('Failed to validate custom chain', error));
     }
   }, [form, location]);
 

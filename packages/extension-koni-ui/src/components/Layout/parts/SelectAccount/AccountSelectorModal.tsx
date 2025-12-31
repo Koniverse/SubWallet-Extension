@@ -5,6 +5,7 @@ import type { ButtonProps } from '@subwallet/react-ui/es/button/button';
 
 import { CurrentAccountInfo } from '@subwallet/extension-base/background/types';
 import { AccountActions, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { AccountChainAddressesModal, AccountProxySelectorAllItem, AccountProxySelectorItem, GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import ExportAllSelector from '@subwallet/extension-koni-ui/components/Layout/parts/SelectAccount/ExportAllSelector';
 import SelectAccountFooter from '@subwallet/extension-koni-ui/components/Layout/parts/SelectAccount/Footer';
@@ -238,10 +239,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             }
           }
         }).catch((e) => {
-          console.error('Failed to switch account', e);
+          defaultLogger.error('Failed to switch account', e);
         });
       } else {
-        console.error('Failed to switch account');
+        defaultLogger.error('Failed to switch account - no account selected');
       }
 
       inactiveModal(modalId);

@@ -2,12 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { PriceChartPoint, PriceChartTimeframe } from '@subwallet/extension-base/background/KoniTypes';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { cancelSubscription, getHistoryTokenPrice, subscribeCurrentTokenPrice } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
+
+const logger = createLogger('PriceChartArea');
 
 import { PriceChart } from './PriceChart';
 import { PriceInfoContainer } from './PriceInfoContainer';
@@ -113,7 +116,7 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
       }
     };
 
-    loadPriceHistory().catch(console.error);
+    loadPriceHistory().catch((error) => logger.error('Failed to load price history', error));
 
     return () => {
       sync = false;
@@ -131,7 +134,7 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
           priceHistoryCacheRef.current[selectedTimeframe] = history;
           setRawPricePoints(history);
         }
-      }).catch(console.error);
+      }).catch((error) => logger.error('Failed to get history token price', error));
 
       prevCurrencyRef.current = currency;
     }
@@ -157,13 +160,13 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
       if (isSync) {
         setLivePrice(price);
       }
-    }).catch(console.error);
+    }).catch((error) => logger.error('Failed to subscribe current token price', error));
 
     return () => {
       isSync = false;
 
       if (subscriptionId) {
-        cancelSubscription(subscriptionId).catch(console.error);
+        cancelSubscription(subscriptionId).catch((error) => logger.error('Failed to cancel subscription', error));
       }
     };
   }, [priceId]);

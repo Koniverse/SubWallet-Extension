@@ -3,6 +3,7 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
@@ -157,13 +158,13 @@ function Component ({ className = '', collectionInfo,
     try {
       if (accountExternalUrl) {
         // eslint-disable-next-line no-void
-        // void chrome.tabs.create({ url: accountExternalUrl, active: true }).then(() => console.log('redirecting'));
+        // void chrome.tabs.create({ url: accountExternalUrl, active: true }).then(() => defaultLogger.debug('redirecting'));
         openInNewTab(accountExternalUrl)();
       } else {
-        console.log('error redirecting to a new tab');
+        defaultLogger.debug('error redirecting to a new tab');
       }
     } catch (e) {
-      console.log('error redirecting to a new tab');
+      defaultLogger.debug('error redirecting to a new tab');
     }
   }, [accountExternalUrl]);
 
@@ -171,13 +172,13 @@ function Component ({ className = '', collectionInfo,
     try {
       if (nftItem.externalUrl) {
         // eslint-disable-next-line no-void
-        // void chrome.tabs.create({ url: nftItem.externalUrl, active: true }).then(() => console.log('redirecting'));
+        // void chrome.tabs.create({ url: nftItem.externalUrl, active: true }).then(() => defaultLogger.debug('redirecting'));
         openInNewTab(nftItem.externalUrl)();
       } else {
-        console.log('error redirecting to a new tab');
+        defaultLogger.debug('error redirecting to a new tab');
       }
     } catch (e) {
-      console.log('error redirecting to a new tab');
+      defaultLogger.debug('error redirecting to a new tab');
     }
   }, [nftItem.externalUrl]);
 
@@ -210,8 +211,8 @@ function Component ({ className = '', collectionInfo,
   const onImageClick = useCallback(() => {
     if (nftItem.externalUrl) {
       chrome.tabs.create({ url: nftItem.externalUrl, active: true })
-        .then(() => console.log('redirecting'))
-        .catch(console.error);
+        .then(() => defaultLogger.debug('redirecting'))
+        .catch((error) => defaultLogger.error('Failed to redirect to NFT external URL', error));
     }
   }, [nftItem.externalUrl]);
 

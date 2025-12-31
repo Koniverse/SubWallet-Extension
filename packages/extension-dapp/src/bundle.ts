@@ -6,7 +6,10 @@ import type { Injected, InjectedAccount, InjectedAccountWithMeta, InjectedExtens
 import { u8aEq } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 
+import { createLogger } from './logger';
 import { documentReadyPromise } from './util';
+
+const logger = createLogger('ExtensionDapp');
 
 // expose utility functions
 export { packageInfo } from './packageInfo';
@@ -52,11 +55,11 @@ export { isWeb3Injected, web3EnablePromise };
 function getWindowExtensions (originName: string): Promise<[InjectedExtensionInfo, Injected | void][]> {
   return Promise.all(
     Object.entries(win.injectedWeb3).map(
-      ([name, { enable, version }]): Promise<[InjectedExtensionInfo, Injected | void]> =>
+        ([name, { enable, version }]): Promise<[InjectedExtensionInfo, Injected | void]> =>
         Promise.all([
           Promise.resolve({ name, version }),
           enable(originName).catch((error: Error): void => {
-            console.error(`Error initializing ${name}: ${error.message}`);
+            logger.error(`Error initializing ${name}: ${error.message}`);
           })
         ])
     )
@@ -84,7 +87,7 @@ export function web3Enable (originName: string, compatInits: (() => Promise<bool
                 // if we don't have an accounts subscriber, add a single-shot version
                 if (!ext.accounts.subscribe) {
                   ext.accounts.subscribe = (cb: (accounts: InjectedAccount[]) => void | Promise<void>): Unsubcall => {
-                    ext.accounts.get().then(cb).catch(console.error);
+                    ext.accounts.get().then(cb).catch((error) => logger.error('Failed to get accounts', error));
 
                     return (): void => {
                       // no ubsubscribe needed, this is a single-shot
@@ -100,7 +103,7 @@ export function web3Enable (originName: string, compatInits: (() => Promise<bool
             const names = values.map(({ name, version }): string => `${name}/${version}`);
 
             isWeb3Injected = web3IsInjected();
-            console.log(`web3Enable: Enabled ${values.length} extension${values.length !== 1 ? 's' : ''}: ${names.join(', ')}`);
+            logger.info(`web3Enable: Enabled ${values.length} extension${values.length !== 1 ? 's' : ''}: ${names.join(', ')}`);
 
             return values;
           })
@@ -138,7 +141,7 @@ export async function web3Accounts ({ accountType, ss58Format }: Web3AccountsOpt
 
   const addresses = accounts.map(({ address }) => address);
 
-  console.log(`web3Accounts: Found ${accounts.length} address${accounts.length !== 1 ? 'es' : ''}: ${addresses.join(', ')}`);
+  logger.info(`web3Accounts: Found ${accounts.length} address${accounts.length !== 1 ? 'es' : ''}: ${addresses.join(', ')}`);
 
   return accounts;
 }
@@ -222,7 +225,7 @@ export async function web3ListRpcProviders (source: string): Promise<ProviderLis
   const { provider } = await web3FromSource(source);
 
   if (!provider) {
-    console.warn(`Extension ${source} does not expose any provider`);
+    logger.warn(`Extension ${source} does not expose any provider`);
 
     return null;
   }

@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { CUSTOMIZE_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { saveShowZeroBalance } from '@subwallet/extension-koni-ui/messaging';
@@ -11,6 +12,8 @@ import { Wallet } from 'phosphor-react';
 import React, { useCallback, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import styled, { useTheme } from 'styled-components';
+
+const logger = createLogger('CustomizeModal');
 
 import CustomizeModalContent from './CustomizeModalContent';
 
@@ -23,7 +26,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const isShowZeroBalance = useSelector((state: RootState) => state.settings.isShowZeroBalance);
 
   const onChangeZeroBalance = useCallback(() => {
-    saveShowZeroBalance(!isShowZeroBalance).catch(console.error);
+    saveShowZeroBalance(!isShowZeroBalance).catch((error) => logger.error('Failed to save show zero balance setting', error));
   }, [isShowZeroBalance]);
 
   const onCancel = useCallback(() => {

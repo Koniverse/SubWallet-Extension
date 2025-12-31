@@ -6,7 +6,10 @@ import type { Message } from '@subwallet/extension-base/types';
 
 import { MESSAGE_ORIGIN_CONTENT } from '@subwallet/extension-base/defaults';
 import { enable, handleResponse, initCardanoProvider, initEvmProvider } from '@subwallet/extension-base/page';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { injectCardanoExtension, injectEvmExtension, injectExtension } from '@subwallet/extension-inject';
+
+const logger = createLogger('Page');
 
 const version = process.env.PKG_VERSION as string;
 
@@ -30,7 +33,7 @@ window.addEventListener('message', ({ data, source }: Message): void => {
   if (data.id) {
     handleResponse(data as TransportRequestMessage<keyof RequestSignatures>);
   } else {
-    console.error('Missing id for response.');
+    logger.error('Missing id for response.');
   }
 });
 

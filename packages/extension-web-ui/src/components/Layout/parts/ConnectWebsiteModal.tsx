@@ -3,6 +3,7 @@
 
 import { AuthUrlInfo } from '@subwallet/extension-base/background/handlers/State';
 import { isAccountAll } from '@subwallet/extension-base/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { BaseModal } from '@subwallet/extension-web-ui/components';
 import AccountItemWithName from '@subwallet/extension-web-ui/components/Account/Item/AccountItemWithName';
 import ConfirmationGeneralInfo from '@subwallet/extension-web-ui/components/Confirmation/ConfirmationGeneralInfo';
@@ -58,7 +59,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       setIsSubmit(true);
       changeAuthorizationPerSite({ values: allowedMap, id: authInfo.id })
         .catch((e) => {
-          console.log('changeAuthorizationPerSite error', e);
+          defaultLogger.error('changeAuthorizationPerSite error', e);
         }).finally(() => {
           onCancel();
           setIsSubmit(false);
@@ -73,7 +74,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
         .then(() => {
           setIsSubmit(false);
         })
-        .catch(console.error);
+        .catch((error) => defaultLogger.error('Failed to change authorization block', error));
     }
   }, [authInfo?.id, isSubmit]);
 

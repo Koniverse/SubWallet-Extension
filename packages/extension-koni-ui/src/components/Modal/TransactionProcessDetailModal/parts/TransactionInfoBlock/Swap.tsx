@@ -4,6 +4,7 @@
 import { _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
 import { SwapBaseTxData, SwapPair } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { QuoteRateDisplay, SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -46,7 +47,7 @@ const Component: FC<Props> = (props: Props) => {
         return result;
       }
     } catch (e) {
-      console.log('getTokenPairFromStep error', e);
+      defaultLogger.debug('getTokenPairFromStep error', e);
     }
 
     // try to fetch originSwapPair, hotfix for old data.
@@ -92,7 +93,7 @@ const Component: FC<Props> = (props: Props) => {
         } as SwapPair;
       }
     } catch (e) {
-      console.log('try handling old data error', e);
+      defaultLogger.debug('try handling old data error', e);
     }
 
     return undefined;

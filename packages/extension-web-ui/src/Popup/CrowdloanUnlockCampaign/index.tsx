@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
 import { PageWrapper } from '@subwallet/extension-web-ui/components';
 import { CROWDLOAN_UNLOCK_TIME } from '@subwallet/extension-web-ui/constants';
@@ -82,7 +83,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
       updateChainLogoMaps(getLogoMap(chainInfoItems));
     }).catch((e) => {
-      console.log('fetch error', e);
+      defaultLogger.error('fetch error', e);
     });
   }, [setCrowdloanUnlockTime]);
 

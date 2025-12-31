@@ -3,6 +3,7 @@
 
 import { _ChainInfo, _FundStatus } from '@subwallet/chain-list/types';
 import { CrowdloanContributionItem } from '@subwallet/extension-base/services/subscan-service/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { AddressInput } from '@subwallet/extension-web-ui/components';
 import CrowdloanTable from '@subwallet/extension-web-ui/components/CrowdloanTable';
@@ -325,7 +326,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
       setAcalaValue(acalaValueInfo?.data?.acala?.[0]?.totalDOTLocked);
     }).catch((e) => {
-      console.log('fetch Contributions Error', e);
+      defaultLogger.error('fetch Contributions Error', e);
     }).finally(() => {
       setLoading(false);
     });

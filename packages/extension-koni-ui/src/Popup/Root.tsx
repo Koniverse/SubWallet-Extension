@@ -3,6 +3,7 @@
 
 import { WalletUnlockType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { Logo2D } from '@subwallet/extension-koni-ui/components/Logo';
 import { CURRENT_PAGE, TRANSACTION_STORAGES } from '@subwallet/extension-koni-ui/constants';
@@ -21,6 +22,8 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
+
+const logger = createLogger('Root');
 
 import { MainWrapper } from './MainWrapper';
 
@@ -198,7 +201,7 @@ function DefaultRoute ({ children }: { children: React.ReactNode }): React.React
   useEffect(() => {
     initDataRef.current.then(() => {
       setDataLoaded(true);
-    }).catch(console.error);
+    }).catch((error) => logger.error('Failed to initialize data', error));
   }, []);
 
   useEffect(() => {
@@ -221,7 +224,7 @@ function DefaultRoute ({ children }: { children: React.ReactNode }): React.React
             lastNotifyTime = id;
           }
         });
-    }).catch(console.error);
+    }).catch((error) => logger.error('Failed to subscribe notifications', error));
 
     return () => {
       cancel = true;

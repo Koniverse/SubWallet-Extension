@@ -3,6 +3,7 @@
 
 import { _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import InfoIcon from '@subwallet/extension-koni-ui/components/Icon/InfoIcon';
 import { RECEIVE_QR_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
@@ -60,10 +61,10 @@ const Component: React.FC<Props> = ({ address, className, selectedNetwork }: Pro
     try {
       if (scanExplorerAddressUrl) {
         // eslint-disable-next-line no-void
-        void chrome.tabs.create({ url: scanExplorerAddressUrl, active: true }).then(() => console.log('redirecting'));
+        void chrome.tabs.create({ url: scanExplorerAddressUrl, active: true }).then(() => defaultLogger.debug('redirecting to explorer'));
       }
     } catch (e) {
-      console.log('error redirecting to a new tab');
+      defaultLogger.debug('error redirecting to a new tab', e);
     }
   }, [scanExplorerAddressUrl]);
 

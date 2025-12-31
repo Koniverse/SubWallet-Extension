@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import BackIcon from '@subwallet/extension-web-ui/components/Icon/BackIcon';
 import CloseIcon from '@subwallet/extension-web-ui/components/Icon/CloseIcon';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
@@ -50,7 +51,7 @@ const Component: React.FC<Props> = ({ className, modalId, onBack, onSubmitSucces
         setSeedPhrase(phrase);
       })
       .catch((e: Error) => {
-        console.error(e);
+        defaultLogger.error('Failed to create seed', e);
       });
   }, [createSeedTrigger]);
 

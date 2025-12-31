@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { BaseModal } from '@subwallet/extension-web-ui/components';
 import InfoIcon from '@subwallet/extension-web-ui/components/Icon/InfoIcon';
@@ -60,15 +61,15 @@ const Component: React.FC<Props> = ({ address, className, selectedNetwork }: Pro
 
   const handleClickViewOnExplorer = useCallback(() => {
     try {
-      console.log('scanExplorerAddressUrl', scanExplorerAddressUrl);
+      defaultLogger.debug('scanExplorerAddressUrl', scanExplorerAddressUrl);
 
       if (scanExplorerAddressUrl) {
         // eslint-disable-next-line no-void
-        // void chrome.tabs.create({ url: scanExplorerAddressUrl, active: true }).then(() => console.log('redirecting'));
+        // void chrome.tabs.create({ url: scanExplorerAddressUrl, active: true }).then(() => defaultLogger.debug('redirecting'));
         openInNewTab(scanExplorerAddressUrl)();
       }
     } catch (e) {
-      console.log('error redirecting to a new tab');
+      defaultLogger.debug('error redirecting to a new tab');
     }
   }, [scanExplorerAddressUrl]);
 

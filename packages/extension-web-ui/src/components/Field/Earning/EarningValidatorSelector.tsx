@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { YieldPoolType } from '@subwallet/extension-base/types';
@@ -317,7 +318,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   useEffect(() => {
     fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningPoolRecommendation) => {
       setDefaultPoolMap(earningPoolRecommendation);
-    }).catch(console.error);
+    }).catch((error) => defaultLogger.error('Failed to fetch direct nomination validator', error));
   }, []);
 
   useEffect(() => {

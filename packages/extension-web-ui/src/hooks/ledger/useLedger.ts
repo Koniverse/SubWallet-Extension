@@ -3,6 +3,7 @@
 
 import { LedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { EVMLedger, SubstrateGenericLedger, SubstrateLegacyLedger, SubstrateMigrationLedger } from '@subwallet/extension-web-ui/connector';
 import { isLedgerCapable, ledgerIncompatible, NotNeedMigrationGens } from '@subwallet/extension-web-ui/constants';
 import { useSelector } from '@subwallet/extension-web-ui/hooks';
@@ -289,14 +290,14 @@ export function useLedger (slug?: string, active = true, isSigning = false, forc
           setIsLoading(false);
           handleError(error, false);
           setIsLocked(true);
-          console.error(error);
+          defaultLogger.error('Error during Ledger connection', error);
         });
     }, 300);
   }, [slug, t, active, handleError, getLedger]);
 
   useEffect(() => {
     destroyRef.current = () => {
-      ledger?.disconnect().catch(console.error);
+      ledger?.disconnect().catch((error) => defaultLogger.error('Failed to disconnect ledger', error));
     };
   }, [ledger]);
 

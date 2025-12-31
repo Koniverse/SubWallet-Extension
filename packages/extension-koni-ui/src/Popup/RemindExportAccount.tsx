@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { Layout } from '@subwallet/extension-koni-ui/components';
 import { USER_GUIDE_URL } from '@subwallet/extension-koni-ui/constants';
 import { setValueLocalStorageWS } from '@subwallet/extension-koni-ui/messaging';
@@ -11,6 +12,8 @@ import { ArrowCircleRight, Export, X, XCircle } from 'phosphor-react';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
+
+const logger = createLogger('RemindExportAccount');
 
 type Props = ThemeProps;
 
@@ -27,12 +30,12 @@ const Component: React.FC<Props> = (props: Props) => {
   const learnMore = useCallback(() => {
     window.open(`${USER_GUIDE_URL}/${SUB_DOMAIN_USER_GUIDE}`);
     setValueLocalStorageWS(valueStorage)
-      .catch(console.error);
+      .catch((error) => logger.error('Failed to set local storage value', error));
   }, []);
 
   const dismiss = useCallback(() => {
     setValueLocalStorageWS(valueStorage)
-      .catch(console.error);
+      .catch((error) => logger.error('Failed to set local storage value', error));
     window.close();
   }, []);
 

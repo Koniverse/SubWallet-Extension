@@ -3,6 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { _ChainConnectionStatus } from '@subwallet/extension-base/services/chain-service/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { enableChain, updateAssetSetting } from '@subwallet/extension-web-ui/messaging';
@@ -57,7 +58,7 @@ export default function useAssetChecker () {
         }).then(() => {
           setEnablingAsset(assetSlug);
           notify({ message: t('{{name}} is turning on.', { replace: { name: assetInfo?.symbol } }), duration: 1.5 });
-        }).catch(console.error);
+        }).catch((error) => defaultLogger.error('Failed to update asset setting', error));
       };
 
       const btn = <Button
@@ -76,7 +77,7 @@ export default function useAssetChecker () {
         btn
       });
     } else if (!!assetSetting?.visible && !chainState?.active) {
-      enableChain(assetInfo.originChain, false).catch(console.error);
+      enableChain(assetInfo.originChain, false).catch((error) => defaultLogger.error('Failed to enable chain for asset', error));
     } else if (chainStatus && chainStatus.connectionStatus === _ChainConnectionStatus.DISCONNECTED) {
       const message = t('Chain {{name}} is disconnected', { replace: { name: chainInfo?.name } });
 

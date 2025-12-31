@@ -3,6 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { _ChainConnectionStatus } from '@subwallet/extension-base/services/chain-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { enableChain, updateAssetSetting } from '@subwallet/extension-koni-ui/messaging';
@@ -10,6 +11,8 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Button } from '@subwallet/react-ui';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+
+const logger = createLogger('useAssetChecker');
 
 export default function useAssetChecker () {
   const { t } = useTranslation();
@@ -57,7 +60,7 @@ export default function useAssetChecker () {
         }).then(() => {
           setEnablingAsset(assetSlug);
           notify({ message: t('ui.NETWORK.hook.chain.useAssetChecker.nameIsTurningOn', { replace: { name: assetInfo?.symbol } }), duration: 1.5 });
-        }).catch(console.error);
+        }).catch((error) => logger.error('Failed to update asset setting', error));
       };
 
       const btn = <Button
@@ -76,7 +79,7 @@ export default function useAssetChecker () {
         btn
       });
     } else if (!!assetSetting?.visible && !chainState?.active) {
-      enableChain(assetInfo.originChain, false).catch(console.error);
+      enableChain(assetInfo.originChain, false).catch((error) => logger.error('Failed to enable chain', error));
     } else if (chainStatus && chainStatus.connectionStatus === _ChainConnectionStatus.DISCONNECTED) {
       const message = t('ui.NETWORK.hook.chain.useAssetChecker.chainIsDisconnected', { replace: { name: chainInfo?.name } });
 

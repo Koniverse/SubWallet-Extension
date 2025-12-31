@@ -3,6 +3,7 @@
 
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { YieldPoolType } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { fetchStaticData } from '@subwallet/extension-base/utils';
 import { StakingPoolItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
@@ -373,7 +374,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   useEffect(() => {
     fetchStaticData<Record<string, number[]>>('nomination-pool-recommendation').then((earningPoolRecommendation) => {
       setDefaultPoolMap(earningPoolRecommendation);
-    }).catch(console.error);
+    }).catch((error) => defaultLogger.error('Failed to fetch static data for nomination pool recommendation', error));
   }, []);
 
   useEffect(() => {

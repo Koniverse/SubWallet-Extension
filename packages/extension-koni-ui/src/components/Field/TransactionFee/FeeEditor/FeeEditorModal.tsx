@@ -4,6 +4,7 @@
 import { _SUPPORT_TOKEN_PAY_FEE_GROUP } from '@subwallet/extension-base/constants';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { EvmEIP1559FeeOption, FeeCustom, FeeDefaultOption, FeeDetail, FeeOptionKey, TransactionFee } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { BN_ZERO, formatNumber, isEvmEIP1559FeeDetail } from '@subwallet/extension-base/utils';
 import { AmountInput, BasicInputEvent, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { FeeOptionItem } from '@subwallet/extension-koni-ui/components/Field/TransactionFee/FeeEditor/FeeOptionItem';
@@ -282,7 +283,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
 
       if (part.priorityFeeValue) {
         form.validateFields(['maxFeeValue']).catch((e) => {
-          console.log(e);
+          defaultLogger.debug('Failed to validate maxFeeValue field', e);
         });
       }
     },

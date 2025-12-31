@@ -6,7 +6,10 @@ import type { Message } from '@subwallet/extension-base/types';
 import { TransportRequestMessage } from '@subwallet/extension-base/background/types';
 import { MESSAGE_ORIGIN_CONTENT, MESSAGE_ORIGIN_PAGE, PORT_CONTENT } from '@subwallet/extension-base/defaults';
 import { getId } from '@subwallet/extension-base/utils/getId';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { addNotificationPopUp } from '@subwallet/extension-koni/helper/PageNotification';
+
+const logger = createLogger('ContentHandler');
 
 const handleRedirectPhishing: { id: string, resolve?: (value: (boolean | PromiseLike<boolean>)) => void, reject?: (e: Error) => void } = {
   id: 'redirect-phishing-' + getId()
@@ -62,7 +65,7 @@ export class ContentHandler {
     const err = checkForLastError();
 
     if (err) {
-      console.warn(`${err.message}, port is disconnected.`);
+      logger.warn(`${err.message}, port is disconnected.`);
     }
 
     port.onMessage.removeListener(onMessage);
@@ -82,10 +85,10 @@ export class ContentHandler {
       this.isConnected = true;
       this.getPort().postMessage(data);
     } catch (e) {
-      console.error(e);
+      logger.error('Error posting message to port', e);
 
       if (!this.isShowNotification) {
-        console.log('The SubWallet extension is not installed. Please install the extension to use the wallet.');
+        logger.info('The SubWallet extension is not installed. Please install the extension to use the wallet.');
         addNotificationPopUp();
         this.isShowNotification = true;
 
@@ -112,10 +115,10 @@ export class ContentHandler {
       this.getPort().postMessage(transportRequestMessage);
     }).then((gotRedirected) => {
       if (!gotRedirected) {
-        console.log('Check phishing by URL: Passed.');
+        logger.info('Check phishing by URL: Passed.');
       }
     }).catch((e) => {
-      console.warn(`Unable to determine if the site is in the phishing list: ${(e as Error).message}`);
+      logger.warn(`Unable to determine if the site is in the phishing list: ${(e as Error).message}`);
     });
   }
 

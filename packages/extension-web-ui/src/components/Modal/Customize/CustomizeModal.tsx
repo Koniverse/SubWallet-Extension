@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
 import { CUSTOMIZE_MODAL } from '@subwallet/extension-web-ui/constants/modal';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
@@ -24,7 +25,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const isShowZeroBalance = useSelector((state: RootState) => state.settings.isShowZeroBalance);
 
   const onChangeZeroBalance = useCallback(() => {
-    saveShowZeroBalance(!isShowZeroBalance).catch(console.error);
+    saveShowZeroBalance(!isShowZeroBalance).catch((error) => defaultLogger.error('Failed to save show zero balance', error));
   }, [isShowZeroBalance]);
 
   const onCancel = useCallback(() => {

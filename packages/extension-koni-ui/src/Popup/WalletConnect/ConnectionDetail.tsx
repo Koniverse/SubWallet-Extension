@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountProxy } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { stripUrl } from '@subwallet/extension-base/utils';
 import { AccountProxyItem, EmptyList, GeneralEmptyList, Layout, MetaInfo, PageWrapper, WCNetworkAvatarGroup } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
@@ -89,7 +90,7 @@ const Component: React.FC<ComponentProps> = (props) => {
         setLoading(true);
         disconnectWalletConnectConnection(topic)
           .catch((e) => {
-            console.log(e);
+            defaultLogger.debug('Failed to disconnect wallet connect connection', e);
             notification({
               type: 'error',
               message: t('ui.WALLET_CONNECT.screen.WalletConnect.ConnectionDetail.failToDisconnect')

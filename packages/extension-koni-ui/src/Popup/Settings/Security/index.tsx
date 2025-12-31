@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WalletUnlockType } from '@subwallet/extension-base/background/KoniTypes';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { EDIT_AUTO_LOCK_TIME_MODAL, EDIT_UNLOCK_TYPE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DEFAULT_ROUTER_PATH } from '@subwallet/extension-koni-ui/constants/router';
@@ -20,6 +21,8 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+
+const logger = createLogger('Security');
 
 type Props = ThemeProps;
 
@@ -145,13 +148,13 @@ const Component: React.FC<Props> = (props: Props) => {
           if (openNewTab) {
             windowOpen({ allowedPath: '/settings/security' })
               .catch((e: Error) => {
-                console.log(e);
+                logger.error('Failed to open window', e);
               });
 
             isSidePanelMode && closeSidePanel();
           }
         })
-        .catch(console.error)
+        .catch((error) => logger.error('Failed to save camera setting', error))
         .finally(() => {
           setLoadingCamera(false);
         });
@@ -163,7 +166,7 @@ const Component: React.FC<Props> = (props: Props) => {
       setLoadingSignOnce(true);
 
       saveAllowOneSign(!currentValue)
-        .catch(console.error)
+        .catch((error) => logger.error('Failed to save allow one sign setting', error))
         .finally(() => {
           setLoadingSignOnce(false);
         });
@@ -175,7 +178,7 @@ const Component: React.FC<Props> = (props: Props) => {
       setLoadingChainPatrol(true);
 
       saveEnableChainPatrol(!currentValue)
-        .catch(console.error)
+        .catch((error) => logger.error('Failed to save enable chain patrol setting', error))
         .finally(() => {
           setLoadingChainPatrol(false);
         });
@@ -267,10 +270,10 @@ const Component: React.FC<Props> = (props: Props) => {
         .then((stream) => {
           // Close video
           stream.getTracks().forEach((track) => {
-            track.stop();
-          });
-        })
-        .catch(console.error);
+          track.stop();
+        });
+      })
+      .catch((error) => logger.error('Failed to get user media', error));
     }
   }, [camera]);
 

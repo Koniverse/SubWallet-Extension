@@ -3,6 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { _ChainConnectionStatus } from '@subwallet/extension-base/services/chain-service/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { enableChain } from '@subwallet/extension-web-ui/messaging';
@@ -41,7 +42,7 @@ export default function useChainChecker () {
 
             setConnectingChain(chain);
             notify({ message: t('Chain {{name}} is connecting', { replace: { name: chainInfo?.name } }), duration: 1.5, type: 'warning' });
-          }).catch(console.error);
+          }).catch((error) => defaultLogger.error('Failed to enable chain', error));
         };
 
         const btn = <Button

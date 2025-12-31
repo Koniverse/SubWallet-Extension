@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import BannerGenerator from '@subwallet/extension-koni-ui/components/StaticContent/BannerGenerator';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
@@ -16,6 +17,8 @@ import { ArrowClockwise, Image, Plus, PlusCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+
+const logger = createLogger('NftCollections');
 
 type Props = ThemeProps
 
@@ -61,7 +64,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           .then(() => {
             setLoading(false);
           })
-          .catch(console.error);
+          .catch((error) => logger.error('Failed to reload NFT cron', error));
       }
     },
     {

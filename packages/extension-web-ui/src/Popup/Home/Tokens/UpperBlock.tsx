@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { balanceNoPrefixFormater, formatNumber } from '@subwallet/extension-base/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { reloadCron, saveShowBalance } from '@subwallet/extension-web-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
@@ -40,13 +41,13 @@ function Component (
   const { currencyData } = useSelector((state) => state.price);
 
   const onChangeShowBalance = useCallback(() => {
-    saveShowBalance(!isShowBalance).catch(console.error);
+    saveShowBalance(!isShowBalance).catch((error) => defaultLogger.error('Failed to save show balance', error));
   }, [isShowBalance]);
 
   const reloadBalance = useCallback(() => {
     setReloading(true);
     reloadCron({ data: 'balance' })
-      .catch(console.error)
+      .catch((error) => defaultLogger.error('Failed to reload balance', error))
       .finally(() => {
         setReloading(false);
       });
