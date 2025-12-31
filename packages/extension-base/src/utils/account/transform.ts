@@ -246,6 +246,11 @@ const OPEN_GOV_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.GOV_UNLOCK_VOTE
 ];
 
+const SUBSTRATE_PROXY_ACTION: ExtrinsicType[] = [
+  ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT,
+  ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT
+];
+
 const OTHER_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.TRANSFER_XCM,
   ExtrinsicType.SEND_NFT,
@@ -268,6 +273,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
           ...OPEN_GOV_ACTIONS,
+          ...SUBSTRATE_PROXY_ACTION,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -278,6 +284,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_STDOT_ACTIONS,
           ...OTHER_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
+          ...SUBSTRATE_PROXY_ACTION,
           ...EVM_ACTIONS
         ];
       case AccountChainType.TON:
@@ -308,6 +315,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
           ...OPEN_GOV_ACTIONS,
+          ...SUBSTRATE_PROXY_ACTION,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -346,6 +354,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_SDOT_ACTIONS,
           // ...EARN_QDOT_ACTIONS,
           ...OPEN_GOV_ACTIONS,
+          ...SUBSTRATE_PROXY_ACTION,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:

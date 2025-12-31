@@ -50,7 +50,7 @@ const Component: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { defaultData, persistData } = useTransactionContext<SendNftParams>();
+  const { defaultData, persistData, selectSubstrateProxyAccountsToSign } = useTransactionContext<SendNftParams>();
 
   const { collectionId, itemId } = defaultData;
 
@@ -131,35 +131,53 @@ const Component: React.FC = () => {
       const from = reformatAddress(_from, addressPrefix);
 
       const params = nftParamsHandler(nftItem, chain);
-      let sendPromise: Promise<SWTransactionResponse>;
 
-      if (isEthereumInterface) {
-        // Send NFT with EVM interface
-        sendPromise = evmNftSubmitTransaction({
-          senderAddress: from,
-          networkKey: chain,
-          recipientAddress: to,
-          nftItemName: nftItem?.name,
-          params,
-          nftItem
-        });
-      } else {
-        // Send NFT with substrate interface
-        sendPromise = substrateNftSubmitTransaction({
-          networkKey: chain,
-          recipientAddress: to,
-          senderAddress: from,
-          nftItemName: nftItem?.name,
-          params,
-          nftItem
-        });
-      }
+      const sendPromise = (signerSubstrateProxyAddress?: string): Promise<SWTransactionResponse> => {
+        if (isEthereumInterface) {
+          // Send NFT with EVM interface
+          return evmNftSubmitTransaction({
+            senderAddress: from,
+            networkKey: chain,
+            recipientAddress: to,
+            nftItemName: nftItem?.name,
+            params,
+            nftItem
+          });
+        } else {
+          // Send NFT with substrate interface
+          return substrateNftSubmitTransaction({
+            networkKey: chain,
+            recipientAddress: to,
+            senderAddress: from,
+            nftItemName: nftItem?.name,
+            signerSubstrateProxyAddress,
+            params,
+            nftItem
+          });
+        }
+      };
 
       setLoading(true);
 
+      // wrap proxy selection
+      // don't need to select proxy for EVM interface
+      const sendPromiseWrapper = async () => {
+        if (!isEthereumInterface) {
+          const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
+            chain,
+            address: from,
+            type: ExtrinsicType.SEND_NFT
+          });
+
+          return await sendPromise(substrateProxyAddress);
+        }
+
+        return await sendPromise();
+      };
+
       setTimeout(() => {
         // Handle transfer action
-        sendPromise
+        sendPromiseWrapper()
           .then(onSuccess)
           .catch(onError)
           .finally(() => {
@@ -167,7 +185,7 @@ const Component: React.FC = () => {
           });
       }, 300);
     },
-    [nftItem, onError, onSuccess, addressPrefix]
+    [addressPrefix, nftItem, selectSubstrateProxyAccountsToSign, onSuccess, onError]
   );
 
   const checkAction = usePreCheckAction(from);

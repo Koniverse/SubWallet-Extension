@@ -74,6 +74,15 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           name={account?.name}
           networkPrefix={networkPrefix}
         />
+
+        {!!transaction.signerSubstrateProxyAddress &&
+          <MetaInfo.Account
+            address={transaction.signerSubstrateProxyAddress}
+            chainSlug={transaction.chain}
+            label={t('ui.TRANSACTION.Confirmations.GovUnvote.signWith')}
+          />
+        }
+
         <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.GovUnvote.networkFee')}

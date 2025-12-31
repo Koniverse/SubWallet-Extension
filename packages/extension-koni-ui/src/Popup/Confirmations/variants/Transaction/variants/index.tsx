@@ -21,6 +21,8 @@ export { default as ChangeEarningValidatorTransactionConfirmation } from './Chan
 export { default as GovVoteTransactionConfirmation } from './GovVote';
 export { default as GovUnvoteTransactionConfirmation } from './GovUnvote';
 export { default as GovUnlockTransactionConfirmation } from './GovUnlock';
+export { default as AddSubstrateProxyAccountTransactionConfirmation } from './AddSubstrateProxyAccount';
+export { default as RemoveSubstrateProxyAccountTransactionConfirmation } from './RemoveSubstrateProxyAccount';
 
 export * from './TransferBlock';
 export * from './Process';

@@ -6,11 +6,11 @@ import { ClaimPolygonBridgeNotificationMetadata, NotificationActionType } from '
 import { RequestClaimBridge } from '@subwallet/extension-base/types';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
-import { isAbleToShowFee } from '@subwallet/extension-koni-ui/utils';
+import { isAbleToShowFee, isTypeManageSubstrateProxy } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Logo, Number, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretRight } from 'phosphor-react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -44,9 +44,13 @@ function Component (
     }
   }
 
+  const isProxyType = useMemo(() => {
+    return isTypeManageSubstrateProxy(item.type);
+  }, [item.type]);
+
   return (
     <Web3Block
-      className={CN('history-item', className, displayData.className)}
+      className={CN('history-item', className, displayData.className, { '-proxy-type': isProxyType })}
       leftItem={(
         <>
           <div className={'__main-icon-wrapper'}>
@@ -225,6 +229,12 @@ export const HistoryItem = styled(Component)<Props>(({ theme: { token } }: Props
       },
       '.__main-icon': {
         color: token.colorSuccess
+      }
+    },
+
+    '&.-proxy-type': {
+      '.__value': {
+        visibility: 'hidden'
       }
     }
   });

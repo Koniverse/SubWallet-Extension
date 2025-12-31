@@ -56,8 +56,8 @@ const Component = () => {
   const { closeSidePanel } = useSidePanelUtils();
   const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { closeAlert, defaultData, goBack, onDone,
-    openAlert, persistData,
+  const { closeAlert, defaultData, goBack, onDone, openAlert,
+    persistData, selectSubstrateProxyAccountsToSign,
     setBackProps, setIsDisableHeader, setSubHeaderRightButtons } = useTransactionContext<EarnParams>();
 
   const { fromAccountProxy, slug } = defaultData;
@@ -469,12 +469,14 @@ const Component = () => {
     setSubmitLoading
   );
 
+  const exType = useMemo(() => getExtrinsicTypeByPoolInfo({ chain: chainValue, type: poolType, slug }), [poolType, chainValue, slug]);
+
   const netuid = useMemo(() => poolInfo.metadata.subnetData?.netuid, [poolInfo.metadata.subnetData]);
   const onSubmit: FormCallbacks<EarnParams>['onFinish'] = useCallback((values: EarnParams) => {
     const transactionBlockProcess = () => {
       setSubmitLoading(true);
       setIsDisableHeader(true);
-      const { from, slug, target, value: _currentAmount } = values;
+      const { chain, from, slug, target, value: _currentAmount } = values;
       let processId = processState.processId;
 
       const getData = (submitStep: number): SubmitYieldJoinData => {
@@ -573,14 +575,43 @@ const Component = () => {
 
               return true;
             } else {
-              const submitPromise: Promise<SWTransactionResponse> = submitJoinYieldPool({
-                path: path,
-                data: data,
-                currentStep: step
-              });
+              // send submit transaction
+              const submitPromise = async (signerSubstrateProxyAddress?: string) => {
+                const rs = await submitJoinYieldPool({
+                  path: path,
+                  data,
+                  currentStep: step,
+                  signerSubstrateProxyAddress
+                });
 
-              const rs = await submitPromise;
-              const success = onSuccess(isLastStep, needRollback)(rs);
+                success = onSuccess(isLastStep, needRollback)(rs);
+              };
+
+              let success = false;
+
+              // wrap proxy selection
+              // for the Liquid Staking feature with multiple steps,
+              // only the root account is allowed to sign transactions, even if a valid proxy account is available to sign on its behalf.
+              if (poolInfo.type !== YieldPoolType.LIQUID_STAKING && path.steps.length <= 2) {
+                selectSubstrateProxyAccountsToSign(
+                  {
+                    chain,
+                    address: from,
+                    type: exType
+                  }
+                )
+                  .then(async (selected?: string) => {
+                    setSubmitLoading(true);
+
+                    await submitPromise(selected);
+                  })
+                  .catch(onError)
+                  .finally(() => {
+                    setSubmitLoading(false);
+                  });
+              } else {
+                await submitPromise();
+              }
 
               if (success) {
                 return await submitData(step + 1);
@@ -636,7 +667,7 @@ const Component = () => {
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, setSubmitLoading, stakingFee, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, exType, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, selectSubstrateProxyAccountsToSign, setIsDisableHeader, stakingFee, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {
@@ -904,8 +935,6 @@ const Component = () => {
   }, [amountValue, assetDecimals, chainAsset, chainValue, currencyData?.isPrefix, currencyData.symbol, estimatedFee, inputAsset.symbol, isSubnetStaking, poolInfo.metadata, poolInfo.statistic, poolInfo?.type, poolTargets, renderSubnetStaking, t]);
 
   const onPreCheck = usePreCheckAction(fromValue);
-
-  const exType = useMemo(() => getExtrinsicTypeByPoolInfo({ chain: chainValue, type: poolType, slug }), [poolType, chainValue, slug]);
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);

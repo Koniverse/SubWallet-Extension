@@ -36,7 +36,7 @@ const REFERENDA_VOTED_MODAL_ID = 'referenda-voted-modal';
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   const { className = '', isAllAccount } = props;
   const { t } = useTranslation();
-  const { defaultData, persistData, setBackProps } = useTransactionContext<GovUnlockVoteParams>();
+  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setBackProps } = useTransactionContext<GovUnlockVoteParams>();
   const formDefault = useMemo((): GovUnlockVoteParams => ({ ...defaultData }), [defaultData]);
   const [form] = Form.useForm<GovUnlockVoteParams>();
   const [loading, setLoading] = useState(false);
@@ -92,13 +92,24 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       amount: values.amount || '0'
     };
 
-    handleUnlockVote(unlockVoteRequest)
+    const sendPromise = (signerSubstrateProxyAddress?: string) => {
+      return handleUnlockVote({
+        ...unlockVoteRequest,
+        signerSubstrateProxyAddress
+      });
+    };
+
+    selectSubstrateProxyAccountsToSign({
+      chain: chainValue,
+      address: values.from,
+      type: ExtrinsicType.GOV_UNLOCK_VOTE
+    }).then(sendPromise)
       .then((tx) => {
         onSuccess(tx);
       })
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [chainValue, onError, onSuccess]);
+  }, [chainValue, onError, onSuccess, selectSubstrateProxyAccountsToSign]);
 
   const goBack = useCallback(() => {
     navigate(`/home/governance?view=unlock-token&chainSlug=${chainValue}`);

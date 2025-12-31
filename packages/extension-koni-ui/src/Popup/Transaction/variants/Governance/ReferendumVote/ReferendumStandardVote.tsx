@@ -45,7 +45,7 @@ const PreviousVoteDetailModalId = 'previous-vote-detail-modal';
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   const { className = '', isAllAccount, targetAccountProxy } = props;
   const { t } = useTranslation();
-  const { defaultData, persistData, setBackProps, setCustomScreenTitle, setSubHeaderRightButtons } = useTransactionContext<GovReferendumVoteParams>();
+  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setBackProps, setCustomScreenTitle, setSubHeaderRightButtons } = useTransactionContext<GovReferendumVoteParams>();
   const [govRefVoteStorage, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData, from: govRefVoteStorage.from, fromAccountProxy: govRefVoteStorage.fromAccountProxy }), [defaultData, govRefVoteStorage.from, govRefVoteStorage.fromAccountProxy]);
   const [, setGovRefUnvoteStorage] = useLocalStorage(GOV_REFERENDUM_UNVOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS);
@@ -186,14 +186,25 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         conviction: conviction
       };
 
-      handleVote(voteRequest)
+      const sendPromise = (signerSubstrateProxyAddress?: string) => {
+        return handleVote({
+          ...voteRequest,
+          signerSubstrateProxyAddress
+        });
+      };
+
+      selectSubstrateProxyAccountsToSign({
+        chain: chainValue,
+        address: values.from,
+        type: ExtrinsicType.GOV_VOTE
+      }).then(sendPromise)
         .then((tx) => {
           onSuccess(tx);
         })
         .catch(onError)
         .finally(() => setLoadingButton(null));
     }
-  }, [chainValue, conviction, referendumId, defaultData.track, onError, onSuccess, voteType]);
+  }, [voteType, chainValue, referendumId, defaultData.track, conviction, selectSubstrateProxyAccountsToSign, onError, onSuccess]);
 
   const goRefSplitVote = useCallback(() => {
     setGovRefVoteStorage({
