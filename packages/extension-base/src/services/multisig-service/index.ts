@@ -1,13 +1,18 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _SubstrateAdapterSubscriptionArgs } from '@subwallet/extension-base/services/chain-service/types';
 import { EventService } from '@subwallet/extension-base/services/event-service';
+import { InappNotificationService } from '@subwallet/extension-base/services/inapp-notification-service';
+import { NotificationDescriptionMap, NotificationTitleMap } from '@subwallet/extension-base/services/inapp-notification-service/consts';
+import { NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import { decodeCallData, DecodeCallDataResponse, DEFAULT_BLOCK_HASH, genPendingMultisigTxKey, getCallData, getMultisigTxType } from '@subwallet/extension-base/services/multisig-service/utils';
 import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
+// import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BehaviorSubject } from 'rxjs';
 
 import { BlockHash, SignedBlock } from '@polkadot/types/interfaces';
@@ -41,6 +46,8 @@ interface PalletMultisigMultisig {
   /** List of addresses that have approved the extrinsic */
   approvals: string[]
 }
+
+// const multisigServiceLogger = createLogger('MultisigService');
 
 /**
  * Interface representing a pending multisig extrinsic with the current signer context
@@ -154,17 +161,21 @@ export class MultisigService implements StoppableServiceInterface {
   private unsubscribes: VoidFunction | undefined;
   /** Promise to check if the subscription logic is currently running */
   private subscribePromise: Promise<void> | undefined;
+  /** Set to track notified transaction keys to avoid duplicate notifications */
+  private readonly notifiedTxKeys: Set<string> = new Set();
 
   /**
    * Creates an instance of MultisigService
    * @param eventService - Service for handling application events
    * @param chainService - Service for managing chain connections
    * @param keyringService - Service for managing accounts and keyring
+   * @param inappNotificationService - Service for creating in-app notifications (optional)
    */
   constructor (
     private readonly eventService: EventService,
     private readonly chainService: ChainService,
-    private readonly keyringService: KeyringService
+    private readonly keyringService: KeyringService,
+    private readonly inappNotificationService: InappNotificationService
   ) {
     this.status = ServiceStatus.NOT_INITIALIZED;
   }
@@ -501,6 +512,7 @@ export class MultisigService implements StoppableServiceInterface {
   /**
    * Updates the multisig extrinsic map for a specific chain and multisig address
    * Removes old extrinsics and adds new ones, then notifies all subscribers
+   * Creates notifications for new pending transactions that require approval
    * @param multisigAddress - Multisig address
    * @param chain - Chain identifier
    * @param rawPendingTxs - Array of raw pending multisig extrinsics to update
@@ -513,19 +525,21 @@ export class MultisigService implements StoppableServiceInterface {
 
     // 1. Clean old extrinsics of multisigAddress and chain
     for (const [key, value] of Object.entries(currentMap)) {
-      if (!key.startsWith(excludedPrefix)) {
+      if (key.startsWith(excludedPrefix)) {
+        this.notifiedTxKeys.delete(key);
+      } else {
         filteredMap[key] = value;
       }
     }
 
     const newTxMap: PendingMultisigTxMap = {};
+    const newNotifiedTxs: PendingMultisigTx[] = [];
 
     // 2. Create new extrinsics of multisigAddress and chain
     for (const rawTx of rawPendingTxs) {
       const extrinsicHash = rawTx.extrinsicHash;
       const signerAddresses = rawTx.signerAddresses;
 
-      // Skip extrinsic if required fields are missing
       if (!extrinsicHash || !signerAddresses || signerAddresses.length === 0) {
         console.warn('Skipping multisig extrinsic due to missing required fields');
         continue;
@@ -538,8 +552,16 @@ export class MultisigService implements StoppableServiceInterface {
         }
 
         const key = genPendingMultisigTxKey(chain, multisigAddress, signerAddress, extrinsicHash);
+        const pendingTx: PendingMultisigTx = { ...rawTx, currentSigner: signerAddress };
 
-        newTxMap[key] = { ...rawTx, currentSigner: signerAddress };
+        newTxMap[key] = pendingTx;
+
+        // Track new transactions that need notification
+        // Only notify if this is a new transaction (not already notified)
+        if (!this.notifiedTxKeys.has(key) && !currentMap[key]) {
+          newNotifiedTxs.push(pendingTx);
+          this.notifiedTxKeys.add(key);
+        }
       }
     }
 
@@ -548,6 +570,79 @@ export class MultisigService implements StoppableServiceInterface {
       ...filteredMap,
       ...newTxMap
     });
+
+    // 4. Create notifications for new pending transactions
+    if (newNotifiedTxs.length > 0) {
+      this.createMultisigApprovalNotifications(newNotifiedTxs).catch((error) => {
+        console.error('Failed to create multisig approval notifications:', error);
+      });
+    }
+  }
+
+  /**
+   * Creates notifications for pending multisig transactions that require approval
+   * @param pendingTxs - Array of pending multisig transactions that need approval
+   */
+  private async createMultisigApprovalNotifications (pendingTxs: PendingMultisigTx[]): Promise<void> {
+    const chainInfoMap = new Map<string, { name: string }>();
+
+    const notifications = pendingTxs.map((tx) => {
+      // Get chain info for description
+      if (!chainInfoMap.has(tx.chain)) {
+        const chainInfo = this.chainService.getChainInfoByKey(tx.chain);
+
+        chainInfoMap.set(tx.chain, {
+          name: chainInfo?.name || tx.chain
+        });
+      }
+
+      const actionType = NotificationActionType.MULTISIG_APPROVAL;
+      const timestamp = Date.now();
+      const notificationId = `${actionType}___${tx.chain}___${tx.multisigAddress}___${tx.extrinsicHash}___${tx.currentSigner}___${timestamp}`;
+
+      return {
+        id: notificationId,
+        address: reformatAddress(tx.currentSigner),
+        title: NotificationTitleMap[actionType],
+        description: NotificationDescriptionMap[actionType](tx.multisigTxType),
+        time: timestamp,
+        extrinsicType: ExtrinsicType.MULTISIG_APPROVE_TX,
+        isRead: false,
+        actionType,
+        metadata: {
+          chain: tx.chain,
+          multisigAddress: tx.multisigAddress,
+          extrinsicHash: tx.extrinsicHash || '',
+          callHash: tx.callHash,
+          blockHeight: tx.blockHeight,
+          extrinsicIndex: tx.extrinsicIndex,
+          currentSigner: tx.currentSigner,
+          approvals: tx.approvals || [],
+          multisigTxType: tx.multisigTxType
+        }
+      };
+    });
+
+    // multisigServiceLogger.info('pendingTxs', pendingTxs);
+    // multisigServiceLogger.info('notifications', notifications);
+
+    // Group notifications by address to batch write
+    const notificationsByAddress = new Map<string, typeof notifications>();
+
+    for (const notification of notifications) {
+      const address = notification.address;
+
+      if (!notificationsByAddress.has(address)) {
+        notificationsByAddress.set(address, []);
+      }
+
+      notificationsByAddress.get(address)!.push(notification);
+    }
+
+    // Write notifications for each address
+    for (const [address, addressNotifications] of notificationsByAddress) {
+      await this.inappNotificationService.validateAndWriteNotificationsToDB(addressNotifications, address);
+    }
   }
 
   /**
