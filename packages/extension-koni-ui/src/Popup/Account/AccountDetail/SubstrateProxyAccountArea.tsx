@@ -339,7 +339,7 @@ function Component ({ accountProxy, className }: Props) {
 
   useEffect(() => {
     if (addressFormated && networkSelected) {
-      fetchProxyAccounts(true);
+      fetchProxyAccounts(true).catch(console.error);
     }
   }, [addressFormated, networkSelected, fetchProxyAccounts]);
 
@@ -356,11 +356,15 @@ function Component ({ accountProxy, className }: Props) {
     }
 
     const interval = setInterval(() => {
-      fetchProxyAccounts(false);
+      fetchProxyAccounts(false).catch(console.error);
     }, 10_000);
 
     return () => clearInterval(interval);
   }, [addressFormated, networkSelected, fetchProxyAccounts]);
+
+  useEffect(() => {
+    networkSelected !== '' && checkChain(networkSelected);
+  }, [networkSelected, checkChain]);
 
   return (
     <div className={className}>
