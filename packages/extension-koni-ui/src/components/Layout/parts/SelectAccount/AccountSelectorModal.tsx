@@ -14,6 +14,7 @@ import { ACCOUNT_CHAIN_ADDRESSES_MODAL, SELECT_ACCOUNT_MODAL } from '@subwallet/
 import { useDefaultNavigate, useExtensionDisplayModes, useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { saveCurrentAccountAddress } from '@subwallet/extension-koni-ui/messaging';
+import { AssetsTab } from '@subwallet/extension-koni-ui/Popup/Home/Tokens';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { AccountDetailParam, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -227,7 +228,9 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             if (locationPaths[1] === 'home') {
               if (locationPaths.length >= 3) {
                 if (pathName.startsWith('/home/nfts')) {
-                  navigate('/home/nfts/collections');
+                  navigate('/home/tokens', {
+                    state: { switchToTab: AssetsTab.NFTS }
+                  });
                 } else if (pathName.startsWith('/home/tokens/detail')) {
                   navigate('/home/tokens');
                 } else {

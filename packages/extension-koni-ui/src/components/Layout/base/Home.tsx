@@ -3,15 +3,14 @@
 
 import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { Layout } from '@subwallet/extension-koni-ui/components';
-import { CUSTOMIZE_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { useExtensionDisplayModes, useSelector, useSidePanelUtils } from '@subwallet/extension-koni-ui/hooks';
 import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ButtonProps, Dropdown, Icon, ModalContext } from '@subwallet/react-ui';
+import { ButtonProps, Dropdown, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ArrowsOut, BellSimpleRinging, FadersHorizontal, MagnifyingGlass, PuzzlePiece, SidebarSimple } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo } from 'react';
+import { ArrowsOut, BellSimpleRinging, PuzzlePiece, SidebarSimple } from 'phosphor-react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -22,15 +21,15 @@ interface Props extends ThemeProps {
   showSearchToken?: boolean;
   showSidebarIcon?: boolean;
   showNotificationIcon?: boolean;
+  showHeader?: boolean;
   onClickSearchToken?: () => void;
   showTabBar?: boolean;
   isDisableHeader?: boolean;
 }
 
-const Component = ({ children, className, isDisableHeader, onClickSearchToken, showFaderIcon, showNotificationIcon, showSearchToken, showSidebarIcon, showTabBar }: Props) => {
+const Component = ({ children, className, isDisableHeader, showHeader = true, showNotificationIcon, showSidebarIcon, showTabBar }: Props) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { activeModal } = useContext(ModalContext);
   const { unreadNotificationCountMap } = useSelector((state: RootState) => state.notification);
   const { currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
   const { notificationSetup: { isEnabled: notiEnable } } = useSelector((state: RootState) => state.settings);
@@ -45,34 +44,9 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
     return isAllAccount ? Object.values(unreadNotificationCountMap).reduce((acc, val) => acc + val, 0) : unreadNotificationCountMap[currentAccountProxy.id] || 0;
   }, [currentAccountProxy, isAllAccount, unreadNotificationCountMap]);
 
-  const onOpenCustomizeModal = useCallback(() => {
-    activeModal(CUSTOMIZE_MODAL);
-  }, [activeModal]);
-
   const onOpenNotification = useCallback(() => {
     navigate('/settings/notification');
   }, [navigate]);
-
-  const faderMenu = useMemo(() => {
-    return [
-      {
-        key: '1',
-        label: t('ui.components.Layout.Home.networkDisplay'),
-        icon: (
-          <Icon phosphorIcon={FadersHorizontal} />
-        ),
-        onClick: onOpenCustomizeModal
-      },
-      {
-        key: '2',
-        label: t('ui.components.Layout.Home.searchToken'),
-        icon: (
-          <Icon phosphorIcon={MagnifyingGlass} />
-        ),
-        onClick: onClickSearchToken
-      }
-    ];
-  }, [onClickSearchToken, onOpenCustomizeModal, t]);
 
   const sidebarMenu = useMemo(() => {
     const expandViewItem = {
@@ -146,42 +120,6 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
       });
     }
 
-    if (showFaderIcon) {
-      if (showSearchToken) {
-        icons.push({
-          icon: (
-            <>
-              <Icon
-                phosphorIcon={FadersHorizontal}
-                size='md'
-              />
-              <Dropdown
-                arrow={false}
-                menu={{ items: faderMenu }}
-                overlayClassName={'sw-dropdown-menu'}
-                placement='bottomRight'
-                trigger={['click']}
-              >
-                <i className={'sw-dropdown-trigger'}></i>
-              </Dropdown>
-            </>
-          )
-        });
-      } else {
-        icons.push({
-          icon: (
-            <Icon
-              phosphorIcon={FadersHorizontal}
-              size='md'
-            />
-          ),
-          onClick: onOpenCustomizeModal,
-          tooltip: t('ui.components.Layout.Home.customizeAssetDisplay'),
-          tooltipPlacement: 'bottomRight'
-        });
-      }
-    }
-
     if (showSidebarIcon) {
       if (isExpanseMode) {
         icons.push({
@@ -220,7 +158,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
     }
 
     return icons;
-  }, [faderMenu, isExpanseMode, isSidePanelSupported, notiEnable, onOpenCustomizeModal, onOpenNotification, openSidePanel, showFaderIcon, showNotificationIcon, showSearchToken, showSidebarIcon, sidebarMenu, t, unreadNotificationCount]);
+  }, [isExpanseMode, isSidePanelSupported, notiEnable, onOpenNotification, openSidePanel, showNotificationIcon, showSidebarIcon, sidebarMenu, t, unreadNotificationCount]);
 
   const onClickListIcon = useCallback(() => {
     navigate('/settings/list');
@@ -235,7 +173,7 @@ const Component = ({ children, className, isDisableHeader, onClickSearchToken, s
       headerOnClickLeft={onClickListIcon}
       headerPaddingVertical={true}
       isDisableHeader={isDisableHeader}
-      showHeader={true}
+      showHeader={showHeader}
       showLeftButton={true}
       showTabBar={showTabBar ?? true}
     >

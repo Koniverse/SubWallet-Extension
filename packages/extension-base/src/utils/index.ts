@@ -9,7 +9,7 @@ import { _isChainEvmCompatible, _isPureBitcoinChain, _isPureCardanoChain, _isPur
 import { AccountJson } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils/account';
 import { decodeAddress, encodeAddress, getKeypairTypeByAddress, isTonAddress } from '@subwallet/keyring';
-import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { AllSubstrateKeypairTypes, BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { t } from 'i18next';
 
 import { assert, BN, hexToU8a, isHex } from '@polkadot/util';
@@ -306,7 +306,7 @@ export function isAddressAndChainCompatible (address: string, chain: _ChainInfo)
   const keypairType = getKeypairTypeByAddress(address);
   const isEvmCompatible = _isChainEvmCompatible(chain) && EthereumKeypairTypes.includes(keypairType); // some chains compatible to substrate and evm, and use evm-address
   const isTonCompatible = _isPureTonChain(chain) && TonKeypairTypes.includes(keypairType);
-  const isSubstrateCompatible = _isPureSubstrateChain(chain) && SubstrateKeypairTypes.includes(keypairType);
+  const isSubstrateCompatible = _isPureSubstrateChain(chain) && AllSubstrateKeypairTypes.includes(keypairType);
   const isCardanoCompatible = _isPureCardanoChain(chain) && CardanoKeypairTypes.includes(keypairType);
   const isBitcoinCompatible = _isPureBitcoinChain(chain) && BitcoinKeypairTypes.includes(keypairType);
 

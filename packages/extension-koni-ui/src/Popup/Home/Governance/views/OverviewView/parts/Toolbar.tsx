@@ -1,0 +1,185 @@
+// Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+import { FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
+import { GovFilterModal } from '@subwallet/extension-koni-ui/components/Modal/Governance/GovFilterModal';
+import { ReferendaCategory } from '@subwallet/extension-koni-ui/Popup/Home/Governance/types';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { Badge, Button, Icon, ModalContext } from '@subwallet/react-ui';
+import { ALL_TRACK_ID, GovStatusKey, SubsquareApiSdk } from '@subwallet/subsquare-api-sdk';
+import { FadersHorizontal, MagnifyingGlass } from 'phosphor-react';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+
+type Props = ThemeProps & {
+  onChangeCategory: (category: ReferendaCategory) => void;
+  selectedReferendaCategory: ReferendaCategory;
+  isEnableTreasuryFilter: boolean;
+  isEnableVotedFilter: boolean;
+  isEnableDelegatedFilter: boolean;
+  setIsEnableVotedFilter: (value: boolean) => void;
+  setIsEnableDelegatedFilter: (value: boolean) => void;
+  setIsEnableTreasuryFilter: (value: boolean) => void;
+  statusSelected: GovStatusKey;
+  setStatusSelected: (value: GovStatusKey) => void;
+  trackSelected: string;
+  setTrackSelected: (value: string) => void;
+  sdkInstance?: SubsquareApiSdk;
+  chain: string;
+};
+
+const GOV_FILTER_MODAL_ID = 'gov-filter-modal';
+const GOV_SEARCH_MODAL_ID = 'referenda-search-modal';
+
+const Component = ({ chain, className, isEnableDelegatedFilter, isEnableTreasuryFilter,
+  isEnableVotedFilter, onChangeCategory, sdkInstance, selectedReferendaCategory,
+  setIsEnableDelegatedFilter, setIsEnableTreasuryFilter, setIsEnableVotedFilter, setStatusSelected, setTrackSelected, statusSelected, trackSelected }: Props): React.ReactElement<Props> => {
+  const { t } = useTranslation();
+  const { activeModal, inactiveModal } = useContext(ModalContext);
+
+  const [trackSelectedState, setTrackSelectedState] = React.useState<string>(trackSelected);
+  const [statusSelectedState, setStatusSelectedState] = React.useState<GovStatusKey>(statusSelected);
+  const [isEnableTreasuryFilterState, setIsEnableTreasuryFilterState] = React.useState<boolean>(isEnableTreasuryFilter);
+
+  const filterTabItems = useMemo(() => {
+    return [
+      {
+        label: t('ui.GOVERNANCE.screen.Governance.Overview.Toolbar.allReferenda'),
+        value: ReferendaCategory.ALL
+      },
+      {
+        label: t('ui.GOVERNANCE.screen.Governance.Overview.Toolbar.ongoing'),
+        value: ReferendaCategory.ONGOING
+      }
+    ];
+  }, [t]);
+
+  const onOpenFilter = useCallback(() => {
+    activeModal(GOV_FILTER_MODAL_ID);
+  }, [activeModal]);
+
+  const onOpenSearch = useCallback(() => {
+    activeModal(GOV_SEARCH_MODAL_ID);
+  }, [activeModal]);
+
+  const onCancelFilter = useCallback(() => {
+    inactiveModal(GOV_FILTER_MODAL_ID);
+    setIsEnableTreasuryFilterState(isEnableTreasuryFilter);
+    setStatusSelectedState(statusSelected);
+    setTrackSelectedState(trackSelected);
+  }, [inactiveModal, isEnableTreasuryFilter, statusSelected, trackSelected]);
+
+  const onSelectFilterTab = useCallback((value: string) => {
+    onChangeCategory(value as ReferendaCategory);
+  }, [onChangeCategory]);
+
+  const onApplyFilter = useCallback(() => {
+    inactiveModal(GOV_FILTER_MODAL_ID);
+    setIsEnableTreasuryFilter(isEnableTreasuryFilterState);
+    setStatusSelected(statusSelectedState);
+    setTrackSelected(trackSelectedState);
+  }, [inactiveModal, isEnableTreasuryFilterState, setIsEnableTreasuryFilter, setStatusSelected, setTrackSelected, statusSelectedState, trackSelectedState]);
+
+  const hasAnyFilterValue = isEnableDelegatedFilter || isEnableTreasuryFilter || isEnableVotedFilter || (trackSelected !== 'All' || statusSelected !== 'All');
+
+  useEffect(() => {
+    setStatusSelected(GovStatusKey.ALL);
+    setStatusSelectedState(GovStatusKey.ALL);
+    setTrackSelected(ALL_TRACK_ID);
+    setTrackSelectedState(ALL_TRACK_ID);
+    setIsEnableTreasuryFilterState(false);
+    setIsEnableTreasuryFilter(false);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedReferendaCategory]);
+
+  return (
+    <div className={className}>
+      <FilterTabs
+        className={'__filter-tabs-bar'}
+        items={filterTabItems}
+        onSelect={onSelectFilterTab}
+        selectedItem={selectedReferendaCategory}
+      />
+
+      <div className='__buttons-wrapper'>
+        <Button
+          icon={(
+            <Icon
+              customSize={'20px'}
+              phosphorIcon={MagnifyingGlass}
+            />
+          )}
+          onClick={onOpenSearch}
+          size={'xs'}
+          type={'ghost'}
+        />
+
+        <Button
+          disabled={sdkInstance?.isLegacyGov}
+          icon={
+            <Badge
+              className={'g-filter-badge'}
+              dot={hasAnyFilterValue}
+            >
+              <Icon
+                customSize='20px'
+                phosphorIcon={FadersHorizontal}
+              />
+            </Badge>
+          }
+          onClick={onOpenFilter}
+          size='xs'
+          type='ghost'
+        />
+
+        <GovFilterModal
+          chain={chain}
+          id={GOV_FILTER_MODAL_ID}
+          isEnableDelegatedFilter={isEnableDelegatedFilter}
+          isEnableTreasuryFilter={isEnableTreasuryFilterState}
+          isEnableVotedFilter={isEnableVotedFilter}
+          onApplyFilter={onApplyFilter}
+          onCancel={onCancelFilter}
+          sdkInstance={sdkInstance}
+          selectedReferendaCategory={selectedReferendaCategory}
+          setIsEnableDelegatedFilter={setIsEnableDelegatedFilter}
+          setIsEnableTreasuryFilter={setIsEnableTreasuryFilterState}
+          setIsEnableVotedFilter={setIsEnableVotedFilter}
+          setStatusSelected={setStatusSelectedState}
+          setTrackSelected={setTrackSelectedState}
+          statusSelected={statusSelectedState}
+          title={t('ui.GOVERNANCE.screen.Governance.Overview.Toolbar.filter')}
+          trackSelected={trackSelectedState}
+        />
+      </div>
+    </div>
+  );
+};
+
+export const Toolbar = styled(Component)<Props>(({ theme: { token } }: Props) => {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    paddingInline: token.padding,
+    paddingTop: token.paddingSM,
+    paddingBottom: token.paddingXS,
+
+    '.__filter-tabs-bar': {
+      flex: 1,
+
+      '.__tab-item-label': {
+        paddingTop: 0,
+        fontSize: token.fontSize,
+        lineHeight: token.lineHeight,
+        paddingBottom: token.paddingXXS
+      }
+    },
+
+    '.__buttons-wrapper': {
+      display: 'flex',
+      alignItems: 'center'
+    }
+  };
+});

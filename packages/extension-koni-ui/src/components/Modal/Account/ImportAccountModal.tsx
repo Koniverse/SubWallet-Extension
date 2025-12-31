@@ -3,6 +3,8 @@
 
 import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { IMPORT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
+import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
+import { IMPORT_ACCOUNT_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { useClickOutSide, useExtensionDisplayModes, useGoBackSelectAccount, useSetSessionLatest, useSidePanelUtils, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
@@ -25,7 +27,7 @@ type Props = ThemeProps;
 interface ImportAccountItem {
   label: string;
   key: string;
-  icon: PhosphorIcon;
+  icon: PhosphorIcon | React.ReactNode;
   backgroundColor: string;
   onClick: () => void;
 }
@@ -75,6 +77,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     navigate('/accounts/import-seed-phrase');
   }, [inactiveModal, navigate]);
 
+  const onClickSeedTrust = useCallback(() => {
+    inactiveModal(modalId);
+    navigate(`/accounts/import-seed-phrase?type=${TRUST_WALLET_MNEMONIC_TYPE}`);
+  }, [inactiveModal, navigate]);
+
   const items = useMemo((): ImportAccountItem[] => [
     {
       backgroundColor: token['green-7'],
@@ -103,16 +110,33 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       key: 'import-by-qr',
       label: t('ui.ACCOUNT.components.Modal.Account.Import.importByQrCode'),
       onClick: onClickItem('/accounts/import-by-qr')
+    },
+    {
+      backgroundColor: token.colorTextBase,
+      icon: (
+        <img
+          alt=''
+          src={DefaultLogosMap.trust}
+          style={{ width: '24px', height: '24px', objectFit: 'contain', display: 'block', borderRadius: '50%' }}
+        />
+      ),
+      key: 'import-seed-phrase-trust',
+      label: t('ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhraseTrust'),
+      onClick: onClickSeedTrust
     }
-  ], [token, t, onClickSeed, onClickJson, onClickItem]);
+  ], [token, t, onClickSeed, onClickJson, onClickItem, onClickSeedTrust]);
 
   const renderIcon = useCallback((item: ImportAccountItem) => {
+    const isNode = React.isValidElement(item.icon);
+
     return (
       <BackgroundIcon
         backgroundColor={item.backgroundColor}
+        customIcon={isNode ? item.icon as React.ReactNode : undefined}
         iconColor={token.colorText}
-        phosphorIcon={item.icon}
+        phosphorIcon={isNode ? undefined : item.icon as PhosphorIcon}
         size='sm'
+        type={isNode ? 'customIcon' : 'phosphor'}
         weight='fill'
       />
     );

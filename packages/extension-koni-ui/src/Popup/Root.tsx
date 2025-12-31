@@ -49,7 +49,7 @@ const createDoneUrl = '/create-done';
 const settingImportNetwork = '/settings/chains/import';
 
 const baseAccountPath = '/accounts';
-const allowImportAccountPaths = ['new-seed-phrase', 'import-seed-phrase', 'import-private-key', 'restore-json', 'import-by-qr', 'attach-read-only', 'connect-polkadot-vault', 'connect-keystone', 'connect-ledger'];
+const allowImportAccountPaths = ['new-seed-phrase', 'import-seed-phrase', 'import-seed-phrase-trust', 'import-private-key', 'restore-json', 'import-by-qr', 'attach-read-only', 'connect-polkadot-vault', 'connect-keystone', 'connect-ledger'];
 const allowBlackScreenWS = [welcomeUrl, loginUrl];
 const allowImportAccountUrls = allowImportAccountPaths.map((path) => `${baseAccountPath}/${path}`);
 

@@ -4,6 +4,7 @@
 import { LedgerNetwork, MigrationLedgerNetwork, POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
 import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { detectTranslate, isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
+import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AccountItemWithName, AccountWithNameSkeleton, BasicOnChangeFunction, ChainSelector, DualLogo, InfoIcon, Layout, LedgerAccountTypeSelector, LedgerPolkadotAccountItemType, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { LedgerChainSelector, LedgerItemType } from '@subwallet/extension-koni-ui/components/Field/LedgerChainSelector';
 import { ATTACH_ACCOUNT_MODAL, SUBSTRATE_GENERIC_KEY, SUBSTRATE_MIGRATION_KEY, USER_GUIDE_URL } from '@subwallet/extension-koni-ui/constants';

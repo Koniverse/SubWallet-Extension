@@ -111,13 +111,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     const priceId = form.getFieldValue('priceId') as string;
 
     const newProviderKey = _generateCustomProviderKey(0);
+    const parsedProvider = provider.replaceAll(' ', '');
 
     const params: _NetworkUpsertParams = {
       mode: 'insert',
       chainEditInfo: {
         slug: '',
         currentProvider: newProviderKey,
-        providers: { [newProviderKey]: provider },
+        providers: { [newProviderKey]: parsedProvider },
         blockExplorer,
         crowdloanUrl,
         symbol,

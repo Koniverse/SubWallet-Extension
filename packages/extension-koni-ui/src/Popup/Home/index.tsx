@@ -4,6 +4,7 @@
 import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { Layout } from '@subwallet/extension-koni-ui/components';
 import { GlobalSearchTokenModal } from '@subwallet/extension-koni-ui/components/Modal/GlobalSearchTokenModal';
+import { GlobalSearchTokenGroupModal, Layout } from '@subwallet/extension-koni-ui/components';
 import RemindUpgradeFirefoxVersion from '@subwallet/extension-koni-ui/components/Modal/RemindUpgradeFirefoxVersion';
 import { GeneralTermModal } from '@subwallet/extension-koni-ui/components/Modal/TermsAndConditions/GeneralTermModal';
 import { CONFIRM_GENERAL_TERM, DEFAULT_SESSION_VALUE, GENERAL_TERM_AND_CONDITION_MODAL, HOME_CAMPAIGN_BANNER_MODAL, LATEST_SESSION, REMIND_BACKUP_SEED_PHRASE_MODAL, REMIND_UPGRADE_FIREFOX_VERSION } from '@subwallet/extension-koni-ui/constants';
@@ -13,7 +14,7 @@ import { useAccountBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, us
 import { RemindBackUpSeedPhraseParamState, SessionStorage, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { isFirefox } from '@subwallet/extension-koni-ui/utils';
 import { ModalContext } from '@subwallet/react-ui';
-import React, { useCallback, useContext, useEffect, useRef } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Outlet } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
@@ -24,6 +25,7 @@ const logger = createLogger('Home');
 type Props = ThemeProps;
 
 export const GlobalSearchTokenModalId = 'globalSearchToken';
+export const GlobalSearchTokenGroupModalId = 'GlobalSearchTokenGroupModalId';
 const historyPageIgnoreRemind = 'ignoreRemind';
 const historyPageIgnoreBanner = 'ignoreBanner';
 
@@ -34,6 +36,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const location = useLocation();
   const accountBalance = useAccountBalance(tokenGroupStructure.tokenGroupMap);
   const [isConfirmedTermGeneral, setIsConfirmedTermGeneral] = useLocalStorage(CONFIRM_GENERAL_TERM, 'nonConfirmed');
+  const [showTabBar, setShowTabBar] = useState<boolean>(true);
   const { isNeedUpgradeVersion } = useUpgradeFireFoxVersion();
   const { showAppPopup } = useContext(AppOnlineContentContext);
 
@@ -46,8 +49,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     activeModal(GlobalSearchTokenModalId);
   }, [activeModal]);
 
-  const onCloseGlobalSearchToken = useCallback(() => {
-    inactiveModal(GlobalSearchTokenModalId);
+  const onCloseGlobalSearchTokenGroup = useCallback(() => {
+    inactiveModal(GlobalSearchTokenGroupModalId);
   }, [inactiveModal]);
 
   const onAfterConfirmTermModal = useCallback(() => {
@@ -109,7 +112,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     <>
       <HomeContext.Provider value={{
         tokenGroupStructure,
-        accountBalance
+        accountBalance,
+        uiState: { setShowTabBar }
       }}
       >
         <div className={`home home-container ${className}`}>
@@ -119,6 +123,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             showNotificationIcon
             showSearchToken
             showSidebarIcon
+            showTabBar={showTabBar}
           >
             <Outlet />
             <GeneralTermModal onOk={onAfterConfirmTermModal} />
@@ -127,11 +132,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         </div>
       </HomeContext.Provider>
 
-      <GlobalSearchTokenModal
-        id={GlobalSearchTokenModalId}
-        onCancel={onCloseGlobalSearchToken}
-        tokenBalanceMap={accountBalance.tokenBalanceMap}
-        tokenSlugs={tokenGroupStructure.tokenSlugs}
+      <GlobalSearchTokenGroupModal
+        id={GlobalSearchTokenGroupModalId}
+        onCancel={onCloseGlobalSearchTokenGroup}
+        tokenGroupBalanceMap={accountBalance.tokenGroupBalanceMap}
+        tokenGroups={tokenGroupStructure.tokenGroups}
       />
     </>
   );
