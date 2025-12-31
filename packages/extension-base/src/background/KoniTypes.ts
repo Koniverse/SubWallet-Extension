@@ -587,9 +587,9 @@ export enum ExtrinsicType {
   // OPEN GOV
 
   // MULTISIG
-  MULTISIG_APPROVE_TX = 'multisig.approve_unstake',
-  MULTISIG_CANCEL_TX = 'multisig.cancel_unstake',
-  MULTISIG_EXECUTE_TX = 'multisig.execute_unstake',
+  MULTISIG_APPROVE_TX = 'multisig.approve',
+  MULTISIG_CANCEL_TX = 'multisig.cancel',
+  MULTISIG_EXECUTE_TX = 'multisig.execute',
   // MULTISIG
 
   EVM_EXECUTE = 'evm.execute',
