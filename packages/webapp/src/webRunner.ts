@@ -8,12 +8,15 @@ import { SWHandler } from '@subwallet/extension-base/koni/background/handlers';
 import { AccountsStore } from '@subwallet/extension-base/stores';
 import KeyringStore from '@subwallet/extension-base/stores/Keyring';
 import { browserName, browserVersion, osName, osVersion } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { ENABLE_INJECT } from '@subwallet/extension-web-ui/constants';
 import keyring from '@subwallet/ui-keyring';
 
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 import { PageStatus, responseMessage, setupHandlers } from './messageHandle';
+
+const logger = createLogger('WebApp');
 
 setupHandlers();
 
@@ -22,7 +25,7 @@ responseMessage({ id: '0', response: { status: 'load' } } as PageStatus);
 // initial setup
 cryptoWaitReady()
   .then((): void => {
-    console.log('[WebApp] crypto initialized');
+    logger.info('[WebApp] crypto initialized');
 
     const envConfig: EnvConfig = {
       appConfig: {
@@ -55,7 +58,7 @@ cryptoWaitReady()
         SWHandler.instance.state.eventService.emit('inject.ready', true);
       }, 1000);
 
-      SWHandler.instance.state.eventService.waitInjectReady.then(() => clearTimeout(timeout)).catch(console.error);
+      SWHandler.instance.state.eventService.waitInjectReady.then(() => clearTimeout(timeout)).catch((error) => logger.error('Failed to wait for inject ready', error));
     } else {
       SWHandler.instance.state.eventService.emit('inject.ready', true);
     }
@@ -65,10 +68,10 @@ cryptoWaitReady()
     responseMessage({ id: '0', response: { status: 'crypto_ready' } } as PageStatus);
 
     // wake webapp up
-    SWHandler.instance.state.wakeup(true).catch((err) => console.warn(err));
+    SWHandler.instance.state.wakeup(true).catch((err) => logger.warn('Failed to wake up webapp', err));
 
-    console.log('[WebApp] initialization completed');
+    logger.info('[WebApp] initialization completed');
   })
   .catch((error): void => {
-    console.error('[WebApp] initialization failed', error);
+    logger.error('[WebApp] initialization failed', error);
   });

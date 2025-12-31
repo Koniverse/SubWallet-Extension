@@ -4,6 +4,7 @@
 import type { Chain } from '@subwallet/extension-chains/types';
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { getMetadata, getMetadataRaw } from '@subwallet/extension-koni-ui/messaging';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -41,7 +42,7 @@ export default function useMetadata (genesisHash?: string | null, specVersion?: 
         try {
           return await getMetadata(genesisHash);
         } catch (error) {
-          console.error(error);
+          defaultLogger.error('Failed to get metadata', error);
 
           return null;
         }
@@ -113,7 +114,7 @@ export default function useMetadata (genesisHash?: string | null, specVersion?: 
           }
         })
         .catch((err) => {
-          console.error(err);
+          defaultLogger.error('Failed to get metadata raw', err);
 
           if (cancel) {
             return;

@@ -4,8 +4,11 @@
 import type { InjectedAccount, InjectedAccounts, Unsubcall } from '@subwallet/extension-inject/types';
 import type { SendRequest } from '../types';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
 // External to class, this.# is not private enough (yet)
 let sendRequest: SendRequest;
+const substrateAccountsLogger = createLogger('SubstrateAccounts');
 
 export default class Accounts implements InjectedAccounts {
   constructor (_sendRequest: SendRequest) {
@@ -23,11 +26,11 @@ export default class Accounts implements InjectedAccounts {
       .then((subId): void => {
         id = subId;
       })
-      .catch(console.error);
+      .catch((e) => substrateAccountsLogger.error('Error subscribing to accounts', e));
 
     return (): void => {
       id && sendRequest('pub(accounts.unsubscribe)', { id })
-        .catch(console.error);
+        .catch((e) => substrateAccountsLogger.error('Error unsubscribing from accounts', e));
     };
   }
 }

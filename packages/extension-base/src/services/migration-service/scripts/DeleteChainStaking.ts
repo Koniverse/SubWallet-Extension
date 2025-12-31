@@ -8,7 +8,7 @@ export default class DeleteChainStaking extends BaseMigrationJob {
     try {
       await this.state.dbService.stores.yieldPoolInfo.table.where({ slug: 'CAPS___native_staking___ternoa_alphanet' }).delete();
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
   }
 }

@@ -6,6 +6,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _getAssetDecimals, _getTokenOnChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHANNEL_ID, fakeAddress } from '@subwallet/extension-base/services/earning-service/constants';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BaseYieldStepDetail, EarningStatus, HandleYieldStepData, LiquidYieldPoolInfo, LiquidYieldPositionInfo, OptimalYieldPath, OptimalYieldPathParams, RuntimeDispatchInfo, SubmitYieldJoinData, TokenBalanceRaw, TransactionData, UnstakingInfo, UnstakingStatus, YieldPoolMethodInfo, YieldPositionInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
@@ -13,6 +14,8 @@ import BigNumber from 'bignumber.js';
 import { BN, BN_ZERO } from '@polkadot/util';
 
 import BaseLiquidStakingPoolHandler from './base';
+
+const bifrostLiquidStakingLogger = createLogger('BifrostLiquidStaking');
 
 export interface BifrostLiquidStakingMeta {
   apy: string,
@@ -97,7 +100,7 @@ export default class BifrostLiquidStakingPoolHandler extends BaseLiquidStakingPo
         method: 'GET'
       }).then((res) => {
         resolve(res.json());
-      }).catch(console.error);
+      }).catch((error) => bifrostLiquidStakingLogger.error('Error in bifrost liquid staking', error));
     });
 
     const exchangeRatePromise = new Promise(function (resolve) {
@@ -111,7 +114,7 @@ export default class BifrostLiquidStakingPoolHandler extends BaseLiquidStakingPo
         })
       }).then((resp) => {
         resolve(resp.json());
-      }).catch(console.error);
+      }).catch((error) => bifrostLiquidStakingLogger.error('Error in bifrost liquid staking', error));
     });
 
     const derivativeTokenInfo = this.state.getAssetBySlug(this.derivativeAssets[0]);

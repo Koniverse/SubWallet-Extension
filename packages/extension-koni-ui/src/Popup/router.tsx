@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { PHISHING_PAGE_REDIRECT } from '@subwallet/extension-base/defaults';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { AppOnlineContentContextProvider } from '@subwallet/extension-koni-ui/contexts/AppOnlineContentProvider';
 import { MktCampaignModalContextProvider } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
@@ -10,6 +11,8 @@ import { Root } from '@subwallet/extension-koni-ui/Popup/Root';
 import { i18nPromise } from '@subwallet/extension-koni-ui/utils/common/i18n';
 import React, { ComponentType } from 'react';
 import { createHashRouter, IndexRouteObject, Outlet, useLocation } from 'react-router-dom';
+
+const logger = createLogger('Router');
 
 export const lazyLoaderMap: Record<string, LazyLoader> = {};
 
@@ -36,7 +39,7 @@ export class LazyLoader {
 
   public generateRouterObject (path: string, preload = false): Pick<IndexRouteObject, 'path' | 'lazy'> {
     if (preload) {
-      this.loadElement().catch(console.error);
+      this.loadElement().catch((error) => logger.error('Failed to load element', error));
     }
 
     return {

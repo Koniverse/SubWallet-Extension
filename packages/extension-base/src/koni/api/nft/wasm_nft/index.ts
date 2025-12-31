@@ -11,8 +11,11 @@ import { collectionApiFromArtZero, collectionDetailApiFromArtZero, externalUrlOn
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { isUrl } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { ApiPromise } from '@polkadot/api';
+
+const wasmNftLogger = createLogger('WasmNft');
 import { ContractPromise } from '@polkadot/api-contract';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
@@ -42,7 +45,7 @@ async function isArtZeroFeaturedCollection (networkKey: string, contractAddress:
       body: urlencoded
     }).then((resp) => {
       resolve(resp.json());
-    }).catch(console.error);
+    }).catch((e) => wasmNftLogger.error('Error fetching collection info', e));
   });
 
   const collectionInfo = await Promise.race([
@@ -425,7 +428,7 @@ export class WasmNftApi extends BaseNftApi {
                 tokenUri = ((tokenUriObj.ok || tokenUriObj.Ok) as string[])[0];
               }
             } catch (e) {
-              console.debug(e);
+              wasmNftLogger.debug('Error getting token URI', e);
             }
 
             if (!tokenUri) {
@@ -468,7 +471,7 @@ export class WasmNftApi extends BaseNftApi {
 
         nftOwnerMap[address] = nftIds;
       } catch (e) {
-        console.error(`${this.chain}`, e);
+        wasmNftLogger.error(`Error handling NFTs for chain ${this.chain}`, e);
       }
     }));
 

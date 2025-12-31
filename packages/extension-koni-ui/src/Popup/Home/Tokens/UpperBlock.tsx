@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { balanceNoPrefixFormater } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { reloadCron, saveShowBalance } from '@subwallet/extension-koni-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -10,6 +11,8 @@ import CN from 'classnames';
 import { ArrowsClockwise, ArrowsLeftRight, CopySimple, Eye, EyeSlash, PaperPlaneTilt, ShoppingCartSimple } from 'phosphor-react';
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
+
+const logger = createLogger('UpperBlock');
 
 import { ActionButtonsContainer } from './ActionButtonsContainer';
 
@@ -46,13 +49,13 @@ function Component (
   const { currencyData } = useSelector((state) => state.price);
 
   const onChangeShowBalance = useCallback(() => {
-    saveShowBalance(!isShowBalance).catch(console.error);
+    saveShowBalance(!isShowBalance).catch((error) => logger.error('Failed to save show balance setting', error));
   }, [isShowBalance]);
 
   const reloadBalance = useCallback(() => {
     setReloading(true);
     reloadCron({ data: 'balance' })
-      .catch(console.error)
+      .catch((error) => logger.error('Failed to reload balance cron', error))
       .finally(() => {
         setReloading(false);
       });

@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, Input } from '@subwallet/react-ui';
@@ -55,7 +56,7 @@ const Component: React.FC<Props> = (props: Props) => {
       .then((validatedData) => {
         onOk(validatedData.password);
       })
-      .catch(console.error);
+      .catch((error) => defaultLogger.error('Failed to validate password fields', error));
   }, [form, onOk]);
 
   const onClickCancel = useCallback(() => {

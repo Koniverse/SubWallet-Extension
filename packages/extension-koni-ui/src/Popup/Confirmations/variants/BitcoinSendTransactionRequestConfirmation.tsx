@@ -5,6 +5,7 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { BitcoinSendTransactionRequest, ConfirmationsQueueItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BN_ZERO, getDomainFromUrl } from '@subwallet/extension-base/utils';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useNotification } from '@subwallet/extension-koni-ui/hooks';
@@ -19,6 +20,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+
+const logger = createLogger('BitcoinSendTransactionRequestConfirmation');
 
 interface Props extends ThemeProps {
   type: BitcoinSignatureSupportType
@@ -89,12 +92,12 @@ function Component ({ className, request, type }: Props) {
         });
         setIsErrorTransaction(true);
         setTransferInfo(transferInfo);
-        cancelSubscription(transferInfo.id).catch(console.error);
+        cancelSubscription(transferInfo.id).catch((error) => logger.error('Failed to cancel subscription', error));
       } else if (!cancel) {
         setTransferInfo(transferInfo);
         id = transferInfo.id;
       } else {
-        cancelSubscription(transferInfo.id).catch(console.error);
+        cancelSubscription(transferInfo.id).catch((error) => logger.error('Failed to cancel subscription', error));
       }
     };
 
@@ -112,7 +115,7 @@ function Component ({ className, request, type }: Props) {
         }, callback)
           .then(callback)
           .catch((e) => {
-            console.error(e);
+            logger.error('Failed to subscribe transfer when confirmation', e);
             notify({
               message: t(e),
               type: 'error',
@@ -123,7 +126,7 @@ function Component ({ className, request, type }: Props) {
           })
           .finally(() => {
             clearTimeout(timeout);
-            id && cancelSubscription(id).catch(console.error);
+            id && cancelSubscription(id).catch((error) => logger.error('Failed to cancel subscription', error));
             setIsFetchingInfo(false);
           });
       }, 100);
@@ -132,7 +135,7 @@ function Component ({ className, request, type }: Props) {
     return () => {
       cancel = true;
       clearTimeout(timeout);
-      id && cancelSubscription(id).catch(console.error);
+      id && cancelSubscription(id).catch((error) => logger.error('Failed to cancel subscription on cleanup', error));
     };
   }, [assetRegistry, assetValue, chainValue, fromValue, toValue, transferAmountValue, notify, t]);
 

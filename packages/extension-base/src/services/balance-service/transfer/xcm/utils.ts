@@ -4,6 +4,7 @@
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/paraspell-chain-map';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
@@ -12,6 +13,8 @@ import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Call, ExtrinsicPayload } from '@polkadot/types/interfaces';
 import { assert, compactToU8a, isHex, u8aConcat, u8aEq } from '@polkadot/util';
+
+const xcmUtilsLogger = createLogger('XcmUtils');
 
 export type DryRunNodeFailure = {
   success: false,
@@ -119,7 +122,7 @@ function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): Submittable
 
           extrinsicCall = api.createType('Call', extrinsicPayload.method.toHex());
         } else {
-          console.error('Unable to decode data as Call, length mismatch in supplied data');
+          xcmUtilsLogger.error('Unable to decode data as Call, length mismatch in supplied data');
         }
       } catch {
         // final attempt, we try this as-is as a (prefixed) payload
@@ -140,7 +143,7 @@ function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): Submittable
 
     return decoded;
   } catch (e) {
-    console.error('Failed to decode extrinsic hex', e);
+    xcmUtilsLogger.error('Failed to decode extrinsic hex', e);
 
     throw new Error('Failed to decode extrinsic hex');
   }
@@ -299,7 +302,7 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   const requestValue = BigNumber(value).gt(0) ? value : '1'; // avoid bug in-case estimate fee sendingValue <= 0;
 
   if (!paraSpellIdentifyV4) {
-    console.error('Lack of paraspell metadata');
+    xcmUtilsLogger.error('Lack of paraspell metadata');
 
     return undefined;
   }
@@ -329,7 +332,7 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   );
 
   if (!response.ok) {
-    console.error('Failed to request estimate fee');
+    xcmUtilsLogger.error('Failed to request estimate fee');
 
     return undefined;
   }

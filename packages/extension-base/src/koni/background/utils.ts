@@ -11,7 +11,11 @@ import { Metadata, TypeRegistry } from '@polkadot/types';
 import { ChainProperties } from '@polkadot/types/interfaces';
 import { Registry, SignerPayloadJSON } from '@polkadot/types/types';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
 import KoniState from './handlers/State';
+
+const registryUtilsLogger = createLogger('RegistryUtils');
 
 export interface RegistrySource{
   registry: Registry,
@@ -74,7 +78,7 @@ export async function setupApiRegistry (chainInfo: _ChainInfo | undefined, koniS
       specVersion: apiSpecVersion
     };
   } catch (e) {
-    console.error('Error in setupApiRegistry:', e);
+    registryUtilsLogger.error('Error in setupApiRegistry', e);
 
     return null;
   }
@@ -82,7 +86,7 @@ export async function setupApiRegistry (chainInfo: _ChainInfo | undefined, koniS
 
 export async function setupDatabaseRegistry (chainInfo: _ChainInfo | undefined, payload: SignerPayloadJSON, koniState: KoniState): Promise<RegistrySource | null> {
   if (!chainInfo) {
-    console.warn('setupDatabaseRegistry: Missing chainInfo');
+    registryUtilsLogger.warn('setupDatabaseRegistry: Missing chainInfo');
 
     return null;
   }
@@ -91,7 +95,7 @@ export async function setupDatabaseRegistry (chainInfo: _ChainInfo | undefined, 
     const metadata = await koniState.chainService.getMetadataByHash(payload.genesisHash) as MetadataItem;
 
     if (!metadata?.genesisHash) {
-      console.warn('setupDatabaseRegistry: Metadata not found or invalid for genesisHash:', payload.genesisHash);
+      registryUtilsLogger.warn('setupDatabaseRegistry: Metadata not found or invalid for genesisHash', payload.genesisHash);
 
       return null;
     }
@@ -108,7 +112,7 @@ export async function setupDatabaseRegistry (chainInfo: _ChainInfo | undefined, 
       specVersion: metadata.specVersion
     };
   } catch (e) {
-    console.error('setupDatabaseRegistry: Error setting up database registry:', e);
+    registryUtilsLogger.error('setupDatabaseRegistry: Error setting up database registry', e);
 
     return null;
   }
@@ -133,7 +137,7 @@ export function setupDappRegistry (payload: SignerPayloadJSON, koniState: KoniSt
         specVersion: metadata.specVersion
       });
     } catch (e) {
-      console.error('setupDappRegistry: Error setting up DApp registry:', e);
+      registryUtilsLogger.error('setupDappRegistry: Error setting up DApp registry', e);
 
       resolve(null);
     }

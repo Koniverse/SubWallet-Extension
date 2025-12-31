@@ -8,12 +8,15 @@ import { SWHandler } from '@subwallet/extension-base/koni/background/handlers';
 import { AccountsStore } from '@subwallet/extension-base/stores';
 import KeyringStore from '@subwallet/extension-base/stores/Keyring';
 import { platformModel, platformType } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import keyring from '@subwallet/ui-keyring';
 
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 import { checkRestore } from './checkRestore';
 import { PageStatus, responseMessage, setupHandlers } from './messageHandle';
+
+const logger = createLogger('WebRunner');
 
 responseMessage({ id: '0', response: { status: 'load' } } as PageStatus);
 
@@ -24,7 +27,7 @@ setupHandlers();
 // Initial setup
 Promise.all([cryptoWaitReady(), checkRestore()])
   .then((): void => {
-    console.log('[Mobile] crypto initialized');
+    logger.info('[Mobile] crypto initialized');
 
     const envConfig: EnvConfig = {
       appConfig: {
@@ -50,12 +53,12 @@ Promise.all([cryptoWaitReady(), checkRestore()])
     koniState.eventService.emit('crypto.ready', true);
 
     // Manual Init koniState
-    koniState.init().catch((err) => console.warn(err));
+    koniState.init().catch((err) => logger.warn('Failed to initialize koniState', err));
 
     responseMessage({ id: '0', response: { status: 'crypto_ready' } } as PageStatus);
 
-    console.log('[Mobile] initialization completed');
+    logger.info('[Mobile] initialization completed');
   })
   .catch((error): void => {
-    console.error('[Mobile] initialization failed', error);
+    logger.error('[Mobile] initialization failed', error);
   });

@@ -15,9 +15,12 @@ import { KeyringService } from '@subwallet/extension-base/services/keyring-servi
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SubscanService } from '@subwallet/extension-base/services/subscan-service';
 import { getAddressesByChainType } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { keyring } from '@subwallet/ui-keyring';
 import { BehaviorSubject } from 'rxjs';
+
+const historyServiceLogger = createLogger('HistoryService');
 
 function filterHistoryItemByAddressAndChain (chain: string, addresses: string[]) {
   return (item: TransactionHistoryItem) => {
@@ -36,7 +39,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     private keyringService: KeyringService,
     private subscanService: SubscanService
   ) {
-    this.init().catch(console.error);
+    this.init().catch((error) => historyServiceLogger.error('Error initializing history service', error));
   }
 
   private fetchPromise: Promise<void> | null = null;
@@ -123,7 +126,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
       });
 
       this.addHistoryItems(result).catch((e) => {
-        console.log('addHistoryItems in fetchAllPossibleExtrinsicItems error', e);
+        historyServiceLogger.error('addHistoryItems in fetchAllPossibleExtrinsicItems error', e);
       });
     }).then((extrinsicItems) => {
       const excludeTransferExtrinsicHash: string[] = [];
@@ -149,13 +152,13 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
         });
 
         this.addHistoryItems(result).catch((e) => {
-          console.log('addHistoryItems in fetchAllPossibleTransferItems-sent error', e);
+          historyServiceLogger.error('addHistoryItems in fetchAllPossibleTransferItems-sent error', e);
         });
       }).catch((e) => {
-        console.log('fetchAllPossibleTransferItems-sent error', e);
+        historyServiceLogger.error('fetchAllPossibleTransferItems-sent error', e);
       });
     }).catch((e) => {
-      console.log('fetchAllPossibleExtrinsicItems error', e);
+      historyServiceLogger.error('fetchAllPossibleExtrinsicItems error', e);
     });
 
     this.subscanService.fetchAllPossibleTransferItems(groupId, chain, address, 'received').then((rsMap) => {
@@ -173,10 +176,10 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
       });
 
       this.addHistoryItems(result).catch((e) => {
-        console.log('addHistoryItems in fetchAllPossibleTransferItems-receive error', e);
+        historyServiceLogger.error('addHistoryItems in fetchAllPossibleTransferItems-receive error', e);
       });
     }).catch((e) => {
-      console.log('fetchAllPossibleTransferItems-receive error', e);
+      historyServiceLogger.error('fetchAllPossibleTransferItems-receive error', e);
     });
   }
 
@@ -232,7 +235,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
       }
     } else if (_isChainBitcoinCompatible(chainInfo)) {
       this.fetchBitcoinTransactionHistory(chain, bitcoinAddresses).catch((e) => {
-        console.log('fetchBitcoinTransactionHistory Error', e);
+        historyServiceLogger.error('fetchBitcoinTransactionHistory Error', e);
       });
     }
 
@@ -306,7 +309,7 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     await this.recoverHistories();
 
     this.recoverInterval = setInterval(() => {
-      this.recoverHistories().catch(console.error);
+      this.recoverHistories().catch((error) => historyServiceLogger.error('Error recovering histories', error));
     }, CRON_RECOVER_HISTORY_INTERVAL);
   }
 
@@ -352,11 +355,11 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
         case HistoryRecoverStatus.FAILED:
         case HistoryRecoverStatus.SUCCESS:
           updateData.status = recoverResult.status === HistoryRecoverStatus.SUCCESS ? ExtrinsicStatus.SUCCESS : ExtrinsicStatus.FAIL;
-          this.updateHistoryByExtrinsicHash(currentExtrinsicHash, updateData, true).catch(console.error);
+          this.updateHistoryByExtrinsicHash(currentExtrinsicHash, updateData, true).catch((error) => historyServiceLogger.error('Error updating history by extrinsic hash', error));
           delete this.#needRecoveryHistories[currentExtrinsicHash];
           break;
         default:
-          this.updateHistoryByExtrinsicHash(currentExtrinsicHash, updateData, true).catch(console.error);
+          this.updateHistoryByExtrinsicHash(currentExtrinsicHash, updateData, true).catch((error) => historyServiceLogger.error('Error updating history by extrinsic hash', error));
           delete this.#needRecoveryHistories[currentExtrinsicHash];
       }
     });
@@ -371,16 +374,16 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
   async init (): Promise<void> {
     this.status = ServiceStatus.INITIALIZING;
     await this.eventService.waitCryptoReady;
-    this.restoreProcessTransaction().catch(console.error);
+    this.restoreProcessTransaction().catch((error) => historyServiceLogger.error('Error restoring process transaction', error));
     await this.loadData();
     Promise.all([this.eventService.waitKeyringReady, this.eventService.waitChainReady]).then(() => {
-      this.getHistories().catch(console.log);
-      this.recoverProcessingHistory().catch(console.error);
+      this.getHistories().catch((error) => historyServiceLogger.error('Error getting histories', error));
+      this.recoverProcessingHistory().catch((error) => historyServiceLogger.error('Error recovering processing history', error));
 
       this.eventService.on('account.remove', (address) => {
-        this.removeHistoryByAddress(address).catch(console.error);
+        this.removeHistoryByAddress(address).catch((error) => historyServiceLogger.error('Error removing history by address', error));
       });
-    }).catch(console.error);
+    }).catch((error) => historyServiceLogger.error('Error in history service operation', error));
     this.status = ServiceStatus.INITIALIZED;
   }
 
@@ -419,10 +422,10 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     const recoverNumber = Object.keys(this.#needRecoveryHistories).length;
 
     if (recoverNumber > 0) {
-      console.log(`Recover ${recoverNumber} processing history`);
+      historyServiceLogger.info(`Recover ${recoverNumber} processing history`);
     }
 
-    this.startRecoverHistories().catch(console.error);
+    this.startRecoverHistories().catch((error) => historyServiceLogger.error('Error starting recover histories', error));
   }
 
   async start (): Promise<void> {

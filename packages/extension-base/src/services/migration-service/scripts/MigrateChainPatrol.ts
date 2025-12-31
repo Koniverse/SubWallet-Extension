@@ -18,7 +18,7 @@ export default class MigrateChainPatrol extends BaseMigrationJob {
         });
       });
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
   }
 }

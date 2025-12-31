@@ -4,6 +4,7 @@
 import type { Chain } from '@subwallet/extension-chains/types';
 
 import { RequestSign } from '@subwallet/extension-base/background/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { _isRuntimeUpdated } from '@subwallet/extension-base/utils';
 import { getMetadataHash } from '@subwallet/extension-web-ui/messaging';
 import { isRawPayload } from '@subwallet/extension-web-ui/utils';
@@ -102,7 +103,7 @@ const useParseSubstrateRequestPayload = (chain: Chain | null, request?: RequestS
         .then(({ metadataHash }) => {
           setMetadataHash(metadataHash);
         })
-        .catch(console.log)
+        .catch((error) => defaultLogger.debug('Failed to get metadata hash', error))
         .finally(() => {
           if (!cancel) {
             setHashLoading(false);

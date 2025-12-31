@@ -7,6 +7,7 @@ import { ledgerMustCheckNetwork } from '@subwallet/extension-base/core/utils';
 import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _getMultiChainAsset, _isAssetFungibleToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { RECEIVE_QR_MODAL, RECEIVE_TOKEN_SELECTOR_MODAL, WARNING_LEDGER_RECEIVE_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { useConfirmModal, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
@@ -18,6 +19,8 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+
+const logger = createLogger('useReceiveQR');
 
 type ReceiveSelectedResult = {
   selectedAccount?: string;
@@ -230,7 +233,7 @@ const useReceiveQR = (tokenGroupSlug?: string) => {
                 setReceiveSelectedResult((prev) => ({ ...prev, selectedNetwork: _tokenSelectorItems[0].originChain }));
                 activeModal(RECEIVE_QR_MODAL);
               })
-              .catch(console.error);
+              .catch((error) => logger.error('Failed to handle ledger warning confirmation', error));
 
             return;
           }
@@ -272,7 +275,7 @@ const useReceiveQR = (tokenGroupSlug?: string) => {
               activeModal(RECEIVE_QR_MODAL);
               inactiveModal(AccountSelectorModalId);
             })
-            .catch(console.error);
+            .catch((error) => logger.error('Failed to handle ledger warning confirmation', error));
 
           return;
         }

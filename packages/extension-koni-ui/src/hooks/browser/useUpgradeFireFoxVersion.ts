@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { UPGRADE_FIREFOX_VERSION } from '@subwallet/extension-koni-ui/constants';
 import { getVersionBrowser } from '@subwallet/extension-koni-ui/utils';
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
@@ -27,7 +28,7 @@ const useUpgradeFireFoxVersion = (): SetStateUpgradeFireFoxVersion => {
 
       return state_ && !!permissions_.origins && permissions_.origins.length > 0;
     } catch (e) {
-      console.error(e);
+      defaultLogger.error('Failed to check permission access', e);
 
       return false;
     }

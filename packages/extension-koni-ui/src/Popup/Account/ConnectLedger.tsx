@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LedgerNetwork, MigrationLedgerNetwork, POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { detectTranslate, isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { AccountItemWithName, AccountWithNameSkeleton, BasicOnChangeFunction, ChainSelector, DualLogo, InfoIcon, Layout, LedgerAccountTypeSelector, LedgerPolkadotAccountItemType, PageWrapper } from '@subwallet/extension-koni-ui/components';
@@ -19,6 +20,10 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+
+const logger = createLogger('ConnectLedger');
+
+import DefaultLogosMap from '../../assets/logo';
 
 type Props = ThemeProps;
 
@@ -192,7 +197,7 @@ const Component: React.FC<Props> = (props: Props) => {
         break;
       } catch (e) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
-        console.error(e);
+        logger.error('Error loading ledger addresses', e);
 
         if (j === maxRetry - 1) {
           refresh();
@@ -219,7 +224,7 @@ const Component: React.FC<Props> = (props: Props) => {
     setFirstStep(false);
 
     if (!page) {
-      onLoadMore().catch(console.error);
+      onLoadMore().catch((error) => logger.error('Failed to load more ledger accounts', error));
     }
   }, [onLoadMore, page]);
 
@@ -298,7 +303,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onComplete();
         })
         .catch((e: Error) => {
-          console.log(e);
+          logger.error('Failed to create hardware accounts', e);
         })
         .finally(() => {
           setIsSubmitting(false);

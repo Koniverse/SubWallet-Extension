@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import Headers from '@subwallet/extension-web-ui/components/Layout/parts/Header';
 import { useNotification, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import { reloadCron } from '@subwallet/extension-web-ui/messaging';
@@ -110,7 +111,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       .then(() => {
         setLoading(false);
       })
-      .catch(console.error);
+      .catch((error) => defaultLogger.error('Failed to reload cron', error));
   }, [notify, t]);
 
   const activeTabIndex = useMemo(() => {

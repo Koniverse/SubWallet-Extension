@@ -7,6 +7,7 @@ import { NotificationType } from '@subwallet/extension-base/background/KoniTypes
 import { ActionType } from '@subwallet/extension-base/core/types';
 import { _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AnalyzeAddress, AnalyzedGroup, ResponseInputAccountSubscribe } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { _reformatAddressWithChain, reformatAddress } from '@subwallet/extension-base/utils';
 import { AddressSelectorItem } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
@@ -105,7 +106,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
     onChange && onChange({ target: { value: val } });
 
     if (isAddress(val) && saveAddress) {
-      saveRecentAccount(val, chainSlug).catch(console.error);
+      saveRecentAccount(val, chainSlug).catch((error) => defaultLogger.error('Failed to save recent account', error));
     }
   }, [chainSlug, onChange, saveAddress]);
 
@@ -427,14 +428,14 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
         data: inputValue,
         chain: chainSlug,
         actionType: actionType
-      }, handler).then(handler).catch(console.error);
+      }, handler).then(handler).catch((error) => defaultLogger.error('Failed to subscribe accounts input address', error));
     }
 
     return () => {
       sync = false;
 
       if (id) {
-        cancelSubscription(id).catch(console.log);
+        cancelSubscription(id).catch((error) => defaultLogger.debug('Failed to cancel subscription', error));
       }
     };
   }, [actionType, chainSlug, inputValue, tokenSlug]);

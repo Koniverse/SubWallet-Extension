@@ -20,6 +20,7 @@ import { BasicTxErrorType, DynamicSwapAction, DynamicSwapType, OptimalSwapPathPa
 import { CommonOptimalSwapPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, ProcessedQuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { SwapPath } from '@subwallet-monorepos/subwallet-services-sdk/services';
 import BigN from 'bignumber.js';
@@ -29,6 +30,8 @@ import { BehaviorSubject } from 'rxjs';
 import { KyberHandler } from './handler/kyber-handler';
 import { SimpleSwapHandler } from './handler/simpleswap-handler';
 import { UniswapHandler, UniswapMetadata } from './handler/uniswap-handler';
+
+const logger = createLogger('SwapService');
 
 export class SwapService implements StoppableServiceInterface {
   protected readonly state: KoniState;
@@ -102,7 +105,7 @@ export class SwapService implements StoppableServiceInterface {
     const swapPairInfo = params.path.find((action) => action.action === DynamicSwapType.SWAP);
 
     if (!swapPairInfo) {
-      console.error('Swap pair is not found');
+      logger.error('Swap pair is not found');
 
       return result;
     }
@@ -152,15 +155,15 @@ export class SwapService implements StoppableServiceInterface {
 
     const { path, swapQuoteResponse } = await this.getLatestQuoteFromSwapRequest(request);
 
-    console.group('Swap Logger');
-    console.log('path', path);
-    console.log('swapQuoteResponse', swapQuoteResponse);
+    logger.group('Swap Logger');
+    logger.info('path', path);
+    logger.info('swapQuoteResponse', swapQuoteResponse);
 
     if (swapQuoteResponse.optimalQuote && swapQuoteResponse.optimalQuote.metadata) {
       const routing = (swapQuoteResponse.optimalQuote.metadata as UniswapMetadata).routing;
 
       if (routing) {
-        console.log('Uniswap routing', routing);
+        logger.info('Uniswap routing', routing);
       }
     }
 
@@ -190,8 +193,8 @@ export class SwapService implements StoppableServiceInterface {
       };
     }
 
-    console.log('optimalProcess', optimalProcess);
-    console.groupEnd();
+    logger.info('optimalProcess', optimalProcess);
+    logger.groupEnd();
 
     if (JSON.stringify(processStepsToPathActions(optimalProcess.steps)) !== JSON.stringify(optimalProcess.path.map((e) => e.action))) {
       throw new Error('Swap pair is not found');
@@ -209,7 +212,7 @@ export class SwapService implements StoppableServiceInterface {
     try {
       availablePath = await subwalletApiSdk.swapApi.findAvailablePath(request);
     } catch (e) {
-      console.log('Error findAvailablePath', e);
+      logger.error('Error findAvailablePath', e);
     }
 
     if (!availablePath) {

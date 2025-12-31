@@ -4,10 +4,13 @@
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { ListBuyServicesResponse, ListBuyTokenResponse } from '@subwallet/extension-base/services/buy-service/types';
 import { AccountChainType, BuyServiceInfo, BuyTokenInfo, OnrampAccountSupportType, SupportService } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
 import { BehaviorSubject } from 'rxjs';
 
 import { DEFAULT_SERVICE_INFO } from './constants';
+
+const buyServiceLogger = createLogger('BuyService');
 
 const convertSupportType = (support: OnrampAccountSupportType): AccountChainType | null => {
   switch (support) {
@@ -40,13 +43,13 @@ export default class BuyService {
 
     this.fetchTokens()
       .catch((e) => {
-        console.error('Error on fetch buy tokens', e);
+        buyServiceLogger.error('Error on fetch buy tokens', e);
         this.#state.eventService.emit('buy.tokens.ready', true);
       });
 
     this.fetchServices()
       .catch((e) => {
-        console.error('Error on fetch buy services', e);
+        buyServiceLogger.error('Error on fetch buy services', e);
         this.#state.eventService.emit('buy.services.ready', true);
       });
   }

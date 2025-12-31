@@ -1,7 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BridgeTransactionStatus } from '../interfaces';
+
+const polygonBridgeUtilsLogger = createLogger('PolygonBridgeUtils');
 
 export const POLYGON_BRIDGE_INDEXER = {
   MAINNET: 'https://api-gateway.polygon.technology/api/v3/transactions/mainnet',
@@ -111,14 +114,14 @@ export async function fetchPolygonBridgeTransactions (userAddress: string, isTes
     );
 
     if (!rawResponse.ok) {
-      console.error('Error fetching claimable bridge transactions');
+      polygonBridgeUtilsLogger.error('Error fetching claimable bridge transactions');
 
       return undefined;
     }
 
     return await rawResponse.json() as PolygonTransactionResponse;
   } catch (e) {
-    console.error(e);
+    polygonBridgeUtilsLogger.error('Error fetching Polygon bridge transactions', e);
 
     return undefined;
   }

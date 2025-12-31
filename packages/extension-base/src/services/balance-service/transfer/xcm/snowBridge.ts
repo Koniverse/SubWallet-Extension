@@ -8,12 +8,15 @@ import { getWeb3Contract } from '@subwallet/extension-base/koni/api/contract-han
 import { _SNOWBRIDGE_GATEWAY_ABI, getSnowBridgeGatewayContract } from '@subwallet/extension-base/koni/api/contract-handler/utils';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken, _getSubstrateParaId, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { EvmEIP1559FeeOption, EvmFeeInfo, FeeCustom, FeeInfo, FeeOption } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
 import { TransactionConfig } from 'web3-core';
 
 import { u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
+
+const snowBridgeLogger = createLogger('SnowBridge');
 
 export async function getSnowBridgeEvmTransfer (tokenInfo: _ChainAsset, originChainInfo: _ChainInfo, destinationChainInfo: _ChainInfo, sender: string, recipientAddress: string, value: string, evmApi: _EvmApi, _feeInfo: FeeInfo, feeCustom?: FeeCustom, feeOption?: FeeOption): Promise<TransactionConfig> {
   const snowBridgeContractAddress = getSnowBridgeGatewayContract(originChainInfo.slug);
@@ -40,7 +43,7 @@ export async function getSnowBridgeEvmTransfer (tokenInfo: _ChainAsset, originCh
       destinationChainParaId
     );
 
-    console.log('deliveryFee', deliveryFee);
+    snowBridgeLogger.debug('deliveryFee', deliveryFee);
 
     totalFee = deliveryFee.totalFeeInWei.toString();
     destinationFee = (deliveryFee.destinationDeliveryFeeDOT + deliveryFee.destinationExecutionFeeDOT).toString();
@@ -48,7 +51,7 @@ export async function getSnowBridgeEvmTransfer (tokenInfo: _ChainAsset, originCh
     // Clean up all open connections
     await context.destroyContext();
   } catch (error) {
-    console.error('Cannot get snow-bridge delivery fees with error:', error);
+    snowBridgeLogger.error('Cannot get snow-bridge delivery fees with error', error);
 
     totalFee = '0';
     destinationFee = '0';

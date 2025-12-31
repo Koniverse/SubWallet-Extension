@@ -3,6 +3,7 @@
 
 import { CurrentAccountInfo } from '@subwallet/extension-base/background/types';
 import { AccountJson } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import ExportAllSelector from '@subwallet/extension-web-ui/components/Layout/parts/SelectAccount/ExportAllSelector';
 import { BaseSelectModal, SimpleQrModal } from '@subwallet/extension-web-ui/components/Modal';
 import { DISCONNECT_EXTENSION_MODAL, SELECT_ACCOUNT_MODAL } from '@subwallet/extension-web-ui/constants';
@@ -150,10 +151,10 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             }
           }
         }).catch((e) => {
-          console.error('Failed to switch account', e);
+          defaultLogger.error('Failed to switch account', e);
         });
       } else {
-        console.error('Failed to switch account');
+        defaultLogger.error('Failed to switch account');
       }
     }
   }, [accounts, location.pathname, navigate, goHome]);

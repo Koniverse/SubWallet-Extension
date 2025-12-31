@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SubWalletEvmProvider } from '@subwallet/extension-base/page/evm';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { addLazy } from '@subwallet/extension-base/utils';
 import { EvmProvider, Injected, InjectedAccountWithMeta, InjectedWindowProvider, Unsubcall } from '@subwallet/extension-inject/types';
 import { DisconnectExtensionModal } from '@subwallet/extension-koni-ui/components';
@@ -204,7 +205,7 @@ export const InjectContextProvider: React.FC<Props> = ({ children }: Props) => {
           setSubstrateWallet(inject);
         })
         .catch((e) => {
-          console.error(e);
+          defaultLogger.error('Failed to enable substrate wallet', e);
           promiseMapRef.current = { ...promiseMapRef.current, 'subwallet-js': 'FAIL' };
           handleConnectFail();
           checkLoading();
@@ -225,7 +226,7 @@ export const InjectContextProvider: React.FC<Props> = ({ children }: Props) => {
           setEvmWallet(wallet);
         })
         .catch((e) => {
-          console.error(e);
+          defaultLogger.error('Failed to enable EVM wallet', e);
           promiseMapRef.current = { ...promiseMapRef.current, SubWallet: 'FAIL' };
           handleConnectFail();
           checkLoading();
@@ -275,7 +276,7 @@ export const InjectContextProvider: React.FC<Props> = ({ children }: Props) => {
 
     if (evmWallet) {
       // Some wallet not fire event on first time
-      evmWallet.request<string[]>({ method: 'eth_accounts' }).then(listener).catch(console.warn);
+      evmWallet.request<string[]>({ method: 'eth_accounts' }).then(listener).catch((error) => defaultLogger.warn('Failed to request eth_accounts', error));
       evmWallet.on('accountsChanged', listener);
     }
 

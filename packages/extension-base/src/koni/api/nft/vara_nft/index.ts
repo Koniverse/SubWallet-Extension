@@ -4,8 +4,11 @@
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { VARA_SCAN_ENDPOINT } from '@subwallet/extension-base/koni/api/nft/config';
 import { BaseNftApi, HandleNftParams } from '@subwallet/extension-base/koni/api/nft/nft';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { hexAddPrefix, u8aToHex } from '@polkadot/util';
+
+const varaNftLogger = createLogger('VaraNft');
 import { decodeAddress } from '@polkadot/util-crypto';
 
 interface NftData {
@@ -109,7 +112,7 @@ export class VaraNftApi extends BaseNftApi {
         }
       }));
     } catch (e) {
-      console.error(`Failed to fetch ${this.chain} nft`, e);
+      varaNftLogger.error(`Failed to fetch ${this.chain} nft`, e);
     }
   }
 

@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { BackIcon, EmptyList, FilterModal, OptionType, TokenToggleWithChainItem } from '@subwallet/extension-koni-ui/components';
 import Search from '@subwallet/extension-koni-ui/components/Search';
@@ -19,6 +20,10 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
+const logger = createLogger('CustomizeModal');
+
+import CustomizeModalContent from './CustomizeModalContent';
+
 type Props = ThemeProps;
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
@@ -35,7 +40,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
   const onChangeZeroBalance = useCallback(() => {
-    saveShowZeroBalance(!isShowZeroBalance).catch(console.error);
+    saveShowZeroBalance(!isShowZeroBalance).catch((error) => logger.error('Failed to save show zero balance setting', error));
   }, [isShowZeroBalance]);
 
   const handleSearch = useCallback((value: string) => {

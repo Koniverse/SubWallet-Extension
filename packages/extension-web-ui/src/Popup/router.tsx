@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { PHISHING_PAGE_REDIRECT } from '@subwallet/extension-base/defaults';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { PageWrapper } from '@subwallet/extension-web-ui/components';
 import ErrorFallback from '@subwallet/extension-web-ui/Popup/ErrorFallback';
 import { Root } from '@subwallet/extension-web-ui/Popup/Root';
@@ -40,7 +41,7 @@ export class LazyLoader {
 
   public generateRouterObject (path: string, preload = false): Pick<IndexRouteObject, 'path' | 'lazy'> {
     if (preload) {
-      this.loadElement().catch(console.error);
+      this.loadElement().catch((error) => defaultLogger.error('LazyLoader preload failed', error));
     }
 
     return {

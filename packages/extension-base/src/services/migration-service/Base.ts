@@ -16,6 +16,6 @@ export default class BaseMigrationJob {
   }
 
   public run (): Promise<void> {
-    return Promise.resolve(console.warn('Need to override function run from base.'));
+    return Promise.resolve(this.logger.warn('Need to override function run from base.'));
   }
 }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { useDefaultNavigate } from '@subwallet/extension-koni-ui/hooks';
 import { saveNotificationSetup } from '@subwallet/extension-koni-ui/messaging';
@@ -15,6 +16,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled, { useTheme } from 'styled-components';
+
+const logger = createLogger('NotificationSetting');
 
 type Props = ThemeProps;
 
@@ -80,7 +83,7 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
     return () => {
       setLoadingNotification(true);
       saveNotificationSetup(setup)
-        .catch(console.error)
+        .catch((error) => logger.error('Failed to save notification setup', error))
         .finally(() => {
           setLoadingNotification(false);
           goBack();

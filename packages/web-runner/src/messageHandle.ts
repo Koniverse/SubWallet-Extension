@@ -4,6 +4,9 @@
 import { RequestSignatures, TransportRequestMessage, TransportResponseMessage } from '@subwallet/extension-base/background/types';
 import { ID_PREFIX, PORT_CONTENT, PORT_EXTENSION, PORT_MOBILE } from '@subwallet/extension-base/defaults';
 import { SWHandler } from '@subwallet/extension-base/koni/background/handlers';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const logger = createLogger('MessageHandle');
 
 export interface CustomResponse<T> {
   id: string,
@@ -20,7 +23,7 @@ export function responseMessage (response: TransportResponseMessage<keyof Reques
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     window.ReactNativeWebView.postMessage(JSON.stringify(response));
   } else {
-    console.log('Post message in browser ', response);
+    logger.info('Post message in browser ', response);
   }
 }
 

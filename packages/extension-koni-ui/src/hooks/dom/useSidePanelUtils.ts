@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import Bowser from 'bowser';
 import { useCallback, useMemo } from 'react';
 
@@ -26,7 +27,7 @@ export default function useSidePanelUtils () {
         const windowId = tab.windowId;
 
         chrome.sidePanel?.open({ windowId: windowId }).catch((err: Error) => {
-          console.log('Error occurred opening side panel', err);
+          defaultLogger.debug('Error occurred opening side panel', err);
         });
       }
     });

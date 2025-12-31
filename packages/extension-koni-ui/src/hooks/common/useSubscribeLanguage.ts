@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LANGUAGE } from '@subwallet/extension-base/constants';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import i18next from 'i18next';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useSelector } from './useSelector';
+
+const logger = createLogger('useSubscribeLanguage');
 
 const useSubscribeLanguage = () => {
   const originalLanguage = useMemo(() => localStorage.getItem(LANGUAGE) || 'en', []);
@@ -22,7 +25,7 @@ const useSubscribeLanguage = () => {
 
   useEffect(() => {
     if (changed) {
-      i18next.changeLanguage(language).catch(console.error);
+      i18next.changeLanguage(language).catch((error) => logger.error('Failed to change language', error));
     }
   }, [changed, language]);
 };

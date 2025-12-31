@@ -15,8 +15,11 @@ import DatabaseService from '@subwallet/extension-base/services/storage-service/
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
 import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningImpact, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, SubmitChangeValidatorStaking, TransactionData, ValidateYieldProcessParams, ValidatorInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject, combineLatest } from 'rxjs';
+
+const earningServiceLogger = createLogger('EarningService');
 
 import { EarningImpactResult } from './handlers/native-staking/dtao';
 import TanssiNativeStakingPoolHandler from './handlers/native-staking/tanssi';
@@ -296,7 +299,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
         if (eventTypes.includes('account.updateCurrent') || eventTypes.includes('account.remove') || eventTypes.includes('chain.updateState') || delayReload) {
           if (delayReload) {
             this.delayReloadTimeout = setTimeout(() => {
-              this.reloadEarning().catch(console.error); // Timeout is removed inside reloadEarning > runUnsubscribePoolsPosition
+              this.reloadEarning().catch((error) => earningServiceLogger.error('Error reloading earning', error)); // Timeout is removed inside reloadEarning > runUnsubscribePoolsPosition
             }, 3000);
           } else {
             this.delayReloadTimeout && clearTimeout(this.delayReloadTimeout);
@@ -304,7 +307,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
             await this.reloadEarning();
           }
         }
-      })().catch(console.error);
+      })().catch((error) => earningServiceLogger.error('Error in earning service operation', error));
     });
   }
 
@@ -343,7 +346,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     // cache identities of validators in native staking
     if (this.useOnlineCacheOnly && !this.validatorInfoCachingInterval) {
-      this.runIntervalGetPoolTargets().catch(console.error);
+      this.runIntervalGetPoolTargets().catch((error) => earningServiceLogger.error('Error running interval get pool targets', error));
     }
 
     // Update promise handler
@@ -464,7 +467,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
               unsub();
             }
           })
-          .catch(console.error);
+          .catch((error) => earningServiceLogger.error('Error in earning service', error));
       }
     }
 
@@ -524,7 +527,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
       this.yieldPoolInfoSubject.next(yieldPoolInfo);
 
       // Persist data
-      this.dbService.updateYieldPoolsStore(queue).catch(console.warn);
+      this.dbService.updateYieldPoolsStore(queue).catch((error) => earningServiceLogger.warn('Error updating yield pools store', error));
     }, 300, 900);
   }
 
@@ -564,7 +567,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     const onlineData = await this.fetchingPoolsInfoOnline();
 
     const interval = setInterval(() => {
-      this.fetchingPoolsInfoOnline().catch(console.error);
+      this.fetchingPoolsInfoOnline().catch((error) => earningServiceLogger.error('Error fetching pools info online', error));
     }, CRON_REFRESH_CHAIN_STAKING_METADATA);
 
     // Fetching from chains
@@ -576,7 +579,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
         rs();
         clearInterval(interval);
       };
-    }).catch(console.error);
+    }).catch((error) => earningServiceLogger.error('Error in earning service operation', error));
   }
 
   runUnsubscribePoolsInfo () {
@@ -612,7 +615,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
               unsubList.push(unsub);
             }
           })
-          .catch(console.error);
+          .catch((error) => earningServiceLogger.error('Error in earning service', error));
       }
     }
 
@@ -709,7 +712,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
       this.yieldPositionSubject.next(yieldPositionInfo);
 
       // Persist data
-      this.dbService.updateYieldPositions(queue).catch(console.warn);
+      this.dbService.updateYieldPositions(queue).catch((error) => earningServiceLogger.warn('Error updating yield positions', error));
     }, 300, 900);
   }
 
@@ -738,7 +741,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
       this.updateYieldPosition(data);
     }).then((rs) => {
       this.yieldPositionUnsub = rs;
-    }).catch(console.error);
+    }).catch((error) => earningServiceLogger.error('Error in earning service operation', error));
   }
 
   runUnsubscribePoolsPosition () {
@@ -796,7 +799,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
               unsubList.push(unsub);
             }
           })
-          .catch(console.error);
+          .catch((error) => earningServiceLogger.error('Error in earning service', error));
       }
     }
 
@@ -832,12 +835,12 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     this.getPoolReward(addresses, (result: EarningRewardItem) => {
       this.updateEarningReward(result);
-    }).catch(console.error);
+    }).catch((error) => earningServiceLogger.error('Error in earning service operation', error));
 
     this.earningsRewardInterval = setInterval(() => {
       this.getPoolReward(addresses, (result: EarningRewardItem) => {
         this.updateEarningReward(result);
-      }).catch(console.error);
+      }).catch((error) => earningServiceLogger.error('Error in earning service operation', error));
     }, CRON_REFRESH_STAKING_REWARD_FAST_INTERVAL);
   }
 
@@ -866,7 +869,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
               unsubList.push(unsub);
             }
           })
-          .catch(console.error);
+          .catch((error) => earningServiceLogger.error('Error in earning service', error));
       }
     }
 
@@ -942,7 +945,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
             unsub = _unsub;
           }
         })
-        .catch(console.error);
+        .catch((error) => earningServiceLogger.error('Error fetching earning reward history', error));
     };
 
     if (!cancel) {
@@ -1009,7 +1012,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
         return { ...newData };
       }
     } catch (e) {
-      console.error(e);
+      earningServiceLogger.error('Error in earning service', e);
     }
 
     const prevValueCached = this.poolTargetsFetchingCached.getValue();
@@ -1024,7 +1027,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
       try {
         poolInfosSubjectValue = await fetchPoolsData();
       } catch (e) {
-        console.log('Error fetching pools data:', e);
+        earningServiceLogger.error('Error fetching pools data', e);
       }
     }
 
@@ -1050,7 +1053,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
         });
 
         this.poolTargetsFetchingCached.next(poolTargetsFetchingCached);
-      }).catch(console.error);
+      }).catch((error) => earningServiceLogger.error('Error in earning service operation', error));
     };
 
     updatePoolTarget();

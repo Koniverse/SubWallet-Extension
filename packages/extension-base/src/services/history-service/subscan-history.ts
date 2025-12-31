@@ -6,7 +6,10 @@ import { ChainType, ExtrinsicStatus, ExtrinsicType, TransactionDirection, Transa
 import { _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
 import { getExtrinsicParserKey, subscanExtrinsicParserMap, supportedExtrinsicParser } from '@subwallet/extension-base/services/history-service/helpers/subscan-extrinsic-parser-helper';
 import { ExtrinsicItem, TransferItem } from '@subwallet/extension-base/services/subscan-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { isSameAddress } from '@subwallet/extension-base/utils';
+
+const subscanHistoryLogger = createLogger('SubscanHistory');
 
 export function parseSubscanExtrinsicData (address: string, extrinsicItem: ExtrinsicItem, chainInfo: _ChainInfo): TransactionHistoryItem | null {
   const extrinsicParserKey = getExtrinsicParserKey(extrinsicItem);
@@ -54,7 +57,7 @@ export function parseSubscanExtrinsicData (address: string, extrinsicItem: Extri
   try {
     return subscanExtrinsicParserMap[extrinsicParserKey](initData);
   } catch (e) {
-    console.log('parseSubscanExtrinsicData error:', e, initData);
+    subscanHistoryLogger.error('parseSubscanExtrinsicData error:', e, initData);
 
     return null;
   }

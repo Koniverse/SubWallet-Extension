@@ -3,6 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountProxyType, ResponseMnemonicValidateV2 } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountNameModal, CloseIcon, Layout, PageWrapper, PhraseNumberSelector, SeedPhraseInput } from '@subwallet/extension-koni-ui/components';
 import { ACCOUNT_NAME_MODAL, DEFAULT_MNEMONIC_TYPE, IMPORT_ACCOUNT_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-koni-ui/constants';
@@ -120,7 +121,7 @@ const Component: React.FC<ImportSeedPhraseProps> = ({ className }: ImportSeedPhr
       try {
         form.setFieldValue('phraseNumber', `${words.length}`);
       } catch (error) {
-        console.error('Error updating phraseNumber field:', error);
+        defaultLogger.error('Error updating phraseNumber field', error);
       }
     }
   }, [form, phraseNumberOptions]);

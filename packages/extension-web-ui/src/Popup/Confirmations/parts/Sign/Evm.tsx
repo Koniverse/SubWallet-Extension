@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ConfirmationDefinitions, ConfirmationResult, EvmSendTransactionRequest, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { CONFIRMATION_QR_MODAL } from '@subwallet/extension-web-ui/constants/modal';
 import { InjectContext } from '@subwallet/extension-web-ui/contexts/InjectContext';
 import { useGetChainInfoByChainId, useLedger, useNotification } from '@subwallet/extension-web-ui/hooks';
@@ -126,7 +127,7 @@ const Component: React.FC<Props> = (props: Props) => {
     setTimeout(() => {
       handleSignature(type, id, signature.signature)
         .catch((e) => {
-          console.log(e);
+          defaultLogger.error('Failed to handle signature', e);
         })
         .finally(() => {
           setLoading(false);
@@ -161,7 +162,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onApproveSignature({ signature });
         })
         .catch((e: Error) => {
-          console.log(e);
+          defaultLogger.error('Failed to handle signature', e);
           setLoading(false);
         });
     });
@@ -189,7 +190,7 @@ const Component: React.FC<Props> = (props: Props) => {
               resolve(value);
             })
             .catch((e: Error) => {
-              console.error(e);
+              defaultLogger.error('Failed to sign transaction', e);
               notify({
                 message: convertErrorMessage(e),
                 type: 'error',
@@ -207,7 +208,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onApproveSignature({ signature });
         })
         .catch((e) => {
-          console.error(e);
+          defaultLogger.error('Failed to sign with wallet', e);
         })
         .finally(() => {
           setLoading(false);

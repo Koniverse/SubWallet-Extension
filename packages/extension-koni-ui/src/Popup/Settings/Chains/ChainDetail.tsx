@@ -3,6 +3,7 @@
 
 import { _NetworkUpsertParams } from '@subwallet/extension-base/services/chain-service/types';
 import { _getBlockExplorerFromChain, _getChainNativeTokenBasicInfo, _getChainSubstrateAddressPrefix, _getCrowdloanUrlFromChain, _getEvmChainId, _getSubstrateParaId, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainSubstrateCompatible, _isChainTonCompatible, _isCustomChain, _isPureEvmChain, _isPureSubstrateChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { isUrl } from '@subwallet/extension-base/utils';
 import { Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { ProviderSelector } from '@subwallet/extension-koni-ui/components/Field/ProviderSelector';
@@ -111,7 +112,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             setIsDeleting(false);
           });
       })
-      .catch(console.log);
+      .catch((error) => defaultLogger.debug('Failed to remove chain', error));
   }, [chainInfo.slug, handleSimpleConfirmModal, navigate, showNotification, t]);
 
   const chainTypeString = useCallback(() => {

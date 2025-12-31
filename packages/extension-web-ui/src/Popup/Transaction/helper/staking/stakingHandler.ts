@@ -3,6 +3,7 @@
 
 import { StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { UnstakingStatus } from '@subwallet/extension-base/types';
 import { ALL_KEY } from '@subwallet/extension-web-ui/constants/common';
 import { getBondingOptions, getNominationPoolOptions } from '@subwallet/extension-web-ui/messaging';
@@ -65,7 +66,7 @@ export const fetchChainValidator = (chain: string, unmount: boolean, setValidato
       .then((result) => {
         store.dispatch({ type: 'bonding/updateChainValidators', payload: { chain, validators: result } });
       })
-      .catch(console.error)
+      .catch((error) => defaultLogger.error('Failed to fetch chain validators', error))
       .finally(() => {
         if (!unmount) {
           setValidatorLoading(false);
@@ -82,7 +83,7 @@ export const fetchChainPool = (chain: string, unmount: boolean, setPoolLoading: 
       .then((result) => {
         store.dispatch({ type: 'bonding/updateNominationPools', payload: { chain, pools: result } });
       })
-      .catch(console.error)
+      .catch((error) => defaultLogger.error('Failed to fetch chain validators', error))
       .finally(() => {
         if (!unmount) {
           setPoolLoading(false);

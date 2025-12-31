@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AppBannerData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { StaticDataProps } from '@subwallet/extension-koni-ui/components/Modal/Campaign/AppPopupModal';
 import Banner from '@subwallet/extension-koni-ui/components/StaticContent/Banner';
 import { APP_INSTRUCTION_DATA } from '@subwallet/extension-koni-ui/constants';
@@ -23,7 +24,7 @@ const Component = ({ banners, className, dismissBanner, onClickBanner }: Props) 
     try {
       return JSON.parse(appInstructionData || '[]') as StaticDataProps[];
     } catch (e) {
-      console.error(e);
+      defaultLogger.error('Failed to parse app instruction data', e);
 
       return [];
     }

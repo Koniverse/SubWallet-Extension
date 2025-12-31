@@ -3,6 +3,7 @@
 
 import { Resolver } from '@subwallet/extension-base/background/types';
 import { AccountJson } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
 import { BaseModal, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-web-ui/components';
 import { AccountSelector } from '@subwallet/extension-web-ui/components/Field/AccountSelector';
@@ -263,7 +264,7 @@ function Component ({ className, modalContent, slug }: Props) {
         })
         .catch((e: Error) => {
           if (e.message !== 'User reject') {
-            console.error(e);
+            defaultLogger.error('Create buy order failed', e);
 
             notify({
               message: t('Create buy order fail')

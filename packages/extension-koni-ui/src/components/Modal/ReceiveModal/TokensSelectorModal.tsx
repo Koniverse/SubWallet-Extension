@@ -4,6 +4,7 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { ledgerMustCheckNetwork } from '@subwallet/extension-base/core/utils';
 import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { RECEIVE_QR_MODAL, RECEIVE_TOKEN_SELECTOR_MODAL, WARNING_LEDGER_RECEIVE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useConfirmModal, useGetAccountByAddress, useGetZkAddress, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -11,6 +12,8 @@ import { ModalContext, SwList, SwModal, SwModalFuncProps } from '@subwallet/reac
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import styled from 'styled-components';
+
+const logger = createLogger('TokensSelectorModal');
 
 import { TokenEmptyList } from '../../EmptyList';
 import { TokenSelectionItem } from '../../TokenItem';
@@ -91,7 +94,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
             inactiveModal(modalId);
             activeModal(RECEIVE_QR_MODAL);
           })
-          .catch(console.error);
+          .catch((error) => logger.error('Failed to handle ledger warning confirmation', error));
 
         return;
       }

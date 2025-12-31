@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { YieldPoolInfo } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { LoadingScreen } from '@subwallet/extension-web-ui/components';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
@@ -27,7 +28,7 @@ function Component ({ className }: Props) {
         setPoolInfoMap(rs.data);
       }
     }).catch((e) => {
-      console.log('Error when fetching yield-pools.json', e);
+      defaultLogger.error('Error when fetching yield-pools.json', e);
     });
 
     return () => {
@@ -43,7 +44,7 @@ function Component ({ className }: Props) {
         if (rs && !!poolInfoMap && isSync) {
           setIsReady(true);
         }
-      }).catch(console.log);
+      }).catch((error) => defaultLogger.debug('Failed to fetch yield pools', error));
     }
 
     return () => {

@@ -6,6 +6,7 @@ import type { Call, ExtrinsicEra, ExtrinsicPayload } from '@polkadot/types/inter
 import type { AnyJson, SignerPayloadJSON } from '@polkadot/types/types';
 
 import { AccountJson } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import MetaInfo from '@subwallet/extension-web-ui/components/MetaInfo/MetaInfo';
 import useGetChainInfoByGenesisHash from '@subwallet/extension-web-ui/hooks/chain/useGetChainInfoByGenesisHash';
 import useMetadata from '@subwallet/extension-web-ui/hooks/transaction/confirmation/useMetadata';
@@ -42,10 +43,10 @@ const decodeMethod = (data: string, chain: Chain, specVersion: BN): Decoded => {
       method = chain.registry.createType('Call', data);
       args = (method.toHuman() as { args: AnyJson }).args;
     } else {
-      console.log(displayDecodeVersion('Your metadata is out of date', chain, specVersion));
+      defaultLogger.warn(displayDecodeVersion('Your metadata is out of date', chain, specVersion));
     }
   } catch (error) {
-    console.error(`${displayDecodeVersion('Error decoding method', chain, specVersion)}:: ${(error as Error).message}`);
+    defaultLogger.error(`${displayDecodeVersion('Error decoding method', chain, specVersion)}:: ${(error as Error).message}`);
 
     args = null;
     method = null;

@@ -9,6 +9,10 @@ import Metadata from './Metadata';
 import PostMessageProvider from './PostMessageProvider';
 import Signer from './Signer';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const substratePageLogger = createLogger('SubstratePage');
+
 export default class implements Injected {
   public readonly accounts: Accounts;
 
@@ -26,7 +30,7 @@ export default class implements Injected {
 
     setInterval((): void => {
       sendRequest('pub(ping)', null).catch((): void => {
-        console.error('Extension unavailable, ping failed');
+        substratePageLogger.error('Extension unavailable, ping failed');
       });
     }, 5_000 + Math.floor(Math.random() * 5_000));
   }

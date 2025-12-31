@@ -1,10 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { enableChain } from '@subwallet/extension-koni-ui/messaging';
 import { useCallback } from 'react';
 
 import { useSelector } from '../common/useSelector';
+
+const logger = createLogger('useChainConnection');
 
 export default function useChainConnection () {
   const chainStateMap = useSelector((root) => root.chainStore.chainStateMap);
@@ -26,7 +29,7 @@ export default function useChainConnection () {
   const turnOnChain = useCallback(
     (chain: string) => {
       enableChain(chain, false)
-        .catch(console.error);
+        .catch((error) => logger.error('Failed to enable chain', error));
     },
     []
   );

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SigningRequest } from '@subwallet/extension-base/background/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { AccountItemWithName, ConfirmationGeneralInfo, ViewDetailIcon } from '@subwallet/extension-web-ui/components';
 import { useMetadata, useOpenDetailModal, useParseSubstrateRequestPayload } from '@subwallet/extension-web-ui/hooks';
 import { enableChain } from '@subwallet/extension-web-ui/messaging';
@@ -52,7 +53,7 @@ function Component ({ className, request }: Props) {
 
       !chainState.active && enableChain(chainInfo.slug, false)
         .then(noop)
-        .catch(console.error);
+        .catch((error) => defaultLogger.error('Failed to enable chain', error));
     }
   }, [chainStateMap, chainInfo, isMessage]);
 

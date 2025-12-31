@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { CloseIcon, InstructionContainer, InstructionContentType, Layout, PageWrapper, WordPhrase } from '@subwallet/extension-web-ui/components';
 import { SeedPhraseTermModal } from '@subwallet/extension-web-ui/components/Modal/TermsAndConditions/SeedPhraseTermModal';
 import { CONFIRM_TERM_SEED_PHRASE, DEFAULT_ACCOUNT_TYPES, DEFAULT_ROUTER_PATH, NEW_SEED_MODAL, SEED_PREVENT_MODAL, SELECTED_ACCOUNT_TYPE, TERM_AND_CONDITION_SEED_PHRASE_MODAL } from '@subwallet/extension-web-ui/constants';
@@ -153,7 +154,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         setSeedPhrase(phrase);
       })
       .catch((e: Error) => {
-        console.error(e);
+        defaultLogger.error('Failed to create seed', e);
       });
   }, []);
 
@@ -168,7 +169,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   useEffect(() => {
     if (isPopup && isFirefox && hasMasterPassword && !isOpenWindowRef.current) {
       isOpenWindowRef.current = true;
-      windowOpen({ allowedPath: '/accounts/new-seed-phrase' }).then(window.close).catch(console.log);
+      windowOpen({ allowedPath: '/accounts/new-seed-phrase' }).then(window.close).catch((error) => defaultLogger.debug('Failed to open window for new seed phrase', error));
     }
   }, [isPopup, hasMasterPassword]);
 

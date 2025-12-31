@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+import { IMPORT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { IMPORT_ACCOUNT_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { useClickOutSide, useExtensionDisplayModes, useGoBackSelectAccount, useSetSessionLatest, useSidePanelUtils, useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -14,6 +16,8 @@ import { FileJs, Leaf, QrCode, Wallet } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+
+const logger = createLogger('ImportAccountModal');
 
 import { BackIcon, CloseIcon } from '../../Icon';
 import { SettingItemSelection } from '../../Setting';
@@ -59,7 +63,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const onClickJson = useCallback(() => {
     if (!isExpanseMode) {
-      windowOpen({ allowedPath: '/accounts/restore-json' }).catch(console.error);
+      windowOpen({ allowedPath: '/accounts/restore-json' }).catch((error) => logger.error('Failed to open window', error));
 
       isSidePanelMode && closeSidePanel();
     } else {

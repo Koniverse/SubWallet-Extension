@@ -3,10 +3,13 @@
 
 import { KeyringState } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { keyring } from '@subwallet/ui-keyring';
 import { BehaviorSubject } from 'rxjs';
 
 import { AccountContext } from './context/account-context';
+
+const keyringServiceLogger = createLogger('KeyringService');
 
 export class KeyringService {
   private readonly stateSubject = new BehaviorSubject<KeyringState>({
@@ -44,7 +47,7 @@ export class KeyringService {
           this.state.eventService.emit('keyring.ready', true);
           this.state.eventService.emit('account.ready', true);
         })
-        .catch(console.error);
+        .catch((error) => keyringServiceLogger.error('Error waiting for crypto ready', error));
     }
 
     this.stateSubject.next({

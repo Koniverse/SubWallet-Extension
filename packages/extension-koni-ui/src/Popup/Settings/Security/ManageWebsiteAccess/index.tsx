@@ -3,6 +3,7 @@
 
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { AccountProxy } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { ActionItemType, ActionModal, EmptyList, FilterModal, PageWrapper, WebsiteAccessItem } from '@subwallet/extension-koni-ui/components';
 import { useDefaultNavigate, useFilterModal } from '@subwallet/extension-koni-ui/hooks';
 import { changeAuthorizationAll, forgetAllSite } from '@subwallet/extension-koni-ui/messaging';
@@ -19,6 +20,8 @@ import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+
+const logger = createLogger('ManageWebsiteAccess');
 
 type Props = ThemeProps;
 
@@ -150,7 +153,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         iconBackgroundColor: token.colorWarning,
         title: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.forgetAll'),
         onClick: () => {
-          forgetAllSite(updateAuthUrls).catch(console.error);
+          forgetAllSite(updateAuthUrls).catch((error) => logger.error('Failed to forget all sites', error));
           onCloseActionModal();
         }
       },
@@ -160,7 +163,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         iconBackgroundColor: token['gray-3'],
         title: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.disconnectAll'),
         onClick: () => {
-          changeAuthorizationAll(false, updateAuthUrls).catch(console.error);
+          changeAuthorizationAll(false, updateAuthUrls).catch((error) => logger.error('Failed to disconnect all', error));
           onCloseActionModal();
         }
       },
@@ -170,7 +173,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         iconBackgroundColor: token['green-6'],
         title: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.connectAll'),
         onClick: () => {
-          changeAuthorizationAll(true, updateAuthUrls).catch(console.error);
+          changeAuthorizationAll(true, updateAuthUrls).catch((error) => logger.error('Failed to connect all', error));
           onCloseActionModal();
         }
       }

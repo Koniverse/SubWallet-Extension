@@ -3,6 +3,7 @@
 
 import { RequestMigrateSoloAccount, SoloAccountToBeMigrated } from '@subwallet/extension-base/background/KoniTypes';
 import { hasAnyAccountForMigration } from '@subwallet/extension-base/services/keyring-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { useDefaultNavigate, useExtensionDisplayModes } from '@subwallet/extension-koni-ui/hooks';
 import { saveMigrationAcknowledgedStatus } from '@subwallet/extension-koni-ui/messaging';
 import { migrateSoloAccount, migrateUnifiedAndFetchEligibleSoloAccounts } from '@subwallet/extension-koni-ui/messaging/migrate-unified-account';
@@ -14,6 +15,8 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
+
+const logger = createLogger('MigrateAccount');
 
 import { EnterPasswordModal, enterPasswordModalId } from './EnterPasswordModal';
 import { SoloAccountMigrationView } from './SoloAccountMigrationView';
@@ -57,7 +60,7 @@ function Component ({ className = '' }: Props) {
   const onInteractAction = useCallback(() => {
     if (isMigrationNotion && !isAcknowledgedUnifiedAccountMigration) {
       // flag that user acknowledge the migration
-      saveMigrationAcknowledgedStatus({ isAcknowledgedUnifiedAccountMigration: true }).catch(console.error);
+      saveMigrationAcknowledgedStatus({ isAcknowledgedUnifiedAccountMigration: true }).catch((error) => logger.error('Failed to save migration acknowledged status', error));
     }
 
     // for now, do nothing
@@ -108,7 +111,7 @@ function Component ({ className = '' }: Props) {
         return [...prev, migratedUnifiedAccountId];
       });
     } catch (e) {
-      console.log('onApproveSoloAccountMigration error:', e);
+      logger.error('onApproveSoloAccountMigration error', e);
     }
   }, []);
 

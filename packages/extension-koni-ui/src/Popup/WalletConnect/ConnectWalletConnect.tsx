@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WALLET_CONNECT_SESSION_TIMEOUT } from '@subwallet/extension-base/services/wallet-connect-service/constants';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { CloseIcon, Layout, QrScannerErrorNotice, WalletConnect } from '@subwallet/extension-koni-ui/components';
 import { TIME_OUT_RECORD } from '@subwallet/extension-koni-ui/constants';
 import { useDefaultNavigate, useOpenQrScanner } from '@subwallet/extension-koni-ui/hooks';
@@ -150,7 +151,7 @@ const Component: React.FC<Props> = (props: Props) => {
     })
       .then(noop)
       .catch((e: Error) => {
-        console.error(e);
+        defaultLogger.error('Failed to add connection', e);
         setLoading(false);
         setConnectionError(convertWCErrorMessage(e));
         activeModal(modalId);
@@ -190,7 +191,7 @@ const Component: React.FC<Props> = (props: Props) => {
   }, []);
 
   const onScanError = useCallback((error: string) => {
-    console.log(error);
+    defaultLogger.debug('Scan error', error);
     setScanError(error);
   }, []);
 

@@ -3,6 +3,7 @@
 
 import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
 import { ProcessTransactionData, ProcessType, ResponseSubscribeProcessById, SwapBaseTxData } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { CloseIcon, Layout, LoadingScreen, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
 import { useDefaultNavigate } from '@subwallet/extension-koni-ui/hooks';
@@ -19,6 +20,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 type Props = ThemeProps;
+
+const logger = createLogger('TransactionSubmission');
 
 type SwapProcessingContentComponentProps = {
   processData: ProcessTransactionData;
@@ -133,7 +136,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
     const onCancel = () => {
       if (id) {
-        cancelSubscription(id).catch(console.error);
+        cancelSubscription(id).catch((error) => logger.error('Failed to cancel subscription', error));
       }
     };
 
@@ -149,7 +152,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
       subscribeProcess({ processId: transactionProcessId }, updateProcess)
         .then(updateProcess)
-        .catch(console.error);
+        .catch((error) => logger.error('Failed to subscribe process', error));
     }
 
     return () => {

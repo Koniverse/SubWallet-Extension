@@ -9,6 +9,7 @@ import { LedgerMustCheckType } from '@subwallet/extension-base/core/types';
 import { ledgerMustCheckNetwork } from '@subwallet/extension-base/core/utils';
 import { _getChainSubstrateAddressPrefix, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { AbstractAddressJson, AccountChainType, AccountJson, AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { isAccountAll, reformatAddress, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { MODE_CAN_SIGN } from '@subwallet/extension-koni-ui/constants/signing';
@@ -20,6 +21,8 @@ import { KeypairType } from '@subwallet/keyring/types';
 import { Web3LogoMap } from '@subwallet/react-ui/es/config-provider/context';
 
 import { decodeAddress, encodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
+
+const logger = createLogger('AccountUtils');
 
 import { getLogoByNetworkKey } from '../common';
 
@@ -56,7 +59,7 @@ export const findAccountByAddress = (accounts: AccountJson[], address?: string):
 
     return result || null;
   } catch (e) {
-    console.error('Fail to detect address', e);
+    logger.error('Fail to detect address', e);
 
     return null;
   }
@@ -162,7 +165,7 @@ export const findContactByAddress = (contacts: AbstractAddressJson[], address?: 
 
     return result || null;
   } catch (e) {
-    console.error('Fail to detect address', e);
+    logger.error('Fail to detect address', e);
 
     return null;
   }

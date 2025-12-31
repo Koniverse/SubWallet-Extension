@@ -6,6 +6,7 @@ import { NotificationType } from '@subwallet/extension-base/background/KoniTypes
 import { _getSubstrateGenesisHash, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { AccountJson, NominationPoolInfo, ValidatorInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { EarningOptionDesktopItem, EarningOptionItem, EarningValidatorDetailRWModal, EmptyList, FilterModal, Layout, LoadingScreen } from '@subwallet/extension-web-ui/components';
 import { ASTAR_PORTAL_URL, CREATE_RETURN, DEFAULT_EARN_PARAMS, DEFAULT_ROUTER_PATH, EARN_TRANSACTION, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, VALIDATOR_DETAIL_RW_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
@@ -198,7 +199,7 @@ function Component ({ className }: Props) {
               chain: chain || prevState.chain,
               from: accountList[0].address
             }));
-            saveCurrentAccountAddress(accountList[0]).then(() => navigate(earnPath, { state: { from: earnPath } })).catch(() => console.error());
+            saveCurrentAccountAddress(accountList[0]).then(() => navigate(earnPath, { state: { from: earnPath } })).catch((error) => defaultLogger.error('Failed to save current account address', error));
           } else {
             if (currentAccount && accountList.some((acc) => acc.address === currentAccount.address)) {
               navigate(earnPath, { state: { from: earnPath } });
@@ -211,7 +212,7 @@ function Component ({ className }: Props) {
               slug: slug || prevState.slug,
               chain: chain || prevState.chain
             }));
-            saveCurrentAccountAddress({ address: 'ALL' }).then(() => navigate(earnPath, { state: { from: earnPath } })).catch(() => console.error());
+            saveCurrentAccountAddress({ address: 'ALL' }).then(() => navigate(earnPath, { state: { from: earnPath } })).catch((error) => defaultLogger.error('Failed to save current account address', error));
           }
         }
       }
@@ -463,7 +464,7 @@ function Component ({ className }: Props) {
             isAutoOpenInstructionViaParamsRef.current = false;
           }
         }).catch((e) => {
-          console.log('Error when fetching poolInfo.slug file', e);
+          defaultLogger.error('Error when fetching poolInfo.slug file', e);
 
           if (isSync) {
             setInitLoading(false);

@@ -5,6 +5,7 @@ import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP, RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { NominationInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
 import { SelectValidatorInput, StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
@@ -350,7 +351,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   useEffect(() => {
     fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningPoolRecommendation) => {
       setDefaultPoolMap(earningPoolRecommendation);
-    }).catch(console.error);
+    }).catch((error) => defaultLogger.error('Failed to fetch static data for direct nomination validator', error));
   }, []);
 
   useEffect(() => {

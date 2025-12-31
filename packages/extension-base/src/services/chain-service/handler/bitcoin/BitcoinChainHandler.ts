@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { AbstractChainHandler } from '../AbstractChainHandler';
+
+const bitcoinChainHandlerLogger = createLogger('BitcoinChainHandler');
 import { _ApiOptions } from '../types';
 import { BitcoinApi } from './BitcoinApi';
 
@@ -34,7 +37,7 @@ export class BitcoinChainHandler extends AbstractChainHandler {
       existed.connect();
 
       if (apiUrl !== existed.apiUrl) {
-        existed.updateApiUrl(apiUrl).catch(console.error);
+        existed.updateApiUrl(apiUrl).catch((error) => bitcoinChainHandlerLogger.error('Error updating Bitcoin API URL', error));
       }
 
       return existed;
@@ -52,7 +55,7 @@ export class BitcoinChainHandler extends AbstractChainHandler {
     const existed = this.getApiByChain(chainSlug);
 
     if (existed && !existed.isApiReadyOnce) {
-      console.log(`Reconnect ${existed.providerName || existed.chainSlug} at ${existed.apiUrl}`);
+      bitcoinChainHandlerLogger.info(`Reconnect ${existed.providerName || existed.chainSlug} at ${existed.apiUrl}`);
 
       return existed.recoverConnect();
     }
@@ -61,7 +64,7 @@ export class BitcoinChainHandler extends AbstractChainHandler {
   destroyApi (chain: string) {
     const api = this.getApiByChain(chain);
 
-    api?.destroy().catch(console.error);
+    api?.destroy().catch((error) => bitcoinChainHandlerLogger.error('Error destroying Bitcoin API', error));
   }
 
   async sleep () {
@@ -69,7 +72,7 @@ export class BitcoinChainHandler extends AbstractChainHandler {
     this.cancelAllRecover();
 
     await Promise.all(Object.values(this.getApiMap()).map((evmApi) => {
-      return evmApi.disconnect().catch(console.error);
+      return evmApi.disconnect().catch((error) => bitcoinChainHandlerLogger.error('Error disconnecting Bitcoin API', error));
     }));
 
     return Promise.resolve();

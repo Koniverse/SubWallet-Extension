@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AbstractAddressJson, AccountJson } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { stripUrl } from '@subwallet/extension-base/utils';
 import { AccountItemWithName, EmptyList, GeneralEmptyList, Layout, MetaInfo, PageWrapper, WCNetworkAvatarGroup } from '@subwallet/extension-web-ui/components';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
@@ -93,7 +94,7 @@ const Component: React.FC<ComponentProps> = (props) => {
         setLoading(true);
         disconnectWalletConnectConnection(topic)
           .catch((e) => {
-            console.log(e);
+            defaultLogger.debug(e);
             notification({
               type: 'error',
               message: t('Fail to disconnect')

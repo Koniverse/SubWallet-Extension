@@ -3,7 +3,10 @@
 
 import { CurrencyJson, CurrencyType, ExchangeRateJSON, PriceJson } from '@subwallet/extension-base/background/KoniTypes';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import axios, { AxiosResponse } from 'axios';
+
+const coingeckoLogger = createLogger('Coingecko');
 
 interface GeckoItem {
   id: string,
@@ -46,7 +49,7 @@ export const getTokenPrice = async (priceIds: Set<string>, currencyCode: Currenc
       }
 
       if (rs?.status !== 200) {
-        console.warn('Failed to get token price');
+        coingeckoLogger.warn('Failed to get token price');
       }
 
       return rs;
@@ -58,11 +61,11 @@ export const getTokenPrice = async (priceIds: Set<string>, currencyCode: Currenc
       try {
         rs = await axios.get('https://api-cache.subwallet.app/exchange-rate');
       } catch (e) {
-        console.warn('Failed to get exchange rate');
+        coingeckoLogger.warn('Failed to get exchange rate', e);
       }
 
       if (rs?.status !== 200) {
-        console.warn('Failed to get exchange rate');
+        coingeckoLogger.warn('Failed to get exchange rate - invalid status');
       }
 
       return rs;
@@ -109,7 +112,7 @@ export const getTokenPrice = async (priceIds: Set<string>, currencyCode: Currenc
       price24hMap
     } as PriceJson;
   } catch (err) {
-    console.error(err);
+    coingeckoLogger.error('Error fetching price data', err);
     throw err;
   }
 };

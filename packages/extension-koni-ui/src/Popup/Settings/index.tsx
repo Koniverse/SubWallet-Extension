@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// Logger removed - unused
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { PageWrapper, WalletConnect } from '@subwallet/extension-koni-ui/components';
 import { CONTACT_SUPPORT_URL, EXTENSION_VERSION, SUPPORT_MAIL, TERMS_OF_SERVICE_URL, TWITTER_URL, WEBSITE_URL, WIKI_URL } from '@subwallet/extension-koni-ui/constants/common';
@@ -18,6 +19,7 @@ import { ArrowSquareOut, Book, BookBookmark, CaretRight, ChatTeardropText, Coin,
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+
 
 type Props = ThemeProps
 

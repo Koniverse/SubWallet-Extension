@@ -4,6 +4,7 @@
 import { Resolver } from '@subwallet/extension-base/background/types';
 import { _getOriginChainOfAsset, _isChainCompatibleLedgerEvm } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountChainType, AccountProxy, AccountSignMode, BuyServiceInfo, BuyTokenInfo, SupportService } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { detectTranslate, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, baseServiceItems, Layout, PageWrapper, ServiceItem } from '@subwallet/extension-koni-ui/components';
 import { ServiceSelector } from '@subwallet/extension-koni-ui/components/Field/BuyTokens/ServiceSelector';
@@ -334,7 +335,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
         })
         .catch((e: Error) => {
           if (e.message !== 'User reject') {
-            console.error(e);
+            defaultLogger.error('Failed to create buy order', e);
 
             notify({
               message: t('ui.BUY.screen.BuyTokens.createBuyOrderFail'),

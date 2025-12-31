@@ -1,7 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BridgeTransactionStatus } from '../interfaces';
+
+const availBridgeUtilsLogger = createLogger('AvailBridgeUtils');
 
 /* Description */
 export function getAvailBridgeClaimDescription (amount: string, symbol: string) {
@@ -96,14 +99,14 @@ export async function fetchAvailBridgeTransactions (userAddress: string, sourceC
     );
 
     if (!rawResponse.ok) {
-      console.error('Error fetching claimable bridge transactions');
+      availBridgeUtilsLogger.error('Error fetching claimable bridge transactions');
 
       return undefined;
     }
 
     return await rawResponse.json() as AvailBridgeTransactionsResponse;
   } catch (e) {
-    console.error(e);
+    availBridgeUtilsLogger.error('Error fetching Avail bridge transactions', e);
 
     return undefined;
   }

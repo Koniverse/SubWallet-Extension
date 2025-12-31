@@ -1,12 +1,15 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { APP_POPUP_MODAL, EARNING_WARNING_ANNOUNCEMENT } from '@subwallet/extension-koni-ui/constants';
 import { toggleCampaignPopup } from '@subwallet/extension-koni-ui/messaging/campaigns';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ModalContext } from '@subwallet/react-ui';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+
+const logger = createLogger('MktCampaignModalContext');
 
 import AppPopupModal from '../components/Modal/Campaign/AppPopupModal';
 import { AppContentButton, PopupFrequency } from '../types/staticContent';
@@ -54,7 +57,7 @@ export const MktCampaignModalContextProvider = ({ children }: MktCampaignModalCo
   }, [activeModal, isPopupVisible, mktCampaignModal?.type, storageEarningPosition]);
 
   const hideModal = useCallback(() => {
-    toggleCampaignPopup({ value: false }).catch((e) => console.error(e)).finally(() => {
+    toggleCampaignPopup({ value: false }).catch((e) => logger.error('Failed to toggle campaign popup', e)).finally(() => {
       inactiveModal(APP_POPUP_MODAL);
       setMktCampaignModal(undefined);
     });

@@ -4,6 +4,7 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { APIItemState, CrowdloanItem, CurrencyJson } from '@subwallet/extension-base/background/KoniTypes';
 import { _getChainNativeTokenBasicInfo, _getSubstrateRelayParent } from '@subwallet/extension-base/services/chain-service/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
 import { BN_ZERO } from '@subwallet/extension-web-ui/constants';
 import { getBalanceValue, getConvertedBalanceValue } from '@subwallet/extension-web-ui/hooks/screen/home/useAccountBalance';
@@ -96,7 +97,7 @@ export default function useGetCrowdloanList () {
 
       setChainInfoMap(result);
     }).catch((e) => {
-      console.log('fetch _ChainInfo error:', e);
+      defaultLogger.error('fetch _ChainInfo error', e);
     });
   }, []);
 

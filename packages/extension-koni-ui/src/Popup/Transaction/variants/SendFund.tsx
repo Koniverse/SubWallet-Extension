@@ -19,6 +19,7 @@ import { SWTransactionResponse } from '@subwallet/extension-base/services/transa
 import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee } from '@subwallet/extension-base/types';
 import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { _reformatAddressWithChain, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenSelector } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
@@ -38,6 +39,8 @@ import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { PaperPlaneRight, PaperPlaneTilt } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+
+const logger = createLogger('SendFund');
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useIsFirstRender, useLocalStorage } from 'usehooks-ts';
@@ -763,7 +766,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
                 setLoading(true);
                 options.isTransferBounceable = true;
                 _doSubmit().catch((error) => {
-                  console.error('Error during submit:', error);
+                  logger.error('Error during submit', error);
                 });
               }
             },
@@ -796,7 +799,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
                 setLoading(true);
                 checkTransferAll = true;
                 _doSubmit().catch((error) => {
-                  console.error('Error during submit:', error);
+                  logger.error('Error during submit', error);
                 });
               }
             },
@@ -819,7 +822,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     };
 
     _doSubmit().catch((error) => {
-      console.error('Error during submit:', error);
+      logger.error('Error during submit', error);
     });
   }, [assetInfo, chainInfoMap, closeAlert, doSubmit, form, isTransferAll, openAlert, t, updateAddressInputValue]);
 
@@ -889,7 +892,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
         validate();
       } else {
-        cancelSubscription(transferInfo.id).catch(console.error);
+        cancelSubscription(transferInfo.id).catch((error) => logger.error('Failed to cancel subscription', error));
       }
     };
 
@@ -908,7 +911,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       }, callback)
         .then((callback))
         .catch((e) => {
-          console.error('Error in subscribeMaxTransfer:', e);
+          logger.error('Error in subscribeMaxTransfer', e);
 
           setTransferInfo(undefined);
           validate();
@@ -920,7 +923,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
     return () => {
       cancel = true;
-      id && cancelSubscription(id).catch(console.error);
+      id && cancelSubscription(id).catch((error) => logger.error('Failed to cancel subscription on cleanup', error));
     };
   }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue, isTransferAll]);
 
@@ -960,7 +963,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         });
       })
       .catch((e) => {
-        console.log('error', e);
+        logger.error('Error fetching optimal transfer process', e);
       });
   }, [assetValue, chainValue, destChainValue, fromValue, transferAmountValue]);
 
@@ -1009,12 +1012,12 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           setIsFetchingListFeeToken(false);
         }
 
-        console.error('Error fetching tokens:', error);
+        logger.error('Error fetching tokens', error);
       }
     };
 
     fetchTokens().catch((error) => {
-      console.error('Unhandled error in fetchTokens:', error);
+      logger.error('Unhandled error in fetchTokens', error);
     });
 
     return () => {
@@ -1023,7 +1026,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [chainValue, fromValue, nativeTokenBalance, nativeTokenSlug]);
 
   useEffect(() => {
-    console.log('transferInfo', transferInfo);
+    logger.debug('transferInfo updated', transferInfo);
   }, [transferInfo]);
 
   useRestoreTransaction(form);

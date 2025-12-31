@@ -3,6 +3,7 @@
 
 import { _getAssetDecimals, _getAssetSymbol, _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
 import { BaseStepType, BaseSwapStepMetadata, BriefSwapStep, CommonStepDetail, CommonStepFeeInfo, CommonStepType, SwapQuote, SwapStepType } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { swapNumberMetadata } from '@subwallet/extension-base/utils';
 import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { BN_TEN, BN_ZERO } from '@subwallet/extension-koni-ui/constants';
@@ -152,7 +153,7 @@ const useGetSwapProcessStepContent = () => {
             destChainName: _getChainName(chainInfoMap[destinationTokenInfo.originChain])
           };
         } catch (e) {
-          console.log('analysisMetadata error', processStep, e);
+          defaultLogger.debug('analysisMetadata error', { processStep, error: e });
 
           return null;
         }
@@ -223,7 +224,7 @@ const useGetSwapProcessStepContent = () => {
             providerName: quote.provider.name
           };
         } catch (e) {
-          console.log('analysisMetadata error', processStep, e);
+          defaultLogger.debug('analysisMetadata error', { processStep, error: e });
 
           return null;
         }
@@ -249,7 +250,7 @@ const useGetSwapProcessStepContent = () => {
             providerName: quote.provider.name
           };
         } catch (e) {
-          console.log('analysisMetadata error', processStep, e);
+          defaultLogger.debug('analysisMetadata error', { processStep, error: e });
 
           return null;
         }
@@ -324,7 +325,7 @@ const useGetSwapProcessStepContent = () => {
             chainName: _getChainName(chainInfoMap[asset.originChain])
           };
         } catch (e) {
-          console.log('analysisMetadata error', e);
+          defaultLogger.debug('analysisMetadata error', e);
 
           return null;
         }

@@ -13,6 +13,7 @@ import { DetectedGenOptimalProcessErrMsg } from '@subwallet/extension-base/servi
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, HiddenInput, LoadingScreen, PageWrapper } from '@subwallet/extension-koni-ui/components';
@@ -845,7 +846,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
           });
           form.setFieldValue('recipient', address);
         } catch (e) {
-          console.log('Parse recipientAutoFilledInfo error', e);
+          defaultLogger.debug('Parse recipientAutoFilledInfo error', e);
         }
       } else {
         addressInputCurrent?.setInputValue?.('');
@@ -865,7 +866,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     const timeout: NodeJS.Timeout = setTimeout(() => {
       if (recipientValue && toAssetInfo && isRecipientFieldAllowed) {
         form.validateFields(['recipient']).catch((e) => {
-          console.log('Error when validating', e);
+          defaultLogger.debug('Error when validating recipient', e);
         });
       }
     }, 300);
@@ -940,7 +941,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
               setHandleRequestLoading(false);
             }
           }).catch((e: Error) => {
-            console.log('handleSwapRequest error', e);
+            defaultLogger.error('handleSwapRequest error', e);
 
             if (sync) {
               if (e.message.toLowerCase().startsWith('swap pair is not found')) {
@@ -963,7 +964,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
             }
           });
         }).catch((e) => {
-          console.log('Error when validating', e);
+          defaultLogger.debug('Error when validating swap form', e);
 
           if (sync) {
             setIsFormInvalid(true);
@@ -996,7 +997,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
             updateSwapStates(rs);
           }
         }).catch((e: Error) => {
-          console.log('Error when doing refreshSwapRequestResult', e);
+          defaultLogger.error('Error when doing refreshSwapRequestResult', e);
 
           if (e.message.toLowerCase().startsWith('swap pair is not found')) {
             notifyErrorMessage(ErrorMessageMap.NoQuote);
@@ -1459,7 +1460,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
         setLoading(false);
       })
       .catch((error: Error) => {
-        console.error(`Error while fetching swap destinations: ${error.message}`);
+        defaultLogger.error(`Error while fetching swap destinations: ${error.message}`, error);
 
         setFetchError(true);
         setLoading(false);

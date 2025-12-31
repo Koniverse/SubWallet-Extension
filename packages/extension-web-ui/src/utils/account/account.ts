@@ -7,6 +7,7 @@ import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { _getChainSubstrateAddressPrefix, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { AbstractAddressJson, AccountJson } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { isAccountAll, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { DEFAULT_ACCOUNT_TYPES, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE, TON_ACCOUNT_TYPE } from '@subwallet/extension-web-ui/constants';
 import { MODE_CAN_SIGN } from '@subwallet/extension-web-ui/constants/signing';
@@ -51,7 +52,7 @@ export const findAccountByAddress = (accounts: AccountJson[], address?: string):
 
     return result || null;
   } catch (e) {
-    console.error('Fail to detect address', e);
+    defaultLogger.error('Fail to detect address', e);
 
     return null;
   }
@@ -153,7 +154,7 @@ export const findContactByAddress = (contacts: AbstractAddressJson[], address?: 
 
     return result || null;
   } catch (e) {
-    console.error('Fail to detect address', e);
+    defaultLogger.error('Fail to detect address', e);
 
     return null;
   }

@@ -3,6 +3,7 @@
 
 import { SoloAccountToBeMigrated } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountProxyType, SUPPORTED_ACCOUNT_CHAIN_TYPES } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { AccountChainTypeLogos, AccountProxyTypeTag } from '@subwallet/extension-koni-ui/components';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { validateAccountName } from '@subwallet/extension-koni-ui/messaging';
@@ -15,6 +16,8 @@ import { CheckCircle, XCircle } from 'phosphor-react';
 import { Callbacks, FieldData, RuleObject } from 'rc-field-form/lib/interface';
 import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
+
+const logger = createLogger('ProcessViewItem');
 
 type Props = ThemeProps & {
   currentProcessOrdinal: number;
@@ -48,7 +51,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
       const { name } = form.getFieldsValue();
 
       onApprove(currentSoloAccountToBeMigratedGroup, name.trim())
-        .catch(console.error)
+        .catch((error) => logger.error('Failed to approve solo account migration', error))
         .finally(() => {
           setLoading(false);
         });

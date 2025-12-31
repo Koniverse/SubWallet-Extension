@@ -3,6 +3,7 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { _handleDisplayInsufficientEarningError } from '@subwallet/extension-base/core/logic-validation/earning';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _getAssetDecimals, _getAssetSymbol, _getSubstrateGenesisHash, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
@@ -813,7 +814,7 @@ const Component = ({ className }: ComponentProps) => {
       } else {
         onValid && onValid();
       }
-    }).catch((e) => console.error(e));
+    }).catch((e) => defaultLogger.error('Error validating yield process', e));
   }, [activeModal, closeAlert, openAlert, poolType, slug, t]);
 
   const isUnstakeAll = useMemo(() => {
@@ -1070,7 +1071,7 @@ const Component = ({ className }: ComponentProps) => {
 
                 setConnectionError(errorNetwork);
               })
-              .catch(console.error)
+              .catch((error) => defaultLogger.error('Error validating yield process with connection', error))
               .finally(() => setStepLoading(false));
           },
           1000,
@@ -1112,7 +1113,7 @@ const Component = ({ className }: ComponentProps) => {
             store.dispatch({ type: 'earning/updatePoolTargets', payload: result });
           }
         })
-        .catch(console.error)
+        .catch((error) => defaultLogger.error('Failed to fetch pool targets', error))
         .finally(() => {
           if (!unmount) {
             setTargetLoading(false);

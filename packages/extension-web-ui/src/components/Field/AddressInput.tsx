@@ -3,6 +3,7 @@
 
 import { CHAINS_SUPPORTED_DOMAIN, isAzeroDomain } from '@subwallet/extension-base/koni/api/dotsama/domain';
 import { AbstractAddressJson } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useForwardInputRef, useOpenQrScanner, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
@@ -101,11 +102,11 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
 
     if (isAddress(val) && saveAddress) {
       if (isEthereumAddress(val)) {
-        saveRecentAccount(val, chain).catch(console.error);
+        saveRecentAccount(val, chain).catch((error) => defaultLogger.error('Failed to save recent account', error));
       } else {
         try {
           if (decodeAddress(val, true, addressPrefix)) {
-            saveRecentAccount(val, chain).catch(console.error);
+            saveRecentAccount(val, chain).catch((error) => defaultLogger.error('Failed to save recent account', error));
           }
         } catch (e) {}
       }
@@ -167,7 +168,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
               inputRef?.current?.blur();
             }
           })
-          .catch(console.error);
+          .catch((error) => defaultLogger.error('Failed to resolve domain to address', error));
       } else if (isAddress(value)) {
         resolveAddressToDomain({
           chain,
@@ -178,7 +179,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
               setDomainName(result);
             }
           })
-          .catch(console.error);
+          .catch((error) => defaultLogger.error('Failed to resolve address to domain', error));
       }
     } else {
       setDomainName(undefined);

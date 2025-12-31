@@ -4,6 +4,7 @@
 import { _ChainAsset, _MultiChainAsset } from '@subwallet/chain-list/types';
 import { APIItemState, CurrencyJson } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetPriceId, _getAssetSymbol, _getChainName, _getMultiChainAssetPriceId, _getMultiChainAssetSymbol, _isAssetValuable } from '@subwallet/extension-base/services/chain-service/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AssetRegistryStore, BalanceStore, ChainStore, PriceStore } from '@subwallet/extension-koni-ui/stores/types';
 import { TokenBalanceItemType } from '@subwallet/extension-koni-ui/types/balance';
@@ -127,7 +128,7 @@ function getAccountBalance (
       const chainAsset = assetRegistryMap[tokenSlug];
 
       if (!chainAsset) {
-        console.warn('Not found chain asset for token slug: ', tokenSlug);
+        defaultLogger.warn('Not found chain asset for token slug', { tokenSlug });
 
         return;
       }

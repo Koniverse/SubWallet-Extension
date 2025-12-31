@@ -11,7 +11,11 @@ import DatabaseService from '@subwallet/extension-base/services/storage-service/
 import { waitTimeout } from '@subwallet/extension-base/utils';
 import { Subject, Subscription } from 'rxjs';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
 import KoniState from './handlers/State';
+
+const koniCronLogger = createLogger('KoniCron');
 
 export class KoniCron {
   subscriptions: KoniSubscription;
@@ -205,12 +209,12 @@ export class KoniCron {
 
   syncMantaPay = () => {
     if (this.state.isMantaPayEnabled) {
-      this.state.syncMantaPay().catch(console.warn);
+      this.state.syncMantaPay().catch((e) => koniCronLogger.warn('Error syncing MantaPay', e));
     }
   };
 
   fetchPoolInfo = () => {
-    this.state.earningService.runSubscribePoolsInfo().catch(console.error);
+    this.state.earningService.runSubscribePoolsInfo().catch((e) => koniCronLogger.error('Error fetching pool info', e));
   };
 
   fetchMktCampaignData = () => {
@@ -242,13 +246,13 @@ export class KoniCron {
       addresses = this.state.keyringService.context.getDecodedAddresses();
 
       if (!addresses.length) {
-        console.warn('[Cron] No decoded addresses found for ALL_ACCOUNT_KEY');
+        koniCronLogger.warn('No decoded addresses found for ALL_ACCOUNT_KEY');
 
         return;
       }
 
       this.state.nftDetectionService.fetchEvmCollectionsWithPreview(addresses)
-        .catch((err) => console.warn(`[Cron] NFT detection failed for ${address}:`, err));
+        .catch((err) => koniCronLogger.warn(`NFT detection failed for ${address}`, err));
     };
   };
 
@@ -270,7 +274,7 @@ export class KoniCron {
   public async reloadStaking () {
     const address = this.state.keyringService.context.currentAccount.proxyId;
 
-    console.log('reload staking', address);
+    koniCronLogger.debug('reload staking', address);
 
     await waitTimeout(1800);
 

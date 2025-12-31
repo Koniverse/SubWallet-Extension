@@ -3,10 +3,13 @@
 
 import { RequestMigrateSoloAccount, SoloAccountToBeMigrated } from '@subwallet/extension-base/background/KoniTypes';
 import { SESSION_TIMEOUT } from '@subwallet/extension-base/services/keyring-service/context/handlers/Migration';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { pingSession } from '@subwallet/extension-koni-ui/messaging/migrate-unified-account';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+
+const logger = createLogger('SoloAccountMigrationView');
 
 import { ProcessViewItem } from './ProcessViewItem';
 
@@ -71,7 +74,7 @@ function Component ({ onApprove, onCompleteMigrationProcess, sessionId, soloAcco
 
     if (sessionId) {
       const doPing = () => {
-        pingSession({ sessionId }).catch(console.error);
+        pingSession({ sessionId }).catch((error) => logger.error('Failed to ping session', error));
       };
 
       timer = setInterval(() => {

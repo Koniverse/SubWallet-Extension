@@ -8,10 +8,13 @@ import { SWStorage } from '@subwallet/extension-base/storage';
 import ChainlistStore, { ChainlistConfig } from '@subwallet/extension-base/stores/ChainlistStore';
 import PassPhishingStore from '@subwallet/extension-base/stores/PassPhishingStore';
 import SettingsStore from '@subwallet/extension-base/stores/Settings';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { Subject } from 'rxjs';
 
 import i18n from './i18n/i18n';
 import { DEFAULT_SETTING } from './constants';
+
+const settingServiceLogger = createLogger('SettingService');
 
 export default class SettingService {
   private readonly settingsStore = new SettingsStore();
@@ -20,7 +23,7 @@ export default class SettingService {
   private readonly environmentStore = new EnvironmentStoreSubject();
 
   constructor () {
-    this.initSetting().catch(console.error);
+    this.initSetting().catch((error) => settingServiceLogger.error('Error initializing settings', error));
   }
 
   private async initSetting () {
@@ -29,7 +32,7 @@ export default class SettingService {
     const updateLanguage = ({ language }: UiSettings) => {
       if (language !== old) {
         old = language;
-        i18n.changeLanguage(language).catch(console.error);
+        i18n.changeLanguage(language).catch((error) => settingServiceLogger.error('Error changing language', error));
       }
     };
 

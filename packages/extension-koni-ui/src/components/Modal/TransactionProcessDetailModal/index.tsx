@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ProcessTransactionData, ProcessType, ResponseSubscribeProcessById } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { TRANSACTION_PROCESS_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { cancelSubscription, subscribeProcess } from '@subwallet/extension-koni-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -9,6 +10,8 @@ import { Button, ModalContext, SwModal } from '@subwallet/react-ui';
 import React, { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+
+const logger = createLogger('TransactionProcessDetailModal');
 
 import { CurrentProcessStep } from './parts/CurrentProcessStep';
 import { ProcessStepList } from './parts/ProcessStepList';
@@ -50,7 +53,7 @@ const Component: FC<Props> = (props: Props) => {
 
     const onCancel = () => {
       if (id) {
-        cancelSubscription(id).catch(console.error);
+        cancelSubscription(id).catch((error) => logger.error('Failed to cancel subscription', error));
       }
     };
 
@@ -68,7 +71,7 @@ const Component: FC<Props> = (props: Props) => {
 
       subscribeProcess({ processId }, updateProcess)
         .then(updateProcess)
-        .catch(console.error);
+        .catch((error) => logger.error('Failed to subscribe process', error));
     }
 
     return () => {

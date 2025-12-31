@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { EarningRewardItem, SpecialYieldPoolInfo, SpecialYieldPositionInfo } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { balanceNoPrefixFormater, BN_TEN, formatNumber, isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
 import { BN_ZERO } from '@subwallet/extension-web-ui/constants';
 import { HomeContext } from '@subwallet/extension-web-ui/contexts/screen/HomeContext';
@@ -38,7 +39,7 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
   const isTotalBalanceDecrease = totalBalanceInfo.change.status === 'decrease';
 
   const onChangeShowBalance = useCallback(() => {
-    saveShowBalance(!isShowBalance).catch(console.error);
+    saveShowBalance(!isShowBalance).catch((error) => defaultLogger.error('Failed to save show balance', error));
   }, [isShowBalance]);
 
   const totalUnstake = useMemo(() => {

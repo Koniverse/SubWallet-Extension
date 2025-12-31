@@ -3,6 +3,7 @@
 
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { AccountProxy } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { isAccountAll, isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountProxyItem, DAppConfigurationModal } from '@subwallet/extension-koni-ui/components';
 import ConfirmationGeneralInfo from '@subwallet/extension-koni-ui/components/Confirmation/ConfirmationGeneralInfo';
@@ -20,6 +21,8 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled, { useTheme } from 'styled-components';
+
+const logger = createLogger('ConnectWebsiteModal');
 
 type Props = ThemeProps & {
   id: string;
@@ -88,7 +91,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
       setIsSubmit(true);
       changeAuthorizationPerSite({ values: allowedMap, id: authInfo.id })
         .catch((e) => {
-          console.log('changeAuthorizationPerSite error', e);
+          logger.error('changeAuthorizationPerSite error', e);
         }).finally(() => {
           onCancel();
           setIsSubmit(false);
@@ -103,7 +106,7 @@ function Component ({ authInfo, className = '', id, isBlocked = true, isNotConne
         .then(() => {
           setIsSubmit(false);
         })
-        .catch(console.error);
+        .catch((error) => logger.error('Failed to change authorization block', error));
     }
   }, [authInfo?.id, isSubmit]);
 

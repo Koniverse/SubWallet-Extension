@@ -5,11 +5,14 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, AmountDataWithId, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { BalanceType } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { cancelSubscription, getAvailableBalanceByType, getFreeBalance, subscribeAvailableBalanceByType, subscribeFreeBalance, updateAssetSetting } from '@subwallet/extension-koni-ui/messaging';
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useSelector } from '../common';
+
+const logger = createLogger('useGetBalance');
 
 const DEFAULT_BALANCE = { value: '0', symbol: '', decimals: 18 };
 
@@ -93,7 +96,7 @@ const useGetBalance = (chain = '', address = '', tokenSlug = '', isSubscribe = f
             return (e: Error) => {
               !cancel && setError(t('ui.BALANCE.hook.balance.useGetBalance.unableToGetBalanceReEnableNetwork'));
               !cancel && setter(DEFAULT_BALANCE);
-              console.error(e);
+              logger.error('Unable to get balance', e);
             };
           };
 
@@ -160,7 +163,7 @@ const useGetBalance = (chain = '', address = '', tokenSlug = '', isSubscribe = f
       setIsLoading(true);
       setError(null);
       Object.keys(idMap).forEach((id) => {
-        cancelSubscription(id).catch(console.error);
+        cancelSubscription(id).catch((error) => logger.error('Failed to cancel subscription', error));
       });
     };
   }, [isRefresh, address, assetRegistry, chain, chainInfo?.name, isChainActive, isSubscribe, isTokenActive, nativeTokenActive, nativeTokenSlug, t, tokenSlug, extrinsicType, balanceType]);

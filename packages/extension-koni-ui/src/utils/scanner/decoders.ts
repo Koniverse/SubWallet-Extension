@@ -5,6 +5,7 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _isChainEnabled, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { createTransactionFromRLP } from '@subwallet/extension-base/utils/eth';
 import { EthereumParsedData, ParsedData, SubstrateCompletedParsedData, SubstrateMultiParsedData } from '@subwallet/extension-koni-ui/types/scanner';
 import { findAccountByAddress } from '@subwallet/extension-koni-ui/utils/account/account';
@@ -15,6 +16,8 @@ import { compactFromU8a, hexStripPrefix, hexToU8a, u8aToHex } from '@polkadot/ut
 import { blake2AsHex, isEthereumAddress } from '@polkadot/util-crypto';
 
 import strings from '../../constants/strings';
+
+const logger = createLogger('Decoders');
 
 // from https://github.com/maciejhirsz/uos#substrate-payload
 const SUBSTRATE_SIGN = '53';
@@ -154,7 +157,7 @@ export const constructDataFromBytes = (bytes: Uint8Array, multipartComplete = fa
 
           data.data.data = uosAfterFrames.slice(44);
         } else {
-          console.error('Failed to identify action type.');
+          logger.error('Failed to identify action type.');
           throw new Error();
         }
 
@@ -193,17 +196,17 @@ export const constructDataFromBytes = (bytes: Uint8Array, multipartComplete = fa
           );
 
           if (!network) {
-            console.error(strings.ERROR_NO_NETWORK);
+            logger.error(strings.ERROR_NO_NETWORK);
             throw new Error(strings.ERROR_NO_NETWORK);
           }
 
           if (network && !_isChainEnabled(networkStateMap[network.slug])) {
-            console.error(strings.ERROR_NETWORK_INACTIVE.replace('(network name)', network.name));
+            logger.error(strings.ERROR_NETWORK_INACTIVE.replace('(network name)', network.name));
             throw new Error(strings.ERROR_NETWORK_INACTIVE.replace('(network name)', network.name));
           }
 
           if (!account) {
-            console.error(strings.ERROR_NO_SENDER_FOUND);
+            logger.error(strings.ERROR_NO_SENDER_FOUND);
             throw new Error(strings.ERROR_NO_SENDER_FOUND);
           }
 
@@ -249,7 +252,7 @@ export const constructDataFromBytes = (bytes: Uint8Array, multipartComplete = fa
 
           data.data.account = account.address;
         } catch (e) {
-          console.log(e);
+          logger.info('Error decoding Substrate UOS payload', e);
 
           if (e instanceof Error) {
             throw new Error(e.message);

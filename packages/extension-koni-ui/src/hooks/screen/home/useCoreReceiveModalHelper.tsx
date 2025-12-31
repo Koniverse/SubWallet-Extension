@@ -5,6 +5,7 @@ import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { _getAssetOriginChain, _getMultiChainAsset, _isChainBitcoinCompatible, _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountActions, AccountChainType, AccountJson, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { RECEIVE_MODAL_ACCOUNT_SELECTOR, RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useCoreCreateReformatAddress, useGetBitcoinAccounts, useGetChainAndExcludedTokenByCurrentAccountProxy, useHandleLedgerAccountWarning, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain } from '@subwallet/extension-koni-ui/hooks';
@@ -143,7 +144,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     const chainInfo = chainInfoMap[chainSlug];
 
     if (!chainInfo) {
-      console.warn(`Missing chainInfo with slug ${chainSlug}`);
+      defaultLogger.warn(`Missing chainInfo with slug ${chainSlug}`);
 
       return;
     }
@@ -400,7 +401,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
 
     if (specificSelectedTokenInfo) {
       if (!chainSupported.includes(specificSelectedTokenInfo.chainSlug)) {
-        console.warn('tokenGroupSlug does not work with current account');
+        defaultLogger.warn('tokenGroupSlug does not work with current account');
 
         return;
       }

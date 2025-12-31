@@ -5,7 +5,10 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _getOriginChainOfAsset, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { BaseSwapStepMetadata, CommonStepDetail, CommonStepType, DynamicSwapAction, DynamicSwapType, SwapStepType } from '@subwallet/extension-base/types';
 import { SwapPair, SwapProviderId } from '@subwallet/extension-base/types/swap';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import BigN from 'bignumber.js';
+
+const swapUtilsLogger = createLogger('SwapUtils');
 
 export const CHAIN_FLIP_TESTNET_EXPLORER = 'https://blocks-perseverance.chainflip.io';
 export const CHAIN_FLIP_MAINNET_EXPLORER = 'https://scan.chainflip.io';
@@ -59,7 +62,7 @@ export function getChainRouteFromSteps (steps: CommonStepDetail[]): string[] {
     const metadata = currentStep.metadata as unknown as BaseSwapStepMetadata;
 
     if (!metadata) {
-      console.error('Step has no metadata');
+      swapUtilsLogger.error('Step has no metadata');
 
       return chainRoute;
     }

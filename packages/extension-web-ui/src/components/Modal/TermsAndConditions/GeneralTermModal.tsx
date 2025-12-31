@@ -3,6 +3,7 @@
 
 // eslint-disable-next-line header/header
 import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { BaseModal } from '@subwallet/extension-web-ui/components';
 import { GENERAL_TERM_AND_CONDITION_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
@@ -38,7 +39,7 @@ const Component = ({ className, onOk }: Props) => {
   useEffect(() => {
     fetchStaticData('term-and-condition', 'index.md')
       .then((md) => setStaticData({ md: md as string }))
-      .catch((e) => console.log('fetch _termAndCondition error:', e));
+      .catch((e) => defaultLogger.error('fetch _termAndCondition error', e));
   }, []);
 
   const onCheckedInput = useCallback((e: CheckboxChangeEvent) => {

@@ -1,8 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { ConvertLedgerError } from '@subwallet/extension-koni-ui/types';
 import { TFunction } from 'i18next';
+
+const logger = createLogger('LedgerConnector');
 
 export const convertLedgerError = (err: Error, t: TFunction, network: string, isSigning = false, expandError = true, isGetAddress = false): ConvertLedgerError => {
   const error = err;
@@ -107,7 +110,7 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
     };
   }
 
-  console.warn('Unknown ledger error', { error });
+  logger.warn('Unknown ledger error', { error });
 
   if (expandError) {
     return {

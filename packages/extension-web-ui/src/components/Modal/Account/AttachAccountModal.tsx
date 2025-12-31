@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import BackIcon from '@subwallet/extension-web-ui/components/Icon/BackIcon';
 import CloseIcon from '@subwallet/extension-web-ui/components/Icon/CloseIcon';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
@@ -83,7 +84,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     inactiveModal(modalId);
 
     if (isPopup) {
-      windowOpen({ allowedPath: '/accounts/connect-ledger' }).catch(console.error);
+      windowOpen({ allowedPath: '/accounts/connect-ledger' }).catch((error) => defaultLogger.error('Failed to open window for connect ledger', error));
     } else {
       navigate('accounts/connect-ledger');
     }

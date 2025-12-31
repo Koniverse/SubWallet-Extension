@@ -4,7 +4,10 @@
 import { MessageTypes, MessageTypesWithNoSubscriptions, MessageTypesWithNullRequest, MessageTypesWithSubscriptions, RequestTypes, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
 import { PORT_EXTENSION } from '@subwallet/extension-base/defaults';
 import { Message } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { getId } from '@subwallet/extension-base/utils/getId';
+
+const logger = createLogger('MessagingBase');
 
 interface Handler {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -21,7 +24,7 @@ onConnectPort();
 
 function onConnectPort () {
   if (!chrome.runtime) {
-    console.error('The connection to the SubWallet port will be disconnected. Please reload your wallet.');
+    logger.error('The connection to the SubWallet port will be disconnected. Please reload your wallet.');
 
     return;
   }
@@ -34,7 +37,7 @@ function onConnectPort () {
     const handler = handlers[data.id];
 
     if (!handler) {
-      console.error(`Unknown response: ${JSON.stringify(data)}.`);
+      logger.error(`Unknown response: ${JSON.stringify(data)}.`);
 
       return;
     }
@@ -64,10 +67,10 @@ function onDisconnectPort () {
   );
 
   if (err) {
-    console.warn(`${err.message}, Reconnecting to the port.`);
+    logger.warn(`${err.message}, Reconnecting to the port.`);
     setTimeout(onConnectPort, 1000);
   } else {
-    console.error('The connection to the SubWallet port will be disconnected. Please reload your wallet.');
+    logger.error('The connection to the SubWallet port will be disconnected. Please reload your wallet.');
   }
 }
 
@@ -95,7 +98,7 @@ export function sendMessage<TMessageType extends MessageTypes> (message: TMessag
     handlers[id] = { reject, resolve, subscriber };
 
     if (!port) {
-      console.error('The connection to the SubWallet port will be disconnected. Please reload your wallet.');
+      logger.error('The connection to the SubWallet port will be disconnected. Please reload your wallet.');
 
       return;
     }
@@ -117,7 +120,7 @@ export function lazySendMessage<TMessageType extends MessageTypesWithNoSubscript
     promise: handlePromise as Promise<ResponseTypes[TMessageType]>,
     start: () => {
       if (!port) {
-        console.error('The connection to the SubWallet port will be disconnected. Please reload your wallet.');
+        logger.error('The connection to the SubWallet port will be disconnected. Please reload your wallet.');
 
         return;
       }
@@ -128,7 +131,7 @@ export function lazySendMessage<TMessageType extends MessageTypesWithNoSubscript
 
   rs.promise.then((data) => {
     callback(data);
-  }).catch(console.error);
+  }).catch((error) => logger.error('Failed to handle lazy send message', error));
 
   return rs;
 }
@@ -148,7 +151,7 @@ export function lazySubscribeMessage<TMessageType extends MessageTypesWithSubscr
     promise: handlePromise as Promise<ResponseTypes[TMessageType]>,
     start: () => {
       if (!port) {
-        console.error('The connection to the SubWallet port will be disconnected. Please reload your wallet.');
+        logger.error('The connection to the SubWallet port will be disconnected. Please reload your wallet.');
 
         return;
       }
@@ -169,7 +172,7 @@ export function lazySubscribeMessage<TMessageType extends MessageTypesWithSubscr
 
   rs.promise.then((data) => {
     !cancel && callback(data);
-  }).catch(console.error);
+  }).catch((error) => logger.error('Failed to handle lazy subscribe message', error));
 
   return rs;
 }

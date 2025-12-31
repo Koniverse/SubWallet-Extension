@@ -4,6 +4,7 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _getAssetDecimals, _getAssetSymbol, _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
 import { BaseStepType, BriefSwapStep, CommonStepType, ProcessStep, SummaryEarningProcessData, SwapStepType, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { toDisplayNumber } from '@subwallet/extension-koni-ui/utils';
@@ -35,7 +36,7 @@ const useGetTransactionProcessStepText = () => {
             destChainName: _getChainName(chainInfoMap[destinationTokenInfo.originChain])
           };
         } catch (e) {
-          console.log('analysisMetadata error', e);
+          defaultLogger.debug('analysisMetadata error', e);
 
           return {
             tokenValue: '',
@@ -71,7 +72,7 @@ const useGetTransactionProcessStepText = () => {
             toChainName: toChain.name
           };
         } catch (e) {
-          console.log('analysisMetadata error', e);
+          defaultLogger.debug('analysisMetadata error', e);
 
           return {
             fromTokenValue: '',
@@ -108,7 +109,7 @@ const useGetTransactionProcessStepText = () => {
             chainName: _getChainName(chainInfoMap[asset.originChain])
           };
         } catch (e) {
-          console.log('analysisMetadata error', e);
+          defaultLogger.debug('analysisMetadata error', e);
 
           return {
             tokenSymbol: '',
@@ -173,7 +174,7 @@ const useGetTransactionProcessStepText = () => {
             earnMethod: earnMethodMap[brief.method]
           };
         } catch (e) {
-          console.log('analysisMetadata error', e);
+          defaultLogger.debug('analysisMetadata error', e);
 
           return {
             tokenValue: '',

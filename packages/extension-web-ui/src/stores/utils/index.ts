@@ -4,6 +4,7 @@
 import { _AssetRef, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
 import { AuthUrls } from '@subwallet/extension-base/background/handlers/State';
 import { AddressBookInfo, AssetSetting, CampaignBanner, ChainStakingMetadata, ConfirmationsQueue, CrowdloanJson, KeyringState, MantaPayConfig, MantaPaySyncState, NftCollection, NftJson, NominatorMetadata, PriceJson, StakingJson, StakingRewardJson, TransactionHistoryItem, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { AccountsContext, AuthorizeRequest, ConfirmationRequestBase, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _ChainApiStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
@@ -358,7 +359,7 @@ export const getDAppsData = (() => {
 
   rs.promise.then((data) => {
     updateDAppStore(data[0] as DAppInfo[], data[1] as DAppCategory[]);
-  }).catch(console.error);
+  }).catch((error) => defaultLogger.error('Failed to get DApp data', error));
 
   return rs;
 })();
@@ -394,7 +395,7 @@ export const getMissionPoolData = (() => {
 
   rs.promise.then((data) => {
     updateMissionPoolStore(data as MissionInfo[]);
-  }).catch(console.error);
+  }).catch((error) => defaultLogger.error('Failed to get DApp data', error));
 
   return rs;
 })();

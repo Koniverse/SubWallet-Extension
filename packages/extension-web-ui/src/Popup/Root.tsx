@@ -3,6 +3,7 @@
 
 import { WalletUnlockType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { isSameAddress, TARGET_ENV } from '@subwallet/extension-base/utils';
 import BaseWeb from '@subwallet/extension-web-ui/components/Layout/base/BaseWeb';
 import { Logo2D } from '@subwallet/extension-web-ui/components/Logo';
@@ -131,7 +132,7 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
   useEffect(() => {
     initDataRef.current.then(() => {
       setDataLoaded(true);
-    }).catch(console.error);
+    }).catch((error) => defaultLogger.error('Failed to initialize data in Root', error));
   }, []);
 
   useEffect(() => {
@@ -154,7 +155,7 @@ function DefaultRoute ({ children }: {children: React.ReactNode}): React.ReactEl
             lastNotifyTime = id;
           }
         });
-    }).catch(console.error);
+    }).catch((error) => defaultLogger.error('Failed to subscribe to notifications', error));
 
     return () => {
       cancel = true;

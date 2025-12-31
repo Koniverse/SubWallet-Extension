@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+import { AccountMigrationInProgressWarningModal, AccountTokenAddressModal, AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RemindBackupSeedPhraseModal, RemindDuplicateAccountNameModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, SwitchNetworkAuthorizeModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-koni-ui/components';
 import { AccountMigrationInProgressWarningModal, AccountTokenAddressModal, AddressQrModal, AlertModal, AttachAccountModal, ClaimDappStakingRewardsModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, ImportSeedTrustModal, NewSeedModal, RemindBackupSeedPhraseModal, RemindDuplicateAccountNameModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, SwitchNetworkAuthorizeModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-koni-ui/components';
 import { CustomizeModal } from '@subwallet/extension-koni-ui/components/Modal/Customize/CustomizeModal';
 import { AccountDeriveActionProps } from '@subwallet/extension-koni-ui/components/Modal/DeriveAccountActionModal';
@@ -20,6 +22,8 @@ import CN from 'classnames';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
+
+const logger = createLogger('WalletModalContextProvider');
 
 import { AddressQrModalProps } from '../components/Modal/Global/AddressQrModal';
 import { UnlockModal } from '../components/Modal/UnlockModal';
@@ -352,7 +356,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
   }, [activeModal, inactiveModals, searchParams]);
 
   useEffect(() => {
-    getConfig().then(setTimeBackUp).catch(console.error);
+    getConfig().then(setTimeBackUp).catch((error) => logger.error('Failed to get config', error));
   }, [getConfig, setTimeBackUp]);
 
   useEffect(() => {

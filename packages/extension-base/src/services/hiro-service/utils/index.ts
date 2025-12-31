@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Brc20Metadata, InscriptionFetchedData } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { HiroService } from '@subwallet/extension-base/services/hiro-service';
+
+const hiroServiceLogger = createLogger('HiroService');
 
 // todo: handle inscription testnet
 export async function getBrc20Metadata (isTestnet = false, ticker: string) {
@@ -25,7 +28,7 @@ export async function getBrc20Metadata (isTestnet = false, ticker: string) {
 
     return defaultMetadata;
   } catch (error) {
-    console.log(`Error on request brc20 metadata with ticker ${ticker}`);
+    hiroServiceLogger.debug(`Error on request brc20 metadata with ticker ${ticker}`);
 
     return defaultMetadata;
   }
@@ -37,7 +40,7 @@ export async function getInscriptionContent (isTestnet: boolean, inscriptionId: 
   try {
     return await hiroService.getInscriptionContent(inscriptionId);
   } catch (error) {
-    console.log(`Error on request inscription ${inscriptionId} content`);
+    hiroServiceLogger.debug(`Error on request inscription ${inscriptionId} content`);
 
     return {};
   }
@@ -56,7 +59,7 @@ export async function getAddressInscriptions (address: string, isTestnet: boolea
 
     return response.results;
   } catch (error) {
-    console.error(`Failed to get ${address} inscriptions with offset ${offset} and limit ${limit}`, error);
+    hiroServiceLogger.error(`Failed to get ${address} inscriptions with offset ${offset} and limit ${limit}`, error);
     throw error;
   }
 }
@@ -67,7 +70,7 @@ export function getPreviewUrl (inscriptionId: string) {
   try {
     return hiroService.getPreviewUrl(inscriptionId);
   } catch (error) {
-    console.error(`Failed to get inscription ${inscriptionId} preview url`, error);
+    hiroServiceLogger.error(`Failed to get inscription ${inscriptionId} preview url`, error);
     throw error;
   }
 }

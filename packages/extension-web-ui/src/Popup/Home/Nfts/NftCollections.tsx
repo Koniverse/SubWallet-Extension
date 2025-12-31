@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { EmptyList, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
 import NoContent, { PAGE_TYPE } from '@subwallet/extension-web-ui/components/NoContent';
@@ -97,7 +98,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           .then(() => {
             setLoading(false);
           })
-          .catch(console.error);
+          .catch((error) => defaultLogger.error('Failed to fetch NFT collections', error));
       }
     },
     {

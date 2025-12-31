@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { useTranslation } from '@subwallet/extension-web-ui/hooks';
 import useUILock from '@subwallet/extension-web-ui/hooks/common/useUILock';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
@@ -20,7 +21,7 @@ const Component: React.FC<ThemeProps> = ({ className }: ThemeProps) => {
       .then(() => {
         // Do nothing
       })
-      .catch(console.error)
+      .catch((error) => defaultLogger.error('Failed to lock UI', error))
       .finally(() => {
         setLocking(false);
       });

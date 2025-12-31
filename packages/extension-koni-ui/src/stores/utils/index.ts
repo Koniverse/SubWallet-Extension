@@ -12,12 +12,15 @@ import { SWTransactionResult } from '@subwallet/extension-base/services/transact
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { AccountJson, AccountProxy, AccountsWithCurrentAddress, BalanceJson, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardJson, ResponseSubscribeProcessAlive, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { SwapPair } from '@subwallet/extension-base/types/swap';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { addLazy, fetchStaticData } from '@subwallet/extension-base/utils';
 import { lazySubscribeMessage } from '@subwallet/extension-koni-ui/messaging';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { WalletConnectSessionsSubscription } from '@subwallet/extension-koni-ui/stores/types';
 import { MissionInfo } from '@subwallet/extension-koni-ui/types';
 import { SessionTypes } from '@walletconnect/types';
+
+const logger = createLogger('StoresUtils');
 
 // Setup redux stores
 
@@ -76,7 +79,7 @@ export const getMissionPoolData = (() => {
 
   rs.promise.then((data) => {
     updateMissionPoolStore(data as MissionInfo[]);
-  }).catch(console.error);
+  }).catch((error) => logger.error('Failed to get mission pool data', error));
 
   return rs;
 })();
@@ -112,7 +115,7 @@ export const getOldChainPrefixData = (() => {
 
   rs.promise.then((data) => {
     updateOldChainPrefixStore(data);
-  }).catch(console.error);
+  }).catch((error) => logger.error('Failed to get old chain prefix data', error));
 
   return rs;
 })();

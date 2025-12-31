@@ -4,6 +4,7 @@
 import type { ButtonProps } from '@subwallet/react-ui/es/button/button';
 
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { AccountActions } from '@subwallet/extension-base/types';
 import { CloseIcon, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
 import { RELAY_CHAINS_TO_MIGRATE } from '@subwallet/extension-koni-ui/constants';
@@ -96,10 +97,10 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
     try {
       if (scanExplorerAddressUrl) {
         // eslint-disable-next-line no-void
-        void chrome.tabs.create({ url: scanExplorerAddressUrl, active: true }).then(() => console.log('redirecting'));
+        void chrome.tabs.create({ url: scanExplorerAddressUrl, active: true }).then(() => defaultLogger.debug('redirecting to explorer'));
       }
     } catch (e) {
-      console.log('error redirecting to a new tab');
+      defaultLogger.debug('error redirecting to a new tab', e);
     }
   }, [scanExplorerAddressUrl]);
 

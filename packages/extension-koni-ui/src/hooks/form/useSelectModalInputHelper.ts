@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { InputRef, ModalContext, SelectModalProps } from '@subwallet/react-ui';
 import { InputFocusOptions } from 'rc-input/es/utils/commonUtils';
@@ -20,7 +21,7 @@ export function useSelectModalInputHelper ({ id, onBlur, onChange, onFocus }: Ba
         modalContext.inactiveModal(modalId);
       },
       setSelectionRange: (start: number, end: number, direction?: 'forward' | 'backward' | 'none') => {
-        console.log('This action is not supported');
+        defaultLogger.debug('This action is not supported');
       },
       select: () => {
         modalContext.activeModal(modalId);

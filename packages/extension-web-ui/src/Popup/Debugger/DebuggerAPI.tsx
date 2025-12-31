@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MessageTypesWithSubscriptions } from '@subwallet/extension-base/background/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { subscribeMessage } from '@subwallet/extension-web-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
@@ -229,7 +230,7 @@ const Component = ({ className }: ComponentProps) => {
       const request = JSON.parse(formValues?.payload || 'null');
 
       const callback = (response: any) => {
-        console.debug(formValues?.api, response);
+        defaultLogger.debug('Debugger API response', { api: formValues?.api, response });
         setResponse(JSON.stringify(response, null, 2));
       };
 
@@ -238,7 +239,7 @@ const Component = ({ className }: ComponentProps) => {
 
       unsub = subscription.unsub;
     }).catch((e) => {
-      console.error(e);
+      defaultLogger.error(e);
     });
   }, []);
 

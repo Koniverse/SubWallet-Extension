@@ -3,6 +3,7 @@
 
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
 import { AssetSetting, ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { _getXcmUnstableWarning, _isMythosFromHydrationToMythos, _isXcmTransferUnstable } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getSnowBridgeGatewayContract } from '@subwallet/extension-base/koni/api/contract-handler/utils';
 import { _getAssetDecimals, _getContractAddressOfToken, _getOriginChainOfAsset, _getTokenMinAmount, _isAssetFungibleToken, _isChainEvmCompatible, _isMantaZkAsset, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
@@ -809,7 +810,7 @@ const _SendFund = ({ className = '', modalContent }: Props): React.ReactElement<
         });
       })
       .catch((e) => {
-        console.log('error', e);
+        defaultLogger.error('Error getting optimal transfer process', e);
       });
   }, [asset, chain, destChain, from, transferAmount]);
 

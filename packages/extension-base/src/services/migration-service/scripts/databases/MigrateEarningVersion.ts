@@ -8,7 +8,7 @@ export default class MigrateEarningVersion extends BaseMigrationJob {
     try {
       await this.state.dbService.removeOldEarningData();
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
   }
 }

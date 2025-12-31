@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountProxyType } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { AccountNameModal, CloseIcon, Layout, PageWrapper, WordPhrase } from '@subwallet/extension-koni-ui/components';
 import { SeedPhraseTermModal } from '@subwallet/extension-koni-ui/components/Modal/TermsAndConditions/SeedPhraseTermModal';
 import { ACCOUNT_NAME_MODAL, CONFIRM_TERM_SEED_PHRASE, CREATE_ACCOUNT_MODAL, DEFAULT_MNEMONIC_TYPE, DEFAULT_ROUTER_PATH, SEED_PREVENT_MODAL, SELECTED_MNEMONIC_TYPE, TERM_AND_CONDITION_SEED_PHRASE_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-koni-ui/constants';
@@ -140,14 +141,14 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         setSeedPhrase(phrase);
       })
       .catch((e: Error) => {
-        console.error(e);
+        defaultLogger.error('Failed to create seed', e);
       });
   }, [selectedMnemonicType]);
 
   useEffect(() => {
     if (isPopupMode && isFirefox() && hasMasterPassword && !isOpenWindowRef.current) {
       isOpenWindowRef.current = true;
-      windowOpen({ allowedPath: '/accounts/new-seed-phrase' }).then(window.close).catch(console.log);
+      windowOpen({ allowedPath: '/accounts/new-seed-phrase' }).then(window.close).catch((error) => defaultLogger.debug('Failed to open window', error));
     }
   }, [isPopupMode, hasMasterPassword]);
 

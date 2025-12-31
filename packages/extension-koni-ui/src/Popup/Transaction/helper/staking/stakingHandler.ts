@@ -4,12 +4,15 @@
 import { StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { UnstakingStatus } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { ALL_KEY } from '@subwallet/extension-koni-ui/constants/common';
 import { getBondingOptions, getNominationPoolOptions } from '@subwallet/extension-koni-ui/messaging';
 import { store } from '@subwallet/extension-koni-ui/stores';
 // @ts-ignore
 import humanizeDuration from 'humanize-duration';
 import { TFunction } from 'react-i18next';
+
+const logger = createLogger('StakingHandler');
 
 export function getUnstakingPeriod (t: TFunction, unstakingPeriod?: number) {
   if (unstakingPeriod) {
@@ -61,7 +64,7 @@ const fetchChainValidator = (chain: string, unmount: boolean, setValidatorLoadin
       .then((result) => {
         store.dispatch({ type: 'bonding/updateChainValidators', payload: { chain, validators: result } });
       })
-      .catch(console.error)
+      .catch((error) => logger.error('Failed to fetch chain validators', error))
       .finally(() => {
         if (!unmount) {
           setValidatorLoading(false);
@@ -78,7 +81,7 @@ const fetchChainPool = (chain: string, unmount: boolean, setPoolLoading: (value:
       .then((result) => {
         store.dispatch({ type: 'bonding/updateNominationPools', payload: { chain, pools: result } });
       })
-      .catch(console.error)
+      .catch((error) => logger.error('Failed to fetch nomination pools', error))
       .finally(() => {
         if (!unmount) {
           setPoolLoading(false);

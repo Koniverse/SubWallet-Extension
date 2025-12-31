@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { ETHEREUM_PREFIX, SCAN_TYPE, SECRET_PREFIX, SUBSTRATE_PREFIX } from '@subwallet/extension-web-ui/constants';
 import { QrAccount } from '@subwallet/extension-web-ui/types';
 
@@ -94,7 +95,7 @@ export const readOnlyScan = (data: string): QrAccount | null => {
       isReadOnly: true
     };
   } catch (e) {
-    console.log(e);
+    defaultLogger.debug(e);
 
     return null;
   }

@@ -3,6 +3,7 @@
 
 import { ResponseParseTransactionSubstrate, ResponseQrParseRLP, SignerDataType } from '@subwallet/extension-base/background/KoniTypes';
 import { _isChainEnabled } from '@subwallet/extension-base/services/chain-service/utils';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { createTransactionFromRLP, Transaction } from '@subwallet/extension-base/utils/eth';
 import { MULTIPART, SCANNER_QR_STEP } from '@subwallet/extension-koni-ui/constants';
 import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -416,7 +417,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
 
           return hexStripPrefix(signature);
         } catch (e) {
-          console.error(e);
+          defaultLogger.error('Failed to process signature', e);
           throw new Error((e as Error).message);
         }
       }

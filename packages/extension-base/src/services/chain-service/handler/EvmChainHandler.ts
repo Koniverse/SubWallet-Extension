@@ -13,6 +13,9 @@ import { Contract } from 'web3-eth-contract';
 
 import { logger as createLogger } from '@polkadot/util/logger';
 import { Logger } from '@polkadot/util/types';
+import { createLogger as createSubWalletLogger } from '@subwallet/extension-base/utils/logger';
+
+const evmChainHandlerLogger = createSubWalletLogger('EvmChainHandler');
 
 export class EvmChainHandler extends AbstractChainHandler {
   private evmApiMap: Record<string, EvmApi> = {};
@@ -46,7 +49,7 @@ export class EvmChainHandler extends AbstractChainHandler {
       existed.connect();
 
       if (apiUrl !== existed.apiUrl) {
-        existed.updateApiUrl(apiUrl).catch(console.error);
+        existed.updateApiUrl(apiUrl).catch((error) => evmChainHandlerLogger.error('Error updating EVM API URL', error));
       }
 
       return existed;
@@ -64,7 +67,7 @@ export class EvmChainHandler extends AbstractChainHandler {
     const existed = this.getEvmApiByChain(chainSlug);
 
     if (existed && !existed.isApiReadyOnce) {
-      console.log(`Reconnect ${existed.providerName || existed.chainSlug} at ${existed.apiUrl}`);
+      evmChainHandlerLogger.info(`Reconnect ${existed.providerName || existed.chainSlug} at ${existed.apiUrl}`);
 
       return existed.recoverConnect();
     }
@@ -73,7 +76,7 @@ export class EvmChainHandler extends AbstractChainHandler {
   destroyEvmApi (chain: string) {
     const evmApi = this.getEvmApiByChain(chain);
 
-    evmApi?.destroy().catch(console.error);
+    evmApi?.destroy().catch((error) => evmChainHandlerLogger.error('Error destroying EVM API', error));
   }
 
   async sleep () {
@@ -81,7 +84,7 @@ export class EvmChainHandler extends AbstractChainHandler {
     this.cancelAllRecover();
 
     await Promise.all(Object.values(this.getEvmApiMap()).map((evmApi) => {
-      return evmApi.disconnect().catch(console.error);
+      return evmApi.disconnect().catch((error) => evmChainHandlerLogger.error('Error disconnecting EVM API', error));
     }));
 
     return Promise.resolve();

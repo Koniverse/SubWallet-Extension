@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { OrdinalNftProperties } from '@subwallet/extension-base/types';
 import { Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
@@ -82,13 +83,13 @@ const Component: React.FC<Props> = (props: Props) => {
     try {
       if (accountExternalUrl) {
         // eslint-disable-next-line no-void
-        // void chrome.tabs.create({ url: accountExternalUrl, active: true }).then(() => console.log('redirecting'));
+        // void chrome.tabs.create({ url: accountExternalUrl, active: true }).then(() => defaultLogger.debug('redirecting'));
         openInNewTab(accountExternalUrl)();
       } else {
-        console.log('error redirecting to a new tab');
+        defaultLogger.debug('error redirecting to a new tab');
       }
     } catch (e) {
-      console.log('error redirecting to a new tab');
+      defaultLogger.debug('error redirecting to a new tab');
     }
   }, [accountExternalUrl]);
 
@@ -96,13 +97,13 @@ const Component: React.FC<Props> = (props: Props) => {
     try {
       if (nftItem?.externalUrl) {
         // eslint-disable-next-line no-void
-        // void chrome.tabs.create({ url: nftItem.externalUrl, active: true }).then(() => console.log('redirecting'));
+        // void chrome.tabs.create({ url: nftItem.externalUrl, active: true }).then(() => defaultLogger.debug('redirecting'));
         openInNewTab(nftItem.externalUrl)();
       } else {
-        console.log('error redirecting to a new tab');
+        defaultLogger.debug('error redirecting to a new tab');
       }
     } catch (e) {
-      console.log('error redirecting to a new tab');
+      defaultLogger.debug('error redirecting to a new tab');
     }
   }, [nftItem?.externalUrl]);
 
@@ -135,8 +136,8 @@ const Component: React.FC<Props> = (props: Props) => {
   const onImageClick = useCallback(() => {
     if (nftItem?.externalUrl) {
       chrome.tabs.create({ url: nftItem.externalUrl, active: true })
-        .then(() => console.log('redirecting'))
-        .catch(console.error);
+        .then(() => defaultLogger.debug('redirecting'))
+        .catch((error) => defaultLogger.error('Failed to redirect to inscription external URL', error));
     }
   }, [nftItem?.externalUrl]);
 

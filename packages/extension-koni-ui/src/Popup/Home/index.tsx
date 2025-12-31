@@ -1,6 +1,9 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+import { Layout } from '@subwallet/extension-koni-ui/components';
+import { GlobalSearchTokenModal } from '@subwallet/extension-koni-ui/components/Modal/GlobalSearchTokenModal';
 import { GlobalSearchTokenGroupModal, Layout } from '@subwallet/extension-koni-ui/components';
 import RemindUpgradeFirefoxVersion from '@subwallet/extension-koni-ui/components/Modal/RemindUpgradeFirefoxVersion';
 import { GeneralTermModal } from '@subwallet/extension-koni-ui/components/Modal/TermsAndConditions/GeneralTermModal';
@@ -16,6 +19,8 @@ import { Outlet } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
+
+const logger = createLogger('Home');
 
 type Props = ThemeProps;
 
@@ -74,7 +79,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           handleOpenBanner();
         }
       })
-        .catch(console.error);
+        .catch((error) => logger.error('Failed to handle campaign banner', error));
     } else {
       handleOpenBanner();
     }

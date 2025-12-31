@@ -3,12 +3,16 @@
 
 import { Root } from 'protobufjs';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const uniqueProtobufLogger = createLogger('UniqueProtobuf');
+
 function defineMessage (schema: string) {
   try {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return Root.fromJSON(JSON.parse(schema));
   } catch (e) {
-    console.log('Error parsing JSON schema', e);
+    uniqueProtobufLogger.error('Error parsing JSON schema', e);
 
     return null;
   }
@@ -32,7 +36,7 @@ function convertEnumToString (value: any, key: string, NFTMeta: any, locale: any
       result = translationObject[locale];
     }
   } catch (e) {
-    console.log('Error parsing schema when trying to convert enum to string: ', e);
+    uniqueProtobufLogger.error('Error parsing schema when trying to convert enum to string', e);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return

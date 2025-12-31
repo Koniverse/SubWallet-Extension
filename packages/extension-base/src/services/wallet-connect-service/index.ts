@@ -7,8 +7,11 @@ import RequestService from '@subwallet/extension-base/services/request-service';
 import Eip155RequestHandler from '@subwallet/extension-base/services/wallet-connect-service/handler/Eip155RequestHandler';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { wait } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { IKeyValueStorage } from '@walletconnect/keyvaluestorage';
 import SignClient from '@walletconnect/sign-client';
+
+const walletConnectLogger = createLogger('WalletConnectService');
 import { EngineTypes, SessionTypes, SignClientTypes } from '@walletconnect/types';
 import { getInternalError, getSdkError } from '@walletconnect/utils';
 import { BehaviorSubject } from 'rxjs';
@@ -67,7 +70,7 @@ export default class WalletConnectService {
     this.#polkadotRequestHandler = new PolkadotRequestHandler(this, requestService);
     this.#eip155RequestHandler = new Eip155RequestHandler(this.#koniState, this);
 
-    this.initClient().catch(console.error);
+    this.initClient().catch((error) => walletConnectLogger.error('Error initializing WalletConnect client', error));
   }
 
   private async haveData () {
@@ -171,7 +174,7 @@ export default class WalletConnectService {
           throw Error(getSdkError('INVALID_METHOD').message + ' ' + method);
       }
     } catch (e) {
-      console.log(e);
+      walletConnectLogger.error('Error in WalletConnect handler', e);
 
       try {
         const requestSession = this.getSession(topic);
@@ -183,7 +186,7 @@ export default class WalletConnectService {
       this.responseRequest({
         topic: topic,
         response: formatJsonRpcError(id, (e as Error).message)
-      }).catch(console.error);
+      }).catch((error) => walletConnectLogger.error('Error handling WalletConnect request', error));
     }
   }
 
@@ -200,7 +203,7 @@ export default class WalletConnectService {
         await this.#client.ping({ topic });
       }
     } catch (e) {
-      console.error(e);
+      walletConnectLogger.error('Error pinging WalletConnect session', e);
     }
   }
 
@@ -208,8 +211,8 @@ export default class WalletConnectService {
     this.#client?.on('session_proposal', this.#onSessionProposal.bind(this));
     this.#client?.on('session_request', this.#onSessionRequest.bind(this));
     this.#client?.on('session_ping', this.#onPingReply.bind(this));
-    this.#client?.on('session_event', (data) => console.log('event', data));
-    this.#client?.on('session_update', (data) => console.log('update', data));
+    this.#client?.on('session_event', (data) => walletConnectLogger.debug('WalletConnect session event', data));
+    this.#client?.on('session_update', (data) => walletConnectLogger.debug('WalletConnect session update', data));
     this.#client?.on('session_delete', this.#updateSessions.bind(this));
   }
 
@@ -302,7 +305,7 @@ export default class WalletConnectService {
           reason: getSdkError('USER_DISCONNECTED')
         });
       } catch (e) {
-        console.error(e);
+        walletConnectLogger.error('Error in WalletConnect operation', e);
       }
     }
 
@@ -316,7 +319,7 @@ export default class WalletConnectService {
           reason: getSdkError('USER_DISCONNECTED')
         });
       } catch (e) {
-        console.error(e);
+        walletConnectLogger.error('Error in WalletConnect operation', e);
       }
     }
 
@@ -328,7 +331,7 @@ export default class WalletConnectService {
       try {
         await this.#client?.core.storage.removeItem(key);
       } catch (e) {
-        console.error(e);
+        walletConnectLogger.error('Error in WalletConnect operation', e);
       }
     }
 

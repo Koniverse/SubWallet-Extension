@@ -3,6 +3,7 @@
 
 import type { ThemeProps } from '../types';
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import applyPreloadStyle from '@subwallet/extension-web-ui/preloadStyle';
 import { RootState } from '@subwallet/extension-web-ui/stores';
@@ -351,7 +352,7 @@ export function ThemeProvider ({ children }: ThemeProviderProps): React.ReactEle
   useEffect(() => {
     dataContext.awaitStores(['settings']).then(() => {
       setThemeReady(true);
-    }).catch(console.error);
+    }).catch((error) => defaultLogger.error('Failed to await stores', error));
   }, [dataContext]);
 
   // Reduce number of re-rendering

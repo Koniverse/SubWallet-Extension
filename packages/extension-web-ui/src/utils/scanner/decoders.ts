@@ -5,6 +5,7 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _isChainEnabled, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountJson } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { createTransactionFromRLP } from '@subwallet/extension-base/utils/eth';
 import { EthereumParsedData, ParsedData, SubstrateCompletedParsedData, SubstrateMultiParsedData } from '@subwallet/extension-web-ui/types/scanner';
 import { findAccountByAddress } from '@subwallet/extension-web-ui/utils/account/account';
@@ -154,7 +155,7 @@ export const constructDataFromBytes = (bytes: Uint8Array, multipartComplete = fa
 
           data.data.data = uosAfterFrames.slice(44);
         } else {
-          console.error('Failed to identify action type.');
+          defaultLogger.error('Failed to identify action type.');
           throw new Error();
         }
 
@@ -193,17 +194,17 @@ export const constructDataFromBytes = (bytes: Uint8Array, multipartComplete = fa
           );
 
           if (!network) {
-            console.error(strings.ERROR_NO_NETWORK);
+            defaultLogger.error(strings.ERROR_NO_NETWORK);
             throw new Error(strings.ERROR_NO_NETWORK);
           }
 
           if (network && !_isChainEnabled(networkStateMap[network.slug])) {
-            console.error(strings.ERROR_NETWORK_INACTIVE.replace('(network name)', network.name));
+            defaultLogger.error(strings.ERROR_NETWORK_INACTIVE.replace('(network name)', network.name));
             throw new Error(strings.ERROR_NETWORK_INACTIVE.replace('(network name)', network.name));
           }
 
           if (!account) {
-            console.error(strings.ERROR_NO_SENDER_FOUND);
+            defaultLogger.error(strings.ERROR_NO_SENDER_FOUND);
             throw new Error(strings.ERROR_NO_SENDER_FOUND);
           }
 
@@ -249,7 +250,7 @@ export const constructDataFromBytes = (bytes: Uint8Array, multipartComplete = fa
 
           data.data.account = account.address;
         } catch (e) {
-          console.log(e);
+          defaultLogger.debug(e);
 
           if (e instanceof Error) {
             throw new Error(e.message);

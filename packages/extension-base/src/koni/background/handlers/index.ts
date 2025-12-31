@@ -11,6 +11,10 @@ import KoniTabs from '@subwallet/extension-base/koni/background/handlers/Tabs';
 
 import { assert } from '@polkadot/util';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const swHandlerLogger = createLogger('SWHandler');
+
 export class SWHandler {
   _state?: KoniState;
   _extensionHandler?: KoniExtension;
@@ -77,8 +81,7 @@ export class SWHandler {
         port.postMessage({ id, response, sender: 'BACKGROUND' });
       })
       .catch((error: ProviderError): void => {
-        console.error(error);
-        console.log(`[err] ${source}:: ${error.message}`);
+        swHandlerLogger.error(`[err] ${source}`, error);
 
         // only send message back to port if it's still connected
         if (port) {

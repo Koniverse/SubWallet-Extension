@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { Layout } from '@subwallet/extension-koni-ui/components';
 import { useExtensionDisplayModes, useSelector, useSidePanelUtils } from '@subwallet/extension-koni-ui/hooks';
 import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
@@ -55,7 +56,7 @@ const Component = ({ children, className, isDisableHeader, showHeader = true, sh
         <Icon phosphorIcon={ArrowsOut} />
       ),
       onClick: () => {
-        windowOpen({ allowedPath: '/' }).catch(console.error);
+        windowOpen({ allowedPath: '/' }).catch((error) => defaultLogger.error('Failed to open window', error));
         isSidePanelMode && closeSidePanel();
       }
     };

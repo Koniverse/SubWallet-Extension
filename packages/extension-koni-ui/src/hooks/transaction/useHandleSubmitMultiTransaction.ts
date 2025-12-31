@@ -4,6 +4,7 @@
 import { AmountData } from '@subwallet/extension-base/background/KoniTypes';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { useExtensionDisplayModes, useSidePanelUtils, useTransactionContext } from '@subwallet/extension-koni-ui/hooks';
 import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { CommonActionType, CommonProcessAction } from '@subwallet/extension-koni-ui/reducer';
@@ -29,7 +30,7 @@ const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonPro
         params: {
           'transaction-process-id': transactionProcessId
         }
-      }).then(window.close).catch(console.log);
+      }).then(window.close).catch((error) => defaultLogger.debug('Failed to open window', error));
 
       isSidePanelMode && closeSidePanel();
     } else {

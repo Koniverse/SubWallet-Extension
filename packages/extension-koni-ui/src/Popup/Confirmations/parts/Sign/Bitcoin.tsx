@@ -4,6 +4,7 @@
 import { BitcoinSignPsbtRequest, ConfirmationDefinitionsBitcoin, ConfirmationResult, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountSignMode } from '@subwallet/extension-base/types';
 import { RequestSubmitTransferWithId } from '@subwallet/extension-base/types/balance/transfer';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { wait } from '@subwallet/extension-base/utils';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import { CONFIRMATION_QR_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -137,7 +138,7 @@ const Component: React.FC<Props> = (props: Props) => {
       });
     })
       .catch((error) => {
-        console.error(error);
+        defaultLogger.error('Failed to handle confirm', error);
         notify({
           message: t((error as Error).message),
           type: 'error',
@@ -155,7 +156,7 @@ const Component: React.FC<Props> = (props: Props) => {
     setTimeout(() => {
       handleSignature(type, id, signature.signature)
         .catch((e) => {
-          console.log(e);
+          defaultLogger.debug('Signature error', e);
         })
         .finally(() => {
           setLoading(false);
@@ -196,7 +197,7 @@ const Component: React.FC<Props> = (props: Props) => {
   // }, [account?.accountIndex, account?.addressOffset, hashPayload, isLedgerConnected, isMessage, ledger, ledgerSignMessage, ledgerSignTransaction, onApproveSignature, refreshLedger]);
 
   const onConfirmInject = useCallback(() => {
-    console.error('Not implemented yet');
+    defaultLogger.error('Not implemented yet');
     // if (evmWallet) {
     //   let promise: Promise<`0x${string}`>;
     //

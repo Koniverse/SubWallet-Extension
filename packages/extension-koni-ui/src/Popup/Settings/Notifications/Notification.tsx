@@ -7,6 +7,7 @@ import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { isClaimedPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { _NotificationInfo, BridgeTransactionStatus, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationSetup, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
+import { createLogger, defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertModal, EmptyList, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
@@ -32,6 +33,8 @@ import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, use
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
+
+const logger = createLogger('Notification');
 
 type Props = ThemeProps;
 
@@ -170,7 +173,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     setLoadingNotification(true);
     saveNotificationSetup(newNotificationSetup)
-      .catch(console.error)
+      .catch((error) => logger.error('Failed to save notification setup', error))
       .finally(() => {
         setLoadingNotification(false);
       });
@@ -196,7 +199,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         setNotifications(rs);
         setTimeout(() => setLoading(false), 300);
       })
-      .catch(console.error);
+      .catch((error) => logger.error('Failed to fetch notifications', error));
   }, [currentProxyId]);
 
   const onClickMore = useCallback((item: NotificationInfoItem) => {
@@ -316,7 +319,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             });
             switchReadNotificationStatus(switchStatusParams).then(() => {
               navigate('/transaction/withdraw');
-            }).catch(console.error);
+            }).catch((error) => logger.error('Failed to switch read notification status', error));
           } else {
             showWarningModal('withdrawn');
           }
@@ -338,7 +341,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             });
             switchReadNotificationStatus(switchStatusParams).then(() => {
               navigate('/transaction/claim-reward');
-            }).catch(console.error);
+            }).catch((error) => defaultLogger.error('Failed to switch read notification status', error));
           } else {
             if (chainStateMap[chainSlug]?.active) {
               showWarningModal('claimed');
@@ -381,12 +384,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 showWarningModal('claimed');
               }
             } catch (error) {
-              console.error(error);
+              logger.error('Error claiming polygon bridge', error);
             }
           };
 
           handleClaimPolygonBridge().catch((err) => {
-            console.error('Error:', err);
+            logger.error('Error claiming polygon bridge', err);
           });
           break;
         }
@@ -407,7 +410,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             });
             switchReadNotificationStatus(switchStatusParams).then(() => {
               navigate('/transaction/claim-bridge');
-            }).catch(console.error);
+            }).catch((error) => logger.error('Failed to switch read notification status', error));
           } else {
             showWarningModal('claimed');
           }
@@ -429,7 +432,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
       if (!item.isRead) {
         switchReadNotificationStatus(item)
-          .catch(console.error)
+          .catch((error) => defaultLogger.error('Failed to switch read notification status', error))
           .finally(() => {
             setTrigger(!isTrigger);
           });
@@ -494,7 +497,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const handleSwitchClick = useCallback(() => {
     markAllReadNotification(currentProxyId || ALL_ACCOUNT_KEY)
-      .catch(console.error);
+      .catch((error) => logger.error('Failed to mark all notifications as read', error));
 
     setLoading(true);
     fetchInappNotifications({
@@ -505,7 +508,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         setNotifications(rs);
         setTimeout(() => setLoading(false), 300);
       })
-      .catch(console.error);
+      .catch((error) => logger.error('Failed to fetch notifications', error));
   }, [currentProxyId, selectedFilterTab]);
 
   useEffect(() => {
@@ -516,7 +519,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       .then((rs) => {
         setNotifications(rs);
       })
-      .catch(console.error);
+      .catch((error) => logger.error('Failed to fetch notifications', error));
   }, [currentProxyId, isAllAccount, isTrigger]);
 
   useEffect(() => {

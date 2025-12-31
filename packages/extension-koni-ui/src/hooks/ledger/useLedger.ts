@@ -3,6 +3,7 @@
 
 import { LedgerNetwork, MigrationLedgerNetwork, POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { createPromiseHandler, isSameAddress } from '@subwallet/extension-base/utils';
 import { EVMLedger, SubstrateGenericLedger, SubstrateLegacyLedger, SubstrateMigrationLedger } from '@subwallet/extension-koni-ui/connector';
 import { LedgerTransportManager } from '@subwallet/extension-koni-ui/connector/Ledger/LedgerTransportManager';
@@ -12,6 +13,8 @@ import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { Ledger, SignMessageLedger, SignTransactionLedger } from '@subwallet/extension-koni-ui/types';
 import { convertLedgerError } from '@subwallet/extension-koni-ui/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+const logger = createLogger('useLedger');
 
 import { AccountOptions, LedgerAddress, LedgerSignature } from '@polkadot/hw-ledger/types';
 import { assert } from '@polkadot/util';
@@ -181,7 +184,7 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
     const message = convertedError.message;
 
     if (convertedError.needCloseLedger) {
-      LedgerTransportManager.getInstance().closeTransport().catch(console.error);
+      LedgerTransportManager.getInstance().closeTransport().catch((error) => logger.error('Failed to close ledger transport', error));
     }
 
     switch (convertedError.status) {
@@ -336,14 +339,14 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
           setIsLoading(false);
           handleError(error, false, true);
           setIsLocked(true);
-          console.error(error);
+          logger.error('Ledger error', error);
         });
     }, 300);
   }, [chainSlug, t, active, handleError, getLedger]);
 
   useEffect(() => {
     destroyRef.current = () => {
-      ledger?.disconnect().catch(console.error);
+      ledger?.disconnect().catch((error) => logger.error('Failed to disconnect ledger', error));
     };
   }, [ledger]);
 

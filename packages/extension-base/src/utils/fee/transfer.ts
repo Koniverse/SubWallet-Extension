@@ -26,8 +26,11 @@ import { ValidateTransactionResponseInput } from '@subwallet/extension-base/serv
 import { EvmEIP1559FeeDetail, EvmEIP1559FeeOption, FeeChainType, FeeDetail, FeeInfo, SubstrateTipInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
+
+const feeTransferLogger = createLogger('FeeTransfer');
 import BigN from 'bignumber.js';
 import * as bitcoin from 'bitcoinjs-lib';
 import { TransactionConfig } from 'web3-core';
@@ -320,7 +323,7 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
 
     error = (e as Error).message || 'Unable to estimate fee';
 
-    console.warn('Unable to estimate fee', e);
+    feeTransferLogger.warn('Unable to estimate fee', e);
   }
 
   if (isTransferLocalTokenAndPayThatTokenAsFee && feeChainType === 'substrate') {
@@ -518,7 +521,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
 
     error = (e as Error).message || 'Unable to estimate fee';
 
-    console.warn('Unable to estimate fee', e);
+    feeTransferLogger.warn('Unable to estimate fee', e);
   }
 
   if (!destToken) {

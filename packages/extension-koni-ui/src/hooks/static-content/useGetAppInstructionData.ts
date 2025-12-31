@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { APP_INSTRUCTION_DATA } from '@subwallet/extension-koni-ui/constants';
 import { useCallback } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
@@ -17,7 +18,7 @@ export const useGetAppInstructionData = (language: string) => {
       .then((data) => {
         setAppInstructionData(JSON.stringify(data));
       })
-      .catch((e) => console.error(e));
+      .catch((e) => defaultLogger.error('Failed to fetch app instruction data', e));
   }, [language, setAppInstructionData]);
 
   return { getAppInstructionData };

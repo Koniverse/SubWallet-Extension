@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { createFrames } from '@subwallet/extension-koni-ui/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -91,7 +92,7 @@ const useCreateQrPayload = (value: Uint8Array, skipEncoding?: boolean): { data: 
             timeOutRef.current = setTimeout(nextFrame, timeDelayRef.current);
           }
         })
-        .catch(console.log)
+        .catch((error) => defaultLogger.debug('Failed to get next frame', error))
       ;
     };
 

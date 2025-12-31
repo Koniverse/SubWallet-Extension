@@ -5,6 +5,7 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { _getSubstrateGenesisHash, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { AccountJson, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { defaultLogger } from '@subwallet/extension-base/utils/logger';
 import { EarningPoolItem, EmptyList, FilterModal, Layout } from '@subwallet/extension-web-ui/components';
 import { CREATE_RETURN, DEFAULT_EARN_PARAMS, DEFAULT_ROUTER_PATH, EARN_TRANSACTION, EARNING_INSTRUCTION_MODAL, EVM_ACCOUNT_TYPE, SUBSTRATE_ACCOUNT_TYPE } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
@@ -194,7 +195,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
           if (_filteredAccounts.length === 1) {
             earnParams.from = _filteredAccounts[0].address;
             setEarnStorage(earnParams);
-            saveCurrentAccountAddress(_filteredAccounts[0]).then(() => navigate(earnPath, { state: { from: earnPath } })).catch(() => console.error());
+            saveCurrentAccountAddress(_filteredAccounts[0]).then(() => navigate(earnPath, { state: { from: earnPath } })).catch((error) => defaultLogger.error('Failed to save current account address', error));
           } else {
             if (currentAccount && _filteredAccounts.some((acc) => acc.address === currentAccount.address)) {
               earnParams.from = currentAccount.address;
@@ -205,7 +206,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
             }
 
             setEarnStorage(earnParams);
-            saveCurrentAccountAddress({ address: 'ALL' }).then(() => navigate(earnPath, { state: { from: earnPath } })).catch(() => console.error());
+            saveCurrentAccountAddress({ address: 'ALL' }).then(() => navigate(earnPath, { state: { from: earnPath } })).catch((error) => defaultLogger.error('Failed to save current account address', error));
           }
         }
       }
