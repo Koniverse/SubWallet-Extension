@@ -249,13 +249,32 @@ export class MultisigService implements StoppableServiceInterface {
 
   /**
    * Handles application events and reloads multisig extrinsics when needed
-   * Reloads when accounts are added/removed or chain state is updated
+   * Reloads when accounts are added/removed or when supported chain state is updated
    * @param events - Array of event items
    * @param eventTypes - Array of event types that occurred
    */
   handleEvents (events: EventItem<EventType>[], eventTypes: EventType[]): void {
-    // todo: improve by reload only when related chains update
-    if (eventTypes.includes('account.add') || eventTypes.includes('account.remove') || eventTypes.includes('chain.updateState')) {
+    let needReload = false;
+
+    if (eventTypes.includes('account.add') || eventTypes.includes('account.remove')) {
+      needReload = true;
+    }
+
+    if (eventTypes.includes('chain.updateState')) {
+      for (const event of events) {
+        if (event.type === 'chain.updateState') {
+          const chainSlug = event.data[0] as string;
+
+          // Only reload if the updated chain is in the supported chains list
+          if (MULTISIG_SUPPORTED_CHAINS.includes(chainSlug)) {
+            needReload = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (needReload) {
       addLazy(
         'reloadPendingMultisigTxsByEvents',
         () => {
