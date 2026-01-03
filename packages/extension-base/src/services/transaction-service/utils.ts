@@ -165,7 +165,7 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
     }
 
     if (chainInfo.slug === 'xode') {
-      return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}polkadot-chain-transaction?search=${value}`);
+      return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}polkadot/extrinsics/${value}`);
     }
 
     if (chainInfo.slug === 'truth_network') {
