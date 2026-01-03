@@ -133,7 +133,9 @@ export const getAccountActions = (signMode: AccountSignMode, networkType: Accoun
   // QR
   if (signMode === AccountSignMode.PASSWORD) {
     if (networkType === AccountChainType.ETHEREUM || networkType === AccountChainType.SUBSTRATE) {
-      result.push(AccountActions.EXPORT_QR);
+      if (type !== 'ed25519-tw') { // todo: recheck if can export this account type
+        result.push(AccountActions.EXPORT_QR);
+      }
     }
   }
 
@@ -238,6 +240,12 @@ const CLAIM_AVAIL_BRIDGE: ExtrinsicType[] = [
   ExtrinsicType.CLAIM_BRIDGE
 ];
 
+const OPEN_GOV_ACTIONS: ExtrinsicType[] = [
+  ExtrinsicType.GOV_VOTE,
+  ExtrinsicType.GOV_UNVOTE,
+  ExtrinsicType.GOV_UNLOCK_VOTE
+];
+
 const OTHER_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.TRANSFER_XCM,
   ExtrinsicType.SEND_NFT,
@@ -259,6 +267,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_QDOT_ACTIONS,
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
+          ...OPEN_GOV_ACTIONS,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -298,6 +307,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_QDOT_ACTIONS,
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
+          ...OPEN_GOV_ACTIONS,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -335,6 +345,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_LDOT_ACTIONS,
           ...EARN_SDOT_ACTIONS,
           // ...EARN_QDOT_ACTIONS,
+          ...OPEN_GOV_ACTIONS,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -397,7 +408,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
   } else if (signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) { // Only for account substrate with ECDSA scheme format
     const result: ExtrinsicType[] = [];
 
-    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ExtrinsicType.TRANSFER_XCM, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
+    result.push(...BASE_TRANSFER_ACTIONS, ...NATIVE_STAKE_ACTIONS, ...POOL_STAKE_ACTIONS, ...OPEN_GOV_ACTIONS, ExtrinsicType.TRANSFER_XCM, ExtrinsicType.SWAP, ExtrinsicType.CROWDLOAN);
 
     return result;
   }
@@ -411,6 +422,7 @@ export const getAccountTokenTypes = (type: KeypairType): _AssetType[] => {
       return [_AssetType.NATIVE, _AssetType.LOCAL, _AssetType.ERC20, _AssetType.ERC721];
     case 'sr25519':
     case 'ed25519':
+    case 'ed25519-tw':
     case 'ecdsa':
       return [_AssetType.NATIVE, _AssetType.LOCAL, _AssetType.PSP22, _AssetType.PSP34, _AssetType.GRC20, _AssetType.ERC721, _AssetType.VFT];
     case 'ton':

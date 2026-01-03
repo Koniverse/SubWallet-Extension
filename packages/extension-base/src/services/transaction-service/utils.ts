@@ -62,7 +62,7 @@ function getBlockExplorerAccountRoute (explorerLink: string) {
     return 'account';
   }
 
-  if (explorerLink.includes('taostats.io')) {
+  if (explorerLink.includes('/taostats.io')) {
     return 'account';
   }
 
@@ -148,7 +148,7 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
   if (explorerLink && type === 'account') {
     const route = getBlockExplorerAccountRoute(explorerLink);
 
-    if (chainInfo.slug === 'truth_network') {
+    if (['truth_network', 'aventus'].includes(chainInfo.slug)) {
       const address = u8aToHex(decodeAddress(value));
 
       return `${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${address}`;
@@ -168,7 +168,7 @@ export function getExplorerLink (chainInfo: _ChainInfo, value: string, type: 'ac
       return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}polkadot/extrinsics/${value}`);
     }
 
-    if (chainInfo.slug === 'truth_network') {
+    if (['truth_network', 'aventus'].includes(chainInfo.slug)) {
       // getTransactionId(value)
       //   .then((transactionId) => {
       //     return (`${explorerLink}${explorerLink.endsWith('/') ? '' : '/'}${route}/${transactionId}`);
