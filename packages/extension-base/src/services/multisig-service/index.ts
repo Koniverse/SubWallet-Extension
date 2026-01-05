@@ -12,7 +12,7 @@ import { NotificationActionType } from '@subwallet/extension-base/services/inapp
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import { decodeCallData, DecodeCallDataResponse, DEFAULT_BLOCK_HASH, genPendingMultisigTxKey, getCallData, getMultisigTxType } from '@subwallet/extension-base/services/multisig-service/utils';
 import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
-// import { createLogger } from '@subwallet/extension-base/utils/logger';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BehaviorSubject } from 'rxjs';
 
 import { BlockHash, SignedBlock } from '@polkadot/types/interfaces';
@@ -47,7 +47,7 @@ interface PalletMultisigMultisig {
   approvals: string[]
 }
 
-// const multisigServiceLogger = createLogger('MultisigService');
+const multisigServiceLogger = createLogger('MultisigService');
 
 /**
  * Interface representing a pending multisig extrinsic with the current signer context
@@ -300,7 +300,7 @@ export class MultisigService implements StoppableServiceInterface {
         'reloadPendingMultisigTxsByEvents',
         () => {
           if (this.status === ServiceStatus.STARTED) {
-            this.runSubscribePendingMultisigTxs().catch(console.error);
+            this.runSubscribePendingMultisigTxs().catch((e) => multisigServiceLogger.error('Error in handleEvents reload', e));
           }
         },
         2000,
@@ -463,13 +463,13 @@ export class MultisigService implements StoppableServiceInterface {
 
         callback(items);
       } catch (error) {
-        console.error(`Multisig Service subscription error ${chain}/${multisigAddress}`, error);
+        multisigServiceLogger.error(`Multisig Service subscription error ${chain}/${multisigAddress}`, error);
 
         addLazy(
           `resubscribeMultisig_${chain}_${multisigAddress}`,
           () => {
             if (this.status === ServiceStatus.STARTED) {
-              this.runSubscribePendingMultisigTxs().catch(console.error);
+              this.runSubscribePendingMultisigTxs().catch((e) => multisigServiceLogger.error('Error during resubscribeMultisig', e));
             }
           },
           1000,
@@ -497,7 +497,7 @@ export class MultisigService implements StoppableServiceInterface {
     return () => {
       unsubPromise.then((unsub) => {
         unsub?.();
-      }).catch(console.error);
+      }).catch((e) => multisigServiceLogger.error('Error during unsubscribe in subscribePendingMultisigTxs', e));
     };
   }
 
@@ -541,7 +541,7 @@ export class MultisigService implements StoppableServiceInterface {
       const signerAddresses = rawTx.signerAddresses;
 
       if (!extrinsicHash || !signerAddresses || signerAddresses.length === 0) {
-        console.warn('Skipping multisig extrinsic due to missing required fields');
+        multisigServiceLogger.warn('Skipping multisig extrinsic due to missing required fields: extrinsicHash or signerAddresses')
         continue;
       }
 
@@ -574,7 +574,7 @@ export class MultisigService implements StoppableServiceInterface {
     // 4. Create notifications for new pending transactions
     if (newNotifiedTxs.length > 0) {
       this.createMultisigApprovalNotifications(newNotifiedTxs).catch((error) => {
-        console.error('Failed to create multisig approval notifications:', error);
+        multisigServiceLogger.error('Failed to create multisig approval notifications:', error);
       });
     }
   }
@@ -623,8 +623,8 @@ export class MultisigService implements StoppableServiceInterface {
       };
     });
 
-    // multisigServiceLogger.info('pendingTxs', pendingTxs);
-    // multisigServiceLogger.info('notifications', notifications);
+    multisigServiceLogger.debug('pendingTxs', pendingTxs);
+    multisigServiceLogger.debug('notifications', notifications);
 
     // Group notifications by address to batch write
     const notificationsByAddress = new Map<string, typeof notifications>();
