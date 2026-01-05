@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MultisigTxType, PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, toShort } from '@subwallet/extension-koni-ui/utils';
-import { Icon, Logo, Number, Web3Block } from '@subwallet/react-ui';
+import { Icon, Logo, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowUpRight, HardDrives, Question } from 'phosphor-react';
 import React, { useMemo } from 'react';
@@ -18,8 +16,6 @@ type Props = ThemeProps & {
 };
 
 const Component = ({ className = '', item, onClick }: Props) => {
-  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
-
   const txInfo = useMemo(() => {
     const method = item.decodedCallData?.method || '';
 
@@ -38,10 +34,6 @@ const Component = ({ className = '', item, onClick }: Props) => {
   const totalSigners = item.signerAddresses?.length || 0;
   const percent = totalSigners > 0 ? (currentApprovals / totalSigners) * 100 : 0;
   const isApproved = currentApprovals === totalSigners;
-
-  const chainInfo = useMemo(() => {
-    return chainInfoMap[item.chain];
-  }, [chainInfoMap, item.chain]);
 
   return (
     <Web3Block
@@ -77,12 +69,12 @@ const Component = ({ className = '', item, onClick }: Props) => {
               {/*  suffix={item.chain.includes('paseo') ? 'PAS' : 'DOT'} */}
               {/*  value={amountValue} */}
               {/* /> */}
-              <Number
-                className={'__deposit-amount'}
-                decimal={chainInfo?.substrateInfo?.decimals || 0}
-                suffix={chainInfo?.substrateInfo?.symbol || ''}
-                value={item.depositAmount}
-              />
+              {/* <Number */}
+              {/*  className={'__deposit-amount'} */}
+              {/*  decimal={chainInfo?.substrateInfo?.decimals || 0} */}
+              {/*  suffix={chainInfo?.substrateInfo?.symbol || ''} */}
+              {/*  value={item.depositAmount} */}
+              {/* /> */}
             </div>
           </div>
 

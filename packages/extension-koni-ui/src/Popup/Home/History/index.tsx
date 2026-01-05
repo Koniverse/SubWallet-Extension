@@ -250,24 +250,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const viewValue = Form.useWatch('view', form);
 
   const multisigList = useMemo(() => {
-    const fullList = Object.values(pendingMultisigTxs);
-
-    const uniqueMap = new Map<string, PendingMultisigTx>();
-
-    fullList.forEach((tx) => {
-      // Todo: Recheck conditional
-      const key = tx.extrinsicHash || tx.callHash;
-
-      if (!uniqueMap.has(key)) {
-        uniqueMap.set(key, tx);
-      }
-    });
-
-    return Array.from(uniqueMap.values());
+    return Object.values(pendingMultisigTxs);
   }, [pendingMultisigTxs]);
-
-  console.log('multisigList', multisigList);
-  console.log('pendingMultisigTxs', pendingMultisigTxs);
 
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
