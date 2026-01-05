@@ -3,6 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AvailBridgeSourceChain } from '@subwallet/extension-base/services/inapp-notification-service/utils';
+import { MultisigTxType } from '@subwallet/extension-base/services/multisig-service';
 import { YieldPoolType } from '@subwallet/extension-base/types';
 
 export interface _BaseNotificationInfo {
@@ -99,7 +100,7 @@ export interface MultisigApprovalNotificationMetadata { // todo
   extrinsicIndex: number;
   currentSigner: string;
   approvals: string[];
-  multisigTxType?: string;
+  multisigTxType: MultisigTxType;
 }
 
 export enum NotificationTimePeriod {

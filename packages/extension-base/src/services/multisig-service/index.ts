@@ -53,6 +53,8 @@ const multisigServiceLogger = createLogger('MultisigService');
  * Interface representing a pending multisig extrinsic with the current signer context
  */
 export interface PendingMultisigTx extends RawPendingMultisigTx {
+  /** ID of the pending multisig extrinsic */
+  id: string;
   /** Address of the current signer viewing this extrinsic */
   currentSigner: string;
 }
@@ -552,7 +554,7 @@ export class MultisigService implements StoppableServiceInterface {
         }
 
         const key = genPendingMultisigTxKey(chain, multisigAddress, signerAddress, extrinsicHash);
-        const pendingTx: PendingMultisigTx = { ...rawTx, currentSigner: signerAddress };
+        const pendingTx: PendingMultisigTx = { ...rawTx, currentSigner: signerAddress, id: key };
 
         newTxMap[key] = pendingTx;
 
@@ -584,25 +586,15 @@ export class MultisigService implements StoppableServiceInterface {
    * @param pendingTxs - Array of pending multisig transactions that need approval
    */
   private async createMultisigApprovalNotifications (pendingTxs: PendingMultisigTx[]): Promise<void> {
-    const chainInfoMap = new Map<string, { name: string }>();
-
     const notifications = pendingTxs.map((tx) => {
-      // Get chain info for description
-      if (!chainInfoMap.has(tx.chain)) {
-        const chainInfo = this.chainService.getChainInfoByKey(tx.chain);
-
-        chainInfoMap.set(tx.chain, {
-          name: chainInfo?.name || tx.chain
-        });
-      }
-
       const actionType = NotificationActionType.MULTISIG_APPROVAL;
       const timestamp = Date.now();
-      const notificationId = `${actionType}___${tx.chain}___${tx.multisigAddress}___${tx.extrinsicHash}___${tx.currentSigner}___${timestamp}`;
+      const multisigKey = genPendingMultisigTxKey(tx.chain, tx.multisigAddress, tx.currentSigner, tx.extrinsicHash);
+      const notificationId = `${actionType}___${multisigKey}___${timestamp}`;
 
       return {
         id: notificationId,
-        address: reformatAddress(tx.currentSigner),
+        address: tx.currentSigner, // todo: reformat?
         title: NotificationTitleMap[actionType],
         description: NotificationDescriptionMap[actionType](tx.multisigTxType),
         time: timestamp,
@@ -612,12 +604,12 @@ export class MultisigService implements StoppableServiceInterface {
         metadata: {
           chain: tx.chain,
           multisigAddress: tx.multisigAddress,
-          extrinsicHash: tx.extrinsicHash || '',
+          extrinsicHash: tx.extrinsicHash,
           callHash: tx.callHash,
           blockHeight: tx.blockHeight,
           extrinsicIndex: tx.extrinsicIndex,
           currentSigner: tx.currentSigner,
-          approvals: tx.approvals || [],
+          approvals: tx.approvals,
           multisigTxType: tx.multisigTxType
         }
       };
