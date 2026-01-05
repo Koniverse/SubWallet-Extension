@@ -4,7 +4,7 @@
 import { SeedLengths } from '@subwallet/extension-base/background/types';
 import { KeypairType } from '@subwallet/keyring/types';
 
-export type MnemonicType = 'general' | 'ton';
+export type MnemonicType = 'general' | 'trust-wallet' | 'ton';
 
 /**
  * @interface RequestMnemonicCreateV2
@@ -43,6 +43,7 @@ export interface ResponseMnemonicCreateV2 {
  */
 export interface RequestMnemonicValidateV2 {
   mnemonic: string;
+  mnemonicType: MnemonicType;
 }
 
 /**
@@ -76,7 +77,7 @@ export interface RequestAccountCreateSuriV2 {
   name: string;
   password?: string;
   suri: string;
-  type?: KeypairType;
+  types: KeypairType[];
   isAllowed: boolean;
 }
 
