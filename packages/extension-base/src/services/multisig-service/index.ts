@@ -8,7 +8,7 @@ import { _SubstrateAdapterSubscriptionArgs } from '@subwallet/extension-base/ser
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { InappNotificationService } from '@subwallet/extension-base/services/inapp-notification-service';
 import { NotificationDescriptionMap, NotificationTitleMap } from '@subwallet/extension-base/services/inapp-notification-service/consts';
-import { NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { _BaseNotificationInfo, NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import { decodeCallData, DecodeCallDataResponse, DEFAULT_BLOCK_HASH, genPendingMultisigTxKey, getCallData, getMultisigTxType } from '@subwallet/extension-base/services/multisig-service/utils';
 import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
@@ -543,7 +543,7 @@ export class MultisigService implements StoppableServiceInterface {
       const signerAddresses = rawTx.signerAddresses;
 
       if (!extrinsicHash || !signerAddresses || signerAddresses.length === 0) {
-        multisigServiceLogger.warn('Skipping multisig extrinsic due to missing required fields: extrinsicHash or signerAddresses')
+        multisigServiceLogger.warn('Skipping multisig extrinsic due to missing required fields: extrinsicHash or signerAddresses');
         continue;
       }
 
@@ -586,7 +586,7 @@ export class MultisigService implements StoppableServiceInterface {
    * @param pendingTxs - Array of pending multisig transactions that need approval
    */
   private async createMultisigApprovalNotifications (pendingTxs: PendingMultisigTx[]): Promise<void> {
-    const notifications = pendingTxs.map((tx) => {
+    const notifications: _BaseNotificationInfo[] = pendingTxs.map((tx) => {
       const actionType = NotificationActionType.MULTISIG_APPROVAL;
       const timestamp = Date.now();
       const multisigKey = genPendingMultisigTxKey(tx.chain, tx.multisigAddress, tx.currentSigner, tx.extrinsicHash);
@@ -619,20 +619,20 @@ export class MultisigService implements StoppableServiceInterface {
     multisigServiceLogger.debug('notifications', notifications);
 
     // Group notifications by address to batch write
-    const notificationsByAddress = new Map<string, typeof notifications>();
+    const notificationsByAddress: Record<string, _BaseNotificationInfo[]> = {};
 
     for (const notification of notifications) {
       const address = notification.address;
 
-      if (!notificationsByAddress.has(address)) {
-        notificationsByAddress.set(address, []);
+      if (!notificationsByAddress[address]) {
+        notificationsByAddress[address] = [];
       }
 
-      notificationsByAddress.get(address)!.push(notification);
+      notificationsByAddress[address] = [...notificationsByAddress[address], notification];
     }
 
     // Write notifications for each address
-    for (const [address, addressNotifications] of notificationsByAddress) {
+    for (const [address, addressNotifications] of Object.entries(notificationsByAddress)) {
       await this.inappNotificationService.validateAndWriteNotificationsToDB(addressNotifications, address);
     }
   }
