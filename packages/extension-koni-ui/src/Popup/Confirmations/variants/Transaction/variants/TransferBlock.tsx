@@ -118,6 +118,13 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
               value={data.value || 0}
             />
           )}
+        {!!transaction.signerSubstrateProxyAddress &&
+          <MetaInfo.Account
+            address={transaction.signerSubstrateProxyAddress}
+            chainSlug={transaction.chain}
+            label={t('ui.TRANSACTION.Confirmations.TransferBlock.signWith')}
+          />
+        }
 
         <MetaInfo.Number
           decimals={feeInfo ? feeInfo.decimals : nativeTokenDecimals}

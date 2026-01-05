@@ -10,7 +10,7 @@
     "url": "https://github.com/Koniverse/Subwallet-V2.git"
   },
   "sideEffects": false,
-  "version": "1.3.70",
+  "version": "1.3.71",
   "workspaces": [
     "packages/*"
   ],
@@ -119,10 +119,10 @@
     "@polkadot/util": "^13.5.3",
     "@polkadot/util-crypto": "^13.5.3",
     "@polkadot/x-global": "^13.5.3",
-    "@subwallet/chain-list": "0.2.122",
-    "@subwallet/keyring": "^0.1.13",
+    "@subwallet/chain-list": "0.2.123-beta.5-pr-612-83ea51f0",
+    "@subwallet/keyring": "0.1.14",
     "@subwallet/react-ui": "5.1.2-b79",
-    "@subwallet/ui-keyring": "^0.1.13",
+    "@subwallet/ui-keyring": "0.1.14",
     "@types/bn.js": "^5.1.6",
     "@zondax/ledger-substrate": "1.1.2",
     "babel-core": "^7.0.0-bridge.0",

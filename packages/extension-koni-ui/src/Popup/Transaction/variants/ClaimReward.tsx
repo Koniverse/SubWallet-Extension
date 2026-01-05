@@ -84,12 +84,11 @@ const filterAccount = (
 const Component = () => {
   const navigate = useNavigate();
 
-  const { defaultData, persistData } = useTransactionContext<ClaimRewardParams>();
+  const { defaultData, persistData, selectSubstrateProxyAccountsToSign } = useTransactionContext<ClaimRewardParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<ClaimRewardParams>();
   const formDefault = useMemo((): ClaimRewardParams => ({ ...defaultData }), [defaultData]);
-
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
   const { chainInfoMap } = useSelector((state) => state.chainStore);
   const { earningRewards, poolInfoMap } = useSelector((state) => state.earning);
@@ -150,22 +149,41 @@ const Component = () => {
   const onSubmit: FormCallbacks<ClaimRewardParams>['onFinish'] = useCallback((values: ClaimRewardParams) => {
     setLoading(true);
 
-    const { bondReward, from, slug } = values;
+    const { bondReward, chain, from, slug } = values;
 
-    setTimeout(() => {
-      yieldSubmitStakingClaimReward({
+    // send submit claim reward transaction
+    const sendPromise = (signerSubstrateProxyAddress?: string) => {
+      return yieldSubmitStakingClaimReward({
         address: from,
         bondReward: bondReward,
         slug,
-        unclaimedReward: reward?.unclaimedReward
-      })
-        .then(onSuccess)
-        .catch(onError)
-        .finally(() => {
-          setLoading(false);
+        unclaimedReward: reward?.unclaimedReward,
+        signerSubstrateProxyAddress
+      }).then(onSuccess);
+    };
+
+    // wrap proxy selection
+    // for the Liquid Staking feature with multiple steps,
+    // only the root account is allowed to sign transactions, even if a valid proxy account is available to sign on its behalf.
+    const sendPromiseWrapper = async () => {
+      if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
+        const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
+          chain,
+          address: from,
+          type: ExtrinsicType.STAKING_CLAIM_REWARD
         });
+
+        return await sendPromise(substrateProxyAddress);
+      }
+
+      return await sendPromise();
+    };
+
+    // delay for better loading UX
+    setTimeout(() => {
+      sendPromiseWrapper().catch(onError).finally(() => setLoading(false));
     }, 300);
-  }, [onError, onSuccess, reward?.unclaimedReward]);
+  }, [reward?.unclaimedReward, onSuccess, poolInfo.type, selectSubstrateProxyAccountsToSign, onError]);
 
   const checkAction = usePreCheckAction(fromValue);
 

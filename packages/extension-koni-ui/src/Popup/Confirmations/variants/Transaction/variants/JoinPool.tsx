@@ -32,6 +32,14 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
+        {!!transaction.signerSubstrateProxyAddress &&
+          <MetaInfo.Account
+            address={transaction.signerSubstrateProxyAddress}
+            chainSlug={transaction.chain}
+            label={t('ui.TRANSACTION.Confirmations.JoinPool.signWith')}
+          />
+        }
+
         <MetaInfo.Account
           address={data.selectedPool.address}
           label={t('ui.TRANSACTION.Confirmations.JoinPool.pool')}

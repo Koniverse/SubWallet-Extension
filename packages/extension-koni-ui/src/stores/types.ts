@@ -229,3 +229,9 @@ export interface GovernanceStore extends BaseReduxStore {
 export interface MultisigStore extends BaseReduxStore {
   pendingMultisigTxs: PendingMultisigTxMap;
 }
+
+export type WalletConnectSessionsSubscription = {
+  promise: Promise<SessionTypes.Struct[]>;
+  start: () => void;
+  unsub: () => void;
+};

@@ -42,6 +42,7 @@ import { HexString } from '@polkadot/util/types';
 
 import { EarningImpactResult } from '../services/earning-service/handlers/native-staking/dtao';
 import { GovVoteRequest, GovVotingInfo, RemoveVoteRequest, UnlockVoteRequest } from '../services/open-gov/interface';
+import { RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount, SubstrateProxyAccountGroup } from '../types/substrateProxyAccount';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -583,7 +584,7 @@ export enum ExtrinsicType {
   // OPEN GOV
   GOV_VOTE = 'gov.vote',
   GOV_UNVOTE = 'gov.unvote',
-  GOV_UNLOCK_VOTE = 'gov.unlock-vote',
+  GOV_UNLOCK_VOTE = 'gov.unlock_vote',
   // OPEN GOV
 
   // MULTISIG
@@ -593,6 +594,10 @@ export enum ExtrinsicType {
   // MULTISIG
 
   EVM_EXECUTE = 'evm.execute',
+
+  ADD_SUBSTRATE_PROXY_ACCOUNT = 'substrateProxyAccount.add',
+  REMOVE_SUBSTRATE_PROXY_ACCOUNT = 'substrateProxyAccount.remove',
+
   UNKNOWN = 'unknown'
 }
 
@@ -661,7 +666,11 @@ export interface ExtrinsicDataTypeMap {
   [ExtrinsicType.MULTISIG_CANCEL_TX]: CancelPendingTxRequest,
   // MULTISIG
 
+  [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: RequestAddSubstrateProxyAccount,
+  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: RequestRemoveSubstrateProxyAccount,
+
   [ExtrinsicType.SWAP]: SwapTxData
+
   [ExtrinsicType.UNKNOWN]: any
 }
 
@@ -793,6 +802,7 @@ export interface TransactionHistoryItem<ET extends ExtrinsicType = ExtrinsicType
   addressPrefix?: number,
   processId?: string;
   apiTxIndex?: number;
+  substrateProxyAddresses?: string[];
 }
 
 export interface SWWarning {
@@ -1037,6 +1047,7 @@ export interface NftTransactionRequest {
   networkKey: string,
   senderAddress: string,
   recipientAddress: string,
+  signerSubstrateProxyAddress?: string;
 
   nftItemName?: string, // Use for confirmation view only
   params: Record<string, any>,
@@ -2824,6 +2835,11 @@ export interface KoniRequestSignatures {
   'pri(multisig.executePendingTx)': [ExecutePendingTxRequest, boolean];
   'pri(multisig.cancelPendingTx)': [CancelPendingTxRequest, boolean];
   /* Multisig Account */
+
+  /* Proxy Account */
+  'pri(substrateProxyAccount.getGroupInfo)': [RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountGroup];
+  'pri(substrateProxyAccount.add)': [RequestAddSubstrateProxyAccount, SWTransactionResponse];
+  'pri(substrateProxyAccount.remove)': [RequestRemoveSubstrateProxyAccount, SWTransactionResponse];
 }
 
 export interface ApplicationMetadataType {

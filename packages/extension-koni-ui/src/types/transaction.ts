@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { StakingType } from '@subwallet/extension-base/background/KoniTypes';
+import { SubstrateProxyType } from '@subwallet/extension-base/types';
 
 export interface TransactionFormBaseProps {
   fromAccountProxy: string;
@@ -94,4 +95,13 @@ export interface GovUnlockVoteParams extends TransactionFormBaseProps {
   amount: string;
   referendumIds?: string[];
   tracks: number[];
+}
+
+export interface AddSubstrateProxyAccountParams extends TransactionFormBaseProps {
+  substrateProxyAddress: string;
+  substrateProxyType: SubstrateProxyType;
+}
+
+export interface RemoveSubstrateProxyAccountParams extends TransactionFormBaseProps {
+  substrateProxyAddressKeys: string[]; // key format is "substrateProxyType:address"
 }
