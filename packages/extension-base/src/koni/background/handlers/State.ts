@@ -957,8 +957,7 @@ export default class KoniState {
 
   public async enableChainWithPriorityAssets (chainSlug: string, enableTokens = true): Promise<boolean> {
     if (enableTokens) {
-      this.balanceService.updatePriorityAssetsByChain(chainSlug, true)
-        .catch(console.error);
+      await this.balanceService.updatePriorityAssetsByChain(chainSlug, true);
     }
 
     return this.chainService.enableChain(chainSlug);
