@@ -88,6 +88,6 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.3.65-01': DeleteEarningData20251105,
   '1.3.66-01': MigrateAssetSetting20251107,
   '1.3.66-02': MigrateTransactionHistoryBySymbol20251107,
-  '1.3.71-01': MigrateAssetSetting20251223,
-  '1.3.71-02': MigrateTransactionHistoryBySymbol20251223
+  '1.3.72-01': MigrateAssetSetting20251223,
+  '1.3.72-02': MigrateTransactionHistoryBySymbol20251223
 };
