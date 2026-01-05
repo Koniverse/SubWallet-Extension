@@ -8,6 +8,7 @@ export { default as CreateAccountModal } from './CreateAccountModal';
 export { default as DeriveAccountListModal } from './DeriveAccountListModal';
 export { default as ImportAccountModal } from './ImportAccountModal';
 export { default as ImportSeedModal } from './ImportSeedModal';
+export { default as ImportSeedTrustModal } from './ImportSeedTrustModal';
 export { default as NewSeedModal } from './NewSeedModal';
 export { default as AccountChainAddressesModal } from './AccountChainAddressesModal';
 export { default as AccountNameModal } from './AccountNameModal';
