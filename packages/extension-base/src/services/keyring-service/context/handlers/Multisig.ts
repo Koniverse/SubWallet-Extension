@@ -92,7 +92,7 @@ export class AccountMultisigHandler extends AccountBaseHandler {
     for (const signer of signers) {
       const proxyId = this.state.belongUnifiedAccount(signer) || reformatAddress(signer);
       const accountProxy = allAccounts[proxyId];
-      const substrateAccount = accountProxy.accounts.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
+      const substrateAccount = accountProxy?.accounts.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
 
       if (substrateAccount) {
         if (substrateAccount.transactionActions.includes(extrinsicType)) {
