@@ -78,20 +78,19 @@ export class AccountMultisigHandler extends AccountBaseHandler {
   public getSignableProxyIds (request: RequestGetSignableProxyIds): ResponseGetSignableProxyIds {
     const { extrinsicType, multisigProxyId } = request;
 
-    const signableProxyIds: string[] = [];
     const allMultisigAccounts = this.state.getMultisigAccounts();
     const allAccounts = this.state.accounts;
     const targetMultisigAccount = allMultisigAccounts.find((acc) => acc.id === multisigProxyId);
+    const signers = targetMultisigAccount?.accounts[0]?.signers as string[];
+    const signableProxyIds: string[] = [];
 
-    if (!targetMultisigAccount) {
+    if (!signers) {
       return { signableProxyIds };
     }
 
-    const signers = targetMultisigAccount.accounts[0].signers as string[];
-
     for (const signer of signers) {
       const proxyId = this.state.belongUnifiedAccount(signer) || reformatAddress(signer);
-      const accountProxy = allAccounts[proxyId];
+      const accountProxy = allAccounts[proxyId]; // todo: recheck with case the signatory account is unified account
       const substrateAccount = accountProxy?.accounts.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
 
       if (substrateAccount) {
