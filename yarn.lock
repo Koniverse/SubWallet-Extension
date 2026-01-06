@@ -6576,13 +6576,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subwallet/chain-list@npm:0.2.123-beta.10-pr-641-8e2135eb":
-  version: 0.2.123-beta.10-pr-641-8e2135eb
-  resolution: "@subwallet/chain-list@npm:0.2.123-beta.10-pr-641-8e2135eb"
+"@subwallet/chain-list@npm:0.2.123-beta.11-pr-641-4ab9b966":
+  version: 0.2.123-beta.11-pr-641-4ab9b966
+  resolution: "@subwallet/chain-list@npm:0.2.123-beta.11-pr-641-4ab9b966"
   dependencies:
     "@polkadot/util": ^13.5.5
     ts-md5: ^1.3.1
-  checksum: 33aff302e101f1bc47ca163de731f4445ed3337e9f2e08fde4d5e348220891aaa3a86964429cdc87480dbb19c9062f0c2dd617fcdd4db70cef6e2b3996cb589b
+  checksum: 8792fb33fef236060637c5214a9004065774690557380538b6be6868f2e972cc27193342b7d10a9eeb1d72d31738d1f288fcff4a7595aab97759ab9f43b136ab
   languageName: node
   linkType: hard
 
@@ -6627,7 +6627,7 @@ __metadata:
     "@sora-substrate/type-definitions": ^1.17.7
     "@substrate/connect": ^0.8.9
     "@subwallet-monorepos/subwallet-services-sdk": 0.1.14
-    "@subwallet/chain-list": 0.2.123-beta.10-pr-641-8e2135eb
+    "@subwallet/chain-list": 0.2.123-beta.11-pr-641-4ab9b966
     "@subwallet/extension-base": ^1.3.71-0
     "@subwallet/extension-chains": ^1.3.71-0
     "@subwallet/extension-dapp": ^1.3.71-0
@@ -6767,7 +6767,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.5.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.123-beta.10-pr-641-8e2135eb
+    "@subwallet/chain-list": 0.2.123-beta.11-pr-641-4ab9b966
     "@subwallet/extension-base": ^1.3.71-0
     "@subwallet/extension-chains": ^1.3.71-0
     "@subwallet/extension-dapp": ^1.3.71-0
@@ -6912,7 +6912,7 @@ __metadata:
     "@polkadot/util-crypto": ^13.5.3
     "@ramonak/react-progress-bar": ^5.0.3
     "@reduxjs/toolkit": ^1.9.1
-    "@subwallet/chain-list": 0.2.123-beta.10-pr-641-8e2135eb
+    "@subwallet/chain-list": 0.2.123-beta.11-pr-641-4ab9b966
     "@subwallet/extension-base": ^1.3.71-0
     "@subwallet/extension-chains": ^1.3.71-0
     "@subwallet/extension-dapp": ^1.3.71-0
