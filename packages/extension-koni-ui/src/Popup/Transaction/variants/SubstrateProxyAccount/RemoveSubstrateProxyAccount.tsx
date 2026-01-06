@@ -197,7 +197,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
             className={'proxy-address-removed'}
             label={t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyAccount')}
           >
-            {substrateProxyAddressCount} {t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts')}
+            {substrateProxyAddressCount} {substrateProxyAddressCount === 1 ? t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccount') : t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts')}
             <Button
               className={'proxy-address-removed-info'}
               icon={ <Icon

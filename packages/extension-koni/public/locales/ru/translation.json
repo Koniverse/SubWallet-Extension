@@ -35,6 +35,7 @@
   "ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.proxyDeposit": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyAccount": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts": "",
+  "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccount": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.network": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.cancel": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.continue": "",
@@ -2580,6 +2581,7 @@
   "ui.TRANSACTION.constant.transaction.removeProxy": "",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyAccount": "",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.accounts": "",
+  "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.account": "",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.networkFee": "",
   "ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.networkFee": "",
   "ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyAccount": "",
@@ -2600,5 +2602,6 @@
   "ui.TRANSACTION.Confirmations.TransferBlock.signWith": "",
   "ui.TRANSACTION.Confirmations.Unbond.signWith": "",
   "ui.TRANSACTION.Confirmations.Withdraw.signWith": "",
-  "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": ""
+  "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "",
+  "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": ""
 }

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { AccountChainType, AccountSignMode, ExcludedSubstrateProxyAccounts, RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountItem } from '@subwallet/extension-base/types';
 import { createPromiseHandler, isSameAddress } from '@subwallet/extension-base/utils';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';

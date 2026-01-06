@@ -50,7 +50,7 @@ const Component: React.FC<Props> = (props: Props) => {
             </MetaInfo.Default>
           )
         }
-        {!!transaction.signerSubstrateProxyAddress &&
+        {!!transaction.signerSubstrateProxyAddress && transaction.signerSubstrateProxyAddress !== transaction.address &&
           <MetaInfo.Account
             address={transaction.signerSubstrateProxyAddress}
             chainSlug={transaction.chain}

@@ -3,14 +3,14 @@
 
 import { SubstrateProxyAccountItem } from '@subwallet/extension-base/types';
 import { AccountProxyAvatar } from '@subwallet/extension-koni-ui/components';
-import { useGetAccountProxyById, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetAccountProxyById, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { toShort } from '@subwallet/extension-koni-ui/utils';
+import { copyToClipboard, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
-import React, { Context, useContext } from 'react';
+import React, { Context, useCallback, useContext } from 'react';
 import styled, { ThemeContext } from 'styled-components';
 
 export interface SubstrateProxyAccountItemExtended extends SubstrateProxyAccountItem {
@@ -29,6 +29,7 @@ function Component (props: Props): React.ReactElement<Props> {
   const { className, isSelected, onClick, showCheckedIcon = true, showUnselectIcon, substrateProxyAccount } = props;
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const { t } = useTranslation();
+  const notify = useNotification();
   const accountProxy = useGetAccountProxyById(substrateProxyAccount.proxyId);
   const checkedIconNode = ((showUnselectIcon || isSelected) && (
     <div className='__checked-icon-wrapper'>
@@ -41,6 +42,15 @@ function Component (props: Props): React.ReactElement<Props> {
     </div>
   ));
 
+  const onCopyAddress = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    copyToClipboard(substrateProxyAccount.substrateProxyAddress);
+    notify({
+      message: t('ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard')
+    });
+  }, [notify, substrateProxyAccount.substrateProxyAddress, t]);
+
   return (
     <div
       className={CN(className, {
@@ -49,7 +59,10 @@ function Component (props: Props): React.ReactElement<Props> {
       key={substrateProxyAccount.substrateProxyAddress}
       onClick={showCheckedIcon ? onClick : undefined}
     >
-      <div className='__item-left-part'>
+      <div
+        className='__item-left-part'
+        onClick={onCopyAddress}
+      >
         <AccountProxyAvatar
           size={32}
           value={substrateProxyAccount.proxyId || substrateProxyAccount.substrateProxyAddress}

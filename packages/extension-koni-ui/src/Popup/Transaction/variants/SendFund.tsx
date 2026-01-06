@@ -565,12 +565,12 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       const { asset, chain, destChain, from, to, value } = values;
 
       // prepare params
-      const createBaseParams = (signerSubstrateProxyAddress?: string): RequestSubmitTransfer => ({
+      const createBaseParams = (signerSubstrateProxyAddress?: string, actualValue?: string): RequestSubmitTransfer => ({
         from,
         chain,
         to,
         tokenSlug: asset,
-        value,
+        value: actualValue ?? value,
         transferAll: options.isTransferAll,
         transferBounceable: options.isTransferBounceable,
         feeOption: selectedTransactionFee?.feeOption,
@@ -599,8 +599,10 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         })
           .then((selectedProxy) => {
             setSubmitLoading(true);
+            // If transfer all with proxy, we do not need to minus fee cause proxy account pay fee
+            const submitValue = selectedProxy && selectedProxy !== from && isTransferAll ? new BigN(transferInfo?.maxTransferable || '0').plus(estimatedNativeFee).toFixed() : undefined;
 
-            createSendPromise(createBaseParams(selectedProxy))
+            createSendPromise(createBaseParams(selectedProxy, submitValue))
               .then(resolve)
               .catch(reject)
               .finally(() => setSubmitLoading(false));
@@ -609,7 +611,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           .finally(() => setLoading(false));
       });
     },
-    [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, selectSubstrateProxyAccountsToSign, extrinsicType, onError]
+    [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, selectSubstrateProxyAccountsToSign, extrinsicType, onError, isTransferAll, transferInfo?.maxTransferable, estimatedNativeFee]
   );
 
   // todo: must refactor later, temporary solution to support SnowBridge

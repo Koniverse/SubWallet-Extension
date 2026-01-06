@@ -6,6 +6,7 @@ import { CommonTransactionInfo, SubstrateProxyAccountListModal } from '@subwalle
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
+import { isSignerDifferentFromSender } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Info } from 'phosphor-react';
@@ -40,7 +41,7 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        {!!transaction.signerSubstrateProxyAddress &&
+        {!!transaction.signerSubstrateProxyAddress && isSignerDifferentFromSender(transaction.address, transaction.signerSubstrateProxyAddress) &&
           <MetaInfo.Account
             address={transaction.signerSubstrateProxyAddress}
             chainSlug={transaction.chain}
@@ -52,7 +53,7 @@ const Component: React.FC<Props> = (props: Props) => {
           className={'proxy-address-removed'}
           label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyAccount')}
         >
-          {substrateProxyAccounts.length} {t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.accounts')}
+          {substrateProxyAccounts.length} {substrateProxyAccounts.length === 1 ? t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.account') : t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.accounts')}
           <Button
             className={'proxy-address-removed-info'}
             icon={

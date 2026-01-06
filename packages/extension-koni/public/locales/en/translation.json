@@ -2249,6 +2249,7 @@
   "ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.proxyDeposit": "Proxy deposit",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyAccount": "Proxy account",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts": "accounts",
+  "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccount": "account",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.network": "Network",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.cancel": "Cancel",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.continue": "Continue",
@@ -2579,6 +2580,7 @@
   "ui.TRANSACTION.constant.transaction.removeProxy": "Remove proxy",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyAccount": "Proxy account",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.accounts": "accounts",
+  "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.account": "account",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.networkFee": "Network fee",
   "ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.networkFee": "Network fee",
   "ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyAccount": "Proxy account",
@@ -2599,5 +2601,6 @@
   "ui.TRANSACTION.Confirmations.TransferBlock.signWith": "Sign with",
   "ui.TRANSACTION.Confirmations.Unbond.signWith": "Sign with",
   "ui.TRANSACTION.Confirmations.Withdraw.signWith": "Sign with",
-  "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "Available balance"
+  "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "Available balance",
+  "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "Copied to clipboard"
 }

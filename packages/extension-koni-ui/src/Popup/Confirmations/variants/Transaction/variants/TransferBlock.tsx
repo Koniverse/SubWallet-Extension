@@ -8,6 +8,7 @@ import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo'
 import QuoteRateDisplay from '@subwallet/extension-koni-ui/components/Swap/QuoteRateDisplay';
 import { useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
+import { isSignerDifferentFromSender } from '@subwallet/extension-koni-ui/utils';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -91,6 +92,14 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
       </MetaInfo>
 
       <MetaInfo hasBackgroundWrapper>
+        {!!transaction.signerSubstrateProxyAddress && isSignerDifferentFromSender(transaction.address, transaction.signerSubstrateProxyAddress) &&
+          <MetaInfo.Account
+            address={transaction.signerSubstrateProxyAddress}
+            chainSlug={transaction.chain}
+            label={t('ui.TRANSACTION.Confirmations.TransferBlock.signWith')}
+          />
+        }
+
         {isAcrossBridge && xcmData.metadata
           ? <>
             <MetaInfo.Default
@@ -118,13 +127,6 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
               value={data.value || 0}
             />
           )}
-        {!!transaction.signerSubstrateProxyAddress &&
-          <MetaInfo.Account
-            address={transaction.signerSubstrateProxyAddress}
-            chainSlug={transaction.chain}
-            label={t('ui.TRANSACTION.Confirmations.TransferBlock.signWith')}
-          />
-        }
 
         <MetaInfo.Number
           decimals={feeInfo ? feeInfo.decimals : nativeTokenDecimals}

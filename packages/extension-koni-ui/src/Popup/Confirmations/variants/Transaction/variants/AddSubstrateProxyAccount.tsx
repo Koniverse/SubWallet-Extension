@@ -5,6 +5,7 @@ import { RequestAddSubstrateProxyAccount } from '@subwallet/extension-base/types
 import { CommonTransactionInfo } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
+import { isSignerDifferentFromSender } from '@subwallet/extension-koni-ui/utils';
 import CN from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -52,18 +53,19 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />
       </MetaInfo>
+      {!!transaction.signerSubstrateProxyAddress && isSignerDifferentFromSender(transaction.address, transaction.signerSubstrateProxyAddress) &&
       <MetaInfo
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        {!!transaction.signerSubstrateProxyAddress &&
-          <MetaInfo.Account
-            address={transaction.signerSubstrateProxyAddress}
-            chainSlug={transaction.chain}
-            label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.signWith')}
-          />
-        }
+        <MetaInfo.Account
+          address={transaction.signerSubstrateProxyAddress}
+          chainSlug={transaction.chain}
+          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.signWith')}
+        />
+
       </MetaInfo>
+      }
     </div>
   );
 };

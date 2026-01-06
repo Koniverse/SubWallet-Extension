@@ -8,6 +8,7 @@ import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { isSignerDifferentFromSender } from '@subwallet/extension-koni-ui/utils';
 import { Number } from '@subwallet/react-ui';
 import BigNumber from 'bignumber.js';
 import CN from 'classnames';
@@ -75,14 +76,6 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           networkPrefix={networkPrefix}
         />
 
-        {!!transaction.signerSubstrateProxyAddress &&
-          <MetaInfo.Account
-            address={transaction.signerSubstrateProxyAddress}
-            chainSlug={transaction.chain}
-            label={t('ui.TRANSACTION.Confirmations.GovUnvote.signWith')}
-          />
-        }
-
         <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.GovUnvote.networkFee')}
@@ -94,6 +87,15 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         className={'meta-info'}
         hasBackgroundWrapper
       >
+
+        {!!transaction.signerSubstrateProxyAddress && isSignerDifferentFromSender(transaction.address, transaction.signerSubstrateProxyAddress) &&
+          <MetaInfo.Account
+            address={transaction.signerSubstrateProxyAddress}
+            chainSlug={transaction.chain}
+            label={t('ui.TRANSACTION.Confirmations.GovUnvote.signWith')}
+          />
+        }
+
         <MetaInfo.Default
           className={'transferable-value-info'}
           label={t('ui.TRANSACTION.Confirmations.GovUnvote.transferable')}
