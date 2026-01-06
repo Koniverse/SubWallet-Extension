@@ -22,9 +22,14 @@ export class AccountMultisigHandler extends AccountBaseHandler {
   public async accountsCreateMultisig (request: RequestAccountCreateMultisig): Promise<AccountMultisigError[]> {
     const { name, signers: _signer, threshold } = request;
 
+    // todo: validate invalid _signer address
+    // todo: validate invalid threshold (<2 or >signers.length)
+    // todo: validate duplicate signers
+    // todo: validate invalid signers array, must has at least 2 signers
+
     const signers = _signer.map((address) => reformatAddress(address));
 
-    const multisigKey = createKeyMulti(signers, threshold);
+    const multisigKey = createKeyMulti(signers, threshold); // todo: recheck if createKeyMulti ensure exact signers order
     const multisigAddress = encodeAddress(multisigKey);
 
     try {

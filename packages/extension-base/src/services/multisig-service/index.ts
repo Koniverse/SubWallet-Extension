@@ -350,7 +350,7 @@ export class MultisigService implements StoppableServiceInterface {
         for (const account of multisigAccounts) {
           const multisigAddress = account.id;
           const reformatAddress = _reformatAddressWithChain(multisigAddress, chainInfo);
-          const signers = account.accounts[0].signers as string[];
+          const signers = account.accounts[0].signers as string[]; // todo: reformat signers by chain
 
           const unsub = this.subscribePendingMultisigTxs(chain, reformatAddress, signers, (rs) => {
             !cancel && this.updatePendingMultisigTxSubjectByChain(reformatAddress, chain, rs);
