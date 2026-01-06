@@ -4172,7 +4172,7 @@ export default class KoniExtension {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { chainType, extrinsic, extrinsicType, transferNativeAmount, txChain, txData, xcmStepFee } = submitData;
+    const { chainType, extrinsic, extrinsicType, transferNativeAmount, txChain, txData } = submitData;
 
     const isPoolSupportAlternativeFee = this.#koniState.earningService.isPoolSupportAlternativeFee(inputData.data.slug);
     const poolHandler = this.#koniState.earningService.getPoolHandler(data.slug);
@@ -4272,7 +4272,7 @@ export default class KoniExtension {
       ...this.createPassConfirmationParams(isPassConfirmation),
       eventsHandler,
       step,
-      xcmFeeDryRun: xcmStepFee
+      xcmFeeDryRun: extrinsicType === ExtrinsicType.TRANSFER_XCM ? submitData.xcmStepFee : undefined
     });
   }
 
