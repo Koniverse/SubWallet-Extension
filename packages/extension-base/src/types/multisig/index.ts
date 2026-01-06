@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BaseRequestSign } from '@subwallet/extension-base/types';
 
 export interface ApprovePendingTxRequest extends BaseRequestSign {
@@ -45,4 +46,13 @@ export interface CancelPendingTxRequest extends BaseRequestSign {
     index: number;
   };
   callHash: string;
+}
+
+export interface RequestGetSignableProxyIds {
+  multisigProxyId: string;
+  extrinsicType: ExtrinsicType
+}
+
+export interface ResponseGetSignableProxyIds {
+  signableProxyIds: string[];
 }
