@@ -11,7 +11,7 @@ import { AccountRefStore } from '@subwallet/extension-base/stores';
 import { AccountMetadataData, AccountProxy, AccountProxyData, AccountProxyMap, AccountProxyStoreData, AccountProxyType, CurrentAccountInfo, ModifyPairStoreData } from '@subwallet/extension-base/types';
 import { addLazy, combineAccountsWithSubjectInfo, isAddressValidWithAuthType, isSameAddress, parseUnifiedSuriToDerivationPath, reformatAddress } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
-import { EthereumKeypairTypes } from '@subwallet/keyring/types';
+import { EthereumKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 import { BehaviorSubject, combineLatest, filter, first } from 'rxjs';
@@ -19,6 +19,7 @@ import { BehaviorSubject, combineLatest, filter, first } from 'rxjs';
 interface ExistsAccount {
   address: string;
   name: string;
+  relatedAccountTypes: KeypairType[];
 }
 
 export class AccountState {
@@ -318,15 +319,18 @@ export class AccountState {
 
           if (belongsTo) {
             const accountProxy = this.accountProxies[belongsTo];
+            const allAccountTypes = this.getDecodedAccountTypes(belongsTo); // get allAccountTypes of unified account of the account address
 
             return {
               address,
-              name: accountProxy.name
+              name: accountProxy.name,
+              relatedAccountTypes: allAccountTypes
             };
           } else {
             return {
               address,
-              name: pair.meta?.name as string || address
+              name: pair.meta?.name as string || address,
+              relatedAccountTypes: [pair.type]
             };
           }
         }
@@ -509,6 +513,24 @@ export class AccountState {
       return [proxyId];
     } else {
       return accountProxies[proxyId].accounts.map((account) => account.address);
+    }
+  }
+
+  public getDecodedAccountTypes (accountProxyId: string): KeypairType[] {
+    if (!accountProxyId) {
+      return [];
+    }
+
+    if (accountProxyId === ALL_ACCOUNT_KEY) {
+      return []; // todo
+    }
+
+    const accountProxies = this.accounts;
+
+    if (!accountProxies[accountProxyId]) {
+      return [];
+    } else {
+      return accountProxies[accountProxyId].accounts.map((account) => account.type);
     }
   }
 
