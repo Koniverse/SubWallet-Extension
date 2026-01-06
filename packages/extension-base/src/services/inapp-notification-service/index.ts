@@ -11,7 +11,7 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { NotificationDescriptionMap, NotificationTitleMap, ONE_DAY_MILLISECOND } from '@subwallet/extension-base/services/inapp-notification-service/consts';
-import { _BaseNotificationInfo, _NotificationInfo, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { _BaseNotificationInfo, _NotificationInfo, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, MultisigApprovalNotificationMetadata, NotificationActionType, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AvailBridgeSourceChain, AvailBridgeTransaction, fetchAllAvailBridgeClaimable, fetchPolygonBridgeTransactions, hrsToMillisecond, PolygonTransaction } from '@subwallet/extension-base/services/inapp-notification-service/utils';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
@@ -113,12 +113,16 @@ export class InappNotificationService implements CronServiceInterface {
     }
 
     if ([NotificationActionType.CLAIM_AVAIL_BRIDGE_ON_ETHEREUM, NotificationActionType.CLAIM_AVAIL_BRIDGE_ON_AVAIL].includes(candidateNotification.actionType)) {
-      const { address, metadata, time } = candidateNotification;
+      const { actionType, address, metadata, time } = candidateNotification;
       const candidateMetadata = metadata as ClaimAvailBridgeNotificationMetadata;
       const remindTime = hrsToMillisecond(remindTimeConfigInHrs[candidateNotification.actionType]);
 
       for (const notification of comparedNotifications) {
         if (notification.address !== address) {
+          continue;
+        }
+
+        if (notification.actionType !== actionType) {
           continue;
         }
 
@@ -139,12 +143,16 @@ export class InappNotificationService implements CronServiceInterface {
     }
 
     if ([NotificationActionType.CLAIM_POLYGON_BRIDGE].includes(candidateNotification.actionType)) {
-      const { address, metadata, time } = candidateNotification;
+      const { actionType, address, metadata, time } = candidateNotification;
       const candidateMetadata = metadata as ClaimPolygonBridgeNotificationMetadata;
       const remindTime = hrsToMillisecond(remindTimeConfigInHrs[candidateNotification.actionType]);
 
       for (const notification of comparedNotifications) {
         if (notification.address !== address) {
+          continue;
+        }
+
+        if (notification.actionType !== actionType) {
           continue;
         }
 
@@ -165,14 +173,47 @@ export class InappNotificationService implements CronServiceInterface {
     }
 
     if ([NotificationActionType.SWAP, NotificationActionType.EARNING].includes(candidateNotification.actionType)) {
-      const candidateMetadata = candidateNotification.metadata as ProcessNotificationMetadata;
+      const { actionType, metadata } = candidateNotification
+      const candidateMetadata = metadata as ProcessNotificationMetadata;
       const processId = candidateMetadata.processId;
 
       for (const notification of comparedNotifications) {
+        if (notification.actionType !== actionType) {
+          continue;
+        }
+
         const comparedMetadata = notification.metadata as ProcessNotificationMetadata;
         const _processId = comparedMetadata.processId;
 
         if (processId === _processId) {
+          return false;
+        }
+      }
+    }
+
+    if ([NotificationActionType.MULTISIG_APPROVAL].includes(candidateNotification.actionType)) {
+      const { actionType, address, metadata } = candidateNotification;
+      const candidateMetadata = metadata as MultisigApprovalNotificationMetadata;
+
+      // todo: experiment without notification reminder, remove this todo if no problems raised
+      for (const notification of comparedNotifications) {
+        if (notification.address !== address) {
+          continue;
+        }
+
+        if (notification.actionType !== actionType) {
+          continue;
+        }
+
+        const comparedMetadata = notification.metadata as MultisigApprovalNotificationMetadata;
+        const sameNotification =
+          candidateMetadata.multisigTxType === comparedMetadata.multisigTxType &&
+          candidateMetadata.chain === comparedMetadata.chain &&
+          candidateMetadata.multisigAddress === comparedMetadata.multisigAddress &&
+          candidateMetadata.extrinsicHash === comparedMetadata.extrinsicHash &&
+          candidateMetadata.currentSigner === comparedMetadata.currentSigner;
+
+        if (sameNotification) {
           return false;
         }
       }
