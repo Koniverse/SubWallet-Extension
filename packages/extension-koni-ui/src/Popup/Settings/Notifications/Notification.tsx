@@ -50,7 +50,8 @@ export enum NotificationIconBackgroundColorMap {
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM = 'yellow-7',
   CLAIM_POLYGON_BRIDGE = 'yellow-7',
   SWAP = 'blue-8',
-  EARNING = 'blue-8'
+  EARNING = 'blue-8',
+  MULTISIG_APPROVAL = 'blue-8' // todo: update this
 }
 
 export const NotificationIconMap = {
@@ -62,7 +63,8 @@ export const NotificationIconMap = {
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM: Coins,
   CLAIM_POLYGON_BRIDGE: Coins,
   SWAP: ArrowsLeftRight,
-  EARNING: Database
+  EARNING: Database,
+  MULTISIG_APPROVAL: Database // todo: update this
 };
 
 const alertModalId = 'notification-alert-modal';
@@ -146,8 +148,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         extrinsicType: item.extrinsicType,
         isRead: item.isRead,
         actionType: item.actionType,
-        backgroundColor: token[NotificationIconBackgroundColorMap[item.actionType]],
-        leftIcon: NotificationIconMap[item.actionType],
+        backgroundColor: token[NotificationIconBackgroundColorMap[item.actionType]], // todo: handle actionType multisig approval.
+        leftIcon: NotificationIconMap[item.actionType], // todo: handle actionType multisig approval.
         metadata: item.metadata,
         proxyId: item.proxyId
       };
