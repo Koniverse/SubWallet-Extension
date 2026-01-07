@@ -3,7 +3,7 @@
 
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
-import { useGetAccountByAddress, useGetChainPrefixBySlug } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreCreateReformatAddress, useGetAccountByAddress, useGetChainPrefixBySlug, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import CN from 'classnames';
 import React from 'react';
@@ -20,15 +20,17 @@ const Component: React.FC<Props> = (props: Props) => {
   const { address, className, network, onlyReturnInnerContent } = props;
 
   const { t } = useTranslation();
-
   const account = useGetAccountByAddress(address);
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+  const getReformatAddress = useCoreCreateReformatAddress();
+
   const networkPrefix = useGetChainPrefixBySlug(network);
-  const displayAddress = reformatAddress(account?.address || address, networkPrefix);
+  const displayAddress = account ? getReformatAddress(account, chainInfoMap[network]) : address;
 
   const innerContent = (
     <>
       <MetaInfo.Account
-        address={displayAddress}
+        address={displayAddress || address}
         chainSlug={network}
         label={t('ui.components.Confirmation.CommonTransactionInfo.account')}
         name={account?.name}
