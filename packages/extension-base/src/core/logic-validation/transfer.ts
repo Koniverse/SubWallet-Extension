@@ -524,9 +524,9 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
         const accountName = account?.name;
 
         validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance', { replace: { accountName: accountName || signerSubstrateProxyAddress } })));
+      } else {
+        validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
       }
-
-      validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
     }
   }
 
