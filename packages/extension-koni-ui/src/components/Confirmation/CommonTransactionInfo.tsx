@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { reformatAddress } from '@subwallet/extension-base/utils';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useCoreCreateReformatAddress, useGetAccountByAddress, useGetChainPrefixBySlug, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
