@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 1.3.71
+Build date: Dec 29, 2025.
+
+Features & Updates:
+- Improve token enabling (Round 2) (#4247)
+- Update libs for SubWallet Extensions (#4808)
+- Support Import from Trust Wallet to SubWallet (#4762)
+
+
 ## 1.3.70
 Build date: Dec 11, 2025.
 
