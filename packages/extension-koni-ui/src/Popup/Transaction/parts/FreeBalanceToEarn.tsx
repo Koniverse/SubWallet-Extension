@@ -234,7 +234,7 @@ const Component = (props: Props) => {
               )
             }
 
-            :
+          :
           </span>
         </Tooltip>
       )}
