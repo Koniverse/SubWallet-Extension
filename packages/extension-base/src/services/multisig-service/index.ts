@@ -79,6 +79,8 @@ export interface RawPendingMultisigTx {
   depositAmount: number,
   /** List of addresses that have approved the extrinsic */
   approvals: string[],
+  /** Number of approval required */
+  threshold: number;
   /** List of signer addresses for the multisig */
   signerAddresses: string[];
   /** Hash of the extrinsic */
@@ -349,11 +351,12 @@ export class MultisigService implements StoppableServiceInterface {
 
         for (const account of multisigAccounts) {
           const multisigAddress = account.id;
-          const reformatMultisigAddress = _reformatAddressWithChain(multisigAddress, chainInfo);
           const signers = account.accounts[0].signers as string[];
+          const reformatMultisigAddress = _reformatAddressWithChain(multisigAddress, chainInfo);
           const reformatSigners = signers.map((s) => _reformatAddressWithChain(s, chainInfo));
+          const threshold = account.accounts[0].threshold as number;
 
-          const unsub = this.subscribePendingMultisigTxs(chain, reformatMultisigAddress, reformatSigners, (rs) => {
+          const unsub = this.subscribePendingMultisigTxs(chain, reformatMultisigAddress, reformatSigners, threshold, (rs) => {
             !cancel && this.updatePendingMultisigTxSubjectByChain(reformatMultisigAddress, chain, rs);
           });
 
@@ -382,10 +385,11 @@ export class MultisigService implements StoppableServiceInterface {
    * @param chain - Chain identifier
    * @param multisigAddress - Multisig address to monitor
    * @param signers - List of signer addresses for the multisig
+   * @param threshold - Number of approval required
    * @param callback - Callback function called with updated pending extrinsics
    * @returns Function to unsubscribe from the subscription
    */
-  private async subscribePendingMultisigTxsPromise (chain: string, multisigAddress: string, signers: string[], callback: (rs: RawPendingMultisigTx[]) => void) {
+  private async subscribePendingMultisigTxsPromise (chain: string, multisigAddress: string, signers: string[], threshold: number, callback: (rs: RawPendingMultisigTx[]) => void) {
     const substrateApi = await this.chainService.getSubstrateApi(chain).isReady;
 
     // todo: validate substrateApi has multisig.multisigs
@@ -455,6 +459,7 @@ export class MultisigService implements StoppableServiceInterface {
             blockHeight,
             extrinsicIndex,
             extrinsicHash,
+            threshold,
             signerAddresses: signers,
             depositAmount: pendingMultisigInfo.deposit,
             depositor: pendingMultisigInfo.depositor,
@@ -491,11 +496,12 @@ export class MultisigService implements StoppableServiceInterface {
    * @param chain - Chain identifier
    * @param multisigAddress - Multisig address to monitor
    * @param signers - List of signer addresses for the multisig
+   * @param threshold - Number of approval required
    * @param callback - Callback function called with updated pending extrinsics
    * @returns Function to unsubscribe from the subscription
    */
-  private subscribePendingMultisigTxs (chain: string, multisigAddress: string, signers: string[], callback: (rs: RawPendingMultisigTx[]) => void) {
-    const unsubPromise = this.subscribePendingMultisigTxsPromise(chain, multisigAddress, signers, callback);
+  private subscribePendingMultisigTxs (chain: string, multisigAddress: string, signers: string[], threshold: number, callback: (rs: RawPendingMultisigTx[]) => void) {
+    const unsubPromise = this.subscribePendingMultisigTxsPromise(chain, multisigAddress, signers, threshold, callback);
 
     return () => {
       unsubPromise.then((unsub) => {
