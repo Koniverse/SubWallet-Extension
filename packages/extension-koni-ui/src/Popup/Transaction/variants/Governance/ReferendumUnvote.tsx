@@ -51,7 +51,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const referendumId = defaultData.referendumId;
   const [isBalanceReady, setIsBalanceReady] = useState(true);
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chainValue);

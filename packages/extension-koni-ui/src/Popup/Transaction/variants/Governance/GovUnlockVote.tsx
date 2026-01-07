@@ -60,7 +60,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     return votingInfo && votingInfo.summary.unlockable.trackIds.length > 0;
   }).sort(funcSortByName), [accountAddressItems, govLockInfo]);
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
   const { onError, onSuccess } = useHandleSubmitTransaction();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chainValue);
 

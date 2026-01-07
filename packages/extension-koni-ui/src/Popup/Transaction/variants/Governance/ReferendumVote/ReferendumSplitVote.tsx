@@ -59,7 +59,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const nayAmount = useWatchTransaction('nayAmount', form, formDefault);
 
   const { chainInfoMap } = useSelector((root) => root.chainStore);
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
   const { voteMap = new Map<string, ReferendumVoteDetail>(),

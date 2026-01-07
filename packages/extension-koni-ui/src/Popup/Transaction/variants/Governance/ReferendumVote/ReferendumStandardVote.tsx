@@ -79,7 +79,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     accountAddressItems: GovAccountAddressItemType[]
   } = useOutletContext();
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
   const { chainInfoMap } = useSelector((root) => root.chainStore);

@@ -188,7 +188,7 @@ const Component: React.FC = () => {
     [addressPrefix, nftItem, selectSignableAccountProxyToSign, onSuccess, onError]
   );
 
-  const checkAction = usePreCheckAction(from);
+  const checkAction = usePreCheckAction({ address: from, chain });
 
   useEffect(() => {
     if (nftItem === DEFAULT_ITEM || collectionInfo === DEFAULT_COLLECTION) {

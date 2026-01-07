@@ -54,7 +54,7 @@ const Component = (): React.ReactElement<Props> => {
   const chainValue = useWatchTransaction('chain', form, defaultData);
 
   const { error, isLoading: balanceLoading } = useGetBalance(chainValue, fromValue);
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
   const substrateProxyAccountGroup = useGetSubstrateProxyAccountGroupByAddress(fromValue, chainValue);
   const nativeToken = useGetNativeTokenBasicInfo(chainValue);
 

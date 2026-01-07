@@ -11,7 +11,19 @@ import { useCallback } from 'react';
 import { useNotification, useTranslation } from '../common';
 import useGetAccountByAddress from './useGetAccountByAddress';
 
-const usePreCheckAction = (address?: string, blockAllAccount = true, message?: string): ((onClick: VoidFunction, action: ExtrinsicType) => VoidFunction) => {
+type WrapActionWithPreCheck = (
+  onClick: VoidFunction,
+  action: ExtrinsicType
+) => VoidFunction;
+
+type ActionPreCheckParams = {
+  address?: string;
+  chain?: string;
+  blockAllAccount?: boolean;
+  message?: string;
+};
+
+const usePreCheckAction = ({ address, blockAllAccount = true, chain, message }: ActionPreCheckParams): WrapActionWithPreCheck => {
   const notify = useNotification();
   const { t } = useTranslation();
 
@@ -57,8 +69,8 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
           defaultMessage = detectTranslate('ui.ACCOUNT.hook.account.usePreCheckAction.earningNotSupportedForAccountType');
         }
 
-        if (account.isMultisig) {
-          const { signableProxies } = await getSignableProxies({ multisigProxyId: account.address, extrinsicType: action });
+        if (account.isMultisig && chain) {
+          const { signableProxies } = await getSignableProxies({ multisigProxyId: account.address, extrinsicType: action, chain });
 
           if (signableProxies.length === 0) {
             block = true;
@@ -119,7 +131,7 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
         }
       }
     };
-  }, [account, blockAllAccount, getAccountTypeTitle, message, notify, t]);
+  }, [account, blockAllAccount, chain, getAccountTypeTitle, message, notify, t]);
 };
 
 export default usePreCheckAction;

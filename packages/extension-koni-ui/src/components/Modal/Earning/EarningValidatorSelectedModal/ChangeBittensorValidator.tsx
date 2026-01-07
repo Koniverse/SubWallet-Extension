@@ -360,7 +360,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     chain && checkChain(chain);
   }, [chain, checkChain]);
 
-  const onPreCheck = usePreCheckAction(from);
+  const onPreCheck = usePreCheckAction({ chain, address: from });
 
   useExcludeModal(modalId);
 

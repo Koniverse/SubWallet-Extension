@@ -161,7 +161,12 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('send-fund');
-  const checkAction = usePreCheckAction(fromValue, true, t('ui.TRANSACTION.screen.Transaction.SendFund.cannotSendWithAccountType'));
+  const checkAction = usePreCheckAction({
+    address: fromValue,
+    chain: chainValue,
+    blockAllAccount: true,
+    message: t('ui.TRANSACTION.screen.Transaction.SendFund.cannotSendWithAccountType')
+  });
 
   const currentConfirmation = useMemo(() => {
     if (chainValue && destChainValue) {

@@ -41,6 +41,7 @@
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.continue": "",
   "ui.ACCOUNT.components.Modal.SubstrateProxyAccount.SubstrateProxyAccountList.substrateProxyAccount": "",
   "ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.selectSigningAccount": "",
+  "ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.selectMultisigSigningAccount": "",
   "ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.continue": "",
   "ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.selectAccount": "",
   "ui.ACCOUNT.components.AccountProxy.SelectorItem.proxiedAccount": "",

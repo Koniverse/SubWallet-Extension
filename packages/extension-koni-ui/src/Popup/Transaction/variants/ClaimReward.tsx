@@ -185,7 +185,7 @@ const Component = () => {
     }, 300);
   }, [reward?.unclaimedReward, onSuccess, poolInfo.type, selectSignableAccountProxyToSign, onError]);
 
-  const checkAction = usePreCheckAction(fromValue);
+  const checkAction = usePreCheckAction({ chain: chainValue, address: fromValue });
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);

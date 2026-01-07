@@ -61,7 +61,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const abstainRenderKey = 'abstain_vote_amount';
   const [abstainAmountRenderKey, setAbstainAmountRenderKey] = useState<string>(abstainRenderKey);
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
   const { voteMap = new Map<string, ReferendumVoteDetail>(),

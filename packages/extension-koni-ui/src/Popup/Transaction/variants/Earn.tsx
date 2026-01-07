@@ -934,7 +934,7 @@ const Component = () => {
     );
   }, [amountValue, assetDecimals, chainAsset, chainValue, currencyData?.isPrefix, currencyData.symbol, estimatedFee, inputAsset.symbol, isSubnetStaking, poolInfo.metadata, poolInfo.statistic, poolInfo?.type, poolTargets, renderSubnetStaking, t]);
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);

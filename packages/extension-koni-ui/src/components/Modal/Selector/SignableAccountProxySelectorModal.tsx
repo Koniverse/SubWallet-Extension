@@ -33,6 +33,8 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   const sectionRef = useRef<SwListSectionRef>(null);
   const account = useGetAccountByAddress(address);
 
+  const isMultisigTransaction = !!account?.isMultisig;
+
   // Combine main account and proxy accounts
   const fullList = useMemo<SignableAccountProxyItem[]>(() => {
     if (!account || account?.isMultisig) {
@@ -121,7 +123,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
       title={t('ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.selectAccount')}
     >
       <div className='proxy-modal__description'>
-        {t('ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.selectSigningAccount')}
+        {isMultisigTransaction ? t('ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.selectMultisigSigningAccount') : t('ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.selectSigningAccount')}
       </div>
       <SwList.Section
         list={fullList}

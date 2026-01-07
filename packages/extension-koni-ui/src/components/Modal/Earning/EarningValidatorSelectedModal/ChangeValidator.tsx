@@ -97,7 +97,7 @@ const Component = (props: Props) => {
   const isActive = checkActive(modalId);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
-  const onPreCheck = usePreCheckAction(from);
+  const onPreCheck = usePreCheckAction({ chain, address: from });
   const { onError, onSuccess, selectSignableAccountProxyToSign } = useHandleSubmitTransaction();
 
   const sectionRef = useRef<SwListSectionRef>(null);

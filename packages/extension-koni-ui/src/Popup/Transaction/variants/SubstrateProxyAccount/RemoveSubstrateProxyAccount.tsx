@@ -41,7 +41,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
   const navigate = useNavigate();
   const { onError, onSuccess } = useHandleSubmitTransaction();
   const substrateProxyAccountGroup = useGetSubstrateProxyAccountGroupByAddress(from, chain);
-  const onPreCheck = usePreCheckAction(from);
+  const onPreCheck = usePreCheckAction({ chain, address: from });
 
   const accountProxy = useGetAccountProxyByAddress(from);
 

@@ -2259,6 +2259,7 @@
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.continue": "Continue",
   "ui.ACCOUNT.components.Modal.SubstrateProxyAccount.SubstrateProxyAccountList.substrateProxyAccount": "Proxy account",
   "ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.selectSigningAccount": "You're performing transactions from a proxied account. Select the account you want to sign this transaction",
+  "ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.selectMultisigSigningAccount": "You're performing a multisig transaction. Select the account you want to sign this transaction",
   "ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.continue": "Continue",
   "ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.cancel": "Cancel",
   "ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.selectAccount": "Select account",

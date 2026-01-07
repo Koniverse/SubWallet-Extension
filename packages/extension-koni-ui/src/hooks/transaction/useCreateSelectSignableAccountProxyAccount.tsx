@@ -103,7 +103,7 @@ export function useCreateSelectSignableAccountProxyAccount (): SelectSignableAcc
     try {
       // Address is required to get signer accounts
       // and chain must support multisig
-      if (!address || MULTISIG_SUPPORTED_CHAINS.includes(chain) || !extrinsicType) {
+      if (!address || !MULTISIG_SUPPORTED_CHAINS.includes(chain) || !extrinsicType) {
         return [];
       }
 
