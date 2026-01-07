@@ -27,9 +27,10 @@ interface TransactionConfirmationInfo {
   transactionFee?: string;
   isUnlock?: boolean;
   isUnVote?: boolean;
+  signerSubstrateProxyAddress?: string;
 }
 
-const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, isUnlock, transactionFee }: TransactionConfirmationInfo): GovLockedInfoConfirmation | null => {
+const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, isUnlock, signerSubstrateProxyAddress, transactionFee }: TransactionConfirmationInfo): GovLockedInfoConfirmation | null => {
   const account = useGetAccountByAddress(address);
   const govLockedInfos = useSelector((state) => state.openGov.govLockedInfos);
   const getAccountTokenBalance = useGetAccountTokenBalance();
@@ -102,7 +103,13 @@ const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, isUnl
       }
     }
 
-    let transferableAfterLock = currentTransferable.minus(transactionFee || BN_ZERO);
+    let transferableAfterLock;
+
+    if (!!signerSubstrateProxyAddress && !isSameAddress(address, signerSubstrateProxyAddress)) {
+      transferableAfterLock = currentTransferable;
+    } else {
+      transferableAfterLock = currentTransferable.minus(transactionFee || BN_ZERO);
+    }
 
     if (isUnlock) {
       // If it's an unvote, we need to add the amount to the transferable balance
@@ -118,7 +125,7 @@ const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, isUnl
     govLockedInfo.transferable.to = BigNumber.max(transferableAfterLock, BN_ZERO);
 
     return govLockedInfo;
-  }, [amount, assetInfo, balanceInfo, currentGovInfo, isUnlock, isUnVote, priceMap, transactionFee]);
+  }, [balanceInfo, assetInfo, currentGovInfo, amount, priceMap, isUnlock, isUnVote, signerSubstrateProxyAddress, address, transactionFee]);
 };
 
 export default useGetGovVoteConfirmationInfo;

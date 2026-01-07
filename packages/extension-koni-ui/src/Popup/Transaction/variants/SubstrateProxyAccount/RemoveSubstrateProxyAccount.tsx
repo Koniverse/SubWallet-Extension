@@ -195,7 +195,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
         >
           <MetaInfo.Default
             className={'proxy-address-removed'}
-            label={t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyAccount')}
+            label={t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyList')}
           >
             {substrateProxyAddressCount} {substrateProxyAddressCount === 1 ? t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccount') : t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts')}
             <Button

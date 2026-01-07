@@ -2247,7 +2247,7 @@
   "ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.proxyType": "Proxy type",
   "ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.addProxy": "Add proxy",
   "ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.proxyDeposit": "Proxy deposit",
-  "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyAccount": "Proxy account",
+  "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyList": "Proxy list",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts": "accounts",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccount": "account",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.network": "Network",
@@ -2576,7 +2576,7 @@
   "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unknownAccountFeatureRestriction": "",
   "ui.TRANSACTION.constant.transaction.addProxy": "Add proxy",
   "ui.TRANSACTION.constant.transaction.removeProxy": "Remove proxy",
-  "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyAccount": "Proxy account",
+  "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyList": "Proxy list",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.accounts": "accounts",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.account": "account",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.networkFee": "Network fee",
@@ -2600,5 +2600,6 @@
   "ui.TRANSACTION.Confirmations.Unbond.signWith": "Sign with",
   "ui.TRANSACTION.Confirmations.Withdraw.signWith": "Sign with",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "Available balance",
-  "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "Copied to clipboard"
+  "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "Copied to clipboard",
+  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again"
 }

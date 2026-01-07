@@ -51,7 +51,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Default
           className={'proxy-address-removed'}
-          label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyAccount')}
+          label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyList')}
         >
           {substrateProxyAccounts.length} {substrateProxyAccounts.length === 1 ? t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.account') : t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.accounts')}
           <Button
