@@ -12,6 +12,7 @@ import { CardanoTransactionConfig } from '@subwallet/extension-base/services/bal
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getEvmChainId, _isChainEvmCompatible, _isNativeTokenBySlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { ClaimAvailBridgeNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { createMultisigExtrinsic } from '@subwallet/extension-base/services/multisig-service/utils';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { TRANSACTION_TIMEOUT } from '@subwallet/extension-base/services/transaction-service/constants';
 import { parseLiquidStakingEvents, parseLiquidStakingFastUnstakeEvents, parseTransferEventLogs, parseXcmEventLogs } from '@subwallet/extension-base/services/transaction-service/event-parser';
@@ -20,7 +21,7 @@ import { OptionalSWTransaction, SWDutchTransaction, SWDutchTransactionInput, SWP
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitBittensorChangeValidatorStaking, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
-import { anyNumberToBN, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, anyNumberToBN, isSameAddress, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
 import { mergeTransactionAndSignature } from '@subwallet/extension-base/utils/eth/mergeTransactionAndSignature';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -165,7 +166,7 @@ export default class TransactionService {
     const nativeTokenAvailable = await this.state.balanceService.getBalanceByType(address, chain, nativeTokenInfo.slug, transactionInput.balanceType, extrinsicType);
 
     // Check available balance against transaction fee
-    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable);
+    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable); // todo: validate with signer account balance
 
     // Warnings Ton address if bounceable and not active
     // if (transaction && isTonTransaction(transaction) && tonApi) {
@@ -1803,7 +1804,8 @@ export default class TransactionService {
     return emitter;
   }
 
-  private signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, signAfterCreate, step, tokenPayFeeSlug, transaction, url }: SWTransaction): TransactionEmitter {
+  private async signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, multisigAccountInfo, signAfterCreate, signerSubstrateMultisigAddress, step, tokenPayFeeSlug, transaction, url }: SWTransaction): Promise<TransactionEmitter> {
+    const api = await this.state.chainService.getSubstrateApi(chain).isReady;
     const tip = (feeCustom as SubstrateTipInfo)?.tip || '0';
     const feeAssetId = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug) && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain) ? this.state.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.multilocation as Record<string, any> : undefined;
 
@@ -1816,14 +1818,30 @@ export default class TransactionService {
       processId: step?.processId
     };
 
-    const extrinsic = transaction as SubmittableExtrinsic;
+    let extrinsic = transaction as SubmittableExtrinsic;
+    let signer = address;
+
+    if (signerSubstrateMultisigAddress && !isSameAddress(signerSubstrateMultisigAddress, address) && multisigAccountInfo) {
+      const chainInfo = this.state.chainService.getChainInfoByKey(chain);
+      const { signers, threshold } = multisigAccountInfo;
+
+      signer = _reformatAddressWithChain(signerSubstrateMultisigAddress, chainInfo);
+      extrinsic = createMultisigExtrinsic(
+        api.api,
+        threshold,
+        signers.map((s) => _reformatAddressWithChain(s, chainInfo)),
+        signer,
+        extrinsic
+      );
+    }
+
     // const registry = extrinsic.registry;
     // const signedExtensions = registry.signedExtensions;
 
     const signerOption: Partial<SignerOptions> = {
       signer: {
         signPayload: async (payload: SignerPayloadJSON) => {
-          const { signature, signedTransaction } = await this.state.requestService.signInternalTransaction(id, address, url || EXTENSION_REQUEST_URL, payload, signAfterCreate);
+          const { signature, signedTransaction } = await this.state.requestService.signInternalTransaction(id, signer, url || EXTENSION_REQUEST_URL, payload, signAfterCreate);
 
           return {
             id: (new Date()).getTime(),
@@ -1851,8 +1869,6 @@ export default class TransactionService {
       emitter.emit('signed', eventData);
 
       // Send transaction
-      const api = this.state.chainService.getSubstrateApi(chain);
-
       eventData.nonce = rs.nonce.toNumber();
       eventData.startBlock = (await api.api.query.system.number()).toPrimitive() as number;
       this.handleTransactionTimeout(emitter, eventData);
