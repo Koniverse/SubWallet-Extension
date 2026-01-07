@@ -31,9 +31,9 @@ const Component = ({ className = '', item, onClick }: Props) => {
   }, [item]);
 
   const currentApprovals = item.approvals.length;
-  const totalSigners = item.signerAddresses?.length || 0;
-  const percent = totalSigners > 0 ? (currentApprovals / totalSigners) * 100 : 0;
-  const isApproved = currentApprovals === totalSigners;
+  const threshold = item.threshold;
+  const percent = threshold > 0 ? (currentApprovals / threshold) * 100 : 0;
+  const isApproved = currentApprovals === threshold;
 
   return (
     <Web3Block
@@ -82,7 +82,7 @@ const Component = ({ className = '', item, onClick }: Props) => {
           <div className={'__progress-section'}>
             <div className={'__label-row'}>
               <span>Approval status</span>
-              <span className={'__count'}>{`${currentApprovals}/${totalSigners} Approval`}</span>
+              <span className={'__count'}>{`${currentApprovals}/${threshold} Approval`}</span>
             </div>
             <div className={'__bar-track'}>
               <div

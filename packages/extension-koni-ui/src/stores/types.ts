@@ -18,6 +18,7 @@ import { SessionTypes } from '@walletconnect/types';
 import { SettingsStruct } from '@polkadot/ui-settings/types';
 
 import { MktCampaignHistoryData } from '../types/staticContent';
+import {PendingMultisigTxMap} from "@subwallet/extension-base/services/multisig-service";
 
 // todo: move this file to extension-koni-ui/src/types/
 
@@ -230,3 +231,7 @@ export type WalletConnectSessionsSubscription = {
   start: () => void;
   unsub: () => void;
 };
+
+export interface MultisigStore extends BaseReduxStore {
+  pendingMultisigTxs: PendingMultisigTxMap;
+}

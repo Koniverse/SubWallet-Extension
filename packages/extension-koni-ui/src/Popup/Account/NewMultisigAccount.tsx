@@ -346,7 +346,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                         </div>
                       ))}
                     </div>
-                    <div className={'threshold-label'}>{'Set approval thresold'.toUpperCase()}</div>
+                    <div className={'threshold-label'}>{'Set approval threhsold'.toUpperCase()}</div>
                     <div className={'threshold-form-wrapper'}>
                       <Form.Item
                         name={'threshold'}
@@ -370,7 +370,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         </div>
       </Layout.WithSubHeaderOnly>
       <AddSignerMultisigModal
-        chainSlug={'polkadot'}  // Todo: Replace hardcoded value with dynamic configuration
+        chainSlug={'polkadot'} // Todo: Replace hardcoded value with dynamic configuration
         id={addressBookId}
         onConfirm={onConfirmSelectSigners}
         selectedSigners={signers}
