@@ -1016,7 +1016,6 @@ export interface NftTransactionRequest {
   networkKey: string,
   senderAddress: string,
   recipientAddress: string,
-  signerSubstrateProxyAddress?: string;
 
   nftItemName?: string, // Use for confirmation view only
   params: Record<string, any>,
@@ -2376,7 +2375,7 @@ export interface KoniRequestSignatures {
   // NFT functions
   'pri(evmNft.submitTransaction)': [NftTransactionRequest, SWTransactionResponse];
   'pri(evmNft.getTransaction)': [NftTransactionRequest, EvmNftTransaction];
-  'pri(substrateNft.submitTransaction)': [NftTransactionRequest, SWTransactionResponse];
+  'pri(substrateNft.submitTransaction)': [RequestSubstrateNftSubmitTransaction, SWTransactionResponse];
   'pri(substrateNft.getTransaction)': [NftTransactionRequest, SubstrateNftTransaction];
   'pri(nft.getNft)': [null, NftJson];
   'pri(nft.getSubscription)': [RequestSubscribeNft, NftJson, NftJson];
