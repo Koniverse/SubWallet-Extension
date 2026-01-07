@@ -3,13 +3,13 @@
 
 import { GearApi } from '@gear-js/api';
 import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { _adaptX1Interior } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/contract-handler/wasm';
 import { getWasmContractGasLimit } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
 import { estimateTonTxFee } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
-import { _TRANSFER_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
+import { _TRANSFER_CHAIN_GROUP, USE_MULTILOCATION_INDEX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible, _isChainTonCompatible, _isGigaToken, _isNativeToken, _isTokenGearSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon, _isTokenWasmSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
-// import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
 import { combineEthFee, getGRC20ContractPromise, getVFTContractPromise } from '@subwallet/extension-base/utils';
 import { keyring } from '@subwallet/ui-keyring';
@@ -105,7 +105,15 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
   } else if (_TRANSFER_CHAIN_GROUP.bitcountry.includes(networkKey) && !_isNativeToken(tokenInfo)) {
     transfer = api.tx.currencies.transfer(to, _getTokenOnChainInfo(tokenInfo), value);
   } else if (_TRANSFER_CHAIN_GROUP.statemine.includes(networkKey) && !_isNativeToken(tokenInfo)) {
-    transfer = api.tx.assets.transfer(_getTokenOnChainAssetId(tokenInfo), to, value);
+    if (USE_MULTILOCATION_INDEX.includes(networkKey)) {
+      const version: number = ['statemint', 'statemine', 'westend_assethub'].includes(networkKey) ? 4 : 3;
+      const multilocationIndex = _adaptX1Interior(_getXcmAssetMultilocation(tokenInfo), version);
+
+      // @ts-ignore
+      transfer = api.tx.assets.transfer(multilocationIndex, to, value);
+    } else {
+      transfer = api.tx.assets.transfer(_getTokenOnChainAssetId(tokenInfo), to, value);
+    }
   } else if (_TRANSFER_CHAIN_GROUP.sora_substrate.includes(networkKey) && isTxAssetsSupported) {
     transfer = api.tx.assets.transfer(_getTokenOnChainAssetId(tokenInfo), to, value);
   } else if (isTxBalancesSupported && _isNativeToken(tokenInfo)) {
@@ -124,15 +132,6 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
     }
   } else if (_TRANSFER_CHAIN_GROUP.truth.includes(networkKey)) {
     transfer = api.tx.assetManager.transfer(to, _getTokenOnChainInfo(tokenInfo), value);
-    // } else if (_TRANSFER_CHAIN_GROUP.bittensor.includes(networkKey) && tokenInfo.metadata?.netuid) {
-    //   const { accountHotKey, isEnableTransferSubnet } = await getAccountNetuidTokenInfo(from, tokenInfo, substrateApi);
-    //   const tokenNetuid = tokenInfo.metadata?.netuid;
-
-  //   if (isEnableTransferSubnet && accountHotKey) {
-  //     transfer = api.tx.subtensorModule.transferStake(from, accountHotKey, tokenNetuid, tokenNetuid, value);
-  // }
-  } else {
-    return [null, value];
   }
 
   return [transfer, transferAmount || value];
@@ -197,22 +196,3 @@ export const getTransferMockTxFee = async (address: string, chainInfo: _ChainInf
     return new BigN(0);
   }
 };
-
-// export const getAccountNetuidTokenInfo = async (address: string, tokenInfo: _ChainAsset, substrateApi: _SubstrateApi): Promise<{isEnableTransferSubnet: boolean, accountHotKey: string | undefined}> => {
-//   const tokenNetuid = tokenInfo.metadata?.netuid;
-
-//   if (!tokenNetuid) {
-//     return { isEnableTransferSubnet: false, accountHotKey: undefined };
-//   }
-
-//   const [isTransferToggle, rawStakeInfoForColdKey] = await Promise.all([
-//     substrateApi.api.query.subtensorModule.transferToggle(tokenNetuid),
-//     substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)
-//   ]);
-
-//   const isEnableTransferSubnet = isTransferToggle.toPrimitive() as boolean;
-//   const taoStakeInfos = rawStakeInfoForColdKey.toPrimitive() as unknown as TaoStakeInfo[];
-//   const accountHotKey = taoStakeInfos.find((value) => value.netuid === tokenNetuid);
-
-//   return { isEnableTransferSubnet, accountHotKey: accountHotKey?.hotkey };
-// };
