@@ -83,6 +83,8 @@ const Component = ({ address,
                 />
               )
             }
+
+            :
           </span>
         </Tooltip>
       )}

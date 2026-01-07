@@ -1249,7 +1249,7 @@ const Component = () => {
                     chain={poolInfo.chain}
                     hidden={[YieldStepType.XCM].includes(submitStepType)}
                     isSubscribe={true}
-                    label={`${t('ui.TRANSACTION.screen.Transaction.Earn.availableBalance')}:`}
+                    label={`${t('ui.TRANSACTION.screen.Transaction.Earn.availableBalance')}`}
                     tokenSlug={inputAsset.slug}
                   />
                 </div>
