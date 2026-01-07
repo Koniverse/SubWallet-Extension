@@ -56,3 +56,9 @@ export interface RequestGetSignableProxyIds {
 export interface ResponseGetSignableProxyIds {
   signableProxyIds: string[];
 }
+
+export interface MultisigAccountInfo {
+  multisigAddress: string;
+  signers: string[];
+  threshold: number;
+}

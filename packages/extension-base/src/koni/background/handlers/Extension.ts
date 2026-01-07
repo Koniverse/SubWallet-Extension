@@ -51,6 +51,7 @@ import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydration
 import { ClaimPolygonBridgeNotificationMetadata, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
 import { RequestGetPendingTxs } from '@subwallet/extension-base/services/multisig-service';
+import { createMultisigExtrinsic } from '@subwallet/extension-base/services/multisig-service/utils';
 import { GovVoteRequest, RemoveVoteRequest, UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
@@ -1665,6 +1666,39 @@ export default class KoniExtension {
       ignoreWarnings.push(BasicTxWarningCode.IS_BOUNCEABLE_ADDRESS);
     }
 
+    console.log('I hate u', {
+      errors,
+      warnings,
+      address: from,
+      chain,
+      feeCustom: overrideFeeCustom || feeCustom,
+      feeOption: overrideFeeCustom ? 'custom' : feeOption,
+      tokenPayFeeSlug,
+      chainType,
+      transferNativeAmount,
+      transaction,
+      data: inputData,
+      extrinsicType,
+      ignoreWarnings,
+      isTransferAll: isTransferNativeToken ? transferAll : false,
+      isTransferLocalTokenAndPayThatTokenAsFee,
+      edAsWarning: isTransferNativeToken,
+      additionalValidator: additionalValidator,
+      signerSubstrateMultisigAddress: inputData.signerSubstrateMultisigAddress
+    });
+
+    const testTx = createMultisigExtrinsic(
+      this.#koniState.getSubstrateApi(chain).api,
+      3,
+      ['1P8B9aHLLUcPrgVo1EfmvJ2yNm9Uac9RkSiNQyVxVp6yons', '16QBEoG2jAVJEyepEyerw1sJzVqctCQc3JaqFnMD1LyYcMY7', '1BzDB5n2rfSJwvuCW9deKY9XnUyys8Gy44SoX8tRNDCFBhx'],
+      '1BzDB5n2rfSJwvuCW9deKY9XnUyys8Gy44SoX8tRNDCFBhx',
+      transaction as SubmittableExtrinsic<'promise'>
+    );
+
+    console.log('testTx', testTx.toHex());
+
+    const multisigAccountInfo = this.#koniState.keyringService.context.getMultisigAccountInfoByAddress(inputData.signerSubstrateMultisigAddress);
+
     return this.#koniState.transactionService.handleTransaction({
       errors,
       warnings,
@@ -1682,7 +1716,9 @@ export default class KoniExtension {
       isTransferAll: isTransferNativeToken ? transferAll : false,
       isTransferLocalTokenAndPayThatTokenAsFee,
       edAsWarning: isTransferNativeToken,
-      additionalValidator: additionalValidator
+      additionalValidator: additionalValidator,
+      signerSubstrateMultisigAddress: inputData.signerSubstrateMultisigAddress,
+      multisigAccountInfo
     });
   }
 
@@ -2669,7 +2705,8 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: { ...inputData, isSendingSelf },
       extrinsicType: ExtrinsicType.SEND_NFT,
-      chainType: ChainType.SUBSTRATE
+      chainType: ChainType.SUBSTRATE,
+      signerSubstrateMultisigAddress: inputData.signerSubstrateMultisigAddress
     });
 
     return { ...rs, isSendingSelf };
@@ -4404,7 +4441,8 @@ export default class KoniExtension {
       errorOnTimeOut,
       ...this.createPassConfirmationParams(isPassConfirmation),
       eventsHandler,
-      step
+      step,
+      signerSubstrateMultisigAddress: inputData.signerSubstrateMultisigAddress
     });
   }
 
@@ -4425,7 +4463,8 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: params, // TODO
       extrinsicType,
-      chainType: handler?.transactionChainType || ChainType.SUBSTRATE
+      chainType: handler?.transactionChainType || ChainType.SUBSTRATE,
+      signerSubstrateMultisigAddress: params.signerSubstrateMultisigAddress
     });
   }
 
@@ -4537,7 +4576,8 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: params,
       extrinsicType: ExtrinsicType.STAKING_WITHDRAW,
-      chainType: poolHandler?.transactionChainType || ChainType.SUBSTRATE
+      chainType: poolHandler?.transactionChainType || ChainType.SUBSTRATE,
+      signerSubstrateMultisigAddress: params.signerSubstrateMultisigAddress
     });
   }
 
@@ -4558,7 +4598,8 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: params,
       extrinsicType: ExtrinsicType.STAKING_CANCEL_UNSTAKE,
-      chainType: poolHandler?.transactionChainType || ChainType.SUBSTRATE
+      chainType: poolHandler?.transactionChainType || ChainType.SUBSTRATE,
+      signerSubstrateMultisigAddress: params.signerSubstrateMultisigAddress
     });
   }
 
@@ -4578,7 +4619,8 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: params,
       extrinsicType: ExtrinsicType.STAKING_CLAIM_REWARD,
-      chainType: poolHandler?.transactionChainType || ChainType.SUBSTRATE
+      chainType: poolHandler?.transactionChainType || ChainType.SUBSTRATE,
+      signerSubstrateMultisigAddress: params.signerSubstrateMultisigAddress
     });
   }
 
@@ -4591,9 +4633,7 @@ export default class KoniExtension {
       return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(BasicTxErrorType.INVALID_PARAMS)]);
     }
 
-    const slippage = await this.#koniState.earningService.yieldGetEarningImpact(params);
-
-    return slippage;
+    return await this.#koniState.earningService.yieldGetEarningImpact(params);
   }
 
   private async handleYieldChangeValidator (params: SubmitChangeValidatorStaking) {
@@ -4613,7 +4653,8 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: params,
       extrinsicType: ExtrinsicType.CHANGE_EARNING_VALIDATOR,
-      chainType: ChainType.SUBSTRATE
+      chainType: ChainType.SUBSTRATE,
+      signerSubstrateMultisigAddress: params.signerSubstrateMultisigAddress
     });
   }
 
@@ -5425,7 +5466,8 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: request,
       extrinsicType: ExtrinsicType.GOV_VOTE,
-      chainType: ChainType.SUBSTRATE
+      chainType: ChainType.SUBSTRATE,
+      signerSubstrateMultisigAddress: request.signerSubstrateMultisigAddress
     });
   }
 
@@ -5438,7 +5480,8 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: request,
       extrinsicType: ExtrinsicType.GOV_UNVOTE,
-      chainType: ChainType.SUBSTRATE
+      chainType: ChainType.SUBSTRATE,
+      signerSubstrateMultisigAddress: request.signerSubstrateMultisigAddress
     });
   }
 
@@ -5451,7 +5494,8 @@ export default class KoniExtension {
       transaction: extrinsic,
       data: request,
       extrinsicType: ExtrinsicType.GOV_UNLOCK_VOTE,
-      chainType: ChainType.SUBSTRATE
+      chainType: ChainType.SUBSTRATE,
+      signerSubstrateMultisigAddress: request.signerSubstrateMultisigAddress
     });
   }
 

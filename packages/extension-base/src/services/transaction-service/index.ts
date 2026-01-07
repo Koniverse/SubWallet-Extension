@@ -118,7 +118,7 @@ export default class TransactionService {
     const transaction = transactionInput.transaction as OptionalSWTransaction;
 
     // Check duplicated transaction
-    validationResponse.errors.push(...this.checkDuplicate(transactionInput));
+    validationResponse.errors.push(...this.checkDuplicate(transactionInput)); // todo: recheck with case sign with proxy or multisig
 
     // Check support for transaction
     checkSupportForTransaction(validationResponse, transaction);
@@ -153,14 +153,14 @@ export default class TransactionService {
     const priceMap = (await this.state.priceService.getPrice()).priceMap;
 
     if (!transactionInput.skipFeeRecalculation) {
-      validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee);
+      validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee, transactionInput.signerSubstrateMultisigAddress);
     }
 
     const chainInfoMap = this.state.chainService.getChainInfoMap();
 
     // Check account signing transaction
 
-    checkSigningAccountForTransaction(validationResponse, chainInfoMap);
+    checkSigningAccountForTransaction(validationResponse, chainInfoMap); // todo: recheck with signer
 
     const nativeTokenAvailable = await this.state.balanceService.getBalanceByType(address, chain, nativeTokenInfo.slug, transactionInput.balanceType, extrinsicType);
 

@@ -17,7 +17,7 @@ import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } 
 import { isBitcoinTransaction, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { OptionalSWTransaction, SWTransactionInput, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountSignMode, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeInfo, BitcoinFeeRate, EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransferTxErrorType } from '@subwallet/extension-base/types';
-import { balanceFormatter, combineBitcoinFee, combineEthFee, formatNumber, getSizeInfo, pairToAccount } from '@subwallet/extension-base/utils';
+import { balanceFormatter, combineBitcoinFee, combineEthFee, formatNumber, getSizeInfo, isSameAddress, pairToAccount } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
@@ -355,7 +355,7 @@ export function checkSupportForTransaction (validationResponse: SWTransactionRes
   }
 }
 
-export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, priceMap: Record<string, number>, feeInfo: FeeInfo, nativeTokenInfo: _ChainAsset, nonNativeTokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined): Promise<FeeData> {
+export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, priceMap: Record<string, number>, feeInfo: FeeInfo, nativeTokenInfo: _ChainAsset, nonNativeTokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined, signerSubstrateMultisigAddress?: string): Promise<FeeData> {
   const estimateFee: FeeData = {
     symbol: '',
     decimals: 0,
@@ -371,7 +371,15 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
   if (transaction) {
     try {
       if (isSubstrateTransaction(transaction)) {
-        estimateFee.value = validationResponse.xcmFeeDryRun ?? (await transaction.paymentInfo(validationResponse.address)).partialFee.toString();
+        if (signerSubstrateMultisigAddress && !isSameAddress(signerSubstrateMultisigAddress, address)) { // todo: try splitting to a new function to estimateFeeForMultisigTransaction
+          await substrateApi.isReady;
+
+          const estimateExtrinsic = substrateApi.api.tx.proxy.proxy(address, null, transaction); // todo: apply multisig pallet
+
+          estimateFee.value = (await estimateExtrinsic.paymentInfo(signerSubstrateMultisigAddress)).partialFee.toString();
+        } else {
+          estimateFee.value = validationResponse.xcmFeeDryRun ?? (await transaction.paymentInfo(validationResponse.address)).partialFee.toString();
+        }
       } else if (isTonTransaction(transaction)) {
         estimateFee.value = transaction.estimateFee; // todo: might need to update logic estimate fee inside for future actions excluding normal transfer Ton and Jetton
       } else if (isCardanoTransaction(transaction)) {

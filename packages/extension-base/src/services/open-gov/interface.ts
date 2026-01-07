@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { BaseRequestSign } from '@subwallet/extension-base/types';
+
 export enum GovVoteType {
   AYE = 'aye',
   NAY = 'nay',
@@ -8,7 +10,7 @@ export enum GovVoteType {
   ABSTAIN = 'abstain',
 }
 
-interface BaseVoteRequest {
+interface BaseVoteRequest extends BaseRequestSign {
   chain: string;
   address: string;
   referendumIndex: string;
@@ -36,7 +38,7 @@ export interface SplitAbstainVoteRequest extends BaseVoteRequest {
 
 export type GovVoteRequest = StandardVoteRequest | SplitVoteRequest | SplitAbstainVoteRequest;
 
-export interface RemoveVoteRequest {
+export interface RemoveVoteRequest extends BaseRequestSign {
   address: string;
   chain: string;
   trackId: number;
@@ -159,7 +161,7 @@ export interface GovDelegationDetail {
 }
 
 // Unlock Vote
-export interface UnlockVoteRequest {
+export interface UnlockVoteRequest extends BaseRequestSign{
   address: string;
   chain: string;
   trackIds?: number[];

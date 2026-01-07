@@ -1,11 +1,15 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { MultisigAccountInfo } from '@subwallet/extension-base/types/multisig';
+
 import { TransactionFee } from '../fee';
 import { TransactionWarningType } from './warning';
 
 export type BaseRequestSign = {
   ignoreWarnings?: TransactionWarningType[];
+  signerSubstrateMultisigAddress?: string;
+  multisigAccountInfo?: MultisigAccountInfo; // todo: think to move this property to another place
 };
 export type InternalRequestSign<T> = T & BaseRequestSign;
 

@@ -2395,9 +2395,9 @@ export interface KoniRequestSignatures {
 
   // NFT functions
   'pri(evmNft.submitTransaction)': [NftTransactionRequest, SWTransactionResponse];
-  'pri(evmNft.getTransaction)': [NftTransactionRequest, EvmNftTransaction];
-  'pri(substrateNft.submitTransaction)': [NftTransactionRequest, SWTransactionResponse];
-  'pri(substrateNft.getTransaction)': [NftTransactionRequest, SubstrateNftTransaction];
+  'pri(evmNft.getTransaction)': [NftTransactionRequest, EvmNftTransaction]; // todo: remove
+  'pri(substrateNft.submitTransaction)': [RequestSubstrateNftSubmitTransaction, SWTransactionResponse];
+  'pri(substrateNft.getTransaction)': [NftTransactionRequest, SubstrateNftTransaction]; // todo: remove
   'pri(nft.getNft)': [null, NftJson];
   'pri(nft.getSubscription)': [RequestSubscribeNft, NftJson, NftJson];
   'pri(nftCollection.getNftCollection)': [null, NftCollectionJson];

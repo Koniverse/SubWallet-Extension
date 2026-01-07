@@ -11,7 +11,20 @@ import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTran
 import { sendMessage } from '../base';
 
 export async function makeTransfer (request: RequestSubmitTransfer): Promise<SWTransactionResponse> {
-  return sendMessage('pri(accounts.transfer)', request);
+  // todo: remove test code
+  const testRequest: RequestSubmitTransfer = {
+    from: '1627ti7gKnn5aTp7a7SUVsgnM9wE6BCNw6CgCzKiVeJz5DDA',
+    chain: 'paseoTest',
+    to: '165jGRG2KDbMJbdYpr8u5USoDUZCPNjPwtjFfU72mPqH59be',
+    tokenSlug: 'paseoTest-NATIVE-PAS',
+    value: '10000000000',
+    transferAll: false,
+    transferBounceable: false,
+    tokenPayFeeSlug: 'paseoTest-NATIVE-PAS',
+    signerSubstrateMultisigAddress: '1BzDB5n2rfSJwvuCW9deKY9XnUyys8Gy44SoX8tRNDCFBhx'
+  };
+
+  return sendMessage('pri(accounts.transfer)', testRequest);
 }
 
 export async function makeBitcoinDappTransferConfirmation (request: RequestSubmitTransferWithId): Promise<SWTransactionResponse> {
