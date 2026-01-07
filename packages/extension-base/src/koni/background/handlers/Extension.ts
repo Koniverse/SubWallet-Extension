@@ -41,7 +41,7 @@ import { _isAcrossChainBridge, AcrossQuote, getAcrossQuote } from '@subwallet/ex
 import { getClaimTxOnAvail, getClaimTxOnEthereum, isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge, getClaimPolygonBridge, isClaimedPolygonBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, getClaimPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { estimateXcmFee, isSubstrateCrossChain } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _NetworkUpsertParams, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _isAssetSmartContractNft, _isChainBitcoinCompatible, _isChainCompatibleLedgerEvm, _isChainEnabled, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isNativeTokenBySlug, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByBitcoin, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
@@ -1708,12 +1708,17 @@ export default class KoniExtension {
     const isPosBridgeTransfer = _isPosChainBridge(originNetworkKey, destinationNetworkKey);
     const isAcrossBridgeTransfer = _isAcrossChainBridge(originNetworkKey, destinationNetworkKey);
     const extrinsicType = ExtrinsicType.TRANSFER_XCM;
-    const isSubstrateXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer);
+    const isSubstrateXcm = isSubstrateCrossChain(chainInfoMap[originNetworkKey], chainInfoMap[destinationNetworkKey]);
 
     const isTransferNative = this.#koniState.getNativeTokenInfo(originNetworkKey).slug === tokenSlug;
     const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNative && tokenSlug === tokenPayFeeSlug;
 
     let xcmFeeDryRun: string | undefined;
+    const xcmDestinationFee: AmountData = {
+      symbol: destinationTokenInfo?.symbol || '',
+      decimals: destinationTokenInfo?.decimals || 0,
+      value: '0'
+    };
 
     let additionalValidator: undefined | ((inputTransaction: SWTransactionResponse) => Promise<void>);
     let eventsHandler: undefined | ((eventEmitter: TransactionEmitter) => void);
@@ -1774,7 +1779,10 @@ export default class KoniExtension {
           value: params.sendingValue
         });
 
+        // todo: refactor name
+        // todo: check to use full interface to has full AmountData, include symbol, decimal
         xcmFeeDryRun = xcmFeeInfo?.origin.fee || '0';
+        xcmDestinationFee.value = xcmFeeInfo?.destination.fee || '0';
       }
 
       if (isAcrossBridgeTransfer) {
@@ -1913,6 +1921,7 @@ export default class KoniExtension {
       isTransferLocalTokenAndPayThatTokenAsFee,
       isPassConfirmation,
       xcmFeeDryRun,
+      xcmDestinationFee,
       errors,
       additionalValidator: additionalValidator,
       eventsHandler: eventsHandler

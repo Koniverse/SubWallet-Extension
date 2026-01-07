@@ -494,8 +494,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     }
   }, [currentAccountProxyid, currentAccountProxy?.id, inactiveModal]);
 
-  const { accountAddressItems, chainItems, selectedAddress, selectedChain, setSelectedAddress,
-    setSelectedChain } = useHistorySelection();
+  const { accountAddressItems, chainItems, selectedAddress, selectedChain, setSelectedAddress, setSelectedChain } = useHistorySelection();
 
   const emptyList = useCallback(() => {
     return (

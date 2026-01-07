@@ -192,6 +192,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const [isFetchingListFeeToken, setIsFetchingListFeeToken] = useState(false);
   const chainStatus = useMemo(() => chainStatusMap[chainValue]?.connectionStatus, [chainValue, chainStatusMap]);
   const estimatedNativeFee = useMemo((): string => transferInfo?.feeOptions.estimatedFee || '0', [transferInfo]);
+  const crossChainFee = useMemo(() => transferInfo?.feeOptions?.crossChainFee || '0', [transferInfo]);
 
   const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
 
@@ -1144,6 +1145,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         {FEE_SHOW_TYPES.includes(transferInfo?.feeType) && !!toValue && !!transferAmountValue && nativeTokenSlug && (
           <FeeEditor
             chainValue={chainValue}
+            crossChainFee={crossChainFee}
             currentTokenPayFee={currentTokenPayFee}
             destChainValue={destChainValue}
             estimateFee={estimatedNativeFee}
@@ -1266,7 +1268,7 @@ const SendFund = styled(Wrapper)(({ theme }) => {
     },
 
     '.__warning_message_cross_chain': {
-      marginTop: token.marginXS
+      marginTop: token.marginSM
     },
 
     '.free-balance-block': {
