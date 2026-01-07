@@ -1,12 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
 import { GENERAL_TERM_AND_CONDITION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Checkbox, Icon, ModalContext, SwModal, Typography } from '@subwallet/react-ui';
 import { CheckboxChangeEvent } from '@subwallet/react-ui/es/checkbox';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import CN from 'classnames';
 import { ArrowCircleRight, CaretDown } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
@@ -33,7 +33,7 @@ const Component = ({ className, onOk }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchStaticData<string>('term-and-condition', 'index.md', false)
+    subwalletApiSdk.staticContentApi.fetchTermAndCondition()
       .then((md) => setStaticData({ md }))
       .catch((e) => console.log('fetch _termAndCondition error:', e));
   }, []);

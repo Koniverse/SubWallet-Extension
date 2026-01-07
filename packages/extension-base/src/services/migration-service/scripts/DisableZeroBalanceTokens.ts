@@ -1,10 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AssetSetting, TokenPriorityDetails } from '@subwallet/extension-base/background/KoniTypes';
+import { AssetSetting } from '@subwallet/extension-base/background/KoniTypes';
 import { _isAssetAutoEnable } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseMigrationJob from '@subwallet/extension-base/services/migration-service/Base';
-import { fetchStaticData } from '@subwallet/extension-base/utils';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 // Usage:
 // 1. Disable tokens with a balance of 0
 // 2. Exclude tokens that belong to the popular list
@@ -29,10 +29,7 @@ export default class DisableZeroBalanceTokens extends BaseMigrationJob {
         return (BigInt(item.free) + BigInt(item.locked) > 0);
       });
 
-      const priorityTokensMap = await fetchStaticData<TokenPriorityDetails>('chain-assets/priority-tokens') || {
-        tokenGroup: {},
-        token: {}
-      };
+      const priorityTokensMap = await subwalletApiSdk.staticContentApi.fetchLatestPriorityTokens();
 
       const priorityTokensList = priorityTokensMap.token && typeof priorityTokensMap.token === 'object'
         ? Object.keys(priorityTokensMap.token)

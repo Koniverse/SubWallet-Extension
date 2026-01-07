@@ -1,9 +1,9 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { BrowserConfirmationType, CurrencyJson, CurrencyType, LanguageType, ThemeNames } from '@subwallet/extension-base/background/KoniTypes';
+import { BrowserConfirmationType, CurrencyType, LanguageType, ThemeNames } from '@subwallet/extension-base/background/KoniTypes';
+import { CURRENCY_SYMBOL_RECORD } from '@subwallet/extension-base/constants';
 import { ENABLE_LANGUAGES, languageOptions } from '@subwallet/extension-base/constants/i18n';
-import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
 import { GeneralEmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
@@ -34,6 +34,7 @@ type SelectionItemType = {
 };
 
 const renderEmpty = () => <GeneralEmptyList />;
+const staticDataCurrencySymbol = CURRENCY_SYMBOL_RECORD;
 
 function renderSelectionItem (item: SelectionItemType, _selected: boolean) {
   const getURLSymbol = (() => {
@@ -182,11 +183,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     }));
   }, [token]);
 
-  // TODO: 'after will be update data online or refactor this function'
-  const staticDataCurrencySymbol = useMemo<Record<string, CurrencyJson> | undefined>(() => {
-    return staticData[StaticKey.CURRENCY_SYMBOL] as Record<string, CurrencyJson>;
-  }, []);
-
   const currencyItems = useMemo<SelectionItemType[]>(() => {
     return staticDataCurrencySymbol
       ? Object.keys(staticDataCurrencySymbol).map((item) => ({
@@ -197,7 +193,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subTitle: staticDataCurrencySymbol[item].symbol
       }))
       : [];
-  }, [staticDataCurrencySymbol, token]);
+  }, [token]);
 
   const browserConfirmationItems = useMemo<SelectionItemType[]>(() => {
     return [

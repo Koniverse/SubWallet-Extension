@@ -428,7 +428,6 @@ export * from './environment';
 export * from './eth';
 export * from './fee';
 export * from './fetchEvmChainInfo';
-export * from './fetchStaticData';
 export * from './gear';
 export * from './lazy';
 export * from './metadata';

@@ -1,11 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
+import { ChainRecommendValidator } from '@subwallet-monorepos/subwallet-services-sdk/services';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { YieldPoolType } from '@subwallet/extension-base/types';
-import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { BaseModal, SelectValidatorInput, StakingValidatorItem } from '@subwallet/extension-web-ui/components';
 import EmptyValidator from '@subwallet/extension-web-ui/components/Account/EmptyValidator';
 import { BasicInputWrapper } from '@subwallet/extension-web-ui/components/Field/Base';
@@ -24,6 +24,7 @@ import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending } from 'phospho
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import subwalletApiSdk from "@subwallet-monorepos/subwallet-services-sdk";
 
 interface Props extends ThemeProps, BasicInputWrapper {
   chain: string;
@@ -315,7 +316,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [activeModal, id]);
 
   useEffect(() => {
-    fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningPoolRecommendation) => {
+    subwalletApiSdk.staticContentApi.fetchValidatorRecommendations().then((earningPoolRecommendation) => {
       setDefaultPoolMap(earningPoolRecommendation);
     }).catch(console.error);
   }, []);

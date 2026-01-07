@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { ListBuyServicesResponse, ListBuyTokenResponse } from '@subwallet/extension-base/services/buy-service/types';
 import { AccountChainType, BuyServiceInfo, BuyTokenInfo, OnrampAccountSupportType, SupportService } from '@subwallet/extension-base/types';
-import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { BehaviorSubject } from 'rxjs';
 
 import { DEFAULT_SERVICE_INFO } from './constants';
@@ -52,7 +51,7 @@ export default class BuyService {
   }
 
   private async fetchTokens () {
-    const data = await fetchStaticData<ListBuyTokenResponse>('buy-token-configs');
+    const data = await subwalletApiSdk.staticContentApi.fetchListBuyToken();
 
     const result: Record<string, BuyTokenInfo> = {};
 
@@ -100,7 +99,7 @@ export default class BuyService {
   }
 
   private async fetchServices () {
-    const data = await fetchStaticData<ListBuyServicesResponse>('buy-service-infos');
+    const data = await subwalletApiSdk.staticContentApi.fetchBuyServices();
 
     const result: Record<string, BuyServiceInfo> = {};
 

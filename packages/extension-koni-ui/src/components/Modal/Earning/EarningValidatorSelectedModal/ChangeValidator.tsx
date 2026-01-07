@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
-import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { NominationInfo, SubmitChangeValidatorStaking, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
-import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
@@ -21,6 +20,8 @@ import { Theme, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Badge, Button, Icon, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
+import { ChainRecommendValidator } from '@subwallet-monorepos/subwallet-services-sdk/services';
 import BigN from 'bignumber.js';
 import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending, ThumbsUp } from 'phosphor-react';
 import React, { forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -425,7 +426,7 @@ const Component = (props: Props) => {
   }, [onCancelSelectValidator, onCancel]);
 
   useEffect(() => {
-    fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningValidatorRecommendation) => {
+    subwalletApiSdk.staticContentApi.fetchValidatorRecommendations().then((earningValidatorRecommendation) => {
       setDefaultValidatorMap(earningValidatorRecommendation);
     }).catch(console.error);
   }, []);

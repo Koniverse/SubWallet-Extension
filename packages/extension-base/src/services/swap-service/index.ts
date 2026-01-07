@@ -4,7 +4,7 @@
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { fetchBlockedConfigObjects, fetchLatestBlockedActionsAndFeatures, getPassConfigId } from '@subwallet/extension-base/constants';
+import { getPassConfigId } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
@@ -432,11 +432,11 @@ export class SwapService implements StoppableServiceInterface {
       return [];
     }
 
-    const blockedConfigObjects = await fetchBlockedConfigObjects();
+    const blockedConfigObjects = await subwalletApiSdk.staticContentApi.fetchBlockedConfigObjects();
     const currentConfig = this.state.settingService.getEnvironmentSetting();
 
     const passBlockedConfigId = getPassConfigId(currentConfig, blockedConfigObjects);
-    const blockedActionsFeaturesMaps = await fetchLatestBlockedActionsAndFeatures(passBlockedConfigId);
+    const blockedActionsFeaturesMaps = await subwalletApiSdk.staticContentApi.fetchLatestBlockedActionsAndFeatures(passBlockedConfigId);
 
     const originSwapPairInfo = getTokenPairFromStep(params.process.steps);
 

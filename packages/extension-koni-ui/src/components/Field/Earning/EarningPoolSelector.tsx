@@ -3,7 +3,6 @@
 
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { YieldPoolType } from '@subwallet/extension-base/types';
-import { fetchStaticData } from '@subwallet/extension-base/utils';
 import { StakingPoolItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
 import { Avatar } from '@subwallet/extension-koni-ui/components/Avatar';
@@ -15,6 +14,7 @@ import { SortingModal } from '@subwallet/extension-koni-ui/components/Modal/Sort
 import { useFilterModal, useGetPoolTargetList, useSelector, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { NominationPoolDataType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ActivityIndicator, Badge, Button, Icon, InputRef, ModalContext, SelectModal, Tooltip, useExcludeModal } from '@subwallet/react-ui';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 import { Book, CaretLeft, FadersHorizontal, SortAscending, ThumbsUp } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -371,7 +371,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [inactiveModal]);
 
   useEffect(() => {
-    fetchStaticData<Record<string, number[]>>('nomination-pool-recommendation').then((earningPoolRecommendation) => {
+    subwalletApiSdk.staticContentApi.fetchNominationPoolRecommendations().then((earningPoolRecommendation) => {
       setDefaultPoolMap(earningPoolRecommendation);
     }).catch(console.error);
   }, []);

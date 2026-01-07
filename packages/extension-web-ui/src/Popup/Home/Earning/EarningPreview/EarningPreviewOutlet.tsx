@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { YieldPoolInfo } from '@subwallet/extension-base/types';
-import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { LoadingScreen } from '@subwallet/extension-web-ui/components';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import React, { useContext, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
+import subwalletApiSdk from "@subwallet-monorepos/subwallet-services-sdk";
 
 type Props = ThemeProps & {
 //
@@ -22,9 +22,9 @@ function Component ({ className }: Props) {
   useEffect(() => {
     let isSync = true;
 
-    fetchStaticCache<{data: Record<string, YieldPoolInfo>}>('earning/yield-pools.json', { data: {} }).then((rs) => {
+    subwalletApiSdk.staticDataCacheApi.fetchPoolsData<YieldPoolInfo>().then((rs) => {
       if (isSync) {
-        setPoolInfoMap(rs.data);
+        setPoolInfoMap(rs);
       }
     }).catch((e) => {
       console.log('Error when fetching yield-pools.json', e);

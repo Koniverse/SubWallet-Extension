@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
-import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/paraspell-chain-map';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService } from '@subwallet/extension-base/utils';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigNumber from 'bignumber.js';
 
 import { ApiPromise } from '@polkadot/api';
@@ -159,7 +159,7 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
     throw new Error('Token is not support XCM at this time');
   }
 
-  const paraSpellChainMap = await fetchParaSpellChainMap();
+  const paraSpellChainMap = await subwalletApiSdk.staticContentApi.fetchParaSpellChainMap();
 
   const bodyData = {
     senderAddress: sender,
@@ -199,7 +199,7 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
 
 export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
-  const paraSpellChainMap = await fetchParaSpellChainMap();
+  const paraSpellChainMap = await subwalletApiSdk.staticContentApi.fetchParaSpellChainMap();
   const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
 
   if (!paraSpellIdentifyV4) {
@@ -246,7 +246,7 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
 
 export async function dryRunPreviewXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
-  const paraSpellChainMap = await fetchParaSpellChainMap();
+  const paraSpellChainMap = await subwalletApiSdk.staticContentApi.fetchParaSpellChainMap();
   const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
 
   if (!paraSpellIdentifyV4) {
@@ -294,7 +294,7 @@ export async function dryRunPreviewXcm (request: CreateXcmExtrinsicProps) {
 
 export async function estimateXcmFee (request: GetXcmFeeRequest) {
   const { fromChainInfo, fromTokenInfo, recipient, sender, toChainInfo, value } = request;
-  const paraSpellChainMap = await fetchParaSpellChainMap();
+  const paraSpellChainMap = await subwalletApiSdk.staticContentApi.fetchParaSpellChainMap();
   const paraSpellIdentifyV4 = fromTokenInfo.metadata?.paraSpellIdentifyV4;
   const requestValue = BigNumber(value).gt(0) ? value : '1'; // avoid bug in-case estimate fee sendingValue <= 0;
 

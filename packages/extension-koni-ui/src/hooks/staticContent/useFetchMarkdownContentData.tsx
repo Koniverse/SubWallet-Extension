@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LanguageType } from '@subwallet/extension-base/background/KoniTypes';
-import { fetchStaticData } from '@subwallet/extension-base/utils';
 import { isProductionMode } from '@subwallet/extension-koni-ui/constants';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -20,7 +20,7 @@ const useFetchMarkdownContentData = () => {
   return useCallback(<T = unknown>(folder: string, supportedLanguages: LanguageType[], fallbackLanguage: LanguageType = 'en') => {
     const jsonFile = getJsonFile(supportedLanguages, fallbackLanguage);
 
-    return fetchStaticData<T>(`markdown-contents/${folder}`, jsonFile, true);
+    return subwalletApiSdk.staticContentApi.fetchMarkdownContent<T>(folder, jsonFile);
   }, [getJsonFile]);
 };
 

@@ -13,6 +13,10 @@ import { RouterProvider } from 'react-router-dom';
 import LoadingScreen from '../components/LoadingScreen';
 import { ScreenContextProvider } from '../contexts/ScreenContext';
 import { router } from './router';
+import { setupApiSDK } from "@subwallet/extension-base/utils";
+
+// Setup API SDK before app init
+setupApiSDK();
 
 export default function Popup (): React.ReactElement {
   return (

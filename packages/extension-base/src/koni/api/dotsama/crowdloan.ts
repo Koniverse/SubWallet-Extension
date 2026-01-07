@@ -8,7 +8,7 @@ import { ACALA_REFRESH_CROWDLOAN_INTERVAL } from '@subwallet/extension-base/cons
 import registry from '@subwallet/extension-base/koni/api/dotsama/typeRegistry';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { fetchJson, getAddressesByChainType, reformatAddress } from '@subwallet/extension-base/utils';
-import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 
 import { DeriveOwnContributions } from '@polkadot/api-derive/types';
 import { BN } from '@polkadot/util';
@@ -35,13 +35,6 @@ function getChainInfoMap (chainInfoList: _ChainInfo[]): Record<string, _ChainInf
 
   return result;
 }
-
-const getOnlineFundList = fetchStaticData<CrowdloanFundInfo[]>('crowdloan-funds');
-const getOnlineChainInfoMap = (async () => {
-  const chainInfoList = await fetchStaticData<_ChainInfo[]>('chains');
-
-  return getChainInfoMap(chainInfoList);
-})();
 
 function getRPCCrowdloan (parentAPI: _SubstrateApi, fundInfo: _CrowdloanFund, hexAddresses: string[], callback: (rs: CrowdloanItem) => void) {
   const { auctionIndex, endTime, firstPeriod, fundId, lastPeriod, paraId, startTime, status } = fundInfo;
@@ -163,8 +156,12 @@ function isNeedToUpdateLatestFundInfoMap (latestMap: Record<string, CrowdloanFun
 export async function subscribeCrowdloan (addresses: string[], substrateApiMap: Record<string, _SubstrateApi>, callback: (networkKey: string, rs: CrowdloanItem) => void) {
   const unsubMap: Record<string, any> = {};
   const latestMap: Record<string, CrowdloanFundInfo> = {};
-  const rawFundList = await getOnlineFundList;
-  const chainInfoMap = await getOnlineChainInfoMap;
+  const rawFundList = await subwalletApiSdk.staticContentApi.fetchCrowdloanFundList();
+  const chainInfoMap = await (async () => {
+    const chainInfoList = await subwalletApiSdk.staticContentApi.fetchLatestChainData();
+
+    return getChainInfoMap(chainInfoList);
+  })();
 
   rawFundList.forEach((fundInfo) => {
     const chainSlug = fundInfo.chain;
