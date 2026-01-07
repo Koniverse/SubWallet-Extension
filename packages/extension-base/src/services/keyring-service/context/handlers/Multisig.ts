@@ -3,6 +3,8 @@
 
 import { AccountMultisigError, AccountMultisigErrorCode, RequestAccountCreateMultisig } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountBaseHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Base';
+import { AccountChainType } from '@subwallet/extension-base/types';
+import { RequestGetSignableProxyIds, ResponseGetSignableProxyIds } from '@subwallet/extension-base/types/multisig';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { encodeAddress } from '@subwallet/keyring';
 import { KeyringPair$Meta } from '@subwallet/keyring/types';
@@ -18,9 +20,16 @@ import { createKeyMulti } from '@polkadot/util-crypto';
  * */
 export class AccountMultisigHandler extends AccountBaseHandler {
   public async accountsCreateMultisig (request: RequestAccountCreateMultisig): Promise<AccountMultisigError[]> {
-    const { name, signers, threshold } = request;
+    const { name, signers: _signer, threshold } = request;
 
-    const multisigKey = createKeyMulti(signers, threshold);
+    // todo: validate invalid _signer address
+    // todo: validate invalid threshold (<2 or >signers.length)
+    // todo: validate duplicate signers
+    // todo: validate invalid signers array, must has at least 2 signers
+
+    const signers = _signer.map((address) => reformatAddress(address));
+
+    const multisigKey = createKeyMulti(signers, threshold); // todo: recheck if createKeyMulti ensure exact signers order
     const multisigAddress = encodeAddress(multisigKey);
 
     try {
@@ -69,5 +78,33 @@ export class AccountMultisigHandler extends AccountBaseHandler {
     } catch (e) {
       return [{ code: AccountMultisigErrorCode.KEYRING_ERROR, message: (e as Error).message }];
     }
+  }
+
+  public getSignableProxyIds (request: RequestGetSignableProxyIds): ResponseGetSignableProxyIds {
+    const { extrinsicType, multisigProxyId } = request;
+
+    const allMultisigAccounts = this.state.getMultisigAccounts();
+    const allAccounts = this.state.accounts;
+    const targetMultisigAccount = allMultisigAccounts.find((acc) => acc.id === multisigProxyId);
+    const signers = targetMultisigAccount?.accounts[0]?.signers as string[];
+    const signableProxyIds: string[] = [];
+
+    if (!signers) {
+      return { signableProxyIds };
+    }
+
+    for (const signer of signers) {
+      const proxyId = this.state.belongUnifiedAccount(signer) || reformatAddress(signer);
+      const accountProxy = allAccounts[proxyId]; // todo: recheck with case the signatory account is unified account
+      const substrateAccount = accountProxy?.accounts.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
+
+      if (substrateAccount) {
+        if (substrateAccount.transactionActions.includes(extrinsicType)) {
+          signableProxyIds.push(proxyId);
+        }
+      }
+    }
+
+    return { signableProxyIds };
   }
 }

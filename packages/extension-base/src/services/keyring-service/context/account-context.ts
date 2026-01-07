@@ -7,6 +7,7 @@ import { KeyringService } from '@subwallet/extension-base/services/keyring-servi
 import { AccountMigrationHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Migration';
 import { AccountMultisigHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Multisig';
 import { AccountProxyMap, CurrentAccountInfo, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestAccountProxyEdit, RequestAccountProxyForget, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestChangeTonWalletContractVersion, RequestCheckPublicAndSecretKey, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseJsonGetAccountInfo, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2 } from '@subwallet/extension-base/types';
+import { RequestGetSignableProxyIds, ResponseGetSignableProxyIds } from '@subwallet/extension-base/types/multisig';
 import { InjectedAccountWithMeta } from '@subwallet/extension-inject/types';
 import { SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 
@@ -171,6 +172,10 @@ export class AccountContext {
   /* Multisig */
   public async accountsCreateMultisig (request: RequestAccountCreateMultisig): Promise<AccountMultisigError[]> {
     return this.multisigHandler.accountsCreateMultisig(request);
+  }
+
+  public getSignableProxyIds (request: RequestGetSignableProxyIds): ResponseGetSignableProxyIds {
+    return this.multisigHandler.getSignableProxyIds(request);
   }
 
   /* Import ethereum account with the private key  */
