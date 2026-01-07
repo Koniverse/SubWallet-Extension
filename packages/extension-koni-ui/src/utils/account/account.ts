@@ -330,7 +330,3 @@ export const getBitcoinKeypairAttributes = (keyPairType: KeypairType): { label: 
       return { label: '', schema: '' };
   }
 };
-
-export const isSignerDifferentFromSender = (transactionAddress: string, signerProxyAddress: string): boolean => {
-  return signerProxyAddress !== transactionAddress;
-};

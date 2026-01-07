@@ -2465,8 +2465,6 @@
   "ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumSplitVote.availableBalance": "Available balance",
   "ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumStandardVote.availableBalance": "Available balance",
   "ui.TRANSACTION.screen.Transaction.GovUnlockVote.address": "Address",
-  "ui.TRANSACTION.Confirmations.GovUnlock.address": "Address",
-  "ui.TRANSACTION.Confirmations.GovVote.address": "Address",
   "ui.TRANSACTION.screen.Transaction.GovUnlockVote.amount": "Amount",
   "ui.TRANSACTION.screen.Transaction.ReferendumVote.ReferendumStandardVote.amount": "Amount",
   "ui.TRANSACTION.screen.Transaction.GovUnlockVote.referendaVoted": "Referenda voted",

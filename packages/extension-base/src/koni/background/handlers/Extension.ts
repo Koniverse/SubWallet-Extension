@@ -2557,7 +2557,8 @@ export default class KoniExtension {
         feeOptions: feeOptions as FeeDetail,
         feeType,
         error,
-        id
+        id,
+        maxTransferableWithoutFee: freeBalance.value
       };
     };
 
