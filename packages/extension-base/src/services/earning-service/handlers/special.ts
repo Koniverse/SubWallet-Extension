@@ -268,7 +268,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
 
     const bnInputTokenBalance = new BigN(inputTokenBalance.value);
 
-    if (!bnInputTokenBalance.gte(bnStakeAmount)) {
+    if (amount && !bnInputTokenBalance.gte(bnStakeAmount)) {
       if (this.altInputAsset) {
         const altInputTokenSlug = this.altInputAsset;
         const altInputTokenInfo = this.state.getAssetBySlug(altInputTokenSlug);
