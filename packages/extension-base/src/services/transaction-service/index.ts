@@ -153,7 +153,7 @@ export default class TransactionService {
     const priceMap = (await this.state.priceService.getPrice()).priceMap;
 
     if (!transactionInput.skipFeeRecalculation) {
-      validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee, transactionInput.signerSubstrateMultisigAddress);
+      validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee, transactionInput.signerSubstrateMultisigAddress, transactionInput.multisigAccountInfo);
     }
 
     const chainInfoMap = this.state.chainService.getChainInfoMap();

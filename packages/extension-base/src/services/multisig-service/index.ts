@@ -351,7 +351,7 @@ export class MultisigService implements StoppableServiceInterface {
 
         for (const account of multisigAccounts) {
           const multisigAddress = account.id;
-          const signers = account.accounts[0].signers as string[]; // todo: use function to query these data
+          const signers = account.accounts[0].signers as string[];
           const reformatMultisigAddress = _reformatAddressWithChain(multisigAddress, chainInfo);
           const reformatSigners = signers.map((s) => _reformatAddressWithChain(s, chainInfo));
           const threshold = account.accounts[0].threshold as number;

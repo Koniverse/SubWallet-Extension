@@ -14,16 +14,19 @@ import { _TRANSFER_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-
 import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getTokenMinAmount, _isCIP26Token, _isNativeToken, _isNativeTokenBySlug, _isTokenEvmSmartContract, _isTokenTonSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
+import { createMultisigExtrinsic } from '@subwallet/extension-base/services/multisig-service/utils';
 import { isBitcoinTransaction, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { OptionalSWTransaction, SWTransactionInput, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountSignMode, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeInfo, BitcoinFeeRate, EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransferTxErrorType } from '@subwallet/extension-base/types';
-import { balanceFormatter, combineBitcoinFee, combineEthFee, formatNumber, getSizeInfo, isSameAddress, pairToAccount } from '@subwallet/extension-base/utils';
+import { MultisigAccountInfo } from '@subwallet/extension-base/types/multisig';
+import { _reformatAddressWithChain, balanceFormatter, combineBitcoinFee, combineEthFee, formatNumber, getSizeInfo, isSameAddress, pairToAccount } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
+import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 // normal transfer
@@ -355,7 +358,7 @@ export function checkSupportForTransaction (validationResponse: SWTransactionRes
   }
 }
 
-export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, priceMap: Record<string, number>, feeInfo: FeeInfo, nativeTokenInfo: _ChainAsset, nonNativeTokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined, signerSubstrateMultisigAddress?: string): Promise<FeeData> {
+export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, priceMap: Record<string, number>, feeInfo: FeeInfo, nativeTokenInfo: _ChainAsset, nonNativeTokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined, signerSubstrateMultisigAddress?: string, multisigAccountInfo?: MultisigAccountInfo): Promise<FeeData> {
   const estimateFee: FeeData = {
     symbol: '',
     decimals: 0,
@@ -371,10 +374,18 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
   if (transaction) {
     try {
       if (isSubstrateTransaction(transaction)) {
-        if (signerSubstrateMultisigAddress && !isSameAddress(signerSubstrateMultisigAddress, address)) { // todo: try splitting to a new function to estimateFeeForMultisigTransaction
+        if (signerSubstrateMultisigAddress && !isSameAddress(signerSubstrateMultisigAddress, address) && multisigAccountInfo) { // todo: try splitting to a new function to estimateFeeForMultisigTransaction
           await substrateApi.isReady;
 
-          const estimateExtrinsic = substrateApi.api.tx.proxy.proxy(address, null, transaction); // todo: apply multisig pallet
+          const { signers, threshold } = multisigAccountInfo;
+
+          const estimateExtrinsic = createMultisigExtrinsic(
+            substrateApi.api,
+            threshold,
+            signers.map((s) => _reformatAddressWithChain(s, chainInfo)),
+            _reformatAddressWithChain(signerSubstrateMultisigAddress, chainInfo),
+            transaction as SubmittableExtrinsic<'promise'>
+          );
 
           estimateFee.value = (await estimateExtrinsic.paymentInfo(signerSubstrateMultisigAddress)).partialFee.toString();
         } else {
