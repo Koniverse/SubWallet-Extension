@@ -3,9 +3,9 @@
 
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { SubmitYieldStepData } from '@subwallet/extension-base/types';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 import { CommonTransactionInfo, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { isSignerDifferentFromSender } from '@subwallet/extension-koni-ui/utils';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -68,7 +68,7 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        {!!transaction.signerSubstrateProxyAddress && isSignerDifferentFromSender(transaction.address, transaction.signerSubstrateProxyAddress) &&
+        {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
           <MetaInfo.Account
             address={transaction.signerSubstrateProxyAddress}
             chainSlug={transaction.chain}

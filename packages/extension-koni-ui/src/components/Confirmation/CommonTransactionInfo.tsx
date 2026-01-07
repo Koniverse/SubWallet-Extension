@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { reformatAddress } from '@subwallet/extension-base/utils';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useGetChainPrefixBySlug } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -22,11 +23,12 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const account = useGetAccountByAddress(address);
   const networkPrefix = useGetChainPrefixBySlug(network);
+  const displayAddress = reformatAddress(account?.address || address, networkPrefix);
 
   const innerContent = (
     <>
       <MetaInfo.Account
-        address={address}
+        address={displayAddress}
         chainSlug={network}
         label={t('ui.components.Confirmation.CommonTransactionInfo.account')}
         name={account?.name}

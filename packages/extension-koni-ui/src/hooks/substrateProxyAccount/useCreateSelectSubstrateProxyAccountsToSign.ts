@@ -38,6 +38,11 @@ type GetSubstrateProxyAccountsToSign = (params: SelectSubstrateProxyAccountsToSi
  * - Not supported for:
  *   1. **dApps** — Substrate extrinsics vary by pallet/method, often nested and chain-dependent, making reliable parsing unsafe.
  *   2. **Liquid staking** and **Swap** — These features involve multi-step transactions and require the original account to sign directly.
+ *
+ * ⚠️ Suggested approach:
+ * Store selected proxy address in a higher-level state
+ * Pass the stored proxy address back into the selector modal when opening it again
+ * This ensures better UX and avoids forcing users to re-select the same proxy account after back from confirmation screen.
  */
 
 export function useCreateSelectSubstrateProxyAccountsToSign (): SelectSubstrateProxyAccountsToSign {

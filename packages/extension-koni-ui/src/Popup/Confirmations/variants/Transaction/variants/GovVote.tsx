@@ -4,13 +4,13 @@
 import { GovVoteRequest, GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { getGovConvictionOptions } from '@subwallet/extension-base/services/open-gov/utils';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 import { MetaInfo, NumberDisplay, PageWrapper, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
-import { isSignerDifferentFromSender, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import BigNumber from 'bignumber.js';
 import CN from 'classnames';
@@ -34,7 +34,6 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
   const currency = useSelector((state: RootState) => state.price.currencyData);
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
-  const shortAddress = toShort(transaction.address);
 
   const totalAmount = useMemo(() => {
     switch (data.type) {
@@ -152,12 +151,6 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           chainSlug={transaction.chain}
           label={t('ui.TRANSACTION.Confirmations.GovVote.account')}
         />
-        <MetaInfo.Default
-          className={'__address-field'}
-          label={t('ui.TRANSACTION.Confirmations.GovVote.address')}
-        >
-          {shortAddress}
-        </MetaInfo.Default>
 
         <MetaInfo.Number
           decimals={decimals}
@@ -171,7 +164,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         className={'__meta-info'}
         hasBackgroundWrapper
       >
-        {!!transaction.signerSubstrateProxyAddress && isSignerDifferentFromSender(transaction.address, transaction.signerSubstrateProxyAddress) &&
+        {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
           <MetaInfo.Account
             address={transaction.signerSubstrateProxyAddress}
             chainSlug={transaction.chain}

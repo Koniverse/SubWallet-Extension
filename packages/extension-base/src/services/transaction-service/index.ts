@@ -20,7 +20,7 @@ import { OptionalSWTransaction, SWDutchTransaction, SWDutchTransactionInput, SWP
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitBittensorChangeValidatorStaking, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
-import { anyNumberToBN, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
+import { anyNumberToBN, isSameAddress, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
 import { mergeTransactionAndSignature } from '@subwallet/extension-base/utils/eth/mergeTransactionAndSignature';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -152,19 +152,19 @@ export default class TransactionService {
     const nonNativeTokenPayFeeInfo = isNonNativeTokenPayFee ? this.state.chainService.getAssetBySlug(tokenPayFeeSlug) : undefined;
     const priceMap = (await this.state.priceService.getPrice()).priceMap;
 
-    if (!transactionInput.skipFeeRecalculation) {
-      validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee);
-    }
-
-    const chainInfoMap = this.state.chainService.getChainInfoMap();
-
     // Get signer account
     let signer = address;
     const signerSubstrateProxyAddress = transactionInput.signerSubstrateProxyAddress;
 
+    if (!transactionInput.skipFeeRecalculation) {
+      validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee, signerSubstrateProxyAddress);
+    }
+
+    const chainInfoMap = this.state.chainService.getChainInfoMap();
+
     let substrateProxyAccountNativeTokenAvailable: AmountData | undefined;
 
-    if (signerSubstrateProxyAddress && signerSubstrateProxyAddress !== address) {
+    if (signerSubstrateProxyAddress && !isSameAddress(signerSubstrateProxyAddress, address)) {
       signer = signerSubstrateProxyAddress;
       substrateProxyAccountNativeTokenAvailable = await this.state.balanceService.getTransferableBalance(signerSubstrateProxyAddress, chain, nativeTokenInfo.slug, extrinsicType);
     }

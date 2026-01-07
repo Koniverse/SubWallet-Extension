@@ -3,12 +3,12 @@
 
 import { UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 import { MetaInfo, NumberDisplay, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { isSignerDifferentFromSender, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Number } from '@subwallet/react-ui';
 import BigNumber from 'bignumber.js';
 import CN from 'classnames';
@@ -28,7 +28,6 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
   const { t } = useTranslation();
   const currency = useSelector((state: RootState) => state.price.currencyData);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
-  const shortAddress = toShort(transaction.address);
 
   const govConfirmationInfo = useGetGovVoteConfirmationInfo({
     address: transaction.address,
@@ -75,12 +74,6 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           chainSlug={transaction.chain}
           label={t('ui.TRANSACTION.Confirmations.GovUnlock.account')}
         />
-        <MetaInfo.Default
-          className={'__address-field'}
-          label={t('ui.TRANSACTION.Confirmations.GovUnlock.address')}
-        >
-          {shortAddress}
-        </MetaInfo.Default>
 
         <MetaInfo.Number
           decimals={decimals}
@@ -93,7 +86,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         className={'__meta-info'}
         hasBackgroundWrapper
       >
-        {!!transaction.signerSubstrateProxyAddress && isSignerDifferentFromSender(transaction.address, transaction.signerSubstrateProxyAddress) &&
+        {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
           <MetaInfo.Account
             address={transaction.signerSubstrateProxyAddress}
             chainSlug={transaction.chain}

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SubmitBittensorChangeValidatorStaking, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
@@ -9,7 +10,7 @@ import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/componen
 import { EARNING_SELECTED_VALIDATOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useSelector, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
-import { isSignerDifferentFromSender, toShort } from '@subwallet/extension-koni-ui/utils';
+import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -200,7 +201,7 @@ const Component: React.FC<Props> = (props: Props) => {
           className={'meta-info'}
           hasBackgroundWrapper
         >
-          {!!transaction.signerSubstrateProxyAddress && isSignerDifferentFromSender(transaction.address, transaction.signerSubstrateProxyAddress) &&
+          {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
             <MetaInfo.Account
               address={transaction.signerSubstrateProxyAddress}
               chainSlug={transaction.chain}

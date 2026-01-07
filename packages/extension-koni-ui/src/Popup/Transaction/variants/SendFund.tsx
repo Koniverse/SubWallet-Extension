@@ -19,7 +19,7 @@ import { SWTransactionResponse } from '@subwallet/extension-base/services/transa
 import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee } from '@subwallet/extension-base/types';
 import { RequestSubmitTransfer, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
-import { _reformatAddressWithChain, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, isAccountAll, isSameAddress, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenSelector } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
@@ -570,7 +570,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         chain,
         to,
         tokenSlug: asset,
-        value: actualValue ?? value,
+        value: actualValue || value,
         transferAll: options.isTransferAll,
         transferBounceable: options.isTransferBounceable,
         feeOption: selectedTransactionFee?.feeOption,
@@ -599,8 +599,15 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         })
           .then((selectedProxy) => {
             setSubmitLoading(true);
-            // If transfer all with proxy, we do not need to minus fee cause proxy account pay fee
-            const submitValue = selectedProxy && selectedProxy !== from && isTransferAll ? new BigN(transferInfo?.maxTransferable || '0').plus(estimatedNativeFee).toFixed() : undefined;
+            // If transfer all and sign by proxy account (proxy account pay fee), we do not need to minus fee
+            let submitValue;
+
+            if (isTransferAll && selectedProxy && !isSameAddress(selectedProxy, from)) {
+              submitValue = transferInfo?.maxTransferableWithoutFee;
+              // TODO: need to re-update max value after getting selected proxy account
+              // form.setFieldValue('value', transferInfo?.maxTransferableWithoutFee);
+              // setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${Date.now()}`);
+            }
 
             createSendPromise(createBaseParams(selectedProxy, submitValue))
               .then(resolve)
@@ -611,7 +618,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           .finally(() => setLoading(false));
       });
     },
-    [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, selectSubstrateProxyAccountsToSign, extrinsicType, onError, isTransferAll, transferInfo?.maxTransferable, estimatedNativeFee]
+    [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, selectSubstrateProxyAccountsToSign, extrinsicType, onError, isTransferAll, transferInfo]
   );
 
   // todo: must refactor later, temporary solution to support SnowBridge
