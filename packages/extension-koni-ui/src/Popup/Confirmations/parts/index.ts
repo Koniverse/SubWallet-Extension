@@ -3,6 +3,7 @@
 
 export { default as ConfirmationHeader } from './ConfirmationHeader';
 export { default as SubmitApiArea } from './SubmitApiArea';
+export { default as MultisigInfoArea } from './MultisigInfoArea';
 
 export * from './Detail';
 export * from './Qr';

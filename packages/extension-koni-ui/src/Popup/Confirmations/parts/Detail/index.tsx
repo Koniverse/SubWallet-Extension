@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { default as BaseDetailModal } from './BaseDetailModal';
+export { default as CallDataDetail } from './CallDataDetail';
 
 export * from './Evm';
 export * from './Substrate';

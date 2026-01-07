@@ -4,9 +4,10 @@
 import { RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
-import { MetaInfo, NumberDisplay, PageWrapper, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
+import { CommonTransactionInfo, MetaInfo, NumberDisplay, PageWrapper, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { CallDataDetail, MultisigInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Number } from '@subwallet/react-ui';
@@ -27,8 +28,6 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
   const { t } = useTranslation();
 
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
-  const account = useGetAccountByAddress(transaction.address);
-  const networkPrefix = useGetChainPrefixBySlug(transaction.chain);
   const { currencyData } = useSelector((state: RootState) => state.price);
 
   const govConfirmationInfo = useGetGovVoteConfirmationInfo({
@@ -64,29 +63,25 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           weight={500}
         />
       </div>
+      <CommonTransactionInfo
+        address={transaction.address}
+        network={transaction.chain}
+      />
       <MetaInfo
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        <MetaInfo.Account
-          address={account?.address || transaction.address}
-          chainSlug={transaction.chain}
-          label={t('ui.TRANSACTION.Confirmations.GovUnvote.account')}
-          name={account?.name}
-          networkPrefix={networkPrefix}
-        />
-
-        <MetaInfo.Number
-          decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.GovUnvote.networkFee')}
-          suffix={symbol}
-          value={transaction.estimateFee?.value || 0}
-        />
+        <CallDataDetail callData={'0x0'} />
       </MetaInfo>
       <MetaInfo
         className={'meta-info'}
         hasBackgroundWrapper
       >
+        <MultisigInfoArea
+          chain={transaction.chain}
+          multisigDeposit={'0'}
+          signatoryAddress={transaction.signerSubstrateMultisigAddress}
+        />
         {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
           <MetaInfo.Account
             address={transaction.signerSubstrateProxyAddress}
@@ -141,6 +136,12 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
             value={govConfirmationInfo?.governanceLock.to || '0'}
           />
         </MetaInfo.Default>
+        <MetaInfo.Number
+          decimals={decimals}
+          label={t('ui.TRANSACTION.Confirmations.GovUnvote.networkFee')}
+          suffix={symbol}
+          value={transaction.estimateFee?.value || 0}
+        />
         <MetaInfo.Default
           label={t('ui.TRANSACTION.Confirmations.GovUnvote.referenda')}
         >

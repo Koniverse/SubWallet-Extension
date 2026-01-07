@@ -7,6 +7,7 @@ import { CommonTransactionInfo, SubstrateProxyAccountListModal } from '@subwalle
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
+import { CallDataDetail, MultisigInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Info } from 'phosphor-react';
@@ -41,6 +42,17 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
+        <CallDataDetail callData={'0x0'} />
+      </MetaInfo>
+      <MetaInfo
+        className={'meta-info'}
+        hasBackgroundWrapper
+      >
+        <MultisigInfoArea
+          chain={transaction.chain}
+          multisigDeposit={'0'}
+          signatoryAddress={transaction.signerSubstrateMultisigAddress}
+        />
         {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
           <MetaInfo.Account
             address={transaction.signerSubstrateProxyAddress}

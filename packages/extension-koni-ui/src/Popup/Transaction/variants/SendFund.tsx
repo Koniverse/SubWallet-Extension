@@ -608,7 +608,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             let submitValue;
             const selectedSigner = signableAccount.signerSubstrateMultisigAddress || signableAccount.signerSubstrateMultisigAddress || from;
 
-            if (isTransferAll && selectedProxy && !isSameAddress(selectedSigner, from)) {
+            if (isTransferAll && selectedSigner && !isSameAddress(selectedSigner, from)) {
               submitValue = transferInfo?.maxTransferableWithoutFee;
               // TODO: need to re-update max value after getting selected proxy account
               // form.setFieldValue('value', transferInfo?.maxTransferableWithoutFee);

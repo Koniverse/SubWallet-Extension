@@ -9,6 +9,7 @@ import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confi
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { useGetChainPrefixBySlug } from '@subwallet/extension-koni-ui/hooks';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
+import { CallDataDetail, MultisigInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -41,6 +42,17 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
+        <CallDataDetail callData={'0x0'} />
+      </MetaInfo>
+      <MetaInfo
+        className={'meta-info'}
+        hasBackgroundWrapper
+      >
+        <MultisigInfoArea
+          chain={transaction.chain}
+          multisigDeposit={'0'}
+          signatoryAddress={transaction.signerSubstrateMultisigAddress}
+        />
 
         {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
           <MetaInfo.Account

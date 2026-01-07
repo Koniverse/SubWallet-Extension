@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { CommonTransactionInfo } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { useGetChainPrefixBySlug, useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
+import { MultisigInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import CN from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,25 +26,16 @@ const Component: React.FC<Props> = (props: Props) => {
 
   return (
     <div className={CN(className)}>
+      <CommonTransactionInfo
+        address={data.senderAddress}
+        network={transaction.chain}
+      />
       <MetaInfo hasBackgroundWrapper>
         <MetaInfo.Account
-          address={data.senderAddress}
-          label={t('ui.TRANSACTION.Confirmations.SendNft.sendFrom')}
-          networkPrefix={networkPrefix}
-        />
-
-        <MetaInfo.Account
           address={data.recipientAddress}
-          label={t('ui.TRANSACTION.Confirmations.SendNft.sendTo')}
+          label={t('ui.TRANSACTION.Confirmations.SendNft.recipient')}
           networkPrefix={networkPrefix}
         />
-
-        <MetaInfo.Chain
-          chain={transaction.chain}
-          label={t('ui.TRANSACTION.Confirmations.SendNft.network')}
-        />
-      </MetaInfo>
-      <MetaInfo hasBackgroundWrapper={true}>
         {
           !!(data.nftItemName || data.nftItem) && (
             <MetaInfo.Default label={t('ui.TRANSACTION.Confirmations.SendNft.nft')}>
@@ -50,6 +43,13 @@ const Component: React.FC<Props> = (props: Props) => {
             </MetaInfo.Default>
           )
         }
+      </MetaInfo>
+      <MetaInfo hasBackgroundWrapper={true}>
+        <MultisigInfoArea
+          chain={transaction.chain}
+          multisigDeposit={'0'}
+          signatoryAddress={transaction.signerSubstrateMultisigAddress}
+        />
         {!!transaction.signerSubstrateProxyAddress && transaction.signerSubstrateProxyAddress !== transaction.address &&
           <MetaInfo.Account
             address={transaction.signerSubstrateProxyAddress}

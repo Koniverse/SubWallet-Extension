@@ -10,6 +10,7 @@ import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/componen
 import { EARNING_SELECTED_VALIDATOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useSelector, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
+import { CallDataDetail, MultisigInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -193,7 +194,12 @@ const Component: React.FC<Props> = (props: Props) => {
         address={transaction.address}
         network={transaction.chain}
       />
-
+      <MetaInfo
+        className={'meta-info'}
+        hasBackgroundWrapper
+      >
+        <CallDataDetail callData={'0x0'} />
+      </MetaInfo>
       <MetaInfo
         className={'nomination-wrapper'}
       >
@@ -201,6 +207,11 @@ const Component: React.FC<Props> = (props: Props) => {
           className={'meta-info'}
           hasBackgroundWrapper
         >
+          <MultisigInfoArea
+            chain={transaction.chain}
+            multisigDeposit={'0'}
+            signatoryAddress={transaction.signerSubstrateMultisigAddress}
+          />
           {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
             <MetaInfo.Account
               address={transaction.signerSubstrateProxyAddress}
@@ -236,7 +247,7 @@ const Component: React.FC<Props> = (props: Props) => {
         </MetaInfo>
       </MetaInfo>
 
-      {isBittensorChain && (
+      { isBittensorChain && (
         <>
           <MetaInfo
             className='nomination-wrapper'

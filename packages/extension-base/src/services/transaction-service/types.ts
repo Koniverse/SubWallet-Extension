@@ -13,7 +13,7 @@ import { TransactionConfig } from 'web3-core';
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { EventRecord } from '@polkadot/types/interfaces';
 
-export interface SWTransactionBase extends ValidateTransactionResponse, Partial<Pick<BaseRequestSign, 'ignoreWarnings' | 'signerSubstrateProxyAddress'>>, TransactionFee, SWTransactionEmitter {
+export interface SWTransactionBase extends ValidateTransactionResponse, Partial<BaseRequestSign>, TransactionFee, SWTransactionEmitter {
   id: string;
   url?: string;
   isInternal: boolean,

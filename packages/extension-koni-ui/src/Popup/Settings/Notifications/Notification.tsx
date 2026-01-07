@@ -51,7 +51,7 @@ export enum NotificationIconBackgroundColorMap {
   CLAIM_POLYGON_BRIDGE = 'yellow-7',
   SWAP = 'blue-8',
   EARNING = 'blue-8',
-  MULTISIG_APPROVAL = 'blue-8' // todo: update this
+  MULTISIG_APPROVAL = 'green-6'
 }
 
 export const NotificationIconMap = {
@@ -148,7 +148,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         extrinsicType: item.extrinsicType,
         isRead: item.isRead,
         actionType: item.actionType,
-        backgroundColor: token[NotificationIconBackgroundColorMap[item.actionType]], // todo: handle actionType multisig approval.
+        backgroundColor: token[NotificationIconBackgroundColorMap[item.actionType]],
         leftIcon: NotificationIconMap[item.actionType], // todo: handle actionType multisig approval.
         metadata: item.metadata,
         proxyId: item.proxyId

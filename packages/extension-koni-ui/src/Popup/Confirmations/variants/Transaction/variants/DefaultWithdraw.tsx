@@ -6,6 +6,7 @@ import { RequestYieldLeave, SpecialYieldPoolInfo, YieldPoolType } from '@subwall
 import { CommonTransactionInfo, MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { CallDataDetail, MultisigInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import CN from 'classnames';
 import React, { useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -62,6 +63,17 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
+        <CallDataDetail callData={'0x0'} />
+      </MetaInfo>
+      <MetaInfo
+        className={'meta-info'}
+        hasBackgroundWrapper
+      >
+        <MultisigInfoArea
+          chain={transaction.chain}
+          multisigDeposit={'0'}
+          signatoryAddress={transaction.signerSubstrateMultisigAddress}
+        />
         <MetaInfo.Number
           decimals={assetInfo.decimals || 0}
           label={'Amount'}
