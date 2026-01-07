@@ -8,5 +8,6 @@ export { default as useRestoreTransaction } from './useRestoreTransaction';
 export { default as useTransactionContext } from './useTransactionContext';
 export { default as useWatchTransaction } from './useWatchTransaction';
 
+export * from './useCreateSelectSignableAccountProxyAccount';
 export * from './confirmation';
 export * from './process';

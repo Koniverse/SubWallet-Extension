@@ -3,14 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountActions, AccountChainType, AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
-import {
-  AccountChainTypeLogos,
-  AccountProxyTypeTag,
-  AddressSelectorItem,
-  CloseIcon,
-  Layout,
-  PageWrapper
-} from '@subwallet/extension-koni-ui/components';
+import { AccountChainTypeLogos, AccountProxyTypeTag, AddressSelectorItem, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useDefaultNavigate, useGetAccountProxyById, useNotification } from '@subwallet/extension-koni-ui/hooks';
@@ -186,7 +179,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
     }
 
     return result;
-  }, [showDerivationInfoTab, showDerivedAccounts, showMultisigAccountInfoTab,canManageSubstrateProxyAccounts , t]);
+  }, [showDerivationInfoTab, showDerivedAccounts, showMultisigAccountInfoTab, canManageSubstrateProxyAccounts, t]);
 
   const onSelectFilterTab = useCallback((value: string) => {
     setSelectedFilterTab(value);
@@ -398,7 +391,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
         {t('ui.ACCOUNT.screen.Account.Detail.export')}
       </Button>
     </>;
-  }, [accountProxy.accountActions, accountProxy.accountType, deleting, deriving, onDelete, onDerive, onExport, selectedFilterTab, t]);
+  }, [accountProxy, deleting, deriving, onDelete, onDerive, onExport, selectedFilterTab, t]);
 
   useEffect(() => {
     if (accountProxy) {
@@ -418,7 +411,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
     } else {
       setSelectedFilterTab(FilterTabType.ACCOUNT_ADDRESS);
     }
-  }, [requestViewDerivedAccountDetails, requestViewDerivedAccounts, showDerivedAccounts, showMultisigAccountInfoTab, requestViewManageProxiesTab]);
+  }, [requestViewDerivedAccountDetails, requestViewDerivedAccounts, showDerivedAccounts, showMultisigAccountInfoTab, requestViewManageProxiesTab, canManageSubstrateProxyAccounts]);
 
   const renderDetailDerivedAccount = () => {
     return (
@@ -468,7 +461,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
         {signers.map((signer) => (
           <div
             className='signatory-item'
-            key={signer.address}
+            key={signer}
           >
             <AddressSelectorItem
               address={signer}

@@ -12,7 +12,7 @@ import { useGetSubstrateProxyAccountGroupByAddress } from '@subwallet/extension-
 import { handleAddSubstrateProxyAccount } from '@subwallet/extension-koni-ui/messaging/transaction/substrateProxy';
 import { TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AddSubstrateProxyAccountParams, ChainItemType, FormCallbacks, FormFieldData, SendNftParams, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AddSubstrateProxyAccountParams, ChainItemType, FormCallbacks, FormFieldData, SelectSignableAccountProxyResult, SendNftParams, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, findAccountByAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
@@ -32,7 +32,7 @@ const hiddenFields: Array<keyof SendNftParams> = ['asset', 'fromAccountProxy', '
 
 const Component = (): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/add-proxy');
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setBackProps } = useTransactionContext<AddSubstrateProxyAccountParams>();
+  const { defaultData, persistData, selectSignableAccountProxyToSign, setBackProps } = useTransactionContext<AddSubstrateProxyAccountParams>();
   const { token } = useTheme() as Theme;
   const { accounts } = useSelector((state: RootState) => state.accountState);
   const { chainInfoMap, ledgerGenericAllowNetworks } = useSelector((state) => state.chainStore);
@@ -97,28 +97,28 @@ const Component = (): React.ReactElement<Props> => {
   const onSubmit: FormCallbacks<AddSubstrateProxyAccountParams>['onFinish'] = useCallback((values: AddSubstrateProxyAccountParams) => {
     setLoading(true);
 
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
+    const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult) => {
       return handleAddSubstrateProxyAccount({
         address: values.from,
         chain: values.chain,
         substrateProxyAddress: values.substrateProxyAddress,
         substrateProxyType: values.substrateProxyType,
         substrateProxyDeposit: substrateProxyAccountGroup.substrateProxyDeposit,
-        signerSubstrateProxyAddress
+        ...otherSignerSelected
       });
     };
 
-    selectSubstrateProxyAccountsToSign({
+    selectSignableAccountProxyToSign({
       chain: values.chain,
       address: values.from,
-      type: ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT
+      extrinsicType: ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT
     }).then(sendPromise)
       .then(onSuccess)
       .catch(onError)
       .finally(() => {
         setLoading(false);
       });
-  }, [onError, onSuccess, selectSubstrateProxyAccountsToSign, substrateProxyAccountGroup.substrateProxyDeposit]);
+  }, [onError, onSuccess, selectSignableAccountProxyToSign, substrateProxyAccountGroup.substrateProxyDeposit]);
 
   // Validate substrate proxy address
   const validateSubstrateProxyAddress = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {

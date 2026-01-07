@@ -441,8 +441,6 @@ export class AccountState {
     const modifyPairs = this.modifyPairs;
     const accountProxies = this.accountProxies;
 
-    console.log('modifyPairs', modifyPairs);
-
     const address = reformatAddress(_address);
     const proxyId = modifyPairs[address]?.accountProxyId;
 

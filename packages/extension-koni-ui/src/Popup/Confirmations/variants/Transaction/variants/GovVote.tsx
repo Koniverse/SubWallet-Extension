@@ -4,13 +4,13 @@
 import { GovVoteRequest, GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { getGovConvictionOptions } from '@subwallet/extension-base/services/open-gov/utils';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountProxyAvatar, MetaInfo, NumberDisplay, PageWrapper, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
+import { MetaInfo, NumberDisplay, PageWrapper, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useGetAccountByAddress, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { VoteAmountDetailProps } from '@subwallet/extension-koni-ui/types/gov';
-import { toShort } from '@subwallet/extension-koni-ui/utils';
+import { isSignerDifferentFromSender, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import BigNumber from 'bignumber.js';
 import CN from 'classnames';
@@ -34,7 +34,6 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
   const currency = useSelector((state: RootState) => state.price.currencyData);
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
-  const account = useGetAccountByAddress(transaction.address);
   const shortAddress = toShort(transaction.address);
 
   const totalAmount = useMemo(() => {
@@ -148,28 +147,11 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         className={'__meta-info'}
         hasBackgroundWrapper
       >
-        {!!transaction.signerSubstrateProxyAddress &&
-          <MetaInfo.Account
-            address={transaction.signerSubstrateProxyAddress}
-            chainSlug={transaction.chain}
-            label={t('ui.TRANSACTION.Confirmations.GovVote.signWith')}
-          />
-        }
-
-        {!!account?.name &&
-          <MetaInfo.Default
-            className={'__account-field'}
-            label={t('ui.TRANSACTION.Confirmations.GovVote.account')}
-          >
-            <AccountProxyAvatar
-              className={'__account-avatar'}
-              size={24}
-              value={account.proxyId || transaction.address}
-            />
-            <div className={'__account-item-name'}>{account.name}</div>
-          </MetaInfo.Default>
-        }
-
+        <MetaInfo.Account
+          address={transaction.address}
+          chainSlug={transaction.chain}
+          label={t('ui.TRANSACTION.Confirmations.GovVote.account')}
+        />
         <MetaInfo.Default
           className={'__address-field'}
           label={t('ui.TRANSACTION.Confirmations.GovVote.address')}
@@ -189,6 +171,13 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         className={'__meta-info'}
         hasBackgroundWrapper
       >
+        {!!transaction.signerSubstrateProxyAddress && isSignerDifferentFromSender(transaction.address, transaction.signerSubstrateProxyAddress) &&
+          <MetaInfo.Account
+            address={transaction.signerSubstrateProxyAddress}
+            chainSlug={transaction.chain}
+            label={t('ui.TRANSACTION.Confirmations.GovVote.signWith')}
+          />
+        }
         {!!govConfirmationInfo &&
           <>
             <MetaInfo.Default

@@ -5,6 +5,7 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { ALL_STAKING_ACTIONS, isLedgerCapable, isProductionMode, ledgerIncompatible, SubstrateLedgerSignModeSupport } from '@subwallet/extension-koni-ui/constants';
+import { getSignableProxies } from '@subwallet/extension-koni-ui/messaging/transaction/multisig';
 import { useCallback } from 'react';
 
 import { useNotification, useTranslation } from '../common';
@@ -39,7 +40,7 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
   }, [t]);
 
   return useCallback((onClick: VoidFunction, action: ExtrinsicType) => {
-    return () => {
+    return async () => {
       if (!account) {
         notify({
           message: t('ui.ACCOUNT.hook.account.usePreCheckAction.accountNotExists'),
@@ -56,7 +57,13 @@ const usePreCheckAction = (address?: string, blockAllAccount = true, message?: s
           defaultMessage = detectTranslate('ui.ACCOUNT.hook.account.usePreCheckAction.earningNotSupportedForAccountType');
         }
 
-        if (!account.transactionActions.includes(action) || (mode === AccountSignMode.QR && account.chainType === 'ethereum' && isProductionMode)) {
+        if (account.isMultisig) {
+          const { signableProxies } = await getSignableProxies({ multisigProxyId: account.address, extrinsicType: action });
+
+          if (signableProxies.length === 0) {
+            block = true;
+          }
+        } else if (!account.transactionActions.includes(action) || (mode === AccountSignMode.QR && account.chainType === 'ethereum' && isProductionMode)) {
           block = true;
 
           switch (mode) {

@@ -10,7 +10,7 @@ import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useDefaultNavigate, useGetGovLockedInfos, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleUnlockVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { useGovReferendumVotes } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView/useGovReferendumVotes';
-import { FormCallbacks, FormFieldData, GovUnlockVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { FormCallbacks, FormFieldData, GovUnlockVoteParams, SelectSignableAccountProxyResult, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, funcSortByName, simpleCheckForm, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -36,7 +36,7 @@ const REFERENDA_VOTED_MODAL_ID = 'referenda-voted-modal';
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   const { className = '', isAllAccount } = props;
   const { t } = useTranslation();
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setBackProps } = useTransactionContext<GovUnlockVoteParams>();
+  const { defaultData, persistData, selectSignableAccountProxyToSign, setBackProps } = useTransactionContext<GovUnlockVoteParams>();
   const formDefault = useMemo((): GovUnlockVoteParams => ({ ...defaultData }), [defaultData]);
   const [form] = Form.useForm<GovUnlockVoteParams>();
   const [loading, setLoading] = useState(false);
@@ -92,24 +92,22 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       amount: values.amount || '0'
     };
 
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
+    const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult) => {
       return handleUnlockVote({
         ...unlockVoteRequest,
-        signerSubstrateProxyAddress
+        ...otherSignerSelected
       });
     };
 
-    selectSubstrateProxyAccountsToSign({
+    selectSignableAccountProxyToSign({
       chain: chainValue,
       address: values.from,
-      type: ExtrinsicType.GOV_UNLOCK_VOTE
+      extrinsicType: ExtrinsicType.GOV_UNLOCK_VOTE
     }).then(sendPromise)
-      .then((tx) => {
-        onSuccess(tx);
-      })
+      .then(onSuccess)
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [chainValue, onError, onSuccess, selectSubstrateProxyAccountsToSign]);
+  }, [chainValue, onError, onSuccess, selectSignableAccountProxyToSign]);
 
   const goBack = useCallback(() => {
     navigate(`/home/governance?view=unlock-token&chainSlug=${chainValue}`);

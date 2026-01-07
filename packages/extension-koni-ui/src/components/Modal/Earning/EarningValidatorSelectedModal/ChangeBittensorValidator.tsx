@@ -12,7 +12,7 @@ import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/Wallet
 import { useChainChecker, useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
-import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
+import { ChangeValidatorParams, FormCallbacks, SelectSignableAccountProxyResult, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, formatBalance, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, InputRef, Logo, ModalContext, Number, Switch, SwModal, Tooltip, useExcludeModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -62,7 +62,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
   const { defaultData } = useTransactionContext<ChangeValidatorParams>();
-  const { onError, onSuccess, selectSubstrateProxyAccountsToSign } = useHandleSubmitTransaction();
+  const { onError, onSuccess, selectSignableAccountProxyToSign } = useHandleSubmitTransaction();
   const account = findAccountByAddress(accounts, from);
   const [form] = Form.useForm<ChangeValidatorParams>();
   const originValidator = useWatchTransaction('originValidator', form, defaultData);
@@ -287,19 +287,19 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         setSubmitLoading(true);
 
         // send change earning validator transaction
-        const sendPromise = (signerSubstrateProxyAddress?: string) => {
+        const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult) => {
           return changeEarningValidator({
             ...baseData,
-            amount,
-            signerSubstrateProxyAddress
+            ...otherSignerSelected,
+            amount
           });
         };
 
-        // select proxy account if available
-        selectSubstrateProxyAccountsToSign({
+        // select signable account proxy or signatory multisig to sign transaction
+        selectSignableAccountProxyToSign({
           chain,
           address: from,
-          type: ExtrinsicType.CHANGE_EARNING_VALIDATOR
+          extrinsicType: ExtrinsicType.CHANGE_EARNING_VALIDATOR
         }).then(sendPromise)
           .then(onSuccess)
           .catch((error: TransactionError) => {
@@ -335,7 +335,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
       send(isShowAmountChange ? value : bondedValue);
     },
-    [bondedValue, chain, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, selectSubstrateProxyAccountsToSign, stakingFee, symbol, t]
+    [bondedValue, chain, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, selectSignableAccountProxyToSign, stakingFee, symbol, t]
   );
   const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
 

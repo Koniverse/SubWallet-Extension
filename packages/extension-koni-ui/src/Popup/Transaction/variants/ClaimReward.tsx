@@ -11,7 +11,7 @@ import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-kon
 import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
 import { useGetNativeTokenBasicInfo, useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { yieldSubmitStakingClaimReward } from '@subwallet/extension-koni-ui/messaging';
-import { ClaimRewardParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ClaimRewardParams, FormCallbacks, FormFieldData, SelectSignableAccountProxyResult, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, isAccountAll, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -84,7 +84,7 @@ const filterAccount = (
 const Component = () => {
   const navigate = useNavigate();
 
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign } = useTransactionContext<ClaimRewardParams>();
+  const { defaultData, persistData, selectSignableAccountProxyToSign } = useTransactionContext<ClaimRewardParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<ClaimRewardParams>();
@@ -152,28 +152,28 @@ const Component = () => {
     const { bondReward, chain, from, slug } = values;
 
     // send submit claim reward transaction
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
+    const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult = {}) => {
       return yieldSubmitStakingClaimReward({
         address: from,
         bondReward: bondReward,
         slug,
         unclaimedReward: reward?.unclaimedReward,
-        signerSubstrateProxyAddress
+        ...otherSignerSelected
       }).then(onSuccess);
     };
 
-    // wrap proxy selection
+    // wrap signable selection
     // for the Liquid Staking feature with multiple steps,
-    // only the root account is allowed to sign transactions, even if a valid proxy account is available to sign on its behalf.
+    // only the root account is allowed to sign transactions, even if a valid proxy account or signatory multisig is available to sign on its behalf.
     const sendPromiseWrapper = async () => {
       if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-        const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
+        const signableAccount = await selectSignableAccountProxyToSign({
           chain,
           address: from,
-          type: ExtrinsicType.STAKING_CLAIM_REWARD
+          extrinsicType: ExtrinsicType.STAKING_CLAIM_REWARD
         });
 
-        return await sendPromise(substrateProxyAddress);
+        return await sendPromise(signableAccount);
       }
 
       return await sendPromise();
@@ -183,7 +183,7 @@ const Component = () => {
     setTimeout(() => {
       sendPromiseWrapper().catch(onError).finally(() => setLoading(false));
     }, 300);
-  }, [reward?.unclaimedReward, onSuccess, poolInfo.type, selectSubstrateProxyAccountsToSign, onError]);
+  }, [reward?.unclaimedReward, onSuccess, poolInfo.type, selectSignableAccountProxyToSign, onError]);
 
   const checkAction = usePreCheckAction(fromValue);
 

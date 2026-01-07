@@ -9,7 +9,7 @@ import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/componen
 import { EARNING_SELECTED_VALIDATOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useSelector, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
-import { toShort } from '@subwallet/extension-koni-ui/utils';
+import { isSignerDifferentFromSender, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -200,7 +200,7 @@ const Component: React.FC<Props> = (props: Props) => {
           className={'meta-info'}
           hasBackgroundWrapper
         >
-          {!!transaction.signerSubstrateProxyAddress &&
+          {!!transaction.signerSubstrateProxyAddress && isSignerDifferentFromSender(transaction.address, transaction.signerSubstrateProxyAddress) &&
             <MetaInfo.Account
               address={transaction.signerSubstrateProxyAddress}
               chainSlug={transaction.chain}

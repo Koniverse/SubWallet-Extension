@@ -5,6 +5,7 @@ import { SWTransactionResult } from '@subwallet/extension-base/services/transact
 import { CommonTransactionInfo, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { isSignerDifferentFromSender } from '@subwallet/extension-koni-ui/utils';
 import CN from 'classnames';
 import React from 'react';
 import styled from 'styled-components';
@@ -32,7 +33,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        {!!transaction.signerSubstrateProxyAddress &&
+        {!!transaction.signerSubstrateProxyAddress && isSignerDifferentFromSender(transaction.address, transaction.signerSubstrateProxyAddress) &&
           <MetaInfo.Account
             address={transaction.signerSubstrateProxyAddress}
             chainSlug={transaction.chain}

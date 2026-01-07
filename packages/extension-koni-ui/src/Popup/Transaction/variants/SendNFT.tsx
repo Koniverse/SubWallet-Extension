@@ -11,7 +11,7 @@ import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, DEFAULT_MODEL_VIEWER_PROPS, SHOW_3D_MO
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useFocusFormItem, useGetChainPrefixBySlug, useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { evmNftSubmitTransaction, substrateNftSubmitTransaction } from '@subwallet/extension-koni-ui/messaging';
-import { FormCallbacks, FormRule, SendNftParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { FormCallbacks, FormRule, SelectSignableAccountProxyResult, SendNftParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, noop, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, Image, Typography } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -50,7 +50,7 @@ const Component: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign } = useTransactionContext<SendNftParams>();
+  const { defaultData, persistData, selectSignableAccountProxyToSign } = useTransactionContext<SendNftParams>();
 
   const { collectionId, itemId } = defaultData;
 
@@ -132,7 +132,7 @@ const Component: React.FC = () => {
 
       const params = nftParamsHandler(nftItem, chain);
 
-      const sendPromise = (signerSubstrateProxyAddress?: string): Promise<SWTransactionResponse> => {
+      const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult = {}): Promise<SWTransactionResponse> => {
         if (isEthereumInterface) {
           // Send NFT with EVM interface
           return evmNftSubmitTransaction({
@@ -150,7 +150,7 @@ const Component: React.FC = () => {
             recipientAddress: to,
             senderAddress: from,
             nftItemName: nftItem?.name,
-            signerSubstrateProxyAddress,
+            ...otherSignerSelected,
             params,
             nftItem
           });
@@ -159,17 +159,17 @@ const Component: React.FC = () => {
 
       setLoading(true);
 
-      // wrap proxy selection
-      // don't need to select proxy for EVM interface
+      // wrap signable selection
+      // don't need to select proxy or signatory multisig for EVM interface
       const sendPromiseWrapper = async () => {
         if (!isEthereumInterface) {
-          const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
+          const signableAccountProxyResult = await selectSignableAccountProxyToSign({
             chain,
             address: from,
-            type: ExtrinsicType.SEND_NFT
+            extrinsicType: ExtrinsicType.SEND_NFT
           });
 
-          return await sendPromise(substrateProxyAddress);
+          return await sendPromise(signableAccountProxyResult);
         }
 
         return await sendPromise();
@@ -185,7 +185,7 @@ const Component: React.FC = () => {
           });
       }, 300);
     },
-    [addressPrefix, nftItem, selectSubstrateProxyAccountsToSign, onSuccess, onError]
+    [addressPrefix, nftItem, selectSignableAccountProxyToSign, onSuccess, onError]
   );
 
   const checkAction = usePreCheckAction(from);

@@ -26,7 +26,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const innerContent = (
     <>
       <MetaInfo.Account
-        address={account?.address || address}
+        address={address}
         chainSlug={network}
         label={t('ui.components.Confirmation.CommonTransactionInfo.account')}
         name={account?.name}

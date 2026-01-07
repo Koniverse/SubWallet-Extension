@@ -3,8 +3,9 @@
 
 import { AccountMultisigError, AccountMultisigErrorCode, RequestAccountCreateMultisig } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountBaseHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Base';
+import { MULTISIG_SUPPORTED_CHAINS } from '@subwallet/extension-base/services/multisig-service';
 import { AccountChainType } from '@subwallet/extension-base/types';
-import { RequestGetSignableProxyIds, ResponseGetSignableProxyIds } from '@subwallet/extension-base/types/multisig';
+import { RequestGetSignableProxies, ResponseGetSignableProxies, SignatorySignableProxy } from '@subwallet/extension-base/types/multisig';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { encodeAddress } from '@subwallet/keyring';
 import { KeyringPair$Meta } from '@subwallet/keyring/types';
@@ -75,18 +76,22 @@ export class AccountMultisigHandler extends AccountBaseHandler {
     }
   }
 
-  public getSignableProxyIds (request: RequestGetSignableProxyIds): ResponseGetSignableProxyIds {
-    const { extrinsicType, multisigProxyId } = request;
+  public getSignableProxies (request: RequestGetSignableProxies): ResponseGetSignableProxies {
+    const { chain, extrinsicType, multisigProxyId } = request;
 
-    const signableProxyIds: string[] = [];
+    if (!MULTISIG_SUPPORTED_CHAINS.includes(chain)) {
+      return { signableProxies: [] };
+    }
+
     const allMultisigAccounts = this.state.getMultisigAccounts();
     const allAccounts = this.state.accounts;
     const targetMultisigAccount = allMultisigAccounts.find((acc) => acc.id === multisigProxyId);
 
     if (!targetMultisigAccount) {
-      return { signableProxyIds };
+      return { signableProxies: [] };
     }
 
+    const signableProxies: SignatorySignableProxy[] = [];
     const signers = targetMultisigAccount.accounts[0].signers as string[];
 
     for (const signer of signers) {
@@ -96,11 +101,14 @@ export class AccountMultisigHandler extends AccountBaseHandler {
 
       if (substrateAccount) {
         if (substrateAccount.transactionActions.includes(extrinsicType)) {
-          signableProxyIds.push(proxyId);
+          signableProxies.push({
+            proxyId,
+            address: signer
+          });
         }
       }
     }
 
-    return { signableProxyIds };
+    return { signableProxies };
   }
 }

@@ -6,7 +6,7 @@ import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@s
 import { ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, GOV_REFERENDUM_UNVOTE_TRANSACTION, GOV_REFERENDUM_VOTE_TRANSACTION, GOV_UNLOCK_VOTE_TRANSACTION, NFT_TRANSACTION, REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
-import { useAlert, useChainChecker, useCreateSelectSubstrateProxyAccountsToSign, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useChainChecker, useCreateSelectSignableAccountProxyAccount, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ManageChainsParam, Theme, ThemeProps, TransactionFormBaseProps } from '@subwallet/extension-koni-ui/types';
 import { detectTransactionPersistKey, getTransactionFromAccountProxyValue } from '@subwallet/extension-koni-ui/utils';
@@ -42,7 +42,7 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
 
   // Select function to choose substrate proxy accounts for signing and will be controlled by TransactionContext
-  const selectSubstrateProxyAccountsToSign = useCreateSelectSubstrateProxyAccountsToSign();
+  const selectSignableAccountProxyToSign = useCreateSelectSignableAccountProxyAccount();
 
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
   const [recheckingChain, setRecheckingChain] = useState<string | undefined>();
@@ -383,8 +383,8 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
     closeRecheckChainConnectionModal,
     modalId,
     setIsDisableHeader,
-    selectSubstrateProxyAccountsToSign
-  }), [defaultData, needPersistData, setStorage, onDone, goBack, closeAlert, openAlert, openRecheckChainConnectionModal, closeRecheckChainConnectionModal, modalId, selectSubstrateProxyAccountsToSign]);
+    selectSignableAccountProxyToSign
+  }), [defaultData, needPersistData, setStorage, onDone, goBack, closeAlert, openAlert, openRecheckChainConnectionModal, closeRecheckChainConnectionModal, modalId, selectSignableAccountProxyToSign]);
 
   const recheckChainConnectionModalNode = (
     <>

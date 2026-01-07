@@ -14,7 +14,7 @@ import { handleVote } from '@subwallet/extension-koni-ui/messaging/transaction/g
 import { ReuseLockedBalance } from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/parts/ReuseLockedBalance';
 import { VoteButton } from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/parts/VoteButton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { FormCallbacks, FormFieldData, GovReferendumVoteParams, SelectSignableAccountProxyResult, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovAccountAddressItemType, GovVoteStatus, PreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject, getAccountVoteStatus, getPreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Form, Icon, ModalContext, SwModal } from '@subwallet/react-ui';
@@ -45,7 +45,7 @@ const PreviousVoteDetailModalId = 'previous-vote-detail-modal';
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   const { className = '', isAllAccount, targetAccountProxy } = props;
   const { t } = useTranslation();
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setBackProps, setCustomScreenTitle, setSubHeaderRightButtons } = useTransactionContext<GovReferendumVoteParams>();
+  const { defaultData, persistData, selectSignableAccountProxyToSign, setBackProps, setCustomScreenTitle, setSubHeaderRightButtons } = useTransactionContext<GovReferendumVoteParams>();
   const [govRefVoteStorage, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData, from: govRefVoteStorage.from, fromAccountProxy: govRefVoteStorage.fromAccountProxy }), [defaultData, govRefVoteStorage.from, govRefVoteStorage.fromAccountProxy]);
   const [, setGovRefUnvoteStorage] = useLocalStorage(GOV_REFERENDUM_UNVOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS);
@@ -186,17 +186,17 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         conviction: conviction
       };
 
-      const sendPromise = (signerSubstrateProxyAddress?: string) => {
+      const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult) => {
         return handleVote({
           ...voteRequest,
-          signerSubstrateProxyAddress
+          ...otherSignerSelected
         });
       };
 
-      selectSubstrateProxyAccountsToSign({
+      selectSignableAccountProxyToSign({
         chain: chainValue,
         address: values.from,
-        type: ExtrinsicType.GOV_VOTE
+        extrinsicType: ExtrinsicType.GOV_VOTE
       }).then(sendPromise)
         .then((tx) => {
           onSuccess(tx);
@@ -204,7 +204,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
         .catch(onError)
         .finally(() => setLoadingButton(null));
     }
-  }, [voteType, chainValue, referendumId, defaultData.track, conviction, selectSubstrateProxyAccountsToSign, onError, onSuccess]);
+  }, [voteType, chainValue, referendumId, defaultData.track, conviction, selectSignableAccountProxyToSign, onError, onSuccess]);
 
   const goRefSplitVote = useCallback(() => {
     setGovRefVoteStorage({

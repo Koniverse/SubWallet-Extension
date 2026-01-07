@@ -1,11 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { SubstrateProxyAccountItem } from '@subwallet/extension-base/types';
-import { SubstrateProxyAccountSelectorItem } from '@subwallet/extension-koni-ui/components';
-import { SUBSTRATE_PROXY_ACCOUNT_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { isSameAddress } from '@subwallet/extension-base/utils';
+import { SignableAccountProxySelectorItem } from '@subwallet/extension-koni-ui/components';
+import { SIGNABLE_ACCOUNT_PROXY_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { SignableAccountProxyItem, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Icon, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import { CheckCircle, X, XCircle } from 'phosphor-react';
@@ -13,69 +13,68 @@ import React, { ForwardedRef, forwardRef, useCallback, useMemo, useRef, useState
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-export interface SubstrateProxyAccountSelectorModalProps {
+export interface SignableAccountProxySelectorModalProps {
   chain: string;
   address: string;
-  substrateProxyAccountItems: SubstrateProxyAccountItem[];
+  accountItems: SignableAccountProxyItem[];
   onCancel: VoidFunction;
-  onApply: (selected: string) => void;
+  onApply: (selected: SignableAccountProxyItem) => void;
 }
 
-export type SubstrateProxyAccountSelectorModalPropsValue = Omit<SubstrateProxyAccountSelectorModalProps, 'onCancel' | 'onApply'>;
+export type SignableAccountProxySelectorModalPropsValue = Omit<SignableAccountProxySelectorModalProps, 'onCancel' | 'onApply'>;
 
-type Props = ThemeProps & SubstrateProxyAccountSelectorModalProps;
+type Props = ThemeProps & SignableAccountProxySelectorModalProps;
 
-interface SubstrateProxyItemExtended extends SubstrateProxyAccountItem {
-  isMain?: boolean;
-}
-
-const modalId = SUBSTRATE_PROXY_ACCOUNT_SELECTOR_MODAL;
+const modalId = SIGNABLE_ACCOUNT_PROXY_SELECTOR_MODAL;
 
 const Component = (props: Props, ref: ForwardedRef<any>) => {
-  const { address, className = '', onApply, onCancel, substrateProxyAccountItems } = props;
+  const { accountItems, address, chain, className = '', onApply, onCancel } = props;
   const { t } = useTranslation();
   const sectionRef = useRef<SwListSectionRef>(null);
   const account = useGetAccountByAddress(address);
-  const [selected, setSelected] = useState<SubstrateProxyItemExtended>(() => ({
-    isMain: true,
-    substrateProxyAddress: address,
-    proxyId: account?.proxyId
-  } as SubstrateProxyItemExtended));
 
   // Combine main account and proxy accounts
-  const fullList = useMemo(() => {
+  const fullList = useMemo<SignableAccountProxyItem[]>(() => {
+    if (!account || account?.isMultisig) {
+      return accountItems;
+    }
+
     return [
       {
-        isMain: true,
-        substrateProxyAddress: address,
-        proxyId: account?.proxyId
+        kind: 'substrate_proxy',
+        isProxiedAccount: true,
+        address,
+        proxyId: account.proxyId
       },
-      ...substrateProxyAccountItems
+      ...accountItems
     ];
-  }, [account?.proxyId, address, substrateProxyAccountItems]);
+  }, [account, accountItems, address]);
 
-  const onSelect = useCallback((item: SubstrateProxyItemExtended) => {
+  const [selected, setSelected] = useState<SignableAccountProxyItem>(fullList[0]);
+
+  const onSelect = useCallback((item: SignableAccountProxyItem) => {
     return () => {
       setSelected(item);
     };
   }, []);
 
-  const renderItem = useCallback((item: SubstrateProxyItemExtended) => {
-    const isSelected = selected?.substrateProxyAddress === item.substrateProxyAddress && selected?.substrateProxyType === item.substrateProxyType;
+  const renderItem = useCallback((item: SignableAccountProxyItem) => {
+    const isSelected = isSameAddress(selected.address, item.address) && selected.substrateProxyType === item.substrateProxyType;
 
     return (
-      <SubstrateProxyAccountSelectorItem
+      <SignableAccountProxySelectorItem
+        accountItem={item}
+        chain={chain}
         className={'__proxy-account-item'}
         isSelected={isSelected}
         onClick={onSelect(item)}
         showUnselectIcon
-        substrateProxyAccount={item}
       />
     );
-  }, [selected, onSelect]);
+  }, [selected.address, selected.substrateProxyType, chain, onSelect]);
 
   const onClickApply = useCallback(() => {
-    onApply?.(selected.substrateProxyAddress);
+    onApply?.(selected);
   }, [onApply, selected]);
 
   return (
@@ -99,7 +98,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
             onClick={onCancel}
             schema='secondary'
           >
-            {t('ui.ACCOUNT.components.Modal.SubstrateProxyAccount.SubstrateProxyAccountSelector.cancel')}
+            {t('ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.cancel')}
           </Button>
           <Button
             block
@@ -113,16 +112,16 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
             }
             onClick={onClickApply}
           >
-            {t('ui.ACCOUNT.components.Modal.SubstrateProxyAccount.SubstrateProxyAccountSelector.continue')}
+            {t('ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.continue')}
           </Button>
         </>
       }
       id={modalId}
       onCancel={onCancel}
-      title={t('ui.ACCOUNT.components.Modal.SubstrateProxyAccount.SubstrateProxyAccountSelector.selectAccount')}
+      title={t('ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.selectAccount')}
     >
       <div className='proxy-modal__description'>
-        {t('ui.ACCOUNT.components.Modal.SubstrateProxyAccount.SubstrateProxyAccountSelector.selectSigningAccount')}
+        {t('ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.selectSigningAccount')}
       </div>
       <SwList.Section
         list={fullList}
@@ -133,7 +132,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   );
 };
 
-const SubstrateProxyAccountSelectorModal = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
+export const SignableAccountProxySelectorModal = styled(forwardRef(Component))<Props>(({ theme: { token } }: Props) => {
   return {
     '.ant-sw-modal-header': {
       paddingTop: token.paddingXS,
@@ -176,5 +175,3 @@ const SubstrateProxyAccountSelectorModal = styled(forwardRef(Component))<Props>(
     }
   };
 });
-
-export default SubstrateProxyAccountSelectorModal;

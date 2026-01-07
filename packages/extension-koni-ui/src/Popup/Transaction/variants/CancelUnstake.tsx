@@ -8,7 +8,7 @@ import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountSelector, CancelUnstakeSelector, HiddenInput } from '@subwallet/extension-koni-ui/components';
 import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { yieldSubmitStakingCancelWithdrawal } from '@subwallet/extension-koni-ui/messaging';
-import { CancelUnStakeParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { CancelUnStakeParams, FormCallbacks, FormFieldData, SelectSignableAccountProxyResult, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -46,7 +46,7 @@ const Component = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign } = useTransactionContext<CancelUnStakeParams>();
+  const { defaultData, persistData, selectSignableAccountProxyToSign } = useTransactionContext<CancelUnStakeParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<CancelUnStakeParams>();
@@ -112,27 +112,27 @@ const Component = () => {
     const selectedUnstaking = positionInfo.unstakings[parseInt(unstakeIndex)];
 
     // send cancel unstake transaction
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
+    const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult = {}) => {
       return yieldSubmitStakingCancelWithdrawal({
         address: from,
         slug,
         selectedUnstaking,
-        signerSubstrateProxyAddress
+        ...otherSignerSelected
       }).then(onSuccess);
     };
 
-    // wrap proxy selection
+    // wrap signable selection
     // for the Liquid Staking feature with multiple steps,
-    // only the root account is allowed to sign transactions, even if a valid proxy account is available to sign on its behalf.
+    // only the root account is allowed to sign transactions, even if a valid proxy account or signatory multisig is available to sign on its behalf.
     const sendPromiseWrapper = async () => {
       if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-        const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
+        const signableAccount = await selectSignableAccountProxyToSign({
           chain,
           address: from,
-          type: ExtrinsicType.STAKING_CANCEL_UNSTAKE
+          extrinsicType: ExtrinsicType.STAKING_CANCEL_UNSTAKE
         });
 
-        return await sendPromise(substrateProxyAddress);
+        return await sendPromise(signableAccount);
       }
 
       return await sendPromise();
@@ -143,7 +143,7 @@ const Component = () => {
       sendPromiseWrapper().catch(onError)
         .finally(() => setLoading(false));
     }, 300);
-  }, [positionInfo, onSuccess, poolInfo.type, selectSubstrateProxyAccountsToSign, onError]);
+  }, [positionInfo, onSuccess, poolInfo.type, selectSignableAccountProxyToSign, onError]);
 
   const onPreCheck = usePreCheckAction(fromValue);
 

@@ -17,7 +17,7 @@ import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useChainChecker, useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
-import { Theme, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
+import { SelectSignableAccountProxyResult, Theme, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Badge, Button, Icon, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
@@ -98,7 +98,7 @@ const Component = (props: Props) => {
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
   const onPreCheck = usePreCheckAction(from);
-  const { onError, onSuccess, selectSubstrateProxyAccountsToSign } = useHandleSubmitTransaction();
+  const { onError, onSuccess, selectSignableAccountProxyToSign } = useHandleSubmitTransaction();
 
   const sectionRef = useRef<SwListSectionRef>(null);
   const networkPrefix = chainInfoMap[chain]?.substrateInfo?.addressPrefix;
@@ -292,24 +292,24 @@ const Component = (props: Props) => {
 
   // submit action
   const submit = useCallback((target: ValidatorInfo[]) => {
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
+    const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult) => {
       return changeEarningValidator({
         slug: poolInfo.slug,
         address: from,
         amount: '0',
         selectedValidators: target,
-        signerSubstrateProxyAddress
+        ...otherSignerSelected
       });
     };
 
     setSubmitLoading(true);
 
     setTimeout(() => {
-      // select proxy and send transaction, then handle result
-      selectSubstrateProxyAccountsToSign({
+      // select signable account proxy or signatory multisig to sign transaction
+      selectSignableAccountProxyToSign({
         address: from,
         chain,
-        type: ExtrinsicType.CHANGE_EARNING_VALIDATOR
+        extrinsicType: ExtrinsicType.CHANGE_EARNING_VALIDATOR
       }).then(sendPromise)
         .then(onSuccess)
         .catch(onError)
@@ -317,7 +317,7 @@ const Component = (props: Props) => {
           setSubmitLoading(false);
         });
     }, 300);
-  }, [poolInfo.slug, from, selectSubstrateProxyAccountsToSign, chain, onSuccess, onError]);
+  }, [poolInfo.slug, from, selectSignableAccountProxyToSign, chain, onSuccess, onError]);
 
   const onClickSubmit = useCallback((values: { target: ValidatorInfo[] }) => {
     const { target } = values;

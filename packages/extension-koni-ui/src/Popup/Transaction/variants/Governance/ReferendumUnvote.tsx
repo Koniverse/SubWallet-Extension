@@ -11,7 +11,7 @@ import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useDefaultNavigate, useGetNativeTokenBasicInfo, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleRemoveVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { useGovReferendumVotes } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView/useGovReferendumVotes';
-import { FormCallbacks, FormFieldData, GovReferendumUnvoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { FormCallbacks, FormFieldData, GovReferendumUnvoteParams, SelectSignableAccountProxyResult, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
@@ -39,7 +39,7 @@ const hideFields: Array<keyof GovReferendumUnvoteParams> = ['chain', 'referendum
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   const { className = '', isAllAccount } = props;
   const { t } = useTranslation();
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setBackProps, setCustomScreenTitle } = useTransactionContext<GovReferendumUnvoteParams>();
+  const { defaultData, persistData, selectSignableAccountProxyToSign, setBackProps, setCustomScreenTitle } = useTransactionContext<GovReferendumUnvoteParams>();
   const [, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const formDefault = useMemo((): GovReferendumUnvoteParams => ({ ...defaultData }), [defaultData]);
   const [form] = Form.useForm<GovReferendumUnvoteParams>();
@@ -137,24 +137,22 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       type: fromVoteType
     };
 
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
+    const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult) => {
       return handleRemoveVote({
         ...voteRequest,
-        signerSubstrateProxyAddress
+        ...otherSignerSelected
       });
     };
 
-    selectSubstrateProxyAccountsToSign({
+    selectSignableAccountProxyToSign({
       chain: chainValue,
       address: values.from,
-      type: ExtrinsicType.GOV_UNVOTE
+      extrinsicType: ExtrinsicType.GOV_UNVOTE
     }).then(sendPromise)
-      .then((tx) => {
-        onSuccess(tx);
-      })
+      .then(onSuccess)
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [chainValue, referendumId, defaultData.track, fromVoteDetail?.balance, fromVoteDetail?.nayBalance, fromVoteDetail?.ayeBalance, fromVoteDetail?.abstainBalance, totalAmount, fromVoteType, selectSubstrateProxyAccountsToSign, onError, onSuccess]);
+  }, [chainValue, referendumId, defaultData.track, fromVoteDetail?.balance, fromVoteDetail?.nayBalance, fromVoteDetail?.ayeBalance, fromVoteDetail?.abstainBalance, totalAmount, fromVoteType, selectSignableAccountProxyToSign, onError, onSuccess]);
 
   const goRefStandardVote = useCallback(() => {
     setGovRefVoteStorage({

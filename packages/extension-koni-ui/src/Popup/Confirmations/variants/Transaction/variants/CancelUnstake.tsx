@@ -5,6 +5,7 @@ import { RequestStakeCancelWithdrawal } from '@subwallet/extension-base/types';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
+import { isSignerDifferentFromSender } from '@subwallet/extension-koni-ui/utils';
 import CN from 'classnames';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,8 +34,7 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
-
-        {!!transaction.signerSubstrateProxyAddress &&
+        {!!transaction.signerSubstrateProxyAddress && isSignerDifferentFromSender(transaction.address, transaction.signerSubstrateProxyAddress) &&
           <MetaInfo.Account
             address={transaction.signerSubstrateProxyAddress}
             chainSlug={transaction.chain}

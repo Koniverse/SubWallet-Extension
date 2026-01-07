@@ -102,6 +102,9 @@ export interface AccountDeriveData {
 export interface AccountMultisigData {
   /** Is multisig account */
   isMultisig?: boolean;
+
+  /** signer addresses */
+  signers?: string[];
 }
 
 /**

@@ -48,11 +48,17 @@ export interface CancelPendingTxRequest extends BaseRequestSign {
   callHash: string;
 }
 
-export interface RequestGetSignableProxyIds {
+export interface RequestGetSignableProxies {
   multisigProxyId: string;
+  chain: string;
   extrinsicType: ExtrinsicType
 }
 
-export interface ResponseGetSignableProxyIds {
-  signableProxyIds: string[];
+export interface SignatorySignableProxy {
+  proxyId: string;
+  address: string;
+}
+
+export interface ResponseGetSignableProxies {
+  signableProxies: SignatorySignableProxy[];
 }

@@ -1,36 +1,46 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { SubstrateProxyAccountItem } from '@subwallet/extension-base/types';
 import { AccountProxyAvatar } from '@subwallet/extension-koni-ui/components';
-import { useGetAccountProxyById, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreCreateReformatAddress, useGetAccountByAddress, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { copyToClipboard, toShort } from '@subwallet/extension-koni-ui/utils';
+import { SignableAccountProxyItem, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
-import React, { Context, useCallback, useContext } from 'react';
+import React, { Context, useContext, useMemo } from 'react';
 import styled, { ThemeContext } from 'styled-components';
 
-export interface SubstrateProxyAccountItemExtended extends SubstrateProxyAccountItem {
-  isMain?: boolean;
-}
-
 type Props = ThemeProps & {
-  substrateProxyAccount: SubstrateProxyAccountItemExtended
+  accountItem: SignableAccountProxyItem;
   isSelected?: boolean;
+  chain: string;
   showUnselectIcon?: boolean;
   showCheckedIcon?: boolean;
   onClick?: VoidFunction;
 };
 
 function Component (props: Props): React.ReactElement<Props> {
-  const { className, isSelected, onClick, showCheckedIcon = true, showUnselectIcon, substrateProxyAccount } = props;
+  const { accountItem, chain, className, isSelected, onClick, showCheckedIcon = true, showUnselectIcon } = props;
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
   const { t } = useTranslation();
-  const notify = useNotification();
-  const accountProxy = useGetAccountProxyById(substrateProxyAccount.proxyId);
+  const accountInfo = useGetAccountByAddress(accountItem.address);
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+  const getReformatAddress = useCoreCreateReformatAddress();
+  const displayAddress = useMemo(
+    () => {
+      if (!accountInfo) {
+        return accountItem.address;
+      }
+
+      const reformatted = getReformatAddress(accountInfo, chainInfoMap[chain]);
+
+      return reformatted || accountItem.address;
+    },
+    [accountInfo, chainInfoMap, chain, accountItem.address, getReformatAddress]
+  );
+
   const checkedIconNode = ((showUnselectIcon || isSelected) && (
     <div className='__checked-icon-wrapper'>
       <Icon
@@ -42,51 +52,53 @@ function Component (props: Props): React.ReactElement<Props> {
     </div>
   ));
 
-  const onCopyAddress = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
+  const accountProxyTypeLabel = useMemo<string>(() => {
+    if (accountItem.kind === 'signatory') {
+      return t('ui.ACCOUNT.components.AccountProxy.SelectorItem.signatory');
+    }
 
-    copyToClipboard(substrateProxyAccount.substrateProxyAddress);
-    notify({
-      message: t('ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard')
-    });
-  }, [notify, substrateProxyAccount.substrateProxyAddress, t]);
+    if (accountItem.isProxiedAccount) {
+      return t('ui.ACCOUNT.components.AccountProxy.SelectorItem.proxiedAccount');
+    }
+
+    if (accountItem.substrateProxyType) {
+      return `${t('ui.ACCOUNT.components.AccountProxy.SelectorItem.proxyType')}: ${accountItem.substrateProxyType}`;
+    }
+
+    return '';
+  }, [accountItem, t]);
 
   return (
     <div
       className={CN(className, {
         '-readonly': !showCheckedIcon
       })}
-      key={substrateProxyAccount.substrateProxyAddress}
+      key={accountItem.address}
       onClick={showCheckedIcon ? onClick : undefined}
     >
-      <div
-        className='__item-left-part'
-        onClick={onCopyAddress}
-      >
+      <div className='__item-left-part'>
         <AccountProxyAvatar
           size={32}
-          value={substrateProxyAccount.proxyId || substrateProxyAccount.substrateProxyAddress}
+          value={accountItem.proxyId || accountItem.address}
         />
       </div>
       <div className='__item-middle-part'>
         <div className='__item-identity-part'>
           <div className={CN('__item-name', {
-            '-has-address': !!accountProxy?.name
+            '-has-address': !!accountInfo?.name
           })}
           >
-            {accountProxy?.name || toShort(substrateProxyAccount.substrateProxyAddress, 9, 9)}
+            {accountInfo?.name || toShort(displayAddress, 9, 9)}
           </div>
-          {!!accountProxy?.name && <div className='__item-address'>
-            ({toShort(substrateProxyAccount.substrateProxyAddress, 4, 5)})
+          {!!accountInfo?.name && <div className='__item-address'>
+            ({toShort(accountItem.address, 4, 5)})
           </div>}
         </div>
-        <div className={CN('__proxy-type', {
-          '-is-main': substrateProxyAccount.isMain
+        <div className={CN('__account-type', `-${accountItem.kind}`, {
+          '-is-main': accountItem.isProxiedAccount
         })}
         >
-          {
-            substrateProxyAccount.isMain ? t('ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.proxiedAccount') : `${t('ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.proxyType')}: ${substrateProxyAccount.substrateProxyType}`
-          }
+          {accountProxyTypeLabel}
         </div>
       </div>
       <div className='__item-right-part'>
@@ -96,7 +108,7 @@ function Component (props: Props): React.ReactElement<Props> {
   );
 }
 
-export const SubstrateProxyAccountSelectorItem = styled(Component)<Props>(({ theme }) => {
+const SignableAccountProxySelectorItem = styled(Component)<Props>(({ theme }) => {
   const { token } = theme as Theme;
 
   return {
@@ -150,14 +162,19 @@ export const SubstrateProxyAccountSelectorItem = styled(Component)<Props>(({ the
       fontWeight: token.headingFontWeight
     },
 
-    '.__proxy-type': {
+    '.__account-type': {
       fontSize: token.fontSizeSM,
       lineHeight: token.lineHeightSM,
       color: '#D92079',
 
       '&.-is-main': {
         color: '#86C338'
+      },
+
+      '&.-signatory': {
+        color: token['geekblue-9']
       }
+
     },
 
     '.__item-right-part': {
@@ -190,3 +207,5 @@ export const SubstrateProxyAccountSelectorItem = styled(Component)<Props>(({ the
     }
   };
 });
+
+export default SignableAccountProxySelectorItem;

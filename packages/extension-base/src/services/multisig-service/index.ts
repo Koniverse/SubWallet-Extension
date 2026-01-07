@@ -23,7 +23,7 @@ import { EventItem, EventType } from '../event-service/types';
  * List of chains that support multisig functionality
  * @todo deploy online
  */
-const MULTISIG_SUPPORTED_CHAINS: readonly string[] = ['statemint', 'statemine', 'paseo_assethub', 'paseoTest', 'westend_assethub'];
+export const MULTISIG_SUPPORTED_CHAINS: readonly string[] = ['statemint', 'statemine', 'paseo_assethub', 'paseoTest', 'westend_assethub'];
 
 /**
  * Query key for multisig multisigs subscription

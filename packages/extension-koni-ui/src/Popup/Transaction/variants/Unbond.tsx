@@ -14,7 +14,7 @@ import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckActi
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
 import { yieldSubmitLeavePool } from '@subwallet/extension-koni-ui/messaging';
-import { FormCallbacks, FormFieldData, ThemeProps, UnStakeParams } from '@subwallet/extension-koni-ui/types';
+import { FormCallbacks, FormFieldData, SelectSignableAccountProxyResult, ThemeProps, UnStakeParams } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, getBannerButtonIcon, getEarningTimeText, noop, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { BackgroundIcon, Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
 import { getAlphaColor } from '@subwallet/react-ui/lib/theme/themes/default/colorAlgorithm';
@@ -67,7 +67,7 @@ const validateFields: Array<keyof UnStakeParams> = ['value'];
 const Component: React.FC = () => {
   const { t } = useTranslation();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setCustomScreenTitle } = useTransactionContext<UnStakeParams>();
+  const { defaultData, persistData, selectSignableAccountProxyToSign, setCustomScreenTitle } = useTransactionContext<UnStakeParams>();
   const { slug } = defaultData;
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('unstake');
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
@@ -378,25 +378,25 @@ const Component: React.FC = () => {
     }
 
     // send unstake transaction
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
+    const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult = {}) => {
       return yieldSubmitLeavePool({
         ...request,
-        signerSubstrateProxyAddress
+        ...otherSignerSelected
       }).then(onSuccess);
     };
 
-    // wrap proxy selection
+    // wrap signable selection
     // for the Liquid Staking feature with multiple steps,
-    // only the root account is allowed to sign transactions, even if a valid proxy account is available to sign on its behalf.
+    // only the root account is allowed to sign transactions, even if a valid proxy account or signatory multisig is available to sign on its behalf.
     const sendPromiseWrapper = async () => {
       if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-        const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
+        const signableAccount = await selectSignableAccountProxyToSign({
           chain,
           address: from,
-          type: exType
+          extrinsicType: exType
         });
 
-        return await sendPromise(substrateProxyAddress);
+        return await sendPromise(signableAccount);
       }
 
       return await sendPromise();
@@ -412,7 +412,7 @@ const Component: React.FC = () => {
           setLoading(false);
         });
     }, 300);
-  }, [currentValidator, exType, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, selectSubstrateProxyAccountsToSign, stakingFee]);
+  }, [currentValidator, exType, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, selectSignableAccountProxyToSign, stakingFee]);
 
   const onClickSubmit = useCallback((values: UnStakeParams) => {
     if (currentConfirmation) {

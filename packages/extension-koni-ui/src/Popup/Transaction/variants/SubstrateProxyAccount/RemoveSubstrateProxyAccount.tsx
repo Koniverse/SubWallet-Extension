@@ -9,7 +9,7 @@ import { useGetAccountProxyByAddress, useGetNativeTokenSlug, useHandleSubmitTran
 import { useGetSubstrateProxyAccountGroupByAddress } from '@subwallet/extension-koni-ui/hooks/substrateProxyAccount/useGetSubstrateProxyAccountGroupByAddress';
 import { handleRemoveSubstrateProxyAccount } from '@subwallet/extension-koni-ui/messaging/transaction/substrateProxy';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
-import { RemoveSubstrateProxyAccountParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { RemoveSubstrateProxyAccountParams, SelectSignableAccountProxyResult, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getSubstrateProxyAddressKey } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -32,7 +32,7 @@ const extrinsicType = ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT;
 
 const Component = ({ className }: Props): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/remove-proxy');
-  const { defaultData: { chain, from, substrateProxyAddressKeys }, goBack, selectSubstrateProxyAccountsToSign, setBackProps } = useTransactionContext<RemoveSubstrateProxyAccountParams>();
+  const { defaultData: { chain, from, substrateProxyAddressKeys }, goBack, selectSignableAccountProxyToSign, setBackProps } = useTransactionContext<RemoveSubstrateProxyAccountParams>();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
@@ -88,13 +88,13 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
 
   const onClickSubmit = useCallback(() => {
     // Function to send the remove substrate proxy account transaction
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
+    const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult) => {
       return handleRemoveSubstrateProxyAccount({
         chain,
         address: from,
         selectedSubstrateProxyAccounts: substrateProxyAddressRemovedFiltered.substrateProxyItems,
         isRemoveAll,
-        signerSubstrateProxyAddress
+        ...otherSignerSelected
       });
     };
 
@@ -107,16 +107,16 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
 
     setLoading(true);
     // Select substrate proxy account to sign the transaction
-    selectSubstrateProxyAccountsToSign({
+    selectSignableAccountProxyToSign({
       chain,
       address: from,
-      type: extrinsicType,
+      extrinsicType,
       excludedSubstrateProxyAccounts
     }).then(sendPromise)
       .then(onSuccess)
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [selectSubstrateProxyAccountsToSign, chain, from, substrateProxyAddressRemovedFiltered.substrateProxyItems, onSuccess, onError, isRemoveAll]);
+  }, [selectSignableAccountProxyToSign, chain, from, substrateProxyAddressRemovedFiltered.substrateProxyItems, onSuccess, onError, isRemoveAll]);
 
   const onCancelRemove = useCallback(() => {
     if (accountProxy?.id) {
@@ -197,7 +197,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
             className={'proxy-address-removed'}
             label={t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyAccount')}
           >
-            {substrateProxyAddressCount} {t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts')}
+            {substrateProxyAddressCount} {substrateProxyAddressCount === 1 ? t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccount') : t('ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts')}
             <Button
               className={'proxy-address-removed-info'}
               icon={ <Icon
