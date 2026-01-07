@@ -160,7 +160,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         value={accountInfo?.proxyId || signer}
                       />
                     </div>
-                    <span className={'signatory-account-value'}>{accountInfo?.name || signer}</span>
+                    <span className={'signatory-account-value'}>{accountInfo?.name || toShort(signer, 8,9)}</span>
                   </div>
                   {(isApproved) && (
                     <div className={CN('__checked-icon-wrapper', {
@@ -207,7 +207,8 @@ const HistoryMultisigLayout = styled(Component)<Props>(({ theme: { token } }: Pr
 
     '.signatory-account-wrapper': {
       display: 'flex',
-      gap: 8
+      gap: 8,
+      overflow: 'hidden'
     },
 
     '.signatory-account-value': {
