@@ -50,7 +50,7 @@ export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
   value: string;
   transferBounceable?: boolean;
   isSubstrateECDSATransaction?: boolean;
-  metadata?: AlphaTokenTransferMetadata
+  metadata?: Record<string, any>; // TODO: convert transferBounceable and isSubstrateECDSATransaction to a metadata type
 }
 
 export interface RequestSubmitSignPsbtTransfer extends BaseRequestSign {

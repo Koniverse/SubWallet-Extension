@@ -194,7 +194,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const [isBalanceReady, setIsBalanceReady] = useState(true);
   const [transferInfo, setTransferInfo] = useState<ResponseSubscribeTransfer | undefined>();
   const [isFetchingInfo, setIsFetchingInfo] = useState(false);
-  const [targetLoading, setTargetLoading] = useState(false);
+  const [isFetchingPoolTargets, setIsFetchingPoolTargets] = useState(false);
   const [isFetchingListFeeToken, setIsFetchingListFeeToken] = useState(false);
   const chainStatus = useMemo(() => chainStatusMap[chainValue]?.connectionStatus, [chainValue, chainStatusMap]);
   const estimatedNativeFee = useMemo((): string => transferInfo?.feeOptions.estimatedFee || '0', [transferInfo]);
@@ -866,7 +866,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
-  const isDataReady = !isFetchingInfo && !isFetchingListFeeToken && !!transferInfo?.feeOptions && (!isAlphaTokenTransfer || !targetLoading);
+  const isDataReady = !isFetchingInfo && !isFetchingListFeeToken && !!transferInfo?.feeOptions && (!isAlphaTokenTransfer || !isFetchingPoolTargets);
 
   useEffect(() => {
     const updateFromValue = () => {
@@ -1121,7 +1121,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
                 poolInfo={poolPositionDetail?.poolInfo}
                 positionInfo={poolPositionDetail?.positions}
                 setIsTransferAll={setIsTransferAll}
-                setTargetLoading={setTargetLoading}
+                setTargetLoading={setIsFetchingPoolTargets}
                 validateRecipient={validateRecipient}
               />
             )
@@ -1258,7 +1258,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
               weight={'fill'}
             />
           )}
-          loading={loading || targetLoading}
+          loading={loading || isFetchingPoolTargets}
           onClick={checkAction(form.submit, extrinsicType)}
           schema={isTransferAll ? 'warning' : undefined}
         >

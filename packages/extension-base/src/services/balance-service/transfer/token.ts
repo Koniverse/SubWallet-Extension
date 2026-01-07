@@ -31,7 +31,7 @@ interface CreateTransferExtrinsicProps {
   value: string,
   transferAll: boolean,
   tokenInfo: _ChainAsset
-  metadata?: AlphaTokenTransferMetadata
+  metadata?: Record<string, any>;
 }
 
 export const createSubstrateExtrinsic = async ({ from, metadata, networkKey, substrateApi, to, tokenInfo, transferAll, value }: CreateTransferExtrinsicProps): Promise<[SubmittableExtrinsic | null, string]> => {
@@ -135,39 +135,38 @@ export const createSubstrateExtrinsic = async ({ from, metadata, networkKey, sub
   } else if (_TRANSFER_CHAIN_GROUP.truth.includes(networkKey)) {
     transfer = api.tx.assetManager.transfer(to, _getTokenOnChainInfo(tokenInfo), value);
   } else if (_TRANSFER_CHAIN_GROUP.bittensor.includes(networkKey) && !!metadata) {
-      const { fromValidator, netuid, toValidator } = metadata;
-      const formatToValidator = toValidator?.split('___')[0];
+    const { fromValidator, netuid, toValidator } = metadata as AlphaTokenTransferMetadata;
+    const formatToValidator = toValidator?.split('___')[0];
 
-      if (fromValidator === formatToValidator) {
-        transfer = substrateApi.api.tx.subtensorModule.transferStake(
-          to,
-          fromValidator,
-          netuid,
-          netuid,
-          value
-        );
-      } else {
-        const moveStakeTx = substrateApi.api.tx.subtensorModule.moveStake(
-          fromValidator,
-          formatToValidator,
-          netuid,
-          netuid,
-          value
-        );
-        const transferStakeTx = substrateApi.api.tx.subtensorModule.transferStake(
-          to,
-          formatToValidator,
-          netuid,
-          netuid,
-          value
-        );
+    if (fromValidator === formatToValidator) {
+      transfer = substrateApi.api.tx.subtensorModule.transferStake(
+        to,
+        fromValidator,
+        netuid,
+        netuid,
+        value
+      );
+    } else {
+      const moveStakeTx = substrateApi.api.tx.subtensorModule.moveStake(
+        fromValidator,
+        formatToValidator,
+        netuid,
+        netuid,
+        value
+      );
+      const transferStakeTx = substrateApi.api.tx.subtensorModule.transferStake(
+        to,
+        formatToValidator,
+        netuid,
+        netuid,
+        value
+      );
 
-        transfer = substrateApi.api.tx.utility.batchAll([
-          moveStakeTx,
-          transferStakeTx
-        ]);
-      }
-
+      transfer = substrateApi.api.tx.utility.batchAll([
+        moveStakeTx,
+        transferStakeTx
+      ]);
+    }
   }
 
   return [transfer, transferAmount || value];

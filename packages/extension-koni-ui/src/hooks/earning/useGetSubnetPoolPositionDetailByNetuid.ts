@@ -25,6 +25,18 @@ const useGetSubnetPoolPositionDetailByNetuid = (netuid?: number, address?: strin
     if (!netuid) {
       return null;
     }
+    /**
+     * Check whether a yield position belongs to the current account context
+     *
+     * - All account mode:
+     *   + If address is provided → match position.address with input address
+     *   + If no address → accept all positions
+     *
+     * - Single account mode:
+     *   + Position address must belong to one of current accounts
+     *   + If address is provided → additionally match input address
+     *
+     */
 
     const checkAddress = (item: YieldPositionInfo): boolean => {
       if (isAllAccount) {
@@ -41,6 +53,14 @@ const useGetSubnetPoolPositionDetailByNetuid = (netuid?: number, address?: strin
         }) ?? false
       );
     };
+
+    /**
+     * Filter all yield positions to get matched subnet staking positions:
+     * - Must be SUBNET_STAKING type
+     * - Must belong to the target subnet (netuid)
+     * - Must match current account (checkAddress)
+     * - Must have non-zero stake
+     */
 
     const matchedPositions = yieldPositions.filter(
       (position): position is SubnetYieldPositionInfo => {

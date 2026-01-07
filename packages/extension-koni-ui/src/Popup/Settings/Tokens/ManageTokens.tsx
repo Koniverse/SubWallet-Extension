@@ -76,8 +76,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     return (
       token.name.toLowerCase().includes(searchTextLowerCase) ||
-      token.symbol.toLowerCase().includes(searchTextLowerCase) ||
-      token.originChain.toLowerCase().includes(searchTextLowerCase)
+      token.symbol.toLowerCase().includes(searchTextLowerCase)
     );
   }, []);
 

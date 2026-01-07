@@ -24,7 +24,7 @@ import { getHydrationRate } from '@subwallet/extension-base/services/fee-service
 import { isCardanoTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { EvmEIP1559FeeDetail, EvmEIP1559FeeOption, FeeChainType, FeeDetail, FeeInfo, SubstrateTipInfo, TransactionFee } from '@subwallet/extension-base/types';
-import { AlphaTokenTransferMetadata, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
+import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { BN_ZERO } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
@@ -55,7 +55,7 @@ export interface CalculateMaxTransferable extends TransactionFee {
   isTransferNativeTokenAndPayLocalTokenAsFee: boolean;
   nativeToken: _ChainAsset;
   transferAll?: boolean;
-  metadata?: AlphaTokenTransferMetadata
+  metadata?: Record<string, any>;
 }
 
 export const detectTransferTxType = (srcToken: _ChainAsset, srcChain: _ChainInfo, destChain: _ChainInfo): FeeChainType => {
