@@ -6,8 +6,7 @@ export const _STAKING_CHAIN_GROUP = {
   assetHub: ['statemine', 'statemint', 'westend_assethub', 'paseo_assethub'],
   para: ['moonbeam', 'moonriver', 'moonbase', 'turing', 'turingStaging', 'bifrost', 'bifrost_testnet', 'calamari_test', 'calamari', 'manta_network', 'polimec'],
   astar: ['astar', 'shiden', 'shibuya'],
-  amplitude: ['amplitude', 'amplitude_test', 'kilt', 'kilt_peregrine', 'pendulum', 'krest_network'], // amplitude and kilt only share some common logic
-  kilt: ['kilt', 'kilt_peregrine'],
+  amplitude: ['amplitude', 'amplitude_test', 'pendulum', 'krest_network'], // amplitude and kilt only share some common logic
   nominationPool: ['polkadot', 'kusama', 'westend', 'alephTest', 'aleph', 'kate', 'vara_network', 'goldberg_testnet', 'availTuringTest', 'avail_mainnet', 'vara_testnet', 'cere', 'analog_timechain', 'paseoTest'],
   bifrost: ['bifrost', 'bifrost_testnet'],
   aleph: ['aleph', 'alephTest'], // A0 has distinct tokenomics
@@ -42,4 +41,3 @@ export const STAKING_IDENTITY_API_SLUG: Record<string, string> = {
   statemine: 'peopleKusama',
   statemint: 'polkadot_people'
 };
-export const _SUPPORT_CHANGE_VALIDATOR_CHAIN = ['polkadot', 'kusama'];
