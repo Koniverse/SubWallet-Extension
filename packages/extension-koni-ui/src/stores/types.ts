@@ -224,3 +224,9 @@ export interface NotificationStore extends BaseReduxStore {
 export interface GovernanceStore extends BaseReduxStore {
   govLockedInfos: GovVotingInfo[];
 }
+
+export type WalletConnectSessionsSubscription = {
+  promise: Promise<SessionTypes.Struct[]>;
+  start: () => void;
+  unsub: () => void;
+};
