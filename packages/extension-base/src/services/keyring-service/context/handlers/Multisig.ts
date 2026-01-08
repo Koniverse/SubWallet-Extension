@@ -76,7 +76,7 @@ export class AccountMultisigHandler extends AccountBaseHandler {
     }
   }
 
-  public getSignableProxies (request: RequestGetSignableProxies): ResponseGetSignableProxies {
+  public getSignableProxies (request: RequestGetSignableProxies): ResponseGetSignableProxies { // todo: rename -> getSignableAccountInfos
     const { chain, extrinsicType, multisigProxyId } = request;
 
     if (!MULTISIG_SUPPORTED_CHAINS.includes(chain)) {
@@ -94,7 +94,13 @@ export class AccountMultisigHandler extends AccountBaseHandler {
     const signableProxies: SignatorySignableProxy[] = [];
     const signers = targetMultisigAccount.accounts[0].signers as string[];
 
+    const allMultisigAccountAddress = allMultisigAccounts.map((acc) => acc.id);
+
     for (const signer of signers) {
+      if (allMultisigAccountAddress.includes(signer)) {
+        continue;
+      }
+
       const proxyId = this.state.belongUnifiedAccount(signer) || reformatAddress(signer);
       const accountProxy = allAccounts[proxyId];
       const substrateAccount = accountProxy?.accounts.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);

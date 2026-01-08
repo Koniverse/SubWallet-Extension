@@ -51,7 +51,7 @@ export interface CancelPendingTxRequest extends BaseRequestSign {
 export interface RequestGetSignableProxies {
   multisigProxyId: string;
   chain: string;
-  extrinsicType: ExtrinsicType
+  extrinsicType: ExtrinsicType;
 }
 
 export interface SignatorySignableProxy {
