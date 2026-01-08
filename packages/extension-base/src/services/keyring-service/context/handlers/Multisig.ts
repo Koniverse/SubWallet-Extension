@@ -5,7 +5,7 @@ import { AccountMultisigError, AccountMultisigErrorCode, RequestAccountCreateMul
 import { AccountBaseHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Base';
 import { MULTISIG_SUPPORTED_CHAINS } from '@subwallet/extension-base/services/multisig-service';
 import { AccountChainType } from '@subwallet/extension-base/types';
-import { RequestGetSignableProxies, ResponseGetSignableProxies, SignatorySignableProxy } from '@subwallet/extension-base/types/multisig';
+import { RequestGetSignableAccountInfos, ResponseGetSignableAccountInfos, SignableAccountInfo } from '@subwallet/extension-base/types/multisig';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { encodeAddress } from '@subwallet/keyring';
 import { KeyringPair$Meta } from '@subwallet/keyring/types';
@@ -76,7 +76,11 @@ export class AccountMultisigHandler extends AccountBaseHandler {
     }
   }
 
-  public getSignableProxies (request: RequestGetSignableProxies): ResponseGetSignableProxies { // todo: rename -> getSignableAccountInfos
+  /**
+   * Get 1-level signatories
+   * Ignore multisig accounts that are also signatories
+   */
+  public getSignableAccountInfos (request: RequestGetSignableAccountInfos): ResponseGetSignableAccountInfos {
     const { chain, extrinsicType, multisigProxyId } = request;
 
     if (!MULTISIG_SUPPORTED_CHAINS.includes(chain)) {
@@ -91,7 +95,7 @@ export class AccountMultisigHandler extends AccountBaseHandler {
       return { signableProxies: [] };
     }
 
-    const signableProxies: SignatorySignableProxy[] = [];
+    const signableAccountInfo: SignableAccountInfo[] = [];
     const signers = targetMultisigAccount.accounts[0].signers as string[];
 
     const allMultisigAccountAddress = allMultisigAccounts.map((acc) => acc.id);
@@ -107,7 +111,7 @@ export class AccountMultisigHandler extends AccountBaseHandler {
 
       if (substrateAccount) {
         if (substrateAccount.transactionActions.includes(extrinsicType)) {
-          signableProxies.push({
+          signableAccountInfo.push({
             proxyId,
             address: signer
           });
@@ -115,6 +119,6 @@ export class AccountMultisigHandler extends AccountBaseHandler {
       }
     }
 
-    return { signableProxies };
+    return { signableProxies: signableAccountInfo };
   }
 }

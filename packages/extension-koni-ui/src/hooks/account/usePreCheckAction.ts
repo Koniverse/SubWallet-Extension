@@ -5,7 +5,7 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { ALL_STAKING_ACTIONS, isLedgerCapable, isProductionMode, ledgerIncompatible, SubstrateLedgerSignModeSupport } from '@subwallet/extension-koni-ui/constants';
-import { getSignableProxies } from '@subwallet/extension-koni-ui/messaging/transaction/multisig';
+import { getSignableAccountInfos } from '@subwallet/extension-koni-ui/messaging/transaction/multisig';
 import { useCallback } from 'react';
 
 import { useNotification, useTranslation } from '../common';
@@ -70,7 +70,7 @@ const usePreCheckAction = ({ address, blockAllAccount = true, chain, message }: 
         }
 
         if (account.isMultisig && chain) {
-          const { signableProxies } = await getSignableProxies({ multisigProxyId: account.address, extrinsicType: action, chain });
+          const { signableProxies } = await getSignableAccountInfos({ multisigProxyId: account.address, extrinsicType: action, chain });
 
           if (signableProxies.length === 0) {
             block = true;

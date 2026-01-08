@@ -6,7 +6,7 @@ import { AccountChainType, AccountSignMode, RequestGetSubstrateProxyAccountGroup
 import { createPromiseHandler, isSameAddress } from '@subwallet/extension-base/utils';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { getSignableProxies } from '@subwallet/extension-koni-ui/messaging/transaction/multisig';
+import { getSignableAccountInfos } from '@subwallet/extension-koni-ui/messaging/transaction/multisig';
 import { getSubstrateProxyAccountGroup } from '@subwallet/extension-koni-ui/messaging/transaction/substrateProxy';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { SelectSignableAccountProxy, SelectSignableAccountProxyParams, SelectSignableAccountProxyResult, SignableAccountProxyItem } from '@subwallet/extension-koni-ui/types';
@@ -119,7 +119,7 @@ export function useCreateSelectSignableAccountProxyAccount (): SelectSignableAcc
         return [];
       }
 
-      const { signableProxies } = await getSignableProxies({
+      const { signableProxies } = await getSignableAccountInfos({
         extrinsicType,
         chain,
         multisigProxyId: account.proxyId

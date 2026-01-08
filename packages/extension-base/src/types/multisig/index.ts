@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { DecodeCallDataResponse } from '@subwallet/extension-base/services/multisig-service/utils';
 import { BaseRequestSign } from '@subwallet/extension-base/types';
+
+import { SubmittableExtrinsic } from '@polkadot/api/types';
 
 export interface ApprovePendingTxRequest extends BaseRequestSign {
   address: string;
@@ -48,17 +51,17 @@ export interface CancelPendingTxRequest extends BaseRequestSign {
   callHash: string;
 }
 
-export interface RequestGetSignableProxies {
+export interface RequestGetSignableAccountInfos {
   multisigProxyId: string;
   chain: string;
   extrinsicType: ExtrinsicType;
 }
 
-export interface SignatorySignableProxy {
+export interface SignableAccountInfo {
   proxyId: string;
   address: string;
 }
 
-export interface ResponseGetSignableProxies {
-  signableProxies: SignatorySignableProxy[];
+export interface ResponseGetSignableAccountInfos {
+  signableProxies: SignableAccountInfo[];
 }
