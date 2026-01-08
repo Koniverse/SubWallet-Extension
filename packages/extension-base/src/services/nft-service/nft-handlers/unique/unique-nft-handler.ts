@@ -1,10 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {ChainType, NftCollection, NftFullListRequest, NftItem} from '@subwallet/extension-base/background/KoniTypes';
+import { ChainType, NftCollection, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { getAddressesByChainType } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
-import {UniqueBundleTree, UniqueNftInstance} from '@subwallet-monorepos/subwallet-services-sdk/services';
+import { UniqueBundleTree, UniqueNftInstance } from '@subwallet-monorepos/subwallet-services-sdk/services';
 import { UniqueCollectionByTokenOwnerRaw } from '@subwallet-monorepos/subwallet-services-sdk/services/nft/unique-nft';
 
 import { BaseNftHandler, NftHandlerResult } from '../base-nft-handler';
@@ -25,7 +25,7 @@ export class UniqueNftHandler extends BaseNftHandler {
     };
   }
 
-  private mapUniqueRootNftToItem(raw: UniqueNftInstance, owner: string): NftItem {
+  private mapUniqueRootNftToItem (raw: UniqueNftInstance, owner: string): NftItem {
     return {
       id: raw.tokenId.toString(),
       chain: this.chain,
@@ -122,7 +122,6 @@ export class UniqueNftHandler extends BaseNftHandler {
         for (const rootNft of sdkNfts) {
           items.push(this.mapUniqueRootNftToItem(rootNft, address));
         }
-
       }));
     } catch (e) {
       console.error(`[UniqueNftHandler] Failed to fetch for ${this.chain}`, e);
@@ -135,14 +134,14 @@ export class UniqueNftHandler extends BaseNftHandler {
     const items: NftItem[] = [];
     const collections: NftCollection[] = [];
     const { collectionId, owners, tokenIds } = request;
-    if (!collectionId || !owners || !tokenIds){
+
+    if (!collectionId || !owners || !tokenIds) {
       console.warn('[NftService] missing params for getFullNftInstancesByCollection');
 
       return { items, collections };
     }
 
     for (const id of tokenIds) {
-
       const fullTree = await this.fetchNftBundle(collectionId, id, owners[0]);
 
       if (fullTree) {
