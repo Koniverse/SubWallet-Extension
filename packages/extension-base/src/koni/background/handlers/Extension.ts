@@ -5297,7 +5297,7 @@ export default class KoniExtension {
 
   private async handleAddSubstrateProxyAccount (params: RequestAddSubstrateProxyAccount): Promise<SWTransactionResponse> {
     const { address, chain, signerSubstrateProxyAddress } = params;
-    const validationErrors = await this.#koniState.substrateProxyAccountService.validateAddSubstrateProxyAccount(params);
+    const validationErrors = await this.#koniState.substrateProxyAccountService.validateAddSubstrateProxyAccount(params, signerSubstrateProxyAddress);
 
     if (validationErrors.length > 0) {
       return this.#koniState.transactionService.generateBeforeHandleResponseErrors(validationErrors);

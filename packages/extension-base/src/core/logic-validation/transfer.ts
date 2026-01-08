@@ -500,7 +500,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
   const bnNativeTokenAvailable = new BigN(nativeTokenAvailable.value);
   const bnNativeTokenTransferAmount = new BigN(validationResponse.transferNativeAmount || '0');
 
-  if (!bnNativeTokenAvailable.gt(0)) {
+  if (!bnNativeTokenAvailable.gt(0) && !substrateProxyAccountNativeTokenAvailable) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
   }
 
