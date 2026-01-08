@@ -165,10 +165,10 @@ export class EvmNftHandler extends BaseNftHandler {
   override async fetchFullListNftOfACollection (request: NftFullListRequest): Promise<NftHandlerResult> {
     const items: NftItem[] = [];
     const collections: NftCollection[] = [];
-    const { chainInfo, contractAddress, owners } = request;
+    const { chainInfo, collectionId, owners } = request;
     const chainId = _getEvmChainId(chainInfo);
 
-    if (!contractAddress || !owners || !chainId) {
+    if (!collectionId || !owners || !chainId) {
       console.warn('[NftService] missing params for getFullNftInstancesByCollection');
 
       return { items, collections };
@@ -188,7 +188,7 @@ export class EvmNftHandler extends BaseNftHandler {
       for (const eachOwner of ownerList) {
         try {
           const instances = await nftDetectionApi.getAllNftInstances(
-            contractAddress,
+            collectionId,
             eachOwner,
             chainId.toString()
           );
@@ -198,7 +198,7 @@ export class EvmNftHandler extends BaseNftHandler {
           }
 
           const mappedItems = instances.map((inst) =>
-            this.mapSdkToNftItem(inst, contractAddress, eachOwner)
+            this.mapSdkToNftItem(inst, collectionId, eachOwner)
           ).filter((i): i is NftItem => Boolean(i));
 
           items.push(...mappedItems);
@@ -208,7 +208,7 @@ export class EvmNftHandler extends BaseNftHandler {
       }
     } catch (err) {
       console.error(
-        `[NftDetectionService] getFullNftInstancesByCollection error for ${contractAddress}`,
+        `[NftDetectionService] getFullNftInstancesByCollection error for ${collectionId}`,
         err
       );
 

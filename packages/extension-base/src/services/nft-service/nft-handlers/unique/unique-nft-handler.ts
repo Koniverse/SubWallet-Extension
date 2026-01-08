@@ -1,10 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ChainType, NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import {ChainType, NftCollection, NftFullListRequest, NftItem} from '@subwallet/extension-base/background/KoniTypes';
 import { getAddressesByChainType } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
-import { UniqueBundleTree } from '@subwallet-monorepos/subwallet-services-sdk/services';
+import {UniqueBundleTree, UniqueNftInstance} from '@subwallet-monorepos/subwallet-services-sdk/services';
 import { UniqueCollectionByTokenOwnerRaw } from '@subwallet-monorepos/subwallet-services-sdk/services/nft/unique-nft';
 
 import { BaseNftHandler, NftHandlerResult } from '../base-nft-handler';
@@ -22,6 +22,20 @@ export class UniqueNftHandler extends BaseNftHandler {
       image: raws.collectionCover?.url || undefined,
       externalUrl: undefined,
       originAsset: undefined
+    };
+  }
+
+  private mapUniqueRootNftToItem(raw: UniqueNftInstance, owner: string): NftItem {
+    return {
+      id: raw.tokenId.toString(),
+      chain: this.chain,
+      collectionId: raw.collectionId.toString(),
+      name: raw.name || `#${raw.tokenId}`,
+      image: raw.image || undefined,
+      description: '',
+      owner: owner,
+      isBundle: raw.isBundle,
+      properties: null
     };
   }
 
@@ -56,7 +70,7 @@ export class UniqueNftHandler extends BaseNftHandler {
     return item;
   }
 
-  async fetchNftBundle (collectionId: number | string, tokenId: number, topmostOwner: string): Promise<NftItem | null> {
+  async fetchNftBundle (collectionId: number | string, tokenId: string, topmostOwner: string): Promise<NftItem | null> {
     const api = subwalletApiSdk.uniqueNftDetectionApi;
 
     if (!api) {
@@ -102,21 +116,43 @@ export class UniqueNftHandler extends BaseNftHandler {
           }
         }
 
-        // 3. NFTs
+        // 2. Root NFTs
         const sdkNfts = await api.getAllUniqueRootNfts({ owner: address });
 
         for (const rootNft of sdkNfts) {
-          const fullTree = await this.fetchNftBundle(rootNft.collectionId, rootNft.tokenId, address);
-
-          if (fullTree) {
-            items.push(fullTree);
-          }
+          items.push(this.mapUniqueRootNftToItem(rootNft, address));
         }
+
       }));
     } catch (e) {
       console.error(`[UniqueNftHandler] Failed to fetch for ${this.chain}`, e);
     }
 
     return { items, collections: Array.from(collectionsMap.values()) };
+  }
+
+  override async fetchFullListNftOfACollection (request: NftFullListRequest): Promise<NftHandlerResult> {
+    const items: NftItem[] = [];
+    const collections: NftCollection[] = [];
+    const { collectionId, owners, tokenIds } = request;
+    if (!collectionId || !owners || !tokenIds){
+      console.warn('[NftService] missing params for getFullNftInstancesByCollection');
+
+      return { items, collections };
+    }
+
+    for (const id of tokenIds) {
+
+      const fullTree = await this.fetchNftBundle(collectionId, id, owners[0]);
+
+      if (fullTree) {
+        items.push(fullTree);
+      }
+    }
+
+    return {
+      items: items,
+      collections: collections
+    };
   }
 }

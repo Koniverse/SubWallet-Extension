@@ -1015,9 +1015,10 @@ export interface NftTransactionRequest {
 }
 
 export interface NftFullListRequest {
-  contractAddress: string;
+  collectionId: string;
   owners: string[];
-  chainInfo: _ChainInfo
+  chainInfo: _ChainInfo;
+  tokenIds?: string[]
 }
 
 export interface EvmNftTransaction extends ValidateTransactionResponse {

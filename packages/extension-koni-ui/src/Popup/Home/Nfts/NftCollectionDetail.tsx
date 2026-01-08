@@ -76,6 +76,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return collectionInfo ? getNftsByCollection(collectionInfo) : [];
   }, [collectionInfo, getNftsByCollection]);
 
+  const tokenIds = useMemo(() => {
+    return nftList.map((nft) => nft.id);
+  }, [nftList]);
+
   const ownerAddresses = useMemo(() => {
     const ownerSet = new Set<string>();
 
@@ -112,7 +116,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const handleOnClickNft = useCallback((state: INftItemDetail) => {
     const { chain, collectionId } = state.collectionInfo;
     const tokenId = state.nftItem.id;
-    const isBundle = state.nftItem?.isBundle;
+    const isBundle = (state.nftItem?.nestingTokens?.length ?? 0) > 0;
 
     const base = `/home/nfts/${isBundle ? 'bundle-item-detail' : 'item-detail'}`;
     const url = `${base}?chain=${chain}&collectionId=${collectionId}&tokenId=${tokenId}`;
@@ -201,7 +205,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     }
 
     setIsFetching(true);
-    getFullNftList({ contractAddress: collectionInfo?.collectionId, owners: ownerAddresses, chainInfo: chainInfo })
+    getFullNftList({ collectionId: collectionInfo?.collectionId, tokenIds: tokenIds, owners: ownerAddresses, chainInfo: chainInfo })
       .catch(console.error)
       .finally(() => {
         if (isMounted) {
@@ -212,7 +216,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return () => {
       isMounted = false;
     };
-  }, [chainInfoMap, collectionInfo, isFetching, nftList.length, ownerAddresses]);
+  }, [chainInfoMap, collectionInfo, isFetching, nftList.length, ownerAddresses, tokenIds]);
 
   return (
     <PageWrapper

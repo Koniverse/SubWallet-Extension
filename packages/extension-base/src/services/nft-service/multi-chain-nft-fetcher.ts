@@ -103,7 +103,7 @@ export class MultiChainNftFetcher {
   }
 
   public async fetchFullListNftOfACollection (request: NftFullListRequest): Promise<NftHandlerResult> {
-    const { chainInfo, contractAddress, owners } = request;
+    const { chainInfo, collectionId, owners, tokenIds } = request;
     const items: NftItem[] = [];
     const collections: NftCollection[] = [];
 
@@ -120,8 +120,9 @@ export class MultiChainNftFetcher {
       try {
         const result = await handler.fetchFullListNftOfACollection(
           {
-            contractAddress: contractAddress,
+            collectionId: collectionId,
             owners: handlerOwners,
+            tokenIds: tokenIds,
             chainInfo
           }
         );
