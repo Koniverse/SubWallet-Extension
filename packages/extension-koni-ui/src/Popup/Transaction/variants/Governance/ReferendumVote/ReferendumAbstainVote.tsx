@@ -11,7 +11,7 @@ import { DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, GOV_REFERENDUM_VOTE_TRANSACTION } f
 import { useDefaultNavigate, useHandleSubmitTransaction, usePreCheckAction, useSelector, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { handleVote } from '@subwallet/extension-koni-ui/messaging/transaction/gov';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { FormCallbacks, FormFieldData, GovReferendumVoteParams, SelectSignableAccountProxyResult, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { FormCallbacks, FormFieldData, GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { GovAccountAddressItemType, PreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/types/gov';
 import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils';
 import { calculateTotalAmountVotes, getPreviousVoteAmountDetail } from '@subwallet/extension-koni-ui/utils/gov';
@@ -42,7 +42,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   // @ts-ignore
   const { className = '', isAllAccount } = props;
   const { t } = useTranslation();
-  const { defaultData, persistData, selectSignableAccountProxyToSign, setBackProps, setCustomScreenTitle } = useTransactionContext<GovReferendumVoteParams>();
+  const { defaultData, persistData, setBackProps, setCustomScreenTitle } = useTransactionContext<GovReferendumVoteParams>();
   const [govRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData, from: govRefVoteStorage.from, fromAccountProxy: govRefVoteStorage.fromAccountProxy }), [defaultData, govRefVoteStorage.from, govRefVoteStorage.fromAccountProxy]);
   const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
@@ -91,22 +91,11 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       nayAmount: values.nayAmount || '0'
     };
 
-    const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult) => {
-      return handleVote({
-        ...voteRequest,
-        ...otherSignerSelected
-      });
-    };
-
-    selectSignableAccountProxyToSign({
-      chain: chainValue,
-      address: values.from,
-      extrinsicType: ExtrinsicType.GOV_VOTE
-    }).then(sendPromise)
+    handleVote(voteRequest)
       .then(onSuccess)
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [chainValue, defaultData.referendumId, defaultData.track, onError, onSuccess, selectSignableAccountProxyToSign]);
+  }, [chainValue, defaultData.referendumId, defaultData.track, onError, onSuccess]);
 
   const goRefStandardVote = useCallback(() => {
     navigate('/transaction/gov-ref-vote/standard');

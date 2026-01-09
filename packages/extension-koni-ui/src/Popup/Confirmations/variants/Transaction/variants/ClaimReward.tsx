@@ -6,7 +6,6 @@ import { RequestStakeClaimReward } from '@subwallet/extension-base/types';
 import { CommonTransactionInfo, MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useGetNativeTokenBasicInfo, useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { CallDataDetail, MultisigInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
@@ -60,17 +59,6 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        <CallDataDetail callData={'0x0'} />
-      </MetaInfo>
-      <MetaInfo
-        className={'meta-info'}
-        hasBackgroundWrapper
-      >
-        <MultisigInfoArea
-          chain={transaction.chain}
-          multisigDeposit={'0'}
-          signatoryAddress={transaction.signerSubstrateMultisigAddress}
-        />
         {
           data.unclaimedReward && <MetaInfo.Number
             decimals={decimals}
@@ -80,12 +68,12 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         }
 
-        <MetaInfo.Number
+        {!transaction.isWrappedTx && <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.ClaimReward.estimatedFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
-        />
+        />}
       </MetaInfo>
 
       <span className={CN('text-light-4')}>

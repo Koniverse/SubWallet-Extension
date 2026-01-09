@@ -105,6 +105,9 @@ export interface AccountMultisigData {
 
   /** signer addresses */
   signers?: string[];
+
+  /** multisig threshold */
+  threshold?: number;
 }
 
 /**

@@ -12,6 +12,7 @@ import { CardanoTransactionConfig } from '@subwallet/extension-base/services/bal
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getEvmChainId, _isChainEvmCompatible, _isNativeTokenBySlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { ClaimAvailBridgeNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { MULTISIG_SUPPORTED_CHAINS } from '@subwallet/extension-base/services/multisig-service';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { TRANSACTION_TIMEOUT } from '@subwallet/extension-base/services/transaction-service/constants';
 import { parseLiquidStakingEvents, parseLiquidStakingFastUnstakeEvents, parseTransferEventLogs, parseXcmEventLogs } from '@subwallet/extension-base/services/transaction-service/event-parser';
@@ -19,8 +20,8 @@ import { getBaseTransactionInfo, getTransactionId, isBitcoinTransaction, isCarda
 import { OptionalSWTransaction, SWDutchTransaction, SWDutchTransactionInput, SWPermitTransaction, SWPermitTransactionInput, SWTransaction, SWTransactionBase, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
-import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitBittensorChangeValidatorStaking, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
-import { anyNumberToBN, isSameAddress, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
+import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestRemoveSubstrateProxyAccount, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitBittensorChangeValidatorStaking, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
+import { anyNumberToBN, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
 import { mergeTransactionAndSignature } from '@subwallet/extension-base/utils/eth/mergeTransactionAndSignature';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -153,20 +154,37 @@ export default class TransactionService {
     const priceMap = (await this.state.priceService.getPrice()).priceMap;
 
     // Get signer account
-    let signer = address;
-    const signerSubstrateProxyAddress = transactionInput.signerSubstrateProxyAddress;
+    const signer = address;
+    // todo: move substarte proxy to new flow later
+    // const signerSubstrateProxyAddress = transactionInput.signerSubstrateProxyAddress;
 
     if (!transactionInput.skipFeeRecalculation) {
-      validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee, signerSubstrateProxyAddress);
+      validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee);
     }
 
     const chainInfoMap = this.state.chainService.getChainInfoMap();
 
     let substrateProxyAccountNativeTokenAvailable: AmountData | undefined;
 
-    if (signerSubstrateProxyAddress && !isSameAddress(signerSubstrateProxyAddress, address)) {
-      signer = signerSubstrateProxyAddress;
-      substrateProxyAccountNativeTokenAvailable = await this.state.balanceService.getTransferableBalance(signerSubstrateProxyAddress, chain, nativeTokenInfo.slug, extrinsicType);
+    if (isSubstrateTransaction(transaction)) {
+      if (MULTISIG_SUPPORTED_CHAINS.includes(chain) && !validationResponse.isWrappedTx) {
+        const pair = keyring.getPair(address);
+
+        if (pair.meta.isMultisig) {
+          validationResponse.isWrappedTx = true;
+        }
+      }
+
+      if (chainInfo.substrateInfo?.supportProxy && !validationResponse.isWrappedTx) {
+        const { substrateProxyAccounts } = await this.state.substrateProxyAccountService.getSubstrateProxyAccountGroup({
+          address,
+          chain,
+          type: validationResponse.extrinsicType,
+          excludedSubstrateProxyAccounts: (validationResponse.data as RequestRemoveSubstrateProxyAccount).selectedSubstrateProxyAccounts
+        });
+
+        validationResponse.isWrappedTx = !!substrateProxyAccounts.length;
+      }
     }
 
     // Check account signing transaction
@@ -1875,7 +1893,7 @@ export default class TransactionService {
     return emitter;
   }
 
-  private async signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, signAfterCreate, signerSubstrateProxyAddress, step, tokenPayFeeSlug, transaction, url }: SWTransaction): Promise<TransactionEmitter> {
+  private signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, signAfterCreate, step, tokenPayFeeSlug, transaction, url }: SWTransaction): TransactionEmitter {
     const tip = (feeCustom as SubstrateTipInfo)?.tip || '0';
     const feeAssetId = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug) && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain) ? this.state.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.multilocation as Record<string, any> : undefined;
 
@@ -1888,18 +1906,16 @@ export default class TransactionService {
       processId: step?.processId
     };
 
-    let extrinsic = transaction as SubmittableExtrinsic;
+    const extrinsic = transaction as SubmittableExtrinsic;
 
-    let signer = address;
+    const signer = address;
 
-    if (signerSubstrateProxyAddress && signerSubstrateProxyAddress !== address) {
-      const substrateApi = this.state.chainService.getSubstrateApi(chain);
-
-      await substrateApi.isReady;
-
-      signer = signerSubstrateProxyAddress;
-      extrinsic = substrateApi.api.tx.proxy.proxy(address, null, transaction as SubmittableExtrinsic);
-    }
+    // if (signerSubstrateProxyAddress && signerSubstrateProxyAddress !== address) {
+    //   const substrateApi = this.state.chainService.getSubstrateApi(chain);
+    //
+    //   await substrateApi.isReady;
+    //   extrinsic = substrateApi.api.tx.proxy.proxy(address, null, transaction as SubmittableExtrinsic);
+    // }
 
     // const registry = extrinsic.registry;
     // const signedExtensions = registry.signedExtensions;

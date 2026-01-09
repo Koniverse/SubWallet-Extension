@@ -67,7 +67,7 @@ export default class SubstrateProxyAccountService {
     if (excludedSubstrateProxyAccounts && excludedSubstrateProxyAccounts.length > 0) {
       substrateProxyAccounts = substrateProxyAccounts.filter((p) => {
         return !excludedSubstrateProxyAccounts.some(
-          (excluded) => excluded.address === p.substrateProxyAddress && excluded.substrateProxyType === p.substrateProxyType
+          (excluded) => excluded.substrateProxyAddress === p.substrateProxyAddress && excluded.substrateProxyType === p.substrateProxyType
         );
       });
     }

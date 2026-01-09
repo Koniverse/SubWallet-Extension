@@ -11,7 +11,7 @@ import { ADDRESS_INPUT_AUTO_FORMAT_VALUE, DEFAULT_MODEL_VIEWER_PROPS, SHOW_3D_MO
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useFocusFormItem, useGetChainPrefixBySlug, useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { evmNftSubmitTransaction, substrateNftSubmitTransaction } from '@subwallet/extension-koni-ui/messaging';
-import { FormCallbacks, FormRule, SelectSignableAccountProxyResult, SendNftParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { FormCallbacks, FormRule, SendNftParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, noop, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, Image, Typography } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -50,7 +50,7 @@ const Component: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { defaultData, persistData, selectSignableAccountProxyToSign } = useTransactionContext<SendNftParams>();
+  const { defaultData, persistData } = useTransactionContext<SendNftParams>();
 
   const { collectionId, itemId } = defaultData;
 
@@ -74,9 +74,9 @@ const Component: React.FC = () => {
     nftItems.find(
       (item) =>
         isSameAddress(item.owner, from) &&
-        chain === item.chain &&
-        item.collectionId === collectionId &&
-        item.id === itemId
+          chain === item.chain &&
+          item.collectionId === collectionId &&
+          item.id === itemId
     ) || DEFAULT_ITEM
   , [collectionId, itemId, chain, nftItems, from]);
 
@@ -84,7 +84,7 @@ const Component: React.FC = () => {
     nftCollections.find(
       (item) =>
         chain === item.chain &&
-      item.collectionId === collectionId
+          item.collectionId === collectionId
     ) || DEFAULT_COLLECTION
   , [collectionId, chain, nftCollections]);
 
@@ -131,53 +131,35 @@ const Component: React.FC = () => {
       const from = reformatAddress(_from, addressPrefix);
 
       const params = nftParamsHandler(nftItem, chain);
+      let sendPromise: Promise<SWTransactionResponse>;
 
-      const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult = {}): Promise<SWTransactionResponse> => {
-        if (isEthereumInterface) {
-          // Send NFT with EVM interface
-          return evmNftSubmitTransaction({
-            senderAddress: from,
-            networkKey: chain,
-            recipientAddress: to,
-            nftItemName: nftItem?.name,
-            params,
-            nftItem
-          });
-        } else {
-          // Send NFT with substrate interface
-          return substrateNftSubmitTransaction({
-            // networkKey: chain,
-            recipientAddress: to,
-            senderAddress: from,
-            nftItemName: nftItem?.name,
-            ...otherSignerSelected,
-            params
-            // nftItem
-          });
-        }
-      };
+      if (isEthereumInterface) {
+        // Send NFT with EVM interface
+        sendPromise = evmNftSubmitTransaction({
+          senderAddress: from,
+          networkKey: chain,
+          recipientAddress: to,
+          nftItemName: nftItem?.name,
+          params,
+          nftItem
+        });
+      } else {
+        // Send NFT with substrate interface
+        sendPromise = substrateNftSubmitTransaction({
+          // networkKey: chain,
+          recipientAddress: to,
+          senderAddress: from,
+          nftItemName: nftItem?.name,
+          params
+          // nftItem
+        });
+      }
 
       setLoading(true);
 
-      // wrap signable selection
-      // don't need to select proxy or signatory multisig for EVM interface
-      const sendPromiseWrapper = async () => {
-        if (!isEthereumInterface) {
-          const signableAccountProxyResult = await selectSignableAccountProxyToSign({
-            chain,
-            address: from,
-            extrinsicType: ExtrinsicType.SEND_NFT
-          });
-
-          return await sendPromise(signableAccountProxyResult);
-        }
-
-        return await sendPromise();
-      };
-
       setTimeout(() => {
         // Handle transfer action
-        sendPromiseWrapper()
+        sendPromise
           .then(onSuccess)
           .catch(onError)
           .finally(() => {
@@ -185,7 +167,7 @@ const Component: React.FC = () => {
           });
       }, 300);
     },
-    [addressPrefix, nftItem, selectSignableAccountProxyToSign, onSuccess, onError]
+    [nftItem, onError, onSuccess, addressPrefix]
   );
 
   const checkAction = usePreCheckAction({ address: from, chain });

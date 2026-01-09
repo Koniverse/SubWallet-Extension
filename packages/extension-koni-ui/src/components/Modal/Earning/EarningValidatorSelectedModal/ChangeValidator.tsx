@@ -4,7 +4,7 @@
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
-import { NominationInfo, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { NominationInfo, SubmitChangeValidatorStaking, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
 import { StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
@@ -17,7 +17,7 @@ import { VALIDATOR_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useChainChecker, useFilterModal, useHandleSubmitTransaction, usePreCheckAction, useSelector, useSelectValidators } from '@subwallet/extension-koni-ui/hooks';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
-import { SelectSignableAccountProxyResult, Theme, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
+import { Theme, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Badge, Button, Icon, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
@@ -98,7 +98,7 @@ const Component = (props: Props) => {
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
   const onPreCheck = usePreCheckAction({ chain, address: from });
-  const { onError, onSuccess, selectSignableAccountProxyToSign } = useHandleSubmitTransaction();
+  const { onError, onSuccess } = useHandleSubmitTransaction();
 
   const sectionRef = useRef<SwListSectionRef>(null);
   const networkPrefix = chainInfoMap[chain]?.substrateInfo?.addressPrefix;
@@ -290,34 +290,25 @@ const Component = (props: Props) => {
     setSearchValue(value);
   }, []);
 
-  // submit action
   const submit = useCallback((target: ValidatorInfo[]) => {
-    const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult) => {
-      return changeEarningValidator({
-        slug: poolInfo.slug,
-        address: from,
-        amount: '0',
-        selectedValidators: target,
-        ...otherSignerSelected
-      });
+    const submitData: SubmitChangeValidatorStaking = {
+      slug: poolInfo.slug,
+      address: from,
+      amount: '0',
+      selectedValidators: target
     };
 
     setSubmitLoading(true);
 
     setTimeout(() => {
-      // select signable account proxy or signatory multisig to sign transaction
-      selectSignableAccountProxyToSign({
-        address: from,
-        chain,
-        extrinsicType: ExtrinsicType.CHANGE_EARNING_VALIDATOR
-      }).then(sendPromise)
+      changeEarningValidator(submitData)
         .then(onSuccess)
         .catch(onError)
         .finally(() => {
           setSubmitLoading(false);
         });
     }, 300);
-  }, [poolInfo.slug, from, selectSignableAccountProxyToSign, chain, onSuccess, onError]);
+  }, [poolInfo.slug, from, onError, onSuccess]);
 
   const onClickSubmit = useCallback((values: { target: ValidatorInfo[] }) => {
     const { target } = values;

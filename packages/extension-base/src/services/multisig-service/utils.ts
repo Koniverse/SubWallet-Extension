@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MULTISIG_TX_TYPE_MAP, MultisigTxType } from '@subwallet/extension-base/services/multisig-service/index';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 
 import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
@@ -247,7 +248,7 @@ export function calcDepositAmount (depositBase: string, threshold: number, depos
 export function createMultisigExtrinsic (api: ApiPromise, threshold: number, signers: string[], signer: string, extrinsic: SubmittableExtrinsic): SubmittableExtrinsic {
   return api.tx.multisig.asMulti(
     threshold,
-    signers.filter((s) => s !== signer).sort().reverse(),
+    signers.filter((s) => !isSameAddress(s, signer)).sort().reverse(),
     null,
     extrinsic,
     {

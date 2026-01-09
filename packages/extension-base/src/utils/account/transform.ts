@@ -351,6 +351,31 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
       case AccountChainType.BITCOIN:
         return [];
     }
+  } else if (signMode === AccountSignMode.MULTISIG) {
+    switch (networkType) {
+      case AccountChainType.SUBSTRATE:
+        return [
+          ...BASE_TRANSFER_ACTIONS,
+          ...NATIVE_STAKE_ACTIONS,
+          ...POOL_STAKE_ACTIONS,
+          // ...EARN_VDOT_ACTIONS, // todo: consider support this
+          // ...EARN_LDOT_ACTIONS,
+          // ...EARN_SDOT_ACTIONS,
+          // ...EARN_QDOT_ACTIONS,
+          // ...EARN_VMANTA_ACTIONS,
+          ...OPEN_GOV_ACTIONS,
+          ...MULTISIG_ACTIONS,
+          ExtrinsicType.SEND_NFT
+        ];
+      case AccountChainType.ETHEREUM:
+        return [];
+      case AccountChainType.TON:
+        return [];
+      case AccountChainType.CARDANO:
+        return [];
+      case AccountChainType.BITCOIN:
+        return [];
+    }
   } else if (signMode === AccountSignMode.GENERIC_LEDGER) {
     switch (networkType) {
       case AccountChainType.SUBSTRATE:

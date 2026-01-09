@@ -8,7 +8,7 @@ import { ProcessType, SwapBaseTxData } from '@subwallet/extension-base/types';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, AlertBoxInstant } from '@subwallet/extension-koni-ui/components';
 import { useIsPolkadotUnifiedChain, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { SubmitApiArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
+import { SubmitApiArea, WrappedTransactionInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import CardanoSignArea from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Sign/Cardano';
 import TonSignArea from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Sign/Ton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -192,6 +192,7 @@ const Component: React.FC<Props> = (props: Props) => {
       })}
       >
         {renderContent(transaction)}
+        {!!transaction.isWrappedTx && <WrappedTransactionInfoArea transaction={transaction} />}
         {isAddressFormatInfoBoxVisible && (
           <AlertBoxInstant
             className={'address-format-info-box'}

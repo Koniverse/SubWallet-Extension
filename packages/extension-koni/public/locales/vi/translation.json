@@ -2608,5 +2608,9 @@
   "ui.TRANSACTION.Confirmations.Unbond.signWith": "",
   "ui.TRANSACTION.Confirmations.Withdraw.signWith": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "",
-  "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": ""
+  "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "",
+  "ui.TRANSACTION.Confirmations.TransferBlock.multisig": "",
+  "ui.Confirmations.WrappedTransactionInfoArea.multisigDeposit": "",
+  "ui.Confirmations.WrappedTransactionInfoArea.networkFee": "",
+  "ui.Confirmations.WrappedTransactionInfoArea.signer": ""
 }
