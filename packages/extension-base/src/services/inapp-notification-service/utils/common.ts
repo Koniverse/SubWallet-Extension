@@ -32,7 +32,7 @@ export function getReceiveDescription (amount: string, symbol: string) {
 }
 
 export function getMultisigApprovalDescription (txType: MultisigTxType) {
-  const txTypeText = txType === MultisigTxType.UNKNOWN ? 'Unknown Multisig' : `Multisig ${txType}`;
+  const txTypeText = txType === MultisigTxType.UNKNOWN ? 'Unknown multisig' : `Multisig ${txType.toLowerCase()}`;
 
   // todo: recheck content txTypeText
   return `${txTypeText} is pending your approval`;
