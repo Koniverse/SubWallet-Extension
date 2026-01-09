@@ -251,7 +251,8 @@ const OPEN_GOV_ACTIONS: ExtrinsicType[] = [
 const MULTISIG_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.MULTISIG_APPROVE_TX,
   ExtrinsicType.MULTISIG_EXECUTE_TX,
-  ExtrinsicType.MULTISIG_CANCEL_TX
+  ExtrinsicType.MULTISIG_CANCEL_TX,
+  ExtrinsicType.MULTISIG_INIT_TX
 ];
 
 const SUBSTRATE_PROXY_ACTION: ExtrinsicType[] = [

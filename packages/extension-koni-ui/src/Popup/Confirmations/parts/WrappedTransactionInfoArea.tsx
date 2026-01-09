@@ -4,13 +4,13 @@
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { ExcludedSubstrateProxyAccounts, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types';
-import { RequestPrepareMultisigTransaction, ResponsePrepareMultisigTransaction } from '@subwallet/extension-base/types/multisig';
+import { InitMultisigTxRequest, InitMultisigTxResponse } from '@subwallet/extension-base/types/multisig';
 import { SignableAccountProxySelectorModal } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { SIGNABLE_ACCOUNT_PROXY_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useGetAccountByAddress, useOpenDetailModal } from '@subwallet/extension-koni-ui/hooks';
 import { useCreateGetSignableAccountProxy, useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks/';
-import { prepareMultisigTransaction } from '@subwallet/extension-koni-ui/messaging/transaction/multisig';
+import { initMultisigTx } from '@subwallet/extension-koni-ui/messaging/transaction/multisig';
 import { BaseDetailModal } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Detail';
 import { SignableAccountProxyItem, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
@@ -34,7 +34,7 @@ function Component ({ className, transaction }: Props) {
   const account = useGetAccountByAddress(transaction.address);
   const selectSignableAccountProxy = useCreateGetSignableAccountProxy();
   const [signerSelected, setSignerSelected] = React.useState<SignableAccountProxyItem | null>(null);
-  const [wrapTransactionInfo, setWrapTransactionInfo] = React.useState<ResponsePrepareMultisigTransaction | null>(null);
+  const [wrapTransactionInfo, setWrapTransactionInfo] = React.useState<InitMultisigTxResponse | null>(null);
   const [isWrapTransactionLoading, setIsWrapTransactionLoading] = React.useState(false);
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const signerAccount = useGetAccountByAddress(signerSelected?.address || '');
@@ -100,13 +100,13 @@ function Component ({ className, transaction }: Props) {
 
     let cancelled = false;
 
-    const prepareTransaction = async (params: RequestPrepareMultisigTransaction) => {
+    const prepareTransaction = async (params: InitMultisigTxRequest) => {
       try {
         setIsWrapTransactionLoading(true);
 
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        const wrappedTransaction = await prepareMultisigTransaction(params);
+        const wrappedTransaction = await initMultisigTx(params);
 
         if (!cancelled) {
           setWrapTransactionInfo(wrappedTransaction);

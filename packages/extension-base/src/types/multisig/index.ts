@@ -71,20 +71,21 @@ export interface MultisigRawMetadata {
   threshold: number;
 }
 
-export interface RequestPrepareMultisigTransaction {
-  transactionId: string;
-  signer: string;
-  multisigMetadata: MultisigRawMetadata;
-  chain: string;
-}
-
 export interface MultisigAccountInfo {
   multisigAddress: string;
   signers: string[];
   threshold: number;
 }
 
-export interface ResponsePrepareMultisigTransaction {
+export interface InitMultisigTxRequest {
+  transactionId: string; // original tx
+  signer: string;
+  multisigMetadata: MultisigRawMetadata;
+  chain: string;
+  previousMultisigTxId?: string; // previous selected signer tx
+}
+
+export interface InitMultisigTxResponse {
   submittedCallData: HexString; // callData of the multisig extrinsic
   callData: HexString; // callData of the original extrinsic
   decodedCallData: DecodeCallDataResponse | undefined; // decoded callData of the original extrinsic

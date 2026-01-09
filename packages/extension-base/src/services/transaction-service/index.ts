@@ -420,6 +420,12 @@ export default class TransactionService {
 
     // Add Transaction
     transactionsSubject[transactionUpdated.id] = { ...transactionUpdated, emitterTransaction: emitter };
+
+    // todo: delete transaction.data.transactionId after user approve
+    if (transaction.data.previousMultisigTxId) {
+      delete transactionsSubject[transaction.data.previousMultisigTxId];
+    }
+
     this.transactionSubject.next({ ...transactionsSubject });
 
     emitter.on('success', (data: TransactionEventResponse) => {
@@ -1206,6 +1212,11 @@ export default class TransactionService {
 
       case ExtrinsicType.MULTISIG_CANCEL_TX: // todo
         historyItem.additionalInfo = parseTransactionData<ExtrinsicType.MULTISIG_CANCEL_TX>(transaction.data);
+
+        break;
+
+      case ExtrinsicType.MULTISIG_INIT_TX: // todo
+        historyItem.additionalInfo = parseTransactionData<ExtrinsicType.MULTISIG_INIT_TX>(transaction.data);
 
         break;
 
