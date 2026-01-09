@@ -3354,6 +3354,8 @@ export default class KoniExtension {
     const depositFactor = substrateApi.api.consts.multisig.depositFactor.toString();
     const depositAmount = calcDepositAmount(depositBase, threshold, depositFactor);
 
+    // todo: add validate error
+
     return {
       submittedCallData: multisigCallData.toHex(),
       callData: callData.toHex(),

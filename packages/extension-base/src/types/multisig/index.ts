@@ -84,4 +84,16 @@ export interface ResponsePrepareMultisigTransaction {
   decodedCallData: DecodeCallDataResponse | undefined; // decoded callData of the original extrinsic
   depositAmount: string;
   networkFee: string;
+  error?: SelectSignatoryError;
+}
+
+export enum SelectSignatoryErrorType {
+  // todo: consider to use same error for these two
+  NOT_ENOUGH_BALANCE = 'NOT_ENOUGH_BALANCE',
+  NOT_ENOUGH_DEPOSIT = 'NOT_ENOUGH_DEPOSIT',
+}
+
+export interface SelectSignatoryError {
+  errorType: SelectSignatoryErrorType;
+  message: string;
 }
