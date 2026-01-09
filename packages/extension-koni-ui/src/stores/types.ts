@@ -6,6 +6,7 @@ import { AddressBookState, AllLogoMap, AssetSetting, CampaignBanner, ChainStakin
 import { AccountsContext, AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _ChainApiStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
+import { PendingMultisigTxMap } from '@subwallet/extension-base/services/multisig-service';
 import { GovVotingInfo } from '@subwallet/extension-base/services/open-gov/interface';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
@@ -18,7 +19,6 @@ import { SessionTypes } from '@walletconnect/types';
 import { SettingsStruct } from '@polkadot/ui-settings/types';
 
 import { MktCampaignHistoryData } from '../types/staticContent';
-import {PendingMultisigTxMap} from "@subwallet/extension-base/services/multisig-service";
 
 // todo: move this file to extension-koni-ui/src/types/
 

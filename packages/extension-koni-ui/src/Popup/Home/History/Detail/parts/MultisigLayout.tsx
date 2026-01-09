@@ -1,24 +1,24 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {ExtrinsicStatus} from '@subwallet/extension-base/background/KoniTypes';
-import {PendingMultisigTx} from '@subwallet/extension-base/services/multisig-service';
-import { MetaInfo} from '@subwallet/extension-koni-ui/components';
-import {HistoryStatusMap} from '@subwallet/extension-koni-ui/constants';
-import {useSelector} from '@subwallet/extension-koni-ui/hooks';
-import {RootState} from '@subwallet/extension-koni-ui/stores';
-import {ThemeProps} from '@subwallet/extension-koni-ui/types';
-import {formatHistoryDate, reformatAddress, toShort} from '@subwallet/extension-koni-ui/utils';
-import {Divider, Icon} from '@subwallet/react-ui';
+import { ExtrinsicStatus } from '@subwallet/extension-base/background/KoniTypes';
+import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
+import { MetaInfo } from '@subwallet/extension-koni-ui/components';
+import AccountProxyAvatar from '@subwallet/extension-koni-ui/components/AccountProxy/AccountProxyAvatar';
+import { HistoryStatusMap } from '@subwallet/extension-koni-ui/constants';
+import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import HistoryMultisigHeader from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigHeader';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { formatHistoryDate, reformatAddress, toShort } from '@subwallet/extension-koni-ui/utils';
+import { Divider, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
-import React, {useCallback, useMemo} from 'react';
-import {useTranslation} from 'react-i18next';
+import { CheckCircle } from 'phosphor-react';
+import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-import {hexAddPrefix, isHex} from '@polkadot/util';
-import HistoryMultisigHeader from "@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigHeader";
-import {CheckCircle} from "phosphor-react";
-import AccountProxyAvatar from "@subwallet/extension-koni-ui/components/AccountProxy/AccountProxyAvatar";
+import { hexAddPrefix, isHex } from '@polkadot/util';
 
 interface Props extends ThemeProps {
   data: PendingMultisigTx;
@@ -34,13 +34,17 @@ const Component: React.FC<Props> = (props: Props) => {
   // Helper to find account information across all proxies
   const getAccountInfo = useCallback((address: string) => {
     const reformatted = reformatAddress(address);
+
     for (const proxy of accountProxies) {
       const found = proxy.accounts.find((acc) => reformatAddress(acc.address) === reformatted);
-      if (found) return found;
+
+      if (found) {
+        return found;
+      }
     }
+
     return undefined;
   }, [accountProxies]);
-
 
   const chainInfo = useMemo(() => {
     return chainInfoMap[data.chain];
@@ -67,7 +71,9 @@ const Component: React.FC<Props> = (props: Props) => {
   }
 
   const sortedSigners = useMemo(() => {
-    if (!data?.signerAddresses) return [];
+    if (!data?.signerAddresses) {
+      return [];
+    }
 
     return [...data.signerAddresses].sort((a, b) => {
       const isInitiatorA = a === data.depositor;
@@ -75,15 +81,25 @@ const Component: React.FC<Props> = (props: Props) => {
       const isApprovedA = data.approvals.includes(a);
       const isApprovedB = data.approvals.includes(b);
 
-      if (isInitiatorA && !isInitiatorB) return -1;
-      if (!isInitiatorA && isInitiatorB) return 1;
+      if (isInitiatorA && !isInitiatorB) {
+        return -1;
+      }
 
-      if (isApprovedA && !isApprovedB) return -1;
-      if (!isApprovedA && isApprovedB) return 1;
+      if (!isInitiatorA && isInitiatorB) {
+        return 1;
+      }
+
+      if (isApprovedA && !isApprovedB) {
+        return -1;
+      }
+
+      if (!isApprovedA && isApprovedB) {
+        return 1;
+      }
 
       return 0;
     });
-  }, [data?.signerAddresses, data?.approvals, data?.depositor]);
+  }, [data]);
 
   return (
     <MetaInfo
@@ -96,7 +112,7 @@ const Component: React.FC<Props> = (props: Props) => {
       {
         // TODO: Re-define MultisigTxType and ExtrinsicType to use a unified type
       }
-      <HistoryMultisigHeader data={data}/>
+      <HistoryMultisigHeader data={data} />
 
       <MetaInfo.Status
         label={t('Status')}
@@ -140,7 +156,7 @@ const Component: React.FC<Props> = (props: Props) => {
       {/* Signatories Section */}
       <div className='signatories-container'>
         <div className='signatories-title'>{t('Signatories')}</div>
-        <div className="signatory-item-container">
+        <div className='signatory-item-container'>
           {sortedSigners.map((signer) => {
             const isApproved = data.approvals.includes(signer);
             const isInitiator = signer === data.depositor;
@@ -148,10 +164,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
             return (
               <div
-                className="signatory-item"
+                className='signatory-item'
                 key={signer}
               >
-                <div className="signatory-item-left">
+                <div className='signatory-item-left'>
                   <div className={'signatory-account-wrapper'}>
                     <div className={'signatory-account-avatar'}>
                       <AccountProxyAvatar
@@ -160,7 +176,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         value={accountInfo?.proxyId || signer}
                       />
                     </div>
-                    <span className={'signatory-account-value'}>{accountInfo?.name || toShort(signer, 8,9)}</span>
+                    <span className={'signatory-account-value'}>{accountInfo?.name || toShort(signer, 8, 9)}</span>
                   </div>
                   {(isApproved) && (
                     <div className={CN('__checked-icon-wrapper', {
@@ -175,9 +191,9 @@ const Component: React.FC<Props> = (props: Props) => {
                     </div>
                   )}
                 </div>
-                <div className="signatory-item-right">
-                  {isInitiator && <span className="initiator-tag">{t('Initiator')}</span>}
-                  {!isInitiator && <span className={CN('signer-status', {approved: isApproved})}>
+                <div className='signatory-item-right'>
+                  {isInitiator && <span className='initiator-tag'>{t('Initiator')}</span>}
+                  {!isInitiator && <span className={CN('signer-status', { approved: isApproved })}>
                     {(isApproved ? t('Approved') : t('Waiting for approval'))}
                   </span>}
                 </div>
@@ -216,7 +232,7 @@ const HistoryMultisigLayout = styled(Component)<Props>(({ theme: { token } }: Pr
       lineHeight: token.lineHeight,
       overflow: 'hidden',
       textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap',
+      whiteSpace: 'nowrap'
     },
 
     '.initiator-tag': {
@@ -246,7 +262,7 @@ const HistoryMultisigLayout = styled(Component)<Props>(({ theme: { token } }: Pr
     '.signatory-item': {
       display: 'flex',
       gap: 12,
-      alignItems: 'center',
+      alignItems: 'center'
     },
 
     '.signatory-item-left': {
