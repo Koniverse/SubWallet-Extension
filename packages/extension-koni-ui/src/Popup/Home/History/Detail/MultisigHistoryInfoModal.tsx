@@ -1,20 +1,20 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {PendingMultisigTx} from '@subwallet/extension-base/services/multisig-service';
-import {MULTISIG_HISTORY_INFO_MODAL} from '@subwallet/extension-koni-ui/constants';
+import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
+import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
+import { reformatAddress } from '@subwallet/extension-base/utils';
+import { MULTISIG_HISTORY_INFO_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { approvePendingTx, cancelPendingTx, executePendingTx } from '@subwallet/extension-koni-ui/messaging';
 import HistoryMultisigLayout from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigLayout';
-import {ThemeProps} from '@subwallet/extension-koni-ui/types';
-import {Button, Icon, SwModal} from '@subwallet/react-ui';
-import React, {useCallback, useMemo, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { Button, Icon, SwModal } from '@subwallet/react-ui';
+import { ArrowCircleUpRight } from 'phosphor-react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import {reformatAddress} from "@subwallet/extension-base/utils";
-import {ArrowCircleUpRight} from "phosphor-react";
-import {getExplorerLink} from "@subwallet/extension-base/services/transaction-service/utils";
-import {approvePendingTx, cancelPendingTx, executePendingTx} from "@subwallet/extension-koni-ui/messaging";
-import {useSelector} from "react-redux";
-import {RootState} from "@subwallet/extension-koni-ui/stores";
 
 type Props = ThemeProps & {
   onCancel: () => void,
@@ -36,10 +36,11 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
     );
   }, [data?.signerAddresses, data?.currentSigner]);
 
-  const handleAction = useCallback(async (action: () => Promise<any>) => {
+  const handleAction = useCallback(async (action: () => Promise<boolean | undefined>) => {
     try {
       setLoading(true);
       const result = await action();
+
       if (result) {
         onCancel();
       }
@@ -56,13 +57,13 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
       chain: data?.chain,
       threshold: data.threshold,
       otherSignatories: otherSignatories,
-      timepoint:  {
+      timepoint: {
         height: data?.blockHeight,
         index: data?.extrinsicIndex
       },
       callHash: data?.callHash
-    })
-  }, []);
+    });
+  }, [data?.blockHeight, data?.callHash, data?.chain, data?.currentSigner, data?.extrinsicIndex, data.threshold, otherSignatories]);
 
   const onApprove = useCallback(() => {
     return approvePendingTx({
@@ -78,8 +79,8 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
         index: data?.extrinsicIndex
       },
       maxWeight: {}
-    })
-  }, []);
+    });
+  }, [data?.blockHeight, data?.callHash, data?.chain, data?.currentSigner, data?.extrinsicIndex, data.threshold, otherSignatories]);
 
   const onExecute = useCallback(() => {
     return executePendingTx({
@@ -93,12 +94,18 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
       },
       call: data?.callData || '',
       maxWeight: {}
-    })
-  }, []);
+    });
+  }, [data?.blockHeight, data?.callData, data?.chain, data?.currentSigner, data?.extrinsicIndex, data.threshold, otherSignatories]);
 
-  const _onReject = useCallback(() => handleAction(onReject), [handleAction, onReject]);
-  const _onApprove = useCallback(() => handleAction(onApprove), [handleAction, onApprove]);
-  const _onExecute = useCallback(() => handleAction(onExecute), [handleAction, onExecute]);
+  const _onReject = useCallback(() => {
+    handleAction(onReject).catch(console.error);
+  }, [handleAction, onReject]);
+  const _onApprove = useCallback(() => {
+    handleAction(onApprove).catch(console.error);
+  }, [handleAction, onApprove]);
+  const _onExecute = useCallback(() => {
+    handleAction(onExecute).catch(console.error);
+  }, [handleAction, onExecute]);
 
   const openBlockExplorer = useCallback(
     (link: string) => {
@@ -110,11 +117,14 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
   );
 
   const formattedApprovals = useMemo(() => {
-    if (!data?.approvals) return [];
+    if (!data?.approvals) {
+      return [];
+    }
+
     return data.approvals.map((address) => reformatAddress(address));
   }, [data?.approvals]);
 
-  const getMultisigFooter = (data: PendingMultisigTx) => {
+  const getMultisigFooter = useMemo(() => {
     const currentSigner = reformatAddress(data?.currentSigner);
     const isInitiator = reformatAddress(data.depositor) === currentSigner;
     const isApproved = formattedApprovals.includes(currentSigner);
@@ -132,14 +142,14 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
               block
               danger
               disabled={loading}
-              onClick={_onReject}
               loading={loading}
+              onClick={_onReject}
             >{t('Reject')}</Button>
             {thresholdReached && (
               <Button
                 block
-                loading={loading}
                 disabled={loading}
+                loading={loading}
                 onClick={_onExecute}
               >{t('Execute')}</Button>
             )}
@@ -153,9 +163,9 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
             {!isApproved && !thresholdReached && (
               <Button
                 block
-                onClick={_onApprove}
-                loading={loading}
                 disabled={loading}
+                loading={loading}
+                onClick={_onApprove}
               >
                 {isLastSigner ? t('Approve & Execute') : t('Approve')}
               </Button>
@@ -173,47 +183,47 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
             {thresholdReached && (
               <Button
                 block
-                onClick={_onExecute}
                 disabled={loading}
+                onClick={_onExecute}
               >{t('Execute')}</Button>
             )}
           </>
         )}
       </div>
     );
-  };
+  }, [_onApprove, _onExecute, _onReject, data, formattedApprovals, loading, t]);
 
   const modalFooter = useMemo(() => {
     if (!data) {
       return null;
     }
-    let originChainInfo = chainInfoMap[data.chain];
 
-    let link = (data.extrinsicHash && data.extrinsicHash !== '') && getExplorerLink(originChainInfo, data.extrinsicHash, 'tx');
+    const originChainInfo = chainInfoMap[data.chain];
 
-    {/* Explorer Button: Always available if link exists */}
+    const link = (data.extrinsicHash && data.extrinsicHash !== '') && getExplorerLink(originChainInfo, data.extrinsicHash, 'tx');
+
     return (
       <div className={'footer-container'}>
         <Button
           block
+          className={'__view-explorer-button'}
           disabled={!link}
           icon={
             <Icon
-              phosphorIcon={ArrowCircleUpRight}
               customSize={'22px'}
+              phosphorIcon={ArrowCircleUpRight}
             />
           }
-          className={'__view-explorer-button'}
-          type={'ghost'}
           onClick={openBlockExplorer(link || '')}
           size={'sm'}
+          type={'ghost'}
         >
           {t('ui.HISTORY.screen.HistoryDetail.viewOnExplorer')}
         </Button>
-        {getMultisigFooter(data)}
+        {getMultisigFooter}
       </div>
-      )
-  }, [data, t, onCancel, loading]);
+    );
+  }, [data, chainInfoMap, openBlockExplorer, t, getMultisigFooter]);
 
   return (
     <SwModal
