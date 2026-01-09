@@ -78,7 +78,10 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
         height: data?.blockHeight,
         index: data?.extrinsicIndex
       },
-      maxWeight: {}
+      maxWeight: {
+        refTime: 0,
+        proofSize: 0
+      }
     });
   }, [data?.blockHeight, data?.callHash, data?.chain, data?.currentSigner, data?.extrinsicIndex, data.threshold, otherSignatories]);
 
@@ -93,7 +96,10 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
         index: data?.extrinsicIndex
       },
       call: data?.callData || '',
-      maxWeight: {}
+      maxWeight: {
+        refTime: 0,
+        proofSize: 0
+      }
     });
   }, [data?.blockHeight, data?.callData, data?.chain, data?.currentSigner, data?.extrinsicIndex, data.threshold, otherSignatories]);
 
