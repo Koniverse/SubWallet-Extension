@@ -9,11 +9,12 @@ import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useDefaultNa
 import { createAccountMultisig } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { SeedPhraseTermStorage, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { isNoAccount } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, isNoAccount, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, Input, ModalContext } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import CN from 'classnames';
 import { Book, ListChecks, PlusCircle } from 'phosphor-react';
+import { ValidateErrorEntity } from 'rc-field-form/es/interface';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -52,7 +53,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const checkUnlock = useUnlockChecker();
   const [form] = Form.useForm<MultisigParams>();
   const [signers, setSigners] = useLocalStorage<SignerData[]>(MULTISIG_SIGNERS, []);
-
+  const [isValidThreshold, setIsValidThreshold] = useState(false);
+  const { accounts } = useSelector((state: RootState) => state.accountState);
   const formDefault = useMemo<MultisigParams>(() => {
     return {
       signerAddress: '',
@@ -65,8 +67,6 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const onComplete = useCompleteCreateAccount();
 
-  const { accounts } = useSelector((state: RootState) => state.accountState);
-
   const [preventModalStorage] = useLocalStorage(SEED_PREVENT_MODAL, false);
   const [preventModal] = useState(preventModalStorage);
 
@@ -78,6 +78,31 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     () => signers.map((s) => s.address),
     [signers]
   );
+
+  useEffect(() => {
+    const checkValidation = async () => {
+      try {
+        if (!thresholdValue || signers.length === 0) {
+          setIsValidThreshold(false);
+
+          return;
+        }
+
+        await form.validateFields(['threshold']);
+
+        setIsValidThreshold(true);
+      } catch (e) {
+        const errorInfo = e as ValidateErrorEntity;
+        const hasError = errorInfo?.errorFields?.length > 0;
+
+        if (hasError) {
+          setIsValidThreshold(false);
+        }
+      }
+    };
+
+    checkValidation().catch(console.error);
+  }, [thresholdValue, signers.length, form]);
 
   const resetMultisigDraft = useCallback(() => {
     setSigners([]);
@@ -134,20 +159,40 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     });
   }, [setSigners]);
 
+  const isReadyAddSigner = useMemo(() => {
+    if (!signerAddressValue) {
+      return false;
+    }
+
+    const isValidAddress = isAddress(signerAddressValue) && !isEthereumAddress(signerAddressValue);
+
+    if (!isValidAddress) {
+      return false;
+    }
+
+    const formattedAddress = reformatAddress(signerAddressValue);
+    const isExisted = signers.some((item) => item.address === formattedAddress);
+
+    return !isExisted;
+  }, [signerAddressValue, signers]);
+
   const onAddManualSigner = useCallback(() => {
     const address = form.getFieldValue('signerAddress') as string;
+    const formattedAddress = reformatAddress(address);
+    const accountInWallet = findAccountByAddress(accounts, formattedAddress);
 
     setSigners((prev) => [
       ...prev,
       {
-        address: address,
-        proxyId: address,
-        formatedAddress: address
+        address: formattedAddress,
+        proxyId: formattedAddress,
+        formatedAddress: formattedAddress,
+        displayName: accountInWallet?.name || ''
       }
     ]);
 
     form.resetFields(['signerAddress']);
-  }, [form, setSigners]);
+  }, [accounts, form, setSigners]);
 
   const emptyList = useCallback(() => {
     return (
@@ -167,8 +212,15 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       return Promise.reject(t('Invalid recipient address'));
     }
 
+    const formattedAddress = reformatAddress(signerAddressValue);
+    const isExisted = signers.some((item) => item.address === formattedAddress);
+
+    if (isExisted) {
+      return Promise.reject(t('This address already exists in the list'));
+    }
+
     return Promise.resolve();
-  }, [form, t]);
+  }, [form, signerAddressValue, signers, t]);
 
   const validateThreshold = useCallback(
     async (_: Rule, value?: string) => {
@@ -206,6 +258,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     })
       .then(() => {
         onComplete();
+        resetMultisigDraft();
       })
       .catch((error: Error): void => {
         notify({
@@ -217,7 +270,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         setLoading(false);
         inactiveModal(accountNameModalId);
       });
-  }, [inactiveModal, notify, onComplete, signerAddresses, thresholdValue]);
+  }, [inactiveModal, notify, onComplete, resetMultisigDraft, signerAddresses, thresholdValue]);
 
   useEffect(() => {
     // Note: This useEffect checks if the data in localStorage has already been migrated from the old "string" structure to the new structure in "SeedPhraseTermStorage".
@@ -247,7 +300,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         rightFooterButton={{
           children: t('Continue'),
           onClick: onConfirmSignatory,
-          disabled: signers.length === 0 || !thresholdValue || thresholdValue === '1'
+          disabled: !isValidThreshold
         }}
         subHeaderIcons={preventModal
           ? undefined
@@ -306,7 +359,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               <div className={'signatory-form-right'}>
                 <Button
                   block={true}
-                  disabled={!signerAddressValue || !isAddress(signerAddressValue) || isEthereumAddress(signerAddressValue)}
+                  disabled={!isReadyAddSigner}
                   icon={(
                     <Icon
                       className={'icon-remove'}
