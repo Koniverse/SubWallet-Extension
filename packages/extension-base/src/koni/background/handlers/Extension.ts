@@ -63,7 +63,14 @@ import { AccountsStore } from '@subwallet/extension-base/stores';
 import { AccountChainType, AccountJson, AccountProxyMap, AccountSignMode, AccountsWithCurrentAddress, BalanceJson, BalanceType, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeDetail, BitcoinFeeInfo, BitcoinFeeRate, BriefProcessStep, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CommonStepFeeInfo, CommonStepType, EarningProcessType, EarningRewardJson, EvmFeeInfo, FeeChainType, FeeCustom, FeeDetail, FeeInfo, FeeOption, HandleYieldStepData, NominationPoolInfo, OptimalYieldPathParams, ProcessStep, ProcessTransactionData, ProcessType, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckPublicAndSecretKey, RequestClaimBridge, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningImpact, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StakingTxErrorType, StepStatus, StorageDataInterface, SubmitChangeValidatorStaking, SummaryEarningProcessData, SwapBaseTxData, SwapFeeType, SwapRequestV2, TokenSpendingApprovalParams, ValidateYieldProcessParams, YieldPoolType, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
-import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, RequestGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
+import {
+  ApprovePendingTxRequest,
+  CancelPendingTxRequest,
+  ExecutePendingTxRequest,
+  RequestGetSignableAccountInfos,
+  RequestPrepareMultisigTransaction,
+  ResponsePrepareMultisigTransaction
+} from '@subwallet/extension-base/types/multisig';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types/substrateProxyAccount';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
@@ -95,6 +102,11 @@ import { assert, hexStripPrefix, hexToU8a, isAscii, isHex, noop, u8aToHex } from
 import { decodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
 
 import { getSuitableRegistry, RegistrySource, setupApiRegistry, setupDappRegistry, setupDatabaseRegistry } from '../utils';
+import {
+  calcDepositAmount,
+  createMultisigExtrinsic,
+  decodeCallData
+} from "@subwallet/extension-base/services/multisig-service/utils";
 
 export function isJsonPayload (value: SignerPayloadJSON | SignerPayloadRaw): value is SignerPayloadJSON {
   return (value as SignerPayloadJSON).genesisHash !== undefined;
@@ -3322,6 +3334,35 @@ export default class KoniExtension {
     }
   }
 
+  // Multisig Account
+  private async prepareMultisigTransaction (request: RequestPrepareMultisigTransaction): Promise<ResponsePrepareMultisigTransaction> {
+    const { chain, multisigMetadata: { signers, threshold }, signer, transactionId } = request;
+
+    const substrateApi = await this.#koniState.chainService.getSubstrateApi(chain).isReady;
+    const callData = this.#koniState.transactionService.getTransaction(transactionId)?.transaction as SubmittableExtrinsic<'promise'>;
+    // const callData = substrateApi.api.createType('Call', '0x1d01007e74bbf369a84613ed81fc0bb7773240b41a591559c6d4e469905f064a545e580000000000'); // todo: to test, remove later
+    const multisigCallData = createMultisigExtrinsic(substrateApi.api, threshold, signers, signer, callData);
+
+    const decodedCallData = decodeCallData({
+      api: substrateApi.api,
+      callData: callData.toHex()
+    });
+
+    const networkFee = (await multisigCallData.paymentInfo(signer)).partialFee.toString();
+
+    const depositBase = substrateApi.api.consts.multisig.depositBase.toString();
+    const depositFactor = substrateApi.api.consts.multisig.depositFactor.toString();
+    const depositAmount = calcDepositAmount(depositBase, threshold, depositFactor);
+
+    return {
+      submittedCallData: multisigCallData.toHex(),
+      callData: callData.toHex(),
+      decodedCallData,
+      depositAmount,
+      networkFee
+    };
+  }
+
   // EVM Transaction
   private async parseContractInput ({ chainId,
     contract,
@@ -6260,6 +6301,8 @@ export default class KoniExtension {
         return await this.cancelPendingTx(request as CancelPendingTxRequest);
       case 'pri(multisig.getSignableAccountInfos)':
         return this.#koniState.keyringService.context.getSignableAccountInfos(request as RequestGetSignableAccountInfos);
+      case 'pri(multisig.prepareMultisigTransaction)':
+        return await this.prepareMultisigTransaction(request as RequestPrepareMultisigTransaction);
         /* Multisig Account */
 
       // Proxy
