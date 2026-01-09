@@ -126,7 +126,8 @@ export enum NotificationActionType {
 export enum NotificationTab {
   ALL = 'ALL',
   UNREAD = 'UNREAD',
-  READ = 'READ'
+  READ = 'READ',
+  MULTISIG = 'MULTISIG'
 }
 
 export interface ShowNotificationPayload {

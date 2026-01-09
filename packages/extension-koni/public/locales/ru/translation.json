@@ -2617,5 +2617,6 @@
   "ui.Confirmations.WrappedTransactionInfoArea.signer": "",
   "ui.Confirmations.WrappedTransactionInfoArea.multisigInitiationDescription": "",
   "ui.Confirmations.WrappedTransactionInfoArea.multisigExecutionDescription": "",
-  "ui.Confirmations.WrappedTransactionInfoArea.multisigCancelDescription": ""
+  "ui.Confirmations.WrappedTransactionInfoArea.multisigCancelDescription": "",
+  "ui.SETTINGS.screen.Setting.Notifications.multisig": ""
 }

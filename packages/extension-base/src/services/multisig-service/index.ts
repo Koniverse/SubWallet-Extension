@@ -418,6 +418,8 @@ export class MultisigService implements StoppableServiceInterface {
         await Promise.all(pendingMultisigEntries.map(async (_pendingMultisigInfo, index) => {
           const pendingMultisigInfo = _pendingMultisigInfo as unknown as PalletMultisigMultisig;
 
+          console.log('pendingMultisigInfo', pendingMultisigInfo);
+
           if (!pendingMultisigInfo) {
             return;
           }

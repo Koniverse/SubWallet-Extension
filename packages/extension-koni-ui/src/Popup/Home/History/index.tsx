@@ -510,7 +510,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return () => {
       setSelectedMultisigItem(item);
       activeModal(MULTISIG_HISTORY_INFO_MODAL);
-      console.log('onOpenMultisigInfo', item);
     };
   }, [activeModal]);
 
