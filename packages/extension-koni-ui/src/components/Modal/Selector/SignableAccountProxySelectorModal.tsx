@@ -52,7 +52,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
     ];
   }, [account, accountItems, address]);
 
-  const [selected, setSelected] = useState<SignableAccountProxyItem>(fullList[0]);
+  const [selected, setSelected] = useState<SignableAccountProxyItem | null>(null);
 
   const onSelect = useCallback((item: SignableAccountProxyItem) => {
     return () => {
@@ -61,7 +61,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   }, []);
 
   const renderItem = useCallback((item: SignableAccountProxyItem) => {
-    const isSelected = isSameAddress(selected.address, item.address) && selected.substrateProxyType === item.substrateProxyType;
+    const isSelected = !!selected && isSameAddress(selected.address, item.address) && selected.substrateProxyType === item.substrateProxyType;
 
     return (
       <SignableAccountProxySelectorItem
@@ -73,10 +73,12 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
         showUnselectIcon
       />
     );
-  }, [selected.address, selected.substrateProxyType, chain, onSelect]);
+  }, [selected, chain, onSelect]);
 
   const onClickApply = useCallback(() => {
-    onApply?.(selected);
+    if (selected) {
+      onApply?.(selected);
+    }
   }, [onApply, selected]);
 
   return (

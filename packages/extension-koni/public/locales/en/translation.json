@@ -2609,5 +2609,9 @@
   "ui.TRANSACTION.Confirmations.Unbond.signWith": "Sign with",
   "ui.TRANSACTION.Confirmations.Withdraw.signWith": "Sign with",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "Available balance",
-  "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "Copied to clipboard"
+  "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "Copied to clipboard",
+  "ui.TRANSACTION.Confirmations.TransferBlock.multisig": "Multisig",
+  "ui.Confirmations.WrappedTransactionInfoArea.multisigDeposit": "Multisig deposit",
+  "ui.Confirmations.WrappedTransactionInfoArea.networkFee": "Network fee",
+  "ui.Confirmations.WrappedTransactionInfoArea.signer": "Signer"
 }

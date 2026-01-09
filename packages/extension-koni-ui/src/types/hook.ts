@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { BaseRequestSign, ExcludedSubstrateProxyAccounts, SubstrateProxyType } from '@subwallet/extension-base/types';
+import { ExcludedSubstrateProxyAccounts, SubstrateProxyType } from '@subwallet/extension-base/types';
 import { PriceChangeStatus, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types/balance';
 import BigN from 'bignumber.js';
 
@@ -43,6 +43,4 @@ export type SelectSignableAccountProxyParams = {
   excludedSubstrateProxyAccounts?: ExcludedSubstrateProxyAccounts[];
 };
 
-export type SelectSignableAccountProxyResult = Pick<BaseRequestSign, 'signerSubstrateProxyAddress' | 'signerSubstrateMultisigAddress'>
-
-export type SelectSignableAccountProxy = (params: SelectSignableAccountProxyParams) => Promise<SelectSignableAccountProxyResult>;
+export type SelectSignableAccountProxy = (params: SelectSignableAccountProxyParams) => Promise<SignableAccountProxyItem[]>;

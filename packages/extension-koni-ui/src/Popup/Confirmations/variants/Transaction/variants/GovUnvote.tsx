@@ -3,11 +3,9 @@
 
 import { RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { isSameAddress } from '@subwallet/extension-base/utils';
-import { CommonTransactionInfo, MetaInfo, NumberDisplay, PageWrapper, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
+import { MetaInfo, NumberDisplay, PageWrapper, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { CallDataDetail, MultisigInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
+import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Number } from '@subwallet/react-ui';
@@ -28,8 +26,11 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
   const { t } = useTranslation();
 
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
+  const account = useGetAccountByAddress(transaction.address);
+  const networkPrefix = useGetChainPrefixBySlug(transaction.chain);
   const { currencyData } = useSelector((state: RootState) => state.price);
 
+  // todo: recheck gov confirmation when case multisig / proxy
   const govConfirmationInfo = useGetGovVoteConfirmationInfo({
     address: transaction.address,
     chain: transaction.chain,
@@ -63,33 +64,28 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           weight={500}
         />
       </div>
-      <CommonTransactionInfo
-        address={transaction.address}
-        network={transaction.chain}
-      />
       <MetaInfo
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        <CallDataDetail callData={'0x0'} />
+        <MetaInfo.Account
+          address={account?.address || transaction.address}
+          chainSlug={transaction.chain}
+          label={t('ui.TRANSACTION.Confirmations.GovUnvote.account')}
+          name={account?.name}
+          networkPrefix={networkPrefix}
+        />
+        {!transaction.isWrappedTx && <MetaInfo.Number
+          decimals={decimals}
+          label={t('ui.TRANSACTION.Confirmations.GovUnvote.networkFee')}
+          suffix={symbol}
+          value={transaction.estimateFee?.value || 0}
+        />}
       </MetaInfo>
       <MetaInfo
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        <MultisigInfoArea
-          chain={transaction.chain}
-          multisigDeposit={'0'}
-          signatoryAddress={transaction.signerSubstrateMultisigAddress}
-        />
-        {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
-          <MetaInfo.Account
-            address={transaction.signerSubstrateProxyAddress}
-            chainSlug={transaction.chain}
-            label={t('ui.TRANSACTION.Confirmations.GovUnvote.signWith')}
-          />
-        }
-
         <MetaInfo.Default
           className={'transferable-value-info'}
           label={t('ui.TRANSACTION.Confirmations.GovUnvote.transferable')}
@@ -136,12 +132,6 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
             value={govConfirmationInfo?.governanceLock.to || '0'}
           />
         </MetaInfo.Default>
-        <MetaInfo.Number
-          decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.GovUnvote.networkFee')}
-          suffix={symbol}
-          value={transaction.estimateFee?.value || 0}
-        />
         <MetaInfo.Default
           label={t('ui.TRANSACTION.Confirmations.GovUnvote.referenda')}
         >

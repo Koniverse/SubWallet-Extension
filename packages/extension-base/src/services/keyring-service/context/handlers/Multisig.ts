@@ -110,7 +110,9 @@ export class AccountMultisigHandler extends AccountBaseHandler {
       const substrateAccount = accountProxy?.accounts.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
 
       if (substrateAccount) {
-        if (substrateAccount.transactionActions.includes(extrinsicType)) {
+        // Check if the account can sign the extrinsic type
+        // Only support 1 level signatories
+        if (substrateAccount.transactionActions.includes(extrinsicType) && !substrateAccount.isMultisig) {
           signableAccountInfo.push({
             proxyId,
             address: signer

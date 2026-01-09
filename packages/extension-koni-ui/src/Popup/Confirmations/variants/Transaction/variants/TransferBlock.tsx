@@ -4,12 +4,10 @@
 import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
-import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import QuoteRateDisplay from '@subwallet/extension-koni-ui/components/Swap/QuoteRateDisplay';
 import { useGetAccountByAddress, useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
-import { CallDataDetail, MultisigInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
@@ -74,19 +72,6 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
       </MetaInfo>
 
       <MetaInfo hasBackgroundWrapper>
-        <MultisigInfoArea
-          chain={transaction.chain}
-          multisigDeposit={'0'}
-          signatoryAddress={transaction.signerSubstrateMultisigAddress}
-        />
-        {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
-          <MetaInfo.Account
-            address={transaction.signerSubstrateProxyAddress}
-            chainSlug={transaction.chain}
-            label={t('ui.TRANSACTION.Confirmations.TransferBlock.signWith')}
-          />
-        }
-
         {isAcrossBridge && xcmData.metadata
           ? <>
             <MetaInfo.Default
@@ -115,13 +100,12 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
             />
           )}
 
-        <MetaInfo.Number
+        {!transaction.isWrappedTx && <MetaInfo.Number
           decimals={feeInfo ? feeInfo.decimals : nativeTokenDecimals}
           label={t('ui.TRANSACTION.Confirmations.TransferBlock.estimatedFee')}
           suffix={feeInfo ? feeInfo.symbol : nativeTokenSymbol}
           value={feeInfo ? feeInfo.value : 0}
-        />
-        <CallDataDetail callData={'0x0'} />
+        />}
       </MetaInfo>
       {
         transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM &&

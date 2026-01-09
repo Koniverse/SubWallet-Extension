@@ -23,7 +23,7 @@ import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/use
 import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, submitProcess, validateYieldProcess, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
-import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, SelectSignableAccountProxyResult, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, getExtrinsicTypeByPoolInfo, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -57,7 +57,7 @@ const Component = () => {
   const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
   const { closeAlert, defaultData, goBack, onDone, openAlert,
-    persistData, selectSignableAccountProxyToSign,
+    persistData,
     setBackProps, setIsDisableHeader, setSubHeaderRightButtons } = useTransactionContext<EarnParams>();
 
   const { fromAccountProxy, slug } = defaultData;
@@ -476,7 +476,7 @@ const Component = () => {
     const transactionBlockProcess = () => {
       setSubmitLoading(true);
       setIsDisableHeader(true);
-      const { chain, from, slug, target, value: _currentAmount } = values;
+      const { from, slug, target, value: _currentAmount } = values;
       let processId = processState.processId;
 
       const getData = (submitStep: number): SubmitYieldJoinData => {
@@ -575,43 +575,14 @@ const Component = () => {
 
               return true;
             } else {
-              // send submit transaction
-              const submitPromise = async (otherSignerSelected: SelectSignableAccountProxyResult = {}) => {
-                const rs = await submitJoinYieldPool({
-                  path: path,
-                  data,
-                  currentStep: step,
-                  ...otherSignerSelected
-                });
+              const submitPromise: Promise<SWTransactionResponse> = submitJoinYieldPool({
+                path: path,
+                data: data,
+                currentStep: step
+              });
 
-                success = onSuccess(isLastStep, needRollback)(rs);
-              };
-
-              let success = false;
-
-              // wrap signable selection
-              // for the Liquid Staking feature with multiple steps,
-              // only the root account is allowed to sign transactions, even if a valid proxy account or signatory multisig is available to sign on its behalf.
-              if (poolInfo.type !== YieldPoolType.LIQUID_STAKING && path.steps.length <= 2) {
-                selectSignableAccountProxyToSign(
-                  {
-                    chain,
-                    address: from,
-                    extrinsicType: exType
-                  }
-                )
-                  .then(async (otherSignerSelected: SelectSignableAccountProxyResult) => {
-                    setSubmitLoading(true);
-
-                    await submitPromise(otherSignerSelected);
-                  })
-                  .catch(onError)
-                  .finally(() => {
-                    setSubmitLoading(false);
-                  });
-              } else {
-                await submitPromise();
-              }
+              const rs = await submitPromise;
+              const success = onSuccess(isLastStep, needRollback)(rs);
 
               if (success) {
                 return await submitData(step + 1);
@@ -667,7 +638,7 @@ const Component = () => {
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, exType, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, selectSignableAccountProxyToSign, setIsDisableHeader, stakingFee, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, stakingFee, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {

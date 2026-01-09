@@ -5,14 +5,14 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ExtrinsicType, NotificationType, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
-import { NominationInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { NominationInfo, SubmitBittensorChangeValidatorStaking, YieldPoolType } from '@subwallet/extension-base/types';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useChainChecker, useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
-import { ChangeValidatorParams, FormCallbacks, SelectSignableAccountProxyResult, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
+import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, formatBalance, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, InputRef, Logo, ModalContext, Number, Switch, SwModal, Tooltip, useExcludeModal } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -62,7 +62,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
   const { defaultData } = useTransactionContext<ChangeValidatorParams>();
-  const { onError, onSuccess, selectSignableAccountProxyToSign } = useHandleSubmitTransaction();
+  const { onError, onSuccess } = useHandleSubmitTransaction();
+
   const account = findAccountByAddress(accounts, from);
   const [form] = Form.useForm<ChangeValidatorParams>();
   const originValidator = useWatchTransaction('originValidator', form, defaultData);
@@ -286,21 +287,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       const send = (amount: string): void => {
         setSubmitLoading(true);
 
-        // send change earning validator transaction
-        const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult) => {
-          return changeEarningValidator({
-            ...baseData,
-            ...otherSignerSelected,
-            amount
-          });
+        const submitData: SubmitBittensorChangeValidatorStaking = {
+          ...baseData,
+          amount
         };
 
-        // select signable account proxy or signatory multisig to sign transaction
-        selectSignableAccountProxyToSign({
-          chain,
-          address: from,
-          extrinsicType: ExtrinsicType.CHANGE_EARNING_VALIDATOR
-        }).then(sendPromise)
+        (changeEarningValidator(submitData))
           .then(onSuccess)
           .catch((error: TransactionError) => {
             if (error.message.includes('remaining')) {
@@ -335,7 +327,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
       send(isShowAmountChange ? value : bondedValue);
     },
-    [bondedValue, chain, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, selectSignableAccountProxyToSign, stakingFee, symbol, t]
+    [bondedValue, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, stakingFee, symbol, t]
   );
   const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
 

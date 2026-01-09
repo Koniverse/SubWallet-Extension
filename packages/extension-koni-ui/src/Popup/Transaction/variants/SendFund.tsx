@@ -17,9 +17,9 @@ import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/c
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee } from '@subwallet/extension-base/types';
-import { RequestSubmitTransfer, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
+import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
-import { _reformatAddressWithChain, isAccountAll, isSameAddress, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenSelector } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
@@ -29,7 +29,7 @@ import useLazyWatchTransaction from '@subwallet/extension-koni-ui/hooks/transact
 import { approveSpending, cancelSubscription, getOptimalTransferProcess, getTokensCanPayFee, isTonBounceableAddress, makeCrossChainTransfer, makeTransfer, subscribeMaxTransfer } from '@subwallet/extension-koni-ui/messaging';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { AccountAddressItemType, ChainItemType, FormCallbacks, SelectSignableAccountProxyResult, Theme, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
+import { AccountAddressItemType, ChainItemType, FormCallbacks, Theme, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
 import { findAccountByAddress, formatBalance, getSignModeByAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
@@ -119,11 +119,10 @@ const FEE_SHOW_TYPES: Array<FeeChainType | undefined> = ['substrate', 'evm'];
 const Component = ({ className = '', isAllAccount, targetAccountProxy }: ComponentProps): React.ReactElement<ComponentProps> => {
   useSetCurrentPage('/transaction/send-fund');
   const { t } = useTranslation();
-
   const notification = useNotification();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
 
-  const { defaultData, persistData, selectSignableAccountProxyToSign } = useTransactionContext<TransferParams>();
+  const { defaultData, persistData } = useTransactionContext<TransferParams>();
   const { defaultSlug: sendFundSlug } = defaultData;
   const isFirstRender = useIsFirstRender();
 
@@ -185,8 +184,6 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [chainValue, destChainValue]);
 
   const [loading, setLoading] = useState(false);
-  const [submitLoading, setSubmitLoading] = useState(false);
-
   const [isTransferAll, setIsTransferAll] = useState(false);
 
   // use this to reinit AddressInput component
@@ -565,67 +562,43 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     return false;
   }, [accounts, assetRegistry, notification, t]);
 
-  const handleBasicSubmit = useCallback(
-    (values: TransferParams, options: TransferOptions): Promise<SWTransactionResponse> => {
-      const { asset, chain, destChain, from, to, value } = values;
+  const handleBasicSubmit = useCallback((values: TransferParams, options: TransferOptions): Promise<SWTransactionResponse> => {
+    const { asset, chain, destChain, from, to, value } = values;
+    let sendPromise: Promise<SWTransactionResponse>;
 
-      // prepare params
-      const createBaseParams = (otherSignerSelected: SelectSignableAccountProxyResult, actualValue?: string): RequestSubmitTransfer => ({
+    if (chain === destChain) {
+      // Transfer token or send fund
+      sendPromise = makeTransfer({
         from,
         chain,
-        to,
+        to: to,
         tokenSlug: asset,
-        value: actualValue || value,
+        value: value,
         transferAll: options.isTransferAll,
         transferBounceable: options.isTransferBounceable,
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
-        tokenPayFeeSlug: currentTokenPayFee,
-        ...otherSignerSelected
+        tokenPayFeeSlug: currentTokenPayFee
       });
-
-      // create send promise
-      const createSendPromise = (params: RequestSubmitTransfer) =>
-        chain === destChain
-          ? makeTransfer(params)
-          : makeCrossChainTransfer({
-            ...params,
-            destinationNetworkKey: destChain,
-            originNetworkKey: chain,
-            tokenPayFeeSlug: undefined // todo: support pay local fee for xcm later
-          });
-
-      // submit logic
-      return new Promise<SWTransactionResponse>((resolve, reject) => {
-        selectSignableAccountProxyToSign({
-          chain: chain,
-          address: from,
-          extrinsicType
-        })
-          .then((signableAccount) => {
-            setSubmitLoading(true);
-            // If transfer all with proxy, we do not need to minus fee cause proxy account pay fee
-            let submitValue;
-            const selectedSigner = signableAccount.signerSubstrateMultisigAddress || signableAccount.signerSubstrateMultisigAddress || from;
-
-            if (isTransferAll && selectedSigner && !isSameAddress(selectedSigner, from)) {
-              submitValue = transferInfo?.maxTransferableWithoutFee;
-              // TODO: need to re-update max value after getting selected proxy account
-              // form.setFieldValue('value', transferInfo?.maxTransferableWithoutFee);
-              // setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${Date.now()}`);
-            }
-
-            createSendPromise(createBaseParams(signableAccount, submitValue))
-              .then(resolve)
-              .catch(reject)
-              .finally(() => setSubmitLoading(false));
-          })
-          .catch(onError)
-          .finally(() => setLoading(false));
+    } else {
+      // Make cross chain transfer
+      sendPromise = makeCrossChainTransfer({
+        destinationNetworkKey: destChain,
+        from,
+        originNetworkKey: chain,
+        tokenSlug: asset,
+        to,
+        value,
+        transferAll: options.isTransferAll,
+        transferBounceable: options.isTransferBounceable,
+        feeOption: selectedTransactionFee?.feeOption,
+        feeCustom: selectedTransactionFee?.feeCustom,
+        tokenPayFeeSlug: undefined // todo: support pay local fee for xcm later
       });
-    },
-    [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, selectSignableAccountProxyToSign, extrinsicType, onError, isTransferAll, transferInfo]
-  );
+    }
+
+    return sendPromise;
+  }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee]);
 
   // todo: must refactor later, temporary solution to support SnowBridge
   const handleBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
@@ -1231,7 +1204,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
               weight={'fill'}
             />
           )}
-          loading={loading || submitLoading}
+          loading={loading}
           onClick={checkAction(form.submit, extrinsicType)}
           schema={isTransferAll ? 'warning' : undefined}
         >

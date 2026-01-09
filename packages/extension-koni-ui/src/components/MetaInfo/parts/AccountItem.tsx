@@ -19,10 +19,11 @@ export interface AccountInfoItem extends InfoItemBase {
   networkPrefix?: number;
   accounts?: BaseAccountInfo[];
   chainSlug?: string;
+  rightItem?: React.ReactNode;
 }
 
 const Component: React.FC<AccountInfoItem> = (props: AccountInfoItem) => {
-  const { accounts, address: accountAddress, className, label, name: accountName, valueColorSchema = 'default' } = props;
+  const { accounts, address: accountAddress, className, label, name: accountName, rightItem, valueColorSchema = 'default' } = props;
 
   const { t } = useTranslation();
   const account = useGetAccountByAddress(accountAddress);
@@ -86,6 +87,7 @@ const Component: React.FC<AccountInfoItem> = (props: AccountInfoItem) => {
                 </>)
           }
         </div>
+        {!!rightItem && rightItem}
       </div>
     </div>
   );

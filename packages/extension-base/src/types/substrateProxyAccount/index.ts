@@ -4,7 +4,7 @@
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 
 export interface ExcludedSubstrateProxyAccounts {
-  address: string
+  substrateProxyAddress: string
   substrateProxyType: SubstrateProxyType
 }
 export interface RequestGetSubstrateProxyAccountGroup {

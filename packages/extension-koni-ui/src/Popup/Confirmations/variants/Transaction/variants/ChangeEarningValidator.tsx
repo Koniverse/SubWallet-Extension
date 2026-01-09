@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SubmitBittensorChangeValidatorStaking, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
@@ -10,7 +9,6 @@ import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/componen
 import { EARNING_SELECTED_VALIDATOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useSelector, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
-import { CallDataDetail, MultisigInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
@@ -194,12 +192,7 @@ const Component: React.FC<Props> = (props: Props) => {
         address={transaction.address}
         network={transaction.chain}
       />
-      <MetaInfo
-        className={'meta-info'}
-        hasBackgroundWrapper
-      >
-        <CallDataDetail callData={'0x0'} />
-      </MetaInfo>
+
       <MetaInfo
         className={'nomination-wrapper'}
       >
@@ -207,18 +200,6 @@ const Component: React.FC<Props> = (props: Props) => {
           className={'meta-info'}
           hasBackgroundWrapper
         >
-          <MultisigInfoArea
-            chain={transaction.chain}
-            multisigDeposit={'0'}
-            signatoryAddress={transaction.signerSubstrateMultisigAddress}
-          />
-          {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
-            <MetaInfo.Account
-              address={transaction.signerSubstrateProxyAddress}
-              chainSlug={transaction.chain}
-              label={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.signWith')}
-            />
-          }
           {isShowAmount && (
             <MetaInfo.Number
               decimals={decimals}
@@ -227,12 +208,12 @@ const Component: React.FC<Props> = (props: Props) => {
               value={data.amount}
             />
           )}
-          <MetaInfo.Number
+          {!transaction.isWrappedTx && <MetaInfo.Number
             decimals={decimals}
             label={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.estimatedFee')}
             suffix={symbol}
             value={transaction.estimateFee?.value || 0}
-          />
+          />}
           {(compound && !isBittensorChain) && (
             <ValidatorGroupModal
               accounts={newValidatorAccounts}
@@ -247,7 +228,7 @@ const Component: React.FC<Props> = (props: Props) => {
         </MetaInfo>
       </MetaInfo>
 
-      { isBittensorChain && (
+      {isBittensorChain && (
         <>
           <MetaInfo
             className='nomination-wrapper'

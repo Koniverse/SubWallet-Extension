@@ -5,7 +5,7 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { getAstarWithdrawable } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/astar';
-import { AccountJson, UnstakingInfo, UnstakingStatus, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, RequestYieldWithdrawal, UnstakingInfo, UnstakingStatus, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
@@ -13,7 +13,7 @@ import { useGetChainAssetInfo, useHandleSubmitTransaction, useInitValidateTransa
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { yieldSubmitStakingWithdrawal } from '@subwallet/extension-koni-ui/messaging';
 import { accountFilterFunc } from '@subwallet/extension-koni-ui/Popup/Transaction/helper';
-import { FormCallbacks, FormFieldData, SelectSignableAccountProxyResult, ThemeProps, WithdrawParams } from '@subwallet/extension-koni-ui/types';
+import { FormCallbacks, FormFieldData, ThemeProps, WithdrawParams } from '@subwallet/extension-koni-ui/types';
 import { convertFieldToObject, isAccountAll, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -51,7 +51,7 @@ const Component = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { defaultData, persistData, selectSignableAccountProxyToSign } = useTransactionContext<WithdrawParams>();
+  const { defaultData, persistData } = useTransactionContext<WithdrawParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<WithdrawParams>();
@@ -89,22 +89,6 @@ const Component = () => {
       return undefined;
     }
   }, [getCurrentConfirmation, slug]);
-
-  const exType = useMemo(() => {
-    if (type === YieldPoolType.LIQUID_STAKING) {
-      if (chainValue === 'moonbeam') {
-        return ExtrinsicType.EVM_EXECUTE;
-      } else {
-        return ExtrinsicType.UNKNOWN;
-      }
-    }
-
-    if (type === YieldPoolType.LENDING) {
-      return ExtrinsicType.UNKNOWN;
-    }
-
-    return ExtrinsicType.STAKING_WITHDRAW;
-  }, [type, chainValue]);
 
   const goHome = useCallback(() => {
     navigate('/home/earning');
@@ -153,42 +137,21 @@ const Component = () => {
       return;
     }
 
-    // submit withdraw
-    const sendPromise = (otherSignerSelected: SelectSignableAccountProxyResult = {}) => {
-      return yieldSubmitStakingWithdrawal({
-        address: values.from,
-        slug: values.slug,
-        unstakingInfo: unstakingInfo,
-        ...otherSignerSelected
-      }).then(onSuccess);
+    const params: RequestYieldWithdrawal = {
+      address: values.from,
+      slug: values.slug,
+      unstakingInfo: unstakingInfo
     };
 
-    // wrap signable selection
-    // for the Liquid Staking feature with multiple steps,
-    // only the root account is allowed to sign transactions, even if a valid proxy account or signatory multisig is available to sign on its behalf.
-    const sendPromiseWrapper = async () => {
-      if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-        const signableAccount = await selectSignableAccountProxyToSign({
-          address: values.from,
-          chain: values.chain,
-          extrinsicType: exType
-        });
-
-        return await sendPromise(signableAccount);
-      }
-
-      return await sendPromise();
-    };
-
-    // delay for better loading UX
     setTimeout(() => {
-      sendPromiseWrapper()
+      yieldSubmitStakingWithdrawal(params)
+        .then(onSuccess)
         .catch(onError)
         .finally(() => {
           setLoading(false);
         });
     }, 300);
-  }, [exType, onError, onSuccess, poolInfo.type, selectSignableAccountProxyToSign, unstakingInfo]);
+  }, [onError, onSuccess, unstakingInfo]);
 
   const onClickSubmit = useCallback((values: WithdrawParams) => {
     if (currentConfirmation) {
@@ -218,6 +181,22 @@ const Component = () => {
   const accountList = useMemo(() => {
     return accounts.filter(filterAccount(chainInfoMap, allPositionInfos, poolInfo.type));
   }, [accounts, allPositionInfos, chainInfoMap, poolInfo.type]);
+
+  const exType = useMemo(() => {
+    if (type === YieldPoolType.LIQUID_STAKING) {
+      if (chainValue === 'moonbeam') {
+        return ExtrinsicType.EVM_EXECUTE;
+      } else {
+        return ExtrinsicType.UNKNOWN;
+      }
+    }
+
+    if (type === YieldPoolType.LENDING) {
+      return ExtrinsicType.UNKNOWN;
+    }
+
+    return ExtrinsicType.STAKING_WITHDRAW;
+  }, [type, chainValue]);
 
   useEffect(() => {
     if (!fromValue && accountList.length === 1) {
