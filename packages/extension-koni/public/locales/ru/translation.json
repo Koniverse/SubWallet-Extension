@@ -2614,5 +2614,8 @@
   "ui.TRANSACTION.Confirmations.TransferBlock.multisig": "",
   "ui.Confirmations.WrappedTransactionInfoArea.multisigDeposit": "",
   "ui.Confirmations.WrappedTransactionInfoArea.networkFee": "",
-  "ui.Confirmations.WrappedTransactionInfoArea.signer": ""
+  "ui.Confirmations.WrappedTransactionInfoArea.signer": "",
+  "ui.Confirmations.WrappedTransactionInfoArea.multisigInitiationDescription": "",
+  "ui.Confirmations.WrappedTransactionInfoArea.multisigExecutionDescription": "",
+  "ui.Confirmations.WrappedTransactionInfoArea.multisigCancelDescription": ""
 }

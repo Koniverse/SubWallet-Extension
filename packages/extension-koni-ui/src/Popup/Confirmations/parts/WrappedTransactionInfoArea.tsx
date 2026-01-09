@@ -14,7 +14,7 @@ import { prepareMultisigTransaction } from '@subwallet/extension-koni-ui/messagi
 import { BaseDetailModal } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Detail';
 import { SignableAccountProxyItem, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
-import { BackgroundIcon, Button, Icon, ModalContext } from '@subwallet/react-ui';
+import { Button, Icon, ModalContext, Typography } from '@subwallet/react-ui';
 import { useQuery } from '@tanstack/react-query';
 import CN from 'classnames';
 import { CircleNotch, Info, PencilSimpleLine } from 'phosphor-react';
@@ -37,6 +37,7 @@ function Component ({ className, transaction }: Props) {
   const [wrapTransactionInfo, setWrapTransactionInfo] = React.useState<ResponsePrepareMultisigTransaction | null>(null);
   const [isWrapTransactionLoading, setIsWrapTransactionLoading] = React.useState(false);
   const { activeModal, inactiveModal } = useContext(ModalContext);
+  const signerAccount = useGetAccountByAddress(signerSelected?.address || '');
 
   const openDetailModal = useOpenDetailModal();
 
@@ -49,6 +50,22 @@ function Component ({ className, transaction }: Props) {
 
     return undefined;
   }, [transaction.data, transaction.extrinsicType]);
+
+  const descriptionContent = useMemo(() => {
+    if (transaction.isWrappedTx && account?.isMultisig && signerAccount) {
+      return t('ui.Confirmations.WrappedTransactionInfoArea.multisigInitiationDescription', { replace: { name: signerAccount.name } });
+    }
+
+    if (transaction.extrinsicType === ExtrinsicType.MULTISIG_EXECUTE_TX) {
+      return t('ui.Confirmations.WrappedTransactionInfoArea.multisigExecutionDescription');
+    }
+
+    if (transaction.extrinsicType === ExtrinsicType.MULTISIG_CANCEL_TX) {
+      return t('ui.Confirmations.WrappedTransactionInfoArea.multisigCancelDescription');
+    }
+
+    return null;
+  }, [account?.isMultisig, signerAccount, t, transaction.extrinsicType, transaction.isWrappedTx]);
 
   const { data: signableAccountProxyItems, isLoading: isGetSignableLoading } = useQuery<SignableAccountProxyItem[]>({
     queryKey: ['non-direct-signing', transaction.id],
@@ -126,13 +143,12 @@ function Component ({ className, transaction }: Props) {
 
   if (isGetSignableLoading) {
     return <MetaInfo
-      className={className}
+      className={CN(className, 'container-loading')}
       hasBackgroundWrapper
     >
-      <BackgroundIcon
-        backgroundColor='var(--icon-bg-color)'
+      <Icon
+        className={'loading-icon'}
         phosphorIcon={CircleNotch}
-        size='sm'
         weight='fill'
       />
     </MetaInfo>;
@@ -141,7 +157,7 @@ function Component ({ className, transaction }: Props) {
   return (
     <>
       <MetaInfo
-        className={CN('sining-info-area ', className)}
+        className={CN('wrapped-transaction-container', className)}
         hasBackgroundWrapper
       >
         <MetaInfo.Account
@@ -149,7 +165,7 @@ function Component ({ className, transaction }: Props) {
           chainSlug={transaction.chain}
           className={CN(className, 'signatory-address-info')}
           label={t('ui.Confirmations.WrappedTransactionInfoArea.signer')}
-          rightItem={(
+          leftItem={(
             <Button
               className={'__fee-editor-button'}
               disabled={isGetSignableLoading || isWrapTransactionLoading}
@@ -168,17 +184,18 @@ function Component ({ className, transaction }: Props) {
 
         {
           isWrapTransactionLoading && (
-            <BackgroundIcon
-              backgroundColor='var(--icon-bg-color)'
-              phosphorIcon={CircleNotch}
-              size='sm'
-              weight='fill'
-            />
+            <div className={'loading-icon-container'}>
+              <Icon
+                className={'loading-icon'}
+                phosphorIcon={CircleNotch}
+                weight='fill'
+              />
+            </div>
           )
         }
 
         {
-          !!wrapTransactionInfo && (
+          !!wrapTransactionInfo && !isWrapTransactionLoading && (
             <>
               <MetaInfo.Number
                 className={CN(className, 'multisig-deposit-info')}
@@ -213,15 +230,20 @@ function Component ({ className, transaction }: Props) {
             </>
           )
         }
-
       </MetaInfo>
+
+      <Typography.Text className={CN(className, 'description-text')}>
+        {descriptionContent}
+      </Typography.Text>
 
       {<BaseDetailModal
         className={CN(className, 'call-data-detail-modal')}
         showFooter={false}
         title={t('ui.Confirmations.Detail.CallDataDetail.transactionDetails')}
       >
-        {JSON.stringify(wrapTransactionInfo?.decodedCallData || '')}
+        <pre className='json'>
+          {JSON.stringify(wrapTransactionInfo?.decodedCallData || '', null, 2)}
+        </pre>
       </BaseDetailModal>}
 
       <SignableAccountProxySelectorModal
@@ -239,21 +261,51 @@ function Component ({ className, transaction }: Props) {
 const WrappedTransactionInfoArea = styled(Component)<Props>(({ theme: { token } }: ThemeProps) => {
   return {
 
-    '.call-data-info-button': {
-      height: 'fit-content !important',
-      width: 'fit-content !important',
-      minWidth: 'unset !important',
-      color: token.colorTextLight4,
-      transform: 'all 0.3s ease-in-out',
+    '&.wrapped-transaction-container': {
+      '.call-data-info-button': {
+        height: 'fit-content !important',
+        width: 'fit-content !important',
+        minWidth: 'unset !important',
+        color: token.colorTextLight4,
+        transform: 'all 0.3s ease-in-out',
 
-      '&:hover': {
-        color: token.colorTextLight2
+        '&:hover': {
+          color: token.colorTextLight2
+        }
+      },
+
+      '.__fee-editor-button': {
+        minWidth: '28px !important',
+        width: 28,
+        height: 22
+      },
+      '.signatory-address-info': {
+        '.__value-col': {
+          flexDirection: 'row',
+          alignItems: 'start',
+          justifyContent: 'end',
+          flexWrap: 'nowrap'
+        }
+      },
+
+      '.__value': {
+        display: 'flex',
+        alignItems: 'center'
+      },
+
+      '.loading-icon': {
+        height: 120,
+        marginInline: 'auto',
+        fontSize: token.fontSizeSuper3,
+        animation: 'spinner-loading 1s infinite linear'
       }
     },
 
-    '.__value': {
-      display: 'flex',
-      alignItems: 'center'
+    '&.description-text': {
+      fontSize: token.fontSize,
+      marginTop: token.marginSM,
+      color: token.colorTextLight4,
+      textAlign: 'left'
     },
 
     '&.call-data-detail-modal': {
@@ -266,21 +318,19 @@ const WrappedTransactionInfoArea = styled(Component)<Props>(({ theme: { token } 
         scrollBehavior: 'smooth',
         color: '#999999',
         margin: `${token.margin}px 0`,
-        fontFamily: 'Space Grotesk',
-        fontSize: token.fontSizeLG - 1
+        fontSize: token.fontSizeLG - 1,
+        fontFamily: token.monoSpaceFontFamily
       }
     },
 
-    '.loading': {
-      '.anticon': {
+    '&.container-loading': {
+      height: 188,
+      '.loading-icon': {
+        position: 'relative',
+        top: '25%',
+        fontSize: token.fontSizeSuper1 + 7,
         animation: 'spinner-loading 1s infinite linear'
       }
-    },
-
-    '.__fee-editor-button': {
-      minWidth: 28,
-      width: 28,
-      height: 22
     }
 
   };

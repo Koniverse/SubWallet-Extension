@@ -1,17 +1,17 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getBitcoinKeypairAttributes, toShort } from '@subwallet/extension-koni-ui/utils';
 import { getKeypairTypeByAddress, isBitcoinAddress } from '@subwallet/keyring';
-import {Button, Icon} from '@subwallet/react-ui';
+import { Button, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
-import {CheckCircle, Copy, Trash} from 'phosphor-react';
+import { CheckCircle, Copy, Trash } from 'phosphor-react';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import AccountProxyAvatar from './AccountProxyAvatar';
-import {useTranslation} from "@subwallet/extension-koni-ui/hooks";
 
 type Props = ThemeProps & {
   name?: string;
@@ -29,9 +29,9 @@ type Props = ThemeProps & {
 function Component (props: Props): React.ReactElement<Props> {
   const { address,
     avatarValue,
-    onCopyItem,
-    showCopyIcon,
-    className, isSelected, name, onClick, onRemoveItem, showRemoveIcon, showUnselectIcon } = props;
+    className,
+    isSelected,
+    name, onClick, onCopyItem, onRemoveItem, showCopyIcon, showRemoveIcon, showUnselectIcon } = props;
 
   const bitcoinAttributes = useMemo(() => {
     if (isBitcoinAddress(address)) {

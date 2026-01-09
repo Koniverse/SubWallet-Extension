@@ -18,6 +18,7 @@ export const REQUEST_CAMERA_ACCESS_MODAL = 'request-camera-access-modal';
 export const VALIDATOR_DETAIL_MODAL = 'validator-detail-modal';
 export const NOTIFICATION_DETAIL_MODAL = 'notification-detail-modal';
 export const HISTORY_DETAIL_MODAL = 'history-detail-modal';
+export const MULTISIG_HISTORY_INFO_MODAL = 'multisig-history-info-modal';
 export const RECEIVE_TOKEN_SELECTOR_MODAL = 'receive-tokens-selector-modal';
 export const RECEIVE_MODAL_TOKEN_SELECTOR = 'receive-modal-token-selector';
 export const RECEIVE_MODAL_ACCOUNT_SELECTOR = 'receive-modal-account-selector';

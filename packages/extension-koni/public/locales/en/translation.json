@@ -2613,5 +2613,8 @@
   "ui.TRANSACTION.Confirmations.TransferBlock.multisig": "Multisig",
   "ui.Confirmations.WrappedTransactionInfoArea.multisigDeposit": "Multisig deposit",
   "ui.Confirmations.WrappedTransactionInfoArea.networkFee": "Network fee",
-  "ui.Confirmations.WrappedTransactionInfoArea.signer": "Signer"
+  "ui.Confirmations.WrappedTransactionInfoArea.signer": "Signer",
+  "ui.Confirmations.WrappedTransactionInfoArea.multisigInitiationDescription": "The multisig transaction will be initiated by {{name}}. A multisig deposit is required and will stay locked on this signatory until the multisig transaction is executed or rejected",
+  "ui.Confirmations.WrappedTransactionInfoArea.multisigExecutionDescription": "The multisig deposit will be returned as transferable balance on the signatory once you click “Reject” to cancel this transaction",
+  "ui.Confirmations.WrappedTransactionInfoArea.multisigCancelDescription": "The multisig deposit will be returned as transferable balance on the initiator signatory once you click “Execute” to finalize this transaction"
 }

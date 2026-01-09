@@ -8,36 +8,16 @@ import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-s
 import { quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { MultisigHistoryItem } from '@subwallet/extension-koni-ui/components/History/MultisigHistoryItem';
-import { DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, MULTISIG_HISTORY_INFO_MODAL, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/extension-koni-ui/messaging';
+import { MultisigHistoryInfoModal } from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/MultisigHistoryInfoModal';
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
-import {
-  customFormatDate,
-  formatHistoryDate,
-  isTypeGov,
-  isTypeManageSubstrateProxy,
-  isTypeStaking,
-  isTypeTransfer
-} from '@subwallet/extension-koni-ui/utils';
+import { customFormatDate, formatHistoryDate, isTypeGov, isTypeManageSubstrateProxy, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Form, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
-import {
-  Aperture,
-  ArrowDownLeft,
-  ArrowsLeftRight,
-  ArrowUpRight,
-  Clock,
-  ClockCounterClockwise,
-  Database,
-  FadersHorizontal,
-  NewspaperClipping,
-  Pencil,
-  Rocket,
-  Spinner,
-  TreeStructure
-} from 'phosphor-react';
+import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, NewspaperClipping, Pencil, Rocket, Spinner, TreeStructure } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -516,6 +496,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   // Handle detail modal
   const { chain, extrinsicHashOrId } = useParams();
   const [selectedItem, setSelectedItem] = useState<TransactionHistoryDisplayItem | null>(null);
+  const [selectedMultisigItem, setSelectedMultisigItem] = useState<PendingMultisigTx | null>(null);
   const [openDetailLink, setOpenDetailLink] = useState<boolean>(!!chain && !!extrinsicHashOrId);
 
   const onOpenDetail = useCallback((item: TransactionHistoryDisplayItem) => {
@@ -527,11 +508,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const onOpenMultisigInfo = useCallback((item: PendingMultisigTx) => {
     return () => {
-      // setSelectedItem(item);
-      // activeModal(modalId);
+      setSelectedMultisigItem(item);
+      activeModal(MULTISIG_HISTORY_INFO_MODAL);
       console.log('onOpenMultisigInfo', item);
     };
-  }, []);
+  }, [activeModal]);
 
   const onCloseDetail = useCallback(() => {
     const infoSession = Date.now();
@@ -546,6 +527,20 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     setSelectedItem(null);
     setOpenDetailLink(false);
+  }, [activeModal, inactiveModal]);
+
+  const onCloseMultisigDetail = useCallback(() => {
+    const infoSession = Date.now();
+
+    const { remind, timeBackup, timeCalculate } = (JSON.parse(localStorage.getItem(LATEST_SESSION) || JSON.stringify(DEFAULT_SESSION_VALUE))) as SessionStorage;
+
+    inactiveModal(MULTISIG_HISTORY_INFO_MODAL);
+
+    if (infoSession - timeCalculate >= timeBackup && remind) {
+      activeModal(REMIND_BACKUP_SEED_PHRASE_MODAL);
+    }
+
+    setSelectedMultisigItem(null);
   }, [activeModal, inactiveModal]);
 
   const onClickFilter = useCallback(() => {
@@ -583,6 +578,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     if (currentAccountProxy?.id !== currentAccountProxyid) {
       inactiveModal(modalId);
       setSelectedItem(null);
+      setSelectedMultisigItem(null);
     }
   }, [currentAccountProxyid, currentAccountProxy?.id, inactiveModal]);
 
@@ -856,6 +852,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         data={selectedItem}
         onCancel={onCloseDetail}
       />
+      {selectedMultisigItem && <MultisigHistoryInfoModal
+        data={selectedMultisigItem}
+        onCancel={onCloseMultisigDetail}
+      />}
 
       <FilterModal
         id={FILTER_MODAL_ID}
