@@ -223,7 +223,7 @@ export class InappNotificationService implements CronServiceInterface {
   }
 
   async validateAndWriteNotificationsToDB (notifications: _BaseNotificationInfo[], address: string) {
-    const proxyId = this.keyringService.context.belongUnifiedAccount(address) || address;
+    const proxyId = this.keyringService.context.belongUnifiedAccount(address) || reformatAddress(address);
     const accountName = this.keyringService.context.getCurrentAccountProxyName(proxyId);
     const passNotifications: _NotificationInfo[] = [];
     const [comparedNotifications, remindTimeConfig] = await Promise.all([

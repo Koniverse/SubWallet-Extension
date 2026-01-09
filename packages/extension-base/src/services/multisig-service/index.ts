@@ -640,6 +640,10 @@ export class MultisigService implements StoppableServiceInterface {
 
     // Write notifications for each address
     for (const [address, addressNotifications] of Object.entries(notificationsByAddress)) {
+      if (!address || !addressNotifications || !addressNotifications.length) {
+        continue;
+      }
+
       await this.inappNotificationService.validateAndWriteNotificationsToDB(addressNotifications, address);
     }
   }
