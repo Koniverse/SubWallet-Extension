@@ -1,16 +1,16 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {_getChainName} from '@subwallet/extension-base/services/chain-service/utils';
-import {MetaInfo} from '@subwallet/extension-koni-ui/components';
-import {RootState} from '@subwallet/extension-koni-ui/stores';
-import {ThemeProps} from '@subwallet/extension-koni-ui/types';
-import React, {useMemo} from 'react';
-import {useTranslation} from 'react-i18next';
-import {useSelector} from 'react-redux';
+import { _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
+import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
+import { MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import {PendingMultisigTx} from "@subwallet/extension-base/services/multisig-service";
-import {useGetAccountByAddress} from "@subwallet/extension-koni-ui/hooks";
 
 interface Props extends ThemeProps {
   data: PendingMultisigTx;

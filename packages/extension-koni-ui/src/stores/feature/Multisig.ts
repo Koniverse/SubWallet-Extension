@@ -3,7 +3,7 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit/dist';
 import { PendingMultisigTxMap } from '@subwallet/extension-base/services/multisig-service';
-import {MultisigStore, ReduxStatus} from '@subwallet/extension-koni-ui/stores/types';
+import { MultisigStore, ReduxStatus } from '@subwallet/extension-koni-ui/stores/types';
 
 const initialState: MultisigStore = {
   reduxStatus: ReduxStatus.INIT,
