@@ -236,6 +236,10 @@ export function genPendingMultisigTxKey (chain: string, multisigAddress: string,
 /**
  * Calculate deposit amount: depositAmount = depositBase + threshold * depositFactor
  * In case threshold equal to 1, return undefined
+ * @param depositBase - Base deposit amount as a string
+ * @param threshold - Multisig threshold
+ * @param depositFactor - Deposit factor per additional signer as a string
+ * @returns Calculated deposit amount as a string
  */
 export function calcDepositAmount (depositBase: string, threshold: number, depositFactor: string): string {
   if (threshold === 1) {
@@ -245,6 +249,15 @@ export function calcDepositAmount (depositBase: string, threshold: number, depos
   return (BigInt(depositBase) + BigInt(threshold) * BigInt(depositFactor)).toString();
 }
 
+/**
+ * Creates a multisig extrinsic using the asMulti method
+ * @param api - Polkadot API instance
+ * @param threshold - Multisig threshold
+ * @param signers - Array of signer addresses
+ * @param signer - Address of the current signer
+ * @param extrinsic - Original extrinsic to be wrapped in multisig
+ * @returns SubmittableExtrinsic representing the multisig transaction
+ */
 export function createMultisigExtrinsic (api: ApiPromise, threshold: number, signers: string[], signer: string, extrinsic: SubmittableExtrinsic): SubmittableExtrinsic {
   return api.tx.multisig.asMulti(
     threshold,

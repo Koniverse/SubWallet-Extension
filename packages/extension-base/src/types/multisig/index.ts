@@ -78,6 +78,12 @@ export interface RequestPrepareMultisigTransaction {
   chain: string;
 }
 
+export interface MultisigAccountInfo {
+  multisigAddress: string;
+  signers: string[];
+  threshold: number;
+}
+
 export interface ResponsePrepareMultisigTransaction {
   submittedCallData: HexString; // callData of the multisig extrinsic
   callData: HexString; // callData of the original extrinsic

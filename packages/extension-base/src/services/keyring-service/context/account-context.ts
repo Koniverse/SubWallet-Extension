@@ -7,7 +7,8 @@ import { KeyringService } from '@subwallet/extension-base/services/keyring-servi
 import { AccountMigrationHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Migration';
 import { AccountMultisigHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Multisig';
 import { AccountProxyMap, CurrentAccountInfo, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestAccountProxyEdit, RequestAccountProxyForget, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestChangeTonWalletContractVersion, RequestCheckPublicAndSecretKey, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseJsonGetAccountInfo, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2 } from '@subwallet/extension-base/types';
-import { RequestGetSignableAccountInfos, ResponseGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
+import { MultisigAccountInfo, RequestGetSignableAccountInfos, ResponseGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
+import { reformatAddress } from '@subwallet/extension-base/utils';
 import { InjectedAccountWithMeta } from '@subwallet/extension-inject/types';
 import { SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 
@@ -306,6 +307,34 @@ export class AccountContext {
 
   public getMultisigAccounts () {
     return this.state.getMultisigAccounts();
+  }
+
+  public getMultisigAccountByAddress (address?: string) {
+    if (!address) {
+      return undefined;
+    }
+
+    const allMultisigAccounts = this.getMultisigAccounts();
+
+    return allMultisigAccounts.find((acc) => acc.accounts[0].address === reformatAddress(address));
+  }
+
+  public getMultisigAccountInfoByAddress (address?: string): MultisigAccountInfo | undefined {
+    const accountProxy = this.getMultisigAccountByAddress(address);
+
+    if (!accountProxy) {
+      return undefined;
+    }
+
+    const threshold = accountProxy.accounts[0].threshold as number;
+    const signers = accountProxy.accounts[0].signers as string[];
+    const multisigAddress = accountProxy.accounts[0].address;
+
+    return {
+      threshold,
+      signers,
+      multisigAddress
+    };
   }
 
   public getMultisigAddresses () {
