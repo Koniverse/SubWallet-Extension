@@ -392,7 +392,11 @@ export class MultisigService implements StoppableServiceInterface {
   private async subscribePendingMultisigTxsPromise (chain: string, multisigAddress: string, signers: string[], threshold: number, callback: (rs: RawPendingMultisigTx[]) => void) {
     const substrateApi = await this.chainService.getSubstrateApi(chain).isReady;
 
-    // todo: validate substrateApi has multisig.multisigs
+    if (!substrateApi.api.query.multisig.multisigs) {
+      multisigServiceLogger.warn('This chain is not has multisig pallet', chain);
+
+      return () => subscription.unsubscribe();
+    }
 
     const keyQuery = MULTISIG_QUERY_KEY;
     const rawKeys = await substrateApi.api.query.multisig.multisigs.keys(multisigAddress);
@@ -560,8 +564,10 @@ export class MultisigService implements StoppableServiceInterface {
           continue;
         }
 
-        const key = genPendingMultisigTxKey(chain, multisigAddress, signerAddress, extrinsicHash);
-        const pendingTx: PendingMultisigTx = { ...rawTx, currentSigner: signerAddress, id: key };
+        const reformatSignerAddress = _reformatAddressWithChain(signerAddress, this.chainService.getChainInfoByKey(chain))
+
+        const key = genPendingMultisigTxKey(chain, multisigAddress, reformatSignerAddress, extrinsicHash);
+        const pendingTx: PendingMultisigTx = { ...rawTx, currentSigner: reformatSignerAddress, id: key };
 
         newTxMap[key] = pendingTx;
 
@@ -601,7 +607,7 @@ export class MultisigService implements StoppableServiceInterface {
 
       return {
         id: notificationId,
-        address: tx.currentSigner, // todo: reformat?
+        address: tx.currentSigner,
         title: NotificationTitleMap[actionType],
         description: NotificationDescriptionMap[actionType](),
         time: timestamp,
