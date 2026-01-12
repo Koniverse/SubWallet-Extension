@@ -91,7 +91,7 @@ export interface ProcessNotificationMetadata {
   processId: string;
 }
 
-export interface MultisigApprovalNotificationMetadata { // todo
+export interface MultisigApprovalNotificationMetadata {
   chain: string;
   multisigAddress: string;
   extrinsicHash: string;

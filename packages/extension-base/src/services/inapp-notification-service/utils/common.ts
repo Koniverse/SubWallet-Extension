@@ -6,7 +6,6 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { NotificationDescriptionMap, NotificationTitleMap } from '@subwallet/extension-base/services/inapp-notification-service/consts';
 import { _BaseNotificationInfo, NotificationActionType, NotificationTab } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
-import { MultisigTxType } from '@subwallet/extension-base/services/multisig-service';
 import { EarningRewardItem, UnstakingInfo, UnstakingStatus, YieldPoolType } from '@subwallet/extension-base/types';
 import { formatNumber } from '@subwallet/extension-base/utils';
 
@@ -31,11 +30,8 @@ export function getReceiveDescription (amount: string, symbol: string) {
   return `You have just received ${amount} ${symbol}`;
 }
 
-export function getMultisigApprovalDescription (txType: MultisigTxType) {
-  const txTypeText = txType === MultisigTxType.UNKNOWN ? 'Unknown multisig' : `Multisig ${txType.toLowerCase()}`;
-
-  // todo: recheck content txTypeText
-  return `${txTypeText} is pending your approval`;
+export function getMultisigApprovalDescription () {
+  return 'A multisig transaction is waiting for your approval. Click to view details';
 }
 
 /* Description */

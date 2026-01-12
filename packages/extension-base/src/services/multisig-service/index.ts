@@ -603,7 +603,7 @@ export class MultisigService implements StoppableServiceInterface {
         id: notificationId,
         address: tx.currentSigner, // todo: reformat?
         title: NotificationTitleMap[actionType],
-        description: NotificationDescriptionMap[actionType](tx.multisigTxType),
+        description: NotificationDescriptionMap[actionType](),
         time: timestamp,
         extrinsicType: ExtrinsicType.MULTISIG_APPROVE_TX,
         isRead: false,
