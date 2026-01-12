@@ -6,7 +6,7 @@ import { AccountBaseHandler } from '@subwallet/extension-base/services/keyring-s
 import { AccountChainType } from '@subwallet/extension-base/types';
 import { RequestGetSignableProxyIds, ResponseGetSignableProxyIds } from '@subwallet/extension-base/types/multisig';
 import { reformatAddress } from '@subwallet/extension-base/utils';
-import { encodeAddress } from '@subwallet/keyring';
+import { encodeAddress, isSubstrateAddress } from '@subwallet/keyring';
 import { KeyringPair$Meta } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { t } from 'i18next';
@@ -19,17 +19,58 @@ import { createKeyMulti } from '@polkadot/util-crypto';
  * @description Handler for multisig account
  * */
 export class AccountMultisigHandler extends AccountBaseHandler {
+  private validateSigners (signers: string[], threshold: number): AccountMultisigError[] {
+    const errors: AccountMultisigError[] = [];
+
+    if (!signers || signers.length === 0) {
+      errors.push({ code: AccountMultisigErrorCode.INVALID_FILLED_ADDRESS, message: t('Signers must be provided') });
+    }
+
+    if (!signers || signers.length < 2) {
+      errors.push({ code: AccountMultisigErrorCode.INVALID_FILLED_ADDRESS, message: t('Only support for multiple signers multisig account creation') });
+    }
+
+    if (!threshold || threshold < 2 || threshold > signers.length) {
+      errors.push({ code: AccountMultisigErrorCode.INVALID_FILLED_THRESHOLD, message: t('Invalid threshold') });
+    }
+
+    for (const signer of signers) {
+      if (!signer || !isSubstrateAddress(signer)) {
+        errors.push({ code: AccountMultisigErrorCode.INVALID_FILLED_ADDRESS, message: t('Address must be a substrate address') });
+
+        break;
+      }
+    }
+
+    const distinctAddress = new Set<string>();
+
+    for (const signer of signers) {
+      const rAddress = reformatAddress(signer);
+
+      if (distinctAddress.has(rAddress)) {
+        errors.push({ code: AccountMultisigErrorCode.DUPLICATE_FILLED_ADDRESS, message: t('Duplicate address found') });
+
+        break;
+      } else {
+        distinctAddress.add(rAddress);
+      }
+    }
+
+    return errors;
+  }
+
   public async accountsCreateMultisig (request: RequestAccountCreateMultisig): Promise<AccountMultisigError[]> {
     const { name, signers: _signer, threshold } = request;
 
-    // todo: validate invalid _signer address
-    // todo: validate invalid threshold (<2 or >signers.length)
-    // todo: validate duplicate signers
-    // todo: validate invalid signers array, must has at least 2 signers
+    // process signers
+    const signerError = this.validateSigners(_signer, threshold);
+
+    if (signerError.length > 0) {
+      return signerError;
+    }
 
     const signers = _signer.map((address) => reformatAddress(address));
-
-    const multisigKey = createKeyMulti(signers, threshold); // todo: recheck if createKeyMulti ensure exact signers order
+    const multisigKey = createKeyMulti(signers, threshold);
     const multisigAddress = encodeAddress(multisigKey);
 
     try {

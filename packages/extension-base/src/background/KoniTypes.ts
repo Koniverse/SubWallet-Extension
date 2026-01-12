@@ -900,7 +900,10 @@ export interface RequestAccountCreateMultisig {
 }
 
 export enum AccountMultisigErrorCode {
-  INVALID_ADDRESS = 'invalidToAccount',
+  INVALID_FILLED_ADDRESS = 'invalidFilledAddress',
+  INVALID_FILLED_THRESHOLD = 'invalidFilledThreshold',
+  DUPLICATE_FILLED_ADDRESS = 'duplicateFilledAddress',
+  INVALID_ADDRESS = 'invalidAddress',
   INVALID_NAME = 'invalidName',
   KEYRING_ERROR = 'keyringError'
 }
