@@ -418,13 +418,10 @@ export default class TransactionService {
     // Fill transaction default info
     const transactionUpdated = this.fillTransactionDefaultInfo(validatedTransaction);
 
-    // Add Transaction
+    // Add transaction
     transactionsSubject[transactionUpdated.id] = { ...transactionUpdated, emitterTransaction: emitter };
-
-    // todo: delete transaction.data.transactionId after user approve
-    if (transaction.data.previousMultisigTxId) {
-      delete transactionsSubject[transaction.data.previousMultisigTxId];
-    }
+    // Delete previous select signer transaction
+    transaction.data.previousMultisigTxId && delete transactionsSubject[transaction.data.previousMultisigTxId];
 
     this.transactionSubject.next({ ...transactionsSubject });
 
@@ -436,6 +433,8 @@ export default class TransactionService {
     });
 
     emitter.on('signed', (data: TransactionEventResponse) => {
+      // Delete base transaction after approve multisig tx
+      transaction.data.multisigMetadata && transaction.data.transactionId && delete transactionsSubject[transaction.data.transactionId];
       validatedTransaction.id = data.id;
       validatedTransaction.extrinsicHash = data.extrinsicHash;
       this.onSigned(data);
