@@ -395,7 +395,7 @@ export class MultisigService implements StoppableServiceInterface {
     if (!substrateApi.api.query.multisig.multisigs) {
       multisigServiceLogger.warn('This chain is not has multisig pallet', chain);
 
-      return () => subscription.unsubscribe();
+      return () => undefined;
     }
 
     const keyQuery = MULTISIG_QUERY_KEY;
