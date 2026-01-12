@@ -29,7 +29,7 @@ const Component: React.FC<Props> = (props: Props) => {
     if (args && typeof args === 'object' && !Array.isArray(args)) {
       const argsRecord = args as Record<string, any>;
 
-      const dest = argsRecord.dest;
+      const dest = (argsRecord.dest as unknown) as Record<string, string>;
 
       if (dest && typeof dest === 'object' && dest.Id) {
         return String(dest.Id);

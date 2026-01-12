@@ -11,7 +11,7 @@ import { editAccount, forgetAccount, validateAccountName } from '@subwallet/exte
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountDetailParam, ThemeProps, VoidFunction } from '@subwallet/extension-koni-ui/types';
 import { FormCallbacks, FormFieldData } from '@subwallet/extension-koni-ui/types/form';
-import { copyToClipboard, findAccountByAddress, reformatAddress } from '@subwallet/extension-koni-ui/utils';
+import { copyToClipboard, findAccountByAddress } from '@subwallet/extension-koni-ui/utils';
 import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils/form/form';
 import { Button, Form, Icon, Input } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -424,8 +424,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
     return (
       <div className={'signatory-item-wrapper'}>
         {signers.map((signer: string) => {
-          const formattedAddress = reformatAddress(signer);
-          const accountInWallet = findAccountByAddress(accounts, formattedAddress);
+          const accountInWallet = findAccountByAddress(accounts, signer);
 
           return (<div
             className='signatory-item'

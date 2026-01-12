@@ -66,10 +66,6 @@ const Component: React.FC<Props> = (props: Props) => {
     return toShort(data.callData, 8, 9);
   }, [data]);
 
-  if (!data) {
-    return null;
-  }
-
   const sortedSigners = useMemo(() => {
     if (!data?.signerAddresses) {
       return [];
@@ -253,7 +249,6 @@ const HistoryMultisigLayout = styled(Component)<Props>(({ theme: { token } }: Pr
     '.signatory-item-container': {
       display: 'flex',
       flexDirection: 'column',
-      marginTop: 12,
       background: token.colorBgSecondary,
       borderRadius: 8,
       padding: 12,

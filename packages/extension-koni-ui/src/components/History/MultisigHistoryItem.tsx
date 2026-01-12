@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MultisigTxType, PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { RootState } from '@subwallet/extension-koni-ui/stores';
+import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { customFormatDate, findAccountByAddress, reformatAddress, toShort } from '@subwallet/extension-koni-ui/utils';
+import { customFormatDate, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Logo, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowUpRight, HardDrives, Question } from 'phosphor-react';
@@ -18,7 +17,6 @@ type Props = ThemeProps & {
 };
 
 const Component = ({ className = '', item, onClick }: Props) => {
-  const accounts = useSelector((state: RootState) => state.accountState.accounts);
   const txInfo = useMemo(() => {
     const method = item.decodedCallData?.method || '';
 
@@ -38,8 +36,7 @@ const Component = ({ className = '', item, onClick }: Props) => {
   const percent = threshold > 0 ? (currentApprovals / threshold) * 100 : 0;
   const isApproved = currentApprovals === threshold;
 
-  const formattedAddress = reformatAddress(item.multisigAddress);
-  const accountInWallet = findAccountByAddress(accounts, formattedAddress);
+  const accountInWallet = useGetAccountByAddress(item.multisigAddress);
 
   return (
     <Web3Block
