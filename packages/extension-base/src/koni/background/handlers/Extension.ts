@@ -93,7 +93,7 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { TypeRegistry } from '@polkadot/types';
 import { Registry, SignerPayloadJSON, SignerPayloadRaw } from '@polkadot/types/types';
 import { assert, hexStripPrefix, hexToU8a, isAscii, isHex, noop, u8aToHex } from '@polkadot/util';
-import { decodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
+import { decodeAddress, isEthereumAddress, sortAddresses } from '@polkadot/util-crypto';
 
 import { getSuitableRegistry, RegistrySource, setupApiRegistry, setupDappRegistry, setupDatabaseRegistry } from '../utils';
 
@@ -3195,9 +3195,9 @@ export default class KoniExtension {
 
   // Multisig handlers
   private async approvePendingTx (inputData: ApprovePendingTxRequest): Promise<boolean> {
-    const { address, callHash, chain, maxWeight, otherSignatories, threshold, timepoint } = inputData;
+    const { address, callHash, chain, maxWeight, multisigMetadata, timepoint } = inputData;
 
-    if (!address || !chain || !threshold || !otherSignatories || !callHash) {
+    if (!address || !chain || !multisigMetadata || !callHash) {
       return false;
     }
 
@@ -3213,9 +3213,11 @@ export default class KoniExtension {
         return false;
       }
 
+      const otherSignatories = multisigMetadata.signers.filter((s) => !isSameAddress(s, address));
+
       const extrinsic = api.tx.multisig.approveAsMulti(
-        threshold,
-        otherSignatories.sort().reverse(),
+        multisigMetadata.threshold,
+        sortAddresses(otherSignatories),
         timepoint,
         callHash,
         maxWeight
@@ -3240,9 +3242,9 @@ export default class KoniExtension {
   }
 
   private async executePendingTx (inputData: ExecutePendingTxRequest): Promise<boolean> {
-    const { address, call, chain, maxWeight, otherSignatories, threshold, timepoint } = inputData;
+    const { address, call, chain, maxWeight, multisigMetadata, timepoint } = inputData;
 
-    if (!address || !chain || !threshold || !otherSignatories || !timepoint || !call) {
+    if (!address || !chain || !multisigMetadata || !timepoint || !call) {
       return false;
     }
 
@@ -3254,9 +3256,11 @@ export default class KoniExtension {
         return false;
       }
 
+      const otherSignatories = multisigMetadata.signers.filter((s) => !isSameAddress(s, address));
+
       const extrinsic = api.tx.multisig.asMulti(
-        threshold,
-        otherSignatories.sort().reverse(),
+        multisigMetadata.threshold,
+        sortAddresses(otherSignatories),
         timepoint,
         call,
         maxWeight
@@ -3281,9 +3285,9 @@ export default class KoniExtension {
   }
 
   private async cancelPendingTx (inputData: CancelPendingTxRequest): Promise<boolean> {
-    const { address, callHash, chain, otherSignatories, threshold, timepoint } = inputData;
+    const { address, callHash, chain, multisigMetadata, timepoint } = inputData;
 
-    if (!address || !chain || !threshold || !otherSignatories || !callHash) {
+    if (!address || !chain || !multisigMetadata || !callHash) {
       return false;
     }
 
@@ -3295,9 +3299,11 @@ export default class KoniExtension {
         return false;
       }
 
+      const otherSignatories = multisigMetadata.signers.filter((s) => !isSameAddress(s, address));
+
       const extrinsic = api.tx.multisig.cancelAsMulti(
-        threshold,
-        otherSignatories.sort().reverse(),
+        multisigMetadata.threshold,
+        sortAddresses(otherSignatories),
         timepoint,
         callHash
       );

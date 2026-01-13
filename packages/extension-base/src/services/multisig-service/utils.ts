@@ -10,7 +10,7 @@ import { GenericExtrinsic } from '@polkadot/types';
 import { Block, Call } from '@polkadot/types/interfaces';
 import { AnyJson, AnyTuple, Codec } from '@polkadot/types/types';
 import { HexString } from '@polkadot/util/types';
-import { blake2AsHex } from '@polkadot/util-crypto';
+import { blake2AsHex, sortAddresses } from '@polkadot/util-crypto';
 
 export const DEFAULT_BLOCK_HASH = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
@@ -259,9 +259,11 @@ export function calcDepositAmount (depositBase: string, threshold: number, depos
  * @returns SubmittableExtrinsic representing the multisig transaction
  */
 export function createMultisigExtrinsic (api: ApiPromise, threshold: number, signers: string[], signer: string, extrinsic: SubmittableExtrinsic): SubmittableExtrinsic {
+  const otherSignatories = signers.filter((s) => !isSameAddress(s, signer));
+
   return api.tx.multisig.asMulti(
     threshold,
-    signers.filter((s) => !isSameAddress(s, signer)).sort().reverse(),
+    sortAddresses(otherSignatories),
     null,
     extrinsic,
     {

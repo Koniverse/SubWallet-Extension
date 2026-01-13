@@ -10,8 +10,7 @@ import { HexString } from '@polkadot/util/types';
 export interface ApprovePendingTxRequest extends BaseRequestSign {
   address: string;
   chain: string;
-  threshold: number;
-  otherSignatories: string[];
+  multisigMetadata: MultisigRawMetadata;
   timepoint?: {
     height: number;
     index: number;
@@ -26,8 +25,7 @@ export interface ApprovePendingTxRequest extends BaseRequestSign {
 export interface ExecutePendingTxRequest extends BaseRequestSign {
   address: string;
   chain: string;
-  threshold: number;
-  otherSignatories: string[];
+  multisigMetadata: MultisigRawMetadata;
   timepoint?: {
     height: number;
     index: number;
@@ -42,8 +40,7 @@ export interface ExecutePendingTxRequest extends BaseRequestSign {
 export interface CancelPendingTxRequest extends BaseRequestSign {
   address: string;
   chain: string;
-  threshold: number;
-  otherSignatories: string[];
+  multisigMetadata: MultisigRawMetadata;
   timepoint: {
     height: number;
     index: number;
