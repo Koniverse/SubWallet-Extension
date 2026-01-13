@@ -3364,7 +3364,7 @@ export default class KoniExtension {
       }
     };
 
-    return await this.#koniState.transactionService.handleTransactionAfterConfirmation({
+    return await this.#koniState.transactionService.handleTransaction({
       address: signer,
       chain,
       chainType: ChainType.SUBSTRATE,
@@ -3381,6 +3381,7 @@ export default class KoniExtension {
         depositAmount,
         networkFee
       },
+      wrappingStatus: 'WRAPPED',
       additionalValidator
     });
   }

@@ -24,7 +24,6 @@ import styled from 'styled-components';
 
 interface Props extends ThemeProps {
   transaction: SWTransactionResult;
-  setTransactionId: (transactionId?: string) => void;
 }
 
 const modalId = SIGNABLE_ACCOUNT_PROXY_SELECTOR_MODAL;
@@ -53,7 +52,7 @@ function Component ({ className, transaction }: Props) {
   }, [transaction.data, transaction.extrinsicType]);
 
   const descriptionContent = useMemo(() => {
-    if (transaction.isWrappedTx && account?.isMultisig && signerAccount) {
+    if (!!transaction.wrappingStatus && account?.isMultisig && signerAccount) {
       return t('ui.Confirmations.WrappedTransactionInfoArea.multisigInitiationDescription', { replace: { name: signerAccount.name } });
     }
 
@@ -66,7 +65,7 @@ function Component ({ className, transaction }: Props) {
     }
 
     return null;
-  }, [account?.isMultisig, signerAccount, t, transaction.extrinsicType, transaction.isWrappedTx]);
+  }, [account?.isMultisig, signerAccount, t, transaction.extrinsicType, transaction.wrappingStatus]);
 
   const { data: signableAccountProxyItems, isLoading: isGetSignableLoading } = useQuery<SignableAccountProxyItem[]>({
     queryKey: ['non-direct-signing', transaction.id],
@@ -77,7 +76,7 @@ function Component ({ className, transaction }: Props) {
       });
     },
     staleTime: 30_000,
-    enabled: !!transaction && !!account && transaction.isWrappedTx
+    enabled: !!transaction && !!account && !!transaction.wrappingStatus
   });
 
   const onSelectSigner = useCallback((selected: SignableAccountProxyItem) => {
@@ -136,12 +135,7 @@ function Component ({ className, transaction }: Props) {
     };
   }, [account, signerSelected, transaction]);
 
-
-  useEffect(() => {
-    if (wrapTransactionInfo.)
-  }, []);
-
-  if (!signableAccountProxyItems?.length || !transaction.isWrappedTx) {
+  if (!signableAccountProxyItems?.length || !transaction.wrappingStatus) {
     return <></>;
   }
 
