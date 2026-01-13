@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MultisigTxType, PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
+import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Logo, Web3Block } from '@subwallet/react-ui';
@@ -35,6 +36,8 @@ const Component = ({ className = '', item, onClick }: Props) => {
   const percent = threshold > 0 ? (currentApprovals / threshold) * 100 : 0;
   const isApproved = currentApprovals === threshold;
 
+  const accountInWallet = useGetAccountByAddress(item.multisigAddress);
+
   return (
     <Web3Block
       className={CN('multisig-item', className)}
@@ -56,7 +59,7 @@ const Component = ({ className = '', item, onClick }: Props) => {
             </div>
             <div className={'__info'}>
               <div className={'__account-name'}>
-                {`${toShort(item.multisigAddress)}`}
+                {accountInWallet?.name || `${toShort(item.multisigAddress)}`}
               </div>
               <div className={'__meta'}>
                 {`${txInfo.name} - ${item.timestamp ? customFormatDate(item.timestamp, '#hhhh#:#mm#') : 'Processing'}`}

@@ -12,7 +12,7 @@ import { SubstrateProxyAccountArea } from '@subwallet/extension-koni-ui/Popup/Ac
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountDetailParam, ThemeProps, VoidFunction } from '@subwallet/extension-koni-ui/types';
 import { FormCallbacks, FormFieldData } from '@subwallet/extension-koni-ui/types/form';
-import { copyToClipboard } from '@subwallet/extension-koni-ui/utils';
+import { copyToClipboard, findAccountByAddress } from '@subwallet/extension-koni-ui/utils';
 import { convertFieldToObject } from '@subwallet/extension-koni-ui/utils/form/form';
 import { Button, Form, Icon, Input } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -68,7 +68,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   const navigate = useNavigate();
 
   const { alertModal, deriveModal: { open: openDeriveModal } } = useContext(WalletModalContext);
-  const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
+  const { accountProxies, accounts } = useSelector((state: RootState) => state.accountState);
   const showDerivationInfoTab = useMemo((): boolean => {
     if (accountProxy.parentId) {
       return !!accountProxies.find((acc) => acc.id === accountProxy.parentId);
@@ -458,8 +458,10 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
 
     return (
       <div className={'signatory-item-wrapper'}>
-        {signers.map((signer) => (
-          <div
+        {signers.map((signer: string) => {
+          const accountInWallet = findAccountByAddress(accounts, signer);
+
+          return (<div
             className='signatory-item'
             key={signer}
           >
@@ -469,12 +471,13 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
               className={CN('__list-selected-item')}
               isSelected={false}
               key={signer}
+              name={accountInWallet?.name || ''}
               onCopyItem={onCopyAddress(signer)}
               showCopyIcon={true}
               showRemoveIcon={false}
             />
-          </div>
-        ))}
+          </div>);
+        })}
       </div>
     );
   };

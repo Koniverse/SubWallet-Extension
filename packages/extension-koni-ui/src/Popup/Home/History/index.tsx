@@ -5,6 +5,7 @@ import { ExtrinsicStatus, ExtrinsicType, TransactionDirection, TransactionHistor
 import { YIELD_EXTRINSIC_TYPES } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
+import { AccountChainType } from '@subwallet/extension-base/types';
 import { quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { MultisigHistoryItem } from '@subwallet/extension-koni-ui/components/History/MultisigHistoryItem';
@@ -14,7 +15,7 @@ import { useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } f
 import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/extension-koni-ui/messaging';
 import { MultisigHistoryInfoModal } from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/MultisigHistoryInfoModal';
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
-import { customFormatDate, formatHistoryDate, isTypeGov, isTypeManageSubstrateProxy, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
+import { customFormatDate, formatHistoryDate, isTypeGov, isTypeManageSubstrateProxy, isTypeStaking, isTypeTransfer, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Form, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, NewspaperClipping, Pencil, Rocket, Spinner, TreeStructure } from 'phosphor-react';
@@ -255,9 +256,32 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const viewValue = Form.useWatch('view', form);
 
+  const currentSubstrateAddress = useMemo(() => {
+    const substrateAccount = currentAccountProxy?.accounts?.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
+
+    return substrateAccount?.address || '';
+  }, [currentAccountProxy?.accounts]);
+
   const multisigList = useMemo(() => {
-    return Object.values(pendingMultisigTxs);
-  }, [pendingMultisigTxs]);
+    const pendingTxs = Object.values(pendingMultisigTxs);
+
+    if (isAllAccount) {
+      return pendingTxs;
+    }
+
+    if (!currentSubstrateAddress) {
+      return [];
+    }
+
+    return pendingTxs.filter((tx) => {
+      const txMultisigAddress = reformatAddress(tx.multisigAddress);
+      const currentSigner = reformatAddress(tx.currentSigner);
+      const isTargetMultisig = txMultisigAddress === currentSubstrateAddress;
+      const isSigner = currentSigner === currentSubstrateAddress;
+
+      return isTargetMultisig || isSigner;
+    });
+  }, [pendingMultisigTxs, isAllAccount, currentSubstrateAddress]);
 
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
@@ -660,7 +684,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             name='token-detail-form'
           >
             <Form.Item
-              hidden={!isAllAccount}
               name='view'
             >
               <RadioGroup
