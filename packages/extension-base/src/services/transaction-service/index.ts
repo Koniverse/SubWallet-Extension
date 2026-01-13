@@ -357,10 +357,6 @@ export default class TransactionService {
     validatedTransaction.warnings = [];
 
     const emitter = await this.addTransaction(validatedTransaction);
-    const transactionData = transaction.data as InitMultisigTxRequest;
-
-    // Delete previous select signer transaction
-    transactionData.previousMultisigTxId && this.removeTransaction(transactionData.previousMultisigTxId);
 
     await new Promise<void>((resolve, reject) => {
       // TODO
@@ -374,10 +370,6 @@ export default class TransactionService {
         emitter.on('signed', (data: TransactionEventResponse) => {
           validatedTransaction.id = data.id;
           validatedTransaction.extrinsicHash = data.extrinsicHash;
-
-          // Delete base transaction after approve multisig tx
-          transactionData.multisigMetadata && transactionData.transactionId && this.removeTransaction(transactionData.transactionId);
-
           resolve();
         });
       }

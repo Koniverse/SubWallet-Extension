@@ -79,7 +79,6 @@ export interface InitMultisigTxRequest {
   signer: string;
   multisigMetadata: MultisigRawMetadata;
   chain: string;
-  previousMultisigTxId?: string; // previous selected signer tx
 }
 
 export interface InitMultisigTxResponse {
