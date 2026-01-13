@@ -25,6 +25,7 @@ export interface ResponseSubscribeTransfer {
   // TODO: Need to manage errors separately between networks
   error?: string;
   isEvmRpcError?: boolean
+  maxTransferableWithoutFee: string;
 }
 
 export interface RequestSubmitTransferWithId extends RequestSubmitTransfer{

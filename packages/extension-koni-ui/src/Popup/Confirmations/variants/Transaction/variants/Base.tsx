@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 import { CommonTransactionInfo, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -32,6 +33,14 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         className={'meta-info'}
         hasBackgroundWrapper
       >
+        {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
+          <MetaInfo.Account
+            address={transaction.signerSubstrateProxyAddress}
+            chainSlug={transaction.chain}
+            label={t('ui.TRANSACTION.Confirmations.variants.Base.signWith')}
+          />
+        }
+
         <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.variants.Base.estimatedFee')}
