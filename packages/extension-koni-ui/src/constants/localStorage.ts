@@ -23,8 +23,10 @@ export const CHANGE_VALIDATOR_TRANSACTION = 'transaction.change-validator';
 export const GOV_REFERENDUM_VOTE_TRANSACTION = 'transaction.gov-referendum-vote';
 export const GOV_REFERENDUM_UNVOTE_TRANSACTION = 'transaction.gov-referendum-unvote';
 export const GOV_UNLOCK_VOTE_TRANSACTION = 'transaction.gov-unlock-vote';
+export const ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION = 'transaction.add-substrateProxyAccount';
+export const REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION = 'transaction.remove-substrateProxyAccount';
 
-export const TRANSACTION_STORAGES = [TRANSFER_TRANSACTION, NFT_TRANSACTION, EARN_TRANSACTION, UN_STAKE_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION, CLAIM_REWARD_TRANSACTION, SWAP_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION];
+export const TRANSACTION_STORAGES = [TRANSFER_TRANSACTION, NFT_TRANSACTION, EARN_TRANSACTION, UN_STAKE_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION, CLAIM_REWARD_TRANSACTION, SWAP_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION];
 
 export const SELECTED_ACCOUNT_TYPE = 'account.selected-type';
 export const SELECTED_MNEMONIC_TYPE = 'account.selected-mnemonic-type';
@@ -46,3 +48,5 @@ export const UPGRADE_FIREFOX_VERSION = 'general.updated-version-firefox';
 export const UPGRADE_DUPLICATE_ACCOUNT_NAME = 'general.upgrade-duplicate-account-name';
 export const CURRENT_CHAIN_GOV = 'gov.current-chain-gov';
 export const ADDRESS_INPUT_AUTO_FORMAT_VALUE = 'component.address-input.auto-format-value'; // value: boolean
+// storage key to persist the currently selected chain in the account details screen's manage proxies tab
+export const CURRENT_CHAIN_SUBSTRATE_PROXY = 'substrateProxy.current-chain-management';

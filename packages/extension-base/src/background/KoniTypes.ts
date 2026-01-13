@@ -23,7 +23,7 @@ import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@su
 import { AccountChainType, AccountJson, AccountsWithCurrentAddress, AddressJson, BalanceJson, BalanceType, BaseRequestSign, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CurrentAccountInfo, EarningRewardHistoryItem, EarningRewardJson, EarningStatus, HandleYieldStepParams, InternalRequestSign, LeavePoolAdditionalData, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestAccountProxyEdit, RequestAccountProxyForget, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckCrossChainTransfer, RequestCheckPublicAndSecretKey, RequestCheckTransfer, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningImpact, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestTransfer, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseEarlyValidateYield, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StorageDataInterface, SubmitChangeValidatorStaking, SubmitYieldJoinData, SubmitYieldStepData, SubnetYieldPositionInfo, SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapRequestV2, SwapSubmitParams, SwapTxData, TokenSpendingApprovalParams, UnlockDotTransactionNft, UnstakingStatus, ValidateSwapProcessParams, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { RequestClaimBridge } from '@subwallet/extension-base/types/bridge';
-import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, RequestGetSignableProxyIds, ResponseGetSignableProxyIds } from '@subwallet/extension-base/types/multisig';
+import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, InitMultisigTxRequest, InitMultisigTxResponse, RequestGetSignableAccountInfos, ResponseGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { InjectedAccount, InjectedAccountWithMeta, MetadataDefBase } from '@subwallet/extension-inject/types';
 import { BitcoinAddressType, KeyringPair$Meta } from '@subwallet/keyring/types';
@@ -42,6 +42,7 @@ import { HexString } from '@polkadot/util/types';
 
 import { EarningImpactResult } from '../services/earning-service/handlers/native-staking/dtao';
 import { GovVoteRequest, GovVotingInfo, RemoveVoteRequest, UnlockVoteRequest } from '../services/open-gov/interface';
+import { RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount, SubstrateProxyAccountGroup } from '../types/substrateProxyAccount';
 import { TransactionWarning } from './warnings/TransactionWarning';
 
 export enum RuntimeEnvironment {
@@ -583,16 +584,21 @@ export enum ExtrinsicType {
   // OPEN GOV
   GOV_VOTE = 'gov.vote',
   GOV_UNVOTE = 'gov.unvote',
-  GOV_UNLOCK_VOTE = 'gov.unlock-vote',
+  GOV_UNLOCK_VOTE = 'gov.unlock_vote',
   // OPEN GOV
 
   // MULTISIG
   MULTISIG_APPROVE_TX = 'multisig.approve',
   MULTISIG_CANCEL_TX = 'multisig.cancel',
   MULTISIG_EXECUTE_TX = 'multisig.execute',
+  MULTISIG_INIT_TX = 'multisig.init',
   // MULTISIG
 
   EVM_EXECUTE = 'evm.execute',
+
+  ADD_SUBSTRATE_PROXY_ACCOUNT = 'substrateProxyAccount.add',
+  REMOVE_SUBSTRATE_PROXY_ACCOUNT = 'substrateProxyAccount.remove',
+
   UNKNOWN = 'unknown'
 }
 
@@ -659,9 +665,14 @@ export interface ExtrinsicDataTypeMap {
   [ExtrinsicType.MULTISIG_APPROVE_TX]: ApprovePendingTxRequest,
   [ExtrinsicType.MULTISIG_EXECUTE_TX]: ExecutePendingTxRequest,
   [ExtrinsicType.MULTISIG_CANCEL_TX]: CancelPendingTxRequest,
+  [ExtrinsicType.MULTISIG_INIT_TX]: InitMultisigTxRequest & InitMultisigTxResponse,
   // MULTISIG
 
+  [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: RequestAddSubstrateProxyAccount,
+  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: RequestRemoveSubstrateProxyAccount,
+
   [ExtrinsicType.SWAP]: SwapTxData
+
   [ExtrinsicType.UNKNOWN]: any
 }
 
@@ -793,6 +804,7 @@ export interface TransactionHistoryItem<ET extends ExtrinsicType = ExtrinsicType
   addressPrefix?: number,
   processId?: string;
   apiTxIndex?: number;
+  substrateProxyAddresses?: string[];
 }
 
 export interface SWWarning {
@@ -2399,7 +2411,7 @@ export interface KoniRequestSignatures {
   // NFT functions
   'pri(evmNft.submitTransaction)': [NftTransactionRequest, SWTransactionResponse];
   'pri(evmNft.getTransaction)': [NftTransactionRequest, EvmNftTransaction];
-  'pri(substrateNft.submitTransaction)': [NftTransactionRequest, SWTransactionResponse];
+  'pri(substrateNft.submitTransaction)': [RequestSubstrateNftSubmitTransaction, SWTransactionResponse];
   'pri(substrateNft.getTransaction)': [NftTransactionRequest, SubstrateNftTransaction];
   'pri(nft.getNft)': [null, NftJson];
   'pri(nft.getSubscription)': [RequestSubscribeNft, NftJson, NftJson];
@@ -2826,8 +2838,14 @@ export interface KoniRequestSignatures {
   'pri(multisig.approvePendingTx)': [ApprovePendingTxRequest, boolean];
   'pri(multisig.executePendingTx)': [ExecutePendingTxRequest, boolean];
   'pri(multisig.cancelPendingTx)': [CancelPendingTxRequest, boolean];
-  'pri(multisig.getSignableProxyIds)': [RequestGetSignableProxyIds, ResponseGetSignableProxyIds];
+  'pri(multisig.getSignableAccountInfos)': [RequestGetSignableAccountInfos, ResponseGetSignableAccountInfos];
+  'pri(multisig.initMultisigTx)': [InitMultisigTxRequest, SWTransactionResponse];
   /* Multisig Account */
+
+  /* Proxy Account */
+  'pri(substrateProxyAccount.getGroupInfo)': [RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountGroup];
+  'pri(substrateProxyAccount.add)': [RequestAddSubstrateProxyAccount, SWTransactionResponse];
+  'pri(substrateProxyAccount.remove)': [RequestRemoveSubstrateProxyAccount, SWTransactionResponse];
 }
 
 export interface ApplicationMetadataType {

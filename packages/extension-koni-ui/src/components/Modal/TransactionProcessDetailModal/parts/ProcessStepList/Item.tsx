@@ -26,10 +26,10 @@ const Component: FC<Props> = (props: Props) => {
   return (
     <TransactionProcessStepSimpleItem
       className={className}
+      content={text}
       index={index}
       isLastItem={isLastItem}
       status={processStep.status}
-      content={text}
     />
   );
 };

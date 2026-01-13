@@ -3,8 +3,9 @@
 
 import { AccountMultisigError, AccountMultisigErrorCode, RequestAccountCreateMultisig } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountBaseHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Base';
+import { MULTISIG_SUPPORTED_CHAINS } from '@subwallet/extension-base/services/multisig-service';
 import { AccountChainType } from '@subwallet/extension-base/types';
-import { RequestGetSignableProxyIds, ResponseGetSignableProxyIds } from '@subwallet/extension-base/types/multisig';
+import { RequestGetSignableAccountInfos, ResponseGetSignableAccountInfos, SignableAccountInfo } from '@subwallet/extension-base/types/multisig';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { encodeAddress, isSubstrateAddress } from '@subwallet/keyring';
 import { KeyringPair$Meta } from '@subwallet/keyring/types';
@@ -121,31 +122,51 @@ export class AccountMultisigHandler extends AccountBaseHandler {
     }
   }
 
-  public getSignableProxyIds (request: RequestGetSignableProxyIds): ResponseGetSignableProxyIds {
-    const { extrinsicType, multisigProxyId } = request;
+  /**
+   * Get 1-level signatories
+   * Ignore multisig accounts that are also signatories
+   */
+  public getSignableAccountInfos (request: RequestGetSignableAccountInfos): ResponseGetSignableAccountInfos {
+    const { chain, extrinsicType, multisigProxyId } = request;
+
+    if (!MULTISIG_SUPPORTED_CHAINS.includes(chain)) {
+      return { signableProxies: [] };
+    }
 
     const allMultisigAccounts = this.state.getMultisigAccounts();
     const allAccounts = this.state.accounts;
     const targetMultisigAccount = allMultisigAccounts.find((acc) => acc.id === multisigProxyId);
-    const signers = targetMultisigAccount?.accounts[0]?.signers as string[];
-    const signableProxyIds: string[] = [];
 
-    if (!signers) {
-      return { signableProxyIds };
+    if (!targetMultisigAccount) {
+      return { signableProxies: [] };
     }
 
+    const signableAccountInfo: SignableAccountInfo[] = [];
+    const signers = targetMultisigAccount.accounts[0].signers as string[];
+
+    const allMultisigAccountAddress = allMultisigAccounts.map((acc) => acc.id);
+
     for (const signer of signers) {
+      if (allMultisigAccountAddress.includes(signer)) {
+        continue;
+      }
+
       const proxyId = this.state.belongUnifiedAccount(signer) || reformatAddress(signer);
-      const accountProxy = allAccounts[proxyId]; // todo: recheck with case the signatory account is unified account
+      const accountProxy = allAccounts[proxyId];
       const substrateAccount = accountProxy?.accounts.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
 
       if (substrateAccount) {
-        if (substrateAccount.transactionActions.includes(extrinsicType)) {
-          signableProxyIds.push(proxyId);
+        // Check if the account can sign the extrinsic type
+        // Only support 1 level signatories
+        if (substrateAccount.transactionActions.includes(extrinsicType) && !substrateAccount.isMultisig) {
+          signableAccountInfo.push({
+            proxyId,
+            address: signer
+          });
         }
       }
     }
 
-    return { signableProxyIds };
+    return { signableProxies: signableAccountInfo };
   }
 }

@@ -208,12 +208,12 @@ const Component: React.FC<Props> = (props: Props) => {
               value={data.amount}
             />
           )}
-          <MetaInfo.Number
+          {!transaction.isWrappedTx && <MetaInfo.Number
             decimals={decimals}
             label={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.estimatedFee')}
             suffix={symbol}
             value={transaction.estimateFee?.value || 0}
-          />
+          />}
           {(compound && !isBittensorChain) && (
             <ValidatorGroupModal
               accounts={newValidatorAccounts}

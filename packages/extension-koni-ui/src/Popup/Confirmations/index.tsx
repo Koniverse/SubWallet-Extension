@@ -385,10 +385,20 @@ const Component = function ({ className }: Props) {
           return t('ui.Confirmations.unvoteConfirmation');
         case ExtrinsicType.GOV_UNLOCK_VOTE:
           return t('ui.Confirmations.unlockVotesConfirmation');
+        case ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT:
+          return t('ui.Confirmations.addSubstrateProxyConfirmation');
+        case ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT:
+          return t('ui.Confirmations.removeSubstrateProxyConfirmation');
         case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.EVM_EXECUTE:
         case ExtrinsicType.UNKNOWN:
           return t('ui.Confirmations.transactionConfirm');
+        case ExtrinsicType.MULTISIG_APPROVE_TX:
+          return t('Multisig approve unstake');
+        case ExtrinsicType.MULTISIG_CANCEL_TX:
+          return t('Multisig cancel unstake');
+        case ExtrinsicType.MULTISIG_EXECUTE_TX:
+          return t('Multisig execute unstake');
       }
     } else {
       return t(titleMap[confirmation.type] || '');
@@ -431,6 +441,10 @@ const Confirmations = styled(Component)<Props>(({ theme: { token } }: ThemeProps
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
+
+  '.ant-sw-header-center-part': {
+    width: 'fit-content'
+  },
 
   '.confirmation-header': {
     paddingTop: token.sizeXS,

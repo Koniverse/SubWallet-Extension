@@ -440,6 +440,7 @@ export class AccountState {
   public belongUnifiedAccount (_address: string): string | undefined {
     const modifyPairs = this.modifyPairs;
     const accountProxies = this.accountProxies;
+
     const address = reformatAddress(_address);
     const proxyId = modifyPairs[address]?.accountProxyId;
 

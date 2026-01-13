@@ -251,7 +251,13 @@ const OPEN_GOV_ACTIONS: ExtrinsicType[] = [
 const MULTISIG_ACTIONS: ExtrinsicType[] = [
   ExtrinsicType.MULTISIG_APPROVE_TX,
   ExtrinsicType.MULTISIG_EXECUTE_TX,
-  ExtrinsicType.MULTISIG_CANCEL_TX
+  ExtrinsicType.MULTISIG_CANCEL_TX,
+  ExtrinsicType.MULTISIG_INIT_TX
+];
+
+const SUBSTRATE_PROXY_ACTION: ExtrinsicType[] = [
+  ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT,
+  ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT
 ];
 
 const OTHER_ACTIONS: ExtrinsicType[] = [
@@ -277,6 +283,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...CLAIM_AVAIL_BRIDGE,
           ...OPEN_GOV_ACTIONS,
           ...MULTISIG_ACTIONS,
+          ...SUBSTRATE_PROXY_ACTION,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -287,6 +294,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_STDOT_ACTIONS,
           ...OTHER_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
+          ...SUBSTRATE_PROXY_ACTION,
           ...EVM_ACTIONS
         ];
       case AccountChainType.TON:
@@ -318,6 +326,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...CLAIM_AVAIL_BRIDGE,
           ...OPEN_GOV_ACTIONS,
           ...MULTISIG_ACTIONS,
+          ...SUBSTRATE_PROXY_ACTION,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:
@@ -343,6 +352,31 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
       case AccountChainType.BITCOIN:
         return [];
     }
+  } else if (signMode === AccountSignMode.MULTISIG) {
+    switch (networkType) {
+      case AccountChainType.SUBSTRATE:
+        return [
+          ...BASE_TRANSFER_ACTIONS,
+          ...NATIVE_STAKE_ACTIONS,
+          ...POOL_STAKE_ACTIONS,
+          // ...EARN_VDOT_ACTIONS, // todo: consider support this
+          // ...EARN_LDOT_ACTIONS,
+          // ...EARN_SDOT_ACTIONS,
+          // ...EARN_QDOT_ACTIONS,
+          // ...EARN_VMANTA_ACTIONS,
+          ...OPEN_GOV_ACTIONS,
+          ...MULTISIG_ACTIONS,
+          ExtrinsicType.SEND_NFT
+        ];
+      case AccountChainType.ETHEREUM:
+        return [];
+      case AccountChainType.TON:
+        return [];
+      case AccountChainType.CARDANO:
+        return [];
+      case AccountChainType.BITCOIN:
+        return [];
+    }
   } else if (signMode === AccountSignMode.GENERIC_LEDGER) {
     switch (networkType) {
       case AccountChainType.SUBSTRATE:
@@ -357,6 +391,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           // ...EARN_QDOT_ACTIONS,
           ...OPEN_GOV_ACTIONS,
           ...MULTISIG_ACTIONS,
+          ...SUBSTRATE_PROXY_ACTION,
           ...OTHER_ACTIONS
         ];
       case AccountChainType.ETHEREUM:

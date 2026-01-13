@@ -21,6 +21,7 @@ import EarningReducer from './feature/Earning';
 import GovernanceReducer from './feature/Governance';
 import MantaPayReducer from './feature/MantaPay';
 import MissionPoolReducer from './feature/MissionPool';
+import MultisigReducer from './feature/Multisig';
 import NftReducer from './feature/Nft';
 import NotificationReducer from './feature/Notification';
 import PriceReducer from './feature/Price';
@@ -81,7 +82,10 @@ const rootReducers = combineReducers({
   notification: NotificationReducer,
 
   // opengov
-  openGov: GovernanceReducer
+  openGov: GovernanceReducer,
+
+  // Multisig Account
+  multisig: MultisigReducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducers);

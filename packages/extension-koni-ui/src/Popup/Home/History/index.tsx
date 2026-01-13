@@ -4,16 +4,21 @@
 import { ExtrinsicStatus, ExtrinsicType, TransactionDirection, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { YIELD_EXTRINSIC_TYPES } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
+import { AccountChainType } from '@subwallet/extension-base/types';
 import { quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
-import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
-import { DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper, RadioGroup } from '@subwallet/extension-koni-ui/components';
+import { MultisigHistoryItem } from '@subwallet/extension-koni-ui/components/History/MultisigHistoryItem';
+import { DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, MULTISIG_HISTORY_INFO_MODAL, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/extension-koni-ui/messaging';
+import { MultisigHistoryInfoModal } from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/MultisigHistoryInfoModal';
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
-import { customFormatDate, formatHistoryDate, isTypeGov, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
-import { ButtonProps, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
-import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, NewspaperClipping, Pencil, Rocket, Spinner } from 'phosphor-react';
+import { customFormatDate, formatHistoryDate, isTypeGov, isTypeManageSubstrateProxy, isTypeStaking, isTypeTransfer, reformatAddress } from '@subwallet/extension-koni-ui/utils';
+import { ButtonProps, Form, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
+import CN from 'classnames';
+import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, NewspaperClipping, Pencil, Rocket, Spinner, TreeStructure } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -35,7 +40,8 @@ const IconMap: Record<string, SwIconProps['phosphorIcon']> = {
   timeout: ClockCounterClockwise,
   swap: ArrowsLeftRight,
   nominate: Pencil,
-  gov: NewspaperClipping
+  gov: NewspaperClipping,
+  substrateProxy: TreeStructure
 };
 
 function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
@@ -73,6 +79,10 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
 
   if (isTypeGov(item.type)) {
     return IconMap.gov;
+  }
+
+  if (isTypeManageSubstrateProxy(item.type)) {
+    return IconMap.substrateProxy;
   }
 
   return IconMap.default;
@@ -199,17 +209,79 @@ const remindSeedPhraseModalId = REMIND_BACKUP_SEED_PHRASE_MODAL;
 const DEFAULT_ITEMS_COUNT = 20;
 const NEXT_ITEMS_COUNT = 10;
 
+enum ViewValue {
+  TRANSACTION = 'Transaction',
+  MULTISIG = 'Multisig'
+}
+
+interface FormState {
+  view: ViewValue
+}
+
+interface ViewOption {
+  label: string;
+  value: ViewValue;
+}
+
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   useSetCurrentPage('/home/history');
   const dataContext = useContext(DataContext);
   const { t } = useTranslation();
+  const [form] = Form.useForm<FormState>();
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
   const { accounts, currentAccountProxy, isAllAccount } = useSelector((root) => root.accountState);
   const { chainInfoMap } = useSelector((root) => root.chainStore);
   const { language } = useSelector((root) => root.settings);
+  const { pendingMultisigTxs } = useSelector((root) => root.multisig);
   const [loading, setLoading] = useState<boolean>(true);
   const [rawHistoryList, setRawHistoryList] = useState<TransactionHistoryItem[]>([]);
   const isActive = checkActive(modalId);
+
+  const defaultValues = useMemo((): FormState => ({
+    view: ViewValue.TRANSACTION
+  }), []);
+
+  const viewOptions = useMemo((): ViewOption[] => {
+    return [
+      {
+        label: t('Transaction'),
+        value: ViewValue.TRANSACTION
+      },
+      {
+        label: t('Multisig'),
+        value: ViewValue.MULTISIG
+      }
+    ];
+  }, [t]);
+
+  const viewValue = Form.useWatch('view', form);
+
+  const currentSubstrateAddress = useMemo(() => {
+    const substrateAccount = currentAccountProxy?.accounts?.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
+
+    return substrateAccount?.address || '';
+  }, [currentAccountProxy?.accounts]);
+
+  const multisigList = useMemo(() => {
+    const pendingTxs = Object.values(pendingMultisigTxs);
+
+    if (isAllAccount) {
+      return pendingTxs;
+    }
+
+    if (!currentSubstrateAddress) {
+      return [];
+    }
+
+    return pendingTxs.filter((tx) => {
+      const txMultisigAddress = reformatAddress(tx.multisigAddress);
+      const currentSigner = reformatAddress(tx.currentSigner);
+      const isTargetMultisig = txMultisigAddress === currentSubstrateAddress;
+      const isSigner = currentSigner === currentSubstrateAddress;
+
+      return isTargetMultisig || isSigner;
+    });
+  }, [pendingMultisigTxs, isAllAccount, currentSubstrateAddress]);
 
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
@@ -338,6 +410,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.GOV_VOTE]: t('ui.HISTORY.screen.History.vote'),
     [ExtrinsicType.GOV_UNVOTE]: t('ui.HISTORY.screen.History.unvote'),
     [ExtrinsicType.GOV_UNLOCK_VOTE]: t('ui.HISTORY.screen.History.unlockVotes'),
+    [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknown'),
+    [ExtrinsicType.MULTISIG_APPROVE_TX]: t('Multisig approve unstake'),
+    [ExtrinsicType.MULTISIG_CANCEL_TX]: t('Multisig cancel unstake'),
+    [ExtrinsicType.MULTISIG_EXECUTE_TX]: t('Multisig execute unstake'),
+    [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: t('ui.HISTORY.screen.History.addSubstrateProxy'),
+    [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: t('ui.HISTORY.screen.History.removeSubstrateProxy'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknown')
   }), [t]);
 
@@ -387,6 +465,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.GOV_VOTE]: t('ui.HISTORY.screen.History.voteTransaction'),
     [ExtrinsicType.GOV_UNVOTE]: t('ui.HISTORY.screen.History.unvoteTransaction'),
     [ExtrinsicType.GOV_UNLOCK_VOTE]: t('ui.HISTORY.screen.History.unlockVotesTransaction'),
+    [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknownTransaction'),
+    [ExtrinsicType.MULTISIG_APPROVE_TX]: t('Multisig approve unstake'),
+    [ExtrinsicType.MULTISIG_CANCEL_TX]: t('Multisig cancel unstake'),
+    [ExtrinsicType.MULTISIG_EXECUTE_TX]: t('Multisig execute unstake'),
+    [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: t('ui.HISTORY.screen.History.addSubstrateProxyTransaction'),
+    [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: t('ui.HISTORY.screen.History.removeSubstrateProxyTransaction'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknownTransaction')
   }), [t]);
 
@@ -395,9 +479,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     const finalHistoryMap: Record<string, TransactionHistoryDisplayItem> = {};
 
     rawHistoryList.forEach((item: TransactionHistoryItem) => {
-      // Format display name for account by address
       const fromName = accountMap[quickFormatAddressToCompare(item.from) || ''];
-      const toName = accountMap[quickFormatAddressToCompare(item.to) || ''];
+      let toName = accountMap[quickFormatAddressToCompare(item.to) || ''];
+
+      if ((item.type === ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT || item.type === ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT) && item.substrateProxyAddresses?.length) {
+        toName = accountMap[quickFormatAddressToCompare(item.address) || ''];
+      }
+
       const key = getHistoryItemKey(item);
       const displayTime = item.blockTime || item.time;
 
@@ -432,12 +520,20 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   // Handle detail modal
   const { chain, extrinsicHashOrId } = useParams();
   const [selectedItem, setSelectedItem] = useState<TransactionHistoryDisplayItem | null>(null);
+  const [selectedMultisigItem, setSelectedMultisigItem] = useState<PendingMultisigTx | null>(null);
   const [openDetailLink, setOpenDetailLink] = useState<boolean>(!!chain && !!extrinsicHashOrId);
 
   const onOpenDetail = useCallback((item: TransactionHistoryDisplayItem) => {
     return () => {
       setSelectedItem(item);
       activeModal(modalId);
+    };
+  }, [activeModal]);
+
+  const onOpenMultisigInfo = useCallback((item: PendingMultisigTx) => {
+    return () => {
+      setSelectedMultisigItem(item);
+      activeModal(MULTISIG_HISTORY_INFO_MODAL);
     };
   }, [activeModal]);
 
@@ -454,6 +550,20 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     setSelectedItem(null);
     setOpenDetailLink(false);
+  }, [activeModal, inactiveModal]);
+
+  const onCloseMultisigDetail = useCallback(() => {
+    const infoSession = Date.now();
+
+    const { remind, timeBackup, timeCalculate } = (JSON.parse(localStorage.getItem(LATEST_SESSION) || JSON.stringify(DEFAULT_SESSION_VALUE))) as SessionStorage;
+
+    inactiveModal(MULTISIG_HISTORY_INFO_MODAL);
+
+    if (infoSession - timeCalculate >= timeBackup && remind) {
+      activeModal(REMIND_BACKUP_SEED_PHRASE_MODAL);
+    }
+
+    setSelectedMultisigItem(null);
   }, [activeModal, inactiveModal]);
 
   const onClickFilter = useCallback(() => {
@@ -491,6 +601,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     if (currentAccountProxy?.id !== currentAccountProxyid) {
       inactiveModal(modalId);
       setSelectedItem(null);
+      setSelectedMultisigItem(null);
     }
   }, [currentAccountProxyid, currentAccountProxy?.id, inactiveModal]);
 
@@ -520,12 +631,31 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [onOpenDetail]
   );
 
-  const groupBy = useCallback((item: TransactionHistoryDisplayItem) => {
-    if (PROCESSING_STATUSES.includes(item.status)) {
-      return t('ui.HISTORY.screen.History.processing');
+  const renderMultisigItem = useCallback(
+    (item: PendingMultisigTx) => {
+      return (
+        <MultisigHistoryItem
+          item={item}
+          key={item.extrinsicHash || item.callHash}
+          onClick={onOpenMultisigInfo(item)}
+        />
+      );
+    },
+    [onOpenMultisigInfo]
+  );
+
+  const groupBy = useCallback((item: TransactionHistoryDisplayItem | PendingMultisigTx) => {
+    if ('status' in item) {
+      if (PROCESSING_STATUSES.includes(item.status)) {
+        return t('ui.HISTORY.screen.History.processing');
+      }
+
+      return formatHistoryDate(item.displayTime, language, 'list');
     }
 
-    return formatHistoryDate(item.displayTime, language, 'list');
+    return item.timestamp
+      ? formatHistoryDate(item.timestamp, language, 'list')
+      : t('Pending Multisig');
   }, [language, t]);
 
   const groupSeparator = useCallback((group: TransactionHistoryItem[], idx: number, groupLabel: string) => {
@@ -546,27 +676,47 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const historySelectorsNode = (
     <>
-      <ChainSelector
-        className={'__history-chain-selector'}
-        disabled={isChainSelectorEmpty}
-        items={chainItems}
-        loading={loading}
-        onChange={onSelectChain}
-        title={t('ui.HISTORY.screen.History.selectChain')}
-        value={selectedChain}
-      />
-
-      {
-        (isAllAccount || accountAddressItems.length > 1) && (
-          <AccountAddressSelector
-            autoSelectFirstItem={true}
-            className={'__history-address-selector'}
-            items={accountAddressItems}
-            onChange={onSelectAccount}
-            value={selectedAddress}
+      <div className={'history-header-wrapper'}>
+        <div className={CN('history-line-1', { '-is-multisig-tab': viewValue === ViewValue.MULTISIG })}>
+          <Form
+            form={form}
+            initialValues={defaultValues}
+            name='token-detail-form'
+          >
+            <Form.Item
+              name='view'
+            >
+              <RadioGroup
+                optionType='button'
+                options={viewOptions}
+              />
+            </Form.Item>
+          </Form>
+        </div>
+        {viewValue === ViewValue.TRANSACTION && <div className={'history-line-2'}>
+          <ChainSelector
+            className={'__history-chain-selector'}
+            disabled={isChainSelectorEmpty}
+            items={chainItems}
+            loading={loading}
+            onChange={onSelectChain}
+            title={t('ui.HISTORY.screen.History.selectChain')}
+            value={selectedChain}
           />
-        )
-      }
+
+          {
+            (isAllAccount || accountAddressItems.length > 1) && (
+              <AccountAddressSelector
+                autoSelectFirstItem={true}
+                className={'__history-address-selector'}
+                items={accountAddressItems}
+                onChange={onSelectAccount}
+                value={selectedAddress}
+              />
+            )
+          }
+        </div>}
+      </div>
     </>
   );
 
@@ -607,6 +757,20 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       </div>
     </>
   ), [emptyList, groupBy, groupSeparator, hasMoreItems, historyItems, onLoadMoreItems, renderItem]);
+
+  const listMultisigSection = useMemo(() => (
+    <div className={'__page-list-area'}>
+      <SwList
+        groupBy={groupBy}
+        groupSeparator={groupSeparator}
+
+        list={multisigList}
+        renderItem={renderMultisigItem}
+        renderOnScroll={false}
+        renderWhenEmpty={emptyList}
+      />
+    </div>
+  ), [emptyList, groupBy, groupSeparator, multisigList, renderMultisigItem]);
 
   const headerIcons = useMemo<ButtonProps[]>(() => {
     return [
@@ -682,7 +846,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     <>
       <PageWrapper
         className={`history ${className}`}
-        resolve={dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance', 'mantaPay'])}
+        resolve={dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance', 'mantaPay', 'multisig'])}
       >
         <Layout.Base>
           <SwSubHeader
@@ -701,7 +865,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             {historySelectorsNode}
           </div>
 
-          {listSection}
+          {viewValue === ViewValue.TRANSACTION && listSection}
+          {viewValue === ViewValue.MULTISIG && listMultisigSection}
         </Layout.Base>
       </PageWrapper>
 
@@ -709,6 +874,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         data={selectedItem}
         onCancel={onCloseDetail}
       />
+      {selectedMultisigItem && <MultisigHistoryInfoModal
+        data={selectedMultisigItem}
+        onCancel={onCloseMultisigDetail}
+      />}
 
       <FilterModal
         id={FILTER_MODAL_ID}
@@ -740,6 +909,32 @@ const History = styled(Component)<Props>(({ theme: { token } }: Props) => {
         right: 0,
         position: 'absolute',
         background: 'linear-gradient(180deg, rgba(76, 234, 172, 0.10) 0%, rgba(76, 234, 172, 0.00) 94.17%)'
+      }
+    },
+    '.history-header-wrapper': {
+      flex: 1
+    },
+
+    '.history-line-2': {
+      display: 'flex',
+      gap: 12
+    },
+
+    '.history-line-1': {
+      '.ant-form-item': {
+        marginBottom: 28
+      },
+
+      '&.-is-multisig-tab': {
+        '.ant-form-item': {
+          marginBottom: 0
+        }
+      }
+    },
+
+    '.history-multisig-tag': {
+      '.ant-form-item': {
+        marginBottom: 0
       }
     },
 

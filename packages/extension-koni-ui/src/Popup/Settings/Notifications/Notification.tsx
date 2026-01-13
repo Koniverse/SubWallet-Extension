@@ -51,7 +51,7 @@ export enum NotificationIconBackgroundColorMap {
   CLAIM_POLYGON_BRIDGE = 'yellow-7',
   SWAP = 'blue-8',
   EARNING = 'blue-8',
-  MULTISIG_APPROVAL = 'blue-8' // todo: update this
+  MULTISIG_APPROVAL = 'green-6'
 }
 
 export const NotificationIconMap = {
@@ -105,6 +105,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       {
         label: t('ui.SETTINGS.screen.Setting.Notifications.read'),
         value: NotificationTab.READ
+      },
+      {
+        label: t('ui.SETTINGS.screen.Setting.Notifications.multisig'),
+        value: NotificationTab.MULTISIG
       }
     ];
   }, [t]);
@@ -125,7 +129,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const notificationItems = useMemo((): NotificationInfoItem[] => {
     const filterTabFunction = (item: NotificationInfoItem) => {
-      if (selectedFilterTab === NotificationTab.ALL) {
+      if (selectedFilterTab === NotificationTab.ALL || selectedFilterTab === NotificationTab.MULTISIG) {
         return true;
       } else if (selectedFilterTab === NotificationTab.UNREAD) {
         return !item.isRead;
@@ -148,7 +152,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         extrinsicType: item.extrinsicType,
         isRead: item.isRead,
         actionType: item.actionType,
-        backgroundColor: token[NotificationIconBackgroundColorMap[item.actionType]], // todo: handle actionType multisig approval.
+        backgroundColor: token[NotificationIconBackgroundColorMap[item.actionType]],
         leftIcon: NotificationIconMap[item.actionType], // todo: handle actionType multisig approval.
         metadata: item.metadata,
         proxyId: item.proxyId
@@ -190,12 +194,25 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const onSelectFilterTab = useCallback((value: string) => {
     setSelectedFilterTab(value as NotificationTab);
     setLoading(true);
+    const isMultisigTab = value === NotificationTab.MULTISIG;
+    const isAllTab = value === NotificationTab.ALL;
+
     fetchInappNotifications({
       proxyId: currentProxyId,
-      notificationTab: value
+      notificationTab: isMultisigTab ? NotificationTab.ALL : value
     } as GetNotificationParams)
       .then((rs) => {
-        setNotifications(rs);
+        const filteredRs = rs.filter((item) => {
+          if (isMultisigTab) {
+            return item.actionType === NotificationActionType.MULTISIG_APPROVAL;
+          } else if (!isAllTab) {
+            return item.actionType !== NotificationActionType.MULTISIG_APPROVAL;
+          }
+
+          return true;
+        });
+
+        setNotifications(filteredRs);
         setTimeout(() => setLoading(false), 300);
       })
       .catch(console.error);
@@ -570,20 +587,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           onSelect={onSelectFilterTab}
           selectedItem={selectedFilterTab}
         />
-        <Button
-          icon={ (
+        {selectedFilterTab === NotificationTab.UNREAD && <Button
+          icon={(
             <Icon
               phosphorIcon={Checks}
               weight={'fill'}
             />
           )}
           // TODO: This is for development. It will be removed when done.
+          className={'mark-read-btn'}
           onClick={handleSwitchClick}
           size='xs'
           type='ghost'
-        >
-          {t('ui.SETTINGS.screen.Setting.Notifications.markAllAsRead')}
-        </Button>
+        />}
       </div>
 
       {enableNotification
@@ -711,6 +727,10 @@ const Notification = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center'
+    },
+
+    '.mark-read-btn': {
+      marginRight: token.margin
     }
   });
 });

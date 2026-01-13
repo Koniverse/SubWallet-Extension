@@ -35,6 +35,7 @@ export interface SWTransactionBase extends ValidateTransactionResponse, Partial<
   errorOnTimeOut?: boolean;
   signAfterCreate?: (id: string) => void;
   step?: BriefProcessStep;
+  isWrappedTx?: boolean;
 }
 
 export interface SWTransaction extends SWTransactionBase {
@@ -63,7 +64,7 @@ export interface SWTransactionEmitter {
 type SwInputBase = Pick<SWTransactionBase, 'address' | 'url' | 'data' | 'extrinsicType' | 'chain' | 'chainType' | 'ignoreWarnings' | 'transferNativeAmount'>
 & Partial<Pick<SWTransactionBase, 'additionalValidator' | 'eventsHandler'>>;
 
-export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransactionBase, 'estimateFee' | 'signAfterCreate' | 'isPassConfirmation' | 'step' | 'errorOnTimeOut' | 'xcmFeeDryRun'>>, TransactionFee {
+export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransactionBase, 'estimateFee' | 'signAfterCreate' | 'isPassConfirmation' | 'step' | 'errorOnTimeOut' | 'xcmFeeDryRun' | 'isWrappedTx'>>, TransactionFee {
   id?: string;
   transaction?: SWTransactionBase['transaction'] | null;
   warnings?: SWTransactionBase['warnings'];
@@ -85,7 +86,7 @@ export interface SWDutchTransactionInput extends Omit<SWTransactionInput, 'trans
   transaction?: SWDutchTransaction['transaction'] | null;
 }
 
-export type SWTransactionResponse = SwInputBase & Pick<SWTransactionBase, 'warnings' | 'errors'> & Partial<Pick<SWTransactionBase, 'id' | 'extrinsicHash' | 'status' | 'estimateFee' | 'xcmFeeDryRun'>> & TransactionFee & {
+export type SWTransactionResponse = SwInputBase & Pick<SWTransactionBase, 'warnings' | 'errors'> & Partial<Pick<SWTransactionBase, 'id' | 'extrinsicHash' | 'status' | 'estimateFee' | 'xcmFeeDryRun' | 'isWrappedTx'>> & TransactionFee & {
   processId?: string;
 }
 
