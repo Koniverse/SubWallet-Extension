@@ -51,12 +51,12 @@ const Component: React.FC<Props> = (props: Props) => {
           value={data.unstakingInfo.claimable}
         />
 
-        <MetaInfo.Number
+        {!transaction.isWrappedTx && <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.Withdraw.estimatedFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
-        />
+        />}
       </MetaInfo>
     </>
   );

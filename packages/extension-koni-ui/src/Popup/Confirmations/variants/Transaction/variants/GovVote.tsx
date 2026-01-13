@@ -169,13 +169,13 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           {shortAddress}
         </MetaInfo.Default>
 
-        <MetaInfo.Number
+        {!transaction.isWrappedTx && <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.GovVote.networkFee')}
           suffix={symbol}
           useNumberDisplay={true}
           value={transaction.estimateFee?.value || 0}
-        />
+        />}
       </MetaInfo>
       <MetaInfo
         className={'__meta-info'}

@@ -28,7 +28,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         address={transaction.address}
         network={transaction.chain}
       />
-      <MetaInfo
+      {!transaction.isWrappedTx && <MetaInfo
         className={'meta-info'}
         hasBackgroundWrapper
       >
@@ -38,7 +38,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
-      </MetaInfo>
+      </MetaInfo>}
     </div>
   );
 };

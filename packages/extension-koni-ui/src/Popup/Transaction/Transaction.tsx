@@ -3,7 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, Layout, PageWrapper, RecheckChainConnectionModal } from '@subwallet/extension-koni-ui/components';
-import { CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, GOV_REFERENDUM_UNVOTE_TRANSACTION, GOV_REFERENDUM_VOTE_TRANSACTION, GOV_UNLOCK_VOTE_TRANSACTION, NFT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_CANCEL_UN_STAKE_PARAMS, DEFAULT_CHANGE_VALIDATOR_PARAMS, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_EARN_PARAMS, DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS, DEFAULT_GOV_UNLOCK_VOTE_PARAMS, DEFAULT_NFT_PARAMS, DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS, DEFAULT_SWAP_PARAMS, DEFAULT_TRANSACTION_PARAMS, DEFAULT_TRANSFER_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, EARN_TRANSACTION, GOV_REFERENDUM_UNVOTE_TRANSACTION, GOV_REFERENDUM_VOTE_TRANSACTION, GOV_UNLOCK_VOTE_TRANSACTION, NFT_TRANSACTION, REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, SWAP_TRANSACTION, TRANSACTION_TITLE_MAP, TRANSFER_TRANSACTION, UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { TransactionContext, TransactionContextProps } from '@subwallet/extension-koni-ui/contexts/TransactionContext';
 import { useAlert, useChainChecker, useNavigateOnChangeAccount, useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -78,6 +78,10 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
         return ExtrinsicType.GOV_UNVOTE;
       case 'gov-unlock-vote':
         return ExtrinsicType.GOV_UNLOCK_VOTE;
+      case 'add-proxy':
+        return ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT;
+      case 'remove-proxy':
+        return ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT;
       case 'send-fund':
       default:
         return ExtrinsicType.TRANSFER_BALANCE;
@@ -86,21 +90,21 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
 
   const storageKey = useMemo((): string => detectTransactionPersistKey(transactionType), [transactionType]);
 
-  const defaultTransactionStorageValue = useMemo(() => {
+  const defaultTransactionStorageValue = useMemo<TransactionFormBaseProps>(() => {
     const fromAccountProxy = getTransactionFromAccountProxyValue(currentAccountProxy);
 
     if (storageKey === NFT_TRANSACTION) {
       return {
         ...DEFAULT_NFT_PARAMS,
         fromAccountProxy
-      };
+      } as TransactionFormBaseProps;
     }
 
     if (storageKey === TRANSFER_TRANSACTION) {
       return {
         ...DEFAULT_TRANSFER_PARAMS,
         fromAccountProxy
-      };
+      } as TransactionFormBaseProps;
     }
 
     // STAKE_TRANSACTION current is deprecated
@@ -115,83 +119,97 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
       return {
         ...DEFAULT_EARN_PARAMS,
         fromAccountProxy
-      };
+      } as TransactionFormBaseProps;
     }
 
     if (storageKey === UN_STAKE_TRANSACTION) {
       return {
         ...DEFAULT_UN_STAKE_PARAMS,
         fromAccountProxy
-      };
+      } as TransactionFormBaseProps;
     }
 
     if (storageKey === CANCEL_UN_STAKE_TRANSACTION) {
       return {
         ...DEFAULT_CANCEL_UN_STAKE_PARAMS,
         fromAccountProxy
-      };
+      } as TransactionFormBaseProps;
     }
 
     if (storageKey === WITHDRAW_TRANSACTION) {
       return {
         ...DEFAULT_WITHDRAW_PARAMS,
         fromAccountProxy
-      };
+      } as TransactionFormBaseProps;
     }
 
     if (storageKey === CLAIM_REWARD_TRANSACTION) {
       return {
         ...DEFAULT_CLAIM_REWARD_PARAMS,
         fromAccountProxy
-      };
+      } as TransactionFormBaseProps;
     }
 
     if (storageKey === SWAP_TRANSACTION) {
       return {
         ...DEFAULT_SWAP_PARAMS,
         fromAccountProxy
-      };
+      } as TransactionFormBaseProps;
     }
 
     if (storageKey === CLAIM_BRIDGE_TRANSACTION) {
       return {
         ...DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS,
         fromAccountProxy
-      };
+      } as TransactionFormBaseProps;
     }
 
     if (storageKey === CHANGE_VALIDATOR_TRANSACTION) {
       return {
         ...DEFAULT_CHANGE_VALIDATOR_PARAMS,
         fromAccountProxy
-      };
+      } as TransactionFormBaseProps;
     }
 
     if (storageKey === GOV_REFERENDUM_VOTE_TRANSACTION) {
       return {
         ...DEFAULT_GOV_REFERENDUM_VOTE_PARAMS,
         fromAccountProxy
-      };
+      } as TransactionFormBaseProps;
     }
 
     if (storageKey === GOV_REFERENDUM_UNVOTE_TRANSACTION) {
       return {
         ...DEFAULT_GOV_REFERENDUM_UNVOTE_PARAMS,
         fromAccountProxy
-      };
+      } as TransactionFormBaseProps;
     }
 
     if (storageKey === GOV_UNLOCK_VOTE_TRANSACTION) {
       return {
         ...DEFAULT_GOV_UNLOCK_VOTE_PARAMS,
         fromAccountProxy
-      };
+      } as TransactionFormBaseProps;
+    }
+
+    if (storageKey === ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION) {
+      return {
+        ...DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS,
+        fromAccountProxy
+      } as TransactionFormBaseProps;
+    }
+
+    if (storageKey === REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION) {
+      return {
+        ...DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS,
+        fromAccountProxy
+      } as TransactionFormBaseProps;
     }
 
     return {
       ...DEFAULT_TRANSACTION_PARAMS,
       fromAccountProxy
-    };
+    } as TransactionFormBaseProps;
   }, [currentAccountProxy, storageKey]);
 
   const [storage, setStorage] = useLocalStorage<TransactionFormBaseProps>(storageKey, { ...defaultTransactionStorageValue });
@@ -226,6 +244,8 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
         return '/home/nfts/collections';
       case 'gov-ref-vote':
         return '/home/governance';
+      case 'add-proxy':
+      case 'remove-proxy':
       case 'send-fund':
       default:
         return '/home/tokens';
@@ -253,6 +273,10 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
         return false;
       }
     } else if (action === 'gov-ref-unvote') {
+      return false;
+    }
+
+    if (action === 'add-proxy' || action === 'remove-proxy') {
       return false;
     }
 
@@ -356,7 +380,7 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
     closeRecheckChainConnectionModal,
     modalId,
     setIsDisableHeader
-  }), [closeAlert, closeRecheckChainConnectionModal, defaultData, goBack, modalId, needPersistData, onDone, openAlert, openRecheckChainConnectionModal, setStorage]);
+  }), [defaultData, needPersistData, setStorage, onDone, goBack, closeAlert, openAlert, openRecheckChainConnectionModal, closeRecheckChainConnectionModal, modalId]);
 
   const recheckChainConnectionModalNode = (
     <>

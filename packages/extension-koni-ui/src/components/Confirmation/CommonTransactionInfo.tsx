@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
-import { useGetAccountByAddress, useGetChainPrefixBySlug } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreCreateReformatAddress, useGetAccountByAddress, useGetChainPrefixBySlug, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import CN from 'classnames';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -19,16 +19,27 @@ const Component: React.FC<Props> = (props: Props) => {
   const { address, className, network, onlyReturnInnerContent } = props;
 
   const { t } = useTranslation();
-
   const account = useGetAccountByAddress(address);
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+  const getReformatAddress = useCoreCreateReformatAddress();
+
   const networkPrefix = useGetChainPrefixBySlug(network);
+  const displayAddress = account ? getReformatAddress(account, chainInfoMap[network]) : address;
+
+  const accountLabel = useMemo(() => {
+    if (account?.isMultisig) {
+      return t('ui.components.Confirmation.CommonTransactionInfo.multisig');
+    }
+
+    return t('ui.components.Confirmation.CommonTransactionInfo.account');
+  }, [account?.isMultisig, t]);
 
   const innerContent = (
     <>
       <MetaInfo.Account
-        address={account?.address || address}
+        address={displayAddress || address}
         chainSlug={network}
-        label={t('ui.components.Confirmation.CommonTransactionInfo.account')}
+        label={accountLabel}
         name={account?.name}
         networkPrefix={networkPrefix}
       />

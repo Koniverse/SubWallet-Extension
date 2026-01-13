@@ -89,7 +89,6 @@ const Component = () => {
 
   const [form] = Form.useForm<ClaimRewardParams>();
   const formDefault = useMemo((): ClaimRewardParams => ({ ...defaultData }), [defaultData]);
-
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
   const { chainInfoMap } = useSelector((state) => state.chainStore);
   const { earningRewards, poolInfoMap } = useSelector((state) => state.earning);
@@ -165,9 +164,9 @@ const Component = () => {
           setLoading(false);
         });
     }, 300);
-  }, [onError, onSuccess, reward?.unclaimedReward]);
+  }, [reward?.unclaimedReward, onSuccess, onError]);
 
-  const checkAction = usePreCheckAction(fromValue);
+  const checkAction = usePreCheckAction({ chain: chainValue, address: fromValue });
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);

@@ -51,7 +51,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const referendumId = defaultData.referendumId;
   const [isBalanceReady, setIsBalanceReady] = useState(true);
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chainValue);
@@ -138,9 +138,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     };
 
     handleRemoveVote(voteRequest)
-      .then((tx) => {
-        onSuccess(tx);
-      })
+      .then(onSuccess)
       .catch(onError)
       .finally(() => setLoading(false));
   }, [chainValue, referendumId, defaultData.track, fromVoteDetail?.balance, fromVoteDetail?.nayBalance, fromVoteDetail?.ayeBalance, fromVoteDetail?.abstainBalance, totalAmount, fromVoteType, onError, onSuccess]);

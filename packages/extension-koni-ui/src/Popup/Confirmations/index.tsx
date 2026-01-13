@@ -385,6 +385,10 @@ const Component = function ({ className }: Props) {
           return t('ui.Confirmations.unvoteConfirmation');
         case ExtrinsicType.GOV_UNLOCK_VOTE:
           return t('ui.Confirmations.unlockVotesConfirmation');
+        case ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT:
+          return t('ui.Confirmations.addSubstrateProxyConfirmation');
+        case ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT:
+          return t('ui.Confirmations.removeSubstrateProxyConfirmation');
         case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.EVM_EXECUTE:
         case ExtrinsicType.UNKNOWN:
@@ -437,6 +441,10 @@ const Confirmations = styled(Component)<Props>(({ theme: { token } }: ThemeProps
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
+
+  '.ant-sw-header-center-part': {
+    width: 'fit-content'
+  },
 
   '.confirmation-header': {
     paddingTop: token.sizeXS,

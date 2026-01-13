@@ -17,7 +17,7 @@ import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } 
 import { isBitcoinTransaction, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { OptionalSWTransaction, SWTransactionInput, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountSignMode, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeInfo, BitcoinFeeRate, EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransferTxErrorType } from '@subwallet/extension-base/types';
-import { balanceFormatter, combineBitcoinFee, combineEthFee, formatNumber, getSizeInfo, pairToAccount } from '@subwallet/extension-base/utils';
+import { balanceFormatter, combineBitcoinFee, combineEthFee, formatNumber, getSizeInfo, isSameAddress, pairToAccount } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
@@ -355,7 +355,7 @@ export function checkSupportForTransaction (validationResponse: SWTransactionRes
   }
 }
 
-export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, priceMap: Record<string, number>, feeInfo: FeeInfo, nativeTokenInfo: _ChainAsset, nonNativeTokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined): Promise<FeeData> {
+export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, priceMap: Record<string, number>, feeInfo: FeeInfo, nativeTokenInfo: _ChainAsset, nonNativeTokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined, signerSubstrateProxyAddress?: string): Promise<FeeData> {
   const estimateFee: FeeData = {
     symbol: '',
     decimals: 0,
@@ -371,7 +371,15 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
   if (transaction) {
     try {
       if (isSubstrateTransaction(transaction)) {
-        estimateFee.value = validationResponse.xcmFeeDryRun ?? (await transaction.paymentInfo(validationResponse.address)).partialFee.toString();
+        if (signerSubstrateProxyAddress && !isSameAddress(signerSubstrateProxyAddress, address)) {
+          await substrateApi.isReady;
+
+          const estimateExtrinsic = substrateApi.api.tx.proxy.proxy(address, null, transaction);
+
+          estimateFee.value = (await estimateExtrinsic.paymentInfo(signerSubstrateProxyAddress)).partialFee.toString();
+        } else {
+          estimateFee.value = validationResponse.xcmFeeDryRun ?? (await transaction.paymentInfo(validationResponse.address)).partialFee.toString();
+        }
       } else if (isTonTransaction(transaction)) {
         estimateFee.value = transaction.estimateFee; // todo: might need to update logic estimate fee inside for future actions excluding normal transfer Ton and Jetton
       } else if (isCardanoTransaction(transaction)) {
@@ -454,9 +462,9 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
   return estimateFee;
 }
 
-export function checkSigningAccountForTransaction (validationResponse: SWTransactionResponse, chainInfoMap: Record<string, _ChainInfo>) {
-  const { address, chain, chainType, extrinsicType } = validationResponse;
-  const pair = keyring.getPair(address);
+export function checkSigningAccountForTransaction (validationResponse: SWTransactionResponse, chainInfoMap: Record<string, _ChainInfo>, signer: string) {
+  const { chain, chainType, extrinsicType } = validationResponse;
+  const pair = keyring.getPair(signer);
 
   if (!pair) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('bg.TRANSACTION.core.validation.transfer.unableToFindAccount')));
@@ -477,7 +485,7 @@ export function checkSigningAccountForTransaction (validationResponse: SWTransac
   }
 }
 
-export function checkBalanceWithTransactionFee (validationResponse: SWTransactionResponse, transactionInput: SWTransactionInput, nativeTokenInfo: _ChainAsset, nativeTokenAvailable: AmountData) {
+export function checkBalanceWithTransactionFee (validationResponse: SWTransactionResponse, transactionInput: SWTransactionInput, nativeTokenInfo: _ChainAsset, nativeTokenAvailable: AmountData, substrateProxyAccountNativeTokenAvailable?: AmountData) {
   if (!validationResponse.estimateFee) { // todo: estimateFee should be must-have, need to refactor interface
     return;
   }
@@ -503,8 +511,16 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
     ..._TRANSFER_CHAIN_GROUP.statemine
   ].includes(nativeTokenInfo.originChain);
 
-  if (bnNativeTokenTransferAmount.plus(bnFee).gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
-    validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
+  if (!substrateProxyAccountNativeTokenAvailable) {
+    if (bnNativeTokenTransferAmount.plus(bnFee).gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
+      validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
+    }
+  } else {
+    const bnSubstrateProxyAccountNativeTokenAvailable = new BigN(substrateProxyAccountNativeTokenAvailable.value);
+
+    if ((bnNativeTokenTransferAmount.gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) || (bnFee.gt(bnSubstrateProxyAccountNativeTokenAvailable))) {
+      validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
+    }
   }
 
   // todo: only system.pallet has metadata, we should add for other pallets and mechanisms as well

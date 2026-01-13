@@ -31,6 +31,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
   const account = useGetAccountByAddress(transaction.address);
   const shortAddress = toShort(transaction.address);
 
+  // todo: recheck gov confirmation when case multisig / proxy
   const govConfirmationInfo = useGetGovVoteConfirmationInfo({
     address: transaction.address,
     chain: transaction.chain,
@@ -91,12 +92,12 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           {shortAddress}
         </MetaInfo.Default>
 
-        <MetaInfo.Number
+        {!transaction.isWrappedTx && <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.GovUnlock.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
-        />
+        />}
       </MetaInfo>
       <MetaInfo
         className={'__meta-info'}

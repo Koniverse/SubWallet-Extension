@@ -226,12 +226,12 @@ export interface GovernanceStore extends BaseReduxStore {
   govLockedInfos: GovVotingInfo[];
 }
 
+export interface MultisigStore extends BaseReduxStore {
+  pendingMultisigTxs: PendingMultisigTxMap;
+}
+
 export type WalletConnectSessionsSubscription = {
   promise: Promise<SessionTypes.Struct[]>;
   start: () => void;
   unsub: () => void;
 };
-
-export interface MultisigStore extends BaseReduxStore {
-  pendingMultisigTxs: PendingMultisigTxMap;
-}

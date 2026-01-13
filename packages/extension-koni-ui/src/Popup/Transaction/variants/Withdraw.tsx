@@ -169,7 +169,7 @@ const Component = () => {
     }
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);

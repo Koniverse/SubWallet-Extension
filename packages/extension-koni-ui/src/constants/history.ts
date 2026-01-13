@@ -52,7 +52,10 @@ export const TxTypeNameMap: Record<ExtrinsicType, string> = {
   [ExtrinsicType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.history.unknown'),
   [ExtrinsicType.MULTISIG_APPROVE_TX]: detectTranslate('Multisig approve unstake'),
   [ExtrinsicType.MULTISIG_CANCEL_TX]: detectTranslate('Multisig cancel unstake'),
-  [ExtrinsicType.MULTISIG_EXECUTE_TX]: detectTranslate('Multisig execute unstake')
+  [ExtrinsicType.MULTISIG_EXECUTE_TX]: detectTranslate('Multisig execute unstake'),
+  [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.HISTORY.constant.history.addSubstrateProxyAccount'),
+  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.HISTORY.constant.history.removeSubstrateProxyAccount'),
+  [ExtrinsicType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.history.unknown')
 };
 
 export const StakingTypeNameMap: Record<string, string> = {

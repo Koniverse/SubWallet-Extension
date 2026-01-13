@@ -8,7 +8,7 @@ import { ProcessType, SwapBaseTxData } from '@subwallet/extension-base/types';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, AlertBoxInstant } from '@subwallet/extension-koni-ui/components';
 import { useIsPolkadotUnifiedChain, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { SubmitApiArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
+import { SubmitApiArea, WrappedTransactionInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import CardanoSignArea from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Sign/Cardano';
 import TonSignArea from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Sign/Ton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -20,7 +20,10 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { BitcoinSignArea, EvmSignArea, SubstrateSignArea } from '../../parts/Sign';
-import { BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ChangeEarningValidatorTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, GovUnlockTransactionConfirmation, GovUnvoteTransactionConfirmation, GovVoteTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
+import GovUnlockTransactionConfirmation from './variants/GovUnlock';
+import GovUnvoteTransactionConfirmation from './variants/GovUnvote';
+import GovVoteTransactionConfirmation from './variants/GovVote';
+import { AddSubstrateProxyAccountTransactionConfirmation, BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ChangeEarningValidatorTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, RemoveSubstrateProxyAccountTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
 
 interface Props extends ThemeProps {
   confirmation: ConfirmationQueueItem;
@@ -87,6 +90,10 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
       return GovUnvoteTransactionConfirmation;
     case ExtrinsicType.GOV_UNLOCK_VOTE:
       return GovUnlockTransactionConfirmation;
+    case ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT:
+      return AddSubstrateProxyAccountTransactionConfirmation;
+    case ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT:
+      return RemoveSubstrateProxyAccountTransactionConfirmation;
     case ExtrinsicType.CROWDLOAN:
     case ExtrinsicType.STAKING_CANCEL_COMPOUNDING:
     case ExtrinsicType.STAKING_COMPOUNDING:
@@ -185,6 +192,7 @@ const Component: React.FC<Props> = (props: Props) => {
       })}
       >
         {renderContent(transaction)}
+        {!!transaction.isWrappedTx && <WrappedTransactionInfoArea transaction={transaction} />}
         {isAddressFormatInfoBoxVisible && (
           <AlertBoxInstant
             className={'address-format-info-box'}

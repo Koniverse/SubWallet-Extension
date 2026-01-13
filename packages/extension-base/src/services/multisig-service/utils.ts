@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MULTISIG_TX_TYPE_MAP, MultisigTxType } from '@subwallet/extension-base/services/multisig-service/index';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 
 import { ApiPromise } from '@polkadot/api';
+import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { GenericExtrinsic } from '@polkadot/types';
 import { Block, Call } from '@polkadot/types/interfaces';
 import { AnyJson, AnyTuple, Codec } from '@polkadot/types/types';
@@ -229,4 +231,29 @@ export function getMultisigTxType (decodedCallData: DecodeCallDataResponse | und
  */
 export function genPendingMultisigTxKey (chain: string, multisigAddress: string, signerAddress: string, extrinsicHash: string) {
   return `${chain}___${multisigAddress}___${signerAddress}______${extrinsicHash}`;
+}
+
+/**
+ * Calculate deposit amount: depositAmount = depositBase + threshold * depositFactor
+ * In case threshold equal to 1, return undefined
+ */
+export function calcDepositAmount (depositBase: string, threshold: number, depositFactor: string): string {
+  if (threshold === 1) {
+    return '0';
+  }
+
+  return (BigInt(depositBase) + BigInt(threshold) * BigInt(depositFactor)).toString();
+}
+
+export function createMultisigExtrinsic (api: ApiPromise, threshold: number, signers: string[], signer: string, extrinsic: SubmittableExtrinsic): SubmittableExtrinsic {
+  return api.tx.multisig.asMulti(
+    threshold,
+    signers.filter((s) => !isSameAddress(s, signer)).sort().reverse(),
+    null,
+    extrinsic,
+    {
+      refTime: 0,
+      proofSize: 0
+    }
+  );
 }

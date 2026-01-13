@@ -74,9 +74,9 @@ const Component: React.FC = () => {
     nftItems.find(
       (item) =>
         isSameAddress(item.owner, from) &&
-        chain === item.chain &&
-        item.collectionId === collectionId &&
-        item.id === itemId
+          chain === item.chain &&
+          item.collectionId === collectionId &&
+          item.id === itemId
     ) || DEFAULT_ITEM
   , [collectionId, itemId, chain, nftItems, from]);
 
@@ -84,7 +84,7 @@ const Component: React.FC = () => {
     nftCollections.find(
       (item) =>
         chain === item.chain &&
-      item.collectionId === collectionId
+          item.collectionId === collectionId
     ) || DEFAULT_COLLECTION
   , [collectionId, chain, nftCollections]);
 
@@ -146,12 +146,12 @@ const Component: React.FC = () => {
       } else {
         // Send NFT with substrate interface
         sendPromise = substrateNftSubmitTransaction({
-          networkKey: chain,
+          // networkKey: chain,
           recipientAddress: to,
           senderAddress: from,
           nftItemName: nftItem?.name,
-          params,
-          nftItem
+          params
+          // nftItem
         });
       }
 
@@ -170,7 +170,7 @@ const Component: React.FC = () => {
     [nftItem, onError, onSuccess, addressPrefix]
   );
 
-  const checkAction = usePreCheckAction(from);
+  const checkAction = usePreCheckAction({ address: from, chain });
 
   useEffect(() => {
     if (nftItem === DEFAULT_ITEM || collectionInfo === DEFAULT_COLLECTION) {
