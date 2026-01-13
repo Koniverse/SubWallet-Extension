@@ -23,6 +23,26 @@ export interface ExplorerRoute {
   extrinsic: ExplorerRouteMap;
 }
 
+let cachedExplorerRouteMap: ExplorerRoute = blockExplorerRouteMap; // init default value
+let fetchPromise: Promise<void> | null = null;
+
+// Initialize fetch on module load (lazy initialization)
+function initExplorerRouteMapFetch (): void {
+  if (fetchPromise) {
+    return; // Already fetching or fetched
+  }
+
+  fetchPromise = fetchStaticData<ExplorerRoute>('chains/block-explorer-route-map')
+    .then((data) => {
+      if (data) {
+        cachedExplorerRouteMap = data;
+      }
+    })
+    .catch((e) => {
+      console.error('Error fetching latest explorer route map:', e);
+    });
+}
+
 // @ts-ignore
 export function parseTransactionData<T extends ExtrinsicType> (data: unknown): ExtrinsicDataTypeMap[T] {
   // @ts-ignore
@@ -31,17 +51,8 @@ export function parseTransactionData<T extends ExtrinsicType> (data: unknown): E
 }
 
 export function getLatestExplorerRouteMap (): ExplorerRoute {
-  let cachedExplorerRouteMap = blockExplorerRouteMap;
-
-  fetchStaticData<ExplorerRoute>('chains/block-explorer-route-map')
-    .then((data) => {
-      if (data) {
-        cachedExplorerRouteMap = data;
-      }
-    })
-    .catch((e) => {
-      console.error(e);
-    });
+  // Trigger fetch on first call (lazy initialization)
+  initExplorerRouteMapFetch();
 
   return cachedExplorerRouteMap;
 }
