@@ -1,7 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { MULTISIG_SUPPORTED_CHAINS } from '@subwallet/extension-base/services/multisig-service';
 import { AccountChainType, AccountSignMode, RequestGetSubstrateProxyAccountGroup } from '@subwallet/extension-base/types';
 import { isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -109,7 +108,7 @@ export function useCreateGetSignableAccountProxy (): SelectSignableAccountProxy 
 
       // Address is required to get signer accounts
       // and chain must support multisig
-      if (!address || !MULTISIG_SUPPORTED_CHAINS.includes(chain) || !extrinsicType) {
+      if (!address || !chainInfo.substrateInfo?.supportMultisig || !extrinsicType) {
         return [];
       }
 

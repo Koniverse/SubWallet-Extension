@@ -20,12 +20,6 @@ import { BlockHash, SignedBlock } from '@polkadot/types/interfaces';
 import { EventItem, EventType } from '../event-service/types';
 
 /**
- * List of chains that support multisig functionality
- * @todo deploy online
- */
-export const MULTISIG_SUPPORTED_CHAINS: readonly string[] = ['statemint', 'statemine', 'paseo_assethub', 'paseoTest', 'westend_assethub'];
-
-/**
  * Query key for multisig multisigs subscription
  */
 const MULTISIG_QUERY_KEY = 'query_multisig_multisigs';
@@ -291,9 +285,10 @@ export class MultisigService implements StoppableServiceInterface {
       for (const event of events) {
         if (event.type === 'chain.updateState') {
           const chainSlug = event.data[0] as string;
+          const chainInfo = this.chainService.getChainInfoByKey(chainSlug);
 
           // Only reload if the updated chain is in the supported chains list
-          if (MULTISIG_SUPPORTED_CHAINS.includes(chainSlug)) {
+          if (chainInfo.substrateInfo?.supportMultisig) {
             needReload = true;
             break;
           }
@@ -345,8 +340,14 @@ export class MultisigService implements StoppableServiceInterface {
 
       let cancel = false;
       const unsubList: Array<() => void> = [];
-      const activeChains = this.chainService.getActiveChains();
-      const supportedActiveChains = MULTISIG_SUPPORTED_CHAINS.filter((chain) => activeChains.includes(chain));
+      const activeChainInfoMap = this.chainService.getActiveChainInfoMap();
+      const supportedActiveChains = Object.values(activeChainInfoMap).reduce((rs, chainInfo) => {
+        if (chainInfo.substrateInfo?.supportMultisig) {
+          rs.push(chainInfo.slug);
+        }
+
+        return rs;
+      }, [] as string[]);
 
       for (const chain of supportedActiveChains) {
         const chainInfo = this.chainService.getChainInfoByKey(chain);

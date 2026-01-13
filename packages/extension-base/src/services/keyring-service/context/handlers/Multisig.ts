@@ -1,9 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AccountMultisigError, AccountMultisigErrorCode, RequestAccountCreateMultisig } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountBaseHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Base';
-import { MULTISIG_SUPPORTED_CHAINS } from '@subwallet/extension-base/services/multisig-service';
 import { AccountChainType } from '@subwallet/extension-base/types';
 import { RequestGetSignableAccountInfos, ResponseGetSignableAccountInfos, SignableAccountInfo } from '@subwallet/extension-base/types/multisig';
 import { reformatAddress } from '@subwallet/extension-base/utils';
@@ -126,10 +126,10 @@ export class AccountMultisigHandler extends AccountBaseHandler {
    * Get 1-level signatories
    * Ignore multisig accounts that are also signatories
    */
-  public getSignableAccountInfos (request: RequestGetSignableAccountInfos): ResponseGetSignableAccountInfos {
-    const { chain, extrinsicType, multisigProxyId } = request;
+  public getSignableAccountInfos (request: RequestGetSignableAccountInfos, chainInfo: _ChainInfo): ResponseGetSignableAccountInfos {
+    const { extrinsicType, multisigProxyId } = request;
 
-    if (!MULTISIG_SUPPORTED_CHAINS.includes(chain)) {
+    if (!chainInfo.substrateInfo?.supportMultisig) {
       return { signableProxies: [] };
     }
 

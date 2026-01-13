@@ -12,7 +12,6 @@ import { CardanoTransactionConfig } from '@subwallet/extension-base/services/bal
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getEvmChainId, _isChainEvmCompatible, _isNativeTokenBySlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { ClaimAvailBridgeNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
-import { MULTISIG_SUPPORTED_CHAINS } from '@subwallet/extension-base/services/multisig-service';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { TRANSACTION_TIMEOUT } from '@subwallet/extension-base/services/transaction-service/constants';
 import { parseLiquidStakingEvents, parseLiquidStakingFastUnstakeEvents, parseTransferEventLogs, parseXcmEventLogs } from '@subwallet/extension-base/services/transaction-service/event-parser';
@@ -167,7 +166,7 @@ export default class TransactionService {
     let substrateProxyAccountNativeTokenAvailable: AmountData | undefined;
 
     if (isSubstrateTransaction(transaction)) {
-      if (MULTISIG_SUPPORTED_CHAINS.includes(chain) && !validationResponse.isWrappedTx) {
+      if (chainInfo.substrateInfo?.supportMultisig && !validationResponse.isWrappedTx) {
         const pair = keyring.getPair(address);
 
         if (pair.meta.isMultisig) {

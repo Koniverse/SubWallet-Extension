@@ -176,7 +176,9 @@ export class AccountContext {
   }
 
   public getSignableAccountInfos (request: RequestGetSignableAccountInfos): ResponseGetSignableAccountInfos {
-    return this.multisigHandler.getSignableAccountInfos(request);
+    const chainInfo = this.koniState.chainService.getChainInfoByKey(request.chain);
+
+    return this.multisigHandler.getSignableAccountInfos(request, chainInfo);
   }
 
   /* Import ethereum account with the private key  */
