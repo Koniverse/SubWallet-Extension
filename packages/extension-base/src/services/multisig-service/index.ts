@@ -619,7 +619,14 @@ export class MultisigService implements StoppableServiceInterface {
           extrinsicIndex: tx.extrinsicIndex,
           currentSigner: tx.currentSigner,
           approvals: tx.approvals,
-          multisigTxType: tx.multisigTxType
+
+          multisigTxType: tx.multisigTxType,
+          threshold: tx.threshold,
+          signerAddresses: tx.signerAddresses,
+          timestamp: tx.timestamp,
+          depositor: tx.depositor,
+          depositAmount: tx.depositAmount,
+          decodedCallData: tx.decodedCallData
         }
       };
     });
