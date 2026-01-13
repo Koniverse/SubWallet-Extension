@@ -107,6 +107,8 @@ export type PendingMultisigTxMap = Record<string, PendingMultisigTx>;
 export interface RequestGetPendingTxs {
   /** Multisig address to query */
   multisigAddress: string
+  /** Optional chain identifier to filter by specific chain */
+  chain?: string
 }
 
 /**
@@ -675,11 +677,10 @@ export class MultisigService implements StoppableServiceInterface {
   /**
    * Gets pending extrinsics for a specific multisig address
    * @param request - Request object containing the multisig address
-   * @param chain - Optional chain identifier to filter by specific chain
    * @returns Array of pending multisig extrinsics matching the criteria
    */
-  public getPendingTxsForMultisigAddress (request: RequestGetPendingTxs, chain?: string): PendingMultisigTx[] {
-    const multisigAddress = request.multisigAddress;
+  public getPendingTxsForMultisigAddress (request: RequestGetPendingTxs): PendingMultisigTx[] {
+    const { chain, multisigAddress } = request;
     const currentMap = this.getPendingMultisigTxMap();
 
     if (chain) {
