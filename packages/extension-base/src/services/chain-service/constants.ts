@@ -85,6 +85,10 @@ export const _NFT_CHAIN_GROUP = {
   story_odyssey: ['storyOdyssey', 'storyOdyssey_testnet']
 };
 
+export const NFT_CHAIN_GROUPS_MIGRATED = {
+  unique_network: ['unique_network']
+};
+
 // Staking--------------------------------------------------------------------------------------------------------------
 
 export const _STAKING_ERA_LENGTH_MAP: Record<string, number> = { // in hours

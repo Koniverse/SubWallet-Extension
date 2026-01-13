@@ -1325,7 +1325,7 @@ export default class KoniExtension {
   }
 
   private async handleGetNftFullList (request: NftFullListRequest): Promise <boolean> {
-    return this.#koniState.nftDetectionService.getFullNftInstancesByCollection(request);
+    return this.#koniState.nftService.fetchFullListNftOfACollection(request);
   }
 
   private getStakingReward (): Promise<StakingRewardJson> {
@@ -5534,12 +5534,8 @@ export default class KoniExtension {
         return this.getCrowdloanContributions(request as RequestCrowdloanContributions);
       case 'pri(crowdloan.getSubscription)':
         return this.subscribeCrowdloan(id, port);
-      case 'pri(nft.getNft)':
-        return await this.getNft();
       case 'pri(nft.getSubscription)':
         return await this.subscribeNft(id, port);
-      case 'pri(nftCollection.getNftCollection)':
-        return await this.getNftCollection();
       case 'pri(nftCollection.getSubscription)':
         return await this.subscribeNftCollection(id, port);
       case 'pri(nft.getFullList)':
