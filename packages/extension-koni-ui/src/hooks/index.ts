@@ -20,3 +20,5 @@ export * from './history';
 export * from './earning';
 export * from './staticContent';
 export * from './browser';
+export * from './gov';
+export * from './substrateProxyAccount';

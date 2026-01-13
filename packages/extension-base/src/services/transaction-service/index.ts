@@ -20,7 +20,7 @@ import { OptionalSWTransaction, SWDutchTransaction, SWDutchTransactionInput, SWP
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitBittensorChangeValidatorStaking, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
-import { anyNumberToBN, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
+import { anyNumberToBN, isSameAddress, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
 import { mergeTransactionAndSignature } from '@subwallet/extension-base/utils/eth/mergeTransactionAndSignature';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -42,6 +42,8 @@ import { EventRecord } from '@polkadot/types/interfaces';
 import { SignerPayloadJSON } from '@polkadot/types/types/extrinsic';
 import { hexToU8a, isHex } from '@polkadot/util';
 import { HexString } from '@polkadot/util/types';
+
+import { GovVoteType } from '../open-gov/interface';
 
 export default class TransactionService {
   private readonly state: KoniState;
@@ -150,20 +152,30 @@ export default class TransactionService {
     const nonNativeTokenPayFeeInfo = isNonNativeTokenPayFee ? this.state.chainService.getAssetBySlug(tokenPayFeeSlug) : undefined;
     const priceMap = (await this.state.priceService.getPrice()).priceMap;
 
+    // Get signer account
+    let signer = address;
+    const signerSubstrateProxyAddress = transactionInput.signerSubstrateProxyAddress;
+
     if (!transactionInput.skipFeeRecalculation) {
-      validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee);
+      validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee, signerSubstrateProxyAddress);
     }
 
     const chainInfoMap = this.state.chainService.getChainInfoMap();
 
+    let substrateProxyAccountNativeTokenAvailable: AmountData | undefined;
+
+    if (signerSubstrateProxyAddress && !isSameAddress(signerSubstrateProxyAddress, address)) {
+      signer = signerSubstrateProxyAddress;
+      substrateProxyAccountNativeTokenAvailable = await this.state.balanceService.getTransferableBalance(signerSubstrateProxyAddress, chain, nativeTokenInfo.slug, extrinsicType);
+    }
+
     // Check account signing transaction
+    checkSigningAccountForTransaction(validationResponse, chainInfoMap, signer);
 
-    checkSigningAccountForTransaction(validationResponse, chainInfoMap);
-
-    const nativeTokenAvailable = await this.state.balanceService.getTransferableBalance(address, chain, nativeTokenInfo.slug, extrinsicType);
+    const nativeTokenAvailable = await this.state.balanceService.getBalanceByType(address, chain, nativeTokenInfo.slug, transactionInput.balanceType, extrinsicType);
 
     // Check available balance against transaction fee
-    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable);
+    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable, substrateProxyAccountNativeTokenAvailable);
 
     // Warnings Ton address if bounceable and not active
     // if (transaction && isTonTransaction(transaction) && tonApi) {
@@ -808,9 +820,11 @@ export default class TransactionService {
       blockHash: '', // Will be added in next step
       nonce: nonce ?? 0,
       startBlock: startBlock || 0,
-      processId: transaction.step?.processId
+      processId: transaction.step?.processId,
+      substrateProxyAddresses: []
     };
 
+    const substrateProxyHistories: TransactionHistoryItem[] = [];
     const nativeAsset = _getChainNativeTokenBasicInfo(chainInfo);
     const baseNativeAmount = { value: '0', decimals: nativeAsset.decimals, symbol: nativeAsset.symbol };
 
@@ -1114,6 +1128,114 @@ export default class TransactionService {
         break;
       }
 
+      case ExtrinsicType.GOV_VOTE: {
+        const data = parseTransactionData<ExtrinsicType.GOV_VOTE>(transaction.data);
+        let totalAmount = new BigN(0);
+
+        switch (data.type) {
+          case GovVoteType.AYE:
+          case GovVoteType.NAY:
+            totalAmount = new BigN(data.amount || '0');
+            break;
+
+          case GovVoteType.SPLIT:
+            totalAmount = new BigN(data.ayeAmount || '0').plus(data.nayAmount || '0');
+            break;
+
+          case GovVoteType.ABSTAIN:
+            totalAmount = new BigN(data.ayeAmount || '0')
+              .plus(data.nayAmount || '0')
+              .plus(data.abstainAmount || '0');
+            break;
+        }
+
+        historyItem.amount = { ...baseNativeAmount, value: totalAmount.toString() };
+        historyItem.additionalInfo = data;
+
+        break;
+      }
+
+      case ExtrinsicType.GOV_UNVOTE: {
+        const data = parseTransactionData<ExtrinsicType.GOV_UNVOTE>(transaction.data);
+
+        historyItem.amount = { ...baseNativeAmount,
+          value: new BigN(data.ayeAmount || '0')
+            .plus(data.nayAmount || '0')
+            .plus(data.abstainAmount || '0')
+            .plus(data.amount || 0).toString() };
+
+        historyItem.additionalInfo = data;
+
+        break;
+      }
+
+      case ExtrinsicType.GOV_UNLOCK_VOTE: {
+        const data = parseTransactionData<ExtrinsicType.GOV_UNLOCK_VOTE>(transaction.data);
+
+        historyItem.amount = { ...baseNativeAmount, value: data.amount };
+        break;
+      }
+
+      case ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT: {
+        const data = parseTransactionData<ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT>(transaction.data);
+
+        const substrateProxyAddress = data.substrateProxyAddress;
+
+        historyItem.substrateProxyAddresses = [substrateProxyAddress];
+
+        substrateProxyHistories.push({
+          ...historyItem,
+          substrateProxyAddresses: [substrateProxyAddress]
+        });
+
+        try {
+          const substrateProxyAccount = keyring.getPair(substrateProxyAddress);
+
+          if (substrateProxyAccount) {
+            substrateProxyHistories.push({
+              ...historyItem,
+              address: substrateProxyAccount.address,
+              direction: TransactionDirection.RECEIVED,
+              substrateProxyAddresses: [substrateProxyAddress]
+            });
+          }
+        } catch (e) {
+          // skip
+        }
+
+        break;
+      }
+
+      case ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT: {
+        const data = parseTransactionData<ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT>(transaction.data);
+
+        for (const substrateProxyItem of data.selectedSubstrateProxyAccounts || []) {
+          const substrateProxyAddress = substrateProxyItem.substrateProxyAddress;
+
+          substrateProxyHistories.push({
+            ...historyItem,
+            substrateProxyAddresses: [substrateProxyAddress]
+          });
+
+          try {
+            const substrateProxyAccount = keyring.getPair(substrateProxyAddress);
+
+            if (substrateProxyAccount) {
+              substrateProxyHistories.push({
+                ...historyItem,
+                address: substrateProxyAccount.address,
+                direction: TransactionDirection.RECEIVED,
+                substrateProxyAddresses: [substrateProxyAddress]
+              });
+            }
+          } catch (e) {
+            // skip
+          }
+        }
+
+        break;
+      }
+
       case ExtrinsicType.UNKNOWN:
         break;
     }
@@ -1147,7 +1269,7 @@ export default class TransactionService {
       console.warn(e);
     }
 
-    return [historyItem];
+    return [historyItem, ...substrateProxyHistories];
   }
 
   private onSigned ({ id }: TransactionEventResponse) {
@@ -1738,7 +1860,7 @@ export default class TransactionService {
     return emitter;
   }
 
-  private signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, signAfterCreate, step, tokenPayFeeSlug, transaction, url }: SWTransaction): TransactionEmitter {
+  private async signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, signAfterCreate, signerSubstrateProxyAddress, step, tokenPayFeeSlug, transaction, url }: SWTransaction): Promise<TransactionEmitter> {
     const tip = (feeCustom as SubstrateTipInfo)?.tip || '0';
     const feeAssetId = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug) && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain) ? this.state.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.multilocation as Record<string, any> : undefined;
 
@@ -1751,14 +1873,26 @@ export default class TransactionService {
       processId: step?.processId
     };
 
-    const extrinsic = transaction as SubmittableExtrinsic;
+    let extrinsic = transaction as SubmittableExtrinsic;
+
+    let signer = address;
+
+    if (signerSubstrateProxyAddress && signerSubstrateProxyAddress !== address) {
+      const substrateApi = this.state.chainService.getSubstrateApi(chain);
+
+      await substrateApi.isReady;
+
+      signer = signerSubstrateProxyAddress;
+      extrinsic = substrateApi.api.tx.proxy.proxy(address, null, transaction as SubmittableExtrinsic);
+    }
+
     // const registry = extrinsic.registry;
     // const signedExtensions = registry.signedExtensions;
 
     const signerOption: Partial<SignerOptions> = {
       signer: {
         signPayload: async (payload: SignerPayloadJSON) => {
-          const { signature, signedTransaction } = await this.state.requestService.signInternalTransaction(id, address, url || EXTENSION_REQUEST_URL, payload, signAfterCreate);
+          const { signature, signedTransaction } = await this.state.requestService.signInternalTransaction(id, signer, url || EXTENSION_REQUEST_URL, payload, signAfterCreate);
 
           return {
             id: (new Date()).getTime(),
@@ -1781,7 +1915,7 @@ export default class TransactionService {
     //   }
     // }
 
-    extrinsic.signAsync(address, signerOption).then(async (rs) => {
+    extrinsic.signAsync(signer, signerOption).then(async (rs) => {
       // Emit signed event
       emitter.emit('signed', eventData);
 

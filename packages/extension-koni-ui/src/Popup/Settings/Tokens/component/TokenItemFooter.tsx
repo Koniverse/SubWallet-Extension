@@ -17,10 +17,11 @@ import styled from 'styled-components';
 interface Props extends ThemeProps {
   assetSetting: AssetSetting | undefined,
   tokenInfo: _ChainAsset,
-  navigate: NavigateFunction
+  navigate: NavigateFunction,
+  showButtonEdit?: boolean
 }
 
-function Component ({ assetSetting, className = '', navigate, tokenInfo }: Props): React.ReactElement<Props> {
+function Component ({ assetSetting, className = '', navigate, showButtonEdit = true, tokenInfo }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const showNotification = useNotification();
 
@@ -73,7 +74,7 @@ function Component ({ assetSetting, className = '', navigate, tokenInfo }: Props
         loading={loading}
         onClick={onSwitchTokenVisible}
       />
-      <Button
+      {showButtonEdit && (<Button
         icon={<Icon
           phosphorIcon={PencilSimpleLine}
           size='sm'
@@ -83,7 +84,8 @@ function Component ({ assetSetting, className = '', navigate, tokenInfo }: Props
         onClick={onClick}
         size={'xs'}
         type={'ghost'}
-      />
+      />)
+      }
     </div>
   );
 }

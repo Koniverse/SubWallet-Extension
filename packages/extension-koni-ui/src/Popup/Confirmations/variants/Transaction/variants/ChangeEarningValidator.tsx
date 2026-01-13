@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SubmitBittensorChangeValidatorStaking, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
@@ -200,6 +201,13 @@ const Component: React.FC<Props> = (props: Props) => {
           className={'meta-info'}
           hasBackgroundWrapper
         >
+          {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
+            <MetaInfo.Account
+              address={transaction.signerSubstrateProxyAddress}
+              chainSlug={transaction.chain}
+              label={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.signWith')}
+            />
+          }
           {isShowAmount && (
             <MetaInfo.Number
               decimals={decimals}

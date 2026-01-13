@@ -5,7 +5,7 @@ import { ChainType, ExtrinsicDataTypeMap, ExtrinsicStatus, ExtrinsicType, FeeDat
 import { SignTypedDataMessageV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { UniswapOrderInfo } from '@subwallet/extension-base/services/swap-service/handler/uniswap-handler';
-import { BaseRequestSign, BriefProcessStep, ProcessTransactionData, TransactionFee } from '@subwallet/extension-base/types';
+import { BalanceType, BaseRequestSign, BriefProcessStep, ProcessTransactionData, TransactionFee } from '@subwallet/extension-base/types';
 import { Psbt } from 'bitcoinjs-lib';
 import EventEmitter from 'eventemitter3';
 import { TransactionConfig } from 'web3-core';
@@ -13,7 +13,7 @@ import { TransactionConfig } from 'web3-core';
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { EventRecord } from '@polkadot/types/interfaces';
 
-export interface SWTransactionBase extends ValidateTransactionResponse, Partial<Pick<BaseRequestSign, 'ignoreWarnings'>>, TransactionFee, SWTransactionEmitter {
+export interface SWTransactionBase extends ValidateTransactionResponse, Partial<Pick<BaseRequestSign, 'ignoreWarnings' | 'signerSubstrateProxyAddress'>>, TransactionFee, SWTransactionEmitter {
   id: string;
   url?: string;
   isInternal: boolean,
@@ -63,7 +63,7 @@ export interface SWTransactionEmitter {
 type SwInputBase = Pick<SWTransactionBase, 'address' | 'url' | 'data' | 'extrinsicType' | 'chain' | 'chainType' | 'ignoreWarnings' | 'transferNativeAmount'>
 & Partial<Pick<SWTransactionBase, 'additionalValidator' | 'eventsHandler'>>;
 
-export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransactionBase, 'estimateFee' | 'signAfterCreate' | 'isPassConfirmation' | 'step' | 'errorOnTimeOut' | 'xcmFeeDryRun'>>, TransactionFee {
+export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransactionBase, 'estimateFee' | 'signAfterCreate' | 'isPassConfirmation' | 'step' | 'errorOnTimeOut' | 'xcmFeeDryRun' | 'signerSubstrateProxyAddress'>>, TransactionFee {
   id?: string;
   transaction?: SWTransactionBase['transaction'] | null;
   warnings?: SWTransactionBase['warnings'];
@@ -74,6 +74,7 @@ export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransact
   resolveOnDone?: boolean;
   skipFeeValidation?: boolean;
   skipFeeRecalculation?: boolean;
+  balanceType?: BalanceType;
 }
 
 export interface SWPermitTransactionInput extends Omit<SWTransactionInput, 'transaction'> {

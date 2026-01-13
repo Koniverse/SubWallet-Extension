@@ -3,6 +3,7 @@
 
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { EarningEntryView } from '@subwallet/extension-koni-ui/types/earning';
+import { GovernanceScreenView } from '@subwallet/extension-koni-ui/types/governance';
 
 // token
 
@@ -62,8 +63,9 @@ export type RemindBackUpSeedPhraseParamState = {
 // account detail
 
 export type AccountDetailParam = {
-  requestViewDerivedAccounts?: boolean
-  requestViewDerivedAccountDetails?: boolean
+  requestViewDerivedAccounts?: boolean;
+  requestViewDerivedAccountDetails?: boolean;
+  requestViewManageProxiesTab?: boolean;
 }
 
 export type NotificationScreenParam = {
@@ -72,3 +74,10 @@ export type NotificationScreenParam = {
     triggerTime: string
   }
 };
+
+// Governance
+export type GovernanceParam = {
+  view: GovernanceScreenView;
+  referendumId?: string | null;
+  chainSlug: string;
+}
