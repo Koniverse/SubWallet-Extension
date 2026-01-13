@@ -127,6 +127,8 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const transaction = useMemo(() => transactionRequest[id], [transactionRequest, id]);
 
+  const [transactionId, setTransactionId] = React.useState<string | undefined>();
+
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
 
   const network = useMemo(() => chainInfoMap[transaction.chain], [chainInfoMap, transaction.chain]);
@@ -192,7 +194,10 @@ const Component: React.FC<Props> = (props: Props) => {
       })}
       >
         {renderContent(transaction)}
-        {!!transaction.isWrappedTx && <WrappedTransactionInfoArea transaction={transaction} />}
+        {!!transaction.isWrappedTx && <WrappedTransactionInfoArea
+          setTransactionId={setTransactionId}
+          transaction={transaction}
+        />}
         {isAddressFormatInfoBoxVisible && (
           <AlertBoxInstant
             className={'address-format-info-box'}
@@ -212,7 +217,7 @@ const Component: React.FC<Props> = (props: Props) => {
         type === 'signingRequest' && (
           <SubstrateSignArea
             extrinsicType={transaction.extrinsicType}
-            id={item.id}
+            id={transactionId || item.id}
             isInternal={item.isInternal}
             request={(item as SigningRequest).request}
             txExpirationTime={txExpirationTime}

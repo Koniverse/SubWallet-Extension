@@ -23,7 +23,8 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 interface Props extends ThemeProps {
-  transaction: SWTransactionResult
+  transaction: SWTransactionResult;
+  setTransactionId: (transactionId?: string) => void;
 }
 
 const modalId = SIGNABLE_ACCOUNT_PROXY_SELECTOR_MODAL;
@@ -104,12 +105,10 @@ function Component ({ className, transaction }: Props) {
       try {
         setIsWrapTransactionLoading(true);
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
         const wrappedTransaction = await initMultisigTx(params);
 
         if (!cancelled) {
-          setWrapTransactionInfo(wrappedTransaction);
+          setWrapTransactionInfo(wrappedTransaction.data as InitMultisigTxResponse);
         }
       } catch (e) {
         if (!cancelled) {
@@ -136,6 +135,11 @@ function Component ({ className, transaction }: Props) {
       cancelled = true;
     };
   }, [account, signerSelected, transaction]);
+
+
+  useEffect(() => {
+    if (wrapTransactionInfo.)
+  }, []);
 
   if (!signableAccountProxyItems?.length || !transaction.isWrappedTx) {
     return <></>;
