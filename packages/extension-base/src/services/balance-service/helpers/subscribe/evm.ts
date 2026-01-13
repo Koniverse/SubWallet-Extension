@@ -7,12 +7,15 @@ import { ASTAR_REFRESH_BALANCE_INTERVAL, SUB_TOKEN_REFRESH_BALANCE_INTERVAL } fr
 import { getERC20Contract } from '@subwallet/extension-base/koni/api/contract-handler/evm/web3';
 import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
-import { BalanceItem, SubscribeEvmPalletBalance } from '@subwallet/extension-base/types';
+import { _getAssetNetuid, _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
+import { BalanceItem, SubscribeEvmPalletBalance, SubscribeSubtensorEvmPalletBalance } from '@subwallet/extension-base/types';
 import { filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
+import BigN from 'bignumber.js';
 import { Contract } from 'web3-eth-contract';
 
 import { BN } from '@polkadot/util';
+import {evmToSs58} from "@subwallet/extension-base/services/balance-service/transfer/xcm/bittensorBridge/utils";
 
 export function subscribeERC20Interval ({ addresses, assetMap, callback, chainInfo, evmApi }: SubscribeEvmPalletBalance): () => void {
   const chain = chainInfo.slug;
@@ -67,6 +70,110 @@ export function subscribeERC20Interval ({ addresses, assetMap, callback, chainIn
   const interval = setInterval(getTokenBalances, SUB_TOKEN_REFRESH_BALANCE_INTERVAL);
 
   return () => {
+    clearInterval(interval);
+  };
+}
+
+export function subscribeERC20IntervalForSubtensorEvm ({ addresses, assetMap, callback, chainInfo, evmApi, substrateApi }: SubscribeSubtensorEvmPalletBalance): () => void {
+  const chain = chainInfo.slug;
+  let tokenList = filterAssetsByChainAndType(assetMap, chain, [_AssetType.ERC20]);
+
+  if (_BALANCE_CHAIN_GROUP.moonbeam.includes(chain)) {
+    const moonbeamLocal = filterAssetsByChainAndType(assetMap, chain, [_AssetType.LOCAL]);
+
+    tokenList = Object.assign({}, tokenList, moonbeamLocal);
+  }
+
+  const erc20ContractMap = {} as Record<string, Contract>;
+
+  Object.entries(tokenList).forEach(([slug, tokenInfo]) => {
+    erc20ContractMap[slug] = getERC20Contract(_getContractAddressOfToken(tokenInfo), evmApi);
+  });
+
+  let cancel = false;
+
+  const getTokenBalances = () => {
+    Object.values(tokenList).map(async (tokenInfo) => {
+      try {
+        if (tokenInfo.metadata?.isAlphaToken) {
+          const subtensorEvmAddress = addresses.map((address: string) => evmToSs58(address));
+
+          if (cancel) {
+            return;
+          }
+
+          const rawData = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(subtensorEvmAddress);
+          const values: Array<[string, TaoStakeInfo[]]> = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
+          const converted: Record<string, Record<number, BigN>> = {};
+
+          for (let i = 0; i < values.length; i++) {
+            const [, stakes] = values[i];
+            const address = subtensorEvmAddress[i];
+
+            converted[address] = {};
+
+            stakes.forEach((stakeInfo) => {
+              const { netuid, stake } = stakeInfo;
+
+              const currentValue = converted[address][netuid] || BigN(0);
+
+              converted[address][netuid] = currentValue.plus(stake);
+            });
+          }
+
+          const netuid = _getAssetNetuid(tokenInfo);
+          const items: BalanceItem[] = Object.entries(converted).map(([address, stakeMap]): BalanceItem => {
+            const value = stakeMap[netuid] || BigN(0);
+
+            return {
+              address: address,
+              tokenSlug: tokenInfo.slug,
+              state: APIItemState.READY,
+              free: value.toFixed(0),
+              locked: '0'
+            };
+          });
+
+          if (!cancel) {
+            callback(items);
+          }
+        } else {
+          const contract = erc20ContractMap[tokenInfo.slug];
+          const balances = await Promise.all(addresses.map(async (address): Promise<string> => {
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+              return await contract.methods.balanceOf(address).call();
+            } catch (e) {
+              console.error(`Error on get balance of account ${address} for token ${tokenInfo.slug}`, e);
+
+              return '0';
+            }
+          }));
+
+          const items: BalanceItem[] = balances.map((balance, index): BalanceItem => {
+            return {
+              address: addresses[index],
+              tokenSlug: tokenInfo.slug,
+              free: new BN(balance || 0).toString(),
+              locked: '0',
+              state: APIItemState.READY
+            };
+          });
+
+          callback(items);
+        }
+      } catch (err) {
+        console.log(tokenInfo.slug, err);
+      }
+    });
+  };
+
+  getTokenBalances();
+
+  const interval = setInterval(getTokenBalances, SUB_TOKEN_REFRESH_BALANCE_INTERVAL);
+
+  return () => {
+    cancel = true;
     clearInterval(interval);
   };
 }

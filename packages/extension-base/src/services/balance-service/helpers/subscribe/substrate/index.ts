@@ -25,7 +25,7 @@ import { timer } from 'rxjs';
 
 import { ContractPromise } from '@polkadot/api-contract';
 
-import { subscribeERC20Interval } from '../evm';
+import {subscribeERC20Interval, subscribeERC20IntervalForSubtensorEvm} from '../evm';
 import { subscribeEquilibriumTokenBalance } from './equilibrium';
 import { subscribeGRC20Balance, subscribeVftBalance } from './gear';
 import { buildLockedDetails, getSpecialStakingBalances } from './utils';
@@ -83,6 +83,14 @@ export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: 
 
     if (_BALANCE_CHAIN_GROUP.bittensor.includes(chain)) {
       unsubSubnetAlphaToken = await subscribeSubnetAlphaPallet(substrateParams);
+    }
+
+    if (chainInfo.slug === 'subtensor_evm') {
+      unsubEvmContractToken = subscribeERC20IntervalForSubtensorEvm({
+        ...baseParams,
+        evmApi: evmApi,
+        substrateApi: substrateApi
+      });
     }
 
     /**
@@ -603,7 +611,7 @@ const subscribeOrmlTokensPallet = async ({ addresses, assetMap, callback, chainI
 };
 
 // eslint-disable-next-line @typescript-eslint/require-await
-const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chainInfo, substrateApi }: SubscribeSubstratePalletBalance): Promise<() => void> => {
+export const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chainInfo, substrateApi }: SubscribeSubstratePalletBalance): Promise<() => void> => {
   let cancel = false;
   const tokenMap = filterAlphaAssetsByChain(assetMap, chainInfo.slug);
 

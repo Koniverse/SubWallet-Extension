@@ -141,7 +141,7 @@ export function subscribeBalance (
       );
     }
 
-    const substrateApi = await substrateApiMap[chainSlug].isReady;
+    const substrateApi = chainSlug === 'subtensor_evm' ? await substrateApiMap.bittensor.isReady : await substrateApiMap[chainSlug].isReady;
 
     return subscribeSubstrateBalance(useAddresses, chainInfo, chainAssetMap, substrateApi, evmApi, callback, extrinsicType);
   });
