@@ -6,21 +6,19 @@ import { NotificationType } from '@subwallet/extension-base/background/KoniTypes
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { isClaimedPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { _NotificationInfo, BridgeTransactionStatus, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationSetup, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
-import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertModal, EmptyList, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import NotificationDetailModal from '@subwallet/extension-koni-ui/components/Modal/NotificationDetailModal';
 import Search from '@subwallet/extension-koni-ui/components/Search';
-import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, MULTISIG_HISTORY_INFO_MODAL, NOTIFICATION_DETAIL_MODAL, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, NOTI_MULTISIG_PENDINGTX_ID, NOTIFICATION_DETAIL_MODAL, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useAlert, useDefaultNavigate, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { enableChain, saveNotificationSetup } from '@subwallet/extension-koni-ui/messaging';
 import { fetchInappNotifications, getIsClaimNotificationStatus, markAllReadNotification, switchReadNotificationStatus } from '@subwallet/extension-koni-ui/messaging/transaction/notification';
-import { MultisigHistoryInfoModal } from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/MultisigHistoryInfoModal';
 import NotificationItem from '@subwallet/extension-koni-ui/Popup/Settings/Notifications/NotificationItem';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { NotificationScreenParam, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -29,7 +27,7 @@ import { ActivityIndicator, Button, Icon, ModalContext, SwList, SwSubHeader } fr
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowsLeftRight, ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, Database, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, XCircle } from 'phosphor-react';
+import { ArrowsLeftRight, ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, Database, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, UserSwitch, XCircle } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -53,7 +51,7 @@ export enum NotificationIconBackgroundColorMap {
   CLAIM_POLYGON_BRIDGE = 'yellow-7',
   SWAP = 'blue-8',
   EARNING = 'blue-8',
-  MULTISIG_APPROVAL = 'green-6'
+  MULTISIG_APPROVAL = 'geekblue-9'
 }
 
 export const NotificationIconMap = {
@@ -66,7 +64,7 @@ export const NotificationIconMap = {
   CLAIM_POLYGON_BRIDGE: Coins,
   SWAP: ArrowsLeftRight,
   EARNING: Database,
-  MULTISIG_APPROVAL: Database // todo: update this
+  MULTISIG_APPROVAL: UserSwitch
 };
 
 const alertModalId = 'notification-alert-modal';
@@ -75,7 +73,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const locationState = useLocation().state as NotificationScreenParam | undefined;
   const paramTransactionProcess = locationState?.transactionProcess;
   const paramTransactionProcessId = paramTransactionProcess?.processId;
-  const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
+  const { activeModal, checkActive } = useContext(ModalContext);
   const { transactionProcessDetailModal: { open: openTransactionProcessModal } } = useContext(WalletModalContext);
 
   const { t } = useTranslation();
@@ -88,6 +86,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
   const [, setWithdrawStorage] = useLocalStorage(WITHDRAW_TRANSACTION, DEFAULT_WITHDRAW_PARAMS);
   const [, setClaimAvailBridgeStorage] = useLocalStorage(CLAIM_BRIDGE_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS);
+  const [, setNotiMultisigPendingTxStorage] = useLocalStorage(NOTI_MULTISIG_PENDINGTX_ID, '');
 
   const { notificationSetup } = useSelector((state: RootState) => state.settings);
   const { accounts, currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
@@ -125,20 +124,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
   // use this to trigger get date when click read/unread
   const [currentTimestampMs, setCurrentTimestampMs] = useState(Date.now());
-  const [selectedMultisigItem, setSelectedMultisigItem] = useState<PendingMultisigTx | null>(null);
   const enableNotification = notificationSetup.isEnabled;
   const isNotificationDetailModalVisible = checkActive(NOTIFICATION_DETAIL_MODAL);
-
-  const onOpenMultisigInfo = useCallback((item: PendingMultisigTx) => {
-    setSelectedMultisigItem(item);
-    activeModal(MULTISIG_HISTORY_INFO_MODAL);
-  }, [activeModal]);
-
-  const onCloseMultisigDetail = useCallback(() => {
-    inactiveModal(MULTISIG_HISTORY_INFO_MODAL);
-
-    setSelectedMultisigItem(null);
-  }, [inactiveModal]);
 
   const notificationItems = useMemo((): NotificationInfoItem[] => {
     const filterTabFunction = (item: NotificationInfoItem) => {
@@ -470,9 +457,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         }
 
         case NotificationActionType.MULTISIG_APPROVAL: {
-          const metadata = item.metadata as PendingMultisigTx;
-
-          onOpenMultisigInfo(metadata);
+          setNotiMultisigPendingTxStorage(item.id);
+          switchReadNotificationStatus(switchStatusParams).then(() => {
+            navigate('/home/history');
+          }).catch(console.error);
 
           break;
         }
@@ -486,7 +474,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           });
       }
     };
-  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, allowedChains, excludedTokens, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, setClaimAvailBridgeStorage, openTransactionProcessModal, onOpenMultisigInfo, isTrigger]);
+  }, [accounts, allowedChains, chainStateMap, currentAccountProxy, currentTimestampMs, earningRewards, excludedTokens, isAllAccount, isTrigger, navigate, openTransactionProcessModal, poolInfoMap, setClaimAvailBridgeStorage, setClaimRewardStorage, setNotiMultisigPendingTxStorage, setWithdrawStorage, showActiveChainModal, showWarningModal, yieldPositions]);
 
   const renderItem = useCallback((item: NotificationInfoItem) => {
     return (
@@ -619,7 +607,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           onSelect={onSelectFilterTab}
           selectedItem={selectedFilterTab}
         />
-        {selectedFilterTab === NotificationTab.UNREAD && <Button
+        {(selectedFilterTab === NotificationTab.UNREAD || selectedFilterTab === NotificationTab.ALL) && <Button
           className={'mark-read-btn'}
           icon={(
             <Icon
@@ -629,6 +617,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           )}
           onClick={handleSwitchClick}
           size='xs'
+          tooltip={t('ui.SETTINGS.screen.Setting.Notifications.markAllAsRead')}
           type='ghost'
         />}
       </div>
@@ -672,11 +661,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 />
               )
             }
-
-            {selectedMultisigItem && <MultisigHistoryInfoModal
-              data={selectedMultisigItem}
-              onCancel={onCloseMultisigDetail}
-            />}
           </>
         )
         : (
