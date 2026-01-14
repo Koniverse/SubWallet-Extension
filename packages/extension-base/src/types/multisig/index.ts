@@ -11,30 +11,22 @@ export interface ApprovePendingTxRequest extends BaseRequestSign {
   address: string;
   chain: string;
   multisigMetadata: MultisigRawMetadata;
-  timepoint?: {
+  timepoint: {
     height: number;
     index: number;
   };
   callHash: string;
-  maxWeight: {
-    refTime: number, // todo
-    proofSize: number // todo
-  };
 }
 
 export interface ExecutePendingTxRequest extends BaseRequestSign {
   address: string;
   chain: string;
   multisigMetadata: MultisigRawMetadata;
-  timepoint?: {
+  timepoint: {
     height: number;
     index: number;
   };
   call: string;
-  maxWeight: {
-    refTime: number, // todo
-    proofSize: number // todo
-  };
 }
 
 export interface CancelPendingTxRequest extends BaseRequestSign {
@@ -46,6 +38,23 @@ export interface CancelPendingTxRequest extends BaseRequestSign {
     index: number;
   };
   callHash: string;
+}
+
+export interface InitMultisigTxRequest {
+  transactionId: string; // original tx
+  signer: string;
+  multisigMetadata: MultisigRawMetadata;
+  chain: string;
+  previousMultisigTxId?: string; // previous selected signer tx
+}
+
+export interface InitMultisigTxResponse {
+  submittedCallData: HexString; // callData of the multisig extrinsic
+  callData: HexString; // callData of the original extrinsic
+  decodedCallData: DecodeCallDataResponse | undefined; // decoded callData of the original extrinsic
+  depositAmount: string;
+  networkFee: string;
+  error?: SelectSignatoryError;
 }
 
 export interface RequestGetSignableAccountInfos {
@@ -72,23 +81,6 @@ export interface MultisigAccountInfo {
   multisigAddress: string;
   signers: string[];
   threshold: number;
-}
-
-export interface InitMultisigTxRequest {
-  transactionId: string; // original tx
-  signer: string;
-  multisigMetadata: MultisigRawMetadata;
-  chain: string;
-  previousMultisigTxId?: string; // previous selected signer tx
-}
-
-export interface InitMultisigTxResponse {
-  submittedCallData: HexString; // callData of the multisig extrinsic
-  callData: HexString; // callData of the original extrinsic
-  decodedCallData: DecodeCallDataResponse | undefined; // decoded callData of the original extrinsic
-  depositAmount: string;
-  networkFee: string;
-  error?: SelectSignatoryError;
 }
 
 export enum SelectSignatoryErrorType {
