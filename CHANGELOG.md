@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 1.3.72
+Build date: Jan 14, 2025.
+
+Features & Updates:
+- Integrate Proxy Account Support (#4725)
+- Update chain-list stable v0.2.123 (#4861)
+- Add support for USDC & stEWT (#639)
+- Migrate to ParaSpell V5 (#4908)
+
+
 ## 1.3.71
 Build date: Dec 29, 2025.
 
