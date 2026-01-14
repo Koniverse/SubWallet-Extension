@@ -78,6 +78,11 @@ export interface SubscribeSubstratePalletBalance extends SubscribeBasePalletBala
   includeNativeToken?: boolean;
 }
 
+export interface SubscribeSubtensorEvmPalletBalance extends SubscribeBasePalletBalance {
+  evmApi: _EvmApi;
+  substrateApiMap: Record<string, _SubstrateApi>;
+}
+
 export interface SubscribeEvmPalletBalance extends SubscribeBasePalletBalance {
   evmApi: _EvmApi;
 }

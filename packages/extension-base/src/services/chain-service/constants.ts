@@ -60,7 +60,8 @@ export const _BALANCE_CHAIN_GROUP = {
   supportBridged: ['rococo_assethub', 'statemint', 'statemine', 'polimec'],
   bittensor: ['bittensor', 'bittensor_testnet'],
   moonbeam: ['moonbeam', 'moonriver', 'moonbase'],
-  notSupportGetBalanceByType: ['vara_network', 'vara_testnet', 'availTuringTest', 'avail_mainnet']
+  notSupportGetBalanceByType: ['vara_network', 'vara_testnet', 'availTuringTest', 'avail_mainnet'],
+  subtensor_evm: ['subtensor_evm']
 };
 
 export const _BALANCE_LOCKED_ID_GROUP = {
