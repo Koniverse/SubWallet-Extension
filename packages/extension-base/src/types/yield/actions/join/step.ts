@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { _ChainAsset } from '@subwallet/chain-list/types';
 import { YieldPoolTarget } from '@subwallet/extension-base/types';
 
 /**
@@ -122,3 +123,9 @@ export interface OptimalYieldPath {
 }
 
 export type GenStepFunction = (params: OptimalYieldPathParams) => Promise<YieldStepBaseInfo | undefined>;
+
+export interface XcmStepMetadataForLiqStaking {
+  sendingValue: string,
+  originTokenInfo: _ChainAsset,
+  destinationTokenInfo: _ChainAsset
+}

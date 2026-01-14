@@ -1085,6 +1085,8 @@ export default class EarningService implements StoppableServiceInterface, Persis
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
+      console.log('all step', await handler.generateOptimalPath(params));
+
       return handler.generateOptimalPath(params);
     } else {
       throw new TransactionError(BasicTxErrorType.INTERNAL_ERROR);

@@ -22,6 +22,8 @@ const Component: React.FC<Props> = (props: Props) => {
   const txParams = useMemo(() => (process.combineInfo as SummaryEarningProcessData).data as unknown as SubmitYieldStepData, [process.combineInfo]);
 
   const { assetRegistry: tokenInfoMap } = useSelector((state) => state.assetRegistry);
+  const { currencyData } = useSelector((state) => state.price);
+  const priceMap = useSelector((state) => state.price.priceMap);
 
   const { inputTokenDecimals, inputTokenSymbol } = useMemo(() => {
     const inputTokenInfo = tokenInfoMap[txParams.inputTokenSlug];
@@ -45,20 +47,31 @@ const Component: React.FC<Props> = (props: Props) => {
     };
   }, [txParams.derivativeTokenSlug, tokenInfoMap]);
 
-  const { feeTokenDecimals, feeTokenSymbol } = useMemo(() => {
-    const feeTokenInfo = tokenInfoMap[txParams.feeTokenSlug];
-
-    return {
-      feeTokenSymbol: _getAssetSymbol(feeTokenInfo),
-      feeTokenDecimals: _getAssetDecimals(feeTokenInfo)
-    };
-  }, [txParams.feeTokenSlug, tokenInfoMap]);
-
   const estimatedReceivables = useMemo(() => {
     return Math.floor(parseInt(txParams.amount) / txParams.exchangeRate);
   }, [txParams.amount, txParams.exchangeRate]);
 
   const getTransactionProcessSteps = useGetTransactionProcessSteps();
+
+  const estimatedFee = useMemo(() => {
+    let _totalFee = 0;
+
+    if (process.steps) {
+      process.steps.forEach((step) => {
+        if (step.fee.defaultFeeToken !== '') {
+          const asset = tokenInfoMap[step.fee.defaultFeeToken];
+          const feeDecimals = _getAssetDecimals(asset);
+          const _priceValue = asset.priceId ? (priceMap[asset.priceId] ?? 0) : 0;
+          const feeValue = step.fee.feeComponent[0].amount;
+          const feeNumb = _priceValue * (feeValue ? parseFloat(feeValue) / 10 ** feeDecimals : 0);
+
+          _totalFee += feeNumb;
+        }
+      });
+    }
+
+    return _totalFee;
+  }, [tokenInfoMap, priceMap, process.steps]);
 
   const stepItems = useMemo(() => {
     return getTransactionProcessSteps(process.steps, process.combineInfo, false);
@@ -91,10 +104,11 @@ const Component: React.FC<Props> = (props: Props) => {
         )}
 
         <MetaInfo.Number
-          decimals={feeTokenDecimals}
+          decimals={0}
           label={t('ui.TRANSACTION.Confirmations.Process.Earn.JoinYieldPool.estimatedFee')}
-          suffix={feeTokenSymbol}
-          value={transaction.estimateFee?.value || 0}
+          prefix={(currencyData?.isPrefix && currencyData.symbol) || ''}
+          suffix={(!currencyData?.isPrefix && currencyData?.symbol) || ''}
+          value={estimatedFee || 0}
         />
 
         <MetaInfo.TransactionProcess
