@@ -3381,7 +3381,6 @@ export default class KoniExtension {
         depositAmount,
         networkFee
       },
-      id: transactionId,
       wrappingStatus: 'WRAPPED',
       additionalValidator
     });
