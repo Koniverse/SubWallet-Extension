@@ -249,7 +249,8 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
 export const MultisigHistoryInfoModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     '.ant-sw-modal-body': {
-      marginBottom: 0
+      marginBottom: 0,
+      paddingBottom: 0
     },
 
     '.ant-sw-modal-footer': {

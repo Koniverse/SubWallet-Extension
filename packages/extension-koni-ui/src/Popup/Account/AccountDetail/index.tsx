@@ -213,15 +213,14 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
         ? (
           <>
             <div className='description-alert-modal'>
-            This account has pending multisig transactions. Removing the account now
-            means you’ll have to re-import it later to complete these transactions
+              {t('This account has pending multisig transactions. Removing the account now means you’ll have to re-import it later to complete these transactions')}
             </div>
           </>
         )
         : (
           t('ui.ACCOUNT.screen.Account.Detail.removeAccountAccessWarning')
         ),
-      subtitle: isMultisig ? 'Are you sure you want to remove this account?' : undefined,
+      subtitle: isMultisig ? t('Are you sure you want to remove this account?') : undefined,
       okButton: {
         text: t('ui.ACCOUNT.screen.Account.Detail.remove'),
         schema: 'error',

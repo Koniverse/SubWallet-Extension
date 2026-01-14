@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MultisigTxType, PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
+import AccountProxyAvatar from '@subwallet/extension-koni-ui/components/AccountProxy/AccountProxyAvatar';
 import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, toShort } from '@subwallet/extension-koni-ui/utils';
@@ -9,6 +10,7 @@ import { Icon, Logo, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { ArrowUpRight, HardDrives, Question } from 'phosphor-react';
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -17,6 +19,7 @@ type Props = ThemeProps & {
 };
 
 const Component = ({ className = '', item, onClick }: Props) => {
+  const { t } = useTranslation();
   const txInfo = useMemo(() => {
     const method = item.decodedCallData?.method || '';
 
@@ -36,7 +39,8 @@ const Component = ({ className = '', item, onClick }: Props) => {
   const percent = threshold > 0 ? (currentApprovals / threshold) * 100 : 0;
   const isApproved = currentApprovals === threshold;
 
-  const accountInWallet = useGetAccountByAddress(item.multisigAddress);
+  const currentSignerInWallet = useGetAccountByAddress(item.currentSigner);
+  const multisigAccInWallet = useGetAccountByAddress(item.multisigAddress);
 
   return (
     <Web3Block
@@ -58,11 +62,18 @@ const Component = ({ className = '', item, onClick }: Props) => {
               />
             </div>
             <div className={'__info'}>
-              <div className={'__account-name'}>
-                {accountInWallet?.name || `${toShort(item.multisigAddress)}`}
+              <div className={'__account-name-container'}>
+                <div className={'__account-name'}>
+                  {currentSignerInWallet?.name || `${toShort(item.currentSigner)}`}
+                </div>
+                <div className={'__status-row'}>
+                  <div className={CN('__status-text', isApproved ? '-approved' : '-waiting')}>
+                    {isApproved ? t('Approved') : t('Waiting for approval')}
+                  </div>
+                </div>
               </div>
               <div className={'__meta'}>
-                {`${txInfo.name} - ${item.timestamp ? customFormatDate(item.timestamp, '#hhhh#:#mm#') : 'Processing'}`}
+                {`${txInfo.name} - ${item.timestamp ? customFormatDate(item.timestamp, '#hhhh#:#mm#') : t('Processing')}`}
               </div>
             </div>
             <div className={'__value-group'}>
@@ -84,8 +95,11 @@ const Component = ({ className = '', item, onClick }: Props) => {
           {/* Progress Section */}
           <div className={'__progress-section'}>
             <div className={'__label-row'}>
-              <span>Approval status</span>
-              <span className={'__count'}>{`${currentApprovals}/${threshold} Approval`}</span>
+              <span>{t('Approval status')}</span>
+              <span className={'__count'}>{t('{{currentApprovals}}/{{threshold}} Approval', { replace: {
+                currentApprovals: currentApprovals,
+                threshold: threshold
+              } })}</span>
             </div>
             <div className={'__bar-track'}>
               <div
@@ -95,11 +109,17 @@ const Component = ({ className = '', item, onClick }: Props) => {
             </div>
           </div>
           <div className={'__divider-line'}></div>
-          {/* Status Section */}
           <div className={'__status-row'}>
-            <span>Signatory approval</span>
-            <div className={CN('__status-text', isApproved ? '-approved' : '-waiting')}>
-              {isApproved ? 'Approved' : 'Waiting for approval'}
+            <span>{t('Multisig account')}</span>
+            <div className={'multisig-account-wrapper'}>
+              <div className={'multisig-account-avatar'}>
+                <AccountProxyAvatar
+                  className={'__avatar'}
+                  size={24}
+                  value={multisigAccInWallet?.proxyId || multisigAccInWallet?.address}
+                />
+              </div>
+              <span className={'multisig-account-value'}>{multisigAccInWallet?.name || toShort(multisigAccInWallet?.address || '', 8, 9)}</span>
             </div>
           </div>
         </div>
@@ -116,6 +136,25 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
   marginBottom: token.marginSM,
   cursor: 'pointer',
   transition: 'background-color 0.2s ease',
+
+  '.__account-name-container': {
+    display: 'flex',
+    justifyContent: 'space-between'
+  },
+
+  '.multisig-account-wrapper': {
+    display: 'flex',
+    gap: 8,
+    overflow: 'hidden'
+  },
+
+  '.multisig-account-value': {
+    fontSize: token.fontSize,
+    lineHeight: token.lineHeight,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  },
 
   '&:hover': {
     backgroundColor: token.colorBgInput
@@ -156,7 +195,6 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
     '.__info': {
       flex: 1,
       overflow: 'hidden',
-      marginRight: 6,
       '.__account-name': {
         color: token.colorTextLight1,
         fontSize: token.fontSizeHeading5,
