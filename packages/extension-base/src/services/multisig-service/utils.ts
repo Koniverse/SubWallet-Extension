@@ -13,6 +13,10 @@ import { HexString } from '@polkadot/util/types';
 import { blake2AsHex, sortAddresses } from '@polkadot/util-crypto';
 
 export const DEFAULT_BLOCK_HASH = '0x0000000000000000000000000000000000000000000000000000000000000000';
+export const DEFAULT_MAX_WEIGHT = {
+  refTime: '0',
+  proofSize: '0'
+};
 
 /**
  * Request interface for getting call data from a block
@@ -250,7 +254,7 @@ export function calcDepositAmount (depositBase: string, threshold: number, depos
 }
 
 /**
- * Creates a multisig extrinsic using the asMulti method
+ * Creates an init multisig extrinsic using the asMulti method
  * @param api - Polkadot API instance
  * @param threshold - Multisig threshold
  * @param signers - Array of signer addresses
@@ -258,7 +262,7 @@ export function calcDepositAmount (depositBase: string, threshold: number, depos
  * @param extrinsic - Original extrinsic to be wrapped in multisig
  * @returns SubmittableExtrinsic representing the multisig transaction
  */
-export function createMultisigExtrinsic (api: ApiPromise, threshold: number, signers: string[], signer: string, extrinsic: SubmittableExtrinsic): SubmittableExtrinsic {
+export function createInitMultisigExtrinsic (api: ApiPromise, threshold: number, signers: string[], signer: string, extrinsic: SubmittableExtrinsic): SubmittableExtrinsic {
   const otherSignatories = signers.filter((s) => !isSameAddress(s, signer));
 
   return api.tx.multisig.asMulti(
@@ -266,9 +270,6 @@ export function createMultisigExtrinsic (api: ApiPromise, threshold: number, sig
     sortAddresses(otherSignatories),
     null,
     extrinsic,
-    {
-      refTime: 0,
-      proofSize: 0
-    }
+    DEFAULT_MAX_WEIGHT // default max weight for init multisig tx
   );
 }
