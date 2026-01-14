@@ -2253,7 +2253,7 @@
   "ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.proxyType": "Proxy type",
   "ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.addProxy": "Add proxy",
   "ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.proxyDeposit": "Proxy deposit",
-  "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyAccount": "Proxy account",
+  "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyList": "Proxy list",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts": "accounts",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccount": "account",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.network": "Network",
@@ -2585,7 +2585,7 @@
   "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unknownAccountFeatureRestriction": "",
   "ui.TRANSACTION.constant.transaction.addProxy": "Add proxy",
   "ui.TRANSACTION.constant.transaction.removeProxy": "Remove proxy",
-  "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyAccount": "Proxy account",
+  "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyList": "Proxy list",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.accounts": "accounts",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.account": "account",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.networkFee": "Network fee",
@@ -2617,5 +2617,6 @@
   "ui.Confirmations.WrappedTransactionInfoArea.multisigInitiationDescription": "The multisig transaction will be initiated by {{name}}. A multisig deposit is required and will stay locked on this signatory until the multisig transaction is executed or rejected",
   "ui.Confirmations.WrappedTransactionInfoArea.multisigExecutionDescription": "The multisig deposit will be returned as transferable balance on the signatory once you click “Reject” to cancel this transaction",
   "ui.Confirmations.WrappedTransactionInfoArea.multisigCancelDescription": "The multisig deposit will be returned as transferable balance on the initiator signatory once you click “Execute” to finalize this transaction",
-  "ui.SETTINGS.screen.Setting.Notifications.multisig": "Multisig"
+  "ui.SETTINGS.screen.Setting.Notifications.multisig": "Multisig",
+  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again"
 }

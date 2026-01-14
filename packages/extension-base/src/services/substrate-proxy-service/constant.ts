@@ -11,7 +11,9 @@ const SUBSTRATE_PROXY_ACCOUNT_EXTRINSIC_GROUPS: Record<string, ExtrinsicType[]> 
     ExtrinsicType.STAKING_WITHDRAW,
     ExtrinsicType.STAKING_JOIN_POOL,
     ExtrinsicType.STAKING_LEAVE_POOL,
-    ExtrinsicType.CHANGE_EARNING_VALIDATOR
+    ExtrinsicType.CHANGE_EARNING_VALIDATOR,
+    ExtrinsicType.STAKING_CANCEL_UNSTAKE,
+    ExtrinsicType.STAKING_CLAIM_REWARD
   ],
   GOV: [
     ExtrinsicType.GOV_VOTE,

@@ -17,7 +17,7 @@ import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } 
 import { isBitcoinTransaction, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
 import { OptionalSWTransaction, SWTransactionInput, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountSignMode, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeInfo, BitcoinFeeRate, EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransferTxErrorType } from '@subwallet/extension-base/types';
-import { balanceFormatter, combineBitcoinFee, combineEthFee, formatNumber, getSizeInfo, isSameAddress, pairToAccount } from '@subwallet/extension-base/utils';
+import { balanceFormatter, combineBitcoinFee, combineEthFee, formatNumber, getAccountJsonByAddress, getSizeInfo, isSameAddress, pairToAccount } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
@@ -490,7 +490,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
     return;
   }
 
-  const { edAsWarning, extrinsicType, isTransferAll, skipFeeValidation, tokenPayFeeSlug } = transactionInput;
+  const { edAsWarning, extrinsicType, isTransferAll, signerSubstrateProxyAddress, skipFeeValidation, tokenPayFeeSlug } = transactionInput;
 
   if (skipFeeValidation || (tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug))) { // todo: need improve: input should be balance of fee token and check this again
     return;
@@ -500,7 +500,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
   const bnNativeTokenAvailable = new BigN(nativeTokenAvailable.value);
   const bnNativeTokenTransferAmount = new BigN(validationResponse.transferNativeAmount || '0');
 
-  if (!bnNativeTokenAvailable.gt(0)) {
+  if (!bnNativeTokenAvailable.gt(0) && !substrateProxyAccountNativeTokenAvailable) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
   }
 
@@ -519,7 +519,14 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
     const bnSubstrateProxyAccountNativeTokenAvailable = new BigN(substrateProxyAccountNativeTokenAvailable.value);
 
     if ((bnNativeTokenTransferAmount.gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) || (bnFee.gt(bnSubstrateProxyAccountNativeTokenAvailable))) {
-      validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
+      if (signerSubstrateProxyAddress) {
+        const account = getAccountJsonByAddress(signerSubstrateProxyAddress);
+        const accountName = account?.name;
+
+        validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance', { replace: { accountName: accountName || signerSubstrateProxyAddress } })));
+      } else {
+        validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
+      }
     }
   }
 

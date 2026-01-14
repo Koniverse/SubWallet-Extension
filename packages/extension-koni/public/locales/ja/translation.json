@@ -32,7 +32,7 @@
   "ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.proxyType": "",
   "ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.addProxy": "",
   "ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.proxyDeposit": "",
-  "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyAccount": "",
+  "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.substrateProxyList": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccounts": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.numberAccount": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.network": "",
@@ -2584,7 +2584,7 @@
   "ui.TRANSACTION.screen.Transaction.AddSubstrateProxyAccount.substrateProxyAccount": "",
   "ui.TRANSACTION.constant.transaction.addProxy": "",
   "ui.TRANSACTION.constant.transaction.removeProxy": "",
-  "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyAccount": "",
+  "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyList": "",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.accounts": "",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.account": "",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.networkFee": "",
@@ -2616,5 +2616,6 @@
   "ui.Confirmations.WrappedTransactionInfoArea.multisigInitiationDescription": "",
   "ui.Confirmations.WrappedTransactionInfoArea.multisigExecutionDescription": "",
   "ui.Confirmations.WrappedTransactionInfoArea.multisigCancelDescription": "",
-  "ui.SETTINGS.screen.Setting.Notifications.multisig": ""
+  "ui.SETTINGS.screen.Setting.Notifications.multisig": "",
+  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": ""
 }
