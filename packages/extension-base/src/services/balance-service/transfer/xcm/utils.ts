@@ -159,6 +159,10 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
 
   const paraSpellChainMap = await fetchParaSpellChainMap();
 
+  if (!paraSpellChainMap[originChain.slug] || !paraSpellChainMap[destinationChain.slug]) {
+    console.warn('This chain is missing in ParaSpell chain map');
+  }
+
   const bodyData = {
     senderAddress: sender,
     address: recipient,
