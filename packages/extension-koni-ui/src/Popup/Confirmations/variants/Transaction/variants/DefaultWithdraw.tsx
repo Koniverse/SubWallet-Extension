@@ -78,7 +78,7 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         )}
 
-        {!!estimateFee && !transaction.isWrappedTx && (
+        {!!estimateFee && !transaction.wrappingStatus && (
           <MetaInfo.Number
             decimals={estimateFee.decimals}
             label={t('ui.TRANSACTION.Confirmations.DefaultWithdraw.estimatedFee')}

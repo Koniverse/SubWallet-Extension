@@ -9,8 +9,7 @@ import { InitMultisigTxRequest, InitMultisigTxResponse } from '@subwallet/extens
 import { AccountProxyAvatar, AlertBox, SignableAccountProxySelectorModal } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { SIGNABLE_ACCOUNT_PROXY_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useGetAccountByAddress, useOpenDetailModal } from '@subwallet/extension-koni-ui/hooks';
-import { useCreateGetSignableAccountProxy, useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks/';
+import { useCreateGetSignableAccountProxy, useGetAccountByAddress, useGetNativeTokenBasicInfo, useOpenDetailModal } from '@subwallet/extension-koni-ui/hooks';
 import { initMultisigTx } from '@subwallet/extension-koni-ui/messaging/transaction/multisig';
 import { BaseDetailModal } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Detail';
 import { SignableAccountProxyItem, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -117,6 +116,7 @@ function Component ({ className, transaction }: Props) {
       transactionId: transaction.id,
       signer: selected.address,
       multisigMetadata: {
+        multisigAddress: transaction.address,
         threshold: account?.threshold || 0,
         signers: account?.signers || []
       },
@@ -125,7 +125,7 @@ function Component ({ className, transaction }: Props) {
     }).finally(() => {
       setIsWrapTransactionLoading(false);
     });
-  }, [account, inactiveModal, prepareTransaction, transaction.chain, transaction.id, wrapTransactionInfo?.id]);
+  }, [account, inactiveModal, prepareTransaction, transaction, wrapTransactionInfo?.id]);
 
   if (!signableAccountProxyItems?.length || !transaction.wrappingStatus) {
     return <></>;

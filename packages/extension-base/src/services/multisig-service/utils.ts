@@ -214,7 +214,7 @@ export function getMultisigTxType (decodedCallData: DecodeCallDataResponse | und
   }
 
   if (MULTISIG_TX_TYPE_MAP.setTokenPayFee.includes(sectionMethod)) {
-    return MultisigTxType.SET_TOKEM_PAY_FEE;
+    return MultisigTxType.SET_TOKEN_PAY_FEE;
   }
 
   return MultisigTxType.UNKNOWN;

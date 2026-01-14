@@ -75,7 +75,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           name={account?.name}
           networkPrefix={networkPrefix}
         />
-        {!transaction.isWrappedTx && <MetaInfo.Number
+        {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.GovUnvote.networkFee')}
           suffix={symbol}

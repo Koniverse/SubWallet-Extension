@@ -23,7 +23,7 @@ import { BitcoinSignArea, EvmSignArea, SubstrateSignArea } from '../../parts/Sig
 import GovUnlockTransactionConfirmation from './variants/GovUnlock';
 import GovUnvoteTransactionConfirmation from './variants/GovUnvote';
 import GovVoteTransactionConfirmation from './variants/GovVote';
-import { AddSubstrateProxyAccountTransactionConfirmation, BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ChangeEarningValidatorTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, RemoveSubstrateProxyAccountTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
+import { AddSubstrateProxyAccountTransactionConfirmation, BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ChangeEarningValidatorTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, PendingMultisigConfirmation, RemoveSubstrateProxyAccountTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
 
 interface Props extends ThemeProps {
   confirmation: ConfirmationQueueItem;
@@ -94,6 +94,10 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
       return AddSubstrateProxyAccountTransactionConfirmation;
     case ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT:
       return RemoveSubstrateProxyAccountTransactionConfirmation;
+    case ExtrinsicType.MULTISIG_CANCEL_TX:
+    case ExtrinsicType.MULTISIG_EXECUTE_TX:
+    case ExtrinsicType.MULTISIG_APPROVE_TX:
+      return PendingMultisigConfirmation;
     case ExtrinsicType.CROWDLOAN:
     case ExtrinsicType.STAKING_CANCEL_COMPOUNDING:
     case ExtrinsicType.STAKING_COMPOUNDING:

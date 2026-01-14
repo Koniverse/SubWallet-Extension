@@ -116,7 +116,7 @@ export enum MultisigTxType {
   /** Lending extrinsic */
   LENDING = 'Lending',
   /** Set token pay fee extrinsic */
-  SET_TOKEM_PAY_FEE = 'SetTokenPayFee',
+  SET_TOKEN_PAY_FEE = 'SetTokenPayFee',
   /** Governance extrinsic */
   GOV = 'Governance',
   /** Swap extrinsic */
@@ -569,7 +569,7 @@ export class MultisigService implements StoppableServiceInterface {
           continue;
         }
 
-        const reformatSignerAddress = _reformatAddressWithChain(signerAddress, this.chainService.getChainInfoByKey(chain))
+        const reformatSignerAddress = _reformatAddressWithChain(signerAddress, this.chainService.getChainInfoByKey(chain));
 
         const key = genPendingMultisigTxKey(chain, multisigAddress, reformatSignerAddress, extrinsicHash);
         const pendingTx: PendingMultisigTx = { ...rawTx, currentSigner: reformatSignerAddress, id: key };
