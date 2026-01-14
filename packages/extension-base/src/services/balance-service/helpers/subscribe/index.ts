@@ -5,13 +5,14 @@ import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types
 import { APIItemState, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { subscribeBitcoinBalance } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/bitcoin';
 import { subscribeCardanoBalance } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano';
+import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _BitcoinApi, _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _isPureBitcoinChain, _isPureCardanoChain, _isPureEvmChain, _isPureTonChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { BalanceItem } from '@subwallet/extension-base/types';
 import { filterAddressByChainInfo, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 
 import { subscribeTonBalance } from './ton/ton';
-import { subscribeEVMBalance } from './evm';
+import { subscribeEVMBalance, subscribeSubtensorEVMBalance } from './evm';
 import { subscribeSubstrateBalance } from './substrate';
 
 const handleUnsupportedOrPendingAddresses = (
@@ -84,6 +85,17 @@ export function subscribeBalance (
 
     const evmApi = evmApiMap[chainSlug];
 
+    if (_BALANCE_CHAIN_GROUP.subtensor_evm.includes(chainSlug)) {
+      return subscribeSubtensorEVMBalance({
+        addresses: useAddresses,
+        assetMap: chainAssetMap,
+        callback,
+        chainInfo,
+        evmApi,
+        substrateApiMap
+      });
+    }
+
     if (_isPureEvmChain(chainInfo)) {
       return subscribeEVMBalance({
         addresses: useAddresses,
@@ -141,7 +153,7 @@ export function subscribeBalance (
       );
     }
 
-    const substrateApi = chainSlug === 'subtensor_evm' ? await substrateApiMap.bittensor.isReady : await substrateApiMap[chainSlug].isReady;
+    const substrateApi = await substrateApiMap[chainSlug].isReady;
 
     return subscribeSubstrateBalance(useAddresses, chainInfo, chainAssetMap, substrateApi, evmApi, callback, extrinsicType);
   });
