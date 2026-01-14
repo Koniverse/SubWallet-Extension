@@ -34,10 +34,6 @@ export interface ExecutePendingTxRequest extends PendingMultisigTxRequest {
     index: number;
   };
   call: string;
-  maxWeight: {
-    refTime: number, // todo
-    proofSize: number // todo
-  };
 }
 
 export interface CancelPendingTxRequest extends PendingMultisigTxRequest {
@@ -45,6 +41,23 @@ export interface CancelPendingTxRequest extends PendingMultisigTxRequest {
     height: number;
     index: number;
   };
+}
+
+export interface InitMultisigTxRequest {
+  transactionId: string; // original tx
+  signer: string;
+  multisigMetadata: MultisigRawMetadata;
+  chain: string;
+  previousMultisigTxId?: string; // previous selected signer tx
+}
+
+export interface InitMultisigTxResponse {
+  submittedCallData: HexString; // callData of the multisig extrinsic
+  callData: HexString; // callData of the original extrinsic
+  decodedCallData: DecodeCallDataResponse | undefined; // decoded callData of the original extrinsic
+  depositAmount: string;
+  networkFee: string;
+  error?: SelectSignatoryError;
 }
 
 export interface RequestGetSignableAccountInfos {
@@ -72,23 +85,6 @@ export interface MultisigAccountInfo {
   multisigAddress: string;
   signers: string[];
   threshold: number;
-}
-
-export interface InitMultisigTxRequest {
-  transactionId: string; // original tx
-  signer: string;
-  multisigMetadata: MultisigRawMetadata;
-  chain: string;
-  previousMultisigTxId?: string; // previous selected signer tx
-}
-
-export interface InitMultisigTxResponse {
-  submittedCallData: HexString; // callData of the multisig extrinsic
-  callData: HexString; // callData of the original extrinsic
-  decodedCallData: DecodeCallDataResponse | undefined; // decoded callData of the original extrinsic
-  depositAmount: string;
-  networkFee: string;
-  error?: SelectSignatoryError;
 }
 
 export enum SelectSignatoryErrorType {

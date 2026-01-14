@@ -51,7 +51,7 @@ import { batchExtrinsicSetFeeHydration, getAssetHubTokensCanPayFee, getHydration
 import { ClaimPolygonBridgeNotificationMetadata, NotificationSetup } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
 import { RequestGetPendingTxs } from '@subwallet/extension-base/services/multisig-service';
-import { calcDepositAmount, createMultisigExtrinsic, decodeCallData } from '@subwallet/extension-base/services/multisig-service/utils';
+import { calcDepositAmount, createInitMultisigExtrinsic, decodeCallData, DEFAULT_MAX_WEIGHT } from '@subwallet/extension-base/services/multisig-service/utils';
 import { GovVoteRequest, RemoveVoteRequest, UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
@@ -3197,12 +3197,8 @@ export default class KoniExtension {
   private async approvePendingTx (inputData: ApprovePendingTxRequest): Promise<boolean> {
     const { address, callHash, chain, maxWeight, multisigMetadata, timepoint } = inputData;
 
-    if (!address || !chain || !multisigMetadata || !callHash) {
+    if (!address || !chain || !multisigMetadata || !callHash || !timepoint) {
       return false;
-    }
-
-    if (!timepoint) {
-      return false; // todo: request with no timepoint
     }
 
     try {
@@ -3220,7 +3216,7 @@ export default class KoniExtension {
         sortAddresses(otherSignatories),
         timepoint,
         callHash,
-        maxWeight
+        DEFAULT_MAX_WEIGHT
       );
 
       await this.#koniState.transactionService.handleTransaction({
@@ -3242,7 +3238,7 @@ export default class KoniExtension {
   }
 
   private async executePendingTx (inputData: ExecutePendingTxRequest): Promise<boolean> {
-    const { address, call, chain, maxWeight, multisigMetadata, timepoint } = inputData;
+    const { address, call, chain, multisigMetadata, timepoint } = inputData;
 
     if (!address || !chain || !multisigMetadata || !timepoint || !call) {
       return false;
@@ -3257,13 +3253,14 @@ export default class KoniExtension {
       }
 
       const otherSignatories = multisigMetadata.signers.filter((s) => !isSameAddress(s, address));
+      const { weight } = await extrinsic.paymentInfo(otherSignatories[0]); // estimate max weight for execute multisig tx
 
       const extrinsic = api.tx.multisig.asMulti(
         multisigMetadata.threshold,
         sortAddresses(otherSignatories),
         timepoint,
         call,
-        maxWeight
+        weight
       );
 
       await this.#koniState.transactionService.handleTransaction({
@@ -3332,7 +3329,7 @@ export default class KoniExtension {
     const substrateApi = await this.#koniState.chainService.getSubstrateApi(chain).isReady;
     const originTransaction = this.#koniState.transactionService.getTransaction(transactionId);
     const callData = originTransaction?.transaction as SubmittableExtrinsic<'promise'>;
-    const multisigCallData = createMultisigExtrinsic(substrateApi.api, threshold, signers, signer, callData);
+    const multisigCallData = createInitMultisigExtrinsic(substrateApi.api, threshold, signers, signer, callData);
 
     const decodedCallData = decodeCallData({
       api: substrateApi.api,
