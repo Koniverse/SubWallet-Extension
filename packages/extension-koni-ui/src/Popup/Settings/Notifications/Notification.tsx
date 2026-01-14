@@ -192,9 +192,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     });
   }, [currentSearchText, notificationItems]);
 
-  console.log('filteredNotificationItems', filteredNotificationItems);
-  console.log('selectedFilterTab', selectedFilterTab);
-
   const onEnableNotification = useCallback(() => {
     const newNotificationSetup: NotificationSetup = {
       ...notificationSetup,
@@ -697,7 +694,7 @@ const Wrapper = (props: Props) => {
     <PageWrapper
       className={CN(props.className)}
       hideLoading={true}
-      resolve={dataContext.awaitStores(['earning'])}
+      resolve={dataContext.awaitStores(['earning', 'price'])}
     >
       <Component {...props} />
     </PageWrapper>
