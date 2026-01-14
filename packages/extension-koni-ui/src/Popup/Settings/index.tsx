@@ -154,16 +154,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           },
           isHidden: !isPopupMode
         },
-        {
-          key: 'crowdloans',
-          leftIcon: Rocket,
-          leftIconBgColor: token['cyan-5'],
-          rightIcon: CaretRight,
-          title: t('ui.SETTINGS.screen.Setting.Root.crowdloans'),
-          onClick: () => {
-            navigate('/settings/crowdloans', { state: true });
-          }
-        }
       ]
     },
     {
