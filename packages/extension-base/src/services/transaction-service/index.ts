@@ -361,7 +361,6 @@ export default class TransactionService {
 
     // Delete previous select signer transaction
     transactionData.previousMultisigTxId && this.removeTransaction(transactionData.previousMultisigTxId);
-
     await new Promise<void>((resolve, reject) => {
       // TODO
       if (transaction.resolveOnDone) {
@@ -374,10 +373,6 @@ export default class TransactionService {
         emitter.on('signed', (data: TransactionEventResponse) => {
           validatedTransaction.id = data.id;
           validatedTransaction.extrinsicHash = data.extrinsicHash;
-
-          // Delete base transaction after approve multisig tx
-          transactionData.multisigMetadata && transactionData.transactionId && this.removeTransaction(transactionData.transactionId);
-
           resolve();
         });
       }
@@ -401,6 +396,9 @@ export default class TransactionService {
     'transaction' in validatedTransaction && delete validatedTransaction.transaction;
     'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
     'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
+
+    // Delete base transaction after approve multisig tx
+    transactionData.multisigMetadata && transactionData.transactionId && this.removeTransaction(transactionData.transactionId);
 
     return validatedTransaction;
   }
@@ -610,6 +608,10 @@ export default class TransactionService {
             : this.signAndSendBitcoinTransaction(transaction));
 
     const { eventsHandler, step } = transaction;
+
+    if (transaction.wrappingStatus === 'WRAPPABLE') {
+      this.updateTransaction(transaction.id, { emitterTransaction: emitter });
+    }
 
     emitter.on('signed', (data: TransactionEventResponse) => {
       this.onSigned(data);
@@ -2039,8 +2041,6 @@ export default class TransactionService {
         emitter.emit('error', eventData);
       });
     }).catch((e: Error) => {
-      console.log(e, 'error');
-      this.removeTransaction(transactionId);
       this.removeTransaction(id);
       eventData.errors.push(new TransactionError(BasicTxErrorType.UNABLE_TO_SIGN, e.message));
       emitter.emit('error', eventData);

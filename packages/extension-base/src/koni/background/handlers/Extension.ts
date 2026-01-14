@@ -3331,7 +3331,8 @@ export default class KoniExtension {
     const { chain, multisigMetadata: { signers, threshold }, signer, transactionId } = request;
 
     const substrateApi = await this.#koniState.chainService.getSubstrateApi(chain).isReady;
-    const callData = this.#koniState.transactionService.getTransaction(transactionId)?.transaction as SubmittableExtrinsic<'promise'>;
+    const originTransaction = this.#koniState.transactionService.getTransaction(transactionId);
+    const callData = originTransaction?.transaction as SubmittableExtrinsic<'promise'>;
     const multisigCallData = createMultisigExtrinsic(substrateApi.api, threshold, signers, signer, callData);
 
     const decodedCallData = decodeCallData({
@@ -3364,6 +3365,28 @@ export default class KoniExtension {
       }
     };
 
+    const eventsHandler = (eventEmitter: TransactionEmitter) => {
+      if (originTransaction?.emitterTransaction) {
+        const originEmitter = originTransaction.emitterTransaction;
+
+        eventEmitter.on('signed', (data: TransactionEventResponse) => {
+          originEmitter.emit('signed', data);
+        });
+
+        eventEmitter.on('error', (data: TransactionEventResponse) => {
+          if (data.errors.length > 0) {
+            originEmitter.emit('error', data);
+          }
+        });
+
+        eventEmitter.on('timeout', (data: TransactionEventResponse) => {
+          if (data.errors.find((error) => error.errorType === BasicTxErrorType.TIMEOUT) && data.errors.length > 0) {
+            originEmitter.emit('timeout', data);
+          }
+        });
+      }
+    };
+
     return await this.#koniState.transactionService.handleTransaction({
       address: signer,
       chain,
@@ -3382,7 +3405,8 @@ export default class KoniExtension {
         networkFee
       },
       wrappingStatus: 'WRAPPED',
-      additionalValidator
+      additionalValidator,
+      eventsHandler
     });
   }
 
