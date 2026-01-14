@@ -36,7 +36,7 @@ import { createCardanoTransaction } from '@subwallet/extension-base/services/bal
 import { getERC20TransactionObject, getERC721Transaction, getEVMTransactionObject, getPSP34TransferExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { createTonTransaction } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
-import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, dryRunXcmExtrinsicV2, FunctionCreateXcmExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
+import { createAcrossBridgeExtrinsic, createAvailBridgeExtrinsicFromAvail, createAvailBridgeTxFromEth, createPolygonBridgeExtrinsic, createSnowBridgeExtrinsic, CreateXcmExtrinsicProps, createXcmExtrinsicV2, dryRunXcmExtrinsicV2, FunctionCreateXcmExtrinsic, getMinXcmTransferableAmount } from '@subwallet/extension-base/services/balance-service/transfer/xcm';
 import { _isAcrossChainBridge, AcrossQuote, getAcrossQuote } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { getClaimTxOnAvail, getClaimTxOnEthereum, isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge, getClaimPolygonBridge, isClaimedPolygonBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
@@ -1848,6 +1848,12 @@ export default class KoniExtension {
 
           isSendingTokenSufficient = await _isSufficientToken(destinationTokenInfo, substrateApi, sufficientChain);
 
+          const minXcmTransferableAmount = await getMinXcmTransferableAmount(params);
+
+          if (!minXcmTransferableAmount) {
+            inputTransaction.errors.push(new TransactionError(BasicTxErrorType.UNSUPPORTED, t('Feature unavailable at the moment. Try again later.')));
+          }
+
           const [warning, error] = additionalValidateTransferForRecipient(
             destinationTokenInfo,
             destinationNativeTokenInfo,
@@ -1856,7 +1862,8 @@ export default class KoniExtension {
             sendingAmount,
             senderTransferable, // different from sendingTokenInfo being passed in
             receiverSystemAccountInfo,
-            isSendingTokenSufficient
+            isSendingTokenSufficient,
+            minXcmTransferableAmount
           );
 
           warning.length && inputTransaction.warnings.push(...warning);
