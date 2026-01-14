@@ -2612,9 +2612,11 @@
   "ui.TRANSACTION.Confirmations.TransferBlock.multisig": "",
   "ui.Confirmations.WrappedTransactionInfoArea.multisigDeposit": "",
   "ui.Confirmations.WrappedTransactionInfoArea.networkFee": "",
-  "ui.Confirmations.WrappedTransactionInfoArea.signer": "",
+  "ui.Confirmations.WrappedTransactionInfoArea.signWith": "",
   "ui.Confirmations.WrappedTransactionInfoArea.multisigInitiationDescription": "",
   "ui.Confirmations.WrappedTransactionInfoArea.multisigExecutionDescription": "",
   "ui.Confirmations.WrappedTransactionInfoArea.multisigCancelDescription": "",
-  "ui.SETTINGS.screen.Setting.Notifications.multisig": ""
+  "ui.SETTINGS.screen.Setting.Notifications.multisig": "",
+  "ui.Confirmations.WrappedTransactionInfoArea.selectAccountToSign": "",
+  "bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee": ""
 }

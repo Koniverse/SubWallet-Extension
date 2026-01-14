@@ -3329,7 +3329,6 @@ export default class KoniExtension {
   // Multisig Account
   private async initMultisigTx (request: InitMultisigTxRequest): Promise<SWTransactionResponse> {
     const { chain, multisigMetadata: { signers, threshold }, signer, transactionId } = request;
-
     const substrateApi = await this.#koniState.chainService.getSubstrateApi(chain).isReady;
     const originTransaction = this.#koniState.transactionService.getTransaction(transactionId);
     const callData = originTransaction?.transaction as SubmittableExtrinsic<'promise'>;
@@ -3357,11 +3356,11 @@ export default class KoniExtension {
       if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) { // todo: check and return better error for the case set token fee on hydration
         const setTokenPayFee = await substrateApi.api.query.multiTransactionPayment?.accountCurrencyMap(signer);
 
-        setTokenPayFee.toPrimitive() && inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
+        setTokenPayFee.toPrimitive() && inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee')));
       }
 
       if (BigInt(signerBalance.value) < BigInt(depositAmount) + BigInt(networkFee)) {
-        inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
+        inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee'))); // not enough balance for deposit and fee
       }
     };
 
@@ -3387,7 +3386,7 @@ export default class KoniExtension {
       }
     };
 
-    return await this.#koniState.transactionService.handleTransaction({
+    return await this.#koniState.transactionService.handleWrappedTransaction({
       address: signer,
       chain,
       chainType: ChainType.SUBSTRATE,

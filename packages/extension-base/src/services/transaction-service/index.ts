@@ -302,6 +302,20 @@ export default class TransactionService {
     } as SWDutchTransaction;
   }
 
+  public async addWrappedTransaction (inputTransaction: SWTransactionInput): Promise<[TransactionEmitter, SWTransaction]> {
+    const transactions = this.transactions;
+    // Fill transaction default info
+    const transaction = this.fillTransactionDefaultInfo(inputTransaction);
+
+    // Add Transaction
+    transactions[transaction.id] = transaction;
+    this.transactionSubject.next({ ...transactions });
+
+    const emitter = await this.sendTransaction(transaction);
+
+    return [emitter, transaction];
+  }
+
   public async addTransaction (inputTransaction: SWTransactionInput): Promise<TransactionEmitter> {
     const transactions = this.transactions;
     // Fill transaction default info
@@ -339,6 +353,75 @@ export default class TransactionService {
     };
   }
 
+  public async handleWrappedTransaction (transaction: SWTransactionInput): Promise<SWTransactionResponse> {
+    const validatedTransaction = await this.validateTransaction(transaction);
+    const ignoreWarnings: BasicTxWarningCode[] = validatedTransaction.ignoreWarnings || [];
+    const stopByErrors = validatedTransaction.errors.length > 0;
+    const stopByWarnings = validatedTransaction.warnings.length > 0 && validatedTransaction.warnings.some((warning) => !ignoreWarnings.includes(warning.warningType));
+
+    if (stopByErrors || stopByWarnings) {
+      // @ts-ignore
+      'transaction' in validatedTransaction && delete validatedTransaction.transaction;
+      'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
+      'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
+
+      return validatedTransaction;
+    }
+
+    validatedTransaction.warnings = [];
+
+    // Todo: refactor this later
+    const [emitter, transactionAdded] = await this.addWrappedTransaction(validatedTransaction);
+    const transactionData = transactionAdded.data as InitMultisigTxRequest;
+
+    if (!validatedTransaction.id) {
+      validatedTransaction.id = transactionAdded.id;
+    }
+
+    // Delete previous select signer transaction
+    transactionData.previousMultisigTxId && this.removeTransaction(transactionData.previousMultisigTxId);
+    emitter && new Promise<void>((resolve, reject) => {
+      // TODO
+      if (transaction.resolveOnDone) {
+        emitter.on('success', (data: TransactionEventResponse) => {
+          validatedTransaction.id = data.id;
+          validatedTransaction.extrinsicHash = data.extrinsicHash;
+          resolve();
+        });
+      } else {
+        emitter.on('signed', (data: TransactionEventResponse) => {
+          validatedTransaction.id = data.id;
+          validatedTransaction.extrinsicHash = data.extrinsicHash;
+          resolve();
+        });
+      }
+
+      emitter.on('error', (data: TransactionEventResponse) => {
+        if (data.errors.length > 0) {
+          validatedTransaction.errors.push(...data.errors);
+          resolve();
+        }
+      });
+
+      emitter.on('timeout', (data: TransactionEventResponse) => {
+        if (transaction.errorOnTimeOut && data.errors.length > 0) {
+          validatedTransaction.errors.push(...data.errors);
+          resolve();
+        }
+      });
+    }).finally(() => {
+      // @ts-ignore
+      'transaction' in validatedTransaction && delete validatedTransaction.transaction;
+      'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
+      'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
+
+      // Delete base transaction after approve multisig tx
+      transactionData.multisigMetadata && transactionData.transactionId && this.removeTransaction(transactionData.transactionId);
+    });
+
+    return validatedTransaction;
+  }
+
   public async handleTransaction (transaction: SWTransactionInput): Promise<SWTransactionResponse> {
     const validatedTransaction = await this.validateTransaction(transaction);
     const ignoreWarnings: BasicTxWarningCode[] = validatedTransaction.ignoreWarnings || [];
@@ -357,12 +440,8 @@ export default class TransactionService {
     validatedTransaction.warnings = [];
 
     const emitter = await this.addTransaction(validatedTransaction);
-    const transactionData = transaction.data as InitMultisigTxRequest;
 
-    // Delete previous select signer transaction
-    transactionData.previousMultisigTxId && this.removeTransaction(transactionData.previousMultisigTxId);
     await new Promise<void>((resolve, reject) => {
-      // TODO
       if (transaction.resolveOnDone) {
         emitter.on('success', (data: TransactionEventResponse) => {
           validatedTransaction.id = data.id;
@@ -396,9 +475,6 @@ export default class TransactionService {
     'transaction' in validatedTransaction && delete validatedTransaction.transaction;
     'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
     'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
-
-    // Delete base transaction after approve multisig tx
-    transactionData.multisigMetadata && transactionData.transactionId && this.removeTransaction(transactionData.transactionId);
 
     return validatedTransaction;
   }

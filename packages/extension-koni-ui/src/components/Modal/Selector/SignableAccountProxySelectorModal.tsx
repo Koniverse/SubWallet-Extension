@@ -6,18 +6,18 @@ import { SignableAccountProxySelectorItem } from '@subwallet/extension-koni-ui/c
 import { SIGNABLE_ACCOUNT_PROXY_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import { SignableAccountProxyItem, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { Button, Icon, SwList, SwModal } from '@subwallet/react-ui';
+import { Button, Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import { CheckCircle, X, XCircle } from 'phosphor-react';
-import React, { ForwardedRef, forwardRef, useCallback, useMemo, useRef, useState } from 'react';
+import React, { ForwardedRef, forwardRef, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 export interface SignableAccountProxySelectorModalProps {
   chain: string;
   address: string;
+  signerSelected: SignableAccountProxyItem | null;
   accountItems: SignableAccountProxyItem[];
-  onCancel: VoidFunction;
   onApply: (selected: SignableAccountProxyItem) => void;
 }
 
@@ -28,10 +28,11 @@ type Props = ThemeProps & SignableAccountProxySelectorModalProps;
 const modalId = SIGNABLE_ACCOUNT_PROXY_SELECTOR_MODAL;
 
 const Component = (props: Props, ref: ForwardedRef<any>) => {
-  const { accountItems, address, chain, className = '', onApply, onCancel } = props;
+  const { accountItems, address, chain, className = '', onApply, signerSelected } = props;
   const { t } = useTranslation();
   const sectionRef = useRef<SwListSectionRef>(null);
   const account = useGetAccountByAddress(address);
+  const { inactiveModal } = useContext(ModalContext);
 
   const isMultisigTransaction = !!account?.isMultisig;
 
@@ -52,13 +53,24 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
     ];
   }, [account, accountItems, address]);
 
-  const [selected, setSelected] = useState<SignableAccountProxyItem | null>(null);
+  const [selected, setSelected] = useState<SignableAccountProxyItem | null>(signerSelected);
 
   const onSelect = useCallback((item: SignableAccountProxyItem) => {
     return () => {
       setSelected(item);
     };
   }, []);
+
+  const onCancelSelectSigner = useCallback(() => {
+    setSelected(() => {
+      if (signerSelected) {
+        return signerSelected;
+      }
+
+      return null;
+    });
+    inactiveModal(modalId);
+  }, [inactiveModal, signerSelected]);
 
   const renderItem = useCallback((item: SignableAccountProxyItem) => {
     const isSelected = !!selected && isSameAddress(selected.address, item.address) && selected.substrateProxyType === item.substrateProxyType;
@@ -69,6 +81,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
         chain={chain}
         className={'__proxy-account-item'}
         isSelected={isSelected}
+        key={item.address}
         onClick={onSelect(item)}
         showUnselectIcon
       />
@@ -99,7 +112,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
                 weight='fill'
               />
             }
-            onClick={onCancel}
+            onClick={onCancelSelectSigner}
             schema='secondary'
           >
             {t('ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.cancel')}
@@ -121,7 +134,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
         </>
       }
       id={modalId}
-      onCancel={onCancel}
+      onCancel={onCancelSelectSigner}
       title={t('ui.ACCOUNT.components.Modal.Selector.SignableAccountProxySelector.selectAccount')}
     >
       <div className='proxy-modal__description'>
