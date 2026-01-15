@@ -7,6 +7,7 @@ import { _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/servic
 import { GovVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { AccountJson, AccountSignMode, ProcessType, SubmitBittensorChangeValidatorStaking } from '@subwallet/extension-base/types';
+import { PendingMultisigTxRequest } from '@subwallet/extension-base/types/multisig';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertModal } from '@subwallet/extension-koni-ui/components';
 import { isProductionMode, NEED_SIGN_CONFIRMATION } from '@subwallet/extension-koni-ui/constants';
@@ -50,6 +51,12 @@ const titleMap: Record<ConfirmationType, string> = {
 } as Record<ConfirmationType, string>;
 
 const alertModalId = 'confirmation-alert-modal';
+const pendingTransactionExtrinsicTypes = [
+  ExtrinsicType.MULTISIG_APPROVE_TX,
+  ExtrinsicType.MULTISIG_CANCEL_TX,
+  ExtrinsicType.MULTISIG_EXECUTE_TX,
+  ExtrinsicType.MULTISIG_INIT_TX
+];
 
 const Component = function ({ className }: Props) {
   const { confirmationQueue, numberOfConfirmations } = useConfirmationsInfo();
@@ -303,6 +310,15 @@ const Component = function ({ className }: Props) {
           case ProcessType.EARNING:
             // TODO: Replace message
             return t('ui.Confirmations.earningConfirmation');
+        }
+      }
+
+      if (pendingTransactionExtrinsicTypes.includes(transaction.extrinsicType)) {
+        const transactionData = transaction.data as PendingMultisigTxRequest;
+
+        if (transactionData.type === 'Transfer' &&
+          (transactionData.decodedCallData?.method === 'transfer' || transactionData.decodedCallData?.method === 'transferKeepAlive')) {
+          return t('ui.Confirmations.transferConfirmation');
         }
       }
 

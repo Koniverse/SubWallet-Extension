@@ -8,7 +8,8 @@ import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo'
 import { useGetNativeTokenBasicInfo, useOpenDetailModal } from '@subwallet/extension-koni-ui/hooks';
 import { BaseDetailModal } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Detail';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { toShort } from '@subwallet/extension-koni-ui/utils';
+import { decodeTransferAmount, toShort } from '@subwallet/extension-koni-ui/utils';
+import { decodeTransferRecipient } from '@subwallet/extension-koni-ui/utils/transaction/decode';
 import { Button, Icon, Typography } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Info } from 'phosphor-react';
@@ -39,8 +40,35 @@ function Component ({ className, transaction }: Props) {
     return null;
   }, [t, transaction.extrinsicType]);
 
+  const recipientAddress = useMemo(
+    () => decodeTransferRecipient(transactionData?.decodedCallData),
+    [transactionData?.decodedCallData]
+  );
+
+  const transferAmount = useMemo(
+    () => decodeTransferAmount(transactionData?.decodedCallData),
+    [transactionData?.decodedCallData]
+  );
+
   return (
     <div className={CN(className, 'multisig-area-container')}>
+      {(recipientAddress && transferAmount) && <MetaInfo
+        className={'transaction-recipient-info'}
+        hasBackgroundWrapper
+      >
+        <MetaInfo.Account
+          address={recipientAddress}
+          chainSlug={transaction.chain}
+          label={t('ui.Confirmations.MultisigInfoArea.recipient')}
+        />
+        <MetaInfo.Number
+          decimals={decimals}
+          label={t('ui.Confirmations.MultisigInfoArea.amount')}
+          suffix={symbol}
+          value={transferAmount}
+        />
+
+      </MetaInfo>}
       <MetaInfo
         className={CN('multisig-info-area')}
         hasBackgroundWrapper
@@ -73,7 +101,6 @@ function Component ({ className, transaction }: Props) {
             type={'ghost'}
           />
         </MetaInfo.Default>
-
       </MetaInfo>
 
       <Typography.Text className={CN('description-text')}>
