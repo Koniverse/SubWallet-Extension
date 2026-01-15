@@ -2611,7 +2611,6 @@
   "ui.Confirmations.multisigApproveConfirmation": "",
   "ui.Confirmations.multisigExecuteConfirmation": "",
   "ui.Confirmations.multisigCancelConfirmation": "",
-  "ui.Confirmations.multisigInitConfirmation": "",
   "ui.Confirmations.MultisigInfoArea.recipient": "",
   "ui.Confirmations.MultisigInfoArea.amount": "",
   "ui.HISTORY.constant.history.multisigApprove": "",
@@ -2623,5 +2622,8 @@
   "ui.HISTORY.screen.History.multisigCancel": "",
   "ui.HISTORY.screen.History.multisigInit": "",
   "ui.Confirmations.multisigInitConfirmation": "",
+  "ui.DAPP.Confirmations.Sign.Substrate.goBack": "",
+  "ui.DAPP.Confirmations.Sign.Substrate.reject": "",
+  "ui.DAPP.Confirmations.Sign.Substrate.execute": "",
   "bg.koni.handler.Extension.proxyAccountNotEnoughBalance": ""
 }

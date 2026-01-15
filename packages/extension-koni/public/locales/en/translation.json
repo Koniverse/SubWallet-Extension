@@ -2623,6 +2623,8 @@
   "ui.HISTORY.screen.History.multisigExecute": "Multisig execute",
   "ui.HISTORY.screen.History.multisigCancel": "Multisig cancel",
   "ui.HISTORY.screen.History.multisigInit": "Multisig init",
-  "ui.Confirmations.multisigInitConfirmation": "Multisig init confirmation",
+  "ui.DAPP.Confirmations.Sign.Substrate.goBack": "Go back",
+  "ui.DAPP.Confirmations.Sign.Substrate.reject": "Reject",
+  "ui.DAPP.Confirmations.Sign.Substrate.execute": "Execute",
   "bg.koni.handler.Extension.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again"
 }

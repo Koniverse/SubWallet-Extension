@@ -24,11 +24,12 @@ import styled from 'styled-components';
 
 interface Props extends ThemeProps {
   transaction: SWTransactionResult;
+  setDisable: (disabled: boolean) => void;
 }
 
 const modalId = SIGNABLE_ACCOUNT_PROXY_SELECTOR_MODAL;
 
-function Component ({ className, transaction }: Props) {
+function Component ({ className, setDisable, transaction }: Props) {
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const account = useGetAccountByAddress(transaction.address);
@@ -92,9 +93,12 @@ function Component ({ className, transaction }: Props) {
     activeModal(modalId);
   }, [activeModal]);
 
+  console.log(transaction, 'transaction');
+
   const prepareTransaction = useCallback(async (params: InitMultisigTxRequest) => {
     try {
       setIsWrapTransactionLoading(true);
+      setDisable(true);
 
       const transactionResponse = await initMultisigTx(params);
 
@@ -102,30 +106,35 @@ function Component ({ className, transaction }: Props) {
         setTransactionError(transactionResponse.errors[0]);
         setWrapTransactionInfo(null);
       } else {
+        setDisable(false);
         setWrapTransactionInfo(transactionResponse);
       }
     } catch (e) {
       setIsWrapTransactionLoading(false);
     }
-  }, []);
+  }, [setDisable]);
 
   const onSelectSigner = useCallback((selected: SignableAccountProxyItem) => {
-    setSignerSelected(selected);
-    inactiveModal(modalId);
-    prepareTransaction({
-      transactionId: transaction.id,
-      signer: selected.address,
-      multisigMetadata: {
-        multisigAddress: transaction.address,
-        threshold: account?.threshold || 0,
-        signers: account?.signers || []
-      },
-      previousWrappedTxId: wrapTransactionInfo?.id,
-      chain: transaction.chain
-    }).finally(() => {
-      setIsWrapTransactionLoading(false);
+    setSignerSelected((prevState) => {
+      if (prevState?.address !== selected.address) {
+        prepareTransaction({
+          transactionId: transaction.id,
+          signer: selected.address,
+          multisigMetadata: {
+            multisigAddress: transaction.address,
+            threshold: account?.threshold || 0,
+            signers: account?.signers || []
+          },
+          chain: transaction.chain
+        }).finally(() => {
+          setIsWrapTransactionLoading(false);
+        });
+      }
+
+      return selected;
     });
-  }, [account, inactiveModal, prepareTransaction, transaction, wrapTransactionInfo?.id]);
+    inactiveModal(modalId);
+  }, [account, inactiveModal, prepareTransaction, transaction]);
 
   if (!signableAccountProxyItems?.length || !transaction.wrappingStatus) {
     return <></>;

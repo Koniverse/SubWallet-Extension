@@ -60,6 +60,7 @@ function Component ({ className, transaction }: Props) {
           address={recipientAddress}
           chainSlug={transaction.chain}
           label={t('ui.Confirmations.MultisigInfoArea.recipient')}
+          onlyShowName
         />
         <MetaInfo.Number
           decimals={decimals}

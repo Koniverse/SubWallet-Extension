@@ -34,6 +34,7 @@ const Component: React.FC<Props> = (props: Props) => {
           address={data.recipientAddress}
           label={t('ui.TRANSACTION.Confirmations.SendNft.recipient')}
           networkPrefix={networkPrefix}
+          onlyShowName
         />
         {
           !!(data.nftItemName || data.nftItem) && (

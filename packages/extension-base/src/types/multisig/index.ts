@@ -44,7 +44,6 @@ export interface InitMultisigTxRequest {
   signer: string;
   chain: string;
   multisigMetadata: MultisigRawMetadata;
-  previousWrappedTxId?: string; // previous selected signer tx
 }
 
 export interface InitMultisigTxResponse {

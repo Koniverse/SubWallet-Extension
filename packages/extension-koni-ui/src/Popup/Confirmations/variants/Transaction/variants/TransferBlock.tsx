@@ -4,7 +4,7 @@
 import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
-import { AlertBox } from '@subwallet/extension-koni-ui/components';
+import { AlertBox, CommonTransactionInfo } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import QuoteRateDisplay from '@subwallet/extension-koni-ui/components/Swap/QuoteRateDisplay';
 import { useGetAccountByAddress, useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
@@ -51,27 +51,47 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
 
   return (
     <>
-      <MetaInfo hasBackgroundWrapper>
-        <MetaInfo.Transfer
-          alwaysShowChain
-          destinationChain={{
-            slug: destinationChainSlug,
-            name: _getChainName(chainInfoMap[destinationChainSlug])
-          }}
-          originChain={{
-            slug: originChainSlug,
-            name: _getChainName(chainInfoMap[originChainSlug])
-          }}
-          recipientAddress={data.to}
-          recipientLabel={t('ui.TRANSACTION.Confirmations.TransferBlock.recipient')}
-          recipientName={toAccountName}
-          senderAddress={data.from}
-          senderLabel={senderLabel}
-          senderName={fromAccountName}
-        />
-      </MetaInfo>
+      {
+        transaction.wrappingStatus
+          ? (
+            <CommonTransactionInfo
+              address={data.from}
+              network={transaction.chain}
+            />
+          )
+          : (
+            <MetaInfo hasBackgroundWrapper>
+
+              <MetaInfo.Transfer
+                alwaysShowChain
+                destinationChain={{
+                  slug: destinationChainSlug,
+                  name: _getChainName(chainInfoMap[destinationChainSlug])
+                }}
+                originChain={{
+                  slug: originChainSlug,
+                  name: _getChainName(chainInfoMap[originChainSlug])
+                }}
+                recipientAddress={data.to}
+                recipientLabel={t('ui.TRANSACTION.Confirmations.TransferBlock.recipient')}
+                recipientName={toAccountName}
+                senderAddress={data.from}
+                senderLabel={senderLabel}
+                senderName={fromAccountName}
+              />
+            </MetaInfo>
+          )
+      }
 
       <MetaInfo hasBackgroundWrapper>
+        { !!transaction.wrappingStatus &&
+          <MetaInfo.Account
+            address={data.to}
+            chainSlug={transaction.chain}
+            label={t('ui.TRANSACTION.Confirmations.TransferBlock.recipient')}
+            onlyShowName
+          />
+        }
         {isAcrossBridge && xcmData.metadata
           ? <>
             <MetaInfo.Default
