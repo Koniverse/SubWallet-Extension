@@ -56,25 +56,6 @@ export interface InitMultisigTxResponse {
   error?: SelectSignatoryError;
 }
 
-interface ProxyRawMetadata {
-  proxiedAddress: string;
-}
-
-// todo: move to proxy
-export interface InitSubstrateProxyTxRequest {
-  transactionId: string; // original tx
-  signer: string;
-  chain: string;
-  proxyMetadata: ProxyRawMetadata;
-  previousWrappedTxId?: string; // previous selected signer tx
-}
-
-export interface InitSubstrateProxyTxResponse {
-  submittedCallData: HexString; // callData of the proxy extrinsic
-  networkFee: string;
-  error?: SelectSignatoryError; // todo: maybe should create separate type for Proxy rather than Multisig
-}
-
 export interface RequestGetSignableAccountInfos {
   multisigProxyId: string;
   chain: string;

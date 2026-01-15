@@ -191,7 +191,7 @@ export default class TransactionService {
     const nativeTokenAvailable = await this.state.balanceService.getBalanceByType(address, chain, nativeTokenInfo.slug, transactionInput.balanceType, extrinsicType);
 
     // Check available balance against transaction fee
-    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable, validationResponse.wrappingStatus === 'WRAPPABLE');
+    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable);
 
     // Warnings Ton address if bounceable and not active
     // if (transaction && isTonTransaction(transaction) && tonApi) {

@@ -477,7 +477,7 @@ export function checkSigningAccountForTransaction (validationResponse: SWTransac
   }
 }
 
-export function checkBalanceWithTransactionFee (validationResponse: SWTransactionResponse, transactionInput: SWTransactionInput, nativeTokenInfo: _ChainAsset, nativeTokenAvailable: AmountData, isWrappable: boolean) {
+export function checkBalanceWithTransactionFee (validationResponse: SWTransactionResponse, transactionInput: SWTransactionInput, nativeTokenInfo: _ChainAsset, nativeTokenAvailable: AmountData) {
   if (!validationResponse.estimateFee) { // todo: estimateFee should be must-have, need to refactor interface
     return;
   }
@@ -503,7 +503,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
     ..._TRANSFER_CHAIN_GROUP.statemine
   ].includes(nativeTokenInfo.originChain);
 
-  if (bnNativeTokenTransferAmount.plus(isWrappable ? bnFee : '0').gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
+  if (bnNativeTokenTransferAmount.plus(validationResponse.wrappingStatus === 'WRAPPABLE' ? bnFee : '0').gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
   }
 

@@ -1,8 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types';
-import { InitSubstrateProxyTxRequest } from '@subwallet/extension-base/types/multisig';
+import { InitSubstrateProxyTxRequest, RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types';
 import { sendMessage } from '@subwallet/extension-koni-ui/messaging';
 
 export async function getSubstrateProxyAccountGroup (request: RequestGetSubstrateProxyAccountGroup) {
