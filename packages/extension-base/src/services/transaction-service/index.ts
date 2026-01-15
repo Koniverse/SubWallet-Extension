@@ -162,7 +162,7 @@ export default class TransactionService {
 
     const chainInfoMap = this.state.chainService.getChainInfoMap();
 
-    if (isSubstrateTransaction(transaction)) {
+    if (isSubstrateTransaction(transaction) && transactionInput.wrappingStatus !== 'WRAPPED') {
       if (chainInfo.substrateInfo?.supportMultisig && !validationResponse.wrappingStatus) {
         const pair = keyring.getPair(address);
 
