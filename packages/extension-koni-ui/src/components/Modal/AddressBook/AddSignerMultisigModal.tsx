@@ -2,16 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ActionType } from '@subwallet/extension-base/core/types';
-import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { AccountSignMode, AnalyzeAddress, AnalyzedGroup } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain, getAccountChainTypeForAddress } from '@subwallet/extension-base/utils';
 import { AddressSelectorItem } from '@subwallet/extension-koni-ui/components';
-import { useChainInfo, useCoreCreateReformatAddress, useFilterModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { useGetExcludedTokens } from '@subwallet/extension-koni-ui/hooks/assets';
+import { useFilterModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { SignerData } from '@subwallet/extension-koni-ui/Popup/Account/NewMultisigAccount';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getSignModeByAccountProxy, isAccountAll, sortFuncAnalyzeAddress } from '@subwallet/extension-koni-ui/utils';
-import { getKeypairTypeByAddress } from '@subwallet/keyring';
+import { getSignModeByAccountProxy, isAccountAll, reformatAddress, sortFuncAnalyzeAddress } from '@subwallet/extension-koni-ui/utils';
+import { isSubstrateAddress } from '@subwallet/keyring';
 import { Button, Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import CN from 'classnames';
@@ -25,8 +22,6 @@ import { GeneralEmptyList } from '../../EmptyList';
 interface Props extends ThemeProps {
   value?: string;
   id: string;
-  chainSlug?: string;
-  tokenSlug?: string;
   actionType?: ActionType;
   selectedSigners?: SignerData[]
   onConfirm: (selectedItems: SignerData[]) => void;
@@ -35,7 +30,7 @@ interface Props extends ThemeProps {
 const renderEmpty = () => <GeneralEmptyList />;
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { actionType, chainSlug, className, id, onConfirm, selectedSigners = [], tokenSlug = '' } = props;
+  const { actionType, className, id, onConfirm, selectedSigners = [] } = props;
   const [checkedSigners, setCheckedSigners] = useState<SignerData[]>([]);
   const disabledAddressList = useMemo(() => {
     return selectedSigners.map((s) => s.address);
@@ -49,12 +44,6 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const { accountProxies, contacts, recent } = useSelector((state) => state.accountState);
 
-  const chainInfo = useChainInfo(chainSlug);
-
-  const getReformatAddress = useCoreCreateReformatAddress();
-
-  const getExcludedTokenByAccountProxy = useGetExcludedTokens();
-
   const filterModal = useMemo(() => `${id}-filter-modal`, [id]);
 
   const { onResetFilter, selectedFilters } = useFilterModal(filterModal);
@@ -62,19 +51,13 @@ const Component: React.FC<Props> = (props: Props) => {
   const sectionRef = useRef<SwListSectionRef>(null);
 
   const items = useMemo((): AnalyzeAddress[] => {
-    if (!chainInfo) {
-      return [];
-    }
-
     const result: AnalyzeAddress[] = [];
 
     (!selectedFilters.length || selectedFilters.includes(AnalyzedGroup.RECENT)) && recent.forEach((acc) => {
-      const chains = acc.recentChainSlugs || [];
-
-      if (chainSlug && chains.includes(chainSlug)) {
+      if (isSubstrateAddress(acc.address)) {
         result.push({
           displayName: acc.name,
-          formatedAddress: _reformatAddressWithChain(acc.address, chainInfo),
+          formatedAddress: reformatAddress(acc.address),
           address: acc.address,
           analyzedGroup: AnalyzedGroup.RECENT
         });
@@ -82,13 +65,10 @@ const Component: React.FC<Props> = (props: Props) => {
     });
 
     (!selectedFilters.length || selectedFilters.includes(AnalyzedGroup.CONTACT)) && contacts.forEach((acc) => {
-      if (_isChainInfoCompatibleWithAccountInfo(chainInfo, {
-        chainType: getAccountChainTypeForAddress(acc.address),
-        type: getKeypairTypeByAddress(acc.address)
-      })) {
+      if (isSubstrateAddress(acc.address)) {
         result.push({
           displayName: acc.name,
-          formatedAddress: _reformatAddressWithChain(acc.address, chainInfo),
+          formatedAddress: reformatAddress(acc.address),
           address: acc.address,
           analyzedGroup: AnalyzedGroup.CONTACT
         });
@@ -97,13 +77,6 @@ const Component: React.FC<Props> = (props: Props) => {
 
     (!selectedFilters.length || selectedFilters.includes(AnalyzedGroup.WALLET)) && accountProxies.forEach((ap) => {
       if (isAccountAll(ap.id)) {
-        return;
-      }
-
-      // todo: recheck with ledger
-      const excludedTokens = getExcludedTokenByAccountProxy([chainInfo.slug], ap);
-
-      if (excludedTokens.includes(tokenSlug)) {
         return;
       }
 
@@ -116,9 +89,9 @@ const Component: React.FC<Props> = (props: Props) => {
       }
 
       ap.accounts.forEach((acc) => {
-        const formatedAddress = getReformatAddress(acc, chainInfo);
+        const formatedAddress = reformatAddress(acc.address);
 
-        if (formatedAddress) {
+        if (isSubstrateAddress(formatedAddress)) {
           result.push({
             displayName: acc.name,
             formatedAddress,
@@ -134,7 +107,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
     return result
       .sort(sortFuncAnalyzeAddress);
-  }, [accountProxies, actionType, chainInfo, chainSlug, contacts, getExcludedTokenByAccountProxy, getReformatAddress, recent, selectedFilters, tokenSlug]);
+  }, [accountProxies, actionType, contacts, recent, selectedFilters]);
 
   const onClose = useCallback(() => {
     inactiveModal(id);
@@ -178,7 +151,7 @@ const Component: React.FC<Props> = (props: Props) => {
     return (
       <AddressSelectorItem
         address={item.formatedAddress}
-        avatarValue={item.proxyId}
+        avatarValue={item.proxyId || item.formatedAddress}
         className={CN('__list-item', { '-disabled': isDisabled })}
         isSelected={isChecked || isDisabled}
         key={item.address}
@@ -267,6 +240,11 @@ const AddSignerMultisigModal = styled(Component)<Props>(({ theme: { token } }: P
     },
 
     '.ant-sw-list': {
+      paddingBottom: 0
+    },
+
+    '.__list-item': {
+      paddingTop: 0,
       paddingBottom: 0
     },
 
