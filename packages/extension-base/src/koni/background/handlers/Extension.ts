@@ -3392,6 +3392,8 @@ export default class KoniExtension {
       chainType: ChainType.SUBSTRATE,
       extrinsicType: ExtrinsicType.MULTISIG_INIT_TX,
       transaction: multisigCallData,
+      skipFeeValidation: true,
+      skipFeeRecalculation: true,
       data: {
         // input
         ...request,
