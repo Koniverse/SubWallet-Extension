@@ -120,7 +120,7 @@ function Component ({ className, transaction }: Props) {
         threshold: account?.threshold || 0,
         signers: account?.signers || []
       },
-      previousMultisigTxId: wrapTransactionInfo?.id,
+      previousWrappedTxId: wrapTransactionInfo?.id,
       chain: transaction.chain
     }).finally(() => {
       setIsWrapTransactionLoading(false);
