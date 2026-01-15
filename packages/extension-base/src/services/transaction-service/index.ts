@@ -379,7 +379,7 @@ export default class TransactionService {
     }
 
     // Delete previous select signer transaction
-    transactionData.previousMultisigTxId && this.removeTransaction(transactionData.previousMultisigTxId);
+    transactionData.previousWrappedTxId && this.removeTransaction(transactionData.previousWrappedTxId);
     emitter && new Promise<void>((resolve, reject) => {
       // TODO
       if (transaction.resolveOnDone) {

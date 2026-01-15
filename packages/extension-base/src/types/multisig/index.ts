@@ -46,9 +46,9 @@ export interface CancelPendingTxRequest extends PendingMultisigTxRequest {
 export interface InitMultisigTxRequest {
   transactionId: string; // original tx
   signer: string;
-  multisigMetadata: MultisigRawMetadata;
   chain: string;
-  previousMultisigTxId?: string; // previous selected signer tx
+  multisigMetadata: MultisigRawMetadata;
+  previousWrappedTxId?: string; // previous selected signer tx
 }
 
 export interface InitMultisigTxResponse {
@@ -58,6 +58,25 @@ export interface InitMultisigTxResponse {
   depositAmount: string;
   networkFee: string;
   error?: SelectSignatoryError;
+}
+
+interface ProxyRawMetadata {
+  proxyAddress: string;
+}
+
+// todo: move to proxy
+export interface InitSubstrateProxyTxRequest {
+  transactionId: string; // original tx
+  signer: string;
+  chain: string;
+  proxyMetadata: ProxyRawMetadata;
+  previousWrappedTxId?: string; // previous selected signer tx
+}
+
+export interface InitSubstrateProxyTxResponse {
+  submittedCallData: HexString; // callData of the proxy extrinsic
+  networkFee: string;
+  error?: SelectSignatoryError; // todo: maybe should create separate type for Proxy rather than Multisig
 }
 
 export interface RequestGetSignableAccountInfos {
