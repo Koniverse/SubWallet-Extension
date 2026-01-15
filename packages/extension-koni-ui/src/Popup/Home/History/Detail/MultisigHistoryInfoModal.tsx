@@ -77,11 +77,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
         height: data?.blockHeight,
         index: data?.extrinsicIndex
       },
-      type: data?.multisigTxType,
-      maxWeight: {
-        refTime: 0,
-        proofSize: 0
-      }
+      type: data?.multisigTxType
     });
   }, [data]);
 
@@ -101,11 +97,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
       decodedCallData: data.decodedCallData,
       callHash: data?.callHash || '',
       call: data?.callData || '',
-      type: data?.multisigTxType,
-      maxWeight: {
-        refTime: 0,
-        proofSize: 0
-      }
+      type: data?.multisigTxType
     });
   }, [data]);
 

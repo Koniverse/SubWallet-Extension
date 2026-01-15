@@ -2622,5 +2622,13 @@
   "ui.components.Confirmation.CommonTransactionInfo.multisig": "",
   "ui.Confirmations.MultisigInfoArea.signatory": "",
   "ui.Confirmations.MultisigInfoArea.networkFee": "",
-  "ui.Confirmations.MultisigInfoArea.callData": ""
+  "ui.Confirmations.MultisigInfoArea.callData": "",
+  "ui.TRANSACTION.constant.transaction.multisigApprove": "",
+  "ui.TRANSACTION.constant.transaction.multisigExecute": "",
+  "ui.TRANSACTION.constant.transaction.multisigCancel": "",
+  "ui.TRANSACTION.constant.transaction.multisigInit": "",
+  "ui.Confirmations.multisigApproveConfirmation": "",
+  "ui.Confirmations.multisigExecuteConfirmation": "",
+  "ui.Confirmations.multisigCancelConfirmation": "",
+  "ui.Confirmations.multisigInitConfirmation": ""
 }

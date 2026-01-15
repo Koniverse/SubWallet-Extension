@@ -22,10 +22,6 @@ export interface ApprovePendingTxRequest extends PendingMultisigTxRequest {
     height: number;
     index: number;
   };
-  maxWeight: {
-    refTime: number, // todo
-    proofSize: number // todo
-  };
 }
 
 export interface ExecutePendingTxRequest extends PendingMultisigTxRequest {

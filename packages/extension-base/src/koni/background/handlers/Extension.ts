@@ -3195,7 +3195,7 @@ export default class KoniExtension {
 
   // Multisig handlers
   private async approvePendingTx (inputData: ApprovePendingTxRequest): Promise<boolean> {
-    const { address, callHash, chain, maxWeight, multisigMetadata, timepoint } = inputData;
+    const { address, callHash, chain, multisigMetadata, timepoint } = inputData;
 
     if (!address || !chain || !multisigMetadata || !callHash || !timepoint) {
       return false;
