@@ -57,7 +57,7 @@ export interface InitMultisigTxResponse {
 }
 
 interface ProxyRawMetadata {
-  proxyAddress: string;
+  proxiedAddress: string;
 }
 
 // todo: move to proxy

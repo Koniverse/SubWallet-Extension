@@ -8,6 +8,8 @@ import { AddSubstrateProxyAccountParams, RemoveSubstrateProxyAccountParams, Requ
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
+import { ApiPromise } from '@polkadot/api';
+import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { Enum } from '@polkadot/types';
 
 import { _SubstrateApi } from '../chain-service/types';
@@ -18,6 +20,10 @@ type PrimitiveSubstrateProxyAccountItem = {
   proxyType: SubstrateProxyType; // type of proxy retrieved from on-chain data
   delay: number;
 };
+
+export function createInitSubstrateProxyExtrinsic (api: ApiPromise, proxiedAddress: string, extrinsic: SubmittableExtrinsic): SubmittableExtrinsic {
+  return api.tx.proxy.proxy(proxiedAddress, null, extrinsic);
+}
 
 export default class SubstrateProxyAccountService {
   protected readonly state: KoniState;

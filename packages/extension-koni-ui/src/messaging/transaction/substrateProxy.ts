@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types';
+import { InitSubstrateProxyTxRequest } from '@subwallet/extension-base/types/multisig';
 import { sendMessage } from '@subwallet/extension-koni-ui/messaging';
 
 export async function getSubstrateProxyAccountGroup (request: RequestGetSubstrateProxyAccountGroup) {
@@ -14,4 +15,8 @@ export async function handleAddSubstrateProxyAccount (request: RequestAddSubstra
 
 export async function handleRemoveSubstrateProxyAccount (request: RequestRemoveSubstrateProxyAccount) {
   return sendMessage('pri(substrateProxyAccount.remove)', request);
+}
+
+export async function initSubstrateProxyTx (request: InitSubstrateProxyTxRequest) {
+  return sendMessage('pri(substrateProxyAccount.initProxyTx)', request);
 }

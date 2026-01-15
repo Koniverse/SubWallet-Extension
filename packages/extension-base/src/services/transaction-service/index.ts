@@ -155,16 +155,12 @@ export default class TransactionService {
 
     // Get signer account
     const signer = address;
-    // todo: move substarte proxy to new flow later
-    // const signerSubstrateProxyAddress = transactionInput.signerSubstrateProxyAddress;
 
     if (!transactionInput.skipFeeRecalculation) {
       validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee);
     }
 
     const chainInfoMap = this.state.chainService.getChainInfoMap();
-
-    let substrateProxyAccountNativeTokenAvailable: AmountData | undefined;
 
     if (isSubstrateTransaction(transaction)) {
       if (chainInfo.substrateInfo?.supportMultisig && !validationResponse.wrappingStatus) {
@@ -195,7 +191,7 @@ export default class TransactionService {
     const nativeTokenAvailable = await this.state.balanceService.getBalanceByType(address, chain, nativeTokenInfo.slug, transactionInput.balanceType, extrinsicType);
 
     // Check available balance against transaction fee
-    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable, substrateProxyAccountNativeTokenAvailable);
+    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable, validationResponse.wrappingStatus === 'WRAPPABLE');
 
     // Warnings Ton address if bounceable and not active
     // if (transaction && isTonTransaction(transaction) && tonApi) {
@@ -2011,13 +2007,6 @@ export default class TransactionService {
       // because we only want the popup to appear once and keep the old one.
       transactionId = (data as InitMultisigTxRequest).transactionId || id;
     }
-
-    // if (signerSubstrateProxyAddress && signerSubstrateProxyAddress !== address) {
-    //   const substrateApi = this.state.chainService.getSubstrateApi(chain);
-    //
-    //   await substrateApi.isReady;
-    //   extrinsic = substrateApi.api.tx.proxy.proxy(address, null, transaction as SubmittableExtrinsic);
-    // }
 
     // const registry = extrinsic.registry;
     // const signedExtensions = registry.signedExtensions;
