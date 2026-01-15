@@ -40,15 +40,15 @@ function Component ({ className, transaction }: Props) {
   }, [t, transaction.extrinsicType]);
 
   return (
-    <>
+    <div className={CN(className, 'multisig-area-container')}>
       <MetaInfo
-        className={CN('wrapped-transaction-container', className)}
+        className={CN('multisig-info-area')}
         hasBackgroundWrapper
       >
         <MetaInfo.Account
           address={transaction.address}
           chainSlug={transaction.chain}
-          className={CN(className, 'signatory-address-info')}
+          className={CN('signatory-address-info')}
           label={t('ui.Confirmations.MultisigInfoArea.signatory')}
         />
 
@@ -60,8 +60,7 @@ function Component ({ className, transaction }: Props) {
         />
 
         <MetaInfo.Default
-          className={className}
-          label={t('ui.Confirmations.Detail.CallDataDetail.callData')}
+          label={t('ui.Confirmations.MultisigInfoArea.callData')}
         >
           {toShort(transactionData.callHash, 5, 5)}
           <Button
@@ -77,7 +76,7 @@ function Component ({ className, transaction }: Props) {
 
       </MetaInfo>
 
-      <Typography.Text className={CN(className, 'description-text')}>
+      <Typography.Text className={CN('description-text')}>
         {descriptionContent}
       </Typography.Text>
 
@@ -90,13 +89,56 @@ function Component ({ className, transaction }: Props) {
           {JSON.stringify(transactionData.decodedCallData || '', null, 2)}
         </pre>
       </BaseDetailModal>}
-    </>
+    </div>
   );
 }
 
 const MultisigInfoArea = styled(Component)<Props>(({ theme: { token } }: ThemeProps) => {
   return {
+    marginTop: token.marginSM,
 
+    '.call-data-info-button': {
+      height: 'fit-content !important',
+      width: 'fit-content !important',
+      minWidth: 'unset !important',
+      color: token.colorTextLight4,
+      transform: 'all 0.3s ease-in-out',
+
+      '&:hover': {
+        color: token.colorTextLight2
+      }
+    },
+
+    '.description-text': {
+      fontSize: token.fontSize,
+      marginTop: token.marginSM,
+      color: token.colorTextLight4,
+      textAlign: 'left',
+      display: 'block'
+    },
+
+    '.error-message': {
+      marginTop: token.marginSM,
+
+      '.alert-description': {
+        color: token.colorWarning
+      }
+    },
+
+    '&.call-data-detail-modal': {
+      '.ant-sw-modal-body': {
+        height: 264,
+        borderRadius: token.borderRadiusLG,
+        padding: token.paddingSM,
+        backgroundColor: token.colorBgSecondary,
+        overflowY: 'auto',
+        scrollBehavior: 'smooth',
+        color: '#999999',
+        margin: `${token.margin}px 0`,
+        fontSize: token.fontSizeLG - 1,
+        fontFamily: token.monoSpaceFontFamily
+      }
+    }
   };
 });
 

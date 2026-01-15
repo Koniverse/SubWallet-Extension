@@ -2620,5 +2620,9 @@
   "ui.Confirmations.WrappedTransactionInfoArea.multisigCancelDescription": "",
   "ui.SETTINGS.screen.Setting.Notifications.multisig": "",
   "ui.Confirmations.WrappedTransactionInfoArea.selectAccountToSign": "",
-  "bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee": ""
+  "bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee": "",
+  "ui.components.Confirmation.CommonTransactionInfo.multisig": "",
+  "ui.Confirmations.MultisigInfoArea.signatory": "",
+  "ui.Confirmations.MultisigInfoArea.networkFee": "",
+  "ui.Confirmations.MultisigInfoArea.callData": ""
 }

@@ -2619,5 +2619,11 @@
   "ui.Confirmations.WrappedTransactionInfoArea.multisigCancelDescription": "The multisig deposit will be returned as transferable balance on the initiator signatory once you click “Execute” to finalize this transaction",
   "ui.SETTINGS.screen.Setting.Notifications.multisig": "Multisig",
   "ui.Confirmations.WrappedTransactionInfoArea.selectAccountToSign": "Select an account to sign transaction",
-  "bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee": "Insufficient balance on the signing account. Top up the account’s balance or select another account and try again"
+  "bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee": "Insufficient balance on the signing account. Top up the account’s balance or select another account and try again",
+  "ui.components.Confirmation.CommonTransactionInfo.multisig": "Multisig",
+  "ui.Confirmations.MultisigInfoArea.signatory": "Signatory",
+  "ui.Confirmations.MultisigInfoArea.networkFee": "Network fee",
+  "ui.Confirmations.MultisigInfoArea.callData": "Call data",
+  "ui.Confirmations.MultisigInfoArea.multisigExecutionDescription": "The multisig deposit will be returned as transferable balance on the signatory once you click “Reject” to cancel this transaction",
+  "ui.Confirmations.MultisigInfoArea.multisigCancelDescription": "The multisig deposit will be returned as transferable balance on the initiator signatory once you click “Execute” to finalize this transaction"
 }

@@ -163,7 +163,7 @@ function Component ({ className, transaction }: Props) {
             </Typography.Text>
 
             <Button
-              className={'__fee-editor-button'}
+              className={'__signatory-editor-button'}
               disabled={isGetSignableLoading || isWrapTransactionLoading}
               icon={
                 <Icon
@@ -196,7 +196,7 @@ function Component ({ className, transaction }: Props) {
                   <div className={'__account-item-name'}>{signerAccount.name}</div>
                 </div>
                 <Button
-                  className={'__fee-editor-button'}
+                  className={'__signatory-editor-button'}
                   disabled={isGetSignableLoading || isWrapTransactionLoading}
                   icon={
                     <Icon
@@ -330,7 +330,7 @@ const WrappedTransactionInfoArea = styled(Component)<Props>(({ theme: { token } 
         }
       },
 
-      '.__fee-editor-button': {
+      '.__signatory-editor-button': {
         minWidth: '28px !important',
         width: 28,
         height: 22
