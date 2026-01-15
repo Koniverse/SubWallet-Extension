@@ -67,7 +67,7 @@ import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/e
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, InitMultisigTxRequest, RequestGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
-import { InitSubstrateProxyTxRequest, RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types/substrateProxyAccount';
+import { HandleSubstrateProxyWrappedTxRequest, RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types/substrateProxyAccount';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountJsonByAddress, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
@@ -3412,7 +3412,7 @@ export default class KoniExtension {
   }
 
   // Substrate Proxy Account
-  private async initSubstrateProxyTx (request: InitSubstrateProxyTxRequest): Promise<SWTransactionResponse> {
+  private async handleSubstrateProxyWrappedTx (request: HandleSubstrateProxyWrappedTxRequest): Promise<SWTransactionResponse> {
     const { chain, proxyMetadata, signer, transactionId } = request;
     const { proxiedAddress } = proxyMetadata;
 
@@ -6435,8 +6435,8 @@ export default class KoniExtension {
         return this.handleAddSubstrateProxyAccount(request as RequestAddSubstrateProxyAccount);
       case 'pri(substrateProxyAccount.remove)':
         return this.handleRemoveSubstrateProxyAccount(request as RequestRemoveSubstrateProxyAccount);
-      case 'pri(substrateProxyAccount.initProxyTx)':
-        return this.initSubstrateProxyTx(request as InitSubstrateProxyTxRequest);
+      case 'pri(substrateProxyAccount.handleProxyWrappedTx)':
+        return this.handleSubstrateProxyWrappedTx(request as HandleSubstrateProxyWrappedTxRequest);
       // Default
       default:
         throw new Error(`Unable to handle message of type ${type}`);

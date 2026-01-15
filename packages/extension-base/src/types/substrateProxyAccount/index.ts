@@ -34,7 +34,7 @@ interface ProxyRawMetadata {
   proxiedAddress: string;
 }
 
-export interface InitSubstrateProxyTxRequest {
+export interface HandleSubstrateProxyWrappedTxRequest {
   transactionId: string; // original tx
   signer: string;
   chain: string;
@@ -42,7 +42,7 @@ export interface InitSubstrateProxyTxRequest {
   previousWrappedTxId?: string; // previous selected signer tx
 }
 
-// export interface InitSubstrateProxyTxResponse {
+// export interface HandleSubstrateProxyWrappedTxResponse {
 //   submittedCallData: HexString; // callData of the proxy extrinsic
 //   networkFee: string;
 //   error?: SelectSignatoryError; // todo: maybe should create separate type for Proxy rather than Multisig
