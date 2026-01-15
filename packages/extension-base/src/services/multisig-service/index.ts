@@ -360,6 +360,8 @@ export class MultisigService implements StoppableServiceInterface {
           const threshold = account.accounts[0].threshold as number;
 
           const unsub = this.subscribePendingMultisigTxs(chain, reformatMultisigAddress, reformatSigners, threshold, (rs) => {
+            multisigServiceLogger.debug('rawPendingMultisigTxs', rs);
+
             !cancel && this.updatePendingMultisigTxSubjectByChain(reformatMultisigAddress, chain, rs);
           });
 
@@ -424,8 +426,6 @@ export class MultisigService implements StoppableServiceInterface {
 
         await Promise.all(pendingMultisigEntries.map(async (_pendingMultisigInfo, index) => {
           const pendingMultisigInfo = _pendingMultisigInfo as unknown as PalletMultisigMultisig;
-
-          console.log('pendingMultisigInfo', pendingMultisigInfo);
 
           if (!pendingMultisigInfo) {
             return;
@@ -633,7 +633,6 @@ export class MultisigService implements StoppableServiceInterface {
       };
     });
 
-    multisigServiceLogger.debug('pendingTxs', pendingTxs);
     multisigServiceLogger.debug('notifications', notifications);
 
     // Group notifications by address to batch write

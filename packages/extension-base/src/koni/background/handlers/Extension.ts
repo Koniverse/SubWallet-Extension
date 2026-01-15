@@ -3239,9 +3239,9 @@ export default class KoniExtension {
   }
 
   private async executePendingTx (inputData: ExecutePendingTxRequest): Promise<boolean> {
-    const { address, call, chain, multisigMetadata, timepoint } = inputData;
+    const { address, call, chain, decodedCallData, multisigMetadata, timepoint } = inputData;
 
-    if (!address || !chain || !multisigMetadata || !timepoint || !call) {
+    if (!address || !chain || !multisigMetadata || !timepoint || !call || !decodedCallData) {
       return false;
     }
 
@@ -3254,13 +3254,16 @@ export default class KoniExtension {
       }
 
       const otherSignatories = multisigMetadata.signers.filter((s) => !isSameAddress(s, address));
+      const originalCall = api.createType('Call', call);
+      const originalExtrinsic = api.tx(originalCall);
+      const { weight } = await originalExtrinsic.paymentInfo(otherSignatories[0]); // estimate max weight for execute multisig tx
 
       const extrinsic = api.tx.multisig.asMulti(
         multisigMetadata.threshold,
         sortAddresses(otherSignatories),
         timepoint,
         call,
-        DEFAULT_MAX_WEIGHT
+        weight
       );
 
       await this.#koniState.transactionService.handleTransaction({
