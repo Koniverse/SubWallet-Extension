@@ -360,7 +360,7 @@ export class MultisigService implements StoppableServiceInterface {
           const threshold = account.accounts[0].threshold as number;
 
           const unsub = this.subscribePendingMultisigTxs(chain, reformatMultisigAddress, reformatSigners, threshold, (rs) => {
-            multisigServiceLogger.debug('rawPendingMultisigTxs', rs);
+            multisigServiceLogger.debug(`pending multisig txs of address ${reformatMultisigAddress}`, rs);
 
             !cancel && this.updatePendingMultisigTxSubjectByChain(reformatMultisigAddress, chain, rs);
           });
