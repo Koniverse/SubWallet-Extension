@@ -2026,7 +2026,7 @@ export default class KoniState {
 
     // Stopping services
     this.campaignService.stop();
-    await Promise.all([this.cron.stop(), this.subscription.stop()]);
+    await Promise.all([this.cron.stop()]);
     await this.pauseAllNetworks(undefined, 'IDLE mode');
     await Promise.all([this.historyService.stop(), this.priceService.stop(), this.balanceService.stop(), this.earningService.stop(), this.swapService.stop(), this.inappNotificationService.stop(), this.openGovService.stop()]);
 
@@ -2184,12 +2184,6 @@ export default class KoniState {
 
   public async reloadBalance () {
     await this.balanceService.reloadBalance();
-
-    return true;
-  }
-
-  public async reloadCrowdloan () {
-    await this.subscription.reloadCrowdloan();
 
     return true;
   }
