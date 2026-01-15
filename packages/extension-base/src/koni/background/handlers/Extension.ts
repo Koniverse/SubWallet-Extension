@@ -3253,14 +3253,13 @@ export default class KoniExtension {
       }
 
       const otherSignatories = multisigMetadata.signers.filter((s) => !isSameAddress(s, address));
-      const { weight } = await extrinsic.paymentInfo(otherSignatories[0]); // estimate max weight for execute multisig tx
 
       const extrinsic = api.tx.multisig.asMulti(
         multisigMetadata.threshold,
         sortAddresses(otherSignatories),
         timepoint,
         call,
-        weight
+        DEFAULT_MAX_WEIGHT
       );
 
       await this.#koniState.transactionService.handleTransaction({
