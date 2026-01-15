@@ -201,6 +201,9 @@ export class MultisigService implements StoppableServiceInterface {
 
       this.stopPromiseHandler = createPromiseHandler();
       this.status = ServiceStatus.STARTED;
+
+      this.eventService.emit('multisig-service.ready', true);
+
       this.startPromiseHandler.resolve();
     } catch (error) {
       this.status = ServiceStatus.NOT_INITIALIZED;
