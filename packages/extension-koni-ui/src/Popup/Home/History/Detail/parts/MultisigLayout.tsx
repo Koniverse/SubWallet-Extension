@@ -11,7 +11,7 @@ import HistoryMultisigHeader from '@subwallet/extension-koni-ui/Popup/Home/Histo
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { formatHistoryDate, reformatAddress, toShort } from '@subwallet/extension-koni-ui/utils';
-import { Divider, Icon } from '@subwallet/react-ui';
+import { Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
 import React, { useCallback, useMemo } from 'react';
@@ -98,60 +98,65 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [data]);
 
   return (
-    <MetaInfo
-      className={CN(className)}
-    >
-      <MetaInfo.DisplayType
-        label={t('Type')}
-        typeName={t(data.multisigTxType || 'Unknown')}
-      />
-      {
-        // TODO: Re-define MultisigTxType and ExtrinsicType to use a unified type
-      }
-      <HistoryMultisigHeader data={data} />
-
-      <MetaInfo.Status
-        label={t('Status')}
-        statusIcon={HistoryStatusMap[ExtrinsicStatus.PROCESSING].icon}
-        statusName={t(HistoryStatusMap[ExtrinsicStatus.PROCESSING].name)}
-        valueColorSchema={HistoryStatusMap[ExtrinsicStatus.PROCESSING].schema}
-      />
-
-      <MetaInfo.Default
-        label={t('Extrinsic hash')}
+    <div className={CN(className)}>
+      <MetaInfo
+        className={'meta-info-area'}
+        hasBackgroundWrapper
       >
-        {extrinsicHash}
-      </MetaInfo.Default>
-
-      {data.callData && (
-        <MetaInfo.Default
-          label={t('Call data')}
-        >
-          {callData}
-        </MetaInfo.Default>
-      )}
-
-      {!!data.timestamp && (
-        <MetaInfo.Default label={t('Submitted time')}>
-          {formatHistoryDate(data.timestamp, language, 'detail')}
-        </MetaInfo.Default>
-      )}
-
-      {/* Multisig Deposit */}
-      {data.depositAmount && (
-        <MetaInfo.Number
-          decimals={chainInfo?.substrateInfo?.decimals || 0}
-          label={t('Multisig deposit')}
-          suffix={chainInfo?.substrateInfo?.symbol || ''}
-          value={data.depositAmount}
+        <MetaInfo.DisplayType
+          label={t('Type')}
+          typeName={t(data.multisigTxType || 'Unknown')}
         />
-      )}
+        <HistoryMultisigHeader data={data} />
 
-      <Divider className='history-multisig-divider' />
+        <MetaInfo.Status
+          label={t('Status')}
+          statusIcon={HistoryStatusMap[ExtrinsicStatus.PROCESSING].icon}
+          statusName={t(HistoryStatusMap[ExtrinsicStatus.PROCESSING].name)}
+          valueColorSchema={HistoryStatusMap[ExtrinsicStatus.PROCESSING].schema}
+        />
+
+        <MetaInfo.Default
+          label={t('Extrinsic hash')}
+        >
+          {extrinsicHash}
+        </MetaInfo.Default>
+
+        {data.callData && (
+          <MetaInfo.Default
+            label={t('Call data')}
+          >
+            {callData}
+          </MetaInfo.Default>
+        )}
+
+        {!!data.timestamp && (
+          <MetaInfo.Default label={t('Submitted time')}>
+            {formatHistoryDate(data.timestamp, language, 'detail')}
+          </MetaInfo.Default>
+        )}
+
+        {/* Multisig Deposit */}
+        {data.depositAmount && (
+          <MetaInfo.Number
+            decimals={chainInfo?.substrateInfo?.decimals || 0}
+            label={t('Multisig deposit')}
+            suffix={chainInfo?.substrateInfo?.symbol || ''}
+            value={data.depositAmount}
+          />
+        )}
+      </MetaInfo>
 
       {/* Signatories Section */}
       <div className='signatories-container'>
-        <div className='signatories-title'>{t('Signatories')}</div>
+        <div className='signatories-label'>
+          <div className={'signatories-label-left'}>
+            {t('Signatories')}
+          </div>
+          <div className={'signatories-label-right'}>
+            {t(`Approval threshold: ${data.approvals.length}/${data.threshold}`)}
+          </div>
+        </div>
         <div className='signatory-item-container'>
           {sortedSigners.map((signer) => {
             const isApproved = data.approvals.includes(signer);
@@ -198,23 +203,31 @@ const Component: React.FC<Props> = (props: Props) => {
           })}
         </div>
       </div>
-    </MetaInfo>
+    </div>
   );
 };
 
 const HistoryMultisigLayout = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-    '.history-multisig-divider': {
-      margin: `${token.marginSM}px 0`,
-      borderColor: token.colorWhite,
-      opacity: 0.1
-    },
-    '.signatories-title': {
+    '.signatories-label': {
+      display: 'flex',
+      justifyContent: 'space-between',
       fontSize: token.fontSize,
       lineHeight: token.lineHeight,
-      fontWeight: token.fontWeightStrong,
-      color: token.colorTextLight2,
       marginBottom: token.marginXS
+    },
+    '.signatories-label-left': {
+      fontWeight: token.fontWeightStrong,
+      color: token.colorTextLight2
+    },
+
+    '.signatories-label-right': {
+      fontWeight: token.bodyFontWeight,
+      color: token.colorTextDescription
+    },
+
+    '.meta-info-area': {
+      marginBottom: token.margin
     },
 
     '.signatory-account-wrapper': {

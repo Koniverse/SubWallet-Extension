@@ -56,6 +56,7 @@ import { GovVoteRequest, RemoveVoteRequest, UnlockVoteRequest } from '@subwallet
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
+import { createInitSubstrateProxyExtrinsic } from '@subwallet/extension-base/services/substrate-proxy-service';
 import { SWDutchTransaction, SWPermitTransaction, SWTransaction, SWTransactionBase, SWTransactionInput, SWTransactionResponse, SWTransactionResult, TransactionEmitter, TransactionEventResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { isProposalExpired, isSupportWalletConnectChain, isSupportWalletConnectNamespace } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { ResultApproveWalletConnectSession, WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
@@ -66,9 +67,9 @@ import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/e
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, InitMultisigTxRequest, RequestGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
 import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
-import { RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types/substrateProxyAccount';
+import { HandleSubstrateProxyWrappedTxRequest, RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types/substrateProxyAccount';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
-import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
+import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountJsonByAddress, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { MetadataDef } from '@subwallet/extension-inject/types';
@@ -3195,7 +3196,7 @@ export default class KoniExtension {
 
   // Multisig handlers
   private async approvePendingTx (inputData: ApprovePendingTxRequest): Promise<boolean> {
-    const { address, callHash, chain, maxWeight, multisigMetadata, timepoint } = inputData;
+    const { address, callHash, chain, multisigMetadata, timepoint } = inputData;
 
     if (!address || !chain || !multisigMetadata || !callHash || !timepoint) {
       return false;
@@ -3238,9 +3239,9 @@ export default class KoniExtension {
   }
 
   private async executePendingTx (inputData: ExecutePendingTxRequest): Promise<boolean> {
-    const { address, call, chain, multisigMetadata, timepoint } = inputData;
+    const { address, call, chain, decodedCallData, multisigMetadata, timepoint } = inputData;
 
-    if (!address || !chain || !multisigMetadata || !timepoint || !call) {
+    if (!address || !chain || !multisigMetadata || !timepoint || !call || !decodedCallData) {
       return false;
     }
 
@@ -3253,7 +3254,9 @@ export default class KoniExtension {
       }
 
       const otherSignatories = multisigMetadata.signers.filter((s) => !isSameAddress(s, address));
-      const { weight } = await extrinsic.paymentInfo(otherSignatories[0]); // estimate max weight for execute multisig tx
+      const originalCall = api.createType('Call', call);
+      const originalExtrinsic = api.tx(originalCall);
+      const { weight } = await originalExtrinsic.paymentInfo(otherSignatories[0]); // estimate max weight for execute multisig tx
 
       const extrinsic = api.tx.multisig.asMulti(
         multisigMetadata.threshold,
@@ -3326,9 +3329,9 @@ export default class KoniExtension {
   // Multisig Account
   private async initMultisigTx (request: InitMultisigTxRequest): Promise<SWTransactionResponse> {
     const { chain, multisigMetadata: { signers, threshold }, signer, transactionId } = request;
-
     const substrateApi = await this.#koniState.chainService.getSubstrateApi(chain).isReady;
-    const callData = this.#koniState.transactionService.getTransaction(transactionId)?.transaction as SubmittableExtrinsic<'promise'>;
+    const originTransaction = this.#koniState.transactionService.getTransaction(transactionId);
+    const callData = originTransaction?.transaction as SubmittableExtrinsic<'promise'>;
     const multisigCallData = createInitMultisigExtrinsic(substrateApi.api, threshold, signers, signer, callData);
 
     const decodedCallData = decodeCallData({
@@ -3353,20 +3356,44 @@ export default class KoniExtension {
       if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) { // todo: check and return better error for the case set token fee on hydration
         const setTokenPayFee = await substrateApi.api.query.multiTransactionPayment?.accountCurrencyMap(signer);
 
-        setTokenPayFee.toPrimitive() && inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
+        setTokenPayFee.toPrimitive() && inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee')));
       }
 
       if (BigInt(signerBalance.value) < BigInt(depositAmount) + BigInt(networkFee)) {
-        inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
+        inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee'))); // not enough balance for deposit and fee
       }
     };
 
-    return await this.#koniState.transactionService.handleTransactionAfterConfirmation({
+    const eventsHandler = (eventEmitter: TransactionEmitter) => {
+      if (originTransaction?.emitterTransaction) {
+        const originEmitter = originTransaction.emitterTransaction;
+
+        eventEmitter.on('signed', (data: TransactionEventResponse) => {
+          originEmitter.emit('signed', data);
+        });
+
+        eventEmitter.on('error', (data: TransactionEventResponse) => {
+          if (data.errors.length > 0) {
+            originEmitter.emit('error', data);
+          }
+        });
+
+        eventEmitter.on('timeout', (data: TransactionEventResponse) => {
+          if (data.errors.find((error) => error.errorType === BasicTxErrorType.TIMEOUT) && data.errors.length > 0) {
+            originEmitter.emit('timeout', data);
+          }
+        });
+      }
+    };
+
+    return await this.#koniState.transactionService.handleWrappedTransaction({
       address: signer,
       chain,
       chainType: ChainType.SUBSTRATE,
       extrinsicType: ExtrinsicType.MULTISIG_INIT_TX,
       transaction: multisigCallData,
+      skipFeeValidation: true,
+      skipFeeRecalculation: true,
       data: {
         // input
         ...request,
@@ -3378,7 +3405,95 @@ export default class KoniExtension {
         depositAmount,
         networkFee
       },
-      additionalValidator
+      wrappingStatus: 'WRAPPED',
+      additionalValidator,
+      eventsHandler
+    });
+  }
+
+  // Substrate Proxy Account
+  private async handleSubstrateProxyWrappedTx (request: HandleSubstrateProxyWrappedTxRequest): Promise<SWTransactionResponse> {
+    const { chain, proxyMetadata, signer, transactionId } = request;
+    const { proxiedAddress } = proxyMetadata;
+
+    const substrateApi = await this.#koniState.chainService.getSubstrateApi(chain).isReady;
+    const originTransaction = this.#koniState.transactionService.getTransaction(transactionId);
+    const callData = originTransaction?.transaction as SubmittableExtrinsic<'promise'>;
+
+    // if signer is proxied address, we do not need to create substrate proxy tx
+    const isSignerProxiedAccount = isSameAddress(signer, proxiedAddress);
+
+    const substrateProxyCallData = isSignerProxiedAccount ? callData : createInitSubstrateProxyExtrinsic(substrateApi.api, proxiedAddress, callData);
+
+    const networkFee = (await substrateProxyCallData.paymentInfo(signer)).partialFee.toString();
+
+    const additionalValidator = async (inputTransaction: SWTransactionResponse): Promise<void> => {
+      const signerBalance = await this.getAddressTransferableBalance({
+        address: signer,
+        networkKey: chain,
+        token: this.#koniState.chainService.getNativeTokenInfo(chain).slug,
+        extrinsicType: ExtrinsicType.TRANSFER_TOKEN
+      });
+
+      if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) { // todo: check and return better error for the case set token fee on hydration
+        const setTokenPayFee = await substrateApi.api.query.multiTransactionPayment?.accountCurrencyMap(signer);
+        const account = getAccountJsonByAddress(signer);
+        const accountName = account?.name;
+
+        setTokenPayFee.toPrimitive() && inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.koni.handler.Extension.proxyAccountNotEnoughBalance', { replace: { accountName: accountName } })));
+      }
+
+      if (BigInt(signerBalance.value) < BigInt(networkFee)) {
+        const account = getAccountJsonByAddress(signer);
+        const accountName = account?.name;
+
+        inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.koni.handler.Extension.proxyAccountNotEnoughBalance', { replace: { accountName: accountName } })));
+      }
+    };
+
+    const eventsHandler = (eventEmitter: TransactionEmitter) => {
+      if (originTransaction?.emitterTransaction) {
+        const originEmitter = originTransaction.emitterTransaction;
+
+        eventEmitter.on('signed', (data: TransactionEventResponse) => {
+          originEmitter.emit('signed', data);
+        });
+
+        eventEmitter.on('error', (data: TransactionEventResponse) => {
+          if (data.errors.length > 0) {
+            originEmitter.emit('error', data);
+          }
+        });
+
+        eventEmitter.on('timeout', (data: TransactionEventResponse) => {
+          if (data.errors.find((error) => error.errorType === BasicTxErrorType.TIMEOUT) && data.errors.length > 0) {
+            originEmitter.emit('timeout', data);
+          }
+        });
+      }
+    };
+
+    return await this.#koniState.transactionService.handleWrappedTransaction({
+      address: signer,
+      chain,
+      chainType: ChainType.SUBSTRATE,
+      extrinsicType: originTransaction.extrinsicType,
+      transaction: proxyMetadata,
+      skipFeeValidation: !isSignerProxiedAccount,
+      skipFeeRecalculation: !isSignerProxiedAccount,
+      transferNativeAmount: originTransaction.transferNativeAmount,
+      data: {
+        // input
+        ...request,
+
+        // output
+        submittedCallData: substrateProxyCallData.toHex(),
+        callData: callData.toHex(),
+        networkFee
+      },
+      wrappingStatus: 'WRAPPED',
+      additionalValidator,
+      eventsHandler
     });
   }
 
@@ -6320,7 +6435,8 @@ export default class KoniExtension {
         return this.handleAddSubstrateProxyAccount(request as RequestAddSubstrateProxyAccount);
       case 'pri(substrateProxyAccount.remove)':
         return this.handleRemoveSubstrateProxyAccount(request as RequestRemoveSubstrateProxyAccount);
-
+      case 'pri(substrateProxyAccount.handleProxyWrappedTx)':
+        return this.handleSubstrateProxyWrappedTx(request as HandleSubstrateProxyWrappedTxRequest);
       // Default
       default:
         throw new Error(`Unable to handle message of type ${type}`);

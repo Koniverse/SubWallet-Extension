@@ -12,7 +12,7 @@ import { AlertModal, EmptyList, PageWrapper } from '@subwallet/extension-koni-ui
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import NotificationDetailModal from '@subwallet/extension-koni-ui/components/Modal/NotificationDetailModal';
 import Search from '@subwallet/extension-koni-ui/components/Search';
-import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, NOTIFICATION_DETAIL_MODAL, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, NOTI_MULTISIG_PENDINGTX_ID, NOTIFICATION_DETAIL_MODAL, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useAlert, useDefaultNavigate, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -27,7 +27,7 @@ import { ActivityIndicator, Button, Icon, ModalContext, SwList, SwSubHeader } fr
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowsLeftRight, ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, Database, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, XCircle } from 'phosphor-react';
+import { ArrowsLeftRight, ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, Database, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, UserSwitch, XCircle } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -51,7 +51,7 @@ export enum NotificationIconBackgroundColorMap {
   CLAIM_POLYGON_BRIDGE = 'yellow-7',
   SWAP = 'blue-8',
   EARNING = 'blue-8',
-  MULTISIG_APPROVAL = 'green-6'
+  MULTISIG_APPROVAL = 'geekblue-9'
 }
 
 export const NotificationIconMap = {
@@ -64,7 +64,7 @@ export const NotificationIconMap = {
   CLAIM_POLYGON_BRIDGE: Coins,
   SWAP: ArrowsLeftRight,
   EARNING: Database,
-  MULTISIG_APPROVAL: Database // todo: update this
+  MULTISIG_APPROVAL: UserSwitch
 };
 
 const alertModalId = 'notification-alert-modal';
@@ -86,6 +86,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
   const [, setWithdrawStorage] = useLocalStorage(WITHDRAW_TRANSACTION, DEFAULT_WITHDRAW_PARAMS);
   const [, setClaimAvailBridgeStorage] = useLocalStorage(CLAIM_BRIDGE_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS);
+  const [, setNotiMultisigPendingTxStorage] = useLocalStorage(NOTI_MULTISIG_PENDINGTX_ID, '');
 
   const { notificationSetup } = useSelector((state: RootState) => state.settings);
   const { accounts, currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
@@ -123,18 +124,28 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
   // use this to trigger get date when click read/unread
   const [currentTimestampMs, setCurrentTimestampMs] = useState(Date.now());
-
   const enableNotification = notificationSetup.isEnabled;
   const isNotificationDetailModalVisible = checkActive(NOTIFICATION_DETAIL_MODAL);
 
   const notificationItems = useMemo((): NotificationInfoItem[] => {
     const filterTabFunction = (item: NotificationInfoItem) => {
-      if (selectedFilterTab === NotificationTab.ALL || selectedFilterTab === NotificationTab.MULTISIG) {
-        return true;
-      } else if (selectedFilterTab === NotificationTab.UNREAD) {
-        return !item.isRead;
-      } else {
-        return item.isRead;
+      const isMultisigAction = item.actionType === NotificationActionType.MULTISIG_APPROVAL;
+
+      switch (selectedFilterTab) {
+        case NotificationTab.MULTISIG:
+          return isMultisigAction;
+
+        case NotificationTab.ALL:
+          return !isMultisigAction;
+
+        case NotificationTab.UNREAD:
+          return !item.isRead && !isMultisigAction;
+
+        case NotificationTab.READ:
+          return item.isRead && !isMultisigAction;
+
+        default:
+          return true;
       }
     };
 
@@ -444,6 +455,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
           break;
         }
+
+        case NotificationActionType.MULTISIG_APPROVAL: {
+          setNotiMultisigPendingTxStorage(item.id);
+          switchReadNotificationStatus(switchStatusParams).then(() => {
+            navigate('/home/history');
+          }).catch(console.error);
+
+          break;
+        }
       }
 
       if (!item.isRead) {
@@ -454,7 +474,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           });
       }
     };
-  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, allowedChains, excludedTokens, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, setClaimAvailBridgeStorage, openTransactionProcessModal, isTrigger]);
+  }, [accounts, allowedChains, chainStateMap, currentAccountProxy, currentTimestampMs, earningRewards, excludedTokens, isAllAccount, isTrigger, navigate, openTransactionProcessModal, poolInfoMap, setClaimAvailBridgeStorage, setClaimRewardStorage, setNotiMultisigPendingTxStorage, setWithdrawStorage, showActiveChainModal, showWarningModal, yieldPositions]);
 
   const renderItem = useCallback((item: NotificationInfoItem) => {
     return (
@@ -587,17 +607,17 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           onSelect={onSelectFilterTab}
           selectedItem={selectedFilterTab}
         />
-        {selectedFilterTab === NotificationTab.UNREAD && <Button
+        {(selectedFilterTab === NotificationTab.UNREAD || selectedFilterTab === NotificationTab.ALL) && <Button
+          className={'mark-read-btn'}
           icon={(
             <Icon
               phosphorIcon={Checks}
               weight={'fill'}
             />
           )}
-          // TODO: This is for development. It will be removed when done.
-          className={'mark-read-btn'}
           onClick={handleSwitchClick}
           size='xs'
+          tooltip={t('ui.SETTINGS.screen.Setting.Notifications.markAllAsRead')}
           type='ghost'
         />}
       </div>

@@ -26,16 +26,6 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const [loading, setLoading] = useState(false);
 
-  const otherSignatories = useMemo(() => {
-    if (!data?.signerAddresses || !data?.currentSigner) {
-      return [];
-    }
-
-    return data?.signerAddresses.filter(
-      (signer) => reformatAddress(signer) !== reformatAddress(data.currentSigner)
-    );
-  }, [data?.signerAddresses, data?.currentSigner]);
-
   const handleAction = useCallback(async (action: () => Promise<boolean | undefined>) => {
     try {
       setLoading(true);
@@ -55,53 +45,61 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
     return cancelPendingTx({
       address: data?.currentSigner,
       chain: data?.chain,
-      threshold: data.threshold,
-      otherSignatories: otherSignatories,
+      multisigMetadata: {
+        multisigAddress: data.multisigAddress,
+        threshold: data.threshold,
+        signers: data?.signerAddresses || []
+      },
       timepoint: {
         height: data?.blockHeight,
         index: data?.extrinsicIndex
       },
+      type: data?.multisigTxType,
+      decodedCallData: data.decodedCallData,
       callHash: data?.callHash
     });
-  }, [data?.blockHeight, data?.callHash, data?.chain, data?.currentSigner, data?.extrinsicIndex, data.threshold, otherSignatories]);
+  }, [data]);
 
   const onApprove = useCallback(() => {
     return approvePendingTx({
       address: data?.currentSigner,
       chain: data?.chain,
-      threshold: data.threshold,
-      otherSignatories: otherSignatories,
+      multisigMetadata: {
+        multisigAddress: data.multisigAddress,
+        threshold: data.threshold,
+        signers: data?.signerAddresses || []
+      },
       // todo: Why is the returned data marked as optional, but when it’s passed down it becomes required?
       // Should we recheck the callData interface?
+      decodedCallData: data.decodedCallData,
       callHash: data?.callHash || '',
       timepoint: {
         height: data?.blockHeight,
         index: data?.extrinsicIndex
       },
-      maxWeight: {
-        refTime: 0,
-        proofSize: 0
-      }
+      type: data?.multisigTxType
     });
-  }, [data?.blockHeight, data?.callHash, data?.chain, data?.currentSigner, data?.extrinsicIndex, data.threshold, otherSignatories]);
+  }, [data]);
 
   const onExecute = useCallback(() => {
     return executePendingTx({
       address: data?.currentSigner,
       chain: data?.chain,
-      threshold: data.threshold,
-      otherSignatories: otherSignatories,
+      multisigMetadata: {
+        multisigAddress: data.multisigAddress,
+        threshold: data.threshold,
+        signers: data?.signerAddresses || []
+      },
       timepoint: {
         height: data?.blockHeight,
         index: data?.extrinsicIndex
       },
+      decodedCallData: data.decodedCallData,
+      callHash: data?.callHash || '',
       call: data?.callData || '',
-      maxWeight: {
-        refTime: 0,
-        proofSize: 0
-      }
+      type: data?.multisigTxType
     });
-  }, [data?.blockHeight, data?.callData, data?.chain, data?.currentSigner, data?.extrinsicIndex, data.threshold, otherSignatories]);
+  }, [data]);
 
   const _onReject = useCallback(() => {
     handleAction(onReject).catch(console.error);
@@ -249,7 +247,8 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
 export const MultisigHistoryInfoModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     '.ant-sw-modal-body': {
-      marginBottom: 0
+      marginBottom: 0,
+      paddingBottom: 0
     },
 
     '.ant-sw-modal-footer': {

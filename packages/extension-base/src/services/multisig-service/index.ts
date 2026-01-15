@@ -116,7 +116,7 @@ export enum MultisigTxType {
   /** Lending extrinsic */
   LENDING = 'Lending',
   /** Set token pay fee extrinsic */
-  SET_TOKEM_PAY_FEE = 'SetTokenPayFee',
+  SET_TOKEN_PAY_FEE = 'SetTokenPayFee',
   /** Governance extrinsic */
   GOV = 'Governance',
   /** Swap extrinsic */
@@ -360,6 +360,8 @@ export class MultisigService implements StoppableServiceInterface {
           const threshold = account.accounts[0].threshold as number;
 
           const unsub = this.subscribePendingMultisigTxs(chain, reformatMultisigAddress, reformatSigners, threshold, (rs) => {
+            multisigServiceLogger.debug('rawPendingMultisigTxs', rs);
+
             !cancel && this.updatePendingMultisigTxSubjectByChain(reformatMultisigAddress, chain, rs);
           });
 
@@ -424,8 +426,6 @@ export class MultisigService implements StoppableServiceInterface {
 
         await Promise.all(pendingMultisigEntries.map(async (_pendingMultisigInfo, index) => {
           const pendingMultisigInfo = _pendingMultisigInfo as unknown as PalletMultisigMultisig;
-
-          console.log('pendingMultisigInfo', pendingMultisigInfo);
 
           if (!pendingMultisigInfo) {
             return;
@@ -569,7 +569,7 @@ export class MultisigService implements StoppableServiceInterface {
           continue;
         }
 
-        const reformatSignerAddress = _reformatAddressWithChain(signerAddress, this.chainService.getChainInfoByKey(chain))
+        const reformatSignerAddress = _reformatAddressWithChain(signerAddress, this.chainService.getChainInfoByKey(chain));
 
         const key = genPendingMultisigTxKey(chain, multisigAddress, reformatSignerAddress, extrinsicHash);
         const pendingTx: PendingMultisigTx = { ...rawTx, currentSigner: reformatSignerAddress, id: key };
@@ -633,7 +633,6 @@ export class MultisigService implements StoppableServiceInterface {
       };
     });
 
-    multisigServiceLogger.debug('pendingTxs', pendingTxs);
     multisigServiceLogger.debug('notifications', notifications);
 
     // Group notifications by address to batch write

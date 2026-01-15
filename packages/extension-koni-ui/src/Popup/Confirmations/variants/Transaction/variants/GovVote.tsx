@@ -170,7 +170,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           {shortAddress}
         </MetaInfo.Default>
 
-        {!transaction.isWrappedTx && <MetaInfo.Number
+        {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.GovVote.networkFee')}
           suffix={symbol}

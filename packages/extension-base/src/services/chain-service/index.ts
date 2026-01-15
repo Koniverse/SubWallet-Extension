@@ -1722,6 +1722,7 @@ export class ChainService {
         hasNativeNft: false,
         supportStaking: params.chainSpec.paraId === null,
         supportProxy: false,
+        supportMultisig: false,
         supportSmartContract: null
       };
     } else if (params.chainSpec.evmChainId !== null) {

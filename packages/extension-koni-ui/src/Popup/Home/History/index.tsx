@@ -9,9 +9,10 @@ import { AccountChainType } from '@subwallet/extension-base/types';
 import { quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { MultisigHistoryItem } from '@subwallet/extension-koni-ui/components/History/MultisigHistoryItem';
-import { DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, MULTISIG_HISTORY_INFO_MODAL, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, MULTISIG_HISTORY_INFO_MODAL, NOTI_MULTISIG_PENDINGTX_ID, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
+import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/extension-koni-ui/messaging';
 import { MultisigHistoryInfoModal } from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/MultisigHistoryInfoModal';
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
@@ -236,6 +237,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [loading, setLoading] = useState<boolean>(true);
   const [rawHistoryList, setRawHistoryList] = useState<TransactionHistoryItem[]>([]);
   const isActive = checkActive(modalId);
+  const [notiMultisigPendingTxId, setNotiMultisigPendingTxId] = useLocalStorage(NOTI_MULTISIG_PENDINGTX_ID, '');
 
   const defaultValues = useMemo((): FormState => ({
     view: ViewValue.TRANSACTION
@@ -282,6 +284,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       return isTargetMultisig || isSigner;
     });
   }, [pendingMultisigTxs, isAllAccount, currentSubstrateAddress]);
+
+  const notiMultisigPendingTxItem = useMemo(() => {
+    const parts = notiMultisigPendingTxId.split('___');
+    const multisigKey = parts.slice(1, -1).join('___');
+
+    return multisigList.find((item) => item.id === multisigKey);
+  }, [multisigList, notiMultisigPendingTxId]);
 
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
@@ -411,9 +420,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.GOV_UNVOTE]: t('ui.HISTORY.screen.History.unvote'),
     [ExtrinsicType.GOV_UNLOCK_VOTE]: t('ui.HISTORY.screen.History.unlockVotes'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknown'),
-    [ExtrinsicType.MULTISIG_APPROVE_TX]: t('Multisig approve unstake'),
-    [ExtrinsicType.MULTISIG_CANCEL_TX]: t('Multisig cancel unstake'),
-    [ExtrinsicType.MULTISIG_EXECUTE_TX]: t('Multisig execute unstake'),
+    [ExtrinsicType.MULTISIG_APPROVE_TX]: t('ui.HISTORY.screen.History.multisigApprove'),
+    [ExtrinsicType.MULTISIG_CANCEL_TX]: t('ui.HISTORY.screen.History.multisigCancel'),
+    [ExtrinsicType.MULTISIG_EXECUTE_TX]: t('ui.HISTORY.screen.History.multisigExecute'),
+    [ExtrinsicType.MULTISIG_INIT_TX]: t('ui.HISTORY.screen.History.multisigInit'),
     [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: t('ui.HISTORY.screen.History.addSubstrateProxy'),
     [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: t('ui.HISTORY.screen.History.removeSubstrateProxy'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknown')
@@ -466,9 +476,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.GOV_UNVOTE]: t('ui.HISTORY.screen.History.unvoteTransaction'),
     [ExtrinsicType.GOV_UNLOCK_VOTE]: t('ui.HISTORY.screen.History.unlockVotesTransaction'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknownTransaction'),
-    [ExtrinsicType.MULTISIG_APPROVE_TX]: t('Multisig approve unstake'),
-    [ExtrinsicType.MULTISIG_CANCEL_TX]: t('Multisig cancel unstake'),
-    [ExtrinsicType.MULTISIG_EXECUTE_TX]: t('Multisig execute unstake'),
+    [ExtrinsicType.MULTISIG_APPROVE_TX]: t('ui.HISTORY.screen.History.multisigApprove'),
+    [ExtrinsicType.MULTISIG_CANCEL_TX]: t('ui.HISTORY.screen.History.multisigCancel'),
+    [ExtrinsicType.MULTISIG_EXECUTE_TX]: t('ui.HISTORY.screen.History.multisigExecute'),
+    [ExtrinsicType.MULTISIG_INIT_TX]: t('ui.HISTORY.screen.History.multisigInit'),
     [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: t('ui.HISTORY.screen.History.addSubstrateProxyTransaction'),
     [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: t('ui.HISTORY.screen.History.removeSubstrateProxyTransaction'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknownTransaction')
@@ -581,6 +592,16 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       }
     }
   }, [activeModal, chain, extrinsicHashOrId, openDetailLink, historyMap, inactiveModal]);
+
+  useEffect(() => {
+    if (!notiMultisigPendingTxItem) {
+      return;
+    }
+
+    setSelectedMultisigItem(notiMultisigPendingTxItem);
+    activeModal(MULTISIG_HISTORY_INFO_MODAL);
+    setNotiMultisigPendingTxId('');
+  }, [activeModal, notiMultisigPendingTxItem, setNotiMultisigPendingTxId]);
 
   useEffect(() => {
     if (isActive) {

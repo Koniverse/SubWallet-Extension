@@ -61,7 +61,7 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         </MetaInfo.Default>
 
-        {!transaction.isWrappedTx && <MetaInfo.Number
+        {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.networkFee')}
           suffix={symbol}

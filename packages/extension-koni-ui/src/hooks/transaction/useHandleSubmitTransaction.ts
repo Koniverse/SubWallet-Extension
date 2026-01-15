@@ -16,7 +16,7 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
   const notify = useNotification();
   const { t } = useTranslation();
 
-  const { closeAlert, onDone, openAlert, openRecheckChainConnectionModal, selectSignableAccountProxyToSign } = useTransactionContext<ClaimRewardParams>();
+  const { closeAlert, onDone, openAlert, openRecheckChainConnectionModal } = useTransactionContext<ClaimRewardParams>();
 
   const onSuccess = useCallback((rs: SWTransactionResponse) => {
     const { errors, estimateFee, id, warnings } = rs;
@@ -82,9 +82,8 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
 
   return useMemo(() => ({
     onSuccess,
-    onError,
-    selectSignableAccountProxyToSign
-  }), [onError, onSuccess, selectSignableAccountProxyToSign]);
+    onError
+  }), [onError, onSuccess]);
 };
 
 export default useHandleSubmitTransaction;

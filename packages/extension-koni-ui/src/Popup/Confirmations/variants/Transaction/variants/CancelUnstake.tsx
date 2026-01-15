@@ -40,7 +40,7 @@ const Component: React.FC<Props> = (props: Props) => {
           value={data.selectedUnstaking.claimable}
         />
 
-        {!transaction.isWrappedTx && <MetaInfo.Number
+        {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.CancelUnstake.cancelUnstakeFee')}
           suffix={symbol}
