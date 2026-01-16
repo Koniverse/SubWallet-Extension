@@ -2040,7 +2040,7 @@ export interface Notification {
 export type NotificationParams = Omit<Notification, 'id'>;
 
 export interface CronReloadRequest {
-  data: 'nft' | 'staking' | 'balance' | 'crowdloan'
+  data: 'nft' | 'staking' | 'balance'
 }
 
 export interface AllLogoMap {
