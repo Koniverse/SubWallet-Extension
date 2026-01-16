@@ -55,7 +55,7 @@ export default class TransactionService {
 
   private readonly transactionSubject: BehaviorSubject<Record<string, SWTransactionBase>> = new BehaviorSubject<Record<string, SWTransactionBase>>({});
   private readonly aliveProcessSubject: BehaviorSubject<Map<string, ProcessTransactionData>> = new BehaviorSubject<Map<string, ProcessTransactionData>>(this.aliveProcessMap);
-
+  private previousWrappedTxId: Record<string, string> = {};
   private cacheProcessInfo: Record<string, Record<string, string>> = {};
 
   private get transactions (): Record<string, SWTransactionBase> {
@@ -298,20 +298,6 @@ export default class TransactionService {
     } as SWDutchTransaction;
   }
 
-  public async addWrappedTransaction (inputTransaction: SWTransactionInput): Promise<[TransactionEmitter, SWTransaction]> {
-    const transactions = this.transactions;
-    // Fill transaction default info
-    const transaction = this.fillTransactionDefaultInfo(inputTransaction);
-
-    // Add Transaction
-    transactions[transaction.id] = transaction;
-    this.transactionSubject.next({ ...transactions });
-
-    const emitter = await this.sendTransaction(transaction);
-
-    return [emitter, transaction];
-  }
-
   public async addTransaction (inputTransaction: SWTransactionInput): Promise<TransactionEmitter> {
     const transactions = this.transactions;
     // Fill transaction default info
@@ -319,6 +305,13 @@ export default class TransactionService {
 
     // Add Transaction
     transactions[transaction.id] = transaction;
+
+    if (transaction.wrappingStatus === 'WRAPPED') {
+      const data = transaction.data as InitMultisigTxRequest;
+
+      this.previousWrappedTxId[data.transactionId] = transaction.id;
+    }
+
     this.transactionSubject.next({ ...transactions });
 
     return await this.sendTransaction(transaction);
@@ -365,17 +358,14 @@ export default class TransactionService {
     }
 
     validatedTransaction.warnings = [];
-
-    // Todo: refactor this later
-    const [emitter, transactionAdded] = await this.addWrappedTransaction(validatedTransaction);
-    const transactionData = transactionAdded.data as InitMultisigTxRequest;
-
-    if (!validatedTransaction.id) {
-      validatedTransaction.id = transactionAdded.id;
-    }
+    const transactionData = validatedTransaction.data as InitMultisigTxRequest;
 
     // Delete previous select signer transaction
-    transactionData.previousWrappedTxId && this.removeTransaction(transactionData.previousWrappedTxId);
+    this.previousWrappedTxId[transactionData.transactionId] && this.removeTransaction(this.previousWrappedTxId[transactionData.transactionId]);
+
+    // Todo: refactor this later
+    const emitter = await this.addTransaction(validatedTransaction);
+
     emitter && new Promise<void>((resolve, reject) => {
       // TODO
       if (transaction.resolveOnDone) {
@@ -876,6 +866,10 @@ export default class TransactionService {
     if (this.transactions[id]) {
       delete this.transactions[id];
       this.transactionSubject.next({ ...this.transactions });
+    }
+
+    if (this.previousWrappedTxId[id]) {
+      delete this.previousWrappedTxId[id];
     }
   }
 

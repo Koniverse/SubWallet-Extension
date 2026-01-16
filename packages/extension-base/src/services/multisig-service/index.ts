@@ -201,6 +201,9 @@ export class MultisigService implements StoppableServiceInterface {
 
       this.stopPromiseHandler = createPromiseHandler();
       this.status = ServiceStatus.STARTED;
+
+      this.eventService.emit('multisig-service.ready', true);
+
       this.startPromiseHandler.resolve();
     } catch (error) {
       this.status = ServiceStatus.NOT_INITIALIZED;
@@ -360,7 +363,7 @@ export class MultisigService implements StoppableServiceInterface {
           const threshold = account.accounts[0].threshold as number;
 
           const unsub = this.subscribePendingMultisigTxs(chain, reformatMultisigAddress, reformatSigners, threshold, (rs) => {
-            multisigServiceLogger.debug('rawPendingMultisigTxs', rs);
+            multisigServiceLogger.debug(`pending multisig txs of address ${reformatMultisigAddress}`, rs);
 
             !cancel && this.updatePendingMultisigTxSubjectByChain(reformatMultisigAddress, chain, rs);
           });

@@ -15,7 +15,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ConfirmationQueueItem } from '@subwallet/extension-koni-ui/stores/base/RequestState';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import CN from 'classnames';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -134,6 +134,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const checkIsPolkadotUnifiedChain = useIsPolkadotUnifiedChain();
 
   const network = useMemo(() => chainInfoMap[transaction.chain], [chainInfoMap, transaction.chain]);
+  const [isDisabledSubstrateApprove, setIsDisabledSubstrateApprove] = useState(!!transaction.wrappingStatus);
 
   const renderContent = useCallback((transaction: SWTransactionResult): React.ReactNode => {
     const { extrinsicType, process } = transaction;
@@ -197,6 +198,7 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         {renderContent(transaction)}
         {!!transaction.wrappingStatus && <WrappedTransactionInfoArea
+          setDisable={setIsDisabledSubstrateApprove}
           transaction={transaction}
         />}
         {isAddressFormatInfoBoxVisible && (
@@ -217,10 +219,12 @@ const Component: React.FC<Props> = (props: Props) => {
       {
         type === 'signingRequest' && (
           <SubstrateSignArea
+            disableApproval={isDisabledSubstrateApprove}
             extrinsicType={transaction.extrinsicType}
             id={item.id}
             isInternal={item.isInternal}
             request={(item as SigningRequest).request}
+            transaction={transaction}
             txExpirationTime={txExpirationTime}
           />
         )
