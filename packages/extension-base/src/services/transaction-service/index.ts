@@ -362,8 +362,6 @@ export default class TransactionService {
     // Delete previous select signer transaction
     this.previousWrappedTxId[transactionData.transactionId] && this.removeTransaction(this.previousWrappedTxId[transactionData.transactionId]);
 
-    console.log(validatedTransaction);
-
     // Todo: refactor this later
     const emitter = await this.addTransaction(validatedTransaction);
 
@@ -1353,6 +1351,11 @@ export default class TransactionService {
 
         break;
       }
+
+      case ExtrinsicType.SUBSTRATE_PROXY_INIT_TX: // todo
+        historyItem.additionalInfo = parseTransactionData<ExtrinsicType.SUBSTRATE_PROXY_INIT_TX>(transaction.data);
+
+        break;
 
       case ExtrinsicType.UNKNOWN:
         break;

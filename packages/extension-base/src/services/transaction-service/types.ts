@@ -69,7 +69,7 @@ export interface SWTransactionEmitter {
 type SwInputBase = Pick<SWTransactionBase, 'address' | 'url' | 'data' | 'extrinsicType' | 'chain' | 'chainType' | 'ignoreWarnings' | 'transferNativeAmount'>
 & Partial<Pick<SWTransactionBase, 'additionalValidator' | 'eventsHandler'>>;
 
-export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransactionBase, 'estimateFee' | 'signAfterCreate' | 'isPassConfirmation' | 'step' | 'errorOnTimeOut' | 'xcmFeeDryRun' | 'wrappingStatus'>>, TransactionFee {
+export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransactionBase, 'estimateFee' | 'signAfterCreate' | 'isPassConfirmation' | 'step' | 'errorOnTimeOut' | 'xcmFeeDryRun' | 'wrappingStatus' | 'origin'>>, TransactionFee {
   id?: string;
   transaction?: SWTransactionBase['transaction'] | null;
   warnings?: SWTransactionBase['warnings'];

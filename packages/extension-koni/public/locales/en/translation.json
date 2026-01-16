@@ -2627,5 +2627,8 @@
   "ui.DAPP.Confirmations.Sign.Substrate.reject": "Reject",
   "ui.DAPP.Confirmations.Sign.Substrate.execute": "Execute",
   "bg.koni.handler.Extension.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again",
-  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again"
+  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again",
+  "ui.HISTORY.constant.history.substrateProxyInitTx": "Proxy init",
+  "ui.Confirmations.substrateProxyInitConfirmation": "Proxy init confirmation",
+  "ui.HISTORY.screen.History.substrateProxyInit": "Proxy init"
 }

@@ -3420,6 +3420,11 @@ export default class KoniExtension {
     const originTransaction = this.#koniState.transactionService.getTransaction(transactionId);
     const callData = originTransaction?.transaction as SubmittableExtrinsic<'promise'>;
 
+    const decodedCallData = decodeCallData({
+      api: substrateApi.api,
+      callData: callData.method.toHex()
+    });
+
     // if signer is proxied address, we do not need to create substrate proxy tx
     const isSignerProxiedAccount = isSameAddress(signer, proxiedAddress);
 
@@ -3455,18 +3460,36 @@ export default class KoniExtension {
       if (originTransaction?.emitterTransaction) {
         const originEmitter = originTransaction.emitterTransaction;
 
+        eventEmitter.on('success', (data: TransactionEventResponse) => {
+          data.id = originTransaction.id;
+          originEmitter.emit('success', data);
+        });
+
+        eventEmitter.on('extrinsicHash', (data: TransactionEventResponse) => {
+          data.id = originTransaction.id;
+          originEmitter.emit('extrinsicHash', data);
+        });
+
+        eventEmitter.on('send', (data: TransactionEventResponse) => {
+          data.id = originTransaction.id;
+          originEmitter.emit('send', data);
+        });
+
         eventEmitter.on('signed', (data: TransactionEventResponse) => {
+          data.id = originTransaction.id;
           originEmitter.emit('signed', data);
         });
 
         eventEmitter.on('error', (data: TransactionEventResponse) => {
           if (data.errors.length > 0) {
+            data.id = originTransaction.id;
             originEmitter.emit('error', data);
           }
         });
 
         eventEmitter.on('timeout', (data: TransactionEventResponse) => {
           if (data.errors.find((error) => error.errorType === BasicTxErrorType.TIMEOUT) && data.errors.length > 0) {
+            data.id = originTransaction.id;
             originEmitter.emit('timeout', data);
           }
         });
@@ -3477,8 +3500,8 @@ export default class KoniExtension {
       address: signer,
       chain,
       chainType: ChainType.SUBSTRATE,
-      extrinsicType: originTransaction.extrinsicType,
-      transaction: proxyMetadata,
+      extrinsicType: ExtrinsicType.SUBSTRATE_PROXY_INIT_TX,
+      transaction: substrateProxyCallData,
       skipFeeValidation: !isSignerProxiedAccount,
       skipFeeRecalculation: !isSignerProxiedAccount,
       transferNativeAmount: originTransaction.transferNativeAmount,
@@ -3487,6 +3510,7 @@ export default class KoniExtension {
         ...request,
 
         // output
+        decodedCallData,
         submittedCallData: substrateProxyCallData.toHex(),
         callData: callData.toHex(),
         networkFee

@@ -3,6 +3,9 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 
+import { AnyJson } from '@polkadot/types/types';
+import { HexString } from '@polkadot/util/types';
+
 export interface ExcludedSubstrateProxyAccounts {
   substrateProxyAddress: string
   substrateProxyType: SubstrateProxyType
@@ -42,10 +45,19 @@ export interface HandleSubstrateProxyWrappedTxRequest {
   previousWrappedTxId?: string; // previous selected signer tx
 }
 
-// export interface HandleSubstrateProxyWrappedTxResponse {
-//   submittedCallData: HexString; // callData of the proxy extrinsic
-//   networkFee: string;
-//   error?: SelectSignatoryError; // todo: maybe should create separate type for Proxy rather than Multisig
-// }
+export interface DecodeCallDataResponse {
+  /** Method name of the call */
+  method: string,
+  /** Section/pallet name of the call */
+  section: string,
+  /** Decoded arguments of the call */
+  args: AnyJson
+}
+
+export interface HandleSubstrateProxyWrappedTxResponse {
+  submittedCallData: HexString; // callData of the proxy extrinsic
+  networkFee: string;
+  decodedCallData: DecodeCallDataResponse | undefined;
+}
 
 export * from './actions';

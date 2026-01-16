@@ -55,7 +55,7 @@ function Component ({ className, setDisable, transaction }: Props) {
   }, [transaction.data, transaction.extrinsicType]);
 
   const descriptionContent = useMemo(() => {
-    if (!!transaction.wrappingStatus && account?.isMultisig && signerAccount) {
+    if (!!transaction.wrappingStatus && account?.isMultisig && signerSelected?.kind === 'signatory' && signerAccount) {
       return t('ui.Confirmations.WrappedTransactionInfoArea.multisigInitiationDescription', { replace: { name: signerAccount.name } });
     }
 
@@ -68,7 +68,7 @@ function Component ({ className, setDisable, transaction }: Props) {
     }
 
     return null;
-  }, [account?.isMultisig, signerAccount, t, transaction.extrinsicType, transaction.wrappingStatus]);
+  }, [account?.isMultisig, signerAccount, signerSelected?.kind, t, transaction.extrinsicType, transaction.wrappingStatus]);
 
   const wrapTransactionData = useMemo(() => {
     if (!wrapTransactionInfo) {
