@@ -1048,7 +1048,7 @@ export type TxResultType = {
   feeSymbol?: string;
 }
 
-export interface NftTransactionRequest {
+export interface NftTransactionRequest extends BaseRequestSign {
   networkKey: string,
   senderAddress: string,
   recipientAddress: string,
@@ -1131,6 +1131,7 @@ export interface SubstrateNftSubmitTransaction extends BaseRequestSign {
   senderAddress: string;
   nftItemName?: string;
   recipientAddress: string;
+  nftItem: NftItem;
 }
 
 export type RequestSubstrateNftSubmitTransaction = InternalRequestSign<SubstrateNftSubmitTransaction>;
@@ -2411,7 +2412,7 @@ export interface KoniRequestSignatures {
   // NFT functions
   'pri(evmNft.submitTransaction)': [NftTransactionRequest, SWTransactionResponse];
   'pri(evmNft.getTransaction)': [NftTransactionRequest, EvmNftTransaction];
-  'pri(substrateNft.submitTransaction)': [RequestSubstrateNftSubmitTransaction, SWTransactionResponse];
+  'pri(substrateNft.submitTransaction)': [NftTransactionRequest, SWTransactionResponse];
   'pri(substrateNft.getTransaction)': [NftTransactionRequest, SubstrateNftTransaction];
   'pri(nft.getNft)': [null, NftJson];
   'pri(nft.getSubscription)': [RequestSubscribeNft, NftJson, NftJson];

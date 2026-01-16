@@ -476,6 +476,18 @@ const subscribeAssetsAccountPallet = async ({ addresses, assetMap, callback, cha
   });
 
   const unsubList = await Promise.all(Object.values(tokenMap).map((tokenInfo) => {
+    if (tokenInfo.slug === 'energy_web_x-LOCAL-stEWT') {
+      return timer(0, CRON_REFRESH_PRICE_INTERVAL).subscribe(() => {
+        const getEwtFrozenBalance = async () => {
+          const ewtTokenBalances = await queryEwtFrozenBalance(substrateApi, addresses, assetMap[tokenInfo.slug], extrinsicType);
+
+          callback(ewtTokenBalances);
+        };
+
+        getEwtFrozenBalance().catch(console.error);
+      });
+    }
+
     try {
       const assetIndex = _getTokenOnChainAssetId(tokenInfo);
 
@@ -664,6 +676,50 @@ async function queryGigaTokenBalance (substrateApi: _SubstrateApi, addresses: st
       state: APIItemState.READY,
       free: transferableBalance.toString(),
       locked: totalLockedFromTransfer.toString()
+    } as unknown as BalanceItem;
+  }));
+}
+
+async function queryEwtFrozenBalance (substrateApi: _SubstrateApi, addresses: string[], tokenInfo: _ChainAsset, extrinsicType?: ExtrinsicType | undefined): Promise<BalanceItem[]> {
+  const multilocation = _getXcmAssetMultilocation(tokenInfo);
+
+  return await Promise.all(addresses.map(async (address) => {
+    const [_frozenBalance, _balanceInfo] = await Promise.all([
+      substrateApi.api.query.assetsFreezer.frozenBalances(multilocation, address),
+      substrateApi.api.query.assets.account(multilocation, address)
+    ]);
+
+    const balanceInfo = _balanceInfo.toPrimitive() as unknown as PalletAssetsAssetAccount | undefined;
+
+    if (!balanceInfo) { // no balance info response
+      return {
+        address: address,
+        tokenSlug: tokenInfo.slug,
+        free: '0',
+        locked: '0',
+        state: APIItemState.READY
+      } as unknown as BalanceItem;
+    }
+
+    const transferableBalance = _getAssetsPalletTransferable(balanceInfo, _getAssetExistentialDeposit(tokenInfo), extrinsicType);
+    const totalLockedFromTransfer = _getAssetsPalletLocked(balanceInfo);
+
+    let freeBalance: bigint = transferableBalance;
+    let lockedBalance: bigint = totalLockedFromTransfer;
+
+    const frozenBalance = _frozenBalance.toPrimitive() as string;
+
+    if (frozenBalance) {
+      freeBalance = transferableBalance - BigInt(frozenBalance);
+      lockedBalance = totalLockedFromTransfer + BigInt(frozenBalance);
+    }
+
+    return {
+      address: address,
+      tokenSlug: tokenInfo.slug,
+      free: freeBalance.toString(),
+      locked: lockedBalance.toString(),
+      state: APIItemState.READY
     } as unknown as BalanceItem;
   }));
 }
