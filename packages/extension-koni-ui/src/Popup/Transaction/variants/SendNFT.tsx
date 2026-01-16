@@ -146,12 +146,12 @@ const Component: React.FC = () => {
       } else {
         // Send NFT with substrate interface
         sendPromise = substrateNftSubmitTransaction({
-          // networkKey: chain,
+          networkKey: chain,
           recipientAddress: to,
           senderAddress: from,
           nftItemName: nftItem?.name,
-          params
-          // nftItem
+          params,
+          nftItem
         });
       }
 
