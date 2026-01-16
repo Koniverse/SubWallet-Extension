@@ -599,9 +599,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     }
 
     setSelectedMultisigItem(notiMultisigPendingTxItem);
+    form.setFieldValue('view', ViewValue.MULTISIG);
     activeModal(MULTISIG_HISTORY_INFO_MODAL);
     setNotiMultisigPendingTxId('');
-  }, [activeModal, notiMultisigPendingTxItem, setNotiMultisigPendingTxId]);
+  }, [activeModal, form, notiMultisigPendingTxItem, setNotiMultisigPendingTxId]);
 
   useEffect(() => {
     if (isActive) {
@@ -875,7 +876,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             center={false}
             className={'history-header'}
             paddingVertical
-            rightButtons={headerIcons}
+            rightButtons={viewValue === ViewValue.MULTISIG ? undefined : headerIcons}
             showBackButton={false}
             title={t('ui.HISTORY.screen.History.history')}
           />
