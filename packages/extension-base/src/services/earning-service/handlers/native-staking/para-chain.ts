@@ -51,11 +51,14 @@ interface AutoCompoundingDelegation {
 
 async function queryDelegationScheduledRequestsFallback (api: ApiPromise, delegator: string, collator: string) {
   const query = api.query.parachainStaking.delegationScheduledRequests;
+  const key = await query.keys();
 
-  try {
-    return await query(collator, delegator);
-  } catch (e) {
+  if (key[0].args.length === 1) {
     return await query(collator);
+  } else if (key[0].args.length === 2) {
+    return await query(collator, delegator);
+  } else {
+    throw new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'More args than 2 and 1');
   }
 }
 
@@ -248,7 +251,9 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
       // parse unstaking info
       if (delegationScheduledRequests) {
         for (const scheduledRequest of delegationScheduledRequests) {
-          if (reformatAddress(scheduledRequest.delegator, 0) === reformatAddress(address, 0)) { // add network prefix
+          const requestDelegator = scheduledRequest.delegator ? scheduledRequest.delegator : address;
+
+          if (reformatAddress(requestDelegator, 0) === reformatAddress(address, 0)) { // add network prefix
             const isClaimable = scheduledRequest.whenExecutable - parseInt(currentRound) <= 0;
             const remainingEra = scheduledRequest.whenExecutable - parseInt(currentRound);
             const waitingTime = remainingEra * _STAKING_ERA_LENGTH_MAP[chainInfo.slug];
