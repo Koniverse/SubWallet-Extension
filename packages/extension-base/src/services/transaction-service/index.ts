@@ -124,6 +124,8 @@ export default class TransactionService {
     // Check support for transaction
     checkSupportForTransaction(validationResponse, transaction);
 
+    console.log('Validation Response after support check: ', validationResponse, chainInfo);
+
     if (!chainInfo) {
       validationResponse.errors.push(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('bg.TRANSACTION_SERVICE.services.service.transaction.cannotFindNetwork')));
     }
@@ -152,9 +154,6 @@ export default class TransactionService {
     const isNonNativeTokenPayFee = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug);
     const nonNativeTokenPayFeeInfo = isNonNativeTokenPayFee ? this.state.chainService.getAssetBySlug(tokenPayFeeSlug) : undefined;
     const priceMap = (await this.state.priceService.getPrice()).priceMap;
-
-    // Get signer account
-    const signer = address;
 
     if (!transactionInput.skipFeeRecalculation) {
       validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee);
@@ -186,7 +185,7 @@ export default class TransactionService {
     }
 
     // Check account signing transaction
-    checkSigningAccountForTransaction(validationResponse, chainInfoMap, signer);
+    checkSigningAccountForTransaction(validationResponse, chainInfoMap, address);
 
     const nativeTokenAvailable = await this.state.balanceService.getBalanceByType(address, chain, nativeTokenInfo.slug, transactionInput.balanceType, extrinsicType);
 
@@ -362,6 +361,8 @@ export default class TransactionService {
 
     // Delete previous select signer transaction
     this.previousWrappedTxId[transactionData.transactionId] && this.removeTransaction(this.previousWrappedTxId[transactionData.transactionId]);
+
+    console.log(validatedTransaction);
 
     // Todo: refactor this later
     const emitter = await this.addTransaction(validatedTransaction);

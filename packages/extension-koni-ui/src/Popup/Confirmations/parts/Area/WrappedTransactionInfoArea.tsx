@@ -5,12 +5,13 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { SWTransactionResponse, SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { ExcludedSubstrateProxyAccounts, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types';
-import { InitMultisigTxRequest, InitMultisigTxResponse } from '@subwallet/extension-base/types/multisig';
+import { InitMultisigTxResponse } from '@subwallet/extension-base/types/multisig';
 import { AccountProxyAvatar, AlertBox, SignableAccountProxySelectorModal } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { SIGNABLE_ACCOUNT_PROXY_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { useCreateGetSignableAccountProxy, useGetAccountByAddress, useGetNativeTokenBasicInfo, useOpenDetailModal } from '@subwallet/extension-koni-ui/hooks';
 import { initMultisigTx } from '@subwallet/extension-koni-ui/messaging/transaction/multisig';
+import { handleSubstrateProxyWrappedTxRequest } from '@subwallet/extension-koni-ui/messaging/transaction/substrateProxy';
 import { BaseDetailModal } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Detail';
 import { SignableAccountProxyItem, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
@@ -93,14 +94,34 @@ function Component ({ className, setDisable, transaction }: Props) {
     activeModal(modalId);
   }, [activeModal]);
 
-  console.log(transaction, 'transaction');
-
-  const prepareTransaction = useCallback(async (params: InitMultisigTxRequest) => {
+  const prepareTransaction = useCallback(async (signerSelected: SignableAccountProxyItem) => {
     try {
       setIsWrapTransactionLoading(true);
       setDisable(true);
 
-      const transactionResponse = await initMultisigTx(params);
+      let transactionResponse: SWTransactionResponse;
+
+      if (signerSelected.kind === 'substrate_proxy') {
+        transactionResponse = await handleSubstrateProxyWrappedTxRequest({
+          transactionId: transaction.id,
+          signer: signerSelected.address,
+          chain: transaction.chain,
+          proxyMetadata: {
+            proxiedAddress: transaction.address
+          }
+        });
+      } else {
+        transactionResponse = await initMultisigTx({
+          transactionId: transaction.id,
+          signer: signerSelected.address,
+          chain: transaction.chain,
+          multisigMetadata: {
+            multisigAddress: transaction.address,
+            threshold: account?.threshold || 0,
+            signers: account?.signers || []
+          }
+        });
+      }
 
       if (transactionResponse.errors?.length) {
         setTransactionError(transactionResponse.errors[0]);
@@ -112,29 +133,21 @@ function Component ({ className, setDisable, transaction }: Props) {
     } catch (e) {
       setIsWrapTransactionLoading(false);
     }
-  }, [setDisable]);
+  }, [account, setDisable, transaction]);
 
   const onSelectSigner = useCallback((selected: SignableAccountProxyItem) => {
     setSignerSelected((prevState) => {
       if (prevState?.address !== selected.address) {
-        prepareTransaction({
-          transactionId: transaction.id,
-          signer: selected.address,
-          multisigMetadata: {
-            multisigAddress: transaction.address,
-            threshold: account?.threshold || 0,
-            signers: account?.signers || []
-          },
-          chain: transaction.chain
-        }).finally(() => {
-          setIsWrapTransactionLoading(false);
-        });
+        prepareTransaction(selected)
+          .finally(() => {
+            setIsWrapTransactionLoading(false);
+          });
       }
 
       return selected;
     });
     inactiveModal(modalId);
-  }, [account, inactiveModal, prepareTransaction, transaction]);
+  }, [inactiveModal, prepareTransaction]);
 
   if (!signableAccountProxyItems?.length || !transaction.wrappingStatus) {
     return <></>;
@@ -234,13 +247,13 @@ function Component ({ className, setDisable, transaction }: Props) {
               {
                 !!wrapTransactionData && !isWrapTransactionLoading && (
                   <>
-                    <MetaInfo.Number
+                    {wrapTransactionData.depositAmount != null && <MetaInfo.Number
                       className={CN('multisig-deposit-info')}
                       decimals={decimals}
                       label={t('ui.Confirmations.WrappedTransactionInfoArea.multisigDeposit')}
                       suffix={symbol}
                       value={wrapTransactionData.depositAmount}
-                    />
+                    />}
 
                     <MetaInfo.Number
                       decimals={decimals}
@@ -249,20 +262,20 @@ function Component ({ className, setDisable, transaction }: Props) {
                       value={wrapTransactionData?.networkFee || transaction.estimateFee?.value || 0}
                     />
 
-                    <MetaInfo.Default
+                    {wrapTransactionData.callData != null && <MetaInfo.Default
                       label={t('ui.Confirmations.Detail.CallDataDetail.callData')}
                     >
                       {toShort(wrapTransactionData.callData, 5, 5)}
                       <Button
                         className={'call-data-info-button'}
-                        icon={ <Icon
+                        icon={<Icon
                           customSize={'18px'}
                           phosphorIcon={Info}
                         />}
                         onClick={openDetailModal}
                         type={'ghost'}
                       />
-                    </MetaInfo.Default>
+                    </MetaInfo.Default>}
                   </>
                 )
               }
