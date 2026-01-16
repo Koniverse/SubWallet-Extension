@@ -85,8 +85,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
     address: transaction.address,
     chain: transaction.chain,
     amount: totalAmount,
-    transactionFee: transaction.estimateFee?.value,
-    signerSubstrateProxyAddress: transaction.signerSubstrateProxyAddress
+    transactionFee: transaction.estimateFee?.value
   });
 
   const govConvictionOptions = useMemo(() => {

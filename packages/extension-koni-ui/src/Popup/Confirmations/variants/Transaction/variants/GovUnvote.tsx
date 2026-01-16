@@ -5,7 +5,7 @@ import { RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/i
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { MetaInfo, NumberDisplay, PageWrapper, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useCoreCreateReformatAddress, useGetAccountByAddress, useGetChainPrefixBySlug, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Number } from '@subwallet/react-ui';
@@ -36,14 +36,8 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
     chain: transaction.chain,
     amount: new BigNumber(data.totalAmount),
     transactionFee: transaction.estimateFee?.value,
-    isUnVote: true,
-    signerSubstrateProxyAddress: transaction.signerSubstrateProxyAddress
+    isUnVote: true
   });
-
-  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
-  const getReformatAddress = useCoreCreateReformatAddress();
-
-  const displayAddress = account ? getReformatAddress(account, chainInfoMap[transaction.chain]) : transaction.address;
 
   return (
     <div className={CN(className)}>
@@ -75,7 +69,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         hasBackgroundWrapper
       >
         <MetaInfo.Account
-          address={displayAddress || transaction.address}
+          address={account?.address || transaction.address}
           chainSlug={transaction.chain}
           label={t('ui.TRANSACTION.Confirmations.GovUnvote.account')}
           name={account?.name}

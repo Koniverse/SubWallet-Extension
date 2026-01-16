@@ -103,7 +103,7 @@ export default class SubstrateProxyAccountService {
   }
 
   // Validate adding proxy account
-  public async validateAddSubstrateProxyAccount (params: AddSubstrateProxyAccountParams, signerSubstrateProxyAddress?: string): Promise<TransactionError[]> {
+  public async validateAddSubstrateProxyAccount (params: AddSubstrateProxyAccountParams): Promise<TransactionError[]> {
     const { address, chain, substrateProxyType } = params;
 
     const substrateApi = this.getSubstrateApi(chain);
@@ -149,7 +149,7 @@ export default class SubstrateProxyAccountService {
     const factorDeposit = substrateApi.api.consts.proxy.proxyDepositFactor?.toString() || '0';
     const requiredDeposit = proxyList.length === 0 ? new BigN(baseDeposit).plus(factorDeposit) : new BigN(factorDeposit);
 
-    const totalRequired = new BigN(requiredDeposit).plus(!signerSubstrateProxyAddress ? estimatedFee : 0);
+    const totalRequired = new BigN(requiredDeposit).plus(estimatedFee);
 
     if (bnTransferableBalance.lt(totalRequired)) {
       return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)];

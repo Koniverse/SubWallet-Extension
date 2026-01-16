@@ -37,8 +37,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
     chain: transaction.chain,
     amount: new BigNumber(data.amount),
     transactionFee: transaction.estimateFee?.value,
-    isUnlock: true,
-    signerSubstrateProxyAddress: transaction.signerSubstrateProxyAddress
+    isUnlock: true
   });
 
   return (

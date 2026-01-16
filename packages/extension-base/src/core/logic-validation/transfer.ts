@@ -482,7 +482,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
     return;
   }
 
-  const { edAsWarning, extrinsicType, isTransferAll, signerSubstrateProxyAddress, skipFeeValidation, tokenPayFeeSlug } = transactionInput;
+  const { edAsWarning, extrinsicType, isTransferAll, skipFeeValidation, tokenPayFeeSlug } = transactionInput;
 
   if (skipFeeValidation || (tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug))) { // todo: need improve: input should be balance of fee token and check this again
     return;
@@ -492,7 +492,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
   const bnNativeTokenAvailable = new BigN(nativeTokenAvailable.value);
   const bnNativeTokenTransferAmount = new BigN(validationResponse.transferNativeAmount || '0');
 
-  if (!bnNativeTokenAvailable.gt(0) && !substrateProxyAccountNativeTokenAvailable) {
+  if (!bnNativeTokenAvailable.gt(0)) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
   }
 
