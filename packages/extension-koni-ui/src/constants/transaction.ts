@@ -60,7 +60,11 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.GOV_VOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.vote'),
   [ExtrinsicType.GOV_UNVOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.unvote'),
   [ExtrinsicType.GOV_UNLOCK_VOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.unlockVotes'),
-
+  [ExtrinsicType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.history.unknown'),
+  [ExtrinsicType.MULTISIG_APPROVE_TX]: detectTranslate('ui.TRANSACTION.constant.transaction.multisigApprove'),
+  [ExtrinsicType.MULTISIG_CANCEL_TX]: detectTranslate('ui.TRANSACTION.constant.transaction.multisigCancel'),
+  [ExtrinsicType.MULTISIG_EXECUTE_TX]: detectTranslate('ui.TRANSACTION.constant.transaction.multisigExecute'),
+  [ExtrinsicType.MULTISIG_INIT_TX]: detectTranslate('ui.TRANSACTION.constant.transaction.multisigInit'),
   [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.TRANSACTION.constant.transaction.addProxy'),
   [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.TRANSACTION.constant.transaction.removeProxy')
 };

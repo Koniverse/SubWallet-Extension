@@ -4,7 +4,7 @@
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 
 export interface ExcludedSubstrateProxyAccounts {
-  address: string
+  substrateProxyAddress: string
   substrateProxyType: SubstrateProxyType
 }
 export interface RequestGetSubstrateProxyAccountGroup {
@@ -29,5 +29,23 @@ export interface SubstrateProxyAccountGroup {
   substrateProxyAccounts: SubstrateProxyAccountItem[];
   substrateProxyDeposit: string;
 }
+
+interface ProxyRawMetadata {
+  proxiedAddress: string;
+}
+
+export interface HandleSubstrateProxyWrappedTxRequest {
+  transactionId: string; // original tx
+  signer: string;
+  chain: string;
+  proxyMetadata: ProxyRawMetadata;
+  previousWrappedTxId?: string; // previous selected signer tx
+}
+
+// export interface HandleSubstrateProxyWrappedTxResponse {
+//   submittedCallData: HexString; // callData of the proxy extrinsic
+//   networkFee: string;
+//   error?: SelectSignatoryError; // todo: maybe should create separate type for Proxy rather than Multisig
+// }
 
 export * from './actions';

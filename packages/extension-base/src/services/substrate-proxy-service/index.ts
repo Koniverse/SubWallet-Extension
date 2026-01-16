@@ -8,6 +8,8 @@ import { AddSubstrateProxyAccountParams, RemoveSubstrateProxyAccountParams, Requ
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
+import { ApiPromise } from '@polkadot/api';
+import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { Enum } from '@polkadot/types';
 
 import { _SubstrateApi } from '../chain-service/types';
@@ -18,6 +20,10 @@ type PrimitiveSubstrateProxyAccountItem = {
   proxyType: SubstrateProxyType; // type of proxy retrieved from on-chain data
   delay: number;
 };
+
+export function createInitSubstrateProxyExtrinsic (api: ApiPromise, proxiedAddress: string, extrinsic: SubmittableExtrinsic): SubmittableExtrinsic {
+  return api.tx.proxy.proxy(proxiedAddress, null, extrinsic);
+}
 
 export default class SubstrateProxyAccountService {
   protected readonly state: KoniState;
@@ -67,7 +73,7 @@ export default class SubstrateProxyAccountService {
     if (excludedSubstrateProxyAccounts && excludedSubstrateProxyAccounts.length > 0) {
       substrateProxyAccounts = substrateProxyAccounts.filter((p) => {
         return !excludedSubstrateProxyAccounts.some(
-          (excluded) => excluded.address === p.substrateProxyAddress && excluded.substrateProxyType === p.substrateProxyType
+          (excluded) => excluded.substrateProxyAddress === p.substrateProxyAddress && excluded.substrateProxyType === p.substrateProxyType
         );
       });
     }
@@ -97,7 +103,7 @@ export default class SubstrateProxyAccountService {
   }
 
   // Validate adding proxy account
-  public async validateAddSubstrateProxyAccount (params: AddSubstrateProxyAccountParams, signerSubstrateProxyAddress?: string): Promise<TransactionError[]> {
+  public async validateAddSubstrateProxyAccount (params: AddSubstrateProxyAccountParams): Promise<TransactionError[]> {
     const { address, chain, substrateProxyType } = params;
 
     const substrateApi = this.getSubstrateApi(chain);
@@ -143,7 +149,7 @@ export default class SubstrateProxyAccountService {
     const factorDeposit = substrateApi.api.consts.proxy.proxyDepositFactor?.toString() || '0';
     const requiredDeposit = proxyList.length === 0 ? new BigN(baseDeposit).plus(factorDeposit) : new BigN(factorDeposit);
 
-    const totalRequired = new BigN(requiredDeposit).plus(!signerSubstrateProxyAddress ? estimatedFee : 0);
+    const totalRequired = new BigN(requiredDeposit).plus(estimatedFee);
 
     if (bnTransferableBalance.lt(totalRequired)) {
       return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)];

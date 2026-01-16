@@ -13,7 +13,7 @@ import { TransactionConfig } from 'web3-core';
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { EventRecord } from '@polkadot/types/interfaces';
 
-export interface SWTransactionBase extends ValidateTransactionResponse, Partial<Pick<BaseRequestSign, 'ignoreWarnings' | 'signerSubstrateProxyAddress'>>, TransactionFee, SWTransactionEmitter {
+export interface SWTransactionBase extends ValidateTransactionResponse, Partial<Pick<BaseRequestSign, 'ignoreWarnings'>>, TransactionFee, SWTransactionEmitter {
   id: string;
   url?: string;
   isInternal: boolean,
@@ -35,7 +35,13 @@ export interface SWTransactionBase extends ValidateTransactionResponse, Partial<
   errorOnTimeOut?: boolean;
   signAfterCreate?: (id: string) => void;
   step?: BriefProcessStep;
+  wrappingStatus?: SubstrateTransactionWrappingStatus;
 }
+
+// 'WRAPPABLE' means the transaction can be wrapped but is not yet wrapped
+// 'WRAPPED' means the transaction has been wrapped
+// use in multisig and proxy for substrate transactions
+export type SubstrateTransactionWrappingStatus = 'WRAPPABLE' | 'WRAPPED';
 
 export interface SWTransaction extends SWTransactionBase {
   transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig | Psbt;
@@ -63,7 +69,7 @@ export interface SWTransactionEmitter {
 type SwInputBase = Pick<SWTransactionBase, 'address' | 'url' | 'data' | 'extrinsicType' | 'chain' | 'chainType' | 'ignoreWarnings' | 'transferNativeAmount'>
 & Partial<Pick<SWTransactionBase, 'additionalValidator' | 'eventsHandler'>>;
 
-export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransactionBase, 'estimateFee' | 'signAfterCreate' | 'isPassConfirmation' | 'step' | 'errorOnTimeOut' | 'xcmFeeDryRun' | 'signerSubstrateProxyAddress'>>, TransactionFee {
+export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransactionBase, 'estimateFee' | 'signAfterCreate' | 'isPassConfirmation' | 'step' | 'errorOnTimeOut' | 'xcmFeeDryRun' | 'wrappingStatus'>>, TransactionFee {
   id?: string;
   transaction?: SWTransactionBase['transaction'] | null;
   warnings?: SWTransactionBase['warnings'];
@@ -85,7 +91,7 @@ export interface SWDutchTransactionInput extends Omit<SWTransactionInput, 'trans
   transaction?: SWDutchTransaction['transaction'] | null;
 }
 
-export type SWTransactionResponse = SwInputBase & Pick<SWTransactionBase, 'warnings' | 'errors'> & Partial<Pick<SWTransactionBase, 'id' | 'extrinsicHash' | 'status' | 'estimateFee' | 'xcmFeeDryRun'>> & TransactionFee & {
+export type SWTransactionResponse = SwInputBase & Pick<SWTransactionBase, 'warnings' | 'errors'> & Partial<Pick<SWTransactionBase, 'id' | 'extrinsicHash' | 'status' | 'estimateFee' | 'xcmFeeDryRun' | 'wrappingStatus'>> & TransactionFee & {
   processId?: string;
 }
 

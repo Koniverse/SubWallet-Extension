@@ -110,6 +110,30 @@ export default class SubstrateRequestHandler {
     });
   }
 
+  // used for wrapped tx where we don't want to show popup for internal requests
+  // transaction is multisig or proxy transaction
+  public async signWrappedTransaction (id: string, address: string, url: string, payload: SignerPayloadJSON, onSign?: (id: string) => void): Promise<ResponseSigning> {
+    const isAlwaysRequired = await this.#requestService.settingService.isAlwaysRequired;
+
+    if (isAlwaysRequired && !onSign) {
+      this.#requestService.keyringService.lock();
+    }
+
+    return new Promise((resolve, reject): void => {
+      this.#substrateRequests[id] = {
+        ...this.signComplete(id, resolve, reject),
+        address,
+        id,
+        request: new RequestExtrinsicSign(payload),
+        url: url
+      };
+
+      this.signSubject.next(this.allSubstrateRequests);
+
+      onSign?.(id);
+    });
+  }
+
   public resetWallet () {
     for (const request of Object.values(this.#substrateRequests)) {
       request.reject(new Error('Reset wallet'));

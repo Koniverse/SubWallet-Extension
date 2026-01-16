@@ -57,7 +57,7 @@ const Component = () => {
   const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
   const { closeAlert, defaultData, goBack, onDone, openAlert,
-    persistData, selectSubstrateProxyAccountsToSign,
+    persistData,
     setBackProps, setIsDisableHeader, setSubHeaderRightButtons } = useTransactionContext<EarnParams>();
 
   const { fromAccountProxy, slug } = defaultData;
@@ -476,7 +476,7 @@ const Component = () => {
     const transactionBlockProcess = () => {
       setSubmitLoading(true);
       setIsDisableHeader(true);
-      const { chain, from, slug, target, value: _currentAmount } = values;
+      const { from, slug, target, value: _currentAmount } = values;
       let processId = processState.processId;
 
       const getData = (submitStep: number): SubmitYieldJoinData => {
@@ -575,43 +575,14 @@ const Component = () => {
 
               return true;
             } else {
-              // send submit transaction
-              const submitPromise = async (signerSubstrateProxyAddress?: string) => {
-                const rs = await submitJoinYieldPool({
-                  path: path,
-                  data,
-                  currentStep: step,
-                  signerSubstrateProxyAddress
-                });
+              const submitPromise: Promise<SWTransactionResponse> = submitJoinYieldPool({
+                path: path,
+                data: data,
+                currentStep: step
+              });
 
-                success = onSuccess(isLastStep, needRollback)(rs);
-              };
-
-              let success = false;
-
-              // wrap proxy selection
-              // for the Liquid Staking feature with multiple steps,
-              // only the root account is allowed to sign transactions, even if a valid proxy account is available to sign on its behalf.
-              if (poolInfo.type !== YieldPoolType.LIQUID_STAKING && path.steps.length <= 2) {
-                selectSubstrateProxyAccountsToSign(
-                  {
-                    chain,
-                    address: from,
-                    type: exType
-                  }
-                )
-                  .then(async (selected?: string) => {
-                    setSubmitLoading(true);
-
-                    await submitPromise(selected);
-                  })
-                  .catch(onError)
-                  .finally(() => {
-                    setSubmitLoading(false);
-                  });
-              } else {
-                await submitPromise();
-              }
+              const rs = await submitPromise;
+              const success = onSuccess(isLastStep, needRollback)(rs);
 
               if (success) {
                 return await submitData(step + 1);
@@ -667,7 +638,7 @@ const Component = () => {
     } else {
       transactionBlockProcess();
     }
-  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, exType, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, selectSubstrateProxyAccountsToSign, setIsDisableHeader, stakingFee, t]);
+  }, [chainInfoMap, chainStakingBoth, closeAlert, currentStep, maxSlippage?.slippage, netuid, onError, onSuccess, oneSign, openAlert, poolInfo, poolTargets, processState.feeStructure, processState.processId, processState.steps, setIsDisableHeader, stakingFee, t]);
 
   const onClickSubmit = useCallback((values: EarnParams) => {
     if (currentConfirmation) {
@@ -934,7 +905,7 @@ const Component = () => {
     );
   }, [amountValue, assetDecimals, chainAsset, chainValue, currencyData?.isPrefix, currencyData.symbol, estimatedFee, inputAsset.symbol, isSubnetStaking, poolInfo.metadata, poolInfo.statistic, poolInfo?.type, poolTargets, renderSubnetStaking, t]);
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);

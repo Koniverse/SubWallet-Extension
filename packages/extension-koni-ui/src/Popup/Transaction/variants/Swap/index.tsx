@@ -220,7 +220,9 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     } });
   }, [assetRegistryMap, chainInfoMap, fromTokenSlugValue, t]);
 
-  const onPreCheck = usePreCheckAction(fromValue, undefined, preCheckMessage);
+  const onPreCheck = usePreCheckAction({
+    address: fromValue, message: preCheckMessage, chain: chainValue
+  });
   const oneSign = useOneSignProcess(fromValue);
   const getReformatAddress = useCoreCreateReformatAddress();
 
