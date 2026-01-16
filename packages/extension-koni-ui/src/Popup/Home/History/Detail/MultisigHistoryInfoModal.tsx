@@ -1,14 +1,16 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
-import { reformatAddress } from '@subwallet/extension-base/utils';
 import { MULTISIG_HISTORY_INFO_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
 import { approvePendingTx, cancelPendingTx, executePendingTx } from '@subwallet/extension-koni-ui/messaging';
 import HistoryMultisigLayout from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigLayout';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, SwModal } from '@subwallet/react-ui';
 import { ArrowCircleUpRight } from 'phosphor-react';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -25,7 +27,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
   const { t } = useTranslation();
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const [loading, setLoading] = useState(false);
-
+  const checkAction = usePreCheckAction({ address: data?.currentSigner });
   const handleAction = useCallback(async (action: () => Promise<boolean | undefined>) => {
     try {
       setLoading(true);
@@ -69,8 +71,6 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
         threshold: data.threshold,
         signers: data?.signerAddresses || []
       },
-      // todo: Why is the returned data marked as optional, but when it’s passed down it becomes required?
-      // Should we recheck the callData interface?
       decodedCallData: data.decodedCallData,
       callHash: data?.callHash || '',
       timepoint: {
@@ -147,14 +147,14 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
               danger
               disabled={loading}
               loading={loading}
-              onClick={_onReject}
+              onClick={checkAction(_onReject, ExtrinsicType.MULTISIG_CANCEL_TX)}
             >{t('Reject')}</Button>
             {thresholdReached && (
               <Button
                 block
                 disabled={loading}
                 loading={loading}
-                onClick={_onExecute}
+                onClick={checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX)}
               >{t('Execute')}</Button>
             )}
           </>
@@ -169,7 +169,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
                 block
                 disabled={loading}
                 loading={loading}
-                onClick={isLastSigner ? _onExecute : _onApprove}
+                onClick={isLastSigner ? checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX) : checkAction(_onApprove, ExtrinsicType.MULTISIG_APPROVE_TX)}
               >
                 {isLastSigner ? t('Approve & Execute') : t('Approve')}
               </Button>
@@ -188,14 +188,14 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
               <Button
                 block
                 disabled={loading}
-                onClick={_onExecute}
+                onClick={checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX)}
               >{t('Execute')}</Button>
             )}
           </>
         )}
       </div>
     );
-  }, [_onApprove, _onExecute, _onReject, data, formattedApprovals, loading, t]);
+  }, [_onApprove, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, formattedApprovals, loading, t]);
 
   const modalFooter = useMemo(() => {
     if (!data) {
@@ -235,7 +235,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
       footer={modalFooter}
       id={MULTISIG_HISTORY_INFO_MODAL}
       onCancel={onCancel}
-      title={'Send token'}
+      title={t('Send token')}
     >
       <div className={'__layout-container'}>
         {data && <HistoryMultisigLayout data={data} />}

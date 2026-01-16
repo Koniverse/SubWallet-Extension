@@ -154,7 +154,7 @@ const Component: React.FC<Props> = (props: Props) => {
             {t('Signatories')}
           </div>
           <div className={'signatories-label-right'}>
-            {t(`Approval threshold: ${data.approvals.length}/${data.threshold}`)}
+            {t(`Approval threshold: ${data.threshold}/${data.signerAddresses.length}`)}
           </div>
         </div>
         <div className='signatory-item-container'>

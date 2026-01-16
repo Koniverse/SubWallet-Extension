@@ -3,6 +3,7 @@
 
 import { _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
 import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
+import { _reformatAddressWithChain } from '@subwallet/extension-base/utils';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -59,7 +60,7 @@ const Component: React.FC<Props> = (props: Props) => {
           slug: data.chain,
           name: _getChainName(chainInfoMap[data.chain])
         }}
-        recipientAddress={recipientAccount?.address || recipientAddress}
+        recipientAddress={recipientAccount?.address ? _reformatAddressWithChain(recipientAccount?.address, chainInfoMap[data.chain]) : recipientAddress}
         recipientName={recipientAccount?.name}
         senderAddress={data.depositor}
         senderName={senderAccount?.name}
