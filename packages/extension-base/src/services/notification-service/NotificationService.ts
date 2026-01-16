@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Notification, NotificationButton, NotificationParams } from '@subwallet/extension-base/background/KoniTypes';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { isFirefox } from '@subwallet/extension-base/utils';
 import { BehaviorSubject } from 'rxjs';
+
+const notificationServiceLogger = createLogger('NotificationService');
 
 export default class NotificationService {
   private notificationSubject = new BehaviorSubject<Notification[]>([]);
@@ -52,7 +55,7 @@ export default class NotificationService {
             if (onClick) {
               onClick();
             } else {
-              chrome.tabs.create({ url: link }).catch(console.error);
+              chrome.tabs.create({ url: link }).catch((error) => notificationServiceLogger.error('Error creating notification tab', error));
             }
           }
         });

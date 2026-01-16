@@ -7,10 +7,13 @@ import { ASTAR_REFRESH_BALANCE_INTERVAL, SUB_TOKEN_REFRESH_BALANCE_INTERVAL } fr
 import { getJettonMasterContract, getJettonWalletContract } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
 import { _TonApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BalanceItem, SubscribeTonPalletBalance } from '@subwallet/extension-base/types';
 import { filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 import { Address } from '@ton/core';
 import { JettonMaster, OpenedContract } from '@ton/ton';
+
+const balanceSubscribeTonLogger = createLogger('BalanceSubscribeTon');
 
 export function subscribeJettonBalanceInterval ({ addresses, assetMap, callback, chainInfo, tonApi }: SubscribeTonPalletBalance): () => void {
   const chain = chainInfo.slug;
@@ -31,7 +34,7 @@ export function subscribeJettonBalanceInterval ({ addresses, assetMap, callback,
 
             return await jettonWalletContract.getBalance();
           } catch (e) {
-            console.error(`Error on get balance of account ${address} for token ${tokenInfo.slug}`, e);
+            balanceSubscribeTonLogger.error(`Error on get balance of account ${address} for token ${tokenInfo.slug}`, e);
 
             return BigInt(0);
           }
@@ -49,7 +52,7 @@ export function subscribeJettonBalanceInterval ({ addresses, assetMap, callback,
 
         callback(items);
       } catch (err) {
-        console.log(tokenInfo.slug, err);
+        balanceSubscribeTonLogger.debug(tokenInfo.slug, err);
       }
     });
   };
@@ -95,7 +98,7 @@ export function subscribeTonBalance (params: SubscribeTonPalletBalance) {
         });
       })
       .catch((e) => {
-        console.error(`Error on get native balance with token ${nativeTokenSlug}`, e);
+        balanceSubscribeTonLogger.error(`Error on get native balance with token ${nativeTokenSlug}`, e);
 
         return addresses.map((address): BalanceItem => {
           return {
@@ -108,7 +111,7 @@ export function subscribeTonBalance (params: SubscribeTonPalletBalance) {
         });
       })
       .then((items) => callback(items))
-      .catch(console.error);
+      .catch((error) => balanceSubscribeTonLogger.error('Error in TON balance subscription', error));
   }
 
   getBalance();

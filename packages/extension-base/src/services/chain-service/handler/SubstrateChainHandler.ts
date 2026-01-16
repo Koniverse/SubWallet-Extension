@@ -17,6 +17,9 @@ import { Registry } from '@polkadot/types/types';
 import { BN } from '@polkadot/util';
 import { logger as createLogger } from '@polkadot/util/logger';
 import { Logger } from '@polkadot/util/types';
+import { createLogger as createSubWalletLogger } from '@subwallet/extension-base/utils/logger';
+
+const substrateChainHandlerLogger = createSubWalletLogger('SubstrateChainHandler');
 
 import { _PSP22_ABI, _PSP34_ABI } from '../../../koni/api/contract-handler/utils';
 
@@ -78,7 +81,7 @@ export class SubstrateChainHandler extends AbstractChainHandler {
     this.cancelAllRecover();
 
     await Promise.all(Object.values(this.getSubstrateApiMap()).map((substrateApi) => {
-      return substrateApi.disconnect().catch(console.error);
+      return substrateApi.disconnect().catch((error) => substrateChainHandlerLogger.error('Error disconnecting Substrate API', error));
     }));
   }
 
@@ -86,7 +89,7 @@ export class SubstrateChainHandler extends AbstractChainHandler {
     const existed = this.getSubstrateApiByChain(chainSlug);
 
     if (existed && !existed.isApiReadyOnce) {
-      console.log(`Reconnect ${existed.providerName || existed.chainSlug} at ${existed.apiUrl}`);
+      substrateChainHandlerLogger.info(`Reconnect ${existed.providerName || existed.chainSlug} at ${existed.apiUrl}`);
 
       return existed.recoverConnect();
     }
@@ -189,9 +192,9 @@ export class SubstrateChainHandler extends AbstractChainHandler {
 
     if (!(apiPromise instanceof GearApi)) {
       if (tokenType === _AssetType.GRC20) {
-        console.warn('Cannot subscribe GRC20 balance without GearApi instance');
+        substrateChainHandlerLogger.warn('Cannot subscribe GRC20 balance without GearApi instance');
       } else if (tokenType === _AssetType.VFT) {
-        console.warn('Cannot subscribe VFT balance without GearApi instance');
+        substrateChainHandlerLogger.warn('Cannot subscribe VFT balance without GearApi instance');
       }
 
       tokenSmartContract.contractError = true;
@@ -302,7 +305,7 @@ export class SubstrateChainHandler extends AbstractChainHandler {
   public destroySubstrateApi (chainSlug: string) {
     const substrateAPI = this.substrateApiMap[chainSlug];
 
-    substrateAPI?.destroy().catch(console.error);
+    substrateAPI?.destroy().catch((error) => substrateChainHandlerLogger.error('Error destroying Substrate API', error));
   }
 
   public async initApi (chainSlug: string, apiUrl: string, { externalApiPromise, onUpdateStatus, providerName }: Omit<_ApiOptions, 'metadata'> = {}): Promise<_SubstrateApi> {

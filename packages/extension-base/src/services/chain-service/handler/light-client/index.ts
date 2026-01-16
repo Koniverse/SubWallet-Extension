@@ -6,6 +6,9 @@ import { WellKnownChain } from '@substrate/connect';
 
 import { ScProvider } from '@polkadot/rpc-provider';
 import { ProviderInterface, ProviderInterfaceCallback, ProviderInterfaceEmitCb, ProviderInterfaceEmitted } from '@polkadot/rpc-provider/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const lightClientLogger = createLogger('LightClient');
 
 export const relayChainSpecs: Record<string, string> = {
   kusama: WellKnownChain.ksmcc3,
@@ -35,7 +38,7 @@ class ProviderPlaceholder implements ProviderInterface {
       .then((provider) => {
         this.provider = provider;
       })
-      .catch(console.error);
+      .catch((error) => lightClientLogger.error('Error initializing provider', error));
   }
 
   get hasSubscriptions () {
@@ -84,7 +87,7 @@ class ProviderPlaceholder implements ProviderInterface {
       if (!cancel) {
         unsub = provider.on(type, sub);
       }
-    }).catch(console.error);
+    }).catch((error) => lightClientLogger.error('Error setting up provider subscription', error));
 
     return () => {
       unsub();
@@ -138,7 +141,10 @@ export function getSubstrateConnectProvider (specLink: string): ProviderInterfac
     scProvider = new ScProvider(Sc, spec);
 
     return scProvider;
-  }).catch(console.error) as Promise<ScProvider>;
+  }).catch((error) => {
+    lightClientLogger.error('Error fetching para chain spec', error);
+    throw error;
+  }) as Promise<ScProvider>;
 
   return new ProviderPlaceholder(scPromise);
 }

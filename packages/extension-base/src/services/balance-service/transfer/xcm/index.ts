@@ -8,6 +8,7 @@ import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsi
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
 import { buildXcm, dryRunPreviewXcm, dryRunXcm, estimateXcmFee, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
@@ -16,6 +17,8 @@ import { TransactionConfig } from 'web3-core';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 
 import { _createPosBridgeL1toL2Extrinsic, _createPosBridgeL2toL1Extrinsic } from './posBridge';
+
+const xcmTransferLogger = createLogger('XcmTransfer');
 
 export type CreateXcmExtrinsicProps = {
   destinationChain: _ChainInfo;
@@ -128,7 +131,7 @@ export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
   try {
     return await buildXcm(request);
   } catch (e) {
-    console.log('createXcmExtrinsicV2 error: ', e);
+    xcmTransferLogger.error('createXcmExtrinsicV2 error', e);
 
     return undefined;
   }

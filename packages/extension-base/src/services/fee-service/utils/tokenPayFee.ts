@@ -6,10 +6,13 @@ import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/
 import { _getAssetDecimals, _getAssetPriceId, _getTokenOnChainAssetId } from '@subwallet/extension-base/services/chain-service/utils';
 import { RequestAssetHubTokensCanPayFee, RequestHydrationTokensCanPayFee, TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { checkLiquidityForPool, estimateTokensForPool, getReserveForPool } from '@subwallet/extension-base/services/swap-service/handler/asset-hub/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
+
+const tokenPayFeeLogger = createLogger('TokenPayFee');
 
 export async function getAssetHubTokensCanPayFee (request: RequestAssetHubTokensCanPayFee): Promise<TokenHasBalanceInfo[]> {
   const { chainService, feeAmount, nativeBalanceInfo, nativeTokenInfo, substrateApi, tokensHasBalanceInfoMap } = request;
@@ -26,7 +29,7 @@ export async function getAssetHubTokensCanPayFee (request: RequestAssetHubTokens
       const token = chainService.getAssetBySlug(tokenSlug);
 
       if (!token) {
-        console.error(`[getAssetHubTokensCanPayFee] Token not found for slug: ${tokenSlug}`);
+        tokenPayFeeLogger.error(`[getAssetHubTokensCanPayFee] Token not found for slug: ${tokenSlug}`);
       }
 
       return token;
@@ -71,7 +74,7 @@ export async function getAssetHubTokensCanPayFee (request: RequestAssetHubTokens
         }
       }
     } catch (e) {
-      console.error('error when fetching pool with token', tokenInfo.slug, e);
+      tokenPayFeeLogger.error('error when fetching pool with token', tokenInfo.slug, e);
     }
   }));
 
@@ -100,7 +103,7 @@ export async function getHydrationTokensCanPayFee (request: RequestHydrationToke
       const token = chainService.getAssetBySlug(tokenSlug);
 
       if (!token) {
-        console.error(`[getHydrationTokensCanPayFee] Token not found for slug: ${tokenSlug}`);
+        tokenPayFeeLogger.error(`[getHydrationTokensCanPayFee] Token not found for slug: ${tokenSlug}`);
       }
 
       return token;
@@ -201,7 +204,7 @@ export async function getHydrationRate (address: string, hdx: _ChainAsset, desTo
 
     quoteRate = quote.rate;
   } catch (error) {
-    console.error(`Failed to fetch swap quote: ${(error as Error).message}`);
+    tokenPayFeeLogger.error(`Failed to fetch swap quote: ${(error as Error).message}`);
   }
 
   if (quoteRate) {

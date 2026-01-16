@@ -1,9 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import BaseStoreWithAddressAndChain from '@subwallet/extension-base/services/storage-service/db-stores/BaseStoreWithAddressAndChain';
 
 import { ICrowdloanItem } from '../databases';
+
+const crowdloanStoreLogger = createLogger('CrowdloanStore');
 
 export default class CrowdloanStore extends BaseStoreWithAddressAndChain<ICrowdloanItem> {
   async removeEndedCrowdloans () {
@@ -16,7 +19,7 @@ export default class CrowdloanStore extends BaseStoreWithAddressAndChain<ICrowdl
           removeList.push(cursor.primaryKey as string);
         }
       } catch (e) {
-        console.error(e);
+        crowdloanStoreLogger.error('Error removing ended crowdloans', e);
       }
     });
 

@@ -16,8 +16,11 @@ import { BN_ZERO, combineEthFee, createPromiseHandler, isSameAddress, reformatAd
 import { validateAddressNetwork } from '@subwallet/extension-base/utils/cardano';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { isCardanoAddress, isCardanoBaseAddress, isCardanoRewardAddress, isSubstrateAddress } from '@subwallet/keyring';
 import { KeyringPair } from '@subwallet/keyring/types';
+
+const logicValidationLogger = createLogger('LogicValidation');
 import { getBitcoinAddressInfo } from '@subwallet/keyring/utils';
 import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 import { keyring } from '@subwallet/ui-keyring';
@@ -262,7 +265,7 @@ export async function validationConnectMiddleware (koni: KoniState, url: string,
     const [message, name] = convertErrorMessage(message_);
     const error = new EvmProviderError(EvmProviderErrorType.CHAIN_DISCONNECTED, message, undefined, name);
 
-    console.error(error);
+    logicValidationLogger.error('Validation error: chain disconnected', error);
     errors.push(error);
   };
 
@@ -356,7 +359,7 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
     const [message, name] = convertErrorMessage(message_);
     const error = new TransactionError(BasicTxErrorType.INVALID_PARAMS, message, undefined, name);
 
-    console.error(error);
+    logicValidationLogger.error('Validation error: invalid params', error);
     errors.push(error);
   };
 
@@ -555,7 +558,7 @@ export async function validationEvmSignMessageMiddleware (koni: KoniState, url: 
     const [message, name] = convertErrorMessage(message_);
     const error = new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, message, undefined, name);
 
-    console.error(error);
+    logicValidationLogger.error('Validation error: invalid params in evm signature', error);
     errors.push(error);
   };
 
@@ -614,7 +617,7 @@ export async function validationEvmSignMessageMiddleware (koni: KoniState, url: 
           throw new Error('Unsupported action');
       }
     } catch (e) {
-      console.error(e);
+      logicValidationLogger.error('Error in validationEvmSignMessageMiddleware', e);
       handleError((e as Error).message);
     }
   } else {
@@ -760,7 +763,7 @@ export async function validationCardanoSignDataMiddleware (koni: KoniState, url:
     const [message, name] = convertErrorMessage(message_);
     const error = new CardanoProviderError(CardanoProviderErrorType.INVALID_REQUEST, message, undefined, name);
 
-    console.error(error);
+    logicValidationLogger.error('Validation error: invalid request in cardano signature', error);
     errors.push(error);
   };
 
@@ -823,7 +826,7 @@ export async function validationBitcoinConnectMiddleware (koni: KoniState, url: 
     const [message, name] = convertErrorMessage(message_);
     const error = new TransactionError(BasicTxErrorType.INVALID_PARAMS, message, undefined, name);
 
-    console.error(error);
+    logicValidationLogger.error('Validation error: invalid params', error);
     errors.push(error);
   };
 
@@ -1074,7 +1077,7 @@ export async function validationBitcoinSendTransactionMiddleware (koni: KoniStat
       const [message, name] = [t('bg.TRANSACTION.core.validation.request.enableChainOnExtension', { replace: { chain: chainInfo.name } }), t('bg.TRANSACTION.core.validation.request.networkNotEnabled')];
       const error = new BitcoinProviderError(BitcoinProviderErrorType.INVALID_PARAMS, message, undefined, name);
 
-      console.error(error);
+      logicValidationLogger.error('Validation error: network not enabled for bitcoin transaction', error);
       errors.push(error);
     } else {
       handleError(message);

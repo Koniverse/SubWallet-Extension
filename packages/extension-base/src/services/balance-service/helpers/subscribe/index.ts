@@ -10,9 +10,12 @@ import { _isPureBitcoinChain, _isPureCardanoChain, _isPureEvmChain, _isPureTonCh
 import { BalanceItem } from '@subwallet/extension-base/types';
 import { filterAddressByChainInfo, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { subscribeTonBalance } from './ton/ton';
 import { subscribeEVMBalance } from './evm';
 import { subscribeSubstrateBalance } from './substrate';
+
+const balanceSubscribeLogger = createLogger('BalanceSubscribe');
 
 const handleUnsupportedOrPendingAddresses = (
   addresses: string[],
@@ -150,7 +153,7 @@ export function subscribeBalance (
     unsubList.forEach((subProm) => {
       subProm.then((unsub) => {
         unsub && unsub();
-      }).catch(console.error);
+      }).catch((error) => balanceSubscribeLogger.error('Error in balance subscription', error));
     });
   };
 }

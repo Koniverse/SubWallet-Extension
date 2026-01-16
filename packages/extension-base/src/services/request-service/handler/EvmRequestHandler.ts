@@ -10,6 +10,8 @@ import RequestService from '@subwallet/extension-base/services/request-service';
 import { anyNumberToBN } from '@subwallet/extension-base/utils/eth';
 import { isInternalRequest } from '@subwallet/extension-base/utils/request';
 import keyring from '@subwallet/ui-keyring';
+
+const evmRequestHandlerLogger = createLogger('EvmRequestHandler');
 import BigN from 'bignumber.js';
 import BN from 'bn.js';
 import { toBuffer } from 'ethereumjs-util';
@@ -305,7 +307,7 @@ export default class EvmRequestHandler {
         const { resolver } = this.confirmationsPromiseMap[id];
 
         if (!resolver || !confirmation) {
-          console.error('Not found confirmation', type, id);
+          evmRequestHandlerLogger.error('Not found confirmation', type, id);
         } else {
           resolver.reject(new Error('Reset wallet'));
         }

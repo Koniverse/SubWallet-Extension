@@ -3,6 +3,9 @@
 
 import { UNIQUE_SCAN_ENDPOINT } from '@subwallet/extension-base/koni/api/nft/config';
 import { BaseNftApi, HandleNftParams } from '@subwallet/extension-base/koni/api/nft/nft';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const uniqueNftV2Logger = createLogger('UniqueNftV2');
 
 interface NftData {
   collection_id: number;
@@ -57,7 +60,7 @@ export class UniqueNftApiV2 extends BaseNftApi {
         allNfts = allNfts.concat(nfts);
       }));
     } catch (e) {
-      console.error(`Failed to fetch ${this.chain} nft`, e);
+      uniqueNftV2Logger.error(`Failed to fetch ${this.chain} nft`, e);
     }
   }
 

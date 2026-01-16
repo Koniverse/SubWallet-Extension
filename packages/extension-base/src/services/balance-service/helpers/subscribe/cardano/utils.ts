@@ -4,6 +4,9 @@
 import { Transaction } from '@emurgo/cardano-serialization-lib-nodejs';
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { CardanoTxOutput } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const balanceSubscribeCardanoLogger = createLogger('BalanceSubscribeCardano');
 
 export function getCardanoAssetId (chainAsset: _ChainAsset): string {
   return chainAsset.metadata?.cardanoId as string;
@@ -46,7 +49,7 @@ export async function retryCardanoTxStatus (fn: () => Promise<boolean>, options:
     }
   }
 
-  console.error('Cardano transaction timeout', lastError); // throw only last error, in case no successful result from fn()
+  balanceSubscribeCardanoLogger.error('Cardano transaction timeout', lastError); // throw only last error, in case no successful result from fn()
 
   return false;
 }

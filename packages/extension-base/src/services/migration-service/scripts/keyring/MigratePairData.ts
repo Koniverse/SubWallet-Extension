@@ -10,13 +10,13 @@ export default class MigratePairData extends BaseMigrationJob {
         try {
           this.state.keyringService.context.updateMetadataForPair();
         } catch (e) {
-          console.error(e);
+          this.logger.error(e);
         }
 
         resolve();
       });
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
   }
 }

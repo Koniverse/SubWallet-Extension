@@ -65,6 +65,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { JsonRpcResponse, ProviderInterface, ProviderInterfaceCallback } from '@polkadot/rpc-provider/types';
 import { assert, logger as createLogger, noop } from '@polkadot/util';
 import { Logger } from '@polkadot/util/types';
+import { createLogger as createExtensionLogger } from '@subwallet/extension-base/utils/logger';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { KoniCron } from '../cron';
@@ -91,6 +92,8 @@ const generateDefaultCrowdloanMap = (): Record<string, CrowdloanItem> => {
 };
 
 const DEFAULT_CURRENCY: CurrencyType = 'USD';
+
+const extensionLogger = createExtensionLogger('State');
 
 export default class KoniState {
   private injectedProviders = new Map<chrome.runtime.Port, ProviderInterface>();
@@ -195,8 +198,8 @@ export default class KoniState {
     // Init state
     if (targetIsWeb) {
       this.init().then(() => {
-        this.wakeup(true).catch(console.error);
-      }).catch(console.error);
+        this.wakeup(true).catch((error) => extensionLogger.error('Error waking up state', error));
+      }).catch((error) => extensionLogger.error('Error initializing state', error));
     }
   }
 
@@ -342,9 +345,9 @@ export default class KoniState {
     const mantaPayConfig = await this.chainService?.mantaPay?.getMantaPayFirstConfig(_DEFAULT_MANTA_ZK_CHAIN) as MantaPayConfig;
 
     if (mantaPayConfig && mantaPayConfig.enabled && !this.isMantaPayEnabled) { // only init the first login
-      console.debug('Initiating MantaPay for', mantaPayConfig.address);
+      extensionLogger.debug('Initiating MantaPay for', mantaPayConfig.address);
       await this.enableMantaPay(false, mantaPayConfig.address, password);
-      console.debug('Initiated MantaPay for', mantaPayConfig.address);
+      extensionLogger.debug('Initiated MantaPay for', mantaPayConfig.address);
 
       this.isMantaPayEnabled = true;
       this.eventService.emit('mantaPay.enable', mantaPayConfig.address);
@@ -1231,7 +1234,7 @@ export default class KoniState {
 
           return await calculateGasFeeParams(web3Api, slug, false, false);
         } catch (e) {
-          console.error(e);
+          extensionLogger.error('Error calculating gas fee params', e);
 
           return null;
         }
@@ -1827,7 +1830,7 @@ export default class KoniState {
 
     if (!migrationStatus || migrationStatus !== 'done') {
       if (!isManifestV3) {
-        this.migrateMV3LocalStorage(JSON.stringify(self.localStorage)).catch(console.error);
+        this.migrateMV3LocalStorage(JSON.stringify(self.localStorage)).catch((error) => extensionLogger.error('Error migrating MV3 localStorage', error));
       }
     }
   }
@@ -1858,11 +1861,11 @@ export default class KoniState {
 
       // Reload some services use SWStorage
       // wallet connect
-      this.walletConnectService.initClient().catch(console.error);
+      this.walletConnectService.initClient().catch((error) => extensionLogger.error('Error initializing wallet connect client', error));
 
       return true;
     } catch (e) {
-      console.error(e);
+      extensionLogger.error('Error migrating MV3 localStorage', e);
 
       return false;
     }
@@ -1880,10 +1883,10 @@ export default class KoniState {
   public onInstallOrUpdate (details: chrome.runtime.InstalledDetails) {
     // Open mv3 migration window
     if (details.reason === 'install') {
-      this.onMV3Install().catch(console.error);
+      this.onMV3Install().catch((error) => extensionLogger.error('Error on MV3 install', error));
     } else if (details.reason === 'update') {
-      this.onMV3Update().catch(console.error);
-      this.storePreviousVersionData(details).catch(console.error);
+      this.onMV3Update().catch((error) => extensionLogger.error('Error on MV3 update', error));
+      this.storePreviousVersionData(details).catch((error) => extensionLogger.error('Error storing previous version data', error));
     }
   }
 
@@ -1898,7 +1901,7 @@ export default class KoniState {
 
           openPopup(url)
             .then(noop)
-            .catch(console.error)
+            .catch((error) => extensionLogger.error('Error opening popup for remind export account', error))
             .finally(() => subscription.unsubscribe());
         } else {
           setTimeout(() => {
@@ -1919,7 +1922,7 @@ export default class KoniState {
 
       return true;
     } catch (e) {
-      console.error(e);
+      extensionLogger.error('Error setting storage from WS', e);
 
       return false;
     }
@@ -1929,7 +1932,7 @@ export default class KoniState {
     try {
       return await SWStorage.instance.getItem(key);
     } catch (e) {
-      console.error(e);
+      extensionLogger.error('Error getting storage from WS', e);
 
       return null;
     }
@@ -1937,7 +1940,7 @@ export default class KoniState {
 
   public onCheckToRemindUser () {
     this.onHandleRemindExportAccount()
-      .catch(console.error);
+      .catch((error) => extensionLogger.error('Error checking to remind user', error));
   }
 
   public onInstall () {
@@ -2161,10 +2164,10 @@ export default class KoniState {
       const stores = this.dbService.stores;
 
       // Remove NFT
-      stores.nft.deleteNftByAddress([address]).catch(console.error);
+      stores.nft.deleteNftByAddress([address]).catch((error) => extensionLogger.error('Error deleting NFT by address', error));
 
       // Remove Staking Data
-      stores.staking.removeAllByAddress(address).catch(console.error);
+      stores.staking.removeAllByAddress(address).catch((error) => extensionLogger.error('Error removing staking data by address', error));
     });
   }
 
@@ -2377,7 +2380,7 @@ export default class KoniState {
           this.balanceService.setBalanceItem([balanceItem]);
         }
       })
-      .catch(console.warn);
+      .catch((error) => extensionLogger.warn('Error getting Manta ZK balance', error));
   }
 
   public subscribeMantaPayBalance () {
@@ -2391,7 +2394,7 @@ export default class KoniState {
           interval = setInterval(this.getMantaZkBalance, MANTA_PAY_BALANCE_INTERVAL);
         }
       })
-      .catch(console.warn);
+      .catch((error) => extensionLogger.warn('Error subscribing MantaPay balance', error));
 
     return () => {
       interval && clearInterval(interval);

@@ -3,9 +3,12 @@
 
 import type { MessageTypesWithSubscriptions, SubscriptionMessageTypes } from '../types';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
 type Subscriptions = Record<string, chrome.runtime.Port>;
 
 const subscriptions: Subscriptions = {};
+const subscriptionsLogger = createLogger('Subscriptions');
 
 // return a subscription callback, that will send the data to the caller via the port
 export function createSubscription<TMessageType extends MessageTypesWithSubscriptions> (id: string, port: chrome.runtime.Port): (data: SubscriptionMessageTypes[TMessageType]) => void {
@@ -27,6 +30,6 @@ export function unsubscribe (id: string): void {
   if (subscriptions[id]) {
     delete subscriptions[id];
   } else {
-    console.error(`Unable to unsubscribe from ${id}`);
+    subscriptionsLogger.error(`Unable to unsubscribe from ${id}`);
   }
 }

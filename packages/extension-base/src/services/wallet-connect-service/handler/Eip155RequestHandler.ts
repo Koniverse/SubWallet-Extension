@@ -6,8 +6,11 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import WalletConnectService from '@subwallet/extension-base/services/wallet-connect-service';
 import { getWCId, parseRequestParams } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { EIP155_SIGNING_METHODS } from '@subwallet/extension-base/services/wallet-connect-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { SignClientTypes } from '@walletconnect/types';
 import { getSdkError } from '@walletconnect/utils';
+
+const eip155RequestHandlerLogger = createLogger('Eip155RequestHandler');
 
 export default class Eip155RequestHandler {
   readonly #walletConnectService: WalletConnectService;
@@ -19,7 +22,7 @@ export default class Eip155RequestHandler {
   }
 
   #handleError (topic: string, id: number, e: unknown) {
-    console.log(e);
+    eip155RequestHandlerLogger.debug('Error in EIP155 request handler', e);
     let message = (e as Error).message;
 
     if (message.includes('User Rejected Request')) {
@@ -29,7 +32,7 @@ export default class Eip155RequestHandler {
     this.#walletConnectService.responseRequest({
       topic: topic,
       response: formatJsonRpcError(id, message)
-    }).catch(console.error);
+    }).catch((error) => eip155RequestHandlerLogger.error('Error responding to wallet connect request', error));
   }
 
   public handleRequest (requestEvent: SignClientTypes.EventArguments['session_request']) {

@@ -4,6 +4,7 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { _BITCOIN_CHAIN_SLUG, _BITCOIN_NAME, _BITCOIN_TESTNET_NAME } from '@subwallet/extension-base/services/chain-service/constants';
 import { _BitcoinApi } from '@subwallet/extension-base/services/chain-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BitcoinFeeInfo, BitcoinFeeRate, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { combineBitcoinFee, determineUtxosForSpend, determineUtxosForSpendAll, getTransferableBitcoinUtxos } from '@subwallet/extension-base/utils';
 import { BitcoinAddressType } from '@subwallet/keyring/types';
@@ -11,6 +12,8 @@ import { getBitcoinAddressInfo } from '@subwallet/keyring/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
 import { Network, Psbt } from 'bitcoinjs-lib';
+
+const bitcoinTransferLogger = createLogger('BitcoinTransfer');
 
 export interface TransferBitcoinProps extends TransactionFee {
   bitcoinApi: _BitcoinApi;
@@ -108,7 +111,7 @@ export async function createBitcoinTransaction (params: TransferBitcoinProps): P
       throw e;
     }
 
-    console.warn('Failed to create Bitcoin transaction:', e);
+    bitcoinTransferLogger.warn('Failed to create Bitcoin transaction', e);
     throw new Error(`You don’t have enough BTC (${convertChainToSymbol(chain)}) for the transaction. Lower your BTC amount and try again`);
   }
 }

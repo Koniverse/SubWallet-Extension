@@ -25,10 +25,13 @@ import { timer } from 'rxjs';
 
 import { ContractPromise } from '@polkadot/api-contract';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { subscribeERC20Interval } from '../evm';
 import { subscribeEquilibriumTokenBalance } from './equilibrium';
 import { subscribeGRC20Balance, subscribeVftBalance } from './gear';
 import { buildLockedDetails, getSpecialStakingBalances } from './utils';
+
+const balanceSubscribeSubstrateLogger = createLogger('BalanceSubscribeSubstrate');
 
 export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: _ChainInfo, assetMap: Record<string, _ChainAsset>, substrateApi: _SubstrateApi, evmApi: _EvmApi, callback: (rs: BalanceItem[]) => void, extrinsicType?: ExtrinsicType) => {
   let unsubNativeToken: () => void;
@@ -108,7 +111,7 @@ export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: 
       unsubVftToken = subscribeVftBalance(substrateParams);
     }
   } catch (err) {
-    console.warn(err);
+    balanceSubscribeSubstrateLogger.warn('Error in substrate balance subscription', err);
   }
 
   return () => {
@@ -323,7 +326,7 @@ const subscribeForeignAssetBalance = async ({ addresses, assetMap, callback, cha
         });
       }
     } catch (err) {
-      console.warn(err);
+      balanceSubscribeSubstrateLogger.warn('Error in substrate balance subscription', err);
     }
 
     return undefined;
@@ -376,7 +379,7 @@ const subscribePSP22Balance = ({ addresses, assetMap, callback, chainInfo, subst
               state: APIItemState.READY
             };
           } catch (err) {
-            console.error(`Error on get balance of account ${address} for token ${tokenInfo.slug}`, err);
+            balanceSubscribeSubstrateLogger.error(`Error on get balance of account ${address} for token ${tokenInfo.slug}`, err);
 
             return {
               address: address,
@@ -390,7 +393,7 @@ const subscribePSP22Balance = ({ addresses, assetMap, callback, chainInfo, subst
 
         callback(balances);
       } catch (err) {
-        console.warn(tokenInfo.slug, err); // TODO: error createType
+        balanceSubscribeSubstrateLogger.warn(`Error for token ${tokenInfo.slug}`, err); // TODO: error createType
       }
     });
   };
@@ -419,7 +422,7 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
           callback(gigaTokenBalances);
         };
 
-        getGigaTokenBalance().catch(console.error);
+        getGigaTokenBalance().catch((error) => balanceSubscribeSubstrateLogger.error('Error getting Giga token balance', error));
       });
     }
 
@@ -452,7 +455,7 @@ const subscribeTokensAccountsPallet = async ({ addresses, assetMap, callback, ch
         callback(items);
       });
     } catch (err) {
-      console.warn(err);
+      balanceSubscribeSubstrateLogger.warn('Error in substrate balance subscription', err);
     }
 
     return undefined;
@@ -540,7 +543,7 @@ const subscribeAssetsAccountPallet = async ({ addresses, assetMap, callback, cha
         callback(items);
       });
     } catch (err) {
-      console.warn(err);
+      balanceSubscribeSubstrateLogger.warn('Error in substrate balance subscription', err);
     }
 
     return undefined;
@@ -589,7 +592,7 @@ const subscribeOrmlTokensPallet = async ({ addresses, assetMap, callback, chainI
         callback(items);
       });
     } catch (err) {
-      console.warn(err);
+      balanceSubscribeSubstrateLogger.warn('Error in substrate balance subscription', err);
 
       return undefined;
     }
@@ -651,10 +654,10 @@ const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chain
     }
   };
 
-  getTokenBalances().catch(console.error);
+  getTokenBalances().catch((error) => balanceSubscribeSubstrateLogger.error('Error getting token balances', error));
 
   const interval = setInterval(() => {
-    getTokenBalances().catch(console.error);
+    getTokenBalances().catch((error) => balanceSubscribeSubstrateLogger.error('Error getting token balances', error));
   }, SUB_TOKEN_REFRESH_BALANCE_INTERVAL);
 
   return () => {

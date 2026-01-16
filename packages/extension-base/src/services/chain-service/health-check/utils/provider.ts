@@ -3,9 +3,12 @@
 
 import { EvmApi } from '@subwallet/extension-base/services/chain-service/handler/EvmApi';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { noop } from '@polkadot/util';
+
+const providerHealthCheckLogger = createLogger('ProviderHealthCheck');
 
 export const failedMessage = 'Connect failed';
 export const timeoutMessage = 'Connect timeout';
@@ -13,7 +16,7 @@ export const timeoutMessage = 'Connect timeout';
 export const substrateHandleConnectChain = async (chain: string, key: string, provider: string, hash: string): Promise<[ApiPromise, string]> => {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises,no-async-promise-executor
   return new Promise<[ApiPromise, string]>(async (resolve) => {
-    console.log('start', chain, key, provider);
+    providerHealthCheckLogger.debug('start', chain, key, provider);
 
     const _api = new ApiPromise({ provider: new WsProvider(provider) });
 
@@ -21,7 +24,7 @@ export const substrateHandleConnectChain = async (chain: string, key: string, pr
 
     const handlerOnFail = (e: Error) => {
       if (logFail) {
-        console.log('error', chain, key);
+        providerHealthCheckLogger.error('error', chain, key);
         resolve([_api, e?.message || failedMessage]);
       }
 
@@ -29,11 +32,11 @@ export const substrateHandleConnectChain = async (chain: string, key: string, pr
     };
 
     const timeout = setTimeout(() => {
-      console.log('timeout', chain, key);
+      providerHealthCheckLogger.warn('timeout', chain, key);
       resolve([_api, timeoutMessage]);
       logFail = false;
 
-      _api.disconnect().catch(console.error);
+      _api.disconnect().catch((error) => providerHealthCheckLogger.error('Error disconnecting API', error));
       _api.off('disconnected', handlerOnFail);
       _api.off('error', handlerOnFail);
     }, 30 * 1000);
@@ -64,7 +67,7 @@ export const substrateHandleConnectChain = async (chain: string, key: string, pr
 export const evmHandleConnectChain = async (chain: string, key: string, provider: string, chainId: number): Promise<[_EvmApi | null, string]> => {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises,no-async-promise-executor
   return new Promise<[_EvmApi | null, string]>(async (resolve) => {
-    console.log('start', chain, key, provider);
+    providerHealthCheckLogger.debug('start', chain, key, provider);
 
     let api: _EvmApi | null = null;
 
@@ -74,7 +77,7 @@ export const evmHandleConnectChain = async (chain: string, key: string, provider
 
     const handlerOnFail = (e: Error) => {
       if (logFail) {
-        console.log('error', chain, key);
+        providerHealthCheckLogger.error('error', chain, key);
         resolve([api, e?.message || failedMessage]);
       }
 
@@ -82,11 +85,11 @@ export const evmHandleConnectChain = async (chain: string, key: string, provider
     };
 
     const timeout = setTimeout(() => {
-      console.log('timeout', chain, key);
+      providerHealthCheckLogger.warn('timeout', chain, key);
       resolve([api, timeoutMessage]);
       logFail = false;
 
-      _api.destroy().catch(console.error);
+      _api.destroy().catch((error) => providerHealthCheckLogger.error('Error destroying API', error));
     }, 60 * 1000);
 
     try {
@@ -208,7 +211,7 @@ export const handleEvmProvider = ({ awaitDisconnect,
         }
       };
 
-      console.log('connected', chain, key, provider);
+      providerHealthCheckLogger.debug('connected', chain, key, provider);
 
       clearTimeout(timeout);
 

@@ -5,8 +5,11 @@ import { NftCollection, NftItem } from '@subwallet/extension-base/background/Kon
 import { BaseNftApi, HandleNftParams } from '@subwallet/extension-base/koni/api/nft/nft';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { hexToStr, hexToUTF16, parseIpfsLink, utf16ToString } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { deserializeNft } from './protobuf';
+
+const quartzNftLogger = createLogger('QuartzNft');
 
 interface CollectionProperties {
   schemaVersion: string,
@@ -218,7 +221,7 @@ export default class QuartzNftApi extends BaseNftApi {
         }
       }));
     } catch (e) {
-      console.error(`${this.chain}`, e);
+      quartzNftLogger.error(`Error handling NFTs for chain ${this.chain}`, e);
     }
   }
 

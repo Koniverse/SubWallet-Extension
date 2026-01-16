@@ -6,11 +6,14 @@ import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { _isAcrossBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { _getAssetDecimals, _getContractAddressOfToken, _getEvmChainId } from '@subwallet/extension-base/services/chain-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BasicTxErrorType } from '@subwallet/extension-base/types';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
 
 import { CreateXcmExtrinsicProps } from '..';
+
+const acrossBridgeLogger = createLogger('AcrossBridge');
 
 // Across Bridge
 const acrossPairsMap = new Map([
@@ -125,7 +128,7 @@ export const getAcrossSendingValue = async (originChain: _ChainInfo, originToken
 
     return sendingValue;
   } catch (error) {
-    console.error('Across Bridge error:', error);
+    acrossBridgeLogger.error('Across Bridge error', error);
 
     // fallback in case fetch API fail
     const defaultSendingAmount = isTestnet ? 0.0037 : 1;

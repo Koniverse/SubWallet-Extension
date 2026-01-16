@@ -5,9 +5,12 @@ import { GearApi } from '@gear-js/api';
 import { _AssetType } from '@subwallet/chain-list/types';
 import { APIItemState } from '@subwallet/extension-base/background/KoniTypes';
 import { SUB_TOKEN_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/constants';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { BalanceItem, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
 import { filterAssetsByChainAndType, getGRC20ContractPromise, getVFTContractPromise, GRC20, VFT } from '@subwallet/extension-base/utils';
+
+const balanceSubscribeGearLogger = createLogger('BalanceSubscribeGear');
 
 import { noop, u8aToHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/util-crypto';
@@ -20,7 +23,7 @@ export const subscribeGRC20Balance = ({ addresses,
   const apiPromise = substrateApi.api;
 
   if (!(apiPromise instanceof GearApi)) {
-    console.warn('Cannot subscribe GRC20 balance without GearApi instance');
+    balanceSubscribeGearLogger.warn('Cannot subscribe GRC20 balance without GearApi instance');
 
     return noop;
   }
@@ -50,7 +53,7 @@ export const subscribeGRC20Balance = ({ addresses,
               state: APIItemState.READY
             };
           } catch (err) {
-            console.error(`Error on get balance of account ${address} for token ${tokenInfo.slug}`, err);
+            balanceSubscribeGearLogger.error(`Error on get balance of account ${address} for token ${tokenInfo.slug}`, err);
 
             return {
               address: address,
@@ -64,7 +67,7 @@ export const subscribeGRC20Balance = ({ addresses,
 
         callback(balances);
       } catch (err) {
-        console.warn(tokenInfo.slug, err); // TODO: error createType
+        balanceSubscribeGearLogger.warn(`Error for token ${tokenInfo.slug}`, err); // TODO: error createType
       }
     });
   };
@@ -86,7 +89,7 @@ export const subscribeVftBalance = ({ addresses,
   const apiPromise = substrateApi.api;
 
   if (!(apiPromise instanceof GearApi)) {
-    console.warn('Cannot subscribe VFT balance without GearApi instance');
+    balanceSubscribeGearLogger.warn('Cannot subscribe VFT balance without GearApi instance');
 
     return noop;
   }
@@ -116,7 +119,7 @@ export const subscribeVftBalance = ({ addresses,
               state: APIItemState.READY
             };
           } catch (err) {
-            console.error(`Error on get balance of account ${address} for token ${tokenInfo.slug}`, err);
+            balanceSubscribeGearLogger.error(`Error on get balance of account ${address} for token ${tokenInfo.slug}`, err);
 
             return {
               address: address,
@@ -130,7 +133,7 @@ export const subscribeVftBalance = ({ addresses,
 
         callback(balances);
       } catch (err) {
-        console.warn(tokenInfo.slug, err); // TODO: error createType
+        balanceSubscribeGearLogger.warn(`Error for token ${tokenInfo.slug}`, err); // TODO: error createType
       }
     });
   };

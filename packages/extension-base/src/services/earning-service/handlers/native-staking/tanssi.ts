@@ -5,6 +5,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { APIItemState, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, NominationInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolTarget, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { formatNumber } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
@@ -14,6 +15,8 @@ import { AnyJson } from '@polkadot/types/types';
 
 import { parseIdentity } from '../../utils';
 import BaseParaNativeStakingPoolHandler from './base-para';
+
+const tanssiStakingLogger = createLogger('TanssiStaking');
 
 interface SortedEligibleCandidate {
   candidate: string;
@@ -373,10 +376,10 @@ export default class TanssiNativeStakingPoolHandler extends BaseParaNativeStakin
         });
       };
 
-      fetchAndUpdate().catch(console.error);
+      fetchAndUpdate().catch((error) => tanssiStakingLogger.error('Error in fetchAndUpdate', error));
 
       const intervalId = setInterval(() => {
-        fetchAndUpdate().catch(console.error);
+        fetchAndUpdate().catch((error) => tanssiStakingLogger.error('Error in fetchAndUpdate', error));
       }, 30000);
 
       intervalIds.push(intervalId);

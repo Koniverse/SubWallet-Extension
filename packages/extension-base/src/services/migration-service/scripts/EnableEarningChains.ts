@@ -8,7 +8,7 @@ export default class EnableEarningChains extends BaseMigrationJob {
     try {
       await this.state.chainService.enableChains(['moonbeam', 'acala', 'bifrost_dot', 'interlay', 'parallel']);
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
   }
 }

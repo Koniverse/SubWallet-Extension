@@ -3,6 +3,7 @@
 
 import { AccountExternalError, AccountExternalErrorCode, RequestAccountCreateExternalV2, RequestAccountCreateWithSecretKey, RequestAccountExportPrivateKey, ResponseAccountCreateWithSecretKey, ResponseAccountExportPrivateKey } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountChainType, CommonAccountErrorType, RequestCheckPublicAndSecretKey, RequestPrivateKeyValidateV2, ResponseCheckPublicAndSecretKey, ResponsePrivateKeyValidateV2, SWCommonAccountError } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { decodePair } from '@subwallet/keyring/pair/decode';
 import { BitcoinKeypairTypes, CardanoKeypairTypes, KeypairType, KeyringPair, KeyringPair$Meta, TonKeypairTypes } from '@subwallet/keyring/types';
@@ -13,6 +14,8 @@ import { assert, hexStripPrefix, hexToU8a, isHex, u8aToHex } from '@polkadot/uti
 import { base64Decode, keyExtractSuri } from '@polkadot/util-crypto';
 
 import { AccountBaseHandler } from './Base';
+
+const accountSecretHandlerLogger = createLogger('AccountSecretHandler');
 
 /**
  * @class AccountSecretHandler
@@ -246,7 +249,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
         };
       }
     } catch (e) {
-      console.error(e);
+      accountSecretHandlerLogger.error('Error checking public and secret key', e);
 
       return {
         address: '',

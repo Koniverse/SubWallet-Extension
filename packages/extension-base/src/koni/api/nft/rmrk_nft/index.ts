@@ -4,8 +4,11 @@
 import { NftCollection, NftItem, RMRK_VER } from '@subwallet/extension-base/background/KoniTypes';
 import { BaseNftApi, HandleNftParams } from '@subwallet/extension-base/koni/api/nft/nft';
 import { isUrl, reformatAddress } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { SINGULAR_V1_COLLECTION_ENDPOINT, SINGULAR_V2_COLLECTION_ENDPOINT, SINGULAR_V2_ENDPOINT } from '../config';
+
+const rmrkNftLogger = createLogger('RmrkNft');
 
 enum RMRK_SOURCE {
   BIRD_KANARIA = 'bird_kanaria',
@@ -160,7 +163,7 @@ export class RmrkNftApi extends BaseNftApi {
           }
         }
       } catch (e) {
-        console.log('error fetching RMRK NFT', e);
+        rmrkNftLogger.error('Error fetching RMRK NFT', e);
       }
     }));
 
@@ -270,7 +273,7 @@ export class RmrkNftApi extends BaseNftApi {
             allCollectionMeta[item?.id as string] = { ...data };
           }
         } catch (e) {
-          console.error(item.url, e);
+          rmrkNftLogger.error(`Error fetching RMRK NFT collection metadata for ${item.url}`, e);
         }
       }));
 
@@ -297,7 +300,7 @@ export class RmrkNftApi extends BaseNftApi {
         params.updateCollection(this.chain, parsedCollection);
       });
     } catch (e) {
-      console.error(`${this.chain}`, e);
+      rmrkNftLogger.error(`Error handling NFTs for chain ${this.chain}`, e);
     }
   }
 

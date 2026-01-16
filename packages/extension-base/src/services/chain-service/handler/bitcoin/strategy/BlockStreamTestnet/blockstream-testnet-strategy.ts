@@ -3,6 +3,7 @@
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { BitcoinAddressSummaryInfo, BitcoinApiStrategy, BitcoinTransactionEventMap, BlockstreamAddressResponse, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, BlockStreamUtxo, Inscription, InscriptionFetchedData, RunesInfoByAddress, RunesInfoByAddressFetchedData } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { HiroService } from '@subwallet/extension-base/services/hiro-service';
 import { RunesService } from '@subwallet/extension-base/services/rune-service';
 import { BaseApiRequestStrategy } from '@subwallet/extension-base/strategy/api-request-strategy';
@@ -11,6 +12,8 @@ import { getRequest, postRequest } from '@subwallet/extension-base/strategy/api-
 import { BitcoinFeeInfo, BitcoinTx, UtxoResponseItem } from '@subwallet/extension-base/types';
 import BigN from 'bignumber.js';
 import EventEmitter from 'eventemitter3';
+
+const blockstreamTestnetLogger = createLogger('BlockStreamTestnetStrategy');
 
 export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy implements BitcoinApiStrategy {
   private readonly baseUrl: string;
@@ -67,7 +70,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
 
       this.timePerBlock = blockTime;
     } catch (e) {
-      console.error('Failed to compute block time', e);
+      blockstreamTestnetLogger.error('Failed to compute block time', e);
 
       blockTime = (this.isTestnet ? 5 * 60 : 10 * 60) * 1000; // Default to 10 minutes if failed
     }
@@ -220,7 +223,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
         const response = await getRequest(this.getUrl('/fee-estimates'), undefined, this.headers);
 
         if (!response.ok) {
-          console.warn(`Failed to fetch fee estimates: ${response.statusText}`);
+          blockstreamTestnetLogger.warn(`Failed to fetch fee estimates: ${response.statusText}`);
 
           return defaultFeeInfo;
         }
@@ -300,7 +303,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
                 eventEmitter.emit('success', transactionStatus);
               }
             })
-            .catch(console.error);
+            .catch((error) => blockstreamTestnetLogger.error('Error in blockstream testnet strategy', error));
         }, 30000);
       })
       .catch((error: Error) => {
@@ -351,7 +354,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
 
       return runesFullList;
     } catch (error) {
-      console.error(`Failed to get ${address} balances`, error);
+      blockstreamTestnetLogger.error(`Failed to get ${address} balances`, error);
       throw error;
     }
   }

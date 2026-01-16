@@ -14,6 +14,10 @@ import { Codec } from '@polkadot/types/types';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const astarStakingLogger = createLogger('AstarStaking');
+
 const convertAddress = (address: string) => {
   return isEthereumAddress(address) ? address.toLowerCase() : address;
 };
@@ -24,7 +28,7 @@ const fetchDApps = async (network: string) => {
       method: 'GET'
     }).then((resp) => {
       resolve(resp.json());
-    }).catch(console.error);
+    }).catch((e) => astarStakingLogger.error('Error fetching dApps', e));
   });
 };
 
@@ -55,7 +59,7 @@ export async function getAstarStakingMetadata (chain: string, substrateApi: _Sub
       method: 'GET'
     }).then((resp) => {
       resolve(resp.json());
-    }).catch(console.error);
+    }).catch((e) => astarStakingLogger.error('Error fetching APR', e));
   });
 
   const timeout = new Promise((resolve) => {

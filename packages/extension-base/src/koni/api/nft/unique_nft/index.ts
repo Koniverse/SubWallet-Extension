@@ -5,8 +5,11 @@ import { NftCollection, NftItem } from '@subwallet/extension-base/background/Kon
 import { BaseNftApi, HandleNftParams } from '@subwallet/extension-base/koni/api/nft/nft';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { hexToStr, hexToUTF16, utf16ToString } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { deserializeNft } from './protobuf';
+
+const uniqueNftLogger = createLogger('UniqueNft');
 
 interface Collection {
   SchemaVersion: string,
@@ -209,7 +212,7 @@ export default class UniqueNftApi extends BaseNftApi {
         }));
       }));
     } catch (e) {
-      console.error(`${this.chain}`, e);
+      uniqueNftLogger.error(`Error handling NFTs for chain ${this.chain}`, e);
     }
   }
 

@@ -8,7 +8,7 @@ export default class DeleteEarningData20251105 extends BaseMigrationJob {
     try {
       await this.state.dbService.deleteYieldPoolInfo(['DOT___native_staking___polkadot', 'DOT___nomination_pool___polkadot']);
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
   }
 }

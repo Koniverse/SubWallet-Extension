@@ -5,6 +5,10 @@ import { resolveAddressToDomain, resolveDomainToAddress, SupportedChainId } from
 
 import { ApiPromise } from '@polkadot/api';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const domainResolverLogger = createLogger('DomainResolver');
+
 export const ENS_SUFFIX = '.eth';
 export const TZERO_ID_SUFFIX = '.tzero';
 
@@ -42,7 +46,7 @@ export async function resolveAzeroDomainToAddress (domain: string, chain: string
   );
 
   if (primaryDomains.error) {
-    console.debug(primaryDomains.error);
+    domainResolverLogger.debug('Error resolving domain to address', primaryDomains.error);
   }
 
   return primaryDomains?.address || undefined;
@@ -64,7 +68,7 @@ export async function resolveAzeroAddressToDomain (address: string, chain: strin
   );
 
   if (primaryDomains.error) {
-    console.debug(primaryDomains.error);
+    domainResolverLogger.debug('Error resolving address to domain', primaryDomains.error);
   }
 
   return primaryDomains?.primaryDomain || undefined;

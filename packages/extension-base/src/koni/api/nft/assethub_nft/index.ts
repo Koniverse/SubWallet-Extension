@@ -5,6 +5,9 @@ import { AssetHubNftType, NftCollection, NftItem } from '@subwallet/extension-ba
 import { BaseNftApi, HandleNftParams } from '@subwallet/extension-base/koni/api/nft/nft';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { isUrl } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const assethubNftLogger = createLogger('AssethubNft');
 
 interface AssetId {
   classId: string | number,
@@ -199,7 +202,7 @@ export default class AssetHubNftsPalletApi extends BaseNftApi {
         params.updateCollection(this.chain, parsedCollection);
       }));
     } catch (e) {
-      console.error(`${this.chain}`, e);
+      assethubNftLogger.error(`Error handling NFTs for chain ${this.chain}`, e);
     }
   }
 

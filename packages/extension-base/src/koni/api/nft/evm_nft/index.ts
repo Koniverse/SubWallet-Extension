@@ -9,8 +9,11 @@ import { BaseNftApi, HandleNftParams } from '@subwallet/extension-base/koni/api/
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { isUrl } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+
+const evmNftLogger = createLogger('EvmNft');
 
 export class EvmNftApi extends BaseNftApi {
   evmContracts: _ChainAsset[] = [];
@@ -151,14 +154,14 @@ export class EvmNftApi extends BaseNftApi {
                 ownItem = true;
               }
             } catch (e) {
-              console.error(`${this.chain}`, e);
+              evmNftLogger.error(`Error handling NFT for chain ${this.chain}`, e);
             }
           }
         }));
 
         nftOwnerMap[address] = nftIds;
       } catch (e) {
-        console.error(`${this.chain}`, e);
+        evmNftLogger.error(`Error handling NFTs for chain ${this.chain}`, e);
       }
     }));
 

@@ -14,8 +14,11 @@ import { _ChainConnectionStatus, _SubstrateAdapterQueryArgs, _SubstrateAdapterSu
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { goldbergRpc, goldbergTypes, spec as availSpec } from 'avail-js-sdk';
 import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'rxjs';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
+
+const substrateApiLogger = createLogger('SubstrateApi');
 import { ApiOptions } from '@polkadot/api/types';
 import { typesBundle as _typesBundle } from '@polkadot/apps-config/api';
 import { ProviderInterface } from '@polkadot/rpc-provider/types';
@@ -207,8 +210,8 @@ export class SubstrateApi implements _SubstrateApi {
           this.api.isReady.then(() => {
             this.updateConnectionStatus(_ChainConnectionStatus.CONNECTED);
             _callbackUpdateMetadata?.(this);
-          }).catch(console.error);
-        }).catch(console.error);
+          }).catch((error) => substrateApiLogger.error('Error in SubstrateApi subscription', error));
+        }).catch((error) => substrateApiLogger.error('Error in SubstrateApi operation', error));
     }
   }
 
@@ -216,7 +219,7 @@ export class SubstrateApi implements _SubstrateApi {
     try {
       await this.api.disconnect();
     } catch (e) {
-      console.error(e);
+      substrateApiLogger.error('Error in SubstrateApi', e);
     }
 
     this.updateConnectionStatus(_ChainConnectionStatus.DISCONNECTED);
@@ -247,7 +250,7 @@ export class SubstrateApi implements _SubstrateApi {
   onConnect (): void {
     this.updateConnectionStatus(_ChainConnectionStatus.CONNECTED);
     this.substrateRetry = 0;
-    console.log(`Connected to ${this.chainSlug || ''} at ${this.apiUrl}`);
+    substrateApiLogger.info(`Connected to ${this.chainSlug || ''} at ${this.apiUrl}`);
 
     if (this.isApiReadyOnce) {
       this.handleApiReady.resolve(this);
@@ -257,7 +260,7 @@ export class SubstrateApi implements _SubstrateApi {
 
   onDisconnect (): void {
     this.isApiReady = false;
-    console.log(`Disconnected from ${this.chainSlug} at ${this.apiUrl}`);
+    substrateApiLogger.info(`Disconnected from ${this.chainSlug} at ${this.apiUrl}`);
     this.updateConnectionStatus(_ChainConnectionStatus.DISCONNECTED);
     this.handleApiReady = createPromiseHandler<_SubstrateApi>();
     this.substrateRetry += 1;
@@ -265,12 +268,12 @@ export class SubstrateApi implements _SubstrateApi {
     if (this.substrateRetry > 9) {
       this.disconnect().then(() => {
         this.updateConnectionStatus(_ChainConnectionStatus.UNSTABLE);
-      }).catch(console.error);
+      }).catch((error) => substrateApiLogger.error('Error disconnecting SubstrateApi', error));
     }
   }
 
   onError (e: Error): void {
-    console.warn(`${this.chainSlug} connection got error`, e);
+    substrateApiLogger.warn(`${this.chainSlug} connection got error`, e);
   }
 
   async fillApiInfo (): Promise<void> {

@@ -4,10 +4,13 @@
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { baseParseIPFSUrl } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 
 import { TERNOA_MAINNET_CLIENT_NFT, TERNOA_MAINNET_GATEWAY } from '../config';
+
+const ternoaNftLogger = createLogger('TernoaNft');
 import { BaseNftApi, HandleNftParams } from '../nft';
 
 interface NftMetadata {
@@ -104,7 +107,7 @@ export class TernoaNftApi extends BaseNftApi {
 
           return { metadata: nft, detail: nftDetail };
         } catch (err) {
-          console.error('Error:', err);
+          ternoaNftLogger.error('Error fetching NFT detail', err);
 
           return null;
         }
@@ -112,7 +115,7 @@ export class TernoaNftApi extends BaseNftApi {
 
       return nftDetails.filter((nft) => nft !== null) as Array<{ metadata: NftMetadata; detail: NftDetail }>;
     } catch (err) {
-      console.error('Error:', err);
+      ternoaNftLogger.error('Error fetching NFT details', err);
 
       return null;
     }
@@ -152,7 +155,7 @@ export class TernoaNftApi extends BaseNftApi {
 
       return collectionDetail;
     } catch (err) {
-      console.error('Error:', err);
+      ternoaNftLogger.error('Error fetching collection detail', err);
 
       return null;
     }
