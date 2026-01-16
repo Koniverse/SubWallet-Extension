@@ -169,7 +169,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
                 block
                 disabled={loading}
                 loading={loading}
-                onClick={_onApprove}
+                onClick={isLastSigner ? _onExecute : _onApprove}
               >
                 {isLastSigner ? t('Approve & Execute') : t('Approve')}
               </Button>

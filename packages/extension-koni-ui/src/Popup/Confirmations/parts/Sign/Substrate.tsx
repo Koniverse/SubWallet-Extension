@@ -3,7 +3,6 @@
 
 import { ExtrinsicType, NotificationType, POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestSign } from '@subwallet/extension-base/background/types';
-import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountSignMode } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox, AlertModal } from '@subwallet/extension-koni-ui/components';
@@ -32,7 +31,7 @@ interface Props extends ThemeProps {
   txExpirationTime?: number;
   isInternal?: boolean;
   disableApproval?: boolean;
-  transaction?: SWTransactionResult
+  isWrapTransaction?: boolean;
 }
 
 interface AlertData {
@@ -73,7 +72,7 @@ const multisigTransaction: ExtrinsicType[] = [
 ];
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, disableApproval, extrinsicType, id, isInternal, request, transaction, txExpirationTime } = props;
+  const { className, disableApproval, extrinsicType, id, isInternal, isWrapTransaction, request, txExpirationTime } = props;
   const { address } = request.payload;
 
   const account = useGetAccountByAddress(address);
@@ -123,10 +122,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const isRejectPendingTransaction = extrinsicType === ExtrinsicType.MULTISIG_CANCEL_TX;
 
-  const isWrappedTransaction = useMemo(() => {
+  const isMultisigOrSubstrateProxyTransaction = useMemo(() => {
     return (extrinsicType && multisigTransaction.includes(extrinsicType)) ||
-        !!transaction?.wrappingStatus;
-  }, [extrinsicType, transaction?.wrappingStatus]);
+        isWrapTransaction;
+  }, [extrinsicType, isWrapTransaction]);
 
   const isMessage = isSubstrateMessage(payload);
 
@@ -353,7 +352,7 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [extrinsicType, isLedger, isLedgerConnected, signMode, t]);
 
   const cancelButtonContent = useMemo(() => {
-    if (isWrappedTransaction) {
+    if (isMultisigOrSubstrateProxyTransaction) {
       return {
         icon: ArrowCircleLeft,
         label: t('ui.DAPP.Confirmations.Sign.Substrate.goBack')
@@ -364,7 +363,7 @@ const Component: React.FC<Props> = (props: Props) => {
       icon: XCircle,
       label: t('ui.DAPP.Confirmations.Sign.Substrate.cancel')
     };
-  }, [isWrappedTransaction, t]);
+  }, [isMultisigOrSubstrateProxyTransaction, t]);
 
   // Handle buttons actions
   const onCancel = useCallback(() => {

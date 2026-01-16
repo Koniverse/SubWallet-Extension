@@ -223,8 +223,8 @@ const Component: React.FC<Props> = (props: Props) => {
             extrinsicType={transaction.extrinsicType}
             id={item.id}
             isInternal={item.isInternal}
+            isWrapTransaction={!!transaction?.wrappingStatus}
             request={(item as SigningRequest).request}
-            transaction={transaction}
             txExpirationTime={txExpirationTime}
           />
         )
