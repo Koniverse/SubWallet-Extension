@@ -13,6 +13,7 @@ import { BaseYieldPositionInfo, BasicTxErrorType, CollatorExtraInfo, EarningStat
 import { balanceFormatter, formatNumber, parseRawNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
+import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
 import { Codec } from '@polkadot/types/types';
@@ -46,6 +47,16 @@ interface InflationInfo {
 interface AutoCompoundingDelegation {
   delegator: string,
   value: string
+}
+
+async function queryDelegationScheduledRequestsFallback (api: ApiPromise, delegator: string, collator: string) {
+  const query = api.query.parachainStaking.delegationScheduledRequests;
+
+  try {
+    return await query(collator, delegator);
+  } catch (e) {
+    return await query(collator);
+  }
 }
 
 function calculateMantaNominatorReturn (decimal: number, commission: number, totalActiveCollators: number, bnAnnualInflation: BigN, blocksPreviousRound: number, bnCollatorExpectedBlocksPerRound: BigN, bnCollatorTotalStaked: BigN, isCountCommission: boolean) {
@@ -214,7 +225,11 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
 
     await Promise.all(delegatorState.delegations.map(async (delegation) => {
       const [_delegationScheduledRequests, [identity], _collatorInfo, _currentBlock, _currentTimestamp] = await Promise.all([
-        substrateApi.api.query.parachainStaking.delegationScheduledRequests(delegation.owner),
+        queryDelegationScheduledRequestsFallback(
+          substrateApi.api,
+          address, // delegator
+          delegation.owner // collator
+        ),
         parseIdentity(substrateIdentityApi, delegation.owner),
         substrateApi.api.query.parachainStaking.candidateInfo(delegation.owner),
         substrateApi.api.query.system.number(),
