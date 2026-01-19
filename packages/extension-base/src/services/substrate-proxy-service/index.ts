@@ -3,7 +3,7 @@
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
+import { AccountChainType, BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
 import { AddSubstrateProxyAccountParams, RemoveSubstrateProxyAccountParams, RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountGroup, SubstrateProxyAccountItem, SubstrateProxyType } from '@subwallet/extension-base/types/substrateProxyAccount';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
@@ -49,6 +49,7 @@ export default class SubstrateProxyAccountService {
     const baseDeposit = substrateApi.api.consts.proxy.proxyDepositBase?.toString() || '0';
     const factorDeposit = substrateApi.api.consts.proxy.proxyDepositFactor?.toString() || '0';
     const deposit = new BigN(baseDeposit).plus(factorDeposit);
+    const allAccounts = this.state.keyringService.context.accounts;
 
     const [_substrateProxyAccounts, currentSubstrateProxyDeposit] = result.toPrimitive() as [PrimitiveSubstrateProxyAccountItem[], string];
 
@@ -67,7 +68,21 @@ export default class SubstrateProxyAccountService {
     if (type) {
       const allowedSet = new Set([...(txTypeToSubstrateProxyMap[type] || []), 'Any']);
 
-      substrateProxyAccounts = substrateProxyAccounts.filter((p) => allowedSet.has(p.substrateProxyType));
+      substrateProxyAccounts = substrateProxyAccounts.filter((p) => {
+        if (!p.proxyId) {
+          return false;
+        }
+
+        const accountProxy = allAccounts[p.proxyId];
+
+        const substrateAccount = accountProxy?.accounts.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
+
+        if (!substrateAccount || !substrateAccount.transactionActions.includes(type)) {
+          return false;
+        }
+
+        return allowedSet.has(p.substrateProxyType);
+      });
     }
 
     if (excludedSubstrateProxyAccounts && excludedSubstrateProxyAccounts.length > 0) {

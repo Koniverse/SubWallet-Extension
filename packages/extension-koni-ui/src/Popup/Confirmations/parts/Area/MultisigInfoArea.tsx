@@ -81,32 +81,36 @@ function Component ({ className, transaction }: Props) {
           label={t('ui.Confirmations.MultisigInfoArea.signatory')}
         />
 
-        <MetaInfo.Number
-          decimals={decimals}
-          label={t('ui.Confirmations.MultisigInfoArea.networkFee')}
-          suffix={symbol}
-          value={transaction.estimateFee?.value || 0}
-        />
+        {!transaction.wrappingStatus && (
+          <>
+            <MetaInfo.Number
+              decimals={decimals}
+              label={t('ui.Confirmations.MultisigInfoArea.networkFee')}
+              suffix={symbol}
+              value={transaction.estimateFee?.value || 0}
+            />
 
-        <MetaInfo.Default
-          label={t('ui.Confirmations.MultisigInfoArea.callData')}
-        >
-          {toShort(transactionData.callHash, 5, 5)}
-          <Button
-            className={'call-data-info-button'}
-            icon={ <Icon
-              customSize={'18px'}
-              phosphorIcon={Info}
-            />}
-            onClick={openDetailModal}
-            type={'ghost'}
-          />
-        </MetaInfo.Default>
+            <MetaInfo.Default
+              label={t('ui.Confirmations.MultisigInfoArea.callData')}
+            >
+              {toShort(transactionData.callHash, 5, 5)}
+              <Button
+                className={'call-data-info-button'}
+                icon={<Icon
+                  customSize={'18px'}
+                  phosphorIcon={Info}
+                />}
+                onClick={openDetailModal}
+                type={'ghost'}
+              />
+            </MetaInfo.Default>
+          </>
+        )}
       </MetaInfo>
 
-      <Typography.Text className={CN('description-text')}>
+      {!transaction.wrappingStatus && <Typography.Text className={CN('description-text')}>
         {descriptionContent}
-      </Typography.Text>
+      </Typography.Text>}
 
       {<BaseDetailModal
         className={CN(className, 'call-data-detail-modal')}

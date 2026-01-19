@@ -57,7 +57,7 @@ import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/reques
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
 import { createInitSubstrateProxyExtrinsic } from '@subwallet/extension-base/services/substrate-proxy-service';
-import { SWDutchTransaction, SWPermitTransaction, SWTransaction, SWTransactionBase, SWTransactionInput, SWTransactionResponse, SWTransactionResult, TransactionEmitter, TransactionEventResponse } from '@subwallet/extension-base/services/transaction-service/types';
+import { SubstrateTransactionWrappingStatus, SWDutchTransaction, SWPermitTransaction, SWTransaction, SWTransactionBase, SWTransactionInput, SWTransactionResponse, SWTransactionResult, TransactionEmitter, TransactionEventResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { isProposalExpired, isSupportWalletConnectChain, isSupportWalletConnectNamespace } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { ResultApproveWalletConnectSession, WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { SWStorage } from '@subwallet/extension-base/storage';
@@ -3393,7 +3393,6 @@ export default class KoniExtension {
       extrinsicType: ExtrinsicType.MULTISIG_INIT_TX,
       transaction: multisigCallData,
       skipFeeValidation: true,
-      skipFeeRecalculation: true,
       data: {
         // input
         ...request,
@@ -3405,7 +3404,7 @@ export default class KoniExtension {
         depositAmount,
         networkFee
       },
-      wrappingStatus: 'WRAPPED',
+      wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_RESULT,
       additionalValidator,
       eventsHandler
     });
@@ -3503,7 +3502,6 @@ export default class KoniExtension {
       extrinsicType: ExtrinsicType.SUBSTRATE_PROXY_INIT_TX,
       transaction: substrateProxyCallData,
       skipFeeValidation: !isSignerProxiedAccount,
-      skipFeeRecalculation: !isSignerProxiedAccount,
       transferNativeAmount: originTransaction.transferNativeAmount,
       data: {
         // input
@@ -3515,7 +3513,7 @@ export default class KoniExtension {
         callData: callData.toHex(),
         networkFee
       },
-      wrappingStatus: 'WRAPPED',
+      wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_RESULT,
       additionalValidator,
       eventsHandler
     });
