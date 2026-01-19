@@ -165,7 +165,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
 
     if (showMultisigAccountInfoTab) {
       result.push({
-        label: t('Multisig members'),
+        label: t('ui.ACCOUNT.screen.Account.Detail.multisigMembers'),
         value: FilterTabType.MULTISIG_INFO
       });
     }
@@ -206,21 +206,21 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
   const onDelete = useCallback(() => {
     alertModal.open({
       title: isMultisig
-        ? t('Remove multisig account')
+        ? t('ui.ACCOUNT.screen.Account.Detail.removeMultisigAccount')
         : t('ui.ACCOUNT.screen.Account.Detail.confirmation'),
       type: isMultisig ? NotificationType.ERROR : NotificationType.WARNING,
       content: isMultisig
         ? (
           <>
             <div className='description-alert-modal'>
-              {t('This account has pending multisig transactions. Removing the account now means you’ll have to re-import it later to complete these transactions')}
+              {t('ui.ACCOUNT.screen.Account.Detail.removeAccountWithPendingTxsWarning')}
             </div>
           </>
         )
         : (
           t('ui.ACCOUNT.screen.Account.Detail.removeAccountAccessWarning')
         ),
-      subtitle: isMultisig ? t('Are you sure you want to remove this account?') : undefined,
+      subtitle: isMultisig ? t('ui.ACCOUNT.screen.Account.Detail.confirmRemoveAccount') : undefined,
       okButton: {
         text: t('ui.ACCOUNT.screen.Account.Detail.remove'),
         schema: 'error',
@@ -337,7 +337,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
         onClick={onDelete}
         schema='error'
       >
-        {isMultisig ? t('Remove') : t('ui.ACCOUNT.screen.Account.Detail.deleteAccount')}
+        {isMultisig ? t('ui.ACCOUNT.screen.Account.Detail.remove') : t('ui.ACCOUNT.screen.Account.Detail.deleteAccount')}
       </Button>
     );
 

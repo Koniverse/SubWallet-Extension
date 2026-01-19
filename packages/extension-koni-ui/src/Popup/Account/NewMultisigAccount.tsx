@@ -198,8 +198,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     return (
       <EmptyList
         className={'__empty-list-signatory-list'}
-        emptyMessage={t('Select signatories to create your multisig account')}
-        emptyTitle={t('Signatory list')}
+        emptyMessage={t('ui.ACCOUNT.screen.Account.NewMultisigAccount.selectSignatoriesToCreate')}
+        emptyTitle={t('ui.ACCOUNT.screen.Account.NewMultisigAccount.signatoryList')}
         phosphorIcon={ListChecks}
       />
     );
@@ -209,14 +209,14 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     const { signerAddress } = form.getFieldsValue();
 
     if (!isAddress(signerAddress) || isEthereumAddress(signerAddress)) {
-      return Promise.reject(t('Invalid recipient address'));
+      return Promise.reject(t('ui.ACCOUNT.screen.Account.NewMultisigAccount.invalidRecipientAddressError'));
     }
 
     const formattedAddress = reformatAddress(signerAddressValue);
     const isExisted = signers.some((item) => item.address === formattedAddress);
 
     if (isExisted) {
-      return Promise.reject(t('This address already exists in the list'));
+      return Promise.reject(t('ui.ACCOUNT.screen.Account.NewMultisigAccount.addressAlreadyExistsInList'));
     }
 
     return Promise.resolve();
@@ -225,22 +225,22 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const validateThreshold = useCallback(
     async (_: Rule, value?: string) => {
       if (!value) {
-        return Promise.reject(t('Threshold is required'));
+        return Promise.reject(t('ui.ACCOUNT.screen.Account.NewMultisigAccount.thresholdRequired'));
       }
 
       const threshold = Number(value);
 
       if (!Number.isInteger(threshold)) {
-        return Promise.reject(t('Threshold must be a natural number'));
+        return Promise.reject(t('ui.ACCOUNT.screen.Account.NewMultisigAccount.thresholdMustBeNaturalNumber'));
       }
 
       if (threshold <= 1) {
-        return Promise.reject(t('Threshold must be greater than 1'));
+        return Promise.reject(t('ui.ACCOUNT.screen.Account.NewMultisigAccount.thresholdGreaterThanOne'));
       }
 
       if (threshold > signers.length) {
         return Promise.reject(
-          t('Threshold cannot be greater than number of signers')
+          t('ui.ACCOUNT.screen.Account.NewMultisigAccount.thresholdExceedsSigners')
         );
       }
 
@@ -298,7 +298,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={preventModal ? onGoHome : onBack}
         rightFooterButton={{
-          children: t('Continue'),
+          children: t('ui.ACCOUNT.screen.Account.NewMultisigAccount.continue'),
           onClick: onConfirmSignatory,
           disabled: !isValidThreshold
         }}
@@ -311,7 +311,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             }
           ]}
         subHeaderLeft={preventModal ? <CloseIcon /> : undefined }
-        title={t('Create multisig account')}
+        title={t('ui.ACCOUNT.screen.Account.NewMultisigAccount.createMultisigAccount')}
       >
         <div className={'container'}>
           <Form
@@ -332,7 +332,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   statusHelpAsTooltip={true}
                 >
                   <Input
-                    placeholder={t('Enter address')}
+                    placeholder={t('ui.ACCOUNT.screen.Account.NewMultisigAccount.enterAddress')}
                     prefix={
                       <AccountProxyAvatar
                         size={24}
@@ -411,7 +411,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                       >
                         <Input
                           className={'threshold-form-input'}
-                          placeholder={t('Enter threshold')}
+                          placeholder={t('ui.ACCOUNT.screen.Account.NewMultisigAccount.enterThreshold')}
                           suffix={`/ ${signers.length > 0 ? signers.length : ''}`}
                         />
                       </Form.Item>

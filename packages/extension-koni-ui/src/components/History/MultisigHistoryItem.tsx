@@ -68,12 +68,12 @@ const Component = ({ className = '', item, onClick }: Props) => {
                 </div>
                 <div className={'__status-row'}>
                   <div className={CN('__status-text', isApproved ? '-approved' : '-waiting')}>
-                    {isApproved ? t('Approved') : t('Waiting for approval')}
+                    {isApproved ? t('ui.HISTORY.components.MultisigItem.approved') : t('ui.HISTORY.components.MultisigItem.waitingForApproval')}
                   </div>
                 </div>
               </div>
               <div className={'__meta'}>
-                {`${txInfo.name} - ${item.timestamp ? customFormatDate(item.timestamp, '#hhhh#:#mm#') : t('Processing')}`}
+                {`${txInfo.name} - ${item.timestamp ? customFormatDate(item.timestamp, '#hhhh#:#mm#') : t('ui.HISTORY.components.MultisigItem.processing')}`}
               </div>
             </div>
             <div className={'__value-group'}>
@@ -95,8 +95,8 @@ const Component = ({ className = '', item, onClick }: Props) => {
           {/* Progress Section */}
           <div className={'__progress-section'}>
             <div className={'__label-row'}>
-              <span>{t('Approval status')}</span>
-              <span className={'__count'}>{t('{{currentApprovals}}/{{threshold}} Approval', { replace: {
+              <span>{t('ui.HISTORY.components.MultisigItem.approvalStatus')}</span>
+              <span className={'__count'}>{t('ui.HISTORY.components.MultisigItem.approvalCount', { replace: {
                 currentApprovals: currentApprovals,
                 threshold: threshold
               } })}</span>
@@ -110,7 +110,7 @@ const Component = ({ className = '', item, onClick }: Props) => {
           </div>
           <div className={'__divider-line'}></div>
           <div className={'__status-row'}>
-            <span>{t('Multisig account')}</span>
+            <span>{t('ui.HISTORY.components.MultisigItem.multisigAccount')}</span>
             <div className={'multisig-account-wrapper'}>
               <div className={'multisig-account-avatar'}>
                 <AccountProxyAvatar

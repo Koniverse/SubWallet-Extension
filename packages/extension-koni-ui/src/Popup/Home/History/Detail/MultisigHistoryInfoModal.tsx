@@ -148,14 +148,14 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
               disabled={loading}
               loading={loading}
               onClick={checkAction(_onReject, ExtrinsicType.MULTISIG_CANCEL_TX)}
-            >{t('Reject')}</Button>
+            >{t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.reject')}</Button>
             {thresholdReached && (
               <Button
                 block
                 disabled={loading}
                 loading={loading}
                 onClick={checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX)}
-              >{t('Execute')}</Button>
+              >{t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.execute')}</Button>
             )}
           </>
         )}
@@ -171,7 +171,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
                 loading={loading}
                 onClick={isLastSigner ? checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX) : checkAction(_onApprove, ExtrinsicType.MULTISIG_APPROVE_TX)}
               >
-                {isLastSigner ? t('Approve & Execute') : t('Approve')}
+                {isLastSigner ? t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.approveAndExecute') : t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.approve')}
               </Button>
             )}
 
@@ -180,7 +180,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
               <Button
                 block
                 disabled
-              >{t('Approved')}</Button>
+              >{t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.approved')}</Button>
             )}
 
             {/* Cases 5 & 6: Threshold reached but not yet executed */}
@@ -189,7 +189,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
                 block
                 disabled={loading}
                 onClick={checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX)}
-              >{t('Execute')}</Button>
+              >{t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.execute')}</Button>
             )}
           </>
         )}
@@ -235,7 +235,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
       footer={modalFooter}
       id={MULTISIG_HISTORY_INFO_MODAL}
       onCancel={onCancel}
-      title={t('Send token')}
+      title={t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.sendToken')}
     >
       <div className={'__layout-container'}>
         {data && <HistoryMultisigLayout data={data} />}
