@@ -3,9 +3,9 @@
 
 import { RemoveVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { MetaInfo, NumberDisplay, PageWrapper, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
+import { CommonTransactionInfo, MetaInfo, NumberDisplay, PageWrapper, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useGetAccountByAddress, useGetChainPrefixBySlug, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreCreateReformatAddress, useGetAccountByAddress, useGetChainPrefixBySlug, useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AlertDialogProps, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Number } from '@subwallet/react-ui';
@@ -39,6 +39,11 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
     isUnVote: true
   });
 
+  const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
+  const getReformatAddress = useCoreCreateReformatAddress();
+
+  const displayAddress = account ? getReformatAddress(account, chainInfoMap[transaction.chain]) : transaction.address;
+
   return (
     <div className={CN(className)}>
       <div className={'overview-info-wrapper'}>
@@ -64,24 +69,35 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           weight={500}
         />
       </div>
-      <MetaInfo
-        className={'meta-info'}
-        hasBackgroundWrapper
-      >
-        <MetaInfo.Account
-          address={account?.address || transaction.address}
-          chainSlug={transaction.chain}
-          label={t('ui.TRANSACTION.Confirmations.GovUnvote.account')}
-          name={account?.name}
-          networkPrefix={networkPrefix}
-        />
-        {!transaction.wrappingStatus && <MetaInfo.Number
-          decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.GovUnvote.networkFee')}
-          suffix={symbol}
-          value={transaction.estimateFee?.value || 0}
-        />}
-      </MetaInfo>
+      {transaction.wrappingStatus
+        ? (
+          <CommonTransactionInfo
+            address={transaction.address}
+            network={transaction.chain}
+          />
+        )
+        : (
+          <MetaInfo
+            className={'meta-info'}
+            hasBackgroundWrapper
+          >
+            <MetaInfo.Account
+              address={displayAddress || transaction.address}
+              chainSlug={transaction.chain}
+              label={t('ui.TRANSACTION.Confirmations.GovUnvote.account')}
+              name={account?.name}
+              networkPrefix={networkPrefix}
+            />
+
+            <MetaInfo.Number
+              decimals={decimals}
+              label={t('ui.TRANSACTION.Confirmations.GovUnvote.networkFee')}
+              suffix={symbol}
+              value={transaction.estimateFee?.value || 0}
+            />
+          </MetaInfo>
+        )
+      }
       <MetaInfo
         className={'meta-info'}
         hasBackgroundWrapper
