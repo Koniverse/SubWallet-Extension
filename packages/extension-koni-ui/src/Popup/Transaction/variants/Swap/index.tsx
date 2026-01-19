@@ -6,12 +6,13 @@ import { SwapError } from '@subwallet/extension-base/background/errors/SwapError
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
+import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainName, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainName, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _isNativeTokenBySlug, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
 import { DetectedGenOptimalProcessErrMsg } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, BalanceType, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -187,7 +188,27 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const recipientValue = useWatchTransaction('recipient', form, defaultData);
 
-  const availableBalanceHookResult = useGetBalance(chainValue, fromValue, fromTokenSlugValue, true, ExtrinsicType.SWAP);
+  const fromAssetInfo = useMemo(() => {
+    return assetRegistryMap[fromTokenSlugValue] || undefined;
+  }, [assetRegistryMap, fromTokenSlugValue]);
+
+  const toAssetInfo = useMemo(() => {
+    return assetRegistryMap[toTokenSlugValue] || undefined;
+  }, [assetRegistryMap, toTokenSlugValue]);
+
+  const isBittensorStakedSwap = useMemo(() => {
+    return _BALANCE_CHAIN_GROUP.bittensor.includes(fromAssetInfo?.originChain) && _BALANCE_CHAIN_GROUP.bittensor.includes(toAssetInfo?.originChain);
+  }, [fromAssetInfo?.originChain, toAssetInfo?.originChain]);
+
+  const balanceType = useMemo(() => {
+    if (isBittensorStakedSwap && _isNativeTokenBySlug(fromAssetInfo?.slug)) {
+      return BalanceType.STAKING;
+    } else {
+      return undefined;
+    }
+  }, [fromAssetInfo?.slug, isBittensorStakedSwap]);
+
+  const availableBalanceHookResult = useGetBalance(chainValue, fromValue, fromTokenSlugValue, true, ExtrinsicType.SWAP, balanceType);
 
   const [swapFromFieldRenderKey, setSwapFromFieldRenderKey] = useState<string>('SwapFromField');
 
@@ -343,14 +364,6 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
 
     return tokenSelectorItems.filter((item) => destinationSlugSet.has(item.slug));
   }, [fromTokenSlugValue, tokenSelectorItems, pairMap]);
-
-  const fromAssetInfo = useMemo(() => {
-    return assetRegistryMap[fromTokenSlugValue] || undefined;
-  }, [assetRegistryMap, fromTokenSlugValue]);
-
-  const toAssetInfo = useMemo(() => {
-    return assetRegistryMap[toTokenSlugValue] || undefined;
-  }, [assetRegistryMap, toTokenSlugValue]);
 
   const destChainValue = _getAssetOriginChain(toAssetInfo);
 
@@ -743,11 +756,17 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       return;
     }
 
-    const result = new BigN(currentFromTokenAvailableBalance.value).multipliedBy(92).dividedToIntegerBy(100).toFixed();
+    let result: string;
+
+    if (isBittensorStakedSwap) {
+      result = currentFromTokenAvailableBalance.value;
+    } else {
+      result = new BigN(currentFromTokenAvailableBalance.value).multipliedBy(92).dividedToIntegerBy(100).toFixed();
+    }
 
     onChangeAmount(result);
     setSwapFromFieldRenderKey(`SwapFromField-${Date.now()}`);
-  }, [currentFromTokenAvailableBalance, onChangeAmount]);
+  }, [currentFromTokenAvailableBalance, isBittensorStakedSwap, onChangeAmount]);
 
   const onClickHaftAmountButton = useCallback(() => {
     if (!currentFromTokenAvailableBalance) {
@@ -1300,6 +1319,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
               <div className={'__balance-display-area'}>
                 <FreeBalance
                   address={fromValue}
+                  balanceType={balanceType}
                   chain={chainValue}
                   className={'__balance-display'}
                   extrinsicType={ExtrinsicType.SWAP}

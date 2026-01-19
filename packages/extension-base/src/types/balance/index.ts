@@ -17,7 +17,8 @@ export enum BalanceType {
   TRANSFERABLE = 'transferable', // free
   TOTAL = 'total', // free + locked
   TOTAL_MINUS_RESERVED = 'totalMinusReserved', // free + locked - reserved
-  KEEP_ALIVE = 'keepAlive'
+  KEEP_ALIVE = 'keepAlive',
+  STAKING = 'staking' // staking balance
 }
 
 /**

@@ -82,7 +82,9 @@ export enum SwapProviderId {
   UNISWAP = 'UNISWAP',
   KYBER = 'KYBER',
   OPTIMEX = 'OPTIMEX',
-  OPTIMEX_TESTNET = 'OPTIMEX_TESTNET'
+  OPTIMEX_TESTNET = 'OPTIMEX_TESTNET',
+  BITTENSOR = 'BITTENSOR',
+  BITTENSOR_TESTNET = 'BITTENSOR_TESTNET'
 }
 
 // todo: export this to use from sdk
@@ -96,7 +98,9 @@ export const _SUPPORTED_SWAP_PROVIDERS: SwapProviderId[] = [
   SwapProviderId.UNISWAP,
   SwapProviderId.KYBER,
   SwapProviderId.OPTIMEX,
-  SwapProviderId.OPTIMEX_TESTNET
+  SwapProviderId.OPTIMEX_TESTNET,
+  SwapProviderId.BITTENSOR,
+  SwapProviderId.BITTENSOR_TESTNET
 ];
 
 export interface SwapProvider {
@@ -212,6 +216,7 @@ export interface SwapSubmitParams extends BaseProcessRequestSign {
   slippage: number; // Example: 0.01 for 1%
   recipient?: string;
   cacheProcessId: string;
+  mevShieldMode?: boolean;
 }
 
 export interface SwapSubmitStepData {
