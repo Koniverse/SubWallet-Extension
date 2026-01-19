@@ -96,6 +96,11 @@ export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 export const GOV_DELEGATION_DETAILS_MODAL = 'gov-delegation-details-modal';
 /* OpenGov */
 
+/* Proxy */
+export const SUBSTRATE_PROXY_ACCOUNT_SELECTOR_MODAL = 'substrateProxyAccount-account-selector-modal';
+export const SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL = 'substrateProxyAccount-account-list-modal';
+/* Proxy */
+
 /* Other */
 export const EARNING_SLIPPAGE_MODAL = 'earning-slippage-modal';
 export const EARNING_SELECTED_VALIDATOR_MODAL = 'earning-selected-validator-modal';

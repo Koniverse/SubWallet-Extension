@@ -23,10 +23,11 @@ type Props = ThemeProps & {
   leftPartNode?: React.ReactNode;
   showAccountNameFallback?: boolean;
   onClick?: VoidFunction;
+  addressFallbackLength?: number;
 };
 
 function Component (props: Props): React.ReactElement<Props> {
-  const { account, accountAddress, accountName, className, isSelected, leftPartNode, onClick, renderRightPart, rightPartNode, showAccountNameFallback = true, showUnselectIcon } = props;
+  const { account, accountAddress, accountName, addressFallbackLength = 4, className, isSelected, leftPartNode, onClick, renderRightPart, rightPartNode, showAccountNameFallback = true, showUnselectIcon } = props;
   const token = useContext<Theme>(ThemeContext as Context<Theme>).token;
 
   const checkedIconNode = ((showUnselectIcon || isSelected) && (
@@ -42,6 +43,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
   const address = useMemo(() => accountAddress || account?.address, [account?.address, accountAddress]);
   const hasAccountName = useMemo(() => !!accountName || !!account?.name, [account?.name, accountName]);
+  const shortLength = useMemo(() => hasAccountName ? 4 : addressFallbackLength, [addressFallbackLength, hasAccountName]);
 
   return (
     <div
@@ -69,7 +71,7 @@ function Component (props: Props): React.ReactElement<Props> {
           <div className={CN('account-item-address-wrapper', {
             '-is-wrap-parentheses': hasAccountName
           })}
-          >{toShort(address, 4, 4)}</div>}
+          >{toShort(address, shortLength, shortLength)}</div>}
       </div>
       <div className='__item-right-part'>
         {rightPartNode || (renderRightPart ? renderRightPart(checkedIconNode) : checkedIconNode)}
