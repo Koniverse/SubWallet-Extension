@@ -66,7 +66,8 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.MULTISIG_EXECUTE_TX]: detectTranslate('ui.TRANSACTION.constant.transaction.multisigExecute'),
   [ExtrinsicType.MULTISIG_INIT_TX]: detectTranslate('ui.TRANSACTION.constant.transaction.multisigInit'),
   [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.TRANSACTION.constant.transaction.addProxy'),
-  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.TRANSACTION.constant.transaction.removeProxy')
+  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.TRANSACTION.constant.transaction.removeProxy'),
+  [ExtrinsicType.SUBSTRATE_PROXY_INIT_TX]: detectTranslate('ui.TRANSACTION.constant.transaction.substrateProxyInit')
 };
 
 export const ALL_STAKING_ACTIONS: ExtrinsicType[] = [

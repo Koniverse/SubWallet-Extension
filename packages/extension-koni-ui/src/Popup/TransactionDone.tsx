@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { SubstrateTransactionWrappingStatus } from '@subwallet/extension-base/services/transaction-service/types';
 import { CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { useDefaultNavigate } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -29,18 +30,18 @@ const Component: React.FC<Props> = (props: Props) => {
   const viewInHistory = useCallback(
     () => {
       if (address && chain && transactionId) {
-        let signer = address;
+        let storedAddressesHistory = address;
 
         if (transactionRequest) {
           const transaction = transactionRequest[transactionId];
 
           // In case of wrapped transaction, show the wrapped address as signer
-          if (transaction?.address && transaction?.wrappingStatus === 'WRAPPED') {
-            signer = transaction.address;
+          if (transaction?.address && transaction?.wrappingStatus === SubstrateTransactionWrappingStatus.WRAP_RESULT) {
+            storedAddressesHistory = transaction.address;
           }
         }
 
-        navigate(`/home/history/${reformatAddress(signer)}/${chain}/${transactionId}`, { state: { from: 'ignoreRemind' } });
+        navigate(`/home/history/${reformatAddress(storedAddressesHistory)}/${chain}/${transactionId}`, { state: { from: 'ignoreRemind' } });
       } else {
         navigate('/home/history');
       }

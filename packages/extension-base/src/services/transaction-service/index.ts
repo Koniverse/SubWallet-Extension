@@ -16,7 +16,7 @@ import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/reques
 import { TRANSACTION_TIMEOUT } from '@subwallet/extension-base/services/transaction-service/constants';
 import { parseLiquidStakingEvents, parseLiquidStakingFastUnstakeEvents, parseTransferEventLogs, parseXcmEventLogs } from '@subwallet/extension-base/services/transaction-service/event-parser';
 import { getBaseTransactionInfo, getTransactionId, isBitcoinTransaction, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
-import { OptionalSWTransaction, SWDutchTransaction, SWDutchTransactionInput, SWPermitTransaction, SWPermitTransactionInput, SWTransaction, SWTransactionBase, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
+import { OptionalSWTransaction, SubstrateTransactionWrappingStatus, SWDutchTransaction, SWDutchTransactionInput, SWPermitTransaction, SWPermitTransactionInput, SWTransaction, SWTransactionBase, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
 import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestRemoveSubstrateProxyAccount, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitBittensorChangeValidatorStaking, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
@@ -124,8 +124,6 @@ export default class TransactionService {
     // Check support for transaction
     checkSupportForTransaction(validationResponse, transaction);
 
-    console.log('Validation Response after support check: ', validationResponse, chainInfo);
-
     if (!chainInfo) {
       validationResponse.errors.push(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('bg.TRANSACTION_SERVICE.services.service.transaction.cannotFindNetwork')));
     }
@@ -161,12 +159,12 @@ export default class TransactionService {
 
     const chainInfoMap = this.state.chainService.getChainInfoMap();
 
-    if (isSubstrateTransaction(transaction) && transactionInput.wrappingStatus !== 'WRAPPED') {
+    if (isSubstrateTransaction(transaction)) {
       if (chainInfo.substrateInfo?.supportMultisig && !validationResponse.wrappingStatus) {
         const pair = keyring.getPair(address);
 
         if (pair.meta.isMultisig) {
-          validationResponse.wrappingStatus = 'WRAPPABLE';
+          validationResponse.wrappingStatus = SubstrateTransactionWrappingStatus.WRAPPABLE;
         }
       }
 
@@ -179,7 +177,7 @@ export default class TransactionService {
         });
 
         if (substrateProxyAccounts.length) {
-          validationResponse.wrappingStatus = 'WRAPPABLE';
+          validationResponse.wrappingStatus = SubstrateTransactionWrappingStatus.WRAPPABLE;
         }
       }
     }
@@ -305,7 +303,7 @@ export default class TransactionService {
     // Add Transaction
     transactions[transaction.id] = transaction;
 
-    if (transaction.wrappingStatus === 'WRAPPED') {
+    if (transaction.wrappingStatus === SubstrateTransactionWrappingStatus.WRAP_RESULT) {
       const data = transaction.data as InitMultisigTxRequest;
 
       this.previousWrappedTxId[data.transactionId] = transaction.id;
@@ -342,6 +340,11 @@ export default class TransactionService {
   }
 
   public async handleWrappedTransaction (transaction: SWTransactionInput): Promise<SWTransactionResponse> {
+    const transactionData = transaction.data as InitMultisigTxRequest;
+
+    // Delete previous select signer transaction
+    this.previousWrappedTxId[transactionData.transactionId] && this.removeTransaction(this.previousWrappedTxId[transactionData.transactionId]);
+
     const validatedTransaction = await this.validateTransaction(transaction);
     const ignoreWarnings: BasicTxWarningCode[] = validatedTransaction.ignoreWarnings || [];
     const stopByErrors = validatedTransaction.errors.length > 0;
@@ -357,12 +360,9 @@ export default class TransactionService {
     }
 
     validatedTransaction.warnings = [];
-    const transactionData = validatedTransaction.data as InitMultisigTxRequest;
 
-    // Delete previous select signer transaction
-    this.previousWrappedTxId[transactionData.transactionId] && this.removeTransaction(this.previousWrappedTxId[transactionData.transactionId]);
-
-    console.log(validatedTransaction);
+    // Update original transaction wrapping status
+    transactionData.transactionId && this.updateTransaction(transactionData.transactionId, { wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_SOURCE });
 
     // Todo: refactor this later
     const emitter = await this.addTransaction(validatedTransaction);
@@ -672,7 +672,7 @@ export default class TransactionService {
 
     const { eventsHandler, step } = transaction;
 
-    if (transaction.wrappingStatus === 'WRAPPABLE') {
+    if (transaction.wrappingStatus === SubstrateTransactionWrappingStatus.WRAPPABLE) {
       this.updateTransaction(transaction.id, { emitterTransaction: emitter });
     }
 
@@ -1354,6 +1354,11 @@ export default class TransactionService {
         break;
       }
 
+      case ExtrinsicType.SUBSTRATE_PROXY_INIT_TX: // todo
+        historyItem.additionalInfo = parseTransactionData<ExtrinsicType.SUBSTRATE_PROXY_INIT_TX>(transaction.data);
+
+        break;
+
       case ExtrinsicType.UNKNOWN:
         break;
     }
@@ -1509,15 +1514,17 @@ export default class TransactionService {
       blockTime
     }).catch(console.error);
 
-    const info = isHex(extrinsicHash) ? extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
+    if (transaction.wrappingStatus !== SubstrateTransactionWrappingStatus.WRAP_SOURCE) {
+      const info = isHex(extrinsicHash) ? extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
 
-    this.state.notificationService.notify({
-      type: NotificationType.SUCCESS,
-      title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionCompleted'),
-      message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoCompleted', { replace: { info } }),
-      action: { url: this.getTransactionLink(id) },
-      notifyViaBrowser: true
-    });
+      this.state.notificationService.notify({
+        type: NotificationType.SUCCESS,
+        title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionCompleted'),
+        message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoCompleted', { replace: { info } }),
+        action: { url: this.getTransactionLink(id) },
+        notifyViaBrowser: true
+      });
+    }
 
     this.state.eventService.emit('transaction.done', transaction);
   }
@@ -1537,15 +1544,17 @@ export default class TransactionService {
         blockHash: blockHash || ''
       }).catch(console.error);
 
-      const info = isHex(transaction?.extrinsicHash) ? transaction?.extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
+      if (transaction.wrappingStatus !== SubstrateTransactionWrappingStatus.WRAP_SOURCE) {
+        const info = isHex(transaction?.extrinsicHash) ? transaction?.extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
 
-      this.state.notificationService.notify({
-        type: NotificationType.ERROR,
-        title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionFailed'),
-        message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoFailed', { replace: { info } }),
-        action: { url: this.getTransactionLink(id) },
-        notifyViaBrowser: true
-      });
+        this.state.notificationService.notify({
+          type: NotificationType.ERROR,
+          title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionFailed'),
+          message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoFailed', { replace: { info } }),
+          action: { url: this.getTransactionLink(id) },
+          notifyViaBrowser: true
+        });
+      }
     }
 
     this.state.eventService.emit('transaction.failed', transaction);
@@ -1565,15 +1574,17 @@ export default class TransactionService {
         blockHash: blockHash || ''
       }).catch(console.error);
 
-      const info = isHex(transaction?.extrinsicHash) ? transaction?.extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
+      if (transaction.wrappingStatus !== SubstrateTransactionWrappingStatus.WRAP_SOURCE) {
+        const info = isHex(transaction?.extrinsicHash) ? transaction?.extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
 
-      this.state.notificationService.notify({
-        type: NotificationType.ERROR,
-        title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionTimedOut'),
-        message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoTimedOut', { replace: { info } }),
-        action: { url: this.getTransactionLink(id) },
-        notifyViaBrowser: true
-      });
+        this.state.notificationService.notify({
+          type: NotificationType.ERROR,
+          title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionTimedOut'),
+          message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoTimedOut', { replace: { info } }),
+          action: { url: this.getTransactionLink(id) },
+          notifyViaBrowser: true
+        });
+      }
     }
 
     this.state.eventService.emit('transaction.timeout', transaction);
@@ -1997,7 +2008,7 @@ export default class TransactionService {
 
     let transactionId = id;
 
-    if (wrappingStatus === 'WRAPPED') {
+    if (wrappingStatus === SubstrateTransactionWrappingStatus.WRAP_RESULT) {
       // we will use the original transaction's ID for this request,
       // because we only want the popup to appear once and keep the old one.
       transactionId = (data as InitMultisigTxRequest).transactionId || id;

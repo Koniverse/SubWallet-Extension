@@ -55,7 +55,7 @@ function Component ({ className, setDisable, transaction }: Props) {
   }, [transaction.data, transaction.extrinsicType]);
 
   const descriptionContent = useMemo(() => {
-    if (!!transaction.wrappingStatus && account?.isMultisig && signerAccount) {
+    if (!!transaction.wrappingStatus && account?.isMultisig && signerSelected?.kind === 'signatory' && signerAccount) {
       return t('ui.Confirmations.WrappedTransactionInfoArea.multisigInitiationDescription', { replace: { name: signerAccount.name } });
     }
 
@@ -68,7 +68,7 @@ function Component ({ className, setDisable, transaction }: Props) {
     }
 
     return null;
-  }, [account?.isMultisig, signerAccount, t, transaction.extrinsicType, transaction.wrappingStatus]);
+  }, [account?.isMultisig, signerAccount, signerSelected?.kind, t, transaction.extrinsicType, transaction.wrappingStatus]);
 
   const wrapTransactionData = useMemo(() => {
     if (!wrapTransactionInfo) {
@@ -97,6 +97,7 @@ function Component ({ className, setDisable, transaction }: Props) {
   const prepareTransaction = useCallback(async (signerSelected: SignableAccountProxyItem) => {
     try {
       setIsWrapTransactionLoading(true);
+      setTransactionError(null);
       setDisable(true);
 
       let transactionResponse: SWTransactionResponse;
@@ -149,54 +150,53 @@ function Component ({ className, setDisable, transaction }: Props) {
     inactiveModal(modalId);
   }, [inactiveModal, prepareTransaction]);
 
-  if (!signableAccountProxyItems?.length || !transaction.wrappingStatus) {
-    return <></>;
-  }
+  const isSelectorDisable = isGetSignableLoading || isWrapTransactionLoading;
 
-  if (isGetSignableLoading) {
-    return <MetaInfo
-      className={CN(className, 'container-loading')}
-      hasBackgroundWrapper
-    >
-      <Icon
-        className={'loading-icon'}
-        phosphorIcon={CircleNotch}
-        weight='fill'
-      />
-    </MetaInfo>;
+  if (!transaction.wrappingStatus) {
+    return <></>;
   }
 
   return (
     <>
       {!signerAccount
         ? (
-          <div
+          <Button
             className={CN(className, 'signer-selection-placeholder-container')}
+            disabled={isSelectorDisable}
             onClick={onOpenSelectSignerModal}
+            schema={'default'}
           >
-            <AccountProxyAvatar
-              className={'__account-avatar'}
-              size={24}
-              value={''}
-            />
+            <div className={'signer-selection-group-item'}>
+              <AccountProxyAvatar
+                className={'__account-avatar'}
+                size={24}
+                value={''}
+              />
 
-            <Typography.Text className={CN('signer-info-placeholder')}>
-              {t('ui.Confirmations.WrappedTransactionInfoArea.selectAccountToSign')}
-            </Typography.Text>
+              <Typography.Text className={CN('signer-info-placeholder')}>
+                {t('ui.Confirmations.WrappedTransactionInfoArea.selectAccountToSign')}
+              </Typography.Text>
+            </div>
 
             <Button
               className={'__signatory-editor-button'}
-              disabled={isGetSignableLoading || isWrapTransactionLoading}
+              disabled={isSelectorDisable}
               icon={
-                <Icon
-                  phosphorIcon={CaretDown}
-                  size='sm'
-                />
+                isSelectorDisable
+                  ? <Icon
+                    className={'loading-icon'}
+                    phosphorIcon={CircleNotch}
+                    weight='fill'
+                  />
+                  : <Icon
+                    phosphorIcon={CaretDown}
+                    size='sm'
+                  />
               }
               size='xs'
               type='ghost'
             />
-          </div>
+          </Button>
         )
         : (
           <div className={CN(className)}>
@@ -308,13 +308,13 @@ function Component ({ className, setDisable, transaction }: Props) {
         </pre>
       </BaseDetailModal>}
 
-      <SignableAccountProxySelectorModal
+      {!!signableAccountProxyItems && <SignableAccountProxySelectorModal
         accountItems={signableAccountProxyItems}
         address={transaction.address}
         chain={transaction.chain}
         onApply={onSelectSigner}
         signerSelected={signerSelected}
-      />
+      />}
     </>
   );
 }
@@ -327,12 +327,22 @@ const WrappedTransactionInfoArea = styled(Component)<Props>(({ theme: { token } 
       display: 'flex',
       flexDirection: 'row',
       alignItems: 'center',
-      gap: token.sizeXS,
       cursor: 'pointer',
       backgroundColor: token.colorBgSecondary,
+      justifyContent: 'space-between',
       borderRadius: token.borderRadiusLG,
       padding: `${token.paddingXS}px ${token.paddingSM}px`,
       height: 48,
+
+      '.signer-selection-group-item': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: token.sizeXS
+      },
+
+      '.loading-icon': {
+        animation: 'spinner-loading 1s infinite linear'
+      },
 
       '.signer-info-placeholder': {
         color: token.colorTextLight4
@@ -419,18 +429,7 @@ const WrappedTransactionInfoArea = styled(Component)<Props>(({ theme: { token } 
         fontSize: token.fontSizeLG - 1,
         fontFamily: token.monoSpaceFontFamily
       }
-    },
-
-    '&.container-loading': {
-      height: 188,
-      '.loading-icon': {
-        position: 'relative',
-        top: '25%',
-        fontSize: token.fontSizeSuper1 + 7,
-        animation: 'spinner-loading 1s infinite linear'
-      }
     }
-
   };
 });
 

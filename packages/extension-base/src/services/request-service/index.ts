@@ -211,7 +211,7 @@ export default class RequestService {
   }
 
   public async signInternalTransaction (id: string, address: string, url: string, payload: SignerPayloadJSON, onSign?: (id: string) => void, isWrappedTx?: SubstrateTransactionWrappingStatus): Promise<ResponseSigning> {
-    if (isWrappedTx === 'WRAPPED') {
+    if (isWrappedTx === SubstrateTransactionWrappingStatus.WRAP_RESULT) {
       return this.#substrateRequestHandler.signWrappedTransaction(id, address, url, payload, onSign);
     }
 

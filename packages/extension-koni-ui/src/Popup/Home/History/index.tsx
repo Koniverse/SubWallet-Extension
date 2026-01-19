@@ -426,6 +426,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.MULTISIG_INIT_TX]: t('ui.HISTORY.screen.History.multisigInit'),
     [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: t('ui.HISTORY.screen.History.addSubstrateProxy'),
     [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: t('ui.HISTORY.screen.History.removeSubstrateProxy'),
+    [ExtrinsicType.SUBSTRATE_PROXY_INIT_TX]: t('ui.HISTORY.screen.History.substrateProxyInit'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknown')
   }), [t]);
 
@@ -482,6 +483,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.MULTISIG_INIT_TX]: t('ui.HISTORY.screen.History.multisigInit'),
     [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: t('ui.HISTORY.screen.History.addSubstrateProxyTransaction'),
     [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: t('ui.HISTORY.screen.History.removeSubstrateProxyTransaction'),
+    [ExtrinsicType.SUBSTRATE_PROXY_INIT_TX]: t('ui.HISTORY.screen.History.substrateProxyInit'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknownTransaction')
   }), [t]);
 

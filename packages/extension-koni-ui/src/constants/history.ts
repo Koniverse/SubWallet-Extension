@@ -56,6 +56,7 @@ export const TxTypeNameMap: Record<ExtrinsicType, string> = {
   [ExtrinsicType.MULTISIG_INIT_TX]: detectTranslate('ui.HISTORY.constant.history.multisigInit'),
   [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.HISTORY.constant.history.addSubstrateProxyAccount'),
   [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.HISTORY.constant.history.removeSubstrateProxyAccount'),
+  [ExtrinsicType.SUBSTRATE_PROXY_INIT_TX]: detectTranslate('ui.HISTORY.constant.history.substrateProxyInit'),
   [ExtrinsicType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.history.unknown')
 };
 

@@ -257,7 +257,8 @@ const MULTISIG_ACTIONS: ExtrinsicType[] = [
 
 const SUBSTRATE_PROXY_ACTION: ExtrinsicType[] = [
   ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT,
-  ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT
+  ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT,
+  ExtrinsicType.SUBSTRATE_PROXY_INIT_TX
 ];
 
 const OTHER_ACTIONS: ExtrinsicType[] = [

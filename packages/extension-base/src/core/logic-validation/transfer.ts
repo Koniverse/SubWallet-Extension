@@ -15,7 +15,7 @@ import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/servi
 import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getTokenMinAmount, _isCIP26Token, _isNativeToken, _isNativeTokenBySlug, _isTokenEvmSmartContract, _isTokenTonSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
 import { isBitcoinTransaction, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
-import { OptionalSWTransaction, SWTransactionInput, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
+import { OptionalSWTransaction, SubstrateTransactionWrappingStatus, SWTransactionInput, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountSignMode, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeInfo, BitcoinFeeRate, EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransferTxErrorType } from '@subwallet/extension-base/types';
 import { balanceFormatter, combineBitcoinFee, combineEthFee, formatNumber, getSizeInfo, pairToAccount } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
@@ -503,7 +503,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
     ..._TRANSFER_CHAIN_GROUP.statemine
   ].includes(nativeTokenInfo.originChain);
 
-  if (bnNativeTokenTransferAmount.plus(validationResponse.wrappingStatus === 'WRAPPABLE' ? bnFee : '0').gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
+  if (bnNativeTokenTransferAmount.plus(validationResponse.wrappingStatus === SubstrateTransactionWrappingStatus.WRAPPABLE ? bnFee : '0').gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
   }
 

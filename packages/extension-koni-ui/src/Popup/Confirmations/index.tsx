@@ -405,6 +405,8 @@ const Component = function ({ className }: Props) {
           return t('ui.Confirmations.addSubstrateProxyConfirmation');
         case ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT:
           return t('ui.Confirmations.removeSubstrateProxyConfirmation');
+        case ExtrinsicType.SUBSTRATE_PROXY_INIT_TX:
+          return t('ui.Confirmations.substrateProxyInitConfirmation');
         case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.EVM_EXECUTE:
         case ExtrinsicType.UNKNOWN:

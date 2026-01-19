@@ -38,10 +38,32 @@ export interface SWTransactionBase extends ValidateTransactionResponse, Partial<
   wrappingStatus?: SubstrateTransactionWrappingStatus;
 }
 
-// 'WRAPPABLE' means the transaction can be wrapped but is not yet wrapped
-// 'WRAPPED' means the transaction has been wrapped
-// use in multisig and proxy for substrate transactions
-export type SubstrateTransactionWrappingStatus = 'WRAPPABLE' | 'WRAPPED';
+/**
+ * Describes how a transaction is related to wrapping (multisig / proxy).
+ */
+export enum SubstrateTransactionWrappingStatus {
+  /**
+   * This transaction can be wrapped.
+   * - It is a base transaction
+   * - Not wrapped yet
+   * - User may choose a signer (multisig / proxy)
+   */
+  WRAPPABLE = 'WRAPPABLE',
+
+  /**
+   * This transaction is the source of a wrap.
+   * - It has been wrapped by another transaction
+   * - This transaction itself should NOT be signed anymore
+   */
+  WRAP_SOURCE = 'WRAP_SOURCE',
+
+  /**
+   * This transaction is the result of wrapping another transaction.
+   * - It wraps a WRAP_SOURCE transaction
+   * - This is the transaction that will be signed and submitted
+   */
+  WRAP_RESULT = 'WRAP_RESULT'
+}
 
 export interface SWTransaction extends SWTransactionBase {
   transaction: SubmittableExtrinsic | TransactionConfig | TonTransactionConfig | Psbt;
