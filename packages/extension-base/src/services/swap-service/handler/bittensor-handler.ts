@@ -132,7 +132,7 @@ export class BittensorSwapHandler implements SwapBaseInterface {
   }
 
   public async handleSubmitStep (params: SwapSubmitParams): Promise<SwapSubmitStepData> {
-    const { address, mevShieldMode, quote } = params;
+    const { address, quote } = params;
 
     const pair = quote.pair;
 
@@ -172,8 +172,7 @@ export class BittensorSwapHandler implements SwapBaseInterface {
       fromNetuid,
       toNetuid,
       amount: new BigNumber(quote.fromAmount),
-      limitPrice,
-      mevShieldMode
+      limitPrice
     }, substrateApi.api);
 
     let extrinsic: SubmittableExtrinsic<'promise', ISubmittableResult>;
@@ -200,7 +199,7 @@ export class BittensorSwapHandler implements SwapBaseInterface {
       .sort((a, b) => new BigNumber(b.stake).minus(a.stake).toNumber());
   }
 
-  private buildSwapCalls (params: { stakeInfo: TaoStakeInfo[]; fromNetuid: number; toNetuid: number; amount: BigNumber; limitPrice: string; mevShieldMode?: boolean }, api: ApiPromise) {
+  private buildSwapCalls (params: { stakeInfo: TaoStakeInfo[]; fromNetuid: number; toNetuid: number; amount: BigNumber; limitPrice: string;}, api: ApiPromise) {
     const { amount, fromNetuid, limitPrice, stakeInfo, toNetuid } = params;
 
     const hotkeys = this.getHotkeysByNetuidDesc(stakeInfo, fromNetuid);

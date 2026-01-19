@@ -216,7 +216,6 @@ export interface SwapSubmitParams extends BaseProcessRequestSign {
   slippage: number; // Example: 0.01 for 1%
   recipient?: string;
   cacheProcessId: string;
-  mevShieldMode?: boolean;
 }
 
 export interface SwapSubmitStepData {
