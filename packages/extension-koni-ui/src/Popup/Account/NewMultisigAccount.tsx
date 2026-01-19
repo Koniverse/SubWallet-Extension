@@ -332,7 +332,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   statusHelpAsTooltip={true}
                 >
                   <Input
-                    placeholder={'Enter address'}
+                    placeholder={t('Enter address')}
                     prefix={
                       <AccountProxyAvatar
                         size={24}
@@ -411,7 +411,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                       >
                         <Input
                           className={'threshold-form-input'}
-                          placeholder={'Enter threshold'}
+                          placeholder={t('Enter threshold')}
                           suffix={`/ ${signers.length > 0 ? signers.length : ''}`}
                         />
                       </Form.Item>

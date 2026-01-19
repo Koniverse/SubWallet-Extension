@@ -337,7 +337,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
         onClick={onDelete}
         schema='error'
       >
-        {isMultisig ? 'Remove' : t('ui.ACCOUNT.screen.Account.Detail.deleteAccount')}
+        {isMultisig ? t('Remove') : t('ui.ACCOUNT.screen.Account.Detail.deleteAccount')}
       </Button>
     );
 
