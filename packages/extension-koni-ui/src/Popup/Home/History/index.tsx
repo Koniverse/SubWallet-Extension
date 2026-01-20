@@ -60,7 +60,7 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
     return IconMap.claim_reward;
   }
 
-  if (item.type === ExtrinsicType.CHANGE_EARNING_VALIDATOR) {
+  if (item.type === ExtrinsicType.CHANGE_EARNING_VALIDATOR || item.type === ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE) {
     return IconMap.nominate;
   }
 
@@ -311,6 +311,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.STAKING_BOND]: t('ui.HISTORY.screen.History.stake'),
     [ExtrinsicType.STAKING_UNBOND]: t('ui.HISTORY.screen.History.unstake'),
     [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: t('ui.HISTORY.screen.History.nominate'),
+    [ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE]: t('ui.HISTORY.screen.History.changeRewards'),
     [ExtrinsicType.STAKING_CLAIM_REWARD]: t('ui.HISTORY.screen.History.claimReward'),
     [ExtrinsicType.STAKING_WITHDRAW]: t('ui.HISTORY.screen.History.withdraw'),
     [ExtrinsicType.STAKING_POOL_WITHDRAW]: t('ui.HISTORY.screen.History.withdraw'),
@@ -362,6 +363,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.STAKING_BOND]: t('ui.HISTORY.screen.History.stakeTransaction'),
     [ExtrinsicType.STAKING_UNBOND]: t('ui.HISTORY.screen.History.unstakeTransaction'),
     [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: t('ui.HISTORY.screen.History.stakeTransaction'),
+    [ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE]: t('ui.HISTORY.screen.History.changeRewards'),
     [ExtrinsicType.STAKING_CLAIM_REWARD]: t('ui.HISTORY.screen.History.claimRewardTransaction'),
     [ExtrinsicType.STAKING_WITHDRAW]: t('ui.HISTORY.screen.History.withdrawTransaction'),
     [ExtrinsicType.STAKING_POOL_WITHDRAW]: t('ui.HISTORY.screen.History.withdrawTransaction'),

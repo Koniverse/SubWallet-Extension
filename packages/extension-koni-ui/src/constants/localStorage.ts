@@ -20,6 +20,7 @@ export const WITHDRAW_TRANSACTION = 'transaction.withdraw';
 export const CLAIM_REWARD_TRANSACTION = 'transaction.claim-reward';
 export const CLAIM_BRIDGE_TRANSACTION = 'transaction.claim-bridge';
 export const CHANGE_VALIDATOR_TRANSACTION = 'transaction.change-validator';
+export const CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION = 'transaction.change-bittensor-root-claim-type';
 export const GOV_REFERENDUM_VOTE_TRANSACTION = 'transaction.gov-referendum-vote';
 export const GOV_REFERENDUM_UNVOTE_TRANSACTION = 'transaction.gov-referendum-unvote';
 export const GOV_UNLOCK_VOTE_TRANSACTION = 'transaction.gov-unlock-vote';

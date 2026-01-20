@@ -1718,10 +1718,10 @@ export class ChainService {
         paraId: params.chainSpec.paraId,
         symbol: params.chainEditInfo.symbol as string,
         genesisHash: params.chainSpec.genesisHash,
+        supportProxy: false,
         relaySlug: null,
         hasNativeNft: false,
         supportStaking: params.chainSpec.paraId === null,
-        supportProxy: false,
         supportSmartContract: null
       };
     } else if (params.chainSpec.evmChainId !== null) {

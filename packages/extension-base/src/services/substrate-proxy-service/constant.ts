@@ -13,7 +13,8 @@ const SUBSTRATE_PROXY_ACCOUNT_EXTRINSIC_GROUPS: Record<string, ExtrinsicType[]> 
     ExtrinsicType.STAKING_LEAVE_POOL,
     ExtrinsicType.CHANGE_EARNING_VALIDATOR,
     ExtrinsicType.STAKING_CANCEL_UNSTAKE,
-    ExtrinsicType.STAKING_CLAIM_REWARD
+    ExtrinsicType.STAKING_CLAIM_REWARD,
+    ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE
   ],
   GOV: [
     ExtrinsicType.GOV_VOTE,

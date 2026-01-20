@@ -3,7 +3,7 @@
 
 import { ExtrinsicType, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { AddSubstrateProxyAccountParams, CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, GovReferendumUnvoteParams, GovReferendumVoteParams, GovUnlockVoteParams, RemoveSubstrateProxyAccountParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
+import { AddSubstrateProxyAccountParams, CancelUnStakeParams, ChangeBittensorRootClaimType, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, GovReferendumUnvoteParams, GovReferendumVoteParams, GovUnlockVoteParams, RemoveSubstrateProxyAccountParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
 
 import { ALL_KEY } from './common';
 
@@ -18,6 +18,7 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('ui.TRANSACTION.constant.transaction.unstake'),
   [ExtrinsicType.STAKING_UNBOND]: detectTranslate('ui.TRANSACTION.constant.transaction.unstake'),
   [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: detectTranslate('ui.TRANSACTION.constant.transaction.changeValidator'),
+  [ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE]: detectTranslate('ui.TRANSACTION.constant.transaction.changeClaimType'),
   [ExtrinsicType.STAKING_WITHDRAW]: detectTranslate('ui.TRANSACTION.constant.transaction.withdraw'),
   [ExtrinsicType.STAKING_POOL_WITHDRAW]: detectTranslate('ui.TRANSACTION.constant.transaction.withdraw'),
   [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: detectTranslate('ui.TRANSACTION.constant.transaction.cancelUnstake'),
@@ -183,6 +184,11 @@ export const DEFAULT_GOV_UNLOCK_VOTE_PARAMS: GovUnlockVoteParams = {
   referendumIds: [],
   tracks: [],
   amount: ''
+};
+
+export const DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS: ChangeBittensorRootClaimType = {
+  ...DEFAULT_TRANSACTION_PARAMS,
+  bittensorRootClaimType: ''
 };
 
 export const DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS: AddSubstrateProxyAccountParams = {

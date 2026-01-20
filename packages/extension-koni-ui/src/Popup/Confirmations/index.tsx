@@ -333,6 +333,8 @@ const Component = function ({ className }: Props) {
           }
 
           return t('ui.Confirmations.changeValidatorConfirm');
+        case ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE:
+          return t('ui.Confirmations.changeClaimTypeConfirm');
         case ExtrinsicType.MINT_VDOT:
           return t('ui.Confirmations.mintVDotConfirm');
         case ExtrinsicType.MINT_VMANTA:

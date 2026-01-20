@@ -44,13 +44,13 @@ function Component (
     }
   }
 
-  const isProxyType = useMemo(() => {
-    return isTypeManageSubstrateProxy(item.type);
+  const isHiddenValue = useMemo(() => {
+    return item.type === ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE || isTypeManageSubstrateProxy(item.type);
   }, [item.type]);
 
   return (
     <Web3Block
-      className={CN('history-item', className, displayData.className, { '-proxy-type': isProxyType })}
+      className={CN('history-item', className, displayData.className, { '-hidden': isHiddenValue })}
       leftItem={(
         <>
           <div className={'__main-icon-wrapper'}>
@@ -232,7 +232,7 @@ export const HistoryItem = styled(Component)<Props>(({ theme: { token } }: Props
       }
     },
 
-    '&.-proxy-type': {
+    '&.-hidden': {
       '.__value': {
         visibility: 'hidden'
       }
