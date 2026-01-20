@@ -3,7 +3,7 @@
 
 import { ExtrinsicType, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { CancelUnStakeParams, ChangeBittensorRootClaimType, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, GovReferendumUnvoteParams, GovReferendumVoteParams, GovUnlockVoteParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
+import { ChangeBittensorRootClaimType, AddSubstrateProxyAccountParams, CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, GovReferendumUnvoteParams, GovReferendumVoteParams, GovUnlockVoteParams, RemoveSubstrateProxyAccountParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
 
 import { ALL_KEY } from './common';
 
@@ -60,7 +60,10 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
 
   [ExtrinsicType.GOV_VOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.vote'),
   [ExtrinsicType.GOV_UNVOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.unvote'),
-  [ExtrinsicType.GOV_UNLOCK_VOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.unlockVotes')
+  [ExtrinsicType.GOV_UNLOCK_VOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.unlockVotes'),
+
+  [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.TRANSACTION.constant.transaction.addProxy'),
+  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.TRANSACTION.constant.transaction.removeProxy')
 };
 
 export const ALL_STAKING_ACTIONS: ExtrinsicType[] = [
@@ -186,4 +189,16 @@ export const DEFAULT_GOV_UNLOCK_VOTE_PARAMS: GovUnlockVoteParams = {
 export const DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS: ChangeBittensorRootClaimType = {
   ...DEFAULT_TRANSACTION_PARAMS,
   bittensorRootClaimType: ''
+}
+
+export const DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS: AddSubstrateProxyAccountParams = {
+  ...DEFAULT_TRANSACTION_PARAMS,
+  substrateProxyAddress: '',
+  substrateProxyType: 'Any',
+  chain: ''
+};
+
+export const DEFAULT_REMOVE_SUBSTRATE_PROXY_ACCOUNT_PARAMS: RemoveSubstrateProxyAccountParams = {
+  ...DEFAULT_TRANSACTION_PARAMS,
+  substrateProxyAddressKeys: []
 };

@@ -43,6 +43,7 @@ import { AuthUrls, MetaRequest, SignRequest } from '@subwallet/extension-base/se
 import SettingService from '@subwallet/extension-base/services/setting-service/SettingService';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SubscanService } from '@subwallet/extension-base/services/subscan-service';
+import SubstrateProxyAccountService from '@subwallet/extension-base/services/substrate-proxy-service';
 import { SwapService } from '@subwallet/extension-base/services/swap-service';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { TransactionEventResponse } from '@subwallet/extension-base/services/transaction-service/types';
@@ -145,7 +146,7 @@ export default class KoniState {
   readonly inappNotificationService: InappNotificationService;
   readonly chainOnlineService: ChainOnlineService;
   readonly openGovService: OpenGovService;
-
+  readonly substrateProxyAccountService: SubstrateProxyAccountService;
   // Handle the general status of the extension
   private generalStatus: ServiceStatus = ServiceStatus.INITIALIZING;
   private waitSleeping: Promise<void> | null = null;
@@ -185,6 +186,7 @@ export default class KoniState {
     this.inappNotificationService = new InappNotificationService(this.dbService, this.keyringService, this.eventService, this.chainService);
     this.chainOnlineService = new ChainOnlineService(this.chainService, this.settingService, this.eventService, this.dbService);
     this.openGovService = new OpenGovService(this);
+    this.substrateProxyAccountService = new SubstrateProxyAccountService(this);
 
     this.subscription = new KoniSubscription(this, this.dbService);
     this.cron = new KoniCron(this, this.subscription, this.dbService);
@@ -957,7 +959,7 @@ export default class KoniState {
 
   public async enableChainWithPriorityAssets (chainSlug: string, enableTokens = true): Promise<boolean> {
     if (enableTokens) {
-      await this.chainService.updatePriorityAssetsByChain(chainSlug, true);
+      await this.balanceService.updatePriorityAssetsByChain(chainSlug, true);
     }
 
     return this.chainService.enableChain(chainSlug);

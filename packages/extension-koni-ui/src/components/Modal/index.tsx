@@ -33,3 +33,4 @@ export * from './Announcement';
 export * from './Selector';
 export * from './NotificationDetailModal';
 export * from './Governance';
+export * from './SubstrateProxyAccount';

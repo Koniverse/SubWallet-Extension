@@ -107,7 +107,7 @@ export interface BondingSubmitParams extends BaseRequestSign {
 
 export type RequestBondingSubmit = InternalRequestSign<BondingSubmitParams>;
 
-export type SubmitChangeValidatorStaking = SubmitBittensorChangeValidatorStaking | SubmitJoinNativeStaking;
+export type SubmitChangeValidatorStaking = InternalRequestSign<SubmitBittensorChangeValidatorStaking | SubmitJoinNativeStaking>;
 
 export interface SubmitBittensorChangeValidatorStaking extends SubmitJoinNativeStaking {
   originValidator: string;

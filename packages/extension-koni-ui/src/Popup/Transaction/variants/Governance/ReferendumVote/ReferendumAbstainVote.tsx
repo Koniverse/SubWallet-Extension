@@ -42,7 +42,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   // @ts-ignore
   const { className = '', isAllAccount } = props;
   const { t } = useTranslation();
-  const { defaultData, persistData, setBackProps, setCustomScreenTitle } = useTransactionContext<GovReferendumVoteParams>();
+  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setBackProps, setCustomScreenTitle } = useTransactionContext<GovReferendumVoteParams>();
   const [govRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const formDefault = useMemo((): GovReferendumVoteParams => ({ ...defaultData, from: govRefVoteStorage.from, fromAccountProxy: govRefVoteStorage.fromAccountProxy }), [defaultData, govRefVoteStorage.from, govRefVoteStorage.fromAccountProxy]);
   const assetRegistry = useSelector((state: RootState) => state.assetRegistry.assetRegistry);
@@ -91,13 +91,24 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       nayAmount: values.nayAmount || '0'
     };
 
-    handleVote(voteRequest)
+    const sendPromise = (signerSubstrateProxyAddress?: string) => {
+      return handleVote({
+        ...voteRequest,
+        signerSubstrateProxyAddress
+      });
+    };
+
+    selectSubstrateProxyAccountsToSign({
+      chain: chainValue,
+      address: values.from,
+      type: ExtrinsicType.GOV_VOTE
+    }).then(sendPromise)
       .then((tx) => {
         onSuccess(tx);
       })
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [chainValue, defaultData.referendumId, defaultData.track, onError, onSuccess]);
+  }, [chainValue, defaultData.referendumId, defaultData.track, onError, onSuccess, selectSubstrateProxyAccountsToSign]);
 
   const goRefStandardVote = useCallback(() => {
     navigate('/transaction/gov-ref-vote/standard');

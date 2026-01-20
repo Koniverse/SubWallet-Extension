@@ -6,7 +6,7 @@ import { ClaimPolygonBridgeNotificationMetadata, NotificationActionType } from '
 import { RequestClaimBridge } from '@subwallet/extension-base/types';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
-import { isAbleToShowFee } from '@subwallet/extension-koni-ui/utils';
+import { isAbleToShowFee, isTypeManageSubstrateProxy } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Logo, Number, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretRight } from 'phosphor-react';
@@ -45,7 +45,7 @@ function Component (
   }
 
   const isHiddenValue = useMemo(() => {
-    return item.type === ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE;
+    return item.type === ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE || isTypeManageSubstrateProxy(item.type);
   }, [item.type]);
 
   return (
@@ -231,6 +231,7 @@ export const HistoryItem = styled(Component)<Props>(({ theme: { token } }: Props
         color: token.colorSuccess
       }
     },
+
     '&.-hidden': {
       '.__value': {
         visibility: 'hidden'

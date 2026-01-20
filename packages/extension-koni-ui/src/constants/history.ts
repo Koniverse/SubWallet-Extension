@@ -50,6 +50,8 @@ export const TxTypeNameMap: Record<ExtrinsicType, string> = {
   [ExtrinsicType.GOV_VOTE]: detectTranslate('ui.HISTORY.constant.history.vote'),
   [ExtrinsicType.GOV_UNVOTE]: detectTranslate('ui.HISTORY.constant.history.unvote'),
   [ExtrinsicType.GOV_UNLOCK_VOTE]: detectTranslate('ui.HISTORY.constant.history.unlockVotes'),
+  [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.HISTORY.constant.history.addSubstrateProxyAccount'),
+  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.HISTORY.constant.history.removeSubstrateProxyAccount'),
   [ExtrinsicType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.history.unknown')
 };
 
