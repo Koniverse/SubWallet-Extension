@@ -78,8 +78,8 @@ function Component ({ className, setDisable, transaction }: Props) {
     return wrapTransactionInfo.data as InitMultisigTxResponse;
   }, [wrapTransactionInfo]);
 
-  const { data: signableAccountProxyItems, isLoading: isGetSignableLoading } = useQuery<WrappedTransactionSigner[]>({
-    queryKey: ['non-direct-signing', transaction.id],
+  const { data: signerItems, isLoading: isGetSignableLoading } = useQuery<WrappedTransactionSigner[]>({
+    queryKey: ['wrapped-transaction-signer', transaction.id],
     queryFn: async () => {
       return await getWrappedTransactionSigners({
         ...transaction,
@@ -310,12 +310,12 @@ function Component ({ className, setDisable, transaction }: Props) {
         </pre>
       </BaseDetailModal>}
 
-      {!!signableAccountProxyItems && (
+      {!!signerItems && (
         <WrappedTransactionSignerSelectorModal
           chainSlug={transaction.chain}
           onSelectSigner={onSelectSigner}
           selectedSigner={signerSelected}
-          signerItems={signableAccountProxyItems}
+          signerItems={signerItems}
           targetAddress={transaction.address}
         />
       )}

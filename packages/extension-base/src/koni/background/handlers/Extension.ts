@@ -3268,7 +3268,7 @@ export default class KoniExtension {
     } catch (e) {
       const errMsg = (e as Error).message;
 
-      return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(MultisigTxErrorType.UNABLE_TO_CONSTRUCT_TX), errMsg]);
+      return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(MultisigTxErrorType.UNABLE_TO_CONSTRUCT_TX, errMsg)]);
     }
   }
 
@@ -3306,25 +3306,78 @@ export default class KoniExtension {
   }
 
   // Multisig Account
-  private async initMultisigTx (request: InitMultisigTxRequest): Promise<SWTransactionResponse> {
-    const { chain, multisigMetadata: { signers, threshold }, signer, transactionId } = request;
-    const substrateApi = await this.#koniState.chainService.getSubstrateApi(chain).isReady;
-    const originTransaction = this.#koniState.transactionService.getTransaction(transactionId);
-    const callData = originTransaction?.transaction as SubmittableExtrinsic<'promise'>;
-    const multisigCallData = createInitMultisigExtrinsic(substrateApi.api, threshold, signers, signer, callData);
+  private async initMultisigTx (
+    request: InitMultisigTxRequest
+  ): Promise<SWTransactionResponse> {
+    const { chain,
+      multisigMetadata: { signers, threshold },
+      signer,
+      transactionId } = request;
+
+    /**
+     * ─────────────────────────────
+     * Prepare original transaction
+     * ─────────────────────────────
+     */
+    const substrateApi = await this.#koniState.chainService
+      .getSubstrateApi(chain)
+      .isReady;
+
+    const originTransaction =
+      this.#koniState.transactionService.getTransaction(transactionId);
+
+    if (!originTransaction?.transaction) {
+      throw new Error(`[initMultisigTx] Origin transaction not found: ${transactionId}`);
+    }
+
+    const originalCall = originTransaction.transaction as SubmittableExtrinsic<'promise'>;
+
+    /**
+     * ─────────────────────────────
+     * Create multisig wrapped extrinsic
+     * ─────────────────────────────
+     */
+    const multisigExtrinsic = createInitMultisigExtrinsic(
+      substrateApi.api,
+      threshold,
+      signers,
+      signer,
+      originalCall
+    );
 
     const decodedCallData = decodeCallData({
       api: substrateApi.api,
-      callData: callData.method.toHex()
+      callData: originalCall.method.toHex()
     });
 
-    const networkFee = (await multisigCallData.paymentInfo(signer)).partialFee.toString();
+    /**
+     * ─────────────────────────────
+     * Fee & deposit calculation
+     * ─────────────────────────────
+     */
+    const networkFee = (await multisigExtrinsic.paymentInfo(signer))
+      .partialFee
+      .toString();
 
     const depositBase = substrateApi.api.consts.multisig.depositBase.toString();
     const depositFactor = substrateApi.api.consts.multisig.depositFactor.toString();
-    const depositAmount = calcDepositAmount(depositBase, threshold, depositFactor);
+    const depositAmount = calcDepositAmount(
+      depositBase,
+      threshold,
+      depositFactor
+    );
 
-    const additionalValidator = async (inputTransaction: SWTransactionResponse): Promise<void> => {
+    /**
+     * ─────────────────────────────
+     * Additional validation
+     * ─────────────────────────────
+     * Validate signer balance:
+     * - multisig deposit
+     * - network fee
+     */
+    const additionalValidator = async (
+      inputTransaction: SWTransactionResponse
+    ): Promise<void> => {
       const signerBalance = await this.getAddressTransferableBalance({
         address: signer,
         networkKey: chain,
@@ -3332,85 +3385,174 @@ export default class KoniExtension {
         extrinsicType: ExtrinsicType.TRANSFER_TOKEN
       });
 
-      if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) { // todo: check and return better error for the case set token fee on hydration
-        const setTokenPayFee = await substrateApi.api.query.multiTransactionPayment?.accountCurrencyMap(signer);
+      // Hydration: token fee setting is not supported
+      // todo: check and return better error for the case set token fee on hydration
+      if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) {
+        const setTokenPayFee =
+          await substrateApi.api.query.multiTransactionPayment?.accountCurrencyMap(signer);
 
-        setTokenPayFee.toPrimitive() && inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee')));
+        if (setTokenPayFee.toPrimitive()) {
+          inputTransaction.errors.push(
+            new TransactionError(
+              BasicTxErrorType.NOT_ENOUGH_BALANCE,
+              t('bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee')
+            )
+          );
+        }
       }
 
-      if (BigInt(signerBalance.value) < BigInt(depositAmount) + BigInt(networkFee)) {
-        inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee'))); // not enough balance for deposit and fee
+      const requiredBalance =
+        BigInt(depositAmount) + BigInt(networkFee);
+
+      if (BigInt(signerBalance.value) < requiredBalance) {
+        inputTransaction.errors.push(
+          new TransactionError(
+            BasicTxErrorType.NOT_ENOUGH_BALANCE,
+            t('bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee')
+          )
+        );
       }
     };
 
+    /**
+     * ─────────────────────────────
+     * Event forwarding
+     * ─────────────────────────────
+     * Multisig INIT transaction:
+     * - `signed` is forwarded to notify that the multisig initialization
+     *   has been successfully submitted.
+     * - `error` / `timeout` are forwarded to propagate failures.
+     *
+     * Note:
+     * Multisig execution requires collecting enough approvals,
+     * so the transaction is not finalized at this stage.
+     * These forwarded events are only used to resolve
+     * the original wrapped transaction promise.
+     */
     const eventsHandler = (eventEmitter: TransactionEmitter) => {
-      if (originTransaction?.emitterTransaction) {
-        const originEmitter = originTransaction.emitterTransaction;
+      const originEmitter = originTransaction?.emitterTransaction;
 
-        eventEmitter.on('signed', (data: TransactionEventResponse) => {
-          originEmitter.emit('signed', data);
-        });
-
-        eventEmitter.on('error', (data: TransactionEventResponse) => {
-          if (data.errors.length > 0) {
-            originEmitter.emit('error', data);
-          }
-        });
-
-        eventEmitter.on('timeout', (data: TransactionEventResponse) => {
-          if (data.errors.find((error) => error.errorType === BasicTxErrorType.TIMEOUT) && data.errors.length > 0) {
-            originEmitter.emit('timeout', data);
-          }
-        });
+      if (!originEmitter) {
+        return;
       }
+
+      eventEmitter.on('signed', (data) => {
+        originEmitter.emit('signed', data);
+      });
+
+      eventEmitter.on('error', (data) => {
+        if (data.errors.length > 0) {
+          originEmitter.emit('error', data);
+        }
+      });
+
+      eventEmitter.on('timeout', (data) => {
+        if (
+          data.errors.length > 0 &&
+          data.errors.some((e) => e.errorType === BasicTxErrorType.TIMEOUT)
+        ) {
+          originEmitter.emit('timeout', data);
+        }
+      });
     };
 
-    return await this.#koniState.transactionService.handleWrappedTransaction({
+    /**
+     * ─────────────────────────────
+     * Submit wrapped transaction
+     * ─────────────────────────────
+     */
+    return this.#koniState.transactionService.handleWrappedTransaction({
       address: signer,
       chain,
       chainType: ChainType.SUBSTRATE,
       extrinsicType: ExtrinsicType.MULTISIG_INIT_TX,
-      transaction: multisigCallData,
+      transaction: multisigExtrinsic,
       skipFeeValidation: true,
+      wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_RESULT,
+
       data: {
         // input
         ...request,
 
         // output
-        submittedCallData: multisigCallData.toHex(),
-        callData: callData.toHex(),
+        submittedCallData: multisigExtrinsic.toHex(),
+        callData: originalCall.toHex(),
         decodedCallData,
         depositAmount,
         networkFee
       },
-      wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_RESULT,
+
       additionalValidator,
       eventsHandler
     });
   }
 
   // Substrate Proxy Account
-  private async handleSubstrateProxyWrappedTx (request: HandleSubstrateProxyWrappedTxRequest): Promise<SWTransactionResponse> {
+  private async handleSubstrateProxyWrappedTx (
+    request: HandleSubstrateProxyWrappedTxRequest
+  ): Promise<SWTransactionResponse> {
     const { chain, proxyMetadata, signer, transactionId } = request;
     const { proxiedAddress } = proxyMetadata;
 
-    const substrateApi = await this.#koniState.chainService.getSubstrateApi(chain).isReady;
-    const originTransaction = this.#koniState.transactionService.getTransaction(transactionId);
-    const callData = originTransaction?.transaction as SubmittableExtrinsic<'promise'>;
+    /**
+     * ─────────────────────────────
+     * Prepare original transaction
+     * ─────────────────────────────
+     */
+    const substrateApi = await this.#koniState.chainService
+      .getSubstrateApi(chain)
+      .isReady;
+
+    const originTransaction =
+      this.#koniState.transactionService.getTransaction(transactionId);
+
+    const callData =
+      originTransaction?.transaction as SubmittableExtrinsic<'promise'>;
 
     const decodedCallData = decodeCallData({
       api: substrateApi.api,
       callData: callData.method.toHex()
     });
 
-    // if signer is proxied address, we do not need to create substrate proxy tx
-    const isSignerProxiedAccount = isSameAddress(signer, proxiedAddress);
+    /**
+     * ─────────────────────────────
+     * Determine proxy execution
+     * ─────────────────────────────
+     * If signer is the proxied address itself,
+     * a substrate proxy transaction is NOT required.
+     */
+    const isSignerProxiedAccount = isSameAddress(
+      signer,
+      proxiedAddress
+    );
 
-    const substrateProxyCallData = isSignerProxiedAccount ? callData : createInitSubstrateProxyExtrinsic(substrateApi.api, proxiedAddress, callData);
+    /**
+     * ─────────────────────────────
+     * Fee calculation
+     * ─────────────────────────────
+     */
 
-    const networkFee = (await substrateProxyCallData.paymentInfo(signer)).partialFee.toString();
+    const substrateProxyCallData = isSignerProxiedAccount
+      ? callData
+      : createInitSubstrateProxyExtrinsic(
+        substrateApi.api,
+        proxiedAddress,
+        callData
+      );
 
-    const additionalValidator = async (inputTransaction: SWTransactionResponse): Promise<void> => {
+    const networkFee = (
+      await substrateProxyCallData.paymentInfo(signer)
+    ).partialFee.toString();
+
+    /**
+     * ─────────────────────────────
+     * Additional validation
+     * ─────────────────────────────
+     * Validate signer balance for proxy execution fee.
+     */
+    const additionalValidator = async (
+      inputTransaction: SWTransactionResponse
+    ): Promise<void> => {
       const signerBalance = await this.getAddressTransferableBalance({
         address: signer,
         networkKey: chain,
@@ -3418,76 +3560,96 @@ export default class KoniExtension {
         extrinsicType: ExtrinsicType.TRANSFER_TOKEN
       });
 
-      if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) { // todo: check and return better error for the case set token fee on hydration
-        const setTokenPayFee = await substrateApi.api.query.multiTransactionPayment?.accountCurrencyMap(signer);
-        const account = getAccountJsonByAddress(signer);
-        const accountName = account?.name;
+      // todo: check and return better error for the case set token fee on hydration
+      if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) {
+        const setTokenPayFee =
+          await substrateApi.api.query.multiTransactionPayment
+            ?.accountCurrencyMap(signer);
 
-        setTokenPayFee.toPrimitive() && inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.koni.handler.Extension.proxyAccountNotEnoughBalance', { replace: { accountName: accountName } })));
+        if (setTokenPayFee.toPrimitive()) {
+          const account = getAccountJsonByAddress(signer);
+
+          inputTransaction.errors.push(
+            new TransactionError(
+              BasicTxErrorType.NOT_ENOUGH_BALANCE,
+              t('bg.koni.handler.Extension.proxyAccountNotEnoughBalance', {
+                replace: { accountName: account?.name }
+              })
+            )
+          );
+        }
       }
 
       if (BigInt(signerBalance.value) < BigInt(networkFee)) {
         const account = getAccountJsonByAddress(signer);
-        const accountName = account?.name;
 
-        inputTransaction.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.koni.handler.Extension.proxyAccountNotEnoughBalance', { replace: { accountName: accountName } })));
+        inputTransaction.errors.push(
+          new TransactionError(
+            BasicTxErrorType.NOT_ENOUGH_BALANCE,
+            t('bg.koni.handler.Extension.proxyAccountNotEnoughBalance', {
+              replace: { accountName: account?.name }
+            })
+          )
+        );
       }
     };
 
+    /**
+     * ─────────────────────────────
+     * Event forwarding
+     * ─────────────────────────────
+     * The substrate proxy transaction acts as a wrapper.
+     * Its lifecycle events are forwarded to the original
+     * transaction to resolve the wrapped transaction promise.
+     * update history transaction accordingly.
+     */
     const eventsHandler = (eventEmitter: TransactionEmitter) => {
-      if (originTransaction?.emitterTransaction) {
-        const originEmitter = originTransaction.emitterTransaction;
-
-        eventEmitter.on('success', (data: TransactionEventResponse) => {
-          originEmitter.emit('success', {
-            ...data,
-            id: originTransaction.id
-          });
-        });
-
-        eventEmitter.on('extrinsicHash', (data: TransactionEventResponse) => {
-          originEmitter.emit('extrinsicHash', {
-            ...data,
-            id: originTransaction.id
-          });
-        });
-
-        eventEmitter.on('send', (data: TransactionEventResponse) => {
-          originEmitter.emit('send', {
-            ...data,
-            id: originTransaction.id
-          });
-        });
-
-        eventEmitter.on('signed', (data: TransactionEventResponse) => {
-          originEmitter.emit('signed', {
-            ...data,
-            id: originTransaction.id
-          });
-        });
-
-        eventEmitter.on('error', (data: TransactionEventResponse) => {
-          if (data.errors.length > 0) {
-            originEmitter.emit('error', {
-              ...data,
-              id: originTransaction.id
-            });
-          }
-        });
-
-        eventEmitter.on('timeout', (data: TransactionEventResponse) => {
-          if (data.errors.find((error) => error.errorType === BasicTxErrorType.TIMEOUT) && data.errors.length > 0) {
-            originEmitter.emit('timeout', {
-              ...data,
-              id: originTransaction.id
-            });
-          }
-        });
+      if (!originTransaction?.emitterTransaction) {
+        return;
       }
+
+      const originEmitter = originTransaction.emitterTransaction;
+
+      eventEmitter.on('send', (data) => {
+        originEmitter.emit('send', { ...data, id: originTransaction.id });
+      });
+
+      eventEmitter.on('signed', (data) => {
+        originEmitter.emit('signed', { ...data, id: originTransaction.id });
+      });
+
+      eventEmitter.on('extrinsicHash', (data) => {
+        originEmitter.emit('extrinsicHash', { ...data, id: originTransaction.id });
+      });
+
+      eventEmitter.on('success', (data) => {
+        originEmitter.emit('success', { ...data, id: originTransaction.id });
+      });
+
+      eventEmitter.on('error', (data) => {
+        if (data.errors.length > 0) {
+          originEmitter.emit('error', { ...data, id: originTransaction.id });
+        }
+      });
+
+      eventEmitter.on('timeout', (data) => {
+        if (
+          data.errors.some(
+            (error) => error.errorType === BasicTxErrorType.TIMEOUT
+          )
+        ) {
+          originEmitter.emit('timeout', { ...data, id: originTransaction.id });
+        }
+      });
     };
 
-    // if signer is proxied address, we do not need to create substrate proxy tx
-    // just handle original transaction
+    /**
+     * ─────────────────────────────
+     * Execute wrapped transaction
+     * ─────────────────────────────
+     */
+
+    // Case 1: signer === proxied address → handle original transaction
     if (isSignerProxiedAccount) {
       return await this.#koniState.transactionService.handleWrappedTransaction({
         ...originTransaction,
@@ -3506,6 +3668,7 @@ export default class KoniExtension {
       });
     }
 
+    // Case 2: create and handle substrate proxy transaction
     return await this.#koniState.transactionService.handleWrappedTransaction({
       address: signer,
       chain,

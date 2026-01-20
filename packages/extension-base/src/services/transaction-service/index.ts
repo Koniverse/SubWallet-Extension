@@ -303,6 +303,7 @@ export default class TransactionService {
     // Add Transaction
     transactions[transaction.id] = transaction;
 
+    // Store previous wrapped tx id for multisig tx to remove it when create new wrapped tx
     if (transaction.wrappingStatus === SubstrateTransactionWrappingStatus.WRAP_RESULT) {
       const data = transaction.data as InitMultisigTxRequest;
 
@@ -341,20 +342,67 @@ export default class TransactionService {
     };
   }
 
-  public async handleWrappedTransaction (transaction: SWTransactionInput): Promise<SWTransactionResponse> {
+  /**
+   * Wrapped transaction flow:
+   *
+   * Create base transaction (WRAPPABLE)
+   *   - skip fee validation
+   *   - NOT submitted to chain
+   *   - acts as the logical / UI-facing transaction
+   *   ↓
+   * Inject event emitter into base transaction
+   *   - base transaction listens to wrapped transaction events
+   *   - used to resolve the original transaction promise
+   *   ↓
+   * User selects signer in UI
+   *   - proxy account or multisig signatory
+   *   ↓
+   * Prepare wrapped transaction
+   *   - resolve actual signer
+   *   - build wrapped extrinsic (proxy / multisig)
+   *   - attach validators & event forwarders
+   *   ↓
+   * Mark base transaction as WRAP_SOURCE
+   *   ↓
+   * Create & submit wrapped transaction (WRAP_RESULT)
+   *   ↓
+   * Forward wrapped transaction events → base transaction
+   *   ↓
+   * Cleanup temporary data
+   *
+   */
+  public async handleWrappedTransaction (
+    transaction: SWTransactionInput
+  ): Promise<SWTransactionResponse> {
     const transactionData = transaction.data as InitMultisigTxRequest;
 
+    // Origin tx id:
+    // - transactionData.transactionId: wrapped from existing tx
+    // - transaction.id: direct wrapped tx ( when transaction was signed by proxied address )
     const originTransactionId = transactionData.transactionId || transaction.id || '';
 
-    // Delete previous select signer transaction
-    this.previousWrappedTxId[originTransactionId] && this.removeTransaction(this.previousWrappedTxId[originTransactionId]);
+    // Remove previous wrapped transaction (select signer flow)
+    if (this.previousWrappedTxId[originTransactionId]) {
+      this.removeTransaction(this.previousWrappedTxId[originTransactionId]);
+    }
 
+    /**
+     * ─────────────────────────────
+     * Validation phase
+     * ─────────────────────────────
+     */
     const validatedTransaction = await this.validateTransaction(transaction);
-    const ignoreWarnings: BasicTxWarningCode[] = validatedTransaction.ignoreWarnings || [];
-    const stopByErrors = validatedTransaction.errors.length > 0;
-    const stopByWarnings = validatedTransaction.warnings.length > 0 && validatedTransaction.warnings.some((warning) => !ignoreWarnings.includes(warning.warningType));
 
-    if (stopByErrors || stopByWarnings) {
+    const ignoreWarnings = validatedTransaction.ignoreWarnings || [];
+    const hasBlockingErrors = validatedTransaction.errors.length > 0;
+    const hasBlockingWarnings =
+      validatedTransaction.warnings.length > 0 &&
+      validatedTransaction.warnings.some(
+        (warning) => !ignoreWarnings.includes(warning.warningType)
+      );
+
+    if (hasBlockingErrors || hasBlockingWarnings) {
+      // Cleanup runtime-only fields before returning
       // @ts-ignore
       'transaction' in validatedTransaction && delete validatedTransaction.transaction;
       'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
@@ -363,54 +411,73 @@ export default class TransactionService {
       return validatedTransaction;
     }
 
+    // Validation passed → warnings already acknowledged
     validatedTransaction.warnings = [];
 
-    // Update original transaction wrapping status
-    transactionData.transactionId && this.updateTransaction(transactionData.transactionId, { wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_SOURCE });
+    /**
+     * ─────────────────────────────
+     * Submit wrapped transaction
+     * ─────────────────────────────
+     */
 
-    // Todo: refactor this later
+    // Mark original transaction as wrapped
+    if (transactionData.transactionId) {
+      this.updateTransaction(transactionData.transactionId, {
+        wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_SOURCE
+      });
+    }
+
     const emitter = await this.addTransaction(validatedTransaction);
 
-    emitter && new Promise<void>((resolve, reject) => {
-      // TODO
-      if (transaction.resolveOnDone) {
-        emitter.on('success', (data: TransactionEventResponse) => {
+    /**
+     * Async side-effect:
+     * - wait for signed / success / error / timeout
+     * - mutate validatedTransaction accordingly
+     */
+    if (emitter) {
+      new Promise<void>((resolve) => {
+        const resolveWithResult = (data: TransactionEventResponse) => {
           validatedTransaction.id = data.id;
           validatedTransaction.extrinsicHash = data.extrinsicHash;
           resolve();
-        });
-      } else {
-        emitter.on('signed', (data: TransactionEventResponse) => {
-          validatedTransaction.id = data.id;
-          validatedTransaction.extrinsicHash = data.extrinsicHash;
-          resolve();
-        });
-      }
+        };
 
-      emitter.on('error', (data: TransactionEventResponse) => {
-        if (data.errors.length > 0) {
-          validatedTransaction.errors.push(...data.errors);
-          resolve();
+        if (transaction.resolveOnDone) {
+          emitter.on('success', resolveWithResult);
+        } else {
+          emitter.on('signed', resolveWithResult);
+        }
+
+        emitter.on('error', (data) => {
+          if (data.errors.length > 0) {
+            validatedTransaction.errors.push(...data.errors);
+            resolve();
+          }
+        });
+
+        emitter.on('timeout', (data) => {
+          if (transaction.errorOnTimeOut && data.errors.length > 0) {
+            validatedTransaction.errors.push(...data.errors);
+            resolve();
+          }
+        });
+      }).finally(() => {
+        // Cleanup runtime-only fields
+        // @ts-ignore
+        'transaction' in validatedTransaction && delete validatedTransaction.transaction;
+        'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
+        'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
+
+        // Remove base multisig transaction after approval
+        if (transactionData.multisigMetadata && transactionData.transactionId) {
+          this.removeTransaction(transactionData.transactionId);
         }
       });
+    }
 
-      emitter.on('timeout', (data: TransactionEventResponse) => {
-        if (transaction.errorOnTimeOut && data.errors.length > 0) {
-          validatedTransaction.errors.push(...data.errors);
-          resolve();
-        }
-      });
-    }).finally(() => {
-      // @ts-ignore
-      'transaction' in validatedTransaction && delete validatedTransaction.transaction;
-      'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
-      'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
-
-      // Delete base transaction after approve multisig tx
-      transactionData.multisigMetadata && transactionData.transactionId && this.removeTransaction(transactionData.transactionId);
-    });
-
-    'emitterTransaction' in validatedTransaction && delete (validatedTransaction as SWTransactionBase).emitterTransaction;
+    // Remove emitter before returning response
+    'emitterTransaction' in validatedTransaction &&
+    delete (validatedTransaction as SWTransactionBase).emitterTransaction;
 
     return validatedTransaction;
   }
@@ -678,6 +745,7 @@ export default class TransactionService {
 
     const { eventsHandler, step } = transaction;
 
+    // Inject emitter into transaction for wrapped tx flow
     if (transaction.wrappingStatus === SubstrateTransactionWrappingStatus.WRAPPABLE) {
       this.updateTransaction(transaction.id, { emitterTransaction: emitter });
     }
