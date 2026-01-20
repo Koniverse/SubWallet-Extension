@@ -3,7 +3,7 @@
 
 import { ExtrinsicType, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { detectTranslate } from '@subwallet/extension-base/utils';
-import { ChangeBittensorRootClaimType, AddSubstrateProxyAccountParams, CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, GovReferendumUnvoteParams, GovReferendumVoteParams, GovUnlockVoteParams, RemoveSubstrateProxyAccountParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
+import { AddSubstrateProxyAccountParams, CancelUnStakeParams, ChangeBittensorRootClaimType, ChangeValidatorParams, ClaimBridgeParams, ClaimRewardParams, EarnParams, GovReferendumUnvoteParams, GovReferendumVoteParams, GovUnlockVoteParams, RemoveSubstrateProxyAccountParams, SendNftParams, StakeParams, SwapParams, TransactionFormBaseProps, TransferParams, UnStakeParams, WithdrawParams } from '@subwallet/extension-koni-ui/types';
 
 import { ALL_KEY } from './common';
 
@@ -189,7 +189,7 @@ export const DEFAULT_GOV_UNLOCK_VOTE_PARAMS: GovUnlockVoteParams = {
 export const DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS: ChangeBittensorRootClaimType = {
   ...DEFAULT_TRANSACTION_PARAMS,
   bittensorRootClaimType: ''
-}
+};
 
 export const DEFAULT_ADD_SUBSTRATE_PROXY_ACCOUNT_PARAMS: AddSubstrateProxyAccountParams = {
   ...DEFAULT_TRANSACTION_PARAMS,
