@@ -34,7 +34,7 @@ const Component: React.FC<BaseProcessConfirmationProps> = (props: BaseProcessCon
       >
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.Process.Base.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.Process.Base.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
