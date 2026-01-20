@@ -215,7 +215,7 @@ const Component: React.FC<Props> = (props: Props) => {
         footer={footerModal}
         id={id}
         onCancel={onClose}
-        title={t('Select account')}
+        title={t('ui.components.Modal.AddressBook.AddSignerMultisigModal.selectAccount')}
       >
         <SwList
           className={'account-list'}

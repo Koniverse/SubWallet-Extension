@@ -24,20 +24,20 @@ export class AccountMultisigHandler extends AccountBaseHandler {
     const errors: AccountMultisigError[] = [];
 
     if (!signers || signers.length === 0) {
-      errors.push({ code: AccountMultisigErrorCode.INVALID_FILLED_ADDRESS, message: t('Signers must be provided') });
+      errors.push({ code: AccountMultisigErrorCode.INVALID_FILLED_ADDRESS, message: t('bg.ACCOUNT.services.keyring.handler.Multisig.signersRequired') });
     }
 
     if (!signers || signers.length < 2) {
-      errors.push({ code: AccountMultisigErrorCode.INVALID_FILLED_ADDRESS, message: t('Only support for multiple signers multisig account creation') });
+      errors.push({ code: AccountMultisigErrorCode.INVALID_FILLED_ADDRESS, message: t('bg.ACCOUNT.services.keyring.handler.Multisig.multipleSignersRequired') });
     }
 
     if (!threshold || threshold < 2 || threshold > signers.length) {
-      errors.push({ code: AccountMultisigErrorCode.INVALID_FILLED_THRESHOLD, message: t('Invalid threshold') });
+      errors.push({ code: AccountMultisigErrorCode.INVALID_FILLED_THRESHOLD, message: t('bg.ACCOUNT.services.keyring.handler.Multisig.invalidThreshold') });
     }
 
     for (const signer of signers) {
       if (!signer || !isSubstrateAddress(signer)) {
-        errors.push({ code: AccountMultisigErrorCode.INVALID_FILLED_ADDRESS, message: t('Address must be a substrate address') });
+        errors.push({ code: AccountMultisigErrorCode.INVALID_FILLED_ADDRESS, message: t('bg.ACCOUNT.services.keyring.handler.Multisig.mustBeSubstrateAddress') });
 
         break;
       }
@@ -49,7 +49,7 @@ export class AccountMultisigHandler extends AccountBaseHandler {
       const rAddress = reformatAddress(signer);
 
       if (distinctAddress.has(rAddress)) {
-        errors.push({ code: AccountMultisigErrorCode.DUPLICATE_FILLED_ADDRESS, message: t('Duplicate address found') });
+        errors.push({ code: AccountMultisigErrorCode.DUPLICATE_FILLED_ADDRESS, message: t('bg.ACCOUNT.services.keyring.handler.Multisig.duplicateAddressFound') });
 
         break;
       } else {

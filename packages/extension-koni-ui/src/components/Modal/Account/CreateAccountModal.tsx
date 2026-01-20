@@ -101,7 +101,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       disabled: false,
       icon: UserSwitch,
       key: 'multisig-account',
-      label: t('Create multisig account'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Create.createMultisigAccount'),
       onClick: () => {
         inactiveModal(modalId);
         navigate('/accounts/new-multisig');

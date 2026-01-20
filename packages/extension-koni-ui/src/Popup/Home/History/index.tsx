@@ -246,11 +246,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const viewOptions = useMemo((): ViewOption[] => {
     return [
       {
-        label: t('Transaction'),
+        label: t('ui.HISTORY.screen.History.transaction'),
         value: ViewValue.TRANSACTION
       },
       {
-        label: t('Multisig'),
+        label: t('ui.HISTORY.screen.History.multisig'),
         value: ViewValue.MULTISIG
       }
     ];
@@ -679,7 +679,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     return item.timestamp
       ? formatHistoryDate(item.timestamp, language, 'list')
-      : t('Pending Multisig');
+      : t('ui.HISTORY.screen.History.pendingMultisig');
   }, [language, t]);
 
   const groupSeparator = useCallback((group: TransactionHistoryItem[], idx: number, groupLabel: string) => {

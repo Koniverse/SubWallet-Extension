@@ -104,34 +104,34 @@ const Component: React.FC<Props> = (props: Props) => {
         hasBackgroundWrapper
       >
         <MetaInfo.DisplayType
-          label={t('Type')}
+          label={t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.type')}
           typeName={t(data.multisigTxType || 'Unknown')}
         />
         <HistoryMultisigHeader data={data} />
 
         <MetaInfo.Status
-          label={t('Status')}
+          label={t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.status')}
           statusIcon={HistoryStatusMap[ExtrinsicStatus.PROCESSING].icon}
           statusName={t(HistoryStatusMap[ExtrinsicStatus.PROCESSING].name)}
           valueColorSchema={HistoryStatusMap[ExtrinsicStatus.PROCESSING].schema}
         />
 
         <MetaInfo.Default
-          label={t('Extrinsic hash')}
+          label={t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.extrinsicHash')}
         >
           {extrinsicHash}
         </MetaInfo.Default>
 
         {data.callData && (
           <MetaInfo.Default
-            label={t('Call data')}
+            label={t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.callData')}
           >
             {callData}
           </MetaInfo.Default>
         )}
 
         {!!data.timestamp && (
-          <MetaInfo.Default label={t('Submitted time')}>
+          <MetaInfo.Default label={t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.submittedTime')}>
             {formatHistoryDate(data.timestamp, language, 'detail')}
           </MetaInfo.Default>
         )}
@@ -140,7 +140,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {data.depositAmount && (
           <MetaInfo.Number
             decimals={chainInfo?.substrateInfo?.decimals || 0}
-            label={t('Multisig deposit')}
+            label={t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.multisigDeposit')}
             suffix={chainInfo?.substrateInfo?.symbol || ''}
             value={data.depositAmount}
           />
@@ -151,10 +151,10 @@ const Component: React.FC<Props> = (props: Props) => {
       <div className='signatories-container'>
         <div className='signatories-label'>
           <div className={'signatories-label-left'}>
-            {t('Signatories')}
+            {t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.signatories')}
           </div>
           <div className={'signatories-label-right'}>
-            {t('Approval threshold: {{threshold}}/{{numberSigners}}', { replace: {
+            {t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.approvalThreshold', { replace: {
               threshold: data.threshold,
               numberSigners: data.signerAddresses.length
             } })}
@@ -196,9 +196,9 @@ const Component: React.FC<Props> = (props: Props) => {
                   )}
                 </div>
                 <div className='signatory-item-right'>
-                  {isInitiator && <span className='initiator-tag'>{t('Initiator')}</span>}
+                  {isInitiator && <span className='initiator-tag'>{t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.initiator')}</span>}
                   {!isInitiator && <span className={CN('signer-status', { approved: isApproved })}>
-                    {(isApproved ? t('Approved') : t('Waiting for approval'))}
+                    {(isApproved ? t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.approved') : t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.waitingForApproval'))}
                   </span>}
                 </div>
               </div>
