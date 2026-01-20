@@ -3,9 +3,11 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
+import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
+import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest } from '@subwallet/extension-base/types/multisig';
 import { MULTISIG_HISTORY_INFO_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
+import { useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
 import { approvePendingTx, cancelPendingTx, executePendingTx } from '@subwallet/extension-koni-ui/messaging';
 import HistoryMultisigLayout from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigLayout';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -16,6 +18,7 @@ import { ArrowCircleUpRight } from 'phosphor-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -25,26 +28,34 @@ type Props = ThemeProps & {
 
 function Component ({ className = '', data, onCancel }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const [loading, setLoading] = useState(false);
   const checkAction = usePreCheckAction({ address: data?.currentSigner });
-  const handleAction = useCallback(async (action: () => Promise<boolean | undefined>) => {
+  const { onError, onSuccess } = useHandleSubmitTransaction();
+  const handleAction = useCallback(async (promise: Promise<SWTransactionResponse>) => {
     try {
       setLoading(true);
-      const result = await action();
+      const result = await promise;
 
       if (result) {
+        onSuccess(result);
+
+        if (result.id) {
+          navigate(`/transaction-done/${data.currentSigner}/${data.chain}/${result.id}`, { replace: true });
+        }
+
         onCancel();
       }
     } catch (e) {
-      console.error(e);
+      onError(e as Error);
     } finally {
       setLoading(false);
     }
-  }, [onCancel]);
+  }, [data.chain, data.currentSigner, navigate, onCancel, onError, onSuccess]);
 
   const onReject = useCallback(() => {
-    return cancelPendingTx({
+    const cancelRequest: CancelPendingTxRequest = {
       address: data?.currentSigner,
       chain: data?.chain,
       multisigMetadata: {
@@ -59,11 +70,13 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
       type: data?.multisigTxType,
       decodedCallData: data.decodedCallData,
       callHash: data?.callHash
-    });
-  }, [data]);
+    };
+
+    return cancelPendingTx(cancelRequest);
+  }, [data?.blockHeight, data?.callHash, data?.chain, data?.currentSigner, data.decodedCallData, data?.extrinsicIndex, data.multisigAddress, data?.multisigTxType, data?.signerAddresses, data.threshold]);
 
   const onApprove = useCallback(() => {
-    return approvePendingTx({
+    const approveRequest: ApprovePendingTxRequest = {
       address: data?.currentSigner,
       chain: data?.chain,
       multisigMetadata: {
@@ -78,11 +91,13 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
         index: data?.extrinsicIndex
       },
       type: data?.multisigTxType
-    });
-  }, [data]);
+    };
+
+    return approvePendingTx(approveRequest);
+  }, [data?.blockHeight, data?.callHash, data?.chain, data?.currentSigner, data.decodedCallData, data?.extrinsicIndex, data.multisigAddress, data?.multisigTxType, data?.signerAddresses, data.threshold]);
 
   const onExecute = useCallback(() => {
-    return executePendingTx({
+    const executeRequest: ExecutePendingTxRequest = {
       address: data?.currentSigner,
       chain: data?.chain,
       multisigMetadata: {
@@ -98,17 +113,19 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
       callHash: data?.callHash || '',
       call: data?.callData || '',
       type: data?.multisigTxType
-    });
-  }, [data]);
+    };
+
+    return executePendingTx(executeRequest);
+  }, [data?.blockHeight, data?.callData, data?.callHash, data?.chain, data?.currentSigner, data.decodedCallData, data?.extrinsicIndex, data.multisigAddress, data?.multisigTxType, data?.signerAddresses, data.threshold]);
 
   const _onReject = useCallback(() => {
-    handleAction(onReject).catch(console.error);
+    handleAction(onReject()).catch(console.error);
   }, [handleAction, onReject]);
   const _onApprove = useCallback(() => {
-    handleAction(onApprove).catch(console.error);
+    handleAction(onApprove()).catch(console.error);
   }, [handleAction, onApprove]);
   const _onExecute = useCallback(() => {
-    handleAction(onExecute).catch(console.error);
+    handleAction(onExecute()).catch(console.error);
   }, [handleAction, onExecute]);
 
   const openBlockExplorer = useCallback(
