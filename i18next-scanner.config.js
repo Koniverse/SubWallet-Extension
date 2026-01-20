@@ -128,9 +128,6 @@ function scanSourceForTranslations(config) {
  * - Uncomment `resource.savePath`
  * - Run `build:i18n`
  *
- * Notes:
- * - `transform` is always enabled.
- * - `scanSourceForTranslations` is only for cleanup phase.
  */
 
 module.exports = {
@@ -159,7 +156,7 @@ module.exports = {
       jsonIndent: 2,
       lineEnding: '\n',
       loadPath: 'packages/extension-koni/public/locales/{{lng}}/{{ns}}.json',
-      // savePath: 'packages/extension-koni/public/locales/{{lng}}/{{ns}}.json',
+      savePath: 'packages/extension-koni/public/locales/{{lng}}/{{ns}}.json',
     },
     trans: {
       component: 'Trans'
@@ -167,5 +164,5 @@ module.exports = {
   },
   output: './',
   transform,
-  scanSourceForTranslations
+  // scanSourceForTranslations
 };
