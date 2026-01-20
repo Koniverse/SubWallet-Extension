@@ -208,10 +208,7 @@ export class InappNotificationService implements CronServiceInterface {
         const comparedMetadata = notification.metadata as MultisigApprovalNotificationMetadata;
         const sameNotification =
           candidateMetadata.multisigTxType === comparedMetadata.multisigTxType &&
-          candidateMetadata.chain === comparedMetadata.chain &&
-          candidateMetadata.multisigAddress === comparedMetadata.multisigAddress &&
-          candidateMetadata.extrinsicHash === comparedMetadata.extrinsicHash &&
-          candidateMetadata.currentSigner === comparedMetadata.currentSigner;
+          candidateMetadata.multisigKey === comparedMetadata.multisigKey;
 
         if (sameNotification) {
           return false;

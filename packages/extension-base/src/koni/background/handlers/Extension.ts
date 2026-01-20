@@ -62,7 +62,7 @@ import { isProposalExpired, isSupportWalletConnectChain, isSupportWalletConnectN
 import { ResultApproveWalletConnectSession, WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { AccountsStore } from '@subwallet/extension-base/stores';
-import { AccountChainType, AccountJson, AccountProxyMap, AccountSignMode, AccountsWithCurrentAddress, BalanceJson, BalanceType, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeDetail, BitcoinFeeInfo, BitcoinFeeRate, BriefProcessStep, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CommonStepFeeInfo, CommonStepType, EarningProcessType, EarningRewardJson, EvmFeeInfo, FeeChainType, FeeCustom, FeeDetail, FeeInfo, FeeOption, HandleYieldStepData, NominationPoolInfo, OptimalYieldPathParams, ProcessStep, ProcessTransactionData, ProcessType, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckPublicAndSecretKey, RequestClaimBridge, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningImpact, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StakingTxErrorType, StepStatus, StorageDataInterface, SubmitChangeValidatorStaking, SummaryEarningProcessData, SwapBaseTxData, SwapFeeType, SwapRequestV2, TokenSpendingApprovalParams, ValidateYieldProcessParams, YieldPoolType, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountJson, AccountProxyMap, AccountSignMode, AccountsWithCurrentAddress, BalanceJson, BalanceType, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeDetail, BitcoinFeeInfo, BitcoinFeeRate, BriefProcessStep, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CommonStepFeeInfo, CommonStepType, EarningProcessType, EarningRewardJson, EvmFeeInfo, FeeChainType, FeeCustom, FeeDetail, FeeInfo, FeeOption, HandleYieldStepData, MultisigTxErrorType, NominationPoolInfo, OptimalYieldPathParams, ProcessStep, ProcessTransactionData, ProcessType, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckPublicAndSecretKey, RequestClaimBridge, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningImpact, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StakingTxErrorType, StepStatus, StorageDataInterface, SubmitChangeValidatorStaking, SummaryEarningProcessData, SwapBaseTxData, SwapFeeType, SwapRequestV2, TokenSpendingApprovalParams, ValidateYieldProcessParams, YieldPoolType, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, InitMultisigTxRequest, RequestGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
@@ -3195,62 +3195,52 @@ export default class KoniExtension {
   }
 
   // Multisig handlers
-  private async approvePendingTx (inputData: ApprovePendingTxRequest): Promise<boolean> {
+  private async approvePendingTx (inputData: ApprovePendingTxRequest): Promise<SWTransactionResponse> {
     const { address, callHash, chain, multisigMetadata, timepoint } = inputData;
 
     if (!address || !chain || !multisigMetadata || !callHash || !timepoint) {
-      return false;
+      return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(MultisigTxErrorType.INVALID_PARAMS)]);
     }
 
-    try {
-      const substrateApi = this.#koniState.getSubstrateApi(chain);
-      const api = substrateApi.api;
+    const api = this.#koniState.getSubstrateApi(chain).api;
 
-      if (!api || !api.tx || !api.tx.multisig) {
-        return false;
-      }
-
-      const otherSignatories = multisigMetadata.signers.filter((s) => !isSameAddress(s, address));
-
-      const extrinsic = api.tx.multisig.approveAsMulti(
-        multisigMetadata.threshold,
-        sortAddresses(otherSignatories),
-        timepoint,
-        callHash,
-        DEFAULT_MAX_WEIGHT
-      );
-
-      await this.#koniState.transactionService.handleTransaction({
-        address,
-        chain,
-        chainType: ChainType.SUBSTRATE,
-        data: inputData,
-        extrinsicType: ExtrinsicType.MULTISIG_APPROVE_TX,
-        transaction: extrinsic,
-        url: EXTENSION_REQUEST_URL
-      });
-
-      return true;
-    } catch (e) {
-      console.error('Error approving pending multisig transaction:', e);
-
-      return false;
+    if (!api || !api.tx || !api.tx.multisig) {
+      return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(MultisigTxErrorType.LACK_MULTISIG_PALLET)]);
     }
+
+    const otherSignatories = multisigMetadata.signers.filter((s) => !isSameAddress(s, address));
+
+    const extrinsic = api.tx.multisig.approveAsMulti(
+      multisigMetadata.threshold,
+      sortAddresses(otherSignatories),
+      timepoint,
+      callHash,
+      DEFAULT_MAX_WEIGHT
+    );
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address,
+      chain,
+      chainType: ChainType.SUBSTRATE,
+      data: inputData,
+      extrinsicType: ExtrinsicType.MULTISIG_APPROVE_TX,
+      transaction: extrinsic,
+      url: EXTENSION_REQUEST_URL
+    });
   }
 
-  private async executePendingTx (inputData: ExecutePendingTxRequest): Promise<boolean> {
+  private async executePendingTx (inputData: ExecutePendingTxRequest): Promise<SWTransactionResponse> {
     const { address, call, chain, decodedCallData, multisigMetadata, timepoint } = inputData;
 
     if (!address || !chain || !multisigMetadata || !timepoint || !call || !decodedCallData) {
-      return false;
+      return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(MultisigTxErrorType.INVALID_PARAMS)]);
     }
 
     try {
-      const substrateApi = this.#koniState.getSubstrateApi(chain);
-      const api = substrateApi.api;
+      const api = this.#koniState.getSubstrateApi(chain).api;
 
       if (!api || !api.tx || !api.tx.multisig) {
-        return false;
+        return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(MultisigTxErrorType.LACK_MULTISIG_PALLET)]);
       }
 
       const otherSignatories = multisigMetadata.signers.filter((s) => !isSameAddress(s, address));
@@ -3266,7 +3256,7 @@ export default class KoniExtension {
         weight
       );
 
-      await this.#koniState.transactionService.handleTransaction({
+      return await this.#koniState.transactionService.handleTransaction({
         address,
         chain,
         chainType: ChainType.SUBSTRATE,
@@ -3275,55 +3265,44 @@ export default class KoniExtension {
         transaction: extrinsic,
         url: EXTENSION_REQUEST_URL
       });
-
-      return true;
     } catch (e) {
-      console.error('Error executing pending multisig transaction:', e);
+      const errMsg = (e as Error).message;
 
-      return false;
+      return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(MultisigTxErrorType.UNABLE_TO_CONSTRUCT_TX), errMsg]);
     }
   }
 
-  private async cancelPendingTx (inputData: CancelPendingTxRequest): Promise<boolean> {
+  private async cancelPendingTx (inputData: CancelPendingTxRequest): Promise<SWTransactionResponse> {
     const { address, callHash, chain, multisigMetadata, timepoint } = inputData;
 
     if (!address || !chain || !multisigMetadata || !callHash) {
-      return false;
+      return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(MultisigTxErrorType.INVALID_PARAMS)]);
     }
 
-    try {
-      const substrateApi = this.#koniState.getSubstrateApi(chain);
-      const api = substrateApi.api;
+    const api = this.#koniState.getSubstrateApi(chain).api;
 
-      if (!api || !api.tx || !api.tx.multisig) {
-        return false;
-      }
-
-      const otherSignatories = multisigMetadata.signers.filter((s) => !isSameAddress(s, address));
-
-      const extrinsic = api.tx.multisig.cancelAsMulti(
-        multisigMetadata.threshold,
-        sortAddresses(otherSignatories),
-        timepoint,
-        callHash
-      );
-
-      await this.#koniState.transactionService.handleTransaction({
-        address,
-        chain,
-        chainType: ChainType.SUBSTRATE,
-        data: inputData,
-        extrinsicType: ExtrinsicType.MULTISIG_CANCEL_TX,
-        transaction: extrinsic,
-        url: EXTENSION_REQUEST_URL
-      });
-
-      return true;
-    } catch (e) {
-      console.error('Error cancelling pending multisig transaction:', e);
-
-      return false;
+    if (!api || !api.tx || !api.tx.multisig) {
+      return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(MultisigTxErrorType.LACK_MULTISIG_PALLET)]);
     }
+
+    const otherSignatories = multisigMetadata.signers.filter((s) => !isSameAddress(s, address));
+
+    const extrinsic = api.tx.multisig.cancelAsMulti(
+      multisigMetadata.threshold,
+      sortAddresses(otherSignatories),
+      timepoint,
+      callHash
+    );
+
+    return await this.#koniState.transactionService.handleTransaction({
+      address,
+      chain,
+      chainType: ChainType.SUBSTRATE,
+      data: inputData,
+      extrinsicType: ExtrinsicType.MULTISIG_CANCEL_TX,
+      transaction: extrinsic,
+      url: EXTENSION_REQUEST_URL
+    });
   }
 
   // Multisig Account

@@ -567,8 +567,8 @@ export class MultisigService implements StoppableServiceInterface {
       }
 
       for (const signerAddress of signerAddresses) {
+        // Do not create pending tx for account not in wallet
         if (!allAddresses.includes(reformatAddress(signerAddress))) {
-          // Skip if signerAddress is not an account in keyring
           continue;
         }
 
@@ -582,6 +582,11 @@ export class MultisigService implements StoppableServiceInterface {
         // Track new transactions that need notification
         // Only notify if this is a new transaction (not already notified)
         if (!this.notifiedTxKeys.has(key) && !currentMap[key]) {
+          // skip notified for account has already approved
+          if (pendingTx.approvals.includes(signerAddress)) {
+            continue;
+          }
+
           newNotifiedTxs.push(pendingTx);
           this.notifiedTxKeys.add(key);
         }
@@ -615,7 +620,7 @@ export class MultisigService implements StoppableServiceInterface {
 
       return {
         id: notificationId,
-        address: tx.currentSigner,
+        address: reformatAddress(tx.currentSigner), // save notification to default address because it's managed by account
         title: NotificationTitleMap[actionType],
         description: NotificationDescriptionMap[actionType](),
         time: timestamp,
@@ -623,6 +628,7 @@ export class MultisigService implements StoppableServiceInterface {
         isRead: false,
         actionType,
         metadata: {
+          multisigKey,
           chain: tx.chain,
           multisigAddress: tx.multisigAddress,
           extrinsicHash: tx.extrinsicHash,
