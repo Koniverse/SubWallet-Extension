@@ -92,6 +92,10 @@ export interface ProcessNotificationMetadata {
 }
 
 export interface MultisigApprovalNotificationMetadata {
+  multisigKey: string;
+  multisigTxType: MultisigTxType;
+
+  // just additional info to easy lookup in notification table
   chain: string;
   multisigAddress: string;
   extrinsicHash: string;
@@ -100,7 +104,6 @@ export interface MultisigApprovalNotificationMetadata {
   extrinsicIndex: number;
   currentSigner: string;
   approvals: string[];
-  multisigTxType: MultisigTxType;
 }
 
 export enum NotificationTimePeriod {

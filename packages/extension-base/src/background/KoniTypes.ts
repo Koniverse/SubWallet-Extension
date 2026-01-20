@@ -2842,9 +2842,9 @@ export interface KoniRequestSignatures {
   /* Multisig Account */
   'pri(multisig.subscribePendingMultisigTxs)': [null, PendingMultisigTxMap, PendingMultisigTxMap];
   'pri(multisig.getPendingMultisigTxs)': [RequestGetPendingTxs, PendingMultisigTx[]]
-  'pri(multisig.approvePendingTx)': [ApprovePendingTxRequest, boolean];
-  'pri(multisig.executePendingTx)': [ExecutePendingTxRequest, boolean];
-  'pri(multisig.cancelPendingTx)': [CancelPendingTxRequest, boolean];
+  'pri(multisig.approvePendingTx)': [ApprovePendingTxRequest, SWTransactionResponse];
+  'pri(multisig.executePendingTx)': [ExecutePendingTxRequest, SWTransactionResponse];
+  'pri(multisig.cancelPendingTx)': [CancelPendingTxRequest, SWTransactionResponse];
   'pri(multisig.getSignableAccountInfos)': [RequestGetSignableAccountInfos, ResponseGetSignableAccountInfos];
   'pri(multisig.initMultisigTx)': [InitMultisigTxRequest, SWTransactionResponse];
   /* Multisig Account */
