@@ -47,7 +47,7 @@ const Component: React.FC<Props> = (props: Props) => {
       <MetaInfo hasBackgroundWrapper={true}>
         {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.SendNft.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.SendNft.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />}

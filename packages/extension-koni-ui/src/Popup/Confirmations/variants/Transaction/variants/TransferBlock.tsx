@@ -122,7 +122,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
 
         {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={feeInfo ? feeInfo.decimals : nativeTokenDecimals}
-          label={t('ui.TRANSACTION.Confirmations.TransferBlock.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.TransferBlock.networkFee')}
           suffix={feeInfo ? feeInfo.symbol : nativeTokenSymbol}
           value={feeInfo ? feeInfo.value : 0}
         />}

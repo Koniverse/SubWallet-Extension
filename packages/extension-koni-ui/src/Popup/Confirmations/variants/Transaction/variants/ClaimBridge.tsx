@@ -70,7 +70,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         }
         <MetaInfo.Number
           decimals={nativeToken.decimals}
-          label={t('ui.TRANSACTION.Confirmations.ClaimBridge.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.ClaimBridge.networkFee')}
           suffix={nativeToken.symbol}
           value={transaction.estimateFee?.value || 0}
         />

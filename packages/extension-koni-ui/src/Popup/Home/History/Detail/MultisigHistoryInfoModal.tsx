@@ -33,26 +33,29 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
   const [loading, setLoading] = useState(false);
   const checkAction = usePreCheckAction({ address: data?.currentSigner });
   const { onError, onSuccess } = useHandleSubmitTransaction();
-  const handleAction = useCallback(async (promise: Promise<SWTransactionResponse>) => {
-    try {
-      setLoading(true);
-      const result = await promise;
+  const handleAction = useCallback(
+    async (action: () => Promise<SWTransactionResponse>) => {
+      try {
+        setLoading(true);
+        const result = await action();
 
-      if (result) {
-        onSuccess(result);
+        if (result) {
+          onSuccess(result);
 
-        if (result.id) {
-          navigate(`/transaction-done/${data.currentSigner}/${data.chain}/${result.id}`, { replace: true });
+          if (result.id) {
+            navigate(`/transaction-done/${data.currentSigner}/${data.chain}/${result.id}`, { replace: true });
+          }
+
+          onCancel();
         }
-
-        onCancel();
+      } catch (e) {
+        onError(e as Error);
+      } finally {
+        setLoading(false);
       }
-    } catch (e) {
-      onError(e as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [data.chain, data.currentSigner, navigate, onCancel, onError, onSuccess]);
+    },
+    [data.chain, data.currentSigner, navigate, onCancel, onError, onSuccess]
+  );
 
   const onReject = useCallback(() => {
     const cancelRequest: CancelPendingTxRequest = {
@@ -119,13 +122,13 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
   }, [data?.blockHeight, data?.callData, data?.callHash, data?.chain, data?.currentSigner, data.decodedCallData, data?.extrinsicIndex, data.multisigAddress, data?.multisigTxType, data?.signerAddresses, data.threshold]);
 
   const _onReject = useCallback(() => {
-    handleAction(onReject()).catch(console.error);
+    handleAction(onReject).catch(console.error);
   }, [handleAction, onReject]);
   const _onApprove = useCallback(() => {
-    handleAction(onApprove()).catch(console.error);
+    handleAction(onApprove).catch(console.error);
   }, [handleAction, onApprove]);
   const _onExecute = useCallback(() => {
-    handleAction(onExecute()).catch(console.error);
+    handleAction(onExecute).catch(console.error);
   }, [handleAction, onExecute]);
 
   const openBlockExplorer = useCallback(
