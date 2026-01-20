@@ -2573,7 +2573,7 @@
   "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.othersTooltipTitle": "Balances locked due to unique on-chain actions on the network",
   "ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.lockedDetails": "Locked details",
   "ui.GOVERNANCE.components.Governance.ReferendumVoteSummary.votedDelegatedTotal_plural": "",
-  "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unknownAccountFeatureRestriction": "",
+  "ui.GOVERNANCE.screen.Governance.UnlockToken.LockedAccountInfoPart.unknownAccountFeatureRestriction": "The account you are using is Unknown account, you cannot use this feature with it",
   "ui.TRANSACTION.constant.transaction.addProxy": "Add proxy",
   "ui.TRANSACTION.constant.transaction.removeProxy": "Remove proxy",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyList": "Proxy list",
