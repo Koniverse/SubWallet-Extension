@@ -3439,40 +3439,72 @@ export default class KoniExtension {
         const originEmitter = originTransaction.emitterTransaction;
 
         eventEmitter.on('success', (data: TransactionEventResponse) => {
-          data.id = originTransaction.id;
-          originEmitter.emit('success', data);
+          originEmitter.emit('success', {
+            ...data,
+            id: originTransaction.id
+          });
         });
 
         eventEmitter.on('extrinsicHash', (data: TransactionEventResponse) => {
-          data.id = originTransaction.id;
-          originEmitter.emit('extrinsicHash', data);
+          originEmitter.emit('extrinsicHash', {
+            ...data,
+            id: originTransaction.id
+          });
         });
 
         eventEmitter.on('send', (data: TransactionEventResponse) => {
-          data.id = originTransaction.id;
-          originEmitter.emit('send', data);
+          originEmitter.emit('send', {
+            ...data,
+            id: originTransaction.id
+          });
         });
 
         eventEmitter.on('signed', (data: TransactionEventResponse) => {
-          data.id = originTransaction.id;
-          originEmitter.emit('signed', data);
+          originEmitter.emit('signed', {
+            ...data,
+            id: originTransaction.id
+          });
         });
 
         eventEmitter.on('error', (data: TransactionEventResponse) => {
           if (data.errors.length > 0) {
-            data.id = originTransaction.id;
-            originEmitter.emit('error', data);
+            originEmitter.emit('error', {
+              ...data,
+              id: originTransaction.id
+            });
           }
         });
 
         eventEmitter.on('timeout', (data: TransactionEventResponse) => {
           if (data.errors.find((error) => error.errorType === BasicTxErrorType.TIMEOUT) && data.errors.length > 0) {
-            data.id = originTransaction.id;
-            originEmitter.emit('timeout', data);
+            originEmitter.emit('timeout', {
+              ...data,
+              id: originTransaction.id
+            });
           }
         });
       }
     };
+
+    // if signer is proxied address, we do not need to create substrate proxy tx
+    // just handle original transaction
+    if (isSignerProxiedAccount) {
+      return await this.#koniState.transactionService.handleWrappedTransaction({
+        ...originTransaction,
+        data: {
+          ...(originTransaction.data as object),
+
+          // output
+          decodedCallData,
+          submittedCallData: substrateProxyCallData.toHex(),
+          callData: callData.toHex(),
+          networkFee
+        },
+        wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_RESULT,
+        additionalValidator,
+        eventsHandler
+      });
+    }
 
     return await this.#koniState.transactionService.handleWrappedTransaction({
       address: signer,
@@ -3480,7 +3512,7 @@ export default class KoniExtension {
       chainType: ChainType.SUBSTRATE,
       extrinsicType: ExtrinsicType.SUBSTRATE_PROXY_INIT_TX,
       transaction: substrateProxyCallData,
-      skipFeeValidation: !isSignerProxiedAccount,
+      skipFeeValidation: true,
       transferNativeAmount: originTransaction.transferNativeAmount,
       data: {
         // input

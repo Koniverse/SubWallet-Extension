@@ -81,7 +81,7 @@ export default class TransactionService {
   private checkDuplicate (transaction: ValidateTransactionResponseInput): TransactionError[] {
     // Check duplicated transaction
     const existed = this.processingTransactions
-      .filter((item) => item.address === transaction.address && item.chain === transaction.chain);
+      .filter((item) => item.address === transaction.address && item.chain === transaction.chain && item.id !== transaction.id);
 
     if (existed.length > 0) {
       return [new TransactionError(BasicTxErrorType.DUPLICATE_TRANSACTION)];
@@ -306,7 +306,9 @@ export default class TransactionService {
     if (transaction.wrappingStatus === SubstrateTransactionWrappingStatus.WRAP_RESULT) {
       const data = transaction.data as InitMultisigTxRequest;
 
-      this.previousWrappedTxId[data.transactionId] = transaction.id;
+      if (data.transactionId) {
+        this.previousWrappedTxId[data.transactionId] = transaction.id;
+      }
     }
 
     this.transactionSubject.next({ ...transactions });
@@ -342,8 +344,10 @@ export default class TransactionService {
   public async handleWrappedTransaction (transaction: SWTransactionInput): Promise<SWTransactionResponse> {
     const transactionData = transaction.data as InitMultisigTxRequest;
 
+    const originTransactionId = transactionData.transactionId || transaction.id || '';
+
     // Delete previous select signer transaction
-    this.previousWrappedTxId[transactionData.transactionId] && this.removeTransaction(this.previousWrappedTxId[transactionData.transactionId]);
+    this.previousWrappedTxId[originTransactionId] && this.removeTransaction(this.previousWrappedTxId[originTransactionId]);
 
     const validatedTransaction = await this.validateTransaction(transaction);
     const ignoreWarnings: BasicTxWarningCode[] = validatedTransaction.ignoreWarnings || [];
@@ -405,6 +409,8 @@ export default class TransactionService {
       // Delete base transaction after approve multisig tx
       transactionData.multisigMetadata && transactionData.transactionId && this.removeTransaction(transactionData.transactionId);
     });
+
+    'emitterTransaction' in validatedTransaction && delete (validatedTransaction as SWTransactionBase).emitterTransaction;
 
     return validatedTransaction;
   }
@@ -2296,7 +2302,6 @@ export default class TransactionService {
     });
 
     event.on('success', (transactionStatus) => {
-      console.log(transactionStatus);
       eventData.blockHash = transactionStatus.block_hash || undefined;
       eventData.blockNumber = transactionStatus.block_height || undefined;
       eventData.blockTime = transactionStatus.block_time ? (transactionStatus.block_time * 1000) : undefined;
