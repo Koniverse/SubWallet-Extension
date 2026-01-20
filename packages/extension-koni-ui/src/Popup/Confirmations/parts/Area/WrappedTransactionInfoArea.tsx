@@ -6,14 +6,14 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { SWTransactionResponse, SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { ExcludedSubstrateProxyAccounts, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types';
 import { InitMultisigTxResponse } from '@subwallet/extension-base/types/multisig';
-import { AccountProxyAvatar, AlertBox, SignableAccountProxySelectorModal } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyAvatar, AlertBox, WrappedTransactionSignerSelectorModal } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
-import { SIGNABLE_ACCOUNT_PROXY_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useCreateGetSignableAccountProxy, useGetAccountByAddress, useGetNativeTokenBasicInfo, useOpenDetailModal } from '@subwallet/extension-koni-ui/hooks';
+import { WRAPPED_TRANSACTION_SIGNER_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { useGetAccountByAddress, useGetNativeTokenBasicInfo, useGetWrappedTransactionSigners, useOpenDetailModal } from '@subwallet/extension-koni-ui/hooks';
 import { initMultisigTx } from '@subwallet/extension-koni-ui/messaging/transaction/multisig';
 import { handleSubstrateProxyWrappedTxRequest } from '@subwallet/extension-koni-ui/messaging/transaction/substrateProxy';
 import { BaseDetailModal } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Detail';
-import { SignableAccountProxyItem, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps, WrappedTransactionSigner } from '@subwallet/extension-koni-ui/types';
 import { toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext, Typography } from '@subwallet/react-ui';
 import { useQuery } from '@tanstack/react-query';
@@ -28,14 +28,14 @@ interface Props extends ThemeProps {
   setDisable: (disabled: boolean) => void;
 }
 
-const modalId = SIGNABLE_ACCOUNT_PROXY_SELECTOR_MODAL;
+const modalId = WRAPPED_TRANSACTION_SIGNER_SELECTOR_MODAL;
 
 function Component ({ className, setDisable, transaction }: Props) {
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const account = useGetAccountByAddress(transaction.address);
-  const selectSignableAccountProxy = useCreateGetSignableAccountProxy();
-  const [signerSelected, setSignerSelected] = React.useState<SignableAccountProxyItem | null>(null);
+  const getWrappedTransactionSigners = useGetWrappedTransactionSigners();
+  const [signerSelected, setSignerSelected] = React.useState<WrappedTransactionSigner | null>(null);
   const [wrapTransactionInfo, setWrapTransactionInfo] = React.useState<SWTransactionResponse | null>(null);
   const [transactionError, setTransactionError] = React.useState<TransactionError| null>(null);
   const [isWrapTransactionLoading, setIsWrapTransactionLoading] = React.useState(false);
@@ -78,11 +78,13 @@ function Component ({ className, setDisable, transaction }: Props) {
     return wrapTransactionInfo.data as InitMultisigTxResponse;
   }, [wrapTransactionInfo]);
 
-  const { data: signableAccountProxyItems, isLoading: isGetSignableLoading } = useQuery<SignableAccountProxyItem[]>({
+  const { data: signableAccountProxyItems, isLoading: isGetSignableLoading } = useQuery<WrappedTransactionSigner[]>({
     queryKey: ['non-direct-signing', transaction.id],
     queryFn: async () => {
-      return await selectSignableAccountProxy({
+      return await getWrappedTransactionSigners({
         ...transaction,
+        chainSlug: transaction.chain,
+        targetAddress: transaction.address,
         excludedSubstrateProxyAccounts
       });
     },
@@ -94,7 +96,7 @@ function Component ({ className, setDisable, transaction }: Props) {
     activeModal(modalId);
   }, [activeModal]);
 
-  const prepareTransaction = useCallback(async (signerSelected: SignableAccountProxyItem) => {
+  const prepareTransaction = useCallback(async (signerSelected: WrappedTransactionSigner) => {
     try {
       setIsWrapTransactionLoading(true);
       setTransactionError(null);
@@ -136,7 +138,7 @@ function Component ({ className, setDisable, transaction }: Props) {
     }
   }, [account, setDisable, transaction]);
 
-  const onSelectSigner = useCallback((selected: SignableAccountProxyItem) => {
+  const onSelectSigner = useCallback((selected: WrappedTransactionSigner) => {
     setSignerSelected((prevState) => {
       if (prevState?.address !== selected.address) {
         prepareTransaction(selected)
@@ -308,13 +310,15 @@ function Component ({ className, setDisable, transaction }: Props) {
         </pre>
       </BaseDetailModal>}
 
-      {!!signableAccountProxyItems && <SignableAccountProxySelectorModal
-        accountItems={signableAccountProxyItems}
-        address={transaction.address}
-        chain={transaction.chain}
-        onApply={onSelectSigner}
-        signerSelected={signerSelected}
-      />}
+      {!!signableAccountProxyItems && (
+        <WrappedTransactionSignerSelectorModal
+          chainSlug={transaction.chain}
+          onSelectSigner={onSelectSigner}
+          selectedSigner={signerSelected}
+          signerItems={signableAccountProxyItems}
+          targetAddress={transaction.address}
+        />
+      )}
     </>
   );
 }

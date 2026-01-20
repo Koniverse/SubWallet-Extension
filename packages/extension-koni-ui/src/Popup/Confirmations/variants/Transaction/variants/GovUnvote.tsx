@@ -30,7 +30,6 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
   const networkPrefix = useGetChainPrefixBySlug(transaction.chain);
   const { currencyData } = useSelector((state: RootState) => state.price);
 
-  // todo: recheck gov confirmation when case multisig / proxy
   const govConfirmationInfo = useGetGovVoteConfirmationInfo({
     address: transaction.address,
     chain: transaction.chain,

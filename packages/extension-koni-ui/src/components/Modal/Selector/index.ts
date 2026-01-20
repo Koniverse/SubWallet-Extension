@@ -3,4 +3,4 @@
 
 export { default as AccountSelectorModal } from './AccountSelector';
 
-export * from './SignableAccountProxySelectorModal';
+export * from './WrappedTransactionSignerSelectorModal';

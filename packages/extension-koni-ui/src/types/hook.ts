@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { ExcludedSubstrateProxyAccounts, SubstrateProxyType } from '@subwallet/extension-base/types';
+import { ExcludedSubstrateProxyAccounts } from '@subwallet/extension-base/types';
+import { WrappedTransactionSigner } from '@subwallet/extension-koni-ui/types/account';
 import { PriceChangeStatus, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types/balance';
 import BigN from 'bignumber.js';
 
@@ -26,21 +27,21 @@ export type AccountBalanceHookType = {
   },
 }
 
-export interface SignableAccountProxyItem {
-  kind: 'substrate_proxy' | 'signatory';
-  address: string;
-  proxyId?: string;
-  isProxiedAccount?: boolean;
-  substrateProxyType?: SubstrateProxyType;
-}
+// useGetWrappedTransactionSigners
 
-export type SelectSignableAccountProxyParams = {
-  chain: string;
-  address?: string;
+export type ResolveWrappedTransactionSignersHookParams = {
+  chainSlug: string;
+  targetAddress?: string;
   extrinsicType?: ExtrinsicType;
 
   // List of substrate proxy accounts to be excluded from selection
   excludedSubstrateProxyAccounts?: ExcludedSubstrateProxyAccounts[];
 };
 
-export type SelectSignableAccountProxy = (params: SelectSignableAccountProxyParams) => Promise<SignableAccountProxyItem[]>;
+export type ResolveWrappedTransactionSigners = (params: ResolveWrappedTransactionSignersHookParams) => Promise<WrappedTransactionSigner[]>;
+
+export type GetWrappedTransactionSignersHookType = (
+  params: ResolveWrappedTransactionSignersHookParams
+) => Promise<WrappedTransactionSigner[]>;
+
+// useGetWrappedTransactionSigners

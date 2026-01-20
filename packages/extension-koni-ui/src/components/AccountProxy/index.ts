@@ -14,4 +14,4 @@ export { default as AddressSelectorItem } from './AddressSelectorItem';
 export { default as AccountProxyTypeTag } from './AccountProxyTypeTag';
 export { default as AccountChainAddressWithStatusItem } from './AccountChainAddressWithStatusItem';
 export { default as AccountChainAddressList } from './list/AccountChainAddressList';
-export { default as SignableAccountProxySelectorItem } from './SignableAccountProxySelectorItem';
+export { default as WrappedTransactionSignerSelectorItem } from './WrappedTransactionSignerSelectorItem';
