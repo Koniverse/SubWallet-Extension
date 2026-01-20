@@ -53,7 +53,6 @@ function Component ({ className,
     'Home',
     'Tokens',
     'NftCollections',
-    'Crowdloans',
     'Staking',
     'Settings'
   ]);
@@ -111,15 +110,6 @@ function Component ({ className,
               {(latestLiveMissionIds.length > 0) && <div className={CN('__active-count')}>{latestLiveMissionIds.length}</div>}
             </>
           )
-        }
-      },
-      {
-        label: t('Crowdloans'),
-        value: '/home/crowdloans',
-        icon: {
-          type: 'phosphor',
-          phosphorIcon: Rocket,
-          weight: 'fill'
         }
       },
       {
