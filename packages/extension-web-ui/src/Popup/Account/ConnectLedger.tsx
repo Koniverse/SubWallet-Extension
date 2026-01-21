@@ -354,6 +354,15 @@ const Component: React.FC<Props> = (props: Props) => {
               {t('here')}
             </a>
           </div>
+          <div className='sub-title'>
+            {t('xxx Unlock your Ledger and open the selected app. For more information regarding Polkadot and Polkadot Migration app, click ')}
+            <a
+              href={CONNECT_LEDGER_USER_GUIDE_URL}
+              target='_blank'
+            >
+              {t('here')}
+            </a>
+          </div>
           {
             firstStep && (
               <>
