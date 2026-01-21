@@ -348,7 +348,8 @@ const Component: React.FC<Props> = (props: Props) => {
             {t('Unlock your Ledger and open the selected app. For more information regarding Polkadot and Polkadot Migration app, click ')}
             <a
               href={CONNECT_LEDGER_USER_GUIDE_URL}
-              target='__blank'
+              target='_blank'
+              rel="noopener noreferrer"
             >
               {t('here')}
             </a>

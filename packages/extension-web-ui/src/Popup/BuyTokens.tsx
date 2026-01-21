@@ -55,7 +55,8 @@ const LinkUrl: React.FC<LinkUrlProps> = (props: LinkUrlProps) => {
     return (
       <a
         href={props.url}
-        target='__blank'
+        target='_blank'
+        rel="noopener noreferrer"
       >
         {props.content}
       </a>
