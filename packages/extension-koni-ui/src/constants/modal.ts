@@ -18,6 +18,7 @@ export const REQUEST_CAMERA_ACCESS_MODAL = 'request-camera-access-modal';
 export const VALIDATOR_DETAIL_MODAL = 'validator-detail-modal';
 export const NOTIFICATION_DETAIL_MODAL = 'notification-detail-modal';
 export const HISTORY_DETAIL_MODAL = 'history-detail-modal';
+export const MULTISIG_HISTORY_INFO_MODAL = 'multisig-history-info-modal';
 export const RECEIVE_TOKEN_SELECTOR_MODAL = 'receive-tokens-selector-modal';
 export const RECEIVE_MODAL_TOKEN_SELECTOR = 'receive-modal-token-selector';
 export const RECEIVE_MODAL_ACCOUNT_SELECTOR = 'receive-modal-account-selector';
@@ -44,6 +45,7 @@ export const CHOOSE_FEE_TOKEN_MODAL = 'choose-fee-token-modal';
 export const SELECT_ADDRESS_FORMAT_MODAL = 'select-address-format-modal';
 export const ADDRESS_GROUP_MODAL = 'address-group-modal';
 export const ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL = 'account-migration-in-progress-warning-modal';
+export const WRAPPED_TRANSACTION_SIGNER_SELECTOR_MODAL = 'wrapped_transaction_signer_selector_modal';
 
 /* Campaign */
 export const HOME_CAMPAIGN_BANNER_MODAL = 'home-campaign-banner-modal';
@@ -97,7 +99,6 @@ export const GOV_DELEGATION_DETAILS_MODAL = 'gov-delegation-details-modal';
 /* OpenGov */
 
 /* Proxy */
-export const SUBSTRATE_PROXY_ACCOUNT_SELECTOR_MODAL = 'substrateProxyAccount-account-selector-modal';
 export const SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL = 'substrateProxyAccount-account-list-modal';
 /* Proxy */
 

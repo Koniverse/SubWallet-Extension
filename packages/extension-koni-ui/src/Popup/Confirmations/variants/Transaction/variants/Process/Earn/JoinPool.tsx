@@ -60,7 +60,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.Process.Earn.JoinPool.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.Process.Earn.JoinPool.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />

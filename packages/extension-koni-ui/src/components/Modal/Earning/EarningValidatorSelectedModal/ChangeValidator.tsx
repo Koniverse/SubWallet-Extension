@@ -4,7 +4,7 @@
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
-import { NominationInfo, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { NominationInfo, SubmitChangeValidatorStaking, ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
 import { StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
@@ -97,8 +97,8 @@ const Component = (props: Props) => {
   const isActive = checkActive(modalId);
   const chainInfoMap = useSelector((state) => state.chainStore.chainInfoMap);
 
-  const onPreCheck = usePreCheckAction(from);
-  const { onError, onSuccess, selectSubstrateProxyAccountsToSign } = useHandleSubmitTransaction();
+  const onPreCheck = usePreCheckAction({ chain, address: from });
+  const { onError, onSuccess } = useHandleSubmitTransaction();
 
   const sectionRef = useRef<SwListSectionRef>(null);
   const networkPrefix = chainInfoMap[chain]?.substrateInfo?.addressPrefix;
@@ -290,34 +290,25 @@ const Component = (props: Props) => {
     setSearchValue(value);
   }, []);
 
-  // submit action
   const submit = useCallback((target: ValidatorInfo[]) => {
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
-      return changeEarningValidator({
-        slug: poolInfo.slug,
-        address: from,
-        amount: '0',
-        selectedValidators: target,
-        signerSubstrateProxyAddress
-      });
+    const submitData: SubmitChangeValidatorStaking = {
+      slug: poolInfo.slug,
+      address: from,
+      amount: '0',
+      selectedValidators: target
     };
 
     setSubmitLoading(true);
 
     setTimeout(() => {
-      // select proxy and send transaction, then handle result
-      selectSubstrateProxyAccountsToSign({
-        address: from,
-        chain,
-        type: ExtrinsicType.CHANGE_EARNING_VALIDATOR
-      }).then(sendPromise)
+      changeEarningValidator(submitData)
         .then(onSuccess)
         .catch(onError)
         .finally(() => {
           setSubmitLoading(false);
         });
     }, 300);
-  }, [poolInfo.slug, from, selectSubstrateProxyAccountsToSign, chain, onSuccess, onError]);
+  }, [poolInfo.slug, from, onError, onSuccess]);
 
   const onClickSubmit = useCallback((values: { target: ValidatorInfo[] }) => {
     const { target } = values;

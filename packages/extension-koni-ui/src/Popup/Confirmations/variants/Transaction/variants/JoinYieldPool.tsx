@@ -3,7 +3,6 @@
 
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { SubmitYieldStepData } from '@subwallet/extension-base/types';
-import { isSameAddress } from '@subwallet/extension-base/utils';
 import { CommonTransactionInfo, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import CN from 'classnames';
@@ -68,14 +67,6 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
-          <MetaInfo.Account
-            address={transaction.signerSubstrateProxyAddress}
-            chainSlug={transaction.chain}
-            label={t('ui.TRANSACTION.Confirmations.JoinYieldPool.signWith')}
-          />
-        }
-
         <MetaInfo.Number
           decimals={inputTokenDecimals}
           label={t('ui.TRANSACTION.Confirmations.JoinYieldPool.amount')}
@@ -92,12 +83,12 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         )}
 
-        <MetaInfo.Number
+        {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={feeTokenDecimals}
-          label={t('ui.TRANSACTION.Confirmations.JoinYieldPool.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.JoinYieldPool.networkFee')}
           suffix={feeTokenSymbol}
           value={transaction.estimateFee?.value || 0}
-        />
+        />}
       </MetaInfo>
     </div>
   );

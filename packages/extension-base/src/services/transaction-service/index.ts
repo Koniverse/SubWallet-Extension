@@ -16,11 +16,12 @@ import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/reques
 import { TRANSACTION_TIMEOUT } from '@subwallet/extension-base/services/transaction-service/constants';
 import { parseLiquidStakingEvents, parseLiquidStakingFastUnstakeEvents, parseTransferEventLogs, parseXcmEventLogs } from '@subwallet/extension-base/services/transaction-service/event-parser';
 import { getBaseTransactionInfo, getTransactionId, isBitcoinTransaction, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
-import { OptionalSWTransaction, SWDutchTransaction, SWDutchTransactionInput, SWPermitTransaction, SWPermitTransactionInput, SWTransaction, SWTransactionBase, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
+import { OptionalSWTransaction, SubstrateTransactionWrappingStatus, SWDutchTransaction, SWDutchTransactionInput, SWPermitTransaction, SWPermitTransactionInput, SWTransaction, SWTransactionBase, SWTransactionInput, SWTransactionResponse, TransactionEmitter, TransactionEventMap, TransactionEventResponse, ValidateTransactionResponseInput } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink, parseTransactionData } from '@subwallet/extension-base/services/transaction-service/utils';
 import { isWalletConnectRequest } from '@subwallet/extension-base/services/wallet-connect-service/helpers';
-import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitBittensorChangeValidatorStaking, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
-import { anyNumberToBN, isSameAddress, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
+import { AccountJson, BaseStepType, BasicTxErrorType, BasicTxWarningCode, BriefProcessStep, LeavePoolAdditionalData, PermitSwapData, ProcessStep, ProcessTransactionData, RequestRemoveSubstrateProxyAccount, RequestStakePoolingBonding, RequestYieldStepSubmit, SpecialYieldPoolInfo, StepStatus, SubmitBittensorChangeValidatorStaking, SubmitJoinNominationPool, SubstrateTipInfo, TransactionErrorType, Web3Transaction, YieldPoolType } from '@subwallet/extension-base/types';
+import { InitMultisigTxRequest } from '@subwallet/extension-base/types/multisig';
+import { anyNumberToBN, pairToAccount, reformatAddress } from '@subwallet/extension-base/utils';
 import { mergeTransactionAndSignature } from '@subwallet/extension-base/utils/eth/mergeTransactionAndSignature';
 import { isContractAddress, parseContractInput } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -54,7 +55,7 @@ export default class TransactionService {
 
   private readonly transactionSubject: BehaviorSubject<Record<string, SWTransactionBase>> = new BehaviorSubject<Record<string, SWTransactionBase>>({});
   private readonly aliveProcessSubject: BehaviorSubject<Map<string, ProcessTransactionData>> = new BehaviorSubject<Map<string, ProcessTransactionData>>(this.aliveProcessMap);
-
+  private previousWrappedTxId: Record<string, string> = {};
   private cacheProcessInfo: Record<string, Record<string, string>> = {};
 
   private get transactions (): Record<string, SWTransactionBase> {
@@ -80,7 +81,7 @@ export default class TransactionService {
   private checkDuplicate (transaction: ValidateTransactionResponseInput): TransactionError[] {
     // Check duplicated transaction
     const existed = this.processingTransactions
-      .filter((item) => item.address === transaction.address && item.chain === transaction.chain);
+      .filter((item) => item.address === transaction.address && item.chain === transaction.chain && item.id !== transaction.id);
 
     if (existed.length > 0) {
       return [new TransactionError(BasicTxErrorType.DUPLICATE_TRANSACTION)];
@@ -152,30 +153,42 @@ export default class TransactionService {
     const nonNativeTokenPayFeeInfo = isNonNativeTokenPayFee ? this.state.chainService.getAssetBySlug(tokenPayFeeSlug) : undefined;
     const priceMap = (await this.state.priceService.getPrice()).priceMap;
 
-    // Get signer account
-    let signer = address;
-    const signerSubstrateProxyAddress = transactionInput.signerSubstrateProxyAddress;
-
     if (!transactionInput.skipFeeRecalculation) {
-      validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee, signerSubstrateProxyAddress);
+      validationResponse.estimateFee = await estimateFeeForTransaction(validationResponse, transaction, chainInfo, evmApi, substrateApi, priceMap, feeInfo, nativeTokenInfo, nonNativeTokenPayFeeInfo, transactionInput.isTransferLocalTokenAndPayThatTokenAsFee);
     }
 
     const chainInfoMap = this.state.chainService.getChainInfoMap();
 
-    let substrateProxyAccountNativeTokenAvailable: AmountData | undefined;
+    if (isSubstrateTransaction(transaction)) {
+      if (chainInfo.substrateInfo?.supportMultisig && !validationResponse.wrappingStatus) {
+        const pair = keyring.getPair(address);
 
-    if (signerSubstrateProxyAddress && !isSameAddress(signerSubstrateProxyAddress, address)) {
-      signer = signerSubstrateProxyAddress;
-      substrateProxyAccountNativeTokenAvailable = await this.state.balanceService.getTransferableBalance(signerSubstrateProxyAddress, chain, nativeTokenInfo.slug, extrinsicType);
+        if (pair.meta.isMultisig) {
+          validationResponse.wrappingStatus = SubstrateTransactionWrappingStatus.WRAPPABLE;
+        }
+      }
+
+      if (chainInfo.substrateInfo?.supportProxy && !validationResponse.wrappingStatus) {
+        const { substrateProxyAccounts } = await this.state.substrateProxyAccountService.getSubstrateProxyAccountGroup({
+          address,
+          chain,
+          type: validationResponse.extrinsicType,
+          excludedSubstrateProxyAccounts: (validationResponse.data as RequestRemoveSubstrateProxyAccount).selectedSubstrateProxyAccounts
+        });
+
+        if (substrateProxyAccounts.length) {
+          validationResponse.wrappingStatus = SubstrateTransactionWrappingStatus.WRAPPABLE;
+        }
+      }
     }
 
     // Check account signing transaction
-    checkSigningAccountForTransaction(validationResponse, chainInfoMap, signer);
+    checkSigningAccountForTransaction(validationResponse, chainInfoMap, address);
 
     const nativeTokenAvailable = await this.state.balanceService.getBalanceByType(address, chain, nativeTokenInfo.slug, transactionInput.balanceType, extrinsicType);
 
     // Check available balance against transaction fee
-    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable, substrateProxyAccountNativeTokenAvailable);
+    checkBalanceWithTransactionFee(validationResponse, transactionInput, nativeTokenInfo, nativeTokenAvailable);
 
     // Warnings Ton address if bounceable and not active
     // if (transaction && isTonTransaction(transaction) && tonApi) {
@@ -289,6 +302,16 @@ export default class TransactionService {
 
     // Add Transaction
     transactions[transaction.id] = transaction;
+
+    // Store previous wrapped tx id for multisig tx to remove it when create new wrapped tx
+    if (transaction.wrappingStatus === SubstrateTransactionWrappingStatus.WRAP_RESULT) {
+      const data = transaction.data as InitMultisigTxRequest;
+
+      if (data.transactionId) {
+        this.previousWrappedTxId[data.transactionId] = transaction.id;
+      }
+    }
+
     this.transactionSubject.next({ ...transactions });
 
     return await this.sendTransaction(transaction);
@@ -319,6 +342,146 @@ export default class TransactionService {
     };
   }
 
+  /**
+   * Wrapped transaction flow:
+   *
+   * Create base transaction (WRAPPABLE)
+   *   - skip fee validation
+   *   - NOT submitted to chain
+   *   - acts as the logical / UI-facing transaction
+   *   ↓
+   * Inject event emitter into base transaction
+   *   - base transaction listens to wrapped transaction events
+   *   - used to resolve the original transaction promise
+   *   ↓
+   * User selects signer in UI
+   *   - proxy account or multisig signatory
+   *   ↓
+   * Prepare wrapped transaction
+   *   - resolve actual signer
+   *   - build wrapped extrinsic (proxy / multisig)
+   *   - attach validators & event forwarders
+   *   ↓
+   * Mark base transaction as WRAP_SOURCE
+   *   ↓
+   * Create & submit wrapped transaction (WRAP_RESULT)
+   *   ↓
+   * Forward wrapped transaction events → base transaction
+   *   ↓
+   * Cleanup temporary data
+   *
+   */
+  public async handleWrappedTransaction (
+    transaction: SWTransactionInput
+  ): Promise<SWTransactionResponse> {
+    const transactionData = transaction.data as InitMultisigTxRequest;
+
+    // Origin tx id:
+    // - transactionData.transactionId: wrapped from existing tx
+    // - transaction.id: direct wrapped tx ( when transaction was signed by proxied address )
+    const originTransactionId = transactionData.transactionId || transaction.id || '';
+
+    // Remove previous wrapped transaction (select signer flow)
+    if (this.previousWrappedTxId[originTransactionId]) {
+      this.removeTransaction(this.previousWrappedTxId[originTransactionId]);
+    }
+
+    /**
+     * ─────────────────────────────
+     * Validation phase
+     * ─────────────────────────────
+     */
+    const validatedTransaction = await this.validateTransaction(transaction);
+
+    const ignoreWarnings = validatedTransaction.ignoreWarnings || [];
+    const hasBlockingErrors = validatedTransaction.errors.length > 0;
+    const hasBlockingWarnings =
+      validatedTransaction.warnings.length > 0 &&
+      validatedTransaction.warnings.some(
+        (warning) => !ignoreWarnings.includes(warning.warningType)
+      );
+
+    if (hasBlockingErrors || hasBlockingWarnings) {
+      // Cleanup runtime-only fields before returning
+      // @ts-ignore
+      'transaction' in validatedTransaction && delete validatedTransaction.transaction;
+      'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
+      'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
+
+      return validatedTransaction;
+    }
+
+    // Validation passed → warnings already acknowledged
+    validatedTransaction.warnings = [];
+
+    /**
+     * ─────────────────────────────
+     * Submit wrapped transaction
+     * ─────────────────────────────
+     */
+
+    // Mark original transaction as wrapped
+    if (transactionData.transactionId) {
+      this.updateTransaction(transactionData.transactionId, {
+        wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_SOURCE
+      });
+    }
+
+    const emitter = await this.addTransaction(validatedTransaction);
+
+    /**
+     * Async side-effect:
+     * - wait for signed / success / error / timeout
+     * - mutate validatedTransaction accordingly
+     */
+    if (emitter) {
+      new Promise<void>((resolve) => {
+        const resolveWithResult = (data: TransactionEventResponse) => {
+          validatedTransaction.id = data.id;
+          validatedTransaction.extrinsicHash = data.extrinsicHash;
+          resolve();
+        };
+
+        if (transaction.resolveOnDone) {
+          emitter.on('success', resolveWithResult);
+        } else {
+          emitter.on('signed', resolveWithResult);
+        }
+
+        emitter.on('error', (data) => {
+          if (data.errors.length > 0) {
+            validatedTransaction.errors.push(...data.errors);
+            resolve();
+          }
+        });
+
+        emitter.on('timeout', (data) => {
+          if (transaction.errorOnTimeOut && data.errors.length > 0) {
+            validatedTransaction.errors.push(...data.errors);
+            resolve();
+          }
+        });
+      }).finally(() => {
+        // Cleanup runtime-only fields
+        // @ts-ignore
+        'transaction' in validatedTransaction && delete validatedTransaction.transaction;
+        'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
+        'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
+
+        // Remove base multisig transaction after approval
+        if (transactionData.multisigMetadata && transactionData.transactionId) {
+          this.removeTransaction(transactionData.transactionId);
+        }
+      });
+    }
+
+    // Remove emitter before returning response
+    'emitterTransaction' in validatedTransaction &&
+    delete (validatedTransaction as SWTransactionBase).emitterTransaction;
+
+    return validatedTransaction;
+  }
+
   public async handleTransaction (transaction: SWTransactionInput): Promise<SWTransactionResponse> {
     const validatedTransaction = await this.validateTransaction(transaction);
     const ignoreWarnings: BasicTxWarningCode[] = validatedTransaction.ignoreWarnings || [];
@@ -339,7 +502,6 @@ export default class TransactionService {
     const emitter = await this.addTransaction(validatedTransaction);
 
     await new Promise<void>((resolve, reject) => {
-      // TODO
       if (transaction.resolveOnDone) {
         emitter.on('success', (data: TransactionEventResponse) => {
           validatedTransaction.id = data.id;
@@ -400,8 +562,9 @@ export default class TransactionService {
     // Fill transaction default info
     const transactionUpdated = this.fillTransactionDefaultInfo(validatedTransaction);
 
-    // Add Transaction
+    // Add transaction
     transactionsSubject[transactionUpdated.id] = { ...transactionUpdated, emitterTransaction: emitter };
+
     this.transactionSubject.next({ ...transactionsSubject });
 
     emitter.on('success', (data: TransactionEventResponse) => {
@@ -581,6 +744,11 @@ export default class TransactionService {
             : this.signAndSendBitcoinTransaction(transaction));
 
     const { eventsHandler, step } = transaction;
+
+    // Inject emitter into transaction for wrapped tx flow
+    if (transaction.wrappingStatus === SubstrateTransactionWrappingStatus.WRAPPABLE) {
+      this.updateTransaction(transaction.id, { emitterTransaction: emitter });
+    }
 
     emitter.on('signed', (data: TransactionEventResponse) => {
       this.onSigned(data);
@@ -773,6 +941,10 @@ export default class TransactionService {
     if (this.transactions[id]) {
       delete this.transactions[id];
       this.transactionSubject.next({ ...this.transactions });
+    }
+
+    if (this.previousWrappedTxId[id]) {
+      delete this.previousWrappedTxId[id];
     }
   }
 
@@ -1176,6 +1348,26 @@ export default class TransactionService {
         break;
       }
 
+      case ExtrinsicType.MULTISIG_APPROVE_TX: // todo
+        historyItem.additionalInfo = parseTransactionData<ExtrinsicType.MULTISIG_APPROVE_TX>(transaction.data);
+
+        break;
+
+      case ExtrinsicType.MULTISIG_EXECUTE_TX: // todo
+        historyItem.additionalInfo = parseTransactionData<ExtrinsicType.MULTISIG_EXECUTE_TX>(transaction.data);
+
+        break;
+
+      case ExtrinsicType.MULTISIG_CANCEL_TX: // todo
+        historyItem.additionalInfo = parseTransactionData<ExtrinsicType.MULTISIG_CANCEL_TX>(transaction.data);
+
+        break;
+
+      case ExtrinsicType.MULTISIG_INIT_TX: // todo
+        historyItem.additionalInfo = parseTransactionData<ExtrinsicType.MULTISIG_INIT_TX>(transaction.data);
+
+        break;
+
       case ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT: {
         const data = parseTransactionData<ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT>(transaction.data);
 
@@ -1235,6 +1427,11 @@ export default class TransactionService {
 
         break;
       }
+
+      case ExtrinsicType.SUBSTRATE_PROXY_INIT_TX: // todo
+        historyItem.additionalInfo = parseTransactionData<ExtrinsicType.SUBSTRATE_PROXY_INIT_TX>(transaction.data);
+
+        break;
 
       case ExtrinsicType.UNKNOWN:
         break;
@@ -1391,15 +1588,17 @@ export default class TransactionService {
       blockTime
     }).catch(console.error);
 
-    const info = isHex(extrinsicHash) ? extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
+    if (transaction.wrappingStatus !== SubstrateTransactionWrappingStatus.WRAP_SOURCE) {
+      const info = isHex(extrinsicHash) ? extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
 
-    this.state.notificationService.notify({
-      type: NotificationType.SUCCESS,
-      title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionCompleted'),
-      message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoCompleted', { replace: { info } }),
-      action: { url: this.getTransactionLink(id) },
-      notifyViaBrowser: true
-    });
+      this.state.notificationService.notify({
+        type: NotificationType.SUCCESS,
+        title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionCompleted'),
+        message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoCompleted', { replace: { info } }),
+        action: { url: this.getTransactionLink(id) },
+        notifyViaBrowser: true
+      });
+    }
 
     this.state.eventService.emit('transaction.done', transaction);
   }
@@ -1419,15 +1618,17 @@ export default class TransactionService {
         blockHash: blockHash || ''
       }).catch(console.error);
 
-      const info = isHex(transaction?.extrinsicHash) ? transaction?.extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
+      if (transaction.wrappingStatus !== SubstrateTransactionWrappingStatus.WRAP_SOURCE) {
+        const info = isHex(transaction?.extrinsicHash) ? transaction?.extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
 
-      this.state.notificationService.notify({
-        type: NotificationType.ERROR,
-        title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionFailed'),
-        message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoFailed', { replace: { info } }),
-        action: { url: this.getTransactionLink(id) },
-        notifyViaBrowser: true
-      });
+        this.state.notificationService.notify({
+          type: NotificationType.ERROR,
+          title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionFailed'),
+          message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoFailed', { replace: { info } }),
+          action: { url: this.getTransactionLink(id) },
+          notifyViaBrowser: true
+        });
+      }
     }
 
     this.state.eventService.emit('transaction.failed', transaction);
@@ -1447,15 +1648,17 @@ export default class TransactionService {
         blockHash: blockHash || ''
       }).catch(console.error);
 
-      const info = isHex(transaction?.extrinsicHash) ? transaction?.extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
+      if (transaction.wrappingStatus !== SubstrateTransactionWrappingStatus.WRAP_SOURCE) {
+        const info = isHex(transaction?.extrinsicHash) ? transaction?.extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
 
-      this.state.notificationService.notify({
-        type: NotificationType.ERROR,
-        title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionTimedOut'),
-        message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoTimedOut', { replace: { info } }),
-        action: { url: this.getTransactionLink(id) },
-        notifyViaBrowser: true
-      });
+        this.state.notificationService.notify({
+          type: NotificationType.ERROR,
+          title: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionTimedOut'),
+          message: t('bg.TRANSACTION_SERVICE.services.service.transaction.transactionInfoTimedOut', { replace: { info } }),
+          action: { url: this.getTransactionLink(id) },
+          notifyViaBrowser: true
+        });
+      }
     }
 
     this.state.eventService.emit('transaction.timeout', transaction);
@@ -1860,7 +2063,7 @@ export default class TransactionService {
     return emitter;
   }
 
-  private async signAndSendSubstrateTransaction ({ address, chain, feeCustom, id, signAfterCreate, signerSubstrateProxyAddress, step, tokenPayFeeSlug, transaction, url }: SWTransaction): Promise<TransactionEmitter> {
+  private signAndSendSubstrateTransaction ({ address, chain, data, feeCustom, id, signAfterCreate, step, tokenPayFeeSlug, transaction, url, wrappingStatus }: SWTransaction): TransactionEmitter {
     const tip = (feeCustom as SubstrateTipInfo)?.tip || '0';
     const feeAssetId = tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug) && _SUPPORT_TOKEN_PAY_FEE_GROUP.assetHub.includes(chain) ? this.state.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.multilocation as Record<string, any> : undefined;
 
@@ -1873,17 +2076,16 @@ export default class TransactionService {
       processId: step?.processId
     };
 
-    let extrinsic = transaction as SubmittableExtrinsic;
+    const extrinsic = transaction as SubmittableExtrinsic;
 
-    let signer = address;
+    const signer = address;
 
-    if (signerSubstrateProxyAddress && signerSubstrateProxyAddress !== address) {
-      const substrateApi = this.state.chainService.getSubstrateApi(chain);
+    let transactionId = id;
 
-      await substrateApi.isReady;
-
-      signer = signerSubstrateProxyAddress;
-      extrinsic = substrateApi.api.tx.proxy.proxy(address, null, transaction as SubmittableExtrinsic);
+    if (wrappingStatus === SubstrateTransactionWrappingStatus.WRAP_RESULT) {
+      // we will use the original transaction's ID for this request,
+      // because we only want the popup to appear once and keep the old one.
+      transactionId = (data as InitMultisigTxRequest).transactionId || id;
     }
 
     // const registry = extrinsic.registry;
@@ -1892,7 +2094,7 @@ export default class TransactionService {
     const signerOption: Partial<SignerOptions> = {
       signer: {
         signPayload: async (payload: SignerPayloadJSON) => {
-          const { signature, signedTransaction } = await this.state.requestService.signInternalTransaction(id, signer, url || EXTENSION_REQUEST_URL, payload, signAfterCreate);
+          const { signature, signedTransaction } = await this.state.requestService.signInternalTransaction(transactionId, signer, url || EXTENSION_REQUEST_URL, payload, signAfterCreate, wrappingStatus);
 
           return {
             id: (new Date()).getTime(),
@@ -2168,7 +2370,6 @@ export default class TransactionService {
     });
 
     event.on('success', (transactionStatus) => {
-      console.log(transactionStatus);
       eventData.blockHash = transactionStatus.block_hash || undefined;
       eventData.blockNumber = transactionStatus.block_height || undefined;
       eventData.blockTime = transactionStatus.block_time ? (transactionStatus.block_time * 1000) : undefined;

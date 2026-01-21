@@ -25,10 +25,12 @@ export interface TransferInfoItem extends Omit<InfoItemBase, 'label'> {
   recipientLabel?: string;
   originChain?: ChainInfo;
   destinationChain?: ChainInfo;
+  alwaysShowChain?: boolean;
 }
 
 const Component: React.FC<TransferInfoItem> = (props: TransferInfoItem) => {
-  const { className,
+  const { alwaysShowChain,
+    className,
     destinationChain,
     originChain,
     recipientAddress,
@@ -149,13 +151,13 @@ const Component: React.FC<TransferInfoItem> = (props: TransferInfoItem) => {
         <div className={'__label'}>{senderLabel || t('ui.components.MetaInfo.TransferItem.sender')}</div>
 
         {genAccountBlock(senderAddress, senderName)}
-        {!!originChain && originChain.slug !== destinationChain?.slug && genChainBlock(originChain)}
+        {!!originChain && (originChain.slug !== destinationChain?.slug || alwaysShowChain) && genChainBlock(originChain)}
       </div>
       <div className={'__col __value-col'}>
         <div className={'__label'}>{recipientLabel || t('ui.components.MetaInfo.TransferItem.recipient')}</div>
 
         {genAccountBlock(recipientAddress, recipientName)}
-        {!!destinationChain && destinationChain.slug !== originChain?.slug && genChainBlock(destinationChain)}
+        {!!destinationChain && (destinationChain.slug !== originChain?.slug || alwaysShowChain) && genChainBlock(destinationChain)}
       </div>
     </div>
   );
