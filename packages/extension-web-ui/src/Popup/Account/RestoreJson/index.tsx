@@ -345,8 +345,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           <a
             className={'__modal-user-guide'}
             href={CHANGE_ACCOUNT_NAME}
-            target='_blank'
-            rel="noopener noreferrer"
+            target='__blank'
           >
             {t('this guide')}
           </a>

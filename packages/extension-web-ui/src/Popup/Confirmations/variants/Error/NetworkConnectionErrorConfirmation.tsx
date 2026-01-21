@@ -54,8 +54,7 @@ function Component ({ className, request, type }: Props) {
         components[key] = <a
           className='link'
           href={link}
-          target='_blank'
-          rel="noopener noreferrer"
+          target='__blank'
         />;
 
         return `<${key}>${text}</${key}>`;

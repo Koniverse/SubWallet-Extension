@@ -206,8 +206,7 @@ const Component: React.FC<Props> = (props: Props) => {
                       <a
                         className='link'
                         href={IMPORTED_NETWORK_GUIDE_URL}
-                        target='_blank'
-                        rel="noopener noreferrer"
+                        target='__blank'
                       />
                     )
                   }}

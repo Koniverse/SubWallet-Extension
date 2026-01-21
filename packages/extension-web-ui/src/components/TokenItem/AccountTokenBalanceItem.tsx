@@ -70,7 +70,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const openBlockExplorer = useCallback(
     (link: string) => {
       return () => {
-        window.open(link, '_blank', 'noopener,noreferrer');
+        window.open(link, '_blank');
       };
     },
     []
