@@ -3,5 +3,6 @@
 
 export * from './common';
 export * from './confirmation';
+export * from './crowdloan';
 export * from './home';
 export * from './nft';

@@ -16,6 +16,7 @@ import BuyServiceReducer from './feature/Buy';
 import CampaignReducer from './feature/Campaign';
 import AssetRegistryReducer from './feature/common/AssetRegistry';
 import ChainStoreReducer from './feature/common/ChainStore';
+import CrowdloanReducer from './feature/Crowdloan';
 import EarningReducer from './feature/Earning';
 import GovernanceReducer from './feature/Governance';
 import MantaPayReducer from './feature/MantaPay';
@@ -47,6 +48,7 @@ const persistConfig = {
 const rootReducers = combineReducers({
   // feature
   transactionHistory: TransactionHistoryReducer,
+  crowdloan: CrowdloanReducer,
   nft: NftReducer,
   staking: StakingReducer,
   price: PriceReducer,
