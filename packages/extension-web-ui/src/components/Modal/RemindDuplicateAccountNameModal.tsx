@@ -83,9 +83,9 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             {t('You have accounts with the same name. We have added characters to these account names to differentiate them. You can change account names later using')}
             <a
               href={CHANGE_ACCOUNT_NAME_URL}
-              rel='noreferrer'
+              rel='noopener noreferrer'
               style={{ textDecoration: 'underline' }}
-              target={'_blank'}
+              target='_blank'
             > this guide</a>
           </div>
         </div>

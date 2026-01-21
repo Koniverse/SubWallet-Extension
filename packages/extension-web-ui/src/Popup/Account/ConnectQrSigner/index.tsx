@@ -192,7 +192,8 @@ const Component: React.FC<Props> = (props: Props) => {
                   <a
                     className='link'
                     href={instructionUrl}
-                    target='__blank'
+                    target='_blank'
+                    rel="noopener noreferrer"
                   />
                 )
               }}
