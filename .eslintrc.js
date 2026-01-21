@@ -20,6 +20,10 @@ module.exports = {
   },
   rules: {
     ...base.rules,
+    'react/jsx-no-target-blank': ['error', {
+      'enforceDynamicLinks': 'always',
+      'warnOnNoReferrer': true
+    }],
     'header/header': [2, 'line', [
       { pattern: ' Copyright 20(17|18|19|20|21|22)(-2022)? (@polkadot|@subwallet)/' },
       ' SPDX-License-Identifier: Apache-2.0'
