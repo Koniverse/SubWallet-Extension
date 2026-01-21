@@ -158,8 +158,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 <a
                   className='link'
                   href={metadataFAQUrl}
-                  target='_blank'
-                  rel="noopener noreferrer"
+                  target='__blank'
                 />
               )
             }}
@@ -192,8 +191,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     <a
                       className='link'
                       href={metadataFAQUrl}
-                      target='_blank'
-                      rel="noopener noreferrer"
+                      target='__blank'
                     />
                   )
                 }}
@@ -213,8 +211,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     <a
                       className='link'
                       href={metadataFAQUrl}
-                      target='_blank'
-                      rel="noopener noreferrer"
+                      target='__blank'
                     />
                   )
                 }}
@@ -248,8 +245,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         <a
                           className='link'
                           href={genericFAQUrl}
-                          target='_blank'
-                          rel="noopener noreferrer"
+                          target='__blank'
                         />
                       )
                     }}
@@ -268,8 +264,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         <a
                           className='link'
                           href={migrationFAQUrl}
-                          target='_blank'
-                          rel="noopener noreferrer"
+                          target='__blank'
                         />
                       )
                     }}

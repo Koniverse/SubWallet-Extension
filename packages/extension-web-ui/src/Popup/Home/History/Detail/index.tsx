@@ -36,7 +36,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
   const openBlockExplorer = useCallback(
     (link: string) => {
       return () => {
-        window.open(link, '_blank', 'noopener,noreferrer');
+        window.open(link, '_blank');
       };
     },
     []

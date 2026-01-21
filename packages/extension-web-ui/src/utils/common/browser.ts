@@ -8,7 +8,7 @@ import { KeypairType } from '@polkadot/util-crypto/types';
 
 export const openInNewTab = (url: string) => {
   return () => {
-    window.open(url, '_blank', 'noopener,noreferrer');
+    window.open(url, '_blank');
   };
 };
 

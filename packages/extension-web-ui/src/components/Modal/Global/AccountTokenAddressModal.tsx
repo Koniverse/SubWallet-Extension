@@ -115,9 +115,9 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
           {t('SubWallet supports three Bitcoin address types for receiving and transferring assets. Make sure you choose the correct address type to avoid risks of fund loss. ')}
           <a
             href={LEARN_MORE_DOCS_URL}
-            rel='noopener noreferrer'
+            rel='noreferrer'
             style={{ textDecoration: 'underline' }}
-            target='_blank'
+            target={'_blank'}
           >Learn more</a>
         </div>
         <SwList

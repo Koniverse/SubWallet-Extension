@@ -132,8 +132,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
           {t('Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, ')}
           <a
             href={CONNECT_LEDGER_USER_GUIDE_URL}
-            target='_blank'
-            rel="noopener noreferrer"
+            target='__blank'
           >
             {t('click here')}
           </a>

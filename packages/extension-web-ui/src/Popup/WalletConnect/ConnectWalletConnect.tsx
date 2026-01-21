@@ -184,7 +184,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
       clearTimeout(idTimeOut);
       delete timeOutRecord[keyRecords];
-      !isDismiss && window.open(faqUrl, '_blank', 'noopener,noreferrer');
+      !isDismiss && window.open(faqUrl, '_blank');
       inactiveModal(confirmErrorModalId);
       form.setFieldValue('uri', DEFAULT_FORM_VALUES.uri);
       setTimeOutRecords(timeOutRecord);

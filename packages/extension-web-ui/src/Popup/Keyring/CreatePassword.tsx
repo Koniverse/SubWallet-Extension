@@ -257,9 +257,9 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 >
                   I understand that SubWallet can’t recover the password. <a
                     href={TERMS_OF_SERVICE_URL}
-                    rel='noopener noreferrer'
+                    rel='noreferrer'
                     style={{ textDecoration: 'underline' }}
-                    target='_blank'
+                    target={'_blank'}
                   >Learn more.</a>
                 </Checkbox>
               </Form.Item>
