@@ -50,6 +50,7 @@ export enum AvailBridgeSourceChain {
   ETHEREUM = 'ETHEREUM',
 }
 
+/** @deprecated */
 export async function fetchAllAvailBridgeClaimable (address: string, sourceChain: AvailBridgeSourceChain, isTestnet: boolean) {
   const transactions: AvailBridgeTransaction[] = [];
   let isContinue = true;
@@ -57,7 +58,7 @@ export async function fetchAllAvailBridgeClaimable (address: string, sourceChain
   const pageSize = 100;
 
   while (isContinue) {
-    const response = await fetchAvailBridgeTransactions(address, sourceChain, BridgeTransactionStatus.READY_TO_CLAIM, pageSize, page, isTestnet);
+    const response = await fetchAvailBridgeTransactions(address, sourceChain, pageSize, page, isTestnet, BridgeTransactionStatus.READY_TO_CLAIM);
 
     if (!response) {
       break;
@@ -72,13 +73,35 @@ export async function fetchAllAvailBridgeClaimable (address: string, sourceChain
   return transactions;
 }
 
-export async function fetchAvailBridgeTransactions (userAddress: string, sourceChain: AvailBridgeSourceChain, status: BridgeTransactionStatus, pageSize = 100, page = 0, isTestnet: boolean) {
+export async function fetchAllAvailBridgeTransactions (address: string, sourceChain: AvailBridgeSourceChain, isTestnet: boolean) {
+  const transactions: AvailBridgeTransaction[] = [];
+  let isContinue = true;
+  let page = 0;
+  const pageSize = 100;
+
+  while (isContinue) {
+    const response = await fetchAvailBridgeTransactions(address, sourceChain, pageSize, page, isTestnet);
+
+    if (!response) {
+      break;
+    }
+
+    transactions.push(...filterClaimableOfAddress(address, response.data.result));
+
+    isContinue = response.data.paginationData.hasNextPage;
+    page = page + 1;
+  }
+
+  return transactions;
+}
+
+export async function fetchAvailBridgeTransactions (userAddress: string, sourceChain: AvailBridgeSourceChain, pageSize = 100, page = 0, isTestnet: boolean, status?: BridgeTransactionStatus) {
   const params = new URLSearchParams({
     userAddress,
     sourceChain,
-    status,
     pageSize: pageSize.toString(),
-    page: page.toString()
+    page: page.toString(),
+    ...(status && { status })
   });
 
   try {

@@ -4955,13 +4955,26 @@ export default class KoniExtension {
       chainType = ChainType.EVM;
     }
 
+    const eventsHandler = (eventEmitter: TransactionEmitter) => {
+      const refreshBridgeNotifications = (): void => {
+        try {
+          this.#koniState.inappNotificationService.cronCreateBridgeClaimNotification();
+        } catch (error) {
+          console.error('Failed to refresh bridge claim notifications:', error);
+        }
+      };
+
+      eventEmitter.once('success', refreshBridgeNotifications);
+    };
+
     return await this.#koniState.transactionService.handleTransaction({
       address,
       chain,
       transaction,
       data,
       extrinsicType,
-      chainType
+      chainType,
+      eventsHandler
     });
   }
 
