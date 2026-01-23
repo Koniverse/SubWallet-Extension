@@ -949,6 +949,10 @@ export default class KoniState {
     return this.chainService.disableChain(chainSlug);
   }
 
+  public disableAllChains (): boolean {
+    return this.chainService.disableAllChains();
+  }
+
   public async enableChain (chainSlug: string, enableTokens = true): Promise<boolean> {
     if (enableTokens) {
       await this.chainService.updateAssetSettingByChain(chainSlug, true);

@@ -1213,6 +1213,17 @@ export class ChainService {
     return true;
   }
 
+  public disableAllChains (): boolean {
+    const chainStateMap = this.getChainStateMap();
+    const activeChainSlugs = Object.keys(chainStateMap).filter((slug) => chainStateMap[slug].active);
+
+    for (const chainSlug of activeChainSlugs) {
+      this.disableChain(chainSlug);
+    }
+
+    return true;
+  }
+
   private checkExistedPredefinedChain (latestChainInfoMap: Record<string, _ChainInfo>, genesisHash?: string, evmChainId?: number) {
     let duplicatedSlug = '';
 
