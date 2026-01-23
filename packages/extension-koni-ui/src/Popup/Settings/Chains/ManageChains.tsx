@@ -6,8 +6,9 @@ import { FilterModal, Layout, NetworkEmptyList, NetworkToggleItem, OptionType, P
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { ChainInfoWithState, useFilterModal, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import useChainInfoWithStateAndStatus, { ChainInfoWithStateAndStatus } from '@subwallet/extension-koni-ui/hooks/chain/useChainInfoWithStateAndStatus';
+import { disableAllNetwork } from '@subwallet/extension-koni-ui/messaging';
 import { ManageChainsParam, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ButtonProps, Icon, ModalContext, SwList } from '@subwallet/react-ui';
+import { ButtonProps, Icon, ModalContext, Switch, SwList } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import { FadersHorizontal, Plus } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -40,6 +41,23 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { activeModal } = useContext(ModalContext);
   const chainInfoList = useChainInfoWithStateAndStatus();
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
+  const [disablingAll, setDisablingAll] = useState(false);
+
+  const hasActiveChains = useMemo(() => {
+    return chainInfoList.some((chain) => chain.active);
+  }, [chainInfoList]);
+
+  const onDisableAll = useCallback(() => {
+    if (!disablingAll) {
+      if (hasActiveChains) {
+        setDisablingAll(true);
+        disableAllNetwork()
+          .finally(() => {
+            setDisablingAll(false);
+          });
+      }
+    }
+  }, [disablingAll, hasActiveChains]);
 
   const FILTER_OPTIONS = useMemo((): OptionType[] => ([
     { label: t('ui.SETTINGS.screen.Setting.Chains.Manage.evmNetworks'), value: FilterValue.EVM },
@@ -171,6 +189,16 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           searchPlaceholder={t<string>('ui.SETTINGS.screen.Setting.Chains.Manage.searchNetwork')}
           showActionBtn
         />
+        <div className={'manage_chains__disable_all_row'}>
+          <span className={'manage_chains__disable_all_label'}>{t('Disable all networks')}</span>
+          <Switch
+            checked={!hasActiveChains}
+            disabled={!hasActiveChains}
+            loading={disablingAll}
+            onClick={onDisableAll}
+            size={'small'}
+          />
+        </div>
 
         <FilterModal
           id={FILTER_MODAL_ID}
@@ -218,9 +246,30 @@ const ManageChains = styled(Component)<Props>(({ theme: { token } }: Props) => {
     },
 
     '.manage_chains__container': {
-      paddingTop: token.padding,
       paddingBottom: token.paddingSM,
-      flex: 1
+      flex: 1,
+
+      '.ant-sw-list-search-input': {
+        marginBottom: 40
+      }
+    },
+
+    '.manage_chains__disable_all_row': {
+      position: 'absolute',
+      top: 116,
+      left: 0,
+      right: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      gap: token.sizeXS,
+      padding: `0 ${token.padding}px`,
+      zIndex: 5
+    },
+
+    '.manage_chains__disable_all_label': {
+      fontSize: token.fontSizeSM,
+      color: token.colorTextLight4
     },
 
     '.ant-network-item-content .__toggle-area': {
