@@ -67,7 +67,7 @@ function Component ({ className = '', id, onCancel, tokenBalanceMap, tokenSlugs 
   const renderItem = useCallback(
     (tokenBalance: TokenBalanceItemType) => {
       const slug = tokenBalance.slug;
-      const tokenName = assetRegistry[slug]?.name || multiChainAssetMap[slug]?.name || '';
+      const tokenName = tokenBalance.displayName || assetRegistry[slug]?.name || multiChainAssetMap[slug]?.name || '';
 
       return (
         <TokenBalanceSelectionItem
@@ -86,8 +86,10 @@ function Component ({ className = '', id, onCancel, tokenBalanceMap, tokenSlugs 
       const searchTextLowerCase = currentSearchText.toLowerCase();
       const chainName = chainInfoMap[item.chain || '']?.name?.toLowerCase();
       const symbol = item.symbol.toLowerCase();
+      const displayName = (item.displayName || '').toLowerCase();
 
       return (
+        displayName.includes(searchTextLowerCase) ||
         symbol.includes(searchTextLowerCase) ||
         chainName.includes(searchTextLowerCase)
       );
