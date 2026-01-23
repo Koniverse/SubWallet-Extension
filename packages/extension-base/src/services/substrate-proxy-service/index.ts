@@ -124,6 +124,11 @@ export default class SubstrateProxyAccountService {
     const substrateApi = this.getSubstrateApi(chain);
 
     await substrateApi.isReady;
+
+    if (!substrateApi.api.tx.proxy || !substrateApi.api.tx.proxy.addProxy) {
+      return [new TransactionError(BasicTxErrorType.UNSUPPORTED)];
+    }
+
     const addProxyTx = substrateApi.api.tx.proxy.addProxy;
     const proxyTypeArg = addProxyTx.meta.args.find((arg) => arg.name.toString() === 'proxyType');
 
@@ -135,10 +140,6 @@ export default class SubstrateProxyAccountService {
       if (!variants.includes(substrateProxyType)) {
         return [new TransactionError(BasicTxErrorType.UNSUPPORTED, 'This proxy type is not supported on the chosen network. Select another one and try again')];
       }
-    }
-
-    if (!substrateApi.api.tx.proxy || !substrateApi.api.tx.proxy.addProxy) {
-      return [new TransactionError(BasicTxErrorType.UNSUPPORTED)];
     }
 
     // Validate max proxies accounts limit
