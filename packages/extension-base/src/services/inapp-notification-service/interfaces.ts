@@ -3,6 +3,7 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { AvailBridgeSourceChain } from '@subwallet/extension-base/services/inapp-notification-service/utils';
+import { MultisigTxType } from '@subwallet/extension-base/services/multisig-service';
 import { YieldPoolType } from '@subwallet/extension-base/types';
 
 export interface _BaseNotificationInfo {
@@ -37,6 +38,7 @@ export interface ActionTypeToMetadataMap {
   [NotificationActionType.CLAIM_POLYGON_BRIDGE]: ClaimPolygonBridgeNotificationMetadata,
   [NotificationActionType.SWAP]: ProcessNotificationMetadata,
   [NotificationActionType.EARNING]: ProcessNotificationMetadata,
+  [NotificationActionType.MULTISIG_APPROVAL]: MultisigApprovalNotificationMetadata,
 }
 
 export interface SendReceiveNotificationMetadata {
@@ -89,6 +91,21 @@ export interface ProcessNotificationMetadata {
   processId: string;
 }
 
+export interface MultisigApprovalNotificationMetadata {
+  multisigKey: string;
+  multisigTxType: MultisigTxType;
+
+  // just additional info to easy lookup in notification table
+  chain: string;
+  multisigAddress: string;
+  extrinsicHash: string;
+  callHash: string;
+  blockHeight: number;
+  extrinsicIndex: number;
+  currentSigner: string;
+  approvals: string[];
+}
+
 export enum NotificationTimePeriod {
   TODAY = 'TODAY',
   THIS_WEEK = 'THIS_WEEK',
@@ -104,13 +121,16 @@ export enum NotificationActionType {
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM = 'CLAIM_AVAIL_BRIDGE_ON_ETHEREUM',
   CLAIM_POLYGON_BRIDGE = 'CLAIM_POLYGON_BRIDGE',
   SWAP = 'SWAP',
-  EARNING = 'EARNING'
+  EARNING = 'EARNING',
+  MULTISIG_APPROVAL = 'MULTISIG_APPROVAL'
+  // todo: MULTISIG_EXECUTE
 }
 
 export enum NotificationTab {
   ALL = 'ALL',
   UNREAD = 'UNREAD',
-  READ = 'READ'
+  READ = 'READ',
+  MULTISIG = 'MULTISIG'
 }
 
 export interface ShowNotificationPayload {

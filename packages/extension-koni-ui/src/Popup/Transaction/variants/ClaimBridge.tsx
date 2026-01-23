@@ -121,7 +121,7 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
     }, 300);
   }, [isPolygonBridge, notification, onError, onSuccess]);
 
-  const checkAction = usePreCheckAction(fromValue);
+  const checkAction = usePreCheckAction({ chain: chainValue, address: fromValue });
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);

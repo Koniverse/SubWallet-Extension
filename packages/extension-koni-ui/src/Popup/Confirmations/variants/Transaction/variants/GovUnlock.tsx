@@ -3,8 +3,7 @@
 
 import { UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { isSameAddress } from '@subwallet/extension-base/utils';
-import { MetaInfo, NumberDisplay, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { CommonTransactionInfo, MetaInfo, NumberDisplay, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -34,8 +33,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
     chain: transaction.chain,
     amount: new BigNumber(data.amount),
     transactionFee: transaction.estimateFee?.value,
-    isUnlock: true,
-    signerSubstrateProxyAddress: transaction.signerSubstrateProxyAddress
+    isUnlock: true
   });
 
   return (
@@ -65,35 +63,39 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
         />
       </div>
 
-      <MetaInfo
-        className={'__meta-info'}
-        hasBackgroundWrapper
-      >
-
-        <MetaInfo.Account
-          address={transaction.address}
-          chainSlug={transaction.chain}
-          label={t('ui.TRANSACTION.Confirmations.GovUnlock.account')}
-        />
-
-        <MetaInfo.Number
-          decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.GovUnlock.networkFee')}
-          suffix={symbol}
-          value={transaction.estimateFee?.value || 0}
-        />
-      </MetaInfo>
-      <MetaInfo
-        className={'__meta-info'}
-        hasBackgroundWrapper
-      >
-        {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
-          <MetaInfo.Account
-            address={transaction.signerSubstrateProxyAddress}
-            chainSlug={transaction.chain}
-            label={t('ui.TRANSACTION.Confirmations.GovUnlock.signWith')}
+      {transaction.wrappingStatus
+        ? (
+          <CommonTransactionInfo
+            address={transaction.address}
+            network={transaction.chain}
           />
-        }
+        )
+        : (
+          <MetaInfo
+            className={'__meta-info'}
+            hasBackgroundWrapper
+          >
+
+            <MetaInfo.Account
+              address={transaction.address}
+              chainSlug={transaction.chain}
+              label={t('ui.TRANSACTION.Confirmations.GovUnlock.account')}
+            />
+
+            <MetaInfo.Number
+              decimals={decimals}
+              label={t('ui.TRANSACTION.Confirmations.GovUnlock.networkFee')}
+              suffix={symbol}
+              value={transaction.estimateFee?.value || 0}
+            />
+          </MetaInfo>
+        )
+      }
+
+      <MetaInfo
+        className={'__meta-info'}
+        hasBackgroundWrapper
+      >
         {!!govConfirmationInfo &&
           <>
             <MetaInfo.Default

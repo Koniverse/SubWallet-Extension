@@ -3,11 +3,13 @@
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
+import { AccountChainType, BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
 import { AddSubstrateProxyAccountParams, RemoveSubstrateProxyAccountParams, RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountGroup, SubstrateProxyAccountItem, SubstrateProxyType } from '@subwallet/extension-base/types/substrateProxyAccount';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
+import { ApiPromise } from '@polkadot/api';
+import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { Enum } from '@polkadot/types';
 
 import { _SubstrateApi } from '../chain-service/types';
@@ -18,6 +20,10 @@ type PrimitiveSubstrateProxyAccountItem = {
   proxyType: SubstrateProxyType; // type of proxy retrieved from on-chain data
   delay: number;
 };
+
+export function createInitSubstrateProxyExtrinsic (api: ApiPromise, proxiedAddress: string, extrinsic: SubmittableExtrinsic): SubmittableExtrinsic {
+  return api.tx.proxy.proxy(proxiedAddress, null, extrinsic);
+}
 
 export default class SubstrateProxyAccountService {
   protected readonly state: KoniState;
@@ -43,6 +49,7 @@ export default class SubstrateProxyAccountService {
     const baseDeposit = substrateApi.api.consts.proxy.proxyDepositBase?.toString() || '0';
     const factorDeposit = substrateApi.api.consts.proxy.proxyDepositFactor?.toString() || '0';
     const deposit = new BigN(baseDeposit).plus(factorDeposit);
+    const allAccounts = this.state.keyringService.context.accounts;
 
     const [_substrateProxyAccounts, currentSubstrateProxyDeposit] = result.toPrimitive() as [PrimitiveSubstrateProxyAccountItem[], string];
 
@@ -61,13 +68,27 @@ export default class SubstrateProxyAccountService {
     if (type) {
       const allowedSet = new Set([...(txTypeToSubstrateProxyMap[type] || []), 'Any']);
 
-      substrateProxyAccounts = substrateProxyAccounts.filter((p) => allowedSet.has(p.substrateProxyType));
+      substrateProxyAccounts = substrateProxyAccounts.filter((p) => {
+        if (!p.proxyId) {
+          return false;
+        }
+
+        const accountProxy = allAccounts[p.proxyId];
+
+        const substrateAccount = accountProxy?.accounts.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
+
+        if (!substrateAccount || !substrateAccount.transactionActions.includes(type)) {
+          return false;
+        }
+
+        return allowedSet.has(p.substrateProxyType);
+      });
     }
 
     if (excludedSubstrateProxyAccounts && excludedSubstrateProxyAccounts.length > 0) {
       substrateProxyAccounts = substrateProxyAccounts.filter((p) => {
         return !excludedSubstrateProxyAccounts.some(
-          (excluded) => excluded.address === p.substrateProxyAddress && excluded.substrateProxyType === p.substrateProxyType
+          (excluded) => excluded.substrateProxyAddress === p.substrateProxyAddress && excluded.substrateProxyType === p.substrateProxyType
         );
       });
     }
@@ -97,12 +118,17 @@ export default class SubstrateProxyAccountService {
   }
 
   // Validate adding proxy account
-  public async validateAddSubstrateProxyAccount (params: AddSubstrateProxyAccountParams, signerSubstrateProxyAddress?: string): Promise<TransactionError[]> {
+  public async validateAddSubstrateProxyAccount (params: AddSubstrateProxyAccountParams): Promise<TransactionError[]> {
     const { address, chain, substrateProxyType } = params;
 
     const substrateApi = this.getSubstrateApi(chain);
 
     await substrateApi.isReady;
+
+    if (!substrateApi.api.tx.proxy || !substrateApi.api.tx.proxy.addProxy) {
+      return [new TransactionError(BasicTxErrorType.UNSUPPORTED)];
+    }
+
     const addProxyTx = substrateApi.api.tx.proxy.addProxy;
     const proxyTypeArg = addProxyTx.meta.args.find((arg) => arg.name.toString() === 'proxyType');
 
@@ -114,10 +140,6 @@ export default class SubstrateProxyAccountService {
       if (!variants.includes(substrateProxyType)) {
         return [new TransactionError(BasicTxErrorType.UNSUPPORTED, 'This proxy type is not supported on the chosen network. Select another one and try again')];
       }
-    }
-
-    if (!substrateApi.api.tx.proxy || !substrateApi.api.tx.proxy.addProxy) {
-      return [new TransactionError(BasicTxErrorType.UNSUPPORTED)];
     }
 
     // Validate max proxies accounts limit
@@ -143,7 +165,7 @@ export default class SubstrateProxyAccountService {
     const factorDeposit = substrateApi.api.consts.proxy.proxyDepositFactor?.toString() || '0';
     const requiredDeposit = proxyList.length === 0 ? new BigN(baseDeposit).plus(factorDeposit) : new BigN(factorDeposit);
 
-    const totalRequired = new BigN(requiredDeposit).plus(!signerSubstrateProxyAddress ? estimatedFee : 0);
+    const totalRequired = new BigN(requiredDeposit).plus(estimatedFee);
 
     if (bnTransferableBalance.lt(totalRequired)) {
       return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)];

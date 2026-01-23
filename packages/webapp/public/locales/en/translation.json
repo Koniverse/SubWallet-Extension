@@ -1834,5 +1834,13 @@
   "bg.EARNING.services.service.earning.nativeStaking.dtao.unstakeAmountTooLow": "Amount too low. You need to unstake at least {{amount}} {{symbol}}",
   "bg.EARNING.services.service.earning.nativeStaking.dtao.fromValidatorSameAsTo": "From validator is the same with to validator",
   "bg.EARNING.services.service.earning.nativeStaking.dtao.moveAmountTooLow": "Amount too low. You need to move at least {{formattedMinUnstake}} {{subnetSymbol}}",
-  "bg.EARNING.services.service.earning.nativeStaking.dtao.remainingStakeBelowMinimumWarning": "Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit \"Move all\" to move all {{maxAmount}} {{subnetSymbol}} to the new validator, or \"Cancel\" and lower the amount, then try again"
+  "bg.EARNING.services.service.earning.nativeStaking.dtao.remainingStakeBelowMinimumWarning": "Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit \"Move all\" to move all {{maxAmount}} {{subnetSymbol}} to the new validator, or \"Cancel\" and lower the amount, then try again",
+  "bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee": "Insufficient balance on the signing account. Top up the account’s balance or select another account and try again",
+  "bg.koni.handler.Extension.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again",
+  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again",
+  "bg.ACCOUNT.services.keyring.handler.Multisig.signersRequired": "Signers must be provided",
+  "bg.ACCOUNT.services.keyring.handler.Multisig.multipleSignersRequired": "Only support for multiple signers multisig account creation",
+  "bg.ACCOUNT.services.keyring.handler.Multisig.invalidThreshold": "Invalid threshold",
+  "bg.ACCOUNT.services.keyring.handler.Multisig.mustBeSubstrateAddress": "Address must be a substrate address",
+  "bg.ACCOUNT.services.keyring.handler.Multisig.duplicateAddressFound": "Duplicate address found"
 }

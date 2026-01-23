@@ -9,6 +9,7 @@ import BitcoinRequestHandler from '@subwallet/extension-base/services/request-se
 import CardanoRequestHandler from '@subwallet/extension-base/services/request-service/handler/CardanoRequestHandler';
 import SettingService from '@subwallet/extension-base/services/setting-service/SettingService';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
+import { SubstrateTransactionWrappingStatus } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { MetadataDef } from '@subwallet/extension-inject/types';
 import { BehaviorSubject } from 'rxjs';
@@ -209,7 +210,11 @@ export default class RequestService {
     return this.#substrateRequestHandler.getSignRequest(id);
   }
 
-  public async signInternalTransaction (id: string, address: string, url: string, payload: SignerPayloadJSON, onSign?: (id: string) => void): Promise<ResponseSigning> {
+  public async signInternalTransaction (id: string, address: string, url: string, payload: SignerPayloadJSON, onSign?: (id: string) => void, isWrappedTx?: SubstrateTransactionWrappingStatus): Promise<ResponseSigning> {
+    if (isWrappedTx === SubstrateTransactionWrappingStatus.WRAP_RESULT) {
+      return this.#substrateRequestHandler.signWrappedTransaction(id, address, url, payload, onSign);
+    }
+
     return this.#substrateRequestHandler.signTransaction(id, address, url, payload, onSign);
   }
 

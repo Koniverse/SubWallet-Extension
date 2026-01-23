@@ -29,7 +29,9 @@ export const REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION = 'transaction.remove-su
 export const TRANSACTION_STORAGES = [TRANSFER_TRANSACTION, NFT_TRANSACTION, EARN_TRANSACTION, UN_STAKE_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION, CLAIM_REWARD_TRANSACTION, SWAP_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, ADD_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION, REMOVE_SUBSTRATE_PROXY_ACCOUNT_TRANSACTION];
 
 export const SELECTED_ACCOUNT_TYPE = 'account.selected-type';
+export const NOTI_MULTISIG_PENDINGTX_ID = 'noti.multisig-pending-transaction-id';
 export const SELECTED_MNEMONIC_TYPE = 'account.selected-mnemonic-type';
+export const MULTISIG_SIGNERS = 'account.multisig-signers-draft';
 export const SEED_PREVENT_MODAL = 'seed.prevent-modal';
 export const IS_SHOW_TON_CONTRACT_VERSION_WARNING = 'account.is-show-ton-contract-version-warning';
 export const CONFIRM_GENERAL_TERM = 'general.term-and-condition';

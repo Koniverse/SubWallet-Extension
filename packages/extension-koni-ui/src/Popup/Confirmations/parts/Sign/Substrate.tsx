@@ -14,7 +14,7 @@ import { PhosphorIcon, SubstrateSigData, ThemeProps } from '@subwallet/extension
 import { getSignMode, isRawPayload, isSubstrateMessage, removeTransactionPersist, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CheckCircle, QrCode, Swatches, Wallet, XCircle } from 'phosphor-react';
+import { ArrowCircleLeft, CheckCircle, QrCode, Swatches, Wallet, XCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -29,7 +29,9 @@ interface Props extends ThemeProps {
   request: RequestSign;
   extrinsicType?: ExtrinsicType;
   txExpirationTime?: number;
-  isInternal?: boolean
+  isInternal?: boolean;
+  disableApproval?: boolean;
+  isWrapTransaction?: boolean;
 }
 
 interface AlertData {
@@ -63,8 +65,14 @@ const isRequireMetadata = (signMode: AccountSignMode, isRuntimeUpdated: boolean)
 
 const modeCanSignMessage: AccountSignMode[] = [AccountSignMode.QR, AccountSignMode.PASSWORD, AccountSignMode.INJECTED, AccountSignMode.LEGACY_LEDGER, AccountSignMode.GENERIC_LEDGER, AccountSignMode.ECDSA_SUBSTRATE_LEDGER];
 
+const multisigTransaction: ExtrinsicType[] = [
+  ExtrinsicType.MULTISIG_APPROVE_TX,
+  ExtrinsicType.MULTISIG_EXECUTE_TX,
+  ExtrinsicType.MULTISIG_CANCEL_TX
+];
+
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, extrinsicType, id, isInternal, request, txExpirationTime } = props;
+  const { className, disableApproval, extrinsicType, id, isInternal, isWrapTransaction, request, txExpirationTime } = props;
   const { address } = request.payload;
 
   const account = useGetAccountByAddress(address);
@@ -112,22 +120,15 @@ const Component: React.FC<Props> = (props: Props) => {
   const accountChainInfo = useGetChainInfoByGenesisHash(account?.genesisHash || '');
   const { addExtraData, hashLoading, isMissingData, payload } = useParseSubstrateRequestPayload(chain, request, isLedger);
 
+  const isRejectPendingTransaction = extrinsicType === ExtrinsicType.MULTISIG_CANCEL_TX;
+
+  const isMultisigOrSubstrateProxyTransaction = useMemo(() => {
+    return (extrinsicType && multisigTransaction.includes(extrinsicType)) ||
+        isWrapTransaction;
+  }, [extrinsicType, isWrapTransaction]);
+
   const isMessage = isSubstrateMessage(payload);
 
-  const approveIcon = useMemo((): PhosphorIcon => {
-    switch (signMode) {
-      case AccountSignMode.QR:
-        return QrCode;
-      case AccountSignMode.LEGACY_LEDGER:
-      case AccountSignMode.GENERIC_LEDGER:
-      case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
-        return Swatches;
-      case AccountSignMode.INJECTED:
-        return Wallet;
-      default:
-        return CheckCircle;
-    }
-  }, [signMode]);
   const chainSlug = useMemo(() => getLedgerChainSlug(signMode, account?.originGenesisHash, accountChainInfo?.slug), [account?.originGenesisHash, accountChainInfo?.slug, signMode]);
   const networkName = useMemo(() => chainInfo?.name || chain?.name || toShort(genesisHash), [chainInfo, genesisHash, chain]);
 
@@ -287,6 +288,82 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const [loading, setLoading] = useState(false);
   const [showQuoteExpired, setShowQuoteExpired] = useState<boolean>(false);
+
+  const approveButtonContent = useMemo(() => {
+    let icon: PhosphorIcon;
+
+    switch (signMode) {
+      case AccountSignMode.QR:
+        icon = QrCode;
+        break;
+      case AccountSignMode.LEGACY_LEDGER:
+      case AccountSignMode.GENERIC_LEDGER:
+      case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
+        icon = Swatches;
+        break;
+      case AccountSignMode.INJECTED:
+        icon = Wallet;
+        break;
+
+      default: {
+        if (extrinsicType === ExtrinsicType.MULTISIG_CANCEL_TX) {
+          icon = XCircle;
+        } else {
+          icon = CheckCircle;
+        }
+      }
+    }
+
+    let defaultLabel: string;
+
+    // Determine default label based on extrinsic type
+    switch (extrinsicType) {
+      case ExtrinsicType.MULTISIG_CANCEL_TX:
+        defaultLabel = t('ui.DAPP.Confirmations.Sign.Substrate.reject');
+        break;
+
+      case ExtrinsicType.MULTISIG_EXECUTE_TX:
+        defaultLabel = t('ui.DAPP.Confirmations.Sign.Substrate.execute');
+        break;
+
+      default:
+        defaultLabel = t('ui.DAPP.Confirmations.Sign.Substrate.approve');
+        break;
+    }
+
+    // Non-ledger accounts always use the default label
+    if (!isLedger) {
+      return { icon, label: defaultLabel };
+    }
+
+    // Ledger account but device is not connected
+    if (!isLedgerConnected) {
+      return {
+        icon,
+        label: t('ui.DAPP.Confirmations.Sign.Substrate.refresh')
+      };
+    }
+
+    // Ledger account and device is connected
+    return {
+      icon,
+      label: t('ui.DAPP.Confirmations.Sign.Substrate.approve')
+    };
+  }, [extrinsicType, isLedger, isLedgerConnected, signMode, t]);
+
+  const cancelButtonContent = useMemo(() => {
+    if (isMultisigOrSubstrateProxyTransaction) {
+      return {
+        icon: ArrowCircleLeft,
+        label: t('ui.DAPP.Confirmations.Sign.Substrate.goBack')
+      };
+    }
+
+    return {
+      icon: XCircle,
+      label: t('ui.DAPP.Confirmations.Sign.Substrate.cancel')
+    };
+  }, [isMultisigOrSubstrateProxyTransaction, t]);
 
   // Handle buttons actions
   const onCancel = useCallback(() => {
@@ -507,6 +584,8 @@ const Component: React.FC<Props> = (props: Props) => {
     };
   }, [txExpirationTime]);
 
+  const isApproveDisabled = showQuoteExpired || loadingChain || hashLoading || (isMessage ? !modeCanSignMessage.includes(signMode) : alertData?.type === 'error') || disableApproval;
+
   return (
     <>
       {
@@ -532,33 +611,30 @@ const Component: React.FC<Props> = (props: Props) => {
           disabled={loading}
           icon={(
             <Icon
-              phosphorIcon={XCircle}
+              phosphorIcon={cancelButtonContent.icon}
               weight='fill'
             />
           )}
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('ui.DAPP.Confirmations.Sign.Substrate.cancel')}
+          {cancelButtonContent.label}
         </Button>
         <Button
-          disabled={showQuoteExpired || loadingChain || hashLoading || (isMessage ? !modeCanSignMessage.includes(signMode) : alertData?.type === 'error')}
+          className={CN('approve-button', {
+            '-danger': isRejectPendingTransaction
+          })}
+          disabled={isApproveDisabled}
           icon={(
             <Icon
-              phosphorIcon={approveIcon}
+              phosphorIcon={approveButtonContent.icon}
               weight='fill'
             />
           )}
           loading={loading}
           onClick={onConfirm}
         >
-          {
-            !isLedger
-              ? t('ui.DAPP.Confirmations.Sign.Substrate.approve')
-              : !isLedgerConnected
-                ? t('ui.DAPP.Confirmations.Sign.Substrate.refresh')
-                : t('ui.DAPP.Confirmations.Sign.Substrate.approve')
-          }
+          {approveButtonContent.label}
         </Button>
         {
           signMode === AccountSignMode.QR && (
@@ -582,6 +658,10 @@ const SubstrateSignArea = styled(Component)<Props>(({ theme: { token } }: Props)
     '&.alert-box': {
       margin: token.padding,
       marginBottom: 0
+    },
+
+    '.approve-button.-danger': {
+      backgroundColor: token['red-6']
     }
   };
 });

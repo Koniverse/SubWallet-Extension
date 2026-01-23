@@ -93,6 +93,7 @@ const NotificationSetting = new LazyLoader('NotificationSetting', () => import('
 const ManageWebsiteAccessDetail = new LazyLoader('ManageWebsiteAccessDetail', () => import('@subwallet/extension-koni-ui/Popup/Settings/Security/ManageWebsiteAccess/Detail'));
 
 const NewSeedPhrase = new LazyLoader('NewSeedPhrase', () => import('@subwallet/extension-koni-ui/Popup/Account/NewSeedPhrase'));
+const NewMultisig = new LazyLoader('NewMultisigAccount', () => import('@subwallet/extension-koni-ui/Popup/Account/NewMultisigAccount'));
 const ImportSeedPhrase = new LazyLoader('ImportSeedPhrase', () => import('@subwallet/extension-koni-ui/Popup/Account/ImportSeedPhrase'));
 const ImportPrivateKey = new LazyLoader('ImportPrivateKey', () => import('@subwallet/extension-koni-ui/Popup/Account/ImportPrivateKey'));
 const RestoreJson = new LazyLoader('RestoreJson', () => import('@subwallet/extension-koni-ui/Popup/Account/RestoreJson'));
@@ -294,6 +295,7 @@ export const router = createHashRouter([
         element: <Outlet />,
         children: [
           NewSeedPhrase.generateRouterObject('new-seed-phrase'),
+          NewMultisig.generateRouterObject('new-multisig'),
           ImportSeedPhrase.generateRouterObject('import-seed-phrase'),
           ImportPrivateKey.generateRouterObject('import-private-key'),
           RestoreJson.generateRouterObject('restore-json'),

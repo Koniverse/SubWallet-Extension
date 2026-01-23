@@ -46,4 +46,10 @@ export enum TransferTxErrorType {
   RECEIVER_ACCOUNT_INACTIVE = 'RECEIVER_ACCOUNT_INACTIVE'
 }
 
-export type TransactionErrorType = BasicTxErrorType | TransferTxErrorType | StakingTxErrorType | YieldValidationStatus | SwapErrorType;
+export enum MultisigTxErrorType {
+  INVALID_PARAMS = 'INVALID_PARAMS',
+  LACK_MULTISIG_PALLET = 'LACK_MULTISIG_PALLET',
+  UNABLE_TO_CONSTRUCT_TX = 'UNABLE_TO_CONSTRUCT_TX'
+}
+
+export type TransactionErrorType = BasicTxErrorType | TransferTxErrorType | StakingTxErrorType | YieldValidationStatus | SwapErrorType | MultisigTxErrorType;

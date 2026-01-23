@@ -1,13 +1,16 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { SubstrateTransactionWrappingStatus } from '@subwallet/extension-base/services/transaction-service/types';
 import { CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { useDefaultNavigate } from '@subwallet/extension-koni-ui/hooks';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { PageIcon } from '@subwallet/react-ui';
 import { CheckCircle } from 'phosphor-react';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -19,7 +22,7 @@ type Props = ThemeProps;
 const Component: React.FC<Props> = (props: Props) => {
   const { className } = props;
   const { address, chain, transactionId } = useParams<{address: string, chain: string, transactionId: string}>();
-
+  const { transactionRequest } = useSelector((state: RootState) => state.requestState);
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { goHome } = useDefaultNavigate();
@@ -27,12 +30,23 @@ const Component: React.FC<Props> = (props: Props) => {
   const viewInHistory = useCallback(
     () => {
       if (address && chain && transactionId) {
-        navigate(`/home/history/${reformatAddress(address)}/${chain}/${transactionId}`, { state: { from: 'ignoreRemind' } });
+        let storedAddressesHistory = address;
+
+        if (transactionRequest) {
+          const transaction = transactionRequest[transactionId];
+
+          // In case of wrapped transaction, show the wrapped address as signer
+          if (transaction?.address && transaction?.wrappingStatus === SubstrateTransactionWrappingStatus.WRAP_RESULT) {
+            storedAddressesHistory = transaction.address;
+          }
+        }
+
+        navigate(`/home/history/${reformatAddress(storedAddressesHistory)}/${chain}/${transactionId}`, { state: { from: 'ignoreRemind' } });
       } else {
         navigate('/home/history');
       }
     },
-    [chain, transactionId, navigate, address]
+    [address, chain, transactionId, transactionRequest, navigate]
   );
 
   return (
