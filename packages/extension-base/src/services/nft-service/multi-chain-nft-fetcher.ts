@@ -1,11 +1,19 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NftCollection, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import {
+  NftCollection,
+  NftDetailRequest,
+  NftFullListRequest,
+  NftItem
+} from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { NFT_HANDLER_REGISTRY, NftHandlerDescriptor } from '@subwallet/extension-base/services/nft-service/nft-handlers/registry';
+import {
+  NFT_HANDLER_REGISTRY,
+  NftHandlerDescriptor
+} from '@subwallet/extension-base/services/nft-service/nft-handlers/registry';
 
-import { BaseNftHandler, NftHandlerResult } from './nft-handlers/base-nft-handler';
+import {BaseNftHandler, NftHandlerResult} from './nft-handlers/base-nft-handler';
 
 export class MultiChainNftFetcher {
   private readonly state: KoniState;
@@ -129,6 +137,30 @@ export class MultiChainNftFetcher {
 
         items.push(...result.items);
         collections.push(...result.collections);
+      } catch (e) {
+        console.error('[NftFetcher] fetchCollection failed', e);
+      }
+    }
+
+    return { items, collections };
+  }
+
+  public async fetchNftDetail (request: NftDetailRequest): Promise<NftHandlerResult> {
+    const { chainSlug, collectionId, tokenId } = request;
+    const items: NftItem[] = [];
+    const collections: NftCollection[] = [];
+
+    const handlers = this.getHandlersForChain(chainSlug);
+
+    for (const handler of handlers) {
+      // Todo: Improve the detail nft fetch feature
+      // if (!handler.supportsFetchFullNftList) {
+      //   continue;
+      // }
+
+
+      try {
+        return await handler.fetchNftDetail({collectionId: collectionId, tokenId: tokenId, chainSlug})
       } catch (e) {
         console.error('[NftFetcher] fetchCollection failed', e);
       }

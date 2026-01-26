@@ -1033,6 +1033,12 @@ export interface NftFullListRequest {
   tokenIds?: string[]
 }
 
+export interface NftDetailRequest {
+  collectionId: string;
+  chainSlug: string;
+  tokenId: string
+}
+
 export interface EvmNftTransaction extends ValidateTransactionResponse {
   tx: Record<string, any> | null;
 }
@@ -2386,6 +2392,7 @@ export interface KoniRequestSignatures {
   'pri(nft.getSubscription)': [RequestSubscribeNft, NftJson, NftJson];
   'pri(nftCollection.getSubscription)': [null, NftCollection[], NftCollection[]];
   'pri(nft.getFullList)': [NftFullListRequest, boolean];
+  'pri(nft.getNftdetail)': [NftDetailRequest, NftItem];
 
   // Staking functions
   'pri(staking.getStaking)': [null, StakingJson];

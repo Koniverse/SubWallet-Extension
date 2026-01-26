@@ -5,7 +5,7 @@ import { NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { ROOT_NFT_TOKEN_ID } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useGetNftByAccount } from '@subwallet/extension-koni-ui/hooks';
+import { useGetNftByAccount, useNavigateOnChangeAccount } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
 import { INftItemDetail } from '@subwallet/extension-koni-ui/Popup/Home/Nfts';
@@ -13,7 +13,7 @@ import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, Image } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretDown, CaretRight, CheckCircle } from 'phosphor-react';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, {useCallback, useContext, useMemo, useState} from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
@@ -89,12 +89,15 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, onClick, parent, selec
 
           {isSelected
             ? (
+              <div className={'nft-info-icon'}>
               <Icon
                 iconColor={token.colorSuccess}
                 phosphorIcon={CheckCircle}
-                size='md'
+                size='xs'
+                // customSize={'16px'}
                 weight='fill'
               />
+              </div>
             )
             : (
               childrenCount > 0 && (
@@ -131,6 +134,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const location = useLocation();
   const state = location.state as INftItemDetail & { rootTokenId?: string };
   const [rootTokenId] = useLocalStorage(ROOT_NFT_TOKEN_ID, '');
+  useNavigateOnChangeAccount();
 
   const navigate = useNavigate();
   const { collectionInfo, nftItem } = state || {};
@@ -248,6 +252,16 @@ const NftStructureScreen = styled(Component)<Props>(({ theme: { token } }: Props
       backgroundColor: token.colorTextLight4,
       opacity: 0.3,
       zIndex: 1
+    },
+
+    '.nft-info-icon': {
+      width: '40px',
+      height: '40px',
+      marginLeft: 12,
+      marginRight: -10,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
     },
 
     // '.connector-line-horizontal': {

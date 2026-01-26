@@ -1,17 +1,27 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainInfo } from '@subwallet/chain-list/types';
-import { NftCollection, NftFullListRequest, NftItem, NftJson } from '@subwallet/extension-base/background/KoniTypes';
+import {_ChainInfo} from '@subwallet/chain-list/types';
+import {
+  NftCollection,
+  NftDetailRequest,
+  NftFullListRequest,
+  NftItem,
+  NftJson
+} from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
-import { _isChainSupportEvmNft, _isChainSupportNativeNft, _isChainSupportWasmNft } from '@subwallet/extension-base/services/chain-service/utils';
-import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
-import { addLazy, createPromiseHandler, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
+import {ServiceStatus, StoppableServiceInterface} from '@subwallet/extension-base/services/base/types';
+import {
+  _isChainSupportEvmNft,
+  _isChainSupportNativeNft,
+  _isChainSupportWasmNft
+} from '@subwallet/extension-base/services/chain-service/utils';
+import {EventItem, EventType} from '@subwallet/extension-base/services/event-service/types';
+import {addLazy, createPromiseHandler, PromiseHandler, waitTimeout} from '@subwallet/extension-base/utils';
 import keyring from '@subwallet/ui-keyring';
-import { BehaviorSubject } from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 
-import { MultiChainNftFetcher } from './multi-chain-nft-fetcher';
+import {MultiChainNftFetcher} from './multi-chain-nft-fetcher';
 
 export interface NftState {
   nftData: NftJson;
@@ -213,6 +223,21 @@ export class NftService implements StoppableServiceInterface {
       console.error('[NftServiceV2] fetchFullListNftOfaCollection failed', e);
 
       return false;
+    }
+  }
+
+  public async fetchNftDetail (request: NftDetailRequest): Promise<NftItem | null> {
+    if (this.isReloading) {
+      return null;
+    }
+
+    try {
+      const result = await this.multiChainFetcher.fetchNftDetail(request);
+      return result.items[0]
+    } catch (e) {
+      console.error('[NftServiceV2] fetchNftDetail failed', e);
+
+      return null;
     }
   }
 

@@ -26,6 +26,7 @@ import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
+import {useGetUniqueNftDetail} from "@subwallet/extension-koni-ui/hooks/nft";
 
 type Props = ThemeProps
 
@@ -40,7 +41,7 @@ const modalCloseButton = <Icon
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const state = useLocation().state as INftItemDetail;
-  const { collectionInfo, nftItem } = state;
+  const { collectionInfo, nftItem: _nftItem } = state;
 
   const { t } = useTranslation();
   const notify = useNotification();
@@ -54,10 +55,21 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { activeModal, inactiveModal } = useContext(ModalContext);
   const { accounts, currentAccountProxy } = useSelector((root: RootState) => root.accountState);
 
-  const originChainInfo = useGetChainInfo(nftItem.chain);
-  const ownerAccountInfo = useGetAccountInfoByAddress(nftItem.owner || '');
-  const accountExternalUrl = getExplorerLink(originChainInfo, nftItem.owner, 'account');
+  const originChainInfo = useGetChainInfo(_nftItem.chain);
+  const ownerAccountInfo = useGetAccountInfoByAddress(_nftItem.owner || '');
+  const accountExternalUrl = getExplorerLink(originChainInfo, _nftItem.owner, 'account');
   const [, setStorage] = useLocalStorage<SendNftParams>(NFT_TRANSACTION, DEFAULT_NFT_PARAMS);
+
+  const { data: fullNftItemFromApi } = useGetUniqueNftDetail(_nftItem.chain, _nftItem.collectionId, _nftItem.id);
+
+  const nftItem = useMemo(() => {
+    if (!fullNftItemFromApi) return _nftItem;
+
+    return {
+      ..._nftItem,
+      description: fullNftItemFromApi.description,
+    };
+  }, [fullNftItemFromApi]);
 
   useNavigateOnChangeAccount('/home/nfts/collections');
 
@@ -285,12 +297,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           <MetaInfo
             hasBackgroundWrapper={true}
           >
+            {
+              nftItem.description && (
             <MetaInfo.Default
               label={'Description'}
               valueAlign={'left'}
             >
-              {
-                nftItem.description && (
                   <div
                     className={'nft_item_detail__description_container'}
                     onClick={handleShowNftDescription}
@@ -308,9 +320,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                       />
                     </div>
                   </div>
-                )
-              }
             </MetaInfo.Default>
+              )}
             <MetaInfo.Default label={'NFT collection name'}>{collectionInfo.collectionName || collectionInfo.collectionId}</MetaInfo.Default>
             <MetaInfo.Default
               className={'nft-bundle-item-owned'}
@@ -356,7 +367,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
           {!!nftItem?.nestingTokens?.length &&
             <>
-              <div className={'nft-item-detail-section-label-2'}>{t<string>('Child NFTs')}</div>
+              <div className={'nft-item-detail-section-label-2'}>{t<string>(`Child NFTs ({{childNumber}})`, {replace: {childNumber: nftItem?.nestingTokens?.length}})}</div>
               {nftItem?.nestingTokens.map((nestingItem, index) => (
                 <div
                   className={'nft-child-item-wrapper'}

@@ -1,7 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ChainType, NftCollection, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import {
+  ChainType,
+  NftCollection,
+  NftDetailRequest,
+  NftFullListRequest,
+  NftItem
+} from '@subwallet/extension-base/background/KoniTypes';
 import { getAddressesByChainType } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { UniqueBundleTree, UniqueNftInstance } from '@subwallet-monorepos/subwallet-services-sdk/services';
@@ -32,7 +38,7 @@ export class UniqueNftHandler extends BaseNftHandler {
       collectionId: raw.collectionId.toString(),
       name: raw.name || `#${raw.tokenId}`,
       image: raw.image || undefined,
-      description: '',
+      description: raw.description || undefined,
       owner: owner,
       isBundle: raw.isBundle,
       properties: null
@@ -51,10 +57,10 @@ export class UniqueNftHandler extends BaseNftHandler {
       collectionId: node.collectionId.toString(),
       name: node.name || `#${node.tokenId}`,
       image: node.image || undefined,
-      description: '',
+      description: node.description || undefined,
 
       owner: topmostOwner,
-      isBundle: node.nested && node.nested.length > 0,
+      isBundle: node.nested && node.nested.length > 0 && level === 0,
       properties: null,
 
       nestingLevel: level,
@@ -153,5 +159,39 @@ export class UniqueNftHandler extends BaseNftHandler {
       items: items,
       collections: collections
     };
+  }
+
+
+  override async fetchNftDetail (request: NftDetailRequest): Promise<NftHandlerResult> {
+    const items: NftItem[] = [];
+    const collections: NftCollection[] = [];
+    const api = subwalletApiSdk.uniqueNftDetectionApi;
+
+    if (!api) {
+      return { items: [], collections: [] };
+    }
+
+    const { collectionId, tokenId } = request;
+
+    if (!collectionId || !tokenId) {
+
+      return { items, collections };
+    }
+
+    try {
+      const rawNft = await api.getNftDetail(collectionId, tokenId);
+
+      if (!rawNft) {
+        return { items: [], collections: [] };
+      }
+      const nftItem = this.mapUniqueRootNftToItem(rawNft, rawNft.owner)
+
+      return {
+        items: [nftItem],
+        collections: []
+      };
+    } catch (e) {
+      return { items: [], collections: [] };
+    }
   }
 }

@@ -1,7 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { NftCollection, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
+import {
+  NftCollection,
+  NftDetailRequest,
+  NftFullListRequest,
+  NftItem
+} from '@subwallet/extension-base/background/KoniTypes';
 
 export interface NftHandlerResult {
   items: NftItem[];
@@ -25,6 +30,11 @@ export abstract class BaseNftHandler {
 
   // Optional method - subclasses can choose to implement or not
   fetchFullListNftOfACollection (_request: NftFullListRequest): Promise<NftHandlerResult> {
+    return Promise.resolve(EMPTY_NFT_RESULT);
+  }
+
+  // Optional method - subclasses can choose to implement or not
+  fetchNftDetail (_request: NftDetailRequest): Promise<NftHandlerResult> {
     return Promise.resolve(EMPTY_NFT_RESULT);
   }
 }
