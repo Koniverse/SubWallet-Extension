@@ -13,7 +13,7 @@ import { ISubmittableResult } from '@polkadot/types/types';
 
 import { BalanceService } from '../../balance-service';
 import { ChainService } from '../../chain-service';
-import { _getAssetDecimals, _isNativeToken, _isNativeTokenBySlug } from '../../chain-service/utils';
+import { _getAssetDecimals, _isNativeTokenBySlug } from '../../chain-service/utils';
 import { TaoStakeInfo } from '../../earning-service/handlers/native-staking/tao';
 import FeeService from '../../fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from './base-handler';
