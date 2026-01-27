@@ -10,7 +10,7 @@ import { GovVotingInfo } from '@subwallet/extension-base/services/open-gov/inter
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { AccountJson, AccountProxy, AccountsWithCurrentAddress, BalanceJson, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardJson, ResponseSubscribeProcessAlive, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountProxy, AccountsWithCurrentAddress, BalanceJson, BuyServiceInfo, BuyTokenInfo, EarningRewardHistoryItem, EarningRewardJson, ResponseSubscribeProcessAlive, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { SwapPair } from '@subwallet/extension-base/types/swap';
 import { addLazy, fetchStaticData } from '@subwallet/extension-base/utils';
 import { lazySubscribeMessage } from '@subwallet/extension-koni-ui/messaging';
@@ -116,10 +116,6 @@ export const getOldChainPrefixData = (() => {
 
   return rs;
 })();
-
-export const updateCurrentAccountState = (currentAccountJson: AccountJson) => {
-  store.dispatch({ type: 'accountState/updateCurrentAccount', payload: currentAccountJson });
-};
 
 export const updateAccountsContext = (data: AccountsContext) => {
   store.dispatch({ type: 'accountState/updateAccountsContext', payload: data });

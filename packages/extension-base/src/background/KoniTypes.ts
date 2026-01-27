@@ -266,6 +266,11 @@ export interface NftItem extends NftItemExtraInfo {
   rarity?: string;
   description?: string;
   properties?: Record<any, any> | null;
+  isBundle?: boolean;
+  nestingLevel?: number;
+  nestingTokens?: NftItem[]
+  parent?: NftItem;
+  parentId?: string;
 }
 
 interface NftItemExtraInfo {
@@ -1023,9 +1028,16 @@ export interface NftTransactionRequest extends BaseRequestSign {
 }
 
 export interface NftFullListRequest {
-  contractAddress: string;
+  collectionId: string;
   owners: string[];
-  chainInfo: _ChainInfo
+  chainInfo: _ChainInfo;
+  tokenIds?: string[]
+}
+
+export interface NftDetailRequest {
+  collectionId: string;
+  chainSlug: string;
+  tokenId: string
 }
 
 export interface EvmNftTransaction extends ValidateTransactionResponse {
@@ -2378,11 +2390,10 @@ export interface KoniRequestSignatures {
   'pri(evmNft.getTransaction)': [NftTransactionRequest, EvmNftTransaction];
   'pri(substrateNft.submitTransaction)': [NftTransactionRequest, SWTransactionResponse];
   'pri(substrateNft.getTransaction)': [NftTransactionRequest, SubstrateNftTransaction];
-  'pri(nft.getNft)': [null, NftJson];
   'pri(nft.getSubscription)': [RequestSubscribeNft, NftJson, NftJson];
-  'pri(nftCollection.getNftCollection)': [null, NftCollectionJson];
   'pri(nftCollection.getSubscription)': [null, NftCollection[], NftCollection[]];
   'pri(nft.getFullList)': [NftFullListRequest, boolean];
+  'pri(nft.getNftdetail)': [NftDetailRequest, NftItem];
 
   // Staking functions
   'pri(staking.getStaking)': [null, StakingJson];

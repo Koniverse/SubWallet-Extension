@@ -16,9 +16,10 @@ interface Props extends ThemeProps {
   handleOnClick?: (params?: any) => void;
   routingParams?: any;
   have3dViewer?: boolean;
+  isBundle?: boolean
 }
 
-function Component ({ className = '', fallbackImage, handleOnClick, image, itemCount, routingParams, title }: Props): React.ReactElement<Props> {
+function Component ({ className = '', fallbackImage, handleOnClick, image, isBundle, itemCount, routingParams, title }: Props): React.ReactElement<Props> {
   const { extendToken } = useTheme() as Theme;
 
   const [showImage, setShowImage] = useState(true);
@@ -59,8 +60,10 @@ function Component ({ className = '', fallbackImage, handleOnClick, image, itemC
   }, []);
 
   const getCollectionImageNode = useCallback(() => {
+    let content: React.ReactNode;
+
     if (showImage) {
-      return (
+      content = (
         <LazyLoadImage
           delayTime={10000}
           height={'100%'}
@@ -70,10 +73,8 @@ function Component ({ className = '', fallbackImage, handleOnClick, image, itemC
           width={'100%'}
         />
       );
-    }
-
-    if (showVideo) {
-      return (
+    } else if (showVideo) {
+      content = (
         <LazyLoadComponent>
           <video
             autoPlay
@@ -90,15 +91,22 @@ function Component ({ className = '', fallbackImage, handleOnClick, image, itemC
           </video>
         </LazyLoadComponent>
       );
+    } else {
+      content = (
+        <LazyLoadImage
+          src={extendToken.defaultImagePlaceholder}
+          visibleByDefault={true}
+        />
+      );
     }
 
     return (
-      <LazyLoadImage
-        src={extendToken.defaultImagePlaceholder}
-        visibleByDefault={true}
-      />
+      <div className='nft_gallery_media_wrapper'>
+        {isBundle && <div className='nft_gallery_label'>Bundle</div>}
+        {content}
+      </div>
     );
-  }, [showImage, showVideo, extendToken.defaultImagePlaceholder, handleImageError, loadingPlaceholder, getCollectionImage, handleVideoError]);
+  }, [showImage, showVideo, isBundle, handleImageError, loadingPlaceholder, getCollectionImage, handleVideoError, extendToken.defaultImagePlaceholder]);
 
   return (
     <NftItem_
@@ -118,6 +126,28 @@ export const NftGalleryWrapper = styled(Component)<Props>(({ theme: { token } }:
 
     '.__image-wrapper': {
       overflow: 'hidden'
+    },
+
+    '.nft_gallery_media_wrapper': {
+      position: 'relative',
+      width: '100%',
+      height: '100%',
+      overflow: 'hidden'
+    },
+
+    '.nft_gallery_label': {
+      position: 'absolute',
+      zIndex: 10,
+      pointerEvents: 'none',
+      padding: '2px 8px 2px 8px',
+      backgroundColor: token.colorSecondaryText,
+      borderRadius: '12px',
+      fontSize: token.fontSizeXS,
+      fontWeight: 700,
+      lineHeight: token.lineHeightXS,
+      color: token['green-1'],
+      right: 8,
+      top: 8
     },
 
     '.nft_gallery_wrapper__loading': {

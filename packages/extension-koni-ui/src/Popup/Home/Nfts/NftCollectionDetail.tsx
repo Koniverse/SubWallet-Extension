@@ -4,9 +4,10 @@
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { _isCustomAsset, _isSmartContractToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
-import { SHOW_3D_MODELS_CHAIN } from '@subwallet/extension-koni-ui/constants';
+import { ROOT_NFT_TOKEN_ID, SHOW_3D_MODELS_CHAIN } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useGetNftByAccount, useNavigateOnChangeAccount, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import useConfirmModal from '@subwallet/extension-koni-ui/hooks/modal/useConfirmModal';
@@ -41,6 +42,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const navigate = useNavigate();
   const { goBack } = useDefaultNavigate();
   const showNotification = useNotification();
+  const [, setRootTokenId] = useLocalStorage(ROOT_NFT_TOKEN_ID, '');
 
   const dataContext = useContext(DataContext);
   const [isFetching, setIsFetching] = useState(false);
@@ -73,6 +75,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const nftList = useMemo(() => {
     return collectionInfo ? getNftsByCollection(collectionInfo) : [];
   }, [collectionInfo, getNftsByCollection]);
+
+  const tokenIds = useMemo(() => {
+    return nftList.map((nft) => nft.id);
+  }, [nftList]);
 
   const ownerAddresses = useMemo(() => {
     const ownerSet = new Set<string>();
@@ -109,9 +115,21 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const handleOnClickNft = useCallback((state: INftItemDetail) => {
     const { chain, collectionId } = state.collectionInfo;
+    const tokenId = state.nftItem.id;
+    const isBundle = (state.nftItem?.nestingTokens?.length ?? 0) > 0;
 
-    navigate(`/home/nfts/item-detail?chain=${chain}&collectionId=${collectionId}`, { state: { ...state, nftList } });
-  }, [navigate, nftList]);
+    const base = `/home/nfts/${isBundle ? 'bundle-item-detail' : 'item-detail'}`;
+    const url = `${base}?chain=${chain}&collectionId=${collectionId}&tokenId=${tokenId}`;
+
+    if (isBundle) {
+      setRootTokenId(tokenId);
+    }
+
+    navigate(url, { state: {
+      ...state,
+      nftList
+    } });
+  }, [navigate, nftList, setRootTokenId]);
 
   const renderNft = useCallback((nftItem: NftItem) => {
     const routingParams = { collectionInfo, nftItem } as INftItemDetail;
@@ -122,6 +140,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         handleOnClick={handleOnClickNft}
         have3dViewer={SHOW_3D_MODELS_CHAIN.includes(nftItem.chain)}
         image={nftItem.image}
+        isBundle={nftItem?.isBundle}
         key={`${nftItem.chain}_${nftItem.collectionId}_${nftItem.id}`}
         routingParams={routingParams}
         title={nftItem.name || nftItem.id}
@@ -186,7 +205,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     }
 
     setIsFetching(true);
-    getFullNftList({ contractAddress: collectionInfo?.collectionId, owners: ownerAddresses, chainInfo: chainInfo })
+    getFullNftList({ collectionId: collectionInfo?.collectionId, tokenIds: tokenIds, owners: ownerAddresses, chainInfo: chainInfo })
       .catch(console.error)
       .finally(() => {
         if (isMounted) {
@@ -197,7 +216,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return () => {
       isMounted = false;
     };
-  }, [chainInfoMap, collectionInfo, isFetching, nftList.length, ownerAddresses]);
+  }, [chainInfoMap, collectionInfo, isFetching, nftList.length, ownerAddresses, tokenIds]);
 
   return (
     <PageWrapper
