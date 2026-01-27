@@ -84,7 +84,7 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, onClick, parent, selec
           <div className='nft-info'>
             <div className='nft-title'>{item.name || item.id}</div>
             <div className='nft-subtitle'>
-              {depth === 0 ? t('Parent') : t('Nested in {{parentId}}', {replace: {parentId: parent?.name || parent?.id}})}
+              {depth === 0 ? t('ui.NFT.screen.nested.NftViewStructure.parent') : t('ui.NFT.screen.nested.NftViewStructure.nestedInParent', {replace: {parentId: parent?.name || parent?.id}})}
             </div>
           </div>
 
@@ -199,7 +199,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderBackground={'transparent'}
         subHeaderCenter={true}
         subHeaderPaddingVertical={true}
-        title={t('NFT Structure ({{totalCount}})', {replace: {totalCount: totalCount}})}
+        title={t('ui.NFT.screen.nested.NftViewStructure.nftStructureWithCount', {replace: {totalCount: totalCount}})}
       >
         <div className='tree-structure-container'>
           {rootNft
@@ -212,7 +212,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               />
             )
             : (
-              <div className='empty-state'>{t('No structure data found')}</div>
+              <div className='empty-state'>{t('ui.NFT.screen.nested.NftViewStructure.noStructureDataFound')}</div>
             )}
         </div>
       </Layout.Base>

@@ -2601,5 +2601,22 @@
   "ui.TRANSACTION.Confirmations.Withdraw.signWith": "Sign with",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "Available balance",
   "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "Copied to clipboard",
-  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again"
+  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again",
+  "ui.NFT.screen.nested.NftBundleItemDetail.level": "Level {{nestingLevel}}",
+  "ui.NFT.screen.nested.NftBundleItemDetail.goToParent": "Go to Parent",
+  "ui.NFT.screen.nested.NftBundleItemDetail.description": "Description",
+  "ui.NFT.screen.nested.NftBundleItemDetail.nftCollectionName": "NFT collection name",
+  "ui.NFT.screen.nested.NftBundleItemDetail.ownedBy": "Owned by",
+  "ui.NFT.screen.nested.NftBundleItemDetail.network": "Network",
+  "ui.NFT.screen.nested.NftBundleItemDetail.nftId": "NFT ID",
+  "ui.NFT.screen.nested.NftBundleItemDetail.collectionId": "Collection ID",
+  "ui.NFT.screen.nested.NftBundleItemDetail.childNfts": "Child NFTs ({{childNumber}})",
+  "ui.NFT.screen.nested.NftBundleItemDetail.nestedIn": "Nested in: {{name}} - ",
+  "ui.NFT.screen.nested.NftBundleItemDetail.items": "items",
+  "ui.NFT.screen.nested.NftBundleItemDetail.item": "item",
+  "ui.NFT.screen.nested.NftBundleItemDetail.nftStructure": "NFT Structure",
+  "ui.NFT.screen.nested.NftViewStructure.parent": "Parent",
+  "ui.NFT.screen.nested.NftViewStructure.nestedInParent": "Nested in {{parentId}}",
+  "ui.NFT.screen.nested.NftViewStructure.nftStructureWithCount": "NFT Structure ({{totalCount}})",
+  "ui.NFT.screen.nested.NftViewStructure.noStructureDataFound": "No structure data found"
 }
