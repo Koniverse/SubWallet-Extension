@@ -58,7 +58,7 @@ export class UniqueNftHandler extends BaseNftHandler {
       properties: null,
 
       nestingLevel: level,
-      parent: parentId
+      parentId: level > 0 ? parentId : undefined
     };
 
     if (node.nested && node.nested.length > 0) {
@@ -84,7 +84,7 @@ export class UniqueNftHandler extends BaseNftHandler {
         return null;
       }
 
-      return this.mapBundleTreeToNftItem(treeData, topmostOwner);
+      return this.mapBundleTreeToNftItem(treeData, topmostOwner, 0, tokenId);
     } catch (e) {
       console.error('[UniqueNftHandler] Failed to fetch bundle tree', e);
 

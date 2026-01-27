@@ -269,7 +269,8 @@ export interface NftItem extends NftItemExtraInfo {
   isBundle?: boolean;
   nestingLevel?: number;
   nestingTokens?: NftItem[]
-  parent?: string;
+  parent?: NftItem;
+  parentId?: string;
 }
 
 interface NftItemExtraInfo {

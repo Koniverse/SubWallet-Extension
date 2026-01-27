@@ -174,7 +174,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const handleOnClickNft = useCallback((clickedItem: NftItem) => {
     const { chain, collectionId } = collectionInfo;
     const tokenId = clickedItem.id;
-    const base = '/home/nfts/item-detail';
+
+    const base = '/home/nfts/bundle-item-detail';
     const url = `${base}?chain=${chain}&collectionId=${collectionId}&tokenId=${tokenId}`;
 
     navigate(url, {

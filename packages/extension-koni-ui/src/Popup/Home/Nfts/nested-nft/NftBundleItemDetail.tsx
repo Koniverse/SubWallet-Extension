@@ -9,7 +9,7 @@ import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useNavigateOnChangeAccount } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
-import { useGetUniqueNftDetail } from '@subwallet/extension-koni-ui/hooks/nft';
+import {useGetUniqueNftDetail, useGetUniqueNftParent} from '@subwallet/extension-koni-ui/hooks/nft';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
 import useGetChainInfo from '@subwallet/extension-koni-ui/hooks/screen/common/useFetchChainInfo';
 import useGetAccountInfoByAddress from '@subwallet/extension-koni-ui/hooks/screen/common/useGetAccountInfoByAddress';
@@ -42,6 +42,7 @@ const modalCloseButton = <Icon
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const state = useLocation().state as INftItemDetail;
   const { collectionInfo, nftItem: _nftItem } = state;
+  const parentNft = useGetUniqueNftParent(_nftItem);
 
   const { t } = useTranslation();
   const notify = useNotification();
@@ -62,16 +63,23 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const { data: fullNftItemFromApi } = useGetUniqueNftDetail(_nftItem.chain, _nftItem.collectionId, _nftItem.id);
 
-  const nftItem = useMemo(() => {
+
+  const nftItem = useMemo((): NftItem => {
     if (!fullNftItemFromApi) {
-      return _nftItem;
+      return {
+        ..._nftItem,
+        parent: parentNft
+      };
     }
 
     return {
       ..._nftItem,
-      description: fullNftItemFromApi.description
+      ...fullNftItemFromApi,
+      parent: parentNft,
+      name: fullNftItemFromApi.name || _nftItem.name,
+      description: fullNftItemFromApi.description || _nftItem.description
     };
-  }, [_nftItem, fullNftItemFromApi]);
+  }, [_nftItem, fullNftItemFromApi, parentNft]);
 
   useNavigateOnChangeAccount('/home/nfts/collections');
 
