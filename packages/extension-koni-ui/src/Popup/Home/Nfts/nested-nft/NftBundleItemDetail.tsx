@@ -396,7 +396,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <div className={'nft-child-item-right-block-1'}>
                       <div className={'nft-child-item-right-block-1-line-1'}>{nestingItem.name}</div>
                       <div className={'nft-child-item-right-block-1-line-2'}>
-                        <span className={'nft-child-item-right-block-1-label'}>{t('Nested in: {{name}} - }', {replace: {name: nftItem?.name || ''}})}</span>
+                        <span className={'nft-child-item-right-block-1-label'}>{t('Nested in: {{name}} - ', {replace: {name: nftItem?.name || ''}})}</span>
                         <span className={'nft-child-item-right-block-1-value'}>{`${nestingItem?.nestingTokens?.length || 0} ${
                           (nestingItem?.nestingTokens?.length || 0) > 1 ? t('items') : t('item')
                         }`}</span>
