@@ -2,4 +2,4 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { default as useGetUniqueNftDetail } from './useGetNftDetail';
-export { default as useGetUniqueNftParent } from './useGetParent';
+export { default as useGetUniqueNftParent } from './useGetNftParent';

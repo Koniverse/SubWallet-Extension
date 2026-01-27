@@ -34,7 +34,7 @@ export class UniqueNftHandler extends BaseNftHandler {
       image: raw.image || undefined,
       description: raw.description || undefined,
       owner: owner,
-      isBundle: raw.isBundle,
+      isBundle: false,
       properties: null
     };
   }

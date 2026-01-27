@@ -74,7 +74,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     return {
       ..._nftItem,
-      ...fullNftItemFromApi,
       parent: parentNft,
       name: fullNftItemFromApi.name || _nftItem.name,
       description: fullNftItemFromApi.description || _nftItem.description
@@ -269,7 +268,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               <div className={'nft-item-img-footer-line1-wrapper'}>
                 <div className={'nft-item-img-footer-left'}>
                   <div className={'nft-item-img-footer-left-1'}>{nftItem.name}</div>
-                  <div className={'nft-item-img-footer-left-2'}>{nftItem.isBundle ? 'Parent' : `Nested in: ${nftItem?.name || ''}`}</div>
+                  <div className={'nft-item-img-footer-left-2'}>{nftItem.isBundle ? 'Parent' : `Nested in: ${nftItem?.parent?.name || ''}`}</div>
                 </div>
                 <div className={'nft-item-img-footer-right'}>
                   <Button
