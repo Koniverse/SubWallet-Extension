@@ -9,7 +9,7 @@ import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useNavigateOnChangeAccount } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
-import {useGetUniqueNftDetail, useGetUniqueNftParent} from '@subwallet/extension-koni-ui/hooks/nft';
+import { useGetUniqueNftDetail, useGetUniqueNftParent } from '@subwallet/extension-koni-ui/hooks/nft';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
 import useGetChainInfo from '@subwallet/extension-koni-ui/hooks/screen/common/useFetchChainInfo';
 import useGetAccountInfoByAddress from '@subwallet/extension-koni-ui/hooks/screen/common/useGetAccountInfoByAddress';
@@ -62,7 +62,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [, setStorage] = useLocalStorage<SendNftParams>(NFT_TRANSACTION, DEFAULT_NFT_PARAMS);
 
   const { data: fullNftItemFromApi } = useGetUniqueNftDetail(_nftItem.chain, _nftItem.collectionId, _nftItem.id);
-
 
   const nftItem = useMemo((): NftItem => {
     if (!fullNftItemFromApi) {
@@ -254,7 +253,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         <div className={'nft_item_detail__container'}>
           <div className={'nft-item-img-wrapper'}>
             <div className={'nft_item_detail__nft_image'}>
-              {nftItem.nestingLevel !== undefined && <div className='nft-item-level-label'>{t('ui.NFT.screen.nested.NftBundleItemDetail.level', {replace: {nestingLevel: nftItem.nestingLevel}})}</div>}
+              {nftItem.nestingLevel !== undefined && <div className='nft-item-level-label'>{t('ui.NFT.screen.nested.NftBundleItemDetail.level', { replace: { nestingLevel: nftItem.nestingLevel } })}</div>}
               <Image
                 className={CN({ clickable: nftItem.externalUrl })}
                 height={358}
@@ -396,7 +395,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <div className={'nft-child-item-right-block-1'}>
                       <div className={'nft-child-item-right-block-1-line-1'}>{nestingItem.name}</div>
                       <div className={'nft-child-item-right-block-1-line-2'}>
-                        <span className={'nft-child-item-right-block-1-label'}>{t('ui.NFT.screen.nested.NftBundleItemDetail.nestedIn', {replace: {name: nftItem?.name || ''}})}</span>
+                        <span className={'nft-child-item-right-block-1-label'}>{t('ui.NFT.screen.nested.NftBundleItemDetail.nestedIn', { replace: { name: nftItem?.name || '' } })}</span>
                         <span className={'nft-child-item-right-block-1-value'}>{`${nestingItem?.nestingTokens?.length || 0} ${
                           (nestingItem?.nestingTokens?.length || 0) > 1 ? t('ui.NFT.screen.nested.NftBundleItemDetail.items') : t('ui.NFT.screen.nested.NftBundleItemDetail.item')
                         }`}</span>
