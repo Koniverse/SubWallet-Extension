@@ -13,17 +13,6 @@ export function _isXcmTransferUnstable (originChainInfo: _ChainInfo, destChainIn
   return !_isXcmWithinSameConsensus(originChainInfo, destChainInfo) || _isMythosFromHydrationToMythos(originChainInfo, destChainInfo, assetSlug) || _isPolygonBridgeXcm(originChainInfo, destChainInfo) || _isPosBridgeXcm(originChainInfo, destChainInfo);
 }
 
-function getAssetHubBridgeUnstableWarning (originChainInfo: _ChainInfo): string {
-  switch (originChainInfo.slug) {
-    case COMMON_CHAIN_SLUGS.POLKADOT_ASSET_HUB:
-      return 'Cross-chain transfer of this token is not recommended as it is in beta and incurs a transaction fee of 2 DOT. Continue at your own risk';
-    case COMMON_CHAIN_SLUGS.KUSAMA_ASSET_HUB:
-      return 'Cross-chain transfer of this token is not recommended as it is in beta and incurs a transaction fee of 0.4 KSM. Continue at your own risk';
-    default:
-      return 'Cross-chain transfer of this token is not recommended as it is in beta and incurs a large transaction fee. Continue at your own risk';
-  }
-}
-
 function getSnowBridgeUnstableWarning (originChainInfo: _ChainInfo): string {
   switch (originChainInfo.slug) {
     case COMMON_CHAIN_SLUGS.POLKADOT_ASSET_HUB:
@@ -71,7 +60,7 @@ export function _getXcmUnstableWarning (originChainInfo: _ChainInfo, destChainIn
   } else if (_isMythosFromHydrationToMythos(originChainInfo, destChainInfo, assetSlug)) {
     return getMythosFromHydrationToMythosWarning();
   } else {
-    return getAssetHubBridgeUnstableWarning(originChainInfo);
+    return '';
   }
 }
 
