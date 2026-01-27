@@ -10,7 +10,11 @@ import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-se
 import { _getSubstrateRelayParent, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 
 export function _isXcmTransferUnstable (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo, assetSlug: string): boolean {
-  return !_isXcmWithinSameConsensus(originChainInfo, destChainInfo) || _isMythosFromHydrationToMythos(originChainInfo, destChainInfo, assetSlug) || _isPolygonBridgeXcm(originChainInfo, destChainInfo) || _isPosBridgeXcm(originChainInfo, destChainInfo);
+  return (!_isXcmWithinSameConsensus(originChainInfo, destChainInfo) && !_isAssetHubBridgeXcm) || _isMythosFromHydrationToMythos(originChainInfo, destChainInfo, assetSlug) || _isPolygonBridgeXcm(originChainInfo, destChainInfo) || _isPosBridgeXcm(originChainInfo, destChainInfo);
+}
+
+function getDefaultUnstableWarning (): string {
+  return 'Cross-chain transfer of this token is not recommended as it is in beta and incurs a large transaction fee. Continue at your own risk';
 }
 
 function getSnowBridgeUnstableWarning (originChainInfo: _ChainInfo): string {
@@ -60,7 +64,7 @@ export function _getXcmUnstableWarning (originChainInfo: _ChainInfo, destChainIn
   } else if (_isMythosFromHydrationToMythos(originChainInfo, destChainInfo, assetSlug)) {
     return getMythosFromHydrationToMythosWarning();
   } else {
-    return '';
+    return getDefaultUnstableWarning();
   }
 }
 
@@ -93,6 +97,10 @@ export function _isPosBridgeXcm (originChainInfo: _ChainInfo, destChainInfo: _Ch
 
 export function _isAcrossBridgeXcm (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo): boolean {
   return _isAcrossChainBridge(originChainInfo.slug, destChainInfo.slug);
+}
+
+export function _isAssetHubBridgeXcm (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo): boolean {
+  return (originChainInfo.slug === 'statemint' && destChainInfo.slug === 'statemine') || (originChainInfo.slug === 'statemine' && destChainInfo.slug === 'statemint');
 }
 // ---------------------------------------------------------------------------------------------------------------------
 

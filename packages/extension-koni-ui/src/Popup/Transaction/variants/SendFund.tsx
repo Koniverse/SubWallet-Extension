@@ -741,12 +741,11 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         const destChainInfo = chainInfoMap[values.destChain];
         const assetSlug = values.asset;
         const isMythosFromHydrationToMythos = _isMythosFromHydrationToMythos(originChainInfo, destChainInfo, assetSlug);
-        const warningQuote = _getXcmUnstableWarning(originChainInfo, destChainInfo, assetSlug);
 
-        if (_isXcmTransferUnstable(originChainInfo, destChainInfo, assetSlug) && warningQuote) {
+        if (_isXcmTransferUnstable(originChainInfo, destChainInfo, assetSlug)) {
           openAlert({
             type: NotificationType.WARNING,
-            content: t(warningQuote),
+            content: t(_getXcmUnstableWarning(originChainInfo, destChainInfo, assetSlug)),
             title: isMythosFromHydrationToMythos ? t('ui.TRANSACTION.screen.Transaction.SendFund.highFeeAlert') : t('ui.TRANSACTION.screen.Transaction.SendFund.payAttentionExclamation'),
             okButton: {
               text: t('ui.TRANSACTION.screen.Transaction.SendFund.continue'),
