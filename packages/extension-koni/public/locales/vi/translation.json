@@ -566,7 +566,6 @@
   "ui.components.Layout.Home.expandView": "Chế độ mở rộng",
   "ui.SETTINGS.screen.Setting.Root.securitySettings": "Cài đặt bảo mật",
   "ui.SETTINGS.screen.Setting.Security.securitySettings": "Cài đặt bảo mật",
-  "ui.SETTINGS.screen.Setting.Root.crowdloans": "Crowdloan",
   "ui.CROWDLOAN.screen.Crowdloans.crowdloans": "Crowdloan",
   "ui.SETTINGS.screen.Setting.Root.websiteAccess": "Truy cập trang web",
   "ui.SETTINGS.screen.Setting.Root.manageWebsiteAccess": "Quản lý truy cập",
@@ -2600,5 +2599,8 @@
   "ui.TRANSACTION.Confirmations.Withdraw.signWith": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "",
   "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "",
-  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": ""
+  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "",
+  "ui.TRANSACTION.screen.Transaction.Swap.stakedBalance": "",
+  "ui.TRANSACTION.screen.Transaction.Swap.stakedBalanceTooltip": "",
+  "ui.TRANSACTION.screen.Transaction.Swap.availableBalanceTooltip": ""
 }

@@ -26,6 +26,7 @@ import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
+import { BittensorSwapHandler } from './handler/bittensor-handler';
 import { KyberHandler } from './handler/kyber-handler';
 import { SimpleSwapHandler } from './handler/simpleswap-handler';
 import { UniswapHandler, UniswapMetadata } from './handler/uniswap-handler';
@@ -343,6 +344,12 @@ export class SwapService implements StoppableServiceInterface {
           break;
         case SwapProviderId.OPTIMEX_TESTNET:
           this.handlers[providerId] = new OptimexHandler(this.chainService, this.state.balanceService, this.state.feeService, true);
+          break;
+        case SwapProviderId.BITTENSOR:
+          this.handlers[providerId] = new BittensorSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, false);
+          break;
+        case SwapProviderId.BITTENSOR_TESTNET:
+          this.handlers[providerId] = new BittensorSwapHandler(this.chainService, this.state.balanceService, this.state.feeService, true);
           break;
         default:
           throw new Error('Unsupported provider');

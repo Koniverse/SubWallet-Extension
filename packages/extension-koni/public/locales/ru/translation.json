@@ -566,7 +566,6 @@
   "ui.components.Layout.Home.expandView": "Expand view",
   "ui.SETTINGS.screen.Setting.Root.securitySettings": "Настройки безопасности",
   "ui.SETTINGS.screen.Setting.Security.securitySettings": "Настройки безопасности",
-  "ui.SETTINGS.screen.Setting.Root.crowdloans": "Краудлоуны",
   "ui.CROWDLOAN.screen.Crowdloans.crowdloans": "Краудлоуны",
   "ui.SETTINGS.screen.Setting.Root.websiteAccess": "Доступ к веб-сайту",
   "ui.SETTINGS.screen.Setting.Root.manageWebsiteAccess": "Управление доступом к веб-сайту",
@@ -2602,5 +2601,8 @@
   "ui.TRANSACTION.Confirmations.Withdraw.signWith": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "",
   "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "",
-  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": ""
+  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "",
+  "ui.TRANSACTION.screen.Transaction.Swap.stakedBalance": "",
+  "ui.TRANSACTION.screen.Transaction.Swap.stakedBalanceTooltip": "",
+  "ui.TRANSACTION.screen.Transaction.Swap.availableBalanceTooltip": ""
 }

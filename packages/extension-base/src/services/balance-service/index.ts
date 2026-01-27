@@ -247,6 +247,10 @@ export class BalanceService implements StoppableServiceInterface {
           case BalanceType.TOTAL:
             value = new BigN(rs.free).plus(new BigN(rs.locked)).toFixed();
             break;
+          case BalanceType.STAKING:
+            value = rs.lockedDetails?.staking || '0';
+            break;
+
           case BalanceType.TOTAL_MINUS_RESERVED:
             if (_BALANCE_CHAIN_GROUP.notSupportGetBalanceByType.includes(chainInfo.slug)) {
               // TODO: Currently Vara and Avail staking from nomination pools is not fully supported.

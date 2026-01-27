@@ -566,7 +566,6 @@
   "ui.components.Layout.Home.expandView": "拡大表示",
   "ui.SETTINGS.screen.Setting.Root.securitySettings": "セキュリティ設定",
   "ui.SETTINGS.screen.Setting.Security.securitySettings": "セキュリティ設定",
-  "ui.SETTINGS.screen.Setting.Root.crowdloans": "クラウドローン",
   "ui.CROWDLOAN.screen.Crowdloans.crowdloans": "クラウドローン",
   "ui.SETTINGS.screen.Setting.Root.websiteAccess": "ウェブサイトへのアクセス",
   "ui.SETTINGS.screen.Setting.Root.manageWebsiteAccess": "ウェブサイトへのアクセスを管理",
@@ -2600,5 +2599,8 @@
   "ui.TRANSACTION.Confirmations.Withdraw.signWith": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "",
   "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "",
-  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": ""
+  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "",
+  "ui.TRANSACTION.screen.Transaction.Swap.stakedBalance": "",
+  "ui.TRANSACTION.screen.Transaction.Swap.stakedBalanceTooltip": "",
+  "ui.TRANSACTION.screen.Transaction.Swap.availableBalanceTooltip": ""
 }

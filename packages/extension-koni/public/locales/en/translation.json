@@ -539,7 +539,6 @@
   "ui.components.Layout.Home.expandView": "Expand view",
   "ui.SETTINGS.screen.Setting.Root.securitySettings": "Security settings",
   "ui.SETTINGS.screen.Setting.Security.securitySettings": "Security settings",
-  "ui.SETTINGS.screen.Setting.Root.crowdloans": "Crowdloans",
   "ui.CROWDLOAN.screen.Crowdloans.crowdloans": "Crowdloans",
   "ui.SETTINGS.screen.Setting.Root.websiteAccess": "Website access",
   "ui.SETTINGS.screen.Setting.Root.manageWebsiteAccess": "Manage website access",
@@ -2601,5 +2600,8 @@
   "ui.TRANSACTION.Confirmations.Withdraw.signWith": "Sign with",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "Available balance",
   "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "Copied to clipboard",
-  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again"
+  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again",
+  "ui.TRANSACTION.screen.Transaction.Swap.stakedBalance": "Staked balance",
+  "ui.TRANSACTION.screen.Transaction.Swap.stakedBalanceTooltip": "Your staked {{symbol}} balance are used to perform the swap",
+  "ui.TRANSACTION.screen.Transaction.Swap.availableBalanceTooltip": "Available balance for swap"
 }
