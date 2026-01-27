@@ -4275,7 +4275,8 @@ export default class KoniExtension {
       errorOnTimeOut,
       ...this.createPassConfirmationParams(isPassConfirmation),
       eventsHandler,
-      step
+      step,
+      xcmFeeDryRun: extrinsicType === ExtrinsicType.TRANSFER_XCM ? submitData.xcmStepFee : undefined
     });
   }
 
