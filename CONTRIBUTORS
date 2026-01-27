@@ -1,16 +1,16 @@
-    3272	AnhMTV                        	Release version 1.3.71
+    3279	AnhMTV                        	Release version 1.3.72
     2671	Nam Phạm                      	disable block explorer for truth network
     2599	S2kael                        	[Issue-4521] Update stable version for chain-list
-    1060	bluezdot                      	[Issue-#4762] update keyring stable 0.1.14
+    1062	bluezdot                      	[Issue-#4762] update keyring stable 0.1.14
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
      650	nguyentiendung                	[Issue-4889] feat: temporarily disable Advanced Phishing Detection (UI & background)
+     583	tunghp2002                    	[Issue-4769] Add more tx type
      550	Frenkie Nguyen                	[Issue-4462] update styling for background phishing page
-     542	tunghp2002                    	chore: fix lint
      465	Jaco                          	0.42.5 (#969)
      355	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
-     332	PDTnhah                       	[Issue-4247] feat: detect token when enabling chain in import NFT screen
-     328	lw                            	[Issue-4530] Fix: Fix eslint issue
-     274	Thiendekaco                   	
+     351	PDTnhah                       	
+     329	lw                            	[Issue-4769] refactor: Refactor several files
+     298	Thiendekaco                   	
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
      170	lw-cdm                        	
