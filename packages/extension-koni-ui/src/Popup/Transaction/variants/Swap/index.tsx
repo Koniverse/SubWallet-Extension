@@ -1325,8 +1325,16 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
                   extrinsicType={ExtrinsicType.SWAP}
                   hidden={!canShowAvailableBalance}
                   isSubscribe={true}
-                  label={`${t('ui.TRANSACTION.screen.Transaction.Swap.availableBalance')}`}
-                  labelTooltip={'Available balance for swap'}
+                  label={balanceType === BalanceType.STAKING ? `${t('ui.TRANSACTION.screen.Transaction.Swap.stakedBalance')}` : `${t('ui.TRANSACTION.screen.Transaction.Swap.availableBalance')}`}
+                  labelTooltip={
+                    balanceType === BalanceType.STAKING
+                      ? t('ui.TRANSACTION.screen.Transaction.Swap.stakedBalanceTooltip', {
+                        replace: {
+                          symbol: fromAssetInfo.symbol
+                        }
+                      })
+                      : t('ui.TRANSACTION.screen.Transaction.Swap.availableBalanceTooltip')
+                  }
                   tokenSlug={fromTokenSlugValue}
                 />
               </div>
