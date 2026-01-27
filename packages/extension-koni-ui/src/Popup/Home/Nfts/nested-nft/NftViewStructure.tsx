@@ -31,6 +31,7 @@ interface TreeNodeProps {
 
 const TreeNode = ({ depth = 0, isLastChild = false, item, onClick, parent, selectedId }: TreeNodeProps) => {
   const { token } = useTheme() as Theme;
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
 
   const hasChildren = item.nestingTokens && item.nestingTokens.length > 0;
@@ -83,7 +84,7 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, onClick, parent, selec
           <div className='nft-info'>
             <div className='nft-title'>{item.name || item.id}</div>
             <div className='nft-subtitle'>
-              {depth === 0 ? 'Parent' : `Nested in ${parent?.name || parent?.id || ''}`}
+              {depth === 0 ? t('Parent') : t('Nested in {{parentId}}', {replace: {parentId: parent?.name || parent?.id}})}
             </div>
           </div>
 
@@ -198,7 +199,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderBackground={'transparent'}
         subHeaderCenter={true}
         subHeaderPaddingVertical={true}
-        title={`${t('NFT Structure')} (${totalCount})`}
+        title={t('NFT Structure ({{totalCount}})', {replace: {totalCount: totalCount}})}
       >
         <div className='tree-structure-container'>
           {rootNft

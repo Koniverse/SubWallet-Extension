@@ -254,7 +254,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         <div className={'nft_item_detail__container'}>
           <div className={'nft-item-img-wrapper'}>
             <div className={'nft_item_detail__nft_image'}>
-              {nftItem.nestingLevel !== undefined && <div className='nft-item-level-label'>{`Level ${nftItem.nestingLevel}`}</div>}
+              {nftItem.nestingLevel !== undefined && <div className='nft-item-level-label'>{t('Level {{nestingLevel}}', {replace: {nestingLevel: nftItem.nestingLevel}})}</div>}
               <Image
                 className={CN({ clickable: nftItem.externalUrl })}
                 height={358}
@@ -294,7 +294,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     schema={'secondary'}
                     size={'sm'}
                   >
-                    {'Go to Parent'}
+                    {t('Go to Parent')}
                   </Button>
                 </div>
 
@@ -309,7 +309,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             {
               nftItem.description && (
                 <MetaInfo.Default
-                  label={'Description'}
+                  label={t('Description')}
                   valueAlign={'left'}
                 >
                   <div
@@ -331,10 +331,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   </div>
                 </MetaInfo.Default>
               )}
-            <MetaInfo.Default label={'NFT collection name'}>{collectionInfo.collectionName || collectionInfo.collectionId}</MetaInfo.Default>
+            <MetaInfo.Default label={t('NFT collection name')}>{collectionInfo.collectionName || collectionInfo.collectionId}</MetaInfo.Default>
             <MetaInfo.Default
               className={'nft-bundle-item-owned'}
-              label={'Owned by'}
+              label={t('Owned by')}
             >
               <MetaInfo.Account
                 address={ownerAccountInfo?.address || ''}
@@ -344,13 +344,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             </MetaInfo.Default>
             <MetaInfo.Chain
               chain={originChainInfo.slug}
-              label={'Network'}
+              label={t('Network')}
             />
             <MetaInfo.Default
-              label={'NFT ID'}
+              label={t('NFT ID')}
             >{nftItem.id}</MetaInfo.Default>
             <MetaInfo.Default
-              label={'Collection ID'}
+              label={t('Collection ID')}
             >
               {nftItem.collectionId}
             </MetaInfo.Default>
@@ -396,9 +396,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <div className={'nft-child-item-right-block-1'}>
                       <div className={'nft-child-item-right-block-1-line-1'}>{nestingItem.name}</div>
                       <div className={'nft-child-item-right-block-1-line-2'}>
-                        <span className={'nft-child-item-right-block-1-label'}>{`Nested in: ${nftItem?.name || ''} - `}</span>
+                        <span className={'nft-child-item-right-block-1-label'}>{t('Nested in: {{name}} - }', {replace: {name: nftItem?.name || ''}})}</span>
                         <span className={'nft-child-item-right-block-1-value'}>{`${nestingItem?.nestingTokens?.length || 0} ${
-                          (nestingItem?.nestingTokens?.length || 0) > 1 ? 'items' : 'item'
+                          (nestingItem?.nestingTokens?.length || 0) > 1 ? t('items') : t('item')
                         }`}</span>
                       </div>
                     </div>
