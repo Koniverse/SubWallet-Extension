@@ -1,12 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-  NftCollection,
-  NftDetailRequest,
-  NftFullListRequest,
-  NftItem
-} from '@subwallet/extension-base/background/KoniTypes';
+import { NftCollection, NftDetailRequest, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 
 export interface NftHandlerResult {
   items: NftItem[];

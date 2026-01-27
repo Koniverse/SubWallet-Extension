@@ -13,7 +13,7 @@ import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Icon, Image } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretDown, CaretRight, CheckCircle } from 'phosphor-react';
-import React, {useCallback, useContext, useMemo, useState} from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
@@ -90,13 +90,13 @@ const TreeNode = ({ depth = 0, isLastChild = false, item, onClick, parent, selec
           {isSelected
             ? (
               <div className={'nft-info-icon'}>
-              <Icon
-                iconColor={token.colorSuccess}
-                phosphorIcon={CheckCircle}
-                size='xs'
-                // customSize={'16px'}
-                weight='fill'
-              />
+                <Icon
+                  iconColor={token.colorSuccess}
+                  phosphorIcon={CheckCircle}
+                  size='xs'
+                  // customSize={'16px'}
+                  weight='fill'
+                />
               </div>
             )
             : (
@@ -134,6 +134,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const location = useLocation();
   const state = location.state as INftItemDetail & { rootTokenId?: string };
   const [rootTokenId] = useLocalStorage(ROOT_NFT_TOKEN_ID, '');
+
   useNavigateOnChangeAccount();
 
   const navigate = useNavigate();

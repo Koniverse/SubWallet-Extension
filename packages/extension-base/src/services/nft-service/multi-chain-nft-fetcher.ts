@@ -1,19 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-  NftCollection,
-  NftDetailRequest,
-  NftFullListRequest,
-  NftItem
-} from '@subwallet/extension-base/background/KoniTypes';
+import { NftCollection, NftDetailRequest, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
-import {
-  NFT_HANDLER_REGISTRY,
-  NftHandlerDescriptor
-} from '@subwallet/extension-base/services/nft-service/nft-handlers/registry';
+import { NFT_HANDLER_REGISTRY, NftHandlerDescriptor } from '@subwallet/extension-base/services/nft-service/nft-handlers/registry';
 
-import {BaseNftHandler, NftHandlerResult} from './nft-handlers/base-nft-handler';
+import { BaseNftHandler, NftHandlerResult } from './nft-handlers/base-nft-handler';
 
 export class MultiChainNftFetcher {
   private readonly state: KoniState;
@@ -158,9 +150,8 @@ export class MultiChainNftFetcher {
       //   continue;
       // }
 
-
       try {
-        return await handler.fetchNftDetail({collectionId: collectionId, tokenId: tokenId, chainSlug})
+        return await handler.fetchNftDetail({ collectionId: collectionId, tokenId: tokenId, chainSlug });
       } catch (e) {
         console.error('[NftFetcher] fetchCollection failed', e);
       }

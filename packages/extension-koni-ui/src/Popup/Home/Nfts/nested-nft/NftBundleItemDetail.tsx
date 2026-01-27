@@ -9,6 +9,7 @@ import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useNavigateOnChangeAccount } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
+import { useGetUniqueNftDetail } from '@subwallet/extension-koni-ui/hooks/nft';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
 import useGetChainInfo from '@subwallet/extension-koni-ui/hooks/screen/common/useFetchChainInfo';
 import useGetAccountInfoByAddress from '@subwallet/extension-koni-ui/hooks/screen/common/useGetAccountInfoByAddress';
@@ -26,7 +27,6 @@ import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
-import {useGetUniqueNftDetail} from "@subwallet/extension-koni-ui/hooks/nft";
 
 type Props = ThemeProps
 
@@ -63,13 +63,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { data: fullNftItemFromApi } = useGetUniqueNftDetail(_nftItem.chain, _nftItem.collectionId, _nftItem.id);
 
   const nftItem = useMemo(() => {
-    if (!fullNftItemFromApi) return _nftItem;
+    if (!fullNftItemFromApi) {
+      return _nftItem;
+    }
 
     return {
       ..._nftItem,
-      description: fullNftItemFromApi.description,
+      description: fullNftItemFromApi.description
     };
-  }, [fullNftItemFromApi]);
+  }, [_nftItem, fullNftItemFromApi]);
 
   useNavigateOnChangeAccount('/home/nfts/collections');
 
@@ -299,10 +301,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           >
             {
               nftItem.description && (
-            <MetaInfo.Default
-              label={'Description'}
-              valueAlign={'left'}
-            >
+                <MetaInfo.Default
+                  label={'Description'}
+                  valueAlign={'left'}
+                >
                   <div
                     className={'nft_item_detail__description_container'}
                     onClick={handleShowNftDescription}
@@ -320,7 +322,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                       />
                     </div>
                   </div>
-            </MetaInfo.Default>
+                </MetaInfo.Default>
               )}
             <MetaInfo.Default label={'NFT collection name'}>{collectionInfo.collectionName || collectionInfo.collectionId}</MetaInfo.Default>
             <MetaInfo.Default
@@ -367,7 +369,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
           {!!nftItem?.nestingTokens?.length &&
             <>
-              <div className={'nft-item-detail-section-label-2'}>{t<string>(`Child NFTs ({{childNumber}})`, {replace: {childNumber: nftItem?.nestingTokens?.length}})}</div>
+              <div className={'nft-item-detail-section-label-2'}>{t<string>('Child NFTs ({{childNumber}})', { replace: { childNumber: nftItem?.nestingTokens?.length } })}</div>
               {nftItem?.nestingTokens.map((nestingItem, index) => (
                 <div
                   className={'nft-child-item-wrapper'}

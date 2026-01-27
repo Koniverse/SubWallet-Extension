@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 
 const useNavigateOnChangeAccount = (path = DEFAULT_ROUTER_PATH) => {
   const navigate = useNavigate();
-  console.log()
 
   const { currentAccountProxy } = useSelector((state) => state.accountState);
 

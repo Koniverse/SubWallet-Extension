@@ -1,13 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-  ChainType,
-  NftCollection,
-  NftDetailRequest,
-  NftFullListRequest,
-  NftItem
-} from '@subwallet/extension-base/background/KoniTypes';
+import { ChainType, NftCollection, NftDetailRequest, NftFullListRequest, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 import { getAddressesByChainType } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { UniqueBundleTree, UniqueNftInstance } from '@subwallet-monorepos/subwallet-services-sdk/services';
@@ -161,7 +155,6 @@ export class UniqueNftHandler extends BaseNftHandler {
     };
   }
 
-
   override async fetchNftDetail (request: NftDetailRequest): Promise<NftHandlerResult> {
     const items: NftItem[] = [];
     const collections: NftCollection[] = [];
@@ -174,7 +167,6 @@ export class UniqueNftHandler extends BaseNftHandler {
     const { collectionId, tokenId } = request;
 
     if (!collectionId || !tokenId) {
-
       return { items, collections };
     }
 
@@ -184,7 +176,8 @@ export class UniqueNftHandler extends BaseNftHandler {
       if (!rawNft) {
         return { items: [], collections: [] };
       }
-      const nftItem = this.mapUniqueRootNftToItem(rawNft, rawNft.owner)
+
+      const nftItem = this.mapUniqueRootNftToItem(rawNft, rawNft.owner);
 
       return {
         items: [nftItem],
