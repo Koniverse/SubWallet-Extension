@@ -78,7 +78,9 @@ const paraSpellApi = {
   buildXcm: `${version}/x-transfer`,
   feeXcm: `${version}/xcm-fee`,
   dryRunXcm: `${version}/dry-run`,
-  dryRunPreviewXcm: `${version}/dry-run-preview`
+  dryRunPreviewXcm: `${version}/dry-run-preview`,
+  maxTransferable: `${version}/transferable-amount`,
+  minTransferable: `${version}/min-transferable-amount`
 };
 
 function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> {
@@ -333,6 +335,90 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   }
 
   return await response.json() as GetXcmFeeResult;
+}
+
+export async function fetchMaxXcmTransferableAmount (request: CreateXcmExtrinsicProps): Promise<string> {
+  const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
+  const paraSpellChainMap = await fetchParaSpellChainMap();
+  const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
+
+  if (!paraSpellIdentifyV4) {
+    throw new Error('Token is not support XCM at this time');
+  }
+
+  const bodyData = {
+    senderAddress: sender,
+    address: recipient,
+    from: paraSpellChainMap[originChain.slug],
+    to: paraSpellChainMap[destinationChain.slug],
+    currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
+    options: {
+      abstractDecimals: false
+    }
+  };
+
+  const response = await fetchFromProxyService(
+    ProxyServiceRoute.PARASPELL,
+    paraSpellApi.maxTransferable,
+    {
+      method: 'POST',
+      body: JSON.stringify(bodyData),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json() as ParaSpellError;
+
+    throw new Error(error.message);
+  }
+
+  return await response.json() as string;
+}
+
+export async function fetchMinXcmTransferableAmount (request: CreateXcmExtrinsicProps): Promise<string> {
+  const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
+  const paraSpellChainMap = await fetchParaSpellChainMap();
+  const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
+
+  if (!paraSpellIdentifyV4) {
+    throw new Error('Token is not support XCM at this time');
+  }
+
+  const bodyData = {
+    senderAddress: sender,
+    address: recipient,
+    from: paraSpellChainMap[originChain.slug],
+    to: paraSpellChainMap[destinationChain.slug],
+    currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
+    options: {
+      abstractDecimals: false
+    }
+  };
+
+  const response = await fetchFromProxyService(
+    ProxyServiceRoute.PARASPELL,
+    paraSpellApi.minTransferable,
+    {
+      method: 'POST',
+      body: JSON.stringify(bodyData),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json() as ParaSpellError;
+
+    throw new Error(error.message);
+  }
+
+  return await response.json() as string;
 }
 
 function createParaSpellCurrency (paraSpellIdentifyV4: Record<string, any>, amount: string): ParaSpellCurrency {
