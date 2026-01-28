@@ -9,7 +9,7 @@ import { ATTACH_ACCOUNT_MODAL, SUBSTRATE_GENERIC_KEY, SUBSTRATE_MIGRATION_KEY, U
 import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useGetSupportedLedger, useGoBackFromCreateAccount, useLedger } from '@subwallet/extension-web-ui/hooks';
 import { createAccountHardwareMultiple } from '@subwallet/extension-web-ui/messaging';
 import { RootState } from '@subwallet/extension-web-ui/stores';
-import {ChainItemType, ThemeProps} from '@subwallet/extension-web-ui/types';
+import { ChainItemType, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { convertNetworkSlug } from '@subwallet/extension-web-ui/utils';
 import { BackgroundIcon, Button, Icon, Image, SwList } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -348,18 +348,8 @@ const Component: React.FC<Props> = (props: Props) => {
             {t('Unlock your Ledger and open the selected app. For more information regarding Polkadot and Polkadot Migration app, click ')}
             <a
               href={CONNECT_LEDGER_USER_GUIDE_URL}
+              rel='noopener noreferrer'
               target='_blank'
-              rel="noopener noreferrer"
-            >
-              {t('here')}
-            </a>
-          </div>
-          <div className='sub-title'>
-            {t('[Test CI/CD] Unlock your Ledger and open the selected app. For more information regarding Polkadot and Polkadot Migration app, click ')}
-            <a
-              href={CONNECT_LEDGER_USER_GUIDE_URL}
-              target='_blank'
-              rel="noopener noreferrer"
             >
               {t('here')}
             </a>
