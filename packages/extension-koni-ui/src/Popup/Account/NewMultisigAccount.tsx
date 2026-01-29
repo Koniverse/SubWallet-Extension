@@ -21,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { isAddress, isEthereumAddress } from '@polkadot/util-crypto';
+import {isSubstrateAddress} from "@subwallet/keyring";
 
 type Props = ThemeProps;
 
@@ -164,7 +164,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       return false;
     }
 
-    const isValidAddress = isAddress(signerAddressValue) && !isEthereumAddress(signerAddressValue);
+    const isValidAddress = isSubstrateAddress(signerAddressValue);
 
     if (!isValidAddress) {
       return false;
@@ -208,7 +208,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const validateSignerAddress = useCallback((rule: Rule): Promise<void> => {
     const { signerAddress } = form.getFieldsValue();
 
-    if (!isAddress(signerAddress) || isEthereumAddress(signerAddress)) {
+    if (!isSubstrateAddress(signerAddress)) {
       return Promise.reject(t('Invalid signatories address'));
     }
 
