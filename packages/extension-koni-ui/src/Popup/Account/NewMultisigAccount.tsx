@@ -209,7 +209,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     const { signerAddress } = form.getFieldsValue();
 
     if (!isAddress(signerAddress) || isEthereumAddress(signerAddress)) {
-      return Promise.reject(t('ui.ACCOUNT.screen.Account.NewMultisigAccount.invalidRecipientAddressError'));
+      return Promise.reject(t('Invalid signatories address'));
     }
 
     const formattedAddress = reformatAddress(signerAddressValue);
@@ -291,6 +291,12 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     }
   }, [confirmedTermSeedPhrase.state, activeModal, inactiveModal, setConfirmedTermSeedPhrase]);
 
+  useEffect(() => {
+    if (signers.length === 0) {
+      form.resetFields(['threshold']);
+    }
+  }, [signers.length, form]);
+
   return (
     <PageWrapper
       className={CN(className)}
@@ -318,12 +324,13 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             form={form}
             initialValues={formDefault}
           >
-            <div className={'signatory-label'}>{'Add signatory'.toUpperCase()}</div>
+            <div className={'signatory-label'}>{t('ADD SIGNATORY')}</div>
             <div className={'signatory-form-wrapper'}>
               <div className={'signatory-form-left'}>
                 <Form.Item
                   className={'signatory-form-address'}
                   name='signerAddress'
+                  normalize={(value: string) => value.trim()}
                   rules={[
                     {
                       validator: validateSignerAddress
@@ -365,6 +372,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                       className={'icon-remove'}
                       customSize={'28px'}
                       phosphorIcon={PlusCircle}
+                      weight={'fill'}
                     />
                   )}
                   onClick={onAddManualSigner}
@@ -379,7 +387,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 ? emptyList()
                 : (
                   <>
-                    <div className={'signatories-label'}>{'Signatories'.toUpperCase()}</div>
+                    <div className={'signatories-label'}>{t('SIGNATORIES')}</div>
                     <div className='signatory-list-content'>
                       {signers.map((signer) => (
                         <div
@@ -399,10 +407,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                         </div>
                       ))}
                     </div>
-                    <div className={'threshold-label'}>{'Set approval threhsold'.toUpperCase()}</div>
+                    <div className={'threshold-label'}>{t('SET APPROVAL THRESHOLD')}</div>
                     <div className={'threshold-form-wrapper'}>
                       <Form.Item
                         name={'threshold'}
+                        normalize={(value: string) => value.trim()}
                         rules={[
                           {
                             validator: validateThreshold

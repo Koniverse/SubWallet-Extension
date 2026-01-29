@@ -266,22 +266,30 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const multisigList = useMemo(() => {
     const pendingTxs = Object.values(pendingMultisigTxs);
+    let filteredList: PendingMultisigTx[] = [];
 
     if (isAllAccount) {
-      return pendingTxs;
+      filteredList = pendingTxs;
+    } else if (!currentSubstrateAddress) {
+      filteredList = [];
+    } else {
+      filteredList = pendingTxs.filter((tx) => {
+        const txMultisigAddress = reformatAddress(tx.multisigAddress);
+        const currentSigner = reformatAddress(tx.currentSigner);
+        const isTargetMultisig = txMultisigAddress === currentSubstrateAddress;
+        const isSigner = currentSigner === currentSubstrateAddress;
+
+        return isTargetMultisig || isSigner;
+      });
     }
 
-    if (!currentSubstrateAddress) {
-      return [];
-    }
+    return filteredList.sort((a, b) => {
+      const timeA = a.timestamp || 0;
+      const timeB = b.timestamp || 0;
+      if (timeA === 0 && timeB !== 0) return -1;
+      if (timeB === 0 && timeA !== 0) return 1;
 
-    return pendingTxs.filter((tx) => {
-      const txMultisigAddress = reformatAddress(tx.multisigAddress);
-      const currentSigner = reformatAddress(tx.currentSigner);
-      const isTargetMultisig = txMultisigAddress === currentSubstrateAddress;
-      const isSigner = currentSigner === currentSubstrateAddress;
-
-      return isTargetMultisig || isSigner;
+      return timeB - timeA;
     });
   }, [pendingMultisigTxs, isAllAccount, currentSubstrateAddress]);
 
@@ -936,7 +944,8 @@ const History = styled(Component)<Props>(({ theme: { token } }: Props) => {
       }
     },
     '.history-header-wrapper': {
-      flex: 1
+      flex: 1,
+      overflow: 'hidden'
     },
 
     '.history-line-2': {

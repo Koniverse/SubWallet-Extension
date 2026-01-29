@@ -116,10 +116,10 @@ const Component = ({ className = '', item, onClick }: Props) => {
                 <AccountProxyAvatar
                   className={'__avatar'}
                   size={24}
-                  value={multisigAccInWallet?.proxyId || multisigAccInWallet?.address}
+                  value={multisigAccInWallet?.proxyId || item.multisigAddress}
                 />
               </div>
-              <span className={'multisig-account-value'}>{multisigAccInWallet?.name || toShort(multisigAccInWallet?.address || '', 8, 9)}</span>
+              <span className={'multisig-account-value'}>{multisigAccInWallet?.name || toShort(item.multisigAddress || '', 8, 9)}</span>
             </div>
           </div>
         </div>
@@ -200,7 +200,8 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
         fontSize: token.fontSizeHeading5,
         fontWeight: token.headingFontWeight,
         textOverflow: 'ellipsis',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        whiteSpace: 'nowrap'
       },
       '.__meta': {
         color: token.colorTextLight4,
@@ -256,6 +257,7 @@ export const MultisigHistoryItem = styled(Component)<Props>(({ theme: { token } 
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    whiteSpace: 'nowrap',
     fontSize: token.fontSizeSM,
     color: token.colorTextLight4,
     lineHeight: token.lineHeightSM,

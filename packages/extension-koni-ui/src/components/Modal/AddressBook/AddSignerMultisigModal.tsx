@@ -176,7 +176,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onClose}
           schema='secondary'
         >
-          {'Cancel'}
+          {t('Cancel')}
         </Button>
         <Button
           block
@@ -188,7 +188,7 @@ const Component: React.FC<Props> = (props: Props) => {
           )}
           onClick={onAddSigner}
         >
-          {'Add signer'}
+          {t('Add signer')}
         </Button>
       </div>
     );
@@ -245,7 +245,11 @@ const AddSignerMultisigModal = styled(Component)<Props>(({ theme: { token } }: P
 
     '.__list-item': {
       paddingTop: 0,
-      paddingBottom: 0
+      paddingBottom: 0,
+      '&.-disabled': {
+        cursor: 'not-allowed',
+        opacity: 0.4
+      }
     },
 
     '.___list-separator + .__list-item, .__list-item + .__list-item, .__list-item + .___list-separator': {
@@ -264,7 +268,8 @@ const AddSignerMultisigModal = styled(Component)<Props>(({ theme: { token } }: P
     '.account-list': {
       display: 'flex',
       flexDirection: 'column',
-      flex: '1'
+      flex: '1',
+      overflow: 'hidden'
     }
   };
 });

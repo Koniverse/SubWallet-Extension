@@ -75,6 +75,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const paramTransactionProcessId = paramTransactionProcess?.processId;
   const { activeModal, checkActive } = useContext(ModalContext);
   const { transactionProcessDetailModal: { open: openTransactionProcessModal } } = useContext(WalletModalContext);
+  const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
+  console.log('accountProxies', accountProxies);
 
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -531,6 +533,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     );
   }, [loadingNotification, onEnableNotification, t]);
 
+  console.log('currentProxyId', currentProxyId);
   const handleSwitchClick = useCallback(() => {
     markAllReadNotification(currentProxyId || ALL_ACCOUNT_KEY)
       .catch(console.error);
