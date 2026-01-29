@@ -75,7 +75,9 @@ const usePreCheckAction = ({ address, blockAllAccount = true, chain, message }: 
           if (signableProxies.length === 0) {
             block = true;
           }
-        } else if (!account.transactionActions.includes(action) || (mode === AccountSignMode.QR && account.chainType === 'ethereum' && isProductionMode)) {
+        }
+
+        if (!account.transactionActions.includes(action) || (mode === AccountSignMode.QR && account.chainType === 'ethereum' && isProductionMode)) {
           block = true;
 
           switch (mode) {
