@@ -2192,12 +2192,6 @@ export default class KoniState {
     return true;
   }
 
-  public async reloadCrowdloan () {
-    await this.subscription.reloadCrowdloan();
-
-    return true;
-  }
-
   public async approvePassPhishingPage (_url: string) {
     return new Promise<boolean>((resolve) => {
       this.settingService.getPassPhishingList((value) => {
