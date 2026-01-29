@@ -115,8 +115,6 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
     });
   }, [items]);
 
-  console.log('sortedItems', sortedItems);
-
   const groupedItemMap = useMemo<GroupedItems>(() => {
     const result: GroupedItems = {
       master: [],
