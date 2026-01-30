@@ -231,7 +231,6 @@ const Component: React.FC<Props> = (props: Props) => {
 const AddSignerMultisigModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     '.ant-sw-modal-body': {
-      display: 'flex',
       paddingBottom: 0
     },
 
