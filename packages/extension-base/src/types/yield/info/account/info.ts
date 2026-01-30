@@ -78,7 +78,7 @@ export interface BittensorStakingMetadata {
   bittensorRootClaimType?: BittensorRootClaimType;
 }
 
-export type BittensorRootClaimType = 'Swap' | 'Keep';
+export type BittensorRootClaimType = 'Swap' | 'Keep' | 'Others';
 
 /**
  * @interface SpecialYieldPositionInfo

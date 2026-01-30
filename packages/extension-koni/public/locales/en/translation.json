@@ -2617,5 +2617,9 @@
   "ui.TRANSACTION.Confirmations.Withdraw.signWith": "Sign with",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "Available balance",
   "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "Copied to clipboard",
-  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again"
+  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.othersCardDescription": "Choose the alpha token(s) you'd like to receive rewards in. This option is not supported in SubWallet",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.swapCardTitle": "Swap",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.keepCardTitle": "Keep",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.othersCardTitle": "Others"
 }

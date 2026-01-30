@@ -477,7 +477,9 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           });
         }
 
-        const rootClaimForAddress = rootClaimType[i]?.toString() as BittensorRootClaimType;
+        const rawType = rootClaimType[i]?.toString();
+
+        const rootClaimForAddress: BittensorRootClaimType = rawType === 'Swap' || rawType === 'Keep' ? rawType : 'Others';
 
         if (delegateStateInfo && delegateStateInfo.length > 0) {
           this.parseNominatorMetadata(chainInfo, delegatorState)
@@ -777,6 +779,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
   /* Others function  */
   public async handleChangeRootClaimType (type: BittensorRootClaimType): Promise<TransactionData> {
+    if (type !== 'Keep' && type !== 'Swap') {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
+    }
+
     const chainApi = await this.substrateApi.isReady;
 
     return chainApi.api.tx.subtensorModule.setRootClaimType(type);
