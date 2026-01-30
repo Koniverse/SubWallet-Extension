@@ -75,8 +75,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const paramTransactionProcessId = paramTransactionProcess?.processId;
   const { activeModal, checkActive } = useContext(ModalContext);
   const { transactionProcessDetailModal: { open: openTransactionProcessModal } } = useContext(WalletModalContext);
-  const accountProxies = useSelector((state: RootState) => state.accountState.accountProxies);
-  console.log('accountProxies', accountProxies);
 
   const { t } = useTranslation();
   const navigate = useNavigate();
