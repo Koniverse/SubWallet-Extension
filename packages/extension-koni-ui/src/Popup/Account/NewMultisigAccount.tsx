@@ -10,6 +10,7 @@ import { createAccountMultisig } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { SeedPhraseTermStorage, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, isNoAccount, reformatAddress } from '@subwallet/extension-koni-ui/utils';
+import { isSubstrateAddress } from '@subwallet/keyring';
 import { Button, Form, Icon, Input, ModalContext } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import CN from 'classnames';
@@ -20,8 +21,6 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
-
-import {isSubstrateAddress} from "@subwallet/keyring";
 
 type Props = ThemeProps;
 
@@ -39,6 +38,10 @@ export interface SignerData {
   proxyId?: string;
   formatedAddress: string;
 }
+
+export const trimNormalize = (value: unknown) => {
+  return typeof value === 'string' ? value.trim() : value;
+};
 
 const addressBookId = 'input-multisig-account-address-book-modal';
 
@@ -330,7 +333,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 <Form.Item
                   className={'signatory-form-address'}
                   name='signerAddress'
-                  normalize={(value: string) => value.trim()}
+                  normalize={trimNormalize}
                   rules={[
                     {
                       validator: validateSignerAddress
@@ -411,7 +414,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                     <div className={'threshold-form-wrapper'}>
                       <Form.Item
                         name={'threshold'}
-                        normalize={(value: string) => value.trim()}
+                        normalize={trimNormalize}
                         rules={[
                           {
                             validator: validateThreshold

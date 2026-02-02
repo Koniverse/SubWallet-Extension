@@ -533,15 +533,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const excludeNotificationIds = useMemo(() => {
     return notifications
-      .filter(acc => acc.actionType === NotificationActionType.MULTISIG_APPROVAL)
-      .map(acc => acc.id);
-  },[notifications])
+      .filter((acc) => acc.actionType === NotificationActionType.MULTISIG_APPROVAL)
+      .map((acc) => acc.id);
+  }, [notifications]);
 
   const handleSwitchClick = useCallback(() => {
     markAllReadNotification({
       proxyId: currentProxyId || ALL_ACCOUNT_KEY,
       excludeNotificationIds: excludeNotificationIds
-  })
+    })
       .catch(console.error);
 
     setLoading(true);

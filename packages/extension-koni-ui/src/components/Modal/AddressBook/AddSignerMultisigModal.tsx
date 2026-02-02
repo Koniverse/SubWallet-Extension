@@ -192,7 +192,7 @@ const Component: React.FC<Props> = (props: Props) => {
         </Button>
       </div>
     );
-  }, [onAddSigner, onClose]);
+  }, [onAddSigner, onClose, t]);
 
   useEffect(() => {
     if (!isActive) {
