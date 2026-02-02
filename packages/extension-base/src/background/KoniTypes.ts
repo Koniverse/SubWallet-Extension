@@ -24,7 +24,12 @@ import { AccountChainType, AccountJson, AccountsWithCurrentAddress, AddressJson,
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { RequestClaimBridge } from '@subwallet/extension-base/types/bridge';
 import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, InitMultisigTxRequest, InitMultisigTxResponse, RequestGetSignableAccountInfos, ResponseGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
-import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
+import {
+  GetNotificationParams,
+  MarkAllReadParams,
+  RequestIsClaimedPolygonBridge,
+  RequestSwitchStatusParams
+} from '@subwallet/extension-base/types/notification';
 import { InjectedAccount, InjectedAccountWithMeta, MetadataDefBase } from '@subwallet/extension-inject/types';
 import { BitcoinAddressType, KeyringPair$Meta } from '@subwallet/keyring/types';
 import { KeyringOptions } from '@subwallet/ui-keyring/options/types';
@@ -2797,7 +2802,7 @@ export interface KoniRequestSignatures {
 
   /* Notification Service */
   'pri(inappNotification.subscribeUnreadNotificationCountMap)': [null, Record<string, number>, Record<string, number>];
-  'pri(inappNotification.markAllReadNotification)': [string, null];
+  'pri(inappNotification.markAllReadNotification)': [MarkAllReadParams, null];
   'pri(inappNotification.switchReadNotificationStatus)': [RequestSwitchStatusParams, null];
   'pri(inappNotification.fetch)': [GetNotificationParams, _NotificationInfo[]];
   'pri(inappNotification.get)': [string, _NotificationInfo];

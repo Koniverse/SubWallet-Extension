@@ -531,8 +531,17 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     );
   }, [loadingNotification, onEnableNotification, t]);
 
+  const excludeNotificationIds = useMemo(() => {
+    return notifications
+      .filter(acc => acc.actionType === NotificationActionType.MULTISIG_APPROVAL)
+      .map(acc => acc.id);
+  },[notifications])
+
   const handleSwitchClick = useCallback(() => {
-    markAllReadNotification(currentProxyId || ALL_ACCOUNT_KEY)
+    markAllReadNotification({
+      proxyId: currentProxyId || ALL_ACCOUNT_KEY,
+      excludeNotificationIds: excludeNotificationIds
+  })
       .catch(console.error);
 
     setLoading(true);
@@ -545,7 +554,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         setTimeout(() => setLoading(false), 300);
       })
       .catch(console.error);
-  }, [currentProxyId, selectedFilterTab]);
+  }, [currentProxyId, selectedFilterTab, excludeNotificationIds]);
 
   useEffect(() => {
     fetchInappNotifications({

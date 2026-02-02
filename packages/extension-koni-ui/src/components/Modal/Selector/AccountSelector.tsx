@@ -24,6 +24,7 @@ type ListItem = AccountAddressItemType | ListItemGroupLabel;
 
 type GroupedItems = {
   master: AccountAddressItemType[];
+  multisig: AccountAddressItemType[];
   qrSigner: AccountAddressItemType[];
   watchOnly: AccountAddressItemType[];
   ledger: AccountAddressItemType[];
@@ -117,6 +118,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
   const groupedItemMap = useMemo<GroupedItems>(() => {
     const result: GroupedItems = {
       master: [],
+      multisig: [],
       qrSigner: [],
       watchOnly: [],
       ledger: [],
@@ -129,6 +131,9 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
         case AccountProxyType.SOLO:
         case AccountProxyType.UNIFIED:
           result.master.push(item);
+          break;
+        case AccountProxyType.MULTISIG:
+          result.multisig.push(item);
           break;
         case AccountProxyType.QR:
           result.qrSigner.push(item);
@@ -172,6 +177,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
     addGroup(groupedItemMap.watchOnly, 'Watch-only account', 'watch-only');
     addGroup(groupedItemMap.ledger, 'Ledger account', 'ledger');
     addGroup(groupedItemMap.injected, 'Injected account', 'injected');
+    addGroup(groupedItemMap.multisig, 'Multisig account', 'multisig');
     addGroup(groupedItemMap.unknown, 'Unknown account', 'unknown');
 
     return result;

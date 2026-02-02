@@ -18,3 +18,8 @@ export interface RequestIsClaimedPolygonBridge {
   counter: number,
   sourceNetwork: number
 }
+
+export interface MarkAllReadParams {
+  proxyId: string;
+  excludeNotificationIds?: string[];
+}

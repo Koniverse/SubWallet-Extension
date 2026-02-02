@@ -17,7 +17,11 @@ import { KeyringService } from '@subwallet/extension-base/services/keyring-servi
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
 import { ProcessTransactionData, ProcessType, SummaryEarningProcessData, SwapBaseTxData, YieldPoolType } from '@subwallet/extension-base/types';
-import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
+import {
+  GetNotificationParams,
+  MarkAllReadParams,
+  RequestSwitchStatusParams
+} from '@subwallet/extension-base/types/notification';
 import { formatNumber, getAddressesByChainType, reformatAddress } from '@subwallet/extension-base/utils';
 import { isSubstrateAddress } from '@subwallet/keyring';
 
@@ -46,8 +50,8 @@ export class InappNotificationService implements CronServiceInterface {
     this.onAccountProxyRemove();
   }
 
-  async markAllRead (proxyId: string) {
-    await this.dbService.markAllRead(proxyId);
+  async markAllRead (params: MarkAllReadParams) {
+    await this.dbService.markAllRead(params);
   }
 
   async switchReadStatus (params: RequestSwitchStatusParams) {

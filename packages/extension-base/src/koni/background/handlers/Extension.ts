@@ -66,7 +66,12 @@ import { AccountChainType, AccountJson, AccountProxyMap, AccountSignMode, Accoun
 import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, InitMultisigTxRequest, RequestGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
-import { GetNotificationParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
+import {
+  GetNotificationParams,
+  MarkAllReadParams,
+  RequestIsClaimedPolygonBridge,
+  RequestSwitchStatusParams
+} from '@subwallet/extension-base/types/notification';
 import { HandleSubstrateProxyWrappedTxRequest, RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types/substrateProxyAccount';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountJsonByAddress, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
@@ -5409,8 +5414,8 @@ export default class KoniExtension {
     return await this.#koniState.inappNotificationService.getUnreadNotificationsCountMap();
   }
 
-  private markAllReadNotification (proxyId: string) {
-    return this.#koniState.inappNotificationService.markAllRead(proxyId);
+  private markAllReadNotification (params: MarkAllReadParams) {
+    return this.#koniState.inappNotificationService.markAllRead(params);
   }
 
   private switchReadNotificationStatus (params: RequestSwitchStatusParams) {
@@ -6545,7 +6550,7 @@ export default class KoniExtension {
       case 'pri(inappNotification.subscribeUnreadNotificationCountMap)':
         return await this.subscribeUnreadNotificationCountMap(id, port);
       case 'pri(inappNotification.markAllReadNotification)':
-        return this.markAllReadNotification(request as string);
+        return this.markAllReadNotification(request as MarkAllReadParams);
       case 'pri(inappNotification.switchReadNotificationStatus)':
         return this.switchReadNotificationStatus(request as RequestSwitchStatusParams);
       case 'pri(inappNotification.fetch)':
