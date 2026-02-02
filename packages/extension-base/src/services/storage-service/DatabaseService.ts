@@ -17,11 +17,7 @@ import { HistoryQuery } from '@subwallet/extension-base/services/storage-service
 import YieldPoolStore from '@subwallet/extension-base/services/storage-service/db-stores/YieldPoolStore';
 import YieldPositionStore from '@subwallet/extension-base/services/storage-service/db-stores/YieldPositionStore';
 import { BalanceItem, ProcessTransactionData, StepStatus, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import {
-  GetNotificationParams,
-  MarkAllReadParams,
-  RequestSwitchStatusParams
-} from '@subwallet/extension-base/types/notification';
+import { GetNotificationParams, MarkAllReadParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { BN_ZERO, reformatAddress } from '@subwallet/extension-base/utils';
 import keyring from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';

@@ -286,8 +286,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return filteredList.sort((a, b) => {
       const timeA = a.timestamp || 0;
       const timeB = b.timestamp || 0;
-      if (timeA === 0 && timeB !== 0) return -1;
-      if (timeB === 0 && timeA !== 0) return 1;
+
+      if (timeA === 0 && timeB !== 0) {
+        return -1;
+      }
+
+      if (timeB === 0 && timeA !== 0) {
+        return 1;
+      }
 
       return timeB - timeA;
     });
