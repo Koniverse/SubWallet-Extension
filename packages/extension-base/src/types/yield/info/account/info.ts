@@ -67,6 +67,7 @@ export interface AbstractYieldPositionInfo extends BaseYieldPositionInfo {
     pendingStake?: string;
     compoundingStake?: string;
     manualStake?: string;
+    constituents?: string[]
   }
 }
 

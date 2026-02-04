@@ -18,7 +18,7 @@ import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 
-import { TaoDelegateStakingPoolHandler } from './handlers/delegate-staking';
+import { TaoDelegateStakingPoolHandler } from './handlers/delegated-staking';
 import { EarningImpactResult } from './handlers/native-staking/dtao';
 import TanssiNativeStakingPoolHandler from './handlers/native-staking/tanssi';
 import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, EnergyNativeStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, SubnetTaoStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';

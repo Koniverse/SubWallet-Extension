@@ -69,7 +69,7 @@ const useYieldPositionDetail = (slug: string, address?: string): Result => {
           subnetData: positionInfo.subnetData
         };
 
-        let rs: YieldPositionInfo = base as YieldPositionInfo;
+        let rs: YieldPositionInfo;
 
         switch (positionInfo.type) {
           case YieldPoolType.LENDING:
@@ -95,6 +95,11 @@ const useYieldPositionDetail = (slug: string, address?: string): Result => {
             } as NominationYieldPositionInfo;
             break;
           case YieldPoolType.SUBNET_STAKING:
+            rs = {
+              ...base
+            } as SubnetYieldPositionInfo;
+            break;
+          case YieldPoolType.DELEGATED_STAKING:
             rs = {
               ...base
             } as SubnetYieldPositionInfo;

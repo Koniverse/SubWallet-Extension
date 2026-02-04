@@ -638,7 +638,7 @@ const Component: React.FC = () => {
                   value={poolInfo?.proxyDeposit || 0}
                 />
                 <MetaInfo.Default label={'Strategy'}>
-                  {nominators[0].validatorIdentity || toShort(nominators[0].validatorAddress)}
+                  {nominators[0]?.validatorIdentity || toShort(nominators[0]?.validatorAddress)}
                 </MetaInfo.Default>
               </MetaInfo>
             )}

@@ -2626,8 +2626,12 @@
   "ui.TRANSACTION.screen.Transaction.Earn.subnets": "",
   "ui.TRANSACTION.screen.Transaction.Earn.proxyAddress": "",
   "ui.TRANSACTION.screen.Transaction.Earn.proxyDeposit": "",
-  "ui.TRANSACTION.Confirmations.DelegateStaking.proxyDeposit": "",
   "ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.stakingProcessDescription": "",
   "ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.stakingProcess": "",
-  "ui.EARNING.screen.EarningPositions.delegatedStaking": ""
+  "ui.EARNING.screen.EarningPositions.delegatedStaking": "",
+  "ui.BALANCE.screen.Tokens.DetailList.balanceFluctuationsDescription": "",
+  "ui.BALANCE.screen.Tokens.DetailList.balanceFluctuations": "",
+  "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyDepositDescription": "",
+  "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyDeposit": "",
+  "ui.TRANSACTION.screen.Transaction.Earn.copiedToClipboard": ""
 }

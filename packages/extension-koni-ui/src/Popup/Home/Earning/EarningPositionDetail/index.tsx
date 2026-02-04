@@ -212,6 +212,10 @@ function Component ({ compound,
       return true;
     }
 
+    if (poolInfo.type === YieldPoolType.DELEGATED_STAKING) {
+      return true;
+    }
+
     return false;
   }, [poolInfo.chain, poolInfo.type]);
 

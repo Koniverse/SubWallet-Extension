@@ -101,7 +101,7 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
     cancelUnstake: false,
     withdraw: false,
     claimReward: false,
-    changeValidator: true
+    changeValidator: false
   };
 
   constructor (state: KoniState, chain: string) {
@@ -248,11 +248,9 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
       for (let i = 0; i < stakeInfos.length; i++) {
         const [owner, delegateStateInfo] = stakeInfos[i];
 
-        const [proxies] =
-        proxiesList[i].toPrimitive() as unknown as [PrimitiveSubstrateProxyAccountItem[], string];
+        const [proxies] = proxiesList[i].toPrimitive() as unknown as [PrimitiveSubstrateProxyAccountItem[], string];
 
-        const stakingProxies =
-        proxies?.filter((p) => p.proxyType === 'Staking') || [];
+        const stakingProxies = proxies?.filter((p) => p.proxyType === 'Staking') || [];
 
         if (!stakingProxies.length || !delegateStateInfo?.length) {
           rsCallback({
@@ -325,15 +323,23 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
         }
 
         // ===== 3. Filter trusted staking proxies =====
-        const nominations: DelegatedStrategyInfo[] = stakingProxies
+        const constituentsSet = new Set<string>();
+
+        const nominations = stakingProxies
           .map((proxy) => {
-            const strategy = trustedStrategies.find((s) =>
-              isSameAddress(s.proxyAddress, proxy.delegate)
+            const strategy = trustedStrategies.find((strategy) =>
+              isSameAddress(strategy.proxyAddress, proxy.delegate)
             );
+
+            console.log('hmm', [strategy, trustedStrategies, proxy]);
 
             if (!strategy) {
               return null;
             }
+
+            Object.keys(strategy.targetConstituents.subnetWeights).forEach((subnet) => {
+              constituentsSet.add(subnet);
+            });
 
             return {
               status: EarningStatus.EARNING_REWARD,
@@ -345,25 +351,31 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
               substrateProxyType: proxy.proxyType,
               delay: proxy.delay
             };
-          })
-          .filter(Boolean) as DelegatedStrategyInfo[];
+          }) as DelegatedStrategyInfo[];
 
         const isTrusted = nominations.length > 0;
+        const constituents = Array.from(constituentsSet);
 
         rsCallback({
           ...defaultInfo,
           type: this.type,
           address: owner,
           balanceToken: this.nativeToken.slug,
-          totalStake: totalTao.toFixed(),
-          activeStake: totalTao.toFixed(),
+
+          totalStake: isTrusted ? totalTao.toFixed() : '0',
+          activeStake: isTrusted ? totalTao.toFixed() : '0',
+
           unstakeBalance: '0',
           status: isTrusted
             ? EarningStatus.EARNING_REWARD
             : EarningStatus.NOT_STAKING,
-          isBondedBefore: totalTao.gt(0),
-          nominations,
-          unstakings: []
+
+          isBondedBefore: isTrusted,
+          nominations: isTrusted ? nominations : [],
+          unstakings: [],
+          metadata: isTrusted && constituents.length
+            ? { constituents }
+            : undefined
         });
       }
     };
@@ -416,18 +428,19 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
 
   override async createJoinExtrinsic (data: SubmitJoinDelegateStaking, positionInfo?: YieldPositionInfo, bondDest?: string, netuid?: number): Promise<[TransactionData, YieldTokenBaseInfo]> {
     const chainApi = await this.substrateApi.isReady;
-    const { substrateProxyAddress, substrateProxyDeposit } = data;
+    const { address, substrateProxyAddress, substrateProxyDeposit } = data;
 
     if (!substrateProxyAddress) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
 
     const txList = [];
-    const proxies = await chainApi.api.query.proxy.proxies(substrateProxyAddress);
+    const proxies = await chainApi.api.query.proxy.proxies(address);
 
     if (proxies) {
       const [proxyDefs] = proxies;
 
+      console.log('checking', proxyDefs);
       proxyDefs.forEach((proxyDef) => {
         txList.push(
           chainApi.api.tx.proxy.removeProxy(
@@ -440,7 +453,6 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
     }
 
     txList.push(chainApi.api.tx.proxy.addProxy(substrateProxyAddress, 'Staking', 0));
-
     const extrinsic = txList.length === 1 ? txList[0] : chainApi.api.tx.utility.batchAll(txList);
 
     return [extrinsic, { slug: this.nativeToken.slug, amount: txList.length === 1 ? substrateProxyDeposit : '0' }];

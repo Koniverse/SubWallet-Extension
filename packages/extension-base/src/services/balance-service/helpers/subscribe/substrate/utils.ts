@@ -5,7 +5,7 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { FrameBalancesFreezesInfo, FrameBalancesHoldsInfo, FrameBalancesLocksInfo } from '@subwallet/extension-base/core/substrate/types';
 import { _BALANCE_CHAIN_GROUP, _BALANCE_LOCKED_ID_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { alphaPriceCache } from '@subwallet/extension-base/services/earning-service/handlers/delegate-staking/tao';
+import { alphaPriceCache } from '@subwallet/extension-base/services/earning-service/handlers/delegated-staking/tao';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
 import { LockedBalanceDetails } from '@subwallet/extension-base/types';
 import BigN from 'bignumber.js';

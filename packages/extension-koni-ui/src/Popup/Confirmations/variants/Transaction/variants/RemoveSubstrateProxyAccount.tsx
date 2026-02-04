@@ -1,9 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types';
+import { RequestRemoveSubstrateProxyAccount, YieldPoolType } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
-import { CommonTransactionInfo, SubstrateProxyAccountListModal } from '@subwallet/extension-koni-ui/components';
+import { AlertBox, CommonTransactionInfo, SubstrateProxyAccountListModal } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
@@ -26,6 +26,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const { activeModal } = useContext(ModalContext);
   const substrateProxyAccounts = useMemo(() => data.selectedSubstrateProxyAccounts, [data.selectedSubstrateProxyAccounts]);
+  const isDelegatedStaking = useMemo(() => data.poolInfo?.type === YieldPoolType.DELEGATED_STAKING, [data.poolInfo?.type]);
 
   const onClickDetail = useCallback(() => {
     activeModal(modalId);
@@ -77,6 +78,15 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />
       </MetaInfo>
+
+      {isDelegatedStaking &&
+        <AlertBox
+          className={CN(className, 'alert-box')}
+          description={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyDepositDescription')}
+          title={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyDeposit')}
+          type='info'
+        />}
+
       <SubstrateProxyAccountListModal
         substrateProxyAccounts={substrateProxyAccounts}
       />
@@ -113,6 +123,10 @@ const RemoveSubstrateProxyAccountTransactionConfirmation = styled(Component)<Pro
           color: token.colorTextLight2
         }
       }
+    },
+
+    '.alert-box': {
+      marginTop: token.marginSM
     }
   };
 });

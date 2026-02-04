@@ -2625,8 +2625,12 @@
   "ui.TRANSACTION.screen.Transaction.Earn.subnets": "Subnets",
   "ui.TRANSACTION.screen.Transaction.Earn.proxyAddress": "Proxy address",
   "ui.TRANSACTION.screen.Transaction.Earn.proxyDeposit": "Proxy deposit",
-  "ui.TRANSACTION.Confirmations.DelegateStaking.proxyDeposit": "Proxy deposit",
   "ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.stakingProcessDescription": "Once delegated to the proxy account, your staked funds will be distributed to subnets within the strategy. This process will take about 4 hours to complete",
   "ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.stakingProcess": "Staking process",
-  "ui.EARNING.screen.EarningPositions.delegatedStaking": "Delegated staking"
+  "ui.EARNING.screen.EarningPositions.delegatedStaking": "Delegated staking",
+  "ui.BALANCE.screen.Tokens.DetailList.balanceFluctuationsDescription": "Your balances will fluctuate every 4 hours as the rebalancing process occurs to align with your delegated staking strategy",
+  "ui.BALANCE.screen.Tokens.DetailList.balanceFluctuations": "Balance fluctuations",
+  "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyDepositDescription": "Once unstaked, the proxy deposit will be unlocked and returned to your accounts as transferable balance",
+  "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyDeposit": "Proxy deposit",
+  "ui.TRANSACTION.screen.Transaction.Earn.copiedToClipboard": "Copy to the clipboard"
 }

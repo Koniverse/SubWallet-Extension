@@ -20,7 +20,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const data = transaction.data as RequestAddSubstrateProxyAccount | RequestDelegateStakingSubmit;
 
-  const isDelegateStaking = 'poolPosition' in data;
+  const isDelegatedStaking = 'poolPosition' in data;
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
 
   return (
@@ -39,25 +39,14 @@ const Component: React.FC<Props> = (props: Props) => {
           label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyAccount')}
         />
 
-        {isDelegateStaking
-          ? (
-            <MetaInfo.Number
-              decimals={decimals}
-              label={t('ui.TRANSACTION.Confirmations.DelegateStaking.proxyDeposit')}
-              suffix={symbol}
-              value={data.substrateProxyDeposit}
-            />
-          )
-          : (
-            <MetaInfo.Default
-              className={CN('__validator-address', className)}
-              label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyType')}
-            >
-              <span className='__selected-validator-type'>
-                {data.substrateProxyType}
-              </span>
-            </MetaInfo.Default>
-          )}
+        <MetaInfo.Default
+          className={CN('__validator-address', className)}
+          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyType')}
+        >
+          <span className='__selected-validator-type'>
+            {isDelegatedStaking ? 'Staking' : data.substrateProxyType}
+          </span>
+        </MetaInfo.Default>
 
         <MetaInfo.Number
           decimals={decimals}
@@ -78,7 +67,7 @@ const Component: React.FC<Props> = (props: Props) => {
         />
       </MetaInfo>
       }
-      {isDelegateStaking &&
+      {isDelegatedStaking &&
       <AlertBox
         className={CN(className, 'alert-box')}
         description={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.stakingProcessDescription')}

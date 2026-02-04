@@ -28,8 +28,9 @@ import { convertFieldToObject, getExtrinsicTypeByPoolInfo, parseNominations, ref
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { CheckCircle, Info, PencilSimpleLine, PlusCircle } from 'phosphor-react';
+import { CheckCircle, Copy, Info, PencilSimpleLine, PlusCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -635,8 +636,9 @@ const Component = () => {
 
               // wrap proxy selection
               // for the Liquid Staking feature with multiple steps,
+              // for the Delegated Staking, we will remove all proxy then add new staking proxy
               // only the root account is allowed to sign transactions, even if a valid proxy account is available to sign on its behalf.
-              if (poolInfo.type !== YieldPoolType.LIQUID_STAKING && path.steps.length <= 2) {
+              if ((poolInfo.type !== YieldPoolType.LIQUID_STAKING && poolInfo.type !== YieldPoolType.DELEGATED_STAKING) && path.steps.length <= 2) {
                 selectSubstrateProxyAccountsToSign(
                   {
                     chain,
@@ -876,6 +878,13 @@ const Component = () => {
     );
   }, [amountValue, assetDecimals, earningRate, inputAsset.symbol, isDisabledSubnetContent, isSlippageAcceptable, maxSlippage.slippage, onOpenSlippageModal, poolChain, poolInfo.metadata.shortName, poolInfo.metadata?.subnetData?.subnetSymbol, subnetToken, t]);
 
+  const _onClickCopyButton = useCallback((e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    notify({
+      message: t('ui.TRANSACTION.screen.Transaction.Earn.copiedToClipboard')
+    });
+  }, [notify, t]);
+
   // For subnet staking
   const renderDelegatedStaking = useCallback(() => {
     const targeted = poolTargets?.[0];
@@ -904,7 +913,23 @@ const Component = () => {
           className='__label-bottom'
           label={t('ui.TRANSACTION.screen.Transaction.Earn.proxyAddress')}
         >
-          {toShort(targeted.address)}
+          <div className='__proxy-address'>
+            <span className='__proxy-address-text'>
+              {toShort(targeted.address)}
+            </span>
+
+            <CopyToClipboard text={targeted.address}>
+              <span
+                className='__proxy-address-copy'
+                onClick={_onClickCopyButton}
+              >
+                <Icon
+                  customSize='16px'
+                  phosphorIcon={Copy}
+                />
+              </span>
+            </CopyToClipboard>
+          </div>
         </MetaInfo.Default>
 
         {!!proxyDeposit && <MetaInfo.Number
@@ -917,7 +942,7 @@ const Component = () => {
         }
       </>
     );
-  }, [assetDecimals, inputAsset.symbol, poolInfo, poolTargets, t]);
+  }, [_onClickCopyButton, assetDecimals, inputAsset.symbol, poolInfo, poolTargets, t]);
 
   const isDisabledButton = useMemo(
     () =>
@@ -1598,6 +1623,15 @@ const Earn = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
     },
     '.__label-bottom, .__value': {
       color: `${token['gray-5']} !important`
+    },
+
+    '.__proxy-address': {
+      display: 'flex',
+      gap: '4px'
+    },
+
+    '.__proxy-address-copy': {
+      cursor: 'pointer'
     }
   };
 });
