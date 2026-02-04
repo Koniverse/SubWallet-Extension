@@ -12,7 +12,7 @@ import { approvePendingTx, cancelPendingTx, executePendingTx } from '@subwallet/
 import HistoryMultisigLayout from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigLayout';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { reformatAddress } from '@subwallet/extension-koni-ui/utils';
+import {isAccountAll, reformatAddress} from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, SwModal } from '@subwallet/react-ui';
 import { ArrowCircleUpRight } from 'phosphor-react';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -30,6 +30,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
   const { t } = useTranslation();
   const navigate = useNavigate();
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
+  const { currentAccountProxy } = useSelector((state:RootState) => state.accountState);
   const [loading, setLoading] = useState(false);
   const checkAction = usePreCheckAction({ address: data?.currentSigner });
   const { onError, onSuccess } = useHandleSubmitTransaction();
@@ -148,6 +149,18 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
     return data.approvals.map((address) => reformatAddress(address));
   }, [data?.approvals]);
 
+  const isCurrentAccountIsMultisig = useMemo(() => {
+
+    if (!currentAccountProxy || !data.multisigAddress) {
+      return false;
+    }
+
+    if (isAccountAll(currentAccountProxy.id)) {
+      return false
+    }
+    return reformatAddress(currentAccountProxy.accounts[0].address) === reformatAddress(data.multisigAddress);
+  }, [currentAccountProxy, data.multisigAddress]);
+
   const getMultisigFooter = useMemo(() => {
     const currentSigner = reformatAddress(data?.currentSigner);
     const isInitiator = reformatAddress(data.depositor) === currentSigner;
@@ -165,14 +178,14 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
             <Button
               block
               danger
-              disabled={loading}
+              disabled={loading || isCurrentAccountIsMultisig}
               loading={loading}
               onClick={checkAction(_onReject, ExtrinsicType.MULTISIG_CANCEL_TX)}
             >{t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.reject')}</Button>
             {thresholdReached && (
               <Button
                 block
-                disabled={loading}
+                disabled={loading || isCurrentAccountIsMultisig}
                 loading={loading}
                 onClick={checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX)}
               >{t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.execute')}</Button>
@@ -187,7 +200,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
             {!isApproved && !thresholdReached && (
               <Button
                 block
-                disabled={loading}
+                disabled={loading || isCurrentAccountIsMultisig}
                 loading={loading}
                 onClick={isLastSigner ? checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX) : checkAction(_onApprove, ExtrinsicType.MULTISIG_APPROVE_TX)}
               >
@@ -207,7 +220,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
             {thresholdReached && (
               <Button
                 block
-                disabled={loading}
+                disabled={loading || isCurrentAccountIsMultisig}
                 onClick={checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX)}
               >{t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.execute')}</Button>
             )}
@@ -215,7 +228,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
         )}
       </div>
     );
-  }, [_onApprove, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, formattedApprovals, loading, t]);
+  }, [_onApprove, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, formattedApprovals, loading, isCurrentAccountIsMultisig, t]);
 
   const modalFooter = useMemo(() => {
     if (!data) {
