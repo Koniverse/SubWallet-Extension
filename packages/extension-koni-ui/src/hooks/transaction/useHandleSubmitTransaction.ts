@@ -19,7 +19,7 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
   const { closeAlert, onDone, openAlert, openRecheckChainConnectionModal } = useTransactionContext<ClaimRewardParams>();
 
   const onSuccess = useCallback((rs: SWTransactionResponse) => {
-    const { errors, estimateFee, id, warnings } = rs;
+    const { address, errors, estimateFee, id, warnings } = rs;
 
     if (errors.length || warnings.length) {
       if (![t('ui.TRANSACTION.hook.transaction.useHandleSubmit.rejectedByUser'), 'Rejected by user'].includes(errors[0]?.message)) {
@@ -68,7 +68,7 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
         warnings[0] && setIgnoreWarnings?.(true);
       }
     } else if (id) {
-      onDone(id);
+      onDone(id, address);
     }
   }, [t, handleDataForInsufficientAlert, openRecheckChainConnectionModal, notify, openAlert, closeAlert, setIgnoreWarnings, onDone]);
 

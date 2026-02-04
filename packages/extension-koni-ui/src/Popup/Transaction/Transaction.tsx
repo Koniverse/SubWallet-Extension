@@ -307,8 +307,8 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
 
   // Navigate to finish page
   const onDone = useCallback(
-    (extrinsicHash: string) => {
-      navigate(`/transaction-done/${from}/${chain}/${extrinsicHash}`, { replace: true });
+    (extrinsicHash: string, transactionFrom?: string) => {
+      navigate(`/transaction-done/${transactionFrom || from}/${chain}/${extrinsicHash}`, { replace: true });
     },
     [navigate, from, chain]
   );

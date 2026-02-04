@@ -299,8 +299,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     });
   }, [pendingMultisigTxs, isAllAccount, currentSubstrateAddress]);
 
-  console.log('multisigList', multisigList);
-
   const notiMultisigPendingTxItem = useMemo(() => {
     const parts = notiMultisigPendingTxId.split('___');
     const multisigKey = parts.slice(1, -1).join('___');
