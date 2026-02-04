@@ -104,7 +104,7 @@ const useGroupYieldPosition = (): YieldPositionInfo[] => {
         subnetData: positionInfo.subnetData
       };
 
-      let rs: YieldPositionInfo;
+      let rs: YieldPositionInfo = base as YieldPositionInfo;
 
       switch (positionInfo.type) {
         case YieldPoolType.LENDING:

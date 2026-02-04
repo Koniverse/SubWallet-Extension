@@ -116,7 +116,7 @@ export async function parseIdentity (substrateApi: _SubstrateApi, address: strin
 }
 
 export function isActionFromValidator (stakingType: YieldPoolType, chain: string) {
-  if (stakingType === YieldPoolType.NOMINATION_POOL || stakingType === YieldPoolType.LIQUID_STAKING || stakingType === YieldPoolType.LENDING) {
+  if (stakingType === YieldPoolType.NOMINATION_POOL || stakingType === YieldPoolType.LIQUID_STAKING || stakingType === YieldPoolType.LENDING || stakingType === YieldPoolType.DELEGATED_STAKING) {
     return false;
   }
 

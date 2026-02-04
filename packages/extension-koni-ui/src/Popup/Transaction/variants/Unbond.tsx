@@ -6,16 +6,17 @@ import { AmountData, ExtrinsicType, NominationInfo } from '@subwallet/extension-
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
-import { AccountJson, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountJson, DelegatedStrategyInfo, RequestRemoveSubstrateProxyAccount, RequestYieldLeave, SlippageType, SpecialYieldPoolMetadata, SubnetYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AccountSelector, AlertBox, AmountInput, HiddenInput, InstructionItem, MetaInfo, NominationSelector } from '@subwallet/extension-koni-ui/components';
-import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA, UNSTAKE_TANSSI_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
+import { BN_ZERO, UNSTAKE_ALERT_DATA, UNSTAKE_BIFROST_ALERT_DATA, UNSTAKE_BITTENSOR_ALERT_DATA, UNSTAKE_DELEGATED_STRATEGY, UNSTAKE_TANSSI_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
 import { yieldSubmitLeavePool } from '@subwallet/extension-koni-ui/messaging';
+import { handleRemoveSubstrateProxyAccount } from '@subwallet/extension-koni-ui/messaging/transaction/substrateProxy';
 import { FormCallbacks, FormFieldData, ThemeProps, UnStakeParams } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, getBannerButtonIcon, getEarningTimeText, noop, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, getBannerButtonIcon, getEarningTimeText, noop, simpleCheckForm, toShort } from '@subwallet/extension-koni-ui/utils';
 import { BackgroundIcon, Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
 import { getAlphaColor } from '@subwallet/react-ui/lib/theme/themes/default/colorAlgorithm';
 import BigN, { BigNumber } from 'bignumber.js';
@@ -119,6 +120,8 @@ const Component: React.FC = () => {
   // For subnet staking
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
+  const isDelegateStaking = useMemo(() => [YieldPoolType.DELEGATED_STAKING].includes(poolType), [poolType]);
+
   const [maxSlippage, setMaxSlippage] = useState<SlippageType>({ slippage: new BigN(0.005), isCustomType: true });
 
   const isDisabledSubnetContent = useMemo(
@@ -280,6 +283,14 @@ const Component: React.FC = () => {
     [chainInfoMap, chainValue]
   );
 
+  const nominators = useMemo(() => {
+    if (fromValue && positionInfo?.nominations && positionInfo.nominations.length) {
+      return positionInfo.nominations.filter((n) => new BigN(n.activeStake || '0').gt(BN_ZERO));
+    }
+
+    return [];
+  }, [fromValue, positionInfo?.nominations]);
+
   const exType = useMemo(() => {
     if (poolType === YieldPoolType.NOMINATION_POOL || poolType === YieldPoolType.NATIVE_STAKING || poolType === YieldPoolType.SUBNET_STAKING) {
       return ExtrinsicType.STAKING_UNBOND;
@@ -311,6 +322,10 @@ const Component: React.FC = () => {
       if (chainValue === 'interlay') {
         return ExtrinsicType.UNSTAKE_QDOT;
       }
+    }
+
+    if (poolType === YieldPoolType.DELEGATED_STAKING) {
+      return ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT;
     }
 
     return ExtrinsicType.STAKING_UNBOND;
@@ -379,6 +394,25 @@ const Component: React.FC = () => {
 
     // send unstake transaction
     const sendPromise = (signerSubstrateProxyAddress?: string) => {
+      if (isDelegateStaking) {
+        const nominator = nominators[0] as DelegatedStrategyInfo;
+
+        const selectedSubstrateProxyAccount = {
+          substrateProxyAddress: nominator.validatorAddress,
+          substrateProxyType: nominator.substrateProxyType,
+          delay: nominator.delay
+        };
+
+        const request: RequestRemoveSubstrateProxyAccount = {
+          address: from,
+          chain,
+          poolInfo,
+          selectedSubstrateProxyAccounts: [selectedSubstrateProxyAccount]
+        };
+
+        return handleRemoveSubstrateProxyAccount({ ...request, signerSubstrateProxyAddress }).then(onSuccess);
+      }
+
       return yieldSubmitLeavePool({
         ...request,
         signerSubstrateProxyAddress
@@ -412,7 +446,7 @@ const Component: React.FC = () => {
           setLoading(false);
         });
     }, 300);
-  }, [currentValidator, exType, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, selectSubstrateProxyAccountsToSign, stakingFee]);
+  }, [currentValidator, exType, isDelegateStaking, maxSlippage.slippage, mustChooseValidator, nominators, onError, onSuccess, poolInfo, positionInfo, selectSubstrateProxyAccountsToSign, stakingFee]);
 
   const onClickSubmit = useCallback((values: UnStakeParams) => {
     if (currentConfirmation) {
@@ -453,14 +487,6 @@ const Component: React.FC = () => {
   const accountList = useMemo(() => {
     return accounts.filter(filterAccount(allPositions, chainInfoMap, poolInfo));
   }, [accounts, allPositions, chainInfoMap, poolInfo]);
-
-  const nominators = useMemo(() => {
-    if (fromValue && positionInfo?.nominations && positionInfo.nominations.length) {
-      return positionInfo.nominations.filter((n) => new BigN(n.activeStake || '0').gt(BN_ZERO));
-    }
-
-    return [];
-  }, [fromValue, positionInfo?.nominations]);
 
   useEffect(() => {
     if (poolInfo.metadata.availableMethod.defaultUnstake && poolInfo.metadata.availableMethod.fastUnstake) {
@@ -507,6 +533,10 @@ const Component: React.FC = () => {
   }, [chainValue]);
 
   const unstakeAlertData = useMemo(() => {
+    if (poolType === YieldPoolType.DELEGATED_STAKING) {
+      return UNSTAKE_DELEGATED_STRATEGY;
+    }
+
     switch (true) {
       case poolChain === 'bifrost_dot':
         return UNSTAKE_BIFROST_ALERT_DATA;
@@ -519,7 +549,7 @@ const Component: React.FC = () => {
       default:
         return UNSTAKE_ALERT_DATA;
     }
-  }, [poolChain]);
+  }, [poolChain, poolType]);
 
   return (
     <>
@@ -567,37 +597,51 @@ const Component: React.FC = () => {
               poolInfo={poolInfo}
             />
           </Form.Item>
-
-          {
-            mustChooseValidator && (
+          {!(poolInfo.type === YieldPoolType.DELEGATED_STAKING)
+            ? (
               <>
-                {renderBounded()}
+                {mustChooseValidator && (
+                  <>
+                    {renderBounded()}
+                  </>
+                )}
+
+                <Form.Item
+                  hidden={isMythosStaking}
+                  name={'value'}
+                  statusHelpAsTooltip={true}
+                >
+                  <AmountInput
+                    decimals={decimals}
+                    maxValue={bondedValue}
+                    showMaxButton={true}
+                  />
+                </Form.Item>
+
+                {
+                  !isDisabledSubnetContent && earningRate > 0 && (
+                    <>
+                      {renderRate()}
+                    </>
+                  )
+                }
+
+                {!mustChooseValidator && renderBounded()}
               </>
             )
-          }
-
-          <Form.Item
-            hidden={isMythosStaking}
-            name={'value'}
-            statusHelpAsTooltip={true}
-          >
-            <AmountInput
-              decimals={decimals}
-              maxValue={bondedValue}
-              showMaxButton={true}
-            />
-          </Form.Item>
-
-          {
-            !isDisabledSubnetContent && earningRate > 0 && (
-              <>
-                {renderRate()}
-              </>
-            )
-          }
-
-          {!mustChooseValidator && renderBounded()}
-
+            : (
+              <MetaInfo hasBackgroundWrapper={true}>
+                <MetaInfo.Number
+                  decimals={decimals}
+                  label={'Amount'}
+                  suffix={symbol}
+                  value={poolInfo?.proxyDeposit || 0}
+                />
+                <MetaInfo.Default label={'Strategy'}>
+                  {nominators[0].validatorIdentity || toShort(nominators[0].validatorAddress)}
+                </MetaInfo.Default>
+              </MetaInfo>
+            )}
           <Form.Item
             hidden={!showFastLeave}
             name={'fastLeave'}

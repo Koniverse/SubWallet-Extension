@@ -6,11 +6,13 @@ import { BalanceType } from '@subwallet/extension-base/types';
 import { useGetBalance } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ActivityIndicator, Icon, Number, Tooltip, Typography } from '@subwallet/react-ui';
+import { ActivityIndicator, Icon, ModalContext, Number, Tooltip, Typography } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Info } from 'phosphor-react';
-import React, { useEffect } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
+
+import { TotalEquivalentDetailModal } from '../../Home/Tokens/TotalEquivalentDetailModal';
 
 type Props = ThemeProps & {
   address?: string,
@@ -37,7 +39,22 @@ const Component = ({ address,
   onBalanceReady, tokenSlug }: Props) => {
   const { t } = useTranslation();
   const { token } = useTheme() as Theme;
+  const { activeModal, inactiveModal } = useContext(ModalContext);
+  const totalEquivalentDetailModalId = 'total-equivalent-details-modal';
+
   const { error, isLoading, nativeTokenBalance, nativeTokenSlug, tokenBalance } = useGetBalance(chain, address, tokenSlug, isSubscribe, extrinsicType, balanceType);
+
+  const [lockedDetailsModalVisible, setLockedDetailsModalVisible] = useState(false);
+
+  const handleOpenLockedDetailsModal = useCallback(() => {
+    setLockedDetailsModalVisible(true);
+    activeModal(totalEquivalentDetailModalId);
+  }, [activeModal]);
+
+  const handleCloseLockedDetailsModal = useCallback(() => {
+    inactiveModal(totalEquivalentDetailModalId);
+    setLockedDetailsModalVisible(false);
+  }, [inactiveModal]);
 
   useEffect(() => {
     onBalanceReady?.(!isLoading && !error);
@@ -119,6 +136,35 @@ const Component = ({ address,
           </>
         )
       }
+      {balanceType === BalanceType.TOTAL_EQUIVALENT && !isLoading && !error && (
+        <>
+          <span
+            className={CN('__info-icon-wrapper')}
+            onClick={handleOpenLockedDetailsModal}
+          >
+            <Icon
+              className={'__info-icon'}
+              phosphorIcon={Info}
+            />
+          </span>
+
+          {lockedDetailsModalVisible && (
+            <TotalEquivalentDetailModal
+              address={address}
+              chain={chain}
+              className={'total-equivalent-detail-modal'}
+              decimals={nativeTokenBalance.decimals || 18}
+              extrinsicType={extrinsicType}
+              id={totalEquivalentDetailModalId}
+              isSubscribe={isSubscribe}
+              onCancel={handleCloseLockedDetailsModal}
+              symbol={nativeTokenBalance.symbol}
+              tokenSlug={tokenSlug}
+            />
+          )}
+        </>
+      )
+      }
     </Typography.Paragraph>
   );
 };
@@ -153,6 +199,10 @@ const FreeBalance = styled(Component)<Props>(({ theme: { token } }: Props) => {
 
     '&.ant-typography': {
       marginBottom: 0
+    },
+
+    '.__info-icon-wrapper': {
+      cursor: 'pointer'
     }
   };
 });

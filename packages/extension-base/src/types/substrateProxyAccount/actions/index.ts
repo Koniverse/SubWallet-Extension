@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BaseRequestSign, InternalRequestSign } from '../../transaction';
+import { YieldPoolInfo } from '../../yield';
 import { SubstrateProxyAccountItem, SubstrateProxyType } from '..';
 
 export interface AddSubstrateProxyAccountParams extends BaseRequestSign {
@@ -19,6 +20,7 @@ export interface RemoveSubstrateProxyAccountParams extends BaseRequestSign {
   chain: string;
   selectedSubstrateProxyAccounts: SubstrateProxyAccountItem[]
   isRemoveAll?: boolean;
+  poolInfo?: YieldPoolInfo // use for delegated staking
 }
 
 export type RequestRemoveSubstrateProxyAccount = InternalRequestSign<RemoveSubstrateProxyAccountParams>;

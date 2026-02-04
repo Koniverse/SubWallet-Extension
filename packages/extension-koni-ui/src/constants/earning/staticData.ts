@@ -220,6 +220,42 @@ export const EARNING_DATA_RAW = {
       iconColor: '#008dff'
     }
   ],
+  [YieldPoolType.DELEGATED_STAKING]: [
+    {
+      icon: 'ThumbsUp',
+      title: 'Staking process',
+      description:
+        'A staking proxy will be activated when you delegate to any staking strategy in order to perform staking operations on your behalf',
+      iconColor: '#aada62'
+    },
+    {
+      icon: 'Aperture',
+      title: 'Minimum balance required',
+      description:
+        'A minimum {maintainSymbol}-equivalent balance of {maintainBalance} {maintainSymbol} is required to delegate to any strategy',
+      iconColor: '#e6478e'
+    },
+    {
+      icon: 'Coins',
+      title: 'Unstake and withdraw',
+      description: 'Once staked, your funds will be locked. You can unstake at any time for immediate withdrawal by removing the staking proxy. Keep in mind that this action is not automated and will incur network fees.',
+      iconColor: '#e6dc25'
+    },
+    {
+      icon: 'CheckCircle',
+      title: 'Automatic alpha claim',
+      description:
+        'Rewards will be automatically claimed in alpha tokens from subnets within the selected strategy',
+      iconColor: '#4cd9ac'
+    },
+    {
+      icon: 'Eye',
+      title: 'Portfolio rebalancing',
+      description:
+        'Once staked, your entire balances on {shortName} will be used for rebalancing. This process is automated and occurs every {paidOut} {paidOutTimeUnit} to align with your strategy',
+      iconColor: '#008dff'
+    }
+  ],
   [YieldPoolType.PARACHAIN_STAKING]: [],
   [YieldPoolType.SINGLE_FARMING]: []
 };
@@ -238,6 +274,11 @@ export const STAKE_ALERT_DATA = {
   title: 'Pay attention!',
   description:
     'Don’t stake all your funds. Keep in mind that you need at least {tokenAmount} in your free balance to pay gas fees for claiming rewards, unstaking and withdrawing'
+};
+
+export const DELEGATED_STAKING_ALERT_DATA = {
+  title: 'All balances will be used',
+  description: 'Your entire {symbol}-equivalent balance will be used for staking and setting up proxy'
 };
 
 export const UNSTAKE_ALERT_DATA = [
@@ -299,5 +340,14 @@ export const UNSTAKE_TANSSI_ALERT_DATA = [
     description: 'During the unstaking period of {unBondedTime}, your tokens produce no rewards',
     icon: 'Coins',
     iconColor: '#e6dc25'
+  }
+];
+
+export const UNSTAKE_DELEGATED_STRATEGY = [
+  {
+    title: 'Proxy undelegation',
+    description: 'Staking proxy will be revoked and remove upon unstaking',
+    icon: 'Info',
+    iconColor: '#004BFF'
   }
 ];

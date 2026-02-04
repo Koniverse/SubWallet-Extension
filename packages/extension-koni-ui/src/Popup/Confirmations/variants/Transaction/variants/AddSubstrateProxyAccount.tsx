@@ -1,9 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RequestAddSubstrateProxyAccount } from '@subwallet/extension-base/types';
+import { RequestAddSubstrateProxyAccount, RequestDelegateStakingSubmit } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
-import { CommonTransactionInfo } from '@subwallet/extension-koni-ui/components';
+import { AlertBox, CommonTransactionInfo } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
 import CN from 'classnames';
@@ -18,7 +18,9 @@ type Props = BaseTransactionConfirmationProps;
 const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
   const { t } = useTranslation();
-  const data = transaction.data as RequestAddSubstrateProxyAccount;
+  const data = transaction.data as RequestAddSubstrateProxyAccount | RequestDelegateStakingSubmit;
+
+  const isDelegateStaking = 'poolPosition' in data;
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
 
   return (
@@ -37,14 +39,25 @@ const Component: React.FC<Props> = (props: Props) => {
           label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyAccount')}
         />
 
-        <MetaInfo.Default
-          className={CN('__validator-address', className)}
-          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyType')}
-        >
-          <span className='__selected-validator-type'>
-            {data.substrateProxyType}
-          </span>
-        </MetaInfo.Default>
+        {isDelegateStaking
+          ? (
+            <MetaInfo.Number
+              decimals={decimals}
+              label={t('ui.TRANSACTION.Confirmations.DelegateStaking.proxyDeposit')}
+              suffix={symbol}
+              value={data.substrateProxyDeposit}
+            />
+          )
+          : (
+            <MetaInfo.Default
+              className={CN('__validator-address', className)}
+              label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyType')}
+            >
+              <span className='__selected-validator-type'>
+                {data.substrateProxyType}
+              </span>
+            </MetaInfo.Default>
+          )}
 
         <MetaInfo.Number
           decimals={decimals}
@@ -63,9 +76,15 @@ const Component: React.FC<Props> = (props: Props) => {
           chainSlug={transaction.chain}
           label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.signWith')}
         />
-
       </MetaInfo>
       }
+      {isDelegateStaking &&
+      <AlertBox
+        className={CN(className, 'alert-box')}
+        description={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.stakingProcessDescription')}
+        title={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.stakingProcess')}
+        type='info'
+      />}
     </div>
   );
 };
@@ -84,6 +103,10 @@ const AddSubstrateProxyAccountTransactionConfirmation = styled(Component)<Props>
 
     '.__selected-validator-type': {
       color: token['magenta-6']
+    },
+
+    '&.alert-box': {
+      marginTop: token.marginSM
     }
   };
 });

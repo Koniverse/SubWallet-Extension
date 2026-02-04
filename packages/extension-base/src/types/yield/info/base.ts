@@ -24,8 +24,11 @@ export enum YieldPoolType {
   /** Parachain staking */
   PARACHAIN_STAKING = 'PARACHAIN_STAKING',
 
-  /** Subnet stakingg */
-  SUBNET_STAKING = 'SUBNET_STAKING'
+  /** Subnet staking */
+  SUBNET_STAKING = 'SUBNET_STAKING',
+
+  /* Delegate staking */
+  DELEGATED_STAKING = 'DELEGATED_STAKING'
 }
 
 /**

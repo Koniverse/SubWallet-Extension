@@ -128,7 +128,11 @@ export interface SubnetYieldPositionInfo extends AbstractYieldPositionInfo {
   };
 }
 
+export interface DelegatedYieldPositionInfo extends AbstractYieldPositionInfo {
+  type: YieldPoolType.DELEGATED_STAKING;
+}
+
 /**
  * Info of yield pool
  * */
-export type YieldPositionInfo = NativeYieldPositionInfo | NominationYieldPositionInfo | LiquidYieldPositionInfo | LendingYieldPositionInfo | SubnetYieldPositionInfo;
+export type YieldPositionInfo = NativeYieldPositionInfo | NominationYieldPositionInfo | LiquidYieldPositionInfo | LendingYieldPositionInfo | SubnetYieldPositionInfo | DelegatedYieldPositionInfo;

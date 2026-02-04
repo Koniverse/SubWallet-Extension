@@ -30,4 +30,10 @@ export interface SubstrateProxyAccountGroup {
   substrateProxyDeposit: string;
 }
 
+export type PrimitiveSubstrateProxyAccountItem = {
+  delegate: string;
+  proxyType: SubstrateProxyType; // type of proxy retrieved from on-chain data
+  delay: number;
+};
+
 export * from './actions';

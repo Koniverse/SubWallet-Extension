@@ -448,6 +448,9 @@ export class InappNotificationService implements CronServiceInterface {
         case YieldPoolType.SUBNET_STAKING:
           method = 'Subnet staking'; // todo: confirm with tester
           break;
+        case YieldPoolType.DELEGATED_STAKING:
+          method = 'Delegated staking';
+          break;
       }
 
       title = '[{{accountName}}] STAKED {{asset}}'

@@ -34,7 +34,7 @@ const useGetPoolTargetList = (slug: string): PoolTargetData[] => {
         };
 
         result.push(nominationPoolItem);
-      } else {
+      } else if ('totalStake' in poolTarget) {
         const validatorItem: ValidatorDataType = {
           ...poolTarget,
           decimals,

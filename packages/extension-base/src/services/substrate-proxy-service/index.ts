@@ -4,7 +4,7 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { BasicTxErrorType, TransactionData } from '@subwallet/extension-base/types';
-import { AddSubstrateProxyAccountParams, RemoveSubstrateProxyAccountParams, RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountGroup, SubstrateProxyAccountItem, SubstrateProxyType } from '@subwallet/extension-base/types/substrateProxyAccount';
+import { AddSubstrateProxyAccountParams, PrimitiveSubstrateProxyAccountItem, RemoveSubstrateProxyAccountParams, RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountGroup, SubstrateProxyAccountItem } from '@subwallet/extension-base/types/substrateProxyAccount';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
@@ -12,12 +12,6 @@ import { Enum } from '@polkadot/types';
 
 import { _SubstrateApi } from '../chain-service/types';
 import { txTypeToSubstrateProxyMap } from './constant';
-
-type PrimitiveSubstrateProxyAccountItem = {
-  delegate: string;
-  proxyType: SubstrateProxyType; // type of proxy retrieved from on-chain data
-  delay: number;
-};
 
 export default class SubstrateProxyAccountService {
   protected readonly state: KoniState;

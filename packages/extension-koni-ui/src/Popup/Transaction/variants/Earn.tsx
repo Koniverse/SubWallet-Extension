@@ -7,15 +7,15 @@ import { _handleDisplayForEarningError, _handleDisplayInsufficientEarningError }
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { BalanceType, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
+import { BalanceType, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, StrategyInfo, SubmitJoinDelegateStaking, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningStrategySelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { EarningProcessItem } from '@subwallet/extension-koni-ui/components/Earning';
 import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
 import { EarningInstructionModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
 import { SlippageModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
-import { EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, STAKE_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
+import { DELEGATED_STAKING_ALERT_DATA, EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, STAKE_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useChainConnection, useCoreCreateReformatAddress, useCreateGetSubnetStakingTokenName, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
@@ -24,7 +24,7 @@ import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, submitProces
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, getExtrinsicTypeByPoolInfo, parseNominations, reformatAddress, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, getExtrinsicTypeByPoolInfo, parseNominations, reformatAddress, simpleCheckForm, toShort } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -142,13 +142,17 @@ const Component = () => {
   }, [slug, getCurrentConfirmation]);
 
   const mustChooseTarget = useMemo(
-    () => [YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING, YieldPoolType.NOMINATION_POOL].includes(poolType),
+    () => [YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING, YieldPoolType.NOMINATION_POOL, YieldPoolType.DELEGATED_STAKING].includes(poolType),
     [poolType]
   );
 
   const balanceTypeForPool = useMemo(() => {
     if ([YieldPoolType.NATIVE_STAKING, YieldPoolType.NOMINATION_POOL].includes(poolType)) {
       return BalanceType.TOTAL_MINUS_RESERVED;
+    }
+
+    if ([YieldPoolType.DELEGATED_STAKING].includes(poolType)) {
+      return BalanceType.TOTAL_EQUIVALENT;
     }
 
     return undefined;
@@ -283,6 +287,28 @@ const Component = () => {
         });
 
         return result;
+      } else if (YieldPoolType.DELEGATED_STAKING === poolType) {
+        const strategyList = _poolTargets as StrategyInfo[];
+
+        if (!strategyList) {
+          return [];
+        }
+
+        const result: StrategyInfo[] = [];
+        const nominations = parseNominations(poolTargetValue);
+        const newStrategyList: { [address: string]: StrategyInfo } = {};
+
+        strategyList.forEach((strategy) => {
+          newStrategyList[reformatAddress(strategy.address)] = strategy;
+        });
+        nominations.forEach((nomination) => {
+          if (newStrategyList?.[reformatAddress(nomination)]) {
+            // remember the format of the address
+            result.push(newStrategyList[reformatAddress(nomination)]);
+          }
+        });
+
+        return result;
       } else {
         return [];
       }
@@ -324,7 +350,14 @@ const Component = () => {
 
   const onFieldsChange: FormCallbacks<EarnParams>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     // TODO: field change
-    const { empty, error } = simpleCheckForm(allFields, ['--asset', '--fromAccountProxy']);
+    const requiredFields: string[] = ['--asset', '--fromAccountProxy'];
+
+    // Do not validate amount when pool type is delegated staking
+    if (poolType === YieldPoolType.DELEGATED_STAKING) {
+      requiredFields.push('--value');
+    }
+
+    const { empty, error } = simpleCheckForm(allFields, requiredFields);
 
     const values = convertFieldToObject<EarnParams>(allFields);
 
@@ -480,7 +513,7 @@ const Component = () => {
       let processId = processState.processId;
 
       const getData = (submitStep: number): SubmitYieldJoinData => {
-        if ([YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING].includes(poolInfo.type) && target) {
+        if ([YieldPoolType.NOMINATION_POOL, YieldPoolType.NATIVE_STAKING, YieldPoolType.SUBNET_STAKING, YieldPoolType.DELEGATED_STAKING].includes(poolInfo.type) && target) {
           const targets = poolTargets;
 
           if (poolInfo.type === YieldPoolType.NOMINATION_POOL) {
@@ -493,6 +526,17 @@ const Component = () => {
               selectedPool,
               selectedValidators: targets
             } as SubmitJoinNominationPool;
+          } else if (poolInfo.type === YieldPoolType.DELEGATED_STAKING) {
+            const selectedStrategy = targets[0];
+
+            return {
+              slug: slug,
+              address: from,
+              amount: 0,
+              substrateProxyAddress: selectedStrategy.address,
+              selectedValidators: targets,
+              substrateProxyDeposit: poolInfo.proxyDeposit
+            } as unknown as SubmitJoinDelegateStaking;
           } else {
             return {
               slug: slug,
@@ -686,6 +730,8 @@ const Component = () => {
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolType), [poolType]);
+  const isDelegatedStaking = useMemo(() => [YieldPoolType.DELEGATED_STAKING].includes(poolType), [poolType]);
+
   const subnetToken = useMemo(() => {
     return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.netuid || 0);
   }, [getSubnetStakingTokenName, poolInfo.chain, poolInfo.metadata.subnetData?.netuid]);
@@ -831,13 +877,54 @@ const Component = () => {
   }, [amountValue, assetDecimals, earningRate, inputAsset.symbol, isDisabledSubnetContent, isSlippageAcceptable, maxSlippage.slippage, onOpenSlippageModal, poolChain, poolInfo.metadata.shortName, poolInfo.metadata?.subnetData?.subnetSymbol, subnetToken, t]);
 
   // For subnet staking
+  const renderDelegatedStaking = useCallback(() => {
+    const targeted = poolTargets?.[0];
+
+    if (!targeted || !('address' in targeted)) {
+      return null;
+    }
+
+    const proxyDeposit = poolInfo && 'proxyDeposit' in poolInfo ? poolInfo.proxyDeposit : 0;
+
+    return (
+      <>
+        {'constituents' in targeted && targeted.constituents?.length > 0 && (
+          <MetaInfo.Default
+            className='__label-bottom'
+            label={t('ui.TRANSACTION.screen.Transaction.Earn.subnetLabel')}
+          >
+            {targeted.constituents.length}{' '}
+            {targeted.constituents.length > 1
+              ? t('ui.TRANSACTION.screen.Transaction.Earn.subnets')
+              : t('ui.TRANSACTION.screen.Transaction.Earn.subnet')}
+          </MetaInfo.Default>
+        )}
+
+        <MetaInfo.Default
+          className='__label-bottom'
+          label={t('ui.TRANSACTION.screen.Transaction.Earn.proxyAddress')}
+        >
+          {toShort(targeted.address)}
+        </MetaInfo.Default>
+
+        {!!proxyDeposit && <MetaInfo.Number
+          className='__label-bottom'
+          decimals={assetDecimals}
+          label={t('ui.TRANSACTION.screen.Transaction.Earn.proxyDeposit')}
+          suffix={inputAsset.symbol}
+          value={proxyDeposit}
+        />
+        }
+      </>
+    );
+  }, [assetDecimals, inputAsset.symbol, poolInfo, poolTargets, t]);
 
   const isDisabledButton = useMemo(
     () =>
       // checkMintLoading ||
       stepLoading ||
       !!connectionError ||
-      !amountValue ||
+      (!amountValue && !isDelegatedStaking) ||
       !isBalanceReady ||
       isFormInvalid ||
       submitLoading ||
@@ -845,7 +932,7 @@ const Component = () => {
       !isSlippageAcceptable ||
       (mustChooseTarget && !poolTargetValue),
 
-    [stepLoading, connectionError, amountValue, isBalanceReady, isFormInvalid, submitLoading, targetLoading, isSlippageAcceptable, mustChooseTarget, poolTargetValue]
+    [stepLoading, connectionError, amountValue, isDelegatedStaking, isBalanceReady, isFormInvalid, submitLoading, targetLoading, isSlippageAcceptable, mustChooseTarget, poolTargetValue]
   );
 
   const renderMetaInfo = useCallback(() => {
@@ -911,14 +998,16 @@ const Component = () => {
           />
         )}
 
-        {!isSubnetStaking
-          ? (
-            <MetaInfo.Chain
-              chain={chainValue}
-              label={t('ui.TRANSACTION.screen.Transaction.Earn.network')}
-            />
-          )
-          : (renderSubnetStaking())
+        {(isDelegatedStaking && !!poolTargetValue)
+          ? (renderDelegatedStaking())
+          : !isSubnetStaking
+            ? (
+              <MetaInfo.Chain
+                chain={chainValue}
+                label={t('ui.TRANSACTION.screen.Transaction.Earn.network')}
+              />
+            )
+            : (renderSubnetStaking())
         }
         {showFee && (
           <MetaInfo.Number
@@ -932,7 +1021,7 @@ const Component = () => {
         )}
       </MetaInfo>
     );
-  }, [amountValue, assetDecimals, chainAsset, chainValue, currencyData?.isPrefix, currencyData.symbol, estimatedFee, inputAsset.symbol, isSubnetStaking, poolInfo.metadata, poolInfo.statistic, poolInfo?.type, poolTargets, renderSubnetStaking, t]);
+  }, [amountValue, assetDecimals, chainAsset, chainValue, currencyData?.isPrefix, currencyData.symbol, estimatedFee, inputAsset.symbol, isDelegatedStaking, isSubnetStaking, poolInfo.metadata, poolInfo.statistic, poolInfo?.type, poolTargetValue, poolTargets, renderDelegatedStaking, renderSubnetStaking, t]);
 
   const onPreCheck = usePreCheckAction(fromValue);
 
@@ -1278,31 +1367,33 @@ const Component = () => {
                     chain={poolInfo.chain}
                     hidden={[YieldStepType.XCM].includes(submitStepType)}
                     isSubscribe={true}
-                    label={`${t('ui.TRANSACTION.screen.Transaction.Earn.availableBalance')}:`}
+                    label={balanceTypeForPool === BalanceType.TOTAL_EQUIVALENT ? `${t('ui.TRANSACTION.screen.Transaction.Earn.totalEquivalent', { symbol: inputAsset.symbol })}` : `${t('ui.TRANSACTION.screen.Transaction.Earn.availableBalance')}`}
                     tokenSlug={inputAsset.slug}
                   />
                 </div>
+                {!isDelegatedStaking && (
+                  <>
+                    <Form.Item
+                      name={'value'}
+                    >
+                      <AmountInput
+                        decimals={assetDecimals}
+                        disabled={processState.currentStep !== 0}
+                        maxValue={'1'} // todo: no maxValue, this is just temporary solution
+                        showMaxButton={false}
+                      />
+                    </Form.Item>
 
-                <Form.Item
-                  name={'value'}
-                >
-                  <AmountInput
-                    decimals={assetDecimals}
-                    disabled={processState.currentStep !== 0}
-                    maxValue={'1'} // todo: no maxValue, this is just temporary solution
-                    showMaxButton={false}
-                  />
-                </Form.Item>
-
-                <div className={'__transformed-amount-value'}>
-                  <Number
-                    decimal={0}
-                    prefix={(currencyData?.isPrefix && currencyData.symbol) || ''}
-                    suffix={(!currencyData?.isPrefix && currencyData?.symbol) || ''}
-                    value={transformAmount}
-                  />
-                </div>
-
+                    <div className={'__transformed-amount-value'}>
+                      <Number
+                        decimal={0}
+                        prefix={(currencyData?.isPrefix && currencyData.symbol) || ''}
+                        suffix={(!currencyData?.isPrefix && currencyData?.symbol) || ''}
+                        value={transformAmount}
+                      />
+                    </div>
+                  </>
+                )}
                 {poolType === YieldPoolType.NOMINATION_POOL && (
                   <Form.Item
                     name={'target'}
@@ -1334,16 +1425,42 @@ const Component = () => {
                     />
                   </Form.Item>
                 )}
+
+                {poolType === YieldPoolType.DELEGATED_STAKING &&
+                  (
+                    <Form.Item
+                      name={'target'}
+                    >
+                      <EarningStrategySelector
+                        chain={chainValue}
+                        disabled={submitLoading}
+                        from={fromValue}
+                        loading={targetLoading}
+                        setForceFetchValidator={setForceFetchValidator}
+                        slug={slug}
+                      />
+                    </Form.Item>
+                  )}
               </Form>
 
               {renderMetaInfo()}
 
-              <AlertBox
-                className='__alert-box'
-                description={STAKE_ALERT_DATA.description.replace('{tokenAmount}', maintainString)}
-                title={STAKE_ALERT_DATA.title}
-                type='warning'
-              />
+              {isDelegatedStaking
+                ? (
+                  <AlertBox
+                    className='__alert-box'
+                    description={DELEGATED_STAKING_ALERT_DATA.description.replace('{symbol}', inputAsset.symbol)}
+                    title={DELEGATED_STAKING_ALERT_DATA.title}
+                    type='warning'
+                  />)
+                : (
+                  <AlertBox
+                    className='__alert-box'
+                    description={STAKE_ALERT_DATA.description.replace('{tokenAmount}', maintainString)}
+                    title={STAKE_ALERT_DATA.title}
+                    type='warning'
+                  />
+                )}
 
               {!isSlippageAcceptable && (
                 <div ref={alertBoxRef}>

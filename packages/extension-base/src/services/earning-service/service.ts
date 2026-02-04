@@ -18,6 +18,7 @@ import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 
+import { TaoDelegateStakingPoolHandler } from './handlers/delegate-staking';
 import { EarningImpactResult } from './handlers/native-staking/dtao';
 import TanssiNativeStakingPoolHandler from './handlers/native-staking/tanssi';
 import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, AstarNativeStakingPoolHandler, BasePoolHandler, BifrostLiquidStakingPoolHandler, BifrostMantaLiquidStakingPoolHandler, EnergyNativeStakingPoolHandler, InterlayLendingPoolHandler, NominationPoolHandler, ParallelLiquidStakingPoolHandler, ParaNativeStakingPoolHandler, RelayNativeStakingPoolHandler, StellaSwapLiquidStakingPoolHandler, SubnetTaoStakingPoolHandler, TaoNativeStakingPoolHandler } from './handlers';
@@ -48,7 +49,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
   private dbService: DatabaseService;
   private eventService: EventService;
-  private useOnlineCacheOnly = true;
+  private useOnlineCacheOnly = false;
   private validatorInfoCachingInterval: NodeJS.Timeout | undefined;
   private inactivePoolReady: PromiseHandler<void> = createPromiseHandler();
 
@@ -113,9 +114,8 @@ export default class EarningService implements StoppableServiceInterface, Persis
       }
 
       if (_STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
-        // todo: check support for testnet
-        // Mainnet only
         handlers.push(new TaoNativeStakingPoolHandler(this.state, chain));
+        handlers.push(new TaoDelegateStakingPoolHandler(this.state, chain));
         handlers.push(new SubnetTaoStakingPoolHandler(this.state, chain));
       }
 

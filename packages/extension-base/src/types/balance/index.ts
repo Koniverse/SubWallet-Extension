@@ -17,7 +17,9 @@ export enum BalanceType {
   TRANSFERABLE = 'transferable', // free
   TOTAL = 'total', // free + locked
   TOTAL_MINUS_RESERVED = 'totalMinusReserved', // free + locked - reserved
-  KEEP_ALIVE = 'keepAlive'
+  KEEP_ALIVE = 'keepAlive',
+  TOTAL_STAKE_EQUIVALENT = 'totalStakeEquivalent', // only for bittensor (delegate staking)
+  TOTAL_EQUIVALENT = 'totalEquivalent' // only for bittensor (delegate staking)
 }
 
 /**
@@ -37,8 +39,8 @@ export interface LockedBalanceDetails {
   democracy: string;
   reserved: string;
   others: string;
+  totalStakingEquivalent?: string; // currtently only used in Bittensor delegate staking to show total native token equivalent (locked alpha token convert to native token)
 }
-
 export interface BalanceItem {
   // metadata
   address: string;

@@ -16,7 +16,7 @@ import { getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/cont
 import { getDefaultWeightV2 } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
 import { _BALANCE_CHAIN_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX, USE_MULTILOCATION_INDEX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _checkSmartContractSupportByChain, _getAssetExistentialDeposit, _getAssetNetuid, _getChainExistentialDeposit, _getChainNativeTokenSlug, _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getTokenTypesSupportedByChain, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { _checkSmartContractSupportByChain, _getAssetDecimals, _getAssetExistentialDeposit, _getAssetNetuid, _getChainExistentialDeposit, _getChainNativeTokenSlug, _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getTokenTypesSupportedByChain, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
 import { BalanceItem, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
 import { filterAlphaAssetsByChain, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
@@ -28,7 +28,7 @@ import { ContractPromise } from '@polkadot/api-contract';
 import { subscribeERC20Interval } from '../evm';
 import { subscribeEquilibriumTokenBalance } from './equilibrium';
 import { subscribeGRC20Balance, subscribeVftBalance } from './gear';
-import { buildLockedDetails, getSpecialStakingBalances } from './utils';
+import { buildLockedDetails, getSpecialStakingBalancesWithDetails } from './utils';
 
 export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: _ChainInfo, assetMap: Record<string, _ChainAsset>, substrateApi: _SubstrateApi, evmApi: _EvmApi, callback: (rs: BalanceItem[]) => void, extrinsicType?: ExtrinsicType) => {
   let unsubNativeToken: () => void;
@@ -124,7 +124,7 @@ export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: 
 };
 
 // eslint-disable-next-line @typescript-eslint/require-await
-const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo, extrinsicType, substrateApi }: SubscribeSubstratePalletBalance) => {
+const subscribeWithSystemAccountPallet = async ({ addresses, assetMap, callback, chainInfo, extrinsicType, substrateApi }: SubscribeSubstratePalletBalance) => {
   const systemAccountKey = 'query_system_account';
   const poolMembersKey = 'query_nominationPools_poolMembers';
 
@@ -155,7 +155,15 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
     const balances = rs[systemAccountKey];
     const poolMemberInfos = rs[poolMembersKey];
 
-    const bittensorStakingBalances = await getSpecialStakingBalances(chainInfo, addresses, substrateApi);
+    const nativeTokenSlug = _getChainNativeTokenSlug(chainInfo);
+    const nativeTokenInfo = assetMap[nativeTokenSlug];
+
+    const bittensorStakingDetails = await getSpecialStakingBalancesWithDetails(
+      chainInfo,
+      addresses,
+      substrateApi,
+      _getAssetDecimals(nativeTokenInfo)
+    );
 
     // Precompute totalLockedFromTransfer for each account to decide if need fetch locks/holds
     const preItems = balances.map((_balance, index) => {
@@ -171,7 +179,7 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
         totalLockedFromTransfer += nominationPoolBalance;
       }
 
-      totalLockedFromTransfer += BigInt(bittensorStakingBalances[index].toString());
+      totalLockedFromTransfer += BigInt(bittensorStakingDetails[index].native.toString());
 
       return { index, totalLockedFromTransfer, balanceInfo };
     });
@@ -222,14 +230,17 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
 
       const allLockEntries = [...lockItems, ...holdItems, ...freezeItems];
 
+      const transferableBalance = _getSystemPalletTransferable(balanceInfo, _getChainExistentialDeposit(chainInfo), extrinsicType);
+
+      const stakingDetails = bittensorStakingDetails[index];
+
       const lockedDetails = buildLockedDetails(
         allLockEntries,
         totalLockedFromTransfer,
         _getSystemPalletReservedBalance(balanceInfo),
-        bittensorStakingBalances[index]
+        stakingDetails?.native,
+        stakingDetails?.total
       );
-
-      const transferableBalance = _getSystemPalletTransferable(balanceInfo, _getChainExistentialDeposit(chainInfo), extrinsicType);
 
       return {
         address: addresses[index],

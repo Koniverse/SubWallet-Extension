@@ -39,6 +39,11 @@ export interface SubmitJoinNominationPool extends AbstractSubmitYieldJoinData {
   selectedPool: NominationPoolInfo;
 }
 
+export interface SubmitJoinDelegateStaking extends AbstractSubmitYieldJoinData {
+  substrateProxyAddress: string;
+  substrateProxyDeposit: string;
+}
+
 export interface SubmitYieldStepData extends AbstractSubmitYieldJoinData { // TODO
   exchangeRate: number, // reward token amount = input token amount * exchange rate
   inputTokenSlug: string,
@@ -47,7 +52,7 @@ export interface SubmitYieldStepData extends AbstractSubmitYieldJoinData { // TO
   feeTokenSlug: string
 }
 
-export type SubmitYieldJoinData = SubmitYieldStepData | SubmitJoinNativeStaking | SubmitJoinNominationPool;
+export type SubmitYieldJoinData = SubmitYieldStepData | SubmitJoinNativeStaking | SubmitJoinNominationPool | SubmitJoinDelegateStaking;
 
 export enum EarningProcessType {
   NOMINATION_POOL = 'NOMINATION_POOL',
@@ -106,6 +111,17 @@ export interface BondingSubmitParams extends BaseRequestSign {
 }
 
 export type RequestBondingSubmit = InternalRequestSign<BondingSubmitParams>;
+
+export interface DelegateStakingSubmitParams extends BaseRequestSign {
+  slug: string,
+  poolPosition: YieldPositionInfo,
+  amount: string,
+  address: string,
+  substrateProxyAddress: string,
+  substrateProxyDeposit: string
+}
+
+export type RequestDelegateStakingSubmit = InternalRequestSign<DelegateStakingSubmitParams>;
 
 export type SubmitChangeValidatorStaking = InternalRequestSign<SubmitBittensorChangeValidatorStaking | SubmitJoinNativeStaking>;
 

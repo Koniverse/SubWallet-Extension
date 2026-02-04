@@ -93,6 +93,7 @@ const Component: React.FC<Props> = (props: Props) => {
         case YieldPoolType.NOMINATION_POOL:
         case YieldPoolType.NATIVE_STAKING:
         case YieldPoolType.LIQUID_STAKING:
+        case YieldPoolType.DELEGATED_STAKING:
           return 'Earn up to {{apy}} yearly from {{minActiveStake}} with {{shortName}}';
         case YieldPoolType.LENDING:
           return 'Earn up to {{apy}} yearly from {{minActiveStake}} with {{shortName}}';
@@ -163,6 +164,7 @@ const Component: React.FC<Props> = (props: Props) => {
       case YieldPoolType.NOMINATION_POOL:
       case YieldPoolType.NATIVE_STAKING:
       case YieldPoolType.LIQUID_STAKING:
+      case YieldPoolType.DELEGATED_STAKING:
         return 'Stake to earn';
       case YieldPoolType.LENDING:
         return 'Supply to earn';
@@ -242,6 +244,31 @@ const Component: React.FC<Props> = (props: Props) => {
         } else {
           return [];
         }
+      }
+
+      case YieldPoolType.DELEGATED_STAKING: {
+        const paidOut = poolInfo.statistic?.eraTime;
+        const maintainAsset = assetRegistry[poolInfo.metadata.maintainAsset];
+        const { decimals: maintainDecimals, symbol: maintainSymbol } = maintainAsset;
+        const maintainBalance = getInputValuesFromString(
+          poolInfo.metadata.maintainBalance || '0',
+          maintainDecimals || 0
+        );
+
+        return EARNING_DATA_RAW.DELEGATED_STAKING.map((item) => {
+          const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
+
+          replaceEarningValue(_item, '{maintainBalance}', maintainBalance);
+          replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
+          replaceEarningValue(_item, '{shortName}', poolInfo.metadata.shortName);
+
+          if (paidOut !== undefined) {
+            replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());
+            replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : paidOut === 1 ? 'hour' : 'minutes');
+          }
+
+          return _item;
+        });
       }
 
       case YieldPoolType.SUBNET_STAKING: // fallthrough

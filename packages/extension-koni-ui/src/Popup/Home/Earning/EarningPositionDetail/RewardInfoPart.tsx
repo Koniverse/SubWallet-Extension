@@ -53,6 +53,7 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
     switch (type) {
       case YieldPoolType.LENDING:
       case YieldPoolType.LIQUID_STAKING:
+      case YieldPoolType.DELEGATED_STAKING:
         return false;
       case YieldPoolType.SUBNET_STAKING:
       case YieldPoolType.NATIVE_STAKING:
