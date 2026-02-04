@@ -299,6 +299,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     });
   }, [pendingMultisigTxs, isAllAccount, currentSubstrateAddress]);
 
+  console.log('multisigList', multisigList);
+
   const notiMultisigPendingTxItem = useMemo(() => {
     const parts = notiMultisigPendingTxId.split('___');
     const multisigKey = parts.slice(1, -1).join('___');
@@ -781,7 +783,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const listSection = useMemo(() => (
     <>
-      <div className={'__page-list-area'}>
+      <div
+        className={'__page-list-area'}
+        key={`history-list-${currentAccountProxy?.id || ''}`}
+      >
         <SwList
           groupBy={groupBy}
           groupSeparator={groupSeparator}
@@ -794,10 +799,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         />
       </div>
     </>
-  ), [emptyList, groupBy, groupSeparator, hasMoreItems, historyItems, onLoadMoreItems, renderItem]);
+  ), [currentAccountProxy?.id, emptyList, groupBy, groupSeparator, hasMoreItems, historyItems, onLoadMoreItems, renderItem]);
 
   const listMultisigSection = useMemo(() => (
-    <div className={'__page-list-area'}>
+    <div
+      className={'__page-list-area'}
+      key={`multisig-list-${currentAccountProxy?.id || ''}`}
+    >
       <SwList
         groupBy={groupBy}
         groupSeparator={groupSeparator}
@@ -808,7 +816,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         renderWhenEmpty={emptyList}
       />
     </div>
-  ), [emptyList, groupBy, groupSeparator, multisigList, renderMultisigItem]);
+  ), [emptyList, groupBy, groupSeparator, multisigList, renderMultisigItem, currentAccountProxy]);
 
   const headerIcons = useMemo<ButtonProps[]>(() => {
     return [
