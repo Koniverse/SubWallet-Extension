@@ -6,19 +6,20 @@ import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-s
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import AccountProxyAvatar from '@subwallet/extension-koni-ui/components/AccountProxy/AccountProxyAvatar';
 import { HistoryStatusMap } from '@subwallet/extension-koni-ui/constants';
-import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import {useNotification, useOpenDetailModal, useSelector} from '@subwallet/extension-koni-ui/hooks';
 import HistoryMultisigHeader from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigHeader';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { formatHistoryDate, reformatAddress, toShort } from '@subwallet/extension-koni-ui/utils';
-import { Icon } from '@subwallet/react-ui';
+import {copyToClipboard, formatHistoryDate, reformatAddress, toShort} from '@subwallet/extension-koni-ui/utils';
+import {Button, Icon} from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CheckCircle } from 'phosphor-react';
+import {CheckCircle, Copy, Info} from 'phosphor-react';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { hexAddPrefix, isHex } from '@polkadot/util';
+import {BaseDetailModal} from "@subwallet/extension-koni-ui/Popup/Confirmations/parts";
 
 interface Props extends ThemeProps {
   data: PendingMultisigTx;
@@ -30,6 +31,8 @@ const Component: React.FC<Props> = (props: Props) => {
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
   const { accountProxies } = useSelector((state) => state.accountState);
   const { language } = useSelector((state) => state.settings);
+  const openDetailModal = useOpenDetailModal();
+  const notify = useNotification();
 
   // Helper to find account information across all proxies
   const getAccountInfo = useCallback((address: string) => {
@@ -97,6 +100,15 @@ const Component: React.FC<Props> = (props: Props) => {
     });
   }, [data]);
 
+  const onCopyAddress = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    copyToClipboard(data?.extrinsicHash);
+    notify({
+      message: t('ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard')
+    });
+  }, [notify, t]);
+
   return (
     <div className={CN(className)}>
       <MetaInfo
@@ -118,15 +130,39 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Default
           label={t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.extrinsicHash')}
+          className={'extrinsic-hash-copy-button-wrapper'}
         >
-          {extrinsicHash}
+          {toShort(extrinsicHash || '', 5, 5)}
+          <Button
+            className={'extrinsic-hash-copy-button'}
+            icon={<Icon
+              customSize={'18px'}
+              phosphorIcon={Copy}
+              className={'extrinsic-hash-copy-icon'}
+            />}
+            onClick={onCopyAddress}
+            type={'ghost'}
+            size={'sm'}
+          />
         </MetaInfo.Default>
 
-        {data.callData && (
+        {!!data.callData && (
           <MetaInfo.Default
             label={t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.callData')}
+            className={'call-data-info-button-wrapper'}
           >
-            {callData}
+            {toShort(callData || '', 5, 5)}
+            <Button
+              className={'call-data-info-button'}
+              icon={<Icon
+                customSize={'18px'}
+                phosphorIcon={Info}
+                className={'call-data-info-icon'}
+              />}
+              onClick={openDetailModal}
+              type={'ghost'}
+              size={'sm'}
+            />
           </MetaInfo.Default>
         )}
 
@@ -162,6 +198,7 @@ const Component: React.FC<Props> = (props: Props) => {
         </div>
         <div className='signatory-item-container'>
           {sortedSigners.map((signer) => {
+            const isCurrentSigner = data.currentSigner === signer;
             const isApproved = data.approvals.includes(signer);
             const isInitiator = signer === data.depositor;
             const accountInfo = getAccountInfo(signer);
@@ -182,9 +219,9 @@ const Component: React.FC<Props> = (props: Props) => {
                     </div>
                     <span className={'signatory-account-value'}>{accountInfo?.name || toShort(signer, 8, 9)}</span>
                   </div>
-                  {(isApproved) && (
+                  {(isCurrentSigner) && (
                     <div className={CN('__checked-icon-wrapper', {
-                      '-selected': isApproved
+                      '-selected': isCurrentSigner
                     })}
                     >
                       <Icon
@@ -206,6 +243,15 @@ const Component: React.FC<Props> = (props: Props) => {
           })}
         </div>
       </div>
+      {<BaseDetailModal
+        className={CN(className, 'call-data-detail-modal')}
+        showFooter={false}
+        title={t('ui.Confirmations.Detail.CallDataDetail.transactionDetails')}
+      >
+        <pre className='json'>
+          {JSON.stringify(data.callData || '', null, 2)}
+        </pre>
+      </BaseDetailModal>}
     </div>
   );
 };
@@ -222,6 +268,44 @@ const HistoryMultisigLayout = styled(Component)<Props>(({ theme: { token } }: Pr
     '.signatories-label-left': {
       fontWeight: token.fontWeightStrong,
       color: token.colorTextLight2
+    },
+
+    '.call-data-info-button, .extrinsic-hash-copy-button': {
+      height: '18px !important',
+      width: '18px !important',
+      minWidth: 'unset !important',
+      color: token.colorTextLight4,
+      transform: 'all 0.3s ease-in-out',
+      '.call-data-info-icon, .extrinsic-hash-copy-icon': {
+        height: '18px !important',
+      },
+
+      '&:hover': {
+        color: token.colorTextLight2
+      }
+    },
+
+    '.call-data-info-button-wrapper, .extrinsic-hash-copy-button-wrapper': {
+      '.__value':{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4
+      }
+    },
+
+    '&.call-data-detail-modal': {
+      '.ant-sw-modal-body': {
+        height: 264,
+        borderRadius: token.borderRadiusLG,
+        padding: token.paddingSM,
+        backgroundColor: token.colorBgSecondary,
+        overflowY: 'auto',
+        scrollBehavior: 'smooth',
+        color: '#999999',
+        margin: `${token.margin}px 0`,
+        fontSize: token.fontSizeLG - 1,
+        fontFamily: token.monoSpaceFontFamily
+      }
     },
 
     '.signatories-label-right': {
