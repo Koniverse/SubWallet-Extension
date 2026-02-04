@@ -11,6 +11,7 @@ import { NotificationDescriptionMap, NotificationTitleMap } from '@subwallet/ext
 import { _BaseNotificationInfo, NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import { decodeCallData, DecodeCallDataResponse, DEFAULT_BLOCK_HASH, genPendingMultisigTxKey, getCallData, getMultisigTxType } from '@subwallet/extension-base/services/multisig-service/utils';
+import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
 import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
 import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BehaviorSubject } from 'rxjs';
@@ -284,7 +285,7 @@ export class MultisigService implements StoppableServiceInterface {
       needReload = true;
     }
 
-    if (eventTypes.includes('chain.updateState')) {
+    if (eventTypes.includes('chain.updateState') || eventTypes.includes('transaction.done')) {
       for (const event of events) {
         if (event.type === 'chain.updateState') {
           const chainSlug = event.data[0] as string;
@@ -292,6 +293,13 @@ export class MultisigService implements StoppableServiceInterface {
 
           // Only reload if the updated chain is in the supported chains list
           if (chainInfo.substrateInfo?.supportMultisig) {
+            needReload = true;
+            break;
+          }
+        } else if (event.type === 'transaction.done') {
+          const txResult = event.data[0] as SWTransactionBase;
+
+          if (txResult.wrappingStatus === 'WRAP_RESULT') {
             needReload = true;
             break;
           }
@@ -416,8 +424,6 @@ export class MultisigService implements StoppableServiceInterface {
       method: keyQuery.split('_')[2],
       args: rawKeysArgs
     }];
-
-    console.log(params);
 
     const subscription = substrateApi.subscribeDataWithMulti(params, async (rs) => {
       try {
