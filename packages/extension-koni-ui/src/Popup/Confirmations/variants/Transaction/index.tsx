@@ -196,11 +196,13 @@ const Component: React.FC<Props> = (props: Props) => {
         '-no-margin-top': [ExtrinsicType.GOV_VOTE, ExtrinsicType.GOV_UNVOTE].includes(transaction.extrinsicType)
       })}
       >
-        {renderContent(transaction)}
-        {!!transaction.wrappingStatus && <WrappedTransactionInfoArea
-          setDisable={setIsDisabledSubstrateApprove}
-          transaction={transaction}
-        />}
+        <div className={'transaction-info-block'}>
+          {renderContent(transaction)}
+          {!!transaction.wrappingStatus && <WrappedTransactionInfoArea
+            setDisable={setIsDisabledSubstrateApprove}
+            transaction={transaction}
+          />}
+        </div>
         {isAddressFormatInfoBoxVisible && (
           <AlertBoxInstant
             className={'address-format-info-box'}
@@ -291,6 +293,16 @@ const TransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: 
   return {
     '&.-no-margin-top': {
       marginTop: 0
+    },
+
+    '.transaction-info-block': {
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
+
+      '.g-PageWrapper': {
+        height: 'auto !important'
+      }
     },
 
     '--content-gap': 0,
