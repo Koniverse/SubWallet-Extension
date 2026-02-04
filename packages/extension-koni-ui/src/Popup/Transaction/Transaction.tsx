@@ -306,6 +306,7 @@ function Component ({ children, className, modalContent, modalId, transactionTyp
   const chainChecker = useChainChecker();
 
   // Navigate to finish page
+  // Todo: recheck, sometimes from is empty
   const onDone = useCallback(
     (extrinsicHash: string, transactionFrom?: string) => {
       navigate(`/transaction-done/${transactionFrom || from}/${chain}/${extrinsicHash}`, { replace: true });

@@ -184,8 +184,8 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
             <Button
               block
               danger
-              disabled={buttonLoading}
-              loading={loading}
+              disabled={buttonDisabled}
+              loading={buttonLoading}
               onClick={checkAction(_onReject, ExtrinsicType.MULTISIG_CANCEL_TX)}
             >{t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.reject')}</Button>
             {thresholdReached && (
