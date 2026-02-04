@@ -6,20 +6,20 @@ import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-s
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import AccountProxyAvatar from '@subwallet/extension-koni-ui/components/AccountProxy/AccountProxyAvatar';
 import { HistoryStatusMap } from '@subwallet/extension-koni-ui/constants';
-import {useNotification, useOpenDetailModal, useSelector} from '@subwallet/extension-koni-ui/hooks';
+import { useNotification, useOpenDetailModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { BaseDetailModal } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import HistoryMultisigHeader from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigHeader';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import {copyToClipboard, formatHistoryDate, reformatAddress, toShort} from '@subwallet/extension-koni-ui/utils';
-import {Button, Icon} from '@subwallet/react-ui';
+import { copyToClipboard, formatHistoryDate, reformatAddress, toShort } from '@subwallet/extension-koni-ui/utils';
+import { Button, Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
-import {CheckCircle, Copy, Info} from 'phosphor-react';
+import { CheckCircle, Copy, Info } from 'phosphor-react';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { hexAddPrefix, isHex } from '@polkadot/util';
-import {BaseDetailModal} from "@subwallet/extension-koni-ui/Popup/Confirmations/parts";
 
 interface Props extends ThemeProps {
   data: PendingMultisigTx;
@@ -107,7 +107,7 @@ const Component: React.FC<Props> = (props: Props) => {
     notify({
       message: t('ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard')
     });
-  }, [notify, t]);
+  }, [data?.extrinsicHash, notify, t]);
 
   return (
     <div className={CN(className)}>
@@ -129,39 +129,39 @@ const Component: React.FC<Props> = (props: Props) => {
         />
 
         <MetaInfo.Default
-          label={t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.extrinsicHash')}
           className={'extrinsic-hash-copy-button-wrapper'}
+          label={t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.extrinsicHash')}
         >
           {toShort(extrinsicHash || '', 5, 5)}
           <Button
             className={'extrinsic-hash-copy-button'}
             icon={<Icon
+              className={'extrinsic-hash-copy-icon'}
               customSize={'18px'}
               phosphorIcon={Copy}
-              className={'extrinsic-hash-copy-icon'}
             />}
             onClick={onCopyAddress}
-            type={'ghost'}
             size={'sm'}
+            type={'ghost'}
           />
         </MetaInfo.Default>
 
         {!!data.callData && (
           <MetaInfo.Default
-            label={t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.callData')}
             className={'call-data-info-button-wrapper'}
+            label={t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.callData')}
           >
             {toShort(callData || '', 5, 5)}
             <Button
               className={'call-data-info-button'}
               icon={<Icon
+                className={'call-data-info-icon'}
                 customSize={'18px'}
                 phosphorIcon={Info}
-                className={'call-data-info-icon'}
               />}
               onClick={openDetailModal}
-              type={'ghost'}
               size={'sm'}
+              type={'ghost'}
             />
           </MetaInfo.Default>
         )}
@@ -277,7 +277,7 @@ const HistoryMultisigLayout = styled(Component)<Props>(({ theme: { token } }: Pr
       color: token.colorTextLight4,
       transform: 'all 0.3s ease-in-out',
       '.call-data-info-icon, .extrinsic-hash-copy-icon': {
-        height: '18px !important',
+        height: '18px !important'
       },
 
       '&:hover': {
@@ -286,7 +286,7 @@ const HistoryMultisigLayout = styled(Component)<Props>(({ theme: { token } }: Pr
     },
 
     '.call-data-info-button-wrapper, .extrinsic-hash-copy-button-wrapper': {
-      '.__value':{
+      '.__value': {
         display: 'flex',
         alignItems: 'center',
         gap: 4

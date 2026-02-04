@@ -417,6 +417,8 @@ export class MultisigService implements StoppableServiceInterface {
       args: rawKeysArgs
     }];
 
+    console.log(params);
+
     const subscription = substrateApi.subscribeDataWithMulti(params, async (rs) => {
       try {
         const items: RawPendingMultisigTx[] = [];

@@ -3,11 +3,11 @@
 
 import { LoadingScreen } from '@subwallet/extension-koni-ui/components';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import CN from 'classnames';
 import React, { useEffect, useState } from 'react';
 import { Await, useLocation } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
 import styled from 'styled-components';
-import CN from "classnames";
 
 export interface PageWrapperProps extends ThemeProps{
   resolve?: Promise<any>;
