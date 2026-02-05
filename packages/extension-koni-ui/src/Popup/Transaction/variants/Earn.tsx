@@ -541,7 +541,7 @@ const Component = () => {
               slug: slug,
               address: from,
               amount: 0,
-              selectedStrategy: selectedStrategy.address,
+              substrateProxyAddress: selectedStrategy.address,
               selectedValidators: targets,
               substrateProxyDeposit: poolInfo.proxyDeposit,
               substrateProxyType: 'Staking',

@@ -486,7 +486,7 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
     return errors;
   }
 
-  override async createJoinExtrinsic (data: SubmitJoinDelegateStaking, positionInfo?: YieldPositionInfo, bondDest?: string, netuid?: number): Promise<[TransactionData, YieldTokenBaseInfo]> {
+  override async createJoinExtrinsic (data: SubmitJoinDelegateStaking): Promise<[TransactionData, YieldTokenBaseInfo]> {
     const chainApi = await this.substrateApi.isReady;
     const { address, substrateProxyAddress, substrateProxyDeposit, substrateProxyType } = data;
 
@@ -522,11 +522,12 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
     const { address, amount, slug, substrateProxyAddress, substrateProxyDeposit, substrateProxyType } = data;
 
     const positionInfo = await this.getPoolPosition(address, slug);
-    const [extrinsic, yieldTokenInfo] = await this.createJoinExtrinsic(data, positionInfo);
 
     if (!positionInfo) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
     }
+
+    const [extrinsic, yieldTokenInfo] = await this.createJoinExtrinsic(data);
 
     const delegateData: RequestDelegateStakingSubmit = {
       poolPosition: positionInfo,
