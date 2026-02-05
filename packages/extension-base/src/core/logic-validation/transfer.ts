@@ -503,7 +503,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
     ..._TRANSFER_CHAIN_GROUP.statemine
   ].includes(nativeTokenInfo.originChain);
 
-  if (bnNativeTokenTransferAmount.plus(validationResponse.wrappingStatus === SubstrateTransactionWrappingStatus.WRAPPABLE ? bnFee : '0').gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
+  if (bnNativeTokenTransferAmount.plus(validationResponse.wrappingStatus === SubstrateTransactionWrappingStatus.WRAPPABLE ? '0' : bnFee).gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
   }
 
