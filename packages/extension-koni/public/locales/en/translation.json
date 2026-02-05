@@ -2606,9 +2606,7 @@
   "ui.BALANCE.screen.Tokens.TotalEquivalentDetailModal.transferable": "Transferable",
   "ui.BALANCE.screen.Tokens.TotalEquivalentDetailModal.staked": "Staked",
   "ui.BALANCE.screen.Tokens.TotalEquivalentDetailModal.balanceDetails": "Balance details",
-  "ui.EARNING.components.Field.Earning.StrategySelector.lowestCommission": "Lowest commission",
   "ui.EARNING.components.Field.Earning.StrategySelector.highestAnnualReturn": "Highest annual return",
-  "ui.EARNING.components.Field.Earning.StrategySelector.nomination": "Nomination",
   "ui.EARNING.components.Field.Earning.StrategySelector.noStrategyAvailable": "Strategy",
   "ui.EARNING.components.Field.Earning.StrategySelector.selectStrategy": "Select strategy",
   "ui.EARNING.components.Field.Earning.StrategySelector.apply": "Apply",
@@ -2632,5 +2630,6 @@
   "ui.BALANCE.screen.Tokens.DetailList.balanceFluctuations": "Balance fluctuations",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyDepositDescription": "Once unstaked, the proxy deposit will be unlocked and returned to your accounts as transferable balance",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyDeposit": "Proxy deposit",
-  "ui.TRANSACTION.screen.Transaction.Earn.copiedToClipboard": "Copy to the clipboard"
+  "ui.TRANSACTION.screen.Transaction.Earn.copiedToClipboard": "Copy to the clipboard",
+  "ui.EARNING.components.Field.Earning.StrategySelector.lowestMinActiveStake": "Lowest min active stake"
 }

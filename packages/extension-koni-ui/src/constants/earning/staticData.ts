@@ -237,8 +237,8 @@ export const EARNING_DATA_RAW = {
     },
     {
       icon: 'Coins',
-      title: 'Unstake and withdraw',
-      description: 'Once staked, your funds will be locked. You can unstake at any time for immediate withdrawal by removing the staking proxy. Keep in mind that this action is not automated and will incur network fees.',
+      title: 'Delegate and undelegate',
+      description: 'Once delegated, the staking proxy will have full control over your Bittensor balances. You can remove it at any time by undelegating. Keep in mind thay neither action is automated and will incur fees',
       iconColor: '#e6dc25'
     },
     {
@@ -252,7 +252,7 @@ export const EARNING_DATA_RAW = {
       icon: 'Eye',
       title: 'Portfolio rebalancing',
       description:
-        'Once staked, your entire balances on {shortName} will be used for rebalancing. This process is automated and occurs every {paidOut} {paidOutTimeUnit} to align with your strategy',
+        'Once staked, your entire balances on {shortName} will be used for rebalancing. This process is automated and occurs every {paidOut} {paidOutTimeUnit} to align with your chosen strategy',
       iconColor: '#008dff'
     }
   ],

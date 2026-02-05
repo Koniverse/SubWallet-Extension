@@ -2607,9 +2607,7 @@
   "ui.BALANCE.screen.Tokens.TotalEquivalentDetailModal.transferable": "",
   "ui.BALANCE.screen.Tokens.TotalEquivalentDetailModal.staked": "",
   "ui.BALANCE.screen.Tokens.TotalEquivalentDetailModal.balanceDetails": "",
-  "ui.EARNING.components.Field.Earning.StrategySelector.lowestCommission": "",
   "ui.EARNING.components.Field.Earning.StrategySelector.highestAnnualReturn": "",
-  "ui.EARNING.components.Field.Earning.StrategySelector.nomination": "",
   "ui.EARNING.components.Field.Earning.StrategySelector.noStrategyAvailable": "",
   "ui.EARNING.components.Field.Earning.StrategySelector.selectStrategy": "",
   "ui.EARNING.components.Field.Earning.StrategySelector.apply": "",
@@ -2633,5 +2631,6 @@
   "ui.BALANCE.screen.Tokens.DetailList.balanceFluctuations": "",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyDepositDescription": "",
   "ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyDeposit": "",
-  "ui.TRANSACTION.screen.Transaction.Earn.copiedToClipboard": ""
+  "ui.TRANSACTION.screen.Transaction.Earn.copiedToClipboard": "",
+  "ui.EARNING.components.Field.Earning.StrategySelector.lowestMinActiveStake": ""
 }

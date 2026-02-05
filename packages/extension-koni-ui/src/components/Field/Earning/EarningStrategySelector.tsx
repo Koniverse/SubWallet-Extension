@@ -1,16 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { NominationInfo } from '@subwallet/extension-base/types';
 import { SelectValidatorInput } from '@subwallet/extension-koni-ui/components';
 import EmptyValidator from '@subwallet/extension-koni-ui/components/Account/EmptyValidator';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { EarningStrategyDetailModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
-import { FilterModal } from '@subwallet/extension-koni-ui/components/Modal/FilterModal';
 import { SortingModal } from '@subwallet/extension-koni-ui/components/Modal/SortingModal';
 import { STRATEGY_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useFilterModal, useGetPoolTargetList, useSelector, useSelectValidators, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
+import { useGetPoolTargetList, useSelector, useSelectValidators, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { StrategyDataType, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/stake';
 import { Badge, Button, Icon, InputRef, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
@@ -35,10 +33,8 @@ interface Props extends ThemeProps, BasicInputWrapper {
 }
 
 enum SortKey {
-  COMMISSION = 'commission',
   RETURN = 'return',
   MIN_STAKE = 'min-stake',
-  NOMINATING = 'nominating',
   DEFAULT = 'default'
 }
 
@@ -49,32 +45,12 @@ interface SortOption {
 }
 
 const SORTING_MODAL_ID = 'nominated-sorting-modal';
-const FILTER_MODAL_ID = 'nominated-filter-modal';
-
-const filterOptions = [
-  {
-    label: 'Active validator',
-    value: '1'
-  },
-  {
-    label: 'Waiting list',
-    value: '2'
-  },
-  {
-    label: 'Locked',
-    value: '3'
-  },
-  {
-    label: 'Destroying',
-    value: '4'
-  }
-];
 
 const defaultModalId = 'multi-validator-selector';
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { chain, className = '', from
-    , id = defaultModalId, isSingleSelect: _isSingleSelect = false,
+    , id = defaultModalId, isSingleSelect: _isSingleSelect = true,
     loading, onChange, setForceFetchValidator
     , slug, value, originValidator } = props;
   const { t } = useTranslation();
@@ -99,18 +75,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   // const cachedNominations = useMemo(() => compound?.nominations || [], [compound]);
 
   const [nominations] = useState<NominationInfo[]>(compound?.nominations || []); // Remove set Nomination
-  const isRelayChain = useMemo(() => RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(chain), [chain]);
-  const isSingleSelect = useMemo(() => _isSingleSelect || !isRelayChain, [_isSingleSelect, isRelayChain]);
   const hasReturn = useMemo(() => items[0]?.expectedReturn !== undefined, [items]);
 
   const sortingOptions: SortOption[] = useMemo(() => {
-    const result: SortOption[] = [
-      {
-        desc: false,
-        label: t('ui.EARNING.components.Field.Earning.StrategySelector.lowestCommission'),
-        value: SortKey.COMMISSION
-      }
-    ];
+    const result: SortOption[] = [];
 
     if (hasReturn) {
       result.push({
@@ -120,31 +88,22 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       });
     }
 
-    if (nominations && nominations.length > 0) {
-      result.push({
-        desc: true,
-        label: t('ui.EARNING.components.Field.Earning.StrategySelector.nomination'),
-        value: SortKey.NOMINATING
-      });
-    }
-
     result.push({
       desc: false,
-      label: t('ui.EARNING.components.Field.Earning.ValidatorSelector.lowestMinActiveStake'),
+      label: t('ui.EARNING.components.Field.Earning.StrategySelector.lowestMinActiveStake'),
       value: SortKey.MIN_STAKE
     });
 
     return result;
-  }, [t, hasReturn, nominations]);
+  }, [t, hasReturn]);
 
   const { changeValidators,
     onApplyChangeValidators,
     onCancelSelectValidator,
-    onChangeSelectedValidator } = useSelectValidators(id, chain, maxCount, onChange, isSingleSelect);
+    onChangeSelectedValidator } = useSelectValidators(id, chain, maxCount, onChange, _isSingleSelect);
 
   const [viewDetailItem, setViewDetailItem] = useState<StrategyDataType | undefined>(undefined);
   const [sortSelection, setSortSelection] = useState<SortKey>(SortKey.DEFAULT);
-  const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, onResetFilter, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
   const nominatorValueList = useMemo(() => {
     return nominations && nominations.length
@@ -165,18 +124,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       }
     });
   }, [items, sortSelection]);
-
-  const filterFunction = useMemo<(item: StrategyDataType) => boolean>(() => {
-    return (item) => {
-      if (!selectedFilters.length) {
-        return true;
-      }
-
-      // todo: logic filter here
-
-      return true;
-    };
-  }, [selectedFilters]);
 
   const onResetSort = useCallback(() => {
     setSortSelection(SortKey.DEFAULT);
@@ -234,10 +181,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     );
   }, [changeValidators, networkPrefix, nominatorValueList, onClickItem, onClickMore, originValidator]);
 
-  const onClickActionBtn = useCallback(() => {
-    activeModal(FILTER_MODAL_ID);
-  }, [activeModal]);
-
   const searchFunction = useCallback((item: StrategyDataType, searchText: string) => {
     const searchTextLowerCase = searchText.toLowerCase();
 
@@ -261,12 +204,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       }, 100);
     }
   }, [isActive]);
-
-  useEffect(() => {
-    if (!isActive) {
-      onResetFilter();
-    }
-  }, [isActive, onResetFilter]);
 
   return (
     <>
@@ -317,9 +254,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
           enableSearchInput={true}
-          filterBy={filterFunction}
           list={resultList}
-          onClickActionBtn={onClickActionBtn}
           ref={sectionRef}
           renderItem={renderItem}
           renderWhenEmpty={renderEmpty}
@@ -329,15 +264,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           // showActionBtn
         />
       </SwModal>
-
-      <FilterModal
-        id={FILTER_MODAL_ID}
-        onApplyFilter={onApplyFilter}
-        onCancel={onCloseFilterModal}
-        onChangeOption={onChangeFilterOption}
-        optionSelectionMap={filterSelectionMap}
-        options={filterOptions}
-      />
 
       <SortingModal
         id={SORTING_MODAL_ID}

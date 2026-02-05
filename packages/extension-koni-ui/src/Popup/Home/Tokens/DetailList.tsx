@@ -168,7 +168,6 @@ function Component (): React.ReactElement {
     );
   }, [yieldPositions, netuid]);
 
-  console.log('Checking', isDelegatedStaking);
   const buyInfos = useMemo(() => {
     const slug = tokenGroupSlug || '';
     const slugs = tokenGroupMap[slug] ? tokenGroupMap[slug] : [slug];
