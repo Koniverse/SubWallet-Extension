@@ -1,18 +1,20 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
+import { AccountProxyType } from '@subwallet/extension-base/types';
 import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest } from '@subwallet/extension-base/types/multisig';
+import { AlertModal } from '@subwallet/extension-koni-ui/components';
 import { MULTISIG_HISTORY_INFO_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useGetBalance, useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useChainChecker, useGetAccountProxyByAddress, useGetBalance, useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
 import { approvePendingTx, cancelPendingTx, executePendingTx } from '@subwallet/extension-koni-ui/messaging';
 import HistoryMultisigLayout from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigLayout';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { reformatAddress } from '@subwallet/extension-koni-ui/utils';
+import { openInNewTab, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, SwModal } from '@subwallet/react-ui';
 import { ArrowCircleUpRight } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -25,6 +27,7 @@ type Props = ThemeProps & {
   onCancel: () => void,
   data: PendingMultisigTx
 }
+const alertModalId = 'multisig-confirmation-alert-modal';
 
 function Component ({ className = '', data, onCancel }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
@@ -33,8 +36,43 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
   const [loading, setLoading] = useState(false);
   const checkAction = usePreCheckAction({ address: data?.currentSigner });
   const { onError, onSuccess } = useHandleSubmitTransaction();
+  const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
+  const accountSigner = useGetAccountProxyByAddress(data.currentSigner);
   const { error, isLoading: isBalanceLoading } = useGetBalance(data.chain, data.currentSigner);
   const originChainInfo = useMemo(() => data && chainInfoMap[data.chain], [chainInfoMap, data]);
+
+  const validateSignerAndExecute = useCallback((action: () => void) => {
+    return () => {
+      const signerIsMultisig = !!accountSigner?.accountType && accountSigner?.accountType === AccountProxyType.MULTISIG;
+
+      if (signerIsMultisig) {
+        openAlert({
+          type: NotificationType.ERROR,
+          content: t('The selected signatory is a multisig account, which can’t be used to sign this transaction in SubWallet. Choose another signatory or go to Polkadot{.js} to sign with the selected signatory'),
+          title: t('Unable to sign'),
+          okButton: {
+            text: t('Go to Polkadot{.js}'),
+            onClick: () => {
+              openInNewTab('https://polkadot.js.org/apps/')();
+              closeAlert();
+              onCancel();
+            }
+          },
+          cancelButton: {
+            text: t('Dismiss'),
+            onClick: () => {
+              closeAlert();
+              onCancel();
+            }
+          }
+        });
+
+        return;
+      }
+
+      action();
+    };
+  }, [accountSigner, openAlert, t, closeAlert]);
 
   const handleAction = useCallback(
     async (action: () => Promise<SWTransactionResponse>) => {
@@ -172,14 +210,14 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
               danger
               disabled={buttonDisabled}
               loading={buttonLoading}
-              onClick={checkAction(_onReject, ExtrinsicType.MULTISIG_CANCEL_TX)}
+              onClick={validateSignerAndExecute(checkAction(_onReject, ExtrinsicType.MULTISIG_CANCEL_TX))}
             >{t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.reject')}</Button>
             {thresholdReached && (
               <Button
                 block
                 disabled={buttonDisabled}
                 loading={buttonLoading}
-                onClick={checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX)}
+                onClick={validateSignerAndExecute(checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX))}
               >{t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.execute')}</Button>
             )}
           </>
@@ -194,7 +232,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
                 block
                 disabled={buttonDisabled}
                 loading={buttonLoading}
-                onClick={isLastSigner ? checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX) : checkAction(_onApprove, ExtrinsicType.MULTISIG_APPROVE_TX)}
+                onClick={isLastSigner ? validateSignerAndExecute(checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX)) : validateSignerAndExecute(checkAction(_onApprove, ExtrinsicType.MULTISIG_APPROVE_TX))}
               >
                 {isLastSigner ? t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.approveAndExecute') : t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.approve')}
               </Button>
@@ -214,14 +252,14 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
                 block
                 disabled={buttonDisabled}
                 loading={buttonLoading}
-                onClick={checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX)}
+                onClick={validateSignerAndExecute(checkAction(_onExecute, ExtrinsicType.MULTISIG_EXECUTE_TX))}
               >{t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.execute')}</Button>
             )}
           </>
         )}
       </div>
     );
-  }, [_onApprove, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, error, formattedApprovals, isBalanceLoading, loading, t]);
+  }, [_onApprove, validateSignerAndExecute, accountSigner, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, error, formattedApprovals, isBalanceLoading, loading, t]);
 
   const modalFooter = useMemo(() => {
     if (!data) {
@@ -260,17 +298,27 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
   }, [error, onError]);
 
   return (
-    <SwModal
-      className={className}
-      footer={modalFooter}
-      id={MULTISIG_HISTORY_INFO_MODAL}
-      onCancel={onCancel}
-      title={t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.sendToken')}
-    >
-      <div className={'__layout-container'}>
-        {data && <HistoryMultisigLayout data={data} />}
-      </div>
-    </SwModal>
+    <>
+      <SwModal
+        className={className}
+        footer={modalFooter}
+        id={MULTISIG_HISTORY_INFO_MODAL}
+        onCancel={onCancel}
+        title={t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.sendToken')}
+      >
+        <div className={'__layout-container'}>
+          {data && <HistoryMultisigLayout data={data} />}
+        </div>
+      </SwModal>
+      {
+        !!alertProps && (
+          <AlertModal
+            modalId={alertModalId}
+            {...alertProps}
+          />
+        )
+      }
+    </>
   );
 }
 

@@ -249,7 +249,7 @@ const Component: React.FC<Props> = (props: Props) => {
         title={t('ui.Confirmations.Detail.CallDataDetail.transactionDetails')}
       >
         <pre className='json'>
-          {JSON.stringify(data.callData || '', null, 2)}
+          {JSON.stringify(data.decodedCallData || '', null, 2)}
         </pre>
       </BaseDetailModal>}
     </div>
