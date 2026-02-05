@@ -44,7 +44,7 @@ const Component: React.FC<Props> = (props: Props) => {
           label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyType')}
         >
           <span className='__selected-validator-type'>
-            {isDelegatedStaking ? 'Staking' : data.substrateProxyType}
+            {data.substrateProxyType}
           </span>
         </MetaInfo.Default>
 

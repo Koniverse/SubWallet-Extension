@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _Address, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { SubstrateProxyType } from '@subwallet/extension-base/types/substrateProxyAccount';
 
 import { BaseProcessRequestSign, BaseRequestSign, InternalRequestSign, TransactionData } from '../../../transaction';
 import { NominationPoolInfo, ValidatorInfo, YieldPoolType, YieldPositionInfo } from '../../info';
@@ -42,6 +43,8 @@ export interface SubmitJoinNominationPool extends AbstractSubmitYieldJoinData {
 export interface SubmitJoinDelegateStaking extends AbstractSubmitYieldJoinData {
   substrateProxyAddress: string;
   substrateProxyDeposit: string;
+  substrateProxyType: SubstrateProxyType;
+  minBond: string;
 }
 
 export interface SubmitYieldStepData extends AbstractSubmitYieldJoinData { // TODO
@@ -118,7 +121,8 @@ export interface DelegateStakingSubmitParams extends BaseRequestSign {
   amount: string,
   address: string,
   substrateProxyAddress: string,
-  substrateProxyDeposit: string
+  substrateProxyDeposit: string,
+  substrateProxyType: SubstrateProxyType,
 }
 
 export type RequestDelegateStakingSubmit = InternalRequestSign<DelegateStakingSubmitParams>;

@@ -6,7 +6,7 @@ import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/K
 import { BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
-import { BasicTxErrorType, DelegatedStrategyInfo, DelegatedYieldPoolInfo, EarningStatus, HandleYieldStepData, OptimalYieldPath, PrimitiveSubstrateProxyAccountItem, RequestDelegateStakingSubmit, RequestEarlyValidateYield, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, StrategyInfo, SubmitJoinDelegateStaking, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BalanceType, BasicTxErrorType, DelegatedStrategyInfo, DelegatedYieldPoolInfo, EarningStatus, HandleYieldStepData, OptimalYieldPath, PrimitiveSubstrateProxyAccountItem, RequestDelegateStakingSubmit, RequestEarlyValidateYield, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, StakingTxErrorType, StrategyInfo, SubmitJoinDelegateStaking, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { BN_TEN, isSameAddress, toBNString } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
 
@@ -331,8 +331,6 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
               isSameAddress(strategy.proxyAddress, proxy.delegate)
             );
 
-            console.log('hmm', [strategy, trustedStrategies, proxy]);
-
             if (!strategy) {
               return null;
             }
@@ -422,13 +420,75 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
     }
   }
 
-  public override validateYieldJoin (data: SubmitYieldJoinData, path: OptimalYieldPath): Promise<TransactionError[]> {
-    return Promise.resolve([]);
+  public override async validateYieldJoin (data: SubmitYieldJoinData, path: OptimalYieldPath): Promise<TransactionError[]> {
+    const { address, minBond, slug, substrateProxyAddress } = data as SubmitJoinDelegateStaking;
+
+    const poolInfo = await this.getPoolInfo(slug) as DelegatedYieldPoolInfo;
+
+    if (!poolInfo) {
+      return Promise.resolve([new TransactionError(BasicTxErrorType.INTERNAL_ERROR)]);
+    }
+
+    if (isSameAddress(address, substrateProxyAddress)) {
+      return Promise.resolve([new TransactionError(BasicTxErrorType.INVALID_PARAMS)]);
+    }
+
+    const errors: TransactionError[] = [];
+
+    const transferableBalance = await this.state.balanceService.getTransferableBalance(
+      address,
+      this.chain,
+      this.nativeToken.slug
+    );
+
+    const totalEquilvalent = await this.state.balanceService.getBalanceByType(
+      address,
+      this.chain,
+      this.nativeToken.slug,
+      BalanceType.TOTAL_EQUIVALENT
+    );
+
+    const bnTransferable = new BigNumber(transferableBalance.value || '0');
+    const bnTotalEquivalent = new BigNumber(totalEquilvalent.value || '0');
+
+    const chainApi = await this.substrateApi.isReady;
+
+    const proxyDeposit = poolInfo.proxyDeposit || '0';
+
+    // Check if account already has a proxy
+    let hasStakingProxy = false;
+
+    try {
+      const proxies = await chainApi.api.query.proxy.proxies(address);
+
+      if (proxies) {
+        const [proxyDefs] = proxies as unknown as [PrimitiveSubstrateProxyAccountItem[], string];
+
+        hasStakingProxy = (proxyDefs || []).length > 0;
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    // If account does not have staking proxy and transferable balance is less than proxy deposit -> error
+    if (!hasStakingProxy && bnTransferable.lt(new BigNumber(proxyDeposit))) {
+      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_STAKE));
+
+      return errors;
+    }
+
+    if (bnTotalEquivalent.lt(new BigNumber(minBond))) {
+      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_STAKE));
+
+      return errors;
+    }
+
+    return errors;
   }
 
   override async createJoinExtrinsic (data: SubmitJoinDelegateStaking, positionInfo?: YieldPositionInfo, bondDest?: string, netuid?: number): Promise<[TransactionData, YieldTokenBaseInfo]> {
     const chainApi = await this.substrateApi.isReady;
-    const { address, substrateProxyAddress, substrateProxyDeposit } = data;
+    const { address, substrateProxyAddress, substrateProxyDeposit, substrateProxyType } = data;
 
     if (!substrateProxyAddress) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
@@ -440,7 +500,6 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
     if (proxies) {
       const [proxyDefs] = proxies;
 
-      console.log('checking', proxyDefs);
       proxyDefs.forEach((proxyDef) => {
         txList.push(
           chainApi.api.tx.proxy.removeProxy(
@@ -452,7 +511,7 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
       });
     }
 
-    txList.push(chainApi.api.tx.proxy.addProxy(substrateProxyAddress, 'Staking', 0));
+    txList.push(chainApi.api.tx.proxy.addProxy(substrateProxyAddress, substrateProxyType, 0));
     const extrinsic = txList.length === 1 ? txList[0] : chainApi.api.tx.utility.batchAll(txList);
 
     return [extrinsic, { slug: this.nativeToken.slug, amount: txList.length === 1 ? substrateProxyDeposit : '0' }];
@@ -460,7 +519,7 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
 
   override async handleYieldJoin (_data: SubmitYieldJoinData, path: OptimalYieldPath, currentStep: number): Promise<HandleYieldStepData> {
     const data = _data as SubmitJoinDelegateStaking;
-    const { address, amount, slug, substrateProxyAddress, substrateProxyDeposit } = data;
+    const { address, amount, slug, substrateProxyAddress, substrateProxyDeposit, substrateProxyType } = data;
 
     const positionInfo = await this.getPoolPosition(address, slug);
     const [extrinsic, yieldTokenInfo] = await this.createJoinExtrinsic(data, positionInfo);
@@ -475,7 +534,8 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
       amount,
       address,
       substrateProxyAddress,
-      substrateProxyDeposit
+      substrateProxyDeposit,
+      substrateProxyType
     };
 
     return {

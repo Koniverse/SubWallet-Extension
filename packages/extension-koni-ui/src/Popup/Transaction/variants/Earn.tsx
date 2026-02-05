@@ -24,7 +24,7 @@ import { fetchPoolTarget, getOptimalYieldPath, submitJoinYieldPool, submitProces
 import { DEFAULT_YIELD_PROCESS, EarningActionType, earningReducer } from '@subwallet/extension-koni-ui/reducer';
 import { store } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, EarnParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, getExtrinsicTypeByPoolInfo, parseNominations, reformatAddress, simpleCheckForm, toShort } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, getExtrinsicTypeByPoolInfo, getValidatorKey, parseDelegatedNominations, parseNominations, reformatAddress, simpleCheckForm, toShort } from '@subwallet/extension-koni-ui/utils';
 import { ActivityIndicator, Button, ButtonProps, Form, Icon, Logo, ModalContext, Number, Tooltip } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -295,17 +295,24 @@ const Component = () => {
           return [];
         }
 
-        const result: StrategyInfo[] = [];
-        const nominations = parseNominations(poolTargetValue);
-        const newStrategyList: { [address: string]: StrategyInfo } = {};
+        const nominations = parseDelegatedNominations(poolTargetValue);
+        const strategyMap: Record<string, StrategyInfo> = {};
 
         strategyList.forEach((strategy) => {
-          newStrategyList[reformatAddress(strategy.address)] = strategy;
+          const key = getValidatorKey(reformatAddress(strategy.address), strategy.identity);
+
+          strategyMap[key] = strategy;
         });
+
+        const result: StrategyInfo[] = [];
+
         nominations.forEach((nomination) => {
-          if (newStrategyList?.[reformatAddress(nomination)]) {
-            // remember the format of the address
-            result.push(newStrategyList[reformatAddress(nomination)]);
+          const [address, identity] = nomination.split('___');
+
+          const key = getValidatorKey(reformatAddress(address), identity);
+
+          if (strategyMap[key]) {
+            result.push(strategyMap[key]);
           }
         });
 
@@ -528,15 +535,17 @@ const Component = () => {
               selectedValidators: targets
             } as SubmitJoinNominationPool;
           } else if (poolInfo.type === YieldPoolType.DELEGATED_STAKING) {
-            const selectedStrategy = targets[0];
+            const selectedStrategy = targets[0] as StrategyInfo;
 
             return {
               slug: slug,
               address: from,
               amount: 0,
-              substrateProxyAddress: selectedStrategy.address,
+              selectedStrategy: selectedStrategy.address,
               selectedValidators: targets,
-              substrateProxyDeposit: poolInfo.proxyDeposit
+              substrateProxyDeposit: poolInfo.proxyDeposit,
+              substrateProxyType: 'Staking',
+              minBond: selectedStrategy.minBond
             } as unknown as SubmitJoinDelegateStaking;
           } else {
             return {

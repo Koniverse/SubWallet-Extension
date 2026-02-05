@@ -222,7 +222,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return (
       <StakingStrategyItem
         apy={item?.expectedReturn?.toString() || '0'}
-        className={'pool-item'}
+        className={'strategy-item'}
         isNominated={nominated}
         isSelected={selected}
         key={key}
@@ -385,7 +385,7 @@ const EarningStrategySelector = styled(forwardRef(Component))<Props>(({ theme: {
       marginBottom: token.margin
     },
 
-    '.pool-item:not(:last-child)': {
+    '.strategy-item:not(:last-child)': {
       marginBottom: token.marginXS
     }
   };

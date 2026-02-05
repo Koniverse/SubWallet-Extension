@@ -16,3 +16,7 @@ export const parseNominations = (nomination: string) => {
 
   return result;
 };
+
+export const parseDelegatedNominations = (nomination: string): string[] => {
+  return (nomination || '').split(',').filter(Boolean);
+};
