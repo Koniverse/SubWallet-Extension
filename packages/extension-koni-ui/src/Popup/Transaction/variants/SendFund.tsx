@@ -12,7 +12,7 @@ import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, _isPosChainL2Bridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getContractAddressOfToken, _getEvmChainId, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainCompatibleLedgerEvm, _isChainEvmCompatible, _isNativeToken, _isNativeTokenBySlug, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getContractAddressOfToken, _getEvmChainId, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainCompatibleLedgerEvm, _isChainEvmCompatible, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
@@ -23,7 +23,7 @@ import { _reformatAddressWithChain, isAccountAll, isSubstrateEcdsaLedgerAssetSup
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenSelector } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { useAlert, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useGetWrappedTransactionSigners, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import useLazyWatchTransaction from '@subwallet/extension-koni-ui/hooks/transaction/useWatchTransactionLazy';
 import { approveSpending, cancelSubscription, getOptimalTransferProcess, getTokensCanPayFee, isTonBounceableAddress, makeCrossChainTransfer, makeTransfer, subscribeMaxTransfer } from '@subwallet/extension-koni-ui/messaging';
@@ -34,6 +34,7 @@ import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field'
 import { findAccountByAddress, formatBalance, getSignModeByAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
+import { useQuery } from '@tanstack/react-query';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { PaperPlaneRight, PaperPlaneTilt } from 'phosphor-react';
@@ -121,7 +122,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const { t } = useTranslation();
   const notification = useNotification();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-
+  const getWrappedTransactionSigners = useGetWrappedTransactionSigners();
   const { defaultData, persistData } = useTransactionContext<TransferParams>();
   const { defaultSlug: sendFundSlug } = defaultData;
   const isFirstRender = useIsFirstRender();
@@ -395,6 +396,21 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const addressInputRef = useRef<AddressInputRef>(null);
   const addressInputCurrent = addressInputRef.current;
 
+  const { data: isWrappTransaction, isLoading: isCheckWrappTransactionLoading } = useQuery<boolean>({
+    queryKey: ['check-transaction-wrappable', fromValue, chainValue, extrinsicType],
+    queryFn: async () => {
+      const data = await getWrappedTransactionSigners({
+        extrinsicType,
+        chainSlug: chainValue,
+        targetAddress: fromValue
+      });
+
+      return data.length > 0;
+    },
+    staleTime: 30_000,
+    enabled: !!fromValue && !!chainValue
+  });
+
   const updateAddressInputValue = useCallback((value: string) => {
     addressInputCurrent?.setInputValue(value);
     addressInputCurrent?.setSelectedOption((prev) => {
@@ -426,7 +442,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [accounts, autoFormatValue, chainInfoMap, destAssetInfo, form, ledgerGenericAllowNetworks]);
 
   const validateAmount = useCallback((rule: Rule, amount: string): Promise<void> => {
-    const maxTransfer = transferInfo?.maxTransferable || '0';
+    const maxTransfer = (isWrappTransaction ? transferInfo?.maxTransferableWithoutFee : transferInfo?.maxTransferable) || '0';
 
     if (!amount) {
       return Promise.reject(t('ui.TRANSACTION.screen.Transaction.SendFund.amountIsRequired'));
@@ -447,7 +463,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
 
     return Promise.resolve();
-  }, [decimals, t, transferInfo?.maxTransferable]);
+  }, [decimals, isWrappTransaction, t, transferInfo?.maxTransferable, transferInfo?.maxTransferableWithoutFee]);
 
   const onValuesChange: FormCallbacks<TransferParams>['onValuesChange'] = useCallback(
     (part: Partial<TransferParams>, values: TransferParams) => {
@@ -932,11 +948,11 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   useEffect(() => {
     if (isTransferAll && transferInfo?.maxTransferable && !hideMaxButton) {
       form.setFieldsValue({
-        value: transferInfo?.maxTransferable
+        value: isWrappTransaction ? transferInfo?.maxTransferableWithoutFee : transferInfo?.maxTransferable
       });
       setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${Date.now()}`);
     }
-  }, [form, hideMaxButton, isTransferAll, transferInfo]);
+  }, [form, hideMaxButton, isTransferAll, isWrappTransaction, transferInfo]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');
@@ -1026,10 +1042,6 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       cancel = true;
     };
   }, [chainValue, fromValue, nativeTokenBalance, nativeTokenSlug]);
-
-  useEffect(() => {
-    console.log('transferInfo', transferInfo);
-  }, [transferInfo]);
 
   useRestoreTransaction(form);
 
@@ -1146,7 +1158,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           </Form.Item>
         </Form>
 
-        {FEE_SHOW_TYPES.includes(transferInfo?.feeType) && !!toValue && !!transferAmountValue && nativeTokenSlug && (
+        {FEE_SHOW_TYPES.includes(transferInfo?.feeType) && !!toValue && !!transferAmountValue && nativeTokenSlug && !isWrappTransaction && (
           <FeeEditor
             chainValue={chainValue}
             currentTokenPayFee={currentTokenPayFee}
@@ -1204,7 +1216,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
               weight={'fill'}
             />
           )}
-          loading={loading}
+          loading={loading || isCheckWrappTransactionLoading}
           onClick={checkAction(form.submit, extrinsicType)}
           schema={isTransferAll ? 'warning' : undefined}
         >

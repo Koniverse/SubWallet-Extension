@@ -407,6 +407,8 @@ export default class TransactionService {
       'transaction' in validatedTransaction && delete validatedTransaction.transaction;
       'additionalValidator' in validatedTransaction && delete validatedTransaction.additionalValidator;
       'eventsHandler' in validatedTransaction && delete validatedTransaction.eventsHandler;
+      // Remove emitter before returning response
+      'emitterTransaction' in validatedTransaction && delete (validatedTransaction as SWTransactionBase).emitterTransaction;
 
       return validatedTransaction;
     }
@@ -423,7 +425,9 @@ export default class TransactionService {
     // Mark original transaction as wrapped
     if (transactionData.transactionId) {
       this.updateTransaction(transactionData.transactionId, {
-        wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_SOURCE
+        wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_SOURCE,
+        estimateFee: validatedTransaction.estimateFee,
+        errors: []
       });
     }
 

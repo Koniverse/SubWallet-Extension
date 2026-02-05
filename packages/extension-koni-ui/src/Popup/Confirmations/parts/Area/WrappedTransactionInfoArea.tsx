@@ -126,12 +126,12 @@ function Component ({ className, setDisable, transaction }: Props) {
         });
       }
 
+      setWrapTransactionInfo(transactionResponse);
+
       if (transactionResponse.errors?.length) {
         setTransactionError(transactionResponse.errors[0]);
-        setWrapTransactionInfo(null);
       } else {
         setDisable(false);
-        setWrapTransactionInfo(transactionResponse);
       }
     } catch (e) {
       setIsWrapTransactionLoading(false);
@@ -417,6 +417,10 @@ const WrappedTransactionInfoArea = styled(Component)<Props>(({ theme: { token } 
 
       '.alert-description': {
         color: token.colorWarning
+      },
+
+      '.alert-content': {
+        justifyContent: 'center'
       }
     },
 
