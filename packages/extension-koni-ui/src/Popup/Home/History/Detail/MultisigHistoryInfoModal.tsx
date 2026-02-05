@@ -7,12 +7,12 @@ import { SWTransactionResponse } from '@subwallet/extension-base/services/transa
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest } from '@subwallet/extension-base/types/multisig';
 import { MULTISIG_HISTORY_INFO_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useChainChecker, useGetBalance, useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
+import { useGetBalance, useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
 import { approvePendingTx, cancelPendingTx, executePendingTx } from '@subwallet/extension-koni-ui/messaging';
 import HistoryMultisigLayout from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigLayout';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { isAccountAll, reformatAddress } from '@subwallet/extension-koni-ui/utils';
+import { reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, SwModal } from '@subwallet/react-ui';
 import { ArrowCircleUpRight } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -30,11 +30,9 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
   const { t } = useTranslation();
   const navigate = useNavigate();
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
-  const { currentAccountProxy } = useSelector((state: RootState) => state.accountState);
   const [loading, setLoading] = useState(false);
   const checkAction = usePreCheckAction({ address: data?.currentSigner });
   const { onError, onSuccess } = useHandleSubmitTransaction();
-  const chainChecker = useChainChecker();
   const { error, isLoading: isBalanceLoading } = useGetBalance(data.chain, data.currentSigner);
   const originChainInfo = useMemo(() => data && chainInfoMap[data.chain], [chainInfoMap, data]);
 
@@ -153,18 +151,6 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
     return data.approvals.map((address) => reformatAddress(address));
   }, [data?.approvals]);
 
-  const isCurrentAccountIsMultisig = useMemo(() => {
-    if (!currentAccountProxy || !data.multisigAddress) {
-      return false;
-    }
-
-    if (isAccountAll(currentAccountProxy.id)) {
-      return false;
-    }
-
-    return reformatAddress(currentAccountProxy.accounts[0].address) === reformatAddress(data.multisigAddress);
-  }, [currentAccountProxy, data.multisigAddress]);
-
   const getMultisigFooter = useMemo(() => {
     const currentSigner = reformatAddress(data?.currentSigner);
     const isInitiator = reformatAddress(data.depositor) === currentSigner;
@@ -174,7 +160,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
     const thresholdReached = approvalCount >= threshold;
     const isLastSigner = approvalCount + 1 === threshold;
     const buttonLoading = loading || isBalanceLoading;
-    const buttonDisabled = buttonLoading || !!error || isCurrentAccountIsMultisig;
+    const buttonDisabled = buttonLoading || !!error;
 
     return (
       <div className={'multisig-footer'}>
@@ -235,7 +221,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
         )}
       </div>
     );
-  }, [_onApprove, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, error, formattedApprovals, isBalanceLoading, loading, isCurrentAccountIsMultisig, t]);
+  }, [_onApprove, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, error, formattedApprovals, isBalanceLoading, loading, t]);
 
   const modalFooter = useMemo(() => {
     if (!data) {
@@ -268,8 +254,10 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
   }, [data, originChainInfo, openBlockExplorer, t, getMultisigFooter]);
 
   useEffect(() => {
-    originChainInfo && chainChecker(originChainInfo.slug);
-  }, [chainChecker, originChainInfo]);
+    if (error) {
+      onError(new Error(error));
+    }
+  }, [error, onError]);
 
   return (
     <SwModal
