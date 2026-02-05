@@ -9,7 +9,7 @@ import { AccountProxyType } from '@subwallet/extension-base/types';
 import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest } from '@subwallet/extension-base/types/multisig';
 import { AlertModal } from '@subwallet/extension-koni-ui/components';
 import { MULTISIG_HISTORY_INFO_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { useAlert, useChainChecker, useGetAccountProxyByAddress, useGetBalance, useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useGetAccountProxyByAddress, useGetBalance, useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
 import { approvePendingTx, cancelPendingTx, executePendingTx } from '@subwallet/extension-koni-ui/messaging';
 import HistoryMultisigLayout from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigLayout';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -72,7 +72,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
 
       action();
     };
-  }, [accountSigner, openAlert, t, closeAlert]);
+  }, [accountSigner, openAlert, t, closeAlert, onCancel]);
 
   const handleAction = useCallback(
     async (action: () => Promise<SWTransactionResponse>) => {
@@ -259,7 +259,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
         )}
       </div>
     );
-  }, [_onApprove, validateSignerAndExecute, accountSigner, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, error, formattedApprovals, isBalanceLoading, loading, t]);
+  }, [_onApprove, validateSignerAndExecute, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, error, formattedApprovals, isBalanceLoading, loading, t]);
 
   const modalFooter = useMemo(() => {
     if (!data) {
