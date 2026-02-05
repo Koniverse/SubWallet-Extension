@@ -661,7 +661,8 @@ const AccountDetail = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
       gap: 8,
       flexDirection: 'column',
       padding: token.padding,
-      paddingTop: 12
+      paddingTop: 12,
+      overflow: 'auto'
     },
 
     '.account-detail-form .ant-form-item': {

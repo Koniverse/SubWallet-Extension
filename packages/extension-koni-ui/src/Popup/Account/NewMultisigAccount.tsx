@@ -452,6 +452,7 @@ const NewMultisigAccount = styled(Component)<Props>(({ theme: { token } }: Props
   return {
     '.container': {
       padding: token.padding,
+      paddingBottom: 0,
       textAlign: 'center'
     },
 
@@ -514,6 +515,12 @@ const NewMultisigAccount = styled(Component)<Props>(({ theme: { token } }: Props
       flex: 1,
       '.__address': {
         display: 'flex'
+      }
+    },
+
+    '.threshold-form-wrapper': {
+      '.ant-form-item': {
+        marginBottom: 0
       }
     }
   };
