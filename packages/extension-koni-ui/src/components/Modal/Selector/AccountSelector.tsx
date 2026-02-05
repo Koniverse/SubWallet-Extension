@@ -203,6 +203,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
         ...groupedItemMap.watchOnly,
         ...groupedItemMap.ledger,
         ...groupedItemMap.injected,
+        ...groupedItemMap.multisig,
         ...groupedItemMap.unknown
       ];
 
