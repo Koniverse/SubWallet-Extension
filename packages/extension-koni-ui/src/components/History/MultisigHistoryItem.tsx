@@ -8,7 +8,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Logo, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ArrowUpRight, HardDrives, Question } from 'phosphor-react';
+import { ArrowsLeftRight, ArrowUpRight, HardDrives, NewspaperClipping, Question } from 'phosphor-react';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -29,6 +29,22 @@ const Component = ({ className = '', item, onClick }: Props) => {
 
     if (item.multisigTxType === MultisigTxType.STAKING) {
       return { icon: HardDrives, name: 'Stake' };
+    }
+
+    if (item.multisigTxType === MultisigTxType.SWAP) {
+      return { icon: ArrowsLeftRight, name: 'Swap' };
+    }
+
+    if (item.multisigTxType === MultisigTxType.GOV) {
+      return { icon: NewspaperClipping, name: 'Governance' };
+    }
+
+    if (item.multisigTxType === MultisigTxType.LENDING) {
+      return { icon: NewspaperClipping, name: 'Lending' };
+    }
+
+    if (item.multisigTxType === MultisigTxType.SET_TOKEN_PAY_FEE) {
+      return { icon: NewspaperClipping, name: 'Token Pay Fee' };
     }
 
     return { icon: Question, name: 'Unknown' };
