@@ -161,11 +161,38 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('send-fund');
+
+  const selectedAccount = useMemo(() => {
+    return fromValue ? findAccountByAddress(accounts, fromValue) : undefined;
+  }, [accounts, fromValue]);
+
+  const isMultisigAccount = useMemo(
+    () => !!selectedAccount?.isMultisig,
+    [selectedAccount]
+  );
+
+  const isCrossChainTransfer = useMemo(
+    () => !!chainValue && !!destChainValue && chainValue !== destChainValue,
+    [chainValue, destChainValue]
+  );
+
+  const isUnsupportedMultisigCrossChain = useMemo(
+    () => isMultisigAccount && isCrossChainTransfer,
+    [isMultisigAccount, isCrossChainTransfer]
+  );
+
+  const preCheckMessage = useMemo(() => {
+    return isUnsupportedMultisigCrossChain
+      ? t('ui.TRANSACTION.screen.Transaction.SendFund.crossChainNotSupportedForMultisig')
+      : t('ui.TRANSACTION.screen.Transaction.SendFund.cannotSendWithAccountType');
+  }, [isUnsupportedMultisigCrossChain, t]);
+
   const checkAction = usePreCheckAction({
     address: fromValue,
     chain: chainValue,
     blockAllAccount: true,
-    message: t('ui.TRANSACTION.screen.Transaction.SendFund.cannotSendWithAccountType')
+    message: preCheckMessage,
+    type: isUnsupportedMultisigCrossChain ? NotificationType.ERROR : NotificationType.INFO
   });
 
   const currentConfirmation = useMemo(() => {

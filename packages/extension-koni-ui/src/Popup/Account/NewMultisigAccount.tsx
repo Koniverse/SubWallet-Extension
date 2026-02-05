@@ -133,12 +133,46 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   }, [setSigners]);
 
   const onConfirmSignatory = useCallback(() => {
+    // Check if multisig account with same signers and threshold already exists
+    const existingMultisigAccount = accounts.find((account) => {
+      if (!account.isMultisig) {
+        return false;
+      }
+
+      // Check if signers match
+      const accountSignerSet = new Set(account.signers || []);
+      const currentSignerSet = new Set(signerAddresses);
+
+      if (accountSignerSet.size !== currentSignerSet.size) {
+        return false;
+      }
+
+      // Check if all signers match
+      for (const signer of accountSignerSet) {
+        if (!currentSignerSet.has(signer)) {
+          return false;
+        }
+      }
+
+      // Check if threshold matches
+      return account.threshold === parseInt(thresholdValue);
+    });
+
+    if (existingMultisigAccount) {
+      notify({
+        message: t('ui.ACCOUNT.screen.Account.NewMultisigAccount.multisigAccountAlreadyExists'),
+        type: 'error'
+      });
+
+      return;
+    }
+
     checkUnlock().then(() => {
       activeModal(accountNameModalId);
     }).catch(() => {
       // User cancel unlock
     });
-  }, [activeModal, checkUnlock]);
+  }, [activeModal, checkUnlock, accounts, signerAddresses, thresholdValue, t, notify]);
 
   const onOpenAddressBook = useCallback((e?: SyntheticEvent) => {
     e && e.stopPropagation();
@@ -212,7 +246,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     const { signerAddress } = form.getFieldsValue();
 
     if (!isSubstrateAddress(signerAddress)) {
-      return Promise.reject(t('Invalid signatories address'));
+      return Promise.reject(t('ui.ACCOUNT.screen.Account.NewMultisigAccount.invalidSignatoryAddress'));
     }
 
     const formattedAddress = reformatAddress(signerAddressValue);
@@ -233,11 +267,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
       const threshold = Number(value);
 
-      if (!Number.isInteger(threshold)) {
-        return Promise.reject(t('ui.ACCOUNT.screen.Account.NewMultisigAccount.thresholdMustBeNaturalNumber'));
-      }
-
-      if (threshold <= 1) {
+      if (!Number.isInteger(threshold) || threshold <= 1) {
         return Promise.reject(t('ui.ACCOUNT.screen.Account.NewMultisigAccount.thresholdGreaterThanOne'));
       }
 
@@ -420,6 +450,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                             validator: validateThreshold
                           }
                         ]}
+                        statusHelpAsTooltip={true}
                       >
                         <Input
                           className={'threshold-form-input'}

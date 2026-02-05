@@ -3,7 +3,7 @@
 
 import { AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { PhosphorIcon } from '@subwallet/extension-koni-ui/types';
-import { Eye, GitCommit, Needle, QrCode, Question, Strategy, Swatches } from 'phosphor-react';
+import { Eye, GitCommit, Needle, QrCode, Question, Strategy, Swatches, UserSwitch } from 'phosphor-react';
 import { IconWeight } from 'phosphor-react/src/lib';
 
 type AccountProxyTypeIcon = {
@@ -53,6 +53,14 @@ export const getAccountProxyTypeIcon = (accountProxy: AccountProxy): AccountProx
   if (accountProxy.accountType === AccountProxyType.INJECTED) {
     return {
       value: Needle,
+      weight: 'fill'
+    };
+  }
+
+  if (accountProxy.accountType === AccountProxyType.MULTISIG) {
+    return {
+      className: '-is-multisig',
+      value: UserSwitch,
       weight: 'fill'
     };
   }

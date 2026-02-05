@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { ALL_STAKING_ACTIONS, isLedgerCapable, isProductionMode, ledgerIncompatible, SubstrateLedgerSignModeSupport } from '@subwallet/extension-koni-ui/constants';
@@ -21,9 +21,10 @@ type ActionPreCheckParams = {
   chain?: string;
   blockAllAccount?: boolean;
   message?: string;
+  type?: NotificationType;
 };
 
-const usePreCheckAction = ({ address, blockAllAccount = true, chain, message }: ActionPreCheckParams): WrapActionWithPreCheck => {
+const usePreCheckAction = ({ address, blockAllAccount = true, chain, message, type }: ActionPreCheckParams): WrapActionWithPreCheck => {
   const notify = useNotification();
   const { t } = useTranslation();
 
@@ -64,20 +65,30 @@ const usePreCheckAction = ({ address, blockAllAccount = true, chain, message }: 
         let block = false;
         let accountTitle = getAccountTypeTitle(mode);
         let defaultMessage = detectTranslate('ui.ACCOUNT.hook.account.usePreCheckAction.featureNotAvailableForAccountType');
+        let messageOverride: string | undefined;
+        let notifyType: NotificationType = type || NotificationType.INFO;
 
         if (ALL_STAKING_ACTIONS.includes(action)) {
           defaultMessage = detectTranslate('ui.ACCOUNT.hook.account.usePreCheckAction.earningNotSupportedForAccountType');
         }
 
         if (account.isMultisig && chain) {
-          const { signableProxies } = await getSignableAccountInfos({ multisigProxyId: account.address, extrinsicType: action, chain });
+          const { signableProxies } = await getSignableAccountInfos({
+            multisigProxyId: account.address,
+            extrinsicType: action,
+            chain
+          });
 
           if (signableProxies.length === 0) {
             block = true;
+            messageOverride = t('ui.ACCOUNT.hook.account.usePreCheckAction.noMultisigSignatories');
+            notifyType = NotificationType.ERROR;
           }
         }
 
-        if (!account.transactionActions.includes(action) || (mode === AccountSignMode.QR && account.chainType === 'ethereum' && isProductionMode)) {
+        if (!account.transactionActions.includes(action) ||
+        (mode === AccountSignMode.QR && account.chainType === 'ethereum' && isProductionMode)
+        ) {
           block = true;
 
           switch (mode) {
@@ -101,6 +112,7 @@ const usePreCheckAction = ({ address, blockAllAccount = true, chain, message }: 
               }
 
               break;
+
             case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
               accountTitle = t('ui.ACCOUNT.hook.account.usePreCheckAction.ledgerPolkadotEvmAccount');
               break;
@@ -111,7 +123,7 @@ const usePreCheckAction = ({ address, blockAllAccount = true, chain, message }: 
           if (!isLedgerCapable) {
             notify({
               message: t(ledgerIncompatible),
-              type: 'error',
+              type: NotificationType.ERROR,
               duration: 8
             });
 
@@ -123,17 +135,17 @@ const usePreCheckAction = ({ address, blockAllAccount = true, chain, message }: 
           onClick();
         } else {
           notify({
-            message: t(
+            message: messageOverride ?? t(
               message ?? t(defaultMessage),
-              { replace: { accountTitle: accountTitle } }
+              { replace: { accountTitle } }
             ),
-            type: 'info',
+            type: notifyType,
             duration: 8
           });
         }
       }
     };
-  }, [account, blockAllAccount, chain, getAccountTypeTitle, message, notify, t]);
+  }, [account, blockAllAccount, chain, getAccountTypeTitle, message, notify, t, type]);
 };
 
 export default usePreCheckAction;

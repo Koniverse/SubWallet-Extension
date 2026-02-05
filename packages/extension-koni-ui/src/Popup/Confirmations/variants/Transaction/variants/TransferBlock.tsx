@@ -46,6 +46,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
   const destinationChainSlug = useMemo(() => xcmData?.destinationNetworkKey || transaction.chain, [xcmData?.destinationNetworkKey, transaction.chain]);
   const originChainSlug = useMemo(() => xcmData?.originNetworkKey || transaction.chain, [xcmData?.originNetworkKey, transaction.chain]);
   const senderLabel = useMemo(() => fromAccount?.isMultisig ? t('ui.TRANSACTION.Confirmations.TransferBlock.multisig') : t('ui.TRANSACTION.Confirmations.TransferBlock.sender'), [fromAccount?.isMultisig, t]);
+  const chainInfo = useMemo(() => chainInfoMap[transaction.chain], [chainInfoMap, transaction.chain]);
   const { decimals: nativeTokenDecimals, symbol: nativeTokenSymbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const feeInfo = transaction.estimateFee;
 
@@ -59,32 +60,48 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
               network={transaction.chain}
             />
           )
-          : (
-            <MetaInfo hasBackgroundWrapper>
-
-              <MetaInfo.Transfer
-                alwaysShowChain
-                destinationChain={{
-                  slug: destinationChainSlug,
-                  name: _getChainName(chainInfoMap[destinationChainSlug])
-                }}
-                originChain={{
-                  slug: originChainSlug,
-                  name: _getChainName(chainInfoMap[originChainSlug])
-                }}
-                recipientAddress={data.to}
-                recipientLabel={t('ui.TRANSACTION.Confirmations.TransferBlock.recipient')}
-                recipientName={toAccountName}
-                senderAddress={data.from}
-                senderLabel={senderLabel}
-                senderName={fromAccountName}
-              />
-            </MetaInfo>
-          )
+          : (!!chainInfo && transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM
+            ? (
+              <MetaInfo hasBackgroundWrapper>
+                <MetaInfo.Transfer
+                  alwaysShowChain
+                  destinationChain={{
+                    slug: destinationChainSlug,
+                    name: _getChainName(chainInfoMap[destinationChainSlug])
+                  }}
+                  originChain={{
+                    slug: originChainSlug,
+                    name: _getChainName(chainInfoMap[originChainSlug])
+                  }}
+                  recipientAddress={data.to}
+                  recipientLabel={t('ui.TRANSACTION.Confirmations.TransferBlock.recipient')}
+                  recipientName={toAccountName}
+                  senderAddress={data.from}
+                  senderLabel={senderLabel}
+                  senderName={fromAccountName}
+                />
+              </MetaInfo>
+            )
+            : (
+              <MetaInfo hasBackgroundWrapper>
+                <MetaInfo.Account
+                  address={data.from}
+                  label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendFrom')}
+                />
+                <MetaInfo.Account
+                  address={data.to}
+                  label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendTo')}
+                />
+                <MetaInfo.Chain
+                  chain={chainInfo.slug}
+                  label={t('ui.TRANSACTION.Confirmations.TransferBlock.network')}
+                />
+              </MetaInfo>
+            ))
       }
 
       <MetaInfo hasBackgroundWrapper>
-        { !!transaction.wrappingStatus &&
+        {!!transaction.wrappingStatus &&
           <MetaInfo.Account
             address={data.to}
             chainSlug={transaction.chain}
