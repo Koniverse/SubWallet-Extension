@@ -3,6 +3,7 @@
 
 import { MultisigTxType, PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import AccountProxyAvatar from '@subwallet/extension-koni-ui/components/AccountProxy/AccountProxyAvatar';
+import { MultisigTxToTypeNameMap } from '@subwallet/extension-koni-ui/constants/multisig';
 import { useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, toShort } from '@subwallet/extension-koni-ui/utils';
@@ -18,6 +19,22 @@ type Props = ThemeProps & {
   onClick?: () => void;
 };
 
+const stakeTypes = [
+  MultisigTxType.STAKING,
+  MultisigTxType.REDEEM,
+  MultisigTxType.UNSTAKE,
+  MultisigTxType.WITHDRAW,
+  MultisigTxType.CANCEL_UNSTAKE,
+  MultisigTxType.NOMINATE,
+  MultisigTxType.CLAIM_REWARD
+];
+
+const govTypes = [
+  MultisigTxType.GOV_VOTE,
+  MultisigTxType.GOV_REMOVE_VOTE,
+  MultisigTxType.GOV_UNLOCK_VOTE
+];
+
 const Component = ({ className = '', item, onClick }: Props) => {
   const { t } = useTranslation();
   const txInfo = useMemo(() => {
@@ -27,7 +44,7 @@ const Component = ({ className = '', item, onClick }: Props) => {
       return { icon: ArrowUpRight, name: 'Send' };
     }
 
-    if (item.multisigTxType === MultisigTxType.STAKING) {
+    if (stakeTypes.includes(item.multisigTxType)) {
       return { icon: HardDrives, name: 'Stake' };
     }
 
@@ -35,7 +52,7 @@ const Component = ({ className = '', item, onClick }: Props) => {
       return { icon: ArrowsLeftRight, name: 'Swap' };
     }
 
-    if (item.multisigTxType === MultisigTxType.GOV) {
+    if (govTypes.includes(item.multisigTxType)) {
       return { icon: NewspaperClipping, name: 'Governance' };
     }
 
@@ -89,7 +106,7 @@ const Component = ({ className = '', item, onClick }: Props) => {
                 </div>
               </div>
               <div className={'__meta'}>
-                {`${txInfo.name} - ${item.timestamp ? customFormatDate(item.timestamp, '#hhhh#:#mm#') : t('ui.HISTORY.components.MultisigItem.processing')}`}
+                {`${t(MultisigTxToTypeNameMap[item?.multisigTxType || MultisigTxType.UNKNOWN])} - ${item.timestamp ? customFormatDate(item.timestamp, '#hhhh#:#mm#') : t('ui.HISTORY.components.MultisigItem.processing')}`}
               </div>
             </div>
             <div className={'__value-group'}>

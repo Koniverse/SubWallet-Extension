@@ -174,7 +174,7 @@ export function getMultisigTxType (decodedCallData: DecodeCallDataResponse | und
   }
 
   if (MULTISIG_TX_TYPE_MAP.transfer_nft.includes(sectionMethod)) {
-    return MultisigTxType.TRANSFER;
+    return MultisigTxType.TRANSFER_NFT;
   }
 
   if (MULTISIG_TX_TYPE_MAP.staking.includes(sectionMethod)) {
@@ -182,35 +182,43 @@ export function getMultisigTxType (decodedCallData: DecodeCallDataResponse | und
   }
 
   if (MULTISIG_TX_TYPE_MAP.redeem.includes(sectionMethod)) {
-    return MultisigTxType.STAKING;
+    return MultisigTxType.REDEEM;
   }
 
   if (MULTISIG_TX_TYPE_MAP.unstake.includes(sectionMethod)) {
-    return MultisigTxType.STAKING;
+    return MultisigTxType.UNSTAKE;
   }
 
   if (MULTISIG_TX_TYPE_MAP.withdraw.includes(sectionMethod)) {
-    return MultisigTxType.STAKING;
+    return MultisigTxType.WITHDRAW;
   }
 
   if (MULTISIG_TX_TYPE_MAP.cancelUnstake.includes(sectionMethod)) {
-    return MultisigTxType.STAKING;
+    return MultisigTxType.CANCEL_UNSTAKE;
   }
 
   if (MULTISIG_TX_TYPE_MAP.claim.includes(sectionMethod)) {
-    return MultisigTxType.STAKING;
+    return MultisigTxType.CLAIM_REWARD;
   }
 
   if (MULTISIG_TX_TYPE_MAP.nominate.includes(sectionMethod)) {
-    return MultisigTxType.STAKING;
+    return MultisigTxType.NOMINATE;
   }
 
   if (MULTISIG_TX_TYPE_MAP.lending.includes(sectionMethod)) {
     return MultisigTxType.LENDING;
   }
 
-  if (MULTISIG_TX_TYPE_MAP.gov.includes(sectionMethod)) {
-    return MultisigTxType.GOV;
+  if (MULTISIG_TX_TYPE_MAP.govVote.includes(sectionMethod)) {
+    return MultisigTxType.GOV_VOTE;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.govUnlockVote.includes(sectionMethod)) {
+    return MultisigTxType.GOV_UNLOCK_VOTE;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.govRemoveVote.includes(sectionMethod)) {
+    return MultisigTxType.GOV_REMOVE_VOTE;
   }
 
   if (MULTISIG_TX_TYPE_MAP.swap.includes(sectionMethod)) {

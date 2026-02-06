@@ -108,22 +108,37 @@ export interface RequestGetPendingTxs {
   chain?: string
 }
 
-/**
- * Enum representing different types of multisig extrinsics
- */
 export enum MultisigTxType {
   /** Transfer extrinsic */
   TRANSFER = 'Transfer',
+  /** Transfer NFT extrinsic */
+  TRANSFER_NFT = 'TransferNFT',
   /** Staking-related extrinsic */
   STAKING = 'Staking',
+  /** Redeem extrinsic */
+  REDEEM = 'Redeem',
+  /** Unstake extrinsic */
+  UNSTAKE = 'Unstake',
+  /** Withdraw extrinsic */
+  WITHDRAW = 'Withdraw',
+  /** Cancel unstake extrinsic */
+  CANCEL_UNSTAKE = 'CancelUnstake',
+  /** Claim extrinsic */
+  CLAIM_REWARD = 'ClaimReward',
+  /** Nominate extrinsic */
+  NOMINATE = 'Nominate',
   /** Lending extrinsic */
   LENDING = 'Lending',
-  /** Set token pay fee extrinsic */
-  SET_TOKEN_PAY_FEE = 'SetTokenPayFee',
-  /** Governance extrinsic */
-  GOV = 'Governance',
   /** Swap extrinsic */
   SWAP = 'Swap',
+  /** Set token pay fee extrinsic */
+  SET_TOKEN_PAY_FEE = 'SetTokenPayFee',
+  /** Governance vote extrinsic */
+  GOV_VOTE = 'govVote',
+  /** Governance remove vote extrinsic */
+  GOV_REMOVE_VOTE = 'govRemoveVote',
+  /** Governance unlock vote extrinsic */
+  GOV_UNLOCK_VOTE = 'govUnlockVote',
   /** Unknown extrinsic type */
   UNKNOWN = 'Unknown'
 }
@@ -145,7 +160,9 @@ export const MULTISIG_TX_TYPE_MAP: Record<string, string[]> = {
   lending: ['loans.mint', 'loans.redeem', 'loans.redeemAll'], // consider remove
   swap: ['assetConversion.swapExactTokensForTokens'],
   setTokenPayFee: ['multiTransactionPayment.setCurrency'],
-  gov: ['convictionVoting.vote', 'convictionVoting.removeVote', 'convictionVoting.unlock']
+  govVote: ['convictionVoting.vote'],
+  govRemoveVote: ['convictionVoting.removeVote'],
+  govUnlockVote: ['convictionVoting.unlock']
 };
 
 /**

@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicStatus, ExtrinsicType, NotificationType, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
-import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
+import { MultisigTxType, PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { AccountProxyType } from '@subwallet/extension-base/types';
 import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest } from '@subwallet/extension-base/types/multisig';
 import { AlertModal } from '@subwallet/extension-koni-ui/components';
 import { MULTISIG_HISTORY_INFO_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { MultisigTxToTitleMap } from '@subwallet/extension-koni-ui/constants/multisig';
 import { useAlert, useGetAccountProxyByAddress, useGetBalance, useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
 import { approvePendingTx, cancelPendingTx, executePendingTx } from '@subwallet/extension-koni-ui/messaging';
 import HistoryMultisigLayout from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigLayout';
@@ -338,7 +339,7 @@ function Component ({ className = '', data, historyList = [], onCancel }: Props)
         footer={modalFooter}
         id={MULTISIG_HISTORY_INFO_MODAL}
         onCancel={onCancel}
-        title={t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.sendToken')}
+        title={t(MultisigTxToTitleMap[data?.multisigTxType || MultisigTxType.UNKNOWN])}
       >
         <div className={'__layout-container'}>
           {data && <HistoryMultisigLayout data={data} />}

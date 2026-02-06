@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicStatus } from '@subwallet/extension-base/background/KoniTypes';
-import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
+import { MultisigTxType, PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import AccountProxyAvatar from '@subwallet/extension-koni-ui/components/AccountProxy/AccountProxyAvatar';
 import { HistoryStatusMap } from '@subwallet/extension-koni-ui/constants';
+import { MultisigTxToTypeNameMap } from '@subwallet/extension-koni-ui/constants/multisig';
 import { useNotification, useOpenDetailModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { BaseDetailModal } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import HistoryMultisigHeader from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigHeader';
@@ -117,7 +118,7 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <MetaInfo.DisplayType
           label={t('ui.HISTORY.screen.HistoryDetail.MultisigLayout.type')}
-          typeName={t(data.multisigTxType || 'Unknown')}
+          typeName={t(MultisigTxToTypeNameMap[data?.multisigTxType || MultisigTxType.UNKNOWN])}
         />
         <HistoryMultisigHeader data={data} />
 

@@ -412,13 +412,13 @@ const Component = function ({ className }: Props) {
         case ExtrinsicType.UNKNOWN:
           return t('ui.Confirmations.transactionConfirm');
         case ExtrinsicType.MULTISIG_APPROVE_TX:
-          return t('ui.Confirmations.multisigApproveConfirmation');
+          return t('ui.Confirmations.multisigTransaction');
         case ExtrinsicType.MULTISIG_CANCEL_TX:
-          return t('ui.Confirmations.multisigCancelConfirmation');
+          return t('ui.Confirmations.multisigTransaction');
         case ExtrinsicType.MULTISIG_EXECUTE_TX:
-          return t('ui.Confirmations.multisigExecuteConfirmation');
+          return t('ui.Confirmations.multisigTransaction');
         case ExtrinsicType.MULTISIG_INIT_TX:
-          return t('ui.Confirmations.multisigInitConfirmation');
+          return t('ui.Confirmations.multisigTransaction');
       }
     } else {
       return t(titleMap[confirmation.type] || '');

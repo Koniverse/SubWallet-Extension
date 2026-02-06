@@ -43,6 +43,14 @@ export const trimNormalize = (value: unknown) => {
   return typeof value === 'string' ? value.trim() : value;
 };
 
+const normalizeNumberOnly = (value: unknown) => {
+  if (typeof value !== 'string') {
+    return value;
+  }
+
+  return value.replace(/\D/g, '');
+};
+
 const addressBookId = 'input-multisig-account-address-book-modal';
 
 const Component: React.FC<Props> = ({ className }: Props) => {
@@ -444,7 +452,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                     <div className={'threshold-form-wrapper'}>
                       <Form.Item
                         name={'threshold'}
-                        normalize={trimNormalize}
+                        normalize={normalizeNumberOnly}
                         rules={[
                           {
                             validator: validateThreshold

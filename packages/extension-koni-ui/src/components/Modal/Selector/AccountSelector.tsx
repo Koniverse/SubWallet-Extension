@@ -40,6 +40,7 @@ interface Props extends ThemeProps {
   onBack?: VoidFunction;
   selectedValue?: string;
   autoSelectFirstItem?: boolean;
+  hiddenAccountProxyTypes?: AccountProxyType[];
 }
 
 const renderEmpty = () => <GeneralEmptyList />;
@@ -48,7 +49,7 @@ function isAccountAddressItem (item: ListItem): item is AccountAddressItemType {
   return 'address' in item && 'accountProxyId' in item && 'accountName' in item && !('groupLabel' in item);
 }
 
-function Component ({ autoSelectFirstItem, className = '', items, modalId, onBack, onCancel, onSelectItem, selectedValue }: Props): React.ReactElement<Props> {
+function Component ({ autoSelectFirstItem, className = '', hiddenAccountProxyTypes = [], items, modalId, onBack, onCancel, onSelectItem, selectedValue }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { checkActive } = useContext(ModalContext);
 
@@ -99,21 +100,23 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
   }, [onSelect, selectedValue]);
 
   const sortedItems = useMemo<AccountAddressItemType[]>(() => {
-    return [...items].sort((a, b) => {
-      const _isABitcoin = isBitcoinAddress(a.address);
-      const _isBBitcoin = isBitcoinAddress(b.address);
-      const _isSameProxyId = a.accountProxyId === b.accountProxyId;
+    return [...items]
+      .filter((i) => !hiddenAccountProxyTypes.includes(i.accountProxyType))
+      .sort((a, b) => {
+        const _isABitcoin = isBitcoinAddress(a.address);
+        const _isBBitcoin = isBitcoinAddress(b.address);
+        const _isSameProxyId = a.accountProxyId === b.accountProxyId;
 
-      if (_isABitcoin && _isBBitcoin && _isSameProxyId) {
-        const aDetails = getBitcoinAccountDetails(a.accountType);
-        const bDetails = getBitcoinAccountDetails(b.accountType);
+        if (_isABitcoin && _isBBitcoin && _isSameProxyId) {
+          const aDetails = getBitcoinAccountDetails(a.accountType);
+          const bDetails = getBitcoinAccountDetails(b.accountType);
 
-        return aDetails.order - bDetails.order;
-      }
+          return aDetails.order - bDetails.order;
+        }
 
-      return 0;
-    });
-  }, [items]);
+        return 0;
+      });
+  }, [items, hiddenAccountProxyTypes]);
 
   const groupedItemMap = useMemo<GroupedItems>(() => {
     const result: GroupedItems = {
