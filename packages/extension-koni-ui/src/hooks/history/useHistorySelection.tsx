@@ -5,6 +5,7 @@ import { AccountProxy } from '@subwallet/extension-base/types';
 import { useChainInfoWithState, useCoreCreateReformatAddress, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { AccountAddressItemType, ChainItemType } from '@subwallet/extension-koni-ui/types';
 import { isAccountAll } from '@subwallet/extension-koni-ui/utils';
+import { isAddress } from '@subwallet/keyring';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -100,7 +101,13 @@ export default function useHistorySelection () {
   useEffect(() => {
     const doFunc = () => {
       if (accountAddressItems.length === 1) {
-        setSelectedAddress(accountAddressItems[0].address);
+        setSelectedAddress((prevState) => {
+          if (isAddress(prevState)) {
+            return prevState;
+          }
+
+          return accountAddressItems[0].address;
+        });
       }
     };
 

@@ -91,7 +91,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
           chainSlug={chainSlug}
           className='__proxy-account-item'
           isSelected={isSelected}
-          key={item.address}
+          key={`${item.address}-${item.kind}`}
           onClick={onSelect(item)}
           showUnselectIcon
           signerItem={item}

@@ -814,8 +814,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     </div>
   ), [emptyList, groupBy, groupSeparator, multisigList, renderMultisigItem, currentAccountProxy]);
 
-  console.log('multisigList', multisigList);
-
   const headerIcons = useMemo<ButtonProps[]>(() => {
     return [
       {

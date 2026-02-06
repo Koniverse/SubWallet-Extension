@@ -154,8 +154,6 @@ function Component ({ className, setDisable, transaction }: Props) {
 
   const isSelectorDisable = isGetSignableLoading || isWrapTransactionLoading;
 
-  console.log(wrapTransactionData?.callData);
-
   if (!transaction.wrappingStatus) {
     return <></>;
   }
@@ -307,7 +305,10 @@ function Component ({ className, setDisable, transaction }: Props) {
         showFooter={false}
         title={t('ui.Confirmations.Detail.CallDataDetail.transactionDetails')}
       >
-        <pre className='json'>
+        <pre
+          className='json'
+          style={{ marginBottom: 0 }}
+        >
           {JSON.stringify(wrapTransactionData?.decodedCallData || '', null, 2)}
         </pre>
       </BaseDetailModal>}
@@ -362,6 +363,11 @@ const WrappedTransactionInfoArea = styled(Component)<Props>(({ theme: { token } 
         minWidth: 'unset !important',
         color: token.colorTextLight4,
         transform: 'all 0.3s ease-in-out',
+        '.anticon': {
+          height: 'fit-content !important',
+          width: 'fit-content !important',
+          marginLeft: token.marginXS - 2
+        },
 
         '&:hover': {
           color: token.colorTextLight2
@@ -401,7 +407,8 @@ const WrappedTransactionInfoArea = styled(Component)<Props>(({ theme: { token } 
         '.__account-item-name': {
           whiteSpace: 'nowrap',
           textOverflow: 'ellipsis',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          maxWidth: 110
         }
       }
     },
@@ -428,7 +435,7 @@ const WrappedTransactionInfoArea = styled(Component)<Props>(({ theme: { token } 
 
     '&.call-data-detail-modal': {
       '.ant-sw-modal-body': {
-        height: 264,
+        maxHeight: 264,
         borderRadius: token.borderRadiusLG,
         padding: token.paddingSM,
         backgroundColor: token.colorBgSecondary,
