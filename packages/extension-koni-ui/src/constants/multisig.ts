@@ -21,6 +21,8 @@ export const MultisigTxToTitleMap: Record<MultisigTxType, string> = {
   [MultisigTxType.GOV_VOTE]: detectTranslate('ui.HISTORY.constant.multisig.title.govVote'),
   [MultisigTxType.GOV_REMOVE_VOTE]: detectTranslate('ui.HISTORY.constant.multisig.title.govRemoveVote'),
   [MultisigTxType.GOV_UNLOCK_VOTE]: detectTranslate('ui.HISTORY.constant.multisig.title.govUnlockVote'),
+  [MultisigTxType.ADD_PROXY]: detectTranslate('ui.HISTORY.constant.multisig.title.addProxy'),
+  [MultisigTxType.REMOVE_PROXY]: detectTranslate('ui.HISTORY.constant.multisig.title.removeProxy'),
   [MultisigTxType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.multisig.title.multisigTransaction')
 };
 
@@ -40,6 +42,8 @@ export const MultisigTxToTypeNameMap: Record<MultisigTxType, string> = {
   [MultisigTxType.GOV_VOTE]: detectTranslate('ui.HISTORY.constant.multisig.typeName.govVote'),
   [MultisigTxType.GOV_REMOVE_VOTE]: detectTranslate('ui.HISTORY.constant.multisig.typeName.govRemoveVote'),
   [MultisigTxType.GOV_UNLOCK_VOTE]: detectTranslate('ui.HISTORY.constant.multisig.typeName.govUnlockVote'),
+  [MultisigTxType.ADD_PROXY]: detectTranslate('ui.HISTORY.constant.multisig.typeName.addProxy'),
+  [MultisigTxType.REMOVE_PROXY]: detectTranslate('ui.HISTORY.constant.multisig.typeName.removeProxy'),
   [MultisigTxType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.multisig.typeName.unknown')
 };
 

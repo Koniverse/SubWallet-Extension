@@ -139,6 +139,10 @@ export enum MultisigTxType {
   GOV_REMOVE_VOTE = 'govRemoveVote',
   /** Governance unlock vote extrinsic */
   GOV_UNLOCK_VOTE = 'govUnlockVote',
+  /** Proxy add extrinsic */
+  ADD_PROXY = 'AddProxy',
+  /** Proxy remove extrinsic */
+  REMOVE_PROXY = 'RemoveProxy',
   /** Unknown extrinsic type */
   UNKNOWN = 'Unknown'
 }
@@ -162,7 +166,9 @@ export const MULTISIG_TX_TYPE_MAP: Record<string, string[]> = {
   setTokenPayFee: ['multiTransactionPayment.setCurrency'],
   govVote: ['convictionVoting.vote'],
   govRemoveVote: ['convictionVoting.removeVote'],
-  govUnlockVote: ['convictionVoting.unlock']
+  govUnlockVote: ['convictionVoting.unlock'],
+  addProxy: ['proxy.addProxy'],
+  removeProxy: ['proxy.removeProxy', 'proxy.removeProxies']
 };
 
 /**
