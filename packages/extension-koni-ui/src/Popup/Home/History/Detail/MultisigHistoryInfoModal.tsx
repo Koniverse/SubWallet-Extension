@@ -25,11 +25,12 @@ import styled from 'styled-components';
 
 type Props = ThemeProps & {
   onCancel: () => void,
-  data: PendingMultisigTx
+  data: PendingMultisigTx,
+  isProcessing?: boolean
 }
 const alertModalId = 'multisig-confirmation-alert-modal';
 
-function Component ({ className = '', data, onCancel }: Props): React.ReactElement<Props> {
+function Component ({ className = '', data, isProcessing = false, onCancel }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
@@ -197,7 +198,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
     const approvalCount = data.approvals.length;
     const thresholdReached = approvalCount >= threshold;
     const isLastSigner = approvalCount + 1 === threshold;
-    const buttonLoading = loading || isBalanceLoading;
+    const buttonLoading = loading || isBalanceLoading || isProcessing;
     const buttonDisabled = buttonLoading || !!error;
 
     return (
@@ -259,7 +260,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
         )}
       </div>
     );
-  }, [_onApprove, validateSignerAndExecute, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, error, formattedApprovals, isBalanceLoading, loading, t]);
+  }, [_onApprove, validateSignerAndExecute, isProcessing, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, error, formattedApprovals, isBalanceLoading, loading, t]);
 
   const modalFooter = useMemo(() => {
     if (!data) {

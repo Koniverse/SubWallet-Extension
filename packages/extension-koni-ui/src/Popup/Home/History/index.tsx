@@ -597,6 +597,39 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     activeModal(FILTER_MODAL_ID);
   }, [activeModal]);
 
+  const isMultisigProcessing = useMemo(() => {
+    if (!selectedMultisigItem || !rawHistoryList.length) {
+      return false;
+    }
+
+    return rawHistoryList.some((tx) => {
+      const isProcessing = tx.status === ExtrinsicStatus.PROCESSING ||
+        tx.status === ExtrinsicStatus.SUBMITTING ||
+        tx.status === ExtrinsicStatus.QUEUED;
+
+      if (!isProcessing) {
+        return false;
+      }
+
+      const txCallHash = tx.additionalInfo?.callHash;
+      const isMatchCallHash = txCallHash === selectedMultisigItem.callHash;
+      const isMyAction = reformatAddress(tx.address) === reformatAddress(selectedMultisigItem.currentSigner);
+      const isMultisigAction = [
+        ExtrinsicType.MULTISIG_APPROVE_TX,
+        ExtrinsicType.MULTISIG_EXECUTE_TX,
+        ExtrinsicType.MULTISIG_CANCEL_TX
+      ].includes(tx.type);
+
+      const tmp = isMatchCallHash && isMyAction && isMultisigAction;
+
+      if (tmp) {
+        console.log('tx', tx);
+      }
+
+      return isMatchCallHash && isMyAction && isMultisigAction;
+    });
+  }, [selectedMultisigItem?.extrinsicHash, selectedMultisigItem?.callHash, rawHistoryList]);
+
   useEffect(() => {
     if (extrinsicHashOrId && chain && openDetailLink) {
       const existed = Object.values(historyMap).find((item) => item.chain === chain && (item.transactionId === extrinsicHashOrId || item.extrinsicHash === extrinsicHashOrId));
@@ -642,6 +675,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       setSelectedMultisigItem(null);
     }
   }, [currentAccountProxyid, currentAccountProxy?.id, inactiveModal]);
+
+  console.log('multisigList', multisigList);
+  console.log('historyItems', historyItems);
+  console.log('isMultisigProcessing', isMultisigProcessing);
 
   const { accountAddressItems, chainItems, selectedAddress, selectedChain, setSelectedAddress,
     setSelectedChain } = useHistorySelection();
@@ -920,8 +957,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       />
       {selectedMultisigItem && <MultisigHistoryInfoModal
         data={selectedMultisigItem}
+        isProcessing={isMultisigProcessing}
         onCancel={onCloseMultisigDetail}
-      />}
+                               />}
 
       <FilterModal
         id={FILTER_MODAL_ID}
