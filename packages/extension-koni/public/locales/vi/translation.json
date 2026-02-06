@@ -254,7 +254,6 @@
   "ui.HISTORY.screen.History.addSubstrateProxy": "Add proxy",
   "ui.HISTORY.screen.History.removeSubstrateProxy": "Remove proxy",
   "ui.HISTORY.constant.history.unknown": "Không xác định",
-  "ui.TRANSACTION.constant.transaction.unknown": "Không xác định",
   "ui.HISTORY.screen.History.unknown": "Không xác định",
   "ui.HISTORY.constant.history.compounding": "Compounding",
   "ui.HISTORY.constant.history.completed": "Hoàn thành",
@@ -2706,5 +2705,6 @@
   "ui.HISTORY.constant.multisig.typeName.govVote": "",
   "ui.HISTORY.constant.multisig.typeName.govRemoveVote": "",
   "ui.HISTORY.constant.multisig.typeName.govUnlockVote": "",
-  "ui.HISTORY.constant.multisig.typeName.unknown": ""
+  "ui.HISTORY.constant.multisig.typeName.unknown": "",
+  "ui.TRANSACTION.screen.Transaction.Swap.multisigAccountNotSupportedForSwap": ""
 }

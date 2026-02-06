@@ -224,7 +224,6 @@
   "ui.HISTORY.screen.History.addSubstrateProxy": "Add proxy",
   "ui.HISTORY.screen.History.removeSubstrateProxy": "Remove proxy",
   "ui.HISTORY.constant.history.unknown": "Unknown",
-  "ui.TRANSACTION.constant.transaction.unknown": "Unknown",
   "ui.HISTORY.screen.History.unknown": "Unknown",
   "ui.HISTORY.constant.history.compounding": "Compounding",
   "ui.HISTORY.constant.history.completed": "Completed",
@@ -2707,5 +2706,6 @@
   "ui.HISTORY.constant.multisig.typeName.govVote": "Vote",
   "ui.HISTORY.constant.multisig.typeName.govRemoveVote": "Unvote",
   "ui.HISTORY.constant.multisig.typeName.govUnlockVote": "Unlock votes",
-  "ui.HISTORY.constant.multisig.typeName.unknown": "Unknown"
+  "ui.HISTORY.constant.multisig.typeName.unknown": "Unknown",
+  "ui.TRANSACTION.screen.Transaction.Swap.multisigAccountNotSupportedForSwap": "Cross-chain swap is not supported for multisig account"
 }

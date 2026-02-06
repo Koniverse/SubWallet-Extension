@@ -254,7 +254,6 @@
   "ui.HISTORY.screen.History.addSubstrateProxy": "Add proxy",
   "ui.HISTORY.screen.History.removeSubstrateProxy": "Remove proxy",
   "ui.HISTORY.constant.history.unknown": "Неизвестно",
-  "ui.TRANSACTION.constant.transaction.unknown": "Неизвестно",
   "ui.HISTORY.screen.History.unknown": "Неизвестно",
   "ui.HISTORY.constant.history.compounding": "Компаундирование",
   "ui.HISTORY.constant.history.completed": "Выполнено",
@@ -2601,7 +2600,6 @@
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.createMultisigAccount": "",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.addSignatory": "",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.signatories": "",
-  "ui.ACCOUNT.screen.Account.NewMultisigAccount.signasetApprovalThresholdories": "",
   "ui.ACCOUNT.components.Modal.Account.Create.createMultisigAccount": "",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.enterAddress": "",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.enterThreshold": "",
@@ -2708,5 +2706,6 @@
   "ui.HISTORY.constant.multisig.typeName.govVote": "",
   "ui.HISTORY.constant.multisig.typeName.govRemoveVote": "",
   "ui.HISTORY.constant.multisig.typeName.govUnlockVote": "",
-  "ui.HISTORY.constant.multisig.typeName.unknown": ""
+  "ui.HISTORY.constant.multisig.typeName.unknown": "",
+  "ui.TRANSACTION.screen.Transaction.Swap.multisigAccountNotSupportedForSwap": ""
 }
