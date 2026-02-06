@@ -597,7 +597,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     activeModal(FILTER_MODAL_ID);
   }, [activeModal]);
 
-
   useEffect(() => {
     if (extrinsicHashOrId && chain && openDetailLink) {
       const existed = Object.values(historyMap).find((item) => item.chain === chain && (item.transactionId === extrinsicHashOrId || item.extrinsicHash === extrinsicHashOrId));
@@ -923,7 +922,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         data={selectedMultisigItem}
         historyList={rawHistoryList}
         onCancel={onCloseMultisigDetail}
-                               />}
+      />}
 
       <FilterModal
         id={FILTER_MODAL_ID}

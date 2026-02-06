@@ -63,15 +63,17 @@ function Component ({ className = '', data, historyList = [], onCancel }: Props)
         type === ExtrinsicType.MULTISIG_EXECUTE_TX ||
         type === ExtrinsicType.MULTISIG_CANCEL_TX;
 
-      if (!isMultisigAction) return false;
+      if (!isMultisigAction) {
+        return false;
+      }
 
-      const txCallHash = tx.additionalInfo?.callHash;
+      const txCallHash = (tx.additionalInfo as { callHash?: string })?.callHash;
       const isMatchCallHash = txCallHash === data.callHash;
       const isMyAction = reformatAddress(tx.address) === reformatAddress(data.currentSigner);
 
       return isMatchCallHash && isMyAction && isMultisigAction;
     });
-  }, [data?.extrinsicHash, data?.callHash, historyList]);
+  }, [data, historyList]);
 
   const validateSignerAndExecute = useCallback((action: () => void) => {
     return () => {
