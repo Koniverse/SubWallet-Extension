@@ -4,7 +4,7 @@
 import { ConfirmationDefinitions, ConfirmationDefinitionsBitcoin, ConfirmationDefinitionsCardano, ConfirmationDefinitionsTon, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { SigningRequest } from '@subwallet/extension-base/background/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { ProcessType, SwapBaseTxData } from '@subwallet/extension-base/types';
+import { ProcessType, RequestStakeClaimReward, SwapBaseTxData } from '@subwallet/extension-base/types';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, AlertBoxInstant } from '@subwallet/extension-koni-ui/components';
 import { useIsPolkadotUnifiedChain, useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -202,6 +202,13 @@ const Component: React.FC<Props> = (props: Props) => {
             setDisable={setIsDisabledSubstrateApprove}
             transaction={transaction}
           />}
+          <span className={CN('bond-reward-label', 'text-light-4')}>
+            {
+              (transaction.data as RequestStakeClaimReward).bondReward
+                ? t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack')
+                : t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable')
+            }
+          </span>
         </div>
         {isAddressFormatInfoBoxVisible && (
           <AlertBoxInstant
@@ -316,6 +323,10 @@ const TransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: 
       '.__value': {
         textAlign: 'right'
       }
+    },
+    '.bond-reward-label': {
+      marginTop: token.marginSM,
+      textAlign: 'left'
     }
   };
 });

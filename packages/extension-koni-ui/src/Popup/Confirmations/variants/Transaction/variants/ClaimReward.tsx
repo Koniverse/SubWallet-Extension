@@ -75,14 +75,6 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />}
       </MetaInfo>
-
-      <span className={CN('text-light-4')}>
-        {
-          data.bondReward
-            ? t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack')
-            : t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable')
-        }
-      </span>
     </>
   );
 };
@@ -104,11 +96,7 @@ const Wrapper = (props: Props) => {
 
 const ClaimRewardTransactionConfirmation = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
   return {
-    textAlign: 'left',
-
-    '.meta-info': {
-      marginBottom: token.marginSM
-    }
+    textAlign: 'left'
   };
 });
 
