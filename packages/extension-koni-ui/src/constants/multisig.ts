@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { MultisigTxType } from '@subwallet/extension-base/services/multisig-service';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 
@@ -41,3 +42,10 @@ export const MultisigTxToTypeNameMap: Record<MultisigTxType, string> = {
   [MultisigTxType.GOV_UNLOCK_VOTE]: detectTranslate('ui.HISTORY.constant.multisig.typeName.govUnlockVote'),
   [MultisigTxType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.multisig.typeName.unknown')
 };
+
+export const MULTISIG_ACTIONS: ExtrinsicType[] = [
+  ExtrinsicType.MULTISIG_APPROVE_TX,
+  ExtrinsicType.MULTISIG_EXECUTE_TX,
+  ExtrinsicType.MULTISIG_CANCEL_TX,
+  ExtrinsicType.MULTISIG_INIT_TX
+];
