@@ -5,7 +5,7 @@ import { ExtrinsicStatus, ExtrinsicType, TransactionDirection, TransactionHistor
 import { YIELD_EXTRINSIC_TYPES } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
-import { AccountChainType } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
 import { quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { MultisigHistoryItem } from '@subwallet/extension-koni-ui/components/History/MultisigHistoryItem';
@@ -261,7 +261,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const currentSubstrateAddress = useMemo(() => {
     const substrateAccount = currentAccountProxy?.accounts?.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
 
-    return substrateAccount?.address || '';
+    if (substrateAccount?.signMode === AccountSignMode.MULTISIG) {
+      return substrateAccount?.address;
+    }
+
+    return undefined;
   }, [currentAccountProxy?.accounts]);
 
   const multisigList = useMemo(() => {
