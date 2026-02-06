@@ -672,7 +672,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       return (
         <MultisigHistoryItem
           item={item}
-          key={item.extrinsicHash || item.callHash}
+          key={item.id}
           onClick={onOpenMultisigInfo(item)}
         />
       );
@@ -813,6 +813,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       />
     </div>
   ), [emptyList, groupBy, groupSeparator, multisigList, renderMultisigItem, currentAccountProxy]);
+
+  console.log('multisigList', multisigList);
 
   const headerIcons = useMemo<ButtonProps[]>(() => {
     return [
