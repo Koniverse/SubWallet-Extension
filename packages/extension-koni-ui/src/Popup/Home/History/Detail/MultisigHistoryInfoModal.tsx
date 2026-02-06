@@ -47,6 +47,7 @@ function Component ({ className = '', data, historyList = [], onCancel }: Props)
       return false;
     }
 
+    // TODO: Improve the algorithm later
     return historyList.some((tx) => {
       const isProcessing = tx.status === ExtrinsicStatus.PROCESSING ||
         tx.status === ExtrinsicStatus.SUBMITTING ||
