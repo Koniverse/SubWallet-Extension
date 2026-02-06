@@ -268,7 +268,6 @@ const ChangeValidatorTransactionConfirmation = styled(Component)<BaseTransaction
       background: token.colorBgSecondary,
       borderRadius: token.borderRadiusLG,
       marginTop: token.marginSM,
-      marginBottom: token.marginSM,
       whiteSpace: 'nowrap'
     },
 
