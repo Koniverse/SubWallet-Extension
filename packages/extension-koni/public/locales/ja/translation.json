@@ -2706,5 +2706,9 @@
   "ui.HISTORY.constant.multisig.typeName.govRemoveVote": "",
   "ui.HISTORY.constant.multisig.typeName.govUnlockVote": "",
   "ui.HISTORY.constant.multisig.typeName.unknown": "",
-  "ui.TRANSACTION.screen.Transaction.Swap.multisigAccountNotSupportedForSwap": ""
+  "ui.TRANSACTION.screen.Transaction.Swap.multisigAccountNotSupportedForSwap": "",
+  "ui.HISTORY.constant.multisig.title.addProxy": "",
+  "ui.HISTORY.constant.multisig.title.removeProxy": "",
+  "ui.HISTORY.constant.multisig.typeName.addProxy": "",
+  "ui.HISTORY.constant.multisig.typeName.removeProxy": ""
 }

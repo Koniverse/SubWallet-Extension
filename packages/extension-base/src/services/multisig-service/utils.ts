@@ -229,6 +229,14 @@ export function getMultisigTxType (decodedCallData: DecodeCallDataResponse | und
     return MultisigTxType.SET_TOKEN_PAY_FEE;
   }
 
+  if (MULTISIG_TX_TYPE_MAP.addProxy.includes(sectionMethod)) {
+    return MultisigTxType.ADD_PROXY;
+  }
+
+  if (MULTISIG_TX_TYPE_MAP.removeProxy.includes(sectionMethod)) {
+    return MultisigTxType.REMOVE_PROXY;
+  }
+
   return MultisigTxType.UNKNOWN;
 }
 

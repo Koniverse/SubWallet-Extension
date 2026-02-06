@@ -483,6 +483,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
   }
 
   const { edAsWarning, extrinsicType, isTransferAll, skipFeeValidation, tokenPayFeeSlug } = transactionInput;
+  const isWrappable = validationResponse.wrappingStatus === SubstrateTransactionWrappingStatus.WRAPPABLE;
 
   if (skipFeeValidation || (tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug))) { // todo: need improve: input should be balance of fee token and check this again
     return;
@@ -492,7 +493,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
   const bnNativeTokenAvailable = new BigN(nativeTokenAvailable.value);
   const bnNativeTokenTransferAmount = new BigN(validationResponse.transferNativeAmount || '0');
 
-  if (!bnNativeTokenAvailable.gt(0)) {
+  if (!bnNativeTokenAvailable.gt(0) && !isWrappable) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
   }
 
@@ -503,7 +504,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
     ..._TRANSFER_CHAIN_GROUP.statemine
   ].includes(nativeTokenInfo.originChain);
 
-  if (bnNativeTokenTransferAmount.plus(validationResponse.wrappingStatus === SubstrateTransactionWrappingStatus.WRAPPABLE ? '0' : bnFee).gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
+  if (bnNativeTokenTransferAmount.plus(isWrappable ? '0' : bnFee).gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
   }
 
