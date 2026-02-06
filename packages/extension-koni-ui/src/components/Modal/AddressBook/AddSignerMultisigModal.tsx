@@ -180,7 +180,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onClose}
           schema='secondary'
         >
-          {t('Cancel')}
+          {t('ui.components.Modal.AddressBook.AddSignerMultisigModal.cancel')}
         </Button>
         <Button
           block
@@ -193,7 +193,7 @@ const Component: React.FC<Props> = (props: Props) => {
           )}
           onClick={onAddSigner}
         >
-          {t('Add signer')}
+          {t('ui.components.Modal.AddressBook.AddSignerMultisigModal.addSigner')}
         </Button>
       </div>
     );

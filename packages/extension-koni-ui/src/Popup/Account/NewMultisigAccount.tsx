@@ -357,7 +357,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             form={form}
             initialValues={formDefault}
           >
-            <div className={'signatory-label'}>{t('ADD SIGNATORY')}</div>
+            <div className={'signatory-label'}>{t('ui.ACCOUNT.screen.Account.NewMultisigAccount.addSignatory')}</div>
             <div className={'signatory-form-wrapper'}>
               <div className={'signatory-form-left'}>
                 <Form.Item
@@ -420,7 +420,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 ? emptyList()
                 : (
                   <>
-                    <div className={'signatories-label'}>{t('SIGNATORIES')}</div>
+                    <div className={'signatories-label'}>{t('ui.ACCOUNT.screen.Account.NewMultisigAccount.signatories')}</div>
                     <div className='signatory-list-content'>
                       {signers.map((signer) => (
                         <div
@@ -440,7 +440,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                         </div>
                       ))}
                     </div>
-                    <div className={'threshold-label'}>{t('SET APPROVAL THRESHOLD')}</div>
+                    <div className={'threshold-label'}>{t('ui.ACCOUNT.screen.Account.NewMultisigAccount.setApprovalThreshold')}</div>
                     <div className={'threshold-form-wrapper'}>
                       <Form.Item
                         name={'threshold'}

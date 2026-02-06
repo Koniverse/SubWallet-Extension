@@ -80,10 +80,10 @@ function Component ({ className = '', data, historyList = [], onCancel }: Props)
       if (signerIsMultisig) {
         openAlert({
           type: NotificationType.ERROR,
-          content: t('The selected signatory is a multisig account, which can’t be used to sign this transaction in SubWallet. Choose another signatory or go to Polkadot{.js} to sign with the selected signatory'),
-          title: t('Unable to sign'),
+          content: t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.selectedSignatoryIsMultisigWarning'),
+          title: t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.unableToSign'),
           okButton: {
-            text: t('Go to Polkadot{.js}'),
+            text: t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.goToPolkadotJs'),
             onClick: () => {
               openInNewTab('https://polkadot.js.org/apps/')();
               closeAlert();
@@ -91,7 +91,7 @@ function Component ({ className = '', data, historyList = [], onCancel }: Props)
             }
           },
           cancelButton: {
-            text: t('Dismiss'),
+            text: t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.dismiss'),
             onClick: () => {
               closeAlert();
               onCancel();
