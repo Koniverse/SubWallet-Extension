@@ -548,6 +548,11 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           resetValueField();
         }
 
+        if (chain !== destChain && selectedAccount?.isMultisig) {
+          form.setFieldValue('from', '');
+          setAddressInputRenderKey(`${defaultAddressInputRenderKey}-${Date.now()}`);
+        }
+
         form.resetFields(['to']);
         resetTransactionFee();
       }
@@ -567,7 +572,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
       persistData(form.getFieldsValue());
     },
-    [persistData, form, assetRegistry, chainInfoMap, isTransferAll, defaultTokenPayFee]
+    [persistData, form, defaultTokenPayFee, assetRegistry, chainInfoMap, isTransferAll, selectedAccount?.isMultisig]
   );
 
   const isShowWarningOnSubmit = useCallback((values: TransferParams): boolean => {
@@ -1121,6 +1126,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             statusHelpAsTooltip={true}
           >
             <AccountAddressSelector
+              hiddenAccountProxyTypes={isCrossChainTransfer ? [AccountProxyType.MULTISIG] : []}
               items={accountAddressItems}
               label={`${t('ui.TRANSACTION.screen.Transaction.SendFund.from')}:`}
               labelStyle={'horizontal'}
