@@ -163,6 +163,10 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [checkedSigners, disabledAddressList, onClickItem]);
 
   const footerModal = useMemo(() => {
+    const isAddButtonDisabled = (() => {
+      return !checkedSigners.filter((i) => !disabledAddressList.includes(i.address)).length;
+    })();
+
     return (
       <div className={'footer-button-wrapper'}>
         <Button
@@ -180,6 +184,7 @@ const Component: React.FC<Props> = (props: Props) => {
         </Button>
         <Button
           block
+          disabled={isAddButtonDisabled}
           icon={(
             <Icon
               phosphorIcon={PlusCircle}
@@ -192,7 +197,7 @@ const Component: React.FC<Props> = (props: Props) => {
         </Button>
       </div>
     );
-  }, [onAddSigner, onClose, t]);
+  }, [checkedSigners, disabledAddressList, onAddSigner, onClose, t]);
 
   useEffect(() => {
     if (!isActive) {
