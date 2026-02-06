@@ -2,17 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _SubstrateAdapterSubscriptionArgs } from '@subwallet/extension-base/services/chain-service/types';
+import { _isChainEnabled } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { InappNotificationService } from '@subwallet/extension-base/services/inapp-notification-service';
 import { NotificationDescriptionMap, NotificationTitleMap } from '@subwallet/extension-base/services/inapp-notification-service/consts';
-import { _BaseNotificationInfo, NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { _BaseNotificationInfo, MultisigApprovalNotificationMetadata, NotificationActionType, NotificationTab } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import { decodeCallData, DecodeCallDataResponse, DEFAULT_BLOCK_HASH, genPendingMultisigTxKey, getCallData, getMultisigTxType } from '@subwallet/extension-base/services/multisig-service/utils';
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
-import { _reformatAddressWithChain, addLazy, createPromiseHandler, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, addLazy, createPromiseHandler, isSameAddress, PromiseHandler, reformatAddress } from '@subwallet/extension-base/utils';
 import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BehaviorSubject } from 'rxjs';
 
@@ -602,6 +604,10 @@ export class MultisigService implements StoppableServiceInterface {
     }
 
     // 3. Replace the extrinsics of multisigAddress and chain
+    // Find approved transactions to clear notifications
+    this.clearMultisigApprovalNotifications(newTxMap, multisigAddress, chain)
+      .catch((e) => multisigServiceLogger.error('Failed to clear multisig approval notifications:', e));
+
     this.pendingMultisigTxSubject.next({
       ...filteredMap,
       ...newTxMap
@@ -612,6 +618,46 @@ export class MultisigService implements StoppableServiceInterface {
       this.createMultisigApprovalNotifications(newNotifiedTxs).catch((error) => {
         multisigServiceLogger.error('Failed to create multisig approval notifications:', error);
       });
+    }
+  }
+
+  /**
+   * Clears notifications for approved pending multisig transactions
+   * @private
+   * @param newTxMap - Map of current pending multisig transactions
+   * @param multisigAddress - Multisig address
+   * @param chain - ChainSlug of the multisig transactions
+   */
+  private async clearMultisigApprovalNotifications (newTxMap: PendingMultisigTxMap, multisigAddress: string, chain: string): Promise<void> {
+    const currentNotifications = await this.inappNotificationService.fetchNotificationsByParams({
+      notificationTab: NotificationTab.MULTISIG,
+      proxyId: ALL_ACCOUNT_KEY,
+      metadata: {
+        multisigAddress,
+        chain
+      }
+    });
+
+    const unapprovedPendingTxs = Object.values(newTxMap).reduce<Set<string>>((set, tx) => {
+      if (!tx.approvals.find((address) => isSameAddress(tx.currentSigner, address))) {
+        set.add(tx.id);
+      }
+
+      return set;
+    }, new Set<string>());
+
+    const notificationsIdsToDelete = currentNotifications.reduce<string[]>((ids, notification) => {
+      const metadata = (notification.metadata as MultisigApprovalNotificationMetadata).multisigKey;
+
+      if (!unapprovedPendingTxs.has(metadata)) {
+        ids.push(notification.id);
+      }
+
+      return ids;
+    }, []);
+
+    if (notificationsIdsToDelete.length > 0) {
+      await this.inappNotificationService.cleanUpNotificationByIds(notificationsIdsToDelete);
     }
   }
 

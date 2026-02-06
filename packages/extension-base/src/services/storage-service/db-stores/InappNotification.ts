@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { _NotificationInfo, MultisigApprovalNotificationMetadata, NotificationActionType, NotificationTab } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { _NotificationInfo, MultisigApprovalNotificationMetadata, NotificationTab } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { getIsTabRead } from '@subwallet/extension-base/services/inapp-notification-service/utils';
 import BaseStore from '@subwallet/extension-base/services/storage-service/db-stores/BaseStore';
-import { CancelPendingTxRequest } from '@subwallet/extension-base/types/multisig';
 import { GetNotificationParams, MarkAllReadParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 import { liveQuery } from 'dexie';
 
 export default class InappNotificationStore extends BaseStore<_NotificationInfo> {
@@ -19,7 +19,7 @@ export default class InappNotificationStore extends BaseStore<_NotificationInfo>
   }
 
   async getNotificationsByParams (params: GetNotificationParams) {
-    const { notificationTab, proxyId } = params;
+    const { metadata, notificationTab, proxyId } = params;
     const isAllAccount = proxyId === ALL_ACCOUNT_KEY;
     const isTabAll = notificationTab === NotificationTab.ALL;
 
@@ -30,6 +30,17 @@ export default class InappNotificationStore extends BaseStore<_NotificationInfo>
     const filteredTable = this.table.filter((item) => {
       const matchesProxyId = item.proxyId === proxyId;
       const matchesReadStatus = item.isRead === getIsTabRead(notificationTab);
+
+      if (metadata?.multisigAddress && metadata?.chain && notificationTab === NotificationTab.MULTISIG) {
+        // @Todo This condition is service only for multisig subscribe service to get all filter by multisig address
+        // then clear it when tx is completed
+        // So, if use this condition to service other feature, need to re-check carefully
+        const multisigMetadata = item.metadata as MultisigApprovalNotificationMetadata;
+        const multisigAddressOfNotification = multisigMetadata?.multisigAddress;
+        const chain = multisigMetadata?.chain;
+
+        return !!multisigAddressOfNotification && isSameAddress(multisigAddressOfNotification, metadata.multisigAddress) && chain === metadata.chain;
+      }
 
       if (isTabAll) {
         return matchesProxyId;
@@ -61,6 +72,10 @@ export default class InappNotificationStore extends BaseStore<_NotificationInfo>
     return this.table
       .filter((item) => item.time <= currentTimestamp - overdueTime)
       .delete();
+  }
+
+  async cleanUpNotificationsByIds (ids: string[]) {
+    return this.table.where('id').anyOf(ids).delete();
   }
 
   subscribeUnreadNotificationsCount () {
@@ -103,24 +118,5 @@ export default class InappNotificationStore extends BaseStore<_NotificationInfo>
 
   removeAccountNotifications (proxyId: string) {
     return this.table.where('proxyId').equalsIgnoreCase(proxyId).delete();
-  }
-
-  async deleteMultisigNotificationsByRequest (params: CancelPendingTxRequest) {
-    const { callHash, chain, multisigMetadata, timepoint } = params;
-
-    const { multisigAddress } = multisigMetadata;
-    const { height, index } = timepoint;
-
-    return this.table
-      .filter((item) => {
-        if (item.actionType !== NotificationActionType.MULTISIG_APPROVAL) {
-          return false;
-        }
-
-        const meta = item.metadata as MultisigApprovalNotificationMetadata;
-
-        return (meta.chain === chain && meta.multisigAddress === multisigAddress && meta.callHash === callHash && meta.blockHeight === height && meta.extrinsicIndex === index);
-      })
-      .delete();
   }
 }

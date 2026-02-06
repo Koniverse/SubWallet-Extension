@@ -17,7 +17,6 @@ import { KeyringService } from '@subwallet/extension-base/services/keyring-servi
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
 import { ProcessTransactionData, ProcessType, SummaryEarningProcessData, SwapBaseTxData, YieldPoolType } from '@subwallet/extension-base/types';
-import { CancelPendingTxRequest } from '@subwallet/extension-base/types/multisig';
 import { GetNotificationParams, MarkAllReadParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { formatNumber, getAddressesByChainType, reformatAddress } from '@subwallet/extension-base/utils';
 import { isSubstrateAddress } from '@subwallet/keyring';
@@ -75,12 +74,12 @@ export class InappNotificationService implements CronServiceInterface {
     return this.dbService.getNotification(id);
   }
 
-  public removePendingMultisigTxNotification (params: CancelPendingTxRequest) {
-    this.dbService.deleteMultisigNotificationsByRequest(params).catch(console.error);
-  }
-
   cleanUpOldNotifications (overdueTime = ONE_DAY_MILLISECOND * 60) {
     return this.dbService.cleanUpOldNotifications(overdueTime);
+  }
+
+  cleanUpNotificationByIds (ids: string[]) {
+    return this.dbService.cleanUpNotificationByIds(ids);
   }
 
   passValidateNotification (candidateNotification: _BaseNotificationInfo, comparedNotifications: _NotificationInfo[], remindTimeConfigInHrs: Record<NotificationActionType, number>) { // todo: simplify condition !!

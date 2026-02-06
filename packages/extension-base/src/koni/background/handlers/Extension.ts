@@ -3285,12 +3285,6 @@ export default class KoniExtension {
       return this.#koniState.transactionService.generateBeforeHandleResponseErrors([new TransactionError(MultisigTxErrorType.LACK_MULTISIG_PALLET)]);
     }
 
-    const eventsHandler = (eventEmitter: TransactionEmitter) => {
-      eventEmitter.on('success', () => {
-        this.#koniState.inappNotificationService.removePendingMultisigTxNotification(inputData);
-      });
-    };
-
     const otherSignatories = multisigMetadata.signers.filter((s) => !isSameAddress(s, address));
 
     const extrinsic = api.tx.multisig.cancelAsMulti(
@@ -3307,8 +3301,7 @@ export default class KoniExtension {
       data: inputData,
       extrinsicType: ExtrinsicType.MULTISIG_CANCEL_TX,
       transaction: extrinsic,
-      url: EXTENSION_REQUEST_URL,
-      eventsHandler
+      url: EXTENSION_REQUEST_URL
     });
   }
 
@@ -3631,10 +3624,6 @@ export default class KoniExtension {
 
       eventEmitter.on('success', (data) => {
         originEmitter.emit('success', { ...data, id: originTransaction.id });
-
-        if (originTransaction.extrinsicType === ExtrinsicType.MULTISIG_CANCEL_TX) {
-          this.#koniState.inappNotificationService.removePendingMultisigTxNotification(originTransaction.data as CancelPendingTxRequest);
-        }
       });
 
       eventEmitter.on('error', (data) => {
