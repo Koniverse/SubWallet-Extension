@@ -3330,7 +3330,8 @@ export default class KoniExtension {
       throw new Error(`[initMultisigTx] Origin transaction not found: ${transactionId}`);
     }
 
-    const originalCall = originTransaction.transaction as SubmittableExtrinsic<'promise'>;
+    const extrinsicOriginTransaction = originTransaction.transaction as SubmittableExtrinsic<'promise'>;
+    const callData = extrinsicOriginTransaction.method.toHex();
 
     /**
      * ─────────────────────────────
@@ -3342,12 +3343,12 @@ export default class KoniExtension {
       threshold,
       signers,
       signer,
-      originalCall
+      extrinsicOriginTransaction
     );
 
     const decodedCallData = decodeCallData({
       api: substrateApi.api,
-      callData: originalCall.method.toHex()
+      callData
     });
 
     /**
@@ -3476,7 +3477,7 @@ export default class KoniExtension {
 
         // output
         submittedCallData: multisigExtrinsic.toHex(),
-        callData: originalCall.toHex(),
+        callData,
         decodedCallData,
         depositAmount,
         networkFee
@@ -3506,12 +3507,13 @@ export default class KoniExtension {
     const originTransaction =
       this.#koniState.transactionService.getTransaction(transactionId);
 
-    const callData =
+    const extrinsicOriginTransaction =
       originTransaction?.transaction as SubmittableExtrinsic<'promise'>;
+    const callData = extrinsicOriginTransaction.method.toHex();
 
     const decodedCallData = decodeCallData({
       api: substrateApi.api,
-      callData: callData.method.toHex()
+      callData
     });
 
     /**
@@ -3532,16 +3534,16 @@ export default class KoniExtension {
      * ─────────────────────────────
      */
 
-    const substrateProxyCallData = isSignerProxiedAccount
-      ? callData
+    const substrateProxyExtrinsic = isSignerProxiedAccount
+      ? extrinsicOriginTransaction
       : createInitSubstrateProxyExtrinsic(
         substrateApi.api,
         proxiedAddress,
-        callData
+        extrinsicOriginTransaction
       );
 
     const networkFee = (
-      await substrateProxyCallData.paymentInfo(signer)
+      await substrateProxyExtrinsic.paymentInfo(signer)
     ).partialFee.toString();
 
     /**
@@ -3659,8 +3661,8 @@ export default class KoniExtension {
 
           // output
           decodedCallData,
-          submittedCallData: substrateProxyCallData.toHex(),
-          callData: callData.toHex(),
+          submittedCallData: substrateProxyExtrinsic.toHex(),
+          callData,
           networkFee
         },
         wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_RESULT,
@@ -3674,7 +3676,7 @@ export default class KoniExtension {
       chain,
       chainType: ChainType.SUBSTRATE,
       extrinsicType: ExtrinsicType.SUBSTRATE_PROXY_INIT_TX,
-      transaction: substrateProxyCallData,
+      transaction: substrateProxyExtrinsic,
       skipFeeValidation: true,
       transferNativeAmount: originTransaction.transferNativeAmount,
       data: {
@@ -3683,8 +3685,8 @@ export default class KoniExtension {
 
         // output
         decodedCallData,
-        submittedCallData: substrateProxyCallData.toHex(),
-        callData: callData.toHex(),
+        submittedCallData: substrateProxyExtrinsic.toHex(),
+        callData,
         networkFee
       },
       wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_RESULT,

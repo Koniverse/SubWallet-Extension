@@ -154,6 +154,8 @@ function Component ({ className, setDisable, transaction }: Props) {
 
   const isSelectorDisable = isGetSignableLoading || isWrapTransactionLoading;
 
+  console.log(wrapTransactionData?.callData);
+
   if (!transaction.wrappingStatus) {
     return <></>;
   }
