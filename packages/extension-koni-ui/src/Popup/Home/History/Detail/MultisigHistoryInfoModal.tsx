@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicStatus, ExtrinsicType, NotificationType, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
@@ -26,11 +26,11 @@ import styled from 'styled-components';
 type Props = ThemeProps & {
   onCancel: () => void,
   data: PendingMultisigTx,
-  isProcessing?: boolean
+  historyList?: TransactionHistoryItem[]
 }
 const alertModalId = 'multisig-confirmation-alert-modal';
 
-function Component ({ className = '', data, isProcessing = false, onCancel }: Props): React.ReactElement<Props> {
+function Component ({ className = '', data, historyList = [], onCancel }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
@@ -41,6 +41,36 @@ function Component ({ className = '', data, isProcessing = false, onCancel }: Pr
   const accountSigner = useGetAccountProxyByAddress(data.currentSigner);
   const { error, isLoading: isBalanceLoading } = useGetBalance(data.chain, data.currentSigner);
   const originChainInfo = useMemo(() => data && chainInfoMap[data.chain], [chainInfoMap, data]);
+
+  const isMultisigProcessing = useMemo(() => {
+    if (!data || !historyList.length) {
+      return false;
+    }
+
+    return historyList.some((tx) => {
+      const isProcessing = tx.status === ExtrinsicStatus.PROCESSING ||
+        tx.status === ExtrinsicStatus.SUBMITTING ||
+        tx.status === ExtrinsicStatus.QUEUED;
+
+      if (!isProcessing) {
+        return false;
+      }
+
+      const type = tx.type;
+      const isMultisigAction =
+        type === ExtrinsicType.MULTISIG_APPROVE_TX ||
+        type === ExtrinsicType.MULTISIG_EXECUTE_TX ||
+        type === ExtrinsicType.MULTISIG_CANCEL_TX;
+
+      if (!isMultisigAction) return false;
+
+      const txCallHash = tx.additionalInfo?.callHash;
+      const isMatchCallHash = txCallHash === data.callHash;
+      const isMyAction = reformatAddress(tx.address) === reformatAddress(data.currentSigner);
+
+      return isMatchCallHash && isMyAction && isMultisigAction;
+    });
+  }, [data?.extrinsicHash, data?.callHash, historyList]);
 
   const validateSignerAndExecute = useCallback((action: () => void) => {
     return () => {
@@ -198,7 +228,7 @@ function Component ({ className = '', data, isProcessing = false, onCancel }: Pr
     const approvalCount = data.approvals.length;
     const thresholdReached = approvalCount >= threshold;
     const isLastSigner = approvalCount + 1 === threshold;
-    const buttonLoading = loading || isBalanceLoading || isProcessing;
+    const buttonLoading = loading || isBalanceLoading || isMultisigProcessing;
     const buttonDisabled = buttonLoading || !!error;
 
     return (
@@ -260,7 +290,7 @@ function Component ({ className = '', data, isProcessing = false, onCancel }: Pr
         )}
       </div>
     );
-  }, [_onApprove, validateSignerAndExecute, isProcessing, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, error, formattedApprovals, isBalanceLoading, loading, t]);
+  }, [_onApprove, validateSignerAndExecute, isMultisigProcessing, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, error, formattedApprovals, isBalanceLoading, loading, t]);
 
   const modalFooter = useMemo(() => {
     if (!data) {
