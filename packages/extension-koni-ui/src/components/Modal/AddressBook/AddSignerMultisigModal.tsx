@@ -163,6 +163,10 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [checkedSigners, disabledAddressList, onClickItem]);
 
   const footerModal = useMemo(() => {
+    const isAddButtonDisabled = (() => {
+      return !checkedSigners.filter((i) => !disabledAddressList.includes(i.address)).length;
+    })();
+
     return (
       <div className={'footer-button-wrapper'}>
         <Button
@@ -176,10 +180,11 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onClose}
           schema='secondary'
         >
-          {t('Cancel')}
+          {t('ui.components.Modal.AddressBook.AddSignerMultisigModal.cancel')}
         </Button>
         <Button
           block
+          disabled={isAddButtonDisabled}
           icon={(
             <Icon
               phosphorIcon={PlusCircle}
@@ -188,11 +193,11 @@ const Component: React.FC<Props> = (props: Props) => {
           )}
           onClick={onAddSigner}
         >
-          {t('Add signer')}
+          {t('ui.components.Modal.AddressBook.AddSignerMultisigModal.addSigner')}
         </Button>
       </div>
     );
-  }, [onAddSigner, onClose, t]);
+  }, [checkedSigners, disabledAddressList, onAddSigner, onClose, t]);
 
   useEffect(() => {
     if (!isActive) {

@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicStatus, ExtrinsicType, NotificationType, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
 import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
@@ -25,11 +25,12 @@ import styled from 'styled-components';
 
 type Props = ThemeProps & {
   onCancel: () => void,
-  data: PendingMultisigTx
+  data: PendingMultisigTx,
+  historyList?: TransactionHistoryItem[]
 }
 const alertModalId = 'multisig-confirmation-alert-modal';
 
-function Component ({ className = '', data, onCancel }: Props): React.ReactElement<Props> {
+function Component ({ className = '', data, historyList = [], onCancel }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
@@ -41,6 +42,37 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
   const { error, isLoading: isBalanceLoading } = useGetBalance(data.chain, data.currentSigner);
   const originChainInfo = useMemo(() => data && chainInfoMap[data.chain], [chainInfoMap, data]);
 
+  const isMultisigProcessing = useMemo(() => {
+    if (!data || !historyList.length) {
+      return false;
+    }
+
+    // TODO: Improve the algorithm later
+    return historyList.some((tx) => {
+      const isProcessing = tx.status === ExtrinsicStatus.PROCESSING ||
+        tx.status === ExtrinsicStatus.SUBMITTING ||
+        tx.status === ExtrinsicStatus.QUEUED;
+
+      if (!isProcessing) {
+        return false;
+      }
+
+      const type = tx.type;
+      const isMultisigAction =
+        type === ExtrinsicType.MULTISIG_APPROVE_TX ||
+        type === ExtrinsicType.MULTISIG_EXECUTE_TX ||
+        type === ExtrinsicType.MULTISIG_CANCEL_TX;
+
+      if (!isMultisigAction) return false;
+
+      const txCallHash = tx.additionalInfo?.callHash;
+      const isMatchCallHash = txCallHash === data.callHash;
+      const isMyAction = reformatAddress(tx.address) === reformatAddress(data.currentSigner);
+
+      return isMatchCallHash && isMyAction && isMultisigAction;
+    });
+  }, [data?.extrinsicHash, data?.callHash, historyList]);
+
   const validateSignerAndExecute = useCallback((action: () => void) => {
     return () => {
       const signerIsMultisig = !!accountSigner?.accountType && accountSigner?.accountType === AccountProxyType.MULTISIG;
@@ -48,10 +80,10 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
       if (signerIsMultisig) {
         openAlert({
           type: NotificationType.ERROR,
-          content: t('The selected signatory is a multisig account, which can’t be used to sign this transaction in SubWallet. Choose another signatory or go to Polkadot{.js} to sign with the selected signatory'),
-          title: t('Unable to sign'),
+          content: t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.selectedSignatoryIsMultisigWarning'),
+          title: t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.unableToSign'),
           okButton: {
-            text: t('Go to Polkadot{.js}'),
+            text: t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.goToPolkadotJs'),
             onClick: () => {
               openInNewTab('https://polkadot.js.org/apps/')();
               closeAlert();
@@ -59,7 +91,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
             }
           },
           cancelButton: {
-            text: t('Dismiss'),
+            text: t('ui.HISTORY.screen.HistoryDetail.MultisigHistoryInfoModal.dismiss'),
             onClick: () => {
               closeAlert();
               onCancel();
@@ -197,7 +229,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
     const approvalCount = data.approvals.length;
     const thresholdReached = approvalCount >= threshold;
     const isLastSigner = approvalCount + 1 === threshold;
-    const buttonLoading = loading || isBalanceLoading;
+    const buttonLoading = loading || isBalanceLoading || isMultisigProcessing;
     const buttonDisabled = buttonLoading || !!error;
 
     return (
@@ -259,7 +291,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
         )}
       </div>
     );
-  }, [_onApprove, validateSignerAndExecute, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, error, formattedApprovals, isBalanceLoading, loading, t]);
+  }, [_onApprove, validateSignerAndExecute, isMultisigProcessing, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, error, formattedApprovals, isBalanceLoading, loading, t]);
 
   const modalFooter = useMemo(() => {
     if (!data) {
