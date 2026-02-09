@@ -929,7 +929,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       />
       {selectedMultisigItem && <MultisigHistoryInfoModal
         data={selectedMultisigItem}
-        historyList={rawHistoryList}
+        historyList={historyItems}
         onCancel={onCloseMultisigDetail}
       />}
 

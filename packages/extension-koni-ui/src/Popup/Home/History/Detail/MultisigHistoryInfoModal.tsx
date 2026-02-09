@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExtrinsicStatus, ExtrinsicType, NotificationType, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
+import { ExtrinsicStatus, ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { MultisigTxType, PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
@@ -14,7 +14,7 @@ import { useAlert, useGetAccountProxyByAddress, useGetBalance, useHandleSubmitTr
 import { approvePendingTx, cancelPendingTx, executePendingTx } from '@subwallet/extension-koni-ui/messaging';
 import HistoryMultisigLayout from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigLayout';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ThemeProps, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
 import { openInNewTab, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, SwModal } from '@subwallet/react-ui';
 import { ArrowCircleUpRight } from 'phosphor-react';
@@ -27,7 +27,7 @@ import styled from 'styled-components';
 type Props = ThemeProps & {
   onCancel: () => void,
   data: PendingMultisigTx,
-  historyList?: TransactionHistoryItem[]
+  historyList?: TransactionHistoryDisplayItem[]
 }
 const alertModalId = 'multisig-confirmation-alert-modal';
 
