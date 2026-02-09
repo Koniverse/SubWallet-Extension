@@ -254,6 +254,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const validateSignerAddress = useCallback((rule: Rule): Promise<void> => {
     const { signerAddress } = form.getFieldsValue();
 
+    if (!signerAddress.trim()) {
+      return Promise.resolve();
+    }
+
     if (!isSubstrateAddress(signerAddress)) {
       return Promise.reject(t('ui.ACCOUNT.screen.Account.NewMultisigAccount.invalidSignatoryAddress'));
     }
