@@ -93,7 +93,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         if (isSubstrateAddress(formatedAddress)) {
           result.push({
-            displayName: acc.name,
+            displayName: ap.name || acc.name,
             formatedAddress,
             address: acc.address,
             analyzedGroup: AnalyzedGroup.WALLET,
