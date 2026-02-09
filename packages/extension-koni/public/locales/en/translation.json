@@ -2598,6 +2598,8 @@
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.selectSignatoriesToCreate": "Select signatories to create your multisig account",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.signatoryList": "Signatory list",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.addressAlreadyExistsInList": "This address already exists in the list",
+  "ui.ACCOUNT.screen.Account.NewMultisigAccount.ledgerLegacyAccountNotSupported": "Ledger Legacy accounts are not supported to create multisig accounts",
+  "ui.ACCOUNT.screen.Account.NewMultisigAccount.ledgerEcdsaAccountNotSupported": "Ledger ECDSA accounts are not supported to create multisig accounts",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.thresholdRequired": "Approval threshold is required",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.thresholdGreaterThanOne": "Approval threshold must be an integer and greater than 1",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.thresholdExceedsSigners": "Approval threshold cannot be higher than the number of signatories",

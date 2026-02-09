@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountMultisigError } from '@subwallet/extension-base/background/KoniTypes';
-import { AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
 import { AccountNameModal, AccountProxyAvatar, AddressSelectorItem, CloseIcon, EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import AddSignerMultisigModal from '@subwallet/extension-koni-ui/components/Modal/AddressBook/AddSignerMultisigModal';
 import { ACCOUNT_NAME_MODAL, CONFIRM_TERM_SEED_PHRASE, CREATE_ACCOUNT_MODAL, DEFAULT_ROUTER_PATH, MULTISIG_SIGNERS, SEED_PREVENT_MODAL, TERM_AND_CONDITION_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -265,12 +265,22 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     const formattedAddress = reformatAddress(signerAddressValue);
     const isExisted = signers.some((item) => item.address === formattedAddress);
 
+    const accountInWallet = findAccountByAddress(accounts, formattedAddress);
+
+    if (accountInWallet?.signMode === AccountSignMode.LEGACY_LEDGER) {
+      return Promise.reject(t('ui.ACCOUNT.screen.Account.NewMultisigAccount.ledgerLegacyAccountNotSupported'));
+    }
+
+    if (accountInWallet?.signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+      return Promise.reject(t('ui.ACCOUNT.screen.Account.NewMultisigAccount.ledgerEcdsaAccountNotSupported'));
+    }
+
     if (isExisted) {
       return Promise.reject(t('ui.ACCOUNT.screen.Account.NewMultisigAccount.addressAlreadyExistsInList'));
     }
 
     return Promise.resolve();
-  }, [form, signerAddressValue, signers, t]);
+  }, [accounts, form, signerAddressValue, signers, t]);
 
   const validateThreshold = useCallback(
     async (_: Rule, value?: string) => {

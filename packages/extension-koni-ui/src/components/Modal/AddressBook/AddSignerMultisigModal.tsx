@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ActionType } from '@subwallet/extension-base/core/types';
-import { AccountSignMode, AnalyzeAddress, AnalyzedGroup } from '@subwallet/extension-base/types';
+import { AccountProxyType, AccountSignMode, AnalyzeAddress, AnalyzedGroup } from '@subwallet/extension-base/types';
 import { AddressSelectorItem } from '@subwallet/extension-koni-ui/components';
 import { useFilterModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { SignerData } from '@subwallet/extension-koni-ui/Popup/Account/NewMultisigAccount';
@@ -78,6 +78,14 @@ const Component: React.FC<Props> = (props: Props) => {
     (!selectedFilters.length || selectedFilters.includes(AnalyzedGroup.WALLET)) && accountProxies.forEach((ap) => {
       if (isAccountAll(ap.id)) {
         return;
+      }
+
+      if (ap.accountType === AccountProxyType.LEDGER) {
+        const account = ap.accounts[0];
+
+        if (account.signMode !== AccountSignMode.GENERIC_LEDGER) {
+          return;
+        }
       }
 
       if (actionType === ActionType.SEND_NFT) {

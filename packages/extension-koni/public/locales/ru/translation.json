@@ -2594,6 +2594,8 @@
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.selectSignatoriesToCreate": "",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.signatoryList": "",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.addressAlreadyExistsInList": "",
+  "ui.ACCOUNT.screen.Account.NewMultisigAccount.ledgerLegacyAccountNotSupported": "",
+  "ui.ACCOUNT.screen.Account.NewMultisigAccount.ledgerEcdsaAccountNotSupported": "",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.thresholdRequired": "",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.thresholdGreaterThanOne": "",
   "ui.ACCOUNT.screen.Account.NewMultisigAccount.thresholdExceedsSigners": "",
