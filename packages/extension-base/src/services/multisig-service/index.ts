@@ -770,9 +770,9 @@ export class MultisigService implements StoppableServiceInterface {
     const currentMap = this.getPendingMultisigTxMap();
 
     if (chain) {
-      return Object.values(currentMap).filter((tx) => tx.multisigAddress === multisigAddress && tx.chain === chain);
+      return Object.values(currentMap).filter((tx) => isSameAddress(tx.multisigAddress, multisigAddress) && tx.chain === chain);
     }
 
-    return Object.values(currentMap).filter((tx) => tx.multisigAddress === multisigAddress);
+    return Object.values(currentMap).filter((tx) => isSameAddress(tx.multisigAddress, multisigAddress));
   }
 }

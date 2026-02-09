@@ -43,6 +43,7 @@ import { EventRecord } from '@polkadot/types/interfaces';
 import { SignerPayloadJSON } from '@polkadot/types/types/extrinsic';
 import { hexToU8a, isHex } from '@polkadot/util';
 import { HexString } from '@polkadot/util/types';
+import { blake2AsHex } from '@polkadot/util-crypto';
 
 import { GovVoteType } from '../open-gov/interface';
 
@@ -165,6 +166,20 @@ export default class TransactionService {
 
         if (pair.meta.isMultisig) {
           validationResponse.wrappingStatus = SubstrateTransactionWrappingStatus.WRAPPABLE;
+
+          const pendingTransaction = this.state.multisigService.getPendingTxsForMultisigAddress({ multisigAddress: address, chain });
+
+          if (pendingTransaction.length > 0) {
+            const extrinsicTransaction = transactionInput.transaction as SubmittableExtrinsic;
+            const callData = extrinsicTransaction.method.toHex();
+            const callHash = blake2AsHex(callData);
+
+            const isExistPendingTx = pendingTransaction.find((tx) => tx.callHash === callHash);
+
+            if (isExistPendingTx) {
+              validationResponse.errors.push(new TransactionError(BasicTxErrorType.DUPLICATE_TRANSACTION, t('bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction')));
+            }
+          }
         }
       }
 

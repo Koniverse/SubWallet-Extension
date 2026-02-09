@@ -2710,5 +2710,6 @@
   "ui.HISTORY.constant.multisig.title.addProxy": "",
   "ui.HISTORY.constant.multisig.title.removeProxy": "",
   "ui.HISTORY.constant.multisig.typeName.addProxy": "",
-  "ui.HISTORY.constant.multisig.typeName.removeProxy": ""
+  "ui.HISTORY.constant.multisig.typeName.removeProxy": "",
+  "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": ""
 }

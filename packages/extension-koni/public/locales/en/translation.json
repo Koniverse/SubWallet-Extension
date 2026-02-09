@@ -2711,5 +2711,6 @@
   "ui.HISTORY.constant.multisig.title.addProxy": "Add proxy",
   "ui.HISTORY.constant.multisig.title.removeProxy": "Remove proxy",
   "ui.HISTORY.constant.multisig.typeName.addProxy": "Add proxy",
-  "ui.HISTORY.constant.multisig.typeName.removeProxy": "Remove proxy"
+  "ui.HISTORY.constant.multisig.typeName.removeProxy": "Remove proxy",
+  "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": "You’ve a pending multisig transaction with the same information. Complete the transaction first, then try again"
 }
