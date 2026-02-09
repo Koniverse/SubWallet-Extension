@@ -3651,6 +3651,26 @@ export default class KoniExtension {
      * ─────────────────────────────
      */
 
+    // Calculate adjusted transfer amount based on transaction type and transferAll flag
+    let adjustedTransferNativeAmount = originTransaction.transferNativeAmount;
+    let adjustedValue: string | undefined;
+
+    if (originTransaction.extrinsicType === ExtrinsicType.TRANSFER_BALANCE) {
+      const transactionData = originTransaction.data as RequestSubmitTransfer;
+
+      if (transactionData?.transferAll === true) {
+        // For transferAll transactions:
+        // - isSignerProxiedAccount (Case 1): use maxTransferable (fee already deducted in proxy)
+        // - !isSignerProxiedAccount (Case 2): use maxTransferableWithoutFee (fee deducted separately in proxy wrapper)
+        adjustedTransferNativeAmount = isSignerProxiedAccount
+          ? transactionData.maxTransferable
+          : transactionData.maxTransferableWithoutFee;
+
+        // Also update the value field with the same adjusted amount
+        adjustedValue = adjustedTransferNativeAmount;
+      }
+    }
+
     // Case 1: signer === proxied address → handle original transaction
     if (isSignerProxiedAccount) {
       return await this.#koniState.transactionService.handleWrappedTransaction({
@@ -3659,13 +3679,16 @@ export default class KoniExtension {
         data: {
           ...(originTransaction.data as object),
 
+          // Update value if transferAll is true
+          ...(adjustedValue && { value: adjustedValue }),
+
           // output
           decodedCallData,
           submittedCallData: substrateProxyExtrinsic.toHex(),
           callData,
           networkFee
         },
-        transferNativeAmount: originTransaction.transferNativeAmount ? new BigN(originTransaction.transferNativeAmount).minus(networkFee).toString() : originTransaction.transferNativeAmount,
+        transferNativeAmount: adjustedTransferNativeAmount,
         wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_RESULT,
         eventsHandler
       });
@@ -3679,10 +3702,13 @@ export default class KoniExtension {
       extrinsicType: ExtrinsicType.SUBSTRATE_PROXY_INIT_TX,
       transaction: substrateProxyExtrinsic,
       skipFeeValidation: true,
-      transferNativeAmount: originTransaction.transferNativeAmount,
+      transferNativeAmount: adjustedTransferNativeAmount,
       data: {
         // input
         ...request,
+
+        // Update value if transferAll is true
+        ...(adjustedValue && { value: adjustedValue }),
 
         // output
         decodedCallData,
