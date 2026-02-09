@@ -15,6 +15,7 @@ export interface PendingMultisigTxRequest extends BaseRequestSign {
   callHash: string;
   decodedCallData?: DecodeCallDataResponse;
   type: MultisigTxType;
+  call: string
 }
 
 export interface ApprovePendingTxRequest extends PendingMultisigTxRequest {
@@ -29,7 +30,6 @@ export interface ExecutePendingTxRequest extends PendingMultisigTxRequest {
     height: number;
     index: number;
   };
-  call: string;
 }
 
 export interface CancelPendingTxRequest extends PendingMultisigTxRequest {

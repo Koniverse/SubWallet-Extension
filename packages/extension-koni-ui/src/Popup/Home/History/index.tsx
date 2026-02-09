@@ -6,17 +6,18 @@ import { YIELD_EXTRINSIC_TYPES } from '@subwallet/extension-base/koni/api/yield/
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
-import { quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
+import { isSameAddress, quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { MultisigHistoryItem } from '@subwallet/extension-koni-ui/components/History/MultisigHistoryItem';
 import { DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, MULTISIG_HISTORY_INFO_MODAL, NOTI_MULTISIG_PENDINGTX_ID, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { MULTISIG_ACTIONS } from '@subwallet/extension-koni-ui/constants/multisig';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/extension-koni-ui/messaging';
 import { MultisigHistoryInfoModal } from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/MultisigHistoryInfoModal';
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
-import { customFormatDate, formatHistoryDate, isTypeGov, isTypeManageSubstrateProxy, isTypeStaking, isTypeTransfer, reformatAddress } from '@subwallet/extension-koni-ui/utils';
+import { customFormatDate, formatHistoryDate, isTypeGov, isTypeManageSubstrateProxy, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Form, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, NewspaperClipping, Pencil, Rocket, Spinner, TreeStructure } from 'phosphor-react';
@@ -261,7 +262,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const currentSubstrateAddress = useMemo(() => {
     const substrateAccount = currentAccountProxy?.accounts?.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
 
+    if (!substrateAccount) {
+      return undefined;
+    }
+
     if (substrateAccount?.signMode === AccountSignMode.MULTISIG) {
+      return substrateAccount?.address;
+    }
+
+    if (MULTISIG_ACTIONS.some((action) => substrateAccount.transactionActions.includes(action))) {
       return substrateAccount?.address;
     }
 
@@ -278,10 +287,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       filteredList = [];
     } else {
       filteredList = pendingTxs.filter((tx) => {
-        const txMultisigAddress = reformatAddress(tx.multisigAddress);
-        const currentSigner = reformatAddress(tx.currentSigner);
-        const isTargetMultisig = txMultisigAddress === currentSubstrateAddress;
-        const isSigner = currentSigner === currentSubstrateAddress;
+        const isTargetMultisig = isSameAddress(tx.multisigAddress, currentSubstrateAddress);
+        const isSigner = isSameAddress(tx.currentSigner, currentSubstrateAddress);
 
         return isTargetMultisig || isSigner;
       });
