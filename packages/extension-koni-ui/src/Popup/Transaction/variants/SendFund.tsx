@@ -439,8 +439,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   });
 
   const actualMaxTransferable = useMemo(() => {
-    return isWrappTransaction ? transferInfo?.maxTransferableWithoutFee : transferInfo?.maxTransferable;
-  }, [isWrappTransaction, transferInfo]);
+    return isMultisigAccount ? transferInfo?.maxTransferableWithoutFee : transferInfo?.maxTransferable;
+  }, [isMultisigAccount, transferInfo]);
 
   const updateAddressInputValue = useCallback((value: string) => {
     addressInputCurrent?.setInputValue(value);
@@ -630,9 +630,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         transferBounceable: options.isTransferBounceable,
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
-        tokenPayFeeSlug: currentTokenPayFee,
-        maxTransferable: transferInfo?.maxTransferable,
-        maxTransferableWithoutFee: transferInfo?.maxTransferableWithoutFee
+        tokenPayFeeSlug: currentTokenPayFee
       });
     } else {
       // Make cross chain transfer
@@ -652,7 +650,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
 
     return sendPromise;
-  }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, transferInfo?.maxTransferable, transferInfo?.maxTransferableWithoutFee]);
+  }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee]);
 
   // todo: must refactor later, temporary solution to support SnowBridge
   const handleBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
