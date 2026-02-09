@@ -370,10 +370,9 @@ const HistoryMultisigLayout = styled(Component)<Props>(({ theme: { token } }: Pr
     '.__checked-icon-wrapper': {
       display: 'flex',
       justifyContent: 'center',
-      minWidth: 40,
       marginRight: -token.marginXS,
       color: token.colorTextLight4,
-
+      paddingLeft: token.paddingXXS,
       '&.-selected': {
         color: token.colorSuccess
       }
