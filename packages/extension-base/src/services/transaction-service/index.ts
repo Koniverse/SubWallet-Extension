@@ -168,7 +168,7 @@ export default class TransactionService {
         }
       }
 
-      if (chainInfo.substrateInfo?.supportProxy && !validationResponse.wrappingStatus) {
+      if (chainInfo.substrateInfo?.supportProxy && !validationResponse.wrappingStatus && !isNonNativeTokenPayFee) {
         const { substrateProxyAccounts } = await this.state.substrateProxyAccountService.getSubstrateProxyAccountGroup({
           address,
           chain,

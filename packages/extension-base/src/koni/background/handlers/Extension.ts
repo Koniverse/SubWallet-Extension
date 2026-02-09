@@ -3665,6 +3665,7 @@ export default class KoniExtension {
           callData,
           networkFee
         },
+        transferNativeAmount: originTransaction.transferNativeAmount ? new BigN(originTransaction.transferNativeAmount).minus(networkFee).toString() : originTransaction.transferNativeAmount,
         wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_RESULT,
         eventsHandler
       });

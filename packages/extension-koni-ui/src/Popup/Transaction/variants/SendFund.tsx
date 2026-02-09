@@ -438,6 +438,10 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     enabled: !!fromValue && !!chainValue
   });
 
+  const actualMaxTransferable = useMemo(() => {
+    return isWrappTransaction ? transferInfo?.maxTransferableWithoutFee : transferInfo?.maxTransferable;
+  }, [isWrappTransaction, transferInfo]);
+
   const updateAddressInputValue = useCallback((value: string) => {
     addressInputCurrent?.setInputValue(value);
     addressInputCurrent?.setSelectedOption((prev) => {
@@ -469,7 +473,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [accounts, autoFormatValue, chainInfoMap, destAssetInfo, form, ledgerGenericAllowNetworks]);
 
   const validateAmount = useCallback((rule: Rule, amount: string): Promise<void> => {
-    const maxTransfer = (isWrappTransaction ? transferInfo?.maxTransferableWithoutFee : transferInfo?.maxTransferable) || '0';
+    const maxTransfer = actualMaxTransferable || '0';
 
     if (!amount) {
       return Promise.reject(t('ui.TRANSACTION.screen.Transaction.SendFund.amountIsRequired'));
@@ -490,7 +494,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
 
     return Promise.resolve();
-  }, [decimals, isWrappTransaction, t, transferInfo?.maxTransferable, transferInfo?.maxTransferableWithoutFee]);
+  }, [actualMaxTransferable, decimals, t]);
 
   const onValuesChange: FormCallbacks<TransferParams>['onValuesChange'] = useCallback(
     (part: Partial<TransferParams>, values: TransferParams) => {
@@ -742,12 +746,12 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [handleBasicSubmit, handleBridgeSpendingApproval, isShowWarningOnSubmit, onError, onSuccess, processState]);
 
   const onSetMaxTransferable = useCallback((value: boolean) => {
-    const bnMaxTransfer = new BN(transferInfo?.maxTransferable || '0');
+    const bnMaxTransfer = new BN(actualMaxTransferable || '0');
 
     if (!bnMaxTransfer.isZero()) {
       setIsTransferAll(value);
     }
-  }, [transferInfo?.maxTransferable]);
+  }, [actualMaxTransferable]);
 
   const onSetTokenPayFee = useCallback((slug: string) => {
     setCurrentTokenPayFee(slug);
@@ -980,11 +984,11 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   useEffect(() => {
     if (isTransferAll && transferInfo?.maxTransferable && !hideMaxButton) {
       form.setFieldsValue({
-        value: isWrappTransaction ? transferInfo?.maxTransferableWithoutFee : transferInfo?.maxTransferable
+        value: actualMaxTransferable
       });
       setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${Date.now()}`);
     }
-  }, [form, hideMaxButton, isTransferAll, isWrappTransaction, transferInfo]);
+  }, [actualMaxTransferable, form, hideMaxButton, isTransferAll, isWrappTransaction, transferInfo]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');
@@ -1183,7 +1187,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
               decimals={decimals}
               disabled={decimals === 0}
               key={amountInputRenderKey}
-              maxValue={transferInfo?.maxTransferable || '0'}
+              maxValue={actualMaxTransferable || '0'}
               onSetMax={onSetMaxTransferable}
               showMaxButton={!hideMaxButton}
               tooltip={t('ui.TRANSACTION.screen.Transaction.SendFund.amount')}
@@ -1191,7 +1195,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           </Form.Item>
         </Form>
 
-        {FEE_SHOW_TYPES.includes(transferInfo?.feeType) && !!toValue && !!transferAmountValue && nativeTokenSlug && !isWrappTransaction && (
+        {FEE_SHOW_TYPES.includes(transferInfo?.feeType) && !!toValue && !!transferAmountValue && nativeTokenSlug && !isMultisigAccount && (
           <FeeEditor
             chainValue={chainValue}
             currentTokenPayFee={currentTokenPayFee}
