@@ -1273,6 +1273,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
                 name={'from'}
               >
                 <AccountAddressSelector
+                  hiddenAccountProxyTypes={[AccountProxyType.MULTISIG]}
                   items={accountAddressItems}
                   label={`${t('ui.TRANSACTION.screen.Transaction.Swap.from')}:`}
                   labelStyle={'horizontal'}

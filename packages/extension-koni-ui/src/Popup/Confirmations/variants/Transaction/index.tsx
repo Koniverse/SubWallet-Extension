@@ -202,13 +202,16 @@ const Component: React.FC<Props> = (props: Props) => {
             setDisable={setIsDisabledSubstrateApprove}
             transaction={transaction}
           />}
-          <span className={CN('bond-reward-label', 'text-light-4')}>
-            {
-              (transaction.data as RequestStakeClaimReward).bondReward
-                ? t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack')
-                : t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable')
-            }
-          </span>
+          {
+            transaction.extrinsicType === ExtrinsicType.STAKING_CLAIM_REWARD &&
+            <span className={CN('bond-reward-label', 'text-light-4')}>
+              {
+                (transaction.data as RequestStakeClaimReward).bondReward
+                  ? t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack')
+                  : t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable')
+              }
+            </span>
+          }
         </div>
         {isAddressFormatInfoBoxVisible && (
           <AlertBoxInstant

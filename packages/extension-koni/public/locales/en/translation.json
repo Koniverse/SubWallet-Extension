@@ -2310,7 +2310,7 @@
   "ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.version": "Version",
   "ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.nonce": "Nonce",
   "ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.tip": "Tip",
-  "ui.EARNING.screen.EarningOptions.earningOptions": "Earning options1",
+  "ui.EARNING.screen.EarningOptions.earningOptions": "Earning options",
   "ui.EARNING.screen.EarningPositions.yourEarningPositions": "Your earning positions",
   "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.close": "Close",
   "ui.EARNING.components.Modal.Earning.ActiveStakeDetails.title": "Active stake details",
