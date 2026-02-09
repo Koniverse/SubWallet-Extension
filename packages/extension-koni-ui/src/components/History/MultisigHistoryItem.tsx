@@ -9,7 +9,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Logo, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ArrowsLeftRight, ArrowUpRight, HardDrives, NewspaperClipping, Question } from 'phosphor-react';
+import { ArrowsLeftRight, ArrowUpRight, ClockCounterClockwise, Database, NewspaperClipping, Pencil, Question, TreeStructure } from 'phosphor-react';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -24,15 +24,18 @@ const stakeTypes = [
   MultisigTxType.REDEEM,
   MultisigTxType.UNSTAKE,
   MultisigTxType.WITHDRAW,
-  MultisigTxType.CANCEL_UNSTAKE,
-  MultisigTxType.NOMINATE,
-  MultisigTxType.CLAIM_REWARD
+  MultisigTxType.CANCEL_UNSTAKE
 ];
 
 const govTypes = [
   MultisigTxType.GOV_VOTE,
   MultisigTxType.GOV_REMOVE_VOTE,
   MultisigTxType.GOV_UNLOCK_VOTE
+];
+
+const substrateProxyType = [
+  MultisigTxType.ADD_PROXY,
+  MultisigTxType.REMOVE_PROXY
 ];
 
 const Component = ({ className = '', item, onClick }: Props) => {
@@ -44,8 +47,16 @@ const Component = ({ className = '', item, onClick }: Props) => {
       return { icon: ArrowUpRight, name: 'Send' };
     }
 
+    if (item.multisigTxType === MultisigTxType.CLAIM_REWARD) {
+      return { icon: ClockCounterClockwise, name: 'Claim Reward' };
+    }
+
+    if (item.multisigTxType === MultisigTxType.NOMINATE) {
+      return { icon: Pencil, name: 'Nominate' };
+    }
+
     if (stakeTypes.includes(item.multisigTxType)) {
-      return { icon: HardDrives, name: 'Stake' };
+      return { icon: Database, name: 'Stake' };
     }
 
     if (item.multisigTxType === MultisigTxType.SWAP) {
@@ -54,6 +65,10 @@ const Component = ({ className = '', item, onClick }: Props) => {
 
     if (govTypes.includes(item.multisigTxType)) {
       return { icon: NewspaperClipping, name: 'Governance' };
+    }
+
+    if (substrateProxyType.includes(item.multisigTxType)) {
+      return { icon: TreeStructure, name: 'Proxy' };
     }
 
     if (item.multisigTxType === MultisigTxType.LENDING) {
