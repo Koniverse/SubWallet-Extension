@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { AccountMultisigError } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountProxyType } from '@subwallet/extension-base/types';
 import { AccountNameModal, AccountProxyAvatar, AddressSelectorItem, CloseIcon, EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import AddSignerMultisigModal from '@subwallet/extension-koni-ui/components/Modal/AddressBook/AddSignerMultisigModal';
@@ -297,7 +298,16 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       threshold: parseInt(thresholdValue),
       name: accountName
     })
-      .then(() => {
+      .then((errors: AccountMultisigError[]) => {
+        if (errors && errors.length > 0) {
+          notify({
+            message: errors[0].message,
+            type: 'error'
+          });
+
+          return;
+        }
+
         onComplete();
         resetMultisigDraft();
       })
