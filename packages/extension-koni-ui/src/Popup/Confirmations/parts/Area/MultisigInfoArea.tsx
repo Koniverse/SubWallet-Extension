@@ -91,9 +91,10 @@ function Component ({ className, transaction }: Props) {
             />
 
             <MetaInfo.Default
+              className={'call-data-info'}
               label={t('ui.Confirmations.MultisigInfoArea.callData')}
             >
-              {toShort(transactionData.callHash, 5, 5)}
+              {toShort(transactionData.call, 5, 5)}
               <Button
                 className={'call-data-info-button'}
                 icon={<Icon
@@ -117,7 +118,10 @@ function Component ({ className, transaction }: Props) {
         showFooter={false}
         title={t('ui.Confirmations.Detail.CallDataDetail.transactionDetails')}
       >
-        <pre className='json'>
+        <pre
+          className='json'
+          style={{ marginBottom: 0 }}
+        >
           {JSON.stringify(transactionData.decodedCallData || '', null, 2)}
         </pre>
       </BaseDetailModal>}
@@ -129,12 +133,22 @@ const MultisigInfoArea = styled(Component)<Props>(({ theme: { token } }: ThemePr
   return {
     marginTop: token.marginSM,
 
+    '.call-data-info .__value': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.sizeXXS
+    },
+
     '.call-data-info-button': {
       height: 'fit-content !important',
       width: 'fit-content !important',
       minWidth: 'unset !important',
       color: token.colorTextLight4,
       transform: 'all 0.3s ease-in-out',
+      '.anticon': {
+        height: 'fit-content !important',
+        width: 'fit-content !important'
+      },
 
       '&:hover': {
         color: token.colorTextLight2

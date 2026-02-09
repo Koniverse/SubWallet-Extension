@@ -147,12 +147,13 @@ function Component ({ className = '', data, historyList = [], onCancel }: Props)
         index: data?.extrinsicIndex
       },
       type: data?.multisigTxType,
+      call: data?.callData || '',
       decodedCallData: data.decodedCallData,
       callHash: data?.callHash
     };
 
     return cancelPendingTx(cancelRequest);
-  }, [data?.blockHeight, data?.callHash, data?.chain, data?.currentSigner, data.decodedCallData, data?.extrinsicIndex, data.multisigAddress, data?.multisigTxType, data?.signerAddresses, data.threshold]);
+  }, [data]);
 
   const onApprove = useCallback(() => {
     const approveRequest: ApprovePendingTxRequest = {
@@ -164,6 +165,7 @@ function Component ({ className = '', data, historyList = [], onCancel }: Props)
         signers: data?.signerAddresses || []
       },
       decodedCallData: data.decodedCallData,
+      call: data?.callData || '',
       callHash: data?.callHash || '',
       timepoint: {
         height: data?.blockHeight,
@@ -173,7 +175,7 @@ function Component ({ className = '', data, historyList = [], onCancel }: Props)
     };
 
     return approvePendingTx(approveRequest);
-  }, [data?.blockHeight, data?.callHash, data?.chain, data?.currentSigner, data.decodedCallData, data?.extrinsicIndex, data.multisigAddress, data?.multisigTxType, data?.signerAddresses, data.threshold]);
+  }, [data]);
 
   const onExecute = useCallback(() => {
     const executeRequest: ExecutePendingTxRequest = {
@@ -195,7 +197,7 @@ function Component ({ className = '', data, historyList = [], onCancel }: Props)
     };
 
     return executePendingTx(executeRequest);
-  }, [data?.blockHeight, data?.callData, data?.callHash, data?.chain, data?.currentSigner, data.decodedCallData, data?.extrinsicIndex, data.multisigAddress, data?.multisigTxType, data?.signerAddresses, data.threshold]);
+  }, [data]);
 
   const _onReject = useCallback(() => {
     handleAction(onReject).catch(console.error);

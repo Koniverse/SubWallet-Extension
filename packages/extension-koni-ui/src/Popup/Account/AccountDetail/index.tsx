@@ -3,6 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountActions, AccountChainType, AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AccountChainTypeLogos, AccountProxyTypeTag, AddressSelectorItem, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
@@ -69,6 +70,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
 
   const { alertModal, deriveModal: { open: openDeriveModal } } = useContext(WalletModalContext);
   const { accountProxies, accounts } = useSelector((state: RootState) => state.accountState);
+  const { pendingMultisigTxs } = useSelector((state: RootState) => state.multisig);
   const showDerivationInfoTab = useMemo((): boolean => {
     if (accountProxy.parentId) {
       return !!accountProxies.find((acc) => acc.id === accountProxy.parentId);
@@ -76,6 +78,22 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
       return false;
     }
   }, [accountProxies, accountProxy.parentId]);
+
+  const hasPendingMultisigTx = useMemo(() => {
+    if (accountProxy.accountType === AccountProxyType.MULTISIG) {
+      const substrateAccount = accountProxy?.accounts?.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
+
+      if (!substrateAccount) {
+        return false;
+      }
+
+      return !!Object.values(pendingMultisigTxs).find(
+        (tx) => isSameAddress(tx.multisigAddress, substrateAccount.address)
+      );
+    }
+
+    return false;
+  }, [accountProxy.accountType, accountProxy.accounts, pendingMultisigTxs]);
 
   const multisigAccount = useMemo(() => {
     if (accountProxy.accountType === AccountProxyType.MULTISIG) {
@@ -202,7 +220,6 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
       });
   }, [accountProxy.id, goHome, notify]);
 
-  // Todo: Recheck with pending transaction
   const onDelete = useCallback(() => {
     alertModal.open({
       title: isMultisig
@@ -213,7 +230,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
         ? (
           <>
             <div className='description-alert-modal'>
-              {t('ui.ACCOUNT.screen.Account.Detail.removeAccountWithPendingTxsWarning')}
+              {hasPendingMultisigTx ? t('ui.ACCOUNT.screen.Account.Detail.removeAccountWithPendingTxsWarning') : t('ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning')}
             </div>
           </>
         )
@@ -230,7 +247,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy,
         }
       }
     });
-  }, [alertModal, doDelete, isMultisig, t]);
+  }, [alertModal, doDelete, hasPendingMultisigTx, isMultisig, t]);
 
   const onDerive = useCallback(() => {
     if (accountProxy) {

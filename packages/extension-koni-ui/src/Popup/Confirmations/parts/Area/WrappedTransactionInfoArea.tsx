@@ -265,6 +265,7 @@ function Component ({ className, setDisable, transaction }: Props) {
                     />
 
                     {wrapTransactionData.callData != null && <MetaInfo.Default
+                      className={'call-data-info'}
                       label={t('ui.Confirmations.Detail.CallDataDetail.callData')}
                     >
                       {toShort(wrapTransactionData.callData, 5, 5)}

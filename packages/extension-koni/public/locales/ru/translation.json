@@ -2712,5 +2712,6 @@
   "ui.HISTORY.constant.multisig.title.removeProxy": "",
   "ui.HISTORY.constant.multisig.typeName.addProxy": "",
   "ui.HISTORY.constant.multisig.typeName.removeProxy": "",
-  "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": ""
+  "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": "",
+  "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": ""
 }
