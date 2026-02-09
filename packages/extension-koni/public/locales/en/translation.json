@@ -1991,6 +1991,7 @@
   "bg.ACCOUNT.services.keyring.handler.Mnemonic.chooseAtLeastOneAccountType": "Please choose at least one account type",
   "bg.ACCOUNT.services.keyring.handler.Secret.accountExists": "Account exists",
   "bg.ACCOUNT.services.keyring.handler.Secret.accountNameAlreadyExists": "Account name already exists",
+  "bg.ACCOUNT.services.keyring.handler.Multisig.multisigAddressExists": "The generated multisig address already exists under the account named \"{{name}}\". Remove the account first, then try again",
   "bg.ACCOUNT.services.keyring.handler.Secret.invalidPrivateKey": "Invalid private key",
   "bg.ACCOUNT.services.keyring.handler.Secret.cannotCreateAccount": "Cannot create account",
   "bg.ACCOUNT.utils.account.deriveSoloInfo.unableToFindParentAccount": "Unable to find parent account",

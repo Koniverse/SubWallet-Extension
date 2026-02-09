@@ -79,7 +79,9 @@ export class AccountMultisigHandler extends AccountBaseHandler {
         const exists = keyring.getPair(multisigAddress);
 
         if (exists?.address === reformatAddress(multisigAddress)) {
-          return [{ code: AccountMultisigErrorCode.INVALID_ADDRESS, message: t('bg.ACCOUNT.services.keyring.handler.Secret.accountExists') }];
+          const existingName = exists.meta?.name || 'Unknown';
+
+          return [{ code: AccountMultisigErrorCode.INVALID_ADDRESS, message: t('bg.ACCOUNT.services.keyring.handler.Multisig.multisigAddressExists', { replace: { name: existingName } }) }];
         }
       } catch (e) {
 

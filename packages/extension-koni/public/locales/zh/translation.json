@@ -2021,6 +2021,7 @@
   "bg.ACCOUNT.services.keyring.handler.Mnemonic.chooseAtLeastOneAccountType": "Please choose at least one account type",
   "bg.ACCOUNT.services.keyring.handler.Secret.accountExists": "Account exists",
   "bg.ACCOUNT.services.keyring.handler.Secret.accountNameAlreadyExists": "Account name already exists",
+  "bg.ACCOUNT.services.keyring.handler.Multisig.multisigAddressExists": "",
   "bg.ACCOUNT.services.keyring.handler.Secret.invalidPrivateKey": "Invalid private key",
   "bg.ACCOUNT.services.keyring.handler.Secret.cannotCreateAccount": "Cannot create account",
   "bg.ACCOUNT.utils.account.deriveSoloInfo.unableToFindParentAccount": "Unable to find parent account",
