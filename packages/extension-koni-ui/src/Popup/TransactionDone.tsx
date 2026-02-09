@@ -1,11 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { SubstrateTransactionWrappingStatus } from '@subwallet/extension-base/services/transaction-service/types';
 import { CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { useDefaultNavigate } from '@subwallet/extension-koni-ui/hooks';
+import { saveCurrentAccountAddress } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { findAccountByAddress } from '@subwallet/extension-koni-ui/utils';
 import { PageIcon } from '@subwallet/react-ui';
 import { CheckCircle } from 'phosphor-react';
 import React, { useCallback } from 'react';
@@ -19,34 +22,49 @@ import reformatAddress from '../utils/account/reformatAddress';
 
 type Props = ThemeProps;
 
+const wrapTransactionStatuses = [
+  SubstrateTransactionWrappingStatus.WRAP_RESULT,
+  SubstrateTransactionWrappingStatus.WRAP_SOURCE
+];
+
 const Component: React.FC<Props> = (props: Props) => {
   const { className } = props;
   const { address, chain, transactionId } = useParams<{address: string, chain: string, transactionId: string}>();
   const { transactionRequest } = useSelector((state: RootState) => state.requestState);
+  const { accounts } = useSelector((state: RootState) => state.accountState);
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { goHome } = useDefaultNavigate();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const viewInHistory = useCallback(
     () => {
-      if (address && chain && transactionId) {
-        let storedAddressesHistory = address;
+      (async () => {
+        if (address && chain && transactionId) {
+          const storedAddressesHistory = address;
 
-        if (transactionRequest) {
-          const transaction = transactionRequest[transactionId];
+          if (transactionRequest) {
+            const transaction = transactionRequest[transactionId];
 
-          // In case of wrapped transaction, show the wrapped address as signer
-          if (transaction?.address && transaction?.wrappingStatus === SubstrateTransactionWrappingStatus.WRAP_RESULT) {
-            storedAddressesHistory = transaction.address;
+            if (transaction?.address && transaction?.wrappingStatus && wrapTransactionStatuses.includes(transaction.wrappingStatus)) {
+              setIsLoading(true);
+              const account = findAccountByAddress(accounts, transaction.address);
+
+              if (account) {
+                await saveCurrentAccountAddress({ address: account.proxyId || ALL_ACCOUNT_KEY }).catch(console.error);
+              }
+
+              setIsLoading(false);
+            }
           }
-        }
 
-        navigate(`/home/history/${reformatAddress(storedAddressesHistory)}/${chain}/${transactionId}`, { state: { from: 'ignoreRemind' } });
-      } else {
-        navigate('/home/history');
-      }
+          navigate(`/home/history/${reformatAddress(storedAddressesHistory)}/${chain}/${transactionId}`, { state: { from: 'ignoreRemind' } });
+        } else {
+          navigate('/home/history');
+        }
+      })().catch(console.error);
     },
-    [address, chain, transactionId, transactionRequest, navigate]
+    [address, chain, transactionId, transactionRequest, navigate, accounts]
   );
 
   return (
@@ -54,11 +72,13 @@ const Component: React.FC<Props> = (props: Props) => {
       <Layout.WithSubHeaderOnly
         leftFooterButton={{
           block: true,
+          loading: isLoading,
           onClick: viewInHistory,
           children: t('ui.TRANSACTION.screen.TransactionDone.viewTransaction')
         }}
         rightFooterButton={{
           block: true,
+          loading: isLoading,
           onClick: goHome,
           children: t('ui.TRANSACTION.screen.TransactionDone.backToHome')
         }}
