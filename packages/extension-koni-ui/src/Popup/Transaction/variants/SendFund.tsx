@@ -630,7 +630,9 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         transferBounceable: options.isTransferBounceable,
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
-        tokenPayFeeSlug: currentTokenPayFee
+        tokenPayFeeSlug: currentTokenPayFee,
+        maxTransferable: transferInfo?.maxTransferable,
+        maxTransferableWithoutFee: transferInfo?.maxTransferableWithoutFee
       });
     } else {
       // Make cross chain transfer
@@ -650,7 +652,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
 
     return sendPromise;
-  }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee]);
+  }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, transferInfo?.maxTransferable, transferInfo?.maxTransferableWithoutFee]);
 
   // todo: must refactor later, temporary solution to support SnowBridge
   const handleBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
