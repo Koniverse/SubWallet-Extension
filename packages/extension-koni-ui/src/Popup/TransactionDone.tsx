@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { SubstrateTransactionWrappingStatus } from '@subwallet/extension-base/services/transaction-service/types';
+import { isSameAddress } from '@subwallet/extension-base/utils';
 import { CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { useDefaultNavigate } from '@subwallet/extension-koni-ui/hooks';
 import { saveCurrentAccountAddress } from '@subwallet/extension-koni-ui/messaging';
@@ -22,11 +22,6 @@ import reformatAddress from '../utils/account/reformatAddress';
 
 type Props = ThemeProps;
 
-const wrapTransactionStatuses = [
-  SubstrateTransactionWrappingStatus.WRAP_RESULT,
-  SubstrateTransactionWrappingStatus.WRAP_SOURCE
-];
-
 const Component: React.FC<Props> = (props: Props) => {
   const { className } = props;
   const { address, chain, transactionId } = useParams<{address: string, chain: string, transactionId: string}>();
@@ -41,22 +36,24 @@ const Component: React.FC<Props> = (props: Props) => {
     () => {
       (async () => {
         if (address && chain && transactionId) {
-          const storedAddressesHistory = address;
+          let storedAddressesHistory = address;
 
           if (transactionRequest) {
             const transaction = transactionRequest[transactionId];
 
-            if (transaction?.address && transaction?.wrappingStatus && wrapTransactionStatuses.includes(transaction.wrappingStatus)) {
-              setIsLoading(true);
-              const account = findAccountByAddress(accounts, transaction.address);
-
-              if (account) {
-                await saveCurrentAccountAddress({ address: account.proxyId || ALL_ACCOUNT_KEY }).catch(console.error);
-              }
-
-              setIsLoading(false);
+            if (transaction?.address && !isSameAddress(transaction.address, address)) {
+              storedAddressesHistory = transaction.address;
             }
           }
+
+          setIsLoading(true);
+          const account = findAccountByAddress(accounts, storedAddressesHistory);
+
+          if (account) {
+            await saveCurrentAccountAddress({ address: account.proxyId || ALL_ACCOUNT_KEY }).catch(console.error);
+          }
+
+          setIsLoading(false);
 
           navigate(`/home/history/${reformatAddress(storedAddressesHistory)}/${chain}/${transactionId}`, { state: { from: 'ignoreRemind' } });
         } else {
