@@ -7,7 +7,7 @@ import { PendingMultisigTxRequest } from '@subwallet/extension-base/types/multis
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
-import { isTypeMultiSig, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
+import { isTypeMultisig, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -33,7 +33,7 @@ const Component: React.FC<Props> = (props: Props) => {
     return undefined;
   }, [data.additionalInfo, data.type]);
 
-  const isMultisig = isTypeMultiSig(data.type);
+  const isMultisig = isTypeMultisig(data.type);
 
   const senderLabel = useMemo(() => {
     switch (data.type) {

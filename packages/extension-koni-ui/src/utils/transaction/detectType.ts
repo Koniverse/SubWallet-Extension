@@ -56,9 +56,9 @@ export const isTypeManageSubstrateProxy = (txType: ExtrinsicType) => [
   ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT
 ].includes(txType);
 
-export const isTypeMultiSig = (txType: ExtrinsicType) => [
-  ExtrinsicType.MULTISIG_INIT_TX,
+export const isTypeMultisig = (txType: ExtrinsicType) => [
   ExtrinsicType.MULTISIG_APPROVE_TX,
   ExtrinsicType.MULTISIG_EXECUTE_TX,
-  ExtrinsicType.MULTISIG_CANCEL_TX
+  ExtrinsicType.MULTISIG_CANCEL_TX,
+  ExtrinsicType.MULTISIG_INIT_TX
 ].includes(txType);

@@ -16,10 +16,10 @@ import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLo
 import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/extension-koni-ui/messaging';
 import { MultisigHistoryInfoModal } from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/MultisigHistoryInfoModal';
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
-import { customFormatDate, formatHistoryDate, isTypeGov, isTypeManageSubstrateProxy, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
+import { customFormatDate, formatHistoryDate, isTypeGov, isTypeManageSubstrateProxy, isTypeMultisig, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Form, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, NewspaperClipping, Pencil, Rocket, Spinner, TreeStructure } from 'phosphor-react';
+import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, NewspaperClipping, Pencil, Rocket, Spinner, TreeStructure, UserSwitch } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -42,7 +42,8 @@ const IconMap: Record<string, SwIconProps['phosphorIcon']> = {
   swap: ArrowsLeftRight,
   nominate: Pencil,
   gov: NewspaperClipping,
-  substrateProxy: TreeStructure
+  substrateProxy: TreeStructure,
+  multisig: UserSwitch
 };
 
 function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
@@ -84,6 +85,10 @@ function getIcon (item: TransactionHistoryItem): SwIconProps['phosphorIcon'] {
 
   if (isTypeManageSubstrateProxy(item.type)) {
     return IconMap.substrateProxy;
+  }
+
+  if (isTypeMultisig(item.type)) {
+    return IconMap.multisig;
   }
 
   return IconMap.default;
