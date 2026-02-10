@@ -9,7 +9,7 @@ import { AccountChainType } from '@subwallet/extension-base/types';
 import { isSameAddress, quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { MultisigHistoryItem } from '@subwallet/extension-koni-ui/components/History/MultisigHistoryItem';
-import { DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, MULTISIG_HISTORY_INFO_MODAL, NOTI_MULTISIG_PENDINGTX_ID, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { CONFIRMATION_DETAIL_MODAL, DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, MULTISIG_HISTORY_INFO_MODAL, NOTI_MULTISIG_PENDINGTX_ID, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
@@ -242,6 +242,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [loading, setLoading] = useState<boolean>(true);
   const [rawHistoryList, setRawHistoryList] = useState<TransactionHistoryItem[]>([]);
   const isActive = checkActive(modalId);
+  const isActiveCallData = checkActive(CONFIRMATION_DETAIL_MODAL);
   const [notiMultisigPendingTxId, setNotiMultisigPendingTxId] = useLocalStorage(NOTI_MULTISIG_PENDINGTX_ID, '');
 
   const defaultValues = useMemo((): FormState => ({
@@ -606,13 +607,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     if (extrinsicHashOrId && chain && openDetailLink) {
       const existed = Object.values(historyMap).find((item) => item.chain === chain && (item.transactionId === extrinsicHashOrId || item.extrinsicHash === extrinsicHashOrId));
 
-      if (existed) {
+      if (existed && !isActiveCallData) {
         setSelectedItem(existed);
         inactiveModal(REMIND_BACKUP_SEED_PHRASE_MODAL);
         activeModal(modalId);
       }
     }
-  }, [activeModal, chain, extrinsicHashOrId, openDetailLink, historyMap, inactiveModal]);
+  }, [activeModal, chain, extrinsicHashOrId, openDetailLink, historyMap, inactiveModal, isActiveCallData]);
 
   useEffect(() => {
     if (!notiMultisigPendingTxItem) {

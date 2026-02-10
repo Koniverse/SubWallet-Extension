@@ -249,7 +249,10 @@ const Component: React.FC<Props> = (props: Props) => {
         showFooter={false}
         title={t('ui.Confirmations.Detail.CallDataDetail.transactionDetails')}
       >
-        <pre className='json'>
+        <pre
+          className='json'
+          style={{ marginBottom: 0 }}
+        >
           {JSON.stringify(data.decodedCallData || '', null, 2)}
         </pre>
       </BaseDetailModal>}
@@ -296,7 +299,7 @@ const HistoryMultisigLayout = styled(Component)<Props>(({ theme: { token } }: Pr
 
     '&.call-data-detail-modal': {
       '.ant-sw-modal-body': {
-        height: 264,
+        maxHeight: 264,
         borderRadius: token.borderRadiusLG,
         padding: token.paddingSM,
         backgroundColor: token.colorBgSecondary,
