@@ -1,10 +1,12 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
 import { RequestSign, Resolver, ResponseSigning, SigningRequest } from '@subwallet/extension-base/background/types';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { SignRequest } from '@subwallet/extension-base/services/request-service/types';
+import { BasicTxErrorType } from '@subwallet/extension-base/types';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import { isInternalRequest } from '@subwallet/extension-base/utils/request';
 import { BehaviorSubject } from 'rxjs';
@@ -117,6 +119,10 @@ export default class SubstrateRequestHandler {
 
     if (isAlwaysRequired && !onSign) {
       this.#requestService.keyringService.lock();
+    }
+
+    if (!this.#substrateRequests[id]) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.USER_REJECT_REQUEST));
     }
 
     return new Promise((resolve, reject): void => {
