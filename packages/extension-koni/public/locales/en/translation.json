@@ -1236,6 +1236,7 @@
   "ui.DAPP.Confirmations.CardanoSignTransaction.fromAccount": "From account",
   "ui.TRANSACTION.Confirmations.EvmTransaction.fromAccount": "From account",
   "ui.HISTORY.screen.HistoryDetail.Header.fromAccount": "From account",
+  "ui.HISTORY.screen.HistoryDetail.Header.multisigAccount": "Multisig account",
   "ui.TRANSACTION.Confirmations.BitcoinSendTransaction.toAccount": "To account",
   "ui.DAPP.Confirmations.CardanoSignTransaction.toAccount": "To account",
   "ui.TRANSACTION.Confirmations.EvmTransaction.toAccount": "To account",
@@ -2716,5 +2717,7 @@
   "ui.HISTORY.constant.multisig.typeName.addProxy": "Add proxy",
   "ui.HISTORY.constant.multisig.typeName.removeProxy": "Remove proxy",
   "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": "You’ve a pending multisig transaction with the same information. Complete the transaction first, then try again",
-  "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": "You will need to re-import this account to be able to access via this extension after removal"
+  "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": "You will need to re-import this account to be able to access via this extension after removal",
+  "ui.HISTORY.screen.HistoryDetail.CallData.transactionDetails": "Transaction details",
+  "ui.HISTORY.screen.HistoryDetail.CallData.callData": "Call data"
 }

@@ -1266,6 +1266,7 @@
   "ui.DAPP.Confirmations.CardanoSignTransaction.fromAccount": "从账户",
   "ui.TRANSACTION.Confirmations.EvmTransaction.fromAccount": "从账户",
   "ui.HISTORY.screen.HistoryDetail.Header.fromAccount": "从账户",
+  "ui.HISTORY.screen.HistoryDetail.Header.multisigAccount": "",
   "ui.TRANSACTION.Confirmations.BitcoinSendTransaction.toAccount": "到账户",
   "ui.DAPP.Confirmations.CardanoSignTransaction.toAccount": "到账户",
   "ui.TRANSACTION.Confirmations.EvmTransaction.toAccount": "到账户",
@@ -2715,5 +2716,7 @@
   "ui.HISTORY.constant.multisig.typeName.addProxy": "",
   "ui.HISTORY.constant.multisig.typeName.removeProxy": "",
   "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": "",
-  "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": ""
+  "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": "",
+  "ui.HISTORY.screen.HistoryDetail.CallData.transactionDetails": "",
+  "ui.HISTORY.screen.HistoryDetail.CallData.callData": ""
 }

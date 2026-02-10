@@ -1266,6 +1266,7 @@
   "ui.DAPP.Confirmations.CardanoSignTransaction.fromAccount": "С аккаунта",
   "ui.TRANSACTION.Confirmations.EvmTransaction.fromAccount": "С аккаунта",
   "ui.HISTORY.screen.HistoryDetail.Header.fromAccount": "С аккаунта",
+  "ui.HISTORY.screen.HistoryDetail.Header.multisigAccount": "",
   "ui.TRANSACTION.Confirmations.BitcoinSendTransaction.toAccount": "К аккаунту",
   "ui.DAPP.Confirmations.CardanoSignTransaction.toAccount": "К аккаунту",
   "ui.TRANSACTION.Confirmations.EvmTransaction.toAccount": "К аккаунту",
@@ -2716,5 +2717,7 @@
   "ui.HISTORY.constant.multisig.typeName.addProxy": "",
   "ui.HISTORY.constant.multisig.typeName.removeProxy": "",
   "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": "",
-  "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": ""
+  "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": "",
+  "ui.HISTORY.screen.HistoryDetail.CallData.transactionDetails": "",
+  "ui.HISTORY.screen.HistoryDetail.CallData.callData": ""
 }

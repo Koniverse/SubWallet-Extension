@@ -65,7 +65,7 @@ import { AccountsStore } from '@subwallet/extension-base/stores';
 import { AccountChainType, AccountJson, AccountProxyMap, AccountSignMode, AccountsWithCurrentAddress, BalanceJson, BalanceType, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeDetail, BitcoinFeeInfo, BitcoinFeeRate, BriefProcessStep, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CommonStepFeeInfo, CommonStepType, EarningProcessType, EarningRewardJson, EvmFeeInfo, FeeChainType, FeeCustom, FeeDetail, FeeInfo, FeeOption, HandleYieldStepData, MultisigTxErrorType, NominationPoolInfo, OptimalYieldPathParams, ProcessStep, ProcessTransactionData, ProcessType, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckPublicAndSecretKey, RequestClaimBridge, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningImpact, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StakingTxErrorType, StepStatus, StorageDataInterface, SubmitChangeValidatorStaking, SummaryEarningProcessData, SwapBaseTxData, SwapFeeType, SwapRequestV2, TokenSpendingApprovalParams, ValidateYieldProcessParams, YieldPoolType, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
-import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, InitMultisigTxRequest, RequestGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
+import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, InitMultisigTxRequest, PendingMultisigTxRequest, RequestGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
 import { GetNotificationParams, MarkAllReadParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { HandleSubstrateProxyWrappedTxRequest, RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types/substrateProxyAccount';
 import { SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
@@ -94,6 +94,7 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { TypeRegistry } from '@polkadot/types';
 import { Registry, SignerPayloadJSON, SignerPayloadRaw } from '@polkadot/types/types';
 import { assert, hexStripPrefix, hexToU8a, isAscii, isHex, noop, u8aToHex } from '@polkadot/util';
+import { HexString } from '@polkadot/util/types';
 import { decodeAddress, isEthereumAddress, sortAddresses } from '@polkadot/util-crypto';
 
 import { getSuitableRegistry, RegistrySource, setupApiRegistry, setupDappRegistry, setupDatabaseRegistry } from '../utils';
@@ -3653,6 +3654,16 @@ export default class KoniExtension {
 
     // Case 1: signer === proxied address → handle original transaction
     if (isSignerProxiedAccount) {
+      let callDataFinal: string | HexString = callData;
+      let decodedCallDataFinal = decodedCallData;
+
+      const pendingMultisigTxRequest = originTransaction.data as PendingMultisigTxRequest;
+
+      if (pendingMultisigTxRequest.call && pendingMultisigTxRequest.decodedCallData) {
+        callDataFinal = pendingMultisigTxRequest.call;
+        decodedCallDataFinal = pendingMultisigTxRequest.decodedCallData;
+      }
+
       return await this.#koniState.transactionService.handleWrappedTransaction({
         ...originTransaction,
         skipFeeValidation: false,
@@ -3660,9 +3671,9 @@ export default class KoniExtension {
           ...(originTransaction.data as object),
 
           // output
-          decodedCallData,
+          decodedCallData: decodedCallDataFinal,
           submittedCallData: substrateProxyExtrinsic.toHex(),
-          callData,
+          callData: callDataFinal,
           networkFee
         },
         wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_RESULT,
