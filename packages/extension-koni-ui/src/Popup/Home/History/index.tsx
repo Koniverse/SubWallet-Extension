@@ -5,12 +5,11 @@ import { ExtrinsicStatus, ExtrinsicType, TransactionDirection, TransactionHistor
 import { YIELD_EXTRINSIC_TYPES } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
-import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
+import { AccountChainType } from '@subwallet/extension-base/types';
 import { isSameAddress, quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { MultisigHistoryItem } from '@subwallet/extension-koni-ui/components/History/MultisigHistoryItem';
 import { CONFIRMATION_DETAIL_MODAL, DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, MULTISIG_HISTORY_INFO_MODAL, NOTI_MULTISIG_PENDINGTX_ID, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
-import { MULTISIG_ACTIONS } from '@subwallet/extension-koni-ui/constants/multisig';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
@@ -267,15 +266,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       return undefined;
     }
 
-    if (substrateAccount?.signMode === AccountSignMode.MULTISIG) {
-      return substrateAccount?.address;
-    }
-
-    if (MULTISIG_ACTIONS.some((action) => substrateAccount.transactionActions.includes(action))) {
-      return substrateAccount?.address;
-    }
-
-    return undefined;
+    return substrateAccount?.address;
   }, [currentAccountProxy?.accounts]);
 
   const multisigList = useMemo(() => {
