@@ -9,7 +9,7 @@ import { CONFIRMATION_DETAIL_MODAL } from '@subwallet/extension-koni-ui/constant
 import { useOpenDetailModal } from '@subwallet/extension-koni-ui/hooks';
 import { BaseDetailModal } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import { ThemeProps, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
-import { isTypeMultiSig, toShort } from '@subwallet/extension-koni-ui/utils';
+import { isTypeMultisig, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, useExcludeModal } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Info } from 'phosphor-react';
@@ -52,7 +52,7 @@ const Component: React.FC<Props> = (props: Props) => {
     }
   }, [data.additionalInfo, data.type]);
 
-  if (!isTypeMultiSig(data.type)) {
+  if (!isTypeMultisig(data.type)) {
     return <></>;
   }
 
