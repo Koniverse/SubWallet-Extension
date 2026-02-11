@@ -3664,7 +3664,7 @@ export default class KoniExtension {
         decodedCallDataFinal = pendingMultisigTxRequest.decodedCallData;
       }
 
-      return await this.#koniState.transactionService.handleWrappedTransaction({
+      const response = await this.#koniState.transactionService.handleWrappedTransaction({
         ...originTransaction,
         skipFeeValidation: false,
         data: {
@@ -3676,9 +3676,15 @@ export default class KoniExtension {
           callData: callDataFinal,
           networkFee
         },
+        errors: [], // Clear previous errors
         wrappingStatus: SubstrateTransactionWrappingStatus.WRAP_RESULT,
         eventsHandler
       });
+
+      // Clear wrappingStatus since no wrapping is needed
+      delete response.wrappingStatus;
+
+      return response;
     }
 
     // Case 2: create and handle substrate proxy transaction
