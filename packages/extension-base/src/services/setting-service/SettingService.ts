@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LanguageType, PassPhishing, RequestSettingsType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
-import { EnvConfig, LANGUAGE } from '@subwallet/extension-base/constants';
+import { LANGUAGE } from '@subwallet/extension-base/constants';
 import { EnvironmentStoreSubject } from '@subwallet/extension-base/services/environment-service/stores/Environment';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import ChainlistStore, { ChainlistConfig } from '@subwallet/extension-base/stores/ChainlistStore';
 import PassPhishingStore from '@subwallet/extension-base/stores/PassPhishingStore';
 import SettingsStore from '@subwallet/extension-base/stores/Settings';
+import { EnvConfig } from '@subwallet-monorepos/subwallet-services-sdk/services';
 import { Subject } from 'rxjs';
 
 import i18n from './i18n/i18n';

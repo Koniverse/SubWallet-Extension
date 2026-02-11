@@ -15,7 +15,7 @@ import DatabaseService from '@subwallet/extension-base/services/storage-service/
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
 import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningImpact, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, SubmitChangeValidatorStaking, TransactionData, ValidateYieldProcessParams, ValidatorInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
-import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 
 import { EarningImpactResult } from './handlers/native-staking/dtao';
@@ -25,9 +25,7 @@ import { AcalaLiquidStakingPoolHandler, AmplitudeNativeStakingPoolHandler, Astar
 type PoolTargetsFetchingCached = Record<string, Record<string, YieldPoolTarget>>;
 
 export const fetchPoolsData = async () => {
-  const fetchData = await fetchStaticCache<{data: Record<string, YieldPoolInfo>}>('earning/yield-pools.json', { data: {} });
-
-  return fetchData.data;
+  return await subwalletApiSdk.staticDataCacheApi.fetchPoolsData<YieldPoolInfo>();
 };
 
 export default class EarningService implements StoppableServiceInterface, PersistDataServiceInterface {
@@ -973,7 +971,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     let targets: YieldPoolTarget[] = [];
 
     if (this.useOnlineCacheOnly) {
-      targets = await fetchStaticCache(`earning/targets/${slug}.json`, []);
+      targets = await subwalletApiSdk.staticDataCacheApi.fetchPoolTargets<YieldPoolTarget>(slug);
     }
 
     const handler = this.getPoolHandler(slug);

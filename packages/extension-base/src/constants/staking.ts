@@ -1,8 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { fetchStaticData } from '@subwallet/extension-base/utils';
-
 export const PREDEFINED_STAKING_POOL: Record<string, number> = {
   kusama: 80,
   polkadot: 39,
@@ -12,12 +10,5 @@ export const PREDEFINED_STAKING_POOL: Record<string, number> = {
 };
 
 export const MAX_NOMINATIONS = '16';
-
-export const PREDEFINED_EARNING_POOL_PROMISE = fetchStaticData<Record<string, number[]>>('nomination-pool-recommendation');
-
-export type ChainRecommendValidator = {
-  maxCount: number;
-  preSelectValidators: string;
-};
 
 export const CRON_REFRESH_EARNING_TARGETS = 10 * 60 * 1000; // 10 minutes depends on cron run time on server
