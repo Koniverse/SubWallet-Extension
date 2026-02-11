@@ -2719,5 +2719,10 @@
   "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": "",
   "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": "",
   "ui.HISTORY.screen.HistoryDetail.CallData.transactionDetails": "",
-  "ui.HISTORY.screen.HistoryDetail.CallData.callData": ""
+  "ui.HISTORY.screen.HistoryDetail.CallData.callData": "",
+  "Only shows referenda you've voted directly in": "",
+  "Only shows referenda you've voted through delegation": "",
+  "Select": "",
+  "ui.ACCOUNT.screen.Account.NewMultisigAccount.setApprovalThreshold": "",
+  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": ""
 }

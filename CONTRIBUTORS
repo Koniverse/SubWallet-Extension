@@ -1,16 +1,16 @@
-    3284	AnhMTV                        	Release version 1.3.73
+    3285	AnhMTV                        	
     2671	Nam Phạm                      	disable block explorer for truth network
     2599	S2kael                        	[Issue-4521] Update stable version for chain-list
-    1062	bluezdot                      	[Issue-#4762] update keyring stable 0.1.14
+    1157	bluezdot                      	[Issue-#4856] feat: update handle tx response
      869	lw-cdm                        	[MasterAccount] Update logic to reorder account on select account modal
-     652	nguyentiendung                	[Issue-#4920] (refactor) fix lint build failed
-     585	tunghp2002                    	[Issue-4950] refactor code
+     742	nguyentiendung                	[Issue-#4855] fix eslint
+     608	tunghp2002                    	[Issue-4875] fix bugs show toast error when tx success
      550	Frenkie Nguyen                	[Issue-4462] update styling for background phishing page
      465	Jaco                          	0.42.5 (#969)
+     385	Thiendekaco                   	
      355	Thiendekaco                   	[Issue-3707] [fix] Unified account - fix dApp ui bug #4
      351	PDTnhah                       	
-     330	lw                            	[Issue-#4920] Refactor: Revert some files and code
-     298	Thiendekaco                   	
+     337	lw                            	[Issue-#4855] Fix: Fix issue "Unable to get record transaction in history when switching account"
      186	dominhquang                   	[Issue-3507] Fix UI bug for Notification
      185	quangdo                       	
      170	lw-cdm                        	
@@ -24,13 +24,13 @@
       53	Dominhquangdev                	update Bridge code
       34	S2kael                        	
       28	Thiendekaco                   	[Issue-4100] fix: resolve PR feedback
+      12	bluezdot                      	[Issue-#4842] feat: add rx subscribe
       11	Phong Le Nhat                 	remove autoEnableTokens and modify method get free balance bitcoin
       10	Trang Trịnh                   	api get karura and acala nfts
       10	tunghp2002                    	
        9	Minh Le                       	
        9	minhld1029                    	[#115] [ForgetAccount] catch exception refList undefined
        7	Ivan Rukhavets                	Mention derivation in FAQ (#334)
-       6	bluezdot                      	[Issue-4787] feat: add senderAddress config
        6	thiendekaco                   	
        6	unknown                       	refactor code
        5	anhnhu                        	[issue-2231]: add condition branch_name webapp-dev auto increase run scripts change build number
@@ -66,6 +66,7 @@
        1	murat onur                    	tr language support added (#681)
        1	Nikos Kontakis                	Fix issue that was breaking extension ui (height collapsed and non-visible); Fixes #720 (#731)
        1	Stéphane P                    	README Fix typo (#700)
+       1	thiendekaco                   	[Issue-#4875] update chain-list to 0.2.124-beta.1
        1	Tore19                        	Add Stafi network (#454)
        1	trieunhu                      	Load transfer history polkadot and kusama by subquid
        1	Vlad Proshchavaiev            	Update extension with Subsocial SS58 included (#416)

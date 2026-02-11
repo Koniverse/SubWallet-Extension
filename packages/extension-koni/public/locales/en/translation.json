@@ -2719,5 +2719,9 @@
   "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": "You’ve a pending multisig transaction with the same information. Complete the transaction first, then try again",
   "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": "You will need to re-import this account to be able to access via this extension after removal",
   "ui.HISTORY.screen.HistoryDetail.CallData.transactionDetails": "Transaction details",
-  "ui.HISTORY.screen.HistoryDetail.CallData.callData": "Call data"
+  "ui.HISTORY.screen.HistoryDetail.CallData.callData": "Call data",
+  "Only shows referenda you've voted directly in": "",
+  "Only shows referenda you've voted through delegation": "",
+  "Select": "",
+  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": ""
 }
