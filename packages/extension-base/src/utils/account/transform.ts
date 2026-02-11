@@ -367,8 +367,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           // ...EARN_VMANTA_ACTIONS,
           ...OPEN_GOV_ACTIONS,
           ...SUBSTRATE_PROXY_ACTION,
-          ExtrinsicType.SEND_NFT,
-          ExtrinsicType.SWAP
+          ExtrinsicType.SEND_NFT
         ];
       case AccountChainType.ETHEREUM:
         return [];
