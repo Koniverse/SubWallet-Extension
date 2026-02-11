@@ -18,8 +18,11 @@ import DatabaseService from '@subwallet/extension-base/services/storage-service/
 import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
 import { ProcessTransactionData, ProcessType, SummaryEarningProcessData, SwapBaseTxData, YieldPoolType } from '@subwallet/extension-base/types';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { formatNumber, getAddressesByChainType, reformatAddress } from '@subwallet/extension-base/utils';
 import { isSubstrateAddress } from '@subwallet/keyring';
+
+const inappNotificationServiceLogger = createLogger('InappNotificationService');
 
 export class InappNotificationService implements CronServiceInterface {
   status: ServiceStatus;
@@ -210,7 +213,7 @@ export class InappNotificationService implements CronServiceInterface {
     this.createAvailBridgeClaimNotification();
 
     this.createPolygonClaimableTransactions().catch((err) => {
-      console.error('Error:', err);
+      inappNotificationServiceLogger.error('Error creating polygon claimable transactions', err);
     });
 
     this.refeshAvailBridgeClaimTimeOut = setTimeout(this.cronCreateBridgeClaimNotification.bind(this), CRON_LISTEN_AVAIL_BRIDGE_CLAIM);
@@ -261,21 +264,21 @@ export class InappNotificationService implements CronServiceInterface {
     substrateAddresses.forEach((address) => {
       fetchAllAvailBridgeClaimable(address, AvailBridgeSourceChain.ETHEREUM, true)
         .then(async (transactions) => await this.processWriteAvailBridgeClaim(address, transactions, chainAssetMap[ASSET_TYPE.TEST_SUBSTRATE]))
-        .catch(console.error);
+        .catch((error) => inappNotificationServiceLogger.error('Error fetching Avail bridge claimable', error));
 
       fetchAllAvailBridgeClaimable(address, AvailBridgeSourceChain.ETHEREUM, false)
         .then(async (transactions) => await this.processWriteAvailBridgeClaim(address, transactions, chainAssetMap[ASSET_TYPE.MAIN_SUBSTRATE]))
-        .catch(console.error);
+        .catch((error) => inappNotificationServiceLogger.error('Error fetching Avail bridge claimable', error));
     });
 
     evmAddresses.forEach((address) => {
       fetchAllAvailBridgeClaimable(address, AvailBridgeSourceChain.AVAIL, true)
         .then(async (transactions) => await this.processWriteAvailBridgeClaim(address, transactions, chainAssetMap[ASSET_TYPE.TEST_EVM]))
-        .catch(console.error);
+        .catch((error) => inappNotificationServiceLogger.error('Error fetching Avail bridge claimable', error));
 
       fetchAllAvailBridgeClaimable(address, AvailBridgeSourceChain.AVAIL, false)
         .then(async (transactions) => await this.processWriteAvailBridgeClaim(address, transactions, chainAssetMap[ASSET_TYPE.MAIN_EVM]))
-        .catch(console.error);
+        .catch((error) => inappNotificationServiceLogger.error('Error fetching Avail bridge claimable', error));
     });
   }
 
@@ -494,7 +497,7 @@ export class InappNotificationService implements CronServiceInterface {
 
   async startCron (): Promise<void> {
     this.cleanUpOldNotifications()
-      .catch(console.error);
+      .catch((error) => inappNotificationServiceLogger.error('Error cleaning up old notifications', error));
     this.cronCreateBridgeClaimNotification();
 
     return Promise.resolve();
@@ -521,7 +524,7 @@ export class InappNotificationService implements CronServiceInterface {
   }
 
   removeAccountNotifications (proxyId: string) {
-    this.dbService.removeAccountNotifications(proxyId).catch(console.error);
+    this.dbService.removeAccountNotifications(proxyId).catch((error) => inappNotificationServiceLogger.error('Error removing account notifications', error));
   }
 
   migrateNotificationProxyId (proxyIds: string[], newProxyId: string, newName: string) {

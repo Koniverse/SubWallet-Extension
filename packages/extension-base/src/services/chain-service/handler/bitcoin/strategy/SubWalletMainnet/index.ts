@@ -5,6 +5,7 @@ import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { _BTC_SERVICE_TOKEN } from '@subwallet/extension-base/services/chain-service/constants';
 import { BitcoinAddressSummaryInfo, BitcoinApiStrategy, BitcoinTransactionEventMap, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, Inscription, InscriptionFetchedData, RecommendedFeeEstimates, RunesInfoByAddress, RunesInfoByAddressFetchedData, UpdateOpenBitUtxo } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
 import { OBResponse } from '@subwallet/extension-base/services/chain-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { HiroService } from '@subwallet/extension-base/services/hiro-service';
 import { RunesService } from '@subwallet/extension-base/services/rune-service';
 import { BaseApiRequestStrategy } from '@subwallet/extension-base/strategy/api-request-strategy';
@@ -13,6 +14,8 @@ import { getRequest, postRequest } from '@subwallet/extension-base/strategy/api-
 import { BitcoinFeeInfo, BitcoinTx, UtxoResponseItem } from '@subwallet/extension-base/types';
 import BigN from 'bignumber.js';
 import EventEmitter from 'eventemitter3';
+
+const subWalletMainnetLogger = createLogger('SubWalletMainnetStrategy');
 
 export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy implements BitcoinApiStrategy {
   private readonly baseUrl: string;
@@ -71,7 +74,7 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
 
       this.timePerBlock = blockTime;
     } catch (e) {
-      console.error('Failed to compute block time', e);
+      subWalletMainnetLogger.error('Failed to compute block time', e);
 
       blockTime = (this.isTestnet ? 5 * 60 : 10 * 60) * 1000; // Default to 10 minutes if failed
     }
@@ -238,7 +241,7 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
                 eventEmitter.emit('success', transactionStatus);
               }
             })
-            .catch(console.error);
+            .catch((error) => subWalletMainnetLogger.error('Error in SubWalletMainnet strategy', error));
         }, 30000);
       })
       .catch((error: Error) => {
@@ -288,7 +291,7 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
 
       return runesFullList;
     } catch (error) {
-      console.error(`Failed to get ${address} balances`, error);
+      subWalletMainnetLogger.error(`Failed to get ${address} balances`, error);
       throw error;
     }
   }
@@ -301,7 +304,7 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
 
       return responseRuneUtxos.results;
     } catch (error) {
-      console.error(`Failed to get ${address} rune utxos`, error);
+      subWalletMainnetLogger.error(`Failed to get ${address} rune utxos`, error);
       throw error;
     }
   }
@@ -333,7 +336,7 @@ export class SubWalletMainnetRequestStrategy extends BaseApiRequestStrategy impl
 
       return inscriptionsFullList;
     } catch (error) {
-      console.error(`Failed to get ${address} inscriptions`, error);
+      subWalletMainnetLogger.error(`Failed to get ${address} inscriptions`, error);
       throw error;
     }
   }

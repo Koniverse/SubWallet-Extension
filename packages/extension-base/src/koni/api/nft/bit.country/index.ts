@@ -6,8 +6,11 @@ import { BIT_AVATAR_API, BIT_COUNTRY_IPFS_SERVER, BIT_COUNTRY_LAND_ESTATE_METADA
 import { BaseNftApi, HandleNftParams } from '@subwallet/extension-base/koni/api/nft/nft';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { isUrl } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { BN_ZERO, hexToBn } from '@polkadot/util';
+
+const bitCountryNftLogger = createLogger('BitCountryNft');
 
 interface AssetId {
   classId: string | number,
@@ -126,7 +129,7 @@ export class BitCountryNftApi extends BaseNftApi {
       try {
         metaverseId = hexToBn(hexMetaverseId);
       } catch (e) {
-        console.warn('Error parsing metaverse id', e);
+        bitCountryNftLogger.warn('Error parsing metaverse id', e);
       }
 
       return {
@@ -217,7 +220,7 @@ export class BitCountryNftApi extends BaseNftApi {
         params.updateCollection(this.chain, parsedCollection);
       }));
     } catch (e) {
-      console.error(`${this.chain}`, e);
+      bitCountryNftLogger.error(`Error handling NFTs for chain ${this.chain}`, e);
     }
   }
 

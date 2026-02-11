@@ -8,10 +8,13 @@ import { _POS_BRIDGE_ABI, _POS_BRIDGE_L2_ABI, getPosL1BridgeContract, getPosL2Br
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _NotificationInfo, ClaimPolygonBridgeNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { fetchPolygonBridgeTransactions } from '@subwallet/extension-base/services/inapp-notification-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BasicTxErrorType, EvmEIP1559FeeOption, EvmFeeInfo, FeeCustom, FeeInfo, FeeOption } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
 import { TransactionConfig } from 'web3-core';
 import { ContractSendMethod } from 'web3-eth-contract';
+
+const posBridgeLogger = createLogger('PosBridge');
 
 interface inputData {
   error?: string
@@ -113,7 +116,7 @@ export async function getClaimPosBridge (chainSlug: string, notification: _Notif
       throw new Error(`${inputData.message}. Please try again later.`);
     }
   } catch (err) {
-    console.error('Error:', err);
+    posBridgeLogger.error('Error in PosBridge operation', err);
     throw new Error(BasicTxErrorType.INTERNAL_ERROR);
   }
 
@@ -151,7 +154,7 @@ export async function isClaimedPosBridge (id: string, address: string, isTestnet
       return !isIdClaimable;
     }
   } catch (err) {
-    console.error('Error:', err);
+    posBridgeLogger.error('Error in PosBridge operation', err);
   }
 
   return false;

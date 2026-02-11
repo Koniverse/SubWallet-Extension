@@ -4,6 +4,7 @@
 import { RequestChangeMasterPassword, RequestMigratePassword, ResponseChangeMasterPassword, ResponseMigratePassword } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { AccountChainType, CommonAccountErrorType, RequestAccountProxyEdit, RequestAccountProxyForget, RequestChangeTonWalletContractVersion, RequestGetAllTonWalletContractVersion, ResponseGetAllTonWalletContractVersion, SWCommonAccountError } from '@subwallet/extension-base/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { KeyringPair$Meta, TonKeypairTypes, TonWalletContractVersion } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { t } from 'i18next';
@@ -11,6 +12,8 @@ import { t } from 'i18next';
 import { assert } from '@polkadot/util';
 
 import { AccountBaseHandler } from './Base';
+
+const accountModifyHandlerLogger = createLogger('AccountModifyHandler');
 
 /**
  * @class AccountModifyHandler
@@ -47,7 +50,7 @@ export class AccountModifyHandler extends AccountBaseHandler {
 
       keyring.changeMasterPassword(newPassword, oldPassword);
     } catch (e) {
-      console.error(e);
+      accountModifyHandlerLogger.error('Error changing master password', e);
 
       return {
         errors: [t((e as Error).message)],
@@ -73,7 +76,7 @@ export class AccountModifyHandler extends AccountBaseHandler {
 
       callback();
     } catch (e) {
-      console.error(e);
+      accountModifyHandlerLogger.error('Error migrating master password', e);
 
       return {
         errors: [(e as Error).message],

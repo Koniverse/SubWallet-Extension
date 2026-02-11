@@ -42,6 +42,9 @@ import { EventRecord } from '@polkadot/types/interfaces';
 import { SignerPayloadJSON } from '@polkadot/types/types/extrinsic';
 import { hexToU8a, isHex } from '@polkadot/util';
 import { HexString } from '@polkadot/util/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const transactionServiceLogger = createLogger('TransactionService');
 
 import { GovVoteType } from '../open-gov/interface';
 
@@ -1266,14 +1269,14 @@ export default class TransactionService {
         return [historyItem, receiverHistory];
       }
     } catch (e) {
-      console.warn(e);
+      transactionServiceLogger.warn('Error processing transaction history', e);
     }
 
     return [historyItem, ...substrateProxyHistories];
   }
 
   private onSigned ({ id }: TransactionEventResponse) {
-    console.debug(`Transaction "${id}" is signed`);
+    transactionServiceLogger.debug(`Transaction "${id}" is signed`);
   }
 
   private onSend ({ id, nonce, startBlock }: TransactionEventResponse) {
@@ -1281,11 +1284,11 @@ export default class TransactionService {
     this.updateTransaction(id, { status: ExtrinsicStatus.SUBMITTING });
 
     // Create Input History Transaction History
-    this.state.historyService.insertHistories(this.transactionToHistories(id, startBlock, nonce)).catch(console.error);
+    this.state.historyService.insertHistories(this.transactionToHistories(id, startBlock, nonce)).catch((error) => transactionServiceLogger.error('Error inserting transaction histories', error));
 
-    this.createProcessNotification(id).catch(console.error);
+    this.createProcessNotification(id).catch((error) => transactionServiceLogger.error('Error creating process notification', error));
 
-    console.debug(`Transaction "${id}" is sent`);
+    transactionServiceLogger.debug(`Transaction "${id}" is sent`);
   }
 
   private onHasTransactionHash ({ blockHash, extrinsicHash, id }: TransactionEventResponse) {
@@ -1295,9 +1298,9 @@ export default class TransactionService {
     this.updateTransaction(id, updateData);
 
     // In this case transaction id is the same as extrinsic hash and will change after below update
-    this.state.historyService.updateHistoryByExtrinsicHash(id, updateData).catch(console.error);
+    this.state.historyService.updateHistoryByExtrinsicHash(id, updateData).catch((error) => transactionServiceLogger.error('Error updating history by extrinsic hash', error));
 
-    console.debug(`Transaction "${id}" is submitted with hash ${extrinsicHash || ''}`);
+    transactionServiceLogger.debug(`Transaction "${id}" is submitted with hash ${extrinsicHash || ''}`);
 
     const transaction = this.getTransaction(id);
 
@@ -1324,18 +1327,18 @@ export default class TransactionService {
         const sender = keyring.getPair(inputData.from);
 
         balanceService.refreshBalanceForAddress(sender.address, transaction.chain, inputData.tokenSlug, transaction.extrinsicType)
-          .catch((error) => console.error('Failed to run balance subscription:', error));
+          .catch((error) => transactionServiceLogger.error('Failed to run balance subscription', error));
       } catch (e) {
-        console.error(e);
+        transactionServiceLogger.error('Error refreshing sender balance', e);
       }
 
       try {
         const recipient = keyring.getPair(inputData.to);
 
         balanceService.refreshBalanceForAddress(recipient.address, transaction.chain, inputData.tokenSlug, transaction.extrinsicType)
-          .catch((error) => console.error('Failed to run balance subscription:', error));
+          .catch((error) => transactionServiceLogger.error('Failed to run balance subscription', error));
       } catch (e) {
-        console.error(e);
+        transactionServiceLogger.error('Error refreshing recipient balance', e);
       }
     }
   }
@@ -1353,18 +1356,18 @@ export default class TransactionService {
           .then(() => {
             this.state.eventService.emit('transaction.transferNft', undefined);
           })
-          .catch(console.error);
+          .catch((error) => transactionServiceLogger.error('Error handling NFT transfer', error));
       } catch (e) {
-        console.error(e);
+        transactionServiceLogger.error('Error processing NFT transfer for sender', e);
       }
 
       try {
         const recipient = keyring.getPair(inputData.recipientAddress);
 
         recipient && this.state.dbService.addNft(recipient.address, { ...inputData.nftItem, owner: recipient.address })
-          .catch(console.error);
+          .catch((error) => transactionServiceLogger.error('Error adding NFT for recipient', error));
       } catch (e) {
-        console.error(e);
+        transactionServiceLogger.error('Error processing NFT transfer for recipient', e);
       }
     } else if ([ExtrinsicType.STAKING_BOND, ExtrinsicType.STAKING_UNBOND, ExtrinsicType.STAKING_WITHDRAW, ExtrinsicType.STAKING_CANCEL_UNSTAKE, ExtrinsicType.STAKING_CLAIM_REWARD, ExtrinsicType.JOIN_YIELD_POOL, ExtrinsicType.STAKING_LEAVE_POOL].includes(transaction.extrinsicType)) {
       this.state.eventService.emit('transaction.submitStaking', transaction.chain);
@@ -1373,7 +1376,7 @@ export default class TransactionService {
       const toAssetSlug = inputData.quote.pair.to;
 
       // todo: consider async
-      this.state.chainService.updateAssetSetting(toAssetSlug, { visible: true }, true).catch(console.error);
+      this.state.chainService.updateAssetSetting(toAssetSlug, { visible: true }, true).catch((error) => transactionServiceLogger.error('Error updating asset setting', error));
     }
   }
 
@@ -1389,7 +1392,7 @@ export default class TransactionService {
       blockNumber: blockNumber || 0,
       blockHash: blockHash || '',
       blockTime
-    }).catch(console.error);
+    }).catch((error) => transactionServiceLogger.error('Error updating history on success', error));
 
     const info = isHex(extrinsicHash) ? extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
 
@@ -1417,7 +1420,7 @@ export default class TransactionService {
         status: nextStatus,
         blockNumber: blockNumber || 0,
         blockHash: blockHash || ''
-      }).catch(console.error);
+      }).catch((error) => transactionServiceLogger.error('Error updating history on failure', error));
 
       const info = isHex(transaction?.extrinsicHash) ? transaction?.extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
 
@@ -1445,7 +1448,7 @@ export default class TransactionService {
         status: nextStatus,
         blockNumber: blockNumber || 0,
         blockHash: blockHash || ''
-      }).catch(console.error);
+      }).catch((error) => transactionServiceLogger.error('Error updating history on failure', error));
 
       const info = isHex(transaction?.extrinsicHash) ? transaction?.extrinsicHash : getBaseTransactionInfo(transaction, this.state.chainService.getChainInfoMap());
 
@@ -1520,7 +1523,7 @@ export default class TransactionService {
             : ''
           : payload.data || '';
       } catch (e) {
-        console.warn('Unable to parse contract input data');
+        transactionServiceLogger.warn('Unable to parse contract input data');
         payload.parseData = payload.data as string;
       }
     }
@@ -2168,7 +2171,7 @@ export default class TransactionService {
     });
 
     event.on('success', (transactionStatus) => {
-      console.log(transactionStatus);
+      transactionServiceLogger.debug('Transaction success', transactionStatus);
       eventData.blockHash = transactionStatus.block_hash || undefined;
       eventData.blockNumber = transactionStatus.block_height || undefined;
       eventData.blockTime = transactionStatus.block_time ? (transactionStatus.block_time * 1000) : undefined;
@@ -2310,7 +2313,7 @@ export default class TransactionService {
       network: transaction.chain,
       extrinsicHash: transaction.extrinsicHash
     })
-      .catch(console.error);
+      .catch((error) => transactionServiceLogger.error('Error creating transaction notification', error));
   }
 
   public async createProcessIfNeed (process: ProcessTransactionData) {
@@ -2330,7 +2333,7 @@ export default class TransactionService {
     const { processId } = step;
 
     this.aliveProcessMap.delete(processId);
-    this.state.dbService.deleteProcessTransactionById(processId).catch(console.error);
+    this.state.dbService.deleteProcessTransactionById(processId).catch((error) => transactionServiceLogger.error('Error deleting process transaction', error));
 
     this.updateAliveProcess();
   }
@@ -2386,7 +2389,7 @@ export default class TransactionService {
       }
 
       this.aliveProcessMap.set(processId, process);
-      this.state.dbService.upsertProcessTransaction(process).catch(console.error);
+      this.state.dbService.upsertProcessTransaction(process).catch((error) => transactionServiceLogger.error('Error upserting process transaction', error));
 
       if ([StepStatus.COMPLETE, StepStatus.FAILED, StepStatus.TIMEOUT].includes(process.status)) {
         this.aliveProcessMap.delete(processId);
@@ -2408,11 +2411,11 @@ export default class TransactionService {
                 process.status = data.status;
               }
 
-              this.state.dbService.upsertProcessTransaction(process).catch(console.error);
+              this.state.dbService.upsertProcessTransaction(process).catch((error) => transactionServiceLogger.error('Error upserting process transaction', error));
             }
           }
         })
-        .catch(console.error);
+        .catch((error) => transactionServiceLogger.error('Error getting process transaction by id', error));
     }
   }
 

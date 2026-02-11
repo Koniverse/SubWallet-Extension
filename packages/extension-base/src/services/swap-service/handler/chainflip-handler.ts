@@ -19,8 +19,11 @@ import BigNumber from 'bignumber.js';
 import * as bitcoin from 'bitcoinjs-lib';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { SWTransaction } from '../../transaction-service/types';
+
+const chainflipHandlerLogger = createLogger('ChainflipHandler');
 
 interface DepositAddressResponse {
   id: number;
@@ -149,7 +152,7 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
     const data = await response.json() as DepositAddressResponse;
 
-    console.log('Chainflip channel info:', data);
+    chainflipHandlerLogger.debug('Chainflip channel info', data);
 
     if (!data.id || !data.address || data.address === '' || !data.issuedBlock || !data.network || !data.channelId) {
       throw new Error('Error get Chainflip data');

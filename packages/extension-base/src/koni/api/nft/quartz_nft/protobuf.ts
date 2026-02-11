@@ -3,6 +3,10 @@
 
 import { Root } from 'protobufjs';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const quartzProtobufLogger = createLogger('QuartzProtobuf');
+
 function defineMessage (schema: string) {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   return Root.fromJSON(JSON.parse(schema));
@@ -26,7 +30,7 @@ function convertEnumToString (value: any, key: string, NFTMeta: any, locale: any
       result = translationObject[locale];
     }
   } catch (e) {
-    console.log('Error parsing schema when trying to convert enum to string: ', e);
+    quartzProtobufLogger.error('Error parsing schema when trying to convert enum to string', e);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return

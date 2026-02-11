@@ -8,11 +8,14 @@ import { getERC20Contract } from '@subwallet/extension-base/koni/api/contract-ha
 import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BalanceItem, SubscribeEvmPalletBalance } from '@subwallet/extension-base/types';
 import { filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 import { Contract } from 'web3-eth-contract';
 
 import { BN } from '@polkadot/util';
+
+const balanceSubscribeEvmLogger = createLogger('BalanceSubscribeEvm');
 
 export function subscribeERC20Interval ({ addresses, assetMap, callback, chainInfo, evmApi }: SubscribeEvmPalletBalance): () => void {
   const chain = chainInfo.slug;
@@ -39,7 +42,7 @@ export function subscribeERC20Interval ({ addresses, assetMap, callback, chainIn
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
             return await contract.methods.balanceOf(address).call();
           } catch (e) {
-            console.error(`Error on get balance of account ${address} for token ${tokenInfo.slug}`, e);
+            balanceSubscribeEvmLogger.error(`Error on get balance of account ${address} for token ${tokenInfo.slug}`, e);
 
             return '0';
           }
@@ -57,7 +60,7 @@ export function subscribeERC20Interval ({ addresses, assetMap, callback, chainIn
 
         callback(items);
       } catch (err) {
-        console.log(tokenInfo.slug, err);
+        balanceSubscribeEvmLogger.debug(tokenInfo.slug, err);
       }
     });
   };
@@ -101,7 +104,7 @@ export function subscribeEVMBalance (params: SubscribeEvmPalletBalance) {
         });
       })
       .catch((e) => {
-        console.error(`Error on get native balance with token ${nativeTokenSlug}`, e);
+        balanceSubscribeEvmLogger.error(`Error on get native balance with token ${nativeTokenSlug}`, e);
 
         return addresses.map((address): BalanceItem => {
           return {
@@ -116,7 +119,7 @@ export function subscribeEVMBalance (params: SubscribeEvmPalletBalance) {
       .then((items) => {
         callback(items);
       })
-      .catch(console.error)
+      .catch((error) => balanceSubscribeEvmLogger.error('Error in EVM balance subscription', error))
     ;
   }
 

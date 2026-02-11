@@ -11,6 +11,8 @@ import { t } from 'i18next';
 import { BehaviorSubject } from 'rxjs';
 
 import { u8aToHex } from '@polkadot/util';
+
+const tonRequestHandlerLogger = createLogger('TonRequestHandler');
 import { logger as createLogger } from '@polkadot/util/logger';
 import { Logger } from '@polkadot/util/types';
 
@@ -186,7 +188,7 @@ export default class TonRequestHandler {
         const { resolver } = this.confirmationsPromiseMap[id];
 
         if (!resolver || !confirmation) {
-          console.error('Not found confirmation', type, id);
+          tonRequestHandlerLogger.error('Not found confirmation', type, id);
         } else {
           resolver.reject(new Error('Reset wallet'));
         }

@@ -4,10 +4,13 @@
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals, _getChainNativeTokenBasicInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { AppBannerData, AppBasicInfoData, AppCommonData, AppConfirmationData, AppPopupData, ConditionBalanceType, ConditionCrowdloanType, ConditionEarningType, ConditionHasMoneyType, ConditionNftType, ConditionType, MktCampaignCondition, MktCampaignConditionTypeValue } from '@subwallet/extension-base/services/mkt-campaign-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { fetchStaticData, TARGET_ENV, wait } from '@subwallet/extension-base/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
 import { BehaviorSubject } from 'rxjs';
+
+const mktCampaignServiceLogger = createLogger('MktCampaignService');
 
 export default class MktCampaignService {
   readonly #state: KoniState;
@@ -23,30 +26,30 @@ export default class MktCampaignService {
     this.appConfirmationSubject.next([]);
 
     this.fetchPopupData().catch((e) => {
-      console.error('Error on fetch popup', e);
+      mktCampaignServiceLogger.error('Error on fetch popup', e);
     });
 
     this.fetchBannerData().catch((e) => {
-      console.error('Error on fetch banner', e);
+      mktCampaignServiceLogger.error('Error on fetch banner', e);
     });
 
     this.fetchConfirmationData().catch((e) => {
-      console.error('Error on fetch confirmation', e);
+      mktCampaignServiceLogger.error('Error on fetch confirmation', e);
     });
   }
 
   fetchMktCampaignData (timeout = 10000) {
     wait(timeout)
       .finally(() => {
-        this.fetchPopupData().catch(console.error);
-        this.fetchBannerData().catch(console.error);
-        this.fetchConfirmationData().catch(console.error);
+        this.fetchPopupData().catch((error) => mktCampaignServiceLogger.error('Error fetching popup data', error));
+        this.fetchBannerData().catch((error) => mktCampaignServiceLogger.error('Error fetching banner data', error));
+        this.fetchConfirmationData().catch((error) => mktCampaignServiceLogger.error('Error fetching confirmation data', error));
       });
   }
 
   public init () {
     this.fetchMktCampaignData();
-    console.log('Mkt campaign service ready');
+    mktCampaignServiceLogger.info('Mkt campaign service ready');
   }
 
   public async fetchPopupData () {

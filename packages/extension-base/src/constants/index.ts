@@ -58,9 +58,13 @@ export const getSupportTokenPayFeeChain = () => {
   return Object.values(_SUPPORT_TOKEN_PAY_FEE_GROUP).flat();
 };
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const constantsLogger = createLogger('Constants');
+
 export const isChainSupportTokenPayFee = (chainSlug: string): boolean => {
   if (!chainSlug) {
-    console.error('You must provide chain slug!');
+    constantsLogger.error('You must provide chain slug!');
 
     return false;
   }

@@ -6,13 +6,17 @@ import type { PasswordStore } from '@subwallet/ui-keyring/types';
 
 import { SUBWALLET_KEYRING } from '@subwallet/ui-keyring/defaults';
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
 type StoreValue = Record<string, unknown>;
+
+const keyringStoreLogger = createLogger('KeyringStore');
 
 const lastError = (type: string): void => {
   const error = chrome.runtime.lastError;
 
   if (error) {
-    console.error(`KeyringStore.${type}:: runtime.lastError:`, error);
+    keyringStoreLogger.error(`KeyringStore.${type}:: runtime.lastError`, error);
   }
 };
 

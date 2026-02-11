@@ -3,9 +3,12 @@
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { BASE_MINUTE_INTERVAL } from '@subwallet/extension-base/constants';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { Md5 } from 'ts-md5';
 
 import { ApiRequestContext } from '../api-request-strategy/types';
+
+const apiRequestStrategyLogger = createLogger('ApiRequestStrategyV2');
 import { ApiRequestStrategyV2, ApiRequestV2 } from './types';
 
 export abstract class BaseApiRequestStrategyV2 implements ApiRequestStrategyV2 {
@@ -79,7 +82,7 @@ export abstract class BaseApiRequestStrategyV2 implements ApiRequestStrategyV2 {
         return;
       }
 
-      console.log('[ApiRequestStrategyV2] Processing requests...', remainingRequests.map((r) => r.groupId));
+      apiRequestStrategyLogger.debug('Processing requests', remainingRequests.map((r) => r.groupId));
 
       // Get first this.limit requests base on id
       const requests = remainingRequests
@@ -98,7 +101,7 @@ export abstract class BaseApiRequestStrategyV2 implements ApiRequestStrategyV2 {
 
             request.resolve(resp);
 
-            console.log('[ApiRequestStrategyV2] Cache hit for request', request.id, 'with cache key', request.cacheKey);
+            apiRequestStrategyLogger.debug(`Cache hit for request ${request.id} with cache key ${request.cacheKey}`);
 
             delete this.requestMap[request.id];
 

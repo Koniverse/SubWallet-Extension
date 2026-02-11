@@ -22,7 +22,7 @@ export default class ReloadMetadata extends BaseMigrationJob {
           this.state.chainService.disableChain(chain);
 
           setTimeout(() => {
-            this.state.chainService.enableChain(chain).catch(console.error);
+            this.state.chainService.enableChain(chain).catch((error) => this.logger.error('Error enabling chain', error));
           }, 500);
         }
       }

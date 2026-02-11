@@ -17,7 +17,7 @@ export default class AutoEnableSomeTokens extends BaseMigrationJob {
         await this.state.chainService.updateAssetSetting(slug, { visible: true }, true);
       }
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
   }
 }

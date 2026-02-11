@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { _NotificationInfo, NotificationTab } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { getIsTabRead } from '@subwallet/extension-base/services/inapp-notification-service/utils';
 import BaseStore from '@subwallet/extension-base/services/storage-service/db-stores/BaseStore';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { liveQuery } from 'dexie';
+
+const inappNotificationStoreLogger = createLogger('InappNotificationStore');
 
 export default class InappNotificationStore extends BaseStore<_NotificationInfo> {
   async getNotificationInfo (id: string) {
@@ -51,7 +54,7 @@ export default class InappNotificationStore extends BaseStore<_NotificationInfo>
         item.proxyId = newProxyId;
         item.title = item.title.replace(/\[.*?\]/, `[${newName}]`);
       })
-      .catch(console.error);
+      .catch((error) => inappNotificationStoreLogger.error('Error updating notification proxy ID', error));
   }
 
   async cleanUpOldNotifications (overdueTime: number) {

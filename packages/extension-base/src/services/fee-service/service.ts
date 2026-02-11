@@ -4,8 +4,11 @@
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { EvmFeeInfo, FeeChainType, FeeInfo, FeeSubscription } from '@subwallet/extension-base/types';
 import { BehaviorSubject } from 'rxjs';
+
+const feeServiceLogger = createLogger('FeeService');
 
 export default class FeeService {
   protected readonly state: KoniState;
@@ -143,7 +146,7 @@ export default class FeeService {
                     observer.next(info);
                   })
                   .catch((e) => {
-                    console.warn(`Cannot get fee param for ${chain}`, e);
+                    feeServiceLogger.warn(`Cannot get fee param for ${chain}`, e);
                     observer.next({
                       type: 'evm',
                       gasPrice: '0',
@@ -152,7 +155,7 @@ export default class FeeService {
                     } as EvmFeeInfo);
                   });
               } else {
-                console.warn(`Cannot get fee param for ${chain}`, 'Cannot get api');
+                feeServiceLogger.warn(`Cannot get fee param for ${chain}`, 'Cannot get api');
 
                 observer.next({
                   type: 'evm',
@@ -168,7 +171,7 @@ export default class FeeService {
                 .then((info) => {
                   observer.next(info);
                 })
-                .catch(console.error);
+                .catch((error) => feeServiceLogger.error('Error in fee service operation', error));
             } else {
               observer.next({
                 type,

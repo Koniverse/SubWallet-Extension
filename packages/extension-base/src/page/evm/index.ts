@@ -8,6 +8,9 @@ import type { RequestArguments } from 'web3-core';
 
 import SafeEventEmitter from '@metamask/safe-event-emitter';
 import { EvmProviderError } from '@subwallet/extension-base/background/errors/EvmProviderError';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const evmPageLogger = createLogger('EvmPage');
 
 interface SendSyncJsonRpcRequest extends JsonRpcRequest<unknown> {
   method: 'net_version';
@@ -57,7 +60,7 @@ export function createSubWalletEvmProvider (sendMessage: SendRequest, version: s
 
         emitter.emit(finalType, payload);
       } else {
-        console.warn('Can not handle event', type, payload);
+        evmPageLogger.warn('Can not handle event', type, payload);
       }
     }).then(() => {
       subscribeFlag = true;

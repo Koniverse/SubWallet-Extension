@@ -30,6 +30,7 @@ import { isArray } from '@polkadot/util';
 import { logger as createLogger } from '@polkadot/util/logger';
 import { HexString, Logger } from '@polkadot/util/types';
 import { ExtraInfo } from '@polkadot-api/merkleize-metadata';
+import { createLogger as createExtensionLogger } from '@subwallet/extension-base/utils/logger';
 
 const filterChainInfoMap = (data: Record<string, _ChainInfo>, ignoredChains: string[]): Record<string, _ChainInfo> => {
   return Object.fromEntries(
@@ -38,6 +39,8 @@ const filterChainInfoMap = (data: Record<string, _ChainInfo>, ignoredChains: str
   );
 };
 // .filter(([slug, info]) => !info.bitcoinInfo && !ignoredChains.includes(slug))
+
+const chainServiceLogger = createExtensionLogger('ChainService');
 
 const ignoredList = [
   'bevm',
@@ -130,7 +133,7 @@ export class ChainService {
     this.swapRefMapSubject.next(this.swapRefMap);
 
     if (MODULE_SUPPORT.MANTA_ZK) {
-      console.log('Init Manta ZK');
+      chainServiceLogger.info('Init Manta ZK');
       this.mantaChainHandler = new MantaPrivateHandler(dbService);
     }
 
@@ -614,7 +617,7 @@ export class ChainService {
     delete chainStateMap[slug];
     delete chainInfoMap[slug];
     this.deleteAssetsByChain(slug);
-    this.dbService.removeFromChainStore([slug]).catch(console.error);
+    this.dbService.removeFromChainStore([slug]).catch((error) => chainServiceLogger.error('Error removing chain from store', error));
 
     this.updateChainSubscription();
 
@@ -650,7 +653,7 @@ export class ChainService {
     delete chainStateMap[slug];
     delete chainInfoMap[slug];
     this.deleteAssetsByChain(slug);
-    this.dbService.removeFromChainStore([slug]).catch(console.error);
+    this.dbService.removeFromChainStore([slug]).catch((error) => chainServiceLogger.error('Error removing chain from store', error));
 
     this.updateChainSubscription();
 
@@ -812,18 +815,18 @@ export class ChainService {
       if (latestChainInfo && latestChainInfo.length > 0) {
         const { needUpdateChainApiList, storedChainInfoList } = updateLatestChainInfo(this.dataMap, latestChainInfo);
 
-        this.dbService.bulkUpdateChainStore(storedChainInfoList).catch(console.error);
+        this.dbService.bulkUpdateChainStore(storedChainInfoList).catch((error) => chainServiceLogger.error('Error bulk updating chain store', error));
         this.updateChainSubscription();
 
         needUpdateChainApiList.forEach((chainInfo) => {
-          console.log('Updating chain API for', chainInfo.slug);
-          this.initApiForChain(chainInfo).catch(console.error);
+          chainServiceLogger.info('Updating chain API for', chainInfo.slug);
+          this.initApiForChain(chainInfo).catch((error) => chainServiceLogger.error('Error initializing API for chain', error));
         });
 
         this.logger.log('Finished updating latest RPC providers');
       }
     } catch (e) {
-      console.error('Error fetching latest chain data');
+      chainServiceLogger.error('Error fetching latest chain data', e);
     }
   }
 
@@ -918,7 +921,7 @@ export class ChainService {
     if (JSON.stringify(currentTokenKeys) !== JSON.stringify(newTokenKeys)) { // Check if token keys have changed
       this.enablePopularTokens()
         .then(() => this.logger.log('Popular tokens enabled due to priority tokens change')) // Log success after enabling tokens
-        .catch((e) => console.error('Error enabling popular tokens:', e)); // Log error if enabling fails
+        .catch((e) => chainServiceLogger.error('Error enabling popular tokens', e)); // Log error if enabling fails
     }
   }
 
@@ -934,7 +937,7 @@ export class ChainService {
       this.lockChainInfoMap = false;
     }).catch((e) => {
       this.lockChainInfoMap = false;
-      console.error('Error update latest chain data', e);
+      chainServiceLogger.error('Error update latest chain data', e);
     });
 
     // this.fetchLatestPriceIdsData().then((latestPriceIds) => {
@@ -945,19 +948,19 @@ export class ChainService {
       .then((latestledgerGenericAllowChains) => {
         this.handleLatestLedgerGenericAllowChains(latestledgerGenericAllowChains);
       })
-      .catch(console.error);
+      .catch((error) => chainServiceLogger.error('Error fetching latest ledger generic allow chains', error));
 
     this.fetchLatestPriorityTokens()
       .then((latestPriorityTokens) => {
         this.handleLatestPriorityTokens(latestPriorityTokens);
       })
-      .catch(console.error);
+      .catch((error) => chainServiceLogger.error('Error fetching latest priority tokens', error));
 
     this.fetchLatestSufficientChains()
       .then((latestSufficientChains) => {
         this.handleLatestSufficientChains(latestSufficientChains);
       })
-      .catch(console.error);
+      .catch((error) => chainServiceLogger.error('Error fetching latest sufficient chains', error));
   }
 
   private async initApis () {
@@ -970,7 +973,7 @@ export class ChainService {
         try {
           return this.initApiForChain(chainInfo);
         } catch (e) {
-          console.error(e);
+          chainServiceLogger.error('Error initializing API for chain', e);
 
           return Promise.resolve();
         }
@@ -1033,7 +1036,7 @@ export class ChainService {
           // eslint-disable-next-line @typescript-eslint/no-empty-function
           .then(() => {
           })
-          .catch((error) => console.error('Error connecting to the report API:', error));
+          .catch((error) => chainServiceLogger.error('Error connecting to the report API', error));
       }
 
       this.updateChainConnectionStatus(slug, status);
@@ -1120,7 +1123,7 @@ export class ChainService {
       active: true,
       currentProvider: chainStateMap[chainSlug].currentProvider,
       manualTurnOff: !!chainStateMap[chainSlug].manualTurnOff
-    }).catch(console.error);
+    }).catch((error) => chainServiceLogger.error('Error upserting chain info', error));
     chainStateMap[chainSlug].active = true;
 
     await this.initApiForChain(chainInfo);
@@ -1159,7 +1162,7 @@ export class ChainService {
             active: true,
             currentProvider: chainStateMap[chainSlug].currentProvider,
             manualTurnOff: !!chainStateMap[chainSlug].manualTurnOff
-          }).catch(console.error);
+          }).catch((error) => chainServiceLogger.error('Error enabling chain', error));
 
           chainStateMap[chainSlug].active = true;
 
@@ -1203,7 +1206,7 @@ export class ChainService {
       active: false,
       currentProvider: chainStateMap[chainSlug].currentProvider,
       manualTurnOff: !preventManualTurnOff
-    }).catch(console.error);
+    }).catch((error) => chainServiceLogger.error('Error disabling chain', error));
 
     this.updateChainStateMapSubscription();
     this.lockChainInfoMap = false;
@@ -1953,7 +1956,7 @@ export class ChainService {
 
       return result;
     } catch (e) {
-      console.error('Error connecting to provider', e);
+      chainServiceLogger.error('Error connecting to provider', e);
 
       result.success = false;
       result.error = _CHAIN_VALIDATION_ERROR.CONNECTION_FAILURE;
@@ -2098,11 +2101,11 @@ export class ChainService {
   }
 
   public refreshSubstrateApi (slug: string) {
-    this.substrateChainHandler.recoverApi(slug).catch(console.error);
+    this.substrateChainHandler.recoverApi(slug).catch((error) => chainServiceLogger.error('Error refreshing substrate API', error));
   }
 
   public refreshEvmApi (slug: string) {
-    this.evmChainHandler.recoverApi(slug).catch(console.error);
+    this.evmChainHandler.recoverApi(slug).catch((error) => chainServiceLogger.error('Error refreshing EVM API', error));
   }
 
   public async stopAllChainApis () {

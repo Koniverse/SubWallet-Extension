@@ -21,6 +21,9 @@ import BigNumber from 'bignumber.js';
 import * as bitcoin from 'bitcoinjs-lib';
 
 import { hexStripPrefix, u8aToHex } from '@polkadot/util';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
+const optimexHandlerLogger = createLogger('OptimexHandler');
 
 interface OptimexQuoteMetadata {
   session_id: string;
@@ -187,7 +190,7 @@ export class OptimexHandler implements SwapBaseInterface {
       });
 
       if (!rawResponse.ok) {
-        console.log('Error bad request while init quote');
+        optimexHandlerLogger.error('Error bad request while init quote');
 
         return undefined;
       }
@@ -196,7 +199,7 @@ export class OptimexHandler implements SwapBaseInterface {
 
       tradeInfo = response.data;
     } catch (e) {
-      console.log('Error while init quote');
+      optimexHandlerLogger.error('Error while init quote');
 
       return undefined;
     }
@@ -233,7 +236,7 @@ export class OptimexHandler implements SwapBaseInterface {
     const depositAddress = this.currentTradeMetadata?.deposit_address;
 
     if (!depositAddress) {
-      console.log('Optimex Trade metadata is undefined, request for new quote');
+      optimexHandlerLogger.warn('Optimex Trade metadata is undefined, request for new quote');
 
       return Promise.resolve(undefined);
     }
@@ -303,7 +306,7 @@ export class OptimexHandler implements SwapBaseInterface {
 
         networkFeeAmount = Math.ceil(feeCombine.feeRate * sizeInfo.txVBytes).toString();
       } else {
-        console.log('Unsupported swap from this chain type', originChainType);
+        optimexHandlerLogger.warn('Unsupported swap from this chain type', originChainType);
 
         return Promise.resolve(undefined);
       }
@@ -437,8 +440,8 @@ export class OptimexHandler implements SwapBaseInterface {
     let extrinsic: SWTransaction['transaction'];
 
     // dont remove this log
-    console.log('Optimex Trade metadata:', this.currentTradeMetadata);
-    console.log('Optimex Trade channel:', this.isTestnet ? `https://provider-api-docs.vercel.app/swap/${tradeId}` : `https://provider-api-docs.vercel.app/swap/${tradeId}?env=sub_wallet`);
+    optimexHandlerLogger.debug('Optimex Trade metadata', this.currentTradeMetadata);
+    optimexHandlerLogger.debug('Optimex Trade channel', this.isTestnet ? `https://provider-api-docs.vercel.app/swap/${tradeId}` : `https://provider-api-docs.vercel.app/swap/${tradeId}?env=sub_wallet`);
 
     if (chainType === ChainType.BITCOIN) {
       const bitcoinApi = this.chainService.getBitcoinApi(chainInfo.slug);

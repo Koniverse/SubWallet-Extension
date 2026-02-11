@@ -10,6 +10,8 @@ import RequestService from '@subwallet/extension-base/services/request-service';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { TransactionEventResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { BasicTxErrorType } from '@subwallet/extension-base/types';
+
+const bitcoinRequestHandlerLogger = createLogger('BitcoinRequestHandler');
 import { createPromiseHandler } from '@subwallet/extension-base/utils';
 import { isInternalRequest } from '@subwallet/extension-base/utils/request';
 import keyring from '@subwallet/ui-keyring';
@@ -432,7 +434,7 @@ export default class BitcoinRequestHandler {
         const { resolver } = this.confirmationsPromiseMap[id];
 
         if (!resolver || !confirmation) {
-          console.error('Not found confirmation', type, id);
+          bitcoinRequestHandlerLogger.error('Not found confirmation', type, id);
         } else {
           resolver.reject(new Error('Reset wallet'));
         }

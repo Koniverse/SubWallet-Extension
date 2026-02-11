@@ -6,8 +6,11 @@ import { COLLECT_ID } from '@subwallet/extension-base/koni/api/nft/blobinscripti
 import { ALC, getNftDetail, NftResponse, RemarkData, transferPayload } from '@subwallet/extension-base/koni/api/nft/blobinscription/types';
 import { AVAIL_LIGHT_CLIENT_NFT } from '@subwallet/extension-base/koni/api/nft/config';
 import { BaseNftApi, HandleNftParams } from '@subwallet/extension-base/koni/api/nft/nft';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { hexToString } from '@polkadot/util';
+
+const blobInscriptionLogger = createLogger('BlobInscription');
 
 export class BlobInscriptionApi extends BaseNftApi {
   endpoint = AVAIL_LIGHT_CLIENT_NFT;
@@ -162,7 +165,7 @@ export class BlobInscriptionApi extends BaseNftApi {
         }
       }));
     } catch (error) {
-      console.error('Failed to fetch blob inscription', error);
+      blobInscriptionLogger.error('Failed to fetch blob inscription', error);
     }
   }
 

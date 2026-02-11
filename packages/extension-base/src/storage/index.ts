@@ -3,8 +3,11 @@
 
 import KoniDatabase from '@subwallet/extension-base/services/storage-service/databases';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import { xglobal } from '@polkadot/x-global';
+
+const swStorageLogger = createLogger('SWStorage');
 
 const hasLocalStorage = typeof localStorage !== 'undefined';
 
@@ -26,7 +29,7 @@ export class SWStorage {
         this.isReady = true;
         this.waitReadyHandler.resolve(this);
       })
-      .catch(console.error);
+      .catch((e) => swStorageLogger.error('Error initializing SWStorage', e));
   }
 
   async setItem (key: string, value: string) {
@@ -36,7 +39,7 @@ export class SWStorage {
     if (this.localStorage) {
       this.localStorage?.setItem(key, value);
     } else {
-      this.kvDatabase.put({ key, value }).catch(console.error);
+      this.kvDatabase.put({ key, value }).catch((e) => swStorageLogger.error('Error putting item to kvDatabase', e));
     }
   }
 
@@ -59,7 +62,7 @@ export class SWStorage {
 
       this.kvDatabase
         .bulkPut(putList)
-        .catch(console.error);
+        .catch((e) => swStorageLogger.error('Error bulk putting items to kvDatabase', e));
     }
   }
 
@@ -95,7 +98,7 @@ export class SWStorage {
       this.kvDatabase
         .where({ key })
         .delete()
-        .catch(console.error);
+        .catch((e) => swStorageLogger.error('Error deleting item from kvDatabase', e));
     }
   }
 
@@ -114,7 +117,7 @@ export class SWStorage {
         .where('key')
         .anyOf(keys)
         .delete()
-        .catch(console.error);
+        .catch((e) => swStorageLogger.error('Error deleting items from kvDatabase', e));
     }
   }
 
@@ -125,7 +128,7 @@ export class SWStorage {
     if (this.localStorage) {
       this.localStorage.clear();
     } else {
-      this.kvDatabase.clear().catch(console.error);
+      this.kvDatabase.clear().catch((e) => swStorageLogger.error('Error clearing kvDatabase', e));
     }
   }
 

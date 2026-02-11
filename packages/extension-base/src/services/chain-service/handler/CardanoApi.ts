@@ -7,9 +7,12 @@ import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/ha
 import { _CardanoApi, _ChainConnectionStatus } from '@subwallet/extension-base/services/chain-service/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { createPromiseHandler, fetchFromProxyService, PromiseHandler } from '@subwallet/extension-base/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BehaviorSubject } from 'rxjs';
 
 import { hexAddPrefix, isHex } from '@polkadot/util';
+
+const cardanoApiLogger = createLogger('CardanoApi');
 
 // export const API_KEY = {
 //   mainnet: process.env.BLOCKFROST_API_KEY_MAIN || '',
@@ -116,7 +119,7 @@ export class CardanoApi implements _CardanoApi {
 
   onConnect (): void {
     if (!this.isApiConnected) {
-      console.log(`Connected to ${this.chainSlug} at ${this.apiUrl}`);
+      cardanoApiLogger.info(`Connected to ${this.chainSlug} at ${this.apiUrl}`);
       this.isApiReady = true;
 
       if (this.isApiReadyOnce) {
@@ -131,7 +134,7 @@ export class CardanoApi implements _CardanoApi {
     this.updateConnectionStatus(_ChainConnectionStatus.DISCONNECTED);
 
     if (this.isApiConnected) {
-      console.warn(`Disconnected from ${this.chainSlug} of ${this.apiUrl}`);
+      cardanoApiLogger.warn(`Disconnected from ${this.chainSlug} of ${this.apiUrl}`);
       this.isApiReady = false;
       this.isReadyHandler = createPromiseHandler<_CardanoApi>();
     }
@@ -149,7 +152,7 @@ export class CardanoApi implements _CardanoApi {
 
       return addressBalance.amount;
     } catch (e) {
-      console.error('Error on getting account balance', e);
+      cardanoApiLogger.error('Error on getting account balance', e);
 
       return [];
     }
@@ -169,7 +172,7 @@ export class CardanoApi implements _CardanoApi {
 
       return utxos;
     } catch (e) {
-      console.error('Error on getting account balance', e);
+      cardanoApiLogger.error('Error on getting account balance', e);
 
       return [];
     }
@@ -187,7 +190,7 @@ export class CardanoApi implements _CardanoApi {
 
       return utxo;
     } catch (e) {
-      console.error('Error on getting account balance', e);
+      cardanoApiLogger.error('Error on getting account balance', e);
 
       return {} as TransactionUtxosItem;
     }
@@ -206,12 +209,12 @@ export class CardanoApi implements _CardanoApi {
       if (isHex(hexAddPrefix(hash))) {
         return hash;
       } else {
-        console.error('Error on submitting cardano tx');
+        cardanoApiLogger.error('Error on submitting cardano tx');
 
         return '';
       }
     } catch (e) {
-      console.error('Error on submitting cardano tx', e);
+      cardanoApiLogger.error('Error on submitting cardano tx', e);
 
       return '';
     }

@@ -11,6 +11,7 @@ import { KeyringService } from '@subwallet/extension-base/services/keyring-servi
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { DAPP_CONNECT_BOTH_TYPE_ACCOUNT_URL, PREDEFINED_CHAIN_DAPP_CHAIN_MAP, WEB_APP_URL } from '@subwallet/extension-base/services/request-service/constants';
 import { AuthUrlInfoNeedMigration, AuthUrls } from '@subwallet/extension-base/services/request-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import AuthorizeStore from '@subwallet/extension-base/stores/Authorize';
 import { createPromiseHandler, getDomainFromUrl, PromiseHandler, stripUrl } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -19,6 +20,8 @@ import { isBitcoinAddress } from '@subwallet/keyring/utils/address/validate';
 import { BehaviorSubject } from 'rxjs';
 
 import { isEthereumAddress } from '@polkadot/util-crypto';
+
+const authRequestHandlerLogger = createLogger('AuthRequestHandler');
 
 const AUTH_URLS_KEY = 'authUrls';
 
@@ -36,8 +39,8 @@ export default class AuthRequestHandler {
     this.#requestService = requestService;
     this.#chainService = chainService;
     this.migrateAuthUrlInfoToUnified().then(() => {
-      this.init().catch(console.error);
-    }).catch(console.error);
+      this.init().catch((error) => authRequestHandlerLogger.error('Error initializing auth request handler', error));
+    }).catch((error) => authRequestHandlerLogger.error('Error migrating auth URL info', error));
   }
 
   private async init () {

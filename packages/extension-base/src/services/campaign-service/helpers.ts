@@ -3,7 +3,10 @@
 
 import { CampaignAction, CampaignNotification, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import NotificationService from '@subwallet/extension-base/services/notification-service/NotificationService';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { t } from 'i18next';
+
+const campaignHelpersLogger = createLogger('CampaignHelpers');
 
 export const runCampaign = (notificationService: NotificationService, campaign: CampaignNotification) => {
   const { action, message, metadata, title } = campaign.data;
@@ -17,7 +20,7 @@ export const runCampaign = (notificationService: NotificationService, campaign: 
             const url = metadata.url as string | undefined;
 
             if (url) {
-              chrome.tabs.create({ url }).catch(console.error);
+              chrome.tabs.create({ url }).catch((error) => campaignHelpersLogger.error('Error opening URL', error));
             }
           }
 

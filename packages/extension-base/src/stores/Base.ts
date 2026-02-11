@@ -1,13 +1,17 @@
 // Copyright 2019-2022 @polkadot/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { createLogger } from '@subwallet/extension-base/utils/logger';
+
 type StoreValue = Record<string, unknown>;
+
+const baseStoreLogger = createLogger('BaseStore');
 
 const lastError = (type: string): void => {
   const error = chrome.runtime.lastError;
 
   if (error) {
-    console.error(`BaseStore.${type}:: runtime.lastError:`, error);
+    baseStoreLogger.error(`BaseStore.${type}:: runtime.lastError`, error);
   }
 };
 

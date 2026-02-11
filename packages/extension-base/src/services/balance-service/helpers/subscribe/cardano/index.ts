@@ -4,11 +4,14 @@
 import { _AssetType } from '@subwallet/chain-list/types';
 import { APIItemState } from '@subwallet/extension-base/background/KoniTypes';
 import { ASTAR_REFRESH_BALANCE_INTERVAL } from '@subwallet/extension-base/constants';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { CardanoBalanceItem } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { getCardanoAssetId } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
 import { _CardanoApi } from '@subwallet/extension-base/services/chain-service/types';
 import { BalanceItem, SusbcribeCardanoPalletBalance } from '@subwallet/extension-base/types';
 import { filterAssetsByChainAndType, reformatAddress } from '@subwallet/extension-base/utils';
+
+const balanceSubscribeCardanoIndexLogger = createLogger('BalanceSubscribeCardano');
 
 async function getBalanceMap (addresses: string[], cardanoApi: _CardanoApi, isTestnet: boolean): Promise<Record<string, CardanoBalanceItem[]>> {
   const addressBalanceMap: Record<string, CardanoBalanceItem[]> = {};
@@ -52,7 +55,7 @@ export function subscribeCardanoBalance (params: SusbcribeCardanoPalletBalance) 
           callback(items);
         });
       })
-      .catch((e) => console.error('Error while fetching cardano balance', e));
+      .catch((e) => balanceSubscribeCardanoIndexLogger.error('Error while fetching cardano balance', e));
   }
 
   const interval = setInterval(getBalance, ASTAR_REFRESH_BALANCE_INTERVAL);

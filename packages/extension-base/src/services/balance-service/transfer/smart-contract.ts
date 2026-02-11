@@ -7,12 +7,15 @@ import { getPSP34ContractPromise } from '@subwallet/extension-base/koni/api/cont
 import { getWasmContractGasLimit } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
 import { EVM_REFORMAT_DECIMALS } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { TransactionConfig } from 'web3-core';
 import { ContractSendMethod } from 'web3-eth-contract';
+
+const smartContractLogger = createLogger('SmartContractTransfer');
 
 interface TransferEvmProps extends TransactionFee {
   chain: string;
@@ -74,7 +77,7 @@ export async function getEVMTransactionObject (props: TransferEvmProps): Promise
     gasLimit = gasSettingsForEWC.gasLimit;
   } else {
     const gasEstimate = await evmApi.api.eth.estimateGas(transactionObject).catch((e: Error) => {
-      console.log('Cannot estimate fee with native transfer on', chain, e);
+      smartContractLogger.warn('Cannot estimate fee with native transfer on', chain, e);
 
       if (fallbackFee) {
         errorOnEstimateFee = e.message;
@@ -163,7 +166,7 @@ export async function getERC20TransactionObject (props: TransferERC20Props): Pro
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     gasLimit = await (erc20Contract.methods.transfer(to, transferValue) as ContractSendMethod).estimateGas({ from })
       .catch((e: Error) => {
-        console.log('Cannot estimate fee with token contract', assetAddress, chain, e);
+        smartContractLogger.warn('Cannot estimate fee with token contract', assetAddress, chain, e);
 
         if (fallbackFee) {
           errorOnEstimateFee = e.message;
@@ -269,7 +272,7 @@ export async function getPSP34TransferExtrinsic (substrateApi: _SubstrateApi, se
     // @ts-ignore
     return contractPromise.tx['psp34::transfer']({ gasLimit }, recipientAddress, onChainOption, {});
   } catch (e) {
-    console.debug(e);
+    smartContractLogger.debug('Error in smart contract transfer', e);
 
     return null;
   }

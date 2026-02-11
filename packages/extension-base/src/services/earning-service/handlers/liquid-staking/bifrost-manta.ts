@@ -5,9 +5,12 @@ import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/K
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals, _getTokenOnChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { CHANNEL_ID } from '@subwallet/extension-base/services/earning-service/constants';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BaseYieldStepDetail, HandleYieldStepData, LiquidYieldPoolInfo, OptimalYieldPath, SubmitYieldJoinData, TransactionData, YieldStepType } from '@subwallet/extension-base/types';
 
 import BifrostLiquidStakingPoolHandler from './bifrost';
+
+const bifrostMantaLiquidStakingLogger = createLogger('BifrostMantaLiquidStaking');
 
 export interface BifrostLiquidStakingMeta {
   apy: string,
@@ -65,7 +68,7 @@ export default class BifrostMantaLiquidStakingPoolHandler extends BifrostLiquidS
         method: 'GET'
       }).then((res) => {
         resolve(res.json());
-      }).catch(console.error);
+      }).catch((error) => bifrostMantaLiquidStakingLogger.error('Error in bifrost manta liquid staking', error));
     });
 
     const exchangeRatePromise = new Promise(function (resolve) {
@@ -73,7 +76,7 @@ export default class BifrostMantaLiquidStakingPoolHandler extends BifrostLiquidS
         method: 'GET'
       }).then((resp) => {
         resolve(resp.json());
-      }).catch(console.error);
+      }).catch((error) => bifrostMantaLiquidStakingLogger.error('Error in bifrost manta liquid staking', error));
     });
 
     const derivativeTokenInfo = this.state.getAssetBySlug(this.derivativeAssets[0]);

@@ -8,6 +8,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { ApproveStepMetadata, BaseYieldStepDetail, BasicTxErrorType, EarningStatus, HandleYieldStepData, LiquidYieldPoolInfo, OptimalYieldPath, OptimalYieldPathParams, SubmitYieldJoinData, TokenSpendingApprovalParams, TransactionData, UnstakingInfo, UnstakingStatus, YieldPoolMethodInfo, YieldPositionInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
 import { TransactionConfig } from 'web3-core';
@@ -17,6 +18,8 @@ import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 
 import { ST_LIQUID_TOKEN_ABI } from '../../constants';
 import BaseLiquidStakingPoolHandler from './base';
+
+const stellaSwapLiquidStakingLogger = createLogger('StellaSwapLiquidStaking');
 
 export const getStellaswapLiquidStakingContract = (networkKey: string, assetAddress: string, evmApi: _EvmApi, options = {}): Contract => {
   // @ts-ignore
@@ -85,7 +88,7 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
         method: 'GET'
       }).then((res) => {
         resolve(res.json());
-      }).catch(console.error);
+      }).catch((error) => stellaSwapLiquidStakingLogger.error('Error in stella swap liquid staking', error));
     });
 
     const sampleTokenShare = 10 ** _getAssetDecimals(derivativeTokenInfo);
@@ -298,7 +301,7 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
 
           break;
         } catch (e) {
-          console.error(e);
+          stellaSwapLiquidStakingLogger.error('Error in stella swap liquid staking', e);
         }
       }
 

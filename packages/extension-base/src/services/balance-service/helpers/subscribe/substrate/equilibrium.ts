@@ -4,12 +4,15 @@
 import { SignedBalance } from '@equilab/api/genshiro/interfaces';
 import { _AssetType } from '@subwallet/chain-list/types';
 import { APIItemState } from '@subwallet/extension-base/background/KoniTypes';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { _getTokenOnChainAssetId } from '@subwallet/extension-base/services/chain-service/utils';
 import { BalanceItem, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
 import { filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 import { BN, BN_ZERO } from '@polkadot/util';
+
+const balanceSubscribeEquilibriumLogger = createLogger('BalanceSubscribeEquilibrium');
 
 type EqBalanceItem = [number, { positive: number }];
 type EqBalanceV0 = {
@@ -100,7 +103,7 @@ export const subscribeEqBalanceAccountPallet = async ({ addresses, assetMap, cal
 
       return unsub;
     } catch (err) {
-      console.warn(err);
+      balanceSubscribeEquilibriumLogger.warn('Error in equilibrium balance subscription', err);
 
       const items: BalanceItem[] = addresses.map((address) => {
         return {
@@ -122,7 +125,7 @@ export const subscribeEqBalanceAccountPallet = async ({ addresses, assetMap, cal
     unsubList.forEach((subProm) => {
       subProm.then((unsub) => {
         unsub && unsub();
-      }).catch(console.error);
+      }).catch((error) => balanceSubscribeEquilibriumLogger.error('Error in equilibrium balance subscription', error));
     });
   };
 };

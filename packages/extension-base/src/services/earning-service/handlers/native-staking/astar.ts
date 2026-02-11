@@ -7,6 +7,7 @@ import { ExtrinsicType, NominationInfo, UnstakingInfo } from '@subwallet/extensi
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, PalletDappsStakingAccountLedger, PalletDappsStakingDappInfo, StakeCancelWithdrawalParams, SubmitJoinNativeStaking, TransactionData, UnstakingStatus, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { balanceFormatter, formatNumber, isUrl, parseRawNumber, reformatAddress } from '@subwallet/extension-base/utils';
 
@@ -17,6 +18,8 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import BaseParaNativeStakingPoolHandler from './base-para';
+
+const astarStakingLogger = createLogger('AstarStaking');
 
 const convertAddress = (address: string) => {
   return isEthereumAddress(address) ? address.toLowerCase() : address;
@@ -94,7 +97,7 @@ export default class AstarNativeStakingPoolHandler extends BaseParaNativeStaking
       }).then((resp) => {
         resolve(resp.json());
       }).catch((e) => {
-        console.error(e);
+        astarStakingLogger.error('Error in astar staking', e);
         resolve(null);
       });
     });
@@ -188,7 +191,7 @@ export default class AstarNativeStakingPoolHandler extends BaseParaNativeStaking
         method: 'GET'
       }).then((resp) => {
         resolve(resp.json());
-      }).catch(console.error);
+      }).catch((error) => astarStakingLogger.error('Error in astar staking', error));
     });
 
     const [_allDapps, _era, _stakerInfo] = await Promise.all([
@@ -386,7 +389,7 @@ export default class AstarNativeStakingPoolHandler extends BaseParaNativeStaking
         method: 'GET'
       }).then((resp) => {
         resolve(resp.json());
-      }).catch(console.error);
+      }).catch((error) => astarStakingLogger.error('Error in astar staking', error));
     });
 
     const [_era, _allDapps] = await Promise.all([

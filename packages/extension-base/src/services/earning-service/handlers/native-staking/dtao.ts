@@ -11,8 +11,11 @@ import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 import { BN, BN_ZERO } from '@polkadot/util';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 
 import TaoNativeStakingPoolHandler, { DEFAULT_DTAO_MINBOND, RateSubnetData, TaoStakeInfo, TaoStakingStakeOption } from './tao';
+
+const dtaoStakingLogger = createLogger('DtaoStaking');
 
 export interface SubnetData {
   netuid: number;
@@ -239,7 +242,7 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
         this.isInit = true;
       }
     } catch (err) {
-      console.error(err);
+      dtaoStakingLogger.error('Error in dtao staking', err);
       this.isInit = false;
     }
   }
@@ -304,12 +307,12 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
           callback(data);
         }
       } catch (error) {
-        console.error('Error updating staking info:', error);
+        dtaoStakingLogger.error('Error updating staking info:', error);
       }
     };
 
     const subscribeStakingMetadataInterval = () => {
-      updateStakingInfo().catch(console.error);
+      updateStakingInfo().catch((error) => dtaoStakingLogger.error('Error updating staking info', error));
     };
 
     subscribeStakingMetadataInterval();
@@ -412,7 +415,7 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
                     }
                   });
                 })
-                .catch(console.error);
+                .catch((error) => dtaoStakingLogger.error('Error in dtao staking', error));
             } else {
               rsCallback({
                 ...defaultInfo,
@@ -447,10 +450,10 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
       await getPoolPosition();
     };
 
-    getStakingPositionInterval().catch(console.error);
+    getStakingPositionInterval().catch((error) => dtaoStakingLogger.error('Error in getStakingPositionInterval', error));
 
     const intervalId = setInterval(() => {
-      getStakingPositionInterval().catch(console.error);
+      getStakingPositionInterval().catch((error) => dtaoStakingLogger.error('Error in getStakingPositionInterval', error));
     }, BITTENSOR_REFRESH_STAKE_INFO);
 
     return () => {

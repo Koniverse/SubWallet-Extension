@@ -4,10 +4,13 @@
 import { ApolloClient, createHttpLink, gql, InMemoryCache } from '@apollo/client';
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { ChainType, ExtrinsicStatus, ExtrinsicType, TransactionDirection, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { MAX_FETCH_PAGE_PER_SESSION, MIN__NUM_HISTORY_PER_ACCOUNT } from '@subwallet/extension-base/services/history-service/constants';
 
 import { isArray } from '@polkadot/util';
 import { decodeAddress, encodeAddress, isEthereumAddress } from '@polkadot/util-crypto';
+
+const subsquidMultiChainHistoryLogger = createLogger('SubsquidMultiChainHistory');
 
 const MULTI_CHAIN_URL = 'https://squid.subsquid.io/multi-chain-tx/v/v1/graphql';
 
@@ -394,7 +397,7 @@ export async function fetchMultiChainHistories (addresses: string[], chainMap: R
     const chainInfo = chainMap[chainId];
 
     if (chainInfo === undefined) {
-      console.debug(`Not found chain info for chain id: ${chainId}`); // TODO: resolve conflicting chainId
+      subsquidMultiChainHistoryLogger.debug(`Not found chain info for chain id: ${chainId}`); // TODO: resolve conflicting chainId
 
       return;
     }
@@ -411,7 +414,7 @@ export async function fetchMultiChainHistories (addresses: string[], chainMap: R
 
         histories.push(transactionData);
       } catch (e) {
-        console.debug('Parse transaction data failed', address, e);
+        subsquidMultiChainHistoryLogger.debug('Parse transaction data failed', address, e);
       }
     });
   });

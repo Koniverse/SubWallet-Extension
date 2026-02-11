@@ -43,7 +43,7 @@ export default class MigrateLedgerAccountV2 extends BaseMigrationJob {
         });
       });
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
   }
 }

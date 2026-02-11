@@ -7,8 +7,11 @@ import { ErrorValidation } from '@subwallet/extension-base/background/KoniTypes'
 import { CardanoTxJson, CardanoTxOutput } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/types';
 import { CardanoAssetMetadata, getAdaBelongUtxo, getCardanoTxFee, splitCardanoId } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/utils';
 import { _CardanoApi } from '@subwallet/extension-base/services/chain-service/types';
+import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { toUnit } from '@subwallet/extension-base/utils';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
+
+const cardanoTransferLogger = createLogger('CardanoTransfer');
 
 export interface CardanoTransactionConfigProps {
   tokenInfo: _ChainAsset;
@@ -86,7 +89,7 @@ export async function createCardanoTransaction (params: CardanoTransactionConfig
       throw new Error(`Insufficient ${nativeTokenSymbol} balance to perform transaction. Top up ${nativeTokenSymbol} and try again`);
     }
 
-    console.error(`Transaction is not built successfully: ${errorMessage}`);
+    cardanoTransferLogger.error(`Transaction is not built successfully: ${errorMessage}`);
     throw new Error('Unable to perform this transaction at the moment. Try again later');
   }
 
@@ -94,7 +97,7 @@ export async function createCardanoTransaction (params: CardanoTransactionConfig
     throw new Error('Build cardano payload failed!');
   }
 
-  console.log('Build cardano payload successfully!', payload);
+  cardanoTransferLogger.debug('Build cardano payload successfully', payload);
 
   validatePayload(payload, params);
 
