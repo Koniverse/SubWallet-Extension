@@ -4,13 +4,14 @@
 import { ExtrinsicType, TransactionDirection } from '@subwallet/extension-base/background/KoniTypes';
 import { ClaimPolygonBridgeNotificationMetadata, NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { RequestClaimBridge } from '@subwallet/extension-base/types';
+import { MULTISIG_ACTIONS } from '@subwallet/extension-koni-ui/constants/multisig';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
 import { isAbleToShowFee, isTypeManageSubstrateProxy } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Logo, Number, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretRight } from 'phosphor-react';
-import React, { useMemo } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -44,9 +45,8 @@ function Component (
     }
   }
 
-  const isProxyType = useMemo(() => {
-    return isTypeManageSubstrateProxy(item.type);
-  }, [item.type]);
+  const isProxyType = isTypeManageSubstrateProxy(item.type);
+  const isMultisigAction = MULTISIG_ACTIONS.includes(item.type);
 
   return (
     <Web3Block
@@ -78,7 +78,9 @@ function Component (
         <>
           <div className={'__value-wrapper'}>
             <Number
-              className={'__value'}
+              className={CN('__value', {
+                '-hide': isMultisigAction
+              })}
               decimal={item?.amount?.decimals || 0}
               decimalOpacity={0.45}
               hide={!isShowBalance}
@@ -174,6 +176,10 @@ export const HistoryItem = styled(Component)<Props>(({ theme: { token } }: Props
     },
 
     '.__fee.-hide': {
+      opacity: 0
+    },
+
+    '.__value.-hide': {
       opacity: 0
     },
 

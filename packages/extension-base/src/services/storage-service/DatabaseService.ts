@@ -17,7 +17,7 @@ import { HistoryQuery } from '@subwallet/extension-base/services/storage-service
 import YieldPoolStore from '@subwallet/extension-base/services/storage-service/db-stores/YieldPoolStore';
 import YieldPositionStore from '@subwallet/extension-base/services/storage-service/db-stores/YieldPositionStore';
 import { BalanceItem, ProcessTransactionData, StepStatus, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
+import { GetNotificationParams, MarkAllReadParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { BN_ZERO, reformatAddress } from '@subwallet/extension-base/utils';
 import keyring from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
@@ -730,6 +730,10 @@ export default class DatabaseService {
     return this.stores.inappNotification.cleanUpOldNotifications(overdueTime);
   }
 
+  public cleanUpNotificationByIds (ids: string[]) {
+    return this.stores.inappNotification.cleanUpNotificationsByIds(ids);
+  }
+
   public subscribeUnreadNotificationsCountMap () {
     return this.stores.inappNotification.subscribeUnreadNotificationsCount();
   }
@@ -742,8 +746,8 @@ export default class DatabaseService {
     return this.stores.inappNotification.bulkUpsert(notifications);
   }
 
-  public markAllRead (proxyId: string) {
-    return this.stores.inappNotification.markAllRead(proxyId);
+  public markAllRead (params: MarkAllReadParams) {
+    return this.stores.inappNotification.markAllRead(params);
   }
 
   public switchReadStatus (params: RequestSwitchStatusParams) {

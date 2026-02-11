@@ -41,6 +41,7 @@ export class EventService extends EventEmitter<EventRegistry> {
   public readonly waitLedgerReady: Promise<boolean>;
 
   public readonly waitOpenGovReady: Promise<boolean>;
+  public readonly waitMultisigReady: Promise<boolean>;
 
   constructor () {
     super();
@@ -68,6 +69,7 @@ export class EventService extends EventEmitter<EventRegistry> {
     this.waitLedgerReady = this.generateWaitPromise('ledger.ready');
 
     this.waitOpenGovReady = this.generateWaitPromise('open-gov.ready');
+    this.waitMultisigReady = this.generateWaitPromise('multisig-service.ready');
   }
 
   private generateWaitPromise<T extends EventType> (eventType: T): Promise<boolean> {
