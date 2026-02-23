@@ -199,7 +199,8 @@ const GovUnlockTransactionConfirmation = styled(Wrapper)<BaseTransactionConfirma
 
     '.governance-value-info': {
       '.__value': {
-        display: 'inherit'
+        display: 'inherit',
+        whiteSpace: 'nowrap'
       }
     }
   };

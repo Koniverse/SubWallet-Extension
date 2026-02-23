@@ -107,6 +107,7 @@ export default class InappNotificationStore extends BaseStore<_NotificationInfo>
 
     return this.table.where('proxyId')
       .equalsIgnoreCase(proxyId)
+      .filter((notification) => !excludeNotificationIds.includes(notification.id))
       .modify({ isRead: true });
   }
 

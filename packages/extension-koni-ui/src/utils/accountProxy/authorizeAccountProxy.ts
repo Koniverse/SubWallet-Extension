@@ -18,6 +18,7 @@ export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], co
       return false;
     }
 
+    // HMM
     if (accountType === AccountProxyType.MULTISIG) {
       return false;
     }

@@ -967,7 +967,7 @@ export default class TransactionService {
     }
   }
 
-  private updateTransaction (id: string, data: Partial<Omit<SWTransactionBase, 'id'>>): void {
+  public updateTransaction (id: string, data: Partial<Omit<SWTransactionBase, 'id'>>): void {
     const transaction = this.transactions[id];
 
     if (transaction) {

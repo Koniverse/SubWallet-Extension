@@ -3505,8 +3505,7 @@ export default class KoniExtension {
       .getSubstrateApi(chain)
       .isReady;
 
-    const originTransaction =
-      this.#koniState.transactionService.getTransaction(transactionId);
+    let originTransaction = this.#koniState.transactionService.getTransaction(transactionId);
 
     const extrinsicOriginTransaction =
       originTransaction?.transaction as SubmittableExtrinsic<'promise'>;
@@ -3651,6 +3650,34 @@ export default class KoniExtension {
      * Execute wrapped transaction
      * ─────────────────────────────
      */
+
+    const originTransferData = originTransaction.data as RequestSubmitTransfer;
+    const isTransferAllBalance = originTransaction.extrinsicType === ExtrinsicType.TRANSFER_BALANCE && !!originTransferData?.transferAll;
+    const maxTransferableWithoutFee = originTransferData?.maxTransferableWithoutFee;
+    const maxTransferable = originTransferData?.maxTransferable;
+
+    if (isTransferAllBalance && !!maxTransferableWithoutFee && !!maxTransferable) {
+      if (isSignerProxiedAccount) {
+        this.#koniState.transactionService.updateTransaction(transactionId, {
+          data: {
+            ...originTransferData,
+            value: maxTransferable,
+            transferNativeAmount: maxTransferable
+          }
+        });
+      } else {
+        this.#koniState.transactionService.updateTransaction(transactionId, {
+          data: {
+            ...originTransferData,
+            value: maxTransferableWithoutFee,
+            transferNativeAmount: maxTransferableWithoutFee
+          }
+        });
+      }
+
+      // Refresh originTransaction after update
+      originTransaction = this.#koniState.transactionService.getTransaction(transactionId);
+    }
 
     // Case 1: signer === proxied address → handle original transaction
     if (isSignerProxiedAccount) {

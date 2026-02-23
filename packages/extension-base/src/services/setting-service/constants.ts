@@ -25,12 +25,14 @@ export const DEFAULT_NOTIFICATION_SETUP: NotificationSetup = {
     earningClaim: true,
     earningWithdraw: true,
     availBridgeClaim: true,
-    polygonBridgeClaim: true
+    polygonBridgeClaim: true,
+    multisigTransactionUpdates: true
     // isHideWithdraw: false, // todo: just for test, remove later
     // isHideMarketing: false,
     // isHideAnnouncement: false
   }
 };
+
 export const DEFAULT_ACKNOWLEDGED_MIGRATION_STATUS = false;
 export const DEFAULT_UNIFIED_ACCOUNT_MIGRATION_IN_PROGRESS = false;
 export const DEFAULT_UNIFIED_ACCOUNT_MIGRATION_IN_DONE = false;

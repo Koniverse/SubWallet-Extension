@@ -1529,6 +1529,7 @@
   "ui.SETTINGS.screen.Setting.Notifications.withdrawTokens": "Withdraw tokens",
   "ui.SETTINGS.screen.Setting.Notifications.claimAvailBridge": "Claim AVAIL bridge",
   "ui.SETTINGS.screen.Setting.Notifications.claimPolygonBridge": "Claim POLYGON bridge",
+  "ui.SETTINGS.screen.Setting.Notifications.multisigTransactionUpdates": "",
   "ui.SETTINGS.screen.Setting.Notifications.today": "Today",
   "ui.SETTINGS.screen.Setting.Notifications.thisWeek": "This week",
   "ui.SETTINGS.screen.Setting.Notifications.thisMonth": "This month",
