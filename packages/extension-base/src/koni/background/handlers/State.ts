@@ -33,7 +33,7 @@ import MigrationService from '@subwallet/extension-base/services/migration-servi
 import MintCampaignService from '@subwallet/extension-base/services/mint-campaign-service';
 import MktCampaignService from '@subwallet/extension-base/services/mkt-campaign-service';
 import { MultisigService } from '@subwallet/extension-base/services/multisig-service';
-import {NftService} from '@subwallet/extension-base/services/nft-service';
+import { NftService } from '@subwallet/extension-base/services/nft-service';
 import NotificationService from '@subwallet/extension-base/services/notification-service/NotificationService';
 import OpenGovService from '@subwallet/extension-base/services/open-gov';
 import { PriceService } from '@subwallet/extension-base/services/price-service';
