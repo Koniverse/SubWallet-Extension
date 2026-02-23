@@ -469,6 +469,10 @@ const Component = (): React.ReactElement => {
       )
   ), [isShrink, onOpenNftModal, handleImportNft, loading, onCronReloadNfts, t]);
 
+  const MemoizedNftList = useMemo(() => (
+    <NftCollectionList id={NFT_COLLECTION_MODAL_ID} />
+  ), []);
+
   useEffect(() => {
     if (originScreen === 'nfts') {
       setSelectedFilterTab(AssetsTab.NFTS);
@@ -646,11 +650,7 @@ const Component = (): React.ReactElement => {
           </>
         )}
 
-        {selectedFilterTab === AssetsTab.NFTS && (
-          <NftCollectionList
-            id={NFT_COLLECTION_MODAL_ID}
-          />
-        )}
+        {selectedFilterTab === AssetsTab.NFTS && MemoizedNftList}
 
       </div>
 
