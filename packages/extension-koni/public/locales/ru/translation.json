@@ -2719,7 +2719,7 @@
   "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": "",
   "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": "",
   "ui.HISTORY.screen.HistoryDetail.CallData.transactionDetails": "",
-  "ui.HISTORY.screen.HistoryDetail.CallData.callData": ""
+  "ui.HISTORY.screen.HistoryDetail.CallData.callData": "",
   "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "",
   "ui.NFT.screen.nested.NftBundleItemDetail.level": "",
   "ui.NFT.screen.nested.NftBundleItemDetail.goToParent": "",

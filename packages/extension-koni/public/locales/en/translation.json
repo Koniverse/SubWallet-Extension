@@ -2719,7 +2719,7 @@
   "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": "You’ve a pending multisig transaction with the same information. Complete the transaction first, then try again",
   "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": "You will need to re-import this account to be able to access via this extension after removal",
   "ui.HISTORY.screen.HistoryDetail.CallData.transactionDetails": "Transaction details",
-  "ui.HISTORY.screen.HistoryDetail.CallData.callData": "Call data"
+  "ui.HISTORY.screen.HistoryDetail.CallData.callData": "Call data",
   "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again",
   "ui.NFT.screen.nested.NftBundleItemDetail.level": "Level {{nestingLevel}}",
   "ui.NFT.screen.nested.NftBundleItemDetail.goToParent": "Go to Parent",
