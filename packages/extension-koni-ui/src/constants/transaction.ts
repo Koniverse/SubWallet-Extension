@@ -26,7 +26,6 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.STAKING_CANCEL_COMPOUNDING]: detectTranslate('ui.TRANSACTION.constant.transaction.cancelCompound'),
   [ExtrinsicType.JOIN_YIELD_POOL]: detectTranslate('ui.TRANSACTION.constant.transaction.startEarning'), // TODO: Change this
   [ExtrinsicType.EVM_EXECUTE]: detectTranslate('ui.TRANSACTION.constant.transaction.execute'),
-  [ExtrinsicType.UNKNOWN]: detectTranslate('ui.TRANSACTION.constant.transaction.unknown'),
 
   [ExtrinsicType.MINT_VDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.mintVDot'), // TODO: Change this
   [ExtrinsicType.MINT_VMANTA]: detectTranslate('ui.TRANSACTION.constant.transaction.mintVManta'), // TODO: Change this
@@ -34,7 +33,6 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.MINT_SDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.mintSDot'), // TODO: Change this
   [ExtrinsicType.MINT_QDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.mintQDot'), // TODO: Change this
   [ExtrinsicType.MINT_STDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.mintStDot'), // TODO: Change this
-  [ExtrinsicType.MINT_VMANTA]: detectTranslate('ui.TRANSACTION.constant.transaction.mintVManta'), // TODO: Change this
 
   [ExtrinsicType.REDEEM_VDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.redeemVDot'), // TODO: Change this
   [ExtrinsicType.REDEEM_VMANTA]: detectTranslate('ui.TRANSACTION.constant.transaction.redeemVManta'), // TODO: Change this
@@ -42,7 +40,6 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.REDEEM_SDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.redeemSDot'), // TODO: Change this
   [ExtrinsicType.REDEEM_QDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.redeemQDot'), // TODO: Change this
   [ExtrinsicType.REDEEM_STDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.redeemStDot'), // TODO: Change this
-  [ExtrinsicType.REDEEM_VMANTA]: detectTranslate('ui.TRANSACTION.constant.transaction.redeemVManta'),
 
   [ExtrinsicType.UNSTAKE_VDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.unstakeVDot'),
   [ExtrinsicType.UNSTAKE_VMANTA]: detectTranslate('ui.TRANSACTION.constant.transaction.unstakeVManta'),
@@ -50,7 +47,6 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.UNSTAKE_SDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.unstakeSDot'),
   [ExtrinsicType.UNSTAKE_STDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.unstakeStDot'),
   [ExtrinsicType.UNSTAKE_QDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.unstakeQDot'),
-  [ExtrinsicType.UNSTAKE_VMANTA]: detectTranslate('ui.TRANSACTION.constant.transaction.unstakeVManta'),
 
   [ExtrinsicType.CLAIM_BRIDGE]: detectTranslate('ui.TRANSACTION.constant.transaction.claimTokens'),
 
@@ -61,8 +57,15 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.GOV_UNVOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.unvote'),
   [ExtrinsicType.GOV_UNLOCK_VOTE]: detectTranslate('ui.TRANSACTION.constant.transaction.unlockVotes'),
 
+  [ExtrinsicType.MULTISIG_APPROVE_TX]: detectTranslate('ui.TRANSACTION.constant.transaction.multisigTransaction'),
+  [ExtrinsicType.MULTISIG_CANCEL_TX]: detectTranslate('ui.TRANSACTION.constant.transaction.multisigTransaction'),
+  [ExtrinsicType.MULTISIG_EXECUTE_TX]: detectTranslate('ui.TRANSACTION.constant.transaction.multisigTransaction'),
+  [ExtrinsicType.MULTISIG_INIT_TX]: detectTranslate('ui.TRANSACTION.constant.transaction.multisigTransaction'),
   [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.TRANSACTION.constant.transaction.addProxy'),
-  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.TRANSACTION.constant.transaction.removeProxy')
+  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.TRANSACTION.constant.transaction.removeProxy'),
+  [ExtrinsicType.SUBSTRATE_PROXY_INIT_TX]: detectTranslate('ui.TRANSACTION.constant.transaction.substrateProxyInit'),
+
+  [ExtrinsicType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.history.unknown')
 };
 
 export const ALL_STAKING_ACTIONS: ExtrinsicType[] = [

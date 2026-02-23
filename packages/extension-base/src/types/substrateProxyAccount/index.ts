@@ -3,8 +3,11 @@
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 
+import { AnyJson } from '@polkadot/types/types';
+import { HexString } from '@polkadot/util/types';
+
 export interface ExcludedSubstrateProxyAccounts {
-  address: string
+  substrateProxyAddress: string
   substrateProxyType: SubstrateProxyType
 }
 export interface RequestGetSubstrateProxyAccountGroup {
@@ -28,6 +31,33 @@ export interface SubstrateProxyAccountItem {
 export interface SubstrateProxyAccountGroup {
   substrateProxyAccounts: SubstrateProxyAccountItem[];
   substrateProxyDeposit: string;
+}
+
+interface ProxyRawMetadata {
+  proxiedAddress: string;
+}
+
+export interface HandleSubstrateProxyWrappedTxRequest {
+  transactionId: string; // original tx
+  signer: string;
+  chain: string;
+  proxyMetadata: ProxyRawMetadata;
+  previousWrappedTxId?: string; // previous selected signer tx
+}
+
+export interface DecodeCallDataResponse {
+  /** Method name of the call */
+  method: string,
+  /** Section/pallet name of the call */
+  section: string,
+  /** Decoded arguments of the call */
+  args: AnyJson
+}
+
+export interface HandleSubstrateProxyWrappedTxResponse {
+  submittedCallData: HexString; // callData of the proxy extrinsic
+  networkFee: string;
+  decodedCallData: DecodeCallDataResponse | undefined;
 }
 
 export * from './actions';

@@ -39,7 +39,7 @@ const hideFields: Array<keyof GovReferendumUnvoteParams> = ['chain', 'referendum
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   const { className = '', isAllAccount } = props;
   const { t } = useTranslation();
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setBackProps, setCustomScreenTitle } = useTransactionContext<GovReferendumUnvoteParams>();
+  const { defaultData, persistData, setBackProps, setCustomScreenTitle } = useTransactionContext<GovReferendumUnvoteParams>();
   const [, setGovRefVoteStorage] = useLocalStorage(GOV_REFERENDUM_VOTE_TRANSACTION, DEFAULT_GOV_REFERENDUM_VOTE_PARAMS);
   const formDefault = useMemo((): GovReferendumUnvoteParams => ({ ...defaultData }), [defaultData]);
   const [form] = Form.useForm<GovReferendumUnvoteParams>();
@@ -51,7 +51,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
   const referendumId = defaultData.referendumId;
   const [isBalanceReady, setIsBalanceReady] = useState(true);
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chainValue);
@@ -137,24 +137,11 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       type: fromVoteType
     };
 
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
-      return handleRemoveVote({
-        ...voteRequest,
-        signerSubstrateProxyAddress
-      });
-    };
-
-    selectSubstrateProxyAccountsToSign({
-      chain: chainValue,
-      address: values.from,
-      type: ExtrinsicType.GOV_UNVOTE
-    }).then(sendPromise)
-      .then((tx) => {
-        onSuccess(tx);
-      })
+    handleRemoveVote(voteRequest)
+      .then(onSuccess)
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [chainValue, referendumId, defaultData.track, fromVoteDetail?.balance, fromVoteDetail?.nayBalance, fromVoteDetail?.ayeBalance, fromVoteDetail?.abstainBalance, totalAmount, fromVoteType, selectSubstrateProxyAccountsToSign, onError, onSuccess]);
+  }, [chainValue, referendumId, defaultData.track, fromVoteDetail?.balance, fromVoteDetail?.nayBalance, fromVoteDetail?.ayeBalance, fromVoteDetail?.abstainBalance, totalAmount, fromVoteType, onError, onSuccess]);
 
   const goRefStandardVote = useCallback(() => {
     setGovRefVoteStorage({
