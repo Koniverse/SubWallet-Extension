@@ -337,7 +337,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
             console.error(e);
 
             notify({
-              message: t('ui.BUY.screen.BuyTokens.createBuyOrderFail'),
+              message: t('ui.BUY.screen.BuyTokens.unableToRedirectToSupplier'),
               type: 'error'
             });
           }
