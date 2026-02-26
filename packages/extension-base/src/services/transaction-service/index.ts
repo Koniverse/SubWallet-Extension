@@ -108,6 +108,7 @@ export default class TransactionService {
   }
 
   public async validateTransaction (transactionInput: SWTransactionInput): Promise<SWTransactionResponse> {
+    console.log('transactionInput', transactionInput);
     const validationResponse: SWTransactionResponse = {
       ...transactionInput,
       status: undefined,
@@ -115,6 +116,7 @@ export default class TransactionService {
       warnings: transactionInput.warnings || [],
       processId: transactionInput.step?.processId
     };
+    console.log('validationResponse', validationResponse);
     const { additionalValidator, address, chain, chainType, extrinsicType } = validationResponse;
     const chainInfo = this.state.chainService.getChainInfoByKey(chain);
 

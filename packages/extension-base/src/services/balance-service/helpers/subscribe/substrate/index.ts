@@ -14,7 +14,7 @@ import { FrameSystemAccountInfo, OrmlTokensAccountData, PalletAssetsAssetAccount
 import { _adaptX1Interior } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/contract-handler/wasm';
 import { getDefaultWeightV2 } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
-import { _BALANCE_CHAIN_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
+import { _BALANCE_CHAIN_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX, USE_MULTILOCATION_INDEX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _checkSmartContractSupportByChain, _getAssetExistentialDeposit, _getAssetNetuid, _getChainExistentialDeposit, _getChainNativeTokenSlug, _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getTokenTypesSupportedByChain, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
@@ -432,7 +432,9 @@ const subscribeAssetsAccountPallet = async ({ addresses, assetMap, callback, cha
   });
 
   const unsubList = await Promise.all(Object.values(tokenMap).map((tokenInfo) => {
+    console.log('tokenInfo.slug', tokenInfo.slug);
     if (tokenInfo.slug === 'energy_web_x-LOCAL-stEWT') {
+      console.log('run to this', tokenInfo.slug);
       return timer(0, CRON_REFRESH_PRICE_INTERVAL).subscribe(() => {
         const getEwtFrozenBalance = async () => {
           const ewtTokenBalances = await queryEwtFrozenBalance(substrateApi, addresses, assetMap[tokenInfo.slug], extrinsicType);
@@ -447,16 +449,20 @@ const subscribeAssetsAccountPallet = async ({ addresses, assetMap, callback, cha
     try {
       const assetIndex = _getTokenOnChainAssetId(tokenInfo);
 
-      if (assetIndex === '-1') {
+      if (assetIndex === '-1' && !USE_MULTILOCATION_INDEX.includes(chainInfo.slug)) {
         return undefined;
       }
+
+      const version: number = ['statemint', 'statemine', 'westend_assethub'].includes(chainInfo.slug) ? 4 : 3;
+
+      const index = USE_MULTILOCATION_INDEX.includes(chainInfo.slug) ? _adaptX1Interior(_getXcmAssetMultilocation(tokenInfo), version) : assetIndex;
 
       const params: _SubstrateAdapterSubscriptionArgs[] = [
         {
           section: 'query',
           module: assetsAccountKey.split('_')[1],
           method: assetsAccountKey.split('_')[2],
-          args: addresses.map((address) => [assetIndex, address])
+          args: addresses.map((address) => [index, address])
         }
       ];
 
