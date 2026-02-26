@@ -15,7 +15,7 @@ import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain
 import { _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
-import subwalletApiSdk from '@subwallet/subwallet-api-sdk';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import { TransactionConfig } from 'web3-core';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -172,15 +172,17 @@ export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
     const originDryRunRs = dryRunResult.origin;
 
     if (originDryRunRs.success) {
-      const { assetHub, bridgeHub, destination } = dryRunResult;
+      const { destination, hops } = dryRunResult;
 
-      if (assetHub?.success === false || bridgeHub?.success === false || destination?.success === false) {
-        if (destination?.success === false) {
-          // pass dry-run in these cases
-          return isChainNotSupportDryRun(destination.failureReason) || isChainNotSupportPolkadotApi(destination.failureReason);
+      for (const hop of hops) {
+        if (!hop.result.success) {
+          return false;
         }
+      }
 
-        return false;
+      if (destination?.success === false) {
+        // pass dry-run in these cases
+        return isChainNotSupportDryRun(destination.failureReason) || isChainNotSupportPolkadotApi(destination.failureReason);
       }
 
       return true;

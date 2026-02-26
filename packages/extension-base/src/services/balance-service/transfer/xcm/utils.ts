@@ -27,11 +27,16 @@ export type DryRunNodeSuccess = {
 
 export type DryRunNodeResult = DryRunNodeSuccess | DryRunNodeFailure;
 
+export type THopInfo = {
+  result: DryRunNodeResult & { currency?: string }
+}
+
 export type DryRunResult = {
   origin: DryRunNodeResult
   destination?: DryRunNodeResult
   assetHub?: DryRunNodeResult
   bridgeHub?: DryRunNodeResult
+  hops: THopInfo[]
 }
 
 interface GetXcmFeeRequest {
@@ -68,7 +73,7 @@ interface ParaSpellError {
   statusCode: number
 }
 
-const version = '/v4';
+const version = '/v5';
 
 const paraSpellApi = {
   buildXcm: `${version}/x-transfer`,
