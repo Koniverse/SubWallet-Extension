@@ -55,6 +55,11 @@ export interface InitMultisigTxResponse {
   error?: SelectSignatoryError;
 }
 
+export interface PrepareMultisigSignRequest {
+  id: string;
+  signer: string;
+}
+
 export interface RequestGetSignableAccountInfos {
   multisigProxyId: string;
   chain: string;

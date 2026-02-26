@@ -2298,8 +2298,8 @@
   "ui.ACCOUNT.components.Modal.Receive.Qr.yourAddress": "Your address",
   "ui.ACCOUNT.components.Modal.Receive.SimpleQr.yourAddress": "Your address",
   "ui.ACCOUNT.components.Modal.Global.SelectAddressFormat.selectAddressFormat": "Select address format",
-  "ui.components.Modal.Selector.Account.enterYourAccountNameOrAddress": "Enter your account name or address1",
-  "ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.enterYourAccountNameOrAddress": "Enter your account name or address2",
+  "ui.components.Modal.Selector.Account.enterYourAccountNameOrAddress": "Enter your account name or address",
+  "ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.enterYourAccountNameOrAddress": "Enter your account name or address",
   "ui.TON.components.Modal.TonWalletContractSelector.walletAddressAndVersion": "Wallet address & version",
   "ui.WALLET_CONNECT.components.WalletConnect.AccountSelect.searchAccount": "Search account",
   "ui.SETTINGS.screen.Setting.Security.WebsiteAccessDetail.searchAccount": "Search account",
@@ -2399,7 +2399,7 @@
   "ui.GOVERNANCE.screen.Governance.featurePolkadotSupportedAccounts": "Feature available only on Polkadot-supported accounts",
   "ui.GOVERNANCE.components.Modal.Governance.GovAccountSelector.notVoted": "Not voted",
   "ui.GOVERNANCE.components.Modal.Governance.GovAccountSelector.selectAccount": "Select account",
-  "ui.GOVERNANCE.components.Modal.Governance.GovAccountSelector.enterAccountNameOrAddress": "Enter your account name or address3",
+  "ui.GOVERNANCE.components.Modal.Governance.GovAccountSelector.enterAccountNameOrAddress": "Enter your account name or address",
   "ui.GOVERNANCE.components.Modal.Governance.GovVotedAccountsModal.votedAccounts": "Voted accounts",
   "ui.HISTORY.screen.History.voteTransaction": "Vote transaction",
   "ui.HISTORY.screen.History.unvoteTransaction": "Unvote transaction",
@@ -2720,5 +2720,7 @@
   "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": "You’ve a pending multisig transaction with the same information. Complete the transaction first, then try again",
   "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": "You will need to re-import this account to be able to access via this extension after removal",
   "ui.HISTORY.screen.HistoryDetail.CallData.transactionDetails": "Transaction details",
-  "ui.HISTORY.screen.HistoryDetail.CallData.callData": "Call data"
+  "ui.HISTORY.screen.HistoryDetail.CallData.callData": "Call data",
+  "ui.DAPP.Confirmations.MultisigSignerSelector.unableToPrepareMultisigSigningRequest": "Unable to prepare multisig signing request",
+  "ui.DAPP.Confirmations.MultisigSignerSelector.selectAccountToSign": "Select an account to sign transaction"
 }

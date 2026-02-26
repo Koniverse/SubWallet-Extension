@@ -44,7 +44,6 @@ import { useCallback } from 'react';
  * ### Limitations
  * - Only supports **Substrate-based** accounts
  * - Not used for:
- *   - dApps
  *   - Liquid staking
  *   - Swap
  *

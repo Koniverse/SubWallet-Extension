@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
-import { AccountChainType, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-koni-ui/utils';
 
 interface AuthorizeAccountProxiesConditions {
@@ -13,13 +13,8 @@ interface AuthorizeAccountProxiesConditions {
 export const filterAuthorizeAccountProxies = (accountProxies: AccountProxy[], conditions: AuthorizeAccountProxiesConditions): AccountProxy[] => {
   const { accountAuthTypes, canConnectSubstrateEcdsa } = conditions;
 
-  const rs = accountProxies.filter(({ accountType, accounts, chainTypes, id }) => {
+  const rs = accountProxies.filter(({ accounts, chainTypes, id }) => {
     if (isAccountAll(id)) {
-      return false;
-    }
-
-    // HMM
-    if (accountType === AccountProxyType.MULTISIG) {
       return false;
     }
 

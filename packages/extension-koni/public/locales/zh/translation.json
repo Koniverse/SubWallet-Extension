@@ -2719,5 +2719,7 @@
   "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": "",
   "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": "",
   "ui.HISTORY.screen.HistoryDetail.CallData.transactionDetails": "",
-  "ui.HISTORY.screen.HistoryDetail.CallData.callData": ""
+  "ui.HISTORY.screen.HistoryDetail.CallData.callData": "",
+  "ui.DAPP.Confirmations.MultisigSignerSelector.unableToPrepareMultisigSigningRequest": "",
+  "ui.DAPP.Confirmations.MultisigSignerSelector.selectAccountToSign": ""
 }

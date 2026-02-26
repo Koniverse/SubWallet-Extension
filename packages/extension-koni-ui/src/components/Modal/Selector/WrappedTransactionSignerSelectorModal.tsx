@@ -104,8 +104,9 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   const onConfirmSelectSigner = useCallback(() => {
     if (selected) {
       onSelectSigner(selected);
+      inactiveModal(modalId);
     }
-  }, [onSelectSigner, selected]);
+  }, [inactiveModal, onSelectSigner, selected]);
 
   useEffect(() => {
     if (fullList.length === 1 && !selectedSigner) {
