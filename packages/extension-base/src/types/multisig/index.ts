@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { MultisigTxType } from '@subwallet/extension-base/services/multisig-service';
 import { DecodeCallDataResponse } from '@subwallet/extension-base/services/multisig-service/utils';
@@ -58,6 +59,14 @@ export interface InitMultisigTxResponse {
 export interface PrepareMultisigSignRequest {
   id: string;
   signer: string;
+}
+
+export interface PrepareMultisigSignResponse {
+  submittedCallData: HexString;
+  callData: HexString;
+  depositAmount: string;
+  networkFee: string;
+  errors: TransactionError[],
 }
 
 export interface RequestGetSignableAccountInfos {

@@ -26,7 +26,7 @@ export const DEFAULT_NOTIFICATION_SETUP: NotificationSetup = {
     earningWithdraw: true,
     availBridgeClaim: true,
     polygonBridgeClaim: true,
-    multisigTransactionUpdates: true
+    pendingMultisigApprovals: true
     // isHideWithdraw: false, // todo: just for test, remove later
     // isHideMarketing: false,
     // isHideAnnouncement: false

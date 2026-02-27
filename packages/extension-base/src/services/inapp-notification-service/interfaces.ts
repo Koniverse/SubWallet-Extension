@@ -140,7 +140,7 @@ export interface ShowNotificationPayload {
   earningWithdraw: boolean, // notice when an account has an earning unstake to withdraw
   availBridgeClaim: boolean, // notice when an account has an avail bridge to claim
   polygonBridgeClaim: boolean, // notice when an account has an polygon bridge to claim
-  multisigTransactionUpdates: boolean // notice when an account has multisig transaction updates
+  pendingMultisigApprovals: boolean // notice when an account has multisig transaction updates
   // marketing: boolean, // notice when wallet has a marketing announcement
   // marketing: boolean, // notice when wallet has a marketing announcement
   // announcement: boolean // notice when wallet has an announcement

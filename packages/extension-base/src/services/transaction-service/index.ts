@@ -1456,6 +1456,18 @@ export default class TransactionService {
         break;
     }
 
+    const txData = transaction.data as { signer?: string } | undefined;
+    const signer = txData?.signer;
+
+    if (signer) {
+      const currentAdditionalInfo: Record<string, unknown> = historyItem.additionalInfo ? historyItem.additionalInfo as Record<string, unknown> : {};
+
+      historyItem.additionalInfo = {
+        ...currentAdditionalInfo,
+        signer
+      };
+    }
+
     try {
       // Return one more history record if transaction send to account in the wallets
       const toAccount = historyItem?.to && keyring.getPair(historyItem.to);

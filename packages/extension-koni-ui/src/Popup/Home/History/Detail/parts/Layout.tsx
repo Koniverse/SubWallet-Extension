@@ -4,7 +4,7 @@
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { HistoryStatusMap, TxTypeNameMap } from '@subwallet/extension-koni-ui/constants';
-import { useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useGetAccountByAddress, useGetChainPrefixBySlug, useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { CallDataLayout } from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/CallDataLayout';
 import SwapLayout from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/SwapLayout';
 import { ThemeProps, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
@@ -31,9 +31,21 @@ const Component: React.FC<Props> = (props: Props) => {
   const { className, data } = props;
 
   const { t } = useTranslation();
-
+  const networkPrefix = useGetChainPrefixBySlug(data.chain);
   const { language } = useSelector((state) => state.settings);
   const notify = useNotification();
+
+  const signerAddress = useMemo(() => {
+    if (data.type === ExtrinsicType.SUBSTRATE_PROXY_INIT_TX) {
+      return undefined;
+    }
+
+    const additionalInfo = data.additionalInfo as { signer?: string } | undefined;
+
+    return additionalInfo?.signer;
+  }, [data.additionalInfo, data.type]);
+
+  const signerAccount = useGetAccountByAddress(signerAddress);
 
   const extrinsicHash = useMemo(() => {
     const hash = data.extrinsicHash || '';
@@ -69,22 +81,35 @@ const Component: React.FC<Props> = (props: Props) => {
         statusName={t(HistoryStatusMap[data.status].name)}
         valueColorSchema={HistoryStatusMap[data.status].schema}
       />
+      {!!signerAddress && (
+        <MetaInfo.Account
+          address={signerAddress}
+          chainSlug={data.chain}
+          label={t('ui.HISTORY.screen.HistoryDetail.Layout.signWith')}
+          name={signerAccount?.name}
+          networkPrefix={networkPrefix}
+        />
+      )}
       <MetaInfo.Default
         className={'extrinsic-hash-wrapper'}
         label={t('ui.HISTORY.screen.HistoryDetail.Layout.extrinsicHash')}
       >
         {extrinsicHash}
-        {extrinsicHash !== '...' && <Button
-          className={'extrinsic-hash-copy-button'}
-          icon={<Icon
-            className={'extrinsic-hash-copy-icon'}
-            customSize={'18px'}
-            phosphorIcon={Copy}
-          />}
-          onClick={onCopyAddress}
-          size={'sm'}
-          type={'ghost'}
-        />}
+        {extrinsicHash !== '...' && (
+          <Button
+            className={'extrinsic-hash-copy-button'}
+            icon={(
+              <Icon
+                className={'extrinsic-hash-copy-icon'}
+                customSize={'18px'}
+                phosphorIcon={Copy}
+              />
+            )}
+            onClick={onCopyAddress}
+            size={'sm'}
+            type={'ghost'}
+          />
+        )}
       </MetaInfo.Default>
       <CallDataLayout data={data} />
       {!!data.time && (<MetaInfo.Default label={t('ui.HISTORY.screen.HistoryDetail.Layout.submittedTime')}>{formatHistoryDate(data.time, language, 'detail')}</MetaInfo.Default>)}
@@ -102,19 +127,41 @@ const Component: React.FC<Props> = (props: Props) => {
 
 const HistoryDetailLayout = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-    '.extrinsic-hash-copy-button': {
+    '.sign-with-copy-button, .extrinsic-hash-copy-button': {
       height: '18px !important',
       width: '18px !important',
       minWidth: 'unset !important',
       color: token.colorTextLight4,
       transform: 'all 0.3s ease-in-out',
-      '.call-data-info-icon, .extrinsic-hash-copy-icon': {
+      '.call-data-info-icon, .extrinsic-hash-copy-icon, .sign-with-copy-icon': {
         height: '18px !important'
       },
 
       '&:hover': {
         color: token.colorTextLight2
       }
+    },
+
+    '.sign-with-wrapper': {
+      '.__value': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4
+      }
+    },
+
+    '.sign-with-account': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.sizeXS,
+      minWidth: 0,
+      flex: 1
+    },
+
+    '.sign-with-account-name': {
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap'
     },
 
     '.extrinsic-hash-wrapper': {
