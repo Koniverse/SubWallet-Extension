@@ -92,7 +92,7 @@ function Component ({ className, request }: Props) {
           {t('ui.DAPP.Confirmations.Message.Sign.signatureRequest')}
         </div>
         <div className='description'>
-          {isMultisigSignRequest ? t('ui.DAPP.Confirmations.Message.Sign.approvingRequestWithAccount') : t('ui.DAPP.Confirmations.Message.Sign.selectSignatory')}
+          {!isMultisigSignRequest ? t('ui.DAPP.Confirmations.Message.Sign.approvingRequestWithAccount') : t('ui.DAPP.Confirmations.Message.Sign.selectSignatory')}
         </div>
         {isMultisigSignRequest
           ? (

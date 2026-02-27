@@ -3570,18 +3570,18 @@ export default class KoniExtension {
 
           if (new BigN(signerBalance.value).lt(requiredBalance)) {
             errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee')));
-          } else {
-            const nonce = await substrateApi.api.rpc.system.accountNextIndex(signer);
-
-            const wrappedPayload: SignerPayloadJSON = {
-              ...payload,
-              address: signer,
-              nonce: nonce.toHex(),
-              method: multisigExtrinsic.method.toHex()
-            };
-
-            this.#koniState.requestService.updateSignRequest(id, new RequestExtrinsicSign(wrappedPayload), signer);
           }
+
+          const nonce = await substrateApi.api.rpc.system.accountNextIndex(signer);
+
+          const wrappedPayload: SignerPayloadJSON = {
+            ...payload,
+            address: signer,
+            nonce: nonce.toHex(),
+            method: multisigExtrinsic.method.toHex()
+          };
+
+          this.#koniState.requestService.updateSignRequest(id, new RequestExtrinsicSign(wrappedPayload), signer);
         }
       }
     }

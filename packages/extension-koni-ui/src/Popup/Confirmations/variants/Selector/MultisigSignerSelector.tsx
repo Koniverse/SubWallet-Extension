@@ -346,7 +346,7 @@ export default styled(React.memo(MultisigSignerSelector))<MultisigSignerSelector
       gap: token.sizeXS
     },
 
-    '.loading-icon': {
+    '.multisig-signer-selector__icon.-loading': {
       animation: 'spinner-loading 1s infinite linear'
     },
 
