@@ -36,7 +36,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const poolInfo = poolInfoMap[slug];
 
   const poolName = useMemo(() => {
-    return (multiChainAssetMap[group] || assetRegistry[group]).symbol;
+    return (multiChainAssetMap[group] || assetRegistry[group])?.symbol || '';
   }, [assetRegistry, group, multiChainAssetMap]);
 
   const balanceValue = useMemo(() => {
@@ -44,8 +44,8 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [totalStake]);
 
   const convertedBalanceValue = useMemo(() => {
-    return new BigN(balanceValue).div(BN_TEN.pow(asset.decimals || 0)).multipliedBy(price);
-  }, [asset.decimals, balanceValue, price]);
+    return new BigN(balanceValue).div(BN_TEN.pow(asset?.decimals || 0)).multipliedBy(price);
+  }, [asset?.decimals, balanceValue, price]);
 
   const _isRelatedToAstar = isRelatedToAstar(slug);
 
@@ -98,9 +98,9 @@ const Component: React.FC<Props> = (props: Props) => {
               !_isRelatedToAstar && (
                 <div className='__item-balance-value'>
                   <Number
-                    decimal={asset.decimals || 0}
+                    decimal={asset?.decimals || 0}
                     hide={!isShowBalance}
-                    suffix={asset.symbol}
+                    suffix={asset?.symbol || ''}
                     value={balanceValue}
                   />
                 </div>

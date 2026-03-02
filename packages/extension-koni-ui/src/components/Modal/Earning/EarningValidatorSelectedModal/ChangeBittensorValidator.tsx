@@ -10,7 +10,6 @@ import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useChainChecker, useCreateGetSubnetStakingTokenName, useGetChainAssetInfo, useHandleSubmitTransaction, useNotification, usePreCheckAction, useSelector, useSelectValidators, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
-import { useTaoStakingFee } from '@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee';
 import { changeEarningValidator } from '@subwallet/extension-koni-ui/messaging';
 import { ChangeValidatorParams, FormCallbacks, ThemeProps, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { findAccountByAddress, formatBalance, noop, parseNominations, reformatAddress } from '@subwallet/extension-koni-ui/utils';
@@ -25,6 +24,7 @@ import { AccountItemWithName } from '../../../Account';
 import AmountInput from '../../../Field/AmountInput';
 import EarningValidatorSelector from '../../../Field/Earning/EarningValidatorSelector';
 import NominationSelector from '../../../Field/NominationSelector';
+import useTaoStakingFee from "@subwallet/extension-koni-ui/hooks/earning/useTaoStakingFee";
 
 interface Props extends ThemeProps, BasicInputWrapper {
   modalId: string;
