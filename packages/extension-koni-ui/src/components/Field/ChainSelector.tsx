@@ -81,7 +81,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
               name={item.name}
               networkKey={item.slug}
               networkMainLogoShape='squircle'
-              networkMainLogoSize={isAllNetwork ? 0 : 28}
+              networkMainLogoSize={28}
               rightItem={selected && (<div className={'__check-icon'}>
                 <Icon
                   customSize={'20px'}
@@ -106,7 +106,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         name={item.name}
         networkKey={item.slug}
         networkMainLogoShape='squircle'
-        networkMainLogoSize={isAllNetwork ? 0 : 28}
+        networkMainLogoSize={28}
         rightItem={selected && (<div className={'__check-icon'}>
           <Icon
             customSize={'20px'}
@@ -132,7 +132,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       loading={loading}
       onSelect={onSelect}
       placeholder={placeholder || t('ui.components.Field.ChainSelector.selectChain')}
-      prefix={!!chainLogo && chainLogo}
+      prefix={value !== '' && chainLogo}
       renderItem={renderItem}
       renderSelected={renderChainSelected}
       renderWhenEmpty={renderEmpty}

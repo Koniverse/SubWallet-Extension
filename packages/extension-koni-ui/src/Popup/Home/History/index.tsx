@@ -269,6 +269,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const multisigList = useMemo(() => {
     let filteredList: PendingMultisigTx[] = Object.values(pendingMultisigTxs);
 
+    const currentProxyAddresses = (!isAllAccount && currentAccountProxy)
+      ? (accountProxies.find((item) => item.id === currentAccountProxy.id)?.accounts || []).map((acc) => acc.address)
+      : undefined;
+
     if (multisigSelectedChain !== ALL_NETWORK_KEY) {
       filteredList = filteredList.filter((tx) => tx.chain === multisigSelectedChain);
     }
@@ -280,6 +284,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
         return isTargetMultisig || isSigner;
       });
+    } else if (currentProxyAddresses && currentProxyAddresses.length) {
+      filteredList = filteredList.filter((tx) =>
+        currentProxyAddresses.some((addr) =>
+          isSameAddress(tx.multisigAddress, addr) || isSameAddress(tx.currentSigner, addr)
+        )
+      );
     }
 
     return filteredList.sort((a, b) => {
@@ -296,7 +306,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
       return timeB - timeA;
     });
-  }, [multisigSelectedAddress, multisigSelectedChain, pendingMultisigTxs]);
+  }, [accountProxies, currentAccountProxy, isAllAccount, multisigSelectedAddress, multisigSelectedChain, pendingMultisigTxs]);
 
   const notiMultisigPendingTxItem = useMemo(() => {
     const parts = notiMultisigPendingTxId.split('___');
