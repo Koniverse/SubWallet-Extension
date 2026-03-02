@@ -156,7 +156,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={preventModal ? goHome : onBack}
         rightFooterButton={{
-          children: t('I have kept it somewhere safe'),
+          children: t('ui.ACCOUNT.screen.Account.NewSeedPhrase.keptItSomewhereSafe'),
           icon: FooterIcon,
           onClick: onConfirmSeedPhrase,
           disabled: !seedPhrase
@@ -170,11 +170,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             }
           ]}
         subHeaderLeft={preventModal ? <CloseIcon /> : undefined }
-        title={t('Your seed phrase')}
+        title={t('ui.ACCOUNT.screen.Account.NewSeedPhrase.yourSeedPhrase')}
       >
         <div className={'container'}>
           <div className='description'>
-            {t('Keep your seed phrase in a safe place and never disclose it. Anyone with this phrase can take control of your assets.')}
+            {t('ui.ACCOUNT.screen.Account.NewSeedPhrase.seedPhraseSecurityWarning')}
           </div>
           <WordPhrase
             enableDownload={true}

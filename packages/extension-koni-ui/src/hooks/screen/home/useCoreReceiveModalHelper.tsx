@@ -7,10 +7,11 @@ import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/c
 import { AccountActions, AccountChainType, AccountJson, AccountProxy, AccountProxyType } from '@subwallet/extension-base/types';
 import { RECEIVE_MODAL_ACCOUNT_SELECTOR, RECEIVE_MODAL_TOKEN_SELECTOR } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useCoreCreateReformatAddress, useGetBitcoinAccounts, useGetChainSlugsByCurrentAccountProxy, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreCreateReformatAddress, useGetBitcoinAccounts, useGetChainAndExcludedTokenByCurrentAccountProxy, useHandleLedgerAccountWarning, useHandleLedgerGenericAccountWarning, useHandleTonAccountWarning, useIsPolkadotUnifiedChain } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, AccountTokenAddress, ReceiveModalProps } from '@subwallet/extension-koni-ui/types';
+import { runPriorityWarningModalHandlers } from '@subwallet/extension-koni-ui/utils';
 import { BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { ModalContext } from '@subwallet/react-ui';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -41,7 +42,8 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
   const [selectedTokenInfo, setSelectedTokenInfo] = useState<SelectedTokenInfo | undefined>();
   const [selectedAccountAddressItem, setSelectedAccountAddressItem] = useState<AccountAddressItemType | undefined>();
   const { accountTokenAddressModal, addressQrModal, selectAddressFormatModal } = useContext(WalletModalContext);
-  const chainSupported = useGetChainSlugsByCurrentAccountProxy();
+  const { allowedChains: chainSupported } = useGetChainAndExcludedTokenByCurrentAccountProxy();
+  const onHandleLedgerAccountWarning = useHandleLedgerAccountWarning();
   const onHandleTonAccountWarning = useHandleTonAccountWarning();
   const onHandleLedgerGenericAccountWarning = useHandleLedgerGenericAccountWarning();
   const getReformatAddress = useCoreCreateReformatAddress();
@@ -60,7 +62,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     return undefined;
   }, [assetRegistryMap, tokenGroupSlug]);
 
-  const openAddressQrModal = useCallback((address: string, accountType: KeypairType, accountProxyId: string, chainSlug: string, closeCallback?: VoidCallback, showQrBack = true) => {
+  const openAddressQrModal = useCallback((address: string, accountType: KeypairType, accountProxyId: string, chainSlug: string, tokenSlug: string, closeCallback?: VoidCallback, showQrBack = true) => {
     const processFunction = () => {
       addressQrModal.open({
         address,
@@ -73,13 +75,14 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
       });
     };
 
-    onHandleTonAccountWarning(accountType, () => {
-      onHandleLedgerGenericAccountWarning({
-        accountProxy: accountProxies.find((ap) => ap.id === accountProxyId),
-        chainSlug
-      }, processFunction);
-    });
-  }, [accountProxies, addressQrModal, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning]);
+    const accountProxy = accountProxies.find((ap) => ap.id === accountProxyId);
+
+    runPriorityWarningModalHandlers([
+      [onHandleTonAccountWarning, accountType],
+      [onHandleLedgerGenericAccountWarning, { accountProxy, chainSlug }],
+      [onHandleLedgerAccountWarning, { accountProxy, targetSlug: tokenSlug, context: 'useToken' }]
+    ], processFunction);
+  }, [accountProxies, addressQrModal, onHandleLedgerAccountWarning, onHandleLedgerGenericAccountWarning, onHandleTonAccountWarning]);
 
   const openAddressFormatModal = useCallback((name: string, address: string, chainSlug: string, closeCallback?: VoidCallback) => {
     const processFunction = () => {
@@ -169,7 +172,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
           setSelectedAccountAddressItem(undefined);
         });
       } else if (accountTokenAddressList.length === 1) {
-        openAddressQrModal(accountTokenAddressList[0].accountInfo.address, accountTokenAddressList[0].accountInfo.type, currentAccountProxy.id, chainSlug, () => {
+        openAddressQrModal(accountTokenAddressList[0].accountInfo.address, accountTokenAddressList[0].accountInfo.type, currentAccountProxy.id, chainSlug, item.slug, () => {
           inactiveModal(tokenSelectorModalId);
           setSelectedAccountAddressItem(undefined);
         });
@@ -200,7 +203,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
             setSelectedAccountAddressItem(undefined);
           });
         } else {
-          openAddressQrModal(reformatedAddress, accountJson.type, currentAccountProxy.id, chainSlug, () => {
+          openAddressQrModal(reformatedAddress, accountJson.type, currentAccountProxy.id, chainSlug, item.slug, () => {
             inactiveModal(tokenSelectorModalId);
             setSelectedAccountAddressItem(undefined);
           });
@@ -241,7 +244,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     };
 
     const getPreferredBitcoinAccount = (accounts: AccountJson[]) => {
-      const bitcoinAccounts = accounts.filter((a) => a.chainType === AccountChainType.BITCOIN && _isChainInfoCompatibleWithAccountInfo(chainInfo, a.chainType, a.type));
+      const bitcoinAccounts = accounts.filter((a) => a.chainType === AccountChainType.BITCOIN && _isChainInfoCompatibleWithAccountInfo(chainInfo, a));
 
       return bitcoinAccounts.find((a) => a.type === 'bitcoin-84' || a.type === 'bittest-84') || bitcoinAccounts[0];
     };
@@ -314,7 +317,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
       if (accountTokenAddressList.length > 1) {
         openAccountTokenAddressModal(accountTokenAddressList, onCloseAccountSelector);
       } else {
-        openAddressQrModal(item.address, item.accountType, item.accountProxyId, targetChain, onCloseAccountSelector);
+        openAddressQrModal(item.address, item.accountType, item.accountProxyId, targetChain, targetTokenInfo.tokenSlug, onCloseAccountSelector);
       }
 
       return;
@@ -326,7 +329,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
     if (isPolkadotUnifiedChain) {
       openAddressFormatModal(chainInfo.name, item.address, targetChain, onCloseAccountSelector);
     } else {
-      openAddressQrModal(item.address, item.accountType, item.accountProxyId, targetChain, onCloseAccountSelector);
+      openAddressQrModal(item.address, item.accountType, item.accountProxyId, targetChain, targetTokenInfo.tokenSlug, onCloseAccountSelector);
     }
   }, [accountProxies, chainInfoMap, checkIsPolkadotUnifiedChain, getBitcoinAccounts, onCloseAccountSelector, openAccountTokenAddressModal, openAddressFormatModal, openAddressQrModal, selectedTokenInfo, specificSelectedTokenInfo]);
 
@@ -337,14 +340,34 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
       return;
     }
 
-    const handleShowQrModal = (chain: string) => {
-      const chainInfo = chainInfoMap[chain];
+    const handleShowQrModal = (chainSlug: string, tokenSlug: string) => {
+      const chainInfo = chainInfoMap[chainSlug];
 
       if (!chainInfo) {
         return;
       }
 
-      const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(chain);
+      const isBitcoinChain = _isChainBitcoinCompatible(chainInfo);
+
+      if (isBitcoinChain) {
+        const accountTokenAddressList = getBitcoinAccounts(chainSlug, tokenSlug, chainInfo, currentAccountProxy.accounts);
+
+        if (accountTokenAddressList.length > 1) {
+          openAccountTokenAddressModal(accountTokenAddressList, () => {
+            inactiveModal(tokenSelectorModalId);
+            setSelectedAccountAddressItem(undefined);
+          });
+        } else if (accountTokenAddressList.length === 1) {
+          openAddressQrModal(accountTokenAddressList[0].accountInfo.address, accountTokenAddressList[0].accountInfo.type, currentAccountProxy.id, chainSlug, tokenSlug, () => {
+            inactiveModal(tokenSelectorModalId);
+            setSelectedAccountAddressItem(undefined);
+          });
+        }
+
+        return;
+      }
+
+      const isPolkadotUnifiedChain = checkIsPolkadotUnifiedChain(chainSlug);
 
       for (const accountJson of currentAccountProxy.accounts) {
         const reformatedAddress = getReformatAddress(accountJson, chainInfo);
@@ -361,11 +384,11 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
           setSelectedAccountAddressItem(accountAddressItem);
 
           if (isPolkadotUnifiedChain) {
-            openAddressFormatModal(chainInfo.name, reformatedAddress, chain, () => {
+            openAddressFormatModal(chainInfo.name, reformatedAddress, chainSlug, () => {
               setSelectedAccountAddressItem(undefined);
             });
           } else {
-            openAddressQrModal(reformatedAddress, accountJson.type, currentAccountProxy.id, chain, () => {
+            openAddressQrModal(reformatedAddress, accountJson.type, currentAccountProxy.id, chainSlug, tokenSlug, () => {
               setSelectedAccountAddressItem(undefined);
             }, false);
           }
@@ -391,7 +414,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
 
       // current account is not All, just do show QR logic
 
-      handleShowQrModal(specificSelectedTokenInfo.chainSlug);
+      handleShowQrModal(specificSelectedTokenInfo.chainSlug, specificSelectedTokenInfo.tokenSlug);
 
       return;
     }
@@ -407,13 +430,13 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
         return;
       }
 
-      handleShowQrModal(tokenSelectorItems[0].originChain);
+      handleShowQrModal(tokenSelectorItems[0].originChain, tokenSelectorItems[0].slug);
 
       return;
     }
 
     activeModal(tokenSelectorModalId);
-  }, [activeModal, chainInfoMap, chainSupported, checkIsPolkadotUnifiedChain, currentAccountProxy, getReformatAddress, isAllAccount, openAddressFormatModal, openAddressQrModal, specificSelectedTokenInfo, tokenGroupSlug, tokenSelectorItems]);
+  }, [activeModal, chainInfoMap, chainSupported, checkIsPolkadotUnifiedChain, currentAccountProxy, getBitcoinAccounts, getReformatAddress, inactiveModal, isAllAccount, openAccountTokenAddressModal, openAddressFormatModal, openAddressQrModal, specificSelectedTokenInfo, tokenGroupSlug, tokenSelectorItems]);
 
   useEffect(() => {
     if (addressQrModal.checkActive() && selectedAccountAddressItem) {

@@ -73,6 +73,7 @@ export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransact
   isTransferLocalTokenAndPayThatTokenAsFee?: boolean;
   resolveOnDone?: boolean;
   skipFeeValidation?: boolean;
+  skipFeeRecalculation?: boolean;
 }
 
 export interface SWPermitTransactionInput extends Omit<SWTransactionInput, 'transaction'> {

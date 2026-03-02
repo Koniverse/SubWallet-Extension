@@ -79,7 +79,7 @@ export default class EvmRequestHandler {
     const duplicated = Object.values(confirmationType).find((c) => (c.url === url) && (c.payloadJson === payloadJson));
 
     if (duplicated) {
-      throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, t('Duplicate request'));
+      throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, t('bg.DAPP.services.service.request.EvmHandler.duplicateRequest'));
     }
 
     confirmationType[id] = {
@@ -130,7 +130,7 @@ export default class EvmRequestHandler {
     const exists = confirmationType[id];
 
     if (!exists) {
-      throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, t('Request does not exist'));
+      throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, t('bg.DAPP.services.service.request.EvmHandler.requestDoesNotExist'));
     }
 
     const payloadJson = JSON.stringify(payload);
@@ -166,7 +166,7 @@ export default class EvmRequestHandler {
       case 'eth_signTypedData_v4':
         return await pair.evm.signMessage(payload, type);
       default:
-        throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, t('Unsupported action'));
+        throw new EvmProviderError(EvmProviderErrorType.INVALID_PARAMS, t('bg.DAPP.services.service.request.EvmHandler.unsupportedAction'));
     }
   }
 
@@ -269,8 +269,8 @@ export default class EvmRequestHandler {
       const confirmation = confirmations[type][id];
 
       if (!resolver || !confirmation) {
-        this.#logger.error(t('Unable to proceed. Please try again'), type, id);
-        throw new Error(t('Unable to proceed. Please try again'));
+        this.#logger.error(t('bg.DAPP.services.service.request.EvmHandler.unableToProceed'), type, id);
+        throw new Error(t('bg.DAPP.services.service.request.EvmHandler.unableToProceed'));
       }
 
       // Fill signature for some special type

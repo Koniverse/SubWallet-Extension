@@ -8,31 +8,31 @@ import { t } from 'i18next';
 
 const defaultErrorMap: Record<BitcoinProviderErrorType, { message: string, code?: number }> = {
   USER_REJECTED_REQUEST: {
-    message: detectTranslate('User Rejected Request'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.userRejectedRequest'),
     code: 4001
   },
   UNAUTHORIZED: {
-    message: detectTranslate('Failed to sign'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.failedToSign'),
     code: 4100
   },
   UNSUPPORTED_METHOD: {
-    message: detectTranslate('Unsupported Method'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.unsupportedMethod'),
     code: 4200
   },
   DISCONNECTED: {
-    message: detectTranslate('Network is disconnected'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.networkIsDisconnected'),
     code: 4900
   },
   CHAIN_DISCONNECTED: {
-    message: detectTranslate('Network is disconnected'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.networkIsDisconnected'),
     code: 4901
   },
   INVALID_PARAMS: {
-    message: detectTranslate('Undefined error. Please contact SubWallet support'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.undefinedErrorContactSupport'),
     code: -32602
   },
   INTERNAL_ERROR: {
-    message: detectTranslate('Undefined error. Please contact SubWallet support'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.undefinedErrorContactSupport'),
     code: -32603
   }
 };
@@ -40,11 +40,11 @@ const defaultErrorMap: Record<BitcoinProviderErrorType, { message: string, code?
 export class BitcoinProviderError extends SWError {
   override errorType: BitcoinProviderErrorType;
 
-  constructor (errorType: BitcoinProviderErrorType, errMessage?: string, data?: unknown) {
+  constructor (errorType: BitcoinProviderErrorType, errMessage?: string, data?: unknown, name?: string) {
     const { code, message } = defaultErrorMap[errorType];
     const finalMessage = errMessage || t(message || '') || errorType;
 
-    super(errorType, finalMessage, code, data);
+    super(errorType, finalMessage, code, data, name);
     this.errorType = errorType;
   }
 }

@@ -67,7 +67,7 @@ export class BitcoinApi implements _BitcoinApi {
     }
   }
 
-  get isReady (): Promise<_BitcoinApi> {
+  get isReady (): Promise<_BitcoinApi> { // todo: recheck if bitcoinApi need this
     return this.isReadyHandler.promise;
   }
 

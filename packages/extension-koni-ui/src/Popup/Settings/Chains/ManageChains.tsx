@@ -42,11 +42,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
   const FILTER_OPTIONS = useMemo((): OptionType[] => ([
-    { label: t('EVM networks'), value: FilterValue.EVM },
-    { label: t('Substrate networks'), value: FilterValue.SUBSTRATE },
-    { label: t('Custom networks'), value: FilterValue.CUSTOM },
-    { label: t('Enabled networks'), value: FilterValue.ENABLED },
-    { label: t('Disabled networks'), value: FilterValue.DISABLED }
+    { label: t('ui.SETTINGS.screen.Setting.Chains.Manage.evmNetworks'), value: FilterValue.EVM },
+    { label: t('ui.SETTINGS.screen.Setting.Chains.Manage.substrateNetworks'), value: FilterValue.SUBSTRATE },
+    { label: t('ui.SETTINGS.screen.Setting.Chains.Manage.customNetworks'), value: FilterValue.CUSTOM },
+    { label: t('ui.SETTINGS.screen.Setting.Chains.Manage.enabledNetworks'), value: FilterValue.ENABLED },
+    { label: t('ui.SETTINGS.screen.Setting.Chains.Manage.disabledNetworks'), value: FilterValue.DISABLED }
   ]), [t]);
 
   const filterFunction = useMemo<(item: ChainInfoWithState) => boolean>(() => {
@@ -147,7 +147,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Manage networks')}
+        title={t<string>('ui.SETTINGS.screen.Setting.Chains.Manage.manageNetworks')}
       >
         <SwList.Section
           actionBtnIcon={(
@@ -168,7 +168,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchToken}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search network')}
+          searchPlaceholder={t<string>('ui.SETTINGS.screen.Setting.Chains.Manage.searchNetwork')}
           showActionBtn
         />
 

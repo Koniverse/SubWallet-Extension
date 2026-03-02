@@ -15,11 +15,11 @@ const Component: React.FC<ThemeProps> = () => {
 
   return (
     <ConnectQrSigner
-      deviceName={t('Keystone')}
+      deviceName={t('ui.ACCOUNT.screen.Account.ConnectQrSigner.Keystone.keystone')}
       instructionUrl={'https://docs.subwallet.app/main/extension-user-guide/account-management/connect-keystone-device'}
       logoUrl={DefaultLogosMap.keystone}
-      subTitle={t('Open "Software Wallet" section on your Keystone and choose SubWallet')}
-      title={t('Connect Keystone device')}
+      subTitle={t('ui.ACCOUNT.screen.Account.ConnectQrSigner.Keystone.keystoneSoftwareWalletInstruction')}
+      title={t('ui.ACCOUNT.screen.Account.ConnectQrSigner.Keystone.connectKeystoneDevice')}
     />
   );
 };

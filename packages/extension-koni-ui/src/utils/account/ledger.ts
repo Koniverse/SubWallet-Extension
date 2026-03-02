@@ -5,7 +5,10 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { LedgerNetwork } from '@subwallet/extension-base/background/KoniTypes';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
+import { AccountChainType, AccountProxy, AccountSignMode } from '@subwallet/extension-base/types';
+import { isAccountAll } from '@subwallet/extension-base/utils';
 import { PredefinedLedgerNetwork, RECOVERY_SLUG } from '@subwallet/extension-koni-ui/constants/ledger';
+import { getSignModeByAccountProxy } from '@subwallet/extension-koni-ui/utils';
 
 interface ChainItem extends _ChainState {
   isEthereum: boolean;
@@ -27,3 +30,35 @@ export const getSupportedLedger = (networkInfoMap: Record<string, _ChainInfo>, n
 };
 
 export const convertNetworkSlug = (network: LedgerNetwork) => network.slug.concat(network.isRecovery ? RECOVERY_SLUG : '');
+
+export const isSubstrateEcdsaAccountProxy = (accountProxy: AccountProxy) => {
+  return getSignModeByAccountProxy(accountProxy) === AccountSignMode.ECDSA_SUBSTRATE_LEDGER;
+};
+
+// This function checks if the account proxies only contain Ledger Substrate ECDSA or Ledger EVM accounts
+export const checkIfAllAccountsAreSpecificLedgerTypes = (accountProxies: AccountProxy[]) => {
+  const noAllAccountProxy = accountProxies.filter((accountProxy) => !isAccountAll(accountProxy.id));
+
+  let hasOnlyLedgerSubstrateEcdsa = true;
+  let hasOnlyLedgerEvm = true;
+
+  for (const accountProxy of noAllAccountProxy) {
+    if (accountProxy.chainTypes.includes(AccountChainType.ETHEREUM)) {
+      const signMode = getSignModeByAccountProxy(accountProxy);
+
+      if (signMode !== AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
+        hasOnlyLedgerSubstrateEcdsa = false;
+      }
+
+      if (signMode !== AccountSignMode.GENERIC_LEDGER) {
+        hasOnlyLedgerEvm = false;
+      }
+    }
+
+    if (!hasOnlyLedgerSubstrateEcdsa && !hasOnlyLedgerEvm) {
+      break; // Exit early if both conditions are false
+    }
+  }
+
+  return { hasOnlyLedgerSubstrateEcdsa, hasOnlyLedgerEvm };
+};

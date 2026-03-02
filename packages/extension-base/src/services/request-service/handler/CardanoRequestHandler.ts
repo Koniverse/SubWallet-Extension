@@ -115,8 +115,8 @@ export default class CardanoRequestHandler {
       const confirmation = confirmations[type][id];
 
       if (!resolver || !confirmation) {
-        this.#logger.error(t('Unable to proceed. Please try again'), type, id);
-        throw new Error(t('Unable to proceed. Please try again'));
+        this.#logger.error(t('bg.DAPP.services.service.request.CardanoHandler.unableToProceed'), type, id);
+        throw new Error(t('bg.DAPP.services.service.request.CardanoHandler.unableToProceed'));
       }
 
       // Fill signature for some special type

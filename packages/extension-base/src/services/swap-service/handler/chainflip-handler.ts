@@ -5,16 +5,11 @@ import { COMMON_ASSETS } from '@subwallet/chain-list';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
+import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
 import { getERC20TransactionObject, getEVMTransactionObject } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
 import { createSubstrateExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/token';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import {
-  _getAssetSymbol,
-  _getContractAddressOfToken,
-  _isChainSubstrateCompatible,
-  _isNativeToken,
-  _isPureBitcoinChain
-} from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken, _isPureBitcoinChain } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from '@subwallet/extension-base/services/swap-service/handler/base-handler';
 import { BaseStepDetail, BasicTxErrorType, ChainFlipSwapStepMetadata, ChainflipSwapTxData, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
@@ -23,9 +18,10 @@ import { _reformatAddressWithChain, fetchFromProxyService } from '@subwallet/ext
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigNumber from 'bignumber.js';
 import * as bitcoin from 'bitcoinjs-lib';
+
 import { SubmittableExtrinsic } from '@polkadot/api/types';
-import {SWTransaction} from "@subwallet/extension-base/services/transaction-service/types";
-import {createBitcoinTransaction} from "@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer";
+
+import { SWTransaction } from '../../transaction-service/types';
 
 const INTERMEDIARY_MAINNET_ASSET_SLUG = COMMON_ASSETS.USDC_ETHEREUM;
 const INTERMEDIARY_TESTNET_ASSET_SLUG = COMMON_ASSETS.USDC_SEPOLIA;
@@ -55,6 +51,8 @@ interface ChainFlipAsset {
 interface ChainFlipMetadata {
   srcChain: string;
   destChain: string;
+  fromAssetId: string;
+  toAssetId: string;
 }
 
 export class ChainflipSwapHandler implements SwapBaseInterface {
@@ -111,18 +109,17 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
     const pair = quote.pair;
     const fromAsset = this.chainService.getAssetBySlug(pair.from);
-    const toAsset = this.chainService.getAssetBySlug(pair.to);
     const chainInfo = this.chainService.getChainInfoByKey(fromAsset.originChain);
     const toChainInfo = this.chainService.getChainInfoByKey(fromAsset.originChain);
     const chainType = _isChainSubstrateCompatible(chainInfo) ? ChainType.SUBSTRATE : _isPureBitcoinChain(chainInfo) ? ChainType.BITCOIN : ChainType.EVM; // todo: improve throw error for unknown chain
     const receiver = _reformatAddressWithChain(recipient ?? address, toChainInfo);
-    const fromAssetId = _getAssetSymbol(fromAsset);
-    const toAssetId = _getAssetSymbol(toAsset);
 
     const minReceive = new BigNumber(quote.rate).times(1 - slippage).toString();
 
     const processMetadata = process.steps[currentStep].metadata as unknown as ChainFlipSwapStepMetadata;
     const quoteMetadata = processMetadata as ChainFlipMetadata;
+    const fromAssetId = quoteMetadata.fromAssetId;
+    const toAssetId = quoteMetadata.toAssetId;
 
     if (!processMetadata || !quoteMetadata) {
       throw new Error('Metadata for Chainflip not found');
@@ -308,6 +305,8 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
 
         srcChain: metadata.srcChain,
         destChain: metadata.destChain,
+        fromAssetId: metadata.fromAssetId,
+        toAssetId: metadata.toAssetId,
 
         version: 2
       } as unknown as ChainFlipSwapStepMetadata

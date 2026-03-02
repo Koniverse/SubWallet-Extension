@@ -64,11 +64,11 @@ const Component: React.FC<Props> = (props: Props) => {
       return ALL_ACCOUNT_KEY;
     }
 
-    const accountAddress = currentAccountProxy?.accounts.find(({ chainType, type: accountType }) => {
+    const accountAddress = currentAccountProxy?.accounts.find((accountInfo) => {
       if (chainInfoMap[poolInfo.chain]) {
         const chainInfo = chainInfoMap[poolInfo.chain];
 
-        return _isChainInfoCompatibleWithAccountInfo(chainInfo, chainType, accountType);
+        return _isChainInfoCompatibleWithAccountInfo(chainInfo, accountInfo);
       }
 
       return false;
@@ -199,8 +199,8 @@ const Component: React.FC<Props> = (props: Props) => {
       time = poolInfo.statistic.unstakingPeriod;
     }
 
-    return getEarningTimeText(time);
-  }, [poolInfo.statistic]);
+    return getEarningTimeText(t, time);
+  }, [poolInfo.statistic, t]);
 
   const data: BoxProps[] = useMemo(() => {
     if (!poolInfo) {
@@ -462,11 +462,11 @@ const Component: React.FC<Props> = (props: Props) => {
 
     const onError = (message: string) => {
       openAlert({
-        title: t('Pay attention!'),
+        title: t('ui.EARNING.components.Modal.Earning.Instruction.payAttentionExclamation'),
         type: NotificationType.ERROR,
         content: message,
         okButton: {
-          text: t('I understand'),
+          text: t('ui.EARNING.components.Modal.Earning.Instruction.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
         }
@@ -550,7 +550,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={detectTranslate('For more information and staking instructions, read <highlight>this FAQ</highlight>')}
+            i18nKey={detectTranslate('ui.EARNING.components.Modal.Earning.Instruction.readFaqForStakingInfo')}
           />
         </div>
 
@@ -577,7 +577,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={closeModal}
           schema={'secondary'}
         >
-          {isShowStakeMoreButton ? t('Back') : t('Close')}
+          {isShowStakeMoreButton ? t('ui.EARNING.components.Modal.Earning.Instruction.back') : t('ui.EARNING.components.Modal.Earning.Instruction.close')}
         </Button>
 
         {isShowStakeMoreButton && (

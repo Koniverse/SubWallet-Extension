@@ -209,7 +209,14 @@ export default abstract class BasePoolHandler {
     }
 
     const nativeTokenInfo = this.state.chainService.getNativeTokenInfo(this.chain);
-    const nativeTokenBalance = await this.state.balanceService.getTransferableBalance(request.address, this.chain);
+    // Use TRANSFER_BALANCE extrinsic in order to get transferable balanace without minus ED
+    const nativeTokenBalance = await this.state.balanceService.getTransferableBalance(
+      request.address,
+      this.chain,
+      undefined,
+      ExtrinsicType.TRANSFER_BALANCE
+    );
+
     const bnNativeTokenBalance = new BN(nativeTokenBalance.value);
     const bnMinBalanceToJoin = new BN(poolInfo.statistic?.earningThreshold?.join || '0').add(new BN(poolInfo.metadata.maintainBalance));
 

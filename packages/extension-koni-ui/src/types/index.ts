@@ -3,7 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountJson } from '@subwallet/extension-base/types';
-import { ButtonSchema } from '@subwallet/react-ui/es/button/button';
+import { type ButtonProps, ButtonSchema } from '@subwallet/react-ui/es/button/button';
 import { Icon as _PhosphorIcon, IconProps } from 'phosphor-react';
 import React from 'react';
 
@@ -32,6 +32,7 @@ export type AlertDialogProps = {
   onCancel?: VoidFunction;
   okLoading?: boolean;
   cancelDisabled?: boolean;
+  rightIconProps?: ButtonProps;
   maskClosable?: boolean;
 };
 

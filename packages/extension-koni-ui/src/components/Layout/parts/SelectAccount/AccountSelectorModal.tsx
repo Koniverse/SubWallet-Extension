@@ -103,6 +103,12 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     return accountProxies.find((ap) => ap.id === selectedAccountProxy.proxyId);
   }, [accountProxies, selectedAccountProxy]);
 
+  const accountProxiesCanExport = useMemo(() => {
+    return accountProxies.filter((item) => {
+      return item.accountType !== AccountProxyType.LEDGER;
+    });
+  }, [accountProxies]);
+
   const listItems = useMemo<ListItem[]>(() => {
     let accountAll: AccountProxy | undefined;
     const result: ListItem[] = [];
@@ -148,7 +154,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (qrSignerAccounts.length) {
       qrSignerAccounts.unshift({
         id: 'qr',
-        groupLabel: t('QR signer account')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.qrSignerAccount')
       });
 
       result.push(...qrSignerAccounts);
@@ -157,7 +163,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (watchOnlyAccounts.length) {
       watchOnlyAccounts.unshift({
         id: 'watch-only',
-        groupLabel: t('Watch-only account')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.watchOnlyAccount')
       });
 
       result.push(...watchOnlyAccounts);
@@ -166,7 +172,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (ledgerAccounts.length) {
       ledgerAccounts.unshift({
         id: 'ledger',
-        groupLabel: t('Ledger account')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.ledgerAccount')
       });
 
       result.push(...ledgerAccounts);
@@ -175,16 +181,16 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (injectedAccounts.length) {
       injectedAccounts.unshift({
         id: 'injected',
-        groupLabel: t('Injected account')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.injectedAccount')
       });
 
-      result.push(...ledgerAccounts);
+      result.push(...injectedAccounts);
     }
 
     if (unknownAccounts.length) {
       unknownAccounts.unshift({
         id: 'unknown',
-        groupLabel: t('Unknown account')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.unknownAccount')
       });
 
       result.push(...unknownAccounts);
@@ -350,7 +356,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       onClick: () => {
         navigate('/settings/account-settings');
       },
-      tooltip: t('Account settings'),
+      tooltip: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.accountSettings'),
       tooltipPlacement: 'topRight'
     };
   }, [navigate, t]);
@@ -374,7 +380,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           destroyTooltipOnHide={true}
           overlayClassName={CN('__tooltip-overlay-remind')}
           placement={'bottomLeft'}
-          title={t('Export and back up accounts')}
+          title={t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.exportAndBackUpAccounts')}
         >
           <div>
             <Icon
@@ -389,9 +395,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       onClick: exportAllAccounts,
       size: 'xs',
       type: 'ghost',
-      tooltipPlacement: 'topLeft'
+      tooltipPlacement: 'topLeft',
+      disabled: accountProxiesCanExport.length === 1 && isAccountAll(accountProxiesCanExport[0].id)
     });
-  }, [exportAllAccounts, t, token.colorHighlight]);
+  }, [accountProxiesCanExport, exportAllAccounts, t, token.colorHighlight]);
 
   const closeAccountChainAddressesModal = useCallback(() => {
     inactiveModal(accountChainAddressesModalId);
@@ -417,7 +424,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         rightIconProps={rightIconProps}
         title={(
           <>
-            {t('Select account')}
+            {t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.selectAccount')}
 
             {isPopupMode && (
               <Button
@@ -434,7 +441,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           className={'__search-box'}
           key={searchInputRenderKey}
           onSearch={handleSearch}
-          placeholder={t<string>('Account name')}
+          placeholder={t<string>('ui.ACCOUNT.components.Layout.SelectAccount.Modal.accountName')}
           searchValue={searchValue}
         />
         <SwList
@@ -456,7 +463,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       }
 
       <ExportAllSelector
-        items={accountProxies}
+        items={accountProxiesCanExport}
       />
     </>
   );

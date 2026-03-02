@@ -110,7 +110,7 @@ const Component: React.FC<TransferInfoItem> = (props: TransferInfoItem) => {
         <AccountItem
           address={senderAddress}
           chainSlug={originChain?.slug}
-          label={senderLabel || t('Sender')}
+          label={senderLabel || t('ui.components.MetaInfo.TransferItem.sender')}
           name={senderName}
         />
 
@@ -118,7 +118,7 @@ const Component: React.FC<TransferInfoItem> = (props: TransferInfoItem) => {
           ? (
             <ChainItem
               chain={originChain.slug}
-              label={t('Network')}
+              label={t('ui.components.MetaInfo.TransferItem.network')}
             />
           )
           : (
@@ -126,14 +126,14 @@ const Component: React.FC<TransferInfoItem> = (props: TransferInfoItem) => {
               {!!originChain && (
                 <ChainItem
                   chain={originChain.slug}
-                  label={t('Origin Chain')}
+                  label={t('ui.components.MetaInfo.TransferItem.originChain')}
                 />
               )}
 
               {!!destinationChain && (
                 <ChainItem
                   chain={destinationChain.slug}
-                  label={t('Destination Chain')}
+                  label={t('ui.components.MetaInfo.TransferItem.destinationChain')}
                 />
               )}
             </>
@@ -146,13 +146,13 @@ const Component: React.FC<TransferInfoItem> = (props: TransferInfoItem) => {
   return (
     <div className={CN(className, '__row -type-transfer')}>
       <div className={'__col __label-col'}>
-        <div className={'__label'}>{senderLabel || t('Sender')}</div>
+        <div className={'__label'}>{senderLabel || t('ui.components.MetaInfo.TransferItem.sender')}</div>
 
         {genAccountBlock(senderAddress, senderName)}
         {!!originChain && originChain.slug !== destinationChain?.slug && genChainBlock(originChain)}
       </div>
       <div className={'__col __value-col'}>
-        <div className={'__label'}>{recipientLabel || t('Recipient')}</div>
+        <div className={'__label'}>{recipientLabel || t('ui.components.MetaInfo.TransferItem.recipient')}</div>
 
         {genAccountBlock(recipientAddress, recipientName)}
         {!!destinationChain && destinationChain.slug !== originChain?.slug && genChainBlock(destinationChain)}

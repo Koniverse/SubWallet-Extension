@@ -3,6 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountProxyExtra } from '@subwallet/extension-base/types';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox, CloseIcon, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { IMPORT_ACCOUNT_MODAL, USER_GUIDE_URL } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
@@ -17,6 +18,7 @@ import { KeyringPairs$Json } from '@subwallet/ui-keyring/types';
 import CN from 'classnames';
 import { CheckCircle, FileArrowDown } from 'phosphor-react';
 import React, { ChangeEventHandler, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { Trans } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -115,6 +117,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const [submitting, setSubmitting] = useState(false);
   const [password, setPassword] = useState('');
   const [stepState, setStepState] = useState<StepState>(StepState.UPLOAD_JSON_FILE);
+  const [showAllAccountsExistAlert, setShowAllAccountsExistAlert] = useState(false);
   const [showNoValidAccountAlert, setShowNoValidAccountAlert] = useState(false);
   const [jsonFile, setJsonFile] = useState<KeyringPair$Json | KeyringPairs$Json | undefined>(undefined);
   const { alertModal } = useContext(WalletModalContext);
@@ -128,8 +131,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       return true;
     }
 
-    return !!fileValidateState.status || (!requirePassword && passwordValidateState.status !== 'success') || !password;
-  }, [fileValidateState.status, password, passwordValidateState.status, requirePassword, stepState, accountProxiesSelected]);
+    return !!fileValidateState.status || (!requirePassword && passwordValidateState.status !== 'success') || !password || showNoValidAccountAlert;
+  }, [stepState, accountProxiesSelected.length, fileValidateState.status, requirePassword, passwordValidateState.status, password, showNoValidAccountAlert]);
 
   const onBack_ = useCallback(() => {
     if (stepState === StepState.SELECT_ACCOUNT_IMPORT) {
@@ -161,13 +164,13 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     });
 
     if (accountProxies.length > 0) {
-      setShowNoValidAccountAlert(exitedAccount.length === accountProxies.length);
+      setShowAllAccountsExistAlert(exitedAccount.length === accountProxies.length);
     }
 
     if (exitedAccount.length) {
       exitedAccount.unshift({
         id: 'existed_accounts',
-        groupLabel: t('Existed account')
+        groupLabel: t('ui.ACCOUNT.screen.Account.RestoreJson.existedAccount')
       });
 
       result.push(...exitedAccount);
@@ -194,13 +197,14 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         const json = JSON.parse(u8aToString(Uint8Array.from(Buffer.from(bytes)))) as KeyringPair$Json | KeyringPairs$Json;
 
         if (!isValidJsonFile(json)) {
-          throw new Error(t('Invalid JSON file'));
+          throw new Error(t('ui.ACCOUNT.screen.Account.RestoreJson.invalidJsonFile'));
         }
 
         if (JSON.stringify(jsonFile) !== JSON.stringify(json)) {
           setAccountProxies([]);
           setPassword('');
           setJsonFile(json);
+          setShowNoValidAccountAlert(false);
           setPasswordValidateState({});
         }
       })
@@ -223,11 +227,15 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     setPasswordValidating(true);
 
     const onFail = (e: Error) => {
-      setPasswordValidateState({
-        status: 'error',
-        message: e.message
-      });
-      selectPassword();
+      if (e.message.toLowerCase().includes('incorrect password')) {
+        setPasswordValidateState({
+          status: 'error',
+          message: e.message
+        });
+        selectPassword();
+      } else {
+        setShowNoValidAccountAlert(true);
+      }
     };
 
     if (isKeyringPairs$Json(jsonFile)) {
@@ -315,18 +323,22 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       closable: true,
       content:
         <div>
-          {t(' You have accounts with the same name. We have added numbers to these account names to differentiate them. You can change account names later using ')}
-          <a
-            className={'__modal-user-guide'}
-            href={CHANGE_ACCOUNT_NAME}
-            target='__blank'
-          >
-            {t('this guide')}
-          </a>
+          <Trans
+            components={{
+              highlight: (
+                <a
+                  className={'__modal-user-guide'}
+                  href={CHANGE_ACCOUNT_NAME}
+                  target='__blank'
+                />
+              )
+            }}
+            i18nKey={detectTranslate('ui.ACCOUNT.screen.Account.RestoreJson.duplicateAccountNameNumberedInfo')}
+          />
         </div>,
-      title: t('Duplicate account name'),
+      title: t('ui.ACCOUNT.screen.Account.RestoreJson.duplicateAccountName'),
       okButton: {
-        text: t('I understand'),
+        text: t('ui.ACCOUNT.screen.Account.RestoreJson.iUnderstand'),
         icon: CheckCircle,
         iconWeight: 'fill',
         onClick: () => {
@@ -416,7 +428,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
     if (!value) {
       setPasswordValidateState({
-        message: t('Password is required'),
+        message: t('ui.ACCOUNT.screen.Account.RestoreJson.passwordIsRequired'),
         status: 'error'
       });
     } else {
@@ -428,23 +440,23 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const footerContent = useMemo(() => {
     if (stepState === StepState.UPLOAD_JSON_FILE) {
-      return t('Unlock file');
+      return t('ui.ACCOUNT.screen.Account.RestoreJson.unlockFile');
     } else {
       if (accountProxiesSelected.length === 0) {
-        return t('Import account');
+        return t('ui.ACCOUNT.screen.Account.RestoreJson.importAccount');
       } else if (accountProxiesSelected.length === 1) {
-        return t('Import 1 account');
+        return t('ui.ACCOUNT.screen.Account.RestoreJson.importOneAccount');
       } else {
-        return t(`Import ${accountProxiesSelected.length} accounts`);
+        return t('ui.ACCOUNT.screen.Account.RestoreJson.importSelectedAccounts', { replace: { accountProxiesSelected: accountProxiesSelected.length } });
       }
     }
   }, [accountProxiesSelected.length, stepState, t]);
 
   const titlePage = useMemo(() => {
     if (stepState === StepState.UPLOAD_JSON_FILE) {
-      return t('Import from JSON file');
+      return t('ui.ACCOUNT.screen.Account.RestoreJson.importFromJsonFile');
     } else {
-      return t('Import account');
+      return t('ui.ACCOUNT.screen.Account.RestoreJson.importAccount');
     }
   }, [stepState, t]);
 
@@ -490,15 +502,15 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         <div className={CN('container')}>
           <div className='description'>
             {stepState === StepState.SELECT_ACCOUNT_IMPORT && passwordValidateState.status === 'success'
-              ? t('Select the account(s) you\'d like to import')
-              : t('Drag and drop the JSON file you exported from Polkadot.{js}')}
+              ? t('ui.ACCOUNT.screen.Account.RestoreJson.selectAccountsToImport')
+              : t('ui.ACCOUNT.screen.Account.RestoreJson.dragAndDropPolkadotJsJson')}
           </div>
 
           {
-            stepState === StepState.SELECT_ACCOUNT_IMPORT && showNoValidAccountAlert && <AlertBox
+            stepState === StepState.SELECT_ACCOUNT_IMPORT && showAllAccountsExistAlert && <AlertBox
               className={'waning-alert-box'}
-              description={t('All accounts found in this file already exist in SubWallet')}
-              title={t('Unable to import')}
+              description={t('ui.ACCOUNT.screen.Account.RestoreJson.allAccountsInFileExist')}
+              title={t('ui.ACCOUNT.screen.Account.RestoreJson.unableToImport')}
               type='warning'
             />
           }
@@ -519,26 +531,35 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   accept={'application/json'}
                   className='file-selector'
                   disabled={fileValidating}
-                  hint={t('Drag and drop the JSON file you exported from Polkadot.{js}')}
+                  hint={t('ui.ACCOUNT.screen.Account.RestoreJson.dragAndDropPolkadotJsJson')}
                   onChange={onChangeFile}
                   statusHelp={fileValidateState.message}
-                  title={t('Import by JSON file')}
+                  title={t('ui.ACCOUNT.screen.Account.RestoreJson.importByJsonFile')}
                 />
               </Form.Item>
             }
 
             {
-              stepState === StepState.UPLOAD_JSON_FILE && requirePassword && (
+              showNoValidAccountAlert && (<AlertBox
+                className={'alert-warning-name-duplicate'}
+                description={t('ui.ACCOUNT.screen.Account.RestoreJson.allAccountsInFileInvalid')}
+                title={t('ui.ACCOUNT.screen.Account.RestoreJson.unableToImport')}
+                type='error'
+              />)
+            }
+
+            {
+              stepState === StepState.UPLOAD_JSON_FILE && requirePassword && !showNoValidAccountAlert && (
                 <Form.Item
                   validateStatus={passwordValidateState.status}
                 >
                   <div className='input-label'>
-                    {t('Please enter the password you have used when creating your Polkadot.{js} account')}
+                    {t('ui.ACCOUNT.screen.Account.RestoreJson.enterPolkadotJsPassword')}
                   </div>
                   <Input.Password
                     id={`${formName}_${passwordField}`}
                     onChange={onChangePassword}
-                    placeholder={t('Password')}
+                    placeholder={t('ui.ACCOUNT.screen.Account.RestoreJson.password')}
                     statusHelp={passwordValidateState.message}
                     type='password'
                     value={password}

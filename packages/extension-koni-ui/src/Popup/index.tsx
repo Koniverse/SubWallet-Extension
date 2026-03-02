@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { setupApiSDK } from '@subwallet/extension-base/utils';
 import { DataContextProvider } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { InjectContextProvider } from '@subwallet/extension-koni-ui/contexts/InjectContext';
 import { ScannerContextProvider } from '@subwallet/extension-koni-ui/contexts/ScannerContext';
@@ -12,6 +13,9 @@ import { RouterProvider } from 'react-router';
 
 import LoadingScreen from '../components/LoadingScreen';
 import { router } from './router';
+
+// Setup API SDK before app init
+setupApiSDK();
 
 export default function Popup (): React.ReactElement {
   return (
