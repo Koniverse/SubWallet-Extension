@@ -722,25 +722,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return Array.from(result.values());
   }, [accountProxies, chainInfoMap, currentAccountProxy, getReformatAddress, isAllAccount, multisigSelectedChain]);
 
-  useEffect(() => {
-    if (!multisigChainItems.some((item) => item.slug === multisigSelectedChain)) {
-      setMultisigSelectedChain(ALL_NETWORK_KEY);
-    }
-  }, [multisigChainItems, multisigSelectedChain]);
-
-  useEffect(() => {
-    if (!multisigAccountAddressItems.some((item) => item.address === multisigSelectedAddress)) {
-      setMultisigSelectedAddress('');
-    }
-  }, [multisigAccountAddressItems, multisigSelectedAddress]);
-
-  useEffect(() => {
-    if (viewValue === ViewValue.MULTISIG) {
-      setMultisigSelectedAddress('');
-    } else {
-      setSelectedAddress('');
-    }
-  }, [setSelectedAddress, viewValue]);
   const emptyList = useCallback(() => {
     return (
       <EmptyList
@@ -998,6 +979,26 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   useEffect(() => {
     setHistoryItems(getHistoryItems(currentItemDisplayCount));
   }, [currentItemDisplayCount, getHistoryItems]);
+
+  useEffect(() => {
+    if (!multisigChainItems.some((item) => item.slug === multisigSelectedChain)) {
+      setMultisigSelectedChain(ALL_NETWORK_KEY);
+    }
+  }, [multisigChainItems, multisigSelectedChain]);
+
+  useEffect(() => {
+    if (!multisigAccountAddressItems.some((item) => item.address === multisigSelectedAddress)) {
+      setMultisigSelectedAddress('');
+    }
+  }, [multisigAccountAddressItems, multisigSelectedAddress]);
+
+  useEffect(() => {
+    if (viewValue !== ViewValue.MULTISIG) {
+      setMultisigSelectedAddress('');
+    } else {
+      setSelectedAddress('');
+    }
+  }, [setSelectedAddress, viewValue]);
 
   return (
     <>
