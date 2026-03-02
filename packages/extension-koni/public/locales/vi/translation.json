@@ -2569,7 +2569,6 @@
   "ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyType": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "",
   "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "",
-  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "",
   "ui.TRANSACTION.screen.Transaction.Swap.stakedBalance": "",
   "ui.TRANSACTION.screen.Transaction.Swap.stakedBalanceTooltip": "",
   "ui.TRANSACTION.screen.Transaction.Swap.availableBalanceTooltip": "",
