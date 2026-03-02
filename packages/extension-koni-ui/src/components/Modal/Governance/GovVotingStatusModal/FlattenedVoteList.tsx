@@ -260,6 +260,10 @@ export const FlattenedVoteList = styled(forwardRef(Component))<Props>(({ theme: 
 
       '&.-is-derived': {
         color: token.colorWarning
+      },
+
+      '&.-is-multisig': {
+        color: token['geekblue-9']
       }
     }
   };

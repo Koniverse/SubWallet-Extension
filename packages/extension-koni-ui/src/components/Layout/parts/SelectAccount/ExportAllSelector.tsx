@@ -40,6 +40,10 @@ const filterOptions = [
   {
     label: 'Watch-only account',
     value: AccountSignMode.READ_ONLY
+  },
+  {
+    label: 'Multisig account',
+    value: AccountSignMode.MULTISIG
   }
 ];
 const renderEmpty = () => <GeneralEmptyList />;
@@ -94,6 +98,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         } else if (filter === AccountProxyType.QR && accountType === AccountProxyType.QR) {
           return true;
         } else if (filter === AccountProxyType.READ_ONLY && accountType === AccountProxyType.READ_ONLY) {
+          return true;
+        } else if (filter === AccountProxyType.MULTISIG && accountType === AccountProxyType.MULTISIG) {
           return true;
         }
       }

@@ -17,7 +17,7 @@
     "./detectPackage.cjs"
   ],
   "type": "module",
-  "version": "1.3.72-0",
+  "version": "1.3.73-0",
   "main": "index.js",
   "dependencies": {
     "@acala-network/api": "^5.0.2",
@@ -58,10 +58,10 @@
     "@substrate/connect": "^0.8.9",
     "@subwallet-monorepos/subwallet-services-sdk": "0.1.16",
     "@subwallet/chain-list": "0.2.124-beta.0-pr-644-55b43f34",
-    "@subwallet/extension-base": "^1.3.72-0",
-    "@subwallet/extension-chains": "^1.3.72-0",
-    "@subwallet/extension-dapp": "^1.3.72-0",
-    "@subwallet/extension-inject": "^1.3.72-0",
+    "@subwallet/extension-base": "^1.3.73-0",
+    "@subwallet/extension-chains": "^1.3.73-0",
+    "@subwallet/extension-dapp": "^1.3.73-0",
+    "@subwallet/extension-inject": "^1.3.73-0",
     "@subwallet/keyring": "^0.1.14",
     "@subwallet/ui-keyring": "^0.1.14",
     "@ton/core": "^0.56.3",
@@ -90,6 +90,7 @@
     "is-buffer": "^2.0.5",
     "joi": "^17.13.3",
     "json-rpc-engine": "^6.1.0",
+    "loglevel": "^1.9.2",
     "manta-extension-sdk": "^1.1.0",
     "moment": "^2.29.4",
     "protobufjs": "^7.5.4",
@@ -108,7 +109,7 @@
     "web3-utils": "1.10.4"
   },
   "devDependencies": {
-    "@subwallet/extension-mocks": "^1.3.72-0",
+    "@subwallet/extension-mocks": "^1.3.73-0",
     "@types/uuid": "^9.0.1"
   }
 }

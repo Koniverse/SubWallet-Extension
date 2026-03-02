@@ -110,6 +110,26 @@ function scanSourceForTranslations(config) {
   });
 }
 
+/**
+ * i18n Scanner Usage
+ *
+ * Step 1: Disable writing
+ * - Comment `resource.savePath`
+ *
+ * Step 2: Run i18n maintenance scripts
+ * - i18n:scan
+ * - i18n:combine-locales
+ * - i18n:replace-text
+ * - i18n:update:ext
+ * - i18n:update:web-mobile
+ *
+ * Step 3: Final build
+ * - Comment `scanSourceForTranslations`
+ * - Uncomment `resource.savePath`
+ * - Run `build:i18n`
+ *
+ */
+
 module.exports = {
   input: [
     'packages/extension-koni-ui/src/**/*.{ts,tsx}',
@@ -144,5 +164,5 @@ module.exports = {
   },
   output: './',
   transform,
-  scanSourceForTranslations
+  // scanSourceForTranslations
 };
