@@ -430,9 +430,7 @@ const subscribeAssetsAccountPallet = async ({ addresses, assetMap, callback, cha
   });
 
   const unsubList = await Promise.all(Object.values(tokenMap).map((tokenInfo) => {
-    console.log('tokenInfo.slug', tokenInfo.slug);
     if (tokenInfo.slug === 'energy_web_x-LOCAL-stEWT') {
-      console.log('run to this', tokenInfo.slug);
       return timer(0, CRON_REFRESH_PRICE_INTERVAL).subscribe(() => {
         const getEwtFrozenBalance = async () => {
           const ewtTokenBalances = await queryEwtFrozenBalance(substrateApi, addresses, assetMap[tokenInfo.slug], extrinsicType);

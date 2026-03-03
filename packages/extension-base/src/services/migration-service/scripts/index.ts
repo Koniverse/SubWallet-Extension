@@ -1,8 +1,6 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import MigrateChainPatrol from '@subwallet/extension-base/services/migration-service/scripts/MigrateChainPatrol';
-
 import BaseMigrationJob from '../Base';
 import ClearMetadataDatabase from './databases/ClearMetadataDatabase';
 import ClearMetadataForMythos from './databases/ClearMetadataForMythos';
@@ -33,6 +31,8 @@ import MigrateTransactionHistoryBySymbol from './MigrateTransactionHistoryBySymb
 import MigrateWalletReference from './MigrateWalletReference';
 import DeleteEarningData20251010
   from "@subwallet/extension-base/services/migration-service/scripts/DeleteEarningData20251010";
+import DeleteInvalidEarningSlug
+  from "@subwallet/extension-base/services/migration-service/scripts/DeleteInvalidEarningSlug";
 
 export const EVERYTIME = '__everytime__';
 
@@ -74,5 +74,6 @@ export default <Record<string, typeof BaseMigrationJob>>{
   // [`${EVERYTIME}-1.1.42-02`]: MigrateTransactionHistoryBySymbol
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
   '1.3.42-01': MigrateNewUnifiedAccount,
-  '1.3.62-01': DeleteEarningData20251010
+  '1.3.62-01': DeleteEarningData20251010,
+  '1.3.57-01': DeleteInvalidEarningSlug //todo: remove this migration after 2 or 3 version on mobile
 };
