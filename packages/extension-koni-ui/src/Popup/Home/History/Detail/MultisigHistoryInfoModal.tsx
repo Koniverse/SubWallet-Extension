@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicStatus, ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { _ChainConnectionStatus } from '@subwallet/extension-base/services/chain-service/types';
 import { MultisigTxType, PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
@@ -34,7 +35,7 @@ const alertModalId = 'multisig-confirmation-alert-modal';
 function Component ({ className = '', data, historyList = [], onCancel }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
+  const { chainInfoMap, chainStateMap, chainStatusMap } = useSelector((state: RootState) => state.chainStore);
   const [loading, setLoading] = useState(false);
   const checkAction = usePreCheckAction({ address: data?.currentSigner });
   const { onError, onSuccess } = useHandleSubmitTransaction();
@@ -335,6 +336,22 @@ function Component ({ className = '', data, historyList = [], onCancel }: Props)
       chainChecker(data.chain);
     }
   }, [data?.chain, chainChecker]);
+
+  useEffect(() => {
+    const handleBalanceError = () => {
+      if (!error || !data?.chain) {
+        return;
+      }
+
+      if (chainStatusMap[data.chain]?.connectionStatus !== _ChainConnectionStatus.CONNECTED) {
+        return;
+      }
+
+      onError(new Error(error));
+    };
+
+    handleBalanceError();
+  }, [chainStateMap, chainStatusMap, data?.chain, error, onError]);
 
   return (
     <>

@@ -3490,6 +3490,7 @@ export default class KoniExtension {
     });
   }
 
+  // Helper for prepareMultisigSignRequest: reconstruct the original extrinsic from the payload's method & args
   private async buildExtrinsicFromPayload (chain: string, payload: SignerPayloadJSON) {
     const substrateApi = await this.#koniState.chainService.getSubstrateApi(chain).isReady;
 
@@ -3505,8 +3506,27 @@ export default class KoniExtension {
     };
   }
 
+  /**
+   * ─────────────────────────────────────────────────────────────
+   * prepareMultisigSignRequest
+   * ─────────────────────────────────────────────────────────────
+   * Called when a dApp sends a signing request to a multisig account.
+   * This method wraps the original extrinsic into a multisig.asMulti call so that it can be submitted by one of the signers on behalf of the multisig account.
+   *
+   * Important:
+   *  - The original sign request is MUTATED in-place via updateSignRequest.
+   *    After this method returns, the UI will prompt the signer to sign
+   *    the wrapped multisig extrinsic, not the original one.
+   *  - Errors are collected (not thrown) and returned in the response
+   *    so the UI can display them without crashing.
+   *  - This method does NOT submit the transaction; it only prepares
+   *    the payload for signing.
+   * ─────────────────────────────────────────────────────────────
+   */
   private async prepareMultisigSignRequest (request: PrepareMultisigSignRequest): Promise<PrepareMultisigSignResponse> {
     const { id, signer } = request;
+
+    // ── Step 1: Retrieve the pending sign request from the queue ──
     const queued = this.#koniState.getSignRequest(id);
 
     assert(queued, t('bg.koni.handler.Extension.unableToProceed'));
@@ -3519,9 +3539,14 @@ export default class KoniExtension {
 
     const payload = queued.request.payload;
 
+    // ── Step 2: Validate payload format ──
+    // Only JSON payloads (SignerPayloadJSON) contain the structured fields
+    // (genesisHash, method, etc.) needed to reconstruct the extrinsic.
+    // Raw (bytes) payloads cannot be wrapped into a multisig call.
     if (!isJsonPayload(payload)) {
       errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.koni.handler.Extension.unableToProceed')));
     } else {
+      // ── Step 3: Resolve chain from genesisHash & check multisig support ──
       callData = payload.method as HexString;
 
       const [chain, chainInfo] = this.#koniState.findNetworkKeyByGenesisHash(payload.genesisHash);
@@ -3529,6 +3554,9 @@ export default class KoniExtension {
       if (!chain || !chainInfo?.substrateInfo?.supportMultisig) {
         errors.push(new TransactionError(BasicTxErrorType.UNSUPPORTED, t('bg.koni.handler.Extension.unableToProceed')));
       } else {
+        // ── Step 4: Look up multisig account configuration ──
+        // queued.address is the multisig account address (the "from" in the original request).
+        // We need its threshold and signers list to construct the asMulti call.
         const accountProxy = this.#koniState.keyringService.context.getMultisigAccountByAddress(queued.address);
 
         if (!accountProxy) {
@@ -3537,8 +3565,10 @@ export default class KoniExtension {
           const threshold = accountProxy.accounts[0].threshold as number;
           const signers = accountProxy.accounts[0].signers as string[];
 
+          // ── Step 5: Rebuild the original extrinsic from payload call data ──
           const { extrinsic: originExtrinsic, substrateApi } = await this.buildExtrinsicFromPayload(chain, payload);
 
+          // ── Step 6: Wrap into multisig initiation extrinsic ──
           const multisigExtrinsic = createInitMultisigExtrinsic(
             substrateApi.api,
             threshold,
@@ -3547,6 +3577,7 @@ export default class KoniExtension {
             originExtrinsic
           );
 
+          // ── Step 7: Estimate fee & calculate multisig deposit ──
           submittedCallData = multisigExtrinsic.method.toHex();
           networkFee = (await multisigExtrinsic.paymentInfo(signer)).partialFee.toString();
 
@@ -3559,6 +3590,7 @@ export default class KoniExtension {
             depositFactor
           );
 
+          // ── Step 8: Validate signer has sufficient balance ──
           const signerBalance = await this.getAddressTransferableBalance({
             address: signer,
             networkKey: chain,
@@ -3572,6 +3604,10 @@ export default class KoniExtension {
             errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee')));
           }
 
+          // ── Step 9: Replace the original sign request with the wrapped payload ──
+          // After this, the signing UI will show the multisig extrinsic instead of
+          // the original one. The signer's address and fresh nonce are used so
+          // the transaction is submitted from the signer (not the multisig account).
           const nonce = await substrateApi.api.rpc.system.accountNextIndex(signer);
 
           const wrappedPayload: SignerPayloadJSON = {
