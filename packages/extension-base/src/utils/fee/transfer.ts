@@ -360,7 +360,8 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
     feeType: feeChainType,
     id: id,
     error,
-    isEvmRpcError: isEvmRpcError
+    isEvmRpcError: isEvmRpcError,
+    maxTransferableWithoutFee: freeBalance.value
   };
 };
 
@@ -565,7 +566,8 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     feeOptions: feeOptions,
     feeType: feeChainType,
     id: id,
-    error
+    error,
+    maxTransferableWithoutFee: freeBalance.value
   };
 };
 

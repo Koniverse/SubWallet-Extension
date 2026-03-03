@@ -386,7 +386,7 @@ const Component: React.FC = () => {
     );
   }, [bondedValue, decimals, symbol, isSlippageAcceptable, isSubnetStaking, maxSlippage, setMaxSlippage]);
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);

@@ -1,5 +1,26 @@
 # CHANGELOG
 
+## 1.3.73
+Build date: Jan 22, 2025.
+
+Features & Updates:
+- Update @subwallet-monorepos/subwallet-services-sdk 0.1.16 (#4957)
+- Remove the Crowdloans tab (#4920)
+
+Bug fixes:
+- Fix bug get Earning position parachain (#4950)
+
+
+## 1.3.72
+Build date: Jan 14, 2025.
+
+Features & Updates:
+- Integrate Proxy Account Support (#4725)
+- Update chain-list stable v0.2.123 (#4861)
+- Add support for USDC & stEWT (#639)
+- Migrate to ParaSpell V5 (#4908)
+
+
 ## 1.3.71
 Build date: Dec 29, 2025.
 

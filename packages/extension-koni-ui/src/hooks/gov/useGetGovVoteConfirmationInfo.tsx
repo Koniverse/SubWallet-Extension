@@ -118,7 +118,7 @@ const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, isUnl
     govLockedInfo.transferable.to = BigNumber.max(transferableAfterLock, BN_ZERO);
 
     return govLockedInfo;
-  }, [amount, assetInfo, balanceInfo, currentGovInfo, isUnlock, isUnVote, priceMap, transactionFee]);
+  }, [balanceInfo, assetInfo, currentGovInfo, amount, priceMap, isUnlock, isUnVote, transactionFee]);
 };
 
 export default useGetGovVoteConfirmationInfo;

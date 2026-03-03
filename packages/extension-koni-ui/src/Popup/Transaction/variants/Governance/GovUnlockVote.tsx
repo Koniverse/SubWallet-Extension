@@ -60,7 +60,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     return votingInfo && votingInfo.summary.unlockable.trackIds.length > 0;
   }).sort(funcSortByName), [accountAddressItems, govLockInfo]);
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
   const { onError, onSuccess } = useHandleSubmitTransaction();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chainValue);
 
@@ -93,9 +93,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     };
 
     handleUnlockVote(unlockVoteRequest)
-      .then((tx) => {
-        onSuccess(tx);
-      })
+      .then(onSuccess)
       .catch(onError)
       .finally(() => setLoading(false));
   }, [chainValue, onError, onSuccess]);

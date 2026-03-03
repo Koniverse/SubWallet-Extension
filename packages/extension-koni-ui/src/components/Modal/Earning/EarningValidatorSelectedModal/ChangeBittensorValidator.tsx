@@ -63,7 +63,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
   const { defaultData } = useTransactionContext<ChangeValidatorParams>();
   const { onError, onSuccess } = useHandleSubmitTransaction();
-
   const account = findAccountByAddress(accounts, from);
   const [form] = Form.useForm<ChangeValidatorParams>();
   const originValidator = useWatchTransaction('originValidator', form, defaultData);
@@ -352,7 +351,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     chain && checkChain(chain);
   }, [chain, checkChain]);
 
-  const onPreCheck = usePreCheckAction(from);
+  const onPreCheck = usePreCheckAction({ chain, address: from });
 
   useExcludeModal(modalId);
 

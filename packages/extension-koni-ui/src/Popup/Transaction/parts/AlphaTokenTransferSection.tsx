@@ -304,16 +304,24 @@ export const AlphaTokenTransferSection = styled(Component)(({ theme }) => {
 
     '.free-balance-block': {
       display: 'flex',
+      flexWrap: 'wrap',
+      alignItems: 'baseline',
       marginBottom: `${token.marginSM}`,
       justifyContent: 'end',
       color: `${token.colorTextTertiary} `,
       gap: token.marginXXS,
-      marginTop: token.marginSM
+      marginTop: token.marginSM,
+
+      '> span': {
+        whiteSpace: 'nowrap'
+      }
     },
 
     '.free-balance-value': {
       display: 'flex',
       flexWrap: 'wrap',
+      alignItems: 'baseline',
+      justifyContent: 'flex-end',
       color: token.colorTextTertiary
     }
   };
