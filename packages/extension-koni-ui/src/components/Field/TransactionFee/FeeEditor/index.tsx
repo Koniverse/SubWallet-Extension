@@ -62,7 +62,6 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
   const assetRegistry = useSelector((root) => root.assetRegistry.assetRegistry);
-  // @ts-ignore
   const priceMap = useSelector((state) => state.price.priceMap);
   const [feeEditorModalRenderKey, setFeeEditorModalRenderKey] = useState<string>(modalId);
   const { currencyData } = useSelector((state: RootState) => state.price);
@@ -77,7 +76,6 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
   })();
 
   const decimals = _getAssetDecimals(tokenAsset);
-  // @ts-ignore
   const priceId = _getAssetPriceId(tokenAsset);
   const priceValue = priceMap[priceId] || 0;
   const symbol = _getAssetSymbol(tokenAsset);
@@ -289,7 +287,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
 const FeeEditor = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     display: 'flex',
-    minHeight: 24,
+    minHeight: 'unset',
     alignItems: 'center',
 
     '.ant-number': {

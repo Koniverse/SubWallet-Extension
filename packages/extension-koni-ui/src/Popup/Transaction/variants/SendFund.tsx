@@ -988,7 +988,16 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
         tokenPayFeeSlug: currentTokenPayFee,
-        transferAll: isTransferAll
+        transferAll: isTransferAll,
+        ...(!!netuid && !!fromValidator && !!toValidator
+          ? {
+            metadata: {
+              netuid,
+              fromValidator,
+              toValidator
+            }
+          }
+          : {})
       }, callback)
         .then((callback))
         .catch((e) => {
@@ -1371,6 +1380,9 @@ const SendFund = styled(Wrapper)(({ theme }) => {
   const token = (theme as Theme).token;
 
   return ({
+    display: 'flex',
+    flexDirection: 'column',
+
     '.__brief': {
       paddingLeft: token.padding,
       paddingRight: token.padding,
