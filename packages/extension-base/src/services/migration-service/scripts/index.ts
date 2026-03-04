@@ -75,5 +75,5 @@ export default <Record<string, typeof BaseMigrationJob>>{
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
   '1.3.42-01': MigrateNewUnifiedAccount,
   '1.3.62-01': DeleteEarningData20251010,
-  '1.3.57-01': DeleteInvalidEarningSlug //todo: remove this migration after 2 or 3 version on mobile
+  [`${EVERYTIME}-1.3.57-01`]: DeleteInvalidEarningSlug //todo: remove this migration after 2 or 3 version on mobile
 };
