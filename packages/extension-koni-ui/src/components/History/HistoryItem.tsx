@@ -4,9 +4,10 @@
 import { ExtrinsicType, TransactionDirection } from '@subwallet/extension-base/background/KoniTypes';
 import { ClaimPolygonBridgeNotificationMetadata, NotificationActionType } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { RequestClaimBridge } from '@subwallet/extension-base/types';
+import { MULTISIG_ACTIONS } from '@subwallet/extension-koni-ui/constants/multisig';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
-import { isAbleToShowFee } from '@subwallet/extension-koni-ui/utils';
+import { isAbleToShowFee, isTypeManageSubstrateProxy } from '@subwallet/extension-koni-ui/utils';
 import { Icon, Logo, Number, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretRight } from 'phosphor-react';
@@ -44,9 +45,12 @@ function Component (
     }
   }
 
+  const isProxyType = isTypeManageSubstrateProxy(item.type);
+  const isMultisigAction = MULTISIG_ACTIONS.includes(item.type);
+
   return (
     <Web3Block
-      className={CN('history-item', className, displayData.className)}
+      className={CN('history-item', className, displayData.className, { '-proxy-type': isProxyType })}
       leftItem={(
         <>
           <div className={'__main-icon-wrapper'}>
@@ -74,7 +78,9 @@ function Component (
         <>
           <div className={'__value-wrapper'}>
             <Number
-              className={'__value'}
+              className={CN('__value', {
+                '-hide': isMultisigAction
+              })}
               decimal={item?.amount?.decimals || 0}
               decimalOpacity={0.45}
               hide={!isShowBalance}
@@ -173,6 +179,10 @@ export const HistoryItem = styled(Component)<Props>(({ theme: { token } }: Props
       opacity: 0
     },
 
+    '.__value.-hide': {
+      opacity: 0
+    },
+
     '.__value-wrapper': {
       textAlign: 'right'
     },
@@ -225,6 +235,12 @@ export const HistoryItem = styled(Component)<Props>(({ theme: { token } }: Props
       },
       '.__main-icon': {
         color: token.colorSuccess
+      }
+    },
+
+    '&.-proxy-type': {
+      '.__value': {
+        visibility: 'hidden'
       }
     }
   });

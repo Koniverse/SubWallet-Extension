@@ -14,9 +14,10 @@ import { BasicInputEvent, BasicInputWrapper } from './Base';
 
 interface Props extends ThemeProps, BasicInputWrapper {
   decimals: number;
-  maxValue: string;
+  maxValue?: string;
   onSetMax?: (value: boolean) => void;
   prefix?: React.ReactNode
+  suffix?: React.ReactNode
   showMaxButton?: boolean;
   forceUpdateMaxValue?: object;
   defaultInvalidOutputValue?: string;
@@ -71,7 +72,7 @@ const isControlKey = (keycode: number) => {
 };
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { className, decimals, defaultInvalidOutputValue, disabled, forceUpdateMaxValue, maxValue, onChange, onSetMax, prefix, showMaxButton, statusHelp, tooltip, value } = props;
+  const { className, decimals, defaultInvalidOutputValue, disabled, forceUpdateMaxValue, maxValue = '0', onChange, onSetMax, prefix, showMaxButton, statusHelp, suffix, tooltip, value } = props;
 
   const { t } = useTranslation();
 
@@ -85,6 +86,31 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     [cmdRightKey]: false,
     [cmdFirefoxKey]: false
   });
+
+  const [, setIsComposing] = useState(false);
+
+  const onCompositionStart = useCallback(() => {
+    setIsComposing(true);
+  }, []);
+
+  const onCompositionEnd = useCallback((event: React.CompositionEvent<HTMLInputElement>) => {
+    setIsComposing(false);
+
+    let value = event.currentTarget.value;
+
+    value = value.replace(/[^0-9.]/g, '');
+
+    const firstDotIndex = value.indexOf('.');
+
+    if (firstDotIndex !== -1) {
+      value = value.slice(0, firstDotIndex + 1) + value.slice(firstDotIndex + 1).replace(/\./g, '');
+    }
+
+    setInputValue(value);
+    onChange && onChange({
+      target: { value: getOutputValuesFromString(value, decimals, defaultInvalidOutputValue) }
+    }, true);
+  }, [onChange, decimals, defaultInvalidOutputValue]);
 
   const _onClickMaxBtn = useCallback((e: SyntheticEvent) => {
     e.stopPropagation();
@@ -102,21 +128,26 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return value.includes('.') ? decimals + 1 + value.split('.')[0].length : undefined;
   }, [decimals]);
 
-  const suffix = useMemo((): React.ReactNode => (
+  const suffixNode = useMemo((): React.ReactNode => (
     showMaxButton
       ? (
-        <Button
-          onClick={_onClickMaxBtn}
-          size='xs'
-          type='ghost'
-        >
-          <span className='max-btn-text'>{t('ui.components.Field.AmountInput.max')}</span>
-        </Button>
+        <>
+          {suffix}
+          <Button
+            onClick={_onClickMaxBtn}
+            size='xs'
+            type='ghost'
+          >
+            <span className='max-btn-text'>{t('ui.components.Field.AmountInput.max')}</span>
+          </Button>
+        </>
       )
       : (
-        <span />
+        <>
+          {suffix}
+        </>
       )
-  ), [showMaxButton, _onClickMaxBtn, t]);
+  ), [showMaxButton, suffix, _onClickMaxBtn, t]);
 
   const onChangeInput: ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
     let value = event.target.value;
@@ -242,6 +273,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       label={props.label}
       onBlur={props.onBlur}
       onChange={onChangeInput}
+      onCompositionEnd={onCompositionEnd}
+      onCompositionStart={onCompositionStart}
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
       onPaste={onPaste}
@@ -251,7 +284,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       readOnly={props.readOnly}
       ref={inputRef}
       statusHelp={statusHelp}
-      suffix={suffix}
+      suffix={suffixNode}
       tooltip={tooltip}
       value={inputValue}
     />
@@ -262,6 +295,10 @@ const AmountInput = styled(forwardRef(Component))<Props>(({ theme: { token } }: 
   return {
     '.ant-input-affix-wrapper, input': {
       overflow: 'hidden'
+    },
+
+    '.ant-input-wrapper .ant-input': {
+      paddingRight: '9px'
     },
 
     '.max-btn-text': {

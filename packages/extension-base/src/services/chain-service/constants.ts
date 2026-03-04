@@ -25,6 +25,28 @@ export const _PREDEFINED_SINGLE_MODES: Record<string, SingleModeJson> = {
 
 export const _PURE_EVM_CHAINS = ['binance', 'binance_test', 'ethereum', 'ethereum_goerli', 'astarEvm', 'shidenEvm', 'shibuyaEvm', 'crabEvm', 'pangolinEvm', 'cloverEvm', 'boba_rinkeby', 'boba', 'bobabase', 'bobabeam', 'watr_network_evm'];
 
+export const _GOVERNANCE_CHAIN_GROUP = {
+  polkadot: [
+    'statemint', 'bifrost_dot', 'hydradx_main', 'ajunaPolkadot', 'astar', 'phala',
+    'litentry', 'acala', 'centrifuge', 'interlay', 'laos_network'
+  ],
+  kusama: [
+    'statemine', 'bifrost', 'basilisk', 'karura', 'kintsugi'
+  ],
+  westend_assethub: [
+    'westend_assethub'
+  ],
+  paseo: [
+    'paseo_assethub'
+  ],
+  solo: [
+    'vara_network', 'zkverify'
+  ],
+  testnet: [
+    'zkverify_testnet'
+  ]
+};
+
 // Get balance----------------------------------------------------------------------------------------------------------
 
 export const _BALANCE_CHAIN_GROUP = {
@@ -32,7 +54,7 @@ export const _BALANCE_CHAIN_GROUP = {
   genshiro: ['genshiro_testnet', 'genshiro'],
   equilibrium_parachain: ['equilibrium_parachain'],
   bifrost: ['bifrost', 'acala', 'karura', 'acala_testnet', 'pioneer', 'bitcountry', 'bifrost_dot', 'hydradx_main', 'hydradx_rococo', 'pendulum', 'amplitude', 'continuum_network', 'truth_network', 'jamton', 'hydradx_hollarnet'],
-  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'origintrail', 'xode', 'paseo_assethub'],
+  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'origintrail', 'xode', 'paseo_assethub', 'energy_web_x'],
   kusama: ['kusama', 'kintsugi', 'kintsugi_test', 'interlay', 'acala', 'statemint', 'karura', 'bifrost'], // perhaps there are some runtime updates
   centrifuge: ['centrifuge'],
   supportBridged: ['rococo_assethub', 'statemint', 'statemine', 'polimec'],
@@ -125,6 +147,8 @@ export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
   statemint: 6,
   statemine: 6,
   polkadex: 12,
+  westend_assethub: 6,
+  paseo_assethub: 6,
   ternoa: 6,
   ternoa_alphanet: 6,
   westend: 6,
@@ -135,7 +159,7 @@ export const _EXPECTED_BLOCK_TIME: Record<string, number> = { // in seconds
   vara_testnet: 3,
   goldberg_testnet: 20,
   polimec: 12,
-  bifrost: 13, // expect 12 but actual 13
+  bifrost: 6, // bifrost kusama
   moonbeam: 12,
   moonriver: 12,
   moonbase: 6,
@@ -251,16 +275,17 @@ export const _TRANSFER_CHAIN_GROUP = {
   kintsugi: ['kintsugi', 'kintsugi_test', 'interlay', 'mangatax_para'],
   genshiro: ['genshiro_testnet', 'genshiro', 'equilibrium_parachain'],
   bitcountry: ['pioneer', 'bitcountry'],
-  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'origintrail', 'xode', 'paseo_assethub'],
+  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'origintrail', 'xode', 'paseo_assethub', 'energy_web_x'],
   riochain: ['riochain'],
   sora_substrate: ['sora_substrate'],
   avail: ['kate', 'goldberg_testnet'],
   pendulum: ['pendulum', 'amplitude', 'amplitude_test', 'hydradx_main', 'bifrost', 'bifrost_dot', 'jamton', 'hydradx_hollarnet'],
   centrifuge: ['centrifuge'],
   disable_transfer: ['crab', 'pangolin'],
-  truth: ['truth_network'],
-  bittensor: ['bittensor']
+  truth: ['truth_network']
 };
+
+export const USE_MULTILOCATION_INDEX = ['energy_web_x'];
 
 export const _MANTA_ZK_CHAIN_GROUP = ['calamari'];
 

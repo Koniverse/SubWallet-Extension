@@ -44,3 +44,21 @@ export const isPoolLeave = (txType: ExtrinsicType) =>
     ExtrinsicType.UNSTAKE_VDOT,
     ExtrinsicType.UNSTAKE_VMANTA
   ].includes(txType);
+
+export const isTypeGov = (txType: ExtrinsicType) => [
+  ExtrinsicType.GOV_VOTE,
+  ExtrinsicType.GOV_UNVOTE,
+  ExtrinsicType.GOV_UNLOCK_VOTE
+].includes(txType);
+
+export const isTypeManageSubstrateProxy = (txType: ExtrinsicType) => [
+  ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT,
+  ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT
+].includes(txType);
+
+export const isTypeMultisig = (txType: ExtrinsicType) => [
+  ExtrinsicType.MULTISIG_APPROVE_TX,
+  ExtrinsicType.MULTISIG_EXECUTE_TX,
+  ExtrinsicType.MULTISIG_CANCEL_TX,
+  ExtrinsicType.MULTISIG_INIT_TX
+].includes(txType);

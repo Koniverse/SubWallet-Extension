@@ -117,7 +117,7 @@ function Component ({ className = '', id, onCancel, tokenBalanceMap, tokenSlugs 
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t<string>('ui.BALANCE.components.Modal.GlobalSearchToken.tokenName')}
+        placeholder={t('ui.BALANCE.components.Modal.GlobalSearchToken.tokenName')}
         searchValue={currentSearchText}
       />
       <SwList

@@ -15,7 +15,11 @@ const useCreateGetChainAndExcludedTokenByAccountProxy = () => {
   const getAllowedChainsByAccountProxy = useCoreCreateGetChainSlugsByAccountProxy();
   const getExcludedTokensByAccountProxy = useGetExcludedTokens();
 
-  return useCallback((accountProxy: AccountProxy): ChainAndExcludedTokenInfo => {
+  return useCallback((accountProxy: AccountProxy | null): ChainAndExcludedTokenInfo => {
+    if (!accountProxy) {
+      return { allowedChains: [], excludedTokens: [] };
+    }
+
     const allowedChains = getAllowedChainsByAccountProxy(accountProxy);
 
     const excludedTokens = getExcludedTokensByAccountProxy(allowedChains, accountProxy);

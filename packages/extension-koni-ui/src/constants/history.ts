@@ -46,6 +46,16 @@ export const TxTypeNameMap: Record<ExtrinsicType, string> = {
   [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: detectTranslate('ui.HISTORY.constant.history.tokenApprove'),
   [ExtrinsicType.SWAP]: detectTranslate('ui.HISTORY.constant.history.swap'),
   [ExtrinsicType.CLAIM_BRIDGE]: detectTranslate('ui.HISTORY.constant.history.claimToken'),
+  [ExtrinsicType.GOV_VOTE]: detectTranslate('ui.HISTORY.constant.history.vote'),
+  [ExtrinsicType.GOV_UNVOTE]: detectTranslate('ui.HISTORY.constant.history.unvote'),
+  [ExtrinsicType.GOV_UNLOCK_VOTE]: detectTranslate('ui.HISTORY.constant.history.unlockVotes'),
+  [ExtrinsicType.MULTISIG_APPROVE_TX]: detectTranslate('ui.HISTORY.constant.history.multisigSignTransaction'),
+  [ExtrinsicType.MULTISIG_CANCEL_TX]: detectTranslate('ui.HISTORY.constant.history.multisigSignTransaction'),
+  [ExtrinsicType.MULTISIG_EXECUTE_TX]: detectTranslate('ui.HISTORY.constant.history.multisigSignTransaction'),
+  [ExtrinsicType.MULTISIG_INIT_TX]: detectTranslate('ui.HISTORY.constant.history.multisigSignTransaction'),
+  [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.HISTORY.constant.history.addSubstrateProxyAccount'),
+  [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.HISTORY.constant.history.removeSubstrateProxyAccount'),
+  [ExtrinsicType.SUBSTRATE_PROXY_INIT_TX]: detectTranslate('ui.HISTORY.constant.history.substrateProxyInit'),
   [ExtrinsicType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.history.unknown')
 };
 

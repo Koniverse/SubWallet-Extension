@@ -17,7 +17,7 @@ import { HistoryQuery } from '@subwallet/extension-base/services/storage-service
 import YieldPoolStore from '@subwallet/extension-base/services/storage-service/db-stores/YieldPoolStore';
 import YieldPositionStore from '@subwallet/extension-base/services/storage-service/db-stores/YieldPositionStore';
 import { BalanceItem, ProcessTransactionData, StepStatus, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
+import { GetNotificationParams, MarkAllReadParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { BN_ZERO, reformatAddress } from '@subwallet/extension-base/utils';
 import keyring from '@subwallet/ui-keyring';
 import BigN from 'bignumber.js';
@@ -26,6 +26,9 @@ import { DexieExportJsonStructure, exportDB } from 'dexie-export-import';
 
 import { logger as createLogger } from '@polkadot/util';
 import { Logger } from '@polkadot/util/types';
+
+import { GovVotingInfo } from '../open-gov/interface';
+import GovLockedInfoStore from './db-stores/GovLockedInfoStore';
 
 export const DEXIE_BACKUP_TABLES = ['chain', 'asset', 'migrations', 'transactions', 'campaign'];
 
@@ -76,8 +79,10 @@ export default class DatabaseService {
       inappNotification: new InappNotificationStore(this._db.inappNotification),
 
       // process transaction
-      processTransactions: new ProcessTransactionStore(this._db.processTransactions)
+      processTransactions: new ProcessTransactionStore(this._db.processTransactions),
 
+      // gov
+      govLockedInfo: new GovLockedInfoStore(this._db.govLockedInfos)
     };
   }
 
@@ -725,6 +730,10 @@ export default class DatabaseService {
     return this.stores.inappNotification.cleanUpOldNotifications(overdueTime);
   }
 
+  public cleanUpNotificationByIds (ids: string[]) {
+    return this.stores.inappNotification.cleanUpNotificationsByIds(ids);
+  }
+
   public subscribeUnreadNotificationsCountMap () {
     return this.stores.inappNotification.subscribeUnreadNotificationsCount();
   }
@@ -737,8 +746,8 @@ export default class DatabaseService {
     return this.stores.inappNotification.bulkUpsert(notifications);
   }
 
-  public markAllRead (proxyId: string) {
-    return this.stores.inappNotification.markAllRead(proxyId);
+  public markAllRead (params: MarkAllReadParams) {
+    return this.stores.inappNotification.markAllRead(params);
   }
 
   public switchReadStatus (params: RequestSwitchStatusParams) {
@@ -751,6 +760,24 @@ export default class DatabaseService {
 
   public updateNotificationProxyId (proxyIds: string[], newProxyId: string, newName: string) {
     return this.stores.inappNotification.updateNotificationProxyId(proxyIds, newProxyId, newName);
+  }
+
+  /* Gov */
+
+  async getGovLockedInfos (addresses: string[], chains: string[]) {
+    return this.stores.govLockedInfo.getByAddressesAndChains(addresses, chains);
+  }
+
+  async updateGovLockedInfos (infos: GovVotingInfo[]) {
+    return this.stores.govLockedInfo.upsertMany(infos);
+  }
+
+  removeGovLockedInfosByAddresses (addresses: string[]) {
+    return this.stores.govLockedInfo.removeByAddresses(addresses);
+  }
+
+  removeGovLockedInfosByChains (chains: string[]) {
+    return this.stores.govLockedInfo.removeByChains(chains);
   }
 
   async exportDB () {

@@ -304,7 +304,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   {t('ui.SETTINGS.screen.Setting.Security.advancedPhishingDetection')}
                 </div>
                 <div className='__item-description'>
-                  {t('Show warnings for phishing sites and protect your assets from scams')}
+                  {t('ui.SETTINGS.screen.Setting.Security.showPhishingWarningsProtectAssets')}
                 </div>
               </div>
               <div className='__item-right-part'>

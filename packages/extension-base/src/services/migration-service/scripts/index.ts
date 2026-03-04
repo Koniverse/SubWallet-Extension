@@ -1,15 +1,13 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import MigrateAssetSetting20251107 from '@subwallet/extension-base/services/migration-service/scripts/databases/MigrateAssetSetting20251107';
-import MigrateChainPatrol from '@subwallet/extension-base/services/migration-service/scripts/MigrateChainPatrol';
-import MigrateTransactionHistoryBySymbol20251107 from '@subwallet/extension-base/services/migration-service/scripts/MigrateTransactionHistoryBySymbol20251107';
-
 import BaseMigrationJob from '../Base';
 import ClearMetadataDatabase from './databases/ClearMetadataDatabase';
 import ClearMetadataForMythos from './databases/ClearMetadataForMythos';
 import MigrateAssetSetting from './databases/MigrateAssetSetting';
 import MigrateAssetSetting20251027 from './databases/MigrateAssetSetting20251027';
+import MigrateAssetSetting20251107 from './databases/MigrateAssetSetting20251107';
+import MigrateAssetSetting20251223 from './databases/MigrateAssetSetting20251223';
 import MigrateEarningVersion from './databases/MigrateEarningVersion';
 import ReloadMetadata from './databases/ReloadMetadata';
 import MigrateLedgerAccount from './keyring/MigrateLedgerAccount';
@@ -28,6 +26,7 @@ import DeleteEarningData20251105 from './DeleteEarningData20251105';
 import DisableZeroBalanceTokens from './DisableZeroBalanceTokens';
 import EnableVaraChain from './EnableVaraChain';
 import MigrateAuthUrls from './MigrateAuthUrls';
+import MigrateChainPatrol from './MigrateChainPatrol';
 import MigrateImportedToken from './MigrateImportedToken';
 import MigrateNetworkSettings from './MigrateNetworkSettings';
 import MigrateNewUnifiedAccount from './MigrateNewUnifiedAccount';
@@ -36,6 +35,8 @@ import MigrateTransactionHistory from './MigrateTransactionHistory';
 import MigrateTransactionHistoryBridge from './MigrateTransactionHistoryBridge';
 import MigrateTransactionHistoryBySymbol from './MigrateTransactionHistoryBySymbol';
 import MigrateTransactionHistoryBySymbol20251027 from './MigrateTransactionHistoryBySymbol20251027';
+import MigrateTransactionHistoryBySymbol20251107 from './MigrateTransactionHistoryBySymbol20251107';
+import MigrateTransactionHistoryBySymbol20251223 from './MigrateTransactionHistoryBySymbol20251223';
 import MigrateWalletReference from './MigrateWalletReference';
 import OptimizeEnableToken from './OptimizeEnableToken';
 
@@ -86,5 +87,7 @@ export default <Record<string, typeof BaseMigrationJob>>{
   '1.3.64-02': MigrateTransactionHistoryBySymbol20251027,
   '1.3.65-01': DeleteEarningData20251105,
   '1.3.66-01': MigrateAssetSetting20251107,
-  '1.3.66-02': MigrateTransactionHistoryBySymbol20251107
+  '1.3.66-02': MigrateTransactionHistoryBySymbol20251107,
+  '1.3.72-01': MigrateAssetSetting20251223,
+  '1.3.72-02': MigrateTransactionHistoryBySymbol20251223
 };
