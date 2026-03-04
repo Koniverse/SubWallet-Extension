@@ -282,7 +282,8 @@ export const _TRANSFER_CHAIN_GROUP = {
   pendulum: ['pendulum', 'amplitude', 'amplitude_test', 'hydradx_main', 'bifrost', 'bifrost_dot', 'jamton', 'hydradx_hollarnet'],
   centrifuge: ['centrifuge'],
   disable_transfer: ['crab', 'pangolin'],
-  truth: ['truth_network']
+  truth: ['truth_network'],
+  bittensor: ['bittensor', 'bittensor_testnet']
 };
 
 export const USE_MULTILOCATION_INDEX = ['energy_web_x'];

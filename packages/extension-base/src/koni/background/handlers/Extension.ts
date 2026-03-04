@@ -1450,7 +1450,7 @@ export default class KoniExtension {
   }
 
   private async makeTransfer (inputData: RequestSubmitTransfer): Promise<SWTransactionResponse> {
-    const { chain, feeCustom, feeOption, from, to, tokenPayFeeSlug, tokenSlug, transferAll, transferBounceable, value } = inputData;
+    const { chain, feeCustom, feeOption, from, metadata, to, tokenPayFeeSlug, tokenSlug, transferAll, transferBounceable, value } = inputData;
     const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(tokenSlug);
     const errors = validateTransferRequest(transferTokenInfo, from, to, value, transferAll);
     const warnings: TransactionWarning[] = [];
@@ -1590,7 +1590,8 @@ export default class KoniExtension {
           networkKey: chain,
           tokenInfo: transferTokenInfo,
           to: to,
-          substrateApi
+          substrateApi,
+          metadata
         });
 
         if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) {
@@ -2360,7 +2361,7 @@ export default class KoniExtension {
   }
 
   private async subscribeMaxTransferable (request: RequestSubscribeTransfer, id: string, port: chrome.runtime.Port): Promise<ResponseSubscribeTransfer> {
-    const { address, chain, destChain: _destChain, feeCustom, feeOption, to, token, tokenPayFeeSlug, transferAll, value } = request;
+    const { address, chain, destChain: _destChain, feeCustom, feeOption, metadata, to, token, tokenPayFeeSlug, transferAll, value } = request;
     const cb = createSubscription<'pri(transfer.subscribe)'>(id, port);
 
     const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(token);
@@ -2399,7 +2400,8 @@ export default class KoniExtension {
       isTransferLocalTokenAndPayThatTokenAsFee,
       isTransferNativeTokenAndPayLocalTokenAsFee,
       nativeToken,
-      transferAll: transferAll
+      transferAll: transferAll,
+      metadata
     };
 
     const subscription = combineLatest({
