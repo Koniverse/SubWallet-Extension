@@ -109,7 +109,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   }, [inactiveModal, onSelectSigner, selected]);
 
   useEffect(() => {
-    if (fullList.length === 1 && !selectedSigner) {
+    if (!selectedSigner) {
       onSelectSigner(fullList[0]);
     }
   }, [fullList, selectedSigner, onSelectSigner]);

@@ -12,7 +12,7 @@ import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, Filt
 import { MultisigHistoryItem } from '@subwallet/extension-koni-ui/components/History/MultisigHistoryItem';
 import { CONFIRMATION_DETAIL_MODAL, DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, MULTISIG_HISTORY_INFO_MODAL, NOTI_MULTISIG_PENDINGTX_ID, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useCoreCreateReformatAddress, useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useCoreCreateReformatAddress, useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/extension-koni-ui/messaging';
 import { MultisigHistoryInfoModal } from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/MultisigHistoryInfoModal';
@@ -991,6 +991,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       setMultisigSelectedAddress('');
     }
   }, [multisigAccountAddressItems, multisigSelectedAddress]);
+
+  const checkChain = useChainChecker();
+
+  useEffect(() => {
+    if (viewValue === ViewValue.MULTISIG && multisigSelectedChain !== ALL_NETWORK_KEY) {
+      checkChain(multisigSelectedChain);
+    }
+  }, [checkChain, multisigChainItems, multisigSelectedChain, viewValue]);
 
   useEffect(() => {
     if (viewValue !== ViewValue.MULTISIG) {
