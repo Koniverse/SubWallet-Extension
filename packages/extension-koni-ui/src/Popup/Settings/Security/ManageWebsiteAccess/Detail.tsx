@@ -3,7 +3,7 @@
 
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
-import { AccountChainType, AccountJson, AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountJson, AccountProxy, AccountSignMode } from '@subwallet/extension-base/types';
 import { AccountProxyItem, DAppConfigurationModal, EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DAPP_CONFIGURATION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
