@@ -1959,6 +1959,10 @@ export default class KoniState {
     return secret;
   }
 
+  // Generate password used to encrypt/decrypt Subscan API key
+  // Password = extensionId + extension secret
+  // -> Bind encrypted data to THIS extension instance
+  // -> Prevent other extensions/apps from decrypting the stored API key
   private async getSubscanApiCipherPassword (): Promise<string> {
     const secret = await this.getExtensionSecret();
 
@@ -1967,13 +1971,20 @@ export default class KoniState {
 
   public async saveSubscanApiKey (apiKey: string): Promise<boolean> {
     try {
+    // Get cipher password used for encryption
       const cipherPassword = await this.getSubscanApiCipherPassword();
+
+      // Encrypt API key before saving to storage
+      // -> Avoid storing API key as plain text
+      // -> Prevent leakage if storage is inspected
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
       const encryptedData = await passworder.encrypt(cipherPassword, { apiKey });
 
+      // Persist encrypted API key to extension storage
       await SWStorage.instance.setItem(SUBSCAN_API_KEY_STORAGE, JSON.stringify(encryptedData));
 
-      // Sync API key to subscan service
+      // Sync API key to Subscan service instance
+      // -> Ensure API calls immediately use the latest key
       await this.syncSubscanApiKey();
 
       return true;
@@ -1986,16 +1997,21 @@ export default class KoniState {
 
   public async getSubscanApiKey (): Promise<string | null> {
     try {
+    // Read encrypted API key from storage
       const encryptedData = await SWStorage.instance.getItem(SUBSCAN_API_KEY_STORAGE);
 
       if (!encryptedData) {
         return null;
       }
 
+      // Recreate cipher password for decryption
       const cipherPassword = await this.getSubscanApiCipherPassword();
+
+      // Decrypt stored API key
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
       const decryptedData = await passworder.decrypt(cipherPassword, JSON.parse(encryptedData)) as { apiKey?: string };
 
+      // Return API key if exists
       return decryptedData.apiKey || null;
     } catch (e) {
       console.error(e);
@@ -2004,6 +2020,8 @@ export default class KoniState {
     }
   }
 
+  // Sync decrypted API key to Subscan service
+  // -> Allows service layer to use API key for authenticated requests
   private async syncSubscanApiKey () {
     try {
       const apiKey = await this.getSubscanApiKey();
