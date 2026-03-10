@@ -56,6 +56,7 @@ import { convertCardanoHexToBech32, validateAddressNetwork } from '@subwallet/ex
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
 import { keyring } from '@subwallet/ui-keyring';
+import { SUBWALLET_KEYRING } from '@subwallet/ui-keyring/defaults';
 import BigN from 'bignumber.js';
 import * as bitcoin from 'bitcoinjs-lib';
 import BN from 'bn.js';
@@ -75,6 +76,7 @@ import { KoniSubscription } from '../subscription';
 const passworder = require('browser-passworder');
 
 const ERROR_CONFIRMATION_TYPE = ['errorConnectNetwork'];
+const SUBSCAN_API_KEY_STORAGE = 'subscan_api_key';
 
 // List of providers passed into constructor. This is the list of providers
 // exposed by the extension.
@@ -304,6 +306,8 @@ export default class KoniState {
 
   private afterChainServiceInit () {
     this.subscanService.setSubscanChainMap(this.chainService.getSubscanChainMap());
+    // Sync Subscan API key
+    this.syncSubscanApiKey().catch(console.error);
   }
 
   public async init () {
@@ -1936,6 +1940,82 @@ export default class KoniState {
       console.error(e);
 
       return null;
+    }
+  }
+
+  private async getStoredKeyringJson (): Promise<string | null> {
+    return await new Promise((resolve) => {
+      chrome.storage.local.get([SUBWALLET_KEYRING], (result) => {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError);
+          resolve(null);
+
+          return;
+        }
+
+        const keyringJson = result[SUBWALLET_KEYRING] as unknown;
+
+        resolve(keyringJson ? JSON.stringify(keyringJson) : null);
+      });
+    });
+  }
+
+  private async getSubscanApiCipherPassword (): Promise<string> {
+    const storedKeyringJson = await this.getStoredKeyringJson();
+
+    if (storedKeyringJson) {
+      return `${chrome.runtime.id}:${storedKeyringJson}`;
+    }
+
+    return `${chrome.runtime.id}:subscan-api-key`;
+  }
+
+  public async saveSubscanApiKey (apiKey: string): Promise<boolean> {
+    try {
+      const cipherPassword = await this.getSubscanApiCipherPassword();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+      const encryptedData = await passworder.encrypt(cipherPassword, { apiKey });
+
+      await SWStorage.instance.setItem(SUBSCAN_API_KEY_STORAGE, JSON.stringify(encryptedData));
+
+      // Sync API key to subscan service
+      await this.syncSubscanApiKey();
+
+      return true;
+    } catch (e) {
+      console.error(e);
+
+      return false;
+    }
+  }
+
+  public async getSubscanApiKey (): Promise<string | null> {
+    try {
+      const encryptedData = await SWStorage.instance.getItem(SUBSCAN_API_KEY_STORAGE);
+
+      if (!encryptedData) {
+        return null;
+      }
+
+      const cipherPassword = await this.getSubscanApiCipherPassword();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+      const decryptedData = await passworder.decrypt(cipherPassword, JSON.parse(encryptedData)) as { apiKey?: string };
+
+      return decryptedData.apiKey || null;
+    } catch (e) {
+      console.error(e);
+
+      return null;
+    }
+  }
+
+  private async syncSubscanApiKey () {
+    try {
+      const apiKey = await this.getSubscanApiKey();
+
+      this.subscanService.setApiKey(apiKey);
+    } catch (e) {
+      console.error('Failed to sync Subscan API key:', e);
     }
   }
 

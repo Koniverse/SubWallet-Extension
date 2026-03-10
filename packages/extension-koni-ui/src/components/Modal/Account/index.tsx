@@ -12,3 +12,4 @@ export { default as ImportSeedTrustModal } from './ImportSeedTrustModal';
 export { default as NewSeedModal } from './NewSeedModal';
 export { default as AccountChainAddressesModal } from './AccountChainAddressesModal';
 export { default as AccountNameModal } from './AccountNameModal';
+export { SubscanApiConfigModal } from './SubscanApiConfigModal';
