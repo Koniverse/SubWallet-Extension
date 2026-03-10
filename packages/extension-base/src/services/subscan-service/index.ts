@@ -19,10 +19,16 @@ interface SubscanError {
 }
 
 export class SubscanService extends BaseApiRequestStrategyV2 {
+  private apiKey: string | null = null;
+
   constructor (private subscanChainMap: Record<string, string>, options?: Partial<ApiRequestContextProps>) {
     const context = new BaseApiRequestContext(options);
 
     super(context);
+  }
+
+  public setApiKey (key: string | null) {
+    this.apiKey = key;
   }
 
   private getApiUrl (chain: string, path: string) {
@@ -36,11 +42,17 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
   }
 
   private postRequest (url: string, body: any) {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+
+    if (this.apiKey) {
+      headers['X-API-Key'] = this.apiKey;
+    }
+
     return fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify(body)
     });
   }
