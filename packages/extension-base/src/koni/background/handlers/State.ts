@@ -56,7 +56,6 @@ import { convertCardanoHexToBech32, validateAddressNetwork } from '@subwallet/ex
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
 import { keyring } from '@subwallet/ui-keyring';
-import { SUBWALLET_KEYRING } from '@subwallet/ui-keyring/defaults';
 import BigN from 'bignumber.js';
 import * as bitcoin from 'bitcoinjs-lib';
 import BN from 'bn.js';
@@ -77,6 +76,7 @@ const passworder = require('browser-passworder');
 
 const ERROR_CONFIRMATION_TYPE = ['errorConnectNetwork'];
 const SUBSCAN_API_KEY_STORAGE = 'subscan_api_key';
+const SUBSCAN_SECRET_STORAGE = 'subscan_secret';
 
 // List of providers passed into constructor. This is the list of providers
 // exposed by the extension.
@@ -1943,31 +1943,26 @@ export default class KoniState {
     }
   }
 
-  private async getStoredKeyringJson (): Promise<string | null> {
-    return await new Promise((resolve) => {
-      chrome.storage.local.get([SUBWALLET_KEYRING], (result) => {
-        if (chrome.runtime.lastError) {
-          console.error(chrome.runtime.lastError);
-          resolve(null);
+  private async getExtensionSecret (): Promise<string> {
+    const result = await chrome.storage.local.get([SUBSCAN_SECRET_STORAGE]);
 
-          return;
-        }
+    let secret = result[SUBSCAN_SECRET_STORAGE] as string | undefined;
 
-        const keyringJson = result[SUBWALLET_KEYRING] as unknown;
+    if (!secret) {
+      secret = crypto.randomUUID();
 
-        resolve(keyringJson ? JSON.stringify(keyringJson) : null);
+      await chrome.storage.local.set({
+        [SUBSCAN_SECRET_STORAGE]: secret
       });
-    });
+    }
+
+    return secret;
   }
 
   private async getSubscanApiCipherPassword (): Promise<string> {
-    const storedKeyringJson = await this.getStoredKeyringJson();
+    const secret = await this.getExtensionSecret();
 
-    if (storedKeyringJson) {
-      return `${chrome.runtime.id}:${storedKeyringJson}`;
-    }
-
-    return `${chrome.runtime.id}:subscan-api-key`;
+    return `${chrome.runtime.id}:${secret}`;
   }
 
   public async saveSubscanApiKey (apiKey: string): Promise<boolean> {
