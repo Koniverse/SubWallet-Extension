@@ -72,17 +72,27 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [inactiveModal, isSaveDisabled, normalizedCurrent, notify, t]);
 
   useEffect(() => {
+    let isSync = true;
+
     if (isModalActive) {
       setIsLoading(true);
 
       getSubscanApiKey()
         .then((value) => {
+          if (!isSync) {
+            return;
+          }
+
           const apiKey = value || '';
 
           setSavedSubscanApiKey(apiKey);
           setSubscanApiKey(apiKey);
         })
         .catch((error) => {
+          if (!isSync) {
+            return;
+          }
+
           console.error(error);
           notify({
             message: t('ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.loadFailed'),
@@ -90,16 +100,16 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           });
         })
         .finally(() => {
-          setIsLoading(false);
+          if (isSync) {
+            setIsLoading(false);
+          }
         });
     }
-  }, [isModalActive, notify, t]);
 
-  useEffect(() => {
-    if (!isModalActive) {
-      setSubscanApiKey(savedSubscanApiKey);
-    }
-  }, [isModalActive, savedSubscanApiKey]);
+    return () => {
+      isSync = false;
+    };
+  }, [isModalActive, notify, t]);
 
   return (
     <SwModal
