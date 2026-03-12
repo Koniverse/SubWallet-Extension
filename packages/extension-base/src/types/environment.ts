@@ -9,4 +9,5 @@ export enum ProxyServiceRoute {
   UNISWAP = '/uniswap',
   CARDANO = '/cardano',
   PARASPELL = '/paraspell',
+  SUBSCAN = '/subscan',
 }

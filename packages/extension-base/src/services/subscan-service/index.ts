@@ -9,7 +9,8 @@ import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-re
 import { ApiRequestContextProps } from '@subwallet/extension-base/strategy/api-request-strategy/types';
 import { BaseApiRequestStrategyV2 } from '@subwallet/extension-base/strategy/api-request-strategy-v2';
 import { SubscanEventBaseItemData, SubscanEventListResponse, SubscanExtrinsicParam, SubscanExtrinsicParamResponse } from '@subwallet/extension-base/types';
-import { wait } from '@subwallet/extension-base/utils';
+import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
+import { fetchFromProxyService, targetIsWeb, wait } from '@subwallet/extension-base/utils';
 
 const QUERY_ROW = 100;
 
@@ -41,13 +42,32 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
     return `https://${subscanChain}.api.subscan.io/${path}`;
   }
 
-  private postRequest (url: string, body: any) {
+  private getProxyPath (url: string): string {
+    const parsed = new URL(url);
+    const suffix = '.api.subscan.io';
+    const chain = parsed.hostname.endsWith(suffix)
+      ? parsed.hostname.slice(0, -suffix.length)
+      : parsed.hostname;
+    const path = parsed.pathname.startsWith('/') ? parsed.pathname.slice(1) : parsed.pathname;
+
+    return `/${chain}/${path}${parsed.search}`;
+  }
+
+  private postRequest (url: string, body: unknown) {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json'
     };
 
     if (this.apiKey) {
       headers['X-API-Key'] = this.apiKey;
+    }
+
+    if (targetIsWeb) {
+      return fetchFromProxyService(ProxyServiceRoute.SUBSCAN, this.getProxyPath(url), {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body)
+      });
     }
 
     return fetch(url, {
