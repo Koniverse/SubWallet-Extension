@@ -1944,16 +1944,17 @@ export default class KoniState {
   }
 
   private async getExtensionSecret (): Promise<string> {
-    const result = await chrome.storage.local.get([SUBSCAN_SECRET_STORAGE]);
+    const result = await SWStorage.instance.getItem(SUBSCAN_SECRET_STORAGE);
 
-    let secret = result[SUBSCAN_SECRET_STORAGE] as string | undefined;
+    let secret = result as string | undefined;
 
     if (!secret) {
       secret = crypto.randomUUID();
 
-      await chrome.storage.local.set({
-        [SUBSCAN_SECRET_STORAGE]: secret
-      });
+      await SWStorage.instance.setItem(
+        SUBSCAN_SECRET_STORAGE,
+        secret
+      );
     }
 
     return secret;
@@ -1966,7 +1967,9 @@ export default class KoniState {
   private async getSubscanApiCipherPassword (): Promise<string> {
     const secret = await this.getExtensionSecret();
 
-    return `${chrome.runtime.id}:${secret}`;
+    const extensionId = chrome?.runtime?.id || 'subwallet';
+
+    return `${extensionId}:${secret}`;
   }
 
   public async saveSubscanApiKey (apiKey: string): Promise<boolean> {
