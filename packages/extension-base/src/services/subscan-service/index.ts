@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
+import { SUBSCAN_GATEWAY_URL } from '@subwallet/extension-base/constants';
 import { BASE_FETCH_ORDINAL_EVENT_DATA } from '@subwallet/extension-base/koni/api/nft/ordinal_nft/constants';
 import { SUBSCAN_API_CHAIN_MAP } from '@subwallet/extension-base/services/subscan-service/subscan-chain-map';
 import { CrowdloanContributionsResponse, ExtrinsicItem, ExtrinsicsListResponse, IMultiChainBalance, RequestBlockRange, RewardHistoryListResponse, SubscanResponse, TransferItem, TransfersListResponse } from '@subwallet/extension-base/services/subscan-service/types';
@@ -9,7 +10,7 @@ import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-re
 import { ApiRequestContextProps } from '@subwallet/extension-base/strategy/api-request-strategy/types';
 import { BaseApiRequestStrategyV2 } from '@subwallet/extension-base/strategy/api-request-strategy-v2';
 import { SubscanEventBaseItemData, SubscanEventListResponse, SubscanExtrinsicParam, SubscanExtrinsicParamResponse } from '@subwallet/extension-base/types';
-import { wait } from '@subwallet/extension-base/utils';
+import { targetIsWeb, wait } from '@subwallet/extension-base/utils';
 
 const QUERY_ROW = 100;
 
@@ -41,13 +42,24 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
     return `https://${subscanChain}.api.subscan.io/${path}`;
   }
 
-  private postRequest (url: string, body: any) {
+  private postRequest (url: string, body: unknown) {
+    const parsed = new URL(url);
     const headers: Record<string, string> = {
       'Content-Type': 'application/json'
     };
 
     if (this.apiKey) {
       headers['X-API-Key'] = this.apiKey;
+    }
+
+    if (targetIsWeb) {
+      headers.Host = parsed.hostname;
+
+      return fetch(`${SUBSCAN_GATEWAY_URL}${parsed.pathname}${parsed.search}`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body)
+      });
     }
 
     return fetch(url, {
