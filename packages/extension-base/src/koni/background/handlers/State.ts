@@ -1933,7 +1933,6 @@ export default class KoniState {
     // Get cipher password used for encryption
       const cipherPassword = await this.getSubscanApiCipherPassword();
 
-      console.log('cipherPassword Subscan API key:', cipherPassword);
       // Encrypt API key before saving to storage
       // -> Avoid storing API key as plain text
       // -> Prevent leakage if storage is inspected
@@ -1960,8 +1959,6 @@ export default class KoniState {
     // Read encrypted API key from storage
       const encryptedData = await SWStorage.instance.getItem(SUBSCAN_API_KEY_STORAGE);
 
-      console.log('Encrypted Subscan API key from storage:', encryptedData);
-
       if (!encryptedData) {
         return null;
       }
@@ -1972,8 +1969,6 @@ export default class KoniState {
       // Decrypt stored API key
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
       const decryptedData = await passworder.decrypt(cipherPassword, JSON.parse(encryptedData)) as { apiKey?: string };
-
-      console.log('Decrypted Subscan API key:', decryptedData);
 
       // Return API key if exists
       return decryptedData.apiKey || null;
