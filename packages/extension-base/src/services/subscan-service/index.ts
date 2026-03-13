@@ -53,7 +53,12 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
     }
 
     if (targetIsWeb) {
-      headers.Host = parsed.hostname;
+      const suffix = '.api.subscan.io';
+      const subscanChain = parsed.hostname.endsWith(suffix)
+        ? parsed.hostname.slice(0, -suffix.length)
+        : parsed.hostname;
+
+      headers['x-network'] = subscanChain;
 
       return fetch(`${SUBSCAN_GATEWAY_URL}${parsed.pathname}${parsed.search}`, {
         method: 'POST',
