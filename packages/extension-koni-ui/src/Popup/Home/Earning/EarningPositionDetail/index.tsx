@@ -215,7 +215,6 @@ function Component ({ compound,
     return !poolInfo.metadata.availableMethod.join;
   }, [poolInfo.chain, poolInfo.type, poolInfo.metadata.availableMethod.join]);
 
-
   const isDisabledUnStaked = useMemo(() => {
     return !poolInfo.metadata.availableMethod.defaultUnstake && !poolInfo.metadata.availableMethod.fastUnstake;
   }, [poolInfo.metadata.availableMethod.defaultUnstake, poolInfo.metadata.availableMethod.fastUnstake]);
