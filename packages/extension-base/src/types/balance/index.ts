@@ -80,6 +80,7 @@ export interface SubscribeSubstratePalletBalance extends SubscribeBasePalletBala
 
 export interface SubscribeEvmPalletBalance extends SubscribeBasePalletBalance {
   evmApi: _EvmApi;
+  substrateApiMap?: Record<string, _SubstrateApi>;
 }
 
 export interface SubscribeTonPalletBalance extends SubscribeBasePalletBalance {
