@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
+import { SUNSETTED_YIELD_POOL_SLUGS } from '@subwallet/extension-base/services/earning-service/constants';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { AccountProxyType, YieldPoolType } from '@subwallet/extension-base/types';
 import { isAccountAll } from '@subwallet/extension-base/utils';
@@ -45,6 +46,10 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
     const result: Record<string, YieldGroupInfo> = {};
 
     for (const pool of Object.values(poolInfoMap)) {
+      if (SUNSETTED_YIELD_POOL_SLUGS.includes(pool.slug)) {
+        continue;
+      }
+
       const chain = pool.chain;
       const extrinsicType = getExtrinsicTypeByPoolInfo(pool);
 

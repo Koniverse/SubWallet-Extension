@@ -38,6 +38,8 @@ interface StellaswapUnbonding {
   waiting: string
 }
 
+export const STELLA_SWAP_LIQUID_STAKING_SLUG = 'xcDOT___liquid_staking___stellaswap';
+
 export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakingPoolHandler {
   public slug: string;
   protected readonly name: string;
@@ -50,8 +52,8 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
   public override transactionChainType: ChainType = ChainType.EVM;
   protected readonly rateDecimals = 10; // Derivative asset decimals
   public readonly availableMethod: YieldPoolMethodInfo = {
-    join: true,
-    defaultUnstake: true,
+    join: false,
+    defaultUnstake: false,
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: true,
@@ -62,7 +64,7 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
   constructor (state: KoniState, chain: string) {
     super(state, chain);
 
-    this.slug = 'xcDOT___liquid_staking___stellaswap';
+    this.slug = STELLA_SWAP_LIQUID_STAKING_SLUG;
     this.name = 'StellaSwap Liquid Staking';
     this._logo = 'stellaswap';
     this.shortName = 'StellaSwap';
@@ -199,7 +201,8 @@ export default class StellaSwapLiquidStakingPoolHandler extends BaseLiquidStakin
             unstakeBalance: unlockBalance.toString(),
             isBondedBefore: totalBalance.gt(BN_ZERO),
             derivativeToken: derivativeTokenSlug,
-            status: activeBalance.gt(BN_ZERO) ? EarningStatus.EARNING_REWARD : EarningStatus.NOT_EARNING,
+            // StellaSwap announced all stDOT positions are auto-unstaking, so rewards are no longer earned.
+            status: EarningStatus.NOT_EARNING,
             nominations: [],
             unstakings
           };

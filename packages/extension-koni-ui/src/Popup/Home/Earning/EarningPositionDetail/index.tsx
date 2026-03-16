@@ -212,8 +212,13 @@ function Component ({ compound,
       return true;
     }
 
-    return false;
-  }, [poolInfo.chain, poolInfo.type]);
+    return !poolInfo.metadata.availableMethod.join;
+  }, [poolInfo.chain, poolInfo.type, poolInfo.metadata.availableMethod.join]);
+
+
+  const isDisabledUnStaked = useMemo(() => {
+    return !poolInfo.metadata.availableMethod.defaultUnstake && !poolInfo.metadata.availableMethod.fastUnstake;
+  }, [poolInfo.metadata.availableMethod.defaultUnstake, poolInfo.metadata.availableMethod.fastUnstake]);
 
   const subHeaderButtons: ButtonProps[] = useMemo(() => {
     return [
@@ -280,6 +285,7 @@ function Component ({ compound,
         <div className={'__transaction-buttons'}>
           <Button
             block={true}
+            disabled={isDisabledUnStaked}
             icon={(
               <Icon
                 phosphorIcon={MinusCircle}
