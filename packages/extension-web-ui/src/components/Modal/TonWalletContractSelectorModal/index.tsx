@@ -194,9 +194,9 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, onBack, onC
           {t('TON wallets have ')}
           <a
             href={TON_WALLET_CONTRACT_TYPES_URL}
-            rel='noreferrer'
+            rel='noopener noreferrer'
             style={{ textDecoration: 'underline' }}
-            target={'_blank'}
+            target='_blank'
           >multiple versions</a>
           {t(', each with its own wallet address and balance. Select a version with the address you want to get')}
         </div>

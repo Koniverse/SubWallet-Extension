@@ -533,8 +533,8 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                   <a
                     className={'__link'}
                     href='https://docs.subwallet.app/main/web-dashboard-user-guide/earning/faqs'
-                    rel='noreferrer'
-                    target={'_blank'}
+                    rel='noopener noreferrer'
+                    target='_blank'
                   >
                     {t('FAQs')}
                   </a>

@@ -146,9 +146,9 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
           {t('Some exchanges are still using legacy format for token deposit and withdrawal. Make sure you choose the correct address format to avoid risks of fund loss. ')}
           <a
             href={LEARN_MORE_DOCS_URL}
-            rel='noreferrer'
+            rel='noopener noreferrer'
             style={{ textDecoration: 'underline' }}
-            target={'_blank'}
+            target='_blank'
           >Learn more</a>
         </div>
         <SwList
