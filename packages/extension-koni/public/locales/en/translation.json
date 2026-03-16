@@ -2719,5 +2719,15 @@
   "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction": "You’ve a pending multisig transaction with the same information. Complete the transaction first, then try again",
   "ui.ACCOUNT.screen.Account.Detail.removeMultisigAccountWarning": "You will need to re-import this account to be able to access via this extension after removal",
   "ui.HISTORY.screen.HistoryDetail.CallData.transactionDetails": "Transaction details",
-  "ui.HISTORY.screen.HistoryDetail.CallData.callData": "Call data"
+  "ui.HISTORY.screen.HistoryDetail.CallData.callData": "Call data",
+  "ui.SETTINGS.screen.Setting.Account.configSubscanApi": "Config Subscan API key",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.title": "Your API key",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.description": "Enter your Subscan API key below to track real-time wallet activity updates in-app",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.apiKeyPlaceholder": "Enter key",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.cancel": "Cancel",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.save": "Save",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveSuccess": "Subscan API key saved",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveFailed": "Failed to save Subscan API key",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.loadFailed": "Failed to load Subscan API key",
+  "ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.select": "Select"
 }

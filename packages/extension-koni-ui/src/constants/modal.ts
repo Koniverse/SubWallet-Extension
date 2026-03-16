@@ -46,6 +46,7 @@ export const SELECT_ADDRESS_FORMAT_MODAL = 'select-address-format-modal';
 export const ADDRESS_GROUP_MODAL = 'address-group-modal';
 export const ACCOUNT_MIGRATION_IN_PROGRESS_WARNING_MODAL = 'account-migration-in-progress-warning-modal';
 export const WRAPPED_TRANSACTION_SIGNER_SELECTOR_MODAL = 'wrapped_transaction_signer_selector_modal';
+export const SUBSCAN_API_CONFIG_MODAL = 'subscan-api-key-modal';
 
 /* Campaign */
 export const HOME_CAMPAIGN_BANNER_MODAL = 'home-campaign-banner-modal';
