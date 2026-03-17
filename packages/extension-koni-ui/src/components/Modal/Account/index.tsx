@@ -11,3 +11,4 @@ export { default as ImportSeedModal } from './ImportSeedModal';
 export { default as NewSeedModal } from './NewSeedModal';
 export { default as AccountChainAddressesModal } from './AccountChainAddressesModal';
 export { default as AccountNameModal } from './AccountNameModal';
+export { default as SubscanApiConfigModal } from './SubscanApiConfigModal';

@@ -162,7 +162,7 @@ const createConfig = (entry, alias = {}, useSplitChunk = false) => {
       }),
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       fallback: {
-        crypto: false,
+        crypto: require.resolve('crypto-browserify'),
         path: require.resolve('path-browserify'),
         stream: require.resolve('stream-browserify'),
         os: require.resolve('os-browserify/browser'),

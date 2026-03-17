@@ -509,6 +509,10 @@ export type RequestSaveBrowserConfig = { browserConfig: BrowserConfig };
 
 export type RequestSaveOSConfig = { osConfig: OSConfig };
 
+export interface RequestSaveSubscanApiKey {
+  apiKey: string;
+}
+
 export interface RandomTestRequest {
   start: number;
   end: number;
@@ -2492,6 +2496,8 @@ export interface KoniRequestSignatures {
   'pri(settings.saveAppConfig)': [RequestSaveAppConfig, boolean];
   'pri(settings.saveBrowserConfig)': [RequestSaveBrowserConfig, boolean];
   'pri(settings.saveOSConfig)': [RequestSaveOSConfig, boolean];
+  'pri(settings.saveSubscanApiKey)': [RequestSaveSubscanApiKey, boolean];
+  'pri(settings.getSubscanApiKey)': [null, string | null];
 
   /* Earning */
 
