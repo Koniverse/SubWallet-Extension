@@ -110,7 +110,7 @@ Cronjob is define in folder `packages/extension-koni-base/src/cron`.
   - hooks: public hook for global function.
   - i18n: Internationalization.
   - stores: Redux stores generate with react hook.
-  - partials: Header components
+  - partials: Header components.
   - util: utilities methods.
   - messaging.ts: Send to background and handle return message.
 
