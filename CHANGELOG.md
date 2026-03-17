@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.3.75
+Build date: Mar 17, 2026.
+
+Features & Updates:
+- Add user-configurable Subscan API Key in settings (#4965)
+
+
 ## 1.3.74
 Build date: Feb 11, 2026.
 
