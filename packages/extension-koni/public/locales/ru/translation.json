@@ -2734,5 +2734,16 @@
   "ui.DAPP.Confirmations.MultisigSignerSelector.CallDataDetail.callData": "",
   "ui.DAPP.Confirmations.MultisigSignerSelector.Message.Sign.unableToSignTransaction": "",
   "ui.HISTORY.screen.History.allNetworks": "",
-  "ui.HISTORY.screen.HistoryDetail.Layout.signWith": ""
+  "ui.HISTORY.screen.HistoryDetail.Layout.signWith": "",
+  "ui.SETTINGS.screen.Setting.Account.configSubscanApi": "",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.title": "",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.description": "",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.apiKeyPlaceholder": "",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.cancel": "",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.save": "",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveSuccess": "",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveFailed": "",
+  "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.loadFailed": "",
+  "ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.select": "",
+  "ui.ACCOUNT.screen.Account.NewMultisigAccount.setApprovalThreshold": ""
 }

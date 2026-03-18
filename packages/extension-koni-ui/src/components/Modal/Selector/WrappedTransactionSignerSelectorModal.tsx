@@ -155,7 +155,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
             }
             onClick={onConfirmSelectSigner}
           >
-            {t('Select')}
+            {t('ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.select')}
           </Button>
         </>
       }
