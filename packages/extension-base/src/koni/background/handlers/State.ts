@@ -957,8 +957,15 @@ export default class KoniState {
     return this.chainService.disableChain(chainSlug);
   }
 
-  public disableAllChains (): boolean {
-    return this.chainService.disableAllChains();
+  public async disableAllChains (): Promise<boolean> {
+    const chainStateMap = this.chainService.getChainStateMap();
+    const activeChainSlugs = Object.keys(chainStateMap).filter((slug) => chainStateMap[slug].active);
+
+    for (const chainSlug of activeChainSlugs) {
+      await this.disableChain(chainSlug);
+    }
+
+    return true;
   }
 
   public async enableChain (chainSlug: string, enableTokens = true): Promise<boolean> {

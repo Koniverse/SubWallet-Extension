@@ -6267,7 +6267,7 @@ export default class KoniExtension {
       case 'pri(chainService.disableChain)':
         return await this.disableChain(request as string);
       case 'pri(chainService.disableAllChains)':
-        return this.#koniState.disableAllChains();
+        return await this.#koniState.disableAllChains();
       case 'pri(chainService.removeChain)':
         return this.removeCustomChain(request as string);
       case 'pri(chainService.validateCustomChain)':
