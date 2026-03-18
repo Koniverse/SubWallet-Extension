@@ -1,13 +1,14 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
+import { Layout, PageWrapper, SubscanApiConfigModal } from '@subwallet/extension-web-ui/components';
+import { SUBSCAN_API_CONFIG_MODAL } from '@subwallet/extension-web-ui/constants';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
-import { BackgroundIcon, Icon, SettingItem, SwIconProps } from '@subwallet/react-ui';
-import { CaretRight, CornersOut, Strategy } from 'phosphor-react';
-import React, { useCallback, useMemo } from 'react';
+import { BackgroundIcon, Icon, ModalContext, SettingItem, SwIconProps } from '@subwallet/react-ui';
+import { CaretRight, CornersOut, Key, Strategy } from 'phosphor-react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
@@ -64,10 +65,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { token } = useTheme() as Theme;
   const notify = useNotification();
   const { t } = useTranslation();
+  const { activeModal } = useContext(ModalContext);
 
   const goBack = useCallback(() => {
     navigate('/settings/list');
   }, [navigate]);
+
+  const onOpenSubscanApiModal = useCallback(() => {
+    activeModal(SUBSCAN_API_CONFIG_MODAL);
+  }, [activeModal]);
 
   const SettingGroupItemType = useMemo((): SettingGroupItemType[] => ([
     {
@@ -94,10 +100,18 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               message: 'Coming soon!'
             });
           }
+        },
+        {
+          key: 'config-subscan-api',
+          leftIcon: Key,
+          leftIconBgColor: token.red,
+          rightIcon: CaretRight,
+          title: t('Config Subscan API key'),
+          onClick: onOpenSubscanApiModal
         }
       ]
     }
-  ]), [navigate, notify, t, token]);
+  ]), [navigate, notify, onOpenSubscanApiModal, t, token]);
 
   return (
     <PageWrapper className={`account-settings ${className}`}>
@@ -139,6 +153,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           }
         </div>
       </Layout.WithSubHeaderOnly>
+      <SubscanApiConfigModal />
     </PageWrapper>
   );
 }
