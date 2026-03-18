@@ -11,7 +11,7 @@ import { isAbleToShowFee, isTypeManageSubstrateProxy } from '@subwallet/extensio
 import { Icon, Logo, Number, Web3Block } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CaretRight } from 'phosphor-react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -45,12 +45,15 @@ function Component (
     }
   }
 
-  const isProxyType = isTypeManageSubstrateProxy(item.type);
+  const isHiddenValue = useMemo(() => {
+    return item.type === ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE || isTypeManageSubstrateProxy(item.type);
+  }, [item.type]);
+
   const isMultisigAction = MULTISIG_ACTIONS.includes(item.type);
 
   return (
     <Web3Block
-      className={CN('history-item', className, displayData.className, { '-proxy-type': isProxyType })}
+      className={CN('history-item', className, displayData.className, { '-hidden': isHiddenValue })}
       leftItem={(
         <>
           <div className={'__main-icon-wrapper'}>
@@ -238,7 +241,7 @@ export const HistoryItem = styled(Component)<Props>(({ theme: { token } }: Props
       }
     },
 
-    '&.-proxy-type': {
+    '&.-hidden': {
       '.__value': {
         visibility: 'hidden'
       }
