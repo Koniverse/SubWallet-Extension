@@ -150,7 +150,6 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const subscription = substrateApi.subscribeDataWithMulti(params, async (rs) => {
     const balances = rs[systemAccountKey];
     const poolMemberInfos = rs[poolMembersKey];

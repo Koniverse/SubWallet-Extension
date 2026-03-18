@@ -24,6 +24,7 @@ export { default as GovUnlockTransactionConfirmation } from './GovUnlock';
 export { default as ChangeBittensorRootClaimRewardTypeTransactionConfirmation } from './ChangeBittensorRootClaimRewardType';
 export { default as AddSubstrateProxyAccountTransactionConfirmation } from './AddSubstrateProxyAccount';
 export { default as RemoveSubstrateProxyAccountTransactionConfirmation } from './RemoveSubstrateProxyAccount';
+export { default as PendingMultisigConfirmation } from './PendingMultisig';
 
 export * from './TransferBlock';
 export * from './Process';

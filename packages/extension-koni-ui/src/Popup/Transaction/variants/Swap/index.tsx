@@ -220,7 +220,9 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     } });
   }, [assetRegistryMap, chainInfoMap, fromTokenSlugValue, t]);
 
-  const onPreCheck = usePreCheckAction(fromValue, undefined, preCheckMessage);
+  const onPreCheck = usePreCheckAction({
+    address: fromValue, message: preCheckMessage, chain: chainValue
+  });
   const oneSign = useOneSignProcess(fromValue);
   const getReformatAddress = useCoreCreateReformatAddress();
 
@@ -521,6 +523,18 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
   }, [chainValue, checkChainConnected]);
 
   const onSubmit: FormCallbacks<SwapParams>['onFinish'] = useCallback((values: SwapParams) => {
+    const hasXcmStep = !!currentOptimalSwapPath?.steps?.some((s) => s.type === 'XCM');
+
+    if (targetAccountProxy.accountType === AccountProxyType.MULTISIG && hasXcmStep) {
+      notify({
+        message: t('ui.TRANSACTION.screen.Transaction.Swap.multisigAccountNotSupportedForSwap'),
+        type: 'error',
+        duration: 5
+      });
+
+      return;
+    }
+
     if (chainValue && !checkChainConnected(chainValue)) {
       openAlert({
         title: t('ui.TRANSACTION.screen.Transaction.Swap.payAttentionExclamation'),
@@ -704,7 +718,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     } else {
       transactionBlockProcess();
     }
-  }, [ErrorMessageMap.NoQuote, accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, customSwapErrorMessage, isChainConnected, notify, notifyErrorMessage, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t]);
+  }, [ErrorMessageMap.NoQuote, accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, customSwapErrorMessage, isChainConnected, notify, notifyErrorMessage, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t, targetAccountProxy.accountType]);
 
   const onAfterConfirmTermModal = useCallback(() => {
     return setConfirmedTerm('swap-term-confirmed');
@@ -1259,6 +1273,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
                 name={'from'}
               >
                 <AccountAddressSelector
+                  hiddenAccountProxyTypes={[AccountProxyType.MULTISIG]}
                   items={accountAddressItems}
                   label={`${t('ui.TRANSACTION.screen.Transaction.Swap.from')}:`}
                   labelStyle={'horizontal'}

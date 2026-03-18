@@ -67,6 +67,9 @@ export interface EventRegistry {
 
   // Open Gov
   'open-gov.ready': [boolean];
+
+  // Multisig
+  'multisig-service.ready': [boolean];
 }
 
 export type EventType = keyof EventRegistry;

@@ -98,8 +98,7 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   const [selectedType, setSelectedType] = useState<BittensorRootClaimType>(() => bittensorRootClaimType === 'Swap' || bittensorRootClaimType === 'Keep' ? bittensorRootClaimType : 'Others');
   const [, setClaimAvailBridgeStorage] = useLocalStorage(CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION, DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS);
   const { onError, onSuccess } = useHandleSubmitTransaction();
-  const onPreCheck = usePreCheckAction(address);
-
+  const onPreCheck = usePreCheckAction({ address, chain });
   const onSelectSwap = useCallback(() => {
     setSelectedType('Swap');
   }, []);

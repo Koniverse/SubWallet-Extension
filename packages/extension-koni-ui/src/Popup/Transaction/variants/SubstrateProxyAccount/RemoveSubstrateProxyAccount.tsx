@@ -32,7 +32,7 @@ const extrinsicType = ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT;
 
 const Component = ({ className }: Props): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/remove-proxy');
-  const { defaultData: { chain, from, substrateProxyAddressKeys }, goBack, selectSubstrateProxyAccountsToSign, setBackProps } = useTransactionContext<RemoveSubstrateProxyAccountParams>();
+  const { defaultData: { chain, from, substrateProxyAddressKeys }, goBack, setBackProps } = useTransactionContext<RemoveSubstrateProxyAccountParams>();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
@@ -41,7 +41,7 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
   const navigate = useNavigate();
   const { onError, onSuccess } = useHandleSubmitTransaction();
   const substrateProxyAccountGroup = useGetSubstrateProxyAccountGroupByAddress(from, chain);
-  const onPreCheck = usePreCheckAction(from);
+  const onPreCheck = usePreCheckAction({ chain, address: from });
 
   const accountProxy = useGetAccountProxyByAddress(from);
 
@@ -87,36 +87,17 @@ const Component = ({ className }: Props): React.ReactElement<Props> => {
   }, [activeModal]);
 
   const onClickSubmit = useCallback(() => {
-    // Function to send the remove substrate proxy account transaction
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
-      return handleRemoveSubstrateProxyAccount({
-        chain,
-        address: from,
-        selectedSubstrateProxyAccounts: substrateProxyAddressRemovedFiltered.substrateProxyItems,
-        isRemoveAll,
-        signerSubstrateProxyAddress
-      });
-    };
-
-    const excludedSubstrateProxyAccounts = substrateProxyAddressRemovedFiltered.substrateProxyItems.map(
-      (item) => ({
-        address: item.substrateProxyAddress,
-        substrateProxyType: item.substrateProxyType
-      })
-    );
-
     setLoading(true);
-    // Select substrate proxy account to sign the transaction
-    selectSubstrateProxyAccountsToSign({
+    handleRemoveSubstrateProxyAccount({
       chain,
       address: from,
-      type: extrinsicType,
-      excludedSubstrateProxyAccounts
-    }).then(sendPromise)
+      selectedSubstrateProxyAccounts: substrateProxyAddressRemovedFiltered.substrateProxyItems,
+      isRemoveAll
+    })
       .then(onSuccess)
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [selectSubstrateProxyAccountsToSign, chain, from, substrateProxyAddressRemovedFiltered.substrateProxyItems, onSuccess, onError, isRemoveAll]);
+  }, [chain, from, substrateProxyAddressRemovedFiltered.substrateProxyItems, onSuccess, onError, isRemoveAll]);
 
   const onCancelRemove = useCallback(() => {
     if (accountProxy?.id) {
