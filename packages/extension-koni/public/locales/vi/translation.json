@@ -2743,5 +2743,6 @@
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveSuccess": "",
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveFailed": "",
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.loadFailed": "",
-  "ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.select": ""
+  "ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.select": "",
+  "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": ""
 }

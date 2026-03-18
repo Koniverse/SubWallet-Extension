@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SigningRequest } from '@subwallet/extension-base/background/types';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountItemWithProxyAvatar, ConfirmationGeneralInfo, ViewDetailIcon } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useGetNativeTokenBasicInfo, useMetadata, useOpenDetailModal, useParseSubstrateRequestPayload } from '@subwallet/extension-koni-ui/hooks';
 import { enableChain } from '@subwallet/extension-koni-ui/messaging';
@@ -11,7 +12,7 @@ import { isRawPayload, isSubstrateMessage, noop } from '@subwallet/extension-kon
 import { Button } from '@subwallet/react-ui';
 import CN from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -49,16 +50,23 @@ function Component ({ className, request }: Props) {
   const onClickDetail = useOpenDetailModal();
 
   const isMessage = useMemo(() => isSubstrateMessage(payload), [payload]);
-  const isMultisigSignRequest = useMemo(() => !!account?.isMultisig && !isMessage, [account?.isMultisig, isMessage]);
+  const requiresMultisigSignerSelection = useMemo(() => !!account?.isMultisig, [account?.isMultisig]);
+  const isUnsupportedMultisigMessage = useMemo(() => requiresMultisigSignerSelection && isMessage, [isMessage, requiresMultisigSignerSelection]);
+  const isWrappedMultisigTransaction = useMemo(() => requiresMultisigSignerSelection && !isMessage, [isMessage, requiresMultisigSignerSelection]);
   const chainSlug = useMemo(() => chainInfo?.slug || '', [chainInfo?.slug]);
+  const accountTitle = useMemo(() => t('ui.ACCOUNT.components.AccountProxy.TypeTag.multisigAccount'), [t]);
 
   const disableApproval = useMemo(() => {
-    if (!isMultisigSignRequest) {
+    if (isUnsupportedMultisigMessage) {
+      return true;
+    }
+
+    if (!requiresMultisigSignerSelection) {
       return false;
     }
 
     return disableMultisigApproval;
-  }, [disableMultisigApproval, isMultisigSignRequest]);
+  }, [disableMultisigApproval, isUnsupportedMultisigMessage, requiresMultisigSignerSelection]);
 
   const initialCallData = useMemo(() => {
     if (isRawPayload(request.request.payload)) {
@@ -79,10 +87,10 @@ function Component ({ className, request }: Props) {
   }, [chainStateMap, chainInfo, isMessage]);
 
   useEffect(() => {
-    if (isMultisigSignRequest) {
+    if (requiresMultisigSignerSelection) {
       setDisableMultisigApproval(true);
     }
-  }, [isMultisigSignRequest, request.id]);
+  }, [requiresMultisigSignerSelection, request.id]);
 
   return (
     <>
@@ -92,9 +100,23 @@ function Component ({ className, request }: Props) {
           {t('ui.DAPP.Confirmations.Message.Sign.signatureRequest')}
         </div>
         <div className='description'>
-          {!isMultisigSignRequest ? t('ui.DAPP.Confirmations.Message.Sign.approvingRequestWithAccount') : t('ui.DAPP.Confirmations.Message.Sign.selectSignatory')}
+          {isUnsupportedMultisigMessage
+            ? (
+              <Trans
+                components={{
+                  highlight: (
+                    <span className='highlight' />
+                  )
+                }}
+                i18nKey={detectTranslate('ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType')}
+                values={{ accountTitle }}
+              />
+            )
+            : !requiresMultisigSignerSelection
+              ? t('ui.DAPP.Confirmations.Message.Sign.approvingRequestWithAccount')
+              : t('ui.DAPP.Confirmations.Message.Sign.selectSignatory')}
         </div>
-        {isMultisigSignRequest
+        {requiresMultisigSignerSelection && !isMessage
           ? (
             <MultisigSignerSelector
               chainSlug={chainSlug}
@@ -111,8 +133,9 @@ function Component ({ className, request }: Props) {
             <AccountItemWithProxyAvatar
               account={account}
               accountAddress={address}
-              className='account-item'
+              className={CN('account-item', { '-unsupported': isUnsupportedMultisigMessage })}
               isSelected={true}
+              showUnselectIcon={isUnsupportedMultisigMessage}
             />
 
             <div>
@@ -133,7 +156,7 @@ function Component ({ className, request }: Props) {
         disableApproval={disableApproval}
         id={request.id}
         isInternal={request.isInternal}
-        isWrapTransaction={isMultisigSignRequest}
+        isWrapTransaction={isWrappedMultisigTransaction}
         request={request.request}
       />
       <BaseDetailModal
@@ -158,6 +181,20 @@ function Component ({ className, request }: Props) {
 }
 
 const SignConfirmation = styled(Component)<Props>(({ theme: { token } }: ThemeProps) => ({
+  '.highlight': {
+    color: token.colorWarning
+  },
+
+  '.account-item.-unsupported': {
+    cursor: 'not-allowed',
+    opacity: token.opacityDisable,
+    background: token.colorBgSecondary,
+
+    '&:hover': {
+      cursor: 'not-allowed'
+    }
+  },
+
   '.account-list': {
     '.__prop-label': {
       marginRight: token.marginMD,

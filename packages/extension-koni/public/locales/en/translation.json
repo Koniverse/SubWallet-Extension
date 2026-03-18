@@ -2744,5 +2744,6 @@
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveSuccess": "Subscan API key saved",
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveFailed": "Failed to save Subscan API key",
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.loadFailed": "Failed to load Subscan API key",
-  "ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.select": "Select"
+  "ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.select": "Select",
+  "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": "Feature not available for <highlight>{{accountTitle}}</highlight>. Change to another account type and try again."
 }
