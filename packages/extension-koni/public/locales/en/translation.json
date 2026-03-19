@@ -2750,5 +2750,8 @@
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveSuccess": "Subscan API key saved",
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveFailed": "Failed to save Subscan API key",
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.loadFailed": "Failed to load Subscan API key",
-  "ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.select": "Select"
+  "ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.select": "Select",
+  "Only shows referenda you've voted directly in": "",
+  "Only shows referenda you've voted through delegation": "",
+  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": ""
 }
