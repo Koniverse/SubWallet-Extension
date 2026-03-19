@@ -2749,5 +2749,10 @@
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveSuccess": "",
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveFailed": "",
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.loadFailed": "",
-  "ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.select": ""
+  "ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.select": "",
+  "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworks": "",
+  "ui.SETTINGS.screen.Setting.Chains.Manage.disableAllNetworkConfirmation": "",
+  "ui.SETTINGS.screen.Setting.Chains.Manage.disableAllNetworkSubtitle": "",
+  "ui.SETTINGS.screen.Setting.Chains.Manage.turnOff": "",
+  "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworksUnable": ""
 }

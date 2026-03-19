@@ -2750,5 +2750,10 @@
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveSuccess": "Subscan API key saved",
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveFailed": "Failed to save Subscan API key",
   "ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.loadFailed": "Failed to load Subscan API key",
-  "ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.select": "Select"
+  "ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.select": "Select",
+  "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworks": "Turn off all networks",
+  "ui.SETTINGS.screen.Setting.Chains.Manage.disableAllNetworkConfirmation": "This button will automatically be toggled off once you enable any network from the network list",
+  "ui.SETTINGS.screen.Setting.Chains.Manage.disableAllNetworkSubtitle": "You sure you want to turn off all networks?",
+  "ui.SETTINGS.screen.Setting.Chains.Manage.turnOff": "Turn off",
+  "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworksUnable": "Unable to turn off all networks. Please try again later"
 }
