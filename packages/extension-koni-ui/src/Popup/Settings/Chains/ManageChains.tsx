@@ -5,7 +5,7 @@ import { NotificationType } from '@subwallet/extension-base/background/KoniTypes
 import { _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { AlertModal, FilterModal, Layout, NetworkEmptyList, NetworkToggleItem, OptionType, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { ChainInfoWithState, useAlert, useFilterModal, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { ChainInfoWithState, useAlert, useFilterModal, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import useChainInfoWithStateAndStatus, { ChainInfoWithStateAndStatus } from '@subwallet/extension-koni-ui/hooks/chain/useChainInfoWithStateAndStatus';
 import { disableAllNetwork } from '@subwallet/extension-koni-ui/messaging';
 import { ManageChainsParam, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -38,6 +38,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const isFillDefaultSearch = useRef<boolean>(false);
 
   const { t } = useTranslation();
+  const notify = useNotification();
   const { token } = useTheme() as Theme;
   const navigate = useNavigate();
   const dataContext = useContext(DataContext);
@@ -55,10 +56,16 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     closeAlert();
     setDisablingAll(true);
     disableAllNetwork()
+      .catch((error: Error) => {
+        notify({
+          message: error?.message || t('ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworksUnable'),
+          type: NotificationType.ERROR
+        });
+      })
       .finally(() => {
         setDisablingAll(false);
       });
-  }, [closeAlert]);
+  }, [closeAlert, notify, t]);
 
   const onDisableAll = useCallback(() => {
     if (!disablingAll && hasActiveChains) {

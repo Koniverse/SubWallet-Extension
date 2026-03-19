@@ -2732,5 +2732,6 @@
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworks": "",
   "ui.SETTINGS.screen.Setting.Chains.Manage.disableAllNetworkConfirmation": "",
   "ui.SETTINGS.screen.Setting.Chains.Manage.disableAllNetworkSubtitle": "",
-  "ui.SETTINGS.screen.Setting.Chains.Manage.turnOff": ""
+  "ui.SETTINGS.screen.Setting.Chains.Manage.turnOff": "",
+  "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworksUnable": ""
 }

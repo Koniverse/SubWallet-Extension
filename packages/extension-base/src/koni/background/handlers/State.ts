@@ -960,9 +960,23 @@ export default class KoniState {
   public async disableAllChains (): Promise<boolean> {
     const chainStateMap = this.chainService.getChainStateMap();
     const activeChainSlugs = Object.keys(chainStateMap).filter((slug) => chainStateMap[slug].active);
+    const failedChainSlugs: string[] = [];
 
     for (const chainSlug of activeChainSlugs) {
-      await this.disableChain(chainSlug);
+      try {
+        const isDisabled = await this.disableChain(chainSlug);
+
+        if (!isDisabled) {
+          failedChainSlugs.push(chainSlug);
+        }
+      } catch (error) {
+        failedChainSlugs.push(chainSlug);
+        this.logger.error(`Failed to disable chain ${chainSlug}`, error);
+      }
+    }
+
+    if (failedChainSlugs.length) {
+      throw new Error('Unable to turn off all networks. Please try again later');
     }
 
     return true;
