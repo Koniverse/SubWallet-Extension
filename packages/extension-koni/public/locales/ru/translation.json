@@ -2587,7 +2587,6 @@
   "ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.proxyType": "",
   "ui.TRANSACTION.screen.Transaction.RemoveSubstrateProxyAccount.availableBalance": "",
   "ui.ACCOUNT.components.SubstrateProxyAccount.SelectorItem.copiedToClipboard": "",
-  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "",
   "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.othersCardDescription": "",
   "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.swapCardTitle": "",
   "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.keepCardTitle": "",
