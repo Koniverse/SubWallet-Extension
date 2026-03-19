@@ -3,12 +3,12 @@
 
 import { _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
 
-const PRODUCTION_BRANCHES = ['master', 'webapp', 'webapp-dev'];
-const branchName = process.env.BRANCH_NAME || 'subwallet-dev';
-const fetchDomain = process.env.PATCH_CHAIN_LIST_URL || (PRODUCTION_BRANCHES.indexOf(branchName) > -1 ? 'https://chain-list-assets.subwallet.app' : 'https://dev.sw-chain-list-assets.pages.dev');
-const fetchFile = PRODUCTION_BRANCHES.indexOf(branchName) > -1 ? 'list.json' : 'preview.json';
+// const PRODUCTION_BRANCHES = ['master', 'webapp', 'webapp-dev'];
+// const branchName = process.env.BRANCH_NAME || 'subwallet-dev';
+// const fetchDomain = process.env.PATCH_CHAIN_LIST_URL || (PRODUCTION_BRANCHES.indexOf(branchName) > -1 ? 'https://chain-list-assets.subwallet.app' : 'https://dev.sw-chain-list-assets.pages.dev');
+// const fetchFile = PRODUCTION_BRANCHES.indexOf(branchName) > -1 ? 'list.json' : 'preview.json';
 
-export const ChainListVersion = '0.2.114-disable-patch-mobile'; // update this when build chain-list
+export const ChainListVersion = '0.2.114'; // update this when build chain-list
 
 // todo: move this interface to chainlist
 export interface PatchInfo {
@@ -27,25 +27,27 @@ export interface PatchInfo {
 }
 
 export async function fetchPatchData<T> () {
-  try {
-    const fetchPromise = fetch(`${fetchDomain}/patch/${ChainListVersion}/${fetchFile}`);
-    const timeout = new Promise<null>((resolve) => {
-      const id = setTimeout(() => {
-        clearTimeout(id);
-        resolve(null);
-      }, 1000);
-    });
-    const rs = await Promise.race([
-      timeout,
-      fetchPromise
-    ]);
+  return null;
 
-    if (!rs) {
-      return null;
-    }
-
-    return await rs.json() as T;
-  } catch (e) {
-    return null;
-  }
+  // try {
+  //   const fetchPromise = fetch(`${fetchDomain}/patch/${ChainListVersion}/${fetchFile}`);
+  //   const timeout = new Promise<null>((resolve) => {
+  //     const id = setTimeout(() => {
+  //       clearTimeout(id);
+  //       resolve(null);
+  //     }, 1000);
+  //   });
+  //   const rs = await Promise.race([
+  //     timeout,
+  //     fetchPromise
+  //   ]);
+  //
+  //   if (!rs) {
+  //     return null;
+  //   }
+  //
+  //   return await rs.json() as T;
+  // } catch (e) {
+  //   return null;
+  // }
 }
