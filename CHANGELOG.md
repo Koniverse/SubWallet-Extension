@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 1.3.76
+Build date: Mar 20, 2026.
+
+Features & Updates:
+- Unable to turn network when no add correct API key (#4972)
+- Display token name and subnet ID for subnet tokens | Bittensor (#4892)
+- Support the newly updated Root staking feature | Bittensor (#4829)
+
+
 ## 1.3.75
 Build date: Mar 17, 2026.
 
