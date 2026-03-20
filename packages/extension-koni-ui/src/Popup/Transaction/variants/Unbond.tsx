@@ -68,7 +68,7 @@ const validateFields: Array<keyof UnStakeParams> = ['value'];
 const Component: React.FC = () => {
   const { t } = useTranslation();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setCustomScreenTitle } = useTransactionContext<UnStakeParams>();
+  const { defaultData, persistData, setCustomScreenTitle } = useTransactionContext<UnStakeParams>();
   const { slug } = defaultData;
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('unstake');
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
@@ -376,7 +376,7 @@ const Component: React.FC = () => {
       return;
     }
 
-    const { chain, fastLeave, from, slug, value } = values;
+    const { fastLeave, from, slug, value } = values;
 
     const request: RequestYieldLeave = {
       address: from,
@@ -393,7 +393,7 @@ const Component: React.FC = () => {
     }
 
     // send unstake transaction
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
+    const unbondingPromise = () => {
       if (isDelegateStaking) {
         const nominator = nominators[0] as DelegatedStrategyInfo;
 
@@ -405,48 +405,32 @@ const Component: React.FC = () => {
 
         const request: RequestRemoveSubstrateProxyAccount = {
           address: from,
-          chain,
+          chain: poolInfo.chain,
           poolInfo,
           selectedSubstrateProxyAccounts: [selectedSubstrateProxyAccount]
         };
 
-        return handleRemoveSubstrateProxyAccount({ ...request, signerSubstrateProxyAddress }).then(onSuccess);
+        return handleRemoveSubstrateProxyAccount({ ...request });
       }
 
       return yieldSubmitLeavePool({
         ...request,
-        signerSubstrateProxyAddress
-      }).then(onSuccess);
+      });
     };
 
-    // wrap proxy selection
-    // for the Liquid Staking feature with multiple steps,
-    // only the root account is allowed to sign transactions, even if a valid proxy account is available to sign on its behalf.
-    const sendPromiseWrapper = async () => {
-      if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-        const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
-          chain,
-          address: from,
-          type: exType
-        });
-
-        return await sendPromise(substrateProxyAddress);
-      }
-
-      return await sendPromise();
-    };
 
     setLoading(true);
 
-    // delay for better loading UX
     setTimeout(() => {
-      sendPromiseWrapper()
+      unbondingPromise()
+        .then(onSuccess)
         .catch(onError)
         .finally(() => {
           setLoading(false);
         });
     }, 300);
-  }, [currentValidator, exType, isDelegateStaking, maxSlippage.slippage, mustChooseValidator, nominators, onError, onSuccess, poolInfo, positionInfo, selectSubstrateProxyAccountsToSign, stakingFee]);
+
+  }, [currentValidator, exType, isDelegateStaking, maxSlippage.slippage, mustChooseValidator, nominators, onError, onSuccess, poolInfo, positionInfo, stakingFee]);
 
   const onClickSubmit = useCallback((values: UnStakeParams) => {
     if (currentConfirmation) {
@@ -479,7 +463,7 @@ const Component: React.FC = () => {
     );
   }, [bondedValue, decimals, symbol, isSlippageAcceptable, isSubnetStaking, maxSlippage, setMaxSlippage]);
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);

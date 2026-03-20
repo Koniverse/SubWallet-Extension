@@ -11,13 +11,13 @@ import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { NotificationDescriptionMap, NotificationTitleMap, ONE_DAY_MILLISECOND } from '@subwallet/extension-base/services/inapp-notification-service/consts';
-import { _BaseNotificationInfo, _NotificationInfo, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { _BaseNotificationInfo, _NotificationInfo, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, MultisigApprovalNotificationMetadata, NotificationActionType, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { AvailBridgeSourceChain, AvailBridgeTransaction, fetchAllAvailBridgeClaimable, fetchPolygonBridgeTransactions, hrsToMillisecond, PolygonTransaction } from '@subwallet/extension-base/services/inapp-notification-service/utils';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
 import { ProcessTransactionData, ProcessType, SummaryEarningProcessData, SwapBaseTxData, YieldPoolType } from '@subwallet/extension-base/types';
-import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
+import { GetNotificationParams, MarkAllReadParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { formatNumber, getAddressesByChainType, reformatAddress } from '@subwallet/extension-base/utils';
 import { isSubstrateAddress } from '@subwallet/keyring';
 
@@ -46,8 +46,8 @@ export class InappNotificationService implements CronServiceInterface {
     this.onAccountProxyRemove();
   }
 
-  async markAllRead (proxyId: string) {
-    await this.dbService.markAllRead(proxyId);
+  async markAllRead (params: MarkAllReadParams) {
+    await this.dbService.markAllRead(params);
   }
 
   async switchReadStatus (params: RequestSwitchStatusParams) {
@@ -76,6 +76,10 @@ export class InappNotificationService implements CronServiceInterface {
 
   cleanUpOldNotifications (overdueTime = ONE_DAY_MILLISECOND * 60) {
     return this.dbService.cleanUpOldNotifications(overdueTime);
+  }
+
+  cleanUpNotificationByIds (ids: string[]) {
+    return this.dbService.cleanUpNotificationByIds(ids);
   }
 
   passValidateNotification (candidateNotification: _BaseNotificationInfo, comparedNotifications: _NotificationInfo[], remindTimeConfigInHrs: Record<NotificationActionType, number>) { // todo: simplify condition !!
@@ -113,12 +117,16 @@ export class InappNotificationService implements CronServiceInterface {
     }
 
     if ([NotificationActionType.CLAIM_AVAIL_BRIDGE_ON_ETHEREUM, NotificationActionType.CLAIM_AVAIL_BRIDGE_ON_AVAIL].includes(candidateNotification.actionType)) {
-      const { address, metadata, time } = candidateNotification;
+      const { actionType, address, metadata, time } = candidateNotification;
       const candidateMetadata = metadata as ClaimAvailBridgeNotificationMetadata;
       const remindTime = hrsToMillisecond(remindTimeConfigInHrs[candidateNotification.actionType]);
 
       for (const notification of comparedNotifications) {
         if (notification.address !== address) {
+          continue;
+        }
+
+        if (notification.actionType !== actionType) {
           continue;
         }
 
@@ -139,12 +147,16 @@ export class InappNotificationService implements CronServiceInterface {
     }
 
     if ([NotificationActionType.CLAIM_POLYGON_BRIDGE].includes(candidateNotification.actionType)) {
-      const { address, metadata, time } = candidateNotification;
+      const { actionType, address, metadata, time } = candidateNotification;
       const candidateMetadata = metadata as ClaimPolygonBridgeNotificationMetadata;
       const remindTime = hrsToMillisecond(remindTimeConfigInHrs[candidateNotification.actionType]);
 
       for (const notification of comparedNotifications) {
         if (notification.address !== address) {
+          continue;
+        }
+
+        if (notification.actionType !== actionType) {
           continue;
         }
 
@@ -165,10 +177,15 @@ export class InappNotificationService implements CronServiceInterface {
     }
 
     if ([NotificationActionType.SWAP, NotificationActionType.EARNING].includes(candidateNotification.actionType)) {
-      const candidateMetadata = candidateNotification.metadata as ProcessNotificationMetadata;
+      const { actionType, metadata } = candidateNotification;
+      const candidateMetadata = metadata as ProcessNotificationMetadata;
       const processId = candidateMetadata.processId;
 
       for (const notification of comparedNotifications) {
+        if (notification.actionType !== actionType) {
+          continue;
+        }
+
         const comparedMetadata = notification.metadata as ProcessNotificationMetadata;
         const _processId = comparedMetadata.processId;
 
@@ -178,11 +195,36 @@ export class InappNotificationService implements CronServiceInterface {
       }
     }
 
+    if ([NotificationActionType.MULTISIG_APPROVAL].includes(candidateNotification.actionType)) {
+      const { actionType, address, metadata } = candidateNotification;
+      const candidateMetadata = metadata as MultisigApprovalNotificationMetadata;
+
+      // todo: experiment without notification reminder, remove this todo if no problems raised
+      for (const notification of comparedNotifications) {
+        if (notification.address !== address) {
+          continue;
+        }
+
+        if (notification.actionType !== actionType) {
+          continue;
+        }
+
+        const comparedMetadata = notification.metadata as MultisigApprovalNotificationMetadata;
+        const sameNotification =
+          candidateMetadata.multisigTxType === comparedMetadata.multisigTxType &&
+          candidateMetadata.multisigKey === comparedMetadata.multisigKey;
+
+        if (sameNotification) {
+          return false;
+        }
+      }
+    }
+
     return true;
   }
 
   async validateAndWriteNotificationsToDB (notifications: _BaseNotificationInfo[], address: string) {
-    const proxyId = this.keyringService.context.belongUnifiedAccount(address) || address;
+    const proxyId = this.keyringService.context.belongUnifiedAccount(address) || reformatAddress(address);
     const accountName = this.keyringService.context.getCurrentAccountProxyName(proxyId);
     const passNotifications: _NotificationInfo[] = [];
     const [comparedNotifications, remindTimeConfig] = await Promise.all([
@@ -491,7 +533,7 @@ export class InappNotificationService implements CronServiceInterface {
       await this.startCron();
       this.status = ServiceStatus.STARTED;
     } catch (e) {
-
+      console.error('Failed to start InappNotificationService', e);
     }
   }
 
@@ -509,7 +551,7 @@ export class InappNotificationService implements CronServiceInterface {
       await this.stopCron();
       this.status = ServiceStatus.STOPPED;
     } catch (e) {
-
+      console.error('Failed to stop InappNotificationService', e);
     }
   }
 

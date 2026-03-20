@@ -5,7 +5,7 @@ import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useCoreCreateReformatAddress, useGetAccountByAddress, useGetChainPrefixBySlug, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import CN from 'classnames';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -26,12 +26,20 @@ const Component: React.FC<Props> = (props: Props) => {
   const networkPrefix = useGetChainPrefixBySlug(network);
   const displayAddress = account ? getReformatAddress(account, chainInfoMap[network]) : address;
 
+  const accountLabel = useMemo(() => {
+    if (account?.isMultisig) {
+      return t('ui.components.Confirmation.CommonTransactionInfo.multisig');
+    }
+
+    return t('ui.components.Confirmation.CommonTransactionInfo.account');
+  }, [account?.isMultisig, t]);
+
   const innerContent = (
     <>
       <MetaInfo.Account
         address={displayAddress || address}
         chainSlug={network}
-        label={t('ui.components.Confirmation.CommonTransactionInfo.account')}
+        label={accountLabel}
         name={account?.name}
         networkPrefix={networkPrefix}
       />

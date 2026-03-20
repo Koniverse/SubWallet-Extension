@@ -148,9 +148,10 @@ const useGroupYieldPosition = (): YieldPositionInfo[] => {
         rs.activeStake = new BigN(rs.activeStake).plus(info.activeStake).toString();
         rs.unstakeBalance = new BigN(rs.unstakeBalance).plus(info.unstakeBalance).toString();
         rs.isBondedBefore = rs.isBondedBefore || info.isBondedBefore;
+        const constituents = (info.metadata?.constituents as string[]);
 
-        if (info.metadata?.constituents?.length) {
-          info.metadata.constituents.forEach((c) => constituentsSet.add(c));
+        if (constituents?.length) {
+          constituents.forEach((c) => constituentsSet.add(c));
         }
       }
 

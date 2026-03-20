@@ -23,6 +23,7 @@ export const TxTypeNameMap: Record<ExtrinsicType, string> = {
   [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('ui.HISTORY.constant.history.unstake'),
   [ExtrinsicType.STAKING_UNBOND]: detectTranslate('ui.HISTORY.constant.history.unstake'),
   [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: detectTranslate('ui.HISTORY.constant.history.nominate'),
+  [ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE]: detectTranslate('ui.HISTORY.constant.history.changeRewards'),
   [ExtrinsicType.JOIN_YIELD_POOL]: detectTranslate('ui.HISTORY.constant.history.joinPool'),
   [ExtrinsicType.UNSTAKE_VDOT]: detectTranslate('ui.HISTORY.constant.history.unstakeVDot'),
   [ExtrinsicType.UNSTAKE_VMANTA]: detectTranslate('ui.HISTORY.constant.history.unstakeVManta'),
@@ -49,8 +50,13 @@ export const TxTypeNameMap: Record<ExtrinsicType, string> = {
   [ExtrinsicType.GOV_VOTE]: detectTranslate('ui.HISTORY.constant.history.vote'),
   [ExtrinsicType.GOV_UNVOTE]: detectTranslate('ui.HISTORY.constant.history.unvote'),
   [ExtrinsicType.GOV_UNLOCK_VOTE]: detectTranslate('ui.HISTORY.constant.history.unlockVotes'),
+  [ExtrinsicType.MULTISIG_APPROVE_TX]: detectTranslate('ui.HISTORY.constant.history.multisigSignTransaction'),
+  [ExtrinsicType.MULTISIG_CANCEL_TX]: detectTranslate('ui.HISTORY.constant.history.multisigSignTransaction'),
+  [ExtrinsicType.MULTISIG_EXECUTE_TX]: detectTranslate('ui.HISTORY.constant.history.multisigSignTransaction'),
+  [ExtrinsicType.MULTISIG_INIT_TX]: detectTranslate('ui.HISTORY.constant.history.multisigSignTransaction'),
   [ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.HISTORY.constant.history.addSubstrateProxyAccount'),
   [ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT]: detectTranslate('ui.HISTORY.constant.history.removeSubstrateProxyAccount'),
+  [ExtrinsicType.SUBSTRATE_PROXY_INIT_TX]: detectTranslate('ui.HISTORY.constant.history.substrateProxyInit'),
   [ExtrinsicType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.history.unknown')
 };
 

@@ -931,7 +931,13 @@ export class BalanceService implements StoppableServiceInterface {
   public async getSubstrateTokensBalanceByChain (address: string, chainSlug: string, assetsByChain: Record<string, _ChainAsset>): Promise<string[]> {
     const tokenBalanceSlugs: string[] = [];
 
-    const balanceData = await this.state.subscanService.getMultiChainBalance(address);
+    // Do not block chain enabling flow when balance detection fails.
+    const balanceData = await this.state.subscanService.getMultiChainBalance(address)
+      .catch((e) => {
+        console.error(e);
+
+        return [];
+      });
 
     if (!balanceData) {
       return [];

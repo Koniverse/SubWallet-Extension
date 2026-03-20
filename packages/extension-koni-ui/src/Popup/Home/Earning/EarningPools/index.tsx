@@ -4,7 +4,7 @@
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
-import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { AccountProxyType, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { EmptyList, FilterModal, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { EarningPoolItem } from '@subwallet/extension-koni-ui/components/Earning';
 import { BN_ZERO, DEFAULT_EARN_PARAMS, EARN_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
@@ -71,6 +71,8 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
     return yieldPositions.map((p) => p.slug);
   }, [yieldPositions]);
 
+  const isMultisigAccount = useMemo(() => currentAccountProxy?.accountType === AccountProxyType.MULTISIG, [currentAccountProxy]);
+
   const items: YieldPoolInfo[] = useMemo(() => {
     if (!pools.length) {
       return [];
@@ -79,6 +81,10 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
     const result: YieldPoolInfo[] = [];
 
     pools.forEach((poolInfo) => {
+      if (isMultisigAccount && poolInfo.type === YieldPoolType.LIQUID_STAKING) {
+        return;
+      }
+
       if (poolInfo.chain === 'parallel' && poolInfo.type === YieldPoolType.LIQUID_STAKING) {
         return;
       }
@@ -136,7 +142,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
     });
 
     return result;
-  }, [assetRegistry, pools, positionSlugs, tokenBalanceMap]);
+  }, [assetRegistry, isMultisigAccount, pools, positionSlugs, tokenBalanceMap]);
 
   const filterFunction = useMemo<(item: YieldPoolInfo) => boolean>(() => {
     return (item) => {
