@@ -2,23 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { BittensorStakingMetadata, SpecialYieldPositionInfo, TanssiStakingMetadata, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { detectTranslate, isSameAddress } from '@subwallet/extension-base/utils';
 import { Avatar, CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { InfoItemBase } from '@subwallet/extension-koni-ui/components/MetaInfo/parts';
-import { EarningActiveStakeDetailsModal, EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
+import { EarningActiveStakeDetailsModal, EarningBittensorClaimRewardTypeModal, EarningNominationModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
 import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/components/Modal/Earning/EarningValidatorSelectedModal';
-import { EARNING_ACITVE_STAKE_DETAILS_MODAL, EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
+import { CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION, DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS, EARNING_ACITVE_STAKE_DETAILS_MODAL, EARNING_BITTENSOR_ROOT_CLAIM_TYPE_MODAL, EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-koni-ui/constants';
 import { useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { EarningTagType, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { createEarningTypeTags, findAccountByAddress, isAccountAll, toShort } from '@subwallet/extension-koni-ui/utils';
+import { createEarningTypeTags, findAccountByAddress, getTransactionFromAccountProxyValue, isAccountAll, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowSquareOut, CaretLeft, CaretRight, Info } from 'phosphor-react';
+import { ArrowSquareOut, CaretLeft, CaretRight, Info, PencilSimpleLine } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import Slider, { CustomArrowProps, Settings } from 'react-slick';
 import styled from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
 type Props = ThemeProps & {
   compound: YieldPositionInfo;
@@ -55,6 +57,10 @@ const PrevArrow = ({ currentSlide, slideCount, ...props }: CustomArrowProps) => 
   </div>
 );
 
+function isBittensorMetadata (metadata: TanssiStakingMetadata | BittensorStakingMetadata | undefined): metadata is BittensorStakingMetadata {
+  return !!metadata && 'bittensorRootClaimType' in metadata;
+}
+
 function Component ({ className, compound, inputAsset, list, poolInfo }: Props) {
   const { t } = useTranslation();
   const { activeModal, inactiveModal } = useContext(ModalContext);
@@ -67,6 +73,8 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
 
   const [isShowActiveStakeDetailsModal, setIsShowActiveStakeDetailsModal] = useState<boolean>(false);
   const [selectedPositionInfo, setSelectedPositionInfo] = useState<YieldPositionInfo | undefined>();
+  const [, setClaimAvailBridgeStorage] = useLocalStorage(CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION, DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS);
+  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
 
   const sliderSettings: Settings = useMemo(() => {
     return {
@@ -176,6 +184,22 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
     setIsShowActiveStakeDetailsModal(false);
   }, [inactiveModal]);
 
+  const openEarningBittensorClaimRewardTypeModal = useCallback((item: YieldPositionInfo) => {
+    return () => {
+      setSelectedAddress(item.address);
+      setClaimAvailBridgeStorage({
+        ...DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS,
+        fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy),
+        chain: item.chain,
+        from: item.address,
+        asset: inputAsset?.slug || '',
+        bittensorRootClaimType: (item.metadata as BittensorStakingMetadata)?.bittensorRootClaimType || ''
+      });
+
+      activeModal(EARNING_BITTENSOR_ROOT_CLAIM_TYPE_MODAL);
+    };
+  }, [activeModal, currentAccountProxy, inputAsset?.slug, setClaimAvailBridgeStorage]);
+
   const accountInfoItemsNode = useMemo(() => {
     return list.map((item) => {
       const disableButton = !item.nominations.length;
@@ -199,7 +223,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
               label: (
                 <div className='__label-with-icon'>
                   {t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.activeStake')}
-                  {item.metadata && new BigN(item.activeStake).gt(0) && (
+                  {!!(item?.metadata as TanssiStakingMetadata)?.isShowActiveStakeDetails && new BigN(item.activeStake).gt(0) && (
                     <span
                       className='__info-icon-wrapper'
                       onClick={openActiveStakeDetailsModal(item)}
@@ -269,6 +293,25 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
             {earningTagType.label}
           </MetaInfo.Default>
 
+          {!!item.metadata && isBittensorMetadata(item.metadata) && (
+            <MetaInfo.Default
+              label={t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.claimRewardsType')}
+            >
+              <div className='__root-claim-type'>
+                {item.metadata.bittensorRootClaimType}
+                <div
+                  className='__root-claim-type-icon'
+                  onClick={openEarningBittensorClaimRewardTypeModal(item)}
+                >
+                  <Icon
+                    customSize={'18px'}
+                    phosphorIcon={PencilSimpleLine}
+                  />
+                </div>
+              </div>
+            </MetaInfo.Default>
+          )}
+
           {metaInfoItems.map((item, index) => (
             <MetaInfo.Number
               key={`${index}`}
@@ -315,10 +358,21 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
               />
             )
           }
+
+          {!!(selectedItem && isBittensorMetadata(selectedItem.metadata) && selectedItem.metadata.bittensorRootClaimType) && (
+            <EarningBittensorClaimRewardTypeModal
+              address={selectedItem.address}
+              bittensorRootClaimType={selectedItem.metadata.bittensorRootClaimType}
+              chain={selectedItem.chain}
+              className={className}
+              modalId={EARNING_BITTENSOR_ROOT_CLAIM_TYPE_MODAL}
+              poolSlug={selectedItem.slug}
+            />
+          )}
         </MetaInfo>
       );
     });
-  }, [list, isSubnetStaking, t, inputAsset, isSpecial, openActiveStakeDetailsModal, deriveAsset?.decimals, deriveAsset?.symbol, isAllAccount, poolInfo.chain, networkPrefix, renderAccount, earningTagType.color, earningTagType.label, haveNomination, haveValidator, canChangeValidator, createOpenValidator, createOpenNomination, isShowActiveStakeDetailsModal, closeActiveStakeDetailsModal, selectedPositionInfo]);
+  }, [list, isSubnetStaking, t, inputAsset, isSpecial, openActiveStakeDetailsModal, deriveAsset?.decimals, deriveAsset?.symbol, isAllAccount, poolInfo.chain, networkPrefix, renderAccount, earningTagType.color, earningTagType.label, openEarningBittensorClaimRewardTypeModal, haveNomination, haveValidator, canChangeValidator, createOpenValidator, createOpenNomination, isShowActiveStakeDetailsModal, selectedPositionInfo, closeActiveStakeDetailsModal, selectedItem, className]);
 
   return (
     <>
@@ -353,7 +407,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         item={selectedItem}
         onCancel={onCloseNominationModal}
       />
-      {selectedItem && (
+      {!!selectedItem && (
         <EarningValidatorSelectedModal
           chain={poolInfo.chain}
           compound={compound}
@@ -529,5 +583,19 @@ export const AccountInfoPart = styled(Component)<Props>(({ theme: { token } }: P
 
   '.__info-icon': {
     color: token.colorTextLight3
+  },
+
+  '.__root-claim-type': {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4
+  },
+
+  '.__root-claim-type-icon': {
+    cursor: 'pointer',
+    color: token.colorTextLight4,
+    '&:hover': {
+      color: token.colorTextLight2
+    }
   }
 }));

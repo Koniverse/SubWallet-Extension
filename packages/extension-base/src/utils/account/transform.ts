@@ -283,6 +283,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
           ...OPEN_GOV_ACTIONS,
+          ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE,
           ...MULTISIG_ACTIONS,
           ...SUBSTRATE_PROXY_ACTION,
           ...OTHER_ACTIONS
@@ -326,6 +327,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_VMANTA_ACTIONS,
           ...CLAIM_AVAIL_BRIDGE,
           ...OPEN_GOV_ACTIONS,
+          ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE,
           ...MULTISIG_ACTIONS,
           ...SUBSTRATE_PROXY_ACTION,
           ...OTHER_ACTIONS
@@ -391,6 +393,7 @@ export const getAccountTransactionActions = (signMode: AccountSignMode, networkT
           ...EARN_SDOT_ACTIONS,
           // ...EARN_QDOT_ACTIONS,
           ...OPEN_GOV_ACTIONS,
+          ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE,
           ...MULTISIG_ACTIONS,
           ...SUBSTRATE_PROXY_ACTION,
           ...OTHER_ACTIONS
