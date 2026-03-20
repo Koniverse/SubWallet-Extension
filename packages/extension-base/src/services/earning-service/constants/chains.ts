@@ -24,7 +24,8 @@ export const _STAKING_CHAIN_GROUP = {
 };
 
 export const SUNSETTED_YIELD_POOL_SLUGS: string[] = [
-  STELLA_SWAP_LIQUID_STAKING_SLUG
+  STELLA_SWAP_LIQUID_STAKING_SLUG,
+  'MANTA___native_staking___manta_network'
 ];
 
 export const RELAY_HANDLER_DIRECT_STAKING_CHAINS = [
