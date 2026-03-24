@@ -261,6 +261,7 @@ const Component: React.FC<Props> = (props: Props) => {
           replaceEarningValue(_item, '{maintainBalance}', maintainBalance);
           replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
           replaceEarningValue(_item, '{shortName}', poolInfo.metadata.shortName);
+          replaceEarningValue(_item, '{proxyDeposit}', getInputValuesFromString((poolInfo)?.proxyDeposit || '0', maintainDecimals || 0));
 
           if (paidOut !== undefined) {
             replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());

@@ -414,10 +414,9 @@ const Component: React.FC = () => {
       }
 
       return yieldSubmitLeavePool({
-        ...request,
+        ...request
       });
     };
-
 
     setLoading(true);
 
@@ -429,8 +428,7 @@ const Component: React.FC = () => {
           setLoading(false);
         });
     }, 300);
-
-  }, [currentValidator, exType, isDelegateStaking, maxSlippage.slippage, mustChooseValidator, nominators, onError, onSuccess, poolInfo, positionInfo, stakingFee]);
+  }, [currentValidator, isDelegateStaking, maxSlippage.slippage, mustChooseValidator, nominators, onError, onSuccess, poolInfo, positionInfo, stakingFee]);
 
   const onClickSubmit = useCallback((values: UnStakeParams) => {
     if (currentConfirmation) {

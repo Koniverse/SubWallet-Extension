@@ -55,17 +55,6 @@ const Component: React.FC<Props> = (props: Props) => {
         />}
       </MetaInfo>
 
-      <MetaInfo
-        className={'meta-info'}
-        hasBackgroundWrapper
-      >
-        <MetaInfo.Account
-          address={transaction.address}
-          chainSlug={transaction.chain}
-          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.signWith')}
-        />
-      </MetaInfo>
-      
       {isDelegatedStaking &&
       <AlertBox
         className={CN(className, 'alert-box')}

@@ -131,6 +131,10 @@ export const TotalEquivalentDetailModal = styled(Component)<Props>(({ theme: { t
       cursor: 'pointer'
     },
 
+    '.error-message': {
+      color: token.colorError
+    },
+
     '.__locked-others-icon': {
       color: token.colorTextLight3,
       marginLeft: token.marginXXS

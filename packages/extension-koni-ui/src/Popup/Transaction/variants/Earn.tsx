@@ -10,12 +10,12 @@ import { SWTransactionResponse } from '@subwallet/extension-base/services/transa
 import { AccountProxyType, BalanceType, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, StrategyInfo, SubmitJoinDelegateStaking, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
 import { addLazy } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningStrategySelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { AccountAddressSelector, AlertBox, AmountInput, EarningPoolSelector, EarningStrategySelector, EarningValidatorSelector, HiddenInput, InfoIcon, LoadingScreen, MetaInfo, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { EarningProcessItem } from '@subwallet/extension-koni-ui/components/Earning';
 import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
-import { EarningInstructionModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
+import { EarningConstituentsModal, EarningInstructionModal } from '@subwallet/extension-koni-ui/components/Modal/Earning';
 import { SlippageModal } from '@subwallet/extension-koni-ui/components/Modal/Swap';
-import { DELEGATED_STAKING_ALERT_DATA, EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, STAKE_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
+import { DELEGATED_STAKING_ALERT_DATA, EARNING_CONSTITUENTS_MODAL, EARNING_INSTRUCTION_MODAL, EARNING_SLIPPAGE_MODAL, STAKE_ALERT_DATA } from '@subwallet/extension-koni-ui/constants';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
 import { useChainConnection, useCoreCreateReformatAddress, useCreateGetSubnetStakingTokenName, useExtensionDisplayModes, useFetchChainState, useGetBalance, useGetNativeTokenSlug, useGetYieldPositionForSpecificAccount, useInitValidateTransaction, useNotification, useOneSignProcess, usePreCheckAction, useRestoreTransaction, useSelector, useSidePanelUtils, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
@@ -864,6 +864,10 @@ const Component = () => {
     });
   }, [notify, t]);
 
+  const onOpenConstituentsModal = useCallback(() => {
+    activeModal(EARNING_CONSTITUENTS_MODAL);
+  }, [activeModal]);
+
   // For subnet staking
   const renderDelegatedStaking = useCallback(() => {
     const targeted = poolTargets?.[0];
@@ -873,21 +877,37 @@ const Component = () => {
     }
 
     const proxyDeposit = poolInfo && 'proxyDeposit' in poolInfo ? poolInfo.proxyDeposit : 0;
+    const constituents = 'constituents' in targeted && targeted.constituents ? targeted.constituents : [];
 
     return (
       <>
-        {'constituents' in targeted && targeted.constituents?.length > 0 && (
+        {constituents.length > 0 && (
           <MetaInfo.Default
             className='__label-bottom'
-            label={t('ui.TRANSACTION.screen.Transaction.Earn.subnetLabel')}
+            label={t('ui.TRANSACTION.screen.Transaction.Earn.constituents')}
           >
-            {targeted.constituents.length}{' '}
-            {targeted.constituents.length > 1
-              ? t('ui.TRANSACTION.screen.Transaction.Earn.subnets')
-              : t('ui.TRANSACTION.screen.Transaction.Earn.subnet')}
+            <div
+              className={'__constituents-info'}
+            >
+              {`${constituents.length} ${constituents.length > 1
+                ? t('ui.TRANSACTION.screen.Transaction.Earn.subnets')
+                : t('ui.TRANSACTION.screen.Transaction.Earn.subnet')}`}
+              <div
+                className={'__constituents-info-button'}
+                onClick={onOpenConstituentsModal}
+              >
+                <Icon
+                  customSize={'16px'}
+                  phosphorIcon={Info}
+                  size={'sm'}
+                />
+              </div>
+            </div>
           </MetaInfo.Default>
+
         )}
 
+        <EarningConstituentsModal constituents={constituents} />
         <MetaInfo.Default
           className='__label-bottom'
           label={t('ui.TRANSACTION.screen.Transaction.Earn.proxyAddress')}
@@ -911,17 +931,35 @@ const Component = () => {
           </div>
         </MetaInfo.Default>
 
-        {!!proxyDeposit && <MetaInfo.Number
-          className='__label-bottom'
-          decimals={assetDecimals}
-          label={t('ui.TRANSACTION.screen.Transaction.Earn.proxyDeposit')}
-          suffix={inputAsset.symbol}
-          value={proxyDeposit}
-        />
-        }
+        {!!proxyDeposit && (
+          <MetaInfo.Default
+            className='__label-bottom'
+            label={t('ui.TRANSACTION.screen.Transaction.Earn.proxyDeposit')}
+          >
+            <div className={'__proxy-deposit-value'}>
+              <NumberDisplay
+                decimal={assetDecimals}
+                suffix={` ${inputAsset.symbol}`}
+                value={proxyDeposit}
+              />
+              <Tooltip
+                placement={'topLeft'}
+                title={t('ui.TRANSACTION.screen.Transaction.Earn.amountRequiredToActivateStakingProxy')}
+              >
+                <div className={'__proxy-deposit-info-button'}>
+                  <Icon
+                    customSize={'16px'}
+                    phosphorIcon={Info}
+                    size={'sm'}
+                  />
+                </div>
+              </Tooltip>
+            </div>
+          </MetaInfo.Default>
+        )}
       </>
     );
-  }, [_onClickCopyButton, assetDecimals, inputAsset.symbol, poolInfo, poolTargets, t]);
+  }, [_onClickCopyButton, assetDecimals, onOpenConstituentsModal, inputAsset.symbol, poolInfo, poolTargets, t]);
 
   const isDisabledButton = useMemo(
     () =>
@@ -1452,12 +1490,18 @@ const Component = () => {
 
               {isDelegatedStaking
                 ? (
-                  <AlertBox
-                    className='__alert-box'
-                    description={DELEGATED_STAKING_ALERT_DATA.description.replace('{symbol}', inputAsset.symbol)}
-                    title={DELEGATED_STAKING_ALERT_DATA.title}
-                    type='warning'
-                  />)
+                  <>
+                    {DELEGATED_STAKING_ALERT_DATA.map((alert, index) => (
+                      <AlertBox
+                        className='__alert-box'
+                        description={alert.description.replace('{symbol}', inputAsset.symbol)}
+                        key={index}
+                        title={alert.title}
+                        type='warning'
+                      />
+                    ))}
+                  </>
+                )
                 : (
                   <AlertBox
                     className='__alert-box'
@@ -1504,6 +1548,7 @@ const Component = () => {
         openAlert={openAlert}
         slug={slug}
       />
+
       {isSlippageModalVisible && (
         <SlippageModal
           modalId={EARNING_SLIPPAGE_MODAL}
@@ -1611,6 +1656,33 @@ const Earn = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
     },
 
     '.__proxy-address-copy': {
+      cursor: 'pointer'
+    },
+
+    '.__proxy-deposit-value': {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: token.sizeXXS
+    },
+
+    '.__proxy-deposit-info-button': {
+      cursor: 'pointer',
+      display: 'inline-flex',
+      alignItems: 'center'
+    },
+
+    '.__constituents-info': {
+      border: 0,
+      padding: 0,
+      background: 'transparent',
+      color: token.colorTextLight4,
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: token.sizeXXS
+
+    },
+
+    '.__constituents-info-button': {
       cursor: 'pointer'
     }
   };

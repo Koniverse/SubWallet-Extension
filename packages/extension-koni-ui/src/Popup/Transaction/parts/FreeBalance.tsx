@@ -9,7 +9,7 @@ import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { ActivityIndicator, Icon, ModalContext, Number, Tooltip, Typography } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Info } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
 
 import { TotalEquivalentDetailModal } from '../../Home/Tokens/TotalEquivalentDetailModal';
@@ -44,16 +44,12 @@ const Component = ({ address,
 
   const { error, isLoading, nativeTokenBalance, nativeTokenSlug, tokenBalance } = useGetBalance(chain, address, tokenSlug, isSubscribe, extrinsicType, balanceType);
 
-  const [lockedDetailsModalVisible, setLockedDetailsModalVisible] = useState(false);
-
   const handleOpenLockedDetailsModal = useCallback(() => {
-    setLockedDetailsModalVisible(true);
     activeModal(totalEquivalentDetailModalId);
   }, [activeModal]);
 
   const handleCloseLockedDetailsModal = useCallback(() => {
     inactiveModal(totalEquivalentDetailModalId);
-    setLockedDetailsModalVisible(false);
   }, [inactiveModal]);
 
   useEffect(() => {
@@ -148,20 +144,18 @@ const Component = ({ address,
             />
           </span>
 
-          {lockedDetailsModalVisible && (
-            <TotalEquivalentDetailModal
-              address={address}
-              chain={chain}
-              className={'total-equivalent-detail-modal'}
-              decimals={nativeTokenBalance.decimals || 18}
-              extrinsicType={extrinsicType}
-              id={totalEquivalentDetailModalId}
-              isSubscribe={isSubscribe}
-              onCancel={handleCloseLockedDetailsModal}
-              symbol={nativeTokenBalance.symbol}
-              tokenSlug={tokenSlug}
-            />
-          )}
+          <TotalEquivalentDetailModal
+            address={address}
+            chain={chain}
+            className={'total-equivalent-detail-modal'}
+            decimals={nativeTokenBalance.decimals || 18}
+            extrinsicType={extrinsicType}
+            id={totalEquivalentDetailModalId}
+            isSubscribe={isSubscribe}
+            onCancel={handleCloseLockedDetailsModal}
+            symbol={nativeTokenBalance.symbol}
+            tokenSlug={tokenSlug}
+          />
         </>
       )
       }

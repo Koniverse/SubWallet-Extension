@@ -8,3 +8,4 @@ export { default as EarningValidatorDetailModal } from './EarningValidatorDetail
 export { default as EarningActiveStakeDetailsModal } from './EarningActiveStakeDetailsModal';
 export { default as EarningStrategyDetailModal } from './EarningStrategyDetailModal';
 export { default as EarningBittensorClaimRewardTypeModal } from './EarningBittensorClaimRewardTypeModal';
+export { default as EarningConstituentsModal } from './EarningConstituentsModal';

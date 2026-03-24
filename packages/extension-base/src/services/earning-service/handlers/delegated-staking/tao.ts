@@ -3,20 +3,16 @@
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
+import { ALL_ACCOUNT_KEY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import { BalanceType, BasicTxErrorType, DelegatedStrategyInfo, DelegatedYieldPoolInfo, EarningStatus, HandleYieldStepData, OptimalYieldPath, PrimitiveSubstrateProxyAccountItem, RequestDelegateStakingSubmit, RequestEarlyValidateYield, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, StakingTxErrorType, StrategyInfo, SubmitJoinDelegateStaking, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { BN_TEN, isSameAddress, toBNString } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
 
+import { getAlphaToTaoRate } from '../../utils/alpha-price';
 import BaseNativeStakingPoolHandler from '../native-staking/base';
 import { TaoStakeInfo } from '../native-staking/tao';
-
-type CacheItem = {
-  value: BigNumber;
-  expiredAt: number;
-}
 
 export interface TrustedStakeStrategy {
   id: string;
@@ -34,65 +30,36 @@ export interface TrustedStakeStrategy {
   type: 'official' | 'custom' | string;
 }
 
-class AlphaPriceCache {
-  // Store resolved alpha prices with expiration time
-  private readonly valueCache = new Map<string, CacheItem>();
-  private readonly TTL = BITTENSOR_REFRESH_STAKE_INFO;
-
-  // eslint-disable-next-line no-useless-constructor, @typescript-eslint/no-empty-function
-  public constructor () {}
-
-  // Build a unique cache key per chain and subnet (netuid)
-  private buildCacheKey (chain: string, netuid: number): string {
-    return `${chain}__${netuid}`;
-  }
-
-  /**
-   * Get alpha price with TTL-based caching
-   *
-   * Flow:
-   * 1. Check cache and return value if still valid
-   * 2. Otherwise, fetch fresh value using provided fetcher
-   * 3. Cache fetched value with expiration timestamp
-   */
-  public async getAlphaPrice (
-    params: { chain: string; netuid: number },
-    fetcher: () => Promise<BigNumber>
-  ): Promise<BigNumber> {
-    const cacheKey = this.buildCacheKey(params.chain, params.netuid);
-    const now = Date.now();
-
-    // Return cached value if it exists and has not expired
-    const cached = this.valueCache.get(cacheKey);
-
-    if (cached && cached.expiredAt > now) {
-      return cached.value;
-    }
-
-    // Fetch fresh alpha price from runtime API
-    const value = await fetcher();
-
-    // Cache fetched value with TTL
-    this.valueCache.set(cacheKey, {
-      value,
-      expiredAt: Date.now() + this.TTL
-    });
-
-    return value;
-  }
-
-  // Clear all cached values
-  public clearAll () {
-    this.valueCache.clear();
-  }
+interface TrustedStakeApyStrategy {
+  strategyId: string;
+  strategyName: string;
+  weightedApy: string;
+  subnetsWithData: number;
+  totalSubnets: number;
+  computationStatus: string;
+  computedAt: string;
 }
 
-export const alphaPriceCache = new AlphaPriceCache();
+interface TrustedStakeApyResponse {
+  count: number;
+  lastRefreshed: string;
+  strategies: TrustedStakeApyStrategy[];
+}
+
+// TrustedStake external APIs — strategies list and APY data
 const trustedStakeApi = 'https://app.trustedstake.ai/api/strategies-active';
+const trustedStakeApyApi = 'https://api.app.trustedstake.ai/tmc-apy';
 
 export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPoolHandler {
   // @ts-ignore
   public override readonly type = YieldPoolType.DELEGATED_STAKING;
+
+  // TTL caches for TrustedStake API responses — avoids repeated HTTP calls across subscriptions.
+  // Each cache pair: a stored value + an in-flight promise to prevent duplicate concurrent fetches.
+  private trustedStakeStrategiesCache: { value: TrustedStakeStrategy[]; expiredAt: number } | null = null;
+  private trustedStakeStrategiesPromise: Promise<TrustedStakeStrategy[]> | null = null;
+  private trustedStakeApyCache: { value: Map<string, number>; expiredAt: number } | null = null;
+  private trustedStakeApyPromise: Promise<Map<string, number>> | null = null;
 
   override readonly availableMethod: YieldPoolMethodInfo = {
     join: true,
@@ -118,30 +85,171 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
   }
 
   public override async earlyValidate (data: RequestEarlyValidateYield): Promise<ResponseEarlyValidateYield> {
-    return Promise.resolve({ passed: true });
+    const { address } = data;
+
+    if (address === ALL_ACCOUNT_KEY) {
+      return { passed: true };
+    }
+
+    const poolInfo = await this.getPoolInfo() as DelegatedYieldPoolInfo | undefined;
+
+    if (!poolInfo) {
+      return {
+        passed: false,
+        errorMessage: 'There is a problem fetching your data. Check your Internet connection or change the network endpoint and try again.'
+      };
+    }
+
+    const decimals = _getAssetDecimals(this.nativeToken);
+    const symbol = this.nativeToken.symbol;
+    const pow = BN_TEN.pow(decimals);
+
+    // maintainBalance for earlyValidate = pool-level joinThreshold (minimum across all strategies)
+    const maintainBalance = poolInfo.metadata.maintainBalance || '0';
+    const proxyDeposit = poolInfo.proxyDeposit || '0';
+
+    const [totalEquivalent, transferableBalance] = await Promise.all([
+      this.state.balanceService.getBalanceByType(
+        address,
+        this.chain,
+        this.nativeToken.slug,
+        BalanceType.TOTAL_EQUIVALENT
+      ),
+      this.state.balanceService.getTransferableBalance(
+        address,
+        this.chain,
+        this.nativeToken.slug
+      )
+    ]);
+
+    const bnTotalEquivalent = new BigNumber(totalEquivalent.value || '0');
+    const bnTransferable = new BigNumber(transferableBalance.value || '0');
+    const bnMaintainBalance = new BigNumber(maintainBalance);
+    const bnProxyDeposit = new BigNumber(proxyDeposit);
+
+    const parsedMaintainBalance = bnMaintainBalance.dividedBy(pow).toFixed();
+    const parsedProxyDeposit = bnProxyDeposit.dividedBy(pow).toFixed();
+
+    if (bnTotalEquivalent.lt(bnMaintainBalance) || bnTransferable.lt(bnProxyDeposit)) {
+      return {
+        passed: false,
+        errorMessage: `You need a minimum total ${symbol}-equivalent balance of ${parsedMaintainBalance} ${symbol} with ${parsedProxyDeposit} ${symbol} on ${this.chainInfo.name} in your transferable balance to start earning`
+      };
+    }
+
+    return { passed: true };
   }
 
-  private async getJoinThresholdFromTrustedStake (): Promise<string | null> {
-    try {
-      const res = await fetch(trustedStakeApi);
-      const data = await res.json() as TrustedStakeStrategy[];
+  private normalizeStrategyName (name: string): string {
+    return name.trim().toLowerCase();
+  }
 
-      const activeStrategies = data.filter((s) => s.isActive);
+  /**
+   * Fetch active TrustedStake strategies with TTL cache.
+   * Reuses in-flight promise if a fetch is already in progress to prevent duplicate requests.
+   * Falls back to stale cache on network error.
+   */
+  private async getTrustedStakeStrategies (): Promise<TrustedStakeStrategy[]> {
+    const now = Date.now();
 
-      if (!activeStrategies.length) {
-        return null;
+    if (this.trustedStakeStrategiesCache && this.trustedStakeStrategiesCache.expiredAt > now) {
+      return this.trustedStakeStrategiesCache.value;
+    }
+
+    if (this.trustedStakeStrategiesPromise) {
+      return this.trustedStakeStrategiesPromise;
+    }
+
+    this.trustedStakeStrategiesPromise = (async () => {
+      try {
+        const res = await fetch(trustedStakeApi);
+        const data = await res.json() as TrustedStakeStrategy[];
+        const activeStrategies = data.filter((s) => s.isActive);
+
+        this.trustedStakeStrategiesCache = {
+          value: activeStrategies,
+          expiredAt: Date.now() + BITTENSOR_REFRESH_STAKE_INFO
+        };
+
+        return activeStrategies;
+      } catch (e) {
+        console.warn('Failed to fetch TrustedStake strategies', e);
+
+        return this.trustedStakeStrategiesCache?.value || [];
+      } finally {
+        this.trustedStakeStrategiesPromise = null;
       }
+    })();
 
-      const minBalance = Math.min(
-        ...activeStrategies.map((s) => s.minBalance)
-      );
+    return this.trustedStakeStrategiesPromise;
+  }
 
-      return minBalance.toString();
-    } catch (e) {
-      console.warn('Failed to fetch joinThreshold', e);
+  /**
+   * Fetch weighted APY per strategy with TTL cache.
+   * NOTE: strategyId in the APY endpoint differs from id in strategies-active,
+   * so APY is keyed by normalized strategy name (lowercase trim) instead.
+   * Returns a Map<normalizedName, apy%>.
+   */
+  private async getTrustedStakeApyMap (): Promise<Map<string, number>> {
+    const now = Date.now();
 
+    if (this.trustedStakeApyCache && this.trustedStakeApyCache.expiredAt > now) {
+      return this.trustedStakeApyCache.value;
+    }
+
+    if (this.trustedStakeApyPromise) {
+      return this.trustedStakeApyPromise;
+    }
+
+    this.trustedStakeApyPromise = (async () => {
+      try {
+        const res = await fetch(trustedStakeApyApi);
+        const data = await res.json() as TrustedStakeApyResponse;
+        const apyMap = new Map<string, number>();
+
+        data.strategies.forEach((item) => {
+          if (item.computationStatus !== 'success') {
+            return;
+          }
+
+          const apy = Number(item.weightedApy);
+
+          // strategyId is different from strategies-active id, so map APY by strategy name.
+          apyMap.set(this.normalizeStrategyName(item.strategyName), apy);
+        });
+
+        this.trustedStakeApyCache = {
+          value: apyMap,
+          expiredAt: Date.now() + BITTENSOR_REFRESH_STAKE_INFO
+        };
+
+        return apyMap;
+      } catch (e) {
+        console.warn('Failed to fetch TrustedStake APY', e);
+
+        return this.trustedStakeApyCache?.value || new Map<string, number>();
+      } finally {
+        this.trustedStakeApyPromise = null;
+      }
+    })();
+
+    return this.trustedStakeApyPromise;
+  }
+
+  // Pool-level join threshold = minimum minBalance across all active strategies.
+  // Used as maintainBalance in poolInfo so the UI can show the lowest possible entry bar.
+  private async getJoinThresholdFromTrustedStake (): Promise<string | null> {
+    const activeStrategies = await this.getTrustedStakeStrategies();
+
+    if (!activeStrategies.length) {
       return null;
     }
+
+    const minBalance = Math.min(
+      ...activeStrategies.map((s) => s.minBalance)
+    );
+
+    return minBalance.toString();
   }
 
   async subscribePoolInfo (callback: (data: YieldPoolInfo) => void): Promise<VoidFunction> {
@@ -149,20 +257,17 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
 
     const defaultCallback = async () => {
       const chainApi = await this.substrateApi.isReady;
+      const apyMap = await this.getTrustedStakeApyMap();
+      // totalApy shown on pool overview = highest APY across all strategies.
+      const totalApy = this.chain === 'bittensor' ? Array.from(apyMap.values()).reduce((maxApy, apy) => Math.max(maxApy, apy), 0) : 0;
 
-      // Get proxy pallet deposit info
-      let proxyDeposit = '0';
+      const proxyDepositBase = chainApi.api.consts.proxy.proxyDepositBase;
+      const proxyDepositFactor = chainApi.api.consts.proxy.proxyDepositFactor;
 
-      try {
-        const proxyDepositBase = chainApi.api.consts.proxy.proxyDepositBase;
-        const proxyDepositFactor = chainApi.api.consts.proxy.proxyDepositFactor;
+      // Calculate earning threshold as baseDeposit + depositFactor
+      const proxyDeposit = proxyDepositBase.add(proxyDepositFactor).toString();
 
-        // Calculate earning threshold as baseDeposit + depositFactor
-        proxyDeposit = proxyDepositBase.add(proxyDepositFactor).toString();
-      } catch (error) {
-        console.warn('Failed to fetch proxy deposit info:', error);
-      }
-
+      // joinThreshold = min strategy minBalance (raw units). Falls back to proxyDeposit if API unavailable.
       const joinThreshold = toBNString((await this.getJoinThresholdFromTrustedStake() || 0), _getAssetDecimals(this.nativeToken)) || proxyDeposit;
 
       const data: DelegatedYieldPoolInfo = {
@@ -187,7 +292,7 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
           eraTime: 4,
           era: 0,
           unstakingPeriod: 0,
-          totalApy: 0
+          totalApy
         },
         proxyDeposit: proxyDeposit
       };
@@ -228,19 +333,10 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
 
     const proxiesList = await chainApi.api.query.proxy.proxies.multi(useAddresses);
 
-    // ===== Fetch TrustedStake strategies =====
-    let trustedStrategies: TrustedStakeStrategy[] = [];
-
-    try {
-      const res = await fetch(trustedStakeApi);
-      const data = await res.json() as TrustedStakeStrategy[];
-
-      trustedStrategies = data.filter((s) => s.isActive);
-    } catch (e) {
-      console.warn('Failed to fetch TrustedStake strategies', e);
-    }
-
     const getPoolPosition = async () => {
+      // Re-fetch strategies & APY each interval so data stays fresh within each poll cycle.
+      const trustedStrategies = await this.getTrustedStakeStrategies();
+      const apyMap = await this.getTrustedStakeApyMap();
       const rawStakeInfos = await chainApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(useAddresses);
 
       const stakeInfos = rawStakeInfos.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
@@ -270,7 +366,9 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
           continue;
         }
 
-        // ===== 1. Calculate total stake =====
+        // ===== 1. Accumulate stakes by token type =====
+        // netuid=0 → native TAO stake; netuid>0 → alpha token stake on that subnet.
+        // Transferable balance is included because it already represents liquid TAO held by the user.
         const transferableBalance = await this.state.balanceService.getTransferableBalance(
           owner,
           this.chain,
@@ -294,24 +392,18 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
           }
         }
 
-        // ===== 2. Convert alpha -> TAO =====
+        // ===== 2. Convert alpha → TAO using on-chain swap price =====
+        // alphaPrice is fetched per netuid and cached to avoid repeated RPC calls.
+        // rate = price / 10^decimals to normalize to human units.
         let totalTao = taoNativeTotal;
 
         for (const [netuid, totalAlpha] of alphaByNetuid.entries()) {
           try {
-            const price = await alphaPriceCache.getAlphaPrice(
-              { chain: this.chain, netuid },
-              async () => {
-                const chainApi = await this.substrateApi.isReady;
-                const priceRaw =
-                await chainApi.api.call.swapRuntimeApi.currentAlphaPrice(netuid);
-
-                return new BigNumber(priceRaw.toString());
-              }
-            );
-
-            const rate = new BigNumber(price.toString()).dividedBy(
-              BN_TEN.pow(_getAssetDecimals(this.nativeToken))
+            const rate = await getAlphaToTaoRate(
+              this.substrateApi,
+              this.chain,
+              netuid,
+              _getAssetDecimals(this.nativeToken)
             );
 
             const taoEquivalent = totalAlpha.multipliedBy(rate);
@@ -322,8 +414,12 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
           }
         }
 
-        // ===== 3. Filter trusted staking proxies =====
+        // ===== 3. Match on-chain proxies to TrustedStake strategies =====
+        // Only proxy accounts whose delegate address matches a known TrustedStake strategy
+        // are counted as "trusted" — unrecognized proxies are excluded from nominations.
         const constituentsSet = new Set<string>();
+
+        const decimals = _getAssetDecimals(this.nativeToken);
 
         const nominations = stakingProxies
           .map((proxy) => {
@@ -344,13 +440,16 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
               chain: chainInfo.slug,
               validatorAddress: proxy.delegate,
               activeStake: totalTao.toFixed(),
-              validatorMinStake: '0',
+              validatorMinStake: toBNString(strategy.minBalance, decimals),
               validatorIdentity: strategy.name,
+              expectedReturn: apyMap.get(this.normalizeStrategyName(strategy.name)),
               substrateProxyType: proxy.proxyType,
               delay: proxy.delay
             };
-          }) as DelegatedStrategyInfo[];
+          }).filter((n) => n !== null) as DelegatedStrategyInfo[];
 
+        // isTrusted = account has at least one proxy pointing at a known TrustedStake strategy.
+        // constituents = union of all subnet IDs across the matched strategies.
         const isTrusted = nominations.length > 0;
         const constituents = Array.from(constituentsSet);
 
@@ -398,20 +497,21 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
 
   public override async getPoolTargets (): Promise<StrategyInfo[]> {
     try {
-      const res = await fetch(trustedStakeApi);
-      const strategies = await res.json() as TrustedStakeStrategy[];
+      const [strategies, apyMap] = await Promise.all([
+        this.getTrustedStakeStrategies(),
+        this.getTrustedStakeApyMap()
+      ]);
 
       const decimals = _getAssetDecimals(this.nativeToken);
 
       return strategies
-        .filter((s) => s.isActive)
         .map((strategy): StrategyInfo => ({
           address: strategy.proxyAddress,
           chain: this.chain,
           minBond: toBNString(strategy.minBalance, decimals),
           constituents: Object.keys(strategy.targetConstituents.subnetWeights),
           identity: strategy.name,
-          expectedReturn: undefined
+          expectedReturn: apyMap.get(this.normalizeStrategyName(strategy.name))
         }));
     } catch (e) {
       console.warn('Failed to fetch pool targets', e);
@@ -420,6 +520,12 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
     }
   }
 
+  /**
+   * Validate before submitting a join transaction.
+   * Two balance requirements must both be met:
+   *  1. transferable >= proxyDeposit  (to pay for adding a substrate proxy)
+   *  2. totalEquivalent >= minBond    (strategy-specific minimum; in TAO-equivalent terms)
+   */
   public override async validateYieldJoin (data: SubmitYieldJoinData, path: OptimalYieldPath): Promise<TransactionError[]> {
     const { address, minBond, slug, substrateProxyAddress } = data as SubmitJoinDelegateStaking;
 
@@ -470,15 +576,23 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
       // ignore
     }
 
+    const decimals = _getAssetDecimals(this.nativeToken);
+    const symbol = this.nativeToken.symbol;
+    const pow = BN_TEN.pow(decimals);
+
+    const bnMinBond = new BigNumber(minBond);
+    const bnProxyDeposit = new BigNumber(proxyDeposit);
+    const parsedProxyDeposit = bnProxyDeposit.dividedBy(pow).toFixed();
+
     // If account does not have staking proxy and transferable balance is less than proxy deposit -> error
-    if (!hasStakingProxy && bnTransferable.lt(new BigNumber(proxyDeposit))) {
-      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_STAKE));
+    if (!hasStakingProxy && bnTransferable.lt(bnProxyDeposit)) {
+      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_STAKE, `Insufficient ${symbol}-equivalent balance to delegate to this strategy. Select another one and try again`));
 
       return errors;
     }
 
-    if (bnTotalEquivalent.lt(new BigNumber(minBond))) {
-      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_STAKE));
+    if (bnTotalEquivalent.lt(bnMinBond)) {
+      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_STAKE, `You need at least ${parsedProxyDeposit} ${symbol} in your transferable balance to start earning `));
 
       return errors;
     }
@@ -486,6 +600,12 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
     return errors;
   }
 
+  /**
+   * Build the join extrinsic.
+   * Flow: remove all existing proxies (if any) then add the new TrustedStake proxy.
+   * Batched via utility.batchAll when there are proxies to remove first;
+   * otherwise a single proxy.addProxy call is used to save fees.
+   */
   override async createJoinExtrinsic (data: SubmitJoinDelegateStaking): Promise<[TransactionData, YieldTokenBaseInfo]> {
     const chainApi = await this.substrateApi.isReady;
     const { address, substrateProxyAddress, substrateProxyDeposit, substrateProxyType } = data;
@@ -498,17 +618,9 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
     const proxies = await chainApi.api.query.proxy.proxies(address);
 
     if (proxies) {
-      const [proxyDefs] = proxies;
-
-      proxyDefs.forEach((proxyDef) => {
-        txList.push(
-          chainApi.api.tx.proxy.removeProxy(
-            proxyDef.delegate,
-            proxyDef.proxyType,
-            proxyDef.delay
-          )
-        );
-      });
+      txList.push(
+        chainApi.api.tx.proxy.removeProxies()
+      );
     }
 
     txList.push(chainApi.api.tx.proxy.addProxy(substrateProxyAddress, substrateProxyType, 0));

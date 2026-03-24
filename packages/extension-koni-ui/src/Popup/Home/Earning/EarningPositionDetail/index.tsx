@@ -331,7 +331,9 @@ function Component ({ compound,
 
         <EarningInfoPart
           className={'__earning-info-part'}
+          compound={compound}
           inputAsset={inputAsset}
+          list={list}
           poolInfo={poolInfo}
         />
       </Layout.Base>

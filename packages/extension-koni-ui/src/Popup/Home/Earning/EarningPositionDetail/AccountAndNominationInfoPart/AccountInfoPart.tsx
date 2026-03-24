@@ -112,6 +112,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
 
   const isAllAccount = useMemo(() => isAccountAll(compound.address), [compound.address]);
   const isSpecial = useMemo(() => [YieldPoolType.LENDING, YieldPoolType.LIQUID_STAKING].includes(type), [type]);
+  const isDelegatedStaking = useMemo(() => type === YieldPoolType.DELEGATED_STAKING, [type]);
 
   const haveNomination = useMemo(() => {
     return [YieldPoolType.NOMINATION_POOL].includes(poolInfo.type);
@@ -222,44 +223,48 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
             suffix: item.subnetData?.subnetSymbol
           }
         ]
-        : !isSpecial
+        : isDelegatedStaking
           ? [
-            metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.totalStake'), new BigN(item.totalStake)),
-            {
-              label: (
-                <div className='__label-with-icon'>
-                  {t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.activeStake')}
-                  {!!(item?.metadata as TanssiStakingMetadata)?.isShowActiveStakeDetails && new BigN(item.activeStake).gt(0) && (
-                    <span
-                      className='__info-icon-wrapper'
-                      onClick={openActiveStakeDetailsModal(item)}
-                    >
-                      <Icon
-                        className='__info-icon'
-                        customSize={'16px'}
-                        phosphorIcon={Info}
-                        size='sm'
-                      />
-                    </span>
-                  )}
-                </div>
-              ),
-              value: item.activeStake,
-              decimals: inputAsset?.decimals || 0,
-              suffix: inputAsset?.symbol
-            },
-
-            metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.unstaked'), item.unstakeBalance)
+            metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.totalStake'), new BigN(item.totalStake))
           ]
-          : [
-            metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.totalStake'), new BigN(item.totalStake)),
-            {
-              label: t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.derivativeTokenBalance'),
-              value: item.activeStake,
-              decimals: deriveAsset?.decimals || 0,
-              suffix: deriveAsset?.symbol
-            }
-          ];
+          : !isSpecial
+            ? [
+              metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.totalStake'), new BigN(item.totalStake)),
+              {
+                label: (
+                  <div className='__label-with-icon'>
+                    {t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.activeStake')}
+                    {!!(item?.metadata as TanssiStakingMetadata)?.isShowActiveStakeDetails && new BigN(item.activeStake).gt(0) && (
+                      <span
+                        className='__info-icon-wrapper'
+                        onClick={openActiveStakeDetailsModal(item)}
+                      >
+                        <Icon
+                          className='__info-icon'
+                          customSize={'16px'}
+                          phosphorIcon={Info}
+                          size='sm'
+                        />
+                      </span>
+                    )}
+                  </div>
+                ),
+                value: item.activeStake,
+                decimals: inputAsset?.decimals || 0,
+                suffix: inputAsset?.symbol
+              },
+
+              metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.unstaked'), item.unstakeBalance)
+            ]
+            : [
+              metaInfoNumber(detectTranslate('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.totalStake'), new BigN(item.totalStake)),
+              {
+                label: t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.derivativeTokenBalance'),
+                value: item.activeStake,
+                decimals: deriveAsset?.decimals || 0,
+                suffix: deriveAsset?.symbol
+              }
+            ];
 
       return (
         <MetaInfo
@@ -378,7 +383,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         </MetaInfo>
       );
     });
-  }, [list, isSubnetStaking, t, inputAsset, isSpecial, openActiveStakeDetailsModal, deriveAsset?.decimals, deriveAsset?.symbol, isAllAccount, poolInfo.chain, networkPrefix, renderAccount, earningTagType.color, earningTagType.label, openEarningBittensorClaimRewardTypeModal, haveNomination, haveValidator, canChangeValidator, createOpenValidator, createOpenNomination, isShowActiveStakeDetailsModal, selectedPositionInfo, closeActiveStakeDetailsModal, selectedItem, className]);
+  }, [list, isSubnetStaking, isDelegatedStaking, t, inputAsset, isSpecial, openActiveStakeDetailsModal, deriveAsset?.decimals, deriveAsset?.symbol, isAllAccount, poolInfo.chain, networkPrefix, renderAccount, earningTagType.color, earningTagType.label, openEarningBittensorClaimRewardTypeModal, haveNomination, haveValidator, canChangeValidator, createOpenValidator, createOpenNomination, isShowActiveStakeDetailsModal, selectedPositionInfo, closeActiveStakeDetailsModal, selectedItem, className]);
 
   return (
     <>

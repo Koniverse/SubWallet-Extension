@@ -5,8 +5,8 @@ import { _ChainInfo } from '@subwallet/chain-list/types';
 import { FrameBalancesFreezesInfo, FrameBalancesHoldsInfo, FrameBalancesLocksInfo } from '@subwallet/extension-base/core/substrate/types';
 import { _BALANCE_CHAIN_GROUP, _BALANCE_LOCKED_ID_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { alphaPriceCache } from '@subwallet/extension-base/services/earning-service/handlers/delegated-staking/tao';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
+import { getAlphaToTaoRate } from '@subwallet/extension-base/services/earning-service/utils/alpha-price';
 import { LockedBalanceDetails } from '@subwallet/extension-base/types';
 import BigN from 'bignumber.js';
 
@@ -108,17 +108,7 @@ export async function getSpecialStakingBalancesWithDetails (chainInfo: _ChainInf
     // Convert alpha → native
     for (const [netuid, totalAlpha] of alphaByNetuid.entries()) {
       try {
-        const price = await alphaPriceCache.getAlphaPrice(
-          { chain: chainInfo.slug, netuid },
-          async () => {
-            const raw =
-              await api.api.call.swapRuntimeApi.currentAlphaPrice(netuid);
-
-            return new BigN(raw.toString());
-          }
-        );
-
-        const rate = price.dividedBy(new BigN(10).pow(nativeDecimals));
+        const rate = new BigN((await getAlphaToTaoRate(substrateApi, chainInfo.slug, netuid, nativeDecimals)).toString());
         const taoEquivalent = totalAlpha.multipliedBy(rate);
 
         result[i].alphaConverted =

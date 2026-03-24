@@ -52,4 +52,5 @@ export interface NominationInfo {
 export interface DelegatedStrategyInfo extends NominationInfo {
   substrateProxyType: SubstrateProxyType
   delay: number;
+  expectedReturn?: number;
 }

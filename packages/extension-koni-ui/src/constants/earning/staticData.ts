@@ -232,13 +232,13 @@ export const EARNING_DATA_RAW = {
       icon: 'Aperture',
       title: 'Minimum balance required',
       description:
-        'A minimum {maintainSymbol}-equivalent balance of {maintainBalance} {maintainSymbol} is required to delegate to any strategy',
+        'A minimum {maintainSymbol}-equivalent balance of {maintainBalance} {maintainSymbol} with at least {proxyDeposit} {maintainSymbol} in your transferable balance is required to start delegating',
       iconColor: '#e6478e'
     },
     {
       icon: 'Coins',
       title: 'Delegate and undelegate',
-      description: 'Once delegated, the staking proxy will have full control over your Bittensor balances. You can remove it at any time by undelegating. Keep in mind thay neither action is automated and will incur fees',
+      description: 'Once delegated, the staking proxy will have control over your Bittensor balances while you retain full control of your funds. You can remove it at any time by undelegating. Keep in mind that neither action is automated and will incur fees',
       iconColor: '#e6dc25'
     },
     {
@@ -276,10 +276,16 @@ export const STAKE_ALERT_DATA = {
     'Don’t stake all your funds. Keep in mind that you need at least {tokenAmount} in your free balance to pay gas fees for claiming rewards, unstaking and withdrawing'
 };
 
-export const DELEGATED_STAKING_ALERT_DATA = {
-  title: 'All balances will be used',
-  description: 'Your entire {symbol}-equivalent balance will be used for staking and setting up proxy'
-};
+export const DELEGATED_STAKING_ALERT_DATA = [
+  {
+    title: 'Staking requires full balances',
+    description: 'Your entire {symbol}-equivalent balance will be used for staking and setting up proxy'
+  },
+  {
+    title: 'All existing proxies will be removed',
+    description: 'If your account has any existing proxies, they will be removed before staking on this strategy'
+  }
+];
 
 export const UNSTAKE_ALERT_DATA = [
   {

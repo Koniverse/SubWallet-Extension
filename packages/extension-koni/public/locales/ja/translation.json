@@ -1592,6 +1592,7 @@
   "ui.TRANSACTION.screen.Transaction.Earn.youllReceive": "You'll receive",
   "ui.TRANSACTION.screen.Transaction.Earn.minimumActiveStake": "Minimum active stake",
   "ui.EARNING.screen.EarningPositionDetail.EarningInfo.minimumActiveStake": "Minimum active stake",
+  "ui.EARNING.components.Modal.Earning.StrategyDetail.proxyAddress": "",
   "ui.TRANSACTION.screen.Transaction.Earn.cancelEarningProcess": "Cancel earning process?",
   "ui.TRANSACTION.screen.Transaction.Earn.confirmCancelEarningProcess": "Going back will cancel the current earning process. Do you wish to cancel?",
   "ui.TRANSACTION.screen.Transaction.Earn.cancelEarning": "Cancel earning",
@@ -2603,7 +2604,7 @@
   "ui.EARNING.components.Modal.Earning.StrategyDetail.subnet": "",
   "ui.EARNING.components.Modal.Earning.StrategyDetail.estimatedApy": "",
   "ui.EARNING.components.StakingItem.Strategy.apy": "",
-  "ui.TRANSACTION.screen.Transaction.Earn.subnetLabel": "",
+  "ui.TRANSACTION.screen.Transaction.Earn.constituents": "",
   "ui.TRANSACTION.screen.Transaction.Earn.subnets": "",
   "ui.TRANSACTION.screen.Transaction.Earn.proxyAddress": "",
   "ui.TRANSACTION.screen.Transaction.Earn.proxyDeposit": "",
@@ -2783,5 +2784,11 @@
   "Only shows referenda you've voted directly in": "",
   "Only shows referenda you've voted through delegation": "",
   "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": "",
-  "ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.signWith": ""
+  "ui.EARNING.screen.EarningPositionDetail.EarningInfo.copiedToClipboard": "",
+  "ui.EARNING.components.Modal.Earning.EarningConstituentsModal.constituents": "",
+  "ui.EARNING.components.Modal.Earning.EarningInfo.strategy": "",
+  "ui.EARNING.components.Modal.Earning.EarningInfo.constituents": "",
+  "ui.EARNING.components.Modal.Earning.EarningInfo.subnets": "",
+  "ui.EARNING.components.Modal.Earning.EarningInfo.subnet": "",
+  "ui.TRANSACTION.screen.Transaction.Earn.amountRequiredToActivateStakingProxy": ""
 }

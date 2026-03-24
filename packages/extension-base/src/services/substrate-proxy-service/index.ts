@@ -7,12 +7,13 @@ import { AccountChainType, BasicTxErrorType, TransactionData } from '@subwallet/
 import { AddSubstrateProxyAccountParams, RemoveSubstrateProxyAccountParams, RequestGetSubstrateProxyAccountGroup, SubstrateProxyAccountGroup, SubstrateProxyAccountItem, SubstrateProxyType } from '@subwallet/extension-base/types/substrateProxyAccount';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
+
 import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import { Enum } from '@polkadot/types';
+
 import { _SubstrateApi } from '../chain-service/types';
 import { txTypeToSubstrateProxyMap } from './constant';
-
 
 type PrimitiveSubstrateProxyAccountItem = {
   delegate: string;

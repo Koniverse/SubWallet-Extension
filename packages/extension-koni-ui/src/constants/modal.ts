@@ -17,6 +17,7 @@ export const CONFIRMATION_SCAN_MODAL = 'confirmation-scan-modal';
 export const REQUEST_CAMERA_ACCESS_MODAL = 'request-camera-access-modal';
 export const VALIDATOR_DETAIL_MODAL = 'validator-detail-modal';
 export const STRATEGY_DETAIL_MODAL = 'strategy-detail-modal';
+export const EARNING_CONSTITUENTS_MODAL = 'strategy-detail-modal-constituents';
 export const NOTIFICATION_DETAIL_MODAL = 'notification-detail-modal';
 export const HISTORY_DETAIL_MODAL = 'history-detail-modal';
 export const MULTISIG_HISTORY_INFO_MODAL = 'multisig-history-info-modal';
