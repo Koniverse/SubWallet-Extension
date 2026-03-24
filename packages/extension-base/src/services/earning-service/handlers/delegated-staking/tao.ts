@@ -9,6 +9,7 @@ import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-serv
 import { BalanceType, BasicTxErrorType, DelegatedStrategyInfo, DelegatedYieldPoolInfo, EarningStatus, HandleYieldStepData, OptimalYieldPath, PrimitiveSubstrateProxyAccountItem, RequestDelegateStakingSubmit, RequestEarlyValidateYield, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, StakingTxErrorType, StrategyInfo, SubmitJoinDelegateStaking, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { BN_TEN, isSameAddress, toBNString } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
+import { t } from 'i18next';
 
 import { getAlphaToTaoRate } from '../../utils/alpha-price';
 import BaseNativeStakingPoolHandler from '../native-staking/base';
@@ -96,7 +97,7 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
     if (!poolInfo) {
       return {
         passed: false,
-        errorMessage: 'There is a problem fetching your data. Check your Internet connection or change the network endpoint and try again.'
+        errorMessage: t('bg.EARNING.services.service.earning.delegatedStaking.tao.fetchPoolInfoError')
       };
     }
 
@@ -133,7 +134,14 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
     if (bnTotalEquivalent.lt(bnMaintainBalance) || bnTransferable.lt(bnProxyDeposit)) {
       return {
         passed: false,
-        errorMessage: `You need a minimum total ${symbol}-equivalent balance of ${parsedMaintainBalance} ${symbol} with ${parsedProxyDeposit} ${symbol} on ${this.chainInfo.name} in your transferable balance to start earning`
+        errorMessage: t('bg.EARNING.services.service.earning.delegatedStaking.tao.minimumBalanceToStartEarning', {
+          replace: {
+            chainName: this.chainInfo.name,
+            parsedMaintainBalance,
+            parsedProxyDeposit,
+            symbol
+          }
+        })
       };
     }
 
@@ -586,13 +594,22 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
 
     // If account does not have staking proxy and transferable balance is less than proxy deposit -> error
     if (!hasStakingProxy && bnTransferable.lt(bnProxyDeposit)) {
-      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_STAKE, `Insufficient ${symbol}-equivalent balance to delegate to this strategy. Select another one and try again`));
+      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_STAKE, t('bg.EARNING.services.service.earning.delegatedStaking.tao.insufficientBalanceToDelegate', {
+        replace: {
+          symbol
+        }
+      })));
 
       return errors;
     }
 
     if (bnTotalEquivalent.lt(bnMinBond)) {
-      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_STAKE, `You need at least ${parsedProxyDeposit} ${symbol} in your transferable balance to start earning `));
+      errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_STAKE, t('bg.EARNING.services.service.earning.delegatedStaking.tao.minimumTransferableBalanceToStartEarning', {
+        replace: {
+          parsedProxyDeposit,
+          symbol
+        }
+      })));
 
       return errors;
     }
