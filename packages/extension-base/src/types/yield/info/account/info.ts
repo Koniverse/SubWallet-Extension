@@ -64,7 +64,7 @@ export interface AbstractYieldPositionInfo extends BaseYieldPositionInfo {
     originalTotalStake: string;
   };
 
-  metadata?: TanssiStakingMetadata | BittensorStakingMetadata;
+  metadata?: Record<string, unknown>;
 }
 
 export interface TanssiStakingMetadata {
@@ -76,6 +76,10 @@ export interface TanssiStakingMetadata {
 
 export interface BittensorStakingMetadata {
   bittensorRootClaimType?: BittensorRootClaimType;
+}
+
+export interface BittensorDelegatedStakingMetadata {
+  constituents: string[];
 }
 
 export type BittensorRootClaimType = 'Swap' | 'Keep' | 'Others';
@@ -138,7 +142,11 @@ export interface SubnetYieldPositionInfo extends AbstractYieldPositionInfo {
   };
 }
 
+export interface DelegatedYieldPositionInfo extends AbstractYieldPositionInfo {
+  type: YieldPoolType.DELEGATED_STAKING;
+}
+
 /**
  * Info of yield pool
  * */
-export type YieldPositionInfo = NativeYieldPositionInfo | NominationYieldPositionInfo | LiquidYieldPositionInfo | LendingYieldPositionInfo | SubnetYieldPositionInfo;
+export type YieldPositionInfo = NativeYieldPositionInfo | NominationYieldPositionInfo | LiquidYieldPositionInfo | LendingYieldPositionInfo | SubnetYieldPositionInfo | DelegatedYieldPositionInfo;

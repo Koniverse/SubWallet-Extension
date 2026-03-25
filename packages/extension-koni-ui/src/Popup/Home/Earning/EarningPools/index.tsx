@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
-import { _STAKING_CHAIN_GROUP, RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
+import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { AccountProxyType, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { EmptyList, FilterModal, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
@@ -63,7 +63,8 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
     { label: t('ui.EARNING.screen.EarningPools.lending'), value: YieldPoolType.LENDING },
     { label: t('ui.EARNING.screen.EarningPools.parachainStaking'), value: YieldPoolType.PARACHAIN_STAKING },
     { label: t('ui.EARNING.screen.EarningPools.singleFarming'), value: YieldPoolType.SINGLE_FARMING },
-    { label: t('ui.EARNING.screen.EarningPools.subnetStaking'), value: YieldPoolType.SUBNET_STAKING }
+    { label: t('ui.EARNING.screen.EarningPools.subnetStaking'), value: YieldPoolType.SUBNET_STAKING },
+    { label: t('ui.EARNING.screen.EarningPools.delegatedStaking'), value: YieldPoolType.DELEGATED_STAKING }
   ], [t]);
 
   const positionSlugs = useMemo(() => {
@@ -163,6 +164,8 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
         } else if (filter === YieldPoolType.LENDING && item.type === YieldPoolType.LENDING) {
           return true;
         } else if (filter === YieldPoolType.SUBNET_STAKING && item.type === YieldPoolType.SUBNET_STAKING) {
+          return true;
+        } else if (filter === YieldPoolType.DELEGATED_STAKING && item.type === YieldPoolType.DELEGATED_STAKING) {
           return true;
         }
         // Uncomment the following code block if needed

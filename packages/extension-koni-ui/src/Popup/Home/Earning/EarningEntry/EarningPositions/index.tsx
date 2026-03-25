@@ -199,7 +199,8 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     { label: t('ui.EARNING.screen.EarningPositions.lending'), value: YieldPoolType.LENDING },
     { label: t('ui.EARNING.screen.EarningPositions.parachainStaking'), value: YieldPoolType.PARACHAIN_STAKING },
     { label: t('ui.EARNING.screen.EarningPositions.singleFarming'), value: YieldPoolType.SINGLE_FARMING },
-    { label: t('ui.EARNING.screen.EarningPositions.subnetStaking'), value: YieldPoolType.SUBNET_STAKING }
+    { label: t('ui.EARNING.screen.EarningPositions.subnetStaking'), value: YieldPoolType.SUBNET_STAKING },
+    { label: t('ui.EARNING.screen.EarningPositions.delegatedStaking'), value: YieldPoolType.DELEGATED_STAKING }
   ];
 
   const filterFunction = useMemo<(item: ExtraYieldPositionInfo) => boolean>(() => {

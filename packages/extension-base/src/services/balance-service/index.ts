@@ -266,6 +266,15 @@ export class BalanceService implements StoppableServiceInterface {
             }
 
             break;
+
+          case BalanceType.TOTAL_STAKE_EQUIVALENT:
+            value = rs.lockedDetails?.totalStakingEquivalent || '0';
+            break;
+
+          case BalanceType.TOTAL_EQUIVALENT:
+            value = new BigN(rs.lockedDetails?.totalStakingEquivalent || 0).plus(new BigN(rs.free)).toFixed();
+            break;
+
           default:
             value = rs.free;
         }

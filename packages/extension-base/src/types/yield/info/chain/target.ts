@@ -38,12 +38,21 @@ export interface ValidatorInfo {
   topQuartile?: boolean;
 }
 
+export interface StrategyInfo {
+  address: string;
+  chain: string;
+  minBond: string;
+  constituents: string[]
+  identity?: string;
+  expectedReturn?: number; // in %, annually
+}
+
 export interface AllValidatorInfo {
   currentSelectedValidatorList: ValidatorInfo[];
   waitingValidatorList: ValidatorInfo[];
 }
 
-export type YieldPoolTarget = NominationPoolInfo | ValidatorInfo;
+export type YieldPoolTarget = NominationPoolInfo | ValidatorInfo | StrategyInfo;
 
 export interface RequestGetYieldPoolTargets {
   slug: string;

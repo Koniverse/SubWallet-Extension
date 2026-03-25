@@ -3,7 +3,7 @@
 
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
-import { NominationPoolDataType, PoolTargetData, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
+import { NominationPoolDataType, PoolTargetData, StrategyDataType, ValidatorDataType } from '@subwallet/extension-koni-ui/types';
 import { useMemo } from 'react';
 
 const useGetPoolTargetList = (slug: string): PoolTargetData[] => {
@@ -35,7 +35,7 @@ const useGetPoolTargetList = (slug: string): PoolTargetData[] => {
 
         result.push(nominationPoolItem);
       } else {
-        const validatorItem: ValidatorDataType = {
+        const validatorItem: ValidatorDataType | StrategyDataType = {
           ...poolTarget,
           decimals,
           symbol
