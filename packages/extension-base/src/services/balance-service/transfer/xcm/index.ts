@@ -6,7 +6,7 @@ import { _isAcrossBridgeXcm, _isPolygonBridgeXcm, _isPosBridgeXcm, _isSnowBridge
 import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
-import { buildXcm, dryRunPreviewXcm, dryRunXcm, estimateXcmFee, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { buildXcm, dryRunPreviewXcm, dryRunXcm, estimateXcmFee, fetchMaxXcmTransferableAmount, fetchMinXcmTransferableAmount, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
@@ -130,6 +130,22 @@ export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
   } catch (e) {
     console.log('createXcmExtrinsicV2 error: ', e);
 
+    return undefined;
+  }
+};
+
+export const getMaxXcmTransferableAmount = async (request: CreateXcmExtrinsicProps): Promise<string | undefined> => {
+  try {
+    return await fetchMaxXcmTransferableAmount(request);
+  } catch (e) {
+    return undefined;
+  }
+};
+
+export const getMinXcmTransferableAmount = async (request: CreateXcmExtrinsicProps): Promise<string | undefined> => {
+  try {
+    return await fetchMinXcmTransferableAmount(request);
+  } catch (e) {
     return undefined;
   }
 };
