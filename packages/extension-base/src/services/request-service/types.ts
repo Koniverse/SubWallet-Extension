@@ -6,6 +6,7 @@ import { MetadataDef } from '@subwallet/extension-inject/types';
 
 export interface SignRequest extends Resolver<ResponseSigning> {
   address: string;
+  signerAddress?: string;
   id: string;
   request: RequestSign;
   url: string;

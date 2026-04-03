@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { ALL_NETWORK_KEY } from '@subwallet/extension-base/constants';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { useSelectModalInputHelper } from '@subwallet/extension-koni-ui/hooks/form/useSelectModalInputHelper';
@@ -48,6 +49,10 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
   }, []);
 
   const chainLogo = useMemo(() => {
+    if (!value || value === ALL_NETWORK_KEY) {
+      return undefined;
+    }
+
     return (
       <Logo
         className='chain-logo'
@@ -59,6 +64,8 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
   }, [token.controlHeightSM, value]);
 
   const renderItem = useCallback((item: ChainItemType, selected: boolean) => {
+    const isAllNetwork = item.slug === ALL_NETWORK_KEY;
+
     if (item.disabled && !!messageTooltip) {
       return (
         <Tooltip
@@ -67,7 +74,10 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         >
           <div>
             <NetworkItem
-              className={CN({ disabled: item.disabled })}
+              className={CN({
+                disabled: item.disabled,
+                '-all-network': isAllNetwork
+              })}
               name={item.name}
               networkKey={item.slug}
               networkMainLogoShape='squircle'
@@ -89,7 +99,10 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
 
     return (
       <NetworkItem
-        className={CN({ disabled: item.disabled })}
+        className={CN({
+          disabled: item.disabled,
+          '-all-network': isAllNetwork
+        })}
         name={item.name}
         networkKey={item.slug}
         networkMainLogoShape='squircle'
@@ -167,6 +180,10 @@ export const ChainSelector = styled(forwardRef(Component))<Props>(({ theme: { to
       display: 'flex',
       width: 40,
       justifyContent: 'center'
+    },
+
+    '.ant-network-item.-all-network .ant-logo, .ant-network-item.-all-network .ant-network-item-logo': {
+      display: 'none'
     },
 
     '.ant-network-item.disabled': {

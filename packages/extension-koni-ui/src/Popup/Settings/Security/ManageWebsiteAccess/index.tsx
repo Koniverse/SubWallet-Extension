@@ -70,8 +70,30 @@ enum FilterValue {
   ETHEREUM = 'ethereum',
   CARDANO = 'cardano',
   BLOCKED = 'blocked',
-  Connected = 'connected',
+  CONNECTED = 'connected',
 }
+
+interface ItemRowProps {
+  item: AuthUrlInfo;
+  accountCount: number;
+  onNavigate: (item: AuthUrlInfo) => void;
+}
+
+const ItemRow = React.memo(function ItemRow ({ accountCount, item, onNavigate }: ItemRowProps) {
+  const handleClick = useCallback(() => {
+    onNavigate(item);
+  }, [item, onNavigate]);
+
+  return (
+    <WebsiteAccessItem
+      accountCount={accountCount}
+      className={'__item'}
+      domain={item.id}
+      onClick={handleClick}
+      siteName={item.origin || item.id}
+    />
+  );
+});
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const authUrlMap = useSelector((state: RootState) => state.settings.authUrls);
@@ -101,7 +123,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           if (!item.isAllowed) {
             return true;
           }
-        } else if (filter === FilterValue.Connected) {
+        } else if (filter === FilterValue.CONNECTED) {
           if (item.isAllowed) {
             return true;
           }
@@ -126,7 +148,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.ethereumDapp'), value: FilterValue.ETHEREUM },
       { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.cardanoDapp'), value: FilterValue.CARDANO },
       { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.blockedDapp'), value: FilterValue.BLOCKED },
-      { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.connectedDapp'), value: FilterValue.Connected }
+      { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.connectedDapp'), value: FilterValue.CONNECTED }
     ];
   }, [t]);
 
@@ -177,30 +199,36 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     ];
   }, [onCloseActionModal, t, token]);
 
-  const onClickItem = useCallback((item: AuthUrlInfo) => {
-    return () => {
-      navigate('/settings/dapp-access-edit', { state: {
-        siteName: item.origin,
-        origin: item.id,
-        accountAuthTypes: item.accountAuthTypes || ''
-      } as ManageWebsiteAccessDetailParam });
-    };
+  const accountCountMap = useMemo<Record<string, number>>(() => {
+    const map: Record<string, number> = {};
+
+    for (const item of websiteAccessItems) {
+      map[item.id] = getAccountCount(item, accountProxies);
+    }
+
+    return map;
+  }, [websiteAccessItems, accountProxies]);
+
+  const onNavigate = useCallback((item: AuthUrlInfo) => {
+    navigate('/settings/dapp-access-edit', { state: {
+      siteName: item.origin,
+      origin: item.id,
+      accountAuthTypes: item.accountAuthTypes || ''
+    } as ManageWebsiteAccessDetailParam });
   }, [navigate]);
 
   const renderItem = useCallback(
     (item: AuthUrlInfo) => {
       return (
-        <WebsiteAccessItem
-          accountCount={getAccountCount(item, accountProxies)}
-          className={'__item'}
-          domain={item.id}
+        <ItemRow
+          accountCount={accountCountMap[item.id] || 0}
+          item={item}
           key={item.id}
-          onClick={onClickItem(item)}
-          siteName={item.origin || item.id}
+          onNavigate={onNavigate}
         />
       );
     },
-    [accountProxies, onClickItem]
+    [accountCountMap, onNavigate]
   );
 
   const renderEmptyList = useCallback(() => {

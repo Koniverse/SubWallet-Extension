@@ -2,17 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ActionType } from '@subwallet/extension-base/core/types';
-import { AccountProxyType, AccountSignMode, AnalyzeAddress, AnalyzedGroup } from '@subwallet/extension-base/types';
+import { AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
 import { AddressSelectorItem } from '@subwallet/extension-koni-ui/components';
-import { useFilterModal, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { SignerData } from '@subwallet/extension-koni-ui/Popup/Account/NewMultisigAccount';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { getSignModeByAccountProxy, isAccountAll, reformatAddress, sortFuncAnalyzeAddress } from '@subwallet/extension-koni-ui/utils';
+import { getSignModeByAccountProxy, isAccountAll, reformatAddress } from '@subwallet/extension-koni-ui/utils';
 import { isSubstrateAddress } from '@subwallet/keyring';
 import { Button, Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import CN from 'classnames';
-import { PlusCircle, XCircle } from 'phosphor-react';
+import { Eye, GitCommit, Needle, PlusCircle, QrCode, Question, Strategy, Swatches, UserSwitch, XCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -29,6 +29,25 @@ interface Props extends ThemeProps {
 
 const renderEmpty = () => <GeneralEmptyList />;
 
+type GroupKey =
+  | AccountProxyType.SOLO
+  | AccountProxyType.UNIFIED
+  | AccountProxyType.QR
+  | AccountProxyType.MULTISIG
+  | AccountProxyType.LEDGER
+  | AccountProxyType.READ_ONLY
+  | AccountProxyType.INJECTED
+  | AccountProxyType.UNKNOWN;
+
+interface SignerItem {
+  displayName?: string;
+  formatedAddress: string;
+  address: string;
+  proxyId?: string;
+  accountType: GroupKey;
+  analyzedGroup: GroupKey;
+}
+
 const Component: React.FC<Props> = (props: Props) => {
   const { actionType, className, id, onConfirm, selectedSigners = [] } = props;
   const [checkedSigners, setCheckedSigners] = useState<SignerData[]>([]);
@@ -42,40 +61,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const isActive = checkActive(id);
 
-  const { accountProxies, contacts, recent } = useSelector((state) => state.accountState);
-
-  const filterModal = useMemo(() => `${id}-filter-modal`, [id]);
-
-  const { onResetFilter, selectedFilters } = useFilterModal(filterModal);
+  const { accountProxies } = useSelector((state) => state.accountState);
 
   const sectionRef = useRef<SwListSectionRef>(null);
 
-  const items = useMemo((): AnalyzeAddress[] => {
-    const result: AnalyzeAddress[] = [];
+  const items = useMemo((): SignerItem[] => {
+    const result: SignerItem[] = [];
 
-    (!selectedFilters.length || selectedFilters.includes(AnalyzedGroup.RECENT)) && recent.forEach((acc) => {
-      if (isSubstrateAddress(acc.address)) {
-        result.push({
-          displayName: acc.name,
-          formatedAddress: reformatAddress(acc.address),
-          address: acc.address,
-          analyzedGroup: AnalyzedGroup.RECENT
-        });
-      }
-    });
-
-    (!selectedFilters.length || selectedFilters.includes(AnalyzedGroup.CONTACT)) && contacts.forEach((acc) => {
-      if (isSubstrateAddress(acc.address)) {
-        result.push({
-          displayName: acc.name,
-          formatedAddress: reformatAddress(acc.address),
-          address: acc.address,
-          analyzedGroup: AnalyzedGroup.CONTACT
-        });
-      }
-    });
-
-    (!selectedFilters.length || selectedFilters.includes(AnalyzedGroup.WALLET)) && accountProxies.forEach((ap) => {
+    accountProxies.forEach((ap) => {
       if (isAccountAll(ap.id)) {
         return;
       }
@@ -104,30 +97,35 @@ const Component: React.FC<Props> = (props: Props) => {
             displayName: ap.name || acc.name,
             formatedAddress,
             address: acc.address,
-            analyzedGroup: AnalyzedGroup.WALLET,
+            accountType: ap.accountType as GroupKey,
+            analyzedGroup: ap.accountType as GroupKey,
             proxyId: ap.id
           });
         }
       });
     });
 
-    // todo: may need better solution for this sorting below
+    return result.sort((a, b) => {
+      const groupCompare = a.analyzedGroup.localeCompare(b.analyzedGroup);
 
-    return result
-      .sort(sortFuncAnalyzeAddress);
-  }, [accountProxies, actionType, contacts, recent, selectedFilters]);
+      if (groupCompare !== 0) {
+        return groupCompare;
+      }
+
+      return (a.displayName || a.formatedAddress).localeCompare(b.displayName || b.formatedAddress);
+    });
+  }, [accountProxies, actionType]);
 
   const onClose = useCallback(() => {
     inactiveModal(id);
-    onResetFilter();
-  }, [id, inactiveModal, onResetFilter]);
+  }, [id, inactiveModal]);
 
   const onAddSigner = useCallback(() => {
     onConfirm(checkedSigners);
     inactiveModal(id);
   }, [checkedSigners, onConfirm, inactiveModal, id]);
 
-  const onClickItem = useCallback((item: AnalyzeAddress) => {
+  const onClickItem = useCallback((item: SignerItem) => {
     return () => {
       if (disabledAddressList.includes(item.address)) {
         return;
@@ -152,23 +150,118 @@ const Component: React.FC<Props> = (props: Props) => {
     };
   }, [disabledAddressList]);
 
-  const renderItem = useCallback((item: AnalyzeAddress) => {
+  const renderItem = useCallback((item: SignerItem) => {
     const isChecked = checkedSigners.some((s) => s.address === item.address);
     const isDisabled = disabledAddressList.includes(item.address);
+    const iconMap: Record<GroupKey, { className?: string; icon: typeof Strategy }> = {
+      [AccountProxyType.UNIFIED]: {
+        className: '-is-unified',
+        icon: Strategy
+      },
+      [AccountProxyType.SOLO]: {
+        className: '-is-solo',
+        icon: GitCommit
+      },
+      [AccountProxyType.QR]: {
+        icon: QrCode
+      },
+      [AccountProxyType.READ_ONLY]: {
+        icon: Eye
+      },
+      [AccountProxyType.LEDGER]: {
+        icon: Swatches
+      },
+      [AccountProxyType.INJECTED]: {
+        icon: Needle
+      },
+      [AccountProxyType.MULTISIG]: {
+        className: '-is-multisig',
+        icon: UserSwitch
+      },
+      [AccountProxyType.UNKNOWN]: {
+        icon: Question
+      }
+    };
+
+    const itemIcon = iconMap[item.accountType];
 
     return (
-      <AddressSelectorItem
-        address={item.formatedAddress}
-        avatarValue={item.proxyId || item.formatedAddress}
-        className={CN('__list-item', { '-disabled': isDisabled })}
-        isSelected={isChecked || isDisabled}
+      <div
+        className={CN('__list-item-wrapper', { '-disabled': isDisabled })}
         key={item.address}
-        name={item.displayName}
-        onClick={onClickItem(item)}
-        showUnselectIcon={true}
-      />
+      >
+        <AddressSelectorItem
+          address={item.formatedAddress}
+          avatarValue={item.proxyId || item.formatedAddress}
+          className={CN('__list-item', { '-disabled': isDisabled })}
+          isSelected={isChecked || isDisabled}
+          name={item.displayName}
+          onClick={onClickItem(item)}
+          showUnselectIcon={true}
+        />
+
+        <div className='__item-account-type-icon-wrapper'>
+          <div className={CN('__item-account-type-icon', itemIcon.className)}>
+            <Icon
+              customSize='10px'
+              phosphorIcon={itemIcon.icon}
+              weight='fill'
+            />
+          </div>
+        </div>
+      </div>
     );
   }, [checkedSigners, disabledAddressList, onClickItem]);
+
+  const searchFunction = useCallback((item: SignerItem, searchText: string) => {
+    const searchTextLowerCase = searchText.toLowerCase();
+
+    return (
+      item.formatedAddress.toLowerCase().includes(searchTextLowerCase) ||
+      (item.displayName
+        ? item.displayName.toLowerCase().includes(searchTextLowerCase)
+        : false)
+    );
+  }, []);
+
+  const groupSeparator = useCallback((group: SignerItem[], _idx: number, groupKey: string) => {
+    const _group = groupKey as GroupKey;
+
+    const groupMap: Record<GroupKey, { label: string }> = {
+      [AccountProxyType.UNIFIED]: {
+        label: t('ui.ACCOUNT.components.AccountProxy.TypeTag.unifiedAccount')
+      },
+      [AccountProxyType.SOLO]: {
+        label: t('ui.ACCOUNT.components.AccountProxy.TypeTag.soloAccount')
+      },
+      [AccountProxyType.QR]: {
+        label: t('ui.ACCOUNT.components.AccountProxy.TypeTag.qrSignerAccount')
+      },
+      [AccountProxyType.READ_ONLY]: {
+        label: t('ui.ACCOUNT.components.AccountProxy.TypeTag.watchOnlyAccount')
+      },
+      [AccountProxyType.LEDGER]: {
+        label: t('ui.ACCOUNT.components.AccountProxy.TypeTag.ledgerAccount')
+      },
+      [AccountProxyType.INJECTED]: {
+        label: t('ui.ACCOUNT.components.AccountProxy.TypeTag.injectedAccount')
+      },
+      [AccountProxyType.MULTISIG]: {
+        label: t('ui.ACCOUNT.components.AccountProxy.TypeTag.multisigAccount')
+      },
+      [AccountProxyType.UNKNOWN]: {
+        label: t('ui.ACCOUNT.components.AccountProxy.TypeTag.unknownAccount')
+      }
+    };
+
+    const groupMeta = groupMap[_group];
+
+    return (
+      <div className='address-book-group-separator'>
+        <span className='address-book-group-label'>{groupMeta.label}</span>
+      </div>
+    );
+  }, [t]);
 
   const footerModal = useMemo(() => {
     const isAddButtonDisabled = (() => {
@@ -230,11 +323,19 @@ const Component: React.FC<Props> = (props: Props) => {
         onCancel={onClose}
         title={t('ui.components.Modal.AddressBook.AddSignerMultisigModal.selectAccount')}
       >
-        <SwList
+        <SwList.Section
           className={'account-list'}
+          enableSearchInput={true}
+          groupBy='analyzedGroup'
+          groupSeparator={groupSeparator}
           list={items}
+          ref={sectionRef}
           renderItem={renderItem}
           renderWhenEmpty={renderEmpty}
+          searchFunction={searchFunction}
+          searchMinCharactersCount={2}
+          searchPlaceholder={t<string>('ui.components.Modal.AddressBook.Selector.accountName')}
+          showActionBtn={false}
         />
       </SwModal>
     </>
@@ -244,7 +345,10 @@ const Component: React.FC<Props> = (props: Props) => {
 const AddSignerMultisigModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
     '.ant-sw-modal-body': {
-      paddingBottom: 0
+      display: 'flex',
+      paddingBottom: 0,
+      paddingLeft: 0,
+      paddingRight: 0
     },
 
     '.ant-sw-list-section': {
@@ -264,8 +368,60 @@ const AddSignerMultisigModal = styled(Component)<Props>(({ theme: { token } }: P
       }
     },
 
-    '.___list-separator + .__list-item, .__list-item + .__list-item, .__list-item + .___list-separator': {
-      marginTop: token.marginXS
+    '.__list-item-wrapper': {
+      position: 'relative',
+
+      '.__item-account-type-icon-wrapper': {
+        position: 'absolute',
+        left: token.padding,
+        bottom: token.paddingXS,
+        width: 24,
+        height: 24,
+        pointerEvents: 'none'
+      },
+
+      '.__item-account-type-icon': {
+        position: 'absolute',
+        right: 0,
+        bottom: 0,
+        width: 16,
+        height: 16,
+        borderRadius: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.65)',
+        color: token.colorWhite,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        pointerEvents: 'none',
+
+        '&.-is-unified': {
+          color: token.colorSuccess
+        },
+
+        '&.-is-solo': {
+          color: token['blue-9']
+        },
+
+        '&.-is-multisig': {
+          color: token['geekblue-9']
+        }
+      },
+
+      '&.-disabled .__item-account-type-icon': {
+        opacity: 0.5
+      }
+    },
+
+    '.___list-separator + .__list-item-wrapper, .__list-item-wrapper + .__list-item-wrapper, .__list-item-wrapper + .___list-separator': {
+      marginTop: token.sizeXS
+    },
+
+    '.ant-sw-list-section-search-wrapper': {
+      marginBottom: token.sizeXS
+    },
+
+    '.ant-sw-list-section-search-wrapper + .___list-separator': {
+      marginTop: token.sizeXS
     },
 
     '.footer-button-wrapper': {
@@ -282,6 +438,24 @@ const AddSignerMultisigModal = styled(Component)<Props>(({ theme: { token } }: P
       flexDirection: 'column',
       flex: '1',
       overflow: 'hidden'
+    },
+
+    '.address-book-group-separator': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.sizeXXS,
+      fontWeight: token.fontWeightStrong,
+      fontSize: 11,
+      lineHeight: '20px',
+      textTransform: 'uppercase',
+
+      '.address-book-group-label': {
+        color: token.colorTextTertiary
+      },
+
+      '.address-book-group-counter': {
+        color: token.colorTextTertiary
+      }
     }
   };
 });

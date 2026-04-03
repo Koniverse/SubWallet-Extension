@@ -353,7 +353,15 @@ function Component ({ accountProxy, className }: Props) {
   }, [addressFormated, networkSelected, fetchProxyAccounts]);
 
   useEffect(() => {
-    if (!networkSelected && chainItems[0]?.slug) {
+    if (!chainItems.length) {
+      setNetworkSelected('');
+
+      return;
+    }
+
+    const hasSelectedInList = !!chainItems.find((item) => item.slug === networkSelected);
+
+    if ((!networkSelected || !hasSelectedInList) && chainItems[0]?.slug) {
       setNetworkSelected(chainItems[0].slug);
     }
   }, [chainItems, networkSelected, setNetworkSelected]);

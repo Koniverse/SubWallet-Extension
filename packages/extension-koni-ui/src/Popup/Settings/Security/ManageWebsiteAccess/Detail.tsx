@@ -3,7 +3,7 @@
 
 import { AccountAuthType } from '@subwallet/extension-base/background/types';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
-import { AccountChainType, AccountJson, AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountJson, AccountProxy, AccountSignMode } from '@subwallet/extension-base/types';
 import { AccountProxyItem, DAppConfigurationModal, EmptyList, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DAPP_CONFIGURATION_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
@@ -47,8 +47,6 @@ const isValidAccountChainType = (chainType: AccountChainType, conditions: Accoun
     case AccountChainType.CARDANO: return accountAuthTypes.includes('cardano');
     case AccountChainType.BITCOIN: return accountAuthTypes.includes('bitcoin');
   }
-
-  return false;
 };
 
 const dAppConfigurationModalId = DAPP_CONFIGURATION_MODAL;
@@ -66,7 +64,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
         accountAuthTypes,
         accountSignMode,
         canConnectSubstrateEcdsa: authInfo.canConnectSubstrateEcdsa
-      })) && ap.accountType !== AccountProxyType.MULTISIG;
+      }));
     });
   }, [accountAuthTypes, accountProxies, authInfo.canConnectSubstrateEcdsa]);
 

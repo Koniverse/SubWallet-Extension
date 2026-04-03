@@ -9,7 +9,7 @@ import { ThemeProps, WrappedTransactionSigner } from '@subwallet/extension-koni-
 import { Button, Icon, ModalContext, SwList, SwModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import { CheckCircle, X, XCircle } from 'phosphor-react';
-import React, { ForwardedRef, forwardRef, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import React, { ForwardedRef, forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -104,8 +104,19 @@ const Component = (props: Props, ref: ForwardedRef<any>) => {
   const onConfirmSelectSigner = useCallback(() => {
     if (selected) {
       onSelectSigner(selected);
+      inactiveModal(modalId);
     }
-  }, [onSelectSigner, selected]);
+  }, [inactiveModal, onSelectSigner, selected]);
+
+  useEffect(() => {
+    if (!selectedSigner) {
+      onSelectSigner(fullList[0]);
+    }
+  }, [fullList, selectedSigner, onSelectSigner]);
+
+  useEffect(() => {
+    setSelected(selectedSigner);
+  }, [selectedSigner]);
 
   return (
     <SwModal

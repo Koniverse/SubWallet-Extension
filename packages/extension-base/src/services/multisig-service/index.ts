@@ -306,7 +306,7 @@ export class MultisigService implements StoppableServiceInterface {
   handleEvents (events: EventItem<EventType>[], eventTypes: EventType[]): void {
     let needReload = false;
 
-    if (eventTypes.includes('account.add') || eventTypes.includes('account.remove')) {
+    if (eventTypes.includes('account.add') || eventTypes.includes('account.remove') || eventTypes.includes('account.updateCurrent')) {
       needReload = true;
     }
 

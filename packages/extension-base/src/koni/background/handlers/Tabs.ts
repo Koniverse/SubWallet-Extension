@@ -98,7 +98,7 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
 
   const injectedAccounts = Object
     .values(accounts)
-    .filter(({ json: { meta: { isHidden, isMultisig } } }) => !isHidden && !isMultisig)
+    .filter(({ json: { meta: { isHidden } } }) => !isHidden)
     .filter(authTypeFilter)
     .filter(({ json: { address } }) => accountSelected.includes(address))
     .sort((a, b) => (a.json.meta.whenCreated || 0) - (b.json.meta.whenCreated || 0))

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicStatus, ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { _ChainConnectionStatus } from '@subwallet/extension-base/services/chain-service/types';
 import { MultisigTxType, PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
@@ -10,7 +11,7 @@ import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxReques
 import { AlertModal } from '@subwallet/extension-koni-ui/components';
 import { MULTISIG_HISTORY_INFO_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { MultisigTxToTitleMap } from '@subwallet/extension-koni-ui/constants/multisig';
-import { useAlert, useGetAccountProxyByAddress, useGetBalance, useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useChainChecker, useGetAccountProxyByAddress, useGetBalance, useHandleSubmitTransaction, usePreCheckAction } from '@subwallet/extension-koni-ui/hooks';
 import { approvePendingTx, cancelPendingTx, executePendingTx } from '@subwallet/extension-koni-ui/messaging';
 import HistoryMultisigLayout from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/parts/MultisigLayout';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -34,7 +35,7 @@ const alertModalId = 'multisig-confirmation-alert-modal';
 function Component ({ className = '', data, historyList = [], onCancel }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
+  const { chainInfoMap, chainStateMap, chainStatusMap } = useSelector((state: RootState) => state.chainStore);
   const [loading, setLoading] = useState(false);
   const checkAction = usePreCheckAction({ address: data?.currentSigner });
   const { onError, onSuccess } = useHandleSubmitTransaction();
@@ -296,7 +297,7 @@ function Component ({ className = '', data, historyList = [], onCancel }: Props)
         )}
       </div>
     );
-  }, [_onApprove, validateSignerAndExecute, isMultisigProcessing, _onExecute, _onReject, checkAction, data.approvals.length, data?.currentSigner, data.depositor, data?.threshold, error, formattedApprovals, isBalanceLoading, loading, t]);
+  }, [data?.currentSigner, data.depositor, data?.threshold, data.approvals.length, formattedApprovals, loading, isBalanceLoading, isMultisigProcessing, error, validateSignerAndExecute, checkAction, _onReject, t, _onExecute, _onApprove]);
 
   const modalFooter = useMemo(() => {
     if (!data) {
@@ -328,11 +329,29 @@ function Component ({ className = '', data, historyList = [], onCancel }: Props)
     );
   }, [data, originChainInfo, openBlockExplorer, t, getMultisigFooter]);
 
+  const chainChecker = useChainChecker();
+
   useEffect(() => {
-    if (error) {
-      onError(new Error(error));
+    if (data?.chain) {
+      chainChecker(data.chain);
     }
-  }, [error, onError]);
+  }, [data?.chain, chainChecker]);
+
+  useEffect(() => {
+    const handleBalanceError = () => {
+      if (!error || !data?.chain) {
+        return;
+      }
+
+      if (chainStatusMap[data.chain]?.connectionStatus !== _ChainConnectionStatus.CONNECTED) {
+        return;
+      }
+
+      onError(new Error(error));
+    };
+
+    handleBalanceError();
+  }, [chainStateMap, chainStatusMap, data?.chain, error, onError]);
 
   return (
     <>

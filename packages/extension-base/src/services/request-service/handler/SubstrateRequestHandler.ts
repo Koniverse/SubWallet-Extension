@@ -36,6 +36,22 @@ export default class SubstrateRequestHandler {
       .map(({ address, id, request, url }) => ({ address, id, request, url, isInternal: isInternalRequest(url) }));
   }
 
+  public updateSignRequest (id: string, request: RequestSign, signerAddress?: string): void {
+    const current = this.getSignRequest(id);
+
+    if (!current) {
+      throw new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Sign request not found');
+    }
+
+    this.#substrateRequests[id] = {
+      ...current,
+      request,
+      signerAddress: signerAddress || current.signerAddress
+    };
+
+    this.updateIconSign();
+  }
+
   private updateIconSign (shouldClose?: boolean): void {
     this.signSubject.next(this.allSubstrateRequests);
     this.#requestService.updateIconV2(shouldClose);
