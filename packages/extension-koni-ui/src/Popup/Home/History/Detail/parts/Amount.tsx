@@ -84,6 +84,10 @@ const Component: React.FC<Props> = (props: Props) => {
     return derivativeTokenSlug ? assetRegistry[derivativeTokenSlug].symbol : '';
   }, [assetRegistry, derivativeTokenSlug]);
 
+  const isHiddenValue = useMemo(() => {
+    return data.type === ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE;
+  }, [data.type]);
+
   if (isLeavePool && data.additionalInfo) {
     return <PoolLeaveAmount data={data} />;
   }
@@ -113,7 +117,7 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <>
       {
-        (isStaking || isCrowdloan || amount) &&
+        !isHiddenValue && (isStaking || isCrowdloan || amount) &&
           (
             <MetaInfo.Number
               decimals={amount?.decimals || undefined}
