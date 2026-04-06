@@ -210,6 +210,10 @@ export default class RequestService {
     return this.#substrateRequestHandler.getSignRequest(id);
   }
 
+  public updateSignRequest (id: string, request: RequestSign, signerAddress?: string): void {
+    this.#substrateRequestHandler.updateSignRequest(id, request, signerAddress);
+  }
+
   public async signInternalTransaction (id: string, address: string, url: string, payload: SignerPayloadJSON, onSign?: (id: string) => void, isWrappedTx?: SubstrateTransactionWrappingStatus): Promise<ResponseSigning> {
     if (isWrappedTx === SubstrateTransactionWrappingStatus.WRAP_RESULT) {
       return this.#substrateRequestHandler.signWrappedTransaction(id, address, url, payload, onSign);

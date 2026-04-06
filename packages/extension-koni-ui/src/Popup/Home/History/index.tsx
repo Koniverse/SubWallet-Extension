@@ -2,23 +2,23 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicStatus, ExtrinsicType, TransactionDirection, TransactionHistoryItem } from '@subwallet/extension-base/background/KoniTypes';
+import { ALL_NETWORK_KEY } from '@subwallet/extension-base/constants';
 import { YIELD_EXTRINSIC_TYPES } from '@subwallet/extension-base/koni/api/yield/helper/utils';
 import { _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { PendingMultisigTx } from '@subwallet/extension-base/services/multisig-service';
 import { AccountChainType } from '@subwallet/extension-base/types';
-import { isSameAddress, quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
+import { isAccountAll, isSameAddress, quickFormatAddressToCompare } from '@subwallet/extension-base/utils';
 import { AccountAddressSelector, BasicInputEvent, ChainSelector, EmptyList, FilterModal, HistoryItem, Layout, PageWrapper, RadioGroup } from '@subwallet/extension-koni-ui/components';
 import { MultisigHistoryItem } from '@subwallet/extension-koni-ui/components/History/MultisigHistoryItem';
 import { CONFIRMATION_DETAIL_MODAL, DEFAULT_SESSION_VALUE, HISTORY_DETAIL_MODAL, LATEST_SESSION, MULTISIG_HISTORY_INFO_MODAL, NOTI_MULTISIG_PENDINGTX_ID, REMIND_BACKUP_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
+import { useChainChecker, useCoreCreateReformatAddress, useFilterModal, useHistorySelection, useSelector, useSetCurrentPage } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { cancelSubscription, subscribeTransactionHistory } from '@subwallet/extension-koni-ui/messaging';
 import { MultisigHistoryInfoModal } from '@subwallet/extension-koni-ui/Popup/Home/History/Detail/MultisigHistoryInfoModal';
 import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
 import { customFormatDate, formatHistoryDate, isTypeGov, isTypeManageSubstrateProxy, isTypeMultisig, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Form, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
-import CN from 'classnames';
 import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, NewspaperClipping, Pencil, Rocket, Spinner, TreeStructure, UserSwitch } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -235,7 +235,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const [form] = Form.useForm<FormState>();
   const { activeModal, checkActive, inactiveModal } = useContext(ModalContext);
-  const { accounts, currentAccountProxy, isAllAccount } = useSelector((root) => root.accountState);
+  const { accountProxies, accounts, currentAccountProxy, isAllAccount } = useSelector((root) => root.accountState);
   const { chainInfoMap } = useSelector((root) => root.chainStore);
   const { language } = useSelector((root) => root.settings);
   const { pendingMultisigTxs } = useSelector((root) => root.multisig);
@@ -263,32 +263,33 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [t]);
 
   const viewValue = Form.useWatch('view', form);
-
-  const currentSubstrateAddress = useMemo(() => {
-    const substrateAccount = currentAccountProxy?.accounts?.find((acc) => acc.chainType === AccountChainType.SUBSTRATE);
-
-    if (!substrateAccount) {
-      return undefined;
-    }
-
-    return substrateAccount?.address;
-  }, [currentAccountProxy?.accounts]);
+  const [multisigSelectedChain, setMultisigSelectedChain] = useState<string>(ALL_NETWORK_KEY);
+  const [multisigSelectedAddress, setMultisigSelectedAddress] = useState<string>('');
 
   const multisigList = useMemo(() => {
-    const pendingTxs = Object.values(pendingMultisigTxs);
-    let filteredList: PendingMultisigTx[] = [];
+    let filteredList: PendingMultisigTx[] = Object.values(pendingMultisigTxs);
 
-    if (isAllAccount) {
-      filteredList = pendingTxs;
-    } else if (!currentSubstrateAddress) {
-      filteredList = [];
-    } else {
-      filteredList = pendingTxs.filter((tx) => {
-        const isTargetMultisig = isSameAddress(tx.multisigAddress, currentSubstrateAddress);
-        const isSigner = isSameAddress(tx.currentSigner, currentSubstrateAddress);
+    const currentProxyAddresses = (!isAllAccount && currentAccountProxy)
+      ? (accountProxies.find((item) => item.id === currentAccountProxy.id)?.accounts || []).map((acc) => acc.address)
+      : undefined;
+
+    if (multisigSelectedChain !== ALL_NETWORK_KEY) {
+      filteredList = filteredList.filter((tx) => tx.chain === multisigSelectedChain);
+    }
+
+    if (multisigSelectedAddress) {
+      filteredList = filteredList.filter((tx) => {
+        const isTargetMultisig = isSameAddress(tx.multisigAddress, multisigSelectedAddress);
+        const isSigner = isSameAddress(tx.currentSigner, multisigSelectedAddress);
 
         return isTargetMultisig || isSigner;
       });
+    } else if (currentProxyAddresses && currentProxyAddresses.length) {
+      filteredList = filteredList.filter((tx) =>
+        currentProxyAddresses.some((addr) =>
+          isSameAddress(tx.multisigAddress, addr) || isSameAddress(tx.currentSigner, addr)
+        )
+      );
     }
 
     return filteredList.sort((a, b) => {
@@ -305,7 +306,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
       return timeB - timeA;
     });
-  }, [pendingMultisigTxs, isAllAccount, currentSubstrateAddress]);
+  }, [accountProxies, currentAccountProxy, isAllAccount, multisigSelectedAddress, multisigSelectedChain, pendingMultisigTxs]);
 
   const notiMultisigPendingTxItem = useMemo(() => {
     const parts = notiMultisigPendingTxId.split('___');
@@ -653,6 +654,75 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const { accountAddressItems, chainItems, selectedAddress, selectedChain, setSelectedAddress,
     setSelectedChain } = useHistorySelection();
+  const getReformatAddress = useCoreCreateReformatAddress();
+
+  const multisigChainItems = useMemo(() => {
+    const supportedMultisigChains = chainItems.filter((item) => chainInfoMap[item.slug]?.substrateInfo?.supportMultisig);
+
+    return [
+      {
+        name: t('ui.HISTORY.screen.History.allNetworks'),
+        slug: ALL_NETWORK_KEY
+      },
+      ...supportedMultisigChains
+    ];
+  }, [chainInfoMap, chainItems, t]);
+
+  const multisigAccountAddressItems = useMemo(() => {
+    if (!currentAccountProxy) {
+      return [];
+    }
+
+    const result = new Map<string, typeof accountAddressItems[number]>();
+    const selectedChainInfo = multisigSelectedChain === ALL_NETWORK_KEY
+      ? undefined
+      : chainInfoMap[multisigSelectedChain];
+
+    if (multisigSelectedChain !== ALL_NETWORK_KEY && !selectedChainInfo) {
+      return [];
+    }
+
+    const pushAccountItems = (proxyId: string) => {
+      const accountProxy = accountProxies.find((item) => item.id === proxyId);
+
+      if (!accountProxy || isAccountAll(accountProxy.id)) {
+        return;
+      }
+
+      accountProxy.accounts.forEach((account) => {
+        if (account.chainType !== AccountChainType.SUBSTRATE) {
+          return;
+        }
+
+        const displayAddress = selectedChainInfo
+          ? getReformatAddress(account, selectedChainInfo)
+          : account.address;
+
+        if (!displayAddress) {
+          return;
+        }
+
+        result.set(account.address, {
+          accountName: accountProxy.name,
+          accountProxyId: accountProxy.id,
+          accountProxyType: accountProxy.accountType,
+          accountType: account.type,
+          address: account.address,
+          displayAddress
+        });
+      });
+    };
+
+    if (isAllAccount) {
+      accountProxies.forEach((proxy) => {
+        pushAccountItems(proxy.id);
+      });
+    } else {
+      pushAccountItems(currentAccountProxy.id);
+    }
+
+    return Array.from(result.values());
+  }, [accountProxies, chainInfoMap, currentAccountProxy, getReformatAddress, isAllAccount, multisigSelectedChain]);
 
   const emptyList = useCallback(() => {
     return (
@@ -711,19 +781,34 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, []);
 
   const onSelectAccount = useCallback((event: BasicInputEvent) => {
-    setSelectedAddress(event.target.value);
-  }, [setSelectedAddress]);
+    const selectedValue = event.target.value;
+
+    if (viewValue === ViewValue.MULTISIG) {
+      setMultisigSelectedAddress(selectedValue);
+    } else {
+      setSelectedAddress(selectedValue);
+    }
+  }, [setSelectedAddress, viewValue]);
 
   const onSelectChain = useCallback((event: BasicInputEvent) => {
-    setSelectedChain(event.target.value);
-  }, [setSelectedChain]);
+    const selectedValue = event.target.value;
 
-  const isChainSelectorEmpty = !chainItems.length;
+    if (viewValue === ViewValue.MULTISIG) {
+      setMultisigSelectedChain(selectedValue);
+      setMultisigSelectedAddress('');
+    } else {
+      setSelectedChain(selectedValue);
+    }
+  }, [setSelectedChain, viewValue]);
+
+  const isChainSelectorEmpty = viewValue === ViewValue.MULTISIG
+    ? multisigChainItems.length <= 1
+    : !chainItems.length;
 
   const historySelectorsNode = (
     <>
       <div className={'history-header-wrapper'}>
-        <div className={CN('history-line-1', { '-is-multisig-tab': viewValue === ViewValue.MULTISIG })}>
+        <div className={'history-line-1'}>
           <Form
             form={form}
             initialValues={defaultValues}
@@ -739,29 +824,32 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             </Form.Item>
           </Form>
         </div>
-        {viewValue === ViewValue.TRANSACTION && <div className={'history-line-2'}>
+        <div className={'history-line-2'}>
           <ChainSelector
-            className={'__history-chain-selector'}
+            className={viewValue === ViewValue.MULTISIG && multisigSelectedChain === ALL_NETWORK_KEY
+              ? '__history-chain-selector -hide-selected-logo'
+              : '__history-chain-selector'}
             disabled={isChainSelectorEmpty}
-            items={chainItems}
+            items={viewValue === ViewValue.MULTISIG ? multisigChainItems : chainItems}
             loading={loading}
             onChange={onSelectChain}
             title={t('ui.HISTORY.screen.History.selectChain')}
-            value={selectedChain}
+            value={viewValue === ViewValue.MULTISIG ? multisigSelectedChain : selectedChain}
           />
 
           {
-            (isAllAccount || accountAddressItems.length > 1) && (
+            ((viewValue === ViewValue.MULTISIG && multisigAccountAddressItems.length > 1) ||
+              (viewValue !== ViewValue.MULTISIG && (isAllAccount || accountAddressItems.length > 1))) && (
               <AccountAddressSelector
-                autoSelectFirstItem={true}
+                autoSelectFirstItem={viewValue !== ViewValue.MULTISIG}
                 className={'__history-address-selector'}
-                items={accountAddressItems}
+                items={viewValue === ViewValue.MULTISIG ? multisigAccountAddressItems : accountAddressItems}
                 onChange={onSelectAccount}
-                value={selectedAddress}
+                value={viewValue === ViewValue.MULTISIG ? multisigSelectedAddress : selectedAddress}
               />
             )
           }
-        </div>}
+        </div>
       </div>
     </>
   );
@@ -894,6 +982,34 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     setHistoryItems(getHistoryItems(currentItemDisplayCount));
   }, [currentItemDisplayCount, getHistoryItems]);
 
+  useEffect(() => {
+    if (!multisigChainItems.some((item) => item.slug === multisigSelectedChain)) {
+      setMultisigSelectedChain(ALL_NETWORK_KEY);
+    }
+  }, [multisigChainItems, multisigSelectedChain]);
+
+  useEffect(() => {
+    if (!multisigAccountAddressItems.some((item) => item.address === multisigSelectedAddress)) {
+      setMultisigSelectedAddress('');
+    }
+  }, [multisigAccountAddressItems, multisigSelectedAddress]);
+
+  const checkChain = useChainChecker();
+
+  useEffect(() => {
+    if (viewValue === ViewValue.MULTISIG && multisigSelectedChain !== ALL_NETWORK_KEY) {
+      checkChain(multisigSelectedChain);
+    }
+  }, [checkChain, multisigChainItems, multisigSelectedChain, viewValue]);
+
+  useEffect(() => {
+    if (viewValue !== ViewValue.MULTISIG) {
+      setMultisigSelectedAddress('');
+    } else {
+      setSelectedAddress('');
+    }
+  }, [setSelectedAddress, viewValue]);
+
   return (
     <>
       <PageWrapper
@@ -926,11 +1042,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         data={selectedItem}
         onCancel={onCloseDetail}
       />
-      {selectedMultisigItem && <MultisigHistoryInfoModal
-        data={selectedMultisigItem}
-        historyList={historyItems}
-        onCancel={onCloseMultisigDetail}
-      />}
+      {selectedMultisigItem && (
+        <MultisigHistoryInfoModal
+          data={selectedMultisigItem}
+          historyList={historyItems}
+          onCancel={onCloseMultisigDetail}
+        />
+      )}
 
       <FilterModal
         id={FILTER_MODAL_ID}
@@ -977,12 +1095,6 @@ const History = styled(Component)<Props>(({ theme: { token } }: Props) => {
     '.history-line-1': {
       '.ant-form-item': {
         marginBottom: 28
-      },
-
-      '&.-is-multisig-tab': {
-        '.ant-form-item': {
-          marginBottom: 0
-        }
       }
     },
 
@@ -1018,6 +1130,10 @@ const History = styled(Component)<Props>(({ theme: { token } }: Props) => {
           paddingLeft: token.padding,
           paddingRight: token.padding
         }
+      },
+
+      '.__history-chain-selector.-hide-selected-logo .chain-logo': {
+        display: 'none'
       },
 
       '.__history-address-selector': {
