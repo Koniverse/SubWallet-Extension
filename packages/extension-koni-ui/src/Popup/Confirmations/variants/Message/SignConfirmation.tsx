@@ -50,23 +50,26 @@ function Component ({ className, request }: Props) {
   const onClickDetail = useOpenDetailModal();
 
   const isMessage = useMemo(() => isSubstrateMessage(payload), [payload]);
-  const requiresMultisigSignerSelection = useMemo(() => !!account?.isMultisig, [account?.isMultisig]);
-  const isUnsupportedMultisigMessage = useMemo(() => requiresMultisigSignerSelection && isMessage, [isMessage, requiresMultisigSignerSelection]);
-  const isWrappedMultisigTransaction = useMemo(() => requiresMultisigSignerSelection && !isMessage, [isMessage, requiresMultisigSignerSelection]);
+  // True when current account is a multisig account.
+  const isMultisigAccount = useMemo(() => !!account?.isMultisig, [account?.isMultisig]);
+  // Multisig does not support direct message signing.
+  const isMultisigMessageSigning = useMemo(() => isMultisigAccount && isMessage, [isMessage, isMultisigAccount]);
+  // Multisig transaction signing must be wrapped before approval.
+  const isMultisigWrappedTransactionSigning = useMemo(() => isMultisigAccount && !isMessage, [isMessage, isMultisigAccount]);
   const chainSlug = useMemo(() => chainInfo?.slug || '', [chainInfo?.slug]);
   const accountTitle = useMemo(() => t('ui.ACCOUNT.components.AccountProxy.TypeTag.multisigAccount'), [t]);
 
   const disableApproval = useMemo(() => {
-    if (isUnsupportedMultisigMessage) {
+    if (isMultisigMessageSigning) {
       return true;
     }
 
-    if (!requiresMultisigSignerSelection) {
+    if (!isMultisigAccount) {
       return false;
     }
 
     return disableMultisigApproval;
-  }, [disableMultisigApproval, isUnsupportedMultisigMessage, requiresMultisigSignerSelection]);
+  }, [disableMultisigApproval, isMultisigMessageSigning, isMultisigAccount]);
 
   const initialCallData = useMemo(() => {
     if (isRawPayload(request.request.payload)) {
@@ -87,10 +90,10 @@ function Component ({ className, request }: Props) {
   }, [chainStateMap, chainInfo, isMessage]);
 
   useEffect(() => {
-    if (requiresMultisigSignerSelection) {
+    if (isMultisigAccount) {
       setDisableMultisigApproval(true);
     }
-  }, [requiresMultisigSignerSelection, request.id]);
+  }, [isMultisigAccount, request.id]);
 
   return (
     <>
@@ -100,7 +103,7 @@ function Component ({ className, request }: Props) {
           {t('ui.DAPP.Confirmations.Message.Sign.signatureRequest')}
         </div>
         <div className='description'>
-          {isUnsupportedMultisigMessage
+          {isMultisigMessageSigning
             ? (
               <Trans
                 components={{
@@ -112,11 +115,11 @@ function Component ({ className, request }: Props) {
                 values={{ accountTitle }}
               />
             )
-            : !requiresMultisigSignerSelection
+            : !isMultisigAccount
               ? t('ui.DAPP.Confirmations.Message.Sign.approvingRequestWithAccount')
               : t('ui.DAPP.Confirmations.Message.Sign.selectSignatory')}
         </div>
-        {requiresMultisigSignerSelection && !isMessage
+        {isMultisigAccount && !isMessage
           ? (
             <MultisigSignerSelector
               chainSlug={chainSlug}
@@ -133,9 +136,9 @@ function Component ({ className, request }: Props) {
             <AccountItemWithProxyAvatar
               account={account}
               accountAddress={address}
-              className={CN('account-item', { '-unsupported': isUnsupportedMultisigMessage })}
+              className={CN('account-item', { '-unsupported': isMultisigMessageSigning })}
               isSelected={true}
-              showUnselectIcon={isUnsupportedMultisigMessage}
+              showUnselectIcon={isMultisigMessageSigning}
             />
 
             <div>
@@ -156,7 +159,7 @@ function Component ({ className, request }: Props) {
         disableApproval={disableApproval}
         id={request.id}
         isInternal={request.isInternal}
-        isWrapTransaction={isWrappedMultisigTransaction}
+        isWrapTransaction={isMultisigWrappedTransactionSigning}
         request={request.request}
       />
       <BaseDetailModal
