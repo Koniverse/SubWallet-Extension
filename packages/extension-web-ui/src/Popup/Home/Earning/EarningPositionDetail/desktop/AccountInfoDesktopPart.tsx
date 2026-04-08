@@ -168,7 +168,7 @@ const Component: React.FC<Props> = ({ className, compound,
             {
               isSpecial && (
                 <div className={'__derivative-balance'}>
-                  <span className={'__derivative-title'}>{`${t('Derivative balance')}: `}</span>
+                  <span className={'__derivative-title'}>{`${t('ui.ACCOUNT_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.AccountInfoDesktopPart.derivativeBalance')}: `}</span>
                   <div className={'__derivative-balance-value'}>
                     <Number
                       decimal={deriveAsset?.decimals || 0}
@@ -183,7 +183,7 @@ const Component: React.FC<Props> = ({ className, compound,
             {
               isSubnetStaking && (
                 <div className={'__derivative-balance'}>
-                  <span className={'__derivative-title'}>{`${t('Derivative balance')}: `}</span>
+                  <span className={'__derivative-title'}>{`${t('ui.ACCOUNT_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.AccountInfoDesktopPart.derivativeBalance')}: `}</span>
                   <div className={'__derivative-balance-value'}>
                     <Number
                       decimal={inputAsset?.decimals || 0}

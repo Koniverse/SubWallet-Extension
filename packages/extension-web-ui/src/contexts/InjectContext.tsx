@@ -469,7 +469,7 @@ export const InjectContextProvider: React.FC<Props> = ({ children }: Props) => {
     injectHandler.noFindAccounts.subscribe((v) => {
       if (v) {
         notify({
-          message: t('{{wallet}} extension disconnected. Re-connect the {{wallet}} extension and select accounts you want to connect.', { replace: { wallet: injectHandler.selectedWallet } }),
+          message: t('ui.INJECT_CONTEXT.contexts.InjectContext.extensionDisconnectedReConnectTheExtensionAndSelectAccountsYouWantToConnect', { replace: { wallet: injectHandler.selectedWallet } }),
           type: 'warning',
           duration: 8
 
@@ -486,7 +486,7 @@ export const InjectContextProvider: React.FC<Props> = ({ children }: Props) => {
     const subscription = injectHandler.errorSubject.subscribe((error) => {
       if (error.substrate && error.evm) {
         notification({
-          message: t('Fail to connect. Please try again later'),
+          message: t('ui.INJECT_CONTEXT.contexts.InjectContext.failToConnectPleaseTryAgainLater'),
           type: 'warning'
         });
       }

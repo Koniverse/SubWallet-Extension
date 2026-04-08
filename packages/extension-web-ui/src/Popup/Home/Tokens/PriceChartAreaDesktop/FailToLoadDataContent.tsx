@@ -21,11 +21,11 @@ const Component: React.FC<Props> = (props: Props) => {
     <div className={className}>
       <div className={'__block-container'}>
         <div className='__block-title'>
-          {t('Failed to load price chart')}
+          {t('ui.FAIL_TO_LOAD_DATA_CONTENT.Popup.Home.Tokens.PriceChartAreaDesktop.FailToLoadDataContent.failedToLoadPriceChart')}
         </div>
 
         <div className='__block-description'>
-          {t('There was an issue fetching the data. Please click the reload button to try again.')}
+          {t('ui.FAIL_TO_LOAD_DATA_CONTENT.Popup.Home.Tokens.PriceChartAreaDesktop.FailToLoadDataContent.thereWasAnIssueFetchingTheDataPleaseClickTheReloadButtonToTryAgain')}
         </div>
 
         <Button
@@ -41,7 +41,7 @@ const Component: React.FC<Props> = (props: Props) => {
           loading={isLoading}
           onClick={onReload}
         >
-          {t('Reload')}
+          {t('ui.FAIL_TO_LOAD_DATA_CONTENT.Popup.Home.Tokens.PriceChartAreaDesktop.FailToLoadDataContent.reload')}
         </Button>
       </div>
     </div>

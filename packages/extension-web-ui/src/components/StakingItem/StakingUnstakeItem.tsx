@@ -53,7 +53,7 @@ const Component: React.FC<Props> = (props: Props) => {
             size='sm'
             weight='fill'
           />
-          <span>{status === UnstakingStatus.CLAIMABLE ? t('Withdrawal ready') : t('Waiting')}</span>
+          <span>{status === UnstakingStatus.CLAIMABLE ? t('ui.STAKING_UNSTAKE_ITEM.components.StakingItem.StakingUnstakeItem.withdrawalReady') : t('ui.STAKING_UNSTAKE_ITEM.components.StakingItem.StakingUnstakeItem.waiting')}</span>
         </div>
       </>
     );

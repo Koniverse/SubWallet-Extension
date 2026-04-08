@@ -46,7 +46,7 @@ function Component ({ className, compound,
   return (
     <CollapsiblePanel
       className={CN(className)}
-      title={t('Nomination info')}
+      title={t('ui.NOMINATION_INFO_PART.Popup.Home.Earning.EarningPositionDetail.AccountAndNominationInfoPart.NominationInfoPart.nominationInfo')}
     >
       <MetaInfo
         labelColorScheme='gray'

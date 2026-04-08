@@ -74,7 +74,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={detectTranslate('Transaction is in progress. Go to <highlight>Notifications</highlight> to view progress and keep SubWallet open until the transaction is completed')}
+            i18nKey={detectTranslate('ui.TRANSACTION_PROCESS_WARNING.components.TransactionProcessWarning.transactionIsInProgressGoToHighlightNotificationsHighlightToViewProgressAndKeepSubwalletOpenUntilTheTransactionIsCompleted')}
           />
         )}
         title={'Do not close SubWallet!'}

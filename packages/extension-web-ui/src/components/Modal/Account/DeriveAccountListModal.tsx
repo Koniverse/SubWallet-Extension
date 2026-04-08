@@ -78,7 +78,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         id={modalId}
         maskClosable={true}
         onCancel={onBack}
-        title={t('Select account')}
+        title={t('ui.DERIVE_ACCOUNT_LIST_MODAL.components.Modal.Account.DeriveAccountListModal.selectAccount')}
       >
         <SwList.Section
           displayRow={true}
@@ -89,7 +89,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           renderWhenEmpty={renderEmpty}
           rowGap='var(--row-gap)'
           searchFunction={searchAccountProxyFunction}
-          searchPlaceholder={t<string>('Account name')}
+          searchPlaceholder={t<string>('ui.DERIVE_ACCOUNT_LIST_MODAL.components.Modal.Account.DeriveAccountListModal.accountName')}
         />
       </BaseModal>
     </>

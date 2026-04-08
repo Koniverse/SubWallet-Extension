@@ -50,18 +50,18 @@ const Component: React.FC<Props> = (props: Props) => {
         >
           <MetaInfo.Chain
             chain={transaction.chain}
-            label={t('Network')}
+            label={t('ui.SWAP_CHOOSE_FEE.Popup.Confirmations.variants.Transaction.variants.SwapChooseFee.network')}
           />
           <MetaInfo.Default
             className={'__token-network-fee'}
-            label={t('Token to paying fee')}
+            label={t('ui.SWAP_CHOOSE_FEE.Popup.Confirmations.variants.Transaction.variants.SwapChooseFee.tokenToPayingFee')}
             valueColorSchema={'default'}
           >
             {_getAssetSymbol(selectedFeeTokenInfo)}
           </MetaInfo.Default>
           <MetaInfo.Number
             decimals={0}
-            label={t('Estimated transaction fee')}
+            label={t('ui.SWAP_CHOOSE_FEE.Popup.Confirmations.variants.Transaction.variants.SwapChooseFee.estimatedTransactionFee')}
             prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
             value={defaultFeeValueInFiatPrice}
           />

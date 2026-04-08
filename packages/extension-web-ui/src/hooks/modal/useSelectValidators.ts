@@ -30,20 +30,20 @@ export function useSelectValidators (validatorList: ValidatorDataType[], modalId
     if (!fewValidators) {
       switch (label) {
         case 'dApp':
-          return detectTranslate('You can only choose {{number}} dApp');
+          return detectTranslate('ui.USE_SELECT_VALIDATORS.hooks.modal.useSelectValidators.youCanOnlyChooseDapp');
         case 'Collator':
-          return detectTranslate('You can only choose {{number}} collator');
+          return detectTranslate('ui.USE_SELECT_VALIDATORS.hooks.modal.useSelectValidators.youCanOnlyChooseCollator');
         case 'Validator':
-          return detectTranslate('You can only choose {{number}} validator');
+          return detectTranslate('ui.USE_SELECT_VALIDATORS.hooks.modal.useSelectValidators.youCanOnlyChooseValidator');
       }
     } else {
       switch (label) {
         case 'dApp':
-          return detectTranslate('You can only choose {{number}} dApps');
+          return detectTranslate('ui.USE_SELECT_VALIDATORS.hooks.modal.useSelectValidators.youCanOnlyChooseDapps');
         case 'Collator':
-          return detectTranslate('You can only choose {{number}} collators');
+          return detectTranslate('ui.USE_SELECT_VALIDATORS.hooks.modal.useSelectValidators.youCanOnlyChooseCollators');
         case 'Validator':
-          return detectTranslate('You can only choose {{number}} validators');
+          return detectTranslate('ui.USE_SELECT_VALIDATORS.hooks.modal.useSelectValidators.youCanOnlyChooseValidators');
       }
     }
   }, [chain, fewValidators]);

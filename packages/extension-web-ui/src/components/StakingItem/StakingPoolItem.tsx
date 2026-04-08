@@ -38,7 +38,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <span>{name || `Pool #${id}`}</span>
           </div>
           <div className={'middle-item__bond-amount'}>
-            <span className={'middle-item__bond-amount-label'}>{t('Staked:')}</span>
+            <span className={'middle-item__bond-amount-label'}>{t('ui.STAKING_POOL_ITEM.components.StakingItem.StakingPoolItem.staked')}</span>
             <Number
               className={'middle-item__bond-amount-number'}
               decimal={decimals}
@@ -54,7 +54,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 &nbsp;-&nbsp;
               </span>
               <span>
-                {isProfitable ? t('Earning') : t('Not earning')}
+                {isProfitable ? t('ui.STAKING_POOL_ITEM.components.StakingItem.StakingPoolItem.earning') : t('ui.STAKING_POOL_ITEM.components.StakingItem.StakingPoolItem.notEarning')}
               </span>
             </span>
           </div>

@@ -151,7 +151,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('send-fund');
-  const checkAction = usePreCheckAction(fromValue, true, detectTranslate('The account you are using is {{accountTitle}}, you cannot send assets with it'));
+  const checkAction = usePreCheckAction(fromValue, true, detectTranslate('ui.SEND_FUND.Popup.Transaction.variants.SendFund.theAccountYouAreUsingIsYouCannotSendAssetsWithIt'));
 
   const [currentChainAsset, setCurrentChainAsset] = useState<_ChainAsset | undefined>(assetRegistry[defaultData.asset]);
 
@@ -424,7 +424,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
     const maxTransfer = transferInfo?.maxTransferable || '0';
 
     if (!amount) {
-      return Promise.reject(t('Amount is required'));
+      return Promise.reject(t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.amountIsRequired'));
     }
 
     if (!isBalanceReady) {
@@ -432,17 +432,17 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
     }
 
     if ((new BN(maxTransfer)).lte(BN_ZERO)) {
-      return Promise.reject(t('You don\'t have enough tokens to proceed'));
+      return Promise.reject(t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.youDonTHaveEnoughTokensToProceed'));
     }
 
     if ((new BigN(amount)).eq(new BigN(0))) {
-      return Promise.reject(t('Amount must be greater than 0'));
+      return Promise.reject(t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.amountMustBeGreaterThan0'));
     }
 
     if ((new BigN(amount)).gt(new BigN(maxTransfer))) {
       const maxString = formatBalance(maxTransfer, decimals);
 
-      return Promise.reject(t('Amount must be equal or less than {{number}}', { replace: { number: maxString } }));
+      return Promise.reject(t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.amountMustBeEqualOrLessThan', { replace: { number: maxString } }));
     }
 
     return Promise.resolve();
@@ -520,7 +520,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
     if (!account) {
       setLoading(false);
       notification({
-        message: t("Can't find account"),
+        message: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.canTFindAccount'),
         type: 'error'
       });
 
@@ -534,7 +534,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
         if (!_isTokenTransferredByEvm(chainAsset)) {
           setLoading(false);
           notification({
-            message: t('Ledger does not support transfer for this token'),
+            message: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.ledgerDoesNotSupportTransferForThisToken'),
             type: 'warning'
           });
 
@@ -711,9 +711,9 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
           openAlert({
             type: NotificationType.WARNING,
             content: t(_getXcmUnstableWarning(originChainInfo, destChainInfo, assetSlug)),
-            title: isMythosFromHydrationToMythos ? t('High fee alert!') : t('Pay attention!'),
+            title: isMythosFromHydrationToMythos ? t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.highFeeAlert') : t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.payAttention'),
             okButton: {
-              text: t('Continue'),
+              text: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.continue'),
               onClick: () => {
                 closeAlert();
                 setLoading(true);
@@ -721,7 +721,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               }
             },
             cancelButton: {
-              text: t('Cancel'),
+              text: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.cancel'),
               onClick: () => {
                 closeAlert();
                 setLoading(false);
@@ -745,9 +745,9 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
           openAlert({
             type: NotificationType.WARNING,
             content: t(`Transferring to an ${bounceableAddressPrefix} address is not supported. Continuing will result in a transfer to the corresponding ${formattedAddressPrefix} address (same seed phrase)`),
-            title: t('Unsupported address'),
+            title: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.unsupportedAddress'),
             okButton: {
-              text: t('Continue'),
+              text: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.continue'),
               onClick: () => {
                 form.setFieldValue('to', formattedAddress);
                 updateAddressInputValue(formattedAddress);
@@ -760,7 +760,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               }
             },
             cancelButton: {
-              text: t('Cancel'),
+              text: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.cancel'),
               onClick: () => {
                 closeAlert();
                 setLoading(false);
@@ -779,10 +779,10 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
         if (bnMinAmount.gt(BN_ZERO) && isTransferAll && values.chain === values.destChain && !checkTransferAll) {
           openAlert({
             type: NotificationType.WARNING,
-            content: t('Transferring all will remove all assets on this network. Are you sure?'),
-            title: t('Pay attention!'),
+            content: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.transferringAllWillRemoveAllAssetsOnThisNetworkAreYouSure'),
+            title: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.payAttention'),
             okButton: {
-              text: t('Transfer'),
+              text: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.transfer'),
               onClick: () => {
                 closeAlert();
                 setLoading(true);
@@ -793,7 +793,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               }
             },
             cancelButton: {
-              text: t('Cancel'),
+              text: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.cancel'),
               onClick: () => {
                 closeAlert();
                 setLoading(false);
@@ -1021,7 +1021,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
       })}
       >
         <div className={'__brief common-text text-light-4 text-center'}>
-          {t('You are performing a transfer of a fungible token')}
+          {t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.youArePerformingATransferOfAFungibleToken')}
         </div>
 
         <Form
@@ -1039,9 +1039,9 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               <TokenSelector
                 disabled={isReadonly || !tokenItems.length}
                 items={tokenItems}
-                placeholder={t('Select token')}
+                placeholder={t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.selectToken')}
                 showChainInSelected
-                tooltip={isWebUI ? t('Select token') : undefined}
+                tooltip={isWebUI ? t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.selectToken') : undefined}
               />
             </Form.Item>
 
@@ -1055,8 +1055,8 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               <ChainSelector
                 disabled={isReadonly || !destChainItems.length}
                 items={destChainItems}
-                title={t('Select destination chain')}
-                tooltip={isWebUI ? t('Select destination chain') : undefined}
+                title={t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.selectDestinationChain')}
+                tooltip={isWebUI ? t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.selectDestinationChain') : undefined}
               />
             </Form.Item>
           </div>
@@ -1069,7 +1069,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
             <AccountAddressSelector
               disabled={isReadonly}
               items={accountAddressItems}
-              label={`${t('From')}:`}
+              label={`${t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.from')}:`}
               labelStyle={'horizontal'}
             />
           </Form.Item>
@@ -1090,9 +1090,9 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               disabled={isReadonly || disabledToAddressInput}
               dropdownHeight={!isAccountSelectorVisible ? 317 : 257}
               key={addressInputRenderKey}
-              label={`${t('To')}:`}
+              label={`${t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.to')}:`}
               labelStyle={'horizontal'}
-              placeholder={t('Enter address')}
+              placeholder={t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.enterAddress')}
               ref={addressInputRef}
               saveAddress={true}
               showAddressBook={!isReadonly}
@@ -1127,7 +1127,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               maxValue={transferInfo?.maxTransferable || '0'}
               onSetMax={onSetMaxTransferable}
               showMaxButton={!hideMaxButton}
-              tooltip={isWebUI ? t('Amount') : undefined}
+              tooltip={isWebUI ? t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.amount') : undefined}
             />
           </Form.Item>
         </Form>
@@ -1171,8 +1171,8 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
           chainValue !== destChainValue && (
             <div className={'__warning_message_cross_chain'}>
               <AlertBox
-                description={t('Cross-chain transfer to an exchange (CEX) will result in loss of funds. Make sure the receiving address is not an exchange address.')}
-                title={t('Pay attention!')}
+                description={t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.crossChainTransferToAnExchangeCexWillResultInLossOfFundsMakeSureTheReceivingAddressIsNotAnExchangeAddress')}
+                title={t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.payAttention')}
                 type={'warning'}
               />
             </div>
@@ -1196,7 +1196,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
           onClick={checkAction(form.submit, extrinsicType)}
           schema={isTransferAll ? 'warning' : undefined}
         >
-          {isTransferAll ? t('Transfer all') : t('Transfer')}
+          {isTransferAll ? t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.transferAll') : t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.transfer')}
         </Button>
       </TransactionFooter>
     </>

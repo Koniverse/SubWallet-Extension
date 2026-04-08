@@ -90,17 +90,17 @@ function Component ({ className, request, type }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('Transaction request')}
+          {t('ui.CARDANO_SIGN_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.CardanoSignTransactionConfirmation.transactionRequest')}
         </div>
         <MetaInfo className={'confirmation-content-body'}>
           <MetaInfo.Number
             decimals={chainInfo?.cardanoInfo?.decimals}
-            label={t('Transaction summary')}
+            label={t('ui.CARDANO_SIGN_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.CardanoSignTransactionConfirmation.transactionSummary')}
             suffix={chainInfo?.cardanoInfo?.symbol}
             value={totalValue}
           />
           <div className='input-transaction'>
-            <div className='account-label'>{t('From account')}</div>
+            <div className='account-label'>{t('ui.CARDANO_SIGN_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.CardanoSignTransactionConfirmation.fromAccount')}</div>
             <div className={'account-list'}>
               {
                 ownerAddresses.map((address) => (
@@ -114,7 +114,7 @@ function Component ({ className, request, type }: Props) {
             </div>
           </div>
           <div className='output-transaction'>
-            <div className='account-label'>{t('To account')}</div>
+            <div className='account-label'>{t('ui.CARDANO_SIGN_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.CardanoSignTransactionConfirmation.toAccount')}</div>
             <div className={'account-list'}>
               {
                 recipientAddresses.map((address) => (
@@ -131,7 +131,7 @@ function Component ({ className, request, type }: Props) {
 
           <MetaInfo.Number
             decimals={chainInfo?.cardanoInfo?.decimals}
-            label={t('Estimated fee')}
+            label={t('ui.CARDANO_SIGN_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.CardanoSignTransactionConfirmation.estimatedFee')}
             suffix={chainInfo?.cardanoInfo?.symbol}
             value={estimateCardanoFee || '0'}
           />
@@ -144,7 +144,7 @@ function Component ({ className, request, type }: Props) {
             size='xs'
             type='ghost'
           >
-            {t('View details')}
+            {t('ui.CARDANO_SIGN_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.CardanoSignTransactionConfirmation.viewDetails')}
           </Button>
         </div>
         }
@@ -157,13 +157,13 @@ function Component ({ className, request, type }: Props) {
       {(!errors || errors.length === 0) &&
         <BaseDetailModal
           className={CN(className, 'transaction-detail-modal')}
-          title={t('Transaction details')}
+          title={t('ui.CARDANO_SIGN_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.CardanoSignTransactionConfirmation.transactionDetails')}
         >
           <MetaInfo>
-            <MetaInfo.Data label={t('Input')}>
+            <MetaInfo.Data label={t('ui.CARDANO_SIGN_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.CardanoSignTransactionConfirmation.input')}>
               {renderAccountTransactionDetail(txInputs)}
             </MetaInfo.Data>
-            <MetaInfo.Data label={t('Output')}>
+            <MetaInfo.Data label={t('ui.CARDANO_SIGN_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.CardanoSignTransactionConfirmation.output')}>
               {renderAccountTransactionDetail(txOutputs)}
             </MetaInfo.Data>
 

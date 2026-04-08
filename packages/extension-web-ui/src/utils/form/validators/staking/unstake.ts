@@ -14,26 +14,26 @@ export const validateUnStakeValue = (min: number | string | BigN, max: number | 
   const maxString = formatBalance(maxValue, decimals);
   // const middleString = middleValue.div(BN_TEN.pow(decimals)).toString();
 
-  const name = _name || t('Value');
+  const name = _name || t('ui.UNSTAKE.utils.form.validators.staking.unstake.value');
 
   return {
     validator: (_, value: string) => {
       const val = new BigN(value);
 
       if (val.gt(maxValue)) {
-        return Promise.reject(new Error(t('{{name}} must be equal or less than {{maxString}}', { replace: { name, maxString } })));
+        return Promise.reject(new Error(t('ui.UNSTAKE.utils.form.validators.staking.unstake.mustBeEqualOrLessThan', { replace: { name, maxString } })));
       }
 
       if (val.lte(BN_ZERO)) {
-        return Promise.reject(new Error(t('{{name}} must be greater than 0', { replace: { name } })));
+        return Promise.reject(new Error(t('ui.UNSTAKE.utils.form.validators.staking.unstake.mustBeGreaterThan0', { replace: { name } })));
       }
 
       if (middleValue.lt(BN_ZERO) && !val.eq(maxValue)) {
-        return Promise.reject(new Error(t('{{name}} must be equal {{maxString}}', { replace: { name, maxString } })));
+        return Promise.reject(new Error(t('ui.UNSTAKE.utils.form.validators.staking.unstake.mustBeEqual', { replace: { name, maxString } })));
       }
 
       if (val.gt(middleValue) && val.lt(maxValue)) {
-        return Promise.reject(new Error(t('If you unstake this amount your staking would fall below minimum stake required. Unstake all instead?')));
+        return Promise.reject(new Error(t('ui.UNSTAKE.utils.form.validators.staking.unstake.ifYouUnstakeThisAmountYourStakingWouldFallBelowMinimumStakeRequiredUnstakeAllInstead')));
       }
 
       return Promise.resolve();

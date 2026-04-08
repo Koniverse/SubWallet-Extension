@@ -77,7 +77,7 @@ function Component ({ className = '', id = AccountSelectorModalId, items, onSele
       fullSizeOnMobile
       id={id}
       onCancel={onCancel}
-      title={t('Select account')}
+      title={t('ui.ACCOUNT_SELECTOR_MODAL.components.Modal.AccountSelectorModal.selectAccount')}
     >
       <SwList.Section
         enableSearchInput={true}
@@ -87,7 +87,7 @@ function Component ({ className = '', id = AccountSelectorModalId, items, onSele
         renderWhenEmpty={renderEmpty}
         searchFunction={searchFunction}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('Search account')}
+        searchPlaceholder={t<string>('ui.ACCOUNT_SELECTOR_MODAL.components.Modal.AccountSelectorModal.searchAccount')}
       />
     </BaseModal>
   );

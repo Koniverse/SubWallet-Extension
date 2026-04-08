@@ -27,32 +27,32 @@ const Component: React.FC<Props> = (props: Props) => {
       <MetaInfo hasBackgroundWrapper>
         <MetaInfo.Account
           address={data.senderAddress}
-          label={t('Send from')}
+          label={t('ui.SEND_NFT.Popup.Confirmations.variants.Transaction.variants.SendNft.sendFrom')}
           networkPrefix={networkPrefix}
         />
 
         <MetaInfo.Account
           address={data.recipientAddress}
-          label={t('Send to')}
+          label={t('ui.SEND_NFT.Popup.Confirmations.variants.Transaction.variants.SendNft.sendTo')}
           networkPrefix={networkPrefix}
         />
 
         <MetaInfo.Chain
           chain={transaction.chain}
-          label={t('Network')}
+          label={t('ui.SEND_NFT.Popup.Confirmations.variants.Transaction.variants.SendNft.network')}
         />
       </MetaInfo>
       <MetaInfo hasBackgroundWrapper={true}>
         {
           (data.nftItemName || data.nftItem) && (
-            <MetaInfo.Default label={t('NFT')}>
+            <MetaInfo.Default label={t('ui.SEND_NFT.Popup.Confirmations.variants.Transaction.variants.SendNft.nft')}>
               {data.nftItemName || data.nftItem.name || `${data.nftItem.collectionId}_${data.nftItem.id}`}
             </MetaInfo.Default>
           )
         }
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Estimated fee')}
+          label={t('ui.SEND_NFT.Popup.Confirmations.variants.Transaction.variants.SendNft.estimatedFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />

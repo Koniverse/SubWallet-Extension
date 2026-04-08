@@ -27,13 +27,13 @@ function Component ({ accountProxies, className = '', onClose }: Props): React.R
             block={true}
             onClick={onClose}
           >
-            {t('Close')}
+            {t('ui.RESULT_ACCOUNT_PROXY_LIST_MODAL.Popup.MigrateAccount.SummaryView.ResultAccountProxyListModal.close')}
           </Button>
         </>
       )}
       id={resultAccountProxyListModal}
       onCancel={onClose}
-      title={t('Migrated account list')}
+      title={t('ui.RESULT_ACCOUNT_PROXY_LIST_MODAL.Popup.MigrateAccount.SummaryView.ResultAccountProxyListModal.migratedAccountList')}
       zIndex={9999}
     >
       {

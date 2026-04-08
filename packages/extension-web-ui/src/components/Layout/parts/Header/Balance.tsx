@@ -133,7 +133,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is read-only, you cannot send assets with it'),
+        message: t('ui.BALANCE.components.Layout.parts.Header.Balance.theAccountYouAreUsingIsReadOnlyYouCannotSendAssetsWithIt'),
         type: 'info',
         duration: 3
       });
@@ -187,20 +187,20 @@ function Component ({ className }: Props): React.ReactElement<Props> {
 
   const actions: Action[] = [
     {
-      label: 'Receive',
+      label: t('ui.BALANCE.components.Layout.parts.Header.Balance.receive'),
       type: 'receive',
       icon: CopySimple,
       onClick: onOpenReceive
     },
     {
-      label: 'Send',
+      label: t('ui.BALANCE.components.Layout.parts.Header.Balance.send'),
       type: 'send',
       icon: PaperPlaneTilt,
       onClick: onOpenSendFund,
       disabled: !isSupportSendFund
     },
     {
-      label: 'Buy & Sell',
+      label: t('ui.BALANCE.components.Layout.Header.Balance.buyAndSell'),
       type: 'buys',
       icon: PlusMinus,
       onClick: onOpenBuyTokens,
@@ -241,7 +241,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     <div className={CN(className, 'flex-row')}>
       <div className={CN('__block-item', '__total-balance-block')}>
         <div className={'__block-title-wrapper'}>
-          <div className={'__block-title'}>{t('Total balance')}</div>
+          <div className={'__block-title'}>{t('ui.BALANCE.components.Layout.parts.Header.Balance.totalBalance')}</div>
           <Button
             className='__balance-visibility-toggle'
             icon={
@@ -251,7 +251,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             }
             onClick={onChangeShowBalance}
             size={'xs'}
-            tooltip={isShowBalance ? t('Hide balance') : t('Show balance')}
+            tooltip={isShowBalance ? t('ui.BALANCE.components.Layout.parts.Header.Balance.hideBalance') : t('ui.BALANCE.components.Layout.parts.Header.Balance.showBalance')}
             type='ghost'
           />
           <Button
@@ -264,7 +264,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             loading={reloading}
             onClick={reloadBalance}
             size={'xs'}
-            tooltip={t('Refresh Balance')}
+            tooltip={t('ui.BALANCE.components.Layout.parts.Header.Balance.refreshBalance')}
             type='ghost'
           />
         </div>
@@ -325,7 +325,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
 
       <div className={CN('__block-item', '__balance-block')}>
         <div className='__block-title-wrapper'>
-          <div className={'__block-title'}>{t('Transferable balance')}</div>
+          <div className={'__block-title'}>{t('ui.BALANCE.components.Layout.parts.Header.Balance.transferableBalance')}</div>
         </div>
         <Tooltip
           overlayClassName={CN({
@@ -355,7 +355,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
 
       <div className={CN('__block-item', '__balance-block')}>
         <div className='__block-title-wrapper'>
-          <div className={'__block-title'}>{t('Locked balance')}</div>
+          <div className={'__block-title'}>{t('ui.BALANCE.components.Layout.parts.Header.Balance.lockedBalance')}</div>
         </div>
         <Tooltip
           overlayClassName={CN({
@@ -384,7 +384,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
 
       <div className={CN('__block-item', '__action-block')}>
         <div className='__block-title-wrapper'>
-          <div className={'__block-title'}>{t('Actions')}</div>
+          <div className={'__block-title'}>{t('ui.BALANCE.components.Layout.parts.Header.Balance.actions')}</div>
         </div>
 
         <div className={'__block-content'}>
@@ -420,7 +420,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             destroyOnClose={true}
             id={TRANSACTION_TRANSFER_MODAL}
             onCancel={handleCancelTransfer}
-            title={t('Transfer')}
+            title={t('ui.BALANCE.components.Layout.parts.Header.Balance.transfer')}
           >
             <Transaction
               modalContent={isWebUI}
@@ -442,7 +442,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             destroyOnClose={true}
             id={BUY_TOKEN_MODAL}
             onCancel={handleCancelBuy}
-            title={t('Buy & sell tokens')}
+            title={t('ui.BALANCE.components.Layout.parts.Header.Balance.buyAndSellTokens')}
           >
             <BuyTokens
               modalContent={isWebUI}

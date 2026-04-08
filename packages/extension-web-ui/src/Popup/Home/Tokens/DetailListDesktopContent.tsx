@@ -52,7 +52,7 @@ function Component ({ className = '',
       <div className={'__token-balance-area'}>
         <div className={'__your-balance-container'}>
           <div className='__your-balance-label'>
-            {t('Your balance')}
+            {t('ui.DETAIL_LIST_DESKTOP_CONTENT.Popup.Home.Tokens.DetailListDesktopContent.yourBalance')}
           </div>
 
           <Tooltip
@@ -88,7 +88,7 @@ function Component ({ className = '',
                 className={'__table'}
                 columns={[
                   {
-                    title: 'Token name',
+                    title: t('ui.BALANCE.screen.Tokens.DetailListDesktopContent.tokenName'),
                     dataIndex: 'name',
                     key: 'name',
                     render: (_, row) => {
@@ -105,7 +105,7 @@ function Component ({ className = '',
                     }
                   },
                   {
-                    title: 'Transferable',
+                    title: t('ui.BALANCE.screen.Tokens.DetailListDesktopContent.transferable'),
                     dataIndex: 'percentage',
                     key: 'percentage',
                     render: (_, row) => {
@@ -119,7 +119,7 @@ function Component ({ className = '',
                     }
                   },
                   {
-                    title: 'Locked',
+                    title: t('ui.BALANCE.screen.Tokens.DetailListDesktopContent.locked'),
                     dataIndex: 'price',
                     key: 'price',
                     render: (_, row) => {
@@ -133,7 +133,7 @@ function Component ({ className = '',
                     }
                   },
                   {
-                    title: 'Balance',
+                    title: t('ui.BALANCE.screen.Tokens.DetailListDesktopContent.balance'),
                     dataIndex: 'balance',
                     key: 'balance',
                     render: (_, row) => {

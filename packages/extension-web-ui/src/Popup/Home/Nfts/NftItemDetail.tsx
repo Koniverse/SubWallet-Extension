@@ -86,7 +86,7 @@ function Component ({ className = '', collectionInfo,
 
       if (owner?.isReadOnly) {
         notify({
-          message: t('The NFT owner is a watch-only account, you cannot send the NFT with it'),
+          message: t('ui.NFT_ITEM_DETAIL.Popup.Home.Nfts.NftItemDetail.theNftOwnerIsAWatchOnlyAccountYouCannotSendTheNftWithIt'),
           type: 'info',
           duration: 3
         });
@@ -114,7 +114,7 @@ function Component ({ className = '', collectionInfo,
 
   const subHeaderRightButton: ButtonProps[] = [
     {
-      children: t<string>('Send'),
+      children: t<string>('ui.NFT_ITEM_DETAIL.Popup.Home.Nfts.NftItemDetail.send'),
       onClick: onClickSend
     }
   ];
@@ -277,7 +277,7 @@ function Component ({ className = '', collectionInfo,
 
           <div className={'nft_item_detail_field_container'}>
             <div className={'nft_item_detail__info_container'}>
-              {!isWebUI && <div className={'nft_item_detail__section_title'}>{t<string>('NFT details')}</div>}
+              {!isWebUI && <div className={'nft_item_detail__section_title'}>{t<string>('ui.NFT_ITEM_DETAIL.Popup.Home.Nfts.NftItemDetail.nftDetails')}</div>}
 
               {isWebUI && !!nftItem.description && (<div className={'nft_item_detail__description'}>
                 {nftItem.description}
@@ -300,7 +300,7 @@ function Component ({ className = '', collectionInfo,
                         type='phosphor'
                         weight={'fill'}
                       />
-                      <div>{t<string>('Description')}</div>
+                      <div>{t<string>('ui.NFT_ITEM_DETAIL.Popup.Home.Nfts.NftItemDetail.description')}</div>
                     </div>
                   </div>
                 )
@@ -309,27 +309,27 @@ function Component ({ className = '', collectionInfo,
               <div className='nft_item_detail__info_field_container'>
                 <Field
                   content={collectionInfo.collectionName || collectionInfo.collectionId}
-                  label={t<string>('NFT collection name')}
+                  label={t<string>('ui.NFT_ITEM_DETAIL.Popup.Home.Nfts.NftItemDetail.nftCollectionName')}
                   suffix={nftItem.externalUrl && externalInfoIcon('collection')}
                 />
 
                 <Field
                   content={ownerInfo()}
-                  label={t<string>('Owned by')}
+                  label={t<string>('ui.NFT_ITEM_DETAIL.Popup.Home.Nfts.NftItemDetail.ownedBy')}
                   prefix={nftItem.owner && ownerPrefix()}
                   suffix={externalInfoIcon('account')}
                 />
 
                 <Field
                   content={originChainInfo.name}
-                  label={t<string>('Network')}
+                  label={t<string>('ui.NFT_ITEM_DETAIL.Popup.Home.Nfts.NftItemDetail.network')}
                   prefix={originChainLogo()}
                 />
               </div>
             </div>
 
             <div className={'nft_item_detail__prop_section'}>
-              <div className={'nft_item_detail__section_title'}>{t<string>('Properties')}</div>
+              <div className={'nft_item_detail__section_title'}>{t<string>('ui.NFT_ITEM_DETAIL.Popup.Home.Nfts.NftItemDetail.properties')}</div>
               <div className={'nft_item_detail__atts_container'}>
                 <Field
                   className={'nft_item_detail__id_field'}
@@ -377,7 +377,7 @@ function Component ({ className = '', collectionInfo,
               )}
               onClick={onClickSend}
             >
-              <span className={'nft_item_detail__send_text'}>{t('Send')}</span>
+              <span className={'nft_item_detail__send_text'}>{t('ui.NFT_ITEM_DETAIL.Popup.Home.Nfts.NftItemDetail.send')}</span>
             </Button>
           )}
         </div>
@@ -386,7 +386,7 @@ function Component ({ className = '', collectionInfo,
           destroyOnClose
           id={modalId}
           onCancel={handleCancelModal}
-          title={t('Transfer')}
+          title={t('ui.NFT_ITEM_DETAIL.Popup.Home.Nfts.NftItemDetail.transfer')}
         >
           {isSendNftModalActive && (
             <Transaction
@@ -406,7 +406,7 @@ function Component ({ className = '', collectionInfo,
           closeIcon={modalCloseButton}
           id={'nftItemDescription'}
           onCancel={onCloseNftDescriptionModal}
-          title={t<string>('Description')}
+          title={t<string>('ui.NFT_ITEM_DETAIL.Popup.Home.Nfts.NftItemDetail.description')}
           wrapClassName={className}
         >
           <div className={'nft_item_detail__description_modal_content'}>

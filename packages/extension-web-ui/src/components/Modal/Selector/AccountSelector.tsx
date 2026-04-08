@@ -248,13 +248,13 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
           onClick: onCancel
         }
         : undefined}
-      title={t('Select account')}
+      title={t('ui.ACCOUNT_SELECTOR.components.Modal.Selector.AccountSelector.selectAccount')}
     >
       <Search
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t<string>('Enter your account name or address')}
+        placeholder={t<string>('ui.ACCOUNT_SELECTOR.components.Modal.Selector.AccountSelector.enterYourAccountNameOrAddress')}
         searchValue={searchValue}
         simpleLayout={true}
       />

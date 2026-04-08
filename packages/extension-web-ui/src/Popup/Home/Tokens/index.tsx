@@ -268,7 +268,7 @@ const Component = (): React.ReactElement => {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.TOKENS.Popup.Home.Tokens.theAccountYouAreUsingIsWatchOnlyYouCannotSendAssetsWithIt'),
         type: 'info',
         duration: 3
       });
@@ -298,7 +298,7 @@ const Component = (): React.ReactElement => {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.TOKENS.Popup.Home.Tokens.theAccountYouAreUsingIsWatchOnlyYouCannotSendAssetsWithIt'),
         type: 'info',
         duration: 3
       });
@@ -312,7 +312,7 @@ const Component = (): React.ReactElement => {
 
     if (isAllLedger) {
       notify({
-        message: 'The account you are using is Ledger account, you cannot use this feature with it',
+        message: t('ui.TRANSACTION.screen.Transaction.Swap.featureNotAvailableForLedger'),
         type: 'error',
         duration: 3
       });
@@ -374,7 +374,7 @@ const Component = (): React.ReactElement => {
       return (
         <div className={'token-item-information__sub-content'}>
           <Typography.Text className={'token-item-information__sub-title'}>
-            {`${relatedChains.length} ${t('networks')}`}
+            {`${relatedChains.length} ${t('ui.TOKENS.Popup.Home.Tokens.networks')}`}
           </Typography.Text>
 
           <AnimatedNetworkGroup chains={relatedChains} />
@@ -388,7 +388,7 @@ const Component = (): React.ReactElement => {
   }, [chainInfoMap, t]);
 
   useEffect(() => {
-    setSearchPlaceholder?.(t('Token name'));
+    setSearchPlaceholder?.(t('ui.TOKENS.Popup.Home.Tokens.tokenName'));
     setShowSearchInput?.(true);
   }, [setSearchPlaceholder, setShowSearchInput, t]);
 
@@ -423,7 +423,7 @@ const Component = (): React.ReactElement => {
             <DetailTable
               columns={[
                 {
-                  title: t<string>('Token name'),
+                  title: t<string>('ui.TOKENS.Popup.Home.Tokens.tokenName'),
                   dataIndex: 'name',
                   key: 'name',
                   render: (_, row) => {
@@ -439,7 +439,7 @@ const Component = (): React.ReactElement => {
                   }
                 },
                 {
-                  title: t<string>('Portfolio %'),
+                  title: t<string>('ui.TOKENS.Popup.Home.Tokens.portfolio'),
                   dataIndex: 'percentage',
                   key: 'percentage',
                   className: '__percentage-col',
@@ -455,7 +455,7 @@ const Component = (): React.ReactElement => {
                   }
                 },
                 {
-                  title: t<string>('Price'),
+                  title: t<string>('ui.TOKENS.Popup.Home.Tokens.price'),
                   dataIndex: 'price',
                   key: 'price',
                   render: (_, row) => {
@@ -500,7 +500,7 @@ const Component = (): React.ReactElement => {
             size={'xs'}
             type='ghost'
           >
-            {t('Manage token list')}
+            {t('ui.TOKENS.Popup.Home.Tokens.manageTokenList')}
           </Button>
         </div>
       </div>
@@ -560,9 +560,9 @@ const Component = (): React.ReactElement => {
                         />
                       )
                     }}
-                    i18nKey={detectTranslate("TON wallets have multiple versions, each with its own wallet address and balance. <highlight>Change versions</highlight> if you don't see balances")}
+                    i18nKey={detectTranslate('ui.TOKENS.Popup.Home.Tokens.tonWalletsHaveMultipleVersionsEachWithItsOwnWalletAddressAndBalanceHighlightChangeVersionsHighlightIfYouDonTSeeBalances')}
                   />}
-                  title={t('Change wallet address & version')}
+                  title={t('ui.TOKENS.Popup.Home.Tokens.changeWalletAddressAndVersion')}
                   type={'warning'}
                 />
                 <AccountSelectorModal
@@ -589,8 +589,8 @@ const Component = (): React.ReactElement => {
             !tokenGroupBalanceItems.length && (
               <EmptyList
                 className={'__empty-list'}
-                emptyMessage={t('Try searching or importing one')}
-                emptyTitle={t('No tokens found')}
+                emptyMessage={t('ui.TOKENS.Popup.Home.Tokens.trySearchingOrImportingOne')}
+                emptyTitle={t('ui.TOKENS.Popup.Home.Tokens.noTokensFound')}
                 phosphorIcon={Coins}
               />
             )
@@ -602,7 +602,7 @@ const Component = (): React.ReactElement => {
               size={'xs'}
               type={'ghost'}
             >
-              {t('Manage tokens')}
+              {t('ui.TOKENS.Popup.Home.Tokens.manageTokens')}
             </Button>
           </div>
         </div>

@@ -36,7 +36,7 @@ function Component ({ accountProxy, className }: Props) {
                 />
               )}
             >
-              {t('Upgrade to Unified account')}
+              {t('ui.ACCOUNT_ADDRESS_LIST.Popup.Account.AccountDetail.AccountAddressList.upgradeToUnifiedAccount')}
             </Button>
           </div>
         )

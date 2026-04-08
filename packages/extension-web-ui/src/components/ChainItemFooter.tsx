@@ -33,14 +33,14 @@ function Component ({ chainInfo, className = '', navigate, showDetailNavigation 
 
           if (!result) {
             showNotification({
-              message: t('Error'),
+              message: t('ui.CHAIN_ITEM_FOOTER.components.ChainItemFooter.error'),
               type: 'error'
             });
           }
         })
         .catch(() => {
           showNotification({
-            message: t('Error'),
+            message: t('ui.CHAIN_ITEM_FOOTER.components.ChainItemFooter.error'),
             type: 'error'
           });
           setLoading(false);

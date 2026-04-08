@@ -57,7 +57,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         onClick={openCreateAccount}
         schema='secondary'
       >
-        {t('Create new')}
+        {t('ui.FOOTER.components.Layout.parts.SelectAccount.Footer.createNew')}
       </Button>
       <Button
         className='btn-min-width'
@@ -69,7 +69,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         )}
         onClick={openImportAccount}
         schema='secondary'
-        tooltip={isWebUI ? t('Import account') : undefined}
+        tooltip={isWebUI ? t('ui.FOOTER.components.Layout.parts.SelectAccount.Footer.importAccount') : undefined}
       />
       <Button
         className='btn-min-width'
@@ -81,7 +81,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         )}
         onClick={openAttachAccount}
         schema='secondary'
-        tooltip={isWebUI ? t('Attach account') : undefined}
+        tooltip={isWebUI ? t('ui.FOOTER.components.Layout.parts.SelectAccount.Footer.attachAccount') : undefined}
       />
       <Button
         className='btn-min-width'
@@ -94,7 +94,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         loading={loadingInject}
         onClick={onClickExtension}
         schema={ (enabled && !loadingInject) ? 'danger' : 'secondary'}
-        tooltip={isWebUI ? ((enabled && !loadingInject) ? t('Disconnect extension') : injected ? t('Connect extension') : t('Download extension')) : undefined}
+        tooltip={isWebUI ? ((enabled && !loadingInject) ? t('ui.FOOTER.components.Layout.parts.SelectAccount.Footer.disconnectExtension') : injected ? t('ui.FOOTER.components.Layout.parts.SelectAccount.Footer.connectExtension') : t('ui.FOOTER.components.Layout.parts.SelectAccount.Footer.downloadExtension')) : undefined}
       />
     </div>
   );

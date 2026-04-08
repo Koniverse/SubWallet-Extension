@@ -29,7 +29,7 @@ const TokenEmptyList: React.FC<Props> = (props: Props) => {
           weight='fill'
         />
       ),
-      children: t('Add token'),
+      children: t('ui.TOKEN_EMPTY_LIST.components.EmptyList.TokenEmptyList.addToken'),
       shape: 'circle',
       size: 'xs',
       onClick: () => {
@@ -45,8 +45,8 @@ const TokenEmptyList: React.FC<Props> = (props: Props) => {
   return (
     <EmptyList
       buttonProps={buttonProps}
-      emptyMessage={t('Try adding one manually')}
-      emptyTitle={t('No tokens found')}
+      emptyMessage={t('ui.TOKEN_EMPTY_LIST.components.EmptyList.TokenEmptyList.tryAddingOneManually')}
+      emptyTitle={t('ui.TOKEN_EMPTY_LIST.components.EmptyList.TokenEmptyList.noTokensFound')}
       phosphorIcon={Coin}
     />
   );

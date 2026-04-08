@@ -41,7 +41,7 @@ function Component ({ className, poolInfo }: Props) {
       <div
         className={CN(className, '__subnet-info-desktop-part')}
       >
-        <div className={'__part-title'}>{t('Subnet info')}</div>
+        <div className={'__part-title'}>{t('ui.SUBNET_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.SubnetInfoDesktopPart.subnetInfo')}</div>
 
         <div className={'__part-content-area'}>
           <div className='__logo-and-name'>
@@ -74,7 +74,7 @@ function Component ({ className, poolInfo }: Props) {
           }
           onClick={onViewOnExplorer}
           type={'ghost'}
-        >{t('View on explorer')}</Button>
+        >{t('ui.SUBNET_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.SubnetInfoDesktopPart.viewOnExplorer')}</Button>
       </div>
     </>
   );

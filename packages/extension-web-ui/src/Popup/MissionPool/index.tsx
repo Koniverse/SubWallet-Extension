@@ -43,7 +43,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   useEffect(() => {
     if (location.pathname === '/home/mission-pools') {
-      setTitle(t('Mission Pools'));
+      setTitle(t('ui.MISSION_POOL.Popup.MissionPool.missionPools'));
     }
   }, [location.pathname, setTitle, t]);
 
@@ -66,19 +66,19 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('All'),
+        label: t('ui.MISSION_POOL.Popup.MissionPool.all'),
         value: MissionCategoryType.ALL
       },
       {
-        label: t('Defi'),
+        label: t('ui.MISSION_POOL.Popup.MissionPool.defi'),
         value: MissionTab.DEFI
       },
       {
-        label: t('Meme'),
+        label: t('ui.MISSION_POOL.Popup.MissionPool.meme'),
         value: MissionTab.MEME
       },
       {
-        label: t('Gaming'),
+        label: t('ui.MISSION_POOL.Popup.MissionPool.gaming'),
         value: MissionTab.GAMING
       }
     ];
@@ -181,7 +181,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             className={'__header-area'}
             paddingVertical
             showBackButton={false}
-            title={t('Mission Pools')}
+            title={t('ui.MISSION_POOL.Popup.MissionPool.missionPools')}
           />)
       }
       {!!banners.length && isWebUI && (
@@ -211,7 +211,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           )}
           onClickActionBtn={onClickActionBtn}
           onSearch={handleSearch}
-          placeholder={t('Campaign name...')}
+          placeholder={t('ui.MISSION_POOL.Popup.MissionPool.campaignName')}
           searchValue={searchInput}
           showActionBtn
         />
@@ -247,14 +247,14 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       />
 
       <FilterModal
-        applyFilterButtonTitle={t('Apply filter')}
+        applyFilterButtonTitle={t('ui.MISSION_POOL.Popup.MissionPool.applyFilter')}
         id={FILTER_MODAL_ID}
         onApplyFilter={onApplyFilter}
         onCancel={onCloseFilterModal}
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
-        title={t('Filter')}
+        title={t('ui.MISSION_POOL.Popup.MissionPool.filter')}
       />
     </div>
   );

@@ -75,7 +75,7 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
     };
 
     const stakingTypeCol = {
-      title: t('Earning type'),
+      title: t('ui.EARNING_POOLS_TABLE.Popup.Home.Earning.shared.desktop.EarningPoolsTable.earningType'),
       key: 'staking_type',
       className: '__table-staking-type-col',
       sortable: true,
@@ -91,7 +91,7 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
     };
 
     const totalValueStakedCol = {
-      title: t('Total value staked'),
+      title: t('ui.EARNING_POOLS_TABLE.Popup.Home.Earning.shared.desktop.EarningPoolsTable.totalValueStaked'),
       key: 'total_value_staked',
       className: '__table-total-value-stake-col',
       render: (row: YieldPoolInfo) => {
@@ -130,7 +130,7 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
               )
               : (
                 <span className={'__tbd'}>
-                  {t('TBD')}
+                  {t('ui.EARNING_POOLS_TABLE.Popup.Home.Earning.shared.desktop.EarningPoolsTable.tbd')}
                 </span>
               )}
           </div>
@@ -139,7 +139,7 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
     };
 
     const rewardsPerYearCol = {
-      title: t('Rewards per year'),
+      title: t('ui.EARNING_POOLS_TABLE.Popup.Home.Earning.shared.desktop.EarningPoolsTable.rewardsPerYear'),
       key: 'rewards_per_year',
       className: '__table-rewards-col',
       sortable: true,
@@ -165,11 +165,11 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
           const isBittensor = row.chain === 'bittensor';
 
           if (isSubnetStaking) {
-            return t('Emission');
+            return t('ui.EARNING_POOLS_TABLE.Popup.Home.Earning.shared.desktop.EarningPoolsTable.emission');
           }
 
           if (isBittensor) {
-            return t('Max APY');
+            return t('ui.EARNING_POOLS_TABLE.Popup.Home.Earning.shared.desktop.EarningPoolsTable.maxApy');
           }
 
           return undefined;
@@ -196,7 +196,7 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
               )
               : (
                 <span className={'__tbd'}>
-                  {t('TBD')}
+                  {t('ui.EARNING_POOLS_TABLE.Popup.Home.Earning.shared.desktop.EarningPoolsTable.tbd')}
                 </span>
               )
             }

@@ -377,7 +377,7 @@ function Component (): React.ReactElement {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.DETAIL_LIST.Popup.Home.Tokens.DetailList.theAccountYouAreUsingIsWatchOnlyYouCannotSendAssetsWithIt'),
         type: 'info',
         duration: 3
       });
@@ -427,7 +427,7 @@ function Component (): React.ReactElement {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('The account you are using is watch-only, you cannot send assets with it'),
+        message: t('ui.DETAIL_LIST.Popup.Home.Tokens.DetailList.theAccountYouAreUsingIsWatchOnlyYouCannotSendAssetsWithIt'),
         type: 'info',
         duration: 3
       });
@@ -441,7 +441,7 @@ function Component (): React.ReactElement {
 
     if (isAllLedger) {
       notify({
-        message: 'The account you are using is Ledger account, you cannot use this feature with it',
+        message: t('ui.TRANSACTION.screen.Transaction.Swap.featureNotAvailableForLedger'),
         type: 'error',
         duration: 3
       });
@@ -544,7 +544,7 @@ function Component (): React.ReactElement {
   }, [handleResize]);
 
   const detailTitle = useMemo(() => {
-    return <div className='header-content'>{t('Token')}: {symbol}</div>;
+    return <div className='header-content'>{t('ui.DETAIL_LIST.Popup.Home.Tokens.DetailList.token')}: {symbol}</div>;
   }, [symbol, t]);
 
   useEffect(() => {
@@ -634,9 +634,9 @@ function Component (): React.ReactElement {
                     />
                   )
                 }}
-                i18nKey={detectTranslate("TON wallets have multiple versions, each with its own wallet address and balance. <highlight>Change versions</highlight> if you don't see balances")}
+                i18nKey={detectTranslate('ui.DETAIL_LIST.Popup.Home.Tokens.DetailList.tonWalletsHaveMultipleVersionsEachWithItsOwnWalletAddressAndBalanceHighlightChangeVersionsHighlightIfYouDonTSeeBalances')}
               />}
-              title={t('Change wallet address & version')}
+              title={t('ui.DETAIL_LIST.Popup.Home.Tokens.DetailList.changeWalletAddressAndVersion')}
               type={'warning'}
             />
             {!!filteredAccountList.length && (

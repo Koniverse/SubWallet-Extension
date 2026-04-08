@@ -136,19 +136,19 @@ const Component = ({ className }: Props) => {
       id: 'Transferable',
       value: transferablePercent,
       color: token['colorPrimary-6'],
-      label: t('Transferable')
+      label: t('ui.STATISTICS.Popup.Home.Statistics.transferable')
     },
     {
       id: 'Staking',
       value: stakingPercent,
       color: token.colorSecondary,
-      label: t('Staking')
+      label: t('ui.STATISTICS.Popup.Home.Statistics.staking')
     },
     {
       id: 'Other',
       value: otherPercent,
       color: token['magenta-6'],
-      label: t('Other')
+      label: t('ui.STATISTICS.Popup.Home.Statistics.other')
     }
   ];
 
@@ -226,7 +226,7 @@ const Component = ({ className }: Props) => {
             <div className='__box-container'>
               <div className='__box-part -left-part'>
                 <div className='__box-part-title'>
-                  {t('Portfolio Allocation')}
+                  {t('ui.STATISTICS.Popup.Home.Statistics.portfolioAllocation')}
                 </div>
 
                 <div className='__present-items-area'>
@@ -235,7 +235,7 @@ const Component = ({ className }: Props) => {
               </div>
               <div className='__box-part'>
                 <div className='__box-part-title'>
-                  {t('Portfolio Distribution')}
+                  {t('ui.STATISTICS.Popup.Home.Statistics.portfolioDistribution')}
                 </div>
 
                 <div className='__chart-area'>

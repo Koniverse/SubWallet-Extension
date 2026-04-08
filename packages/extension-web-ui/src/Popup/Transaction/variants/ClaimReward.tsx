@@ -208,7 +208,7 @@ const Component = () => {
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('Available balance')}
+            label={t('ui.CLAIM_REWARD.Popup.Transaction.variants.ClaimReward.availableBalance')}
             onBalanceReady={setIsBalanceReady}
           />
           <Form.Item>
@@ -218,13 +218,13 @@ const Component = () => {
             >
               <MetaInfo.Chain
                 chain={chainValue}
-                label={t('Network')}
+                label={t('ui.CLAIM_REWARD.Popup.Transaction.variants.ClaimReward.network')}
               />
               {
                 reward?.unclaimedReward && (
                   <MetaInfo.Number
                     decimals={decimals}
-                    label={t('Reward claiming')}
+                    label={t('ui.CLAIM_REWARD.Popup.Transaction.variants.ClaimReward.rewardClaiming')}
                     suffix={symbol}
                     value={reward.unclaimedReward}
                   />
@@ -238,7 +238,7 @@ const Component = () => {
             valuePropName='checked'
           >
             <Checkbox>
-              <span className={'__option-label'}>{t('Stake reward after claim')}</span>
+              <span className={'__option-label'}>{t('ui.CLAIM_REWARD.Popup.Transaction.variants.ClaimReward.stakeRewardAfterClaim')}</span>
             </Checkbox>
           </Form.Item>
         </Form>
@@ -257,7 +257,7 @@ const Component = () => {
               onClick={goHome}
               schema={'secondary'}
             >
-              {t('Cancel')}
+              {t('ui.CLAIM_REWARD.Popup.Transaction.variants.ClaimReward.cancel')}
             </Button>
           )
         }
@@ -273,7 +273,7 @@ const Component = () => {
           loading={loading}
           onClick={checkAction(form.submit, ExtrinsicType.STAKING_CLAIM_REWARD)}
         >
-          {t('Continue')}
+          {t('ui.CLAIM_REWARD.Popup.Transaction.variants.ClaimReward.continue')}
         </Button>
       </TransactionFooter>
     </>

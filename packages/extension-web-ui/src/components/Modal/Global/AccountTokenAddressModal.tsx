@@ -57,7 +57,7 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
       const processFunction = () => {
         copyToClipboard(item.accountInfo.address || '');
         notify({
-          message: t('Copied to clipboard')
+          message: t('ui.ACCOUNT_TOKEN_ADDRESS_MODAL.components.Modal.Global.AccountTokenAddressModal.copiedToClipboard')
         });
       };
 
@@ -107,12 +107,12 @@ const Component: React.FC<Props> = ({ className, items, onBack, onCancel }: Prop
           onClick: onCancel
         }
         : undefined}
-      title={t<string>('Select address type')}
+      title={t<string>('ui.ACCOUNT_TOKEN_ADDRESS_MODAL.components.Modal.Global.AccountTokenAddressModal.selectAddressType')}
     >
       <div>
         {/* TODO: Move this description content into a prop passed to the component */}
         <div className={'description'}>
-          {t('SubWallet supports three Bitcoin address types for receiving and transferring assets. Make sure you choose the correct address type to avoid risks of fund loss. ')}
+          {t('ui.ACCOUNT_TOKEN_ADDRESS_MODAL.components.Modal.Global.AccountTokenAddressModal.subwalletSupportsThreeBitcoinAddressTypesForReceivingAndTransferringAssetsMakeSureYouChooseTheCorrectAddressTypeToAvoidRisksOfFundLoss')}
           <a
             href={LEARN_MORE_DOCS_URL}
             rel='noreferrer'

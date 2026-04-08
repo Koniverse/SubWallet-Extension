@@ -51,7 +51,7 @@ function Component ({ className, extraActionNode, inputPlaceholder, onClickFilte
                 size='xs'
                 type='ghost'
               >
-                {t('Help')}
+                {t('ui.TOOLBAR.Popup.Home.Earning.shared.desktop.Toolbar.help')}
               </Button>
 
               {extraActionNode}

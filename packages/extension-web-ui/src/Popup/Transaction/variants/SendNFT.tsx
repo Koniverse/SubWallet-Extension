@@ -242,8 +242,8 @@ const Component: React.FC<{ nftDetail?: NftItem, modalContent?: boolean }> = ({ 
               actionType={ActionType.SEND_NFT}
               chainSlug={chain}
               dropdownHeight={227}
-              label={t('Send to')}
-              placeholder={t('Account address')}
+              label={t('ui.SEND_NFT.Popup.Transaction.variants.SendNFT.sendTo')}
+              placeholder={t('ui.SEND_NFT.Popup.Transaction.variants.SendNFT.accountAddress')}
               saveAddress={true}
               showAddressBook={true}
               showScanner={true}
@@ -254,7 +254,7 @@ const Component: React.FC<{ nftDetail?: NftItem, modalContent?: boolean }> = ({ 
             <ChainSelector
               disabled={true}
               items={chainInfo ? [{ name: chainInfo.name, slug: chainInfo.slug }] : []}
-              label={t('Network')}
+              label={t('ui.SEND_NFT.Popup.Transaction.variants.SendNFT.network')}
               value={collectionInfo.chain}
             />
           </Form.Item>
@@ -263,7 +263,7 @@ const Component: React.FC<{ nftDetail?: NftItem, modalContent?: boolean }> = ({ 
         <FreeBalance
           address={from}
           chain={chain}
-          label={t('Sender transferable balance')}
+          label={t('ui.SEND_NFT.Popup.Transaction.variants.SendNFT.senderTransferableBalance')}
           onBalanceReady={setIsBalanceReady}
         />
       </TransactionContent>
@@ -283,7 +283,7 @@ const Component: React.FC<{ nftDetail?: NftItem, modalContent?: boolean }> = ({ 
           loading={loading}
           onClick={checkAction(form.submit, ExtrinsicType.SEND_NFT)}
         >
-          {t('Next')}
+          {t('ui.SEND_NFT.Popup.Transaction.variants.SendNFT.next')}
         </Button>
       </TransactionFooter>
     </>

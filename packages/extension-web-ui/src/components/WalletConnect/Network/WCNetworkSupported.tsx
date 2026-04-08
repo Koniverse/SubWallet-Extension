@@ -22,12 +22,12 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <WCNetworkBase
       className={className}
-      content={t('{{number}} {{network}} support', { replace: { number: networkNumber, network: networkNumber > 1 ? 'networks' : 'network' } })}
+      content={t('ui.WCNETWORK_SUPPORTED.components.WalletConnect.Network.WCNetworkSupported.support', { replace: { number: networkNumber, network: networkNumber > 1 ? 'networks' : 'network' } })}
       contentNetworks={networks}
       id={id}
       networks={networks}
-      subTitle={t('{{number}} {{network}} support', { replace: { number: networkNumber, network: networkNumber > 1 ? 'networks' : 'network' } })}
-      title={t('Supported networks')}
+      subTitle={t('ui.WCNETWORK_SUPPORTED.components.WalletConnect.Network.WCNetworkSupported.support', { replace: { number: networkNumber, network: networkNumber > 1 ? 'networks' : 'network' } })}
+      title={t('ui.WCNETWORK_SUPPORTED.components.WalletConnect.Network.WCNetworkSupported.supportedNetworks')}
     />
   );
 };

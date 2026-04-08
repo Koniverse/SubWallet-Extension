@@ -73,7 +73,7 @@ function Component ({ className, request, type }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('Transaction request')}
+          {t('ui.NETWORK_CONNECTION_ERROR_CONFIRMATION.Popup.Confirmations.variants.Error.NetworkConnectionErrorConfirmation.transactionRequest')}
         </div>
         {/* <div className='description'> */}
         {/*  {t('You are approving a request with the following account')} */}
@@ -82,7 +82,7 @@ function Component ({ className, request, type }: Props) {
           {account && <MetaInfo.Account
             address={account.address}
             className={'account-info-item meta-info-item'}
-            label={t('Account')}
+            label={t('ui.NETWORK_CONNECTION_ERROR_CONFIRMATION.Popup.Confirmations.variants.Error.NetworkConnectionErrorConfirmation.account')}
             name={account.name}
           />}
           { networkKey
@@ -90,7 +90,7 @@ function Component ({ className, request, type }: Props) {
               <MetaInfo.Chain
                 chain={networkKey}
                 className={'meta-info-item'}
-                label={t<string>('Network')}
+                label={t<string>('ui.NETWORK_CONNECTION_ERROR_CONFIRMATION.Popup.Confirmations.variants.Error.NetworkConnectionErrorConfirmation.network')}
               />)
             : <></>}
         </MetaInfo>
@@ -116,7 +116,7 @@ function Component ({ className, request, type }: Props) {
           onClick={onCancel}
           schema={'primary'}
         >
-          {t('I understand')}
+          {t('ui.NETWORK_CONNECTION_ERROR_CONFIRMATION.Popup.Confirmations.variants.Error.NetworkConnectionErrorConfirmation.iUnderstand')}
         </Button>
       </div>
     </>

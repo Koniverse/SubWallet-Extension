@@ -152,7 +152,7 @@ function Component (props: _AccountCardItem): React.ReactElement<_AccountCardIte
           { (accountProxy.isExistName || accountProxy.isNameDuplicated) && !accountProxy.isExistAccount && <div className={'__warning-name-already'}>
             <Tooltip
               placement='bottomLeft'
-              title={accountProxy.isExistName ? t('Account name already in use') : t('Duplicate account name')}
+              title={accountProxy.isExistName ? t('ui.ACCOUNT_RESTORE_JSON_ITEM.Popup.Account.RestoreJson.AccountRestoreJsonItem.accountNameAlreadyInUse') : t('ui.ACCOUNT_RESTORE_JSON_ITEM.Popup.Account.RestoreJson.AccountRestoreJsonItem.duplicateAccountName')}
             >
               <div>
                 <Icon

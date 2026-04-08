@@ -55,14 +55,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         setSubscanApiKey(normalizedCurrent);
         inactiveModal(SUBSCAN_API_CONFIG_MODAL);
         notify({
-          message: t('Subscan API key saved'),
+          message: t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.subscanApiKeySaved'),
           type: NotificationType.SUCCESS
         });
       })
       .catch((error) => {
         console.error(error);
         notify({
-          message: t('Failed to save Subscan API key'),
+          message: t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.failedToSaveSubscanApiKey'),
           type: NotificationType.ERROR
         });
       })
@@ -95,7 +95,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
           console.error(error);
           notify({
-            message: t('Failed to load Subscan API key'),
+            message: t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.failedToLoadSubscanApiKey'),
             type: NotificationType.ERROR
           });
         })
@@ -122,7 +122,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             onClick={onClose}
             schema={'secondary'}
           >
-            {t('Cancel')}
+            {t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.cancel')}
           </Button>
           <Button
             block={true}
@@ -130,23 +130,23 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             loading={isLoading}
             onClick={onSave}
           >
-            {t('Save')}
+            {t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.save')}
           </Button>
         </div>
       )}
       id={SUBSCAN_API_CONFIG_MODAL}
       maskClosable={false}
       onCancel={onClose}
-      title={t('Your API key')}
+      title={t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.yourApiKey')}
     >
       <div className='__content'>
         <div className='__description'>
-          {t('Enter your Subscan API key below to track real-time wallet activity updates in-app')}
+          {t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.enterYourSubscanApiKeyBelowToTrackRealTimeWalletActivityUpdatesInApp')}
         </div>
         <Input.Password
           disabled={isLoading}
           onChange={onChangeApiKey}
-          placeholder={t('Enter key')}
+          placeholder={t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.enterKey')}
           value={subscanApiKey}
         />
       </div>

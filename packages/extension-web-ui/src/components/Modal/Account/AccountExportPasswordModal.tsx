@@ -114,7 +114,7 @@ function Component ({ addresses, className = '' }: Props): React.ReactElement<Pr
         )}
         id={EXPORT_ACCOUNTS_PASSWORD_MODAL}
         onCancel={closeModal}
-        title={t('Confirmation')}
+        title={t('ui.ACCOUNT_EXPORT_PASSWORD_MODAL.components.Modal.Account.AccountExportPasswordModal.confirmation')}
         zIndex={9999}
       >
         <div className='body-container'>
@@ -127,11 +127,11 @@ function Component ({ addresses, className = '' }: Props): React.ReactElement<Pr
           >
             <Form.Item
               className='password-form-item'
-              label={t('Enter password to confirm')}
+              label={t('ui.ACCOUNT_EXPORT_PASSWORD_MODAL.components.Modal.Account.AccountExportPasswordModal.enterPasswordToConfirm')}
               name={FormFieldName.PASSWORD}
               rules={[
                 {
-                  message: t('Password is required'),
+                  message: t('ui.ACCOUNT_EXPORT_PASSWORD_MODAL.components.Modal.Account.AccountExportPasswordModal.passwordIsRequired'),
                   required: true
                 }
               ]}
@@ -140,7 +140,7 @@ function Component ({ addresses, className = '' }: Props): React.ReactElement<Pr
               <Input.Password
                 containerClassName='password-input'
                 id={passwordInputId}
-                placeholder={t('Password')}
+                placeholder={t('ui.ACCOUNT_EXPORT_PASSWORD_MODAL.components.Modal.Account.AccountExportPasswordModal.password')}
               />
             </Form.Item>
             <div className='button-container'>
@@ -156,7 +156,7 @@ function Component ({ addresses, className = '' }: Props): React.ReactElement<Pr
                 onClick={closeModal}
                 schema='secondary'
               >
-                {t('Cancel')}
+                {t('ui.ACCOUNT_EXPORT_PASSWORD_MODAL.components.Modal.Account.AccountExportPasswordModal.cancel')}
               </Button>
               <Button
                 block={true}
@@ -170,7 +170,7 @@ function Component ({ addresses, className = '' }: Props): React.ReactElement<Pr
                 )}
                 loading={loading}
               >
-                {t('Submit')}
+                {t('ui.ACCOUNT_EXPORT_PASSWORD_MODAL.components.Modal.Account.AccountExportPasswordModal.submit')}
               </Button>
             </div>
           </Form>

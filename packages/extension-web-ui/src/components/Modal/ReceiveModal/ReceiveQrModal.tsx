@@ -74,7 +74,7 @@ const Component: React.FC<Props> = ({ address, className, selectedNetwork }: Pro
     }
   }, [scanExplorerAddressUrl]);
 
-  const onClickCopyBtn = useCallback(() => notify({ message: t('Copied to clipboard') }), [notify, t]);
+  const onClickCopyBtn = useCallback(() => notify({ message: t('ui.RECEIVE_QR_MODAL.components.Modal.ReceiveModal.ReceiveQrModal.copiedToClipboard') }), [notify, t]);
 
   const onCancel = useCallback(() => {
     inactiveModal(modalId);
@@ -95,7 +95,7 @@ const Component: React.FC<Props> = ({ address, className, selectedNetwork }: Pro
       rightIconProps={{
         icon: <InfoIcon />
       }}
-      title={t<string>('Your address')}
+      title={t<string>('ui.RECEIVE_QR_MODAL.components.Modal.ReceiveModal.ReceiveQrModal.yourAddress')}
     >
       <>
         <div className='receive-qr-code-wrapper'>
@@ -133,7 +133,7 @@ const Component: React.FC<Props> = ({ address, className, selectedNetwork }: Pro
                   }
                   onClick={onClickCopyBtn}
                   size='xs'
-                  tooltip={isWebUI ? t('Copy address') : undefined}
+                  tooltip={isWebUI ? t('ui.RECEIVE_QR_MODAL.components.Modal.ReceiveModal.ReceiveQrModal.copyAddress') : undefined}
                   type='ghost'
                 />
               </CopyToClipboard>
@@ -153,7 +153,7 @@ const Component: React.FC<Props> = ({ address, className, selectedNetwork }: Pro
             />
           }
           onClick={handleClickViewOnExplorer}
-        >{t('View account on explorer')}</Button>
+        >{t('ui.RECEIVE_QR_MODAL.components.Modal.ReceiveModal.ReceiveQrModal.viewAccountOnExplorer')}</Button>
       </>
     </BaseModal>
   );

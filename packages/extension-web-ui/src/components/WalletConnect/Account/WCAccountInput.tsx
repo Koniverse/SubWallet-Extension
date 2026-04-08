@@ -42,7 +42,7 @@ const Component: React.FC<Props> = (props: Props) => {
       leftItem={<AccountProxyAvatarGroup accountProxies={basicAccountProxiesInfo} />}
       middleItem={(
         <div className={CN('wallet-connect-account-input-content')}>
-          { countSelected ? t('{{number}} accounts connected', { replace: { number: countSelected } }) : t('Select account')}
+          { countSelected ? t('ui.WCACCOUNT_INPUT.components.WalletConnect.Account.WCAccountInput.accountsConnected', { replace: { number: countSelected } }) : t('ui.WCACCOUNT_INPUT.components.WalletConnect.Account.WCAccountInput.selectAccount')}
         </div>
       )}
       rightItem={(

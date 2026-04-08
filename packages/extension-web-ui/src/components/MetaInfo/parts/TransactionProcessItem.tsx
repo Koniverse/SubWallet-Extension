@@ -34,7 +34,7 @@ const Component: React.FC<TransactionProcessItemType> = (props: TransactionProce
   }, [items, transactionStepsModal, type]);
 
   const defaultLabel = useMemo(() => {
-    return t('Process');
+    return t('ui.TRANSACTION_PROCESS_ITEM.components.MetaInfo.parts.TransactionProcessItem.process');
   }, [t]);
 
   const stepText = useMemo(() => {

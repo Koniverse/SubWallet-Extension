@@ -108,7 +108,7 @@ function Component ({ accountProxy, className }: Props) {
         renderWhenEmpty={emptyList}
         searchFunction={searchFunction}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('Enter account name or address')}
+        searchPlaceholder={t<string>('ui.DERIVED_ACCOUNT_LIST.Popup.Account.AccountDetail.DerivedAccountList.enterAccountNameOrAddress')}
       />
 
       {accountProxyToCopyAddresses && (

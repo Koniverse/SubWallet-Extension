@@ -52,7 +52,7 @@ function Component ({ className, request, type }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('Transaction request')}
+          {t('ui.EVM_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.EvmTransactionConfirmation.transactionRequest')}
         </div>
         <MetaInfo>
           {
@@ -60,7 +60,7 @@ function Component ({ className, request, type }: Props) {
             (
               <MetaInfo.Number
                 decimals={chainInfo?.evmInfo?.decimals}
-                label={t('Amount')}
+                label={t('ui.EVM_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.EvmTransactionConfirmation.amount')}
                 suffix={chainInfo?.evmInfo?.symbol}
                 value={amount}
               />
@@ -69,19 +69,19 @@ function Component ({ className, request, type }: Props) {
           <MetaInfo.Account
             address={address}
             className={'account-info-item'}
-            label={t('From account')}
+            label={t('ui.EVM_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.EvmTransactionConfirmation.fromAccount')}
             name={account?.name || ''}
           />
           {(recipientAddress || recipient?.address) && <MetaInfo.Account
             address={recipient?.address || recipientAddress || ''}
             className='to-account'
-            label={request.payload.isToContract ? t('To contract') : t('To account')}
+            label={request.payload.isToContract ? t('ui.EVM_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.EvmTransactionConfirmation.toContract') : t('ui.EVM_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.EvmTransactionConfirmation.toAccount')}
             name={recipient?.name}
           />}
           {request.payload.estimateGas &&
               <MetaInfo.Number
                 decimals={chainInfo?.evmInfo?.decimals}
-                label={t('Estimated gas')}
+                label={t('ui.EVM_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.EvmTransactionConfirmation.estimatedGas')}
                 suffix={chainInfo?.evmInfo?.symbol}
                 value={request.payload.estimateGas || '0'}
               />}
@@ -89,8 +89,8 @@ function Component ({ className, request, type }: Props) {
         {!!transaction?.estimateFee?.tooHigh && (
           <AlertBox
             className='network-box'
-            description={t('Gas fees on {{networkName}} are high due to high demands, so gas estimates are less accurate.', { replace: { networkName: chainInfo?.name } })}
-            title={t('Pay attention!')}
+            description={t('ui.EVM_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.EvmTransactionConfirmation.gasFeesOnAreHighDueToHighDemandsSoGasEstimatesAreLessAccurate', { replace: { networkName: chainInfo?.name } })}
+            title={t('ui.EVM_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.EvmTransactionConfirmation.payAttention')}
             type='warning'
           />
         )}
@@ -101,7 +101,7 @@ function Component ({ className, request, type }: Props) {
             size='xs'
             type='ghost'
           >
-            {t('View details')}
+            {t('ui.EVM_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.EvmTransactionConfirmation.viewDetails')}
           </Button>
         </div>
         }
@@ -113,7 +113,7 @@ function Component ({ className, request, type }: Props) {
       />
       {(!errors || errors.length === 0) &&
         <BaseDetailModal
-          title={t('Transaction details')}
+          title={t('ui.EVM_TRANSACTION_CONFIRMATION.Popup.Confirmations.variants.EvmTransactionConfirmation.transactionDetails')}
         >
           <EvmTransactionDetail
             accountName={account?.name}

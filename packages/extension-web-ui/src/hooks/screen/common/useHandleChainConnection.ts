@@ -81,11 +81,11 @@ export default function useHandleChainConnection (
           closeLoadingModal();
           setIsLoadingChainConnection(false);
           openAlert({
-            title: t('Error!'),
+            title: t('ui.USE_HANDLE_CHAIN_CONNECTION.hooks.screen.common.useHandleChainConnection.error'),
             type: NotificationType.ERROR,
-            content: t('Failed to get data. Please try again later.'),
+            content: t('ui.USE_HANDLE_CHAIN_CONNECTION.hooks.screen.common.useHandleChainConnection.failedToGetDataPleaseTryAgainLater'),
             okButton: {
-              text: t('Continue'),
+              text: t('ui.USE_HANDLE_CHAIN_CONNECTION.hooks.screen.common.useHandleChainConnection.continue'),
               onClick: closeAlert
             }
           });

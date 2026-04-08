@@ -119,7 +119,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
     (item: UnstakingInfo) => {
       if (!poolInfo.metadata.availableMethod.withdraw) {
         return (
-          <div className={'__withdraw-time-label'}>{t('Automatic withdrawal')}</div>
+          <div className={'__withdraw-time-label'}>{t('ui.WITHDRAW_INFO_PART.Popup.Home.Earning.EarningPositionDetail.WithdrawInfoPart.automaticWithdrawal')}</div>
         );
       } else {
         if (item.targetTimestampMs === undefined && item.waitingTime === undefined) {
@@ -176,7 +176,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
     >
       <CollapsiblePanel
         className={'__collapsible-panel'}
-        title={t('Withdraw info')}
+        title={t('ui.WITHDRAW_INFO_PART.Popup.Home.Earning.EarningPositionDetail.WithdrawInfoPart.withdrawInfo')}
       >
         <MetaInfo
           labelColorScheme='gray'
@@ -212,7 +212,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
               size='xs'
               type='ghost'
             >
-              {t('Cancel unstaking')}
+              {t('ui.WITHDRAW_INFO_PART.Popup.Home.Earning.EarningPositionDetail.WithdrawInfoPart.cancelUnstaking')}
             </Button>
           </div>
         )}
@@ -236,7 +236,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
               onClick={onWithDraw}
               size='xs'
             >
-              {t('Withdraw')}
+              {t('ui.WITHDRAW_INFO_PART.Popup.Home.Earning.EarningPositionDetail.WithdrawInfoPart.withdraw')}
             </Button>
           </div>
         </>

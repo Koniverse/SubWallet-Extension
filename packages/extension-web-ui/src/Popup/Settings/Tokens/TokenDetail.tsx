@@ -51,13 +51,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [loading, setLoading] = useState(false);
 
   const { handleSimpleConfirmModal } = useConfirmModal({
-    title: t<string>('Delete token'),
+    title: t<string>('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.deleteToken'),
     maskClosable: true,
     closable: true,
     type: 'error',
-    subTitle: t<string>('You are about to delete this token'),
-    content: t<string>('Confirm delete this token'),
-    okText: t<string>('Remove')
+    subTitle: t<string>('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.youAreAboutToDeleteThisToken'),
+    content: t<string>('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.confirmDeleteThisToken'),
+    okText: t<string>('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.remove')
   });
 
   const handleDeleteToken = useCallback(() => {
@@ -71,17 +71,17 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           if (result) {
             goBack();
             showNotification({
-              message: t('Deleted token successfully')
+              message: t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.deletedTokenSuccessfully')
             });
           } else {
             showNotification({
-              message: t('Deleted token unsuccessfully')
+              message: t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.deletedTokenUnsuccessfully')
             });
           }
         })
         .catch(() => {
           showNotification({
-            message: t('Deleted token unsuccessfully')
+            message: t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.deletedTokenUnsuccessfully')
           });
         });
     }).catch(console.log);
@@ -98,7 +98,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         />,
         onClick: handleDeleteToken,
         disabled: !(_isCustomAsset(tokenInfo.slug) && _isSmartContractToken(tokenInfo)),
-        tooltip: isWebUI ? t('Delete token') : undefined
+        tooltip: isWebUI ? t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.deleteToken') : undefined
       }
     ];
   }, [handleDeleteToken, isWebUI, t, token.fontSizeHeading3, tokenInfo]);
@@ -131,7 +131,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     navigator?.clipboard?.writeText(contractAddress).then().catch(console.error);
 
     showNotification({
-      message: t('Copied to clipboard')
+      message: t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.copiedToClipboard')
     });
   }, [showNotification, t, tokenInfo]);
 
@@ -178,14 +178,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         } else {
           setLoading(false);
           showNotification({
-            message: t('Error')
+            message: t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.error')
           });
         }
       })
       .catch(() => {
         setLoading(false);
         showNotification({
-          message: t('Error')
+          message: t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.error')
         });
       });
   }, [goBack, priceId, showNotification, t, tokenInfo]);
@@ -198,7 +198,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return _isCustomAsset(tokenInfo.slug)
       ? {
         onClick: goBack,
-        children: t('Cancel')
+        children: t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.cancel')
       }
       : undefined;
   }, [goBack, tokenInfo?.slug, t]);
@@ -220,7 +220,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         ),
         loading,
         onClick: onSubmit,
-        children: t('Save')
+        children: t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.save')
       }
       : undefined;
   }, [isSubmitDisabled, loading, onSubmit, t, tokenInfo?.slug]);
@@ -244,7 +244,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Token detail')}
+        title={t<string>('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.tokenDetail')}
       >
         <div className={'token_detail__container'}>
           <div className={'token_detail__header_container'}>
@@ -264,16 +264,16 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             {
               _isSmartContractToken(tokenInfo) && <Field
                 content={contractAddressInfo()}
-                label={t<string>('Contract address')}
-                placeholder={t<string>('Contract address')}
+                label={t<string>('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.contractAddress')}
+                placeholder={t<string>('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.contractAddress')}
                 prefix={contractAddressIcon()}
                 suffix={contractAddressSuffix()}
               />
             }
             <Field
               content={originChainInfo.name}
-              label={t<string>('Network')}
-              placeholder={t<string>('Network')}
+              label={t<string>('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.network')}
+              placeholder={t<string>('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.network')}
               prefix={<Logo
                 network={originChainInfo.slug}
                 size={20}
@@ -285,12 +285,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Tooltip
                   open={isWebUI ? undefined : false}
                   placement={'topLeft'}
-                  title={t('Symbol')}
+                  title={t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.symbol')}
                 >
                   <div>
                     <Field
                       content={tokenInfo.symbol}
-                      placeholder={t<string>('Symbol')}
+                      placeholder={t<string>('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.symbol')}
                       prefix={(
                         <Logo
                           size={20}
@@ -305,12 +305,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Tooltip
                   open={isWebUI ? undefined : false}
                   placement={'topLeft'}
-                  title={t('Token name')}
+                  title={t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.tokenName')}
                 >
                   <div>
                     <Field
                       content={tokenInfo.name}
-                      placeholder={t<string>('Token name')}
+                      placeholder={t<string>('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.tokenName')}
                     />
                   </div>
                 </Tooltip>
@@ -321,13 +321,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Tooltip
                   open={isWebUI ? undefined : false}
                   placement={'topLeft'}
-                  title={t('Price ID')}
+                  title={t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.priceId')}
                 >
                   <div>
                     <Input
                       disabled={!_isCustomAsset(tokenInfo.slug)}
                       onChange={onChangePriceId}
-                      placeholder={t('Price ID')}
+                      placeholder={t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.priceId')}
                       value={priceId}
                     />
                   </div>
@@ -337,12 +337,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Tooltip
                   open={isWebUI ? undefined : false}
                   placement={'topLeft'}
-                  title={t('Decimals')}
+                  title={t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.decimals')}
                 >
                   <div>
                     <Field
                       content={tokenInfo.decimals}
-                      placeholder={t<string>('Decimals')}
+                      placeholder={t<string>('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.decimals')}
                     />
                   </div>
                 </Tooltip>

@@ -152,8 +152,8 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Your accounts will appear here.')}
-        emptyTitle={t('No account found')}
+        emptyMessage={t('ui.DETAIL.Popup.Settings.Security.ManageWebsiteAccess.Detail.yourAccountsWillAppearHere')}
+        emptyTitle={t('ui.DETAIL.Popup.Settings.Security.ManageWebsiteAccess.Detail.noAccountFound')}
         phosphorIcon={MagnifyingGlass}
       />
     );
@@ -186,7 +186,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
           renderWhenEmpty={renderEmptyList}
           searchFunction={searchFunc}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search account')}
+          searchPlaceholder={t<string>('ui.DETAIL.Popup.Settings.Security.ManageWebsiteAccess.Detail.searchAccount')}
         />
 
         <DAppConfigurationModal

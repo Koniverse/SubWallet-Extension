@@ -22,7 +22,7 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
     const { errors, estimateFee, id, warnings } = rs;
 
     if (errors.length || warnings.length) {
-      if (![t('Rejected by user'), 'Rejected by user'].includes(errors[0]?.message)) {
+      if (![t('ui.USE_HANDLE_SUBMIT_TRANSACTION.hooks.transaction.useHandleSubmitTransaction.rejectedByUser'), 'Rejected by user'].includes(errors[0]?.message)) {
         if (errors[0]?.message?.startsWith('Unable to fetch staking data.')) {
           openRecheckChainConnectionModal(errors[0].message.split('"')[1]);
         } else if (
@@ -33,7 +33,7 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
           )
         ) {
           notify({
-            message: t('Your selected network has lost connection. Update it by re-enabling it or changing network provider'),
+            message: t('ui.USE_HANDLE_SUBMIT_TRANSACTION.hooks.transaction.useHandleSubmitTransaction.yourSelectedNetworkHasLostConnectionUpdateItByReEnablingItOrChangingNetworkProvider'),
             type: 'error',
             duration: 8
           });
@@ -45,12 +45,12 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
           const _data = handleDataForInsufficientAlert(estimateFee);
 
           openAlert({
-            title: t('Insufficient balance'),
+            title: t('ui.USE_HANDLE_SUBMIT_TRANSACTION.hooks.transaction.useHandleSubmitTransaction.insufficientBalance'),
             type: NotificationType.ERROR,
-            content: t('You don\'t have enough {{symbol}} ({{chainName}}) to pay gas fee. Top up your transferable balance and try again',
+            content: t('ui.USE_HANDLE_SUBMIT_TRANSACTION.hooks.transaction.useHandleSubmitTransaction.youDonTHaveEnoughToPayGasFeeTopUpYourTransferableBalanceAndTryAgain',
               { replace: { ..._data } }),
             okButton: {
-              text: t('I understand'),
+              text: t('ui.USE_HANDLE_SUBMIT_TRANSACTION.hooks.transaction.useHandleSubmitTransaction.iUnderstand'),
               onClick: () => {
                 closeAlert();
               }

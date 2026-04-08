@@ -102,7 +102,7 @@ const PartComponent: React.FC<PartProps> = (props: PartProps) => {
     <>
       {
         !first && (
-          <span className={'__name'}>&nbsp;{t('and')}&nbsp;</span>
+          <span className={'__name'}>&nbsp;{t('ui.FREE_BALANCE_TO_YIELD.Popup.Transaction.parts.FreeBalanceToYield.and')}&nbsp;</span>
         )
       }
       {
@@ -193,7 +193,7 @@ const Component = (props: Props) => {
 
   return (
     <Typography.Paragraph className={CN(className, 'free-balance')}>
-      {!error && <span className='__label'>{label || t('Sender available balance:')}</span>}
+      {!error && <span className='__label'>{label || t('ui.FREE_BALANCE_TO_YIELD.Popup.Transaction.parts.FreeBalanceToYield.senderAvailableBalance')}</span>}
       {isLoading && <ActivityIndicator size={14} />}
       {error && <Typography.Text className={'error-message'}>{error}</Typography.Text>}
       {

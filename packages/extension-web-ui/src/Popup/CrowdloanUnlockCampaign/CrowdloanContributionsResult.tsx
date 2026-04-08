@@ -170,7 +170,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
 
   useEffect(() => {
     if (location.pathname === '/crowdloan-unlock-campaign/contributions-result') {
-      setTitle(t('Your crowdloan contributions'));
+      setTitle(t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.yourCrowdloanContributions'));
     }
   }, [location.pathname, setTitle, t]);
 
@@ -281,15 +281,15 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('All'),
+        label: t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.all'),
         value: FilterValue.ALL
       },
       {
-        label: t('In Auction'),
+        label: t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.inAuction'),
         value: FilterValue.IN_AUCTION
       },
       {
-        label: t('Won'),
+        label: t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.won'),
         value: FilterValue.WON
       }
     ];
@@ -343,11 +343,11 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
 
   const validateAddress = useCallback((rule: Rule, address: string): Promise<void> => {
     if (!address) {
-      return Promise.reject(t('Address is required.'));
+      return Promise.reject(t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.addressIsRequired'));
     }
 
     if (!isAddress(address)) {
-      return Promise.reject(t('Invalid address. Check again or create a new account to get started.'));
+      return Promise.reject(t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.invalidAddressCheckAgainOrCreateANewAccountToGetStarted'));
     }
 
     fetchTableData(address);
@@ -453,7 +453,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
               paddingVertical
               // rightButtons={headerIcons}
               showBackButton
-              title={t('Your contributions')}
+              title={t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.yourContributions')}
             />
           )
         }
@@ -487,7 +487,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
               validateTrigger='onChange'
             >
               <AddressInput
-                placeholder={t('Enter your Polkadot wallet address')}
+                placeholder={t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.enterYourPolkadotWalletAddress')}
                 prefix={(
                   <Icon
                     className={'address-input-icon'}
@@ -528,7 +528,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
               emptyMessage={
                 <>
                   <span className={'__has-suffix-space'}>
-                    {t('Check again, create a new account or visit our')}
+                    {t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.checkAgainCreateANewAccountOrVisitOur')}
                   </span>
                   <a
                     className={'__link'}
@@ -536,11 +536,11 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                     rel='noreferrer'
                     target={'_blank'}
                   >
-                    {t('FAQs')}
+                    {t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.faqs')}
                   </a>
                 </>
               }
-              emptyTitle={t('We can\'t find any crowdloan contributions from this address.')}
+              emptyTitle={t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.weCanTFindAnyCrowdloanContributionsFromThisAddress')}
               phosphorIcon={RocketLaunch}
             />
 
@@ -559,7 +559,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                 onClick={onClickCheckAgain}
                 schema='secondary'
               >
-                {t('Check again')}
+                {t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.checkAgain')}
               </Button>
 
               <Button
@@ -575,7 +575,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                 onClick={onClickCreateNewWallet}
                 schema='primary'
               >
-                {t('Create a new account')}
+                {t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createANewAccount')}
               </Button>
             </div>
           </div>
@@ -585,8 +585,8 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
       <div className={'__footer-area'}>
         <NoteBox
           className={'__note-box'}
-          content={t('There\'re multiple ways you can play with your unlocked DOT, such as native staking, liquid staking, or lending. Check out SubWallet Dashboard for curated options with competitive APY to earn yield on your DOT.')}
-          title={t('Crowdloan unlock, then what?')}
+          content={t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.thereReMultipleWaysYouCanPlayWithYourUnlockedDotSuchAsNativeStakingLiquidStakingOrLendingCheckOutSubwalletDashboardForCuratedOptionsWithCompetitiveApyToEarnYieldOnYourDot')}
+          title={t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.crowdloanUnlockThenWhat')}
         />
 
         <Button
@@ -603,8 +603,8 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
           onClick={goEarningDemo}
         >
           <div className={'__footer-button-content'}>
-            <div className={'__footer-button-title'}>{t('Rewards: 14.8% - 18.5 %')}</div>
-            <div className={'__footer-button-subtitle'}>{t('Earn with SubWallet Dashboard')}</div>
+            <div className={'__footer-button-title'}>{t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.rewards148185')}</div>
+            <div className={'__footer-button-subtitle'}>{t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.earnWithSubwalletDashboard')}</div>
           </div>
         </Button>
       </div>

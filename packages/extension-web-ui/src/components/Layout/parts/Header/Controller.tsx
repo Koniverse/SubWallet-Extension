@@ -95,7 +95,7 @@ function Component ({ className, onBack, showBackButton, title = '' }: Props): R
             schema={'secondary'}
             shape={'circle'}
             size={'xs'}
-            tooltip={t('Notifications')}
+            tooltip={t('ui.CONTROLLER.components.Layout.parts.Header.Controller.notifications')}
             tooltipPlacement={'bottomRight'}
           >
           </Button>

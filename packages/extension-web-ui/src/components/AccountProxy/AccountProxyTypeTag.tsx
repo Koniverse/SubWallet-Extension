@@ -40,30 +40,30 @@ const Component: React.FC<Props> = ({ className, type }: Props) => {
     };
 
     if (type === AccountProxyType.ALL_ACCOUNT) {
-      result.label = t('All account');
+      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.allAccount');
       result.icon.phosphorIcon = CirclesThreePlus;
     } else if (type === AccountProxyType.SOLO) {
       result.color = 'blue';
-      result.label = t('Solo account');
+      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.soloAccount');
       result.icon.phosphorIcon = GitCommit;
     } else if (type === AccountProxyType.UNIFIED) {
       result.color = 'success';
-      result.label = t('Unified account');
+      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.unifiedAccount');
       result.icon.phosphorIcon = Strategy;
     } else if (type === AccountProxyType.QR) {
-      result.label = t('QR signer account');
+      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.qrSignerAccount');
       result.icon.phosphorIcon = QrCode;
     } else if (type === AccountProxyType.LEDGER) {
-      result.label = t('Ledger account');
+      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.ledgerAccount');
       result.icon.phosphorIcon = Swatches;
     } else if (type === AccountProxyType.READ_ONLY) {
-      result.label = t('Watch-only account');
+      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.watchOnlyAccount');
       result.icon.phosphorIcon = Eye;
     } else if (type === AccountProxyType.INJECTED) {
-      result.label = t('Extension account');
+      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.extensionAccount');
       result.icon.phosphorIcon = Needle;
     } else if (type === AccountProxyType.UNKNOWN) {
-      result.label = t('Unknown account');
+      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.unknownAccount');
       result.icon.phosphorIcon = Question;
     }
 

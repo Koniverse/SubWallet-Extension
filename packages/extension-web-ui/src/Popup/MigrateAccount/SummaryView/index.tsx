@@ -61,10 +61,10 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
 
   const getAccountListModalTriggerLabel = () => {
     if (resultAccountProxies.length === 3) {
-      return t('And 1 other');
+      return t('ui.SUMMARY_VIEW.Popup.MigrateAccount.SummaryView.and1Other');
     }
 
-    return t('And {{number}} others', { replace: { number: resultAccountProxies.length - 2 } });
+    return t('ui.SUMMARY_VIEW.Popup.MigrateAccount.SummaryView.andOthers', { replace: { number: resultAccountProxies.length - 2 } });
   };
 
   const hasAnyAccountToMigrate = !!resultAccountProxies.length;
@@ -82,7 +82,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
       })}
       >
         <div className='__header-area'>
-          {t('Finish')}
+          {t('ui.SUMMARY_VIEW.Popup.MigrateAccount.SummaryView.finish')}
         </div>
 
         <div className='__body-area'><div className='__body-area-inner'>
@@ -97,7 +97,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
           </div>
 
           <div className='__content-title'>
-            {t('All done!')}
+            {t('ui.SUMMARY_VIEW.Popup.MigrateAccount.SummaryView.allDone')}
           </div>
 
           {
@@ -113,7 +113,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                       />
                     )
                   }}
-                  i18nKey={detectTranslate('All eligible accounts have been migrated. Review <guide>our guide</guide> to learn more about migration eligibility & process')}
+                  i18nKey={detectTranslate('ui.SUMMARY_VIEW.Popup.MigrateAccount.SummaryView.allEligibleAccountsHaveBeenMigratedReviewGuideOurGuideGuideToLearnMoreAboutMigrationEligibilityAndProcess')}
                 />
               </div>
             )
@@ -135,7 +135,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                               />
                             )
                           }}
-                          i18nKey={detectTranslate('You have successfully migrated to <br/> <highlight>{{number}} unified accounts</highlight>')}
+                          i18nKey={detectTranslate('ui.SUMMARY_VIEW.Popup.MigrateAccount.SummaryView.youHaveSuccessfullyMigratedToBrHighlightUnifiedAccountsHighlight')}
                           values={{ number: `${resultAccountProxies.length}`.padStart(2, '0') }}
                         />
                       )
@@ -149,7 +149,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                               />
                             )
                           }}
-                          i18nKey={detectTranslate('You have successfully migrated to <br/> <highlight>{{number}} unified account</highlight>')}
+                          i18nKey={detectTranslate('ui.SUMMARY_VIEW.Popup.MigrateAccount.SummaryView.youHaveSuccessfullyMigratedToBrHighlightUnifiedAccountHighlight')}
                           values={{ number: `${resultAccountProxies.length}`.padStart(2, '0') }}
                         />
                       )
@@ -201,7 +201,7 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
             }
             onClick={onClickFinish}
           >
-            {hasAnyAccountToMigrate ? t('Finish') : t('Back to home')}
+            {hasAnyAccountToMigrate ? t('ui.SUMMARY_VIEW.Popup.MigrateAccount.SummaryView.finish') : t('ui.SUMMARY_VIEW.Popup.MigrateAccount.SummaryView.backToHome')}
           </Button>
         </div>
       </div>

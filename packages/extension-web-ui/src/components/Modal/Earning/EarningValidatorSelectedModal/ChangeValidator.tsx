@@ -60,19 +60,19 @@ const FILTER_MODAL_ID = 'nominated-filter-modal';
 
 const filterOptions = [
   {
-    label: 'Active validator',
+    label: detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.activeValidator'),
     value: '1'
   },
   {
-    label: 'Waiting list',
+    label: detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.waitingList'),
     value: '2'
   },
   {
-    label: 'Locked',
+    label: detectTranslate('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.locked'),
     value: '3'
   },
   {
-    label: 'Destroying',
+    label: detectTranslate('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.destroying'),
     value: '4'
   }
 ];
@@ -123,7 +123,7 @@ const Component = (props: Props) => {
     const result: SortOption[] = [
       {
         desc: false,
-        label: t('Lowest commission'),
+        label: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.lowestCommission'),
         value: SortKey.COMMISSION
       }
     ];
@@ -131,7 +131,7 @@ const Component = (props: Props) => {
     if (hasReturn) {
       result.push({
         desc: true,
-        label: t('Highest annual return'),
+        label: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.highestAnnualReturn'),
         value: SortKey.RETURN
       });
     }
@@ -139,14 +139,14 @@ const Component = (props: Props) => {
     if (nominations && nominations.length > 0) {
       result.push({
         desc: true,
-        label: t('Nomination'),
+        label: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.nomination'),
         value: SortKey.NOMINATING
       });
     }
 
     result.push({
       desc: false,
-      label: t('Lowest min active stake'),
+      label: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.lowestMinActiveStake'),
       value: SortKey.MIN_STAKE
     });
 
@@ -163,9 +163,9 @@ const Component = (props: Props) => {
 
   const applyLabel = useMemo(() => {
     if (!fewValidators) {
-      return detectTranslate('Apply {{number}} validator');
+      return detectTranslate('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.applyValidator');
     } else {
-      return detectTranslate('Apply {{number}} validators');
+      return detectTranslate('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.applyValidators');
     }
   }, [fewValidators]);
 
@@ -316,17 +316,17 @@ const Component = (props: Props) => {
     if (isNoValidatorChanged) {
       openAlert({
         type: NotificationType.INFO,
-        content: t('Your new selections of validators is the same as the original selection. Do you still want to continue?'),
-        title: t('No changes detected!'),
+        content: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.yourNewSelectionsOfValidatorsIsTheSameAsTheOriginalSelectionDoYouStillWantToContinue'),
+        title: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.noChangesDetected'),
         okButton: {
-          text: t('Continue'),
+          text: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.continue'),
           onClick: () => {
             closeAlert();
             submit(target);
           }
         },
         cancelButton: {
-          text: t('Cancel'),
+          text: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.cancel'),
           onClick: closeAlert
         }
       });
@@ -362,7 +362,7 @@ const Component = (props: Props) => {
       <EmptyValidator
         isDataEmpty={items.length === 0}
         onClickReload={setForceFetchValidator}
-        validatorTitle={t('Validators')}
+        validatorTitle={t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.validators')}
       />
     );
   }, [items.length, setForceFetchValidator, t]);
@@ -508,13 +508,13 @@ const Component = (props: Props) => {
             activeModal(SORTING_MODAL_ID);
           }
         }}
-        title={t('Select validators')}
+        title={t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.selectValidators')}
       >
         <Search
           autoFocus={true}
           className={'__search-box'}
           onSearch={handleSearch}
-          placeholder={t<string>('Search validator')}
+          placeholder={t<string>('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.searchValidator')}
           searchValue={searchValue}
           simpleLayout={true}
         />

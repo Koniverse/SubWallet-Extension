@@ -111,11 +111,11 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
   const viewOptions = useMemo((): ViewOption[] => {
     return [
       {
-        label: t('Recommended'),
+        label: t('ui.FEE_EDITOR_MODAL.components.Field.TransactionFee.FeeEditor.FeeEditorModal.recommended'),
         value: ViewMode.RECOMMENDED
       },
       {
-        label: t('Custom'),
+        label: t('ui.FEE_EDITOR_MODAL.components.Field.TransactionFee.FeeEditor.FeeEditorModal.custom'),
         value: ViewMode.CUSTOM
       }
     ];
@@ -199,7 +199,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
     }
 
     if ((new BigN(value)).lte(BN_ZERO)) {
-      return Promise.reject(t('The custom value must be greater than 0'));
+      return Promise.reject(t('ui.FEE_EDITOR_MODAL.components.Field.TransactionFee.FeeEditor.FeeEditorModal.theCustomValueMustBeGreaterThan0'));
     }
 
     return Promise.resolve();
@@ -220,7 +220,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
     }
 
     if ((new BigN(value)).lt(BN_ZERO)) {
-      return Promise.reject(t('The priority fee must be equal or greater than 0'));
+      return Promise.reject(t('ui.FEE_EDITOR_MODAL.components.Field.TransactionFee.FeeEditor.FeeEditorModal.thePriorityFeeMustBeEqualOrGreaterThan0'));
     }
 
     if (isEvmEIP1559FeeDetail(feeOptionsInfo)) {
@@ -230,7 +230,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
         const fastPriorityMax = new BigN(fastOption.maxPriorityFeePerGas).multipliedBy(2);
 
         if (new BigN(value).gt(fastPriorityMax)) {
-          return Promise.reject(t('Priority fee is higher than necessary. You may pay more than needed'));
+          return Promise.reject(t('ui.FEE_EDITOR_MODAL.components.Field.TransactionFee.FeeEditor.FeeEditorModal.priorityFeeIsHigherThanNecessaryYouMayPayMoreThanNeeded'));
         }
       }
     }
@@ -240,22 +240,22 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
 
   const customMaxFeeValidator = useCallback((rule: Rule, value: string): Promise<void> => {
     if (!value) {
-      return Promise.reject(t('Amount is required'));
+      return Promise.reject(t('ui.FEE_EDITOR_MODAL.components.Field.TransactionFee.FeeEditor.FeeEditorModal.amountIsRequired'));
     }
 
     if ((new BigN(value)).lte(BN_ZERO)) {
-      return Promise.reject(t('The maximum fee must be greater than 0'));
+      return Promise.reject(t('ui.FEE_EDITOR_MODAL.components.Field.TransactionFee.FeeEditor.FeeEditorModal.theMaximumFeeMustBeGreaterThan0'));
     }
 
     const priorityFeeValue = form.getFieldValue('priorityFeeValue') as string;
 
     if (priorityFeeValue && value && new BigN(value).lt(new BigN(priorityFeeValue))) {
-      return Promise.reject(t('Max fee cannot be lower than priority fee'));
+      return Promise.reject(t('ui.TRANSACTION.components.Field.FeeEditor.Modal.maxFeeLowerThanPriorityFee'));
     }
 
     if (isEvmEIP1559FeeDetail(feeOptionsInfo)) {
       if (minRequiredMaxFeePerGas && value && new BigN(value).lt(minRequiredMaxFeePerGas)) {
-        return Promise.reject(t('Max fee per gas must be higher than {{min}} GWEI', { replace: { min: formatNumber(minRequiredMaxFeePerGas, 9, (s) => s) } }));
+        return Promise.reject(t('ui.FEE_EDITOR_MODAL.components.Field.TransactionFee.FeeEditor.FeeEditorModal.maxFeePerGasMustBeHigherThanGwei', { replace: { min: formatNumber(minRequiredMaxFeePerGas, 9, (s) => s) } }));
       }
 
       const fastOption = feeOptionsInfo?.options?.fast;
@@ -264,7 +264,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
         const fastMax = new BigN(fastOption.maxFeePerGas).multipliedBy(2);
 
         if (new BigN(value).gt(fastMax) && fastMax.gt(minRequiredMaxFeePerGas)) {
-          return Promise.reject(t('Max fee is higher than necessary'));
+          return Promise.reject(t('ui.FEE_EDITOR_MODAL.components.Field.TransactionFee.FeeEditor.FeeEditorModal.maxFeeIsHigherThanNecessary'));
         }
       }
     }
@@ -345,7 +345,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
           disabled={decimals === 0}
           maxValue='1'
           showMaxButton={false}
-          tooltip={t('Amount')}
+          tooltip={t('ui.FEE_EDITOR_MODAL.components.Field.TransactionFee.FeeEditor.FeeEditorModal.amount')}
         />
       </Form.Item>
     </div>
@@ -417,7 +417,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
             className={'__approve-button'}
             onClick={onClickSubmit}
           >
-            {t('Apply fee')}
+            {t('ui.FEE_EDITOR_MODAL.components.Field.TransactionFee.FeeEditor.FeeEditorModal.applyFee')}
           </Button>
         )}
         id={modalId}
@@ -431,7 +431,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
           ),
           onClick: onCancelModal
         }}
-        title={t('Edit fee')}
+        title={t('ui.FEE_EDITOR_MODAL.components.Field.TransactionFee.FeeEditor.FeeEditorModal.editFee')}
       >
         {feeType === 'evm' && (
           <div className={'__switcher-box'}>
@@ -445,7 +445,7 @@ const Component = ({ chainValue, className, decimals, feeOptionsInfo, feeType, m
         )}
 
         <div className={'__fee-token-selector-area'}>
-          <div className={'__fee-token-selector-label'}>{t('Fee paid in')}</div>
+          <div className={'__fee-token-selector-label'}>{t('ui.FEE_EDITOR_MODAL.components.Field.TransactionFee.FeeEditor.FeeEditorModal.feePaidIn')}</div>
           <div
             className={'__fee-paid-token'}
           >

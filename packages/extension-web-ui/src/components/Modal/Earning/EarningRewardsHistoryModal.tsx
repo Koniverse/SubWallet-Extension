@@ -42,7 +42,7 @@ function Component ({ className, inputAsset, modalId, onClickViewExplore, reward
           )}
           onClick={onClickViewExplore}
         >
-          {t('View on explorer')}
+          {t('ui.EARNING_REWARDS_HISTORY_MODAL.components.Modal.Earning.EarningRewardsHistoryModal.viewOnExplorer')}
         </Button>
       }
       id={modalId}

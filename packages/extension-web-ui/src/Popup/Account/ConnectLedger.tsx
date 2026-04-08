@@ -52,14 +52,14 @@ const FooterIcon = (
 );
 
 export const PolkadotLedgerAccountTypeItems: LedgerPolkadotAccountItemType[] = [{
-  name: detectTranslate('Polkadot account'),
+  name: detectTranslate('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.polkadotAccount'),
   slug: 'polkadot',
-  description: detectTranslate('Manage, receive & transfer assets on Substrate-based networks in the Polkadot ecosystem'),
+  description: detectTranslate('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.manageReceiveAndTransferAssetsOnSubstrateBasedNetworksInThePolkadotEcosystem'),
   scheme: POLKADOT_LEDGER_SCHEME.ED25519
 }, {
-  name: detectTranslate('Ethereum account'),
+  name: detectTranslate('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.ethereumAccount'),
   slug: 'ethereum',
-  description: detectTranslate('Manage, receive & transfer assets on Substrate-based networks that use EVM addresses in the Polkadot ecosystem'),
+  description: detectTranslate('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.manageReceiveAndTransferAssetsOnSubstrateBasedNetworksThatUseEvmAddressesInThePolkadotEcosystem'),
   scheme: POLKADOT_LEDGER_SCHEME.ECDSA
 }];
 
@@ -329,7 +329,7 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'web-single-column web-cancel-fill-height'}
         onBack={firstStep ? onBack : onPreviousStep}
         rightFooterButton={{
-          children: t('Connect Ledger device'),
+          children: t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.connectLedgerDevice'),
           icon: FooterIcon,
           disabled: !isConnected || (!firstStep && !(selectedAccounts.length > 0)),
           onClick: firstStep ? onNextStep : onSubmit,
@@ -341,16 +341,16 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick: goUserGuide
           }
         ]}
-        title={t('Connect Ledger device')}
+        title={t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.connectLedgerDevice')}
       >
         <div className={CN('container')}>
           <div className='sub-title'>
-            {t('Unlock your Ledger and open the selected app. For more information regarding Polkadot and Polkadot Migration app, click ')}
+            {t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.unlockYourLedgerAndOpenTheSelectedAppForMoreInformationRegardingPolkadotAndPolkadotMigrationAppClick')}
             <a
               href={CONNECT_LEDGER_USER_GUIDE_URL}
               target='__blank'
             >
-              {t('here')}
+              {t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.here')}
             </a>
           </div>
           {
@@ -379,9 +379,9 @@ const Component: React.FC<Props> = (props: Props) => {
                 <LedgerChainSelector
                   className={'select-ledger-app'}
                   items={networks}
-                  label={t('Select Ledger app')}
+                  label={t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.selectLedgerApp')}
                   onChange={onChainChange}
-                  placeholder={t('Select Ledger app')}
+                  placeholder={t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.selectLedgerApp')}
                   value={chain}
                 />
                 {
@@ -389,10 +389,10 @@ const Component: React.FC<Props> = (props: Props) => {
                     className={'ledger-chain-migrate-select'}
                     id={'migrate-chain-select-modal-id'}
                     items={networkMigrates}
-                    label={t('Select network')}
-                    messageTooltip={t('To use this network, choose Polkadot Ledger app')}
+                    label={t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.selectNetwork')}
+                    messageTooltip={t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.toUseThisNetworkChoosePolkadotLedgerApp')}
                     onChange={onMigrateChainChange}
-                    placeholder={t('Select network')}
+                    placeholder={t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.selectNetwork')}
                     value={chainMigrateMode}
                   />
                 }
@@ -424,11 +424,11 @@ const Component: React.FC<Props> = (props: Props) => {
                   <div className='ledger-button-content'>
                     <span className='ledger-info-text'>
                       {isConnected
-                        ? t('Device found')
+                        ? t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.deviceFound')
                         : warning || error || (
                           ledger
-                            ? t('Loading')
-                            : t('Searching Ledger device')
+                            ? t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.loading')
+                            : t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.searchingLedgerDevice')
                         )
                       }
                     </span>

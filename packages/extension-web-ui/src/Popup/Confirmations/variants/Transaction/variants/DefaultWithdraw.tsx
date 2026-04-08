@@ -72,7 +72,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {!isLendingPool && (
           <MetaInfo.Number
             decimals={receivedAssetInfo.decimals || 0}
-            label={t('Estimated receivables')}
+            label={t('ui.DEFAULT_WITHDRAW.Popup.Confirmations.variants.Transaction.variants.DefaultWithdraw.estimatedReceivables')}
             suffix={receivedAssetInfo.symbol}
             value={estimatedReceivables}
           />
@@ -81,7 +81,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {!!estimateFee && (
           <MetaInfo.Number
             decimals={estimateFee.decimals}
-            label={t('Estimated fee')}
+            label={t('ui.DEFAULT_WITHDRAW.Popup.Confirmations.variants.Transaction.variants.DefaultWithdraw.estimatedFee')}
             suffix={estimateFee.symbol}
             value={estimateFee.value}
           />

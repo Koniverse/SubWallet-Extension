@@ -89,7 +89,7 @@ function Component ({ className,
   const menuItems = useMemo<MenuItemType[]>(() => {
     return [
       {
-        label: t('Portfolio'),
+        label: t('ui.SIDE_MENU.components.Layout.parts.SideMenu.SideMenu.portfolio'),
         value: '/home',
         icon: {
           type: 'phosphor',
@@ -98,7 +98,7 @@ function Component ({ className,
         }
       },
       {
-        label: t('Earning'),
+        label: t('ui.SIDE_MENU.components.Layout.parts.SideMenu.SideMenu.earning'),
         value: '/home/earning',
         icon: {
           type: 'phosphor',
@@ -108,7 +108,7 @@ function Component ({ className,
         disabled: isCurrentAccountProxySoloTon
       },
       {
-        label: t('Swap'),
+        label: t('ui.SIDE_MENU.components.Layout.parts.SideMenu.SideMenu.swap'),
         value: '/transaction/swap',
         icon: {
           type: 'phosphor',
@@ -118,7 +118,7 @@ function Component ({ className,
         disabled: !isSwapSupported
       },
       {
-        label: t('dApps'),
+        label: t('ui.SIDE_MENU.components.Layout.parts.SideMenu.SideMenu.dapps'),
         value: '/home/dapps',
         icon: {
           type: 'phosphor',
@@ -127,7 +127,7 @@ function Component ({ className,
         }
       },
       {
-        label: t('Mission Pools'),
+        label: t('ui.SIDE_MENU.components.Layout.parts.SideMenu.SideMenu.missionPools'),
         value: '/home/mission-pools',
         icon: {
           type: 'customIcon',
@@ -144,7 +144,7 @@ function Component ({ className,
         }
       },
       {
-        label: t('Crowdloans'),
+        label: t('ui.SIDE_MENU.components.Layout.parts.SideMenu.SideMenu.crowdloans'),
         value: '/home/crowdloans',
         icon: {
           type: 'phosphor',
@@ -154,7 +154,7 @@ function Component ({ className,
         disabled: isCurrentAccountProxySoloTon
       },
       {
-        label: t('History'),
+        label: t('ui.SIDE_MENU.components.Layout.parts.SideMenu.SideMenu.history'),
         value: '/home/history',
         icon: {
           type: 'phosphor',
@@ -163,7 +163,7 @@ function Component ({ className,
         }
       },
       {
-        label: t('Settings'),
+        label: t('ui.SIDE_MENU.components.Layout.parts.SideMenu.SideMenu.settings'),
         value: '/settings',
         icon: {
           type: 'phosphor',
@@ -177,7 +177,7 @@ function Component ({ className,
   const staticMenuItems = useMemo<MenuItemType[]>(() => {
     return [
       {
-        label: t('FAQs'),
+        label: t('ui.SIDE_MENU.components.Layout.parts.SideMenu.SideMenu.faqs'),
         value: 'faqs',
         icon: {
           type: 'phosphor',
@@ -186,7 +186,7 @@ function Component ({ className,
         }
       },
       {
-        label: t('Contact'),
+        label: t('ui.SIDE_MENU.components.Layout.parts.SideMenu.SideMenu.contact'),
         value: 'contact',
         icon: {
           type: 'phosphor',
@@ -195,7 +195,7 @@ function Component ({ className,
         }
       },
       {
-        label: t('Terms of services'),
+        label: t('ui.SIDE_MENU.components.Layout.parts.SideMenu.SideMenu.termsOfServices'),
         value: 'tos',
         icon: {
           type: 'phosphor',
@@ -322,7 +322,7 @@ function Component ({ className,
           }
           onClick={onToggleCollapse}
           size={'xs'}
-          tooltip={isCollapsed ? t('Expand') : t('Collapse')}
+          tooltip={isCollapsed ? t('ui.SIDE_MENU.components.Layout.parts.SideMenu.SideMenu.expand') : t('ui.SIDE_MENU.components.Layout.parts.SideMenu.SideMenu.collapse')}
           type='ghost'
         />
       </div>

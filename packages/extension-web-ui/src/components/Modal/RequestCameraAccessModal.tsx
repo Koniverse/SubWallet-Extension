@@ -39,7 +39,7 @@ const Component: React.FC<Props> = (props: Props) => {
       center={true}
       id={modalId}
       onCancel={closeModal}
-      title={t('Cannot scan')}
+      title={t('ui.REQUEST_CAMERA_ACCESS_MODAL.components.Modal.RequestCameraAccessModal.cannotScan')}
       wrapClassName={CN(className)}
       zIndex={1005}
     >
@@ -51,11 +51,11 @@ const Component: React.FC<Props> = (props: Props) => {
             size='sm'
           />
           <div className='title'>
-            {t('Your camera is not available')}
+            {t('ui.REQUEST_CAMERA_ACCESS_MODAL.components.Modal.RequestCameraAccessModal.yourCameraIsNotAvailable')}
           </div>
         </div>
         <div className='description'>
-          {t('Please allow camera access to continue')}
+          {t('ui.REQUEST_CAMERA_ACCESS_MODAL.components.Modal.RequestCameraAccessModal.pleaseAllowCameraAccessToContinue')}
         </div>
         <Button
           block={true}
@@ -66,7 +66,7 @@ const Component: React.FC<Props> = (props: Props) => {
           )}
           onClick={onClick}
         >
-          {t('Go to Setting')}
+          {t('ui.REQUEST_CAMERA_ACCESS_MODAL.components.Modal.RequestCameraAccessModal.goToSetting')}
         </Button>
       </div>
     </BaseModal>

@@ -81,11 +81,11 @@ const Component: React.FC<Props> = ({ className, tokenGroupSlug }: Props) => {
           />
 
           <div className={'__title'}>
-            {t('Earn yield on your {{symbol}}', { replace: { symbol: symbol } })}
+            {t('ui.EARN_CTABANNER.components.EarnCTABanner.earnYieldOnYour', { replace: { symbol: symbol } })}
           </div>
         </div>
 
-        <div className={'__content'}>{t('There are multiple ways to earn with your {{symbol}}, such as native staking, liquid staking, or lending. Check out Earning for curated options with competitive APY to earn yield on your DOT.', { replace: { symbol: symbol } })}</div>
+        <div className={'__content'}>{t('ui.EARN_CTABANNER.components.EarnCTABanner.thereAreMultipleWaysToEarnWithYourSuchAsNativeStakingLiquidStakingOrLendingCheckOutEarningForCuratedOptionsWithCompetitiveApyToEarnYieldOnYourDot', { replace: { symbol: symbol } })}</div>
       </div>
 
       <Button
@@ -102,8 +102,8 @@ const Component: React.FC<Props> = ({ className, tokenGroupSlug }: Props) => {
         onClick={onClickEarnNow}
       >
         <div className={'__footer-button-content'}>
-          <div className={'__footer-button-title'}>{t('Rewards: 14.8% - 18.5%')}</div>
-          <div className={'__footer-button-subtitle'}>{t('Earn now')}</div>
+          <div className={'__footer-button-title'}>{t('ui.EARN_CTABANNER.components.EarnCTABanner.rewards148185')}</div>
+          <div className={'__footer-button-subtitle'}>{t('ui.EARN_CTABANNER.components.EarnCTABanner.earnNow')}</div>
         </div>
       </Button>
     </div>

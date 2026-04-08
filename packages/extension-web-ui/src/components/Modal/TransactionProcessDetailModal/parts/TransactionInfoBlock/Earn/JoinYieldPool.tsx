@@ -77,7 +77,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Number
           decimals={inputTokenDecimals}
-          label={t('Amount')}
+          label={t('ui.JOIN_YIELD_POOL.components.Modal.TransactionProcessDetailModal.parts.TransactionInfoBlock.Earn.JoinYieldPool.amount')}
           suffix={inputTokenSymbol}
           value={txParams.amount}
         />
@@ -85,7 +85,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {!!derivativeTokenBasicInfo && (
           <MetaInfo.Number
             decimals={derivativeTokenBasicInfo.decimals}
-            label={t('Estimated receivables')}
+            label={t('ui.JOIN_YIELD_POOL.components.Modal.TransactionProcessDetailModal.parts.TransactionInfoBlock.Earn.JoinYieldPool.estimatedReceivables')}
             suffix={derivativeTokenBasicInfo.symbol}
             value={estimatedReceivables.toString()}
           />

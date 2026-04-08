@@ -15,11 +15,11 @@ const Component: React.FC<ThemeProps> = () => {
 
   return (
     <ConnectQrSigner
-      deviceName={t('Polkadot Vault')}
+      deviceName={t('ui.CONNECT_POLKADOT_VAULT.Popup.Account.ConnectQrSigner.ConnectPolkadotVault.polkadotVault')}
       instructionUrl={'https://docs.subwallet.app/main/extension-user-guide/account-management/attach-a-polkadot-vault-previously-parity-signer-account'}
       logoUrl={DefaultLogosMap.polkadot_vault}
-      subTitle={t('Open Polkadot Vault on your phone to connect wallet')}
-      title={t('Connect Polkadot Vault')}
+      subTitle={t('ui.CONNECT_POLKADOT_VAULT.Popup.Account.ConnectQrSigner.ConnectPolkadotVault.openPolkadotVaultOnYourPhoneToConnectWallet')}
+      title={t('ui.CONNECT_POLKADOT_VAULT.Popup.Account.ConnectQrSigner.ConnectPolkadotVault.connectPolkadotVault')}
     />
   );
 };

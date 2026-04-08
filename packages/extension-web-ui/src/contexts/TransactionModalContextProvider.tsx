@@ -179,7 +179,7 @@ export const TransactionModalContextProvider = ({ children }: Props) => {
               }
               : undefined
             }
-            title={t('Claim rewards')}
+            title={t('ui.TRANSACTION_MODAL_CONTEXT_PROVIDER.contexts.TransactionModalContextProvider.claimRewards')}
           >
             <Transaction
               modalContent={true}
@@ -216,7 +216,7 @@ export const TransactionModalContextProvider = ({ children }: Props) => {
               }
               : undefined
             }
-            title={t('Claim rewards')}
+            title={t('ui.TRANSACTION_MODAL_CONTEXT_PROVIDER.contexts.TransactionModalContextProvider.claimRewards')}
           >
             <Transaction
               modalContent={true}
@@ -253,7 +253,7 @@ export const TransactionModalContextProvider = ({ children }: Props) => {
               }
               : undefined
             }
-            title={t('Withdraw')}
+            title={t('ui.TRANSACTION_MODAL_CONTEXT_PROVIDER.contexts.TransactionModalContextProvider.withdraw')}
           >
             <Transaction
               modalContent={true}

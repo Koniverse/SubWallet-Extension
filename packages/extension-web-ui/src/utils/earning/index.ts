@@ -10,37 +10,37 @@ import { TFunction } from 'react-i18next';
 export const createEarningTagTypes = (t: TFunction): Record<YieldPoolType, EarningTagType> => {
   return {
     [YieldPoolType.LIQUID_STAKING]: {
-      label: t('Liquid staking'),
+      label: t('ui.EARNING.utils.earning.liquidStaking'),
       icon: Leaf,
       color: 'magenta',
       weight: 'bold'
     },
     [YieldPoolType.LENDING]: {
-      label: t('Lending'),
+      label: t('ui.EARNING.utils.earning.lending'),
       icon: HandsClapping,
       color: 'green',
       weight: 'bold'
     },
     [YieldPoolType.SINGLE_FARMING]: {
-      label: t('Single farming'),
+      label: t('ui.EARNING.utils.earning.singleFarming'),
       icon: User,
       color: 'green',
       weight: 'bold'
     },
     [YieldPoolType.NOMINATION_POOL]: {
-      label: t('Nomination pool'),
+      label: t('ui.EARNING.utils.earning.nominationPool'),
       icon: Users,
       color: 'secondary',
       weight: 'bold'
     },
     [YieldPoolType.PARACHAIN_STAKING]: {
-      label: t('Parachain staking'),
+      label: t('ui.EARNING.utils.earning.parachainStaking'),
       icon: User,
       color: 'yellow',
       weight: 'bold'
     },
     [YieldPoolType.NATIVE_STAKING]: {
-      label: t('Native staking'),
+      label: t('ui.EARNING.utils.earning.nativeStaking'),
       icon: Database,
       color: 'gold',
       weight: 'fill'

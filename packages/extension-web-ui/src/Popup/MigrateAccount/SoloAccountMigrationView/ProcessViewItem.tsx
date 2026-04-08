@@ -40,7 +40,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
 
   const headerContent = useMemo(() => {
-    return `${t('Accounts migrated')}: ${currentProcessOrdinal}/${totalProcessSteps}`;
+    return `${t('ui.PROCESS_VIEW_ITEM.Popup.MigrateAccount.SoloAccountMigrationView.ProcessViewItem.accountsMigrated')}: ${currentProcessOrdinal}/${totalProcessSteps}`;
   }, [currentProcessOrdinal, t, totalProcessSteps]);
 
   const _onApprove = useCallback(() => {
@@ -67,10 +67,10 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
         const { isValid } = await validateAccountName({ name: value });
 
         if (!isValid) {
-          return Promise.reject(t('Account name already in use'));
+          return Promise.reject(t('ui.PROCESS_VIEW_ITEM.Popup.MigrateAccount.SoloAccountMigrationView.ProcessViewItem.accountNameAlreadyInUse'));
         }
       } catch (e) {
-        return Promise.reject(t('Account name invalid'));
+        return Promise.reject(t('ui.PROCESS_VIEW_ITEM.Popup.MigrateAccount.SoloAccountMigrationView.ProcessViewItem.accountNameInvalid'));
       }
     }
 
@@ -94,11 +94,11 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
 
       <div className='__body-area'><div className={'__body-area-inner'}>
         <div className='__brief'>
-          {t('Enter a name for this unified account to complete the migration')}
+          {t('ui.PROCESS_VIEW_ITEM.Popup.MigrateAccount.SoloAccountMigrationView.ProcessViewItem.enterANameForThisUnifiedAccountToCompleteTheMigration')}
         </div>
 
         <div className='__section-label'>
-          {t('Migrate from')}
+          {t('ui.PROCESS_VIEW_ITEM.Popup.MigrateAccount.SoloAccountMigrationView.ProcessViewItem.migrateFrom')}
         </div>
 
         <div className='__account-list'>
@@ -114,7 +114,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
         </div>
 
         <div className='__section-label'>
-          {t('To')}
+          {t('ui.PROCESS_VIEW_ITEM.Popup.MigrateAccount.SoloAccountMigrationView.ProcessViewItem.to')}
         </div>
 
         <Form
@@ -136,7 +136,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
               name={'name'}
               rules={[
                 {
-                  message: t('Account name is required'),
+                  message: t('ui.PROCESS_VIEW_ITEM.Popup.MigrateAccount.SoloAccountMigrationView.ProcessViewItem.accountNameIsRequired'),
                   transform: (value: string) => value.trim(),
                   required: true
                 },
@@ -149,8 +149,8 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
               <Input
                 className='__account-name-input'
                 disabled={loading}
-                label={t('Account name')}
-                placeholder={t('Enter the account name')}
+                label={t('ui.PROCESS_VIEW_ITEM.Popup.MigrateAccount.SoloAccountMigrationView.ProcessViewItem.accountName')}
+                placeholder={t('ui.PROCESS_VIEW_ITEM.Popup.MigrateAccount.SoloAccountMigrationView.ProcessViewItem.enterTheAccountName')}
                 suffix={(
                   <AccountChainTypeLogos
                     chainTypes={SUPPORTED_ACCOUNT_CHAIN_TYPES}
@@ -176,7 +176,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
           onClick={onSkip}
           schema={'secondary'}
         >
-          {t('Skip')}
+          {t('ui.PROCESS_VIEW_ITEM.Popup.MigrateAccount.SoloAccountMigrationView.ProcessViewItem.skip')}
         </Button>
         <Button
           block={true}
@@ -190,7 +190,7 @@ function Component ({ className = '', currentProcessOrdinal, currentSoloAccountT
           loading={loading}
           onClick={_onApprove}
         >
-          {t('Approve')}
+          {t('ui.PROCESS_VIEW_ITEM.Popup.MigrateAccount.SoloAccountMigrationView.ProcessViewItem.approve')}
         </Button>
       </div>
     </div>

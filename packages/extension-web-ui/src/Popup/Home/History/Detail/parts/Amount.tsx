@@ -41,18 +41,18 @@ const Component: React.FC<Props> = (props: Props) => {
     switch (transactionType) {
       case ExtrinsicType.STAKING_BOND:
       case ExtrinsicType.STAKING_JOIN_POOL:
-        return t('Staking value');
+        return t('ui.AMOUNT.Popup.Home.History.Detail.parts.Amount.stakingValue');
       case ExtrinsicType.STAKING_WITHDRAW:
       case ExtrinsicType.STAKING_POOL_WITHDRAW:
-        return t('Withdraw value');
+        return t('ui.AMOUNT.Popup.Home.History.Detail.parts.Amount.withdrawValue');
       case ExtrinsicType.STAKING_UNBOND:
-        return t('Unstake value');
+        return t('ui.AMOUNT.Popup.Home.History.Detail.parts.Amount.unstakeValue');
       case ExtrinsicType.STAKING_CANCEL_UNSTAKE:
-        return t('Cancel unstake value');
+        return t('ui.AMOUNT.Popup.Home.History.Detail.parts.Amount.cancelUnstakeValue');
       case ExtrinsicType.CROWDLOAN:
-        return t('Contribute balance');
+        return t('ui.AMOUNT.Popup.Home.History.Detail.parts.Amount.contributeBalance');
       default:
-        return t('Amount');
+        return t('ui.AMOUNT.Popup.Home.History.Detail.parts.Amount.amount');
     }
   }, [t, transactionType]);
 
@@ -124,20 +124,20 @@ const Component: React.FC<Props> = (props: Props) => {
           )
       }
       {data.additionalInfo && hasOrderId && (
-        <MetaInfo.Default label={t('Order ID')}> {(data.additionalInfo as TransactionAdditionalInfo[ExtrinsicType.TRANSFER_TOKEN]).orderId} </MetaInfo.Default>
+        <MetaInfo.Default label={t('ui.AMOUNT.Popup.Home.History.Detail.parts.Amount.orderId')}> {(data.additionalInfo as TransactionAdditionalInfo[ExtrinsicType.TRANSFER_TOKEN]).orderId} </MetaInfo.Default>
       )}
       {isMint && amountDerivative && (
 
         <MetaInfo.Number
           decimals={0}
-          label={t('Estimated receivables')}
+          label={t('ui.AMOUNT.Popup.Home.History.Detail.parts.Amount.estimatedReceivables')}
           suffix={derivativeSymbol}
           value={amountDerivative}
         />
       )}
       {data.additionalInfo && isNft && (
         <MetaInfo.Default
-          label={t('Collection Name')}
+          label={t('ui.AMOUNT.Popup.Home.History.Detail.parts.Amount.collectionName')}
         >
           {(data.additionalInfo as TransactionAdditionalInfo[ExtrinsicType.SEND_NFT]).collectionName}
         </MetaInfo.Default>

@@ -12,18 +12,18 @@ export const validateYieldWithdrawPosition = (min: number | string | BigN, max: 
   const maxString = formatBalance(maxValue, decimals);
   const minString = formatBalance(minValue, decimals);
 
-  const name = _name || t('Value');
+  const name = _name || t('ui.YIELD.utils.form.validators.yield.value');
 
   return {
     validator: (_, value: string) => {
       const val = new BigN(value);
 
       if (val.gt(maxValue)) {
-        return Promise.reject(new Error(t('{{name}} must be equal or less than {{maxString}}', { replace: { name, maxString } })));
+        return Promise.reject(new Error(t('ui.YIELD.utils.form.validators.yield.mustBeEqualOrLessThan', { replace: { name, maxString } })));
       }
 
       if (val.lt(minValue)) {
-        return Promise.reject(new Error(t('{{name}} must be equal or greater than {{minString}}', { replace: { name, minString } })));
+        return Promise.reject(new Error(t('ui.YIELD.utils.form.validators.yield.mustBeEqualOrGreaterThan', { replace: { name, minString } })));
       }
 
       return Promise.resolve();

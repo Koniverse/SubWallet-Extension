@@ -102,16 +102,16 @@ const Component: React.FC<Props> = (props: Props) => {
   const balanceItems = useMemo<BalanceDisplayItem[]>(() => {
     if (isBitcoinChain && isBitcoinMetadata(metadata)) {
       return [
-        { key: 'btc_transferable', label: t('BTC Transferable'), value: free },
-        { key: 'btc_rune', label: t('BTC Rune (Locked)'), value: isBitcoinMetadata(metadata) ? String(metadata.runeBalance) : '0' },
-        { key: 'btc_inscription', label: t('BTC Inscription (Locked)'), value: isBitcoinMetadata(metadata) ? String(metadata.inscriptionBalance) : '0' },
-        { key: 'btc_total', label: t('Total'), value: total }
+        { key: 'btc_transferable', label: t('ui.ACCOUNT_TOKEN_BALANCE_ITEM.components.TokenItem.AccountTokenBalanceItem.btcTransferable'), value: free },
+        { key: 'btc_rune', label: t('ui.ACCOUNT_TOKEN_BALANCE_ITEM.components.TokenItem.AccountTokenBalanceItem.btcRuneLocked'), value: isBitcoinMetadata(metadata) ? String(metadata.runeBalance) : '0' },
+        { key: 'btc_inscription', label: t('ui.ACCOUNT_TOKEN_BALANCE_ITEM.components.TokenItem.AccountTokenBalanceItem.btcInscriptionLocked'), value: isBitcoinMetadata(metadata) ? String(metadata.inscriptionBalance) : '0' },
+        { key: 'btc_total', label: t('ui.ACCOUNT_TOKEN_BALANCE_ITEM.components.TokenItem.AccountTokenBalanceItem.total'), value: total }
       ];
     }
 
     return [
-      { key: 'transferable', label: t('Transferable'), value: free },
-      { key: 'locked', label: t('Locked'), value: locked }
+      { key: 'transferable', label: t('ui.ACCOUNT_TOKEN_BALANCE_ITEM.components.TokenItem.AccountTokenBalanceItem.transferable'), value: free },
+      { key: 'locked', label: t('ui.ACCOUNT_TOKEN_BALANCE_ITEM.components.TokenItem.AccountTokenBalanceItem.locked'), value: locked }
     ];
   }, [free, isBitcoinChain, locked, metadata, t, total]);
 
@@ -203,7 +203,7 @@ const Component: React.FC<Props> = (props: Props) => {
           size={'xs'}
           type={'ghost'}
         >
-          {t('View on explorer')}
+          {t('ui.ACCOUNT_TOKEN_BALANCE_ITEM.components.TokenItem.AccountTokenBalanceItem.viewOnExplorer')}
         </Button>
       )}
     </MetaInfo>

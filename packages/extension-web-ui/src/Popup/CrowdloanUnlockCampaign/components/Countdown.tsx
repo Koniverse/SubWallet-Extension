@@ -20,28 +20,28 @@ const Component: React.FC<Props> = ({ className, targetTime }: Props) => {
       <div className={'__time-item'}>
         <div className={'__time-item-number'}>{`${days}`.padStart(2, '0')}</div>
         <div className={'__time-item-unit'}>
-          {days < 2 ? t('day') : t('days')}
+          {days < 2 ? t('ui.COUNTDOWN.Popup.CrowdloanUnlockCampaign.components.Countdown.day') : t('ui.COUNTDOWN.Popup.CrowdloanUnlockCampaign.components.Countdown.days')}
         </div>
       </div>
       <div className={'__time-separator'}>:</div>
       <div className={'__time-item'}>
         <div className={'__time-item-number'}>{`${hours}`.padStart(2, '0')}</div>
         <div className={'__time-item-unit'}>
-          {hours < 2 ? t('hour') : t('hours')}
+          {hours < 2 ? t('ui.COUNTDOWN.Popup.CrowdloanUnlockCampaign.components.Countdown.hour') : t('ui.COUNTDOWN.Popup.CrowdloanUnlockCampaign.components.Countdown.hours')}
         </div>
       </div>
       <div className={'__time-separator'}>:</div>
       <div className={'__time-item'}>
         <div className={'__time-item-number'}>{`${minutes}`.padStart(2, '0')}</div>
         <div className={'__time-item-unit'}>
-          {minutes < 2 ? t('minute') : t('minutes')}
+          {minutes < 2 ? t('ui.COUNTDOWN.Popup.CrowdloanUnlockCampaign.components.Countdown.minute') : t('ui.COUNTDOWN.Popup.CrowdloanUnlockCampaign.components.Countdown.minutes')}
         </div>
       </div>
       <div className={'__time-separator'}>:</div>
       <div className={'__time-item'}>
         <div className={'__time-item-number'}>{`${seconds}`.padStart(2, '0')}</div>
         <div className={'__time-item-unit'}>
-          {seconds < 2 ? t('second') : t('seconds')}
+          {seconds < 2 ? t('ui.COUNTDOWN.Popup.CrowdloanUnlockCampaign.components.Countdown.second') : t('ui.COUNTDOWN.Popup.CrowdloanUnlockCampaign.components.Countdown.seconds')}
         </div>
       </div>
     </div>

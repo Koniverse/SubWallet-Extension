@@ -18,7 +18,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     <AccountTypeModal
       className={className}
       id={NEW_SEED_MODAL}
-      label={t('Confirm')}
+      label={t('ui.NEW_SEED_MODAL.components.Modal.Account.NewSeedModal.confirm')}
       nextId={SEED_PHRASE_MODAL}
       previousId={CREATE_ACCOUNT_MODAL}
       url={'/accounts/new-seed-phrase'}

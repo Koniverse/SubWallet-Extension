@@ -168,7 +168,7 @@ const Component = () => {
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('Available balance')}
+            label={t('ui.CANCEL_UNSTAKE.Popup.Transaction.variants.CancelUnstake.availableBalance')}
             onBalanceReady={setIsBalanceReady}
           />
           <Form.Item name={'unstake'}>
@@ -176,7 +176,7 @@ const Component = () => {
               chain={chainValue}
               defaultValue={persistUnstake}
               disabled={!fromValue}
-              label={t('Select an unstake request')}
+              label={t('ui.CANCEL_UNSTAKE.Popup.Transaction.variants.CancelUnstake.selectAnUnstakeRequest')}
               nominators={fromValue ? positionInfo?.unstakings || [] : []}
             />
           </Form.Item>
@@ -196,7 +196,7 @@ const Component = () => {
               onClick={goHome}
               schema={'secondary'}
             >
-              {t('Cancel')}
+              {t('ui.CANCEL_UNSTAKE.Popup.Transaction.variants.CancelUnstake.cancel')}
             </Button>
           )
         }
@@ -212,7 +212,7 @@ const Component = () => {
           loading={loading}
           onClick={onPreCheck(form.submit, ExtrinsicType.STAKING_CANCEL_UNSTAKE)}
         >
-          {t('Approve')}
+          {t('ui.CANCEL_UNSTAKE.Popup.Transaction.variants.CancelUnstake.approve')}
         </Button>
       </TransactionFooter>
     </>

@@ -36,14 +36,14 @@ export default function useHandleLedgerGenericAccountWarning (): HookType {
 
       alertModal.open({
         closable: false,
-        title: t('Unsupported network'),
-        subtitle: t('Do you still want to get the address?'),
+        title: t('ui.USE_HANDLE_LEDGER_GENERIC_ACCOUNT_WARNING.hooks.account.useHandleLedgerGenericAccountWarning.unsupportedNetwork'),
+        subtitle: t('ui.USE_HANDLE_LEDGER_GENERIC_ACCOUNT_WARNING.hooks.account.useHandleLedgerGenericAccountWarning.doYouStillWantToGetTheAddress'),
         type: NotificationType.WARNING,
         content: (
           <>
             <div>
               {t(
-                'Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.',
+                'ui.USE_HANDLE_LEDGER_GENERIC_ACCOUNT_WARNING.hooks.account.useHandleLedgerGenericAccountWarning.ledgerAccountsAreNotCompatibleWithNetworkTokensWillGetStuckIECanTBeTransferredOutOrStakedWhenSentToThisAccountType',
                 {
                   replace: {
                     ledgerApp,
@@ -55,7 +55,7 @@ export default function useHandleLedgerGenericAccountWarning (): HookType {
           </>
         ),
         cancelButton: {
-          text: t('Cancel'),
+          text: t('ui.USE_HANDLE_LEDGER_GENERIC_ACCOUNT_WARNING.hooks.account.useHandleLedgerGenericAccountWarning.cancel'),
           icon: XCircle,
           iconWeight: 'fill',
           onClick: () => {
@@ -64,7 +64,7 @@ export default function useHandleLedgerGenericAccountWarning (): HookType {
           schema: 'secondary'
         },
         okButton: {
-          text: t('Get address'),
+          text: t('ui.USE_HANDLE_LEDGER_GENERIC_ACCOUNT_WARNING.hooks.account.useHandleLedgerGenericAccountWarning.getAddress'),
           icon: CheckCircle,
           iconWeight: 'fill',
           onClick: () => {

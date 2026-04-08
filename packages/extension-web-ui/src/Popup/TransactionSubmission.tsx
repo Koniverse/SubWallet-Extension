@@ -39,8 +39,8 @@ const SwapProcessingContentComponent = (props: SwapProcessingContentComponentPro
 
   const messages = useMemo<string[]>(() => {
     return [
-      t('Tip: Hit “View process” to view step-by-step details of your swap'),
-      t('Hanging in there...')
+      t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.tipHitViewProcessToViewStepByStepDetailsOfYourSwap'),
+      t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.hangingInThere')
     ];
   }, [t]);
 
@@ -65,10 +65,10 @@ const SwapProcessingContentComponent = (props: SwapProcessingContentComponentPro
         />
       </div>
       <div className='title'>
-        {t('Swap in process')}
+        {t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.swapInProcess')}
       </div>
       <div className='subtitle'>
-        {t('DO NOT close the app!')}
+        {t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.doNotCloseTheApp')}
       </div>
       <div className='description'>
         {messages[messageIndex]}
@@ -202,18 +202,18 @@ const Component: React.FC<Props> = (props: Props) => {
           ? ({
             block: true,
             onClick: goHome,
-            children: t('Back to home')
+            children: t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.backToHome')
           })
           : undefined}
         rightFooterButton={processData
           ? ({
             block: true,
             onClick: viewProgress,
-            children: t('View process')
+            children: t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.viewProcess')
           })
           : undefined}
         subHeaderLeft={<CloseIcon />}
-        title={isSwapProcessing ? t('Swap') : t('Submitted')}
+        title={isSwapProcessing ? t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.swap') : t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.submitted')}
       >
         {!processData && (
           <LoadingScreen />
@@ -236,10 +236,10 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               </div>
               <div className='title'>
-                {t('Transaction submitted!')}
+                {t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.transactionSubmitted')}
               </div>
               <div className='description'>
-                {t('View transaction progress in the Notifications screen or go back to home')}
+                {t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.viewTransactionProgressInTheNotificationsScreenOrGoBackToHome')}
               </div>
             </div>
           )

@@ -59,11 +59,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     }
   ];
 
-  const newPasswordRules = useMemo(() => renderBasePasswordRules(t('New password'), t), [t]);
+  const newPasswordRules = useMemo(() => renderBasePasswordRules(t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.newPassword'), t), [t]);
   const confirmPasswordRules = useMemo(() => renderBaseConfirmPasswordRules(FormFieldName.PASSWORD, t), [t]);
   const checkBoxValidator = useCallback((rule: RuleObject, value: boolean): Promise<void> => {
     if (!value) {
-      return Promise.reject(new Error(t('CheckBox is required')));
+      return Promise.reject(new Error(t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.checkboxIsRequired')));
     }
 
     return Promise.resolve();
@@ -123,7 +123,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         onBack={goBack}
         rightFooterButton={!isWebUI
           ? {
-            children: t('Save'),
+            children: t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.save'),
             onClick: form.submit,
             loading: loading,
             disabled: isDisabled,
@@ -141,7 +141,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             onClick: isWebUI ? goBackSetting : goHome
           }
         ]}
-        title={t('Change password')}
+        title={t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.changePassword')}
       >
         <div className={CN('body-container', {
           '__web-ui': isWebUI
@@ -159,14 +159,14 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 />
               </div>
               <div className='title'>
-                {t('Change your password')}
+                {t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.changeYourPassword')}
               </div>
             </div>
           )}
           <div className='form-container'>
             {isWebUI && <AlertBox
-              description={t('Recommended security practice')}
-              title={t('Always choose a strong password!')}
+              description={t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.recommendedSecurityPractice')}
+              title={t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.alwaysChooseAStrongPassword')}
               type='warning'
             />}
             <Form
@@ -185,7 +185,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 name={FormFieldName.OLD_PASSWORD}
                 rules={[
                   {
-                    message: t('Password is required'),
+                    message: t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.passwordIsRequired'),
                     required: true
                   }
                 ]}
@@ -193,7 +193,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               >
                 <Input.Password
                   disabled={loading}
-                  placeholder={t('Current password')}
+                  placeholder={t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.currentPassword')}
                   type='password'
                 />
               </Form.Item>
@@ -205,7 +205,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 <Input.Password
                   disabled={loading}
                   onChange={onChangePassword}
-                  placeholder={t('New password')}
+                  placeholder={t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.newPassword')}
                   type='password'
                 />
               </Form.Item>
@@ -216,13 +216,13 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               >
                 <Input.Password
                   disabled={loading}
-                  placeholder={t('Confirm new password')}
+                  placeholder={t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.confirmNewPassword')}
                   type='password'
                 />
               </Form.Item>
               <Form.Item>
                 {isWebUI && <div className={'annotation'}>
-                  {t('Passwords should be at least 8 characters in length, including letters and numbers')}
+                  {t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.passwordsShouldBeAtLeast8CharactersInLengthIncludingLettersAndNumbers')}
                 </div>}
               </Form.Item>
               <Form.Item
@@ -239,7 +239,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 <Checkbox
                   className={'checkbox'}
                 >
-                  {t('I understand that SubWallet can’t recover the password.')}
+                  {t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.iUnderstandThatSubwalletCanTRecoverThePassword')}
                   <a
                     href={TERMS_OF_SERVICE_URL}
                     rel='noreferrer'
@@ -267,7 +267,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   loading={loading}
                   onClick={form.submit}
                 >
-                  {t('Save')}
+                  {t('ui.CHANGE_PASSWORD.Popup.Keyring.ChangePassword.save')}
                 </Button>
               )}
             </Form>

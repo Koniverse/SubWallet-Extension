@@ -62,7 +62,7 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
             unitColor={token.colorTextTertiary}
             value={bondedBalance || 0}
           />
-          {label || t('Staked')}
+          {label || t('ui.BONDED_BALANCE.Popup.Transaction.parts.BondedBalance.staked')}
         </div>
 
         {isSubnetStaking && (
@@ -71,7 +71,7 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
             title={'Transaction will not be executed if the price changes more than this slippage'}
           >
             <div className='slippage-info'>
-              <span className='slippage-label'>{t('Slippage')}: </span>
+              <span className='slippage-label'>{t('ui.BONDED_BALANCE.Popup.Transaction.parts.BondedBalance.slippage')}: </span>
               <Number
                 className='slippage-value'
                 decimal={0}

@@ -45,18 +45,18 @@ const Component: React.FC<Props> = (props: Props) => {
           leftFooterButton: {
             block: true,
             onClick: viewInHistory,
-            children: t('View transaction')
+            children: t('ui.TRANSACTION_DONE.Popup.TransactionDone.viewTransaction')
           },
           rightFooterButton: {
             block: true,
             onClick: goHome,
-            children: t('Back to home')
+            children: t('ui.TRANSACTION_DONE.Popup.TransactionDone.backToHome')
           },
           subHeaderLeft: <CloseIcon />
         }
         : {}
       )}
-      title={t('Submitted')}
+      title={t('ui.TRANSACTION_DONE.Popup.TransactionDone.submitted')}
     >
       <div className={CN(className, {
         '__web-ui': isWebUI
@@ -72,10 +72,10 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         </div>
         <div className='title'>
-          {t('Transaction submitted!')}
+          {t('ui.TRANSACTION_DONE.Popup.TransactionDone.transactionSubmitted')}
         </div>
         <div className='description'>
-          {t('Track transaction progress in the History tab or go back to home')}
+          {t('ui.TRANSACTION_DONE.Popup.TransactionDone.trackTransactionProgressInTheHistoryTabOrGoBackToHome')}
         </div>
         <SocialGroup />
         {isWebUI && (
@@ -92,14 +92,14 @@ const Component: React.FC<Props> = (props: Props) => {
                 block: true,
                 schema: 'secondary',
                 onClick: viewInHistory,
-                children: t('View transaction')
+                children: t('ui.TRANSACTION_DONE.Popup.TransactionDone.viewTransaction')
               }}
             />
             <Button
               {...{
                 block: true,
                 onClick: goHome,
-                children: t('Back to home')
+                children: t('ui.TRANSACTION_DONE.Popup.TransactionDone.backToHome')
               }}
             />
           </div>

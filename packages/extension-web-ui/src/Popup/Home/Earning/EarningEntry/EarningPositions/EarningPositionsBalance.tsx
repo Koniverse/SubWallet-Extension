@@ -127,7 +127,7 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
     <div className={CN(className, 'flex-row', { '-mobile-mode': !isWebUI })}>
       <div className={CN('__block-item', '__total-balance-block')}>
         <div className={'__block-title-wrapper'}>
-          <div className={'__block-title'}>{t('Total value staked')}</div>
+          <div className={'__block-title'}>{t('ui.EARNING_POSITIONS_BALANCE.Popup.Home.Earning.EarningEntry.EarningPositions.EarningPositionsBalance.totalValueStaked')}</div>
           {!isWebUI && <Button
             className='__balance-visibility-toggle'
             icon={
@@ -137,7 +137,7 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
             }
             onClick={onChangeShowBalance}
             size={'xs'}
-            tooltip={isShowBalance ? t('Hide balance') : t('Show balance')}
+            tooltip={isShowBalance ? t('ui.EARNING_POSITIONS_BALANCE.Popup.Home.Earning.EarningEntry.EarningPositions.EarningPositionsBalance.hideBalance') : t('ui.EARNING_POSITIONS_BALANCE.Popup.Home.Earning.EarningEntry.EarningPositions.EarningPositionsBalance.showBalance')}
             type='ghost'
           />}
         </div>
@@ -175,7 +175,7 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
 
           <div className={CN('__block-item', '__balance-block')}>
             <div className='__block-title-wrapper'>
-              <div className={'__block-title'}>{t('Total active stake')}</div>
+              <div className={'__block-title'}>{t('ui.EARNING_POSITIONS_BALANCE.Popup.Home.Earning.EarningEntry.EarningPositions.EarningPositionsBalance.totalActiveStake')}</div>
             </div>
             <Tooltip
               overlayClassName={CN({
@@ -205,7 +205,7 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
 
           <div className={CN('__block-item', '__balance-block')}>
             <div className='__block-title-wrapper'>
-              <div className={'__block-title'}>{t('Total unstake')}</div>
+              <div className={'__block-title'}>{t('ui.EARNING_POSITIONS_BALANCE.Popup.Home.Earning.EarningEntry.EarningPositions.EarningPositionsBalance.totalUnstake')}</div>
             </div>
             <Tooltip
               overlayClassName={CN({
@@ -234,7 +234,7 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
 
           <div className={CN('__block-item', '__balance-block')}>
             <div className='__block-title-wrapper'>
-              <div className={'__block-title'}>{t('Total unclaimed rewards')}</div>
+              <div className={'__block-title'}>{t('ui.EARNING_POSITIONS_BALANCE.Popup.Home.Earning.EarningEntry.EarningPositions.EarningPositionsBalance.totalUnclaimedRewards')}</div>
             </div>
             <Tooltip
               overlayClassName={CN({

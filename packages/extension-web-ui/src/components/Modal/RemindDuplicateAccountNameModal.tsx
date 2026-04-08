@@ -53,7 +53,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
           block={true}
           onClick={onCancel}
         >
-          {t('I understand')}
+          {t('ui.REMIND_DUPLICATE_ACCOUNT_NAME_MODAL.components.Modal.RemindDuplicateAccountNameModal.iUnderstand')}
         </Button>
       </>
     );
@@ -69,7 +69,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         id={RemindDuplicateAccountNameModalId}
         maskClosable={false}
         onCancel={onCancel}
-        title={t('Duplicate account name')}
+        title={t('ui.REMIND_DUPLICATE_ACCOUNT_NAME_MODAL.components.Modal.RemindDuplicateAccountNameModal.duplicateAccountName')}
       >
         <div className={'__modal-content'}>
           <PageIcon
@@ -80,7 +80,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             }}
           />
           <div className='__modal-description'>
-            {t('You have accounts with the same name. We have added characters to these account names to differentiate them. You can change account names later using')}
+            {t('ui.REMIND_DUPLICATE_ACCOUNT_NAME_MODAL.components.Modal.RemindDuplicateAccountNameModal.youHaveAccountsWithTheSameNameWeHaveAddedCharactersToTheseAccountNamesToDifferentiateThemYouCanChangeAccountNamesLaterUsing')}
             <a
               href={CHANGE_ACCOUNT_NAME_URL}
               rel='noreferrer'

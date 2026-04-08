@@ -159,24 +159,24 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
           if (result.error === 'incompatibleNFT') {
             showNotification({
               type: 'error',
-              message: t('Failed to import. Incompatible NFT')
+              message: t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.failedToImportIncompatibleNft')
             });
           } else if (result.success) {
             showNotification({
               type: 'success',
-              message: t('Imported NFT successfully')
+              message: t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.importedNftSuccessfully')
             });
             goBack();
           } else {
             showNotification({
               type: 'error',
-              message: t('An error occurred, please try again')
+              message: t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.anErrorOccurredPleaseTryAgain')
             });
           }
         })
         .catch(() => {
           showNotification({
-            message: t('An error occurred, please try again')
+            message: t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.anErrorOccurredPleaseTryAgain')
           });
         })
         .finally(() => {
@@ -192,7 +192,7 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
       if (parsedValue.length >= 3) {
         resolve();
       } else {
-        reject(new Error(t('Collection name must have at least 3 characters')));
+        reject(new Error(t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.collectionNameMustHaveAtLeast3Characters')));
       }
     });
   }, [t]);
@@ -208,7 +208,7 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
         validator: (_, contractAddress: string): Promise<void> => {
           return new Promise((resolve, reject) => {
             if (!isAddress(contractAddress)) {
-              reject(t('Invalid contract address'));
+              reject(t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.invalidContractAddress'));
             } else {
               const selectedChain = getFieldValue('chain') as string;
               const selectedNftType = getFieldValue('type') as _AssetType;
@@ -227,11 +227,11 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
                     setLoading(false);
 
                     if (validationResult.isExist) {
-                      reject(t('Existed NFT'));
+                      reject(t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.existedNft'));
                     }
 
                     if (validationResult.contractError) {
-                      reject(t('Invalid contract for the selected chain'));
+                      reject(t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.invalidContractForTheSelectedChain'));
                     }
 
                     if (!validationResult.isExist && !validationResult.contractError) {
@@ -242,10 +242,10 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
                   })
                   .catch(() => {
                     setLoading(false);
-                    reject(t('Invalid contract for the selected chain'));
+                    reject(t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.invalidContractForTheSelectedChain'));
                   });
               } else {
-                reject(t('Invalid contract address'));
+                reject(t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.invalidContractAddress'));
               }
             }
           });
@@ -275,9 +275,9 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
           ),
           loading: loading,
           onClick: form.submit,
-          children: t('Import')
+          children: t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.import')
         }}
-        title={t<string>('Import NFT')}
+        title={t<string>('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.importNft')}
       >
         {!modalContent && <SwSubHeader
           background={'transparent'}
@@ -286,7 +286,7 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
           onBack={goBack}
           paddingVertical
           showBackButton
-          title={t('Import NFT')}
+          title={t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.importNft')}
         />}
         <div className={'nft_import__container'}>
           <Form
@@ -307,9 +307,9 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
             >
               <ChainSelector
                 items={chains}
-                label={t<string>('Network')}
-                placeholder={t('Select network')}
-                title={t('Select network')}
+                label={t<string>('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.network')}
+                placeholder={t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.selectNetwork')}
+                title={t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.selectNetwork')}
               />
             </Form.Item>
 
@@ -320,9 +320,9 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
                 className={className}
                 disabled={!selectedChain}
                 items={nftTypeOptions}
-                label={t<string>('Type')}
-                placeholder={t('Select NFT type')}
-                title={t('Select NFT type')}
+                label={t<string>('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.type')}
+                placeholder={t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.selectNftType')}
+                title={t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.selectNftType')}
               />
             </Form.Item>
 
@@ -334,8 +334,8 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
               <AddressInput
                 addressPrefix={chainNetworkPrefix}
                 disabled={!selectedNftType}
-                label={t<string>('Contract address')}
-                placeholder={t('Enter or paste an address')}
+                label={t<string>('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.contractAddress')}
+                placeholder={t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.enterOrPasteAnAddress')}
                 showScanner={true}
               />
             </Form.Item>
@@ -348,7 +348,7 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
             >
               <Input
                 disabled={nameDisabled}
-                label={t<string>('NFT collection name')}
+                label={t<string>('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.nftCollectionName')}
               />
             </Form.Item>
           </Form>

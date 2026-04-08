@@ -68,13 +68,13 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
   }, [yieldPositionsList]);
 
   const filterOptions = useMemo(() => [
-    { label: t('Nomination pool'), value: YieldPoolType.NOMINATION_POOL },
-    { label: t('Direct nomination'), value: YieldPoolType.NATIVE_STAKING },
-    { label: t('Liquid staking'), value: YieldPoolType.LIQUID_STAKING },
-    { label: t('Lending'), value: YieldPoolType.LENDING },
-    { label: t('Parachain staking'), value: YieldPoolType.PARACHAIN_STAKING },
-    { label: t('Single farming'), value: YieldPoolType.SINGLE_FARMING },
-    { label: t('Subnet staking'), value: YieldPoolType.SUBNET_STAKING }
+    { label: t('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.nominationPool'), value: YieldPoolType.NOMINATION_POOL },
+    { label: t('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.directNomination'), value: YieldPoolType.NATIVE_STAKING },
+    { label: t('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.liquidStaking'), value: YieldPoolType.LIQUID_STAKING },
+    { label: t('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.lending'), value: YieldPoolType.LENDING },
+    { label: t('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.parachainStaking'), value: YieldPoolType.PARACHAIN_STAKING },
+    { label: t('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.singleFarming'), value: YieldPoolType.SINGLE_FARMING },
+    { label: t('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.subnetStaking'), value: YieldPoolType.SUBNET_STAKING }
   ], [t]);
 
   const items: YieldPoolInfo[] = useMemo(() => {
@@ -318,8 +318,8 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
     return (
       <EmptyList
         className='__empty-list-earning-pool'
-        emptyMessage={t('Change your search and try again')}
-        emptyTitle={t('No earning option found')}
+        emptyMessage={t('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.changeYourSearchAndTryAgain')}
+        emptyTitle={t('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.noEarningOptionFound')}
         phosphorIcon={Vault}
       />
     );
@@ -369,7 +369,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
         subHeaderBackground={'transparent'}
         subHeaderCenter={false}
         subHeaderPaddingVertical={true}
-        title={t<string>('{{symbol}} earning options', { replace: { symbol: symbol } })}
+        title={t<string>('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.earningOptions', { replace: { symbol: symbol } })}
       >
 
         {
@@ -378,7 +378,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
               <>
                 <Toolbar
                   className={'__desktop-toolbar'}
-                  inputPlaceholder={t<string>('Search token')}
+                  inputPlaceholder={t<string>('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.searchToken')}
                   onClickFilter={onClickFilterButton}
                   onSearch={setSearchInput}
                   searchValue={searchInput}
@@ -406,21 +406,21 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
                 renderWhenEmpty={emptyList}
                 searchFunction={searchFunction}
                 searchMinCharactersCount={1}
-                searchPlaceholder={t<string>('Search token')}
+                searchPlaceholder={t<string>('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.searchToken')}
                 showActionBtn
               />
             )
         }
 
         <FilterModal
-          applyFilterButtonTitle={t('Apply filter')}
+          applyFilterButtonTitle={t('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('Filter')}
+          title={t('ui.EARNING_POOLS.Popup.Home.Earning.EarningPools.filter')}
         />
       </Layout.Base>
 

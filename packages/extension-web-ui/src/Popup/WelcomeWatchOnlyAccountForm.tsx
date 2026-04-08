@@ -72,10 +72,10 @@ const Component: React.FC<Props> = (props: Props) => {
         const { isValid } = await validateAccountName({ name: value });
 
         if (!isValid) {
-          return Promise.reject(t('Account name already in use'));
+          return Promise.reject(t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountNameAlreadyInUse'));
         }
       } catch (e) {
-        return Promise.reject(t('Account name invalid'));
+        return Promise.reject(t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountNameInvalid'));
       }
     }
 
@@ -85,7 +85,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const accountAddressValidator = useCallback(
     (rule: RuleObject, value: string) => {
       if (!value || !value.trim()) {
-        return Promise.reject(t('Account address is required'));
+        return Promise.reject(t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountAddressIsRequired'));
       }
 
       const result = readOnlyScan(value);
@@ -96,14 +96,14 @@ const Component: React.FC<Props> = (props: Props) => {
           if (isSameAddress(account.address, result.content)) {
             setReformatAttachAddress('');
 
-            return Promise.reject(t('Account already exists'));
+            return Promise.reject(t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountAlreadyExists'));
           }
         }
       } else {
         setReformatAttachAddress('');
 
         if (value !== '') {
-          return Promise.reject(t('Invalid address'));
+          return Promise.reject(t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.invalidAddress'));
         }
       }
 
@@ -161,12 +161,12 @@ const Component: React.FC<Props> = (props: Props) => {
         onFieldsChange={onFieldsChange}
         onFinish={onSubmitAttachReadonlyAccount}
       >
-        <div className='form-title lg-text'>{t('Watch any wallet')}?</div>
+        <div className='form-title lg-text'>{t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.watchAnyWallet')}?</div>
         <Form.Item
           name={'address'}
           rules={[
             {
-              message: t('Account address is required'),
+              message: t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountAddressIsRequired'),
               required: true
             },
             {
@@ -176,7 +176,7 @@ const Component: React.FC<Props> = (props: Props) => {
           statusHelpAsTooltip={true}
         >
           <Input
-            placeholder={t('Enter address')}
+            placeholder={t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.enterAddress')}
             prefix={<Wallet size={24} />}
             type={'text'}
           />
@@ -187,7 +187,7 @@ const Component: React.FC<Props> = (props: Props) => {
           hidden={!isAccountNameInputVisible}
           name={'name'}
           rules={[{
-            message: t('Account name is required'),
+            message: t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountNameIsRequired'),
             transform: (value: string) => value.trim(),
             required: true
           },
@@ -201,8 +201,8 @@ const Component: React.FC<Props> = (props: Props) => {
           <Input
             className='__account-name-input'
             disabled={loading}
-            label={t('Account name')}
-            placeholder={t('Enter the account name')}
+            label={t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountName')}
+            placeholder={t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.enterTheAccountName')}
           />
         </Form.Item>
         <Button
@@ -213,7 +213,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={form.submit}
           schema='primary'
         >
-          {t('Add watch-only wallet')}
+          {t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.addWatchOnlyWallet')}
         </Button>
       </Form>
     </>

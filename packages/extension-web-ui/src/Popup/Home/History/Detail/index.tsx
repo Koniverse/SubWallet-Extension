@@ -91,7 +91,7 @@ function Component ({ className = '', data, onCancel }: Props): React.ReactEleme
         }
         onClick={openBlockExplorer(link || '')}
       >
-        {t('View on explorer')}
+        {t('ui.DETAIL.Popup.Home.History.Detail.viewOnExplorer')}
       </Button>
     );
   }, [chainInfoMap, data, openBlockExplorer, t]);

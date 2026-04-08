@@ -92,12 +92,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return [
       {
         desc: false,
-        label: t('Lowest total member'),
+        label: t('ui.EARNING_POOL_SELECTOR.components.Field.Earning.EarningPoolSelector.lowestTotalMember'),
         value: SortKey.MEMBER
       },
       {
         desc: true,
-        label: t('Highest total staked'),
+        label: t('ui.EARNING_POOL_SELECTOR.components.Field.Earning.EarningPoolSelector.highestTotalStaked'),
         value: SortKey.TOTAL_POOLED
       }
     ];
@@ -105,19 +105,19 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const filterOptions: FilterOption[] = useMemo(() => ([
     {
-      label: t('Open'),
+      label: t('ui.EARNING_POOL_SELECTOR.components.Field.Earning.EarningPoolSelector.open'),
       value: 'Open'
     },
     {
-      label: t('Locked'),
+      label: t('ui.EARNING_POOL_SELECTOR.components.Field.Earning.EarningPoolSelector.locked'),
       value: 'Locked'
     },
     {
-      label: t('Destroying'),
+      label: t('ui.EARNING_POOL_SELECTOR.components.Field.Earning.EarningPoolSelector.destroying'),
       value: 'Destroying'
     },
     {
-      label: t('Blocked'),
+      label: t('ui.EARNING_POOL_SELECTOR.components.Field.Earning.EarningPoolSelector.blocked'),
       value: 'Blocked'
     }
   ]), [t]);
@@ -269,7 +269,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           <Tooltip
             key={item.id}
             placement={'top'}
-            title={t('This pool has reached the maximum number of members. Select another to continue')}
+            title={t('ui.EARNING_POOL_SELECTOR.components.Field.Earning.EarningPoolSelector.thisPoolHasReachedTheMaximumNumberOfMembersSelectAnotherToContinue')}
           >
             <div
               className={'__pool-item-wrapper'}
@@ -290,7 +290,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
               <Tooltip
                 key={item.id}
                 placement={'top'}
-                title={t('This pool is blocked. Select another to continue')}
+                title={t('ui.EARNING_POOL_SELECTOR.components.Field.Earning.EarningPoolSelector.thisPoolIsBlockedSelectAnotherToContinue')}
               >
                 <div
                   className={'__pool-item-wrapper'}
@@ -417,7 +417,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         loading={false}
         onClickActionBtn={onClickActionBtn}
         onSelect={_onSelectItem}
-        placeholder={placeholder || t('Select pool')}
+        placeholder={placeholder || t('ui.EARNING_POOL_SELECTOR.components.Field.Earning.EarningPoolSelector.selectPool')}
         prefix={(
           <Avatar
             size={20}
@@ -443,7 +443,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         }}
         searchFunction={searchFunction}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('Search validator')}
+        searchPlaceholder={t<string>('ui.EARNING_POOL_SELECTOR.components.Field.Earning.EarningPoolSelector.searchValidator')}
         selected={value || ''}
         showActionBtn
         statusHelp={statusHelp}
@@ -463,7 +463,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             />
           </div>
         )}
-        title={t('Select pool')}
+        title={t('ui.EARNING_POOL_SELECTOR.components.Field.Earning.EarningPoolSelector.selectPool')}
       />
 
       <FilterModal

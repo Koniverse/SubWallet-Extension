@@ -100,11 +100,11 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const filterOptions: FilterOption[] = useMemo(() => ([
     {
-      label: t('Saved contacts'),
+      label: t('ui.ADDRESS_BOOK.Popup.Settings.AddressBook.savedContacts'),
       value: AccountGroup.CONTACT
     },
     {
-      label: t('Recent'),
+      label: t('ui.ADDRESS_BOOK.Popup.Settings.AddressBook.recent'),
       value: AccountGroup.RECENT
     }
   ]), [t]);
@@ -124,7 +124,7 @@ const Component: React.FC<Props> = (props: Props) => {
         />
       ),
       onClick: openAddContact,
-      tooltip: isWebUI ? t('Add contact') : undefined
+      tooltip: isWebUI ? t('ui.ADDRESS_BOOK.Popup.Settings.AddressBook.addContact') : undefined
     }
   ], [isWebUI, openAddContact, t]);
 
@@ -139,10 +139,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
     switch (_group) {
       case AccountGroup.CONTACT:
-        groupLabel = t('Saved contacts');
+        groupLabel = t('ui.ADDRESS_BOOK.Popup.Settings.AddressBook.savedContacts');
         break;
       case AccountGroup.RECENT:
-        groupLabel = t('Recent');
+        groupLabel = t('ui.ADDRESS_BOOK.Popup.Settings.AddressBook.recent');
         break;
     }
 
@@ -199,7 +199,7 @@ const Component: React.FC<Props> = (props: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={goBack}
         subHeaderIcons={subHeaderIcons}
-        title={t('Manage address book')}
+        title={t('ui.ADDRESS_BOOK.Popup.Settings.AddressBook.manageAddressBook')}
       >
         <SwList.Section
           actionBtnIcon={(
@@ -227,7 +227,7 @@ const Component: React.FC<Props> = (props: Props) => {
           rowGap='var(--row-gap)'
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Account name')}
+          searchPlaceholder={t<string>('ui.ADDRESS_BOOK.Popup.Settings.AddressBook.accountName')}
           showActionBtn={true}
         />
         <FilterModal
@@ -238,7 +238,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('Filter')}
+          title={t('ui.ADDRESS_BOOK.Popup.Settings.AddressBook.filter')}
         />
         <AddContactModal />
         {selectedItem && <EditContactModal addressJson={selectedItem} />}

@@ -46,62 +46,62 @@ const Component: React.FC<Props> = ({ className, pageType }: Props) => {
     return {
       [PAGE_TYPE.NFT_COLLECTION]: {
         icon: Image,
-        title: t('No collectible found'),
-        content: t('Your collectibles will appear here')
+        title: t('ui.NO_CONTENT.components.NoContent.noCollectibleFound'),
+        content: t('ui.NO_CONTENT.components.NoContent.yourCollectiblesWillAppearHere')
       },
       [PAGE_TYPE.INSCRIPTION]: {
         icon: Image,
-        title: t('No inscription found'),
-        content: t('Your inscriptions will appear here')
+        title: t('ui.NO_CONTENT.components.NoContent.noInscriptionFound'),
+        content: t('ui.NO_CONTENT.components.NoContent.yourInscriptionsWillAppearHere')
       },
       [PAGE_TYPE.NFT_COLLECTION_DETAIL]: {
         icon: Image,
-        title: t('No NFT collectible'),
-        content: t('Your NFT collectible will appear here!')
+        title: t('ui.NO_CONTENT.components.NoContent.noNftCollectible'),
+        content: t('ui.NO_CONTENT.components.NoContent.yourNftCollectibleWillAppearHere')
       },
       [PAGE_TYPE.TOKEN]: {
         icon: Coin,
-        title: t('No token found'),
-        content: t('Your token will appear here')
+        title: t('ui.NO_CONTENT.components.NoContent.noTokenFound'),
+        content: t('ui.NO_CONTENT.components.NoContent.yourTokenWillAppearHere')
       },
       [PAGE_TYPE.SEARCH]: {
         icon: MagnifyingGlass,
-        title: t('No results found'),
-        content: t('Please change your search criteria and try again'),
+        title: t('ui.NO_CONTENT.components.NoContent.noResultsFound'),
+        content: t('ui.NO_CONTENT.components.NoContent.pleaseChangeYourSearchCriteriaAndTryAgain'),
         button: {
-          label: t('Manage token list'),
+          label: t('ui.NO_CONTENT.components.NoContent.manageTokenList'),
           icon: SlidersHorizontal
         }
       },
       [PAGE_TYPE.CROWDLOANS]: {
         icon: RocketLaunch,
-        title: t('You’ve not participated in any crowdloans'),
-        content: t('Your crowdloans portfolio will appear here')
+        title: t('ui.NO_CONTENT.components.NoContent.youVeNotParticipatedInAnyCrowdloans'),
+        content: t('ui.NO_CONTENT.components.NoContent.yourCrowdloansPortfolioWillAppearHere')
       },
       [PAGE_TYPE.HISTORY]: {
         icon: ListBullets,
-        title: t('No transaction yet'),
-        content: t('Your transaction history will appear here')
+        title: t('ui.NO_CONTENT.components.NoContent.noTransactionYet'),
+        content: t('ui.NO_CONTENT.components.NoContent.yourTransactionHistoryWillAppearHere')
       },
       [PAGE_TYPE.STAKING]: {
         icon: Trophy,
-        title: t('No staking'),
-        content: t('Your staking accounts will appear here')
+        title: t('ui.NO_CONTENT.components.NoContent.noStaking'),
+        content: t('ui.NO_CONTENT.components.NoContent.yourStakingAccountsWillAppearHere')
       },
       [PAGE_TYPE.STATISTIC]: {
         icon: ChartBar,
-        title: t('There is no data'),
-        content: t('The data will automatically appear when your portfolio has assets')
+        title: t('ui.NO_CONTENT.components.NoContent.thereIsNoData'),
+        content: t('ui.NO_CONTENT.components.NoContent.theDataWillAutomaticallyAppearWhenYourPortfolioHasAssets')
       },
       [PAGE_TYPE.DAPPS]: {
         icon: GlobeHemisphereWest,
-        title: t('No dApps found'),
-        content: t('Your dApps will show up here')
+        title: t('ui.NO_CONTENT.components.NoContent.noDappsFound'),
+        content: t('ui.NO_CONTENT.components.NoContent.yourDappsWillShowUpHere')
       },
       [PAGE_TYPE.MISSION]: {
         icon: GlobeHemisphereWest,
-        title: t('No mission found'),
-        content: t('Your missions will show up here')
+        title: t('ui.NO_CONTENT.components.NoContent.noMissionFound'),
+        content: t('ui.NO_CONTENT.components.NoContent.yourMissionsWillShowUpHere')
       }
     };
   }, [t]);

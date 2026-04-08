@@ -45,7 +45,7 @@ const Component: React.FC<Props> = (props: Props) => {
           icon={closeIcon}
           onClick={onClose}
         >
-          {t('Close')}
+          {t('ui.BASE_DETAIL_MODAL.Popup.Confirmations.parts.Detail.BaseDetailModal.close')}
         </Button>
       )}
       id={modalId}

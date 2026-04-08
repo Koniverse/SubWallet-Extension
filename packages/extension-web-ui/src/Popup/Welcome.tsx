@@ -67,35 +67,35 @@ function Component ({ className }: Props): React.ReactElement<Props> {
 
   const buttonList = useMemo((): WelcomeButtonItem[] => [
     {
-      description: t('Connect to your existing wallet'),
+      description: t('ui.WELCOME.Popup.Welcome.connectToYourExistingWallet'),
       icon: PuzzlePiece,
       id: CONNECT_EXTENSION,
       schema: 'primary',
-      title: t('Connect wallet'),
+      title: t('ui.WELCOME.Popup.Welcome.connectWallet'),
       loading: loadingInject
     },
     {
-      description: t('Create a new account with SubWallet'),
+      description: t('ui.WELCOME.Popup.Welcome.createANewAccountWithSubwallet'),
       icon: PlusCircle,
       id: CREATE_ACCOUNT_MODAL,
       schema: 'secondary',
-      title: t('Create a new account'),
+      title: t('ui.WELCOME.Popup.Welcome.createANewAccount'),
       loading: false
     },
     {
-      description: t('Import an existing account'),
+      description: t('ui.WELCOME.Popup.Welcome.importAnExistingAccount'),
       icon: FileArrowDown,
       id: IMPORT_ACCOUNT_MODAL,
       schema: 'secondary',
-      title: t('Import an account'),
+      title: t('ui.WELCOME.Popup.Welcome.importAnAccount'),
       loading: false
     },
     {
-      description: t('Attach an account without private key'),
+      description: t('ui.WELCOME.Popup.Welcome.attachAnAccountWithoutPrivateKey'),
       icon: Swatches,
       id: ATTACH_ACCOUNT_MODAL,
       schema: 'secondary',
-      title: t('Attach an account'),
+      title: t('ui.WELCOME.Popup.Welcome.attachAnAccount'),
       loading: false
     }
   ], [t, loadingInject]);
@@ -184,10 +184,10 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             }
           </div>
           {
-            isWebUI && (<div className='title'>{t('Welcome to SubWallet!')}</div>)
+            isWebUI && (<div className='title'>{t('ui.WELCOME.Popup.Welcome.welcomeToSubwallet')}</div>)
           }
           <div className='sub-title'>
-            {t('Choose how you\'d like to set up your wallet')}
+            {t('ui.WELCOME.Popup.Welcome.chooseHowYouDLikeToSetUpYourWallet')}
           </div>
         </div>
 

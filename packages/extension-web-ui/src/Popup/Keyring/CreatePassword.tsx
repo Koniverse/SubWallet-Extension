@@ -67,11 +67,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const notification = useNotification();
 
-  const passwordRules = useMemo(() => renderBasePasswordRules(t('Password'), t), [t]);
+  const passwordRules = useMemo(() => renderBasePasswordRules(t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.password'), t), [t]);
   const confirmPasswordRules = useMemo(() => renderBaseConfirmPasswordRules(FormFieldName.PASSWORD, t), [t]);
   const checkBoxValidator = useCallback((rule: RuleObject, value: boolean): Promise<void> => {
     if (!value) {
-      return Promise.reject(new Error(t('CheckBox is required')));
+      return Promise.reject(new Error(t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.checkboxIsRequired')));
     }
 
     return Promise.resolve();
@@ -169,7 +169,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       <Layout.WithSubHeaderOnly
         rightFooterButton={!isWebUI
           ? {
-            children: t('Continue'),
+            children: t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.continue'),
             onClick: form.submit,
             loading: loading,
             disabled: isDisabled,
@@ -183,7 +183,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             onClick: openModal
           }
         ]}
-        title={t('Create a password')}
+        title={t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.createAPassword')}
       >
         <div
           className={CN('body-container', {
@@ -191,7 +191,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           })}
         >
           {!isWebUI && <div className='notify'>
-            {t('This password can only unlock your SubWallet on this browser')}
+            {t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.thisPasswordCanOnlyUnlockYourSubwalletOnThisBrowser')}
           </div>
           }
 
@@ -209,8 +209,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             >
               {isWebUI && <Form.Item>
                 <AlertBox
-                  description={t('Recommended security practice')}
-                  title={t('Always choose a strong password!')}
+                  description={t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.recommendedSecurityPractice')}
+                  title={t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.alwaysChooseAStrongPassword')}
                   type={'warning'}
                 />
               </Form.Item>}
@@ -221,7 +221,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               >
                 <Input.Password
                   onChange={onChangePassword}
-                  placeholder={t('Enter password')}
+                  placeholder={t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.enterPassword')}
                   type='password'
                 />
               </Form.Item>
@@ -232,13 +232,13 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               >
                 <Input.Password
                   onKeyDown={onConfirmPasswordKeyPress}
-                  placeholder={t('Confirm password')}
+                  placeholder={t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.confirmPassword')}
                   type='password'
                 />
               </Form.Item>
               <Form.Item>
                 <div className={'annotation'}>
-                  {t('Passwords should be at least 8 characters in length, including letters and numbers')}
+                  {t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.passwordsShouldBeAtLeast8CharactersInLengthIncludingLettersAndNumbers')}
                 </div>
               </Form.Item>
               <Form.Item
@@ -270,7 +270,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   loading={loading}
                   onClick={form.submit}
                 >
-                  {t('Continue')}
+                  {t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.continue')}
                 </Button>
               )}
             </Form>
@@ -295,7 +295,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   rightIconProps={{
                     icon: <InfoIcon />
                   }}
-                  title={t('Instructions')}
+                  title={t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.instructions')}
                   wrapClassName={className}
                 >
                   <InstructionContainer contents={instructionContents} />

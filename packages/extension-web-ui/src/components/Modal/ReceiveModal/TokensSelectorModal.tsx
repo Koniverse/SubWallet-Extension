@@ -38,15 +38,15 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
 
   const confirmModalProps = useMemo((): SwModalFuncProps => ({
     id: WARNING_LEDGER_RECEIVE_MODAL,
-    title: t<string>('Unsupported network'),
+    title: t<string>('ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.unsupportedNetwork'),
     maskClosable: true,
     closable: true,
-    subTitle: t<string>('Do you still want to get the address?'),
-    okText: t<string>('Get address'),
+    subTitle: t<string>('ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.doYouStillWantToGetTheAddress'),
+    okText: t<string>('ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.getAddress'),
     okCancel: true,
     type: 'warn',
     cancelButtonProps: {
-      children: t<string>('Cancel'),
+      children: t<string>('ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.cancel'),
       schema: 'secondary'
     },
     className: 'ledger-warning-modal'
@@ -77,7 +77,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
       if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(item.originChain)) {
         handleSimpleConfirmModal({
           content: t<string>(
-            'Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.',
+            'ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.ledgerAccountsAreNotCompatibleWithNetworkTokensWillGetStuckIECanTBeTransferredOutOrStakedWhenSentToThisAccountType',
             {
               replace: {
                 ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
@@ -115,7 +115,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
     return () => {
       return handleSimpleConfirmModal({
         content: t<string>(
-          'Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.',
+          'ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.ledgerAccountsAreNotCompatibleWithNetworkTokensWillGetStuckIECanTBeTransferredOutOrStakedWhenSentToThisAccountType',
           {
             replace: {
               ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
@@ -157,7 +157,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
       fullSizeOnMobile
       id={modalId}
       onCancel={onCancel}
-      title={t('Select token')}
+      title={t('ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.selectToken')}
     >
       <SwList.Section
         enableSearchInput={true}
@@ -167,7 +167,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
         renderWhenEmpty={renderEmpty}
         searchFunction={searchFunction}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('Search token')}
+        searchPlaceholder={t<string>('ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.searchToken')}
       />
     </BaseModal>
   );

@@ -91,7 +91,7 @@ const Component: React.FC<Props> = (props: Props) => {
         <ConfirmationGeneralInfo request={request} />
         <Field
           content={chainInfoMap[originChain].name}
-          label={t<string>('Network')}
+          label={t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.network')}
           prefix={(
             <Image
               height={token.fontSizeXL}
@@ -103,11 +103,11 @@ const Component: React.FC<Props> = (props: Props) => {
         />
         <Field
           content={type}
-          tooltip={isWebUI ? t<string>('Token type') : undefined}
+          tooltip={isWebUI ? t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.tokenType') : undefined}
         />
         <Field
           content={toShort(contractAddress)}
-          label={t<string>('Contract address')}
+          label={t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.contractAddress')}
           prefix={
             <SwAvatar
               identPrefix={42}
@@ -117,14 +117,14 @@ const Component: React.FC<Props> = (props: Props) => {
             />
           }
           status={contractError ? 'error' : slug ? 'warning' : ''}
-          statusHelp={contractError ? t('The token contract is invalid.') : slug ? t('The token already exists.') : ''}
+          statusHelp={contractError ? t('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.theTokenContractIsInvalid') : slug ? t('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.theTokenAlreadyExists') : ''}
           suffix={contractSuffix}
         />
         <Row gutter={token.margin}>
           <Col span={12}>
             <Field
               content={symbol}
-              placeholder={t<string>('Symbol')}
+              placeholder={t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.symbol')}
               prefix={
                 <SwAvatar
                   identPrefix={42}
@@ -133,22 +133,22 @@ const Component: React.FC<Props> = (props: Props) => {
                   value={contractAddress}
                 />
               }
-              tooltip={isWebUI ? t<string>('Symbol') : undefined}
+              tooltip={isWebUI ? t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.symbol') : undefined}
               tooltipPlacement='topLeft'
             />
           </Col>
           <Col span={12}>
             <Field
               content={decimals === -1 ? '' : decimals}
-              placeholder={t<string>('Decimals')}
-              tooltip={isWebUI ? t<string>('Decimals') : undefined}
+              placeholder={t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.decimals')}
+              tooltip={isWebUI ? t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.decimals') : undefined}
               tooltipPlacement='topLeft'
             />
           </Col>
         </Row>
         <Field
           content={name}
-          tooltip={t<string>('Token name')}
+          tooltip={t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.tokenName')}
         />
       </div>
       <div className='confirmation-footer'>
@@ -163,7 +163,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.cancel')}
         </Button>
         <Button
           disabled={!!slug || !validated || contractError}
@@ -176,7 +176,7 @@ const Component: React.FC<Props> = (props: Props) => {
           loading={loading}
           onClick={onApprove}
         >
-          {t('Approve')}
+          {t('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.approve')}
         </Button>
       </div>
     </>

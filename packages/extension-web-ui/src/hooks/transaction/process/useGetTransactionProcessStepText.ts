@@ -46,7 +46,7 @@ const useGetTransactionProcessStepText = () => {
         }
       };
 
-      return t('Transfer {{tokenValue}} {{tokenSymbol}} from {{chainName}} to {{destChainName}}', {
+      return t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.transferFromTo', {
         replace: {
           ...analysisMetadata()
         }
@@ -84,7 +84,7 @@ const useGetTransactionProcessStepText = () => {
         }
       };
 
-      return t('Swap {{fromTokenValue}} {{fromTokenSymbol}} on {{fromChainName}} for {{toTokenValue}} {{toTokenSymbol}} on {{toChainName}}', {
+      return t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.swapOnForOn', {
         replace: {
           ...analysisMetadata()
         }
@@ -123,14 +123,14 @@ const useGetTransactionProcessStepText = () => {
        * So simple check with this type is enough
        * */
       if (processStep.type === CommonStepType.TOKEN_APPROVAL) {
-        return t('Approve {{tokenSymbol}} on {{chainName}} for swap', {
+        return t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.approveOnForSwap', {
           replace: {
             ...analysisMetadata()
           }
         });
       }
 
-      return t('Approve {{tokenSymbol}} on {{chainName}} for transfer', {
+      return t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.approveOnForTransfer', {
         replace: {
           ...analysisMetadata()
         }
@@ -138,7 +138,7 @@ const useGetTransactionProcessStepText = () => {
     }
 
     if (processStep.type === SwapStepType.PERMIT) {
-      return t('Sign message to authorize provider');
+      return t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.signMessageToAuthorizeProvider');
     }
 
     if (([
@@ -158,13 +158,13 @@ const useGetTransactionProcessStepText = () => {
           const asset = assetRegistry[brief.token];
 
           const earnMethodMap: Record<string, string> = {
-            [`${YieldPoolType.NOMINATION_POOL}`]: t('Nomination pool'),
-            [`${YieldPoolType.NATIVE_STAKING}`]: t('Direct nomination'),
-            [`${YieldPoolType.LIQUID_STAKING}`]: t('Liquid staking'),
-            [`${YieldPoolType.LENDING}`]: t('Lending'),
-            [`${YieldPoolType.PARACHAIN_STAKING}`]: t('Parachain staking'),
-            [`${YieldPoolType.SINGLE_FARMING}`]: t('Single farming'),
-            [`${YieldPoolType.SUBNET_STAKING}`]: t('Subnet staking')
+            [`${YieldPoolType.NOMINATION_POOL}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.nominationPool'),
+            [`${YieldPoolType.NATIVE_STAKING}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.directNomination'),
+            [`${YieldPoolType.LIQUID_STAKING}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.liquidStaking'),
+            [`${YieldPoolType.LENDING}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.lending'),
+            [`${YieldPoolType.PARACHAIN_STAKING}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.parachainStaking'),
+            [`${YieldPoolType.SINGLE_FARMING}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.singleFarming'),
+            [`${YieldPoolType.SUBNET_STAKING}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.subnetStaking')
           };
 
           return {
@@ -183,7 +183,7 @@ const useGetTransactionProcessStepText = () => {
         }
       };
 
-      return t('Stake {{tokenValue}} {{tokenSymbol}} via {{earnMethod}}', {
+      return t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.stakeVia', {
         replace: {
           ...analysisMetadata()
         }

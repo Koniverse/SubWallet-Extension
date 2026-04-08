@@ -63,7 +63,7 @@ function Component ({ className, compound, onEarnMore, onLeavePool,
           spaceSize='sm'
         >
           <MetaInfo.Status
-            label={t('Earning status')}
+            label={t('ui.EARNING_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.EarningInfoDesktopPart.earningStatus')}
             statusIcon={EarningStatusUi[compound.status].icon}
             statusName={EarningStatusUi[compound.status].name}
             valueColorSchema={EarningStatusUi[compound.status].schema}
@@ -73,13 +73,13 @@ function Component ({ className, compound, onEarnMore, onLeavePool,
             ? (
               <MetaInfo.Chain
                 chain={poolInfo.chain}
-                label={t('Network')}
+                label={t('ui.EARNING_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.EarningInfoDesktopPart.network')}
                 valueColorSchema='gray'
               />
             )
             : (
               <MetaInfo.Default
-                label={t('Subnet')}
+                label={t('ui.EARNING_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.EarningInfoDesktopPart.subnet')}
               >
                 <div className='__subnet-wrapper'>
                   <Logo
@@ -108,7 +108,7 @@ function Component ({ className, compound, onEarnMore, onLeavePool,
             onClick={onLeavePool}
             type={'ghost'}
           >
-            {poolInfo.type === YieldPoolType.LENDING ? t('Withdraw') : t('Unstake')}
+            {poolInfo.type === YieldPoolType.LENDING ? t('ui.EARNING_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.EarningInfoDesktopPart.withdraw') : t('ui.EARNING_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.EarningInfoDesktopPart.unstake')}
           </Button>
 
           <Button
@@ -124,7 +124,7 @@ function Component ({ className, compound, onEarnMore, onLeavePool,
             onClick={onEarnMore}
             type={'ghost'}
           >
-            {poolInfo.type === YieldPoolType.LENDING ? t('Supply more') : t('Stake more')}
+            {poolInfo.type === YieldPoolType.LENDING ? t('ui.EARNING_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.EarningInfoDesktopPart.supplyMore') : t('ui.EARNING_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.EarningInfoDesktopPart.stakeMore')}
           </Button>
         </div>
       </div>
@@ -133,7 +133,7 @@ function Component ({ className, compound, onEarnMore, onLeavePool,
         destroyOnClose={true}
         id={TRANSACTION_YIELD_UNSTAKE_MODAL}
         onCancel={handleCloseUnstake}
-        title={t('Unstake')}
+        title={t('ui.EARNING_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.EarningInfoDesktopPart.unstake')}
       >
         <Transaction
           modalContent={isWebUI}

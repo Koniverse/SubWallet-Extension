@@ -28,7 +28,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   return (
     <MetaInfo className={CN(className)}>
-      <MetaInfo.Data label={t('Message')}>
+      <MetaInfo.Data label={t('ui.MESSAGE.Popup.Confirmations.parts.Detail.Cardano.Message.message')}>
         {message}
       </MetaInfo.Data>
     </MetaInfo>

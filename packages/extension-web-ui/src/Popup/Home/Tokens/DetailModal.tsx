@@ -96,11 +96,11 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
   const viewOptions = useMemo((): ViewOption[] => {
     return [
       {
-        label: t('Token Details'),
+        label: t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.tokenDetails'),
         value: ViewValue.OVERVIEW
       },
       {
-        label: t('Account Details'),
+        label: t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.accountDetails'),
         value: ViewValue.DETAIL
       }
     ];
@@ -119,8 +119,8 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
     const lockedValue = balanceInfo?.locked.value ?? new BigN(0);
 
     return [
-      createItem('transferable', t('Transferable'), transferableValue),
-      createItem('locked', t('Locked'), lockedValue)
+      createItem('transferable', t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.transferable'), transferableValue),
+      createItem('locked', t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.locked'), lockedValue)
     ];
   }, [balanceInfo?.free.value, balanceInfo?.locked.value, currentTokenInfo?.symbol, t]);
 
@@ -208,7 +208,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
       className={CN(className, { 'fix-height': isAllAccount })}
       id={id}
       onCancel={onCancel}
-      title={(isAllAccount && isBitcoinChain) ? t('Account Details') : t('Token details')}
+      title={(isAllAccount && isBitcoinChain) ? t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.accountDetails') : t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.tokenDetails')}
     >
       <Form
         form={form}
@@ -274,11 +274,11 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
                         onClick: onCancel,
                         size: 'xs',
                         shape: 'circle',
-                        children: t('Back to home')
+                        children: t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.backToHome')
                       }}
                       className='__empty-list'
-                      emptyMessage={t('Switch to another token to see account balance')}
-                      emptyTitle={t('No account with {{symbol}} balance found', {
+                      emptyMessage={t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.switchToAnotherTokenToSeeAccountBalance')}
+                      emptyTitle={t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.noAccountWithBalanceFound', {
                         replace: {
                           symbol: symbol
                         }

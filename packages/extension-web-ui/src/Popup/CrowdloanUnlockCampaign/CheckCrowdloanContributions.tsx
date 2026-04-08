@@ -69,7 +69,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
     } else {
       setSubmitResponse({
         status: 'error',
-        message: t('Invalid address. Check again or create a new account to get started.')
+        message: t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.invalidAddressCheckAgainOrCreateANewAccountToGetStarted')
       });
       setIsWrongAddress(true);
     }
@@ -145,7 +145,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
             />
           </div>
           <div className={'__countdown-title'}>
-            {t('Next Polkadot crowdloan unlocking in')}
+            {t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.nextPolkadotCrowdloanUnlockingIn')}
           </div>
           <Countdown
             className={'__countdown'}
@@ -168,7 +168,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
               validateStatus={responseStatus}
             >
               <AddressInput
-                placeholder={t('Enter your Polkadot wallet address')}
+                placeholder={t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.enterYourPolkadotWalletAddress')}
                 prefix={(
                   <Icon
                     phosphorIcon={Wallet}
@@ -192,7 +192,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                 onClick={form.submit}
                 schema='primary'
               >
-                {t('Check your crowdloan contributions')}
+                {t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.checkYourCrowdloanContributions')}
               </Button>
             )
           }
@@ -214,7 +214,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                   onClick={form.submit}
                   schema='secondary'
                 >
-                  {t('Check again')}
+                  {t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.checkAgain')}
                 </Button>
 
                 <Button
@@ -230,7 +230,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                   onClick={onClickCreateNewWallet}
                   schema='primary'
                 >
-                  {t('Create a new account')}
+                  {t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.createANewAccount')}
                 </Button>
               </div>
             )
@@ -241,8 +241,8 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
       <div className={'__footer-area'}>
         <NoteBox
           className={'__note-box'}
-          content={t('There\'re multiple ways you can play with your unlocked DOT, such as native staking, liquid staking, or lending. Check out SubWallet Dashboard for curated options with competitive APY to earn yield on your DOT.')}
-          title={t('Crowdloan unlock, then what?')}
+          content={t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.thereReMultipleWaysYouCanPlayWithYourUnlockedDotSuchAsNativeStakingLiquidStakingOrLendingCheckOutSubwalletDashboardForCuratedOptionsWithCompetitiveApyToEarnYieldOnYourDot')}
+          title={t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.crowdloanUnlockThenWhat')}
         />
 
         <div className='__footer-buttons'>
@@ -262,9 +262,9 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
             schema={'secondary'}
           >
             <div className={'__footer-button-content'}>
-              <div className={'__footer-button-title'}>{t('Rewards: 14.8% - 18.5 %')}</div>
+              <div className={'__footer-button-title'}>{t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.rewards148185')}</div>
 
-              <div className={'__footer-button-subtitle'}>{t('Earn with SubWallet Dashboard')}</div>
+              <div className={'__footer-button-subtitle'}>{t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.earnWithSubwalletDashboard')}</div>
             </div>
           </Button>
 
@@ -284,9 +284,9 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
             schema={'secondary'}
           >
             <div className={'__footer-button-content'}>
-              <div className={'__footer-button-title'}>{t('Frequently asked questions')}</div>
+              <div className={'__footer-button-title'}>{t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.frequentlyAskedQuestions')}</div>
 
-              <div className={'__footer-button-subtitle'}>{t('Learn more about our solution')}</div>
+              <div className={'__footer-button-subtitle'}>{t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.learnMoreAboutOurSolution')}</div>
             </div>
           </Button>
         </div>

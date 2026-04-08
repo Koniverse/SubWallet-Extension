@@ -93,7 +93,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
       const processFunction = () => {
         copyToClipboard(item.address || '');
         notify({
-          message: t('Copied to clipboard')
+          message: t('ui.SELECT_ADDRESS_FORMAT_MODAL.components.Modal.Global.SelectAddressFormatModal.copiedToClipboard')
         });
       };
 
@@ -139,11 +139,11 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
         }
         : undefined
       }
-      title={t<string>('Select address format')}
+      title={t<string>('ui.SELECT_ADDRESS_FORMAT_MODAL.components.Modal.Global.SelectAddressFormatModal.selectAddressFormat')}
     >
       <div>
         <div className={'sub-title'}>
-          {t('Some exchanges are still using legacy format for token deposit and withdrawal. Make sure you choose the correct address format to avoid risks of fund loss. ')}
+          {t('ui.SELECT_ADDRESS_FORMAT_MODAL.components.Modal.Global.SelectAddressFormatModal.someExchangesAreStillUsingLegacyFormatForTokenDepositAndWithdrawalMakeSureYouChooseTheCorrectAddressFormatToAvoidRisksOfFundLoss')}
           <a
             href={LEARN_MORE_DOCS_URL}
             rel='noreferrer'

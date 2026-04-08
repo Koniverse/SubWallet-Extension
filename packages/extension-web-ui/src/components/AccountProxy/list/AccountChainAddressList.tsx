@@ -196,7 +196,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
       const processFunction = () => {
         copyToClipboard(item.address || '');
         notify({
-          message: t('Copied to clipboard')
+          message: t('ui.ACCOUNT_CHAIN_ADDRESS_LIST.components.AccountProxy.list.AccountChainAddressList.copiedToClipboard')
         });
       };
 
@@ -323,7 +323,7 @@ function Component ({ accountProxy, className, isInModal, modalProps }: Props) {
       renderWhenEmpty={emptyList}
       searchFunction={searchFunction}
       searchMinCharactersCount={2}
-      searchPlaceholder={t<string>('Enter network name or address')}
+      searchPlaceholder={t<string>('ui.ACCOUNT_CHAIN_ADDRESS_LIST.components.AccountProxy.list.AccountChainAddressList.enterNetworkNameOrAddress')}
     />
   );
 }

@@ -64,7 +64,7 @@ function Component (props: Props): React.ReactElement<Props> {
         }
         onClick={onApplyFilter}
       >
-        {applyFilterButtonTitle || t('Apply filter')}
+        {applyFilterButtonTitle || t('ui.FILTER_MODAL.components.Modal.FilterModal.applyFilter')}
       </Button>
     );
   }, [t, onApplyFilter, applyFilterButtonTitle]);
@@ -117,7 +117,7 @@ function Component (props: Props): React.ReactElement<Props> {
       footer={filterModalFooter}
       id={id}
       onCancel={onCancel}
-      title={title || t('Filter')}
+      title={title || t('ui.FILTER_MODAL.components.Modal.FilterModal.filter')}
     >
       {
         !!searchBox && (

@@ -71,7 +71,7 @@ const Component: React.FC<Props> = (props: Props) => {
             customSize='28px'
             phosphorIcon={EyeSlash}
           />
-          <span>{t('Hover to view seed phrase')}</span>
+          <span>{t('ui.WORD_PHRASE.components.WordPhrase.hoverToViewSeedPhrase')}</span>
         </div>
       </div>
       <Button
@@ -83,11 +83,11 @@ const Component: React.FC<Props> = (props: Props) => {
         size='xs'
         type='ghost'
       >
-        {t('Copy to the clipboard')}
+        {t('ui.WORD_PHRASE.components.WordPhrase.copyToTheClipboard')}
       </Button>
       { !isWebUI &&
         <>
-          <span style={{ color: token.colorTextLight5, marginTop: '-4px', marginBottom: '-4px' }}>{t('or')}</span>
+          <span style={{ color: token.colorTextLight5, marginTop: '-4px', marginBottom: '-4px' }}>{t('ui.WORD_PHRASE.components.WordPhrase.or')}</span>
           <Button
             disabled={!enableDownload}
             icon={(<></>)}
@@ -96,7 +96,7 @@ const Component: React.FC<Props> = (props: Props) => {
             style={{ textDecoration: 'underline' }}
             type='ghost'
           >
-            {t('Download seed phrase')}
+            {t('ui.WORD_PHRASE.components.WordPhrase.downloadSeedPhrase')}
           </Button>
         </>
 

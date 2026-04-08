@@ -88,7 +88,7 @@ const Component: React.FC<Props> = (props: Props) => {
         title={(
           <>
             <span className={'__modal-title'}>
-              {t('Select provider')}
+              {t('ui.SWAP_QUOTES_SELECTOR_MODAL.components.Modal.Swap.SwapQuotesSelectorModal.selectProvider')}
             </span>
 
             <QuoteResetTime

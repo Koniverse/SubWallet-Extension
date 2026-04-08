@@ -150,13 +150,13 @@ const Component: React.FC = () => {
         <MetaInfo.Number
           className='__label-bottom'
           decimals={decimals}
-          label={t('Expected TAO to receive')}
+          label={t('ui.UNBOND.Popup.Transaction.variants.Unbond.expectedTaoToReceive')}
           suffix={bondedAsset?.symbol || ''}
           value={BigNumber(amountValue).multipliedBy(earningRate)}
         />
         <MetaInfo.Default
           className='__label-bottom'
-          label={t('Conversion rate')}
+          label={t('ui.UNBOND.Popup.Transaction.variants.Unbond.conversionRate')}
         >
           <div className='__subnet-rate'>
             <span
@@ -243,7 +243,7 @@ const Component: React.FC = () => {
 
       return getEarningTimeText(time);
     } else {
-      return t('unknown time');
+      return t('ui.UNBOND.Popup.Transaction.variants.Unbond.unknownTime');
     }
   }, [poolInfo.statistic, t]);
 
@@ -400,7 +400,7 @@ const Component: React.FC = () => {
 
   useEffect(() => {
     if (poolType === YieldPoolType.LENDING) {
-      setCustomScreenTitle(t('Withdraw'));
+      setCustomScreenTitle(t('ui.UNBOND.Popup.Transaction.variants.Unbond.withdraw'));
     }
 
     return () => {
@@ -469,14 +469,14 @@ const Component: React.FC = () => {
               disabled={!isAllAccount}
               doFilter={false}
               externalAccounts={accountList}
-              label={poolInfo.type === YieldPoolType.LENDING ? t('Withdraw from account') : t('Unstake from account')}
+              label={poolInfo.type === YieldPoolType.LENDING ? t('ui.UNBOND.Popup.Transaction.variants.Unbond.withdrawFromAccount') : t('ui.UNBOND.Popup.Transaction.variants.Unbond.unstakeFromAccount')}
             />
           </Form.Item>
           <FreeBalance
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('Available balance')}
+            label={t('ui.UNBOND.Popup.Transaction.variants.Unbond.availableBalance')}
             onBalanceReady={setIsBalanceReady}
           />
 
@@ -530,7 +530,7 @@ const Component: React.FC = () => {
             valuePropName='checked'
           >
             <Checkbox>
-              <span className={'__option-label'}>{t('Fast unstake')}</span>
+              <span className={'__option-label'}>{t('ui.UNBOND.Popup.Transaction.variants.Unbond.fastUnstake')}</span>
             </Checkbox>
           </Form.Item>
 
@@ -570,7 +570,7 @@ const Component: React.FC = () => {
                         >
                           <AlertBox
                             description={t(
-                              'Unable to unstake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your unstake amount or increase slippage and try again',
+                              'ui.TRANSACTION.screen.Transaction.Unbond.unstakeSlippageExceeded',
                               { replace: { slippage: (earningSlippage * 100).toFixed(2) } }
                             )}
                             title='Slippage too high!'
@@ -582,8 +582,8 @@ const Component: React.FC = () => {
                   )
                   : (
                     <AlertBox
-                      description={t('You can withdraw your supplied funds immediately')}
-                      title={t('Withdraw')}
+                      description={t('ui.UNBOND.Popup.Transaction.variants.Unbond.youCanWithdrawYourSuppliedFundsImmediately')}
+                      title={t('ui.UNBOND.Popup.Transaction.variants.Unbond.withdraw')}
                       type={'info'}
                     />
                   )
@@ -592,8 +592,8 @@ const Component: React.FC = () => {
                 <AlertBox
                   description={poolChain === 'bifrost_dot'
                     ? t(`In this mode, ${symbol} will be directly exchanged for ${altSymbol} at the market price without waiting for the unstaking period`)
-                    : t('With fast unstake, you will receive your funds immediately with a higher fee')}
-                  title={t('Fast unstake')}
+                    : t('ui.UNBOND.Popup.Transaction.variants.Unbond.withFastUnstakeYouWillReceiveYourFundsImmediatelyWithAHigherFee')}
+                  title={t('ui.UNBOND.Popup.Transaction.variants.Unbond.fastUnstake')}
                   type={'info'}
                 />
               )}
@@ -613,7 +613,7 @@ const Component: React.FC = () => {
           loading={loading}
           onClick={onPreCheck(form.submit, exType)}
         >
-          {poolInfo.type === YieldPoolType.LENDING ? t('Withdraw') : t('Unstake')}
+          {poolInfo.type === YieldPoolType.LENDING ? t('ui.UNBOND.Popup.Transaction.variants.Unbond.withdraw') : t('ui.UNBOND.Popup.Transaction.variants.Unbond.unstake')}
         </Button>
       </TransactionFooter>
     </>

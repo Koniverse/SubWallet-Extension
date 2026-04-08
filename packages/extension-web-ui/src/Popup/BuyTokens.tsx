@@ -374,7 +374,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
     if (action === 'SELL') {
       if (currentAccountProxy && currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
         notify({
-          message: t('Feature not available for watch-only account'),
+          message: t('ui.BUY_TOKENS.Popup.BuyTokens.featureNotAvailableForWatchOnlyAccount'),
           type: 'info',
           duration: 3
         });
@@ -442,7 +442,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
             console.error(e);
 
             notify({
-              message: t('Unable to redirect you to the selected supplier at the moment. Try again later'),
+              message: t('ui.BUY_TOKENS.Popup.BuyTokens.unableToRedirectYouToTheSelectedSupplierAtTheMomentTryAgainLater'),
               type: 'error',
             });
           }
@@ -529,7 +529,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
           onBack={goHome}
           paddingVertical
           showBackButton
-          title={t('Buy & sell tokens')}
+          title={t('ui.BUY_TOKENS.Popup.BuyTokens.buyAndSellTokens')}
         />
       )}
       <div className={'__scroll-container'}>
@@ -587,8 +587,8 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
               <ServiceSelector
                 disabled={!selectedTokenSlug}
                 items={serviceItems}
-                placeholder={t('Select supplier')}
-                title={t('Select supplier')}
+                placeholder={t('ui.BUY_TOKENS.Popup.BuyTokens.selectSupplier')}
+                title={t('ui.BUY_TOKENS.Popup.BuyTokens.selectSupplier')}
               />
             </Form.Item>
           </div>
@@ -601,14 +601,14 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
           >
             <AccountAddressSelector
               items={accountAddressItems}
-              label={`${t('To')}:`}
+              label={`${t('ui.BUY_TOKENS.Popup.BuyTokens.to')}:`}
               labelStyle={'horizontal'}
             />
           </Form.Item>
         </Form>
 
         <div className={'common-text __note'}>
-          {t('You will be directed to the chosen supplier to complete this transaction')}
+          {t('ui.BUY_TOKENS.Popup.BuyTokens.youWillBeDirectedToTheChosenSupplierToCompleteThisTransaction')}
         </div>
       </div>
 
@@ -625,7 +625,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
           // eslint-disable-next-line react/jsx-no-bind
           onClick={() => onClickNext(buyForm ? 'BUY' : 'SELL')}
         >
-          {buyForm ? t('Buy now') : t('Sell now')}
+          {buyForm ? t('ui.BUY_TOKENS.Popup.BuyTokens.buyNow') : t('ui.BUY_TOKENS.Popup.BuyTokens.sellNow')}
         </Button>
       </div>
       <BaseModal
@@ -644,7 +644,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
               onClick={onReject}
               schema={'secondary'}
             >
-              {t('Cancel')}
+              {t('ui.BUY_TOKENS.Popup.BuyTokens.cancel')}
             </Button>
             <Button
               block={true}
@@ -656,13 +656,13 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
               )}
               onClick={onApprove}
             >
-              {t('Agree')}
+              {t('ui.BUY_TOKENS.Popup.BuyTokens.agree')}
             </Button>
           </>
         )}
         id={modalId}
         onCancel={onReject}
-        title={t('Disclaimer')}
+        title={t('ui.BUY_TOKENS.Popup.BuyTokens.disclaimer')}
       >
         <Trans
           components={{
@@ -674,34 +674,34 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
             ),
             termUrl: (
               <LinkUrl
-                content={t('Terms of Service')}
+                content={t('ui.BUY_TOKENS.Popup.BuyTokens.termsOfService')}
                 url={termUrl}
               />
             ),
             policyUrl: (
               <LinkUrl
-                content={t('Privacy Policy')}
+                content={t('ui.BUY_TOKENS.Popup.BuyTokens.privacyPolicy')}
                 url={policyUrl}
               />
             ),
             contactUrl: (
               <LinkUrl
-                content={t('support site')}
+                content={t('ui.BUY_TOKENS.Popup.BuyTokens.supportSite')}
                 url={contactUrl}
               />
             )
           }}
-          i18nKey={detectTranslate('You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}\'s <termUrl/> and <policyUrl/>. For any question related to {{service}}\'s services, please visit {{service}}\'s <contactUrl/>.')}
+          i18nKey={detectTranslate('ui.BUY_TOKENS.Popup.BuyTokens.youAreNowLeavingSubwalletForMainurlServicesRelatedToCardPaymentsAreProvidedByASeparateThirdPartyPlatformByProceedingAndProcuringServicesFromYouAcknowledgeThatYouHaveReadAndAgreedToSTermurlAndPolicyurlForAnyQuestionRelatedToSServicesPleaseVisitSContacturl')}
           values={{
             service: serviceName
           }}
         />
         <br />
         <Trans
-          i18nKey={detectTranslate('Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}')}
+          i18nKey={detectTranslate('ui.BUY_TOKENS.Popup.BuyTokens.noteThatSomeTokensMayNotBeAvailableForDependingOnYourRegionReviewYourChosenTokenAndRegionBeforeProceedingWithTheTransactionVia')}
           values={{
             service: serviceName,
-            action: t('buying')
+            action: t('ui.BUY_TOKENS.Popup.BuyTokens.buying')
           }}
         />
       </BaseModal>

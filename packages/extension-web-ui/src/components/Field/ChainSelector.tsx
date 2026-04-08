@@ -31,7 +31,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
   const renderChainSelected = useCallback((item: ChainItemType) => {
     if (loading) {
       return (
-        <div className={'__loading-text'}>{t('Loading ...')}</div>
+        <div className={'__loading-text'}>{t('ui.CHAIN_SELECTOR.components.Field.ChainSelector.loading')}</div>
       );
     }
 
@@ -119,17 +119,17 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       label={label}
       loading={loading}
       onSelect={onSelect}
-      placeholder={placeholder || t('Select chain')}
+      placeholder={placeholder || t('ui.CHAIN_SELECTOR.components.Field.ChainSelector.selectChain')}
       prefix={value !== '' && chainLogo}
       renderItem={renderItem}
       renderSelected={renderChainSelected}
       renderWhenEmpty={renderEmpty}
       searchFunction={searchFunction}
       searchMinCharactersCount={2}
-      searchPlaceholder={t<string>('Network name')}
+      searchPlaceholder={t<string>('ui.CHAIN_SELECTOR.components.Field.ChainSelector.networkName')}
       selected={value || ''}
       statusHelp={statusHelp}
-      title={title || label || placeholder || t('Select network')}
+      title={title || label || placeholder || t('ui.CHAIN_SELECTOR.components.Field.ChainSelector.selectNetwork')}
       tooltip={tooltip}
     />
   );

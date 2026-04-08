@@ -255,7 +255,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
   const { assetRegistry, assetSettingMap, multiChainAssetMap, xcmRefMap } = useSelector((root) => root.assetRegistry);
   const { accounts } = useSelector((state: RootState) => state.accountState);
   const [maxTransfer, setMaxTransfer] = useState<string>('0');
-  const checkAction = usePreCheckAction(from, true, detectTranslate('The account you are using is {{accountTitle}}, you cannot send assets with it'));
+  const checkAction = usePreCheckAction(from, true, detectTranslate('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.theAccountYouAreUsingIsYouCannotSendAssetsWithIt'));
   const isZKModeEnabled = useIsMantaPayEnabled(from);
 
   const hideMaxButton = useMemo(() => {
@@ -332,11 +332,11 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
 
   const validateRecipientAddress = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {
     if (!_recipientAddress) {
-      return Promise.reject(t('Recipient address is required'));
+      return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.recipientAddressIsRequired'));
     }
 
     if (!isAddress(_recipientAddress)) {
-      return Promise.reject(t('Invalid recipient address'));
+      return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.invalidRecipientAddress'));
     }
 
     const { chain, destChain, from, to } = form.getFieldsValue();
@@ -351,7 +351,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
       const _addressOnChain = reformatAddress(_recipientAddress, addressPrefix);
 
       if (_addressOnChain !== _recipientAddress) {
-        return Promise.reject(t('Recipient should be a valid {{networkName}} address', { replace: { networkName: destChainInfo.name } }));
+        return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.recipientShouldBeAValidAddress', { replace: { networkName: destChainInfo.name } }));
       }
     }
 
@@ -360,7 +360,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
     if (isOnChain) {
       if (isSameAddress(from, _recipientAddress)) {
         // todo: change message later
-        return Promise.reject(t('The recipient address can not be the same as the sender address'));
+        return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.theRecipientAddressCanNotBeTheSameAsTheSenderAddress'));
       }
 
       const isNotSameAddressType = (isEthereumAddress(from) && !!_recipientAddress && !isEthereumAddress(_recipientAddress)) ||
@@ -368,7 +368,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
 
       if (isNotSameAddressType) {
         // todo: change message later
-        return Promise.reject(t('The recipient address must be same type as the current account address.'));
+        return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.theRecipientAddressMustBeSameTypeAsTheCurrentAccountAddress'));
       }
     } else {
       const isDestChainEvmCompatible = _isChainEvmCompatible(chainInfoMap[destChain]);
@@ -376,9 +376,9 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
       if (isDestChainEvmCompatible !== isEthereumAddress(to)) {
         // todo: change message later
         if (isDestChainEvmCompatible) {
-          return Promise.reject(t('The recipient address must be EVM type'));
+          return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.theRecipientAddressMustBeEvmType'));
         } else {
-          return Promise.reject(t('The recipient address must be Substrate type'));
+          return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.theRecipientAddressMustBeSubstrateType'));
         }
       }
     }
@@ -392,13 +392,13 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
       if (!account.isGeneric && !availableGen.includes(destChainInfo?.substrateInfo?.genesisHash || '')) {
         const destChainName = destChainInfo?.name || 'Unknown';
 
-        return Promise.reject(t('Wrong network. Your Ledger account is not supported by {{network}}. Please choose another receiving account and try again.', { replace: { network: destChainName } }));
+        return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.wrongNetworkYourLedgerAccountIsNotSupportedByPleaseChooseAnotherReceivingAccountAndTryAgain', { replace: { network: destChainName } }));
       }
 
       const ledgerCheck = ledgerMustCheckNetwork(account);
 
       if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(destChainInfo.slug)) {
-        return Promise.reject(t('Ledger {{ledgerApp}} address is not supported for this transfer', { replace: { ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration' } }));
+        return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.ledgerAddressIsNotSupportedForThisTransfer', { replace: { ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration' } }));
       }
     }
 
@@ -407,21 +407,21 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
 
   const validateAmount = useCallback((rule: Rule, amount: string): Promise<void> => {
     if (!amount) {
-      return Promise.reject(t('Amount is required'));
+      return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.amountIsRequired'));
     }
 
     if ((new BN(maxTransfer)).lte(BN_ZERO)) {
-      return Promise.reject(t('You don\'t have enough tokens to proceed'));
+      return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.youDonTHaveEnoughTokensToProceed'));
     }
 
     if ((new BigN(amount)).eq(new BigN(0))) {
-      return Promise.reject(t('Amount must be greater than 0'));
+      return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.amountMustBeGreaterThan0'));
     }
 
     if ((new BigN(amount)).gt(new BigN(maxTransfer))) {
       const maxString = formatBalance(maxTransfer, decimals);
 
-      return Promise.reject(t('Amount must be equal or less than {{number}}', { replace: { number: maxString } }));
+      return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.amountMustBeEqualOrLessThan', { replace: { number: maxString } }));
     }
 
     return Promise.resolve();
@@ -485,7 +485,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
     if (!account) {
       setLoading(false);
       notification({
-        message: t("Can't find account"),
+        message: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.canTFindAccount'),
         type: 'error'
       });
 
@@ -502,7 +502,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
           if (!_isTokenTransferredByEvm(chainAsset)) {
             setLoading(false);
             notification({
-              message: t('Ledger does not support transfer for this token'),
+              message: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.ledgerDoesNotSupportTransferForThisToken'),
               type: 'warning'
             });
 
@@ -647,16 +647,16 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
         openAlert({
           type: NotificationType.WARNING,
           content: t(_getXcmUnstableWarning(originChainInfo, destChainInfo, assetSlug)),
-          title: isMythosFromHydrationToMythos ? t('High fee alert!') : t('Pay attention!'),
+          title: isMythosFromHydrationToMythos ? t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.highFeeAlert') : t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.payAttention'),
           okButton: {
-            text: t('Continue'),
+            text: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.continue'),
             onClick: () => {
               closeAlert();
               doSubmit(values);
             }
           },
           cancelButton: {
-            text: t('Cancel'),
+            text: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.cancel'),
             onClick: closeAlert
           }
         });
@@ -672,17 +672,17 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
       if (bnMinAmount.gt(BN_ZERO) && isTransferAll && chain === destChain) {
         openAlert({
           type: NotificationType.WARNING,
-          content: t('Transferring all will remove all assets on this network. Are you sure?'),
-          title: t('Pay attention!'),
+          content: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.transferringAllWillRemoveAllAssetsOnThisNetworkAreYouSure'),
+          title: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.payAttention'),
           okButton: {
-            text: t('Transfer'),
+            text: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.transfer'),
             onClick: () => {
               closeAlert();
               doSubmit(values);
             }
           },
           cancelButton: {
-            text: t('Cancel'),
+            text: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.cancel'),
             onClick: closeAlert
           }
         });
@@ -825,7 +825,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
       })}
       >
         <div className={'__brief common-text text-light-4 text-center'}>
-          {t('You are performing a transfer of a fungible token')}
+          {t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.youArePerformingATransferOfAFungibleToken')}
         </div>
 
         <Form
@@ -843,7 +843,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
               addressPrefix={fromChainNetworkPrefix}
               disabled={true}
               filter={onFilterAccountFunc}
-              label={t('Send from')}
+              label={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.sendFrom')}
             />
           </Form.Item>
 
@@ -852,9 +852,9 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
               <TokenSelector
                 disabled={true}
                 items={tokenItems}
-                placeholder={t('Select token')}
+                placeholder={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.selectToken')}
                 showChainInSelected
-                tooltip={isWebUI ? t('Select token') : undefined}
+                tooltip={isWebUI ? t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.selectToken') : undefined}
               />
             </Form.Item>
 
@@ -868,8 +868,8 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
               <ChainSelector
                 disabled={true}
                 items={destChainItems}
-                title={t('Select destination chain')}
-                tooltip={isWebUI ? t('Select destination chain') : undefined}
+                title={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.selectDestinationChain')}
+                tooltip={isWebUI ? t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.selectDestinationChain') : undefined}
               />
             </Form.Item>
           </div>
@@ -892,9 +892,9 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
               chain={destChain}
               disabled={true}
               fitNetwork={true}
-              label={t('Send to')}
+              label={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.sendTo')}
               networkGenesisHash={destChainGenesisHash}
-              placeholder={t('Account address')}
+              placeholder={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.accountAddress')}
               saveAddress={true}
               showAddressBook={false}
               showScanner={true}
@@ -918,7 +918,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
               maxValue={maxTransfer}
               onSetMax={onSetMaxTransferable}
               showMaxButton={!hideMaxButton}
-              tooltip={isWebUI ? t('Amount') : undefined}
+              tooltip={isWebUI ? t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.amount') : undefined}
             />
           </Form.Item>
         </Form>
@@ -943,8 +943,8 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
           chain !== destChain && (
             <div className={'__warning_message_cross_chain'}>
               <AlertBox
-                description={t('Cross-chain transfer to an exchange (CEX) will result in loss of funds. Make sure the receiving address is not an exchange address.')}
-                title={t('Pay attention!')}
+                description={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.crossChainTransferToAnExchangeCexWillResultInLossOfFundsMakeSureTheReceivingAddressIsNotAnExchangeAddress')}
+                title={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.payAttention')}
                 type={'warning'}
               />
             </div>
@@ -968,7 +968,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
           onClick={checkAction(form.submit, extrinsicType)}
           schema={isTransferAll ? 'warning' : undefined}
         >
-          {isTransferAll ? t('Transfer all') : t('Transfer')}
+          {isTransferAll ? t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.transferAll') : t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.transfer')}
         </Button>
       </TransactionFooter>
     </>

@@ -69,26 +69,26 @@ const Component: FC<Props> = (props: Props) => {
   const title = useMemo(() => {
     if (isStepCompleted(processData.status)) {
       if (processData.type === ProcessType.SWAP) {
-        return t('Swap success');
+        return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.swapSuccess');
       } else if (processData.type === ProcessType.EARNING) {
-        return t('Stake success');
+        return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.stakeSuccess');
       }
 
-      return t('Transaction success');
+      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.transactionSuccess');
     }
 
     if (isStepFailed(processData.status)) {
       if (processData.type === ProcessType.SWAP) {
-        return t('Swap failed');
+        return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.swapFailed');
       } else if (processData.type === ProcessType.EARNING) {
-        return t('Stake failed');
+        return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.stakeFailed');
       }
 
-      return t('Transaction failed');
+      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.transactionFailed');
     }
 
     if (isStepTimeout(processData.status)) {
-      return t('Transaction timeout');
+      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.transactionTimeout');
     }
 
     if (!currentStep) {
@@ -99,18 +99,18 @@ const Component: FC<Props> = (props: Props) => {
       CommonStepType.XCM,
       YieldStepType.XCM
     ] as BaseStepType[]).includes(currentStep.type)) {
-      return t('Transfer token cross-chain');
+      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.transferTokenCrossChain');
     }
 
     if (currentStep.type === SwapStepType.SWAP) {
-      return t('Swap token');
+      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.swapToken');
     }
 
     if (([
       CommonStepType.TOKEN_APPROVAL,
       YieldStepType.TOKEN_APPROVAL
     ] as BaseStepType[]).includes(currentStep.type)) {
-      return t('Approve token');
+      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.approveToken');
     }
 
     if (([
@@ -123,11 +123,11 @@ const Component: FC<Props> = (props: Props) => {
       YieldStepType.MINT_SDOT,
       YieldStepType.MINT_STDOT
     ] as BaseStepType[]).includes(currentStep.type)) {
-      return t('Stake token');
+      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.stakeToken');
     }
 
     if (currentStep.type === SwapStepType.PERMIT) {
-      return t('Sign message');
+      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.signMessage');
     }
 
     // if (processData.type === ProcessType.SWAP) {

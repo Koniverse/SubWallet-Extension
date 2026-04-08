@@ -56,11 +56,11 @@ function Component (props: Props): React.ReactElement<Props> {
 
     switch (label) {
       case 'dApp':
-        return t('DApp details');
+        return t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.dappDetails');
       case 'Collator':
-        return t('Collator details');
+        return t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.collatorDetails');
       case 'Validator':
-        return t('Validator details');
+        return t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.validatorDetails');
     }
   }, [t, chain]);
 
@@ -116,7 +116,7 @@ function Component (props: Props): React.ReactElement<Props> {
             <>
               <MetaInfo.Number
                 decimals={decimals}
-                label={t('Minimum stake required')}
+                label={t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.minimumStakeRequired')}
                 suffix={symbol}
                 value={minStake}
                 valueColorSchema={'even-odd'}
@@ -125,7 +125,7 @@ function Component (props: Props): React.ReactElement<Props> {
               {totalStake !== '0' && (
                 <MetaInfo.Number
                   decimals={decimals}
-                  label={isBittensorChain ? t('Total stake weight') : t('Total stake')}
+                  label={isBittensorChain ? t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.totalStakeWeight') : t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.totalStake')}
                   suffix={symbol}
                   value={totalStake}
                   valueColorSchema={'even-odd'}
@@ -139,15 +139,15 @@ function Component (props: Props): React.ReactElement<Props> {
                     ? (
                       <Tooltip
                         placement='topLeft'
-                        title={t('Calculated as 18% of the root stake')}
+                        title={t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.calculatedAs18OfTheRootStake')}
                       >
                         <span className={'__tooltip-label'}>
-                          {t('Root weight')}
+                          {t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.rootWeight')}
                           <Icon phosphorIcon={Info} />
                         </span>
                       </Tooltip>
                     )
-                    : t('Own stake')
+                    : t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.ownStake')
                 }
                 suffix={symbol}
                 value={ownStake}
@@ -157,7 +157,7 @@ function Component (props: Props): React.ReactElement<Props> {
               {otherStake !== '0' && (
                 <MetaInfo.Number
                   decimals={decimals}
-                  label={isBittensorChain ? t('Subnet stake') : t('Stake from others')}
+                  label={isBittensorChain ? t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.subnetStake') : t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.stakeFromOthers')}
                   suffix={symbol}
                   value={otherStake}
                   valueColorSchema={'even-odd'}
@@ -166,7 +166,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
               {earningEstimated > 0 && earningEstimated !== '' && (
                 <MetaInfo.Number
-                  label={t('Estimated APY')}
+                  label={t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.estimatedApy')}
                   suffix={'%'}
                   value={earningEstimated}
                   valueColorSchema={'even-odd'}
@@ -174,7 +174,7 @@ function Component (props: Props): React.ReactElement<Props> {
               )}
 
               <MetaInfo.Number
-                label={t('Commission')}
+                label={t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.commission')}
                 suffix={'%'}
                 value={commission}
                 valueColorSchema={'even-odd'}
@@ -182,7 +182,7 @@ function Component (props: Props): React.ReactElement<Props> {
             </>
           )
           : <MetaInfo.Default
-            label={t('Commission')}
+            label={t('ui.EARNING_VALIDATOR_DETAIL_MODAL.components.Modal.Earning.EarningValidatorDetailModal.commission')}
           >
           N/A
           </MetaInfo.Default>

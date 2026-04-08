@@ -65,7 +65,7 @@ const Component: React.FC<Props> = (props: Props) => {
             displayBalanceInfo && (
               <div className='__item-available-balance-wrapper'>
                 <div className='__item-available-balance-label'>
-                  {t('Available')}:
+                  {t('ui.EARNING_OPTION_DESKTOP_ITEM.components.Earning.desktop.EarningOptionDesktopItem.available')}:
                 </div>
                 <Number
                   className={'__item-available-balance-value'}
@@ -96,11 +96,11 @@ const Component: React.FC<Props> = (props: Props) => {
                 </>
               )
           }
-          <div className={'__item-apy-sub-text'}>{t('per year')}</div>
+          <div className={'__item-apy-sub-text'}>{t('ui.EARNING_OPTION_DESKTOP_ITEM.components.Earning.desktop.EarningOptionDesktopItem.perYear')}</div>
         </div>
 
         <div className={'__item-total-stake-wrapper'}>
-          <div className='__item-total-stake-label'>{t('Total value staked')}:</div>
+          <div className='__item-total-stake-label'>{t('ui.EARNING_OPTION_DESKTOP_ITEM.components.Earning.desktop.EarningOptionDesktopItem.totalValueStaked')}:</div>
 
           <Number
             className={'__item-total-stake-value'}

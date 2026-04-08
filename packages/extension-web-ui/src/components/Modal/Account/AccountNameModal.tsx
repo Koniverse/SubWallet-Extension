@@ -44,10 +44,10 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
         const { isValid } = await validateAccountName({ name: value });
 
         if (!isValid) {
-          return Promise.reject(t('Account name already in use'));
+          return Promise.reject(t('ui.ACCOUNT_NAME_MODAL.components.Modal.Account.AccountNameModal.accountNameAlreadyInUse'));
         }
       } catch (e) {
-        return Promise.reject(t('Account name invalid'));
+        return Promise.reject(t('ui.ACCOUNT_NAME_MODAL.components.Modal.Account.AccountNameModal.accountNameInvalid'));
       }
     }
 
@@ -77,10 +77,10 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
       id={modalId}
       maskClosable={false}
       onCancel={onCancel}
-      title={t<string>('Account name')}
+      title={t<string>('ui.ACCOUNT_NAME_MODAL.components.Modal.Account.AccountNameModal.accountName')}
     >
       <div className={'__brief'}>
-        {t('Enter a name for your account.\n You can edit this later.')}
+        {t('ui.ACCOUNT_NAME_MODAL.components.Modal.Account.AccountNameModal.enterANameForYourAccountYouCanEditThisLater')}
       </div>
 
       <Form
@@ -107,7 +107,7 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
             name={'name'}
             rules={[
               {
-                message: t('Account name is required'),
+                message: t('ui.ACCOUNT_NAME_MODAL.components.Modal.Account.AccountNameModal.accountNameIsRequired'),
                 transform: (value: string) => value.trim(),
                 required: true
               },
@@ -120,8 +120,8 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
             <Input
               className='__account-name-input'
               disabled={isLoading}
-              label={t('Account name')}
-              placeholder={t('Enter the account name')}
+              label={t('ui.ACCOUNT_NAME_MODAL.components.Modal.Account.AccountNameModal.accountName')}
+              placeholder={t('ui.ACCOUNT_NAME_MODAL.components.Modal.Account.AccountNameModal.enterTheAccountName')}
             />
           </Form.Item>
         </div>
@@ -140,7 +140,7 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
           loading={isLoading}
           onClick={form.submit}
         >
-          {t('Confirm')}
+          {t('ui.ACCOUNT_NAME_MODAL.components.Modal.Account.AccountNameModal.confirm')}
         </Button>
       </div>
     </BaseModal>

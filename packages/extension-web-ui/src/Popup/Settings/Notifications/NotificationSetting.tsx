@@ -62,19 +62,19 @@ const Component = ({ isInModal, modalProps }: Props): React.ReactElement<Props> 
   const notificationOptions = useMemo((): ShowNoticeOption[] => {
     return [
       {
-        label: t('Claim tokens'),
+        label: t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.claimTokens'),
         value: 'earningClaim'
       },
       {
-        label: t('Withdraw tokens'),
+        label: t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.withdrawTokens'),
         value: 'earningWithdraw'
       },
       {
-        label: t('Claim AVAIL bridge'),
+        label: t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.claimAvailBridge'),
         value: 'availBridgeClaim'
       },
       {
-        label: t('Claim POLYGON bridge'),
+        label: t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.claimPolygonBridge'),
         value: 'polygonBridgeClaim'
       }
     ];
@@ -143,7 +143,7 @@ const Component = ({ isInModal, modalProps }: Props): React.ReactElement<Props> 
           onBack={goBack}
           paddingVertical
           showBackButton
-          title={t('Notification settings')}
+          title={t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.notificationSettings')}
         />
       )}
 
@@ -160,7 +160,7 @@ const Component = ({ isInModal, modalProps }: Props): React.ReactElement<Props> 
                 weight='fill'
               />
             )}
-            name={t('Enable notifications')}
+            name={t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.enableNotifications')}
             rightItem={(
               <Switch
                 checked={currentNotificationSetting.isEnabled}
@@ -170,7 +170,7 @@ const Component = ({ isInModal, modalProps }: Props): React.ReactElement<Props> 
           />
           {currentNotificationSetting.isEnabled && <div className={'content-wrapper'}>
             <div className={'options-container'}>
-              <div className={'option-title'}>{t('Show notifications about')}</div>
+              <div className={'option-title'}>{t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.showNotificationsAbout')}</div>
               {
                 notificationOptions.map((option) => (
                   <div
@@ -198,7 +198,7 @@ const Component = ({ isInModal, modalProps }: Props): React.ReactElement<Props> 
           // todo: handle params for notification setup
           onClick={onSaveNotificationSetup(currentNotificationSetting)}
         >
-          {t('Save settings')}
+          {t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.saveSettings')}
         </Button>
       </div>
     </>
@@ -236,7 +236,7 @@ const Wrapper = (props: WrapperProps) => {
                 }
                 : undefined
               }
-              title={t('Notifications')}
+              title={t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.notifications')}
             >
               <Component
                 isInModal

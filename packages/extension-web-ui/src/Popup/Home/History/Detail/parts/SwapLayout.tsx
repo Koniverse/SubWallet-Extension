@@ -83,16 +83,16 @@ const Component: React.FC<Props> = (props: Props) => {
       {(assetTo.originChain === assetFrom.originChain) && (
         <MetaInfo.Chain
           chain={data.chain}
-          label={t('Network')}
+          label={t('ui.SWAP_LAYOUT.Popup.Home.History.Detail.parts.SwapLayout.network')}
         />
       )}
       <MetaInfo.DisplayType
-        label={t('Transaction type')}
+        label={t('ui.SWAP_LAYOUT.Popup.Home.History.Detail.parts.SwapLayout.transactionType')}
         typeName={t(TxTypeNameMap[data.type])}
       />
       <MetaInfo.Status
         className={CN('__transaction-status')}
-        label={t('Transaction status')}
+        label={t('ui.SWAP_LAYOUT.Popup.Home.History.Detail.parts.SwapLayout.transactionStatus')}
         statusIcon={HistoryStatusMap[data.status].icon}
         statusName={t(HistoryStatusMap[data.status].name)}
         valueColorSchema={HistoryStatusMap[data.status].schema}
@@ -108,8 +108,8 @@ const Component: React.FC<Props> = (props: Props) => {
         />
         <AlertBox
           className={'__swap-quote-warning'}
-          description={t('You can view your swap process and details by clicking View on explorer')}
-          title={t('Helpful tip')}
+          description={t('ui.SWAP_LAYOUT.Popup.Home.History.Detail.parts.SwapLayout.youCanViewYourSwapProcessAndDetailsByClickingViewOnExplorer')}
+          title={t('ui.SWAP_LAYOUT.Popup.Home.History.Detail.parts.SwapLayout.helpfulTip')}
           type='info'
         />
       </>

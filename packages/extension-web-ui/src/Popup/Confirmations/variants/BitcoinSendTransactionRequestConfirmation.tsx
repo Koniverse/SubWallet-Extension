@@ -150,33 +150,33 @@ function Component ({ className, request, type }: Props) {
         <MetaInfo hasBackgroundWrapper>
           <MetaInfo.Account
             address={address}
-            label={t('From account')}
+            label={t('ui.BITCOIN_SEND_TRANSACTION_REQUEST_CONFIRMATION.Popup.Confirmations.variants.BitcoinSendTransactionRequestConfirmation.fromAccount')}
             name={account?.name}
           />
           <MetaInfo.Account
             address={recipient?.address || toValue || ''}
             className='to-account'
-            label={t('To account')}
+            label={t('ui.BITCOIN_SEND_TRANSACTION_REQUEST_CONFIRMATION.Popup.Confirmations.variants.BitcoinSendTransactionRequestConfirmation.toAccount')}
             name={recipient?.name}
           />
 
           <MetaInfo.Chain
             chain={chainValue}
-            label={t('Network')}
+            label={t('ui.BITCOIN_SEND_TRANSACTION_REQUEST_CONFIRMATION.Popup.Confirmations.variants.BitcoinSendTransactionRequestConfirmation.network')}
           />
         </MetaInfo>
 
         <MetaInfo hasBackgroundWrapper>
           <MetaInfo.Number
             decimals={assetInfo?.decimals || 0}
-            label={t('Amount')}
+            label={t('ui.BITCOIN_SEND_TRANSACTION_REQUEST_CONFIRMATION.Popup.Confirmations.variants.BitcoinSendTransactionRequestConfirmation.amount')}
             suffix={assetInfo?.symbol || ''}
             value={amount}
           />
 
           <MetaInfo.Default
             className='__fee-editor'
-            label={t('Estimated fee')}
+            label={t('ui.BITCOIN_SEND_TRANSACTION_REQUEST_CONFIRMATION.Popup.Confirmations.variants.BitcoinSendTransactionRequestConfirmation.estimatedFee')}
           >
             {isFetchingInfo || !transferInfo
               ? (

@@ -35,7 +35,7 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <MetaInfo.Account
           address={data.selectedPool.address}
-          label={t('Pool')}
+          label={t('ui.JOIN_POOL.Popup.Confirmations.variants.Transaction.variants.JoinPool.pool')}
           networkPrefix={42}
         />
 
@@ -47,14 +47,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Amount')}
+          label={t('ui.JOIN_POOL.Popup.Confirmations.variants.Transaction.variants.JoinPool.amount')}
           suffix={symbol}
           value={data.amount}
         />
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Estimated fee')}
+          label={t('ui.JOIN_POOL.Popup.Confirmations.variants.Transaction.variants.JoinPool.estimatedFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
@@ -62,10 +62,8 @@ const Component: React.FC<Props> = (props: Props) => {
 
       <AlertBox
         className={'description'}
-        description={t('Once staked, your funds will be locked and become non-transferable. ' +
-          'To unlock your funds, you need to unstake manually, wait for the unstaking period to' +
-          ' end and then withdraw manually.')}
-        title={t('Your staked funds will be locked')}
+        description={t('ui.JOIN_POOL.Popup.Confirmations.variants.Transaction.variants.JoinPool.onceStakedYourFundsWillBeLockedAndBecomeNonTransferableToUnlockYourFundsYouNeedToUnstakeManuallyWaitForTheUnstakingPeriodToEndAndThenWithdrawManually')}
+        title={t('ui.JOIN_POOL.Popup.Confirmations.variants.Transaction.variants.JoinPool.yourStakedFundsWillBeLocked')}
         type='warning'
       />
     </div>

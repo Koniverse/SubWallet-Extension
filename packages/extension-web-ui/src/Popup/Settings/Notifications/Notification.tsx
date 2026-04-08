@@ -117,15 +117,15 @@ function Component ({ isInModal,
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('All'),
+        label: t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.all'),
         value: NotificationTab.ALL
       },
       {
-        label: t('Unread'),
+        label: t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.unread'),
         value: NotificationTab.UNREAD
       },
       {
-        label: t('Read'),
+        label: t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.read'),
         value: NotificationTab.READ
       }
     ];
@@ -257,11 +257,11 @@ function Component ({ isInModal,
     const chainInfo = chainInfoMap[chainSlug];
 
     const content = action === NotificationActionType.WITHDRAW
-      ? detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start withdrawing your funds')
-      : detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start claiming your funds');
+      ? detectTranslate('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.networkIsCurrentlyDisabledEnableTheNetworkAndThenReClickTheNotificationToStartWithdrawingYourFunds')
+      : detectTranslate('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.networkIsCurrentlyDisabledEnableTheNetworkAndThenReClickTheNotificationToStartClaimingYourFunds');
 
     alertModal.open({
-      title: t('Enable network'),
+      title: t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.enableNetwork'),
       type: NotificationType.WARNING,
       content: t(content, { replace: { networkName: chainInfo?.name || chainSlug } }),
       closable: false,
@@ -270,23 +270,23 @@ function Component ({ isInModal,
         icon: XCircle,
         onClick: alertModal.close,
         schema: 'secondary',
-        text: t('Cancel')
+        text: t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.cancel')
       },
       okButton: {
         icon: CheckCircle,
         onClick: onOk,
-        text: t('Enable')
+        text: t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.enable')
       }
     });
   }, [chainInfoMap, alertModal, t]);
 
   const showWarningModal = useCallback((action: string) => {
     alertModal.open({
-      title: t('You’ve {{action}} tokens', { replace: { action: action } }),
+      title: t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.youVeTokens', { replace: { action: action } }),
       type: NotificationType.INFO,
-      content: t('You’ve already {{action}} your tokens. Check for unread notifications to stay updated on any important', { replace: { action: action } }),
+      content: t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.youVeAlreadyYourTokensCheckForUnreadNotificationsToStayUpdatedOnAnyImportant', { replace: { action: action } }),
       okButton: {
-        text: t('I understand'),
+        text: t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.iUnderstand'),
         onClick: alertModal.close,
         icon: CheckCircle
       }
@@ -539,8 +539,8 @@ function Component ({ isInModal,
     return (
       <EmptyList
         className={'notification-empty-list'}
-        emptyMessage={t('Your notifications will appear here')}
-        emptyTitle={t('No notifications yet')}
+        emptyMessage={t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.yourNotificationsWillAppearHere')}
+        emptyTitle={t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.noNotificationsYet')}
         phosphorIcon={ListBullets}
       />
     );
@@ -560,11 +560,11 @@ function Component ({ isInModal,
           loading: loadingNotification,
           size: 'xs',
           shape: 'circle',
-          children: t('Enable notifications')
+          children: t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.enableNotifications')
         }}
         className={'notification-empty-with-button'}
-        emptyMessage={t('Enable notifications now to not miss anything!')}
-        emptyTitle={t('Notifications are disabled')}
+        emptyMessage={t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.enableNotificationsNowToNotMissAnything')}
+        emptyTitle={t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.notificationsAreDisabled')}
         phosphorIcon={BellSimpleSlash}
       />
     );
@@ -649,7 +649,7 @@ function Component ({ isInModal,
             }
           ]}
           showBackButton
-          title={t('Notifications')}
+          title={t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.notifications')}
         />
       )}
 
@@ -673,7 +673,7 @@ function Component ({ isInModal,
           size='xs'
           type='ghost'
         >
-          {t('Mark all as read')}
+          {t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.markAllAsRead')}
         </Button>
       </div>
 
@@ -685,7 +685,7 @@ function Component ({ isInModal,
                 actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
                 className={'__search-box'}
                 onSearch={handleSearch}
-                placeholder={t<string>('Search notification')}
+                placeholder={t<string>('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.searchNotification')}
                 searchValue={currentSearchText}
                 simpleLayout
               />
@@ -802,7 +802,7 @@ const Wrapper = (props: WrapperProps) => {
                 ),
                 onClick: openNotificationSettingModal
               }}
-              title={t('Notifications')}
+              title={t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.notifications')}
             >
               {mainComponent}
             </BaseModal>
