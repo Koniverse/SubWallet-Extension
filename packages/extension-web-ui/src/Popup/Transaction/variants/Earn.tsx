@@ -742,7 +742,7 @@ const Component = ({ className }: ComponentProps) => {
               title={'Transaction will not be executed if the price changes more than this slippage'}
             >
               <div className={'__max-slippage'}>
-                <div className='__label-bottom'>{t('ui.EARN.Popup.Transaction.variants.Earn.slippage')}</div>
+                <div className='__label-bottom'>{t('ui.TRANSACTION.screen.Transaction.Earn.slippage')}</div>
                 <Icon
                   className='__label-bottom'
                   customSize={'16px'}
@@ -845,7 +845,7 @@ const Component = ({ className }: ComponentProps) => {
               <MetaInfo.Number
                 decimals={0}
                 key={item.slug}
-                label={t('ui.EARN.Popup.Transaction.variants.Earn.youLlReceive')}
+                label={t('ui.TRANSACTION.screen.Transaction.Earn.youllReceive')}
                 suffix={_getAssetSymbol(derivativeAssetInfo)}
                 value={value / item.exchangeRate}
               />
@@ -865,7 +865,7 @@ const Component = ({ className }: ComponentProps) => {
           ? (
             <MetaInfo.Chain
               chain={chainValue}
-              label={t('ui.EARN.Popup.Transaction.variants.Earn.network')}
+              label={t('ui.TRANSACTION.screen.Transaction.Earn.network')}
             />
           )
           : (renderSubnetStaking())
@@ -875,7 +875,7 @@ const Component = ({ className }: ComponentProps) => {
           <MetaInfo.Number
             className='__label-bottom'
             decimals={0}
-            label={t('ui.EARN.Popup.Transaction.variants.Earn.estimatedFee')}
+            label={t('ui.TRANSACTION.screen.Transaction.Earn.estimatedFee')}
             prefix={(currencyData?.isPrefix && currencyData.symbol) || ''}
             suffix={(!currencyData?.isPrefix && currencyData?.symbol) || ''}
             value={estimatedFee}
@@ -1214,8 +1214,8 @@ const Component = ({ className }: ComponentProps) => {
             title: t('ui.EARN.Popup.Transaction.variants.Earn.connectionLost'),
             type: NotificationType.ERROR,
             content: altChain
-              ? t(`${poolChainName} network or ${altChainName} network has lost connection. Re-enable the network and try again`)
-              : t(`${poolChainName} network has lost connection. Re-enable the network and try again`),
+              ? t('ui.TRANSACTION.screen.Transaction.Earn.dualNetworkConnectionLost', { replace: { poolChainName, altChainName } })
+              : t('ui.TRANSACTION.screen.Transaction.Earn.networkConnectionLost', { replace: { poolChainName } }),
             okButton: {
               text: t('ui.EARN.Popup.Transaction.variants.Earn.iUnderstand'),
               onClick: closeAlert,

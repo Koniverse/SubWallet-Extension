@@ -54,19 +54,19 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Account
           address={data.selectedPool.address}
-          label={t('ui.JOIN_POOL.components.Modal.TransactionProcessDetailModal.parts.TransactionInfoBlock.Earn.JoinPool.pool')}
+          label={t('ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Earn.JoinPool.pool')}
           networkPrefix={42}
         />
 
         {/* <MetaInfo.AccountGroup */}
         {/*  accounts={data.address} */}
-        {/*  content={t(`${data.selectedValidators.length} selected validators`)} */}
-        {/*  label={t('Pool')} */}
+        {/*  content={t('ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Earn.Bond.numberSelectedValidator', { replace: { number: data.selectedValidators.length, validatorLabel: 'validators' } })} */}
+        {/*  label={t('ui.TRANSACTION.screen.Transaction.Earn.pool')} */}
         {/* /> */}
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.JOIN_POOL.components.Modal.TransactionProcessDetailModal.parts.TransactionInfoBlock.Earn.JoinPool.amount')}
+          label={t('ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Earn.JoinPool.estimatedFee')}
           suffix={symbol}
           value={data.amount}
         />

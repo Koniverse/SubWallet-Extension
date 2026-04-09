@@ -37,7 +37,7 @@ const Component: React.FC<Props> = (props: Props) => {
         signature: signature
       });
     } else {
-      setError(t('ui.SCAN_SIGNATURE.Popup.Confirmations.parts.Qr.ScanSignature.invalidSignature'));
+      setError(t('ui.DAPP.Confirmations.Qr.ScanSignature.invalidSignature'));
     }
   }, [onSignature, inactiveModal, t]);
 
@@ -58,7 +58,7 @@ const Component: React.FC<Props> = (props: Props) => {
       onSuccess={onSuccess}
       overlay={error && <QrScannerErrorNotice message={error} />}
       selectCameraMotion={isWebUI ? 'move-right' : undefined}
-      title={t('ui.SCAN_SIGNATURE.Popup.Confirmations.parts.Qr.ScanSignature.scanSignature')}
+      title={t('ui.DAPP.Confirmations.Qr.ScanSignature.scanSignature')}
     />
   );
 };

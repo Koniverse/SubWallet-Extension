@@ -64,7 +64,7 @@ function Component ({ authUrlInfo, className, needsTabAuthCheck, onCancel, onCom
 
       switchCurrentNetworkAuthorization({ networkKey: networkSelected, authSwitchNetworkType: networkTypeSupported, url }).then(({ list }) => {
         showNotification({
-          message: t('ui.SWITCH_NETWORK_AUTHORIZE_MODAL.components.Modal.SwitchNetworkAuthorizeModal.switchedNetworkSuccessfully')
+          message: t('ui.DAPP.components.Modal.SwitchNetworkAuthorize.switchedNetworkSuccessfully')
         });
         onComplete(list);
       }).catch(console.error).finally(() => {
@@ -95,7 +95,7 @@ function Component ({ authUrlInfo, className, needsTabAuthCheck, onCancel, onCom
       items={networkItems}
       loading={loading}
       onChange={onSelectNetwork}
-      title={t('ui.SWITCH_NETWORK_AUTHORIZE_MODAL.components.Modal.SwitchNetworkAuthorizeModal.selectNetwork')}
+      title={t('ui.DAPP.components.Modal.SwitchNetworkAuthorize.selectNetwork')}
       value={networkSelected}
     />
   );

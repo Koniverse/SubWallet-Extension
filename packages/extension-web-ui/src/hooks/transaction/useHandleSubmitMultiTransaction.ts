@@ -63,7 +63,7 @@ const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonPro
               _errors[0]?.message.startsWith('connection not open on send()')
             ) {
               notify({
-                message: t('ui.USE_HANDLE_SUBMIT_MULTI_TRANSACTION.hooks.transaction.useHandleSubmitMultiTransaction.yourSelectedNetworkHasLostConnectionUpdateItByReEnablingItOrChangingNetworkProvider'),
+                message: t('ui.TRANSACTION.hook.transaction.useHandleSubmitMulti.selectedNetworkLostConnection'),
                 type: 'error',
                 duration: 8
               });

@@ -48,7 +48,7 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         </div>
         <div className='message-content'>
-          {t('ui.PIN_EXTENSION_MESSAGE.components.PinExtensionMessage.pinSubwalletToToolbarForEasierAccess')}
+          {t('ui.SETTING.components.PinExtensionMessage.pinSubWalletToToolbar')}
         </div>
       </div>
       <div className='message-sub-content'>
@@ -59,7 +59,7 @@ const Component: React.FC<Props> = (props: Props) => {
               <Icon phosphorIcon={PushPinSimple} />
             )
           }}
-          i18nKey={detectTranslate('ui.PIN_EXTENSION_MESSAGE.components.PinExtensionMessage.clickExtensionSelectSubwalletAndThenPin')}
+          i18nKey={detectTranslate('ui.SETTING.components.PinExtensionMessage.pinExtensionInstruction')}
         />
       </div>
     </div>

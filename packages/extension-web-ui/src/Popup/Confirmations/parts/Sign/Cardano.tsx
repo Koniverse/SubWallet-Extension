@@ -80,7 +80,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
       if (currentTime >= txExpirationTime) {
         notify({
-          message: t('ui.CARDANO.Popup.Confirmations.parts.Sign.Cardano.transactionExpired'),
+          message: t('ui.DAPP.Confirmations.Sign.Cardano.transactionExpired'),
           type: 'error'
         });
         onCancel();
@@ -130,7 +130,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick={onCancel}
             schema={'primary'}
           >
-            {t('ui.CARDANO.Popup.Confirmations.parts.Sign.Cardano.iUnderstand')}
+            {t('ui.DAPP.Confirmations.Sign.Cardano.iUnderstand')}
           </Button>
           : <Button
             disabled={loading}
@@ -143,7 +143,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick={onCancel}
             schema={'secondary'}
           >
-            {t('ui.CARDANO.Popup.Confirmations.parts.Sign.Cardano.cancel')}
+            {t('ui.DAPP.Confirmations.Sign.Cardano.cancel')}
           </Button>
       }
       {!isErrorTransaction && <Button
@@ -157,7 +157,7 @@ const Component: React.FC<Props> = (props: Props) => {
         loading={loading}
         onClick={onConfirm}
       >
-        {t('ui.CARDANO.Popup.Confirmations.parts.Sign.Cardano.approve')}
+        {t('ui.DAPP.Confirmations.Sign.Cardano.approve')}
       </Button> }
     </div>
   );

@@ -86,7 +86,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
         />}
         onClick={handleAddProvider}
       >
-        {t('ui.PROVIDER_SELECTOR.components.Field.ProviderSelector.addNewProvider')}
+        {t('ui.NETWORK.components.Field.ProviderSelector.addNewProvider')}
       </Button>
     );
   }, [handleAddProvider, t, token.colorTextLight1]);
@@ -102,7 +102,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
       items={providerValueList()}
       label={label}
       onSelect={onSelect}
-      placeholder={placeholder || t('ui.PROVIDER_SELECTOR.components.Field.ProviderSelector.selectProvider')}
+      placeholder={placeholder || t('ui.NETWORK.components.Field.ProviderSelector.selectProvider')}
       prefix={(
         <Icon
           customSize={'24px'}
@@ -116,7 +116,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
       renderSelected={renderSelectedProvider}
       selected={value || ''}
       statusHelp={statusHelp}
-      title={label || placeholder || t('ui.PROVIDER_SELECTOR.components.Field.ProviderSelector.selectProvider')}
+      title={label || placeholder || t('ui.NETWORK.components.Field.ProviderSelector.selectProvider')}
     />
   );
 };

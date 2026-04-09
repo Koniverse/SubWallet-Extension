@@ -39,7 +39,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
         key: isAllowed ? 'block' : 'unblock',
         icon: isAllowed ? ShieldSlash : ShieldCheck,
         iconBackgroundColor: isAllowed ? token.colorError : token.colorSuccess,
-        title: isAllowed ? t('ui.DAPP_CONFIGURATION_MODAL.components.Modal.DAppConfigurationModal.blockThisSite') : t('ui.DAPP_CONFIGURATION_MODAL.components.Modal.DAppConfigurationModal.unblockThisSite'),
+        title: isAllowed ? t('ui.DAPP.components.Modal.DAppConfiguration.blockThisSite') : t('ui.DAPP.components.Modal.DAppConfiguration.unblockThisSite'),
         onClick: () => {
           toggleAuthorization(authInfo.id)
             .then(({ list }) => {
@@ -53,7 +53,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
         key: 'forget-site',
         icon: X,
         iconBackgroundColor: token.colorWarning,
-        title: t('ui.DAPP_CONFIGURATION_MODAL.components.Modal.DAppConfigurationModal.forgetThisSite'),
+        title: t('ui.DAPP.components.Modal.DAppConfiguration.forgetThisSite'),
         onClick: () => {
           forgetSite(authInfo.id, updateAuthUrls).catch(console.error);
           onCloseActionModal();
@@ -67,7 +67,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
           key: 'disconnect-all',
           icon: Plugs,
           iconBackgroundColor: token['gray-3'],
-          title: t('ui.DAPP_CONFIGURATION_MODAL.components.Modal.DAppConfigurationModal.disconnectAllAccounts'),
+          title: t('ui.DAPP.components.Modal.DAppConfiguration.disconnectAllAccounts'),
           onClick: () => {
             changeAuthorization(false, authInfo.id, updateAuthUrls).catch(console.error);
             onCloseActionModal();
@@ -77,7 +77,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
           key: 'connect-all',
           icon: PlugsConnected,
           iconBackgroundColor: token['green-6'],
-          title: t('ui.DAPP_CONFIGURATION_MODAL.components.Modal.DAppConfigurationModal.connectAllAccounts'),
+          title: t('ui.DAPP.components.Modal.DAppConfiguration.connectAllAccounts'),
           onClick: () => {
             changeAuthorization(true, authInfo.id, updateAuthUrls).catch(console.error);
             onCloseActionModal();
@@ -90,7 +90,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
           key: 'switch-network',
           icon: ArrowsLeftRight,
           iconBackgroundColor: token['geekblue-6'],
-          title: t('ui.DAPP_CONFIGURATION_MODAL.components.Modal.DAppConfigurationModal.switchNetwork'),
+          title: t('ui.DAPP.components.Modal.DAppConfiguration.switchNetwork'),
           onClick: () => {
             switchNetworkAuthorizeModal.open(
               {
@@ -115,7 +115,7 @@ function Component ({ authInfo, className = '' }: Props): React.ReactElement<Pro
       className={`${className} action-modal`}
       id={modalId}
       onCancel={onCloseActionModal}
-      title={t('ui.DAPP_CONFIGURATION_MODAL.components.Modal.DAppConfigurationModal.dappConfiguration')}
+      title={t('ui.DAPP.components.Modal.DAppConfiguration.dappConfiguration')}
     />
   );
 }

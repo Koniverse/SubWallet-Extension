@@ -12,8 +12,8 @@ const GeneralEmptyList: React.FC = () => {
 
   return (
     <EmptyList
-      emptyMessage={t('ui.GENERAL_EMPTY_LIST.components.EmptyList.GeneralEmptyList.changeYourSearchCriteriaAndTryAgain')}
-      emptyTitle={t('ui.GENERAL_EMPTY_LIST.components.EmptyList.GeneralEmptyList.noResultsFound')}
+      emptyMessage={t('ui.components.EmptyList.General.changeSearchCriteriaAndTryAgain')}
+      emptyTitle={t('ui.components.EmptyList.General.noResultsFound')}
       phosphorIcon={MagnifyingGlass}
     />
   );

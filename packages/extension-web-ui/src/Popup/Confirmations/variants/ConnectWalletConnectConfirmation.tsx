@@ -54,8 +54,8 @@ function Component ({ className, request }: Props) {
   const [networkNeedToImport, setNetworkNeedToImport] = useState<string[]>([]);
 
   const accountTypeNameMap = useMemo((): Record<string, string> => ({
-    [AccountChainType.ETHEREUM]: t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.evmAccounts'),
-    [AccountChainType.SUBSTRATE]: t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.substrateAccounts')
+    [AccountChainType.ETHEREUM]: t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.evmAccounts'),
+    [AccountChainType.SUBSTRATE]: t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.substrateAccounts')
   }), [t]);
 
   useEffect(() => {
@@ -215,8 +215,8 @@ function Component ({ className, request }: Props) {
           (isUnSupportCase || blockAddNetwork || hasNoNamespaceAccounts) && (
             <>
               <AlertBox
-                description={t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.thereIsAtLeast1ChosenNetworkUnavailable')}
-                title={t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.unsupportedNetwork')}
+                description={t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.atLeastOneNetworkUnavailable')}
+                title={t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.unsupportedNetwork')}
                 type='warning'
               />
               <WCNetworkSupported
@@ -230,8 +230,8 @@ function Component ({ className, request }: Props) {
           noNetwork && (
             (
               <AlertBox
-                description={t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.weAreUnableToDetectAnyNetworkFromTheDappThroughWalletconnect')}
-                title={t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.networkUndetected')}
+                description={t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.unableToDetectNetworkWc')}
+                title={t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.networkUndetected')}
                 type='warning'
               />
             )
@@ -241,8 +241,8 @@ function Component ({ className, request }: Props) {
           !isUnSupportCase && !noNetwork && isExpired && (
             <>
               <AlertBox
-                description={t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.connectionExpiredPleaseCreateANewConnectionFromDapp')}
-                title={t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.connectionExpired')}
+                description={t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.connectionExpiredCreateNew')}
+                title={t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.connectionExpired')}
                 type='warning'
               />
             </>
@@ -263,7 +263,7 @@ function Component ({ className, request }: Props) {
                       {!supportOneChain && (
                         <>
                           <div className='namespace-title'>
-                            {supportOneAccountType ? t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.networks') : accountTypeNameMap[namespace]}
+                            {supportOneAccountType ? t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.networks') : accountTypeNameMap[namespace]}
                           </div>
                           <WCNetworkSelected
                             id={`${namespace}-networks`}
@@ -274,7 +274,7 @@ function Component ({ className, request }: Props) {
                       {
                         supportOneAccountType && (
                           <div className='account-list-title'>
-                            {t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.chooseTheAccountSYouDLikeToConnect')}
+                            {t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.chooseAccountsToConnect')}
                           </div>
                         )
                       }
@@ -312,7 +312,7 @@ function Component ({ className, request }: Props) {
               onClick={onCancel}
               schema={'secondary'}
             >
-              {t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.cancel')}
+              {t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.cancel')}
             </Button>
           )
         }
@@ -331,7 +331,7 @@ function Component ({ className, request }: Props) {
                 onClick={onCancel}
                 schema={'secondary'}
               >
-                {t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.cancel')}
+                {t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.cancel')}
               </Button>
               <Button
                 disabled={!allowSubmit}
@@ -344,7 +344,7 @@ function Component ({ className, request }: Props) {
                 loading={loading}
                 onClick={onConfirm}
               >
-                {t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.approve')}
+                {t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.approve')}
               </Button>
             </>
           )
@@ -364,7 +364,7 @@ function Component ({ className, request }: Props) {
                   onClick={onCancel}
                   schema={'secondary'}
                 >
-                  {t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.cancel')}
+                  {t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.cancel')}
                 </Button>
                 <Button
                   disabled={loading}
@@ -376,7 +376,7 @@ function Component ({ className, request }: Props) {
                   )}
                   onClick={onAddAccount}
                 >
-                  {t('ui.CONNECT_WALLET_CONNECT_CONFIRMATION.Popup.Confirmations.variants.ConnectWalletConnectConfirmation.createOne')}
+                  {t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.createOne')}
                 </Button>
               </>
             )

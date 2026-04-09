@@ -45,7 +45,7 @@ export const ChainConnectionWrapper = ({ alertModalId,
       }
 
       <LoadingModal
-        loadingText={t('ui.CHAIN_CONNECTION_WRAPPER.Popup.Home.Earning.shared.ChainConnectionWrapper.gettingData')}
+        loadingText={t('ui.EARNING.screen.Earning.shared.gettingData')}
         modalId={chainConnectionLoadingModalId}
       />
 

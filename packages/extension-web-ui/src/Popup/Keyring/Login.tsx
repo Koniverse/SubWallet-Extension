@@ -91,10 +91,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             />
           </div>
           <div className='title'>
-            {t('ui.LOGIN.Popup.Keyring.Login.welcomeBack')}
+            {t('ui.ACCOUNT.screen.Keyring.Login.welcomeBack')}
           </div>
           <div className='sub-title'>
-            {t('ui.LOGIN.Popup.Keyring.Login.enterYourPasswordToUnlockWallet')}
+            {t('ui.ACCOUNT.screen.Keyring.Login.enterPasswordToUnlock')}
           </div>
           <Form
             form={form}
@@ -106,7 +106,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               name={FormFieldName.PASSWORD}
               rules={[
                 {
-                  message: t('ui.LOGIN.Popup.Keyring.Login.passwordIsRequired'),
+                  message: t('ui.ACCOUNT.screen.Keyring.Login.passwordIsRequired'),
                   required: true
                 }
               ]}
@@ -115,7 +115,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               <Input.Password
                 containerClassName='password-input'
                 id={passwordInputId}
-                placeholder={t('ui.LOGIN.Popup.Keyring.Login.password')}
+                placeholder={t('ui.ACCOUNT.screen.Keyring.Login.password')}
               />
             </Form.Item>
             <Form.Item>
@@ -125,7 +125,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 htmlType='submit'
                 loading={loading}
               >
-                {t('ui.LOGIN.Popup.Keyring.Login.unlock')}
+                {t('ui.ACCOUNT.screen.Keyring.Login.unlock')}
               </Button>
             </Form.Item>
             <Form.Item>
@@ -133,7 +133,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 className='forgot-password'
                 onClick={onReset}
               >
-                {t('ui.LOGIN.Popup.Keyring.Login.donTRememberYourPassword')}
+                {t('ui.ACCOUNT.screen.Keyring.Login.dontRememberPassword')}
               </div>
             </Form.Item>
           </Form>

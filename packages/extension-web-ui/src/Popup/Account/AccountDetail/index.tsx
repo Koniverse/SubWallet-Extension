@@ -120,21 +120,21 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     const result = [
       {
-        label: t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.accountAddress'),
+        label: t('ui.ACCOUNT.screen.Account.Detail.accountAddress'),
         value: FilterTabType.ACCOUNT_ADDRESS
       }
     ];
 
     if (showDerivedAccounts) {
       result.push({
-        label: t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.derivedAccount'),
+        label: t('ui.ACCOUNT.screen.Account.Detail.derivedAccount'),
         value: FilterTabType.DERIVED_ACCOUNT
       });
     }
 
     if (showDerivationInfoTab) {
       result.push({
-        label: t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.derivationInfo'),
+        label: t('ui.ACCOUNT.screen.Account.Detail.derivationInfo'),
         value: FilterTabType.DERIVATION_INFO
       });
     }
@@ -165,11 +165,11 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
 
   const onDelete = useCallback(() => {
     alertModal.open({
-      title: t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.confirmation'),
+      title: t('ui.ACCOUNT.screen.Account.Detail.confirmation'),
       type: NotificationType.WARNING,
-      content: t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.youWillNoLongerBeAbleToAccessThisAccountViaThisExtension'),
+      content: t('ui.ACCOUNT.screen.Account.Detail.removeAccountAccessWarning'),
       okButton: {
-        text: t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.remove'),
+        text: t('ui.ACCOUNT.screen.Account.Detail.remove'),
         onClick: () => {
           doDelete();
           alertModal.close();
@@ -200,7 +200,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
   // @ts-ignore
   const onCopyAddress = useCallback(() => {
     notify({
-      message: t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.copiedToClipboard')
+      message: t('ui.ACCOUNT.screen.Account.Detail.copiedToClipboard')
     });
   }, [notify, t]);
 
@@ -220,10 +220,10 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
         const { isValid } = await validateAccountName({ name: value, proxyId: accountProxyId });
 
         if (!isValid) {
-          return Promise.reject(t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.accountNameAlreadyInUse'));
+          return Promise.reject(t('ui.ACCOUNT.screen.Account.Detail.accountNameInUse'));
         }
       } catch (e) {
-        return Promise.reject(t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.accountNameInvalid'));
+        return Promise.reject(t('ui.ACCOUNT.screen.Account.Detail.accountNameInvalid'));
       }
     }
 
@@ -283,7 +283,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
           onClick={onDelete}
           schema='error'
         >
-          {t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.deleteAccount')}
+          {t('ui.ACCOUNT.screen.Account.Detail.deleteAccount')}
         </Button>
       );
     }
@@ -316,7 +316,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
         onClick={onDerive}
         schema='secondary'
       >
-        {t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.derive')}
+        {t('ui.ACCOUNT.screen.Account.Detail.derive')}
       </Button>
       <Button
         block={true}
@@ -330,7 +330,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
         onClick={onExport}
         schema='secondary'
       >
-        {t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.export')}
+        {t('ui.ACCOUNT.screen.Account.Detail.export')}
       </Button>
     </>;
   }, [accountProxy, deleting, deriving, onDelete, onDerive, onExport, t]);
@@ -374,8 +374,8 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
           >
             <Input
               disabled={true}
-              label={t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.derivationPath')}
-              placeholder={t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.derivationPath')}
+              label={t('ui.ACCOUNT.screen.Account.Detail.derivationPath')}
+              placeholder={t('ui.ACCOUNT.screen.Account.Detail.derivationPath')}
             />
           </Form.Item>
           {!!parentDerivedAccountProxy && <Form.Item
@@ -384,8 +384,8 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
           >
             <Input
               disabled={true}
-              label={t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.parentAccount')}
-              placeholder={t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.parentAccount')}
+              label={t('ui.ACCOUNT.screen.Account.Detail.parentAccount')}
+              placeholder={t('ui.ACCOUNT.screen.Account.Detail.parentAccount')}
             />
           </Form.Item>}
         </Form>
@@ -408,7 +408,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
             }
           ]
       )}
-      title={t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.accountDetails')}
+      title={t('ui.ACCOUNT.screen.Account.Detail.accountDetails')}
     >
       <div className='body-container'>
         <div className='main-content-area'>
@@ -434,7 +434,7 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
                 name={FormFieldName.NAME}
                 rules={[
                   {
-                    message: t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.accountNameIsRequired'),
+                    message: t('ui.ACCOUNT.screen.Account.Detail.accountNameRequired'),
                     transform: (value: string) => value.trim(),
                     required: true
                   },
@@ -447,9 +447,9 @@ const Component: React.FC<ComponentProps> = ({ accountProxy, onBack, requestView
                 <Input
                   className='account-name-input'
                   disabled={false}
-                  label={t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.accountName')}
+                  label={t('ui.ACCOUNT.screen.Account.Detail.accountName')}
                   onBlur={form.submit}
-                  placeholder={t('ui.ACCOUNT_DETAIL.Popup.Account.AccountDetail.accountName')}
+                  placeholder={t('ui.ACCOUNT.screen.Account.Detail.accountName')}
                   suffix={(
                     <AccountChainTypeLogos
                       chainTypes={accountProxy.chainTypes}

@@ -27,7 +27,7 @@ const Component: React.FC<Props> = ({ className, isDataEmpty, onClickReload, val
       direction: 'vertical',
       duration: 1.8,
       closable: false,
-      message: t('ui.EMPTY_VALIDATOR.components.Account.EmptyValidator.reloading')
+      message: t('ui.ACCOUNT.components.Account.EmptyValidator.reloading')
     });
     onClickReload(true);
   }, [notify, onClickReload, t]);
@@ -43,14 +43,14 @@ const Component: React.FC<Props> = ({ className, isDataEmpty, onClickReload, val
         }}
       />
       <div className='message'>
-        {t('ui.EMPTY_VALIDATOR.components.Account.EmptyValidator.noResultsFound')}
+        {t('ui.ACCOUNT.components.Account.EmptyValidator.noResultsFound')}
       </div>
       {
         isDataEmpty
           ? (
             <div className={'data-empty-msg'}>
               <div className='description'>
-                {t('ui.EMPTY_VALIDATOR.components.Account.EmptyValidator.reloadToFetchInformation', { replace: { value: validatorTitle } })}
+                {t('ui.ACCOUNT.components.Account.EmptyValidator.reloadToFetchInfo', { replace: { value: validatorTitle } })}
               </div>
               <div className={'description'}>
                 <Trans
@@ -62,14 +62,14 @@ const Component: React.FC<Props> = ({ className, isDataEmpty, onClickReload, val
                       />
                     )
                   }}
-                  i18nKey={detectTranslate('ui.EMPTY_VALIDATOR.components.Account.EmptyValidator.pleaseHighlightReloadHighlight')}
+                  i18nKey={detectTranslate('ui.ACCOUNT.components.Account.EmptyValidator.pleaseReload')}
                 />
               </div>
             </div>
           )
           : (
             <div className='description'>
-              {t('ui.EMPTY_VALIDATOR.components.Account.EmptyValidator.pleaseChangeYourSearchCriteriaTryAgain')}
+              {t('ui.ACCOUNT.components.Account.EmptyValidator.changeSearchCriteria')}
             </div>
           )
       }

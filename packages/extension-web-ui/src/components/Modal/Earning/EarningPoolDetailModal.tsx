@@ -51,7 +51,7 @@ function Component ({ chain, className, detailItem, maxPoolMembersValue, onCance
       className={className}
       id={EarningPoolDetailModalId}
       onCancel={onCancel}
-      title={t('ui.EARNING_POOL_DETAIL_MODAL.components.Modal.Earning.EarningPoolDetailModal.poolDetails')}
+      title={t('ui.EARNING.components.Modal.Earning.PoolDetail.poolDetails')}
     >
       <MetaInfo
         hasBackgroundWrapper
@@ -60,7 +60,7 @@ function Component ({ chain, className, detailItem, maxPoolMembersValue, onCance
       >
         <MetaInfo.Account
           address={address}
-          label={t('ui.EARNING_POOL_DETAIL_MODAL.components.Modal.Earning.EarningPoolDetailModal.pool')}
+          label={t('ui.EARNING.components.Modal.Earning.PoolDetail.pool')}
           name={name}
           networkPrefix={networkPrefix}
         />
@@ -68,7 +68,7 @@ function Component ({ chain, className, detailItem, maxPoolMembersValue, onCance
         {
           state && (
             <MetaInfo.Status
-              label={t('ui.EARNING_POOL_DETAIL_MODAL.components.Modal.Earning.EarningPoolDetailModal.state')}
+              label={t('ui.EARNING.components.Modal.Earning.PoolDetail.state')}
               statusIcon={NominationPoolsEarningStatusUi[state].icon}
               statusName={state || ''}
               valueColorSchema={NominationPoolsEarningStatusUi[state].schema}
@@ -77,7 +77,7 @@ function Component ({ chain, className, detailItem, maxPoolMembersValue, onCance
         }
 
         <MetaInfo.Status
-          label={t('ui.EARNING_POOL_DETAIL_MODAL.components.Modal.Earning.EarningPoolDetailModal.earningStatus')}
+          label={t('ui.EARNING.components.Modal.Earning.PoolDetail.earningStatus')}
           statusIcon={EarningStatusUi[earningStatus].icon}
           statusName={EarningStatusUi[earningStatus].name}
           valueColorSchema={EarningStatusUi[earningStatus].schema}
@@ -85,7 +85,7 @@ function Component ({ chain, className, detailItem, maxPoolMembersValue, onCance
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.EARNING_POOL_DETAIL_MODAL.components.Modal.Earning.EarningPoolDetailModal.totalStaked')}
+          label={t('ui.EARNING.components.Modal.Earning.PoolDetail.totalStaked')}
           suffix={symbol}
           value={bondedAmount || '0'}
           valueColorSchema={'even-odd'}
@@ -93,7 +93,7 @@ function Component ({ chain, className, detailItem, maxPoolMembersValue, onCance
 
         {!maxPoolMembersValue &&
           <MetaInfo.Number
-            label={t('ui.EARNING_POOL_DETAIL_MODAL.components.Modal.Earning.EarningPoolDetailModal.member')}
+            label={t('ui.EARNING.components.Modal.Earning.PoolDetail.member')}
             value={memberCounter}
             valueColorSchema={'even-odd'}
           />}

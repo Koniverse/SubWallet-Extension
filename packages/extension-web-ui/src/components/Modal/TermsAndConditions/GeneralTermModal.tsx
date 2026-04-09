@@ -70,7 +70,7 @@ const Component = ({ className, onOk }: Props) => {
       })}
       closable={false}
       id={modalId}
-      title={t('ui.GENERAL_TERM_MODAL.components.Modal.TermsAndConditions.GeneralTermModal.termsOfUse')}
+      title={t('ui.TERM.components.Modal.Terms.General.termsOfUseTitle')}
       width={ isWebUI ? 784 : undefined }
     >
       <div
@@ -95,7 +95,7 @@ const Component = ({ className, onOk }: Props) => {
           checked={isChecked}
           className={'term-footer-checkbox'}
           onChange={onCheckedInput}
-        >{t('ui.GENERAL_TERM_MODAL.components.Modal.TermsAndConditions.GeneralTermModal.iUnderstandAndAgreeToTheTermsOfUseWhichApplyToMyUseOfSubwalletAndAllOfItsFeature')}</Checkbox>
+        >{t('ui.TERM.components.Modal.Terms.General.agreeToTermsOfUse')}</Checkbox>
         <div className={'term-footer-button-group'}>
           <Button
             block={true}
@@ -109,9 +109,9 @@ const Component = ({ className, onOk }: Props) => {
             )}
             onClick={onConfirm}
           >
-            {t('ui.GENERAL_TERM_MODAL.components.Modal.TermsAndConditions.GeneralTermModal.continue')}
+            {t('ui.TERM.components.Modal.Terms.General.continue')}
           </Button>
-          <span className={'term-footer-annotation'}>{t('ui.GENERAL_TERM_MODAL.components.Modal.TermsAndConditions.GeneralTermModal.scrollToReadAllSections')}</span>
+          <span className={'term-footer-annotation'}>{t('ui.TERM.components.Modal.Terms.General.scrollToReadAll')}</span>
         </div>
 
       </div>

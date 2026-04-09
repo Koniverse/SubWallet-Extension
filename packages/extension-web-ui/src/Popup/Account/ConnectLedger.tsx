@@ -15,7 +15,7 @@ import { BackgroundIcon, Button, Icon, Image, SwList } from '@subwallet/react-ui
 import CN from 'classnames';
 import { CheckCircle, CircleNotch, Swatches } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -52,14 +52,14 @@ const FooterIcon = (
 );
 
 export const PolkadotLedgerAccountTypeItems: LedgerPolkadotAccountItemType[] = [{
-  name: detectTranslate('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.polkadotAccount'),
+  name: detectTranslate('ui.ACCOUNT.screen.Account.ConnectLedger.polkadotAccount'),
   slug: 'polkadot',
-  description: detectTranslate('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.manageReceiveAndTransferAssetsOnSubstrateBasedNetworksInThePolkadotEcosystem'),
+  description: detectTranslate('ui.ACCOUNT.screen.Account.ConnectLedger.polkadotAccountDescription'),
   scheme: POLKADOT_LEDGER_SCHEME.ED25519
 }, {
-  name: detectTranslate('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.ethereumAccount'),
+  name: detectTranslate('ui.ACCOUNT.screen.Account.ConnectLedger.ethereumAccount'),
   slug: 'ethereum',
-  description: detectTranslate('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.manageReceiveAndTransferAssetsOnSubstrateBasedNetworksThatUseEvmAddressesInThePolkadotEcosystem'),
+  description: detectTranslate('ui.ACCOUNT.screen.Account.ConnectLedger.ethereumAccountDescription'),
   scheme: POLKADOT_LEDGER_SCHEME.ECDSA
 }];
 
@@ -329,7 +329,7 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'web-single-column web-cancel-fill-height'}
         onBack={firstStep ? onBack : onPreviousStep}
         rightFooterButton={{
-          children: t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.connectLedgerDevice'),
+          children: t('ui.ACCOUNT.screen.Account.ConnectLedger.connectLedgerDevice'),
           icon: FooterIcon,
           disabled: !isConnected || (!firstStep && !(selectedAccounts.length > 0)),
           onClick: firstStep ? onNextStep : onSubmit,
@@ -341,17 +341,22 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick: goUserGuide
           }
         ]}
-        title={t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.connectLedgerDevice')}
+        title={t('ui.ACCOUNT.screen.Account.ConnectLedger.connectLedgerDevice')}
       >
         <div className={CN('container')}>
           <div className='sub-title'>
-            {t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.unlockYourLedgerAndOpenTheSelectedAppForMoreInformationRegardingPolkadotAndPolkadotMigrationAppClick')}
-            <a
-              href={CONNECT_LEDGER_USER_GUIDE_URL}
-              target='__blank'
-            >
-              {t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.here')}
-            </a>
+            <Trans
+              components={{
+                highlight: (
+                  <a
+                    className='link'
+                    href={CONNECT_LEDGER_USER_GUIDE_URL}
+                    target='__blank'
+                  />
+                )
+              }}
+              i18nKey={detectTranslate('ui.ACCOUNT.screen.Account.ConnectLedger.unlockLedgerInstruction')}
+            />
           </div>
           {
             firstStep && (
@@ -379,9 +384,9 @@ const Component: React.FC<Props> = (props: Props) => {
                 <LedgerChainSelector
                   className={'select-ledger-app'}
                   items={networks}
-                  label={t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.selectLedgerApp')}
+                  label={t('ui.ACCOUNT.screen.Account.ConnectLedger.selectLedgerApp')}
                   onChange={onChainChange}
-                  placeholder={t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.selectLedgerApp')}
+                  placeholder={t('ui.ACCOUNT.screen.Account.ConnectLedger.selectLedgerApp')}
                   value={chain}
                 />
                 {
@@ -389,10 +394,10 @@ const Component: React.FC<Props> = (props: Props) => {
                     className={'ledger-chain-migrate-select'}
                     id={'migrate-chain-select-modal-id'}
                     items={networkMigrates}
-                    label={t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.selectNetwork')}
-                    messageTooltip={t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.toUseThisNetworkChoosePolkadotLedgerApp')}
+                    label={t('ui.ACCOUNT.screen.Account.ConnectLedger.selectNetwork')}
+                    messageTooltip={t('ui.ACCOUNT.screen.Account.ConnectLedger.choosePolkadotLedgerApp')}
                     onChange={onMigrateChainChange}
-                    placeholder={t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.selectNetwork')}
+                    placeholder={t('ui.ACCOUNT.screen.Account.ConnectLedger.selectNetwork')}
                     value={chainMigrateMode}
                   />
                 }
@@ -424,11 +429,11 @@ const Component: React.FC<Props> = (props: Props) => {
                   <div className='ledger-button-content'>
                     <span className='ledger-info-text'>
                       {isConnected
-                        ? t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.deviceFound')
+                        ? t('ui.ACCOUNT.screen.Account.ConnectLedger.deviceFound')
                         : warning || error || (
                           ledger
-                            ? t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.loading')
-                            : t('ui.CONNECT_LEDGER.Popup.Account.ConnectLedger.searchingLedgerDevice')
+                            ? t('ui.ACCOUNT.screen.Account.ConnectLedger.loading')
+                            : t('ui.ACCOUNT.screen.Account.ConnectLedger.searchingLedgerDevice')
                         )
                       }
                     </span>

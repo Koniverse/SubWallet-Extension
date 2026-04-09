@@ -70,7 +70,7 @@ const Component = (props: Props) => {
           size='xs'
           type='ghost'
         >
-          <span className='max-btn-text'>{t('ui.SWAP_FROM_FIELD.components.Field.Swap.SwapFromField.max')}</span>
+          <span className='max-btn-text'>{t('ui.SWAP.components.Field.Swap.SwapFromField.max')}</span>
         </Button>
       </div>
       <div className='__input-container'>

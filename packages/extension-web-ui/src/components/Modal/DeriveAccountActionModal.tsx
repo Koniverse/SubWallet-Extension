@@ -104,7 +104,7 @@ const Component: React.FC<Props> = (props: Props) => {
       setInfo(undefined);
 
       if (!suri) {
-        reject(t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.derivePathIsRequired'));
+        reject(t('ui.components.Modal.DeriveAccountAction.derivePathIsRequired'));
       }
 
       addLazy('validateDerivationPath', () => {
@@ -132,7 +132,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const accountNameValidator = useCallback(async (validate: RuleObject, value: string) => {
     return new Promise<void>((resolve, reject) => {
       if (!value) {
-        reject(t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.accountNameIsRequired'));
+        reject(t('ui.components.Modal.DeriveAccountAction.accountNameRequired'));
 
         return;
       }
@@ -140,13 +140,13 @@ const Component: React.FC<Props> = (props: Props) => {
       validateAccountName({ name: value })
         .then((rs) => {
           if (!rs.isValid) {
-            reject(t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.accountNameAlreadyInUse'));
+            reject(t('ui.components.Modal.DeriveAccountAction.accountNameInUse'));
           } else {
             resolve();
           }
         })
         .catch(() => {
-          reject(t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.accountNameInvalid'));
+          reject(t('ui.components.Modal.DeriveAccountAction.accountNameInvalid'));
         });
     });
   }, [t]);
@@ -191,17 +191,17 @@ const Component: React.FC<Props> = (props: Props) => {
     if (_info.depth === 2 && alertTypes.includes(_info.type)) {
       openAlert({
         type: NotificationType.WARNING,
-        content: t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.thisDerivedAccountCanOnlyBeUsedInSubwalletAndWonTBeCompatibleWithOtherWalletsDoYouStillWantToContinue'),
-        title: t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.incompatibleAccount'),
+        content: t('ui.components.Modal.DeriveAccountAction.incompatibleDerivedAccountWarning'),
+        title: t('ui.components.Modal.DeriveAccountAction.incompatibleAccount'),
         okButton: {
-          text: t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.continue'),
+          text: t('ui.components.Modal.DeriveAccountAction.continue'),
           onClick: () => {
             closeAlert();
             _doSubmit();
           }
         },
         cancelButton: {
-          text: t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.cancel'),
+          text: t('ui.components.Modal.DeriveAccountAction.cancel'),
           onClick: closeAlert
         }
       });
@@ -259,7 +259,7 @@ const Component: React.FC<Props> = (props: Props) => {
       closeIcon={modalCloseButton}
       id={modalId}
       onCancel={closeModal}
-      title={t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.createDerivedAccount')}
+      title={t('ui.components.Modal.DeriveAccountAction.createDerivedAccount')}
     >
       <div className='body-container'>
         <Form
@@ -276,7 +276,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 components={{
                   highlight: <span className='account-name' />
                 }}
-                i18nKey={detectTranslate('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.youAreCreatingADerivedAccountFromAccountHighlightHighlightCustomizeTheDerivationPathAndNameTheAccountAsYouWish')}
+                i18nKey={detectTranslate('ui.components.Modal.DeriveAccountAction.creatingDerivedAccountInstruction')}
                 values={{ accountName: accountProxy.name }}
               />
             </div>
@@ -293,9 +293,9 @@ const Component: React.FC<Props> = (props: Props) => {
           >
             <Input
               // id={passwordInputId}
-              label={t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.derivationPath')}
+              label={t('ui.components.Modal.DeriveAccountAction.derivationPath')}
               onChange={onSuriChange}
-              placeholder={t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.derivationPath')}
+              placeholder={t('ui.components.Modal.DeriveAccountAction.derivationPath')}
             />
           </Form.Item>
           <div className='account-name-info'>
@@ -322,9 +322,9 @@ const Component: React.FC<Props> = (props: Props) => {
             >
               <Input
                 // id={passwordInputId}
-                label={t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.accountName')}
+                label={t('ui.components.Modal.DeriveAccountAction.accountName')}
                 onChange={onAccountNameChange}
-                placeholder={t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.accountName')}
+                placeholder={t('ui.components.Modal.DeriveAccountAction.accountName')}
                 suffix={(
                   <div className='__item-chain-types'>
                     <AccountChainTypeLogos chainTypes={chainTypes} />
@@ -348,7 +348,7 @@ const Component: React.FC<Props> = (props: Props) => {
               )}
               loading={loading}
             >
-              {t('ui.DERIVE_ACCOUNT_ACTION_MODAL.components.Modal.DeriveAccountActionModal.createAccount')}
+              {t('ui.components.Modal.DeriveAccountAction.createAccount')}
             </Button>
           </Form.Item>
         </Form>

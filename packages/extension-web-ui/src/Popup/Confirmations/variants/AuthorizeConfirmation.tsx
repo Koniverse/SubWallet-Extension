@@ -63,36 +63,36 @@ function Component ({ className, request }: Props) {
     if (accountAuthTypes && accountAuthTypes.length === 1) {
       switch (accountAuthTypes[0]) {
         case 'substrate':
-          return t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.noAvailableSubstrateAccount');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableSubstrateAccount');
         case 'evm':
-          return t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.noAvailableEvmAccount');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableEvmAccount');
         case 'ton':
-          return t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.noAvailableTonAccount');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableTonAccount');
         case 'cardano':
-          return t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.noAvailableCardanoAccount');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableCardanoAccount');
         case 'bitcoin':
-          return t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.noAvailableBitcoinAccount');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableBitcoinAccount');
       }
     }
 
-    return t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.noAvailableAccount');
+    return t('ui.DAPP.Confirmations.Authorize.noAvailableAccount');
   }, [accountAuthTypes, t]);
 
   const noAvailableDescription = useMemo(() => {
     if (accountAuthTypes && accountAuthTypes.length === 1) {
       switch (accountAuthTypes[0]) {
         case 'substrate':
-          return t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.youDonTHaveAnySubstrateAccountToConnectPleaseCreateOneOrSkipThisStepByHittingCancel');
+          return t('ui.DAPP.Confirmations.Authorize.noSubstrateAccountToConnect');
         case 'evm':
-          return t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.youDonTHaveAnyEvmAccountToConnectPleaseCreateOneOrSkipThisStepByHittingCancel');
+          return t('ui.DAPP.Confirmations.Authorize.noEvmAccountToConnect');
         case 'cardano':
-          return t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.youDonTHaveAnyCardanoAccountToConnectPleaseCreateOneOrSkipThisStepByHittingCancel');
+          return t('ui.DAPP.Confirmations.Authorize.noCardanoAccountToConnect');
         case 'bitcoin':
-          return t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.youDonTHaveAnyBitcoinAccountToConnectPleaseCreateOneOrSkipThisStepByHittingCancel');
+          return t('ui.DAPP.Confirmations.Authorize.noBitcoinAccountToConnect');
       }
     }
 
-    return t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.youDonTHaveAnyAccountToConnectPleaseCreateOneOrSkipThisStepByHittingCancel');
+    return t('ui.DAPP.Confirmations.Authorize.noAccountToConnect');
   }, [accountAuthTypes, t]);
 
   // Handle buttons actions
@@ -215,7 +215,7 @@ function Component ({ className, request }: Props) {
           {
             visibleAccountProxies.length === 0
               ? noAvailableTitle
-              : t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.chooseTheAccountSYouDLikeToConnect')
+              : t('ui.DAPP.Confirmations.Authorize.chooseAccountsToConnect')
           }
         </div>
         {
@@ -251,7 +251,7 @@ function Component ({ className, request }: Props) {
           {
             visibleAccountProxies.length === 0
               ? noAvailableDescription
-              : t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.makeSureYouTrustThisSiteBeforeConnecting')
+              : t('ui.DAPP.Confirmations.Authorize.trustSiteBeforeConnecting')
           }
         </div>
       </div>
@@ -272,14 +272,14 @@ function Component ({ className, request }: Props) {
                 onClick={onCancel}
                 schema={'secondary'}
               >
-                {t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.cancel')}
+                {t('ui.DAPP.Confirmations.Authorize.cancel')}
               </Button>
               <Button
                 disabled={isDisableConnect}
                 loading={loading}
                 onClick={onConfirm}
               >
-                {t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.connect')}
+                {t('ui.DAPP.Confirmations.Authorize.connect')}
               </Button>
             </>
           )
@@ -299,7 +299,7 @@ function Component ({ className, request }: Props) {
                 onClick={onCancel}
                 schema={'secondary'}
               >
-                {t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.cancel')}
+                {t('ui.DAPP.Confirmations.Authorize.cancel')}
               </Button>
               <Button
                 disabled={loading}
@@ -311,7 +311,7 @@ function Component ({ className, request }: Props) {
                 )}
                 onClick={onAddAccount}
               >
-                {t('ui.AUTHORIZE_CONFIRMATION.Popup.Confirmations.variants.AuthorizeConfirmation.createOne')}
+                {t('ui.DAPP.Confirmations.Authorize.createOne')}
               </Button>
             </>
           )

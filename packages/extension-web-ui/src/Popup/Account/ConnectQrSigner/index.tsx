@@ -72,7 +72,7 @@ const Component: React.FC<Props> = (props: Props) => {
       for (const account of accounts) {
         // todo: Recheck this logic with master account
         if (isSameAddress(account.address, scannedAccount.content)) {
-          return Promise.reject(new Error(t('ui.CONNECT_QR_SIGNER.Popup.Account.ConnectQrSigner.accountAlreadyExists')));
+          return Promise.reject(new Error(t('ui.ACCOUNT.screen.Account.ConnectQrSigner.accountAlreadyExists')));
         }
       }
     }
@@ -148,7 +148,7 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'web-single-column web-cancel-fill-height'}
         onBack={onBack}
         rightFooterButton={{
-          children: loading ? t('ui.CONNECT_QR_SIGNER.Popup.Account.ConnectQrSigner.creating') : t('ui.CONNECT_QR_SIGNER.Popup.Account.ConnectQrSigner.scanQrCode'),
+          children: loading ? t('ui.ACCOUNT.screen.Account.ConnectQrSigner.creating') : t('ui.ACCOUNT.screen.Account.ConnectQrSigner.scanQrCode'),
           icon: FooterIcon,
           onClick: openCamera,
           loading: loading
@@ -196,7 +196,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   />
                 )
               }}
-              i18nKey={detectTranslate('ui.CONNECT_QR_SIGNER.Popup.Account.ConnectQrSigner.willProvideYouWithAQrCodeToScanReadHighlightThisInstructionHighlightForMoreDetails')}
+              i18nKey={detectTranslate('ui.ACCOUNT.screen.Account.ConnectQrSigner.qrCodeInstruction')}
               values={{ deviceName }}
             />
           </div>

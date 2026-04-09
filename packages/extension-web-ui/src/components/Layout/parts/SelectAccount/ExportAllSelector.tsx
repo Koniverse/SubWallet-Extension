@@ -47,7 +47,7 @@ const FILTER_MODAL_ID = 'export-account-filter-modal';
 const defaultModalId = 'multi-export-account-selector';
 const modalId = SELECT_ACCOUNT_MODAL;
 
-const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
+const Component = (props: Props, _ref: ForwardedRef<InputRef>) => {
   const { className = '',
     id = defaultModalId,
     isSingleSelect = false,

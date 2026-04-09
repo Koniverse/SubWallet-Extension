@@ -41,7 +41,7 @@ const Component: React.FC<Props> = (props: Props) => {
               />
             </div>
             <div className='description'>
-              {t('ui.SWAP_IDLE_WARNING_MODAL.components.Modal.Swap.SwapIdleWarningModal.weAreReadyToShowYouTheLatestQuotesWhenYouWantToContinue')}
+              {t('ui.SWAP.components.Modal.Swap.IdleWarning.readyForLatestQuotes')}
             </div>
           </div>
           <div className='__button-wrapper'>
@@ -58,7 +58,7 @@ const Component: React.FC<Props> = (props: Props) => {
               }
               onClick={onOk}
             >
-              {t('ui.SWAP_IDLE_WARNING_MODAL.components.Modal.Swap.SwapIdleWarningModal.yesShowMeLatestQuote')}
+              {t('ui.SWAP.components.Modal.Swap.IdleWarning.showMeLatestQuote')}
             </Button>
           </div>
         </div>

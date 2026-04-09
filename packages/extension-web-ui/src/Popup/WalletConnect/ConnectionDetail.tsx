@@ -124,7 +124,7 @@ const Component: React.FC<ComponentProps> = (props) => {
     return (
       <NetworkItem
         key={item.slug}
-        name={item.chainInfo?.name || t('ui.CONNECTION_DETAIL.Popup.WalletConnect.ConnectionDetail.unknownNetwork', { replace: { slug: item.slug } })}
+        name={item.chainInfo?.name || t('ui.WALLET_CONNECT.screen.WalletConnect.ConnectionDetail.unknownNetwork', { replace: { slug: item.slug } })}
         networkKey={item.slug}
         networkMainLogoShape='squircle'
         networkMainLogoSize={28}

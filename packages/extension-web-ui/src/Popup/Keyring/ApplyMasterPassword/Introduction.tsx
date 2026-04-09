@@ -27,10 +27,10 @@ const Component: React.FC<Props> = (props: Props) => {
         />
       </div>
       <div className='title'>
-        {t('ui.INTRODUCTION.Popup.Keyring.ApplyMasterPassword.Introduction.applyMasterPassword')}
+        {t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.Introduction.applyMasterPassword')}
       </div>
       <div className='description'>
-        {t('ui.INTRODUCTION.Popup.Keyring.ApplyMasterPassword.Introduction.masterPasswordCreatedSuccessfullyPleaseApplyTheMasterPasswordToYourExistingAccounts')}
+        {t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.Introduction.masterPasswordCreatedApply')}
       </div>
     </div>
   );

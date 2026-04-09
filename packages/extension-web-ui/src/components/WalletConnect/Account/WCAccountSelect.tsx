@@ -48,22 +48,22 @@ const Component: React.FC<Props> = (props: Props) => {
   const noAccountTitle = useMemo(() => {
     switch (accountType) {
       case AccountChainType.SUBSTRATE:
-        return t('ui.WCACCOUNT_SELECT.components.WalletConnect.Account.WCAccountSelect.noAvailableSubstrateAccount');
+        return t('ui.WALLET_CONNECT.components.WalletConnect.AccountSelect.noAvailableSubstrateAccount');
       case AccountChainType.ETHEREUM:
-        return t('ui.WCACCOUNT_SELECT.components.WalletConnect.Account.WCAccountSelect.noAvailableEvmAccount');
+        return t('ui.WALLET_CONNECT.components.WalletConnect.AccountSelect.noAvailableEvmAccount');
       default:
-        return t('ui.WCACCOUNT_SELECT.components.WalletConnect.Account.WCAccountSelect.noAvailableAccount');
+        return t('ui.WALLET_CONNECT.components.WalletConnect.AccountSelect.noAvailableAccount');
     }
   }, [accountType, t]);
 
   const noAccountDescription = useMemo(() => {
     switch (accountType) {
       case AccountChainType.SUBSTRATE:
-        return t('ui.WCACCOUNT_SELECT.components.WalletConnect.Account.WCAccountSelect.youDonTHaveAnySubstrateAccountToConnectPleaseCreateOneOrSkipThisStepByHittingCancel');
+        return t('ui.WALLET_CONNECT.components.WalletConnect.AccountSelect.noSubstrateAccountToConnect');
       case AccountChainType.ETHEREUM:
-        return t('ui.WCACCOUNT_SELECT.components.WalletConnect.Account.WCAccountSelect.youDonTHaveAnyEvmAccountToConnectPleaseCreateOneOrSkipThisStepByHittingCancel');
+        return t('ui.WALLET_CONNECT.components.WalletConnect.AccountSelect.noEvmAccountToConnect');
       default:
-        return t('ui.WCACCOUNT_SELECT.components.WalletConnect.Account.WCAccountSelect.youDonTHaveAnyAccountToConnectPleaseCreateOneOrSkipThisStepByHittingCancel');
+        return t('ui.WALLET_CONNECT.components.WalletConnect.AccountSelect.noAccountToConnect');
     }
   }, [accountType, t]);
 
@@ -141,12 +141,12 @@ const Component: React.FC<Props> = (props: Props) => {
                       )}
                       onClick={_onApply}
                     >
-                      {t('ui.WCACCOUNT_SELECT.components.WalletConnect.Account.WCAccountSelect.applyAccount', { replace: { number: selectedAccounts.length, s: selectedAccounts.length > 1 ? 's' : '' } })}
+                      {t('ui.WALLET_CONNECT.components.WalletConnect.AccountSelect.applyNumberAccounts', { replace: { number: selectedAccounts.length, s: selectedAccounts.length > 1 ? 's' : '' } })}
                     </Button>
                   )}
                   id={id}
                   onCancel={onCloseModal}
-                  title={t('ui.WCACCOUNT_SELECT.components.WalletConnect.Account.WCAccountSelect.selectAccount')}
+                  title={t('ui.WALLET_CONNECT.components.WalletConnect.AccountSelect.selectAccount')}
                 >
                   <SwList.Section
                     className='account-list'
@@ -158,7 +158,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     rowGap='var(--row-gap)'
                     searchFunction={searchAccountFunction}
                     searchMinCharactersCount={2}
-                    searchPlaceholder={t<string>('ui.WCACCOUNT_SELECT.components.WalletConnect.Account.WCAccountSelect.searchAccount')}
+                    searchPlaceholder={t<string>('ui.WALLET_CONNECT.components.WalletConnect.AccountSelect.searchAccount')}
                   />
                 </BaseModal>
               </>
@@ -193,7 +193,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   })}
                 </div>
                 <div className={CN(className, 'additional-content')}>
-                  {t('ui.WCACCOUNT_SELECT.components.WalletConnect.Account.WCAccountSelect.makeSureYouTrustThisSiteBeforeConnecting')}
+                  {t('ui.WALLET_CONNECT.components.WalletConnect.AccountSelect.trustSiteBeforeConnecting')}
                 </div>
               </>
             )

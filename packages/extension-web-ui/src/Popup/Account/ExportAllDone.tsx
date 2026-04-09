@@ -40,7 +40,7 @@ const Component: React.FC<Props> = (props: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={goHome}
         rightFooterButton={{
-          children: t('ui.EXPORT_ALL_DONE.Popup.Account.ExportAllDone.finish'),
+          children: t('ui.ACCOUNT.screen.Account.ExportAllDone.finish'),
           icon: FinishIcon,
           onClick: goHome
         }}
@@ -51,13 +51,13 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick: goHome
           }
         ]}
-        title={t('ui.EXPORT_ALL_DONE.Popup.Account.ExportAllDone.successful')}
+        title={t('ui.ACCOUNT.screen.Account.ExportAllDone.successful')}
       >
         <div className='body-container'>
           <div className={CN('notice')}>
             <AlertBox
-              description={t('ui.EXPORT_ALL_DONE.Popup.Account.ExportAllDone.anyoneWithYourKeyCanUseAnyAssetsHeldInYourAccount')}
-              title={t('ui.EXPORT_ALL_DONE.Popup.Account.ExportAllDone.warningNeverDiscloseThisKey')}
+              description={t('ui.ACCOUNT.screen.Account.ExportAllDone.privateKeyWarning')}
+              title={t('ui.ACCOUNT.screen.Account.ExportAllDone.warningNeverDiscloseKey')}
               type='warning'
             />
           </div>
@@ -72,10 +72,10 @@ const Component: React.FC<Props> = (props: Props) => {
               />
             </div>
             <div className='json-done-tile'>
-              {t('ui.EXPORT_ALL_DONE.Popup.Account.ExportAllDone.success')}
+              {t('ui.ACCOUNT.screen.Account.ExportAllDone.success')}
             </div>
             <div className='json-done-description'>
-              {t('ui.EXPORT_ALL_DONE.Popup.Account.ExportAllDone.youHaveSuccessfullyExportJsonFileForYourAccounts')}
+              {t('ui.ACCOUNT.screen.Account.ExportAllDone.successfullyExportedJsonForAccounts')}
             </div>
           </div>
         </div>

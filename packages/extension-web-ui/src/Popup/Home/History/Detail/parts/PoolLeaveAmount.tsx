@@ -35,14 +35,14 @@ const Component: React.FC<Props> = (props: Props) => {
     <>
       <MetaInfo.Number
         decimals={amount?.decimals || undefined}
-        label={t('ui.POOL_LEAVE_AMOUNT.Popup.Home.History.Detail.parts.PoolLeaveAmount.amount')}
+        label={t('ui.HISTORY.screen.HistoryDetail.PoolLeaveAmount.amount')}
         suffix={amount?.symbol || undefined}
         value={amountValue}
       />
       {!isLending && (
         <MetaInfo.Number
           decimals={additionalInfo.decimals}
-          label={t('ui.POOL_LEAVE_AMOUNT.Popup.Home.History.Detail.parts.PoolLeaveAmount.estimatedReceivables')}
+          label={t('ui.HISTORY.screen.HistoryDetail.PoolLeaveAmount.estimatedReceivables')}
           suffix={additionalInfo.symbol}
           value={estimatedValue}
         />
@@ -50,7 +50,7 @@ const Component: React.FC<Props> = (props: Props) => {
       {additionalInfo.isFast && (
         <MetaInfo.Number
           decimals={additionalInfo.decimals}
-          label={t('ui.POOL_LEAVE_AMOUNT.Popup.Home.History.Detail.parts.PoolLeaveAmount.minimumReceivables')}
+          label={t('ui.HISTORY.screen.HistoryDetail.PoolLeaveAmount.minimumReceivables')}
           suffix={additionalInfo.symbol}
           value={minReceiveValue}
         />

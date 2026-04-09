@@ -17,15 +17,15 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~!@#$%^&*])[A-Za-z\d
 export const renderBasePasswordRules = (fieldName: string, t: TFunction): FormRule[] => {
   return [
     {
-      message: t('ui.PASSWORD.utils.form.validators.password.mustBeAtLeastCharactersInLength', { replace: { minLen: MinPasswordLength, fieldName: fieldName } }),
+      message: t('ui.ACCOUNT.util.validator.password.fieldMinLength', { replace: { minLen: MinPasswordLength, fieldName: fieldName } }),
       min: MinPasswordLength
     },
     {
-      message: t('ui.PASSWORD.utils.form.validators.password.isRequired', { replace: { fieldName: fieldName } }),
+      message: t('ui.ACCOUNT.util.validator.password.fieldIsRequired', { replace: { fieldName: fieldName } }),
       required: true
     },
     {
-      message: t('ui.PASSWORD.utils.form.validators.password.shouldBeAtLeast1UppercaseLetter1NumberAnd1SpecialCharacter', { replace: { fieldName: fieldName } }),
+      message: t('ui.ACCOUNT.util.validator.password.fieldPasswordPolicy', { replace: { fieldName: fieldName } }),
       pattern: passwordRegex,
       warningOnly: true
     }
@@ -34,7 +34,7 @@ export const renderBasePasswordRules = (fieldName: string, t: TFunction): FormRu
 
 export const renderBaseConfirmPasswordRules = (passwordFieldName: string, t: TFunction): FormRule[] => {
   return [
-    ...renderBasePasswordRules(t('ui.PASSWORD.utils.form.validators.password.confirmPassword'), t),
+    ...renderBasePasswordRules(t('ui.ACCOUNT.util.validator.password.confirmPassword'), t),
     ({ getFieldValue }) => ({
       validator: (_, value) => {
         const password = getFieldValue(passwordFieldName) as string;
@@ -43,7 +43,7 @@ export const renderBaseConfirmPasswordRules = (passwordFieldName: string, t: TFu
           return Promise.resolve();
         }
 
-        return Promise.reject(new Error(t('ui.PASSWORD.utils.form.validators.password.confirmPasswordDoNotMatch')));
+        return Promise.reject(new Error(t('ui.ACCOUNT.util.validator.password.confirmPasswordDoNotMatch')));
       }
     })
   ];

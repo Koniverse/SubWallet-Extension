@@ -118,7 +118,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: FrameCorners,
           leftIconBgColor: token.colorPrimary,
           rightIcon: ArrowsOut,
-          title: t('ui.SETTINGS.Popup.Settings.expandView'),
+          title: t('ui.SETTINGS.screen.Setting.Root.expandView'),
           onClick: () => {
             windowOpen({ allowedPath: '/' }).catch(console.error);
           },
@@ -129,7 +129,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: GlobeHemisphereEast,
           leftIconBgColor: token['magenta-6'],
           rightIcon: CaretRight,
-          title: t('ui.SETTINGS.Popup.Settings.generalSettings'),
+          title: t('ui.SETTINGS.screen.Setting.Root.generalSettings'),
           onClick: () => {
             navigate('/settings/general');
           }
@@ -139,7 +139,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: ShieldCheck,
           leftIconBgColor: token['green-6'],
           rightIcon: CaretRight,
-          title: t('ui.SETTINGS.Popup.Settings.securitySettings'),
+          title: t('ui.SETTINGS.screen.Setting.Root.securitySettings'),
           onClick: () => {
             navigate('/settings/security', { state: true });
           }
@@ -149,7 +149,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: UserCircleGear,
           leftIconBgColor: token['purple-8'],
           rightIcon: CaretRight,
-          title: t('ui.SETTINGS.Popup.Settings.accountSettings'),
+          title: t('ui.SETTINGS.screen.Setting.Root.accountSettings'),
           onClick: () => {
             navigate('/settings/account-settings');
           }
@@ -158,14 +158,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     },
     {
       key: 'assets-&-addresses',
-      label: t('ui.SETTINGS.Popup.Settings.assetsAndAddresses'),
+      label: t('ui.SETTINGS.screen.Setting.Root.assetsAndAddresses'),
       items: [
         {
           key: 'manage-networks',
           leftIcon: ShareNetwork,
           leftIconBgColor: token['purple-7'],
           rightIcon: CaretRight,
-          title: t('ui.SETTINGS.Popup.Settings.manageNetworks'),
+          title: t('ui.SETTINGS.screen.Setting.Root.manageNetworks'),
           onClick: () => {
             navigate('/settings/chains/manage');
           }
@@ -175,7 +175,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: Coin,
           leftIconBgColor: token['gold-6'],
           rightIcon: CaretRight,
-          title: t('ui.SETTINGS.Popup.Settings.manageTokens'),
+          title: t('ui.SETTINGS.screen.Setting.Root.manageTokens'),
           onClick: () => {
             navigate('/settings/tokens/manage');
           }
@@ -185,7 +185,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: BookBookmark,
           leftIconBgColor: token['blue-6'],
           rightIcon: CaretRight,
-          title: t('ui.SETTINGS.Popup.Settings.manageAddressBook'),
+          title: t('ui.SETTINGS.screen.Setting.Root.manageAddressBook'),
           onClick: () => {
             navigate('/settings/address-book');
           }
@@ -194,14 +194,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     },
     {
       key: 'networks-&-tokens',
-      label: t('ui.SETTINGS.Popup.Settings.communityAndSupport'),
+      label: t('ui.SETTINGS.screen.Setting.Root.communityAndSupport'),
       items: [
         {
           key: 'contact-support',
           leftIcon: EnvelopeSimple,
           leftIconBgColor: token['geekblue-6'],
           rightIcon: ArrowSquareOut,
-          title: t('ui.SETTINGS.Popup.Settings.contactSupport'),
+          title: t('ui.SETTINGS.screen.Setting.Root.contactSupport'),
           onClick: openInNewTab(CONTACT_SUPPORT_URL)
         },
         {
@@ -209,7 +209,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: Book,
           leftIconBgColor: token['green-6'],
           rightIcon: ArrowSquareOut,
-          title: t('ui.SETTINGS.Popup.Settings.userGuide'),
+          title: t('ui.SETTINGS.screen.Setting.Root.userGuide'),
           onClick: openInNewTab(WIKI_URL)
         },
         {
@@ -217,7 +217,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: ChatTeardropText,
           leftIconBgColor: token['magenta-7'],
           rightIcon: ArrowSquareOut,
-          title: t('ui.SETTINGS.Popup.Settings.requestAFeature'),
+          title: t('ui.SETTINGS.screen.Setting.Root.requestAFeature'),
           onClick: () => {
             window.open(`${SUPPORT_MAIL}?subject=[SubWallet In-app Feedback]`, '_self');
           }
@@ -235,7 +235,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           ),
           leftIconBgColor: 'transparent',
           rightIcon: CaretRight,
-          title: t('ui.SETTINGS.Popup.Settings.aboutSubwallet'),
+          title: t('ui.SETTINGS.screen.Setting.Root.aboutSubWallet'),
           onClick: () => {
             activeModal(modalId);
           }
@@ -252,7 +252,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         leftIcon: Globe,
         rightIcon: ArrowSquareOut,
         leftIconBgColor: token['purple-7'],
-        title: t('ui.SETTINGS.Popup.Settings.website'),
+        title: t('ui.SETTINGS.screen.Setting.Root.website'),
         onClick: openInNewTab(WEBSITE_URL)
       },
       {
@@ -260,7 +260,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         leftIcon: BookBookmark,
         rightIcon: ArrowSquareOut,
         leftIconBgColor: token['volcano-7'],
-        title: t('ui.SETTINGS.Popup.Settings.termsOfUse'),
+        title: t('ui.SETTINGS.screen.Setting.Root.termsOfUse'),
         onClick: openInNewTab(TERMS_OF_SERVICE_URL)
       },
       {
@@ -275,7 +275,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         ),
         rightIcon: ArrowSquareOut,
         leftIconBgColor: token.colorBgSecondary,
-        title: t('ui.SETTINGS.Popup.Settings.xTwitter'),
+        title: t('ui.SETTINGS.screen.Setting.Root.xTwitter'),
         onClick: openInNewTab(TWITTER_URL)
       }
     ];
@@ -299,7 +299,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   useEffect(() => {
     if (location.pathname === '/settings' || location.pathname === '/settings/list') {
-      setTitle(t('ui.SETTINGS.Popup.Settings.settings'));
+      setTitle(t('ui.SETTINGS.screen.Setting.Root.settings'));
     }
   }, [location.pathname, setTitle, t]);
 
@@ -318,7 +318,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             rightButtons={headerIcons}
             showLeftButton={true}
           >
-            {t('ui.SETTINGS.Popup.Settings.settings')}
+            {t('ui.SETTINGS.screen.Setting.Root.settings')}
           </SwHeader>
         )}
 
@@ -364,7 +364,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             onClick={onLock}
             schema={'secondary'}
           >
-            {t('ui.SETTINGS.Popup.Settings.lock')}
+            {t('ui.SETTINGS.screen.Setting.Root.lock')}
           </Button>
 
           <div className={'__version'}>
@@ -377,7 +377,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           className={CN(className, 'about-subwallet-modal')}
           id={modalId}
           onCancel={closeModal}
-          title={t('ui.SETTINGS.Popup.Settings.aboutSubwallet')}
+          title={t('ui.SETTINGS.screen.Setting.Root.aboutSubWallet')}
         >
           {aboutSubwalletType.map((item) => (
             <div

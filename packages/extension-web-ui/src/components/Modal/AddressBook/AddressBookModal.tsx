@@ -75,15 +75,15 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const filterOptions: FilterOption[] = useMemo(() => ([
     {
-      label: t('ui.ADDRESS_BOOK_MODAL.components.Modal.AddressBook.AddressBookModal.yourWallet'),
+      label: t('ui.components.Modal.AddressBook.Selector.yourWallet'),
       value: AnalyzedGroup.WALLET
     },
     {
-      label: t('ui.ADDRESS_BOOK_MODAL.components.Modal.AddressBook.AddressBookModal.savedContacts'),
+      label: t('ui.components.Modal.AddressBook.Selector.savedContacts'),
       value: AnalyzedGroup.CONTACT
     },
     {
-      label: t('ui.ADDRESS_BOOK_MODAL.components.Modal.AddressBook.AddressBookModal.recent'),
+      label: t('ui.components.Modal.AddressBook.Selector.recent'),
       value: AnalyzedGroup.RECENT
     }
   ]), [t]);
@@ -209,13 +209,13 @@ const Component: React.FC<Props> = (props: Props) => {
 
     switch (_group) {
       case AnalyzedGroup.WALLET:
-        groupLabel = t('ui.ADDRESS_BOOK_MODAL.components.Modal.AddressBook.AddressBookModal.yourWallet');
+        groupLabel = t('ui.components.Modal.AddressBook.Selector.yourWallet');
         break;
       case AnalyzedGroup.CONTACT:
-        groupLabel = t('ui.ADDRESS_BOOK_MODAL.components.Modal.AddressBook.AddressBookModal.savedContacts');
+        groupLabel = t('ui.components.Modal.AddressBook.Selector.savedContacts');
         break;
       case AnalyzedGroup.RECENT:
-        groupLabel = t('ui.ADDRESS_BOOK_MODAL.components.Modal.AddressBook.AddressBookModal.recent');
+        groupLabel = t('ui.components.Modal.AddressBook.Selector.recent');
         break;
     }
 
@@ -256,7 +256,7 @@ const Component: React.FC<Props> = (props: Props) => {
         fullSizeOnMobile
         id={id}
         onCancel={onClose}
-        title={t('ui.ADDRESS_BOOK_MODAL.components.Modal.AddressBook.AddressBookModal.addressBook')}
+        title={t('ui.components.Modal.AddressBook.Selector.addressBook')}
       >
         <SwList.Section
           actionBtnIcon={(
@@ -282,7 +282,7 @@ const Component: React.FC<Props> = (props: Props) => {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('ui.ADDRESS_BOOK_MODAL.components.Modal.AddressBook.AddressBookModal.accountName')}
+          searchPlaceholder={t<string>('ui.components.Modal.AddressBook.Selector.accountName')}
           showActionBtn={true}
         />
       </BaseModal>
@@ -294,7 +294,7 @@ const Component: React.FC<Props> = (props: Props) => {
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
-        title={t('ui.ADDRESS_BOOK_MODAL.components.Modal.AddressBook.AddressBookModal.filterAddress')}
+        title={t('ui.components.Modal.AddressBook.Selector.filterAddress')}
       />
     </>
   );

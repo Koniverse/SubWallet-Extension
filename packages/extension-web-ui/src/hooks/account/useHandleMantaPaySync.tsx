@@ -52,7 +52,7 @@ export default function useHandleMantaPaySync () {
           schema={'warning'}
           size={'xs'}
         >
-          {t('ui.USE_HANDLE_MANTA_PAY_SYNC.hooks.account.useHandleMantaPaySync.sync')}
+          {t('ui.ACCOUNT.hook.account.useHandleMantaPaySync.sync')}
         </Button>
 
         <Button
@@ -60,14 +60,14 @@ export default function useHandleMantaPaySync () {
           schema={'secondary'}
           size={'xs'}
         >
-          {t('ui.USE_HANDLE_MANTA_PAY_SYNC.hooks.account.useHandleMantaPaySync.cancel')}
+          {t('ui.ACCOUNT.hook.account.useHandleMantaPaySync.cancel')}
         </Button>
       </div>
     );
 
     notify({
-      description: t('ui.USE_HANDLE_MANTA_PAY_SYNC.hooks.account.useHandleMantaPaySync.thisMayTakeAFewMinutes'),
-      message: t('ui.USE_HANDLE_MANTA_PAY_SYNC.hooks.account.useHandleMantaPaySync.syncZkMode'),
+      description: t('ui.ACCOUNT.hook.account.useHandleMantaPaySync.thisMayTakeAFewMinutes'),
+      message: t('ui.ACCOUNT.hook.account.useHandleMantaPaySync.syncZkMode'),
       type: NotificationType.WARNING,
       btn: button,
       duration: 3

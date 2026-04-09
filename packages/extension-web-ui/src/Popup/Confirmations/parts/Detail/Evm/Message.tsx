@@ -147,21 +147,21 @@ const Component: React.FC<Props> = (props: Props) => {
       case 'eth_signTypedData_v3':
       case 'eth_signTypedData_v4':
         return (
-          <MetaInfo.Data label={t('ui.MESSAGE.Popup.Confirmations.parts.Detail.Evm.Message.rawData')}>
+          <MetaInfo.Data label={t('ui.DAPP.Confirmations.Detail.Evm.Message.rawData')}>
             {renderData(rawData, true)}
           </MetaInfo.Data>
         );
       case 'eth_signTypedData_v1':
       case 'eth_signTypedData':
         return (
-          <MetaInfo.Data label={t('ui.MESSAGE.Popup.Confirmations.parts.Detail.Evm.Message.rawData')}>
+          <MetaInfo.Data label={t('ui.DAPP.Confirmations.Detail.Evm.Message.rawData')}>
             {handlerRenderV1(rawData as unknown as SignTypedDataObjectV1[])}
           </MetaInfo.Data>
         );
       default:
         return (
           <MetaInfo.Data
-            label={t('ui.MESSAGE.Popup.Confirmations.parts.Detail.Evm.Message.message')}
+            label={t('ui.DAPP.Confirmations.Detail.Evm.Message.message')}
           >
             {renderData(rawData)}
           </MetaInfo.Data>
@@ -175,7 +175,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {
           signMethod && (
             <MetaInfo.DisplayType
-              label={t('ui.MESSAGE.Popup.Confirmations.parts.Detail.Evm.Message.signMethod')}
+              label={t('ui.DAPP.Confirmations.Detail.Evm.Message.signMethod')}
               typeName={signMethod}
             />
           )

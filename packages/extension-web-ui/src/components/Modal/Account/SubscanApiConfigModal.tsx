@@ -55,14 +55,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         setSubscanApiKey(normalizedCurrent);
         inactiveModal(SUBSCAN_API_CONFIG_MODAL);
         notify({
-          message: t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.subscanApiKeySaved'),
+          message: t('ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveSuccess'),
           type: NotificationType.SUCCESS
         });
       })
       .catch((error) => {
         console.error(error);
         notify({
-          message: t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.failedToSaveSubscanApiKey'),
+          message: t('ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveFailed'),
           type: NotificationType.ERROR
         });
       })
@@ -95,7 +95,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
           console.error(error);
           notify({
-            message: t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.failedToLoadSubscanApiKey'),
+            message: t('ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.loadFailed'),
             type: NotificationType.ERROR
           });
         })
@@ -122,7 +122,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             onClick={onClose}
             schema={'secondary'}
           >
-            {t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.cancel')}
+            {t('ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.cancel')}
           </Button>
           <Button
             block={true}
@@ -130,23 +130,23 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             loading={isLoading}
             onClick={onSave}
           >
-            {t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.save')}
+            {t('ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.save')}
           </Button>
         </div>
       )}
       id={SUBSCAN_API_CONFIG_MODAL}
       maskClosable={false}
       onCancel={onClose}
-      title={t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.yourApiKey')}
+      title={t('ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.title')}
     >
       <div className='__content'>
         <div className='__description'>
-          {t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.enterYourSubscanApiKeyBelowToTrackRealTimeWalletActivityUpdatesInApp')}
+          {t('ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.description')}
         </div>
         <Input.Password
           disabled={isLoading}
           onChange={onChangeApiKey}
-          placeholder={t('ui.SUBSCAN_API_CONFIG_MODAL.components.Modal.Account.SubscanApiConfigModal.enterKey')}
+          placeholder={t('ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.apiKeyPlaceholder')}
           value={subscanApiKey}
         />
       </div>

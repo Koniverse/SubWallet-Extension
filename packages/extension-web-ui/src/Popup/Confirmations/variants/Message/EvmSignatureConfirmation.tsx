@@ -30,10 +30,10 @@ function Component ({ className, request, type }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('ui.EVM_SIGNATURE_CONFIRMATION.Popup.Confirmations.variants.Message.EvmSignatureConfirmation.signatureRequired')}
+          {t('ui.DAPP.Confirmations.Message.EvmSignature.signatureRequired')}
         </div>
         <div className='description'>
-          {t('ui.EVM_SIGNATURE_CONFIRMATION.Popup.Confirmations.variants.Message.EvmSignatureConfirmation.youAreApprovingARequestWithTheFollowingAccount')}
+          {t('ui.DAPP.Confirmations.Message.EvmSignature.approvingRequestWithAccount')}
         </div>
         <AccountItemWithProxyAvatar
           account={account}
@@ -48,7 +48,7 @@ function Component ({ className, request, type }: Props) {
             size='xs'
             type='ghost'
           >
-            {t('ui.EVM_SIGNATURE_CONFIRMATION.Popup.Confirmations.variants.Message.EvmSignatureConfirmation.viewDetails')}
+            {t('ui.DAPP.Confirmations.Message.EvmSignature.viewDetails')}
           </Button>
         </div>
         }
@@ -59,7 +59,7 @@ function Component ({ className, request, type }: Props) {
         type={type}
       />
       {(!errors || errors.length === 0) && <BaseDetailModal
-        title={t('ui.EVM_SIGNATURE_CONFIRMATION.Popup.Confirmations.variants.Message.EvmSignatureConfirmation.messageDetails')}
+        title={t('ui.DAPP.Confirmations.Message.EvmSignature.messageDetails')}
       >
         <EvmMessageDetail payload={request.payload} />
       </BaseDetailModal>}

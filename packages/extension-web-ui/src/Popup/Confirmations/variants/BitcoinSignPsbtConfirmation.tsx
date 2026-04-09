@@ -69,10 +69,10 @@ function Component ({ className, request, type }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('ui.BITCOIN_SIGN_PSBT_CONFIRMATION.Popup.Confirmations.variants.BitcoinSignPsbtConfirmation.signatureRequired')}
+          {t('ui.DAPP.Confirmations.BitcoinSignPsbt.signatureRequired')}
         </div>
         <div className='description'>
-          {t('ui.BITCOIN_SIGN_PSBT_CONFIRMATION.Popup.Confirmations.variants.BitcoinSignPsbtConfirmation.youAreApprovingARequestWithTheFollowingAccount')}
+          {t('ui.DAPP.Confirmations.BitcoinSignPsbt.approvingRequestWithAccount')}
         </div>
         <AccountItemWithProxyAvatar
           account={account}
@@ -87,7 +87,7 @@ function Component ({ className, request, type }: Props) {
             size='xs'
             type='ghost'
           >
-            {t('ui.BITCOIN_SIGN_PSBT_CONFIRMATION.Popup.Confirmations.variants.BitcoinSignPsbtConfirmation.viewDetails')}
+            {t('ui.DAPP.Confirmations.BitcoinSignPsbt.viewDetails')}
           </Button>
         </div>}
       </div>
@@ -98,13 +98,13 @@ function Component ({ className, request, type }: Props) {
       />
       <BaseDetailModal
         className={CN(className, 'transaction-detail-modal')}
-        title={t('ui.BITCOIN_SIGN_PSBT_CONFIRMATION.Popup.Confirmations.variants.BitcoinSignPsbtConfirmation.psbtDetails')}
+        title={t('ui.DAPP.Confirmations.BitcoinSignPsbt.psbtDetails')}
       >
         <MetaInfo>
-          <MetaInfo.Data label={t('ui.BITCOIN_SIGN_PSBT_CONFIRMATION.Popup.Confirmations.variants.BitcoinSignPsbtConfirmation.input')}>
+          <MetaInfo.Data label={t('ui.DAPP.Confirmations.BitcoinSignPsbt.input')}>
             {renderAccountTransactionDetail(txInput)}
           </MetaInfo.Data>
-          <MetaInfo.Data label={t('ui.BITCOIN_SIGN_PSBT_CONFIRMATION.Popup.Confirmations.variants.BitcoinSignPsbtConfirmation.output')}>
+          <MetaInfo.Data label={t('ui.DAPP.Confirmations.BitcoinSignPsbt.output')}>
             {renderAccountTransactionDetail(txOutput)}
           </MetaInfo.Data>
 

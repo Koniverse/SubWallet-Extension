@@ -75,14 +75,14 @@ const Component: React.FC<Props> = (props: Props) => {
       <>
         <MetaInfo.Default
           className='method-name'
-          label={t('ui.TRANSACTION.Popup.Confirmations.parts.Detail.Evm.Transaction.method')}
+          label={t('ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.method')}
           labelAlign='top'
         >
           {data.methodName}
         </MetaInfo.Default>
         <MetaInfo.Data
           className='arg-container'
-          label={t('ui.TRANSACTION.Popup.Confirmations.parts.Detail.Evm.Transaction.arguments')}
+          label={t('ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.arguments')}
         >
           {
             data.args.map((value) => handlerRenderArg(value, ''))
@@ -99,13 +99,13 @@ const Component: React.FC<Props> = (props: Props) => {
           ? (
             <MetaInfo.Chain
               chain={chainInfo.slug}
-              label={t<string>('ui.TRANSACTION.Popup.Confirmations.parts.Detail.Evm.Transaction.network')}
+              label={t<string>('ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.network')}
             />
           )
           : chainId !== undefined
             ? (
               <MetaInfo.Default
-                label={t<string>('ui.TRANSACTION.Popup.Confirmations.parts.Detail.Evm.Transaction.chainId')}
+                label={t<string>('ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.chainId')}
               >
                 {chainId}
               </MetaInfo.Default>
@@ -117,10 +117,10 @@ const Component: React.FC<Props> = (props: Props) => {
           '-no-account-name-item': !recipient?.name || !accountName
         })}
         recipientAddress={recipient?.address || request.to || ''}
-        recipientLabel={t('ui.TRANSACTION.Popup.Confirmations.parts.Detail.Evm.Transaction.to')}
+        recipientLabel={t('ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.to')}
         recipientName={recipient?.name || ''}
         senderAddress={address}
-        senderLabel={t('ui.TRANSACTION.Popup.Confirmations.parts.Detail.Evm.Transaction.from')}
+        senderLabel={t('ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.from')}
         senderName={accountName || ''}
       />
       {
@@ -128,7 +128,7 @@ const Component: React.FC<Props> = (props: Props) => {
         (
           <MetaInfo.Number
             decimals={chainInfo?.evmInfo?.decimals}
-            label={t('ui.TRANSACTION.Popup.Confirmations.parts.Detail.Evm.Transaction.amount')}
+            label={t('ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.amount')}
             suffix={chainInfo?.evmInfo?.symbol}
             value={amount}
           />
@@ -136,7 +136,7 @@ const Component: React.FC<Props> = (props: Props) => {
       }
       <MetaInfo.Number
         decimals={chainInfo?.evmInfo?.decimals}
-        label={t('ui.TRANSACTION.Popup.Confirmations.parts.Detail.Evm.Transaction.estimateGas')}
+        label={t('ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.estimateGas')}
         suffix={chainInfo?.evmInfo?.symbol}
         value={request.estimateGas}
       />
@@ -144,7 +144,7 @@ const Component: React.FC<Props> = (props: Props) => {
       {
         (request.data && request.data !== '0x') &&
           (
-            <MetaInfo.Data label={t('ui.TRANSACTION.Popup.Confirmations.parts.Detail.Evm.Transaction.hexData')}>
+            <MetaInfo.Data label={t('ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.hexData')}>
               <details>
                 <summary>{request.data}</summary>
               </details>

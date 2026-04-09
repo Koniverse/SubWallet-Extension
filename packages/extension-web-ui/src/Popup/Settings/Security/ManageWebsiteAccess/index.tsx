@@ -122,11 +122,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const filterOptions = useMemo(() => {
     return [
-      { label: t('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.substrateDapp'), value: FilterValue.SUBSTRATE },
-      { label: t('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.ethereumDapp'), value: FilterValue.ETHEREUM },
-      { label: t('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.cardanoDapp'), value: FilterValue.CARDANO },
-      { label: t('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.blockedDapp'), value: FilterValue.BLOCKED },
-      { label: t('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.connectedDapp'), value: FilterValue.Connected }
+      { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.substrateDapp'), value: FilterValue.SUBSTRATE },
+      { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.ethereumDapp'), value: FilterValue.ETHEREUM },
+      { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.cardanoDapp'), value: FilterValue.CARDANO },
+      { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.blockedDapp'), value: FilterValue.BLOCKED },
+      { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.connectedDapp'), value: FilterValue.Connected }
     ];
   }, [t]);
 
@@ -148,7 +148,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         key: 'forget-all',
         icon: X,
         iconBackgroundColor: token.colorWarning,
-        title: t('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.forgetAll'),
+        title: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.forgetAll'),
         onClick: () => {
           forgetAllSite(updateAuthUrls).catch(console.error);
           onCloseActionModal();
@@ -158,7 +158,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         key: 'disconnect-all',
         icon: Plugs,
         iconBackgroundColor: token['gray-3'],
-        title: t('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.disconnectAll'),
+        title: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.disconnectAll'),
         onClick: () => {
           changeAuthorizationAll(false, updateAuthUrls).catch(console.error);
           onCloseActionModal();
@@ -168,7 +168,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         key: 'connect-all',
         icon: PlugsConnected,
         iconBackgroundColor: token['green-6'],
-        title: t('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.connectAll'),
+        title: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.connectAll'),
         onClick: () => {
           changeAuthorizationAll(true, updateAuthUrls).catch(console.error);
           onCloseActionModal();
@@ -206,8 +206,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.yourDappsWillShowUpHere')}
-        emptyTitle={t('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.noDappsFound')}
+        emptyMessage={t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.yourDappsWillShowUpHere')}
+        emptyTitle={t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.noDappsFound')}
         phosphorIcon={GlobeHemisphereWest}
       />
     );
@@ -243,7 +243,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           }
         ]}
         showBackButton
-        title={t('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.manageWebsiteAccess')}
+        title={t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.manageWebsiteAccess')}
       />
 
       <SwList.Section
@@ -256,7 +256,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         renderWhenEmpty={renderEmptyList}
         searchFunction={searchFunc}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.searchOrEnterAWebsite')}
+        searchPlaceholder={t<string>('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.searchOrEnterWebsite')}
         showActionBtn
       />
 
@@ -264,7 +264,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         actions={actions}
         id={ACTION_MODAL_ID}
         onCancel={onCloseActionModal}
-        title={t('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.accessConfiguration')}
+        title={t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.accessConfiguration')}
       />
 
       <FilterModal
@@ -274,7 +274,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
-        title={t('ui.MANAGE_WEBSITE_ACCESS.Popup.Settings.Security.ManageWebsiteAccess.filter')}
+        title={t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.filter')}
       />
     </PageWrapper>
   );

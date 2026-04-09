@@ -39,12 +39,12 @@ const Component: React.FC<Props> = (props: Props) => {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('ui.NOT_SUPPORT_WCCONFIRMATION.Popup.Confirmations.variants.NotSupportWCConfirmation.signatureRequired')}
+          {t('ui.WALLET_CONNECT.Confirmations.NotSupportWC.signatureRequired')}
         </div>
         <div className='description'>
           <AlertBox
-            description={t('ui.NOT_SUPPORT_WCCONFIRMATION.Popup.Confirmations.variants.NotSupportWCConfirmation.subwalletHasNotSupportedThisRequestForWalletconnectYet')}
-            title={t('ui.NOT_SUPPORT_WCCONFIRMATION.Popup.Confirmations.variants.NotSupportWCConfirmation.requestNotSupported')}
+            description={t('ui.WALLET_CONNECT.Confirmations.NotSupportWC.wcRequestNotSupported')}
+            title={t('ui.WALLET_CONNECT.Confirmations.NotSupportWC.requestNotSupported')}
             type='warning'
           />
         </div>
@@ -54,7 +54,7 @@ const Component: React.FC<Props> = (props: Props) => {
           loading={loading}
           onClick={handleCancel}
         >
-          {t('ui.NOT_SUPPORT_WCCONFIRMATION.Popup.Confirmations.variants.NotSupportWCConfirmation.backToHome')}
+          {t('ui.WALLET_CONNECT.Confirmations.NotSupportWC.backToHome')}
         </Button>
       </div>
     </>

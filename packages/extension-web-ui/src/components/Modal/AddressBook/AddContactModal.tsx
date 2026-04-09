@@ -62,11 +62,11 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const addressValidator = useCallback((rule: RuleObject, address: string): Promise<void> => {
     if (!address) {
-      return Promise.reject(new Error(t('ui.ADD_CONTACT_MODAL.components.Modal.AddressBook.AddContactModal.contactAddressIsRequired')));
+      return Promise.reject(new Error(t('ui.components.Modal.AddressBook.AddContact.contactAddressRequired')));
     }
 
     if (!isAddress(address)) {
-      return Promise.reject(new Error(t('ui.ADD_CONTACT_MODAL.components.Modal.AddressBook.AddContactModal.invalidContactAddress')));
+      return Promise.reject(new Error(t('ui.components.Modal.AddressBook.AddContact.invalidContactAddress')));
     }
 
     return Promise.resolve();
@@ -74,11 +74,11 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const nameValidator = useCallback((rule: RuleObject, name: string): Promise<void> => {
     if (!name) {
-      return Promise.reject(new Error(t('ui.ADD_CONTACT_MODAL.components.Modal.AddressBook.AddContactModal.contactNameIsRequired')));
+      return Promise.reject(new Error(t('ui.components.Modal.AddressBook.AddContact.contactNameRequired')));
     }
 
     if (existNames.includes(name)) {
-      return Promise.reject(new Error(t('ui.ADD_CONTACT_MODAL.components.Modal.AddressBook.AddContactModal.contactNameMustBeUnique')));
+      return Promise.reject(new Error(t('ui.components.Modal.AddressBook.AddContact.contactNameMustBeUnique')));
     }
 
     return Promise.resolve();
@@ -126,7 +126,7 @@ const Component: React.FC<Props> = (props: Props) => {
       id={modalId}
       maskClosable={!loading}
       onCancel={onCancel}
-      title={t('ui.ADD_CONTACT_MODAL.components.Modal.AddressBook.AddContactModal.addContact')}
+      title={t('ui.components.Modal.AddressBook.AddContact.addContact')}
     >
       <Form
         className='form-space-sm'
@@ -147,7 +147,7 @@ const Component: React.FC<Props> = (props: Props) => {
           statusHelpAsTooltip={true}
         >
           <Input
-            label={t('ui.ADD_CONTACT_MODAL.components.Modal.AddressBook.AddContactModal.contactName')}
+            label={t('ui.components.Modal.AddressBook.AddContact.contactName')}
             prefix={(
               <AccountProxyAvatar
                 className={'__account-avatar'}
@@ -168,7 +168,7 @@ const Component: React.FC<Props> = (props: Props) => {
         >
           <Input
             className='address-input'
-            label={t('ui.ADD_CONTACT_MODAL.components.Modal.AddressBook.AddContactModal.contactAddress')}
+            label={t('ui.components.Modal.AddressBook.AddContact.contactAddress')}
             prefix={
               address && isAddress(address) && (
                 <div className={'__overlay'}>
@@ -195,7 +195,7 @@ const Component: React.FC<Props> = (props: Props) => {
             )}
             loading={loading}
           >
-            {t('ui.ADD_CONTACT_MODAL.components.Modal.AddressBook.AddContactModal.addContact')}
+            {t('ui.components.Modal.AddressBook.AddContact.addContact')}
           </Button>
         </Form.Item>
       </Form>

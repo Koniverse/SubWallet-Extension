@@ -98,7 +98,7 @@ function Component (
             )}
             onClick={onChangeShowBalance}
             size='xs'
-            tooltip={isShowBalance ? t('ui.UPPER_BLOCK.Popup.Home.Tokens.UpperBlock.hideBalance') : t('ui.UPPER_BLOCK.Popup.Home.Tokens.UpperBlock.showBalance')}
+            tooltip={isShowBalance ? t('ui.BALANCE.screen.Tokens.UpperBlock.hideBalance') : t('ui.BALANCE.screen.Tokens.UpperBlock.showBalance')}
             type='ghost'
           />
           <Number
@@ -133,7 +133,7 @@ function Component (
             loading={reloading}
             onClick={reloadBalance}
             size='xs'
-            tooltip={t('ui.UPPER_BLOCK.Popup.Home.Tokens.UpperBlock.refreshBalance')}
+            tooltip={t('ui.BALANCE.screen.Tokens.UpperBlock.refreshBalance')}
             type='ghost'
           />
         </div>
@@ -150,7 +150,7 @@ function Component (
           onClick={onOpenReceive}
           shape='squircle'
           size={isShrink ? 'xs' : 'sm'}
-          tooltip={t('ui.UPPER_BLOCK.Popup.Home.Tokens.UpperBlock.getAddress')}
+          tooltip={t('ui.BALANCE.screen.Tokens.UpperBlock.getAddress')}
         />
         <div className={'__button-space'} />
         <Button
@@ -164,7 +164,7 @@ function Component (
           onClick={onOpenSendFund}
           shape='squircle'
           size={isShrink ? 'xs' : 'sm'}
-          tooltip={t('ui.UPPER_BLOCK.Popup.Home.Tokens.UpperBlock.sendTokens')}
+          tooltip={t('ui.BALANCE.screen.Tokens.UpperBlock.sendTokens')}
         />
         <div className={'__button-space hidden'} />
         <Button
@@ -180,7 +180,7 @@ function Component (
           onClick={onOpenSwap}
           shape='squircle'
           size={isShrink ? 'xs' : 'sm'}
-          tooltip={t('ui.UPPER_BLOCK.Popup.Home.Tokens.UpperBlock.swap')}
+          tooltip={t('ui.BALANCE.screen.Tokens.UpperBlock.swap')}
         />
         <div className={CN('__button-space', { hidden: isShrink })} />
         <Button
@@ -196,7 +196,7 @@ function Component (
           onClick={onOpenBuyTokens}
           shape='squircle'
           size={isShrink ? 'xs' : 'sm'}
-          tooltip={t('ui.UPPER_BLOCK.Popup.Home.Tokens.UpperBlock.buyAndSell')}
+          tooltip={t('ui.BALANCE.screen.Tokens.UpperBlock.buyToken')}
         />
       </ActionButtonsContainer>
     </div>

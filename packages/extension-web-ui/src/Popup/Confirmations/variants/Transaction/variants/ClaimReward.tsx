@@ -34,13 +34,13 @@ const Component: React.FC<Props> = (props: Props) => {
     if (isRewardLteFee) {
       // todo: will convert message to key for i18n later
       openAlert({
-        title: t('ui.CLAIM_REWARD.Popup.Confirmations.variants.Transaction.variants.ClaimReward.payAttention'),
+        title: t('ui.TRANSACTION.Confirmations.ClaimReward.payAttentionExclamation'),
         type: NotificationType.WARNING,
         content: t(`The rewards you are about to claim are ${
           isRewardLtFee ? 'smaller than' : 'equal to'
         } the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?`),
         okButton: {
-          text: t('ui.CLAIM_REWARD.Popup.Confirmations.variants.Transaction.variants.ClaimReward.iUnderstand'),
+          text: t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsSmallerThanFeeWarning'),
           onClick: closeAlert,
           icon: CheckCircle
         }
@@ -61,7 +61,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {
           data.unclaimedReward && <MetaInfo.Number
             decimals={decimals}
-            label={t('ui.CLAIM_REWARD.Popup.Confirmations.variants.Transaction.variants.ClaimReward.availableRewards')}
+            label={t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsEqualToFeeWarning')}
             suffix={symbol}
             value={data.unclaimedReward}
           />
@@ -69,7 +69,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.CLAIM_REWARD.Popup.Confirmations.variants.Transaction.variants.ClaimReward.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.ClaimReward.iUnderstand')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
@@ -78,8 +78,8 @@ const Component: React.FC<Props> = (props: Props) => {
       <span className={CN('text-light-4')}>
         {
           data.bondReward
-            ? t('ui.CLAIM_REWARD.Popup.Confirmations.variants.Transaction.variants.ClaimReward.yourRewardsWillBeStakedBackIntoThePoolAfterClaiming')
-            : t('ui.CLAIM_REWARD.Popup.Confirmations.variants.Transaction.variants.ClaimReward.yourRewardsWillBeAddedToYourTransferableBalanceAfterClaiming')
+            ? t('ui.TRANSACTION.Confirmations.ClaimReward.availableRewards')
+            : t('ui.TRANSACTION.Confirmations.ClaimReward.networkFee')
         }
       </span>
     </>

@@ -49,9 +49,9 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
 
   const feeTypeNameMap = useMemo<Record<FeeOption, string>>(() => ({
-    slow: t('ui.FEE_OPTION_ITEM.components.Field.TransactionFee.FeeEditor.FeeOptionItem.low'),
-    average: t('ui.FEE_OPTION_ITEM.components.Field.TransactionFee.FeeEditor.FeeOptionItem.medium'),
-    fast: t('ui.FEE_OPTION_ITEM.components.Field.TransactionFee.FeeEditor.FeeOptionItem.high')
+    slow: t('ui.TRANSACTION.components.Field.FeeEditor.FeeOptionItem.low'),
+    average: t('ui.TRANSACTION.components.Field.FeeEditor.FeeOptionItem.medium'),
+    fast: t('ui.TRANSACTION.components.Field.FeeEditor.FeeOptionItem.high')
   }), [t]);
 
   // todo: i18n this, may convert to util

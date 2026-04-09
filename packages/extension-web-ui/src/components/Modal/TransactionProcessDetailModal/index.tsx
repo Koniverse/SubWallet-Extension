@@ -35,14 +35,14 @@ const Component: FC<Props> = (props: Props) => {
     }
 
     if (processData.type === ProcessType.SWAP) {
-      return t('ui.TRANSACTION_PROCESS_DETAIL_MODAL.components.Modal.TransactionProcessDetailModal.swapDetails');
+      return t('ui.TRANSACTION.components.Modal.TxProcessDetail.swapDetails');
     }
 
     if (processData.type === ProcessType.EARNING) {
-      return t('ui.TRANSACTION_PROCESS_DETAIL_MODAL.components.Modal.TransactionProcessDetailModal.stakeDetails');
+      return t('ui.TRANSACTION.components.Modal.TxProcessDetail.stakeDetails');
     }
 
-    return t('ui.TRANSACTION_PROCESS_DETAIL_MODAL.components.Modal.TransactionProcessDetailModal.transactionDetails');
+    return t('ui.TRANSACTION.components.Modal.TxProcessDetail.transactionDetails');
   }, [processData, t]);
 
   useEffect(() => {
@@ -91,7 +91,7 @@ const Component: FC<Props> = (props: Props) => {
           block={true}
           onClick={onCancel}
         >
-          {t('ui.TRANSACTION_PROCESS_DETAIL_MODAL.components.Modal.TransactionProcessDetailModal.close')}
+          {t('ui.TRANSACTION.components.Modal.TxProcessDetail.close')}
         </Button>
       )}
       id={modalId}

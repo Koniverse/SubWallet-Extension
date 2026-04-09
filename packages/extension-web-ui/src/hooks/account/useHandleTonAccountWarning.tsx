@@ -25,17 +25,17 @@ export default function useHandleTonAccountWarning (): HookType {
     if (accountType === 'ton') {
       alertModal.open({
         closable: false,
-        title: t('ui.USE_HANDLE_TON_ACCOUNT_WARNING.hooks.account.useHandleTonAccountWarning.incompatibleSeedPhrase'),
+        title: t('ui.ACCOUNT.hook.account.useHandleTonWarning.incompatibleSeedPhrase'),
         type: NotificationType.WARNING,
         content: (
           <>
             <div>
-              {t('ui.USE_HANDLE_TON_ACCOUNT_WARNING.hooks.account.useHandleTonAccountWarning.thisAddressSSeedPhraseIsNotCompatibleWithTonNativeWalletsContinueUsingThisAddressOrCreateANewAccountThatCanBeUsedOnBothSubwalletAndTonNativeWallets')}
+              {t('ui.ACCOUNT.hook.account.useHandleTonWarning.tonIncompatibleSeedPhraseAction')}
             </div>
           </>
         ),
         okButton: {
-          text: t('ui.USE_HANDLE_TON_ACCOUNT_WARNING.hooks.account.useHandleTonAccountWarning.getAddress'),
+          text: t('ui.ACCOUNT.hook.account.useHandleTonWarning.getAddress'),
           onClick: () => {
             alertModal.close();
             processFunction();
@@ -43,7 +43,7 @@ export default function useHandleTonAccountWarning (): HookType {
           schema: 'primary'
         },
         cancelButton: {
-          text: t('ui.USE_HANDLE_TON_ACCOUNT_WARNING.hooks.account.useHandleTonAccountWarning.createNew'),
+          text: t('ui.ACCOUNT.hook.account.useHandleTonWarning.createNew'),
           onClick: () => {
             setSelectedMnemonicType('ton');
             setConfirmedTermSeedPhrase((prevState: string | SeedPhraseTermStorage) => {

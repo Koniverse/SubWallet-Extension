@@ -337,12 +337,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Tooltip
                   open={isWebUI ? undefined : false}
                   placement={'topLeft'}
-                  title={t('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.decimals')}
+                  title={t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.decimals')}
                 >
                   <div>
                     <Field
                       content={tokenInfo.decimals}
-                      placeholder={t<string>('ui.TOKEN_DETAIL.Popup.Settings.Tokens.TokenDetail.decimals')}
+                      placeholder={t<string>('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.decimals')}
                     />
                   </div>
                 </Tooltip>

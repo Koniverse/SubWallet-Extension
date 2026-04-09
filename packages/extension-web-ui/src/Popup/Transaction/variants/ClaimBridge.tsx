@@ -158,7 +158,7 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('ui.CLAIM_BRIDGE.Popup.Transaction.variants.ClaimBridge.availableBalance')}
+            label={t('ui.TRANSACTION.screen.Transaction.ClaimBridge.availableBalance')}
             onBalanceReady={setIsBalanceReady}
           />
           <Form.Item>
@@ -168,13 +168,13 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
             >
               <MetaInfo.Chain
                 chain={chainValue}
-                label={t('ui.CLAIM_BRIDGE.Popup.Transaction.variants.ClaimBridge.network')}
+                label={t('ui.TRANSACTION.screen.Transaction.ClaimBridge.network')}
               />
               {
                 metadata && (
                   <MetaInfo.Number
                     decimals={decimals}
-                    label={t('ui.CLAIM_BRIDGE.Popup.Transaction.variants.ClaimBridge.amount')}
+                    label={t('ui.TRANSACTION.screen.Transaction.ClaimBridge.amount')}
                     suffix={symbol}
                     value={ amountValue }
                   />
@@ -198,7 +198,7 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
               onClick={goHome}
               schema={'secondary'}
             >
-              {t('ui.CLAIM_BRIDGE.Popup.Transaction.variants.ClaimBridge.cancel')}
+              {t('ui.TRANSACTION.screen.Transaction.ClaimBridge.cancel')}
             </Button>
           )
         }
@@ -214,7 +214,7 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
           loading={loading}
           onClick={checkAction(form.submit, ExtrinsicType.CLAIM_BRIDGE)}
         >
-          {t('ui.CLAIM_BRIDGE.Popup.Transaction.variants.ClaimBridge.continue')}
+          {t('ui.TRANSACTION.screen.Transaction.ClaimBridge.continue')}
         </Button>
       </TransactionFooter>
     </>

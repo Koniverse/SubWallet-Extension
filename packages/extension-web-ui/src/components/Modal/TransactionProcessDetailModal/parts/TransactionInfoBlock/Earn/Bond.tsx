@@ -62,14 +62,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.AccountGroup
           accounts={data.selectedValidators}
-          content={t(`{{number}} selected ${handleValidatorLabel.toLowerCase()}`, { replace: { number: data.selectedValidators.length } })}
+          content={t('ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Earn.Bond.numberSelectedValidator', { replace: { number: data.selectedValidators.length, validatorLabel: handleValidatorLabel.toLowerCase() } })}
           identPrefix={networkPrefix}
-          label={t(data.type === StakingType.POOLED ? 'Pool' : handleValidatorLabel)}
+          label={data.type === StakingType.POOLED ? t('ui.TRANSACTION.screen.Transaction.Earn.pool') : t(handleValidatorLabel)}
         />
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.BOND.components.Modal.TransactionProcessDetailModal.parts.TransactionInfoBlock.Earn.Bond.amount')}
+          label={t('ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Earn.Bond.estimatedFee')}
           suffix={symbol}
           value={data.amount}
         />

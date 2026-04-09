@@ -65,9 +65,9 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
 
   const title = useMemo(() => {
     if (type === YieldPoolType.NOMINATION_POOL) {
-      return t('ui.REWARD_INFO_PART.Popup.Home.Earning.EarningPositionDetail.RewardInfoPart.unclaimedRewards');
+      return t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.unclaimedRewards');
     } else {
-      return t('ui.REWARD_INFO_PART.Popup.Home.Earning.EarningPositionDetail.RewardInfoPart.rewards');
+      return t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.rewards');
     }
   }, [t, type]);
 
@@ -88,11 +88,11 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
       navigate('/transaction/claim-reward');
     } else {
       openAlert({
-        title: t('ui.REWARD_INFO_PART.Popup.Home.Earning.EarningPositionDetail.RewardInfoPart.rewardsUnavailable'),
+        title: t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.rewardsUnavailable'),
         type: NotificationType.ERROR,
-        content: t('ui.REWARD_INFO_PART.Popup.Home.Earning.EarningPositionDetail.RewardInfoPart.youDonTHaveAnyRewardsToClaimAtTheMomentTryAgainLater'),
+        content: t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.noRewardsToClaim'),
         okButton: {
-          text: t('ui.REWARD_INFO_PART.Popup.Home.Earning.EarningPositionDetail.RewardInfoPart.iUnderstand'),
+          text: t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
         }
@@ -152,13 +152,13 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
                 : (
                   <ActivityIndicator size={20} />
                 )
-              : isDAppStaking && (<div className={'__visit-dapp-label'}>{t('ui.REWARD_INFO_PART.Popup.Home.Earning.EarningPositionDetail.RewardInfoPart.visitAstarPortal')}</div>)}
+              : isDAppStaking && (<div className={'__visit-dapp-label'}>{t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.visitAstarPortal')}</div>)}
             {canClaim && (
               <Button
                 onClick={onClaimReward}
                 size='xs'
               >
-                {type === YieldPoolType.NATIVE_STAKING && isDAppStaking ? t('ui.REWARD_INFO_PART.Popup.Home.Earning.EarningPositionDetail.RewardInfoPart.checkRewards') : t('ui.REWARD_INFO_PART.Popup.Home.Earning.EarningPositionDetail.RewardInfoPart.claimRewards')}
+                {type === YieldPoolType.NATIVE_STAKING && isDAppStaking ? t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.checkRewards') : t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.claimRewards')}
               </Button>
             )}
           </div>
@@ -171,7 +171,7 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
 
           <CollapsiblePanel
             className={'__reward-history-panel'}
-            title={t('ui.REWARD_INFO_PART.Popup.Home.Earning.EarningPositionDetail.RewardInfoPart.rewardHistory')}
+            title={t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.rewardHistory')}
           >
             <MetaInfo
               labelColorScheme='gray'
@@ -202,7 +202,7 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
               size={'xs'}
               type={'ghost'}
             >
-              {t('ui.REWARD_INFO_PART.Popup.Home.Earning.EarningPositionDetail.RewardInfoPart.viewOnExplorer')}
+              {t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.viewOnExplorer')}
             </Button>
           </CollapsiblePanel>
         </>

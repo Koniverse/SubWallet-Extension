@@ -71,12 +71,12 @@ const Component: React.FC<Props> = (props: Props) => {
         onFieldsChange={onUpdate}
         onFinish={onSubmit}
       >
-        <div className={'zk_confirmation_modal__input_label'}>{t('ui.ZK_MODE_FOOTER.components.Confirmation.ZkModeFooter.enterPasswordToConfirm')}</div>
+        <div className={'zk_confirmation_modal__input_label'}>{t('ui.components.Confirmation.ZkModeFooter.enterPasswordToConfirm')}</div>
         <Form.Item
           name={'password'}
           rules={[
             {
-              message: t('ui.ZK_MODE_FOOTER.components.Confirmation.ZkModeFooter.passwordIsRequired'),
+              message: t('ui.components.Confirmation.ZkModeFooter.passwordIsRequired'),
               required: true
             }
           ]}
@@ -85,7 +85,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <Input.Password
             containerClassName='password-input'
             id={passwordInputId}
-            placeholder={t('ui.ZK_MODE_FOOTER.components.Confirmation.ZkModeFooter.password')}
+            placeholder={t('ui.components.Confirmation.ZkModeFooter.password')}
           />
         </Form.Item>
       </Form>
@@ -102,7 +102,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onClickCancel}
           schema={'secondary'}
         >
-          {t('ui.ZK_MODE_FOOTER.components.Confirmation.ZkModeFooter.cancel')}
+          {t('ui.components.Confirmation.ZkModeFooter.cancel')}
         </Button>
 
         <Button
@@ -117,7 +117,7 @@ const Component: React.FC<Props> = (props: Props) => {
           loading={loading}
           onClick={form.submit}
         >
-          {t('ui.ZK_MODE_FOOTER.components.Confirmation.ZkModeFooter.enable')}
+          {t('ui.components.Confirmation.ZkModeFooter.enable')}
         </Button>
       </div>
     </div>

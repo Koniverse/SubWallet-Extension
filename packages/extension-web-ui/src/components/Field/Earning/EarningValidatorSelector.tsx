@@ -444,7 +444,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>(`Search ${handleValidatorLabel}`)}
+          searchPlaceholder={`${t('ui.EARNING.components.Modal.Earning.Validator.Change.searchValidator')} ${t(handleValidatorLabel)}`}
           // showActionBtn
         />
       </BaseModal>

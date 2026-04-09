@@ -313,7 +313,7 @@ const Component = (props: Props) => {
               )}
               onClick={onClick}
             >
-              {t('ui.EARNING_VALIDATOR_SELECTED_MODAL.components.Modal.Earning.EarningValidatorSelectedModal.changeValidators')}
+              {t('ui.EARNING.components.Modal.Earning.Validator.changeValidators')}
             </Button>
           )
         }

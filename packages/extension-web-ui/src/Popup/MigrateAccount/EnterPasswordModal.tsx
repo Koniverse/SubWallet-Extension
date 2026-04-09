@@ -70,7 +70,7 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
             onClick={onClose}
             schema={'secondary'}
           >
-            {t('ui.ENTER_PASSWORD_MODAL.Popup.MigrateAccount.EnterPasswordModal.cancel')}
+            {t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.cancel')}
           </Button>
           <Button
             block={true}
@@ -84,16 +84,16 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
             loading={loading}
             onClick={form.submit}
           >
-            {t('ui.ENTER_PASSWORD_MODAL.Popup.MigrateAccount.EnterPasswordModal.continue')}
+            {t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.continue')}
           </Button>
         </>
       )}
       id={enterPasswordModalId}
-      title={t('ui.ENTER_PASSWORD_MODAL.Popup.MigrateAccount.EnterPasswordModal.enterPassword')}
+      title={t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.enterPassword')}
       zIndex={9999}
     >
       <div className='__brief'>
-        {t('ui.ENTER_PASSWORD_MODAL.Popup.MigrateAccount.EnterPasswordModal.enterYourSubwalletPasswordToContinue')}
+        {t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.enterSubWalletPasswordToContinue')}
       </div>
 
       <Form
@@ -105,7 +105,7 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
           name={FormFieldName.PASSWORD}
           rules={[
             {
-              message: t('ui.ENTER_PASSWORD_MODAL.Popup.MigrateAccount.EnterPasswordModal.passwordIsRequired'),
+              message: t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.passwordIsRequired'),
               required: true
             }
           ]}
@@ -114,8 +114,8 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
           <Input.Password
             containerClassName='__password-input'
             id={passwordInputId}
-            label={t('ui.ENTER_PASSWORD_MODAL.Popup.MigrateAccount.EnterPasswordModal.password')}
-            placeholder={t('ui.ENTER_PASSWORD_MODAL.Popup.MigrateAccount.EnterPasswordModal.enterPassword')}
+            label={t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.password')}
+            placeholder={t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.enterPassword')}
             suffix={<span />}
           />
         </Form.Item>

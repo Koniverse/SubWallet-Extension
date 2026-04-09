@@ -201,7 +201,7 @@ const Component = () => {
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('ui.WITHDRAW.Popup.Transaction.variants.Withdraw.availableBalance')}
+            label={t('ui.TRANSACTION.screen.Transaction.Withdraw.availableBalance')}
             onBalanceReady={setIsBalanceReady}
           />
           <Form.Item>
@@ -211,13 +211,13 @@ const Component = () => {
             >
               <MetaInfo.Chain
                 chain={chainValue}
-                label={t('ui.WITHDRAW.Popup.Transaction.variants.Withdraw.network')}
+                label={t('ui.TRANSACTION.screen.Transaction.Withdraw.network')}
               />
               {
                 unstakingInfo && (
                   <MetaInfo.Number
                     decimals={decimals}
-                    label={t('ui.WITHDRAW.Popup.Transaction.variants.Withdraw.amount')}
+                    label={t('ui.TRANSACTION.screen.Transaction.Withdraw.amount')}
                     suffix={symbol}
                     value={unstakingInfo.claimable}
                   />
@@ -241,7 +241,7 @@ const Component = () => {
               onClick={goHome}
               schema={'secondary'}
             >
-              {t('ui.WITHDRAW.Popup.Transaction.variants.Withdraw.cancel')}
+              {t('ui.TRANSACTION.screen.Transaction.Withdraw.cancel')}
             </Button>
           )
         }
@@ -257,7 +257,7 @@ const Component = () => {
           loading={loading}
           onClick={onPreCheck(form.submit, exType)}
         >
-          {t('ui.WITHDRAW.Popup.Transaction.variants.Withdraw.continue')}
+          {t('ui.TRANSACTION.screen.Transaction.Withdraw.continue')}
         </Button>
       </TransactionFooter>
     </>

@@ -46,7 +46,7 @@ const useGetTransactionProcessStepText = () => {
         }
       };
 
-      return t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.transferFromTo', {
+      return t('ui.TRANSACTION.hook.transaction.useGetTxStepText.transferTokenFromTo', {
         replace: {
           ...analysisMetadata()
         }
@@ -84,7 +84,7 @@ const useGetTransactionProcessStepText = () => {
         }
       };
 
-      return t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.swapOnForOn', {
+      return t('ui.TRANSACTION.hook.transaction.useGetTxStepText.swapTokenFromTo', {
         replace: {
           ...analysisMetadata()
         }
@@ -123,14 +123,14 @@ const useGetTransactionProcessStepText = () => {
        * So simple check with this type is enough
        * */
       if (processStep.type === CommonStepType.TOKEN_APPROVAL) {
-        return t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.approveOnForSwap', {
+        return t('ui.TRANSACTION.hook.transaction.useGetTxStepText.approveTokenForSwap', {
           replace: {
             ...analysisMetadata()
           }
         });
       }
 
-      return t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.approveOnForTransfer', {
+      return t('ui.TRANSACTION.hook.transaction.useGetTxStepText.approveTokenForTransfer', {
         replace: {
           ...analysisMetadata()
         }
@@ -138,7 +138,7 @@ const useGetTransactionProcessStepText = () => {
     }
 
     if (processStep.type === SwapStepType.PERMIT) {
-      return t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.signMessageToAuthorizeProvider');
+      return t('ui.TRANSACTION.hook.transaction.useGetTxStepText.signMessageToAuthorizeProvider');
     }
 
     if (([
@@ -158,13 +158,13 @@ const useGetTransactionProcessStepText = () => {
           const asset = assetRegistry[brief.token];
 
           const earnMethodMap: Record<string, string> = {
-            [`${YieldPoolType.NOMINATION_POOL}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.nominationPool'),
-            [`${YieldPoolType.NATIVE_STAKING}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.directNomination'),
-            [`${YieldPoolType.LIQUID_STAKING}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.liquidStaking'),
-            [`${YieldPoolType.LENDING}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.lending'),
-            [`${YieldPoolType.PARACHAIN_STAKING}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.parachainStaking'),
-            [`${YieldPoolType.SINGLE_FARMING}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.singleFarming'),
-            [`${YieldPoolType.SUBNET_STAKING}`]: t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.subnetStaking')
+            [`${YieldPoolType.NOMINATION_POOL}`]: t('ui.TRANSACTION.hook.transaction.useGetTxStepText.nominationPool'),
+            [`${YieldPoolType.NATIVE_STAKING}`]: t('ui.TRANSACTION.hook.transaction.useGetTxStepText.directNomination'),
+            [`${YieldPoolType.LIQUID_STAKING}`]: t('ui.TRANSACTION.hook.transaction.useGetTxStepText.liquidStaking'),
+            [`${YieldPoolType.LENDING}`]: t('ui.TRANSACTION.hook.transaction.useGetTxStepText.lending'),
+            [`${YieldPoolType.PARACHAIN_STAKING}`]: t('ui.TRANSACTION.hook.transaction.useGetTxStepText.parachainStaking'),
+            [`${YieldPoolType.SINGLE_FARMING}`]: t('ui.TRANSACTION.hook.transaction.useGetTxStepText.singleFarming'),
+            [`${YieldPoolType.SUBNET_STAKING}`]: t('ui.TRANSACTION.hook.transaction.useGetTxStepText.subnetStaking')
           };
 
           return {
@@ -183,7 +183,7 @@ const useGetTransactionProcessStepText = () => {
         }
       };
 
-      return t('ui.USE_GET_TRANSACTION_PROCESS_STEP_TEXT.hooks.transaction.process.useGetTransactionProcessStepText.stakeVia', {
+      return t('ui.TRANSACTION.hook.transaction.useGetTxStepText.stakeTokenViaMethod', {
         replace: {
           ...analysisMetadata()
         }

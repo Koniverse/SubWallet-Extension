@@ -161,13 +161,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         key: ThemeNames.DARK,
         leftIcon: MoonStars,
         leftIconBgColor: token.colorPrimary,
-        title: t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.darkTheme')
+        title: t('ui.SETTINGS.screen.Setting.General.darkTheme')
       },
       {
         key: ThemeNames.LIGHT,
         leftIcon: Sun,
         leftIconBgColor: token.colorPrimary,
-        title: t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.lightTheme'),
+        title: t('ui.SETTINGS.screen.Setting.General.lightTheme'),
         disabled: true
       }
     ];
@@ -206,19 +206,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         key: 'extension',
         leftIcon: LayoutIcon,
         leftIconBgColor: token['volcano-6'],
-        title: t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.extension')
+        title: t('ui.SETTINGS.screen.Setting.General.popup')
       },
       {
         key: 'popup',
         leftIcon: ArrowSquareUpRight,
         leftIconBgColor: token['volcano-6'],
-        title: t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.popup')
+        title: t('ui.SETTINGS.screen.Setting.General.extension')
       },
       {
         key: 'window',
         leftIcon: CornersOut,
         leftIconBgColor: token['volcano-6'],
-        title: t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.window')
+        title: t('ui.SETTINGS.screen.Setting.General.window')
       }
     ];
   }, [t, token]);
@@ -306,7 +306,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     <PageWrapper className={`general-setting ${className}`}>
       <Layout.WithSubHeaderOnly
         onBack={goBack}
-        title={t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.generalSettings')}
+        title={t('ui.SETTINGS.screen.Setting.General.generalSettings')}
       >
         <div className={'__scroll-container'}>
           <BaseSelectModal
@@ -316,7 +316,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               key: 'wallet-theme-trigger',
               leftIcon: ImageSquare,
               leftIconBgColor: token.colorPrimary,
-              title: t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.walletTheme')
+              title: t('ui.SETTINGS.screen.Setting.General.walletTheme')
             })}
             id='wallet-theme-select-modal'
             inputWidth={'100%'}
@@ -326,7 +326,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             renderItem={renderSelectionItem}
             selected={theme}
             shape='round'
-            title={t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.walletTheme')}
+            title={t('ui.SETTINGS.screen.Setting.General.walletTheme')}
           />
           <BaseSelectModal
             background={'default'}
@@ -335,7 +335,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               key: 'price-currency-trigger',
               leftIcon: CurrencyCircleDollar,
               leftIconBgColor: token['gold-6'],
-              title: t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.currency'),
+              title: t('ui.SETTINGS.screen.Setting.General.currency'),
               subTitle: currency
             })}
             disabled={loadingMap.currency}
@@ -348,11 +348,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             renderWhenEmpty={renderEmpty}
             searchFunction={searchFunction}
             searchMinCharactersCount={2}
-            searchPlaceholder={t<string>('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.searchCurrency')}
+            searchPlaceholder={t<string>('ui.SETTINGS.screen.Setting.General.searchCurrency')}
             selected={currency}
             shape='round'
             size='small'
-            title={t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.selectACurrency')}
+            title={t('ui.SETTINGS.screen.Setting.General.selectCurrency')}
           />
 
           <BaseSelectModal
@@ -362,7 +362,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               key: 'languages-trigger',
               leftIcon: GlobeHemisphereEast,
               leftIconBgColor: token['green-6'],
-              title: t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.language')
+              title: t('ui.SETTINGS.screen.Setting.General.language')
             })}
             disabled={loadingMap.language}
             id='languages-select-modal'
@@ -374,7 +374,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             selected={_language}
             shape='round'
             size='small'
-            title={t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.language')}
+            title={t('ui.SETTINGS.screen.Setting.General.language')}
           />
 
           {
@@ -386,7 +386,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   key: 'browser-confirmation-type-trigger',
                   leftIcon: BellSimpleRinging,
                   leftIconBgColor: token['volcano-6'],
-                  title: t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.browserNotifications')
+                  title: t('ui.SETTINGS.screen.Setting.General.browserNotifications')
                 })}
                 disabled={loadingMap.browserConfirmationType}
                 id='browser-confirmation-type-select-modal'
@@ -398,7 +398,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 selected={_browserConfirmationType}
                 shape='round'
                 size='small'
-                title={t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.viewNotificationsIn')}
+                title={t('ui.SETTINGS.screen.Setting.General.viewNotificationsIn')}
               />
             )
           }
@@ -413,7 +413,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 weight='fill'
               />
             )}
-            name={t('ui.GENERAL_SETTING.Popup.Settings.GeneralSetting.inAppNotifications')}
+            name={t('ui.SETTINGS.screen.Setting.General.inAppNotifications')}
             onPressItem={onClickEnableNotification}
             rightItem={(
               <div className={'__trigger-right-item'}>

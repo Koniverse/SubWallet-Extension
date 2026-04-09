@@ -57,7 +57,7 @@ const decodeMethod = (data: string, chain: Chain, specVersion: BN): Decoded => {
 const renderMethod = (data: string, { args, method }: Decoded, t: TFunction): React.ReactNode => {
   if (!args || !method) {
     return (
-      <MetaInfo.Data label={t<string>('ui.EXTRINSIC.Popup.Confirmations.parts.Detail.Substrate.Extrinsic.methodData')}>
+      <MetaInfo.Data label={t<string>('ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.methodData')}>
         {data}
       </MetaInfo.Data>
     );
@@ -65,7 +65,7 @@ const renderMethod = (data: string, { args, method }: Decoded, t: TFunction): Re
 
   return (
     <div className='method-container'>
-      <MetaInfo.Data label={t<string>('ui.EXTRINSIC.Popup.Confirmations.parts.Detail.Substrate.Extrinsic.method')}>
+      <MetaInfo.Data label={t<string>('ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.method')}>
         <details>
           <summary>
             {method.section}.{method.method}{method.meta ? `(${method.meta.args.map(({ name }) => name).join(', ')})` : ''}
@@ -75,7 +75,7 @@ const renderMethod = (data: string, { args, method }: Decoded, t: TFunction): Re
       </MetaInfo.Data>
       {
         method.meta && (
-          <MetaInfo.Data label={t<string>('ui.EXTRINSIC.Popup.Confirmations.parts.Detail.Substrate.Extrinsic.info')}>
+          <MetaInfo.Data label={t<string>('ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.info')}>
             <details>
               <summary>{method.meta.docs.map((d) => d.toString().trim()).join(' ')}</summary>
             </details>
@@ -88,13 +88,13 @@ const renderMethod = (data: string, { args, method }: Decoded, t: TFunction): Re
 
 const mortalityAsString = (era: ExtrinsicEra, hexBlockNumber: string, t: TFunction): string => {
   if (era.isImmortalEra) {
-    return t<string>('ui.EXTRINSIC.Popup.Confirmations.parts.Detail.Substrate.Extrinsic.immortal');
+    return t<string>('ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.immortal');
   }
 
   const blockNumber = bnToBn(hexBlockNumber);
   const mortal = era.asMortalEra;
 
-  return t<string>('ui.EXTRINSIC.Popup.Confirmations.parts.Detail.Substrate.Extrinsic.mortalValidFromTo', {
+  return t<string>('ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.mortalValidFromTo', {
     replace: {
       birth: formatNumber(mortal.birth(blockNumber)),
       death: formatNumber(mortal.death(blockNumber))
@@ -121,12 +121,12 @@ const Component: React.FC<Props> = ({ accountName, address, className, payload: 
           ? (
             <MetaInfo.Chain
               chain={chainInfo.slug}
-              label={t<string>('ui.EXTRINSIC.Popup.Confirmations.parts.Detail.Substrate.Extrinsic.network')}
+              label={t<string>('ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.network')}
             />
           )
           : (
             <MetaInfo.Default
-              label={t<string>('ui.EXTRINSIC.Popup.Confirmations.parts.Detail.Substrate.Extrinsic.genesishash')}
+              label={t<string>('ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.genesisHash')}
             >
               {toShort(genesisHash, 10, 10)}
             </MetaInfo.Default>
@@ -135,29 +135,29 @@ const Component: React.FC<Props> = ({ accountName, address, className, payload: 
       <MetaInfo.Account
         address={address}
         className={'account-info-item'}
-        label={t('ui.EXTRINSIC.Popup.Confirmations.parts.Detail.Substrate.Extrinsic.from')}
+        label={t('ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.from')}
         name={accountName}
         networkPrefix={chain?.ss58Format ?? chainInfo?.substrateInfo?.addressPrefix}
       />
       <MetaInfo.Number
-        label={t<string>('ui.EXTRINSIC.Popup.Confirmations.parts.Detail.Substrate.Extrinsic.version')}
+        label={t<string>('ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.version')}
         value={specVersion.toNumber()}
       />
       <MetaInfo.Number
-        label={t<string>('ui.EXTRINSIC.Popup.Confirmations.parts.Detail.Substrate.Extrinsic.nonce')}
+        label={t<string>('ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.nonce')}
         value={formatNumber(nonce)}
       />
       {!tip.isEmpty && (
         <MetaInfo.Number
           decimals={chainInfo?.substrateInfo?.decimals || 0}
-          label={t<string>('ui.EXTRINSIC.Popup.Confirmations.parts.Detail.Substrate.Extrinsic.tip')}
+          label={t<string>('ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.tip')}
           suffix={chainInfo?.substrateInfo?.symbol}
           value={tip.toPrimitive() as string | number}
         />
       )}
       {renderMethod(method, decoded, t)}
       <MetaInfo.Data
-        label={t('ui.EXTRINSIC.Popup.Confirmations.parts.Detail.Substrate.Extrinsic.lifetime')}
+        label={t('ui.DAPP.Confirmations.Detail.Substrate.Extrinsic.lifetime')}
       >
         {mortalityAsString(era, blockNumber, t)}
       </MetaInfo.Data>

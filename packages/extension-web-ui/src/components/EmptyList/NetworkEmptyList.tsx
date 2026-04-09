@@ -29,7 +29,7 @@ const NetworkEmptyList: React.FC<Props> = (props: Props) => {
           weight='fill'
         />
       ),
-      children: t('ui.NETWORK_EMPTY_LIST.components.EmptyList.NetworkEmptyList.addNetwork'),
+      children: t('ui.components.EmptyList.Network.addNetwork'),
       shape: 'circle',
       size: 'xs',
       onClick: () => {
@@ -45,8 +45,8 @@ const NetworkEmptyList: React.FC<Props> = (props: Props) => {
   return (
     <EmptyList
       buttonProps={buttonProps}
-      emptyMessage={t('ui.NETWORK_EMPTY_LIST.components.EmptyList.NetworkEmptyList.tryAddingOneManually')}
-      emptyTitle={t('ui.NETWORK_EMPTY_LIST.components.EmptyList.NetworkEmptyList.noNetworksFound')}
+      emptyMessage={t('ui.components.EmptyList.Network.tryAddingOneManually')}
+      emptyTitle={t('ui.components.EmptyList.Network.noNetworksFound')}
       phosphorIcon={ListChecks}
     />
   );

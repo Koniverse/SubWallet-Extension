@@ -19,24 +19,24 @@ const useGetAccountTitleByAddress = (address?: string): string => {
       case AccountSignMode.LEGACY_LEDGER:
       case AccountSignMode.GENERIC_LEDGER:
       case AccountSignMode.ECDSA_SUBSTRATE_LEDGER:
-        return t('ui.USE_GET_ACCOUNT_TITLE_BY_ADDRESS.hooks.account.useGetAccountTitleByAddress.ledgerAccount');
+        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.ledgerAccount');
       case AccountSignMode.ALL_ACCOUNT:
-        return t('ui.USE_GET_ACCOUNT_TITLE_BY_ADDRESS.hooks.account.useGetAccountTitleByAddress.allAccount');
+        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.allAccount');
       case AccountSignMode.PASSWORD:
-        return t('ui.USE_GET_ACCOUNT_TITLE_BY_ADDRESS.hooks.account.useGetAccountTitleByAddress.normalAccount');
+        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.normalAccount');
 
       case AccountSignMode.QR:
         if (isEvm) {
-          return t('ui.USE_GET_ACCOUNT_TITLE_BY_ADDRESS.hooks.account.useGetAccountTitleByAddress.evmQrSignerAccount');
+          return t('ui.ACCOUNT.hook.account.useGetAccountTitle.evmQrSignerAccount');
         } else {
-          return t('ui.USE_GET_ACCOUNT_TITLE_BY_ADDRESS.hooks.account.useGetAccountTitleByAddress.substrateQrSignerAccount');
+          return t('ui.ACCOUNT.hook.account.useGetAccountTitle.substrateQrSignerAccount');
         }
 
       case AccountSignMode.READ_ONLY:
-        return t('ui.USE_GET_ACCOUNT_TITLE_BY_ADDRESS.hooks.account.useGetAccountTitleByAddress.watchOnlyAccount');
+        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.watchOnlyAccount');
       case AccountSignMode.UNKNOWN:
       default:
-        return t('ui.USE_GET_ACCOUNT_TITLE_BY_ADDRESS.hooks.account.useGetAccountTitleByAddress.unknownAccount');
+        return t('ui.ACCOUNT.hook.account.useGetAccountTitle.unknownAccount');
     }
   }, [signMode, t, isEvm]);
 };

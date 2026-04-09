@@ -57,7 +57,7 @@ const Component: React.FC<Props> = (props: Props) => {
       rowGap={'8px'}
       searchFunction={chainSearchFunc}
       searchMinCharactersCount={2}
-      searchPlaceholder={t<string>('ui.CUSTOMIZE_MODAL_CONTENT.components.Modal.Customize.CustomizeModalContent.networkName')}
+      searchPlaceholder={t<string>('ui.BALANCE.components.Modal.Customize.Content.networkName')}
     />
   );
 };

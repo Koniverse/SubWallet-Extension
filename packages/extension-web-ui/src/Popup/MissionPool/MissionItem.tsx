@@ -89,7 +89,7 @@ function Component (props: Props): React.ReactElement<Props> {
             phosphorIcon={icon}
             weight={iconWeight}
           />
-          {t(`${name}`)}
+          {name}
         </Tag>
         {
           !!missionStatus && !!missionName && (
@@ -103,7 +103,7 @@ function Component (props: Props): React.ReactElement<Props> {
                 phosphorIcon={missionIcon}
                 weight={missionIconWeight}
               />
-              {t(`${missionName}`)}
+              {missionName}
             </Tag>
           )
         }

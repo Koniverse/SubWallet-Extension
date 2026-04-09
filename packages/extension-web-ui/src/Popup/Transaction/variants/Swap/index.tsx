@@ -15,8 +15,6 @@ import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, Common
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
-import { ChainAndExcludedTokenInfo } from '@subwallet/extension-web-ui/hooks/chain/useCreateGetChainAndExcludedTokenByAccountProxy';
-import EmptySwapPairs from '@subwallet/extension-web-ui/Popup/Transaction/variants/Swap/EmptySwapPairs';
 import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, HiddenInput, LoadingScreen, PageWrapper } from '@subwallet/extension-web-ui/components';
 import { SwapFromField, SwapToField } from '@subwallet/extension-web-ui/components/Field/Swap';
 import { ChooseFeeTokenModal, SlippageModal, SwapIdleWarningModal, SwapQuotesSelectorModal, SwapTermsOfServiceModal } from '@subwallet/extension-web-ui/components/Modal/Swap';
@@ -25,9 +23,11 @@ import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { WebUIContext } from '@subwallet/extension-web-ui/contexts/WebUIContext';
 import { useChainConnection, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-web-ui/hooks';
+import { ChainAndExcludedTokenInfo } from '@subwallet/extension-web-ui/hooks/chain/useCreateGetChainAndExcludedTokenByAccountProxy';
 import { submitProcess } from '@subwallet/extension-web-ui/messaging';
 import { handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-web-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-web-ui/Popup/Transaction/parts';
+import EmptySwapPairs from '@subwallet/extension-web-ui/Popup/Transaction/variants/Swap/EmptySwapPairs';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-web-ui/reducer';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-web-ui/types';
@@ -468,7 +468,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
   }, [showSwapError, t]);
 
   const showTooLowAmountError = useCallback(() => {
-    showSwapError(t('ui.SWAP.Popup.Transaction.variants.Swap.amountTooLowIncreaseYourAmountAndTryAgain'));
+    showSwapError(t('bg.SWAP.background.error.Swap.amountTooLow'));
   }, [showSwapError, t]);
 
   const showTooHighAmountError = useCallback(() => {
@@ -689,7 +689,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
         title: isHighPriceImpact ? t('ui.SWAP.Popup.Transaction.variants.Swap.highPriceImpact') : t('ui.SWAP.Popup.Transaction.variants.Swap.payAttention'),
         type: NotificationType.WARNING,
         content: isHighPriceImpact && metadata.priceImpact
-          ? t(`Swapping this amount will result in a -${metadata.priceImpact}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk`)
+          ? t('ui.TRANSACTION.screen.Transaction.Swap.highPriceImpactWarning', { replace: { priceImpact: metadata.priceImpact } })
           : t('ui.SWAP.Popup.Transaction.variants.Swap.lowLiquiditySwapIsAvailableButNotRecommendedAsSwapRateIsUnfavorable'),
         okButton: {
           text: t('ui.SWAP.Popup.Transaction.variants.Swap.continue'),
@@ -1174,7 +1174,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
                         size='xs'
                         type={'ghost'}
                       >
-                        {t('ui.SWAP.Popup.Transaction.variants.Swap.max')}
+                        {t('ui.SWAP.components.Field.Swap.SwapFromField.max')}
                       </Button>
 
                       <Button
@@ -1194,7 +1194,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
                   className={'__swap-from-field'}
                   fromAsset={fromAssetInfo}
                   key={swapFromFieldRenderKey}
-                  label={t('ui.SWAP.Popup.Transaction.variants.Swap.from')}
+                  label={t('ui.TRANSACTION.screen.Transaction.Swap.from')}
                   onChangeAmount={onChangeAmount}
                   onSelectToken={onSelectFromToken}
                   tokenSelectorItems={fromTokenItems}
@@ -1258,7 +1258,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
               >
                 <AccountAddressSelector
                   items={accountAddressItems}
-                  label={`${t('ui.SWAP.Popup.Transaction.variants.Swap.from')}:`}
+                  label={`${t('ui.TRANSACTION.screen.Transaction.Swap.from')}:`}
                   labelStyle={'horizontal'}
                 />
               </Form.Item>
@@ -1285,7 +1285,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
                   actionType={ActionType.SWAP}
                   chainSlug={destChainValue}
                   dropdownHeight={isNotShowAccountSelector ? 227 : 167}
-                  label={`${t('ui.SWAP.Popup.Transaction.variants.Swap.to')}:`}
+                  label={`${t('ui.SWAP.components.Field.Swap.SwapToField.to')}:`}
                   labelStyle={'horizontal'}
                   placeholder={t('ui.SWAP.Popup.Transaction.variants.Swap.inputYourRecipientAccount')}
                   ref={addressInputRef}
@@ -1303,7 +1303,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
                   extrinsicType={ExtrinsicType.SWAP}
                   hidden={!canShowAvailableBalance}
                   isSubscribe={true}
-                  label={`${t('ui.SWAP.Popup.Transaction.variants.Swap.availableBalance')}`}
+                  label={`${t('ui.TRANSACTION.screen.Transaction.Swap.availableBalance')}`}
                   labelTooltip={'Available balance for swap'}
                   tokenSlug={fromTokenSlugValue}
                 />

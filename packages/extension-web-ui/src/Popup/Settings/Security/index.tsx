@@ -94,7 +94,7 @@ const Component: React.FC<Props> = (props: Props) => {
     {
       icon: Key,
       key: SecurityType.WALLET_PASSWORD,
-      title: t('ui.SECURITY.Popup.Settings.Security.changeWalletPassword'),
+      title: t('ui.SETTINGS.screen.Setting.Security.changeWalletPassword'),
       url: '/keyring/change-password',
       disabled: noAccount
     },
@@ -345,7 +345,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   weight='fill'
                 />
               )}
-              name={t('ui.SECURITY.Popup.Settings.Security.cameraAccessForQr')}
+              name={t('ui.SETTINGS.screen.Setting.Security.cameraAccessForQr')}
               rightItem={(
                 <Switch
                   checked={camera}
@@ -429,7 +429,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <SettingItem
               className={CN('__selection-item')}
               key={WalletUnlockType.ALWAYS_REQUIRED}
-              name={t('ui.SECURITY.Popup.Settings.Security.alwaysRequired')}
+              name={t('ui.SETTINGS.screen.Setting.Security.alwaysRequired')}
               onPressItem={onSetUnlockType(WalletUnlockType.ALWAYS_REQUIRED)}
               rightItem={
                 unlockType === WalletUnlockType.ALWAYS_REQUIRED
@@ -449,7 +449,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <SettingItem
               className={CN('__selection-item')}
               key={WalletUnlockType.WHEN_NEEDED}
-              name={t('ui.SECURITY.Popup.Settings.Security.whenNeeded')}
+              name={t('ui.SETTINGS.screen.Setting.Security.whenNeeded')}
               onPressItem={onSetUnlockType(WalletUnlockType.WHEN_NEEDED)}
               rightItem={
                 unlockType === WalletUnlockType.WHEN_NEEDED

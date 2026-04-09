@@ -130,8 +130,8 @@ const Component: React.FC<Props> = (props: Props) => {
           className={'-d-column'}
           label={t('Swap route')}
         >
+          <SwapRoute swapRoute={data.quote.route} />
         </MetaInfo.Default>
-        <SwapRoute swapRoute={data.quote.route} />
 
       </MetaInfo>
       {!showQuoteExpired && getWaitingTime > 0 && <AlertBox

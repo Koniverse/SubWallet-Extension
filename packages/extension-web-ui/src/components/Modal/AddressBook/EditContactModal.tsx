@@ -59,11 +59,11 @@ const Component: React.FC<Props> = (props: Props) => {
   const modalProps: SwModalFuncProps = useMemo(() => {
     return {
       closable: true,
-      content: t('ui.EDIT_CONTACT_MODAL.components.Modal.AddressBook.EditContactModal.youWouldNoLongerSeeThisAddressInYourAddressBook'),
+      content: t('ui.components.Modal.AddressBook.EditContact.deleteContactWarning'),
       id: DELETE_ADDRESS_BOOK_MODAL,
-      okText: t('ui.EDIT_CONTACT_MODAL.components.Modal.AddressBook.EditContactModal.remove'),
-      subTitle: t('ui.EDIT_CONTACT_MODAL.components.Modal.AddressBook.EditContactModal.deleteThisContact'),
-      title: t('ui.EDIT_CONTACT_MODAL.components.Modal.AddressBook.EditContactModal.confirmation'),
+      okText: t('ui.components.Modal.AddressBook.EditContact.remove'),
+      subTitle: t('ui.components.Modal.AddressBook.EditContact.deleteThisContact'),
+      title: t('ui.components.Modal.AddressBook.EditContact.confirmation'),
       type: 'error',
       maskClosable: true,
       zIndex: 1005
@@ -92,11 +92,11 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const nameValidator = useCallback((rule: RuleObject, name: string): Promise<void> => {
     if (!name) {
-      return Promise.reject(new Error(t('ui.EDIT_CONTACT_MODAL.components.Modal.AddressBook.EditContactModal.contactNameIsRequired')));
+      return Promise.reject(new Error(t('ui.components.Modal.AddressBook.EditContact.contactNameRequired')));
     }
 
     if (existNames.includes(name)) {
-      return Promise.reject(new Error(t('ui.EDIT_CONTACT_MODAL.components.Modal.AddressBook.EditContactModal.contactNameMustBeUnique')));
+      return Promise.reject(new Error(t('ui.components.Modal.AddressBook.EditContact.contactNameMustBeUnique')));
     }
 
     return Promise.resolve();
@@ -151,7 +151,7 @@ const Component: React.FC<Props> = (props: Props) => {
       className={CN(className)}
       id={modalId}
       onCancel={(!loading && !deleting) ? onCancel : undefined}
-      title={t('ui.EDIT_CONTACT_MODAL.components.Modal.AddressBook.EditContactModal.editContact')}
+      title={t('ui.components.Modal.AddressBook.EditContact.editContact')}
     >
       <Form
         className='form-space-sm'
@@ -172,7 +172,7 @@ const Component: React.FC<Props> = (props: Props) => {
           statusHelpAsTooltip={true}
         >
           <Input
-            label={t('ui.EDIT_CONTACT_MODAL.components.Modal.AddressBook.EditContactModal.contactName')}
+            label={t('ui.components.Modal.AddressBook.EditContact.contactName')}
             prefix={(
               <AccountProxyAvatar
                 className={'__account-avatar'}
@@ -186,7 +186,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <Field
             className='address-input'
             content={toShort(address, 12, 12)}
-            label={t('ui.EDIT_CONTACT_MODAL.components.Modal.AddressBook.EditContactModal.contactAddress')}
+            label={t('ui.components.Modal.AddressBook.EditContact.contactAddress')}
             suffix={(
               <Button
                 className='copy-button'
@@ -224,7 +224,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick={onCancel}
             schema='secondary'
           >
-            {t('ui.EDIT_CONTACT_MODAL.components.Modal.AddressBook.EditContactModal.cancel')}
+            {t('ui.components.Modal.AddressBook.EditContact.cancel')}
           </Button>
           <Button
             block={true}
@@ -232,7 +232,7 @@ const Component: React.FC<Props> = (props: Props) => {
             htmlType='submit'
             loading={loading}
           >
-            {t('ui.EDIT_CONTACT_MODAL.components.Modal.AddressBook.EditContactModal.save')}
+            {t('ui.components.Modal.AddressBook.EditContact.save')}
           </Button>
         </Form.Item>
       </Form>

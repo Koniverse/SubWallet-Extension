@@ -179,7 +179,7 @@ const Component = ({ chainValue, className, currentTokenPayFee, destChainValue, 
           <div className={CN(className, '__estimate-fee-wrapper')}>
             <div className='__field-line-1'>
               <div className='__field-label'>
-                {t('ui.FEE_EDITOR.components.Field.TransactionFee.FeeEditor.estimatedFee')}
+                {t('ui.TRANSACTION.components.Field.FeeEditor.estimatedFee')}
               </div>
               {FEE_TYPES_CAN_SHOW.includes(feeType) && (
                 <div

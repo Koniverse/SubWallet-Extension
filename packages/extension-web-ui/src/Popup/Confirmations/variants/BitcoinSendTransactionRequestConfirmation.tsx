@@ -150,33 +150,33 @@ function Component ({ className, request, type }: Props) {
         <MetaInfo hasBackgroundWrapper>
           <MetaInfo.Account
             address={address}
-            label={t('ui.BITCOIN_SEND_TRANSACTION_REQUEST_CONFIRMATION.Popup.Confirmations.variants.BitcoinSendTransactionRequestConfirmation.fromAccount')}
+            label={t('ui.TRANSACTION.Confirmations.BitcoinSendTransaction.fromAccount')}
             name={account?.name}
           />
           <MetaInfo.Account
             address={recipient?.address || toValue || ''}
             className='to-account'
-            label={t('ui.BITCOIN_SEND_TRANSACTION_REQUEST_CONFIRMATION.Popup.Confirmations.variants.BitcoinSendTransactionRequestConfirmation.toAccount')}
+            label={t('ui.TRANSACTION.Confirmations.BitcoinSendTransaction.toAccount')}
             name={recipient?.name}
           />
 
           <MetaInfo.Chain
             chain={chainValue}
-            label={t('ui.BITCOIN_SEND_TRANSACTION_REQUEST_CONFIRMATION.Popup.Confirmations.variants.BitcoinSendTransactionRequestConfirmation.network')}
+            label={t('ui.TRANSACTION.Confirmations.BitcoinSendTransaction.network')}
           />
         </MetaInfo>
 
         <MetaInfo hasBackgroundWrapper>
           <MetaInfo.Number
             decimals={assetInfo?.decimals || 0}
-            label={t('ui.BITCOIN_SEND_TRANSACTION_REQUEST_CONFIRMATION.Popup.Confirmations.variants.BitcoinSendTransactionRequestConfirmation.amount')}
+            label={t('ui.TRANSACTION.Confirmations.BitcoinSendTransaction.amount')}
             suffix={assetInfo?.symbol || ''}
             value={amount}
           />
 
           <MetaInfo.Default
             className='__fee-editor'
-            label={t('ui.BITCOIN_SEND_TRANSACTION_REQUEST_CONFIRMATION.Popup.Confirmations.variants.BitcoinSendTransactionRequestConfirmation.estimatedFee')}
+            label={t('ui.TRANSACTION.Confirmations.BitcoinSendTransaction.estimatedFee')}
           >
             {isFetchingInfo || !transferInfo
               ? (

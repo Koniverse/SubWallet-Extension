@@ -45,7 +45,7 @@ const Component: React.FC<Props> = (props: Props) => {
               onClick={onCancel}
               schema={'secondary'}
             >
-              {t('ui.CONNECT_CHAIN_MODAL.components.Modal.Common.ConnectChainModal.cancel')}
+              {t('ui.NETWORK.components.Modal.Common.ConnectChain.cancel')}
             </Button>
             <Button
               block={true}
@@ -57,13 +57,13 @@ const Component: React.FC<Props> = (props: Props) => {
               )}
               onClick={connectChain}
             >
-              {t('ui.CONNECT_CHAIN_MODAL.components.Modal.Common.ConnectChainModal.enable')}
+              {t('ui.NETWORK.components.Modal.Common.ConnectChain.enable')}
             </Button>
           </>
         )}
         id={modalId}
         onCancel={onCancel}
-        title={t('ui.CONNECT_CHAIN_MODAL.components.Modal.Common.ConnectChainModal.enableNetwork')}
+        title={t('ui.NETWORK.components.Modal.Common.ConnectChain.enableNetwork')}
       >
         <div className={'__modal-content'}>
           <div className='__logo-wrapper'>
@@ -80,7 +80,7 @@ const Component: React.FC<Props> = (props: Props) => {
           </div>
 
           <div className={'__message'}>
-            {t('ui.CONNECT_CHAIN_MODAL.components.Modal.Common.ConnectChainModal.yourSelectedNetworkIsCurrentlyDisabledEnableItToStartUsing')}
+            {t('ui.NETWORK.components.Modal.Common.ConnectChain.selectedNetworkDisabled')}
           </div>
         </div>
       </BaseModal>

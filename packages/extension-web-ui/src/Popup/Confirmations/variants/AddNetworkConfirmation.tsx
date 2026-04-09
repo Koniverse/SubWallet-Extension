@@ -51,13 +51,13 @@ const Component: React.FC<Props> = (props: Props) => {
 
     switch (errorCode) {
       case _CHAIN_VALIDATION_ERROR.CONNECTION_FAILURE:
-        return t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.cannotConnectToThisProvider');
+        return t('ui.DAPP.Confirmations.AddNetwork.cannotConnectToProvider');
       case _CHAIN_VALIDATION_ERROR.EXISTED_PROVIDER:
-        return t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.thisProviderHasAlreadyBeenAdded');
+        return t('ui.DAPP.Confirmations.AddNetwork.providerAlreadyAdded');
       case _CHAIN_VALIDATION_ERROR.EXISTED_CHAIN:
-        return t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.thisChainHasAlreadyBeenAdded');
+        return t('ui.DAPP.Confirmations.AddNetwork.chainAlreadyAdded');
       default:
-        return t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.errorValidatingThisProvider');
+        return t('ui.DAPP.Confirmations.AddNetwork.errorValidatingProvider');
     }
   }, [t]);
 
@@ -111,7 +111,7 @@ const Component: React.FC<Props> = (props: Props) => {
         <ConfirmationGeneralInfo request={request} />
         <Field
           content={chainEditInfo.providers[chainEditInfo.currentProvider]}
-          placeholder={t<string>('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.providerUrl')}
+          placeholder={t<string>('ui.DAPP.Confirmations.AddNetwork.providerUrl')}
           prefix={(
             <Icon
               customSize={'24px'}
@@ -124,14 +124,14 @@ const Component: React.FC<Props> = (props: Props) => {
           status={providerError ? 'error' : ''}
           statusHelp={handleErrorMessage(providerError)}
           suffix={providerSuffix}
-          tooltip={isWebUI ? t<string>('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.providerUrl') : undefined}
+          tooltip={isWebUI ? t<string>('ui.DAPP.Confirmations.AddNetwork.providerUrl') : undefined}
           tooltipPlacement='topLeft'
         />
         <Row gutter={token.paddingSM}>
           <Col span={16}>
             <Field
               content={chainEditInfo.name || ''}
-              placeholder={t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.networkName')}
+              placeholder={t('ui.DAPP.Confirmations.AddNetwork.networkName')}
               prefix={(
                 <Icon
                   customSize={'24px'}
@@ -141,15 +141,15 @@ const Component: React.FC<Props> = (props: Props) => {
                   weight={'bold'}
                 />
               )}
-              tooltip={isWebUI ? t<string>('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.networkName') : undefined}
+              tooltip={isWebUI ? t<string>('ui.DAPP.Confirmations.AddNetwork.networkName') : undefined}
               tooltipPlacement='topLeft'
             />
           </Col>
           <Col span={8}>
             <Field
               content={chainEditInfo.symbol || ''}
-              placeholder={t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.symbol')}
-              tooltip={isWebUI ? t<string>('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.symbol') : undefined}
+              placeholder={t('ui.DAPP.Confirmations.AddNetwork.symbol')}
+              tooltip={isWebUI ? t<string>('ui.DAPP.Confirmations.AddNetwork.symbol') : undefined}
               tooltipPlacement='topLeft'
             />
           </Col>
@@ -158,42 +158,42 @@ const Component: React.FC<Props> = (props: Props) => {
           <Col span={12}>
             <Field
               content={chainSpec?.decimals || 0}
-              placeholder={t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.decimals')}
-              tooltip={isWebUI ? t<string>('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.decimals') : undefined}
+              placeholder={t('ui.DAPP.Confirmations.AddNetwork.decimals')}
+              tooltip={isWebUI ? t<string>('ui.DAPP.Confirmations.AddNetwork.decimals') : undefined}
               tooltipPlacement='topLeft'
             />
           </Col>
           <Col span={12}>
             <Field
               content={chainSpec?.evmChainId || 0}
-              placeholder={t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.chainId')}
-              tooltip={isWebUI ? t<string>('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.chainId') : undefined}
+              placeholder={t('ui.DAPP.Confirmations.AddNetwork.chainId')}
+              tooltip={isWebUI ? t<string>('ui.DAPP.Confirmations.AddNetwork.chainId') : undefined}
               tooltipPlacement='topLeft'
             />
           </Col>
         </Row>
         <Field
           content={chainEditInfo.chainType}
-          placeholder={t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.networkType')}
-          tooltip={isWebUI ? t<string>('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.networkType') : undefined}
+          placeholder={t('ui.DAPP.Confirmations.AddNetwork.networkType')}
+          tooltip={isWebUI ? t<string>('ui.DAPP.Confirmations.AddNetwork.networkType') : undefined}
           tooltipPlacement='topLeft'
         />
         <Field
           content={chainEditInfo.blockExplorer}
-          placeholder={t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.blockExplorer')}
-          tooltip={isWebUI ? t<string>('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.blockExplorer') : undefined}
+          placeholder={t('ui.DAPP.Confirmations.AddNetwork.blockExplorer')}
+          tooltip={isWebUI ? t<string>('ui.DAPP.Confirmations.AddNetwork.blockExplorer') : undefined}
           tooltipPlacement='topLeft'
         />
         <Field
           content={chainEditInfo.crowdloanUrl}
-          placeholder={t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.crowdloanUrl')}
-          tooltip={isWebUI ? t<string>('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.crowdloanUrl') : undefined}
+          placeholder={t('ui.DAPP.Confirmations.AddNetwork.crowdloanUrl')}
+          tooltip={isWebUI ? t<string>('ui.DAPP.Confirmations.AddNetwork.crowdloanUrl') : undefined}
           tooltipPlacement='topLeft'
         />
       </div>
       <div className='confirmation-footer'>
         {mode === 'update' && (<div className={'warning-message'}>
-          {t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.theNetworkAlreadyExists')}
+          {t('ui.DAPP.Confirmations.AddNetwork.networkAlreadyExists')}
         </div>)}
         {
           isUnsupportedChain && (
@@ -210,12 +210,12 @@ const Component: React.FC<Props> = (props: Props) => {
                       />
                     )
                   }}
-                  i18nKey={detectTranslate('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.thisNetworkIsNotYetSupportedOnSubwalletImportTheNetworkUsingThisHighlightGuideHighlightAndTryAgain')}
+                  i18nKey={detectTranslate('ui.DAPP.Confirmations.AddNetwork.networkNotSupportedImport')}
                 />
               )
 
               }
-              title={t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.networkNotSupported')}
+              title={t('ui.DAPP.Confirmations.AddNetwork.networkNotSupported')}
               type={'error'}
             />
           )
@@ -227,7 +227,7 @@ const Component: React.FC<Props> = (props: Props) => {
               onClick={onCancel}
               schema={'primary'}
             >
-              {t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.iUnderstand')}
+              {t('ui.DAPP.Confirmations.AddNetwork.iUnderstand')}
             </Button>
             : <Button
               disabled={loading}
@@ -240,7 +240,7 @@ const Component: React.FC<Props> = (props: Props) => {
               onClick={onCancel}
               schema={'secondary'}
             >
-              {t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.cancel')}
+              {t('ui.DAPP.Confirmations.AddNetwork.cancel')}
             </Button>
         }
 
@@ -255,7 +255,7 @@ const Component: React.FC<Props> = (props: Props) => {
           loading={loading}
           onClick={onApprove}
         >
-          {t('ui.ADD_NETWORK_CONFIRMATION.Popup.Confirmations.variants.AddNetworkConfirmation.approve')}
+          {t('ui.DAPP.Confirmations.AddNetwork.approve')}
         </Button>}
       </div>
     </>

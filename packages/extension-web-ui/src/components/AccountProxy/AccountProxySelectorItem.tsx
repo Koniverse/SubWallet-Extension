@@ -201,7 +201,7 @@ function Component (props: Props): React.ReactElement<Props> {
                   }
                   onClick={_onClickDeriveButton}
                   size='xs'
-                  tooltip={t('ui.ACCOUNT_PROXY_SELECTOR_ITEM.components.AccountProxy.AccountProxySelectorItem.deriveThisAccount')}
+                  tooltip={t('ui.ACCOUNT.components.AccountProxy.SelectorItem.deriveThisAccount')}
                   type='ghost'
                 />
               )
@@ -218,7 +218,7 @@ function Component (props: Props): React.ReactElement<Props> {
               }
               onClick={_onClickCopyButton}
               size='xs'
-              tooltip={t('ui.ACCOUNT_PROXY_SELECTOR_ITEM.components.AccountProxy.AccountProxySelectorItem.copyAddress')}
+              tooltip={t('ui.ACCOUNT.components.AccountProxy.SelectorItem.copyAddress')}
               type='ghost'
             />
             <Button
@@ -230,7 +230,7 @@ function Component (props: Props): React.ReactElement<Props> {
               }
               onClick={_onClickLastButton}
               size='xs'
-              tooltip={isInjectedAccountProxy ? undefined : t('ui.ACCOUNT_PROXY_SELECTOR_ITEM.components.AccountProxy.AccountProxySelectorItem.viewDetails')}
+              tooltip={isInjectedAccountProxy ? undefined : t('ui.ACCOUNT.components.AccountProxy.SelectorItem.viewDetails')}
               type='ghost'
             />
           </div>

@@ -185,7 +185,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return (
       <MetaInfo.Default
         className='__label-bottom'
-        label={t('ui.CHANGE_BITTENSOR_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeBittensorValidator.subnet')}
+        label={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.subnet')}
       >
         <div className='__subnet-wrapper'>
           <Logo
@@ -298,17 +298,17 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             if (error.message.includes('remaining')) {
               openAlert({
                 type: NotificationType.WARNING,
-                title: t('ui.CHANGE_BITTENSOR_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeBittensorValidator.payAttention'),
+                title: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.payAttentionExclamation'),
                 content: error.message,
                 okButton: {
-                  text: t('ui.CHANGE_BITTENSOR_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeBittensorValidator.moveAll'),
+                  text: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.moveAll'),
                   onClick: () => {
                     closeAlert();
                     send(bondedValue);
                   }
                 },
                 cancelButton: {
-                  text: t('ui.CHANGE_BITTENSOR_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeBittensorValidator.cancel'),
+                  text: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.cancel'),
                   onClick: () => {
                     closeAlert();
                     setSubmitLoading(false);
@@ -378,13 +378,13 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           loading={submitLoading}
           onClick={onPreCheck(form.submit, ExtrinsicType.CHANGE_EARNING_VALIDATOR)}
         >
-          {t('ui.CHANGE_BITTENSOR_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeBittensorValidator.updateValidator')}
+          {t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.updateValidator')}
         </Button>
       }
       fullSizeOnMobile={true}
       id={modalId}
       onCancel={handleCancel}
-      title={t('ui.CHANGE_BITTENSOR_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeBittensorValidator.changeValidator')}
+      title={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.changeValidator')}
     >
       <Form
         className={'form-container form-space-sm'}
@@ -402,7 +402,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           />
           <div className={'staked-balance__info'}>
             <span>
-              {t('ui.CHANGE_BITTENSOR_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeBittensorValidator.stakedBalance')}
+              {t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.stakedBalance')}
             </span>
             <span>
                   &nbsp;{formatBalance(bondedValue, decimals)}&nbsp;
@@ -417,7 +417,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             defaultValue={persistValidator}
             disabled={!from}
             isChangeValidator={true}
-            label={t('ui.CHANGE_BITTENSOR_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeBittensorValidator.from')}
+            label={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.from')}
             networkPrefix={networkPrefix}
             nominators={nominations}
             poolInfo={poolInfo}
@@ -429,7 +429,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             chain={chain}
             disabled={!from}
             from={from}
-            label={t('ui.CHANGE_BITTENSOR_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeBittensorValidator.changeTo')}
+            label={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.changeTo')}
             originValidator={originValidator}
             setForceFetchValidator={setForceFetchValidator}
             slug={slug}
@@ -441,7 +441,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             ? (
               <MetaInfo.Chain
                 chain={chain}
-                label={t('ui.CHANGE_BITTENSOR_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeBittensorValidator.network')}
+                label={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.network')}
               />
 
             )
@@ -452,9 +452,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         <div className='__amount-part'>
           <Tooltip
             placement={'topRight'}
-            title={t('ui.CHANGE_BITTENSOR_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeBittensorValidator.amountYouWantToMoveFromTheSelectedValidatorToTheNewValidator')}
+            title={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.amountToMoveDescription')}
           >
-            <div className='__item-left-part'>{t('ui.CHANGE_BITTENSOR_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeBittensorValidator.changeStakingAmount')}
+            <div className='__item-left-part'>{t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.changeStakingAmount')}
               <Icon
                 className='__validator-info'
                 iconColor='white'
@@ -494,7 +494,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             </Form.Item>
             <div className={'minimum-stake__info'}>
               <div className={'minimum-stake__label'}>
-                {t('ui.CHANGE_BITTENSOR_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeBittensorValidator.minimumActiveStake')}
+                {t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.minimumActiveStake')}
               </div>
               <Number
                 className='minimum-stake__value'

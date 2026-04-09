@@ -251,7 +251,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             }
             onClick={onChangeShowBalance}
             size={'xs'}
-            tooltip={isShowBalance ? t('ui.BALANCE.components.Layout.parts.Header.Balance.hideBalance') : t('ui.BALANCE.components.Layout.parts.Header.Balance.showBalance')}
+            tooltip={isShowBalance ? t('ui.BALANCE.screen.Tokens.UpperBlock.hideBalance') : t('ui.BALANCE.screen.Tokens.UpperBlock.showBalance')}
             type='ghost'
           />
           <Button

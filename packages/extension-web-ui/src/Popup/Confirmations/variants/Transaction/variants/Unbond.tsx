@@ -36,14 +36,14 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.UNBOND.Popup.Confirmations.variants.Transaction.variants.Unbond.unstakeAmount')}
+          label={t('ui.TRANSACTION.Confirmations.Unbond.unstakeAmount')}
           suffix={subnetSymbol || symbol}
           value={data.amount}
         />
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.UNBOND.Popup.Confirmations.variants.Transaction.variants.Unbond.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.Unbond.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
@@ -52,7 +52,7 @@ const Component: React.FC<Props> = (props: Props) => {
         <AlertBox
           className={CN(className, 'alert-box')}
           description={t('ui.TRANSACTION.Confirmations.Unbond.taoUnstakingFeeDeductedInfo', { replace: { fee: stakingFee } })}
-          title={t('ui.UNBOND.Popup.Confirmations.variants.Transaction.variants.Unbond.taoUnstakingFee')}
+          title={t('ui.TRANSACTION.Confirmations.Unbond.taoUnstakingFee')}
           type='info'
         />
       )}

@@ -25,7 +25,7 @@ const Component: React.FC<TotalInfoItem> = (props: TotalInfoItem) => {
     <div className={CN(className, '__row -type-total}')}>
       <div className={'__col __label-col'}>
         <div className={'__label'}>
-          {t('ui.TOTAL_ITEM.components.MetaInfo.parts.TotalItem.total')}
+          {t('ui.components.MetaInfo.TotalItem.total')}
         </div>
       </div>
       <div className={'__col __value-col -to-right'}>

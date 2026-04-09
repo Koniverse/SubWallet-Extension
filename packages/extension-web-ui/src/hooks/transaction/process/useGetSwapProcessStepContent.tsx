@@ -353,7 +353,7 @@ const useGetSwapProcessStepContent = () => {
     }
 
     if (processStep.type === SwapStepType.PERMIT) {
-      return t('ui.USE_GET_SWAP_PROCESS_STEP_CONTENT.hooks.transaction.process.useGetSwapProcessStepContent.signMessageToAuthorizeProvider');
+      return t('ui.TRANSACTION.hook.transaction.useGetSwapStepContent.signMessageToAuthorizeProvider');
     }
 
     return '';

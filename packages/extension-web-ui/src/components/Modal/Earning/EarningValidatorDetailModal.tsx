@@ -106,7 +106,7 @@ function Component (props: Props): React.ReactElement<Props> {
         />
 
         {/* <MetaInfo.Status */}
-        {/*  label={t('Status')} */}
+        {/*  label={t('ui.EARNING.components.Modal.Earning.ValidatorDetail.status')} */}
         {/*  statusIcon={StakingStatusUi[status].icon} */}
         {/*  statusName={StakingStatusUi[status].name} */}
         {/*  valueColorSchema={StakingStatusUi[status].schema} */}

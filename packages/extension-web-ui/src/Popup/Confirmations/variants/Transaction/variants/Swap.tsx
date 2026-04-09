@@ -134,7 +134,7 @@ const Component: React.FC<Props> = (props: Props) => {
       </MetaInfo>
       {!showQuoteExpired && getWaitingTime > 0 && <AlertBox
         className={'__swap-arrival-time'}
-        description={t(`Swapping via ${data.provider.name} can take up to ${getWaitingTime} minutes. Make sure you review all information carefully before submitting.`)}
+        description={t('ui.TRANSACTION.Confirmations.Swap.swapProviderWaitingTime', { replace: { provider: data.provider.name, getWaitingTime } })}
         title={t('ui.SWAP.Popup.Confirmations.variants.Transaction.variants.Swap.payAttention')}
         type='warning'
       />}

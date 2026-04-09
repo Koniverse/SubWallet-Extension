@@ -242,22 +242,22 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
 
     if (walletItems.length) {
       walletItems.sort(sortFuncAnalyzeAddress);
-      result.push(genAutoCompleteGroupItem(t('ui.ADDRESS_INPUT_NEW.components.Field.AddressInputNew.myWallet'), walletItems.map((i) => genAutoCompleteItem(i))));
+      result.push(genAutoCompleteGroupItem(t('ui.components.Field.AddressInputNew.myWallet'), walletItems.map((i) => genAutoCompleteItem(i))));
     }
 
     if (contactItems.length) {
       contactItems.sort(sortFuncAnalyzeAddress);
-      result.push(genAutoCompleteGroupItem(t('ui.ADDRESS_INPUT_NEW.components.Field.AddressInputNew.myContact'), contactItems.map((i) => genAutoCompleteItem(i))));
+      result.push(genAutoCompleteGroupItem(t('ui.components.Field.AddressInputNew.myContact'), contactItems.map((i) => genAutoCompleteItem(i))));
     }
 
     if (domainItems.length) {
       domainItems.sort(sortFuncAnalyzeAddress);
-      result.push(genAutoCompleteGroupItem(t('ui.ADDRESS_INPUT_NEW.components.Field.AddressInputNew.domainName'), domainItems.map((i) => genAutoCompleteItem(i))));
+      result.push(genAutoCompleteGroupItem(t('ui.components.Field.AddressInputNew.domainName'), domainItems.map((i) => genAutoCompleteItem(i))));
     }
 
     if (recentItems.length) {
       recentItems.sort(sortFuncAnalyzeAddress);
-      result.push(genAutoCompleteGroupItem(t('ui.ADDRESS_INPUT_NEW.components.Field.AddressInputNew.recent'), recentItems.map((i) => genAutoCompleteItem(i))));
+      result.push(genAutoCompleteGroupItem(t('ui.components.Field.AddressInputNew.recent'), recentItems.map((i) => genAutoCompleteItem(i))));
     }
 
     return result;
@@ -267,11 +267,11 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
     if (checked) {
       alertModal.open({
         closable: false,
-        title: t('ui.ADDRESS_INPUT_NEW.components.Field.AddressInputNew.advancedAddressConversion'),
+        title: t('ui.components.Field.AddressInputNew.advancedAddressConversion'),
         type: NotificationType.WARNING,
-        content: t('ui.ADDRESS_INPUT_NEW.components.Field.AddressInputNew.thisFeatureAutoConvertsYourRecipientAddressIntoTheCorrectFormatForYourChosenDestinationNetworkWrongDestinationNetworkWillResultInLossOfFundsOnlyEnableIfYouReAnAdvancedUser'),
+        content: t('ui.components.Field.AddressInputNew.advancedAddressConversionInfo'),
         cancelButton: {
-          text: t('ui.ADDRESS_INPUT_NEW.components.Field.AddressInputNew.cancel'),
+          text: t('ui.components.Field.AddressInputNew.cancel'),
           icon: XCircle,
           iconWeight: 'fill',
           onClick: () => {
@@ -281,7 +281,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
           schema: 'secondary'
         },
         okButton: {
-          text: t('ui.ADDRESS_INPUT_NEW.components.Field.AddressInputNew.enable'),
+          text: t('ui.components.Field.AddressInputNew.enable'),
           icon: CheckCircle,
           iconWeight: 'fill',
           onClick: () => {
@@ -312,7 +312,7 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
               />
 
               <div className={'__advanced-address-detection-label'}>
-                {t('ui.ADDRESS_INPUT_NEW.components.Field.AddressInputNew.advancedAddressDetection')}
+                {t('ui.components.Field.AddressInputNew.advancedAddressDetection')}
               </div>
 
               <Switch
@@ -465,8 +465,8 @@ function Component (props: Props, ref: ForwardedRef<AddressInputRef>): React.Rea
             })}
             disabled={disabled}
             id={id}
-            label={label || t('ui.ADDRESS_INPUT_NEW.components.Field.AddressInputNew.accountAddress')}
-            placeholder={placeholder || t('ui.ADDRESS_INPUT_NEW.components.Field.AddressInputNew.pleaseTypeOrPasteAnAddress')}
+            label={label || t('ui.components.Field.AddressInputNew.accountAddress')}
+            placeholder={placeholder || t('ui.components.Field.AddressInputNew.typeOrPasteAddress')}
             prefix={
               <>
                 {

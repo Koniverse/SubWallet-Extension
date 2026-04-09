@@ -67,7 +67,7 @@ const Component = ({ className, onOk }: Props) => {
       className={CN(className)}
       closable={false}
       id={modalId}
-      title={t('ui.SWAP_TERMS_OF_SERVICE_MODAL.components.Modal.Swap.SwapTermsOfServiceModal.termsOfService')}
+      title={t('ui.SWAP.components.Modal.Swap.Terms.termsOfService')}
       width={ isWebUI ? 736 : undefined }
     >
       <div className={'__content-title'}>You’re using third-party swap providers, which may contain inherent risks. Please read the following carefully</div>
@@ -109,7 +109,7 @@ const Component = ({ className, onOk }: Props) => {
           className={'__content-footer-checkbox'}
           onChange={onCheckedInput}
         >
-          {t('ui.SWAP_TERMS_OF_SERVICE_MODAL.components.Modal.Swap.SwapTermsOfServiceModal.iUnderstandTheAssociatedRiskAndWillActUnderCaution')}
+          {t('ui.SWAP.components.Modal.Swap.Terms.understandAssociatedRisk')}
         </Checkbox>
         <div className={'__content-footer-button-group'}>
           <Button
@@ -124,7 +124,7 @@ const Component = ({ className, onOk }: Props) => {
             )}
             onClick={onConfirm}
           >
-            {t('ui.SWAP_TERMS_OF_SERVICE_MODAL.components.Modal.Swap.SwapTermsOfServiceModal.confirmAndContinueSwapping')}
+            {t('ui.SWAP.components.Modal.Swap.Terms.confirmAndContinueSwapping')}
           </Button>
           <div className={'__content-footer-label'}>Scroll to read all sections</div>
         </div>

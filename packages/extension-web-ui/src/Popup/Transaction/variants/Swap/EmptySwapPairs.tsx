@@ -31,11 +31,11 @@ const Component: React.FC<Props> = ({ className, onClickReload }: Props) => {
         }}
       />
       <div className='message'>
-        {t('ui.EMPTY_SWAP_PAIRS.Popup.Transaction.variants.Swap.EmptySwapPairs.unableToLoadData')}
+        {t('ui.TRANSACTION.screen.Transaction.Swap.EmptySwapPairs.unableToLoadData')}
       </div>
       <div className={'data-empty-msg'}>
         <div className='description'>
-          {t('ui.EMPTY_SWAP_PAIRS.Popup.Transaction.variants.Swap.EmptySwapPairs.somethingWentWrongWhileLoadingDataForThisScreen')}
+          {t('ui.TRANSACTION.screen.Transaction.Swap.EmptySwapPairs.errorLoadingScreenData')}
         </div>
         <div className={'description'}>
           <Trans

@@ -38,15 +38,15 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
 
   const confirmModalProps = useMemo((): SwModalFuncProps => ({
     id: WARNING_LEDGER_RECEIVE_MODAL,
-    title: t<string>('ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.unsupportedNetwork'),
+    title: t<string>('ui.ACCOUNT.components.Modal.Receive.TokensSelector.unsupportedNetwork'),
     maskClosable: true,
     closable: true,
-    subTitle: t<string>('ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.doYouStillWantToGetTheAddress'),
-    okText: t<string>('ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.getAddress'),
+    subTitle: t<string>('ui.ACCOUNT.components.Modal.Receive.TokensSelector.confirmGetAddress'),
+    okText: t<string>('ui.ACCOUNT.components.Modal.Receive.TokensSelector.getAddress'),
     okCancel: true,
     type: 'warn',
     cancelButtonProps: {
-      children: t<string>('ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.cancel'),
+      children: t<string>('ui.ACCOUNT.components.Modal.Receive.TokensSelector.cancel'),
       schema: 'secondary'
     },
     className: 'ledger-warning-modal'
@@ -77,7 +77,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
       if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(item.originChain)) {
         handleSimpleConfirmModal({
           content: t<string>(
-            'ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.ledgerAccountsAreNotCompatibleWithNetworkTokensWillGetStuckIECanTBeTransferredOutOrStakedWhenSentToThisAccountType',
+            'ui.ACCOUNT.components.Modal.Receive.TokensSelector.ledgerIncompatibleNetworkWarning',
             {
               replace: {
                 ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
@@ -115,7 +115,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
     return () => {
       return handleSimpleConfirmModal({
         content: t<string>(
-          'ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.ledgerAccountsAreNotCompatibleWithNetworkTokensWillGetStuckIECanTBeTransferredOutOrStakedWhenSentToThisAccountType',
+          'ui.ACCOUNT.components.Modal.Receive.TokensSelector.ledgerIncompatibleNetworkWarning',
           {
             replace: {
               ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
@@ -157,7 +157,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
       fullSizeOnMobile
       id={modalId}
       onCancel={onCancel}
-      title={t('ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.selectToken')}
+      title={t('ui.ACCOUNT.components.Modal.Receive.TokensSelector.selectToken')}
     >
       <SwList.Section
         enableSearchInput={true}
@@ -167,7 +167,7 @@ function Component ({ address, className = '', items, onSelectItem }: Props): Re
         renderWhenEmpty={renderEmpty}
         searchFunction={searchFunction}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('ui.TOKENS_SELECTOR_MODAL.components.Modal.ReceiveModal.TokensSelectorModal.searchToken')}
+        searchPlaceholder={t<string>('ui.ACCOUNT.components.Modal.Receive.TokensSelector.searchToken')}
       />
     </BaseModal>
   );

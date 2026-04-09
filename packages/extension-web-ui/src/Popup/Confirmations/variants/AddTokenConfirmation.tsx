@@ -91,7 +91,7 @@ const Component: React.FC<Props> = (props: Props) => {
         <ConfirmationGeneralInfo request={request} />
         <Field
           content={chainInfoMap[originChain].name}
-          label={t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.network')}
+          label={t<string>('ui.DAPP.Confirmations.AddToken.network')}
           prefix={(
             <Image
               height={token.fontSizeXL}
@@ -103,11 +103,11 @@ const Component: React.FC<Props> = (props: Props) => {
         />
         <Field
           content={type}
-          tooltip={isWebUI ? t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.tokenType') : undefined}
+          tooltip={isWebUI ? t<string>('ui.DAPP.Confirmations.AddToken.tokenType') : undefined}
         />
         <Field
           content={toShort(contractAddress)}
-          label={t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.contractAddress')}
+          label={t<string>('ui.DAPP.Confirmations.AddToken.contractAddress')}
           prefix={
             <SwAvatar
               identPrefix={42}
@@ -117,14 +117,14 @@ const Component: React.FC<Props> = (props: Props) => {
             />
           }
           status={contractError ? 'error' : slug ? 'warning' : ''}
-          statusHelp={contractError ? t('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.theTokenContractIsInvalid') : slug ? t('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.theTokenAlreadyExists') : ''}
+          statusHelp={contractError ? t('ui.DAPP.Confirmations.AddToken.tokenContractInvalid') : slug ? t('ui.DAPP.Confirmations.AddToken.tokenAlreadyExists') : ''}
           suffix={contractSuffix}
         />
         <Row gutter={token.margin}>
           <Col span={12}>
             <Field
               content={symbol}
-              placeholder={t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.symbol')}
+              placeholder={t<string>('ui.DAPP.Confirmations.AddToken.symbol')}
               prefix={
                 <SwAvatar
                   identPrefix={42}
@@ -133,22 +133,22 @@ const Component: React.FC<Props> = (props: Props) => {
                   value={contractAddress}
                 />
               }
-              tooltip={isWebUI ? t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.symbol') : undefined}
+              tooltip={isWebUI ? t<string>('ui.DAPP.Confirmations.AddToken.symbol') : undefined}
               tooltipPlacement='topLeft'
             />
           </Col>
           <Col span={12}>
             <Field
               content={decimals === -1 ? '' : decimals}
-              placeholder={t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.decimals')}
-              tooltip={isWebUI ? t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.decimals') : undefined}
+              placeholder={t<string>('ui.DAPP.Confirmations.AddToken.decimals')}
+              tooltip={isWebUI ? t<string>('ui.DAPP.Confirmations.AddToken.decimals') : undefined}
               tooltipPlacement='topLeft'
             />
           </Col>
         </Row>
         <Field
           content={name}
-          tooltip={t<string>('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.tokenName')}
+          tooltip={t<string>('ui.DAPP.Confirmations.AddToken.tokenName')}
         />
       </div>
       <div className='confirmation-footer'>
@@ -163,7 +163,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.cancel')}
+          {t('ui.DAPP.Confirmations.AddToken.cancel')}
         </Button>
         <Button
           disabled={!!slug || !validated || contractError}
@@ -176,7 +176,7 @@ const Component: React.FC<Props> = (props: Props) => {
           loading={loading}
           onClick={onApprove}
         >
-          {t('ui.ADD_TOKEN_CONFIRMATION.Popup.Confirmations.variants.AddTokenConfirmation.approve')}
+          {t('ui.DAPP.Confirmations.AddToken.approve')}
         </Button>
       </div>
     </>

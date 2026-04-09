@@ -140,21 +140,21 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
         if (result) {
           showNotification({
-            message: t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.importedChainSuccessfully')
+            message: t('ui.SETTINGS.screen.Setting.Chains.ChainImport.importedChainSuccessfully')
           });
           setTimeout(() => {
             navigate(-1);
           }, 100);
         } else {
           showNotification({
-            message: t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.anErrorOccurredPleaseTryAgain')
+            message: t('ui.SETTINGS.screen.Setting.Chains.ChainImport.anErrorOccurredPleaseTryAgain')
           });
         }
       })
       .catch(() => {
         setLoading(false);
         showNotification({
-          message: t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.anErrorOccurredPleaseTryAgain')
+          message: t('ui.SETTINGS.screen.Setting.Chains.ChainImport.anErrorOccurredPleaseTryAgain')
         });
       });
   }, [existentialDeposit, form, genesisHash, isPureEvmChain, navigate, showNotification, t]);
@@ -164,7 +164,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (value.length === 0 || isUrl(value)) {
         resolve();
       } else {
-        reject(new Error(t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.blockExplorerMustBeAValidUrl')));
+        reject(new Error(t('ui.SETTINGS.screen.Setting.Chains.ChainImport.blockExplorerMustBeValid')));
       }
     });
   }, [t]);
@@ -174,7 +174,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (value.length === 0 || isUrl(value)) {
         resolve();
       } else {
-        reject(new Error(t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.crowdloanUrlMustBeAValidUrl')));
+        reject(new Error(t('ui.SETTINGS.screen.Setting.Chains.ChainImport.crowdloanUrlMustBeValid')));
       }
     });
   }, [t]);
@@ -182,13 +182,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const handleErrorMessage = useCallback((errorCode: _CHAIN_VALIDATION_ERROR) => {
     switch (errorCode) {
       case _CHAIN_VALIDATION_ERROR.CONNECTION_FAILURE:
-        return t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.cannotConnectToThisProvider');
+        return t('ui.SETTINGS.screen.Setting.Chains.ChainImport.cannotConnectToProvider');
       case _CHAIN_VALIDATION_ERROR.EXISTED_PROVIDER:
-        return t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.thisProviderHasAlreadyBeenAdded');
+        return t('ui.SETTINGS.screen.Setting.Chains.ChainImport.providerAlreadyAdded');
       case _CHAIN_VALIDATION_ERROR.EXISTED_CHAIN:
-        return t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.thisChainHasAlreadyBeenAdded');
+        return t('ui.SETTINGS.screen.Setting.Chains.ChainImport.chainAlreadyAdded');
       default:
-        return t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.errorValidatingThisProvider');
+        return t('ui.SETTINGS.screen.Setting.Chains.ChainImport.errorValidatingProvider');
     }
   }, [t]);
 
@@ -249,11 +249,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           })
           .catch(() => {
             setIsValidating(false);
-            reject(new Error(t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.errorValidatingThisProvider')));
-            setProviderValidation({ status: 'error', message: t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.errorValidatingThisProvider') });
+            reject(new Error(t('ui.SETTINGS.screen.Setting.Chains.ChainImport.errorValidatingProvider')));
+            setProviderValidation({ status: 'error', message: t('ui.SETTINGS.screen.Setting.Chains.ChainImport.errorValidatingProvider') });
           });
       } else {
-        reject(new Error(t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.providerUrlIsNotValid')));
+        reject(new Error(t('ui.SETTINGS.screen.Setting.Chains.ChainImport.providerUrlNotValid')));
         setProviderValidation({ status: '' });
         setIsShowConnectionStatus(false);
       }
@@ -323,7 +323,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       <Layout.WithSubHeaderOnly
         leftFooterButton={{
           onClick: onBack,
-          children: t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.cancel')
+          children: t('ui.SETTINGS.screen.Setting.Chains.ChainImport.cancel')
         }}
         onBack={onBack}
         rightFooterButton={{
@@ -338,7 +338,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           ),
           loading: loading,
           onClick: onSubmit,
-          children: t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.save')
+          children: t('ui.SETTINGS.screen.Setting.Chains.ChainImport.save')
         }}
         subHeaderIcons={[
           {
@@ -346,11 +346,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             onClick: handleClickSubheaderButton
           }
         ]}
-        title={t<string>('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.importNetwork')}
+        title={t<string>('ui.SETTINGS.screen.Setting.Chains.ChainImport.importNetwork')}
       >
         <div className={'chain_import__container'}>
           <div className={'chain_import__header_info'}>
-            {t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.currentlySupportWssProviderForSubstrateNetworksAndHttpProviderForEvmNetwork')}
+            {t('ui.SETTINGS.screen.Setting.Chains.ChainImport.providerSupportInfo')}
           </div>
           <Form
             disabled={loading}
@@ -365,7 +365,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               >
                 <Input
                   disabled={isValidating}
-                  placeholder={t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.providerUrl')}
+                  placeholder={t('ui.SETTINGS.screen.Setting.Chains.ChainImport.providerUrl')}
                   prefix={(
                     <Icon
                       customSize={'24px'}
@@ -376,7 +376,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     />
                   )}
                   suffix={providerSuffix()}
-                  tooltip={isWebUI ? t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.providerUrl') : undefined}
+                  tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.ChainImport.providerUrl') : undefined}
                   tooltipPlacement={'topLeft'}
                 />
               </Form.Item>
@@ -386,7 +386,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   <Form.Item name={'name'}>
                     <Input
                       disabled={true}
-                      placeholder={t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.networkName')}
+                      placeholder={t('ui.SETTINGS.screen.Setting.Chains.ChainImport.networkName')}
                       prefix={<Icon
                         customSize={'24px'}
                         iconColor={token['gray-4']}
@@ -394,7 +394,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                         type={'phosphor'}
                         weight={'bold'}
                       />}
-                      tooltip={isWebUI ? t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.networkName') : undefined}
+                      tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.ChainImport.networkName') : undefined}
                       tooltipPlacement={'topLeft'}
                     />
                   </Form.Item>
@@ -403,8 +403,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   <Form.Item name={'symbol'}>
                     <Input
                       disabled={true}
-                      placeholder={t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.symbol')}
-                      tooltip={isWebUI ? t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.symbol') : undefined}
+                      placeholder={t('ui.SETTINGS.screen.Setting.Chains.ChainImport.symbol')}
+                      tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.ChainImport.symbol') : undefined}
                       tooltipPlacement={'topLeft'}
                     />
                   </Form.Item>
@@ -415,8 +415,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col span={12}>
                   <Form.Item name={'priceId'}>
                     <Input
-                      placeholder={t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.priceId')}
-                      tooltip={isWebUI ? t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.priceId') : undefined}
+                      placeholder={t('ui.SETTINGS.screen.Setting.Chains.ChainImport.priceId')}
+                      tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.ChainImport.priceId') : undefined}
                       tooltipPlacement={'topLeft'}
                     />
                   </Form.Item>
@@ -426,8 +426,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   <Form.Item name={'type'}>
                     <Input
                       disabled={true}
-                      placeholder={t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.networkType')}
-                      tooltip={isWebUI ? t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.networkType') : undefined}
+                      placeholder={t('ui.SETTINGS.screen.Setting.Chains.ChainImport.networkType')}
+                      tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.ChainImport.networkType') : undefined}
                       tooltipPlacement={'topLeft'}
                     />
                   </Form.Item>
@@ -440,8 +440,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 statusHelpAsTooltip={isWebUI}
               >
                 <Input
-                  placeholder={t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.blockExplorer')}
-                  tooltip={isWebUI ? t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.blockExplorer') : undefined}
+                  placeholder={t('ui.SETTINGS.screen.Setting.Chains.ChainImport.blockExplorer')}
+                  tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.ChainImport.blockExplorer') : undefined}
                   tooltipPlacement={'topLeft'}
                 />
               </Form.Item>
@@ -452,8 +452,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 statusHelpAsTooltip={isWebUI}
               >
                 <Input
-                  placeholder={t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.crowdloanUrl')}
-                  tooltip={isWebUI ? t('ui.CHAIN_IMPORT.Popup.Settings.Chains.ChainImport.crowdloanUrl') : undefined}
+                  placeholder={t('ui.SETTINGS.screen.Setting.Chains.ChainImport.crowdloanUrl')}
+                  tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.ChainImport.crowdloanUrl') : undefined}
                   tooltipPlacement={'topLeft'}
                 />
               </Form.Item>

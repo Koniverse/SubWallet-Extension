@@ -80,15 +80,15 @@ export default function useReceiveQR (tokenGroupSlug?: string) {
 
   const confirmModalProps = useMemo((): SwModalFuncProps => ({
     id: WARNING_LEDGER_RECEIVE_MODAL,
-    title: t<string>('ui.USE_RECEIVE_QR.hooks.screen.home.useReceiveQR.unsupportedNetwork'),
+    title: t<string>('ui.ACCOUNT.hook.screen.useReceiveQR.unsupportedNetwork'),
     maskClosable: true,
     closable: true,
-    subTitle: t<string>('ui.USE_RECEIVE_QR.hooks.screen.home.useReceiveQR.doYouStillWantToGetTheAddress'),
-    okText: t<string>('ui.USE_RECEIVE_QR.hooks.screen.home.useReceiveQR.getAddress'),
+    subTitle: t<string>('ui.ACCOUNT.hook.screen.useReceiveQR.confirmGetAddress'),
+    okText: t<string>('ui.ACCOUNT.hook.screen.useReceiveQR.getAddress'),
     okCancel: true,
     type: 'warn',
     cancelButtonProps: {
-      children: t<string>('ui.USE_RECEIVE_QR.hooks.screen.home.useReceiveQR.cancel'),
+      children: t<string>('ui.ACCOUNT.hook.screen.useReceiveQR.cancel'),
       schema: 'secondary'
     },
     className: 'ledger-warning-modal'
@@ -216,7 +216,7 @@ export default function useReceiveQR (tokenGroupSlug?: string) {
           if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(firstToken.originChain)) {
             handleSimpleConfirmModal({
               content: t<string>(
-                'ui.USE_RECEIVE_QR.hooks.screen.home.useReceiveQR.ledgerAccountsAreNotCompatibleWithNetworkTokensWillGetStuckIECanTBeTransferredOutOrStakedWhenSentToThisAccountType',
+                'ui.ACCOUNT.hook.screen.useReceiveQR.ledgerIncompatibleNetworkWarning',
                 {
                   replace: {
                     ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
@@ -259,7 +259,7 @@ export default function useReceiveQR (tokenGroupSlug?: string) {
         if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(first.originChain)) {
           handleSimpleConfirmModal({
             content: t<string>(
-              'ui.USE_RECEIVE_QR.hooks.screen.home.useReceiveQR.ledgerAccountsAreNotCompatibleWithNetworkTokensWillGetStuckIECanTBeTransferredOutOrStakedWhenSentToThisAccountType',
+              'ui.ACCOUNT.hook.screen.useReceiveQR.ledgerIncompatibleNetworkWarning',
               {
                 replace: {
                   ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',

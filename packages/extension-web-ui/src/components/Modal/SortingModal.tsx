@@ -55,7 +55,7 @@ function Component (props: Props): React.ReactElement<Props> {
       className={className}
       id={id}
       onCancel={_onCancel}
-      title={title || t('ui.SORTING_MODAL.components.Modal.SortingModal.sorting')}
+      title={title || t('ui.components.Modal.Sorting.sorting')}
     >
       <div className={'__options-container'}>
         {
@@ -88,7 +88,7 @@ function Component (props: Props): React.ReactElement<Props> {
               )}
               onClick={_onReset}
             >
-              {t('ui.SORTING_MODAL.components.Modal.SortingModal.resetSorting')}
+              {t('ui.components.Modal.Sorting.resetSorting')}
             </Button>
           )
         }

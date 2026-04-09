@@ -94,28 +94,28 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       backgroundColor: token['orange-7'],
       icon: Swatches,
       key: 'connect-ledger',
-      label: t('ui.ATTACH_ACCOUNT_MODAL.components.Modal.Account.AttachAccountModal.connectALedgerDevice'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Attach.connectLedgerDevice'),
       onClick: onClickLedger
     },
     {
       backgroundColor: token['magenta-7'],
       icon: QrCode,
       key: 'connect-polkadot-vault',
-      label: t('ui.ATTACH_ACCOUNT_MODAL.components.Modal.Account.AttachAccountModal.connectAPolkadotVaultAccount'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Attach.connectPolkadotVaultAccount'),
       onClick: onClickItem('accounts/connect-polkadot-vault')
     },
     {
       backgroundColor: token['blue-7'],
       icon: DeviceTabletCamera,
       key: 'connect-keystone',
-      label: t('ui.ATTACH_ACCOUNT_MODAL.components.Modal.Account.AttachAccountModal.connectAKeystoneDevice'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Attach.connectKeystoneDevice'),
       onClick: onClickItem('accounts/connect-keystone')
     },
     {
       backgroundColor: token['green-7'],
       icon: Eye,
       key: 'attach-read-only',
-      label: t('ui.ATTACH_ACCOUNT_MODAL.components.Modal.Account.AttachAccountModal.attachAWatchOnlyAccount'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Attach.attachWatchOnlyAccount'),
       onClick: onClickItem('accounts/attach-read-only')
     }
   ]), [t, token, onClickItem, onClickLedger]);
@@ -133,7 +133,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           icon: <CloseIcon />,
           onClick: onCancel
         })}
-      title={t<string>('ui.ATTACH_ACCOUNT_MODAL.components.Modal.Account.AttachAccountModal.attachAnAccount')}
+      title={t<string>('ui.ACCOUNT.components.Modal.Account.Attach.attachAccount')}
     >
       <div className='items-container'>
         {items.map((item) => {

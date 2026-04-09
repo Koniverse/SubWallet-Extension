@@ -31,10 +31,10 @@ function Component ({ className, request, type }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('ui.CARDANO_SIGNATURE_CONFIRMATION.Popup.Confirmations.variants.Message.CardanoSignatureConfirmation.signatureRequired')}
+          {t('ui.DAPP.Confirmations.Message.CardanoSignature.signatureRequired')}
         </div>
         <div className='description'>
-          {t('ui.CARDANO_SIGNATURE_CONFIRMATION.Popup.Confirmations.variants.Message.CardanoSignatureConfirmation.youAreApprovingARequestWithTheFollowingAccount')}
+          {t('ui.DAPP.Confirmations.Message.CardanoSignature.approvingRequestWithAccount')}
         </div>
         <AccountItemWithProxyAvatar
           account={account}
@@ -49,7 +49,7 @@ function Component ({ className, request, type }: Props) {
             size='xs'
             type='ghost'
           >
-            {t('ui.CARDANO_SIGNATURE_CONFIRMATION.Popup.Confirmations.variants.Message.CardanoSignatureConfirmation.viewDetails')}
+            {t('ui.DAPP.Confirmations.Message.CardanoSignature.viewDetails')}
           </Button>
         </div>
         }
@@ -60,7 +60,7 @@ function Component ({ className, request, type }: Props) {
         type={type}
       />
       {(!errors || errors.length === 0) && <BaseDetailModal
-        title={t('ui.CARDANO_SIGNATURE_CONFIRMATION.Popup.Confirmations.variants.Message.CardanoSignatureConfirmation.messageDetails')}
+        title={t('ui.DAPP.Confirmations.Message.CardanoSignature.messageDetails')}
       >
         <CardanoMessageDetail bytes={payload.hashPayload} />
       </BaseDetailModal>}

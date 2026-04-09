@@ -72,7 +72,7 @@ const Component: React.FC<Props> = (props: Props) => {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          { isMessage ? t('ui.NOT_SUPPORT_CONFIRMATION.Popup.Confirmations.variants.NotSupportConfirmation.signatureRequired') : t('ui.NOT_SUPPORT_CONFIRMATION.Popup.Confirmations.variants.NotSupportConfirmation.transactionRequest')}
+          { isMessage ? t('ui.Confirmations.NotSupport.signatureRequired') : t('ui.Confirmations.NotSupport.transactionRequest')}
         </div>
         <div className='description'>
           <Trans
@@ -81,7 +81,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 <span className='highlight' />
               )
             }}
-            i18nKey={detectTranslate('ui.NOT_SUPPORT_CONFIRMATION.Popup.Confirmations.variants.NotSupportConfirmation.featureNotAvailableForHighlightHighlightChangeToAnotherAccountTypeAndTryAgain')}
+            i18nKey={detectTranslate('ui.Confirmations.NotSupport.featureNotAvailableForAccountType')}
             values={{ accountTitle }}
           />
         </div>
@@ -96,7 +96,7 @@ const Component: React.FC<Props> = (props: Props) => {
           loading={loading}
           onClick={handleCancel}
         >
-          {t('ui.NOT_SUPPORT_CONFIRMATION.Popup.Confirmations.variants.NotSupportConfirmation.backToHome')}
+          {t('ui.Confirmations.NotSupport.backToHome')}
         </Button>
       </div>
     </>

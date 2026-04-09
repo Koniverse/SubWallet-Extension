@@ -151,7 +151,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
                 )}
                 onClick={onMigrateNow}
               >
-                {t('ui.BRIEF_VIEW.Popup.MigrateAccount.BriefView.migrateNow')}
+                {t('ui.ACCOUNT.screen.MigrateAccount.BriefView.migrateNow')}
               </Button>
             </>
           )

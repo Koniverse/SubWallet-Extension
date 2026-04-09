@@ -488,11 +488,11 @@ const Component: React.FC<Props> = (props: Props) => {
 
     const onError = (message: string) => {
       openAlert({
-        title: t('ui.EARNING_INSTRUCTION_MODAL.components.Modal.Earning.EarningInstructionModal.payAttention'),
+        title: t('ui.EARNING.components.Modal.Earning.Instruction.payAttentionExclamation'),
         type: NotificationType.ERROR,
         content: message,
         okButton: {
-          text: t('ui.EARNING_INSTRUCTION_MODAL.components.Modal.Earning.EarningInstructionModal.iUnderstand'),
+          text: t('ui.EARNING.components.Modal.Earning.Instruction.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
         }
@@ -590,7 +590,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={detectTranslate('ui.EARNING_INSTRUCTION_MODAL.components.Modal.Earning.EarningInstructionModal.forMoreInformationAndStakingInstructionsReadHighlightThisFaqHighlight')}
+            i18nKey={detectTranslate('ui.EARNING.components.Modal.Earning.Instruction.readFaqForStakingInfo')}
           />
         </div>
 
@@ -618,7 +618,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick={closeModal}
             schema={'secondary'}
           >
-            {isShowStakeMoreButton ? t('ui.EARNING_INSTRUCTION_MODAL.components.Modal.Earning.EarningInstructionModal.back') : t('ui.EARNING_INSTRUCTION_MODAL.components.Modal.Earning.EarningInstructionModal.close')}
+            {isShowStakeMoreButton ? t('ui.EARNING.components.Modal.Earning.Instruction.back') : t('ui.EARNING.components.Modal.Earning.Instruction.close')}
           </Button>
         }
         {isShowStakeMoreButton && (

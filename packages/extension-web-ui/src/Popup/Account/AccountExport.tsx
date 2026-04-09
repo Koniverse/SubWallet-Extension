@@ -108,10 +108,10 @@ const Component: React.FC<Props> = (props: Props) => {
   const { isWebUI } = useContext(ScreenContext);
 
   const titleMap = useMemo((): Record<ExportType, string> => ({
-    [ExportType.JSON_FILE]: t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.successful'),
-    [ExportType.QR_CODE]: t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.yourQrCode'),
-    [ExportType.PRIVATE_KEY]: t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.yourPrivateKey'),
-    [ExportType.SEED_PHRASE]: t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.yourSeedPhrase')
+    [ExportType.JSON_FILE]: t('ui.ACCOUNT.screen.Account.Export.successful'),
+    [ExportType.QR_CODE]: t('ui.ACCOUNT.screen.Account.Export.yourQrCode'),
+    [ExportType.PRIVATE_KEY]: t('ui.ACCOUNT.screen.Account.Export.yourPrivateKey'),
+    [ExportType.SEED_PHRASE]: t('ui.ACCOUNT.screen.Account.Export.yourSeedPhrase')
   }), [t]);
 
   const qrData = useMemo((): string => {
@@ -225,7 +225,7 @@ const Component: React.FC<Props> = (props: Props) => {
           let message = e.message;
 
           if (message === 'Unable to decode using the supplied passphrase') {
-            message = t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.wrongPassword');
+            message = t('ui.ACCOUNT.screen.Account.Export.wrongPassword');
           }
 
           form.setFields([{ name: FormFieldName.PASSWORD, errors: [message] }]);
@@ -259,14 +259,14 @@ const Component: React.FC<Props> = (props: Props) => {
         disable: !accountProxy || !accountProxy.accountActions.includes(AccountActions.EXPORT_MNEMONIC),
         hidden: false,
         icon: Leaf,
-        label: t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.exportSeedPhrase'),
+        label: t('ui.ACCOUNT.screen.Account.Export.exportSeedPhrase'),
         type: ExportType.SEED_PHRASE
       },
       {
         disable: !accountProxy || !accountProxy.accountActions.includes(AccountActions.EXPORT_JSON),
         hidden: false,
         icon: FileJs,
-        label: t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.exportJsonFile'),
+        label: t('ui.ACCOUNT.screen.Account.Export.exportJsonFile'),
         type: ExportType.JSON_FILE
       },
       {
@@ -274,14 +274,14 @@ const Component: React.FC<Props> = (props: Props) => {
         disable: !accountProxy || !accountProxy.accountActions.includes(AccountActions.EXPORT_PRIVATE_KEY),
         hidden: false,
         icon: Wallet,
-        label: t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.exportPrivateKey'),
+        label: t('ui.ACCOUNT.screen.Account.Export.exportPrivateKey'),
         type: ExportType.PRIVATE_KEY
       },
       {
         disable: !accountProxy || !accountProxy.accountActions.includes(AccountActions.EXPORT_QR),
         hidden: false,
         icon: QrCode,
-        label: t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.exportQrCode'),
+        label: t('ui.ACCOUNT.screen.Account.Export.exportQrCode'),
         type: ExportType.QR_CODE
       }
     ];
@@ -326,7 +326,7 @@ const Component: React.FC<Props> = (props: Props) => {
         disableBack={loading}
         onBack={isModalMode ? onCancel : onBack}
         rightFooterButton={{
-          children: firstStep ? t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.confirm') : t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.finish'),
+          children: firstStep ? t('ui.ACCOUNT.screen.Account.Export.confirm') : t('ui.ACCOUNT.screen.Account.Export.finish'),
           icon: firstStep ? undefined : FinishIcon,
           disabled: isDisabled || !exportTypes.length,
           loading: loading,
@@ -348,17 +348,17 @@ const Component: React.FC<Props> = (props: Props) => {
           : undefined}
         title={
           firstStep
-            ? t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.exportAccount')
+            ? t('ui.ACCOUNT.screen.Account.Export.exportAccount')
             : !exportSingle
-              ? t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.exportSuccessful')
+              ? t('ui.ACCOUNT.screen.Account.Export.exportSuccessful')
               : titleMap[exportTypes[0]]
         }
       >
         <div className='body-container'>
           <div className={CN('notice', { 'mb-large': !firstStep })}>
             <AlertBox
-              description={t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.anyoneWithYourKeyCanUseAnyAssetsHeldInYourAccount')}
-              title={t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.warningNeverDiscloseThisKey')}
+              description={t('ui.ACCOUNT.screen.Account.Export.privateKeyWarning')}
+              title={t('ui.ACCOUNT.screen.Account.Export.warningNeverDiscloseKey')}
               type='warning'
             />
           </div>
@@ -378,7 +378,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   name={FormFieldName.PASSWORD}
                   rules={[
                     {
-                      message: t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.passwordIsRequired'),
+                      message: t('ui.ACCOUNT.screen.Account.Export.passwordIsRequired'),
                       required: true
                     }
                   ]}
@@ -386,7 +386,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 >
                   <Input.Password
                     disabled={loading}
-                    placeholder={t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.typeYourSubwalletPassword')}
+                    placeholder={t('ui.ACCOUNT.screen.Account.Export.typeYourSubWalletPassword')}
                     suffix={<span />}
                     type='password'
                   />
@@ -467,7 +467,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         onClick={onCopyPrivateKey}
                         type='ghost'
                       >
-                        {t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.copyToClipboard')}
+                        {t('ui.ACCOUNT.screen.Account.Export.copyToClipboard')}
                       </Button>
                     </div>
                   )
@@ -502,7 +502,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 {
                   exportTypes.includes(ExportType.JSON_FILE) && jsonData && (
                     <div className='result-content'>
-                      <div className='result-title'>{t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.yourJsonFile')}</div>
+                      <div className='result-title'>{t('ui.ACCOUNT.screen.Account.Export.yourJsonFile')}</div>
                       {
                         exportSingle && (
                           <>
@@ -516,10 +516,10 @@ const Component: React.FC<Props> = (props: Props) => {
                               />
                             </div>
                             <div className='json-done-tile'>
-                              {t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.success')}
+                              {t('ui.ACCOUNT.screen.Account.Export.success')}
                             </div>
                             <div className='json-done-description'>
-                              {t('ui.ACCOUNT_EXPORT.Popup.Account.AccountExport.youHaveSuccessfullyExportedJsonFileForThisAccount')}
+                              {t('ui.ACCOUNT.screen.Account.Export.successfullyExportedJson')}
                             </div>
                           </>
                         )

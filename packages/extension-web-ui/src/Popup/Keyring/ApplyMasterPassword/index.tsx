@@ -153,7 +153,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const convertError = useCallback((error: string) => {
     if (error === 'Unable to decode using the supplied passphrase') {
-      return t('ui.APPLY_MASTER_PASSWORD.Popup.Keyring.ApplyMasterPassword.wrongPassword');
+      return t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.wrongPassword');
     } else {
       return t(error);
     }
@@ -192,9 +192,9 @@ const Component: React.FC<Props> = (props: Props) => {
 
     switch (step) {
       case 'Introduction':
-        return t<string>('ui.APPLY_MASTER_PASSWORD.Popup.Keyring.ApplyMasterPassword.applyMasterPassword');
+        return t<string>('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.applyMasterPassword');
       case 'Done':
-        return t<string>('ui.APPLY_MASTER_PASSWORD.Popup.Keyring.ApplyMasterPassword.successful');
+        return t<string>('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.successful');
       case 'Migrate':
         return `${String(migrated + 1).padStart(2, '0')}/${String(canMigrate.length).padStart(2, '0')}`;
       default:
@@ -206,7 +206,7 @@ const Component: React.FC<Props> = (props: Props) => {
     switch (step) {
       case 'Introduction':
         return {
-          children: t('ui.APPLY_MASTER_PASSWORD.Popup.Keyring.ApplyMasterPassword.applyMasterPasswordNow'),
+          children: t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.applyMasterPasswordNow'),
           onClick: () => {
             checkUnlock().then(() => {
               if (isWebUI) {
@@ -226,7 +226,7 @@ const Component: React.FC<Props> = (props: Props) => {
         };
       case 'Done':
         return {
-          children: t('ui.APPLY_MASTER_PASSWORD.Popup.Keyring.ApplyMasterPassword.finish'),
+          children: t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.finish'),
           onClick: () => {
             goHome();
           },
@@ -234,7 +234,7 @@ const Component: React.FC<Props> = (props: Props) => {
         };
       case 'Migrate':
         return {
-          children: t('ui.APPLY_MASTER_PASSWORD.Popup.Keyring.ApplyMasterPassword.next'),
+          children: t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.next'),
           onClick: () => {
             form.submit();
           },
@@ -382,29 +382,29 @@ const Component: React.FC<Props> = (props: Props) => {
                 <Form.Item>
                   <Field
                     content={currentAccount.name || ''}
-                    label={t('ui.APPLY_MASTER_PASSWORD.Popup.Keyring.ApplyMasterPassword.accountName')}
-                    placeholder={t('ui.APPLY_MASTER_PASSWORD.Popup.Keyring.ApplyMasterPassword.accountName')}
+                    label={t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.accountName')}
+                    placeholder={t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.accountName')}
                   />
                 </Form.Item>
                 <Form.Item>
                   <Field
                     content={toShort(currentAccount.address || '', 15, 17)}
-                    label={t('ui.APPLY_MASTER_PASSWORD.Popup.Keyring.ApplyMasterPassword.accountAddress')}
-                    placeholder={t('ui.APPLY_MASTER_PASSWORD.Popup.Keyring.ApplyMasterPassword.accountAddress')}
+                    label={t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.accountAddress')}
+                    placeholder={t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.accountAddress')}
                   />
                 </Form.Item>
                 <Form.Item
                   name={FormFieldName.PASSWORD}
                   rules={[
                     {
-                      message: t('ui.APPLY_MASTER_PASSWORD.Popup.Keyring.ApplyMasterPassword.currentPasswordIsRequired'),
+                      message: t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.currentPasswordIsRequired'),
                       required: true
                     }
                   ]}
                   statusHelpAsTooltip={isWebUI}
                 >
                   <Input.Password
-                    label={t('ui.APPLY_MASTER_PASSWORD.Popup.Keyring.ApplyMasterPassword.currentPassword')}
+                    label={t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.currentPassword')}
                     type='password'
                   />
                 </Form.Item>
@@ -420,7 +420,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         size='xs'
                         type='ghost'
                       >
-                        {t('ui.APPLY_MASTER_PASSWORD.Popup.Keyring.ApplyMasterPassword.removeThisAccount')}
+                        {t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.removeThisAccount')}
                       </Button>
                     </Form.Item>
                   )

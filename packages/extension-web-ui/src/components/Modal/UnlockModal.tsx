@@ -100,7 +100,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       className={className}
       id={UNLOCK_MODAL_ID}
       onCancel={closeModal}
-      title={t('ui.UNLOCK_MODAL.components.Modal.UnlockModal.enterPassword')}
+      title={t('ui.ACCOUNT.components.Modal.Unlock.enterPasswordTitle')}
       zIndex={9999}
     >
       <div className='body-container'>
@@ -114,7 +114,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             name={FormFieldName.PASSWORD}
             rules={[
               {
-                message: t('ui.UNLOCK_MODAL.components.Modal.UnlockModal.passwordIsRequired'),
+                message: t('ui.ACCOUNT.components.Modal.Unlock.passwordIsRequired'),
                 required: true
               }
             ]}
@@ -123,7 +123,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             <Input.Password
               containerClassName='password-input'
               id={passwordInputId}
-              placeholder={t('ui.UNLOCK_MODAL.components.Modal.UnlockModal.password')}
+              placeholder={t('ui.ACCOUNT.components.Modal.Unlock.password')}
             />
           </Form.Item>
           <Form.Item>
@@ -133,7 +133,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               htmlType='submit'
               loading={loading}
             >
-              {t('ui.UNLOCK_MODAL.components.Modal.UnlockModal.unlock')}
+              {t('ui.ACCOUNT.components.Modal.Unlock.unlock')}
             </Button>
           </Form.Item>
         </Form>

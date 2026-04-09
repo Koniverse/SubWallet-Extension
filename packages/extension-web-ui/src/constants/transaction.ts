@@ -8,56 +8,56 @@ import { CancelUnStakeParams, ChangeValidatorParams, ClaimBridgeParams, ClaimRew
 import { ALL_KEY } from './common';
 
 export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
-  [ExtrinsicType.TRANSFER_BALANCE]: detectTranslate('ui.TRANSACTION.constants.transaction.transfer'),
-  [ExtrinsicType.TRANSFER_XCM]: detectTranslate('ui.TRANSACTION.constants.transaction.transfer'),
-  [ExtrinsicType.TRANSFER_TOKEN]: detectTranslate('ui.TRANSACTION.constants.transaction.transfer'),
-  [ExtrinsicType.SEND_NFT]: detectTranslate('ui.TRANSACTION.constants.transaction.transferNft'),
-  [ExtrinsicType.CROWDLOAN]: detectTranslate('ui.TRANSACTION.constants.transaction.crowdloan'),
-  [ExtrinsicType.STAKING_JOIN_POOL]: detectTranslate('ui.TRANSACTION.constants.transaction.addToStake'),
-  [ExtrinsicType.STAKING_BOND]: detectTranslate('ui.TRANSACTION.constants.transaction.addToStake'),
-  [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('ui.TRANSACTION.constants.transaction.unstake'),
-  [ExtrinsicType.STAKING_UNBOND]: detectTranslate('ui.TRANSACTION.constants.transaction.unstake'),
-  [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: detectTranslate('ui.TRANSACTION.constants.transaction.changeValidator'),
-  [ExtrinsicType.STAKING_WITHDRAW]: detectTranslate('ui.TRANSACTION.constants.transaction.withdraw'),
-  [ExtrinsicType.STAKING_POOL_WITHDRAW]: detectTranslate('ui.TRANSACTION.constants.transaction.withdraw'),
-  [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: detectTranslate('ui.TRANSACTION.constants.transaction.cancelUnstake'),
-  [ExtrinsicType.STAKING_CLAIM_REWARD]: detectTranslate('ui.TRANSACTION.constants.transaction.claimRewards'),
-  [ExtrinsicType.STAKING_COMPOUNDING]: detectTranslate('ui.TRANSACTION.constants.transaction.compound'),
-  [ExtrinsicType.STAKING_CANCEL_COMPOUNDING]: detectTranslate('ui.TRANSACTION.constants.transaction.cancelCompound'),
-  [ExtrinsicType.JOIN_YIELD_POOL]: detectTranslate('ui.TRANSACTION.constants.transaction.startEarning'), // TODO: Change this
-  [ExtrinsicType.EVM_EXECUTE]: detectTranslate('ui.TRANSACTION.constants.transaction.execute'),
+  [ExtrinsicType.TRANSFER_BALANCE]: detectTranslate('ui.TRANSACTION.constant.transaction.transfer'),
+  [ExtrinsicType.TRANSFER_XCM]: detectTranslate('ui.TRANSACTION.constant.transaction.transfer'),
+  [ExtrinsicType.TRANSFER_TOKEN]: detectTranslate('ui.TRANSACTION.constant.transaction.transfer'),
+  [ExtrinsicType.SEND_NFT]: detectTranslate('ui.TRANSACTION.constant.transaction.transferNft'),
+  [ExtrinsicType.CROWDLOAN]: detectTranslate('ui.TRANSACTION.constant.transaction.crowdloan'),
+  [ExtrinsicType.STAKING_JOIN_POOL]: detectTranslate('ui.TRANSACTION.constant.transaction.addToStake'),
+  [ExtrinsicType.STAKING_BOND]: detectTranslate('ui.TRANSACTION.constant.transaction.addToStake'),
+  [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('ui.TRANSACTION.constant.transaction.unstake'),
+  [ExtrinsicType.STAKING_UNBOND]: detectTranslate('ui.TRANSACTION.constant.transaction.unstake'),
+  [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: detectTranslate('ui.TRANSACTION.constant.transaction.changeValidator'),
+  [ExtrinsicType.STAKING_WITHDRAW]: detectTranslate('ui.TRANSACTION.constant.transaction.withdraw'),
+  [ExtrinsicType.STAKING_POOL_WITHDRAW]: detectTranslate('ui.TRANSACTION.constant.transaction.withdraw'),
+  [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: detectTranslate('ui.TRANSACTION.constant.transaction.cancelUnstake'),
+  [ExtrinsicType.STAKING_CLAIM_REWARD]: detectTranslate('ui.TRANSACTION.constant.transaction.claimRewards'),
+  [ExtrinsicType.STAKING_COMPOUNDING]: detectTranslate('ui.TRANSACTION.constant.transaction.compound'),
+  [ExtrinsicType.STAKING_CANCEL_COMPOUNDING]: detectTranslate('ui.TRANSACTION.constant.transaction.cancelCompound'),
+  [ExtrinsicType.JOIN_YIELD_POOL]: detectTranslate('ui.TRANSACTION.constant.transaction.startEarning'), // TODO: Change this
+  [ExtrinsicType.EVM_EXECUTE]: detectTranslate('ui.TRANSACTION.constant.transaction.execute'),
   [ExtrinsicType.UNKNOWN]: detectTranslate('ui.TRANSACTION.constants.transaction.unknown'),
 
-  [ExtrinsicType.MINT_VDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.mintVdot'), // TODO: Change this
-  [ExtrinsicType.MINT_VMANTA]: detectTranslate('ui.TRANSACTION.constants.transaction.mintVmanta'), // TODO: Change this
-  [ExtrinsicType.MINT_LDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.mintLdot'), // TODO: Change this
-  [ExtrinsicType.MINT_SDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.mintSdot'), // TODO: Change this
-  [ExtrinsicType.MINT_QDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.mintQdot'), // TODO: Change this
-  [ExtrinsicType.MINT_STDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.mintStdot'), // TODO: Change this
-  [ExtrinsicType.MINT_VMANTA]: detectTranslate('ui.TRANSACTION.constants.transaction.mintVmanta'), // TODO: Change this
+  [ExtrinsicType.MINT_VDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.mintVDot'), // TODO: Change this
+  [ExtrinsicType.MINT_VMANTA]: detectTranslate('ui.TRANSACTION.constant.transaction.mintVManta'), // TODO: Change this
+  [ExtrinsicType.MINT_LDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.mintLDot'), // TODO: Change this
+  [ExtrinsicType.MINT_SDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.mintSDot'), // TODO: Change this
+  [ExtrinsicType.MINT_QDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.mintQDot'), // TODO: Change this
+  [ExtrinsicType.MINT_STDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.mintStDot'), // TODO: Change this
+  [ExtrinsicType.MINT_VMANTA]: detectTranslate('ui.TRANSACTION.constant.transaction.mintVManta'), // TODO: Change this
 
-  [ExtrinsicType.REDEEM_VDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.redeemVdot'), // TODO: Change this
-  [ExtrinsicType.REDEEM_VMANTA]: detectTranslate('ui.TRANSACTION.constants.transaction.redeemVmanta'), // TODO: Change this
-  [ExtrinsicType.REDEEM_LDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.redeemLdot'), // TODO: Change this
-  [ExtrinsicType.REDEEM_SDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.redeemSdot'), // TODO: Change this
-  [ExtrinsicType.REDEEM_QDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.redeemQdot'), // TODO: Change this
-  [ExtrinsicType.REDEEM_STDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.redeemStdot'), // TODO: Change this
-  [ExtrinsicType.REDEEM_VMANTA]: detectTranslate('ui.TRANSACTION.constants.transaction.redeemVmanta'),
+  [ExtrinsicType.REDEEM_VDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.redeemVDot'), // TODO: Change this
+  [ExtrinsicType.REDEEM_VMANTA]: detectTranslate('ui.TRANSACTION.constant.transaction.redeemVManta'), // TODO: Change this
+  [ExtrinsicType.REDEEM_LDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.redeemLDot'), // TODO: Change this
+  [ExtrinsicType.REDEEM_SDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.redeemSDot'), // TODO: Change this
+  [ExtrinsicType.REDEEM_QDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.redeemQDot'), // TODO: Change this
+  [ExtrinsicType.REDEEM_STDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.redeemStDot'), // TODO: Change this
+  [ExtrinsicType.REDEEM_VMANTA]: detectTranslate('ui.TRANSACTION.constant.transaction.redeemVManta'),
 
-  [ExtrinsicType.UNSTAKE_VDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.unstakeVdot'),
-  [ExtrinsicType.UNSTAKE_VMANTA]: detectTranslate('ui.TRANSACTION.constants.transaction.unstakeVmanta'),
-  [ExtrinsicType.UNSTAKE_LDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.unstakeLdot'),
-  [ExtrinsicType.UNSTAKE_SDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.unstakeSdot'),
-  [ExtrinsicType.UNSTAKE_STDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.unstakeStdot'),
-  [ExtrinsicType.UNSTAKE_QDOT]: detectTranslate('ui.TRANSACTION.constants.transaction.unstakeQdot'),
-  [ExtrinsicType.UNSTAKE_VMANTA]: detectTranslate('ui.TRANSACTION.constants.transaction.unstakeVmanta'),
+  [ExtrinsicType.UNSTAKE_VDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.unstakeVDot'),
+  [ExtrinsicType.UNSTAKE_VMANTA]: detectTranslate('ui.TRANSACTION.constant.transaction.unstakeVManta'),
+  [ExtrinsicType.UNSTAKE_LDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.unstakeLDot'),
+  [ExtrinsicType.UNSTAKE_SDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.unstakeSDot'),
+  [ExtrinsicType.UNSTAKE_STDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.unstakeStDot'),
+  [ExtrinsicType.UNSTAKE_QDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.unstakeQDot'),
+  [ExtrinsicType.UNSTAKE_VMANTA]: detectTranslate('ui.TRANSACTION.constant.transaction.unstakeVManta'),
 
-  [ExtrinsicType.CLAIM_BRIDGE]: detectTranslate('ui.TRANSACTION.constants.transaction.claimTokens'),
+  [ExtrinsicType.CLAIM_BRIDGE]: detectTranslate('ui.TRANSACTION.constant.transaction.claimTokens'),
 
   [ExtrinsicType.SET_FEE_TOKEN]: detectTranslate('ui.TRANSACTION.constants.transaction.setFeeToken'),
 
-  [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: detectTranslate('ui.TRANSACTION.constants.transaction.tokenApprove'),
-  [ExtrinsicType.SWAP]: detectTranslate('ui.TRANSACTION.constants.transaction.swap')
+  [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: detectTranslate('ui.TRANSACTION.constant.transaction.tokenApprove'),
+  [ExtrinsicType.SWAP]: detectTranslate('ui.TRANSACTION.constant.transaction.swap')
 };
 
 export const ALL_STAKING_ACTIONS: ExtrinsicType[] = [

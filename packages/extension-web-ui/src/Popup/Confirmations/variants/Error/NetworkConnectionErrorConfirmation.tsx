@@ -73,16 +73,16 @@ function Component ({ className, request, type }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('ui.NETWORK_CONNECTION_ERROR_CONFIRMATION.Popup.Confirmations.variants.Error.NetworkConnectionErrorConfirmation.transactionRequest')}
+          {t('ui.NETWORK.Confirmations.Error.NetworkConnection.transactionRequest')}
         </div>
         {/* <div className='description'> */}
-        {/*  {t('You are approving a request with the following account')} */}
+        {/*  {t('ui.NETWORK.Confirmations.Error.NetworkConnection.approvingRequestWithAccount')} */}
         {/* </div> */}
         <MetaInfo>
           {account && <MetaInfo.Account
             address={account.address}
             className={'account-info-item meta-info-item'}
-            label={t('ui.NETWORK_CONNECTION_ERROR_CONFIRMATION.Popup.Confirmations.variants.Error.NetworkConnectionErrorConfirmation.account')}
+            label={t('ui.NETWORK.Confirmations.Error.NetworkConnection.account')}
             name={account.name}
           />}
           { networkKey
@@ -90,7 +90,7 @@ function Component ({ className, request, type }: Props) {
               <MetaInfo.Chain
                 chain={networkKey}
                 className={'meta-info-item'}
-                label={t<string>('ui.NETWORK_CONNECTION_ERROR_CONFIRMATION.Popup.Confirmations.variants.Error.NetworkConnectionErrorConfirmation.network')}
+                label={t<string>('ui.NETWORK.Confirmations.Error.NetworkConnection.network')}
               />)
             : <></>}
         </MetaInfo>
@@ -116,7 +116,7 @@ function Component ({ className, request, type }: Props) {
           onClick={onCancel}
           schema={'primary'}
         >
-          {t('ui.NETWORK_CONNECTION_ERROR_CONFIRMATION.Popup.Confirmations.variants.Error.NetworkConnectionErrorConfirmation.iUnderstand')}
+          {t('ui.NETWORK.Confirmations.Error.NetworkConnection.iUnderstand')}
         </Button>
       </div>
     </>

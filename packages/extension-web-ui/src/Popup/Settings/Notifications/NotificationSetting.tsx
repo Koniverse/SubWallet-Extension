@@ -62,19 +62,19 @@ const Component = ({ isInModal, modalProps }: Props): React.ReactElement<Props> 
   const notificationOptions = useMemo((): ShowNoticeOption[] => {
     return [
       {
-        label: t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.claimTokens'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.claimTokens'),
         value: 'earningClaim'
       },
       {
-        label: t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.withdrawTokens'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.withdrawTokens'),
         value: 'earningWithdraw'
       },
       {
-        label: t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.claimAvailBridge'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.claimAvailBridge'),
         value: 'availBridgeClaim'
       },
       {
-        label: t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.claimPolygonBridge'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.claimPolygonBridge'),
         value: 'polygonBridgeClaim'
       }
     ];
@@ -83,15 +83,15 @@ const Component = ({ isInModal, modalProps }: Props): React.ReactElement<Props> 
   // const timeSetup = useMemo((): ViewOption[] => {
   //   return [
   //     {
-  //       label: t('Today'),
+  //       label: t('ui.SETTINGS.screen.Setting.Notifications.today'),
   //       value: NotificationTimePeriod.TODAY
   //     },
   //     {
-  //       label: t('This week'),
+  //       label: t('ui.SETTINGS.screen.Setting.Notifications.thisWeek'),
   //       value: NotificationTimePeriod.THIS_WEEK
   //     },
   //     {
-  //       label: t('This month'),
+  //       label: t('ui.SETTINGS.screen.Setting.Notifications.thisMonth'),
   //       value: NotificationTimePeriod.THIS_MONTH
   //     }
   //   ];
@@ -143,7 +143,7 @@ const Component = ({ isInModal, modalProps }: Props): React.ReactElement<Props> 
           onBack={goBack}
           paddingVertical
           showBackButton
-          title={t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.notificationSettings')}
+          title={t('ui.SETTINGS.screen.Setting.Notifications.thisMonth')}
         />
       )}
 
@@ -160,7 +160,7 @@ const Component = ({ isInModal, modalProps }: Props): React.ReactElement<Props> 
                 weight='fill'
               />
             )}
-            name={t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.enableNotifications')}
+            name={t('ui.SETTINGS.screen.Setting.Notifications.notificationSettings')}
             rightItem={(
               <Switch
                 checked={currentNotificationSetting.isEnabled}
@@ -170,7 +170,7 @@ const Component = ({ isInModal, modalProps }: Props): React.ReactElement<Props> 
           />
           {currentNotificationSetting.isEnabled && <div className={'content-wrapper'}>
             <div className={'options-container'}>
-              <div className={'option-title'}>{t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.showNotificationsAbout')}</div>
+              <div className={'option-title'}>{t('ui.SETTINGS.screen.Setting.Notifications.enableNotifications')}</div>
               {
                 notificationOptions.map((option) => (
                   <div
@@ -198,7 +198,7 @@ const Component = ({ isInModal, modalProps }: Props): React.ReactElement<Props> 
           // todo: handle params for notification setup
           onClick={onSaveNotificationSetup(currentNotificationSetting)}
         >
-          {t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.saveSettings')}
+          {t('ui.SETTINGS.screen.Setting.Notifications.showNotificationsAbout')}
         </Button>
       </div>
     </>
@@ -236,7 +236,7 @@ const Wrapper = (props: WrapperProps) => {
                 }
                 : undefined
               }
-              title={t('ui.NOTIFICATION_SETTING.Popup.Settings.Notifications.NotificationSetting.notifications')}
+              title={t('ui.SETTINGS.screen.Setting.Notifications.saveSettings')}
             >
               <Component
                 isInModal

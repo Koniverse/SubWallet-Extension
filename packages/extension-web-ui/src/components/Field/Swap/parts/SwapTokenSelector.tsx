@@ -190,7 +190,7 @@ const Component = (props: Props) => {
 
   const filterSearchBox = useMemo(() => {
     return {
-      placeholder: t('ui.SWAP_TOKEN_SELECTOR.components.Field.Swap.parts.SwapTokenSelector.searchNetwork')
+      placeholder: t('ui.SWAP.components.Field.Swap.TokenSelector.searchNetwork')
     };
   }, [t]);
 
@@ -207,7 +207,7 @@ const Component = (props: Props) => {
             !selectedItem
               ? (
                 <div className={'__placeholder-text'}>
-                  {placeholder || t('ui.SWAP_TOKEN_SELECTOR.components.Field.Swap.parts.SwapTokenSelector.selectToken')}
+                  {placeholder || t('ui.SWAP.components.Field.Swap.TokenSelector.selectToken')}
                 </div>
               )
               : (
@@ -239,7 +239,7 @@ const Component = (props: Props) => {
         destroyOnClose={true}
         id={modalId}
         onCancel={onCloseModal}
-        title={label || t('ui.SWAP_TOKEN_SELECTOR.components.Field.Swap.parts.SwapTokenSelector.selectToken')}
+        title={label || t('ui.SWAP.components.Field.Swap.TokenSelector.selectToken')}
       >
         <Search
           actionBtnIcon={(
@@ -259,7 +259,7 @@ const Component = (props: Props) => {
           className={'__search-box'}
           onClickActionBtn={openFilter}
           onSearch={handleSearch}
-          placeholder={t<string>('ui.SWAP_TOKEN_SELECTOR.components.Field.Swap.parts.SwapTokenSelector.enterTokenNameOrNetworkName')}
+          placeholder={t<string>('ui.SWAP.components.Field.Swap.TokenSelector.enterTokenOrNetworkName')}
           searchValue={currentSearchText}
           showActionBtn
         />

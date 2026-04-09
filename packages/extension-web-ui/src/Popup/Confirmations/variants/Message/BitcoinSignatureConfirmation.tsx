@@ -31,10 +31,10 @@ function Component ({ className, request, type }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('ui.BITCOIN_SIGNATURE_CONFIRMATION.Popup.Confirmations.variants.Message.BitcoinSignatureConfirmation.signatureRequired')}
+          {t('ui.DAPP.Confirmations.Message.BitcoinSignature.signatureRequired')}
         </div>
         <div className='description'>
-          {t('ui.BITCOIN_SIGNATURE_CONFIRMATION.Popup.Confirmations.variants.Message.BitcoinSignatureConfirmation.youAreApprovingARequestWithTheFollowingAccount')}
+          {t('ui.DAPP.Confirmations.Message.BitcoinSignature.approvingRequestWithAccount')}
         </div>
         <AccountItemWithProxyAvatar
           account={account}
@@ -49,7 +49,7 @@ function Component ({ className, request, type }: Props) {
             size='xs'
             type='ghost'
           >
-            {t('ui.BITCOIN_SIGNATURE_CONFIRMATION.Popup.Confirmations.variants.Message.BitcoinSignatureConfirmation.viewDetails')}
+            {t('ui.DAPP.Confirmations.Message.BitcoinSignature.viewDetails')}
           </Button>
         </div>
         }
@@ -60,7 +60,7 @@ function Component ({ className, request, type }: Props) {
         type={type}
       />
       {(!errors || errors.length === 0) && <BaseDetailModal
-        title={t('ui.BITCOIN_SIGNATURE_CONFIRMATION.Popup.Confirmations.variants.Message.BitcoinSignatureConfirmation.messageDetails')}
+        title={t('ui.DAPP.Confirmations.Message.BitcoinSignature.messageDetails')}
       >
         <MetaInfo.Data>
           {request.payload.payload as string}

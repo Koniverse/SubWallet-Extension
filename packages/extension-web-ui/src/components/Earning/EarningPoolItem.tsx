@@ -123,7 +123,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
           <div className='__item-line-2'>
             <div className='__item-total-staked-label'>
-              {t('ui.EARNING_POOL_ITEM.components.Earning.EarningPoolItem.totalValueStaked')}:
+              {t('ui.EARNING.components.Earning.PoolItem.totalValueStaked')}:
             </div>
             <div className='__item-total-staked-value'>
               {total
@@ -137,7 +137,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 )
                 : (
                   <span>
-                    {t('ui.EARNING_POOL_ITEM.components.Earning.EarningPoolItem.tbd')}
+                    {t('ui.EARNING.components.Earning.PoolItem.tbd')}
                   </span>
                 )}
             </div>

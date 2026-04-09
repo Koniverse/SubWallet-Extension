@@ -34,11 +34,11 @@ const AlertBoxInstant: React.FC<Props> = (props: Props) => {
                   />
                 )
               }}
-              i18nKey={detectTranslate('ui.ALERT_BOX_INSTANT.components.AlertBoxInstant.thisNetworkHas2AddressFormatsSubwalletAutomaticallyTransformsLegacyFormatsIntoNewFormatWithoutAffectingYourTransferHighlightLearnMoreHighlight')}
+              i18nKey={detectTranslate('ui.components.AlertBoxInstant.dualAddressFormatInfo')}
             />
           </>
         }
-        title={t('ui.ALERT_BOX_INSTANT.components.AlertBoxInstant.newAddressFormat')}
+        title={t('ui.components.AlertBoxInstant.newAddressFormat')}
         type={'info'}
       />
     );

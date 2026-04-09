@@ -23,7 +23,7 @@ const useScanAccountQr = (
     if (result) {
       if (isProductionMode && result.isEthereum) {
         setValidateState({
-          message: t('ui.USE_SCAN_ACCOUNT_QR.hooks.qr.useScanAccountQr.evmQrSingerAccountIsNotSupported'),
+          message: t('ui.SETTING.hook.qr.useScanAccountQr.evmQrSignerNotSupported'),
           status: 'error'
         });
 
@@ -33,7 +33,7 @@ const useScanAccountQr = (
       }
     } else {
       setValidateState({
-        message: t('ui.USE_SCAN_ACCOUNT_QR.hooks.qr.useScanAccountQr.invalidQrCode'),
+        message: t('ui.SETTING.hook.qr.useScanAccountQr.invalidQrCode'),
         status: 'error'
       });
 

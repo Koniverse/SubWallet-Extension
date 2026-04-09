@@ -46,14 +46,14 @@ function Component ({ cancelRequest, className, networkToAdd, requestId }: Props
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('ui.ADD_NETWORK_WCMODAL.components.Modal.AddNetworkWCModal.cancel')}
+          {t('ui.WALLET_CONNECT.components.Modal.AddNetworkWC.cancel')}
         </Button>
 
         <Button
           block={true}
           onClick={addNetwork}
         >
-          {t('ui.ADD_NETWORK_WCMODAL.components.Modal.AddNetworkWCModal.addNetwork')}
+          {t('ui.WALLET_CONNECT.components.Modal.AddNetworkWC.addNetwork')}
         </Button>
       </>
     );
@@ -70,7 +70,7 @@ function Component ({ cancelRequest, className, networkToAdd, requestId }: Props
         id={AddNetworkWCModalId}
         maskClosable={false}
         onCancel={onCancel}
-        title={t('ui.ADD_NETWORK_WCMODAL.components.Modal.AddNetworkWCModal.addNetworkToConnect')}
+        title={t('ui.WALLET_CONNECT.components.Modal.AddNetworkWC.addNetworkToConnect')}
       >
         <div className={'__modal-content'}>
           <PageIcon
@@ -81,7 +81,7 @@ function Component ({ cancelRequest, className, networkToAdd, requestId }: Props
             }}
           />
           <div className='__modal-description'>
-            {t('ui.ADD_NETWORK_WCMODAL.components.Modal.AddNetworkWCModal.theNetworkYouReConnectingToIsNotYetSupportedOnSubwalletAddTheNetworkFirstThenConnectWithWalletconnectAgain')}
+            {t('ui.WALLET_CONNECT.components.Modal.AddNetworkWC.unsupportedNetworkAddFirst')}
           </div>
         </div>
       </BaseModal>

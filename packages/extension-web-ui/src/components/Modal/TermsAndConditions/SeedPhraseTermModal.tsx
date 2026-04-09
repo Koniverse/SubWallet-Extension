@@ -45,10 +45,10 @@ const Component = ({ className }: Props) => {
   const { token } = useTheme() as Theme;
 
   const ListTermSeedPhrase: Record<TermSeedPhrase, string> = useMemo(() => ({
-    [TermSeedPhrase.TERM_1]: t('ui.SEED_PHRASE_TERM_MODAL.components.Modal.TermsAndConditions.SeedPhraseTermModal.subwalletDoesnTKeepAnyCopyOfYourSeedPhraseAndOtherBackupMethodsSuchAsJsonFileOrPrivateKey'),
-    [TermSeedPhrase.TERM_2]: t('ui.SEED_PHRASE_TERM_MODAL.components.Modal.TermsAndConditions.SeedPhraseTermModal.subwalletCanTHelpYouRecoverYourAccountOnceYourSeedPhraseJsonFileOrPrivateKeyIsLost'),
-    [TermSeedPhrase.TERM_3]: t('ui.SEED_PHRASE_TERM_MODAL.components.Modal.TermsAndConditions.SeedPhraseTermModal.youMustWriteDownYourSeedPhraseInTheCorrectOrderItIsRecommendedThatYouStoreItInASecureOfflineLocation'),
-    [TermSeedPhrase.TERM_4]: t('ui.SEED_PHRASE_TERM_MODAL.components.Modal.TermsAndConditions.SeedPhraseTermModal.youAreNotRecommendedToDownloadAndStoreYourSeedPhraseInADigitalDevice')
+    [TermSeedPhrase.TERM_1]: t('ui.TERM.components.Modal.Terms.SeedPhrase.subwalletDoesNotKeepSeed'),
+    [TermSeedPhrase.TERM_2]: t('ui.TERM.components.Modal.Terms.SeedPhrase.subwalletCannotRecoverAccount'),
+    [TermSeedPhrase.TERM_3]: t('ui.TERM.components.Modal.Terms.SeedPhrase.writeSeedPhraseInOrder'),
+    [TermSeedPhrase.TERM_4]: t('ui.TERM.components.Modal.Terms.SeedPhrase.doNotStoreSeedDigitally')
   }), [t]);
 
   const ListTermItem: TermSeedPhrase[] = useMemo(() => [TermSeedPhrase.TERM_1, TermSeedPhrase.TERM_2, TermSeedPhrase.TERM_3, TermSeedPhrase.TERM_4], []);
@@ -103,8 +103,8 @@ const Component = ({ className }: Props) => {
 
   const subTitle = useMemo(() => {
     return useDefaultContent
-      ? t('ui.SEED_PHRASE_TERM_MODAL.components.Modal.TermsAndConditions.SeedPhraseTermModal.tapOnAllCheckboxesToConfirmYouUnderstandTheImportanceOfYourSeedPhrase')
-      : t('ui.SEED_PHRASE_TERM_MODAL.components.Modal.TermsAndConditions.SeedPhraseTermModal.thisSeedPhraseCreatesAUnifiedAccountThatCanBeUsedForPolkadotEthereumTonCardanoAndBitcoinEcosystemsKeepInMindThatForTonSpecificallyThisSeedPhraseIsNotCompatibleWithTonNativeWallets');
+      ? t('ui.TERM.components.Modal.Terms.SeedPhrase.confirmSeedPhraseImportance')
+      : t('ui.TERM.components.Modal.Terms.SeedPhrase.seedPhraseAccount');
   }, [useDefaultContent, t]);
 
   return (
@@ -115,7 +115,7 @@ const Component = ({ className }: Props) => {
       })}
       closable={false}
       id={modalId}
-      title={t('ui.SEED_PHRASE_TERM_MODAL.components.Modal.TermsAndConditions.SeedPhraseTermModal.keepYourSeedPhraseSafe')}
+      title={t('ui.TERM.components.Modal.Terms.SeedPhrase.keepYourSeedPhraseSafe')}
       width={ isWebUI ? 584 : undefined }
     >
       <div
@@ -136,7 +136,7 @@ const Component = ({ className }: Props) => {
           checked={isCheckDontShow}
           className={'term-footer-checkbox'}
           onChange={onCheckedInput}
-        >{t('ui.SEED_PHRASE_TERM_MODAL.components.Modal.TermsAndConditions.SeedPhraseTermModal.donTShowAgain')}</Checkbox>
+        >{t('ui.TERM.components.Modal.Terms.SeedPhrase.dontShowAgain')}</Checkbox>
         <div className={'term-footer-button-group'}>
           <Button
             block={true}
@@ -150,7 +150,7 @@ const Component = ({ className }: Props) => {
             )}
             onClick={onConfirm}
           >
-            {t('ui.SEED_PHRASE_TERM_MODAL.components.Modal.TermsAndConditions.SeedPhraseTermModal.continue')}
+            {t('ui.TERM.components.Modal.Terms.SeedPhrase.continue')}
           </Button>
         </div>
       </div>

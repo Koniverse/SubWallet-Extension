@@ -89,13 +89,13 @@ function Component ({ className = '', items, onCancel, onSelectItem }: Props): R
       destroyOnClose={true}
       id={modalId}
       onCancel={onPressCancel}
-      title={t('ui.TOKEN_SELECTOR.components.Modal.ReceiveModalNew.parts.TokenSelector.selectToken')}
+      title={t('ui.ACCOUNT.components.Modal.ReceiveNew.TokenSelector.selectToken')}
     >
       <Search
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t<string>('ui.TOKEN_SELECTOR.components.Modal.ReceiveModalNew.parts.TokenSelector.enterTokenNameOrNetworkName')}
+        placeholder={t<string>('ui.ACCOUNT.components.Modal.ReceiveNew.TokenSelector.enterTokenOrNetworkName')}
         searchValue={currentSearchText}
         simpleLayout={true}
       />

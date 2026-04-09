@@ -86,11 +86,11 @@ export default function useHandleLedgerAccountWarning (): HookType {
 
     if (isNeedShowAlert) {
       const targetSymbol = isTokenContext ? assetRegistry[targetSlug]?.symbol : '';
-      const title = isTokenContext ? t('ui.USE_HANDLE_LEDGER_ACCOUNT_WARNING.hooks.account.useHandleLedgerAccountWarning.unsupportedToken') : t('ui.USE_HANDLE_LEDGER_ACCOUNT_WARNING.hooks.account.useHandleLedgerAccountWarning.payAttention');
-      const subtitle = isTokenContext ? t('ui.USE_HANDLE_LEDGER_ACCOUNT_WARNING.hooks.account.useHandleLedgerAccountWarning.doYouStillWantToGetTheAddress') : undefined;
+      const title = isTokenContext ? t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.unsupportedToken') : t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention');
+      const subtitle = isTokenContext ? t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.stillWantAddress') : undefined;
       const contentMessage = isTokenContext
-        ? t('ui.USE_HANDLE_LEDGER_ACCOUNT_WARNING.hooks.account.useHandleLedgerAccountWarning.yourAccountIsNotCompatibleWithTokenTransferringToThisAccountWillResultInTokensGettingStuckIECanTBeTransferredOutOrStaked', { replace: { symbol: targetSymbol } })
-        : t('ui.USE_HANDLE_LEDGER_ACCOUNT_WARNING.hooks.account.useHandleLedgerAccountWarning.thisAddressCanOnlyBeUsedToReceiveCompatibleTokensSendingIncompatibleTokensToThisAddressWillResultInTheseTokensGettingStuckIECanTBeSentOutOrStaked');
+        ? t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.accountIncompatibleTokenWarning', { replace: { symbol: targetSymbol } })
+        : t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.addressReceiveCompatibleTokensWarning');
 
       const content = (<div>{contentMessage}</div>);
 
@@ -107,7 +107,7 @@ export default function useHandleLedgerAccountWarning (): HookType {
           : undefined,
         type: NotificationType.WARNING,
         okButton: {
-          text: t('ui.USE_HANDLE_LEDGER_ACCOUNT_WARNING.hooks.account.useHandleLedgerAccountWarning.getAddress'),
+          text: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.getAddress'),
           onClick: () => {
             alertModal.close();
             processFunction();
@@ -115,7 +115,7 @@ export default function useHandleLedgerAccountWarning (): HookType {
           schema: 'primary'
         },
         cancelButton: {
-          text: t('ui.USE_HANDLE_LEDGER_ACCOUNT_WARNING.hooks.account.useHandleLedgerAccountWarning.cancel'),
+          text: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.cancel'),
           onClick: () => {
             alertModal.close();
           },

@@ -57,7 +57,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         onClick={openCreateAccount}
         schema='secondary'
       >
-        {t('ui.FOOTER.components.Layout.parts.SelectAccount.Footer.createNew')}
+        {t('ui.ACCOUNT.components.Layout.SelectAccount.Footer.createNewAccount')}
       </Button>
       <Button
         className='btn-min-width'

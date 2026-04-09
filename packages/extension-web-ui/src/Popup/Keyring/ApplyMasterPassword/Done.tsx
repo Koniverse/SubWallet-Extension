@@ -33,10 +33,10 @@ const Component: React.FC<Props> = (props: Props) => {
         />
       </div>
       <div className='title'>
-        {t('ui.DONE.Popup.Keyring.ApplyMasterPassword.Done.allDone')}
+        {t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.Done.allDone')}
       </div>
       <div className='description'>
-        {t('ui.DONE.Popup.Keyring.ApplyMasterPassword.Done.youHaveSuccessfullyUpdatedMasterPasswordToAllAccounts')}
+        {t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.Done.masterPasswordUpdatedForAllAccounts')}
       </div>
       <div className='account-container'>
         {accounts.slice(0, 2).map((account) => (
@@ -54,7 +54,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <div className='and-more'>
               <Trans
                 components={{ highlight: <span className='highlight' /> }}
-                i18nKey={detectTranslate('ui.DONE.Popup.Keyring.ApplyMasterPassword.Done.andOtherHighlightHighlightAccounts')}
+                i18nKey={detectTranslate('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.Done.andOtherNumberAccounts')}
                 values={{ number: String(accounts.length - 2).padStart(2, '0') }}
               />
             </div>

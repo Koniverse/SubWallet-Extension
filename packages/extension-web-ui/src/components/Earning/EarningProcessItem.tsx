@@ -98,7 +98,7 @@ const Component = ({ className, index, stepName, stepStatus }: Props) => {
       {stepStatusIcon}
       <div className={CN('__step-title', stepTextClassName)}>
         <span className={'__order'}>
-          {t('ui.EARNING_PROCESS_ITEM.components.Earning.EarningProcessItem.step', { replace: { stepNumb: index + 1 } })}
+          {t('ui.EARNING.components.Earning.ProcessItem.stepNumber', { replace: { stepNumb: index + 1 } })}
         </span>
 
         <span className={'__name'}>

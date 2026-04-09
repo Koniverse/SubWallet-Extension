@@ -29,14 +29,14 @@ const Component: FC<Props> = (props: Props) => {
 
   const modalTitle = useMemo(() => {
     if (type === ProcessType.SWAP) {
-      return t('ui.TRANSACTION_STEPS_MODAL.components.Modal.TransactionStepsModal.swapProcess');
+      return t('ui.TRANSACTION.components.Modal.TransactionSteps.swapProcess');
     }
 
     if (type === ProcessType.EARNING) {
-      return t('ui.TRANSACTION_STEPS_MODAL.components.Modal.TransactionStepsModal.stakeProcess');
+      return t('ui.TRANSACTION.components.Modal.TransactionSteps.stakeProcess');
     }
 
-    return t('ui.TRANSACTION_STEPS_MODAL.components.Modal.TransactionStepsModal.process');
+    return t('ui.TRANSACTION.components.Modal.TransactionSteps.process');
   }, [t, type]);
 
   const ItemComponent = variant === 'standard' ? TransactionProcessStepItem : TransactionProcessStepSimpleItem;
@@ -50,7 +50,7 @@ const Component: FC<Props> = (props: Props) => {
           block={true}
           onClick={onCancel}
         >
-          {t('ui.TRANSACTION_STEPS_MODAL.components.Modal.TransactionStepsModal.close')}
+          {t('ui.TRANSACTION.components.Modal.TransactionSteps.close')}
         </Button>
       )}
       id={modalId}

@@ -744,7 +744,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
 
           openAlert({
             type: NotificationType.WARNING,
-            content: t(`Transferring to an ${bounceableAddressPrefix} address is not supported. Continuing will result in a transfer to the corresponding ${formattedAddressPrefix} address (same seed phrase)`),
+            content: t('ui.TRANSACTION.screen.Transaction.SendFund.bounceableAddressNotSupported', { replace: { bounceableAddressPrefix, formattedAddressPrefix } }),
             title: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.unsupportedAddress'),
             okButton: {
               text: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.continue'),

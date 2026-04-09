@@ -203,14 +203,14 @@ const Component: React.FC<Props> = (props: Props) => {
           {isShowAmount && (
             <MetaInfo.Number
               decimals={decimals}
-              label={t('ui.CHANGE_EARNING_VALIDATOR.Popup.Confirmations.variants.Transaction.variants.ChangeEarningValidator.amount')}
+              label={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.amount')}
               suffix={data.metadata?.subnetSymbol || symbol}
               value={data.amount}
             />
           )}
           <MetaInfo.Number
             decimals={decimals}
-            label={t('ui.CHANGE_EARNING_VALIDATOR.Popup.Confirmations.variants.Transaction.variants.ChangeEarningValidator.estimatedFee')}
+            label={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.estimatedFee')}
             suffix={symbol}
             value={transaction.estimateFee?.value || 0}
           />
@@ -252,7 +252,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <AlertBox
               className={'alert-box'}
               description={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFeeInfo', { replace: { number: stakingFee } })}
-              title={t('ui.CHANGE_EARNING_VALIDATOR.Popup.Confirmations.variants.Transaction.variants.ChangeEarningValidator.validatorChangeFee')}
+              title={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFee')}
               type='info'
             />
           )}

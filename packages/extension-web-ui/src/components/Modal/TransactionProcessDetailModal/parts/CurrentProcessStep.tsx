@@ -69,26 +69,26 @@ const Component: FC<Props> = (props: Props) => {
   const title = useMemo(() => {
     if (isStepCompleted(processData.status)) {
       if (processData.type === ProcessType.SWAP) {
-        return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.swapSuccess');
+        return t('ui.TRANSACTION.components.Modal.TxProcessDetail.CurrentStep.swapSuccess');
       } else if (processData.type === ProcessType.EARNING) {
-        return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.stakeSuccess');
+        return t('ui.TRANSACTION.components.Modal.TxProcessDetail.CurrentStep.stakeSuccess');
       }
 
-      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.transactionSuccess');
+      return t('ui.TRANSACTION.components.Modal.TxProcessDetail.CurrentStep.transactionSuccess');
     }
 
     if (isStepFailed(processData.status)) {
       if (processData.type === ProcessType.SWAP) {
-        return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.swapFailed');
+        return t('ui.TRANSACTION.components.Modal.TxProcessDetail.CurrentStep.swapFailed');
       } else if (processData.type === ProcessType.EARNING) {
-        return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.stakeFailed');
+        return t('ui.TRANSACTION.components.Modal.TxProcessDetail.CurrentStep.stakeFailed');
       }
 
-      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.transactionFailed');
+      return t('ui.TRANSACTION.components.Modal.TxProcessDetail.CurrentStep.transactionFailed');
     }
 
     if (isStepTimeout(processData.status)) {
-      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.transactionTimeout');
+      return t('ui.TRANSACTION.components.Modal.TxProcessDetail.CurrentStep.transactionTimeout');
     }
 
     if (!currentStep) {
@@ -99,18 +99,18 @@ const Component: FC<Props> = (props: Props) => {
       CommonStepType.XCM,
       YieldStepType.XCM
     ] as BaseStepType[]).includes(currentStep.type)) {
-      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.transferTokenCrossChain');
+      return t('ui.TRANSACTION.components.Modal.TxProcessDetail.CurrentStep.transferTokenCrossChain');
     }
 
     if (currentStep.type === SwapStepType.SWAP) {
-      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.swapToken');
+      return t('ui.TRANSACTION.components.Modal.TxProcessDetail.CurrentStep.swapToken');
     }
 
     if (([
       CommonStepType.TOKEN_APPROVAL,
       YieldStepType.TOKEN_APPROVAL
     ] as BaseStepType[]).includes(currentStep.type)) {
-      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.approveToken');
+      return t('ui.TRANSACTION.components.Modal.TxProcessDetail.CurrentStep.approveToken');
     }
 
     if (([
@@ -123,11 +123,11 @@ const Component: FC<Props> = (props: Props) => {
       YieldStepType.MINT_SDOT,
       YieldStepType.MINT_STDOT
     ] as BaseStepType[]).includes(currentStep.type)) {
-      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.stakeToken');
+      return t('ui.TRANSACTION.components.Modal.TxProcessDetail.CurrentStep.stakeToken');
     }
 
     if (currentStep.type === SwapStepType.PERMIT) {
-      return t('ui.CURRENT_PROCESS_STEP.components.Modal.TransactionProcessDetailModal.parts.CurrentProcessStep.signMessage');
+      return t('ui.TRANSACTION.components.Modal.TxProcessDetail.CurrentStep.signMessage');
     }
 
     // if (processData.type === ProcessType.SWAP) {

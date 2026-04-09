@@ -44,8 +44,8 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <MetaInfo.AccountGroup
           accounts={data.selectedValidators}
-          content={t(`{{number}} selected ${pluralizedValidators}`, { replace: { number: data.selectedValidators.length } })}
-          label={t(data.type === StakingType.POOLED ? 'Pool' : handleValidatorLabel)}
+          content={t('ui.TRANSACTION.Confirmations.Bond.numberSelectedValidator', { replace: { number: data.selectedValidators.length, validatorLabel: pluralizedValidators } })}
+          label={data.type === StakingType.POOLED ? t('ui.TRANSACTION.screen.Transaction.Earn.pool') : t(handleValidatorLabel)}
         />
 
         <MetaInfo.Number
@@ -65,10 +65,8 @@ const Component: React.FC<Props> = (props: Props) => {
 
       {/* <AlertBox */}
       {/*  className={'description'} */}
-      {/*  description={t('Once staked, your funds will be locked and become non-transferable. ' + */}
-      {/*    'To unlock your funds, you need to unstake manually, wait for the unstaking period to' + */}
-      {/*    ' end and then withdraw manually.')} */}
-      {/*  title={t('Your staked funds will be locked')} */}
+      {/*  description={t('ui.JOIN_POOL.Popup.Confirmations.variants.Transaction.variants.JoinPool.onceStakedYourFundsWillBeLockedAndBecomeNonTransferableToUnlockYourFundsYouNeedToUnstakeManuallyWaitForTheUnstakingPeriodToEndAndThenWithdrawManually')} */}
+      {/*  title={t('ui.JOIN_POOL.Popup.Confirmations.variants.Transaction.variants.JoinPool.yourStakedFundsWillBeLocked')} */}
       {/*  type='warning' */}
       {/* /> */}
 

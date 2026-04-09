@@ -45,7 +45,7 @@ function Component ({ className = '' }: Props) {
   return (
     <PageWrapper className={CN('main-page-container', className, { '__mobile-mode': !isWebUI })}>
       <div className={'web-layout-background'}></div>
-      <div className={'__header-area'}>{t('ui.ERROR_FALLBACK.Popup.ErrorFallback.unknownError')}</div>
+      <div className={'__header-area'}>{t('ui.screen.ErrorFallback.unknownError')}</div>
       <div className={'container'}>
         <div className={'__body-area'}>
           <PageIcon
@@ -54,9 +54,9 @@ function Component ({ className = '' }: Props) {
               phosphorIcon: Robot
             }}
           />
-          <div className={'__title'}>{t('ui.ERROR_FALLBACK.Popup.ErrorFallback.oopsAnErrorOccurred')}</div>
+          <div className={'__title'}>{t('ui.screen.ErrorFallback.oopsAnErrorOccurred')}</div>
           <div className={'__content'}>
-            <span>{t('ui.ERROR_FALLBACK.Popup.ErrorFallback.somethingWentWrongHelpUsFixTheProblemBySendingAReportAnonymously')}</span>
+            <span>{t('ui.screen.ErrorFallback.somethingWentWrongSendReport')}</span>
           </div>
         </div>
 
@@ -73,7 +73,7 @@ function Component ({ className = '' }: Props) {
             loading={isUploading}
             onClick={uploadCrashLog}
           >
-            {t('ui.ERROR_FALLBACK.Popup.ErrorFallback.sendReport')}
+            {t('ui.screen.ErrorFallback.sendReport')}
           </Button>
           <Button
             block={true}
@@ -88,7 +88,7 @@ function Component ({ className = '' }: Props) {
             onClick={goHome}
             schema={'secondary'}
           >
-            {t('ui.ERROR_FALLBACK.Popup.ErrorFallback.backToHome')}
+            {t('ui.screen.ErrorFallback.backToHome')}
           </Button>
         </div>
 

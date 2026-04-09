@@ -116,7 +116,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
     // concatenate all the parts into one binary blob
     let concatMultipartData = multipartData.reduce((acc: Uint8Array, part: Uint8Array | null): Uint8Array => {
       if (part === null) {
-        throw new Error(t('ui.SCANNER_CONTEXT.contexts.ScannerContext.incompletePleaseContinueScanning'));
+        throw new Error(t('ui.SETTING.context.Scanner.incompleteContinueScanning'));
       }
 
       const c = new Uint8Array(acc.length + part.length);
@@ -153,7 +153,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
 
     if (currentFrame === 0 && (partDataAsBytes[0] === new Uint8Array([0x00])[0] || partDataAsBytes[0] === new Uint8Array([0x7b])[0])) {
       // part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
-      throw new Error(t('ui.SCANNER_CONTEXT.contexts.ScannerContext.failedToDecryptData'));
+      throw new Error(t('ui.SETTING.context.Scanner.failedToDecryptData'));
     }
 
     if (completedFramesCount < totalFrameCount) {
@@ -290,7 +290,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
 
     if (isSubstrateMessageParsedData(signRequest)) {
       if (signRequest.data.crypto !== 'sr25519') {
-        throw new Error(t('ui.SCANNER_CONTEXT.contexts.ScannerContext.subwalletOnlySupportsAccountsUsingSr25519Crypto'));
+        throw new Error(t('ui.SETTING.context.Scanner.sr25519CryptoOnly'));
       }
 
       isHash = signRequest.isHash;
@@ -306,7 +306,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
     const sender = findAccountByAddress(accounts, address);
 
     if (!sender) {
-      throw new Error(t('ui.SCANNER_CONTEXT.contexts.ScannerContext.unableToFindAccount'));
+      throw new Error(t('ui.SETTING.context.Scanner.unableToFindAccount'));
     }
 
     const qrInfo: MessageQRInfo = {
@@ -335,10 +335,10 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
         case 'signData':
           return _setDataToSign(unsignedData);
         default:
-          throw new Error(t('ui.SCANNER_CONTEXT.contexts.ScannerContext.invalidQrCode'));
+          throw new Error(t('ui.SETTING.context.Scanner.invalidQrCode'));
       }
     } else {
-      throw new Error(t('ui.SCANNER_CONTEXT.contexts.ScannerContext.invalidQrCode'));
+      throw new Error(t('ui.SETTING.context.Scanner.invalidQrCode'));
     }
   }, [t, _setDataToSign, _setTXRequest]);
 
@@ -355,15 +355,15 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
     }
 
     if (!_isChainEnabled(senderNetworkState)) {
-      throw new Error(t('ui.SCANNER_CONTEXT.contexts.ScannerContext.inactiveNetworkPleaseEnableOnThisDeviceAndTryAgain', { replace: { networkName: senderNetwork.name?.replace(' Relay Chain', '') } }));
+      throw new Error(t('ui.SETTING.context.Scanner.enableInactiveNetwork', { replace: { networkName: senderNetwork.name?.replace(' Relay Chain', '') } }));
     }
 
     if (!sender) {
-      throw new Error(t('ui.SCANNER_CONTEXT.contexts.ScannerContext.failedToSignSenderAccountNotFound'));
+      throw new Error(t('ui.SETTING.context.Scanner.failedToSignSenderNotFound'));
     }
 
     if (!type) {
-      throw new Error(t('ui.SCANNER_CONTEXT.contexts.ScannerContext.failedToSignUnableToDetectType'));
+      throw new Error(t('ui.SETTING.context.Scanner.failedToSignUnableToDetectType'));
     }
 
     const signData = async (): Promise<string> => {
@@ -379,7 +379,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
         } else if (isHash) {
           signable = dataToSign;
         } else {
-          throw new Error(t('ui.SCANNER_CONTEXT.contexts.ScannerContext.failedToSignInvalidMessageType'));
+          throw new Error(t('ui.SETTING.context.Scanner.failedToSignInvalidMessageType'));
         }
 
         const { signature } = await qrSignEvm({
@@ -400,7 +400,7 @@ export const ScannerContextProvider = ({ children }: ScannerContextProviderProps
         } else if (isAscii(dataToSign) || isHash) {
           signable = dataToSign;
         } else {
-          throw new Error(t('ui.SCANNER_CONTEXT.contexts.ScannerContext.failedToSignInvalidMessageType'));
+          throw new Error(t('ui.SETTING.context.Scanner.failedToSignInvalidMessageType'));
         }
 
         try {

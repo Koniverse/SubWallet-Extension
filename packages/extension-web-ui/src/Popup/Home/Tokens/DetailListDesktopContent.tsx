@@ -88,7 +88,7 @@ function Component ({ className = '',
                 className={'__table'}
                 columns={[
                   {
-                    title: t('ui.BALANCE.screen.Tokens.DetailListDesktopContent.tokenName'),
+                    title: t('ui.BALANCE.components.Modal.GlobalSearchToken.tokenName'),
                     dataIndex: 'name',
                     key: 'name',
                     render: (_, row) => {

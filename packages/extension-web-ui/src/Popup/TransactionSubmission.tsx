@@ -39,8 +39,8 @@ const SwapProcessingContentComponent = (props: SwapProcessingContentComponentPro
 
   const messages = useMemo<string[]>(() => {
     return [
-      t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.tipHitViewProcessToViewStepByStepDetailsOfYourSwap'),
-      t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.hangingInThere')
+      t('ui.TRANSACTION.screen.TransactionSubmission.tipViewSwapProcess'),
+      t('ui.TRANSACTION.screen.TransactionSubmission.hangingInThere')
     ];
   }, [t]);
 
@@ -65,10 +65,10 @@ const SwapProcessingContentComponent = (props: SwapProcessingContentComponentPro
         />
       </div>
       <div className='title'>
-        {t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.swapInProcess')}
+        {t('ui.TRANSACTION.screen.TransactionSubmission.swapInProcess')}
       </div>
       <div className='subtitle'>
-        {t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.doNotCloseTheApp')}
+        {t('ui.TRANSACTION.screen.TransactionSubmission.doNotCloseApp')}
       </div>
       <div className='description'>
         {messages[messageIndex]}
@@ -202,18 +202,18 @@ const Component: React.FC<Props> = (props: Props) => {
           ? ({
             block: true,
             onClick: goHome,
-            children: t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.backToHome')
+            children: t('ui.TRANSACTION.screen.TransactionSubmission.backToHome')
           })
           : undefined}
         rightFooterButton={processData
           ? ({
             block: true,
             onClick: viewProgress,
-            children: t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.viewProcess')
+            children: t('ui.TRANSACTION.screen.TransactionSubmission.viewProcess')
           })
           : undefined}
         subHeaderLeft={<CloseIcon />}
-        title={isSwapProcessing ? t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.swap') : t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.submitted')}
+        title={isSwapProcessing ? t('ui.TRANSACTION.screen.TransactionSubmission.swap') : t('ui.TRANSACTION.screen.TransactionSubmission.submitted')}
       >
         {!processData && (
           <LoadingScreen />
@@ -236,10 +236,10 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               </div>
               <div className='title'>
-                {t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.transactionSubmitted')}
+                {t('ui.TRANSACTION.screen.TransactionSubmission.transactionSubmitted')}
               </div>
               <div className='description'>
-                {t('ui.TRANSACTION_SUBMISSION.Popup.TransactionSubmission.viewTransactionProgressInTheNotificationsScreenOrGoBackToHome')}
+                {t('ui.TRANSACTION.screen.TransactionSubmission.trackTransactionInNotifications')}
               </div>
             </div>
           )

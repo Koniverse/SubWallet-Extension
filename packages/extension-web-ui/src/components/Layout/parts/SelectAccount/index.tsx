@@ -191,14 +191,14 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         }
 
       case ConnectionStatement.DISCONNECTED:
-        return t('ui.SELECT_ACCOUNT.components.Layout.parts.SelectAccount.disconnected');
+        return t('ui.ACCOUNT.components.Layout.SelectAccount.disconnected');
 
       case ConnectionStatement.BLOCKED:
-        return t('ui.SELECT_ACCOUNT.components.Layout.parts.SelectAccount.blocked');
+        return t('ui.ACCOUNT.components.Layout.SelectAccount.blocked');
 
       case ConnectionStatement.NOT_CONNECTED:
       default:
-        return t('ui.SELECT_ACCOUNT.components.Layout.parts.SelectAccount.notConnected');
+        return t('ui.ACCOUNT.components.Layout.SelectAccount.notConnected');
     }
   }, [canConnect, connected, connectionState, isAllAccount, t]);
 

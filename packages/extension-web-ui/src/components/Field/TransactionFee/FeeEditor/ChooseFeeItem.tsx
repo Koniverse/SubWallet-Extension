@@ -68,7 +68,7 @@ const Component: React.FC<Props> = (props: Props) => {
               }
             </div>
             <div className={'__line-2'}>
-              <span className={'__label-available-balance'}>{t('ui.CHOOSE_FEE_ITEM.components.Field.TransactionFee.FeeEditor.ChooseFeeItem.availableBalance')}&nbsp;</span>
+              <span className={'__label-available-balance'}>{t('ui.TRANSACTION.components.Field.FeeEditor.ChooseFeeItem.availableBalanceColon')}&nbsp;</span>
               <Number
                 className={'__available-balance-info'}
                 customFormatter={swapCustomFormatter}

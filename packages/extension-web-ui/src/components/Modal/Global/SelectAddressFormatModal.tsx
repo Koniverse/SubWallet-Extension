@@ -93,7 +93,7 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
       const processFunction = () => {
         copyToClipboard(item.address || '');
         notify({
-          message: t('ui.SELECT_ADDRESS_FORMAT_MODAL.components.Modal.Global.SelectAddressFormatModal.copiedToClipboard')
+          message: t('ui.ACCOUNT.components.Modal.Global.SelectAddressFormat.copiedToClipboard')
         });
       };
 
@@ -139,11 +139,11 @@ const Component: React.FC<Props> = ({ address, chainSlug, className, name, onBac
         }
         : undefined
       }
-      title={t<string>('ui.SELECT_ADDRESS_FORMAT_MODAL.components.Modal.Global.SelectAddressFormatModal.selectAddressFormat')}
+      title={t<string>('ui.ACCOUNT.components.Modal.Global.SelectAddressFormat.selectAddressFormat')}
     >
       <div>
         <div className={'sub-title'}>
-          {t('ui.SELECT_ADDRESS_FORMAT_MODAL.components.Modal.Global.SelectAddressFormatModal.someExchangesAreStillUsingLegacyFormatForTokenDepositAndWithdrawalMakeSureYouChooseTheCorrectAddressFormatToAvoidRisksOfFundLoss')}
+          {t('ui.ACCOUNT.components.Modal.Global.SelectAddressFormat.legacyAddressFormatWarning')}
           <a
             href={LEARN_MORE_DOCS_URL}
             rel='noreferrer'

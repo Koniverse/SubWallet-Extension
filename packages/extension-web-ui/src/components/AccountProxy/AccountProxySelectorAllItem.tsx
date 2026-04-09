@@ -34,7 +34,7 @@ function Component (props: Props): React.ReactElement<Props> {
         <AccountProxyAvatarGroup accountProxies={ accountProxies } />
       </div>
       <div className='__item-middle-part'>
-        {t('ui.ACCOUNT_PROXY_SELECTOR_ALL_ITEM.components.AccountProxy.AccountProxySelectorAllItem.allAccounts')}
+        {t('ui.ACCOUNT.components.AccountProxy.SelectorAllItem.allAccounts')}
       </div>
       <div className='__item-right-part'>
         {(showUnSelectedIcon || isSelected) && (

@@ -95,7 +95,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           setReformatAddress('');
           setIsHideAccountNameInput(true);
 
-          return Promise.reject(t('ui.ATTACH_READ_ONLY.Popup.Account.AttachReadOnly.accountAlreadyExists'));
+          return Promise.reject(t('ui.ACCOUNT.screen.Account.AttachReadOnly.accountAlreadyExists'));
         }
       }
     } else {
@@ -103,7 +103,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       setIsHideAccountNameInput(true);
 
       if (value !== '') {
-        return Promise.reject(t('ui.ATTACH_READ_ONLY.Popup.Account.AttachReadOnly.invalidAddress'));
+        return Promise.reject(t('ui.ACCOUNT.screen.Account.AttachReadOnly.invalidAddress'));
       }
     }
 
@@ -118,10 +118,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         const { isValid } = await validateAccountName({ name: value });
 
         if (!isValid) {
-          return Promise.reject(t('ui.ATTACH_READ_ONLY.Popup.Account.AttachReadOnly.accountNameAlreadyInUse'));
+          return Promise.reject(t('ui.ACCOUNT.screen.Account.AttachReadOnly.accountNameInUse'));
         }
       } catch (e) {
-        return Promise.reject(t('ui.ATTACH_READ_ONLY.Popup.Account.AttachReadOnly.accountNameInvalid'));
+        return Promise.reject(t('ui.ACCOUNT.screen.Account.AttachReadOnly.accountNameInvalid'));
       }
     }
 
@@ -151,7 +151,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               } else if (error.message.toLowerCase().includes('account name already exists')) {
                 errorNameInputs.push(error.message);
               } else {
-                errorAddressInputs.push(t('ui.ATTACH_READ_ONLY.Popup.Account.AttachReadOnly.invalidAddress'));
+                errorAddressInputs.push(t('ui.ACCOUNT.screen.Account.AttachReadOnly.invalidAddress'));
               }
             });
 
@@ -188,7 +188,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         className='web-single-column web-cancel-fill-height'
         onBack={onBack}
         rightFooterButton={{
-          children: t('ui.ATTACH_READ_ONLY.Popup.Account.AttachReadOnly.attachWatchOnlyAccount'),
+          children: t('ui.ACCOUNT.screen.Account.AttachReadOnly.attachWatchOnlyAccount'),
           icon: FooterIcon,
           disabled: isDisable,
           onClick: onSubmit,
@@ -200,11 +200,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             onClick: goHome
           }
         ]}
-        title={t<string>('ui.ATTACH_READ_ONLY.Popup.Account.AttachReadOnly.attachWatchOnlyAccount')}
+        title={t<string>('ui.ACCOUNT.screen.Account.AttachReadOnly.attachWatchOnlyAccount')}
       >
         <div className={CN('container')}>
           <div className='description'>
-            {t('ui.ATTACH_READ_ONLY.Popup.Account.AttachReadOnly.trackTheActivityOfAnyWalletWithoutAPrivateKey')}
+            {t('ui.ACCOUNT.screen.Account.AttachReadOnly.trackWalletActivity')}
           </div>
           <div className='page-icon'>
             <PageIcon
@@ -227,7 +227,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               name={fieldName}
               rules={[
                 {
-                  message: t('ui.ATTACH_READ_ONLY.Popup.Account.AttachReadOnly.accountAddressIsRequired'),
+                  message: t('ui.ACCOUNT.screen.Account.AttachReadOnly.accountAddressRequired'),
                   required: true
                 },
                 {
@@ -238,7 +238,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             >
               <AddressInput
                 id={modalId}
-                placeholder={t('ui.ATTACH_READ_ONLY.Popup.Account.AttachReadOnly.pleaseTypeOrPasteAccountAddress')}
+                placeholder={t('ui.ACCOUNT.screen.Account.AttachReadOnly.typeOrPasteAccountAddress')}
                 showScanner={true}
               />
             </Form.Item>
@@ -248,7 +248,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               hidden={isHideAccountNameInput}
               name={'name'}
               rules={[{
-                message: t('ui.ATTACH_READ_ONLY.Popup.Account.AttachReadOnly.accountNameIsRequired'),
+                message: t('ui.ACCOUNT.screen.Account.AttachReadOnly.accountNameRequired'),
                 transform: (value: string) => value.trim(),
                 required: true
               },
@@ -262,8 +262,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               <Input
                 className='__account-name-input'
                 disabled={loading}
-                label={t('ui.ATTACH_READ_ONLY.Popup.Account.AttachReadOnly.accountName')}
-                placeholder={t('ui.ATTACH_READ_ONLY.Popup.Account.AttachReadOnly.enterTheAccountName')}
+                label={t('ui.ACCOUNT.screen.Account.AttachReadOnly.accountName')}
+                placeholder={t('ui.ACCOUNT.screen.Account.AttachReadOnly.enterAccountName')}
               />
             </Form.Item>
           </Form>

@@ -34,7 +34,7 @@ const Component: React.FC<Props> = (props: Props) => {
           (
             <MetaInfo.Account
               address={txParams.contractAddress}
-              label={t('ui.TOKEN_APPROVE.Popup.Confirmations.variants.Transaction.variants.TokenApprove.contract')}
+              label={t('ui.TRANSACTION.Confirmations.TokenApprove.contract')}
             />
           )
         }
@@ -43,13 +43,13 @@ const Component: React.FC<Props> = (props: Props) => {
           (
             <MetaInfo.Account
               address={txParams.spenderAddress}
-              label={t('ui.TOKEN_APPROVE.Popup.Confirmations.variants.Transaction.variants.TokenApprove.spenderContract')}
+              label={t('ui.TRANSACTION.Confirmations.TokenApprove.spenderContract')}
             />
           )
         }
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.TOKEN_APPROVE.Popup.Confirmations.variants.Transaction.variants.TokenApprove.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.TokenApprove.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />

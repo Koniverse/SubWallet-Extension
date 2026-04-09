@@ -149,15 +149,15 @@ const Component: React.FC<Props> = (props: Props) => {
 
         {!showQuoteExpired && getWaitingTime > 0 && <AlertBox
           className={'__swap-arrival-time'}
-          description={t(`Swapping via ${data.provider.name} can take up to ${getWaitingTime} minutes. Make sure you review all information carefully before submitting.`)}
+          description={t('ui.TRANSACTION.Confirmations.Process.Swap.swapProviderWaitingTime', { replace: { provider: data.provider.name, getWaitingTime } })}
           title={t('ui.SWAP.Popup.Confirmations.variants.Process.Swap.payAttention')}
           type='warning'
         />}
         {/* {!showQuoteExpired && isSwapXCM && ( */}
         {/*   <AlertBox */}
         {/*     className={'__swap-quote-expired'} */}
-        {/*     description={t('The swap quote has been updated. Make sure to double-check all information before confirming the transaction.')} */}
-        {/*     title={t('Pay attention!')} */}
+        {/*     description={t('ui.TRANSACTION.Confirmations.Process.Swap.swapQuoteUpdated')} */}
+        {/*     title={t('ui.TRANSACTION.Confirmations.Process.Swap.payAttentionExclamation')} */}
         {/*     type='warning' */}
         {/*   /> */}
         {/* )} */}

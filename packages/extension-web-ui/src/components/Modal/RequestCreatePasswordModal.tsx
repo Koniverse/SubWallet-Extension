@@ -39,7 +39,7 @@ const Component: React.FC<Props> = (props: Props) => {
       closable={false}
       id={modalId}
       maskClosable={false}
-      title={t('ui.REQUEST_CREATE_PASSWORD_MODAL.components.Modal.RequestCreatePasswordModal.createMasterPassword')}
+      title={t('ui.SETTING.components.Modal.RequestCreatePassword.createMasterPassword')}
       wrapClassName={CN(className)}
     >
       <div className='body-container'>
@@ -53,7 +53,7 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         </div>
         <div className='description'>
-          {t('ui.REQUEST_CREATE_PASSWORD_MODAL.components.Modal.RequestCreatePasswordModal.yourMasterPasswordIsThePasswordThatAllowsAccessToMultipleAccountsOnceAMasterPasswordIsConfirmedYouWillNotNeedToManuallyTypeYourPasswordWithEveryTransaction')}
+          {t('ui.SETTING.components.Modal.RequestCreatePassword.masterPasswordInfo')}
         </div>
         <Button
           block={true}
@@ -65,7 +65,7 @@ const Component: React.FC<Props> = (props: Props) => {
           )}
           onClick={onClick}
         >
-          {t('ui.REQUEST_CREATE_PASSWORD_MODAL.components.Modal.RequestCreatePasswordModal.createMasterPassword')}
+          {t('ui.SETTING.components.Modal.RequestCreatePassword.createMasterPassword')}
         </Button>
       </div>
     </BaseModal>

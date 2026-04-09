@@ -140,7 +140,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {
           _isRelatedToAstar && (
             <div className={'__visit-dapp'}>
-              {t('ui.EARNING_POSITION_ITEM.components.Earning.EarningPositionItem.viewOnDapp')}
+              {t('ui.EARNING.components.Earning.PositionItem.viewOnDapp')}
             </div>
           )
         }

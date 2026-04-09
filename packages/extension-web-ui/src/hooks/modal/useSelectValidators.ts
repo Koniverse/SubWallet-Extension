@@ -30,20 +30,20 @@ export function useSelectValidators (validatorList: ValidatorDataType[], modalId
     if (!fewValidators) {
       switch (label) {
         case 'dApp':
-          return detectTranslate('ui.USE_SELECT_VALIDATORS.hooks.modal.useSelectValidators.youCanOnlyChooseDapp');
+          return detectTranslate('ui.EARNING.hook.modal.useSelectValidators.canOnlyChooseOneDapp');
         case 'Collator':
-          return detectTranslate('ui.USE_SELECT_VALIDATORS.hooks.modal.useSelectValidators.youCanOnlyChooseCollator');
+          return detectTranslate('ui.EARNING.hook.modal.useSelectValidators.canOnlyChooseOneCollator');
         case 'Validator':
-          return detectTranslate('ui.USE_SELECT_VALIDATORS.hooks.modal.useSelectValidators.youCanOnlyChooseValidator');
+          return detectTranslate('ui.EARNING.hook.modal.useSelectValidators.canOnlyChooseOneValidator');
       }
     } else {
       switch (label) {
         case 'dApp':
-          return detectTranslate('ui.USE_SELECT_VALIDATORS.hooks.modal.useSelectValidators.youCanOnlyChooseDapps');
+          return detectTranslate('ui.EARNING.hook.modal.useSelectValidators.canOnlyChooseNumberDapps');
         case 'Collator':
-          return detectTranslate('ui.USE_SELECT_VALIDATORS.hooks.modal.useSelectValidators.youCanOnlyChooseCollators');
+          return detectTranslate('ui.EARNING.hook.modal.useSelectValidators.canOnlyChooseNumberCollators');
         case 'Validator':
-          return detectTranslate('ui.USE_SELECT_VALIDATORS.hooks.modal.useSelectValidators.youCanOnlyChooseValidators');
+          return detectTranslate('ui.EARNING.hook.modal.useSelectValidators.canOnlyChooseNumberValidators');
       }
     }
   }, [chain, fewValidators]);

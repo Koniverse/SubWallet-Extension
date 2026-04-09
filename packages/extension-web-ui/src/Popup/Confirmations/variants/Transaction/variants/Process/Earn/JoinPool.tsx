@@ -47,8 +47,8 @@ const Component: React.FC<Props> = (props: Props) => {
 
         {/* <MetaInfo.AccountGroup */}
         {/*  accounts={data.address} */}
-        {/*  content={t(`${data.selectedValidators.length} selected validators`)} */}
-        {/*  label={t('Pool')} */}
+        {/*  content={t('ui.TRANSACTION.Confirmations.Process.Earn.Bond.numberSelectedValidator', { replace: { number: data.selectedValidators.length, validatorLabel: 'validators' } })} */}
+        {/*  label={t('ui.TRANSACTION.screen.Transaction.Earn.pool')} */}
         {/* /> */}
 
         <MetaInfo.Number
