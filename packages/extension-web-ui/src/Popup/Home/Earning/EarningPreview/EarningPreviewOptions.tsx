@@ -491,7 +491,7 @@ function Component ({ className }: Props) {
       type: NotificationType.ERROR,
       content: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.yourChosenValidatorIsNotRecommendedBySubwalletAsStakingWithThisValidatorWonTAccrueAnyRewardsSelectAnotherValidatorAndTryAgain'),
       okButton: {
-        text: t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.dismiss'),
+        text: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.dismiss'),
         onClick: () => {
           setIsAlertWarningValidator(false);
           closeAlert();

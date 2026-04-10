@@ -27,7 +27,7 @@ const Component: React.FC<Props> = (props: Props) => {
       <MetaInfo hasBackgroundWrapper>
         <MetaInfo.Account
           address={data.senderAddress}
-          label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendFrom')}
+          label={t('ui.TRANSACTION.screen.Transaction.SendFund.from')}
           networkPrefix={networkPrefix}
         />
 
@@ -39,7 +39,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Chain
           chain={transaction.chain}
-          label={t('ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.network')}
+          label={t('ui.NFT.screen.NftsItemDetail.network')}
         />
       </MetaInfo>
       <MetaInfo hasBackgroundWrapper={true}>

@@ -206,7 +206,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         type='phosphor'
                         weight={'fill'}
                       />
-                      <div>{t<string>('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.description')}</div>
+                      <div>{t<string>('ui.INSCRIPTION_ITEM_DETAIL.Popup.Home.Inscriptions.InscriptionItemDetail.description')}</div>
                     </div>
                   </div>
                 )
@@ -274,7 +274,7 @@ const Component: React.FC<Props> = (props: Props) => {
           closeIcon={modalCloseButton}
           id={'nftItemDescription'}
           onCancel={onCloseNftDescriptionModal}
-          title={t<string>('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.description')}
+          title={t<string>('ui.INSCRIPTION_ITEM_DETAIL.Popup.Home.Inscriptions.InscriptionItemDetail.description')}
           wrapClassName={className}
         >
           <div className={'nft_item_detail__description_modal_content'}>

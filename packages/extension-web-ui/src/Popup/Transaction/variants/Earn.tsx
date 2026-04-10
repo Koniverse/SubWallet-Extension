@@ -1010,7 +1010,7 @@ const Component = ({ className }: ComponentProps) => {
           type: NotificationType.ERROR,
           content: t('ui.EARN.Popup.Transaction.variants.Earn.yourChosenValidatorIsNotRecommendedBySubwalletAsStakingWithThisValidatorWonTAccrueAnyRewardsSelectAnotherValidatorAndTryAgain'),
           cancelButton: {
-            text: t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.dismiss'),
+            text: t('ui.EARN.Popup.Transaction.variants.Earn.dismiss'),
             onClick: () => {
               isReadyToShowAlertRef.current = true;
               closeAlert();

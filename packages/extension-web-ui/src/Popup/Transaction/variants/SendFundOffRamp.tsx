@@ -843,7 +843,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
               addressPrefix={fromChainNetworkPrefix}
               disabled={true}
               filter={onFilterAccountFunc}
-              label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendFrom')}
+              label={t('ui.TRANSACTION.screen.Transaction.SendFund.from')}
             />
           </Form.Item>
 
@@ -892,7 +892,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
               chain={destChain}
               disabled={true}
               fitNetwork={true}
-              label={t('ui.TRANSACTION.screen.Transaction.SendNFT.sendTo')}
+              label={t('ui.TRANSACTION.screen.Transaction.SendFund.to')}
               networkGenesisHash={destChainGenesisHash}
               placeholder={t('ui.TRANSACTION.screen.Transaction.SendNFT.accountAddress')}
               saveAddress={true}

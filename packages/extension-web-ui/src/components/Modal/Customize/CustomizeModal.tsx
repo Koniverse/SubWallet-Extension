@@ -64,7 +64,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         />
       </div>
 
-      <div className={'__group-label'}>{t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.networks')}</div>
+      <div className={'__group-label'}>{t('ui.BALANCE.components.Modal.Customize.Modal.networks')}</div>
 
       <CustomizeModalContent />
     </BaseModal>

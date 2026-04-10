@@ -114,7 +114,7 @@ function Component ({ className = '', collectionInfo,
 
   const subHeaderRightButton: ButtonProps[] = [
     {
-      children: t<string>('ui.HISTORY.screen.History.send'),
+      children: t<string>('ui.NFT.screen.NftsItemDetail.send'),
       onClick: onClickSend
     }
   ];
@@ -300,7 +300,7 @@ function Component ({ className = '', collectionInfo,
                         type='phosphor'
                         weight={'fill'}
                       />
-                      <div>{t<string>('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.description')}</div>
+                      <div>{t<string>('ui.NFT.screen.NftsItemDetail.description')}</div>
                     </div>
                   </div>
                 )
@@ -377,7 +377,7 @@ function Component ({ className = '', collectionInfo,
               )}
               onClick={onClickSend}
             >
-              <span className={'nft_item_detail__send_text'}>{t('ui.HISTORY.screen.History.send')}</span>
+              <span className={'nft_item_detail__send_text'}>{t('ui.NFT.screen.NftsItemDetail.send')}</span>
             </Button>
           )}
         </div>
@@ -406,7 +406,7 @@ function Component ({ className = '', collectionInfo,
           closeIcon={modalCloseButton}
           id={'nftItemDescription'}
           onCancel={onCloseNftDescriptionModal}
-          title={t<string>('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.description')}
+          title={t<string>('ui.NFT.screen.NftsItemDetail.description')}
           wrapClassName={className}
         >
           <div className={'nft_item_detail__description_modal_content'}>
