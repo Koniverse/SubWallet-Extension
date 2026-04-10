@@ -215,7 +215,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               : {}
           ]}
         subHeaderLeft={preventModal ? !isWebUI ? <CloseIcon /> : undefined : undefined }
-        title={t('ui.NEW_SEED_PHRASE.Popup.Account.NewSeedPhrase.yourSeedPhrase')}
+        title={t('ui.ACCOUNT.screen.Account.NewSeedPhrase.yourSeedPhrase')}
       >
         <div className={CN('container', {
           '__web-ui': isWebUI

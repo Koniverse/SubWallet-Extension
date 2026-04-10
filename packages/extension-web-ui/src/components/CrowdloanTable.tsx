@@ -28,22 +28,22 @@ const Component: React.FC<Props> = (props: Props) => {
     const getUnlockTexts = (fundStatus: _FundStatus, unlockTime: number): [string, string, string] => {
       if (fundStatus === _FundStatus.WON) {
         if (unlockTime < Date.now()) {
-          return [t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.dissolved'), t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.on'), '-won'];
+          return [t('ui.components.CrowdloanTable.dissolved'), t('ui.components.CrowdloanTable.on'), '-won'];
         }
 
-        return [t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.locked'), t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.until'), '-won'];
+        return [t('ui.components.CrowdloanTable.locked'), t('ui.components.CrowdloanTable.until'), '-won'];
       }
 
       if (fundStatus === _FundStatus.IN_AUCTION) {
-        return [t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.crowdloan'), t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.endsOn'), '-in-auction'];
+        return [t('ui.components.CrowdloanTable.crowdloan'), t('ui.components.CrowdloanTable.endsOn'), '-in-auction'];
       }
 
-      return [t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.refunded'), t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.on'), '-fail'];
+      return [t('ui.components.CrowdloanTable.refunded'), t('ui.components.CrowdloanTable.on'), '-fail'];
     };
 
     return [
       {
-        title: t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.projectName'),
+        title: t('ui.components.CrowdloanTable.projectName'),
         dataIndex: 'name',
         key: 'name',
         render: (_: any, row: _CrowdloanItemType) => {
@@ -62,13 +62,13 @@ const Component: React.FC<Props> = (props: Props) => {
                 <div className={'__row-project-name'}>{row.chainName}</div>
               </div>
 
-              <div className={'__row-project-parachain'}>{`${row.relayChainName} ${t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.parachain')}`}</div>
+              <div className={'__row-project-parachain'}>{`${row.relayChainName} ${t('ui.components.CrowdloanTable.parachain')}`}</div>
             </div>
           </div>;
         }
       },
       {
-        title: t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.status'),
+        title: t('ui.EARNING.components.Modal.Earning.ValidatorDetail.status'),
         dataIndex: 'status',
         key: 'status',
         className: '__table-status-col',
@@ -81,7 +81,7 @@ const Component: React.FC<Props> = (props: Props) => {
         }
       },
       {
-        title: t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.details'),
+        title: t('ui.components.CrowdloanTable.details'),
         dataIndex: 'details',
         key: 'details',
         render: (_: any, row: _CrowdloanItemType) => {
@@ -95,7 +95,7 @@ const Component: React.FC<Props> = (props: Props) => {
         }
       },
       {
-        title: t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.contribution'),
+        title: t('ui.components.CrowdloanTable.contribution'),
         dataIndex: 'contribution',
         key: 'contribution',
         render: (_: any, row: _CrowdloanItemType) => {
@@ -132,8 +132,8 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <div className={CN(className)}>
       <div className={'__col-names-container'}>
-        <div className='__col-name'>{t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.projectName')}</div>
-        <div className='__col-name'>{t('ui.CROWDLOAN_TABLE.components.CrowdloanTable.contribution')}</div>
+        <div className='__col-name'>{t('ui.components.CrowdloanTable.projectName')}</div>
+        <div className='__col-name'>{t('ui.components.CrowdloanTable.contribution')}</div>
       </div>
 
       <div className={'__list-container'}>

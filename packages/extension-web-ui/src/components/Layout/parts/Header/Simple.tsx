@@ -75,7 +75,7 @@ function Component ({ className,
           size='xs'
           type='ghost'
         >
-          {t<string>('ui.SIMPLE.components.Layout.parts.Header.Simple.help')}
+          {t<string>('ui.components.Simple.help')}
         </Button>
       </div>
     </div>

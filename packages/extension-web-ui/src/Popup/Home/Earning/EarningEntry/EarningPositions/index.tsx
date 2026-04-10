@@ -102,41 +102,41 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.all'),
+        label: t('ui.EARNING.screen.EarningPositions.all'),
         value: FilterValue.ALL,
         icon: SquaresFour,
         iconColor: token.geekblue,
         weight: 'fill'
       },
       {
-        label: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.nominationPool'),
+        label: t('ui.EARNING.screen.EarningPositions.nominationPool'),
         value: FilterValue.NOMINATION_POOL,
         icon: Users,
         iconColor: token['colorSuccess-6']
 
       },
       {
-        label: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.directNomination'),
+        label: t('ui.EARNING.screen.EarningPositions.directNomination'),
         value: FilterValue.DIRECT_NOMINATION,
         icon: Database,
         iconColor: token['gold-6'],
         weight: 'fill'
       },
       {
-        label: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.liquidStaking'),
+        label: t('ui.EARNING.screen.EarningPositions.liquidStaking'),
         value: FilterValue.LIQUID_STAKING,
         icon: Leaf,
         iconColor: token['magenta-6'],
         weight: 'fill'
       },
       {
-        label: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.lending'),
+        label: t('ui.EARNING.screen.EarningPositions.lending'),
         value: FilterValue.LENDING,
         icon: HandsClapping,
         iconColor: token['green-6']
       },
       {
-        label: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.subnetStaking'),
+        label: t('ui.EARNING.screen.EarningPositions.subnetStaking'),
         value: FilterValue.SUBNET_STAKING,
         icon: CirclesThreePlus,
         iconColor: token['blue-6'],
@@ -180,13 +180,13 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
   }, [assetInfoMap, chainInfoMap, currencyData, earningPositions, priceMap]);
 
   const filterOptions = [
-    { label: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.nominationPool'), value: YieldPoolType.NOMINATION_POOL },
-    { label: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.directNomination'), value: YieldPoolType.NATIVE_STAKING },
-    { label: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.liquidStaking'), value: YieldPoolType.LIQUID_STAKING },
-    { label: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.lending'), value: YieldPoolType.LENDING },
-    { label: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.parachainStaking'), value: YieldPoolType.PARACHAIN_STAKING },
-    { label: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.singleFarming'), value: YieldPoolType.SINGLE_FARMING },
-    { label: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.subnetStaking'), value: YieldPoolType.SUBNET_STAKING }
+    { label: t('ui.EARNING.screen.EarningPositions.nominationPool'), value: YieldPoolType.NOMINATION_POOL },
+    { label: t('ui.EARNING.screen.EarningPositions.directNomination'), value: YieldPoolType.NATIVE_STAKING },
+    { label: t('ui.EARNING.screen.EarningPositions.liquidStaking'), value: YieldPoolType.LIQUID_STAKING },
+    { label: t('ui.EARNING.screen.EarningPositions.lending'), value: YieldPoolType.LENDING },
+    { label: t('ui.EARNING.screen.EarningPositions.parachainStaking'), value: YieldPoolType.PARACHAIN_STAKING },
+    { label: t('ui.EARNING.screen.EarningPositions.singleFarming'), value: YieldPoolType.SINGLE_FARMING },
+    { label: t('ui.EARNING.screen.EarningPositions.subnetStaking'), value: YieldPoolType.SUBNET_STAKING }
   ];
 
   const filterFunction = useMemo<(item: ExtraYieldPositionInfo) => boolean>(() => {
@@ -303,15 +303,15 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     return () => {
       if (isRelatedToAstar(item.slug)) {
         openAlert({
-          title: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.enterAstarPortal'),
+          title: t('ui.EARNING.screen.EarningPositions.enterAstarPortal'),
           content: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.youAreNavigatingToAstarPortalToViewAndManageYourStakeInAstarDappStakingV3SubwalletWillOfferSupportForAstarDappStakingV3Soon'),
           cancelButton: {
-            text: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.cancel'),
+            text: t('ui.EARNING.screen.EarningPositions.cancel'),
             schema: 'secondary',
             onClick: closeAlert
           },
           okButton: {
-            text: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.enterAstarPortal'),
+            text: t('ui.EARNING.screen.EarningPositions.enterAstarPortal'),
             onClick: () => {
               openInNewTab(ASTAR_PORTAL_URL)();
               closeAlert();
@@ -356,7 +356,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
               size={'xs'}
               type={'ghost'}
             >
-              {t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.exploreEarningOptions')}
+              {t('ui.EARNING.screen.EarningPositions.exploreEarningOptions')}
             </Button>
           </div>}
         </React.Fragment>
@@ -426,11 +426,11 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
           },
           size: 'xs',
           shape: 'circle',
-          children: t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.exploreEarningOptions')
+          children: t('ui.EARNING.screen.EarningPositions.exploreEarningOptions')
         }}
         className={'__empty-list-earning-positions'}
-        emptyMessage={t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.changeYourSearchOrExploreOtherEarningOptions')}
-        emptyTitle={t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.noEarningPositionFound')}
+        emptyMessage={t('ui.EARNING.screen.EarningPositions.changeSearchOrExplore')}
+        emptyTitle={t('ui.EARNING.screen.EarningPositions.noEarningPositionFound')}
         phosphorIcon={Vault}
       />
     );
@@ -528,7 +528,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
         subHeaderCenter={false}
         subHeaderIcons={subHeaderButtons}
         subHeaderPaddingVertical={true}
-        title={t<string>('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.yourEarningPositions')}
+        title={t<string>('ui.EARNING.screen.EarningPositions.yourEarningPositions')}
       >
         {
           isWebUI
@@ -561,7 +561,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
                         />
                       ))
                     }
-                    inputPlaceholder={t<string>('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.searchToken')}
+                    inputPlaceholder={t<string>('ui.EARNING.screen.EarningPositions.searchToken')}
                     onClickFilter={onClickFilterButton}
                     onSearch={setSearchInput}
                     searchValue={searchInput}
@@ -606,7 +606,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
                   renderWhenEmpty={emptyList}
                   searchFunction={searchFunction}
                   searchMinCharactersCount={1}
-                  searchPlaceholder={t<string>('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.searchToken')}
+                  searchPlaceholder={t<string>('ui.EARNING.screen.EarningPositions.searchToken')}
                   showActionBtn
                 />
               </>
@@ -640,14 +640,14 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
         </div>
 
         <FilterModal
-          applyFilterButtonTitle={t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.applyFilter')}
+          applyFilterButtonTitle={t('ui.EARNING.screen.EarningPositions.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.filter')}
+          title={t('ui.EARNING.screen.EarningPositions.filter')}
         />
       </Layout.Base>
 
@@ -656,7 +656,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
         destroyOnClose={true}
         id={TRANSACTION_YIELD_UNSTAKE_MODAL}
         onCancel={handleCloseUnstake}
-        title={selectedPositionInfo?.type === YieldPoolType.LENDING ? t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.withdraw') : t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.unstake')}
+        title={selectedPositionInfo?.type === YieldPoolType.LENDING ? t('ui.EARNING.screen.EarningPositionDetail.withdraw') : t('ui.EARNING.screen.EarningPositionDetail.unstake')}
       >
         <Transaction
           modalContent={isWebUI}
@@ -670,7 +670,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
         destroyOnClose={true}
         id={TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL}
         onCancel={handleCloseCancelUnstake}
-        title={t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.cancelUnstake')}
+        title={t('ui.TRANSACTION.constant.transaction.cancelUnstake')}
       >
         <Transaction
           modalContent={isWebUI}
@@ -686,7 +686,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
             assetRegistry={assetRegistry}
             bypassEarlyValidate={true}
             closeAlert={closeAlert}
-            customButtonTitle={selectedPositionInfo.type === YieldPoolType.LENDING ? t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.supplyMore') : t('ui.EARNING_POSITIONS.Popup.Home.Earning.EarningEntry.EarningPositions.stakeMore')}
+            customButtonTitle={selectedPositionInfo.type === YieldPoolType.LENDING ? t('ui.EARNING.screen.EarningPositionDetail.supplyMore') : t('ui.EARNING.screen.EarningPositionDetail.stakeMore')}
             isShowStakeMoreButton={true}
             onStakeMore={navigateToEarnTransaction}
             openAlert={openAlert}

@@ -78,7 +78,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const checkUnlock = useUnlockChecker();
 
   const phraseNumberItems = useMemo(() => phraseNumberOptions.map((value) => ({
-    label: t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.words', { replace: { number: value } }),
+    label: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.numberWords', { replace: { number: value } }),
     value: `${value}`
   })), [t]);
 
@@ -102,11 +102,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const seedValidator = useCallback((rule: FormRule, value: string) => {
     return new Promise<void>((resolve, reject) => {
       if (!value) {
-        reject(new Error(t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.thisFieldIsRequired')));
+        reject(new Error(t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.thisFieldIsRequired')));
       }
 
       if (!words.includes(value)) {
-        reject(new Error(t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.invalidWord')));
+        reject(new Error(t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.invalidWord')));
       }
 
       resolve();
@@ -129,7 +129,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     const phraseNumber = parseInt(_phraseNumber);
 
     if (![12, 15, 18, 21, 24].includes(seedKeys.length)) {
-      throw Error(t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.mnemonicNeedsToContain1215182124Words'));
+      throw Error(t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.mnemonicWordCountError'));
     }
 
     const seeds: string[] = [];
@@ -139,7 +139,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     }
 
     if (seeds.some((value) => !value)) {
-      throw Error(t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.mnemonicNeedsToContain1215182124Words'));
+      throw Error(t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.mnemonicWordCountError'));
     }
 
     const seed = seeds.join(' ');
@@ -154,21 +154,21 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             if (response.mnemonicTypes === 'general') {
               alertModal.open({
                 closable: false,
-                title: t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.incompatibleSeedPhrase'),
+                title: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.incompatibleSeedPhrase'),
                 type: NotificationType.WARNING,
                 content: (
                   <>
                     <div>
-                      {t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.thisSeedPhraseGeneratesAUnifiedAccountThatCanBeUsedOnMultipleEcosystemsInSubwalletIncludingTon')}
+                      {t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.unifiedSeedPhraseInfo')}
                     </div>
                     <br />
                     <div>
-                      {t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.noteThatYouCanTImportThisSeedPhraseIntoTonNativeWalletsAsThisSeedPhraseIsIncompatibleWithTonNativeWallets')}
+                      {t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.tonIncompatibleSeedPhraseWarning')}
                     </div>
                   </>
                 ),
                 cancelButton: {
-                  text: t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.goBack'),
+                  text: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.goBack'),
                   icon: XCircle,
                   iconWeight: 'fill',
                   onClick: () => {
@@ -178,7 +178,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   schema: 'secondary'
                 },
                 okButton: {
-                  text: t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.import'),
+                  text: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.import'),
                   icon: CheckCircle,
                   iconWeight: 'fill',
                   onClick: () => {
@@ -251,7 +251,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   useFocusFormItem(form, `${fieldNamePrefix}0`);
 
   const buttonProps = {
-    children: t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.importAccount'),
+    children: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.importAccount'),
     icon: FooterIcon,
     onClick: form.submit,
     disabled: disabled,
@@ -271,11 +271,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               onClick: goHome
             }
           ])}
-        title={t<string>('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.importFromSeedPhrase')}
+        title={t<string>('ui.ACCOUNT.screen.Account.ImportSeedPhrase.importFromSeedPhrase')}
       >
         <div className='container'>
           <div className='description'>
-            {!isWebUI && t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.toImportAnExistingAccountPleaseEnterSeedPhrase')}
+            {!isWebUI && t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.enterSeedPhraseToImport')}
             { isWebUI && t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.toImportAnExistingExistingAccountPleaseSelectAccountTypeAndEnterTheRecoverySeedPhraseHere')}
           </div>
           <Form
@@ -312,7 +312,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   size='xs'
                   type='ghost'
                 >
-                  {showSeed ? t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.hideSeedPhrase') : t('ui.IMPORT_SEED_PHRASE.Popup.Account.ImportSeedPhrase.showSeedPhrase')}
+                  {showSeed ? t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.hideSeedPhrase') : t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.showSeedPhrase')}
                 </Button>
               </div>
               <div className='seed-container'>

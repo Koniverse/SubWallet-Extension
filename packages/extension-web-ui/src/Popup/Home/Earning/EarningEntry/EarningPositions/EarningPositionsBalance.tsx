@@ -127,7 +127,7 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
     <div className={CN(className, 'flex-row', { '-mobile-mode': !isWebUI })}>
       <div className={CN('__block-item', '__total-balance-block')}>
         <div className={'__block-title-wrapper'}>
-          <div className={'__block-title'}>{t('ui.EARNING_POSITIONS_BALANCE.Popup.Home.Earning.EarningEntry.EarningPositions.EarningPositionsBalance.totalValueStaked')}</div>
+          <div className={'__block-title'}>{t('ui.EARNING.components.Earning.PoolItem.totalValueStaked')}</div>
           {!isWebUI && <Button
             className='__balance-visibility-toggle'
             icon={
@@ -137,7 +137,7 @@ function Component ({ className, items }: Props): React.ReactElement<Props> {
             }
             onClick={onChangeShowBalance}
             size={'xs'}
-            tooltip={isShowBalance ? t('ui.EARNING_POSITIONS_BALANCE.Popup.Home.Earning.EarningEntry.EarningPositions.EarningPositionsBalance.hideBalance') : t('ui.EARNING_POSITIONS_BALANCE.Popup.Home.Earning.EarningEntry.EarningPositions.EarningPositionsBalance.showBalance')}
+            tooltip={isShowBalance ? t('ui.BALANCE.screen.Tokens.UpperBlock.hideBalance') : t('ui.BALANCE.screen.Tokens.UpperBlock.showBalance')}
             type='ghost'
           />}
         </div>

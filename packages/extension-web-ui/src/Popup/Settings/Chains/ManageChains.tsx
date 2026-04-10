@@ -38,11 +38,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
   const FILTER_OPTIONS = useMemo((): OptionType[] => ([
-    { label: t('ui.MANAGE_CHAINS.Popup.Settings.Chains.ManageChains.evmNetworks'), value: FilterValue.EVM },
-    { label: t('ui.MANAGE_CHAINS.Popup.Settings.Chains.ManageChains.substrateNetworks'), value: FilterValue.SUBSTRATE },
-    { label: t('ui.MANAGE_CHAINS.Popup.Settings.Chains.ManageChains.customNetworks'), value: FilterValue.CUSTOM },
-    { label: t('ui.MANAGE_CHAINS.Popup.Settings.Chains.ManageChains.enabledNetworks'), value: FilterValue.ENABLED },
-    { label: t('ui.MANAGE_CHAINS.Popup.Settings.Chains.ManageChains.disabledNetworks'), value: FilterValue.DISABLED }
+    { label: t('ui.SETTINGS.screen.Setting.Chains.Manage.evmNetworks'), value: FilterValue.EVM },
+    { label: t('ui.SETTINGS.screen.Setting.Chains.Manage.substrateNetworks'), value: FilterValue.SUBSTRATE },
+    { label: t('ui.SETTINGS.screen.Setting.Chains.Manage.customNetworks'), value: FilterValue.CUSTOM },
+    { label: t('ui.SETTINGS.screen.Setting.Chains.Manage.enabledNetworks'), value: FilterValue.ENABLED },
+    { label: t('ui.SETTINGS.screen.Setting.Chains.Manage.disabledNetworks'), value: FilterValue.DISABLED }
   ]), [t]);
 
   const filterFunction = useMemo<(item: ChainInfoWithState) => boolean>(() => {
@@ -110,7 +110,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         onClick: () => {
           navigate('/settings/chains/import', { state: { isExternalRequest: false } });
         },
-        tooltip: isWebUI ? t('ui.MANAGE_CHAINS.Popup.Settings.Chains.ManageChains.importNetwork') : undefined
+        tooltip: isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.ChainImport.importNetwork') : undefined
       }
     ];
   }, [isWebUI, navigate, t]);
@@ -137,7 +137,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('ui.MANAGE_CHAINS.Popup.Settings.Chains.ManageChains.manageNetworks')}
+        title={t<string>('ui.SETTINGS.screen.Setting.Chains.Manage.manageNetworks')}
       >
         <SwList.Section
           actionBtnIcon={(
@@ -157,7 +157,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchToken}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('ui.MANAGE_CHAINS.Popup.Settings.Chains.ManageChains.searchNetwork')}
+          searchPlaceholder={t<string>('ui.SETTINGS.screen.Setting.Chains.Manage.searchNetwork')}
           showActionBtn
         />
 

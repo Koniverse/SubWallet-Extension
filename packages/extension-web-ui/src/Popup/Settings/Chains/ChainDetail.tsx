@@ -40,13 +40,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const showNotification = useNotification();
   const [form] = Form.useForm<ChainDetailForm>();
   const { handleSimpleConfirmModal } = useConfirmModal({
-    title: t<string>('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.deleteNetwork'),
+    title: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.deleteNetwork'),
     maskClosable: true,
     closable: true,
     type: 'error',
-    subTitle: t<string>('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.youAreAboutToDeleteThisNetwork'),
-    content: t<string>('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.confirmDeleteThisNetwork'),
-    okText: t<string>('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.remove')
+    subTitle: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.aboutToDeleteNetwork'),
+    content: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.confirmDeleteNetwork'),
+    okText: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.remove')
   });
 
   const [isChanged, setIsChanged] = useState(false);
@@ -97,18 +97,18 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             if (result) {
               navigate(-1);
               showNotification({
-                message: t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.deletedNetworkSuccessfully')
+                message: t('ui.SETTINGS.screen.Setting.Chains.Detail.deletedNetworkSuccessfully')
               });
             } else {
               showNotification({
-                message: t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.errorPleaseTryAgain')
+                message: t('ui.SETTINGS.screen.Setting.Chains.Detail.errorPleaseTryAgain')
               });
               setIsDeleting(false);
             }
           })
           .catch(() => {
             showNotification({
-              message: t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.errorPleaseTryAgain')
+              message: t('ui.SETTINGS.screen.Setting.Chains.Detail.errorPleaseTryAgain')
             });
             setIsDeleting(false);
           });
@@ -167,7 +167,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         type='phosphor'
         weight={'light'}
       />,
-      tooltip: isWebUI ? t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.deleteNetwork') : undefined,
+      tooltip: isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.deleteNetwork') : undefined,
       onClick: handleDeleteCustomChain,
       disabled: !(_isCustomChain(chainInfo.slug) && !chainState.active)
     }
@@ -205,19 +205,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
         if (result) {
           showNotification({
-            message: t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.updatedNetworkSuccessfully')
+            message: t('ui.SETTINGS.screen.Setting.Chains.Detail.updatedNetworkSuccessfully')
           });
           navigate(-1);
         } else {
           showNotification({
-            message: t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.anErrorOccurredPleaseTryAgain')
+            message: t('ui.SETTINGS.screen.Setting.Chains.Detail.anErrorOccurredPleaseTryAgain')
           });
         }
       })
       .catch(() => {
         setLoading(false);
         showNotification({
-          message: t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.anErrorOccurredPleaseTryAgain')
+          message: t('ui.SETTINGS.screen.Setting.Chains.Detail.anErrorOccurredPleaseTryAgain')
         });
       });
   }, [chainInfo.providers, chainInfo.slug, form, navigate, showNotification, t]);
@@ -257,7 +257,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (value.length === 0 || isUrl(value)) {
         resolve();
       } else {
-        reject(new Error(t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.crowdloanUrlMustBeAValidUrl')));
+        reject(new Error(t('ui.SETTINGS.screen.Setting.Chains.ChainImport.crowdloanUrlMustBeValid')));
       }
     });
   }, [t]);
@@ -267,7 +267,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (value.length === 0 || isUrl(value)) {
         resolve();
       } else {
-        reject(new Error(t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.blockExplorerMustBeAValidUrl')));
+        reject(new Error(t('ui.SETTINGS.screen.Setting.Chains.ChainImport.blockExplorerMustBeValid')));
       }
     });
   }, [t]);
@@ -318,7 +318,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           ),
           loading: loading,
           onClick: onSubmit,
-          children: t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.save')
+          children: t('ui.SETTINGS.screen.Setting.Chains.Detail.save')
         }}
         showBackButton={true}
         showSubHeader={true}
@@ -326,7 +326,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.networkDetail')}
+        title={t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.networkDetail')}
       >
         <div className={'chain_detail__container'}>
           <Form
@@ -350,7 +350,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   : <Field
                     className={'chain_detail__provider_url'}
                     content={currentProviderUrl}
-                    placeholder={t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.providerUrl')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.providerUrl')}
                     prefix={<Icon
                       customSize={'24px'}
                       iconColor={token['gray-4']}
@@ -366,7 +366,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col span={16}>
                   <Field
                     content={chainInfo.name}
-                    placeholder={t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.networkName')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.networkName')}
                     prefix={<Icon
                       customSize={'24px'}
                       iconColor={token['gray-4']}
@@ -374,15 +374,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                       type={'phosphor'}
                       weight={'bold'}
                     />}
-                    tooltip={isWebUI ? t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.networkName') : undefined}
+                    tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.networkName') : undefined}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
                 <Col span={8}>
                   <Field
                     content={symbol}
-                    placeholder={t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.symbol')}
-                    tooltip={isWebUI ? t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.symbol') : undefined}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.symbol')}
+                    tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.symbol') : undefined}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
@@ -392,8 +392,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col>
                   <Field
                     content={decimals}
-                    placeholder={t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.decimals')}
-                    tooltip={isWebUI ? t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.decimals') : undefined}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.decimals')}
+                    tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.decimals') : undefined}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
@@ -403,8 +403,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <Col>
                       <Field
                         content={paraId > -1 ? paraId : undefined}
-                        placeholder={t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.paraid')}
-                        tooltip={isWebUI ? t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.paraid') : undefined}
+                        placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.paraId')}
+                        tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.paraId') : undefined}
                         tooltipPlacement={'topLeft'}
                       />
                     </Col>
@@ -416,8 +416,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <Col>
                       <Field
                         content={chainId > -1 ? chainId : 'None'}
-                        placeholder={t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.chainId')}
-                        tooltip={isWebUI ? t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.chainId') : undefined}
+                        placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.chainId')}
+                        tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.chainId') : undefined}
                         tooltipPlacement={'topLeft'}
                       />
                     </Col>
@@ -429,8 +429,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <Col>
                       <Field
                         content={addressPrefix.toString()}
-                        placeholder={t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.addressPrefix')}
-                        tooltip={isWebUI ? t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.addressPrefix') : undefined}
+                        placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.addressPrefix')}
+                        tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.addressPrefix') : undefined}
                         tooltipPlacement={'topLeft'}
                       />
                     </Col>
@@ -440,8 +440,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col>
                   <Field
                     content={chainTypeString()}
-                    placeholder={t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.networkType')}
-                    tooltip={isWebUI ? t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.networkType') : undefined}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.networkType')}
+                    tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.networkType') : undefined}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
@@ -453,8 +453,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 statusHelpAsTooltip={isWebUI}
               >
                 <Input
-                  placeholder={t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.blockExplorer')}
-                  tooltip={isWebUI ? t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.blockExplorer') : undefined}
+                  placeholder={t('ui.SETTINGS.screen.Setting.Chains.ChainImport.blockExplorer')}
+                  tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.ChainImport.blockExplorer') : undefined}
                   tooltipPlacement={'topLeft'}
                 />
               </Form.Item>
@@ -466,8 +466,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   statusHelpAsTooltip={isWebUI}
                 >
                   <Input
-                    placeholder={t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.crowdloanUrl')}
-                    tooltip={isWebUI ? t('ui.CHAIN_DETAIL.Popup.Settings.Chains.ChainDetail.crowdloanUrl') : undefined}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.ChainImport.crowdloanUrl')}
+                    tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.ChainImport.crowdloanUrl') : undefined}
                     tooltipPlacement={'topLeft'}
                   />
                 </Form.Item>

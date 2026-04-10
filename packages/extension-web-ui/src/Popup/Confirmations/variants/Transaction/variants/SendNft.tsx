@@ -27,32 +27,32 @@ const Component: React.FC<Props> = (props: Props) => {
       <MetaInfo hasBackgroundWrapper>
         <MetaInfo.Account
           address={data.senderAddress}
-          label={t('ui.SEND_NFT.Popup.Confirmations.variants.Transaction.variants.SendNft.sendFrom')}
+          label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendFrom')}
           networkPrefix={networkPrefix}
         />
 
         <MetaInfo.Account
           address={data.recipientAddress}
-          label={t('ui.SEND_NFT.Popup.Confirmations.variants.Transaction.variants.SendNft.sendTo')}
+          label={t('ui.TRANSACTION.screen.Transaction.SendNFT.sendTo')}
           networkPrefix={networkPrefix}
         />
 
         <MetaInfo.Chain
           chain={transaction.chain}
-          label={t('ui.SEND_NFT.Popup.Confirmations.variants.Transaction.variants.SendNft.network')}
+          label={t('ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.network')}
         />
       </MetaInfo>
       <MetaInfo hasBackgroundWrapper={true}>
         {
           (data.nftItemName || data.nftItem) && (
-            <MetaInfo.Default label={t('ui.SEND_NFT.Popup.Confirmations.variants.Transaction.variants.SendNft.nft')}>
+            <MetaInfo.Default label={t('ui.TRANSACTION.Confirmations.SendNft.nft')}>
               {data.nftItemName || data.nftItem.name || `${data.nftItem.collectionId}_${data.nftItem.id}`}
             </MetaInfo.Default>
           )
         }
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.SEND_NFT.Popup.Confirmations.variants.Transaction.variants.SendNft.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.BitcoinSendTransaction.estimatedFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />

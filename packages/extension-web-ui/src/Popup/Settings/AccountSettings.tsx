@@ -84,7 +84,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: Strategy,
           leftIconBgColor: token.colorPrimary,
           rightIcon: CaretRight,
-          title: t('ui.ACCOUNT_SETTINGS.Popup.Settings.AccountSettings.migrateToUnifiedAccount'),
+          title: t('ui.SETTINGS.screen.Setting.Account.migrateToUnifiedAccount'),
           onClick: () => {
             navigate('/migrate-account');
           }
@@ -94,7 +94,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: CornersOut,
           leftIconBgColor: token['volcano-6'],
           rightIcon: CaretRight,
-          title: t('ui.ACCOUNT_SETTINGS.Popup.Settings.AccountSettings.splitUnifiedAccount'),
+          title: t('ui.SETTINGS.screen.Setting.Account.splitUnifiedAccount'),
           onClick: () => {
             notify({
               message: t('ui.SETTINGS.screen.Setting.AccountSettings.comingSoon')
@@ -106,7 +106,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           leftIcon: Key,
           leftIconBgColor: token.red,
           rightIcon: CaretRight,
-          title: t('ui.ACCOUNT_SETTINGS.Popup.Settings.AccountSettings.configSubscanApiKey'),
+          title: t('ui.SETTINGS.screen.Setting.Account.configSubscanApi'),
           onClick: onOpenSubscanApiModal
         }
       ]
@@ -117,7 +117,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     <PageWrapper className={`account-settings ${className}`}>
       <Layout.WithSubHeaderOnly
         onBack={goBack}
-        title={t('ui.ACCOUNT_SETTINGS.Popup.Settings.AccountSettings.accountSettings')}
+        title={t('ui.SETTINGS.screen.Setting.Root.accountSettings')}
       >
         <div className={'__scroll-container'}>
           {

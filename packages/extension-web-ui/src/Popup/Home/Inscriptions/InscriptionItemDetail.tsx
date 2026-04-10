@@ -183,7 +183,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
           <div className={'nft_item_detail_field_container'}>
             <div className={'nft_item_detail__info_container'}>
-              {!isWebUI && <div className={'nft_item_detail__section_title'}>{t<string>('ui.INSCRIPTION_ITEM_DETAIL.Popup.Home.Inscriptions.InscriptionItemDetail.nftDetails')}</div>}
+              {!isWebUI && <div className={'nft_item_detail__section_title'}>{t<string>('ui.NFT.screen.NftsItemDetail.nftDetails')}</div>}
 
               {isWebUI && !!nftItem.description && (<div className={'nft_item_detail__description'}>
                 {nftItem.description}
@@ -206,7 +206,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         type='phosphor'
                         weight={'fill'}
                       />
-                      <div>{t<string>('ui.INSCRIPTION_ITEM_DETAIL.Popup.Home.Inscriptions.InscriptionItemDetail.description')}</div>
+                      <div>{t<string>('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.description')}</div>
                     </div>
                   </div>
                 )
@@ -220,14 +220,14 @@ const Component: React.FC<Props> = (props: Props) => {
                       <span className={'nft_item_detail__owner_address'}>({`${nftItem.owner.slice(0, 4)}...${nftItem.owner.slice(-4)}`})</span>
                     </span>
                   )}
-                  label={t<string>('ui.INSCRIPTION_ITEM_DETAIL.Popup.Home.Inscriptions.InscriptionItemDetail.ownedBy')}
+                  label={t<string>('ui.NFT.screen.NftsItemDetail.ownedBy')}
                   prefix={nftItem.owner && ownerPrefix()}
                   suffix={externalInfoIcon('account')}
                 />
 
                 <Field
                   content={originChainInfo.name}
-                  label={t<string>('ui.INSCRIPTION_ITEM_DETAIL.Popup.Home.Inscriptions.InscriptionItemDetail.network')}
+                  label={t<string>('ui.NFT.screen.NftsItemDetail.network')}
                   prefix={(
                     <Logo
                       network={originChainInfo.slug}
@@ -240,7 +240,7 @@ const Component: React.FC<Props> = (props: Props) => {
             </div>
 
             <div className={'nft_item_detail__prop_section'}>
-              <div className={'nft_item_detail__section_title'}>{t<string>('ui.INSCRIPTION_ITEM_DETAIL.Popup.Home.Inscriptions.InscriptionItemDetail.properties')}</div>
+              <div className={'nft_item_detail__section_title'}>{t<string>('ui.NFT.screen.NftsItemDetail.properties')}</div>
               <div className={'nft_item_detail__atts_container'}>
                 <Field
                   className={'nft_item_detail__id_field'}
@@ -274,7 +274,7 @@ const Component: React.FC<Props> = (props: Props) => {
           closeIcon={modalCloseButton}
           id={'nftItemDescription'}
           onCancel={onCloseNftDescriptionModal}
-          title={t<string>('ui.INSCRIPTION_ITEM_DETAIL.Popup.Home.Inscriptions.InscriptionItemDetail.description')}
+          title={t<string>('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.description')}
           wrapClassName={className}
         >
           <div className={'nft_item_detail__description_modal_content'}>

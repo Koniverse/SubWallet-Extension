@@ -40,30 +40,30 @@ const Component: React.FC<Props> = ({ className, type }: Props) => {
     };
 
     if (type === AccountProxyType.ALL_ACCOUNT) {
-      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.allAccount');
+      result.label = t('ui.ACCOUNT.components.AccountProxy.TypeTag.allAccount');
       result.icon.phosphorIcon = CirclesThreePlus;
     } else if (type === AccountProxyType.SOLO) {
       result.color = 'blue';
-      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.soloAccount');
+      result.label = t('ui.ACCOUNT.components.AccountProxy.TypeTag.soloAccount');
       result.icon.phosphorIcon = GitCommit;
     } else if (type === AccountProxyType.UNIFIED) {
       result.color = 'success';
-      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.unifiedAccount');
+      result.label = t('ui.ACCOUNT.components.AccountProxy.TypeTag.unifiedAccount');
       result.icon.phosphorIcon = Strategy;
     } else if (type === AccountProxyType.QR) {
-      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.qrSignerAccount');
+      result.label = t('ui.ACCOUNT.components.AccountProxy.TypeTag.qrSignerAccount');
       result.icon.phosphorIcon = QrCode;
     } else if (type === AccountProxyType.LEDGER) {
-      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.ledgerAccount');
+      result.label = t('ui.ACCOUNT.components.AccountProxy.TypeTag.ledgerAccount');
       result.icon.phosphorIcon = Swatches;
     } else if (type === AccountProxyType.READ_ONLY) {
-      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.watchOnlyAccount');
+      result.label = t('ui.ACCOUNT.components.AccountProxy.TypeTag.watchOnlyAccount');
       result.icon.phosphorIcon = Eye;
     } else if (type === AccountProxyType.INJECTED) {
-      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.extensionAccount');
+      result.label = t('ui.ACCOUNT.components.AccountProxy.TypeTag.extensionAccount');
       result.icon.phosphorIcon = Needle;
     } else if (type === AccountProxyType.UNKNOWN) {
-      result.label = t('ui.ACCOUNT_PROXY_TYPE_TAG.components.AccountProxy.AccountProxyTypeTag.unknownAccount');
+      result.label = t('ui.ACCOUNT.components.AccountProxy.TypeTag.unknownAccount');
       result.icon.phosphorIcon = Question;
     }
 

@@ -79,7 +79,7 @@ function Component ({ chain, className, detailItem, maxPoolMembersValue, onCance
         <MetaInfo.Status
           label={t('ui.EARNING.components.Modal.Earning.PoolDetail.earningStatus')}
           statusIcon={EarningStatusUi[earningStatus].icon}
-          statusName={EarningStatusUi[earningStatus].name}
+          statusName={t(EarningStatusUi[earningStatus].name)}
           valueColorSchema={EarningStatusUi[earningStatus].schema}
         />
 

@@ -136,9 +136,9 @@ function Component ({ className = '' }: Props) {
 
   useEffect(() => {
     if (currentScreenView === ScreenView.SUMMARY) {
-      setTitle(t('ui.MIGRATE_ACCOUNT.Popup.MigrateAccount.finish'));
+      setTitle(t('ui.ACCOUNT.screen.MigrateAccount.SummaryView.finish'));
     } else {
-      setTitle(t('ui.MIGRATE_ACCOUNT.Popup.MigrateAccount.migrateToUnifiedAccount'));
+      setTitle(t('ui.SETTINGS.screen.Setting.Account.migrateToUnifiedAccount'));
     }
   }, [currentScreenView, setTitle, t]);
 

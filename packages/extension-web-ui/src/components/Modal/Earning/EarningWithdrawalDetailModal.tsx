@@ -39,7 +39,7 @@ function Component ({ canWithdraw, className, currentTimestampMs, inputAsset, mo
     (item: UnstakingInfo) => {
       if (!poolInfo.metadata.availableMethod.withdraw) {
         return (
-          <div className={'__withdraw-time-label'}>{t('ui.EARNING_WITHDRAWAL_DETAIL_MODAL.components.Modal.Earning.EarningWithdrawalDetailModal.automaticWithdrawal')}</div>
+          <div className={'__withdraw-time-label'}>{t('ui.EARNING.screen.EarningPositionDetail.WithdrawInfo.automaticWithdrawal')}</div>
         );
       } else {
         if (item.targetTimestampMs === undefined && item.waitingTime === undefined) {
@@ -110,7 +110,7 @@ function Component ({ canWithdraw, className, currentTimestampMs, inputAsset, mo
                   )}
                   onClick={onWithdraw}
                 >
-                  {t('ui.EARNING_WITHDRAWAL_DETAIL_MODAL.components.Modal.Earning.EarningWithdrawalDetailModal.withdraw')}
+                  {t('ui.EARNING.screen.EarningPositionDetail.withdraw')}
                 </Button>)
             }
             {
@@ -127,7 +127,7 @@ function Component ({ canWithdraw, className, currentTimestampMs, inputAsset, mo
                   onClick={onClickCancelUnstaking}
                   schema={'secondary'}
                 >
-                  {t('ui.EARNING_WITHDRAWAL_DETAIL_MODAL.components.Modal.Earning.EarningWithdrawalDetailModal.cancelUnstake')}
+                  {t('ui.TRANSACTION.constant.transaction.cancelUnstake')}
                 </Button>)
             }
           </>

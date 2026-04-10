@@ -102,7 +102,7 @@ const PartComponent: React.FC<PartProps> = (props: PartProps) => {
     <>
       {
         !first && (
-          <span className={'__name'}>&nbsp;{t('ui.FREE_BALANCE_TO_YIELD.Popup.Transaction.parts.FreeBalanceToYield.and')}&nbsp;</span>
+          <span className={'__name'}>&nbsp;{t('ui.TRANSACTION.screen.Transaction.part.FreeBalanceToEarn.and')}&nbsp;</span>
         )
       }
       {

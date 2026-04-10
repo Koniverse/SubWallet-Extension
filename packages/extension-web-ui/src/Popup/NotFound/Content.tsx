@@ -22,7 +22,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const { isWebUI } = useContext(ScreenContext);
 
   const footerBtn = useMemo((): ButtonProps => ({
-    children: t('ui.CONTENT.Popup.NotFound.Content.backToHome'),
+    children: t('ui.screen.NotFound.backToHome'),
     icon: (
       <Icon
         phosphorIcon={House}
@@ -39,7 +39,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       rightFooterButton={!isWebUI ? footerBtn : undefined}
       showBackButton={isWebUI}
       subHeaderPaddingVertical={true}
-      title={isWebUI ? t('ui.CONTENT.Popup.NotFound.Content.pageNotFound') : undefined}
+      title={isWebUI ? t('ui.screen.NotFound.pageNotFound') : undefined}
     >
       <div className='title'>
         <div className='title-text'>4</div>
@@ -49,8 +49,8 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         />
         <div className='title-text'>4</div>
       </div>
-      <div className='sub-title h3-text'>{t('ui.CONTENT.Popup.NotFound.Content.pageNotFound')}</div>
-      <div className='h5-text description'>{t('ui.CONTENT.Popup.NotFound.Content.yourWebsiteUrlIsInvalid')}</div>
+      <div className='sub-title h3-text'>{t('ui.screen.NotFound.pageNotFound')}</div>
+      <div className='h5-text description'>{t('ui.screen.NotFound.invalidWebsiteUrl')}</div>
       {
         isWebUI &&
           (

@@ -62,7 +62,7 @@ const Component = ({ children, className, headerIcons, isSetTitleContext = true,
         phosphorIcon: Wallet,
         weight: 'fill'
       },
-      label: t('ui.BASE.components.Layout.base.Base.tokens'),
+      label: t('ui.components.Layout.Base.tokens'),
       key: 'tokens',
       url: '/home/tokens'
     },
@@ -72,7 +72,7 @@ const Component = ({ children, className, headerIcons, isSetTitleContext = true,
         phosphorIcon: Aperture,
         weight: 'fill'
       },
-      label: t('ui.BASE.components.Layout.base.Base.nfts'),
+      label: t('ui.components.Layout.Base.nfts'),
       key: 'nfts',
       url: '/home/nfts/collections'
     },
@@ -82,7 +82,7 @@ const Component = ({ children, className, headerIcons, isSetTitleContext = true,
         phosphorIcon: Vault,
         weight: 'fill'
       },
-      label: t('ui.BASE.components.Layout.base.Base.earning'),
+      label: t('ui.components.Layout.Base.earning'),
       key: 'earning',
       url: '/home/earning'
     },
@@ -92,7 +92,7 @@ const Component = ({ children, className, headerIcons, isSetTitleContext = true,
         phosphorIcon: Globe,
         weight: 'fill'
       },
-      label: t('ui.BASE.components.Layout.base.Base.dapps'),
+      label: t('ui.components.Layout.Base.dapps'),
       key: 'dapps',
       url: '/home/dapps'
     },
@@ -110,7 +110,7 @@ const Component = ({ children, className, headerIcons, isSetTitleContext = true,
           </>
         )
       },
-      label: t('ui.BASE.components.Layout.base.Base.missions'),
+      label: t('ui.components.Layout.Base.missions'),
       key: 'mission-pools',
       url: '/home/mission-pools'
     },
@@ -120,7 +120,7 @@ const Component = ({ children, className, headerIcons, isSetTitleContext = true,
         phosphorIcon: Rocket,
         weight: 'fill'
       },
-      label: t('ui.BASE.components.Layout.base.Base.crowdloans'),
+      label: t('ui.components.Layout.Base.crowdloans'),
       key: 'crowdloans',
       url: '/home/crowdloans'
     },
@@ -130,7 +130,7 @@ const Component = ({ children, className, headerIcons, isSetTitleContext = true,
         phosphorIcon: Clock,
         weight: 'fill'
       },
-      label: t('ui.BASE.components.Layout.base.Base.history'),
+      label: t('ui.components.Layout.Base.history'),
       key: 'history',
       url: '/home/history'
     }

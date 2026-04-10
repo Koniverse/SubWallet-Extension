@@ -136,13 +136,13 @@ const Component = ({ className }: Props) => {
       id: 'Transferable',
       value: transferablePercent,
       color: token['colorPrimary-6'],
-      label: t('ui.STATISTICS.Popup.Home.Statistics.transferable')
+      label: t('ui.BALANCE.components.TokenItem.AccountBalance.transferable')
     },
     {
       id: 'Staking',
       value: stakingPercent,
       color: token.colorSecondary,
-      label: t('ui.STATISTICS.Popup.Home.Statistics.staking')
+      label: t('ui.BALANCE.screen.Tokens.LockedBalanceDetailsModal.staking')
     },
     {
       id: 'Other',

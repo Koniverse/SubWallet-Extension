@@ -45,18 +45,18 @@ const Component: React.FC<Props> = (props: Props) => {
           leftFooterButton: {
             block: true,
             onClick: viewInHistory,
-            children: t('ui.TRANSACTION_DONE.Popup.TransactionDone.viewTransaction')
+            children: t('ui.TRANSACTION.screen.TransactionDone.viewTransaction')
           },
           rightFooterButton: {
             block: true,
             onClick: goHome,
-            children: t('ui.TRANSACTION_DONE.Popup.TransactionDone.backToHome')
+            children: t('ui.TRANSACTION.screen.TransactionDone.backToHome')
           },
           subHeaderLeft: <CloseIcon />
         }
         : {}
       )}
-      title={t('ui.TRANSACTION_DONE.Popup.TransactionDone.submitted')}
+      title={t('ui.TRANSACTION.screen.TransactionDone.submitted')}
     >
       <div className={CN(className, {
         '__web-ui': isWebUI
@@ -72,10 +72,10 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         </div>
         <div className='title'>
-          {t('ui.TRANSACTION_DONE.Popup.TransactionDone.transactionSubmitted')}
+          {t('ui.TRANSACTION.screen.TransactionDone.transactionSubmitted')}
         </div>
         <div className='description'>
-          {t('ui.TRANSACTION_DONE.Popup.TransactionDone.trackTransactionProgressInTheHistoryTabOrGoBackToHome')}
+          {t('ui.TRANSACTION.screen.TransactionDone.trackTransactionInHistory')}
         </div>
         <SocialGroup />
         {isWebUI && (
@@ -92,14 +92,14 @@ const Component: React.FC<Props> = (props: Props) => {
                 block: true,
                 schema: 'secondary',
                 onClick: viewInHistory,
-                children: t('ui.TRANSACTION_DONE.Popup.TransactionDone.viewTransaction')
+                children: t('ui.TRANSACTION.screen.TransactionDone.viewTransaction')
               }}
             />
             <Button
               {...{
                 block: true,
                 onClick: goHome,
-                children: t('ui.TRANSACTION_DONE.Popup.TransactionDone.backToHome')
+                children: t('ui.TRANSACTION.screen.TransactionDone.backToHome')
               }}
             />
           </div>

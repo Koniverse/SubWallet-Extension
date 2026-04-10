@@ -37,7 +37,7 @@ const Component: React.FC<ThemeProps> = ({ className }: ThemeProps) => {
       schema={'secondary'}
       shape={'circle'}
       size={'xs'}
-      tooltip={t('ui.LOCK_STATUS.components.Layout.parts.Header.parts.LockStatus.lock')}
+      tooltip={t('ui.SETTINGS.screen.Setting.Root.lock')}
     />
   </div>);
 };

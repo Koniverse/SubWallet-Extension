@@ -268,7 +268,7 @@ const Component = (): React.ReactElement => {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('ui.TOKENS.Popup.Home.Tokens.theAccountYouAreUsingIsWatchOnlyYouCannotSendAssetsWithIt'),
+        message: t('ui.BALANCE.screen.Tokens.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -298,7 +298,7 @@ const Component = (): React.ReactElement => {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('ui.TOKENS.Popup.Home.Tokens.theAccountYouAreUsingIsWatchOnlyYouCannotSendAssetsWithIt'),
+        message: t('ui.BALANCE.screen.Tokens.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -388,7 +388,7 @@ const Component = (): React.ReactElement => {
   }, [chainInfoMap, t]);
 
   useEffect(() => {
-    setSearchPlaceholder?.(t('ui.TOKENS.Popup.Home.Tokens.tokenName'));
+    setSearchPlaceholder?.(t('ui.BALANCE.components.Modal.GlobalSearchToken.tokenName'));
     setShowSearchInput?.(true);
   }, [setSearchPlaceholder, setShowSearchInput, t]);
 
@@ -423,7 +423,7 @@ const Component = (): React.ReactElement => {
             <DetailTable
               columns={[
                 {
-                  title: t<string>('ui.TOKENS.Popup.Home.Tokens.tokenName'),
+                  title: t<string>('ui.BALANCE.components.Modal.GlobalSearchToken.tokenName'),
                   dataIndex: 'name',
                   key: 'name',
                   render: (_, row) => {
@@ -560,9 +560,9 @@ const Component = (): React.ReactElement => {
                         />
                       )
                     }}
-                    i18nKey={detectTranslate('ui.TOKENS.Popup.Home.Tokens.tonWalletsHaveMultipleVersionsEachWithItsOwnWalletAddressAndBalanceHighlightChangeVersionsHighlightIfYouDonTSeeBalances')}
+                    i18nKey={detectTranslate('ui.BALANCE.screen.Tokens.tonWalletVersionInfo')}
                   />}
-                  title={t('ui.TOKENS.Popup.Home.Tokens.changeWalletAddressAndVersion')}
+                  title={t('ui.BALANCE.screen.Tokens.changeWalletAddressAndVersion')}
                   type={'warning'}
                 />
                 <AccountSelectorModal
@@ -589,8 +589,8 @@ const Component = (): React.ReactElement => {
             !tokenGroupBalanceItems.length && (
               <EmptyList
                 className={'__empty-list'}
-                emptyMessage={t('ui.TOKENS.Popup.Home.Tokens.trySearchingOrImportingOne')}
-                emptyTitle={t('ui.TOKENS.Popup.Home.Tokens.noTokensFound')}
+                emptyMessage={t('ui.BALANCE.screen.Tokens.trySearchingOrImporting')}
+                emptyTitle={t('ui.BALANCE.screen.Tokens.noTokensFound')}
                 phosphorIcon={Coins}
               />
             )
@@ -602,7 +602,7 @@ const Component = (): React.ReactElement => {
               size={'xs'}
               type={'ghost'}
             >
-              {t('ui.TOKENS.Popup.Home.Tokens.manageTokens')}
+              {t('ui.BALANCE.screen.Tokens.manageTokens')}
             </Button>
           </div>
         </div>

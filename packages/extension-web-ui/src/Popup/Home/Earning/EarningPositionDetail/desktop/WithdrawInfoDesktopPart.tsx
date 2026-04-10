@@ -172,7 +172,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
       <div
         className={CN(className, '__withdraw-info-desktop-part')}
       >
-        <div className={'__part-title'}>{t('ui.WITHDRAW_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.WithdrawInfoDesktopPart.withdrawInfo')}</div>
+        <div className={'__part-title'}>{t('ui.EARNING.screen.EarningPositionDetail.WithdrawInfo.withdrawInfo')}</div>
 
         <div className={'__withdraw-area'}>
           <Number
@@ -190,7 +190,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
               onClick={onWithDraw}
               size='xs'
             >
-              {t('ui.WITHDRAW_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.WithdrawInfoDesktopPart.withdraw')}
+              {t('ui.EARNING.screen.EarningPositionDetail.withdraw')}
             </Button>
           )}
         </div>
@@ -208,7 +208,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
           }
           onClick={onOpenDetailModal}
           type={'ghost'}
-        >{t('ui.WITHDRAW_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.WithdrawInfoDesktopPart.viewDetails')}</Button>
+        >{t('ui.Confirmations.Action.SubmitApi.viewDetails')}</Button>
       </div>
 
       <EarningWithdrawalDetailModal
@@ -227,7 +227,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
         destroyOnClose={true}
         id={TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL}
         onCancel={handleCloseCancelUnstake}
-        title={t('ui.WITHDRAW_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.WithdrawInfoDesktopPart.cancelUnstake')}
+        title={t('ui.TRANSACTION.constant.transaction.cancelUnstake')}
       >
         <Transaction
           modalContent={isWebUI}

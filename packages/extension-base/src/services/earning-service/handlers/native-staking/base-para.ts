@@ -35,7 +35,7 @@ export default abstract class BaseParaNativeStakingPoolHandler extends BaseNativ
     const bnAmount = new BN(amount);
 
     if (bnAmount.lte(BN_ZERO)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'bg.SWAP.background.error.Swap.amountMustBeGreaterThanZero')];
     }
 
     if (!poolInfo || !poolInfo.statistic) {
@@ -125,7 +125,7 @@ export default abstract class BaseParaNativeStakingPoolHandler extends BaseNativ
     const bnAmount = new BN(amount);
 
     if (bnAmount.lte(BN_ZERO)) {
-      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('Amount must be greater than 0')));
+      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.SWAP.background.error.Swap.amountMustBeGreaterThanZero')));
     }
 
     let targetNomination: NominationInfo | undefined;

@@ -255,7 +255,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
   const { assetRegistry, assetSettingMap, multiChainAssetMap, xcmRefMap } = useSelector((root) => root.assetRegistry);
   const { accounts } = useSelector((state: RootState) => state.accountState);
   const [maxTransfer, setMaxTransfer] = useState<string>('0');
-  const checkAction = usePreCheckAction(from, true, detectTranslate('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.theAccountYouAreUsingIsYouCannotSendAssetsWithIt'));
+  const checkAction = usePreCheckAction(from, true, detectTranslate('ui.TRANSACTION.screen.Transaction.SendFund.cannotSendWithAccountType'));
   const isZKModeEnabled = useIsMantaPayEnabled(from);
 
   const hideMaxButton = useMemo(() => {
@@ -336,7 +336,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
     }
 
     if (!isAddress(_recipientAddress)) {
-      return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.invalidRecipientAddress'));
+      return Promise.reject(t('bg.TRANSACTION.core.validation.request.invalidRecipientAddressError'));
     }
 
     const { chain, destChain, from, to } = form.getFieldsValue();
@@ -407,21 +407,21 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
 
   const validateAmount = useCallback((rule: Rule, amount: string): Promise<void> => {
     if (!amount) {
-      return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.amountIsRequired'));
+      return Promise.reject(t('ui.TRANSACTION.screen.Transaction.SendFund.amountIsRequired'));
     }
 
     if ((new BN(maxTransfer)).lte(BN_ZERO)) {
-      return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.youDonTHaveEnoughTokensToProceed'));
+      return Promise.reject(t('ui.TRANSACTION.screen.Transaction.SendFund.notEnoughTokensToProceed'));
     }
 
     if ((new BigN(amount)).eq(new BigN(0))) {
-      return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.amountMustBeGreaterThan0'));
+      return Promise.reject(t('ui.TRANSACTION.screen.Transaction.SendFund.amountMustBeGreaterThanZero'));
     }
 
     if ((new BigN(amount)).gt(new BigN(maxTransfer))) {
       const maxString = formatBalance(maxTransfer, decimals);
 
-      return Promise.reject(t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.amountMustBeEqualOrLessThan', { replace: { number: maxString } }));
+      return Promise.reject(t('ui.TRANSACTION.screen.Transaction.SendFund.amountMaxError', { replace: { number: maxString } }));
     }
 
     return Promise.resolve();
@@ -485,7 +485,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
     if (!account) {
       setLoading(false);
       notification({
-        message: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.canTFindAccount'),
+        message: t('ui.TRANSACTION.screen.Transaction.SendFund.cantFindAccount'),
         type: 'error'
       });
 
@@ -502,7 +502,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
           if (!_isTokenTransferredByEvm(chainAsset)) {
             setLoading(false);
             notification({
-              message: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.ledgerDoesNotSupportTransferForThisToken'),
+              message: t('ui.TRANSACTION.screen.Transaction.SendFund.ledgerNotSupportTransfer'),
               type: 'warning'
             });
 
@@ -647,16 +647,16 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
         openAlert({
           type: NotificationType.WARNING,
           content: t(_getXcmUnstableWarning(originChainInfo, destChainInfo, assetSlug)),
-          title: isMythosFromHydrationToMythos ? t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.highFeeAlert') : t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.payAttention'),
+          title: isMythosFromHydrationToMythos ? t('ui.TRANSACTION.screen.Transaction.SendFund.highFeeAlert') : t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
           okButton: {
-            text: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.continue'),
+            text: t('ui.TRANSACTION.screen.Transaction.SendFund.continue'),
             onClick: () => {
               closeAlert();
               doSubmit(values);
             }
           },
           cancelButton: {
-            text: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.cancel'),
+            text: t('ui.TRANSACTION.screen.Transaction.SendFund.cancel'),
             onClick: closeAlert
           }
         });
@@ -672,17 +672,17 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
       if (bnMinAmount.gt(BN_ZERO) && isTransferAll && chain === destChain) {
         openAlert({
           type: NotificationType.WARNING,
-          content: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.transferringAllWillRemoveAllAssetsOnThisNetworkAreYouSure'),
-          title: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.payAttention'),
+          content: t('ui.TRANSACTION.screen.Transaction.SendFund.transferAllWarning'),
+          title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
           okButton: {
-            text: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.transfer'),
+            text: t('ui.TRANSACTION.screen.Transaction.SendFund.transfer'),
             onClick: () => {
               closeAlert();
               doSubmit(values);
             }
           },
           cancelButton: {
-            text: t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.cancel'),
+            text: t('ui.TRANSACTION.screen.Transaction.SendFund.cancel'),
             onClick: closeAlert
           }
         });
@@ -825,7 +825,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
       })}
       >
         <div className={'__brief common-text text-light-4 text-center'}>
-          {t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.youArePerformingATransferOfAFungibleToken')}
+          {t('ui.TRANSACTION.screen.Transaction.SendFund.transferringFungibleToken')}
         </div>
 
         <Form
@@ -843,7 +843,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
               addressPrefix={fromChainNetworkPrefix}
               disabled={true}
               filter={onFilterAccountFunc}
-              label={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.sendFrom')}
+              label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendFrom')}
             />
           </Form.Item>
 
@@ -852,9 +852,9 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
               <TokenSelector
                 disabled={true}
                 items={tokenItems}
-                placeholder={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.selectToken')}
+                placeholder={t('ui.TRANSACTION.screen.Transaction.SendFund.selectToken')}
                 showChainInSelected
-                tooltip={isWebUI ? t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.selectToken') : undefined}
+                tooltip={isWebUI ? t('ui.TRANSACTION.screen.Transaction.SendFund.selectToken') : undefined}
               />
             </Form.Item>
 
@@ -868,8 +868,8 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
               <ChainSelector
                 disabled={true}
                 items={destChainItems}
-                title={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.selectDestinationChain')}
-                tooltip={isWebUI ? t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.selectDestinationChain') : undefined}
+                title={t('ui.TRANSACTION.screen.Transaction.SendFund.selectDestinationChain')}
+                tooltip={isWebUI ? t('ui.TRANSACTION.screen.Transaction.SendFund.selectDestinationChain') : undefined}
               />
             </Form.Item>
           </div>
@@ -892,9 +892,9 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
               chain={destChain}
               disabled={true}
               fitNetwork={true}
-              label={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.sendTo')}
+              label={t('ui.TRANSACTION.screen.Transaction.SendNFT.sendTo')}
               networkGenesisHash={destChainGenesisHash}
-              placeholder={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.accountAddress')}
+              placeholder={t('ui.TRANSACTION.screen.Transaction.SendNFT.accountAddress')}
               saveAddress={true}
               showAddressBook={false}
               showScanner={true}
@@ -918,7 +918,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
               maxValue={maxTransfer}
               onSetMax={onSetMaxTransferable}
               showMaxButton={!hideMaxButton}
-              tooltip={isWebUI ? t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.amount') : undefined}
+              tooltip={isWebUI ? t('ui.TRANSACTION.screen.Transaction.SendFund.amount') : undefined}
             />
           </Form.Item>
         </Form>
@@ -943,8 +943,8 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
           chain !== destChain && (
             <div className={'__warning_message_cross_chain'}>
               <AlertBox
-                description={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.crossChainTransferToAnExchangeCexWillResultInLossOfFundsMakeSureTheReceivingAddressIsNotAnExchangeAddress')}
-                title={t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.payAttention')}
+                description={t('ui.TRANSACTION.screen.Transaction.SendFund.crossChainCexWarning')}
+                title={t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention')}
                 type={'warning'}
               />
             </div>
@@ -968,7 +968,7 @@ const _SendFundOffRamp = ({ className = '', modalContent }: Props): React.ReactE
           onClick={checkAction(form.submit, extrinsicType)}
           schema={isTransferAll ? 'warning' : undefined}
         >
-          {isTransferAll ? t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.transferAll') : t('ui.SEND_FUND_OFF_RAMP.Popup.Transaction.variants.SendFundOffRamp.transfer')}
+          {isTransferAll ? t('ui.TRANSACTION.screen.Transaction.SendFund.transferAll') : t('ui.TRANSACTION.screen.Transaction.SendFund.transfer')}
         </Button>
       </TransactionFooter>
     </>

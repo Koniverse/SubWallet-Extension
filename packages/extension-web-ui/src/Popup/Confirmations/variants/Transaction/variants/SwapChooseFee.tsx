@@ -50,7 +50,7 @@ const Component: React.FC<Props> = (props: Props) => {
         >
           <MetaInfo.Chain
             chain={transaction.chain}
-            label={t('ui.SWAP_CHOOSE_FEE.Popup.Confirmations.variants.Transaction.variants.SwapChooseFee.network')}
+            label={t('ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.network')}
           />
           <MetaInfo.Default
             className={'__token-network-fee'}

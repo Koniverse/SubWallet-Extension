@@ -442,7 +442,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
             console.error(e);
 
             notify({
-              message: t('ui.BUY_TOKENS.Popup.BuyTokens.unableToRedirectYouToTheSelectedSupplierAtTheMomentTryAgainLater'),
+              message: t('ui.BUY.screen.BuyTokens.unableToRedirectToSupplier'),
               type: 'error',
             });
           }
@@ -587,8 +587,8 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
               <ServiceSelector
                 disabled={!selectedTokenSlug}
                 items={serviceItems}
-                placeholder={t('ui.BUY_TOKENS.Popup.BuyTokens.selectSupplier')}
-                title={t('ui.BUY_TOKENS.Popup.BuyTokens.selectSupplier')}
+                placeholder={t('ui.BUY.screen.BuyTokens.selectSupplier')}
+                title={t('ui.BUY.screen.BuyTokens.selectSupplier')}
               />
             </Form.Item>
           </div>
@@ -601,14 +601,14 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
           >
             <AccountAddressSelector
               items={accountAddressItems}
-              label={`${t('ui.BUY_TOKENS.Popup.BuyTokens.to')}:`}
+              label={`${t('ui.BUY.screen.BuyTokens.to')}:`}
               labelStyle={'horizontal'}
             />
           </Form.Item>
         </Form>
 
         <div className={'common-text __note'}>
-          {t('ui.BUY_TOKENS.Popup.BuyTokens.youWillBeDirectedToTheChosenSupplierToCompleteThisTransaction')}
+          {t('ui.BUY.screen.BuyTokens.directedToSupplierToComplete')}
         </div>
       </div>
 
@@ -625,7 +625,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
           // eslint-disable-next-line react/jsx-no-bind
           onClick={() => onClickNext(buyForm ? 'BUY' : 'SELL')}
         >
-          {buyForm ? t('ui.BUY_TOKENS.Popup.BuyTokens.buyNow') : t('ui.BUY_TOKENS.Popup.BuyTokens.sellNow')}
+          {buyForm ? t('ui.BUY.screen.BuyTokens.buyNow') : t('ui.BUY_TOKENS.Popup.BuyTokens.sellNow')}
         </Button>
       </div>
       <BaseModal
@@ -644,7 +644,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
               onClick={onReject}
               schema={'secondary'}
             >
-              {t('ui.BUY_TOKENS.Popup.BuyTokens.cancel')}
+              {t('ui.BUY.screen.BuyTokens.cancel')}
             </Button>
             <Button
               block={true}
@@ -656,13 +656,13 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
               )}
               onClick={onApprove}
             >
-              {t('ui.BUY_TOKENS.Popup.BuyTokens.agree')}
+              {t('ui.BUY.screen.BuyTokens.agree')}
             </Button>
           </>
         )}
         id={modalId}
         onCancel={onReject}
-        title={t('ui.BUY_TOKENS.Popup.BuyTokens.disclaimer')}
+        title={t('ui.BUY.screen.BuyTokens.disclaimer')}
       >
         <Trans
           components={{
@@ -674,24 +674,24 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
             ),
             termUrl: (
               <LinkUrl
-                content={t('ui.BUY_TOKENS.Popup.BuyTokens.termsOfService')}
+                content={t('ui.BUY.screen.BuyTokens.termsOfService')}
                 url={termUrl}
               />
             ),
             policyUrl: (
               <LinkUrl
-                content={t('ui.BUY_TOKENS.Popup.BuyTokens.privacyPolicy')}
+                content={t('ui.BUY.screen.BuyTokens.privacyPolicy')}
                 url={policyUrl}
               />
             ),
             contactUrl: (
               <LinkUrl
-                content={t('ui.BUY_TOKENS.Popup.BuyTokens.supportSite')}
+                content={t('ui.BUY.screen.BuyTokens.supportSite')}
                 url={contactUrl}
               />
             )
           }}
-          i18nKey={detectTranslate('ui.BUY_TOKENS.Popup.BuyTokens.youAreNowLeavingSubwalletForMainurlServicesRelatedToCardPaymentsAreProvidedByASeparateThirdPartyPlatformByProceedingAndProcuringServicesFromYouAcknowledgeThatYouHaveReadAndAgreedToSTermurlAndPolicyurlForAnyQuestionRelatedToSServicesPleaseVisitSContacturl')}
+          i18nKey={detectTranslate('ui.BUY.screen.BuyTokens.leavingSubwalletDisclaimer')}
           values={{
             service: serviceName
           }}

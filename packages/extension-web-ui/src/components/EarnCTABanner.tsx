@@ -102,8 +102,8 @@ const Component: React.FC<Props> = ({ className, tokenGroupSlug }: Props) => {
         onClick={onClickEarnNow}
       >
         <div className={'__footer-button-content'}>
-          <div className={'__footer-button-title'}>{t('ui.EARN_CTABANNER.components.EarnCTABanner.rewards148185')}</div>
-          <div className={'__footer-button-subtitle'}>{t('ui.EARN_CTABANNER.components.EarnCTABanner.earnNow')}</div>
+          <div className={'__footer-button-title'}>{t('ui.components.Announcement.EarningMigration.rewards')}</div>
+          <div className={'__footer-button-subtitle'}>{t('ui.components.Announcement.EarningMigration.earnNow')}</div>
         </div>
       </Button>
     </div>

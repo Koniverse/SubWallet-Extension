@@ -116,13 +116,13 @@ const Component: React.FC<Props> = (props: Props) => {
         <MetaInfo.Account
           address={recipientAddress}
           className={'__recipient-item'}
-          label={t('ui.SWAP.Popup.Confirmations.variants.Process.Swap.recipient')}
+          label={t('ui.TRANSACTION.Confirmations.Process.Swap.recipient')}
           name={recipient?.name}
           networkPrefix={networkPrefix}
         />
         <MetaInfo.Default
           className={'__quote-rate-confirm'}
-          label={t('ui.SWAP.Popup.Confirmations.variants.Process.Swap.quoteRate')}
+          label={t('ui.TRANSACTION.Confirmations.Process.Swap.quoteRate')}
           valueColorSchema={'gray'}
         >
           <QuoteRateDisplay
@@ -150,7 +150,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {!showQuoteExpired && getWaitingTime > 0 && <AlertBox
           className={'__swap-arrival-time'}
           description={t('ui.TRANSACTION.Confirmations.Process.Swap.swapProviderWaitingTime', { replace: { provider: data.provider.name, getWaitingTime } })}
-          title={t('ui.SWAP.Popup.Confirmations.variants.Process.Swap.payAttention')}
+          title={t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention')}
           type='warning'
         />}
         {/* {!showQuoteExpired && isSwapXCM && ( */}
@@ -167,8 +167,8 @@ const Component: React.FC<Props> = (props: Props) => {
         (
           <AlertBox
             className={'__swap-quote-expired'}
-            description={t('ui.SWAP.Popup.Confirmations.variants.Process.Swap.swapQuoteExpiredCancelToGetANewQuote')}
-            title={t('ui.SWAP.Popup.Confirmations.variants.Process.Swap.payAttention')}
+            description={t('ui.TRANSACTION.Confirmations.Process.Swap.swapQuoteExpired')}
+            title={t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention')}
             type='warning'
           />)
       }

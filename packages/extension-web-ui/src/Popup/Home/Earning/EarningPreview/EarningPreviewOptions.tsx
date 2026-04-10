@@ -133,8 +133,8 @@ function Component ({ className }: Props) {
   }, [data]);
 
   const filterOptions = useMemo(() => [
-    { label: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.mainnet'), value: FilterOptionType.MAIN_NETWORK },
-    { label: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.testnet'), value: FilterOptionType.TEST_NETWORK }
+    { label: t('ui.EARNING.screen.EarningOptions.mainnet'), value: FilterOptionType.MAIN_NETWORK },
+    { label: t('ui.EARNING.screen.EarningOptions.testnet'), value: FilterOptionType.TEST_NETWORK }
   ], [t]);
 
   const filterFunction = useMemo<(item: YieldGroupInfo) => boolean>(() => {
@@ -258,15 +258,15 @@ function Component ({ className }: Props) {
 
       if (isRelatedToAstar(item.group)) {
         openAlert({
-          title: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.enterAstarPortal'),
+          title: t('ui.EARNING.screen.EarningOptions.enterAstarPortal'),
           content: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.youAreNavigatingToAstarPortalToViewAndManageYourStakeInAstarDappStakingV3SubwalletWillOfferSupportForAstarDappStakingV3Soon'),
           cancelButton: {
-            text: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.cancel'),
+            text: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.cancel'),
             schema: 'secondary',
             onClick: closeAlert
           },
           okButton: {
-            text: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.enterAstarPortal'),
+            text: t('ui.EARNING.screen.EarningOptions.enterAstarPortal'),
             onClick: () => {
               openInNewTab(ASTAR_PORTAL_URL)();
               closeAlert();
@@ -377,8 +377,8 @@ function Component ({ className }: Props) {
     return (
       <EmptyList
         className={'__empty-list-earning-options'}
-        emptyMessage={t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.noEarningOptionFound')}
-        emptyTitle={t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.changeYourSearchAndTryAgain')}
+        emptyMessage={t('ui.EARNING.screen.EarningOptions.noEarningOptionFound')}
+        emptyTitle={t('ui.EARNING.screen.EarningOptions.changeYourSearchAndTryAgain')}
         phosphorIcon={Vault}
       />
     );
@@ -491,7 +491,7 @@ function Component ({ className }: Props) {
       type: NotificationType.ERROR,
       content: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.yourChosenValidatorIsNotRecommendedBySubwalletAsStakingWithThisValidatorWonTAccrueAnyRewardsSelectAnotherValidatorAndTryAgain'),
       okButton: {
-        text: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.dismiss'),
+        text: t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.dismiss'),
         onClick: () => {
           setIsAlertWarningValidator(false);
           closeAlert();
@@ -518,7 +518,7 @@ function Component ({ className }: Props) {
         subHeaderBackground={'transparent'}
         subHeaderCenter={false}
         subHeaderPaddingVertical={true}
-        title={t<string>('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.earningOptions')}
+        title={t<string>('ui.EARNING.screen.EarningOptions.earningOptions')}
       >
         {
           initLoading && (
@@ -534,7 +534,7 @@ function Component ({ className }: Props) {
                     <>
                       <Toolbar
                         className={'__desktop-toolbar'}
-                        inputPlaceholder={t<string>('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.searchToken')}
+                        inputPlaceholder={t<string>('ui.EARNING.screen.EarningOptions.searchToken')}
                         onClickFilter={onClickFilterButton}
                         onSearch={setSearchInput}
                         searchValue={searchInput}
@@ -566,7 +566,7 @@ function Component ({ className }: Props) {
                       renderWhenEmpty={emptyList}
                       searchFunction={searchFunction}
                       searchMinCharactersCount={1}
-                      searchPlaceholder={t<string>('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.searchToken')}
+                      searchPlaceholder={t<string>('ui.EARNING.screen.EarningOptions.searchToken')}
                       showActionBtn
                     />
                   )
@@ -576,14 +576,14 @@ function Component ({ className }: Props) {
         }
 
         <FilterModal
-          applyFilterButtonTitle={t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.applyFilter')}
+          applyFilterButtonTitle={t('ui.EARNING.screen.EarningOptions.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.filter')}
+          title={t('ui.EARNING.screen.EarningOptions.filter')}
         />
       </Layout.Base>
 

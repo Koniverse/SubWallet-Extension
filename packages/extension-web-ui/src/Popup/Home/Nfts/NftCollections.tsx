@@ -90,7 +90,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           direction: 'vertical',
           duration: 1.8,
           closable: false,
-          message: t('ui.NFT_COLLECTIONS.Popup.Home.Nfts.NftCollections.reloading')
+          message: t('ui.ACCOUNT.components.Account.EmptyValidator.reloading')
         });
 
         reloadCron({ data: 'nft' })
@@ -156,7 +156,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           weight='fill'
         />
       ),
-      children: t('ui.NFT_COLLECTIONS.Popup.Home.Nfts.NftCollections.addNft'),
+      children: t('ui.NFT.screen.NftsCollections.addNft'),
       shape: 'circle',
       size: 'xs',
       onClick: () => {
@@ -178,8 +178,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return (
       <EmptyList
         buttonProps={emptyButtonProps}
-        emptyMessage={t('ui.NFT_COLLECTIONS.Popup.Home.Nfts.NftCollections.tryAddingOneManually')}
-        emptyTitle={t('ui.NFT_COLLECTIONS.Popup.Home.Nfts.NftCollections.noNftsFound')}
+        emptyMessage={t('ui.NFT.screen.NftsCollections.tryAddingOneManually')}
+        emptyTitle={t('ui.NFT.screen.NftsCollections.noNftsFound')}
         phosphorIcon={Image}
       />
     );
@@ -210,7 +210,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           renderWhenEmpty={emptyNft}
           searchFunction={searchCollection}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('ui.NFT_COLLECTIONS.Popup.Home.Nfts.NftCollections.searchCollectionName')}
+          searchPlaceholder={t<string>('ui.NFT.screen.NftsCollections.searchCollectionName')}
         />
       );
     }
@@ -283,7 +283,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         className={CN('import-nft-modal', className)}
         id={modalId}
         onCancel={closeImportModal}
-        title={t('ui.NFT_COLLECTIONS.Popup.Home.Nfts.NftCollections.importNft')}
+        title={t('ui.NFT.screen.NftsImport.importNft')}
       >
         <NftImport
           key={importNftKey}

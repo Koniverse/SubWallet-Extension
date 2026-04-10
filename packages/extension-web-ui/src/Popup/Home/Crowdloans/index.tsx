@@ -49,9 +49,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [selectedFilterTab, setSelectedFilterTab] = useState<string>(FilterValue.ALL);
 
   const filterOptions = useMemo(() => [
-    { label: t('ui.CROWDLOANS.Popup.Home.Crowdloans.polkadotParachain'), value: FilterValue.POLKADOT_PARACHAIN },
-    { label: t('ui.CROWDLOANS.Popup.Home.Crowdloans.kusamaParachain'), value: FilterValue.KUSAMA_PARACHAIN },
-    { label: t('ui.CROWDLOANS.Popup.Home.Crowdloans.won'), value: FilterValue.WON }
+    { label: t('ui.CROWDLOAN.screen.Crowdloans.polkadotParachain'), value: FilterValue.POLKADOT_PARACHAIN },
+    { label: t('ui.CROWDLOAN.screen.Crowdloans.kusamaParachain'), value: FilterValue.KUSAMA_PARACHAIN },
+    { label: t('ui.CROWDLOAN.screen.Crowdloans.won'), value: FilterValue.WON }
   ], [t]);
 
   const filterFunction = useMemo<(item: _CrowdloanItemType) => boolean>(() => {
@@ -138,7 +138,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         value: FilterValue.IN_AUCTION
       },
       {
-        label: t('ui.CROWDLOANS.Popup.Home.Crowdloans.won'),
+        label: t('ui.CROWDLOAN.screen.Crowdloans.won'),
         value: FilterValue.WON
       }
     ];
@@ -214,18 +214,18 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderBackground={'transparent'}
         subHeaderCenter={false}
         subHeaderPaddingVertical={true}
-        title={t<string>('ui.CROWDLOANS.Popup.Home.Crowdloans.crowdloans')}
+        title={t<string>('ui.components.Layout.Base.crowdloans')}
       >
         {crowdloansContent}
         <FilterModal
-          applyFilterButtonTitle={t('ui.CROWDLOANS.Popup.Home.Crowdloans.applyFilter')}
+          applyFilterButtonTitle={t('ui.CROWDLOAN.screen.Crowdloans.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('ui.CROWDLOANS.Popup.Home.Crowdloans.filter')}
+          title={t('ui.CROWDLOAN.screen.Crowdloans.filter')}
         />
       </Layout.Base>
     </PageWrapper>

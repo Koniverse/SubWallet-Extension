@@ -39,17 +39,17 @@ const Component: React.FC<Props> = (props: Props) => {
       center={true}
       id={modalId}
       onCancel={closeModal}
-      title={t('ui.DISCONNECT_EXTENSION_MODAL.components.Modal.Wallet.DisconnectExtensionModal.disconnectWallet')}
+      title={t('ui.components.Modal.DisconnectExtension.disconnectWallet')}
       wrapClassName={CN(className)}
     >
       <div className='body-container'>
         <div className='notice'>
           <div className='title'>
-            {t('ui.DISCONNECT_EXTENSION_MODAL.components.Modal.Wallet.DisconnectExtensionModal.doWantToDisconnectAllWallets')}
+            {t('ui.components.Modal.DisconnectExtension.confirmDisconnectAllWallets')}
           </div>
         </div>
         <div className='description'>
-          {t('ui.DISCONNECT_EXTENSION_MODAL.components.Modal.Wallet.DisconnectExtensionModal.allConnectedWalletsWillBeDisconnectedImmediatelyIfYouWantToDisconnectSomeAccountsPleaseGoToTheCorrespondingWalletAppToDisable')}
+          {t('ui.components.Modal.DisconnectExtension.disconnectAllWalletsInfo')}
         </div>
         <div className='button-group'>
           <Button
@@ -57,14 +57,14 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick={closeModal}
             schema='secondary'
           >
-            {t('ui.DISCONNECT_EXTENSION_MODAL.components.Modal.Wallet.DisconnectExtensionModal.cancel')}
+            {t('ui.components.Layout.ConnectWebsiteModal.cancel')}
           </Button>
           <Button
             block={true}
             onClick={onClick}
             schema='danger'
           >
-            {t('ui.DISCONNECT_EXTENSION_MODAL.components.Modal.Wallet.DisconnectExtensionModal.disconnect')}
+            {t('ui.components.Modal.DisconnectExtension.disconnect')}
           </Button>
         </div>
       </div>

@@ -54,7 +54,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               weight='fill'
             />
           }
-          name={t('ui.CUSTOMIZE_MODAL.components.Modal.Customize.CustomizeModal.showZeroBalance')}
+          name={t('ui.BALANCE.components.Modal.Customize.Modal.showZeroBalance')}
           rightItem={
             <Switch
               checked={isShowZeroBalance}
@@ -64,7 +64,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         />
       </div>
 
-      <div className={'__group-label'}>{t('ui.CUSTOMIZE_MODAL.components.Modal.Customize.CustomizeModal.networks')}</div>
+      <div className={'__group-label'}>{t('ui.WALLET_CONNECT.Confirmations.ConnectWalletConnect.networks')}</div>
 
       <CustomizeModalContent />
     </BaseModal>

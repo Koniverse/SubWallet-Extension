@@ -539,8 +539,8 @@ function Component ({ isInModal,
     return (
       <EmptyList
         className={'notification-empty-list'}
-        emptyMessage={t('ui.SETTINGS.screen.Setting.Notifications.iUnderstand')}
-        emptyTitle={t('ui.SETTINGS.screen.Setting.Notifications.yourNotificationsWillAppearHere')}
+        emptyMessage={t('ui.SETTINGS.screen.Setting.Notifications.yourNotificationsWillAppearHere')}
+        emptyTitle={t('ui.SETTINGS.screen.Setting.Notifications.noNotificationsYet')}
         phosphorIcon={ListBullets}
       />
     );
@@ -649,7 +649,7 @@ function Component ({ isInModal,
             }
           ]}
           showBackButton
-          title={t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.notifications')}
+          title={t('ui.SETTINGS.screen.Setting.Notifications.notifications')}
         />
       )}
 
@@ -673,7 +673,7 @@ function Component ({ isInModal,
           size='xs'
           type='ghost'
         >
-          {t('ui.SETTINGS.screen.Setting.Notifications.notifications')}
+          {t('ui.SETTINGS.screen.Setting.Notifications.markAllAsRead')}
         </Button>
       </div>
 
@@ -685,7 +685,7 @@ function Component ({ isInModal,
                 actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
                 className={'__search-box'}
                 onSearch={handleSearch}
-                placeholder={t<string>('ui.SETTINGS.screen.Setting.Notifications.markAllAsRead')}
+                placeholder={t<string>('ui.SETTINGS.screen.Setting.Notifications.searchNotification')}
                 searchValue={currentSearchText}
                 simpleLayout
               />
@@ -802,7 +802,7 @@ const Wrapper = (props: WrapperProps) => {
                 ),
                 onClick: openNotificationSettingModal
               }}
-              title={t('ui.NOTIFICATION.Popup.Settings.Notifications.Notification.notifications')}
+              title={t('ui.SETTINGS.screen.Setting.Notifications.notifications')}
             >
               {mainComponent}
             </BaseModal>

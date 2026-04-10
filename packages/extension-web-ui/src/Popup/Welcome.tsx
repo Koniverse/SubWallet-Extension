@@ -75,27 +75,27 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       loading: loadingInject
     },
     {
-      description: t('ui.WELCOME.Popup.Welcome.createANewAccountWithSubwallet'),
+      description: t('ui.screen.Welcome.createNewAccountWithSubWallet'),
       icon: PlusCircle,
       id: CREATE_ACCOUNT_MODAL,
       schema: 'secondary',
-      title: t('ui.WELCOME.Popup.Welcome.createANewAccount'),
+      title: t('ui.screen.Welcome.createNewAccount'),
       loading: false
     },
     {
-      description: t('ui.WELCOME.Popup.Welcome.importAnExistingAccount'),
+      description: t('ui.screen.Welcome.importExistingAccount'),
       icon: FileArrowDown,
       id: IMPORT_ACCOUNT_MODAL,
       schema: 'secondary',
-      title: t('ui.WELCOME.Popup.Welcome.importAnAccount'),
+      title: t('ui.screen.Welcome.importAccount'),
       loading: false
     },
     {
-      description: t('ui.WELCOME.Popup.Welcome.attachAnAccountWithoutPrivateKey'),
+      description: t('ui.screen.Welcome.attachAccountWithoutPrivateKey'),
       icon: Swatches,
       id: ATTACH_ACCOUNT_MODAL,
       schema: 'secondary',
-      title: t('ui.WELCOME.Popup.Welcome.attachAnAccount'),
+      title: t('ui.screen.Welcome.attachAccount'),
       loading: false
     }
   ], [t, loadingInject]);
@@ -187,7 +187,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             isWebUI && (<div className='title'>{t('ui.WELCOME.Popup.Welcome.welcomeToSubwallet')}</div>)
           }
           <div className='sub-title'>
-            {t('ui.WELCOME.Popup.Welcome.chooseHowYouDLikeToSetUpYourWallet')}
+            {t('ui.screen.Welcome.chooseWalletSetupMethod')}
           </div>
         </div>
 

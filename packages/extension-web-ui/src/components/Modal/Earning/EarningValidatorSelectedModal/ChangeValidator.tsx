@@ -68,11 +68,11 @@ const filterOptions = [
     value: '2'
   },
   {
-    label: detectTranslate('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.locked'),
+    label: detectTranslate('ui.EARNING.components.Field.Earning.PoolSelector.locked'),
     value: '3'
   },
   {
-    label: detectTranslate('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.destroying'),
+    label: detectTranslate('ui.EARNING.components.Field.Earning.PoolSelector.destroying'),
     value: '4'
   }
 ];
@@ -123,7 +123,7 @@ const Component = (props: Props) => {
     const result: SortOption[] = [
       {
         desc: false,
-        label: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.lowestCommission'),
+        label: t('ui.EARNING.components.Modal.Earning.Validator.Change.lowestCommission'),
         value: SortKey.COMMISSION
       }
     ];
@@ -131,7 +131,7 @@ const Component = (props: Props) => {
     if (hasReturn) {
       result.push({
         desc: true,
-        label: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.highestAnnualReturn'),
+        label: t('ui.EARNING.components.Modal.Earning.Validator.Change.highestAnnualReturn'),
         value: SortKey.RETURN
       });
     }
@@ -139,14 +139,14 @@ const Component = (props: Props) => {
     if (nominations && nominations.length > 0) {
       result.push({
         desc: true,
-        label: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.nomination'),
+        label: t('ui.EARNING.components.Modal.Earning.Validator.Change.nomination'),
         value: SortKey.NOMINATING
       });
     }
 
     result.push({
       desc: false,
-      label: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.lowestMinActiveStake'),
+      label: t('ui.EARNING.components.Modal.Earning.Validator.Change.lowestMinActiveStake'),
       value: SortKey.MIN_STAKE
     });
 
@@ -163,9 +163,9 @@ const Component = (props: Props) => {
 
   const applyLabel = useMemo(() => {
     if (!fewValidators) {
-      return detectTranslate('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.applyValidator');
+      return detectTranslate('ui.EARNING.components.Modal.Earning.Validator.Change.applyOneValidator');
     } else {
-      return detectTranslate('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.applyValidators');
+      return detectTranslate('ui.EARNING.components.Modal.Earning.Validator.Change.applyNumberValidators');
     }
   }, [fewValidators]);
 
@@ -316,17 +316,17 @@ const Component = (props: Props) => {
     if (isNoValidatorChanged) {
       openAlert({
         type: NotificationType.INFO,
-        content: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.yourNewSelectionsOfValidatorsIsTheSameAsTheOriginalSelectionDoYouStillWantToContinue'),
-        title: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.noChangesDetected'),
+        content: t('ui.EARNING.components.Modal.Earning.Validator.Change.noValidatorChangesWarning'),
+        title: t('ui.EARNING.components.Modal.Earning.Validator.Change.noChangesDetected'),
         okButton: {
-          text: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.continue'),
+          text: t('ui.EARNING.components.Modal.Earning.Validator.Change.continue'),
           onClick: () => {
             closeAlert();
             submit(target);
           }
         },
         cancelButton: {
-          text: t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.cancel'),
+          text: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.cancel'),
           onClick: closeAlert
         }
       });
@@ -362,7 +362,7 @@ const Component = (props: Props) => {
       <EmptyValidator
         isDataEmpty={items.length === 0}
         onClickReload={setForceFetchValidator}
-        validatorTitle={t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.validators')}
+        validatorTitle={t('ui.EARNING.components.Modal.Earning.Validator.Change.validators')}
       />
     );
   }, [items.length, setForceFetchValidator, t]);
@@ -508,13 +508,13 @@ const Component = (props: Props) => {
             activeModal(SORTING_MODAL_ID);
           }
         }}
-        title={t('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.selectValidators')}
+        title={t('ui.EARNING.components.Modal.Earning.Validator.Change.selectValidators')}
       >
         <Search
           autoFocus={true}
           className={'__search-box'}
           onSearch={handleSearch}
-          placeholder={t<string>('ui.CHANGE_VALIDATOR.components.Modal.Earning.EarningValidatorSelectedModal.ChangeValidator.searchValidator')}
+          placeholder={t<string>('ui.EARNING.components.Modal.Earning.Validator.Change.searchValidator')}
           searchValue={searchValue}
           simpleLayout={true}
         />

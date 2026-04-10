@@ -16,11 +16,11 @@ const useDeleteAccount = () => {
   const modalProps: SwModalFuncProps = useMemo(() => {
     return {
       closable: true,
-      content: isWebUI ? t('ui.USE_DELETE_ACCOUNT.hooks.account.useDeleteAccount.ifYouEverWantToUseThisAccountAgainYouWouldNeedToImportItAgainWithSeedphrasePrivateKeyOrJsonFile') : t('ui.USE_DELETE_ACCOUNT.hooks.account.useDeleteAccount.youWillNoLongerBeAbleToAccessThisAccountViaThisExtension'),
+      content: isWebUI ? t('ui.ACCOUNT.hook.account.useDeleteAccount.ifYouEverWantToUseThisAccountAgainYouWouldNeedToImportItAgainWithSeedphrasePrivateKeyOrJsonFile') : t('ui.ACCOUNT.hook.account.useDeleteAccount.removeAccountAccessWarning'),
       id: modalId,
-      okText: isWebUI ? t('ui.USE_DELETE_ACCOUNT.hooks.account.useDeleteAccount.delete') : t('ui.USE_DELETE_ACCOUNT.hooks.account.useDeleteAccount.remove'),
-      subTitle: isWebUI ? t('ui.USE_DELETE_ACCOUNT.hooks.account.useDeleteAccount.deleteThisAccount') : t('ui.USE_DELETE_ACCOUNT.hooks.account.useDeleteAccount.removeThisAccount'),
-      title: isWebUI ? t('ui.USE_DELETE_ACCOUNT.hooks.account.useDeleteAccount.removeAccount') : t('ui.USE_DELETE_ACCOUNT.hooks.account.useDeleteAccount.confirmation'),
+      okText: isWebUI ? t('ui.ACCOUNT.hook.account.useDeleteAccount.delete') : t('ui.ACCOUNT.hook.account.useDeleteAccount.remove'),
+      subTitle: isWebUI ? t('ui.ACCOUNT.hook.account.useDeleteAccount.deleteThisAccount') : t('ui.ACCOUNT.hook.account.useDeleteAccount.removeThisAccount'),
+      title: isWebUI ? t('ui.ACCOUNT.hook.account.useDeleteAccount.removeAccount') : t('ui.ACCOUNT.hook.account.useDeleteAccount.confirmation'),
       type: 'error'
     };
   }, [isWebUI, t]);

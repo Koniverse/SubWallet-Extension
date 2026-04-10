@@ -187,13 +187,13 @@ function Component ({ className }: Props): React.ReactElement<Props> {
 
   const actions: Action[] = [
     {
-      label: t('ui.BALANCE.components.Layout.parts.Header.Balance.receive'),
+      label: t('ui.BALANCE.components.Layout.Header.Balance.receive'),
       type: 'receive',
       icon: CopySimple,
       onClick: onOpenReceive
     },
     {
-      label: t('ui.BALANCE.components.Layout.parts.Header.Balance.send'),
+      label: t('ui.BALANCE.components.Layout.Header.Balance.send'),
       type: 'send',
       icon: PaperPlaneTilt,
       onClick: onOpenSendFund,
@@ -384,7 +384,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
 
       <div className={CN('__block-item', '__action-block')}>
         <div className='__block-title-wrapper'>
-          <div className={'__block-title'}>{t('ui.BALANCE.components.Layout.parts.Header.Balance.actions')}</div>
+          <div className={'__block-title'}>{t('ui.components.Modal.NotificationDetail.actions')}</div>
         </div>
 
         <div className={'__block-content'}>
@@ -420,7 +420,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
             destroyOnClose={true}
             id={TRANSACTION_TRANSFER_MODAL}
             onCancel={handleCancelTransfer}
-            title={t('ui.BALANCE.components.Layout.parts.Header.Balance.transfer')}
+            title={t('ui.TRANSACTION.constant.transaction.transfer')}
           >
             <Transaction
               modalContent={isWebUI}

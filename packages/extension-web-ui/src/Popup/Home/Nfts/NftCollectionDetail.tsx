@@ -61,13 +61,13 @@ function Component ({ className = '', collectionInfo, nftList }: Props): React.R
   const originAssetInfo = useGetChainAssetInfo(collectionInfo.originAsset);
 
   const { handleSimpleConfirmModal } = useConfirmModal({
-    title: t<string>('ui.NFT_COLLECTION_DETAIL.Popup.Home.Nfts.NftCollectionDetail.deleteNft'),
+    title: t<string>('ui.NFT.screen.NftsCollectionDetail.deleteNft'),
     maskClosable: true,
     closable: true,
     type: 'error',
-    subTitle: t<string>('ui.NFT_COLLECTION_DETAIL.Popup.Home.Nfts.NftCollectionDetail.youAreAboutToDeleteThisNftCollection'),
-    content: t<string>('ui.NFT_COLLECTION_DETAIL.Popup.Home.Nfts.NftCollectionDetail.confirmDeleteThisNftCollection'),
-    okText: t<string>('ui.NFT_COLLECTION_DETAIL.Popup.Home.Nfts.NftCollectionDetail.remove')
+    subTitle: t<string>('ui.NFT.screen.NftsCollectionDetail.aboutToDeleteNftCollection'),
+    content: t<string>('ui.NFT.screen.NftsCollectionDetail.confirmDeleteNftCollection'),
+    okText: t<string>('ui.NFT.screen.NftsCollectionDetail.remove')
   });
 
   const searchNft = useCallback((nftItem: NftItem, searchText: string) => {
@@ -115,8 +115,8 @@ function Component ({ className = '', collectionInfo, nftList }: Props): React.R
 
     return (
       <EmptyList
-        emptyMessage={t('ui.NFT_COLLECTION_DETAIL.Popup.Home.Nfts.NftCollectionDetail.yourNftCollectibleWillAppearHere')}
-        emptyTitle={t('ui.NFT_COLLECTION_DETAIL.Popup.Home.Nfts.NftCollectionDetail.noNftCollectible')}
+        emptyMessage={t('ui.NFT.screen.NftsCollectionDetail.yourNftCollectibleWillAppearHere')}
+        emptyTitle={t('ui.NFT.screen.NftsCollectionDetail.noNftCollectible')}
         phosphorIcon={Image}
       />
     );
@@ -130,11 +130,11 @@ function Component ({ className = '', collectionInfo, nftList }: Props): React.R
             if (result) {
               goBack();
               showNotification({
-                message: t('ui.NFT_COLLECTION_DETAIL.Popup.Home.Nfts.NftCollectionDetail.deletedNftCollectionSuccessfully')
+                message: t('ui.NFT.screen.NftsCollectionDetail.deletedNftCollectionSuccessfully')
               });
             } else {
               showNotification({
-                message: t('ui.NFT_COLLECTION_DETAIL.Popup.Home.Nfts.NftCollectionDetail.deletedNftCollectionUnsuccessfully')
+                message: t('ui.NFT.screen.NftsCollectionDetail.deletedNftCollectionUnsuccessfully')
               });
             }
           })

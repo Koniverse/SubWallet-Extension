@@ -73,9 +73,9 @@ function Component ({ className, closeAlert, compound,
 
   const title = useMemo(() => {
     if (type === YieldPoolType.NOMINATION_POOL) {
-      return t('ui.REWARD_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.RewardInfoDesktopPart.unclaimedRewards');
+      return t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.unclaimedRewards');
     } else {
-      return t('ui.REWARD_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.RewardInfoDesktopPart.rewards');
+      return t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.rewards');
     }
   }, [t, type]);
 
@@ -102,11 +102,11 @@ function Component ({ className, closeAlert, compound,
       }
     } else {
       openAlert({
-        title: t('ui.REWARD_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.RewardInfoDesktopPart.rewardsUnavailable'),
+        title: t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.rewardsUnavailable'),
         type: NotificationType.ERROR,
-        content: t('ui.REWARD_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.RewardInfoDesktopPart.youDonTHaveAnyRewardsToClaimAtTheMomentTryAgainLater'),
+        content: t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.noRewardsToClaim'),
         okButton: {
-          text: t('ui.REWARD_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.RewardInfoDesktopPart.iUnderstand'),
+          text: t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
         }
@@ -165,13 +165,13 @@ function Component ({ className, closeAlert, compound,
                     : (
                       <ActivityIndicator size={20} />
                     )
-                  : isDAppStaking && (<div className={'__visit-dapp-label'}>{t('ui.REWARD_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.RewardInfoDesktopPart.visitAstarPortal')}</div>)}
+                  : isDAppStaking && (<div className={'__visit-dapp-label'}>{t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.visitAstarPortal')}</div>)}
                 {canClaim && (
                   <Button
                     onClick={onClaimReward}
                     size='xs'
                   >
-                    {type === YieldPoolType.NATIVE_STAKING && isDAppStaking ? t('ui.REWARD_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.RewardInfoDesktopPart.checkRewards') : t('ui.REWARD_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.RewardInfoDesktopPart.claimRewards')}
+                    {type === YieldPoolType.NATIVE_STAKING && isDAppStaking ? t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.checkRewards') : t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.claimRewards')}
                   </Button>
                 )}
               </div>
@@ -199,7 +199,7 @@ function Component ({ className, closeAlert, compound,
           }
           onClick={onOpenRewardsHistoryModal}
           type={'ghost'}
-        >{t('ui.REWARD_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.RewardInfoDesktopPart.rewardHistory')}</Button>
+        >{t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.rewardHistory')}</Button>
       </div>
       <EarningRewardsHistoryModal
         inputAsset={inputAsset}

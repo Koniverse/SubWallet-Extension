@@ -116,8 +116,8 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         <Field
           className={CN('is-selectable')}
           content={fieldContent}
-          label={t('ui.LEDGER_ACCOUNT_TYPE_SELECTOR.components.Field.LedgerAccountTypeSelector.selectAccountType')}
-          placeholder={t('ui.LEDGER_ACCOUNT_TYPE_SELECTOR.components.Field.LedgerAccountTypeSelector.selectAccountType')}
+          label={t('ui.components.Field.LedgerAccountTypeSelector.selectAccountType')}
+          placeholder={t('ui.components.Field.LedgerAccountTypeSelector.selectAccountType')}
           suffix={fieldSuffix}
         />
       </div>
@@ -126,15 +126,15 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         closable={true}
         id={id}
         onCancel={onCancelModal}
-        title={t('ui.LEDGER_ACCOUNT_TYPE_SELECTOR.components.Field.LedgerAccountTypeSelector.selectAccountType')}
+        title={t('ui.components.Field.LedgerAccountTypeSelector.selectAccountType')}
       >
         <div className={'modal-description'}>
-          {t('ui.LEDGER_ACCOUNT_TYPE_SELECTOR.components.Field.LedgerAccountTypeSelector.chooseTheAccountTypeYouDLikeToUseWithPolkadotAppForMoreInformationRegardingTheseAccountTypes')}
+          {t('ui.components.Field.LedgerAccountTypeSelector.chooseTheAccountTypeYouLike')}
           <a
             href={CONNECT_LEDGER_USER_GUIDE_URL}
             target='__blank'
           >
-            {t('ui.LEDGER_ACCOUNT_TYPE_SELECTOR.components.Field.LedgerAccountTypeSelector.clickHere')}
+            {t('ui.components.Field.LedgerAccountTypeSelector.clickHere')}
           </a>
         </div>
 

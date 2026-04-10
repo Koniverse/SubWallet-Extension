@@ -91,7 +91,7 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
     };
 
     const totalValueStakedCol = {
-      title: t('ui.EARNING_POOLS_TABLE.Popup.Home.Earning.shared.desktop.EarningPoolsTable.totalValueStaked'),
+      title: t('ui.EARNING.components.Earning.PoolItem.totalValueStaked'),
       key: 'total_value_staked',
       className: '__table-total-value-stake-col',
       render: (row: YieldPoolInfo) => {
@@ -130,7 +130,7 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
               )
               : (
                 <span className={'__tbd'}>
-                  {t('ui.EARNING_POOLS_TABLE.Popup.Home.Earning.shared.desktop.EarningPoolsTable.tbd')}
+                  {t('ui.EARNING.components.Earning.PoolItem.tbd')}
                 </span>
               )}
           </div>
@@ -196,7 +196,7 @@ const Component: React.FC<Props> = ({ className, emptyListFunction, filterFuncti
               )
               : (
                 <span className={'__tbd'}>
-                  {t('ui.EARNING_POOLS_TABLE.Popup.Home.Earning.shared.desktop.EarningPoolsTable.tbd')}
+                  {t('ui.EARNING.components.Earning.PoolItem.tbd')}
                 </span>
               )
             }

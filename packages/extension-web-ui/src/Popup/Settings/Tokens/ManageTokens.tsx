@@ -68,9 +68,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [assetSettingMap, selectedFilters]);
 
   const FILTER_OPTIONS = useMemo((): OptionType[] => ([
-    { label: t('ui.MANAGE_TOKENS.Popup.Settings.Tokens.ManageTokens.enabledTokens'), value: FilterValue.ENABLED },
-    { label: t('ui.MANAGE_TOKENS.Popup.Settings.Tokens.ManageTokens.disabledTokens'), value: FilterValue.DISABLED },
-    { label: t('ui.MANAGE_TOKENS.Popup.Settings.Tokens.ManageTokens.customTokens'), value: FilterValue.CUSTOM }
+    { label: t('ui.SETTINGS.screen.Setting.Tokens.Manage.enabledTokens'), value: FilterValue.ENABLED },
+    { label: t('ui.SETTINGS.screen.Setting.Tokens.Manage.disabledTokens'), value: FilterValue.DISABLED },
+    { label: t('ui.SETTINGS.screen.Setting.Tokens.Manage.customTokens'), value: FilterValue.CUSTOM }
   ]), [t]);
 
   const searchToken = useCallback((token: _ChainAsset, searchText: string) => {
@@ -105,7 +105,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         onClick: () => {
           navigate('/settings/tokens/import-token', { state: { isExternalRequest: false } });
         },
-        tooltip: isWebUI ? t('ui.MANAGE_TOKENS.Popup.Settings.Tokens.ManageTokens.importToken') : undefined
+        tooltip: isWebUI ? t('ui.SETTINGS.screen.Setting.Tokens.ImportFungible.importToken') : undefined
       }
     ];
   }, [isWebUI, navigate, t]);
@@ -128,7 +128,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('ui.MANAGE_TOKENS.Popup.Settings.Tokens.ManageTokens.manageTokens')}
+        title={t<string>('ui.SETTINGS.screen.Setting.Tokens.Manage.manageTokens')}
       >
         <SwList.Section
           actionBtnIcon={(
@@ -152,7 +152,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchToken}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('ui.MANAGE_TOKENS.Popup.Settings.Tokens.ManageTokens.searchToken')}
+          searchPlaceholder={t<string>('ui.SETTINGS.screen.Setting.Tokens.Manage.searchToken')}
           showActionBtn={true}
         />
 

@@ -69,7 +69,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         )}
         onClick={openImportAccount}
         schema='secondary'
-        tooltip={isWebUI ? t('ui.FOOTER.components.Layout.parts.SelectAccount.Footer.importAccount') : undefined}
+        tooltip={isWebUI ? t('ui.ACCOUNT.components.Layout.SelectAccount.Footer.importAccount') : undefined}
       />
       <Button
         className='btn-min-width'
@@ -81,7 +81,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         )}
         onClick={openAttachAccount}
         schema='secondary'
-        tooltip={isWebUI ? t('ui.FOOTER.components.Layout.parts.SelectAccount.Footer.attachAccount') : undefined}
+        tooltip={isWebUI ? t('ui.ACCOUNT.components.Layout.SelectAccount.Footer.attachAccount') : undefined}
       />
       <Button
         className='btn-min-width'

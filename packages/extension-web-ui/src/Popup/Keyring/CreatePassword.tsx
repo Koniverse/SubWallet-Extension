@@ -67,11 +67,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const notification = useNotification();
 
-  const passwordRules = useMemo(() => renderBasePasswordRules(t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.password'), t), [t]);
+  const passwordRules = useMemo(() => renderBasePasswordRules(t('ui.ACCOUNT.screen.Keyring.CreatePassword.password'), t), [t]);
   const confirmPasswordRules = useMemo(() => renderBaseConfirmPasswordRules(FormFieldName.PASSWORD, t), [t]);
   const checkBoxValidator = useCallback((rule: RuleObject, value: boolean): Promise<void> => {
     if (!value) {
-      return Promise.reject(new Error(t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.checkboxIsRequired')));
+      return Promise.reject(new Error(t('ui.ACCOUNT.screen.Keyring.CreatePassword.checkboxIsRequired')));
     }
 
     return Promise.resolve();
@@ -169,7 +169,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       <Layout.WithSubHeaderOnly
         rightFooterButton={!isWebUI
           ? {
-            children: t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.continue'),
+            children: t('ui.ACCOUNT.screen.Keyring.CreatePassword.continue'),
             onClick: form.submit,
             loading: loading,
             disabled: isDisabled,
@@ -183,7 +183,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             onClick: openModal
           }
         ]}
-        title={t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.createAPassword')}
+        title={t('ui.ACCOUNT.screen.Keyring.CreatePassword.createAPassword')}
       >
         <div
           className={CN('body-container', {
@@ -191,7 +191,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           })}
         >
           {!isWebUI && <div className='notify'>
-            {t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.thisPasswordCanOnlyUnlockYourSubwalletOnThisBrowser')}
+            {t('ui.ACCOUNT.screen.Keyring.CreatePassword.passwordForThisBrowserOnly')}
           </div>
           }
 
@@ -221,7 +221,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               >
                 <Input.Password
                   onChange={onChangePassword}
-                  placeholder={t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.enterPassword')}
+                  placeholder={t('ui.ACCOUNT.screen.Keyring.CreatePassword.enterPassword')}
                   type='password'
                 />
               </Form.Item>
@@ -232,13 +232,13 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               >
                 <Input.Password
                   onKeyDown={onConfirmPasswordKeyPress}
-                  placeholder={t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.confirmPassword')}
+                  placeholder={t('ui.ACCOUNT.screen.Keyring.CreatePassword.confirmPassword')}
                   type='password'
                 />
               </Form.Item>
               <Form.Item>
                 <div className={'annotation'}>
-                  {t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.passwordsShouldBeAtLeast8CharactersInLengthIncludingLettersAndNumbers')}
+                  {t('ui.ACCOUNT.screen.Keyring.CreatePassword.passwordRequirements')}
                 </div>
               </Form.Item>
               <Form.Item
@@ -270,7 +270,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   loading={loading}
                   onClick={form.submit}
                 >
-                  {t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.continue')}
+                  {t('ui.ACCOUNT.screen.Keyring.CreatePassword.continue')}
                 </Button>
               )}
             </Form>
@@ -295,7 +295,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   rightIconProps={{
                     icon: <InfoIcon />
                   }}
-                  title={t('ui.CREATE_PASSWORD.Popup.Keyring.CreatePassword.instructions')}
+                  title={t('ui.ACCOUNT.screen.Keyring.CreatePassword.instructions')}
                   wrapClassName={className}
                 >
                   <InstructionContainer contents={instructionContents} />

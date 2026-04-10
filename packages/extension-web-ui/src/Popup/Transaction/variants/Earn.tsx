@@ -336,7 +336,7 @@ const Component = ({ className }: ComponentProps) => {
           type: NotificationType.ERROR,
           content: t(balanceDisplayInfo.message, { replace: { minJoinPool, symbol, chain } }),
           okButton: {
-            text: t('ui.EARN.Popup.Transaction.variants.Earn.iUnderstand'),
+            text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
             onClick: closeAlert,
             icon: CheckCircle
           }
@@ -350,11 +350,11 @@ const Component = ({ className }: ComponentProps) => {
         return;
       } else if (insufficientXCMMessages.some((v) => error.message.includes(v))) {
         openAlert({
-          title: t('ui.EARN.Popup.Transaction.variants.Earn.insufficientBalance'),
+          title: t('ui.TRANSACTION.screen.Transaction.Earn.insufficientBalance'),
           type: NotificationType.ERROR,
           content: error.message,
           okButton: {
-            text: t('ui.EARN.Popup.Transaction.variants.Earn.iUnderstand'),
+            text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
             onClick: closeAlert,
             icon: CheckCircle
           }
@@ -399,7 +399,7 @@ const Component = ({ className }: ComponentProps) => {
               _errors[0]?.message.startsWith('connection not open on send()')
             ) {
               notify({
-                message: t('ui.EARN.Popup.Transaction.variants.Earn.yourSelectedNetworkHasLostConnectionUpdateItByReEnablingItOrChangingNetworkProvider'),
+                message: t('ui.TRANSACTION.hook.transaction.useHandleSubmit.selectedNetworkLostConnection'),
                 type: 'error',
                 duration: 8
               });
@@ -586,17 +586,17 @@ const Component = ({ className }: ComponentProps) => {
 
         if (isRelayChain && (userSelectedPoolCount < maxCount && label === 'Validator')) {
           openAlert({
-            title: t('ui.EARN.Popup.Transaction.variants.Earn.payAttention'),
+            title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
             content: t('ui.EARN.Popup.Transaction.variants.Earn.youAreRecommendedToChooseValidatorsToOptimizeYourEarningsDoYouWishToContinueWithValidator', { replace: { maxCount, userSelectedPoolCount, x: userSelectedPoolCount === 1 ? '' : 's' } }),
             okButton: {
-              text: t('ui.EARN.Popup.Transaction.variants.Earn.continue'),
+              text: t('ui.TRANSACTION.screen.Transaction.Earn.continue'),
               onClick: () => {
                 closeAlert();
                 resolve();
               }
             },
             cancelButton: {
-              text: t('ui.EARN.Popup.Transaction.variants.Earn.goBack'),
+              text: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.goBack'),
               onClick: () => {
                 // eslint-disable-next-line prefer-promise-reject-errors
                 reject();
@@ -684,7 +684,7 @@ const Component = ({ className }: ComponentProps) => {
       <>
         <MetaInfo.Default
           className='__label-bottom'
-          label={t('ui.EARN.Popup.Transaction.variants.Earn.subnet')}
+          label={t('ui.TRANSACTION.screen.Transaction.Earn.subnet')}
         >
           <div className='__subnet-wrapper'>
             <Logo
@@ -709,13 +709,13 @@ const Component = ({ className }: ComponentProps) => {
             <MetaInfo.Number
               className='__label-bottom'
               decimals={assetDecimals}
-              label={t('ui.EARN.Popup.Transaction.variants.Earn.expectedAlphaAmount')}
+              label={t('ui.TRANSACTION.screen.Transaction.Earn.expectedAlphaAmount')}
               suffix={poolInfo?.metadata?.subnetData?.subnetSymbol || ''}
               value={BigN(amountValue).multipliedBy(1 / earningRate)}
             />
             <MetaInfo.Default
               className='__label-bottom'
-              label={t('ui.EARN.Popup.Transaction.variants.Earn.conversionRate')}
+              label={t('ui.TRANSACTION.screen.Transaction.Earn.conversionRate')}
             >
               <div className='__subnet-rate'>
                 <span
@@ -855,7 +855,7 @@ const Component = ({ className }: ComponentProps) => {
           <MetaInfo.Number
             className='__label-bottom'
             decimals={assetDecimals}
-            label={t('ui.EARN.Popup.Transaction.variants.Earn.minimumActiveStake')}
+            label={t('ui.TRANSACTION.screen.Transaction.Earn.minimumActiveStake')}
             suffix={assetSymbol}
             value={minJoinPool || 0}
           />
@@ -897,16 +897,16 @@ const Component = ({ className }: ComponentProps) => {
       goBack();
     } else {
       openAlert({
-        title: t('ui.EARN.Popup.Transaction.variants.Earn.cancelEarningProcess'),
+        title: t('ui.TRANSACTION.screen.Transaction.Earn.cancelEarningProcess'),
         type: NotificationType.WARNING,
-        content: t('ui.EARN.Popup.Transaction.variants.Earn.goingBackWillCancelTheCurrentEarningProcessDoYouWishToCancel'),
+        content: t('ui.TRANSACTION.screen.Transaction.Earn.confirmCancelEarningProcess'),
         okButton: {
-          text: t('ui.EARN.Popup.Transaction.variants.Earn.cancelEarning'),
+          text: t('ui.TRANSACTION.screen.Transaction.Earn.cancelEarning'),
           onClick: goBack,
           schema: 'warning'
         },
         cancelButton: {
-          text: t('ui.EARN.Popup.Transaction.variants.Earn.notNow'),
+          text: t('ui.TRANSACTION.screen.Transaction.Earn.notNow'),
           onClick: closeAlert
         }
       });
@@ -1010,7 +1010,7 @@ const Component = ({ className }: ComponentProps) => {
           type: NotificationType.ERROR,
           content: t('ui.EARN.Popup.Transaction.variants.Earn.yourChosenValidatorIsNotRecommendedBySubwalletAsStakingWithThisValidatorWonTAccrueAnyRewardsSelectAnotherValidatorAndTryAgain'),
           cancelButton: {
-            text: t('ui.EARN.Popup.Transaction.variants.Earn.dismiss'),
+            text: t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.dismiss'),
             onClick: () => {
               isReadyToShowAlertRef.current = true;
               closeAlert();
@@ -1018,7 +1018,7 @@ const Component = ({ className }: ComponentProps) => {
             icon: XCircle
           },
           okButton: {
-            text: t('ui.EARN.Popup.Transaction.variants.Earn.selectValidators'),
+            text: t('ui.EARNING.components.Modal.Earning.Validator.Change.selectValidators'),
             onClick: () => {
               isReadyToShowAlertRef.current = true;
               closeAlert();
@@ -1055,11 +1055,11 @@ const Component = ({ className }: ComponentProps) => {
           if (isUnstakeAll) {
             if (poolType === YieldPoolType.NOMINATION_POOL) {
               isReadyToShowAlertRef.current && openAlert({
-                title: t('ui.EARN.Popup.Transaction.variants.Earn.payAttention'),
+                title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
                 content: t('ui.EARN.Popup.Transaction.variants.Earn.thisAccountIsUnstakingAllStakeAndCanTNominateValidatorsYouCanChangeYourAccountOnTheAccountTabOrTryAgainAfterWithdrawingUnstakedFunds'),
                 type: NotificationType.WARNING,
                 okButton: {
-                  text: t('ui.EARN.Popup.Transaction.variants.Earn.iUnderstand'),
+                  text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
                   onClick: () => {
                     isReadyToShowAlertRef.current = true;
                     closeAlert();
@@ -1073,11 +1073,11 @@ const Component = ({ className }: ComponentProps) => {
             } else if (poolType === YieldPoolType.NATIVE_STAKING) {
               if (_STAKING_CHAIN_GROUP.para.includes(chainValue)) {
                 isReadyToShowAlertRef.current && openAlert({
-                  title: t('ui.EARN.Popup.Transaction.variants.Earn.payAttention'),
+                  title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
                   content: t('ui.EARN.Popup.Transaction.variants.Earn.thisAccountIsUnstakingAllStakeAndCanTNominateValidatorsYouCanChangeYourAccountOnTheAccountTabOrTryAgainAfterWithdrawingUnstakedFunds'),
                   type: NotificationType.WARNING,
                   okButton: {
-                    text: t('ui.EARN.Popup.Transaction.variants.Earn.iUnderstand'),
+                    text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
                     onClick: () => {
                       isReadyToShowAlertRef.current = true;
                       closeAlert();
@@ -1120,7 +1120,7 @@ const Component = ({ className }: ComponentProps) => {
           };
 
           isReadyToShowAlertRef.current && openAlert({
-            title: t('ui.EARN.Popup.Transaction.variants.Earn.payAttention'),
+            title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
             content: content,
             className: CN(className, 'earning-alert-modal'),
             type: NotificationType.WARNING,
@@ -1129,7 +1129,7 @@ const Component = ({ className }: ComponentProps) => {
               onClick: onPressCancel
             },
             okButton: {
-              text: poolType === YieldPoolType.NATIVE_STAKING ? t('ui.EARN.Popup.Transaction.variants.Earn.changeValidators') : poolType === YieldPoolType.NOMINATION_POOL ? t('ui.EARN.Popup.Transaction.variants.Earn.useNominationPool') : '',
+              text: poolType === YieldPoolType.NATIVE_STAKING ? t('ui.EARNING.components.Modal.Earning.Validator.changeValidators') : poolType === YieldPoolType.NOMINATION_POOL ? t('ui.EARN.Popup.Transaction.variants.Earn.useNominationPool') : '',
               onClick: onPressContinue
             }
           });
@@ -1211,13 +1211,13 @@ const Component = ({ className }: ComponentProps) => {
         if (!isConnectingChainSuccess) {
           setIsLoadingChainConnection(false);
           openAlert({
-            title: t('ui.EARN.Popup.Transaction.variants.Earn.connectionLost'),
+            title: t('ui.TRANSACTION.screen.Transaction.Earn.connectionLost'),
             type: NotificationType.ERROR,
             content: altChain
               ? t('ui.TRANSACTION.screen.Transaction.Earn.dualNetworkConnectionLost', { replace: { poolChainName, altChainName } })
               : t('ui.TRANSACTION.screen.Transaction.Earn.networkConnectionLost', { replace: { poolChainName } }),
             okButton: {
-              text: t('ui.EARN.Popup.Transaction.variants.Earn.iUnderstand'),
+              text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
               onClick: closeAlert,
               icon: CheckCircle
             }
@@ -1476,7 +1476,7 @@ const Component = ({ className }: ComponentProps) => {
                     <FreeBalanceToEarn
                       address={fromValue}
                       hidden={submitStepType !== YieldStepType.XCM}
-                      label={`${t('ui.EARN.Popup.Transaction.variants.Earn.availableBalance')}`}
+                      label={`${t('ui.TRANSACTION.screen.Transaction.Earn.availableBalance')}`}
                       onBalanceReady={setIsBalanceReady}
                       tokens={balanceTokens}
                     />
@@ -1486,7 +1486,7 @@ const Component = ({ className }: ComponentProps) => {
                       chain={poolInfo?.chain || ''}
                       hidden={[YieldStepType.XCM].includes(submitStepType)}
                       isSubscribe={true}
-                      label={`${t('ui.EARN.Popup.Transaction.variants.Earn.availableBalance')}`}
+                      label={`${t('ui.TRANSACTION.screen.Transaction.Earn.availableBalance')}`}
                       tokenSlug={inputAsset?.slug}
                     />
                   </div>
@@ -1520,7 +1520,7 @@ const Component = ({ className }: ComponentProps) => {
                         defaultValue={defaultData.target === 'not-support' || !!compound ? '' : defaultData.target}
                         disabled={submitLoading}
                         from={fromValue}
-                        label={t('ui.EARN.Popup.Transaction.variants.Earn.pool')}
+                        label={t('ui.TRANSACTION.screen.Transaction.Earn.pool')}
                         loading={targetLoading}
                         setForceFetchValidator={setForceFetchValidator}
                         slug={slug}
@@ -1582,7 +1582,7 @@ const Component = ({ className }: ComponentProps) => {
                   loading={submitLoading}
                   onClick={onPreCheck(form.submit, exType)}
                 >
-                  {processState.currentStep === 0 ? t('ui.EARN.Popup.Transaction.variants.Earn.stake') : t('ui.EARN.Popup.Transaction.variants.Earn.continue')}
+                  {processState.currentStep === 0 ? t('ui.TRANSACTION.screen.Transaction.Earn.stake') : t('ui.TRANSACTION.screen.Transaction.Earn.continue')}
                 </Button>
               </TransactionFooter>
             </div>

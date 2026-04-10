@@ -183,11 +183,11 @@ function Component (props: Props): React.ReactElement<Props> {
 
     const onError = (message: string) => {
       openAlert({
-        title: t('ui.EARNING_VALIDATOR_DETAIL_RWMODAL.components.Modal.Earning.EarningValidatorDetailRWModal.payAttention'),
+        title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
         type: NotificationType.ERROR,
         content: message,
         okButton: {
-          text: t('ui.EARNING_VALIDATOR_DETAIL_RWMODAL.components.Modal.Earning.EarningValidatorDetailRWModal.iUnderstand'),
+          text: t('ui.EARNING.components.Modal.Earning.Instruction.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
         }

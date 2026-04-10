@@ -91,7 +91,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
       if (currentTime >= txExpirationTime) {
         notify({
-          message: t('ui.SUBMIT_API_AREA.Popup.Confirmations.parts.SubmitApiArea.transactionExpired'),
+          message: t('ui.Confirmations.SubmitApiArea.transactionExpired'),
           type: 'error'
         });
         onCancel();
@@ -141,7 +141,7 @@ const Component: React.FC<Props> = (props: Props) => {
         onClick={onCancel}
         schema={'secondary'}
       >
-        {t('ui.SUBMIT_API_AREA.Popup.Confirmations.parts.SubmitApiArea.cancel')}
+        {t('ui.Confirmations.SubmitApiArea.cancel')}
       </Button>
       <Button
         disabled={showQuoteExpired}
@@ -154,7 +154,7 @@ const Component: React.FC<Props> = (props: Props) => {
         loading={loading}
         onClick={onConfirm}
       >
-        {t('ui.SUBMIT_API_AREA.Popup.Confirmations.parts.SubmitApiArea.approve')}
+        {t('ui.Confirmations.SubmitApiArea.approve')}
       </Button>
     </div>
   );

@@ -113,7 +113,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           block={true}
           onClick={onBackToHome}
         >
-          {t('ui.OFF_RAMP_LOADING.Popup.OffRampLoading.iUnderstand')}
+          {t('ui.SETTINGS.screen.Setting.Notifications.iUnderstand')}
         </Button>
       </>
     );
@@ -127,13 +127,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           onClick={onBackToHome}
           schema={'secondary'}
         >
-          {t('ui.OFF_RAMP_LOADING.Popup.OffRampLoading.cancel')}
+          {t('ui.components.Modal.DeriveAccountAction.cancel')}
         </Button>
         <Button
           block={true}
           onClick={onRedirectToTransfer}
         >
-          {t('ui.OFF_RAMP_LOADING.Popup.OffRampLoading.continue')}
+          {t('ui.components.Modal.DeriveAccountAction.continue')}
         </Button>
       </>
     );

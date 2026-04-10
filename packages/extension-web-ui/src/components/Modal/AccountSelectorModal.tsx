@@ -77,7 +77,7 @@ function Component ({ className = '', id = AccountSelectorModalId, items, onSele
       fullSizeOnMobile
       id={id}
       onCancel={onCancel}
-      title={t('ui.ACCOUNT_SELECTOR_MODAL.components.Modal.AccountSelectorModal.selectAccount')}
+      title={t('ui.ACCOUNT.components.Modal.Selector.WrappedTransactionSignerSelectorModal.selectAccount')}
     >
       <SwList.Section
         enableSearchInput={true}
@@ -87,7 +87,7 @@ function Component ({ className = '', id = AccountSelectorModalId, items, onSele
         renderWhenEmpty={renderEmpty}
         searchFunction={searchFunction}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('ui.ACCOUNT_SELECTOR_MODAL.components.Modal.AccountSelectorModal.searchAccount')}
+        searchPlaceholder={t<string>('ui.WALLET_CONNECT.components.WalletConnect.AccountSelect.searchAccount')}
       />
     </BaseModal>
   );

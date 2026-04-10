@@ -258,7 +258,7 @@ const Component = (props: Props, _ref: ForwardedRef<InputRef>) => {
         id={id}
         onCancel={onBack}
         rightIconProps={rightButton}
-        title={t('ui.EXPORT_ALL_SELECTOR.components.Layout.parts.SelectAccount.ExportAllSelector.exportAccount')}
+        title={t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportAccount')}
       >
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
@@ -271,7 +271,7 @@ const Component = (props: Props, _ref: ForwardedRef<InputRef>) => {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchAccountProxyFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('ui.EXPORT_ALL_SELECTOR.components.Layout.parts.SelectAccount.ExportAllSelector.accountName')}
+          searchPlaceholder={t<string>('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.accountName')}
           showActionBtn
         />
       </BaseModal>

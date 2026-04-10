@@ -224,7 +224,7 @@ function Component ({ className }: Props): JSX.Element {
                 console.error(e);
                 setFileValidateState({
                   status: 'error',
-                  message: t<string>('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.invalidJsonFile')
+                  message: t<string>('ui.ACCOUNT.screen.Account.RestoreJson.invalidJsonFile')
                 });
                 setValidating(false);
                 setCountAccountInvalid((pre) => pre + 1);
@@ -233,7 +233,7 @@ function Component ({ className }: Props): JSX.Element {
         } catch (e) {
           setFileValidateState({
             status: 'error',
-            message: t<string>('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.invalidJsonFile')
+            message: t<string>('ui.ACCOUNT.screen.Account.RestoreJson.invalidJsonFile')
           });
           setValidating(false);
           setRequirePassword(false);
@@ -328,7 +328,7 @@ function Component ({ className }: Props): JSX.Element {
 
     if (!value) {
       setSubmitValidateState({
-        message: t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.passwordIsRequired'),
+        message: t('ui.ACCOUNT.screen.Account.RestoreJson.passwordIsRequired'),
         status: 'error'
       });
     } else {
@@ -345,7 +345,7 @@ function Component ({ className }: Props): JSX.Element {
   }, [requirePassword]);
 
   const buttonProps = {
-    children: t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.importAccount'),
+    children: t('ui.ACCOUNT.screen.Account.RestoreJson.importAccount'),
     icon: FooterIcon,
     onClick: form.submit,
     disabled: !!fileValidateState.status || !!submitValidateState.status || !password,
@@ -382,7 +382,7 @@ function Component ({ className }: Props): JSX.Element {
         onBack={onBack}
         rightFooterButton={!isWebUI
           ? {
-            children: t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.importByJsonFile'),
+            children: t('ui.ACCOUNT.screen.Account.RestoreJson.importByJsonFile'),
             icon: FooterIcon,
             onClick: form.submit,
             disabled: !!fileValidateState.status || !!submitValidateState.status || !password,
@@ -403,7 +403,7 @@ function Component ({ className }: Props): JSX.Element {
         >
           <div className={CN('import-container')}>
             <div className='description'>
-              {t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.dragAndDropTheJsonFileYouExportedFromPolkadotJs')}
+              {t('ui.ACCOUNT.screen.Account.RestoreJson.dragAndDropPolkadotJsJson')}
             </div>
             <Form
               className='form-container'
@@ -418,10 +418,10 @@ function Component ({ className }: Props): JSX.Element {
                   accept={'application/json'}
                   className='file-selector'
                   disabled={validating}
-                  hint={t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.dragAndDropTheJsonFileYouExportedFromPolkadotJs')}
+                  hint={t('ui.ACCOUNT.screen.Account.RestoreJson.dragAndDropPolkadotJsJson')}
                   onChange={onChange}
                   statusHelp={fileValidateState.message}
-                  title={t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.importByJsonFile')}
+                  title={t('ui.ACCOUNT.screen.Account.RestoreJson.importByJsonFile')}
                 />
               </Form.Item>
               {
@@ -469,8 +469,8 @@ function Component ({ className }: Props): JSX.Element {
                   : countAccountInvalid
                     ? (<AlertBox
                       className={'alert-warning-name-duplicate'}
-                      description={t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.allAccountsFoundInThisFileAreInvalidImportAnotherJsonFileAndTryAgain')}
-                      title={t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.unableToImport')}
+                      description={t('ui.ACCOUNT.screen.Account.RestoreJson.allAccountsInFileInvalid')}
+                      title={t('ui.ACCOUNT.screen.Account.RestoreJson.unableToImport')}
                       type='error'
                     />)
                     : <></>
@@ -481,12 +481,12 @@ function Component ({ className }: Props): JSX.Element {
                     validateStatus={submitValidateState.status}
                   >
                     <div className='input-label'>
-                      {t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.pleaseEnterThePasswordYouHaveUsedWhenCreatingYourPolkadotJsAccount')}
+                      {t('ui.ACCOUNT.screen.Account.RestoreJson.enterPolkadotJsPassword')}
                     </div>
                     <Input.Password
                       id={`${formName}_${passwordField}`}
                       onChange={onChangePassword}
-                      placeholder={t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.password')}
+                      placeholder={t('ui.ACCOUNT.screen.Account.RestoreJson.password')}
                       statusHelp={submitValidateState.message}
                       type='password'
                       value={password}

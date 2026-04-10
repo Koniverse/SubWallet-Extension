@@ -151,7 +151,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('send-fund');
-  const checkAction = usePreCheckAction(fromValue, true, detectTranslate('ui.SEND_FUND.Popup.Transaction.variants.SendFund.theAccountYouAreUsingIsYouCannotSendAssetsWithIt'));
+  const checkAction = usePreCheckAction(fromValue, true, detectTranslate('ui.TRANSACTION.screen.Transaction.SendFund.cannotSendWithAccountType'));
 
   const [currentChainAsset, setCurrentChainAsset] = useState<_ChainAsset | undefined>(assetRegistry[defaultData.asset]);
 
@@ -424,7 +424,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
     const maxTransfer = transferInfo?.maxTransferable || '0';
 
     if (!amount) {
-      return Promise.reject(t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.amountIsRequired'));
+      return Promise.reject(t('ui.TRANSACTION.screen.Transaction.SendFund.amountIsRequired'));
     }
 
     if (!isBalanceReady) {
@@ -432,17 +432,17 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
     }
 
     if ((new BN(maxTransfer)).lte(BN_ZERO)) {
-      return Promise.reject(t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.youDonTHaveEnoughTokensToProceed'));
+      return Promise.reject(t('ui.TRANSACTION.screen.Transaction.SendFund.notEnoughTokensToProceed'));
     }
 
     if ((new BigN(amount)).eq(new BigN(0))) {
-      return Promise.reject(t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.amountMustBeGreaterThan0'));
+      return Promise.reject(t('ui.TRANSACTION.screen.Transaction.SendFund.amountMustBeGreaterThanZero'));
     }
 
     if ((new BigN(amount)).gt(new BigN(maxTransfer))) {
       const maxString = formatBalance(maxTransfer, decimals);
 
-      return Promise.reject(t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.amountMustBeEqualOrLessThan', { replace: { number: maxString } }));
+      return Promise.reject(t('ui.TRANSACTION.screen.Transaction.SendFund.amountMaxError', { replace: { number: maxString } }));
     }
 
     return Promise.resolve();
@@ -520,7 +520,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
     if (!account) {
       setLoading(false);
       notification({
-        message: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.canTFindAccount'),
+        message: t('ui.TRANSACTION.screen.Transaction.SendFund.cantFindAccount'),
         type: 'error'
       });
 
@@ -534,7 +534,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
         if (!_isTokenTransferredByEvm(chainAsset)) {
           setLoading(false);
           notification({
-            message: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.ledgerDoesNotSupportTransferForThisToken'),
+            message: t('ui.TRANSACTION.screen.Transaction.SendFund.ledgerNotSupportTransfer'),
             type: 'warning'
           });
 
@@ -711,9 +711,9 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
           openAlert({
             type: NotificationType.WARNING,
             content: t(_getXcmUnstableWarning(originChainInfo, destChainInfo, assetSlug)),
-            title: isMythosFromHydrationToMythos ? t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.highFeeAlert') : t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.payAttention'),
+            title: isMythosFromHydrationToMythos ? t('ui.TRANSACTION.screen.Transaction.SendFund.highFeeAlert') : t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
             okButton: {
-              text: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.continue'),
+              text: t('ui.TRANSACTION.screen.Transaction.SendFund.continue'),
               onClick: () => {
                 closeAlert();
                 setLoading(true);
@@ -721,7 +721,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               }
             },
             cancelButton: {
-              text: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.cancel'),
+              text: t('ui.TRANSACTION.screen.Transaction.SendFund.cancel'),
               onClick: () => {
                 closeAlert();
                 setLoading(false);
@@ -745,9 +745,9 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
           openAlert({
             type: NotificationType.WARNING,
             content: t('ui.TRANSACTION.screen.Transaction.SendFund.bounceableAddressNotSupported', { replace: { bounceableAddressPrefix, formattedAddressPrefix } }),
-            title: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.unsupportedAddress'),
+            title: t('ui.TRANSACTION.screen.Transaction.SendFund.unsupportedAddress'),
             okButton: {
-              text: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.continue'),
+              text: t('ui.TRANSACTION.screen.Transaction.SendFund.continue'),
               onClick: () => {
                 form.setFieldValue('to', formattedAddress);
                 updateAddressInputValue(formattedAddress);
@@ -760,7 +760,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               }
             },
             cancelButton: {
-              text: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.cancel'),
+              text: t('ui.TRANSACTION.screen.Transaction.SendFund.cancel'),
               onClick: () => {
                 closeAlert();
                 setLoading(false);
@@ -779,10 +779,10 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
         if (bnMinAmount.gt(BN_ZERO) && isTransferAll && values.chain === values.destChain && !checkTransferAll) {
           openAlert({
             type: NotificationType.WARNING,
-            content: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.transferringAllWillRemoveAllAssetsOnThisNetworkAreYouSure'),
-            title: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.payAttention'),
+            content: t('ui.TRANSACTION.screen.Transaction.SendFund.transferAllWarning'),
+            title: t('ui.TRANSACTION.screen.Transaction.SendFund.payAttentionExclamation'),
             okButton: {
-              text: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.transfer'),
+              text: t('ui.TRANSACTION.screen.Transaction.SendFund.transfer'),
               onClick: () => {
                 closeAlert();
                 setLoading(true);
@@ -793,7 +793,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               }
             },
             cancelButton: {
-              text: t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.cancel'),
+              text: t('ui.TRANSACTION.screen.Transaction.SendFund.cancel'),
               onClick: () => {
                 closeAlert();
                 setLoading(false);
@@ -1021,7 +1021,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
       })}
       >
         <div className={'__brief common-text text-light-4 text-center'}>
-          {t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.youArePerformingATransferOfAFungibleToken')}
+          {t('ui.TRANSACTION.screen.Transaction.SendFund.transferringFungibleToken')}
         </div>
 
         <Form
@@ -1039,9 +1039,9 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               <TokenSelector
                 disabled={isReadonly || !tokenItems.length}
                 items={tokenItems}
-                placeholder={t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.selectToken')}
+                placeholder={t('ui.TRANSACTION.screen.Transaction.SendFund.selectToken')}
                 showChainInSelected
-                tooltip={isWebUI ? t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.selectToken') : undefined}
+                tooltip={isWebUI ? t('ui.TRANSACTION.screen.Transaction.SendFund.selectToken') : undefined}
               />
             </Form.Item>
 
@@ -1055,8 +1055,8 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               <ChainSelector
                 disabled={isReadonly || !destChainItems.length}
                 items={destChainItems}
-                title={t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.selectDestinationChain')}
-                tooltip={isWebUI ? t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.selectDestinationChain') : undefined}
+                title={t('ui.TRANSACTION.screen.Transaction.SendFund.selectDestinationChain')}
+                tooltip={isWebUI ? t('ui.TRANSACTION.screen.Transaction.SendFund.selectDestinationChain') : undefined}
               />
             </Form.Item>
           </div>
@@ -1069,7 +1069,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
             <AccountAddressSelector
               disabled={isReadonly}
               items={accountAddressItems}
-              label={`${t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.from')}:`}
+              label={`${t('ui.TRANSACTION.screen.Transaction.SendFund.from')}:`}
               labelStyle={'horizontal'}
             />
           </Form.Item>
@@ -1090,9 +1090,9 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               disabled={isReadonly || disabledToAddressInput}
               dropdownHeight={!isAccountSelectorVisible ? 317 : 257}
               key={addressInputRenderKey}
-              label={`${t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.to')}:`}
+              label={`${t('ui.TRANSACTION.screen.Transaction.SendFund.to')}:`}
               labelStyle={'horizontal'}
-              placeholder={t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.enterAddress')}
+              placeholder={t('ui.TRANSACTION.screen.Transaction.SendFund.enterAddress')}
               ref={addressInputRef}
               saveAddress={true}
               showAddressBook={!isReadonly}
@@ -1127,7 +1127,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
               maxValue={transferInfo?.maxTransferable || '0'}
               onSetMax={onSetMaxTransferable}
               showMaxButton={!hideMaxButton}
-              tooltip={isWebUI ? t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.amount') : undefined}
+              tooltip={isWebUI ? t('ui.TRANSACTION.screen.Transaction.SendFund.amount') : undefined}
             />
           </Form.Item>
         </Form>
@@ -1171,8 +1171,8 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
           chainValue !== destChainValue && (
             <div className={'__warning_message_cross_chain'}>
               <AlertBox
-                description={t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.crossChainTransferToAnExchangeCexWillResultInLossOfFundsMakeSureTheReceivingAddressIsNotAnExchangeAddress')}
-                title={t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.payAttention')}
+                description={t('ui.TRANSACTION.screen.Transaction.SendFund.crossChainCexWarning')}
+                title={t('ui.TRANSACTION.screen.Transaction.SendFund.payAttentionExclamation')}
                 type={'warning'}
               />
             </div>
@@ -1196,7 +1196,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
           onClick={checkAction(form.submit, extrinsicType)}
           schema={isTransferAll ? 'warning' : undefined}
         >
-          {isTransferAll ? t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.transferAll') : t('ui.SEND_FUND.Popup.Transaction.variants.SendFund.transfer')}
+          {isTransferAll ? t('ui.TRANSACTION.screen.Transaction.SendFund.transferAll') : t('ui.TRANSACTION.screen.Transaction.SendFund.transfer')}
         </Button>
       </TransactionFooter>
     </>

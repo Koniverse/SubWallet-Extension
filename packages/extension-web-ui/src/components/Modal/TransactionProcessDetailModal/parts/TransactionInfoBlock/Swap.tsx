@@ -118,13 +118,13 @@ const Component: FC<Props> = (props: Props) => {
         <MetaInfo.Account
           address={recipientAddress}
           className={'__recipient-item'}
-          label={t('ui.SWAP.components.Modal.TransactionProcessDetailModal.parts.TransactionInfoBlock.Swap.recipient')}
+          label={t('ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Swap.recipient')}
           name={recipient?.name}
           networkPrefix={networkPrefix}
         />
         <MetaInfo.Default
           className={'__quote-rate-confirm'}
-          label={t('ui.SWAP.components.Modal.TransactionProcessDetailModal.parts.TransactionInfoBlock.Swap.quoteRate')}
+          label={t('ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Swap.quoteRate')}
           valueColorSchema={'gray'}
         >
           <QuoteRateDisplay

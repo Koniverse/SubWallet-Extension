@@ -188,7 +188,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const onCopyAddress = useCallback(() => {
     copyToClipboard(account?.address || '');
     notify({
-      message: t('ui.ACCOUNT_DETAIL_.Popup.Account.AccountDetail_.copiedToClipboard')
+      message: t('ui.ACCOUNT.screen.Account.Detail.copiedToClipboard')
     });
   }, [account?.address, notify, t]);
 
@@ -256,7 +256,7 @@ const Component: React.FC<Props> = (props: Props) => {
               disabled: deriving
             }
           ])}
-        title={t('ui.ACCOUNT_DETAIL_.Popup.Account.AccountDetail_.accountDetails')}
+        title={t('ui.ACCOUNT.screen.Account.Detail.accountDetails')}
       >
         <div className={CN('body-container')}>
           <div className='main-content'>
@@ -285,7 +285,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 name={FormFieldName.NAME}
                 rules={[
                   {
-                    message: t('ui.ACCOUNT_DETAIL_.Popup.Account.AccountDetail_.accountNameIsRequired'),
+                    message: t('ui.ACCOUNT.screen.Account.Detail.accountNameRequired'),
                     transform: (value: string) => value.trim(),
                     required: true
                   }
@@ -295,9 +295,9 @@ const Component: React.FC<Props> = (props: Props) => {
                 <Input
                   className='account-name-input'
                   disabled={deriving || account.isInjected}
-                  label={t('ui.ACCOUNT_DETAIL_.Popup.Account.AccountDetail_.accountName')}
+                  label={t('ui.ACCOUNT.screen.Account.Detail.accountName')}
                   onBlur={form.submit}
-                  placeholder={t('ui.ACCOUNT_DETAIL_.Popup.Account.AccountDetail_.accountName')}
+                  placeholder={t('ui.ACCOUNT.screen.Account.Detail.accountName')}
                   prefix={(
                     <BackgroundIcon
                       backgroundColor='var(--wallet-name-icon-bg-color)'
@@ -318,8 +318,8 @@ const Component: React.FC<Props> = (props: Props) => {
             <div className={CN('account-field', 'mb-lg')}>
               <Field
                 content={toShort(account.address, 11, 13)}
-                label={t('ui.ACCOUNT_DETAIL_.Popup.Account.AccountDetail_.walletAddress')}
-                placeholder={t('ui.ACCOUNT_DETAIL_.Popup.Account.AccountDetail_.walletAddress')}
+                label={t('ui.ACCOUNT.screen.Account.Detail.accountAddress')}
+                placeholder={t('ui.ACCOUNT.screen.Account.Detail.accountAddress')}
                 prefix={(
                   <AccountAvatar
                     size={token.sizeMD}
@@ -358,7 +358,7 @@ const Component: React.FC<Props> = (props: Props) => {
               onClick={onDerive}
               schema='secondary'
             >
-              {t('ui.ACCOUNT_DETAIL_.Popup.Account.AccountDetail_.deriveAccount')}
+              {t('ui.ACCOUNT.screen.Account.Detail.derive')}
             </Button>
             <Button
               block={true}
@@ -376,7 +376,7 @@ const Component: React.FC<Props> = (props: Props) => {
               onClick={onExport}
               schema='secondary'
             >
-              {t('ui.ACCOUNT_DETAIL_.Popup.Account.AccountDetail_.exportAccount')}
+              {t('ui.ACCOUNT.screen.Account.Export.exportAccount')}
             </Button>
             <Button
               block={true}
@@ -395,7 +395,7 @@ const Component: React.FC<Props> = (props: Props) => {
               onClick={onDelete}
               schema='secondary'
             >
-              {t('ui.ACCOUNT_DETAIL_.Popup.Account.AccountDetail_.removeAccount')}
+              {t('ui.ACCOUNT.screen.Account.Detail.deleteAccount')}
             </Button>
           </div>
 

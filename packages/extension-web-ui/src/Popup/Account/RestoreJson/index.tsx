@@ -189,7 +189,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (exitedAccount.length) {
       exitedAccount.unshift({
         id: 'existed_accounts',
-        groupLabel: t('ui.RESTORE_JSON.Popup.Account.RestoreJson.existedAccount')
+        groupLabel: t('ui.ACCOUNT.screen.Account.RestoreJson.existedAccount')
       });
 
       result.push(...exitedAccount);
@@ -216,7 +216,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         const json = JSON.parse(u8aToString(Uint8Array.from(Buffer.from(bytes)))) as KeyringPair$Json | KeyringPairs$Json;
 
         if (!isValidJsonFile(json)) {
-          throw new Error(t('ui.RESTORE_JSON.Popup.Account.RestoreJson.invalidJsonFile'));
+          throw new Error(t('ui.ACCOUNT.screen.Account.RestoreJson.invalidJsonFile'));
         }
 
         if (JSON.stringify(jsonFile) !== JSON.stringify(json)) {
@@ -351,9 +351,9 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             {t('ui.RESTORE_JSON.Popup.Account.RestoreJson.thisGuide')}
           </a>
         </div>,
-      title: t('ui.RESTORE_JSON.Popup.Account.RestoreJson.duplicateAccountName'),
+      title: t('ui.ACCOUNT.screen.Account.RestoreJson.duplicateAccountName'),
       okButton: {
-        text: t('ui.RESTORE_JSON.Popup.Account.RestoreJson.iUnderstand'),
+        text: t('ui.ACCOUNT.screen.Account.RestoreJson.iUnderstand'),
         icon: CheckCircle,
         iconWeight: 'fill',
         onClick: () => {
@@ -442,7 +442,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
     if (!value) {
       setPasswordValidateState({
-        message: t('ui.RESTORE_JSON.Popup.Account.RestoreJson.passwordIsRequired'),
+        message: t('ui.ACCOUNT.screen.Account.RestoreJson.passwordIsRequired'),
         status: 'error'
       });
     } else {
@@ -454,12 +454,12 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const footerContent = useMemo(() => {
     if (stepState === StepState.UPLOAD_JSON_FILE) {
-      return t('ui.RESTORE_JSON.Popup.Account.RestoreJson.unlockFile');
+      return t('ui.ACCOUNT.screen.Account.RestoreJson.unlockFile');
     } else {
       if (accountProxiesSelected.length === 0) {
-        return t('ui.RESTORE_JSON.Popup.Account.RestoreJson.importAccount');
+        return t('ui.ACCOUNT.screen.Account.RestoreJson.importAccount');
       } else if (accountProxiesSelected.length === 1) {
-        return t('ui.RESTORE_JSON.Popup.Account.RestoreJson.import1Account');
+        return t('ui.ACCOUNT.screen.Account.RestoreJson.importOneAccount');
       } else {
         return t('ui.ACCOUNT.screen.Account.RestoreJson.importSelectedAccounts', { replace: { accountProxiesSelected: accountProxiesSelected.length } });
       }
@@ -468,9 +468,9 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const titlePage = useMemo(() => {
     if (stepState === StepState.UPLOAD_JSON_FILE) {
-      return t('ui.RESTORE_JSON.Popup.Account.RestoreJson.importFromJsonFile');
+      return t('ui.ACCOUNT.screen.Account.RestoreJson.importFromJsonFile');
     } else {
-      return t('ui.RESTORE_JSON.Popup.Account.RestoreJson.importAccount');
+      return t('ui.ACCOUNT.screen.Account.RestoreJson.importAccount');
     }
   }, [stepState, t]);
 
@@ -519,16 +519,16 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           <div className={CN('import-area')}>
             <div className='description'>
               {stepState === StepState.SELECT_ACCOUNT_IMPORT && passwordValidateState.status === 'success'
-                ? t('ui.RESTORE_JSON.Popup.Account.RestoreJson.selectTheAccountSYouDLikeToImport')
-                : t('ui.RESTORE_JSON.Popup.Account.RestoreJson.dragAndDropTheJsonFileYouExportedFromPolkadotJs')}
+                ? t('ui.ACCOUNT.screen.Account.RestoreJson.selectAccountsToImport')
+                : t('ui.ACCOUNT.screen.Account.RestoreJson.dragAndDropPolkadotJsJson')}
             </div>
 
             {
               stepState === StepState.SELECT_ACCOUNT_IMPORT && showAllAccountsExistAlert && (
                 <AlertBox
                   className={'waning-alert-box'}
-                  description={t('ui.RESTORE_JSON.Popup.Account.RestoreJson.allAccountsFoundInThisFileAlreadyExistInSubwallet')}
-                  title={t('ui.RESTORE_JSON.Popup.Account.RestoreJson.unableToImport')}
+                  description={t('ui.ACCOUNT.screen.Account.RestoreJson.allAccountsInFileExist')}
+                  title={t('ui.ACCOUNT.screen.Account.RestoreJson.unableToImport')}
                   type='warning'
                 />
               )
@@ -550,10 +550,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   accept={'application/json'}
                   className='file-selector'
                   disabled={fileValidating}
-                  hint={t('ui.RESTORE_JSON.Popup.Account.RestoreJson.dragAndDropTheJsonFileYouExportedFromPolkadotJs')}
+                  hint={t('ui.ACCOUNT.screen.Account.RestoreJson.dragAndDropPolkadotJsJson')}
                   onChange={onChangeFile}
                   statusHelp={fileValidateState.message}
-                  title={t('ui.RESTORE_JSON.Popup.Account.RestoreJson.importByJsonFile')}
+                  title={t('ui.ACCOUNT.screen.Account.RestoreJson.importByJsonFile')}
                 />
               </Form.Item>
               }
@@ -562,8 +562,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 showNoValidAccountAlert && (
                   <AlertBox
                     className={'alert-warning-name-duplicate'}
-                    description={t('ui.RESTORE_JSON.Popup.Account.RestoreJson.allAccountsFoundInThisFileAreInvalidImportAnotherJsonFileAndTryAgain')}
-                    title={t('ui.RESTORE_JSON.Popup.Account.RestoreJson.unableToImport')}
+                    description={t('ui.ACCOUNT.screen.Account.RestoreJson.allAccountsInFileInvalid')}
+                    title={t('ui.ACCOUNT.screen.Account.RestoreJson.unableToImport')}
                     type='error'
                   />
                 )
@@ -575,12 +575,12 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                     validateStatus={passwordValidateState.status}
                   >
                     <div className='input-label'>
-                      {t('ui.RESTORE_JSON.Popup.Account.RestoreJson.pleaseEnterThePasswordYouHaveUsedWhenCreatingYourPolkadotJsAccount')}
+                      {t('ui.ACCOUNT.screen.Account.RestoreJson.enterPolkadotJsPassword')}
                     </div>
                     <Input.Password
                       id={`${formName}_${passwordField}`}
                       onChange={onChangePassword}
-                      placeholder={t('ui.RESTORE_JSON.Popup.Account.RestoreJson.password')}
+                      placeholder={t('ui.ACCOUNT.screen.Account.RestoreJson.password')}
                       statusHelp={passwordValidateState.message}
                       type='password'
                       value={password}

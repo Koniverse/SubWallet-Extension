@@ -122,7 +122,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (qrSignerAccounts.length) {
       qrSignerAccounts.unshift({
         id: 'qr',
-        groupLabel: t('ui.ACCOUNT_SELECTOR.components.Modal.ReceiveModalNew.parts.AccountSelector.qrSignerAccount')
+        groupLabel: t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.qrSignerAccount')
       });
 
       result.push(...qrSignerAccounts);
@@ -131,7 +131,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (watchOnlyAccounts.length) {
       watchOnlyAccounts.unshift({
         id: 'watch-only',
-        groupLabel: t('ui.ACCOUNT_SELECTOR.components.Modal.ReceiveModalNew.parts.AccountSelector.watchOnlyAccount')
+        groupLabel: t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.watchOnlyAccount')
       });
 
       result.push(...watchOnlyAccounts);
@@ -140,7 +140,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (ledgerAccounts.length) {
       ledgerAccounts.unshift({
         id: 'ledger',
-        groupLabel: t('ui.ACCOUNT_SELECTOR.components.Modal.ReceiveModalNew.parts.AccountSelector.ledgerAccount')
+        groupLabel: t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.ledgerAccount')
       });
 
       result.push(...ledgerAccounts);
@@ -149,7 +149,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (injectedAccounts.length) {
       injectedAccounts.unshift({
         id: 'injected',
-        groupLabel: t('ui.ACCOUNT_SELECTOR.components.Modal.ReceiveModalNew.parts.AccountSelector.injectedAccount')
+        groupLabel: t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.injectedAccount')
       });
 
       result.push(...ledgerAccounts);
@@ -158,7 +158,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (unknownAccounts.length) {
       unknownAccounts.unshift({
         id: 'unknown',
-        groupLabel: t('ui.ACCOUNT_SELECTOR.components.Modal.ReceiveModalNew.parts.AccountSelector.unknownAccount')
+        groupLabel: t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.unknownAccount')
       });
 
       result.push(...unknownAccounts);
@@ -201,13 +201,13 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
           onClick: onCancel
         }
         : undefined}
-      title={t('ui.ACCOUNT_SELECTOR.components.Modal.ReceiveModalNew.parts.AccountSelector.selectAccount')}
+      title={t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.selectAccount')}
     >
       <Search
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t<string>('ui.ACCOUNT_SELECTOR.components.Modal.ReceiveModalNew.parts.AccountSelector.enterYourAccountNameOrAddress')}
+        placeholder={t<string>('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.enterYourAccountNameOrAddress')}
         searchValue={searchValue}
         simpleLayout={true}
       />

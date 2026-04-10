@@ -28,13 +28,13 @@ const Component: React.FC<Props> = (props: Props) => {
       <MetaInfo.Account
         address={account?.address || address}
         chainSlug={network}
-        label={t('ui.COMMON_TRANSACTION_INFO.components.Confirmation.CommonTransactionInfo.account')}
+        label={t('ui.components.Confirmation.CommonTransactionInfo.account')}
         name={account?.name}
         networkPrefix={networkPrefix}
       />
       <MetaInfo.Chain
         chain={network}
-        label={t('ui.COMMON_TRANSACTION_INFO.components.Confirmation.CommonTransactionInfo.network')}
+        label={t('ui.components.Confirmation.CommonTransactionInfo.network')}
       />
     </>
   );

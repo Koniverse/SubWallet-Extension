@@ -430,7 +430,7 @@ export class KyberHandler implements SwapBaseInterface {
     // todo: validate path with optimalProcess
     // todo: review error message in case many step swap
     if (BigNumber(selectedQuote.fromAmount).lte(0)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'bg.SWAP.background.error.Swap.amountMustBeGreaterThanZero')];
     }
 
     const actionList = JSON.stringify(process.path.map((step) => step.action));

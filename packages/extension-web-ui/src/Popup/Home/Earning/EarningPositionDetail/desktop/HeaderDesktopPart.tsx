@@ -56,7 +56,7 @@ function Component ({ activeStake, className, convertActiveStake, inputAsset, is
           {
             isSubnetStaking && (
               <div className={'__unstaking-period-value-prefix'}>
-                {t('ui.HEADER_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.HeaderDesktopPart.upTo')}
+                {t('ui.EARNING.components.Earning.OptionItem.upTo')}
               </div>
             )
           }
@@ -66,14 +66,14 @@ function Component ({ activeStake, className, convertActiveStake, inputAsset, is
           </div>
 
           <div className={'__unstaking-period-value-suffix'}>
-            {days < 1 ? t('ui.HEADER_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.HeaderDesktopPart.hours') : t('ui.HEADER_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.HeaderDesktopPart.days')}
+            {days < 1 ? t('ui.EARNING.util.earning.hours') : t('ui.EARNING.util.earning.days')}
           </div>
         </div>
       );
     } else {
       return (
         <div className={'__unstaking-period-value'}>
-          {t('ui.HEADER_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.HeaderDesktopPart.tbd')}
+          {t('ui.EARNING.components.Earning.PoolItem.tbd')}
         </div>
       );
     }
@@ -83,7 +83,7 @@ function Component ({ activeStake, className, convertActiveStake, inputAsset, is
     <div className={CN(className, '__header-desktop-part-container')}>
       <div className={CN('__block-item', '__total-balance-block')}>
         <div className={'__block-title-wrapper'}>
-          <div className={'__block-title'}>{t('ui.HEADER_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.HeaderDesktopPart.activeStake')}</div>
+          <div className={'__block-title'}>{t('ui.EARNING.screen.EarningPositionDetail.activeStake')}</div>
           <div className={'__tag-earning-type'}>
             <EarningTypeTag
               chain={poolInfo.chain}
@@ -120,7 +120,7 @@ function Component ({ activeStake, className, convertActiveStake, inputAsset, is
 
       <div className={CN('__block-item', '__estimate-block')}>
         <div className='__block-title-wrapper'>
-          <div className={'__block-title'}>{t('ui.HEADER_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.HeaderDesktopPart.estimatedEarnings')}</div>
+          <div className={'__block-title'}>{t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.estimatedEarnings')}</div>
         </div>
 
         <div className={'__block-content'}>
@@ -135,11 +135,11 @@ function Component ({ activeStake, className, convertActiveStake, inputAsset, is
                     value={totalApy}
                   />
 
-                  <div className={'earning-item-reward-sub-text'}>{t('ui.HEADER_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.HeaderDesktopPart.perYear')}</div>
+                  <div className={'earning-item-reward-sub-text'}>{t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.perYear')}</div>
                 </>
               )
               : (
-                <div className={'__tbd'}>{t('ui.HEADER_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.HeaderDesktopPart.tbd')}</div>
+                <div className={'__tbd'}>{t('ui.EARNING.components.Earning.PoolItem.tbd')}</div>
               )
           }
         </div>
@@ -151,7 +151,7 @@ function Component ({ activeStake, className, convertActiveStake, inputAsset, is
 
       <div className={CN('__block-item', '__minimun-stake-block')}>
         <div className='__block-title-wrapper'>
-          <div className={'__block-title'}>{t('ui.HEADER_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.HeaderDesktopPart.minimumActiveStake')}</div>
+          <div className={'__block-title'}>{t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.minimumActiveStake')}</div>
         </div>
 
         <div className={'__block-content'}>
@@ -170,7 +170,7 @@ function Component ({ activeStake, className, convertActiveStake, inputAsset, is
 
       <div className={CN('__block-item', '__action-block')}>
         <div className='__block-title-wrapper'>
-          <div className={'__block-title'}>{t('ui.HEADER_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.HeaderDesktopPart.unstakingPeriod')}</div>
+          <div className={'__block-title'}>{t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.unstakingPeriod')}</div>
         </div>
 
         <div className={'__block-content'}>

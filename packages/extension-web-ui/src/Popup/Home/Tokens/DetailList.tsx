@@ -377,7 +377,7 @@ function Component (): React.ReactElement {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('ui.DETAIL_LIST.Popup.Home.Tokens.DetailList.theAccountYouAreUsingIsWatchOnlyYouCannotSendAssetsWithIt'),
+        message: t('ui.BALANCE.screen.Tokens.DetailList.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -427,7 +427,7 @@ function Component (): React.ReactElement {
 
     if (currentAccountProxy.accountType === AccountProxyType.READ_ONLY) {
       notify({
-        message: t('ui.DETAIL_LIST.Popup.Home.Tokens.DetailList.theAccountYouAreUsingIsWatchOnlyYouCannotSendAssetsWithIt'),
+        message: t('ui.BALANCE.screen.Tokens.DetailList.accountIsWatchOnlyCannotSend'),
         type: 'info',
         duration: 3
       });
@@ -544,7 +544,7 @@ function Component (): React.ReactElement {
   }, [handleResize]);
 
   const detailTitle = useMemo(() => {
-    return <div className='header-content'>{t('ui.DETAIL_LIST.Popup.Home.Tokens.DetailList.token')}: {symbol}</div>;
+    return <div className='header-content'>{t('ui.BALANCE.screen.Tokens.DetailUpperBlock.token')}: {symbol}</div>;
   }, [symbol, t]);
 
   useEffect(() => {
@@ -634,9 +634,9 @@ function Component (): React.ReactElement {
                     />
                   )
                 }}
-                i18nKey={detectTranslate('ui.DETAIL_LIST.Popup.Home.Tokens.DetailList.tonWalletsHaveMultipleVersionsEachWithItsOwnWalletAddressAndBalanceHighlightChangeVersionsHighlightIfYouDonTSeeBalances')}
+                i18nKey={detectTranslate('ui.BALANCE.screen.Tokens.DetailList.tonWalletVersionInfo')}
               />}
-              title={t('ui.DETAIL_LIST.Popup.Home.Tokens.DetailList.changeWalletAddressAndVersion')}
+              title={t('ui.BALANCE.screen.Tokens.DetailList.changeWalletAddressAndVersion')}
               type={'warning'}
             />
             {!!filteredAccountList.length && (

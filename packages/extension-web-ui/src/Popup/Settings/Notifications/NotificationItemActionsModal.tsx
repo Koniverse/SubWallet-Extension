@@ -107,7 +107,7 @@ function Component (props: Props): React.ReactElement<Props> {
       }
       id={NOTIFICATION_DETAIL_MODAL}
       onCancel={onCancel}
-      title={t('ui.NOTIFICATION_ITEM_ACTIONS_MODAL.Popup.Settings.Notifications.NotificationItemActionsModal.actions')}
+      title={t('ui.components.Modal.NotificationDetail.actions')}
     >
       <div className={'__button-container'}>
         <div
@@ -136,7 +136,7 @@ function Component (props: Props): React.ReactElement<Props> {
               weight='fill'
             />
           </div>
-          <div className={'__right-part'}>{readNotification ? t('ui.NOTIFICATION_ITEM_ACTIONS_MODAL.Popup.Settings.Notifications.NotificationItemActionsModal.markAsUnread') : t('ui.NOTIFICATION_ITEM_ACTIONS_MODAL.Popup.Settings.Notifications.NotificationItemActionsModal.markAsRead')}</div>
+          <div className={'__right-part'}>{readNotification ? t('ui.components.Modal.NotificationDetail.markAsUnread') : t('ui.components.Modal.NotificationDetail.markAsRead')}</div>
         </div>
       </div>
 

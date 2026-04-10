@@ -91,7 +91,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('ui.DAPPS.Popup.DApps.all'),
+        label: t('ui.screen.DApps.all'),
         value: DAppCategoryType.ALL
       },
       ...filterOptions
@@ -264,14 +264,14 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       </div>
 
       <FilterModal
-        applyFilterButtonTitle={t('ui.DAPPS.Popup.DApps.applyFilter')}
+        applyFilterButtonTitle={t('ui.screen.DApps.applyFilter')}
         id={FILTER_MODAL_ID}
         onApplyFilter={onApplyFilter}
         onCancel={onCloseFilterModal}
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
-        title={t('ui.DAPPS.Popup.DApps.filter')}
+        title={t('ui.screen.DApps.filter')}
       />
     </div>
   );

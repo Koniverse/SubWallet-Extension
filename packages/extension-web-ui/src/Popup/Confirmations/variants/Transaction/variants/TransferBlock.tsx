@@ -50,7 +50,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
       <MetaInfo hasBackgroundWrapper>
         <MetaInfo.Account
           address={data.from}
-          label={t('ui.TRANSFER_BLOCK.Popup.Confirmations.variants.Transaction.variants.TransferBlock.sendFrom')}
+          label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendFrom')}
         />
 
         {
@@ -65,7 +65,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
 
         <MetaInfo.Account
           address={data.to}
-          label={t('ui.TRANSFER_BLOCK.Popup.Confirmations.variants.Transaction.variants.TransferBlock.sendTo')}
+          label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendTo')}
         />
 
         {
@@ -83,7 +83,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
           (
             <MetaInfo.Chain
               chain={chainInfo.slug}
-              label={t('ui.TRANSFER_BLOCK.Popup.Confirmations.variants.Transaction.variants.TransferBlock.network')}
+              label={t('ui.TRANSACTION.Confirmations.TransferBlock.network')}
             />
           )
         }
@@ -100,7 +100,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
         {isAcrossBridge && xcmData.metadata
           ? <>
             <MetaInfo.Default
-              label={t('ui.TRANSFER_BLOCK.Popup.Confirmations.variants.Transaction.variants.TransferBlock.quote')}
+              label={t('ui.TRANSACTION.Confirmations.TransferBlock.quote')}
             >
               <QuoteRateDisplay
                 className={'__quote-estimate-swap-value'}
@@ -111,7 +111,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
             </MetaInfo.Default>
             <MetaInfo.Number
               decimals={destTokenInfo.decimals || 0}
-              label={t('ui.TRANSFER_BLOCK.Popup.Confirmations.variants.Transaction.variants.TransferBlock.expectedAmount')}
+              label={t('ui.TRANSACTION.Confirmations.TransferBlock.expectedAmount')}
               suffix={destTokenInfo.symbol}
               value={xcmData.metadata.amountOut}
             />
@@ -119,7 +119,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
           : (
             <MetaInfo.Number
               decimals={tokenInfo.decimals || 0}
-              label={t('ui.TRANSFER_BLOCK.Popup.Confirmations.variants.Transaction.variants.TransferBlock.amount')}
+              label={t('ui.TRANSACTION.Confirmations.TransferBlock.amount')}
               suffix={tokenInfo.symbol}
               value={data.value || 0}
             />
@@ -127,7 +127,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
 
         <MetaInfo.Number
           decimals={feeInfo ? feeInfo.decimals : nativeTokenDecimals}
-          label={t('ui.TRANSFER_BLOCK.Popup.Confirmations.variants.Transaction.variants.TransferBlock.estimatedFee')}
+          label={t('ui.TRANSACTION.components.Field.FeeEditor.estimatedFee')}
           suffix={feeInfo ? feeInfo.symbol : nativeTokenSymbol}
           value={feeInfo ? feeInfo.value : 0}
         />
@@ -137,8 +137,8 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
         (
           <AlertBox
             className={CN(className, 'alert-area')}
-            description={t('ui.TRANSFER_BLOCK.Popup.Confirmations.variants.Transaction.variants.TransferBlock.youLlNeedToPayAnAdditionalFeeForTheDestinationNetworkInACrossChainTransferThisFeeCannotBeCalculatedInAdvance')}
-            title={t('ui.TRANSFER_BLOCK.Popup.Confirmations.variants.Transaction.variants.TransferBlock.payAttention')}
+            description={t('ui.TRANSACTION.Confirmations.TransferBlock.crossChainAdditionalFee')}
+            title={t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention')}
             type='warning'
           />
         )

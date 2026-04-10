@@ -159,24 +159,24 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
           if (result.error === 'incompatibleNFT') {
             showNotification({
               type: 'error',
-              message: t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.failedToImportIncompatibleNft')
+              message: t('ui.NFT.screen.NftsImport.failedToImportIncompatibleNft')
             });
           } else if (result.success) {
             showNotification({
               type: 'success',
-              message: t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.importedNftSuccessfully')
+              message: t('ui.NFT.screen.NftsImport.importedNftSuccessfully')
             });
             goBack();
           } else {
             showNotification({
               type: 'error',
-              message: t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.anErrorOccurredPleaseTryAgain')
+              message: t('ui.NFT.screen.NftsImport.anErrorOccurredPleaseTryAgain')
             });
           }
         })
         .catch(() => {
           showNotification({
-            message: t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.anErrorOccurredPleaseTryAgain')
+            message: t('ui.NFT.screen.NftsImport.anErrorOccurredPleaseTryAgain')
           });
         })
         .finally(() => {
@@ -192,7 +192,7 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
       if (parsedValue.length >= 3) {
         resolve();
       } else {
-        reject(new Error(t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.collectionNameMustHaveAtLeast3Characters')));
+        reject(new Error(t('ui.NFT.screen.NftsImport.collectionNameMinLength')));
       }
     });
   }, [t]);
@@ -208,7 +208,7 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
         validator: (_, contractAddress: string): Promise<void> => {
           return new Promise((resolve, reject) => {
             if (!isAddress(contractAddress)) {
-              reject(t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.invalidContractAddress'));
+              reject(t('ui.SETTINGS.screen.Setting.Tokens.ImportFungible.invalidContractAddress'));
             } else {
               const selectedChain = getFieldValue('chain') as string;
               const selectedNftType = getFieldValue('type') as _AssetType;
@@ -227,11 +227,11 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
                     setLoading(false);
 
                     if (validationResult.isExist) {
-                      reject(t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.existedNft'));
+                      reject(t('ui.NFT.screen.NftsImport.existedNft'));
                     }
 
                     if (validationResult.contractError) {
-                      reject(t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.invalidContractForTheSelectedChain'));
+                      reject(t('ui.NFT.screen.NftsImport.invalidContractForChain'));
                     }
 
                     if (!validationResult.isExist && !validationResult.contractError) {
@@ -242,10 +242,10 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
                   })
                   .catch(() => {
                     setLoading(false);
-                    reject(t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.invalidContractForTheSelectedChain'));
+                    reject(t('ui.NFT.screen.NftsImport.invalidContractForChain'));
                   });
               } else {
-                reject(t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.invalidContractAddress'));
+                reject(t('ui.SETTINGS.screen.Setting.Tokens.ImportFungible.invalidContractAddress'));
               }
             }
           });
@@ -275,9 +275,9 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
           ),
           loading: loading,
           onClick: form.submit,
-          children: t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.import')
+          children: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.import')
         }}
-        title={t<string>('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.importNft')}
+        title={t<string>('ui.NFT.screen.NftsImport.importNft')}
       >
         {!modalContent && <SwSubHeader
           background={'transparent'}
@@ -286,7 +286,7 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
           onBack={goBack}
           paddingVertical
           showBackButton
-          title={t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.importNft')}
+          title={t('ui.NFT.screen.NftsImport.importNft')}
         />}
         <div className={'nft_import__container'}>
           <Form
@@ -307,9 +307,9 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
             >
               <ChainSelector
                 items={chains}
-                label={t<string>('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.network')}
-                placeholder={t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.selectNetwork')}
-                title={t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.selectNetwork')}
+                label={t<string>('ui.NFT.screen.NftsImport.network')}
+                placeholder={t('ui.NFT.screen.NftsImport.selectNetwork')}
+                title={t('ui.NFT.screen.NftsImport.selectNetwork')}
               />
             </Form.Item>
 
@@ -320,9 +320,9 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
                 className={className}
                 disabled={!selectedChain}
                 items={nftTypeOptions}
-                label={t<string>('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.type')}
-                placeholder={t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.selectNftType')}
-                title={t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.selectNftType')}
+                label={t<string>('ui.NFT.screen.NftsImport.type')}
+                placeholder={t('ui.NFT.screen.NftsImport.selectNftType')}
+                title={t('ui.NFT.screen.NftsImport.selectNftType')}
               />
             </Form.Item>
 
@@ -334,8 +334,8 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
               <AddressInput
                 addressPrefix={chainNetworkPrefix}
                 disabled={!selectedNftType}
-                label={t<string>('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.contractAddress')}
-                placeholder={t('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.enterOrPasteAnAddress')}
+                label={t<string>('ui.NFT.screen.NftsImport.contractAddress')}
+                placeholder={t('ui.NFT.screen.NftsImport.enterOrPasteAddress')}
                 showScanner={true}
               />
             </Form.Item>
@@ -348,7 +348,7 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
             >
               <Input
                 disabled={nameDisabled}
-                label={t<string>('ui.NFT_IMPORT.Popup.Home.Nfts.NftImport.nftCollectionName')}
+                label={t<string>('ui.NFT.screen.NftsImport.nftCollectionName')}
               />
             </Form.Item>
           </Form>

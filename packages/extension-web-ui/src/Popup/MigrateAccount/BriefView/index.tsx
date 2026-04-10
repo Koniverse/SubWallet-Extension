@@ -77,7 +77,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
           {
             !isForcedMigration
               ? contentData.title
-              : t('ui.BRIEF_VIEW.Popup.MigrateAccount.BriefView.migrationIncomplete')
+              : t('ui.ACCOUNT.screen.MigrateAccount.BriefView.migrationIncomplete')
           }
         </div>
       </div>
@@ -106,17 +106,17 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
               {
                 isWebUI && (
                   <div className={'__subtitle'}>
-                    {t('ui.BRIEF_VIEW.Popup.MigrateAccount.BriefView.migrationIncomplete')}
+                    {t('ui.ACCOUNT.screen.MigrateAccount.BriefView.migrationIncomplete')}
                   </div>
                 )
               }
 
               <div className={'__forced-migration-content'}>
                 <div className='__content-line'>
-                  {t('ui.BRIEF_VIEW.Popup.MigrateAccount.BriefView.accountMigrationIsNotYetCompleteIfThisProcessRemainsIncompleteYouWillNotBeAbleToPerformAnyActionOnSubwalletExtension')}
+                  {t('ui.ACCOUNT.screen.MigrateAccount.BriefView.migrationIncompleteWarning')}
                 </div>
                 <div className='__content-line'>
-                  {t('ui.BRIEF_VIEW.Popup.MigrateAccount.BriefView.makeSureToCompleteTheMigrationToAvoidAnyPotentialIssuesWithYourAccountsHitContinueToResumeAndCompleteTheProcess')}
+                  {t('ui.ACCOUNT.screen.MigrateAccount.BriefView.completeMigrationToAvoidIssues')}
                 </div>
               </div>
             </>
@@ -139,7 +139,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
                 onClick={onDismiss}
                 schema={'secondary'}
               >
-                {t('ui.BRIEF_VIEW.Popup.MigrateAccount.BriefView.cancel')}
+                {t('ui.ACCOUNT.screen.MigrateAccount.BriefView.cancel')}
               </Button>
               <Button
                 block={true}
@@ -163,7 +163,7 @@ function Component ({ className = '', isForcedMigration, onDismiss, onMigrateNow
               block={true}
               onClick={onMigrateNow}
             >
-              {t('ui.BRIEF_VIEW.Popup.MigrateAccount.BriefView.continue')}
+              {t('ui.ACCOUNT.screen.MigrateAccount.BriefView.continue')}
             </Button>
           )
         }

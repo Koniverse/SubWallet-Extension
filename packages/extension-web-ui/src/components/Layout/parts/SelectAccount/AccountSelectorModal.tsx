@@ -153,7 +153,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (qrSignerAccounts.length) {
       qrSignerAccounts.unshift({
         id: 'qr',
-        groupLabel: t('ui.ACCOUNT_SELECTOR_MODAL.components.Layout.parts.SelectAccount.AccountSelectorModal.qrSignerAccount')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.qrSignerAccount')
       });
 
       result.push(...qrSignerAccounts);
@@ -162,7 +162,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (watchOnlyAccounts.length) {
       watchOnlyAccounts.unshift({
         id: 'watch-only',
-        groupLabel: t('ui.ACCOUNT_SELECTOR_MODAL.components.Layout.parts.SelectAccount.AccountSelectorModal.watchOnlyAccount')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.watchOnlyAccount')
       });
 
       result.push(...watchOnlyAccounts);
@@ -171,7 +171,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (ledgerAccounts.length) {
       ledgerAccounts.unshift({
         id: 'ledger',
-        groupLabel: t('ui.ACCOUNT_SELECTOR_MODAL.components.Layout.parts.SelectAccount.AccountSelectorModal.ledgerAccount')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.ledgerAccount')
       });
 
       result.push(...ledgerAccounts);
@@ -180,7 +180,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (injectedAccounts.length) {
       injectedAccounts.unshift({
         id: 'injected',
-        groupLabel: t('ui.ACCOUNT_SELECTOR_MODAL.components.Layout.parts.SelectAccount.AccountSelectorModal.extensionAccount')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.extensionAccount')
       });
 
       result.push(...injectedAccounts);
@@ -189,7 +189,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (unknownAccounts.length) {
       unknownAccounts.unshift({
         id: 'unknown',
-        groupLabel: t('ui.ACCOUNT_SELECTOR_MODAL.components.Layout.parts.SelectAccount.AccountSelectorModal.unknownAccount')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.unknownAccount')
       });
 
       result.push(...unknownAccounts);
@@ -369,7 +369,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       onClick: () => {
         navigate('/settings/account-settings');
       },
-      tooltip: t('ui.ACCOUNT_SELECTOR_MODAL.components.Layout.parts.SelectAccount.AccountSelectorModal.accountSettings'),
+      tooltip: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.accountSettings'),
       tooltipPlacement: 'topRight'
     };
   }, [navigate, t]);
@@ -393,7 +393,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           destroyTooltipOnHide={true}
           overlayClassName={CN('__tooltip-overlay-remind')}
           placement={'bottomLeft'}
-          title={t('ui.ACCOUNT_SELECTOR_MODAL.components.Layout.parts.SelectAccount.AccountSelectorModal.exportAndBackUpAccounts')}
+          title={t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.exportAndBackUpAccounts')}
         >
           <div>
             <Icon
@@ -437,7 +437,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         rightIconProps={rightIconProps}
         title={(
           <>
-            {t('ui.ACCOUNT_SELECTOR_MODAL.components.Layout.parts.SelectAccount.AccountSelectorModal.selectAccount')}
+            {t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.selectAccount')}
 
             <Button
               {...accountSettingButtonProps}
@@ -452,7 +452,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           className={'__search-box'}
           key={searchInputRenderKey}
           onSearch={handleSearch}
-          placeholder={t<string>('ui.ACCOUNT_SELECTOR_MODAL.components.Layout.parts.SelectAccount.AccountSelectorModal.accountName')}
+          placeholder={t<string>('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.accountName')}
           searchValue={searchValue}
           simpleLayout={true}
         />

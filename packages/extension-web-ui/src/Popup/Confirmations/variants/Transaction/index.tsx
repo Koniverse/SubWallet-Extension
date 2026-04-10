@@ -186,8 +186,8 @@ const Component: React.FC<Props> = (props: Props) => {
         {!!transaction.estimateFee?.tooHigh && (
           <AlertBox
             className='network-box'
-            description={t('ui.TRANSACTION.Popup.Confirmations.variants.Transaction.gasFeesOnAreHighDueToHighDemandsSoGasEstimatesAreLessAccurate', { replace: { networkName: network?.name } })}
-            title={t('ui.TRANSACTION.Popup.Confirmations.variants.Transaction.payAttention')}
+            description={t('ui.TRANSACTION.Confirmations.EvmTransaction.highGasFeeWarning', { replace: { networkName: network?.name } })}
+            title={t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention')}
             type='warning'
           />
         )}

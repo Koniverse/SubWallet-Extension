@@ -2479,7 +2479,7 @@ export default class KoniExtension {
         const amountLeft = sum.minus(amount).minus(new BigN(estimatedFee));
 
         if (amountLeft.lte(0)) {
-          error = 'Insufficient balance';
+          error = 'bg.koni.handler.Extension.insufficientBalance';
         } else {
           const senderAddressInfo = getBitcoinAddressInfo(address);
           const dustLimit = BTC_DUST_AMOUNT[senderAddressInfo.type] || 546;

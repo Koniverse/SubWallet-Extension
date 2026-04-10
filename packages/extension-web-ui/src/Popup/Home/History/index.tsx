@@ -550,11 +550,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('ui.HISTORY.Popup.Home.History.all'),
+        label: t('ui.HISTORY.screen.History.all'),
         value: FilterValue.ALL
       },
       {
-        label: t('ui.HISTORY.Popup.Home.History.tokens'),
+        label: t('ui.BALANCE.components.Modal.Customize.Modal.tokens'),
         value: FilterValue.TOKENS
       },
       {
@@ -562,7 +562,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         value: FilterValue.NFT
       },
       {
-        label: t('ui.HISTORY.Popup.Home.History.earning'),
+        label: t('ui.components.Layout.Base.earning'),
         value: FilterValue.EARN
       }
     ];

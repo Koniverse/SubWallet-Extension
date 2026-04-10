@@ -138,7 +138,7 @@ const Component: React.FC<Props> = ({ className, compound,
           <MetaInfo>
             <MetaInfo.Status
               statusIcon={EarningStatusUi[row.status].icon}
-              statusName={EarningStatusUi[row.status].name}
+              statusName={t(EarningStatusUi[row.status].name)}
               valueColorSchema={EarningStatusUi[row.status].schema}
             />
           </MetaInfo>

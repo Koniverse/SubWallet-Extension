@@ -45,19 +45,19 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <MetaInfo className={CN(className)}>
       <MetaInfo.DisplayType
-        label={t('ui.LAYOUT.Popup.Home.History.Detail.parts.Layout.transactionType')}
+        label={t('ui.HISTORY.screen.HistoryDetail.Layout.transactionType')}
         typeName={t(TxTypeNameMap[data.type])}
       />
       <HistoryDetailHeader data={data} />
       <MetaInfo.Status
-        label={t('ui.LAYOUT.Popup.Home.History.Detail.parts.Layout.transactionStatus')}
+        label={t('ui.HISTORY.screen.HistoryDetail.Layout.transactionStatus')}
         statusIcon={HistoryStatusMap[data.status].icon}
         statusName={t(HistoryStatusMap[data.status].name)}
         valueColorSchema={HistoryStatusMap[data.status].schema}
       />
-      <MetaInfo.Default label={t('ui.LAYOUT.Popup.Home.History.Detail.parts.Layout.extrinsicHash')}>{extrinsicHash}</MetaInfo.Default>
-      {!!data.time && (<MetaInfo.Default label={t('ui.LAYOUT.Popup.Home.History.Detail.parts.Layout.submittedTime')}>{formatHistoryDate(data.time, language, 'detail')}</MetaInfo.Default>)}
-      {!!data.blockTime && (<MetaInfo.Default label={t('ui.LAYOUT.Popup.Home.History.Detail.parts.Layout.blockTime')}>{formatHistoryDate(data.blockTime, language, 'detail')}</MetaInfo.Default>)}
+      <MetaInfo.Default label={t('ui.HISTORY.screen.HistoryDetail.Layout.extrinsicHash')}>{extrinsicHash}</MetaInfo.Default>
+      {!!data.time && (<MetaInfo.Default label={t('ui.HISTORY.screen.HistoryDetail.Layout.submittedTime')}>{formatHistoryDate(data.time, language, 'detail')}</MetaInfo.Default>)}
+      {!!data.blockTime && (<MetaInfo.Default label={t('ui.HISTORY.screen.HistoryDetail.Layout.blockTime')}>{formatHistoryDate(data.blockTime, language, 'detail')}</MetaInfo.Default>)}
       <HistoryDetailAmount data={data} />
 
       {

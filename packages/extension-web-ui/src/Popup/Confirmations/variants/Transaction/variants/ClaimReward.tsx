@@ -32,13 +32,12 @@ const Component: React.FC<Props> = (props: Props) => {
     const isRewardLtFee = new BigN(data.unclaimedReward || 0).lt(transaction.estimateFee?.value || 0);
 
     if (isRewardLteFee) {
-      // todo: will convert message to key for i18n later
       openAlert({
         title: t('ui.TRANSACTION.Confirmations.ClaimReward.payAttentionExclamation'),
         type: NotificationType.WARNING,
-        content: t(`The rewards you are about to claim are ${
-          isRewardLtFee ? 'smaller than' : 'equal to'
-        } the transaction fee. This means that you won’t receive any rewards after claiming. Do you wish to continue?`),
+        content: t(isRewardLtFee
+          ? 'ui.TRANSACTION.Confirmations.ClaimReward.rewardsSmallerThanFeeWarning'
+          : 'ui.TRANSACTION.Confirmations.ClaimReward.rewardsEqualToFeeWarning'),
         okButton: {
           text: t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsSmallerThanFeeWarning'),
           onClick: closeAlert,

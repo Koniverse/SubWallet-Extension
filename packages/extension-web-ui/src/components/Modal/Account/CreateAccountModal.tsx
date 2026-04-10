@@ -82,7 +82,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       disabled: false,
       icon: Leaf,
       key: 'new-seed-phrase',
-      label: t('ui.CREATE_ACCOUNT_MODAL.components.Modal.Account.CreateAccountModal.createWithANewSeedPhrase'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Create.createWithNewSeedPhrase'),
       onClick: () => {
         inactiveModal(modalId);
         setSelectedMnemonicType('general');
@@ -94,7 +94,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       disabled: disableDerive,
       icon: ShareNetwork,
       key: 'derive-account',
-      label: t('ui.CREATE_ACCOUNT_MODAL.components.Modal.Account.CreateAccountModal.deriveFromAnExistingAccount'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Create.deriveFromExistingAccount'),
       onClick: () => {
         inactiveModal(modalId);
         activeModal(DERIVE_ACCOUNT_LIST_MODAL);
@@ -115,7 +115,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           icon: <CloseIcon />,
           onClick: onCancel
         })}
-      title={t<string>('ui.CREATE_ACCOUNT_MODAL.components.Modal.Account.CreateAccountModal.createANewAccount')}
+      title={t<string>('ui.ACCOUNT.components.Modal.Account.Create.createNewAccount')}
     >
       <div className='items-container'>
         {items.map((item) => {

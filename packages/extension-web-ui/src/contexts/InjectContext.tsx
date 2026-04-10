@@ -486,7 +486,7 @@ export const InjectContextProvider: React.FC<Props> = ({ children }: Props) => {
     const subscription = injectHandler.errorSubject.subscribe((error) => {
       if (error.substrate && error.evm) {
         notification({
-          message: t('ui.INJECT_CONTEXT.contexts.InjectContext.failToConnectPleaseTryAgainLater'),
+          message: t('ui.DAPP.context.Inject.failToConnectTryAgain'),
           type: 'warning'
         });
       }

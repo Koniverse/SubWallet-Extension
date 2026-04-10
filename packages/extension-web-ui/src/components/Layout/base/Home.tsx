@@ -95,7 +95,7 @@ const Component = ({ children, className, onClickFilterIcon, onClickSearchIcon, 
 
         ),
         onClick: onOpenNotification,
-        tooltip: t('ui.HOME.components.Layout.base.Home.notifications'),
+        tooltip: t('ui.components.Layout.Home.notifications'),
         tooltipPlacement: 'bottomRight'
       });
     }

@@ -83,12 +83,12 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
 
   const filterOptions = [
-    { label: t('ui.EARNING_PREVIEW_POOLS.Popup.Home.Earning.EarningPreview.EarningPreviewPools.nominationPool'), value: YieldPoolType.NOMINATION_POOL },
-    { label: t('ui.EARNING_PREVIEW_POOLS.Popup.Home.Earning.EarningPreview.EarningPreviewPools.directNomination'), value: YieldPoolType.NATIVE_STAKING },
-    { label: t('ui.EARNING_PREVIEW_POOLS.Popup.Home.Earning.EarningPreview.EarningPreviewPools.liquidStaking'), value: YieldPoolType.LIQUID_STAKING },
-    { label: t('ui.EARNING_PREVIEW_POOLS.Popup.Home.Earning.EarningPreview.EarningPreviewPools.lending'), value: YieldPoolType.LENDING },
-    { label: t('ui.EARNING_PREVIEW_POOLS.Popup.Home.Earning.EarningPreview.EarningPreviewPools.parachainStaking'), value: YieldPoolType.PARACHAIN_STAKING },
-    { label: t('ui.EARNING_PREVIEW_POOLS.Popup.Home.Earning.EarningPreview.EarningPreviewPools.singleFarming'), value: YieldPoolType.SINGLE_FARMING }
+    { label: t('ui.EARNING.screen.EarningPools.nominationPool'), value: YieldPoolType.NOMINATION_POOL },
+    { label: t('ui.EARNING.screen.EarningPools.directNomination'), value: YieldPoolType.NATIVE_STAKING },
+    { label: t('ui.EARNING.screen.EarningPools.liquidStaking'), value: YieldPoolType.LIQUID_STAKING },
+    { label: t('ui.EARNING.screen.EarningPools.lending'), value: YieldPoolType.LENDING },
+    { label: t('ui.EARNING.screen.EarningPools.parachainStaking'), value: YieldPoolType.PARACHAIN_STAKING },
+    { label: t('ui.EARNING.screen.EarningPools.singleFarming'), value: YieldPoolType.SINGLE_FARMING }
   ];
 
   const items: YieldPoolInfo[] = useMemo(() => {
@@ -306,8 +306,8 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
     return (
       <EmptyList
         className='__empty-list-earning-pool'
-        emptyMessage={t('ui.EARNING_PREVIEW_POOLS.Popup.Home.Earning.EarningPreview.EarningPreviewPools.changeYourSearchAndTryAgain')}
-        emptyTitle={t('ui.EARNING_PREVIEW_POOLS.Popup.Home.Earning.EarningPreview.EarningPreviewPools.noEarningOptionFound')}
+        emptyMessage={t('ui.EARNING.screen.EarningPools.changeYourSearchAndTryAgain')}
+        emptyTitle={t('ui.EARNING.screen.EarningPools.noEarningOptionFound')}
         phosphorIcon={Vault}
       />
     );
@@ -355,7 +355,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
         subHeaderBackground={'transparent'}
         subHeaderCenter={false}
         subHeaderPaddingVertical={true}
-        title={t<string>('ui.EARNING_PREVIEW_POOLS.Popup.Home.Earning.EarningPreview.EarningPreviewPools.earningOptions', { replace: { symbol: symbol } })}
+        title={t<string>('ui.EARNING.screen.EarningPools.symbolEarningOptions', { replace: { symbol: symbol } })}
       >
         <div className={'__body-area'}>
           {
@@ -364,7 +364,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
                 <>
                   <Toolbar
                     className={'__desktop-toolbar'}
-                    inputPlaceholder={t<string>('ui.EARNING_PREVIEW_POOLS.Popup.Home.Earning.EarningPreview.EarningPreviewPools.searchToken')}
+                    inputPlaceholder={t<string>('ui.EARNING.screen.EarningPools.searchToken')}
                     onClickFilter={onClickFilterButton}
                     onSearch={setSearchInput}
                     searchValue={searchInput}
@@ -392,7 +392,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
                   renderWhenEmpty={emptyList}
                   searchFunction={searchFunction}
                   searchMinCharactersCount={1}
-                  searchPlaceholder={t<string>('ui.EARNING_PREVIEW_POOLS.Popup.Home.Earning.EarningPreview.EarningPreviewPools.searchToken')}
+                  searchPlaceholder={t<string>('ui.EARNING.screen.EarningPools.searchToken')}
                   showActionBtn
                 />
               )
@@ -400,14 +400,14 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
         </div>
 
         <FilterModal
-          applyFilterButtonTitle={t('ui.EARNING_PREVIEW_POOLS.Popup.Home.Earning.EarningPreview.EarningPreviewPools.applyFilter')}
+          applyFilterButtonTitle={t('ui.EARNING.screen.EarningPools.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('ui.EARNING_PREVIEW_POOLS.Popup.Home.Earning.EarningPreview.EarningPreviewPools.filter')}
+          title={t('ui.EARNING.screen.EarningPools.filter')}
         />
       </Layout.Base>
     </ChainConnectionWrapper>

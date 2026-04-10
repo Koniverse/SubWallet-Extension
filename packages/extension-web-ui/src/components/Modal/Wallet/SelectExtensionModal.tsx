@@ -139,7 +139,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('ui.SELECT_EXTENSION_MODAL.components.Modal.Wallet.SelectExtensionModal.changeYourSearchCriteriaAndTryAgain')}
+        emptyMessage={t('ui.components.EmptyList.General.changeSearchCriteriaAndTryAgain')}
         emptyTitle={t('ui.SELECT_EXTENSION_MODAL.components.Modal.Wallet.SelectExtensionModal.noExtensionsFound')}
         phosphorIcon={MagnifyingGlass}
       />

@@ -165,7 +165,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         ? [
           metaInfoNumber('Total stake', new BigN(item.totalStake)),
           {
-            label: t('ui.ACCOUNT_INFO_PART.Popup.Home.Earning.EarningPositionDetail.AccountAndNominationInfoPart.AccountInfoPart.derivativeTokenBalance'),
+            label: t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.derivativeTokenBalance'),
             value: item.subnetData?.originalTotalStake || '',
             decimals: inputAsset?.decimals || 0,
             suffix: item.subnetData?.subnetSymbol
@@ -180,7 +180,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
           : [
             metaInfoNumber('Total stake', new BigN(item.totalStake)),
             {
-              label: t('ui.ACCOUNT_INFO_PART.Popup.Home.Earning.EarningPositionDetail.AccountAndNominationInfoPart.AccountInfoPart.derivativeTokenBalance'),
+              label: t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.derivativeTokenBalance'),
               value: item.activeStake,
               decimals: deriveAsset?.decimals || 0,
               suffix: deriveAsset?.symbol
@@ -204,7 +204,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
               <MetaInfo.Account
                 address={item.address}
                 chainSlug={poolInfo.chain}
-                label={t('ui.ACCOUNT_INFO_PART.Popup.Home.Earning.EarningPositionDetail.AccountAndNominationInfoPart.AccountInfoPart.account')}
+                label={t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.account')}
               />
             )
             : (
@@ -212,13 +212,13 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
                 className={'__meta-earning-status-item'}
                 label={renderAccount(item)}
                 statusIcon={EarningStatusUi[item.status].icon}
-                statusName={EarningStatusUi[item.status].name}
+                statusName={t(EarningStatusUi[item.status].name)}
                 valueColorSchema={EarningStatusUi[item.status].schema}
               />
             )}
 
           <MetaInfo.Default
-            label={t('ui.ACCOUNT_INFO_PART.Popup.Home.Earning.EarningPositionDetail.AccountAndNominationInfoPart.AccountInfoPart.stakingType')}
+            label={t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.stakingType')}
             valueColorSchema={earningTagType.color as InfoItemBase['valueColorSchema']}
           >
             {earningTagType.label}
@@ -273,7 +273,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
           '-horizontal-mode': isAllAccount,
           '-has-one-item': list.length === 1
         })}
-        title={t('ui.ACCOUNT_INFO_PART.Popup.Home.Earning.EarningPositionDetail.AccountAndNominationInfoPart.AccountInfoPart.accountInfo')}
+        title={t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.accountInfo')}
       >
 
         {isAllAccount && list.length > 1

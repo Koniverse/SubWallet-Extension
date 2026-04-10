@@ -26,7 +26,7 @@ export const TRANSACTION_TITLE_MAP: Record<ExtrinsicType, string> = {
   [ExtrinsicType.STAKING_CANCEL_COMPOUNDING]: detectTranslate('ui.TRANSACTION.constant.transaction.cancelCompound'),
   [ExtrinsicType.JOIN_YIELD_POOL]: detectTranslate('ui.TRANSACTION.constant.transaction.startEarning'), // TODO: Change this
   [ExtrinsicType.EVM_EXECUTE]: detectTranslate('ui.TRANSACTION.constant.transaction.execute'),
-  [ExtrinsicType.UNKNOWN]: detectTranslate('ui.TRANSACTION.constants.transaction.unknown'),
+  [ExtrinsicType.UNKNOWN]: detectTranslate('ui.HISTORY.constant.history.unknown'),
 
   [ExtrinsicType.MINT_VDOT]: detectTranslate('ui.TRANSACTION.constant.transaction.mintVDot'), // TODO: Change this
   [ExtrinsicType.MINT_VMANTA]: detectTranslate('ui.TRANSACTION.constant.transaction.mintVManta'), // TODO: Change this

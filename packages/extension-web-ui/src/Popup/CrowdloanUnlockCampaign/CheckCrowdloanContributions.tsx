@@ -230,7 +230,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                   onClick={onClickCreateNewWallet}
                   schema='primary'
                 >
-                  {t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.createANewAccount')}
+                  {t('ui.ACCOUNT.components.Layout.SelectAccount.Footer.createNewAccount')}
                 </Button>
               </div>
             )

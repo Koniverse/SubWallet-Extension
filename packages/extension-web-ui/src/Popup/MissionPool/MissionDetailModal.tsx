@@ -32,11 +32,11 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
 
   const timeline = useMemo<string>(() => {
     if (!data?.start_time && !data?.end_time) {
-      return t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.tbd');
+      return t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.tbd');
     }
 
-    const start = data.start_time ? customFormatDate(new Date(data.start_time), '#DD# #MMM# #YYYY#') : t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.tbd');
-    const end = data.end_time ? customFormatDate(new Date(data.end_time), '#DD# #MMM# #YYYY#') : t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.tbd');
+    const start = data.start_time ? customFormatDate(new Date(data.start_time), '#DD# #MMM# #YYYY#') : t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.tbd');
+    const end = data.end_time ? customFormatDate(new Date(data.end_time), '#DD# #MMM# #YYYY#') : t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.tbd');
 
     return `${start} - ${end}`;
   }, [data?.end_time, data?.start_time, t]);
@@ -126,7 +126,7 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
               valueColorScheme={'light'}
             >
               <MetaInfo.Default
-                label={t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.name')}
+                label={t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.name')}
               >
                 {data.name}
               </MetaInfo.Default>
@@ -134,7 +134,7 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
               {
                 !!data.chains && data.chains.length > 1 && (
                   <MetaInfo.Default
-                    label={t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.network')}
+                    label={t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.network')}
                   >
                     <NetworkGroup chains={data.chains} />
                   </MetaInfo.Default>
@@ -145,12 +145,12 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
                 !!data.chains && data.chains.length === 1 && (
                   <MetaInfo.Chain
                     chain={data.chains[0]}
-                    label={t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.network')}
+                    label={t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.network')}
                   />
                 )
               }
               <MetaInfo.Default
-                label={t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.status')}
+                label={t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.status')}
                 valueColorSchema={valueColorSchema}
               >
                 {status}
@@ -159,7 +159,7 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
               {data?.categories && data.categories.length > 0 && (
                 <MetaInfo.Default
                   className='__category-pool'
-                  label={t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.categories')}
+                  label={t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.categories')}
                 >
                   {data.categories.map((category, index) => (
                     <Tag
@@ -179,31 +179,31 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
 
               <MetaInfo.Default
                 className={'-vertical'}
-                label={t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.description')}
+                label={t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.description')}
                 valueColorSchema={'gray'}
               >
                 <Markdown remarkPlugins={[remarkGfm]}>{data.description}</Markdown>
               </MetaInfo.Default>
               {!!data.total_supply && <MetaInfo.Default
-                label={t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.totalTokenSupply')}
+                label={t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.totalTokenSupply')}
                 valueColorSchema={'gray'}
               >
                 {data.total_supply}
               </MetaInfo.Default>}
               <MetaInfo.Default
-                label={t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.totalRewards')}
+                label={t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.totalRewards')}
                 valueColorSchema={'gray'}
               >
                 {data.reward}
               </MetaInfo.Default>
               <MetaInfo.Default
-                label={t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.timeline')}
+                label={t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.timeline')}
                 valueColorSchema={'success'}
               >
                 {timeline}
               </MetaInfo.Default>
               <MetaInfo.Default
-                label={t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.totalWinners')}
+                label={t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.totalWinners')}
                 valueColorSchema={'gray'}
               >
                 {data.total_winner}
@@ -255,7 +255,7 @@ function Component ({ className = '', data }: Props): React.ReactElement<Props> 
                   shape={'circle'}
                   size={'xs'}
                 >
-                  {t('ui.MISSION_DETAIL_MODAL.Popup.MissionPool.MissionDetailModal.joinNow')}
+                  {t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.joinNow')}
                 </Button>
               </div>
             </div>

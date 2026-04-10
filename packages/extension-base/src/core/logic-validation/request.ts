@@ -226,7 +226,7 @@ export async function validationAuthMiddleware (koni: KoniState, url: string, pa
       payload.pair = keyring.getPair(address);
 
       if (!payload.pair) {
-        return handleAuthError(payload, 'Unable to find account', 'dApp', errors);
+        return handleAuthError(payload, 'bg.koni.handler.Extension.unableToFindAccount', 'dApp', errors);
       } else {
         const authList = await koni.getAuthList();
 
@@ -322,7 +322,7 @@ export async function validationConnectMiddleware (koni: KoniState, url: string,
       handleError((e as Error).message);
     }
   } else {
-    handleError('This network is currently not supported');
+    handleError('bg.DAPP.background.error.EvmProvider.networkCurrentlyNotSupported');
   }
 
   return {
@@ -497,7 +497,7 @@ export async function validationEvmDataTransactionMiddleware (koni: KoniState, u
       if (!estimateGas) {
         handleError('Can\'t calculate estimate gas fee');
       } else if (balance.lt(new BN(estimateGas).add(new BN(autoFormatNumber(transactionParams.value) || '0')))) {
-        handleError('Insufficient balance');
+        handleError('bg.koni.handler.Extension.insufficientBalance');
       }
     } catch (e) {
       handleError((e as Error).message);
@@ -575,7 +575,7 @@ export async function validationEvmSignMessageMiddleware (koni: KoniState, url: 
 
   if (method) {
     if (['eth_sign', 'personal_sign', 'eth_signTypedData', 'eth_signTypedData_v1', 'eth_signTypedData_v3', 'eth_signTypedData_v4'].indexOf(method) < 0) {
-      handleError('Unsupported action');
+      handleError('bg.DAPP.services.service.request.EvmHandler.unsupportedAction');
     }
 
     try {
@@ -611,7 +611,7 @@ export async function validationEvmSignMessageMiddleware (koni: KoniState, url: 
 
           break;
         default:
-          throw new Error('Unsupported action');
+          throw new Error('bg.DAPP.services.service.request.EvmHandler.unsupportedAction');
       }
     } catch (e) {
       console.error(e);
@@ -661,7 +661,7 @@ export function validationAuthWCMiddleware (koni: KoniState, url: string, payloa
 
     if (!address || !isString(address)) {
       payload.errorPosition = 'dApp';
-      const [message] = convertErrorMessage('Unable to find account');
+      const [message] = convertErrorMessage('bg.koni.handler.Extension.unableToFindAccount');
 
       errors.push(new Error(message));
     } else {
@@ -670,7 +670,7 @@ export function validationAuthWCMiddleware (koni: KoniState, url: string, payloa
 
         if (!payload.pair) {
           payload.errorPosition = 'dApp';
-          const [message] = convertErrorMessage('Unable to find account');
+          const [message] = convertErrorMessage('bg.koni.handler.Extension.unableToFindAccount');
 
           errors.push(new Error(message));
         }
@@ -711,13 +711,13 @@ export async function validationAuthCardanoMiddleware (koni: KoniState, url: str
   const currentNetworkId = +(currentNetwork === 'cardano');
 
   if (!currentAddress || !authInfo.isAllowedMap[currentAddress]) {
-    return handleAuthError(payload, 'Unable to find account', 'dApp', errors);
+    return handleAuthError(payload, 'bg.koni.handler.Extension.unableToFindAccount', 'dApp', errors);
   }
 
   const pair = keyring.getPair(currentAddress);
 
   if (!pair) {
-    return handleAuthError(payload, 'Unable to find account', 'dApp', errors);
+    return handleAuthError(payload, 'bg.koni.handler.Extension.unableToFindAccount', 'dApp', errors);
   }
 
   payload.pair = pair;
@@ -852,7 +852,7 @@ export async function validationBitcoinConnectMiddleware (koni: KoniState, url: 
       }
     }
   } else {
-    handleError('This network is currently not supported');
+    handleError('bg.DAPP.background.error.EvmProvider.networkCurrentlyNotSupported');
   }
 
   return {

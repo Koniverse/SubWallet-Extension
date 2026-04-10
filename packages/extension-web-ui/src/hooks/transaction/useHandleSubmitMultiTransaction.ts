@@ -56,7 +56,7 @@ const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonPro
         const { errors: _errors, id, processId, warnings } = rs;
 
         if (_errors.length || warnings.length) {
-          if (_errors[0]?.message !== 'Rejected by user') {
+          if (_errors[0]?.message !== 'bg.NETWORK.background.error.Provider.rejectedByUser') {
             if (
               _errors[0]?.message.startsWith('UnknownError Connection to Indexed DataBase server lost') ||
               _errors[0]?.message.startsWith('Provided address is invalid, the capitalization checksum test failed') ||

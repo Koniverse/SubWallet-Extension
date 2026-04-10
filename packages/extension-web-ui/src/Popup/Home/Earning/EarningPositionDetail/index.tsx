@@ -137,11 +137,11 @@ function Component ({ compound,
   const onLeavePool = useCallback(() => {
     if (isActiveStakeZero) {
       openAlert({
-        title: t('ui.EARNING_POSITION_DETAIL.Popup.Home.Earning.EarningPositionDetail.unstakingNotAvailable'),
+        title: t('ui.EARNING.screen.EarningPositionDetail.unstakingNotAvailable'),
         type: NotificationType.ERROR,
-        content: t('ui.EARNING_POSITION_DETAIL.Popup.Home.Earning.EarningPositionDetail.youDonTHaveAnyStakedFundsLeftToUnstakeCheckWithdrawalStatusHowLongLeftUntilTheUnstakingPeriodEndsByCheckingTheWithdrawInfoKeepInMindThatYouNeedToWithdrawManually'),
+        content: t('ui.EARNING.screen.EarningPositionDetail.noStakedFundsToUnstake'),
         okButton: {
-          text: t('ui.EARNING_POSITION_DETAIL.Popup.Home.Earning.EarningPositionDetail.ok'),
+          text: t('ui.EARNING.screen.EarningPositionDetail.ok'),
           onClick: closeAlert
         }
       });
@@ -220,7 +220,7 @@ function Component ({ compound,
         subHeaderCenter={false}
         subHeaderIcons={subHeaderButtons}
         subHeaderPaddingVertical={true}
-        title={t<string>('ui.EARNING_POSITION_DETAIL.Popup.Home.Earning.EarningPositionDetail.earningPositionDetails')}
+        title={t<string>('ui.EARNING.screen.EarningPositionDetail.earningPositionDetails')}
       >
         {
           isWebUI && (
@@ -288,7 +288,7 @@ function Component ({ compound,
           !isWebUI && (
             <>
               <div className={'__active-stake-info-area'}>
-                <div className={'__active-stake-title'}>{t('ui.EARNING_POSITION_DETAIL.Popup.Home.Earning.EarningPositionDetail.activeStake')}</div>
+                <div className={'__active-stake-title'}>{t('ui.EARNING.screen.EarningPositionDetail.activeStake')}</div>
                 <Number
                   className={'__active-stake-value'}
                   decimal={inputAsset?.decimals || 0}
@@ -332,7 +332,7 @@ function Component ({ compound,
                   onClick={onLeavePool}
                   schema='secondary'
                 >
-                  {poolInfo.type === YieldPoolType.LENDING ? t('ui.EARNING_POSITION_DETAIL.Popup.Home.Earning.EarningPositionDetail.withdraw') : t('ui.EARNING_POSITION_DETAIL.Popup.Home.Earning.EarningPositionDetail.unstake')}
+                  {poolInfo.type === YieldPoolType.LENDING ? t('ui.EARNING.screen.EarningPositionDetail.withdraw') : t('ui.EARNING.screen.EarningPositionDetail.unstake')}
                 </Button>
 
                 <Button
@@ -347,7 +347,7 @@ function Component ({ compound,
                   onClick={onEarnMore}
                   schema='secondary'
                 >
-                  {poolInfo.type === YieldPoolType.LENDING ? t('ui.EARNING_POSITION_DETAIL.Popup.Home.Earning.EarningPositionDetail.supplyMore') : t('ui.EARNING_POSITION_DETAIL.Popup.Home.Earning.EarningPositionDetail.stakeMore')}
+                  {poolInfo.type === YieldPoolType.LENDING ? t('ui.EARNING.screen.EarningPositionDetail.supplyMore') : t('ui.EARNING.screen.EarningPositionDetail.stakeMore')}
                 </Button>
               </div>
 

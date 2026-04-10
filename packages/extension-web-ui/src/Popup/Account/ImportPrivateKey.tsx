@@ -108,10 +108,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         const { isValid } = await validateAccountName({ name: value });
 
         if (!isValid) {
-          return Promise.reject(t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.accountNameAlreadyInUse'));
+          return Promise.reject(t('ui.ACCOUNT.screen.Account.ImportPrivateKey.accountNameInUse'));
         }
       } catch (e) {
-        return Promise.reject(t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.accountNameInvalid'));
+        return Promise.reject(t('ui.ACCOUNT.screen.Account.ImportPrivateKey.accountNameInvalid'));
       }
     }
 
@@ -164,7 +164,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         if (privateKeyChanged) {
           setValidateState({
             status: 'error',
-            message: t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.privateKeyIsRequired')
+            message: t('ui.ACCOUNT.screen.Account.ImportPrivateKey.privateKeyRequired')
           });
         }
       }
@@ -203,7 +203,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         onBack={onBack}
         rightFooterButton={!isWebUI
           ? {
-            children: validating ? t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.validating') : t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.importAccount'),
+            children: validating ? t('ui.ACCOUNT.screen.Account.ImportPrivateKey.validating') : t('ui.ACCOUNT.screen.Account.ImportPrivateKey.importAccount'),
             icon: FooterIcon,
             onClick: form.submit,
             disabled: !privateKey || !!validateState.status || isDisable,
@@ -216,7 +216,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             onClick: goHome
           }
         ]}
-        title={t<string>('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.importFromPrivateKey')}
+        title={t<string>('ui.ACCOUNT.screen.Account.ImportPrivateKey.importFromPrivateKey')}
       >
         <div className={'container'}>
           <div className='import-container'>
@@ -241,7 +241,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 <PrivateKeyInput
                   className='private-key-input'
                   hideText={!show}
-                  label={t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.privateKey')}
+                  label={t('ui.ACCOUNT.screen.Account.ImportPrivateKey.privateKey')}
                   placeholder={t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.enterOrPastePrivateKey')}
                   statusHelp={validateState.message}
                 />
@@ -250,7 +250,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 className={CN('__account-name-field')}
                 name={'name'}
                 rules={[{
-                  message: t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.accountNameIsRequired'),
+                  message: t('ui.ACCOUNT.screen.Account.ImportPrivateKey.accountNameRequired'),
                   transform: (value: string) => value.trim(),
                   required: true
                 }, {
@@ -261,8 +261,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 <Input
                   className='__account-name-input'
                   disabled={loading}
-                  label={t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.accountName')}
-                  placeholder={t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.enterTheAccountName')}
+                  label={t('ui.ACCOUNT.screen.Account.ImportPrivateKey.accountName')}
+                  placeholder={t('ui.ACCOUNT.screen.Account.ImportPrivateKey.enterAccountName')}
                 />
               </Form.Item>
               <div className='button-container'>
@@ -278,7 +278,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   size='xs'
                   type='ghost'
                 >
-                  {show ? t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.hidePrivateKey') : t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.showPrivateKey')}
+                  {show ? t('ui.ACCOUNT.screen.Account.ImportPrivateKey.hidePrivateKey') : t('ui.ACCOUNT.screen.Account.ImportPrivateKey.showPrivateKey')}
                 </Button>
               </div>
               <Form.Item hidden={!isWebUI}>
@@ -289,7 +289,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   loading={validating || loading}
                   onClick={form.submit}
                 >
-                  {validating ? t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.validating') : t('ui.IMPORT_PRIVATE_KEY.Popup.Account.ImportPrivateKey.importAccount')}
+                  {validating ? t('ui.ACCOUNT.screen.Account.ImportPrivateKey.validating') : t('ui.ACCOUNT.screen.Account.ImportPrivateKey.importAccount')}
                 </Button>
               </Form.Item>
             </Form>

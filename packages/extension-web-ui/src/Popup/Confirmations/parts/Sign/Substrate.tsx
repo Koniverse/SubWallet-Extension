@@ -149,7 +149,7 @@ const Component: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     if (isOpenAlert) {
       openAlert({
-        title: t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.payAttention'),
+        title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
         type: NotificationType.WARNING,
         content: (
           <Trans
@@ -162,11 +162,11 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={detectTranslate('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.networkSMetadataIsOutOfDateWhichMayCauseTheTransactionToFailUpdateMetadataUsingHighlightThisGuideHighlightOrApproveTransactionAtYourOwnRisk')}
+            i18nKey={detectTranslate('ui.DAPP.Confirmations.Sign.Substrate.metadataOutOfDateUpdateOrApprove')}
             values={{ networkName }}
           />),
         okButton: {
-          text: t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.iUnderstand'),
+          text: t('ui.DAPP.Confirmations.Sign.Substrate.iUnderstand'),
           icon: CheckCircle,
           iconWeight: 'fill',
           onClick: closeAlert
@@ -183,7 +183,7 @@ const Component: React.FC<Props> = (props: Props) => {
         if (requireMetadata) {
           return {
             type: 'error',
-            title: t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.error'),
+            title: t('ui.DAPP.Confirmations.Sign.Substrate.errorExclamation'),
             description: (
               <Trans
                 components={{
@@ -195,7 +195,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     />
                   )
                 }}
-                i18nKey={detectTranslate('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.networkSMetadataIsOutOfDateUpdateMetadataUsingHighlightThisGuideHighlightAndTryAgain')}
+                i18nKey={detectTranslate('ui.DAPP.Confirmations.Sign.Substrate.metadataOutOfDateUpdateAndRetry')}
                 values={{ networkName }}
               />
             )
@@ -203,7 +203,7 @@ const Component: React.FC<Props> = (props: Props) => {
         } else {
           return {
             type: 'warning',
-            title: t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.payAttention'),
+            title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
             description: (
               <Trans
                 components={{
@@ -215,7 +215,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     />
                   )
                 }}
-                i18nKey={detectTranslate('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.networkSMetadataIsOutOfDateWhichMayCauseTheTransactionToFailUpdateMetadataUsingHighlightThisGuideHighlightOrApproveTransactionAtYourOwnRisk')}
+                i18nKey={detectTranslate('ui.DAPP.Confirmations.Sign.Substrate.metadataOutOfDateUpdateOrApprove')}
                 values={{ networkName }}
               />
             )
@@ -226,8 +226,8 @@ const Component: React.FC<Props> = (props: Props) => {
           if (requireMetadata && isMissingData && !addExtraData) {
             return {
               type: 'error',
-              title: t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.error'),
-              description: t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.unableToSignThisTransactionOnLedgerBecauseTheDappIsOutOfDate')
+              title: t('ui.DAPP.Confirmations.Sign.Substrate.errorExclamation'),
+              description: t('ui.DAPP.Confirmations.Sign.Substrate.unableToSignLedgerDappOutOfDate')
             };
           }
 
@@ -237,7 +237,7 @@ const Component: React.FC<Props> = (props: Props) => {
             if (NotNeedMigrationGens.includes(gens)) {
               return {
                 type: 'info',
-                title: t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.helpfulTip'),
+                title: t('ui.DAPP.Confirmations.Sign.Substrate.helpfulTip'),
                 description: (
                   <Trans
                     components={{
@@ -249,14 +249,14 @@ const Component: React.FC<Props> = (props: Props) => {
                         />
                       )
                     }}
-                    i18nKey={detectTranslate('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.toSignThisTransactionOpenPolkadotAppOnLedgerHitRefreshAndApproveAgainForABetterExperienceReAttachYourPolkadotNewAccountUsingHighlightThisGuideHighlight')}
+                    i18nKey={detectTranslate('ui.DAPP.Confirmations.Sign.Substrate.ledgerSignWithPolkadotApp')}
                   />
                 )
               };
             } else {
               return {
                 type: 'info',
-                title: t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.helpfulTip'),
+                title: t('ui.DAPP.Confirmations.Sign.Substrate.helpfulTip'),
                 description: (
                   <Trans
                     components={{
@@ -268,7 +268,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         />
                       )
                     }}
-                    i18nKey={detectTranslate('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.toSignThisTransactionOpenPolkadotMigrationAppOnLedgerHitRefreshAndApproveAgainForABetterExperienceMoveYourAssetsOnNetworkToThePolkadotNewAccountUsingHighlightThisGuideHighlight')}
+                    i18nKey={detectTranslate('ui.DAPP.Confirmations.Sign.Substrate.ledgerSignWithMigrationApp')}
                     values={{ networkName }}
                   />
                 )
@@ -279,8 +279,8 @@ const Component: React.FC<Props> = (props: Props) => {
           if (signMode === AccountSignMode.GENERIC_LEDGER || signMode === AccountSignMode.ECDSA_SUBSTRATE_LEDGER) {
             return {
               type: 'error',
-              title: t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.error'),
-              description: t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.unableToSignThisTransactionOnLedgerBecauseTheNetworkIsOutOfDate', { replace: { networkName } })
+              title: t('ui.DAPP.Confirmations.Sign.Substrate.errorExclamation'),
+              description: t('ui.DAPP.Confirmations.Sign.Substrate.unableToSignLedgerNetworkOutOfDate', { replace: { networkName } })
             };
           }
         }
@@ -468,7 +468,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
       if (currentTime >= txExpirationTime) {
         notify({
-          message: t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.transactionExpired'),
+          message: t('ui.DAPP.Confirmations.Sign.Substrate.transactionExpired'),
           type: 'error'
         });
         onCancel();
@@ -559,7 +559,7 @@ const Component: React.FC<Props> = (props: Props) => {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.cancel')}
+          {t('ui.DAPP.Confirmations.Sign.Substrate.cancel')}
         </Button>
         <Button
           disabled={showQuoteExpired || loadingChain || hashLoading || (isMessage ? !modeCanSignMessage.includes(signMode) : alertData?.type === 'error')}
@@ -574,10 +574,10 @@ const Component: React.FC<Props> = (props: Props) => {
         >
           {
             !isLedger
-              ? t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.approve')
+              ? t('ui.DAPP.Confirmations.Sign.Substrate.approve')
               : !isLedgerConnected
-                ? t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.refresh')
-                : t('ui.SUBSTRATE.Popup.Confirmations.parts.Sign.Substrate.approve')
+                ? t('ui.DAPP.Confirmations.Sign.Substrate.refresh')
+                : t('ui.DAPP.Confirmations.Sign.Substrate.approve')
           }
         </Button>
         {

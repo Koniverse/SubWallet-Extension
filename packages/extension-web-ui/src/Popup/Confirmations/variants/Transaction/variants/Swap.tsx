@@ -100,13 +100,13 @@ const Component: React.FC<Props> = (props: Props) => {
         <MetaInfo.Account
           address={recipientAddress}
           className={'__recipient-item'}
-          label={t('ui.SWAP.Popup.Confirmations.variants.Transaction.variants.Swap.recipient')}
+          label={t('ui.TRANSACTION.Confirmations.Process.Swap.recipient')}
           name={account?.name}
           networkPrefix={networkPrefix}
         />
         <MetaInfo.Default
           className={'__quote-rate-confirm'}
-          label={t('ui.SWAP.Popup.Confirmations.variants.Transaction.variants.Swap.quoteRate')}
+          label={t('ui.TRANSACTION.Confirmations.Process.Swap.quoteRate')}
           valueColorSchema={'gray'}
         >
           <QuoteRateDisplay
@@ -126,7 +126,7 @@ const Component: React.FC<Props> = (props: Props) => {
         />
         <MetaInfo.Default
           className={'-d-column'}
-          label={t('ui.SWAP.Popup.Confirmations.variants.Transaction.variants.Swap.swapRoute')}
+          label={t('ui.TRANSACTION.Confirmations.Swap.swapRoute')}
         >
         </MetaInfo.Default>
         <SwapRoute swapRoute={data.quote.route} />
@@ -135,22 +135,22 @@ const Component: React.FC<Props> = (props: Props) => {
       {!showQuoteExpired && getWaitingTime > 0 && <AlertBox
         className={'__swap-arrival-time'}
         description={t('ui.TRANSACTION.Confirmations.Swap.swapProviderWaitingTime', { replace: { provider: data.provider.name, getWaitingTime } })}
-        title={t('ui.SWAP.Popup.Confirmations.variants.Transaction.variants.Swap.payAttention')}
+        title={t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention')}
         type='warning'
       />}
       {!showQuoteExpired && isSwapXCM && (
         <AlertBox
           className={'__swap-quote-warning'}
-          description={t('ui.SWAP.Popup.Confirmations.variants.Transaction.variants.Swap.theSwapQuoteHasBeenUpdatedMakeSureToDoubleCheckAllInformationBeforeConfirmingTheTransaction')}
-          title={t('ui.SWAP.Popup.Confirmations.variants.Transaction.variants.Swap.payAttention')}
+          description={t('ui.TRANSACTION.Confirmations.Process.Swap.swapQuoteUpdated')}
+          title={t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention')}
           type='warning'
         />
       )}
       {isKyberProvider && (
         <AlertBox
           className={'__swap-quote-warning'}
-          description={t('ui.SWAP.Popup.Confirmations.variants.Transaction.variants.Swap.dueToMarketConditionsYouMayReceiveMoreOrLessThanExpected')}
-          title={t('ui.SWAP.Popup.Confirmations.variants.Transaction.variants.Swap.payAttention')}
+          description={t('ui.TRANSACTION.Confirmations.Swap.marketConditionsMayAffectAmount')}
+          title={t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention')}
           type='warning'
         />
       )}
@@ -158,8 +158,8 @@ const Component: React.FC<Props> = (props: Props) => {
           (
             <AlertBox
               className={'__swap-quote-warning'}
-              description={t('ui.SWAP.Popup.Confirmations.variants.Transaction.variants.Swap.swapQuoteExpiredCancelToGetANewQuote')}
-              title={t('ui.SWAP.Popup.Confirmations.variants.Transaction.variants.Swap.payAttention')}
+              description={t('ui.TRANSACTION.Confirmations.Process.Swap.swapQuoteExpired')}
+              title={t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention')}
               type='warning'
             />)
       }

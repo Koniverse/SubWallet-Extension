@@ -36,7 +36,7 @@ function Component () {
   useEffect(() => {
     if (redirectFromPreviewRef.current) {
       openAlert({
-        title: t('ui.EARNING_ENTRY.Popup.Home.Earning.EarningEntry.invalidAccountType'),
+        title: t('bg.TRANSACTION.core.validation.request.invalidAccountType'),
         type: NotificationType.ERROR,
         content: t('ui.EARNING_ENTRY.Popup.Home.Earning.EarningEntry.youDonTHaveAnyAccountToStakeOnNetworkYetCreateANewAccountAndTryAgain', { replace: { chainName: chainNameRef.current } }),
         cancelButton: {
@@ -45,7 +45,7 @@ function Component () {
           icon: XCircle
         },
         okButton: {
-          text: t('ui.EARNING_ENTRY.Popup.Home.Earning.EarningEntry.createNew'),
+          text: t('ui.ACCOUNT.hook.account.useHandleTonWarning.createNew'),
           onClick: () => {
             closeAlert();
             setReturnStorage('/transaction/earn');

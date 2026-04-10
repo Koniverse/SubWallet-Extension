@@ -281,7 +281,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.all'),
+        label: t('ui.CROWDLOAN.screen.Crowdloans.all'),
         value: FilterValue.ALL
       },
       {
@@ -289,7 +289,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
         value: FilterValue.IN_AUCTION
       },
       {
-        label: t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.won'),
+        label: t('ui.CROWDLOAN.screen.Crowdloans.won'),
         value: FilterValue.WON
       }
     ];
@@ -575,7 +575,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                 onClick={onClickCreateNewWallet}
                 schema='primary'
               >
-                {t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createANewAccount')}
+                {t('ui.ACCOUNT.components.Layout.SelectAccount.Footer.createNewAccount')}
               </Button>
             </div>
           </div>

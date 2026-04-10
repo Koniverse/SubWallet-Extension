@@ -75,17 +75,17 @@ const Component: React.FC<Props> = (props: Props) => {
     if (value > 0) {
       return {
         value: value,
-        label: t('ui.SECURITY.Popup.Settings.Security.minutes', { replace: { time: value } })
+        label: t('ui.SETTINGS.screen.Setting.Security.timeMinutes', { replace: { time: value } })
       };
     } else if (value < 0) {
       return {
         value: value,
-        label: t('ui.SECURITY.Popup.Settings.Security.requiredOnce')
+        label: t('ui.SETTINGS.screen.Setting.Security.requiredOnce')
       };
     } else {
       return {
         value: value,
-        label: t('ui.SECURITY.Popup.Settings.Security.alwaysRequire')
+        label: t('ui.SETTINGS.screen.Setting.Security.alwaysRequire')
       };
     }
   }), [t]);
@@ -108,7 +108,7 @@ const Component: React.FC<Props> = (props: Props) => {
     {
       icon: LockKeyOpen,
       key: SecurityType.UNLOCK_TYPE,
-      title: t('ui.SECURITY.Popup.Settings.Security.authenticateWithPassword'),
+      title: t('ui.SETTINGS.screen.Setting.Security.authenticateWithPassword'),
       url: '',
       disabled: false
     }
@@ -117,7 +117,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const websiteAccessItem = useMemo((): SecurityItem => ({
     icon: GlobeHemisphereEast,
     key: SecurityType.WEBSITE_ACCESS,
-    title: t('ui.SECURITY.Popup.Settings.Security.manageWebsiteAccess'),
+    title: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.manageWebsiteAccess'),
     url: '/settings/dapp-access',
     disabled: noAccount
   }), [noAccount, t]);
@@ -296,7 +296,7 @@ const Component: React.FC<Props> = (props: Props) => {
     <PageWrapper className={CN(className)}>
       <Layout.WithSubHeaderOnly
         onBack={onBack}
-        title={t('ui.SECURITY.Popup.Settings.Security.securitySettings')}
+        title={t('ui.SETTINGS.screen.Setting.Security.securitySettings')}
       >
         <div className='body-container'>
           <div className='items-container'>
@@ -304,7 +304,7 @@ const Component: React.FC<Props> = (props: Props) => {
           </div>
           <div className='setting-config-container hidden'>
             <div className='label'>
-              {t('ui.SECURITY.Popup.Settings.Security.websiteAccess')}
+              {t('ui.SETTINGS.screen.Setting.Root.websiteAccess')}
             </div>
             <div className='items-container'>
               {onRenderItem(websiteAccessItem)}
@@ -319,7 +319,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     weight='fill'
                   />
                 )}
-                name={t('ui.SECURITY.Popup.Settings.Security.advancedPhishingDetection')}
+                name={t('ui.SETTINGS.screen.Setting.Security.advancedPhishingDetection')}
                 rightItem={(
                   <Switch
                     checked={enableChainPatrol}
@@ -366,10 +366,10 @@ const Component: React.FC<Props> = (props: Props) => {
               </div>
               <div className='__item-center-part'>
                 <div className='__item-title'>
-                  {t('ui.SECURITY.Popup.Settings.Security.signForMultipleTransactions')}
+                  {t('ui.SETTINGS.screen.Setting.Security.signForMultipleTransactions')}
                 </div>
                 <div className='__item-description'>
-                  {t('ui.SECURITY.Popup.Settings.Security.allowSigningOnceForMultipleTransactions')}
+                  {t('ui.SETTINGS.screen.Setting.Security.allowSignOnceForMultiple')}
                 </div>
               </div>
               <div className='__item-right-part'>
@@ -423,7 +423,7 @@ const Component: React.FC<Props> = (props: Props) => {
           className={className}
           id={editUnlockTypeModalId}
           onCancel={onCloseUnlockTypeModal}
-          title={t('ui.SECURITY.Popup.Settings.Security.authenticateWithPassword')}
+          title={t('ui.SETTINGS.screen.Setting.Security.authenticateWithPassword')}
         >
           <div className='modal-body-container'>
             <SettingItem

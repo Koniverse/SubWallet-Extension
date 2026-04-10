@@ -74,7 +74,7 @@ function Component ({ className, poolInfo }: Props) {
           }
           onClick={onViewOnExplorer}
           type={'ghost'}
-        >{t('ui.SUBNET_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.SubnetInfoDesktopPart.viewOnExplorer')}</Button>
+        >{t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.viewOnExplorer')}</Button>
       </div>
     </>
   );

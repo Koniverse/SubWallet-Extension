@@ -164,7 +164,7 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [checkUnlock, openCamera]);
 
   const buttonProps = {
-    children: loading ? t('ui.IMPORT_QR_CODE.Popup.Account.ImportQrCode.creating') : t('ui.IMPORT_QR_CODE.Popup.Account.ImportQrCode.scanTheQrCode'),
+    children: loading ? t('ui.ACCOUNT.screen.Account.ImportQrCode.creating') : t('ui.IMPORT_QR_CODE.Popup.Account.ImportQrCode.scanTheQrCode'),
     icon: FooterIcon,
     onClick: onScan,
     loading: loading
@@ -176,7 +176,7 @@ const Component: React.FC<Props> = (props: Props) => {
         onBack={onBack}
         rightFooterButton={!isWebUI
           ? {
-            children: loading ? t('ui.IMPORT_QR_CODE.Popup.Account.ImportQrCode.creating') : t('ui.IMPORT_QR_CODE.Popup.Account.ImportQrCode.scanQr'),
+            children: loading ? t('ui.ACCOUNT.screen.Account.ImportQrCode.creating') : t('ui.ACCOUNT.screen.Account.ImportQrCode.scanQr'),
             icon: FooterIcon,
             onClick: onScan,
             loading: loading
@@ -188,14 +188,14 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick: goHome
           }
         ]}
-        title={t('ui.IMPORT_QR_CODE.Popup.Account.ImportQrCode.importByQrCode')}
+        title={t('ui.ACCOUNT.screen.Account.ImportQrCode.importByQrCode')}
       >
         <div className={CN('container', {
           '__web-ui': isWebUI
         })}
         >
           <div className='sub-title'>
-            {t('ui.IMPORT_QR_CODE.Popup.Account.ImportQrCode.makeSureThatYouHaveGrantedSubwalletTheAccessToYourDeviceSCamera')}
+            {t('ui.ACCOUNT.screen.Account.ImportQrCode.grantCameraAccess')}
           </div>
           <div className='logo'>
             <DualLogo
@@ -236,7 +236,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     />
                   )
                 }}
-                i18nKey={detectTranslate('ui.IMPORT_QR_CODE.Popup.Account.ImportQrCode.clickTheScanQrButtonOrReadHighlightThisInstructionHighlightForMoreDetails')}
+                i18nKey={detectTranslate('ui.ACCOUNT.screen.Account.ImportQrCode.scanQrInstruction')}
               />
             </div>
           </div>
@@ -261,7 +261,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onSuccess={onSuccess}
             overlay={validateState.message && (<QrScannerErrorNotice message={validateState.message} />)}
             selectCameraMotion={isWebUI ? 'move-right' : undefined}
-            title={t('ui.IMPORT_QR_CODE.Popup.Account.ImportQrCode.scanQr')}
+            title={t('ui.ACCOUNT.screen.Account.ImportQrCode.scanQr')}
           />
           {isWebUI && (
             <Button

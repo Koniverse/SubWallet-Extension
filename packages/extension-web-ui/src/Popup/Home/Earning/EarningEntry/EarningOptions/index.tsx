@@ -105,8 +105,8 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
   }, [data]);
 
   const filterOptions = useMemo(() => [
-    { label: t('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.mainnet'), value: NetworkType.MAIN_NETWORK },
-    { label: t('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.testnet'), value: NetworkType.TEST_NETWORK }
+    { label: t('ui.EARNING.screen.EarningOptions.mainnet'), value: NetworkType.MAIN_NETWORK },
+    { label: t('ui.EARNING.screen.EarningOptions.testnet'), value: NetworkType.TEST_NETWORK }
   ], [t]);
 
   const filterFunction = useMemo<(item: YieldGroupInfo) => boolean>(() => {
@@ -186,15 +186,15 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
 
       if (isRelatedToAstar(item.group)) {
         openAlert({
-          title: t('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.enterAstarPortal'),
+          title: t('ui.EARNING.screen.EarningOptions.enterAstarPortal'),
           content: t('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.youAreNavigatingToAstarPortalToViewAndManageYourStakeInAstarDappStakingV3SubwalletWillOfferSupportForAstarDappStakingV3Soon'),
           cancelButton: {
-            text: t('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.cancel'),
+            text: t('ui.EARNING.screen.EarningOptions.cancel'),
             schema: 'secondary',
             onClick: closeAlert
           },
           okButton: {
-            text: t('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.enterAstarPortal'),
+            text: t('ui.EARNING.screen.EarningOptions.enterAstarPortal'),
             onClick: () => {
               openInNewTab(ASTAR_PORTAL_URL)();
               closeAlert();
@@ -348,8 +348,8 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
     return (
       <EmptyList
         className={'__empty-list-earning-options'}
-        emptyMessage={t('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.noEarningOptionFound')}
-        emptyTitle={t('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.changeYourSearchAndTryAgain')}
+        emptyMessage={t('ui.EARNING.screen.EarningOptions.noEarningOptionFound')}
+        emptyTitle={t('ui.EARNING.screen.EarningOptions.changeYourSearchAndTryAgain')}
         phosphorIcon={Vault}
       />
     );
@@ -392,7 +392,7 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
         subHeaderBackground={'transparent'}
         subHeaderCenter={false}
         subHeaderPaddingVertical={true}
-        title={t<string>('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.earningOptions')}
+        title={t<string>('ui.EARNING.screen.EarningOptions.earningOptions')}
       >
         {
           isWebUI
@@ -407,7 +407,7 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
                 </div>
                 <Toolbar
                   className={'__desktop-toolbar'}
-                  inputPlaceholder={t<string>('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.searchToken')}
+                  inputPlaceholder={t<string>('ui.EARNING.screen.EarningOptions.searchToken')}
                   onClickFilter={onClickFilterButton}
                   onSearch={setSearchInput}
                   searchValue={searchInput}
@@ -439,21 +439,21 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
                 renderWhenEmpty={emptyList}
                 searchFunction={searchFunction}
                 searchMinCharactersCount={1}
-                searchPlaceholder={t<string>('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.searchToken')}
+                searchPlaceholder={t<string>('ui.EARNING.screen.EarningOptions.searchToken')}
                 showActionBtn
               />
             )
         }
 
         <FilterModal
-          applyFilterButtonTitle={t('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.applyFilter')}
+          applyFilterButtonTitle={t('ui.EARNING.screen.EarningOptions.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.filter')}
+          title={t('ui.EARNING.screen.EarningOptions.filter')}
         />
       </Layout.Base>
 

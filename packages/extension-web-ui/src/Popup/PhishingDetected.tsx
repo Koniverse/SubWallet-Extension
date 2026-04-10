@@ -25,7 +25,7 @@ function _PhishingDetected ({ className }: Props): React.ReactElement<Props> {
   const decodedWebsite = decodeURIComponent(website);
 
   const footerBtn: ButtonProps = {
-    children: t('ui.PHISHING_DETECTED.Popup.PhishingDetected.getMeOutOfHere'),
+    children: t('ui.SECURITY.screen.PhishingDetected.getMeOutOfHere'),
     icon: <Icon
       phosphorIcon={XCircle}
       weight='fill'
@@ -47,14 +47,14 @@ function _PhishingDetected ({ className }: Props): React.ReactElement<Props> {
       rightFooterButton={footerBtn}
       showBackButton={false}
       subHeaderPaddingVertical={true}
-      title={t('ui.PHISHING_DETECTED.Popup.PhishingDetected.phishingDetection')}
+      title={t('ui.SECURITY.screen.PhishingDetected.phishingDetection')}
     >
       <div className={CN('__upper-block-wrapper')} />
       <PageIcon
         color={token.colorError}
         iconProps={{ phosphorIcon: ShieldSlash, weight: 'fill' }}
       />
-      <div className='title h3-text text-danger'>{t('ui.PHISHING_DETECTED.Popup.PhishingDetected.phishingDetection')}</div>
+      <div className='title h3-text text-danger'>{t('ui.SECURITY.screen.PhishingDetected.phishingDetection')}</div>
       <div className='h4-text text-danger website-url'>{decodedWebsite}</div>
       <div className='phishing-detection-message'>
         <span>{t('ui.PHISHING_DETECTED.Popup.PhishingDetected.thisDomainHasBeenReportedAsAKnownPhishingSiteOnACommunityMaintainedList')}&nbsp;</span>
@@ -69,7 +69,7 @@ function _PhishingDetected ({ className }: Props): React.ReactElement<Props> {
         className='trust-site'
         onClick={onTrustSite}
       >
-        {t('ui.PHISHING_DETECTED.Popup.PhishingDetected.iTrustThisSite')}
+        {t('ui.SECURITY.screen.PhishingDetected.iTrustThisSite')}
       </div>
       <BackgroundExpandView />
     </Layout.WithSubHeaderOnly>

@@ -62,10 +62,10 @@ function Component ({ className, request }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('ui.SIGN_CONFIRMATION.Popup.Confirmations.variants.Message.SignConfirmation.signatureRequest')}
+          {t('ui.DAPP.Confirmations.Message.Sign.signatureRequest')}
         </div>
         <div className='description'>
-          {t('ui.SIGN_CONFIRMATION.Popup.Confirmations.variants.Message.SignConfirmation.youAreApprovingARequestWithTheFollowingAccount')}
+          {t('ui.DAPP.Confirmations.Message.Sign.approvingRequestWithAccount')}
         </div>
         <AccountItemWithProxyAvatar
           account={account}
@@ -80,7 +80,7 @@ function Component ({ className, request }: Props) {
             size='xs'
             type='ghost'
           >
-            {t('ui.SIGN_CONFIRMATION.Popup.Confirmations.variants.Message.SignConfirmation.viewDetails')}
+            {t('ui.DAPP.Confirmations.Message.Sign.viewDetails')}
           </Button>
         </div>
       </div>
@@ -90,7 +90,7 @@ function Component ({ className, request }: Props) {
         request={request.request}
       />
       <BaseDetailModal
-        title={isMessage ? t('ui.SIGN_CONFIRMATION.Popup.Confirmations.variants.Message.SignConfirmation.messageDetails') : t('ui.SIGN_CONFIRMATION.Popup.Confirmations.variants.Message.SignConfirmation.transactionDetails')}
+        title={isMessage ? t('ui.DAPP.Confirmations.Message.Sign.messageDetails') : t('ui.DAPP.Confirmations.Message.Sign.transactionDetails')}
       >
         {isMessage
           ? (

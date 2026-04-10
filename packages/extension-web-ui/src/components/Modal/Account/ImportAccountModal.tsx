@@ -88,28 +88,28 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       backgroundColor: token['green-7'],
       icon: Leaf,
       key: 'import-seed-phrase',
-      label: t('ui.IMPORT_ACCOUNT_MODAL.components.Modal.Account.ImportAccountModal.importFromSeedPhrase'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhrase'),
       onClick: onClickSeed
     },
     {
       backgroundColor: token['orange-7'],
       icon: FileJs,
       key: 'restore-json',
-      label: t('ui.IMPORT_ACCOUNT_MODAL.components.Modal.Account.ImportAccountModal.importFromJsonFile'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Import.importFromJsonFile'),
       onClick: onClickJson
     },
     {
       backgroundColor: token['gray-3'],
       icon: Wallet,
       key: 'import-private-key',
-      label: t('ui.IMPORT_ACCOUNT_MODAL.components.Modal.Account.ImportAccountModal.importFromPrivateKey'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Import.importFromPrivateKey'),
       onClick: onClickItem('/accounts/import-private-key')
     },
     {
       backgroundColor: token['blue-7'],
       icon: QrCode,
       key: 'import-by-qr',
-      label: t('ui.IMPORT_ACCOUNT_MODAL.components.Modal.Account.ImportAccountModal.importByQrCode'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Import.importByQrCode'),
       onClick: onClickItem('/accounts/import-by-qr')
     }
   ], [token, t, onClickSeed, onClickJson, onClickItem]);
@@ -139,7 +139,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           icon: <CloseIcon />,
           onClick: onCancel
         })}
-      title={t<string>('ui.IMPORT_ACCOUNT_MODAL.components.Modal.Account.ImportAccountModal.importAccount')}
+      title={t<string>('ui.ACCOUNT.components.Modal.Account.ImportSeed.importAccount')}
     >
       <div className='items-container'>
         {items.map((item) => {

@@ -96,11 +96,11 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
   const viewOptions = useMemo((): ViewOption[] => {
     return [
       {
-        label: t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.tokenDetails'),
+        label: t('ui.BALANCE.screen.Tokens.DetailModal.tokenDetailsTitle'),
         value: ViewValue.OVERVIEW
       },
       {
-        label: t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.accountDetails'),
+        label: t('ui.BALANCE.screen.Tokens.DetailModal.accountDetailsTitle'),
         value: ViewValue.DETAIL
       }
     ];
@@ -119,8 +119,8 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
     const lockedValue = balanceInfo?.locked.value ?? new BigN(0);
 
     return [
-      createItem('transferable', t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.transferable'), transferableValue),
-      createItem('locked', t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.locked'), lockedValue)
+      createItem('transferable', t('ui.BALANCE.screen.Tokens.DetailModal.transferable'), transferableValue),
+      createItem('locked', t('ui.BALANCE.screen.Tokens.DetailModal.locked'), lockedValue)
     ];
   }, [balanceInfo?.free.value, balanceInfo?.locked.value, currentTokenInfo?.symbol, t]);
 
@@ -208,7 +208,7 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
       className={CN(className, { 'fix-height': isAllAccount })}
       id={id}
       onCancel={onCancel}
-      title={(isAllAccount && isBitcoinChain) ? t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.accountDetails') : t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.tokenDetails')}
+      title={(isAllAccount && isBitcoinChain) ? t('ui.BALANCE.screen.Tokens.DetailModal.accountDetailsTitle') : t('ui.BALANCE.screen.Tokens.DetailModal.tokenDetailsTitle')}
     >
       <Form
         form={form}
@@ -274,11 +274,11 @@ function Component ({ className = '', currentTokenInfo, id, onCancel, tokenBalan
                         onClick: onCancel,
                         size: 'xs',
                         shape: 'circle',
-                        children: t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.backToHome')
+                        children: t('ui.BALANCE.screen.Tokens.DetailModal.backToHome')
                       }}
                       className='__empty-list'
-                      emptyMessage={t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.switchToAnotherTokenToSeeAccountBalance')}
-                      emptyTitle={t('ui.DETAIL_MODAL.Popup.Home.Tokens.DetailModal.noAccountWithBalanceFound', {
+                      emptyMessage={t('ui.BALANCE.screen.Tokens.DetailModal.switchTokenToSeeBalance')}
+                      emptyTitle={t('ui.BALANCE.screen.Tokens.DetailModal.noAccountWithSymbolBalance', {
                         replace: {
                           symbol: symbol
                         }

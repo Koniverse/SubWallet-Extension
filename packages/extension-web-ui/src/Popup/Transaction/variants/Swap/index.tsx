@@ -217,7 +217,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     const chainSlug = _getAssetOriginChain(chainAsset);
     const chainName = _getChainName(chainInfoMap[chainSlug]);
 
-    return t('ui.SWAP.Popup.Transaction.variants.Swap.onIsNotSupportedForSwappingSelectAnotherTokenAndTryAgain', { replace: {
+    return t('ui.TRANSACTION.screen.Transaction.Swap.tokenNotSupportedForSwap', { replace: {
       symbol: _getAssetSymbol(chainAsset),
       chainName
     } });
@@ -464,15 +464,15 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
   }, [isWebUI, notify]);
 
   const showNoQuoteError = useCallback(() => {
-    showSwapError(t('ui.SWAP.Popup.Transaction.variants.Swap.swapPairNotSupportedSelectAnotherPairAndTryAgain'));
+    showSwapError(t('ui.TRANSACTION.screen.Transaction.Swap.swapPairNotSupportedTryAnother'));
   }, [showSwapError, t]);
 
   const showTooLowAmountError = useCallback(() => {
-    showSwapError(t('bg.SWAP.background.error.Swap.amountTooLow'));
+    showSwapError(t('ui.TRANSACTION.screen.Transaction.Swap.amountTooLow'));
   }, [showSwapError, t]);
 
   const showTooHighAmountError = useCallback(() => {
-    showSwapError(t('ui.SWAP.Popup.Transaction.variants.Swap.amountTooHighLowerYourAmountAndTryAgain'));
+    showSwapError(t('ui.TRANSACTION.screen.Transaction.Swap.amountTooHigh'));
   }, [showSwapError, t]);
 
   const onConfirmSelectedQuote = useCallback(
@@ -533,11 +533,11 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
   const onSubmit: FormCallbacks<SwapParams>['onFinish'] = useCallback((values: SwapParams) => {
     if (chainValue && !checkChainConnected(chainValue)) {
       openAlert({
-        title: t('ui.SWAP.Popup.Transaction.variants.Swap.payAttention'),
+        title: t('ui.TRANSACTION.screen.Transaction.Swap.payAttentionExclamation'),
         type: NotificationType.ERROR,
-        content: t('ui.SWAP.Popup.Transaction.variants.Swap.yourSelectedNetworkMightHaveLostConnectionTryUpdatingItByEitherReEnablingItOrChangingNetworkProvider'),
+        content: t('ui.TRANSACTION.screen.Transaction.Swap.selectedNetworkMightLostConnection'),
         okButton: {
-          text: t('ui.SWAP.Popup.Transaction.variants.Swap.iUnderstand'),
+          text: t('ui.TRANSACTION.screen.Transaction.Swap.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
         }
@@ -566,7 +566,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
 
     if (account?.isHardware) {
       notify({
-        message: t('ui.SWAP.Popup.Transaction.variants.Swap.theAccountYouAreUsingIsLedgerAccountYouCannotUseThisFeatureWithIt'),
+        message: t('ui.TRANSACTION.screen.Transaction.Swap.featureNotAvailableForLedger'),
         type: 'error',
         duration: 8
       });
@@ -686,13 +686,13 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       const isHighPriceImpact = metadata?.priceImpact;
 
       openAlert({
-        title: isHighPriceImpact ? t('ui.SWAP.Popup.Transaction.variants.Swap.highPriceImpact') : t('ui.SWAP.Popup.Transaction.variants.Swap.payAttention'),
+        title: isHighPriceImpact ? t('ui.TRANSACTION.screen.Transaction.Swap.highPriceImpact') : t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
         type: NotificationType.WARNING,
         content: isHighPriceImpact && metadata.priceImpact
           ? t('ui.TRANSACTION.screen.Transaction.Swap.highPriceImpactWarning', { replace: { priceImpact: metadata.priceImpact } })
-          : t('ui.SWAP.Popup.Transaction.variants.Swap.lowLiquiditySwapIsAvailableButNotRecommendedAsSwapRateIsUnfavorable'),
+          : t('ui.TRANSACTION.screen.Transaction.Swap.lowLiquidityWarning'),
         okButton: {
-          text: t('ui.SWAP.Popup.Transaction.variants.Swap.continue'),
+          text: t('ui.TRANSACTION.screen.Transaction.Swap.continue'),
           onClick: () => {
             closeAlert();
             transactionBlockProcess();
@@ -700,7 +700,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
           icon: CheckCircle
         },
         cancelButton: {
-          text: t('ui.SWAP.Popup.Transaction.variants.Swap.cancel'),
+          text: t('ui.TRANSACTION.screen.Transaction.Swap.cancel'),
           schema: 'secondary',
           onClick: closeAlert
         }
@@ -1287,7 +1287,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
                   dropdownHeight={isNotShowAccountSelector ? 227 : 167}
                   label={`${t('ui.SWAP.components.Field.Swap.SwapToField.to')}:`}
                   labelStyle={'horizontal'}
-                  placeholder={t('ui.SWAP.Popup.Transaction.variants.Swap.inputYourRecipientAccount')}
+                  placeholder={t('ui.TRANSACTION.screen.Transaction.Swap.inputYourRecipientAccount')}
                   ref={addressInputRef}
                   showAddressBook={true}
                   showScanner={true}
@@ -1341,7 +1341,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
             loading={submitLoading}
             onClick={onPreCheck(form.submit, ExtrinsicType.SWAP)}
           >
-            {t('ui.SWAP.Popup.Transaction.variants.Swap.swap')}
+            {t('ui.TRANSACTION.screen.Transaction.Swap.swap')}
           </Button>
         </TransactionFooter>
       </>

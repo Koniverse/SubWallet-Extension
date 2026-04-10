@@ -43,7 +43,7 @@ const Component: React.FC<Props> = (props: Props) => {
     return (
       <Layout.Base
         showBackButton={false}
-        title={t('ui.CREATE_DONE.Popup.CreateDone.successful')}
+        title={t('ui.screen.CreateDone.successful')}
       >
         <div className={className}>
           <MigrateDone
@@ -64,7 +64,7 @@ const Component: React.FC<Props> = (props: Props) => {
               }
               onClick={onDone}
             >
-              {t('ui.CREATE_DONE.Popup.CreateDone.finish')}
+              {t('ui.ACCOUNT.screen.Account.ExportAllDone.finish')}
             </Button>
           </div>
         </div>
@@ -76,7 +76,7 @@ const Component: React.FC<Props> = (props: Props) => {
     <Layout.WithSubHeaderOnly
       rightFooterButton={!isWebUI
         ? {
-          children: isDefaultReturnPath ? t('ui.CREATE_DONE.Popup.CreateDone.goToHome') : t('ui.CREATE_DONE.Popup.CreateDone.finish'),
+          children: isDefaultReturnPath ? t('ui.screen.CreateDone.goToHome') : t('ui.ACCOUNT.screen.Account.ExportAllDone.finish'),
           onClick: onDone,
           icon: (
             <Icon
@@ -93,7 +93,7 @@ const Component: React.FC<Props> = (props: Props) => {
           size='md'
         />
       )}
-      title={t('ui.CREATE_DONE.Popup.CreateDone.successful')}
+      title={t('ui.screen.CreateDone.successful')}
     >
       <div className={CN(className)}>
         <div className='page-icon'>
@@ -106,10 +106,10 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         </div>
         <div className='title'>
-          {t('ui.CREATE_DONE.Popup.CreateDone.allDone')}
+          {t('ui.screen.CreateDone.allDone')}
         </div>
         <div className='description'>
-          {t('ui.CREATE_DONE.Popup.CreateDone.followAlongWithProductUpdatesOrReachOutIfYouHaveAnyQuestions')}
+          {t('ui.screen.CreateDone.followProductUpdates')}
         </div>
         <SocialButtonGroup />
 
@@ -128,7 +128,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 onClick={onDone}
                 schema={'primary'}
               >
-                {isDefaultReturnPath ? t('ui.CREATE_DONE.Popup.CreateDone.goToPortfolio') : t('ui.CREATE_DONE.Popup.CreateDone.finish')}
+                {isDefaultReturnPath ? t('ui.CREATE_DONE.Popup.CreateDone.goToPortfolio') : t('ui.ACCOUNT.screen.Account.ExportAllDone.finish')}
               </Button>
             </div>
           )

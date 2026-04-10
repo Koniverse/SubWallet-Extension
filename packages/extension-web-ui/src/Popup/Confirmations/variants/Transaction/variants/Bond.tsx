@@ -50,14 +50,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.BOND.Popup.Confirmations.variants.Transaction.variants.Bond.amount')}
+          label={t('ui.TRANSACTION.Confirmations.Process.Earn.Bond.amount')}
           suffix={symbol}
           value={data.amount}
         />
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.BOND.Popup.Confirmations.variants.Transaction.variants.Bond.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.Process.Earn.Bond.estimatedFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
@@ -74,7 +74,7 @@ const Component: React.FC<Props> = (props: Props) => {
         <AlertBox
           className={CN(className, 'alert-box')}
           description={t('ui.TRANSACTION.Confirmations.Bond.taoStakingFeeDeductedInfo', { replace: { fee: stakingFee } })}
-          title={t('ui.BOND.Popup.Confirmations.variants.Transaction.variants.Bond.taoStakingFee')}
+          title={t('ui.TRANSACTION.Confirmations.Bond.taoStakingFee')}
           type='info'
         />
       )}

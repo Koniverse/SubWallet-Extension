@@ -72,10 +72,10 @@ const Component: React.FC<Props> = (props: Props) => {
         const { isValid } = await validateAccountName({ name: value });
 
         if (!isValid) {
-          return Promise.reject(t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountNameAlreadyInUse'));
+          return Promise.reject(t('ui.ACCOUNT.screen.Account.AttachReadOnly.accountNameInUse'));
         }
       } catch (e) {
-        return Promise.reject(t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountNameInvalid'));
+        return Promise.reject(t('ui.ACCOUNT.screen.Account.AttachReadOnly.accountNameInvalid'));
       }
     }
 
@@ -85,7 +85,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const accountAddressValidator = useCallback(
     (rule: RuleObject, value: string) => {
       if (!value || !value.trim()) {
-        return Promise.reject(t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountAddressIsRequired'));
+        return Promise.reject(t('ui.ACCOUNT.screen.Account.AttachReadOnly.accountAddressRequired'));
       }
 
       const result = readOnlyScan(value);
@@ -96,14 +96,14 @@ const Component: React.FC<Props> = (props: Props) => {
           if (isSameAddress(account.address, result.content)) {
             setReformatAttachAddress('');
 
-            return Promise.reject(t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountAlreadyExists'));
+            return Promise.reject(t('ui.ACCOUNT.screen.Account.AttachReadOnly.accountAlreadyExists'));
           }
         }
       } else {
         setReformatAttachAddress('');
 
         if (value !== '') {
-          return Promise.reject(t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.invalidAddress'));
+          return Promise.reject(t('ui.ACCOUNT.screen.Account.AttachReadOnly.invalidAddress'));
         }
       }
 
@@ -166,7 +166,7 @@ const Component: React.FC<Props> = (props: Props) => {
           name={'address'}
           rules={[
             {
-              message: t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountAddressIsRequired'),
+              message: t('ui.ACCOUNT.screen.Account.AttachReadOnly.accountAddressRequired'),
               required: true
             },
             {
@@ -176,7 +176,7 @@ const Component: React.FC<Props> = (props: Props) => {
           statusHelpAsTooltip={true}
         >
           <Input
-            placeholder={t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.enterAddress')}
+            placeholder={t('ui.TRANSACTION.screen.Transaction.SendFund.enterAddress')}
             prefix={<Wallet size={24} />}
             type={'text'}
           />
@@ -187,7 +187,7 @@ const Component: React.FC<Props> = (props: Props) => {
           hidden={!isAccountNameInputVisible}
           name={'name'}
           rules={[{
-            message: t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountNameIsRequired'),
+            message: t('ui.ACCOUNT.screen.Account.AttachReadOnly.accountNameRequired'),
             transform: (value: string) => value.trim(),
             required: true
           },
@@ -201,8 +201,8 @@ const Component: React.FC<Props> = (props: Props) => {
           <Input
             className='__account-name-input'
             disabled={loading}
-            label={t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.accountName')}
-            placeholder={t('ui.WELCOME_WATCH_ONLY_ACCOUNT_FORM.Popup.WelcomeWatchOnlyAccountForm.enterTheAccountName')}
+            label={t('ui.ACCOUNT.screen.Account.AttachReadOnly.accountName')}
+            placeholder={t('ui.ACCOUNT.screen.Account.AttachReadOnly.enterAccountName')}
           />
         </Form.Item>
         <Button

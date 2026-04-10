@@ -42,7 +42,7 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <MetaInfo.Account
           address={data.selectedPool.address}
-          label={t('ui.JOIN_POOL.Popup.Confirmations.variants.Process.Earn.JoinPool.pool')}
+          label={t('ui.TRANSACTION.Confirmations.Process.Earn.JoinPool.pool')}
           networkPrefix={42}
         />
 
@@ -54,7 +54,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.JOIN_POOL.Popup.Confirmations.variants.Process.Earn.JoinPool.amount')}
+          label={t('ui.TRANSACTION.Confirmations.Process.Earn.JoinPool.amount')}
           suffix={symbol}
           value={data.amount}
         />
@@ -66,7 +66,7 @@ const Component: React.FC<Props> = (props: Props) => {
         }
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.JOIN_POOL.Popup.Confirmations.variants.Process.Earn.JoinPool.estimatedFee')}
+          label={t('ui.TRANSACTION.components.Modal.TxProcessDetail.InfoBlock.Earn.JoinPool.estimatedFee')}
           suffix={symbol}
           value={0}
         />

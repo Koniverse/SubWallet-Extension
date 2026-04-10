@@ -61,7 +61,7 @@ const Component: React.FC<Props> = (props: Props) => {
           )}
           onBack={closeModal}
           showBackButton
-          title={t('ui.DISPLAY_PAYLOAD_MODAL.Popup.Confirmations.parts.Qr.DisplayPayload.DisplayPayloadModal.confirm')}
+          title={t('ui.DAPP.Confirmations.Qr.DisplayPayloadModal.confirm')}
         />
         <div className='body-container'>
           {children}
@@ -78,7 +78,7 @@ const Component: React.FC<Props> = (props: Props) => {
             )}
             onClick={onScan}
           >
-            {t('ui.DISPLAY_PAYLOAD_MODAL.Popup.Confirmations.parts.Qr.DisplayPayload.DisplayPayloadModal.scanQr')}
+            {t('ui.DAPP.Confirmations.Qr.DisplayPayloadModal.scanQr')}
           </Button>
         </div>
       </BaseModal>
@@ -97,7 +97,7 @@ const Component: React.FC<Props> = (props: Props) => {
         onBack={closeModal}
         rightFooterButton={{
           onClick: onScan,
-          children: t('ui.DISPLAY_PAYLOAD_MODAL.Popup.Confirmations.parts.Qr.DisplayPayload.DisplayPayloadModal.scanQr'),
+          children: t('ui.DAPP.Confirmations.Qr.DisplayPayloadModal.scanQr'),
           icon: (
             <Icon
               phosphorIcon={QrCode}
@@ -106,7 +106,7 @@ const Component: React.FC<Props> = (props: Props) => {
           )
         }}
         showBackButton={true}
-        title={t('ui.DISPLAY_PAYLOAD_MODAL.Popup.Confirmations.parts.Qr.DisplayPayload.DisplayPayloadModal.confirm')}
+        title={t('ui.DAPP.Confirmations.Qr.DisplayPayloadModal.confirm')}
       >
         <div className='body-container'>
           {children}

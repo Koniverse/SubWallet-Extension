@@ -56,8 +56,8 @@ const Component: React.FC<Props> = ({ className, pageType }: Props) => {
       },
       [PAGE_TYPE.NFT_COLLECTION_DETAIL]: {
         icon: Image,
-        title: t('ui.NO_CONTENT.components.NoContent.noNftCollectible'),
-        content: t('ui.NO_CONTENT.components.NoContent.yourNftCollectibleWillAppearHere')
+        title: t('ui.NFT.screen.NftsCollectionDetail.noNftCollectible'),
+        content: t('ui.NFT.screen.NftsCollectionDetail.yourNftCollectibleWillAppearHere')
       },
       [PAGE_TYPE.TOKEN]: {
         icon: Coin,
@@ -66,7 +66,7 @@ const Component: React.FC<Props> = ({ className, pageType }: Props) => {
       },
       [PAGE_TYPE.SEARCH]: {
         icon: MagnifyingGlass,
-        title: t('ui.NO_CONTENT.components.NoContent.noResultsFound'),
+        title: t('ui.components.EmptyList.General.noResultsFound'),
         content: t('ui.NO_CONTENT.components.NoContent.pleaseChangeYourSearchCriteriaAndTryAgain'),
         button: {
           label: t('ui.NO_CONTENT.components.NoContent.manageTokenList'),
@@ -95,13 +95,13 @@ const Component: React.FC<Props> = ({ className, pageType }: Props) => {
       },
       [PAGE_TYPE.DAPPS]: {
         icon: GlobeHemisphereWest,
-        title: t('ui.NO_CONTENT.components.NoContent.noDappsFound'),
-        content: t('ui.NO_CONTENT.components.NoContent.yourDappsWillShowUpHere')
+        title: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.noDappsFound'),
+        content: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.yourDappsWillShowUpHere')
       },
       [PAGE_TYPE.MISSION]: {
         icon: GlobeHemisphereWest,
-        title: t('ui.NO_CONTENT.components.NoContent.noMissionFound'),
-        content: t('ui.NO_CONTENT.components.NoContent.yourMissionsWillShowUpHere')
+        title: t('ui.SETTINGS.screen.Setting.MissionPool.noMissionFound'),
+        content: t('ui.SETTINGS.screen.Setting.MissionPool.yourMissionsWillShowUpHere')
       }
     };
   }, [t]);
