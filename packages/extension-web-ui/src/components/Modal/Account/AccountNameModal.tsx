@@ -83,7 +83,7 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
       <div className={'__brief'}>
         <Trans
           components={{ br: <br /> }}
-          i18nKey={'ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo'}
+          i18nKey={t('ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo')}
         />
       </div>
 

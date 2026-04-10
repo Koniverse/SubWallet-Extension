@@ -2370,5 +2370,6 @@
   "ui.HISTORY.screen.History.all": "All",
   "ui.EARNING.screen.EarningPools.nativeStaking": "",
   "ui.EARNING.util.validator.staking.unstake.mustBeEqualOrGreaterThan": "",
-  "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createNewAccount": "Tạo tài khoản mới"
+  "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createNewAccount": "Tạo tài khoản mới",
+  "ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo": "ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo": "Enter a name for your account.<br/> You can edit this later."
 }

@@ -2370,5 +2370,6 @@
   "ui.EARNING.screen.EarningPositions.all": "All",
   "ui.HISTORY.screen.History.all": "All",
   "ui.screen.CheckCrowdloanContributions.createNewAccount": "Создать новый аккаунт",
-  "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createNewAccount": "Создать новый аккаунт"
+  "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createNewAccount": "Создать новый аккаунт",
+  "ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo": "ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo": "Enter a name for your account.<br/> You can edit this later."
 }
