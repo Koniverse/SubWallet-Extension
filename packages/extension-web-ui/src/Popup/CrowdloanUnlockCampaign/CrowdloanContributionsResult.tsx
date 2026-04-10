@@ -170,7 +170,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
 
   useEffect(() => {
     if (location.pathname === '/crowdloan-unlock-campaign/contributions-result') {
-      setTitle(t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.yourCrowdloanContributions'));
+      setTitle(t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.yourCrowdloanContributions'));
     }
   }, [location.pathname, setTitle, t]);
 
@@ -285,7 +285,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
         value: FilterValue.ALL
       },
       {
-        label: t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.inAuction'),
+        label: t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.inAuction'),
         value: FilterValue.IN_AUCTION
       },
       {
@@ -343,11 +343,11 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
 
   const validateAddress = useCallback((rule: Rule, address: string): Promise<void> => {
     if (!address) {
-      return Promise.reject(t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.addressIsRequired'));
+      return Promise.reject(t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.addressIsRequired'));
     }
 
     if (!isAddress(address)) {
-      return Promise.reject(t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.invalidAddressCheckAgainOrCreateANewAccountToGetStarted'));
+      return Promise.reject(t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.invalidAddressCheckAgainOrCreateANewAccountToGetStarted'));
     }
 
     fetchTableData(address);
@@ -453,7 +453,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
               paddingVertical
               // rightButtons={headerIcons}
               showBackButton
-              title={t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.yourContributions')}
+              title={t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.yourContributions')}
             />
           )
         }
@@ -487,7 +487,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
               validateTrigger='onChange'
             >
               <AddressInput
-                placeholder={t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.enterYourPolkadotWalletAddress')}
+                placeholder={t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.enterYourPolkadotWalletAddress')}
                 prefix={(
                   <Icon
                     className={'address-input-icon'}
@@ -528,7 +528,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
               emptyMessage={
                 <>
                   <span className={'__has-suffix-space'}>
-                    {t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.checkAgainCreateANewAccountOrVisitOur')}
+                    {t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.checkAgainCreateANewAccountOrVisitOur')}
                   </span>
                   <a
                     className={'__link'}
@@ -536,11 +536,11 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                     rel='noreferrer'
                     target={'_blank'}
                   >
-                    {t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.faqs')}
+                    {t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.faqs')}
                   </a>
                 </>
               }
-              emptyTitle={t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.weCanTFindAnyCrowdloanContributionsFromThisAddress')}
+              emptyTitle={t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.weCanTFindAnyCrowdloanContributionsFromThisAddress')}
               phosphorIcon={RocketLaunch}
             />
 
@@ -559,7 +559,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                 onClick={onClickCheckAgain}
                 schema='secondary'
               >
-                {t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.checkAgain')}
+                {t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.checkAgain')}
               </Button>
 
               <Button
@@ -575,7 +575,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                 onClick={onClickCreateNewWallet}
                 schema='primary'
               >
-                {t('ui.ACCOUNT.components.Layout.SelectAccount.Footer.createNewAccount')}
+                {t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createNewAccount')}
               </Button>
             </div>
           </div>
@@ -585,8 +585,8 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
       <div className={'__footer-area'}>
         <NoteBox
           className={'__note-box'}
-          content={t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.thereReMultipleWaysYouCanPlayWithYourUnlockedDotSuchAsNativeStakingLiquidStakingOrLendingCheckOutSubwalletDashboardForCuratedOptionsWithCompetitiveApyToEarnYieldOnYourDot')}
-          title={t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.crowdloanUnlockThenWhat')}
+          content={t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.thereReMultipleWaysYouCanPlayWithYourUnlockedDotSuchAsNativeStakingLiquidStakingOrLendingCheckOutSubwalletDashboardForCuratedOptionsWithCompetitiveApyToEarnYieldOnYourDot')}
+          title={t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.crowdloanUnlockThenWhat')}
         />
 
         <Button
@@ -603,8 +603,8 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
           onClick={goEarningDemo}
         >
           <div className={'__footer-button-content'}>
-            <div className={'__footer-button-title'}>{t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.rewards148185')}</div>
-            <div className={'__footer-button-subtitle'}>{t('ui.CROWDLOAN_CONTRIBUTIONS_RESULT.Popup.CrowdloanUnlockCampaign.CrowdloanContributionsResult.earnWithSubwalletDashboard')}</div>
+            <div className={'__footer-button-title'}>{t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.rewards148185')}</div>
+            <div className={'__footer-button-subtitle'}>{t('ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.earnWithSubwalletDashboard')}</div>
           </div>
         </Button>
       </div>

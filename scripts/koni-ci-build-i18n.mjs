@@ -43,10 +43,9 @@ function cloneTrans() {
 }
 
 // runTest();
-runBuild();
+// runBuild();
 
 // Web runner
 cloneTrans();
 
-// Prune webapp locale: remove keys not used in extension-web-ui
 runWebappI18n();

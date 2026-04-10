@@ -69,7 +69,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
     } else {
       setSubmitResponse({
         status: 'error',
-        message: t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.invalidAddressCheckAgainOrCreateANewAccountToGetStarted')
+        message: t('ui.screen.CheckCrowdloanContributions.invalidAddressCheckAgainOrCreateANewAccountToGetStarted')
       });
       setIsWrongAddress(true);
     }
@@ -145,7 +145,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
             />
           </div>
           <div className={'__countdown-title'}>
-            {t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.nextPolkadotCrowdloanUnlockingIn')}
+            {t('ui.screen.CheckCrowdloanContributions.nextPolkadotCrowdloanUnlockingIn')}
           </div>
           <Countdown
             className={'__countdown'}
@@ -168,7 +168,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
               validateStatus={responseStatus}
             >
               <AddressInput
-                placeholder={t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.enterYourPolkadotWalletAddress')}
+                placeholder={t('ui.screen.CheckCrowdloanContributions.enterYourPolkadotWalletAddress')}
                 prefix={(
                   <Icon
                     phosphorIcon={Wallet}
@@ -192,7 +192,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                 onClick={form.submit}
                 schema='primary'
               >
-                {t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.checkYourCrowdloanContributions')}
+                {t('ui.screen.CheckCrowdloanContributions.checkYourCrowdloanContributions')}
               </Button>
             )
           }
@@ -214,7 +214,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                   onClick={form.submit}
                   schema='secondary'
                 >
-                  {t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.checkAgain')}
+                  {t('ui.screen.CheckCrowdloanContributions.checkAgain')}
                 </Button>
 
                 <Button
@@ -230,7 +230,7 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
                   onClick={onClickCreateNewWallet}
                   schema='primary'
                 >
-                  {t('ui.ACCOUNT.components.Layout.SelectAccount.Footer.createNewAccount')}
+                  {t('ui.screen.CheckCrowdloanContributions.createNewAccount')}
                 </Button>
               </div>
             )
@@ -241,8 +241,8 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
       <div className={'__footer-area'}>
         <NoteBox
           className={'__note-box'}
-          content={t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.thereReMultipleWaysYouCanPlayWithYourUnlockedDotSuchAsNativeStakingLiquidStakingOrLendingCheckOutSubwalletDashboardForCuratedOptionsWithCompetitiveApyToEarnYieldOnYourDot')}
-          title={t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.crowdloanUnlockThenWhat')}
+          content={t('ui.screen.CheckCrowdloanContributions.thereReMultipleWaysYouCanPlayWithYourUnlockedDotSuchAsNativeStakingLiquidStakingOrLendingCheckOutSubwalletDashboardForCuratedOptionsWithCompetitiveApyToEarnYieldOnYourDot')}
+          title={t('ui.screen.CheckCrowdloanContributions.crowdloanUnlockThenWhat')}
         />
 
         <div className='__footer-buttons'>
@@ -262,9 +262,9 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
             schema={'secondary'}
           >
             <div className={'__footer-button-content'}>
-              <div className={'__footer-button-title'}>{t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.rewards148185')}</div>
+              <div className={'__footer-button-title'}>{t('ui.screen.CheckCrowdloanContributions.rewards148185')}</div>
 
-              <div className={'__footer-button-subtitle'}>{t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.earnWithSubwalletDashboard')}</div>
+              <div className={'__footer-button-subtitle'}>{t('ui.screen.CheckCrowdloanContributions.earnWithSubwalletDashboard')}</div>
             </div>
           </Button>
 
@@ -284,9 +284,9 @@ const Component: React.FC<Props> = ({ className = '' }: Props) => {
             schema={'secondary'}
           >
             <div className={'__footer-button-content'}>
-              <div className={'__footer-button-title'}>{t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.frequentlyAskedQuestions')}</div>
+              <div className={'__footer-button-title'}>{t('ui.screen.CheckCrowdloanContributions.frequentlyAskedQuestions')}</div>
 
-              <div className={'__footer-button-subtitle'}>{t('ui.CHECK_CROWDLOAN_CONTRIBUTIONS.Popup.CrowdloanUnlockCampaign.CheckCrowdloanContributions.learnMoreAboutOurSolution')}</div>
+              <div className={'__footer-button-subtitle'}>{t('ui.screen.CheckCrowdloanContributions.learnMoreAboutOurSolution')}</div>
             </div>
           </Button>
         </div>

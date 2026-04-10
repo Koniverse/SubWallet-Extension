@@ -12,6 +12,7 @@ import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
 import { RuleObject } from 'rc-field-form/lib/interface';
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import { Trans } from 'react-i18next';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -80,7 +81,10 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
       title={t<string>('ui.ACCOUNT.components.Modal.Account.Name.accountName')}
     >
       <div className={'__brief'}>
-        {t('ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo')}
+        <Trans
+          components={{ br: <br /> }}
+          i18nKey={'ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo'}
+        />
       </div>
 
       <Form

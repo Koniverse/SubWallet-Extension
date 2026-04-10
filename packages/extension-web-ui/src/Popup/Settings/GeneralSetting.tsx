@@ -83,13 +83,15 @@ function renderSelectionItem (item: SelectionItemType, _selected: boolean) {
       name={item.title}
       rightItem={
         _selected
-          ? <Icon
-            className='__right-icon'
-            customSize={'20px'}
-            phosphorIcon={CheckCircle}
-            type='phosphor'
-            weight='fill'
-          />
+          ? (
+            <Icon
+              className='__right-icon'
+              customSize={'20px'}
+              phosphorIcon={CheckCircle}
+              type='phosphor'
+              weight='fill'
+            />
+          )
           : null
       }
     />
@@ -475,10 +477,6 @@ export const GeneralSetting = styled(Component)<Props>(({ theme: { token } }: Pr
       display: 'flex',
       alignItems: 'center'
     },
-    '.-subTitle-container .ant-web3-block-left-item': {
-      paddingRight: 12
-    },
-
     '.-subTitle-container .ant-image-img': {
       display: 'block'
     },
