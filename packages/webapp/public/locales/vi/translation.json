@@ -2146,7 +2146,7 @@
   "ui.screen.CheckCrowdloanContributions.frequentlyAskedQuestions": "Frequently asked questions",
   "ui.screen.CheckCrowdloanContributions.learnMoreAboutOurSolution": "Learn more about our solution",
   "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.yourCrowdloanContributions": "Your crowdloan contributions",
-  "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.inAuction": "In auction",
+  "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.inAuction": "In Auction",
   "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.addressIsRequired": "Address is required.",
   "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.invalidAddressCheckAgainOrCreateANewAccountToGetStarted": "Invalid address. Check again or create a new account to get started.",
   "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.yourContributions": "Your contributions",
@@ -2165,7 +2165,7 @@
   "ui.DAPPS.Popup.DApps.dapps": "DApps",
   "ui.DAPPS.Popup.DApps.dappName": "DApp name",
   "ui.CROWDLOANS.Popup.Home.Crowdloans.all": "All",
-  "ui.CROWDLOANS.Popup.Home.Crowdloans.inAuction": "In auction",
+  "ui.CROWDLOANS.Popup.Home.Crowdloans.inAuction": "In Auction",
   "ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.youAreNavigatingToAstarPortalToViewAndManageYourStakeInAstarDappStakingV3SubwalletWillOfferSupportForAstarDappStakingV3Soon": "You are navigating to Astar portal to view and manage your stake in Astar dApp staking v3. SubWallet will offer support for Astar dApp staking v3 soon.",
   "ui.EARNING_POSITIONS_BALANCE.Popup.Home.Earning.EarningEntry.EarningPositions.EarningPositionsBalance.totalActiveStake": "Total active stake",
   "ui.EARNING_POSITIONS_BALANCE.Popup.Home.Earning.EarningEntry.EarningPositions.EarningPositionsBalance.totalUnstake": "Total unstake",
@@ -2226,8 +2226,8 @@
   "ui.PHISHING_DETECTED.Popup.PhishingDetected.thisDomainHasBeenReportedAsAKnownPhishingSiteOnACommunityMaintainedList": "This domain has been reported as a known phishing site on a community maintained list:",
   "ui.PHISHING_DETECTED.Popup.PhishingDetected.viewFullList": "view full list",
   "ui.SETTINGS.screen.Setting.AccountSettings.comingSoon": "Coming soon",
-  "ui.SECURITY.Popup.Settings.Security.walletAutoLock": "Wallet auto-lock",
-  "ui.SECURITY.Popup.Settings.Security.cameraAccess": "Camera access",
+  "ui.SECURITY.Popup.Settings.Security.walletAutoLock": "Khóa tự động",
+  "ui.SECURITY.Popup.Settings.Security.cameraAccess": "Truy cập máy ảnh",
   "ui.FREE_BALANCE_TO_STAKE.Popup.Transaction.parts.FreeBalanceToStake.senderAvailableBalance": "Sender available balance",
   "ui.FREE_BALANCE_TO_YIELD.Popup.Transaction.parts.FreeBalanceToYield.senderAvailableBalance": "Sender available balance",
   "ui.EARN.Popup.Transaction.variants.Earn.youAreRecommendedToChooseValidatorsToOptimizeYourEarningsDoYouWishToContinueWithValidator": "You are recommended to choose {{maxCount}} validators to optimize your earnings. Do you wish to continue with {{userSelectedPoolCount}} validator{{x}}?",
@@ -2371,5 +2371,6 @@
   "ui.EARNING.screen.EarningPools.nativeStaking": "",
   "ui.EARNING.util.validator.staking.unstake.mustBeEqualOrGreaterThan": "",
   "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createNewAccount": "Tạo tài khoản mới",
-  "ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo": "Enter a name for your account.<br/> You can edit this later."
+  "ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo": "Enter a name for your account.<br/> You can edit this later.",
+  "ui.HISTORY.screen.History.token": "Token"
 }

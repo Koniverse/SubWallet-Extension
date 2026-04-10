@@ -554,7 +554,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         value: FilterValue.ALL
       },
       {
-        label: t('ui.BALANCE.components.Modal.Customize.Modal.tokens'),
+        label: t('ui.HISTORY.screen.History.token'),
         value: FilterValue.TOKENS
       },
       {

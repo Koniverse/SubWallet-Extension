@@ -2349,7 +2349,7 @@
   "ui.ACCOUNT.hook.account.useDeleteAccount.removeAccount": "Remove account",
   "ui.EARNING.screen.EarningPools.nativeStaking": "Native staking",
   "ui.EARNING.util.validator.staking.unstake.mustBeEqualOrGreaterThan": "{{name}} must be equal or greater than {{minString}}",
-  "ui.components.Layout.Base.crowdloans": "Crowdloans",
+  "ui.components.Layout.Base.crowdloans": "Crowdloan",
   "ui.components.CrowdloanTable.details": "Details",
   "ui.components.Announcement.EarningMigration.earnNow": "Earn now",
   "ui.components.Earning.LedgerAccountTypeSelector.EarningBtn": "Coming soon",
@@ -2371,5 +2371,6 @@
   "ui.HISTORY.screen.History.all": "All",
   "ui.screen.CheckCrowdloanContributions.createNewAccount": "Create a new account",
   "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createNewAccount": "Create a new account",
-  "ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo": "Enter a name for your account.<br/> You can edit this later."
+  "ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo": "Enter a name for your account.<br/> You can edit this later.",
+  "ui.HISTORY.screen.History.token": "Token"
 }
