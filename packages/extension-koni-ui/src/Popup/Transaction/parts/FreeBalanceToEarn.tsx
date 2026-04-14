@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { BalanceType } from '@subwallet/extension-base/types';
 import { useGetBalance, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -22,6 +23,7 @@ type Props = ThemeProps & {
   labelTooltip?: string;
   onBalanceReady?: (rs: boolean) => void;
   hidden?: boolean;
+  balanceType?: BalanceType;
 }
 
 interface PartProps {
@@ -33,6 +35,7 @@ interface PartProps {
   showNetwork: boolean;
   first: boolean;
   showContent: boolean;
+  balanceType?: BalanceType;
 }
 
 const parseToLoadingMap = (tokens: BalanceInfo[]): Record<string, boolean> => {
@@ -56,14 +59,14 @@ const parseToErrorMap = (tokens: BalanceInfo[]): Record<string, string | null> =
 };
 
 const PartComponent: React.FC<PartProps> = (props: PartProps) => {
-  const { address, chain, first, setError, setLoading, showContent, showNetwork, token } = props;
+  const { address, balanceType, chain, first, setError, setLoading, showContent, showNetwork, token } = props;
 
   const { token: theme } = useTheme() as Theme;
   const { t } = useTranslation();
 
   const { chainInfoMap } = useSelector((state) => state.chainStore);
 
-  const { error, isLoading, nativeTokenBalance, nativeTokenSlug, tokenBalance } = useGetBalance(chain, address, token, true);
+  const { error, isLoading, nativeTokenBalance, nativeTokenSlug, tokenBalance } = useGetBalance(chain, address, token, true, undefined, balanceType);
 
   const balance = useMemo(() => {
     if (token) {
@@ -126,7 +129,7 @@ const PartComponent: React.FC<PartProps> = (props: PartProps) => {
 };
 
 const Component = (props: Props) => {
-  const { address, className, hidden, label, labelTooltip, onBalanceReady, tokens } = props;
+  const { address, balanceType, className, hidden, label, labelTooltip, onBalanceReady, tokens } = props;
 
   const { t } = useTranslation();
 
@@ -242,6 +245,7 @@ const Component = (props: Props) => {
           return (
             <PartComponent
               address={address}
+              balanceType={balanceType}
               chain={chain}
               first={index === 0}
               key={token}

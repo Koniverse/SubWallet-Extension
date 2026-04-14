@@ -13,6 +13,13 @@ export interface TokenBalanceRaw {
   free: BN
 }
 
+export enum BalanceType {
+  TRANSFERABLE = 'transferable', // free
+  TOTAL = 'total', // free + locked
+  TOTAL_MINUS_RESERVED = 'totalMinusReserved', // free + locked - reserved
+  KEEP_ALIVE = 'keepAlive'
+}
+
 /**
  * Balance info of a token on an address
  * @property {string} address - Address
@@ -23,6 +30,15 @@ export interface TokenBalanceRaw {
  * @property {string} locked - Locked balance, cannot be transferred, locked here is only meaningful in the context of token transfer
  * @property {metadata} [metadata] - Could be anything, supposed to be generic to handle various contexts
  */
+
+export interface LockedBalanceDetails {
+  staking: string;
+  governance: string;
+  democracy: string;
+  reserved: string;
+  others: string;
+}
+
 export interface BalanceItem {
   // metadata
   address: string;
@@ -33,6 +49,8 @@ export interface BalanceItem {
   // must-have, total = transferable + locked
   free: string;
   locked: string;
+
+  lockedDetails?: LockedBalanceDetails;
 
   // substrate fields
   metadata?: _BalanceMetadata;

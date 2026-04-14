@@ -35,8 +35,6 @@ export type THopInfo = {
 export type DryRunResult = {
   origin: DryRunNodeResult
   destination?: DryRunNodeResult
-  assetHub?: DryRunNodeResult
-  bridgeHub?: DryRunNodeResult
   hops: THopInfo[]
 }
 
@@ -74,7 +72,7 @@ interface ParaSpellError {
   statusCode: number
 }
 
-const version = '/v4';
+const version = '/v5';
 
 const paraSpellApi = {
   buildXcm: `${version}/x-transfer`,
