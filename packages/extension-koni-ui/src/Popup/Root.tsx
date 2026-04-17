@@ -118,7 +118,7 @@ function DefaultRoute ({ children }: { children: React.ReactNode }): React.React
   }, [isAcknowledgedUnifiedAccountMigration, isPopupMode, isUnifiedAccountMigrationInProgress]);
 
   const internalConfirmationPath = useMemo(() => {
-    return currentPage.startsWith('/transaction/') ? currentPage : null;
+    return currentPage?.startsWith('/transaction/') ? currentPage : null;
   }, [currentPage]);
 
   const redirectPath = useMemo<string | null>(() => {
