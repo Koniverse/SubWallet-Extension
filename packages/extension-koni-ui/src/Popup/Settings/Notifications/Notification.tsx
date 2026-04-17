@@ -117,6 +117,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [selectedFilterTab, setSelectedFilterTab] = useState<NotificationTab>(NotificationTab.ALL);
   const [viewDetailItem, setViewDetailItem] = useState<NotificationInfoItem | undefined>(undefined);
   const [notifications, setNotifications] = useState<_NotificationInfo[]>([]);
+  const [allNotifications, setAllNotifications] = useState<_NotificationInfo[]>([]);
   const [currentProxyId] = useState<string | undefined>(currentAccountProxy?.id);
   const [loadingNotification, setLoadingNotification] = useState<boolean>(false);
   const [isTrigger, setTrigger] = useState<boolean>(false);
@@ -135,14 +136,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         case NotificationTab.MULTISIG:
           return isMultisigAction;
 
-        case NotificationTab.ALL:
-          return !isMultisigAction;
-
         case NotificationTab.UNREAD:
-          return !item.isRead && !isMultisigAction;
+          return !item.isRead;
 
         case NotificationTab.READ:
-          return item.isRead && !isMultisigAction;
+          return item.isRead;
 
         default:
           return true;
@@ -206,7 +204,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     setSelectedFilterTab(value as NotificationTab);
     setLoading(true);
     const isMultisigTab = value === NotificationTab.MULTISIG;
-    const isAllTab = value === NotificationTab.ALL;
 
     fetchInappNotifications({
       proxyId: currentProxyId,
@@ -216,8 +213,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         const filteredRs = rs.filter((item) => {
           if (isMultisigTab) {
             return item.actionType === NotificationActionType.MULTISIG_APPROVAL;
-          } else if (!isAllTab) {
-            return item.actionType !== NotificationActionType.MULTISIG_APPROVAL;
           }
 
           return true;
@@ -532,10 +527,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [loadingNotification, onEnableNotification, t]);
 
   const excludeNotificationIds = useMemo(() => {
-    return notifications
-      .filter((acc) => acc.actionType === NotificationActionType.MULTISIG_APPROVAL)
-      .map((acc) => acc.id);
-  }, [notifications]);
+    // When on MULTISIG tab, exclude non-multisig notifications (mark only multisig)
+    if (selectedFilterTab === NotificationTab.MULTISIG) {
+      return allNotifications
+        .filter((acc) => acc.actionType !== NotificationActionType.MULTISIG_APPROVAL)
+        .map((acc) => acc.id);
+    }
+
+    return [];
+  }, [allNotifications, selectedFilterTab]);
 
   const handleSwitchClick = useCallback(() => {
     markAllReadNotification({
@@ -547,14 +547,14 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     setLoading(true);
     fetchInappNotifications({
       proxyId: currentProxyId,
-      notificationTab: selectedFilterTab
+      notificationTab: NotificationTab.ALL
     } as GetNotificationParams)
       .then((rs) => {
         setNotifications(rs);
         setTimeout(() => setLoading(false), 300);
       })
       .catch(console.error);
-  }, [currentProxyId, selectedFilterTab, excludeNotificationIds]);
+  }, [currentProxyId, excludeNotificationIds]);
 
   useEffect(() => {
     fetchInappNotifications({
@@ -563,6 +563,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     } as GetNotificationParams)
       .then((rs) => {
         setNotifications(rs);
+        setAllNotifications(rs);
       })
       .catch(console.error);
   }, [currentProxyId, isAllAccount, isTrigger]);
@@ -616,7 +617,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           onSelect={onSelectFilterTab}
           selectedItem={selectedFilterTab}
         />
-        {(selectedFilterTab === NotificationTab.UNREAD || selectedFilterTab === NotificationTab.ALL) && <Button
+        {(selectedFilterTab === NotificationTab.UNREAD || selectedFilterTab === NotificationTab.ALL || selectedFilterTab === NotificationTab.MULTISIG) && <Button
           className={'mark-read-btn'}
           icon={(
             <Icon

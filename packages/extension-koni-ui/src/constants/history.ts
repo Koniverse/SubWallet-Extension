@@ -23,6 +23,7 @@ export const TxTypeNameMap: Record<ExtrinsicType, string> = {
   [ExtrinsicType.STAKING_LEAVE_POOL]: detectTranslate('ui.HISTORY.constant.history.unstake'),
   [ExtrinsicType.STAKING_UNBOND]: detectTranslate('ui.HISTORY.constant.history.unstake'),
   [ExtrinsicType.CHANGE_EARNING_VALIDATOR]: detectTranslate('ui.HISTORY.constant.history.nominate'),
+  [ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE]: detectTranslate('ui.HISTORY.constant.history.changeRewards'),
   [ExtrinsicType.JOIN_YIELD_POOL]: detectTranslate('ui.HISTORY.constant.history.joinPool'),
   [ExtrinsicType.UNSTAKE_VDOT]: detectTranslate('ui.HISTORY.constant.history.unstakeVDot'),
   [ExtrinsicType.UNSTAKE_VMANTA]: detectTranslate('ui.HISTORY.constant.history.unstakeVManta'),
