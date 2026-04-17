@@ -31,7 +31,7 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ChainItemType, FormCallbacks, Theme, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { findAccountByAddress, formatBalance, getSignModeByAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, formatBalance, getAssetDisplayName, getSignModeByAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import { useQuery } from '@tanstack/react-query';
@@ -378,6 +378,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             slug: chainAsset.slug,
             name: _getAssetName(chainAsset),
             symbol: _getAssetSymbol(chainAsset),
+            displayName: getAssetDisplayName(chainAsset, chainAsset.symbol),
             originChain
           });
         }
@@ -630,7 +631,9 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         transferBounceable: options.isTransferBounceable,
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
-        tokenPayFeeSlug: currentTokenPayFee
+        tokenPayFeeSlug: currentTokenPayFee,
+        maxTransferableWithoutFee: transferInfo?.maxTransferableWithoutFee,
+        maxTransferable: transferInfo?.maxTransferable
       });
     } else {
       // Make cross chain transfer
@@ -650,7 +653,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
 
     return sendPromise;
-  }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee]);
+  }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, transferInfo?.maxTransferableWithoutFee, transferInfo?.maxTransferable]);
 
   // todo: must refactor later, temporary solution to support SnowBridge
   const handleBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
