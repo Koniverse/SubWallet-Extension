@@ -27,8 +27,6 @@ export function subscribeERC20Interval ({ addresses, assetMap, callback, chainIn
     tokenList = Object.assign({}, tokenList, moonbeamLocal);
   }
 
-  tokenList = Object.fromEntries(Object.entries(tokenList).filter(([, tokenInfo]) => tokenInfo?.originChain !== 'subtensor_evm' && tokenInfo.metadata?.isAlphaToken));
-
   const erc20ContractMap = {} as Record<string, Contract>;
 
   Object.entries(tokenList).forEach(([slug, tokenInfo]) => {
