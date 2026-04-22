@@ -13,6 +13,7 @@ import { useGetAccountByAddress, useGetNativeTokenBasicInfo } from '@subwallet/e
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
+import CN from 'classnames';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -123,9 +124,6 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
       .dividedBy(BN_TEN.pow(destTokenInfo.decimals || 0))
       .toNumber();
   }, [destTokenInfo.decimals, destTransferTokenValue, isAcrossBridge, xcmData.metadata?.amountOut]);
-
-  const destinationChainSlug = xcmData?.destinationNetworkKey || transaction.chain;
-  const originChainSlug = xcmData?.originNetworkKey || transaction.chain;
 
   const isSubstrateXcm = useMemo(() => {
     const originChainInfo = chainInfoMap[originChainSlug];
@@ -250,7 +248,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
         <MetaInfo.Default
           label={t('ui.TRANSACTION.Confirmations.TransferBlock.networkFee')}
         >
-          <div className='__fee-editor-area'>
+          {!transaction.wrappingStatus && <div className='__fee-editor-area'>
             <Number
               decimal={feeInfo ? feeInfo.decimals : nativeTokenDecimals}
               suffix={feeInfo ? feeInfo.symbol : nativeTokenSymbol}
@@ -264,7 +262,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
               suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
               value={convertedFeeValueToUSD}
             />
-          </div>
+          </div>}
         </MetaInfo.Default>
 
         {transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM && crossChainFeeInfo?.value && isSubstrateXcm && (
@@ -287,7 +285,18 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
           </MetaInfo.Default>
         )}
       </MetaInfo>
-    </div>
+      {
+        transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM &&
+        (
+          <AlertBox
+            className={CN(className, 'alert-area')}
+            description={t('ui.TRANSACTION.Confirmations.TransferBlock.crossChainAdditionalFee')}
+            title={t('ui.TRANSACTION.Confirmations.TransferBlock.payAttentionExclamation')}
+            type='warning'
+          />
+        )
+      }
+    </>
   );
 };
 
@@ -297,6 +306,9 @@ export const TransferBlock = styled(Component)<Props>(({ theme: { token } }: Pro
       fontSize: `${token.fontSizeSM}px !important`,
       lineHeight: '20px !important',
       color: `${token.colorTextTertiary} !important`
+    },
+    '&.alert-area': {
+      marginTop: token.marginSM
     }
   };
 });
