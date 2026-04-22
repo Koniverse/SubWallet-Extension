@@ -1,5 +1,86 @@
 # CHANGELOG
 
+## 1.3.76
+Build date: Mar 20, 2026.
+
+Features & Updates:
+- Unable to turn network when no add correct API key (#4972)
+- Display token name and subnet ID for subnet tokens | Bittensor (#4892)
+- Support the newly updated Root staking feature | Bittensor (#4829)
+
+
+## 1.3.75
+Build date: Mar 17, 2026.
+
+Features & Updates:
+- Add user-configurable Subscan API Key in settings (#4965)
+
+
+## 1.3.74
+Build date: Feb 11, 2026.
+
+Features & Updates:
+- Support Multisig Account Phase 1 (#4855)
+
+
+## 1.3.73
+Build date: Jan 22, 2026.
+
+Features & Updates:
+- Update @subwallet-monorepos/subwallet-services-sdk 0.1.16 (#4957)
+- Remove the Crowdloans tab (#4920)
+
+Bug fixes:
+- Fix bug get Earning position parachain (#4950)
+
+
+## 1.3.72
+Build date: Jan 14, 2026.
+
+Features & Updates:
+- Integrate Proxy Account Support (#4725)
+- Update chain-list stable v0.2.123 (#4861)
+- Add support for USDC & stEWT (#639)
+- Migrate to ParaSpell V5 (#4908)
+
+
+## 1.3.71
+Build date: Dec 29, 2025.
+
+Features & Updates:
+- Improve token enabling (Round 2) (#4247)
+- Update libs for SubWallet Extensions (#4808)
+- Support Import from Trust Wallet to SubWallet (#4762)
+
+
+## 1.3.70
+Build date: Dec 11, 2025.
+
+Features & Updates:
+- Support OpenGov (Phase 1) (#4678)
+
+
+## 1.3.69
+Build date: Dec 08, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.122 (#4827)
+- Turn off "Advanced phishing detection" feature (#4891)
+
+
+## 1.3.68
+Build date: Dec 03, 2025.
+
+Features & Updates:
+- Standardize the Module Price History according to the new standard (#4784)
+- Locked Balance Display (#4708)
+- Update Transak Widget URL (#4835)
+
+Bug fixes:
+- Unable to import NFT ERC-721 on Rari chain (#4625)
+- Support show NFT haven't method tokenOfOwnerByIndex (#4568)
+
+
 ## 1.3.67
 Build date: Nov 13, 2025.
 

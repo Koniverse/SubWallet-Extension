@@ -47,8 +47,6 @@ const isValidAccountChainType = (chainType: AccountChainType, conditions: Accoun
     case AccountChainType.CARDANO: return accountAuthTypes.includes('cardano');
     case AccountChainType.BITCOIN: return accountAuthTypes.includes('bitcoin');
   }
-
-  return false;
 };
 
 const dAppConfigurationModalId = DAPP_CONFIGURATION_MODAL;

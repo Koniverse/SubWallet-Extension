@@ -138,32 +138,6 @@ export function quickFormatAddressToCompare (address?: string) {
   return reformatAddress(address, 42).toLowerCase();
 }
 
-/** @deprecated */
-export const modifyAccountName = (type: KeypairType, name: string, modify: boolean) => {
-  if (!modify) {
-    return name;
-  }
-
-  let network = '';
-
-  switch (type) {
-    case 'sr25519':
-    case 'ed25519':
-    case 'ecdsa':
-      network = 'Substrate';
-      break;
-    case 'ethereum':
-      network = 'EVM';
-      break;
-    case 'ton':
-    case 'ton-native':
-      network = 'Ton';
-      break;
-  }
-
-  return network ? [name, network].join(' - ') : name;
-};
-
 /**
  * @function getAccountJsonByAddress
  * @desc Get account info by address

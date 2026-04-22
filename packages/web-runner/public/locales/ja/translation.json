@@ -1834,5 +1834,13 @@
   "bg.EARNING.services.service.earning.nativeStaking.dtao.unstakeAmountTooLow": "Amount too low. You need to unstake at least {{amount}} {{symbol}}",
   "bg.EARNING.services.service.earning.nativeStaking.dtao.fromValidatorSameAsTo": "From validator is the same with to validator",
   "bg.EARNING.services.service.earning.nativeStaking.dtao.moveAmountTooLow": "Amount too low. You need to move at least {{formattedMinUnstake}} {{subnetSymbol}}",
-  "bg.EARNING.services.service.earning.nativeStaking.dtao.remainingStakeBelowMinimumWarning": "Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit \"Move all\" to move all {{maxAmount}} {{subnetSymbol}} to the new validator, or \"Cancel\" and lower the amount, then try again"
+  "bg.EARNING.services.service.earning.nativeStaking.dtao.remainingStakeBelowMinimumWarning": "Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit \"Move all\" to move all {{maxAmount}} {{subnetSymbol}} to the new validator, or \"Cancel\" and lower the amount, then try again",
+  "bg.koni.handler.Extension.notEnoughBalanceForMultisigDepositAndFee": "",
+  "bg.koni.handler.Extension.proxyAccountNotEnoughBalance": "",
+  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "",
+  "bg.ACCOUNT.services.keyring.handler.Multisig.signersRequired": "",
+  "bg.ACCOUNT.services.keyring.handler.Multisig.multipleSignersRequired": "",
+  "bg.ACCOUNT.services.keyring.handler.Multisig.invalidThreshold": "",
+  "bg.ACCOUNT.services.keyring.handler.Multisig.mustBeSubstrateAddress": "",
+  "bg.ACCOUNT.services.keyring.handler.Multisig.duplicateAddressFound": ""
 }

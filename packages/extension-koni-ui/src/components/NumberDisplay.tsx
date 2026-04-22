@@ -89,14 +89,14 @@ function analyzeDecimal (value: string | number | BigNumber): DecimalParts {
 
     return {
       integerPart: intPart,
-      fractionPart: roundFraction(fracRaw, 4)
+      fractionPart: roundFraction(fracRaw, Math.min(fracRaw.length, 4))
     };
   }
 
   const zeroMatch = fracRaw.match(/^(0{3,})/);
   const subCount = zeroMatch?.[1].length;
   const rest = subCount ? fracRaw.slice(subCount) : fracRaw;
-  const maxLen = subCount ? 2 : 4;
+  const maxLen = subCount ? 2 : Math.min(fracRaw.length, 4);
   const rounded = roundFraction(rest, maxLen);
 
   return {

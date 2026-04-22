@@ -25,6 +25,7 @@ export interface ResponseSubscribeTransfer {
   // TODO: Need to manage errors separately between networks
   error?: string;
   isEvmRpcError?: boolean
+  maxTransferableWithoutFee: string;
 }
 
 export interface RequestSubmitTransferWithId extends RequestSubmitTransfer{
@@ -44,6 +45,8 @@ export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
   value: string;
   transferBounceable?: boolean;
   isSubstrateECDSATransaction?: boolean;
+  maxTransferableWithoutFee?: string;
+  maxTransferable?: string;
 }
 
 export interface RequestSubmitSignPsbtTransfer extends BaseRequestSign {

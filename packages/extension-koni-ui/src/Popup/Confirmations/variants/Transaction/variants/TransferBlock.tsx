@@ -5,6 +5,7 @@ import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/b
 import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { isSubstrateCrossChain } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
+import { AlertBox, CommonTransactionInfo } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import QuoteRateDisplay from '@subwallet/extension-koni-ui/components/Swap/QuoteRateDisplay';
 import { BN_TEN } from '@subwallet/extension-koni-ui/constants';
@@ -45,9 +46,12 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
 
   const fromAccount = useGetAccountByAddress(data.from);
   const toAccount = useGetAccountByAddress(data.to);
-  const fromAccountName = fromAccount?.name;
-  const toAccountName = toAccount?.name;
-
+  const fromAccountName = useMemo(() => fromAccount?.name, [fromAccount]);
+  const toAccountName = useMemo(() => toAccount?.name, [toAccount]);
+  const destinationChainSlug = useMemo(() => xcmData?.destinationNetworkKey || transaction.chain, [xcmData?.destinationNetworkKey, transaction.chain]);
+  const originChainSlug = useMemo(() => xcmData?.originNetworkKey || transaction.chain, [xcmData?.originNetworkKey, transaction.chain]);
+  const senderLabel = useMemo(() => fromAccount?.isMultisig ? t('ui.TRANSACTION.Confirmations.TransferBlock.multisig') : t('ui.TRANSACTION.Confirmations.TransferBlock.sender'), [fromAccount?.isMultisig, t]);
+  const chainInfo = useMemo(() => chainInfoMap[transaction.chain], [chainInfoMap, transaction.chain]);
   const { decimals: nativeTokenDecimals, symbol: nativeTokenSymbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const feeInfo = transaction.estimateFee;
   const crossChainFeeInfo = transaction?.xcmDestinationFee;
@@ -135,32 +139,68 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
   }, [destinationChainSlug, originChainSlug, chainInfoMap]);
 
   return (
-    <div className={className}>
-      <MetaInfo hasBackgroundWrapper>
-        <MetaInfo.Transfer
-          alwaysShowChain
-          destinationChain={{
-            slug: destinationChainSlug,
-            name: _getChainName(chainInfoMap[destinationChainSlug])
-          }}
-          originChain={{
-            slug: originChainSlug,
-            name: _getChainName(chainInfoMap[originChainSlug])
-          }}
-          recipientAddress={data.to}
-          recipientLabel={t('ui.TRANSACTION.Confirmations.TransferBlock.sendTo')}
-          recipientName={toAccountName}
-          senderAddress={data.from}
-          senderLabel={t('ui.TRANSACTION.Confirmations.TransferBlock.sendFrom')}
-          senderName={fromAccountName}
-        />
-      </MetaInfo>
+    <>
+      {
+        transaction.wrappingStatus
+          ? (
+            <CommonTransactionInfo
+              address={data.from}
+              network={transaction.chain}
+            />
+          )
+          : (!!chainInfo && transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM
+            ? (
+              <MetaInfo hasBackgroundWrapper>
+                <MetaInfo.Transfer
+                  alwaysShowChain
+                  destinationChain={{
+                    slug: destinationChainSlug,
+                    name: _getChainName(chainInfoMap[destinationChainSlug])
+                  }}
+                  originChain={{
+                    slug: originChainSlug,
+                    name: _getChainName(chainInfoMap[originChainSlug])
+                  }}
+                  recipientAddress={data.to}
+                  recipientLabel={t('ui.TRANSACTION.Confirmations.TransferBlock.recipient')}
+                  recipientName={toAccountName}
+                  senderAddress={data.from}
+                  senderLabel={senderLabel}
+                  senderName={fromAccountName}
+                />
+              </MetaInfo>
+            )
+            : (
+              <MetaInfo hasBackgroundWrapper>
+                <MetaInfo.Account
+                  address={data.from}
+                  label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendFrom')}
+                />
+                <MetaInfo.Account
+                  address={data.to}
+                  label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendTo')}
+                />
+                <MetaInfo.Chain
+                  chain={chainInfo.slug}
+                  label={t('ui.TRANSACTION.Confirmations.TransferBlock.network')}
+                />
+              </MetaInfo>
+            ))
+      }
 
       <MetaInfo
         hasBackgroundWrapper
         labelColorScheme={'gray'}
         valueColorScheme={'light'}
       >
+        {!!transaction.wrappingStatus &&
+          <MetaInfo.Account
+            address={data.to}
+            chainSlug={transaction.chain}
+            label={t('ui.TRANSACTION.Confirmations.TransferBlock.recipient')}
+            onlyShowName
+          />
+        }
         {isAcrossBridge && xcmData.metadata
           ? <>
             <MetaInfo.Default

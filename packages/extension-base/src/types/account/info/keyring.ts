@@ -96,6 +96,21 @@ export interface AccountDeriveData {
 }
 
 /**
+ * @interface AccountMultisigData
+ * @prop {boolean} [isMultisig] - Is multisig account
+ * */
+export interface AccountMultisigData {
+  /** Is multisig account */
+  isMultisig?: boolean;
+
+  /** signer addresses */
+  signers?: string[];
+
+  /** multisig threshold */
+  threshold?: number;
+}
+
+/**
  * Represents the comprehensive metadata associated with an account, combining various aspects of account data.
  * This interface extends from multiple specific metadata interfaces to provide a unified view of an account's metadata.
  * It includes external, ledger, injected, and derived account data, offering a detailed perspective on the account's characteristics and origins.
@@ -108,7 +123,7 @@ export interface AccountDeriveData {
  * @extends AccountInjectData - Covers data related to injected accounts, including the source of the injection.
  * @extends AccountDeriveData - Holds information about derived accounts, including the parent address and derivation path (suri).
  */
-export interface AccountMetadataData extends AccountExternalData, AccountLedgerData, AccountInjectData, AccountDeriveData {}
+export interface AccountMetadataData extends AccountExternalData, AccountLedgerData, AccountInjectData, AccountDeriveData, AccountMultisigData {}
 
 export enum AccountSignMode {
   PASSWORD = 'password',
@@ -117,6 +132,7 @@ export enum AccountSignMode {
   GENERIC_LEDGER = 'generic-ledger',
   ECDSA_SUBSTRATE_LEDGER = 'ecdsa-substrate-ledger',
   READ_ONLY = 'readonly',
+  MULTISIG = 'multisig',
   ALL_ACCOUNT = 'all',
   INJECTED = 'injected',
   UNKNOWN = 'unknown'
