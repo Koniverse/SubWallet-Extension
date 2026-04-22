@@ -326,7 +326,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
       checkActive: checkSwapFeesModalActive,
       update: setSwapFeesModalProps
     }
-  }), [checkAddressQrModalActive, closeAccountTokenAddressModal, checkSwapFeesModalActive, closeAddressQrModal, closeAlert, openAccountTokenAddressModal, closeSelectAddressFormatModal, openAddressQrModal, openAlert, openDeriveModal, openProcessModal, openSelectAddressFormatModal, openSwapFeesModal, openSwitchNetworkAuthorizeModal, openTransactionStepsModal]);
+  }), [openAddressQrModal, checkAddressQrModalActive, closeAddressQrModal, openSelectAddressFormatModal, closeSelectAddressFormatModal, openAccountTokenAddressModal, closeAccountTokenAddressModal, openAlert, closeAlert, openDeriveModal, openProcessModal, openTransactionStepsModal, openSwitchNetworkAuthorizeModal, openSwapFeesModal, checkSwapFeesModalActive]);
 
   useEffect(() => {
     if (hasMasterPassword && isLocked) {

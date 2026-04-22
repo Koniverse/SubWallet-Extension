@@ -148,7 +148,7 @@ export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps, isP
     const originDryRunRs = dryRunResult.origin;
 
     if (originDryRunRs.success) {
-      const { assetHub, bridgeHub, destination, hops } = dryRunResult;
+      const { destination, hops } = dryRunResult;
 
       for (const hop of hops) {
         if (!hop.result.success) {
@@ -156,13 +156,9 @@ export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps, isP
         }
       }
 
-      if (assetHub?.success === false || bridgeHub?.success === false || destination?.success === false) {
-        if (destination?.success === false) {
-          // pass dry-run in these cases
-          return isChainNotSupportDryRun(destination.failureReason) || isChainNotSupportPolkadotApi(destination.failureReason);
-        }
-
-        return false;
+      if (destination?.success === false) {
+        // pass dry-run in these cases
+        return isChainNotSupportDryRun(destination.failureReason) || isChainNotSupportPolkadotApi(destination.failureReason);
       }
 
       return true;

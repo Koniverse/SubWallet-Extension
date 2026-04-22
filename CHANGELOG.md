@@ -1,5 +1,49 @@
 # CHANGELOG
 
+## 1.3.76
+Build date: Mar 20, 2026.
+
+Features & Updates:
+- Unable to turn network when no add correct API key (#4972)
+- Display token name and subnet ID for subnet tokens | Bittensor (#4892)
+- Support the newly updated Root staking feature | Bittensor (#4829)
+
+
+## 1.3.75
+Build date: Mar 17, 2026.
+
+Features & Updates:
+- Add user-configurable Subscan API Key in settings (#4965)
+
+
+## 1.3.74
+Build date: Feb 11, 2026.
+
+Features & Updates:
+- Support Multisig Account Phase 1 (#4855)
+
+
+## 1.3.73
+Build date: Jan 22, 2026.
+
+Features & Updates:
+- Update @subwallet-monorepos/subwallet-services-sdk 0.1.16 (#4957)
+- Remove the Crowdloans tab (#4920)
+
+Bug fixes:
+- Fix bug get Earning position parachain (#4950)
+
+
+## 1.3.72
+Build date: Jan 14, 2026.
+
+Features & Updates:
+- Integrate Proxy Account Support (#4725)
+- Update chain-list stable v0.2.123 (#4861)
+- Add support for USDC & stEWT (#639)
+- Migrate to ParaSpell V5 (#4908)
+
+
 ## 1.3.71
 Build date: Dec 29, 2025.
 

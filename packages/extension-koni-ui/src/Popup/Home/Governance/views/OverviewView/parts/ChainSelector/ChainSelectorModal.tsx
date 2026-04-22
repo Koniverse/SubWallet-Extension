@@ -3,6 +3,8 @@
 
 import { _GOVERNANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
+import { AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
+import { isAccountAll } from '@subwallet/extension-base/utils';
 import { GeneralEmptyList } from '@subwallet/extension-koni-ui/components';
 import Search from '@subwallet/extension-koni-ui/components/Search';
 import { useGetAccountTokenBalance, useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -38,6 +40,7 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain, selectedC
   const [searchValue, setSearchValue] = useState<string>('');
   const getAccountTokenBalance = useGetAccountTokenBalance();
   const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
+  const accounts = useSelector((state: RootState) => state.accountState.accounts);
 
   const handleSearch = useCallback((value: string) => {
     setSearchValue(value);
@@ -49,9 +52,34 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain, selectedC
     return item.chainName.toLowerCase().includes(lowerCaseSearchText);
   }, []);
 
+  const isOnlyMultiSigAccounts = useMemo(() => {
+    if (!currentAccountProxy) {
+      return false;
+    }
+
+    if (!isAccountAll(currentAccountProxy.id)) {
+      // Todo: We may need to revisit this logic in case multisig is supported by networks other than Substrate
+      return currentAccountProxy.accountType === AccountProxyType.MULTISIG;
+    } else {
+      return accounts.every((a) => a.signMode === AccountSignMode.MULTISIG);
+    }
+  }, [accounts, currentAccountProxy]);
+
   const itemGroupMap = useMemo(() => {
     const getItems = (chainSlugs: string[]) => {
-      return chainSlugs.map((cs) => ({
+      return chainSlugs.filter((cs) => {
+        if (!isOnlyMultiSigAccounts) {
+          return true;
+        }
+
+        const chainInfo = chainInfoMap[cs];
+
+        if (!chainInfo) {
+          return false;
+        }
+
+        return chainInfo.substrateInfo?.supportMultisig;
+      }).map((cs) => ({
         chainSlug: cs,
         chainName: chainInfoMap[cs]?.name || `${cs}-noName`
       }));
@@ -65,7 +93,7 @@ const Component = ({ className = '', modalId, onCancel, onChangeChain, selectedC
       solo: getItems(_GOVERNANCE_CHAIN_GROUP.solo),
       testnet: getItems(_GOVERNANCE_CHAIN_GROUP.testnet)
     };
-  }, [chainInfoMap]);
+  }, [chainInfoMap, isOnlyMultiSigAccounts]);
 
   const listItems = useMemo<ListItem[]>(() => {
     const result: ListItem[] = [];

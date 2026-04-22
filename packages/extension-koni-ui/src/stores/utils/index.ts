@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _AssetRef, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
-import { AddressBookInfo, AssetSetting, CampaignBanner, ChainStakingMetadata, ConfirmationsQueue, ConfirmationsQueueBitcoin, ConfirmationsQueueCardano, ConfirmationsQueueTon, CrowdloanJson, KeyringState, MantaPayConfig, MantaPaySyncState, NftCollection, NftJson, NominatorMetadata, PriceJson, ShowCampaignPopupRequest, StakingJson, StakingRewardJson, TokenPriorityDetails, TransactionHistoryItem, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
+import { AddressBookInfo, AssetSetting, CampaignBanner, ChainStakingMetadata, ConfirmationsQueue, ConfirmationsQueueBitcoin, ConfirmationsQueueCardano, ConfirmationsQueueTon, KeyringState, MantaPayConfig, MantaPaySyncState, NftCollection, NftJson, NominatorMetadata, PriceJson, ShowCampaignPopupRequest, StakingJson, StakingRewardJson, TokenPriorityDetails, TransactionHistoryItem, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountsContext, AuthorizeRequest, ConfirmationRequestBase, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _ChainApiStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
+import { PendingMultisigTxMap } from '@subwallet/extension-base/services/multisig-service';
 import { GovVotingInfo } from '@subwallet/extension-base/services/open-gov/interface';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
@@ -305,12 +306,6 @@ export const updateBalance = (data: BalanceJson) => {
 
 export const subscribeBalance = lazySubscribeMessage('pri(balance.getSubscription)', null, updateBalance, updateBalance);
 
-export const updateCrowdloan = (data: CrowdloanJson) => {
-  store.dispatch({ type: 'crowdloan/update', payload: data.details });
-};
-
-export const subscribeCrowdloan = lazySubscribeMessage('pri(crowdloan.getSubscription)', null, updateCrowdloan, updateCrowdloan);
-
 export const updateNftItems = (data: NftJson) => {
   store.dispatch({ type: 'nft/updateNftItems', payload: data.nftList });
 };
@@ -588,4 +583,10 @@ export const updateGovLockedInfo = (data: GovVotingInfo[]) => {
 };
 
 export const subscribeGovLockedInfo = lazySubscribeMessage('pri(openGov.subscribeGovLockedInfo)', null, updateGovLockedInfo, updateGovLockedInfo);
-/* OpenGov */
+
+/* Multisig Account */
+export const updatePendingMultisigTxs = (data: PendingMultisigTxMap) => {
+  store.dispatch({ type: 'multisig/updatePendingMultisigTxs', payload: data });
+};
+
+export const subscribePendingMultisigTxs = lazySubscribeMessage('pri(multisig.subscribePendingMultisigTxs)', null, updatePendingMultisigTxs, updatePendingMultisigTxs);

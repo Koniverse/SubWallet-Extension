@@ -5,7 +5,11 @@ import { NotificationTab } from '@subwallet/extension-base/services/inapp-notifi
 
 export interface GetNotificationParams {
   proxyId: string,
-  notificationTab: NotificationTab
+  notificationTab: NotificationTab;
+  metadata?: {
+    multisigAddress?: string
+    chain?: string
+  }
 }
 
 export interface RequestSwitchStatusParams {
@@ -17,4 +21,9 @@ export interface RequestIsClaimedPolygonBridge {
   chainslug: string,
   counter: number,
   sourceNetwork: number
+}
+
+export interface MarkAllReadParams {
+  proxyId: string;
+  excludeNotificationIds?: string[];
 }

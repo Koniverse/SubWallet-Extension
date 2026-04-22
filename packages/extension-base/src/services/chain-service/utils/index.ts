@@ -768,6 +768,10 @@ export const _isChainInfoCompatibleWithAccountInfo = (chainInfo: _ChainInfo, acc
   const { chainType: accountChainType, signMode: accountSignMode, type: accountType } = accountInfo;
 
   if (accountChainType === AccountChainType.SUBSTRATE) {
+    if (accountSignMode === AccountSignMode.MULTISIG && !chainInfo.substrateInfo?.supportMultisig) {
+      return false;
+    }
+
     return _isPureSubstrateChain(chainInfo) && AllSubstrateKeypairTypes.includes(accountType);
   }
 

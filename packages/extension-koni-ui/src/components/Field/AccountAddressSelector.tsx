@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { AccountProxyType } from '@subwallet/extension-base/types';
 import { AccountProxyAvatar } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { useSelectModalInputHelper, useTranslation } from '@subwallet/extension-koni-ui/hooks';
@@ -25,12 +26,13 @@ interface Props extends BaseProps {
   items: AccountAddressItemType[] | GovAccountAddressItemType[];
   isGovModal?: boolean;
   avatarSize?: number;
+  hiddenAccountProxyTypes?: AccountProxyType[];
 }
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElement<Props> => {
   const { autoSelectFirstItem, avatarSize = 20, className = '', disabled
-    , id = 'account-selector', isGovModal, items, label
-    , labelStyle, placeholder, readOnly, statusHelp, tooltip, value } = props;
+    , hiddenAccountProxyTypes, id = 'account-selector', isGovModal, items
+    , label, labelStyle, placeholder, readOnly, statusHelp, tooltip, value } = props;
 
   const { t } = useTranslation();
   const { onSelect } = useSelectModalInputHelper(props, ref);
@@ -132,6 +134,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
         : (
           <AccountSelectorModal
             autoSelectFirstItem={autoSelectFirstItem}
+            hiddenAccountProxyTypes={hiddenAccountProxyTypes}
             items={items}
             modalId={id}
             onCancel={onCancelModal}

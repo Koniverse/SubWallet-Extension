@@ -117,7 +117,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [navigate]);
 
   const onBack = useCallback(() => {
-    navigate(-1);
+    navigate('/settings/list');
   }, [navigate]);
 
   const openFilterModal = useCallback((e?: SyntheticEvent) => {
