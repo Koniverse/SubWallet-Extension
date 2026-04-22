@@ -16,7 +16,8 @@ export const isTypeStaking = (txType: ExtrinsicType) => [
   ExtrinsicType.STAKING_UNBOND,
   ExtrinsicType.STAKING_WITHDRAW,
   ExtrinsicType.STAKING_COMPOUNDING,
-  ExtrinsicType.STAKING_CANCEL_UNSTAKE
+  ExtrinsicType.STAKING_CANCEL_UNSTAKE,
+  ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE
 ].includes(txType);
 
 export const isTypeMint = (txType: ExtrinsicType) =>

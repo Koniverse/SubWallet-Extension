@@ -7,13 +7,13 @@ import { CRON_REFRESH_CHAIN_STAKING_METADATA, CRON_REFRESH_EARNING_REWARD_HISTOR
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { _getChainSubstrateTokenSymbol, _isChainEnabled } from '@subwallet/extension-base/services/chain-service/utils';
-import { _STAKING_CHAIN_GROUP, STAKING_IDENTITY_API_SLUG } from '@subwallet/extension-base/services/earning-service/constants';
+import { _STAKING_CHAIN_GROUP, STAKING_IDENTITY_API_SLUG, SUNSETTED_YIELD_POOL_SLUGS } from '@subwallet/extension-base/services/earning-service/constants';
 import BaseLiquidStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/liquid-staking/base';
 import MythosNativeStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/mythos';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
-import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningImpact, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, SubmitChangeValidatorStaking, TransactionData, ValidateYieldProcessParams, ValidatorInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, EarningStatus, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestChangeBittensorRootClaimType, RequestEarlyValidateYield, RequestEarningImpact, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, SubmitChangeValidatorStaking, TransactionData, ValidateYieldProcessParams, ValidatorInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject, combineLatest } from 'rxjs';
@@ -113,8 +113,6 @@ export default class EarningService implements StoppableServiceInterface, Persis
       }
 
       if (_STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
-        // todo: check support for testnet
-        // Mainnet only
         handlers.push(new TaoNativeStakingPoolHandler(this.state, chain));
         handlers.push(new SubnetTaoStakingPoolHandler(this.state, chain));
       }
@@ -548,6 +546,14 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
       updatedItem.metadata.availableMethod = handler.availableMethod;
 
+      // Disable staking for sunsetted pools
+      if (SUNSETTED_YIELD_POOL_SLUGS.includes(item.slug)) {
+        updatedItem.metadata.availableMethod = {
+          ...updatedItem.metadata.availableMethod,
+          join: false
+        };
+      }
+
       this.updateYieldPoolInfo(updatedItem);
     });
 
@@ -663,7 +669,14 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     existedYieldPosition.forEach((item) => {
       if (!this.inactivePoolSlug.has(item.slug)) {
-        yieldPositionInfo[this._getYieldPositionKey(item.slug, item.address)] = item;
+        const normalizedItem = SUNSETTED_YIELD_POOL_SLUGS.includes(item.slug)
+          ? {
+            ...item,
+            status: EarningStatus.NOT_EARNING
+          }
+          : item;
+
+        yieldPositionInfo[this._getYieldPositionKey(item.slug, item.address)] = normalizedItem;
       }
     });
 
@@ -694,7 +707,14 @@ export default class EarningService implements StoppableServiceInterface, Persis
   }
 
   public updateYieldPosition (data: YieldPositionInfo) {
-    this.yieldPositionPersistQueue.push(data);
+    const normalizedData = SUNSETTED_YIELD_POOL_SLUGS.includes(data.slug)
+      ? {
+        ...data,
+        status: EarningStatus.NOT_EARNING
+      }
+      : data;
+
+    this.yieldPositionPersistQueue.push(normalizedData);
 
     addLazy('persistYieldPositionInfo', () => {
       const yieldPositionInfo = this.yieldPositionSubject.getValue();
@@ -1216,6 +1236,24 @@ export default class EarningService implements StoppableServiceInterface, Persis
 
     if (handler) {
       return handler.handleChangeEarningValidator(params);
+    } else {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
+    }
+  }
+
+  public async handleChangeRootClaimType (params: RequestChangeBittensorRootClaimType): Promise<TransactionData> {
+    await this.eventService.waitChainReady;
+
+    const { bittensorRootClaimType, chain, slug } = params;
+
+    if (!_STAKING_CHAIN_GROUP.bittensor.includes(chain)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+    }
+
+    const handler = this.getPoolHandler(slug) as TaoNativeStakingPoolHandler;
+
+    if (handler) {
+      return handler.handleChangeRootClaimType(bittensorRootClaimType);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
