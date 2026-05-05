@@ -53,12 +53,12 @@ function Component ({ chainInfo, className = '', navigate, showDetailNavigation 
   }, [chainInfo, navigate]);
 
   useEffect(() => {
-    if (chainInfo.connectionStatus === _ChainConnectionStatus.CONNECTED && !chainInfo.active) {
+    if (chainInfo.connectionStatus === _ChainConnectionStatus.CONNECTED && !chainInfo.active && !chainInfo.manualTurnOff) {
       updateChainActiveState(chainInfo.slug, true).catch(() => {
         // skip error since we will try to update active state again when user click the switch
       });
     }
-  }, [chainInfo, t]);
+  }, [chainInfo.active, chainInfo.connectionStatus, chainInfo.manualTurnOff, chainInfo.slug, t]);
 
   return (
     <div className={`${className}`}>
