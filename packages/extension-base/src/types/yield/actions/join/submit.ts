@@ -15,6 +15,7 @@ export interface HandleYieldStepData {
   chainType: ChainType;
   txData: any;
   transferNativeAmount: string;
+  xcmStepFee?: string;
 }
 
 export interface AbstractSubmitYieldJoinData {
