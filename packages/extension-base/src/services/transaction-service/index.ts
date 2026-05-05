@@ -1012,6 +1012,7 @@ export default class TransactionService {
       nonce: nonce ?? 0,
       startBlock: startBlock || 0,
       processId: transaction.step?.processId,
+      crossChainFeeInfo: transaction?.xcmDestinationFee,
       substrateProxyAddresses: []
     };
 
