@@ -20,7 +20,7 @@ export function validateSpendingAndFeePayment (spendingToken: _ChainAsset, feeTo
       return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.core.validation.insufficientSpendingTokenBalance', { replace: { spendingTokenSymbol: spendingToken.symbol } }))];
     }
   } else {
-    if (bnFromTokenBalance.lte(bnSpendingAmount.plus(_isNativeToken(spendingToken) ? '0' : _getTokenMinAmount(spendingToken)))) {
+    if (bnFromTokenBalance.lt(bnSpendingAmount.plus(_isNativeToken(spendingToken) ? '0' : _getTokenMinAmount(spendingToken)))) {
       return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.core.validation.insufficientSpendingTokenBalance', { replace: { spendingTokenSymbol: spendingToken.symbol } }))];
     }
 
