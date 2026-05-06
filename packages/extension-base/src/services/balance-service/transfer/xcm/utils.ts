@@ -18,6 +18,7 @@ import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Call, ExtrinsicPayload } from '@polkadot/types/interfaces';
 import { assert, compactToU8a, isHex, u8aConcat, u8aEq } from '@polkadot/util';
+
 import { _isBittensorToSubtensorBridge, _isSubtensorToBittensorBridge } from './bittensorBridge';
 
 export type DryRunNodeFailure = {
@@ -90,7 +91,7 @@ const paraSpellApi = {
   minTransferable: `${version}/min-transferable-amount`
 };
 
-function txHexToSubmittableExtrinsic(api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> {
+function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> {
   try {
     assert(isHex(hex), 'Expected a hex-encoded call');
 
@@ -153,7 +154,7 @@ function txHexToSubmittableExtrinsic(api: ApiPromise, hex: string): SubmittableE
   }
 }
 
-export async function buildXcm(request: CreateXcmExtrinsicProps) {
+export async function buildXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue, substrateApi } = request;
 
   if (!substrateApi) {
@@ -204,7 +205,7 @@ export async function buildXcm(request: CreateXcmExtrinsicProps) {
   return txHexToSubmittableExtrinsic(chainApi.api, extrinsicHex);
 }
 
-export async function dryRunXcm(request: CreateXcmExtrinsicProps) {
+export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
   const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
@@ -251,7 +252,7 @@ export async function dryRunXcm(request: CreateXcmExtrinsicProps) {
   return await response.json() as DryRunResult;
 }
 
-export async function dryRunPreviewXcm(request: CreateXcmExtrinsicProps) {
+export async function dryRunPreviewXcm (request: CreateXcmExtrinsicProps) {
   const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
   const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
@@ -299,7 +300,7 @@ export async function dryRunPreviewXcm(request: CreateXcmExtrinsicProps) {
   return await response.json() as DryRunResult;
 }
 
-export async function estimateXcmFee(request: GetXcmFeeRequest) {
+export async function estimateXcmFee (request: GetXcmFeeRequest) {
   const { fromChainInfo, fromTokenInfo, recipient, sender, toChainInfo, value } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
   const paraSpellIdentifyV4 = fromTokenInfo.metadata?.paraSpellIdentifyV4;
@@ -344,7 +345,7 @@ export async function estimateXcmFee(request: GetXcmFeeRequest) {
   return await response.json() as GetXcmFeeResult;
 }
 
-export async function fetchMinXcmTransferableAmount(request: GetXcmFeeRequest) {
+export async function fetchMinXcmTransferableAmount (request: GetXcmFeeRequest) {
   const { fromChainInfo: originChain, fromTokenInfo: originTokenInfo, recipient, sender, toChainInfo: destinationChain, value: sendingValue } = request;
   const paraSpellChainMap = await fetchParaSpellChainMap();
   const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
@@ -380,26 +381,26 @@ export async function fetchMinXcmTransferableAmount(request: GetXcmFeeRequest) {
   return await response.json() as string;
 }
 
-function createParaSpellCurrency(paraSpellIdentifyV4: Record<string, any>, amount: string): ParaSpellCurrency {
+function createParaSpellCurrency (paraSpellIdentifyV4: Record<string, any>, amount: string): ParaSpellCurrency {
   return {
     ...paraSpellIdentifyV4,
     amount
   };
 }
 
-export function isChainNotSupportPolkadotApi(str: string): boolean {
+export function isChainNotSupportPolkadotApi (str: string): boolean {
   const regex = /(?=.*not yet supported)(?=.*Polkadot API).*/i; // Example: The node Interlay is not yet supported by the Polkadot API.
 
   return regex.test(str);
 }
 
-export function isChainNotSupportDryRun(str: string): boolean {
+export function isChainNotSupportDryRun (str: string): boolean {
   const regex = /(?=.*DryRunApi)(?=.*not available).*/i; // Example: DryRunApi is not available on node Acala
 
   return regex.test(str);
 }
 
-export function isSubstrateCrossChain(originChainInfo: _ChainInfo, destinationChainInfo: _ChainInfo) {
+export function isSubstrateCrossChain (originChainInfo: _ChainInfo, destinationChainInfo: _ChainInfo) {
   if (originChainInfo.slug === destinationChainInfo.slug) {
     return false;
   }
