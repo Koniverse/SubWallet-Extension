@@ -19,6 +19,8 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Call, ExtrinsicPayload } from '@polkadot/types/interfaces';
 import { assert, compactToU8a, isHex, u8aConcat, u8aEq } from '@polkadot/util';
 
+import { _isBittensorToSubtensorBridge, _isSubtensorToBittensorBridge } from './bittensorBridge';
+
 export type DryRunNodeFailure = {
   success: false,
   failureReason: string
@@ -430,6 +432,14 @@ export function isSubstrateCrossChain (originChainInfo: _ChainInfo, destinationC
 
   // isAcrossBridgeTransfer
   if (_isAcrossChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
+    return false;
+  }
+
+  if (_isBittensorToSubtensorBridge(originChainInfo.slug, destinationChainInfo.slug)) {
+    return false;
+  }
+
+  if (_isSubtensorToBittensorBridge(originChainInfo.slug, destinationChainInfo.slug)) {
     return false;
   }
 
