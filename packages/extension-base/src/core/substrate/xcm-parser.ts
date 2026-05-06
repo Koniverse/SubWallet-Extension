@@ -13,10 +13,10 @@ import { _getSubstrateRelayParent, _isPureEvmChain } from '@subwallet/extension-
 export function _isXcmTransferUnstable (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo, assetSlug: string): boolean {
   return (
     !_isBittensorToSubtensorEvmBridge(originChainInfo, destChainInfo) && !_isSubtensorEvmtoBittensorBridge(originChainInfo, destChainInfo) &&
-    (!_isXcmWithinSameConsensus(originChainInfo, destChainInfo) && !_isAssetHubBridgeXcm) ||
+    (!_isXcmWithinSameConsensus(originChainInfo, destChainInfo) && !_isAssetHubBridgeXcm(originChainInfo, destChainInfo))) ||
     _isMythosFromHydrationToMythos(originChainInfo, destChainInfo, assetSlug) ||
      _isPolygonBridgeXcm(originChainInfo, destChainInfo) ||
-     _isPosBridgeXcm(originChainInfo, destChainInfo)));
+     _isPosBridgeXcm(originChainInfo, destChainInfo);
 }
 
 function getDefaultUnstableWarning (): string {
