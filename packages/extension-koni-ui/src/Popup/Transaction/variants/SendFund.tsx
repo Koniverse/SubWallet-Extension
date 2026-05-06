@@ -652,8 +652,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         feeCustom: selectedTransactionFee?.feeCustom,
         tokenPayFeeSlug: currentTokenPayFee,
         maxTransferableWithoutFee: transferInfo?.maxTransferableWithoutFee,
-        maxTransferable: transferInfo?.maxTransferable
-        tokenPayFeeSlug: currentTokenPayFee,
+        maxTransferable: transferInfo?.maxTransferable,
         ...(!!netuid && !!fromValidator && !!toValidator
           ? {
             metadata: {
@@ -682,8 +681,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
 
     return sendPromise;
-  }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, transferInfo?.maxTransferableWithoutFee, transferInfo?.maxTransferable]);
-  }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, netuid]);
+  }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, transferInfo?.maxTransferableWithoutFee, transferInfo?.maxTransferable, netuid]);
 
   // todo: must refactor later, temporary solution to support SnowBridge
   const handleBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
