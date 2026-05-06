@@ -33,7 +33,7 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ChainItemType, FormCallbacks, Theme, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { findAccountByAddress, formatBalance, getSignModeByAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, formatBalance, getAssetDisplayName, getSignModeByAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import { useQuery } from '@tanstack/react-query';
@@ -231,6 +231,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const [isFetchingListFeeToken, setIsFetchingListFeeToken] = useState(false);
   const chainStatus = useMemo(() => chainStatusMap[chainValue]?.connectionStatus, [chainValue, chainStatusMap]);
   const estimatedNativeFee = useMemo((): string => transferInfo?.feeOptions.estimatedFee || '0', [transferInfo]);
+  const crossChainFee = useMemo(() => transferInfo?.feeOptions?.crossChainFee || '0', [transferInfo]);
 
   const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
 
@@ -384,6 +385,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             slug: chainAsset.slug,
             name: _getAssetName(chainAsset),
             symbol: _getAssetSymbol(chainAsset),
+            displayName: getAssetDisplayName(chainAsset, chainAsset.symbol),
             originChain
           });
         }
@@ -649,6 +651,9 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
         tokenPayFeeSlug: currentTokenPayFee,
+        maxTransferableWithoutFee: transferInfo?.maxTransferableWithoutFee,
+        maxTransferable: transferInfo?.maxTransferable
+        tokenPayFeeSlug: currentTokenPayFee,
         ...(!!netuid && !!fromValidator && !!toValidator
           ? {
             metadata: {
@@ -677,6 +682,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
 
     return sendPromise;
+  }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, transferInfo?.maxTransferableWithoutFee, transferInfo?.maxTransferable]);
   }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, netuid]);
 
   // todo: must refactor later, temporary solution to support SnowBridge
@@ -1266,6 +1272,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         {FEE_SHOW_TYPES.includes(transferInfo?.feeType) && !!toValue && !!transferAmountValue && nativeTokenSlug && !isMultisigAccount && (
           <FeeEditor
             chainValue={chainValue}
+            crossChainFee={crossChainFee}
             currentTokenPayFee={currentTokenPayFee}
             destChainValue={destChainValue}
             estimateFee={estimatedNativeFee}
@@ -1398,7 +1405,7 @@ const SendFund = styled(Wrapper)(({ theme }) => {
     },
 
     '.__warning_message_cross_chain': {
-      marginTop: token.marginXS
+      marginTop: token.marginSM
     },
 
     '.free-balance-block': {

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
+import { SUBSCAN_GATEWAY_URL } from '@subwallet/extension-base/constants';
 import { BASE_FETCH_ORDINAL_EVENT_DATA } from '@subwallet/extension-base/koni/api/nft/ordinal_nft/constants';
 import { SUBSCAN_API_CHAIN_MAP } from '@subwallet/extension-base/services/subscan-service/subscan-chain-map';
 import { CrowdloanContributionsResponse, ExtrinsicItem, ExtrinsicsListResponse, IMultiChainBalance, RequestBlockRange, RewardHistoryListResponse, SubscanResponse, TransferItem, TransfersListResponse } from '@subwallet/extension-base/services/subscan-service/types';
@@ -9,7 +10,7 @@ import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-re
 import { ApiRequestContextProps } from '@subwallet/extension-base/strategy/api-request-strategy/types';
 import { BaseApiRequestStrategyV2 } from '@subwallet/extension-base/strategy/api-request-strategy-v2';
 import { SubscanEventBaseItemData, SubscanEventListResponse, SubscanExtrinsicParam, SubscanExtrinsicParamResponse } from '@subwallet/extension-base/types';
-import { wait } from '@subwallet/extension-base/utils';
+import { targetIsWeb, wait } from '@subwallet/extension-base/utils';
 
 const QUERY_ROW = 100;
 
@@ -19,10 +20,16 @@ interface SubscanError {
 }
 
 export class SubscanService extends BaseApiRequestStrategyV2 {
+  private apiKey: string | null = null;
+
   constructor (private subscanChainMap: Record<string, string>, options?: Partial<ApiRequestContextProps>) {
     const context = new BaseApiRequestContext(options);
 
     super(context);
+  }
+
+  public setApiKey (key: string | null) {
+    this.apiKey = key;
   }
 
   private getApiUrl (chain: string, path: string) {
@@ -35,12 +42,34 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
     return `https://${subscanChain}.api.subscan.io/${path}`;
   }
 
-  private postRequest (url: string, body: any) {
+  private postRequest (url: string, body: unknown) {
+    const parsed = new URL(url);
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+
+    if (this.apiKey) {
+      headers['X-API-Key'] = this.apiKey;
+    }
+
+    if (targetIsWeb) {
+      const suffix = '.api.subscan.io';
+      const subscanChain = parsed.hostname.endsWith(suffix)
+        ? parsed.hostname.slice(0, -suffix.length)
+        : parsed.hostname;
+
+      headers['x-network'] = subscanChain;
+
+      return fetch(`${SUBSCAN_GATEWAY_URL}${parsed.pathname}${parsed.search}`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body)
+      });
+    }
+
     return fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify(body)
     });
   }
@@ -340,7 +369,15 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
 
   public static getInstance () {
     if (!SubscanService._instance) {
-      SubscanService._instance = new SubscanService(SUBSCAN_API_CHAIN_MAP);
+      // Subscan API allows only ~2 requests per second.
+      // However, each request from the webapp also triggers an OPTIONS request (CORS preflight),
+      // which Subscan counts towards the quota as well → effectively 1 call = 2 requests.
+      // To avoid hitting the rate limit, we configure the queue
+      // to allow only 1 request per second.
+      SubscanService._instance = new SubscanService(SUBSCAN_API_CHAIN_MAP, {
+        limitRate: 1,
+        intervalCheck: 1000
+      });
     }
 
     return SubscanService._instance;

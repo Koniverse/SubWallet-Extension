@@ -1,7 +1,41 @@
 # CHANGELOG
 
+## 1.3.77
+Build date: Apr 09, 2026.
+
+Features & Updates:
+- Improve Proxy account features (#4942)
+- Improve Multisig account feature  (#4963)
+- Turn off warning popup for transfers between PAH <> KAH (#4954)
+- Support stDOT LSD sunset (#4968)
+- Update for chainlist stable v0.2.126
+
+
+## 1.3.76
+Build date: Mar 20, 2026.
+
+Features & Updates:
+- Unable to turn network when no add correct API key (#4972)
+- Display token name and subnet ID for subnet tokens | Bittensor (#4892)
+- Support the newly updated Root staking feature | Bittensor (#4829)
+
+
+## 1.3.75
+Build date: Mar 17, 2026.
+
+Features & Updates:
+- Add user-configurable Subscan API Key in settings (#4965)
+
+
+## 1.3.74
+Build date: Feb 11, 2026.
+
+Features & Updates:
+- Support Multisig Account Phase 1 (#4855)
+
+
 ## 1.3.73
-Build date: Jan 22, 2025.
+Build date: Jan 22, 2026.
 
 Features & Updates:
 - Update @subwallet-monorepos/subwallet-services-sdk 0.1.16 (#4957)
@@ -12,7 +46,7 @@ Bug fixes:
 
 
 ## 1.3.72
-Build date: Jan 14, 2025.
+Build date: Jan 14, 2026.
 
 Features & Updates:
 - Integrate Proxy Account Support (#4725)

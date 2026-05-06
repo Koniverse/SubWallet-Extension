@@ -967,7 +967,7 @@ export default class TransactionService {
     }
   }
 
-  private updateTransaction (id: string, data: Partial<Omit<SWTransactionBase, 'id'>>): void {
+  public updateTransaction (id: string, data: Partial<Omit<SWTransactionBase, 'id'>>): void {
     const transaction = this.transactions[id];
 
     if (transaction) {
@@ -1012,6 +1012,7 @@ export default class TransactionService {
       nonce: nonce ?? 0,
       startBlock: startBlock || 0,
       processId: transaction.step?.processId,
+      crossChainFeeInfo: transaction?.xcmDestinationFee,
       substrateProxyAddresses: []
     };
 
@@ -1454,6 +1455,18 @@ export default class TransactionService {
 
       case ExtrinsicType.UNKNOWN:
         break;
+    }
+
+    const txData = transaction.data as { signer?: string } | undefined;
+    const signer = txData?.signer;
+
+    if (signer) {
+      const currentAdditionalInfo: Record<string, unknown> = historyItem.additionalInfo ? historyItem.additionalInfo as Record<string, unknown> : {};
+
+      historyItem.additionalInfo = {
+        ...currentAdditionalInfo,
+        signer
+      };
     }
 
     try {

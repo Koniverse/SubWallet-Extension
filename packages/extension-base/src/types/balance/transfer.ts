@@ -52,6 +52,8 @@ export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
   value: string;
   transferBounceable?: boolean;
   isSubstrateECDSATransaction?: boolean;
+  maxTransferableWithoutFee?: string;
+  maxTransferable?: string;
   metadata?: Record<string, any>; // TODO: convert transferBounceable and isSubstrateECDSATransaction to a metadata type
 }
 
