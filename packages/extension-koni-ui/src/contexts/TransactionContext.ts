@@ -10,7 +10,7 @@ export interface TransactionContextProps {
   defaultData: TransactionFormBaseProps;
   persistData: Dispatch<SetStateAction<TransactionFormBaseProps>>;
   needPersistData: boolean;
-  onDone: (extrinsicHash: string) => void;
+  onDone: (extrinsicHash: string, address?: string) => void;
   setSubHeaderRightButtons: Dispatch<SetStateAction<ButtonProps[] | undefined>>;
   setCustomScreenTitle: Dispatch<SetStateAction<string | undefined>>;
   setIsDisableHeader: Dispatch<SetStateAction<boolean | undefined>>;

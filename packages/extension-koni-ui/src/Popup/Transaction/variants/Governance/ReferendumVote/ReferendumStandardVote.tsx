@@ -79,7 +79,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     accountAddressItems: GovAccountAddressItemType[]
   } = useOutletContext();
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
   const { onError, onSuccess } = useHandleSubmitTransaction();
 
   const { chainInfoMap } = useSelector((root) => root.chainStore);
@@ -187,13 +187,11 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       };
 
       handleVote(voteRequest)
-        .then((tx) => {
-          onSuccess(tx);
-        })
+        .then(onSuccess)
         .catch(onError)
         .finally(() => setLoadingButton(null));
     }
-  }, [chainValue, conviction, referendumId, defaultData.track, onError, onSuccess, voteType]);
+  }, [voteType, chainValue, referendumId, defaultData.track, conviction, onError, onSuccess]);
 
   const goRefSplitVote = useCallback(() => {
     setGovRefVoteStorage({

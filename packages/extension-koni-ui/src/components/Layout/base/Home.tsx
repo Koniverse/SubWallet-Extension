@@ -20,13 +20,13 @@ interface Props extends ThemeProps {
   showSearchToken?: boolean;
   showSidebarIcon?: boolean;
   showNotificationIcon?: boolean;
-  showHeader?: boolean;
   onClickSearchToken?: () => void;
   showTabBar?: boolean;
+  showHeader?: boolean;
   isDisableHeader?: boolean;
 }
 
-const Component = ({ children, className, isDisableHeader, showHeader = true, showNotificationIcon, showSidebarIcon, showTabBar }: Props) => {
+const Component = ({ children, className, isDisableHeader, onClickSearchToken, showFaderIcon, showHeader = true, showNotificationIcon, showSearchToken, showSidebarIcon, showTabBar }: Props) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { unreadNotificationCountMap } = useSelector((state: RootState) => state.notification);

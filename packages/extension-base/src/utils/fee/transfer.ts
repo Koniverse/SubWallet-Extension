@@ -17,7 +17,7 @@ import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-s
 import { _isBittensorToSubtensorBridge, _isSubtensorToBittensorBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/bittensorBridge/nativeTokenBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { estimateXcmFee, isSubstrateCrossChain } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _BitcoinApi, _CardanoApi, _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getContractAddressOfToken, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainEvmCompatible, _isChainTonCompatible, _isLocalToken, _isNativeToken, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByBitcoin, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
@@ -359,7 +359,8 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
     feeType: feeChainType,
     id: id,
     error,
-    isEvmRpcError: isEvmRpcError
+    isEvmRpcError: isEvmRpcError,
+    maxTransferableWithoutFee: freeBalance.value
   };
 };
 
@@ -367,6 +368,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
   const { address, destChain, destToken, evmApi, feeCustom, feeOption, isTransferLocalTokenAndPayThatTokenAsFee, isTransferNativeTokenAndPayLocalTokenAsFee, nativeToken, srcChain, srcToken, substrateApi, transferAll, value } = request;
   const feeChainType = fee.type;
   let estimatedFee = '0';
+  let crossChainFee = '0';
   let feeOptions: FeeDetail;
   let maxTransferable: BigN;
   let error: string | undefined;
@@ -469,6 +471,7 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
         });
 
         estimatedFee = xcmFeeInfo?.origin.fee || '0';
+        crossChainFee = xcmFeeInfo?.destination?.fee || '0';
       } else {
         try {
           const paymentInfo = await (extrinsic as SubmittableExtrinsic<'promise'>).paymentInfo(address);
@@ -487,7 +490,8 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
 
       feeOptions = {
         ...fee,
-        estimatedFee
+        estimatedFee,
+        crossChainFee
       };
     } else if (feeChainType === 'bitcoin') {
       feeOptions = {
@@ -572,7 +576,8 @@ export const calculateXcmMaxTransferable = async (id: string, request: Calculate
     feeOptions: feeOptions,
     feeType: feeChainType,
     id: id,
-    error
+    error,
+    maxTransferableWithoutFee: freeBalance.value
   };
 };
 

@@ -6,7 +6,7 @@ import { _isAcrossBridgeXcm, _isBittensorToSubtensorEvmBridge, _isPolygonBridgeX
 import { getAvailBridgeExtrinsicFromAvail, getAvailBridgeTxFromEth } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _createPolygonBridgeL1toL2Extrinsic, _createPolygonBridgeL2toL1Extrinsic } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { getSnowBridgeEvmTransfer } from '@subwallet/extension-base/services/balance-service/transfer/xcm/snowBridge';
-import { buildXcm, dryRunPreviewXcm, dryRunXcm, estimateXcmFee, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { buildXcm, dryRunPreviewXcm, dryRunXcm, estimateXcmFee, fetchMinXcmTransferableAmount, GetXcmFeeRequest, isChainNotSupportDryRun, isChainNotSupportPolkadotApi } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransactionFee } from '@subwallet/extension-base/types';
 import { combineEthFee } from '@subwallet/extension-base/utils';
@@ -136,13 +136,21 @@ export const createXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps): Pr
   }
 };
 
+export const getMinXcmTransferableAmount = async (request: GetXcmFeeRequest): Promise<string | undefined> => {
+  try {
+    return await fetchMinXcmTransferableAmount(request);
+  } catch (e) {
+    return undefined;
+  }
+};
+
 export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps, isPreview = false): Promise<boolean> => {
   try {
     const dryRunResult = isPreview ? await dryRunPreviewXcm(request) : await dryRunXcm(request);
     const originDryRunRs = dryRunResult.origin;
 
     if (originDryRunRs.success) {
-      const { assetHub, bridgeHub, destination, hops } = dryRunResult;
+      const { destination, hops } = dryRunResult;
 
       for (const hop of hops) {
         if (!hop.result.success) {
@@ -150,13 +158,9 @@ export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps, isP
         }
       }
 
-      if (assetHub?.success === false || bridgeHub?.success === false || destination?.success === false) {
-        if (destination?.success === false) {
-          // pass dry-run in these cases
-          return isChainNotSupportDryRun(destination.failureReason) || isChainNotSupportPolkadotApi(destination.failureReason);
-        }
-
-        return false;
+      if (destination?.success === false) {
+        // pass dry-run in these cases
+        return isChainNotSupportDryRun(destination.failureReason) || isChainNotSupportPolkadotApi(destination.failureReason);
       }
 
       return true;

@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { SUNSETTED_YIELD_POOL_SLUGS } from '@subwallet/extension-base/services/earning-service/constants';
 import { YieldPoolInfo } from '@subwallet/extension-base/types';
 import { useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { useMemo } from 'react';
@@ -16,7 +17,12 @@ const useYieldPoolInfoByGroup = (group: string): YieldPoolInfo[] => {
       const chain = pool.chain;
       const inputAssets = pool.metadata?.inputAsset || '';
 
-      if (allowedChains.includes(chain) && !excludedTokens.includes(inputAssets) && group === pool.group) {
+      if (
+        allowedChains.includes(chain) &&
+        !excludedTokens.includes(inputAssets) &&
+        group === pool.group &&
+        !SUNSETTED_YIELD_POOL_SLUGS.includes(pool.slug)
+      ) {
         result.push(pool);
       }
     }
