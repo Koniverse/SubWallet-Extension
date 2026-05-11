@@ -220,36 +220,7 @@ export class BittensorCache {
   }
 }
 
-// export async function fetchTaoDelegateState (address: string): Promise<RawDelegateState> {
-//   const apiKey = bittensorApiKey();
-
-//   return new Promise(function (resolve) {
-//     fetch(`https://api.taostats.io/api/stake_balance/latest/v1?coldkey=${address}`, {
-//       method: 'GET',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         Authorization: `${apiKey}`
-//       }
-//     }).then((resp) => {
-//       resolve(resp.json());
-//     }).catch(console.error);
-//   });
-// }
-
-/* Fetch data */
-
-// const testnetDelegate = {
-//   '5G6wdAdS7hpBuH1tjuZDhpzrGw9Wf71WEVakDCxHDm1cxEQ2': {
-//     name: '0x436c6f776e4e616d65f09fa4a1',
-//     url: 'https://example.com  ',
-//     image: 'https://example.com/image.png',
-//     discord: '0xe28094446973636f7264',
-//     description: 'This is an example identity.',
-//     additional: ''
-//   }
-// };
-
-export const getAlphaToTaoRate = async (substrateApi: _SubstrateApi, netuid: number): Promise<string> => {
+export const getAlphaToTaoRate = async (substrateApi: _SubstrateApi, netuid: number, priceScaleDecimals = 9): Promise<string> => {
   if (netuid === 0) {
     return '1';
   }
@@ -260,7 +231,7 @@ export const getAlphaToTaoRate = async (substrateApi: _SubstrateApi, netuid: num
   ]);
 
   const subnetPrice = new BigN(rawSubnetPrice.toString());
-  const defaultScale = new BigN(10).pow(9);
+  const defaultScale = new BigN(10).pow(priceScaleDecimals);
   const rootPrice = new BigN(rawRootPrice.toString());
   const priceScale = rootPrice.lte(0) ? defaultScale : rootPrice;
 
@@ -279,6 +250,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   };
 
   protected bittensorCache: BittensorCache;
+
+  protected getAlphaPriceScaleDecimals (): number {
+    return _getAssetDecimals(this.nativeToken);
+  }
 
   protected async getMinBond (netuid?: number): Promise<BigN> {
     // @ts-ignore
@@ -683,7 +658,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const netuid = subnetData?.netuid ?? 0;
     const slippage = subnetData?.slippage ?? DEFAULT_BITTENSOR_SLIPPAGE;
 
-    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid));
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid, this.getAlphaPriceScaleDecimals()));
     const limitPrice = alphaToTaoPrice
       .multipliedBy(10 ** _getAssetDecimals(this.nativeToken))
       .multipliedBy(1 + slippage);
@@ -733,7 +708,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const binaryAmount = new BigN(amount);
 
-    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid));
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid, this.getAlphaPriceScaleDecimals()));
     const limitPrice = alphaToTaoPrice
       .multipliedBy(10 ** _getAssetDecimals(this.nativeToken))
       .multipliedBy(1 - slippage);
@@ -763,7 +738,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     }
 
     const netuid = poolInfo.metadata.subnetData?.netuid;
-    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid || 0));
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid || 0, this.getAlphaPriceScaleDecimals()));
 
     const minDelegatorStake = await this.getMinBond(netuid);
 
@@ -799,7 +774,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.fromValidatorSameAsTo')));
     }
 
-    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid));
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid, this.getAlphaPriceScaleDecimals()));
     const bnMinStake = await this.getMinBond(netuid);
     const minUnstake = bnMinStake.dividedBy(alphaToTaoPrice);
 
