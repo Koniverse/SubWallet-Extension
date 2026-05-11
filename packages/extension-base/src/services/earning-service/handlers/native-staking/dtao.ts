@@ -59,9 +59,9 @@ interface SubnetPosition {
   originalTotalStake: BigN;
 }
 
-const getAlphaToTaoRateMap = async (substrateApi: _SubstrateApi): Promise<Record<number, string>> => {
+const getAlphaToTaoRateMap = async (substrateApi: _SubstrateApi, priceScaleDecimals = 9): Promise<Record<number, string>> => {
   const result = Object.create(null) as Record<number, string>;
-  const PRICE_SCALE = new BigN(10).pow(9); // Runtime price is fixed-point with 9 decimals.
+  const PRICE_SCALE = new BigN(10).pow(priceScaleDecimals);
 
   const allSubnetPrices = (await substrateApi.api.call.swapRuntimeApi.currentAlphaPriceAll()).toJSON() as SubnetPriceData[] | undefined;
 
@@ -300,7 +300,7 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
       const rawDelegateStateInfos = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(useAddresses);
       const delegateStateInfos = rawDelegateStateInfos.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
 
-      const alphaToTaoRateMap = await getAlphaToTaoRateMap(this.substrateApi);
+      const alphaToTaoRateMap = await getAlphaToTaoRateMap(this.substrateApi, this.getAlphaPriceScaleDecimals());
 
       if (!delegateStateInfos || delegateStateInfos.length === 0) {
         return;
