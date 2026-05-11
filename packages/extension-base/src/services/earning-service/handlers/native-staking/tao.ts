@@ -221,16 +221,21 @@ export class BittensorCache {
 }
 
 export const getAlphaToTaoRate = async (substrateApi: _SubstrateApi, netuid: number): Promise<string> => {
-  const subnetInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getDynamicInfo(netuid)).toJSON() as RateSubnetData | undefined;
-
-  if (!subnetInfo) {
+  if (netuid === 0) {
     return '1';
   }
 
-  const taoIn = subnetInfo.taoIn ? new BigN(subnetInfo.taoIn) : new BigN(0);
-  const alphaIn = subnetInfo.alphaIn ? new BigN(subnetInfo.alphaIn) : new BigN(0);
+  const [rawSubnetPrice, rawRootPrice] = await Promise.all([
+    substrateApi.api.call.swapRuntimeApi.currentAlphaPrice(netuid),
+    substrateApi.api.call.swapRuntimeApi.currentAlphaPrice(0)
+  ]);
 
-  return netuid === 0 || alphaIn.lte(0) ? '1' : taoIn.dividedBy(alphaIn).toString();
+  const subnetPrice = new BigN(rawSubnetPrice.toString());
+  const defaultScale = new BigN(10).pow(9);
+  const rootPrice = new BigN(rawRootPrice.toString());
+  const priceScale = rootPrice.lte(0) ? defaultScale : rootPrice;
+
+  return subnetPrice.lte(0) ? '0' : subnetPrice.dividedBy(priceScale).toFixed();
 };
 
 export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHandler {
