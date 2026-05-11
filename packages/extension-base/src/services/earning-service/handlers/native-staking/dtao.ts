@@ -93,32 +93,41 @@ interface SubnetsInfo {
   maxAllowedValidators: number;
 }
 
+interface SubnetPriceData {
+  netuid: number;
+  price: string | number;
+}
+
 export interface EarningImpactResult {
   slippage: number;
   rate: number;
   stakingTaoFee?: string;
 }
 
-const getAlphaToTaoMapping = async (substrateApi: _SubstrateApi): Promise<Record<number, string>> => {
-  const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as RateSubnetData[] | undefined;
+interface SubnetPosition {
+  delegatorState: TaoStakingStakeOption[];
+  totalBalance: BigN;
+  originalTotalStake: BigN;
+}
 
-  if (!allSubnets || allSubnets.length === 0) {
-    return {};
-  }
-
+const getAlphaToTaoRateMap = async (substrateApi: _SubstrateApi): Promise<Record<number, string>> => {
   const result = Object.create(null) as Record<number, string>;
+  const PRICE_SCALE = new BigN(10).pow(9); // Runtime price is fixed-point with 9 decimals.
 
-  for (const subnet of allSubnets) {
-    const netuid = subnet?.netuid;
+  const allSubnetPrices = (await substrateApi.api.call.swapRuntimeApi.currentAlphaPriceAll()).toJSON() as SubnetPriceData[] | undefined;
 
-    if (netuid === undefined) {
-      continue;
+  if (allSubnetPrices && allSubnetPrices.length > 0) {
+    for (const subnetPrice of allSubnetPrices) {
+      const netuid = subnetPrice?.netuid;
+
+      if (netuid === undefined) {
+        continue;
+      }
+
+      const rawPrice = subnetPrice?.price ? new BigN(subnetPrice.price) : new BigN(0);
+
+      result[netuid] = netuid === 0 ? '1' : rawPrice.dividedBy(PRICE_SCALE).toFixed();
     }
-
-    const taoIn = subnet?.taoIn ? new BigN(subnet.taoIn) : new BigN(0);
-    const alphaIn = subnet?.alphaIn ? new BigN(subnet.alphaIn) : new BigN(0);
-
-    result[netuid] = netuid === 0 || alphaIn.lte(0) ? '1' : taoIn.dividedBy(alphaIn).toString();
   }
 
   return result;
@@ -345,7 +354,7 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
         )
       );
 
-      const price = await getAlphaToTaoMapping(this.substrateApi);
+      const price = await getAlphaToTaoRateMap(this.substrateApi);
 
       if (rawDelegateStateInfos && rawDelegateStateInfos.length > 0) {
         rawDelegateStateInfos.forEach((rawDelegateStateInfo, i) => {
