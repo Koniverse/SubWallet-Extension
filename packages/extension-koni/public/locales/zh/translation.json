@@ -10,7 +10,7 @@
   "ui.TRANSACTION.screen.Transaction.Swap.to": "到",
   "ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.to": "到",
   "ui.TRANSACTION.components.Field.FeeEditor.networkFee": "Network fee",
-  "ui.TRANSACTION.Confirmations.TransferBlock.networkFee": "Network fee",
+  "ui.TRANSACTION.Confirmations.TransferBlock.networkFee": "",
   "ui.TRANSACTION.Confirmations.TransferBlock.crossChainFee": "Cross-chain fee",
   "ui.TRANSACTION.components.Field.FeeEditor.crossChainFee": "Cross-chain fee",
   "ui.BUY.screen.BuyTokens.directedToSupplierToComplete": "你将自动跳转到所选提供商以完成此交易",
@@ -1278,7 +1278,6 @@
   "ui.DAPP.Confirmations.CardanoSignTransaction.estimatedFee": "预估费用",
   "ui.TRANSACTION.screen.Transaction.Earn.estimatedFee": "预估费用",
   "ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.estimatedFee": "预估费用",
-  "ui.TRANSACTION.components.Field.FeeEditor.estimatedFee": "预估费用",
   "ui.TRANSACTION.Confirmations.Process.Earn.Bond.estimatedFee": "预估费用",
   "ui.DAPP.Confirmations.BitcoinSignPsbt.signatureRequired": "需要签名",
   "ui.Confirmations.NotSupport.signatureRequired": "需要签名",
@@ -2097,7 +2096,6 @@
   "ui.HISTORY.screen.HistoryDetail.Amount.cancelUnstakeValue": "取消解除质押价值",
   "ui.HISTORY.screen.HistoryDetail.Amount.contributeBalance": "捐助余额",
   "ui.HISTORY.screen.HistoryDetail.Amount.collectionName": "合集名字",
-  "ui.HISTORY.screen.HistoryDetail.Fee.originChainFee": "原始链费用",
   "ui.HISTORY.screen.HistoryDetail.Layout.transactionType": "交易类型",
   "ui.HISTORY.screen.HistoryDetail.SwapLayout.transactionType": "交易类型",
   "ui.HISTORY.screen.HistoryDetail.Layout.transactionStatus": "交易状态",
@@ -2702,7 +2700,6 @@
   "ui.TRANSACTION.Confirmations.LeavePool.networkFee": "",
   "ui.TRANSACTION.Confirmations.SendNft.networkFee": "",
   "ui.TRANSACTION.Confirmations.TokenApprove.networkFee": "",
-  "ui.TRANSACTION.Confirmations.TransferBlock.networkFee": "",
   "ui.TRANSACTION.Confirmations.Unbond.networkFee": "",
   "ui.TRANSACTION.Confirmations.Withdraw.networkFee": "",
   "ui.TRANSACTION.Confirmations.Process.Base.networkFee": "",
@@ -2784,5 +2781,8 @@
   "ui.SETTINGS.screen.Setting.Chains.Manage.disableAllNetworkSubtitle": "",
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOff": "",
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworksUnable": "",
-  "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": ""
+  "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": "",
+  "Only shows referenda you've voted directly in": "",
+  "Only shows referenda you've voted through delegation": "",
+  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": ""
 }

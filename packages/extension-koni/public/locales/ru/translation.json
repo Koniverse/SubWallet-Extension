@@ -10,7 +10,7 @@
   "ui.TRANSACTION.screen.Transaction.Swap.to": "К",
   "ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.to": "К",
   "ui.TRANSACTION.components.Field.FeeEditor.networkFee": "Network fee",
-  "ui.TRANSACTION.Confirmations.TransferBlock.networkFee": "Network fee",
+  "ui.TRANSACTION.Confirmations.TransferBlock.networkFee": "",
   "ui.TRANSACTION.Confirmations.TransferBlock.crossChainFee": "Cross-chain fee",
   "ui.TRANSACTION.components.Field.FeeEditor.crossChainFee": "Cross-chain fee",
   "ui.BUY.screen.BuyTokens.directedToSupplierToComplete": "Вы будете направлены к выбранному поставщику для завершения этой транзакции.",
@@ -1278,7 +1278,6 @@
   "ui.DAPP.Confirmations.CardanoSignTransaction.estimatedFee": "Расчётная плата",
   "ui.TRANSACTION.screen.Transaction.Earn.estimatedFee": "Расчётная плата",
   "ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.estimatedFee": "Расчётная плата",
-  "ui.TRANSACTION.components.Field.FeeEditor.estimatedFee": "Расчётная плата",
   "ui.TRANSACTION.Confirmations.Process.Earn.Bond.estimatedFee": "Расчётная плата",
   "ui.DAPP.Confirmations.BitcoinSignPsbt.signatureRequired": "Требуется подпись",
   "ui.Confirmations.NotSupport.signatureRequired": "Требуется подпись",
@@ -2097,7 +2096,6 @@
   "ui.HISTORY.screen.HistoryDetail.Amount.cancelUnstakeValue": "Отменить сумму анстейкинга",
   "ui.HISTORY.screen.HistoryDetail.Amount.contributeBalance": "Пополнить баланс",
   "ui.HISTORY.screen.HistoryDetail.Amount.collectionName": "Название коллекции",
-  "ui.HISTORY.screen.HistoryDetail.Fee.originChainFee": "Комиссия Origin Chain",
   "ui.HISTORY.screen.HistoryDetail.Layout.transactionType": "Тип транзакции",
   "ui.HISTORY.screen.HistoryDetail.SwapLayout.transactionType": "Тип транзакции",
   "ui.HISTORY.screen.HistoryDetail.Layout.transactionStatus": "Статус транзакции",
@@ -2703,7 +2701,6 @@
   "ui.TRANSACTION.Confirmations.LeavePool.networkFee": "",
   "ui.TRANSACTION.Confirmations.SendNft.networkFee": "",
   "ui.TRANSACTION.Confirmations.TokenApprove.networkFee": "",
-  "ui.TRANSACTION.Confirmations.TransferBlock.networkFee": "",
   "ui.TRANSACTION.Confirmations.Unbond.networkFee": "",
   "ui.TRANSACTION.Confirmations.Withdraw.networkFee": "",
   "ui.TRANSACTION.Confirmations.Process.Base.networkFee": "",
@@ -2786,5 +2783,8 @@
   "ui.SETTINGS.screen.Setting.Chains.Manage.disableAllNetworkSubtitle": "",
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOff": "",
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworksUnable": "",
-  "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": ""
+  "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": "",
+  "Only shows referenda you've voted directly in": "",
+  "Only shows referenda you've voted through delegation": "",
+  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": ""
 }
