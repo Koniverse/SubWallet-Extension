@@ -22,5 +22,9 @@ export const HomeContext = React.createContext<HomeContextType>({
     tokenGroupMap: {},
     tokenGroups: [],
     tokenSlugs: []
+  },
+  uiState: {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    setShowTabBar: (_: boolean) => {}
   }
 });

@@ -33,7 +33,8 @@ const SwLogosMap: Record<string, string> = {
   [SwapProviderId.KUSAMA_ASSET_HUB.toLowerCase()]: DefaultLogosMap.kusama_assethub,
   [SwapProviderId.ROCOCO_ASSET_HUB.toLowerCase()]: DefaultLogosMap.rococo_assethub,
   ton: DefaultLogosMap.ton,
-  meld: DefaultLogosMap.meld
+  meld: DefaultLogosMap.meld,
+  trust: DefaultLogosMap.trust
 };
 
 export default SwLogosMap;

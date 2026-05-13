@@ -11,7 +11,7 @@ import styled from 'styled-components';
 
 interface Props extends ThemeProps {
   type?: 'info' | 'warning' | 'error';
-  title: string;
+  title?: string;
   description: React.ReactNode;
 }
 
@@ -30,7 +30,7 @@ const Component: React.FC<Props> = (props: Props) => {
         />
       </div>
       <div className='alert-content'>
-        <div className='alert-title'>{title}</div>
+        {!!title && <div className='alert-title'>{title}</div>}
         <div className='alert-description'>{description}</div>
       </div>
     </div>

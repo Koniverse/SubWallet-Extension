@@ -3,7 +3,7 @@
 
 import { AccountDeriveData, DeriveInfo, IDerivePathInfo_, NextDerivePair } from '@subwallet/extension-base/types';
 import { getDerivePath } from '@subwallet/keyring';
-import { BitcoinKeypairTypes, EthereumKeypairTypes, KeypairType, KeyringPair, SubstrateKeypairType, SubstrateKeypairTypes, TonWalletContractVersion } from '@subwallet/keyring/types';
+import { BitcoinKeypairTypes, DefaultSubstrateKeypairType, DefaultSubstrateKeypairTypes, EthereumKeypairTypes, KeypairType, KeyringPair, TonWalletContractVersion } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { t } from 'i18next';
 
@@ -72,7 +72,7 @@ export const parseUnifiedSuriToDerivationPath = (suri: string, type: KeypairType
       }
     }
 
-    if (SubstrateKeypairTypes.includes(type)) {
+    if (DefaultSubstrateKeypairTypes.includes(type)) {
       return suri;
     }
   }
@@ -134,8 +134,8 @@ export const getSoloDerivationInfo = (type: KeypairType, metadata: AccountDerive
         };
       }
     } else {
-      if (SubstrateKeypairTypes.includes(type)) {
-        const _type = type as SubstrateKeypairType;
+      if (DefaultSubstrateKeypairTypes.includes(type)) {
+        const _type = type as DefaultSubstrateKeypairType;
         const validateTypeFunc = _type === 'sr25519' ? validateSr25519DerivationPath : (raw: string) => validateOtherSubstrateDerivationPath(raw, _type);
         const validateTypeRs = validateTypeFunc(suri);
 
@@ -276,7 +276,7 @@ export const findSoloNextDerive = (parentAddress: string): NextDerivePair => {
     }
   }
 
-  const isSubstrate = SubstrateKeypairTypes.includes(parentPair.type);
+  const isSubstrate = DefaultSubstrateKeypairTypes.includes(parentPair.type);
 
   const indexes: number[] = currentDepth > 0 ? (deriveInfo.autoIndexes || []) as number[] : [];
 
@@ -329,7 +329,11 @@ export const derivePair = (parentPair: KeyringPair, name: string, suri: string, 
 };
 
 export const getSuri = (seed: string, type?: KeypairType): string => {
-  const extraPath = type ? getDerivePath(type)(0) : '';
+  if (!type) {
+    return seed;
+  }
+
+  const extraPath = getDerivePath(type)(0);
 
   return seed + (extraPath ? '/' + extraPath : '');
 };

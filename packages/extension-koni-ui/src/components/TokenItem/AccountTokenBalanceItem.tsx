@@ -5,7 +5,7 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _BalanceMetadata, BitcoinBalanceMetadata } from '@subwallet/extension-base/background/KoniTypes';
 import { _isChainBitcoinCompatible, _isChainTonCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
-import { AccountProxyAvatar, InfoItemBase } from '@subwallet/extension-koni-ui/components';
+import { AccountProxyAvatar, InfoItemBase, NumberDisplay } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useGetChainPrefixBySlug, useSelector, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { BalanceItemWithAddressType, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -13,7 +13,7 @@ import { reformatAddress, toShort } from '@subwallet/extension-koni-ui/utils';
 import { Button, Icon } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowSquareOut } from 'phosphor-react';
+import { ArrowSquareOut, CaretRight } from 'phosphor-react';
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -21,6 +21,7 @@ import { MetaInfo } from '../MetaInfo';
 
 interface Props extends ThemeProps {
   item: BalanceItemWithAddressType;
+  onShowLockedDetailsModal?: () => void;
 }
 
 interface BalanceDisplayItem {
@@ -31,7 +32,7 @@ interface BalanceDisplayItem {
 
 // todo: logic in this file may not be correct in some case, need to recheck
 const Component: React.FC<Props> = (props: Props) => {
-  const { className, item } = props;
+  const { className, item, onShowLockedDetailsModal } = props;
 
   const { address, addressTypeLabel, free, locked, metadata, schema: _schema, tokenSlug } = item;
 
@@ -85,19 +86,41 @@ const Component: React.FC<Props> = (props: Props) => {
   };
 
   const renderBalanceItem = useCallback(
-    ({ key, label, value }: BalanceDisplayItem) => (
-      <MetaInfo.Number
-        className='balance-info'
-        decimals={decimals}
-        key={key}
-        label={label}
-        suffix={symbol}
-        value={value}
-        valueColorSchema='gray'
-      />
-    ),
-    [decimals, symbol]
+    ({ key, label, value }: BalanceDisplayItem) => {
+      const isLocked = key === 'locked';
+
+      return (
+        <div
+          className='balance-info'
+          key={key}
+        >
+          <div className='__label'>{label}</div>
+          <div className='__value-wrapper'>
+            <NumberDisplay
+              className='__value'
+              decimal={decimals}
+              size={14}
+              suffix={symbol}
+              value={value || 0}
+            />
+            {isLocked && value !== '0' && (
+              <div
+                className='__locked-suffix-icon'
+                onClick={onShowLockedDetailsModal}
+              >
+                <Icon
+                  phosphorIcon={CaretRight}
+                  size='xs'
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    },
+    [decimals, onShowLockedDetailsModal, symbol]
   );
+
   const isBitcoinChain = !!chainInfo && _isChainBitcoinCompatible(chainInfo);
   const balanceItems = useMemo<BalanceDisplayItem[]>(() => {
     if (isBitcoinChain && isBitcoinMetadata(metadata)) {
@@ -280,20 +303,39 @@ const AccountTokenBalanceItem = styled(Component)<Props>(({ theme: { token } }: 
     },
 
     '.balance-info': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       paddingLeft: token.paddingXL,
 
       '.__label': {
         fontSize: token.fontSizeSM,
         lineHeight: token.lineHeightSM,
-        color: token.colorTextTertiary
+        color: token.colorTextTertiary,
+        flex: 1
+      },
+
+      '.__value-wrapper': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2
       },
 
       '.__value': {
         fontSize: token.fontSizeSM,
         lineHeight: token.lineHeightSM
       },
-      '.__value-col': {
-        flex: '0 1 auto'
+
+      '.__symbol': {
+        fontSize: token.fontSizeSM,
+        color: token.colorTextTertiary
+      },
+
+      '.__locked-suffix-icon': {
+        display: 'flex',
+        color: token.colorTextLight4,
+        alignItems: 'center',
+        cursor: 'pointer'
       }
     }
   };

@@ -10,6 +10,7 @@ export interface BaseFeeInfo {
 
 export interface BaseFeeDetail {
   estimatedFee: string;
+  crossChainFee?: string
 }
 
 export interface BaseFeeTime {

@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { STELLA_SWAP_LIQUID_STAKING_SLUG } from '../handlers/liquid-staking/stella-swap';
+
 export const _STAKING_CHAIN_GROUP = {
   relay: ['polkadot', 'kusama', 'aleph', 'polkadex', 'ternoa', 'alephTest', 'polkadexTest', 'westend', 'kate', 'edgeware', 'creditcoin', 'vara_network', 'goldberg_testnet', 'availTuringTest', 'avail_mainnet', 'vara_testnet', 'dentnet', 'cere', 'paseoTest', 'zkverify', 'zkverify_testnet'],
   assetHub: ['statemine', 'statemint', 'westend_assethub', 'paseo_assethub'], // assethub defined, include nomination pool and native staking
@@ -20,6 +22,11 @@ export const _STAKING_CHAIN_GROUP = {
   mythos: ['mythos', 'muse_testnet'],
   tanssi: ['tanssi', 'dancelight']
 };
+
+export const SUNSETTED_YIELD_POOL_SLUGS: string[] = [
+  STELLA_SWAP_LIQUID_STAKING_SLUG,
+  'MANTA___native_staking___manta_network'
+];
 
 export const RELAY_HANDLER_DIRECT_STAKING_CHAINS = [
   ..._STAKING_CHAIN_GROUP.relay,
@@ -42,3 +49,5 @@ export const STAKING_IDENTITY_API_SLUG: Record<string, string> = {
   statemine: 'peopleKusama',
   statemint: 'polkadot_people'
 };
+
+export const MIN_XCM_LIQUID_STAKING_DOT = '15000000000';

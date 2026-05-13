@@ -218,7 +218,7 @@ export default class EvmRequestHandler {
     const params = {
       ...transaction,
       gas: anyNumberToBN(gas).toNumber(),
-      value: anyNumberToBN(value).toNumber(),
+      value: anyNumberToBN(value).toFixed(),
       gasPrice: anyNumberToBN(gasPrice).toNumber(),
       gasLimit: anyNumberToBN(estimateGas).toNumber(),
       maxFeePerGas: anyNumberToBN(maxFeePerGas).toNumber(),

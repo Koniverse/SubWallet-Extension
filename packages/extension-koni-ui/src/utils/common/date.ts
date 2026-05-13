@@ -187,7 +187,7 @@ export const customFormatDate = (dateMilli: string | number | Date, formatString
 
   const hour = time.getHours();
   const hhh = hour.toString();
-  const hourInHalf = hour === 0 ? 24 : hour > 12 ? hour - 12 : hour;
+  const hourInHalf = hour > 12 ? hour - 12 : hour;
   const h = hourInHalf.toString();
   const hh = h.padStart(2, '0');
   const hhhh = hhh.padStart(2, '0');
@@ -246,8 +246,6 @@ export const formatHistoryDate = (dateMilli: string | number | Date, language: L
         return customFormatDate(dateMilli, '#hhhh#:#mm# - #MMM# #DD#, #YYYY#', 'en');
     }
   }
-
-  return customFormatDate(dateMilli, '#MMM# #DD#, #YYYY#', 'en');
 };
 
 export const formatConditionalDuration = (transactionTime: number) => {

@@ -86,11 +86,11 @@ export default function useHandleLedgerAccountWarning (): HookType {
 
     if (isNeedShowAlert) {
       const targetSymbol = isTokenContext ? assetRegistry[targetSlug]?.symbol : '';
-      const title = isTokenContext ? t('Unsupported token') : t('Pay attention!');
-      const subtitle = isTokenContext ? t('Do you still want to get the address?') : undefined;
+      const title = isTokenContext ? t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.unsupportedToken') : t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention');
+      const subtitle = isTokenContext ? t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.stillWantAddress') : undefined;
       const contentMessage = isTokenContext
-        ? t('Your account is not compatible with {{symbol}} token. Transferring {{symbol}} to this account will result in tokens getting stuck (i.e., can’t be transferred out or staked)', { replace: { symbol: targetSymbol } })
-        : t(' This address can only be used to receive compatible tokens. Sending incompatible tokens to this address will result in these tokens getting stuck (i.e., can’t be sent out or staked)');
+        ? t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.accountIncompatibleTokenWarning', { replace: { symbol: targetSymbol } })
+        : t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.addressReceiveCompatibleTokensWarning');
 
       const content = (<div>{contentMessage}</div>);
 
@@ -107,7 +107,7 @@ export default function useHandleLedgerAccountWarning (): HookType {
           : undefined,
         type: NotificationType.WARNING,
         okButton: {
-          text: t('Get address'),
+          text: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.getAddress'),
           onClick: () => {
             alertModal.close();
             processFunction();
@@ -115,7 +115,7 @@ export default function useHandleLedgerAccountWarning (): HookType {
           schema: 'primary'
         },
         cancelButton: {
-          text: t('Cancel'),
+          text: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.cancel'),
           onClick: () => {
             alertModal.close();
           },
