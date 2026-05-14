@@ -321,4 +321,7 @@ export const _BITCOIN_CHAIN_SLUG = 'bitcoin';
 export const _BITCOIN_TESTNET_CHAIN_SLUG = 'bitcoinTestnet';
 export const _BITCOIN_NAME = 'Bitcoin';
 export const _BITCOIN_TESTNET_NAME = 'Bitcoin Testnet';
+export const _UNISAT_API_URL = 'https://open-api.unisat.io';
+export const _UNISAT_API_URL_TEST = 'https://open-api-testnet.unisat.io';
+export const _UNISAT_PAGE_SIZE = 500;
 export const _BTC_SERVICE_TOKEN = process.env.BTC_SERVICE_TOKEN || '';
