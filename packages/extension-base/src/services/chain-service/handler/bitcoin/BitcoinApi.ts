@@ -9,9 +9,12 @@ import { BehaviorSubject } from 'rxjs';
 
 import { _ApiOptions } from '../../handler/types';
 import { _BitcoinApi, _ChainConnectionStatus } from '../../types';
+import { BitcoinApiWithFallback } from './BitcoinFallbackApi';
 
 const BLOCKSTREAM_MAINNET_API_URL = 'https://blockstream.info/api/';
 const BLOCKSTREAM_TESTNET_API_URL = 'https://blockstream.info/testnet/api/';
+const MEMPOOL_MAINNET_API_URL = 'https://mempool.space/api/';
+const MEMPOOL_TESTNET_API_URL = 'https://mempool.space/testnet/api/';
 
 export class BitcoinApi implements _BitcoinApi {
   chainSlug: string;
@@ -49,10 +52,16 @@ export class BitcoinApi implements _BitcoinApi {
         return new MempoolTestnetRequestStrategy(apiUrl);
       }
 
-      return new BlockStreamTestnetRequestStrategy(BLOCKSTREAM_TESTNET_API_URL);
+      return new BitcoinApiWithFallback(
+        new BlockStreamTestnetRequestStrategy(BLOCKSTREAM_TESTNET_API_URL),
+        new MempoolTestnetRequestStrategy(MEMPOOL_TESTNET_API_URL)
+      );
     }
 
-    return new SubWalletMainnetRequestStrategy(BLOCKSTREAM_MAINNET_API_URL);
+    return new BitcoinApiWithFallback(
+      new SubWalletMainnetRequestStrategy(BLOCKSTREAM_MAINNET_API_URL),
+      new MempoolTestnetRequestStrategy(MEMPOOL_MAINNET_API_URL)
+    );
   }
 
   get connectionStatus (): _ChainConnectionStatus {
