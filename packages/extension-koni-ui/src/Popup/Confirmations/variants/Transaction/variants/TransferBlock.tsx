@@ -267,7 +267,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
           </div>
         )}
 
-        {transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM && crossChainFeeInfo?.value && isSubstrateXcm && (
+        {transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM && crossChainFeeInfo?.value && new BigN(crossChainFeeInfo.value).gt(0) && isSubstrateXcm && (
           <div className={'__row -type-default __fee-row'}>
             <div className={'__field-line-1'}>
               <div className={'__label'}>
