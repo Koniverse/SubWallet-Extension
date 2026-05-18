@@ -21,7 +21,7 @@ interface Props extends ThemeProps {
   showButtonEdit?: boolean
 }
 
-function Component({ assetSetting, className = '', navigate, showButtonEdit = true, tokenInfo }: Props): React.ReactElement<Props> {
+function Component ({ assetSetting, className = '', navigate, showButtonEdit = true, tokenInfo }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const showNotification = useNotification();
 
