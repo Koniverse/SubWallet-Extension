@@ -14,6 +14,7 @@ export interface RequestSubscribeTransfer extends TransactionFee {
   token: string;
   destChain: string;
   transferAll?: boolean;
+  metadata?: Record<string, any>;
 }
 
 export interface ResponseSubscribeTransfer {
@@ -36,6 +37,12 @@ export interface ResponseSubscribeTransferConfirmation extends Omit<ResponseSubs
   error?: string;
 }
 
+export interface AlphaTokenTransferMetadata {
+  netuid: number;
+  fromValidator: string;
+  toValidator: string;
+}
+
 export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
   chain: string;
   from: string;
@@ -47,6 +54,7 @@ export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
   isSubstrateECDSATransaction?: boolean;
   maxTransferableWithoutFee?: string;
   maxTransferable?: string;
+  metadata?: Record<string, any>; // TODO: convert transferBounceable and isSubstrateECDSATransaction to a metadata type
 }
 
 export interface RequestSubmitSignPsbtTransfer extends BaseRequestSign {

@@ -1,22 +1,25 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomChain } from '@subwallet/extension-base/services/chain-service/utils';
-import { FilterModal, Layout, NetworkEmptyList, NetworkToggleItem, OptionType, PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { AlertModal, FilterModal, Layout, NetworkEmptyList, NetworkToggleItem, OptionType, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
-import { ChainInfoWithState, useFilterModal, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { ChainInfoWithState, useAlert, useFilterModal, useNotification, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import useChainInfoWithStateAndStatus, { ChainInfoWithStateAndStatus } from '@subwallet/extension-koni-ui/hooks/chain/useChainInfoWithStateAndStatus';
-import { ManageChainsParam, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { ButtonProps, Icon, ModalContext, SwList } from '@subwallet/react-ui';
+import { disableAllNetwork } from '@subwallet/extension-koni-ui/messaging';
+import { ManageChainsParam, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { BackgroundIcon, ButtonProps, Icon, ModalContext, SettingItem, Switch, SwList } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
-import { FadersHorizontal, Plus } from 'phosphor-react';
+import { FadersHorizontal, Plus, WifiSlash } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 type Props = ThemeProps
 
 const FILTER_MODAL_ID = 'filterTokenModal';
+const DISABLE_ALL_ALERT_MODAL_ID = 'manage-chains-disable-all-alert';
 
 enum FilterValue {
   ENABLED = 'enabled',
@@ -35,11 +38,53 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const isFillDefaultSearch = useRef<boolean>(false);
 
   const { t } = useTranslation();
+  const notify = useNotification();
+  const { token } = useTheme() as Theme;
   const navigate = useNavigate();
   const dataContext = useContext(DataContext);
   const { activeModal } = useContext(ModalContext);
   const chainInfoList = useChainInfoWithStateAndStatus();
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
+  const [disablingAll, setDisablingAll] = useState(false);
+  const { alertProps, closeAlert, openAlert } = useAlert(DISABLE_ALL_ALERT_MODAL_ID);
+
+  const hasActiveChains = useMemo(() => {
+    return chainInfoList.some((chain) => chain.active);
+  }, [chainInfoList]);
+
+  const doDisableAll = useCallback(() => {
+    closeAlert();
+    setDisablingAll(true);
+    disableAllNetwork()
+      .catch((error: Error) => {
+        notify({
+          message: error?.message || t('ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworksUnable'),
+          type: NotificationType.ERROR
+        });
+      })
+      .finally(() => {
+        setDisablingAll(false);
+      });
+  }, [closeAlert, notify, t]);
+
+  const onDisableAll = useCallback(() => {
+    if (!disablingAll && hasActiveChains) {
+      openAlert({
+        title: t('ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworks'),
+        type: NotificationType.WARNING,
+        hideIcon: true,
+        content: t('ui.SETTINGS.screen.Setting.Chains.Manage.disableAllNetworkConfirmation'),
+        subtitle: t('ui.SETTINGS.screen.Setting.Chains.Manage.disableAllNetworkSubtitle'),
+        subtitleDanger: true,
+        okButton: {
+          text: t('ui.SETTINGS.screen.Setting.Chains.Manage.turnOff'),
+          schema: 'error',
+          onClick: doDisableAll,
+          icon: WifiSlash
+        }
+      });
+    }
+  }, [disablingAll, doDisableAll, hasActiveChains, openAlert, t]);
 
   const FILTER_OPTIONS = useMemo((): OptionType[] => ([
     { label: t('ui.SETTINGS.screen.Setting.Chains.Manage.evmNetworks'), value: FilterValue.EVM },
@@ -149,6 +194,31 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderPaddingVertical={true}
         title={t<string>('ui.SETTINGS.screen.Setting.Chains.Manage.manageNetworks')}
       >
+        <SettingItem
+          className={'manage_chains__disable_all'}
+          leftItemIcon={(
+            <BackgroundIcon
+              backgroundColor={token.colorError}
+              iconColor={token.colorTextLight1}
+              phosphorIcon={WifiSlash}
+              size='sm'
+              type='phosphor'
+              weight='fill'
+            />
+          )}
+          name={t('ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworks')}
+          rightItem={(
+            <Switch
+              checked={!hasActiveChains}
+              disabled={!hasActiveChains}
+              loading={disablingAll}
+              onClick={onDisableAll}
+              size={'small'}
+              style={{ marginRight: 8 }}
+            />
+          )}
+        />
+
         <SwList.Section
           actionBtnIcon={(
             <Icon
@@ -180,6 +250,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           optionSelectionMap={filterSelectionMap}
           options={FILTER_OPTIONS}
         />
+
+        {!!alertProps && (
+          <AlertModal
+            modalId={DISABLE_ALL_ALERT_MODAL_ID}
+            {...alertProps}
+          />
+        )}
       </Layout.Base>
     </PageWrapper>
   );
@@ -188,7 +265,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 const ManageChains = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return ({
     '.ant-sw-screen-layout-body': {
-      display: 'flex'
+      display: 'flex',
+      flexDirection: 'column'
     },
 
     '.ant-sw-list-wrapper.ant-sw-list-wrapper:before': {
@@ -218,9 +296,33 @@ const ManageChains = styled(Component)<Props>(({ theme: { token } }: Props) => {
     },
 
     '.manage_chains__container': {
-      paddingTop: token.padding,
-      paddingBottom: token.paddingSM,
-      flex: 1
+      flex: 1,
+
+      '.ant-sw-list-search-input': {
+        marginBottom: token.marginSM
+      }
+    },
+
+    '.manage_chains__disable_all': {
+      marginTop: token.padding,
+      marginBottom: token.paddingSM,
+      marginInline: token.padding,
+
+      '.ant-setting-item-content': {
+        minHeight: 52,
+        paddingTop: 0,
+        paddingBottom: 0,
+        alignItems: 'center'
+      },
+
+      '.ant-sw-switch': {
+        flexShrink: 0
+      }
+    },
+
+    '.manage_chains__disable_all .ant-setting-item-name-wrapper': {
+      alignItems: 'center',
+      gap: token.sizeSM
     },
 
     '.ant-network-item-content .__toggle-area': {
