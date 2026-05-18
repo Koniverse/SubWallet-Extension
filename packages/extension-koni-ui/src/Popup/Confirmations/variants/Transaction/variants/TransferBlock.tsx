@@ -103,17 +103,6 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
       .toNumber();
   }, [crossChainFeeInfo, tokenInfo, transferTokenValue]);
 
-  const convertedAmountValueToUSD = useMemo(() => {
-    if (!data.value) {
-      return 0;
-    }
-
-    return new BigN(data.value)
-      .multipliedBy(transferTokenValue)
-      .dividedBy(BN_TEN.pow(tokenInfo.decimals || 0))
-      .toNumber();
-  }, [data.value, tokenInfo.decimals, transferTokenValue]);
-
   const convertedXcmDestTokenValueToUSD = useMemo(() => {
     if (!isAcrossBridge || !xcmData.metadata?.amountOut) {
       return 0;
@@ -187,6 +176,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
       }
 
       <MetaInfo
+        className={className}
         hasBackgroundWrapper
         labelColorScheme={'gray'}
         valueColorScheme={'light'}
@@ -211,20 +201,31 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
                 toAssetInfo={destTokenInfo}
               />
             </MetaInfo.Default>
-            <MetaInfo.Default label={t('ui.TRANSACTION.Confirmations.TransferBlock.expectedAmount')}>
-              <Number
-                decimal={destTokenInfo.decimals || 0}
-                suffix={destTokenInfo.symbol}
-                value={xcmData.metadata.amountOut}
-              />
-              <Number
-                className={'__amount-price-value'}
-                decimal={0}
-                prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
-                suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
-                value={convertedXcmDestTokenValueToUSD}
-              />
-            </MetaInfo.Default>
+            <div className={'__row -type-default __fee-row'}>
+              <div className={'__field-line-1'}>
+                <div className={'__label'}>
+                  {t('ui.TRANSACTION.Confirmations.TransferBlock.expectedAmount')}
+                </div>
+
+                <div className={'__value'}>
+                  <Number
+                    decimal={destTokenInfo.decimals || 0}
+                    suffix={destTokenInfo.symbol}
+                    value={xcmData.metadata.amountOut}
+                  />
+                </div>
+              </div>
+
+              <div className={'__field-line-2'}>
+                <Number
+                  className={'__fee-price-value'}
+                  decimal={0}
+                  prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
+                  suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+                  value={convertedXcmDestTokenValueToUSD}
+                />
+              </div>
+            </div>
           </>
           : (
             <MetaInfo.Default
@@ -235,45 +236,54 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
                 suffix={tokenInfo.symbol}
                 value={data.value || 0}
               />
-              <Number
-                className={'__amount-price-value'}
-                decimal={0}
-                prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
-                suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
-                value={convertedAmountValueToUSD}
-              />
             </MetaInfo.Default>
           )}
 
-        <MetaInfo.Default
-          label={t('ui.TRANSACTION.Confirmations.TransferBlock.networkFee')}
-        >
-          {!transaction.wrappingStatus && <div className='__fee-editor-area'>
-            <Number
-              decimal={feeInfo ? feeInfo.decimals : nativeTokenDecimals}
-              suffix={feeInfo ? feeInfo.symbol : nativeTokenSymbol}
-              value={feeInfo ? feeInfo.value : 0}
-            />
+        {!transaction.wrappingStatus && (
+          <div className={'__row -type-default __fee-row'}>
+            <div className={'__field-line-1'}>
+              <div className={'__label'}>
+                {t('ui.TRANSACTION.Confirmations.TransferBlock.networkFee')}
+              </div>
 
-            <Number
-              className={'__fee-price-value'}
-              decimal={0}
-              prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
-              suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
-              value={convertedFeeValueToUSD}
-            />
-          </div>}
-        </MetaInfo.Default>
+              <div className={'__value'}>
+                <Number
+                  decimal={feeInfo ? feeInfo.decimals : nativeTokenDecimals}
+                  suffix={feeInfo ? feeInfo.symbol : nativeTokenSymbol}
+                  value={feeInfo ? feeInfo.value : 0}
+                />
+              </div>
+            </div>
+
+            <div className={'__field-line-2'}>
+              <Number
+                className={'__fee-price-value'}
+                decimal={0}
+                prefix={`~ ${(currencyData.isPrefix && currencyData.symbol) || ''}`}
+                suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
+                value={convertedFeeValueToUSD}
+              />
+            </div>
+          </div>
+        )}
 
         {transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM && crossChainFeeInfo?.value && isSubstrateXcm && (
-          <MetaInfo.Default label={t('ui.TRANSACTION.Confirmations.TransferBlock.crossChainFee')}>
-            <div className={'__value-col-wrapper'}>
-              <Number
-                decimal={transferTokenDecimals}
-                suffix={transferTokenSymbol}
-                value={crossChainFeeInfo ? crossChainFeeInfo?.value : 0}
-              />
+          <div className={'__row -type-default __fee-row'}>
+            <div className={'__field-line-1'}>
+              <div className={'__label'}>
+                {t('ui.TRANSACTION.Confirmations.TransferBlock.crossChainFee')}
+              </div>
 
+              <div className={'__value'}>
+                <Number
+                  decimal={transferTokenDecimals}
+                  suffix={transferTokenSymbol}
+                  value={crossChainFeeInfo ? crossChainFeeInfo?.value : 0}
+                />
+              </div>
+            </div>
+
+            <div className={'__field-line-2'}>
               <Number
                 className={'__fee-price-value'}
                 decimal={0}
@@ -282,7 +292,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
                 value={convertedCrossChainFeeValueToUSD}
               />
             </div>
-          </MetaInfo.Default>
+          </div>
         )}
       </MetaInfo>
       {
@@ -302,10 +312,26 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
 
 export const TransferBlock = styled(Component)<Props>(({ theme: { token } }: Props) => {
   return {
-    '.__fee-price-value, .__amount-price-value': {
-      fontSize: `${token.fontSizeSM}px !important`,
-      lineHeight: '20px !important',
-      color: `${token.colorTextTertiary} !important`
+    '.__fee-price-value': {
+      fontSize: token.fontSizeSM,
+      lineHeight: '20px',
+      color: token.colorTextTertiary
+    },
+    '.__fee-row': {
+      flexDirection: 'column',
+      overflow: 'visible'
+    },
+    '.__field-line-1': {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: token.sizeXXS,
+      width: '100%'
+    },
+    '.__field-line-2': {
+      display: 'flex',
+      justifyContent: 'flex-end',
+      width: '100%'
     },
     '&.alert-area': {
       marginTop: token.marginSM

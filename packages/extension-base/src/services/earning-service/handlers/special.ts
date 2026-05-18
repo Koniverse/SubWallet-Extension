@@ -315,6 +315,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
 
           const metadata: XcmStepMetadataForLiqStaking = {
             sendingValue,
+            xcmDestinationFee,
             originTokenInfo: altInputTokenInfo,
             destinationTokenInfo: inputTokenInfo
           };
@@ -559,7 +560,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
     const xcmStepFee = path.totalFee[1].amount;
 
     const address = data.address;
-    const { destinationTokenInfo, originTokenInfo, sendingValue } = metadata;
+    const { destinationTokenInfo, originTokenInfo, sendingValue, xcmDestinationFee } = metadata;
     const originChainInfo = this.state.getChainInfo(originTokenInfo.originChain);
     const originTokenSlug = _getChainNativeTokenSlug(originChainInfo);
     const substrateApi = this.state.getSubstrateApi(originChainInfo.slug);
@@ -601,7 +602,14 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       txData: xcmData,
       transferNativeAmount: sendingValue,
       chainType: ChainType.SUBSTRATE,
-      xcmStepFee
+      xcmStepFee,
+      xcmDestinationFee: xcmDestinationFee
+        ? {
+          decimals: _getAssetDecimals(destinationTokenInfo),
+          symbol: _getAssetSymbol(destinationTokenInfo),
+          value: xcmDestinationFee
+        }
+        : undefined
     };
   }
 

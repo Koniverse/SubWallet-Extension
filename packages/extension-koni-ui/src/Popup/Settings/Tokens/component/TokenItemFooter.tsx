@@ -21,7 +21,7 @@ interface Props extends ThemeProps {
   showButtonEdit?: boolean
 }
 
-function Component ({ assetSetting, className = '', navigate, showButtonEdit = true, tokenInfo }: Props): React.ReactElement<Props> {
+function Component({ assetSetting, className = '', navigate, showButtonEdit = true, tokenInfo }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const showNotification = useNotification();
 
@@ -31,24 +31,47 @@ function Component ({ assetSetting, className = '', navigate, showButtonEdit = t
     return _isNativeToken(tokenInfo);
   }, [tokenInfo]);
 
+  const doUpdateAssetSetting = useCallback((checked: boolean): Promise<boolean> => {
+    return updateAssetSetting({
+      tokenSlug: tokenInfo.slug,
+      assetSetting: {
+        visible: checked
+      },
+      autoEnableNativeToken: !isNativeToken
+    });
+  }, [isNativeToken, tokenInfo.slug]);
+
   const onSwitchTokenVisible = useCallback((checked: boolean, event: React.MouseEvent<HTMLButtonElement>) => {
     if (!loading) {
       setLoading(true);
       setTimeout(() => {
-        updateAssetSetting({
-          tokenSlug: tokenInfo.slug,
-          assetSetting: {
-            visible: checked
-          },
-          autoEnableNativeToken: !isNativeToken
-        })
+        doUpdateAssetSetting(checked)
           .then((result) => {
             if (!result) {
-              showNotification({
-                message: t('ui.SETTINGS.screen.Setting.Tokens.ItemFooter.error'),
-                type: 'error'
+              // Retry once after 600ms — lockChainInfoMap may have been busy
+              return new Promise<void>((resolve) => {
+                setTimeout(() => {
+                  doUpdateAssetSetting(checked)
+                    .then((retryResult) => {
+                      if (!retryResult) {
+                        showNotification({
+                          message: t('ui.SETTINGS.screen.Setting.Tokens.ItemFooter.error'),
+                          type: 'error'
+                        });
+                      }
+                    })
+                    .catch(() => {
+                      showNotification({
+                        message: t('ui.SETTINGS.screen.Setting.Tokens.ItemFooter.error'),
+                        type: 'error'
+                      });
+                    })
+                    .finally(resolve);
+                }, 600);
               });
             }
+
+            return undefined;
           })
           .catch(() => {
             showNotification({
@@ -61,7 +84,7 @@ function Component ({ assetSetting, className = '', navigate, showButtonEdit = t
           });
       }, 300);
     }
-  }, [isNativeToken, loading, showNotification, t, tokenInfo.slug]);
+  }, [doUpdateAssetSetting, loading, showNotification, t]);
 
   const onClick = useCallback(() => {
     navigate('/settings/tokens/detail', { state: tokenInfo.slug });
