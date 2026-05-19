@@ -18,7 +18,7 @@ export enum BalanceType {
   TOTAL = 'total', // free + locked
   TOTAL_MINUS_RESERVED = 'totalMinusReserved', // free + locked - reserved
   KEEP_ALIVE = 'keepAlive',
-  STAKING = 'staking' // staking balance,
+  STAKING = 'staking', // staking balance
   TOTAL_STAKE_EQUIVALENT = 'totalStakeEquivalent', // only for bittensor (delegate staking)
   TOTAL_EQUIVALENT = 'totalEquivalent' // only for bittensor (delegate staking)
 }
