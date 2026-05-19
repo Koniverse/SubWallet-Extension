@@ -220,17 +220,22 @@ export class BittensorCache {
   }
 }
 
-export const getAlphaToTaoRate = async (substrateApi: _SubstrateApi, netuid: number): Promise<string> => {
-  const subnetInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getDynamicInfo(netuid)).toJSON() as RateSubnetData | undefined;
-
-  if (!subnetInfo) {
+export const getAlphaToTaoRate = async (substrateApi: _SubstrateApi, netuid: number, priceScaleDecimals = 9): Promise<string> => {
+  if (netuid === 0) {
     return '1';
   }
 
-  const taoIn = subnetInfo.taoIn ? new BigN(subnetInfo.taoIn) : new BigN(0);
-  const alphaIn = subnetInfo.alphaIn ? new BigN(subnetInfo.alphaIn) : new BigN(0);
+  const [rawSubnetPrice, rawRootPrice] = await Promise.all([
+    substrateApi.api.call.swapRuntimeApi.currentAlphaPrice(netuid),
+    substrateApi.api.call.swapRuntimeApi.currentAlphaPrice(0)
+  ]);
 
-  return netuid === 0 || alphaIn.lte(0) ? '1' : taoIn.dividedBy(alphaIn).toString();
+  const subnetPrice = new BigN(rawSubnetPrice.toString());
+  const defaultScale = new BigN(10).pow(priceScaleDecimals);
+  const rootPrice = new BigN(rawRootPrice.toString());
+  const priceScale = rootPrice.lte(0) ? defaultScale : rootPrice;
+
+  return subnetPrice.lte(0) ? '0' : subnetPrice.dividedBy(priceScale).toFixed();
 };
 
 export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHandler {
@@ -245,6 +250,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   };
 
   protected bittensorCache: BittensorCache;
+
+  protected getAlphaPriceScaleDecimals (): number {
+    return _getAssetDecimals(this.nativeToken);
+  }
 
   protected async getMinBond (netuid?: number): Promise<BigN> {
     // @ts-ignore
@@ -640,7 +649,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const netuid = subnetData?.netuid ?? 0;
     const slippage = subnetData?.slippage ?? DEFAULT_BITTENSOR_SLIPPAGE;
 
-    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid));
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid, this.getAlphaPriceScaleDecimals()));
     const limitPrice = alphaToTaoPrice
       .multipliedBy(10 ** _getAssetDecimals(this.nativeToken))
       .multipliedBy(1 + slippage);
@@ -690,7 +699,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const binaryAmount = new BigN(amount);
 
-    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid));
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid, this.getAlphaPriceScaleDecimals()));
     const limitPrice = alphaToTaoPrice
       .multipliedBy(10 ** _getAssetDecimals(this.nativeToken))
       .multipliedBy(1 - slippage);
@@ -720,7 +729,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     }
 
     const netuid = poolInfo.metadata.subnetData?.netuid;
-    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid || 0));
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid || 0, this.getAlphaPriceScaleDecimals()));
 
     const minDelegatorStake = await this.getMinBond(netuid);
 
@@ -756,7 +765,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.fromValidatorSameAsTo')));
     }
 
-    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid));
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid, this.getAlphaPriceScaleDecimals()));
     const bnMinStake = await this.getMinBond(netuid);
     const minUnstake = bnMinStake.dividedBy(alphaToTaoPrice);
 
