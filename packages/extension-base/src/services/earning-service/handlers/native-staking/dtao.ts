@@ -7,14 +7,12 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, RequestEarningImpact, TransactionData, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 import { BN_ZERO } from '@polkadot/util';
 
-import { getAlphaToTaoRate } from '../../utils/alpha-price';
 import TaoNativeStakingPoolHandler, { DEFAULT_DTAO_MINBOND, RateSubnetData, TaoStakeInfo, TaoStakingStakeOption } from './tao';
 
 export interface SubnetData {
@@ -44,6 +42,11 @@ interface SubnetsInfo {
   maxAllowedValidators: number;
 }
 
+interface SubnetPriceData {
+  netuid: number;
+  price: string | number;
+}
+
 export interface EarningImpactResult {
   slippage: number;
   rate: number;
@@ -56,32 +59,25 @@ interface SubnetPosition {
   originalTotalStake: BigN;
 }
 
-const getAlphaToTaoRateMap = async (substrateApi: _SubstrateApi, chain: string, nativeTokenDecimals: number): Promise<Record<number, string>> => {
-  const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as RateSubnetData[] | undefined;
-
-  if (!allSubnets || allSubnets.length === 0) {
-    return {};
-  }
-
+const getAlphaToTaoRateMap = async (substrateApi: _SubstrateApi, priceScaleDecimals = 9): Promise<Record<number, string>> => {
   const result = Object.create(null) as Record<number, string>;
+  const PRICE_SCALE = new BigN(10).pow(priceScaleDecimals);
 
-  await Promise.all(allSubnets.map(async (subnet) => {
-    const netuid = subnet?.netuid;
+  const allSubnetPrices = (await substrateApi.api.call.swapRuntimeApi.currentAlphaPriceAll()).toJSON() as SubnetPriceData[] | undefined;
 
-    if (netuid === undefined) {
-      return;
+  if (allSubnetPrices && allSubnetPrices.length > 0) {
+    for (const subnetPrice of allSubnetPrices) {
+      const netuid = subnetPrice?.netuid;
+
+      if (netuid === undefined) {
+        continue;
+      }
+
+      const rawPrice = subnetPrice?.price ? new BigN(subnetPrice.price) : new BigN(0);
+
+      result[netuid] = netuid === 0 ? '1' : rawPrice.dividedBy(PRICE_SCALE).toFixed();
     }
-
-    if (netuid === 0) {
-      result[netuid] = '1';
-
-      return;
-    }
-
-    const rate = await getAlphaToTaoRate(substrateApi, chain, netuid, nativeTokenDecimals);
-
-    result[netuid] = rate.toString();
-  }));
+  }
 
   return result;
 };
@@ -303,8 +299,7 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
     const getPoolPosition = async () => {
       const rawDelegateStateInfos = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(useAddresses);
       const delegateStateInfos = rawDelegateStateInfos.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
-
-      const alphaToTaoRateMap = await getAlphaToTaoRateMap(this.substrateApi, this.chain, _getAssetDecimals(this.nativeToken));
+      const alphaToTaoRateMap = await getAlphaToTaoRateMap(this.substrateApi, this.getAlphaPriceScaleDecimals());
 
       if (!delegateStateInfos || delegateStateInfos.length === 0) {
         return;

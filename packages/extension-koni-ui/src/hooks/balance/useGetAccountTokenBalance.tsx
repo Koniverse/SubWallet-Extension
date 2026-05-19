@@ -120,6 +120,16 @@ function getTokenBalanceMap (
       tokenBalance.free.value = tokenBalance.free.value.plus(getBalanceValue(balanceItem.free || '0', decimals));
       tokenBalance.locked.value = tokenBalance.locked.value.plus(getBalanceValue(balanceItem.locked || '0', decimals));
       tokenBalance.total.value = tokenBalance.free.value.plus(tokenBalance.locked.value);
+
+      tokenBalance.lockedDetails = balanceItem?.lockedDetails
+        ? {
+          staking: getBalanceValue(balanceItem.lockedDetails.staking || '0', decimals).toFixed(),
+          governance: getBalanceValue(balanceItem.lockedDetails.governance || '0', decimals).toFixed(),
+          democracy: getBalanceValue(balanceItem.lockedDetails.democracy || '0', decimals).toFixed(),
+          reserved: getBalanceValue(balanceItem.lockedDetails.reserved || '0', decimals).toFixed(),
+          others: getBalanceValue(balanceItem.lockedDetails.others || '0', decimals).toFixed()
+        }
+        : undefined;
     }
 
     const priceId = _getAssetPriceId(chainAsset);
