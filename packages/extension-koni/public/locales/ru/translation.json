@@ -2783,5 +2783,6 @@
   "ui.SETTINGS.screen.Setting.Chains.Manage.disableAllNetworkSubtitle": "",
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOff": "",
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworksUnable": "",
-  "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": ""
+  "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": "",
+  "ui.DAPP.Confirmations.Sign.Substrate.unableToDecode": ""
 }

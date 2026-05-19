@@ -118,7 +118,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { chain, loadingChain } = useMetadata(genesisHash, requireSpecVersion);
   const chainInfo = useGetChainInfoByGenesisHash(genesisHash);
   const accountChainInfo = useGetChainInfoByGenesisHash(account?.genesisHash || '');
-  const { addExtraData, hashLoading, isMissingData, payload } = useParseSubstrateRequestPayload(chain, request, isLedger);
+  const { addExtraData, hashLoading, isMissingData, payload, payloadError } = useParseSubstrateRequestPayload(chain, request, isLedger);
 
   const isRejectPendingTransaction = extrinsicType === ExtrinsicType.MULTISIG_CANCEL_TX;
 
@@ -127,7 +127,7 @@ const Component: React.FC<Props> = (props: Props) => {
         isWrapTransaction;
   }, [extrinsicType, isWrapTransaction]);
 
-  const isMessage = isSubstrateMessage(payload);
+  const isMessage = !payloadError && isSubstrateMessage(payload);
 
   const chainSlug = useMemo(() => getLedgerChainSlug(signMode, account?.originGenesisHash, accountChainInfo?.slug), [account?.originGenesisHash, accountChainInfo?.slug, signMode]);
   const networkName = useMemo(() => chainInfo?.name || chain?.name || toShort(genesisHash), [chainInfo, genesisHash, chain]);
@@ -178,6 +178,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const alertData = useMemo((): AlertData | undefined => {
     const requireMetadata = isRequireMetadata(signMode, isRuntimeUpdated);
+
+    if (payloadError) {
+      return {
+        type: 'error',
+        title: t('ui.DAPP.Confirmations.Sign.Substrate.errorExclamation'),
+        description: t('ui.DAPP.Confirmations.Sign.Substrate.unableToDecode')
+      };
+    }
 
     if (!isMessage && !loadingChain) {
       if (!chain || !chain.hasMetadata || isMetadataOutdated) {
@@ -269,7 +277,7 @@ const Component: React.FC<Props> = (props: Props) => {
     }
 
     return undefined;
-  }, [addExtraData, chain, isMessage, isMetadataOutdated, isMissingData, isRuntimeUpdated, loadingChain, networkName, signMode, t]);
+  }, [addExtraData, chain, isMessage, isMetadataOutdated, isMissingData, isRuntimeUpdated, loadingChain, networkName, payloadError, signMode, t]);
 
   const activeLedger = useMemo(() => isLedger && !loadingChain && alertData?.type !== 'error', [isLedger, loadingChain, alertData?.type]);
   const forceUseMigrationApp = useMemo(() => isRuntimeUpdated || (isMessage && chainSlug !== 'avail_mainnet'), [isRuntimeUpdated, isMessage, chainSlug]);
@@ -584,7 +592,7 @@ const Component: React.FC<Props> = (props: Props) => {
     };
   }, [txExpirationTime]);
 
-  const isApproveDisabled = showQuoteExpired || loadingChain || hashLoading || (isMessage ? !modeCanSignMessage.includes(signMode) : alertData?.type === 'error') || disableApproval;
+  const isApproveDisabled = !!payloadError || showQuoteExpired || loadingChain || hashLoading || (isMessage ? !modeCanSignMessage.includes(signMode) : alertData?.type === 'error') || disableApproval;
 
   return (
     <>
@@ -637,7 +645,7 @@ const Component: React.FC<Props> = (props: Props) => {
           {approveButtonContent.label}
         </Button>
         {
-          signMode === AccountSignMode.QR && (
+          signMode === AccountSignMode.QR && !payloadError && (
             <DisplayPayloadModal>
               <SubstrateQr
                 address={account?.address || address}
@@ -647,7 +655,7 @@ const Component: React.FC<Props> = (props: Props) => {
             </DisplayPayloadModal>
           )
         }
-        {signMode === AccountSignMode.QR && <ScanSignature onSignature={onApproveSignature} />}
+        {signMode === AccountSignMode.QR && !payloadError && <ScanSignature onSignature={onApproveSignature} />}
       </div>
     </>
   );

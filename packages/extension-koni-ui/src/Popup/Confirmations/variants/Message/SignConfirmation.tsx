@@ -46,16 +46,16 @@ function Component ({ className, request }: Props) {
   const { chain } = useMetadata(genesisHash);
   const chainInfo = useGetChainInfoByGenesisHash(genesisHash);
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chainInfo?.slug || '');
-  const { payload } = useParseSubstrateRequestPayload(chain, request.request);
+  const { payload, payloadError } = useParseSubstrateRequestPayload(chain, request.request);
   const onClickDetail = useOpenDetailModal();
 
-  const isMessage = useMemo(() => isSubstrateMessage(payload), [payload]);
+  const isMessage = useMemo(() => !payloadError && isSubstrateMessage(payload), [payload, payloadError]);
   // True when current account is a multisig account.
   const isMultisigAccount = useMemo(() => !!account?.isMultisig, [account?.isMultisig]);
   // Multisig does not support direct message signing.
   const isMultisigMessageSigning = useMemo(() => isMultisigAccount && isMessage, [isMessage, isMultisigAccount]);
   // Multisig transaction signing must be wrapped before approval.
-  const isMultisigWrappedTransactionSigning = useMemo(() => isMultisigAccount && !isMessage, [isMessage, isMultisigAccount]);
+  const isMultisigWrappedTransactionSigning = useMemo(() => isMultisigAccount && !isMessage && !payloadError, [isMessage, isMultisigAccount, payloadError]);
   const chainSlug = useMemo(() => chainInfo?.slug || '', [chainInfo?.slug]);
   const accountTitle = useMemo(() => t('ui.ACCOUNT.components.AccountProxy.TypeTag.multisigAccount'), [t]);
 
@@ -95,6 +95,57 @@ function Component ({ className, request }: Props) {
     }
   }, [isMultisigAccount, request.id]);
 
+  const confirmationAccountNode = useMemo(() => {
+    if (payloadError) {
+      return (
+        <AccountItemWithProxyAvatar
+          account={account}
+          accountAddress={address}
+          className='account-item'
+          isSelected={true}
+        />
+      );
+    }
+
+    if (isMultisigAccount && !isMessage) {
+      return (
+        <MultisigSignerSelector
+          chainSlug={chainSlug}
+          decimals={decimals}
+          initialCallData={initialCallData}
+          onDisableApprovalChange={setDisableMultisigApproval}
+          onOpenCallDataDetail={onClickDetail}
+          requestId={request.id}
+          symbol={symbol}
+          targetAddress={address}
+        />
+      );
+    }
+
+    return (
+      <>
+        <AccountItemWithProxyAvatar
+          account={account}
+          accountAddress={address}
+          className={CN('account-item', { '-unsupported': isMultisigMessageSigning })}
+          isSelected={true}
+          showUnselectIcon={isMultisigMessageSigning}
+        />
+
+        <div>
+          <Button
+            icon={<ViewDetailIcon />}
+            onClick={onClickDetail}
+            size='xs'
+            type='ghost'
+          >
+            {t('ui.DAPP.Confirmations.Message.Sign.viewDetails')}
+          </Button>
+        </div>
+      </>
+    );
+  }, [account, address, chainSlug, decimals, initialCallData, isMessage, isMultisigAccount, isMultisigMessageSigning, onClickDetail, payloadError, request.id, symbol, t]);
+
   return (
     <>
       <div className={CN('confirmation-content', className)}>
@@ -119,40 +170,7 @@ function Component ({ className, request }: Props) {
               ? t('ui.DAPP.Confirmations.Message.Sign.approvingRequestWithAccount')
               : t('ui.DAPP.Confirmations.Message.Sign.selectSignatory')}
         </div>
-        {isMultisigAccount && !isMessage
-          ? (
-            <MultisigSignerSelector
-              chainSlug={chainSlug}
-              decimals={decimals}
-              initialCallData={initialCallData}
-              onDisableApprovalChange={setDisableMultisigApproval}
-              onOpenCallDataDetail={onClickDetail}
-              requestId={request.id}
-              symbol={symbol}
-              targetAddress={address}
-            />
-          )
-          : <>
-            <AccountItemWithProxyAvatar
-              account={account}
-              accountAddress={address}
-              className={CN('account-item', { '-unsupported': isMultisigMessageSigning })}
-              isSelected={true}
-              showUnselectIcon={isMultisigMessageSigning}
-            />
-
-            <div>
-              <Button
-                icon={<ViewDetailIcon />}
-                onClick={onClickDetail}
-                size='xs'
-                type='ghost'
-              >
-                {t('ui.DAPP.Confirmations.Message.Sign.viewDetails')}
-              </Button>
-            </div>
-          </>
-        }
+        {confirmationAccountNode}
 
       </div>
       <SubstrateSignArea
@@ -162,23 +180,25 @@ function Component ({ className, request }: Props) {
         isWrapTransaction={isMultisigWrappedTransactionSigning}
         request={request.request}
       />
-      <BaseDetailModal
-        title={isMessage ? t('ui.DAPP.Confirmations.Message.Sign.messageDetails') : t('ui.DAPP.Confirmations.Message.Sign.transactionDetails')}
-      >
-        {isMessage
-          ? (
-            <SubstrateMessageDetail bytes={payload as string} />
-          )
-          : (
-            <SubstrateExtrinsic
-              accountName={account?.name}
-              address={address}
-              payload={payload as ExtrinsicPayload}
-              request={request.request.payload as SignerPayloadJSON}
-            />
-          )
-        }
-      </BaseDetailModal>
+      {!payloadError && (
+        <BaseDetailModal
+          title={isMessage ? t('ui.DAPP.Confirmations.Message.Sign.messageDetails') : t('ui.DAPP.Confirmations.Message.Sign.transactionDetails')}
+        >
+          {isMessage
+            ? (
+              <SubstrateMessageDetail bytes={payload as string} />
+            )
+            : (
+              <SubstrateExtrinsic
+                accountName={account?.name}
+                address={address}
+                payload={payload as ExtrinsicPayload}
+                request={request.request.payload as SignerPayloadJSON}
+              />
+            )
+          }
+        </BaseDetailModal>
+      )}
     </>
   );
 }
