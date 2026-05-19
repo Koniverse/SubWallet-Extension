@@ -8,7 +8,6 @@ import { BasicTxErrorType } from '@subwallet/extension-base/types';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
-export * from './swap';
 export * from './request';
 export * from './earning';
 export * from './transfer';
