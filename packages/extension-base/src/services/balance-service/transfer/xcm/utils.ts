@@ -73,12 +73,13 @@ interface ParaSpellError {
   statusCode: number
 }
 
-const version = '/v4';
+const version = '/v1';
 
 const paraSpellApi = {
   buildXcm: `${version}/x-transfer`,
   dryRunXcm: `${version}/dry-run`,
-  feeXcm: `${version}/xcm-fee`
+  feeXcm: `${version}/xcm-fee`,
+  dryRunPreviewXcm: `${version}/dry-run-preview`
 };
 
 function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> {
@@ -160,8 +161,8 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
   const paraSpellChainMap = await fetchParaSpellChainMap();
 
   const bodyData = {
-    senderAddress: sender,
-    address: recipient,
+    sender,
+    recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
     currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
@@ -205,8 +206,8 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   }
 
   const bodyData = {
-    senderAddress: sender,
-    address: recipient,
+    sender,
+    recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
     currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
@@ -218,6 +219,54 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   const response = await fetchFromProxyService(
     ProxyServiceRoute.PARASPELL,
     paraSpellApi.dryRunXcm,
+    {
+      method: 'POST',
+      body: JSON.stringify(bodyData),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json() as ParaSpellError;
+
+    return {
+      origin: {
+        success: false,
+        failureReason: error.message
+      }
+    } as DryRunResult;
+  }
+
+  return await response.json() as DryRunResult;
+}
+
+export async function dryRunPreviewXcm (request: CreateXcmExtrinsicProps) {
+  const { destinationChain, originChain, originTokenInfo, recipient, sender, sendingValue } = request;
+  const paraSpellChainMap = await fetchParaSpellChainMap();
+  const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
+
+  if (!paraSpellIdentifyV4) {
+    throw new Error('Token is not support XCM at this time');
+  }
+
+  const bodyData = {
+    sender,
+    recipient,
+    from: paraSpellChainMap[originChain.slug],
+    to: paraSpellChainMap[destinationChain.slug],
+    currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
+    options: {
+      abstractDecimals: false,
+      mintFeeAssets: true
+    }
+  };
+
+  const response = await fetchFromProxyService(
+    ProxyServiceRoute.PARASPELL,
+    paraSpellApi.dryRunPreviewXcm,
     {
       method: 'POST',
       body: JSON.stringify(bodyData),
@@ -254,8 +303,8 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   }
 
   const bodyData = {
-    senderAddress: sender,
-    address: recipient,
+    sender,
+    recipient,
     from: paraSpellChainMap[fromChainInfo.slug],
     to: paraSpellChainMap[toChainInfo.slug],
     currency: createParaSpellCurrency(paraSpellIdentifyV4, value),
