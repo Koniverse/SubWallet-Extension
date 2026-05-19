@@ -80,7 +80,7 @@ interface ParaSpellError {
   statusCode: number
 }
 
-const version = '/v5';
+const version = '/v1';
 
 const paraSpellApi = {
   buildXcm: `${version}/x-transfer`,
@@ -170,8 +170,8 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
   const paraSpellChainMap = await fetchParaSpellChainMap();
 
   const bodyData = {
-    senderAddress: sender,
-    address: recipient,
+    sender,
+    recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
     currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
@@ -215,8 +215,8 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   }
 
   const bodyData = {
-    senderAddress: sender,
-    address: recipient,
+    sender,
+    recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
     currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
@@ -262,8 +262,8 @@ export async function dryRunPreviewXcm (request: CreateXcmExtrinsicProps) {
   }
 
   const bodyData = {
-    senderAddress: sender,
-    address: recipient,
+    sender,
+    recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
     currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
@@ -313,8 +313,8 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   }
 
   const bodyData = {
-    senderAddress: sender,
-    address: recipient,
+    sender,
+    recipient,
     from: paraSpellChainMap[fromChainInfo.slug],
     to: paraSpellChainMap[toChainInfo.slug],
     currency: createParaSpellCurrency(paraSpellIdentifyV4, requestValue),
