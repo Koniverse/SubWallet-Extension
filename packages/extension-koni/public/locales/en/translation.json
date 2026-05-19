@@ -2782,5 +2782,6 @@
   "ui.SETTINGS.screen.Setting.Chains.Manage.disableAllNetworkSubtitle": "You sure you want to turn off all networks?",
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOff": "Turn off",
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworksUnable": "Unable to turn off all networks. Please try again later",
-  "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": "Feature not available for <highlight>{{accountTitle}}</highlight>. Change to another account type and try again."
+  "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": "Feature not available for <highlight>{{accountTitle}}</highlight>. Change to another account type and try again.",
+  "ui.DAPP.Confirmations.Sign.Substrate.unableToDecode": "Unable to decode this signing payload. Reject this request and try again after the dApp or network type definitions are updated."
 }
