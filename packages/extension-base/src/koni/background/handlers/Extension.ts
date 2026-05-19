@@ -1099,7 +1099,7 @@ export default class KoniExtension {
 
       return true;
     } catch (e) {
-      console.error(e);
+      console.error('[updateAssetSetting] Error:', e);
 
       return false;
     }
@@ -5039,7 +5039,8 @@ export default class KoniExtension {
       ...this.createPassConfirmationParams(isPassConfirmation),
       eventsHandler,
       step,
-      xcmFeeDryRun: extrinsicType === ExtrinsicType.TRANSFER_XCM ? submitData.xcmStepFee : undefined
+      xcmFeeDryRun: extrinsicType === ExtrinsicType.TRANSFER_XCM ? submitData.xcmStepFee : undefined,
+      xcmDestinationFee: submitData.xcmDestinationFee
     });
   }
 

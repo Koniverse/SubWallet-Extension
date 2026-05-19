@@ -126,6 +126,7 @@ export type GenStepFunction = (params: OptimalYieldPathParams) => Promise<YieldS
 
 export interface XcmStepMetadataForLiqStaking {
   sendingValue: string,
+  xcmDestinationFee?: string,
   originTokenInfo: _ChainAsset,
   destinationTokenInfo: _ChainAsset
 }

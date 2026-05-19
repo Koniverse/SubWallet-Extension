@@ -304,7 +304,7 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
       }
 
       {
-        isSubstrateXcm && (
+        isSubstrateXcm && new BigN(crossChainFee).gt(0) && (
           <div className={CN(className, '__cross-chain-fee-wrapper')}>
             <div className='__field-line-1'>
               <div className='__field-label'>
