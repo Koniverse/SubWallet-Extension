@@ -10,7 +10,7 @@
   "ui.TRANSACTION.screen.Transaction.Swap.to": "宛先",
   "ui.TRANSACTION.Confirmations.Detail.Evm.Transaction.to": "宛先",
   "ui.TRANSACTION.components.Field.FeeEditor.networkFee": "Network fee",
-  "ui.TRANSACTION.Confirmations.TransferBlock.networkFee": "Network fee",
+  "ui.TRANSACTION.Confirmations.TransferBlock.networkFee": "",
   "ui.TRANSACTION.Confirmations.TransferBlock.crossChainFee": "Cross-chain fee",
   "ui.TRANSACTION.components.Field.FeeEditor.crossChainFee": "Cross-chain fee",
   "ui.BUY.screen.BuyTokens.directedToSupplierToComplete": "このトランザクションを完了するために、選択したサプライヤーに移動します",
