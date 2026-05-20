@@ -194,9 +194,9 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
 
   /**
    * Fetch weighted APY per strategy with TTL cache.
-   * NOTE: strategyId in the APY endpoint differs from id in strategies-active,
-   * so APY is keyed by normalized strategy name (lowercase trim) instead.
-   * Returns a Map<normalizedName, apy%>.
+   * APY is keyed by both normalized strategy name (lowercase trim) AND strategyId (UUID)
+   * for reliable lookup, since strategyId in the APY endpoint differs from id in strategies-active.
+   * Returns a Map<normalizedName | strategyId, apy%>.
    */
   private async getTrustedStakeApyMap (): Promise<Map<string, number>> {
     const now = Date.now();
@@ -222,8 +222,11 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
 
           const apy = Number(item.weightedApy);
 
-          // strategyId is different from strategies-active id, so map APY by strategy name.
+          // Map by normalized name for name-based lookup
           apyMap.set(this.normalizeStrategyName(item.strategyName), apy);
+
+          // Also map by strategyId (UUID) as a more reliable fallback key
+          apyMap.set(item.strategyId, apy);
         });
 
         this.trustedStakeApyCache = {
@@ -450,7 +453,8 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
               activeStake: totalTao.toFixed(),
               validatorMinStake: toBNString(strategy.minBalance, decimals),
               validatorIdentity: strategy.name,
-              expectedReturn: apyMap.get(this.normalizeStrategyName(strategy.name)),
+              // Lookup APY by name first, fallback to strategy id
+              expectedReturn: apyMap.get(this.normalizeStrategyName(strategy.name)) ?? apyMap.get(strategy.id),
               substrateProxyType: proxy.proxyType,
               delay: proxy.delay
             };
@@ -519,7 +523,8 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
           minBond: toBNString(strategy.minBalance, decimals),
           constituents: Object.keys(strategy.targetConstituents.subnetWeights),
           identity: strategy.name,
-          expectedReturn: apyMap.get(this.normalizeStrategyName(strategy.name))
+          // Lookup APY by name first, fallback to strategy id
+          expectedReturn: apyMap.get(this.normalizeStrategyName(strategy.name)) ?? apyMap.get(strategy.id)
         }));
     } catch (e) {
       console.warn('Failed to fetch pool targets', e);
@@ -588,7 +593,6 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
     const symbol = this.nativeToken.symbol;
     const pow = BN_TEN.pow(decimals);
 
-    const bnMinBond = new BigNumber(minBond);
     const bnProxyDeposit = new BigNumber(proxyDeposit);
     const parsedProxyDeposit = bnProxyDeposit.dividedBy(pow).toFixed();
 
@@ -603,7 +607,7 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
       return errors;
     }
 
-    if (bnTotalEquivalent.lt(bnMinBond)) {
+    if (bnTotalEquivalent.lt(minBond)) {
       errors.push(new TransactionError(StakingTxErrorType.NOT_ENOUGH_MIN_STAKE, t('bg.EARNING.services.service.earning.delegatedStaking.tao.minimumTransferableBalanceToStartEarning', {
         replace: {
           parsedProxyDeposit,
