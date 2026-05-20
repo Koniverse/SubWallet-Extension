@@ -16,12 +16,12 @@ The extension is compiled from folder `packages/extension-koni`
 All data requests must be called and processed in the background. Extension Pages and Inject Scripts use data from the background environment and do not call APIs directly.
 
 ## Project structure
-- **extension-base** - Contains main features run in background, call api, persist data into chrome store and inject script.
+- **extension-base** - Contains main features run in background, call api, persist data into chrome store and inject script
 - **extension-dapp** - A convenience wrapper to work with the injected objects, simplifying data extraction for any dapp that wishes to integrate the extension (or any extension that supports the interface)
 - **extension-inject** - A convenience wrapper that allows extension developers to inject their extension for use by any dapp
 - **extension-chains** - Definitions for chains that are supported by this extension. It contains the bare definitions as well as a stripped-down (call-only) metadata format.
 - **extension-dapp** - The actual in-depth technical breakdown is given in the next section for any dapp developer wishing to work with the raw objects injected into the window. However, convenience wrappers are provided that allows for any dapp to use this extension (or any other extension that conforms to the interface) without having to manage any additional info.
-- **extension-mocks** - Mock data for testing.
+- **extension-mocks** - Mock data for testing
 - **extension-compat-metamask**: Compatible with MetaMask
 - **extension-koni-base**: Custom package, extension extension base
 - **extension-koni-ui** *(replace extension-ui)*: The UI components for the extension, to build up the popup
