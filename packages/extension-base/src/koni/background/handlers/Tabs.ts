@@ -1065,8 +1065,8 @@ export default class KoniTabs {
     return this.#koniState.fallbackEvmRpcProvider(evmState.networkKey || '').catch(() => false);
   }
 
-  private async performWeb3Method (id: string, url: string, { method,
-    params }: RequestArguments, callback?: (result?: any) => void, retriedRpcFallback = false) {
+  private async performWeb3Method (id: string, url: string, request: RequestArguments, callback?: (result?: any) => void, retriedRpcFallback = false) {
+    const { method } = request;
     const provider = await this.getEvmProvider(url);
 
     this.checkAndHandleProviderStatus(provider);
@@ -1075,7 +1075,7 @@ export default class KoniTabs {
       provider?.send({
         jsonrpc: '2.0',
         method: method,
-        params: params as any[],
+        params: request.params as any[],
         id
       }, (error, result) => {
         let err = result?.error || error;
@@ -1097,7 +1097,7 @@ export default class KoniTabs {
             this.fallbackEvmRpcProvider(url)
               .then((fallbackSuccess) => {
                 if (fallbackSuccess && !retriedRpcFallback) {
-                  return this.performWeb3Method(id, url, { method, params }, callback, true);
+                  return this.performWeb3Method(id, url, request, callback, true);
                 }
 
                 return this.showEvmRpcErrorConfirmation(id, url, err)
