@@ -1,9 +1,17 @@
 # CHANGELOG
 
+## 1.3.79
+Build date: May 21, 2026.
+
+- Alpha price calculation mismatch vs TaoStats (#4987)
+- Update ParaSpell API integration to v1 (#4979)
+- Extension – Some issues when merging in version 1.3.78 (#4988)
+- Refactor Swap Service interface and redundant code (#4826)
+
+
 ## 1.3.78
 Build date: May 14, 2026.
 
-Nội dung release:
 - Extension - Support display destination fee for transfer XCM (#4278)
 - Calculate exactly estimate fee for bridge step in liquid staking (#4803)
 - Disable all networks' switch to Manage Networks page (#4970)
