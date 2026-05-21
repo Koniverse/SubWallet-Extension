@@ -36,16 +36,16 @@ function Component () {
   useEffect(() => {
     if (redirectFromPreviewRef.current) {
       openAlert({
-        title: t('Invalid account type'),
+        title: t('bg.TRANSACTION.core.validation.request.invalidAccountType'),
         type: NotificationType.ERROR,
-        content: t('You don’t have any account to stake on {{chainName}} network yet. Create a new account and try again.', { replace: { chainName: chainNameRef.current } }),
+        content: t('ui.EARNING_ENTRY.Popup.Home.Earning.EarningEntry.youDonTHaveAnyAccountToStakeOnNetworkYetCreateANewAccountAndTryAgain', { replace: { chainName: chainNameRef.current } }),
         cancelButton: {
           text: 'Dismiss',
           onClick: closeAlert,
           icon: XCircle
         },
         okButton: {
-          text: t('Create new'),
+          text: t('ui.ACCOUNT.hook.account.useHandleTonWarning.createNew'),
           onClick: () => {
             closeAlert();
             setReturnStorage('/transaction/earn');

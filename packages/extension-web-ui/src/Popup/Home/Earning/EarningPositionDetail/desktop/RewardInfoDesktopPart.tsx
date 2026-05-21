@@ -73,9 +73,9 @@ function Component ({ className, closeAlert, compound,
 
   const title = useMemo(() => {
     if (type === YieldPoolType.NOMINATION_POOL) {
-      return t('Unclaimed rewards');
+      return t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.unclaimedRewards');
     } else {
-      return t('Rewards');
+      return t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.rewards');
     }
   }, [t, type]);
 
@@ -102,11 +102,11 @@ function Component ({ className, closeAlert, compound,
       }
     } else {
       openAlert({
-        title: t('Rewards unavailable'),
+        title: t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.rewardsUnavailable'),
         type: NotificationType.ERROR,
-        content: t("You don't have any rewards to claim at the moment. Try again later."),
+        content: t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.noRewardsToClaim'),
         okButton: {
-          text: t('I understand'),
+          text: t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
         }
@@ -165,13 +165,13 @@ function Component ({ className, closeAlert, compound,
                     : (
                       <ActivityIndicator size={20} />
                     )
-                  : isDAppStaking && (<div className={'__visit-dapp-label'}>{t('Visit Astar portal')}</div>)}
+                  : isDAppStaking && (<div className={'__visit-dapp-label'}>{t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.visitAstarPortal')}</div>)}
                 {canClaim && (
                   <Button
                     onClick={onClaimReward}
                     size='xs'
                   >
-                    {type === YieldPoolType.NATIVE_STAKING && isDAppStaking ? t('Check rewards') : t('Claim rewards')}
+                    {type === YieldPoolType.NATIVE_STAKING && isDAppStaking ? t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.checkRewards') : t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.claimRewards')}
                   </Button>
                 )}
               </div>
@@ -180,7 +180,7 @@ function Component ({ className, closeAlert, compound,
           : (
             <div className={'__claim-reward-area'}>
               <div className={'__auto-compounded'}>
-                {t('Auto compounded')}
+                {t('ui.REWARD_INFO_DESKTOP_PART.Popup.Home.Earning.EarningPositionDetail.desktop.RewardInfoDesktopPart.autoCompounded')}
               </div>
             </div>
           )}
@@ -199,7 +199,7 @@ function Component ({ className, closeAlert, compound,
           }
           onClick={onOpenRewardsHistoryModal}
           type={'ghost'}
-        >{t('Reward history')}</Button>
+        >{t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.rewardHistory')}</Button>
       </div>
       <EarningRewardsHistoryModal
         inputAsset={inputAsset}

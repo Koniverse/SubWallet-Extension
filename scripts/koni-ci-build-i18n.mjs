@@ -11,7 +11,14 @@ function runBuild() {
   execSync('yarn i18next-scanner --config i18next-scanner.config.js');
 }
 
-const path= './packages/{{name}}/public/locales';
+// After cloning the extension-koni locale to webapp, run a second pass that
+// scans extension-web-ui and removes keys not used by the webapp UI.
+// This keeps the webapp locale lean and avoids merge conflicts.
+function runWebappI18n() {
+  execSync('yarn i18next-scanner --config i18next-scanner.webapp.config.js');
+}
+
+const path = './packages/{{name}}/public/locales';
 
 const source = 'extension-koni'
 const destinations = ['web-runner', 'webapp']
@@ -36,7 +43,9 @@ function cloneTrans() {
 }
 
 // runTest();
-runBuild();
+// runBuild();
 
 // Web runner
 cloneTrans();
+
+runWebappI18n();

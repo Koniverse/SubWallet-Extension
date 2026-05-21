@@ -87,12 +87,12 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         title: 'What if I lose the seed phrase?',
         description:
           <div>
-            {t('There is no way to get back your seed phrase if you lose it. Make sure you store them at someplace safe which is accessible only to you. ')}
+            {t('ui.NEW_SEED_PHRASE.Popup.Account.NewSeedPhrase.thereIsNoWayToGetBackYourSeedPhraseIfYouLoseItMakeSureYouStoreThemAtSomeplaceSafeWhichIsAccessibleOnlyToYou')}
             <u
               className={'__instruction-content-download'}
               onClick={onClickToSave}
               style={{ textDecoration: 'underline' }}
-            >{t('Download seed phrase ')}
+            >{t('ui.NEW_SEED_PHRASE.Popup.Account.NewSeedPhrase.downloadSeedPhrase')}
               <Icon
                 phosphorIcon={Download}
                 size='sm'
@@ -142,7 +142,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   }, [inactiveModal, notify, onComplete, seedPhrase, selectedMnemonicType]);
 
   const buttonProps = {
-    children: t('I have saved it somewhere safe'),
+    children: t('ui.NEW_SEED_PHRASE.Popup.Account.NewSeedPhrase.iHaveSavedItSomewhereSafe'),
     icon: FooterIcon,
     onClick: onConfirmSeedPhrase,
     disabled: !seedPhrase,
@@ -215,7 +215,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               : {}
           ]}
         subHeaderLeft={preventModal ? !isWebUI ? <CloseIcon /> : undefined : undefined }
-        title={t('Your seed phrase')}
+        title={t('ui.ACCOUNT.screen.Account.NewSeedPhrase.yourSeedPhrase')}
       >
         <div className={CN('container', {
           '__web-ui': isWebUI
@@ -223,7 +223,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         >
           <div className={'seed-phrase-container'}>
             <div className='description'>
-              {t('Keep your seed phrase in a safe place, and never disclose it. Anyone with this phrase can take control of your assets.')}
+              {t('ui.NEW_SEED_PHRASE.Popup.Account.NewSeedPhrase.keepYourSeedPhraseInASafePlaceAndNeverDiscloseItAnyoneWithThisPhraseCanTakeControlOfYourAssets')}
             </div>
             <WordPhrase
               enableDownload={true}

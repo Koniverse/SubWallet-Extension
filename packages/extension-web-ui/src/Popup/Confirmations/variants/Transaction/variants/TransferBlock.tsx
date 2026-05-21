@@ -50,7 +50,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
       <MetaInfo hasBackgroundWrapper>
         <MetaInfo.Account
           address={data.from}
-          label={t('Send from')}
+          label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendFrom')}
         />
 
         {
@@ -58,14 +58,14 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
           (
             <MetaInfo.Chain
               chain={chainInfo.slug}
-              label={t('Sender network')}
+              label={t('ui.TRANSFER_BLOCK.Popup.Confirmations.variants.Transaction.variants.TransferBlock.senderNetwork')}
             />
           )
         }
 
         <MetaInfo.Account
           address={data.to}
-          label={t('Send to')}
+          label={t('ui.TRANSACTION.Confirmations.TransferBlock.sendTo')}
         />
 
         {
@@ -73,7 +73,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
           (
             <MetaInfo.Chain
               chain={xcmData.destinationNetworkKey}
-              label={t('Destination network')}
+              label={t('ui.TRANSFER_BLOCK.Popup.Confirmations.variants.Transaction.variants.TransferBlock.destinationNetwork')}
             />
           )
         }
@@ -83,13 +83,13 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
           (
             <MetaInfo.Chain
               chain={chainInfo.slug}
-              label={t('Network')}
+              label={t('ui.TRANSACTION.Confirmations.TransferBlock.network')}
             />
           )
         }
         {data.orderId && (
           <MetaInfo.Default
-            label={t('Order ID')}
+            label={t('ui.TRANSFER_BLOCK.Popup.Confirmations.variants.Transaction.variants.TransferBlock.orderId')}
           >
             {data.orderId}
           </MetaInfo.Default>
@@ -100,7 +100,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
         {isAcrossBridge && xcmData.metadata
           ? <>
             <MetaInfo.Default
-              label={t('Quote')}
+              label={t('ui.TRANSACTION.Confirmations.TransferBlock.quote')}
             >
               <QuoteRateDisplay
                 className={'__quote-estimate-swap-value'}
@@ -111,7 +111,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
             </MetaInfo.Default>
             <MetaInfo.Number
               decimals={destTokenInfo.decimals || 0}
-              label={t('Expected amount')}
+              label={t('ui.TRANSACTION.Confirmations.TransferBlock.expectedAmount')}
               suffix={destTokenInfo.symbol}
               value={xcmData.metadata.amountOut}
             />
@@ -119,7 +119,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
           : (
             <MetaInfo.Number
               decimals={tokenInfo.decimals || 0}
-              label={t('Amount')}
+              label={t('ui.TRANSACTION.Confirmations.TransferBlock.amount')}
               suffix={tokenInfo.symbol}
               value={data.value || 0}
             />
@@ -127,7 +127,7 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
 
         <MetaInfo.Number
           decimals={feeInfo ? feeInfo.decimals : nativeTokenDecimals}
-          label={t('Estimated fee')}
+          label={t('ui.TRANSACTION.components.Field.FeeEditor.estimatedFee')}
           suffix={feeInfo ? feeInfo.symbol : nativeTokenSymbol}
           value={feeInfo ? feeInfo.value : 0}
         />
@@ -137,8 +137,8 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
         (
           <AlertBox
             className={CN(className, 'alert-area')}
-            description={t("You'll need to pay an additional fee for the destination network in a cross-chain transfer. This fee cannot be calculated in advance.")}
-            title={t('Pay attention!')}
+            description={t('ui.TRANSACTION.Confirmations.TransferBlock.crossChainAdditionalFee')}
+            title={t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention')}
             type='warning'
           />
         )

@@ -51,7 +51,7 @@ function Component ({ className, extraActionNode, inputPlaceholder, onClickFilte
                 size='xs'
                 type='ghost'
               >
-                {t('Help')}
+                {t('ui.components.BackgroundExpandView.help')}
               </Button>
 
               {extraActionNode}

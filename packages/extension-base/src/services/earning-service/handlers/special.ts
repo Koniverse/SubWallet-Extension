@@ -401,7 +401,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       const currentValue = formatNumber(bnInputTokenBalance.toString(), inputTokenDecimal);
 
       processValidation.message = t(
-        'You can only enter a maximum of {{maxValue}} {{symbol}}, which is {{currentValue}} {{symbol}} ({{inputNetworkName}}) and {{maxXCMValue}} {{symbol}} ({{altNetworkName}}). Lower your amount and try again.',
+        'bg.EARNING.services.service.earning.specialHandler.maximumInputExceeded',
         {
           replace: {
             symbol,
@@ -473,9 +473,9 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       const maxString = formatNumber(bnInputTokenBalance.toString(), inputTokenInfo.decimals || 0);
 
       if (maxString !== '0') {
-        processValidation.message = t('Amount must be equal or less than {{number}}', { replace: { number: maxString } });
+        processValidation.message = t('ui.TRANSACTION.screen.Transaction.SendFund.amountMaxError', { replace: { number: maxString } });
       } else {
-        processValidation.message = t('You need balance greater than 0 to continue');
+        processValidation.message = t('bg.EARNING.services.service.earning.specialHandler.balanceGreaterThanZeroRequired');
       }
 
       return [new TransactionError(YieldValidationStatus.NOT_ENOUGH_BALANCE, processValidation.message, processValidation)];
@@ -493,7 +493,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
     const bnAmount = new BN(params.amount);
 
     if (bnAmount.lte(BN_ZERO)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'bg.SWAP.background.error.Swap.amountMustBeGreaterThanZero')];
     }
 
     let isXcmOk = false;

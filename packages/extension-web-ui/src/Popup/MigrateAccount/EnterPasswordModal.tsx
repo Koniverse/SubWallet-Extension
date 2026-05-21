@@ -70,7 +70,7 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
             onClick={onClose}
             schema={'secondary'}
           >
-            {t('Cancel')}
+            {t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.cancel')}
           </Button>
           <Button
             block={true}
@@ -84,16 +84,16 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
             loading={loading}
             onClick={form.submit}
           >
-            {t('Continue')}
+            {t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.continue')}
           </Button>
         </>
       )}
       id={enterPasswordModalId}
-      title={t('Enter password')}
+      title={t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.enterPassword')}
       zIndex={9999}
     >
       <div className='__brief'>
-        {t('Enter your SubWallet password to continue')}
+        {t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.enterSubWalletPasswordToContinue')}
       </div>
 
       <Form
@@ -105,7 +105,7 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
           name={FormFieldName.PASSWORD}
           rules={[
             {
-              message: t('Password is required'),
+              message: t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.passwordIsRequired'),
               required: true
             }
           ]}
@@ -114,8 +114,8 @@ function Component ({ className = '', onClose, onSubmit }: Props): React.ReactEl
           <Input.Password
             containerClassName='__password-input'
             id={passwordInputId}
-            label={t('Password')}
-            placeholder={t('Enter password')}
+            label={t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.password')}
+            placeholder={t('ui.ACCOUNT.screen.MigrateAccount.EnterPasswordModal.enterPassword')}
             suffix={<span />}
           />
         </Form.Item>

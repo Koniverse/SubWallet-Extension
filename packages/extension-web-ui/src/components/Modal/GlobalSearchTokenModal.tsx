@@ -98,7 +98,7 @@ function Component ({ className = '', id, onCancel, tokenBalanceMap, tokenSlugs 
       fullSizeOnMobile
       id={id}
       onCancel={onCancel}
-      title={t('Select token')}
+      title={t('ui.BALANCE.components.Modal.GlobalSearchToken.selectToken')}
     >
       <SwList.Section
         displayRow
@@ -109,7 +109,7 @@ function Component ({ className = '', id, onCancel, tokenBalanceMap, tokenSlugs 
         rowGap = {'8px'}
         searchFunction={searchFunc}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('Token name')}
+        searchPlaceholder={t<string>('ui.BALANCE.components.Modal.GlobalSearchToken.tokenName')}
       />
     </BaseModal>
   );

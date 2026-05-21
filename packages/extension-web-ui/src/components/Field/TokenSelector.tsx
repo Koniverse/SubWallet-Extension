@@ -137,17 +137,17 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       items={filteredItems}
       label={label}
       onSelect={onSelect}
-      placeholder={placeholder || t('Select token')}
+      placeholder={placeholder || t('ui.TRANSACTION.components.Field.TokenSelector.selectToken')}
       prefix={value !== '' && chainLogo}
       renderItem={renderItem}
       renderSelected={renderTokenSelected}
       renderWhenEmpty={renderEmpty}
       searchFunction={searchFunction}
       searchMinCharactersCount={2}
-      searchPlaceholder={t<string>('Enter token name or network name')}
+      searchPlaceholder={t<string>('ui.TRANSACTION.components.Field.TokenSelector.enterTokenOrNetworkName')}
       selected={value || ''}
       statusHelp={statusHelp}
-      title={label || placeholder || t('Select token')}
+      title={label || placeholder || t('ui.TRANSACTION.components.Field.TokenSelector.selectToken')}
       tooltip={tooltip}
     />
   );

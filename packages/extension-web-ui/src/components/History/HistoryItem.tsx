@@ -239,7 +239,7 @@ function Component (
           }
           onClick={handleOnClick}
           size={'xs'}
-          tooltip={t('View on explorer')}
+          tooltip={t('ui.components.HistoryItem.viewOnExplorer')}
           type='ghost'
         />
       </div>

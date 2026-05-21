@@ -224,7 +224,7 @@ function Component ({ className }: Props): JSX.Element {
                 console.error(e);
                 setFileValidateState({
                   status: 'error',
-                  message: t<string>('Invalid JSON file')
+                  message: t<string>('ui.ACCOUNT.screen.Account.RestoreJson.invalidJsonFile')
                 });
                 setValidating(false);
                 setCountAccountInvalid((pre) => pre + 1);
@@ -233,7 +233,7 @@ function Component ({ className }: Props): JSX.Element {
         } catch (e) {
           setFileValidateState({
             status: 'error',
-            message: t<string>('Invalid JSON file')
+            message: t<string>('ui.ACCOUNT.screen.Account.RestoreJson.invalidJsonFile')
           });
           setValidating(false);
           setRequirePassword(false);
@@ -276,12 +276,12 @@ function Component ({ className }: Props): JSX.Element {
             setTimeout(() => {
               if (addressList.length === 1) {
                 notify({
-                  message: t('1 account imported'),
+                  message: t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.1AccountImported'),
                   type: 'success'
                 });
               } else if (addressList.length > 1) {
                 notify({
-                  message: t('{{number}} accounts imported', { replace: { number: addressList.length } }),
+                  message: t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.accountsImported', { replace: { number: addressList.length } }),
                   type: 'success'
                 });
               }
@@ -328,7 +328,7 @@ function Component ({ className }: Props): JSX.Element {
 
     if (!value) {
       setSubmitValidateState({
-        message: t('Password is required'),
+        message: t('ui.ACCOUNT.screen.Account.RestoreJson.passwordIsRequired'),
         status: 'error'
       });
     } else {
@@ -345,7 +345,7 @@ function Component ({ className }: Props): JSX.Element {
   }, [requirePassword]);
 
   const buttonProps = {
-    children: t('Import account'),
+    children: t('ui.ACCOUNT.screen.Account.RestoreJson.importAccount'),
     icon: FooterIcon,
     onClick: form.submit,
     disabled: !!fileValidateState.status || !!submitValidateState.status || !password,
@@ -357,23 +357,23 @@ function Component ({ className }: Props): JSX.Element {
 
     if (countAccountInvalid > 0) {
       if (accountsInfo.length === 1) {
-        return t('{{number}} account found', { replace: { number: countAccount } });
+        return t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.accountFound', { replace: { number: countAccount } });
       }
 
-      return t('{{number}} accounts found', { replace: { number: countAccount } });
+      return t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.accountsFound', { replace: { number: countAccount } });
     }
 
-    return t('Import {{number}} accounts', { replace: { number: countAccount } });
+    return t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.importAccounts', { replace: { number: countAccount } });
   }, [accountsInfo.length, countAccountInvalid, t]);
 
   const descriptionAlertWarningBox = useMemo(() => {
     const countAccount = String(accountsInfo.length).padStart(2, '0');
 
     if (accountsInfo.length === 1) {
-      return t('One or more accounts found in this file are invalid. Only {{x}} account can be imported as listed below', { replace: { x: countAccount } });
+      return t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.oneOrMoreAccountsFoundInThisFileAreInvalidOnlyAccountCanBeImportedAsListedBelow', { replace: { x: countAccount } });
     }
 
-    return t('One or more accounts found in this file are invalid. Only {{x}} accounts can be imported as listed below', { replace: { x: countAccount } });
+    return t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.oneOrMoreAccountsFoundInThisFileAreInvalidOnlyAccountsCanBeImportedAsListedBelow', { replace: { x: countAccount } });
   }, [accountsInfo.length, t]);
 
   return (
@@ -382,7 +382,7 @@ function Component ({ className }: Props): JSX.Element {
         onBack={onBack}
         rightFooterButton={!isWebUI
           ? {
-            children: t('Import by JSON file'),
+            children: t('ui.ACCOUNT.screen.Account.RestoreJson.importByJsonFile'),
             icon: FooterIcon,
             onClick: form.submit,
             disabled: !!fileValidateState.status || !!submitValidateState.status || !password,
@@ -395,7 +395,7 @@ function Component ({ className }: Props): JSX.Element {
             onClick: goHome
           }
         ]}
-        title={t<string>('Import from Polkadot.{js}')}
+        title={t<string>('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.importFromPolkadotJs')}
       >
         <div className={CN('layout-container', {
           '__web-ui': isWebUI
@@ -403,7 +403,7 @@ function Component ({ className }: Props): JSX.Element {
         >
           <div className={CN('import-container')}>
             <div className='description'>
-              {t('Drag and drop the JSON file you exported from Polkadot.{js}')}
+              {t('ui.ACCOUNT.screen.Account.RestoreJson.dragAndDropPolkadotJsJson')}
             </div>
             <Form
               className='form-container'
@@ -418,10 +418,10 @@ function Component ({ className }: Props): JSX.Element {
                   accept={'application/json'}
                   className='file-selector'
                   disabled={validating}
-                  hint={t('Drag and drop the JSON file you exported from Polkadot.{js}')}
+                  hint={t('ui.ACCOUNT.screen.Account.RestoreJson.dragAndDropPolkadotJsJson')}
                   onChange={onChange}
                   statusHelp={fileValidateState.message}
-                  title={t('Import by JSON file')}
+                  title={t('ui.ACCOUNT.screen.Account.RestoreJson.importByJsonFile')}
                 />
               </Form.Item>
               {
@@ -469,8 +469,8 @@ function Component ({ className }: Props): JSX.Element {
                   : countAccountInvalid
                     ? (<AlertBox
                       className={'alert-warning-name-duplicate'}
-                      description={t('All accounts found in this file are invalid. Import another JSON file and try again')}
-                      title={t('Unable to import')}
+                      description={t('ui.ACCOUNT.screen.Account.RestoreJson.allAccountsInFileInvalid')}
+                      title={t('ui.ACCOUNT.screen.Account.RestoreJson.unableToImport')}
                       type='error'
                     />)
                     : <></>
@@ -481,12 +481,12 @@ function Component ({ className }: Props): JSX.Element {
                     validateStatus={submitValidateState.status}
                   >
                     <div className='input-label'>
-                      {t('Please enter the password you have used when creating your Polkadot.{js} account')}
+                      {t('ui.ACCOUNT.screen.Account.RestoreJson.enterPolkadotJsPassword')}
                     </div>
                     <Input.Password
                       id={`${formName}_${passwordField}`}
                       onChange={onChangePassword}
-                      placeholder={t('Password')}
+                      placeholder={t('ui.ACCOUNT.screen.Account.RestoreJson.password')}
                       statusHelp={submitValidateState.message}
                       type='password'
                       value={password}
@@ -505,12 +505,12 @@ function Component ({ className }: Props): JSX.Element {
               className={className}
               id={modalId}
               onCancel={closeModal}
-              title={t('Import list')}
+              title={t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.importList')}
             >
               {countAccountInvalid > 0 && <AlertBox
                 className={'alert-warning-name-duplicate -item'}
                 description={descriptionAlertWarningBox}
-                title={t('Some accounts can’t be imported')}
+                title={t('ui.RESTORE_JSON_.Popup.Account.RestoreJson_.someAccountsCanTBeImported')}
                 type='warning'
               />}
               <SwList.Section

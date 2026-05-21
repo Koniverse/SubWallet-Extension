@@ -75,7 +75,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   useEffect(() => {
     if (location.pathname === '/home/dapps') {
-      setTitle(t('DApps'));
+      setTitle(t('ui.DAPPS.Popup.DApps.dapps'));
     }
   }, [location.pathname, setTitle, t]);
 
@@ -91,7 +91,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('All'),
+        label: t('ui.screen.DApps.all'),
         value: DAppCategoryType.ALL
       },
       ...filterOptions
@@ -184,7 +184,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             className={'__header-area'}
             paddingVertical
             showBackButton={false}
-            title={t('DApps')}
+            title={t('ui.DAPPS.Popup.DApps.dapps')}
           />
         )
       }
@@ -234,7 +234,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             )}
             onClickActionBtn={onClickActionBtn}
             onSearch={handleSearch}
-            placeholder={t('DApp name')}
+            placeholder={t('ui.DAPPS.Popup.DApps.dappName')}
             searchValue={searchInput}
             showActionBtn
           />
@@ -264,14 +264,14 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       </div>
 
       <FilterModal
-        applyFilterButtonTitle={t('Apply filter')}
+        applyFilterButtonTitle={t('ui.screen.DApps.applyFilter')}
         id={FILTER_MODAL_ID}
         onApplyFilter={onApplyFilter}
         onCancel={onCloseFilterModal}
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
-        title={t('Filter')}
+        title={t('ui.screen.DApps.filter')}
       />
     </div>
   );

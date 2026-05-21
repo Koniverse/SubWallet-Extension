@@ -74,8 +74,8 @@ const Component: React.FC<Props> = (props: Props) => {
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Your dApps will show up here')}
-        emptyTitle={t('No dApps found')}
+        emptyMessage={t('ui.WALLET_CONNECT.screen.WalletConnect.ConnectionList.yourDappsWillShowUpHere')}
+        emptyTitle={t('ui.WALLET_CONNECT.screen.WalletConnect.ConnectionList.noDappsFound')}
         phosphorIcon={GlobeHemisphereWest}
       />
     );
@@ -115,7 +115,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {...modalProps}
         className={CN(className, '-modal')}
         id={WALLET_CONNECT_LIST_MODAL}
-        title={t('WalletConnect')}
+        title={t('ui.WALLET_CONNECT.screen.WalletConnect.ConnectionList.walletConnect')}
       >
         <PageWrapper
           className={'__modal-content'}
@@ -131,7 +131,7 @@ const Component: React.FC<Props> = (props: Props) => {
             rowGap='var(--row-gap)'
             searchFunction={searchFunc}
             searchMinCharactersCount={2}
-            searchPlaceholder={t<string>('Search or enter a website')}
+            searchPlaceholder={t<string>('ui.WALLET_CONNECT.screen.WalletConnect.ConnectionList.searchOrEnterWebsite')}
           />
         </PageWrapper>
 
@@ -151,7 +151,7 @@ const Component: React.FC<Props> = (props: Props) => {
             }
             onClick={onAdd}
           >
-            {t('New connection')}
+            {t('ui.WALLET_CONNECT.screen.WalletConnect.ConnectionList.newConnection')}
           </Button>
         </div>
       </BaseModal>
@@ -163,7 +163,7 @@ const Component: React.FC<Props> = (props: Props) => {
       className={'setting-pages'}
       onBack={goBack}
       rightFooterButton={{
-        children: t('New connection'),
+        children: t('ui.WALLET_CONNECT.screen.WalletConnect.ConnectionList.newConnection'),
         onClick: onAdd,
         icon: (
           <Icon
@@ -177,7 +177,7 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         )
       }}
-      title={t('WalletConnect')}
+      title={t('ui.WALLET_CONNECT.screen.WalletConnect.ConnectionList.walletConnect')}
     >
       <PageWrapper
         className={CN(className, '-layout-container')}
@@ -193,7 +193,7 @@ const Component: React.FC<Props> = (props: Props) => {
           rowGap='var(--row-gap)'
           searchFunction={searchFunc}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search or enter a website')}
+          searchPlaceholder={t<string>('ui.WALLET_CONNECT.screen.WalletConnect.ConnectionList.searchOrEnterWebsite')}
         />
       </PageWrapper>
     </Layout.WithSubHeaderOnly>

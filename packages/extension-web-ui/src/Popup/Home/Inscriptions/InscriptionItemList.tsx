@@ -76,8 +76,8 @@ const Component: React.FC<Props> = (props: Props) => {
 
     return (
       <EmptyList
-        emptyMessage={t('Your inscriptions will appear here')}
-        emptyTitle={t('No inscription found')}
+        emptyMessage={t('ui.INSCRIPTION_ITEM_LIST.Popup.Home.Inscriptions.InscriptionItemList.yourInscriptionsWillAppearHere')}
+        emptyTitle={t('ui.INSCRIPTION_ITEM_LIST.Popup.Home.Inscriptions.InscriptionItemList.noInscriptionFound')}
         phosphorIcon={Image}
       />
     );
@@ -101,7 +101,7 @@ const Component: React.FC<Props> = (props: Props) => {
           subHeaderBackground: 'transparent',
           subHeaderCenter: false,
           subHeaderPaddingVertical: true,
-          title: t('Inscriptions')
+          title: t('ui.INSCRIPTION_ITEM_LIST.Popup.Home.Inscriptions.InscriptionItemList.inscriptions')
         }}
       >
         {isWebUI

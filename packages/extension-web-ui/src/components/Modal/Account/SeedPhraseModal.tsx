@@ -108,11 +108,11 @@ const Component: React.FC<Props> = ({ className, modalId, onBack, onSubmitSucces
           onClick: onCancel
         })
         : undefined}
-      title={t<string>('Your recovery phrase')}
+      title={t<string>('ui.SEED_PHRASE_MODAL.components.Modal.Account.SeedPhraseModal.yourRecoveryPhrase')}
     >
       <div className='items-container'>
         <div className='__description'>
-          {t('Keep your recovery phrase in a safe place, and never disclose it. Anyone with this phrase can take control of your assets.')}
+          {t('ui.SEED_PHRASE_MODAL.components.Modal.Account.SeedPhraseModal.keepYourRecoveryPhraseInASafePlaceAndNeverDiscloseItAnyoneWithThisPhraseCanTakeControlOfYourAssets')}
         </div>
         <WordPhrase
           className={'__word-phrase'}
@@ -131,7 +131,7 @@ const Component: React.FC<Props> = ({ className, modalId, onBack, onSubmitSucces
           loading={loading}
           onClick={onSubmit}
         >
-          {t('I have saved it somewhere safe')}
+          {t('ui.SEED_PHRASE_MODAL.components.Modal.Account.SeedPhraseModal.iHaveSavedItSomewhereSafe')}
         </Button>
       </div>
     </BaseModal>

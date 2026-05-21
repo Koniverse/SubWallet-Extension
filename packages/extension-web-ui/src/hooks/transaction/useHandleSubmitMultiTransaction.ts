@@ -56,14 +56,14 @@ const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonPro
         const { errors: _errors, id, processId, warnings } = rs;
 
         if (_errors.length || warnings.length) {
-          if (_errors[0]?.message !== 'Rejected by user') {
+          if (_errors[0]?.message !== 'bg.NETWORK.background.error.Provider.rejectedByUser') {
             if (
               _errors[0]?.message.startsWith('UnknownError Connection to Indexed DataBase server lost') ||
               _errors[0]?.message.startsWith('Provided address is invalid, the capitalization checksum test failed') ||
               _errors[0]?.message.startsWith('connection not open on send()')
             ) {
               notify({
-                message: t('Your selected network has lost connection. Update it by re-enabling it or changing network provider'),
+                message: t('ui.TRANSACTION.hook.transaction.useHandleSubmitMulti.selectedNetworkLostConnection'),
                 type: 'error',
                 duration: 8
               });

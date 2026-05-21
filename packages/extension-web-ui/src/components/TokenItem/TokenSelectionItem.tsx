@@ -50,7 +50,7 @@ const Component = (props: Props) => {
     onPreCopy?.()
       .then(() => {
         notify({
-          message: t('Copied to clipboard')
+          message: t('ui.BALANCE.components.TokenItem.Selection.copiedToClipboard')
         });
         copyToClipboard(formattedAddress);
         onClickCopyBtn && onClickCopyBtn();
@@ -62,7 +62,7 @@ const Component = (props: Props) => {
     e.stopPropagation();
 
     notify({
-      message: t('Copied to clipboard')
+      message: t('ui.BALANCE.components.TokenItem.Selection.copiedToClipboard')
     });
     onClickCopyBtn && onClickCopyBtn();
   }, [notify, onClickCopyBtn, t]);
@@ -110,7 +110,7 @@ const Component = (props: Props) => {
                       }
                       onClick={_onClickCopyBtnAsync}
                       size='xs'
-                      tooltip={isWebUI ? t('Copy address') : undefined}
+                      tooltip={isWebUI ? t('ui.BALANCE.components.TokenItem.Selection.copyAddress') : undefined}
                       type='ghost'
                     />
                   )
@@ -125,7 +125,7 @@ const Component = (props: Props) => {
                         }
                         onClick={_onCLickCopyBtn}
                         size='xs'
-                        tooltip={isWebUI ? t('Copy address') : undefined}
+                        tooltip={isWebUI ? t('ui.BALANCE.components.TokenItem.Selection.copyAddress') : undefined}
                         type='ghost'
                       />
                     </CopyToClipboard>
@@ -141,7 +141,7 @@ const Component = (props: Props) => {
                 }
                 onClick={onClickQrBtn}
                 size='xs'
-                tooltip={isWebUI ? t('Show QR code') : undefined}
+                tooltip={isWebUI ? t('ui.BALANCE.components.TokenItem.Selection.showQrCode') : undefined}
                 type='ghost'
               />
             </>

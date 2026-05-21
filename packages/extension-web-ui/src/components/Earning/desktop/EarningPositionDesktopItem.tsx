@@ -151,7 +151,7 @@ const Component: React.FC<Props> = (props: Props) => {
       switch (item) {
         case YieldAction.STAKE:
         case YieldAction.START_EARNING:
-          text = poolInfo.type === YieldPoolType.LENDING ? t('Supply more') : t('Stake more');
+          text = poolInfo.type === YieldPoolType.LENDING ? t('ui.EARNING.screen.EarningPositionDetail.supplyMore') : t('ui.EARNING.screen.EarningPositionDetail.stakeMore');
 
           temp.icon = PlusCircle;
           temp.label = !compact ? text : undefined;
@@ -163,29 +163,29 @@ const Component: React.FC<Props> = (props: Props) => {
         case YieldAction.CLAIM_REWARD:
           temp.icon = Wallet;
           temp.onClick = onClickButton(onClickClaimButton);
-          temp.label = !compact ? t('Claim rewards') : undefined;
-          temp.tooltip = compact ? t('Claim rewards') : undefined;
+          temp.label = !compact ? t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.claimRewards') : undefined;
+          temp.tooltip = compact ? t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.claimRewards') : undefined;
           break;
         case YieldAction.WITHDRAW:
         case YieldAction.WITHDRAW_EARNING:
           temp.icon = StopCircle;
           temp.onClick = onClickButton(onClickWithdrawButton);
-          temp.label = !compact ? t('Withdraw') : undefined;
-          temp.tooltip = compact ? t('Withdraw') : undefined;
+          temp.label = !compact ? t('ui.EARNING.screen.EarningPositionDetail.withdraw') : undefined;
+          temp.tooltip = compact ? t('ui.EARNING.screen.EarningPositionDetail.withdraw') : undefined;
           temp.schema = 'secondary';
           break;
         case YieldAction.UNSTAKE:
           temp.icon = MinusCircle;
           temp.onClick = onClickButton(onClickUnStakeButton);
-          temp.label = !compact ? t('Unstake') : undefined;
-          temp.tooltip = compact ? t('Unstake') : undefined;
+          temp.label = !compact ? t('ui.EARNING.screen.EarningPositionDetail.unstake') : undefined;
+          temp.tooltip = compact ? t('ui.EARNING.screen.EarningPositionDetail.unstake') : undefined;
           temp.schema = 'secondary';
           break;
         case YieldAction.CANCEL_UNSTAKE:
           temp.icon = MinusCircle;
           temp.onClick = onClickButton(onClickCancelUnStakeButton);
-          temp.label = !compact ? t('Cancel unstake') : undefined;
-          temp.tooltip = compact ? t('Cancel unstake') : undefined;
+          temp.label = !compact ? t('ui.TRANSACTION.constant.transaction.cancelUnstake') : undefined;
+          temp.tooltip = compact ? t('ui.TRANSACTION.constant.transaction.cancelUnstake') : undefined;
           temp.schema = 'secondary';
           break;
       }
@@ -263,7 +263,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <MetaInfo.Status
               className={'__item-status'}
               statusIcon={EarningStatusUi[positionInfo.status].icon}
-              statusName={EarningStatusUi[positionInfo.status].name}
+              statusName={t(EarningStatusUi[positionInfo.status].name)}
               valueColorSchema={EarningStatusUi[positionInfo.status].schema}
             />
           </MetaInfo>
@@ -276,10 +276,12 @@ const Component: React.FC<Props> = (props: Props) => {
               className={'__item-tag'}
               type={poolInfo.type}
             />
-            {isTestNet && <NetworkTag
-              className={'__item-tag'}
-              type={isTestNet ? NetworkType.TEST_NETWORK : NetworkType.MAIN_NETWORK}
-            />}
+            {isTestNet && (
+              <NetworkTag
+                className={'__item-tag'}
+                type={isTestNet ? NetworkType.TEST_NETWORK : NetworkType.MAIN_NETWORK}
+              />
+            )}
           </div>
 
           <div className='__item-total-balance-value'>

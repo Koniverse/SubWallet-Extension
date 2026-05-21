@@ -5,7 +5,7 @@ import { detectTranslate } from '@subwallet/extension-base/utils';
 
 export const ExternalTranslation: string[] = [
   // Case change password
-  detectTranslate('Invalid master password')
+  detectTranslate('bg.SETTING.services.service.setting.i18nExtend.invalidMasterPassword')
 ];
 
 export const InternalTranslation: string[] = [

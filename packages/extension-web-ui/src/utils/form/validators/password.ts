@@ -17,15 +17,15 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~!@#$%^&*])[A-Za-z\d
 export const renderBasePasswordRules = (fieldName: string, t: TFunction): FormRule[] => {
   return [
     {
-      message: t('{{fieldName}} must be at least {{minLen}} characters in length', { replace: { minLen: MinPasswordLength, fieldName: fieldName } }),
+      message: t('ui.ACCOUNT.util.validator.password.fieldMinLength', { replace: { minLen: MinPasswordLength, fieldName: fieldName } }),
       min: MinPasswordLength
     },
     {
-      message: t('{{fieldName}} is required', { replace: { fieldName: fieldName } }),
+      message: t('ui.ACCOUNT.util.validator.password.fieldIsRequired', { replace: { fieldName: fieldName } }),
       required: true
     },
     {
-      message: t('{{fieldName}} should be at least 1 uppercase letter, 1 number, and 1 special character', { replace: { fieldName: fieldName } }),
+      message: t('ui.ACCOUNT.util.validator.password.fieldPasswordPolicy', { replace: { fieldName: fieldName } }),
       pattern: passwordRegex,
       warningOnly: true
     }
@@ -34,7 +34,7 @@ export const renderBasePasswordRules = (fieldName: string, t: TFunction): FormRu
 
 export const renderBaseConfirmPasswordRules = (passwordFieldName: string, t: TFunction): FormRule[] => {
   return [
-    ...renderBasePasswordRules(t('Confirm password'), t),
+    ...renderBasePasswordRules(t('ui.ACCOUNT.util.validator.password.confirmPassword'), t),
     ({ getFieldValue }) => ({
       validator: (_, value) => {
         const password = getFieldValue(passwordFieldName) as string;
@@ -43,7 +43,7 @@ export const renderBaseConfirmPasswordRules = (passwordFieldName: string, t: TFu
           return Promise.resolve();
         }
 
-        return Promise.reject(new Error(t('Confirm password do not match!')));
+        return Promise.reject(new Error(t('ui.ACCOUNT.util.validator.password.confirmPasswordDoNotMatch')));
       }
     })
   ];

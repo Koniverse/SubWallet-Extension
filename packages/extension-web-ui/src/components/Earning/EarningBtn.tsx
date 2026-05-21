@@ -50,7 +50,7 @@ const Component: React.FC<Props> = (props: Props) => {
       shape={'round'}
       size={size}
       style={{ borderRadius: _borderRadius }}
-      tooltip={!available ? t('Coming soon') : ''}
+      tooltip={!available ? t('ui.components.Earning.LedgerAccountTypeSelector.EarningBtn') : ''}
       type={'ghost'}
     >
       {symbol}

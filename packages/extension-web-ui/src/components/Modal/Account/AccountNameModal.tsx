@@ -12,6 +12,7 @@ import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
 import { RuleObject } from 'rc-field-form/lib/interface';
 import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import { Trans } from 'react-i18next';
 import styled from 'styled-components';
 
 type Props = ThemeProps & {
@@ -44,10 +45,10 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
         const { isValid } = await validateAccountName({ name: value });
 
         if (!isValid) {
-          return Promise.reject(t('Account name already in use'));
+          return Promise.reject(t('ui.ACCOUNT.components.Modal.Account.Name.accountNameInUse'));
         }
       } catch (e) {
-        return Promise.reject(t('Account name invalid'));
+        return Promise.reject(t('ui.ACCOUNT.components.Modal.Account.Name.accountNameInvalid'));
       }
     }
 
@@ -77,10 +78,13 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
       id={modalId}
       maskClosable={false}
       onCancel={onCancel}
-      title={t<string>('Account name')}
+      title={t<string>('ui.ACCOUNT.components.Modal.Account.Name.accountName')}
     >
       <div className={'__brief'}>
-        {t('Enter a name for your account.\n You can edit this later.')}
+        <Trans
+          components={{ br: <br /> }}
+          i18nKey={t('ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo')}
+        />
       </div>
 
       <Form
@@ -107,7 +111,7 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
             name={'name'}
             rules={[
               {
-                message: t('Account name is required'),
+                message: t('ui.ACCOUNT.components.Modal.Account.Name.accountNameRequired'),
                 transform: (value: string) => value.trim(),
                 required: true
               },
@@ -120,8 +124,8 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
             <Input
               className='__account-name-input'
               disabled={isLoading}
-              label={t('Account name')}
-              placeholder={t('Enter the account name')}
+              label={t('ui.ACCOUNT.components.Modal.Account.Name.accountName')}
+              placeholder={t('ui.ACCOUNT.components.Modal.Account.Name.enterAccountName')}
             />
           </Form.Item>
         </div>
@@ -140,7 +144,7 @@ const Component: React.FC<Props> = ({ accountType, className, isLoading, onSubmi
           loading={isLoading}
           onClick={form.submit}
         >
-          {t('Confirm')}
+          {t('ui.ACCOUNT.components.Modal.Account.Name.confirm')}
         </Button>
       </div>
     </BaseModal>

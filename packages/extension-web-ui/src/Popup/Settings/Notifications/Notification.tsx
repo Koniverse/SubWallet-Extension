@@ -117,15 +117,15 @@ function Component ({ isInModal,
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('All'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.all'),
         value: NotificationTab.ALL
       },
       {
-        label: t('Unread'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.unread'),
         value: NotificationTab.UNREAD
       },
       {
-        label: t('Read'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.read'),
         value: NotificationTab.READ
       }
     ];
@@ -257,11 +257,11 @@ function Component ({ isInModal,
     const chainInfo = chainInfoMap[chainSlug];
 
     const content = action === NotificationActionType.WITHDRAW
-      ? detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start withdrawing your funds')
-      : detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start claiming your funds');
+      ? detectTranslate('ui.SETTINGS.screen.Setting.Notifications.multisig')
+      : detectTranslate('ui.SETTINGS.screen.Setting.Notifications.enableNetworkToWithdraw');
 
     alertModal.open({
-      title: t('Enable network'),
+      title: t('ui.SETTINGS.screen.Setting.Notifications.enableNetworkToClaim'),
       type: NotificationType.WARNING,
       content: t(content, { replace: { networkName: chainInfo?.name || chainSlug } }),
       closable: false,
@@ -270,23 +270,23 @@ function Component ({ isInModal,
         icon: XCircle,
         onClick: alertModal.close,
         schema: 'secondary',
-        text: t('Cancel')
+        text: t('ui.SETTINGS.screen.Setting.Notifications.enableNetwork')
       },
       okButton: {
         icon: CheckCircle,
         onClick: onOk,
-        text: t('Enable')
+        text: t('ui.SETTINGS.screen.Setting.Notifications.cancel')
       }
     });
   }, [chainInfoMap, alertModal, t]);
 
   const showWarningModal = useCallback((action: string) => {
     alertModal.open({
-      title: t('You’ve {{action}} tokens', { replace: { action: action } }),
+      title: t('ui.SETTINGS.screen.Setting.Notifications.enable', { replace: { action: action } }),
       type: NotificationType.INFO,
-      content: t('You’ve already {{action}} your tokens. Check for unread notifications to stay updated on any important', { replace: { action: action } }),
+      content: t('ui.SETTINGS.screen.Setting.Notifications.youveActionTokens', { replace: { action: action } }),
       okButton: {
-        text: t('I understand'),
+        text: t('ui.SETTINGS.screen.Setting.Notifications.alreadyActionedTokens'),
         onClick: alertModal.close,
         icon: CheckCircle
       }
@@ -539,8 +539,8 @@ function Component ({ isInModal,
     return (
       <EmptyList
         className={'notification-empty-list'}
-        emptyMessage={t('Your notifications will appear here')}
-        emptyTitle={t('No notifications yet')}
+        emptyMessage={t('ui.SETTINGS.screen.Setting.Notifications.yourNotificationsWillAppearHere')}
+        emptyTitle={t('ui.SETTINGS.screen.Setting.Notifications.noNotificationsYet')}
         phosphorIcon={ListBullets}
       />
     );
@@ -560,11 +560,11 @@ function Component ({ isInModal,
           loading: loadingNotification,
           size: 'xs',
           shape: 'circle',
-          children: t('Enable notifications')
+          children: t('ui.SETTINGS.screen.Setting.Notifications.noNotificationsYet')
         }}
         className={'notification-empty-with-button'}
-        emptyMessage={t('Enable notifications now to not miss anything!')}
-        emptyTitle={t('Notifications are disabled')}
+        emptyMessage={t('ui.SETTINGS.screen.Setting.Notifications.enableNotifications')}
+        emptyTitle={t('ui.SETTINGS.screen.Setting.Notifications.enableNotificationsPrompt')}
         phosphorIcon={BellSimpleSlash}
       />
     );
@@ -649,7 +649,7 @@ function Component ({ isInModal,
             }
           ]}
           showBackButton
-          title={t('Notifications')}
+          title={t('ui.SETTINGS.screen.Setting.Notifications.notifications')}
         />
       )}
 
@@ -673,7 +673,7 @@ function Component ({ isInModal,
           size='xs'
           type='ghost'
         >
-          {t('Mark all as read')}
+          {t('ui.SETTINGS.screen.Setting.Notifications.markAllAsRead')}
         </Button>
       </div>
 
@@ -685,7 +685,7 @@ function Component ({ isInModal,
                 actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
                 className={'__search-box'}
                 onSearch={handleSearch}
-                placeholder={t<string>('Search notification')}
+                placeholder={t<string>('ui.SETTINGS.screen.Setting.Notifications.searchNotification')}
                 searchValue={currentSearchText}
                 simpleLayout
               />
@@ -802,7 +802,7 @@ const Wrapper = (props: WrapperProps) => {
                 ),
                 onClick: openNotificationSettingModal
               }}
-              title={t('Notifications')}
+              title={t('ui.SETTINGS.screen.Setting.Notifications.notifications')}
             >
               {mainComponent}
             </BaseModal>

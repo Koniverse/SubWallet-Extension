@@ -62,7 +62,7 @@ function Component (props: Props): React.ReactElement<Props> {
             shape={'circle'}
             size={'xs'}
           >
-            {t('Launch app')}
+            {t('ui.FEATURE_DAPP_ITEM.Popup.DApps.FeatureDAppItem.launchApp')}
           </Button>
         </div>
       </div>

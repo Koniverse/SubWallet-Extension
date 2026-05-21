@@ -43,7 +43,7 @@ const Component: React.FC<Props> = (props: Props) => {
     return (
       <Layout.Base
         showBackButton={false}
-        title={t('Successful')}
+        title={t('ui.screen.CreateDone.successful')}
       >
         <div className={className}>
           <MigrateDone
@@ -64,7 +64,7 @@ const Component: React.FC<Props> = (props: Props) => {
               }
               onClick={onDone}
             >
-              {t('Finish')}
+              {t('ui.ACCOUNT.screen.Account.ExportAllDone.finish')}
             </Button>
           </div>
         </div>
@@ -76,7 +76,7 @@ const Component: React.FC<Props> = (props: Props) => {
     <Layout.WithSubHeaderOnly
       rightFooterButton={!isWebUI
         ? {
-          children: isDefaultReturnPath ? t('Go to home') : t('Finish'),
+          children: isDefaultReturnPath ? t('ui.screen.CreateDone.goToHome') : t('ui.ACCOUNT.screen.Account.ExportAllDone.finish'),
           onClick: onDone,
           icon: (
             <Icon
@@ -93,7 +93,7 @@ const Component: React.FC<Props> = (props: Props) => {
           size='md'
         />
       )}
-      title={t('Successful')}
+      title={t('ui.screen.CreateDone.successful')}
     >
       <div className={CN(className)}>
         <div className='page-icon'>
@@ -106,10 +106,10 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         </div>
         <div className='title'>
-          {t('All done!')}
+          {t('ui.screen.CreateDone.allDone')}
         </div>
         <div className='description'>
-          {t('Follow along with product updates or reach out if you have any questions.')}
+          {t('ui.screen.CreateDone.followProductUpdates')}
         </div>
         <SocialButtonGroup />
 
@@ -128,7 +128,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 onClick={onDone}
                 schema={'primary'}
               >
-                {isDefaultReturnPath ? t('Go to portfolio') : t('Finish')}
+                {isDefaultReturnPath ? t('ui.CREATE_DONE.Popup.CreateDone.goToPortfolio') : t('ui.ACCOUNT.screen.Account.ExportAllDone.finish')}
               </Button>
             </div>
           )

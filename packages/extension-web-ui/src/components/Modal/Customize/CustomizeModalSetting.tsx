@@ -35,7 +35,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           weight='fill'
         />
       }
-      name={t('Show zero balance')}
+      name={t('ui.BALANCE.components.Modal.Customize.Modal.showZeroBalance')}
       rightItem={
         <Switch
           checked={isShowZeroBalance}
