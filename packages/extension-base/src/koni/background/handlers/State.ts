@@ -74,9 +74,21 @@ import { KoniSubscription } from '../subscription';
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 const passworder = require('browser-passworder');
 
-const ERROR_CONFIRMATION_TYPE = ['errorConnectNetwork'];
+const ERROR_CONFIRMATION_TYPE = ['errorConnectNetwork', 'evmWatchTransactionRequest'];
 const SUBSCAN_API_KEY_STORAGE = 'subscan_api_key';
 const SUBSCAN_SECRET_STORAGE = 'subscan_secret';
+
+const isEvmRpcFallbackError = (error: unknown): boolean => {
+  const message = (error as Error)?.message?.toLowerCase?.() || String(error).toLowerCase();
+
+  return message.includes('usage limit') ||
+    message.includes('rate limit') ||
+    message.includes('too many requests') ||
+    message.includes('invalid json rpc') ||
+    message.includes('re-enable the network') ||
+    message.includes('reenableorchangerpc') ||
+    message.includes('unstable network connection');
+};
 
 // List of providers passed into constructor. This is the list of providers
 // exposed by the extension.
@@ -1057,6 +1069,45 @@ export default class KoniState {
     this.chainService.refreshEvmApi(key);
   }
 
+  public async fallbackEvmRpcProvider (networkKey: string): Promise<boolean> {
+    if (!networkKey) {
+      return false;
+    }
+
+    const chainInfo = this.getChainInfo(networkKey);
+    const chainState = this.getChainStateByKey(networkKey);
+
+    if (!chainInfo?.evmInfo || !chainState) {
+      return false;
+    }
+
+    const providers = chainInfo.providers || {};
+    const providerKeys = Object.keys(providers);
+    const fallbackProviderKeys = providerKeys.filter((key) => key !== chainState.currentProvider && !providers[key].startsWith('light'));
+
+    if (!fallbackProviderKeys.length) {
+      return false;
+    }
+
+    const currentIndex = providerKeys.indexOf(chainState.currentProvider);
+    const nextProvider = fallbackProviderKeys.find((key) => providerKeys.indexOf(key) > currentIndex) || fallbackProviderKeys[0];
+
+    await this.upsertChainInfo({
+      mode: 'update',
+      chainEditInfo: {
+        blockExplorer: chainInfo.evmInfo.blockExplorer || undefined,
+        chainType: 'EVM',
+        currentProvider: nextProvider,
+        name: chainInfo.name,
+        providers,
+        slug: networkKey,
+        symbol: chainInfo.evmInfo.symbol
+      }
+    });
+
+    return true;
+  }
+
   public getServiceInfo (): ServiceInfo {
     return {
       chainInfoMap: this.chainService.getChainInfoMap(),
@@ -1278,7 +1329,7 @@ export default class KoniState {
     return Object.fromEntries(await Promise.all(promiseList));
   }
 
-  public async evmSendTransaction (id: string, url: string, transactionParams: EvmSendTransactionParams, networkKeyInit?: string, topic?: string): Promise<string | undefined> {
+  public async evmSendTransaction (id: string, url: string, transactionParams: EvmSendTransactionParams, networkKeyInit?: string, topic?: string, retriedRpcFallback = false): Promise<string | undefined> {
     const payloadValidation: PayloadValidated = {
       errors: [],
       type: 'evm',
@@ -1297,15 +1348,6 @@ export default class KoniState {
     const { confirmationType, errors, networkKey: networkKey_ } = result;
     const errorsFormated = convertErrorFormat(errors);
 
-    if (errorsFormated && errorsFormated.length > 0 && confirmationType) {
-      if (ERROR_CONFIRMATION_TYPE.includes(confirmationType)) {
-        return this.requestService.addConfirmation(id, url, confirmationType as ConfirmationType, { ...result, errors: errorsFormated }, {})
-          .then(() => {
-            throw new EvmProviderError(EvmProviderErrorType.USER_REJECTED_REQUEST);
-          });
-      }
-    }
-
     const transactionValidated = result.payloadAfterValidated as EvmSendTransactionRequest;
     const networkKey = networkKey_ || '';
 
@@ -1313,6 +1355,28 @@ export default class KoniState {
       ...transactionValidated,
       errors: errorsFormated
     };
+
+    if (errors.length && !retriedRpcFallback && errors.some(isEvmRpcFallbackError)) {
+      const fallbackSuccess = await this.fallbackEvmRpcProvider(networkKey);
+
+      if (fallbackSuccess) {
+        return this.evmSendTransaction(id, url, transactionParams, networkKey, topic, true);
+      }
+    }
+
+    if (errorsFormated && errorsFormated.length > 0 && confirmationType) {
+      if (ERROR_CONFIRMATION_TYPE.includes(confirmationType)) {
+        const { pair: _pair, ...resultForUi } = result;
+        const confirmationPayload = confirmationType === 'evmWatchTransactionRequest'
+          ? requestPayload
+          : { ...resultForUi, errors: errorsFormated };
+
+        return this.requestService.addConfirmation(id, url, confirmationType as ConfirmationType, confirmationPayload, {})
+          .then(() => {
+            throw new EvmProviderError(EvmProviderErrorType.USER_REJECTED_REQUEST);
+          });
+      }
+    }
 
     const eType = transactionValidated.value ? ExtrinsicType.TRANSFER_BALANCE : ExtrinsicType.EVM_EXECUTE;
 
