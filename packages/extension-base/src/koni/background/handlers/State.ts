@@ -12,7 +12,7 @@ import { isSubscriptionRunning, unsubscribe } from '@subwallet/extension-base/ba
 import { AddressCardanoTransactionBalance, AddTokenRequestExternal, AmountData, APIItemState, ApiMap, AuthRequestV2, BitcoinProviderErrorType, BitcoinSendTransactionParams, BitcoinSendTransactionRequest, BitcoinSignatureRequest, BitcoinSignMessageParams, BitcoinSignMessageResult, BitcoinSignPsbtParams, BitcoinSignPsbtRequest, BitcoinSignPsbtResult, CardanoKeyType, CardanoProviderErrorType, CardanoSignatureRequest, CardanoTransactionDappConfig, ChainStakingMetadata, ChainType, ConfirmationsQueue, ConfirmationsQueueBitcoin, ConfirmationsQueueCardano, ConfirmationsQueueTon, ConfirmationType, CrowdloanItem, CrowdloanJson, CurrencyType, EvmProviderErrorType, EvmSendTransactionParams, EvmSendTransactionRequest, EvmSignatureRequest, ExternalRequestPromise, ExternalRequestPromiseStatus, ExtrinsicType, MantaAuthorizationContext, MantaPayConfig, MantaPaySyncState, NftCollection, NftItem, NftJson, NominatorMetadata, PsbtTransactionArg, RequestAccountExportPrivateKey, RequestCardanoSignData, RequestCardanoSignTransaction, RequestConfirmationComplete, RequestConfirmationCompleteBitcoin, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestCrowdloanContributions, RequestSettingsType, ResponseAccountExportPrivateKey, ResponseCardanoSignData, ResponseCardanoSignTransaction, ServiceInfo, SingleModeJson, StakingItem, StakingJson, StakingRewardItem, StakingRewardJson, StakingType, UiSettings } from '@subwallet/extension-base/background/KoniTypes';
 import { RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestSign, ResponseRpcListProviders, ResponseSigning } from '@subwallet/extension-base/background/types';
 import { EnvConfig, MANTA_PAY_BALANCE_INTERVAL, REMIND_EXPORT_ACCOUNT } from '@subwallet/extension-base/constants';
-import { convertErrorFormat, generateValidationProcess, PayloadValidated, ValidateStepFunction, validationAuthCardanoMiddleware, validationAuthMiddleware, validationAuthWCMiddleware, validationBitcoinConnectMiddleware, validationBitcoinSendTransactionMiddleware, validationBitcoinSignMessageMiddleware, validationBitcoinSignPsbtMiddleware, validationCardanoSignDataMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
+import { convertErrorFormat, generateValidationProcess, isEvmRpcFallbackError, PayloadValidated, ValidateStepFunction, validationAuthCardanoMiddleware, validationAuthMiddleware, validationAuthWCMiddleware, validationBitcoinConnectMiddleware, validationBitcoinSendTransactionMiddleware, validationBitcoinSignMessageMiddleware, validationBitcoinSignPsbtMiddleware, validationCardanoSignDataMiddleware, validationConnectMiddleware, validationEvmDataTransactionMiddleware, validationEvmSignMessageMiddleware } from '@subwallet/extension-base/core/logic-validation';
 import { BalanceService } from '@subwallet/extension-base/services/balance-service';
 import { ServiceStatus } from '@subwallet/extension-base/services/base/types';
 import BuyService from '@subwallet/extension-base/services/buy-service';
@@ -74,21 +74,9 @@ import { KoniSubscription } from '../subscription';
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 const passworder = require('browser-passworder');
 
-const ERROR_CONFIRMATION_TYPE = ['errorConnectNetwork', 'evmWatchTransactionRequest'];
+const CONFIRMATION_TYPES_WITH_VALIDATION_ERRORS = ['errorConnectNetwork', 'evmWatchTransactionRequest'];
 const SUBSCAN_API_KEY_STORAGE = 'subscan_api_key';
 const SUBSCAN_SECRET_STORAGE = 'subscan_secret';
-
-const isEvmRpcFallbackError = (error: unknown): boolean => {
-  const message = (error as Error)?.message?.toLowerCase?.() || String(error).toLowerCase();
-
-  return message.includes('usage limit') ||
-    message.includes('rate limit') ||
-    message.includes('too many requests') ||
-    message.includes('invalid json rpc') ||
-    message.includes('re-enable the network') ||
-    message.includes('reenableorchangerpc') ||
-    message.includes('unstable network connection');
-};
 
 // List of providers passed into constructor. This is the list of providers
 // exposed by the extension.
@@ -1070,42 +1058,48 @@ export default class KoniState {
   }
 
   public async fallbackEvmRpcProvider (networkKey: string): Promise<boolean> {
-    if (!networkKey) {
-      return false;
-    }
-
-    const chainInfo = this.getChainInfo(networkKey);
-    const chainState = this.getChainStateByKey(networkKey);
-
-    if (!chainInfo?.evmInfo || !chainState) {
-      return false;
-    }
-
-    const providers = chainInfo.providers || {};
-    const providerKeys = Object.keys(providers);
-    const fallbackProviderKeys = providerKeys.filter((key) => key !== chainState.currentProvider && !providers[key].startsWith('light'));
-
-    if (!fallbackProviderKeys.length) {
-      return false;
-    }
-
-    const currentIndex = providerKeys.indexOf(chainState.currentProvider);
-    const nextProvider = fallbackProviderKeys.find((key) => providerKeys.indexOf(key) > currentIndex) || fallbackProviderKeys[0];
-
-    await this.upsertChainInfo({
-      mode: 'update',
-      chainEditInfo: {
-        blockExplorer: chainInfo.evmInfo.blockExplorer || undefined,
-        chainType: 'EVM',
-        currentProvider: nextProvider,
-        name: chainInfo.name,
-        providers,
-        slug: networkKey,
-        symbol: chainInfo.evmInfo.symbol
+    try {
+      if (!networkKey) {
+        return false;
       }
-    });
 
-    return true;
+      const chainInfo = this.getChainInfo(networkKey);
+      const chainState = this.getChainStateByKey(networkKey);
+
+      if (!chainInfo?.evmInfo || !chainState) {
+        return false;
+      }
+
+      const providers = chainInfo.providers || {};
+      const providerKeys = Object.keys(providers);
+      const fallbackProviderKeys = providerKeys.filter((key) => key !== chainState.currentProvider && !providers[key].startsWith('light'));
+
+      if (!fallbackProviderKeys.length) {
+        return false;
+      }
+
+      const currentIndex = providerKeys.indexOf(chainState.currentProvider);
+      const nextProvider = fallbackProviderKeys.find((key) => providerKeys.indexOf(key) > currentIndex) || fallbackProviderKeys[0];
+
+      await this.upsertChainInfo({
+        mode: 'update',
+        chainEditInfo: {
+          blockExplorer: chainInfo.evmInfo.blockExplorer || undefined,
+          chainType: 'EVM',
+          currentProvider: nextProvider,
+          name: chainInfo.name,
+          providers,
+          slug: networkKey,
+          symbol: chainInfo.evmInfo.symbol
+        }
+      });
+
+      return true;
+    } catch (e) {
+      console.warn(`Failed to fallback EVM RPC provider for ${networkKey}`, e);
+
+      return false;
+    }
   }
 
   public getServiceInfo (): ServiceInfo {
@@ -1365,7 +1359,7 @@ export default class KoniState {
     }
 
     if (errorsFormated && errorsFormated.length > 0 && confirmationType) {
-      if (ERROR_CONFIRMATION_TYPE.includes(confirmationType)) {
+      if (CONFIRMATION_TYPES_WITH_VALIDATION_ERRORS.includes(confirmationType)) {
         const { pair: _pair, ...resultForUi } = result;
         const confirmationPayload = confirmationType === 'evmWatchTransactionRequest'
           ? requestPayload

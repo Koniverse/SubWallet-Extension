@@ -1210,6 +1210,18 @@ export function convertErrorMessage (message_: string, name?: string): string[] 
   return [message, name || 'Error'];
 }
 
+export function isEvmRpcFallbackError (error: unknown): boolean {
+  const message = (error as Error)?.message?.toLowerCase?.() || String(error).toLowerCase();
+
+  return message.includes('usage limit') ||
+    message.includes('rate limit') ||
+    message.includes('too many requests') ||
+    message.includes('invalid json rpc') ||
+    message.includes('re-enable the network') ||
+    message.includes('reenableorchangerpc') ||
+    message.includes('unstable network connection');
+}
+
 export function convertErrorFormat (errors: Error[]): ErrorValidation[] {
   if (errors.length > 0) {
     return [{ name: errors[0].name, message: errors[0].message }];

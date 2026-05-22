@@ -15,7 +15,7 @@ import RequestBytesSign from '@subwallet/extension-base/background/RequestBytesS
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
 import { AccountAuthType, MessageTypes, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestTypes, ResponseRpcListProviders, ResponseSigning, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_KEY, CRON_GET_API_MAP_STATUS, MAX_COLLATERAL_AMOUNT, PERMISSIONS_TO_REVOKE } from '@subwallet/extension-base/constants';
-import { convertErrorMessage, generateValidationProcess, PayloadValidated, validationAuthMiddleware } from '@subwallet/extension-base/core/logic-validation';
+import { convertErrorMessage, generateValidationProcess, isEvmRpcFallbackError, PayloadValidated, validationAuthMiddleware } from '@subwallet/extension-base/core/logic-validation';
 import { PHISHING_PAGE_REDIRECT } from '@subwallet/extension-base/defaults';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
@@ -1037,15 +1037,6 @@ export default class KoniTabs {
     return provider;
   }
 
-  private shouldShowEvmRpcErrorConfirmation (error: unknown): boolean {
-    const message = (error as Error)?.message?.toLowerCase?.() || String(error).toLowerCase();
-
-    return message.includes('usage limit') ||
-      message.includes('rate limit') ||
-      message.includes('too many requests') ||
-      message.includes('invalid json rpc response');
-  }
-
   private async showEvmRpcErrorConfirmation (id: string, url: string, error: unknown): Promise<void> {
     const evmState = await this.getEvmState(url).catch(() => ({} as EvmAppState));
     const networkKey = evmState.networkKey || '';
@@ -1093,7 +1084,7 @@ export default class KoniTabs {
 
           err = { ...err, message };
 
-          if (this.shouldShowEvmRpcErrorConfirmation(err)) {
+          if (isEvmRpcFallbackError(err)) {
             this.fallbackEvmRpcProvider(url)
               .then((fallbackSuccess) => {
                 if (fallbackSuccess && !retriedRpcFallback) {
