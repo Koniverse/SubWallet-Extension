@@ -11,7 +11,7 @@ import { AccountRefStore } from '@subwallet/extension-base/stores';
 import { AccountMetadataData, AccountProxy, AccountProxyData, AccountProxyMap, AccountProxyStoreData, AccountProxyType, CurrentAccountInfo, ModifyPairStoreData } from '@subwallet/extension-base/types';
 import { addLazy, combineAccountsWithSubjectInfo, isAddressValidWithAuthType, isSameAddress, parseUnifiedSuriToDerivationPath, reformatAddress } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
-import { EthereumKeypairTypes } from '@subwallet/keyring/types';
+import { EthereumKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { keyring } from '@subwallet/ui-keyring';
 import { SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 import { BehaviorSubject, combineLatest, filter, first } from 'rxjs';
@@ -19,6 +19,7 @@ import { BehaviorSubject, combineLatest, filter, first } from 'rxjs';
 interface ExistsAccount {
   address: string;
   name: string;
+  relatedAccountTypes: KeypairType[];
 }
 
 export class AccountState {
@@ -318,15 +319,18 @@ export class AccountState {
 
           if (belongsTo) {
             const accountProxy = this.accountProxies[belongsTo];
+            const allAccountTypes = this.getDecodedAccountTypes(belongsTo); // get allAccountTypes of unified account of the account address
 
             return {
               address,
-              name: accountProxy.name
+              name: accountProxy.name,
+              relatedAccountTypes: allAccountTypes
             };
           } else {
             return {
               address,
-              name: pair.meta?.name as string || address
+              name: pair.meta?.name as string || address,
+              relatedAccountTypes: [pair.type]
             };
           }
         }
@@ -436,6 +440,7 @@ export class AccountState {
   public belongUnifiedAccount (_address: string): string | undefined {
     const modifyPairs = this.modifyPairs;
     const accountProxies = this.accountProxies;
+
     const address = reformatAddress(_address);
     const proxyId = modifyPairs[address]?.accountProxyId;
 
@@ -512,6 +517,24 @@ export class AccountState {
     }
   }
 
+  public getDecodedAccountTypes (accountProxyId: string): KeypairType[] {
+    if (!accountProxyId) {
+      return [];
+    }
+
+    if (accountProxyId === ALL_ACCOUNT_KEY) {
+      return []; // todo
+    }
+
+    const accountProxies = this.accounts;
+
+    if (!accountProxies[accountProxyId]) {
+      return [];
+    } else {
+      return accountProxies[accountProxyId].accounts.map((account) => account.type);
+    }
+  }
+
   /* Get address for another service */
 
   /**
@@ -573,6 +596,20 @@ export class AccountState {
   /**
    * Account ref
    * */
+
+  /* Multisig */
+
+  public getMultisigAccounts () {
+    return Object.values(this.accounts).filter((acc) => acc.accountType === AccountProxyType.MULTISIG);
+  }
+
+  public getMultisigAddresses () {
+    const allAccounts = this.getMultisigAccounts();
+
+    return allAccounts.map((acc) => acc.id);
+  }
+
+  /* Multisig */
 
   /* Others */
 

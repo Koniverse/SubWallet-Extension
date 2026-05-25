@@ -14,6 +14,7 @@ export interface RequestSubscribeTransfer extends TransactionFee {
   token: string;
   destChain: string;
   transferAll?: boolean;
+  metadata?: Record<string, any>;
 }
 
 export interface ResponseSubscribeTransfer {
@@ -25,6 +26,7 @@ export interface ResponseSubscribeTransfer {
   // TODO: Need to manage errors separately between networks
   error?: string;
   isEvmRpcError?: boolean
+  maxTransferableWithoutFee: string;
 }
 
 export interface RequestSubmitTransferWithId extends RequestSubmitTransfer{
@@ -33,6 +35,12 @@ export interface RequestSubmitTransferWithId extends RequestSubmitTransfer{
 
 export interface ResponseSubscribeTransferConfirmation extends Omit<ResponseSubscribeTransfer, 'maxTransferable'> {
   error?: string;
+}
+
+export interface AlphaTokenTransferMetadata {
+  netuid: number;
+  fromValidator: string;
+  toValidator: string;
 }
 
 export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
@@ -44,6 +52,9 @@ export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
   value: string;
   transferBounceable?: boolean;
   isSubstrateECDSATransaction?: boolean;
+  maxTransferableWithoutFee?: string;
+  maxTransferable?: string;
+  metadata?: Record<string, any>; // TODO: convert transferBounceable and isSubstrateECDSATransaction to a metadata type
 }
 
 export interface RequestSubmitSignPsbtTransfer extends BaseRequestSign {

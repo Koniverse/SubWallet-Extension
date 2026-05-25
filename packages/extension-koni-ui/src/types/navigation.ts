@@ -63,8 +63,9 @@ export type RemindBackUpSeedPhraseParamState = {
 // account detail
 
 export type AccountDetailParam = {
-  requestViewDerivedAccounts?: boolean
-  requestViewDerivedAccountDetails?: boolean
+  requestViewDerivedAccounts?: boolean;
+  requestViewDerivedAccountDetails?: boolean;
+  requestViewManageProxiesTab?: boolean;
 }
 
 export type NotificationScreenParam = {
