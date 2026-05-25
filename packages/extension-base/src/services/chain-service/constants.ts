@@ -54,13 +54,14 @@ export const _BALANCE_CHAIN_GROUP = {
   genshiro: ['genshiro_testnet', 'genshiro'],
   equilibrium_parachain: ['equilibrium_parachain'],
   bifrost: ['bifrost', 'acala', 'karura', 'acala_testnet', 'pioneer', 'bitcountry', 'bifrost_dot', 'hydradx_main', 'hydradx_rococo', 'pendulum', 'amplitude', 'continuum_network', 'truth_network', 'jamton', 'hydradx_hollarnet'],
-  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'origintrail', 'xode', 'paseo_assethub'],
+  statemine: ['statemine', 'astar', 'shiden', 'statemint', 'crabParachain', 'darwinia2', 'parallel', 'calamari', 'manta_network', 'rococo_assethub', 'liberlandTest', 'liberland', 'dentnet', 'pangolin', 'crust', 'phala', 'shibuya', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'origintrail', 'xode', 'paseo_assethub', 'energy_web_x'],
   kusama: ['kusama', 'kintsugi', 'kintsugi_test', 'interlay', 'acala', 'statemint', 'karura', 'bifrost'], // perhaps there are some runtime updates
   centrifuge: ['centrifuge'],
   supportBridged: ['rococo_assethub', 'statemint', 'statemine', 'polimec'],
   bittensor: ['bittensor', 'bittensor_testnet'],
   moonbeam: ['moonbeam', 'moonriver', 'moonbase'],
-  notSupportGetBalanceByType: ['vara_network', 'vara_testnet', 'availTuringTest', 'avail_mainnet']
+  notSupportGetBalanceByType: ['vara_network', 'vara_testnet', 'availTuringTest', 'avail_mainnet'],
+  subtensor_evm: ['subtensor_evm']
 };
 
 export const _BALANCE_LOCKED_ID_GROUP = {
@@ -275,7 +276,7 @@ export const _TRANSFER_CHAIN_GROUP = {
   kintsugi: ['kintsugi', 'kintsugi_test', 'interlay', 'mangatax_para'],
   genshiro: ['genshiro_testnet', 'genshiro', 'equilibrium_parachain'],
   bitcountry: ['pioneer', 'bitcountry'],
-  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'origintrail', 'xode', 'paseo_assethub'],
+  statemine: ['statemint', 'statemine', 'darwinia2', 'astar', 'shiden', 'shibuya', 'parallel', 'liberland', 'liberlandTest', 'dentnet', 'dbcchain', 'westend_assethub', 'chainflip_assethub', 'origintrail', 'xode', 'paseo_assethub', 'energy_web_x'],
   riochain: ['riochain'],
   sora_substrate: ['sora_substrate'],
   avail: ['kate', 'goldberg_testnet'],
@@ -283,8 +284,10 @@ export const _TRANSFER_CHAIN_GROUP = {
   centrifuge: ['centrifuge'],
   disable_transfer: ['crab', 'pangolin'],
   truth: ['truth_network'],
-  bittensor: ['bittensor']
+  bittensor: ['bittensor', 'bittensor_testnet']
 };
+
+export const USE_MULTILOCATION_INDEX = ['energy_web_x'];
 
 export const _MANTA_ZK_CHAIN_GROUP = ['calamari'];
 

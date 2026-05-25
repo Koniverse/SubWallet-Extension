@@ -56,7 +56,7 @@ export type SubstrateCompletedParsedData = SubstrateTransactionParsedData | Subs
 export interface SubstrateTransactionParsedData {
   data: {
     account: string;
-    crypto: 'ed25519' | 'sr25519' | null;
+    crypto: 'ed25519' | 'ed25519-tw' | 'sr25519' | null;
     data: Uint8Array;
     genesisHash: string;
     rawPayload?: Uint8Array;
@@ -69,7 +69,7 @@ export interface SubstrateTransactionParsedData {
 export interface SubstrateMessageParsedData {
   data: {
     account: string;
-    crypto: 'ed25519' | 'sr25519' | null;
+    crypto: 'ed25519' | 'ed25519-tw' | 'sr25519' | null;
     data: string;
     genesisHash: string;
     rawPayload?: string;

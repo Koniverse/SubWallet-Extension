@@ -28,6 +28,9 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
   const { token } = useTheme() as Theme;
   const { onSelect } = useSelectModalInputHelper(props, ref);
 
+  const isSingleItem = items.length === 1;
+  const isDisabled = disabled || isSingleItem;
+
   const renderSelected = useCallback((item: Item) => {
     return (
       <div className={'__selected-item'}>{item.label}</div>
@@ -55,8 +58,8 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
 
   return (
     <SelectModal
-      className={`${className} phrase-number-selector-modal`}
-      disabled={disabled}
+      className={`${className} phrase-number-selector-modal ${isSingleItem ? 'single-item' : ''}`}
+      disabled={isDisabled}
       id={id}
       inputClassName={`${className} phrase-number-selector-input`}
       itemKey={'value'}
@@ -69,6 +72,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       renderWhenEmpty={renderEmpty}
       selected={value || ''}
       statusHelp={statusHelp}
+      suffix={isSingleItem ? null : undefined}
       title={title || label || placeholder || t('ui.components.Field.PhraseNumberSelector.selectType')}
       tooltip={tooltip}
     />
@@ -93,6 +97,10 @@ const PhraseNumberSelector = styled(forwardRef(Component))<Props>(({ theme: { to
       display: 'flex',
       width: 40,
       justifyContent: 'center'
+    },
+
+    '&.single-item .ant-select-modal-input-suffix': {
+      display: 'none'
     }
   });
 });

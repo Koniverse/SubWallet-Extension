@@ -8,3 +8,4 @@ export const APP_VERSION = process.env.PKG_VERSION || '';
 export const isProductionMode = PRODUCTION_BRANCHES.indexOf(branchName) > -1;
 export const BACKEND_API_URL = process.env.SUBWALLET_API || (isProductionMode ? 'https://sw-services.subwallet.app/api' : 'https://be-dev.subwallet.app/api');
 export const SW_EXTERNAL_SERVICES_API = process.env.SW_EXTERNAL_SERVICES_API || (isProductionMode ? 'https://external-services.subwallet.app' : 'https://external-services-dev.subwallet.app');
+export const SUBSCAN_GATEWAY_URL = process.env.SUBSCAN_GATEWAY_URL || 'https://gateway-dev.konistudio.xyz';
