@@ -297,6 +297,10 @@ const AmountInput = styled(forwardRef(Component))<Props>(({ theme: { token } }: 
       overflow: 'hidden'
     },
 
+    '.ant-input-wrapper .ant-input': {
+      paddingRight: '9px'
+    },
+
     '.max-btn-text': {
       color: token.colorSuccess
     },

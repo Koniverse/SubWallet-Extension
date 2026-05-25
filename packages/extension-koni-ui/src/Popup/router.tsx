@@ -69,7 +69,6 @@ const NftImport = new LazyLoader('NftImport', () => import('@subwallet/extension
 const Governance = new LazyLoader('Governance', () => import('@subwallet/extension-koni-ui/Popup/Home/Governance'));
 
 const History = new LazyLoader('History', () => import('@subwallet/extension-koni-ui/Popup/Home/History'));
-const Crowdloans = new LazyLoader('Crowdloans', () => import('@subwallet/extension-koni-ui/Popup/Home/Crowdloans'));
 const Home = new LazyLoader('Home', () => import('@subwallet/extension-koni-ui/Popup/Home'));
 
 const Settings = new LazyLoader('Settings', () => import('@subwallet/extension-koni-ui/Popup/Settings'));
@@ -94,6 +93,7 @@ const NotificationSetting = new LazyLoader('NotificationSetting', () => import('
 const ManageWebsiteAccessDetail = new LazyLoader('ManageWebsiteAccessDetail', () => import('@subwallet/extension-koni-ui/Popup/Settings/Security/ManageWebsiteAccess/Detail'));
 
 const NewSeedPhrase = new LazyLoader('NewSeedPhrase', () => import('@subwallet/extension-koni-ui/Popup/Account/NewSeedPhrase'));
+const NewMultisig = new LazyLoader('NewMultisigAccount', () => import('@subwallet/extension-koni-ui/Popup/Account/NewMultisigAccount'));
 const ImportSeedPhrase = new LazyLoader('ImportSeedPhrase', () => import('@subwallet/extension-koni-ui/Popup/Account/ImportSeedPhrase'));
 const ImportPrivateKey = new LazyLoader('ImportPrivateKey', () => import('@subwallet/extension-koni-ui/Popup/Account/ImportPrivateKey'));
 const RestoreJson = new LazyLoader('RestoreJson', () => import('@subwallet/extension-koni-ui/Popup/Account/RestoreJson'));
@@ -132,7 +132,8 @@ const GovReferendumUnvote = new LazyLoader('GovReferendumUnvote', () => import('
 const GovUnlockVote = new LazyLoader('GovUnlockVote', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/Governance/GovUnlockVote'));
 
 const MigrateAccount = new LazyLoader('MigrateAccount', () => import('@subwallet/extension-koni-ui/Popup/MigrateAccount'));
-
+const AddSubstrateProxyAccount = new LazyLoader('AddProxy', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/SubstrateProxyAccount/AddSubstrateProxyAccount'));
+const RemoveSubstrateProxyAccount = new LazyLoader('AddProxy', () => import('@subwallet/extension-koni-ui/Popup/Transaction/variants/SubstrateProxyAccount/RemoveSubstrateProxyAccount'));
 // Earning
 
 const EarningEntry = new LazyLoader('EarningEntry', () => import('@subwallet/extension-koni-ui/Popup/Home/Earning/EarningEntry'));
@@ -219,6 +220,8 @@ export const router = createHashRouter([
           ClaimReward.generateRouterObject('claim-reward'),
           Withdraw.generateRouterObject('withdraw'),
           ClaimBridge.generateRouterObject('claim-bridge'),
+          AddSubstrateProxyAccount.generateRouterObject('add-proxy'),
+          RemoveSubstrateProxyAccount.generateRouterObject('remove-proxy'),
           {
             ...GovReferendumVote.generateRouterObject('gov-ref-vote'),
             children: [
@@ -259,7 +262,6 @@ export const router = createHashRouter([
           Settings.generateRouterObject('list'),
           GeneralSetting.generateRouterObject('general'),
           AccountSettings.generateRouterObject('account-settings'),
-          Crowdloans.generateRouterObject('crowdloans'),
           ManageAddressBook.generateRouterObject('address-book'),
           SecurityList.generateRouterObject('security'),
           ManageWebsiteAccess.generateRouterObject('dapp-access'),
@@ -293,6 +295,7 @@ export const router = createHashRouter([
         element: <Outlet />,
         children: [
           NewSeedPhrase.generateRouterObject('new-seed-phrase'),
+          NewMultisig.generateRouterObject('new-multisig'),
           ImportSeedPhrase.generateRouterObject('import-seed-phrase'),
           ImportPrivateKey.generateRouterObject('import-private-key'),
           RestoreJson.generateRouterObject('restore-json'),

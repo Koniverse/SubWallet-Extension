@@ -185,6 +185,10 @@ const GovVotedAccountsModal = styled(forwardRef(Component))<Props>(({ theme: { t
 
       '&.-is-derived': {
         color: token.colorWarning
+      },
+
+      '&.-is-multisig': {
+        color: token['geekblue-9']
       }
     },
 

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DerivePathInfo, IDerivePathInfo_ } from '@subwallet/extension-base/types';
-import { BitcoinKeypairTypes, KeypairType, SubstrateKeypairType } from '@subwallet/keyring/types';
+import { BitcoinKeypairTypes, DefaultSubstrateKeypairType, KeypairType, TrustWalletSubstrateKeypairType } from '@subwallet/keyring/types';
 
 export const validateUnifiedDerivationPath = (raw: string): DerivePathInfo | undefined => {
   const reg = /^\/\/(\d+)(\/\/\d+)?$/;
@@ -266,7 +266,7 @@ export const validateSr25519DerivationPath = (raw: string): IDerivePathInfo_ | u
   };
 };
 
-export const validateOtherSubstrateDerivationPath = (raw: string, type: Exclude<SubstrateKeypairType, 'sr25519'>): IDerivePathInfo_ | undefined => {
+export const validateOtherSubstrateDerivationPath = (raw: string, type: Exclude<DefaultSubstrateKeypairType | TrustWalletSubstrateKeypairType, 'sr25519'>): IDerivePathInfo_ | undefined => {
   const reg = /\/\/([^/]+)/g;
   const parts = raw.match(reg);
   let constructed = '';
@@ -305,7 +305,7 @@ export const validateDerivationPath = (raw: string, type?: KeypairType): DeriveP
       return validateTonDerivationPath(raw);
     } else if (type === 'sr25519') {
       return validateSr25519DerivationPath(raw);
-    } else if (type === 'ed25519' || type === 'ecdsa') {
+    } else if (type === 'ed25519' || type === 'ed25519-tw' || type === 'ecdsa') {
       return validateOtherSubstrateDerivationPath(raw, type);
     } else if (type === 'cardano') {
       return validateCardanoDerivationPath(raw);

@@ -38,7 +38,8 @@ export const DefaultLogosMap: Record<string, string> = {
   ton: './images/projects/ton.png',
   meld: './images/projects/meld.png',
   polkassembly: './images/projects/polkassembly.png',
-  subsquare: './images/projects/subsquare.png'
+  subsquare: './images/projects/subsquare.png',
+  trust: './images/projects/trust.png'
 };
 
 export const IconMap = {

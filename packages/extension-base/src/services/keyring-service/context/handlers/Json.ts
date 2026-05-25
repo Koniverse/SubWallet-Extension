@@ -60,6 +60,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
     if (isPasswordValidated) {
       try {
         const { address, meta, type } = keyring.createFromJson(json);
+
         const { name } = meta;
         const account = transformAccount(address, type, meta);
         const accountExists = this.state.checkAddressExists([address]);

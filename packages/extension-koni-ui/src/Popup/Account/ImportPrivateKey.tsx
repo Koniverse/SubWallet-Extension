@@ -70,7 +70,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           name: accountName,
           suri: privateKey.trim(),
           isAllowed: true,
-          type: keypairType
+          types: [keypairType]
         })
           .then(() => {
             onComplete();

@@ -3,7 +3,13 @@
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { fetchParaSpellChainMap } from '@subwallet/extension-base/constants/paraspell-chain-map';
+import { _isSnowBridgeXcm } from '@subwallet/extension-base/core/substrate/xcm-parser';
+import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { CreateXcmExtrinsicProps } from '@subwallet/extension-base/services/balance-service/transfer/xcm/index';
+import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
+import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
+import { _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService } from '@subwallet/extension-base/utils';
 import BigNumber from 'bignumber.js';
@@ -12,6 +18,8 @@ import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Call, ExtrinsicPayload } from '@polkadot/types/interfaces';
 import { assert, compactToU8a, isHex, u8aConcat, u8aEq } from '@polkadot/util';
+
+import { _isBittensorToSubtensorBridge, _isSubtensorToBittensorBridge } from './bittensorBridge';
 
 export type DryRunNodeFailure = {
   success: false,
@@ -35,12 +43,10 @@ export type THopInfo = {
 export type DryRunResult = {
   origin: DryRunNodeResult
   destination?: DryRunNodeResult
-  assetHub?: DryRunNodeResult
-  bridgeHub?: DryRunNodeResult
   hops: THopInfo[]
 }
 
-interface GetXcmFeeRequest {
+export interface GetXcmFeeRequest {
   sender: string,
   recipient: string,
   value: string,
@@ -74,13 +80,15 @@ interface ParaSpellError {
   statusCode: number
 }
 
-const version = '/v4';
+const version = '/v1';
 
 const paraSpellApi = {
   buildXcm: `${version}/x-transfer`,
   feeXcm: `${version}/xcm-fee`,
   dryRunXcm: `${version}/dry-run`,
-  dryRunPreviewXcm: `${version}/dry-run-preview`
+  dryRunPreviewXcm: `${version}/dry-run-preview`,
+  maxTransferable: `${version}/transferable-amount`,
+  minTransferable: `${version}/min-transferable-amount`
 };
 
 function txHexToSubmittableExtrinsic (api: ApiPromise, hex: string): SubmittableExtrinsic<'promise'> {
@@ -162,8 +170,8 @@ export async function buildXcm (request: CreateXcmExtrinsicProps) {
   const paraSpellChainMap = await fetchParaSpellChainMap();
 
   const bodyData = {
-    senderAddress: sender,
-    address: recipient,
+    sender,
+    recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
     currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
@@ -207,8 +215,8 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   }
 
   const bodyData = {
-    senderAddress: sender,
-    address: recipient,
+    sender,
+    recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
     currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
@@ -254,8 +262,8 @@ export async function dryRunPreviewXcm (request: CreateXcmExtrinsicProps) {
   }
 
   const bodyData = {
-    senderAddress: sender,
-    address: recipient,
+    sender,
+    recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
     currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
@@ -305,8 +313,8 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   }
 
   const bodyData = {
-    senderAddress: sender,
-    address: recipient,
+    sender,
+    recipient,
     from: paraSpellChainMap[fromChainInfo.slug],
     to: paraSpellChainMap[toChainInfo.slug],
     currency: createParaSpellCurrency(paraSpellIdentifyV4, requestValue),
@@ -337,6 +345,42 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
   return await response.json() as GetXcmFeeResult;
 }
 
+export async function fetchMinXcmTransferableAmount (request: GetXcmFeeRequest) {
+  const { fromChainInfo: originChain, fromTokenInfo: originTokenInfo, recipient, sender, toChainInfo: destinationChain, value: sendingValue } = request;
+  const paraSpellChainMap = await fetchParaSpellChainMap();
+  const paraSpellIdentifyV4 = originTokenInfo.metadata?.paraSpellIdentifyV4;
+
+  if (!paraSpellIdentifyV4) {
+    throw new Error('Token is not support XCM at this time');
+  }
+
+  const bodyData = {
+    senderAddress: sender,
+    address: recipient,
+    from: paraSpellChainMap[originChain.slug],
+    to: paraSpellChainMap[destinationChain.slug],
+    currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
+    options: {
+      abstractDecimals: false
+    }
+  };
+
+  const response = await fetchFromProxyService(
+    ProxyServiceRoute.PARASPELL,
+    paraSpellApi.minTransferable,
+    {
+      method: 'POST',
+      body: JSON.stringify(bodyData),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    }
+  );
+
+  return await response.json() as string;
+}
+
 function createParaSpellCurrency (paraSpellIdentifyV4: Record<string, any>, amount: string): ParaSpellCurrency {
   return {
     ...paraSpellIdentifyV4,
@@ -354,4 +398,50 @@ export function isChainNotSupportDryRun (str: string): boolean {
   const regex = /(?=.*DryRunApi)(?=.*not available).*/i; // Example: DryRunApi is not available on node Acala
 
   return regex.test(str);
+}
+
+export function isSubstrateCrossChain (originChainInfo: _ChainInfo, destinationChainInfo: _ChainInfo) {
+  if (originChainInfo.slug === destinationChainInfo.slug) {
+    return false;
+  }
+
+  // isAvailBridgeFromEvm
+  if (_isPureEvmChain(originChainInfo) && isAvailChainBridge(destinationChainInfo.slug)) {
+    return false;
+  }
+
+  // isAvailBridgeFromAvail
+  if (isAvailChainBridge(originChainInfo.slug) && _isPureEvmChain(destinationChainInfo)) {
+    return false;
+  }
+
+  // isSnowBridgeEvmTransfer
+  if (_isPureEvmChain(originChainInfo) && _isSnowBridgeXcm(originChainInfo, destinationChainInfo)) {
+    return false;
+  }
+
+  // isPolygonBridgeTransfer
+  if (_isPolygonChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
+    return false;
+  }
+
+  // isPosBridgeTransfer
+  if (_isPosChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
+    return false;
+  }
+
+  // isAcrossBridgeTransfer
+  if (_isAcrossChainBridge(originChainInfo.slug, destinationChainInfo.slug)) {
+    return false;
+  }
+
+  if (_isBittensorToSubtensorBridge(originChainInfo.slug, destinationChainInfo.slug)) {
+    return false;
+  }
+
+  if (_isSubtensorToBittensorBridge(originChainInfo.slug, destinationChainInfo.slug)) {
+    return false;
+  }
+
+  return true;
 }
