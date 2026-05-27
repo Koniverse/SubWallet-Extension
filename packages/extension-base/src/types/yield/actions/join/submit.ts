@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _Address, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { _Address, AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 
 import { BaseProcessRequestSign, BaseRequestSign, InternalRequestSign, TransactionData } from '../../../transaction';
 import { BittensorRootClaimType, NominationPoolInfo, ValidatorInfo, YieldPoolType, YieldPositionInfo } from '../../info';
@@ -15,6 +15,8 @@ export interface HandleYieldStepData {
   chainType: ChainType;
   txData: any;
   transferNativeAmount: string;
+  xcmStepFee?: string;
+  xcmDestinationFee?: AmountData;
 }
 
 export interface AbstractSubmitYieldJoinData {

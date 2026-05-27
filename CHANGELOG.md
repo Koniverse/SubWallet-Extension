@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## 1.3.78
+Build date: May 14, 2026.
+
+Nội dung release:
+- Extension - Support display destination fee for transfer XCM (#4278)
+- Calculate exactly estimate fee for bridge step in liquid staking (#4803)
+- Disable all networks' switch to Manage Networks page (#4970)
+- Update for chain-list stable v0.2.127
+  - Support Transfer Alpha Token (#4900)
+  - Bridge native TAO <-> Subtensor EVM (#4901)
+  - Support bittensor on-chain swap (#4899)
+  - [Subtensor EVM] Add support for some alpha tokens
+
+
+## 1.3.77
+Build date: Apr 09, 2026.
+
+Features & Updates:
+- Improve Proxy account features (#4942)
+- Improve Multisig account feature  (#4963)
+- Turn off warning popup for transfers between PAH <> KAH (#4954)
+- Support stDOT LSD sunset (#4968)
+- Update for chainlist stable v0.2.126
+
+
 ## 1.3.76
 Build date: Mar 20, 2026.
 

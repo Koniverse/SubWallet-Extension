@@ -1,14 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { SwapRequest, SwapSubmitParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { SwapRequestV2, SwapSubmitParams, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { sendMessage } from '@subwallet/extension-web-ui/messaging';
 
-export async function handleSwapRequest (request: SwapRequest) {
+export async function handleSwapRequest (request: SwapRequestV2) {
   return sendMessage('pri(swapService.handleSwapRequest)', request);
 }
 
-export async function getLatestSwapQuote (request: SwapRequest) {
+export async function getLatestSwapQuote (request: SwapRequestV2) {
   return sendMessage('pri(swapService.getLatestQuote)', request);
 }
 

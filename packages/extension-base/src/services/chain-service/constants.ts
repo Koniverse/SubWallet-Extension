@@ -60,7 +60,8 @@ export const _BALANCE_CHAIN_GROUP = {
   supportBridged: ['rococo_assethub', 'statemint', 'statemine', 'polimec'],
   bittensor: ['bittensor', 'bittensor_testnet'],
   moonbeam: ['moonbeam', 'moonriver', 'moonbase'],
-  notSupportGetBalanceByType: ['vara_network', 'vara_testnet', 'availTuringTest', 'avail_mainnet']
+  notSupportGetBalanceByType: ['vara_network', 'vara_testnet', 'availTuringTest', 'avail_mainnet'],
+  subtensor_evm: ['subtensor_evm']
 };
 
 export const _BALANCE_LOCKED_ID_GROUP = {
@@ -286,7 +287,8 @@ export const _TRANSFER_CHAIN_GROUP = {
   pendulum: ['pendulum', 'amplitude', 'amplitude_test', 'hydradx_main', 'bifrost', 'bifrost_dot', 'jamton', 'hydradx_hollarnet'],
   centrifuge: ['centrifuge'],
   disable_transfer: ['crab', 'pangolin'],
-  truth: ['truth_network']
+  truth: ['truth_network'],
+  bittensor: ['bittensor', 'bittensor_testnet']
 };
 
 export const USE_MULTILOCATION_INDEX = ['energy_web_x'];

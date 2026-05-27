@@ -16,6 +16,10 @@ export interface TransferParams extends TransactionFormBaseProps {
   destChain: string;
   value: string;
   defaultSlug: string;
+
+  // Transfer alpha token params
+  fromValidator?: string;
+  toValidator?: string;
 }
 
 export interface SendNftParams extends TransactionFormBaseProps {

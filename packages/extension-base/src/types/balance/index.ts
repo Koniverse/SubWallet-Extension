@@ -17,7 +17,8 @@ export enum BalanceType {
   TRANSFERABLE = 'transferable', // free
   TOTAL = 'total', // free + locked
   TOTAL_MINUS_RESERVED = 'totalMinusReserved', // free + locked - reserved
-  KEEP_ALIVE = 'keepAlive'
+  KEEP_ALIVE = 'keepAlive',
+  STAKING = 'staking' // staking balance
 }
 
 /**
@@ -80,6 +81,7 @@ export interface SubscribeSubstratePalletBalance extends SubscribeBasePalletBala
 
 export interface SubscribeEvmPalletBalance extends SubscribeBasePalletBalance {
   evmApi: _EvmApi;
+  substrateApiMap?: Record<string, _SubstrateApi>;
 }
 
 export interface SubscribeTonPalletBalance extends SubscribeBasePalletBalance {
