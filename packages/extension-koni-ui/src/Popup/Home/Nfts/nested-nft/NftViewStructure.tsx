@@ -6,6 +6,7 @@ import { Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { ROOT_NFT_TOKEN_ID } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useGetNftByAccount, useNavigateOnChangeAccount } from '@subwallet/extension-koni-ui/hooks';
+import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
 import { INftItemDetail } from '@subwallet/extension-koni-ui/Popup/Home/Nfts';
@@ -16,7 +17,6 @@ import { CaretDown, CaretRight, CheckCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
-import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 
 type Props = ThemeProps;
 
