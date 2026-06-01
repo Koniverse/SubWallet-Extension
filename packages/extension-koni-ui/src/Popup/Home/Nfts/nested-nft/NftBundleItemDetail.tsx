@@ -7,6 +7,7 @@ import { Layout, MetaInfo, PageWrapper } from '@subwallet/extension-koni-ui/comp
 import { CAMERA_CONTROLS_MODEL_VIEWER_PROPS, DEFAULT_MODEL_VIEWER_PROPS, DEFAULT_NFT_PARAMS, NFT_TRANSACTION, ROOT_NFT_TOKEN_ID, SHOW_3D_MODELS_CHAIN } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useNavigateOnChangeAccount } from '@subwallet/extension-koni-ui/hooks';
+import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { useGetUniqueNftDetail, useGetUniqueNftParent } from '@subwallet/extension-koni-ui/hooks/nft';
@@ -26,7 +27,6 @@ import React, { useCallback, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
-import { useLocalStorage } from 'usehooks-ts';
 
 type Props = ThemeProps
 
