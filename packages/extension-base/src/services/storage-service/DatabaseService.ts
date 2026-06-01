@@ -486,8 +486,8 @@ export default class DatabaseService {
     return this.stores.nft.removeNfts(chain, address, collectionId, nftIds);
   }
 
-  removeNftsByAddress (address: string) {
-    return this.stores.nft.removeNftsByAddress([address]);
+  removeNftsByAddress (address: string[]) {
+    return this.stores.nft.removeNftsByAddress(address);
   }
 
   // Chain

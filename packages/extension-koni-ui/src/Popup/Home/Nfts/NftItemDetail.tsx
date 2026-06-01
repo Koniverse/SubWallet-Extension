@@ -98,7 +98,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const subHeaderRightButton: ButtonProps[] = [
     {
       children: t<string>('ui.NFT.screen.NftsItemDetail.send'),
-      onClick: onClickSend
+      onClick: onClickSend,
+      disabled: (nftItem.nestingLevel ?? 0) > 0
     }
   ];
 
@@ -315,6 +316,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
           <Button
             block
+            disabled={(nftItem.nestingLevel ?? 0) > 0}
             icon={<Icon
               phosphorIcon={PaperPlaneTilt}
               type='phosphor'
@@ -399,8 +401,7 @@ const NftItemDetail = styled(Component)<Props>(({ theme: { token } }: Props) => 
 
     '.nft_item_detail__send_text': {
       fontSize: token.fontSizeLG,
-      lineHeight: token.lineHeightLG,
-      color: token.colorTextLight1
+      lineHeight: token.lineHeightLG
     },
 
     '.nft_item_detail__prop_section': {
