@@ -16,7 +16,7 @@ import { CaretDown, CaretRight, CheckCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
-import { useLocalStorage } from 'usehooks-ts';
+import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 
 type Props = ThemeProps;
 
