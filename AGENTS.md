@@ -54,10 +54,12 @@ For full details, see each package's `README.md` (where present) and
 |---|---|
 | Install dependencies | `yarn install` |
 | Build all packages | `yarn build` |
-| Build extension only | `yarn webpack:build:extension` |
-| Watch extension during dev | `yarn webpack:watch:extension` |
-| Start web app dev server | `yarn webpack:dev:webapp` |
-| Build webapp | `yarn webpack:build:webapp` |
+| Build extension UI | `yarn build:ui` |
+| Watch extension during dev | `yarn watch-dev` |
+| Start webapp dev server | `yarn webapp:dev` |
+| Build webapp | `yarn webapp:build` |
+| Start web-runner dev server | `yarn web-runner:dev` |
+| Build web-runner | `yarn web-runner:build` |
 | Run lint | `yarn lint` |
 | Run tests | `yarn test` |
 
@@ -103,7 +105,7 @@ GitHub issue → story/epic migration is **pending sub-task 3**.
 
 This repo follows the Koniverse product development pipeline:
 
-```
+```text
 BRAINSTORM → BRIEF → PRD → ARCH → EPIC/US → DESIGN → REVIEW → QA → IMPLEMENT → COMMIT/DOCS
    BMAD       BMAD    BMAD   BMAD     BMAD     GSTACK  GSTACK  GSTACK  SUPERPOWERS   KONI-DOCS
 ```
