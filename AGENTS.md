@@ -6,7 +6,73 @@
 > Koni-Docs Integration block and an Active Context pointer.
 > On any conflict between AGENTS.md and CLAUDE.md, AGENTS.md wins.
 
-## 1. Project purpose
+## 1. AI coding behavior guidelines
+
+> Adapted from [multica-ai/andrej-karpathy-skills · CLAUDE.md](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/CLAUDE.md).
+> Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
+>
+> **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+
+### 1.1 Think Before Coding
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them — don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+### 1.2 Simplicity First
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+### 1.3 Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it — don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+### 1.4 Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+
+```text
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+## 2. Project purpose
 
 SubWallet-Extension is a non-custodial multi-chain wallet delivered as a
 browser extension and web app. It supports Substrate (Polkadot / Kusama
@@ -16,7 +82,7 @@ codebase is a Yarn 3 monorepo of TypeScript packages: background services
 React UI (extension popup + full-page web app), and shared message bus
 layer between them.
 
-## 2. Monorepo layout
+## 3. Monorepo layout
 
 | Package | Purpose | Top dependencies |
 |---|---|---|
@@ -36,7 +102,7 @@ layer between them.
 For full details, see each package's `README.md` (where present) and
 `package.json`.
 
-## 3. Tech stack
+## 4. Tech stack
 
 - **Node:** `.nvmrc` → 12 (build target). Local shell may be newer (Node 18+ recommended for dev).
 - **Package manager:** Yarn 3 (berry), workspaces. Never use npm install.
@@ -48,7 +114,7 @@ For full details, see each package's `README.md` (where present) and
 - **Lint / format:** ESLint (config: `.eslintrc.js`), Prettier (`.prettierrc.cjs`).
 - **CI:** GitHub Actions (`.github/workflows/`).
 
-## 4. Build / dev commands
+## 5. Build / dev commands
 
 | Goal | Command |
 |---|---|
@@ -66,7 +132,7 @@ For full details, see each package's `README.md` (where present) and
 See `package.json` (root) `scripts` for the full list, and `CONTRIBUTING.md`
 for the contributor workflow.
 
-## 5. Conventions
+## 6. Conventions
 
 - **Branch naming:** `koni/dev/issue-<number>` for feature/bug branches
   tied to GitHub issues; `koni/dev/<short-slug>` for branches without a
@@ -83,7 +149,7 @@ for the contributor workflow.
   with `-N` suffix (currently `1.3.79-1`). The canonical user-facing
   version also lives in `VERSION` (repo root, per koni-docs §0).
 
-## 6. Documentation
+## 7. Documentation
 
 Current docs at the repo root:
 
@@ -101,7 +167,7 @@ commit) enforcement is deferred for this repo.
 
 GitHub issue → story/epic migration is **pending sub-task 3**.
 
-## 7. Koniverse pipeline
+## 8. Koniverse pipeline
 
 This repo follows the Koniverse product development pipeline:
 
@@ -114,7 +180,7 @@ Koni-docs is the **final standardization stage**: it maps planning
 artifacts produced by upstream tools into the canonical `docs/` structure
 and enforces the 12 core rules.
 
-## 8. Active context pattern (Pattern B — file-extracted)
+## 9. Active context pattern (Pattern B — file-extracted)
 
 Live per-developer state lives in `.active-context.md` (gitignored). The
 committed template is `.active-context.example.md`. On first checkout:
@@ -127,7 +193,7 @@ Update `.active-context.md` as you work — sprint, active stories, recent
 decisions, recent lessons. It is consumed by koni-docs status / sync
 commands.
 
-## 9. Skill quick reference
+## 10. Skill quick reference
 
 | Skill | Triggers on |
 |---|---|
@@ -136,7 +202,7 @@ commands.
 Additional skills (e.g. `koni-api`, plugin skills for Supabase / Next.js)
 may be added to `skills-lock.json` over time.
 
-## 10. Out of scope for sub-task 1
+## 11. Out of scope for sub-task 1
 
 The following are tracked in separate sub-tasks and **not** part of this
 branch (`ai-development`):
