@@ -2,16 +2,11 @@
 
 > **This file is the single source of truth for all AI agent instructions in this project.**
 > Cursor, Gemini, Codex CLI, Copilot CLI, and Claude Code all read it.
-> [`CLAUDE.md`](CLAUDE.md) is a thin pointer back to this file plus the
+> [CLAUDE.md](./CLAUDE.md) is a thin pointer back to this file plus the
 > Koni-Docs Integration block and an Active Context pointer.
 > On any conflict between AGENTS.md and CLAUDE.md, AGENTS.md wins.
 
 ## 1. AI coding behavior guidelines
-
-> Adapted from [multica-ai/andrej-karpathy-skills · CLAUDE.md](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/CLAUDE.md).
-> Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
->
-> **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
 ### 1.1 Think Before Coding
 
@@ -85,7 +80,7 @@ layer between them.
 ## 3. Monorepo layout
 
 | Package | Purpose | Top dependencies |
-|---|---|---|
+| --- | --- | --- |
 | `@subwallet/extension-base` | Functions, classes and other utilities used in @subwallet/extension | @acala-network/api, @apollo/client, @azns/resolver-core |
 | `@subwallet/extension-chains` | Definitions for all known chains as exposed by the extension. | @babel/runtime, @polkadot/networks, @polkadot/util |
 | `@subwallet/extension-compat-metamask` | Metamask compatibility layer | @babel/runtime, @metamask/detect-provider, @polkadot/types |
@@ -117,15 +112,17 @@ For full details, see each package's `README.md` (where present) and
 ## 5. Build / dev commands
 
 | Goal | Command |
-|---|---|
+| --- | --- |
 | Install dependencies | `yarn install` |
 | Build all packages | `yarn build` |
 | Build extension UI | `yarn build:ui` |
-| Watch extension during dev | `yarn watch-dev` |
 | Start webapp dev server | `yarn webapp:dev` |
-| Build webapp | `yarn webapp:build` |
 | Start web-runner dev server | `yarn web-runner:dev` |
 | Build web-runner | `yarn web-runner:build` |
+| Build extension only | `yarn webpack:build:extension` |
+| Watch extension during dev | `yarn watch-dev` |
+| Start web app dev server | `yarn webpack:dev:webapp` |
+| Build webapp | `yarn webapp:build` |
 | Run lint | `yarn lint` |
 | Run tests | `yarn test` |
 
@@ -196,7 +193,7 @@ commands.
 ## 10. Skill quick reference
 
 | Skill | Triggers on |
-|---|---|
+| --- | --- |
 | `koni-docs` | Update docs, create story, record decision, log lesson, write changelog entry, document architecture, run pre-commit doc checklist |
 
 Additional skills (e.g. `koni-api`, plugin skills for Supabase / Next.js)
