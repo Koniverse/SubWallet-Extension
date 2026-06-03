@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
-import { BitcoinAddressSummaryInfo, BitcoinApiStrategy, BitcoinTransactionEventMap, BlockstreamAddressResponse, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, BlockStreamUtxo, Inscription, InscriptionFetchedData, RunesInfoByAddress, RunesInfoByAddressFetchedData } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
-import { HiroService } from '@subwallet/extension-base/services/hiro-service';
-import { RunesService } from '@subwallet/extension-base/services/rune-service';
+import { BitcoinAddressSummaryInfo, BitcoinApiStrategy, BitcoinTransactionEventMap, BlockstreamAddressResponse, BlockStreamBlock, BlockStreamFeeEstimates, BlockStreamTransactionDetail, BlockStreamTransactionStatus, BlockStreamUtxo, Inscription, InscriptionFetchedData } from '@subwallet/extension-base/services/chain-service/handler/bitcoin/strategy/types';
+import { UnisatService } from '@subwallet/extension-base/services/unisat-service';
 import { BaseApiRequestStrategy } from '@subwallet/extension-base/strategy/api-request-strategy';
 import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-request-strategy/context/base';
 import { getRequest, postRequest } from '@subwallet/extension-base/strategy/api-request-strategy/utils';
@@ -295,7 +294,7 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
         const interval = setInterval(() => {
           this.getTransactionStatus(extrinsicHash)
             .then((transactionStatus) => {
-              if (transactionStatus.confirmed && transactionStatus.block_time > 0) {
+              if (transactionStatus.confirmed) {
                 clearInterval(interval);
                 eventEmitter.emit('success', transactionStatus);
               }
@@ -325,42 +324,11 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
     }, 0);
   }
 
-  async getRunes (address: string) {
-    const runesFullList: RunesInfoByAddress[] = [];
-    const pageSize = 60;
-    let offset = 0;
-
-    const runeService = RunesService.getInstance(this.isTestnet);
-
-    try {
-      while (true) {
-        const response = await runeService.getAddressRunesInfo(address, {
-          limit: String(pageSize),
-          offset: String(offset)
-        }) as unknown as RunesInfoByAddressFetchedData;
-
-        const runes = response.runes;
-
-        if (runes.length !== 0) {
-          runesFullList.push(...runes);
-          offset += pageSize;
-        } else {
-          break;
-        }
-      }
-
-      return runesFullList;
-    } catch (error) {
-      console.error(`Failed to get ${address} balances`, error);
-      throw error;
-    }
-  }
-
   async getRuneUtxos (address: string) {
-    const runeService = RunesService.getInstance(this.isTestnet);
+    const unisatService = UnisatService.getInstance(this.isTestnet);
 
     try {
-      const responseRuneUtxos = await runeService.getAddressRuneUtxos(address);
+      const responseRuneUtxos = await unisatService.getAddressRuneUtxos(address);
 
       return responseRuneUtxos.results;
     } catch (error) {
@@ -375,11 +343,11 @@ export class BlockStreamTestnetRequestStrategy extends BaseApiRequestStrategy im
     const pageSize = 60;
     let offset = 0;
 
-    const hiroService = HiroService.getInstance(this.isTestnet);
+    const unisatService = UnisatService.getInstance(this.isTestnet);
 
     try {
       while (true) {
-        const response = await hiroService.getAddressInscriptionsInfo({
+        const response = await unisatService.getAddressInscriptionsInfo({
           limit: String(pageSize),
           offset: String(offset),
           address: String(address)
