@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [Unreleased]
+
+(empty — track unreleased changes here; new version sections are inserted above the previous version, anchored on this block, per koni-docs changelog template)
+
+---
+
 ## 1.3.79
 Build date: May 21, 2026.
 
