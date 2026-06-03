@@ -504,11 +504,11 @@ flowchart TB
     G2{"⚠ G2 PRD"}
 
     subgraph W4["WAVE 4 — after B1+ARCH"]
-        W4["B2 Epic synth"]
+        W4N["B2 Epic synth"]
     end
 
     subgraph W5["WAVE 5 — after B2"]
-        W5["B3 Story conversion"]
+        W5N["B3 Story conversion"]
     end
 
     subgraph W6["WAVE 6 — interactive bootstrap"]
@@ -529,7 +529,7 @@ flowchart TB
     classDef wave fill:#fff3bf,stroke:#a80
     classDef gate fill:#cfe2ff,stroke:#06c
     classDef input fill:#e9d5ff,stroke:#7c3aed
-    class W1,W2,W3,W4,W5,W1A,W1B,W1C,W1D,W2R,W2A,W2B,W2C,W2D,W3A,W3B wave
+    class W1,W2,W3,W4,W5,W1A,W1B,W1C,W1D,W2R,W2A,W2B,W2C,W2D,W3A,W3B,W4N,W5N wave
     class G1,G2,G3 gate
     class W6,W6S input
 ```
