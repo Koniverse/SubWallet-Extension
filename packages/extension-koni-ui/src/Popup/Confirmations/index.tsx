@@ -202,9 +202,10 @@ const Component = function ({ className }: Props) {
           />
         );
       case 'evmSendTransactionRequest':
+      case 'evmWatchTransactionRequest':
         return (
           <EvmTransactionConfirmation
-            request={confirmation.item as ConfirmationDefinitions['evmSendTransactionRequest'][0]}
+            request={confirmation.item as ConfirmationDefinitions['evmSendTransactionRequest' | 'evmWatchTransactionRequest'][0]}
             type={confirmation.type}
           />
         );
