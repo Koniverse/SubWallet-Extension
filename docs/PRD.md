@@ -134,6 +134,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-88 | Chain abstraction SDK: package multi-chain logic as a developer-facing service for external dApp teams | chain-abstraction | planned |
 | FR-89 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | chain-abstraction | planned |
 | FR-90 | Starknet ecosystem integration (seed-phrase-derived account-abstracted wallets, STRK + ERC-20 transfers) | chain-management | planned |
+| FR-91 | Custom token import and registry management: add ERC-20 / PSP-22 tokens by contract, enable/disable tokens, and set token display order | chain-management | shipped |
 
 ---
 
@@ -198,7 +199,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 ### EPIC-4 — chain-management
 
-**FRs:** FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-18, FR-19, FR-90
+**FRs:** FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-18, FR-19, FR-90, FR-91
 
 | Story | Title | Status | Version |
 |-------|-------|--------|---------|
