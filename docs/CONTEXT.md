@@ -1062,3 +1062,96 @@
 **Citations**: [#4725](https://github.com/Koniverse/SubWallet-Extension/issues/4725), [#4935](https://github.com/Koniverse/SubWallet-Extension/issues/4935)
 
 ---
+
+## Phase 5 — Fee Abstraction, Swap-Provider & dApp-Connection Hardening (2024–2025, shipped v1.2.x–v1.3.x)
+
+> Decisions in this phase were recovered from internal product reports (Notion) during the koni-docs migration; they were under-represented in the issue-derived history because much of the work landed as backend/proxy changes rather than extension-only issues. Dates/versions are approximate where the source did not pin them.
+
+### D60. Compute fee-level parameters and fee logic on the backend, consumed via a subscribe-based FeeService
+
+**Context**: Supporting per-level custom fees (EVM `gasPrice` / `maxFeePerGas` / `maxPriorityFeePerGas`; Substrate tip) and keeping fee logic adjustable required estimating fee parameters that change with network conditions. Doing this purely in-extension meant every fee-logic fix needed a full extension release.
+
+**Decision**: Move fee-parameter calculation (`calculateGasFeeParams`) and fee-data sourcing to the SubWallet backend, and have the extension consume online fee data through a subscribe-based `FeeService` that subscribes on demand and cancels when no requests remain. EVM custom max-fee input is validated against a `> 1.5 × base fee` guard; RPCs that do not support custom fees fall back to default estimation (#4559).
+
+**Rationale**: Backend-sourced fee data can be hotfixed without shipping a build, and a subscribe controller minimises fee-param call frequency. Client-side-only computation would have frozen fee logic to the release cadence.
+
+**Impact**: Adds `FeeService` and a backend fee endpoint; fee-level UI reads live data; EVM/Substrate fee paths share one parameter source.
+
+**Date**: 2025
+**Version**: v1.3.x
+**Citations**: [#4559](https://github.com/Koniverse/SubWallet-Extension/issues/4559), [#4371](https://github.com/Koniverse/SubWallet-Extension/issues/4371), [#4045](https://github.com/Koniverse/SubWallet-Extension/issues/4045)
+
+### D61. Pay transaction fees in non-native tokens on Asset Hub via the `assetConversion` pallet
+
+**Context**: Users wanted to pay tx fees in a non-native token. On Polkadot/Kusama Asset Hub and Hydration this is expressible on-chain, but the mechanism and supported-network scope had to be decided.
+
+**Decision**: Implement non-native fee payment by routing through the `assetConversion` pallet (pool existence checked via `query.assetConversion.pools`, price ratio via `assetConversionApi`, pools always paired against the native asset). Scope the custom **fee-token** feature to Hydration and Polkadot Asset Hub; EVM networks get custom fee-**level** only. Warn the user when the chosen fee token's liquidity pool is too shallow to price reliably.
+
+**Rationale**: `assetConversion` is the native on-chain fee-abstraction mechanism on Asset Hub; limiting scope to networks with real pools avoids mispricing, and shallow-pool warnings prevent bad swaps inside the fee path.
+
+**Alternatives considered**:
+- Allow any token as a fee token everywhere — rejected: most chains lack a conversion pool, so the fee could not be priced.
+
+**Impact**: Fee-token selector gated by chain; pool/liquidity checks in the fee estimation path; fixes around non-native fee accounting (#4043, #4552).
+
+**Date**: 2025
+**Version**: v1.3.x
+**Citations**: [#3590](https://github.com/Koniverse/SubWallet-Extension/issues/3590), [#4371](https://github.com/Koniverse/SubWallet-Extension/issues/4371), [#4043](https://github.com/Koniverse/SubWallet-Extension/issues/4043), [#4552](https://github.com/Koniverse/SubWallet-Extension/issues/4552)
+
+### D62. Migrate Coinbase on-ramp to the secure-init (backend session-token) flow
+
+**Context**: Coinbase deprecated client-side on-ramp initialisation in favour of a "secure init" flow requiring a server-generated session token. D34 covered the Meld on-ramp but not Coinbase, whose secret key must never ship in the extension bundle.
+
+**Decision**: Generate the Coinbase session in the SubWallet backend `small-features` proxy module: the backend mints a short-lived JWT (TTL ≤ 120s, cached ~110s), calls Coinbase to obtain a `sessionToken`, and returns a ready `pay.coinbase.com/onramp` URL that the UI opens. The frontend never holds the Coinbase secret.
+
+**Rationale**: Coinbase's secure-init migration mandates server-side session-token generation; keeping the secret on the backend prevents key exposure in a publicly distributed bundle.
+
+**Impact**: Coinbase on-ramp depends on the backend proxy (extends AD-19); buy-token flow opens a backend-built URL rather than constructing it client-side.
+
+**Date**: 2025
+**Version**: v1.3.x
+**Citations**: [#4572](https://github.com/Koniverse/SubWallet-Extension/issues/4572), [#1834](https://github.com/Koniverse/SubWallet-Extension/issues/1834)
+
+### D63. Adapt KyberSwap aggregator integration to its divergent slippage / price-impact rules
+
+**Context**: Integrating KyberSwap (EVM chains) surfaced rules that diverge from SubWallet's own quote model: Kyber caps slippage input at 2 decimals / 19.99% max, blocks very small amounts with "Unable to calculate Price Impact", and requires "Degen Mode" for price impact > 10%.
+
+**Decision**: Bridge the differences rather than constrain the wallet UI: enable `ignoreCappedSlippage` to honour the wallet's wider slippage range, silently enable Degen Mode when price impact > 10% (warn from > 1%), block swaps whose input is too small to price, and pass a stored `clientId` (treated like an API key) to avoid rate limits.
+
+**Rationale**: Without these adaptations Kyber would reject or silently revert swaps that the wallet presents as valid, costing users gas. Aligning to the provider's constraints at the adapter layer keeps the shared swap UX consistent.
+
+**Impact**: KyberSwap swap handler carries provider-specific slippage/price-impact handling; `clientId` config added.
+
+**Date**: 2025
+**Version**: v1.3.x
+**Citations**: [#4144](https://github.com/Koniverse/SubWallet-Extension/issues/4144)
+
+### D64. Model XCM fees as source-execution + source-delivery (sender-paid) vs remote/transport (amount-paid), validated by ParaSpell dry-run
+
+**Context**: After delivery fees were introduced, it was unclear which balance covers each XCM fee, risking under-reserving the sender's balance (see LESSONS §2 for the symptom).
+
+**Decision**: Attribute XCM fees explicitly: (1) SourceExecutionFee and (2) SourceDeliveryFee are paid from the **sender's** balance, while (3) remote/transport fees are taken out of the **sending amount**. SourceDeliveryFee is computed per transport class (DMP teleport/reserve, UMP teleport, HRMP) and validated by building the transaction and dry-running it through ParaSpell (extends AD-18).
+
+**Rationale**: A single explicit fee-attribution model prevents balance under-reservation and matches ParaSpell's dry-run output, which is the source of truth for delivery fees.
+
+**Impact**: XCM fee preview and balance validation use the three-part model; estimation runs a ParaSpell dry-run.
+
+**Date**: 2025
+**Version**: v1.3.x
+**Citations**: [#4133](https://github.com/Koniverse/SubWallet-Extension/issues/4133), [#2792](https://github.com/Koniverse/SubWallet-Extension/issues/2792)
+
+### D65. Model WalletConnect as a single "Connection" merging pair + session, with separate Substrate / EVM sessions; Wallet-role only
+
+**Context**: WalletConnect v2 exposes both a "pair" and a "session" as distinct concepts, and supported chains/methods differ per ecosystem. Surfacing both raw concepts to users would be confusing.
+
+**Decision**: Expose a single user-facing "Connection" object that merges the underlying WC pair and session. Because chains and methods differ per ecosystem, keep Substrate and EVM as **separate sessions** under that one connection. Implement SubWallet in the WalletConnect **Wallet role only** (not the hybrid DApp role) initially, ship on extension before mobile, and deliberately omit editing a connection (delete-and-recreate instead). Complements the method-scope decision D13.
+
+**Rationale**: One merged concept lowers user cognitive load; separate per-ecosystem sessions are required because a single session cannot span the differing chain/method sets; Wallet-role-only and no-edit keep the first release's surface area small.
+
+**Impact**: `ConnectWCRequestHandler` and the connection list present one connection per dApp with per-ecosystem sessions underneath.
+
+**Date**: 2024–2025
+**Version**: v1.2.x–v1.3.x
+**Citations**: [#1497](https://github.com/Koniverse/SubWallet-Extension/issues/1497), [#2407](https://github.com/Koniverse/SubWallet-Extension/issues/2407), [#3870](https://github.com/Koniverse/SubWallet-Extension/issues/3870), [#4598](https://github.com/Koniverse/SubWallet-Extension/issues/4598)
+
+---
