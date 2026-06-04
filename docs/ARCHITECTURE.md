@@ -129,6 +129,52 @@ material and do not call chain APIs directly.
        └── Bitcoin:   bitcoinjs-lib
 ```
 
+### Runtime lifecycle & service coordination
+
+Under Manifest V3 the background is an evictable service worker, so the
+runtime implements an explicit four-state lifecycle (see AD-20). An
+`ActionHandler` (`extension-koni`) tracks open ports in a `connectionMap`
+and drives `KoniState` between states:
+
+| State | Trigger | What runs |
+|-------|---------|-----------|
+| Init | service worker boot | construct services, no chain connections |
+| Start Partially | first `pub(…)` / dApp message — `state.wakeup(false)` | minimal services for dApp requests |
+| Start Fully | `pri(…)` / `mobile(…)` message — `state.wakeup(true)` | all services booted together |
+| Sleep | last port disconnects → `SLEEP_TIMEOUT` (~60s) → `state.sleep()` | services stopped in order, all networks paused |
+
+`KoniState` exposes a `ServiceStatus` (INITIALIZING / STARTING / STARTED /
+STARTING_FULL / STARTED_FULL / STOPPING / STOPPED) so wake/sleep are
+idempotent and overlapping transitions are awaited rather than raced. On
+sleep, services are torn down in a fixed order and networks paused; a
+`HeartBeat` (`extension-koni`) keeps the service worker alive while
+connections are open, countering Chrome's ~5-minute idle eviction.
+
+Services coordinate through a central RxJS-backed `EventService` whose
+awaitable promises (`waitAppInitialized`, `waitAppStart`,
+`waitAppStartFull`) let services block until the runtime reaches the
+required state before acting. Event emission is lazy-batched: events are
+queued and flushed on a debounce timer with two tiers
+(`DEFAULT_LAZY_TIME` 300ms vs `LONG_LAZY_TIME` 900ms for `LONG_LAZY_EVENTS`)
+to coalesce bursts.
+
+The lifecycle profile differs per runtime: the extension follows the full
+MV3 Init/Partial/Full/Sleep machine; mobile re-injects reset data then
+always full-starts; the web app full-starts on load with no sleep state.
+
+**Transaction & request subsystem.** Transaction handling is split across
+three cooperating services. `TransactionService` validates, routes,
+submits, and caches transactions; `RequestService` manages every
+approval-required request (auth, sign-message, sign-tx) from in-app,
+dApp-inject, and WalletConnect sources, owning popup open/close and
+approve/reject; `HistoryService` records in-app submissions and merges
+them with history fetched from per-chain third-party indexers (Subscan for
+Substrate, Blockstream for Bitcoin, taostats for Bittensor). In-app flows
+go UI → TransactionService → RequestService → sign → submit →
+HistoryService; dApp/WC flows go straight to RequestService. `RequestService`
+fans out to per-ecosystem request handlers behind a shared `PopupHandler`
+(see AD-21).
+
 ## Data layer
 
 | Store | Technology | Scope | Persistence |
@@ -263,6 +309,10 @@ update before tagging.
 | AD-17 | Multisig account model | Multisig uses native pallet extrinsics (`as_multi` / `approveAsMulti`) with role-differentiated actions, deterministic off-chain account creation (no on-chain tx), and on-chain pending-tx detection without an indexer; scoped to Polkadot Substrate chains in Phase 1 | Pallet-native multisig needs no custodial service; off-chain/indexer-free design ships without new backend infrastructure | CONTEXT D48, D54, D55, D56; issues #4696, #4843 |
 | AD-18 | XCM delegated to ParaSpell (build-vs-buy) | Delegate XCM transfer construction to the ParaSpell API and upgrade through its versions (v4 → v5 → v1 API) rather than building in-house or self-hosting | Building/forking XCM logic would require tracking every Polkadot runtime upgrade; staying on the official API inherits ParaSpell's ecosystem tracking | CONTEXT D28, D44, D45; issues #3416, #4979 |
 | AD-19 | Backend proxy for third-party API keys | Route third-party data-provider calls (Blockfrost, Bitcoin indexer, etc.) through a Koni-hosted backend proxy instead of calling them directly from the client | Hides API keys from the shipped bundle and lets the provider be swapped (e.g. Koni-hosted → Blockstream) without an extension release | CONTEXT D36, D42; issues #4112, #4368 |
+| AD-20 | Four-state MV3 background lifecycle with heartbeat | Drive the service worker through Init → Start-Partially → Start-Fully → Sleep via an `ActionHandler` + `connectionMap`; `pub(…)` wakes partially, `pri(…)`/`mobile(…)` wakes fully, last disconnect sleeps after `SLEEP_TIMEOUT`; a `HeartBeat` keeps the worker alive while ports are open | MV3 evicts idle service workers (~5 min), so the runtime needs explicit wake/sleep with a `ServiceStatus` machine to make transitions idempotent and avoid starting all chains for a request that only needs a few | `extension-koni` `ActionHandler`, `HeartBeat`; `State.ts` `generalStatus`; realises AD-08 |
+| AD-21 | Per-ecosystem request-handler abstraction in RequestService | `RequestService` fans approval-required requests out to dedicated handlers (Auth, Metadata, Substrate, EVM, Bitcoin, TON, Cardano, plus WalletConnect connect/unsupported) behind a shared `PopupHandler`, each owning its own pending-request cache | Each ecosystem has a different signing payload and approval shape; isolating them keeps one signing surface per chain family while sharing the popup/approve/reject plumbing | `services/request-service/handler/*`; CONTEXT D13, D65 |
+| AD-22 | EarningService pool-handler class hierarchy | Model every yield mechanism through a `BasePoolHandler` inheritance tree: native staking (`BaseNativeStakingPoolHandler` → relay/para/Astar/Mythos/Tao subclasses), `NominationPoolHandler`, and `BaseSpecialStakingPoolHandler` → liquid-staking / lending; data exposed via RxJS subjects, driven by account/chain/transaction events | A handler-per-pool-type tree is the extensibility seam for adding earning protocols without touching shared logic; matches the dTAO subnet model (D33) | `services/earning-service/handlers/*`; CONTEXT D33, D46 |
+| AD-23 | Static-data caching generated by a headless web-runner cron | Serve heavy, slow-changing data (earning pool info/targets, priority tokens, config) from the `SubWallet-Static-Content` repo via `fetchStaticData`; the cache is regenerated by a scheduled job that runs a `web-runner-cron` build of the extension in a headless browser and commits refreshed data | Polling this data live would hammer RPCs and slow the UI; running the real client headless reuses the actual background logic to produce the cache rather than reimplementing it server-side | `utils/fetchStaticData`; CONTEXT D46 |
 
 Individual decisions are recorded in [CONTEXT.md](CONTEXT.md).
 Link new architecture decisions from CONTEXT.md here as they are recorded.
