@@ -6,10 +6,6 @@
 
 ---
 
----
-
----
-
 ## Phase 0 — Foundation & Early Architecture (2022, shipped v0.3.x–v0.5.x)
 
 ### D1. Fork polkadot-js extension rather than copying code
@@ -114,10 +110,6 @@
 **Version**: pre-v0.6.x
 
 **Citations**: [#504](https://github.com/Koniverse/SubWallet-Extension/issues/504)
-
----
-
----
 
 ---
 
@@ -410,8 +402,6 @@
 
 ---
 
----
-
 ## Phase 2 — Earning Rebrand, TON & Cardano Integration, XCM/i18n Tooling (2024, shipped v1.1.x–v1.2.x)
 
 ### D20. Native Substrate Path for TAO Staking (Not EVM)
@@ -425,11 +415,6 @@
 **Date**: 2024-01-22
 **Version**: v1.3.x (Milestone 8)
 **Citations**: [#2505](https://github.com/Koniverse/SubWallet-Extension/issues/2505), [#4901](https://github.com/Koniverse/SubWallet-Extension/issues/4901)
-
-
----
-
----
 
 ---
 
@@ -487,9 +472,6 @@
 **Version**: v1.3.x (Milestone 8 Experiment)
 **Citations**: [#3394](https://github.com/Koniverse/SubWallet-Extension/issues/3394), [#3455](https://github.com/Koniverse/SubWallet-Extension/issues/3455), [#3384](https://github.com/Koniverse/SubWallet-Extension/issues/3384)
 
-
----
-
 ---
 
 ### D24. GRC-20 token type renamed to VFT (Vara Fungible Token)
@@ -525,9 +507,6 @@
 **Version**: v1.3.x (Milestone 8 Experiment)
 **Citations**: [#3449](https://github.com/Koniverse/SubWallet-Extension/issues/3449), [#3455](https://github.com/Koniverse/SubWallet-Extension/issues/3455), [#3384](https://github.com/Koniverse/SubWallet-Extension/issues/3384)
 
-
----
-
 ---
 
 ### D26. User-Selectable WalletContract Version (v3r1/v3r2/v4/v5), Default v5
@@ -542,9 +521,6 @@
 **Date**: 2024-08-26
 **Version**: v1.3.x (Milestone 8 Experiment)
 **Citations**: [#3512](https://github.com/Koniverse/SubWallet-Extension/issues/3512), [#3700](https://github.com/Koniverse/SubWallet-Extension/issues/3700), [#3449](https://github.com/Koniverse/SubWallet-Extension/issues/3449)
-
-
----
 
 ---
 
@@ -615,9 +591,6 @@
 **Version**: v1.3.x (Milestone 8 Experiment)
 **Citations**: [#3816](https://github.com/Koniverse/SubWallet-Extension/issues/3816), [#4164](https://github.com/Koniverse/SubWallet-Extension/issues/4164), [#4368](https://github.com/Koniverse/SubWallet-Extension/issues/4368)
 
-
----
-
 ---
 
 ### D31. Support Cardano Native Assets (CIP-26) Alongside ADA Transfers; Defer Staking/Delegation
@@ -632,15 +605,6 @@
 **Date**: 2024-11-23
 **Version**: v1.3.x (Milestone 8 Experiment)
 **Citations**: [#3862](https://github.com/Koniverse/SubWallet-Extension/issues/3862), [#3942](https://github.com/Koniverse/SubWallet-Extension/issues/3942), [#4016](https://github.com/Koniverse/SubWallet-Extension/issues/4016)
-
-
----
-
-## Multisig Decisions
-
----
-
----
 
 ---
 
@@ -680,9 +644,6 @@
 **Version**: v1.3.x (Milestone 8 / Milestone 9)
 **Citations**: [#4036](https://github.com/Koniverse/SubWallet-Extension/issues/4036), [#4145](https://github.com/Koniverse/SubWallet-Extension/issues/4145), [#4150](https://github.com/Koniverse/SubWallet-Extension/issues/4150), [#4151](https://github.com/Koniverse/SubWallet-Extension/issues/4151), [#4520](https://github.com/Koniverse/SubWallet-Extension/issues/4520)
 
-
----
-
 ---
 
 ### D34. Integrate Meld All-in-One Wizard directly (supersedes standalone Meld research task)
@@ -718,9 +679,6 @@
 **Version**: v1.3.x (Milestone 9)
 **Citations**: [#4100](https://github.com/Koniverse/SubWallet-Extension/issues/4100), [#4352](https://github.com/Koniverse/SubWallet-Extension/issues/4352)
 
-
----
-
 ---
 
 ### D36. Bitcoin data/indexer strategy — Koni-hosted API first, migrating to Blockstream public API
@@ -737,9 +695,6 @@
 **Version**: v1.3.42
 **Citations**: [#4112](https://github.com/Koniverse/SubWallet-Extension/issues/4112), [#4162](https://github.com/Koniverse/SubWallet-Extension/issues/4162), [#4619](https://github.com/Koniverse/SubWallet-Extension/issues/4619), [#4991](https://github.com/Koniverse/SubWallet-Extension/issues/4991), [#4997](https://github.com/Koniverse/SubWallet-Extension/issues/4997)
 
-
----
-
 ---
 
 ### D37. Bitcoin integrated into the existing Unified Account model (Substrate + EVM + TON + Cardano + BTC)
@@ -755,9 +710,6 @@
 **Version**: v1.3.42
 **Citations**: [#4184](https://github.com/Koniverse/SubWallet-Extension/issues/4184), [#4168](https://github.com/Koniverse/SubWallet-Extension/issues/4168), [#4201](https://github.com/Koniverse/SubWallet-Extension/issues/4201), [#4261](https://github.com/Koniverse/SubWallet-Extension/issues/4261)
 
-
----
-
 ---
 
 ### D38. Three Bitcoin address types (BIP44/BIP84/BIP86) supported simultaneously per account
@@ -772,9 +724,6 @@
 **Date**: 2025-04-01
 **Version**: v1.3.42
 **Citations**: [#4200](https://github.com/Koniverse/SubWallet-Extension/issues/4200), [#4168](https://github.com/Koniverse/SubWallet-Extension/issues/4168), [#4316](https://github.com/Koniverse/SubWallet-Extension/issues/4316), [#4414](https://github.com/Koniverse/SubWallet-Extension/issues/4414)
-
-
----
 
 ---
 
@@ -812,9 +761,6 @@
 **Version**: v1.3.54
 **Citations**: [#4245](https://github.com/Koniverse/SubWallet-Extension/issues/4245), [#4598](https://github.com/Koniverse/SubWallet-Extension/issues/4598), [PR #4477](https://github.com/Koniverse/SubWallet-Extension/pull/4477), [PR #4397](https://github.com/Koniverse/SubWallet-Extension/pull/4397)
 
-
----
-
 ---
 
 ### D41. Use Subsquare API as the primary data source for referenda content and metadata
@@ -829,9 +775,6 @@
 **Date**: 2025-04-28
 **Version**: v1.3.x (Milestone 9)
 **Citations**: [#2222](https://github.com/Koniverse/SubWallet-Extension/issues/2222), [#4257](https://github.com/Koniverse/SubWallet-Extension/issues/4257), [#4678](https://github.com/Koniverse/SubWallet-Extension/issues/4678), [#4722](https://github.com/Koniverse/SubWallet-Extension/issues/4722)
-
-
----
 
 ---
 
@@ -848,9 +791,6 @@
 **Version**: v1.3.x (Milestone 9)
 **Citations**: [#4368](https://github.com/Koniverse/SubWallet-Extension/issues/4368)
 
-
----
-
 ---
 
 ### D43. Crosschain BTC swap via Chainflip (BTC ↔ DOT) and Optimex (BTC ↔ ETH); 1-click BTC ↔ tBTC deferred
@@ -865,8 +805,6 @@
 **Date**: 2025-06-23
 **Version**: v1.3.50
 **Citations**: [#4467](https://github.com/Koniverse/SubWallet-Extension/issues/4467), [#4496](https://github.com/Koniverse/SubWallet-Extension/issues/4496), [#4517](https://github.com/Koniverse/SubWallet-Extension/issues/4517), [#4573](https://github.com/Koniverse/SubWallet-Extension/issues/4573), [#4595](https://github.com/Koniverse/SubWallet-Extension/issues/4595), [PR #4574](https://github.com/Koniverse/SubWallet-Extension/pull/4574), [PR #4637](https://github.com/Koniverse/SubWallet-Extension/pull/4637)
-
----
 
 ---
 
@@ -926,9 +864,6 @@
 **Version**: v1.3.x
 **Citations**: [#4623](https://github.com/Koniverse/SubWallet-Extension/issues/4623), [#3809](https://github.com/Koniverse/SubWallet-Extension/issues/3809), [#4058](https://github.com/Koniverse/SubWallet-Extension/issues/4058)
 
-
----
-
 ---
 
 ### D47. Phased delegation rollout — delegation deferred to Phase 2 of OpenGov implementation
@@ -958,9 +893,6 @@
 **Date**: 2025-09-22
 **Version**: v1.3.x (Milestone 10)
 **Citations**: [#4696](https://github.com/Koniverse/SubWallet-Extension/issues/4696), [#1677](https://github.com/Koniverse/SubWallet-Extension/issues/1677)
-
-
----
 
 ---
 
@@ -998,9 +930,6 @@
 **Version**: v1.3.x (Milestone 9)
 **Citations**: [#1676](https://github.com/Koniverse/SubWallet-Extension/issues/1676), [#4725](https://github.com/Koniverse/SubWallet-Extension/issues/4725), [#4777](https://github.com/Koniverse/SubWallet-Extension/issues/4777)
 
-
----
-
 ---
 
 ### D51. Proxy signing via "Sign Selector" popup on existing transaction flows — no separate proxy-initiated flow
@@ -1015,9 +944,6 @@
 **Date**: 2025-10-14
 **Version**: v1.3.x (Milestone 9)
 **Citations**: [#4779](https://github.com/Koniverse/SubWallet-Extension/issues/4779), [#4782](https://github.com/Koniverse/SubWallet-Extension/issues/4782), [#4783](https://github.com/Koniverse/SubWallet-Extension/issues/4783), [#4942](https://github.com/Koniverse/SubWallet-Extension/issues/4942)
-
-
----
 
 ---
 
@@ -1034,9 +960,6 @@
 **Version**: v1.3.x (Milestone 9)
 **Citations**: [#4729](https://github.com/Koniverse/SubWallet-Extension/issues/4729), [#4678](https://github.com/Koniverse/SubWallet-Extension/issues/4678)
 
-
----
-
 ---
 
 ### D53. Support Root Staking Reward Claim Options (Root Claim vs Alpha Claim)
@@ -1050,9 +973,6 @@
 **Date**: 2025-11-10
 **Version**: v1.3.x (Milestone 9)
 **Citations**: [#4829](https://github.com/Koniverse/SubWallet-Extension/issues/4829), [#4851](https://github.com/Koniverse/SubWallet-Extension/issues/4851), [#4852](https://github.com/Koniverse/SubWallet-Extension/issues/4852)
-
-
----
 
 ---
 
@@ -1083,9 +1003,6 @@
 **Version**: v1.3.x (Milestone 9/10)
 **Citations**: [#4838](https://github.com/Koniverse/SubWallet-Extension/issues/4838), [#4841](https://github.com/Koniverse/SubWallet-Extension/issues/4841)
 
-
----
-
 ---
 
 ### D56. On-Chain Pending-Transaction Detection Without an Indexer in Phase 1; Indexer Integration Deferred to Phase 2
@@ -1101,9 +1018,6 @@
 **Version**: v1.3.x (Milestone 9)
 **Citations**: [#4842](https://github.com/Koniverse/SubWallet-Extension/issues/4842), [#4839](https://github.com/Koniverse/SubWallet-Extension/issues/4839)
 
-
----
-
 ---
 
 ### D57. No display of reverse "proxied-by" relationship in the Manage Proxies screen
@@ -1117,9 +1031,6 @@
 **Date**: 2025-12-05
 **Version**: v1.3.x (Milestone 9)
 **Citations**: [#4725](https://github.com/Koniverse/SubWallet-Extension/issues/4725)
-
-
----
 
 ---
 
@@ -1135,11 +1046,6 @@
 **Version**: v1.3.x
 **Citations**: [#4899](https://github.com/Koniverse/SubWallet-Extension/issues/4899), [#3855](https://github.com/Koniverse/SubWallet-Extension/issues/3855)
 
-
----
-
-## TON
-
 ---
 
 ### D59. Scope proxy support to Substrate (Polkadot pallet) accounts only — exclude EVM solo and Ledger EVM
@@ -1154,8 +1060,5 @@
 **Date**: 2025-12-30
 **Version**: v1.3.x (Milestone 9 / 10 boundary)
 **Citations**: [#4725](https://github.com/Koniverse/SubWallet-Extension/issues/4725), [#4935](https://github.com/Koniverse/SubWallet-Extension/issues/4935)
-
-
----
 
 ---
