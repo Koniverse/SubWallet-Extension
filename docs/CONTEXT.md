@@ -527,7 +527,7 @@
 
 ---
 
-## Phase 3 — Bitcoin, Cardano, Multi-chain Ecosystem (2025-01-01, shipped v1.3.x)
+## Phase 3 — Swap/XCM Consolidation & Feature Pruning (2025-01-01, shipped v1.3.x)
 
 ### D26. Cancel dynamic swap pair support (Milestone 8 Cancel)
 
