@@ -402,7 +402,7 @@
 
 ---
 
-## Phase 2 — Earning, Swap, and Multi-chain Expansion (2024-02-01, shipped v1.1.x–v1.2.x)
+## Phase 2 — Earning Rebrand, XCM Bridge, i18n & Fiat Tooling (2024-02-01, shipped v1.1.x–v1.2.x)
 
 ### D20. Rename "Staking" feature to "Earning" across all platforms
 
