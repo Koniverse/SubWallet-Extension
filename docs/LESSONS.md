@@ -535,4 +535,82 @@ See [#4987](https://github.com/Koniverse/SubWallet-Extension/issues/4987), [#402
 
 ---
 
+## 35. Manifest V3 migration trades RAM for responsiveness — treat higher memory as a known cost
+
+**What happened**: A controlled test (MV2 1.1.35 vs MV3-with-Earning, identical 33-network / all-accounts setup) showed MV3 feels more responsive but uses markedly more RAM: ~78–102 MB idle, rising to 360–600 MB once a popup/view is open, versus ~280–400 MB on MV2. RAM only dropped materially when networks were reduced to Polkadot + Kusama.
+
+**Why**: The MV3 service worker itself costs more than the old persistent background page, and memory is dominated by live chain connections, not by the migration per se. This is a vendor-driven cost of the MV3 model, not a leak to "fix".
+
+**How to avoid**:
+- Do not treat MV3 RAM as a regression to chase down; treat chain-connection count as the real lever (see AD-20 lifecycle, which only connects chains a request needs).
+- Use middleware to limit unneeded chain connections and a lightweight connection mode for balance-only queries (see AD-07).
+- When profiling memory, fix the network/account set first — comparisons are meaningless otherwise.
+
+See internal report "Manifest V3 Performance Test" (Notion); related AD-07, AD-08, AD-20.
+
+## 36. Chrome silently disables the extension after an update that increases permissions — never raise permissions in a routine release
+
+**What happened**: When an extension update adds a sensitive Chrome permission, the Chrome Web Store silently disables the extension and shows the user only a one-time toolbar notification; many users then uninstall. A disabled extension still receives version updates but runs no logic.
+
+**Why**: Chrome's permission-increase flow requires explicit user re-enable. Worse, `uninstall_url` can no longer be updated via manifest (removed in Chrome 69) nor set from a disabled background, and re-marking the permission optional does not clear the warning — so there is no clean in-product recovery once it happens.
+
+**How to avoid**:
+- Avoid adding sensitive permissions in routine updates; batch and justify any permission change deliberately.
+- If a permission increase is unavoidable, validate the upgrade prompt on a staging extension first and prepare user-recovery messaging out-of-band (the disabled extension cannot message users itself).
+
+See internal report "[Extension] Xử lý sau khi update permission" (Notion).
+
+## 37. WalletConnect dApps hide wallets not registered in the WC dashboard — registration is part of the integration
+
+**What happened**: SubWallet did not appear in some dApps' WalletConnect wallet picker even though the integration worked end-to-end when connected manually.
+
+**Why**: The omission was dApp-side filtering, not a SubWallet bug: dApps pass a `chains` list and only show wallets that are registered (and chain-matched) via the WalletConnect dashboard. This is distinct from the EIP-6963 multi-wallet and missing-RPC-method causes already in §8 / §28.
+
+**How to avoid**:
+- Treat WC dashboard registration (supported chains, desktop-wallet entry, dApp whitelisting) as a required deliverable of the integration, not an afterthought.
+- When "wallet not listed" is reported, check dashboard/whitelist registration before debugging the connection code.
+
+See [#2407](https://github.com/Koniverse/SubWallet-Extension/issues/2407), [#4598](https://github.com/Koniverse/SubWallet-Extension/issues/4598); internal report "Wallet connect không hiển thị SW" (Notion).
+
+## 38. Native-module / WASM libraries must be validated against the mobile web-runner — gate features per platform
+
+**What happened**: On a web-runner/library upgrade, Cardano broke on mobile. `@emurgo/cardano-serialization-lib-nodejs` and `@emurgo/cardano-message-signing-browser` ship WASM that React Native does not support, and the mobile bridge `@emurgo/csl-mobile-bridge` exposes a different interface incompatible with the shared background.
+
+**Why**: The shared `extension-base` background assumes a browser/Node WASM environment; the mobile web-runner runs under React Native, where WASM and some native modules are unavailable or have divergent interfaces.
+
+**How to avoid**:
+- Validate any WASM/native-module dependency against the React Native web-runner before bumping it.
+- Be prepared to patch packages (`@subwallet/keyring`, `@subwallet/extension-base`) to a mobile bridge and to gate the affected feature per platform (Cardano account create/import was disabled on mobile until interfaces reconciled).
+- Maintain the "special handling when updating web-runner" checklist (see SETUP) as the gate for these bumps.
+
+See internal reports "Xử lý thư viện cho Cardano" and "Các nội dung xử lý đặc biệt khi Update web-runner" (Notion).
+
+## 39. Online-content publish workflows must validate required parameters — a misfire pushes live to all users with no review gate
+
+**What happened**: A `SubWallet-Static-Content` GitHub Action was triggered missing parameters and published unintended changes across online resources (airdrop campaigns archived, buy-token list, crowdloan, chain-assets) — some acceptable, others not.
+
+**Why**: Static content is pulled by the extension at runtime, so a workflow misfire reaches all users immediately with no per-change review. The action did not validate that required parameters were present before running.
+
+**How to avoid**:
+- Block online-content actions that are missing required parameters; fail closed, not open.
+- When a misfire happens, audit every changed resource type to scope impact before remediating.
+- Complements §26 (always bundle a static fallback) and §32 (guard against undefined campaign data).
+
+See [#2322](https://github.com/Koniverse/SubWallet-Extension/issues/2322); internal report "Các thay đổi trên Static Content do trigger nhầm" (Notion).
+
+## 40. A chain-connector migration must run both stacks in parallel and gate the new client per chain
+
+**What happened**: An experiment to migrate the chain connector from polkadot-js `ApiPromise` to Dedot found that the new `DedotClient` (chainHead / JSON-RPC v2) fails or hangs on many RPCs ("No methods found with prefix chainHead"; unresponsive nodes), requiring a hardcoded whitelist of ~90 chains to fall back to `LegacyClient`.
+
+**Why**: Real-world RPC nodes vary widely in JSON-RPC v2 support, and several SubWallet code paths assume polkadot-js behaviour: `DedotClient` vs `LegacyClient` differ on `.entries()` / `pagedEntries()`, Dedot uses BigInt for values, there is no `derive` (crowdloan), and Vara's `GearApi` cannot move yet.
+
+**How to avoid**:
+- Keep both connector stacks live during a migration and per-chain-gate the new client (whitelist/fallback), rather than flipping globally.
+- Audit numeric handling (BigInt) and removed APIs (`derive`) before switching a code path.
+- Drop outdated V12/V13 RPCs rather than special-casing them indefinitely.
+
+See [#4143](https://github.com/Koniverse/SubWallet-Extension/issues/4143); internal report "Dedot Experiment" (Notion).
+
+---
+
 _End of LESSONS.md_
