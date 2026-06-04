@@ -125,7 +125,75 @@ branches; all changes via PR; CI must pass before merge).
 
 ---
 
-## 7. Reference
+## 7. Related repositories & release processes
+
+The extension consumes data and config from sibling repos. Working on a
+feature often means touching one of these too.
+
+### SubWallet-ChainList (chains, tokens, XCM pairs)
+
+- **Build tooling is migrating** from the polkadot/dev (Yarn) setup to
+  **Vite** (`vite.config.ts`) orchestrated by **Nx** (`nx.json`). When
+  working on chain-list, re-verify after the migration that: data scripts
+  still fetch from Strapi, the beta/patch `build` output installs cleanly
+  into the extension/monorepo, and `ci.yml` still gates malformed PRs.
+  This differs from the extension's own Webpack + Yarn 3 build (§4).
+- **Release types**: *Version* — verify patch changes, check the PR, merge
+  to `dev`, ensure the final chain-list version is stable on
+  `subwallet-dev`, then bump the patch version. *Patch* — verify the patch
+  is set up on the correct version across `test-patch`, `subwallet-dev`,
+  and `master`, verify PR + dev build, then release to stable. Online
+  chain-list patches are published to `SubWallet-Static-Content` and pulled
+  by the extension at runtime.
+- **Required Strapi fields** when adding a token/network (omitting these
+  breaks balance/history/auto-enable): `chainBalanceSlug` (auto-enable on
+  balance detection via Subscan multiChain API), `subscanSlug` (online tx
+  history), `priceId` + `multiChainAsset` grouping (price + same-symbol
+  grouping), and for Cardano tokens `cardanoId = policyId + hexName`.
+  Useful asset flags: `autoEnable`, `isBridged`, `isSufficient`,
+  `disableEvmTransfer`, `paraSpell*` (XCM), `netuid` (Bittensor subnet),
+  `isGigaToken` (Hydration). Renaming a token means changing its slug and
+  migrating `assetSetting` in the extension.
+
+### SubWallet-Static-Content (online content)
+
+Pulled at runtime via `fetchStaticData` for buy-token configs, chain-asset
+priority, campaign data, and earning static data (see AD-23). Publishing is
+via GitHub Actions — these **must** be triggered with all required
+parameters; a misfire pushes live to all users with no review gate
+(see LESSONS §39).
+
+### Web-runner update checklist
+
+The mobile app runs `extension-base` inside a React Native web-runner.
+Before bumping a WASM/native-module dependency, validate it against the
+web-runner (React Native has no WASM and some native modules differ) — see
+LESSONS §38. Keep the "special handling when updating web-runner" checklist
+current as the gate for these bumps.
+
+### i18n text→key migration
+
+Migrating hardcoded strings to i18n keys (distinct from the Texterify
+adoption in CONTEXT D27) is a scripted, AI-assisted pipeline: extract with
+`i18next-scanner` → derive AI-summarised key names in the
+`[prefix].[module].[submodule].[section].[element]` convention (prefix
+`bg.` / `ui.`) → combine into a mapping JSON → apply with `replace-in-file`
+→ review + self-test (lint + scan + old-vs-new key count). Template/variable
+keys and many `Trans` components must be handled manually; `detectTranslate`
+marks strings for the scanner.
+
+### Mobile deep links (QA)
+
+The mobile app exposes a `subwallet://` scheme used for QA / feature entry,
+e.g. `subwallet://browser?url=…`,
+`subwallet://home/main/tokens/token-groups-detail?slug=DOT-Polkadot`,
+`subwallet://home/main/earning/earning-pool-list?group=…&symbol=…`,
+`subwallet://drawer/transaction-action/swap?slug=…`,
+`subwallet://account-detail?address=…`.
+
+---
+
+## 8. Reference
 
 - `AGENTS.md` — canonical project guide (monorepo layout, tech stack, conventions).
 - `CONTRIBUTING.md` — contributor rules and PR/review process.
