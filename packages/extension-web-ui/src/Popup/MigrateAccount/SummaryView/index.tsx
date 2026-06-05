@@ -109,7 +109,8 @@ function Component ({ className = '', onClickFinish, resultProxyIds }: Props) {
                       <a
                         className='__link'
                         href={'https://docs.subwallet.app/main/extension-user-guide/account-management/migrate-solo-accounts-to-unified-accounts'}
-                        target='__blank'
+                        target='_blank'
+                        rel="noopener noreferrer"
                       />
                     )
                   }}
