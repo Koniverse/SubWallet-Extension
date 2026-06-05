@@ -70,17 +70,19 @@ Key inferred advantages traceable to corpus:
 
 No dedicated persona research document was found in the corpus. The following four personas are inferred with LOW confidence from product positioning, feature set, and design intent. A product input session is needed to validate, rank, and refine them.
 
-**Primary user: Multi-Chain DeFi Participant**
-- A crypto user actively engaged in two or more blockchain ecosystems (e.g., holds DOT on Polkadot and ETH/ERC-20s on Ethereum, uses dApps across both).
-- Pain point: managing multiple wallet extensions simultaneously, bridging assets across chains, signing multiple approvals for a single DeFi action.
-- Job to be done: access all assets and earn/stake/swap across chains without juggling multiple extensions or tracking which token lives on which chain.
-- Evidence: Unified Account design doc explicitly names multi-wallet fragmentation as the problem to solve; the Earning and Swap feature sets target active yield-seeking behavior; cross-chain swap routing (Bridge-Swap-Bridge) addresses multi-hop DeFi flows.
+> **Ranking note (corrected against public positioning):** SubWallet's public-facing identity is Polkadot-first — the Chrome Web Store listing is literally titled "SubWallet - Polkadot Wallet", the documentation lives under a Polkadot-Wallet brand, and Polkadot-area features (staking, OpenGov, XCM) are the largest areas in the product history. The Polkadot-native user is therefore the **anchor persona by current branding**, while the multi-chain DeFi user represents the **growth/expansion direction** the Unified Account and five-ecosystem breadth are built toward. The two are treated below as **co-primary**, with the Polkadot persona reflecting present market identity and the multi-chain persona reflecting product ambition. (Chrome Web Store: "SubWallet - Polkadot Wallet"; docs.subwallet.app)
 
-**Secondary user: Polkadot Ecosystem Participant**
+**Co-primary user (anchor / current identity): Polkadot Ecosystem Participant**
 - A DOT/KSM holder or parachain community member who stakes, votes via OpenGov, and participates in crowdloans/parachain activity.
 - Pain point: Polkadot.js is developer-grade and does not surface nomination, pool staking, and governance voting in an accessible UI; other consumer wallets lack Polkadot-native features.
 - Job to be done: stake DOT easily, vote on referenda, track rewards, and manage parachain assets — all without CLI tools or developer-grade interfaces.
-- Evidence: SubWallet is built atop Polkadot.js but provides consumer-facing staking, OpenGov voting, and XCM transfer UI. Polkadot-area features represent the largest single area in the product history (staking: 60 entries, bridge-xcm: 41 entries). (docs.subwallet.app: Core Capabilities; product-history)
+- Evidence: SubWallet is built atop Polkadot.js but provides consumer-facing staking, OpenGov voting, and XCM transfer UI. Polkadot-area features represent the largest single area in the product history (staking: 60 entries, bridge-xcm: 41 entries). The product is publicly branded and listed as "SubWallet - Polkadot Wallet". (docs.subwallet.app: Core Capabilities; Chrome Web Store; product-history)
+
+**Co-primary user (growth direction): Multi-Chain DeFi Participant**
+- A crypto user actively engaged in two or more blockchain ecosystems (e.g., holds DOT on Polkadot and ETH/ERC-20s on Ethereum, uses dApps across both).
+- Pain point: managing multiple wallet extensions simultaneously, bridging assets across chains, signing multiple approvals for a single DeFi action.
+- Job to be done: access all assets and earn/stake/swap across chains without juggling multiple extensions or tracking which token lives on which chain.
+- Evidence: Unified Account design doc explicitly names multi-wallet fragmentation as the problem to solve; the Earning and Swap feature sets target active yield-seeking behavior; cross-chain swap routing (Bridge-Swap-Bridge) addresses multi-hop DeFi flows. This persona reflects the five-ecosystem expansion (TON, Cardano, Bitcoin added alongside the Polkadot/EVM base) rather than the current Polkadot-first public identity.
 
 **NFT / Web3 Explorer** (mentioned, lower confidence)
 - User active in NFT collections and dApps across EVM chains and Polkadot; needs a single display layer for multi-chain NFTs and wants to transfer them without switching wallets. Evidence: NFT management is a core feature with 31 issue entries and broad collection integrations. (product-history: nft area)
@@ -90,9 +92,25 @@ No dedicated persona research document was found in the corpus. The following fo
 
 ## Success Criteria
 
-_Pending product input — no KPIs / north-star metrics documented yet._
+Internal KPIs / north-star metrics are pending product input. The table below lists **publicly observable traction metrics** as point-in-time proxies (observed outcomes, not product-set targets).
+
+| Dimension | Observed proxy metric (public, point-in-time) | Source |
+|---|---|---|
+| Adoption | ~200,000 extension users | Chrome Web Store ("SubWallet - Polkadot Wallet") |
+| User satisfaction | 4.6 / 5 average rating across 159 ratings | Chrome Web Store reviews |
+| Ecosystem coverage | 5 ecosystems; 200+ networks; 450+ tokens | docs.subwallet.app: Introduction |
+
+_Store figures verified live as of 2026-06 (extension v1.3.80). These move over time — re-check the live listing before any external use._
+
+**Candidate north-star / KPI directions to validate with product** (inferred, not documented):
+- Growth: monthly active wallets and new-account activation rate
+- Engagement: share of users performing an on-chain action (stake / swap / vote) vs. hold-only
+- Retention: 30-day return rate; cross-ecosystem usage (users active on ≥2 ecosystems)
+- Quality: sustained store rating ≥ 4.5; support-ticket / phishing-incident rate
 
 ## Scope
+
+> **Count discrepancy note**: SubWallet's own pages cite different coverage figures — the Introduction page states "200+ networks / 450+ tokens", while other documentation/listing pages state "150+ networks / 450+ tokens / 80+ dApps". The "200+ networks" figure is used throughout this brief; treat all such counts as directional and verify against the live listing before external use.
 
 ### In Scope (MVP — shipped and ready)
 
