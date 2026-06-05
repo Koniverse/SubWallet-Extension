@@ -132,6 +132,10 @@ export const getChainsByAccountAll = (accountAllProxy: AccountProxy, accountProx
   const result: string[] = [];
 
   if (!specialChain) {
+    const bitcoinAccountTypes = accountTypes.filter((type) => BitcoinMainnetKeypairTypes.includes(type) || BitcoinTestnetKeypairTypes.includes(type));
+    const isOnlyBitcoinMainnet = bitcoinAccountTypes.every((type) => BitcoinMainnetKeypairTypes.includes(type));
+    const isOnlyBitcoinTestnet = bitcoinAccountTypes.every((type) => BitcoinTestnetKeypairTypes.includes(type));
+
     Object.values(chainInfoMap).forEach((chainInfo) => {
       const isAllowed = chainTypes.some((chainType) => {
         const specialChains = specialChainRecord[chainType];
@@ -140,9 +144,6 @@ export const getChainsByAccountAll = (accountAllProxy: AccountProxy, accountProx
       });
 
       if (isAllowed) {
-        const bitcoinAccountTypes = accountTypes.filter((type) => BitcoinMainnetKeypairTypes.includes(type) || BitcoinTestnetKeypairTypes.includes(type));
-        const isOnlyBitcoinMainnet = bitcoinAccountTypes.every((type) => BitcoinMainnetKeypairTypes.includes(type));
-        const isOnlyBitcoinTestnet = bitcoinAccountTypes.every((type) => BitcoinTestnetKeypairTypes.includes(type));
         const isBitcoinChain = !!chainInfo && _isChainBitcoinCompatible(chainInfo);
 
         if (isBitcoinChain) {
