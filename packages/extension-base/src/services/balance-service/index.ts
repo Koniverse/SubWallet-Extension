@@ -28,7 +28,7 @@ import { _BALANCE_CHAIN_GROUP } from '../chain-service/constants';
 import { CreateXcmExtrinsicProps } from './transfer/xcm';
 import { _isAcrossChainBridge, getAcrossQuote } from './transfer/xcm/acrossBridge';
 import { BalanceMapImpl } from './BalanceMapImpl';
-import { subscribeBalance } from './helpers';
+import { subscribeBalance, subscribeBalanceByChainInfo } from './helpers';
 
 /**
  * Balance service
@@ -441,23 +441,40 @@ export class BalanceService implements StoppableServiceInterface {
 
   /** Subscribe area */
 
-  private _unsubscribeBalance: VoidFunction | undefined;
+  // One live subscription per chain, keyed by chain slug. `signature` captures the
+  // (addresses + visible tokens) the chain was subscribed with, so we can diff and only
+  // re-subscribe the chains that actually changed instead of tearing everything down.
+  private _chainBalanceSubs: Map<string, { signature: string; cancel: () => void }> = new Map();
+  private _unsubscribeMantaPay: VoidFunction | undefined;
+  // Serialize runs so two overlapping calls can't double-subscribe the same chain.
+  private _subscribeChain: Promise<void> = Promise.resolve();
 
-  /** Subscribe balance subscription */
-  async runSubscribeBalances () {
+  /** Subscribe balance subscription (diff-based: only add/remove the chains that changed) */
+  async runSubscribeBalances (force = false) {
+    this._subscribeChain = this._subscribeChain
+      .catch(() => undefined)
+      .then(() => this.diffSubscribeBalances(force));
+
+    return this._subscribeChain;
+  }
+
+  private async diffSubscribeBalances (force = false) {
     await Promise.all([this.state.eventService.waitKeyringReady, this.state.eventService.waitChainReady]);
-    this.runUnsubscribeBalances();
 
     const addresses = this.state.keyringService.context.getDecodedAddresses();
 
     if (!addresses.length) {
+      this.runUnsubscribeBalances();
+
       return;
     }
 
-    // Reset balance before subscribe
-    await this.handleResetBalance();
+    // Force a full rebuild (e.g. manual refresh after wiping balances): drop existing
+    // subscriptions inside the serialized run so the diff below re-subscribes everything.
+    if (force) {
+      this.runUnsubscribeBalances();
+    }
 
-    let cancel = false;
     const assetMap = this.state.chainService.getAssetRegistry();
     const chainInfoMap = this.state.chainService.getChainInfoMap();
     const evmApiMap = this.state.chainService.getEvmApiMap();
@@ -465,25 +482,96 @@ export class BalanceService implements StoppableServiceInterface {
     const tonApiMap = this.state.chainService.getTonApiMap();
     const cardanoApiMap = this.state.chainService.getCardanoApiMap();
     const bitcoinApiMap = this.state.chainService.getBitcoinApiMap();
-    const activeChainSlugs = Object.keys(this.state.getActiveChainInfoMap());
+    const activeChainSlugs = new Set(Object.keys(this.state.getActiveChainInfoMap()));
     const assetState = this.state.chainService.subscribeAssetSettings().value;
-    const assets: string[] = Object.values(assetMap)
-      .filter((asset) => {
-        return activeChainSlugs.includes(asset.originChain) && assetState[asset.slug]?.visible;
-      })
-      .map((asset) => asset.slug);
 
-    const unsub = subscribeBalance(addresses, activeChainSlugs, assets, assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, cardanoApiMap, bitcoinApiMap, (result) => {
-      !cancel && this.setBalanceItem(result);
-    }, ExtrinsicType.TRANSFER_BALANCE);
+    // Visible tokens grouped by their origin chain.
+    const tokensByChain = new Map<string, string[]>();
 
-    const unsub2 = this.state.subscribeMantaPayBalance();
+    Object.values(assetMap).forEach((asset) => {
+      if (activeChainSlugs.has(asset.originChain) && assetState[asset.slug]?.visible) {
+        const list = tokensByChain.get(asset.originChain);
 
-    this._unsubscribeBalance = () => {
-      cancel = true;
-      unsub && unsub();
-      unsub2 && unsub2();
-    };
+        list ? list.push(asset.slug) : tokensByChain.set(asset.originChain, [asset.slug]);
+      }
+    });
+
+    // Drop balances for tokens that are no longer active/visible (targeted, not a full wipe).
+    await this.handleResetBalance();
+
+    const addressKey = [...addresses].sort().join(',');
+
+    // Desired per-chain descriptors with a signature for diffing.
+    const desired = new Map<string, { signature: string; tokens: string[] }>();
+
+    tokensByChain.forEach((tokens, chainSlug) => {
+      if (!tokens.length || !chainInfoMap[chainSlug]) {
+        return;
+      }
+
+      const sortedTokens = [...tokens].sort();
+      const signature = `${addressKey}|${sortedTokens.join(',')}`;
+
+      desired.set(chainSlug, { signature, tokens: sortedTokens });
+    });
+
+    // 1) Tear down chains that disappeared or whose signature changed.
+    for (const [chainSlug, entry] of this._chainBalanceSubs) {
+      const next = desired.get(chainSlug);
+
+      if (!next || next.signature !== entry.signature) {
+        entry.cancel();
+        this._chainBalanceSubs.delete(chainSlug);
+      }
+    }
+
+    // 2) Subscribe chains that are new or changed; leave unchanged chains untouched.
+    for (const [chainSlug, desc] of desired) {
+      if (this._chainBalanceSubs.has(chainSlug)) {
+        continue;
+      }
+
+      const chainInfo = chainInfoMap[chainSlug];
+      const chainAssetMap: Record<string, _ChainAsset> = {};
+
+      desc.tokens.forEach((slug) => {
+        if (assetMap[slug]) {
+          chainAssetMap[slug] = assetMap[slug];
+        }
+      });
+
+      let cancelled = false;
+
+      const unsubProm = subscribeBalanceByChainInfo({
+        addresses,
+        bitcoinApiMap,
+        callback: (result) => {
+          !cancelled && this.setBalanceItem(result);
+        },
+        cardanoApiMap,
+        chainAssetMap,
+        chainInfo,
+        evmApiMap,
+        extrinsicType: ExtrinsicType.TRANSFER_BALANCE,
+        substrateApiMap,
+        tonApiMap
+      }).catch((error): undefined => {
+        console.error(`Subscribe balance failed for chain ${chainSlug}:`, error);
+
+        return undefined;
+      });
+
+      const cancel = () => {
+        cancelled = true;
+        unsubProm.then((unsub) => unsub && unsub()).catch(console.error);
+      };
+
+      this._chainBalanceSubs.set(chainSlug, { signature: desc.signature, cancel });
+    }
+
+    // MantaPay depends on the current account; keep a single handle re-subscribed each run.
+    this._unsubscribeMantaPay && this._unsubscribeMantaPay();
+    this._unsubscribeMantaPay = this.state.subscribeMantaPayBalance();
   }
 
   async refreshBalanceForAddress (address: string, chain: string, asset: string, extrinsicType?: ExtrinsicType) {
@@ -526,17 +614,21 @@ export class BalanceService implements StoppableServiceInterface {
     });
   }
 
-  /** Unsubscribe balance subscription */
+  /** Unsubscribe balance subscription (tear down every per-chain subscription) */
   runUnsubscribeBalances () {
-    this._unsubscribeBalance && this._unsubscribeBalance();
-    this._unsubscribeBalance = undefined;
+    this._chainBalanceSubs.forEach((entry) => entry.cancel());
+    this._chainBalanceSubs.clear();
+    this._unsubscribeMantaPay && this._unsubscribeMantaPay();
+    this._unsubscribeMantaPay = undefined;
   }
 
   /** Reload balance subscription */
   async reloadBalance () {
     this.isReload = true;
     await this.handleResetBalance(true);
-    await this.runSubscribeBalances();
+    // Force a full rebuild: after wiping balances the diff would otherwise see unchanged
+    // signatures and skip re-subscribing, so nothing would refetch.
+    await this.runSubscribeBalances(true);
 
     await waitTimeout(1800);
     this.isReload = false;

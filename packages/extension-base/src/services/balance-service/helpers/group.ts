@@ -15,23 +15,43 @@ import BigN from 'bignumber.js';
 export const groupBalance = (items: BalanceItem[], address: string, token: string): BalanceItem => {
   const states = items.map((item) => item.state);
 
-  const sum = (selector: (i: BalanceItem) => string) => BigN.sum.apply(null, items.map(selector)).toFixed();
+  const aggregated = items.reduce((acc, item) => {
+    const lockedDetails = item.lockedDetails;
 
-  const staking = sum((i) => i.lockedDetails?.staking ?? '0');
-  const governance = sum((i) => i.lockedDetails?.governance ?? '0');
-  const democracy = sum((i) => i.lockedDetails?.democracy ?? '0');
-  const reserved = sum((i) => i.lockedDetails?.reserved ?? '0');
-  const others = sum((i) => i.lockedDetails?.others ?? '0');
+    return {
+      free: acc.free.plus(new BigN(item.free)),
+      locked: acc.locked.plus(new BigN(item.locked)),
+      staking: acc.staking.plus(new BigN(lockedDetails?.staking || '0')),
+      governance: acc.governance.plus(new BigN(lockedDetails?.governance || '0')),
+      democracy: acc.democracy.plus(new BigN(lockedDetails?.democracy || '0')),
+      reserved: acc.reserved.plus(new BigN(lockedDetails?.reserved || '0')),
+      others: acc.others.plus(new BigN(lockedDetails?.others || '0'))
+    };
+  }, {
+    free: new BigN(0),
+    locked: new BigN(0),
+    staking: new BigN(0),
+    governance: new BigN(0),
+    democracy: new BigN(0),
+    reserved: new BigN(0),
+    others: new BigN(0)
+  });
 
-  const hasLockedDetails = new BigN(staking).gt(0) || new BigN(governance).gt(0) || new BigN(democracy).gt(0) || new BigN(others).gt(0);
+  const hasLockedDetails = aggregated.staking.gt(0) || aggregated.governance.gt(0) || aggregated.democracy.gt(0) || aggregated.others.gt(0);
 
   return {
     address,
     tokenSlug: token,
-    free: sum((i) => i.free),
-    locked: sum((i) => i.locked),
+    free: aggregated.free.toFixed(),
+    locked: aggregated.locked.toFixed(),
     lockedDetails: hasLockedDetails
-      ? { staking, governance, democracy, reserved, others }
+      ? {
+        staking: aggregated.staking.toFixed(),
+        governance: aggregated.governance.toFixed(),
+        democracy: aggregated.democracy.toFixed(),
+        reserved: aggregated.reserved.toFixed(),
+        others: aggregated.others.toFixed()
+      }
       : undefined,
     state: states.every((item) => item === APIItemState.NOT_SUPPORT)
       ? APIItemState.NOT_SUPPORT

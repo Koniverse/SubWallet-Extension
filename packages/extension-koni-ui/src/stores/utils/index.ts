@@ -297,13 +297,17 @@ export const updatePrice = (data: PriceJson) => {
 export const subscribePrice = lazySubscribeMessage('pri(price.getSubscription)', null, updatePrice, updatePrice);
 
 export const updateBalance = (data: BalanceJson) => {
-  store.dispatch({ type: 'balance/update', payload: data.details });
+  addLazy('store:updateBalance', () => {
+    store.dispatch({ type: 'balance/update', payload: data.details });
+  }, 100, 500);
 };
 
 export const subscribeBalance = lazySubscribeMessage('pri(balance.getSubscription)', null, updateBalance, updateBalance);
 
 export const updateNftItems = (data: NftJson) => {
-  store.dispatch({ type: 'nft/updateNftItems', payload: data.nftList });
+  addLazy('store:updateNftItems', () => {
+    store.dispatch({ type: 'nft/updateNftItems', payload: data.nftList });
+  }, 100, 500);
 };
 
 export const subscribeNftItems = lazySubscribeMessage('pri(nft.getSubscription)', null, updateNftItems, updateNftItems);
@@ -315,7 +319,9 @@ export const updateNftCollections = (data: NftCollection[]) => {
 export const subscribeNftCollections = lazySubscribeMessage('pri(nftCollection.getSubscription)', null, updateNftCollections, updateNftCollections);
 
 export const updateStaking = (data: StakingJson) => {
-  store.dispatch({ type: 'staking/updateStaking', payload: data.details });
+  addLazy('store:updateStaking', () => {
+    store.dispatch({ type: 'staking/updateStaking', payload: data.details });
+  }, 100, 500);
 };
 
 export const subscribeStaking = lazySubscribeMessage('pri(staking.getSubscription)', null, updateStaking, updateStaking);
@@ -339,7 +345,9 @@ export const updateStakingNominatorMetadata = (data: NominatorMetadata[]) => {
 export const subscribeStakingNominatorMetadata = lazySubscribeMessage('pri(bonding.subscribeNominatorMetadata)', null, updateStakingNominatorMetadata, updateStakingNominatorMetadata);
 
 export const updateTxHistory = (data: TransactionHistoryItem[]) => {
-  store.dispatch({ type: 'transactionHistory/update', payload: data });
+  addLazy('store:updateTxHistory', () => {
+    store.dispatch({ type: 'transactionHistory/update', payload: data });
+  }, 100, 500);
 };
 
 export const subscribeTxHistory = lazySubscribeMessage('pri(transaction.history.getSubscription)', null, updateTxHistory, updateTxHistory);
