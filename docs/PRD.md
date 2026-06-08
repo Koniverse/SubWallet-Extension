@@ -167,137 +167,11 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 ## Epics & User Stories
 
-### EPIC-1 — account
+Epics are ordered by product lifecycle and grouped into themes; epic numbers follow this order. Each epic maps 1:1 to a canonical area (see Functional Requirements). User stories are populated by Stream B.
 
-**FRs:** FR-1, FR-2, FR-3, FR-4, FR-5, FR-6, FR-7, FR-8
+### Setup & Accounts
 
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
----
-
-### EPIC-2 — proxy
-
-**FRs:** FR-9
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
----
-
-### EPIC-3 — multisig
-
-**FRs:** FR-10, FR-11
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
----
-
-### EPIC-4 — chain-management
-
-**FRs:** FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-18, FR-19, FR-90, FR-91
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
----
-
-### EPIC-5 — balance
-
-**FRs:** FR-20, FR-21, FR-22, FR-23, FR-24, FR-25
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
----
-
-### EPIC-6 — transaction
-
-**FRs:** FR-26, FR-27, FR-28, FR-29, FR-30, FR-31, FR-32
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
----
-
-### EPIC-7 — bridge-xcm
-
-**FRs:** FR-33, FR-34, FR-35, FR-36, FR-37
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
----
-
-### EPIC-8 — swap
-
-**FRs:** FR-38, FR-39, FR-40, FR-41, FR-42, FR-43, FR-44, FR-45
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
----
-
-### EPIC-9 — earning
-
-**FRs:** FR-46, FR-47, FR-48, FR-49, FR-50, FR-51, FR-52, FR-53
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
----
-
-### EPIC-10 — governance
-
-**FRs:** FR-54, FR-55, FR-56
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
----
-
-### EPIC-11 — campaign
-
-**FRs:** FR-57, FR-58
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
----
-
-### EPIC-12 — hardware-wallet
-
-**FRs:** FR-59, FR-60, FR-61
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
----
-
-### EPIC-13 — dapp-connection
-
-**FRs:** FR-62, FR-63, FR-64, FR-65, FR-66, FR-67
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
----
-
-### EPIC-14 — onboarding
+#### EPIC-1 — onboarding
 
 **FRs:** FR-68, FR-69, FR-70, FR-71
 
@@ -305,19 +179,39 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
----
+#### EPIC-2 — account
 
-### EPIC-15 — nft
-
-**FRs:** FR-72, FR-73, FR-74, FR-75, FR-76
+**FRs:** FR-1, FR-2, FR-3, FR-4, FR-5, FR-6, FR-7, FR-8
 
 | Story | Title | Status | Version |
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
----
+#### EPIC-3 — hardware-wallet
 
-### EPIC-16 — security
+**FRs:** FR-59, FR-60, FR-61
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+#### EPIC-4 — proxy
+
+**FRs:** FR-9
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+#### EPIC-5 — multisig
+
+**FRs:** FR-10, FR-11
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+#### EPIC-6 — security
 
 **FRs:** FR-77, FR-78, FR-79
 
@@ -325,9 +219,95 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
----
+### Networks & Assets
 
-### EPIC-17 — ui-ux
+#### EPIC-7 — chain-management
+
+**FRs:** FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-18, FR-19, FR-90, FR-91
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+#### EPIC-8 — balance
+
+**FRs:** FR-20, FR-21, FR-22, FR-23, FR-24, FR-25
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+#### EPIC-9 — nft
+
+**FRs:** FR-72, FR-73, FR-74, FR-75, FR-76
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+### Transactions & DeFi
+
+#### EPIC-10 — transaction
+
+**FRs:** FR-26, FR-27, FR-28, FR-29, FR-30, FR-31, FR-32
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+#### EPIC-11 — bridge-xcm
+
+**FRs:** FR-33, FR-34, FR-35, FR-36, FR-37
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+#### EPIC-12 — swap
+
+**FRs:** FR-38, FR-39, FR-40, FR-41, FR-42, FR-43, FR-44, FR-45
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+#### EPIC-13 — earning
+
+**FRs:** FR-46, FR-47, FR-48, FR-49, FR-50, FR-51, FR-52, FR-53
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+#### EPIC-14 — governance
+
+**FRs:** FR-54, FR-55, FR-56
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+### Connectivity & Engagement
+
+#### EPIC-15 — dapp-connection
+
+**FRs:** FR-62, FR-63, FR-64, FR-65, FR-66, FR-67
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+#### EPIC-16 — campaign
+
+**FRs:** FR-57, FR-58
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+### Platform & Cross-cutting
+
+#### EPIC-17 — ui-ux
 
 **FRs:** FR-80, FR-81, FR-82, FR-83, FR-84
 
@@ -335,9 +315,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
----
-
-### EPIC-18 — build-infra
+#### EPIC-18 — build-infra
 
 **FRs:** FR-85, FR-86, FR-87
 
@@ -345,9 +323,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
----
-
-### EPIC-19 — chain-abstraction
+#### EPIC-19 — chain-abstraction
 
 **FRs:** FR-88, FR-89
 
