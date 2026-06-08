@@ -167,13 +167,13 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 ## Epics & User Stories
 
-Epics are ordered by product lifecycle and grouped into themes; epic numbers follow this order. Each epic maps 1:1 to a canonical area (see Functional Requirements). User stories are populated by Stream B.
+Epics are ordered by importance to a non-custodial multi-chain wallet, foundation first (the build/runtime platform the app needs to run, then key management, then security, then the multi-chain engine), grouped into themes; epic numbers follow this order. Each epic maps 1:1 to a canonical area (see Functional Requirements). User stories are populated by Stream B.
 
-### Setup & Accounts
+### Foundation & Platform
 
-#### EPIC-1 — onboarding
+#### EPIC-1 — build-infra
 
-**FRs:** FR-68, FR-69, FR-70, FR-71
+**FRs:** FR-85, FR-86, FR-87
 
 | Story | Title | Status | Version |
 |-------|-------|--------|---------|
@@ -187,31 +187,7 @@ Epics are ordered by product lifecycle and grouped into themes; epic numbers fol
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
-#### EPIC-3 — hardware-wallet
-
-**FRs:** FR-59, FR-60, FR-61
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
-#### EPIC-4 — proxy
-
-**FRs:** FR-9
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
-#### EPIC-5 — multisig
-
-**FRs:** FR-10, FR-11
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
-#### EPIC-6 — security
+#### EPIC-3 — security
 
 **FRs:** FR-77, FR-78, FR-79
 
@@ -219,9 +195,7 @@ Epics are ordered by product lifecycle and grouped into themes; epic numbers fol
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
-### Networks & Assets
-
-#### EPIC-7 — chain-management
+#### EPIC-4 — chain-management
 
 **FRs:** FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-18, FR-19, FR-90, FR-91
 
@@ -229,7 +203,9 @@ Epics are ordered by product lifecycle and grouped into themes; epic numbers fol
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
-#### EPIC-8 — balance
+### Core Wallet
+
+#### EPIC-5 — balance
 
 **FRs:** FR-20, FR-21, FR-22, FR-23, FR-24, FR-25
 
@@ -237,19 +213,43 @@ Epics are ordered by product lifecycle and grouped into themes; epic numbers fol
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
-#### EPIC-9 — nft
+#### EPIC-6 — transaction
 
-**FRs:** FR-72, FR-73, FR-74, FR-75, FR-76
+**FRs:** FR-26, FR-27, FR-28, FR-29, FR-30, FR-31, FR-32
 
 | Story | Title | Status | Version |
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
-### Transactions & DeFi
+#### EPIC-7 — dapp-connection
 
-#### EPIC-10 — transaction
+**FRs:** FR-62, FR-63, FR-64, FR-65, FR-66, FR-67
 
-**FRs:** FR-26, FR-27, FR-28, FR-29, FR-30, FR-31, FR-32
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+#### EPIC-8 — onboarding
+
+**FRs:** FR-68, FR-69, FR-70, FR-71
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+### DeFi & Assets
+
+#### EPIC-9 — swap
+
+**FRs:** FR-38, FR-39, FR-40, FR-41, FR-42, FR-43, FR-44, FR-45
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+#### EPIC-10 — earning
+
+**FRs:** FR-46, FR-47, FR-48, FR-49, FR-50, FR-51, FR-52, FR-53
 
 | Story | Title | Status | Version |
 |-------|-------|--------|---------|
@@ -263,23 +263,15 @@ Epics are ordered by product lifecycle and grouped into themes; epic numbers fol
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
-#### EPIC-12 — swap
+#### EPIC-12 — nft
 
-**FRs:** FR-38, FR-39, FR-40, FR-41, FR-42, FR-43, FR-44, FR-45
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
-#### EPIC-13 — earning
-
-**FRs:** FR-46, FR-47, FR-48, FR-49, FR-50, FR-51, FR-52, FR-53
+**FRs:** FR-72, FR-73, FR-74, FR-75, FR-76
 
 | Story | Title | Status | Version |
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
-#### EPIC-14 — governance
+#### EPIC-13 — governance
 
 **FRs:** FR-54, FR-55, FR-56
 
@@ -287,25 +279,33 @@ Epics are ordered by product lifecycle and grouped into themes; epic numbers fol
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
-### Connectivity & Engagement
+### Advanced Accounts & Signing
 
-#### EPIC-15 — dapp-connection
+#### EPIC-14 — hardware-wallet
 
-**FRs:** FR-62, FR-63, FR-64, FR-65, FR-66, FR-67
-
-| Story | Title | Status | Version |
-|-------|-------|--------|---------|
-| — | Stories: populated by Stream B | — | — |
-
-#### EPIC-16 — campaign
-
-**FRs:** FR-57, FR-58
+**FRs:** FR-59, FR-60, FR-61
 
 | Story | Title | Status | Version |
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
-### Platform & Cross-cutting
+#### EPIC-15 — proxy
+
+**FRs:** FR-9
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+#### EPIC-16 — multisig
+
+**FRs:** FR-10, FR-11
+
+| Story | Title | Status | Version |
+|-------|-------|--------|---------|
+| — | Stories: populated by Stream B | — | — |
+
+### Cross-cutting, Growth & Future
 
 #### EPIC-17 — ui-ux
 
@@ -315,9 +315,9 @@ Epics are ordered by product lifecycle and grouped into themes; epic numbers fol
 |-------|-------|--------|---------|
 | — | Stories: populated by Stream B | — | — |
 
-#### EPIC-18 — build-infra
+#### EPIC-18 — campaign
 
-**FRs:** FR-85, FR-86, FR-87
+**FRs:** FR-57, FR-58
 
 | Story | Title | Status | Version |
 |-------|-------|--------|---------|
