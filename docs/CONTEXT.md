@@ -476,7 +476,7 @@
 
 **Rationale**: Any password-recovery channel would require a custodial backdoor, breaking the core non-custodial guarantee. The seed phrase is the sole recovery root; the master password only encrypts local key material.
 
-**Impact**: Reset flow must clear balance/NFT caches and re-show the create-master-password screen (gaps fixed via #2880, #2106). FR-127.
+**Impact**: Reset flow must clear balance/NFT caches and re-show the create-master-password screen (gaps fixed via #2880, #2106). FR-25.
 
 **Date**: 2023–2024
 **Version**: v1.1.x
@@ -723,7 +723,7 @@
 ### D87. Retire Interlay lending by controlled deprecation (hide option, keep positions, allow withdraw)
 
 **Context**: Interlay lending was being wound down and the team had to retire it without trapping users holding open positions.
-**Decision**: Hide the Interlay lending option on the earning-options screen but keep showing existing positions, disable adding to them, and continue to allow withdraw. (Lending later returns to the product — see FR-83; this records the v1.2 deprecation step.)
+**Decision**: Hide the Interlay lending option on the earning-options screen but keep showing existing positions, disable adding to them, and continue to allow withdraw. (Lending later returns to the product — see FR-100; this records the v1.2 deprecation step.)
 **Rationale**: A graceful unwind lets users exit existing positions safely while preventing new exposure to a retiring product; a hard removal would strand funds.
 **Date**: 2024
 **Version**: v1.2.12
@@ -1439,12 +1439,12 @@
 
 **Decision**: Expose One-Sign as an explicit Settings toggle (`allowOneSign`), **off by default**. When enabled, approving the first transaction implicitly approves the subsequent batch in the flow.
 
-**Rationale**: Collapsing several transactions under one signature is a convenience-vs-consent tradeoff; defaulting OFF preserves explicit per-transaction consent, and users opt in knowingly. Pairs with the multi-step signing capability (FR-54) and its settings toggle (FR-133).
+**Rationale**: Collapsing several transactions under one signature is a convenience-vs-consent tradeoff; defaulting OFF preserves explicit per-transaction consent, and users opt in knowingly. Pairs with the multi-step signing capability (FR-66) and its settings toggle (FR-31).
 
 **Impact**: One-Sign gated behind the toggle; default flows keep per-tx confirmation.
 
 **Date**: 2025
 **Version**: v1.3.x
-**Citations**: code `allowOneSign`; PRD FR-54, FR-133
+**Citations**: code `allowOneSign`; PRD FR-66, FR-31
 
 ---
