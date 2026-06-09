@@ -613,4 +613,303 @@ See [#4143](https://github.com/Koniverse/SubWallet-Extension/issues/4143); inter
 
 ---
 
+## 41. Paying fees in a non-native token is a separate fee model — estimate via asset-conversion, validate the fee token's ED
+
+**What happened**: A cluster of bugs landed around paying tx fees in a non-native token (Asset Hub / Hydration `feeAssetId`). Transfer-max failed on-chain because the estimated fee (in the chosen fee token) was lower than the actual fee charged; the fee-token picker didn't render on Hydration until the SDK was bumped; and a metadata-cache failure silently dropped tokens from the eligible list.
+
+**Why**: When fees are paid in a non-native asset the fee is computed via an on-chain asset-conversion/multiplier path, not the native weight-to-fee. Max-transfer and fee-estimate logic built around native fees under-estimates the converted fee and ignores the fee token's own existential deposit; the eligible-token list also depends on live metadata/SDK support.
+
+**How to avoid**:
+- Treat "fee paid in token X" as a distinct estimation path: derive the fee through the chain's asset-conversion rate and add a safety buffer before allowing transfer-max; never reuse the native-fee estimate.
+- Validate the fee token's own ED (and the recipient's native ED) before submission.
+- Build the eligible-fee-token list defensively: filter inactive tokens, handle metadata-cache failure so a metadata error doesn't silently drop tokens, and pin the SDK version that exposes the list per chain.
+
+See [#4494](https://github.com/Koniverse/SubWallet-Extension/issues/4494), [#4552](https://github.com/Koniverse/SubWallet-Extension/issues/4552), [#4043](https://github.com/Koniverse/SubWallet-Extension/issues/4043), [#4065](https://github.com/Koniverse/SubWallet-Extension/issues/4065).
+
+---
+
+## 42. EVM custom fee (EIP-1559) must gate on RPC capability and never round the value/wei params
+
+**What happened**: Opening "custom priority fee" threw an error outright; RPCs that don't support custom fees still showed editable fields instead of disabling them; and an EVM `value` from a dApp `eth_sendTransaction` (`1.169847813119247738`) was rounded to `1.1698478131192478`, causing under-transfer and failed bridges.
+
+**Why**: EVM fee handling has two traps: (1) EIP-1559 editing assumes the node exposes fee-history/oracle RPCs, which many don't; (2) large wei amounts passed through a JS `Number` conversion in `EvmRequestHandler` silently truncated precision — the same class as §4 (BigInt) but on the EVM request path, corrupting the on-chain `value`.
+
+**How to avoid**:
+- Probe RPC capability (fee-history / custom-fee support) before showing fee editing; when unsupported, disable the control with a tooltip rather than rendering broken fields.
+- Keep every EVM `value`/`gas`/`maxFeePerGas`/`maxPriorityFeePerGas` as hex/BigInt end-to-end; never pass them through `Number()`/float math, and enforce the 1-wei minimum tip.
+- Add a regression that round-trips a full-precision 18-decimal `value` from dApp request to signed payload.
+
+See [#4461](https://github.com/Koniverse/SubWallet-Extension/issues/4461), [#4559](https://github.com/Koniverse/SubWallet-Extension/issues/4559), [#3632](https://github.com/Koniverse/SubWallet-Extension/issues/3632), [#3293](https://github.com/Koniverse/SubWallet-Extension/issues/3293), [#4065](https://github.com/Koniverse/SubWallet-Extension/issues/4065). Complements §4.
+
+---
+
+## 43. Unified ("master") account migration is a data-model rewrite — version the JSON both ways, recompute suffix/count
+
+**What happened**: Migrating solo accounts to the unified-account model produced defects across releases: the migrate screen showed the wrong account count and dropped the network logo from names; the WebApp could not open after the upgrade; multi-account export broke; duplicate-name suffix logic misbehaved on upgrade and QR import; and JSON exported from the new build could not be imported back into the old (solo-model) build.
+
+**Why**: Unified accounts change the shape of the keyring record (a grouping over per-chain solo accounts) rather than adding a field. Any code assuming one address == one account (count displays, name+suffix derivation, JSON serialization) silently breaks, and the new JSON shape is not round-trip compatible with the old build unless handled explicitly — and the migration runs at upgrade time, so one bad path bricks open-on-upgrade.
+
+**How to avoid**:
+- Treat an account-model change as a versioned migration with forward/back JSON compatibility: a file exported by the new build must still import into the old build (or fail with a clear message); recompute tags/derivation/suffix, don't copy.
+- Centralize duplicate-name suffix logic and re-run it on every entry path (create, JSON import, QR import, migrate); count displays must read the unified record, not the address count.
+- Add an upgrade regression that migrates a multi-account wallet, asserts the count, exports, and re-imports on both the new and previous build.
+
+See [#4893](https://github.com/Koniverse/SubWallet-Extension/issues/4893), [#4068](https://github.com/Koniverse/SubWallet-Extension/issues/4068), [#3592](https://github.com/Koniverse/SubWallet-Extension/issues/3592), [#3581](https://github.com/Koniverse/SubWallet-Extension/issues/3581), [#4620](https://github.com/Koniverse/SubWallet-Extension/issues/4620), [#3643](https://github.com/Koniverse/SubWallet-Extension/issues/3643), [#4031](https://github.com/Koniverse/SubWallet-Extension/issues/4031), [#3570](https://github.com/Koniverse/SubWallet-Extension/issues/3570). Distinct from §25 (count/load), this is format.
+
+---
+
+## 44. Account type and chain ecosystem are coupled at create/import — reset and re-derive on type change
+
+**What happened**: Choosing EVM type but reusing the prior selection produced a Substrate account; entering a Substrate seed while EVM was selected crashed the extension; the network field showed no EVM networks for an EVM account on first import; private keys without a `0x` prefix were rejected as "not a valid mnemonic"; and single-account-type wallets displayed the other chain's tokens.
+
+**Why**: The create/import flow carries account type, seed/key parsing, the network picker, and derivation as loosely-coupled state. When type changes, dependent fields are not re-derived or reset, so stale/mismatched values leak through — and some mismatches hit the keyring parser unguarded and throw instead of validating.
+
+**How to avoid**:
+- Make account type the single source of truth: when it changes, reset and re-derive the network list, the seed/private-key parser, and the derivation path.
+- Validate seed/private-key input against the selected type before calling the keyring (accept private keys with or without `0x`); return a typed validation error instead of letting the parser throw.
+- Filter token visibility by the account types actually present so a single-type wallet never shows the other ecosystem's tokens.
+
+See [#1925](https://github.com/Koniverse/SubWallet-Extension/issues/1925), [#192](https://github.com/Koniverse/SubWallet-Extension/issues/192), [#1933](https://github.com/Koniverse/SubWallet-Extension/issues/1933), [#120](https://github.com/Koniverse/SubWallet-Extension/issues/120), [#75](https://github.com/Koniverse/SubWallet-Extension/issues/75), [#1687](https://github.com/Koniverse/SubWallet-Extension/issues/1687), [#4630](https://github.com/Koniverse/SubWallet-Extension/issues/4630), [#2616](https://github.com/Koniverse/SubWallet-Extension/issues/2616).
+
+---
+
+## 45. JSON keystore decode depends on the @subwallet/keyring ↔ util-crypto version — smoke-test import on every bump
+
+**What happened**: Accounts exported from the latest Polkadot{.js} extension failed to import into SubWallet with a spurious "incorrect password" error that was actually a decode failure; JSON from the migrate build failed to decode on the store build; and an invalid-then-valid file left the screen stuck in the "Invalid Json file" state.
+
+**Why**: JSON keystore encrypt/decrypt is delegated to `@subwallet/keyring` → `@polkadot/util-crypto`. When Polkadot{.js} bumps its crypto routine and SubWallet's pinned keyring lags, decode silently fails and surfaces as "wrong password". The invalid-then-valid case shows decode state was not reset when the selected file changed.
+
+**How to avoid**:
+- Pin and bump `@subwallet/keyring` in lockstep with `@polkadot/util-crypto`; after any bump, run an import smoke test against a JSON exported from the current Polkadot{.js} release.
+- Distinguish "decode failed" from "wrong password" in the error surface.
+- Reset file-validation and password state whenever the selected JSON file changes.
+
+See [#4565](https://github.com/Koniverse/SubWallet-Extension/issues/4565), [#2376](https://github.com/Koniverse/SubWallet-Extension/issues/2376), [#3643](https://github.com/Koniverse/SubWallet-Extension/issues/3643), [#4031](https://github.com/Koniverse/SubWallet-Extension/issues/4031), [#107](https://github.com/Koniverse/SubWallet-Extension/issues/107).
+
+---
+
+## 46. Creating/attaching an account mid-flow (dApp connect, watch-only, post-reset) must thread the requested context
+
+**What happened**: Creating an account from a dApp "Create one" prompt produced the wrong type and stranded the user on the create screen; an account created while the connect popup was open could not be connected; attaching a watch-only account on first WebApp use navigated to the wrong screen instead of master-password setup; and attaching after a reset showed a blank screen.
+
+**Why**: These entry points start from a non-default context (a dApp's requested chain type, a fresh keyring, or a watch-only path that skips seed/password), but the flow falls back to the global default account-type and standard post-create navigation. The requested type and the "first account / master-password-set?" condition are not propagated.
+
+**How to avoid**:
+- Pass the dApp's requested account type (and chainId) explicitly into the create flow; the created account and auto-connect must use that requested type.
+- Compute post-create/attach navigation from actual keyring state (first account? master password set?), not a fixed route — especially for watch-only and post-reset.
+- Regression-test create/attach launched from: live dApp connect popup, empty keyring after reset, and watch-only on first run.
+
+See [#1912](https://github.com/Koniverse/SubWallet-Extension/issues/1912), [#1930](https://github.com/Koniverse/SubWallet-Extension/issues/1930), [#231](https://github.com/Koniverse/SubWallet-Extension/issues/231), [#297](https://github.com/Koniverse/SubWallet-Extension/issues/297), [#1859](https://github.com/Koniverse/SubWallet-Extension/issues/1859), [#3054](https://github.com/Koniverse/SubWallet-Extension/issues/3054). Distinct from §25/§32.
+
+---
+
+## 47. Earning-form default selection (pool/validator/subnet) must derive from the selected account, not carry over
+
+**What happened**: The earning form repeatedly pre-selected the wrong pool/validator: switching from an earning account to a fresh one kept the old pool; default-validator setup broke when `maxCount = 1`; after withdraw-all the form still showed the old pool and blocked re-staking with a phantom "Exist unstaking request"; AHM-migrated chains failed to auto-select the already-staked validator.
+
+**Why**: The default-selection state was seeded once (or keyed on the wrong dependency) and not recomputed when the active account, its existing position, or `maxCount` changed. "No prior position" and "has a prior position" are distinct branches that were not reset on account change.
+
+**How to avoid**:
+- Re-derive the default selection as a pure function of (selected account, that account's current position, recommended-validator list, maxCount); never persist across an account switch.
+- Branch explicitly: no position → recommended default; has position → that account's pool/validator; cover maxCount=1 and active-stake=0 as their own cases.
+- After a successful withdraw-all, clear the residual position so re-staking is not blocked by a stale unstake request.
+
+See [#3972](https://github.com/Koniverse/SubWallet-Extension/issues/3972), [#3971](https://github.com/Koniverse/SubWallet-Extension/issues/3971), [#3840](https://github.com/Koniverse/SubWallet-Extension/issues/3840), [#3001](https://github.com/Koniverse/SubWallet-Extension/issues/3001), [#1323](https://github.com/Koniverse/SubWallet-Extension/issues/1323), [#4754](https://github.com/Koniverse/SubWallet-Extension/issues/4754), [#1346](https://github.com/Koniverse/SubWallet-Extension/issues/1346).
+
+---
+
+## 48. Earning position-read paths must handle per-chain RPC arg shapes and missing asset/identity metadata
+
+**What happened**: Reading positions crashed or returned nothing for structural reasons: some parachains require 2 args for `delegationScheduledRequests` and the single-arg call failed; `EarningPositions` sorting crashed on `item.asset.decimals` when `assetRegistry` had not loaded; Calamari failed on identity-pallet parsing; migrated AHM chains showed blank validator names.
+
+**Why**: Position-read code assumed one canonical query signature and that referenced metadata (asset registry, identity) was always present. Per-chain pallet variants and load-order races violate both assumptions.
+
+**How to avoid**:
+- Treat every position-query signature as per-chain (arg count, response shape), the same way extrinsics are mapped in §5.
+- Null-guard all metadata lookups in read/sort paths (`asset?.decimals ?? 0`, `price ?? 0`); never let an unloaded registry or unparseable identity crash the list (extends §32).
+- Add a per-chain regression fixture that exercises position read with metadata deliberately absent.
+
+See [#4950](https://github.com/Koniverse/SubWallet-Extension/issues/4950), [#4731](https://github.com/Koniverse/SubWallet-Extension/issues/4731), [#1538](https://github.com/Koniverse/SubWallet-Extension/issues/1538), [#884](https://github.com/Koniverse/SubWallet-Extension/issues/884), [#4754](https://github.com/Koniverse/SubWallet-Extension/issues/4754), [#3413](https://github.com/Koniverse/SubWallet-Extension/issues/3413), [#4006](https://github.com/Koniverse/SubWallet-Extension/issues/4006). Extends §5, §32.
+
+---
+
+## 49. Earning state must auto-refresh from chain events — including actions performed in a dApp
+
+**What happened**: After unstake / cancel-unstake / withdraw on direct-nomination parachains the UI didn't update and required a manual reload; unstake balance still showed after a successful withdraw performed in a dApp; positions persisted after withdraw-all; staking details didn't render on first access until the popup was reopened.
+
+**Why**: Earning state was refreshed only on in-app action callbacks, so out-of-band changes (dApp-originated extrinsics, withdraw-all reaching zero) left stale balances. Adjacent to but distinct from §3 — here the trigger is an earning action's on-chain effect, including ones SubWallet didn't originate.
+
+**How to avoid**:
+- Drive earning-position refresh off chain subscription/event data, not only the in-app transaction success callback, so external/dApp changes propagate without a manual reload.
+- After withdraw-all / zero active stake, remove the position entry rather than leaving a stale balance.
+- When a backing network is disconnected, show a "data unavailable" state instead of a stuck value.
+
+See [#2652](https://github.com/Koniverse/SubWallet-Extension/issues/2652), [#2645](https://github.com/Koniverse/SubWallet-Extension/issues/2645), [#2494](https://github.com/Koniverse/SubWallet-Extension/issues/2494), [#699](https://github.com/Koniverse/SubWallet-Extension/issues/699), [#1246](https://github.com/Koniverse/SubWallet-Extension/issues/1246), [#845](https://github.com/Koniverse/SubWallet-Extension/issues/845). Complements §3.
+
+---
+
+## 50. All-accounts mode must aggregate earning status/rewards only over accounts that actually stake
+
+**What happened**: All-accounts aggregation miscomputed: unclaimed-reward totals were wrong; reward-status counted all wallet accounts instead of only staking ones; the summary showed "Earning a part" when a single account was "Waiting"; and extension vs mobile disagreed on status for the same account.
+
+**Why**: The aggregation reduced over the full account list rather than the subset with a position, and the status-rollup merged distinct buckets (Waiting / Earning / Partial) incorrectly. The same flawed reducer diverged between platforms.
+
+**How to avoid**:
+- Filter to accounts with a non-empty position before aggregating rewards/status; never divide or label over the full account set.
+- Define a single canonical status-rollup function shared by extension and mobile so the two cannot diverge.
+- Add an All-accounts fixture mixing staking + non-staking + Waiting accounts and assert the summary.
+
+See [#907](https://github.com/Koniverse/SubWallet-Extension/issues/907), [#1456](https://github.com/Koniverse/SubWallet-Extension/issues/1456), [#2364](https://github.com/Koniverse/SubWallet-Extension/issues/2364), [#2514](https://github.com/Koniverse/SubWallet-Extension/issues/2514), [#3327](https://github.com/Koniverse/SubWallet-Extension/issues/3327).
+
+---
+
+## 51. Token visibility on the balance screen must distinguish fetch-failed from zero, and filter by account key-type
+
+**What happened**: Tokens silently disappeared or wrongly appeared due to visibility logic, not balance math: in All-accounts mode with "Show zero balance" on, a token that failed to return a balance was dropped while Specific-account mode still showed it; an ed25519-imported account still listed Ethereum tokens invalid for that key type.
+
+**Why**: Token-row visibility conflates three independent predicates — token enabled, balance fetched successfully, token valid for the account's key type — and the All-accounts and single-account paths apply them inconsistently. A fetch failure is treated the same as a zero balance, and key-type compatibility isn't part of the filter.
+
+**How to avoid**:
+- Distinguish "fetch failed / pending" from "balance is zero" — a pending/errored fetch must not be collapsed into the zero-balance hide rule.
+- Filter token visibility by account key-type compatibility (no EVM tokens for ed25519/Substrate-only keys) before rendering.
+- Any visibility predicate must give identical results in All-accounts and Specific-account mode; unit-test both against one fixture.
+
+See [#2352](https://github.com/Koniverse/SubWallet-Extension/issues/2352), [#2518](https://github.com/Koniverse/SubWallet-Extension/issues/2518), [#77](https://github.com/Koniverse/SubWallet-Extension/issues/77), [#1143](https://github.com/Koniverse/SubWallet-Extension/issues/1143). Distinct from §3 (cache invalidation).
+
+---
+
+## 52. Fiat valuation must exclude unpriceable assets — testnet, crowdloan and derivative positions are recurring traps
+
+**What happened**: Total fiat balance was systematically wrong because the wrong things got a price: testnet tokens were valued instead of $0; DOT contributed to a crowdloan (later converted to LCDOT and sold) was still counted in total; the Crowdloans screen showed the project token's price instead of the contributed token's.
+
+**Why**: Fiat value joins a token's amount to a price-feed entry, but several categories have no legitimate price in context: testnet tokens (must be $0), crowdloan/derivative balances (priced by the contributed token, removed once exited), and screen-specific token semantics. A blind price join inflates or misstates the total.
+
+**How to avoid**:
+- Force testnet token fiat value to $0 explicitly; never let a mainnet price feed bleed onto a testnet slug.
+- Price crowdloan/derivative positions by the underlying contributed token and exclude them from totals once closed/converted.
+- On crowdloan/staking screens, bind the price to the specific token the user holds for that action.
+
+See [#145](https://github.com/Koniverse/SubWallet-Extension/issues/145), [#206](https://github.com/Koniverse/SubWallet-Extension/issues/206), [#1694](https://github.com/Koniverse/SubWallet-Extension/issues/1694), [#1766](https://github.com/Koniverse/SubWallet-Extension/issues/1766). Distinct from §34 (formula correctness).
+
+---
+
+## 53. The price-history chart is a separate data series from the spot price — re-key on (price-id, currency)
+
+**What happened**: The spot price updated correctly but the price-history chart did not: switching currency (USD→CNY) in popup mode left the chart on stale/wrong-scaled data (flat line → vertical spike); no chart for derivation tokens; wrong chart for USDT/USDC stablecoins.
+
+**Why**: The history chart is fetched from a different endpoint and cached independently, keyed only on the token and not re-fetched on currency change; it also can't resolve a series for tokens whose price identity isn't the slug itself (derivation tokens, pegged stablecoins) — which the spot-price path handles but the history path doesn't.
+
+**How to avoid**:
+- Key the chart series on (price-id, currency) and refetch/rescale whenever currency changes — don't assume the spot-price subscription refreshes it.
+- Resolve the chart's price-id the same way the spot price does (derivation token → parent; stablecoin → its peg id).
+- Test currency switching specifically in popup mode and on token-detail charts.
+
+See [#4586](https://github.com/Koniverse/SubWallet-Extension/issues/4586), [#4332](https://github.com/Koniverse/SubWallet-Extension/issues/4332), [#4344](https://github.com/Koniverse/SubWallet-Extension/issues/4344).
+
+---
+
+## 54. Adding a custom RPC/provider must validate connectivity in a bounded background probe — never block startup
+
+**What happened**: Adding a custom provider left the extension stuck on an infinite loading screen and unopenable (only recovery = reinstall); adding a custom network reported "connected successfully" then "unable to connect" 2s later; on reopen, RPC-lost errors auto-disabled networks.
+
+**Why**: Provider validation at add-time ran on a path that could hang the startup flow, and the provider was persisted before connectivity was confirmed. A user-supplied URL that is slow, wrong-type, or unreachable then poisons every subsequent startup. Distinct from §20 (reconnect debounce) — the failure originates from user-entered config.
+
+**How to avoid**:
+- Validate a custom RPC in a cancellable, timeout-bounded background probe before persisting; surface a field-level error, never a full-screen hang. Persist only after a successful handshake and verify the endpoint's chain type/genesis matches.
+- A stored custom provider must never be on the critical path of first paint — if it fails at startup, fall back to a default RPC and flag the network disconnected (see §21).
+
+See [#4216](https://github.com/Koniverse/SubWallet-Extension/issues/4216), [#351](https://github.com/Koniverse/SubWallet-Extension/issues/351), [#2236](https://github.com/Koniverse/SubWallet-Extension/issues/2236), [#4123](https://github.com/Koniverse/SubWallet-Extension/issues/4123), [#2884](https://github.com/Koniverse/SubWallet-Extension/issues/2884). Distinct from §20.
+
+---
+
+## 55. Concurrent / multi-tab dApp authorization requests must be de-duplicated into a single connect popup
+
+**What happened**: Connecting to some dApps displayed two connect popups instead of one; opening multiple dApp pages produced stacked connect popups; and a "connection existed" error appeared when no connection had been added, because a duplicate request collided with an in-flight one.
+
+**Why**: Each `requestAuthorize` from a dApp (and each tab) enqueued its own confirmation independently. Pages that emit the connect handshake more than once on load, or multiple tabs racing, generate parallel authorization entries with no coalescing.
+
+**How to avoid**:
+- Key pending authorization requests by (origin, dApp-type) and coalesce duplicates into one popup; a second request from the same origin while one is pending attaches to the existing confirmation.
+- Make the authorize handler idempotent so a double-fired handshake doesn't create two entries.
+- Test against dApps known to double-fire the connect event and the multi-tab case explicitly.
+
+See [#285](https://github.com/Koniverse/SubWallet-Extension/issues/285), [#227](https://github.com/Koniverse/SubWallet-Extension/issues/227), [#2903](https://github.com/Koniverse/SubWallet-Extension/issues/2903), [#2923](https://github.com/Koniverse/SubWallet-Extension/issues/2923).
+
+---
+
+## 56. Connecting a dApp/WalletConnect to an unsupported chain must degrade to a clear screen, not an error page
+
+**What happened**: Pairing WalletConnect against a namespace SubWallet doesn't support (Bitcoin, SUI, etc.) threw a raw error instead of an "Unsupported network" screen; generic dApp connect and several WC pairings surfaced a full error page instead of the confirmation screen.
+
+**Why**: The pairing/connect code assumed every requested chain resolved to a known, enabled network. An unknown CAIP namespace or chainId fell through to an unhandled throw that React rendered as the global error boundary. Narrower than §28 — the defect is the missing graceful-degradation branch for unknown chains.
+
+**How to avoid**:
+- Intersect requested chains against supported+enabled networks before building the session; if empty, render a dedicated "Unsupported network" screen (optionally offering add-network), never an error boundary.
+- Wrap session approval in try/catch and map known WC failure codes to specific messages.
+- Add a regression that pairs against a deliberately unsupported namespace.
+
+See [#4598](https://github.com/Koniverse/SubWallet-Extension/issues/4598), [#4005](https://github.com/Koniverse/SubWallet-Extension/issues/4005), [#4401](https://github.com/Koniverse/SubWallet-Extension/issues/4401), [#1981](https://github.com/Koniverse/SubWallet-Extension/issues/1981), [#2896](https://github.com/Koniverse/SubWallet-Extension/issues/2896). Narrower than §28.
+
+---
+
+## 57. dApp RPC methods beyond connect/sign (e.g. wallet_watchAsset) need explicit handlers — unhandled methods crash the session
+
+**What happened**: Clicking "Add token to wallet" on a dApp did nothing — the add-token screen never opened; an earlier instance threw an error that left SubWallet unusable until restart; on WalletConnect, "some required methods are missing" blocked login and prevented wallet detection.
+
+**Why**: The provider implemented the common path (enable, accounts, sign, send) but treated less-common EIP-1193 / WC methods as unrecognized, silently dropping them or throwing into the global handler. Each needs an explicit handler that routes to the right in-extension flow and returns a spec-compliant response.
+
+**How to avoid**:
+- Maintain an explicit allowlist of supported dApp RPC methods with a handler each; `wallet_watchAsset` must deep-link to the import-token confirmation and return the spec boolean.
+- Unknown methods should return a structured EIP-1193 "unsupported method" error, never throw uncaught.
+- Audit the WC EVM session against the current required-method set on each SDK bump (complements §28).
+
+See [#1242](https://github.com/Koniverse/SubWallet-Extension/issues/1242), [#959](https://github.com/Koniverse/SubWallet-Extension/issues/959), [#2860](https://github.com/Koniverse/SubWallet-Extension/issues/2860).
+
+---
+
+## 58. Browser-engine compatibility is a release gate — Firefox / LibreWolf / old-Chromium each break differently
+
+**What happened**: An error page appeared only when performing XCM on Firefox; LibreWolf showed a blank extension (fix = a WebGL-enable FAQ, not code); after an upgrade, sub-tokens stopped showing only on Firefox; identicons broke for Moonbeam/Moonriver.
+
+**Why**: SubWallet ships one bundle to multiple engines that differ in WebExtension storage semantics, WebGL/canvas availability (identicons), CSP, and upgrade timing. Firefox-only and LibreWolf-only failures are invisible if QA runs on Chrome alone; some are user-environment issues with no code fix.
+
+**How to avoid**:
+- Run the release regression matrix on Firefox and at least one hardened fork (LibreWolf/Brave), not Chrome alone; include XCM, post-upgrade token visibility, and identicon rendering.
+- Guard WebGL/canvas-dependent rendering with a feature check and a non-WebGL fallback.
+- Keep an FAQ entry for environment-only breakage (e.g. WebGL disabled) where no code fix exists.
+
+See [#1505](https://github.com/Koniverse/SubWallet-Extension/issues/1505), [#1561](https://github.com/Koniverse/SubWallet-Extension/issues/1561), [#792](https://github.com/Koniverse/SubWallet-Extension/issues/792), [#58](https://github.com/Koniverse/SubWallet-Extension/issues/58).
+
+---
+
+## 59. Non-XCM (trustless/optimistic) bridges need a separate destination claim step and resilient bridge APIs
+
+**What happened**: Claiming AVAIL on Ethereum Sepolia after bridging failed; a broader Avail set had "unable to claim token after bridge" plus a request to hide the bridge when broken; for the Across bridge, `getLimits`/`getQuote` failed on temporary API downtime with no logging, retry, or de-dup.
+
+**Why**: Unlike XCM (§2/§27), these are two-leg bridges: a source-chain lock and a separate user-initiated claim/mint on the destination chain, mediated by a flaky third-party REST API. The destination claim is a distinct failure surface, and transient API downtime surfaces as a hard error with funds in limbo.
+
+**How to avoid**:
+- Model external bridges as explicit multi-leg flows with a recoverable, retryable destination claim step; never assume completion at source-chain submission.
+- Wrap bridge-API calls in try/catch + retry + an in-flight-dedup promise, and reduce fetch frequency.
+- Provide an instant feature-disable toggle (as with XCM channels in §2) so a broken bridge can be hidden without a release.
+
+See [#4636](https://github.com/Koniverse/SubWallet-Extension/issues/4636), [#4255](https://github.com/Koniverse/SubWallet-Extension/issues/4255), [#4108](https://github.com/Koniverse/SubWallet-Extension/issues/4108), [#4798](https://github.com/Koniverse/SubWallet-Extension/issues/4798).
+
+---
+
+## 60. Per-marketplace NFT adapters break on upstream API drift, pagination and missing contract methods
+
+**What happened**: Quartz/Unique NFTs errored when the old `getAddressTokens` RPC was replaced upstream; RMRK metadata failed to JSON-parse; Singular and Acala NFTs didn't show; ERC-721 collections lacking `tokenOfOwnerByIndex()` couldn't enumerate owned tokens; multi-page collections lost NFTs when switching accounts because pagination wasn't reset.
+
+**Why**: Each NFT source (Unique RPC, RMRK, Singular, Acala, generic ERC-721) has its own adapter with assumptions about API shape, contract methods, and metadata format. When a marketplace ships a new API or a contract omits an optional method, that single adapter throws — and §15 only covers IPFS/gateway concerns, not the adapter layer or pagination.
+
+**How to avoid**:
+- Treat every NFT marketplace/standard as a versioned adapter with a regression test against a known holding address; monitor upstream API changes.
+- Detect missing ERC-721 enumeration (`tokenOfOwnerByIndex`) and fall back to a manual-token-ID path; reset pagination state on account/collection switch.
+- Wrap per-collection fetch/parse in try/catch so one bad collection doesn't blank the whole tab.
+
+See [#178](https://github.com/Koniverse/SubWallet-Extension/issues/178), [#415](https://github.com/Koniverse/SubWallet-Extension/issues/415), [#194](https://github.com/Koniverse/SubWallet-Extension/issues/194), [#2029](https://github.com/Koniverse/SubWallet-Extension/issues/2029), [#726](https://github.com/Koniverse/SubWallet-Extension/issues/726), [#639](https://github.com/Koniverse/SubWallet-Extension/issues/639), [#1300](https://github.com/Koniverse/SubWallet-Extension/issues/1300). Extends §15.
+
+---
+
 _End of LESSONS.md_
