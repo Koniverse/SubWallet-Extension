@@ -6,7 +6,9 @@
 
 ---
 
-## Phase 0 — Foundation & Early Architecture (2022, shipped v0.3.x–v0.5.x)
+## Phase 0 — Foundation through v1.0 (2022–2023, shipped v0.3.x–v1.0.x)
+
+> Fork & Yarn-monorepo foundation, ChainService, keyring/storage model, and early dApp / MV3 groundwork.
 
 ### D1. Fork polkadot-js extension rather than copying code
 
@@ -112,8 +114,6 @@
 **Citations**: [#504](https://github.com/Koniverse/SubWallet-Extension/issues/504)
 
 ---
-
-## Phase 1 — ChainService Architecture, MV3 Migration & dApp Connectivity (2022-10 → 2023, shipped v0.7.x–v1.0.x)
 
 ### D6. Scope MV3 migration storage to chrome.storage (defer PouchDB)
 
@@ -262,6 +262,10 @@
 
 ---
 
+## Phase 1 — v1.1.x (2023–2024)
+
+> Earning rebrand, EIP-6963 multi-provider & WalletConnect, i18n/Texterify tooling, early XCM, the non-recoverable master-password reset (D69), the Swap feature debut (WebApp-first aggregator, D71), API-based metadata auto-update (D72), the chain status/state split (D73), the notification + banner subsystem (D75), the unified dApp-connect popup (D76), and Mission Pools (D77).
+
 ### D13. WalletConnect initial integration defers eth_signTransaction and eth_signTypedData
 
 **Context**: The initial WalletConnect integration was scoped. `eth_signTransaction` was not supported by the WC Core library at the time; `eth_signTypedData` had known stability problems.
@@ -342,26 +346,6 @@
 
 ---
 
-### D17. Complete MV3 migration (service-worker lifecycle, DApp connection, fetch, storage)
-
-**Context**: Chrome's roadmap required MV3 compliance. The full migration had been researched since D3 (2022-07-01) but execution was deferred while the architecture was stabilised.
-
-**Decision**: Upgrade the extension from MV2 to MV3, redesigning service-worker lifecycle (sleep/full mode), DApp connection (reconnect on wake), `fetch` API (moved to service worker), and storage.
-
-**Rationale**: Chrome's enforcement deadline left no further room for delay. A full architectural migration is cleaner than maintaining both MV2 and MV3 code paths.
-
-**Alternatives considered**:
-- Delay MV3 migration and maintain MV2 branch until Chrome forced migration — rejected: timeline risk too high.
-
-**Impact**: Extension shipped as MV3 on Chrome and Firefox; a new MV3 UI design also shipped alongside.
-
-**Date**: 2023-11-18
-**Version**: v1.2.1
-
-**Citations**: [#2205](https://github.com/Koniverse/SubWallet-Extension/issues/2205), [#2120](https://github.com/Koniverse/SubWallet-Extension/issues/2120)
-
----
-
 ### D18. Implement full OpenGov voting (not read-only) for Polkadot governance
 
 **Context**: Polkadot switched to OpenGov (governance v2). SubWallet needed to decide the scope of governance support.
@@ -399,22 +383,6 @@
 **Version**: v1.1.27
 
 **Citations**: [#2416](https://github.com/Koniverse/SubWallet-Extension/issues/2416)
-
----
-
-## Phase 2 — Earning Rebrand, TON & Cardano Integration, XCM/i18n Tooling (2024, shipped v1.1.x–v1.2.x)
-
-### D20. Native Substrate Path for TAO Staking (Not EVM)
-
-**Context**: When SubWallet began implementing TAO in-app staking (#2505, Jan 2024), a choice existed between integrating Bittensor via its native Substrate/Substrate-based `delegation` pallet or via the Subtensor EVM compatibility layer.
-**Decision**: Implement TAO staking using the native Substrate path, calling Bittensor's native `delegation` pallet directly (via WebSocket RPC to archive nodes such as `wss://archivelb.nakamoto.opentensor.ai:9943`), with validator/delegate data pulled from the OpenTensor delegates JSON and middleware API.
-**Rationale**: Because at the time of initial staking implementation, the native delegation model was the established, well-documented mechanism (`docs.bittensor.com/delegation`); the Subtensor EVM path existed but bridging between native TAO and Subtensor EVM was scoped as a separate later feature (#4901, Dec 2025), confirming the native-first decision.
-**Alternatives considered**:
-- Subtensor EVM path — deferred until Dec 2025 as a separate bridge feature (#4901), not chosen for core staking because native substrate was already the standard Bittensor interaction model.
-**Impact**: The staking service handler, balance subscription, and earning position logic all operate against the native Substrate chain; the Subtensor EVM bridge remains a distinct integration track.
-**Date**: 2024-01-22
-**Version**: v1.3.x (Milestone 8)
-**Citations**: [#2505](https://github.com/Koniverse/SubWallet-Extension/issues/2505), [#4901](https://github.com/Koniverse/SubWallet-Extension/issues/4901)
 
 ---
 
@@ -460,20 +428,6 @@
 
 ---
 
-### D23. Support TEP-74 Jetton Standard as the TON Token Type
-
-**Context**: TON's fungible token standard is TEP-74 (Jettons), distinct from ERC-20. Issue #3394 was specifically raised to implement Jetton balance display, and #3455 added `tokenType = TEP74` to the chainlist schema.
-**Decision**: Implement Jetton (TEP-74) as the TON-specific local token type, registering it in the chainlist under `tokenType: TEP74`. Jetton transfer and balance handling follows the TEP-74 spec (Jetton wallet contracts, `transfer` op-code messages). The initial scope includes USD₮ (USDT on TON) as the primary Jetton.
-**Rationale**: Because TEP-74 is the only standardized fungible token spec on TON; without it, only native TON could be supported, excluding the large Jetton ecosystem (USDT on TON being the primary demand driver).
-**Alternatives considered**:
-- Supporting only native TON initially and deferring Jettons — partially done (mainnet was initially disabled in wallet even after chainlist addition, per #3455 comment), but Jetton balance was scoped into the same milestone.
-**Impact**: New `TEP74` token type enum in chainlist; Jetton-specific balance query and transfer message construction; Jetton metadata fetching per TEP-64.
-**Date**: 2024-07-29
-**Version**: v1.3.x (Milestone 8 Experiment)
-**Citations**: [#3394](https://github.com/Koniverse/SubWallet-Extension/issues/3394), [#3455](https://github.com/Koniverse/SubWallet-Extension/issues/3455), [#3384](https://github.com/Koniverse/SubWallet-Extension/issues/3384)
-
----
-
 ### D24. GRC-20 token type renamed to VFT (Vara Fungible Token)
 
 **Context**: The upstream Vara ecosystem renamed the GRC-20 token standard to VFT (Vara Fungible Token). Existing GRC-20 tokens in user wallets had the old type stored.
@@ -491,6 +445,332 @@
 **Version**: v1.1.66
 
 **Citations**: [#3268](https://github.com/Koniverse/SubWallet-Extension/issues/3268), [#3290](https://github.com/Koniverse/SubWallet-Extension/issues/3290), [#3291](https://github.com/Koniverse/SubWallet-Extension/issues/3291), [PR #3271](https://github.com/Koniverse/SubWallet-Extension/pull/3271)
+
+---
+
+### D27. Adopt Texterify as the multilingual management platform
+
+**Context**: Translation management was fragmented — files were manually managed in source control with no cross-team tooling, making updates and coordination difficult.
+
+**Decision**: Adopt Texterify as the centralised multilingual management platform.
+
+**Rationale**: Texterify enables cross-team coordination and easier updates compared to ad-hoc translation file management. It provides a dedicated workflow for translators and reduces the risk of key drift between source and translated strings.
+
+**Alternatives considered**:
+- Continue with ad-hoc translation files managed in source control — rejected: not scalable as language count grows.
+
+**Impact**: Translation workflow moved to Texterify; keys synced from the CMS rather than manually in-repo.
+
+**Date**: 2024-09-09
+**Version**: v1.1.x
+
+**Citations**: [#2132](https://github.com/Koniverse/SubWallet-Extension/issues/2132)
+
+---
+
+### D69. The master password is non-recoverable by design; "forgot password" resets the wallet
+
+**Context**: SubWallet is non-custodial, so there is no server that could restore a forgotten master password.
+
+**Decision**: Provide **no password recovery**. "Forgot password" triggers a full wallet reset (`resetWallet`) that clears all accounts and requires re-importing from seed phrase / private key. The reset must also purge derived data (balance, NFT, etc.).
+
+**Rationale**: Any password-recovery channel would require a custodial backdoor, breaking the core non-custodial guarantee. The seed phrase is the sole recovery root; the master password only encrypts local key material.
+
+**Impact**: Reset flow must clear balance/NFT caches and re-show the create-master-password screen (gaps fixed via #2880, #2106). FR-127.
+
+**Date**: 2023–2024
+**Version**: v1.1.x
+**Citations**: [#2056](https://github.com/Koniverse/SubWallet-Extension/issues/2056), [#2880](https://github.com/Koniverse/SubWallet-Extension/issues/2880), [#2106](https://github.com/Koniverse/SubWallet-Extension/issues/2106)
+
+---
+
+### D71. Ship Swap WebApp-first as a multi-provider aggregator; extension first gets a deep-link button
+
+**Context**: SubWallet had no in-wallet swap. After evaluating Chainflip (cross-chain), the Asset Hub `assetConversion` pallet, and the HydraDX SDK, the team had to decide where swap would live and how it would source liquidity.
+**Decision**: Build Swap as a multi-provider aggregator (Chainflip + HydraDX + Asset Hub `assetConversion`), ship it on the WebApp first, and initially surface it in the extension only as a "Swap" button that deep-links to the WebApp before the native extension screen lands.
+**Rationale**: The WebApp could iterate the complex swap/routing UX faster than the constrained extension popup, delivering the feature sooner; multi-provider routing avoids depending on one liquidity source and lets each provider cover its best pairs.
+**Date**: 2024
+**Version**: v1.1.50 → v1.1.55
+**Citations**: [#2823](https://github.com/Koniverse/SubWallet-Extension/issues/2823), [#2784](https://github.com/Koniverse/SubWallet-Extension/issues/2784), [#2310](https://github.com/Koniverse/SubWallet-Extension/issues/2310), [#2512](https://github.com/Koniverse/SubWallet-Extension/issues/2512), [#2535](https://github.com/Koniverse/SubWallet-Extension/issues/2535), [#2758](https://github.com/Koniverse/SubWallet-Extension/issues/2758)
+
+---
+
+### D72. Auto-update chain metadata over an API instead of bundling polkadot-js/apps metadata
+
+**Context**: Extrinsic construction needs current chain metadata, which the polkadot-js model expected to be refreshed from `polkadot-js/apps` releases — tying signing correctness to upstream release cadence.
+**Decision**: Fetch and auto-update chain metadata over an API at runtime, so the wallet no longer needs a metadata refresh shipped from `polkadot-js/apps`.
+**Rationale**: Decoupling metadata from upstream app releases keeps signing valid across runtime upgrades without a new extension build. Conceptual precursor to the static-data/cache layer (D67/AD-23).
+**Date**: 2023
+**Version**: v1.1.3
+**Citations**: [#588](https://github.com/Koniverse/SubWallet-Extension/issues/588), [#525](https://github.com/Koniverse/SubWallet-Extension/issues/525)
+
+---
+
+### D73. Separate chain "status" (live connection) from chain "state" (configuration)
+
+**Context**: Chain connection health and chain enabled/configured state were conflated in one model, causing performance churn and incorrect network-status display across platforms.
+**Decision**: Split chain status from chain state as separate concepts, applied consistently across Extension, WebApp, Web-Runner and Mobile.
+**Rationale**: Conflating live health with persistent config forced recompute/re-render on every status tick; separating them lets status update independently without churning configuration state.
+**Date**: 2024
+**Version**: v1.1.41
+**Citations**: [#2550](https://github.com/Koniverse/SubWallet-Extension/issues/2550), [#3037](https://github.com/Koniverse/SubWallet-Extension/issues/3037)
+
+---
+
+### D74. Cache earning pool/validator data client-side for performance
+
+**Context**: After the Staking→Earning migration, fetching pool info and full validator/nominator lists on demand made the Earning screens slow.
+**Decision**: Cache most Earning data (pool info, validator lists) client-side and read from cache rather than re-fetching per interaction ("Optimize Earning Performance Round 2").
+**Rationale**: Re-fetching large validator/pool datasets per interaction was the bottleneck; caching trades a little freshness for responsiveness. Early step toward the later middleware/static caching (D85, D46, D66).
+**Date**: 2024
+**Version**: v1.1.41
+**Citations**: [#2636](https://github.com/Koniverse/SubWallet-Extension/issues/2636), [#2615](https://github.com/Koniverse/SubWallet-Extension/issues/2615)
+
+---
+
+### D75. Add an in-app notification + banner subsystem (browser push + remotely-driven banners)
+
+**Context**: Growth/marketing needed to reach users with campaign content (e.g. crowdloan-unlock prompts) without shipping a build per campaign.
+**Decision**: Build a notification subsystem with browser push plus in-app banners, where banner content is provided remotely and click actions deep-link into app screens.
+**Rationale**: A data-driven banner/notification channel lets the team run time-sensitive, segmented campaigns without code changes per campaign.
+**Date**: 2023
+**Version**: v1.1.18
+**Citations**: [#2000](https://github.com/Koniverse/SubWallet-Extension/issues/2000), [#1989](https://github.com/Koniverse/SubWallet-Extension/issues/1989), [#2003](https://github.com/Koniverse/SubWallet-Extension/issues/2003)
+
+---
+
+### D76. Merge the two dApp-connect request interfaces into one connection popup
+
+**Context**: Connecting a dApp surfaced authorization through two separate request interfaces, producing duplicate/confusing connection popups.
+**Decision**: Merge both dApp request interfaces into a single interface so a connection request shows one popup.
+**Rationale**: Two parallel request paths produced redundant popups and inconsistent behaviour; unifying gives one predictable authorization surface (distinct from the WalletConnect pair+session merge of D65 — this is the injected-provider path).
+**Date**: 2024
+**Version**: v1.1.46
+**Citations**: [#2722](https://github.com/Koniverse/SubWallet-Extension/issues/2722)
+
+---
+
+### D77. Introduce Mission Pools as a dedicated, remotely-driven growth/discovery surface
+
+**Context**: SubWallet wanted to promote curated earning/airdrop "missions" and make them easy to discover, separate from the user's own earning positions.
+**Decision**: Ship a dedicated Mission Pools feature and surface it in Settings as a curated, remotely-driven list distinct from the core Earning pool list.
+**Rationale**: A separate promotional surface lets the team push campaigns/missions to the whole user base, which the position-filtered Earning list cannot serve.
+**Date**: 2024
+**Version**: v1.1.46–v1.1.49
+**Citations**: [#2781](https://github.com/Koniverse/SubWallet-Extension/issues/2781), [#2375](https://github.com/Koniverse/SubWallet-Extension/issues/2375), [#2710](https://github.com/Koniverse/SubWallet-Extension/issues/2710), [#2796](https://github.com/Koniverse/SubWallet-Extension/issues/2796)
+
+---
+
+### D78. Warn (not block) on cross-chain transfers to a centralized-exchange (CEX) address
+
+**Context**: Sending assets cross-chain (XCM) to a CEX deposit address can permanently lose funds, since exchanges typically do not credit cross-chain deposits.
+**Decision**: Show an explicit warning on cross-chain transfers cautioning that sending to an exchange address may lose funds — a warning, not a hard block.
+**Rationale**: CEX-destination loss is a known footgun, but the wallet cannot reliably detect every exchange address, so a prominent warning preserves user agency while mitigating the common irreversible mistake (distinct from the ED/dust guard).
+**Date**: 2024
+**Version**: v1.1.55
+**Citations**: [#2873](https://github.com/Koniverse/SubWallet-Extension/issues/2873)
+
+---
+
+## Phase 2 — v1.2.x (2024)
+
+> XCM delegated to ParaSpell, the dark-only UI decision (D68), the Zondax generic Ledger app + CheckMetadataHash client signing (D79–D80), the remote "block action" kill-switch (D81), serving EVM accounts via the Substrate provider (D82), decoupling from @polkadot/js (D83), the price/earning cache + fallback precursors to D67/D66 (D84–D85), and Firefox MV3 (D88).
+
+### D17. Complete MV3 migration (service-worker lifecycle, DApp connection, fetch, storage)
+
+**Context**: Chrome's roadmap required MV3 compliance. The full migration had been researched since D3 (2022-07-01) but execution was deferred while the architecture was stabilised.
+
+**Decision**: Upgrade the extension from MV2 to MV3, redesigning service-worker lifecycle (sleep/full mode), DApp connection (reconnect on wake), `fetch` API (moved to service worker), and storage.
+
+**Rationale**: Chrome's enforcement deadline left no further room for delay. A full architectural migration is cleaner than maintaining both MV2 and MV3 code paths.
+
+**Alternatives considered**:
+- Delay MV3 migration and maintain MV2 branch until Chrome forced migration — rejected: timeline risk too high.
+
+**Impact**: Extension shipped as MV3 on Chrome and Firefox; a new MV3 UI design also shipped alongside.
+
+**Date**: 2023-11-18
+**Version**: v1.2.1
+
+**Citations**: [#2205](https://github.com/Koniverse/SubWallet-Extension/issues/2205), [#2120](https://github.com/Koniverse/SubWallet-Extension/issues/2120)
+
+---
+
+### D28. Abandon SnowBridge SDK in favour of ParaSpell API for XCM bridge protection
+
+**Context**: A SnowBridge SDK implementation was underway to provide safety guards against asset loss on the Polkadot↔Ethereum bridge.
+
+**Decision**: Abandon the SnowBridge SDK implementation and rely on the ParaSpell API (already integrated) to provide the same protection.
+
+**Rationale**: ParaSpell was already integrated and provides equivalent protection against asset loss without adding a new SDK dependency. Maintaining two bridge SDKs for overlapping functionality increases complexity.
+
+**Alternatives considered**:
+- Implement SnowBridge SDK directly (`@snowbridge/api`) — rejected: redundant with ParaSpell.
+
+**Impact**: SnowBridge SDK not shipped; ParaSpell API used for all XCM bridge operations.
+
+**Date**: 2024-10-01
+**Version**: v1.2.4
+
+**Citations**: [#3416](https://github.com/Koniverse/SubWallet-Extension/issues/3416)
+
+---
+
+### D68. Ship a dark-only product UI; keep the theme enum but hide the theme selector
+
+**Context**: The `ThemeNames` enum carries `DARK`, `LIGHT` and `SUBSPACE`, but maintaining a fully polished light theme across the entire extension + web app + mobile surface is expensive.
+
+**Decision**: Ship **dark-only** in the product: default to `ThemeNames.DARK` and hide the theme selector in Settings. `LIGHT` remains in the enum/code but is not user-selectable.
+
+**Rationale**: One well-finished dark theme is cheaper to maintain and matches the brand; a half-finished light theme is a worse experience than offering none. Keeping the enum avoids ripping out theming infrastructure should light return later.
+
+**Impact**: Settings has no theme toggle (FR-137); components assume the dark palette.
+
+**Date**: 2024
+**Version**: v1.2.x
+**Citations**: [#973](https://github.com/Koniverse/SubWallet-Extension/issues/973)
+
+---
+
+### D79. Adopt the Zondax Polkadot Generic + Migration Ledger apps instead of per-chain Ledger apps
+
+**Context**: Ledger Substrate support previously required a separate device app per chain, so new parachains had no Ledger support until a bespoke app shipped. Zondax released a single "Polkadot Generic" app (plus a "Migration" app).
+**Decision**: Integrate the Zondax Polkadot Generic Ledger app as the path to Ledger support for all Substrate chains, and allow the Migration app to attach Ledger accounts to non-Polkadot networks, showing the attachable-network list per chosen app.
+**Rationale**: A single generic app removes the per-chain-app bottleneck so any Substrate chain gets Ledger support without waiting on a dedicated app; the migration path lets existing per-chain Ledger users move over without re-attaching.
+**Date**: 2024
+**Version**: v1.2.11 → v1.2.29
+**Citations**: [#2453](https://github.com/Koniverse/SubWallet-Extension/issues/2453), [#3307](https://github.com/Koniverse/SubWallet-Extension/issues/3307), [#3402](https://github.com/Koniverse/SubWallet-Extension/issues/3402), [#3458](https://github.com/Koniverse/SubWallet-Extension/issues/3458)
+
+---
+
+### D80. Adopt the CheckMetadataHash signed extension and compute the metadata hash client-side
+
+**Context**: The Polkadot fellowship added a `CheckMetadataHash` signed extension so devices can verify transaction metadata against a known hash, removing Ledger blind-signing — the prerequisite that makes the generic Ledger app (D79) safe.
+**Decision**: Add `CheckMetadataHash` signed-extension support, and move metadata-shortening + `metadataHash` calculation into the client using `@polkadot-api/merkleize-metadata` rather than a server or bundled hash.
+**Rationale**: The signed extension lets the device confirm exactly what it signs (no blind-signing); computing the merkleized hash on the client keeps it in sync with the runtime metadata the extension already holds, avoiding a server round-trip or stale value.
+**Date**: 2024
+**Version**: v1.2.5 → v1.2.16
+**Citations**: [#3175](https://github.com/Koniverse/SubWallet-Extension/issues/3175), [#3305](https://github.com/Koniverse/SubWallet-Extension/issues/3305)
+
+---
+
+### D81. Add a remote "Block action online" kill-switch for transaction submission
+
+**Context**: During emergency outages (backend or chain incident) there was no way to stop users broadcasting transactions that would fail or be unsafe, while still letting them view data.
+**Decision**: Add an online-controlled mechanism that keeps the wallet showing data and operating normally but can block transaction submission remotely on demand during an emergency.
+**Rationale**: A server-controlled submission gate lets the team halt risky on-chain actions instantly without shipping a build, limiting damage during an incident while preserving read-only usability.
+**Date**: 2024
+**Version**: v1.2.31
+**Citations**: [#3635](https://github.com/Koniverse/SubWallet-Extension/issues/3635), [#3711](https://github.com/Koniverse/SubWallet-Extension/issues/3711)
+
+---
+
+### D82. Serve EVM accounts through the Substrate injected provider for dual-ecosystem dApps
+
+**Context**: Some dApps use the Substrate injected interface but need an EVM address (chains with both ecosystems). The Substrate provider previously exposed only Substrate accounts with `substrate`/`both` options.
+**Decision**: Extend the Substrate provider so a dApp can request and use an EVM address through the Substrate interface — adding an `evm` connection option alongside `substrate`/`both`, plus a node-connection-status check.
+**Rationale**: Dual-ecosystem dApps connecting via the Substrate interface could not obtain an EVM address; exposing it through the existing provider reuses the established injection surface instead of forcing a separate path (inverse of the EIP-6963 EVM-provider work in D15).
+**Date**: 2024
+**Version**: v1.2.5 → v1.2.28
+**Citations**: [#2869](https://github.com/Koniverse/SubWallet-Extension/issues/2869), [#3401](https://github.com/Koniverse/SubWallet-Extension/issues/3401)
+
+---
+
+### D83. Decouple from @polkadot/js by removing direct API calls (starting with balance fetching)
+
+**Context**: Extension code called `@polkadot/js` APIs directly throughout, tightly coupling features to that library and to the heavy `ApiPromise` model.
+**Decision**: Stop calling `@polkadot/js` directly and route through SubWallet's own abstraction, beginning with native-token balance fetching.
+**Rationale**: Direct calls make it hard to swap the connection layer or move logic to the lightweight connector / backend services; abstracting them is a prerequisite for backend-aggregated data (D66) and for not being locked to `@polkadot/js` internals (extends the motivation of D2).
+**Date**: 2024
+**Version**: v1.2.24
+**Citations**: [#3308](https://github.com/Koniverse/SubWallet-Extension/issues/3308)
+
+---
+
+### D84. Front price & exchange-rate data with a cached endpoint + bundled static fallback
+
+**Context**: SubWallet's price/exchange-rate API frequently failed (403/502), leaving tokens with no price — breaking value display on an outage.
+**Decision**: Move price/exchange-rate fetching to the `api-cache` endpoint and add a static-cache fallback (`static-cache.subwallet.app/price/...`, `.../exchange-rate/...`) plus a final no-data path.
+**Rationale**: A cached endpoint plus bundled static fallback keeps prices available when upstream is down instead of breaking the token/value display. This is the v1.2 origin of the cache/CDN proxy layer formalized in D67 (complements LESSONS §26).
+**Date**: 2024
+**Version**: v1.2.15
+**Citations**: [#3183](https://github.com/Koniverse/SubWallet-Extension/issues/3183)
+
+---
+
+### D85. Serve earning data from a middleware-service cache rather than polling live sources
+
+**Context**: Earning (staking pool/validator) data was fetched live and was a heavy, error-prone path that did not scale per subscription.
+**Decision**: Update the earning feature to read from a cache provided by the middleware service, alongside an earning-service refactor.
+**Rationale**: Live per-subscription polling did not scale; a middleware cache reduces load and improves reliability — the v1.2 origin of the principle D46 (static earning cache) and D66 (Services SDK) later generalized.
+**Date**: 2024
+**Version**: v1.2.5 → v1.2.26
+**Citations**: [#3000](https://github.com/Koniverse/SubWallet-Extension/issues/3000)
+
+---
+
+### D86. Warn and require unstaking when an account stakes via both nomination pool and direct nomination
+
+**Context**: Polkadot announced an upcoming change under which an account staking simultaneously via a nomination pool AND direct nomination would have its pool funds frozen (unable to unstake or claim).
+**Decision**: Detect accounts staking both ways and show a blocking warning at the staking-action confirmation, plus a standing notice advising affected users to unstake one of the two.
+**Rationale**: Without the warning users would unknowingly create positions that the protocol change would freeze; surfacing it at confirmation prevents fund lock-up rather than only documenting it.
+**Date**: 2024
+**Version**: v1.2.28
+**Citations**: [#3477](https://github.com/Koniverse/SubWallet-Extension/issues/3477)
+
+---
+
+### D87. Retire Interlay lending by controlled deprecation (hide option, keep positions, allow withdraw)
+
+**Context**: Interlay lending was being wound down and the team had to retire it without trapping users holding open positions.
+**Decision**: Hide the Interlay lending option on the earning-options screen but keep showing existing positions, disable adding to them, and continue to allow withdraw. (Lending later returns to the product — see FR-83; this records the v1.2 deprecation step.)
+**Rationale**: A graceful unwind lets users exit existing positions safely while preventing new exposure to a retiring product; a hard removal would strand funds.
+**Date**: 2024
+**Version**: v1.2.12
+**Citations**: [#3226](https://github.com/Koniverse/SubWallet-Extension/issues/3226), [#3227](https://github.com/Koniverse/SubWallet-Extension/issues/3227)
+
+---
+
+### D88. Ship MV3 on Firefox, gated on Firefox ≥ 127
+
+**Context**: After the Chrome MV3 migration (D17), Firefox MV3 required separate validation (extension ID, file-size limits) and depended on runtime capabilities only present in newer Firefox.
+**Decision**: Ship the MV3 build on Firefox as well, gating it on Firefox ≥ 127 and prompting users on older versions to upgrade.
+**Rationale**: Firefox's MV3 service-worker behaviour only works correctly from v127, so cross-browser MV3 needed a minimum-version gate plus an upgrade nudge rather than assuming Chrome parity (extends D17).
+**Date**: 2024
+**Version**: v1.2.7
+**Citations**: [#3109](https://github.com/Koniverse/SubWallet-Extension/issues/3109), [#3202](https://github.com/Koniverse/SubWallet-Extension/issues/3202), [#3364](https://github.com/Koniverse/SubWallet-Extension/issues/3364)
+
+---
+
+## Phase 3 — v1.3.x (2024–2025, primary development cycle — Milestones 8–10)
+
+> The bulk of the product: Bitcoin/TON/Cardano integration, dTAO staking & swap, Swap/Fiat consolidation, Proxy/Multisig/Governance, fee abstraction, the WalletConnect Connection model, and the backend Services SDK + cache/CDN layer.
+
+### D20. Native Substrate Path for TAO Staking (Not EVM)
+
+**Context**: When SubWallet began implementing TAO in-app staking (#2505, Jan 2024), a choice existed between integrating Bittensor via its native Substrate/Substrate-based `delegation` pallet or via the Subtensor EVM compatibility layer.
+**Decision**: Implement TAO staking using the native Substrate path, calling Bittensor's native `delegation` pallet directly (via WebSocket RPC to archive nodes such as `wss://archivelb.nakamoto.opentensor.ai:9943`), with validator/delegate data pulled from the OpenTensor delegates JSON and middleware API.
+**Rationale**: Because at the time of initial staking implementation, the native delegation model was the established, well-documented mechanism (`docs.bittensor.com/delegation`); the Subtensor EVM path existed but bridging between native TAO and Subtensor EVM was scoped as a separate later feature (#4901, Dec 2025), confirming the native-first decision.
+**Alternatives considered**:
+- Subtensor EVM path — deferred until Dec 2025 as a separate bridge feature (#4901), not chosen for core staking because native substrate was already the standard Bittensor interaction model.
+**Impact**: The staking service handler, balance subscription, and earning position logic all operate against the native Substrate chain; the Subtensor EVM bridge remains a distinct integration track.
+**Date**: 2024-01-22
+**Version**: v1.3.x (Milestone 8)
+**Citations**: [#2505](https://github.com/Koniverse/SubWallet-Extension/issues/2505), [#4901](https://github.com/Koniverse/SubWallet-Extension/issues/4901)
+
+---
+
+### D23. Support TEP-74 Jetton Standard as the TON Token Type
+
+**Context**: TON's fungible token standard is TEP-74 (Jettons), distinct from ERC-20. Issue #3394 was specifically raised to implement Jetton balance display, and #3455 added `tokenType = TEP74` to the chainlist schema.
+**Decision**: Implement Jetton (TEP-74) as the TON-specific local token type, registering it in the chainlist under `tokenType: TEP74`. Jetton transfer and balance handling follows the TEP-74 spec (Jetton wallet contracts, `transfer` op-code messages). The initial scope includes USD₮ (USDT on TON) as the primary Jetton.
+**Rationale**: Because TEP-74 is the only standardized fungible token spec on TON; without it, only native TON could be supported, excluding the large Jetton ecosystem (USDT on TON being the primary demand driver).
+**Alternatives considered**:
+- Supporting only native TON initially and deferring Jettons — partially done (mainnet was initially disabled in wallet even after chainlist addition, per #3455 comment), but Jetton balance was scoped into the same milestone.
+**Impact**: New `TEP74` token type enum in chainlist; Jetton-specific balance query and transfer message construction; Jetton metadata fetching per TEP-64.
+**Date**: 2024-07-29
+**Version**: v1.3.x (Milestone 8 Experiment)
+**Citations**: [#3394](https://github.com/Koniverse/SubWallet-Extension/issues/3394), [#3455](https://github.com/Koniverse/SubWallet-Extension/issues/3455), [#3384](https://github.com/Koniverse/SubWallet-Extension/issues/3384)
 
 ---
 
@@ -521,46 +801,6 @@
 **Date**: 2024-08-26
 **Version**: v1.3.x (Milestone 8 Experiment)
 **Citations**: [#3512](https://github.com/Koniverse/SubWallet-Extension/issues/3512), [#3700](https://github.com/Koniverse/SubWallet-Extension/issues/3700), [#3449](https://github.com/Koniverse/SubWallet-Extension/issues/3449)
-
----
-
-### D27. Adopt Texterify as the multilingual management platform
-
-**Context**: Translation management was fragmented — files were manually managed in source control with no cross-team tooling, making updates and coordination difficult.
-
-**Decision**: Adopt Texterify as the centralised multilingual management platform.
-
-**Rationale**: Texterify enables cross-team coordination and easier updates compared to ad-hoc translation file management. It provides a dedicated workflow for translators and reduces the risk of key drift between source and translated strings.
-
-**Alternatives considered**:
-- Continue with ad-hoc translation files managed in source control — rejected: not scalable as language count grows.
-
-**Impact**: Translation workflow moved to Texterify; keys synced from the CMS rather than manually in-repo.
-
-**Date**: 2024-09-09
-**Version**: v1.1.x
-
-**Citations**: [#2132](https://github.com/Koniverse/SubWallet-Extension/issues/2132)
-
----
-
-### D28. Abandon SnowBridge SDK in favour of ParaSpell API for XCM bridge protection
-
-**Context**: A SnowBridge SDK implementation was underway to provide safety guards against asset loss on the Polkadot↔Ethereum bridge.
-
-**Decision**: Abandon the SnowBridge SDK implementation and rely on the ParaSpell API (already integrated) to provide the same protection.
-
-**Rationale**: ParaSpell was already integrated and provides equivalent protection against asset loss without adding a new SDK dependency. Maintaining two bridge SDKs for overlapping functionality increases complexity.
-
-**Alternatives considered**:
-- Implement SnowBridge SDK directly (`@snowbridge/api`) — rejected: redundant with ParaSpell.
-
-**Impact**: SnowBridge SDK not shipped; ParaSpell API used for all XCM bridge operations.
-
-**Date**: 2024-10-01
-**Version**: v1.2.4
-
-**Citations**: [#3416](https://github.com/Koniverse/SubWallet-Extension/issues/3416)
 
 ---
 
@@ -607,8 +847,6 @@
 **Citations**: [#3862](https://github.com/Koniverse/SubWallet-Extension/issues/3862), [#3942](https://github.com/Koniverse/SubWallet-Extension/issues/3942), [#4016](https://github.com/Koniverse/SubWallet-Extension/issues/4016)
 
 ---
-
-## Phase 3 — Bitcoin Integration, dTAO Staking & Swap/Fiat Consolidation (2025 H1, shipped v1.3.x)
 
 ### D32. Cancel dynamic swap pair support (Milestone 8 Cancel)
 
@@ -807,8 +1045,6 @@
 **Citations**: [#4467](https://github.com/Koniverse/SubWallet-Extension/issues/4467), [#4496](https://github.com/Koniverse/SubWallet-Extension/issues/4496), [#4517](https://github.com/Koniverse/SubWallet-Extension/issues/4517), [#4573](https://github.com/Koniverse/SubWallet-Extension/issues/4573), [#4595](https://github.com/Koniverse/SubWallet-Extension/issues/4595), [PR #4574](https://github.com/Koniverse/SubWallet-Extension/pull/4574), [PR #4637](https://github.com/Koniverse/SubWallet-Extension/pull/4637)
 
 ---
-
-## Phase 4 — Proxy/Multisig Account Models, Governance Rollout & XCM Migration (2025 H2, shipped v1.3.x)
 
 ### D44. Migrate ParaSpell from V4/V5 to v1 API (docs v12-to-v13)
 
@@ -1063,10 +1299,6 @@
 
 ---
 
-## Phase 5 — Fee Abstraction, Swap-Provider & dApp-Connection Hardening (2024–2025, shipped v1.2.x–v1.3.x)
-
-> Decisions in this phase were recovered from internal product reports (Notion) during the koni-docs migration; they were under-represented in the issue-derived history because much of the work landed as backend/proxy changes rather than extension-only issues. Dates/versions are approximate where the source did not pin them.
-
 ### D60. Compute fee-level parameters and fee logic on the backend, consumed via a subscribe-based FeeService
 
 **Context**: Supporting per-level custom fees (EVM `gasPrice` / `maxFeePerGas` / `maxPriorityFeePerGas`; Substrate tip) and keeping fee logic adjustable required estimating fee parameters that change with network conditions. Doing this purely in-extension meant every fee-logic fix needed a full extension release.
@@ -1080,6 +1312,8 @@
 **Date**: 2025
 **Version**: v1.3.x
 **Citations**: [#4559](https://github.com/Koniverse/SubWallet-Extension/issues/4559), [#4371](https://github.com/Koniverse/SubWallet-Extension/issues/4371), [#4045](https://github.com/Koniverse/SubWallet-Extension/issues/4045)
+
+---
 
 ### D61. Pay transaction fees in non-native tokens on Asset Hub via the `assetConversion` pallet
 
@@ -1098,6 +1332,8 @@
 **Version**: v1.3.x
 **Citations**: [#3590](https://github.com/Koniverse/SubWallet-Extension/issues/3590), [#4371](https://github.com/Koniverse/SubWallet-Extension/issues/4371), [#4043](https://github.com/Koniverse/SubWallet-Extension/issues/4043), [#4552](https://github.com/Koniverse/SubWallet-Extension/issues/4552)
 
+---
+
 ### D62. Migrate Coinbase on-ramp to the secure-init (backend session-token) flow
 
 **Context**: Coinbase deprecated client-side on-ramp initialisation in favour of a "secure init" flow requiring a server-generated session token. D34 covered the Meld on-ramp but not Coinbase, whose secret key must never ship in the extension bundle.
@@ -1111,6 +1347,8 @@
 **Date**: 2025
 **Version**: v1.3.x
 **Citations**: [#4572](https://github.com/Koniverse/SubWallet-Extension/issues/4572), [#1834](https://github.com/Koniverse/SubWallet-Extension/issues/1834)
+
+---
 
 ### D63. Adapt KyberSwap aggregator integration to its divergent slippage / price-impact rules
 
@@ -1126,6 +1364,8 @@
 **Version**: v1.3.x
 **Citations**: [#4144](https://github.com/Koniverse/SubWallet-Extension/issues/4144)
 
+---
+
 ### D64. Model XCM fees as source-execution + source-delivery (sender-paid) vs remote/transport (amount-paid), validated by ParaSpell dry-run
 
 **Context**: After delivery fees were introduced, it was unclear which balance covers each XCM fee, risking under-reserving the sender's balance (see LESSONS §2 for the symptom).
@@ -1140,6 +1380,8 @@
 **Version**: v1.3.x
 **Citations**: [#4133](https://github.com/Koniverse/SubWallet-Extension/issues/4133), [#2792](https://github.com/Koniverse/SubWallet-Extension/issues/2792)
 
+---
+
 ### D65. Model WalletConnect as a single "Connection" merging pair + session, with separate Substrate / EVM sessions; Wallet-role only
 
 **Context**: WalletConnect v2 exposes both a "pair" and a "session" as distinct concepts, and supported chains/methods differ per ecosystem. Surfacing both raw concepts to users would be confusing.
@@ -1153,5 +1395,56 @@
 **Date**: 2024–2025
 **Version**: v1.2.x–v1.3.x
 **Citations**: [#1497](https://github.com/Koniverse/SubWallet-Extension/issues/1497), [#2407](https://github.com/Koniverse/SubWallet-Extension/issues/2407), [#3870](https://github.com/Koniverse/SubWallet-Extension/issues/3870), [#4598](https://github.com/Koniverse/SubWallet-Extension/issues/4598)
+
+---
+
+### D66. Aggregate multi-chain data through the SubWallet Services SDK backend rather than computing it on-device
+
+**Context**: Fetching balance, fee, swap quote, XCM and NFT data per-chain over RPC across 200+ networks is heavy, slow, and rate-limited; doing it all in the client also froze data logic to the extension release cadence.
+
+**Decision**: Route aggregated balance / fee / swap / XCM / NFT data through the SubWallet **Services SDK backend** (`@subwallet-monorepos/subwallet-services-sdk`, wired via `setup-api-sdk.ts`) so the client consumes pre-aggregated data instead of computing everything on-device. See AD-24.
+
+**Rationale**: A backend aggregation layer cuts per-chain RPC load, centralizes multi-chain data assembly, and lets data/aggregation bugs be fixed server-side without shipping a build. Extends the backend-proxy principle of D36/AD-19 from "hide API keys" to "aggregate the data too".
+
+**Alternatives considered**:
+- Keep all aggregation on-device — rejected: doesn't scale to 200+ networks and rate-limits public RPCs.
+
+**Impact**: Balance/fee/swap/XCM/NFT paths consume the SDK; on-device RPC becomes the fallback. NFR-20.
+
+**Date**: 2024–2025
+**Version**: v1.3.x
+**Citations**: [#4112](https://github.com/Koniverse/SubWallet-Extension/issues/4112), [#2615](https://github.com/Koniverse/SubWallet-Extension/issues/2615)
+
+---
+
+### D67. Front market data, metadata and NFT media behind SubWallet cache/CDN proxies with static fallback
+
+**Context**: Market data (token prices, EVM gas, exchange rates) and chain/asset metadata hit upstream rate limits; IPFS NFT media is slow and unreliable; and updating any of this required an extension release when bundled.
+
+**Decision**: Serve prices/gas/rates via `api-cache.subwallet.app`, chain-list and token/asset metadata via `static-data.subwallet.app` (with a `static-cache` JSON fallback), and NFT media via the `ipfs-files` IPFS gateway — all fronting upstream providers. See AD-25.
+
+**Rationale**: A cache/CDN layer reduces rate-limit exposure, enables release-free data updates, and provides a fallback when an upstream is unavailable (complements LESSONS §26 "always bundle a static fallback").
+
+**Impact**: Price/gas/metadata/NFT paths read from SubWallet proxies first; extends the static-data caching of AD-23.
+
+**Date**: 2024–2025
+**Version**: v1.3.x
+**Citations**: [#4074](https://github.com/Koniverse/SubWallet-Extension/issues/4074), [#2696](https://github.com/Koniverse/SubWallet-Extension/issues/2696), [#2615](https://github.com/Koniverse/SubWallet-Extension/issues/2615)
+
+---
+
+### D70. One-Sign (single-signature batch approval) is opt-in and off by default
+
+**Context**: Multi-step flows (swap / XCM approve-then-execute) otherwise prompt the user to sign each constituent transaction. One-Sign lets a single approval cover the whole batch.
+
+**Decision**: Expose One-Sign as an explicit Settings toggle (`allowOneSign`), **off by default**. When enabled, approving the first transaction implicitly approves the subsequent batch in the flow.
+
+**Rationale**: Collapsing several transactions under one signature is a convenience-vs-consent tradeoff; defaulting OFF preserves explicit per-transaction consent, and users opt in knowingly. Pairs with the multi-step signing capability (FR-54) and its settings toggle (FR-133).
+
+**Impact**: One-Sign gated behind the toggle; default flows keep per-tx confirmation.
+
+**Date**: 2025
+**Version**: v1.3.x
+**Citations**: code `allowOneSign`; PRD FR-54, FR-133
 
 ---
