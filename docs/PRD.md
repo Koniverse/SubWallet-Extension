@@ -231,17 +231,29 @@ Epics are ordered by importance to a non-custodial multi-chain wallet, foundatio
 
 #### EPIC-1 — build-infra
 
+Build, packaging and runtime infrastructure the wallet needs before any user-facing feature can run. Covers Manifest V3 service-worker compliance, the Yarn 3 monorepo that shares one codebase across extension / web app / mobile, and the online chain-list + i18n hot-update mechanism that adds networks and translations without shipping a new release.
+**Status:** 3 of 4 FRs shipped; online i18n hot-update (FR-145) is planned.
+
 **FRs:** FR-142, FR-143, FR-144, FR-145
 
 #### EPIC-2 — account
+
+The wallet's foundation: creating, importing (seed phrase, private key, JSON keystore, QR, Trust Wallet) and managing accounts, plus the Unified Account model where one seed phrase derives addresses across Substrate, EVM, Bitcoin, TON and Cardano. Also watch-only accounts, the address book, and custom / child-account derivation. Every other feature builds on these accounts.
+**Status:** 14 of 18 FRs shipped; social recovery, session keys, DID, and the unified→solo split are planned.
 
 **FRs:** FR-1, FR-2, FR-3, FR-4, FR-5, FR-6, FR-7, FR-8, FR-9, FR-10, FR-11, FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-18
 
 #### EPIC-3 — security
 
+Everything protecting the user's keys and funds: phishing-site/address blocking, a master-password policy with auto-lock timer and per-action vs per-session unlock, camera-access and One-Sign toggles, and the non-recoverable-password reset model. This epic is where the non-custodial promise is enforced.
+**Status:** 9 of 11 FRs shipped; Blockaid transaction risk scanning and Merkle Science address screening are planned.
+
 **FRs:** FR-125, FR-126, FR-127, FR-128, FR-129, FR-130, FR-131, FR-132, FR-133, FR-134, FR-135
 
 #### EPIC-4 — chain-management
+
+The multi-chain engine: adding/removing networks and custom RPCs, the 200+-network registry, per-ecosystem integration (EVM, Bitcoin, TON, Cardano), light-client fallback, and custom token import/registry. It determines which chains and tokens the wallet can see at all.
+**Status:** 12 of 18 FRs shipped; Starknet, Cosmos, Solana, Midnight, Flow and Bitcoin-UTXO support are planned.
 
 **FRs:** FR-22, FR-23, FR-24, FR-25, FR-26, FR-27, FR-28, FR-29, FR-30, FR-31, FR-32, FR-33, FR-34, FR-35, FR-36, FR-37, FR-38, FR-39
 
@@ -249,17 +261,29 @@ Epics are ordered by importance to a non-custodial multi-chain wallet, foundatio
 
 #### EPIC-5 — balance
 
+The screen users look at most: an aggregated portfolio across all accounts and chains, transferable-vs-locked balance calculation, auto-detection of tokens, and real-time price plus per-asset price charts. This is the wallet's primary daily surface.
+**Status:** 5 of 6 FRs shipped; portfolio balance-history over time is planned.
+
 **FRs:** FR-40, FR-41, FR-42, FR-43, FR-44, FR-45
 
 #### EPIC-6 — transaction
+
+Moving assets: send/receive, custom fee and tip (including paying fees in a non-native token), on-chain transaction history via indexers, existential-deposit safety guards, metadata-hash signing, one-sign multi-step batching, and ERC-20/PSP-22 spending approval. The core money-movement surface.
+**Status:** 10 of 11 FRs shipped; transaction-history export is planned.
 
 **FRs:** FR-46, FR-47, FR-48, FR-49, FR-50, FR-51, FR-52, FR-53, FR-54, FR-55, FR-56
 
 #### EPIC-7 — dapp-connection
 
+How the wallet talks to dApps: EVM provider injection (EIP-1193 / EIP-6963), the Substrate inject API, WalletConnect v2, and Cardano / Bitcoin / TON connectors, plus per-origin authorization management and arbitrary message signing. For a Web3 wallet this is a primary reason to exist.
+**Status:** 8 of 9 FRs shipped; the dApp createTransaction signing API (Polkadot-JS RFC #6213) is planned.
+
 **FRs:** FR-101, FR-102, FR-103, FR-104, FR-105, FR-106, FR-107, FR-108, FR-109
 
 #### EPIC-8 — onboarding
+
+The first-run and fiat experience: wallet create/restore with backup reminder and terms acceptance, fiat on-ramp (Transak, Banxa, Coinbase Pay, Meld) and off-ramp, and multi-language localization. This is how new users get in and fund the wallet.
+**Status:** 4 of 6 FRs shipped; additional on-ramp providers (MoonPay, Ramp, Apple/Google Pay) and more UI languages are planned.
 
 **FRs:** FR-110, FR-111, FR-112, FR-113, FR-114, FR-115
 
@@ -267,21 +291,36 @@ Epics are ordered by importance to a non-custodial multi-chain wallet, foundatio
 
 #### EPIC-9 — swap
 
+In-wallet token swapping aggregated across providers (Chainflip, Hydration, Uniswap, KyberSwap, SimpleSwap, Asset Hub DEX, Bittensor dTAO) with cross-chain Swap→Bridge multi-hop routing. It lets users exchange tokens without leaving the wallet.
+**Status:** 9 of 10 FRs shipped; additional providers (PiperX, StellaSwap) are planned.
+
 **FRs:** FR-67, FR-68, FR-69, FR-70, FR-71, FR-72, FR-73, FR-74, FR-75, FR-76
 
 #### EPIC-10 — earning
+
+Yield aggregation across every staking mechanism: native nomination, nomination pools, collator/parachain staking, liquid staking, Astar dApp staking, Bittensor dTAO, and Interlay lending — plus earning-path simulation and XCM deposit routing. This is SubWallet's largest feature area and a key differentiator.
+**Status:** 9 of 12 FRs shipped; Bittensor alpha liquid-staking / index strategies and more in-app staking chains are planned.
 
 **FRs:** FR-77, FR-78, FR-79, FR-80, FR-81, FR-82, FR-83, FR-84, FR-85, FR-86, FR-87, FR-88
 
 #### EPIC-11 — bridge-xcm
 
+Cross-chain asset movement: XCM between Polkadot/Kusama parachains plus external bridges (Snowbridge, Avail, Polygon Unified Bridge, Across, and Bittensor TAO↔Subtensor-EVM), including the destination-chain claim step. It connects the wallet's chains to each other and to Ethereum.
+**Status:** 7 of 10 FRs shipped; Bittensor alpha-token bridges, Hyperbridge and Axelar are planned.
+
 **FRs:** FR-57, FR-58, FR-59, FR-60, FR-61, FR-62, FR-63, FR-64, FR-65, FR-66
 
 #### EPIC-12 — nft
 
+NFT display, transfer and import across Substrate (RMRK, Unique/Quartz, Statemint, PSP-34), EVM (ERC-721 / ERC-1155) and Bitcoin Ordinals, including 3D/video rendering and nested collections. The wallet's collectibles surface.
+**Status:** 7 of 9 FRs shipped; ERC-1155 transfer and additional collections/standards are planned.
+
 **FRs:** FR-116, FR-117, FR-118, FR-119, FR-120, FR-121, FR-122, FR-123, FR-124
 
 #### EPIC-13 — governance
+
+On-chain participation: Polkadot OpenGov referenda browsing and conviction voting with vote-lock tracking, plus legacy Governance V1 (Democracy) display. It lets users vote on the chains where their tokens give them a say.
+**Status:** 3 of 4 FRs shipped; OpenGov Phase 2 (delegation, tracks, web-app governance) is planned.
 
 **FRs:** FR-89, FR-90, FR-91, FR-92
 
@@ -289,13 +328,22 @@ Epics are ordered by importance to a non-custodial multi-chain wallet, foundatio
 
 #### EPIC-14 — hardware-wallet
 
+Cold-storage signing: Ledger (generic + per-chain + EVM apps), Keystone, and Polkadot Vault / Parity Signer QR signing, completing the signing step offline. It serves security-conscious users without exposing keys to the extension.
+**Status:** 3 of 4 FRs shipped; more devices (Trezor, Tangem, D'Cent, Keystone 3 Pro) are planned.
+
 **FRs:** FR-97, FR-98, FR-99, FR-100
 
 #### EPIC-15 — proxy
 
+Polkadot pallet proxy accounts: managing named proxy types (Any, NonTransfer, Governance, Staking…) and signing on their behalf via the Sign Selector. An advanced account-authority model for power users.
+**Status:** Shipped (Substrate-only).
+
 **FRs:** FR-19
 
 #### EPIC-16 — multisig
+
+Native Substrate multisig: deterministic off-chain account creation and on-chain pending-transaction detection with role-differentiated approval. Multi-party custody without a custodial backend service.
+**Status:** Shipped (Phase 1, Substrate/Polkadot).
 
 **FRs:** FR-20, FR-21
 
@@ -303,12 +351,21 @@ Epics are ordered by importance to a non-custodial multi-chain wallet, foundatio
 
 #### EPIC-17 — ui-ux
 
+Cross-cutting product quality shared by every feature: the in-app notification center, the dark-only responsive popup + expand view, web-app and mobile parity, settings management, and display-currency selection. The experience layer everything renders through.
+**Status:** All 6 FRs shipped.
+
 **FRs:** FR-136, FR-137, FR-138, FR-139, FR-140, FR-141
 
 #### EPIC-18 — campaign
 
+Growth and engagement: in-app campaign banners, airdrop/quest missions, NFT-mint campaigns, and the Mission Pools reward program. How the team reaches and rewards users inside the product.
+**Status:** All 4 FRs shipped.
+
 **FRs:** FR-93, FR-94, FR-95, FR-96
 
 #### EPIC-19 — chain-abstraction
+
+The forward-looking platform direction: a developer-facing chain-abstraction SDK, account-abstraction and cross-chain-intent standards (ERC-4337 / EIP-7702 / EIP-7683), and AI / DeFAI features. This epic is vision/roadmap, not yet built.
+**Status:** All 3 FRs are planned (roadmap).
 
 **FRs:** FR-146, FR-147, FR-148

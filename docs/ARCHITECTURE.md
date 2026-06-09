@@ -48,43 +48,39 @@ web-runner iframe for mobile webview contexts).
 
 ## Component architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  Browser Extension (Manifest V3)                                    │
-│                                                                     │
-│  ┌──────────────────────────────────────────────────────────────┐  │
-│  │  Background Service Worker                                    │  │
-│  │  (packages/extension-koni → background.ts)                   │  │
-│  │                                                              │  │
-│  │  KoniState ──► ChainService ──► Substrate ApiPromise/WS      │  │
-│  │       │    ──► BalanceService  ──► EVM Web3/Ethers           │  │
-│  │       │    ──► EarningService  ──► TON @ton/ton              │  │
-│  │       │    ──► NFTService      ──► Bitcoin bitcoinjs-lib     │  │
-│  │       │    ──► StakingService                                │  │
-│  │       │    ──► TransactionService                            │  │
-│  │       └──► KeyringService (@subwallet/keyring)               │  │
-│  │                                                              │  │
-│  │  KoniExtension (pri handlers)  ◄── Extension pages           │  │
-│  │  KoniTabs     (pub handlers)   ◄── Injected dApp scripts     │  │
-│  │  KoniCron     (scheduled jobs)                               │  │
-│  └─────────────────┬────────────────────────────────────────────┘  │
-│                    │ Chrome message bus (chrome.runtime.sendMessage) │
-│         ┌──────────┴──────────────────────┐                        │
-│         │                                 │                        │
-│  ┌──────▼──────────┐            ┌─────────▼──────────┐            │
-│  │  popup.html     │            │  portfolio.html     │            │
-│  │  extension-     │            │  (expand view)      │            │
-│  │  koni-ui        │            │  extension-koni-ui  │            │
-│  └─────────────────┘            └────────────────────┘            │
-│                                                                     │
-│  content-script (extension-inject) injected into every browser tab  │
-│    └── exposes window.injectedWeb3 for dApp Substrate access        │
-│    └── exposes window.ethereum for MetaMask-compatible EVM dApps    │
-└─────────────────────────────────────────────────────────────────────┘
-
-Alternate runtimes (no extension):
-  web-runner ──► background logic in iframe/WebView (mobile webview)
-  webapp     ──► standalone web app (extension-web-ui + extension-base)
+```mermaid
+flowchart TD
+    subgraph EXT["Browser Extension (Manifest V3)"]
+        subgraph BG["Background Service Worker — extension-koni / background.ts"]
+            KS["KoniState"]
+            KS --> CS["ChainService"]
+            KS --> BS["BalanceService"]
+            KS --> ES["EarningService"]
+            KS --> NS["NFTService"]
+            KS --> TXS["TransactionService"]
+            KS --> KR["KeyringService<br/>@subwallet/keyring"]
+            KE["KoniExtension — pri handlers"]
+            KT["KoniTabs — pub handlers"]
+            KC["KoniCron — scheduled jobs"]
+        end
+        subgraph UISURF["UI surfaces — extension-koni-ui"]
+            POPUP["popup.html"]
+            EXPAND["portfolio.html — expand view"]
+        end
+        INJ["content-script (extension-inject)<br/>exposes window.injectedWeb3 + window.ethereum"]
+    end
+    CHAINLIB["Chain libraries<br/>@polkadot/api · ethers/web3 · @ton/ton · bitcoinjs-lib"]
+    EXTPAGE["Extension pages"]
+    DAPP["Injected dApp scripts (browser tabs)"]
+    CS --> CHAINLIB
+    BG -- "chrome.runtime.sendMessage" --> UISURF
+    EXTPAGE --> KE
+    DAPP --> KT
+    INJ -. injected into every tab .-> DAPP
+    subgraph ALT["Alternate runtimes (no extension)"]
+        WR["web-runner — background in WebView/iframe (mobile)"]
+        WA["webapp — standalone (extension-web-ui + extension-base)"]
+    end
 ```
 
 ### Package map
@@ -110,23 +106,18 @@ All API calls and key operations must be processed in the background
 environment. Extension pages and inject scripts hold no private key
 material and do not call chain APIs directly.
 
-```
-  UI Surface (extension-koni-ui / extension-web-ui)
-       │
-       │  messaging.ts — typed request/response wrappers
-       │  chrome.runtime.sendMessage (extension) / postMessage (web-runner)
-       ▼
-  Message Bus (extension-base: KoniExtension / KoniTabs)
-       │  routes by message type prefix:
-       │    pri(…) — privileged, only extension pages
-       │    pub(…) — public, injectable by dApps via tabs
-       ▼
-  Background Services (KoniState, ChainService, BalanceService, …)
-       │
-       ├── Substrate: @polkadot/api ApiPromise / WsProvider
-       ├── EVM:       ethers JsonRpcProvider / web3 Web3
-       ├── TON:       @ton/ton TonClient
-       └── Bitcoin:   bitcoinjs-lib
+```mermaid
+flowchart TB
+    UI["UI Surface<br/>extension-koni-ui / extension-web-ui"]
+    BUS["Message Bus<br/>extension-base: KoniExtension / KoniTabs"]
+    SVC["Background Services<br/>KoniState, ChainService, BalanceService, …"]
+    UI -- "messaging.ts — chrome.runtime.sendMessage / postMessage" --> BUS
+    BUS -- "pri(…) privileged — extension pages only" --> SVC
+    BUS -- "pub(…) public — injectable by dApps via tabs" --> SVC
+    SVC --> SUB["Substrate — @polkadot/api ApiPromise / WsProvider"]
+    SVC --> EVM["EVM — ethers JsonRpcProvider / web3"]
+    SVC --> TON["TON — @ton/ton TonClient"]
+    SVC --> BTC["Bitcoin — bitcoinjs-lib"]
 ```
 
 ### Runtime lifecycle & service coordination
@@ -135,6 +126,22 @@ Under Manifest V3 the background is an evictable service worker, so the
 runtime implements an explicit four-state lifecycle (see AD-20). An
 `ActionHandler` (`extension-koni`) tracks open ports in a `connectionMap`
 and drives `KoniState` between states:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Init: service worker boot
+    Init --> StartPartially: pub(…) / dApp msg — wakeup(false)
+    Init --> StartFully: pri(…) / mobile msg — wakeup(true)
+    StartPartially --> StartFully: pri(…) msg — wakeup(true)
+    StartFully --> Sleep: last port closes, SLEEP_TIMEOUT ~60s
+    StartPartially --> Sleep: last port closes, SLEEP_TIMEOUT ~60s
+    Sleep --> StartPartially: pub(…) wakeup
+    Sleep --> StartFully: pri(…) wakeup
+    Init: Init — services constructed, no chain connections
+    StartPartially: Start Partially — minimal services for dApp requests
+    StartFully: Start Fully — all services booted together
+    Sleep: Sleep — services stopped in order, networks paused
+```
 
 | State | Trigger | What runs |
 |-------|---------|-----------|
