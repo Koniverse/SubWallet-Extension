@@ -50,37 +50,47 @@ web-runner iframe for mobile webview contexts).
 
 ```mermaid
 flowchart TD
-    subgraph EXT["Browser Extension (Manifest V3)"]
-        subgraph BG["Background Service Worker — extension-koni / background.ts"]
+    subgraph EXT["🧩 Browser Extension (Manifest V3)"]
+        subgraph BG["⚙️ Background Service Worker — extension-koni / background.ts"]
             KS["KoniState"]
             KS --> CS["ChainService"]
             KS --> BS["BalanceService"]
             KS --> ES["EarningService"]
             KS --> NS["NFTService"]
             KS --> TXS["TransactionService"]
-            KS --> KR["KeyringService<br/>@subwallet/keyring"]
+            KS --> KR["🔑 KeyringService<br/>@subwallet/keyring"]
             KE["KoniExtension — pri handlers"]
             KT["KoniTabs — pub handlers"]
             KC["KoniCron — scheduled jobs"]
         end
-        subgraph UISURF["UI surfaces — extension-koni-ui"]
+        subgraph UISURF["🖥️ UI surfaces — extension-koni-ui"]
             POPUP["popup.html"]
             EXPAND["portfolio.html — expand view"]
         end
-        INJ["content-script (extension-inject)<br/>exposes window.injectedWeb3 + window.ethereum"]
+        INJ["💉 content-script (extension-inject)<br/>window.injectedWeb3 + window.ethereum"]
     end
-    CHAINLIB["Chain libraries<br/>@polkadot/api · ethers/web3 · @ton/ton · bitcoinjs-lib"]
+    CHAINLIB["🌐 Chain libraries<br/>@polkadot/api · ethers/web3 · @ton/ton · bitcoinjs-lib"]
     EXTPAGE["Extension pages"]
-    DAPP["Injected dApp scripts (browser tabs)"]
+    DAPP["🌍 Injected dApp scripts (browser tabs)"]
     CS --> CHAINLIB
     BG -- "chrome.runtime.sendMessage" --> UISURF
     EXTPAGE --> KE
     DAPP --> KT
     INJ -. injected into every tab .-> DAPP
-    subgraph ALT["Alternate runtimes (no extension)"]
-        WR["web-runner — background in WebView/iframe (mobile)"]
-        WA["webapp — standalone (extension-web-ui + extension-base)"]
+    subgraph ALT["📱 Alternate runtimes (no extension)"]
+        WR["web-runner — background in WebView (mobile)"]
+        WA["webapp — standalone (extension-web-ui + base)"]
     end
+    classDef core fill:#cfe2ff,stroke:#06c,color:#000
+    classDef key fill:#ffe4e1,stroke:#d33,color:#000
+    classDef ui fill:#e0f2e0,stroke:#070,color:#000
+    classDef ext fill:#fff3bf,stroke:#a80,color:#000
+    classDef dapp fill:#e9d5ff,stroke:#7c3aed,color:#000
+    class KS,CS,BS,ES,NS,TXS,KE,KT,KC core
+    class KR key
+    class POPUP,EXPAND ui
+    class CHAINLIB,WR,WA ext
+    class INJ,DAPP,EXTPAGE dapp
 ```
 
 ### Package map
@@ -108,16 +118,24 @@ material and do not call chain APIs directly.
 
 ```mermaid
 flowchart TB
-    UI["UI Surface<br/>extension-koni-ui / extension-web-ui"]
-    BUS["Message Bus<br/>extension-base: KoniExtension / KoniTabs"]
-    SVC["Background Services<br/>KoniState, ChainService, BalanceService, …"]
+    UI["🖥️ UI Surface<br/>extension-koni-ui / extension-web-ui"]
+    BUS["📬 Message Bus<br/>extension-base: KoniExtension / KoniTabs"]
+    SVC["⚙️ Background Services<br/>KoniState, ChainService, BalanceService, …"]
     UI -- "messaging.ts — chrome.runtime.sendMessage / postMessage" --> BUS
-    BUS -- "pri(…) privileged — extension pages only" --> SVC
-    BUS -- "pub(…) public — injectable by dApps via tabs" --> SVC
-    SVC --> SUB["Substrate — @polkadot/api ApiPromise / WsProvider"]
-    SVC --> EVM["EVM — ethers JsonRpcProvider / web3"]
-    SVC --> TON["TON — @ton/ton TonClient"]
+    BUS -- "🔒 pri(…) privileged — extension pages only" --> SVC
+    BUS -- "🌍 pub(…) public — injectable by dApps via tabs" --> SVC
+    SVC --> SUB["Substrate — @polkadot/api"]
+    SVC --> EVM["EVM — ethers / web3"]
+    SVC --> TON["TON — @ton/ton"]
     SVC --> BTC["Bitcoin — bitcoinjs-lib"]
+    classDef ui fill:#e0f2e0,stroke:#070,color:#000
+    classDef bus fill:#fff3bf,stroke:#a80,color:#000
+    classDef svc fill:#cfe2ff,stroke:#06c,color:#000
+    classDef chain fill:#e9d5ff,stroke:#7c3aed,color:#000
+    class UI ui
+    class BUS bus
+    class SVC svc
+    class SUB,EVM,TON,BTC chain
 ```
 
 ### Runtime lifecycle & service coordination
@@ -130,17 +148,25 @@ and drives `KoniState` between states:
 ```mermaid
 stateDiagram-v2
     [*] --> Init: service worker boot
-    Init --> StartPartially: pub(…) / dApp msg — wakeup(false)
-    Init --> StartFully: pri(…) / mobile msg — wakeup(true)
-    StartPartially --> StartFully: pri(…) msg — wakeup(true)
-    StartFully --> Sleep: last port closes, SLEEP_TIMEOUT ~60s
-    StartPartially --> Sleep: last port closes, SLEEP_TIMEOUT ~60s
+    Init --> StartPartially: pub(…) / dApp — wakeup(false)
+    Init --> StartFully: pri(…) / mobile — wakeup(true)
+    StartPartially --> StartFully: pri(…) — wakeup(true)
+    StartFully --> Sleep: last port closes, ~60s
+    StartPartially --> Sleep: last port closes, ~60s
     Sleep --> StartPartially: pub(…) wakeup
     Sleep --> StartFully: pri(…) wakeup
-    Init: Init — services constructed, no chain connections
-    StartPartially: Start Partially — minimal services for dApp requests
-    StartFully: Start Fully — all services booted together
-    Sleep: Sleep — services stopped in order, networks paused
+    Init: Init — services constructed, no chains
+    StartPartially: Start Partially — minimal services
+    StartFully: Start Fully — all services
+    Sleep: Sleep — services stopped, networks paused
+    classDef init fill:#e9ecef,stroke:#868e96,color:#000
+    classDef partial fill:#fff3bf,stroke:#a80,color:#000
+    classDef full fill:#e0f2e0,stroke:#070,color:#000
+    classDef sleep fill:#ffe4e1,stroke:#d33,color:#000
+    class Init init
+    class StartPartially partial
+    class StartFully full
+    class Sleep sleep
 ```
 
 | State | Trigger | What runs |
