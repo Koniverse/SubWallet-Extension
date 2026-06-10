@@ -5,6 +5,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
+import { _BTC_SERVICE_TOKEN } from '@subwallet/extension-base/services/chain-service/constants';
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
 import { BalanceType, BasicTxErrorType, DelegatedStrategyInfo, DelegatedYieldPoolInfo, EarningStatus, HandleYieldStepData, OptimalYieldPath, PrimitiveSubstrateProxyAccountItem, RequestDelegateStakingSubmit, RequestEarlyValidateYield, ResponseEarlyValidateYield, StakeCancelWithdrawalParams, StakingTxErrorType, StrategyInfo, SubmitJoinDelegateStaking, SubmitYieldJoinData, TransactionData, UnstakingInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { BN_TEN, isSameAddress, toBNString } from '@subwallet/extension-base/utils';
@@ -47,9 +48,14 @@ interface TrustedStakeApyResponse {
   strategies: TrustedStakeApyStrategy[];
 }
 
-// TrustedStake external APIs — strategies list and APY data
-const trustedStakeApi = 'https://app.trustedstake.ai/api/strategies-active';
-const trustedStakeApyApi = 'https://api.app.trustedstake.ai/tmc-apy';
+// TrustedStake APIs proxied through btc-api.koni.studio — strategies list and APY data
+const BITCOIN_API_URL = 'https://btc-api.koni.studio';
+const trustedStakeApi = `${BITCOIN_API_URL}/proxy/trustedstake/strategies/active`;
+const trustedStakeApyApi = `${BITCOIN_API_URL}/proxy/trustedstake/tmc-apy`;
+const trustedStakeHeaders = {
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${_BTC_SERVICE_TOKEN}`
+};
 
 export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPoolHandler {
   // @ts-ignore
@@ -170,7 +176,7 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
 
     this.trustedStakeStrategiesPromise = (async () => {
       try {
-        const res = await fetch(trustedStakeApi);
+        const res = await fetch(trustedStakeApi, { headers: trustedStakeHeaders });
         const data = await res.json() as TrustedStakeStrategy[];
         const activeStrategies = data.filter((s) => s.isActive);
 
@@ -211,7 +217,7 @@ export default class TaoDelegateStakingPoolHandler extends BaseNativeStakingPool
 
     this.trustedStakeApyPromise = (async () => {
       try {
-        const res = await fetch(trustedStakeApyApi);
+        const res = await fetch(trustedStakeApyApi, { headers: trustedStakeHeaders });
         const data = await res.json() as TrustedStakeApyResponse;
         const apyMap = new Map<string, number>();
 
