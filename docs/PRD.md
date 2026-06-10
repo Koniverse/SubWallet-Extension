@@ -41,7 +41,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 ---
 
 ## Functional Requirements & Epics
-The wallet's 148 functional requirements, grouped by epic and ordered by importance (foundation first). Each epic states what it covers, why it matters, and its status; the FR table lists every requirement inline with its status. User stories are populated per epic by Stream B under `docs/sprints/`.
+The wallet's 149 functional requirements, grouped by epic and ordered by importance (foundation first). Each epic states what it covers, why it matters, and its status; the FR table lists every requirement inline with its status. User stories are populated per epic by Stream B under `docs/sprints/`.
 
 ### Foundation & Platform
 
@@ -321,14 +321,15 @@ The wallet's 148 functional requirements, grouped by epic and ordered by importa
 
 #### EPIC-16 — multisig
 
-- **Covers:** Native Substrate multisig — deterministic off-chain account creation and on-chain pending-transaction detection with role-differentiated approval.
+- **Covers:** Native Substrate multisig — deterministic off-chain account creation and on-chain pending-transaction detection with role-differentiated approval; indexer-enriched auto-detection and rich history planned (Phase 2).
 - **Why it matters:** Multi-party custody without a custodial backend service.
-- **Status:** 🟢 **Shipped** — 2/2 FRs
+- **Status:** 🟡 **Partially shipped** — 2/3 FRs
 
 | FR | Requirement | Status |
 |----|-------------|--------|
 | FR-134 | Multisig account creation (deterministic off-chain, no on-chain transaction required) and management for Substrate/Polkadot chains | ✅ shipped |
 | FR-135 | Multisig pending-transaction detection (on-chain, no indexer) with role-differentiated approval/rejection flows (initiator vs co-signer) | ✅ shipped |
+| FR-136 | Multisig auto-detection of activated accounts via on-chain scan, plus indexer-enriched transaction history and pending-transaction detail (call data, confirmations) — Phase 2 | 📋 planned |
 
 ### Cross-cutting, Growth & Future
 
@@ -340,12 +341,12 @@ The wallet's 148 functional requirements, grouped by epic and ordered by importa
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-136 | In-app notification center for transaction status, campaign alerts, and system messages | ✅ shipped |
-| FR-137 | Dark-only UI + responsive extension popup and full-page expand view (theme selector hidden in Settings — light theme not user-selectable) | ✅ shipped |
-| FR-138 | Web app (standalone browser app) with feature parity to the extension | ✅ shipped |
-| FR-139 | Mobile app support via web-runner/WebView strategy sharing extension background logic | ✅ shipped |
-| FR-140 | Settings management: network selection, token preferences, account metadata | ✅ shipped |
-| FR-141 | Select display fiat currency for balances and prices | ✅ shipped |
+| FR-137 | In-app notification center for transaction status, campaign alerts, and system messages | ✅ shipped |
+| FR-138 | Dark-only UI + responsive extension popup and full-page expand view (theme selector hidden in Settings — light theme not user-selectable) | ✅ shipped |
+| FR-139 | Web app (standalone browser app) with feature parity to the extension | ✅ shipped |
+| FR-140 | Mobile app support via web-runner/WebView strategy sharing extension background logic | ✅ shipped |
+| FR-141 | Settings management: network selection, token preferences, account metadata | ✅ shipped |
+| FR-142 | Select display fiat currency for balances and prices | ✅ shipped |
 
 #### EPIC-18 — campaign
 
@@ -355,10 +356,10 @@ The wallet's 148 functional requirements, grouped by epic and ordered by importa
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-142 | In-app marketing campaign banners | ✅ shipped |
-| FR-143 | Airdrop / quest mission display | ✅ shipped |
-| FR-144 | NFT mint campaigns | ✅ shipped |
-| FR-145 | Mission Pools reward program | ✅ shipped |
+| FR-143 | In-app marketing campaign banners | ✅ shipped |
+| FR-144 | Airdrop / quest mission display | ✅ shipped |
+| FR-145 | NFT mint campaigns | ✅ shipped |
+| FR-146 | Mission Pools reward program | ✅ shipped |
 
 #### EPIC-19 — chain-abstraction
 
@@ -368,9 +369,9 @@ The wallet's 148 functional requirements, grouped by epic and ordered by importa
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-146 | Chain abstraction SDK: package multi-chain logic as a developer-facing service for external dApp teams | 📋 planned |
-| FR-147 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | 📋 planned |
-| FR-148 | AI / DeFAI features (AI agent; AI-assisted swap / earn / transfer; chain-abstraction UX) | 📋 planned |
+| FR-147 | Chain abstraction SDK: package multi-chain logic as a developer-facing service for external dApp teams | 📋 planned |
+| FR-148 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | 📋 planned |
+| FR-149 | AI / DeFAI features (AI agent; AI-assisted swap / earn / transfer; chain-abstraction UX) | 📋 planned |
 
 ---
 
@@ -390,7 +391,7 @@ The wallet's 148 functional requirements, grouped by epic and ordered by importa
 | NFR-10 | Open-source codebase: published on GitHub under an open-source license; community contributions accepted | Transparency |
 | NFR-11 | Memory performance: lightweight WsProvider-only connections used for balance queries; full ApiPromise instantiated only for extrinsic construction; target ≤72 MB RAM regardless of chain count (vs. ~264 MB with full ApiPromise across 20 chains) | Performance |
 | NFR-12 | Cold-start and balance-load performance: background caches last-known state and serves it immediately on popup open; progressive refresh on reconnect with visible skeleton states | Performance |
-| NFR-13 | English-canonical i18n: all user-facing strings authored in English first; translations are bundled per locale in the extension package (loaded from `locales/{lng}/translation.json`) — online runtime translation hot-update is planned (FR-145); background error messages are internationalized | Localization |
+| NFR-13 | English-canonical i18n: all user-facing strings authored in English first; translations are bundled per locale in the extension package (loaded from `locales/{lng}/translation.json`) — online runtime translation hot-update is planned (FR-146); background error messages are internationalized | Localization |
 | NFR-14 | Offline / air-gap signing: hardware wallet flows (Ledger, Keystone, Polkadot Vault) complete without an internet connection for the signing step; signing payloads sent to device; private keys never enter the extension | Security / Availability |
 | NFR-15 | Per-chain XCM route toggle: individual XCM routes can be disabled at runtime via the online chain-list update without requiring an extension release (rapid response to partner-chain incidents) | Availability |
 | NFR-16 | Third-party API-key protection: keyed external providers — swap/bridge routing (Chainflip, KyberSwap, SimpleSwap, Uniswap), Bittensor (dTAO), Cardano/Blockfrost, ParaSpell XCM, and the Bitcoin mainnet indexer + Ordinals/Runes (btc-api) — are proxied through SubWallet-hosted backends (`external-services` via `fetchFromProxyService`; `btc-api` with a service-token header) so provider API keys are never shipped in the extension bundle (only Bitcoin testnet hits public Blockstream/mempool endpoints directly) | Security |
