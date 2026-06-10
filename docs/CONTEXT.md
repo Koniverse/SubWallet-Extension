@@ -476,7 +476,7 @@
 
 **Rationale**: Any password-recovery channel would require a custodial backdoor, breaking the core non-custodial guarantee. The seed phrase is the sole recovery root; the master password only encrypts local key material.
 
-**Impact**: Reset flow must clear balance/NFT caches and re-show the create-master-password screen (gaps fixed via #2880, #2106). FR-25.
+**Impact**: Reset flow must clear balance/NFT caches and re-show the create-master-password screen (gaps fixed via #2880, #2106). FR-33.
 
 **Date**: 2023–2024
 **Version**: v1.1.x
@@ -624,7 +624,7 @@
 
 **Rationale**: One well-finished dark theme is cheaper to maintain and matches the brand; a half-finished light theme is a worse experience than offering none. Keeping the enum avoids ripping out theming infrastructure should light return later.
 
-**Impact**: Settings has no theme toggle (FR-138); components assume the dark palette.
+**Impact**: Settings has no theme toggle (FR-149); components assume the dark palette.
 
 **Date**: 2024
 **Version**: v1.2.x
@@ -723,7 +723,7 @@
 ### D87. Retire Interlay lending by controlled deprecation (hide option, keep positions, allow withdraw)
 
 **Context**: Interlay lending was being wound down and the team had to retire it without trapping users holding open positions.
-**Decision**: Hide the Interlay lending option on the earning-options screen but keep showing existing positions, disable adding to them, and continue to allow withdraw. (Lending later returns to the product — see FR-100; this records the v1.2 deprecation step.)
+**Decision**: Hide the Interlay lending option on the earning-options screen but keep showing existing positions, disable adding to them, and continue to allow withdraw. (Lending later returns to the product — see FR-118; this records the v1.2 deprecation step.)
 **Rationale**: A graceful unwind lets users exit existing positions safely while preventing new exposure to a retiring product; a hard removal would strand funds.
 **Date**: 2024
 **Version**: v1.2.12
@@ -1439,12 +1439,28 @@
 
 **Decision**: Expose One-Sign as an explicit Settings toggle (`allowOneSign`), **off by default**. When enabled, approving the first transaction implicitly approves the subsequent batch in the flow.
 
-**Rationale**: Collapsing several transactions under one signature is a convenience-vs-consent tradeoff; defaulting OFF preserves explicit per-transaction consent, and users opt in knowingly. Pairs with the multi-step signing capability (FR-66) and its settings toggle (FR-31).
+**Rationale**: Collapsing several transactions under one signature is a convenience-vs-consent tradeoff; defaulting OFF preserves explicit per-transaction consent, and users opt in knowingly. Pairs with the multi-step signing capability (FR-83) and its settings toggle (FR-39).
 
 **Impact**: One-Sign gated behind the toggle; default flows keep per-tx confirmation.
 
 **Date**: 2025
 **Version**: v1.3.x
-**Citations**: code `allowOneSign`; PRD FR-66, FR-31
+**Citations**: code `allowOneSign`; PRD FR-83, FR-39
+
+---
+
+### D89. Evaluated-and-dropped swap providers: 1inch, Acala, Zenlink, Parallel Finance
+
+**Context**: Several swap-provider integrations were scoped via GitHub issues over time but never shipped — the earliest Substrate-DEX ambitions (Acala [#39], Zenlink [#38], Parallel Finance [#40]) and, later, the 1inch EVM DEX aggregator ([#4105], PR #4223).
+
+**Decision**: Do not ship these providers. Acala / Zenlink / Parallel Finance were closed `NOT_PLANNED`; the 1inch aggregator effort was shelved — its issue was closed without a merged swap handler (only the `1INCH` token appears in buy-token configs, no DEX integration in `swap-service/handler/`).
+
+**Rationale**: KyberSwap already provides EVM DEX aggregation (FR-104), making a second aggregator (1inch) redundant; Hydration/HydraDX (FR-102) and Asset Hub DEX (FR-106) superseded the early Substrate-DEX ambitions. Adding overlapping aggregators increases maintenance (per-provider slippage/quote rules — see LESSONS) without expanding coverage.
+
+**Impact**: The shipped swap surface is Chainflip, Hydration, Uniswap, KyberSwap, SimpleSwap, Asset Hub DEX, Bittensor dTAO and Optimex; PiperX (FR-110) and StellaSwap (FR-111) remain the only forward-looking swap-provider items in the PRD.
+
+**Date**: 2022–2025
+**Version**: spans v0.x (Acala/Zenlink/Parallel) – v1.3.x (1inch)
+**Citations**: [#4105](https://github.com/Koniverse/SubWallet-Extension/issues/4105) (1inch, PR #4223), [#39](https://github.com/Koniverse/SubWallet-Extension/issues/39) (Acala), [#38](https://github.com/Koniverse/SubWallet-Extension/issues/38) (Zenlink), [#40](https://github.com/Koniverse/SubWallet-Extension/issues/40) (Parallel Finance)
 
 ---
