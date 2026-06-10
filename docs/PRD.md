@@ -41,7 +41,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 ---
 
 ## Functional Requirements & Epics
-  The wallet's 160 functional requirements, grouped by epic and ordered by importance (foundation first). Each epic states what it covers, why it matters, and its status; the FR table lists every requirement inline with its status. User stories are populated per epic by Stream B under `docs/sprints/`.
+  The wallet's 161 functional requirements, grouped by epic and ordered by importance (foundation first). Each epic states what it covers, why it matters, and its status; the FR table lists every requirement inline with its status. User stories are populated per epic by Stream B under `docs/sprints/`.
 
 **Status key:** ✅ shipped · 🚧 in progress (active PR/branch, not yet released) · 📋 planned (no code yet). Epic badge: 🟢 mostly/fully shipped · 🟡 partially shipped · 🔵 roadmap.
 
@@ -305,16 +305,17 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 #### EPIC-14 — governance
 
-- **Covers:** Polkadot OpenGov referenda browsing, conviction voting with vote-lock tracking, plus legacy Governance V1 display.
+- **Covers:** Polkadot OpenGov referenda browsing, conviction voting with vote-lock tracking, plus legacy Governance V1 display; delegation, governance tracks and a dedicated web-app governance surface are the planned Phase-2 expansion.
 - **Why it matters:** Lets users vote where their tokens give them a say in chain decisions.
-- **Status:** 🟢 **Mostly shipped** — 3/4 FRs (1 🚧 in progress)
+- **Status:** 🟡 **Partially shipped** — 3/5 FRs (1 🚧 in progress)
 
 | FR | Requirement | Status |
 |----|-------------|--------|
 | FR-136 | Polkadot OpenGov: referenda list, referendum detail, conviction vote / revote / unvote | ✅ shipped |
 | FR-137 | OpenGov: locked-token detail view and unlock flow after voting period | ✅ shipped |
 | FR-138 | Governance V1 (Democracy) referenda display — legacy chains, display-only | ✅ shipped |
-| FR-139 | OpenGov Phase 2: delegation support, governance tracks, and web-app governance | 🚧 in progress |
+| FR-139 | OpenGov Phase 2: delegation support and governance tracks | 🚧 in progress |
+| FR-140 | Web-app governance — the full OpenGov experience (referenda, conviction voting, delegation, tracks) delivered in the standalone web app | 📋 planned |
 
 ### Advanced Accounts & Signing
 
@@ -326,10 +327,10 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-140 | Ledger Nano S/X hardware wallet signing — Substrate generic app, per-chain Substrate apps, and EVM app | ✅ shipped |
-| FR-141 | Keystone hardware wallet QR-based signing (Substrate) | ✅ shipped |
-| FR-142 | Polkadot Vault / Parity Signer QR-based offline signing | ✅ shipped |
-| FR-143 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | 📋 planned |
+| FR-141 | Ledger Nano S/X hardware wallet signing — Substrate generic app, per-chain Substrate apps, and EVM app | ✅ shipped |
+| FR-142 | Keystone hardware wallet QR-based signing (Substrate) | ✅ shipped |
+| FR-143 | Polkadot Vault / Parity Signer QR-based offline signing | ✅ shipped |
+| FR-144 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | 📋 planned |
 
 #### EPIC-16 — proxy
 
@@ -339,7 +340,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-144 | Proxy account management following Polkadot pallet proxy types (Any, NonTransfer, Governance, Staking, etc.) with proxy signing via Sign Selector | ✅ shipped |
+| FR-145 | Proxy account management following Polkadot pallet proxy types (Any, NonTransfer, Governance, Staking, etc.) with proxy signing via Sign Selector | ✅ shipped |
 
 #### EPIC-17 — multisig
 
@@ -349,9 +350,9 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-145 | Multisig account creation (deterministic off-chain, no on-chain transaction required) and management for Substrate/Polkadot chains | ✅ shipped |
-| FR-146 | Multisig pending-transaction detection (on-chain, no indexer) with role-differentiated approval/rejection flows (initiator vs co-signer) | ✅ shipped |
-| FR-147 | Multisig auto-detection of activated accounts via on-chain scan, plus indexer-enriched transaction history and pending-transaction detail (call data, confirmations) — Phase 2 | 📋 planned |
+| FR-146 | Multisig account creation (deterministic off-chain, no on-chain transaction required) and management for Substrate/Polkadot chains | ✅ shipped |
+| FR-147 | Multisig pending-transaction detection (on-chain, no indexer) with role-differentiated approval/rejection flows (initiator vs co-signer) | ✅ shipped |
+| FR-148 | Multisig auto-detection of activated accounts via on-chain scan, plus indexer-enriched transaction history and pending-transaction detail (call data, confirmations) — Phase 2 | 📋 planned |
 
 ### Cross-cutting, Growth & Future
 
@@ -363,12 +364,12 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-148 | In-app notification center for transaction status, campaign alerts, and system messages | ✅ shipped |
-| FR-149 | Dark-only UI + responsive extension popup and full-page expand view (theme selector hidden in Settings — light theme not user-selectable) | ✅ shipped |
-| FR-150 | Web app (standalone browser app) with feature parity to the extension | ✅ shipped |
-| FR-151 | Mobile app support via web-runner/WebView strategy sharing extension background logic | ✅ shipped |
-| FR-152 | Settings management: network selection, token preferences, account metadata | ✅ shipped |
-| FR-153 | Select display fiat currency for balances and prices | ✅ shipped |
+| FR-149 | In-app notification center for transaction status, campaign alerts, and system messages | ✅ shipped |
+| FR-150 | Dark-only UI + responsive extension popup and full-page expand view (theme selector hidden in Settings — light theme not user-selectable) | ✅ shipped |
+| FR-151 | Web app (standalone browser app) with feature parity to the extension | ✅ shipped |
+| FR-152 | Mobile app support via web-runner/WebView strategy sharing extension background logic | ✅ shipped |
+| FR-153 | Settings management: network selection, token preferences, account metadata | ✅ shipped |
+| FR-154 | Select display fiat currency for balances and prices | ✅ shipped |
 
 #### EPIC-19 — campaign
 
@@ -378,10 +379,10 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-154 | In-app marketing campaign banners | ✅ shipped |
-| FR-155 | Airdrop / quest mission display | ✅ shipped |
-| FR-156 | NFT mint campaigns | ✅ shipped |
-| FR-157 | Mission Pools reward program | ✅ shipped |
+| FR-155 | In-app marketing campaign banners | ✅ shipped |
+| FR-156 | Airdrop / quest mission display | ✅ shipped |
+| FR-157 | NFT mint campaigns | ✅ shipped |
+| FR-158 | Mission Pools reward program | ✅ shipped |
 
 #### EPIC-20 — chain-abstraction
 
@@ -391,9 +392,9 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-158 | Chain abstraction SDK: package multi-chain logic as a developer-facing service for external dApp teams | 📋 planned |
-| FR-159 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | 🚧 in progress |
-| FR-160 | AI / DeFAI features (AI agent; AI-assisted swap / earn / transfer; chain-abstraction UX) | 📋 planned |
+| FR-159 | Chain abstraction SDK: package multi-chain logic as a developer-facing service for external dApp teams | 📋 planned |
+| FR-160 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | 🚧 in progress |
+| FR-161 | AI / DeFAI features (AI agent; AI-assisted swap / earn / transfer; chain-abstraction UX) | 📋 planned |
 
 ---
 

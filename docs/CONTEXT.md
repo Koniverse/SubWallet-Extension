@@ -624,7 +624,7 @@
 
 **Rationale**: One well-finished dark theme is cheaper to maintain and matches the brand; a half-finished light theme is a worse experience than offering none. Keeping the enum avoids ripping out theming infrastructure should light return later.
 
-**Impact**: Settings has no theme toggle (FR-149); components assume the dark palette.
+**Impact**: Settings has no theme toggle (FR-150); components assume the dark palette.
 
 **Date**: 2024
 **Version**: v1.2.x
