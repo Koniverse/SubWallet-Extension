@@ -13,8 +13,10 @@ classification:
   complexity: 'High'
   projectContext: 'Brownfield'
 workflowType: 'prd'
-lastEdited: '2026-06-10'
+lastEdited: '2026-06-11'
 editHistory:
+  - date: '2026-06-11'
+    changes: 'Restructure: chain-management above security + absorbs chain-abstraction; split DeFi/Governance groups; new Utilities epic (onboarding+campaign+notification); renumber all EPIC (1-19) and FR (1-161)'
   - date: '2026-06-10'
     changes: 'EPIC arrangement review — swap transaction/NFT ordering, move UI/UX to Foundation, split onboarding/on-ramp, add EPIC-21 fiat-gateway to DeFi, rename Section 5'
   - date: '2026-06-04'
@@ -82,138 +84,137 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-28 | Social recovery for wallet accounts | P0 | 📋 planned | EPIC-3 |
 | FR-29 | Session keys support | P0 | 📋 planned | EPIC-3 |
 | FR-30 | Decentralized identity (DID) integration (e.g. KILT) and DID-based transactions | P0 | 📋 planned | EPIC-3 |
-| FR-31 | Phishing protection: block known phishing sites and addresses via @polkadot/phishing list an… | P0 | ✅ shipped | EPIC-4 |
-| FR-32 | Master password with strength policy covering all accounts | P0 | ✅ shipped | EPIC-4 |
-| FR-33 | Forgot password → reset wallet (master password is non-recoverable; reset clears accounts an… | P0 | ✅ shipped | EPIC-4 |
-| FR-34 | Unified unlock / auto-lock flow | P0 | ✅ shipped | EPIC-4 |
-| FR-35 | Seed phrase display via input elements only (demonic-vulnerability mitigation against autoco… | P0 | ✅ shipped | EPIC-4 |
-| FR-36 | Configurable extension auto-lock timer (lock the wallet after an inactivity timeout) | P0 | ✅ shipped | EPIC-4 |
-| FR-37 | Unlock type: require the master password on every protected action or only once per unlocked… | P0 | ✅ shipped | EPIC-4 |
-| FR-38 | Camera access permission toggle (enable/disable the camera for QR scanning) | P0 | ✅ shipped | EPIC-4 |
-| FR-39 | Single-approval (One-Sign) toggle: opt in to confirm multiple sequential transactions with a… | P0 | ✅ shipped | EPIC-4 |
-| FR-40 | Blockaid transaction & signature risk scanning (EVM) | P0 | 📋 planned | EPIC-4 |
-| FR-41 | Anti-scam address screening (Merkle Science) | P0 | 📋 planned | EPIC-4 |
-| FR-42 | Add and remove networks; configure custom RPC endpoints per chain | P1 | ✅ shipped | EPIC-5 |
-| FR-43 | Disable all active networks at once (bulk disable with confirmation) | P1 | ✅ shipped | EPIC-5 |
-| FR-44 | Reset networks to the default active set | P1 | ✅ shipped | EPIC-5 |
-| FR-45 | Auto-update chain list and token metadata online without requiring an extension release | P1 | ✅ shipped | EPIC-5 |
-| FR-46 | Polkadot/Substrate parachain registry covering 200+ networks with live connectivity status | P1 | ✅ shipped | EPIC-5 |
-| FR-47 | EVM network support (Ethereum mainnet, Base, Moonbeam, Astar, BNB Chain, Polygon, Avalanche,… | P1 | ✅ shipped | EPIC-5 |
-| FR-48 | Bitcoin network integration (BIP44 Legacy / BIP84 Native SegWit / BIP86 Taproot addresses pe… | P1 | ✅ shipped | EPIC-5 |
-| FR-49 | TON network integration with selectable wallet-contract version (v3r1/v3r2/v4/v5) and Jetton… | P1 | ✅ shipped | EPIC-5 |
-| FR-50 | Cardano network integration via Blockfrost (ADA transfers, CIP-26 native assets, CIP-30 dApp… | P1 | ✅ shipped | EPIC-5 |
-| FR-51 | Substrate light-client fallback for chains where no RPC is reachable | P1 | ✅ shipped | EPIC-5 |
-| FR-52 | Starknet ecosystem integration (seed-phrase-derived account-abstracted wallets, STRK + ERC-2… | P1 | 📋 planned | EPIC-5 |
-| FR-53 | Custom token import: add ERC-20 / PSP-22 tokens by contract address | P1 | ✅ shipped | EPIC-5 |
-| FR-54 | Token registry management: enable/disable tokens (visibility) | P1 | ✅ shipped | EPIC-5 |
-| FR-55 | Bitcoin UTXO multi-asset transfer & custom fee control | P1 | 📋 planned | EPIC-5 |
-| FR-56 | Midnight network support | P1 | 📋 planned | EPIC-5 |
-| FR-57 | Flow network support (Cadence & EVM) | P1 | 📋 planned | EPIC-5 |
-| FR-58 | Cosmos ecosystem support | P1 | 📋 planned | EPIC-5 |
-| FR-59 | Solana support | P1 | 📋 planned | EPIC-5 |
-| FR-60 | Aggregate portfolio balance view across all accounts and chains in a single dashboard | P1 | ✅ shipped | EPIC-6 |
-| FR-61 | Transferable vs. locked/frozen balance calculation with correct display in all send flows | P1 | ✅ shipped | EPIC-6 |
-| FR-62 | Auto-detect tokens on supported chains; show/hide zero-balance tokens | P1 | ✅ shipped | EPIC-6 |
-| FR-63 | Real-time token price data and price chart per asset | P1 | ✅ shipped | EPIC-6 |
-| FR-64 | Price history chart per asset (historical OHLCV data) | P1 | ✅ shipped | EPIC-6 |
-| FR-65 | Balance history (historical portfolio value over time) | P1 | 📋 planned | EPIC-6 |
-| FR-66 | NFT display across Substrate collections (RMRK 1.0/2.0, Unique/Quartz, Statemine/Statemint,… | P1 | ✅ shipped | EPIC-7 |
-| FR-67 | Nested / bundled NFT display and navigation (parent–child structure, e.g. Unique network) | P1 | ✅ shipped | EPIC-7 |
-| FR-68 | NFT display across EVM chains (Moonbeam/Moonriver, Astar, ERC-721) | P1 | ✅ shipped | EPIC-7 |
-| FR-69 | ERC-1155 NFT support (display & transfer) | P1 | 📋 planned | EPIC-7 |
-| FR-70 | NFT transfer (send) from the wallet to any compatible address | P1 | ✅ shipped | EPIC-7 |
-| FR-71 | 3D and video NFT viewer support | P1 | ✅ shipped | EPIC-7 |
-| FR-72 | Bitcoin Ordinals/inscriptions display | P1 | ✅ shipped | EPIC-7 |
-| FR-73 | Custom NFT import: add NFT collections by contract (ERC-721 / PSP-34) | P1 | ✅ shipped | EPIC-7 |
-| FR-74 | Additional NFT collections & standards (Ternoa, Joystream, Aventus; ERC-6551 token-bound acc… | P1 | 🚧 in progress | EPIC-7 |
-| FR-75 | Send native tokens and fungible tokens (ERC-20, PSP-22) on all supported ecosystems | P1 | ✅ shipped | EPIC-8 |
-| FR-76 | Receive — display QR code and copyable address per ecosystem | P1 | ✅ shipped | EPIC-8 |
-| FR-77 | Custom fee / tip setting for Substrate and EVM transactions | P1 | ✅ shipped | EPIC-8 |
-| FR-78 | Pay transaction fees with a non-native token (e.g. Asset Hub, Hydration) | P1 | ✅ shipped | EPIC-8 |
-| FR-79 | Transaction history (on-chain) via SubQuery and SubSquid indexer integration | P1 | ✅ shipped | EPIC-8 |
-| FR-80 | Configure a personal Subscan API key for Subscan-powered queries (transaction history, trans… | P1 | ✅ shipped | EPIC-8 |
-| FR-81 | Existential-deposit safety guard: warn user before sending a transfer that would drop the se… | P1 | ✅ shipped | EPIC-8 |
-| FR-82 | Metadata-hash signing for verified extrinsic review (Polkadot Generic Ledger app compatibility) | P1 | ✅ shipped | EPIC-8 |
-| FR-83 | Multi-step signing: approve multiple sequential transactions with a single user confirmation… | P1 | ✅ shipped | EPIC-8 |
-| FR-84 | Token spending approval (ERC-20 / PSP-22 allowance) confirmation step | P1 | ✅ shipped | EPIC-8 |
-| FR-85 | Export transaction history | P1 | 📋 planned | EPIC-8 |
-| FR-86 | MetaMask-compatible EVM provider injection (EIP-1193, EIP-6963 multi-provider discovery) int… | P1 | ✅ shipped | EPIC-9 |
-| FR-87 | Substrate inject API (window.injectedWeb3) for Polkadot dApp compatibility | P1 | ✅ shipped | EPIC-9 |
-| FR-88 | WalletConnect v2 — Substrate and EVM session support | P1 | ✅ shipped | EPIC-9 |
-| FR-89 | Cardano dApp connector: CIP-30 (connect, signData, signTx, submitTx, getUtxo) | P1 | ✅ shipped | EPIC-9 |
-| FR-90 | Bitcoin dApp connection: connect, getAddresses, signMessage, signPsbt, sendTransfer | P1 | ✅ shipped | EPIC-9 |
-| FR-91 | TON dApp connection and signature requests | P1 | ✅ shipped | EPIC-9 |
-| FR-92 | dApp authorization UI (Manage website access): per-origin connection management, per-account… | P1 | ✅ shipped | EPIC-9 |
-| FR-93 | Arbitrary message signing for dApps (personal_sign / eth_signTypedData, Polkadot signMessage… | P1 | ✅ shipped | EPIC-9 |
-| FR-94 | dApp createTransaction signing API (Polkadot-JS RFC #6213) | P1 | 📋 planned | EPIC-9 |
-| FR-95 | Wallet creation and restore onboarding flow with backup reminder and terms acceptance | P1 | ✅ shipped | EPIC-10 |
-| FR-96 | Fiat on-ramp: buy crypto with card via Transak, Banxa, Coinbase Pay, and Meld | P1 | ✅ shipped | EPIC-10 |
-| FR-97 | Fiat off-ramp: sell crypto for fiat via Transak (web app) | P1 | ✅ shipped | EPIC-10 |
-| FR-98 | Multi-language UI (i18n): Vietnamese, Chinese, Japanese, Russian localization (Round 1) | P1 | ✅ shipped | EPIC-10 |
-| FR-99 | Additional fiat on-ramp providers (MoonPay, Ramp.Network, Apple Pay / Google Pay) | P1 | 📋 planned | EPIC-10 |
-| FR-100 | Additional UI languages (German, French, and others) | P1 | 📋 planned | EPIC-10 |
-| FR-101 | In-wallet token swap via Chainflip (Bitcoin ↔ Polkadot ↔ EVM) | P1 | ✅ shipped | EPIC-11 |
-| FR-102 | In-wallet token swap via HydraDX/Hydration DEX | P1 | ✅ shipped | EPIC-11 |
-| FR-103 | In-wallet token swap via Uniswap V3/V4 and UniswapX (Dutch Swap on EVM) | P1 | ✅ shipped | EPIC-11 |
-| FR-104 | In-wallet token swap via KyberSwap (EVM aggregator) | P1 | ✅ shipped | EPIC-11 |
-| FR-105 | In-wallet token swap via SimpleSwap (non-custodial, cross-chain) | P1 | ✅ shipped | EPIC-11 |
-| FR-106 | In-wallet token swap via Asset Hub DEX (Polkadot ecosystem) | P1 | ✅ shipped | EPIC-11 |
-| FR-107 | In-wallet Bittensor dTAO swap: TAO ↔ alpha and cross-subnet alpha-token swaps (subnet AMM) | P1 | ✅ shipped | EPIC-11 |
-| FR-108 | Cross-chain swap routing: Swap→Bridge and Bridge→Swap multi-hop paths | P1 | ✅ shipped | EPIC-11 |
-| FR-109 | Optimex swap integration (intent-based cross-chain swap) | P1 | ✅ shipped | EPIC-11 |
-| FR-110 | In-wallet token swap via PiperX | P1 | 🚧 in progress | EPIC-11 |
-| FR-111 | In-wallet token swap via StellaSwap (Moonbeam DEX) | P1 | 📋 planned | EPIC-11 |
-| FR-112 | Native nomination staking on Polkadot, Kusama, and Substrate parachains | P1 | ✅ shipped | EPIC-12 |
-| FR-113 | Nomination pool staking on Polkadot/Kusama (join, leave, withdraw) | P1 | ✅ shipped | EPIC-12 |
-| FR-114 | Collator / parachain staking (Moonbeam, Moonriver, Astar, Amplitude, Pendulum, Krest, Energy… | P1 | ✅ shipped | EPIC-12 |
-| FR-115 | Liquid staking integrations (e.g., Bifrost, Interlay, and other LST protocols) | P1 | ✅ shipped | EPIC-12 |
-| FR-116 | dApp staking — Astar network dApp staking support | P1 | ✅ shipped | EPIC-12 |
-| FR-117 | Bittensor dTAO / alpha-token subnet staking model | P1 | ✅ shipped | EPIC-12 |
-| FR-118 | Lending integration (Interlay): lend assets to earn yield (distinct from liquid staking) | P1 | ✅ shipped | EPIC-12 |
-| FR-119 | Earning path simulation and step-status tracking for multi-step staking flows | P1 | ✅ shipped | EPIC-12 |
-| FR-120 | XCM channel support for cross-chain deposit routing into earning positions | P1 | ✅ shipped | EPIC-12 |
-| FR-121 | Bittensor alpha-token liquid staking | P1 | 📋 planned | EPIC-12 |
-| FR-122 | Bittensor alpha-index auto-rebalancing delegate-staking strategy | P1 | 🚧 in progress | EPIC-12 |
-| FR-123 | Trusted Stake — alpha index staking integration | P1 | 📋 planned | EPIC-12 |
-| FR-124 | Backprop — alpha subnet trading integration | P1 | 📋 planned | EPIC-12 |
-| FR-125 | In-app staking for additional networks (Enjin, Phala, xx Network, and others) | P1 | 📋 planned | EPIC-12 |
-| FR-126 | XCM cross-chain transfers between Polkadot/Kusama parachains with fee estimation and per-rou… | P1 | ✅ shipped | EPIC-13 |
-| FR-127 | Snowbridge: ETH ↔ Polkadot Asset Hub bridge | P1 | ✅ shipped | EPIC-13 |
-| FR-128 | Avail Bridge: Avail ↔ Ethereum bridge | P1 | ✅ shipped | EPIC-13 |
-| FR-129 | Polygon Unified Bridge: Polygon ↔ Ethereum bridge | P1 | ✅ shipped | EPIC-13 |
-| FR-130 | Across protocol cross-chain bridge (Across-backed Bridge-Swap-Bridge routing) | P1 | ✅ shipped | EPIC-13 |
-| FR-131 | Bridge claim / withdrawal step to finalize cross-chain transfers (Avail, Polygon) | P1 | ✅ shipped | EPIC-13 |
-| FR-132 | Bridge: Bittensor TAO ↔ Subtensor EVM (native-token bridge, bidirectional) | P1 | ✅ shipped | EPIC-13 |
-| FR-133 | Bittensor alpha-token bridges (alpha ↔ Subtensor EVM; xTAO/xAlpha → Base; Liquid Stake Alpha… | P1 | 📋 planned | EPIC-13 |
-| FR-134 | Hyperbridge integration | P1 | 📋 planned | EPIC-13 |
-| FR-135 | Axelar cross-chain integration | P1 | 📋 planned | EPIC-13 |
-| FR-136 | Polkadot OpenGov: referenda list, referendum detail, conviction vote / revote / unvote | P2 | ✅ shipped | EPIC-14 |
-| FR-137 | OpenGov: locked-token detail view and unlock flow after voting period | P2 | ✅ shipped | EPIC-14 |
-| FR-138 | Governance V1 (Democracy) referenda display — legacy chains, display-only | P2 | ✅ shipped | EPIC-14 |
-| FR-139 | OpenGov Phase 2: delegation support and governance tracks | P2 | 🚧 in progress | EPIC-14 |
-| FR-140 | Web-app governance — the full OpenGov experience (referenda, conviction voting, delegation,… | P2 | 📋 planned | EPIC-14 |
-| FR-141 | Ledger Nano S/X hardware wallet signing — Substrate generic app, per-chain Substrate apps, a… | P2 | ✅ shipped | EPIC-15 |
-| FR-142 | Keystone hardware wallet QR-based signing (Substrate) | P2 | ✅ shipped | EPIC-15 |
-| FR-143 | Polkadot Vault / Parity Signer QR-based offline signing | P2 | ✅ shipped | EPIC-15 |
-| FR-144 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | P2 | 📋 planned | EPIC-15 |
-| FR-145 | Proxy account management following Polkadot pallet proxy types (Any, NonTransfer, Governance… | P2 | ✅ shipped | EPIC-16 |
-| FR-146 | Multisig account creation (deterministic off-chain, no on-chain transaction required) and ma… | P2 | ✅ shipped | EPIC-17 |
-| FR-147 | Multisig pending-transaction detection (on-chain, no indexer) with role-differentiated appro… | P2 | ✅ shipped | EPIC-17 |
-| FR-148 | Multisig auto-detection of activated accounts via on-chain scan, plus indexer-enriched trans… | P2 | 📋 planned | EPIC-17 |
-| FR-149 | In-app notification center for transaction status, campaign alerts, and system messages | P2 | ✅ shipped | EPIC-18 |
-| FR-150 | Dark-only UI + responsive extension popup and full-page expand view (theme selector hidden i… | P2 | ✅ shipped | EPIC-18 |
-| FR-151 | Web app (standalone browser app) with feature parity to the extension | P2 | ✅ shipped | EPIC-18 |
-| FR-152 | Mobile app support via web-runner/WebView strategy sharing extension background logic | P2 | ✅ shipped | EPIC-18 |
-| FR-153 | Settings management: network selection, token preferences, account metadata | P2 | ✅ shipped | EPIC-18 |
-| FR-154 | Select display fiat currency for balances and prices | P2 | ✅ shipped | EPIC-18 |
-| FR-155 | In-app marketing campaign banners | P2 | ✅ shipped | EPIC-19 |
-| FR-156 | Airdrop / quest mission display | P2 | ✅ shipped | EPIC-19 |
-| FR-157 | NFT mint campaigns | P2 | ✅ shipped | EPIC-19 |
-| FR-158 | Mission Pools reward program | P2 | ✅ shipped | EPIC-19 |
-| FR-159 | Chain abstraction SDK: package multi-chain logic as a developer-facing service for external… | P2 | 📋 planned | EPIC-20 |
-| FR-160 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | P2 | 🚧 in progress | EPIC-20 |
-| FR-161 | AI / DeFAI features (AI agent; AI-assisted swap / earn / transfer; chain-abstraction UX) | P2 | 📋 planned | EPIC-20 |
-
+| FR-31 | Add and remove networks; configure custom RPC endpoints per chain | P1 | ✅ shipped | EPIC-4 |
+| FR-32 | Disable all active networks at once (bulk disable with confirmation) | P1 | ✅ shipped | EPIC-4 |
+| FR-33 | Reset networks to the default active set | P1 | ✅ shipped | EPIC-4 |
+| FR-34 | Auto-update chain list and token metadata online without requiring an extension release | P1 | ✅ shipped | EPIC-4 |
+| FR-35 | Polkadot/Substrate parachain registry covering 200+ networks with live connectivity status | P1 | ✅ shipped | EPIC-4 |
+| FR-36 | EVM network support (Ethereum mainnet, Base, Moonbeam, Astar, BNB Chain, Polygon, Avalanche,… | P1 | ✅ shipped | EPIC-4 |
+| FR-37 | Bitcoin network integration (BIP44 Legacy / BIP84 Native SegWit / BIP86 Taproot addresses pe… | P1 | ✅ shipped | EPIC-4 |
+| FR-38 | TON network integration with selectable wallet-contract version (v3r1/v3r2/v4/v5) and Jetton… | P1 | ✅ shipped | EPIC-4 |
+| FR-39 | Cardano network integration via Blockfrost (ADA transfers, CIP-26 native assets, CIP-30 dApp… | P1 | ✅ shipped | EPIC-4 |
+| FR-40 | Substrate light-client fallback for chains where no RPC is reachable | P1 | ✅ shipped | EPIC-4 |
+| FR-41 | Starknet ecosystem integration (seed-phrase-derived account-abstracted wallets, STRK + ERC-2… | P1 | 📋 planned | EPIC-4 |
+| FR-42 | Custom token import: add ERC-20 / PSP-22 tokens by contract address | P1 | ✅ shipped | EPIC-4 |
+| FR-43 | Token registry management: enable/disable tokens (visibility) | P1 | ✅ shipped | EPIC-4 |
+| FR-44 | Bitcoin UTXO multi-asset transfer & custom fee control | P1 | 📋 planned | EPIC-4 |
+| FR-45 | Midnight network support | P1 | 📋 planned | EPIC-4 |
+| FR-46 | Flow network support (Cadence & EVM) | P1 | 📋 planned | EPIC-4 |
+| FR-47 | Cosmos ecosystem support | P1 | 📋 planned | EPIC-4 |
+| FR-48 | Solana support | P1 | 📋 planned | EPIC-4 |
+| FR-49 | Chain abstraction SDK: package multi-chain logic as a developer-facing service for external… | P2 | 📋 planned | EPIC-4 |
+| FR-50 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | P2 | 🚧 in progress | EPIC-4 |
+| FR-51 | AI / DeFAI features (AI agent; AI-assisted swap / earn / transfer; chain-abstraction UX) | P2 | 📋 planned | EPIC-4 |
+| FR-52 | Phishing protection: block known phishing sites and addresses via @polkadot/phishing list an… | P0 | ✅ shipped | EPIC-5 |
+| FR-53 | Master password with strength policy covering all accounts | P0 | ✅ shipped | EPIC-5 |
+| FR-54 | Forgot password → reset wallet (master password is non-recoverable; reset clears accounts an… | P0 | ✅ shipped | EPIC-5 |
+| FR-55 | Unified unlock / auto-lock flow | P0 | ✅ shipped | EPIC-5 |
+| FR-56 | Seed phrase display via input elements only (demonic-vulnerability mitigation against autoco… | P0 | ✅ shipped | EPIC-5 |
+| FR-57 | Configurable extension auto-lock timer (lock the wallet after an inactivity timeout) | P0 | ✅ shipped | EPIC-5 |
+| FR-58 | Unlock type: require the master password on every protected action or only once per unlocked… | P0 | ✅ shipped | EPIC-5 |
+| FR-59 | Camera access permission toggle (enable/disable the camera for QR scanning) | P0 | ✅ shipped | EPIC-5 |
+| FR-60 | Single-approval (One-Sign) toggle: opt in to confirm multiple sequential transactions with a… | P0 | ✅ shipped | EPIC-5 |
+| FR-61 | Blockaid transaction & signature risk scanning (EVM) | P0 | 📋 planned | EPIC-5 |
+| FR-62 | Anti-scam address screening (Merkle Science) | P0 | 📋 planned | EPIC-5 |
+| FR-63 | Dark-only UI + responsive extension popup and full-page expand view (theme selector hidden i… | P2 | ✅ shipped | EPIC-6 |
+| FR-64 | Web app (standalone browser app) with feature parity to the extension | P2 | ✅ shipped | EPIC-6 |
+| FR-65 | Mobile app support via web-runner/WebView strategy sharing extension background logic | P2 | ✅ shipped | EPIC-6 |
+| FR-66 | Settings management: network selection, token preferences, account metadata | P2 | ✅ shipped | EPIC-6 |
+| FR-67 | Select display fiat currency for balances and prices | P2 | ✅ shipped | EPIC-6 |
+| FR-68 | Aggregate portfolio balance view across all accounts and chains in a single dashboard | P1 | ✅ shipped | EPIC-7 |
+| FR-69 | Transferable vs. locked/frozen balance calculation with correct display in all send flows | P1 | ✅ shipped | EPIC-7 |
+| FR-70 | Auto-detect tokens on supported chains; show/hide zero-balance tokens | P1 | ✅ shipped | EPIC-7 |
+| FR-71 | Real-time token price data and price chart per asset | P1 | ✅ shipped | EPIC-7 |
+| FR-72 | Price history chart per asset (historical OHLCV data) | P1 | ✅ shipped | EPIC-7 |
+| FR-73 | Balance history (historical portfolio value over time) | P1 | 📋 planned | EPIC-7 |
+| FR-74 | Send native tokens and fungible tokens (ERC-20, PSP-22) on all supported ecosystems | P1 | ✅ shipped | EPIC-8 |
+| FR-75 | Receive — display QR code and copyable address per ecosystem | P1 | ✅ shipped | EPIC-8 |
+| FR-76 | Custom fee / tip setting for Substrate and EVM transactions | P1 | ✅ shipped | EPIC-8 |
+| FR-77 | Pay transaction fees with a non-native token (e.g. Asset Hub, Hydration) | P1 | ✅ shipped | EPIC-8 |
+| FR-78 | Transaction history (on-chain) via SubQuery and SubSquid indexer integration | P1 | ✅ shipped | EPIC-8 |
+| FR-79 | Configure a personal Subscan API key for Subscan-powered queries (transaction history, trans… | P1 | ✅ shipped | EPIC-8 |
+| FR-80 | Existential-deposit safety guard: warn user before sending a transfer that would drop the se… | P1 | ✅ shipped | EPIC-8 |
+| FR-81 | Metadata-hash signing for verified extrinsic review (Polkadot Generic Ledger app compatibility) | P1 | ✅ shipped | EPIC-8 |
+| FR-82 | Multi-step signing: approve multiple sequential transactions with a single user confirmation… | P1 | ✅ shipped | EPIC-8 |
+| FR-83 | Token spending approval (ERC-20 / PSP-22 allowance) confirmation step | P1 | ✅ shipped | EPIC-8 |
+| FR-84 | Export transaction history | P1 | 📋 planned | EPIC-8 |
+| FR-85 | NFT display across Substrate collections (RMRK 1.0/2.0, Unique/Quartz, Statemine/Statemint,… | P1 | ✅ shipped | EPIC-9 |
+| FR-86 | Nested / bundled NFT display and navigation (parent–child structure, e.g. Unique network) | P1 | ✅ shipped | EPIC-9 |
+| FR-87 | NFT display across EVM chains (Moonbeam/Moonriver, Astar, ERC-721) | P1 | ✅ shipped | EPIC-9 |
+| FR-88 | ERC-1155 NFT support (display & transfer) | P1 | 📋 planned | EPIC-9 |
+| FR-89 | NFT transfer (send) from the wallet to any compatible address | P1 | ✅ shipped | EPIC-9 |
+| FR-90 | 3D and video NFT viewer support | P1 | ✅ shipped | EPIC-9 |
+| FR-91 | Bitcoin Ordinals/inscriptions display | P1 | ✅ shipped | EPIC-9 |
+| FR-92 | Custom NFT import: add NFT collections by contract (ERC-721 / PSP-34) | P1 | ✅ shipped | EPIC-9 |
+| FR-93 | Additional NFT collections & standards (Ternoa, Joystream, Aventus; ERC-6551 token-bound acc… | P1 | 🚧 in progress | EPIC-9 |
+| FR-94 | MetaMask-compatible EVM provider injection (EIP-1193, EIP-6963 multi-provider discovery) int… | P1 | ✅ shipped | EPIC-10 |
+| FR-95 | Substrate inject API (window.injectedWeb3) for Polkadot dApp compatibility | P1 | ✅ shipped | EPIC-10 |
+| FR-96 | WalletConnect v2 — Substrate and EVM session support | P1 | ✅ shipped | EPIC-10 |
+| FR-97 | Cardano dApp connector: CIP-30 (connect, signData, signTx, submitTx, getUtxo) | P1 | ✅ shipped | EPIC-10 |
+| FR-98 | Bitcoin dApp connection: connect, getAddresses, signMessage, signPsbt, sendTransfer | P1 | ✅ shipped | EPIC-10 |
+| FR-99 | TON dApp connection and signature requests | P1 | ✅ shipped | EPIC-10 |
+| FR-100 | dApp authorization UI (Manage website access): per-origin connection management, per-account… | P1 | ✅ shipped | EPIC-10 |
+| FR-101 | Arbitrary message signing for dApps (personal_sign / eth_signTypedData, Polkadot signMessage… | P1 | ✅ shipped | EPIC-10 |
+| FR-102 | dApp createTransaction signing API (Polkadot-JS RFC #6213) | P1 | 📋 planned | EPIC-10 |
+| FR-103 | In-wallet token swap via Chainflip (Bitcoin ↔ Polkadot ↔ EVM) | P1 | ✅ shipped | EPIC-11 |
+| FR-104 | In-wallet token swap via HydraDX/Hydration DEX | P1 | ✅ shipped | EPIC-11 |
+| FR-105 | In-wallet token swap via Uniswap V3/V4 and UniswapX (Dutch Swap on EVM) | P1 | ✅ shipped | EPIC-11 |
+| FR-106 | In-wallet token swap via KyberSwap (EVM aggregator) | P1 | ✅ shipped | EPIC-11 |
+| FR-107 | In-wallet token swap via SimpleSwap (non-custodial, cross-chain) | P1 | ✅ shipped | EPIC-11 |
+| FR-108 | In-wallet token swap via Asset Hub DEX (Polkadot ecosystem) | P1 | ✅ shipped | EPIC-11 |
+| FR-109 | In-wallet Bittensor dTAO swap: TAO ↔ alpha and cross-subnet alpha-token swaps (subnet AMM) | P1 | ✅ shipped | EPIC-11 |
+| FR-110 | Cross-chain swap routing: Swap→Bridge and Bridge→Swap multi-hop paths | P1 | ✅ shipped | EPIC-11 |
+| FR-111 | Optimex swap integration (intent-based cross-chain swap) | P1 | ✅ shipped | EPIC-11 |
+| FR-112 | In-wallet token swap via PiperX | P1 | 🚧 in progress | EPIC-11 |
+| FR-113 | In-wallet token swap via StellaSwap (Moonbeam DEX) | P1 | 📋 planned | EPIC-11 |
+| FR-114 | Native nomination staking on Polkadot, Kusama, and Substrate parachains | P1 | ✅ shipped | EPIC-12 |
+| FR-115 | Nomination pool staking on Polkadot/Kusama (join, leave, withdraw) | P1 | ✅ shipped | EPIC-12 |
+| FR-116 | Collator / parachain staking (Moonbeam, Moonriver, Astar, Amplitude, Pendulum, Krest, Energy… | P1 | ✅ shipped | EPIC-12 |
+| FR-117 | Liquid staking integrations (e.g., Bifrost, Interlay, and other LST protocols) | P1 | ✅ shipped | EPIC-12 |
+| FR-118 | dApp staking — Astar network dApp staking support | P1 | ✅ shipped | EPIC-12 |
+| FR-119 | Bittensor dTAO / alpha-token subnet staking model | P1 | ✅ shipped | EPIC-12 |
+| FR-120 | Lending integration (Interlay): lend assets to earn yield (distinct from liquid staking) | P1 | ✅ shipped | EPIC-12 |
+| FR-121 | Earning path simulation and step-status tracking for multi-step staking flows | P1 | ✅ shipped | EPIC-12 |
+| FR-122 | XCM channel support for cross-chain deposit routing into earning positions | P1 | ✅ shipped | EPIC-12 |
+| FR-123 | Bittensor alpha-token liquid staking | P1 | 📋 planned | EPIC-12 |
+| FR-124 | Bittensor alpha-index auto-rebalancing delegate-staking strategy | P1 | 🚧 in progress | EPIC-12 |
+| FR-125 | Trusted Stake — alpha index staking integration | P1 | 📋 planned | EPIC-12 |
+| FR-126 | Backprop — alpha subnet trading integration | P1 | 📋 planned | EPIC-12 |
+| FR-127 | In-app staking for additional networks (Enjin, Phala, xx Network, and others) | P1 | 📋 planned | EPIC-12 |
+| FR-128 | XCM cross-chain transfers between Polkadot/Kusama parachains with fee estimation and per-rou… | P1 | ✅ shipped | EPIC-13 |
+| FR-129 | Snowbridge: ETH ↔ Polkadot Asset Hub bridge | P1 | ✅ shipped | EPIC-13 |
+| FR-130 | Avail Bridge: Avail ↔ Ethereum bridge | P1 | ✅ shipped | EPIC-13 |
+| FR-131 | Polygon Unified Bridge: Polygon ↔ Ethereum bridge | P1 | ✅ shipped | EPIC-13 |
+| FR-132 | Across protocol cross-chain bridge (Across-backed Bridge-Swap-Bridge routing) | P1 | ✅ shipped | EPIC-13 |
+| FR-133 | Bridge claim / withdrawal step to finalize cross-chain transfers (Avail, Polygon) | P1 | ✅ shipped | EPIC-13 |
+| FR-134 | Bridge: Bittensor TAO ↔ Subtensor EVM (native-token bridge, bidirectional) | P1 | ✅ shipped | EPIC-13 |
+| FR-135 | Bittensor alpha-token bridges (alpha ↔ Subtensor EVM; xTAO/xAlpha → Base; Liquid Stake Alpha… | P1 | 📋 planned | EPIC-13 |
+| FR-136 | Hyperbridge integration | P1 | 📋 planned | EPIC-13 |
+| FR-137 | Axelar cross-chain integration | P1 | 📋 planned | EPIC-13 |
+| FR-138 | Fiat on-ramp: buy crypto with card via Transak, Banxa, Coinbase Pay, and Meld | P1 | ✅ shipped | EPIC-14 |
+| FR-139 | Fiat off-ramp: sell crypto for fiat via Transak (web app) | P1 | ✅ shipped | EPIC-14 |
+| FR-140 | Additional fiat on-ramp providers (MoonPay, Ramp.Network, Apple Pay / Google Pay) | P1 | 📋 planned | EPIC-14 |
+| FR-141 | Polkadot OpenGov: referenda list, referendum detail, conviction vote / revote / unvote | P2 | ✅ shipped | EPIC-15 |
+| FR-142 | OpenGov: locked-token detail view and unlock flow after voting period | P2 | ✅ shipped | EPIC-15 |
+| FR-143 | Governance V1 (Democracy) referenda display — legacy chains, display-only | P2 | ✅ shipped | EPIC-15 |
+| FR-144 | OpenGov Phase 2: delegation support and governance tracks | P2 | 🚧 in progress | EPIC-15 |
+| FR-145 | Web-app governance — the full OpenGov experience (referenda, conviction voting, delegation,… | P2 | 📋 planned | EPIC-15 |
+| FR-146 | Ledger Nano S/X hardware wallet signing — Substrate generic app, per-chain Substrate apps, a… | P2 | ✅ shipped | EPIC-16 |
+| FR-147 | Keystone hardware wallet QR-based signing (Substrate) | P2 | ✅ shipped | EPIC-16 |
+| FR-148 | Polkadot Vault / Parity Signer QR-based offline signing | P2 | ✅ shipped | EPIC-16 |
+| FR-149 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | P2 | 📋 planned | EPIC-16 |
+| FR-150 | Proxy account management following Polkadot pallet proxy types (Any, NonTransfer, Governance… | P2 | ✅ shipped | EPIC-17 |
+| FR-151 | Multisig account creation (deterministic off-chain, no on-chain transaction required) and ma… | P2 | ✅ shipped | EPIC-18 |
+| FR-152 | Multisig pending-transaction detection (on-chain, no indexer) with role-differentiated appro… | P2 | ✅ shipped | EPIC-18 |
+| FR-153 | Multisig auto-detection of activated accounts via on-chain scan, plus indexer-enriched trans… | P2 | 📋 planned | EPIC-18 |
+| FR-154 | Wallet creation and restore onboarding flow with backup reminder and terms acceptance | P1 | ✅ shipped | EPIC-19 |
+| FR-155 | Multi-language UI (i18n): Vietnamese, Chinese, Japanese, Russian localization (Round 1) | P1 | ✅ shipped | EPIC-19 |
+| FR-156 | Additional UI languages (German, French, and others) | P1 | 📋 planned | EPIC-19 |
+| FR-157 | In-app marketing campaign banners | P2 | ✅ shipped | EPIC-19 |
+| FR-158 | Airdrop / quest mission display | P2 | ✅ shipped | EPIC-19 |
+| FR-159 | NFT mint campaigns | P2 | ✅ shipped | EPIC-19 |
+| FR-160 | Mission Pools reward program | P2 | ✅ shipped | EPIC-19 |
+| FR-161 | In-app notification center for transaction status, campaign alerts, and system messages | P2 | ✅ shipped | EPIC-19 |
 
 </details>
 
@@ -230,7 +231,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-1 | Manifest V3 (MV3) service-worker background for Chrome/Firefox extension compliance | ✅ shipped |
 | FR-2 | Yarn 3 monorepo package structure enabling code reuse across extension, web app, and mobile | ✅ shipped |
 | FR-3 | Online chain-list hot-update mechanism (no release required) | ✅ shipped |
-| FR-4 | Online i18n hot-update — runtime remote translations (no release); bundled multi-language is FR-98 | 📋 planned |
+| FR-4 | Online i18n hot-update — runtime remote translations (no release); bundled multi-language is FR-155 | 📋 planned |
 
 #### EPIC-2 — core-platform
 
@@ -276,7 +277,37 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-29 | Session keys support | 📋 planned |
 | FR-30 | Decentralized identity (DID) integration (e.g. KILT) and DID-based transactions | 📋 planned |
 
-#### EPIC-4 — security
+#### EPIC-4 — chain-management
+
+- **Covers:** Adding/removing networks and custom RPCs, the 200+-network registry, per-ecosystem integration (EVM, Bitcoin, TON, Cardano), light-client fallback, and custom token import/registry — plus the forward-looking chain-abstraction layer: a developer-facing SDK, account-abstraction / cross-chain-intent standards (ERC-4337 / EIP-7702 / EIP-7683), and AI / DeFAI features.
+- **Why it matters:** It determines which chains and tokens the wallet can see at all — the multi-chain engine; the chain-abstraction roadmap extends that engine into a developer-facing platform.
+- **Status:** 🟡 **Partially shipped** — 12/21 FRs (1 🚧 in progress)
+
+| FR | Requirement | Status |
+|----|-------------|--------|
+| FR-31 | Add and remove networks; configure custom RPC endpoints per chain | ✅ shipped |
+| FR-32 | Disable all active networks at once (bulk disable with confirmation) | ✅ shipped |
+| FR-33 | Reset networks to the default active set | ✅ shipped |
+| FR-34 | Auto-update chain list and token metadata online without requiring an extension release | ✅ shipped |
+| FR-35 | Polkadot/Substrate parachain registry covering 200+ networks with live connectivity status | ✅ shipped |
+| FR-36 | EVM network support (Ethereum mainnet, Base, Moonbeam, Astar, BNB Chain, Polygon, Avalanche, and others) | ✅ shipped |
+| FR-37 | Bitcoin network integration (BIP44 Legacy / BIP84 Native SegWit / BIP86 Taproot addresses per account) | ✅ shipped |
+| FR-38 | TON network integration with selectable wallet-contract version (v3r1/v3r2/v4/v5) and Jetton token support | ✅ shipped |
+| FR-39 | Cardano network integration via Blockfrost (ADA transfers, CIP-26 native assets, CIP-30 dApp connector) | ✅ shipped |
+| FR-40 | Substrate light-client fallback for chains where no RPC is reachable | ✅ shipped |
+| FR-41 | Starknet ecosystem integration (seed-phrase-derived account-abstracted wallets, STRK + ERC-20 transfers) | 📋 planned |
+| FR-42 | Custom token import: add ERC-20 / PSP-22 tokens by contract address | ✅ shipped |
+| FR-43 | Token registry management: enable/disable tokens (visibility) | ✅ shipped |
+| FR-44 | Bitcoin UTXO multi-asset transfer & custom fee control | 📋 planned |
+| FR-45 | Midnight network support | 📋 planned |
+| FR-46 | Flow network support (Cadence & EVM) | 📋 planned |
+| FR-47 | Cosmos ecosystem support | 📋 planned |
+| FR-48 | Solana support | 📋 planned |
+| FR-49 | Chain abstraction SDK: package multi-chain logic as a developer-facing service for external dApp teams | 📋 planned |
+| FR-50 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | 🚧 in progress |
+| FR-51 | AI / DeFAI features (AI agent; AI-assisted swap / earn / transfer; chain-abstraction UX) | 📋 planned |
+
+#### EPIC-5 — security
 
 - **Covers:** Phishing-site/address blocking, a master-password policy with auto-lock and per-action vs per-session unlock, camera-access and One-Sign toggles, and the non-recoverable-password reset model.
 - **Why it matters:** This is where the non-custodial promise is enforced — protecting the user's keys and funds.
@@ -284,63 +315,35 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-31 | Phishing protection: block known phishing sites and addresses via @polkadot/phishing list and ChainPatrol API | ✅ shipped |
-| FR-32 | Master password with strength policy covering all accounts | ✅ shipped |
-| FR-33 | Forgot password → reset wallet (master password is non-recoverable; reset clears accounts and requires re-import) | ✅ shipped |
-| FR-34 | Unified unlock / auto-lock flow | ✅ shipped |
-| FR-35 | Seed phrase display via input elements only (demonic-vulnerability mitigation against autocomplete leaks) | ✅ shipped |
-| FR-36 | Configurable extension auto-lock timer (lock the wallet after an inactivity timeout) | ✅ shipped |
-| FR-37 | Unlock type: require the master password on every protected action or only once per unlocked session | ✅ shipped |
-| FR-38 | Camera access permission toggle (enable/disable the camera for QR scanning) | ✅ shipped |
-| FR-39 | Single-approval (One-Sign) toggle: opt in to confirm multiple sequential transactions with a single signature | ✅ shipped |
-| FR-40 | Blockaid transaction & signature risk scanning (EVM) | 📋 planned |
-| FR-41 | Anti-scam address screening (Merkle Science) | 📋 planned |
+| FR-52 | Phishing protection: block known phishing sites and addresses via @polkadot/phishing list and ChainPatrol API | ✅ shipped |
+| FR-53 | Master password with strength policy covering all accounts | ✅ shipped |
+| FR-54 | Forgot password → reset wallet (master password is non-recoverable; reset clears accounts and requires re-import) | ✅ shipped |
+| FR-55 | Unified unlock / auto-lock flow | ✅ shipped |
+| FR-56 | Seed phrase display via input elements only (demonic-vulnerability mitigation against autocomplete leaks) | ✅ shipped |
+| FR-57 | Configurable extension auto-lock timer (lock the wallet after an inactivity timeout) | ✅ shipped |
+| FR-58 | Unlock type: require the master password on every protected action or only once per unlocked session | ✅ shipped |
+| FR-59 | Camera access permission toggle (enable/disable the camera for QR scanning) | ✅ shipped |
+| FR-60 | Single-approval (One-Sign) toggle: opt in to confirm multiple sequential transactions with a single signature | ✅ shipped |
+| FR-61 | Blockaid transaction & signature risk scanning (EVM) | 📋 planned |
+| FR-62 | Anti-scam address screening (Merkle Science) | 📋 planned |
 
-#### EPIC-5 — chain-management
+#### EPIC-6 — ui-ux
 
-- **Covers:** Adding/removing networks and custom RPCs, the 200+-network registry, per-ecosystem integration (EVM, Bitcoin, TON, Cardano), light-client fallback, and custom token import/registry.
-- **Why it matters:** It determines which chains and tokens the wallet can see at all — the multi-chain engine.
-- **Status:** 🟡 **Partially shipped** — 12/18 FRs
-
-| FR | Requirement | Status |
-|----|-------------|--------|
-| FR-42 | Add and remove networks; configure custom RPC endpoints per chain | ✅ shipped |
-| FR-43 | Disable all active networks at once (bulk disable with confirmation) | ✅ shipped |
-| FR-44 | Reset networks to the default active set | ✅ shipped |
-| FR-45 | Auto-update chain list and token metadata online without requiring an extension release | ✅ shipped |
-| FR-46 | Polkadot/Substrate parachain registry covering 200+ networks with live connectivity status | ✅ shipped |
-| FR-47 | EVM network support (Ethereum mainnet, Base, Moonbeam, Astar, BNB Chain, Polygon, Avalanche, and others) | ✅ shipped |
-| FR-48 | Bitcoin network integration (BIP44 Legacy / BIP84 Native SegWit / BIP86 Taproot addresses per account) | ✅ shipped |
-| FR-49 | TON network integration with selectable wallet-contract version (v3r1/v3r2/v4/v5) and Jetton token support | ✅ shipped |
-| FR-50 | Cardano network integration via Blockfrost (ADA transfers, CIP-26 native assets, CIP-30 dApp connector) | ✅ shipped |
-| FR-51 | Substrate light-client fallback for chains where no RPC is reachable | ✅ shipped |
-| FR-52 | Starknet ecosystem integration (seed-phrase-derived account-abstracted wallets, STRK + ERC-20 transfers) | 📋 planned |
-| FR-53 | Custom token import: add ERC-20 / PSP-22 tokens by contract address | ✅ shipped |
-| FR-54 | Token registry management: enable/disable tokens (visibility) | ✅ shipped |
-| FR-55 | Bitcoin UTXO multi-asset transfer & custom fee control | 📋 planned |
-| FR-56 | Midnight network support | 📋 planned |
-| FR-57 | Flow network support (Cadence & EVM) | 📋 planned |
-| FR-58 | Cosmos ecosystem support | 📋 planned |
-| FR-59 | Solana support | 📋 planned |
-
-#### EPIC-18 — ui-ux
-
-- **Covers:** The in-app notification center, the dark-only responsive popup + expand view, web-app and mobile parity, settings, and display-currency selection.
+- **Covers:** The dark-only responsive popup + expand view, web-app and mobile parity, settings management, and display-currency selection.
 - **Why it matters:** The shared experience layer every feature renders through.
-- **Status:** 🟢 **Shipped** — 6/6 FRs
+- **Status:** 🟢 **Shipped** — 5/5 FRs
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-149 | In-app notification center for transaction status, campaign alerts, and system messages | ✅ shipped |
-| FR-150 | Dark-only UI + responsive extension popup and full-page expand view (theme selector hidden in Settings — light theme not user-selectable) | ✅ shipped |
-| FR-151 | Web app (standalone browser app) with feature parity to the extension | ✅ shipped |
-| FR-152 | Mobile app support via web-runner/WebView strategy sharing extension background logic | ✅ shipped |
-| FR-153 | Settings management: network selection, token preferences, account metadata | ✅ shipped |
-| FR-154 | Select display fiat currency for balances and prices | ✅ shipped |
+| FR-63 | Dark-only UI + responsive extension popup and full-page expand view (theme selector hidden in Settings — light theme not user-selectable) | ✅ shipped |
+| FR-64 | Web app (standalone browser app) with feature parity to the extension | ✅ shipped |
+| FR-65 | Mobile app support via web-runner/WebView strategy sharing extension background logic | ✅ shipped |
+| FR-66 | Settings management: network selection, token preferences, account metadata | ✅ shipped |
+| FR-67 | Select display fiat currency for balances and prices | ✅ shipped |
 
 ### Core Wallet
 
-#### EPIC-6 — balance
+#### EPIC-7 — balance
 
 - **Covers:** An aggregated portfolio across all accounts and chains, transferable-vs-locked calculation, token auto-detection, and real-time price plus per-asset charts.
 - **Why it matters:** It is the screen users look at most — the wallet's daily home.
@@ -348,12 +351,12 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-60 | Aggregate portfolio balance view across all accounts and chains in a single dashboard | ✅ shipped |
-| FR-61 | Transferable vs. locked/frozen balance calculation with correct display in all send flows | ✅ shipped |
-| FR-62 | Auto-detect tokens on supported chains; show/hide zero-balance tokens | ✅ shipped |
-| FR-63 | Real-time token price data and price chart per asset | ✅ shipped |
-| FR-64 | Price history chart per asset (historical OHLCV data) | ✅ shipped |
-| FR-65 | Balance history (historical portfolio value over time) | 📋 planned |
+| FR-68 | Aggregate portfolio balance view across all accounts and chains in a single dashboard | ✅ shipped |
+| FR-69 | Transferable vs. locked/frozen balance calculation with correct display in all send flows | ✅ shipped |
+| FR-70 | Auto-detect tokens on supported chains; show/hide zero-balance tokens | ✅ shipped |
+| FR-71 | Real-time token price data and price chart per asset | ✅ shipped |
+| FR-72 | Price history chart per asset (historical OHLCV data) | ✅ shipped |
+| FR-73 | Balance history (historical portfolio value over time) | 📋 planned |
 
 #### EPIC-8 — transaction
 
@@ -363,19 +366,19 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-75 | Send native tokens and fungible tokens (ERC-20, PSP-22) on all supported ecosystems | ✅ shipped |
-| FR-76 | Receive — display QR code and copyable address per ecosystem | ✅ shipped |
-| FR-77 | Custom fee / tip setting for Substrate and EVM transactions | ✅ shipped |
-| FR-78 | Pay transaction fees with a non-native token (e.g. Asset Hub, Hydration) | ✅ shipped |
-| FR-79 | Transaction history (on-chain) via SubQuery and SubSquid indexer integration | ✅ shipped |
-| FR-80 | Configure a personal Subscan API key for Subscan-powered queries (transaction history, transfers, staking rewards) to raise shared rate limits | ✅ shipped |
-| FR-81 | Existential-deposit safety guard: warn user before sending a transfer that would drop the sender below the existential deposit | ✅ shipped |
-| FR-82 | Metadata-hash signing for verified extrinsic review (Polkadot Generic Ledger app compatibility) | ✅ shipped |
-| FR-83 | Multi-step signing: approve multiple sequential transactions with a single user confirmation (One Sign / batch, Round 1) | ✅ shipped |
-| FR-84 | Token spending approval (ERC-20 / PSP-22 allowance) confirmation step | ✅ shipped |
-| FR-85 | Export transaction history | 📋 planned |
+| FR-74 | Send native tokens and fungible tokens (ERC-20, PSP-22) on all supported ecosystems | ✅ shipped |
+| FR-75 | Receive — display QR code and copyable address per ecosystem | ✅ shipped |
+| FR-76 | Custom fee / tip setting for Substrate and EVM transactions | ✅ shipped |
+| FR-77 | Pay transaction fees with a non-native token (e.g. Asset Hub, Hydration) | ✅ shipped |
+| FR-78 | Transaction history (on-chain) via SubQuery and SubSquid indexer integration | ✅ shipped |
+| FR-79 | Configure a personal Subscan API key for Subscan-powered queries (transaction history, transfers, staking rewards) to raise shared rate limits | ✅ shipped |
+| FR-80 | Existential-deposit safety guard: warn user before sending a transfer that would drop the sender below the existential deposit | ✅ shipped |
+| FR-81 | Metadata-hash signing for verified extrinsic review (Polkadot Generic Ledger app compatibility) | ✅ shipped |
+| FR-82 | Multi-step signing: approve multiple sequential transactions with a single user confirmation (One Sign / batch, Round 1) | ✅ shipped |
+| FR-83 | Token spending approval (ERC-20 / PSP-22 allowance) confirmation step | ✅ shipped |
+| FR-84 | Export transaction history | 📋 planned |
 
-#### EPIC-7 — nft
+#### EPIC-9 — nft
 
 - **Covers:** NFT display, transfer and import across Substrate (RMRK, Unique, PSP-34), EVM (ERC-721/1155) and Bitcoin Ordinals, with 3D/video rendering and nested collections.
 - **Why it matters:** The collectibles surface — display and move users' NFTs.
@@ -383,17 +386,17 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-66 | NFT display across Substrate collections (RMRK 1.0/2.0, Unique/Quartz, Statemine/Statemint, PSP-34/WASM) | ✅ shipped |
-| FR-67 | Nested / bundled NFT display and navigation (parent–child structure, e.g. Unique network) | ✅ shipped |
-| FR-68 | NFT display across EVM chains (Moonbeam/Moonriver, Astar, ERC-721) | ✅ shipped |
-| FR-69 | ERC-1155 NFT support (display & transfer) | 📋 planned |
-| FR-70 | NFT transfer (send) from the wallet to any compatible address | ✅ shipped |
-| FR-71 | 3D and video NFT viewer support | ✅ shipped |
-| FR-72 | Bitcoin Ordinals/inscriptions display | ✅ shipped |
-| FR-73 | Custom NFT import: add NFT collections by contract (ERC-721 / PSP-34) | ✅ shipped |
-| FR-74 | Additional NFT collections & standards (Ternoa, Joystream, Aventus; ERC-6551 token-bound accounts) | 🚧 in progress |
+| FR-85 | NFT display across Substrate collections (RMRK 1.0/2.0, Unique/Quartz, Statemine/Statemint, PSP-34/WASM) | ✅ shipped |
+| FR-86 | Nested / bundled NFT display and navigation (parent–child structure, e.g. Unique network) | ✅ shipped |
+| FR-87 | NFT display across EVM chains (Moonbeam/Moonriver, Astar, ERC-721) | ✅ shipped |
+| FR-88 | ERC-1155 NFT support (display & transfer) | 📋 planned |
+| FR-89 | NFT transfer (send) from the wallet to any compatible address | ✅ shipped |
+| FR-90 | 3D and video NFT viewer support | ✅ shipped |
+| FR-91 | Bitcoin Ordinals/inscriptions display | ✅ shipped |
+| FR-92 | Custom NFT import: add NFT collections by contract (ERC-721 / PSP-34) | ✅ shipped |
+| FR-93 | Additional NFT collections & standards (Ternoa, Joystream, Aventus; ERC-6551 token-bound accounts) | 🚧 in progress |
 
-#### EPIC-9 — dapp-connection
+#### EPIC-10 — dapp-connection
 
 - **Covers:** EVM provider injection (EIP-1193 / EIP-6963), the Substrate inject API, WalletConnect v2, Cardano / Bitcoin / TON connectors, per-origin authorization, and message signing.
 - **Why it matters:** Interacting with dApps is a primary reason a Web3 wallet exists.
@@ -401,29 +404,17 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-86 | MetaMask-compatible EVM provider injection (EIP-1193, EIP-6963 multi-provider discovery) into dApp pages | ✅ shipped |
-| FR-87 | Substrate inject API (window.injectedWeb3) for Polkadot dApp compatibility | ✅ shipped |
-| FR-88 | WalletConnect v2 — Substrate and EVM session support | ✅ shipped |
-| FR-89 | Cardano dApp connector: CIP-30 (connect, signData, signTx, submitTx, getUtxo) | ✅ shipped |
-| FR-90 | Bitcoin dApp connection: connect, getAddresses, signMessage, signPsbt, sendTransfer | ✅ shipped |
-| FR-91 | TON dApp connection and signature requests | ✅ shipped |
-| FR-92 | dApp authorization UI (Manage website access): per-origin connection management, per-account access control, and revocation | ✅ shipped |
-| FR-93 | Arbitrary message signing for dApps (personal_sign / eth_signTypedData, Polkadot signMessage/signRaw, Cardano signData, Bitcoin signMessage, TON sign) | ✅ shipped |
-| FR-94 | dApp createTransaction signing API (Polkadot-JS RFC #6213) | 📋 planned |
+| FR-94 | MetaMask-compatible EVM provider injection (EIP-1193, EIP-6963 multi-provider discovery) into dApp pages | ✅ shipped |
+| FR-95 | Substrate inject API (window.injectedWeb3) for Polkadot dApp compatibility | ✅ shipped |
+| FR-96 | WalletConnect v2 — Substrate and EVM session support | ✅ shipped |
+| FR-97 | Cardano dApp connector: CIP-30 (connect, signData, signTx, submitTx, getUtxo) | ✅ shipped |
+| FR-98 | Bitcoin dApp connection: connect, getAddresses, signMessage, signPsbt, sendTransfer | ✅ shipped |
+| FR-99 | TON dApp connection and signature requests | ✅ shipped |
+| FR-100 | dApp authorization UI (Manage website access): per-origin connection management, per-account access control, and revocation | ✅ shipped |
+| FR-101 | Arbitrary message signing for dApps (personal_sign / eth_signTypedData, Polkadot signMessage/signRaw, Cardano signData, Bitcoin signMessage, TON sign) | ✅ shipped |
+| FR-102 | dApp createTransaction signing API (Polkadot-JS RFC #6213) | 📋 planned |
 
-#### EPIC-10 — onboarding
-
-- **Covers:** Wallet create/restore with backup reminder and T&C, and multi-language localization.
-- **Why it matters:** How new users get into the wallet — the top of the funnel.
-- **Status:** 🟢 **Mostly shipped** — 2/3 FRs
-
-| FR | Requirement | Status |
-|----|-------------|--------|
-| FR-95 | Wallet creation and restore onboarding flow with backup reminder and terms acceptance | ✅ shipped |
-| FR-98 | Multi-language UI (i18n): Vietnamese, Chinese, Japanese, Russian localization (Round 1) | ✅ shipped |
-| FR-100 | Additional UI languages (German, French, and others) | 📋 planned |
-
-### DeFi & Governance
+### DeFi
 
 #### EPIC-11 — swap
 
@@ -433,17 +424,17 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-101 | In-wallet token swap via Chainflip (Bitcoin ↔ Polkadot ↔ EVM) | ✅ shipped |
-| FR-102 | In-wallet token swap via HydraDX/Hydration DEX | ✅ shipped |
-| FR-103 | In-wallet token swap via Uniswap V3/V4 and UniswapX (Dutch Swap on EVM) | ✅ shipped |
-| FR-104 | In-wallet token swap via KyberSwap (EVM aggregator) | ✅ shipped |
-| FR-105 | In-wallet token swap via SimpleSwap (non-custodial, cross-chain) | ✅ shipped |
-| FR-106 | In-wallet token swap via Asset Hub DEX (Polkadot ecosystem) | ✅ shipped |
-| FR-107 | In-wallet Bittensor dTAO swap: TAO ↔ alpha and cross-subnet alpha-token swaps (subnet AMM) | ✅ shipped |
-| FR-108 | Cross-chain swap routing: Swap→Bridge and Bridge→Swap multi-hop paths | ✅ shipped |
-| FR-109 | Optimex swap integration (intent-based cross-chain swap) | ✅ shipped |
-| FR-110 | In-wallet token swap via PiperX | 🚧 in progress |
-| FR-111 | In-wallet token swap via StellaSwap (Moonbeam DEX) | 📋 planned |
+| FR-103 | In-wallet token swap via Chainflip (Bitcoin ↔ Polkadot ↔ EVM) | ✅ shipped |
+| FR-104 | In-wallet token swap via HydraDX/Hydration DEX | ✅ shipped |
+| FR-105 | In-wallet token swap via Uniswap V3/V4 and UniswapX (Dutch Swap on EVM) | ✅ shipped |
+| FR-106 | In-wallet token swap via KyberSwap (EVM aggregator) | ✅ shipped |
+| FR-107 | In-wallet token swap via SimpleSwap (non-custodial, cross-chain) | ✅ shipped |
+| FR-108 | In-wallet token swap via Asset Hub DEX (Polkadot ecosystem) | ✅ shipped |
+| FR-109 | In-wallet Bittensor dTAO swap: TAO ↔ alpha and cross-subnet alpha-token swaps (subnet AMM) | ✅ shipped |
+| FR-110 | Cross-chain swap routing: Swap→Bridge and Bridge→Swap multi-hop paths | ✅ shipped |
+| FR-111 | Optimex swap integration (intent-based cross-chain swap) | ✅ shipped |
+| FR-112 | In-wallet token swap via PiperX | 🚧 in progress |
+| FR-113 | In-wallet token swap via StellaSwap (Moonbeam DEX) | 📋 planned |
 
 #### EPIC-12 — earning
 
@@ -453,20 +444,20 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-112 | Native nomination staking on Polkadot, Kusama, and Substrate parachains | ✅ shipped |
-| FR-113 | Nomination pool staking on Polkadot/Kusama (join, leave, withdraw) | ✅ shipped |
-| FR-114 | Collator / parachain staking (Moonbeam, Moonriver, Astar, Amplitude, Pendulum, Krest, Energy Web X, Mythos, Tanssi, and compatible parachains) | ✅ shipped |
-| FR-115 | Liquid staking integrations (e.g., Bifrost, Interlay, and other LST protocols) | ✅ shipped |
-| FR-116 | dApp staking — Astar network dApp staking support | ✅ shipped |
-| FR-117 | Bittensor dTAO / alpha-token subnet staking model | ✅ shipped |
-| FR-118 | Lending integration (Interlay): lend assets to earn yield (distinct from liquid staking) | ✅ shipped |
-| FR-119 | Earning path simulation and step-status tracking for multi-step staking flows | ✅ shipped |
-| FR-120 | XCM channel support for cross-chain deposit routing into earning positions | ✅ shipped |
-| FR-121 | Bittensor alpha-token liquid staking | 📋 planned |
-| FR-122 | Bittensor alpha-index auto-rebalancing delegate-staking strategy | 🚧 in progress |
-| FR-123 | Trusted Stake — alpha index staking integration | 📋 planned |
-| FR-124 | Backprop — alpha subnet trading integration | 📋 planned |
-| FR-125 | In-app staking for additional networks (Enjin, Phala, xx Network, and others) | 📋 planned |
+| FR-114 | Native nomination staking on Polkadot, Kusama, and Substrate parachains | ✅ shipped |
+| FR-115 | Nomination pool staking on Polkadot/Kusama (join, leave, withdraw) | ✅ shipped |
+| FR-116 | Collator / parachain staking (Moonbeam, Moonriver, Astar, Amplitude, Pendulum, Krest, Energy Web X, Mythos, Tanssi, and compatible parachains) | ✅ shipped |
+| FR-117 | Liquid staking integrations (e.g., Bifrost, Interlay, and other LST protocols) | ✅ shipped |
+| FR-118 | dApp staking — Astar network dApp staking support | ✅ shipped |
+| FR-119 | Bittensor dTAO / alpha-token subnet staking model | ✅ shipped |
+| FR-120 | Lending integration (Interlay): lend assets to earn yield (distinct from liquid staking) | ✅ shipped |
+| FR-121 | Earning path simulation and step-status tracking for multi-step staking flows | ✅ shipped |
+| FR-122 | XCM channel support for cross-chain deposit routing into earning positions | ✅ shipped |
+| FR-123 | Bittensor alpha-token liquid staking | 📋 planned |
+| FR-124 | Bittensor alpha-index auto-rebalancing delegate-staking strategy | 🚧 in progress |
+| FR-125 | Trusted Stake — alpha index staking integration | 📋 planned |
+| FR-126 | Backprop — alpha subnet trading integration | 📋 planned |
+| FR-127 | In-app staking for additional networks (Enjin, Phala, xx Network, and others) | 📋 planned |
 
 #### EPIC-13 — bridge-xcm
 
@@ -476,32 +467,18 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-126 | XCM cross-chain transfers between Polkadot/Kusama parachains with fee estimation and per-route toggle | ✅ shipped |
-| FR-127 | Snowbridge: ETH ↔ Polkadot Asset Hub bridge | ✅ shipped |
-| FR-128 | Avail Bridge: Avail ↔ Ethereum bridge | ✅ shipped |
-| FR-129 | Polygon Unified Bridge: Polygon ↔ Ethereum bridge | ✅ shipped |
-| FR-130 | Across protocol cross-chain bridge (Across-backed Bridge-Swap-Bridge routing) | ✅ shipped |
-| FR-131 | Bridge claim / withdrawal step to finalize cross-chain transfers (Avail, Polygon) | ✅ shipped |
-| FR-132 | Bridge: Bittensor TAO ↔ Subtensor EVM (native-token bridge, bidirectional) | ✅ shipped |
-| FR-133 | Bittensor alpha-token bridges (alpha ↔ Subtensor EVM; xTAO/xAlpha → Base; Liquid Stake Alpha Bridge) | 📋 planned |
-| FR-134 | Hyperbridge integration | 📋 planned |
-| FR-135 | Axelar cross-chain integration | 📋 planned |
+| FR-128 | XCM cross-chain transfers between Polkadot/Kusama parachains with fee estimation and per-route toggle | ✅ shipped |
+| FR-129 | Snowbridge: ETH ↔ Polkadot Asset Hub bridge | ✅ shipped |
+| FR-130 | Avail Bridge: Avail ↔ Ethereum bridge | ✅ shipped |
+| FR-131 | Polygon Unified Bridge: Polygon ↔ Ethereum bridge | ✅ shipped |
+| FR-132 | Across protocol cross-chain bridge (Across-backed Bridge-Swap-Bridge routing) | ✅ shipped |
+| FR-133 | Bridge claim / withdrawal step to finalize cross-chain transfers (Avail, Polygon) | ✅ shipped |
+| FR-134 | Bridge: Bittensor TAO ↔ Subtensor EVM (native-token bridge, bidirectional) | ✅ shipped |
+| FR-135 | Bittensor alpha-token bridges (alpha ↔ Subtensor EVM; xTAO/xAlpha → Base; Liquid Stake Alpha Bridge) | 📋 planned |
+| FR-136 | Hyperbridge integration | 📋 planned |
+| FR-137 | Axelar cross-chain integration | 📋 planned |
 
-#### EPIC-14 — governance
-
-- **Covers:** Polkadot OpenGov referenda browsing, conviction voting with vote-lock tracking, plus legacy Governance V1 display; delegation, governance tracks and a dedicated web-app governance surface are the planned Phase-2 expansion.
-- **Why it matters:** Lets users vote where their tokens give them a say in chain decisions.
-- **Status:** 🟡 **Partially shipped** — 3/5 FRs (1 🚧 in progress)
-
-| FR | Requirement | Status |
-|----|-------------|--------|
-| FR-136 | Polkadot OpenGov: referenda list, referendum detail, conviction vote / revote / unvote | ✅ shipped |
-| FR-137 | OpenGov: locked-token detail view and unlock flow after voting period | ✅ shipped |
-| FR-138 | Governance V1 (Democracy) referenda display — legacy chains, display-only | ✅ shipped |
-| FR-139 | OpenGov Phase 2: delegation support and governance tracks | 🚧 in progress |
-| FR-140 | Web-app governance — the full OpenGov experience (referenda, conviction voting, delegation, tracks) delivered in the standalone web app | 📋 planned |
-
-#### EPIC-21 — fiat-gateway
+#### EPIC-14 — fiat-gateway
 
 - **Covers:** Fiat on-ramp (buy crypto with card via Transak, Banxa, Coinbase Pay, Meld) and off-ramp (sell crypto for fiat), plus additional provider integrations.
 - **Why it matters:** The bridge between traditional finance and the wallet — how users fund their crypto holdings.
@@ -509,13 +486,29 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-96 | Fiat on-ramp: buy crypto with card via Transak, Banxa, Coinbase Pay, and Meld | ✅ shipped |
-| FR-97 | Fiat off-ramp: sell crypto for fiat via Transak (web app) | ✅ shipped |
-| FR-99 | Additional fiat on-ramp providers (MoonPay, Ramp.Network, Apple Pay / Google Pay) | 📋 planned |
+| FR-138 | Fiat on-ramp: buy crypto with card via Transak, Banxa, Coinbase Pay, and Meld | ✅ shipped |
+| FR-139 | Fiat off-ramp: sell crypto for fiat via Transak (web app) | ✅ shipped |
+| FR-140 | Additional fiat on-ramp providers (MoonPay, Ramp.Network, Apple Pay / Google Pay) | 📋 planned |
+
+### Governance
+
+#### EPIC-15 — governance
+
+- **Covers:** Polkadot OpenGov referenda browsing, conviction voting with vote-lock tracking, plus legacy Governance V1 display; delegation, governance tracks and a dedicated web-app governance surface are the planned Phase-2 expansion.
+- **Why it matters:** Lets users vote where their tokens give them a say in chain decisions.
+- **Status:** 🟡 **Partially shipped** — 3/5 FRs (1 🚧 in progress)
+
+| FR | Requirement | Status |
+|----|-------------|--------|
+| FR-141 | Polkadot OpenGov: referenda list, referendum detail, conviction vote / revote / unvote | ✅ shipped |
+| FR-142 | OpenGov: locked-token detail view and unlock flow after voting period | ✅ shipped |
+| FR-143 | Governance V1 (Democracy) referenda display — legacy chains, display-only | ✅ shipped |
+| FR-144 | OpenGov Phase 2: delegation support and governance tracks | 🚧 in progress |
+| FR-145 | Web-app governance — the full OpenGov experience (referenda, conviction voting, delegation, tracks) delivered in the standalone web app | 📋 planned |
 
 ### Advanced Accounts & Signing
 
-#### EPIC-15 — hardware-wallet
+#### EPIC-16 — hardware-wallet
 
 - **Covers:** Ledger (generic / per-chain / EVM apps), Keystone, and Polkadot Vault / Parity Signer QR signing, completing the signing step offline.
 - **Why it matters:** Serves security-conscious users with cold-storage signing — keys never enter the extension.
@@ -523,12 +516,12 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-141 | Ledger Nano S/X hardware wallet signing — Substrate generic app, per-chain Substrate apps, and EVM app | ✅ shipped |
-| FR-142 | Keystone hardware wallet QR-based signing (Substrate) | ✅ shipped |
-| FR-143 | Polkadot Vault / Parity Signer QR-based offline signing | ✅ shipped |
-| FR-144 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | 📋 planned |
+| FR-146 | Ledger Nano S/X hardware wallet signing — Substrate generic app, per-chain Substrate apps, and EVM app | ✅ shipped |
+| FR-147 | Keystone hardware wallet QR-based signing (Substrate) | ✅ shipped |
+| FR-148 | Polkadot Vault / Parity Signer QR-based offline signing | ✅ shipped |
+| FR-149 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | 📋 planned |
 
-#### EPIC-16 — proxy
+#### EPIC-17 — proxy
 
 - **Covers:** Polkadot pallet proxy accounts — managing named proxy types and signing on their behalf via the Sign Selector.
 - **Why it matters:** An advanced account-authority model for power users (delegated signing).
@@ -536,9 +529,9 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-145 | Proxy account management following Polkadot pallet proxy types (Any, NonTransfer, Governance, Staking, etc.) with proxy signing via Sign Selector | ✅ shipped |
+| FR-150 | Proxy account management following Polkadot pallet proxy types (Any, NonTransfer, Governance, Staking, etc.) with proxy signing via Sign Selector | ✅ shipped |
 
-#### EPIC-17 — multisig
+#### EPIC-18 — multisig
 
 - **Covers:** Native Substrate multisig — deterministic off-chain account creation and on-chain pending-transaction detection with role-differentiated approval; indexer-enriched auto-detection and rich history planned (Phase 2).
 - **Why it matters:** Multi-party custody without a custodial backend service.
@@ -546,36 +539,28 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-146 | Multisig account creation (deterministic off-chain, no on-chain transaction required) and management for Substrate/Polkadot chains | ✅ shipped |
-| FR-147 | Multisig pending-transaction detection (on-chain, no indexer) with role-differentiated approval/rejection flows (initiator vs co-signer) | ✅ shipped |
-| FR-148 | Multisig auto-detection of activated accounts via on-chain scan, plus indexer-enriched transaction history and pending-transaction detail (call data, confirmations) — Phase 2 | 📋 planned |
+| FR-151 | Multisig account creation (deterministic off-chain, no on-chain transaction required) and management for Substrate/Polkadot chains | ✅ shipped |
+| FR-152 | Multisig pending-transaction detection (on-chain, no indexer) with role-differentiated approval/rejection flows (initiator vs co-signer) | ✅ shipped |
+| FR-153 | Multisig auto-detection of activated accounts via on-chain scan, plus indexer-enriched transaction history and pending-transaction detail (call data, confirmations) — Phase 2 | 📋 planned |
 
-### Growth & Future
+### Utilities
 
-#### EPIC-19 — campaign
+#### EPIC-19 — utilities
 
-- **Covers:** In-app campaign banners, airdrop/quest missions, NFT-mint campaigns, and the Mission Pools reward program.
-- **Why it matters:** How the team reaches and rewards users inside the product — growth.
-- **Status:** 🟢 **Shipped** — 4/4 FRs
-
-| FR | Requirement | Status |
-|----|-------------|--------|
-| FR-155 | In-app marketing campaign banners | ✅ shipped |
-| FR-156 | Airdrop / quest mission display | ✅ shipped |
-| FR-157 | NFT mint campaigns | ✅ shipped |
-| FR-158 | Mission Pools reward program | ✅ shipped |
-
-#### EPIC-20 — chain-abstraction
-
-- **Covers:** A developer-facing chain-abstraction SDK, account-abstraction and cross-chain-intent standards (ERC-4337 / EIP-7702 / EIP-7683), and AI / DeFAI features.
-- **Why it matters:** The forward-looking platform direction — where SubWallet is heading next.
-- **Status:** 🔵 **Roadmap** — 0/3 FRs (1 🚧 in progress, 2 planned)
+- **Covers:** Wallet create/restore onboarding (backup reminder, T&C) and multi-language localization; in-app growth campaigns (banners, airdrop/quest missions, NFT-mint, Mission Pools); and the in-app notification center.
+- **Why it matters:** The supporting utilities wrapped around the core wallet — getting users in (onboarding, i18n), reaching and rewarding them (campaigns), and keeping them informed (notifications).
+- **Status:** 🟢 **Mostly shipped** — 7/8 FRs
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-159 | Chain abstraction SDK: package multi-chain logic as a developer-facing service for external dApp teams | 📋 planned |
-| FR-160 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | 🚧 in progress |
-| FR-161 | AI / DeFAI features (AI agent; AI-assisted swap / earn / transfer; chain-abstraction UX) | 📋 planned |
+| FR-154 | Wallet creation and restore onboarding flow with backup reminder and terms acceptance | ✅ shipped |
+| FR-155 | Multi-language UI (i18n): Vietnamese, Chinese, Japanese, Russian localization (Round 1) | ✅ shipped |
+| FR-156 | Additional UI languages (German, French, and others) | 📋 planned |
+| FR-157 | In-app marketing campaign banners | ✅ shipped |
+| FR-158 | Airdrop / quest mission display | ✅ shipped |
+| FR-159 | NFT mint campaigns | ✅ shipped |
+| FR-160 | Mission Pools reward program | ✅ shipped |
+| FR-161 | In-app notification center for transaction status, campaign alerts, and system messages | ✅ shipped |
 
 ---
 
