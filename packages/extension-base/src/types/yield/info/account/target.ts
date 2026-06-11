@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { SubstrateProxyType } from '@subwallet/extension-base/types/substrateProxyAccount';
+
 /**
  * @enum {string}
  * @description The earning status of an account in a pool.
@@ -45,4 +47,10 @@ export interface NominationInfo {
   validatorMinStake?: string;
   /** The staking status of the account */
   status: EarningStatus;
+}
+
+export interface DelegatedStrategyInfo extends NominationInfo {
+  substrateProxyType: SubstrateProxyType
+  delay: number;
+  expectedReturn?: number;
 }

@@ -7,7 +7,7 @@ import { ValidatorInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { EarningTagType } from '@subwallet/extension-koni-ui/types';
 import { shuffle } from '@subwallet/extension-koni-ui/utils';
 import { TFunction } from 'i18next';
-import { CirclesThreePlus, Database, HandsClapping, Leaf, User, Users } from 'phosphor-react';
+import { CirclesThreePlus, Database, HandsClapping, Leaf, User, UserCircle, Users } from 'phosphor-react';
 
 // todo: after supporting Astar v3, remove this
 export function isRelatedToAstar (slug: string) {
@@ -64,6 +64,12 @@ export const createEarningTypeTags = (chain: string): Record<YieldPoolType, Earn
       label: 'Subnet staking',
       icon: CirclesThreePlus,
       color: 'blue',
+      weight: 'fill'
+    },
+    [YieldPoolType.DELEGATED_STAKING]: {
+      label: 'Delegated staking',
+      icon: UserCircle,
+      color: 'orange',
       weight: 'fill'
     }
   };
@@ -171,6 +177,10 @@ export const getExtrinsicTypeByPoolInfo = (pool: PoolInfoToGetExtrinsicType): Ex
     if (chain === 'interlay') {
       return ExtrinsicType.MINT_QDOT;
     }
+  }
+
+  if (type === YieldPoolType.DELEGATED_STAKING) {
+    return ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT;
   }
 
   return ExtrinsicType.STAKING_BOND;

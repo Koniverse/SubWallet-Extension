@@ -299,7 +299,6 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
     const getPoolPosition = async () => {
       const rawDelegateStateInfos = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(useAddresses);
       const delegateStateInfos = rawDelegateStateInfos.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
-
       const alphaToTaoRateMap = await getAlphaToTaoRateMap(this.substrateApi, this.getAlphaPriceScaleDecimals());
 
       if (!delegateStateInfos || delegateStateInfos.length === 0) {

@@ -4,7 +4,7 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { CurrencyJson } from '@subwallet/extension-base/background/KoniTypes';
 import { PalletNominationPoolsBondedPoolInner, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { NominationPoolInfo, ValidatorInfo } from '@subwallet/extension-base/types/yield/info/chain/target';
+import { NominationPoolInfo, StrategyInfo, ValidatorInfo } from '@subwallet/extension-base/types/yield/info/chain/target';
 import { InfoItemBase } from '@subwallet/extension-koni-ui/components';
 import { BalanceValueInfo } from '@subwallet/extension-koni-ui/types/balance';
 import { PhosphorIcon } from '@subwallet/extension-koni-ui/types/index';
@@ -69,9 +69,16 @@ export interface ValidatorDataType extends ValidatorInfo {
   isMissingInfo?: boolean;
   isSectionHeader?: boolean;
 }
+
+export interface StrategyDataType extends StrategyInfo {
+  symbol: string;
+  decimals: number;
+  isSectionHeader?: boolean;
+}
+
 export enum NetworkType {
   MAIN_NETWORK = 'MAIN_NETWORK',
   TEST_NETWORK = 'TEST_NETWORK',
 }
 
-export type PoolTargetData = NominationPoolDataType | ValidatorDataType;
+export type PoolTargetData = NominationPoolDataType | ValidatorDataType | StrategyDataType;

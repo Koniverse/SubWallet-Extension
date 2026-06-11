@@ -332,10 +332,17 @@ export interface NativeYieldPoolInfo extends AbstractYieldPoolInfo {
   maxPoolMembers?: number;
 }
 
+export interface DelegatedYieldPoolInfo extends AbstractYieldPoolInfo {
+  type: YieldPoolType.DELEGATED_STAKING;
+  statistic?: NormalYieldPoolStatistic;
+  maxPoolMembers?: number;
+  proxyDeposit?: string;
+}
+
 /**
  * Info of yield pool
  * */
-export type YieldPoolInfo = NativeYieldPoolInfo | NominationYieldPoolInfo | LiquidYieldPoolInfo | LendingYieldPoolInfo;
+export type YieldPoolInfo = NativeYieldPoolInfo | NominationYieldPoolInfo | LiquidYieldPoolInfo | LendingYieldPoolInfo | DelegatedYieldPoolInfo;
 
 /**
  * @interface YieldAssetExpectedEarning

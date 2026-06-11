@@ -5,7 +5,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { STAKING_IDENTITY_API_SLUG } from '@subwallet/extension-base/services/earning-service/constants';
-import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestBondingSubmit, SubmitChangeValidatorStaking, SubmitJoinNativeStaking, SubmitYieldJoinData, TransactionData, ValidatorInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestBondingSubmit, SubmitChangeValidatorStaking, SubmitJoinDelegateStaking, SubmitJoinNativeStaking, SubmitYieldJoinData, TransactionData, ValidatorInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 
 import { noop } from '@polkadot/util';
 
@@ -135,7 +135,7 @@ export default abstract class BaseNativeStakingPoolHandler extends BasePoolHandl
     ];
   }
 
-  abstract createJoinExtrinsic (data: SubmitJoinNativeStaking, positionInfo?: YieldPositionInfo, bondDest?: string, netuid?: number): Promise<[TransactionData, YieldTokenBaseInfo]>
+  abstract createJoinExtrinsic (data: SubmitJoinNativeStaking | SubmitJoinDelegateStaking, positionInfo?: YieldPositionInfo, bondDest?: string, netuid?: number): Promise<[TransactionData, YieldTokenBaseInfo]>
 
   protected async getSubmitStep (params: OptimalYieldPathParams): Promise<YieldStepBaseInfo> {
     const { address, amount, netuid, slug, targets } = params;

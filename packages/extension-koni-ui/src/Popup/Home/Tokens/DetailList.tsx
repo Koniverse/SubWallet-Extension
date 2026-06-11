@@ -3,7 +3,7 @@
 
 import { _getAssetPriceId, _getMultiChainAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
-import { AccountChainType, AccountProxy, AccountProxyType, BuyTokenInfo } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType, BuyTokenInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountSelectorModal, AlertBox, CloseIcon, LoadingScreen, ReceiveModal, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
 import PageWrapper from '@subwallet/extension-koni-ui/components/Layout/PageWrapper';
@@ -12,7 +12,7 @@ import { TokenBalanceDetailItem } from '@subwallet/extension-koni-ui/components/
 import { DEFAULT_SWAP_PARAMS, DEFAULT_TRANSFER_PARAMS, IS_SHOW_TON_CONTRACT_VERSION_WARNING, SWAP_TRANSACTION, TON_ACCOUNT_SELECTOR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL, TRANSFER_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { HomeContext } from '@subwallet/extension-koni-ui/contexts/screen/HomeContext';
-import { useCoreReceiveModalHelper, useDefaultNavigate, useGetBannerByScreen, useGetChainAndExcludedTokenByCurrentAccountProxy, useNavigateOnChangeAccount, useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useCoreReceiveModalHelper, useDefaultNavigate, useGetBannerByScreen, useGetChainAndExcludedTokenByCurrentAccountProxy, useGroupYieldPosition, useNavigateOnChangeAccount, useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { canShowChart } from '@subwallet/extension-koni-ui/messaging';
 import { DetailModal } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/DetailModal';
 import { DetailUpperBlock } from '@subwallet/extension-koni-ui/Popup/Home/Tokens/DetailUpperBlock';
@@ -44,7 +44,7 @@ function WrapperComponent ({ className = '' }: ThemeProps): React.ReactElement<P
   return (
     <PageWrapper
       className={`tokens ${className}`}
-      resolve={dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance', 'swap'])}
+      resolve={dataContext.awaitStores(['price', 'chainStore', 'assetRegistry', 'balance', 'swap', 'earning'])}
     >
       <Component />
     </PageWrapper>
@@ -77,6 +77,8 @@ function Component (): React.ReactElement {
   const [, setSwapStorage] = useLocalStorage(SWAP_TRANSACTION, DEFAULT_SWAP_PARAMS);
   const { banners, dismissBanner, onClickBanner } = useGetBannerByScreen('token_detail', tokenGroupSlug);
   const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
+  const yieldPositions = useGroupYieldPosition();
+
   const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
   const [isShowTonWarning, setIsShowTonWarning] = useLocalStorage(IS_SHOW_TON_CONTRACT_VERSION_WARNING, true);
   const tonAddress = useMemo(() => {
@@ -139,6 +141,32 @@ function Component (): React.ReactElement {
 
     return undefined;
   }, [assetRegistryMap, multiChainAssetMap, tokenGroupSlug]);
+
+  const netuid = useMemo<number | undefined>(() => {
+    if (!tokenGroupSlug) {
+      return;
+    }
+
+    if (assetRegistryMap[tokenGroupSlug]) {
+      return assetRegistryMap[tokenGroupSlug].metadata?.netuid;
+    }
+
+    return undefined;
+  }, [assetRegistryMap, tokenGroupSlug]);
+
+  const isDelegatedStaking = useMemo(() => {
+    if (netuid === undefined) {
+      return false;
+    }
+
+    const netuidStr = String(netuid);
+
+    return yieldPositions.some(
+      (pos) =>
+        pos.type === YieldPoolType.DELEGATED_STAKING &&
+      (pos.metadata?.constituents as string[])?.includes(netuidStr)
+    );
+  }, [yieldPositions, netuid]);
 
   const buyInfos = useMemo(() => {
     const slug = tokenGroupSlug || '';
@@ -557,6 +585,14 @@ function Component (): React.ReactElement {
             />
           ))
         }
+        {isDelegatedStaking && (
+          <AlertBox
+            className={classNames('delegated-staking-alert-area')}
+            description={t('ui.BALANCE.screen.Tokens.DetailList.balanceFluctuationsDescription')}
+            title={t('ui.BALANCE.screen.Tokens.DetailList.balanceFluctuations')}
+            type={'warning'}
+          />
+        )}
         {
           !isHaveOnlyTonSoloAcc && !isReadonlyAccount && isIncludesTonToken && isShowTonWarning && (
             <>
@@ -695,6 +731,10 @@ const Tokens = styled(WrapperComponent)<ThemeProps>(({ theme: { extendToken, tok
     },
 
     '.token-balance-detail-item, .token-detail-banner-wrapper, .ton-solo-acc-alert-area': {
+      marginBottom: token.sizeXS
+    },
+
+    '.delegated-staking-alert-area': {
       marginBottom: token.sizeXS
     }
   });

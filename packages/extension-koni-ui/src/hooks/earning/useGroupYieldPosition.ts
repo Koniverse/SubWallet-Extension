@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { AbstractYieldPositionInfo, EarningStatus, LendingYieldPositionInfo, LiquidYieldPositionInfo, NativeYieldPositionInfo, NominationYieldPositionInfo, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AbstractYieldPositionInfo, DelegatedYieldPositionInfo, EarningStatus, LendingYieldPositionInfo, LiquidYieldPositionInfo, NativeYieldPositionInfo, NominationYieldPositionInfo, SubnetYieldPositionInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import { useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import BigN from 'bignumber.js';
@@ -134,13 +134,29 @@ const useGroupYieldPosition = (): YieldPositionInfo[] => {
             ...base
           } as SubnetYieldPositionInfo;
           break;
+        case YieldPoolType.DELEGATED_STAKING:
+          rs = {
+            ...base
+          } as DelegatedYieldPositionInfo;
+          break;
       }
+
+      const constituentsSet = new Set<string>();
 
       for (const info of infoList) {
         rs.totalStake = new BigN(rs.totalStake).plus(info.totalStake).toString();
         rs.activeStake = new BigN(rs.activeStake).plus(info.activeStake).toString();
         rs.unstakeBalance = new BigN(rs.unstakeBalance).plus(info.unstakeBalance).toString();
         rs.isBondedBefore = rs.isBondedBefore || info.isBondedBefore;
+        const constituents = (info.metadata?.constituents as string[]);
+
+        if (constituents?.length) {
+          constituents.forEach((c) => constituentsSet.add(c));
+        }
+      }
+
+      if (!!constituentsSet.size && !!rs.metadata) {
+        rs.metadata.constituents = Array.from(constituentsSet);
       }
 
       result.push(rs);

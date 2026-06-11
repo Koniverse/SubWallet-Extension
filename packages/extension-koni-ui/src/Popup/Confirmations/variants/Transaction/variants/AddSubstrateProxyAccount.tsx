@@ -1,8 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { RequestAddSubstrateProxyAccount } from '@subwallet/extension-base/types';
-import { CommonTransactionInfo } from '@subwallet/extension-koni-ui/components';
+import { RequestAddSubstrateProxyAccount, RequestDelegateStakingSubmit } from '@subwallet/extension-base/types';
+import { AlertBox, CommonTransactionInfo } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
 import CN from 'classnames';
@@ -17,7 +17,9 @@ type Props = BaseTransactionConfirmationProps;
 const Component: React.FC<Props> = (props: Props) => {
   const { className, transaction } = props;
   const { t } = useTranslation();
-  const data = transaction.data as RequestAddSubstrateProxyAccount;
+  const data = transaction.data as RequestAddSubstrateProxyAccount | RequestDelegateStakingSubmit;
+
+  const isDelegatedStaking = 'poolPosition' in data;
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
 
   return (
@@ -52,6 +54,14 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />}
       </MetaInfo>
+
+      {isDelegatedStaking &&
+      <AlertBox
+        className={CN(className, 'alert-box')}
+        description={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.stakingProcessDescription')}
+        title={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.stakingProcess')}
+        type='info'
+      />}
     </div>
   );
 };
@@ -70,6 +80,10 @@ const AddSubstrateProxyAccountTransactionConfirmation = styled(Component)<Props>
 
     '.__selected-validator-type': {
       color: token['magenta-6']
+    },
+
+    '&.alert-box': {
+      marginTop: token.marginSM
     }
   };
 });

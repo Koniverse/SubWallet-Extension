@@ -212,6 +212,10 @@ function Component ({ compound,
       return true;
     }
 
+    if (poolInfo.type === YieldPoolType.DELEGATED_STAKING) {
+      return true;
+    }
+
     return !poolInfo.metadata.availableMethod.join;
   }, [poolInfo.chain, poolInfo.type, poolInfo.metadata.availableMethod.join]);
 
@@ -332,7 +336,9 @@ function Component ({ compound,
 
         <EarningInfoPart
           className={'__earning-info-part'}
+          compound={compound}
           inputAsset={inputAsset}
+          list={list}
           poolInfo={poolInfo}
         />
       </Layout.Base>
