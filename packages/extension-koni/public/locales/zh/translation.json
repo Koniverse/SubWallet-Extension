@@ -2824,5 +2824,22 @@
   "ui.TRANSACTION.screen.Transaction.Earn.proxyAddress": "Proxy address",
   "ui.TRANSACTION.screen.Transaction.Earn.proxyDeposit": "Proxy deposit",
   "ui.TRANSACTION.screen.Transaction.Earn.amountRequiredToActivateStakingProxy": "Amount required to activate the staking proxy",
-  "ui.TRANSACTION.screen.Transaction.Earn.totalEquivalent": "Total {{symbol}}-equivalent balance"
+  "ui.TRANSACTION.screen.Transaction.Earn.totalEquivalent": "Total {{symbol}}-equivalent balance",
+  "ui.NFT.screen.nested.NftBundleItemDetail.level": "",
+  "ui.NFT.screen.nested.NftBundleItemDetail.goToParent": "",
+  "ui.NFT.screen.nested.NftBundleItemDetail.description": "",
+  "ui.NFT.screen.nested.NftBundleItemDetail.nftCollectionName": "",
+  "ui.NFT.screen.nested.NftBundleItemDetail.ownedBy": "",
+  "ui.NFT.screen.nested.NftBundleItemDetail.network": "",
+  "ui.NFT.screen.nested.NftBundleItemDetail.nftId": "",
+  "ui.NFT.screen.nested.NftBundleItemDetail.collectionId": "",
+  "ui.NFT.screen.nested.NftBundleItemDetail.childNfts": "",
+  "ui.NFT.screen.nested.NftBundleItemDetail.nestedIn": "",
+  "ui.NFT.screen.nested.NftBundleItemDetail.items": "",
+  "ui.NFT.screen.nested.NftBundleItemDetail.item": "",
+  "ui.NFT.screen.nested.NftBundleItemDetail.nftStructure": "",
+  "ui.NFT.screen.nested.NftViewStructure.parent": "",
+  "ui.NFT.screen.nested.NftViewStructure.nestedInParent": "",
+  "ui.NFT.screen.nested.NftViewStructure.nftStructureWithCount": "",
+  "ui.NFT.screen.nested.NftViewStructure.noStructureDataFound": ""
 }
