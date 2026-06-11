@@ -71,7 +71,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 SubWallet-Extension is a non-custodial multi-chain wallet delivered as a
 browser extension and web app. It supports Substrate (Polkadot / Kusama
-ecosystem), EVM (Ethereum, Base, Arbitrum, …), Bitcoin, and TON. The
+ecosystem), EVM (Ethereum, Base, Arbitrum, …), Bitcoin, TON, and Cardano. The
 codebase is a Yarn 3 monorepo of TypeScript packages: background services
 (account / balance / chain / earning / NFT / staking / transaction), a
 React UI (extension popup + full-page web app), and shared message bus

@@ -7,16 +7,16 @@
 
 SubWallet-Extension is a non-custodial multi-chain cryptocurrency wallet
 delivered as a Chromium/Firefox browser extension and a standalone web
-application. It supports four blockchain ecosystems: Substrate/Polkadot
+application. It supports five blockchain ecosystems: Substrate/Polkadot
 (relay chains and parachains), EVM (Ethereum and EVM-compatible chains),
-Bitcoin, and TON. The architecture is a message-passing monolith: a
+Bitcoin, TON, and Cardano. The architecture is a message-passing monolith: a
 persistent background service owns all state, key material, and on-chain
 communication, while multiple UI surfaces (extension popup, full-page
 web app) communicate with it exclusively over the browser's message-bus
 API. The codebase is organised as a Yarn 3 monorepo of twelve TypeScript
 packages with explicit dependency boundaries between background logic,
 UI, and shared protocol layers. Architectural drivers are: self-custody
-(keys never leave the background environment), multi-chain breadth (100+
+(keys never leave the background environment), multi-chain breadth (200+
 networks from a single install), and portability (the same background
 logic runs inside the browser extension service worker and inside a
 web-runner iframe for mobile webview contexts).
