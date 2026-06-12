@@ -44,3 +44,6 @@ test.ts
 /packages/extension-koni-base/src/test-api/
 /packages/extension-base/src/koni/test-api/
 /packages/extension-base/src/services/chain-service/chain.spec.ts
+
+# Koni-docs Active Context (per-developer, Pattern B)
+.active-context.md
