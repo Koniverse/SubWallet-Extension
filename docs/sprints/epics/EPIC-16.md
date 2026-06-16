@@ -1,6 +1,6 @@
 ---
 id: EPIC-16
-title: "hardware-wallet"
+title: "Hardware Wallet Signing"
 status: in-progress
 prd_ref:
   - FR-146
@@ -26,7 +26,7 @@ Before this epic, signing is only possible with software keys held in the
 background keyring (EPIC-3). EPIC-16 adds the **external-device signing path**:
 the wallet builds and validates the payload, the device signs, and the wallet
 submits — the offline branch of the keyring boundary ([AD-04](../../ARCHITECTURE.md#architecture-decisions),
-[NFR-14](../../PRD.md)). Supported devices differ only in **transport**: Ledger
+[NFR-14](../../PRD.md#non-functional-requirements)). Supported devices differ only in **transport**: Ledger
 over USB/WebHID, Keystone and Polkadot Vault over QR, with more devices planned.
 
 The epic owns **how an external device completes a signature**, not what is being
@@ -34,7 +34,7 @@ signed: transaction building belongs to [EPIC-8](EPIC-8.md), the approval/reques
 queue to [EPIC-2](EPIC-2.md) (RequestService), and software-key accounts to
 [EPIC-3](EPIC-3.md).
 
-> FR statuses below are **story-planning** statuses; shipped state is in [PRD](../../PRD.md).
+> FR statuses below are **story-planning** statuses; shipped state is in [PRD](../../PRD.md#functional-requirements).
 
 ### Out of scope
 
@@ -49,7 +49,7 @@ queue to [EPIC-2](EPIC-2.md) (RequestService), and software-key accounts to
 | FR-146 | [US-16.1](../stories/US-16.1-ledger-hardware-wallet-signing.md) | 📋 backlog |
 | FR-147 | [US-16.2](../stories/US-16.2-qr-signing-keystone-and-polkadot-vault.md) | 📋 backlog |
 | FR-148 | [US-16.2](../stories/US-16.2-qr-signing-keystone-and-polkadot-vault.md) | 📋 backlog |
-| FR-149 | US-16.3 _(planned)_ | 📋 backlog |
+| FR-149 | [US-16.3](../stories/US-16.3-additional-hardware-wallets.md) | 📋 backlog |
 
 ## Stories
 
@@ -57,11 +57,11 @@ queue to [EPIC-2](EPIC-2.md) (RequestService), and software-key accounts to
 |---|---|---|---|---|
 | [US-16.1](../stories/US-16.1-ledger-hardware-wallet-signing.md) | Ledger hardware-wallet signing | Sign over USB across Substrate generic/per-chain/EVM apps, key never leaves device | 📋 backlog | — |
 | [US-16.2](../stories/US-16.2-qr-signing-keystone-and-polkadot-vault.md) | QR-based signing — Keystone & Polkadot Vault | Fully-offline QR display→scan→submit signing round trip | 📋 backlog | — |
-| US-16.3 | Additional hardware wallets (roadmap) | Trezor, Tangem, D'Cent, Keystone 3 Pro | 📋 backlog | — |
+| [US-16.3](../stories/US-16.3-additional-hardware-wallets.md) | Additional hardware wallets (roadmap) | Trezor, Tangem, D'Cent, Keystone 3 Pro | 📋 backlog | — |
 
 ## Cross-cutting invariants
 
-- **Key never enters the extension ([NFR-14](../../PRD.md), AD-04):** every device
+- **Key never enters the extension ([NFR-14](../../PRD.md#non-functional-requirements), AD-04):** every device
   flow completes the signature off-extension; the wallet only exchanges
   payload/signature. Enforced by each story's AC-1.
 - **Transport-adapter abstraction:** a new device is a new transport adapter on the
@@ -74,4 +74,7 @@ queue to [EPIC-2](EPIC-2.md) (RequestService), and software-key accounts to
       generic / per-chain / EVM apps, key never leaving the device — [US-16.1](../stories/US-16.1-ledger-hardware-wallet-signing.md)
 - [ ] A transaction can be signed + submitted fully offline via Keystone and
       Polkadot Vault over QR — [US-16.2](../stories/US-16.2-qr-signing-keystone-and-polkadot-vault.md)
-- [ ] _(pending story for FR-149 — additional devices: Trezor, Tangem, D'Cent, Keystone 3 Pro)_
+- [ ] A transaction can be signed + submitted via additional cold-storage devices —
+      Trezor, Tangem, D'Cent, Keystone 3 Pro — with the key never entering the
+      extension, extending the same off-extension guarantee to the user's device of
+      choice — [US-16.3](../stories/US-16.3-additional-hardware-wallets.md)
