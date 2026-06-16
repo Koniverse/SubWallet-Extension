@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-06-15 09:09:50 UTC
-> Total stories: 170
+> Last generated: 2026-06-16 08:32:37 UTC
+> Total stories: 169
 
-## 📋 Backlog (170)
+## 📋 Backlog (169)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -12,7 +12,7 @@
 | US-1.2 | Yarn 3 monorepo shared across extension, web app and mobile | EPIC-1 | P0 | 5 | — | — |
 | US-1.3 | Online chain-list hot-update (release-free network/token/XCM delivery) | EPIC-1 | P0 | 5 | — | — |
 | US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | — | — |
-| US-1.5 | Build, CI & cross-browser packaging hardening | EPIC-1 | P2 | 5 | — | — |
+| US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | — | — |
 | US-10.1 | EVM provider injection (EIP-1193 / EIP-6963) | EPIC-10 | P1 | 5 | — | — |
 | US-10.2 | Substrate inject API (injectedWeb3) | EPIC-10 | P1 | 5 | — | — |
 | US-10.3 | WalletConnect v2 (Substrate + EVM) | EPIC-10 | P1 | 5 | — | — |
@@ -101,7 +101,6 @@
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | — | — |
 | US-20.5 | List rendering performance | EPIC-20 | P2 | 5 | — | — |
 | US-20.6 | WebApp & web-runner performance | EPIC-20 | P2 | 5 | — | — |
-| US-20.7 | Dependency auditability & supply-chain hygiene | EPIC-20 | P2 | 3 | — | — |
 | US-3.1 | Create a new wallet via seed phrase | EPIC-3 | P0 | 3 | — | — |
 | US-3.2 | Import account via seed phrase or private key | EPIC-3 | P0 | 3 | — | — |
 | US-3.3 | Import account via JSON / QR / Trust Wallet | EPIC-3 | P1 | 5 | — | — |
@@ -207,7 +206,7 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 170
+- 📋 **Backlog**: 169
 - 🟢 **Ready**: 0
 - 🟡 **In Progress**: 0
 - 👀 **Review**: 0
