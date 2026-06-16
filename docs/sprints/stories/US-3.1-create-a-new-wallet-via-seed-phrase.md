@@ -31,11 +31,11 @@ guarantee is exercised. Seed entropy is generated inside the background keyring
 UI or inject scripts; the resulting seed is materialized straight into a
 **Unified Account** ([AD-11](../../ARCHITECTURE.md#architecture-decisions)) so the
 user is not asked to set up each chain. The master password
-([FR-53](../../PRD.md)) wraps the key at rest and is **non-recoverable by design**
+([FR-53](../../PRD.md#functional-requirements)) wraps the key at rest and is **non-recoverable by design**
 (reset = wipe), which is why backup confirmation is a mandatory gate, not a
 skippable nicety.
 
-Materializes [FR-13](../../PRD.md). Sibling onboarding story:
+Materializes [FR-13](../../PRD.md#functional-requirements). Sibling onboarding story:
 [US-3.2](US-3.2-import-account-via-seed-phrase-or-private-key.md) (import an
 existing account). This story is **retroactive** — the capability already ships
 in the product; `commit` / `version_shipped` are backfilled during version
@@ -83,9 +83,9 @@ reconciliation.
 
 ### References
 
-- [Source: PRD FR-13](../../PRD.md) — create a new wallet via seed phrase
-- [Source: PRD FR-53](../../PRD.md) — master password with strength policy
-- [Source: PRD NFR-3](../../PRD.md) — AES-256-GCM encryption at rest
+- [Source: PRD FR-13](../../PRD.md#functional-requirements) — create a new wallet via seed phrase
+- [Source: PRD FR-53](../../PRD.md#functional-requirements) — master password with strength policy
+- [Source: PRD NFR-3](../../PRD.md#non-functional-requirements) — AES-256-GCM encryption at rest
 - [Source: CONTEXT D37](../../CONTEXT.md) — Unified Account model
 
 ## Verification commands
@@ -112,6 +112,6 @@ and any implementation caveats during version reconciliation._
 
 ## Cross-references
 
-- [PRD FR-13](../../PRD.md)
+- [PRD FR-13](../../PRD.md#functional-requirements)
 - [Epic EPIC-3](../epics/EPIC-3.md)
 - [US-3.2](US-3.2-import-account-via-seed-phrase-or-private-key.md)

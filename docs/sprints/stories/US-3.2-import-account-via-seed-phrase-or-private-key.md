@@ -35,7 +35,7 @@ UI. Other import formats (JSON keystore, QR, Trust Wallet) are separate stories 
 this one is scoped to the two raw-secret paths because they share validation and
 the solo-vs-unified branching.
 
-Materializes [FR-14](../../PRD.md) and [FR-15](../../PRD.md). **Retroactive** —
+Materializes [FR-14](../../PRD.md#functional-requirements) and [FR-15](../../PRD.md#functional-requirements). **Retroactive** —
 already shipped; `commit` / `version_shipped` backfilled in reconciliation.
 
 ## Acceptance criteria
@@ -79,9 +79,9 @@ already shipped; `commit` / `version_shipped` backfilled in reconciliation.
 
 ### References
 
-- [Source: PRD FR-14](../../PRD.md) — import via seed phrase
-- [Source: PRD FR-15](../../PRD.md) — import via private key
-- [Source: PRD NFR-3](../../PRD.md) — encryption at rest
+- [Source: PRD FR-14](../../PRD.md#functional-requirements) — import via seed phrase
+- [Source: PRD FR-15](../../PRD.md#functional-requirements) — import via private key
+- [Source: PRD NFR-3](../../PRD.md#non-functional-requirements) — encryption at rest
 - [Source: CONTEXT D37](../../CONTEXT.md) — Unified Account model
 
 ## Verification commands
@@ -108,6 +108,6 @@ and caveats during version reconciliation._
 
 ## Cross-references
 
-- [PRD FR-14](../../PRD.md), [PRD FR-15](../../PRD.md)
+- [PRD FR-14](../../PRD.md#functional-requirements), [PRD FR-15](../../PRD.md#functional-requirements)
 - [Epic EPIC-3](../epics/EPIC-3.md)
 - [US-3.1](US-3.1-create-a-new-wallet-via-seed-phrase.md)
