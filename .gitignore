@@ -47,3 +47,6 @@ test.ts
 
 # Koni-docs Active Context (per-developer, Pattern B)
 .active-context.md
+
+# Codegraph local index (tool artifact)
+.codegraph/
