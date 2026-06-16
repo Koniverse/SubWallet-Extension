@@ -1,14 +1,14 @@
 ---
 id: US-1.5
-title: "Build, CI & cross-browser packaging hardening"
+title: "Build, CI, packaging & supply-chain hardening"
 epic: EPIC-1
 status: backlog
 priority: P2
-points: 5
+points: 8
 sprint:
 version_shipped:
 prd_ref: []
-arch_ref: [AD-06, AD-08, AD-25]
+arch_ref: [AD-05, AD-06, AD-08, AD-25]
 depends_on: [US-1.1]
 assignee:
 commit:
@@ -27,7 +27,10 @@ its fallback rather than going stale, and graceful build-time error UX. This sto
 has no user-facing feature — its value is that EPIC-1's build/packaging surface
 (FR-1 MV3 background, FR-2 monorepo/packaging) stays releasable as the codebase
 grows, so downstream epics get to stop worrying about whether a green build is a
-shippable one on every target.
+shippable one on every target. It also keeps the dependency tree auditable: the
+Yarn 3 lockfile is committed and integrity-checked, core-wallet deps resolve from
+the public npm registry, and CI fails closed on a drifted lockfile or a flagged
+advisory (NFR-19).
 
 ## Background
 
@@ -43,7 +46,7 @@ fixes coordinated under a shared regression suite.
 Unlike the feature stories in this epic (US-1.1–US-1.4), this story carries no new
 FR. It **defends the FR-1 (MV3 service-worker background) and FR-2 (monorepo /
 cross-target packaging) build surface** against real-world drift across the
-supported browsers. The real issues anchoring it group into six themes:
+supported browsers. The real issues anchoring it group into seven themes:
 
 1. **Build / webpack process.**
    [#3904](https://github.com/Koniverse/SubWallet-Extension/issues/3904) — review
@@ -81,6 +84,15 @@ supported browsers. The real issues anchoring it group into six themes:
    error when importing an invalid JSON file. The packaged build must degrade
    gracefully on malformed input rather than emitting a broken/unstyled error
    surface.
+7. **Supply-chain hygiene (NFR-19).**
+   [#4197](https://github.com/Koniverse/SubWallet-Extension/issues/4197) (umbrella;
+   no dedicated issue anchor — NFR-19 standing policy). The Yarn 3 lockfile
+   ([AD-05](../../ARCHITECTURE.md#architecture-decisions)) and bundle-splitting
+   ([AD-06](../../ARCHITECTURE.md#architecture-decisions)) determine the shipped
+   bytes; the committed `yarn.lock` + npm-only registry posture (partly already in
+   place — retroactive) is turned into a CI gate that fails closed on a drifted
+   lockfile, a private/untrusted registry, duplicate/untrusted deps, or a flagged
+   advisory.
 
 This story builds on [US-1.1](US-1.1-mv3-service-worker-background.md): the
 Firefox MV3 build (#4115/#3360) hardens the same MV3 service-worker background that
@@ -115,6 +127,20 @@ story stays open to absorb new build/packaging bug clusters.
 - [ ] **AC-7** — **Given** any build/packaging bug fixed under this story, **When**
   the regression suite runs, **Then** the previously reported symptom no longer
   reproduces.
+- [ ] **AC-8** — **Given** the repository, **When** CI runs, **Then** it fails if
+  `yarn.lock` is missing, out-of-sync with `package.json`, or modified by an install
+  (lockfile integrity / `--immutable`) (NFR-19). *(Committed lockfile: retroactive;
+  the CI gate: forward.)*
+- [ ] **AC-9** — **Given** the dependency set, **When** it is resolved, **Then**
+  every core-wallet dependency comes from the public npm registry — no
+  private/untrusted registry sources (NFR-19). *(npm-only set: retroactive; the
+  assertion: forward.)*
+- [ ] **AC-10** — **Given** the dependency tree, **When** it is audited, **Then**
+  there are no untrusted dependencies and duplicate dependencies are flagged/deduped,
+  asserted in CI (NFR-19).
+- [ ] **AC-11** — **Given** a known-vulnerable advisory in the tree, **When** CI runs
+  the audit gate, **Then** it fails on a flagged advisory (above an agreed severity
+  threshold) (NFR-19).
 
 ## Tasks
 
@@ -126,11 +152,17 @@ story stays open to absorb new build/packaging bug clusters.
 - [ ] **TASK-1.5.5** — Refresh the online-resource bundled fallback on the build cadence and fix the online-resource update path (#2461, #4664) (AD-25) (AC: 5)
 - [ ] **TASK-1.5.6** — Fix the invalid-JSON-import error styling so the build-time error surface degrades gracefully (#1270) (AC: 6)
 - [ ] **TASK-1.5.7** — Land regression coverage (test or CI guard) for each fixed build/packaging bug so none can silently reappear (AC: 7)
+- [ ] **TASK-1.5.8** — CI lockfile-integrity gate: `yarn install --immutable` (or equivalent) fails on a drifted/out-of-sync `yarn.lock` (NFR-19) (AC: 8)
+- [ ] **TASK-1.5.9** — Registry assertion: verify all core-wallet deps resolve from the public npm registry; no private/untrusted registry entries in resolution config (NFR-19) (AC: 9)
+- [ ] **TASK-1.5.10** — Duplicate/untrusted-dependency check (dedupe report + allowlist) in CI (NFR-19) (AC: 10)
+- [ ] **TASK-1.5.11** — Advisory audit gate (severity-thresholded) that fails CI on a flagged advisory (NFR-19) (AC: 11)
+- [ ] **TASK-1.5.12** — Regression: the lockfile/audit gate is a standing CI step; document the severity threshold and the retroactive-vs-forward split (NFR-19) (AC: 8, 11)
 
 ## Dev notes
 
 ### Architecture constraints
 
+- [AD-05](../../ARCHITECTURE.md#architecture-decisions) — Yarn 3 monorepo package boundaries; the committed lockfile pins the whole workspace (supply-chain hygiene rides this).
 - [AD-06](../../ARCHITECTURE.md#architecture-decisions) — Webpack 5 bundle splitting for the Firefox per-file limit; this story audits/hardens the build config (#3904) that keeps every emitted chunk under the cap.
 - [AD-08](../../ARCHITECTURE.md#architecture-decisions) — MV3 service-worker background; the Firefox MV3 build (#4115/#3360) must produce a loadable artifact under MV3, matching the contract US-1.1 establishes on the extension target.
 - [AD-25](../../ARCHITECTURE.md#architecture-decisions) — CDN proxy layer with bundled JSON fallback; the online-resource fallback refresh (#2461/#4664) keeps the build-time bundled fallback from going stale.
@@ -147,18 +179,23 @@ story stays open to absorb new build/packaging bug clusters.
 - No iOS-storage work — there is no iOS issue in triage; the earlier draft's "iOS-storage" theme was invented and has been removed.
 - No per-browser story split — the supported browsers share one webpack/MV3/packaging pipeline; splitting would duplicate near-identical hardening across stories and fragment the shared regression suite.
 - No runtime chain/i18n hot-update feature work — that is owned by US-1.3 / US-1.4; this story only refreshes the *bundled fallback* on the build cadence.
+- No dependency-version *upgrades* — this story is about auditability + gating, not bumping versions; a flagged advisory triggers separate remediation.
 
 ### Points justification
 
-5 pts — a build/CI/packaging hardening **cluster** spanning six distinct
+8 pts — a build/CI/packaging hardening **cluster** spanning six distinct
 build-infra subsystems: the webpack/build config (#3904), the Firefox MV3 build
 and its error-page regression (#4115/#3360), cross-browser uninstall packaging
 (#2942), the Jest test/build environment (#2577), the online-resource fallback
-refresh (#2461/#4664), and build-time error UX (#1270). Per SKILL §3a-bis this is
-broader than a single-area focused hardening story (which calibrates at 3 — cf.
-[US-4.21](US-4.21-asset-hub-migration-hardening.md), a single-facet 3-pointer) but
-short of a full-week multi-system integration (8): it is a multi-subsystem
-build/packaging bundle plus a shared regression task. It carries no FR.
+refresh (#2461/#4664), and build-time error UX (#1270). It now also absorbs the
+3-pt supply-chain CI gate (NFR-19) — immutable lockfile integrity, npm-only
+registry assertion, dedupe/untrusted check, and the advisory audit gate — which
+rides the same Yarn-3-monorepo / Webpack / CI build surface (AD-05/AD-06) this
+story already hardens. Per SKILL §3a-bis the original six-theme cluster sat above
+a single-area focused hardening story (which calibrates at 3 — cf.
+[US-4.21](US-4.21-asset-hub-migration-hardening.md), a single-facet 3-pointer);
+folding in the supply-chain cluster pushes it to a full multi-system
+build/packaging + CI-gate bundle plus a shared regression task. It carries no FR.
 
 ### References
 
@@ -170,9 +207,11 @@ build/packaging bundle plus a shared regression task. It carries no FR.
 - [Issue #2461](https://github.com/Koniverse/SubWallet-Extension/issues/2461) — Update fallback for online resources periodically (online-resource fallback, AD-25)
 - [Issue #4664](https://github.com/Koniverse/SubWallet-Extension/issues/4664) — Cannot update online resources (online-resource fallback, AD-25)
 - [Issue #1270](https://github.com/Koniverse/SubWallet-Extension/issues/1270) — Style error when importing invalid JSON file (build-time error UX)
+- [Issue #4197](https://github.com/Koniverse/SubWallet-Extension/issues/4197) — umbrella performance/quality program (supply-chain facet; NFR-19 standing policy)
 - [Source: PRD FR-1](../../PRD.md#functional-requirements) — MV3 service-worker background (build surface defended)
 - [Source: PRD FR-2](../../PRD.md#functional-requirements) — Yarn 3 monorepo / cross-target packaging (build surface defended)
-- [Source: ARCHITECTURE AD-06, AD-08, AD-25](../../ARCHITECTURE.md#architecture-decisions)
+- [Source: PRD NFR-19](../../PRD.md#non-functional-requirements) — dependency auditability / supply-chain hygiene (defended)
+- [Source: ARCHITECTURE AD-05, AD-06, AD-08, AD-25](../../ARCHITECTURE.md#architecture-decisions)
 
 ## Verification commands
 
@@ -185,8 +224,15 @@ build/packaging bundle plus a shared regression task. It carries no FR.
 | AC-5 | Run the build → bundled online-resource fallback is refreshed; exercise the online-resource update path → it succeeds (#2461/#4664) |
 | AC-6 | In the packaged build, import an invalid JSON file → error surface renders with correct styling, not a broken/unstyled page (#1270) |
 | AC-7 | Each fixed build/packaging issue has an accompanying regression test/CI guard in the same PR |
+| AC-8 | CI: `yarn install --immutable` fails on a drifted/out-of-sync `yarn.lock` (lockfile integrity, NFR-19) |
+| AC-9 | CI: registry assertion shows all core-wallet deps resolve from the public npm registry; no private/untrusted registry entries (NFR-19) |
+| AC-10 | CI: dedupe / untrusted-dependency check passes (or flags) per the allowlist (NFR-19) |
+| AC-11 | CI: advisory audit gate fails on a flagged advisory above the agreed severity threshold (NFR-19) |
 
 ## Changelog entry
+
+### Added
+- CI supply-chain gate: immutable `yarn.lock` integrity check, npm-only registry assertion, duplicate/untrusted-dependency check, and a severity-thresholded advisory audit gate that fails closed on regression (NFR-19).
 
 ### Fixed
 - Webpack config / build-process review so every supported target emits a shippable, Firefox-safe artifact (#3904).

@@ -87,7 +87,7 @@ runtime* translation channel (FR-4).
 |----|-------|-------|
 | AD-08 | Manifest V3 migration with service worker background | [US-1.1](../stories/US-1.1-mv3-service-worker-background.md) |
 | AD-20 | Four-state MV3 background lifecycle with heartbeat | [US-1.1](../stories/US-1.1-mv3-service-worker-background.md) |
-| AD-05 | Yarn 3 monorepo package boundaries | [US-1.2](../stories/US-1.2-yarn-3-monorepo-shared-across-extension-web-mobile.md) |
+| AD-05 | Yarn 3 monorepo package boundaries | [US-1.2](../stories/US-1.2-yarn-3-monorepo-shared-across-extension-web-mobile.md), [US-1.5](../stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md) |
 | AD-06 | Webpack 5 bundle splitting (Firefox per-file limit) | [US-1.2](../stories/US-1.2-yarn-3-monorepo-shared-across-extension-web-mobile.md), [US-1.5](../stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md) |
 | AD-09 | Per-chain XCM route toggle (release-free) | [US-1.3](../stories/US-1.3-online-chain-list-hot-update.md) |
 | AD-25 | Cache / CDN proxy layer (static-data / chain-list slice) | [US-1.3](../stories/US-1.3-online-chain-list-hot-update.md), [US-1.4](../stories/US-1.4-online-i18n-hot-update.md) |
@@ -105,7 +105,7 @@ runtime* translation channel (FR-4).
 | [US-1.2](../stories/US-1.2-yarn-3-monorepo-shared-across-extension-web-mobile.md) | Yarn 3 monorepo shared across extension/web/mobile | One `extension-base` core reused by extension, web app and mobile web-runner | 📋 backlog | — |
 | [US-1.3](../stories/US-1.3-online-chain-list-hot-update.md) | Online chain-list hot-update | Add networks/tokens/logos and toggle XCM routes without a release | 📋 backlog | — |
 | [US-1.4](../stories/US-1.4-online-i18n-hot-update.md) | Online i18n hot-update | Fetch updated UI translations at runtime without a release | 📋 backlog | — |
-| [US-1.5](../stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md) | Build, CI & cross-browser packaging hardening | Keep the build/webpack and packaging pipeline shippable across browsers (Firefox MV3, Brave uninstall, Jest env, online-resource fallback) | 📋 backlog | — |
+| [US-1.5](../stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md) | Build, CI, packaging & supply-chain hardening | Keep the build/webpack/packaging pipeline shippable across browsers (Firefox MV3, Brave uninstall, Jest env, online-resource fallback) and the dependency tree auditable (lockfile / npm-registry / audit gate, NFR-19) | 📋 backlog | — |
 
 > US-1.1–1.4 each materialize one FR; US-1.5 is the epic's bug/iteration
 > (hardening) cluster and owns no FR — it enforces the build/compliance NFRs.
@@ -125,4 +125,4 @@ runtime* translation channel (FR-4).
 - [ ] `@subwallet/extension-base` builds and runs unchanged in the extension, the web app and the mobile web-runner, with no chunk exceeding Firefox's per-file limit — [US-1.2](../stories/US-1.2-yarn-3-monorepo-shared-across-extension-web-mobile.md)
 - [ ] New networks/tokens/logos and per-route XCM toggles take effect from the online chain-list without an extension release, with a bundled fallback when the channel is unreachable — [US-1.3](../stories/US-1.3-online-chain-list-hot-update.md)
 - [ ] Updated UI translations are fetched at runtime without a release, falling back to bundled locales on failure — [US-1.4](../stories/US-1.4-online-i18n-hot-update.md)
-- [ ] The build/webpack and packaging pipeline stays shippable across supported browsers — Firefox MV3 build, cross-browser (Brave) uninstall, the Jest test/build environment, and the online-resource bundled fallback are all hardened — [US-1.5](../stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md)
+- [ ] The build/webpack and packaging pipeline stays shippable across supported browsers — Firefox MV3 build, cross-browser (Brave) uninstall, the Jest test/build environment, and the online-resource bundled fallback are all hardened, plus supply-chain hygiene (committed `yarn.lock` integrity, npm-only registry, CI audit gate — NFR-19) — [US-1.5](../stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md)

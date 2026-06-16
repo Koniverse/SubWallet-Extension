@@ -581,7 +581,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | NFR-11 (shared) — Many-account submit/close must not block the main thread | [US-20.4](sprints/stories/US-20.4-many-account-submit-performance.md) |
 | NFR-17 — List render performance on heavy selection/collection screens | [US-20.5](sprints/stories/US-20.5-list-rendering-performance.md) |
 | NFR-17 (shared) — Web-surface portability/performance (webapp / web-runner) | [US-20.6](sprints/stories/US-20.6-webapp-and-web-runner-performance.md) |
-| NFR-19 — Dependency auditability: Yarn 3 lockfile, npm-only registry | [US-20.7](sprints/stories/US-20.7-dependency-auditability-and-supply-chain-hygiene.md) |
+| NFR-19 — Dependency auditability: Yarn 3 lockfile, npm-only registry | [US-1.5](sprints/stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md) |
 
 ---
 
