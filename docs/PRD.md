@@ -103,7 +103,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-47 | Cosmos ecosystem support | P1 | 📋 planned | EPIC-4 |
 | FR-48 | Solana support | P1 | 📋 planned | EPIC-4 |
 | FR-49 | Chain abstraction SDK: package multi-chain logic as a developer-facing service for external… | P2 | 📋 planned | EPIC-4 |
-| FR-50 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | P2 | 🚧 in progress | EPIC-4 |
+| FR-50 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | P2 | 📋 planned | EPIC-4 |
 | FR-51 | AI / DeFAI features (AI agent; AI-assisted swap / earn / transfer; chain-abstraction UX) | P2 | 📋 planned | EPIC-4 |
 | FR-52 | Phishing protection: block known phishing sites and addresses via @polkadot/phishing list an… | P0 | ✅ shipped | EPIC-5 |
 | FR-53 | Master password with strength policy covering all accounts | P0 | ✅ shipped | EPIC-5 |
@@ -146,13 +146,13 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-90 | 3D and video NFT viewer support | P1 | ✅ shipped | EPIC-9 |
 | FR-91 | Bitcoin Ordinals/inscriptions display | P1 | ✅ shipped | EPIC-9 |
 | FR-92 | Custom NFT import: add NFT collections by contract (ERC-721 / PSP-34) | P1 | ✅ shipped | EPIC-9 |
-| FR-93 | Additional NFT collections & standards (Ternoa, Joystream, Aventus; ERC-6551 token-bound acc… | P1 | 🚧 in progress | EPIC-9 |
+| FR-93 | Additional NFT collections & standards (Ternoa, Joystream, Aventus; ERC-6551 token-bound acc… | P1 | 📋 planned | EPIC-9 |
 | FR-94 | MetaMask-compatible EVM provider injection (EIP-1193, EIP-6963 multi-provider discovery) int… | P1 | ✅ shipped | EPIC-10 |
 | FR-95 | Substrate inject API (window.injectedWeb3) for Polkadot dApp compatibility | P1 | ✅ shipped | EPIC-10 |
 | FR-96 | WalletConnect v2 — Substrate and EVM session support | P1 | ✅ shipped | EPIC-10 |
 | FR-97 | Cardano dApp connector: CIP-30 (connect, signData, signTx, submitTx, getUtxo) | P1 | ✅ shipped | EPIC-10 |
 | FR-98 | Bitcoin dApp connection: connect, getAddresses, signMessage, signPsbt, sendTransfer | P1 | ✅ shipped | EPIC-10 |
-| FR-99 | TON dApp connection and signature requests | P1 | ✅ shipped | EPIC-10 |
+| FR-99 | TON dApp connection and signature requests | P1 | 📋 planned | EPIC-10 |
 | FR-100 | dApp authorization UI (Manage website access): per-origin connection management, per-account… | P1 | ✅ shipped | EPIC-10 |
 | FR-101 | Arbitrary message signing for dApps (personal_sign / eth_signTypedData, Polkadot signMessage… | P1 | ✅ shipped | EPIC-10 |
 | FR-102 | dApp createTransaction signing API (Polkadot-JS RFC #6213) | P1 | 📋 planned | EPIC-10 |
@@ -165,19 +165,19 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-109 | In-wallet Bittensor dTAO swap: TAO ↔ alpha and cross-subnet alpha-token swaps (subnet AMM) | P1 | ✅ shipped | EPIC-11 |
 | FR-110 | Cross-chain swap routing: Swap→Bridge and Bridge→Swap multi-hop paths | P1 | ✅ shipped | EPIC-11 |
 | FR-111 | Optimex swap integration (intent-based cross-chain swap) | P1 | ✅ shipped | EPIC-11 |
-| FR-112 | In-wallet token swap via PiperX | P1 | 🚧 in progress | EPIC-11 |
+| FR-112 | In-wallet token swap via PiperX | P1 | 📋 planned | EPIC-11 |
 | FR-113 | In-wallet token swap via StellaSwap (Moonbeam DEX) | P1 | 📋 planned | EPIC-11 |
 | FR-114 | Native nomination staking on Polkadot, Kusama, and Substrate parachains | P1 | ✅ shipped | EPIC-12 |
 | FR-115 | Nomination pool staking on Polkadot/Kusama (join, leave, withdraw) | P1 | ✅ shipped | EPIC-12 |
 | FR-116 | Collator / parachain staking (Moonbeam, Moonriver, Astar, Amplitude, Pendulum, Krest, Energy… | P1 | ✅ shipped | EPIC-12 |
-| FR-117 | Liquid staking integrations (e.g., Bifrost, Interlay, and other LST protocols) | P1 | ✅ shipped | EPIC-12 |
+| FR-117 | Liquid staking integrations (e.g., Acala, Bifrost, Parallel, StellaSwap) | P1 | ✅ shipped | EPIC-12 |
 | FR-118 | dApp staking — Astar network dApp staking support | P1 | ✅ shipped | EPIC-12 |
 | FR-119 | Bittensor dTAO / alpha-token subnet staking model | P1 | ✅ shipped | EPIC-12 |
 | FR-120 | Lending integration (Interlay): lend assets to earn yield (distinct from liquid staking) | P1 | ✅ shipped | EPIC-12 |
 | FR-121 | Earning path simulation and step-status tracking for multi-step staking flows | P1 | ✅ shipped | EPIC-12 |
 | FR-122 | XCM channel support for cross-chain deposit routing into earning positions | P1 | ✅ shipped | EPIC-12 |
 | FR-123 | Bittensor alpha-token liquid staking | P1 | 📋 planned | EPIC-12 |
-| FR-124 | Bittensor alpha-index auto-rebalancing delegate-staking strategy | P1 | 🚧 in progress | EPIC-12 |
+| FR-124 | Bittensor alpha-index auto-rebalancing delegate-staking strategy | P1 | 📋 planned | EPIC-12 |
 | FR-125 | Trusted Stake — alpha index staking integration | P1 | 📋 planned | EPIC-12 |
 | FR-126 | Backprop — alpha subnet trading integration | P1 | 📋 planned | EPIC-12 |
 | FR-127 | In-app staking for additional networks (Enjin, Phala, xx Network, and others) | P1 | 📋 planned | EPIC-12 |
@@ -197,7 +197,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-141 | Polkadot OpenGov: referenda list, referendum detail, conviction vote / revote / unvote | P2 | ✅ shipped | EPIC-15 |
 | FR-142 | OpenGov: locked-token detail view and unlock flow after voting period | P2 | ✅ shipped | EPIC-15 |
 | FR-143 | Governance V1 (Democracy) referenda display — legacy chains, display-only | P2 | ✅ shipped | EPIC-15 |
-| FR-144 | OpenGov Phase 2: delegation support and governance tracks | P2 | 🚧 in progress | EPIC-15 |
+| FR-144 | OpenGov Phase 2: delegation support and governance tracks | P2 | 📋 planned | EPIC-15 |
 | FR-145 | Web-app governance — the full OpenGov experience (referenda, conviction voting, delegation,… | P2 | 📋 planned | EPIC-15 |
 | FR-146 | Ledger Nano S/X hardware wallet signing — Substrate generic app, per-chain Substrate apps, a… | P2 | ✅ shipped | EPIC-16 |
 | FR-147 | Keystone hardware wallet QR-based signing (Substrate) | P2 | ✅ shipped | EPIC-16 |
@@ -281,7 +281,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 - **Covers:** Adding/removing networks and custom RPCs, the 200+-network registry, per-ecosystem integration (EVM, Bitcoin, TON, Cardano), light-client fallback, and custom token import/registry — plus the forward-looking chain-abstraction layer: a developer-facing SDK, account-abstraction / cross-chain-intent standards (ERC-4337 / EIP-7702 / EIP-7683), and AI / DeFAI features.
 - **Why it matters:** It determines which chains and tokens the wallet can see at all — the multi-chain engine; the chain-abstraction roadmap extends that engine into a developer-facing platform.
-- **Status:** 🟡 **Partially shipped** — 12/21 FRs (1 🚧 in progress)
+- **Status:** 🟡 **Partially shipped** — 12/21 FRs
 
 | FR | Requirement | Status |
 |----|-------------|--------|
@@ -304,7 +304,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-47 | Cosmos ecosystem support | 📋 planned |
 | FR-48 | Solana support | 📋 planned |
 | FR-49 | Chain abstraction SDK: package multi-chain logic as a developer-facing service for external dApp teams | 📋 planned |
-| FR-50 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | 🚧 in progress |
+| FR-50 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | 📋 planned |
 | FR-51 | AI / DeFAI features (AI agent; AI-assisted swap / earn / transfer; chain-abstraction UX) | 📋 planned |
 
 #### EPIC-5 — security
@@ -315,7 +315,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 |----|-------------|--------|
-| FR-52 | Phishing protection: block known phishing sites and addresses via @polkadot/phishing list and ChainPatrol API | ✅ shipped |
+| FR-52 | Phishing protection: block known phishing sites and addresses via @polkadot/phishing list (ChainPatrol API integrated but currently disabled) | ✅ shipped |
 | FR-53 | Master password with strength policy covering all accounts | ✅ shipped |
 | FR-54 | Forgot password → reset wallet (master password is non-recoverable; reset clears accounts and requires re-import) | ✅ shipped |
 | FR-55 | Unified unlock / auto-lock flow | ✅ shipped |
@@ -382,7 +382,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 - **Covers:** NFT display, transfer and import across Substrate (RMRK, Unique, PSP-34), EVM (ERC-721/1155) and Bitcoin Ordinals, with 3D/video rendering and nested collections.
 - **Why it matters:** The collectibles surface — display and move users' NFTs.
-- **Status:** 🟢 **Mostly shipped** — 7/9 FRs (1 🚧 in progress)
+- **Status:** 🟢 **Mostly shipped** — 7/9 FRs
 
 | FR | Requirement | Status |
 |----|-------------|--------|
@@ -394,7 +394,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-90 | 3D and video NFT viewer support | ✅ shipped |
 | FR-91 | Bitcoin Ordinals/inscriptions display | ✅ shipped |
 | FR-92 | Custom NFT import: add NFT collections by contract (ERC-721 / PSP-34) | ✅ shipped |
-| FR-93 | Additional NFT collections & standards (Ternoa, Joystream, Aventus; ERC-6551 token-bound accounts) | 🚧 in progress |
+| FR-93 | Additional NFT collections & standards (Ternoa, Joystream, Aventus; ERC-6551 token-bound accounts) | 📋 planned |
 
 #### EPIC-10 — dapp-connection
 
@@ -409,7 +409,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-96 | WalletConnect v2 — Substrate and EVM session support | ✅ shipped |
 | FR-97 | Cardano dApp connector: CIP-30 (connect, signData, signTx, submitTx, getUtxo) | ✅ shipped |
 | FR-98 | Bitcoin dApp connection: connect, getAddresses, signMessage, signPsbt, sendTransfer | ✅ shipped |
-| FR-99 | TON dApp connection and signature requests | ✅ shipped |
+| FR-99 | TON dApp connection and signature requests | 📋 planned |
 | FR-100 | dApp authorization UI (Manage website access): per-origin connection management, per-account access control, and revocation | ✅ shipped |
 | FR-101 | Arbitrary message signing for dApps (personal_sign / eth_signTypedData, Polkadot signMessage/signRaw, Cardano signData, Bitcoin signMessage, TON sign) | ✅ shipped |
 | FR-102 | dApp createTransaction signing API (Polkadot-JS RFC #6213) | 📋 planned |
@@ -420,7 +420,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 - **Covers:** In-wallet token swapping aggregated across Chainflip, Hydration, Uniswap, KyberSwap, SimpleSwap, Asset Hub DEX and Bittensor dTAO, with cross-chain Swap→Bridge routing.
 - **Why it matters:** Lets users exchange tokens without leaving the wallet — a key DeFi convenience.
-- **Status:** 🟢 **Mostly shipped** — 9/11 FRs (1 🚧 in progress)
+- **Status:** 🟢 **Mostly shipped** — 9/11 FRs
 
 | FR | Requirement | Status |
 |----|-------------|--------|
@@ -433,28 +433,28 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-109 | In-wallet Bittensor dTAO swap: TAO ↔ alpha and cross-subnet alpha-token swaps (subnet AMM) | ✅ shipped |
 | FR-110 | Cross-chain swap routing: Swap→Bridge and Bridge→Swap multi-hop paths | ✅ shipped |
 | FR-111 | Optimex swap integration (intent-based cross-chain swap) | ✅ shipped |
-| FR-112 | In-wallet token swap via PiperX | 🚧 in progress |
+| FR-112 | In-wallet token swap via PiperX | 📋 planned |
 | FR-113 | In-wallet token swap via StellaSwap (Moonbeam DEX) | 📋 planned |
 
 #### EPIC-12 — earning
 
 - **Covers:** Native / nomination-pool / collator / liquid / dApp staking, Bittensor dTAO, Interlay lending, plus earning-path simulation and XCM deposit routing.
 - **Why it matters:** SubWallet's largest feature area and biggest differentiator — where users grow their holdings.
-- **Status:** 🟢 **Mostly shipped** — 9/14 FRs (1 🚧 in progress)
+- **Status:** 🟢 **Mostly shipped** — 9/14 FRs
 
 | FR | Requirement | Status |
 |----|-------------|--------|
 | FR-114 | Native nomination staking on Polkadot, Kusama, and Substrate parachains | ✅ shipped |
 | FR-115 | Nomination pool staking on Polkadot/Kusama (join, leave, withdraw) | ✅ shipped |
 | FR-116 | Collator / parachain staking (Moonbeam, Moonriver, Astar, Amplitude, Pendulum, Krest, Energy Web X, Mythos, Tanssi, and compatible parachains) | ✅ shipped |
-| FR-117 | Liquid staking integrations (e.g., Bifrost, Interlay, and other LST protocols) | ✅ shipped |
+| FR-117 | Liquid staking integrations (e.g., Acala, Bifrost, Parallel, StellaSwap) | ✅ shipped |
 | FR-118 | dApp staking — Astar network dApp staking support | ✅ shipped |
 | FR-119 | Bittensor dTAO / alpha-token subnet staking model | ✅ shipped |
 | FR-120 | Lending integration (Interlay): lend assets to earn yield (distinct from liquid staking) | ✅ shipped |
 | FR-121 | Earning path simulation and step-status tracking for multi-step staking flows | ✅ shipped |
 | FR-122 | XCM channel support for cross-chain deposit routing into earning positions | ✅ shipped |
 | FR-123 | Bittensor alpha-token liquid staking | 📋 planned |
-| FR-124 | Bittensor alpha-index auto-rebalancing delegate-staking strategy | 🚧 in progress |
+| FR-124 | Bittensor alpha-index auto-rebalancing delegate-staking strategy | 📋 planned |
 | FR-125 | Trusted Stake — alpha index staking integration | 📋 planned |
 | FR-126 | Backprop — alpha subnet trading integration | 📋 planned |
 | FR-127 | In-app staking for additional networks (Enjin, Phala, xx Network, and others) | 📋 planned |
@@ -496,14 +496,14 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 - **Covers:** Polkadot OpenGov referenda browsing, conviction voting with vote-lock tracking, plus legacy Governance V1 display; delegation, governance tracks and a dedicated web-app governance surface are the planned Phase-2 expansion.
 - **Why it matters:** Lets users vote where their tokens give them a say in chain decisions.
-- **Status:** 🟡 **Partially shipped** — 3/5 FRs (1 🚧 in progress)
+- **Status:** 🟡 **Partially shipped** — 3/5 FRs
 
 | FR | Requirement | Status |
 |----|-------------|--------|
 | FR-141 | Polkadot OpenGov: referenda list, referendum detail, conviction vote / revote / unvote | ✅ shipped |
 | FR-142 | OpenGov: locked-token detail view and unlock flow after voting period | ✅ shipped |
 | FR-143 | Governance V1 (Democracy) referenda display — legacy chains, display-only | ✅ shipped |
-| FR-144 | OpenGov Phase 2: delegation support and governance tracks | 🚧 in progress |
+| FR-144 | OpenGov Phase 2: delegation support and governance tracks | 📋 planned |
 | FR-145 | Web-app governance — the full OpenGov experience (referenda, conviction voting, delegation, tracks) delivered in the standalone web app | 📋 planned |
 
 ### Advanced Accounts & Signing
@@ -561,6 +561,54 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-159 | NFT mint campaigns | ✅ shipped |
 | FR-160 | Mission Pools reward program | ✅ shipped |
 | FR-161 | In-app notification center for transaction status, campaign alerts, and system messages | ✅ shipped |
+
+### Performance
+
+#### EPIC-20 — performance
+
+- **Covers:** The wallet's cross-cutting performance and lifecycle program — the phased MV3 background lifecycle and idle behaviour, API-call optimization (eliminating redundant fan-out and the notification-fetch flood), the read-path memory budget, many-account submit/close responsiveness, list/render performance on heavy screens, WebApp and web-runner web-surface performance, and dependency / supply-chain hygiene.
+- **Why it matters:** It gives the performance program a single home so every other epic can stop re-litigating "is this fast enough and lightweight enough"; the budgets, lifecycle phases, and request/memory invariants are owned and defended here.
+- **NFR-driven (owns no FR):** EPIC-20 materializes the performance non-functional requirements rather than any FR, so instead of an FR table the table below maps each performance NFR it owns to the story that defends it.
+- **Status:** 🔵 **Roadmap** — gathers the cross-cutting performance program (feature-local perf stays in each epic's hardening story); #4197 = umbrella perf tracker (GitHub).
+
+| NFR | Story |
+|-----|-------|
+| NFR-8 — MV3 service-worker shutdown/wake state persistence | [US-20.1](sprints/stories/US-20.1-core-structure-and-lifecycle-refactor.md) |
+| NFR-12 — Cold-start: cached-first paint, progressive refresh | [US-20.1](sprints/stories/US-20.1-core-structure-and-lifecycle-refactor.md) |
+| NFR-20 — Services SDK aggregation; reduce per-chain RPC fan-out | [US-20.2](sprints/stories/US-20.2-api-call-optimization.md) |
+| NFR-21 — Cache / CDN proxy layer for market/metadata/media | [US-20.2](sprints/stories/US-20.2-api-call-optimization.md) |
+| NFR-11 — Read-path memory ≤72 MB regardless of chain count | [US-20.3](sprints/stories/US-20.3-read-path-memory-budget.md) |
+| NFR-11 (shared) — Many-account submit/close must not block the main thread | [US-20.4](sprints/stories/US-20.4-many-account-submit-performance.md) |
+| NFR-17 — List render performance on heavy selection/collection screens | [US-20.5](sprints/stories/US-20.5-list-rendering-performance.md) |
+| NFR-17 (shared) — Web-surface portability/performance (webapp / web-runner) | [US-20.6](sprints/stories/US-20.6-webapp-and-web-runner-performance.md) |
+| NFR-19 — Dependency auditability: Yarn 3 lockfile, npm-only registry | [US-20.7](sprints/stories/US-20.7-dependency-auditability-and-supply-chain-hygiene.md) |
+
+---
+
+## Epics & User Stories
+
+This project is **FR-centric**: stories link back to the PRD through `prd_ref → FR`, and the FR tables above are the authoritative requirement list. This index lists the 20 epics and points to each epic's Stories table (the authoritative US list) rather than enumerating the ~170 user-story rows here.
+
+- **EPIC-1 — Build & Platform Infrastructure** — The runnable platform every other epic builds on: MV3 service-worker background, the Yarn 3 monorepo, and the online hot-update channel. — [stories](sprints/epics/EPIC-1.md#stories)
+- **EPIC-2 — Core Platform Engines** — The distinctive engine modules that power every wallet feature (Unified-Account keyring, ChainService, EarningService, SwapService, balance/fee engines, RequestService, transaction lifecycle). — [stories](sprints/epics/EPIC-2.md#stories)
+- **EPIC-3 — Account Creation & Management** — How keys enter (create/import), are organized & derived, and leave (export) the wallet, including the one-seed-many-chains Unified Account. — [stories](sprints/epics/EPIC-3.md#stories)
+- **EPIC-4 — Network & Token Management** — Determines which chains and tokens the wallet can see: networks/RPCs, the 200+-network registry, per-ecosystem integration, plus the chain-abstraction roadmap. — [stories](sprints/epics/EPIC-4.md#stories)
+- **EPIC-5 — Wallet Security** — Where the non-custodial promise is enforced: key isolation, master-password / lock policy, and the phishing / malicious-transaction / scam-address threat-defence surface. — [stories](sprints/epics/EPIC-5.md#stories)
+- **EPIC-6 — UI & User Experience** — The one shared, dark-only responsive experience layer every feature renders through across popup, expand view, web app, and mobile web-runner, plus settings and display-currency controls. — [stories](sprints/epics/EPIC-6.md#stories)
+- **EPIC-7 — Portfolio & Balances** — The wallet's daily-home screen: the aggregated portfolio, transferable-vs-locked breakdown, token auto-detection, and live price plus per-asset charts. — [stories](sprints/epics/EPIC-7.md#stories)
+- **EPIC-8 — Transactions & Transfers** — The core money-movement surface: send/receive across all five ecosystems, fee/tip controls, on-chain history, the existential-deposit guard, and the signing experiences a user confirms. — [stories](sprints/epics/EPIC-8.md#stories)
+- **EPIC-9 — NFT Management** — A single collectibles surface to see and send every NFT across Substrate, EVM and Bitcoin, however rendered (image / 3D / video / inscription), regardless of standard or chain. — [stories](sprints/epics/EPIC-9.md#stories)
+- **EPIC-10 — dApp Connectivity** — Connect SubWallet to any dApp across every supported ecosystem and approve connections, signatures and transactions from one consistent connector + authorization surface. — [stories](sprints/epics/EPIC-10.md#stories)
+- **EPIC-11 — In-Wallet Token Swap** — Let users exchange tokens without leaving the wallet by aggregating many swap providers behind one quote / route / execute surface. — [stories](sprints/epics/EPIC-11.md#stories)
+- **EPIC-12 — Staking & Earning** — The wallet's yield surface: native/pool/collator/dApp staking, liquid staking and lending, the Bittensor dTAO model, earning-path simulation, and XCM-deposit routing. — [stories](sprints/epics/EPIC-12.md#stories)
+- **EPIC-13 — Cross-Chain Bridge & XCM** — Moving a token from the chain it is on to the chain the user needs it on, one hop end to end: XCM, external bridges to/from Ethereum, the TAO↔Subtensor-EVM bridge, and the claim step. — [stories](sprints/epics/EPIC-13.md#stories)
+- **EPIC-14 — Fiat On/Off-Ramp** — The fiat↔crypto bridge: how a user funds the wallet with a card (on-ramp) and cashes out (off-ramp) by routing to a regulated third-party provider through one buy/sell surface. — [stories](sprints/epics/EPIC-14.md#stories)
+- **EPIC-15 — On-Chain Governance** — The wallet's on-chain voice: browse Polkadot OpenGov referenda, cast conviction votes that lock tokens, track and unlock them, and read legacy Governance V1 / Democracy referenda. — [stories](sprints/epics/EPIC-15.md#stories)
+- **EPIC-16 — Hardware Wallet Signing** — Cold-storage signing for security-conscious users: the private key never enters the extension; the signing step completes on an external device. — [stories](sprints/epics/EPIC-16.md#stories)
+- **EPIC-17 — Proxy Accounts** — Delegated signing authority on Substrate: a proxy account signs and submits with its own key on behalf of another account, scoped to a named Polkadot proxy-pallet type. — [stories](sprints/epics/EPIC-17.md#stories)
+- **EPIC-18 — Multisig Accounts** — Multi-party custody on Substrate/Polkadot without a custodial backend: an M-of-N signatory set shares one deterministic address and a tx executes only at threshold on-chain approval. — [stories](sprints/epics/EPIC-18.md#stories)
+- **EPIC-19 — Onboarding, Localization & Engagement** — The supporting surfaces wrapped around the core wallet: first-run onboarding, bundled multi-language UI, in-app growth campaigns, and the notification center. — [stories](sprints/epics/EPIC-19.md#stories)
+- **EPIC-20 — Performance & Lifecycle** — The wallet's cross-cutting performance and lifecycle program: how fast the background wakes, how few API requests fan out, read-path memory, render performance, web-surface performance, and dependency hygiene. — [stories](sprints/epics/EPIC-20.md#stories)
 
 ---
 

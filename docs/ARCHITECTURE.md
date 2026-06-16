@@ -56,7 +56,7 @@ flowchart TD
             KS --> CS["ChainService"]
             KS --> BS["BalanceService"]
             KS --> ES["EarningService"]
-            KS --> NS["NFTService"]
+            KS --> NS["NftService"]
             KS --> TXS["TransactionService"]
             KS --> KR["🔑 KeyringService<br/>@subwallet/keyring"]
             KE["KoniExtension — pri handlers"]
