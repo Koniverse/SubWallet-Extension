@@ -353,7 +353,7 @@ export function subscribeERC20IntervalForSubtensorEvm ({ addresses, assetMap, ca
             subtensorEvmSs58Addresses.push(ss58Address);
             ss58ToEvmMap[ss58Address] = address;
           });
-          
+
           if (cancelled) {
             return;
           }
