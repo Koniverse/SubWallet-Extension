@@ -17,21 +17,6 @@ import { Contract } from 'web3-eth-contract';
 
 import { BN } from '@polkadot/util';
 
-/**
- * Runtime probe cache: `true` = Multicall3 confirmed, `false` = not available.
- * `undefined` = not yet probed for this chain.
- *
- * Populated lazily on the first call per chain so we never need a hardcoded
- * allow-list and automatically pick up new chains without a code change.
- */
-const multicallSupportCache = new Map<string, boolean>();
-
-/**
- * Pending probes: prevents concurrent duplicate probes for the same chain
- * when the first interval fires before the probe resolves.
- */
-const multicallProbeInFlight = new Map<string, Promise<boolean>>();
-
 /** How many (token × address) pairs to include per Multicall3 batch. */
 const MULTICALL_BATCH_SIZE = 100;
 
@@ -70,94 +55,8 @@ interface AddressEntry {
 }
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Multicall3 helpers
 // ---------------------------------------------------------------------------
-
-/**
- * Probes whether Multicall3 is available on the given chain by making a
- * minimal read-only call (`getBlockNumber`). Result is cached permanently for
- * the lifetime of the background service worker — a chain's Multicall3 support
- * does not change at runtime.
- *
- * Concurrent callers for the same chain share the single in-flight promise so
- * we never fire duplicate probes.
- */
-async function probeMulticall3Support (chain: string, evmApi: _EvmApi, sampleAddress?: string): Promise<boolean> {
-  const cached = multicallSupportCache.get(chain);
-
-  if (cached !== undefined) {
-    return cached;
-  }
-
-  const inFlight = multicallProbeInFlight.get(chain);
-
-  if (inFlight !== undefined) {
-    return inFlight;
-  }
-
-  const probe = (async (): Promise<boolean> => {
-    try {
-      const web3 = evmApi.api;
-      const multicall = getMulticall3Contract(evmApi);
-
-      // 1) There must be a real contract at the canonical Multicall3 address.
-      const code = await web3.eth.getCode(multicall.options.address);
-
-      if (!code || code === '0x' || code === '0x0') {
-        multicallSupportCache.set(chain, false);
-
-        return false;
-      }
-
-      // 2) Behavioural check — the real protection against a spoofed contract.
-      // `getEthBalance` must equal the canonical `eth_getBalance`.
-      if (sampleAddress) {
-        const balancesMatch = async (): Promise<boolean> => {
-          const [direct, viaMulticall] = await Promise.all([
-            web3.eth.getBalance(sampleAddress),
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-            multicall.methods.getEthBalance(sampleAddress).call() as Promise<string>
-          ]);
-
-          return new BN(direct || '0').eq(new BN(viaMulticall || '0'));
-        };
-
-        // Retry once to absorb the rare case where the balance changes between
-        // the two reads (a tx mining); a genuinely fake contract mismatches
-        // every time, so a single retry can't let it through.
-        const ok = (await balancesMatch()) || (await balancesMatch());
-
-        multicallSupportCache.set(chain, ok);
-
-        return ok;
-      }
-
-      // 3) No sample address available — fall back to a block-number sanity
-      // cross-check (weaker, but better than trusting a bare call success).
-      const [chainBlock, mcBlock] = await Promise.all([
-        web3.eth.getBlockNumber(),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        multicall.methods.getBlockNumber().call() as Promise<string>
-      ]);
-
-      const ok = new BN(chainBlock.toString()).sub(new BN(mcBlock || '0')).abs().lten(3);
-
-      multicallSupportCache.set(chain, ok);
-
-      return ok;
-    } catch {
-      multicallSupportCache.set(chain, false);
-
-      return false;
-    } finally {
-      multicallProbeInFlight.delete(chain);
-    }
-  })();
-
-  multicallProbeInFlight.set(chain, probe);
-
-  return probe;
-}
 
 /**
  * Fetches ERC-20 balances for all (token, address) pairs in a single
@@ -166,9 +65,9 @@ async function probeMulticall3Support (chain: string, evmApi: _EvmApi, sampleAdd
  *
  * Returns a nested map:  tokenSlug → address → rawBalance (decimal string).
  */
-async function fetchERC20BalancesViaMulticall (addresses: string[], tokenList: Record<string, ReturnType<typeof filterAssetsByChainAndType>[string]>, evmApi: _EvmApi, erc20ContractMap: Record<string, Contract>): Promise<Record<string, Record<string, string>>> {
+async function fetchERC20BalancesViaMulticall (addresses: string[], tokenList: Record<string, ReturnType<typeof filterAssetsByChainAndType>[string]>, multicall3Address: string, evmApi: _EvmApi, erc20ContractMap: Record<string, Contract>): Promise<Record<string, Record<string, string>>> {
   const web3 = evmApi.api;
-  const multicall = getMulticall3Contract(evmApi);
+  const multicall = getMulticall3Contract(multicall3Address, evmApi);
 
   // Build full call + metadata list
   const allCalls: Multicall3Call[] = [];
@@ -184,7 +83,6 @@ async function fetchERC20BalancesViaMulticall (addresses: string[], tokenList: R
     const contractAddress: string = contract.options.address;
 
     for (const address of addresses) {
-      // encodeABI returns a hex string – no unsafe cast needed
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       const callData = contract.methods.balanceOf(address).encodeABI() as string;
 
@@ -286,16 +184,16 @@ async function fetchERC20BalancesViaChunks (addresses: string[], tokenList: Reco
     }, FALLBACK_TOKEN_CHUNK, FALLBACK_CHUNK_DELAY_MS);
 }
 
-async function fetchEVMNativeBalancesViaMulticall (addresses: string[], evmApi: _EvmApi): Promise<string[]> {
+async function fetchEVMNativeBalancesViaMulticall (addresses: string[], multicall3Address: string, evmApi: _EvmApi): Promise<string[]> {
   const web3 = evmApi.api;
-  const multicall = getMulticall3Contract(evmApi);
+  const multicall = getMulticall3Contract(multicall3Address, evmApi);
 
   const calls: Multicall3Call[] = addresses.map((address) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     const callData = multicall.methods.getEthBalance(address).encodeABI() as string;
 
     return {
-      target: multicall.options.address,
+      target: multicall3Address,
       allowFailure: true,
       callData
     };
@@ -308,7 +206,7 @@ async function fetchEVMNativeBalancesViaMulticall (addresses: string[], evmApi: 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     results = await multicall.methods.aggregate3(calls).call() as Multicall3Result[];
   } catch (err) {
-    console.error('[Multicall3] fetchNativeBalancesViaMulticall failed, will fall back to chunks', err);
+    console.error('[Multicall3] fetchNativeBalancesViaMulticall failed, will fall back to individual calls', err);
 
     return [];
   }
@@ -355,6 +253,8 @@ async function fetchEVMNativeBalancesViaChunks (addresses: string[], evmApi: _Ev
 
 export function subscribeERC20Interval ({ addresses, assetMap, callback, chainInfo, evmApi }: SubscribeEvmPalletBalance): () => void {
   const chain = chainInfo.slug;
+  const multicall3Address = chainInfo.evmInfo?.multicall3 || null;
+
   let tokenList = filterAssetsByChainAndType(assetMap, chain, [_AssetType.ERC20]);
 
   if (_BALANCE_CHAIN_GROUP.moonbeam.includes(chain)) {
@@ -371,31 +271,14 @@ export function subscribeERC20Interval ({ addresses, assetMap, callback, chainIn
 
   let cancelled = false;
 
-  // Resolved once on first call then reused — probe result never changes.
-  let multicallSupportedPromise: Promise<boolean> | undefined;
-
-  const resolveMulticallSupport = (): Promise<boolean> => {
-    if (multicallSupportedPromise === undefined) {
-      multicallSupportedPromise = probeMulticall3Support(chain, evmApi, addresses[0]);
-    }
-
-    return multicallSupportedPromise;
-  };
-
   const getTokenBalances = async (): Promise<void> => {
     if (cancelled) {
       return;
     }
 
-    const useMulticall = await resolveMulticallSupport();
-
-    if (cancelled) {
-      return;
-    }
-
     try {
-      if (useMulticall) {
-        const balanceMap = await fetchERC20BalancesViaMulticall(addresses, tokenList, evmApi, erc20ContractMap);
+      if (multicall3Address) {
+        const balanceMap = await fetchERC20BalancesViaMulticall(addresses, tokenList, multicall3Address, evmApi, erc20ContractMap);
 
         if (cancelled) {
           return;
@@ -470,7 +353,7 @@ export function subscribeERC20IntervalForSubtensorEvm ({ addresses, assetMap, ca
             subtensorEvmSs58Addresses.push(ss58Address);
             ss58ToEvmMap[ss58Address] = address;
           });
-
+          
           if (cancelled) {
             return;
           }
@@ -541,19 +424,19 @@ export function subscribeERC20IntervalForSubtensorEvm ({ addresses, assetMap, ca
   };
 }
 
-async function fetchEVMNativeBalances (addresses: string[], chain: string, evmApi: _EvmApi): Promise<string[]> {
+async function fetchEVMNativeBalances (addresses: string[], chainInfo: SubscribeEvmPalletBalance['chainInfo'], evmApi: _EvmApi): Promise<string[]> {
   if (!addresses.length) {
     return [];
   }
 
-  const useMulticall = await probeMulticall3Support(chain, evmApi, addresses[0]);
+  const multicall3Address = chainInfo.evmInfo?.multicall3 ?? null;
 
-  if (!useMulticall) {
+  if (!multicall3Address) {
     return fetchEVMNativeBalancesViaChunks(addresses, evmApi);
   }
 
   try {
-    return await fetchEVMNativeBalancesViaMulticall(addresses, evmApi);
+    return await fetchEVMNativeBalancesViaMulticall(addresses, multicall3Address, evmApi);
   } catch (e) {
     console.error('[Multicall3] native balance batch failed, fallback to individual calls', e);
 
@@ -575,7 +458,7 @@ export function subscribeEVMBalance (params: SubscribeEvmPalletBalance): () => v
     }
 
     try {
-      const balances = await fetchEVMNativeBalances(addresses, chain, evmApi);
+      const balances = await fetchEVMNativeBalances(addresses, chainInfo, evmApi);
 
       if (cancelled) {
         return;

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _Address } from '@subwallet/extension-base/background/KoniTypes';
-import { _ERC20_ABI, _MULTICALL3_ABI, MULTICALL3_CONTRACT_ADDRESS } from '@subwallet/extension-base/koni/api/contract-handler/utils';
+import { _ERC20_ABI, _MULTICALL3_ABI } from '@subwallet/extension-base/koni/api/contract-handler/utils';
 import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
 import { EvmFeeInfo } from '@subwallet/extension-base/types';
@@ -17,10 +17,10 @@ export const getERC20Contract = (assetAddress: string, evmApi: _EvmApi, options 
   return new evmApi.api.eth.Contract(_ERC20_ABI, assetAddress, options);
 };
 
-export const getMulticall3Contract = (evmApi: _EvmApi, options = {}): Contract => {
+export const getMulticall3Contract = (address: string, evmApi: _EvmApi, options = {}): Contract => {
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
-  return new evmApi.api.eth.Contract(_MULTICALL3_ABI, MULTICALL3_CONTRACT_ADDRESS, options);
+  return new evmApi.api.eth.Contract(_MULTICALL3_ABI, address, options);
 };
 
 export function getWeb3Contract (contractAddress: _Address, evmApi: _EvmApi, contractAbi: Record<string, any>, options = {}): Contract {
