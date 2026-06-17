@@ -21,7 +21,10 @@ function filterNftByAccount (currentAccount: AccountJson | null, nftCollections:
   const filteredNftItems: NftItem[] = [];
   const filteredNftCollections: NftCollection[] = [];
 
-  const targetCollectionKeys: string[] = [];
+  // Use a Set for O(1) membership checks. With an array this loop is O(items × distinct-collections),
+  // which becomes a hotspot in all-account mode where every account's items are scanned.
+  const targetCollectionKeys = new Set<string>();
+  const accountNetworkSet = accountNetworks ? new Set(accountNetworks) : undefined;
 
   nftItems.forEach((nftItem) => {
     const formattedOwnerAddress = reformatAddress(nftItem.owner, 0);
@@ -29,19 +32,15 @@ function filterNftByAccount (currentAccount: AccountJson | null, nftCollections:
     if (isAll || currentAddress === formattedOwnerAddress) {
       let pass = true;
 
-      if (accountNetworks) {
-        if (!accountNetworks.includes(nftItem.chain)) {
+      if (accountNetworkSet) {
+        if (!accountNetworkSet.has(nftItem.chain)) {
           pass = false;
         }
       }
 
       if (pass) {
         filteredNftItems.push(nftItem);
-        const collectionKey = `${nftItem.chain}__${nftItem.collectionId}`;
-
-        if (!targetCollectionKeys.includes(collectionKey)) {
-          targetCollectionKeys.push(collectionKey);
-        }
+        targetCollectionKeys.add(`${nftItem.chain}__${nftItem.collectionId}`);
       }
     }
   });
@@ -49,7 +48,7 @@ function filterNftByAccount (currentAccount: AccountJson | null, nftCollections:
   nftCollections.forEach((nftCollection) => {
     const collectionKey = `${nftCollection.chain}__${nftCollection.collectionId}`;
 
-    if (targetCollectionKeys.includes(collectionKey)) {
+    if (targetCollectionKeys.has(collectionKey)) {
       filteredNftCollections.unshift(nftCollection);
     }
   });

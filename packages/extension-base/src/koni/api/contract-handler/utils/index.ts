@@ -33,6 +33,8 @@ export const _POLYGON_BRIDGE_ABI: Record<string, any> = require('./polygon_bridg
 export const _POS_BRIDGE_ABI: Record<string, any> = require('./pos_bridge_abi.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 export const _POS_BRIDGE_L2_ABI: Record<string, any> = require('./pos_bridge_l2_abi.json');
+// eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
+export const _MULTICALL3_ABI: Record<string, any> = require('./multicall3_abi.json');
 
 const SNOWBRIDGE_GATEWAY_ETHEREUM_CONTRACT_ADDRESS = '0x27ca963C279c93801941e1eB8799c23f407d68e7';
 const SNOWBRIDGE_GATEWAY_SEPOLIA_CONTRACT_ADDRESS = '0x5B4909cE6Ca82d2CE23BD46738953c7959E710Cd';

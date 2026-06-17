@@ -14,7 +14,7 @@ import { parseSubscanExtrinsicData, parseSubscanTransferData } from '@subwallet/
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SubscanService } from '@subwallet/extension-base/services/subscan-service';
-import { getAddressesByChainType } from '@subwallet/extension-base/utils';
+import { addLazy, getAddressesByChainType } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { keyring } from '@subwallet/ui-keyring';
 import { BehaviorSubject } from 'rxjs';
@@ -251,43 +251,71 @@ export class HistoryService implements StoppableServiceInterface, PersistDataSer
     await this.addHistoryItems(updatedRecords);
   }
 
+  /**
+   * Debounced emit: fires immediately on the first call, then debounces
+   * subsequent calls within 300 ms (max delay 2 s). This prevents a flood
+   * of UI re-renders when many history items are processed at once.
+   */
+  private _emitHistoryUpdate (histories: TransactionHistoryItem[]): void {
+    addLazy('historySubjectUpdate', () => {
+      this.historySubject.next(histories);
+    }, 300, 2000, true);
+  }
+
   async updateHistoryByExtrinsicHash (extrinsicHash: string, updateData: Partial<TransactionHistoryItem>, isRecover = false) {
     await this.dbService.updateHistoryByExtrinsicHash(extrinsicHash, updateData, isRecover);
-    this.historySubject.next(await this.dbService.getHistories());
+    const histories = await this.dbService.getHistories();
+
+    this._emitHistoryUpdate(histories);
   }
 
   // Insert history without check override origin 'app'
   async insertHistories (historyItems: TransactionHistoryItem[]) {
     await this.dbService.upsertHistory(historyItems);
-    this.historySubject.next(await this.dbService.getHistories());
+    const histories = await this.dbService.getHistories();
+
+    this._emitHistoryUpdate(histories);
   }
 
   // Insert history with check override origin 'app'
   async addHistoryItems (historyItems: TransactionHistoryItem[]) {
+    if (!historyItems.length) {
+      return;
+    }
+
+    // Build a Map from app-originated items for O(1) lookup instead of O(n) find per item
+    const appItemsMap = new Map<string, TransactionHistoryItem>();
+
+    for (const item of this.historySubject.value) {
+      if (item.origin === 'app') {
+        appItemsMap.set(`${item.chain}|${item.address}|${item.extrinsicHash}`, item);
+      }
+    }
+
     const updateRecords: TransactionHistoryItem[] = [];
 
-    const appItems = this.historySubject.value.filter((i) => i.origin === 'app');
-
-    historyItems.forEach((item) => {
-      const needUpdateItem = appItems.find(
-        (item_) => item_.extrinsicHash === item.extrinsicHash && item.chain === item_.chain && item.address === item_.address);
+    for (const item of historyItems) {
+      const key = `${item.chain}|${item.address}|${item.extrinsicHash}`;
+      const needUpdateItem = appItemsMap.get(key);
 
       if (needUpdateItem) {
         updateRecords.push({ ...needUpdateItem, status: item.status, apiTxIndex: item.apiTxIndex });
-
-        return;
+      } else {
+        updateRecords.push(item);
       }
-
-      updateRecords.push(item);
-    });
+    }
 
     await this.dbService.upsertHistory(updateRecords);
-    this.historySubject.next(await this.dbService.getHistories());
+    const histories = await this.dbService.getHistories();
+
+    this._emitHistoryUpdate(histories);
   }
 
   async removeHistoryByAddress (address: string) {
     await this.dbService.stores.transaction.removeAllByAddress(address);
-    this.historySubject.next(await this.dbService.getHistories());
+    const histories = await this.dbService.getHistories();
+
+    this._emitHistoryUpdate(histories);
   }
 
   status: ServiceStatus = ServiceStatus.NOT_INITIALIZED;
