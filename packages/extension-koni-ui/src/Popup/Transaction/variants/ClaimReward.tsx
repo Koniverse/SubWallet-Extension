@@ -71,10 +71,11 @@ const filterAccount = (
     const isAstarNetwork = _STAKING_CHAIN_GROUP.astar.includes(_poolChain);
     const isMythosNetwork = _STAKING_CHAIN_GROUP.mythos.includes(_poolChain);
     const isAmplitudeNetwork = _STAKING_CHAIN_GROUP.amplitude.includes(_poolChain);
+    const isTanssiNetwork = _STAKING_CHAIN_GROUP.tanssi.includes(_poolChain);
     const bnUnclaimedReward = new BigN(reward?.unclaimedReward || '0');
 
     return (
-      ((poolType === YieldPoolType.NOMINATION_POOL || isAmplitudeNetwork || isMythosNetwork) && bnUnclaimedReward.gt(BN_ZERO)) ||
+      ((poolType === YieldPoolType.NOMINATION_POOL || isAmplitudeNetwork || isMythosNetwork || isTanssiNetwork) && bnUnclaimedReward.gt(BN_ZERO)) ||
       isAstarNetwork
     );
   };
@@ -88,7 +89,6 @@ const Component = () => {
 
   const [form] = Form.useForm<ClaimRewardParams>();
   const formDefault = useMemo((): ClaimRewardParams => ({ ...defaultData }), [defaultData]);
-
   const { accounts, isAllAccount } = useSelector((state) => state.accountState);
   const { chainInfoMap } = useSelector((state) => state.chainStore);
   const { earningRewards, poolInfoMap } = useSelector((state) => state.earning);
@@ -108,7 +108,7 @@ const Component = () => {
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
 
-  const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolChain), [poolChain]);
+  const isHideCheckBox = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolChain) || _STAKING_CHAIN_GROUP.tanssi.includes(poolChain), [poolChain]);
 
   const handleDataForInsufficientAlert = useCallback(
     (estimateFee: AmountData) => {
@@ -164,9 +164,9 @@ const Component = () => {
           setLoading(false);
         });
     }, 300);
-  }, [onError, onSuccess, reward?.unclaimedReward]);
+  }, [reward?.unclaimedReward, onSuccess, onError]);
 
-  const checkAction = usePreCheckAction(fromValue);
+  const checkAction = usePreCheckAction({ chain: chainValue, address: fromValue });
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);
@@ -210,7 +210,7 @@ const Component = () => {
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('Available balance')}
+            label={t('ui.TRANSACTION.screen.Transaction.ClaimReward.availableBalance')}
             onBalanceReady={setIsBalanceReady}
           />
           <Form.Item>
@@ -220,13 +220,13 @@ const Component = () => {
             >
               <MetaInfo.Chain
                 chain={chainValue}
-                label={t('Network')}
+                label={t('ui.TRANSACTION.screen.Transaction.ClaimReward.network')}
               />
               {
                 reward?.unclaimedReward && (
                   <MetaInfo.Number
                     decimals={decimals}
-                    label={t('Reward claiming')}
+                    label={t('ui.TRANSACTION.screen.Transaction.ClaimReward.rewardClaiming')}
                     suffix={symbol}
                     value={reward.unclaimedReward}
                   />
@@ -235,12 +235,12 @@ const Component = () => {
             </MetaInfo>
           </Form.Item>
           <Form.Item
-            hidden={isMythosStaking}
+            hidden={isHideCheckBox}
             name={'bondReward'}
             valuePropName='checked'
           >
             <Checkbox>
-              <span className={'__option-label'}>{t('Stake reward after claim')}</span>
+              <span className={'__option-label'}>{t('ui.TRANSACTION.screen.Transaction.ClaimReward.stakeRewardAfterClaim')}</span>
             </Checkbox>
           </Form.Item>
         </Form>
@@ -257,7 +257,7 @@ const Component = () => {
           onClick={goHome}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.TRANSACTION.screen.Transaction.ClaimReward.cancel')}
         </Button>
 
         <Button
@@ -271,7 +271,7 @@ const Component = () => {
           loading={loading}
           onClick={checkAction(form.submit, ExtrinsicType.STAKING_CLAIM_REWARD)}
         >
-          {t('Continue')}
+          {t('ui.TRANSACTION.screen.Transaction.ClaimReward.continue')}
         </Button>
       </TransactionFooter>
     </>

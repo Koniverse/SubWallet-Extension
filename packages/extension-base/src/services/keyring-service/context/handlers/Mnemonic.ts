@@ -42,7 +42,8 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
   }
 
   /* Validate seed */
-  public mnemonicValidateV2 ({ mnemonic }: RequestMnemonicValidateV2): ResponseMnemonicValidateV2 {
+  public mnemonicValidateV2 (request: RequestMnemonicValidateV2): ResponseMnemonicValidateV2 {
+    const { mnemonic, mnemonicType } = request;
     const { phrase } = keyExtractSuri(mnemonic);
     let mnemonicTypes: MnemonicType = 'general';
     let pairTypes: KeypairType[] = [];
@@ -56,8 +57,13 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
       try {
         assert(mnemonicValidate(phrase), t('bg.ACCOUNT.services.keyring.handler.Mnemonic.invalidSeedPhraseTryAgain'));
 
-        mnemonicTypes = 'general';
-        pairTypes = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
+        if (mnemonicType === 'trust-wallet') {
+          mnemonicTypes = 'trust-wallet';
+          pairTypes = ['ed25519-tw'];
+        } else {
+          mnemonicTypes = 'general';
+          pairTypes = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
+        }
       } catch (e) {
         assert(tonMnemonicValidate(phrase), t('bg.ACCOUNT.services.keyring.handler.Mnemonic.invalidSeedPhraseTryAgain'));
         mnemonicTypes = 'ton';
@@ -76,20 +82,19 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
       rs.addressMap[type] = keyring.createFromUri(getSuri(mnemonic, type), {}, type).address;
     });
 
-    const exists = this.state.checkAddressExists(Object.values(rs.addressMap));
+    const existingAccount = this.state.checkAddressExists(Object.values(rs.addressMap));
 
-    assert(!exists, t('bg.ACCOUNT.types.error.account.common.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
+    assert(!existingAccount, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: existingAccount?.name || existingAccount?.address || '' } }));
 
     return rs;
   }
 
   /* Add accounts from mnemonic */
   public accountsCreateSuriV2 (request: RequestAccountCreateSuriV2): ResponseAccountCreateSuriV2 {
-    const { isAllowed, name, password, suri: _suri, type } = request;
+    const { isAllowed, name, password, suri: _suri, types } = request;
     const addressDict = {} as Record<KeypairType, string>;
     let changedAccount = false;
     const hasMasterPassword = keyring.keyring.hasMasterPassword;
-    const types: KeypairType[] = type ? [type] : ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
 
     if (!hasMasterPassword) {
       if (!password) {
@@ -126,7 +131,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
 
     const exists = this.state.checkAddressExists(Object.values(addressDict));
 
-    assert(!exists, t('bg.ACCOUNT.types.error.account.common.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
+    assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
 
     // Upsert account group first, to avoid combine latest have no account group data.
     if (proxyId) {
@@ -173,7 +178,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
     if (!isUnified) {
       const pair = keyring.getPair(proxyId);
 
-      assert(pair, t('bg.koni.handler.Extension.unableToFindAccount'));
+      assert(pair, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.unableToFindAccount'));
 
       const result = pair.exportMnemonic(password);
 
@@ -192,7 +197,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
         }
       }
 
-      assert(pair, t('bg.koni.handler.Extension.unableToFindAccount'));
+      assert(pair, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.unableToFindAccount'));
 
       const result = pair.exportMnemonic(password) || '';
 

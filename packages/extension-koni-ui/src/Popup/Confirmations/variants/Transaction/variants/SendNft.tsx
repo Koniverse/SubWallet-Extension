@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { CommonTransactionInfo } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { useGetChainPrefixBySlug, useGetNativeTokenBasicInfo } from '@subwallet/extension-koni-ui/hooks';
 import CN from 'classnames';
@@ -24,39 +25,35 @@ const Component: React.FC<Props> = (props: Props) => {
 
   return (
     <div className={CN(className)}>
+      <CommonTransactionInfo
+        address={data.senderAddress}
+        network={transaction.chain}
+      />
       <MetaInfo hasBackgroundWrapper>
         <MetaInfo.Account
-          address={data.senderAddress}
-          label={t('Send from')}
-          networkPrefix={networkPrefix}
-        />
-
-        <MetaInfo.Account
           address={data.recipientAddress}
-          label={t('Send to')}
+          label={t('ui.TRANSACTION.Confirmations.SendNft.recipient')}
           networkPrefix={networkPrefix}
+          onlyShowName
         />
-
-        <MetaInfo.Chain
-          chain={transaction.chain}
-          label={t('Network')}
-        />
-      </MetaInfo>
-      <MetaInfo hasBackgroundWrapper={true}>
         {
           !!(data.nftItemName || data.nftItem) && (
-            <MetaInfo.Default label={t('NFT')}>
+            <MetaInfo.Default label={t('ui.TRANSACTION.Confirmations.SendNft.nft')}>
               {data.nftItemName || data.nftItem.name || data.nftItem.id}
             </MetaInfo.Default>
           )
         }
+      </MetaInfo>
+      {!transaction.wrappingStatus &&
+      <MetaInfo hasBackgroundWrapper={true}>
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Estimated fee')}
+          label={t('ui.TRANSACTION.Confirmations.SendNft.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
       </MetaInfo>
+      }
     </div>
   );
 };

@@ -26,7 +26,7 @@ const Component: React.FC<Props> = ({ accountProxy, className }: Props) => {
         className='account-name'
         ellipsis={true}
       >
-        { isAll ? t('All accounts') : accountProxy.name}
+        { isAll ? t('ui.ACCOUNT.components.AccountProxy.BriefInfo.allAccounts') : accountProxy.name}
       </Typography.Text>
     </div>
   );

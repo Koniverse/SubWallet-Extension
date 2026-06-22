@@ -18,11 +18,13 @@ export interface AccountInfoItem extends InfoItemBase {
   name?: string;
   networkPrefix?: number;
   accounts?: BaseAccountInfo[];
+  onlyShowName?: boolean;
   chainSlug?: string;
+  leftItem?: React.ReactNode;
 }
 
 const Component: React.FC<AccountInfoItem> = (props: AccountInfoItem) => {
-  const { accounts, address: accountAddress, className, label, name: accountName, valueColorSchema = 'default' } = props;
+  const { accounts, address: accountAddress, className, label, leftItem, name: accountName, onlyShowName, valueColorSchema = 'default' } = props;
 
   const { t } = useTranslation();
   const account = useGetAccountByAddress(accountAddress);
@@ -40,6 +42,7 @@ const Component: React.FC<AccountInfoItem> = (props: AccountInfoItem) => {
         </div>
       </div>}
       <div className={'__col __value-col -to-right'}>
+        {!!leftItem && leftItem}
         <div className={`__account-item __value -is-wrapper -schema-${valueColorSchema}`}>
           {
             isAll
@@ -50,7 +53,7 @@ const Component: React.FC<AccountInfoItem> = (props: AccountInfoItem) => {
                     className={'__account-avatar'}
                   />
                   <div className={'__account-name ml-xs'}>
-                    {accounts ? t('{{number}} accounts', { replace: { number: accounts.length } }) : t('All accounts')}
+                    {accounts ? t('ui.components.MetaInfo.AccountItem.numberAccounts', { replace: { number: accounts.length } }) : t('ui.components.MetaInfo.AccountItem.allAccounts')}
                   </div>
                 </>
               )
@@ -68,7 +71,7 @@ const Component: React.FC<AccountInfoItem> = (props: AccountInfoItem) => {
                             />
                             <div className={'__account-item-name'}>{name}</div>
                           </div>
-                          <div className={'__account-item-address'}>{shortAddress}</div>
+                          {!onlyShowName && <div className={'__account-item-address'}>{shortAddress}</div>}
                         </div>
                       </>
                     )

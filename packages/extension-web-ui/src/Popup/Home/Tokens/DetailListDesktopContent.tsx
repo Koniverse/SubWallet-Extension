@@ -84,7 +84,7 @@ function Component ({ className = '',
           )
           : (
             <div className='__table-wrapper'>
-              <DetailTable
+              <DetailTable<TokenBalanceItemType>
                 className={'__table'}
                 columns={[
                   {

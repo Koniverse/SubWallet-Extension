@@ -8,7 +8,7 @@ import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { PhosphorIcon } from '@subwallet/extension-koni-ui/types';
 import { Icon, Tooltip } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CheckCircle, Eye, GitCommit, Needle, QrCode, Question, Strategy, Swatches, Warning } from 'phosphor-react';
+import { CheckCircle, Eye, GitCommit, Needle, QrCode, Question, Strategy, Swatches, UserSwitch, Warning } from 'phosphor-react';
 import { IconWeight } from 'phosphor-react/src/lib';
 import React, { Context, useCallback, useContext, useMemo } from 'react';
 import styled, { ThemeContext } from 'styled-components';
@@ -99,6 +99,14 @@ function Component (props: _AccountCardItem): React.ReactElement<_AccountCardIte
       };
     }
 
+    if (accountType === AccountProxyType.MULTISIG) {
+      return {
+        className: '-is-multisig',
+        value: UserSwitch,
+        weight: 'fill'
+      };
+    }
+
     if (accountType === AccountProxyType.UNKNOWN) {
       return {
         value: Question,
@@ -153,7 +161,7 @@ function Component (props: _AccountCardItem): React.ReactElement<_AccountCardIte
           { (accountProxy.isExistName || accountProxy.isNameDuplicated) && !accountProxy.isExistAccount && <div className={'__warning-name-already'}>
             <Tooltip
               placement='bottomLeft'
-              title={accountProxy.isExistName ? t('Account name already in use') : t('Duplicate account name')}
+              title={accountProxy.isExistName ? t('ui.ACCOUNT.screen.Account.RestoreJson.Item.accountNameInUse') : t('ui.ACCOUNT.screen.Account.RestoreJson.Item.duplicateAccountName')}
             >
               <div>
                 <Icon
@@ -234,6 +242,10 @@ const AccountRestoreJsonItem = styled(Component)<_AccountCardItem>(({ theme }) =
 
       '&.-is-derived': {
         color: token.colorWarning
+      },
+
+      '&.-is-multisig': {
+        color: token['geekblue-9']
       }
     },
     '.__item-center-part': {

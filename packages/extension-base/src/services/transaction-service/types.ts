@@ -1,11 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ChainType, ExtrinsicDataTypeMap, ExtrinsicStatus, ExtrinsicType, FeeData, ValidateTransactionResponse } from '@subwallet/extension-base/background/KoniTypes';
+import { AmountData, ChainType, ExtrinsicDataTypeMap, ExtrinsicStatus, ExtrinsicType, FeeData, ValidateTransactionResponse } from '@subwallet/extension-base/background/KoniTypes';
 import { SignTypedDataMessageV3V4 } from '@subwallet/extension-base/core/logic-validation';
 import { TonTransactionConfig } from '@subwallet/extension-base/services/balance-service/transfer/ton-transfer';
 import { UniswapOrderInfo } from '@subwallet/extension-base/services/swap-service/handler/uniswap-handler';
-import { BaseRequestSign, BriefProcessStep, ProcessTransactionData, TransactionFee } from '@subwallet/extension-base/types';
+import { BalanceType, BaseRequestSign, BriefProcessStep, ProcessTransactionData, TransactionFee } from '@subwallet/extension-base/types';
 import { Psbt } from 'bitcoinjs-lib';
 import EventEmitter from 'eventemitter3';
 import { TransactionConfig } from 'web3-core';
@@ -28,6 +28,7 @@ export interface SWTransactionBase extends ValidateTransactionResponse, Partial<
   updatedAt: number;
   estimateFee?: FeeData,
   xcmFeeDryRun?: string;
+  xcmDestinationFee?: AmountData;
   transaction: any;
   additionalValidator?: (inputTransaction: SWTransactionResponse) => Promise<void>;
   eventsHandler?: (eventEmitter: TransactionEmitter) => void;
@@ -35,6 +36,34 @@ export interface SWTransactionBase extends ValidateTransactionResponse, Partial<
   errorOnTimeOut?: boolean;
   signAfterCreate?: (id: string) => void;
   step?: BriefProcessStep;
+  wrappingStatus?: SubstrateTransactionWrappingStatus;
+}
+
+/**
+ * Describes how a transaction is related to wrapping (multisig / proxy).
+ */
+export enum SubstrateTransactionWrappingStatus {
+  /**
+   * This transaction can be wrapped.
+   * - It is a base transaction
+   * - Not wrapped yet
+   * - User may choose a signer (multisig / proxy)
+   */
+  WRAPPABLE = 'WRAPPABLE',
+
+  /**
+   * This transaction is the source of a wrap.
+   * - It has been wrapped by another transaction
+   * - This transaction itself should NOT be signed anymore
+   */
+  WRAP_SOURCE = 'WRAP_SOURCE',
+
+  /**
+   * This transaction is the result of wrapping another transaction.
+   * - It wraps a WRAP_SOURCE transaction
+   * - This is the transaction that will be signed and submitted
+   */
+  WRAP_RESULT = 'WRAP_RESULT'
 }
 
 export interface SWTransaction extends SWTransactionBase {
@@ -63,7 +92,7 @@ export interface SWTransactionEmitter {
 type SwInputBase = Pick<SWTransactionBase, 'address' | 'url' | 'data' | 'extrinsicType' | 'chain' | 'chainType' | 'ignoreWarnings' | 'transferNativeAmount'>
 & Partial<Pick<SWTransactionBase, 'additionalValidator' | 'eventsHandler'>>;
 
-export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransactionBase, 'estimateFee' | 'signAfterCreate' | 'isPassConfirmation' | 'step' | 'errorOnTimeOut' | 'xcmFeeDryRun'>>, TransactionFee {
+export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransactionBase, 'estimateFee' | 'signAfterCreate' | 'isPassConfirmation' | 'step' | 'errorOnTimeOut' | 'xcmFeeDryRun' | 'xcmDestinationFee' | 'wrappingStatus'>>, TransactionFee {
   id?: string;
   transaction?: SWTransactionBase['transaction'] | null;
   warnings?: SWTransactionBase['warnings'];
@@ -74,6 +103,7 @@ export interface SWTransactionInput extends SwInputBase, Partial<Pick<SWTransact
   resolveOnDone?: boolean;
   skipFeeValidation?: boolean;
   skipFeeRecalculation?: boolean;
+  balanceType?: BalanceType;
 }
 
 export interface SWPermitTransactionInput extends Omit<SWTransactionInput, 'transaction'> {
@@ -84,7 +114,7 @@ export interface SWDutchTransactionInput extends Omit<SWTransactionInput, 'trans
   transaction?: SWDutchTransaction['transaction'] | null;
 }
 
-export type SWTransactionResponse = SwInputBase & Pick<SWTransactionBase, 'warnings' | 'errors'> & Partial<Pick<SWTransactionBase, 'id' | 'extrinsicHash' | 'status' | 'estimateFee' | 'xcmFeeDryRun'>> & TransactionFee & {
+export type SWTransactionResponse = SwInputBase & Pick<SWTransactionBase, 'warnings' | 'errors'> & Partial<Pick<SWTransactionBase, 'id' | 'extrinsicHash' | 'status' | 'estimateFee' | 'xcmFeeDryRun' | 'xcmDestinationFee' | 'wrappingStatus'>> & TransactionFee & {
   processId?: string;
 }
 

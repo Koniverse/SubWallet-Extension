@@ -83,15 +83,15 @@ const useReceiveQR = (tokenGroupSlug?: string) => {
 
   const confirmModalProps = useMemo((): SwModalFuncProps => ({
     id: WARNING_LEDGER_RECEIVE_MODAL,
-    title: t<string>('Unsupported network'),
+    title: t<string>('ui.ACCOUNT.hook.screen.useReceiveQR.unsupportedNetwork'),
     maskClosable: true,
     closable: true,
-    subTitle: t<string>('Do you still want to get the address?'),
-    okText: t<string>('Get address'),
+    subTitle: t<string>('ui.ACCOUNT.hook.screen.useReceiveQR.confirmGetAddress'),
+    okText: t<string>('ui.ACCOUNT.hook.screen.useReceiveQR.getAddress'),
     okCancel: true,
     type: 'warn',
     cancelButtonProps: {
-      children: t<string>('Cancel'),
+      children: t<string>('ui.ACCOUNT.hook.screen.useReceiveQR.cancel'),
       schema: 'secondary'
     },
     className: 'ledger-warning-modal'
@@ -218,14 +218,12 @@ const useReceiveQR = (tokenGroupSlug?: string) => {
 
           if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(firstToken.originChain)) {
             handleSimpleConfirmModal({
-              content: t<string>(
-                'Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.',
-                {
-                  replace: {
-                    ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
-                    networkName: chainInfoMap[firstToken.originChain]?.name
-                  }
+              content: t('ui.ACCOUNT.hook.screen.useReceiveQR.ledgerIncompatibleNetworkWarning', {
+                replace: {
+                  ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
+                  networkName: chainInfoMap[firstToken.originChain]?.name
                 }
+              }
               )
             })
               .then(() => {
@@ -261,14 +259,12 @@ const useReceiveQR = (tokenGroupSlug?: string) => {
 
         if (ledgerCheck !== 'unnecessary' && !ledgerGenericAllowNetworks.includes(first.originChain)) {
           handleSimpleConfirmModal({
-            content: t<string>(
-              'Ledger {{ledgerApp}} accounts are NOT compatible with {{networkName}} network. Tokens will get stuck (i.e., can’t be transferred out or staked) when sent to this account type.',
-              {
-                replace: {
-                  ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
-                  networkName: chainInfoMap[first.originChain]?.name
-                }
+            content: t('ui.ACCOUNT.hook.screen.useReceiveQR.ledgerIncompatibleNetworkWarning', {
+              replace: {
+                ledgerApp: ledgerCheck === 'polkadot' ? 'Polkadot' : 'Migration',
+                networkName: chainInfoMap[first.originChain]?.name
               }
+            }
             )
           })
             .then(() => {

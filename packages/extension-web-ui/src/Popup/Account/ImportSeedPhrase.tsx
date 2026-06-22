@@ -5,7 +5,7 @@ import { NotificationType } from '@subwallet/extension-base/background/KoniTypes
 import { AccountProxyType, ResponseMnemonicValidateV2 } from '@subwallet/extension-base/types';
 import { AccountNameModal, CloseIcon, InstructionContentType, Layout, PageWrapper, PhraseNumberSelector, SeedPhraseInput } from '@subwallet/extension-web-ui/components';
 import InstructionContainer from '@subwallet/extension-web-ui/components/InstructionContainer';
-import { ACCOUNT_NAME_MODAL, IMPORT_ACCOUNT_MODAL, IMPORT_SEED_MODAL } from '@subwallet/extension-web-ui/constants';
+import { ACCOUNT_NAME_MODAL, DEFAULT_MNEMONIC_TYPE, IMPORT_ACCOUNT_MODAL, IMPORT_SEED_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { WalletModalContext } from '@subwallet/extension-web-ui/contexts/WalletModalContextProvider';
 import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useDefaultNavigate, useFocusFormItem, useGoBackFromCreateAccount, useNotification, useTranslation, useUnlockChecker } from '@subwallet/extension-web-ui/hooks';
@@ -148,7 +148,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       checkUnlock()
         .then(() => {
           setSubmitting(true);
-          validateSeedV2(seed).then((response) => {
+          validateSeedV2({ mnemonic: seed, mnemonicType: DEFAULT_MNEMONIC_TYPE }).then((response) => {
             setSeedValidationResponse(response);
 
             if (response.mnemonicTypes === 'general') {
@@ -218,7 +218,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     createAccountSuriV2({
       name: accountName,
       suri: seedValidationResponse.mnemonic,
-      type: seedValidationResponse.mnemonicTypes === 'ton' ? 'ton-native' : undefined,
+      types: seedValidationResponse.pairTypes,
       isAllowed: true
     })
       .then(() => {

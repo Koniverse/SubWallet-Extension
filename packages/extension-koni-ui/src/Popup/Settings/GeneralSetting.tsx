@@ -160,13 +160,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         key: ThemeNames.DARK,
         leftIcon: MoonStars,
         leftIconBgColor: token.colorPrimary,
-        title: t('Dark theme')
+        title: t('ui.SETTINGS.screen.Setting.General.darkTheme')
       },
       {
         key: ThemeNames.LIGHT,
         leftIcon: Sun,
         leftIconBgColor: token.colorPrimary,
-        title: t('Light theme'),
+        title: t('ui.SETTINGS.screen.Setting.General.lightTheme'),
         disabled: true
       }
     ];
@@ -205,19 +205,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         key: 'popup',
         leftIcon: ArrowSquareUpRight,
         leftIconBgColor: token['volcano-6'],
-        title: t('Popup')
+        title: t('ui.SETTINGS.screen.Setting.General.popup')
       },
       {
         key: 'extension',
         leftIcon: LayoutIcon,
         leftIconBgColor: token['volcano-6'],
-        title: t('Extension')
+        title: t('ui.SETTINGS.screen.Setting.General.extension')
       },
       {
         key: 'window',
         leftIcon: CornersOut,
         leftIconBgColor: token['volcano-6'],
-        title: t('Window')
+        title: t('ui.SETTINGS.screen.Setting.General.window')
       }
     ];
   }, [t, token]);
@@ -294,7 +294,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     >
       <Layout.WithSubHeaderOnly
         onBack={goBackToSettingList}
-        title={t('General settings')}
+        title={t('ui.SETTINGS.screen.Setting.General.generalSettings')}
       >
         <div className={'__scroll-container'}>
           {isShowWalletTheme &&
@@ -305,7 +305,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 key: 'wallet-theme-trigger',
                 leftIcon: Image as unknown as PhosphorIcon,
                 leftIconBgColor: token.colorPrimary,
-                title: t('Wallet theme')
+                title: t('ui.SETTINGS.screen.Setting.General.walletTheme')
               })}
               id='wallet-theme-select-modal'
               inputWidth={'100%'}
@@ -316,7 +316,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               searchFunction={searchFunction}
               selected={theme}
               shape='round'
-              title={t('Wallet theme')}
+              title={t('ui.SETTINGS.screen.Setting.General.walletTheme')}
             />}
           <SelectModal
             background={'default'}
@@ -325,7 +325,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               key: 'price-currency-trigger',
               leftIcon: CurrencyCircleDollar,
               leftIconBgColor: token['gold-6'],
-              title: t('Currency'),
+              title: t('ui.SETTINGS.screen.Setting.General.currency'),
               subTitle: currency
             })}
             disabled={loadingMap.currency}
@@ -338,11 +338,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             renderWhenEmpty={renderEmpty}
             searchFunction={searchFunction}
             searchMinCharactersCount={2}
-            searchPlaceholder={t<string>('Search currency')}
+            searchPlaceholder={t<string>('ui.SETTINGS.screen.Setting.General.searchCurrency')}
             selected={currency}
             shape='round'
             size='small'
-            title={t('Select a currency')}
+            title={t('ui.SETTINGS.screen.Setting.General.selectCurrency')}
           />
 
           <SelectModal
@@ -352,7 +352,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               key: 'languages-trigger',
               leftIcon: GlobeHemisphereEast,
               leftIconBgColor: token['green-6'],
-              title: t('Language')
+              title: t('ui.SETTINGS.screen.Setting.General.language')
             })}
             disabled={loadingMap.language}
             id='languages-select-modal'
@@ -364,7 +364,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             selected={_language}
             shape='round'
             size='small'
-            title={t('Language')}
+            title={t('ui.SETTINGS.screen.Setting.General.language')}
           />
 
           <SelectModal
@@ -374,7 +374,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
               key: 'browser-confirmation-type-trigger',
               leftIcon: BellSimpleRinging,
               leftIconBgColor: token['volcano-6'],
-              title: t('Browser notifications')
+              title: t('ui.SETTINGS.screen.Setting.General.browserNotifications')
             })}
             disabled={loadingMap.browserConfirmationType}
             id='browser-confirmation-type-select-modal'
@@ -386,7 +386,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             selected={_browserConfirmationType}
             shape='round'
             size='small'
-            title={t('View notifications in')}
+            title={t('ui.SETTINGS.screen.Setting.General.viewNotificationsIn')}
           />
           <SettingItem
             className={CN('__trigger-item setting-item', 'notification-item')}
@@ -399,7 +399,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 weight='fill'
               />
             )}
-            name={t('In-app notifications')}
+            name={t('ui.SETTINGS.screen.Setting.General.inAppNotifications')}
             onPressItem={onClickEnableNotification}
             rightItem={(
               <div className={'__trigger-right-item'}>

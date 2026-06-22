@@ -35,7 +35,7 @@ const Component: React.FC<Props> = (props: Props) => {
         signature: signature
       });
     } else {
-      setError(t('Invalid signature!'));
+      setError(t('ui.DAPP.Confirmations.Qr.ScanSignature.invalidSignature'));
     }
   }, [onSignature, inactiveModal, t]);
 
@@ -55,7 +55,7 @@ const Component: React.FC<Props> = (props: Props) => {
       onError={onError}
       onSuccess={onSuccess}
       overlay={error && <QrScannerErrorNotice message={error} />}
-      title={t('Scan signature')}
+      title={t('ui.DAPP.Confirmations.Qr.ScanSignature.scanSignature')}
     />
   );
 };

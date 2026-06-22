@@ -112,7 +112,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
 
   const { defaultData, persistData } = useTransactionContext<TransferParams>();
-  const { defaultSlug: sendFundSlug, isReadonly, orderId, service } = defaultData;
+  const { defaultSlug: sendFundSlug, isReadonly } = defaultData;
   const { isWebUI } = useContext(ScreenContext);
   const currentAccountProxy = useSelector((state) => state.accountState.currentAccountProxy);
 
@@ -563,9 +563,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
         transferBounceable: options.isTransferBounceable,
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
-        tokenPayFeeSlug: currentTokenPayFee,
-        orderId,
-        service
+        tokenPayFeeSlug: currentTokenPayFee
       });
     } else {
       // Make cross chain transfer
@@ -585,7 +583,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
     }
 
     return sendPromise;
-  }, [currentTokenPayFee, orderId, selectedTransactionFee?.feeCustom, selectedTransactionFee?.feeOption, service]);
+  }, [currentTokenPayFee, selectedTransactionFee?.feeCustom, selectedTransactionFee?.feeOption]);
 
   // todo: must refactor later, temporary solution to support SnowBridge
   const handleBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {

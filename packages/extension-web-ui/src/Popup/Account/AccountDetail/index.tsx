@@ -13,7 +13,7 @@ import { useDefaultNavigate, useGetAccountProxyById, useNotification } from '@su
 import { editAccount, forgetAccount, validateAccountName } from '@subwallet/extension-web-ui/messaging';
 import AccountExport from '@subwallet/extension-web-ui/Popup/Account/AccountExport';
 import { RootState } from '@subwallet/extension-web-ui/stores';
-import { AccountDetailParam, ThemeProps, VoidFunction } from '@subwallet/extension-web-ui/types';
+import { ThemeProps, VoidFunction } from '@subwallet/extension-web-ui/types';
 import { FormCallbacks, FormFieldData } from '@subwallet/extension-web-ui/types/form';
 import { convertFieldToObject } from '@subwallet/extension-web-ui/utils/form/form';
 import { Button, Form, Icon, Input, ModalContext } from '@subwallet/react-ui';

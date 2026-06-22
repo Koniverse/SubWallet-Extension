@@ -1,5 +1,248 @@
 # CHANGELOG
 
+## 1.3.79
+Build date: May 21, 2026.
+
+- Alpha price calculation mismatch vs TaoStats (#4987)
+- Update ParaSpell API integration to v1 (#4979)
+- Extension – Some issues when merging in version 1.3.78 (#4988)
+- Refactor Swap Service interface and redundant code (#4826)
+
+
+## 1.3.78
+Build date: May 14, 2026.
+
+- Extension - Support display destination fee for transfer XCM (#4278)
+- Calculate exactly estimate fee for bridge step in liquid staking (#4803)
+- Disable all networks' switch to Manage Networks page (#4970)
+- Update for chain-list stable v0.2.127
+  - Support Transfer Alpha Token (#4900)
+  - Bridge native TAO <-> Subtensor EVM (#4901)
+  - Support bittensor on-chain swap (#4899)
+  - [Subtensor EVM] Add support for some alpha tokens
+
+
+## 1.3.77
+Build date: Apr 09, 2026.
+
+Features & Updates:
+- Improve Proxy account features (#4942)
+- Improve Multisig account feature  (#4963)
+- Turn off warning popup for transfers between PAH <> KAH (#4954)
+- Support stDOT LSD sunset (#4968)
+- Update for chainlist stable v0.2.126
+
+
+## 1.3.76
+Build date: Mar 20, 2026.
+
+Features & Updates:
+- Unable to turn network when no add correct API key (#4972)
+- Display token name and subnet ID for subnet tokens | Bittensor (#4892)
+- Support the newly updated Root staking feature | Bittensor (#4829)
+
+
+## 1.3.75
+Build date: Mar 17, 2026.
+
+Features & Updates:
+- Add user-configurable Subscan API Key in settings (#4965)
+
+
+## 1.3.74
+Build date: Feb 11, 2026.
+
+Features & Updates:
+- Support Multisig Account Phase 1 (#4855)
+
+
+## 1.3.73
+Build date: Jan 22, 2026.
+
+Features & Updates:
+- Update @subwallet-monorepos/subwallet-services-sdk 0.1.16 (#4957)
+- Remove the Crowdloans tab (#4920)
+
+Bug fixes:
+- Fix bug get Earning position parachain (#4950)
+
+
+## 1.3.72
+Build date: Jan 14, 2026.
+
+Features & Updates:
+- Integrate Proxy Account Support (#4725)
+- Update chain-list stable v0.2.123 (#4861)
+- Add support for USDC & stEWT (#639)
+- Migrate to ParaSpell V5 (#4908)
+
+
+## 1.3.71
+Build date: Dec 29, 2025.
+
+Features & Updates:
+- Improve token enabling (Round 2) (#4247)
+- Update libs for SubWallet Extensions (#4808)
+- Support Import from Trust Wallet to SubWallet (#4762)
+
+
+## 1.3.70
+Build date: Dec 11, 2025.
+
+Features & Updates:
+- Support OpenGov (Phase 1) (#4678)
+
+
+## 1.3.69
+Build date: Dec 08, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.122 (#4827)
+- Turn off "Advanced phishing detection" feature (#4891)
+
+
+## 1.3.68
+Build date: Dec 03, 2025.
+
+Features & Updates:
+- Standardize the Module Price History according to the new standard (#4784)
+- Locked Balance Display (#4708)
+- Update Transak Widget URL (#4835)
+
+Bug fixes:
+- Unable to import NFT ERC-721 on Rari chain (#4625)
+- Support show NFT haven't method tokenOfOwnerByIndex (#4568)
+
+
+## 1.3.67
+Build date: Nov 13, 2025.
+
+Features & Updates:
+- Improve Swap validation by Dry-run-preview API from ParaSpell (#4671)
+- Configure gas limit & max gas fee for Energy Web Chain (#4716)
+
+
+## 1.3.66
+Build date: Nov 07, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.121 (#4812):
+  - Add multichain asset for ANLOG token
+  - Update alpha token netuid 71: ( name: Fa -> Leadpoet , symbol: ف -> ㄴ, priceId: dtao-71 -> kora )
+- Re-enable Cross-chain transfer related to Relay-chain (#4822)
+- Rounded value parameter send in EVM transaction request (#3632)
+
+
+## 1.3.65
+Build date: Nov 06, 2025.
+
+Features & Updates:
+- Improve detect assets & optimize enabled tokens on EVM chains (#4542)
+- Improve estimate fee through Across Bridge (#4310)
+- Check buy options for DOT & KSM token (#4815)
+- Add Collator's APY for Tanssi Staking (#4795)
+- Some updates after Polkadot Asset Hub Migration (#4819)
+- Update altinputasset for some liquid staking (#4813)
+
+
+## 1.3.64
+Build date: Oct 30, 2025.
+
+Features & Updates:
+- [Energy Web X] Display APY for collators in collator list (#4739)
+- Polkadot Asset Hub Migration (#4790)
+- Update chain-list stable v0.2.120 (#4797):
+   - Add XCM support for MYTH from Mythos -> Polkadot Asset Hub
+   - Update symbol for GLMR.wb (Moonriver) (GLMR.wb -> GLMR.mb)
+   - Remove Polkadot & Kusama related XCM Ref
+   - [Hydration] Add support for ENA
+   - [Hydration] Add swap support for ENA
+
+
+## 1.3.63
+Build date: Oct 23, 2025.
+
+Features & Updates:
+- Add support for in-app TANSSI staking (#4666)
+- Update params for XCM transfer - Related to DOT/KSM XCM (#4787)
+- Update Earning Info config for migrated chain after AHM (#4752)
+- Integrate Optimex into BTC Swap Flow (#4496)
+- Update chain-list stable v0.2.119 (#4767)
+   - Re-check metadata for tokens that support XCM
+   - \[Moonriver\] Add support for Bridged GLMR
+   - \[Moonbeam\] Add support for Bridged MOVR
+   - \[Hydration\] Add support for PAXG
+   - Update outdated data
+
+
+## 1.3.62
+Build date: Oct 10, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.118 (#4730):
+  - [Xode] Add XCM support for DOT & USDT
+
+Bug fixes:
+- Fixed missing "Edit Fee" button / Improve fee loading UI (#4652)
+- Fixed issue can not update patch and online resources (#4536)
+- Fixed some UI bugs for migrated chain after AHM on Earning features (#4754)
+- Fixed bug show Earning options for Kusama although AHM migrated (#4763)
+- Fixed bug don't show toast message validate in case input amount < 1 when transfer Cardano (#4706)
+
+
+## 1.3.61
+Build date: Oct 04, 2025.
+
+Features & Updates:
+- Hide copy/QR content for relay chain addresses (AssetHub migration) (#4735)
+- Re-check for Paseo after migrated (#4507)
+
+Bug fixes:
+- Fixed crash in EarningPositions when asset is undefined (read property 'decimals' of undefined) in case update version (#4731)
+
+## 1.3.60
+Build date: Oct 02, 2025.
+
+Features & Updates:
+- [zkVerify Mainnet] Add support for in-app VFY staking (#4688)
+- Update chain-list version v0.2.117 (#4693):
+   - [Xode] Add block explorer only for when users want to view transaction details SubWallet-ChainList
+   - Add group for VFY tokens
+
+Bug fixes:
+- Fixed error when performing EWC staking (#4694)
+
+
+## 1.3.59
+Build date: Sep 23, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.116 (#4704):
+- Support HOLLAR mainnet (#4692)
+
+
+## 1.3.58
+Build date: Sep 19, 2025.
+
+Features & Updates:
+- Update chain-list stable v0.2.115 (#4668)
+  - Add XCM support for teleporting KSM between encointer-kusama and asset-hub-kusama
+  - Add block explorer only for when users want to view transaction details
+  - Fixed bug do not show HOLLAR balance
+  - Remove USDC.wh token (Moonbeam)
+  - ...
+
+Bug fixes:
+- Fixed bug Show incorrect amount when transfer max (#4462)
+
+
+## 1.3.57
+Build date: Sep 17, 2025.
+
+Features & Updates:
+- Add support for in-app EWT staking (#4638)
+
+
 ## 1.3.56
 Build date: Sep 11, 2025.
 

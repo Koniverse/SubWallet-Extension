@@ -62,7 +62,7 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
             unitColor={token.colorTextTertiary}
             value={bondedBalance || 0}
           />
-          {label || t('Staked')}
+          {label || t('ui.TRANSACTION.screen.Transaction.part.BondedBalance.staked')}
         </div>
 
         {isSubnetStaking && (
@@ -71,7 +71,7 @@ const Component = ({ bondedBalance, className, decimals, isSlippageAcceptable, i
             title={'Transaction will not be executed if the price changes more than this slippage'}
           >
             <div className='slippage-info'>
-              <span className='slippage-label'>{t('Slippage')}: </span>
+              <span className='slippage-label'>{t('ui.TRANSACTION.screen.Transaction.part.BondedBalance.slippage')}: </span>
               <Number
                 className='slippage-value'
                 decimal={0}
@@ -130,10 +130,11 @@ const BondedBalance = styled(Component)(({ theme: { token } }: Props) => {
     },
 
     '.balance-value': {
-      display: 'flex',
+      display: 'inline-flex',
       alignItems: 'center',
+      whiteSpace: 'nowrap',
       maxWidth: '10.625rem'
-    },
+    } as const,
 
     '.slippage-info': {
       display: 'flex',

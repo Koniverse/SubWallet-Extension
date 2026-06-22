@@ -41,7 +41,7 @@ const showScanner = true;
 const keyRecords = 'unsuccessful_connect_wc_modal';
 let idTimeOut: NodeJS.Timeout;
 const connectionErrorDefault: ConnectionError = {
-  message: t('Connection unsuccessful. Review our user guide and try connecting again.')
+  message: t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectionUnsuccessfulReviewGuide')
 };
 
 const getTimeOutRecords = () => {
@@ -99,16 +99,16 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const convertWCErrorMessage = useCallback((e: Error): ConnectionError => {
     const message = e.message.toLowerCase();
-    let newStandardMessage = t('Connection unsuccessful. Review our user guide and try connecting again.');
+    let newStandardMessage = t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectionUnsuccessfulReviewGuide');
     let isConnectionBlockedError = false;
 
     if (message.includes('socket hang up') || message.includes('stalled') || message.includes('interrupted')) {
-      newStandardMessage = t('Turn off VPN/ad blocker apps, reload the dApp, and try again. If the issue persists, contact support at agent@subwallet.app');
+      newStandardMessage = t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.turnOffVpnAdBlocker');
       isConnectionBlockedError = true;
     }
 
     if (message.includes('failed for host')) {
-      newStandardMessage = t('Turn off some networks on the wallet or close any privacy protection apps (e.g. VPN, ad blocker apps) and try again. If the issue persists, contact support at agent@subwallet.app');
+      newStandardMessage = t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.turnOffNetworksOrPrivacyApps');
       isConnectionBlockedError = true;
     }
 
@@ -122,7 +122,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <Button
             block={true}
             onClick={onClickToFAQ(true)}
-          >{t('I understand')}</Button>
+          >{t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.iUnderstand')}</Button>
         </div>
       );
     }
@@ -133,11 +133,11 @@ const Component: React.FC<Props> = (props: Props) => {
           block={true}
           onClick={onClickToFAQ(true)}
           schema={'secondary'}
-        >{t('Dismiss')}</Button>
+        >{t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.dismiss')}</Button>
         <Button
           block={true}
           onClick={onClickToFAQ(false)}
-        >{t('Review guide')}</Button>
+        >{t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.reviewGuide')}</Button>
       </div>
     );
   }, [connectionError?.isConnectionBlockedError, onClickToFAQ, t]);
@@ -215,7 +215,7 @@ const Component: React.FC<Props> = (props: Props) => {
       className={CN(className)}
       onBack={goBack}
       rightFooterButton={{
-        children: t('Connect'),
+        children: t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.connect'),
         onClick: form.submit,
         loading: loading,
         icon: (
@@ -234,11 +234,11 @@ const Component: React.FC<Props> = (props: Props) => {
         icon: <CloseIcon />,
         onClick: goHome
       }]}
-      title={t('WalletConnect')}
+      title={t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.walletConnect')}
     >
       <div className='body-container'>
         <div className='description'>
-          {t('By clicking "Connect", you allow this dapp to view your public address')}
+          {t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectToViewPublicAddress')}
         </div>
         <div className='page-icon'>
           <PageIcon
@@ -264,7 +264,7 @@ const Component: React.FC<Props> = (props: Props) => {
             rules={[
               {
                 required: true,
-                message: t('URI is required')
+                message: t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.uriIsRequired')
               },
               {
                 validator: uriValidator
@@ -274,8 +274,8 @@ const Component: React.FC<Props> = (props: Props) => {
           >
             <Input
               disabled={loading}
-              label={t('URI')}
-              placeholder={t('Please type or paste or scan URI')}
+              label={t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.uri')}
+              placeholder={t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.typePasteScanUri')}
               suffix={(
                 <>
                   {
@@ -319,7 +319,7 @@ const Component: React.FC<Props> = (props: Props) => {
         footer={footerModalWC}
         id={modalId}
         onCancel={onClickToFAQ(true)}
-        title={t('Connection unsuccessful')}
+        title={t('ui.WALLET_CONNECT.screen.WalletConnect.Connect.connectionUnsuccessful')}
       >
         <div className='__wc-modal-container'>
           <div className='page-icon'>

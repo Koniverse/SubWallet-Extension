@@ -5,7 +5,7 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { _getAssetDecimals, _getAssetSymbol, _getContractAddressOfToken, _isChainSubstrateCompatible, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
+import { _chainInfoToChainType, _getAssetDecimals, _getAssetSymbol, _getContractAddressOfToken, _isNativeToken } from '@subwallet/extension-base/services/chain-service/utils';
 import FeeService from '@subwallet/extension-base/services/fee-service/service';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SimpleSwapTxData, SwapErrorType, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, TransactionData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
@@ -213,7 +213,7 @@ export class SimpleSwapHandler implements SwapBaseInterface {
     const toAsset = this.chainService.getAssetBySlug(pair.to);
     const chainInfo = this.chainService.getChainInfoByKey(fromAsset.originChain);
     const toChainInfo = this.chainService.getChainInfoByKey(toAsset.originChain);
-    const chainType = _isChainSubstrateCompatible(chainInfo) ? ChainType.SUBSTRATE : ChainType.EVM;
+    const chainType = _chainInfoToChainType(chainInfo);
     const sender = _reformatAddressWithChain(address, chainInfo);
     const receiver = _reformatAddressWithChain(recipient ?? sender, toChainInfo);
 
@@ -281,7 +281,7 @@ export class SimpleSwapHandler implements SwapBaseInterface {
       });
 
       extrinsic = submittableExtrinsic as SubmittableExtrinsic<'promise'>;
-    } else {
+    } else if (chainType === ChainType.EVM) {
       const feeInfo = await this.swapBaseHandler.feeService.subscribeChainFee(getId(), chainInfo.slug, 'evm');
 
       if (_isNativeToken(fromAsset)) {
@@ -310,6 +310,8 @@ export class SimpleSwapHandler implements SwapBaseInterface {
 
         extrinsic = transactionConfig;
       }
+    } else {
+      throw new Error('Unknown swap chain type');
     }
 
     return {

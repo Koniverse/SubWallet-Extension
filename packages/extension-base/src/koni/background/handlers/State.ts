@@ -32,7 +32,10 @@ import { KeyringService } from '@subwallet/extension-base/services/keyring-servi
 import MigrationService from '@subwallet/extension-base/services/migration-service';
 import MintCampaignService from '@subwallet/extension-base/services/mint-campaign-service';
 import MktCampaignService from '@subwallet/extension-base/services/mkt-campaign-service';
+import { MultisigService } from '@subwallet/extension-base/services/multisig-service';
+import { NftService } from '@subwallet/extension-base/services/nft-service';
 import NotificationService from '@subwallet/extension-base/services/notification-service/NotificationService';
+import OpenGovService from '@subwallet/extension-base/services/open-gov';
 import { PriceService } from '@subwallet/extension-base/services/price-service';
 import RequestService from '@subwallet/extension-base/services/request-service';
 import { openPopup } from '@subwallet/extension-base/services/request-service/handler/PopupHandler';
@@ -41,6 +44,7 @@ import { AuthUrls, MetaRequest, SignRequest } from '@subwallet/extension-base/se
 import SettingService from '@subwallet/extension-base/services/setting-service/SettingService';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SubscanService } from '@subwallet/extension-base/services/subscan-service';
+import SubstrateProxyAccountService from '@subwallet/extension-base/services/substrate-proxy-service';
 import { SwapService } from '@subwallet/extension-base/services/swap-service';
 import TransactionService from '@subwallet/extension-base/services/transaction-service';
 import { TransactionEventResponse } from '@subwallet/extension-base/services/transaction-service/types';
@@ -71,7 +75,6 @@ import { KoniSubscription } from '../subscription';
 const passworder = require('browser-passworder');
 
 const ERROR_CONFIRMATION_TYPE = ['errorConnectNetwork'];
-
 const SUBSCAN_API_KEY_STORAGE = 'subscan_api_key';
 const SUBSCAN_SECRET_STORAGE = 'subscan_secret';
 
@@ -101,6 +104,11 @@ export default class KoniState {
   private crowdloanMap: Record<string, CrowdloanItem> = generateDefaultCrowdloanMap();
   private crowdloanSubject = new Subject<CrowdloanJson>();
 
+  /**
+   * TODO: Remove this subject once NFT migration to the service layer is completed.
+   * The state manager should not handle the internal state of the NFT service.
+   * The NFT service will manage its own state independently.
+   */
   private nftSubject = new Subject<NftJson>();
 
   private mantaPayConfigSubject = new Subject<MantaPayConfig[]>();
@@ -138,13 +146,16 @@ export default class KoniState {
   readonly mintCampaignService: MintCampaignService;
   readonly campaignService: CampaignService;
   readonly mktCampaignService: MktCampaignService;
+  readonly nftService: NftService;
   readonly buyService: BuyService;
   readonly earningService: EarningService;
   readonly feeService: FeeService;
   readonly swapService: SwapService;
   readonly inappNotificationService: InappNotificationService;
   readonly chainOnlineService: ChainOnlineService;
-
+  readonly openGovService: OpenGovService;
+  readonly multisigService: MultisigService;
+  readonly substrateProxyAccountService: SubstrateProxyAccountService;
   // Handle the general status of the extension
   private generalStatus: ServiceStatus = ServiceStatus.INITIALIZING;
   private waitSleeping: Promise<void> | null = null;
@@ -170,6 +181,7 @@ export default class KoniState {
     this.requestService = new RequestService(this.chainService, this.settingService, this.keyringService, this.transactionService);
     this.priceService = new PriceService(this.dbService, this.eventService, this.chainService);
     this.balanceService = new BalanceService(this);
+    this.nftService = new NftService(this);
     this.historyService = new HistoryService(this.dbService, this.chainService, this.eventService, this.keyringService, this.subscanService);
     this.mintCampaignService = new MintCampaignService(this);
     this.walletConnectService = new WalletConnectService(this, this.requestService);
@@ -182,6 +194,9 @@ export default class KoniState {
     this.swapService = new SwapService(this);
     this.inappNotificationService = new InappNotificationService(this.dbService, this.keyringService, this.eventService, this.chainService);
     this.chainOnlineService = new ChainOnlineService(this.chainService, this.settingService, this.eventService, this.dbService);
+    this.openGovService = new OpenGovService(this);
+    this.multisigService = new MultisigService(this.eventService, this.chainService, this.keyringService, this.inappNotificationService);
+    this.substrateProxyAccountService = new SubstrateProxyAccountService(this);
 
     this.subscription = new KoniSubscription(this, this.dbService);
     this.cron = new KoniCron(this, this.subscription, this.dbService);
@@ -309,9 +324,12 @@ export default class KoniState {
     this.eventService.emit('chain.ready', true);
 
     await this.balanceService.init();
+    await this.nftService.init();
     await this.earningService.init();
     await this.swapService.init();
     await this.inappNotificationService.init();
+    await this.openGovService.init();
+    await this.multisigService.init();
 
     // this.onReady();
     this.onAccountAdd();
@@ -498,7 +516,7 @@ export default class KoniState {
     return this.dbService.getAllNftCollection(this.activeChainSlugs);
   }
 
-  public subscribeNftCollection () {
+  public subscribeNftCollection () { // TODO: Move this logic to the NFT service once migration is complete.
     const getChains = () => this.activeChainSlugs;
 
     return this.dbService.stores.nftCollection.subscribeNftCollection(getChains);
@@ -528,6 +546,39 @@ export default class KoniState {
 
   public deleteNftCollection (chain: string, collectionId: string) {
     return this.dbService.deleteNftCollection(chain, collectionId);
+  }
+
+  public async handleDetectedNfts (address: string, nftItems: NftItem[]) {
+    try {
+      const chainSlugs = this.activeChainSlugs;
+      const currentNfts = await this.dbService.getNft([address], chainSlugs);
+
+      const newNfts = nftItems.filter((n) => !currentNfts.some((c) => c.id === n.id));
+
+      for (const nft of newNfts) {
+        this.updateNftData(nft.chain, nft, address);
+      }
+    } catch (e) {
+      this.logger.warn('handleDetectedNfts error:', e);
+    }
+  }
+
+  public async handleDetectedNftCollections (collections: NftCollection[]) {
+    try {
+      const currentCollections = await this.getNftCollection();
+
+      const newCollections = collections.filter(
+        (col) => !currentCollections.some(
+          (c) => c.collectionId === col.collectionId && c.chain === col.chain
+        )
+      );
+
+      for (const col of newCollections) {
+        this.setNftCollection(col.chain, col);
+      }
+    } catch (e) {
+      this.logger.warn('handleDetectedNftCollections error:', e);
+    }
   }
 
   public cleanUpNfts (chain: string, owner: string, collectionId: string[], nftIds: string[], ownNothing?: boolean) {
@@ -622,7 +673,7 @@ export default class KoniState {
   public async showUnsupportedNetworkSwitchConfirm (id: string, url: string, networkData: _NetworkUpsertParams) {
     return this.requestService.addConfirmation(id, url, 'addNetworkRequest', networkData)
       .then(() => {
-        throw new EvmProviderError(EvmProviderErrorType.NETWORK_NOT_SUPPORTED, 'bg.DAPP.background.error.EvmProvider.networkCurrentlyNotSupported');
+        throw new EvmProviderError(EvmProviderErrorType.NETWORK_NOT_SUPPORTED, 'This network is currently not supported');
       });
   }
 
@@ -912,6 +963,31 @@ export default class KoniState {
     return this.chainService.disableChain(chainSlug);
   }
 
+  public async disableAllChains (): Promise<boolean> {
+    const chainStateMap = this.chainService.getChainStateMap();
+    const activeChainSlugs = Object.keys(chainStateMap).filter((slug) => chainStateMap[slug].active);
+    const failedChainSlugs: string[] = [];
+
+    for (const chainSlug of activeChainSlugs) {
+      try {
+        const isDisabled = await this.disableChain(chainSlug);
+
+        if (!isDisabled) {
+          failedChainSlugs.push(chainSlug);
+        }
+      } catch (error) {
+        failedChainSlugs.push(chainSlug);
+        this.logger.error(`Failed to disable chain ${chainSlug}`, error);
+      }
+    }
+
+    if (failedChainSlugs.length) {
+      throw new Error('Unable to turn off all networks. Please try again later');
+    }
+
+    return true;
+  }
+
   public async enableChain (chainSlug: string, enableTokens = true): Promise<boolean> {
     if (enableTokens) {
       await this.chainService.updateAssetSettingByChain(chainSlug, true);
@@ -922,7 +998,7 @@ export default class KoniState {
 
   public async enableChainWithPriorityAssets (chainSlug: string, enableTokens = true): Promise<boolean> {
     if (enableTokens) {
-      await this.chainService.updatePriorityAssetsByChain(chainSlug, true);
+      await this.balanceService.updatePriorityAssetsByChain(chainSlug, true);
     }
 
     return this.chainService.enableChain(chainSlug);
@@ -1267,8 +1343,7 @@ export default class KoniState {
       estimateFee: {
         value: transactionValidated.estimateGas,
         symbol: token.symbol,
-        decimals: token.decimals || 18,
-        feeTokenSlug: token.slug
+        decimals: token.decimals || 18
       },
       id
     });
@@ -1663,7 +1738,7 @@ export default class KoniState {
     }, [] as PsbtTransactionArg[]);
 
     if (new BigN(totalBalance.value).lt(inputAmount)) {
-      payloadAfterValidated.errors = [{ message: t('bg.koni.handler.Extension.insufficientBalance'), name: t('bg.TRANSACTION.core.validation.request.unableToSignTransaction') }];
+      payloadAfterValidated.errors = [{ message: t('bg.koni.handler.State.insufficientBalance'), name: t('bg.koni.handler.State.unableToSignTransaction') }];
     }
 
     const psbtOutputData = psbtGenerate.txOutputs.map((output) => {
@@ -2084,7 +2159,7 @@ export default class KoniState {
     this.campaignService.stop();
     await Promise.all([this.cron.stop(), this.subscription.stop()]);
     await this.pauseAllNetworks(undefined, 'IDLE mode');
-    await Promise.all([this.historyService.stop(), this.priceService.stop(), this.balanceService.stop(), this.earningService.stop(), this.swapService.stop(), this.inappNotificationService.stop()]);
+    await Promise.all([this.historyService.stop(), this.priceService.stop(), this.balanceService.stop(), this.nftService.stop(), this.earningService.stop(), this.swapService.stop(), this.inappNotificationService.stop(), this.openGovService.stop(), this.multisigService.stop()]);
 
     // Complete sleeping
     sleeping.resolve();
@@ -2148,7 +2223,7 @@ export default class KoniState {
 
     this.waitStartingFull = startingFull.promise;
 
-    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start()]);
+    await Promise.all([this.cron.start(), this.subscription.start(), this.historyService.start(), this.priceService.start(), this.balanceService.start(), this.nftService.start(), this.earningService.start(), this.swapService.start(), this.inappNotificationService.start(), this.openGovService.start(), this.multisigService.start()]);
     this.eventService.emit('general.start_full', true);
 
     this.waitStartingFull = null;
@@ -2225,11 +2300,23 @@ export default class KoniState {
   }
 
   public async reloadNft () {
-    const currentAddress = this.keyringService.context.currentAccount.proxyId;
+    const currentProxyId = this.keyringService.context.currentAccount.proxyId;
+    const currentAddress = this.keyringService.context.addressesByProxyId(currentProxyId);
 
     await this.dbService.removeNftsByAddress(currentAddress);
 
-    return await this.cron.reloadNft();
+    await this.cron.reloadNft();
+    await this.reloadNftV2();
+
+    return true;
+  }
+
+  public async reloadNftV2 () {
+    // TODO: Recheck: Uncomment this block when migration is complete
+    // const currentAddress = this.keyringService.context.currentAccount.proxyId;
+    //
+    // await this.dbService.removeNftsByAddress(currentAddress);
+    await this.nftService.forceReload();
   }
 
   public async reloadStaking () {
@@ -2240,12 +2327,6 @@ export default class KoniState {
 
   public async reloadBalance () {
     await this.balanceService.reloadBalance();
-
-    return true;
-  }
-
-  public async reloadCrowdloan () {
-    await this.subscription.reloadCrowdloan();
 
     return true;
   }
@@ -2294,6 +2375,7 @@ export default class KoniState {
       await this.priceService.setPriceCurrency(DEFAULT_CURRENCY);
       this.settingService.resetWallet();
       await this.priceService.setPriceCurrency(DEFAULT_CURRENCY);
+      this.chainService.resetPopularTokenList();
     }
 
     this.chainService.resetWallet(resetAll);

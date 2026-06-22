@@ -14,6 +14,7 @@ import { SwapPair } from '@subwallet/extension-base/types/swap';
 import { addLazy, fetchStaticData, isEmptyObject } from '@subwallet/extension-base/utils';
 import { lazySubscribeMessage } from '@subwallet/extension-web-ui/messaging';
 import { store } from '@subwallet/extension-web-ui/stores';
+import { WalletConnectSessionsSubscription } from '@subwallet/extension-web-ui/stores/types';
 import { DAppCategory, DAppInfo } from '@subwallet/extension-web-ui/types/dapp';
 import { MissionInfo } from '@subwallet/extension-web-ui/types/missionPool';
 import { SessionTypes } from '@walletconnect/types';
@@ -364,7 +365,7 @@ export const updateWalletConnectSessions = (data: SessionTypes.Struct[]) => {
   store.dispatch({ type: 'walletConnect/updateSessions', payload: payload });
 };
 
-export const subscribeWalletConnectSessions = lazySubscribeMessage('pri(walletConnect.session.subscribe)', null, updateWalletConnectSessions, updateWalletConnectSessions);
+export const subscribeWalletConnectSessions: WalletConnectSessionsSubscription = lazySubscribeMessage('pri(walletConnect.session.subscribe)', null, updateWalletConnectSessions, updateWalletConnectSessions);
 
 export const updateWCNotSupportRequests = (data: WalletConnectNotSupportRequest[]) => {
   // Convert data to object with key as id

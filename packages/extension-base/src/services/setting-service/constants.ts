@@ -9,7 +9,7 @@ export const DEFAULT_THEME: ThemeNames = ThemeNames.DARK;
 export const DEFAULT_NOTIFICATION_TYPE: BrowserConfirmationType = 'popup';
 export const DEFAULT_AUTO_LOCK_TIME = 15;
 export const DEFAULT_UNLOCK_TYPE: WalletUnlockType = targetIsExtension ? WalletUnlockType.ALWAYS_REQUIRED : WalletUnlockType.WHEN_NEEDED;
-export const DEFAULT_CHAIN_PATROL_ENABLE = false;
+export const DEFAULT_CHAIN_PATROL_ENABLE = true;
 export const DEFAULT_LANGUAGE: LanguageType = 'en';
 export const DEFAULT_CURRENCY = 'usd';
 export const DEFAULT_SHOW_ZERO_BALANCE = true;
@@ -25,12 +25,14 @@ export const DEFAULT_NOTIFICATION_SETUP: NotificationSetup = {
     earningClaim: true,
     earningWithdraw: true,
     availBridgeClaim: true,
-    polygonBridgeClaim: true
+    polygonBridgeClaim: true,
+    pendingMultisigApprovals: true
     // isHideWithdraw: false, // todo: just for test, remove later
     // isHideMarketing: false,
     // isHideAnnouncement: false
   }
 };
+
 export const DEFAULT_ACKNOWLEDGED_MIGRATION_STATUS = false;
 export const DEFAULT_UNIFIED_ACCOUNT_MIGRATION_IN_PROGRESS = false;
 export const DEFAULT_UNIFIED_ACCOUNT_MIGRATION_IN_DONE = false;

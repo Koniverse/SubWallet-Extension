@@ -79,7 +79,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
   const renderTokenSelected = useCallback((item: TokenSelectorItemType) => {
     return (
       <div className={'__selected-item'}>
-        {item.symbol}
+        {item.displayName}
         {showChainInSelected}
       </div>
     );
@@ -89,8 +89,10 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
     const searchTextLowerCase = searchText.toLowerCase();
     const chainName = chainInfoMap[item.originChain]?.name?.toLowerCase();
     const symbol = item.symbol.toLowerCase();
+    const symbolDisplay = item.displayName.toLowerCase();
 
     return (
+      symbolDisplay.includes(searchTextLowerCase) ||
       symbol.includes(searchTextLowerCase) ||
       chainName.includes(searchTextLowerCase)
     );
@@ -106,6 +108,7 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         isSelected={selected}
         key={item.slug}
         showBalance={true}
+        tokenDisplayName={item.displayName}
         tokenSlug={item.slug}
         tokenSymbol={item.symbol}
       />
@@ -137,17 +140,17 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
       items={filteredItems}
       label={label}
       onSelect={onSelect}
-      placeholder={placeholder || t('Select token')}
+      placeholder={placeholder || t('ui.TRANSACTION.components.Field.TokenSelector.selectToken')}
       prefix={value !== '' && chainLogo}
       renderItem={renderItem}
       renderSelected={renderTokenSelected}
       renderWhenEmpty={renderEmpty}
       searchFunction={searchFunction}
       searchMinCharactersCount={2}
-      searchPlaceholder={t<string>('Enter token name or network name')}
+      searchPlaceholder={t<string>('ui.TRANSACTION.components.Field.TokenSelector.enterTokenOrNetworkName')}
       selected={value || ''}
       statusHelp={statusHelp}
-      title={label || placeholder || t('Select token')}
+      title={label || placeholder || t('ui.TRANSACTION.components.Field.TokenSelector.selectToken')}
       tooltip={tooltip}
     />
   );

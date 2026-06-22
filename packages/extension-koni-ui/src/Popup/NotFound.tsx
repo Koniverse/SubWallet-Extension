@@ -20,7 +20,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const { token } = useTheme() as Theme;
 
   const footerBtn = useMemo((): ButtonProps => ({
-    children: t('Back to home'),
+    children: t('ui.screen.NotFound.backToHome'),
     icon: (
       <Icon
         phosphorIcon={House}
@@ -45,8 +45,8 @@ function Component ({ className }: Props): React.ReactElement<Props> {
         />
         <div className='title-text'>4</div>
       </div>
-      <div className='sub-title h3-text'>{t('Page not found')}</div>
-      <div className='h5-text description'>{t('Your website URL is invalid')}</div>
+      <div className='sub-title h3-text'>{t('ui.screen.NotFound.pageNotFound')}</div>
+      <div className='h5-text description'>{t('ui.screen.NotFound.invalidWebsiteUrl')}</div>
       <BackgroundExpandView />
     </Layout.Base>
   );

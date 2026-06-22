@@ -31,11 +31,11 @@ const Component: React.FC<Props> = ({ className, onClickReload }: Props) => {
         }}
       />
       <div className='message'>
-        {t('Unable to load data')}
+        {t('ui.TRANSACTION.screen.Transaction.Swap.EmptySwapPairs.unableToLoadData')}
       </div>
       <div className={'data-empty-msg'}>
         <div className='description'>
-          {t('Something went wrong while loading data for this screen.')}
+          {t('ui.TRANSACTION.screen.Transaction.Swap.EmptySwapPairs.errorLoadingScreenData')}
         </div>
         <div className={'description'}>
           <Trans
@@ -47,7 +47,7 @@ const Component: React.FC<Props> = ({ className, onClickReload }: Props) => {
                 />
               )
             }}
-            i18nKey={detectTranslate('<highlight>Reload now</highlight> to get the new data')}
+            i18nKey={detectTranslate('ui.TRANSACTION.screen.Transaction.Swap.EmptySwapPairs.reloadNowForNewData')}
           />
         </div>
       </div>

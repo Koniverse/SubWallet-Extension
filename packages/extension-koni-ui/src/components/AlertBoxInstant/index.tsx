@@ -34,11 +34,11 @@ const AlertBoxInstant: React.FC<Props> = (props: Props) => {
                   />
                 )
               }}
-              i18nKey={detectTranslate('This network has 2 address formats. SubWallet automatically transforms Legacy formats into New format without affecting your transfer. <highlight>Learn more</highlight>')}
+              i18nKey={detectTranslate('ui.components.AlertBoxInstant.dualAddressFormatInfo')}
             />
           </>
         }
-        title={t('New address format')}
+        title={t('ui.components.AlertBoxInstant.newAddressFormat')}
         type={'info'}
       />
     );

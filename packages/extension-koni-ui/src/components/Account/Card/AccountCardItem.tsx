@@ -124,7 +124,7 @@ function Component (props: _AccountCardItem): React.ReactElement<_AccountCardIte
   const _onClickCopyButton = useCallback((e: React.SyntheticEvent) => {
     e.stopPropagation();
     notify({
-      message: t('Copied to clipboard')
+      message: t('ui.ACCOUNT.components.Account.Card.Item.copiedToClipboard')
     });
   }, [notify, t]);
 
@@ -165,7 +165,7 @@ function Component (props: _AccountCardItem): React.ReactElement<_AccountCardIte
               }
               onClick={_onClickQrBtn}
               size='xs'
-              tooltip={t('Show QR code')}
+              tooltip={t('ui.ACCOUNT.components.Account.Card.Item.showQrCode')}
               type='ghost'
             />
             <CopyToClipboard text={formattedAddress || ''}>
@@ -179,7 +179,7 @@ function Component (props: _AccountCardItem): React.ReactElement<_AccountCardIte
                 }
                 onClick={_onClickCopyButton}
                 size='xs'
-                tooltip={t('Copy address')}
+                tooltip={t('ui.ACCOUNT.components.Account.Card.Item.copyAddress')}
                 type='ghost'
               />
             </CopyToClipboard>

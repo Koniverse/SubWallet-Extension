@@ -6,10 +6,10 @@ import { SwapError } from '@subwallet/extension-base/background/errors/SwapError
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
-import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainName, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
+import { DetectedGenOptimalProcessErrMsg } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
@@ -952,11 +952,11 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
                 showNoQuoteError();
               }
 
-              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
+              if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_LOW)) {
                 showTooLowAmountError();
               }
 
-              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
+              if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_HIGH)) {
                 showTooHighAmountError();
               }
 
@@ -1005,11 +1005,11 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
               showNoQuoteError();
             }
 
-            if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
+            if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_LOW)) {
               showTooLowAmountError();
             }
 
-            if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
+            if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_HIGH)) {
               showTooHighAmountError();
             }
 

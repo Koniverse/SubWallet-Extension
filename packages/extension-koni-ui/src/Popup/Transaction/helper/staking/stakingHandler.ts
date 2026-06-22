@@ -16,9 +16,9 @@ export function getUnstakingPeriod (t: TFunction, unstakingPeriod?: number) {
     const days = unstakingPeriod / 24;
 
     if (days < 1) {
-      return t('{{time}} hours', { replace: { time: unstakingPeriod } });
+      return t('ui.TRANSACTION.screen.Transaction.helper.stakingHandler.timeHours', { replace: { time: unstakingPeriod } });
     } else {
-      return t('{{time}} days', { replace: { time: days } });
+      return t('ui.TRANSACTION.screen.Transaction.helper.stakingHandler.timeDays', { replace: { time: days } });
     }
   }
 
@@ -27,7 +27,7 @@ export function getUnstakingPeriod (t: TFunction, unstakingPeriod?: number) {
 
 export function getWaitingTime (waitingTime: number, status: UnstakingStatus, t: TFunction) {
   if (status === UnstakingStatus.CLAIMABLE) {
-    return t('Available for withdrawal');
+    return t('ui.TRANSACTION.screen.Transaction.helper.stakingHandler.availableForWithdrawal');
   } else {
     const waitingTimeInMs = waitingTime * 60 * 60 * 1000;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
@@ -50,7 +50,7 @@ export function getWaitingTime (waitingTime: number, status: UnstakingStatus, t:
       } // TODO: should not be shorten
     }) as string;
 
-    return t('Withdrawable in {{time}}', { replace: { time: formattedWaitingTime } });
+    return t('ui.TRANSACTION.screen.Transaction.helper.stakingHandler.withdrawableInTime', { replace: { time: formattedWaitingTime } });
   }
 }
 

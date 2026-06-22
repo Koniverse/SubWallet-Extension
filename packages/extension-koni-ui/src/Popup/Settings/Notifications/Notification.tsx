@@ -12,7 +12,7 @@ import { AlertModal, EmptyList, PageWrapper } from '@subwallet/extension-koni-ui
 import { FilterTabItemType, FilterTabs } from '@subwallet/extension-koni-ui/components/FilterTabs';
 import NotificationDetailModal from '@subwallet/extension-koni-ui/components/Modal/NotificationDetailModal';
 import Search from '@subwallet/extension-koni-ui/components/Search';
-import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, NOTIFICATION_DETAIL_MODAL, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
+import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, NOTI_MULTISIG_PENDINGTX_ID, NOTIFICATION_DETAIL_MODAL, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useAlert, useDefaultNavigate, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
@@ -27,7 +27,7 @@ import { ActivityIndicator, Button, Icon, ModalContext, SwList, SwSubHeader } fr
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowsLeftRight, ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, Database, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, XCircle } from 'phosphor-react';
+import { ArrowsLeftRight, ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, Database, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, UserSwitch, XCircle } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -50,7 +50,8 @@ export enum NotificationIconBackgroundColorMap {
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM = 'yellow-7',
   CLAIM_POLYGON_BRIDGE = 'yellow-7',
   SWAP = 'blue-8',
-  EARNING = 'blue-8'
+  EARNING = 'blue-8',
+  MULTISIG_APPROVAL = 'geekblue-9'
 }
 
 export const NotificationIconMap = {
@@ -62,7 +63,8 @@ export const NotificationIconMap = {
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM: Coins,
   CLAIM_POLYGON_BRIDGE: Coins,
   SWAP: ArrowsLeftRight,
-  EARNING: Database
+  EARNING: Database,
+  MULTISIG_APPROVAL: UserSwitch
 };
 
 const alertModalId = 'notification-alert-modal';
@@ -84,6 +86,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [, setClaimRewardStorage] = useLocalStorage(CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_REWARD_PARAMS);
   const [, setWithdrawStorage] = useLocalStorage(WITHDRAW_TRANSACTION, DEFAULT_WITHDRAW_PARAMS);
   const [, setClaimAvailBridgeStorage] = useLocalStorage(CLAIM_BRIDGE_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS);
+  const [, setNotiMultisigPendingTxStorage] = useLocalStorage(NOTI_MULTISIG_PENDINGTX_ID, '');
 
   const { notificationSetup } = useSelector((state: RootState) => state.settings);
   const { accounts, currentAccountProxy, isAllAccount } = useSelector((state: RootState) => state.accountState);
@@ -93,16 +96,20 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('All'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.all'),
         value: NotificationTab.ALL
       },
       {
-        label: t('Unread'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.unread'),
         value: NotificationTab.UNREAD
       },
       {
-        label: t('Read'),
+        label: t('ui.SETTINGS.screen.Setting.Notifications.read'),
         value: NotificationTab.READ
+      },
+      {
+        label: t('ui.SETTINGS.screen.Setting.Notifications.multisig'),
+        value: NotificationTab.MULTISIG
       }
     ];
   }, [t]);
@@ -110,6 +117,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [selectedFilterTab, setSelectedFilterTab] = useState<NotificationTab>(NotificationTab.ALL);
   const [viewDetailItem, setViewDetailItem] = useState<NotificationInfoItem | undefined>(undefined);
   const [notifications, setNotifications] = useState<_NotificationInfo[]>([]);
+  const [allNotifications, setAllNotifications] = useState<_NotificationInfo[]>([]);
   const [currentProxyId] = useState<string | undefined>(currentAccountProxy?.id);
   const [loadingNotification, setLoadingNotification] = useState<boolean>(false);
   const [isTrigger, setTrigger] = useState<boolean>(false);
@@ -117,18 +125,25 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
   // use this to trigger get date when click read/unread
   const [currentTimestampMs, setCurrentTimestampMs] = useState(Date.now());
-
   const enableNotification = notificationSetup.isEnabled;
   const isNotificationDetailModalVisible = checkActive(NOTIFICATION_DETAIL_MODAL);
 
   const notificationItems = useMemo((): NotificationInfoItem[] => {
     const filterTabFunction = (item: NotificationInfoItem) => {
-      if (selectedFilterTab === NotificationTab.ALL) {
-        return true;
-      } else if (selectedFilterTab === NotificationTab.UNREAD) {
-        return !item.isRead;
-      } else {
-        return item.isRead;
+      const isMultisigAction = item.actionType === NotificationActionType.MULTISIG_APPROVAL;
+
+      switch (selectedFilterTab) {
+        case NotificationTab.MULTISIG:
+          return isMultisigAction;
+
+        case NotificationTab.UNREAD:
+          return !item.isRead;
+
+        case NotificationTab.READ:
+          return item.isRead;
+
+        default:
+          return true;
       }
     };
 
@@ -147,7 +162,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         isRead: item.isRead,
         actionType: item.actionType,
         backgroundColor: token[NotificationIconBackgroundColorMap[item.actionType]],
-        leftIcon: NotificationIconMap[item.actionType],
+        leftIcon: NotificationIconMap[item.actionType], // todo: handle actionType multisig approval.
         metadata: item.metadata,
         proxyId: item.proxyId
       };
@@ -188,12 +203,22 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const onSelectFilterTab = useCallback((value: string) => {
     setSelectedFilterTab(value as NotificationTab);
     setLoading(true);
+    const isMultisigTab = value === NotificationTab.MULTISIG;
+
     fetchInappNotifications({
       proxyId: currentProxyId,
-      notificationTab: value
+      notificationTab: isMultisigTab ? NotificationTab.ALL : value
     } as GetNotificationParams)
       .then((rs) => {
-        setNotifications(rs);
+        const filteredRs = rs.filter((item) => {
+          if (isMultisigTab) {
+            return item.actionType === NotificationActionType.MULTISIG_APPROVAL;
+          }
+
+          return true;
+        });
+
+        setNotifications(filteredRs);
         setTimeout(() => setLoading(false), 300);
       })
       .catch(console.error);
@@ -240,11 +265,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     const chainInfo = chainInfoMap[chainSlug];
 
     const content = action === NotificationActionType.WITHDRAW
-      ? detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start withdrawing your funds')
-      : detectTranslate('{{networkName}} network is currently disabled. Enable the network and then re-click the notification to start claiming your funds');
+      ? detectTranslate('ui.SETTINGS.screen.Setting.Notifications.enableNetworkToWithdraw')
+      : detectTranslate('ui.SETTINGS.screen.Setting.Notifications.enableNetworkToClaim');
 
     openAlert({
-      title: t('Enable network'),
+      title: t('ui.SETTINGS.screen.Setting.Notifications.enableNetwork'),
       type: NotificationType.WARNING,
       content: t(content, { replace: { networkName: chainInfo?.name || chainSlug } }),
       closable: false,
@@ -253,23 +278,23 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         icon: XCircle,
         onClick: closeAlert,
         schema: 'secondary',
-        text: t('Cancel')
+        text: t('ui.SETTINGS.screen.Setting.Notifications.cancel')
       },
       okButton: {
         icon: CheckCircle,
         onClick: onOk,
-        text: t('Enable')
+        text: t('ui.SETTINGS.screen.Setting.Notifications.enable')
       }
     });
   }, [closeAlert, openAlert, t, updateAlertProps, chainInfoMap]);
 
   const showWarningModal = useCallback((action: string) => {
     openAlert({
-      title: t('You’ve {{action}} tokens', { replace: { action: action } }),
+      title: t('ui.SETTINGS.screen.Setting.Notifications.youveActionTokens', { replace: { action: action } }),
       type: NotificationType.INFO,
-      content: t('You’ve already {{action}} your tokens. Check for unread notifications to stay updated on any important', { replace: { action: action } }),
+      content: t('ui.SETTINGS.screen.Setting.Notifications.alreadyActionedTokens', { replace: { action: action } }),
       okButton: {
-        text: t('I understand'),
+        text: t('ui.SETTINGS.screen.Setting.Notifications.iUnderstand'),
         onClick: closeAlert,
         icon: CheckCircle
       }
@@ -425,6 +450,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
           break;
         }
+
+        case NotificationActionType.MULTISIG_APPROVAL: {
+          setNotiMultisigPendingTxStorage(item.id);
+          switchReadNotificationStatus(switchStatusParams).then(() => {
+            navigate('/home/history');
+          }).catch(console.error);
+
+          break;
+        }
       }
 
       if (!item.isRead) {
@@ -435,7 +469,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           });
       }
     };
-  }, [poolInfoMap, yieldPositions, currentAccountProxy, isAllAccount, allowedChains, excludedTokens, currentTimestampMs, chainStateMap, showActiveChainModal, setWithdrawStorage, navigate, showWarningModal, earningRewards, accounts, setClaimRewardStorage, setClaimAvailBridgeStorage, openTransactionProcessModal, isTrigger]);
+  }, [accounts, allowedChains, chainStateMap, currentAccountProxy, currentTimestampMs, earningRewards, excludedTokens, isAllAccount, isTrigger, navigate, openTransactionProcessModal, poolInfoMap, setClaimAvailBridgeStorage, setClaimRewardStorage, setNotiMultisigPendingTxStorage, setWithdrawStorage, showActiveChainModal, showWarningModal, yieldPositions]);
 
   const renderItem = useCallback((item: NotificationInfoItem) => {
     return (
@@ -463,8 +497,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Your notifications will appear here')}
-        emptyTitle={t('No notifications yet')}
+        emptyMessage={t('ui.SETTINGS.screen.Setting.Notifications.yourNotificationsWillAppearHere')}
+        emptyTitle={t('ui.SETTINGS.screen.Setting.Notifications.noNotificationsYet')}
         phosphorIcon={ListBullets}
       />
     );
@@ -483,30 +517,44 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           loading: loadingNotification,
           size: 'xs',
           shape: 'circle',
-          children: t('Enable notifications')
+          children: t('ui.SETTINGS.screen.Setting.Notifications.enableNotifications')
         }}
-        emptyMessage={t('Enable notifications now to not miss anything!')}
-        emptyTitle={t('Notifications are disabled')}
+        emptyMessage={t('ui.SETTINGS.screen.Setting.Notifications.enableNotificationsPrompt')}
+        emptyTitle={t('ui.SETTINGS.screen.Setting.Notifications.notificationsAreDisabled')}
         phosphorIcon={BellSimpleSlash}
       />
     );
   }, [loadingNotification, onEnableNotification, t]);
 
+  const excludeNotificationIds = useMemo(() => {
+    // When on MULTISIG tab, exclude non-multisig notifications (mark only multisig)
+    if (selectedFilterTab === NotificationTab.MULTISIG) {
+      return allNotifications
+        .filter((acc) => acc.actionType !== NotificationActionType.MULTISIG_APPROVAL)
+        .map((acc) => acc.id);
+    }
+
+    return [];
+  }, [allNotifications, selectedFilterTab]);
+
   const handleSwitchClick = useCallback(() => {
-    markAllReadNotification(currentProxyId || ALL_ACCOUNT_KEY)
+    markAllReadNotification({
+      proxyId: currentProxyId || ALL_ACCOUNT_KEY,
+      excludeNotificationIds: excludeNotificationIds
+    })
       .catch(console.error);
 
     setLoading(true);
     fetchInappNotifications({
       proxyId: currentProxyId,
-      notificationTab: selectedFilterTab
+      notificationTab: NotificationTab.ALL
     } as GetNotificationParams)
       .then((rs) => {
         setNotifications(rs);
         setTimeout(() => setLoading(false), 300);
       })
       .catch(console.error);
-  }, [currentProxyId, selectedFilterTab]);
+  }, [currentProxyId, excludeNotificationIds]);
 
   useEffect(() => {
     fetchInappNotifications({
@@ -515,6 +563,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     } as GetNotificationParams)
       .then((rs) => {
         setNotifications(rs);
+        setAllNotifications(rs);
       })
       .catch(console.error);
   }, [currentProxyId, isAllAccount, isTrigger]);
@@ -558,7 +607,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           }
         ]}
         showBackButton
-        title={t('Notifications')}
+        title={t('ui.SETTINGS.screen.Setting.Notifications.notifications')}
       />
 
       <div className={'tool-area'}>
@@ -568,20 +617,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           onSelect={onSelectFilterTab}
           selectedItem={selectedFilterTab}
         />
-        <Button
-          icon={ (
+        {(selectedFilterTab === NotificationTab.UNREAD || selectedFilterTab === NotificationTab.ALL || selectedFilterTab === NotificationTab.MULTISIG) && <Button
+          className={'mark-read-btn'}
+          icon={(
             <Icon
               phosphorIcon={Checks}
               weight={'fill'}
             />
           )}
-          // TODO: This is for development. It will be removed when done.
           onClick={handleSwitchClick}
           size='xs'
+          tooltip={t('ui.SETTINGS.screen.Setting.Notifications.markAllAsRead')}
           type='ghost'
-        >
-          {t('Mark all as read')}
-        </Button>
+        />}
       </div>
 
       {enableNotification
@@ -592,7 +640,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
                 className={'__search-box'}
                 onSearch={handleSearch}
-                placeholder={t<string>('Search notification')}
+                placeholder={t<string>('ui.SETTINGS.screen.Setting.Notifications.searchNotification')}
                 searchValue={currentSearchText}
               />
               {loading
@@ -709,6 +757,10 @@ const Notification = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center'
+    },
+
+    '.mark-read-btn': {
+      marginRight: token.margin
     }
   });
 });

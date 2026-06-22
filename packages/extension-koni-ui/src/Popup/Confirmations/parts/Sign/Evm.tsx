@@ -214,7 +214,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
       if (currentTime >= txExpirationTime) {
         notify({
-          message: t('Transaction expired'),
+          message: t('ui.DAPP.Confirmations.Sign.Evm.transactionExpired'),
           type: 'error'
         });
         onCancel();
@@ -290,7 +290,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick={onCancel}
             schema={'primary'}
           >
-            {t('I understand')}
+            {t('ui.DAPP.Confirmations.Sign.Evm.iUnderstand')}
           </Button>
           : <Button
             disabled={loading}
@@ -303,7 +303,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick={onCancel}
             schema={'secondary'}
           >
-            {t('Cancel')}
+            {t('ui.DAPP.Confirmations.Sign.Evm.cancel')}
           </Button>
       }
 
@@ -320,10 +320,10 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         {
           !isLedger
-            ? t('Approve')
+            ? t('ui.DAPP.Confirmations.Sign.Evm.approve')
             : !isLedgerConnected
-              ? t('Refresh')
-              : t('Approve')
+              ? t('ui.DAPP.Confirmations.Sign.Evm.refresh')
+              : t('ui.DAPP.Confirmations.Sign.Evm.approve')
         }
       </Button>}
       {

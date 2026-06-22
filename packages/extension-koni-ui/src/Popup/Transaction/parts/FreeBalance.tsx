@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { BalanceType } from '@subwallet/extension-base/types';
 import { useGetBalance } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -21,9 +22,11 @@ type Props = ThemeProps & {
   hidden?: boolean;
   isSubscribe?: boolean;
   extrinsicType?: ExtrinsicType;
+  balanceType?: BalanceType
 }
 
 const Component = ({ address,
+  balanceType,
   chain,
   className,
   extrinsicType,
@@ -31,11 +34,10 @@ const Component = ({ address,
   isSubscribe,
   label,
   labelTooltip,
-  onBalanceReady,
-  tokenSlug }: Props) => {
+  onBalanceReady, tokenSlug }: Props) => {
   const { t } = useTranslation();
   const { token } = useTheme() as Theme;
-  const { error, isLoading, nativeTokenBalance, nativeTokenSlug, tokenBalance } = useGetBalance(chain, address, tokenSlug, isSubscribe, extrinsicType);
+  const { error, isLoading, nativeTokenBalance, nativeTokenSlug, tokenBalance } = useGetBalance(chain, address, tokenSlug, isSubscribe, extrinsicType, balanceType);
 
   useEffect(() => {
     onBalanceReady?.(!isLoading && !error);
@@ -51,7 +53,7 @@ const Component = ({ address,
         hidden: hidden
       })}
       >
-        {t('Select account to view available balance')}
+        {t('ui.TRANSACTION.screen.Transaction.part.FreeBalance.selectAccountToViewBalance')}
       </Typography.Paragraph>
     );
   }
@@ -71,7 +73,7 @@ const Component = ({ address,
             '-hoverable': !!label
           })}
           >
-            {label || t('Sender available balance')}
+            {label || t('ui.TRANSACTION.screen.Transaction.part.FreeBalance.senderAvailableBalance')}
 
             {
               !!labelTooltip && (
@@ -104,7 +106,7 @@ const Component = ({ address,
       {
         !isLoading && !error && !!tokenSlug && (tokenSlug !== nativeTokenSlug) && (
           <>
-            <span className={'__name'}>&nbsp;{t('and')}&nbsp;</span>
+            <span className={'__name'}>&nbsp;{t('ui.TRANSACTION.screen.Transaction.part.FreeBalance.and')}&nbsp;</span>
             <Number
               decimal={tokenBalance?.decimals || 18}
               decimalColor={token.colorTextTertiary}

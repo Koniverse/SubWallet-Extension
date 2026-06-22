@@ -318,7 +318,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     }, {} as Record<string, string>);
   }, [accounts]);
 
-  const typeNameMap: Record<string, string> = useMemo((): Record<ExtrinsicType | 'default' | 'submitting' | 'processing' | 'timeout' | 'send' | 'received', string> => ({
+  const typeNameMap: Record<string, string> = useMemo((): Record<string, string> => ({
     default: t('ui.HISTORY.screen.History.transaction'),
     submitting: t('ui.HISTORY.screen.History.submittingEllipsis'),
     processing: t('ui.HISTORY.screen.History.processing'),
@@ -363,12 +363,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.UNSTAKE_STDOT]: t('ui.HISTORY.screen.History.unstakeStDot'),
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('ui.HISTORY.screen.History.tokenApprove'),
     [ExtrinsicType.SWAP]: t('ui.HISTORY.screen.History.swap'),
-    [ExtrinsicType.SET_FEE_TOKEN]: t('ui.HISTORY.Popup.Home.History.feeToken'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('ui.HISTORY.screen.History.claimToken'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknown')
   }), [t]);
 
-  const typeTitleMap: Record<string, string> = useMemo((): Record<ExtrinsicType | 'default' | 'send' | 'received', string> => ({
+  const typeTitleMap: Record<string, string> = useMemo((): Record<string, string> => ({
     default: t('ui.HISTORY.screen.History.transaction'),
     send: t('ui.HISTORY.screen.History.sendToken'),
     received: t('ui.HISTORY.screen.History.receiveToken'),
@@ -410,7 +409,6 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     [ExtrinsicType.UNSTAKE_STDOT]: t('ui.HISTORY.screen.History.unstakeStDotTransaction'),
     [ExtrinsicType.TOKEN_SPENDING_APPROVAL]: t('ui.HISTORY.screen.History.tokenApproveTransaction'),
     [ExtrinsicType.SWAP]: t('ui.HISTORY.screen.History.swapTransaction'),
-    [ExtrinsicType.SET_FEE_TOKEN]: t('ui.HISTORY.Popup.Home.History.feeToken'),
     [ExtrinsicType.CLAIM_BRIDGE]: t('ui.HISTORY.screen.History.claimTokenTransaction'),
     [ExtrinsicType.UNKNOWN]: t('ui.HISTORY.screen.History.unknownTransaction')
   }), [t]);

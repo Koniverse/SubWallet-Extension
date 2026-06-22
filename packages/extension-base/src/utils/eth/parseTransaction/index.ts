@@ -221,7 +221,7 @@ export const parseEvmRlp = async (data: string, networkMap: Record<string, _Chai
   const tx: QrTransaction | null = createTransactionFromRLP(data);
 
   if (!tx) {
-    throw new Error(t('bg.koni.handler.Extension.failedToDecodeQr'));
+    throw new Error(t('bg.DAPP.utils.eth.parseTransaction.failedToDecodeQr'));
   }
 
   const result: ResponseQrParseRLP = {

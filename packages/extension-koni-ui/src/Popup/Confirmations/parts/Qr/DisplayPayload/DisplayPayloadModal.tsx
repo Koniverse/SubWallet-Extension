@@ -48,7 +48,7 @@ const Component: React.FC<Props> = (props: Props) => {
         onBack={closeModal}
         rightFooterButton={{
           onClick: onScan,
-          children: t('Scan QR'),
+          children: t('ui.DAPP.Confirmations.Qr.DisplayPayloadModal.scanQr'),
           icon: (
             <Icon
               phosphorIcon={QrCode}
@@ -57,7 +57,7 @@ const Component: React.FC<Props> = (props: Props) => {
           )
         }}
         showBackButton={true}
-        title={t('Confirm')}
+        title={t('ui.DAPP.Confirmations.Qr.DisplayPayloadModal.confirm')}
       >
         <div className='body-container'>
           {children}

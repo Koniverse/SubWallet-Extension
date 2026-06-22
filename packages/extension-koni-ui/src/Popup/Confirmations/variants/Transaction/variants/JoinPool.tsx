@@ -34,29 +34,29 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <MetaInfo.Account
           address={data.selectedPool.address}
-          label={t('Pool')}
+          label={t('ui.TRANSACTION.Confirmations.JoinPool.pool')}
           networkPrefix={42}
         />
 
         {/* <MetaInfo.AccountGroup */}
         {/*  accounts={data.address} */}
         {/*  content={t(`${data.selectedValidators.length} selected validators`)} */}
-        {/*  label={t('Pool')} */}
+        {/*  label={t('ui.TRANSACTION.Confirmations.JoinPool.pool')} */}
         {/* /> */}
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Amount')}
+          label={t('ui.TRANSACTION.Confirmations.JoinPool.amount')}
           suffix={symbol}
           value={data.amount}
         />
 
-        <MetaInfo.Number
+        {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={decimals}
-          label={t('Estimated fee')}
+          label={t('ui.TRANSACTION.Confirmations.JoinPool.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
-        />
+        />}
       </MetaInfo>
     </div>
   );

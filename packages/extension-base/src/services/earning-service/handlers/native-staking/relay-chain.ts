@@ -76,7 +76,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
 
       const unlimitedNominatorRewarded = substrateApi.api.consts.staking.maxExposurePageSize !== undefined;
       const maxNominatorRewarded = substrateApi.api.consts.staking.maxNominatorRewardedPerValidator?.toString();
-      const maxNominations = await getRelayMaxNominations(substrateApi);
+      const maxNominations = await getRelayMaxNominations(substrateApi, this.chain);
       const currentEra = _currentEra.toString();
       const maxUnlockingChunks = substrateApi.api.consts.staking.maxUnlockingChunks.toString();
       const unlockingEras = substrateApi.api.consts.staking.bondingDuration.toString();
@@ -617,7 +617,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     const bnAmount = new BN(amount);
 
     if (bnAmount.lte(BN_ZERO)) {
-      return Promise.resolve([new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'bg.SWAP.background.error.Swap.amountMustBeGreaterThanZero')]);
+      return Promise.resolve([new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')]);
     }
 
     if (!_poolInfo) {
@@ -767,7 +767,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     const bnAmount = new BN(amount);
 
     if (bnAmount.lte(BN_ZERO)) {
-      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.SWAP.background.error.Swap.amountMustBeGreaterThanZero')));
+      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStakingRelay.amountMustBeGreaterThanZero')));
     }
 
     const bnActiveStake = new BN(poolPosition.activeStake);
@@ -780,7 +780,7 @@ export default class RelayNativeStakingPoolHandler extends BaseNativeStakingPool
     }
 
     if (poolPosition.unstakings.length > maxUnstake) {
-      errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('bg.EARNING.koni.api.staking.bonding.relayChain.maxUnstakeTimes', { replace: { number: maxUnstake } })));
+      errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('bg.EARNING.services.service.earning.nativeStakingRelay.maxUnstakeTimes', { replace: { number: maxUnstake } })));
     }
 
     return Promise.resolve(errors);
