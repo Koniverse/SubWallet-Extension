@@ -2372,5 +2372,7 @@
   "ui.EARNING.util.validator.staking.unstake.mustBeEqualOrGreaterThan": "",
   "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createNewAccount": "Tạo tài khoản mới",
   "ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo": "Enter a name for your account.<br/> You can edit this later.",
-  "ui.HISTORY.screen.History.token": "Token"
+  "ui.HISTORY.screen.History.token": "Token",
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack": "Your rewards will be staked back into the pool after claiming",
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable": "Phần thưởng của bạn sẽ được thêm vào số dư khả dụng"
 }

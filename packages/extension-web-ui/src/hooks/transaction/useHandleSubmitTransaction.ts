@@ -58,11 +58,17 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
           });
         } else {
           notify({
-            message: errors[0]?.message || warnings[0]?.message,
+            message: t(errors[0]?.message || warnings[0]?.message || ''),
             type: errors.length ? 'error' : 'warning',
             duration: 8
           });
         }
+      } else {
+        notify({
+          message: t(errors[0].message),
+          type: 'error',
+          duration: 8
+        });
       }
 
       if (!errors.length) {

@@ -2372,5 +2372,7 @@
   "ui.screen.CheckCrowdloanContributions.createNewAccount": "Создать новый аккаунт",
   "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createNewAccount": "Создать новый аккаунт",
   "ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo": "Enter a name for your account.<br/> You can edit this later.",
-  "ui.HISTORY.screen.History.token": "Токен"
+  "ui.HISTORY.screen.History.token": "Токен",
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack": "Your rewards will be staked back into the pool after claiming",
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable": "Ваши награды будут добавлены к вашему переводному балансу после запроса"
 }

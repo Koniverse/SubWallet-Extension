@@ -2372,5 +2372,7 @@
   "ui.screen.CheckCrowdloanContributions.createNewAccount": "Create a new account",
   "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createNewAccount": "Create a new account",
   "ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo": "Enter a name for your account.<br/> You can edit this later.",
-  "ui.HISTORY.screen.History.token": "Token"
+  "ui.HISTORY.screen.History.token": "Token",
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack": "Your rewards will be staked back into the pool after claiming",
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable": "Your rewards will be added to your transferable balance after claiming"
 }

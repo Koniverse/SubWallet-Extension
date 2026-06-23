@@ -2372,5 +2372,7 @@
   "ui.screen.CheckCrowdloanContributions.createNewAccount": "创建新账户",
   "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createNewAccount": "创建新账户",
   "ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo": "Enter a name for your account.<br/> You can edit this later.",
-  "ui.HISTORY.screen.History.token": "通证"
+  "ui.HISTORY.screen.History.token": "通证",
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack": "Your rewards will be staked back into the pool after claiming",
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable": "领取后，你的奖励将加入到可转移的余额"
 }

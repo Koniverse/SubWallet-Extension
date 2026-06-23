@@ -226,7 +226,7 @@ function Component (
           className='tag'
           color={HistoryStatusMap[item.status].schema === 'danger' ? 'error' : HistoryStatusMap[item.status].schema}
         >
-          {HistoryStatusMap[item.status].name}
+          {t(HistoryStatusMap[item.status].name)}
         </Tag>
 
         <Button

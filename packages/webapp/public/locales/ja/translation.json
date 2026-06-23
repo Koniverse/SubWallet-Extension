@@ -2372,5 +2372,7 @@
   "ui.screen.CheckCrowdloanContributions.createNewAccount": "新しいアカウントを作成",
   "ui.screen.CrowdloanUnlockCampaign.CrowdloanContributionsResult.createNewAccount": "新しいアカウントを作成",
   "ui.ACCOUNT.components.Modal.Account.Name.enterAccountNameInfo": "Enter a name for your account.<br/> You can edit this later.",
-  "ui.HISTORY.screen.History.token": "トークン"
+  "ui.HISTORY.screen.History.token": "トークン",
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack": "Your rewards will be staked back into the pool after claiming",
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable": "あなたの報酬は請求後、移行可能な残高に加算されます。"
 }

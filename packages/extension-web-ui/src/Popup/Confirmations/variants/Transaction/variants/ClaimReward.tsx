@@ -39,7 +39,7 @@ const Component: React.FC<Props> = (props: Props) => {
           ? 'ui.TRANSACTION.Confirmations.ClaimReward.rewardsSmallerThanFeeWarning'
           : 'ui.TRANSACTION.Confirmations.ClaimReward.rewardsEqualToFeeWarning'),
         okButton: {
-          text: t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsSmallerThanFeeWarning'),
+          text: t('ui.TRANSACTION.Confirmations.ClaimReward.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
         }
@@ -60,7 +60,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {
           data.unclaimedReward && <MetaInfo.Number
             decimals={decimals}
-            label={t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsEqualToFeeWarning')}
+            label={t('ui.TRANSACTION.Confirmations.ClaimReward.availableRewards')}
             suffix={symbol}
             value={data.unclaimedReward}
           />
@@ -68,7 +68,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.ClaimReward.iUnderstand')}
+          label={t('ui.TRANSACTION.Confirmations.ClaimReward.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
@@ -77,8 +77,8 @@ const Component: React.FC<Props> = (props: Props) => {
       <span className={CN('text-light-4')}>
         {
           data.bondReward
-            ? t('ui.TRANSACTION.Confirmations.ClaimReward.availableRewards')
-            : t('ui.TRANSACTION.Confirmations.ClaimReward.networkFee')
+            ? t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack')
+            : t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable')
         }
       </span>
     </>
