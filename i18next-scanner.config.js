@@ -150,7 +150,7 @@ module.exports = {
       list: ['t', 'i18next.t', 'i18n.t', 'detectTranslate']
     },
     keySeparator: false, // key separator
-    lngs: ['en', 'vi', 'zh', 'ja', 'ru'],
+    lngs: fs.readdirSync('packages/extension-koni/public/locales', { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name),
     nsSeparator: false, // namespace separator
     resource: {
       jsonIndent: 2,
