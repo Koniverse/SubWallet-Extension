@@ -11,7 +11,7 @@ import { estimateXcmFee } from '@subwallet/extension-base/services/balance-servi
 import { _getAssetDecimals, _getAssetExistentialDeposit, _getAssetSymbol, _getChainName, _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
 import { MIN_XCM_LIQUID_STAKING_DOT } from '@subwallet/extension-base/services/earning-service/constants';
 import { BaseYieldStepDetail, BasicTxErrorType, HandleYieldStepData, OptimalYieldPath, OptimalYieldPathParams, RequestCrossChainTransfer, RequestEarlyValidateYield, ResponseEarlyValidateYield, SpecialYieldPoolInfo, SpecialYieldPoolMetadata, SubmitChangeValidatorStaking, SubmitYieldJoinData, TransactionData, UnstakingInfo, XcmStepMetadataForLiqStaking, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldProcessValidation, YieldStepBaseInfo, YieldStepType, YieldTokenBaseInfo, YieldValidationStatus } from '@subwallet/extension-base/types';
-import { createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, createPromiseHandler, formatNumber, PromiseHandler } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -564,6 +564,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
     const originChainInfo = this.state.getChainInfo(originTokenInfo.originChain);
     const originTokenSlug = _getChainNativeTokenSlug(originChainInfo);
     const substrateApi = this.state.getSubstrateApi(originChainInfo.slug);
+    const fromAddress = _reformatAddressWithChain(address, originChainInfo);
 
     const id = getId();
     const feeInfo = await this.state.feeService.subscribeChainFee(id, originChainInfo.slug, 'substrate');
@@ -573,7 +574,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
       recipient: address,
       sendingValue,
       substrateApi,
-      sender: address,
+      sender: fromAddress,
       originChain: originChainInfo,
       destinationChain: this.chainInfo,
       feeInfo
@@ -588,7 +589,7 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
     const xcmData: RequestCrossChainTransfer = {
       originNetworkKey: originChainInfo.slug,
       destinationNetworkKey: destinationTokenInfo.originChain,
-      from: address,
+      from: fromAddress,
       to: address,
       value: sendingValue,
       tokenSlug: originTokenSlug,
