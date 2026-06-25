@@ -352,7 +352,7 @@ const Component = ({ className }: ComponentProps) => {
         openAlert({
           title: t('ui.TRANSACTION.screen.Transaction.Earn.insufficientBalance'),
           type: NotificationType.ERROR,
-          content: error.message,
+          content: t(error.message),
           okButton: {
             text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
             onClick: closeAlert,
@@ -369,7 +369,7 @@ const Component = ({ className }: ComponentProps) => {
       }
 
       notify({
-        message: error.message,
+        message: t(error.message),
         type: 'error',
         duration: 8
       });
@@ -392,7 +392,7 @@ const Component = ({ className }: ComponentProps) => {
         const { errors: _errors, id, processId, warnings } = rs;
 
         if (_errors.length || warnings.length) {
-          if (_errors[0]?.message !== 'Rejected by user') {
+          if (![t('ui.TRANSACTION.hook.transaction.useHandleSubmit.rejectedByUser'), 'bg.NETWORK.background.error.Provider.rejectedByUser'].includes(_errors[0]?.message)) {
             if (
               _errors[0]?.message.startsWith('UnknownError Connection to Indexed DataBase server lost') ||
               _errors[0]?.message.startsWith('Provided address is invalid, the capitalization checksum test failed') ||
@@ -412,6 +412,12 @@ const Component = ({ className }: ComponentProps) => {
 
             return false;
           } else {
+            notify({
+              message: t(_errors[0].message),
+              type: 'error',
+              duration: 8
+            });
+
             dispatchProcessState({
               type: needRollback ? EarningActionType.STEP_ERROR_ROLLBACK : EarningActionType.STEP_ERROR,
               payload: _errors[0]

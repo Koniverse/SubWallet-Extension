@@ -2415,5 +2415,7 @@
   "ui.TRANSACTION.constant.transaction.multisigTransaction": "Multisig transaction",
   "ui.TRANSACTION.constant.transaction.addProxy": "Add proxy",
   "ui.TRANSACTION.constant.transaction.removeProxy": "Remove proxy",
-  "ui.TRANSACTION.constant.transaction.substrateProxyInit": "Proxy init"
+  "ui.TRANSACTION.constant.transaction.substrateProxyInit": "Proxy init",
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack": "Your rewards will be staked back into the pool after claiming",
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable": "あなたの報酬は請求後、移行可能な残高に加算されます。"
 }

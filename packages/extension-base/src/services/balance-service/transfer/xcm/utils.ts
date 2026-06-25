@@ -43,6 +43,8 @@ export type THopInfo = {
 export type DryRunResult = {
   origin: DryRunNodeResult
   destination?: DryRunNodeResult
+  assetHub?: DryRunNodeResult
+  bridgeHub?: DryRunNodeResult
   hops: THopInfo[]
 }
 
