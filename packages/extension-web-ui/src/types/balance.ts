@@ -30,6 +30,7 @@ export interface TokenBalanceItemType {
   total: BalanceValueInfo;
   isReady: boolean;
   relatedChains: string[];
+  displayName?: string;
 }
 
 export interface BalanceItemWithAddressType extends BalanceItem {

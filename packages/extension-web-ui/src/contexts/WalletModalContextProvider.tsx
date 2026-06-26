@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountTokenAddressModal, AddressQrModal, AlertModal, AttachAccountModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, NewSeedModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, SelectExtensionModal, SwitchNetworkAuthorizeModal, TonWalletContractSelectorModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-web-ui/components';
+import { AccountTokenAddressModal, AddressQrModal, AlertModal, AttachAccountModal, CreateAccountModal, DeriveAccountActionModal, DeriveAccountListModal, ImportAccountModal, ImportSeedModal, ImportSeedTrustModal, NewSeedModal, RequestCameraAccessModal, RequestCreatePasswordModal, SelectAddressFormatModal, SelectExtensionModal, SwitchNetworkAuthorizeModal, TonWalletContractSelectorModal, TransactionProcessDetailModal, TransactionStepsModal } from '@subwallet/extension-web-ui/components';
 import SeedPhraseModal from '@subwallet/extension-web-ui/components/Modal/Account/SeedPhraseModal';
 import { ConfirmationModal } from '@subwallet/extension-web-ui/components/Modal/ConfirmationModal';
 import { CustomizeModal } from '@subwallet/extension-web-ui/components/Modal/Customize/CustomizeModal';
@@ -416,6 +416,7 @@ export const WalletModalContextProvider = ({ children }: Props) => {
     <ImportAccountModal />
     <AttachAccountModal />
     <ImportSeedModal />
+    <ImportSeedTrustModal />
     <DeriveAccountListModal />
     <RequestCreatePasswordModal />
     <RequestCameraAccessModal />

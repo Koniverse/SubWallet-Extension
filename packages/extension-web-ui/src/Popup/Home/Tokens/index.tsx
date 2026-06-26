@@ -40,9 +40,10 @@ const BN_100 = new BigN(100);
 
 const searchFunc = (item: TokenBalanceItemType, searchText: string) => {
   const searchTextLowerCase = searchText.toLowerCase();
+  const displayName = item.displayName?.toLowerCase() || '';
   const symbol = item.symbol.toLowerCase();
 
-  return symbol.includes(searchTextLowerCase);
+  return symbol.includes(searchTextLowerCase) || displayName.includes(searchTextLowerCase);
 };
 
 const tonAccountSelectorModalId = TON_ACCOUNT_SELECTOR_MODAL;

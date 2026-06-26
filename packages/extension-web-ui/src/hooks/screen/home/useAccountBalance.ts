@@ -8,6 +8,7 @@ import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AssetRegistryStore, BalanceStore, ChainStore, PriceStore } from '@subwallet/extension-web-ui/stores/types';
 import { TokenBalanceItemType } from '@subwallet/extension-web-ui/types/balance';
 import { AccountBalanceHookType } from '@subwallet/extension-web-ui/types/hook';
+import { getAssetDisplayName } from '@subwallet/extension-web-ui/utils';
 import BigN from 'bignumber.js';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -29,6 +30,7 @@ function getDefaultBalanceItem (
   slug: string,
   symbol: string,
   logoKey: string,
+  displayName?: string,
   currency?: CurrencyJson
 ): TokenBalanceItemType {
   return {
@@ -56,6 +58,7 @@ function getDefaultBalanceItem (
     slug,
     currency: currency || defaultCurrency,
     symbol,
+    displayName,
     relatedChains: []
   };
 }
@@ -68,6 +71,7 @@ function getDefaultTokenGroupBalance (
 ): TokenBalanceItemType {
   let symbol: string;
   let logoKey: string;
+  let displayName: string | undefined;
 
   // note: tokenGroupKey is either multiChainAsset or a tokenSlug
   // Thus, multiChainAsset may be undefined
@@ -78,10 +82,11 @@ function getDefaultTokenGroupBalance (
     const asset = assetRegistryMap[tokenGroupKey];
 
     symbol = _getAssetSymbol(asset);
+    displayName = getAssetDisplayName(asset);
     logoKey = asset.slug;
   }
 
-  return getDefaultBalanceItem(tokenGroupKey, symbol, logoKey.toLowerCase(), currency);
+  return getDefaultBalanceItem(tokenGroupKey, symbol, logoKey.toLowerCase(), displayName, currency);
 }
 
 function getDefaultTokenBalance (
@@ -90,8 +95,9 @@ function getDefaultTokenBalance (
   currency?: CurrencyJson
 ): TokenBalanceItemType {
   const symbol = _getAssetSymbol(chainAsset);
+  const displayName = getAssetDisplayName(chainAsset);
 
-  return getDefaultBalanceItem(tokenSlug, symbol, chainAsset.slug.toLowerCase(), currency);
+  return getDefaultBalanceItem(tokenSlug, symbol, chainAsset.slug.toLowerCase(), displayName, currency);
 }
 
 function getAccountBalance (

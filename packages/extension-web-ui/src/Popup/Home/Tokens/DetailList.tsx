@@ -60,10 +60,12 @@ const TokenDetailModalId = 'tokenDetailModalId';
 const searchFunc = (item: TokenBalanceItemType, searchText: string) => {
   const searchTextLowerCase = searchText.toLowerCase();
   const chainName = item.chainDisplayName?.toLowerCase() || '';
+  const displayName = item.displayName?.toLowerCase() || '';
   const symbol = item.symbol.toLowerCase();
 
   return (
     symbol.includes(searchTextLowerCase) ||
+    displayName.includes(searchTextLowerCase) ||
     (chainName && chainName.includes(searchTextLowerCase))
   );
 };
