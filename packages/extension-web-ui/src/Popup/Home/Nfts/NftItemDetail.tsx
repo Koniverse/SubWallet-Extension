@@ -348,12 +348,15 @@ function Component ({ className = '', collectionInfo,
                 />
 
                 {
-                  nftItem.properties && Object.entries(nftItem.properties).map(([attName, attValueObj], index) => {
-                    const { value: attValue } = attValueObj as Record<string, string>;
+                  nftItem.properties && Object.entries(nftItem.properties as Record<string, any>).map(([attName, attValueRaw], index) => {
+                    const attValue =
+                      typeof attValueRaw === 'object' && attValueRaw !== null && 'value' in attValueRaw
+                        ? String((attValueRaw as { value: string }).value)
+                        : String(attValueRaw);
 
                     return (
                       <Field
-                        content={attValue.toString()}
+                        content={attValue}
                         key={index}
                         label={attName}
                         width={'fit-content'}
