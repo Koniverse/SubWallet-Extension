@@ -2428,5 +2428,22 @@
   "ui.TRANSACTION.constant.transaction.removeProxy": "Remove proxy",
   "ui.TRANSACTION.constant.transaction.substrateProxyInit": "Proxy init",
   "ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack": "Your rewards will be staked back into the pool after claiming",
-  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable": "Phần thưởng của bạn sẽ được thêm vào số dư khả dụng"
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable": "Phần thưởng của bạn sẽ được thêm vào số dư khả dụng",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.submit": "",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.title": "",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.description": "",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.swapCardDescription": "",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.keepCardDescription": "",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.othersCardDescription": "",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.swapCardTitle": "",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.keepCardTitle": "",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.othersCardTitle": "",
+  "ui.Confirmations.changeClaimTypeConfirm": "",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.claimRewardsType": "",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.estimatedFee": "",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.alphaClaimDescription": "",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.TAOClaimDescription": "",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.alphaClaimTitle": "",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.TAOClaimTitle": "",
+  "ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.claimRewardsType": ""
 }

@@ -2428,5 +2428,22 @@
   "ui.TRANSACTION.constant.transaction.removeProxy": "Remove proxy",
   "ui.TRANSACTION.constant.transaction.substrateProxyInit": "Proxy init",
   "ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack": "Your rewards will be staked back into the pool after claiming",
-  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable": "Your rewards will be added to your transferable balance after claiming"
+  "ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable": "Your rewards will be added to your transferable balance after claiming",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.submit": "Change claim type",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.title": "Claim type",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.description": "When you stake TAO via a validator, you'll earn alpha rewards from every subnet that validator validates. Choose how you'd like to claim rewards",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.swapCardDescription": "Your accumulated alpha rewards will be swapped to TAO and added to your stake automatically",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.keepCardDescription": "Your accumulated alpha rewards will be kept and staked on the subnets that generated them",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.othersCardDescription": "Choose the alpha token(s) you'd like to receive rewards in. This option is not supported in SubWallet",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.swapCardTitle": "Swap",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.keepCardTitle": "Keep",
+  "ui.EARNING.components.Modal.Earning.BittensorClaimRewardType.othersCardTitle": "Others",
+  "ui.Confirmations.changeClaimTypeConfirm": "Change type confirm",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.claimRewardsType": "Claim rewards type",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.estimatedFee": "Estimated fee",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.alphaClaimDescription": "Your alpha rewards will be auto-claimed once the accumulated rewards reach 0.0005 alpha units",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.TAOClaimDescription": "Your alpha rewards will be auto-swapped to TAO and added to your stake once the accumulated rewards reach 0.0005 alpha units",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.alphaClaimTitle": "Automatic alpha claim",
+  "ui.TRANSACTION.Confirmations.ChangeBittensorRootClaimReward.TAOClaimTitle": "Automatic TAO claim",
+  "ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.claimRewardsType": "Claim reward type"
 }

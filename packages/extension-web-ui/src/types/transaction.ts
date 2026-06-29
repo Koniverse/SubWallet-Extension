@@ -89,3 +89,7 @@ export interface SwapParams extends TransactionFormBaseProps {
 export interface ClaimBridgeParams extends TransactionFormBaseProps {
   notificationId: string;
 }
+
+export interface ChangeBittensorRootClaimType extends TransactionFormBaseProps {
+  bittensorRootClaimType: string;
+}

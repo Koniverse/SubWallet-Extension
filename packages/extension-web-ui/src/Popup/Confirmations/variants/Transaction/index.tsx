@@ -19,7 +19,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { BitcoinSignArea, CardanoSignArea, EvmSignArea, SubstrateSignArea } from '../../parts/Sign';
-import { BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ChangeEarningValidatorTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
+import { BaseProcessConfirmation, BaseTransactionConfirmation, BondTransactionConfirmation, CancelUnstakeTransactionConfirmation, ChangeBittensorRootClaimRewardTypeTransactionConfirmation, ChangeEarningValidatorTransactionConfirmation, ClaimBridgeTransactionConfirmation, ClaimRewardTransactionConfirmation, DefaultWithdrawTransactionConfirmation, EarnProcessConfirmation, FastWithdrawTransactionConfirmation, JoinPoolTransactionConfirmation, JoinYieldPoolConfirmation, LeavePoolTransactionConfirmation, SendNftTransactionConfirmation, SwapProcessConfirmation, SwapTransactionConfirmation, TokenApproveConfirmation, TransferBlock, UnbondTransactionConfirmation, WithdrawTransactionConfirmation } from './variants';
 
 interface Props extends ThemeProps {
   confirmation: ConfirmationQueueItem;
@@ -46,6 +46,8 @@ const getTransactionComponent = (extrinsicType: ExtrinsicType): typeof BaseTrans
       return UnbondTransactionConfirmation;
     case ExtrinsicType.CHANGE_EARNING_VALIDATOR:
       return ChangeEarningValidatorTransactionConfirmation;
+    case ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE:
+      return ChangeBittensorRootClaimRewardTypeTransactionConfirmation;
     case ExtrinsicType.STAKING_WITHDRAW:
     case ExtrinsicType.STAKING_POOL_WITHDRAW:
       return WithdrawTransactionConfirmation;
