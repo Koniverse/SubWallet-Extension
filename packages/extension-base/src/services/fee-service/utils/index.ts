@@ -162,10 +162,8 @@ export const calculateGasFeeParams = async (web3: _EvmApi, networkKey: string, u
   }
 
   try {
-    if (networkKey === 'polygonzkEvm_cardona' || networkKey === 'polygonZkEvm') {
-      const isTestnet = networkKey === 'polygonzkEvm_cardona';
-      const gasDomain = isTestnet ? POLYGON_GAS_INDEXER.TESTNET : POLYGON_GAS_INDEXER.MAINNET;
-      const gasResponse = await fetch(`${gasDomain}`).then((res) => res.json()) as gasStation;
+    if (networkKey === 'polygonzkEvm_cardona') {
+      const gasResponse = await fetch(`${POLYGON_GAS_INDEXER.TESTNET}`).then((res) => res.json()) as gasStation;
       const gasPriceInWei = gasResponse.standard * 1e9 + 200000;
 
       return {
