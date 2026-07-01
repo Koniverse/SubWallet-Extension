@@ -92,7 +92,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 ? (
                   <div className='__item-available-balance'>
                     <div className='__item-available-balance-label'>
-                      {t('ui.EARNING.components.Earning.OptionItem.upTo')}:
+                      {t('ui.EARNING.components.Earning.OptionItem.available')}:
                     </div>
                     <div className={'__item-available-balance-value'}>
                       <Number

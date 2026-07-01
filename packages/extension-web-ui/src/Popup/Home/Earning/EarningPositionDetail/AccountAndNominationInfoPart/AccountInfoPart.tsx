@@ -187,7 +187,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
 
       const metaInfoItems = isSubnetStaking
         ? [
-          metaInfoNumber('Total stake', new BigN(item.totalStake)),
+          metaInfoNumber('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.totalStake', new BigN(item.totalStake)),
           {
             label: t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.derivativeTokenBalance'),
             value: item.subnetData?.originalTotalStake || '',
@@ -197,12 +197,12 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
         ]
         : !isSpecial
           ? [
-            metaInfoNumber('Total stake', new BigN(item.totalStake)),
-            metaInfoNumber('Active stake', item.activeStake),
-            metaInfoNumber('Unstaked', item.unstakeBalance)
+            metaInfoNumber('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.totalStake', new BigN(item.totalStake)),
+            metaInfoNumber('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.activeStake', item.activeStake),
+            metaInfoNumber('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.unstaked', item.unstakeBalance)
           ]
           : [
-            metaInfoNumber('Total stake', new BigN(item.totalStake)),
+            metaInfoNumber('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.totalStake', new BigN(item.totalStake)),
             {
               label: t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.derivativeTokenBalance'),
               value: item.activeStake,
@@ -292,7 +292,7 @@ function Component ({ className, compound, inputAsset, list, poolInfo }: Props) 
                   type='ghost'
                 >
                   <div className='__nomination-button-label'>
-                    {t(canChangeValidator ? 'Your validators' : 'Nomination info')}
+                    {t(canChangeValidator ? 'ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.yourValidators' : 'ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.nominationInfo')}
                   </div>
 
                   <Icon

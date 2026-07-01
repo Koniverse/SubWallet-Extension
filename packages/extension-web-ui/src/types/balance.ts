@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { CurrencyJson } from '@subwallet/extension-base/background/KoniTypes';
-import { BalanceItem } from '@subwallet/extension-base/types';
+import { BalanceItem, LockedBalanceDetails } from '@subwallet/extension-base/types';
 import BigN from 'bignumber.js';
 
 export type BalanceValueInfo = {
@@ -31,6 +31,7 @@ export interface TokenBalanceItemType {
   isReady: boolean;
   relatedChains: string[];
   displayName?: string;
+  lockedDetails?: LockedBalanceDetails;
 }
 
 export interface BalanceItemWithAddressType extends BalanceItem {

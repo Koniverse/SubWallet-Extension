@@ -137,7 +137,8 @@ const usePreviewYieldGroupInfo = (poolInfoMap: Record<string, YieldPoolInfo>): Y
             ? BN_ZERO
             : calculateTotalValueStaked(pool, assetRegistry, priceMap),
           minJoin: pool.statistic?.earningThreshold?.join,
-          isRelatedToRelayChain: checkRelatedRelaChain
+          isRelatedToRelayChain: checkRelatedRelaChain,
+          assetSlugs: [pool.metadata.inputAsset]
         };
       }
     }
