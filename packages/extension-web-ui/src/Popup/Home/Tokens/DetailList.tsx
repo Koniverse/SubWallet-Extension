@@ -20,7 +20,7 @@ import { DetailUpperBlock } from '@subwallet/extension-web-ui/Popup/Home/Tokens/
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { TokenBalanceItemType } from '@subwallet/extension-web-ui/types/balance';
-import { getTransactionFromAccountProxyValue, isAccountAll, isSoloTonAccountProxy, sortTokensByStandard } from '@subwallet/extension-web-ui/utils';
+import { getAssetDisplayName, getTransactionFromAccountProxyValue, isAccountAll, isSoloTonAccountProxy, sortTokensByStandard } from '@subwallet/extension-web-ui/utils';
 import { isTonAddress } from '@subwallet/keyring';
 import { KeypairType } from '@subwallet/keyring/types';
 import { ModalContext } from '@subwallet/react-ui';
@@ -141,7 +141,7 @@ function Component (): React.ReactElement {
       }
 
       if (assetRegistryMap[tokenGroupSlug]) {
-        return assetRegistryMap[tokenGroupSlug].symbol;
+        return getAssetDisplayName(assetRegistryMap[tokenGroupSlug], assetRegistryMap[tokenGroupSlug].symbol);
       }
     }
 

@@ -434,7 +434,7 @@ const Component = (): React.ReactElement => {
                         logoKey={row.logoKey}
                         slug={row.slug}
                         subContent={getRowSubContent(row)}
-                        symbol={row.symbol}
+                        symbol={row.displayName || row.symbol}
                       />
                     );
                   }

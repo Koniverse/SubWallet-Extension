@@ -98,7 +98,7 @@ function Component ({ className = '',
                           logoKey={row.logoKey}
                           slug={row.slug}
                           subTitle={row.chainDisplayName?.replace(' Relay Chain', '') || ''}
-                          symbol={row.symbol}
+                          symbol={row.displayName || row.symbol}
                           tokenGroupSlug={tokenGroupSlug}
                         />
                       );

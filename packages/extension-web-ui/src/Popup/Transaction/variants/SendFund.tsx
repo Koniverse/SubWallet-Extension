@@ -36,7 +36,7 @@ import { approveSpending, cancelSubscription, getOptimalTransferProcess, getToke
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-web-ui/reducer';
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, ChainItemType, FormCallbacks, Theme, ThemeProps, TokenSelectorItemType, TransferParams } from '@subwallet/extension-web-ui/types';
-import { findAccountByAddress, formatBalance, getSignModeByAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
+import { findAccountByAddress, formatBalance, getAssetDisplayName, getSignModeByAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
 import BigN from 'bignumber.js';
@@ -340,6 +340,7 @@ const Component = ({ className = '', modalContent, targetAccountProxy }: Compone
             slug: chainAsset.slug,
             name: _getAssetName(chainAsset),
             symbol: _getAssetSymbol(chainAsset),
+            displayName: getAssetDisplayName(chainAsset, chainAsset.symbol),
             originChain
           });
         }
