@@ -2783,6 +2783,8 @@
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOff": "Turn off",
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworksUnable": "Unable to turn off all networks. Please try again later",
   "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": "Feature not available for <highlight>{{accountTitle}}</highlight>. Change to another account type and try again.",
+  "ui.DAPP.Confirmations.Sign.Substrate.unableToDecode": "Unable to decode this signing payload. Reject this request and try again after the dApp or network type definitions are updated.",
+  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "Insufficient balance on the account named {{accountName}}. Top up the balance or change the signing account and try again",
   "ui.NFT.screen.nested.NftBundleItemDetail.level": "Level {{nestingLevel}}",
   "ui.NFT.screen.nested.NftBundleItemDetail.goToParent": "Go to Parent",
   "ui.NFT.screen.nested.NftBundleItemDetail.description": "Description",

@@ -3,6 +3,7 @@
 
 import { Common } from '@ethereumjs/common';
 import { LegacyTransaction } from '@ethereumjs/tx';
+import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _MultiChainAsset } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
@@ -5753,6 +5754,10 @@ export default class KoniExtension {
   }
 
   private async getIsClaimedPolygonBridge (data: RequestIsClaimedPolygonBridge) {
+    if (data.chainslug !== COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA) {
+      throw new Error('Polygon zkEVM Mainnet Beta has sunset. Please use Polygon official Ethereum claim flow.');
+    }
+
     const evmApi = this.#koniState.getEvmApi(data.chainslug);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const isClaimed: boolean = await isClaimedPolygonBridge(data.chainslug, data.counter, data.sourceNetwork, evmApi);
@@ -5766,13 +5771,18 @@ export default class KoniExtension {
 
     let transaction: SubmittableExtrinsic<'promise'> | TransactionConfig | null = null;
 
-    const evmApi = this.#koniState.getEvmApi(chain);
     const metadata = notification.metadata as ClaimPolygonBridgeNotificationMetadata;
+
+    if (metadata.bridgeType !== 'POS' && chain !== COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA) {
+      throw new Error('Polygon zkEVM Mainnet Beta has sunset. Please use Polygon official Ethereum claim flow.');
+    }
+
+    const evmApi = this.#koniState.getEvmApi(chain);
     const feeInfo = await this.#koniState.feeService.subscribeChainFee(getId(), chain, 'evm') as EvmFeeInfo;
 
     if (metadata.bridgeType === 'POS') {
       transaction = await getClaimPosBridge(chain, notification, evmApi, feeInfo);
-    } else {
+    } else if (chain === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA) {
       transaction = await getClaimPolygonBridge(chain, notification, evmApi, feeInfo);
     }
 
