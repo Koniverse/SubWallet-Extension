@@ -4,12 +4,14 @@
 import { NftCollection, NftItem } from '@subwallet/extension-base/background/KoniTypes';
 
 export interface INftCollectionDetail {
-  collectionId: string
+  collectionId: string;
+  chain?: string;
 }
 
 export interface INftItemDetail {
-  collectionId: string,
-  nftId: string
+  collectionId: string;
+  nftId: string;
+  chain?: string;
 }
 
 // might set perPage based on screen height

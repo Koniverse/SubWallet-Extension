@@ -269,6 +269,7 @@ export class AccountState {
    */
   public saveCurrentAccountProxyId (_proxyId: string, callback?: (data: CurrentAccountInfo) => void, preventOneAccount?: boolean) {
     let result = this.currentAccount;
+    const currentProxyId = result?.proxyId;
 
     if (!result) {
       result = {
@@ -289,7 +290,7 @@ export class AccountState {
         // For case have more than 1 account or no account
       } else {
         // For case have only 1 account
-        if (!preventOneAccount) {
+        if (!preventOneAccount && currentProxyId !== ALL_ACCOUNT_KEY) {
           result.proxyId = accounts[0];
         }
       }

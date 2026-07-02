@@ -133,7 +133,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       }
     }
 
-    const state: INftCollectionDetail = { collectionId: nftCollection.collectionId };
+    const state: INftCollectionDetail = { collectionId: nftCollection.collectionId, chain: nftCollection.chain };
 
     return (
       <NftGalleryWrapper

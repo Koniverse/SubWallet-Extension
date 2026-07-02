@@ -71,6 +71,8 @@ const TokenDetailList = new LazyLoader('TokenDetailList', () => import('@subwall
 const NftItemDetail = new LazyLoader('NftItemDetail', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftItemDetail'));
 const NftCollections = new LazyLoader('NftCollections', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftCollections'));
 const NftCollectionDetail = new LazyLoader('NftCollectionDetail', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftCollectionDetail'));
+const NftBundleItemDetail = new LazyLoader('NftBundleItemDetail', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/nested-nft/NftBundleItemDetail'));
+const NftViewStructure = new LazyLoader('NftViewStructure', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/nested-nft/NftViewStructure'));
 const NftImport = new LazyLoader('NftImport', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftImport'));
 const NftEntry = new LazyLoader('NftEntry', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftEntry'));
 
@@ -216,7 +218,9 @@ export const router = createBrowserRouter([
             children: [
               NftCollections.generateRouterObject('collections'),
               NftCollectionDetail.generateRouterObject('collection-detail'),
-              NftItemDetail.generateRouterObject('item-detail')
+              NftItemDetail.generateRouterObject('item-detail'),
+              NftBundleItemDetail.generateRouterObject('bundle-item-detail'),
+              NftViewStructure.generateRouterObject('view-structure')
             ]
           },
           {

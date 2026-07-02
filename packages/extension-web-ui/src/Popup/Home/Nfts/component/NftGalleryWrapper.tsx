@@ -17,9 +17,10 @@ interface Props extends ThemeProps {
   handleOnClick?: (params?: any) => void;
   routingParams?: any;
   have3dViewer?: boolean;
+  isBundle?: boolean;
 }
 
-function Component ({ className = '', fallbackImage, handleOnClick, have3dViewer, image, itemCount, routingParams, title }: Props): React.ReactElement<Props> {
+function Component ({ className = '', fallbackImage, handleOnClick, have3dViewer, image, isBundle, itemCount, routingParams, title }: Props): React.ReactElement<Props> {
   const { extendToken } = useTheme() as Theme;
 
   const [showImage, setShowImage] = useState(true);
@@ -62,8 +63,10 @@ function Component ({ className = '', fallbackImage, handleOnClick, have3dViewer
   }, []);
 
   const getCollectionImageNode = useCallback(() => {
+    let content: React.ReactNode;
+
     if (showImage) {
-      return (
+      content = (
         <LazyLoadImage
           delayTime={10000}
           height={'100%'}
@@ -73,10 +76,8 @@ function Component ({ className = '', fallbackImage, handleOnClick, have3dViewer
           width={'100%'}
         />
       );
-    }
-
-    if (showVideo) {
-      return (
+    } else if (showVideo) {
+      content = (
         <LazyLoadComponent>
           <video
             autoPlay
@@ -93,10 +94,8 @@ function Component ({ className = '', fallbackImage, handleOnClick, have3dViewer
           </video>
         </LazyLoadComponent>
       );
-    }
-
-    if (have3dViewer && show3dViewer) {
-      return (
+    } else if (have3dViewer && show3dViewer) {
+      content = (
         <LazyLoadComponent>
           {/* @ts-ignore */}
           <model-viewer
@@ -119,15 +118,22 @@ function Component ({ className = '', fallbackImage, handleOnClick, have3dViewer
           />
         </LazyLoadComponent>
       );
+    } else {
+      content = (
+        <LazyLoadImage
+          src={extendToken.defaultImagePlaceholder}
+          visibleByDefault={true}
+        />
+      );
     }
 
     return (
-      <LazyLoadImage
-        src={extendToken.defaultImagePlaceholder}
-        visibleByDefault={true}
-      />
+      <div className='nft_gallery_media_wrapper'>
+        {isBundle && <div className='nft_gallery_label'>Bundle</div>}
+        {content}
+      </div>
     );
-  }, [showImage, showVideo, have3dViewer, show3dViewer, extendToken.defaultImagePlaceholder, handleImageError, loadingPlaceholder, getCollectionImage, handleVideoError]);
+  }, [showImage, showVideo, have3dViewer, show3dViewer, extendToken.defaultImagePlaceholder, handleImageError, loadingPlaceholder, getCollectionImage, handleVideoError, isBundle]);
 
   return (
     <NftItem_
@@ -147,6 +153,28 @@ export const NftGalleryWrapper = styled(Component)<Props>(({ theme: { token } }:
 
     '.__image-wrapper': {
       overflow: 'hidden'
+    },
+
+    '.nft_gallery_media_wrapper': {
+      position: 'relative',
+      width: '100%',
+      height: '100%',
+      overflow: 'hidden'
+    },
+
+    '.nft_gallery_label': {
+      position: 'absolute',
+      zIndex: 10,
+      pointerEvents: 'none',
+      padding: '2px 8px',
+      backgroundColor: token.colorSecondaryText,
+      borderRadius: 12,
+      fontSize: token.fontSizeXS,
+      fontWeight: 700,
+      lineHeight: token.lineHeightXS,
+      color: token['green-1'],
+      right: 8,
+      top: 8
     },
 
     '.nft_gallery_wrapper__loading': {
