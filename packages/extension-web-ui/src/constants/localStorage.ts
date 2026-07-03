@@ -32,6 +32,7 @@ export const IS_SHOW_TON_CONTRACT_VERSION_WARNING = 'account.is-show-ton-contrac
 export const CONFIRM_GENERAL_TERM = 'general.term-and-condition';
 export const MISSIONS_POOL_LIVE_ID = 'mission-pool-live-id';
 export const CONFIRM_SWAP_TERM = 'swap.term-and-service';
+export const CONFIRM_EARNING_TERM = 'earning.term-and-service';
 export const CONFIRM_TERM_SEED_PHRASE = 'seed-phrase.term-and-condition';
 
 export const DAPPS_FAVORITE = 'dapps.favorite';
