@@ -8,6 +8,7 @@
     "icon": "https://static-data.subwallet.app/chains/images/icon/polkadot_63b5dd41ef.png",
     "providers": {
       "Dwellir": "wss://polkadot-rpc.dwellir.com",
+      "Gatotech Unlimited": "wss://polkadot.gatotech.network",
       "RadiumBlock": "wss://polkadot.public.curie.radiumblock.co/ws",
       "Stakeworld": "wss://dot-rpc.stakeworld.io",
       "LuckyFriday": "wss://rpc-polkadot.luckyfriday.io",
@@ -46,6 +47,7 @@
     "icon": "https://static-data.subwallet.app/chains/images/icon/kusama_3a65d79366.png",
     "providers": {
       "Dwellir": "wss://kusama-rpc.dwellir.com",
+      "Gatotech Unlimited": "wss://kusama.gatotech.network",
       "RadiumBlock": "wss://kusama.public.curie.radiumblock.co/ws",
       "Dwellir Tunisia": "wss://kusama-rpc-tn.dwellir.com",
       "LuckyFriday": "wss://rpc-kusama.luckyfriday.io",
@@ -359,6 +361,7 @@
     "providers": {
       "Dwellir": "wss://statemint-rpc.dwellir.com",
       "Dwellir Tunisia": "wss://statemint-rpc-tn.dwellir.com",
+      "Gatotech Unlimited": "wss://asset-hub-polkadot.gatotech.network",
       "Lucky Friday": "wss://rpc-asset-hub-polkadot.luckyfriday.io",
       "StakeWorld": "wss://dot-rpc.stakeworld.io/assethub"
     },
