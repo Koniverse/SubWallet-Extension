@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 1.3.80
+Build date: Jun 02, 2026.
+
+- Extension - Re-check transaction failed in case transfer max with balance = ED (#2641)
+- Extension - Show incorrect network address on XCM confirmation screen when perform Swap, Earning (#3936)
+- Re-check logic approve token when perform XCM (#4830)
+- Implement NFTService + Migrate EVM & Unique Network NFT logic (Phase 1) (#4884)
+
+
 ## 1.3.79
 Build date: May 21, 2026.
 
