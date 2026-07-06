@@ -1,13 +1,17 @@
 # CHANGELOG
 
-## 1.3.81
-Build date: Jul 03, 2026.
+## 1.3.82
+Build date: Jul 06, 2026.
 
 Features & Updates:
 - Remove Polygon zkEVM support due to network sunset (#5002)
 
 Bug fixes:
 - Signing popup crashes with "Unable to create Enum via index 9" when SignerPayload.assetId is a V5 cross-consensus Location (#4989)
+
+
+## 1.3.81
+Build date: Jul 03, 2026 => This version was skipped due to a release issue.
 
 
 ## 1.3.80
