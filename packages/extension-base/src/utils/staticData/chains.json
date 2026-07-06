@@ -12,8 +12,6 @@
       "Stakeworld": "wss://dot-rpc.stakeworld.io",
       "LuckyFriday": "wss://rpc-polkadot.luckyfriday.io",
       "Dwellir Tunisia": "wss://polkadot-rpc-tn.dwellir.com",
-      "IBP-GeoDNS1": "wss://rpc.ibp.network/polkadot",
-      "IBP-GeoDNS2": "wss://rpc.dotters.network/polkadot",
       "Light Client": "light://substrate-connect/polkadot",
       "BlockOps": "wss://polkadot-public-rpc.blockops.network/ws"
     },
@@ -52,8 +50,6 @@
       "Dwellir Tunisia": "wss://kusama-rpc-tn.dwellir.com",
       "LuckyFriday": "wss://rpc-kusama.luckyfriday.io",
       "Stakeworld": "wss://ksm-rpc.stakeworld.io",
-      "IBP-GeoDNS1": "wss://rpc.ibp.network/kusama",
-      "IBP-GeoDNS2": "wss://rpc.dotters.network/kusama",
       "Light Client": "light://substrate-connect/kusama"
     },
     "evmInfo": null,
@@ -363,8 +359,6 @@
     "providers": {
       "Dwellir": "wss://statemint-rpc.dwellir.com",
       "Dwellir Tunisia": "wss://statemint-rpc-tn.dwellir.com",
-      "IBP-GeoDNS1": "wss://sys.ibp.network/statemint",
-      "IBP-GeoDNS2": "wss://sys.dotters.network/statemint",
       "Lucky Friday": "wss://rpc-asset-hub-polkadot.luckyfriday.io",
       "StakeWorld": "wss://dot-rpc.stakeworld.io/assethub"
     },
@@ -2266,8 +2260,6 @@
     "providers": {
       "Dwellir": "wss://statemine-rpc.dwellir.com",
       "Dwellir Tunisia": "wss://statemine-rpc-tn.dwellir.com",
-      "IBP-GeoDNS1": "wss://sys.ibp.network/statemine",
-      "IBP-GeoDNS2": "wss://sys.dotters.network/statemine",
       "Lucky Friday": "wss://rpc-asset-hub-kusama.luckyfriday.io",
       "Stake World": "wss://ksm-rpc.stakeworld.io/assethub"
     },
@@ -5818,9 +5810,7 @@
     "icon": "https://static-data.subwallet.app/chains/images/icon/kusama_bridge_hub_e6daccf32b.png",
     "providers": {
       "Parity": "wss://kusama-bridge-hub-rpc.polkadot.io",
-      "Stakeworld": "wss://ksm-rpc.stakeworld.io/bridgehub",
-      "IBP-GeoDNS1": "wss://sys.ibp.network/bridgehub-kusama",
-      "IBP-GeoDNS2": "wss://sys.dotters.network/bridgehub-kusama"
+      "Stakeworld": "wss://ksm-rpc.stakeworld.io/bridgehub"
     },
     "evmInfo": null,
     "substrateInfo": {
