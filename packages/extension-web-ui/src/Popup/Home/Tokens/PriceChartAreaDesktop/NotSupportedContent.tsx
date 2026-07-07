@@ -38,11 +38,11 @@ const Component: React.FC<Props> = (props: Props) => {
         </div>
 
         <div className='__price-data-unavailable-block-title'>
-          {t('No chart data available')}
+          {t('ui.NOT_SUPPORTED_CONTENT.Popup.Home.Tokens.PriceChartAreaDesktop.NotSupportedContent.noChartDataAvailable')}
         </div>
 
         <div className='__price-data-unavailable-block-description'>
-          {t('This token is not listed or does not have market data on Coingecko at the moment')}
+          {t('ui.NOT_SUPPORTED_CONTENT.Popup.Home.Tokens.PriceChartAreaDesktop.NotSupportedContent.thisTokenIsNotListedOrDoesNotHaveMarketDataOnCoingeckoAtTheMoment')}
         </div>
       </div>
     </div>

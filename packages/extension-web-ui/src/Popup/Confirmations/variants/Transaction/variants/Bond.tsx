@@ -44,20 +44,20 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <MetaInfo.AccountGroup
           accounts={data.selectedValidators}
-          content={t(`{{number}} selected ${pluralizedValidators}`, { replace: { number: data.selectedValidators.length } })}
-          label={t(data.type === StakingType.POOLED ? 'Pool' : handleValidatorLabel)}
+          content={t('ui.TRANSACTION.Confirmations.Bond.numberSelectedValidator', { replace: { number: data.selectedValidators.length, validatorLabel: pluralizedValidators } })}
+          label={data.type === StakingType.POOLED ? t('ui.TRANSACTION.screen.Transaction.Earn.pool') : t(handleValidatorLabel)}
         />
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Amount')}
+          label={t('ui.TRANSACTION.Confirmations.Process.Earn.Bond.amount')}
           suffix={symbol}
           value={data.amount}
         />
 
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Estimated fee')}
+          label={t('ui.TRANSACTION.Confirmations.Process.Earn.Bond.estimatedFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />
@@ -65,18 +65,16 @@ const Component: React.FC<Props> = (props: Props) => {
 
       {/* <AlertBox */}
       {/*  className={'description'} */}
-      {/*  description={t('Once staked, your funds will be locked and become non-transferable. ' + */}
-      {/*    'To unlock your funds, you need to unstake manually, wait for the unstaking period to' + */}
-      {/*    ' end and then withdraw manually.')} */}
-      {/*  title={t('Your staked funds will be locked')} */}
+      {/*  description={t('ui.JOIN_POOL.Popup.Confirmations.variants.Transaction.variants.JoinPool.onceStakedYourFundsWillBeLockedAndBecomeNonTransferableToUnlockYourFundsYouNeedToUnstakeManuallyWaitForTheUnstakingPeriodToEndAndThenWithdrawManually')} */}
+      {/*  title={t('ui.JOIN_POOL.Popup.Confirmations.variants.Transaction.variants.JoinPool.yourStakedFundsWillBeLocked')} */}
       {/*  type='warning' */}
       {/* /> */}
 
       {!!stakingFee && (
         <AlertBox
           className={CN(className, 'alert-box')}
-          description={t('A staking fee of {{fee}} TAO will be deducted from your stake once the transaction is complete', { replace: { fee: stakingFee } })}
-          title={t('TAO staking fee')}
+          description={t('ui.TRANSACTION.Confirmations.Bond.taoStakingFeeDeductedInfo', { replace: { fee: stakingFee } })}
+          title={t('ui.TRANSACTION.Confirmations.Bond.taoStakingFee')}
           type='info'
         />
       )}

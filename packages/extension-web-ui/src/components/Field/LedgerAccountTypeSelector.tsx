@@ -116,8 +116,8 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         <Field
           className={CN('is-selectable')}
           content={fieldContent}
-          label={t('Select account type')}
-          placeholder={t('Select account type')}
+          label={t('ui.components.Field.LedgerAccountTypeSelector.selectAccountType')}
+          placeholder={t('ui.components.Field.LedgerAccountTypeSelector.selectAccountType')}
           suffix={fieldSuffix}
         />
       </div>
@@ -126,15 +126,15 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         closable={true}
         id={id}
         onCancel={onCancelModal}
-        title={t('Select account type')}
+        title={t('ui.components.Field.LedgerAccountTypeSelector.selectAccountType')}
       >
         <div className={'modal-description'}>
-          {t('Choose the account type you’d like to use with Polkadot app. For more information regarding these account types, ')}
+          {t('ui.components.Field.LedgerAccountTypeSelector.chooseTheAccountTypeYouLike')}
           <a
             href={CONNECT_LEDGER_USER_GUIDE_URL}
             target='__blank'
           >
-            {t('click here')}
+            {t('ui.components.Field.LedgerAccountTypeSelector.clickHere')}
           </a>
         </div>
 

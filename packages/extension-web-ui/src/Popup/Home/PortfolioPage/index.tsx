@@ -81,7 +81,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   const notify = useNotification();
 
   const TAB_LIST = useMemo(() => {
-    return [t('Tokens'), t('NFTs'), t('Inscriptions'), t('Statistics')];
+    return [t('ui.BALANCE.components.Modal.Customize.Modal.tokens'), t('ui.NFT.screen.NftsCollections.Tab.nfts'), t('ui.PORTFOLIO_PAGE.Popup.Home.PortfolioPage.inscriptions'), t('ui.PORTFOLIO_PAGE.Popup.Home.PortfolioPage.statistics')];
   }, [t]);
 
   const handleSelectTab = useCallback((index: number) => {
@@ -104,7 +104,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       direction: 'vertical',
       duration: 1.8,
       closable: false,
-      message: t('Reloading')
+      message: t('ui.ACCOUNT.components.Account.EmptyValidator.reloading')
     });
 
     reloadCron({ data: 'nft' })

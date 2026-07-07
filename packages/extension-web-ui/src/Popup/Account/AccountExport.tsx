@@ -108,10 +108,10 @@ const Component: React.FC<Props> = (props: Props) => {
   const { isWebUI } = useContext(ScreenContext);
 
   const titleMap = useMemo((): Record<ExportType, string> => ({
-    [ExportType.JSON_FILE]: t('Successful'),
-    [ExportType.QR_CODE]: t('Your QR code'),
-    [ExportType.PRIVATE_KEY]: t('Your private key'),
-    [ExportType.SEED_PHRASE]: t('Your seed phrase')
+    [ExportType.JSON_FILE]: t('ui.ACCOUNT.screen.Account.Export.successful'),
+    [ExportType.QR_CODE]: t('ui.ACCOUNT.screen.Account.Export.yourQrCode'),
+    [ExportType.PRIVATE_KEY]: t('ui.ACCOUNT.screen.Account.Export.yourPrivateKey'),
+    [ExportType.SEED_PHRASE]: t('ui.ACCOUNT.screen.Account.Export.yourSeedPhrase')
   }), [t]);
 
   const qrData = useMemo((): string => {
@@ -225,7 +225,7 @@ const Component: React.FC<Props> = (props: Props) => {
           let message = e.message;
 
           if (message === 'Unable to decode using the supplied passphrase') {
-            message = t('Wrong password');
+            message = t('ui.ACCOUNT.screen.Account.Export.wrongPassword');
           }
 
           form.setFields([{ name: FormFieldName.PASSWORD, errors: [message] }]);
@@ -259,14 +259,14 @@ const Component: React.FC<Props> = (props: Props) => {
         disable: !accountProxy || !accountProxy.accountActions.includes(AccountActions.EXPORT_MNEMONIC),
         hidden: false,
         icon: Leaf,
-        label: t('Export seed phrase'),
+        label: t('ui.ACCOUNT.screen.Account.Export.exportSeedPhrase'),
         type: ExportType.SEED_PHRASE
       },
       {
         disable: !accountProxy || !accountProxy.accountActions.includes(AccountActions.EXPORT_JSON),
         hidden: false,
         icon: FileJs,
-        label: t('Export JSON file'),
+        label: t('ui.ACCOUNT.screen.Account.Export.exportJsonFile'),
         type: ExportType.JSON_FILE
       },
       {
@@ -274,14 +274,14 @@ const Component: React.FC<Props> = (props: Props) => {
         disable: !accountProxy || !accountProxy.accountActions.includes(AccountActions.EXPORT_PRIVATE_KEY),
         hidden: false,
         icon: Wallet,
-        label: t('Export private key'),
+        label: t('ui.ACCOUNT.screen.Account.Export.exportPrivateKey'),
         type: ExportType.PRIVATE_KEY
       },
       {
         disable: !accountProxy || !accountProxy.accountActions.includes(AccountActions.EXPORT_QR),
         hidden: false,
         icon: QrCode,
-        label: t('Export QR Code'),
+        label: t('ui.ACCOUNT.screen.Account.Export.exportQrCode'),
         type: ExportType.QR_CODE
       }
     ];
@@ -326,7 +326,7 @@ const Component: React.FC<Props> = (props: Props) => {
         disableBack={loading}
         onBack={isModalMode ? onCancel : onBack}
         rightFooterButton={{
-          children: firstStep ? t('Confirm') : t('Finish'),
+          children: firstStep ? t('ui.ACCOUNT.screen.Account.Export.confirm') : t('ui.ACCOUNT.screen.Account.Export.finish'),
           icon: firstStep ? undefined : FinishIcon,
           disabled: isDisabled || !exportTypes.length,
           loading: loading,
@@ -348,17 +348,17 @@ const Component: React.FC<Props> = (props: Props) => {
           : undefined}
         title={
           firstStep
-            ? t('Export account')
+            ? t('ui.ACCOUNT.screen.Account.Export.exportAccount')
             : !exportSingle
-              ? t('Export successful')
+              ? t('ui.ACCOUNT.screen.Account.Export.exportSuccessful')
               : titleMap[exportTypes[0]]
         }
       >
         <div className='body-container'>
           <div className={CN('notice', { 'mb-large': !firstStep })}>
             <AlertBox
-              description={t('Anyone with your key can use any assets held in your account.')}
-              title={t('Warning: Never disclose this key')}
+              description={t('ui.ACCOUNT.screen.Account.Export.privateKeyWarning')}
+              title={t('ui.ACCOUNT.screen.Account.Export.warningNeverDiscloseKey')}
               type='warning'
             />
           </div>
@@ -378,7 +378,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   name={FormFieldName.PASSWORD}
                   rules={[
                     {
-                      message: t('Password is required'),
+                      message: t('ui.ACCOUNT.screen.Account.Export.passwordIsRequired'),
                       required: true
                     }
                   ]}
@@ -386,7 +386,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 >
                   <Input.Password
                     disabled={loading}
-                    placeholder={t('Type your SubWallet password')}
+                    placeholder={t('ui.ACCOUNT.screen.Account.Export.typeYourSubWalletPassword')}
                     suffix={<span />}
                     type='password'
                   />
@@ -467,7 +467,7 @@ const Component: React.FC<Props> = (props: Props) => {
                         onClick={onCopyPrivateKey}
                         type='ghost'
                       >
-                        {t('Copy to clipboard')}
+                        {t('ui.ACCOUNT.screen.Account.Export.copyToClipboard')}
                       </Button>
                     </div>
                   )
@@ -502,7 +502,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 {
                   exportTypes.includes(ExportType.JSON_FILE) && jsonData && (
                     <div className='result-content'>
-                      <div className='result-title'>{t('Your json file')}</div>
+                      <div className='result-title'>{t('ui.ACCOUNT.screen.Account.Export.yourJsonFile')}</div>
                       {
                         exportSingle && (
                           <>
@@ -516,10 +516,10 @@ const Component: React.FC<Props> = (props: Props) => {
                               />
                             </div>
                             <div className='json-done-tile'>
-                              {t('Success!')}
+                              {t('ui.ACCOUNT.screen.Account.Export.success')}
                             </div>
                             <div className='json-done-description'>
-                              {t('You have successfully exported JSON file for this account')}
+                              {t('ui.ACCOUNT.screen.Account.Export.successfullyExportedJson')}
                             </div>
                           </>
                         )

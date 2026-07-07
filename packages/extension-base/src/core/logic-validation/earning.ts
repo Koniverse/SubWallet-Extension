@@ -18,7 +18,7 @@ export function _handleDisplayForEarningError (error: TransactionError) {
   return undefined;
 }
 
-export const INSUFFICIENT_MESSAGES = ['残高不足', 'Недостаточный баланс', 'Insufficient balance'];
+export const INSUFFICIENT_MESSAGES = ['残高不足', 'Недостаточный баланс', 'bg.koni.handler.Extension.insufficientBalance'];
 
 export function _handleDisplayInsufficientEarningError (error: Error, isXCM: boolean, availableBalance: string, amount: string, minJoinPool: string) {
   if (isXCM || !INSUFFICIENT_MESSAGES.some((v) => error.message.includes(v))) {
@@ -30,20 +30,20 @@ export function _handleDisplayInsufficientEarningError (error: Error, isXCM: boo
 
   if (bnAvailableBalance.gt(0) && bnAmount.gte(bnAvailableBalance)) {
     return {
-      title: 'Insufficient balance',
+      title: 'bg.koni.handler.Extension.insufficientBalance',
       message: 'Insufficient balance. Amount must be smaller than available balance'
     };
   }
 
   if (bnAvailableBalance.lte(minJoinPool)) {
     return {
-      title: 'Insufficient balance',
+      title: 'bg.koni.handler.Extension.insufficientBalance',
       message: 'You don\'t have enough {{symbol}} ({{chain}}) to stake, make sure your available balance is higher than {{minJoinPool}} {{symbol}}'
     };
   }
 
   return {
-    title: 'Insufficient balance',
+    title: 'bg.koni.handler.Extension.insufficientBalance',
     message: 'You don\'t have enough {{symbol}} ({{chain}}) to pay gas fee. Lower your amount and try again'
   };
 }

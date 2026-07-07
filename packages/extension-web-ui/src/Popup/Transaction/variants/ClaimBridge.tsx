@@ -158,7 +158,7 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('Available balance')}
+            label={t('ui.TRANSACTION.screen.Transaction.ClaimBridge.availableBalance')}
             onBalanceReady={setIsBalanceReady}
           />
           <Form.Item>
@@ -168,13 +168,13 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
             >
               <MetaInfo.Chain
                 chain={chainValue}
-                label={t('Network')}
+                label={t('ui.TRANSACTION.screen.Transaction.ClaimBridge.network')}
               />
               {
                 metadata && (
                   <MetaInfo.Number
                     decimals={decimals}
-                    label={t('Amount')}
+                    label={t('ui.TRANSACTION.screen.Transaction.ClaimBridge.amount')}
                     suffix={symbol}
                     value={ amountValue }
                   />
@@ -198,7 +198,7 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
               onClick={goHome}
               schema={'secondary'}
             >
-              {t('Cancel')}
+              {t('ui.TRANSACTION.screen.Transaction.ClaimBridge.cancel')}
             </Button>
           )
         }
@@ -214,7 +214,7 @@ const Component: React.FC<ComponentProps> = (props: ComponentProps) => {
           loading={loading}
           onClick={checkAction(form.submit, ExtrinsicType.CLAIM_BRIDGE)}
         >
-          {t('Continue')}
+          {t('ui.TRANSACTION.screen.Transaction.ClaimBridge.continue')}
         </Button>
       </TransactionFooter>
     </>

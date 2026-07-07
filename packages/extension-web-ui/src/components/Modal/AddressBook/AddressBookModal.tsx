@@ -75,15 +75,15 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const filterOptions: FilterOption[] = useMemo(() => ([
     {
-      label: t('Your wallet'),
+      label: t('ui.components.Modal.AddressBook.Selector.yourWallet'),
       value: AnalyzedGroup.WALLET
     },
     {
-      label: t('Saved contacts'),
+      label: t('ui.components.Modal.AddressBook.Selector.savedContacts'),
       value: AnalyzedGroup.CONTACT
     },
     {
-      label: t('Recent'),
+      label: t('ui.components.Modal.AddressBook.Selector.recent'),
       value: AnalyzedGroup.RECENT
     }
   ]), [t]);
@@ -209,13 +209,13 @@ const Component: React.FC<Props> = (props: Props) => {
 
     switch (_group) {
       case AnalyzedGroup.WALLET:
-        groupLabel = t('Your wallet');
+        groupLabel = t('ui.components.Modal.AddressBook.Selector.yourWallet');
         break;
       case AnalyzedGroup.CONTACT:
-        groupLabel = t('Saved contacts');
+        groupLabel = t('ui.components.Modal.AddressBook.Selector.savedContacts');
         break;
       case AnalyzedGroup.RECENT:
-        groupLabel = t('Recent');
+        groupLabel = t('ui.components.Modal.AddressBook.Selector.recent');
         break;
     }
 
@@ -256,7 +256,7 @@ const Component: React.FC<Props> = (props: Props) => {
         fullSizeOnMobile
         id={id}
         onCancel={onClose}
-        title={t('Address book')}
+        title={t('ui.components.Modal.AddressBook.Selector.addressBook')}
       >
         <SwList.Section
           actionBtnIcon={(
@@ -282,7 +282,7 @@ const Component: React.FC<Props> = (props: Props) => {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Account name')}
+          searchPlaceholder={t<string>('ui.components.Modal.AddressBook.Selector.accountName')}
           showActionBtn={true}
         />
       </BaseModal>
@@ -294,7 +294,7 @@ const Component: React.FC<Props> = (props: Props) => {
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
-        title={t('Filter address')}
+        title={t('ui.components.Modal.AddressBook.Selector.filterAddress')}
       />
     </>
   );

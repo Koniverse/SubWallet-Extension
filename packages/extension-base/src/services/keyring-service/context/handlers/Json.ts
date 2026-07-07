@@ -89,7 +89,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         throw new Error((e as Error).message);
       }
     } else {
-      throw new Error(t('Incorrect password'));
+      throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.incorrectPassword'));
     }
   }
 
@@ -102,7 +102,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         const _pair = keyring.createFromJson(file);
         const exists = this.state.checkAddressExists([_pair.address]);
 
-        assert(!exists, t('Account already exists under the name {{name}}', { replace: { name: exists?.name || exists?.address || _pair.address } }));
+        assert(!exists, t('bg.ACCOUNT.types.error.account.common.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || _pair.address } }));
 
         const _name = _pair.meta.name as string || '';
 
@@ -127,7 +127,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         reject(error);
       }
     } else {
-      reject(new Error(t('Incorrect password')));
+      reject(new Error(t('bg.ACCOUNT.services.keyring.handler.Json.incorrectPassword')));
     }
 
     return promise;
@@ -161,7 +161,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         }, []);
 
         if (!pairs?.length) {
-          throw new Error(t('No valid accounts found to import'));
+          throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.noValidAccountsToImport'));
         }
 
         const accountProxyMap = combineAccountsWithKeyPair(pairs, modifyPairs, accountProxies);
@@ -191,7 +191,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         throw new Error((e as Error).message);
       }
     } else {
-      throw new Error(t('Incorrect password'));
+      throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.incorrectPassword'));
     }
   }
 
@@ -220,7 +220,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         }, []);
 
         if (!pairs?.length) {
-          throw new Error(t('No valid accounts found to import'));
+          throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.noValidAccountsToImport'));
         }
 
         const accountProxyMap = combineAccountsWithKeyPair(pairs, modifyPairs, accountProxies);
@@ -254,9 +254,9 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
         if (!addresses.length) {
           if (_exists) {
-            throw new Error(t('Account already exists under the name {{name}}', { replace: { name: _exists.name || _exists.address || '' } }));
+            throw new Error(t('bg.ACCOUNT.types.error.account.common.accountAlreadyExistsWithName', { replace: { name: _exists.name || _exists.address || '' } }));
           } else {
-            throw new Error(t('No accounts found to import'));
+            throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.noAccountsFoundToImport'));
           }
         }
 
@@ -332,7 +332,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         throw new Error((error as Error).message);
       }
     } else {
-      reject(new Error(t('Incorrect password')));
+      reject(new Error(t('bg.ACCOUNT.services.keyring.handler.Json.incorrectPassword')));
     }
 
     return promise;
@@ -343,7 +343,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
     try {
       if (proxyIds && !proxyIds.length) {
-        throw new Error(t('No accounts found to export'));
+        throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.noAccountsFoundToExport'));
       }
 
       const _accountProxy = this.state.value.accountProxy;
@@ -366,8 +366,8 @@ export class AccountJsonHandler extends AccountBaseHandler {
     } catch (e) {
       const error = e as Error;
 
-      if (error.message === 'Invalid master password') {
-        throw new Error(t('Incorrect password'));
+      if (error.message === 'bg.SETTING.services.service.setting.i18nExtend.invalidMasterPassword') {
+        throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.incorrectPassword'));
       } else {
         throw error;
       }

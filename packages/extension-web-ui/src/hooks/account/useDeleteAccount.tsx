@@ -16,11 +16,11 @@ const useDeleteAccount = () => {
   const modalProps: SwModalFuncProps = useMemo(() => {
     return {
       closable: true,
-      content: isWebUI ? t('If you ever want to use this account again, you would need to import it again with seedphrase, private key, or JSON file') : t('You will no longer be able to access this account via this extension'),
+      content: isWebUI ? t('ui.ACCOUNT.hook.account.useDeleteAccount.ifYouEverWantToUseThisAccountAgainYouWouldNeedToImportItAgainWithSeedphrasePrivateKeyOrJsonFile') : t('ui.ACCOUNT.hook.account.useDeleteAccount.removeAccountAccessWarning'),
       id: modalId,
-      okText: isWebUI ? t('Delete') : t('Remove'),
-      subTitle: isWebUI ? t('Delete this account') : t('Remove this account?'),
-      title: isWebUI ? t('Remove account') : t('Confirmation'),
+      okText: isWebUI ? t('ui.ACCOUNT.hook.account.useDeleteAccount.delete') : t('ui.ACCOUNT.hook.account.useDeleteAccount.remove'),
+      subTitle: isWebUI ? t('ui.ACCOUNT.hook.account.useDeleteAccount.deleteThisAccount') : t('ui.ACCOUNT.hook.account.useDeleteAccount.removeThisAccount'),
+      title: isWebUI ? t('ui.ACCOUNT.hook.account.useDeleteAccount.removeAccount') : t('ui.ACCOUNT.hook.account.useDeleteAccount.confirmation'),
       type: 'error'
     };
   }, [isWebUI, t]);

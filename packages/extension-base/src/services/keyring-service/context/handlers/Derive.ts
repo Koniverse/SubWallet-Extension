@@ -367,7 +367,7 @@ export class AccountDeriveHandler extends AccountBaseHandler {
     const exists = this.state.checkAddressExists(addresses);
 
     if (!isMigration) {
-      assert(!exists, t('Account already exists under the name "{{name}}"', { replace: { name: exists?.name || exists?.address || '' } }));
+      assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Derive.accountExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
     }
 
     childAccountProxy && this.state.upsertAccountProxyByKey(childAccountProxy);

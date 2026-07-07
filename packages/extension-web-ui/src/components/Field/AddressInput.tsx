@@ -225,11 +225,11 @@ function Component (props: Props, ref: ForwardedRef<InputRef>): React.ReactEleme
         })}
         disabled={disabled}
         id={id}
-        label={showLabel ? (label || t('Account address')) : undefined}
+        label={showLabel ? (label || t('ui.components.Field.AddressInput.accountAddress')) : undefined}
         onBlur={onBlur}
         onChange={_onChange}
         onFocus={onFocus}
-        placeholder={placeholder || t('Please type or paste an address')}
+        placeholder={placeholder || t('ui.components.Field.AddressInput.typeOrPasteAddress')}
         prefix={
           <>
             {

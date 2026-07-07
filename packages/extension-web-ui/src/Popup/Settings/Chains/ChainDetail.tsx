@@ -40,13 +40,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const showNotification = useNotification();
   const [form] = Form.useForm<ChainDetailForm>();
   const { handleSimpleConfirmModal } = useConfirmModal({
-    title: t<string>('Delete network'),
+    title: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.deleteNetwork'),
     maskClosable: true,
     closable: true,
     type: 'error',
-    subTitle: t<string>('You are about to delete this network'),
-    content: t<string>('Confirm delete this network'),
-    okText: t<string>('Remove')
+    subTitle: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.aboutToDeleteNetwork'),
+    content: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.confirmDeleteNetwork'),
+    okText: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.remove')
   });
 
   const [isChanged, setIsChanged] = useState(false);
@@ -97,18 +97,18 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             if (result) {
               navigate(-1);
               showNotification({
-                message: t('Deleted network successfully')
+                message: t('ui.SETTINGS.screen.Setting.Chains.Detail.deletedNetworkSuccessfully')
               });
             } else {
               showNotification({
-                message: t('Error. Please try again')
+                message: t('ui.SETTINGS.screen.Setting.Chains.Detail.errorPleaseTryAgain')
               });
               setIsDeleting(false);
             }
           })
           .catch(() => {
             showNotification({
-              message: t('Error. Please try again')
+              message: t('ui.SETTINGS.screen.Setting.Chains.Detail.errorPleaseTryAgain')
             });
             setIsDeleting(false);
           });
@@ -167,7 +167,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         type='phosphor'
         weight={'light'}
       />,
-      tooltip: isWebUI ? t('Delete network') : undefined,
+      tooltip: isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.deleteNetwork') : undefined,
       onClick: handleDeleteCustomChain,
       disabled: !(_isCustomChain(chainInfo.slug) && !chainState.active)
     }
@@ -205,19 +205,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
         if (result) {
           showNotification({
-            message: t('Updated network successfully')
+            message: t('ui.SETTINGS.screen.Setting.Chains.Detail.updatedNetworkSuccessfully')
           });
           navigate(-1);
         } else {
           showNotification({
-            message: t('An error occurred, please try again')
+            message: t('ui.SETTINGS.screen.Setting.Chains.Detail.anErrorOccurredPleaseTryAgain')
           });
         }
       })
       .catch(() => {
         setLoading(false);
         showNotification({
-          message: t('An error occurred, please try again')
+          message: t('ui.SETTINGS.screen.Setting.Chains.Detail.anErrorOccurredPleaseTryAgain')
         });
       });
   }, [chainInfo.providers, chainInfo.slug, form, navigate, showNotification, t]);
@@ -257,7 +257,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (value.length === 0 || isUrl(value)) {
         resolve();
       } else {
-        reject(new Error(t('Crowdloan URL must be a valid URL')));
+        reject(new Error(t('ui.SETTINGS.screen.Setting.Chains.ChainImport.crowdloanUrlMustBeValid')));
       }
     });
   }, [t]);
@@ -267,7 +267,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (value.length === 0 || isUrl(value)) {
         resolve();
       } else {
-        reject(new Error(t('Block explorer must be a valid URL')));
+        reject(new Error(t('ui.SETTINGS.screen.Setting.Chains.ChainImport.blockExplorerMustBeValid')));
       }
     });
   }, [t]);
@@ -318,7 +318,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           ),
           loading: loading,
           onClick: onSubmit,
-          children: t('Save')
+          children: t('ui.SETTINGS.screen.Setting.Chains.Detail.save')
         }}
         showBackButton={true}
         showSubHeader={true}
@@ -326,7 +326,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Network detail')}
+        title={t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.networkDetail')}
       >
         <div className={'chain_detail__container'}>
           <Form
@@ -350,7 +350,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   : <Field
                     className={'chain_detail__provider_url'}
                     content={currentProviderUrl}
-                    placeholder={t('Provider URL')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.providerUrl')}
                     prefix={<Icon
                       customSize={'24px'}
                       iconColor={token['gray-4']}
@@ -366,7 +366,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col span={16}>
                   <Field
                     content={chainInfo.name}
-                    placeholder={t('Network name')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.networkName')}
                     prefix={<Icon
                       customSize={'24px'}
                       iconColor={token['gray-4']}
@@ -374,15 +374,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                       type={'phosphor'}
                       weight={'bold'}
                     />}
-                    tooltip={isWebUI ? t('Network name') : undefined}
+                    tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.networkName') : undefined}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
                 <Col span={8}>
                   <Field
                     content={symbol}
-                    placeholder={t('Symbol')}
-                    tooltip={isWebUI ? t('Symbol') : undefined}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.symbol')}
+                    tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.symbol') : undefined}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
@@ -392,8 +392,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col>
                   <Field
                     content={decimals}
-                    placeholder={t('Decimals')}
-                    tooltip={isWebUI ? t('Decimals') : undefined}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.decimals')}
+                    tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.decimals') : undefined}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
@@ -403,8 +403,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <Col>
                       <Field
                         content={paraId > -1 ? paraId : undefined}
-                        placeholder={t('ParaId')}
-                        tooltip={isWebUI ? t('ParaId') : undefined}
+                        placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.paraId')}
+                        tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.paraId') : undefined}
                         tooltipPlacement={'topLeft'}
                       />
                     </Col>
@@ -416,8 +416,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <Col>
                       <Field
                         content={chainId > -1 ? chainId : 'None'}
-                        placeholder={t('Chain ID')}
-                        tooltip={isWebUI ? t('Chain ID') : undefined}
+                        placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.chainId')}
+                        tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.chainId') : undefined}
                         tooltipPlacement={'topLeft'}
                       />
                     </Col>
@@ -429,8 +429,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <Col>
                       <Field
                         content={addressPrefix.toString()}
-                        placeholder={t('Address prefix')}
-                        tooltip={isWebUI ? t('Address prefix') : undefined}
+                        placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.addressPrefix')}
+                        tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.addressPrefix') : undefined}
                         tooltipPlacement={'topLeft'}
                       />
                     </Col>
@@ -440,8 +440,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col>
                   <Field
                     content={chainTypeString()}
-                    placeholder={t('Network type')}
-                    tooltip={isWebUI ? t('Network type') : undefined}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.networkType')}
+                    tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.Detail.networkType') : undefined}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
@@ -453,8 +453,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 statusHelpAsTooltip={isWebUI}
               >
                 <Input
-                  placeholder={t('Block explorer')}
-                  tooltip={isWebUI ? t('Block explorer') : undefined}
+                  placeholder={t('ui.SETTINGS.screen.Setting.Chains.ChainImport.blockExplorer')}
+                  tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.ChainImport.blockExplorer') : undefined}
                   tooltipPlacement={'topLeft'}
                 />
               </Form.Item>
@@ -466,8 +466,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   statusHelpAsTooltip={isWebUI}
                 >
                   <Input
-                    placeholder={t('Crowdloan URL')}
-                    tooltip={isWebUI ? t('Crowdloan URL') : undefined}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.ChainImport.crowdloanUrl')}
+                    tooltip={isWebUI ? t('ui.SETTINGS.screen.Setting.Chains.ChainImport.crowdloanUrl') : undefined}
                     tooltipPlacement={'topLeft'}
                   />
                 </Form.Item>

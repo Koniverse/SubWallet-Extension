@@ -105,8 +105,8 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
   }, [data]);
 
   const filterOptions = useMemo(() => [
-    { label: t('Mainnet'), value: NetworkType.MAIN_NETWORK },
-    { label: t('Testnet'), value: NetworkType.TEST_NETWORK }
+    { label: t('ui.EARNING.screen.EarningOptions.mainnet'), value: NetworkType.MAIN_NETWORK },
+    { label: t('ui.EARNING.screen.EarningOptions.testnet'), value: NetworkType.TEST_NETWORK }
   ], [t]);
 
   const filterFunction = useMemo<(item: YieldGroupInfo) => boolean>(() => {
@@ -186,15 +186,15 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
 
       if (isRelatedToAstar(item.group)) {
         openAlert({
-          title: t('Enter Astar portal'),
-          content: t('You are navigating to Astar portal to view and manage your stake in Astar dApp staking v3. SubWallet will offer support for Astar dApp staking v3 soon.'),
+          title: t('ui.EARNING.screen.EarningOptions.enterAstarPortal'),
+          content: t('ui.EARNING_OPTIONS.Popup.Home.Earning.EarningEntry.EarningOptions.youAreNavigatingToAstarPortalToViewAndManageYourStakeInAstarDappStakingV3SubwalletWillOfferSupportForAstarDappStakingV3Soon'),
           cancelButton: {
-            text: t('Cancel'),
+            text: t('ui.EARNING.screen.EarningOptions.cancel'),
             schema: 'secondary',
             onClick: closeAlert
           },
           okButton: {
-            text: t('Enter Astar portal'),
+            text: t('ui.EARNING.screen.EarningOptions.enterAstarPortal'),
             onClick: () => {
               openInNewTab(ASTAR_PORTAL_URL)();
               closeAlert();
@@ -348,8 +348,8 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
     return (
       <EmptyList
         className={'__empty-list-earning-options'}
-        emptyMessage={t('No earning option found')}
-        emptyTitle={t('Change your search and try again')}
+        emptyMessage={t('ui.EARNING.screen.EarningOptions.noEarningOptionFound')}
+        emptyTitle={t('ui.EARNING.screen.EarningOptions.changeYourSearchAndTryAgain')}
         phosphorIcon={Vault}
       />
     );
@@ -392,7 +392,7 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
         subHeaderBackground={'transparent'}
         subHeaderCenter={false}
         subHeaderPaddingVertical={true}
-        title={t<string>('Earning options')}
+        title={t<string>('ui.EARNING.screen.EarningOptions.earningOptions')}
       >
         {
           isWebUI
@@ -407,7 +407,7 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
                 </div>
                 <Toolbar
                   className={'__desktop-toolbar'}
-                  inputPlaceholder={t<string>('Search token')}
+                  inputPlaceholder={t<string>('ui.EARNING.screen.EarningOptions.searchToken')}
                   onClickFilter={onClickFilterButton}
                   onSearch={setSearchInput}
                   searchValue={searchInput}
@@ -439,21 +439,21 @@ function Component ({ className, earningPositions, setEntryView }: Props) {
                 renderWhenEmpty={emptyList}
                 searchFunction={searchFunction}
                 searchMinCharactersCount={1}
-                searchPlaceholder={t<string>('Search token')}
+                searchPlaceholder={t<string>('ui.EARNING.screen.EarningOptions.searchToken')}
                 showActionBtn
               />
             )
         }
 
         <FilterModal
-          applyFilterButtonTitle={t('Apply filter')}
+          applyFilterButtonTitle={t('ui.EARNING.screen.EarningOptions.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('Filter')}
+          title={t('ui.EARNING.screen.EarningOptions.filter')}
         />
       </Layout.Base>
 

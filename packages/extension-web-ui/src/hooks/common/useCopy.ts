@@ -13,7 +13,7 @@ const useCopy = (value: string): () => void => {
   return useCallback(() => {
     copyToClipboard(value);
     notify({
-      message: t('Copied to clipboard')
+      message: t('ui.hook.common.useCopy.copiedToClipboard')
     });
   }, [value, notify, t]);
 };

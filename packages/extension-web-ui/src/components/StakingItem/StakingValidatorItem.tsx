@@ -74,14 +74,14 @@ const Component: React.FC<Props> = (props: Props) => {
 
             <div className={'middle-item__info'}>
               <span className={'middle-item__commission'}>
-                {t('Commission')}: {validatorInfo.isMissingInfo ? 'N/A' : `${validatorInfo.commission}%`}
+                {t('ui.EARNING.components.StakingItem.Validator.commission')}: {validatorInfo.isMissingInfo ? 'N/A' : `${validatorInfo.commission}%`}
               </span>
               {
                 apy !== '0' && (
                   <>
                     <span>-</span>
                     <span className={'middle-item__apy'}>
-                      {t('APY')}: {formatBalance(apy, 0)}%
+                      {t('ui.EARNING.components.StakingItem.Validator.apy')}: {formatBalance(apy, 0)}%
                     </span>
                   </>
                 )

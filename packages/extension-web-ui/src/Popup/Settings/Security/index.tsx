@@ -75,17 +75,17 @@ const Component: React.FC<Props> = (props: Props) => {
     if (value > 0) {
       return {
         value: value,
-        label: t('{{time}} minutes', { replace: { time: value } })
+        label: t('ui.SETTINGS.screen.Setting.Security.timeMinutes', { replace: { time: value } })
       };
     } else if (value < 0) {
       return {
         value: value,
-        label: t('Required once')
+        label: t('ui.SETTINGS.screen.Setting.Security.requiredOnce')
       };
     } else {
       return {
         value: value,
-        label: t('Always require')
+        label: t('ui.SETTINGS.screen.Setting.Security.alwaysRequire')
       };
     }
   }), [t]);
@@ -94,21 +94,21 @@ const Component: React.FC<Props> = (props: Props) => {
     {
       icon: Key,
       key: SecurityType.WALLET_PASSWORD,
-      title: t('Change wallet password'),
+      title: t('ui.SETTINGS.screen.Setting.Security.changeWalletPassword'),
       url: '/keyring/change-password',
       disabled: noAccount
     },
     {
       icon: LockLaminated,
       key: SecurityType.AUTO_LOCK,
-      title: t('Wallet auto-lock'),
+      title: t('ui.SECURITY.Popup.Settings.Security.walletAutoLock'),
       url: '',
       disabled: false
     },
     {
       icon: LockKeyOpen,
       key: SecurityType.UNLOCK_TYPE,
-      title: t('Authenticate with password'),
+      title: t('ui.SETTINGS.screen.Setting.Security.authenticateWithPassword'),
       url: '',
       disabled: false
     }
@@ -117,7 +117,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const websiteAccessItem = useMemo((): SecurityItem => ({
     icon: GlobeHemisphereEast,
     key: SecurityType.WEBSITE_ACCESS,
-    title: t('Manage website access'),
+    title: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.manageWebsiteAccess'),
     url: '/settings/dapp-access',
     disabled: noAccount
   }), [noAccount, t]);
@@ -296,7 +296,7 @@ const Component: React.FC<Props> = (props: Props) => {
     <PageWrapper className={CN(className)}>
       <Layout.WithSubHeaderOnly
         onBack={onBack}
-        title={t('Security settings')}
+        title={t('ui.SETTINGS.screen.Setting.Security.securitySettings')}
       >
         <div className='body-container'>
           <div className='items-container'>
@@ -304,7 +304,7 @@ const Component: React.FC<Props> = (props: Props) => {
           </div>
           <div className='setting-config-container hidden'>
             <div className='label'>
-              {t('Website access')}
+              {t('ui.SETTINGS.screen.Setting.Root.websiteAccess')}
             </div>
             <div className='items-container'>
               {onRenderItem(websiteAccessItem)}
@@ -319,7 +319,7 @@ const Component: React.FC<Props> = (props: Props) => {
                     weight='fill'
                   />
                 )}
-                name={t('Advanced phishing detection')}
+                name={t('ui.SETTINGS.screen.Setting.Security.advancedPhishingDetection')}
                 rightItem={(
                   <Switch
                     checked={enableChainPatrol}
@@ -332,7 +332,7 @@ const Component: React.FC<Props> = (props: Props) => {
           </div>
           <div className='setting-config-container'>
             <div className='label'>
-              {t('Camera access')}
+              {t('ui.SECURITY.Popup.Settings.Security.cameraAccess')}
             </div>
             <SettingItem
               className={CN('security-item', `security-type-${SecurityType.CAMERA_ACCESS}`)}
@@ -345,7 +345,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   weight='fill'
                 />
               )}
-              name={t('Camera access for QR')}
+              name={t('ui.SETTINGS.screen.Setting.Security.cameraAccessForQr')}
               rightItem={(
                 <Switch
                   checked={camera}
@@ -366,10 +366,10 @@ const Component: React.FC<Props> = (props: Props) => {
               </div>
               <div className='__item-center-part'>
                 <div className='__item-title'>
-                  {t('Sign for multiple transactions')}
+                  {t('ui.SETTINGS.screen.Setting.Security.signForMultipleTransactions')}
                 </div>
                 <div className='__item-description'>
-                  {t('Allow signing once for multiple transactions')}
+                  {t('ui.SETTINGS.screen.Setting.Security.allowSignOnceForMultiple')}
                 </div>
               </div>
               <div className='__item-right-part'>
@@ -386,7 +386,7 @@ const Component: React.FC<Props> = (props: Props) => {
           className={className}
           id={editAutoLockTimeModalId}
           onCancel={onCloseAutoLockTimeModal}
-          title={t('Wallet auto-lock')}
+          title={t('ui.SECURITY.Popup.Settings.Security.walletAutoLock')}
         >
           <div className='modal-body-container'>
             {
@@ -423,13 +423,13 @@ const Component: React.FC<Props> = (props: Props) => {
           className={className}
           id={editUnlockTypeModalId}
           onCancel={onCloseUnlockTypeModal}
-          title={t('Authenticate with password')}
+          title={t('ui.SETTINGS.screen.Setting.Security.authenticateWithPassword')}
         >
           <div className='modal-body-container'>
             <SettingItem
               className={CN('__selection-item')}
               key={WalletUnlockType.ALWAYS_REQUIRED}
-              name={t('Always required')}
+              name={t('ui.SETTINGS.screen.Setting.Security.alwaysRequired')}
               onPressItem={onSetUnlockType(WalletUnlockType.ALWAYS_REQUIRED)}
               rightItem={
                 unlockType === WalletUnlockType.ALWAYS_REQUIRED
@@ -449,7 +449,7 @@ const Component: React.FC<Props> = (props: Props) => {
             <SettingItem
               className={CN('__selection-item')}
               key={WalletUnlockType.WHEN_NEEDED}
-              name={t('When needed')}
+              name={t('ui.SETTINGS.screen.Setting.Security.whenNeeded')}
               onPressItem={onSetUnlockType(WalletUnlockType.WHEN_NEEDED)}
               rightItem={
                 unlockType === WalletUnlockType.WHEN_NEEDED

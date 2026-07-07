@@ -182,7 +182,7 @@ const BaseWeb = ({ children }: LayoutBaseWebProps) => {
 
   const headerTitle = useMemo(() => {
     if (isPortfolio) {
-      return t('Portfolio');
+      return t('ui.BASE_WEB.components.Layout.base.BaseWeb.portfolio');
     }
 
     return title;

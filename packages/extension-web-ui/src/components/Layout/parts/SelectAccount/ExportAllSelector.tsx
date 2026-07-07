@@ -3,6 +3,7 @@
 
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { AccountProxy, AccountProxyType, AccountSignMode } from '@subwallet/extension-base/types';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountProxySelectorAllItem, BaseModal, BasicInputWrapper, FilterModal, GeneralEmptyList } from '@subwallet/extension-web-ui/components';
 import ExportAllSelectItem from '@subwallet/extension-web-ui/components/Layout/parts/SelectAccount/ExportAllSelectItem';
 import AccountExportPasswordModal from '@subwallet/extension-web-ui/components/Modal/Account/AccountExportPasswordModal';
@@ -25,19 +26,19 @@ interface Props extends ThemeProps, BasicInputWrapper {
 
 const filterOptions = [
   {
-    label: 'Unified account',
+    label: detectTranslate('ui.ACCOUNT.components.AccountProxy.TypeTag.unifiedAccount'),
     value: AccountProxyType.UNIFIED
   },
   {
-    label: 'Solo account',
+    label: detectTranslate('ui.ACCOUNT.components.AccountProxy.TypeTag.soloAccount'),
     value: AccountProxyType.SOLO
   },
   {
-    label: 'QR signer account',
+    label: detectTranslate('ui.ACCOUNT.components.AccountProxy.TypeTag.qrSignerAccount'),
     value: AccountProxyType.QR
   },
   {
-    label: 'Watch-only account',
+    label: detectTranslate('ui.ACCOUNT.components.AccountProxy.TypeTag.watchOnlyAccount'),
     value: AccountSignMode.READ_ONLY
   }
 ];
@@ -46,7 +47,7 @@ const FILTER_MODAL_ID = 'export-account-filter-modal';
 const defaultModalId = 'multi-export-account-selector';
 const modalId = SELECT_ACCOUNT_MODAL;
 
-const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
+const Component = (props: Props, _ref: ForwardedRef<InputRef>) => {
   const { className = '',
     id = defaultModalId,
     isSingleSelect = false,
@@ -212,7 +213,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           className={'__icon-export-remind'}
           overlayClassName={CN(className, '__tooltip-overlay-remind')}
           placement={'bottomLeft'}
-          title={t('SubWallet only supports exporting accounts created and attached directly on SubWallet Web dashboard. Accounts connected from the Extension or via Ledger aren\'t supported for this feature')}
+          title={t('ui.EXPORT_ALL_SELECTOR.components.Layout.parts.SelectAccount.ExportAllSelector.subwalletOnlySupportsExportingAccountsCreatedAndAttachedDirectlyOnSubwalletWebDashboardAccountsConnectedFromTheExtensionOrViaLedgerArenTSupportedForThisFeature')}
         >
           <div className={'__tooltip-info-wrapper'}>
             <Icon
@@ -257,7 +258,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         id={id}
         onCancel={onBack}
         rightIconProps={rightButton}
-        title={t('Export account')}
+        title={t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportAccount')}
       >
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
@@ -270,7 +271,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchAccountProxyFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Account name')}
+          searchPlaceholder={t<string>('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.accountName')}
           showActionBtn
         />
       </BaseModal>

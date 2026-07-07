@@ -40,7 +40,7 @@ const Component: React.FC<Props> = (props: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={goHome}
         rightFooterButton={{
-          children: t('Finish'),
+          children: t('ui.ACCOUNT.screen.Account.ExportAllDone.finish'),
           icon: FinishIcon,
           onClick: goHome
         }}
@@ -51,13 +51,13 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick: goHome
           }
         ]}
-        title={t('Successful')}
+        title={t('ui.ACCOUNT.screen.Account.ExportAllDone.successful')}
       >
         <div className='body-container'>
           <div className={CN('notice')}>
             <AlertBox
-              description={t('Anyone with your key can use any assets held in your account.')}
-              title={t('Warning: Never disclose this key')}
+              description={t('ui.ACCOUNT.screen.Account.ExportAllDone.privateKeyWarning')}
+              title={t('ui.ACCOUNT.screen.Account.ExportAllDone.warningNeverDiscloseKey')}
               type='warning'
             />
           </div>
@@ -72,10 +72,10 @@ const Component: React.FC<Props> = (props: Props) => {
               />
             </div>
             <div className='json-done-tile'>
-              {t('Success!')}
+              {t('ui.ACCOUNT.screen.Account.ExportAllDone.success')}
             </div>
             <div className='json-done-description'>
-              {t('You have successfully export JSON file for your accounts')}
+              {t('ui.ACCOUNT.screen.Account.ExportAllDone.successfullyExportedJsonForAccounts')}
             </div>
           </div>
         </div>
