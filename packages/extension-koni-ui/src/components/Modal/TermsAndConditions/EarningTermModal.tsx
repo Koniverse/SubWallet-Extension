@@ -33,9 +33,9 @@ const Component = ({ className, onOk }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchStaticData<string>('earning-term-and-condition', `${localStorage.getItem(LANGUAGE) || 'en'}.md`, false)
+    fetchStaticData<string>('compliance-term-and-condition', `${localStorage.getItem(LANGUAGE) || 'en'}.md`, false)
       .then((md) => setStaticData({ md }))
-      .catch((e) => console.log('fetch _earningTermAndCondition error:', e));
+      .catch((e) => console.log('fetch _complianceTermAndCondition error:', e));
   }, []);
 
   const onCheckedInput = useCallback((e: CheckboxChangeEvent) => {
@@ -71,17 +71,22 @@ const Component = ({ className, onOk }: Props) => {
         onScroll={onScrollToAcceptButton}
         ref={scrollRef}
       >
+        <Typography.Text className={'term-subheading'}>
+          {t('ui.TERM.components.Modal.Terms.Earning.subheading')}
+        </Typography.Text>
         <Typography.Text>
           <Markdown>{staticData && staticData.md}</Markdown>
         </Typography.Text>
-        {!isScrollEnd && <Button
-          className={'term-body-caret-button'}
-          icon={<Icon phosphorIcon={CaretDown} />}
-          onClick={onScrollContent}
-          schema={'secondary'}
-          shape={'circle'}
-          size={'xs'}
-        />}
+        {!isScrollEnd && (
+          <Button
+            className={'term-body-caret-button'}
+            icon={<Icon phosphorIcon={CaretDown} />}
+            onClick={onScrollContent}
+            schema={'secondary'}
+            shape={'circle'}
+            size={'xs'}
+          />
+        )}
       </div>
       <div className={'term-footer'}>
         <Checkbox
@@ -117,6 +122,24 @@ export const EarningTermModal = styled(Component)<Props>(({ theme: { token } }: 
       overflow: 'hidden',
       maxHeight: 600,
       paddingBottom: 0
+    },
+
+    '.ant-modal-title, .ant-sw-modal-title, .ant-sw-sub-header-title, .ant-sw-sub-header-title-content': {
+      overflow: 'visible !important',
+      textOverflow: 'clip !important',
+      whiteSpace: 'nowrap !important'
+    },
+
+    '.ant-sw-sub-header-title-content': {
+      fontSize: token.fontSizeLG,
+      lineHeight: '24px'
+    },
+
+    '.term-subheading': {
+      color: token.colorTextLight4,
+      display: 'block',
+      fontSize: token.fontSizeSM,
+      marginBottom: token.marginSM
     },
 
     '.term-body': {
