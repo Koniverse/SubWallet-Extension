@@ -34,9 +34,9 @@ const Component = ({ className, onOk }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchStaticData<string>('earning-term-and-condition', `${localStorage.getItem(LANGUAGE) || 'en'}.md`, false)
+    fetchStaticData<string>('compliance-term-and-condition', `${localStorage.getItem(LANGUAGE) || 'en'}.md`, false)
       .then((md) => setStaticData({ md }))
-      .catch((e) => console.log('fetch _earningTermAndCondition error:', e));
+      .catch((e) => console.log('fetch _complianceTermAndCondition error:', e));
   }, []);
 
   const onCheckedInput = useCallback((e: CheckboxChangeEvent) => {
@@ -68,7 +68,7 @@ const Component = ({ className, onOk }: Props) => {
       })}
       closable={false}
       id={modalId}
-      title={'Earning Policy'}
+      title={'Compliance Confirmation'}
       width={isWebUI ? 784 : undefined}
     >
       <div
@@ -76,6 +76,9 @@ const Component = ({ className, onOk }: Props) => {
         onScroll={onScrollToAcceptButton}
         ref={scrollRef}
       >
+        <Typography.Text className={'term-subheading'}>
+          Before using staking, earning, or any third-party protocol services through SubWallet, please review and confirm the following:
+        </Typography.Text>
         <Typography.Text>
           <Markdown>{staticData && staticData.md}</Markdown>
         </Typography.Text>
@@ -95,7 +98,7 @@ const Component = ({ className, onOk }: Props) => {
           checked={isChecked}
           className={'term-footer-checkbox'}
           onChange={onCheckedInput}
-        >I understand and agree to the Earning Policy</Checkbox>
+        >I have read, understood, and agree to the above, and confirm that all representations made by me are true, accurate, and complete to the best of my knowledge.</Checkbox>
         <div className={'term-footer-button-group'}>
           <Button
             block={true}
@@ -109,7 +112,7 @@ const Component = ({ className, onOk }: Props) => {
             )}
             onClick={onConfirm}
           >
-            Continue
+            I Agree & Continue
           </Button>
           <span className={'term-footer-annotation'}>Scroll to read all sections</span>
         </div>
@@ -124,6 +127,24 @@ export const EarningTermModal = styled(Component)<Props>(({ theme: { token } }: 
       overflow: 'hidden',
       maxHeight: 600,
       paddingBottom: 0
+    },
+
+    '.ant-modal-title, .ant-sw-modal-title, .ant-sw-sub-header-title, .ant-sw-sub-header-title-content': {
+      overflow: 'visible !important',
+      textOverflow: 'clip !important',
+      whiteSpace: 'nowrap !important'
+    },
+
+    '.ant-sw-sub-header-title-content': {
+      fontSize: token.fontSizeLG,
+      lineHeight: '24px'
+    },
+
+    '.term-subheading': {
+      color: token.colorTextLight4,
+      display: 'block',
+      fontSize: token.fontSizeSM,
+      marginBottom: token.marginSM
     },
 
     '.term-body': {
