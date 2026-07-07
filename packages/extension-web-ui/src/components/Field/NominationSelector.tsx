@@ -124,7 +124,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         renderWhenEmpty={renderEmpty}
         searchFunction={searchFunction}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>(`Search ${handleValidatorLabel}`)}
+        searchPlaceholder={`${t('ui.EARNING.components.Modal.Earning.Validator.Change.searchValidator')} ${t(handleValidatorLabel)}`}
         selected={value || ''}
         statusHelp={statusHelp}
         suffix={
@@ -137,7 +137,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             )
             : undefined
         }
-        title={t('Select a') + ' ' + t(handleValidatorLabel) || placeholder || t('Select validator')}
+        title={t('ui.TRANSACTION.screen.Transaction.Unbond.selectValidatorLabel') + ' ' + t(handleValidatorLabel) || placeholder || t('ui.EARNING.components.Field.NominationSelector.selectValidator')}
       />
     </>
   );

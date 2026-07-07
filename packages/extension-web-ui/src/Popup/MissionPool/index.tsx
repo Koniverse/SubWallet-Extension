@@ -43,7 +43,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   useEffect(() => {
     if (location.pathname === '/home/mission-pools') {
-      setTitle(t('Mission Pools'));
+      setTitle(t('ui.SETTINGS.screen.Setting.MissionPool.missionPools'));
     }
   }, [location.pathname, setTitle, t]);
 
@@ -66,19 +66,19 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('All'),
+        label: t('ui.SETTINGS.screen.Setting.MissionPool.all'),
         value: MissionCategoryType.ALL
       },
       {
-        label: t('Defi'),
+        label: t('ui.SETTINGS.screen.Setting.MissionPool.defi'),
         value: MissionTab.DEFI
       },
       {
-        label: t('Meme'),
+        label: t('ui.SETTINGS.screen.Setting.MissionPool.meme'),
         value: MissionTab.MEME
       },
       {
-        label: t('Gaming'),
+        label: t('ui.SETTINGS.screen.Setting.MissionPool.gaming'),
         value: MissionTab.GAMING
       }
     ];
@@ -181,7 +181,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             className={'__header-area'}
             paddingVertical
             showBackButton={false}
-            title={t('Mission Pools')}
+            title={t('ui.SETTINGS.screen.Setting.MissionPool.missionPools')}
           />)
       }
       {!!banners.length && isWebUI && (
@@ -211,7 +211,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           )}
           onClickActionBtn={onClickActionBtn}
           onSearch={handleSearch}
-          placeholder={t('Campaign name...')}
+          placeholder={t('ui.SETTINGS.screen.Setting.MissionPool.campaignNamePlaceholder')}
           searchValue={searchInput}
           showActionBtn
         />
@@ -247,14 +247,14 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       />
 
       <FilterModal
-        applyFilterButtonTitle={t('Apply filter')}
+        applyFilterButtonTitle={t('ui.SETTINGS.screen.Setting.MissionPool.applyFilter')}
         id={FILTER_MODAL_ID}
         onApplyFilter={onApplyFilter}
         onCancel={onCloseFilterModal}
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
-        title={t('Filter')}
+        title={t('ui.SETTINGS.screen.Setting.MissionPool.filter')}
       />
     </div>
   );

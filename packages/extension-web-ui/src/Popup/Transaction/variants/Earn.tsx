@@ -336,7 +336,7 @@ const Component = ({ className }: ComponentProps) => {
           type: NotificationType.ERROR,
           content: t(balanceDisplayInfo.message, { replace: { minJoinPool, symbol, chain } }),
           okButton: {
-            text: t('I understand'),
+            text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
             onClick: closeAlert,
             icon: CheckCircle
           }
@@ -350,11 +350,11 @@ const Component = ({ className }: ComponentProps) => {
         return;
       } else if (insufficientXCMMessages.some((v) => error.message.includes(v))) {
         openAlert({
-          title: t('Insufficient balance'),
+          title: t('ui.TRANSACTION.screen.Transaction.Earn.insufficientBalance'),
           type: NotificationType.ERROR,
-          content: error.message,
+          content: t(error.message),
           okButton: {
-            text: t('I understand'),
+            text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
             onClick: closeAlert,
             icon: CheckCircle
           }
@@ -369,7 +369,7 @@ const Component = ({ className }: ComponentProps) => {
       }
 
       notify({
-        message: error.message,
+        message: t(error.message),
         type: 'error',
         duration: 8
       });
@@ -392,14 +392,14 @@ const Component = ({ className }: ComponentProps) => {
         const { errors: _errors, id, processId, warnings } = rs;
 
         if (_errors.length || warnings.length) {
-          if (_errors[0]?.message !== 'Rejected by user') {
+          if (![t('ui.TRANSACTION.hook.transaction.useHandleSubmit.rejectedByUser'), 'bg.NETWORK.background.error.Provider.rejectedByUser'].includes(_errors[0]?.message)) {
             if (
               _errors[0]?.message.startsWith('UnknownError Connection to Indexed DataBase server lost') ||
               _errors[0]?.message.startsWith('Provided address is invalid, the capitalization checksum test failed') ||
               _errors[0]?.message.startsWith('connection not open on send()')
             ) {
               notify({
-                message: t('Your selected network has lost connection. Update it by re-enabling it or changing network provider'),
+                message: t('ui.TRANSACTION.hook.transaction.useHandleSubmit.selectedNetworkLostConnection'),
                 type: 'error',
                 duration: 8
               });
@@ -412,6 +412,12 @@ const Component = ({ className }: ComponentProps) => {
 
             return false;
           } else {
+            notify({
+              message: t(_errors[0].message),
+              type: 'error',
+              duration: 8
+            });
+
             dispatchProcessState({
               type: needRollback ? EarningActionType.STEP_ERROR_ROLLBACK : EarningActionType.STEP_ERROR,
               payload: _errors[0]
@@ -586,17 +592,17 @@ const Component = ({ className }: ComponentProps) => {
 
         if (isRelayChain && (userSelectedPoolCount < maxCount && label === 'Validator')) {
           openAlert({
-            title: t('Pay attention!'),
-            content: t('You are recommended to choose {{maxCount}} validators to optimize your earnings. Do you wish to continue with {{userSelectedPoolCount}} validator{{x}}?', { replace: { maxCount, userSelectedPoolCount, x: userSelectedPoolCount === 1 ? '' : 's' } }),
+            title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
+            content: t('ui.EARN.Popup.Transaction.variants.Earn.youAreRecommendedToChooseValidatorsToOptimizeYourEarningsDoYouWishToContinueWithValidator', { replace: { maxCount, userSelectedPoolCount, x: userSelectedPoolCount === 1 ? '' : 's' } }),
             okButton: {
-              text: t('Continue'),
+              text: t('ui.TRANSACTION.screen.Transaction.Earn.continue'),
               onClick: () => {
                 closeAlert();
                 resolve();
               }
             },
             cancelButton: {
-              text: t('Go back'),
+              text: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.goBack'),
               onClick: () => {
                 // eslint-disable-next-line prefer-promise-reject-errors
                 reject();
@@ -684,7 +690,7 @@ const Component = ({ className }: ComponentProps) => {
       <>
         <MetaInfo.Default
           className='__label-bottom'
-          label={t('Subnet')}
+          label={t('ui.TRANSACTION.screen.Transaction.Earn.subnet')}
         >
           <div className='__subnet-wrapper'>
             <Logo
@@ -709,13 +715,13 @@ const Component = ({ className }: ComponentProps) => {
             <MetaInfo.Number
               className='__label-bottom'
               decimals={assetDecimals}
-              label={t('Expected alpha amount')}
+              label={t('ui.TRANSACTION.screen.Transaction.Earn.expectedAlphaAmount')}
               suffix={poolInfo?.metadata?.subnetData?.subnetSymbol || ''}
               value={BigN(amountValue).multipliedBy(1 / earningRate)}
             />
             <MetaInfo.Default
               className='__label-bottom'
-              label={t('Conversion rate')}
+              label={t('ui.TRANSACTION.screen.Transaction.Earn.conversionRate')}
             >
               <div className='__subnet-rate'>
                 <span
@@ -742,7 +748,7 @@ const Component = ({ className }: ComponentProps) => {
               title={'Transaction will not be executed if the price changes more than this slippage'}
             >
               <div className={'__max-slippage'}>
-                <div className='__label-bottom'>{t('Slippage')}</div>
+                <div className='__label-bottom'>{t('ui.TRANSACTION.screen.Transaction.Earn.slippage')}</div>
                 <Icon
                   className='__label-bottom'
                   customSize={'16px'}
@@ -845,7 +851,7 @@ const Component = ({ className }: ComponentProps) => {
               <MetaInfo.Number
                 decimals={0}
                 key={item.slug}
-                label={t("You'll receive")}
+                label={t('ui.TRANSACTION.screen.Transaction.Earn.youllReceive')}
                 suffix={_getAssetSymbol(derivativeAssetInfo)}
                 value={value / item.exchangeRate}
               />
@@ -855,7 +861,7 @@ const Component = ({ className }: ComponentProps) => {
           <MetaInfo.Number
             className='__label-bottom'
             decimals={assetDecimals}
-            label={t('Minimum active stake')}
+            label={t('ui.TRANSACTION.screen.Transaction.Earn.minimumActiveStake')}
             suffix={assetSymbol}
             value={minJoinPool || 0}
           />
@@ -865,7 +871,7 @@ const Component = ({ className }: ComponentProps) => {
           ? (
             <MetaInfo.Chain
               chain={chainValue}
-              label={t('Network')}
+              label={t('ui.TRANSACTION.screen.Transaction.Earn.network')}
             />
           )
           : (renderSubnetStaking())
@@ -875,7 +881,7 @@ const Component = ({ className }: ComponentProps) => {
           <MetaInfo.Number
             className='__label-bottom'
             decimals={0}
-            label={t('Estimated fee')}
+            label={t('ui.TRANSACTION.screen.Transaction.Earn.estimatedFee')}
             prefix={(currencyData?.isPrefix && currencyData.symbol) || ''}
             suffix={(!currencyData?.isPrefix && currencyData?.symbol) || ''}
             value={estimatedFee}
@@ -897,16 +903,16 @@ const Component = ({ className }: ComponentProps) => {
       goBack();
     } else {
       openAlert({
-        title: t('Cancel earning process?'),
+        title: t('ui.TRANSACTION.screen.Transaction.Earn.cancelEarningProcess'),
         type: NotificationType.WARNING,
-        content: t('Going back will cancel the current earning process. Do you wish to cancel?'),
+        content: t('ui.TRANSACTION.screen.Transaction.Earn.confirmCancelEarningProcess'),
         okButton: {
-          text: t('Cancel earning'),
+          text: t('ui.TRANSACTION.screen.Transaction.Earn.cancelEarning'),
           onClick: goBack,
           schema: 'warning'
         },
         cancelButton: {
-          text: t('Not now'),
+          text: t('ui.TRANSACTION.screen.Transaction.Earn.notNow'),
           onClick: closeAlert
         }
       });
@@ -921,7 +927,7 @@ const Component = ({ className }: ComponentProps) => {
     const _shortName = poolInfo.metadata.shortName;
     const _type = t(earningTypeLabelMap[poolInfo.type]);
 
-    return t('{{type}} process on {{shortName}} :', { replace: { shortName: _shortName, type: _type } });
+    return t('ui.EARN.Popup.Transaction.variants.Earn.processOn', { replace: { shortName: _shortName, type: _type } });
   })();
 
   const onCancelInstructionModal = useCallback(() => {
@@ -1006,11 +1012,11 @@ const Component = ({ className }: ComponentProps) => {
 
       if (!isValidatorSupported && defaultTarget.current) {
         isReadyToShowAlertRef.current && openAlert({
-          title: t('Unrecommended validator'),
+          title: t('ui.EARN.Popup.Transaction.variants.Earn.unrecommendedValidator'),
           type: NotificationType.ERROR,
-          content: t('Your chosen validator is not recommended by SubWallet as staking with this validator won’t accrue any rewards. Select another validator and try again.'),
+          content: t('ui.EARN.Popup.Transaction.variants.Earn.yourChosenValidatorIsNotRecommendedBySubwalletAsStakingWithThisValidatorWonTAccrueAnyRewardsSelectAnotherValidatorAndTryAgain'),
           cancelButton: {
-            text: t('Dismiss'),
+            text: t('ui.EARN.Popup.Transaction.variants.Earn.dismiss'),
             onClick: () => {
               isReadyToShowAlertRef.current = true;
               closeAlert();
@@ -1018,7 +1024,7 @@ const Component = ({ className }: ComponentProps) => {
             icon: XCircle
           },
           okButton: {
-            text: t('Select validators'),
+            text: t('ui.EARNING.components.Modal.Earning.Validator.Change.selectValidators'),
             onClick: () => {
               isReadyToShowAlertRef.current = true;
               closeAlert();
@@ -1055,11 +1061,11 @@ const Component = ({ className }: ComponentProps) => {
           if (isUnstakeAll) {
             if (poolType === YieldPoolType.NOMINATION_POOL) {
               isReadyToShowAlertRef.current && openAlert({
-                title: t('Pay attention'),
-                content: t('This account is unstaking all stake and can\'t nominate validators. You can change your account on the Account tab or try again after withdrawing unstaked funds'),
+                title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
+                content: t('ui.EARN.Popup.Transaction.variants.Earn.thisAccountIsUnstakingAllStakeAndCanTNominateValidatorsYouCanChangeYourAccountOnTheAccountTabOrTryAgainAfterWithdrawingUnstakedFunds'),
                 type: NotificationType.WARNING,
                 okButton: {
-                  text: t('I understand'),
+                  text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
                   onClick: () => {
                     isReadyToShowAlertRef.current = true;
                     closeAlert();
@@ -1073,11 +1079,11 @@ const Component = ({ className }: ComponentProps) => {
             } else if (poolType === YieldPoolType.NATIVE_STAKING) {
               if (_STAKING_CHAIN_GROUP.para.includes(chainValue)) {
                 isReadyToShowAlertRef.current && openAlert({
-                  title: t('Pay attention'),
-                  content: t('This account is unstaking all stake and can\'t nominate validators. You can change your account on the Account tab or try again after withdrawing unstaked funds'),
+                  title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
+                  content: t('ui.EARN.Popup.Transaction.variants.Earn.thisAccountIsUnstakingAllStakeAndCanTNominateValidatorsYouCanChangeYourAccountOnTheAccountTabOrTryAgainAfterWithdrawingUnstakedFunds'),
                   type: NotificationType.WARNING,
                   okButton: {
-                    text: t('I understand'),
+                    text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
                     onClick: () => {
                       isReadyToShowAlertRef.current = true;
                       closeAlert();
@@ -1095,9 +1101,9 @@ const Component = ({ className }: ComponentProps) => {
           }
 
           const content = poolType === YieldPoolType.NATIVE_STAKING
-            ? t('This account is currently nominating {{number}} validators. You can change validators or change your account on the Account tab', { number: compound.nominations.length })
+            ? t('ui.EARN.Popup.Transaction.variants.Earn.thisAccountIsCurrentlyNominatingValidatorsYouCanChangeValidatorsOrChangeYourAccountOnTheAccountTab', { number: compound.nominations.length })
             : poolType === YieldPoolType.NOMINATION_POOL
-              ? t('This account is currently a member of a nomination pool. You can continue using nomination pool, explore other Earning options or change your account on the Account tab', { x: compound?.nominations[0]?.validatorIdentity || compound?.nominations[0]?.validatorAddress || '' })
+              ? t('ui.EARN.Popup.Transaction.variants.Earn.thisAccountIsCurrentlyAMemberOfANominationPoolYouCanContinueUsingNominationPoolExploreOtherEarningOptionsOrChangeYourAccountOnTheAccountTab', { x: compound?.nominations[0]?.validatorIdentity || compound?.nominations[0]?.validatorAddress || '' })
               : '';
 
           const onPressContinue = () => {
@@ -1120,16 +1126,16 @@ const Component = ({ className }: ComponentProps) => {
           };
 
           isReadyToShowAlertRef.current && openAlert({
-            title: t('Pay attention'),
+            title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
             content: content,
             className: CN(className, 'earning-alert-modal'),
             type: NotificationType.WARNING,
             cancelButton: {
-              text: poolType === YieldPoolType.NATIVE_STAKING ? t('Keep current validators') : poolType === YieldPoolType.NOMINATION_POOL ? t('Explore Earning options') : '',
+              text: poolType === YieldPoolType.NATIVE_STAKING ? t('ui.EARN.Popup.Transaction.variants.Earn.keepCurrentValidators') : poolType === YieldPoolType.NOMINATION_POOL ? t('ui.EARN.Popup.Transaction.variants.Earn.exploreEarningOptions') : '',
               onClick: onPressCancel
             },
             okButton: {
-              text: poolType === YieldPoolType.NATIVE_STAKING ? t('Change validators') : poolType === YieldPoolType.NOMINATION_POOL ? t('Use nomination pool') : '',
+              text: poolType === YieldPoolType.NATIVE_STAKING ? t('ui.EARNING.components.Modal.Earning.Validator.changeValidators') : poolType === YieldPoolType.NOMINATION_POOL ? t('ui.EARN.Popup.Transaction.variants.Earn.useNominationPool') : '',
               onClick: onPressContinue
             }
           });
@@ -1211,13 +1217,13 @@ const Component = ({ className }: ComponentProps) => {
         if (!isConnectingChainSuccess) {
           setIsLoadingChainConnection(false);
           openAlert({
-            title: t('Connection lost'),
+            title: t('ui.TRANSACTION.screen.Transaction.Earn.connectionLost'),
             type: NotificationType.ERROR,
             content: altChain
-              ? t(`${poolChainName} network or ${altChainName} network has lost connection. Re-enable the network and try again`)
-              : t(`${poolChainName} network has lost connection. Re-enable the network and try again`),
+              ? t('ui.TRANSACTION.screen.Transaction.Earn.dualNetworkConnectionLost', { replace: { poolChainName, altChainName } })
+              : t('ui.TRANSACTION.screen.Transaction.Earn.networkConnectionLost', { replace: { poolChainName } }),
             okButton: {
-              text: t('I understand'),
+              text: t('ui.TRANSACTION.screen.Transaction.Earn.iUnderstand'),
               onClick: closeAlert,
               icon: CheckCircle
             }
@@ -1476,7 +1482,7 @@ const Component = ({ className }: ComponentProps) => {
                     <FreeBalanceToEarn
                       address={fromValue}
                       hidden={submitStepType !== YieldStepType.XCM}
-                      label={`${t('Available balance')}`}
+                      label={`${t('ui.TRANSACTION.screen.Transaction.Earn.availableBalance')}`}
                       onBalanceReady={setIsBalanceReady}
                       tokens={balanceTokens}
                     />
@@ -1486,7 +1492,7 @@ const Component = ({ className }: ComponentProps) => {
                       chain={poolInfo?.chain || ''}
                       hidden={[YieldStepType.XCM].includes(submitStepType)}
                       isSubscribe={true}
-                      label={`${t('Available balance')}`}
+                      label={`${t('ui.TRANSACTION.screen.Transaction.Earn.availableBalance')}`}
                       tokenSlug={inputAsset?.slug}
                     />
                   </div>
@@ -1520,7 +1526,7 @@ const Component = ({ className }: ComponentProps) => {
                         defaultValue={defaultData.target === 'not-support' || !!compound ? '' : defaultData.target}
                         disabled={submitLoading}
                         from={fromValue}
-                        label={t('Pool')}
+                        label={t('ui.TRANSACTION.screen.Transaction.Earn.pool')}
                         loading={targetLoading}
                         setForceFetchValidator={setForceFetchValidator}
                         slug={slug}
@@ -1559,7 +1565,7 @@ const Component = ({ className }: ComponentProps) => {
                     <AlertBox
                       className='__alert-box'
                       description={t(
-                        'Unable to stake due to a slippage of {{slippage}}%, which exceeds the current slippage set for this transaction. Lower your stake amount or increase slippage and try again',
+                        'ui.TRANSACTION.screen.Transaction.Earn.stakeSlippageExceeded',
                         { replace: { slippage: (earningSlippage * 100).toFixed(2) } }
                       )}
                       title='Slippage too high!'
@@ -1582,7 +1588,7 @@ const Component = ({ className }: ComponentProps) => {
                   loading={submitLoading}
                   onClick={onPreCheck(form.submit, exType)}
                 >
-                  {processState.currentStep === 0 ? t('Stake') : t('Continue')}
+                  {processState.currentStep === 0 ? t('ui.TRANSACTION.screen.Transaction.Earn.stake') : t('ui.TRANSACTION.screen.Transaction.Earn.continue')}
                 </Button>
               </TransactionFooter>
             </div>
@@ -1615,7 +1621,7 @@ const Component = ({ className }: ComponentProps) => {
                   <Divider style={{ backgroundColor: token.colorBgDivider, marginTop: token.marginSM, marginBottom: token.marginSM, height: 2 }} />
 
                   <Typography.Text style={{ color: token.colorTextLight4 }}>
-                    {t('All steps in the process are designed based on your available multi-chain assets to optimize fee structure and enhance your overall experience.')}
+                    {t('ui.EARN.Popup.Transaction.variants.Earn.allStepsInTheProcessAreDesignedBasedOnYourAvailableMultiChainAssetsToOptimizeFeeStructureAndEnhanceYourOverallExperience')}
                   </Typography.Text>
                 </div>
               </div>

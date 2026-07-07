@@ -35,14 +35,14 @@ const Component: FC<Props> = (props: Props) => {
     }
 
     if (processData.type === ProcessType.SWAP) {
-      return t('Swap details');
+      return t('ui.TRANSACTION.components.Modal.TxProcessDetail.swapDetails');
     }
 
     if (processData.type === ProcessType.EARNING) {
-      return t('Stake details');
+      return t('ui.TRANSACTION.components.Modal.TxProcessDetail.stakeDetails');
     }
 
-    return t('Transaction details');
+    return t('ui.TRANSACTION.components.Modal.TxProcessDetail.transactionDetails');
   }, [processData, t]);
 
   useEffect(() => {
@@ -91,7 +91,7 @@ const Component: FC<Props> = (props: Props) => {
           block={true}
           onClick={onCancel}
         >
-          {t('Close')}
+          {t('ui.TRANSACTION.components.Modal.TxProcessDetail.close')}
         </Button>
       )}
       id={modalId}

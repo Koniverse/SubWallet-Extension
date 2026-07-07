@@ -137,11 +137,11 @@ function Component ({ compound,
   const onLeavePool = useCallback(() => {
     if (isActiveStakeZero) {
       openAlert({
-        title: t('Unstaking not available'),
+        title: t('ui.EARNING.screen.EarningPositionDetail.unstakingNotAvailable'),
         type: NotificationType.ERROR,
-        content: t("You don't have any staked funds left to unstake. Check withdrawal status (how long left until the unstaking period ends) by checking the Withdraw info. Keep in mind that you need to withdraw manually."),
+        content: t('ui.EARNING.screen.EarningPositionDetail.noStakedFundsToUnstake'),
         okButton: {
-          text: t('OK'),
+          text: t('ui.EARNING.screen.EarningPositionDetail.ok'),
           onClick: closeAlert
         }
       });
@@ -220,7 +220,7 @@ function Component ({ compound,
         subHeaderCenter={false}
         subHeaderIcons={subHeaderButtons}
         subHeaderPaddingVertical={true}
-        title={t<string>('Earning position details')}
+        title={t<string>('ui.EARNING.screen.EarningPositionDetail.earningPositionDetails')}
       >
         {
           isWebUI && (
@@ -288,7 +288,7 @@ function Component ({ compound,
           !isWebUI && (
             <>
               <div className={'__active-stake-info-area'}>
-                <div className={'__active-stake-title'}>{t('Active stake')}</div>
+                <div className={'__active-stake-title'}>{t('ui.EARNING.screen.EarningPositionDetail.activeStake')}</div>
                 <Number
                   className={'__active-stake-value'}
                   decimal={inputAsset?.decimals || 0}
@@ -332,7 +332,7 @@ function Component ({ compound,
                   onClick={onLeavePool}
                   schema='secondary'
                 >
-                  {poolInfo.type === YieldPoolType.LENDING ? t('Withdraw') : t('Unstake')}
+                  {poolInfo.type === YieldPoolType.LENDING ? t('ui.EARNING.screen.EarningPositionDetail.withdraw') : t('ui.EARNING.screen.EarningPositionDetail.unstake')}
                 </Button>
 
                 <Button
@@ -347,7 +347,7 @@ function Component ({ compound,
                   onClick={onEarnMore}
                   schema='secondary'
                 >
-                  {poolInfo.type === YieldPoolType.LENDING ? t('Supply more') : t('Stake more')}
+                  {poolInfo.type === YieldPoolType.LENDING ? t('ui.EARNING.screen.EarningPositionDetail.supplyMore') : t('ui.EARNING.screen.EarningPositionDetail.stakeMore')}
                 </Button>
               </div>
 

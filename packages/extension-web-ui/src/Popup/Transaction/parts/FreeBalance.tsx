@@ -43,7 +43,7 @@ const Component = ({ address, chain, className, extrinsicType, hidden, isSubscri
         hidden: hidden
       })}
       >
-        {t('Select account to view available balance')}
+        {t('ui.TRANSACTION.screen.Transaction.part.FreeBalance.selectAccountToViewBalance')}
       </Typography.Paragraph>
     );
   }
@@ -63,7 +63,7 @@ const Component = ({ address, chain, className, extrinsicType, hidden, isSubscri
             '-hoverable': !!label
           })}
           >
-            {label || t('Sender available balance')}
+            {label || t('ui.TRANSACTION.screen.Transaction.part.FreeBalance.senderAvailableBalance')}
 
             {
               !!labelTooltip && (
@@ -96,7 +96,7 @@ const Component = ({ address, chain, className, extrinsicType, hidden, isSubscri
       {
         !isLoading && !error && !!tokenSlug && (tokenSlug !== nativeTokenSlug) && (
           <>
-            <span className={'__name'}>&nbsp;{t('and')}&nbsp;</span>
+            <span className={'__name'}>&nbsp;{t('ui.TRANSACTION.screen.Transaction.part.FreeBalance.and')}&nbsp;</span>
             <Number
               decimal={tokenBalance?.decimals || 18}
               decimalColor={token.colorTextTertiary}

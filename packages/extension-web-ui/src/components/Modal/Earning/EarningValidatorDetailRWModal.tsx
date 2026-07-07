@@ -183,11 +183,11 @@ function Component (props: Props): React.ReactElement<Props> {
 
     const onError = (message: string) => {
       openAlert({
-        title: t('Pay attention!'),
+        title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
         type: NotificationType.ERROR,
         content: message,
         okButton: {
-          text: t('I understand'),
+          text: t('ui.EARNING.components.Modal.Earning.Instruction.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
         }
@@ -245,7 +245,7 @@ function Component (props: Props): React.ReactElement<Props> {
       loading={loading}
       onClick={onClickButton}
     >
-      {t('Stake to earn')}
+      {t('ui.EARNING_VALIDATOR_DETAIL_RWMODAL.components.Modal.Earning.EarningValidatorDetailRWModal.stakeToEarn')}
     </Button>
   );
 
@@ -273,7 +273,7 @@ function Component (props: Props): React.ReactElement<Props> {
         />
         <div className={'__meta-info-group-item'}>
           <div className={'__validator-label'}>
-            {t('Validator')}
+            {t('ui.EARNING_VALIDATOR_DETAIL_RWMODAL.components.Modal.Earning.EarningValidatorDetailRWModal.validator')}
           </div>
           <div className={'__validator-name'}>
             {name || identity || toShort(validatorAddress)}
@@ -282,7 +282,7 @@ function Component (props: Props): React.ReactElement<Props> {
             !!apy &&
               <div className={'__meta-info-item -apy-item'}>
                 <div className={'__meta-info-label'}>
-                  {t('APY:')}
+                  {t('ui.EARNING_VALIDATOR_DETAIL_RWMODAL.components.Modal.Earning.EarningValidatorDetailRWModal.apy')}
                 </div>
                 <NumberComponent
                   className={'__apy-value'}
@@ -298,7 +298,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
           {!!commission && <div className={'__meta-info-item'}>
             <div className={'__meta-info-label'}>
-              {t('Commission:')}
+              {t('ui.EARNING_VALIDATOR_DETAIL_RWMODAL.components.Modal.Earning.EarningValidatorDetailRWModal.commission')}
             </div>
             <NumberComponent
               decimal={0}
@@ -310,7 +310,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
           {totalStake && <div className={'__meta-info-item'}>
             <div className={'__meta-info-label'}>
-              {t('Total stake:')}
+              {t('ui.EARNING_VALIDATOR_DETAIL_RWMODAL.components.Modal.Earning.EarningValidatorDetailRWModal.totalStake')}
             </div>
             <NumberComponent
               decimal={asset?.decimals || 0}
@@ -322,7 +322,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
           {!!nominatorCount && <div className={'__meta-info-item'}>
             <div className={'__meta-info-label'}>
-              {t('Nominator count:')}
+              {t('ui.EARNING_VALIDATOR_DETAIL_RWMODAL.components.Modal.Earning.EarningValidatorDetailRWModal.nominatorCount')}
             </div>
             <NumberComponent
               decimal={0}
@@ -333,7 +333,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
           {!!minStake && <div className={'__meta-info-item'}>
             <div className={'__meta-info-label'}>
-              {t('Minimum active stake:')}
+              {t('ui.EARNING_VALIDATOR_DETAIL_RWMODAL.components.Modal.Earning.EarningValidatorDetailRWModal.minimumActiveStake')}
             </div>
             <NumberComponent
               decimal={asset?.decimals || 0}

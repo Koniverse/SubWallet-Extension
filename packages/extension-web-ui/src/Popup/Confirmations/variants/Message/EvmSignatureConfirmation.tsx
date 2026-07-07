@@ -30,10 +30,10 @@ function Component ({ className, request, type }: Props) {
       <div className={CN('confirmation-content', className)}>
         <ConfirmationGeneralInfo request={request} />
         <div className='title'>
-          {t('Signature required')}
+          {t('ui.DAPP.Confirmations.Message.EvmSignature.signatureRequired')}
         </div>
         <div className='description'>
-          {t('You are approving a request with the following account')}
+          {t('ui.DAPP.Confirmations.Message.EvmSignature.approvingRequestWithAccount')}
         </div>
         <AccountItemWithProxyAvatar
           account={account}
@@ -48,7 +48,7 @@ function Component ({ className, request, type }: Props) {
             size='xs'
             type='ghost'
           >
-            {t('View details')}
+            {t('ui.DAPP.Confirmations.Message.EvmSignature.viewDetails')}
           </Button>
         </div>
         }
@@ -59,7 +59,7 @@ function Component ({ className, request, type }: Props) {
         type={type}
       />
       {(!errors || errors.length === 0) && <BaseDetailModal
-        title={t('Message details')}
+        title={t('ui.DAPP.Confirmations.Message.EvmSignature.messageDetails')}
       >
         <EvmMessageDetail payload={request.payload} />
       </BaseDetailModal>}

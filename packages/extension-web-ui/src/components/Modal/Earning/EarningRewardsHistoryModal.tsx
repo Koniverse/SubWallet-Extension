@@ -42,7 +42,7 @@ function Component ({ className, inputAsset, modalId, onClickViewExplore, reward
           )}
           onClick={onClickViewExplore}
         >
-          {t('View on explorer')}
+          {t('ui.ACCOUNT.components.Modal.Global.AddressQr.viewOnExplorer')}
         </Button>
       }
       id={modalId}

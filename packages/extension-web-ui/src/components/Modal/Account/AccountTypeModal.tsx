@@ -73,7 +73,7 @@ const Component: React.FC<Props> = (props: Props) => {
         icon: <CloseIcon />,
         onClick: onCancel
       }}
-      title={t<string>('Select account type')}
+      title={t<string>('ui.ACCOUNT.components.Modal.Account.Type.selectAccountType')}
     >
       <div className='__select-account-type'>
         <SelectAccountType

@@ -63,7 +63,7 @@ const Component = ({ children, className, onClickFilterIcon, onClickSearchIcon, 
           />
         ),
         onClick: onClickFilterIcon || onOpenCustomizeModal,
-        tooltip: isWebUI ? t('Customize your asset display') : undefined,
+        tooltip: isWebUI ? t('ui.HOME.components.Layout.base.Home.customizeYourAssetDisplay') : undefined,
         tooltipPlacement: 'bottomRight'
       });
     }
@@ -77,7 +77,7 @@ const Component = ({ children, className, onClickFilterIcon, onClickSearchIcon, 
           />
         ),
         onClick: onClickSearchIcon,
-        tooltip: isWebUI ? t('Search a token') : undefined,
+        tooltip: isWebUI ? t('ui.HOME.components.Layout.base.Home.searchAToken') : undefined,
         tooltipPlacement: 'bottomRight'
       });
     }
@@ -95,7 +95,7 @@ const Component = ({ children, className, onClickFilterIcon, onClickSearchIcon, 
 
         ),
         onClick: onOpenNotification,
-        tooltip: t('Notifications'),
+        tooltip: t('ui.components.Layout.Home.notifications'),
         tooltipPlacement: 'bottomRight'
       });
     }

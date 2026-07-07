@@ -72,7 +72,7 @@ const Component: React.FC<Props> = (props: Props) => {
       for (const account of accounts) {
         // todo: Recheck this logic with master account
         if (isSameAddress(account.address, scannedAccount.content)) {
-          return Promise.reject(new Error(t('Account already exists')));
+          return Promise.reject(new Error(t('ui.ACCOUNT.screen.Account.ConnectQrSigner.accountAlreadyExists')));
         }
       }
     }
@@ -148,7 +148,7 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'web-single-column web-cancel-fill-height'}
         onBack={onBack}
         rightFooterButton={{
-          children: loading ? t('Creating') : t('Scan QR code'),
+          children: loading ? t('ui.ACCOUNT.screen.Account.ConnectQrSigner.creating') : t('ui.ACCOUNT.screen.Account.ConnectQrSigner.scanQrCode'),
           icon: FooterIcon,
           onClick: openCamera,
           loading: loading
@@ -196,7 +196,7 @@ const Component: React.FC<Props> = (props: Props) => {
                   />
                 )
               }}
-              i18nKey={detectTranslate('{{deviceName}} will provide you with a QR code to scan. Read <highlight>this instruction</highlight>, for more details.')}
+              i18nKey={detectTranslate('ui.ACCOUNT.screen.Account.ConnectQrSigner.qrCodeInstruction')}
               values={{ deviceName }}
             />
           </div>

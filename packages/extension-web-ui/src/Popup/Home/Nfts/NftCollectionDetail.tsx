@@ -61,13 +61,13 @@ function Component ({ className = '', collectionInfo, nftList }: Props): React.R
   const originAssetInfo = useGetChainAssetInfo(collectionInfo.originAsset);
 
   const { handleSimpleConfirmModal } = useConfirmModal({
-    title: t<string>('Delete NFT'),
+    title: t<string>('ui.NFT.screen.NftsCollectionDetail.deleteNft'),
     maskClosable: true,
     closable: true,
     type: 'error',
-    subTitle: t<string>('You are about to delete this NFT collection'),
-    content: t<string>('Confirm delete this NFT collection'),
-    okText: t<string>('Remove')
+    subTitle: t<string>('ui.NFT.screen.NftsCollectionDetail.aboutToDeleteNftCollection'),
+    content: t<string>('ui.NFT.screen.NftsCollectionDetail.confirmDeleteNftCollection'),
+    okText: t<string>('ui.NFT.screen.NftsCollectionDetail.remove')
   });
 
   const searchNft = useCallback((nftItem: NftItem, searchText: string) => {
@@ -115,8 +115,8 @@ function Component ({ className = '', collectionInfo, nftList }: Props): React.R
 
     return (
       <EmptyList
-        emptyMessage={t('Your NFT collectible will appear here!')}
-        emptyTitle={t('No NFT collectible')}
+        emptyMessage={t('ui.NFT.screen.NftsCollectionDetail.yourNftCollectibleWillAppearHere')}
+        emptyTitle={t('ui.NFT.screen.NftsCollectionDetail.noNftCollectible')}
         phosphorIcon={Image}
       />
     );
@@ -130,11 +130,11 @@ function Component ({ className = '', collectionInfo, nftList }: Props): React.R
             if (result) {
               goBack();
               showNotification({
-                message: t('Deleted NFT collection successfully')
+                message: t('ui.NFT.screen.NftsCollectionDetail.deletedNftCollectionSuccessfully')
               });
             } else {
               showNotification({
-                message: t('Deleted NFT collection unsuccessfully')
+                message: t('ui.NFT.screen.NftsCollectionDetail.deletedNftCollectionUnsuccessfully')
               });
             }
           })
@@ -225,7 +225,7 @@ function Component ({ className = '', collectionInfo, nftList }: Props): React.R
                   onClick={handleDeleteNftCollection}
                   type='ghost'
                 >
-                  {t('Delete this collectible')}
+                  {t('ui.NFT_COLLECTION_DETAIL.Popup.Home.Nfts.NftCollectionDetail.deleteThisCollectible')}
                 </Button>
               </div>
             </>
@@ -244,7 +244,7 @@ function Component ({ className = '', collectionInfo, nftList }: Props): React.R
               renderWhenEmpty={emptyNft}
               searchFunction={searchNft}
               searchMinCharactersCount={2}
-              searchPlaceholder={t<string>('Search Nft name or ID')}
+              searchPlaceholder={t<string>('ui.NFT_COLLECTION_DETAIL.Popup.Home.Nfts.NftCollectionDetail.searchNftNameOrId')}
             />
           )}
       </Layout.Base>

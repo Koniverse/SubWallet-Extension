@@ -25,7 +25,7 @@ function _PhishingDetected ({ className }: Props): React.ReactElement<Props> {
   const decodedWebsite = decodeURIComponent(website);
 
   const footerBtn: ButtonProps = {
-    children: t('Get me out of here'),
+    children: t('ui.SECURITY.screen.PhishingDetected.getMeOutOfHere'),
     icon: <Icon
       phosphorIcon={XCircle}
       weight='fill'
@@ -47,29 +47,29 @@ function _PhishingDetected ({ className }: Props): React.ReactElement<Props> {
       rightFooterButton={footerBtn}
       showBackButton={false}
       subHeaderPaddingVertical={true}
-      title={t('Phishing detection')}
+      title={t('ui.SECURITY.screen.PhishingDetected.phishingDetection')}
     >
       <div className={CN('__upper-block-wrapper')} />
       <PageIcon
         color={token.colorError}
         iconProps={{ phosphorIcon: ShieldSlash, weight: 'fill' }}
       />
-      <div className='title h3-text text-danger'>{t('Phishing detection')}</div>
+      <div className='title h3-text text-danger'>{t('ui.SECURITY.screen.PhishingDetected.phishingDetection')}</div>
       <div className='h4-text text-danger website-url'>{decodedWebsite}</div>
       <div className='phishing-detection-message'>
-        <span>{t('This domain has been reported as a known phishing site on a community maintained list:')}&nbsp;</span>
+        <span>{t('ui.PHISHING_DETECTED.Popup.PhishingDetected.thisDomainHasBeenReportedAsAKnownPhishingSiteOnACommunityMaintainedList')}&nbsp;</span>
         <Typography.Link
           href='https://polkadot.js.org/phishing/#'
           size='lg'
         >
-          {t('view full list')}
+          {t('ui.PHISHING_DETECTED.Popup.PhishingDetected.viewFullList')}
         </Typography.Link>
       </div>
       <div
         className='trust-site'
         onClick={onTrustSite}
       >
-        {t('I trust this site')}
+        {t('ui.SECURITY.screen.PhishingDetected.iTrustThisSite')}
       </div>
       <BackgroundExpandView />
     </Layout.WithSubHeaderOnly>

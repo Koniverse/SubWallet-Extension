@@ -101,7 +101,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
         items={items}
         label={label}
         onSelect={onSelect}
-        placeholder={placeholder || t('Select account')}
+        placeholder={placeholder || t('ui.components.Field.AccountSelector.selectAccount')}
         prefix={
           <Avatar
             size={20}
@@ -114,10 +114,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
         renderWhenEmpty={renderEmpty}
         searchFunction={searchFunction}
         searchMinCharactersCount={1}
-        searchPlaceholder={t<string>('Account name')}
+        searchPlaceholder={t<string>('ui.components.Field.AccountSelector.accountName')}
         selected={value || ''}
         statusHelp={statusHelp}
-        title={label || placeholder || t('Select account')}
+        title={label || placeholder || t('ui.components.Field.AccountSelector.selectAccount')}
       />
     </>
   );

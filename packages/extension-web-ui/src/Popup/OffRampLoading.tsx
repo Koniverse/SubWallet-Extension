@@ -113,7 +113,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           block={true}
           onClick={onBackToHome}
         >
-          {t('I understand')}
+          {t('ui.SETTINGS.screen.Setting.Notifications.iUnderstand')}
         </Button>
       </>
     );
@@ -127,13 +127,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           onClick={onBackToHome}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.components.Modal.DeriveAccountAction.cancel')}
         </Button>
         <Button
           block={true}
           onClick={onRedirectToTransfer}
         >
-          {t('Continue')}
+          {t('ui.components.Modal.DeriveAccountAction.continue')}
         </Button>
       </>
     );
@@ -163,7 +163,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         footer={footerModal}
         id={noAccountModalId}
         onCancel={onBackToHome}
-        title={t('Unable to sell tokens')}
+        title={t('ui.OFF_RAMP_LOADING.Popup.OffRampLoading.unableToSellTokens')}
       >
         <div className={'__modal-content'}>
           <PageIcon
@@ -174,7 +174,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             }}
           />
           <div className='__modal-description'>
-            {t('The requested account is not found in SubWallet. Re-import the account and try again')}
+            {t('ui.OFF_RAMP_LOADING.Popup.OffRampLoading.theRequestedAccountIsNotFoundInSubwalletReImportTheAccountAndTryAgain')}
           </div>
         </div>
       </SwModal>
@@ -184,7 +184,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         footer={redirectFooterModal}
         id={redirectTransakModalId}
         maskClosable={false}
-        title={t('Action needed')}
+        title={t('ui.OFF_RAMP_LOADING.Popup.OffRampLoading.actionNeeded')}
       >
         <div className={'__modal-content'}>
           <PageIcon
@@ -194,7 +194,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             }}
           />
           <div className='__modal-description'>
-            {t('To complete the transaction, you\'ll need to transfer tokens to the the address of your chosen provider. Hit "Continue" to proceed')}
+            {t('ui.OFF_RAMP_LOADING.Popup.OffRampLoading.toCompleteTheTransactionYouLlNeedToTransferTokensToTheTheAddressOfYourChosenProviderHitContinueToProceed')}
           </div>
         </div>
       </SwModal>

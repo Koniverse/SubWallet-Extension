@@ -27,32 +27,32 @@ const Component: React.FC<Props> = (props: Props) => {
       <MetaInfo hasBackgroundWrapper>
         <MetaInfo.Account
           address={data.senderAddress}
-          label={t('Send from')}
+          label={t('ui.TRANSACTION.screen.Transaction.SendFund.from')}
           networkPrefix={networkPrefix}
         />
 
         <MetaInfo.Account
           address={data.recipientAddress}
-          label={t('Send to')}
+          label={t('ui.TRANSACTION.screen.Transaction.SendNFT.sendTo')}
           networkPrefix={networkPrefix}
         />
 
         <MetaInfo.Chain
           chain={transaction.chain}
-          label={t('Network')}
+          label={t('ui.NFT.screen.NftsItemDetail.network')}
         />
       </MetaInfo>
       <MetaInfo hasBackgroundWrapper={true}>
         {
           (data.nftItemName || data.nftItem) && (
-            <MetaInfo.Default label={t('NFT')}>
+            <MetaInfo.Default label={t('ui.TRANSACTION.Confirmations.SendNft.nft')}>
               {data.nftItemName || data.nftItem.name || `${data.nftItem.collectionId}_${data.nftItem.id}`}
             </MetaInfo.Default>
           )
         }
         <MetaInfo.Number
           decimals={decimals}
-          label={t('Estimated fee')}
+          label={t('ui.TRANSACTION.Confirmations.BitcoinSendTransaction.estimatedFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
         />

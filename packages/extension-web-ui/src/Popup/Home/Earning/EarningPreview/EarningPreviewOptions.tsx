@@ -133,8 +133,8 @@ function Component ({ className }: Props) {
   }, [data]);
 
   const filterOptions = useMemo(() => [
-    { label: t('Mainnet'), value: FilterOptionType.MAIN_NETWORK },
-    { label: t('Testnet'), value: FilterOptionType.TEST_NETWORK }
+    { label: t('ui.EARNING.screen.EarningOptions.mainnet'), value: FilterOptionType.MAIN_NETWORK },
+    { label: t('ui.EARNING.screen.EarningOptions.testnet'), value: FilterOptionType.TEST_NETWORK }
   ], [t]);
 
   const filterFunction = useMemo<(item: YieldGroupInfo) => boolean>(() => {
@@ -258,15 +258,15 @@ function Component ({ className }: Props) {
 
       if (isRelatedToAstar(item.group)) {
         openAlert({
-          title: t('Enter Astar portal'),
-          content: t('You are navigating to Astar portal to view and manage your stake in Astar dApp staking v3. SubWallet will offer support for Astar dApp staking v3 soon.'),
+          title: t('ui.EARNING.screen.EarningOptions.enterAstarPortal'),
+          content: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.youAreNavigatingToAstarPortalToViewAndManageYourStakeInAstarDappStakingV3SubwalletWillOfferSupportForAstarDappStakingV3Soon'),
           cancelButton: {
-            text: t('Cancel'),
+            text: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.cancel'),
             schema: 'secondary',
             onClick: closeAlert
           },
           okButton: {
-            text: t('Enter Astar portal'),
+            text: t('ui.EARNING.screen.EarningOptions.enterAstarPortal'),
             onClick: () => {
               openInNewTab(ASTAR_PORTAL_URL)();
               closeAlert();
@@ -377,8 +377,8 @@ function Component ({ className }: Props) {
     return (
       <EmptyList
         className={'__empty-list-earning-options'}
-        emptyMessage={t('No earning option found')}
-        emptyTitle={t('Change your search and try again')}
+        emptyMessage={t('ui.EARNING.screen.EarningOptions.noEarningOptionFound')}
+        emptyTitle={t('ui.EARNING.screen.EarningOptions.changeYourSearchAndTryAgain')}
         phosphorIcon={Vault}
       />
     );
@@ -487,11 +487,11 @@ function Component ({ className }: Props) {
 
   useEffect(() => {
     isAlertWarningValidator && openAlert({
-      title: t('Unrecommended validator'),
+      title: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.unrecommendedValidator'),
       type: NotificationType.ERROR,
-      content: t('Your chosen validator is not recommended by SubWallet as staking with this validator won’t accrue any rewards. Select another validator and try again.'),
+      content: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.yourChosenValidatorIsNotRecommendedBySubwalletAsStakingWithThisValidatorWonTAccrueAnyRewardsSelectAnotherValidatorAndTryAgain'),
       okButton: {
-        text: t('Dismiss'),
+        text: t('ui.EARNING_PREVIEW_OPTIONS.Popup.Home.Earning.EarningPreview.EarningPreviewOptions.dismiss'),
         onClick: () => {
           setIsAlertWarningValidator(false);
           closeAlert();
@@ -518,7 +518,7 @@ function Component ({ className }: Props) {
         subHeaderBackground={'transparent'}
         subHeaderCenter={false}
         subHeaderPaddingVertical={true}
-        title={t<string>('Earning options')}
+        title={t<string>('ui.EARNING.screen.EarningOptions.earningOptions')}
       >
         {
           initLoading && (
@@ -534,7 +534,7 @@ function Component ({ className }: Props) {
                     <>
                       <Toolbar
                         className={'__desktop-toolbar'}
-                        inputPlaceholder={t<string>('Search token')}
+                        inputPlaceholder={t<string>('ui.EARNING.screen.EarningOptions.searchToken')}
                         onClickFilter={onClickFilterButton}
                         onSearch={setSearchInput}
                         searchValue={searchInput}
@@ -566,7 +566,7 @@ function Component ({ className }: Props) {
                       renderWhenEmpty={emptyList}
                       searchFunction={searchFunction}
                       searchMinCharactersCount={1}
-                      searchPlaceholder={t<string>('Search token')}
+                      searchPlaceholder={t<string>('ui.EARNING.screen.EarningOptions.searchToken')}
                       showActionBtn
                     />
                   )
@@ -576,14 +576,14 @@ function Component ({ className }: Props) {
         }
 
         <FilterModal
-          applyFilterButtonTitle={t('Apply filter')}
+          applyFilterButtonTitle={t('ui.EARNING.screen.EarningOptions.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('Filter')}
+          title={t('ui.EARNING.screen.EarningOptions.filter')}
         />
       </Layout.Base>
 

@@ -27,7 +27,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
   }, [navigate]);
 
   const footerBtn = useMemo((): ButtonProps => ({
-    children: t('Back to Security settings'),
+    children: t('ui.ACCESS.Popup.NotFound.Access.backToSecuritySettings'),
     icon: (
       <Icon
         phosphorIcon={House}
@@ -44,7 +44,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
       rightFooterButton={!isWebUI ? footerBtn : undefined}
       showBackButton={isWebUI}
       subHeaderPaddingVertical={true}
-      title={isWebUI ? t('Danger ahead!') : undefined}
+      title={isWebUI ? t('ui.ACCESS.Popup.NotFound.Access.dangerAhead') : undefined}
     >
       <div className='title'>
         <PageIcon
@@ -52,8 +52,8 @@ function Component ({ className }: Props): React.ReactElement<Props> {
           iconProps={{ phosphorIcon: GlobeSimple, weight: 'fill' }}
         />
       </div>
-      <div className='sub-title h3-text'>{t('Danger ahead!')}</div>
-      <div className='h5-text description'>{t('Attackers might trick you into doing something dangerous like installing software or revealing your personal information. Stay away from this page!')}</div>
+      <div className='sub-title h3-text'>{t('ui.ACCESS.Popup.NotFound.Access.dangerAhead')}</div>
+      <div className='h5-text description'>{t('ui.ACCESS.Popup.NotFound.Access.attackersMightTrickYouIntoDoingSomethingDangerousLikeInstallingSoftwareOrRevealingYourPersonalInformationStayAwayFromThisPage')}</div>
       {
         isWebUI &&
         (

@@ -39,17 +39,17 @@ const Component: React.FC<Props> = (props: Props) => {
       center={true}
       id={modalId}
       onCancel={closeModal}
-      title={t('Disconnect wallet')}
+      title={t('ui.components.Modal.DisconnectExtension.disconnectWallet')}
       wrapClassName={CN(className)}
     >
       <div className='body-container'>
         <div className='notice'>
           <div className='title'>
-            {t('Do want to disconnect all wallets?')}
+            {t('ui.components.Modal.DisconnectExtension.confirmDisconnectAllWallets')}
           </div>
         </div>
         <div className='description'>
-          {t('All connected wallets will be disconnected immediately. If you want to disconnect some accounts, please go to the corresponding wallet app to disable.')}
+          {t('ui.components.Modal.DisconnectExtension.disconnectAllWalletsInfo')}
         </div>
         <div className='button-group'>
           <Button
@@ -57,14 +57,14 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick={closeModal}
             schema='secondary'
           >
-            {t('Cancel')}
+            {t('ui.components.Layout.ConnectWebsiteModal.cancel')}
           </Button>
           <Button
             block={true}
             onClick={onClick}
             schema='danger'
           >
-            {t('Disconnect')}
+            {t('ui.components.Modal.DisconnectExtension.disconnect')}
           </Button>
         </div>
       </div>

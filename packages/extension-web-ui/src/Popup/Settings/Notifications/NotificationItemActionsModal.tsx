@@ -44,30 +44,30 @@ function Component (props: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { token } = useTheme() as Theme;
 
-  const getNotificationAction = (type: ExtrinsicType): BriefActionInfo => {
+  const getNotificationAction = useCallback((type: ExtrinsicType): BriefActionInfo => {
     switch (type) {
       case ExtrinsicType.STAKING_WITHDRAW:
         return {
-          title: 'Withdraw tokens',
+          title: t('ui.SETTINGS.screen.Setting.Notifications.withdrawTokens'),
           icon: DownloadSimple
         };
       case ExtrinsicType.STAKING_CLAIM_REWARD:
         return {
-          title: 'Claim tokens',
+          title: t('ui.SETTINGS.screen.Setting.Notifications.claimTokens'),
           icon: Gift
         };
       case ExtrinsicType.CLAIM_BRIDGE:
         return {
-          title: 'Claim tokens',
+          title: t('ui.SETTINGS.screen.Setting.Notifications.claimTokens'),
           icon: Coins
         };
       default:
         return {
-          title: 'View details',
+          title: t('ui.ACCOUNT.components.AccountProxy.SelectorItem.viewDetails'),
           icon: Eye
         };
     }
-  };
+  }, [t]);
 
   const handleNotificationInfo = useMemo(() => {
     const { icon, title } = getNotificationAction(notificationItem.extrinsicType);
@@ -79,7 +79,7 @@ function Component (props: Props): React.ReactElement<Props> {
     };
 
     return sampleData;
-  }, [notificationItem.extrinsicType, token.geekblue]);
+  }, [getNotificationAction, notificationItem.extrinsicType, token.geekblue]);
 
   const onClickReadButton = useCallback(() => {
     setReadNotification(!readNotification);
@@ -107,7 +107,7 @@ function Component (props: Props): React.ReactElement<Props> {
       }
       id={NOTIFICATION_DETAIL_MODAL}
       onCancel={onCancel}
-      title={t('Actions')}
+      title={t('ui.components.Modal.NotificationDetail.actions')}
     >
       <div className={'__button-container'}>
         <div
@@ -136,7 +136,7 @@ function Component (props: Props): React.ReactElement<Props> {
               weight='fill'
             />
           </div>
-          <div className={'__right-part'}>{readNotification ? t('Mark as unread') : t('Mark as read')}</div>
+          <div className={'__right-part'}>{readNotification ? t('ui.components.Modal.NotificationDetail.markAsUnread') : t('ui.components.Modal.NotificationDetail.markAsRead')}</div>
         </div>
       </div>
 

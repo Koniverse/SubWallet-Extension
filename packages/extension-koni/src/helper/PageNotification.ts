@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-const unableConnectImageSrc = chrome.runtime.getURL('/images/icons/__error__.png');
+const unableConnectImageSrc = chrome.runtime.getURL('images/icons/__error__.png');
 
 export function removeNotificationPopup () {
   const divContainerExisted = document.getElementById('__notification-container');

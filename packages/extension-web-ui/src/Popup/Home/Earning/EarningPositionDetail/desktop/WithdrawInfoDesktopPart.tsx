@@ -172,7 +172,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
       <div
         className={CN(className, '__withdraw-info-desktop-part')}
       >
-        <div className={'__part-title'}>{t('Withdraw info')}</div>
+        <div className={'__part-title'}>{t('ui.EARNING.screen.EarningPositionDetail.WithdrawInfo.withdrawInfo')}</div>
 
         <div className={'__withdraw-area'}>
           <Number
@@ -190,7 +190,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
               onClick={onWithDraw}
               size='xs'
             >
-              {t('Withdraw')}
+              {t('ui.EARNING.screen.EarningPositionDetail.withdraw')}
             </Button>
           )}
         </div>
@@ -208,7 +208,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
           }
           onClick={onOpenDetailModal}
           type={'ghost'}
-        >{t('View details')}</Button>
+        >{t('ui.Confirmations.Action.SubmitApi.viewDetails')}</Button>
       </div>
 
       <EarningWithdrawalDetailModal
@@ -227,7 +227,7 @@ function Component ({ className, inputAsset, poolInfo, transactionChainValue, tr
         destroyOnClose={true}
         id={TRANSACTION_YIELD_CANCEL_UNSTAKE_MODAL}
         onCancel={handleCloseCancelUnstake}
-        title={t('Cancel unstake')}
+        title={t('ui.TRANSACTION.constant.transaction.cancelUnstake')}
       >
         <Transaction
           modalContent={isWebUI}

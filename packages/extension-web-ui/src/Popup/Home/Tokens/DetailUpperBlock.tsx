@@ -73,7 +73,7 @@ function Component (
           size={'xs'}
           type={'ghost'}
         />
-        <div className={'__token-display'}>{t('Token')}: {symbol}</div>
+        <div className={'__token-display'}>{t('ui.BALANCE.screen.Tokens.DetailUpperBlock.token')}: {symbol}</div>
       </div>
 
       <div className='__middle-part'>
@@ -97,7 +97,7 @@ function Component (
             onClick={onOpenReceive}
             shape='squircle'
             size={isShrink ? 'xs' : 'sm'}
-            tooltip={isWebUI ? t('Get address') : undefined}
+            tooltip={isWebUI ? t('ui.BALANCE.screen.Tokens.DetailUpperBlock.getAddress') : undefined}
           />
           <div className={'__button-space'} />
           <Button
@@ -112,7 +112,7 @@ function Component (
             onClick={onOpenSendFund}
             shape='squircle'
             size={isShrink ? 'xs' : 'sm'}
-            tooltip={isWebUI ? t('Send tokens') : undefined}
+            tooltip={isWebUI ? t('ui.BALANCE.screen.Tokens.DetailUpperBlock.sendTokens') : undefined}
           />
           <div className={'__button-space hidden'} />
           <Button
@@ -128,7 +128,7 @@ function Component (
             onClick={onOpenSwap}
             shape='squircle'
             size={isShrink ? 'xs' : 'sm'}
-            tooltip={isWebUI ? t('Swap') : undefined}
+            tooltip={isWebUI ? t('ui.BALANCE.screen.Tokens.DetailUpperBlock.swap') : undefined}
           />
           <div className={CN('__button-space', { hidden: isShrink })} />
           <Button
@@ -144,13 +144,13 @@ function Component (
             onClick={onOpenBuyTokens}
             shape='squircle'
             size={isShrink ? 'xs' : 'sm'}
-            tooltip={isWebUI ? t('Buy token') : undefined}
+            tooltip={isWebUI ? t('ui.BALANCE.screen.Tokens.DetailUpperBlock.buyToken') : undefined}
           />
         </ActionButtonsContainer>
 
         <div className={'__your-balance-container'}>
           <div className='__your-balance-label'>
-            {t('Your balance')}
+            {t('ui.BALANCE.screen.Tokens.DetailUpperBlock.yourBalance')}
           </div>
 
           <Tooltip

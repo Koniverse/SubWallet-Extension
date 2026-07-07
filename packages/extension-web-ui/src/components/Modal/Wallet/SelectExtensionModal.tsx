@@ -139,8 +139,8 @@ const Component: React.FC<Props> = (props: Props) => {
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Change your search criteria and try again')}
-        emptyTitle={t('No extensions found')}
+        emptyMessage={t('ui.components.EmptyList.General.changeSearchCriteriaAndTryAgain')}
+        emptyTitle={t('ui.SELECT_EXTENSION_MODAL.components.Modal.Wallet.SelectExtensionModal.noExtensionsFound')}
         phosphorIcon={MagnifyingGlass}
       />
     );
@@ -151,7 +151,7 @@ const Component: React.FC<Props> = (props: Props) => {
       className={CN(className)}
       id={modalId}
       onCancel={onClose}
-      title={t('Connect wallet')}
+      title={t('ui.SELECT_EXTENSION_MODAL.components.Modal.Wallet.SelectExtensionModal.connectWallet')}
     >
       <SwList
         displayRow

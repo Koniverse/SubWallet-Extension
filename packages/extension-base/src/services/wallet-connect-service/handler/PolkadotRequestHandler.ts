@@ -31,7 +31,7 @@ export default class PolkadotRequestHandler {
   #handleError (topic: string, id: number, e: unknown) {
     let message = (e as Error).message;
 
-    if (message.includes('User Rejected Request')) {
+    if (message.includes('bg.DAPP.background.error.EvmProvider.userRejectedRequest')) {
       message = getSdkError('USER_REJECTED').message;
     }
 

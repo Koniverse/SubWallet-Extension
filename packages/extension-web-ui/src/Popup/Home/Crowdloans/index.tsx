@@ -49,9 +49,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [selectedFilterTab, setSelectedFilterTab] = useState<string>(FilterValue.ALL);
 
   const filterOptions = useMemo(() => [
-    { label: t('Polkadot parachain'), value: FilterValue.POLKADOT_PARACHAIN },
-    { label: t('Kusama parachain'), value: FilterValue.KUSAMA_PARACHAIN },
-    { label: t('Won'), value: FilterValue.WON }
+    { label: t('ui.CROWDLOAN.screen.Crowdloans.polkadotParachain'), value: FilterValue.POLKADOT_PARACHAIN },
+    { label: t('ui.CROWDLOAN.screen.Crowdloans.kusamaParachain'), value: FilterValue.KUSAMA_PARACHAIN },
+    { label: t('ui.CROWDLOAN.screen.Crowdloans.won'), value: FilterValue.WON }
   ], [t]);
 
   const filterFunction = useMemo<(item: _CrowdloanItemType) => boolean>(() => {
@@ -130,15 +130,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const filterTabItems = useMemo<FilterTabItemType[]>(() => {
     return [
       {
-        label: t('All'),
+        label: t('ui.CROWDLOANS.Popup.Home.Crowdloans.all'),
         value: FilterValue.ALL
       },
       {
-        label: t('In Auction'),
+        label: t('ui.CROWDLOANS.Popup.Home.Crowdloans.inAuction'),
         value: FilterValue.IN_AUCTION
       },
       {
-        label: t('Won'),
+        label: t('ui.CROWDLOAN.screen.Crowdloans.won'),
         value: FilterValue.WON
       }
     ];
@@ -214,18 +214,18 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderBackground={'transparent'}
         subHeaderCenter={false}
         subHeaderPaddingVertical={true}
-        title={t<string>('Crowdloans')}
+        title={t<string>('ui.components.Layout.Base.crowdloans')}
       >
         {crowdloansContent}
         <FilterModal
-          applyFilterButtonTitle={t('Apply filter')}
+          applyFilterButtonTitle={t('ui.CROWDLOAN.screen.Crowdloans.applyFilter')}
           id={FILTER_MODAL_ID}
           onApplyFilter={onApplyFilter}
           onCancel={onCloseFilterModal}
           onChangeOption={onChangeFilterOption}
           optionSelectionMap={filterSelectionMap}
           options={filterOptions}
-          title={t('Filter')}
+          title={t('ui.CROWDLOAN.screen.Crowdloans.filter')}
         />
       </Layout.Base>
     </PageWrapper>

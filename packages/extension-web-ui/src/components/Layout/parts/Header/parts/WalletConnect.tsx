@@ -54,14 +54,14 @@ const Component: React.FC<ThemeProps> = ({ className }: ThemeProps) => {
 
   const triggerLabel = useMemo(() => {
     if (!sessionItems.length) {
-      return '0 ' + t('connection');
+      return '0 ' + t('ui.WALLET_CONNECT.components.Layout.parts.Header.parts.WalletConnect.connection');
     }
 
     if (sessionItems.length === 1) {
-      return '01 ' + t('connection');
+      return '01 ' + t('ui.WALLET_CONNECT.components.Layout.parts.Header.parts.WalletConnect.connection');
     }
 
-    return `${sessionItems.length}`.padStart(2, '0') + ' ' + t('connections');
+    return `${sessionItems.length}`.padStart(2, '0') + ' ' + t('ui.WALLET_CONNECT.components.Layout.parts.Header.parts.WalletConnect.connections');
   }, [sessionItems.length, t]);
 
   const connectWalletConnectModalProps = useMemo(() => {

@@ -28,11 +28,11 @@ function Component (props: Props): React.ReactElement<Props> {
 
   const timeline = useMemo<string>(() => {
     if (!data.start_time && !data.end_time) {
-      return t('TBD');
+      return t('ui.SETTINGS.screen.Setting.MissionPool.Item.tbd');
     }
 
-    const start = data.start_time ? customFormatDate(new Date(data.start_time), '#DD# #MMM# #YYYY#') : t('TBD');
-    const end = data.end_time ? customFormatDate(new Date(data.end_time), '#DD# #MMM# #YYYY#') : t('TBD');
+    const start = data.start_time ? customFormatDate(new Date(data.start_time), '#DD# #MMM# #YYYY#') : t('ui.SETTINGS.screen.Setting.MissionPool.Item.tbd');
+    const end = data.end_time ? customFormatDate(new Date(data.end_time), '#DD# #MMM# #YYYY#') : t('ui.SETTINGS.screen.Setting.MissionPool.Item.tbd');
 
     return `${start} - ${end}`;
   }, [data.end_time, data.start_time, t]);
@@ -89,7 +89,7 @@ function Component (props: Props): React.ReactElement<Props> {
             phosphorIcon={icon}
             weight={iconWeight}
           />
-          {t(`${name}`)}
+          {name}
         </Tag>
         {
           !!missionStatus && !!missionName && (
@@ -103,7 +103,7 @@ function Component (props: Props): React.ReactElement<Props> {
                 phosphorIcon={missionIcon}
                 weight={missionIconWeight}
               />
-              {t(`${missionName}`)}
+              {missionName}
             </Tag>
           )
         }
@@ -152,7 +152,7 @@ function Component (props: Props): React.ReactElement<Props> {
             </div>
             <div className='__compact-item-date-time'>{timeline}</div>
             <div className={'__compact-item-value-row'}>
-              <div className='__compact-item-label'>{t('Rewards')}:&nbsp;</div>
+              <div className='__compact-item-label'>{t('ui.SETTINGS.screen.Setting.MissionPool.Item.rewards')}:&nbsp;</div>
               <div className='__compact-item-value'>
                 {data.reward}
               </div>
@@ -194,7 +194,7 @@ function Component (props: Props): React.ReactElement<Props> {
           {data.name || ''}
         </div>
         <div className={'__item-rewards __item-value-row'}>
-          <div className='__item-label'>{t('Rewards')}:</div>
+          <div className='__item-label'>{t('ui.SETTINGS.screen.Setting.MissionPool.Item.rewards')}:</div>
           <div className='__item-value'>
             {data.reward}
           </div>
@@ -203,7 +203,7 @@ function Component (props: Props): React.ReactElement<Props> {
           {data.description || ''}
         </div>
         <div className={'__item-timeline __item-value-row'}>
-          <div className='__item-label'>{t('Timeline')}:</div>
+          <div className='__item-label'>{t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.timeline')}:</div>
           <div className='__item-value'>{timeline}</div>
         </div>
         <div className={'__item-tags'}>
@@ -251,7 +251,7 @@ function Component (props: Props): React.ReactElement<Props> {
             shape={'circle'}
             size={'xs'}
           >
-            {t('Join now')}
+            {t('ui.SETTINGS.screen.Setting.MissionPool.DetailModal.joinNow')}
           </Button>
         </div>
       </div>

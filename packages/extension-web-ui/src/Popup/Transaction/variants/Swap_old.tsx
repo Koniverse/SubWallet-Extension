@@ -552,11 +552,11 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
     const _loading = handleRequestLoading && !isFormInvalid;
 
     if (isFormInvalid) {
-      message = t('Invalid input. Re-enter information in the red field and try again');
+      message = t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.invalidInputReEnter');
     } else if (handleRequestLoading) {
-      message = t('Loading...');
+      message = t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.loadingEllipsis');
     } else {
-      message = swapError ? swapError?.message : t('No swap quote found. Adjust your amount or try again later.');
+      message = swapError ? swapError?.message : t('ui.SWAP_OLD.Popup.Transaction.variants.Swap_old.noSwapQuoteFoundAdjustYourAmountOrTryAgainLater');
     }
 
     return (
@@ -611,14 +611,14 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
         const { errors: _errors, id, warnings } = rs;
 
         if (_errors.length || warnings.length) {
-          if (_errors[0]?.message !== 'Rejected by user') {
+          if (_errors[0]?.message !== 'bg.NETWORK.background.error.Provider.rejectedByUser') {
             if (
               _errors[0]?.message.startsWith('UnknownError Connection to Indexed DataBase server lost') ||
               _errors[0]?.message.startsWith('Provided address is invalid, the capitalization checksum test failed') ||
               _errors[0]?.message.startsWith('connection not open on send()')
             ) {
               notify({
-                message: t('Your selected network has lost connection. Update it by re-enabling it or changing network provider'),
+                message: t('ui.TRANSACTION.hook.transaction.useHandleSubmit.selectedNetworkLostConnection'),
                 type: 'error',
                 duration: 8
               });
@@ -674,11 +674,11 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
   const onSubmit: FormCallbacks<SwapParams>['onFinish'] = useCallback((values: SwapParams) => {
     if (chainValue && !checkChainConnected(chainValue)) {
       openAlert({
-        title: t('Pay attention!'),
+        title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
         type: NotificationType.ERROR,
-        content: t('Your selected network might have lost connection. Try updating it by either re-enabling it or changing network provider'),
+        content: t('ui.TRANSACTION.screen.Transaction.Swap.selectedNetworkMightLostConnection'),
         okButton: {
-          text: t('I understand'),
+          text: t('ui.TRANSACTION.screen.Transaction.Swap.iUnderstand'),
           onClick: closeAlert,
           icon: CheckCircle
         }
@@ -705,7 +705,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
     if (account?.isHardware) {
       notify({
-        message: t('The account you are using is Ledger account, you cannot use this feature with it'),
+        message: t('ui.TRANSACTION.screen.Transaction.Swap.featureNotAvailableForLedger'),
         type: 'error',
         duration: 8
       });
@@ -808,11 +808,11 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
     if (currentQuote.isLowLiquidity) {
       openAlert({
-        title: t('Pay attention!'),
+        title: t('ui.ACCOUNT.hook.account.useHandleLedgerAccountWarning.payAttention'),
         type: NotificationType.WARNING,
-        content: t('Low liquidity. Swap is available but not recommended as swap rate is unfavorable'),
+        content: t('ui.TRANSACTION.screen.Transaction.Swap.lowLiquidityWarning'),
         okButton: {
-          text: t('Continue'),
+          text: t('ui.TRANSACTION.screen.Transaction.Swap.continue'),
           onClick: () => {
             closeAlert();
             transactionBlockProcess();
@@ -820,7 +820,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
           icon: CheckCircle
         },
         cancelButton: {
-          text: t('Cancel'),
+          text: t('ui.TRANSACTION.screen.Transaction.Swap.cancel'),
           schema: 'secondary',
           onClick: closeAlert
         }
@@ -1039,9 +1039,9 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
   useEffect(() => {
     if (isWebUI) {
-      setCustomScreenTitle(t('Swap'));
+      setCustomScreenTitle(t('ui.TRANSACTION.screen.Transaction.Swap.swap'));
     } else {
-      setCustomScreenTitle(showQuoteDetailOnMobile ? t('Swap quote detail') : t('Swap'));
+      setCustomScreenTitle(showQuoteDetailOnMobile ? t('ui.SWAP_OLD.Popup.Transaction.variants.Swap_old.swapQuoteDetail') : t('ui.TRANSACTION.screen.Transaction.Swap.swap'));
     }
 
     return () => {
@@ -1287,7 +1287,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   <SwapFromField
                     amountValue={fromAmountValue}
                     fromAsset={fromAssetInfo}
-                    label={t('From')}
+                    label={t('ui.TRANSACTION.screen.Transaction.Swap.from')}
                     onChangeAmount={onChangeAmount}
                     onSelectToken={onSelectFromToken}
                     tokenSelectorItems={fromTokenItems}
@@ -1330,7 +1330,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 >
                   <AccountAddressSelector
                     items={accountAddressItems}
-                    label={`${t('From')}:`}
+                    label={`${t('ui.TRANSACTION.screen.Transaction.Swap.from')}:`}
                     labelStyle={'horizontal'}
                   />
                 </Form.Item>
@@ -1349,9 +1349,9 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                     <AddressInputNew
                       chainSlug={destChainValue}
                       dropdownHeight={isNotShowAccountSelector ? 227 : 167}
-                      label={`${t('To')}:`}
+                      label={`${t('ui.TRANSACTION.screen.Transaction.Swap.to')}:`}
                       labelStyle={'horizontal'}
-                      placeholder={t('Input your recipient account')}
+                      placeholder={t('ui.TRANSACTION.screen.Transaction.Swap.inputYourRecipientAccount')}
                       showAddressBook={true}
                       showScanner={true}
                     />
@@ -1362,7 +1362,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   <FreeBalanceToEarn
                     address={fromValue}
                     hidden={!canShowAvailableBalance || !isSwapXCM}
-                    label={`${t('Available balance')}:`}
+                    label={`${t('ui.TRANSACTION.screen.Transaction.Swap.availableBalance')}:`}
                     tokens={xcmBalanceTokens}
                   />
 
@@ -1371,7 +1371,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                     chain={chainValue}
                     hidden={!canShowAvailableBalance || isSwapXCM}
                     isSubscribe={true}
-                    label={`${t('Available balance')}:`}
+                    label={`${t('ui.TRANSACTION.screen.Transaction.Swap.availableBalance')}:`}
                     tokenSlug={fromTokenSlugValue}
                   />
                 </div>
@@ -1392,7 +1392,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                         >
                           <MetaInfo.Default
                             className={'__quote-rate'}
-                            label={t('Quote rate')}
+                            label={t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.quoteRate')}
                             valueColorSchema={'gray'}
                           >
                             {
@@ -1405,7 +1405,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                           </MetaInfo.Default>
 
                           <MetaInfo.Default
-                            label={t('Estimated fee')}
+                            label={t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.estimatedFee')}
                           >
                             {
                               handleRequestLoading
@@ -1449,7 +1449,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                             size='xs'
                             type='ghost'
                           >
-                            <span>{t('View swap quote')}</span>
+                            <span>{t('ui.SWAP_OLD.Popup.Transaction.variants.Swap_old.viewSwapQuote')}</span>
 
                             <Icon
                               phosphorIcon={CaretRight}
@@ -1472,7 +1472,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
               loading={submitLoading}
               onClick={onPreCheck(form.submit, ExtrinsicType.SWAP)}
             >
-              {t('Swap')}
+              {t('ui.TRANSACTION.screen.Transaction.Swap.swap')}
             </Button>
           </TransactionFooter>
         </div>
@@ -1502,7 +1502,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                   size='xs'
                   type='ghost'
                 >
-                  <span>{t('View quote')}</span>
+                  <span>{t('ui.SWAP_OLD.Popup.Transaction.variants.Swap_old.viewQuote')}</span>
 
                   <Icon
                     phosphorIcon={CaretRight}
@@ -1523,7 +1523,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                 >
                   <MetaInfo.Default
                     className={'__quote-rate'}
-                    label={t('Quote rate')}
+                    label={t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.quoteRate')}
                     valueColorSchema={'gray'}
                   >
                     {renderRateInfo()}
@@ -1531,7 +1531,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
                   <MetaInfo.Default
                     className={'__swap-provider'}
-                    label={t('Swap provider')}
+                    label={t('ui.SWAP_OLD.Popup.Transaction.variants.Swap_old.swapProvider')}
                   >
                     <Logo
                       className='__provider-logo'
@@ -1545,7 +1545,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
 
                   <MetaInfo.Default
                     className={'-d-column'}
-                    label={t('Swap route')}
+                    label={t('ui.TRANSACTION.Confirmations.Swap.swapRoute')}
                   >
                   </MetaInfo.Default>
                   <SwapRoute swapRoute={currentQuote.route} />
@@ -1560,7 +1560,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                           title={'The least amount of token received based on slippage tolerance. Any amount less than this will make the transaction fail.'}
                         >
                           <div className={'__minimum-received-label'}>
-                            <div>{t('Minimum received')}</div>
+                            <div>{t('ui.SWAP_OLD.Popup.Transaction.variants.Swap_old.minimumReceived')}</div>
                             <Icon
                               customSize={'16px'}
                               iconColor={token.colorTextTertiary}
@@ -1611,7 +1611,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                     <MetaInfo.Number
                       className={'__total-fee-value'}
                       decimals={0}
-                      label={t('Estimated fee')}
+                      label={t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.estimatedFee')}
                       onClickValue={onToggleFeeDetails}
                       prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
                       suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
@@ -1740,7 +1740,7 @@ const Component = ({ targetAccountProxy }: ComponentProps) => {
                     <MetaInfo.Number
                       className={'__total-fee-value'}
                       decimals={0}
-                      label={t('Estimated fee')}
+                      label={t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.estimatedFee')}
                       prefix={'$'}
                       value={estimatedFeeValue}
                     />

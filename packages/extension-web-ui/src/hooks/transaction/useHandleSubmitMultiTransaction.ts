@@ -37,7 +37,7 @@ const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonPro
   const onError = useCallback(
     (error: Error) => {
       notify({
-        message: error.message,
+        message: t(error.message),
         type: 'error',
         duration: 8
       });
@@ -47,7 +47,7 @@ const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonPro
         payload: error
       });
     },
-    [dispatchProcessState, notify]
+    [dispatchProcessState, notify, t]
   );
 
   const onSuccess = useCallback(
@@ -56,14 +56,14 @@ const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonPro
         const { errors: _errors, id, processId, warnings } = rs;
 
         if (_errors.length || warnings.length) {
-          if (_errors[0]?.message !== 'Rejected by user') {
+          if (![t('ui.TRANSACTION.hook.transaction.useHandleSubmit.rejectedByUser'), 'bg.NETWORK.background.error.Provider.rejectedByUser'].includes(_errors[0]?.message)) {
             if (
               _errors[0]?.message.startsWith('UnknownError Connection to Indexed DataBase server lost') ||
               _errors[0]?.message.startsWith('Provided address is invalid, the capitalization checksum test failed') ||
               _errors[0]?.message.startsWith('connection not open on send()')
             ) {
               notify({
-                message: t('Your selected network has lost connection. Update it by re-enabling it or changing network provider'),
+                message: t('ui.TRANSACTION.hook.transaction.useHandleSubmitMulti.selectedNetworkLostConnection'),
                 type: 'error',
                 duration: 8
               });
@@ -71,7 +71,7 @@ const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonPro
               return false;
             } else {
               notify({
-                message: _errors[0]?.message || warnings[0]?.message,
+                message: t(_errors[0]?.message || warnings[0]?.message || ''),
                 type: _errors.length ? 'error' : 'warning',
                 duration: 8
               });
@@ -87,6 +87,12 @@ const useHandleSubmitMultiTransaction = (dispatchProcessState: (value: CommonPro
 
             return false;
           } else {
+            notify({
+              message: t(_errors[0].message),
+              type: 'error',
+              duration: 8
+            });
+
             dispatchProcessState({
               type: needRollback ? CommonActionType.STEP_ERROR_ROLLBACK : CommonActionType.STEP_ERROR,
               payload: _errors[0]
