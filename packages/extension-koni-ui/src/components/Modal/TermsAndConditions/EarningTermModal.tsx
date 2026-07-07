@@ -125,9 +125,9 @@ export const EarningTermModal = styled(Component)<Props>(({ theme: { token } }: 
     },
 
     '.ant-modal-title, .ant-sw-modal-title, .ant-sw-sub-header-title, .ant-sw-sub-header-title-content': {
-      overflow: 'visible !important',
-      textOverflow: 'clip !important',
-      whiteSpace: 'nowrap !important'
+      overflow: 'visible',
+      textOverflow: 'clip',
+      whiteSpace: 'nowrap'
     },
 
     '.ant-sw-sub-header-title-content': {
