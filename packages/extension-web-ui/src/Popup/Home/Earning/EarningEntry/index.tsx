@@ -3,15 +3,17 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AlertModal, LoadingScreen, PageWrapper } from '@subwallet/extension-web-ui/components';
-import { CREATE_RETURN, DEFAULT_ROUTER_PATH } from '@subwallet/extension-web-ui/constants';
+import { EarningTermModal } from '@subwallet/extension-web-ui/components/Modal/TermsAndConditions/EarningTermModal';
+import { CONFIRM_EARNING_TERM, CREATE_RETURN, DEFAULT_ROUTER_PATH, EARNING_TERM_AND_CONDITION_MODAL } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { useAlert, useGroupYieldPosition, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import EarningOptions from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningEntry/EarningOptions';
 import EarningPositions from '@subwallet/extension-web-ui/Popup/Home/Earning/EarningEntry/EarningPositions';
 import { EarningEntryParam, EarningEntryView, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { PlusCircle, XCircle } from 'phosphor-react';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
@@ -28,10 +30,22 @@ function Component () {
   const redirectFromPreviewRef = useRef<boolean>(locationState?.redirectFromPreview || false);
   const chainNameRef = useRef<string>(locationState?.chainName || '');
   const { t } = useTranslation();
+  const { activeModal } = useContext(ModalContext);
   const { alertProps, closeAlert, openAlert } = useAlert(alertModalId);
   const [, setReturnStorage] = useLocalStorage(CREATE_RETURN, DEFAULT_ROUTER_PATH);
+  const [confirmedEarningTerm, setConfirmedEarningTerm] = useLocalStorage(CONFIRM_EARNING_TERM, 'nonConfirmed');
   const earningPositions = useGroupYieldPosition();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (confirmedEarningTerm === 'nonConfirmed') {
+      activeModal(EARNING_TERM_AND_CONDITION_MODAL);
+    }
+  }, [activeModal, confirmedEarningTerm]);
+
+  const onAfterConfirmEarningTermModal = useCallback(() => {
+    setConfirmedEarningTerm('confirmed');
+  }, [setConfirmedEarningTerm]);
 
   useEffect(() => {
     if (redirectFromPreviewRef.current) {
@@ -98,6 +112,7 @@ function Component () {
           />
         )
       }
+      <EarningTermModal onOk={onAfterConfirmEarningTermModal} />
     </>
   );
 }
@@ -115,7 +130,7 @@ const Wrapper = ({ className }: Props) => {
   );
 };
 
-const EarningEntry = styled(Wrapper)<Props>(({ theme: { token } }: Props) => ({
+const EarningEntry = styled(Wrapper)<Props>(() => ({
 
 }));
 
