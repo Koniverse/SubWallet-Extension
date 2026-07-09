@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-09 10:23:03 UTC
+> Last generated: 2026-07-09 10:32:51 UTC
 > Total stories: 175
 
-## 📋 Backlog (172)
+## 📋 Backlog (171)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -101,9 +101,8 @@
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | — | — |
 | US-20.5 | List rendering performance | EPIC-20 | P2 | 5 | — | — |
 | US-20.6 | WebApp & web-runner performance | EPIC-20 | P2 | 5 | — | — |
-| US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | — | — |
-| US-21.2 | History backfill | EPIC-21 | P1 | 13 | — | — |
-| US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | — | — |
+| US-21.2 | History backfill | EPIC-21 | P1 | 13 | sprint-2026-W28 | tunghp2002 |
+| US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
 | US-3.1 | Create a new wallet via seed phrase | EPIC-3 | P0 | 3 | — | — |
 | US-3.2 | Import account via seed phrase or private key | EPIC-3 | P0 | 3 | — | — |
 | US-3.3 | Import account via JSON / QR / Trust Wallet | EPIC-3 | P1 | 5 | — | — |
@@ -185,9 +184,11 @@
 
 _No stories_
 
-## 🟡 In Progress (0)
+## 🟡 In Progress (1)
 
-_No stories_
+| ID | Title | Epic | Pri | Points | Sprint | Assignee |
+|---|---|---|---|---|---|---|
+| US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | sprint-2026-W28 | tunghp2002 |
 
 ## 👀 Review (0)
 
@@ -213,12 +214,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 172
+- 📋 **Backlog**: 171
 - 🟢 **Ready**: 0
-- 🟡 **In Progress**: 0
+- 🟡 **In Progress**: 1
 - 👀 **Review**: 0
 - ✅ **Done**: 3
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 0
 
-✓ WIP: 0/3 stories in-progress.
+✓ WIP: 1/3 stories in-progress.
