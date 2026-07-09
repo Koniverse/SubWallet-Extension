@@ -45,6 +45,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 ---
 
 ## Functional Requirements
+
   The wallet's 161 functional requirements, grouped by epic and ordered by importance (foundation first). Each epic states what it covers, why it matters, and its status; the FR table lists every requirement inline with its status. User stories are populated per epic by Stream B under `docs/sprints/`.
 
 **Status key:** ✅ shipped · 🚧 in progress (active PR/branch, not yet released) · 📋 planned (no code yet). Epic badge: 🟢 mostly/fully shipped · 🟡 partially shipped · 🔵 roadmap.
@@ -53,7 +54,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 <summary><strong>📋 FR index</strong> — 161 requirements (click to expand · full text in each epic below)</summary>
 
 | ID | Requirement | Priority | Status | Epic |
-|----|-------------|----------|--------|------|
+| ---- | ------------- | ---------- | -------- | ------ |
 | FR-1 | Manifest V3 (MV3) service-worker background for Chrome/Firefox extension compliance | P0 | ✅ shipped | EPIC-1 |
 | FR-2 | Yarn 3 monorepo package structure enabling code reuse across extension, web app, and mobile | P0 | ✅ shipped | EPIC-1 |
 | FR-3 | Online chain-list hot-update mechanism (no release required) | P0 | ✅ shipped | EPIC-1 |
@@ -227,7 +228,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟢 **Mostly shipped** — 3/4 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-1 | Manifest V3 (MV3) service-worker background for Chrome/Firefox extension compliance | ✅ shipped |
 | FR-2 | Yarn 3 monorepo package structure enabling code reuse across extension, web app, and mobile | ✅ shipped |
 | FR-3 | Online chain-list hot-update mechanism (no release required) | ✅ shipped |
@@ -240,7 +241,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟢 **Shipped** — 8/8 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-5 | **Unified-Account keyring engine** (`keyring-service` + `@subwallet/keyring`) — derives one seed phrase into addresses across Substrate, EVM, Bitcoin, TON and Cardano under a single account, with unified↔solo conversion; the product's signature capability, confined to the background (AD-11, AD-04) | ✅ shipped |
 | FR-6 | **ChainService** (`chain-service`) — maintains a live API object per network for 200+ chains (connect/disconnect, retry, metadata cache) and uses a lightweight WsProvider for balance/token queries to cap memory (AD-02, AD-07) | ✅ shipped |
 | FR-7 | **EarningService pool-handler engine** (`earning-service`) — a `BasePoolHandler` class tree (native / nomination-pool / collator / liquid-staking / lending / dTAO subnet) exposing positions via RxJS subjects; the extensibility seam for every yield protocol (AD-22) | ✅ shipped |
@@ -257,7 +258,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟢 **Mostly shipped** — 14/18 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-13 | Create a new wallet via seed phrase (12/24-word mnemonic) with master password protection | ✅ shipped |
 | FR-14 | Import an existing account via 12/24-word seed phrase (mnemonic) | ✅ shipped |
 | FR-15 | Import an existing account via private key | ✅ shipped |
@@ -284,7 +285,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟡 **Partially shipped** — 12/21 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-31 | Add and remove networks; configure custom RPC endpoints per chain | ✅ shipped |
 | FR-32 | Disable all active networks at once (bulk disable with confirmation) | ✅ shipped |
 | FR-33 | Reset networks to the default active set | ✅ shipped |
@@ -314,7 +315,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟢 **Mostly shipped** — 9/11 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-52 | Phishing protection: block known phishing sites and addresses via @polkadot/phishing list (ChainPatrol API integrated but currently disabled) | ✅ shipped |
 | FR-53 | Master password with strength policy covering all accounts | ✅ shipped |
 | FR-54 | Forgot password → reset wallet (master password is non-recoverable; reset clears accounts and requires re-import) | ✅ shipped |
@@ -334,7 +335,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟢 **Shipped** — 5/5 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-63 | Dark-only UI + responsive extension popup and full-page expand view (theme selector hidden in Settings — light theme not user-selectable) | ✅ shipped |
 | FR-64 | Web app (standalone browser app) with feature parity to the extension | ✅ shipped |
 | FR-65 | Mobile app support via web-runner/WebView strategy sharing extension background logic | ✅ shipped |
@@ -350,7 +351,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟢 **Mostly shipped** — 5/6 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-68 | Aggregate portfolio balance view across all accounts and chains in a single dashboard | ✅ shipped |
 | FR-69 | Transferable vs. locked/frozen balance calculation with correct display in all send flows | ✅ shipped |
 | FR-70 | Auto-detect tokens on supported chains; show/hide zero-balance tokens | ✅ shipped |
@@ -365,7 +366,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟢 **Mostly shipped** — 10/11 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-74 | Send native tokens and fungible tokens (ERC-20, PSP-22) on all supported ecosystems | ✅ shipped |
 | FR-75 | Receive — display QR code and copyable address per ecosystem | ✅ shipped |
 | FR-76 | Custom fee / tip setting for Substrate and EVM transactions | ✅ shipped |
@@ -385,7 +386,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟢 **Mostly shipped** — 7/9 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-85 | NFT display across Substrate collections (RMRK 1.0/2.0, Unique/Quartz, Statemine/Statemint, PSP-34/WASM) | ✅ shipped |
 | FR-86 | Nested / bundled NFT display and navigation (parent–child structure, e.g. Unique network) | ✅ shipped |
 | FR-87 | NFT display across EVM chains (Moonbeam/Moonriver, Astar, ERC-721) | ✅ shipped |
@@ -403,7 +404,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟢 **Mostly shipped** — 8/9 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-94 | MetaMask-compatible EVM provider injection (EIP-1193, EIP-6963 multi-provider discovery) into dApp pages | ✅ shipped |
 | FR-95 | Substrate inject API (window.injectedWeb3) for Polkadot dApp compatibility | ✅ shipped |
 | FR-96 | WalletConnect v2 — Substrate and EVM session support | ✅ shipped |
@@ -423,7 +424,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟢 **Mostly shipped** — 9/11 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-103 | In-wallet token swap via Chainflip (Bitcoin ↔ Polkadot ↔ EVM) | ✅ shipped |
 | FR-104 | In-wallet token swap via HydraDX/Hydration DEX | ✅ shipped |
 | FR-105 | In-wallet token swap via Uniswap V3/V4 and UniswapX (Dutch Swap on EVM) | ✅ shipped |
@@ -443,7 +444,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟢 **Mostly shipped** — 9/14 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-114 | Native nomination staking on Polkadot, Kusama, and Substrate parachains | ✅ shipped |
 | FR-115 | Nomination pool staking on Polkadot/Kusama (join, leave, withdraw) | ✅ shipped |
 | FR-116 | Collator / parachain staking (Moonbeam, Moonriver, Astar, Amplitude, Pendulum, Krest, Energy Web X, Mythos, Tanssi, and compatible parachains) | ✅ shipped |
@@ -466,7 +467,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟡 **Partially shipped** — 7/10 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-128 | XCM cross-chain transfers between Polkadot/Kusama parachains with fee estimation and per-route toggle | ✅ shipped |
 | FR-129 | Snowbridge: ETH ↔ Polkadot Asset Hub bridge | ✅ shipped |
 | FR-130 | Avail Bridge: Avail ↔ Ethereum bridge | ✅ shipped |
@@ -485,7 +486,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟡 **Partially shipped** — 2/3 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-138 | Fiat on-ramp: buy crypto with card via Transak, Banxa, Coinbase Pay, and Meld | ✅ shipped |
 | FR-139 | Fiat off-ramp: sell crypto for fiat via Transak (web app) | ✅ shipped |
 | FR-140 | Additional fiat on-ramp providers (MoonPay, Ramp.Network, Apple Pay / Google Pay) | 📋 planned |
@@ -499,7 +500,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟡 **Partially shipped** — 3/5 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-141 | Polkadot OpenGov: referenda list, referendum detail, conviction vote / revote / unvote | ✅ shipped |
 | FR-142 | OpenGov: locked-token detail view and unlock flow after voting period | ✅ shipped |
 | FR-143 | Governance V1 (Democracy) referenda display — legacy chains, display-only | ✅ shipped |
@@ -515,7 +516,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟢 **Mostly shipped** — 3/4 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-146 | Ledger Nano S/X hardware wallet signing — Substrate generic app, per-chain Substrate apps, and EVM app | ✅ shipped |
 | FR-147 | Keystone hardware wallet QR-based signing (Substrate) | ✅ shipped |
 | FR-148 | Polkadot Vault / Parity Signer QR-based offline signing | ✅ shipped |
@@ -538,7 +539,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟡 **Partially shipped** — 2/3 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-151 | Multisig account creation (deterministic off-chain, no on-chain transaction required) and management for Substrate/Polkadot chains | ✅ shipped |
 | FR-152 | Multisig pending-transaction detection (on-chain, no indexer) with role-differentiated approval/rejection flows (initiator vs co-signer) | ✅ shipped |
 | FR-153 | Multisig auto-detection of activated accounts via on-chain scan, plus indexer-enriched transaction history and pending-transaction detail (call data, confirmations) — Phase 2 | 📋 planned |
@@ -552,7 +553,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🟢 **Mostly shipped** — 7/8 FRs
 
 | FR | Requirement | Status |
-|----|-------------|--------|
+| ---- | ------------- | -------- |
 | FR-154 | Wallet creation and restore onboarding flow with backup reminder and terms acceptance | ✅ shipped |
 | FR-155 | Multi-language UI (i18n): Vietnamese, Chinese, Japanese, Russian localization (Round 1) | ✅ shipped |
 | FR-156 | Additional UI languages (German, French, and others) | 📋 planned |
@@ -572,7 +573,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 - **Status:** 🔵 **Roadmap** — gathers the cross-cutting performance program (feature-local perf stays in each epic's hardening story); #4197 = umbrella perf tracker (GitHub).
 
 | NFR | Story |
-|-----|-------|
+| ----- | ------- |
 | NFR-8 — MV3 service-worker shutdown/wake state persistence | [US-20.1](sprints/stories/US-20.1-core-structure-and-lifecycle-refactor.md) |
 | NFR-12 — Cold-start: cached-first paint, progressive refresh | [US-20.1](sprints/stories/US-20.1-core-structure-and-lifecycle-refactor.md) |
 | NFR-20 — Services SDK aggregation; reduce per-chain RPC fan-out | [US-20.2](sprints/stories/US-20.2-api-call-optimization.md) |
@@ -615,7 +616,7 @@ This project is **FR-centric**: stories link back to the PRD through `prd_ref �
 ## Non-Functional Requirements
 
 | ID | Requirement | Category |
-|----|-------------|----------|
+| ---- | ------------- | ---------- |
 | NFR-1 | Non-custodial: private keys never leave the background service worker; no key material transmitted to any server | Security |
 | NFR-2 | Key isolation: all signing and key operations are confined to the background process; UI and inject scripts hold no private key bytes | Security |
 | NFR-3 | Keys encrypted at rest with AES-256-GCM (via browser-passworder) derived from the master password; raw key bytes never written to storage | Security |

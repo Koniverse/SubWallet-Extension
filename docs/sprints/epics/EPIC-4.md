@@ -82,7 +82,7 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 ### Feature pillars
 
 | # | Pillar | Stories | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | **Network configuration & registry** | [US-4.1](../stories/US-4.1-add-remove-networks-and-custom-rpc.md), [US-4.2](../stories/US-4.2-bulk-disable-and-reset-default-networks.md), [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md), [US-4.4](../stories/US-4.4-substrate-parachain-registry.md), [US-4.9](../stories/US-4.9-substrate-light-client-fallback.md) | Add/remove networks + custom RPC, bulk disable/reset, online metadata updates, the 200+-network registry, light-client fallback |
 | 2 | **Live ecosystems** | [US-4.5](../stories/US-4.5-evm-network-support.md), [US-4.6](../stories/US-4.6-bitcoin-network-integration.md), [US-4.7](../stories/US-4.7-ton-network-integration.md), [US-4.8](../stories/US-4.8-cardano-network-integration.md) | EVM, Bitcoin, TON and Cardano integrations already shipped |
 | 3 | **Token surface** | [US-4.11](../stories/US-4.11-custom-token-import.md), [US-4.12](../stories/US-4.12-token-registry-enable-disable.md) | Custom token import by contract; enable/disable token visibility |
@@ -107,7 +107,7 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 > up front so numbering is locked.
 
 | FR | Story | Status |
-|----|-------|--------|
+| ---- | ------- | -------- |
 | FR-31 | [US-4.1](../stories/US-4.1-add-remove-networks-and-custom-rpc.md) | 📋 backlog |
 | FR-32 | [US-4.2](../stories/US-4.2-bulk-disable-and-reset-default-networks.md) | 📋 backlog |
 | FR-33 | [US-4.2](../stories/US-4.2-bulk-disable-and-reset-default-networks.md) | 📋 backlog |
@@ -142,7 +142,7 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 ## AD Coverage
 
 | AD | Title | Story |
-|----|-------|-------|
+| ---- | ------- | ------- |
 | AD-02 | ChainService per-chain API objects | [US-4.4](../stories/US-4.4-substrate-parachain-registry.md), [US-4.5](../stories/US-4.5-evm-network-support.md), [US-4.21](../stories/US-4.21-asset-hub-migration-hardening.md), [US-4.22](../stories/US-4.22-rpc-and-endpoint-management-hardening.md) |
 | AD-07 | Lightweight WsProvider for balance queries | [US-4.4](../stories/US-4.4-substrate-parachain-registry.md) |
 | AD-12 | Bitcoin integration model (BIP44/84/86, PSBT) | [US-4.6](../stories/US-4.6-bitcoin-network-integration.md), [US-4.13](../stories/US-4.13-bitcoin-utxo-multi-asset-transfer.md) |
@@ -164,7 +164,7 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 ## Stories
 
 | ID | Title | Goal | Status | Version |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | [US-4.1](../stories/US-4.1-add-remove-networks-and-custom-rpc.md) | Add/remove networks + custom RPC | User-managed networks and per-chain custom RPC endpoints | 📋 backlog | — |
 | [US-4.2](../stories/US-4.2-bulk-disable-and-reset-default-networks.md) | Bulk disable + reset to default networks | One-tap disable-all (confirmed) and reset to default active set | 📋 backlog | — |
 | [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md) | Auto-update chain list & token metadata | Online chain/token metadata updates without an extension release | 📋 backlog | — |
@@ -188,13 +188,14 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 | [US-4.21](../stories/US-4.21-asset-hub-migration-hardening.md) | Asset Hub migration hardening | Keep chains/assets visible and endpoints correct through the Asset Hub migration | 📋 backlog | — |
 | [US-4.22](../stories/US-4.22-rpc-and-endpoint-management-hardening.md) | RPC & endpoint-management hardening | Accurate connectivity, endpoint fallback/retry, custom-RPC validation (#4216) | 📋 backlog | — |
 | [US-4.23](../stories/US-4.23-bitcoin-api-path-hardening.md) | Bitcoin-API path hardening | Bitcoin indexer timeouts/retries/provider-drift behind the backend proxy | 📋 backlog | — |
+| [US-4.24](../stories/US-4.24-remove-polygon-zkevm.md) | Remove Polygon zkEVM | Remove Polygon zkEVM network support and update chainlist/domain config | ✅ done | 1.3.80 |
 
 ## Object map & user-story interactions
 
 ### US ↔ entity / subsystem matrix
 
 | US | Primary entity / subsystem | FR |
-|---|---|---|
+| --- | --- | --- |
 | [US-4.1](../stories/US-4.1-add-remove-networks-and-custom-rpc.md) | `ChainService` network config + custom-RPC store | FR-31 |
 | [US-4.2](../stories/US-4.2-bulk-disable-and-reset-default-networks.md) | `ChainService` active-chain set | FR-32, FR-33 |
 | [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md) | `fetchLatestChainData` → `fetchStaticData('chains')` chain-list / asset-registry cache | FR-34 |
@@ -254,7 +255,7 @@ US-4.13..US-4.17) introduce a new API-object type before this flow applies.
 ## Cross-story testing requirements
 
 | Pattern | Stories that apply | Shared infra |
-|---|---|---|
+| --- | --- | --- |
 | **Chain registry / connectivity fixture** | [US-4.1](../stories/US-4.1-add-remove-networks-and-custom-rpc.md), [US-4.2](../stories/US-4.2-bulk-disable-and-reset-default-networks.md), [US-4.4](../stories/US-4.4-substrate-parachain-registry.md), [US-4.9](../stories/US-4.9-substrate-light-client-fallback.md) | `ChainService` test fixtures (mock chain-list + connectivity states) |
 | **Per-ecosystem API-object integration test** | [US-4.5](../stories/US-4.5-evm-network-support.md), [US-4.6](../stories/US-4.6-bitcoin-network-integration.md), [US-4.7](../stories/US-4.7-ton-network-integration.md), [US-4.8](../stories/US-4.8-cardano-network-integration.md), [US-4.10](../stories/US-4.10-starknet-ecosystem-integration.md), [US-4.14](../stories/US-4.14-midnight-network-support.md), [US-4.15](../stories/US-4.15-flow-network-support.md), [US-4.16](../stories/US-4.16-cosmos-ecosystem-support.md), [US-4.17](../stories/US-4.17-solana-support.md) | Connect/disconnect + basic-query harness per API-object type |
 | **Asset-registry import / visibility test** | [US-4.11](../stories/US-4.11-custom-token-import.md), [US-4.12](../stories/US-4.12-token-registry-enable-disable.md) | Asset-registry mutation + visibility-flag fixture |
@@ -266,7 +267,7 @@ US-4.13..US-4.17) introduce a new API-object type before this flow applies.
 ## Performance budgets & invariants
 
 | Concern | Budget | Story | Rationale |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Multi-chain RAM** | WsProvider-only mode ~constant regardless of enabled-chain count (full ApiPromise only on extrinsic build) | [US-4.4](../stories/US-4.4-substrate-parachain-registry.md) | Full ApiPromise hit ~264 MB for 20 chains; the registry must stay usable at 200+ networks (AD-07) |
 | **Chain-list refresh** | Served from cache / CDN proxy, with a bundled JSON fallback | [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md) | Live metadata updates must not hammer RPCs or block first paint (AD-23, AD-25) |
 
@@ -279,8 +280,8 @@ US-4.13..US-4.17) introduce a new API-object type before this flow applies.
 - [ ] EVM, Bitcoin, TON and Cardano ecosystems are fully integrated — [US-4.5](../stories/US-4.5-evm-network-support.md), [US-4.6](../stories/US-4.6-bitcoin-network-integration.md), [US-4.7](../stories/US-4.7-ton-network-integration.md), [US-4.8](../stories/US-4.8-cardano-network-integration.md)
 - [ ] A chain with no reachable RPC falls back to a light client — [US-4.9](../stories/US-4.9-substrate-light-client-fallback.md)
 - [ ] Custom tokens can be imported by contract and per-token visibility controlled — [US-4.11](../stories/US-4.11-custom-token-import.md), [US-4.12](../stories/US-4.12-token-registry-enable-disable.md)
-- [ ] _(planned ecosystems — US-4.10, US-4.13–US-4.17, per FR Coverage)_
-- [ ] _(chain-abstraction platform — US-4.18, US-4.19, US-4.20, per FR Coverage)_
+- [ ] *(planned ecosystems — US-4.10, US-4.13–US-4.17, per FR Coverage)*
+- [ ] *(chain-abstraction platform — US-4.18, US-4.19, US-4.20, per FR Coverage)*
 - [ ] Asset Hub migration is hardened — chains/assets stay visible, endpoints stay correct (defends FR-34 / FR-31) — [US-4.21](../stories/US-4.21-asset-hub-migration-hardening.md)
 - [ ] RPC / endpoint management is hardened — accurate connectivity, fallback/retry, custom-RPC validation that does not block load (defends FR-31, #4216) — [US-4.22](../stories/US-4.22-rpc-and-endpoint-management-hardening.md)
 - [ ] The Bitcoin API path is hardened — indexer timeouts/retries/provider-drift behind the backend proxy (defends FR-37) — [US-4.23](../stories/US-4.23-bitcoin-api-path-hardening.md)

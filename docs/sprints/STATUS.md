@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-06-16 08:32:37 UTC
-> Total stories: 169
+> Last generated: 2026-07-09 10:21:53 UTC
+> Total stories: 175
 
-## 📋 Backlog (169)
+## 📋 Backlog (172)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -101,6 +101,9 @@
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | — | — |
 | US-20.5 | List rendering performance | EPIC-20 | P2 | 5 | — | — |
 | US-20.6 | WebApp & web-runner performance | EPIC-20 | P2 | 5 | — | — |
+| US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | — | — |
+| US-21.2 | History backfill | EPIC-21 | P1 | 13 | — | — |
+| US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | — | — |
 | US-3.1 | Create a new wallet via seed phrase | EPIC-3 | P0 | 3 | — | — |
 | US-3.2 | Import account via seed phrase or private key | EPIC-3 | P0 | 3 | — | — |
 | US-3.3 | Import account via JSON / QR / Trust Wallet | EPIC-3 | P1 | 5 | — | — |
@@ -190,9 +193,13 @@ _No stories_
 
 _No stories_
 
-## ✅ Done (0)
+## ✅ Done (3)
 
-_No stories_
+| ID | Title | Epic | Pri | Points | Sprint | Assignee |
+|---|---|---|---|---|---|---|
+| US-12.17 | Earning term and condition display mechanism | EPIC-12 | P1 | 3 | — | — |
+| US-4.24 | Remove Polygon zkEVM logic and update chainlist | EPIC-4 | P1 | 3 | — | — |
+| US-8.13 | Payload decode error handling — graceful degradation instead of crash | EPIC-8 | P1 | 2 | — | — |
 
 ## 🚫 Blocked (0)
 
@@ -206,11 +213,11 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 169
+- 📋 **Backlog**: 172
 - 🟢 **Ready**: 0
 - 🟡 **In Progress**: 0
 - 👀 **Review**: 0
-- ✅ **Done**: 0
+- ✅ **Done**: 3
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 0
 

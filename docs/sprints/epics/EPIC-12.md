@@ -73,7 +73,7 @@ power, not yield — owned by EPIC-15).
 ### Feature pillars
 
 | # | Pillar | Stories | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | **Native staking** | [US-12.1](../stories/US-12.1-native-nomination-staking-relay-and-parachains.md), [US-12.2](../stories/US-12.2-nomination-pool-staking.md), [US-12.3](../stories/US-12.3-collator-parachain-staking.md), [US-12.5](../stories/US-12.5-dapp-staking-astar.md) | Nomination, pool, collator/parachain and Astar dApp staking on the native pallet path |
 | 2 | **Special staking & lending** | [US-12.4](../stories/US-12.4-liquid-staking-acala-bifrost-parallel-stellaswap.md), [US-12.7](../stories/US-12.7-lending-interlay.md) | Liquid-staking (LST) and Interlay lending via the special-pool handler |
 | 3 | **Bittensor / dTAO** | [US-12.6](../stories/US-12.6-bittensor-dtao-subnet-staking.md), [US-12.10](../stories/US-12.10-bittensor-alpha-token-liquid-staking.md), [US-12.11](../stories/US-12.11-alpha-index-auto-rebalancing-delegate-staking.md), [US-12.12](../stories/US-12.12-trusted-stake-alpha-index.md), [US-12.13](../stories/US-12.13-backprop-alpha-subnet-trading.md) | dTAO subnet staking plus the forward alpha-token product line |
@@ -93,7 +93,7 @@ power, not yield — owned by EPIC-15).
 ## FR Coverage
 
 | FR | Story | Status |
-|----|-------|--------|
+| ---- | ------- | -------- |
 | FR-114 | [US-12.1](../stories/US-12.1-native-nomination-staking-relay-and-parachains.md) | 📋 backlog |
 | FR-115 | [US-12.2](../stories/US-12.2-nomination-pool-staking.md) | 📋 backlog |
 | FR-116 | [US-12.3](../stories/US-12.3-collator-parachain-staking.md) | 📋 backlog |
@@ -132,7 +132,7 @@ power, not yield — owned by EPIC-15).
 ## AD Coverage
 
 | AD | Title | Story |
-|----|-------|-------|
+| ---- | ------- | ------- |
 | AD-22 | EarningService pool-handler class hierarchy | [US-12.1](../stories/US-12.1-native-nomination-staking-relay-and-parachains.md), [US-12.2](../stories/US-12.2-nomination-pool-staking.md), [US-12.3](../stories/US-12.3-collator-parachain-staking.md), [US-12.4](../stories/US-12.4-liquid-staking-acala-bifrost-parallel-stellaswap.md), [US-12.5](../stories/US-12.5-dapp-staking-astar.md), [US-12.7](../stories/US-12.7-lending-interlay.md), [US-12.15](../stories/US-12.15-earning-reward-and-apy-accuracy-hardening.md) |
 | AD-15 | Bittensor integration model (dTAO / alpha-token, native Subtensor path) | [US-12.6](../stories/US-12.6-bittensor-dtao-subnet-staking.md), [US-12.10](../stories/US-12.10-bittensor-alpha-token-liquid-staking.md), [US-12.11](../stories/US-12.11-alpha-index-auto-rebalancing-delegate-staking.md), [US-12.12](../stories/US-12.12-trusted-stake-alpha-index.md), [US-12.13](../stories/US-12.13-backprop-alpha-subnet-trading.md) |
 | AD-18 | XCM delegated to ParaSpell (deposit-step routing) | [US-12.9](../stories/US-12.9-xcm-deposit-routing-into-earning.md) |
@@ -148,7 +148,7 @@ power, not yield — owned by EPIC-15).
 ## Stories
 
 | ID | Title | Goal | Status | Version |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | [US-12.1](../stories/US-12.1-native-nomination-staking-relay-and-parachains.md) | Native nomination staking (relay + parachains) | Nominate validators and stake natively on Polkadot/Kusama and Substrate parachains | 📋 backlog | — |
 | [US-12.2](../stories/US-12.2-nomination-pool-staking.md) | Nomination pool staking | Join / bond-extra / leave / withdraw a nomination pool on Polkadot/Kusama | 📋 backlog | — |
 | [US-12.3](../stories/US-12.3-collator-parachain-staking.md) | Collator / parachain staking | Delegate to collators on Moonbeam/Astar/Amplitude/Mythos and compatible parachains | 📋 backlog | — |
@@ -165,6 +165,7 @@ power, not yield — owned by EPIC-15).
 | [US-12.14](../stories/US-12.14-staking-for-additional-networks-enjin-phala-xx.md) | Staking for additional networks (Enjin/Phala/xx) | Additional-network staking — Enjin/Phala/xx planned (Mythos/Tanssi/Amplitude/Energy ship under FR-114 / US-12.1) | 📋 backlog | — |
 | [US-12.15](../stories/US-12.15-earning-reward-and-apy-accuracy-hardening.md) | Earning reward & APY-accuracy hardening | Keep reward/APY figures accurate across every pool type | 📋 backlog | — |
 | [US-12.16](../stories/US-12.16-earning-performance-and-cache-hardening.md) | Earning performance & cache hardening | Keep the earning surface fast, memory-bounded and cache-fresh across many pools | 📋 backlog | — |
+| [US-12.17](../stories/US-12.17-earning-term-and-condition-display.md) | Earning term & condition display | Display earning T&Cs before user commits to a staking/earning position | ✅ done | 1.3.81 |
 
 > US-12.1–12.14 each materialize one FR (US-12.1–12.9 retroactive; US-12.11 planned;
 > US-12.10/12/13 forward; US-12.14 (FR-127) is **planned** — its Enjin / Phala /
@@ -182,7 +183,7 @@ power, not yield — owned by EPIC-15).
 ### US ↔ entity / subsystem matrix
 
 | US | Primary entity / subsystem | FR |
-|---|---|---|
+| --- | --- | --- |
 | [US-12.1](../stories/US-12.1-native-nomination-staking-relay-and-parachains.md) | `EarningService` `BaseNativeStakingPoolHandler` relay/para subjects + bond/nominate write flows; validator targets from the static-data cache (AD-23) | FR-114 |
 | [US-12.2](../stories/US-12.2-nomination-pool-staking.md) | `NominationPoolHandler` branch + join / bond-extra / claim / unbond / withdraw pool flows | FR-115 |
 | [US-12.3](../stories/US-12.3-collator-parachain-staking.md) | Parachain collator subclasses of `BaseNativeStakingPoolHandler` + delegate / bond-more / schedule+execute-unbond / claim | FR-116 |
@@ -244,7 +245,7 @@ sequenceDiagram
 ## Cross-story testing requirements
 
 | Pattern | Stories that apply | Shared infra |
-|---|---|---|
+| --- | --- | --- |
 | **Pool-handler subject fixture** | [US-12.1](../stories/US-12.1-native-nomination-staking-relay-and-parachains.md), [US-12.2](../stories/US-12.2-nomination-pool-staking.md), [US-12.3](../stories/US-12.3-collator-parachain-staking.md), [US-12.4](../stories/US-12.4-liquid-staking-acala-bifrost-parallel-stellaswap.md), [US-12.5](../stories/US-12.5-dapp-staking-astar.md), [US-12.6](../stories/US-12.6-bittensor-dtao-subnet-staking.md), [US-12.7](../stories/US-12.7-lending-interlay.md) | A mock `EarningService` RxJS subject (position + APY + claimable + unbonding, per pool type) reused by every earning-screen render test |
 | **Multi-step path harness** | [US-12.8](../stories/US-12.8-earning-path-simulation-and-step-tracking.md), [US-12.9](../stories/US-12.9-xcm-deposit-routing-into-earning.md) | A step-status state machine fixture (simulate → submit → track → resume-after-interrupt) the path-tracking + XCM-deposit stories share |
 | **Static earning-data mock** | [US-12.1](../stories/US-12.1-native-nomination-staking-relay-and-parachains.md), [US-12.8](../stories/US-12.8-earning-path-simulation-and-step-tracking.md), [US-12.16](../stories/US-12.16-earning-performance-and-cache-hardening.md) | A stub `fetchStaticData` earning-pool/targets endpoint (fresh + stale + missing) for cache/load + degraded-source tests |
@@ -261,7 +262,7 @@ sequenceDiagram
 ## Performance budgets & invariants
 
 | Concern | Budget | Story | Rationale |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Earning list first paint** | Cached positions visible ≤ 300 ms on popup open (NFR-12) | [US-12.16](../stories/US-12.16-earning-performance-and-cache-hardening.md) | The earning tab is a daily surface; a blank wait while many pool subjects resolve reads as a broken wallet |
 | **Pool data fetch** | Pool info / targets read from static cache, not live RPC per render (NFR-21, AD-23) | [US-12.16](../stories/US-12.16-earning-performance-and-cache-hardening.md) | Live per-render RPC across many pools rate-limits the chain and stalls the list |
 | **Earning aggregation memory** | Read path stays on the lightweight WsProvider / Services-SDK aggregation (≤ 72 MB, NFR-11) | [US-12.16](../stories/US-12.16-earning-performance-and-cache-hardening.md) | Instantiating a full ApiPromise per earning chain to read positions blows the memory budget |

@@ -68,7 +68,7 @@ their own epics.
 ### Feature pillars
 
 | # | Pillar | Stories | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | **Send & receive** | [US-8.1](../stories/US-8.1-send-native-and-fungible-tokens.md), [US-8.2](../stories/US-8.2-receive-qr-and-copyable-address.md) | Native + ERC-20/PSP-22 transfers across five ecosystems; per-ecosystem receive QR + copyable address |
 | 2 | **Fee & tip control** | [US-8.3](../stories/US-8.3-custom-fee-and-tip.md), [US-8.4](../stories/US-8.4-pay-fees-with-non-native-token.md) | User-facing custom fee/tip for Substrate + EVM; pay fees with a non-native token |
 | 3 | **Transaction history** | [US-8.5](../stories/US-8.5-on-chain-transaction-history.md), [US-8.6](../stories/US-8.6-subscan-api-key-configuration.md), [US-8.11](../stories/US-8.11-export-transaction-history.md) | Indexer-backed history, personal Subscan key for higher limits, planned history export |
@@ -88,7 +88,7 @@ their own epics.
 ## FR Coverage
 
 | FR | Story | Status |
-|----|-------|--------|
+| ---- | ------- | -------- |
 | FR-74 | [US-8.1](../stories/US-8.1-send-native-and-fungible-tokens.md) | 📋 backlog |
 | FR-75 | [US-8.2](../stories/US-8.2-receive-qr-and-copyable-address.md) | 📋 backlog |
 | FR-76 | [US-8.3](../stories/US-8.3-custom-fee-and-tip.md) | 📋 backlog |
@@ -110,7 +110,7 @@ their own epics.
 ## AD Coverage
 
 | AD | Title | Story |
-|----|-------|-------|
+| ---- | ------- | ------- |
 | AD-02 | ChainService per-chain API objects (fee/build/submit per ecosystem) | [US-8.3](../stories/US-8.3-custom-fee-and-tip.md), [US-8.4](../stories/US-8.4-pay-fees-with-non-native-token.md), [US-8.12](../stories/US-8.12-fee-bigint-and-gas-estimation-hardening.md) |
 | AD-21 | Per-ecosystem request-handler abstraction in RequestService | [US-8.8](../stories/US-8.8-metadata-hash-signing.md), [US-8.9](../stories/US-8.9-multi-step-one-sign-signing.md), [US-8.10](../stories/US-8.10-token-spending-approval-confirmation.md) |
 | AD-24 | Backend Services SDK for multi-chain data aggregation (fee / history) | [US-8.4](../stories/US-8.4-pay-fees-with-non-native-token.md), [US-8.5](../stories/US-8.5-on-chain-transaction-history.md) |
@@ -124,7 +124,7 @@ their own epics.
 ## Stories
 
 | ID | Title | Goal | Status | Version |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | [US-8.1](../stories/US-8.1-send-native-and-fungible-tokens.md) | Send native & fungible tokens | Send native + ERC-20/PSP-22 tokens across all five ecosystems | 📋 backlog | — |
 | [US-8.2](../stories/US-8.2-receive-qr-and-copyable-address.md) | Receive (QR + copyable address) | Show a per-ecosystem receive QR code and copyable address | 📋 backlog | — |
 | [US-8.3](../stories/US-8.3-custom-fee-and-tip.md) | Custom fee / tip | Let the user set a custom fee and tip on Substrate and EVM sends | 📋 backlog | — |
@@ -137,17 +137,18 @@ their own epics.
 | [US-8.10](../stories/US-8.10-token-spending-approval-confirmation.md) | Token spending-approval confirmation | Surface an ERC-20/PSP-22 allowance approval step before spend | 📋 backlog | — |
 | [US-8.11](../stories/US-8.11-export-transaction-history.md) | Export transaction history | Export the transaction history to a file (planned) | 📋 backlog | — |
 | [US-8.12](../stories/US-8.12-fee-bigint-and-gas-estimation-hardening.md) | Fee/BigInt & gas-estimation hardening | Fix fee-estimation accuracy, non-native fee payment, ED/BigInt transfer-max/all edges, and error surfacing (#4649/#4552/#2643/#4936/#4043/#3314/#4985/#3240) | 📋 backlog | — |
+| [US-8.13](../stories/US-8.13-payload-decode-error-handling.md) | Payload decode error handling | Show a user-facing error instead of crashing when a transaction payload cannot be decoded | ✅ done | 1.3.80 |
 
 > US-8.1..8.11 each materialize one FR (FR-74..84); US-8.12 is the epic's
 > bug/iteration (hardening) cluster and owns no FR — it defends the fee / BigInt /
-> gas-estimation correctness NFRs.
+> gas-estimation correctness NFRs. US-8.13 is a shipped hardening fix (Issue #4989).
 
 ## Object map & user-story interactions
 
 ### US ↔ entity / subsystem matrix
 
 | US | Primary entity / subsystem | FR |
-|---|---|---|
+| --- | --- | --- |
 | [US-8.1](../stories/US-8.1-send-native-and-fungible-tokens.md) | Per-ecosystem `ChainService` transfer builder (`SubstrateApi` / `EvmApi` / BTC / TON / Cardano) | FR-74 |
 | [US-8.2](../stories/US-8.2-receive-qr-and-copyable-address.md) | Per-ecosystem address resolver + QR encoder (keyring/account layer) | FR-75 |
 | [US-8.3](../stories/US-8.3-custom-fee-and-tip.md) | Fee/tip control over the fee engine (Substrate tip / EVM EIP-1559, `api-cache` gas) | FR-76 |
@@ -205,7 +206,7 @@ sequenceDiagram
 ## Cross-story testing requirements
 
 | Pattern | Stories that apply | Shared infra |
-|---|---|---|
+| --- | --- | --- |
 | **Per-ecosystem transfer build → submit harness** | [US-8.1](../stories/US-8.1-send-native-and-fungible-tokens.md), [US-8.4](../stories/US-8.4-pay-fees-with-non-native-token.md), [US-8.12](../stories/US-8.12-fee-bigint-and-gas-estimation-hardening.md) | `services/transaction-service` transfer-build tests + per-ecosystem `ChainService` API-object fixtures (Substrate/EVM/BTC/TON/Cardano) |
 | **Fee-estimation / custom-fee fixture** | [US-8.3](../stories/US-8.3-custom-fee-and-tip.md), [US-8.4](../stories/US-8.4-pay-fees-with-non-native-token.md), [US-8.12](../stories/US-8.12-fee-bigint-and-gas-estimation-hardening.md) | `services` fee tests incl. the EVM-gas `api-cache` path + non-native fee-asset quote (Services SDK) |
 | **Confirmation / safety-guard fixture** | [US-8.7](../stories/US-8.7-existential-deposit-safety-guard.md), [US-8.8](../stories/US-8.8-metadata-hash-signing.md), [US-8.9](../stories/US-8.9-multi-step-one-sign-signing.md), [US-8.10](../stories/US-8.10-token-spending-approval-confirmation.md) | ED-threshold (BigInt vs chain ED constant) + RequestService per-ecosystem handler enqueue harness (metadata-hash / one-sign batch / allowance) |
@@ -218,7 +219,7 @@ sequenceDiagram
 ## Performance budgets & invariants
 
 | Concern | Budget | Story | Rationale |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Fee/gas suggestion responsiveness** | Send form stays interactive while a default estimate shows; refined when the suggestion resolves (never blocks the form) | [US-8.3](../stories/US-8.3-custom-fee-and-tip.md) | Fee/gas fetch via the `api-cache` proxy must not stall the send form; defended by the EVM-gas path test in `services` fee tests |
 | **History first-paint** | In-app records render immediately; indexer results stream in without blocking the first paint | [US-8.5](../stories/US-8.5-on-chain-transaction-history.md) | History is the trust surface; an unreachable indexer must degrade to in-app records + a staleness indicator, not a blank screen (defended by the `HistoryService` merge test) |
 | **Fee/amount/ED arithmetic correctness** | All fee/tip/gas/ED math in integer base units (`bigint`/`BN`), exact at the `transferable = ED` boundary; estimated fee matches the on-chain charge within the chain's tolerance or surfaces unavailable | [US-8.12](../stories/US-8.12-fee-bigint-and-gas-estimation-hardening.md) | A float on an amount is a fund-loss bug; transfer-max/transfer-all at the ED boundary and disconnected-source estimates must never fail silently or show a stale fee (regression-guarded on #4649/#4552/#2643/#4936/#4043/#3314/#4985/#3240) |
