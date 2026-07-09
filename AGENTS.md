@@ -152,15 +152,30 @@ Current docs at the repo root:
 
 - `README.md` — quickstart + feature overview
 - `CONTRIBUTING.md` — contributor workflow
-- `CHANGELOG.md` — release history
+- `CHANGELOG.md` — legacy release history, kept for CI only (see below)
 - `BOUNTIES.md` — open bounties for contributors
 - `LICENSE` — Apache-2.0
 - `VERSION` — canonical semver (= root `package.json` version)
 
 Canonical `docs/` content per koni-docs spec (BRIEF, PRD, ARCHITECTURE,
-CONTEXT, LESSONS, SETUP, sprints/, CHANGELOG) is **pending sub-task 2**.
-Until then, koni-docs `RULE-1` / `RULE-2` (VERSION + CHANGELOG in same
-commit) enforcement is deferred for this repo.
+CONTEXT, LESSONS, SETUP, sprints/, CHANGELOG) is **authored**.
+
+### The two change logs
+
+`docs/CHANGELOG.md` is the **canonical** release history, in koni-docs format.
+The root `CHANGELOG.md` is the same history in the old format, retained solely
+because [`scripts/koni-ci-ghact-build.mjs`](scripts/koni-ci-ghact-build.mjs)
+reads it to gate GitHub releases — it greps for a bare `## <version>` heading,
+which the koni-docs `## [<version>] — …` heading does not match.
+
+**Until the CI script is migrated, a release must be written to both files.**
+
+Retiring the root file: delete it, point that `readFileSync` at
+`docs/CHANGELOG.md`, and change the grep to `## [${version}]`.
+
+koni-docs `RULE-1` / `RULE-2` (VERSION + CHANGELOG in the same commit, real
+commit SHA — never `pending`) apply to `docs/CHANGELOG.md`, which is where
+`npx koni-docs backfill-commits` looks by default.
 
 GitHub issue → story/epic migration is **pending sub-task 3**.
 
@@ -204,9 +219,6 @@ may be added to `skills-lock.json` over time.
 The following are tracked in separate sub-tasks and **not** part of this
 branch (`ai-development`):
 
-- Authoring `docs/BRIEF.md`, `docs/PRD.md`, `docs/ARCHITECTURE.md`,
-  `docs/CONTEXT.md`, `docs/LESSONS.md`, `docs/SETUP.md`,
-  `docs/CHANGELOG.md`, `docs/sprints/` — **sub-task 2**.
 - Migrating GitHub issues to stories/epics — **sub-task 3**.
 - Reconciling `packages/*` version suffix (`-N`) with root VERSION —
   **sub-task 2**.
