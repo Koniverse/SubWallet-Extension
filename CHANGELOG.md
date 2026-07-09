@@ -1,8 +1,23 @@
 # CHANGELOG
 
+## 1.3.82
+Build date: Jul 06, 2026.
+
+Features & Updates:
+- Remove Polygon zkEVM support due to network sunset (#5002)
+
+Bug fixes:
+- Signing popup crashes with "Unable to create Enum via index 9" when SignerPayload.assetId is a V5 cross-consensus Location (#4989)
+
+
+## 1.3.81
+Build date: Jul 03, 2026 => This version was skipped due to a release issue.
+
+
 ## 1.3.80
 Build date: Jun 02, 2026.
 
+Features & Updates:
 - Extension - Re-check transaction failed in case transfer max with balance = ED (#2641)
 - Extension - Show incorrect network address on XCM confirmation screen when perform Swap, Earning (#3936)
 - Re-check logic approve token when perform XCM (#4830)
@@ -12,6 +27,7 @@ Build date: Jun 02, 2026.
 ## 1.3.79
 Build date: May 21, 2026.
 
+Features & Updates:
 - Alpha price calculation mismatch vs TaoStats (#4987)
 - Update ParaSpell API integration to v1 (#4979)
 - Extension – Some issues when merging in version 1.3.78 (#4988)
@@ -21,6 +37,7 @@ Build date: May 21, 2026.
 ## 1.3.78
 Build date: May 14, 2026.
 
+Features & Updates:
 - Extension - Support display destination fee for transfer XCM (#4278)
 - Calculate exactly estimate fee for bridge step in liquid staking (#4803)
 - Disable all networks' switch to Manage Networks page (#4970)
