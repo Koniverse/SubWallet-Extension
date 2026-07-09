@@ -60,7 +60,7 @@ that invariant.
 
 | ID | Title | Goal | Status | Version |
 | --- | --- | --- | --- | --- |
-| [US-21.1](../stories/US-21.1-contributor-identity-map.md) | Contributor identity map | Resolve every git identity to one GitHub login, producing the canonical contributor map | 📋 backlog | — |
+| [US-21.1](../stories/US-21.1-contributor-identity-map.md) | Contributor identity map | Resolve every git identity to one GitHub login, producing the canonical contributor map | 👀 review | — |
 | [US-21.2](../stories/US-21.2-history-backfill.md) | History backfill | Backfill version_shipped, CHANGELOG SHAs, sprint/status history, and bump VERSION | 📋 backlog | — |
 | [US-21.3](../stories/US-21.3-conformance-close-out.md) | Conformance close-out | Run the 5-layer invariant check, graduate notes, make `koni-docs validate` exit zero | 📋 backlog | — |
 

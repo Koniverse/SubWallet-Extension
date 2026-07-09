@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-09 10:32:51 UTC
+> Last generated: 2026-07-09 11:03:05 UTC
 > Total stories: 175
 
 ## 📋 Backlog (171)
@@ -184,15 +184,15 @@
 
 _No stories_
 
-## 🟡 In Progress (1)
+## 🟡 In Progress (0)
+
+_No stories_
+
+## 👀 Review (1)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | sprint-2026-W28 | tunghp2002 |
-
-## 👀 Review (0)
-
-_No stories_
 
 ## ✅ Done (3)
 
@@ -216,10 +216,10 @@ _No stories_
 
 - 📋 **Backlog**: 171
 - 🟢 **Ready**: 0
-- 🟡 **In Progress**: 1
-- 👀 **Review**: 0
+- 🟡 **In Progress**: 0
+- 👀 **Review**: 1
 - ✅ **Done**: 3
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 0
 
-✓ WIP: 1/3 stories in-progress.
+✓ WIP: 0/3 stories in-progress.
