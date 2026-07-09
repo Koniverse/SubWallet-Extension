@@ -527,6 +527,11 @@
   "ui.TRANSACTION.screen.Transaction.SendFund.continue": "Tiếp tục",
   "ui.TRANSACTION.screen.Transaction.Withdraw.continue": "Tiếp tục",
   "ui.TERM.components.Modal.Terms.General.continue": "Tiếp tục",
+  "ui.TERM.components.Modal.Terms.Earning.earningPolicy": "Compliance Confirmation",
+  "ui.TERM.components.Modal.Terms.Earning.subheading": "Before using staking, earning, or any third-party protocol services through SubWallet, please review and confirm the following:",
+  "ui.TERM.components.Modal.Terms.Earning.agreeToEarningPolicy": "I have read, understood, and agree to the above, and confirm that all representations made by me are true, accurate, and complete to the best of my knowledge.",
+  "ui.TERM.components.Modal.Terms.Earning.continue": "I Agree & Continue",
+  "ui.TERM.components.Modal.Terms.Earning.scrollToReadAll": "Scroll to read all sections",
   "ui.TERM.components.Modal.Terms.SeedPhrase.continue": "Tiếp tục",
   "ui.NETWORK.hook.screen.useHandleChainConnection.continue": "Tiếp tục",
   "ui.TRANSACTION.screen.Transaction.Swap.continue": "Tiếp tục",
@@ -2782,7 +2787,7 @@
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOff": "",
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworksUnable": "",
   "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": "",
-  "bg.TRANSACTION.core.validation.transfer.proxyAccountNotEnoughBalance": "",
+  "ui.DAPP.Confirmations.Sign.Substrate.unableToDecode": "",
   "ui.NFT.screen.nested.NftBundleItemDetail.level": "",
   "ui.NFT.screen.nested.NftBundleItemDetail.goToParent": "",
   "ui.NFT.screen.nested.NftBundleItemDetail.description": "",
@@ -2799,5 +2804,8 @@
   "ui.NFT.screen.nested.NftViewStructure.parent": "",
   "ui.NFT.screen.nested.NftViewStructure.nestedInParent": "",
   "ui.NFT.screen.nested.NftViewStructure.nftStructureWithCount": "",
-  "ui.NFT.screen.nested.NftViewStructure.noStructureDataFound": ""
+  "ui.NFT.screen.nested.NftViewStructure.noStructureDataFound": "",
+  "Only shows referenda you've voted directly in": "",
+  "Only shows referenda you've voted through delegation": "",
+  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": ""
 }

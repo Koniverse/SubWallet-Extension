@@ -43,7 +43,7 @@ function getAvailBridgeWarning (): string {
 }
 
 function getPolygonBridgeWarning (originChainInfo: _ChainInfo): string {
-  if (originChainInfo.slug === COMMON_CHAIN_SLUGS.ETHEREUM || originChainInfo.slug === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA) {
+  if (originChainInfo.slug === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA) {
     return 'Cross-chain transfer of this token may take up to 40 minutes. Do you still want to continue?';
   } else {
     return 'Cross-chain transfer of this token may take up to 3 hours, and you’ll need to manually claim the funds on the destination network to complete the transfer. Do you still want to continue?';
