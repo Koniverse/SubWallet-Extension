@@ -208,7 +208,7 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
         validator: (_, contractAddress: string): Promise<void> => {
           return new Promise((resolve, reject) => {
             if (!isAddress(contractAddress)) {
-              reject(t('ui.SETTINGS.screen.Setting.Tokens.ImportFungible.invalidContractAddress'));
+              reject(t('ui.NFT.screen.NftsImport.invalidContractAddress'));
             } else {
               const selectedChain = getFieldValue('chain') as string;
               const selectedNftType = getFieldValue('type') as _AssetType;
@@ -245,7 +245,7 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
                     reject(t('ui.NFT.screen.NftsImport.invalidContractForChain'));
                   });
               } else {
-                reject(t('ui.SETTINGS.screen.Setting.Tokens.ImportFungible.invalidContractAddress'));
+                reject(t('ui.NFT.screen.NftsImport.invalidContractAddress'));
               }
             }
           });
@@ -275,7 +275,7 @@ function Component ({ className = '', modalContent, onSubmitCallback }: Props): 
           ),
           loading: loading,
           onClick: form.submit,
-          children: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.import')
+          children: t('ui.NFT.screen.NftsImport.import')
         }}
         title={t<string>('ui.NFT.screen.NftsImport.importNft')}
       >
