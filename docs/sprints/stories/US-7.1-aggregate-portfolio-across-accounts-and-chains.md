@@ -16,6 +16,16 @@ created: 2026-06-12
 updated: 2026-06-12
 ---
 
+> **⚠️ Corrected 2026-07-13 — AD-07's mechanism does not exist.** Wherever this file says
+> reads ride a *"lightweight WsProvider"* and that a full `ApiPromise` is deferred to
+> extrinsic construction, that is inherited from [AD-07](../../ARCHITECTURE.md#architecture-decisions),
+> which was **decided in 2022 and never implemented**: `SubstrateApi` builds a full
+> `ApiPromise` eagerly per enabled chain and the read path reads off it. Every memory figure
+> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. The gap is
+> owned by [US-20.3](US-20.3-read-path-memory-budget.md); the decision trail is
+> [CONTEXT D95](../../CONTEXT.md).
+
+
 ## Goal
 
 A user opens the wallet and immediately sees one aggregated portfolio value —
@@ -66,7 +76,7 @@ version reconciliation.
   - [x] Consume the multi-account/multi-chain subject exposed by [US-2.5](US-2.5-balance-detection-and-aggregation-engine.md); do not re-derive per-chain.
 - [x] **TASK-7.1.2** — Cached-first render with progressive refresh + skeletons (AC: 2)
   - [x] Serve `redux-persist` last-known snapshot on open; replace rows as fresh data arrives.
-- [x] **TASK-7.1.3** — Account-scope selector recompute on the lightweight read path (AC: 3)
+- [x] **TASK-7.1.3** — Account-scope selector recompute on the read path (AC: 3). *("Lightweight" in the original wording is inherited from AD-07 and is not what the code does — see the banner.)*
   - [x] Assert no full `@polkadot/api` ApiPromise is instantiated for the read (AD-07).
 - [x] **TASK-7.1.4** — Per-chain degraded-source handling (AC: 4)
   - [x] Mark unreachable chains stale; keep aggregate sum over reachable chains.

@@ -16,6 +16,16 @@ created: 2026-06-12
 updated: 2026-06-12
 ---
 
+> **⚠️ Corrected 2026-07-13 — AD-07's mechanism does not exist.** Wherever this file says
+> reads ride a *"lightweight WsProvider"* and that a full `ApiPromise` is deferred to
+> extrinsic construction, that is inherited from [AD-07](../../ARCHITECTURE.md#architecture-decisions),
+> which was **decided in 2022 and never implemented**: `SubstrateApi` builds a full
+> `ApiPromise` eagerly per enabled chain and the read path reads off it. Every memory figure
+> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. The gap is
+> owned by [US-20.3](US-20.3-read-path-memory-budget.md); the decision trail is
+> [CONTEXT D95](../../CONTEXT.md).
+
+
 ## Goal
 
 The balance engine subscribes to and aggregates transferable and locked balances
@@ -69,7 +79,7 @@ This story is **Retroactive** — the engine already ships; `commit` /
 
 - [x] **TASK-2.5.1** — Subscribe + aggregate transferable/locked balances across accounts × chains (AC: 1)
 - [x] **TASK-2.5.2** — Token auto-detection into the aggregate (AC: 2)
-- [x] **TASK-2.5.3** — Read path over WsProvider + Services SDK aggregation layer (AC: 3)
+- [x] **TASK-2.5.3** — Read path over ChainService's per-chain API + the Services SDK aggregation layer (AC: 3). *(The "WsProvider-only" half of the original wording was never built — see the banner.)*
 - [x] **TASK-2.5.4** — Per-source degradation on RPC / SDK backend failure (AC: 4)
 
 ## Dev notes
@@ -103,7 +113,7 @@ This story is **Retroactive** — the engine already ships; `commit` /
 |---|---|
 | AC-1 | Unit test: aggregated transferable/locked balances per account + roll-up (`services/balance-service` tests) |
 | AC-2 | Test: a held-but-unlisted token is auto-detected into the aggregate |
-| AC-3 | Inspect read path: WsProvider / Services SDK used; no full ApiPromise per chain |
+| AC-3 | Services SDK aggregation is used (AD-24 — real). ⚠️ The "no full ApiPromise per chain" half is FALSE in the shipped code — see [US-20.3](US-20.3-read-path-memory-budget.md). |
 | AC-4 | Test: RPC / SDK backend down → stale/last-known for that source, healthy chains unaffected |
 
 ## Changelog entry

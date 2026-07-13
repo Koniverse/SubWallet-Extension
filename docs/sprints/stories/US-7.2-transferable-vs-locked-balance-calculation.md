@@ -16,6 +16,16 @@ created: 2026-06-12
 updated: 2026-06-12
 ---
 
+> **⚠️ Corrected 2026-07-13 — AD-07's mechanism does not exist.** Wherever this file says
+> reads ride a *"lightweight WsProvider"* and that a full `ApiPromise` is deferred to
+> extrinsic construction, that is inherited from [AD-07](../../ARCHITECTURE.md#architecture-decisions),
+> which was **decided in 2022 and never implemented**: `SubstrateApi` builds a full
+> `ApiPromise` eagerly per enabled chain and the read path reads off it. Every memory figure
+> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. The gap is
+> owned by [US-20.3](US-20.3-read-path-memory-budget.md); the decision trail is
+> [CONTEXT D95](../../CONTEXT.md).
+
+
 ## Goal
 
 For every token the user holds, split the raw balance into a **transferable**

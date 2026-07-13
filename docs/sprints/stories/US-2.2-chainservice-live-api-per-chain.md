@@ -16,6 +16,16 @@ created: 2026-06-12
 updated: 2026-06-12
 ---
 
+> **⚠️ Corrected 2026-07-13 — AD-07's mechanism does not exist.** Wherever this file says
+> reads ride a *"lightweight WsProvider"* and that a full `ApiPromise` is deferred to
+> extrinsic construction, that is inherited from [AD-07](../../ARCHITECTURE.md#architecture-decisions),
+> which was **decided in 2022 and never implemented**: `SubstrateApi` builds a full
+> `ApiPromise` eagerly per enabled chain and the read path reads off it. Every memory figure
+> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. The gap is
+> owned by [US-20.3](US-20.3-read-path-memory-budget.md); the decision trail is
+> [CONTEXT D95](../../CONTEXT.md).
+
+
 ## Goal
 
 ChainService gives every supported network a single, managed API object and a
@@ -72,7 +82,7 @@ This story is **Retroactive** — the engine already ships; `commit` /
 ## Tasks
 
 - [x] **TASK-2.2.1** — One managed `SubstrateApi`/`EvmApi` per network with reuse (AC: 1)
-- [x] **TASK-2.2.2** — Lightweight WsProvider read path; defer full ApiPromise to extrinsic construction (AC: 2)
+- [x] **TASK-2.2.2** — ~~Lightweight WsProvider read path; defer full ApiPromise to extrinsic construction~~ — **never built** (see the banner). What shipped: one `ApiPromise` per enabled chain, created eagerly, with connect/disconnect/retry and a metadata cache. The memory contract is [US-20.3](US-20.3-read-path-memory-budget.md)'s to measure.
   - [x] Confirm memory envelope holds as chain count grows (AD-07).
 - [x] **TASK-2.2.3** — Connect/disconnect/retry lifecycle + metadata cache (AC: 3)
 - [x] **TASK-2.2.4** — Per-chain failure isolation on bad endpoints (AC: 4)
@@ -106,7 +116,7 @@ This story is **Retroactive** — the engine already ships; `commit` /
 | AC | Command |
 |---|---|
 | AC-1 | Unit test: `ChainService` returns one cached `SubstrateApi`/`EvmApi` per chain key |
-| AC-2 | Inspect read path: balance queries use WsProvider; assert no ApiPromise instantiation (`services/chain-service` tests) |
+| AC-2 | ⚠️ Obsolete — the assertion is false in the shipped code. `git grep 'new ApiPromise' -- packages/extension-base/src/services/chain-service/handler/SubstrateApi.ts` shows one per chain. See [US-20.3](US-20.3-read-path-memory-budget.md). |
 | AC-3 | Test: simulated disconnect → reconnect reuses cached metadata |
 | AC-4 | Test: unreachable endpoint → chain marked disconnected, other chains unaffected |
 

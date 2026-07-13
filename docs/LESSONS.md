@@ -958,4 +958,20 @@ See [US-21.1](sprints/stories/US-21.1-contributor-identity-map.md), [US-21.2](sp
 
 ---
 
+## 64. A doc-stated invariant is a claim, not evidence — check the code before you build a story to "guard" it
+
+**What happened**: [AD-07](ARCHITECTURE.md#architecture-decisions) and NFR-11 stated that balance/token reads ride a *"lightweight WsProvider"* connector and that the full `@polkadot/api` `ApiPromise` is instantiated *"only for extrinsic construction"*, bounding RAM at ~72 MB regardless of chain count. A story ([US-20.3](sprints/stories/US-20.3-read-path-memory-budget.md)) was written to *guard that invariant against regression*, and a dozen other stories and epics repeated the claim in their own Background, ACs and even their **ticked** task lists. An audit found the mechanism **has never existed**: `SubstrateApi`'s constructor builds `new ApiPromise` eagerly for every enabled chain and never tears it down, and the read path awaits it (`substrateApiMap[slug].isReady`) and reads `substrateApi.api.query.balances.locks.multi(…)` off it. Same shape at v0.4.1 (2022), at v1.1.64 — the release AD-07 *claimed it shipped in* — and at v1.3.83. The string `lightweight` has zero hits in `packages/*/src`. AD-07's citation was wrong too: the PR it names merged a chain-list update.
+
+**Why**: a decision was recorded ([CONTEXT D2](CONTEXT.md), 2022) and then the *decision* was cited ever after as if it were the *implementation*. Nothing in the toolchain checks that. Worse, the claim propagated: each new story inherited it from the AD, so the docs became internally consistent and externally false — and consistency is exactly what a reviewer checks.
+
+**How to avoid**:
+- Treat an AD / NFR as a **claim with a citation**, not as a fact. Before depending on one, run the grep: does the mechanism exist in the tree, at the tag the AD says it shipped in?
+- An AD's "shipped vX.Y.Z" is a testable statement. Test it: `git grep <the mechanism's symbol> vX.Y.Z`.
+- Be extra suspicious of a story whose job is to *guard* or *not regress* an invariant. That framing presumes the invariant exists. If nobody can point at the code, the story's real first task is to **measure**, not to guard.
+- Numbers age with their platform. The 137/264/72 MB figures were measured on the **MV2 always-on background page**; under MV3 the worker sleeps after 60 s and stops every chain API, so the premise changed and nobody re-measured. A number without a probe in CI is folklore.
+
+See [CONTEXT D95](CONTEXT.md) (revision of D2), [US-20.3](sprints/stories/US-20.3-read-path-memory-budget.md), [US-21.2](sprints/stories/US-21.2-history-backfill.md).
+
+---
+
 _End of LESSONS.md_

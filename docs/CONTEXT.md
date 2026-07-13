@@ -1546,3 +1546,21 @@
 **Citations**: [notes/2026-07-13-id-renumber.md](notes/2026-07-13-id-renumber.md)
 
 ---
+
+### D95. The lightweight read connector (revision of D2) was never implemented — measure before refactoring
+
+**Context**: [D2](#d2-replace-apipromise-with-a-lightweight-connector-for-balancetoken-queries) (2022-05-10) decided to replace `ApiPromise` with a lightweight `WsProvider`-only connector for balance/token reads, deferring the full `ApiPromise` to extrinsic construction. AD-07 recorded it as *"shipped v1.1.64"* and NFR-11 states the ≤72 MB budget it promised. **An audit on 2026-07-13 found the mechanism has never existed in the code.**
+
+**Evidence**: at **v0.4.1** (2022-05, the D2 era), at **v1.1.64** (the release AD-07 claimed it shipped in) and at **v1.3.83**, the substrate read path awaits the full `ApiPromise` — `substrateApiMap[slug].isReady` — and reads off it (`api.query.system.account.multi(…)` then `api.query.balances.locks.multi(…)`). `SubstrateApi`'s constructor builds `new ApiPromise` eagerly for every enabled chain and never tears it down; one read site even reaches `api.tx.nominationPools`. The string `lightweight` has **zero hits** in `packages/*/src` at any of the three tags. AD-07's citation was wrong too: PR #3024 merged `koni/dev/3020`, and 1.1.64 shipped only *"Update chain-list (#3020)"*. This is not a regression — the mechanism was **never** built as described.
+
+**Decision**: Do **not** open the read-path refactor on the strength of the doc. **Measure first.** [US-20.3](sprints/stories/US-20.3-read-path-memory-budget.md) is rescoped from "guard the ≤72 MB invariant" to "measure the real budget, then decide": land a memory probe, record the true number in AD-07 / NFR-11, and only then judge whether an ApiPromise-free read path is worth building. AD-07 and NFR-11 now carry ⚠️ notes saying the invariant is not held; FR-6 and FR-9 no longer credit AD-07.
+
+**Rationale**: The 2022 numbers (137 MB / 4 chains, 264 MB / 20 chains, 72 MB WsProvider-only) were measured on the **MV2 always-on background page**. Under MV3 the worker sleeps after 60 s idle and `sleep()` stops every chain API ([D6](#d6-scope-mv3-migration-storage-to-chromestorage-defer-pouchdb), AD-08) — memory no longer accumulates for the life of the browser session, so the premise the decision rested on has changed and **nobody has re-measured**. Meanwhile, rewriting every balance read across 200+ chains is the highest-blast-radius change available in a wallet: a wrong balance costs trust, not milliseconds. A refactor of that size must be justified by a number, not by a sentence in a doc.
+
+**Impact**: The docs stop asserting a property the code does not have — which is the concrete harm here: a contributor (human or AI) reading AD-07 would conclude balance reads are ApiPromise-free and reason from that. The refactor stays on the table, gated on the measurement. Two cheaper wins surfaced by the same audit are better first spends: the unbounded `while (isContinue)` notification pagination loop fired 4× per address every 30 min (US-20.2 AC-3 / #4021, zero commits), and the already-written multicall3 balance batching sitting unmerged on `koni/dev/issue-4984`.
+
+**Date**: 2026-07-13
+**Version**: docs-only (audit against v1.3.83)
+**Citations**: [D2](#d2-replace-apipromise-with-a-lightweight-connector-for-balancetoken-queries); AD-07; NFR-11; [US-20.3](sprints/stories/US-20.3-read-path-memory-budget.md); [US-21.2](sprints/stories/US-21.2-history-backfill.md)
+
+---

@@ -16,6 +16,16 @@ created: 2026-06-12
 updated: 2026-06-12
 ---
 
+> **⚠️ Corrected 2026-07-13 — AD-07's mechanism does not exist.** Wherever this file says
+> reads ride a *"lightweight WsProvider"* and that a full `ApiPromise` is deferred to
+> extrinsic construction, that is inherited from [AD-07](../../ARCHITECTURE.md#architecture-decisions),
+> which was **decided in 2022 and never implemented**: `SubstrateApi` builds a full
+> `ApiPromise` eagerly per enabled chain and the read path reads off it. Every memory figure
+> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. The gap is
+> owned by [US-20.3](US-20.3-read-path-memory-budget.md); the decision trail is
+> [CONTEXT D95](../../CONTEXT.md).
+
+
 ## Goal
 
 The wallet ships a Polkadot/Substrate registry covering 200+ networks
@@ -60,7 +70,7 @@ already shipped.
 
 - [x] **TASK-4.4.1** — Registry of 200+ Substrate networks (relay + parachains), searchable (AC: 1)
 - [x] **TASK-4.4.2** — Per-chain live connectivity status driven by `SubstrateApi` connect state (AC: 2, 4)
-- [x] **TASK-4.4.3** — WsProvider-first connection; defer full `ApiPromise` to extrinsic build (AC: 3)
+- [x] **TASK-4.4.3** — ~~WsProvider-first connection; defer full `ApiPromise` to extrinsic build~~ — **never built** (see the banner). What shipped: a `WsProvider` handed straight into a full `ApiPromise`, one per enabled chain.
 
 ## Dev notes
 
@@ -98,7 +108,7 @@ already shipped.
 |---|---|
 | AC-1 | Manual: browse registry → 200+ Substrate networks searchable |
 | AC-2, AC-4 | Manual: enable a chain → live status; unreachable chain → unavailable, registry usable |
-| AC-3 | Manual: enable many chains → RAM stays bounded (WsProvider mode) |
+| AC-3 | ⚠️ Unverifiable as written — there is no WsProvider-only mode and no memory probe. [US-20.3](US-20.3-read-path-memory-budget.md) owns measuring the real ceiling. |
 
 ## Changelog entry
 

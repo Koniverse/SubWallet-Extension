@@ -242,10 +242,16 @@ from `@polkadot/networks`.
 | TON | TON client | `@ton/ton` |
 | Bitcoin | UTXO builder | `bitcoinjs-lib` |
 
-Each enabled chain gets one API instance managed by `ChainService`. RAM
-usage is controlled by creating lightweight WsProvider-only connections
-for balance queries and instantiating the full `ApiPromise` only when
-complex extrinsic construction is needed (see AD-07).
+Each enabled chain gets one API instance managed by `ChainService`.
+**`SubstrateApi`'s constructor builds a full `ApiPromise` eagerly for every enabled
+chain and keeps it for the chain's lifetime — including on the read path**, which
+awaits `substrateApiMap[slug].isReady` and reads off `substrateApi.api.query.*`.
+RAM is therefore bounded by *how many chains are enabled and awake*, not by a
+lightweight read connector: the MV3 worker sleeps after 60 s idle and
+`sleep()` stops every chain API (see AD-08). The WsProvider-only read path that
+[AD-07](#architecture-decisions) describes **is not implemented** — see the ⚠️ note on
+that row, and [US-20.3](sprints/stories/US-20.3-read-path-memory-budget.md), which now
+owns measuring what the real budget is.
 
 XCM cross-chain transfers are coordinated in `extension-base` using
 Paraspell-compatible `MultiLocation` v3 formatting. XCM route
@@ -329,7 +335,7 @@ update before tagging.
 | AD-04 | Non-custodial keyring confined to background | `@subwallet/keyring` and `@subwallet/ui-keyring` are instantiated only in the background service worker; no private key bytes flow to UI or inject scripts | Eliminates key exfiltration via XSS or compromised dApp pages; hardware-wallet signing delegates to device | issues #433; security area entries |
 | AD-05 | Yarn 3 monorepo package boundaries | Codebase split into twelve packages with explicit peer/runtime dependencies | Enables code reuse across extension and mobile/web contexts (`extension-base` shared by extension-koni, web-runner, webapp); prevents coupling between UI and background logic | issues #276, #169, #594; AGENTS.md §3 |
 | AD-06 | Webpack 5 bundle splitting | Extension output split into many smaller chunks rather than one monolithic bundle | Avoids Firefox extension submission file-size limits (~4 MB per file cap); reduces memory overhead from large monolithic JS files | issues #48, #80, #131; shipped v0.3.6 |
-| AD-07 | Lightweight WsProvider for balance queries; full ApiPromise deferred | Use a custom lightweight connector for balance/token queries; instantiate full `@polkadot/api` ApiPromise only for extrinsic construction | Full ApiPromise consumed ~137 MB for 4 chains / ~264 MB for 20 chains; WsProvider-only mode requires only ~72 MB regardless of chain count | issues #217, #232; PR #3024; shipped v1.1.64 |
+| AD-07 | Lightweight WsProvider for balance queries; full ApiPromise deferred | **⚠️ DECIDED 2022, NEVER IMPLEMENTED (audited 2026-07-13).** The decision ([CONTEXT D2](CONTEXT.md), revised by D95) was to use a lightweight WsProvider connector for balance/token reads and instantiate the full `@polkadot/api` ApiPromise only for extrinsic construction. **The code has never done this.** | The 2022 rationale — full ApiPromise ~137 MB for 4 chains / ~264 MB for 20 chains vs ~72 MB WsProvider-only — was measured on the **MV2 always-on background page**. Under MV3 the worker sleeps after 60 s idle and `sleep()` stops every chain API (AD-08), so the premise has changed and **nobody has re-measured**. | Evidence: at v0.4.1, v1.1.64 (the release this row claimed it shipped in) and v1.3.83 the read path awaits the full ApiPromise (`substrateApiMap[slug].isReady`) and reads `substrateApi.api.query.balances.locks.multi(…)` off it; `SubstrateApi` builds `new ApiPromise` eagerly per chain; the string `lightweight` has **zero hits** in `packages/*/src`. The old citation "PR #3024; shipped v1.1.64" is also wrong — PR #3024 merged `koni/dev/3020`, and 1.1.64 shipped only *"Update chain-list (#3020)"*. Original issues: #217, #232. **Owner of the gap: [US-20.3](sprints/stories/US-20.3-read-path-memory-budget.md) — measure first, then decide whether to refactor or to rewrite this row.** |
 | AD-08 | Manifest V3 migration with service worker background | Rebuild background layer around MV3 event-driven service worker rather than polyfilling the MV2 persistent-page model | Chrome enforcement timeline left no viable alternative; WASM support resolved via `wasm-unsafe-eval` CSP from Chrome 102; service worker shutdown/wake lifecycle required new state-persistence strategy | issues #349, #413, #412, #707, #782 |
 | AD-09 | Per-chain XCM route toggle | XCM transfer routes are individually configurable per chain pair and can be disabled at runtime without a code release | Enables rapid response to partner-chain security incidents (e.g., Acala 2022 incident, issue #667) without requiring a full extension release cycle | issues #667, #695; bridge-xcm decision entries |
 | AD-10 | Polkadot-js fork with upstream rebase strategy | Fork `polkadot-js/extension` and maintain `origin` remote so upstream changes can be rebased at any time | Minimises divergence risk and keeps the extension compatible with polkadot-js tooling; avoids full-rewrite maintenance burden | issue #15; decided 2022-03-15 |

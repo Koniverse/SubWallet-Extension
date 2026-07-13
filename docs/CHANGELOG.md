@@ -604,7 +604,7 @@ Bug fixed:
 
 Features & Update:
 
-- Optimize Subscan API request (#4458)
+- Optimize Subscan API request (#4448 — the published release note said `#4458` in error; #4458 is the chain-list bump below. The work is PR #4470 / branch `koni/dev/issue-4448`: `strategy/api-request-strategy-v2`, an md5-keyed 60s response cache and group request cancellation)
 - Update Gears Library (#4443)
 - Support buy token BTC (Bitcoin) (#4490)
 - Update chainlist stable v0.2.108 (#4458)

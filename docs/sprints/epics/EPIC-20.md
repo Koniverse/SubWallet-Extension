@@ -14,6 +14,16 @@ created: 2026-06-12
 updated: 2026-06-12
 ---
 
+> **⚠️ Corrected 2026-07-13 — AD-07's mechanism does not exist.** Wherever this file says
+> reads ride a *"lightweight WsProvider"* and that a full `ApiPromise` is deferred to
+> extrinsic construction, that is inherited from [AD-07](../../ARCHITECTURE.md#architecture-decisions),
+> which was **decided in 2022 and never implemented**: `SubstrateApi` builds a full
+> `ApiPromise` eagerly per enabled chain and the read path reads off it. Every memory figure
+> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. The gap is
+> owned by [US-20.3](../stories/US-20.3-read-path-memory-budget.md); the decision trail is
+> [CONTEXT D95](../../CONTEXT.md).
+
+
 ## Goal
 
 EPIC-20 owns the wallet's **cross-cutting performance and lifecycle program** —
@@ -90,6 +100,27 @@ boundary is drawn explicitly in Out of scope.
 - **The Services SDK and cache/CDN proxy engines** — the backend aggregation layer (AD-24) and the `api-cache` / `static-data` / `ipfs-files` proxy layer (AD-25) are built in [EPIC-2](EPIC-2.md) and consumed across the read epics. EPIC-20 enforces that the client *routes through* them instead of fanning out redundantly; it does not build the backend.
 - **Functional correctness of the data being made faster** — accuracy of balances, APY, fees, routing remains owned by the engine epics ([EPIC-2](EPIC-2.md)) and the feature epics. EPIC-20 never trades correctness for speed.
 
+## Shipped state (audited 2026-07-13)
+
+> EPIC-20 was written as a roadmap epic and every story sat at `backlog`. **That was
+> wrong.** Four pieces of this program are in the product and no story recorded them:
+>
+> | Shipped | Release | Story it belongs to |
+> | --- | --- | --- |
+> | `#4428` MV3 lifecycle **P1** — wake-depth split (`pub(` → partial wake, `pri(` → full wake) | **1.3.42** | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) |
+> | `#4478` fix for the regression #4428 introduced (`isFullActive` never reset → Home/Earning failed to load after the first sleep) | **1.3.43** | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) |
+> | `#4448` `api-request-strategy-v2` — md5-keyed 60 s response cache + group cancellation (**the changelog mislabelled this `#4458`**) | **1.3.47** | [US-20.2](../stories/US-20.2-api-call-optimization.md) |
+> | `#4465` aggregated data routed through the external Services SDK (18 call sites) — what actually satisfies NFR-20 / AD-24 | **1.3.52** | [US-20.2](../stories/US-20.2-api-call-optimization.md) |
+>
+> US-20.1 and US-20.2 are now `in-progress` — **stalled, not active** (last commits 2025).
+> US-20.3 / US-20.4 / US-20.5 / US-20.6 remain `backlog`: every issue they cite (#4197,
+> #4427, #4445, #4446, #4021, #4447, #2245, #2549, #2248, #2337) has **zero commits**.
+> US-20.4's `#4984` has real work but on an **unmerged branch**, in no release.
+>
+> One doc-vs-reality gap this audit exposed: **AD-07 / NFR-11's invariant is not held by
+> the code** — the substrate read path uses the full `ApiPromise`, not a lightweight
+> WsProvider. Owner: [US-20.3](../stories/US-20.3-read-path-memory-budget.md).
+
 ## AD Coverage
 
 | AD | Title | Story |
@@ -133,8 +164,8 @@ boundary is drawn explicitly in Out of scope.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | Core-structure & lifecycle refactor | Phase the MV3 background into Init/Start/StartFull + background-idle, remove deprecated features, refactor cron/subscription into services, and refine the data-processing architecture | 📋 backlog | — |
-| [US-20.2](../stories/US-20.2-api-call-optimization.md) | API-call optimization | Remove redundant API fan-out, cap per-window requests, and fix the notification-fetch flood that suspends other requests and blocks opening the extension | 📋 backlog | — |
+| [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | Core-structure & lifecycle refactor | Phase the MV3 background into Init/Start/StartFull + background-idle, remove deprecated features, refactor cron/subscription into services, and refine the data-processing architecture | 🚧 in-progress | — |
+| [US-20.2](../stories/US-20.2-api-call-optimization.md) | API-call optimization | Remove redundant API fan-out, cap per-window requests, and fix the notification-fetch flood that suspends other requests and blocks opening the extension | 🚧 in-progress | — |
 | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | Read-path memory budget | Hold the ≤72 MB balance/read-path budget regardless of chain count via the lightweight WsProvider path | 📋 backlog | — |
 | [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | Many-account submit performance | Stop the freeze when, with many accounts, a user submits a tx then closes the history popup | 📋 backlog | — |
 | [US-20.5](../stories/US-20.5-list-rendering-performance.md) | List rendering performance | Make heavy lists/screens (NFT / Receive / customization / select token / select network) render fast | 📋 backlog | — |
