@@ -1464,3 +1464,85 @@
 **Citations**: [#4105](https://github.com/Koniverse/SubWallet-Extension/issues/4105) (1inch, PR #4223), [#39](https://github.com/Koniverse/SubWallet-Extension/issues/39) (Acala), [#38](https://github.com/Koniverse/SubWallet-Extension/issues/38) (Zenlink), [#40](https://github.com/Koniverse/SubWallet-Extension/issues/40) (Parallel Finance)
 
 ---
+
+## Phase 4 — v1.3.8x (2026, shipped v1.3.83)
+
+> The current era. Its first decisions come from the koni-docs adoption (EPIC-21): making the doc layer canonical over 302 releases of existing history. They govern how the docs describe the product rather than the product itself — but they bind every future story, so they belong in the log.
+
+### D90. Run two changelogs until the CI release gate is migrated
+
+**Context**: koni-docs requires `docs/CHANGELOG.md` in its own format (`## [X.Y.Z] — date — title — vX.Y.Z`, `**Commit**: <sha>`). The repo already had a root `CHANGELOG.md` in the old format, and [`scripts/koni-ci-ghact-build.mjs`](../scripts/koni-ci-ghact-build.mjs) greps it for a bare `## <version>` heading to gate GitHub releases — the koni-docs heading does not match that grep.
+
+**Decision**: Keep both files. `docs/CHANGELOG.md` is **canonical** (all 302 releases converted, with real commit SHAs); the root file is retained byte-compatible with the CI grep. Until the CI script is migrated, **a release must be written to both**.
+
+**Rationale**: Deleting the root file today breaks the release pipeline; converting the pipeline is a code change with its own risk, and the docs work could not wait on it. Two files with one canonical source is the cheaper temporary cost.
+
+**Impact**: Retiring the root file later is mechanical: point that `readFileSync` at `docs/CHANGELOG.md` and change the grep to `## [${version}]`. Recorded in AGENTS.md §7.
+
+**Date**: 2026-07-10
+**Version**: docs-only (product at 1.3.82)
+**Citations**: AGENTS.md §7 "The two change logs"; `scripts/koni-ci-ghact-build.mjs`
+
+---
+
+### D91. One repo, two version spaces — declare the space, never mix the numbers
+
+**Context**: `master` / `subwallet-dev` build the **extension** (tagged `vX.Y.Z`, at 1.3.83). `webapp` / `webapp-dev` build the **web app** — untagged, its releases are `[CI Skip] release/stable X.Y.Z` commits, at 1.3.56, with its own CHANGELOG on that branch. `origin/master` is not an ancestor of `origin/webapp`. **Extension v1.3.56 and web-app 1.3.56 are different releases.**
+
+**Decision**: A story's `version_shipped` is meaningless without its space. Stories default to the extension space; a story that shipped in the web app declares `version_space: webapp`. Containment is proven against the tag (extension) or the release commit (web app).
+
+**Rationale**: The alternative — scoping the docs tree to the extension only — would have forced us to delete real, shipped capabilities from the PRD (Transak off-ramp) every time one lands in a sibling surface. The product is the wallet, not one of its builds.
+
+**Impact**: [US-14.2](sprints/stories/US-14.2-fiat-off-ramp-sell-crypto-for-fiat.md) is the first story in the web-app space (1.3.56). Documented in AGENTS.md §7 with the anchor commands for each space.
+
+**Date**: 2026-07-13
+**Version**: docs-only
+**Citations**: AGENTS.md §7 "The two version spaces"; [US-21.2](sprints/stories/US-21.2-history-backfill.md)
+
+---
+
+### D92. The PRD needs a `⏸️ withdrawn` state — "shipped" is not forever
+
+**Context**: Two capabilities were marked `✅ shipped` and are no longer in the product: Interlay lending (shipped 1.1.36, **removed** in 1.2.12, #3226) and NFT-mint campaigns (ran on the web-app Earning Dashboard as an unversioned CD deploy during the Oct–Nov 2023 campaign; surface since deleted).
+
+**Decision**: Add `⏸️ withdrawn` to the PRD status key — *was in the product, since removed*. The story keeps whatever status its delivery earned: [US-12.7](sprints/stories/US-12.7-lending-interlay.md) stays `done` (it really shipped), [US-19.6](sprints/stories/US-19.6-nft-mint-campaigns.md) stays `backlog` (no numbered release ever carried it).
+
+**Rationale**: Without a withdrawn state, the PRD tells a true-but-misleading story: a reader planning work would believe Interlay lending is available. Marking it `📋 planned` would be worse — it erases the fact that it was built.
+
+**Date**: 2026-07-13
+**Version**: docs-only
+**Citations**: docs/PRD.md status key; [US-21.2](sprints/stories/US-21.2-history-backfill.md)
+
+---
+
+### D93. `prd_ref` holds `FR-N` **or** `NFR-N` — the project is requirement-centric, not FR-centric
+
+**Context**: 22 hardening / performance stories had an empty `prd_ref` because no FR describes what they defend (memory budget, cold-start, supply chain, API-key hygiene). The koni-docs schema had always allowed `^NFR-\d+$` in `prd_ref`; no story in the repo had ever used it.
+
+**Decision**: Capability stories cite the FR they materialize; hardening and performance stories cite the **NFR** they defend. The PRD's "FR-centric" wording was corrected accordingly.
+
+**Rationale**: Forcing a hardening story onto a capability FR is how false claims get in — and they did: US-8.12 and EPIC-8 cited an "arithmetic-correctness NFR" that does not exist; US-20.4/US-20.5 cited NFR-11/NFR-17 for properties those rows do not state.
+
+**Impact**: 19 stories mapped; nine NFRs now referenced. Six stories keep an empty `prd_ref` on purpose — the three EPIC-21 docs stories, plus four whose property the PRD genuinely does not state (see the PRD-gap list in US-21.2).
+
+**Date**: 2026-07-13
+**Version**: docs-only
+**Citations**: [US-21.2](sprints/stories/US-21.2-history-backfill.md); frontmatter-spec §`prd_ref`
+
+---
+
+### D94. One-time gapless renumber of FR and EPIC-12 story IDs — never again
+
+**Context**: Deleting two title-extrapolated duplicate stories (Trusted Stake's child issue #4946; "Backprop" #4880, which was really US-11.7's alpha swap) left two holes in the FR table and two in EPIC-12's story IDs — the only gaps in the tree.
+
+**Decision**: Close them by renumbering (FR-125→124; FR-127..161 −2; US-12.12→11, 12.14→12, 12.15→13, 12.16→14, 12.17→15), **once**, while the docs tree still lived only on `ai-development` and had never merged to `master`. IDs are otherwise permanent — this is the only renumber in the project's history.
+
+**Rationale**: The blast radius was at its minimum (docs-only; no source, CI script or automation references an FR/US ID) and it only grows once the tree ships. The alternative was two permanent holes in a 159-row table.
+
+**Impact**: Anything written before 2026-07-13 (commit messages, review comments, chat) uses the old numbering. The full old→new mapping is in [2026-07-13-id-renumber.md](notes/2026-07-13-id-renumber.md).
+
+**Date**: 2026-07-13
+**Version**: docs-only
+**Citations**: [notes/2026-07-13-id-renumber.md](notes/2026-07-13-id-renumber.md)
+
+---

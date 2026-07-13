@@ -11,8 +11,8 @@ goal: "Launch EPIC-21 docs conformance program — contributor map, history back
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | 👀 review | new | [link](stories/US-21.1-contributor-identity-map.md) |
-| US-21.2 | History backfill | EPIC-21 | P1 | 13 | 🚧 in-progress | new | [link](stories/US-21.2-history-backfill.md) |
-| US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | 📋 backlog | new | [link](stories/US-21.3-conformance-close-out.md) |
+| US-21.2 | History backfill | EPIC-21 | P1 | 13 | 👀 review | new | [link](stories/US-21.2-history-backfill.md) |
+| US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | 👀 review | new | [link](stories/US-21.3-conformance-close-out.md) |
 
 ## Sprint goal recap
 
@@ -20,7 +20,7 @@ This sprint launches the **docs conformance program** (EPIC-21) as the first wav
 
 The sequencing follows the dependency chain: US-21.1 (contributor map) must complete before US-21.2 (history backfill), which must complete before US-21.3 (conformance close-out). US-21.2 is the largest story (13pt) and spans the full sprint; the plan below phases accordingly.
 
-**Deliverable**: By sprint end, `npx koni-docs validate` exits zero, all 175 stories have canonical metadata, and the conformance invariants are CI-gated.
+**Deliverable**: By sprint end, `npx koni-docs validate` exits zero, all 174 stories have canonical metadata, and the conformance invariants are CI-gated.
 
 ## Phased plan
 

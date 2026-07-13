@@ -1,5 +1,7 @@
 # 2026-07-13 — Gapless ID renumber (FR + EPIC-12 stories)
 
+> **(graduated 2026-07-13)** — recorded as [CONTEXT.md](../CONTEXT.md) D94. **This file stays** as the lookup table: it is the only place the full old→new ID mapping lives.
+
 **What changed:** the two ID gaps left by the 2026-07-10 duplicate-story deletion
 were closed by renumbering. Every ID below its gap keeps its number; every ID
 above shifts down. **This is the only renumber in the project's history** — IDs

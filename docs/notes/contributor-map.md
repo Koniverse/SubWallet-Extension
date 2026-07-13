@@ -1,5 +1,7 @@
 # Contributor identity map
 
+> **Deliverable of [US-21.1](../sprints/stories/US-21.1-contributor-identity-map.md) — not a scratch note.** It is the lookup table `assignee` resolution depends on (email → GitHub login); it does not graduate and must not be deleted.
+
 Canonical mapping from every git identity in this repository to exactly one GitHub
 login. Story [US-21.1](../sprints/stories/US-21.1-contributor-identity-map.md).
 

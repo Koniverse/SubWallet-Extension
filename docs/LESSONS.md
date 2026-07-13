@@ -912,4 +912,50 @@ See [#178](https://github.com/Koniverse/SubWallet-Extension/issues/178), [#415](
 
 ---
 
+## 61. Merged is not enabled, and enabled is not shipped — check the tree and the build env, not just git
+
+**What happened**: Two capabilities were recorded as `✅ shipped` and neither was ever available to a user. The **Bitcoin dApp provider** merged in v1.3.43, but the injection is commented out on the inject path with a "wait until ready" note — no release has ever exposed `connect` / `getAddresses` / `signPsbt` to a dApp. The **NFT-mint campaign** is worse: its commits *are* ancestors of every extension tag from v1.1.36, so `git tag --contains` "proves" it shipped — but the Jan-2024 earning migration deleted the mint render *before* that first containing tag, and the extension build never injects `NFT_MINTING_HOST`, so `MINT_HOST` is `''` and the service can't reach a host. `MintCampaignService` is still instantiated in `State.ts` in every release, with all its UI callers commented out and `packages/webapp/public/images/subwallet/mint-nft-done.gif` orphaned.
+
+**Why**: Commit containment is a *necessary* condition for "shipped", never a sufficient one. A commit rides into a release; a **capability** needs its code present in that release's tree, reachable from a UI entry point, and switched on by the build (env var, feature flag, uncommented injection). Each of those can fail independently, and git tells you nothing about any of them.
+
+**How to avoid**:
+- Before calling a capability shipped, check the release's **tree**, not its ancestry: `git ls-tree <release-sha> <path>` for the surface, plus a grep for the entry point (a commented-out `inject(...)`, a `const [, setX]` that discards the result, a `process.env.FOO ||''`).
+- Check the **build**: is the env var/flag actually injected in the workflow that builds that target? A secret set only in a preview-deploy workflow means the capability shipped in the preview, not the product.
+- When containment and the shipped tree disagree, **the tree wins**.
+- Dead code from an ended campaign lingers: if a service is instantiated but its env var is never set and its callers are commented out, it's a cleanup candidate, not a feature.
+
+See [#4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929), [#5007](https://github.com/Koniverse/SubWallet-Extension/issues/5007), PRD FR-98 / FR-157, and [US-21.2](sprints/stories/US-21.2-history-backfill.md).
+
+---
+
+## 62. One repo, two release lineages — the same version number means two different products
+
+**What happened**: While backfilling shipping versions, the Transak off-ramp looked like it "shipped in 1.3.56" — but the extension at 1.3.56 has no off-ramp code at all. The flow shipped in **web-app 1.3.56**, an entirely different release.
+
+**Why**: `master` / `subwallet-dev` build the extension (tagged `vX.Y.Z`, now 1.3.83). `webapp` / `webapp-dev` build the web app — **untagged**, its releases are `[CI Skip] release/stable X.Y.Z` commits on `origin/webapp`, with its own `CHANGELOG.md` on that branch, now at 1.3.56. `origin/master` is not an ancestor of `origin/webapp`; hundreds of commits diverge. The two lineages share a version-number series and nothing else.
+
+**How to avoid**:
+- Never state a version without its space. In the docs, stories declare `version_space: webapp` (extension is the default).
+- Anchor containment per space: `git merge-base --is-ancestor <sha> v<ver>` for the extension; for the web app, resolve the release commit first — `git log --format='%H %s' origin/webapp --grep='^\[CI Skip\] release/stable <ver>$'` — and test against that.
+- A feature can ship in one lineage and be *written but abandoned* in the other: the extension off-ramp port sits unmerged on `koni/dev/issue-3843`, in no tag.
+
+See AGENTS.md §7 "The two version spaces", [US-14.2](sprints/stories/US-14.2-fiat-off-ramp-sell-crypto-for-fiat.md).
+
+---
+
+## 63. Issue numbers in git history collide with inherited upstream polkadot-js PRs — always date-window the grep
+
+**What happened**: Tracing which commit delivered a changelog bullet by its issue number (`git log --all --grep='#911'`) returned commits from 2019 — polkadot-js PRs inherited with the fork, not SubWallet work. Attributing them would have dated features years early and credited the wrong authors.
+
+**Why**: The repo is a fork of `polkadot-js/extension` and carries its full history. Low issue/PR numbers exist in both numbering spaces. Nothing in the commit message distinguishes them.
+
+**How to avoid**:
+- Filter every `--grep` by a date window around the release you are tracing (±270 days was enough for every case in the 302-release backfill), and discard anything outside it.
+- Sanity-check the author: an upstream-era commit is usually authored by a polkadot-js maintainer, and its email will not resolve through `docs/notes/contributor-map.md`.
+- The same trap bites `git tag --contains` on early commits: the six earliest Koni releases have neither a tag nor a release commit, so containment must be proven against the earliest existing tag (`v0.2.5`) instead.
+
+See [US-21.1](sprints/stories/US-21.1-contributor-identity-map.md), [US-21.2](sprints/stories/US-21.2-history-backfill.md).
+
+---
+
 _End of LESSONS.md_

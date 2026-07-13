@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-13 05:01:51 UTC
+> Last generated: 2026-07-13 08:48:09 UTC
 > Total stories: 174
 
-## 📋 Backlog (58)
+## 📋 Backlog (57)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -39,7 +39,6 @@
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | — | — |
 | US-20.5 | List rendering performance | EPIC-20 | P2 | 5 | — | — |
 | US-20.6 | WebApp & web-runner performance | EPIC-20 | P2 | 5 | — | — |
-| US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
 | US-3.8 | Account recovery & identity (roadmap) | EPIC-3 | P3 | 8 | — | — |
 | US-3.9 | Unified → Solo account split | EPIC-3 | P0 | 3 | — | — |
 | US-4.10 | Starknet ecosystem integration | EPIC-4 | P1 | 5 | — | — |
@@ -75,13 +74,14 @@ _No stories_
 
 _No stories_
 
-## 👀 Review (3)
+## 👀 Review (4)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | — | tunghp2002 |
 | US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | sprint-2026-W28 | tunghp2002 |
 | US-21.2 | History backfill | EPIC-21 | P1 | 13 | sprint-2026-W28 | tunghp2002 |
+| US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
 
 ## ✅ Done (113)
 
@@ -213,10 +213,10 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 58
+- 📋 **Backlog**: 57
 - 🟢 **Ready**: 0
 - 🟡 **In Progress**: 0
-- 👀 **Review**: 3
+- 👀 **Review**: 4
 - ✅ **Done**: 113
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 0
