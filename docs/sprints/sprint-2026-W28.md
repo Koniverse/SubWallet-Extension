@@ -1,6 +1,6 @@
 ---
 id: sprint-2026-W28
-status: done
+status: closed
 start: 2026-07-06
 end: 2026-07-12
 goal: "Launch EPIC-21 docs conformance program — contributor map, history backfill, and conformance close-out"
