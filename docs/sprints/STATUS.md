@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-13 09:31:57 UTC
+> Last generated: 2026-07-13 10:21:46 UTC
 > Total stories: 174
 
-## 📋 Backlog (55)
+## 📋 Backlog (54)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -33,7 +33,6 @@
 | US-18.3 | Auto-detection + indexer history + Phase-2 optimization | EPIC-18 | P2 | 5 | — | — |
 | US-19.3 | Additional UI languages (DE/FR/…) | EPIC-19 | P3 | 3 | — | — |
 | US-19.6 | NFT mint campaigns | EPIC-19 | P2 | 3 | — | — |
-| US-20.3 | Read-path memory budget | EPIC-20 | P1 | 3 | — | — |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | — | — |
 | US-20.5 | List rendering performance | EPIC-20 | P2 | 5 | — | — |
 | US-20.6 | WebApp & web-runner performance | EPIC-20 | P2 | 5 | — | — |
@@ -206,20 +205,22 @@ _No stories_
 
 _No stories_
 
-## 🗑️ Deprecated (0)
+## 🗑️ Deprecated (1)
 
-_No stories_
+| ID | Title | Epic | Pri | Points | Sprint | Assignee |
+|---|---|---|---|---|---|---|
+| US-20.3 | Read-path memory budget | EPIC-20 | P1 | 0 | — | — |
 
 ---
 
 ## Summary
 
-- 📋 **Backlog**: 55
+- 📋 **Backlog**: 54
 - 🟢 **Ready**: 0
 - 🟡 **In Progress**: 2
 - 👀 **Review**: 4
 - ✅ **Done**: 113
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 0
+- 🗑️ **Deprecated**: 1
 
 ✓ WIP: 2/3 stories in-progress.

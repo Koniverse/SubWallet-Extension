@@ -970,6 +970,8 @@ See [US-21.1](sprints/stories/US-21.1-contributor-identity-map.md), [US-21.2](sp
 - Be extra suspicious of a story whose job is to *guard* or *not regress* an invariant. That framing presumes the invariant exists. If nobody can point at the code, the story's real first task is to **measure**, not to guard.
 - Numbers age with their platform. The 137/264/72 MB figures were measured on the **MV2 always-on background page**; under MV3 the worker sleeps after 60 s and stops every chain API, so the premise changed and nobody re-measured. A number without a probe in CI is folklore.
 
+**Postscript (2026-07-13)**: the follow-through matters as much as the catch. Once the invariant turned out never to have existed, the right move was **not** to build the refactor that would make the doc true — it was to ask whether anyone still wants the property. Nobody did: the only memory incident in 302 releases is from 2022 (MV2), the perf umbrella has zero commits, and MV3's idle `sleep()` became the de-facto control anyway. **NFR-11 was retired and the guarding story deprecated** ([CONTEXT D96](CONTEXT.md)). A requirement nobody measures and nobody enforces is already deleted in practice — the doc was only pretending otherwise. Retire it out loud, and leave the instruction behind: *if the complaint ever arrives, measure first.*
+
 See [CONTEXT D95](CONTEXT.md) (revision of D2), [US-20.3](sprints/stories/US-20.3-read-path-memory-budget.md), [US-21.2](sprints/stories/US-21.2-history-backfill.md).
 
 ---

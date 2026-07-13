@@ -21,9 +21,11 @@ updated: 2026-06-12
 > extrinsic construction, that is inherited from [AD-07](../../ARCHITECTURE.md#architecture-decisions),
 > which was **decided in 2022 and never implemented**: `SubstrateApi` builds a full
 > `ApiPromise` eagerly per enabled chain and the read path reads off it. Every memory figure
-> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. The gap is
-> owned by [US-20.3](US-20.3-read-path-memory-budget.md); the decision trail is
-> [CONTEXT D95](../../CONTEXT.md).
+> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. **NFR-11 has
+> since been retired and [US-20.3](US-20.3-read-path-memory-budget.md) deprecated** — memory
+> is no longer a stated requirement ([CONTEXT D95](../../CONTEXT.md) / D96). Treat every
+> memory sentence in this file as historical. If a memory complaint appears: **measure
+> first** ([LESSONS §64](../../LESSONS.md)).
 
 
 ## Goal
@@ -97,7 +99,7 @@ version reconciliation.
 ### Performance budget
 
 - Home-screen first paint: cached portfolio visible ≤ 300 ms on popup open (NFR-12).
-- Aggregation read memory: ≤ 72 MB regardless of chain count (NFR-11, AD-07).
+- ~~Aggregation read memory: ≤ 72 MB~~ — **RETIRED** (CONTEXT D96): the budget was never measured and its mechanism never built.
 - Story PR description must explicitly confirm both budgets are met.
 
 ### Points justification
@@ -110,7 +112,7 @@ price-feed integration sizes at 5 per the epic sizing guidance.
 ### References
 
 - [Source: PRD FR-68](../../PRD.md#functional-requirements) — aggregate portfolio balance view
-- [Source: PRD NFR-11](../../PRD.md#non-functional-requirements) — memory-bounded WsProvider read path
+- ~~Source: PRD NFR-11~~ — **retired 2026-07-13** (no memory budget is stated any more; see [CONTEXT D96](../../CONTEXT.md))
 - [Source: PRD NFR-12](../../PRD.md#non-functional-requirements) — cached cold-start + progressive refresh
 - [Source: ARCHITECTURE AD-07, AD-24](../../ARCHITECTURE.md#architecture-decisions)
 

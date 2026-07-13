@@ -30,9 +30,11 @@ updated: 2026-06-12
 > extrinsic construction, that is inherited from [AD-07](../../ARCHITECTURE.md#architecture-decisions),
 > which was **decided in 2022 and never implemented**: `SubstrateApi` builds a full
 > `ApiPromise` eagerly per enabled chain and the read path reads off it. Every memory figure
-> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. The gap is
-> owned by [US-20.3](../stories/US-20.3-read-path-memory-budget.md); the decision trail is
-> [CONTEXT D95](../../CONTEXT.md).
+> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. **NFR-11 has
+> since been retired and [US-20.3](../stories/US-20.3-read-path-memory-budget.md) deprecated** — memory
+> is no longer a stated requirement ([CONTEXT D95](../../CONTEXT.md) / D96). Treat every
+> memory sentence in this file as historical. If a memory complaint appears: **measure
+> first** ([LESSONS §64](../../LESSONS.md)).
 
 
 ## Goal
@@ -178,7 +180,7 @@ power, not yield — owned by EPIC-15).
 > staking belongs to FR-114 / US-12.1, not this story). US-12.13 and US-12.14 are the epic's two hardening
 > clusters and own no FR. US-12.13 defends reward/APY-figure **accuracy** at the
 > AD-22 handler seam (issues #3527, #2708, #4135, #2975, #2755). US-12.14 defends
-> the earning surface's **performance + cache freshness** NFRs (NFR-11, NFR-12,
+> the earning surface's **performance + cache freshness** NFRs (NFR-12,
 > NFR-20, NFR-21) and absorbs the perf/stale-cache cluster around issues #2615,
 > #2749 and #3328 — note #2615 is a performance + removed-account stale-cache
 > issue and homes in US-12.14, not the accuracy story.

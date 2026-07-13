@@ -19,9 +19,11 @@ updated: 2026-06-12
 > extrinsic construction, that is inherited from [AD-07](../../ARCHITECTURE.md#architecture-decisions),
 > which was **decided in 2022 and never implemented**: `SubstrateApi` builds a full
 > `ApiPromise` eagerly per enabled chain and the read path reads off it. Every memory figure
-> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. The gap is
-> owned by [US-20.3](../stories/US-20.3-read-path-memory-budget.md); the decision trail is
-> [CONTEXT D95](../../CONTEXT.md).
+> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. **NFR-11 has
+> since been retired and [US-20.3](../stories/US-20.3-read-path-memory-budget.md) deprecated** — memory
+> is no longer a stated requirement ([CONTEXT D95](../../CONTEXT.md) / D96). Treat every
+> memory sentence in this file as historical. If a memory complaint appears: **measure
+> first** ([LESSONS §64](../../LESSONS.md)).
 
 
 ## Goal
@@ -35,8 +37,8 @@ web surfaces perform. This epic ships
 **no end-user feature of its own**; its deliverable is that every other epic gets
 to stop re-litigating "is this fast enough and lightweight enough", because the
 budgets, lifecycle phases, and request/memory invariants are owned and defended
-here. It materializes the performance non-functional requirements (NFR-8, NFR-11,
-NFR-12, NFR-17, NFR-20, NFR-21) and absorbs the cross-cutting
+here. It materializes the performance non-functional requirements (NFR-8, NFR-12,
+NFR-17, NFR-20, NFR-21 — **NFR-11 was retired 2026-07-13, see [CONTEXT D96](../../CONTEXT.md)**) and absorbs the cross-cutting
 performance-program tracked by umbrella issue
 [#4197](https://github.com/Koniverse/SubWallet-Extension/issues/4197).
 
@@ -117,9 +119,12 @@ boundary is drawn explicitly in Out of scope.
 > #4427, #4445, #4446, #4021, #4447, #2245, #2549, #2248, #2337) has **zero commits**.
 > US-20.4's `#4984` has real work but on an **unmerged branch**, in no release.
 >
-> One doc-vs-reality gap this audit exposed: **AD-07 / NFR-11's invariant is not held by
-> the code** — the substrate read path uses the full `ApiPromise`, not a lightweight
-> WsProvider. Owner: [US-20.3](../stories/US-20.3-read-path-memory-budget.md).
+> The audit also exposed that **AD-07 / NFR-11's invariant was never held by the code** —
+> the substrate read path uses the full `ApiPromise`, not a lightweight WsProvider. Rather
+> than build a refactor to satisfy a doc, **NFR-11 was retired and [US-20.3](../stories/US-20.3-read-path-memory-budget.md)
+> deprecated** ([CONTEXT D96](../../CONTEXT.md)): the only memory incident in 302 releases is
+> from 2022 (MV2), and MV3's idle `sleep()` is the de-facto control. Memory is no longer a
+> stated requirement — if a complaint appears, **measure first**.
 
 ## AD Coverage
 
@@ -155,7 +160,7 @@ boundary is drawn explicitly in Out of scope.
 | [NFR-12](../../PRD.md#non-functional-requirements) | Cold-start: cached-first paint, progressive refresh | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) |
 | [NFR-20](../../PRD.md#non-functional-requirements) | Services SDK aggregation; reduce per-chain RPC fan-out | [US-20.2](../stories/US-20.2-api-call-optimization.md) |
 | [NFR-21](../../PRD.md#non-functional-requirements) | Cache / CDN proxy layer for market/metadata/media | [US-20.2](../stories/US-20.2-api-call-optimization.md) |
-| [NFR-11](../../PRD.md#non-functional-requirements) | Read-path memory ≤72 MB regardless of chain count | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) |
+| ~~NFR-11~~ **retired** ([D96](../../CONTEXT.md)) | ~~Read-path memory ≤72 MB~~ — never measured, mechanism never built | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) |
 | _(no covering NFR — PRD gap)_ | Many-account submit/close must not block the main thread | [US-20.4](../stories/US-20.4-many-account-submit-performance.md) |
 | [NFR-21](../../PRD.md#non-functional-requirements) (partial) | List screens read slow-changing config from the static-data cache, not a per-render sweep — the render cost itself has _no covering NFR_ (PRD gap) | [US-20.5](../stories/US-20.5-list-rendering-performance.md) |
 | [NFR-17](../../PRD.md#non-functional-requirements) (shared) | Web-surface portability/performance (webapp / web-runner) | [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) |
@@ -166,7 +171,7 @@ boundary is drawn explicitly in Out of scope.
 |---|---|---|---|---|
 | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | Core-structure & lifecycle refactor | Phase the MV3 background into Init/Start/StartFull + background-idle, remove deprecated features, refactor cron/subscription into services, and refine the data-processing architecture | 🚧 in-progress | — |
 | [US-20.2](../stories/US-20.2-api-call-optimization.md) | API-call optimization | Remove redundant API fan-out, cap per-window requests, and fix the notification-fetch flood that suspends other requests and blocks opening the extension | 🚧 in-progress | — |
-| [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | Read-path memory budget | Hold the ≤72 MB balance/read-path budget regardless of chain count via the lightweight WsProvider path | 📋 backlog | — |
+| [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | Read-path memory budget | Hold the ≤72 MB balance/read-path budget regardless of chain count via the lightweight WsProvider path | ⏸️ deprecated | — |
 | [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | Many-account submit performance | Stop the freeze when, with many accounts, a user submits a tx then closes the history popup | 📋 backlog | — |
 | [US-20.5](../stories/US-20.5-list-rendering-performance.md) | List rendering performance | Make heavy lists/screens (NFT / Receive / customization / select token / select network) render fast | 📋 backlog | — |
 | [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) | WebApp & web-runner performance | WebApp animations + list pagination and a web-runner shared worker across tabs | 📋 backlog | — |
@@ -202,7 +207,7 @@ HAPPY-PATH: N/A — performance/lifecycle epic; optimizations are cross-cutting,
 
 ## Cross-cutting invariants
 
-- **Read path stays memory-bounded ([NFR-11](../../PRD.md#non-functional-requirements), AD-07):** every balance/token read rides the lightweight WsProvider path; a full `@polkadot/api` ApiPromise is instantiated only for extrinsic construction, never for a read. The ≤72 MB budget MUST hold regardless of chain count. Enforced by [US-20.3](../stories/US-20.3-read-path-memory-budget.md); upheld by every read epic (EPIC-7, EPIC-9, EPIC-12).
+- ~~**Read path stays memory-bounded (NFR-11, AD-07)**~~ — **INVARIANT RETIRED 2026-07-13** ([CONTEXT D96](../../CONTEXT.md)); it was never true. Formerly: every balance/token read rides the lightweight WsProvider path; a full `@polkadot/api` ApiPromise is instantiated only for extrinsic construction, never for a read. The ≤72 MB budget MUST hold regardless of chain count. Enforced by [US-20.3](../stories/US-20.3-read-path-memory-budget.md); upheld by every read epic (EPIC-7, EPIC-9, EPIC-12).
 - **Many accounts never block the main thread** _(no covering NFR — PRD gap; NFR-11 is a memory/connection-strategy row, not a main-thread one)_**:** per-account work on submit, close, and refresh is bounded and off the critical UI path; the screen never freezes because the account count is large. Enforced by [US-20.4](../stories/US-20.4-many-account-submit-performance.md).
 - **Cached-first paint, progressive refresh ([NFR-12](../../PRD.md#non-functional-requirements)):** on popup open the background serves last-known cached state immediately and refreshes progressively with visible skeletons; a blank wait while data loads is a defect. Owned cross-cutting by [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md); each read surface implements it (US-7.1, US-12.14).
 - **API calls go through optimization / proxy, not redundant fan-out ([NFR-20](../../PRD.md#non-functional-requirements), [NFR-21](../../PRD.md#non-functional-requirements), AD-24, AD-25):** aggregated multi-chain data is fetched through the Services SDK and market/metadata/media through the cache/CDN proxies; the client never re-issues a request another in-flight request already covers, and no request class may flood out the others (the #4021 notification case). Enforced by [US-20.2](../stories/US-20.2-api-call-optimization.md).
@@ -229,7 +234,7 @@ HAPPY-PATH: N/A — performance/lifecycle epic; optimizations are cross-cutting,
 | **Idle background work** | No avoidable polling / chain connect / API call while backgrounded; partial wake never starts all chains | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | MV3 evicts idle workers (~5 min); idle CPU/memory/API is pure waste and drains the host |
 | **Cold-start first paint** | Cached state visible ≤ 300 ms on popup open (NFR-12) | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | The popup is the most-opened surface; a blank wait reads as "wallet broken" |
 | **Redundant requests** | Zero duplicate in-flight requests; per-window request cap; no request class starves others | [US-20.2](../stories/US-20.2-api-call-optimization.md) | Notification fetch today floods and suspends all other requests so the extension can't open (#4021); fan-out also raises backend infra pressure (#4447) |
-| **Read-path memory** | ≤ 72 MB regardless of chain count (NFR-11, AD-07) | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | Full ApiPromise across 20 chains hits ~264 MB; the read path MUST stay on the lightweight WsProvider path |
+| ~~**Read-path memory**~~ **retired** | ~~≤ 72 MB regardless of chain count~~ — no memory budget is stated any more ([D96](../../CONTEXT.md)) | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | Full ApiPromise across 20 chains hits ~264 MB; the read path MUST stay on the lightweight WsProvider path |
 | **Many-account submit** | Submit + history-popup close never blocks the main thread; per-account work bounded | [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | With many accounts, submit-then-close-history freezes the screen today (#4984) |
 | **List render** | Heavy lists virtualized + paginated; no synchronous full-list render on the heavy selection/collection screens | [US-20.5](../stories/US-20.5-list-rendering-performance.md) | NFT / Receive Token / customization-network / select-token / select-network screens jank on large lists (#2245) |
 | **Web-surface render** | WebApp lists paginated with animations; web-runner shares one worker across tabs | [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) | WebApp Dapps/Mission-Pools lists lack animations and load all at once (#2248); each tab spawns its own runner without a shared worker (#2337) |
@@ -247,5 +252,5 @@ HAPPY-PATH: N/A — performance/lifecycle epic; optimizations are cross-cutting,
 
 - [Issue #4197 — umbrella program tracker](https://github.com/Koniverse/SubWallet-Extension/issues/4197) — "Evaluate and update the performance of the extension"; indexes the performance sub-issues this epic absorbs.
 - [Issue #4427 — lifecycle tracker](https://github.com/Koniverse/SubWallet-Extension/issues/4427) — "Improve SubWallet Lifecycle"; the phased core-architecture refactor materialized by US-20.1.
-- [Source: PRD §Non-Functional Requirements NFR-8, NFR-11, NFR-12, NFR-17, NFR-20, NFR-21](../../PRD.md#non-functional-requirements)
+- [Source: PRD §Non-Functional Requirements NFR-8, NFR-12, NFR-17, NFR-20, NFR-21](../../PRD.md#non-functional-requirements)
 - [Source: ARCHITECTURE AD-07, AD-08, AD-20, AD-23, AD-24, AD-25](../../ARCHITECTURE.md#architecture-decisions)

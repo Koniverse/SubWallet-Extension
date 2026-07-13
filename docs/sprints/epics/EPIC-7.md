@@ -23,9 +23,11 @@ updated: 2026-06-12
 > extrinsic construction, that is inherited from [AD-07](../../ARCHITECTURE.md#architecture-decisions),
 > which was **decided in 2022 and never implemented**: `SubstrateApi` builds a full
 > `ApiPromise` eagerly per enabled chain and the read path reads off it. Every memory figure
-> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. The gap is
-> owned by [US-20.3](../stories/US-20.3-read-path-memory-budget.md); the decision trail is
-> [CONTEXT D95](../../CONTEXT.md).
+> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. **NFR-11 has
+> since been retired and [US-20.3](../stories/US-20.3-read-path-memory-budget.md) deprecated** — memory
+> is no longer a stated requirement ([CONTEXT D95](../../CONTEXT.md) / D96). Treat every
+> memory sentence in this file as historical. If a memory complaint appears: **measure
+> first** ([LESSONS §64](../../LESSONS.md)).
 
 
 ## Goal
@@ -199,7 +201,7 @@ sequenceDiagram
 | Concern | Budget | Story | Rationale |
 |---|---|---|---|
 | **Home-screen first paint** | Cached portfolio visible ≤ 300 ms on popup open (NFR-12) | [US-7.1](../stories/US-7.1-aggregate-portfolio-across-accounts-and-chains.md) | The home screen is the most-opened surface; a blank wait reads as "wallet broken" |
-| **Aggregation read memory** | ≤ 72 MB regardless of chain count (NFR-11, AD-07) | [US-7.1](../stories/US-7.1-aggregate-portfolio-across-accounts-and-chains.md) | Full ApiPromise across 20 chains hits ~264 MB; the home read MUST stay on the lightweight path |
+| ~~**Aggregation read memory**~~ **retired** | ~~≤ 72 MB regardless of chain count~~ — NFR-11 retired 2026-07-13 ([D96](../../CONTEXT.md)) | [US-7.1](../stories/US-7.1-aggregate-portfolio-across-accounts-and-chains.md) | Full ApiPromise across 20 chains hits ~264 MB; the home read MUST stay on the lightweight path |
 | **Price refresh** | Live price tick ≤ 1 fetch per asset per refresh window through `api-cache` | [US-7.4](../stories/US-7.4-real-time-token-price-and-per-asset-chart.md) | Per-asset upstream fetches cascade into proxy rate-limit exposure (NFR-21) |
 
 ## Acceptance criteria (propagated from stories)

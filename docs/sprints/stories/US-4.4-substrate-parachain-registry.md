@@ -21,9 +21,11 @@ updated: 2026-06-12
 > extrinsic construction, that is inherited from [AD-07](../../ARCHITECTURE.md#architecture-decisions),
 > which was **decided in 2022 and never implemented**: `SubstrateApi` builds a full
 > `ApiPromise` eagerly per enabled chain and the read path reads off it. Every memory figure
-> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. The gap is
-> owned by [US-20.3](US-20.3-read-path-memory-budget.md); the decision trail is
-> [CONTEXT D95](../../CONTEXT.md).
+> here (~72 MB / ~264 MB) is a 2022 MV2-era claim with **no probe behind it**. **NFR-11 has
+> since been retired and [US-20.3](US-20.3-read-path-memory-budget.md) deprecated** — memory
+> is no longer a stated requirement ([CONTEXT D95](../../CONTEXT.md) / D96). Treat every
+> memory sentence in this file as historical. If a memory complaint appears: **measure
+> first** ([LESSONS §64](../../LESSONS.md)).
 
 
 ## Goal

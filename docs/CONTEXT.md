@@ -1564,3 +1564,26 @@
 **Citations**: [D2](#d2-replace-apipromise-with-a-lightweight-connector-for-balancetoken-queries); AD-07; NFR-11; [US-20.3](sprints/stories/US-20.3-read-path-memory-budget.md); [US-21.2](sprints/stories/US-21.2-history-backfill.md)
 
 ---
+
+### D96. Retire the memory requirement (NFR-11) — delete on evidence, not on a guess (revision of D95)
+
+**Context**: [D95](#d95-the-lightweight-read-connector-revision-of-d2-was-never-implemented--measure-before-refactoring) established that AD-07's lightweight-WsProvider read path was **decided in 2022 and never built**, and rescoped [US-20.3](sprints/stories/US-20.3-read-path-memory-budget.md) to *measure first, then decide*. The question that remained: is the ≤72 MB budget worth keeping as a target at all, when it was measured on the MV2 always-on background page and no probe has ever existed?
+
+**Decision**: **Retire NFR-11.** Memory is no longer a stated requirement of this product. US-20.3 is **deprecated** (kept as a file — 16 stories/epics, D95 and LESSONS §64 link to it, and its audit is the starting point for whoever eventually measures). AD-07 stays in ARCHITECTURE as a **historical record of a decision never implemented** — deleting it would erase the reason the trap existed. The number 11 is **retired, not renumbered**: NFR-11 is never reused (per [D94](#d94-one-time-gapless-renumber-of-fr-and-epic-12-story-ids--never-again), the FR/story renumber was a one-time exception and IDs are otherwise permanent).
+
+**Rationale — three independent signals, all pointing the same way:**
+1. **The pain is four years cold.** The only memory incident in **302 releases** is *"Extension Crash due to memory overflow when loading NFT data"* in **0.2.2 (2022)** — the very era that motivated D2/AD-07. Nothing since.
+2. **The organisation has not prioritised it.** The umbrella perf tracker `#4197` has sat at **zero commits** for about a year.
+3. **The mitigation arrived anyway.** MV3's idle `sleep()` stops every chain API after 60 s (shipped 1.2.1), so memory no longer accumulates for the life of the browser session — without anyone doing the refactor the AD prescribed.
+
+A requirement that nobody measures and nobody enforces **is already deleted in practice**; the doc was merely pretending otherwise. Retiring it is the honest form of what is already true. And the alternative — keeping a ≤72 MB target — would commit the product to a number **no one has ever achieved or verified in this architecture**, since it was the promise of a mechanism that was never built.
+
+**What was considered and rejected**: paying 3 points for the probe to "close the question forever". Rejected on priority, not on principle: the same points buy a fix for a *live, measurable* waste — the unbounded `while (isContinue)` notification pagination loop, fired 4× per address every 30 minutes ([US-20.2](sprints/stories/US-20.2-api-call-optimization.md) AC-3, issue #4021, zero commits). Measure a problem someone reports; do not measure a problem the docs invented.
+
+**Impact**: NFR count 21 → 20 live (NFR-11 tombstoned in the PRD table). `US-12.14`'s `prd_ref` drops NFR-11. Every "≤72 MB" budget line in EPIC-7 / EPIC-12 / EPIC-20 and in the read-path stories is struck through and marked historical. **The one thing that must survive this decision**: if a memory complaint ever appears, **measure first — do not re-derive an architecture decision from a guess.** That is precisely how AD-07 came to exist and rot for four years ([LESSONS §64](LESSONS.md)).
+
+**Date**: 2026-07-13
+**Version**: docs-only (audit against v1.3.83)
+**Citations**: [D2](#d2-replace-apipromise-with-a-lightweight-connector-for-balancetoken-queries), [D95](#d95-the-lightweight-read-connector-revision-of-d2-was-never-implemented--measure-before-refactoring); AD-07; PRD NFR-11 (retired); [US-20.3](sprints/stories/US-20.3-read-path-memory-budget.md) (deprecated); CHANGELOG 0.2.2
+
+---
