@@ -27,10 +27,9 @@ interface TransactionConfirmationInfo {
   transactionFee?: string;
   isUnlock?: boolean;
   isUnVote?: boolean;
-  signerSubstrateProxyAddress?: string;
 }
 
-const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, isUnlock, signerSubstrateProxyAddress, transactionFee }: TransactionConfirmationInfo): GovLockedInfoConfirmation | null => {
+const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, isUnlock, transactionFee }: TransactionConfirmationInfo): GovLockedInfoConfirmation | null => {
   const account = useGetAccountByAddress(address);
   const govLockedInfos = useSelector((state) => state.openGov.govLockedInfos);
   const getAccountTokenBalance = useGetAccountTokenBalance();
@@ -103,17 +102,28 @@ const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, isUnl
       }
     }
 
-    let transferableAfterLock;
-
-    if (!!signerSubstrateProxyAddress && !isSameAddress(address, signerSubstrateProxyAddress)) {
-      transferableAfterLock = currentTransferable;
-    } else {
-      transferableAfterLock = currentTransferable.minus(transactionFee || BN_ZERO);
-    }
+    let transferableAfterLock = currentTransferable.minus(transactionFee || BN_ZERO);
 
     if (isUnlock) {
-      // If it's an unvote, we need to add the amount to the transferable balance
-      transferableAfterLock = transferableAfterLock.plus(amount);
+      if (balanceInfo.lockedDetails) {
+        const stakingLocked = new BigNumber(balanceInfo.lockedDetails.staking || 0).shiftedBy(decimals);
+        const governanceLocked = new BigNumber(balanceInfo.lockedDetails.governance || 0).shiftedBy(decimals);
+        const reservedLocked = new BigNumber(balanceInfo.lockedDetails.reserved || 0).shiftedBy(decimals);
+        const othersLocked = new BigNumber(balanceInfo.lockedDetails.others || 0).shiftedBy(decimals);
+
+        const totalOthersLock = stakingLocked.plus(reservedLocked).plus(othersLocked);
+
+        if (governanceLocked.gt(totalOthersLock)) {
+          // If the governance locked is greater than the max of staking and reserved locked,
+          // we need to consider the reduction from unlocking
+          const reductionFromUnlock = BigNumber.min(amount, governanceLocked.minus(totalOthersLock));
+
+          transferableAfterLock = transferableAfterLock.plus(reductionFromUnlock);
+        }
+      } else {
+        // Fallback: if we don't have lock details, assume transferable increases by amount
+        transferableAfterLock = transferableAfterLock.plus(amount);
+      }
     } else if (amount.gt(currentAllLocked) && !isUnVote) {
       // If the amount to lock is greater than the current total locked,
       // we need to minus the difference from the transferable balance
@@ -125,7 +135,7 @@ const useGetGovVoteConfirmationInfo = ({ address, amount, chain, isUnVote, isUnl
     govLockedInfo.transferable.to = BigNumber.max(transferableAfterLock, BN_ZERO);
 
     return govLockedInfo;
-  }, [balanceInfo, assetInfo, currentGovInfo, amount, priceMap, isUnlock, isUnVote, signerSubstrateProxyAddress, address, transactionFee]);
+  }, [balanceInfo, assetInfo, currentGovInfo, amount, priceMap, isUnlock, isUnVote, transactionFee]);
 };
 
 export default useGetGovVoteConfirmationInfo;

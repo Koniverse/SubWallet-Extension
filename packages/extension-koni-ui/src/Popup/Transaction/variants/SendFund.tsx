@@ -12,18 +12,20 @@ import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, _isPosChainL2Bridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getContractAddressOfToken, _getEvmChainId, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainCompatibleLedgerEvm, _isChainEvmCompatible, _isNativeToken, _isNativeTokenBySlug, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
+import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
+import { _getAssetDecimals, _getAssetName, _getAssetOriginChain, _getAssetSymbol, _getChainNativeTokenSlug, _getContractAddressOfToken, _getEvmChainId, _getMultiChainAsset, _getOriginChainOfAsset, _getTokenMinAmount, _isChainBitcoinCompatible, _isChainCardanoCompatible, _isChainCompatibleLedgerEvm, _isChainEvmCompatible, _isNativeToken, _isTokenTransferredByEvm } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { TokenHasBalanceInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountChainType, AccountProxy, AccountProxyType, AccountSignMode, AnalyzedGroup, BasicTxWarningCode, FeeChainType, TransactionFee } from '@subwallet/extension-base/types';
-import { RequestSubmitTransfer, ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
+import { ResponseSubscribeTransfer } from '@subwallet/extension-base/types/balance/transfer';
 import { CommonStepType } from '@subwallet/extension-base/types/service-base';
-import { _reformatAddressWithChain, isAccountAll, isSameAddress, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
-import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, TokenSelector } from '@subwallet/extension-koni-ui/components';
+import { _reformatAddressWithChain, isAccountAll, isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
+import { AccountAddressSelector, AddressInputNew, AddressInputRef, AlertBox, AlertBoxInstant, AlertModal, AmountInput, ChainSelector, FeeEditor, HiddenInput, PageWrapper, TokenSelector } from '@subwallet/extension-koni-ui/components';
 import { ADDRESS_INPUT_AUTO_FORMAT_VALUE } from '@subwallet/extension-koni-ui/constants';
+import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/MktCampaignModalContext';
-import { useAlert, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useGetSubnetPoolPositionDetailByNetuid, useGetWrappedTransactionSigners, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import useLazyWatchTransaction from '@subwallet/extension-koni-ui/hooks/transaction/useWatchTransactionLazy';
 import { approveSpending, cancelSubscription, getOptimalTransferProcess, getTokensCanPayFee, isTonBounceableAddress, makeCrossChainTransfer, makeTransfer, subscribeMaxTransfer } from '@subwallet/extension-koni-ui/messaging';
@@ -31,9 +33,10 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ChainItemType, FormCallbacks, Theme, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { findAccountByAddress, formatBalance, getSignModeByAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { findAccountByAddress, formatBalance, getAssetDisplayName, getSignModeByAccountProxy, noop, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon } from '@subwallet/react-ui';
 import { Rule } from '@subwallet/react-ui/es/form';
+import { useQuery } from '@tanstack/react-query';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { PaperPlaneRight, PaperPlaneTilt } from 'phosphor-react';
@@ -45,6 +48,7 @@ import { useIsFirstRender, useLocalStorage } from 'usehooks-ts';
 import { BN, BN_ZERO } from '@polkadot/util';
 
 import { FreeBalance, TransactionContent, TransactionFooter } from '../parts';
+import { AlphaTokenTransferSection } from '../parts/AlphaTokenTransferSection';
 
 type WrapperProps = ThemeProps;
 
@@ -79,7 +83,7 @@ function getTokenAvailableDestinations (tokenSlug: string, xcmRefMap: Record<str
     if (xcmRef.srcAsset === tokenSlug) {
       const destinationChain = chainInfoMap[xcmRef.destChain];
 
-      if (destinationChain.chainStatus === _ChainStatus.ACTIVE) {
+      if (destinationChain?.chainStatus === _ChainStatus.ACTIVE) {
         result.push({
           name: destinationChain.name,
           slug: destinationChain.slug
@@ -119,11 +123,10 @@ const FEE_SHOW_TYPES: Array<FeeChainType | undefined> = ['substrate', 'evm'];
 const Component = ({ className = '', isAllAccount, targetAccountProxy }: ComponentProps): React.ReactElement<ComponentProps> => {
   useSetCurrentPage('/transaction/send-fund');
   const { t } = useTranslation();
-
   const notification = useNotification();
   const mktCampaignModalContext = useContext(MktCampaignModalContext);
-
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign } = useTransactionContext<TransferParams>();
+  const getWrappedTransactionSigners = useGetWrappedTransactionSigners();
+  const { defaultData, persistData } = useTransactionContext<TransferParams>();
   const { defaultSlug: sendFundSlug } = defaultData;
   const isFirstRender = useIsFirstRender();
 
@@ -140,6 +143,8 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const fromValue = useWatchTransaction('from', form, defaultData);
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const assetValue = useWatchTransaction('asset', form, defaultData);
+  const fromValidator = useWatchTransaction('fromValidator', form, defaultData);
+  const toValidator = useWatchTransaction('toValidator', form, defaultData);
 
   const { nativeTokenBalance } = useGetBalance(chainValue, fromValue);
   const assetInfo = useFetchChainAssetInfo(assetValue);
@@ -161,7 +166,39 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
   const [selectedTransactionFee, setSelectedTransactionFee] = useState<TransactionFee | undefined>();
   const { getCurrentConfirmation, renderConfirmationButtons } = useGetConfirmationByScreen('send-fund');
-  const checkAction = usePreCheckAction(fromValue, true, t('ui.TRANSACTION.screen.Transaction.SendFund.cannotSendWithAccountType'));
+
+  const selectedAccount = useMemo(() => {
+    return fromValue ? findAccountByAddress(accounts, fromValue) : undefined;
+  }, [accounts, fromValue]);
+
+  const isMultisigAccount = useMemo(
+    () => !!selectedAccount?.isMultisig,
+    [selectedAccount]
+  );
+
+  const isCrossChainTransfer = useMemo(
+    () => !!chainValue && !!destChainValue && chainValue !== destChainValue,
+    [chainValue, destChainValue]
+  );
+
+  const isUnsupportedMultisigCrossChain = useMemo(
+    () => isMultisigAccount && isCrossChainTransfer,
+    [isMultisigAccount, isCrossChainTransfer]
+  );
+
+  const preCheckMessage = useMemo(() => {
+    return isUnsupportedMultisigCrossChain
+      ? t('ui.TRANSACTION.screen.Transaction.SendFund.crossChainNotSupportedForMultisig')
+      : t('ui.TRANSACTION.screen.Transaction.SendFund.cannotSendWithAccountType');
+  }, [isUnsupportedMultisigCrossChain, t]);
+
+  const checkAction = usePreCheckAction({
+    address: fromValue,
+    chain: chainValue,
+    blockAllAccount: true,
+    message: preCheckMessage,
+    type: isUnsupportedMultisigCrossChain ? NotificationType.ERROR : NotificationType.INFO
+  });
 
   const currentConfirmation = useMemo(() => {
     if (chainValue && destChainValue) {
@@ -180,8 +217,6 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [chainValue, destChainValue]);
 
   const [loading, setLoading] = useState(false);
-  const [submitLoading, setSubmitLoading] = useState(false);
-
   const [isTransferAll, setIsTransferAll] = useState(false);
 
   // use this to reinit AddressInput component
@@ -192,9 +227,11 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const [isBalanceReady, setIsBalanceReady] = useState(true);
   const [transferInfo, setTransferInfo] = useState<ResponseSubscribeTransfer | undefined>();
   const [isFetchingInfo, setIsFetchingInfo] = useState(false);
+  const [isFetchingPoolTargets, setIsFetchingPoolTargets] = useState(false);
   const [isFetchingListFeeToken, setIsFetchingListFeeToken] = useState(false);
   const chainStatus = useMemo(() => chainStatusMap[chainValue]?.connectionStatus, [chainValue, chainStatusMap]);
   const estimatedNativeFee = useMemo((): string => transferInfo?.feeOptions.estimatedFee || '0', [transferInfo]);
+  const crossChainFee = useMemo(() => transferInfo?.feeOptions?.crossChainFee || '0', [transferInfo]);
 
   const [processState, dispatchProcessState] = useReducer(commonProcessReducer, DEFAULT_COMMON_PROCESS);
 
@@ -348,6 +385,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             slug: chainAsset.slug,
             name: _getAssetName(chainAsset),
             symbol: _getAssetSymbol(chainAsset),
+            displayName: getAssetDisplayName(chainAsset, chainAsset.symbol),
             originChain
           });
         }
@@ -393,6 +431,25 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   const addressInputRef = useRef<AddressInputRef>(null);
   const addressInputCurrent = addressInputRef.current;
 
+  const { data: isWrappTransaction, isLoading: isCheckWrappTransactionLoading } = useQuery<boolean>({
+    queryKey: ['check-transaction-wrappable', fromValue, chainValue, extrinsicType],
+    queryFn: async () => {
+      const data = await getWrappedTransactionSigners({
+        extrinsicType,
+        chainSlug: chainValue,
+        targetAddress: fromValue
+      });
+
+      return data.length > 0;
+    },
+    staleTime: 30_000,
+    enabled: !!fromValue && !!chainValue
+  });
+
+  const actualMaxTransferable = useMemo(() => {
+    return isMultisigAccount ? transferInfo?.maxTransferableWithoutFee : transferInfo?.maxTransferable;
+  }, [isMultisigAccount, transferInfo]);
+
   const updateAddressInputValue = useCallback((value: string) => {
     addressInputCurrent?.setInputValue(value);
     addressInputCurrent?.setSelectedOption((prev) => {
@@ -424,7 +481,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [accounts, autoFormatValue, chainInfoMap, destAssetInfo, form, ledgerGenericAllowNetworks]);
 
   const validateAmount = useCallback((rule: Rule, amount: string): Promise<void> => {
-    const maxTransfer = transferInfo?.maxTransferable || '0';
+    const maxTransfer = actualMaxTransferable || '0';
 
     if (!amount) {
       return Promise.reject(t('ui.TRANSACTION.screen.Transaction.SendFund.amountIsRequired'));
@@ -445,7 +502,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
 
     return Promise.resolve();
-  }, [decimals, t, transferInfo?.maxTransferable]);
+  }, [actualMaxTransferable, decimals, t]);
 
   const onValuesChange: FormCallbacks<TransferParams>['onValuesChange'] = useCallback(
     (part: Partial<TransferParams>, values: TransferParams) => {
@@ -503,6 +560,11 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
           resetValueField();
         }
 
+        if (chain !== destChain && selectedAccount?.isMultisig) {
+          form.setFieldValue('from', '');
+          setAddressInputRenderKey(`${defaultAddressInputRenderKey}-${Date.now()}`);
+        }
+
         form.resetFields(['to']);
         resetTransactionFee();
       }
@@ -522,7 +584,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
 
       persistData(form.getFieldsValue());
     },
-    [persistData, form, assetRegistry, chainInfoMap, isTransferAll, defaultTokenPayFee]
+    [persistData, form, defaultTokenPayFee, assetRegistry, chainInfoMap, isTransferAll, selectedAccount?.isMultisig]
   );
 
   const isShowWarningOnSubmit = useCallback((values: TransferParams): boolean => {
@@ -560,67 +622,66 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     return false;
   }, [accounts, assetRegistry, notification, t]);
 
-  const handleBasicSubmit = useCallback(
-    (values: TransferParams, options: TransferOptions): Promise<SWTransactionResponse> => {
-      const { asset, chain, destChain, from, to, value } = values;
+  const isAlphaTokenTransfer = useMemo(() => {
+    return _BALANCE_CHAIN_GROUP.bittensor.includes(chainValue) && !_isNativeToken(assetInfo) && !!assetInfo?.metadata?.netuid;
+  }, [assetInfo, chainValue]);
 
-      // prepare params
-      const createBaseParams = (signerSubstrateProxyAddress?: string, actualValue?: string): RequestSubmitTransfer => ({
+  const netuid = useMemo(() => {
+    if (!isAlphaTokenTransfer) {
+      return undefined;
+    }
+
+    return assetInfo?.metadata?.netuid;
+  }, [assetInfo, isAlphaTokenTransfer]);
+
+  const handleBasicSubmit = useCallback((values: TransferParams, options: TransferOptions): Promise<SWTransactionResponse> => {
+    const { asset, chain, destChain, from, fromValidator, to, toValidator, value } = values;
+    let sendPromise: Promise<SWTransactionResponse>;
+
+    if (chain === destChain) {
+      // Transfer token or send fund
+      sendPromise = makeTransfer({
         from,
         chain,
-        to,
+        to: to,
         tokenSlug: asset,
-        value: actualValue || value,
+        value: value,
         transferAll: options.isTransferAll,
         transferBounceable: options.isTransferBounceable,
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
         tokenPayFeeSlug: currentTokenPayFee,
-        signerSubstrateProxyAddress
-      });
-
-      // create send promise
-      const createSendPromise = (params: RequestSubmitTransfer) =>
-        chain === destChain
-          ? makeTransfer(params)
-          : makeCrossChainTransfer({
-            ...params,
-            destinationNetworkKey: destChain,
-            originNetworkKey: chain,
-            tokenPayFeeSlug: undefined // todo: support pay local fee for xcm later
-          });
-
-      // submit logic
-      return new Promise<SWTransactionResponse>((resolve, reject) => {
-        selectSubstrateProxyAccountsToSign({
-          chain: chain,
-          address: from,
-          type: extrinsicType,
-          isDisabled: currentTokenPayFee ? !_isNativeTokenBySlug(currentTokenPayFee) : false
-        })
-          .then((selectedProxy) => {
-            setSubmitLoading(true);
-            // If transfer all and sign by proxy account (proxy account pay fee), we do not need to minus fee
-            let submitValue;
-
-            if (isTransferAll && selectedProxy && !isSameAddress(selectedProxy, from)) {
-              submitValue = transferInfo?.maxTransferableWithoutFee;
-              // TODO: need to re-update max value after getting selected proxy account
-              // form.setFieldValue('value', transferInfo?.maxTransferableWithoutFee);
-              // setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${Date.now()}`);
+        maxTransferableWithoutFee: transferInfo?.maxTransferableWithoutFee,
+        maxTransferable: transferInfo?.maxTransferable,
+        ...(!!netuid && !!fromValidator && !!toValidator
+          ? {
+            metadata: {
+              netuid,
+              fromValidator,
+              toValidator: toValidator
             }
-
-            createSendPromise(createBaseParams(selectedProxy, submitValue))
-              .then(resolve)
-              .catch(reject)
-              .finally(() => setSubmitLoading(false));
-          })
-          .catch(onError)
-          .finally(() => setLoading(false));
+          }
+          : {})
       });
-    },
-    [selectedTransactionFee, currentTokenPayFee, selectSubstrateProxyAccountsToSign, extrinsicType, onError, isTransferAll, transferInfo?.maxTransferableWithoutFee]
-  );
+    } else {
+      // Make cross chain transfer
+      sendPromise = makeCrossChainTransfer({
+        destinationNetworkKey: destChain,
+        from,
+        originNetworkKey: chain,
+        tokenSlug: asset,
+        to,
+        value,
+        transferAll: options.isTransferAll,
+        transferBounceable: options.isTransferBounceable,
+        feeOption: selectedTransactionFee?.feeOption,
+        feeCustom: selectedTransactionFee?.feeCustom,
+        tokenPayFeeSlug: undefined // todo: support pay local fee for xcm later
+      });
+    }
+
+    return sendPromise;
+  }, [selectedTransactionFee?.feeOption, selectedTransactionFee?.feeCustom, currentTokenPayFee, transferInfo?.maxTransferableWithoutFee, transferInfo?.maxTransferable, netuid]);
 
   // todo: must refactor later, temporary solution to support SnowBridge
   const handleBridgeSpendingApproval = useCallback((values: TransferParams): Promise<SWTransactionResponse> => {
@@ -716,12 +777,12 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
   }, [handleBasicSubmit, handleBridgeSpendingApproval, isShowWarningOnSubmit, onError, onSuccess, processState]);
 
   const onSetMaxTransferable = useCallback((value: boolean) => {
-    const bnMaxTransfer = new BN(transferInfo?.maxTransferable || '0');
+    const bnMaxTransfer = new BN(actualMaxTransferable || '0');
 
     if (!bnMaxTransfer.isZero()) {
       setIsTransferAll(value);
     }
-  }, [transferInfo?.maxTransferable]);
+  }, [actualMaxTransferable]);
 
   const onSetTokenPayFee = useCallback((slug: string) => {
     setCurrentTokenPayFee(slug);
@@ -866,7 +927,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     }
   }, [currentConfirmation, mktCampaignModalContext, onSubmit, renderConfirmationButtons]);
 
-  const isDataReady = !isFetchingInfo && !isFetchingListFeeToken && !!transferInfo?.feeOptions;
+  const isDataReady = !isFetchingInfo && !isFetchingListFeeToken && !!transferInfo?.feeOptions && (!isAlphaTokenTransfer || !isFetchingPoolTargets);
 
   useEffect(() => {
     const updateFromValue = () => {
@@ -920,7 +981,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       }
     };
 
-    if (fromValue && assetValue) {
+    if (fromValue && assetValue && (!isAlphaTokenTransfer || !!(fromValidator && toValidator))) {
       subscribeMaxTransfer({
         address: fromValue,
         to: toValue,
@@ -931,7 +992,16 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         feeOption: selectedTransactionFee?.feeOption,
         feeCustom: selectedTransactionFee?.feeCustom,
         tokenPayFeeSlug: currentTokenPayFee,
-        transferAll: isTransferAll
+        transferAll: isTransferAll,
+        ...(!!netuid && !!fromValidator && !!toValidator
+          ? {
+            metadata: {
+              netuid,
+              fromValidator,
+              toValidator
+            }
+          }
+          : {})
       }, callback)
         .then((callback))
         .catch((e) => {
@@ -949,16 +1019,16 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
       cancel = true;
       id && cancelSubscription(id).catch(console.error);
     };
-  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue, isTransferAll]);
+  }, [assetValue, assetRegistry, chainValue, chainStatus, form, fromValue, destChainValue, selectedTransactionFee, nativeTokenSlug, currentTokenPayFee, transferAmountValue, toValue, isTransferAll, isAlphaTokenTransfer, fromValidator, toValidator, netuid]);
 
   useEffect(() => {
-    if (isTransferAll && transferInfo?.maxTransferable && !hideMaxButton) {
+    if (isTransferAll && transferInfo?.maxTransferable && !hideMaxButton && !isAlphaTokenTransfer) {
       form.setFieldsValue({
-        value: transferInfo?.maxTransferable
+        value: actualMaxTransferable
       });
       setAmountInputRenderKey(`${defaultAmountInputRenderKey}-${Date.now()}`);
     }
-  }, [form, hideMaxButton, isTransferAll, transferInfo]);
+  }, [actualMaxTransferable, form, hideMaxButton, isTransferAll, isAlphaTokenTransfer, isWrappTransaction, transferInfo]);
 
   useEffect(() => {
     const bnTransferAmount = new BN(transferAmountValue || '0');
@@ -1049,9 +1119,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     };
   }, [chainValue, fromValue, nativeTokenBalance, nativeTokenSlug]);
 
-  useEffect(() => {
-    console.log('transferInfo', transferInfo);
-  }, [transferInfo]);
+  const poolPositionDetail = useGetSubnetPoolPositionDetailByNetuid(netuid, fromValue);
 
   useRestoreTransaction(form);
 
@@ -1098,79 +1166,111 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
             </Form.Item>
           </div>
 
-          <Form.Item
-            className={CN({ hidden: isNotShowAccountSelector })}
-            name={'from'}
-            statusHelpAsTooltip={true}
-          >
-            <AccountAddressSelector
-              items={accountAddressItems}
-              label={`${t('ui.TRANSACTION.screen.Transaction.SendFund.from')}:`}
-              labelStyle={'horizontal'}
-            />
-          </Form.Item>
+          {isAlphaTokenTransfer && !!poolPositionDetail?.poolInfo && !!poolPositionDetail?.positions && poolPositionDetail?.positions.length > 0
+            ? (
+              <AlphaTokenTransferSection
+                accountAddressItems={accountAddressItems}
+                addressInputRef={addressInputRef}
+                addressInputRenderKey={addressInputRenderKey}
+                amountInputRenderKey={amountInputRenderKey}
+                assetInfo={assetInfo}
+                chainValue={chainValue}
+                className={'alpha-token-transfer-section'}
+                decimals={decimals}
+                defaultData={defaultData}
+                destAssetInfo={destAssetInfo}
+                destChainValue={destChainValue}
+                disabledToAddressInput={disabledToAddressInput}
+                form={form}
+                fromValue={fromValue}
+                isNotShowAccountSelector={isNotShowAccountSelector}
+                onBalanceReady={setIsBalanceReady}
+                poolInfo={poolPositionDetail?.poolInfo}
+                positionInfo={poolPositionDetail?.positions}
+                setIsTransferAll={setIsTransferAll}
+                setTargetLoading={setIsFetchingPoolTargets}
+                validateRecipient={validateRecipient}
+              />
+            )
+            : (
+              <>
+                <Form.Item
+                  className={CN({ hidden: isNotShowAccountSelector })}
+                  name={'from'}
+                  statusHelpAsTooltip={true}
+                >
+                  <AccountAddressSelector
+                    items={accountAddressItems}
+                    label={`${t('ui.TRANSACTION.screen.Transaction.SendFund.from')}:`}
+                    labelStyle={'horizontal'}
+                  />
+                </Form.Item>
 
-          <Form.Item
-            name={'to'}
-            rules={[
-              {
-                validator: validateRecipient
-              }
-            ]}
-            statusHelpAsTooltip={true}
-            validateTrigger={false}
-          >
-            <AddressInputNew
-              actionType={ActionType.SEND_FUND}
-              chainSlug={destChainValue}
-              disabled={disabledToAddressInput}
-              dropdownHeight={isNotShowAccountSelector ? 317 : 257}
-              key={addressInputRenderKey}
-              label={`${t('ui.TRANSACTION.screen.Transaction.SendFund.to')}:`}
-              labelStyle={'horizontal'}
-              placeholder={t('ui.TRANSACTION.screen.Transaction.SendFund.enterAddress')}
-              ref={addressInputRef}
-              saveAddress={true}
-              showAddressBook={true}
-              showScanner={true}
-              tokenSlug={destAssetInfo?.slug}
-            />
-          </Form.Item>
+                <Form.Item
+                  name={'to'}
+                  rules={[
+                    {
+                      validator: validateRecipient
+                    }
+                  ]}
+                  statusHelpAsTooltip={true}
+                  validateTrigger={false}
+                >
+                  <AddressInputNew
+                    actionType={ActionType.SEND_FUND}
+                    chainSlug={destChainValue}
+                    disabled={disabledToAddressInput}
+                    dropdownHeight={isNotShowAccountSelector ? 317 : 257}
+                    key={addressInputRenderKey}
+                    label={`${t('ui.TRANSACTION.screen.Transaction.SendFund.to')}:`}
+                    labelStyle={'horizontal'}
+                    placeholder={t('ui.TRANSACTION.screen.Transaction.SendFund.enterAddress')}
+                    ref={addressInputRef}
+                    saveAddress={true}
+                    showAddressBook={true}
+                    showScanner={true}
+                    tokenSlug={destAssetInfo?.slug}
+                  />
+                </Form.Item>
 
-          <FreeBalance
-            address={fromValue}
-            chain={chainValue}
-            className={'free-balance-block'}
-            extrinsicType={extrinsicType}
-            onBalanceReady={setIsBalanceReady}
-            tokenSlug={assetValue}
-          />
+                <FreeBalance
+                  address={fromValue}
+                  chain={chainValue}
+                  className={'free-balance-block'}
+                  extrinsicType={extrinsicType}
+                  onBalanceReady={setIsBalanceReady}
+                  tokenSlug={assetValue}
+                />
 
-          <Form.Item
-            name={'value'}
-            rules={[
-              {
-                validator: validateAmount
-              }
-            ]}
-            statusHelpAsTooltip={true}
-            validateTrigger={false}
-          >
-            <AmountInput
-              decimals={decimals}
-              disabled={decimals === 0}
-              key={amountInputRenderKey}
-              maxValue={transferInfo?.maxTransferable || '0'}
-              onSetMax={onSetMaxTransferable}
-              showMaxButton={!hideMaxButton}
-              tooltip={t('ui.TRANSACTION.screen.Transaction.SendFund.amount')}
-            />
-          </Form.Item>
+                <Form.Item
+                  name={'value'}
+                  rules={[
+                    {
+                      validator: validateAmount
+                    }
+                  ]}
+                  statusHelpAsTooltip={true}
+                  validateTrigger={false}
+                >
+                  <AmountInput
+                    decimals={decimals}
+                    disabled={decimals === 0}
+                    key={amountInputRenderKey}
+                    maxValue={transferInfo?.maxTransferable || '0'}
+                    onSetMax={onSetMaxTransferable}
+                    showMaxButton={!hideMaxButton}
+                    tooltip={t('ui.TRANSACTION.screen.Transaction.SendFund.amount')}
+                  />
+                </Form.Item>
+              </>
+            )
+          }
         </Form>
 
-        {FEE_SHOW_TYPES.includes(transferInfo?.feeType) && !!toValue && !!transferAmountValue && nativeTokenSlug && (
+        {FEE_SHOW_TYPES.includes(transferInfo?.feeType) && !!toValue && !!transferAmountValue && nativeTokenSlug && !isMultisigAccount && (
           <FeeEditor
             chainValue={chainValue}
+            crossChainFee={crossChainFee}
             currentTokenPayFee={currentTokenPayFee}
             destChainValue={destChainValue}
             estimateFee={estimatedNativeFee}
@@ -1226,7 +1326,9 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
               weight={'fill'}
             />
           )}
-          loading={loading || submitLoading}
+
+          loading={loading || isCheckWrappTransactionLoading || isFetchingPoolTargets}
+
           onClick={checkAction(form.submit, extrinsicType)}
           schema={isTransferAll ? 'warning' : undefined}
         >
@@ -1242,7 +1344,7 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   const { defaultData } = useTransactionContext<TransferParams>();
   const { goHome } = useDefaultNavigate();
   const { accountProxies, isAllAccount } = useSelector((state) => state.accountState);
-
+  const dataContext = useContext(DataContext);
   const targetAccountProxy = useMemo(() => {
     return accountProxies.find((ap) => {
       if (!defaultData.fromAccountProxy) {
@@ -1266,11 +1368,16 @@ const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
   }
 
   return (
-    <Component
-      className={className}
-      isAllAccount={isAllAccount}
-      targetAccountProxy={targetAccountProxy}
-    />
+    <PageWrapper
+      className={CN(className, 'send-fund-wrapper')}
+      resolve={dataContext.awaitStores(['earning'])}
+    >
+      <Component
+        className={className}
+        isAllAccount={isAllAccount}
+        targetAccountProxy={targetAccountProxy}
+      />
+    </PageWrapper>
   );
 };
 
@@ -1278,6 +1385,9 @@ const SendFund = styled(Wrapper)(({ theme }) => {
   const token = (theme as Theme).token;
 
   return ({
+    display: 'flex',
+    flexDirection: 'column',
+
     '.__brief': {
       paddingLeft: token.padding,
       paddingRight: token.padding,
@@ -1293,12 +1403,14 @@ const SendFund = styled(Wrapper)(({ theme }) => {
     },
 
     '.__warning_message_cross_chain': {
-      marginTop: token.marginXS
+      marginTop: token.marginSM
     },
 
     '.free-balance-block': {
+      display: 'flex',
       marginBottom: token.marginSM,
-      justifyContent: 'end'
+      justifyContent: 'end',
+      color: token.colorTextTertiary
     },
 
     '&.-transaction-content.-is-zero-balance': {

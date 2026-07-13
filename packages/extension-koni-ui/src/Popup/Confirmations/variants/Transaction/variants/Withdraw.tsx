@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RequestYieldWithdrawal } from '@subwallet/extension-base/types';
-import { isSameAddress } from '@subwallet/extension-base/utils';
 import { PageWrapper } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
@@ -45,14 +44,6 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
-          <MetaInfo.Account
-            address={transaction.signerSubstrateProxyAddress}
-            chainSlug={transaction.chain}
-            label={t('ui.TRANSACTION.Confirmations.Withdraw.signWith')}
-          />
-        }
-
         <MetaInfo.Number
           decimals={amountDecimals}
           label={t('ui.TRANSACTION.Confirmations.Withdraw.amount')}
@@ -60,12 +51,12 @@ const Component: React.FC<Props> = (props: Props) => {
           value={data.unstakingInfo.claimable}
         />
 
-        <MetaInfo.Number
+        {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.Withdraw.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.Withdraw.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
-        />
+        />}
       </MetaInfo>
     </>
   );

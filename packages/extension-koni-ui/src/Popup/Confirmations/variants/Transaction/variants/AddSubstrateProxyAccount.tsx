@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RequestAddSubstrateProxyAccount } from '@subwallet/extension-base/types';
-import { isSameAddress } from '@subwallet/extension-base/utils';
 import { CommonTransactionInfo } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
@@ -46,26 +45,13 @@ const Component: React.FC<Props> = (props: Props) => {
           </span>
         </MetaInfo.Default>
 
-        <MetaInfo.Number
+        {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
-        />
+        />}
       </MetaInfo>
-      {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
-      <MetaInfo
-        className={'meta-info'}
-        hasBackgroundWrapper
-      >
-        <MetaInfo.Account
-          address={transaction.signerSubstrateProxyAddress}
-          chainSlug={transaction.chain}
-          label={t('ui.TRANSACTION.Confirmations.AddSubstrateProxyAccount.signWith')}
-        />
-
-      </MetaInfo>
-      }
     </div>
   );
 };

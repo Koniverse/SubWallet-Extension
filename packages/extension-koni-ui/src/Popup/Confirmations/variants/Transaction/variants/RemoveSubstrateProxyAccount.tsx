@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types';
-import { isSameAddress } from '@subwallet/extension-base/utils';
 import { CommonTransactionInfo, SubstrateProxyAccountListModal } from '@subwallet/extension-koni-ui/components';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { SUBSTRATE_PROXY_ACCOUNT_LIST_MODAL } from '@subwallet/extension-koni-ui/constants';
@@ -41,14 +40,6 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
-          <MetaInfo.Account
-            address={transaction.signerSubstrateProxyAddress}
-            chainSlug={transaction.chain}
-            label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.signWith')}
-          />
-        }
-
         <MetaInfo.Default
           className={'proxy-address-removed'}
           label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.proxyList')}
@@ -70,12 +61,12 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         </MetaInfo.Default>
 
-        <MetaInfo.Number
+        {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.RemoveSubstrateProxyAccount.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
-        />
+        />}
       </MetaInfo>
       <SubstrateProxyAccountListModal
         substrateProxyAccounts={substrateProxyAccounts}

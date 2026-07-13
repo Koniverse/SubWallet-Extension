@@ -76,15 +76,24 @@ function Component ({ accountProxy, className }: Props) {
     // Filter chains that support substrate proxy and are in allowedChains
     Object.values(chainInfoMap).forEach((c) => {
       if (c.substrateInfo?.supportProxy && allowedChains.includes(c.slug)) {
-        result.push({
-          name: c.name,
-          slug: c.slug
-        });
+        if (accountProxy.accountType === AccountProxyType.MULTISIG) {
+          if (c.substrateInfo.supportMultisig) {
+            result.push({
+              name: c.name,
+              slug: c.slug
+            });
+          }
+        } else {
+          result.push({
+            name: c.name,
+            slug: c.slug
+          });
+        }
       }
     });
 
     return result;
-  }, [allowedChains, chainInfoMap]);
+  }, [accountProxy.accountType, allowedChains, chainInfoMap]);
 
   // Sort selected Substrate proxy accounts, those managed by the current wallet appear on top
   const substrateProxyAccountSelectedSorted = useMemo<SubstrateProxyItemSelector[]>(() => {
@@ -344,7 +353,15 @@ function Component ({ accountProxy, className }: Props) {
   }, [addressFormated, networkSelected, fetchProxyAccounts]);
 
   useEffect(() => {
-    if (!networkSelected && chainItems[0]?.slug) {
+    if (!chainItems.length) {
+      setNetworkSelected('');
+
+      return;
+    }
+
+    const hasSelectedInList = !!chainItems.find((item) => item.slug === networkSelected);
+
+    if ((!networkSelected || !hasSelectedInList) && chainItems[0]?.slug) {
       setNetworkSelected(chainItems[0].slug);
     }
   }, [chainItems, networkSelected, setNetworkSelected]);

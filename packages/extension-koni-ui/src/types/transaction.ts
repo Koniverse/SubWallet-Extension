@@ -16,6 +16,10 @@ export interface TransferParams extends TransactionFormBaseProps {
   destChain: string;
   value: string;
   defaultSlug: string;
+
+  // Transfer alpha token params
+  fromValidator?: string;
+  toValidator?: string;
 }
 
 export interface SendNftParams extends TransactionFormBaseProps {
@@ -97,6 +101,9 @@ export interface GovUnlockVoteParams extends TransactionFormBaseProps {
   tracks: number[];
 }
 
+export interface ChangeBittensorRootClaimType extends TransactionFormBaseProps {
+  bittensorRootClaimType: string;
+}
 export interface AddSubstrateProxyAccountParams extends TransactionFormBaseProps {
   substrateProxyAddress: string;
   substrateProxyType: SubstrateProxyType;

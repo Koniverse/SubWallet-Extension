@@ -4,8 +4,7 @@
 import { GovVoteRequest, GovVoteType } from '@subwallet/extension-base/services/open-gov/interface';
 import { getGovConvictionOptions } from '@subwallet/extension-base/services/open-gov/utils';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
-import { isSameAddress } from '@subwallet/extension-base/utils';
-import { MetaInfo, NumberDisplay, PageWrapper, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
+import { CommonTransactionInfo, MetaInfo, NumberDisplay, PageWrapper, VoteAmountDetail, VoteTypeLabel } from '@subwallet/extension-koni-ui/components';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useGetGovVoteConfirmationInfo, useGetNativeTokenBasicInfo, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -83,8 +82,7 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
     address: transaction.address,
     chain: transaction.chain,
     amount: totalAmount,
-    transactionFee: transaction.estimateFee?.value,
-    signerSubstrateProxyAddress: transaction.signerSubstrateProxyAddress
+    transactionFee: transaction.estimateFee?.value
   });
 
   const govConvictionOptions = useMemo(() => {
@@ -142,36 +140,38 @@ const Component: React.FC<BaseTransactionConfirmationProps> = (props: BaseTransa
           weight={500}
         />
       </div>
-
-      <MetaInfo
-        className={'__meta-info'}
-        hasBackgroundWrapper
-      >
-        <MetaInfo.Account
-          address={transaction.address}
-          chainSlug={transaction.chain}
-          label={t('ui.TRANSACTION.Confirmations.GovVote.account')}
-        />
-
-        <MetaInfo.Number
-          decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.GovVote.networkFee')}
-          suffix={symbol}
-          useNumberDisplay={true}
-          value={transaction.estimateFee?.value || 0}
-        />
-      </MetaInfo>
-      <MetaInfo
-        className={'__meta-info'}
-        hasBackgroundWrapper
-      >
-        {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
-          <MetaInfo.Account
-            address={transaction.signerSubstrateProxyAddress}
-            chainSlug={transaction.chain}
-            label={t('ui.TRANSACTION.Confirmations.GovVote.signWith')}
+      {transaction.wrappingStatus
+        ? (
+          <CommonTransactionInfo
+            address={transaction.address}
+            network={transaction.chain}
           />
-        }
+        )
+        : (
+          <MetaInfo
+            className={'__meta-info'}
+            hasBackgroundWrapper
+          >
+            <MetaInfo.Account
+              address={transaction.address}
+              chainSlug={transaction.chain}
+              label={t('ui.TRANSACTION.Confirmations.GovVote.account')}
+            />
+
+            <MetaInfo.Number
+              decimals={decimals}
+              label={t('ui.TRANSACTION.Confirmations.GovVote.networkFee')}
+              suffix={symbol}
+              useNumberDisplay={true}
+              value={transaction.estimateFee?.value || 0}
+            />
+          </MetaInfo>
+        )
+      }
+      <MetaInfo
+        className={'__meta-info'}
+        hasBackgroundWrapper
+      >
         {!!govConfirmationInfo &&
           <>
             <MetaInfo.Default

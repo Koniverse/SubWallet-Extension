@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RequestUnbondingSubmit } from '@subwallet/extension-base/background/KoniTypes';
-import { isSameAddress } from '@subwallet/extension-base/utils';
 import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
@@ -34,14 +33,6 @@ const Component: React.FC<Props> = (props: Props) => {
         className={'meta-info'}
         hasBackgroundWrapper
       >
-        {!!transaction.signerSubstrateProxyAddress && !isSameAddress(transaction.address, transaction.signerSubstrateProxyAddress) &&
-          <MetaInfo.Account
-            address={transaction.signerSubstrateProxyAddress}
-            chainSlug={transaction.chain}
-            label={t('ui.TRANSACTION.Confirmations.Unbond.signWith')}
-          />
-        }
-
         <MetaInfo.Number
           decimals={decimals}
           label={t('ui.TRANSACTION.Confirmations.Unbond.unstakeAmount')}
@@ -49,12 +40,12 @@ const Component: React.FC<Props> = (props: Props) => {
           value={data.amount}
         />
 
-        <MetaInfo.Number
+        {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.Unbond.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.Unbond.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
-        />
+        />}
       </MetaInfo>
       {!!stakingFee && (
         <AlertBox

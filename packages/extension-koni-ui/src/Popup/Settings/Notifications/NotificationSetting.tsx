@@ -28,7 +28,7 @@ interface ShowNoticeOption {
   value: keyof NotificationSetup['showNotice'];
 }
 
-const CAN_NOT_CHANGE_SETTING: Array<keyof NotificationSetup['showNotice']> = ['earningClaim', 'earningWithdraw', 'availBridgeClaim', 'polygonBridgeClaim'];
+const CAN_NOT_CHANGE_SETTING: Array<keyof NotificationSetup['showNotice']> = ['earningClaim', 'earningWithdraw', 'availBridgeClaim', 'polygonBridgeClaim', 'pendingMultisigApprovals'];
 
 const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
   const { token } = useTheme() as Theme;
@@ -55,6 +55,10 @@ const Component = ({ className = '' }: Props): React.ReactElement<Props> => {
       {
         label: t('ui.SETTINGS.screen.Setting.Notifications.claimPolygonBridge'),
         value: 'polygonBridgeClaim'
+      },
+      {
+        label: t('ui.SETTINGS.screen.Setting.Notifications.pendingMultisigApprovals'),
+        value: 'pendingMultisigApprovals'
       }
     ];
   }, [t]);

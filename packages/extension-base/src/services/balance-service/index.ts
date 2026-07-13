@@ -247,6 +247,10 @@ export class BalanceService implements StoppableServiceInterface {
           case BalanceType.TOTAL:
             value = new BigN(rs.free).plus(new BigN(rs.locked)).toFixed();
             break;
+          case BalanceType.STAKING:
+            value = rs.lockedDetails?.staking || '0';
+            break;
+
           case BalanceType.TOTAL_MINUS_RESERVED:
             if (_BALANCE_CHAIN_GROUP.notSupportGetBalanceByType.includes(chainInfo.slug)) {
               // TODO: Currently Vara and Avail staking from nomination pools is not fully supported.
@@ -707,10 +711,10 @@ export class BalanceService implements StoppableServiceInterface {
     }
 
     const destChainInfo = this.state.chainService.getChainInfoByKey(params.destChain);
+    const evmApi = this.state.chainService.getEvmApi(originChainInfo.slug);
 
     // xcm
     if (!_isXcmWithinSameConsensus(originChainInfo, destChainInfo) && _isPureEvmChain(originChainInfo)) {
-      const evmApi = this.state.chainService.getEvmApi(originChainInfo.slug);
       const tokenInfo = this.state.chainService.getAssetBySlug(params.tokenSlug);
 
       return getSnowbridgeTransferProcessFromEvm(params.address, evmApi, tokenInfo, params.amount);
@@ -745,7 +749,7 @@ export class BalanceService implements StoppableServiceInterface {
           throw new Error('Failed to fetch Across Bridge Data. Please try again later');
         }
 
-        return getAcrossbridgeTransferProcessFromEvm(data.to);
+        return getAcrossbridgeTransferProcessFromEvm(data.to, params.address, originTokenInfo, evmApi, params.amount);
       }
     }
 
@@ -922,7 +926,13 @@ export class BalanceService implements StoppableServiceInterface {
   public async getSubstrateTokensBalanceByChain (address: string, chainSlug: string, assetsByChain: Record<string, _ChainAsset>): Promise<string[]> {
     const tokenBalanceSlugs: string[] = [];
 
-    const balanceData = await this.state.subscanService.getMultiChainBalance(address);
+    // Do not block chain enabling flow when balance detection fails.
+    const balanceData = await this.state.subscanService.getMultiChainBalance(address)
+      .catch((e) => {
+        console.error(e);
+
+        return [];
+      });
 
     if (!balanceData) {
       return [];

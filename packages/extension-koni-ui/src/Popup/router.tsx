@@ -63,13 +63,14 @@ const Tokens = new LazyLoader('Tokens', () => import('@subwallet/extension-koni-
 const TokenDetailList = new LazyLoader('TokenDetailList', () => import('@subwallet/extension-koni-ui/Popup/Home/Tokens/DetailList'));
 
 const NftItemDetail = new LazyLoader('NftItemDetail', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftItemDetail'));
+const NftBundleItemDetail = new LazyLoader('NftBundleItemDetail', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/nested-nft/NftBundleItemDetail'));
+const NftViewStructure = new LazyLoader('NftViewStructure', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/nested-nft/NftViewStructure'));
 const NftCollections = new LazyLoader('NftCollections', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftCollections'));
 const NftCollectionDetail = new LazyLoader('NftCollectionDetail', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftCollectionDetail'));
 const NftImport = new LazyLoader('NftImport', () => import('@subwallet/extension-koni-ui/Popup/Home/Nfts/NftImport'));
 const Governance = new LazyLoader('Governance', () => import('@subwallet/extension-koni-ui/Popup/Home/Governance'));
 
 const History = new LazyLoader('History', () => import('@subwallet/extension-koni-ui/Popup/Home/History'));
-const Crowdloans = new LazyLoader('Crowdloans', () => import('@subwallet/extension-koni-ui/Popup/Home/Crowdloans'));
 const Home = new LazyLoader('Home', () => import('@subwallet/extension-koni-ui/Popup/Home'));
 
 const Settings = new LazyLoader('Settings', () => import('@subwallet/extension-koni-ui/Popup/Settings'));
@@ -94,6 +95,7 @@ const NotificationSetting = new LazyLoader('NotificationSetting', () => import('
 const ManageWebsiteAccessDetail = new LazyLoader('ManageWebsiteAccessDetail', () => import('@subwallet/extension-koni-ui/Popup/Settings/Security/ManageWebsiteAccess/Detail'));
 
 const NewSeedPhrase = new LazyLoader('NewSeedPhrase', () => import('@subwallet/extension-koni-ui/Popup/Account/NewSeedPhrase'));
+const NewMultisig = new LazyLoader('NewMultisigAccount', () => import('@subwallet/extension-koni-ui/Popup/Account/NewMultisigAccount'));
 const ImportSeedPhrase = new LazyLoader('ImportSeedPhrase', () => import('@subwallet/extension-koni-ui/Popup/Account/ImportSeedPhrase'));
 const ImportPrivateKey = new LazyLoader('ImportPrivateKey', () => import('@subwallet/extension-koni-ui/Popup/Account/ImportPrivateKey'));
 const RestoreJson = new LazyLoader('RestoreJson', () => import('@subwallet/extension-koni-ui/Popup/Account/RestoreJson'));
@@ -190,7 +192,8 @@ export const router = createHashRouter([
             children: [
               NftCollections.generateRouterObject('collections'),
               NftCollectionDetail.generateRouterObject('collection-detail'),
-              NftItemDetail.generateRouterObject('item-detail')
+              NftItemDetail.generateRouterObject('item-detail'),
+              NftBundleItemDetail.generateRouterObject('bundle-item-detail')
             ]
           },
           // Staking.generateRouterObject('staking'),
@@ -245,6 +248,7 @@ export const router = createHashRouter([
       {
         ...TransactionDone.generateRouterObject('transaction-done/:address/:chain/:transactionId')
       },
+      { ...NftViewStructure.generateRouterObject('nft-view-structure') },
       {
         path: '/keyring',
         element: <Outlet />,
@@ -262,7 +266,6 @@ export const router = createHashRouter([
           Settings.generateRouterObject('list'),
           GeneralSetting.generateRouterObject('general'),
           AccountSettings.generateRouterObject('account-settings'),
-          Crowdloans.generateRouterObject('crowdloans'),
           ManageAddressBook.generateRouterObject('address-book'),
           SecurityList.generateRouterObject('security'),
           ManageWebsiteAccess.generateRouterObject('dapp-access'),
@@ -296,6 +299,7 @@ export const router = createHashRouter([
         element: <Outlet />,
         children: [
           NewSeedPhrase.generateRouterObject('new-seed-phrase'),
+          NewMultisig.generateRouterObject('new-multisig'),
           ImportSeedPhrase.generateRouterObject('import-seed-phrase'),
           ImportPrivateKey.generateRouterObject('import-private-key'),
           RestoreJson.generateRouterObject('restore-json'),

@@ -6,7 +6,6 @@ import { TransactionWarningType } from './warning';
 
 export type BaseRequestSign = {
   ignoreWarnings?: TransactionWarningType[];
-  signerSubstrateProxyAddress?: string;
 };
 
 export type InternalRequestSign<T> = T & BaseRequestSign;

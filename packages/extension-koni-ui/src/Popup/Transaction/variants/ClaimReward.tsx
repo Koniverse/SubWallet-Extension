@@ -84,7 +84,7 @@ const filterAccount = (
 const Component = () => {
   const navigate = useNavigate();
 
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign } = useTransactionContext<ClaimRewardParams>();
+  const { defaultData, persistData } = useTransactionContext<ClaimRewardParams>();
   const { slug } = defaultData;
 
   const [form] = Form.useForm<ClaimRewardParams>();
@@ -149,43 +149,24 @@ const Component = () => {
   const onSubmit: FormCallbacks<ClaimRewardParams>['onFinish'] = useCallback((values: ClaimRewardParams) => {
     setLoading(true);
 
-    const { bondReward, chain, from, slug } = values;
+    const { bondReward, from, slug } = values;
 
-    // send submit claim reward transaction
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
-      return yieldSubmitStakingClaimReward({
+    setTimeout(() => {
+      yieldSubmitStakingClaimReward({
         address: from,
         bondReward: bondReward,
         slug,
-        unclaimedReward: reward?.unclaimedReward,
-        signerSubstrateProxyAddress
-      }).then(onSuccess);
-    };
-
-    // wrap proxy selection
-    // for the Liquid Staking feature with multiple steps,
-    // only the root account is allowed to sign transactions, even if a valid proxy account is available to sign on its behalf.
-    const sendPromiseWrapper = async () => {
-      if (poolInfo.type !== YieldPoolType.LIQUID_STAKING) {
-        const substrateProxyAddress = await selectSubstrateProxyAccountsToSign({
-          chain,
-          address: from,
-          type: ExtrinsicType.STAKING_CLAIM_REWARD
+        unclaimedReward: reward?.unclaimedReward
+      })
+        .then(onSuccess)
+        .catch(onError)
+        .finally(() => {
+          setLoading(false);
         });
-
-        return await sendPromise(substrateProxyAddress);
-      }
-
-      return await sendPromise();
-    };
-
-    // delay for better loading UX
-    setTimeout(() => {
-      sendPromiseWrapper().catch(onError).finally(() => setLoading(false));
     }, 300);
-  }, [reward?.unclaimedReward, onSuccess, poolInfo.type, selectSubstrateProxyAccountsToSign, onError]);
+  }, [reward?.unclaimedReward, onSuccess, onError]);
 
-  const checkAction = usePreCheckAction(fromValue);
+  const checkAction = usePreCheckAction({ chain: chainValue, address: fromValue });
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);

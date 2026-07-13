@@ -25,6 +25,8 @@ export type AlertDialogProps = {
   title: string;
   subtitle?: React.ReactNode;
   type?: NotificationType;
+  hideIcon?: boolean;
+  subtitleDanger?: boolean;
   closable?: boolean;
   content: React.ReactNode;
   cancelButton?: AlertDialogButtonProps;

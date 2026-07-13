@@ -440,6 +440,7 @@ export class AccountState {
   public belongUnifiedAccount (_address: string): string | undefined {
     const modifyPairs = this.modifyPairs;
     const accountProxies = this.accountProxies;
+
     const address = reformatAddress(_address);
     const proxyId = modifyPairs[address]?.accountProxyId;
 
@@ -595,6 +596,20 @@ export class AccountState {
   /**
    * Account ref
    * */
+
+  /* Multisig */
+
+  public getMultisigAccounts () {
+    return Object.values(this.accounts).filter((acc) => acc.accountType === AccountProxyType.MULTISIG);
+  }
+
+  public getMultisigAddresses () {
+    const allAccounts = this.getMultisigAccounts();
+
+    return allAccounts.map((acc) => acc.id);
+  }
+
+  /* Multisig */
 
   /* Others */
 

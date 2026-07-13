@@ -36,7 +36,7 @@ const REFERENDA_VOTED_MODAL_ID = 'referenda-voted-modal';
 const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
   const { className = '', isAllAccount } = props;
   const { t } = useTranslation();
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setBackProps } = useTransactionContext<GovUnlockVoteParams>();
+  const { defaultData, persistData, setBackProps } = useTransactionContext<GovUnlockVoteParams>();
   const formDefault = useMemo((): GovUnlockVoteParams => ({ ...defaultData }), [defaultData]);
   const [form] = Form.useForm<GovUnlockVoteParams>();
   const [loading, setLoading] = useState(false);
@@ -60,7 +60,7 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
     return votingInfo && votingInfo.summary.unlockable.trackIds.length > 0;
   }).sort(funcSortByName), [accountAddressItems, govLockInfo]);
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
   const { onError, onSuccess } = useHandleSubmitTransaction();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(chainValue);
 
@@ -92,24 +92,11 @@ const Component = (props: ComponentProps): React.ReactElement<ComponentProps> =>
       amount: values.amount || '0'
     };
 
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
-      return handleUnlockVote({
-        ...unlockVoteRequest,
-        signerSubstrateProxyAddress
-      });
-    };
-
-    selectSubstrateProxyAccountsToSign({
-      chain: chainValue,
-      address: values.from,
-      type: ExtrinsicType.GOV_UNLOCK_VOTE
-    }).then(sendPromise)
-      .then((tx) => {
-        onSuccess(tx);
-      })
+    handleUnlockVote(unlockVoteRequest)
+      .then(onSuccess)
       .catch(onError)
       .finally(() => setLoading(false));
-  }, [chainValue, onError, onSuccess, selectSubstrateProxyAccountsToSign]);
+  }, [chainValue, onError, onSuccess]);
 
   const goBack = useCallback(() => {
     navigate(`/home/governance?view=unlock-token&chainSlug=${chainValue}`);

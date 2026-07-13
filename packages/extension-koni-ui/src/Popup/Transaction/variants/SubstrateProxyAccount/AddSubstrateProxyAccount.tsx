@@ -32,7 +32,7 @@ const hiddenFields: Array<keyof SendNftParams> = ['asset', 'fromAccountProxy', '
 
 const Component = (): React.ReactElement<Props> => {
   useSetCurrentPage('/transaction/add-proxy');
-  const { defaultData, persistData, selectSubstrateProxyAccountsToSign, setBackProps } = useTransactionContext<AddSubstrateProxyAccountParams>();
+  const { defaultData, persistData, setBackProps } = useTransactionContext<AddSubstrateProxyAccountParams>();
   const { token } = useTheme() as Theme;
   const { accounts } = useSelector((state: RootState) => state.accountState);
   const { chainInfoMap, ledgerGenericAllowNetworks } = useSelector((state) => state.chainStore);
@@ -54,7 +54,7 @@ const Component = (): React.ReactElement<Props> => {
   const chainValue = useWatchTransaction('chain', form, defaultData);
 
   const { error, isLoading: balanceLoading } = useGetBalance(chainValue, fromValue);
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
   const substrateProxyAccountGroup = useGetSubstrateProxyAccountGroupByAddress(fromValue, chainValue);
   const nativeToken = useGetNativeTokenBasicInfo(chainValue);
 
@@ -97,28 +97,19 @@ const Component = (): React.ReactElement<Props> => {
   const onSubmit: FormCallbacks<AddSubstrateProxyAccountParams>['onFinish'] = useCallback((values: AddSubstrateProxyAccountParams) => {
     setLoading(true);
 
-    const sendPromise = (signerSubstrateProxyAddress?: string) => {
-      return handleAddSubstrateProxyAccount({
-        address: values.from,
-        chain: values.chain,
-        substrateProxyAddress: values.substrateProxyAddress,
-        substrateProxyType: values.substrateProxyType,
-        substrateProxyDeposit: substrateProxyAccountGroup.substrateProxyDeposit,
-        signerSubstrateProxyAddress
-      });
-    };
-
-    selectSubstrateProxyAccountsToSign({
-      chain: values.chain,
+    handleAddSubstrateProxyAccount({
       address: values.from,
-      type: ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT
-    }).then(sendPromise)
+      chain: values.chain,
+      substrateProxyAddress: values.substrateProxyAddress,
+      substrateProxyType: values.substrateProxyType,
+      substrateProxyDeposit: substrateProxyAccountGroup.substrateProxyDeposit
+    })
       .then(onSuccess)
       .catch(onError)
       .finally(() => {
         setLoading(false);
       });
-  }, [onError, onSuccess, selectSubstrateProxyAccountsToSign, substrateProxyAccountGroup.substrateProxyDeposit]);
+  }, [onError, onSuccess, substrateProxyAccountGroup.substrateProxyDeposit]);
 
   // Validate substrate proxy address
   const validateSubstrateProxyAddress = useCallback((rule: Rule, _recipientAddress: string): Promise<void> => {

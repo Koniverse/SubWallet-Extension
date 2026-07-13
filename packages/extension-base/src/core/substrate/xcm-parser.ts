@@ -5,23 +5,22 @@ import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
 import { isAvailChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/availBridge';
+import { _isBittensorToSubtensorBridge, _isSubtensorToBittensorBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/bittensorBridge/nativeTokenBridge';
 import { _isPolygonChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { _getSubstrateRelayParent, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 
 export function _isXcmTransferUnstable (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo, assetSlug: string): boolean {
-  return !_isXcmWithinSameConsensus(originChainInfo, destChainInfo) || _isMythosFromHydrationToMythos(originChainInfo, destChainInfo, assetSlug) || _isPolygonBridgeXcm(originChainInfo, destChainInfo) || _isPosBridgeXcm(originChainInfo, destChainInfo);
+  return (
+    !_isBittensorToSubtensorEvmBridge(originChainInfo, destChainInfo) && !_isSubtensorEvmtoBittensorBridge(originChainInfo, destChainInfo) &&
+    (!_isXcmWithinSameConsensus(originChainInfo, destChainInfo) && !_isAssetHubBridgeXcm(originChainInfo, destChainInfo))) ||
+    _isMythosFromHydrationToMythos(originChainInfo, destChainInfo, assetSlug) ||
+     _isPolygonBridgeXcm(originChainInfo, destChainInfo) ||
+     _isPosBridgeXcm(originChainInfo, destChainInfo);
 }
 
-function getAssetHubBridgeUnstableWarning (originChainInfo: _ChainInfo): string {
-  switch (originChainInfo.slug) {
-    case COMMON_CHAIN_SLUGS.POLKADOT_ASSET_HUB:
-      return 'Cross-chain transfer of this token is not recommended as it is in beta and incurs a transaction fee of 2 DOT. Continue at your own risk';
-    case COMMON_CHAIN_SLUGS.KUSAMA_ASSET_HUB:
-      return 'Cross-chain transfer of this token is not recommended as it is in beta and incurs a transaction fee of 0.4 KSM. Continue at your own risk';
-    default:
-      return 'Cross-chain transfer of this token is not recommended as it is in beta and incurs a large transaction fee. Continue at your own risk';
-  }
+function getDefaultUnstableWarning (): string {
+  return 'Cross-chain transfer of this token is not recommended as it is in beta and incurs a large transaction fee. Continue at your own risk';
 }
 
 function getSnowBridgeUnstableWarning (originChainInfo: _ChainInfo): string {
@@ -44,7 +43,7 @@ function getAvailBridgeWarning (): string {
 }
 
 function getPolygonBridgeWarning (originChainInfo: _ChainInfo): string {
-  if (originChainInfo.slug === COMMON_CHAIN_SLUGS.ETHEREUM || originChainInfo.slug === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA) {
+  if (originChainInfo.slug === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA) {
     return 'Cross-chain transfer of this token may take up to 40 minutes. Do you still want to continue?';
   } else {
     return 'Cross-chain transfer of this token may take up to 3 hours, and you’ll need to manually claim the funds on the destination network to complete the transfer. Do you still want to continue?';
@@ -71,7 +70,7 @@ export function _getXcmUnstableWarning (originChainInfo: _ChainInfo, destChainIn
   } else if (_isMythosFromHydrationToMythos(originChainInfo, destChainInfo, assetSlug)) {
     return getMythosFromHydrationToMythosWarning();
   } else {
-    return getAssetHubBridgeUnstableWarning(originChainInfo);
+    return getDefaultUnstableWarning();
   }
 }
 
@@ -104,6 +103,18 @@ export function _isPosBridgeXcm (originChainInfo: _ChainInfo, destChainInfo: _Ch
 
 export function _isAcrossBridgeXcm (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo): boolean {
   return _isAcrossChainBridge(originChainInfo.slug, destChainInfo.slug);
+}
+
+export function _isBittensorToSubtensorEvmBridge (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo): boolean {
+  return _isBittensorToSubtensorBridge(originChainInfo.slug, destChainInfo.slug);
+}
+
+export function _isSubtensorEvmtoBittensorBridge (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo): boolean {
+  return _isSubtensorToBittensorBridge(originChainInfo.slug, destChainInfo.slug);
+}
+
+export function _isAssetHubBridgeXcm (originChainInfo: _ChainInfo, destChainInfo: _ChainInfo): boolean {
+  return (originChainInfo.slug === 'statemint' && destChainInfo.slug === 'statemine') || (originChainInfo.slug === 'statemine' && destChainInfo.slug === 'statemint');
 }
 // ---------------------------------------------------------------------------------------------------------------------
 
