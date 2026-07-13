@@ -2,16 +2,16 @@
 id: US-4.8
 title: "Cardano network integration"
 epic: EPIC-4
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 1.3.23
 prd_ref: [FR-39]
 arch_ref: [AD-14, AD-19]
 depends_on: [US-4.1]
-assignee:
-commit:
+assignee: bluezdot
+commit: 3ba31ae831, eca66a269c
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -46,23 +46,23 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an account, **When** Cardano is enabled, **Then** a
+- [x] **AC-1** — **Given** an account, **When** Cardano is enabled, **Then** a
   Cardano address derives from the unified seed and ADA balance resolves via
   Blockfrost (AD-14), with no separate seed/backup (AD-11).
-- [ ] **AC-2** — **Given** an enabled Cardano account holding CIP-26 native assets,
+- [x] **AC-2** — **Given** an enabled Cardano account holding CIP-26 native assets,
   **When** balances load, **Then** those native assets are listed alongside ADA.
-- [ ] **AC-3** — **Given** Blockfrost is reached, **When** any Cardano data is
+- [x] **AC-3** — **Given** Blockfrost is reached, **When** any Cardano data is
   requested, **Then** it resolves through the backend proxy and no Blockfrost key
   is present in the shipped bundle (AD-19).
-- [ ] **AC-4** — **Given** Blockfrost is unreachable, **When** data is requested,
+- [x] **AC-4** — **Given** Blockfrost is unreachable, **When** data is requested,
   **Then** a clear unavailable state is shown without breaking other ecosystems.
 
 ## Tasks
 
-- [ ] **TASK-4.8.1** — Cardano API object via Blockfrost (backend-proxied), wired into `ChainService` (AC: 1, 3)
-- [ ] **TASK-4.8.2** — CIP-26 native-asset balance read alongside ADA (AC: 2)
-- [ ] **TASK-4.8.3** — Backend-proxy routing assertion: no Blockfrost key in bundle (AC: 3)
-- [ ] **TASK-4.8.4** — Blockfrost-unavailable error state (AC: 4)
+- [x] **TASK-4.8.1** — Cardano API object via Blockfrost (backend-proxied), wired into `ChainService` (AC: 1, 3)
+- [x] **TASK-4.8.2** — CIP-26 native-asset balance read alongside ADA (AC: 2)
+- [x] **TASK-4.8.3** — Backend-proxy routing assertion: no Blockfrost key in bundle (AC: 3)
+- [x] **TASK-4.8.4** — Blockfrost-unavailable error state (AC: 4)
 
 ## Dev notes
 
@@ -108,7 +108,7 @@ external system integration).
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (batch 1, commit `571f3085be`). Version `1.3.23` is the release whose docs/CHANGELOG.md bullet first delivers this story's headline capability; commits `3ba31ae831, eca66a269c` were resolved from that bullet's issue number (`git log --grep`, filtered to a ±270-day window around the release date to exclude same-numbered upstream polkadot-js PRs) and each verified contained in the v1.3.23 anchor via `git merge-base --is-ancestor`. Assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

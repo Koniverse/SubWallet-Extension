@@ -2,16 +2,16 @@
 id: US-8.3
 title: "Custom fee / tip"
 epic: EPIC-8
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 1.3.24
 prd_ref: [FR-76]
 arch_ref: [AD-02, AD-25]
 depends_on: [US-8.1]
-assignee:
-commit:
+assignee: frenkie-ng
+commit: 582568f97d, 17d8f4153d, de412ae0fe
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -47,28 +47,28 @@ backfilled during version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a Substrate transfer, **When** the user sets a tip,
+- [x] **AC-1** — **Given** a Substrate transfer, **When** the user sets a tip,
   **Then** the tip (in base units) is added to the extrinsic and the displayed
   total cost updates accordingly before submission.
-- [ ] **AC-2** — **Given** an EVM transfer, **When** the user selects a fee level
+- [x] **AC-2** — **Given** an EVM transfer, **When** the user selects a fee level
   or edits maxFee / maxPriorityFee / gas-limit, **Then** the chosen parameters are
   applied to the transaction and the estimated cost reflects them.
-- [ ] **AC-3** — **Given** any fee/tip input, **When** it is entered, **Then** all
+- [x] **AC-3** — **Given** any fee/tip input, **When** it is entered, **Then** all
   fee, tip and gas math is performed in integer base units (`bigint` / `BN`) with
   no `number`/float coercion of an amount.
-- [ ] **AC-4** — **Given** an invalid custom value (gas-limit below the estimated
+- [x] **AC-4** — **Given** an invalid custom value (gas-limit below the estimated
   minimum, or a tip/fee that leaves the account unable to cover the total), **When**
   the user attempts to confirm, **Then** the input is rejected with an inline error
   and the transaction is not submitted.
 
 ## Tasks
 
-- [ ] **TASK-8.3.1** — Substrate tip input wired into the extrinsic + total-cost display (AC: 1, 3)
-- [ ] **TASK-8.3.2** — EVM fee-level / EIP-1559 editor (maxFee, maxPriorityFee, gas-limit) (AC: 2, 3)
-  - [ ] Source EVM gas suggestions via the `api-cache` proxy (AD-25).
-- [ ] **TASK-8.3.3** — Feed the user's choice into the fee engine preflight / lifecycle validate step (AC: 1, 2)
-- [ ] **TASK-8.3.4** — BigInt-only arithmetic for fee/tip/gas (AC: 3)
-- [ ] **TASK-8.3.5** — Validate custom values; reject under-min gas-limit / unaffordable total (AC: 4)
+- [x] **TASK-8.3.1** — Substrate tip input wired into the extrinsic + total-cost display (AC: 1, 3)
+- [x] **TASK-8.3.2** — EVM fee-level / EIP-1559 editor (maxFee, maxPriorityFee, gas-limit) (AC: 2, 3)
+  - [x] Source EVM gas suggestions via the `api-cache` proxy (AD-25).
+- [x] **TASK-8.3.3** — Feed the user's choice into the fee engine preflight / lifecycle validate step (AC: 1, 2)
+- [x] **TASK-8.3.4** — BigInt-only arithmetic for fee/tip/gas (AC: 3)
+- [x] **TASK-8.3.5** — Validate custom values; reject under-min gas-limit / unaffordable total (AC: 4)
 
 ## Dev notes
 

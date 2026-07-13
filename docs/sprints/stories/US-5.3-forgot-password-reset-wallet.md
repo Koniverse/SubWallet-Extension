@@ -2,16 +2,16 @@
 id: US-5.3
 title: "Forgot password → reset wallet"
 epic: EPIC-5
-status: backlog
+status: done
 priority: P0
 points: 3
 sprint:
-version_shipped:
+version_shipped: 1.0.4
 prd_ref: [FR-54]
 arch_ref: [AD-04]
 depends_on: [US-5.2]
-assignee:
-commit:
+assignee: S2kael
+commit: 5bae12e640b665a13eea2c942a240ee766a0ab88, 3e7c67bb15e28d5283e8e0068267486a0b01061b, 5f89e5911ece4caf9c807295be5735434cfb6f37
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -46,25 +46,25 @@ reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the unlock screen, **When** the user chooses "Forgot
+- [x] **AC-1** — **Given** the unlock screen, **When** the user chooses "Forgot
   password", **Then** the only offered path is a wallet reset (no recovery option
   is presented).
-- [ ] **AC-2** — **Given** the reset confirmation, **When** the user has not
+- [x] **AC-2** — **Given** the reset confirmation, **When** the user has not
   explicitly acknowledged that accounts will be cleared and a seed re-import is
   required, **Then** the reset cannot proceed.
-- [ ] **AC-3** — **Given** a confirmed reset, **When** it runs, **Then** every
+- [x] **AC-3** — **Given** a confirmed reset, **When** it runs, **Then** every
   data service is iterated and cleared — accounts, keyring, settings, caches — with
   no stale account data left behind (LESSONS §16).
-- [ ] **AC-4** — **Given** the reset completes, **When** the user re-imports a
+- [x] **AC-4** — **Given** the reset completes, **When** the user re-imports a
   seed, **Then** the original accounts are reconstructed deterministically
   (NFR-18) and a new master password is set.
 
 ## Tasks
 
-- [ ] **TASK-5.3.1** — "Forgot password" → reset-only path on the unlock screen (AC: 1)
-- [ ] **TASK-5.3.2** — Destructive-reset confirmation gate with explicit consequences (AC: 2)
-- [ ] **TASK-5.3.3** — Iterate every data service on reset (AC: 3) — keyring, accounts, settings, caches (LESSONS §16)
-- [ ] **TASK-5.3.4** — Post-reset re-import path + new master password (AC: 4)
+- [x] **TASK-5.3.1** — "Forgot password" → reset-only path on the unlock screen (AC: 1)
+- [x] **TASK-5.3.2** — Destructive-reset confirmation gate with explicit consequences (AC: 2)
+- [x] **TASK-5.3.3** — Iterate every data service on reset (AC: 3) — keyring, accounts, settings, caches (LESSONS §16)
+- [x] **TASK-5.3.4** — Post-reset re-import path + new master password (AC: 4)
 
 ## Dev notes
 

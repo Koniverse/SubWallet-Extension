@@ -2,16 +2,16 @@
 id: US-4.12
 title: "Token registry enable/disable"
 epic: EPIC-4
-status: backlog
+status: done
 priority: P1
 points: 2
 sprint:
-version_shipped:
+version_shipped: 1.0.1
 prd_ref: [FR-43]
 arch_ref: [AD-02]
 depends_on: [US-4.11]
-assignee:
-commit:
+assignee: nulllpc
+commit: 5c82ff0bea9f68c2c48a62e00da2d101a1605631, 83e8c110419850de1b91618d21e0ebf5055b823a
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -38,23 +38,23 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the token-management screen, **When** the user hides a
+- [x] **AC-1** — **Given** the token-management screen, **When** the user hides a
   token, **Then** it is removed from the balance/portfolio views and the
   visibility flag persists across restarts.
-- [ ] **AC-2** — **Given** a hidden token, **When** the user re-enables it,
+- [x] **AC-2** — **Given** a hidden token, **When** the user re-enables it,
   **Then** it reappears in the portfolio with its current balance.
-- [ ] **AC-3** — **Given** a token is hidden, **When** the portfolio aggregates,
+- [x] **AC-3** — **Given** a token is hidden, **When** the portfolio aggregates,
   **Then** the underlying chain stays connected and the token data is retained
   (hide is presentation-only, not deletion).
-- [ ] **AC-4** — **Given** a custom-imported token, **When** the user hides it,
+- [x] **AC-4** — **Given** a custom-imported token, **When** the user hides it,
   **Then** the same visibility flag applies (registry and custom tokens behave
   identically).
 
 ## Tasks
 
-- [ ] **TASK-4.12.1** — Per-token visibility flag on the asset-registry entry; persist + re-apply on restart (AC: 1, 2)
-- [ ] **TASK-4.12.2** — Filter balance/portfolio aggregation by visibility without dropping the chain connection (AC: 3)
-- [ ] **TASK-4.12.3** — Apply the flag uniformly to registry and custom tokens (AC: 4)
+- [x] **TASK-4.12.1** — Per-token visibility flag on the asset-registry entry; persist + re-apply on restart (AC: 1, 2)
+- [x] **TASK-4.12.2** — Filter balance/portfolio aggregation by visibility without dropping the chain connection (AC: 3)
+- [x] **TASK-4.12.3** — Apply the flag uniformly to registry and custom tokens (AC: 4)
 
 ## Dev notes
 
@@ -98,7 +98,11 @@ file / internal review).
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-d08`; trace confidence: medium, rule: first-delivery).
+
+**Evidence:** No changelog bullet ever names token show/hide; it shipped inside 1.0.1's generic rewrite entry "## [1.0.1] — 2023-03-31 — Upgrade: All extension UI" (release commit ad2567d9ae, which contains AssetSetting). Git evidence: Issue-1016 commits 83e8c11041 "setup assetSetting" and 5c82ff0bea "done basic logic for AssetSetting" (Feb 2023) introduce the per-token visibility flag (stores/AssetSetting.ts, ChainService, ManageTokens toggle UI); pre-rewrite v0.8.4 TokenSetting screen only deleted custom tokens, no visibility toggle. Both commits pass ancestry: in 1.0.1 release commit ad2567d9ae and in v1.0.2 (v1.0.1 was never tagged — tags start at v1.0.2). Later bullet "Enable native token automatically when enabling local token from the transfer screen (#1289)" (1.0.4) confirms the capability already existed. Medium confidence per rule 8: no explicit bullet, resolved via git.
+
+Commits `5c82ff0bea9f68c2c48a62e00da2d101a1605631, 83e8c110419850de1b91618d21e0ebf5055b823a` verified contained in the v1.0.1 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

@@ -66,15 +66,15 @@ AD-18), and the SwapService engine itself lives in [EPIC-2](EPIC-2.md).
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-103 | [US-11.1](../stories/US-11.1-in-wallet-swap-via-chainflip.md) | 📋 backlog |
-| FR-104 | [US-11.2](../stories/US-11.2-in-wallet-swap-via-hydration-dex.md) | 📋 backlog |
-| FR-105 | [US-11.3](../stories/US-11.3-in-wallet-swap-via-uniswap.md) | 📋 backlog |
-| FR-106 | [US-11.4](../stories/US-11.4-in-wallet-swap-via-kyberswap.md) | 📋 backlog |
-| FR-107 | [US-11.5](../stories/US-11.5-in-wallet-swap-via-simpleswap.md) | 📋 backlog |
-| FR-108 | [US-11.6](../stories/US-11.6-in-wallet-swap-via-asset-hub-dex.md) | 📋 backlog |
-| FR-109 | [US-11.7](../stories/US-11.7-in-wallet-bittensor-dtao-swap.md) | 📋 backlog |
-| FR-110 | [US-11.8](../stories/US-11.8-cross-chain-swap-routing.md) | 📋 backlog |
-| FR-111 | [US-11.9](../stories/US-11.9-in-wallet-swap-via-optimex.md) | 📋 backlog |
+| FR-103 | [US-11.1](../stories/US-11.1-in-wallet-swap-via-chainflip.md) | ✅ done |
+| FR-104 | [US-11.2](../stories/US-11.2-in-wallet-swap-via-hydration-dex.md) | ✅ done |
+| FR-105 | [US-11.3](../stories/US-11.3-in-wallet-swap-via-uniswap.md) | ✅ done |
+| FR-106 | [US-11.4](../stories/US-11.4-in-wallet-swap-via-kyberswap.md) | ✅ done |
+| FR-107 | [US-11.5](../stories/US-11.5-in-wallet-swap-via-simpleswap.md) | ✅ done |
+| FR-108 | [US-11.6](../stories/US-11.6-in-wallet-swap-via-asset-hub-dex.md) | ✅ done |
+| FR-109 | [US-11.7](../stories/US-11.7-in-wallet-bittensor-dtao-swap.md) | ✅ done |
+| FR-110 | [US-11.8](../stories/US-11.8-cross-chain-swap-routing.md) | ✅ done |
+| FR-111 | [US-11.9](../stories/US-11.9-in-wallet-swap-via-optimex.md) | ✅ done |
 | FR-112 | [US-11.10](../stories/US-11.10-in-wallet-swap-via-piperx.md) | 📋 backlog |
 | FR-113 | [US-11.11](../stories/US-11.11-in-wallet-swap-via-stellaswap.md) | 📋 backlog |
 
@@ -95,15 +95,15 @@ AD-18), and the SwapService engine itself lives in [EPIC-2](EPIC-2.md).
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-11.1](../stories/US-11.1-in-wallet-swap-via-chainflip.md) | In-wallet swap via Chainflip | Native BTC↔Polkadot↔EVM swap | 📋 backlog | — |
-| [US-11.2](../stories/US-11.2-in-wallet-swap-via-hydration-dex.md) | In-wallet swap via Hydration DEX | Substrate omnipool DEX swap | 📋 backlog | — |
-| [US-11.3](../stories/US-11.3-in-wallet-swap-via-uniswap.md) | In-wallet swap via Uniswap (V3/V4 + UniswapX) | EVM DEX swap | 📋 backlog | — |
-| [US-11.4](../stories/US-11.4-in-wallet-swap-via-kyberswap.md) | In-wallet swap via KyberSwap | EVM aggregator swap | 📋 backlog | — |
-| [US-11.5](../stories/US-11.5-in-wallet-swap-via-simpleswap.md) | In-wallet swap via SimpleSwap | Non-custodial cross-chain swap | 📋 backlog | — |
-| [US-11.6](../stories/US-11.6-in-wallet-swap-via-asset-hub-dex.md) | In-wallet swap via Asset Hub DEX | Polkadot Asset Hub swap | 📋 backlog | — |
-| [US-11.7](../stories/US-11.7-in-wallet-bittensor-dtao-swap.md) | In-wallet Bittensor dTAO swap | TAO↔alpha subnet-AMM swap | 📋 backlog | — |
-| [US-11.8](../stories/US-11.8-cross-chain-swap-routing.md) | Cross-chain swap routing (Swap↔Bridge) | Multi-hop swap+bridge routing | 📋 backlog | — |
-| [US-11.9](../stories/US-11.9-in-wallet-swap-via-optimex.md) | In-wallet swap via Optimex | Intent-based cross-chain swap | 📋 backlog | — |
+| [US-11.1](../stories/US-11.1-in-wallet-swap-via-chainflip.md) | In-wallet swap via Chainflip | Native BTC↔Polkadot↔EVM swap | ✅ done | 1.1.55 |
+| [US-11.2](../stories/US-11.2-in-wallet-swap-via-hydration-dex.md) | In-wallet swap via Hydration DEX | Substrate omnipool DEX swap | ✅ done | 1.1.55 |
+| [US-11.3](../stories/US-11.3-in-wallet-swap-via-uniswap.md) | In-wallet swap via Uniswap (V3/V4 + UniswapX) | EVM DEX swap | ✅ done | 1.3.36 |
+| [US-11.4](../stories/US-11.4-in-wallet-swap-via-kyberswap.md) | In-wallet swap via KyberSwap | EVM aggregator swap | ✅ done | 1.3.36 |
+| [US-11.5](../stories/US-11.5-in-wallet-swap-via-simpleswap.md) | In-wallet swap via SimpleSwap | Non-custodial cross-chain swap | ✅ done | 1.3.11 |
+| [US-11.6](../stories/US-11.6-in-wallet-swap-via-asset-hub-dex.md) | In-wallet swap via Asset Hub DEX | Polkadot Asset Hub swap | ✅ done | 1.2.14 |
+| [US-11.7](../stories/US-11.7-in-wallet-bittensor-dtao-swap.md) | In-wallet Bittensor dTAO swap | TAO↔alpha subnet-AMM swap | ✅ done | 1.3.78 |
+| [US-11.8](../stories/US-11.8-cross-chain-swap-routing.md) | Cross-chain swap routing (Swap↔Bridge) | Multi-hop swap+bridge routing | ✅ done | 1.3.30 |
+| [US-11.9](../stories/US-11.9-in-wallet-swap-via-optimex.md) | In-wallet swap via Optimex | Intent-based cross-chain swap | ✅ done | 1.3.63 |
 | [US-11.10](../stories/US-11.10-in-wallet-swap-via-piperx.md) | In-wallet swap via PiperX | EVM DEX swap (planned) | 📋 backlog | — |
 | [US-11.11](../stories/US-11.11-in-wallet-swap-via-stellaswap.md) | In-wallet swap via StellaSwap | Moonbeam DEX swap (planned) | 📋 backlog | — |
 

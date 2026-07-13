@@ -2,16 +2,16 @@
 id: US-1.3
 title: "Online chain-list hot-update (release-free network/token/XCM delivery)"
 epic: EPIC-1
-status: backlog
+status: done
 priority: P0
 points: 5
 sprint:
-version_shipped:
+version_shipped: 1.1.50
 prd_ref: [FR-3]
 arch_ref: [AD-25, AD-09]
 depends_on: [US-1.2]
-assignee:
-commit:
+assignee: S2kael
+commit: d4bb42fea3, 7fd9605016, ffda7fb297
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -52,30 +52,30 @@ are backfilled during version reconciliation. Builds on the monorepo and shared
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a published chain-list update on the `static-data`
+- [x] **AC-1** — **Given** a published chain-list update on the `static-data`
   channel, **When** the background refreshes, **Then** new networks / tokens /
   logos become available **without an extension release** (AD-25).
-- [ ] **AC-2** — **Given** the online channel is unreachable, **When** the
+- [x] **AC-2** — **Given** the online channel is unreachable, **When** the
   chain-list is needed, **Then** the wallet falls back to the **bundled
   `@subwallet/chain-list` baseline JSON** and remains usable (AD-25 fallback) —
   the network-failure unhappy path.
-- [ ] **AC-3** — **Given** a per-chain XCM route disabled in the online
+- [x] **AC-3** — **Given** a per-chain XCM route disabled in the online
   chain-list, **When** the update is applied at runtime, **Then** that route is
   toggled off **without a code release** (AD-09, NFR-15).
-- [ ] **AC-4** — **Given** a fetched chain-list payload, **When** it is applied,
+- [x] **AC-4** — **Given** a fetched chain-list payload, **When** it is applied,
   **Then** it is merged/validated before use so a malformed remote payload cannot
   corrupt the active network state (it falls back to the prior/baseline data).
 
 ## Tasks
 
-- [ ] **TASK-1.3.1** — Wire the online chain-list fetch against the static-data channel (AC: 1)
-  - [ ] Fetch + merge the `@subwallet/chain-list` update from `static-data` / `static-cache` (AD-25); refresh networks/tokens/logos in `extension-base`.
-- [ ] **TASK-1.3.2** — Bundled-JSON fallback on fetch failure (AC: 2, 4)
-  - [ ] On unreachable/malformed remote, fall back to the bundled `@subwallet/chain-list` baseline; validate payload before applying.
-- [ ] **TASK-1.3.3** — Apply per-route XCM toggles from the channel (AC: 3)
-  - [ ] Honor per-chain-pair XCM route enable/disable flags from the online chain-list at runtime (AD-09, NFR-15).
-- [ ] **TASK-1.3.4** — Refresh cadence + cache (AC: 1)
-  - [ ] Schedule/refresh the online update (cron/lifecycle hook) and cache the result for offline wakes.
+- [x] **TASK-1.3.1** — Wire the online chain-list fetch against the static-data channel (AC: 1)
+  - [x] Fetch + merge the `@subwallet/chain-list` update from `static-data` / `static-cache` (AD-25); refresh networks/tokens/logos in `extension-base`.
+- [x] **TASK-1.3.2** — Bundled-JSON fallback on fetch failure (AC: 2, 4)
+  - [x] On unreachable/malformed remote, fall back to the bundled `@subwallet/chain-list` baseline; validate payload before applying.
+- [x] **TASK-1.3.3** — Apply per-route XCM toggles from the channel (AC: 3)
+  - [x] Honor per-chain-pair XCM route enable/disable flags from the online chain-list at runtime (AD-09, NFR-15).
+- [x] **TASK-1.3.4** — Refresh cadence + cache (AC: 1)
+  - [x] Schedule/refresh the online update (cron/lifecycle hook) and cache the result for offline wakes.
 
 ## Dev notes
 

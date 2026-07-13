@@ -2,16 +2,16 @@
 id: US-7.1
 title: "Aggregate portfolio across accounts and chains"
 epic: EPIC-7
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 0.2.2
 prd_ref: [FR-68]
 arch_ref: [AD-07, AD-24]
 depends_on:
-assignee:
-commit:
+assignee: LeeW0ng
+commit: 532e984c09, d48520c384, 3843712877
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -47,29 +47,29 @@ version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** accounts across multiple ecosystems and chains, **When**
+- [x] **AC-1** — **Given** accounts across multiple ecosystems and chains, **When**
   the user opens the portfolio screen, **Then** a single aggregated fiat total is
   shown that equals the sum of all per-account, per-chain token values.
-- [ ] **AC-2** — **Given** the popup is opened after a background eviction, **When**
+- [x] **AC-2** — **Given** the popup is opened after a background eviction, **When**
   the screen first paints, **Then** the last-known cached portfolio is shown within
   ≤ 300 ms with skeletons on not-yet-refreshed rows (NFR-12), never a blank screen.
-- [ ] **AC-3** — **Given** a selected account context (all-accounts vs a single
+- [x] **AC-3** — **Given** a selected account context (all-accounts vs a single
   account), **When** the user switches it, **Then** the aggregated total recomputes
   to the selected scope without forcing a full ApiPromise on the read path (AD-07).
-- [ ] **AC-4** — **Given** one chain's data source is unreachable, **When** the
+- [x] **AC-4** — **Given** one chain's data source is unreachable, **When** the
   portfolio refreshes, **Then** the reachable chains still aggregate and the
   degraded chain is shown as stale/unavailable rather than failing the whole view.
 
 ## Tasks
 
-- [ ] **TASK-7.1.1** — Subscribe the portfolio screen to the aggregated `BalanceService` subjects from the Services SDK (AC: 1)
-  - [ ] Consume the multi-account/multi-chain subject exposed by [US-2.5](US-2.5-balance-detection-and-aggregation-engine.md); do not re-derive per-chain.
-- [ ] **TASK-7.1.2** — Cached-first render with progressive refresh + skeletons (AC: 2)
-  - [ ] Serve `redux-persist` last-known snapshot on open; replace rows as fresh data arrives.
-- [ ] **TASK-7.1.3** — Account-scope selector recompute on the lightweight read path (AC: 3)
-  - [ ] Assert no full `@polkadot/api` ApiPromise is instantiated for the read (AD-07).
-- [ ] **TASK-7.1.4** — Per-chain degraded-source handling (AC: 4)
-  - [ ] Mark unreachable chains stale; keep aggregate sum over reachable chains.
+- [x] **TASK-7.1.1** — Subscribe the portfolio screen to the aggregated `BalanceService` subjects from the Services SDK (AC: 1)
+  - [x] Consume the multi-account/multi-chain subject exposed by [US-2.5](US-2.5-balance-detection-and-aggregation-engine.md); do not re-derive per-chain.
+- [x] **TASK-7.1.2** — Cached-first render with progressive refresh + skeletons (AC: 2)
+  - [x] Serve `redux-persist` last-known snapshot on open; replace rows as fresh data arrives.
+- [x] **TASK-7.1.3** — Account-scope selector recompute on the lightweight read path (AC: 3)
+  - [x] Assert no full `@polkadot/api` ApiPromise is instantiated for the read (AD-07).
+- [x] **TASK-7.1.4** — Per-chain degraded-source handling (AC: 4)
+  - [x] Mark unreachable chains stale; keep aggregate sum over reachable chains.
 
 ## Dev notes
 
@@ -124,8 +124,7 @@ price-feed integration sizes at 5 per the epic sizing guidance.
 
 ## Implementation notes
 
-_Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
-and any implementation caveats during version reconciliation._
+Traced 2026-07-13 (US-21.2 straggler pass). Same first-delivery bullet as the engine story it reads from ([US-2.5](US-2.5-balance-detection-and-aggregation-engine.md)): **[0.2.2] — 2022-02-19**, "Added the feature to track the balances of multiple accounts in one wallet". This story owns the *read surface*: at the 0.2.2 cut, `Popup/Home/index.tsx` renders `<BalanceVal value={totalBalanceValue}>` from `useAccountBalance`, summing `convertedBalanceValue` over every shown network for every address behind `ALL_ACCOUNT_KEY` — one total across all accounts and chains. The all-accounts UI did not exist before 2022-02-11, so 0.2.1 (2022-02-10) could not have carried it. **0.2.2 is untagged**; all three commits verified contained in the earliest existing tag, `v0.2.5`.
 
 ## Cross-references
 

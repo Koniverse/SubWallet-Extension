@@ -2,16 +2,16 @@
 id: US-2.7
 title: "RequestService approval queue"
 epic: EPIC-2
-status: backlog
+status: done
 priority: P0
 points: 8
 sprint:
-version_shipped:
+version_shipped: 1.0.1
 prd_ref: [FR-11]
 arch_ref: [AD-21]
 depends_on: [US-2.1]
-assignee:
-commit:
+assignee: S2kael
+commit: 581fe6a2ff, ad2567d9ae
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -55,28 +55,28 @@ This story is **Retroactive** — the engine already ships; `commit` /
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a dApp connect, a sign-message or a sign-transaction
+- [x] **AC-1** — **Given** a dApp connect, a sign-message or a sign-transaction
   request from any source (in-app, dApp-inject, WalletConnect), **When** it
   requires user consent, **Then** it is enqueued in RequestService and surfaced
   through the single approve/reject popup.
-- [ ] **AC-2** — **Given** a request for a specific ecosystem (Substrate / EVM /
+- [x] **AC-2** — **Given** a request for a specific ecosystem (Substrate / EVM /
   Bitcoin / TON / Cardano) or an auth/metadata/WalletConnect request, **When** it
   is processed, **Then** it is routed to that ecosystem's dedicated handler with
   its own pending-request cache, behind the shared `PopupHandler`.
-- [ ] **AC-3** — **Given** a pending request, **When** the user approves it,
+- [x] **AC-3** — **Given** a pending request, **When** the user approves it,
   **Then** signing is performed through the background keyring (AD-04) and no key
   bytes are exposed to the popup or message bus.
-- [ ] **AC-4** — **Given** a pending request, **When** the user rejects it or the
+- [x] **AC-4** — **Given** a pending request, **When** the user rejects it or the
   popup is dismissed, **Then** the request resolves as rejected, its cache entry
   is cleared, and no partial approval leaks to the caller.
 
 ## Tasks
 
-- [ ] **TASK-2.7.1** — Central request queue + shared `PopupHandler` approve/reject surface (AC: 1, 4)
-- [ ] **TASK-2.7.2** — Per-ecosystem handlers (Substrate / EVM / Bitcoin / TON / Cardano) with isolated pending-request caches (AC: 2)
-  - [ ] Auth, Metadata and WalletConnect connect/unsupported handlers under `handler/`.
-- [ ] **TASK-2.7.3** — Route approved signing through the background keyring; never expose key bytes (AC: 3)
-- [ ] **TASK-2.7.4** — Reject / dismiss path clears the cache and resolves the caller as rejected (AC: 4)
+- [x] **TASK-2.7.1** — Central request queue + shared `PopupHandler` approve/reject surface (AC: 1, 4)
+- [x] **TASK-2.7.2** — Per-ecosystem handlers (Substrate / EVM / Bitcoin / TON / Cardano) with isolated pending-request caches (AC: 2)
+  - [x] Auth, Metadata and WalletConnect connect/unsupported handlers under `handler/`.
+- [x] **TASK-2.7.3** — Route approved signing through the background keyring; never expose key bytes (AC: 3)
+- [x] **TASK-2.7.4** — Reject / dismiss path clears the cache and resolves the caller as rejected (AC: 4)
 
 ## Dev notes
 

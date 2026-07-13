@@ -2,16 +2,16 @@
 id: US-3.6
 title: "Watch-only accounts & address book"
 epic: EPIC-3
-status: backlog
+status: done
 priority: P2
 points: 3
 sprint:
-version_shipped:
+version_shipped: 1.0.2
 prd_ref: [FR-24, FR-25]
 arch_ref: [AD-04]
 depends_on: [US-3.1, US-2.1]
-assignee:
-commit:
+assignee: saltict
+commit: dbbbe616a0, 174fcd48d8, 35ec52daac
 created: 2026-06-11
 updated: 2026-06-11
 ---
@@ -46,24 +46,24 @@ reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** any valid address, **When** the user adds it as
+- [x] **AC-1** — **Given** any valid address, **When** the user adds it as
   watch-only, **Then** an account is created that shows balances read-only, with
   no private key imported.
-- [ ] **AC-2** — **Given** a watch-only account, **When** the user attempts to
+- [x] **AC-2** — **Given** a watch-only account, **When** the user attempts to
   sign or send from it, **Then** the action is blocked with a clear "watch-only —
   cannot sign" message.
-- [ ] **AC-3** — **Given** the address book, **When** the user saves a recipient
+- [x] **AC-3** — **Given** the address book, **When** the user saves a recipient
   with a label, **Then** it persists and is selectable by label when sending.
-- [ ] **AC-4** — **Given** an invalid / malformed address, **When** the user
+- [x] **AC-4** — **Given** an invalid / malformed address, **When** the user
   tries to add it (watch-only or address book), **Then** it is rejected with a
   clear error and nothing is persisted.
 
 ## Tasks
 
-- [ ] **TASK-3.6.1** — Add watch-only account (read-only, no key) (AC: 1, 4)
-- [ ] **TASK-3.6.2** — Block signing/sending from a watch-only account (AC: 2)
-- [ ] **TASK-3.6.3** — Address book: save / label / select recipient (AC: 3, 4)
-- [ ] **TASK-3.6.4** — Address validation for both flows (AC: 4)
+- [x] **TASK-3.6.1** — Add watch-only account (read-only, no key) (AC: 1, 4)
+- [x] **TASK-3.6.2** — Block signing/sending from a watch-only account (AC: 2)
+- [x] **TASK-3.6.3** — Address book: save / label / select recipient (AC: 3, 4)
+- [x] **TASK-3.6.4** — Address validation for both flows (AC: 4)
 
 ## Dev notes
 

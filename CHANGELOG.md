@@ -6,6 +6,15 @@
 
 ---
 
+## 1.3.83
+
+Build date: Jul 08, 2026.
+
+Features & Updates:
+- Add earning term and condition display mechanism (#5007)
+
+---
+
 ## 1.3.82
 
 Build date: Jul 06, 2026.

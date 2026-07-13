@@ -2,16 +2,16 @@
 id: US-8.5
 title: "On-chain transaction history"
 epic: EPIC-8
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 0.2.7
 prd_ref: [FR-78]
 arch_ref: [AD-24]
 depends_on:
-assignee:
-commit:
+assignee: lw-cdm
+commit: 7e795bc144, b486d4fd4f, 071345e374
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -45,28 +45,28 @@ backfilled during version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an account with on-chain activity, **When** the user
+- [x] **AC-1** — **Given** an account with on-chain activity, **When** the user
   opens history, **Then** transactions fetched from the per-chain indexers
   (SubQuery / SubSquid) are listed with type, amount, counterparty and status.
-- [ ] **AC-2** — **Given** a transaction just submitted in-app, **When** the
+- [x] **AC-2** — **Given** a transaction just submitted in-app, **When** the
   indexer has not yet indexed it, **Then** it still appears (from the in-app
   record) as pending and is not dropped from the list.
-- [ ] **AC-3** — **Given** an in-app submission and its later indexer entry,
+- [x] **AC-3** — **Given** an in-app submission and its later indexer entry,
   **When** both are present, **Then** they reconcile into a single history item
   (status advanced to confirmed) rather than appearing twice.
-- [ ] **AC-4** — **Given** an indexer is unreachable or returns an error, **When**
+- [x] **AC-4** — **Given** an indexer is unreachable or returns an error, **When**
   the user opens history, **Then** the in-app records still render and a
   non-blocking staleness/error indicator is shown instead of an empty or broken
   screen.
 
 ## Tasks
 
-- [ ] **TASK-8.5.1** — Fetch per-chain history from the indexers via the Services SDK (AC: 1)
-- [ ] **TASK-8.5.2** — Merge indexer history with in-app lifecycle submissions (AC: 2, 3)
-  - [ ] Pending in-app tx never dropped before the indexer catches up.
-  - [ ] Reconcile matching in-app + indexer entries into one item.
-- [ ] **TASK-8.5.3** — History list UI: type, amount, counterparty, status, detail view (AC: 1)
-- [ ] **TASK-8.5.4** — Degrade on indexer failure: render in-app records + staleness indicator (AC: 4)
+- [x] **TASK-8.5.1** — Fetch per-chain history from the indexers via the Services SDK (AC: 1)
+- [x] **TASK-8.5.2** — Merge indexer history with in-app lifecycle submissions (AC: 2, 3)
+  - [x] Pending in-app tx never dropped before the indexer catches up.
+  - [x] Reconcile matching in-app + indexer entries into one item.
+- [x] **TASK-8.5.3** — History list UI: type, amount, counterparty, status, detail view (AC: 1)
+- [x] **TASK-8.5.4** — Degrade on indexer failure: render in-app records + staleness indicator (AC: 4)
 
 ## Dev notes
 

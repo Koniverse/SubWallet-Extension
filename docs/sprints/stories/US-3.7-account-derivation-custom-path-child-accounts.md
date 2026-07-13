@@ -2,16 +2,16 @@
 id: US-3.7
 title: "Account derivation: custom path & child accounts"
 epic: EPIC-3
-status: backlog
+status: done
 priority: P2
 points: 3
 sprint:
-version_shipped:
+version_shipped: 0.24.1
 prd_ref: [FR-26, FR-27]
 arch_ref: [AD-04, AD-11]
 depends_on: [US-3.5, US-2.1]
-assignee:
-commit:
+assignee: barrutko
+commit: eeac2c1064c591dd33af129a323d2c57ce191bfa, d0de8c0f34c11d1506b68ff592c2ddc451919caa
 created: 2026-06-11
 updated: 2026-06-11
 ---
@@ -48,24 +48,24 @@ reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a parent account, **When** the user derives a child
+- [x] **AC-1** — **Given** a parent account, **When** the user derives a child
   with no path specified, **Then** the wallet uses the next free index and adds
   the account to the parent's derived-account list (FR-27).
-- [ ] **AC-2** — **Given** a parent account, **When** the user supplies a valid
+- [x] **AC-2** — **Given** a parent account, **When** the user supplies a valid
   custom derivation path, **Then** an account is created on that path,
   reproducibly (FR-26, NFR-18), with keys derived only in the background (AD-04).
-- [ ] **AC-3** — **Given** both unified and solo parents, **When** child accounts
+- [x] **AC-3** — **Given** both unified and solo parents, **When** child accounts
   are derived, **Then** each parent maintains its own derived-account list.
-- [ ] **AC-4** — **Given** an invalid / malformed derivation path, **When** the
+- [x] **AC-4** — **Given** an invalid / malformed derivation path, **When** the
   user submits it, **Then** derivation is rejected with a clear error and no
   account is persisted.
 
 ## Tasks
 
-- [ ] **TASK-3.7.1** — Auto next-index child derivation + per-parent list (AC: 1, 3)
-- [ ] **TASK-3.7.2** — Custom derivation-path account creation (AC: 2)
-- [ ] **TASK-3.7.3** — Derived-account lists for unified and solo parents (AC: 3)
-- [ ] **TASK-3.7.4** — Derivation-path validation + error states (AC: 4)
+- [x] **TASK-3.7.1** — Auto next-index child derivation + per-parent list (AC: 1, 3)
+- [x] **TASK-3.7.2** — Custom derivation-path account creation (AC: 2)
+- [x] **TASK-3.7.3** — Derived-account lists for unified and solo parents (AC: 3)
+- [x] **TASK-3.7.4** — Derivation-path validation + error states (AC: 4)
 
 ## Dev notes
 

@@ -108,19 +108,19 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 
 | FR | Story | Status |
 | ---- | ------- | -------- |
-| FR-31 | [US-4.1](../stories/US-4.1-add-remove-networks-and-custom-rpc.md) | 📋 backlog |
-| FR-32 | [US-4.2](../stories/US-4.2-bulk-disable-and-reset-default-networks.md) | 📋 backlog |
-| FR-33 | [US-4.2](../stories/US-4.2-bulk-disable-and-reset-default-networks.md) | 📋 backlog |
-| FR-34 | [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md) | 📋 backlog |
-| FR-35 | [US-4.4](../stories/US-4.4-substrate-parachain-registry.md) | 📋 backlog |
-| FR-36 | [US-4.5](../stories/US-4.5-evm-network-support.md) | 📋 backlog |
-| FR-37 | [US-4.6](../stories/US-4.6-bitcoin-network-integration.md) | 📋 backlog |
-| FR-38 | [US-4.7](../stories/US-4.7-ton-network-integration.md) | 📋 backlog |
-| FR-39 | [US-4.8](../stories/US-4.8-cardano-network-integration.md) | 📋 backlog |
-| FR-40 | [US-4.9](../stories/US-4.9-substrate-light-client-fallback.md) | 📋 backlog |
+| FR-31 | [US-4.1](../stories/US-4.1-add-remove-networks-and-custom-rpc.md) | ✅ done |
+| FR-32 | [US-4.2](../stories/US-4.2-bulk-disable-and-reset-default-networks.md) | ✅ done |
+| FR-33 | [US-4.2](../stories/US-4.2-bulk-disable-and-reset-default-networks.md) | ✅ done |
+| FR-34 | [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md) | ✅ done |
+| FR-35 | [US-4.4](../stories/US-4.4-substrate-parachain-registry.md) | ✅ done |
+| FR-36 | [US-4.5](../stories/US-4.5-evm-network-support.md) | ✅ done |
+| FR-37 | [US-4.6](../stories/US-4.6-bitcoin-network-integration.md) | ✅ done |
+| FR-38 | [US-4.7](../stories/US-4.7-ton-network-integration.md) | ✅ done |
+| FR-39 | [US-4.8](../stories/US-4.8-cardano-network-integration.md) | ✅ done |
+| FR-40 | [US-4.9](../stories/US-4.9-substrate-light-client-fallback.md) | ✅ done |
 | FR-41 | [US-4.10](../stories/US-4.10-starknet-ecosystem-integration.md) | 📋 backlog |
-| FR-42 | [US-4.11](../stories/US-4.11-custom-token-import.md) | 📋 backlog |
-| FR-43 | [US-4.12](../stories/US-4.12-token-registry-enable-disable.md) | 📋 backlog |
+| FR-42 | [US-4.11](../stories/US-4.11-custom-token-import.md) | ✅ done |
+| FR-43 | [US-4.12](../stories/US-4.12-token-registry-enable-disable.md) | ✅ done |
 | FR-44 | [US-4.13](../stories/US-4.13-bitcoin-utxo-multi-asset-transfer.md) | 📋 backlog |
 | FR-45 | [US-4.14](../stories/US-4.14-midnight-network-support.md) | 📋 backlog |
 | FR-46 | [US-4.15](../stories/US-4.15-flow-network-support.md) | 📋 backlog |
@@ -165,18 +165,18 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 
 | ID | Title | Goal | Status | Version |
 | --- | --- | --- | --- | --- |
-| [US-4.1](../stories/US-4.1-add-remove-networks-and-custom-rpc.md) | Add/remove networks + custom RPC | User-managed networks and per-chain custom RPC endpoints | 📋 backlog | — |
-| [US-4.2](../stories/US-4.2-bulk-disable-and-reset-default-networks.md) | Bulk disable + reset to default networks | One-tap disable-all (confirmed) and reset to default active set | 📋 backlog | — |
-| [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md) | Auto-update chain list & token metadata | Online chain/token metadata updates without an extension release | 📋 backlog | — |
-| [US-4.4](../stories/US-4.4-substrate-parachain-registry.md) | Substrate parachain registry (200+) | 200+-network registry with live connectivity status | 📋 backlog | — |
-| [US-4.5](../stories/US-4.5-evm-network-support.md) | EVM network support | Ethereum, L2s and EVM parachains via the EVM API object | 📋 backlog | — |
-| [US-4.6](../stories/US-4.6-bitcoin-network-integration.md) | Bitcoin network integration | BIP44/84/86 addresses per account, PSBT signing | 📋 backlog | — |
-| [US-4.7](../stories/US-4.7-ton-network-integration.md) | TON network integration | Selectable wallet-contract version + Jetton tokens | 📋 backlog | — |
-| [US-4.8](../stories/US-4.8-cardano-network-integration.md) | Cardano network integration | Blockfrost-backed ADA + CIP-26 assets, CIP-30 connector | 📋 backlog | — |
-| [US-4.9](../stories/US-4.9-substrate-light-client-fallback.md) | Substrate light-client fallback | Connect via `@substrate/connect` when no RPC is reachable | 📋 backlog | — |
+| [US-4.1](../stories/US-4.1-add-remove-networks-and-custom-rpc.md) | Add/remove networks + custom RPC | User-managed networks and per-chain custom RPC endpoints | ✅ done | 0.4.3 |
+| [US-4.2](../stories/US-4.2-bulk-disable-and-reset-default-networks.md) | Bulk disable + reset to default networks | One-tap disable-all (confirmed) and reset to default active set | ✅ done | 0.4.3 |
+| [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md) | Auto-update chain list & token metadata | Online chain/token metadata updates without an extension release | ✅ done | 1.1.50 |
+| [US-4.4](../stories/US-4.4-substrate-parachain-registry.md) | Substrate parachain registry (200+) | 200+-network registry with live connectivity status | ✅ done | 1.0.1 |
+| [US-4.5](../stories/US-4.5-evm-network-support.md) | EVM network support | Ethereum, L2s and EVM parachains via the EVM API object | ✅ done | 0.3.1 |
+| [US-4.6](../stories/US-4.6-bitcoin-network-integration.md) | Bitcoin network integration | BIP44/84/86 addresses per account, PSBT signing | ✅ done | 1.3.42 |
+| [US-4.7](../stories/US-4.7-ton-network-integration.md) | TON network integration | Selectable wallet-contract version + Jetton tokens | ✅ done | 1.3.1 |
+| [US-4.8](../stories/US-4.8-cardano-network-integration.md) | Cardano network integration | Blockfrost-backed ADA + CIP-26 assets, CIP-30 connector | ✅ done | 1.3.23 |
+| [US-4.9](../stories/US-4.9-substrate-light-client-fallback.md) | Substrate light-client fallback | Connect via `@substrate/connect` when no RPC is reachable | ✅ done | 0.7.7 |
 | [US-4.10](../stories/US-4.10-starknet-ecosystem-integration.md) | Starknet ecosystem integration | Seed-derived account-abstracted Starknet wallets + transfers | 📋 backlog | — |
-| [US-4.11](../stories/US-4.11-custom-token-import.md) | Custom token import (ERC-20 / PSP-22) | Add tokens by contract address | 📋 backlog | — |
-| [US-4.12](../stories/US-4.12-token-registry-enable-disable.md) | Token registry enable/disable | Control per-token visibility | 📋 backlog | — |
+| [US-4.11](../stories/US-4.11-custom-token-import.md) | Custom token import (ERC-20 / PSP-22) | Add tokens by contract address | ✅ done | 0.6.7 |
+| [US-4.12](../stories/US-4.12-token-registry-enable-disable.md) | Token registry enable/disable | Control per-token visibility | ✅ done | 1.0.1 |
 | [US-4.13](../stories/US-4.13-bitcoin-utxo-multi-asset-transfer.md) | Bitcoin UTXO multi-asset transfer & custom fee | UTXO multi-asset transfer with manual fee control | 📋 backlog | — |
 | [US-4.14](../stories/US-4.14-midnight-network-support.md) | Midnight network support | Add the Midnight privacy ecosystem | 📋 backlog | — |
 | [US-4.15](../stories/US-4.15-flow-network-support.md) | Flow network support (Cadence & EVM) | Add Flow across its Cadence and EVM runtimes | 📋 backlog | — |
@@ -188,7 +188,7 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 | [US-4.21](../stories/US-4.21-asset-hub-migration-hardening.md) | Asset Hub migration hardening | Keep chains/assets visible and endpoints correct through the Asset Hub migration | 📋 backlog | — |
 | [US-4.22](../stories/US-4.22-rpc-and-endpoint-management-hardening.md) | RPC & endpoint-management hardening | Accurate connectivity, endpoint fallback/retry, custom-RPC validation (#4216) | 📋 backlog | — |
 | [US-4.23](../stories/US-4.23-bitcoin-api-path-hardening.md) | Bitcoin-API path hardening | Bitcoin indexer timeouts/retries/provider-drift behind the backend proxy | 📋 backlog | — |
-| [US-4.24](../stories/US-4.24-remove-polygon-zkevm.md) | Remove Polygon zkEVM | Remove Polygon zkEVM network support and update chainlist/domain config | ✅ done | 1.3.80 |
+| [US-4.24](../stories/US-4.24-remove-polygon-zkevm.md) | Remove Polygon zkEVM | Remove Polygon zkEVM network support and update chainlist/domain config | ✅ done | 1.3.82 |
 
 ## Object map & user-story interactions
 

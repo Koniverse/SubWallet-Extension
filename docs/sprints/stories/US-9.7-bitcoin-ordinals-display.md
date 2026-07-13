@@ -86,7 +86,11 @@ already shipped.
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+**Stays `backlog` — the capability was never released** (US-21.2 straggler, resolved 2026-07-13).
+Ordinals/inscription display exists only on an unreleased branch: no docs/CHANGELOG.md bullet
+delivers it and no commit implementing it is contained in any release tag. The PRD row (FR-91)
+was marked `✅ shipped` in error and is now `🚧 in progress` — code exists, no release carries it.
+Flip this story to `done` only when a release actually ships it.
 
 ## Cross-references
 

@@ -2,16 +2,16 @@
 id: US-9.3
 title: "EVM NFT display (ERC-721)"
 epic: EPIC-9
-status: backlog
+status: done
 priority: P1
 points: 3
 sprint:
-version_shipped:
+version_shipped: 0.3.1
 prd_ref: [FR-87]
 arch_ref: [AD-24]
 depends_on:
-assignee:
-commit:
+assignee: nulllpc
+commit: 5493ff4f0483999ebfbb67049b37bbb8e838b229, 73dfc19b8ecf7107415d943e21aebb672407b2a2, fc11432fdd9487eeb38140571f086a9446db2cad
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -37,15 +37,15 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an EVM account holding ERC-721 NFTs, **When** the NFT screen loads, **Then** each ERC-721 collection appears in the grid with name, image and item count.
-- [ ] **AC-2** — **Given** an EVM collection, **When** the user opens it, **Then** items render with metadata and IPFS-resolved media.
-- [ ] **AC-3** — **Given** a contract that is not ERC-721 (e.g. ERC-1155), **When** detection runs, **Then** it is not mis-shown as ERC-721 (handled by [US-9.4](US-9.4-erc-1155-nft-support.md), not silently dropped into the 721 path).
+- [x] **AC-1** — **Given** an EVM account holding ERC-721 NFTs, **When** the NFT screen loads, **Then** each ERC-721 collection appears in the grid with name, image and item count.
+- [x] **AC-2** — **Given** an EVM collection, **When** the user opens it, **Then** items render with metadata and IPFS-resolved media.
+- [x] **AC-3** — **Given** a contract that is not ERC-721 (e.g. ERC-1155), **When** detection runs, **Then** it is not mis-shown as ERC-721 (handled by [US-9.4](US-9.4-erc-1155-nft-support.md), not silently dropped into the 721 path).
 
 ## Tasks
 
-- [ ] **TASK-9.3.1** — `EvmNftHandler` detection over EVM addresses via the Services SDK (AC: 1)
-- [ ] **TASK-9.3.2** — Map ERC-721 collections/items to `NftCollection` / `NftItem` and render in the shared grid (AC: 1, 2)
-- [ ] **TASK-9.3.3** — Standard filter so non-ERC-721 contracts are not mapped as ERC-721 (AC: 3)
+- [x] **TASK-9.3.1** — `EvmNftHandler` detection over EVM addresses via the Services SDK (AC: 1)
+- [x] **TASK-9.3.2** — Map ERC-721 collections/items to `NftCollection` / `NftItem` and render in the shared grid (AC: 1, 2)
+- [x] **TASK-9.3.3** — Standard filter so non-ERC-721 contracts are not mapped as ERC-721 (AC: 3)
 
 ## Dev notes
 
@@ -81,7 +81,11 @@ already shipped.
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-d08`; trace confidence: high, rule: first-delivery).
+
+**Evidence:** CHANGELOG 0.3.1 (2022-04-05): "Display Moonbeam / Moonriver NFT (issue #33)" — the first bullet delivering EVM ERC-721 NFT display (earlier 0.2.x releases shipped only Substrate NFTs: RMRK, Unique, Acala, Quartz, Statemine); delivering commits add ERC721Contract.json ABI and the web3-based moonbeam_nft handler, are ancestors of v0.3.1 (merge-base verified), and v0.3.1 is the first tag containing them. Note: the issue-#33 grep also hits 2019 upstream polkadot-js PR #33 (discarded per fork-collision rule), and the story's AD-24 EvmNftHandler/Services-SDK architecture is a much later re-implementation ("Implement NFTService + Migrate EVM & Unique Network NFT logic (Phase 1) (#4884)", 1.3.x era) of a capability first shipped here.
+
+Commits `5493ff4f0483999ebfbb67049b37bbb8e838b229, 73dfc19b8ecf7107415d943e21aebb672407b2a2, fc11432fdd9487eeb38140571f086a9446db2cad` verified contained in the v0.3.1 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

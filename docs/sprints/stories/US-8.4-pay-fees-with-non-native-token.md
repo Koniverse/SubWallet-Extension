@@ -2,16 +2,16 @@
 id: US-8.4
 title: "Pay fees with a non-native token"
 epic: EPIC-8
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 1.3.18
 prd_ref: [FR-77]
 arch_ref: [AD-02, AD-24]
 depends_on: [US-8.3]
-assignee:
-commit:
+assignee: bluezdot
+commit: f964b504bd, 38d890fa7f
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -45,27 +45,27 @@ backfilled during version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a chain that supports non-native fee payment (Asset Hub,
+- [x] **AC-1** — **Given** a chain that supports non-native fee payment (Asset Hub,
   Hydration), **When** the user opens the fee step, **Then** they can choose a fee
   asset from the tokens they hold that the chain accepts, and the fee is quoted in
   that asset.
-- [ ] **AC-2** — **Given** a selected non-native fee asset, **When** the user
+- [x] **AC-2** — **Given** a selected non-native fee asset, **When** the user
   confirms, **Then** the extrinsic is built to charge the fee in that asset and the
   transaction submits through the shared lifecycle.
-- [ ] **AC-3** — **Given** a chain that does NOT support non-native fees, **When**
+- [x] **AC-3** — **Given** a chain that does NOT support non-native fees, **When**
   the user opens the fee step, **Then** only the native fee path is offered (no
   non-native selector) — the feature degrades cleanly per chain.
-- [ ] **AC-4** — **Given** a chosen fee asset whose balance is insufficient to
+- [x] **AC-4** — **Given** a chosen fee asset whose balance is insufficient to
   cover the quoted fee, **When** the user attempts to confirm, **Then** the
   selection is rejected with an inline error and no transaction is submitted.
 
 ## Tasks
 
-- [ ] **TASK-8.4.1** — Resolve per-chain supported fee-asset list via the Services SDK (AC: 1, 3)
-- [ ] **TASK-8.4.2** — Fee-asset selector in the fee step; quote the fee in the chosen asset (AC: 1)
-- [ ] **TASK-8.4.3** — Build the extrinsic to charge the fee in the selected asset via ChainService (AC: 2)
-- [ ] **TASK-8.4.4** — Gate the selector to supporting chains only; native-only fallback elsewhere (AC: 3)
-- [ ] **TASK-8.4.5** — Validate fee-asset balance vs quoted fee; reject insufficient (AC: 4)
+- [x] **TASK-8.4.1** — Resolve per-chain supported fee-asset list via the Services SDK (AC: 1, 3)
+- [x] **TASK-8.4.2** — Fee-asset selector in the fee step; quote the fee in the chosen asset (AC: 1)
+- [x] **TASK-8.4.3** — Build the extrinsic to charge the fee in the selected asset via ChainService (AC: 2)
+- [x] **TASK-8.4.4** — Gate the selector to supporting chains only; native-only fallback elsewhere (AC: 3)
+- [x] **TASK-8.4.5** — Validate fee-asset balance vs quoted fee; reject insufficient (AC: 4)
 
 ## Dev notes
 

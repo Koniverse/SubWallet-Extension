@@ -2,16 +2,16 @@
 id: US-2.4
 title: "SwapService routing engine"
 epic: EPIC-2
-status: backlog
+status: done
 priority: P1
 points: 8
 sprint:
-version_shipped:
+version_shipped: 1.1.55
 prd_ref: [FR-8]
 arch_ref: [AD-24]
 depends_on: [US-2.2]
-assignee:
-commit:
+assignee: frenkie-ng
+commit: 20fea6388b, 79caa647ab
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -52,26 +52,26 @@ This story is **Retroactive** — the engine already ships; `commit` /
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a source token/chain and a destination token/chain,
+- [x] **AC-1** — **Given** a source token/chain and a destination token/chain,
   **When** a quote is requested, **Then** each enabled provider handler produces
   a quote through the shared interface and the engine returns comparable
   options.
-- [ ] **AC-2** — **Given** a route requiring more than one leg (swap then
+- [x] **AC-2** — **Given** a route requiring more than one leg (swap then
   bridge), **When** the engine assembles it, **Then** it produces an ordered
   multi-step route behind one interface, not separate per-provider flows.
-- [ ] **AC-3** — **Given** a new swap provider, **When** it is added as a handler
+- [x] **AC-3** — **Given** a new swap provider, **When** it is added as a handler
   over `base-handler.ts`, **Then** it plugs into quoting/routing without
   modifying the shared SwapService logic (handler abstraction).
-- [ ] **AC-4** — **Given** a provider is unavailable, rate-limited, or returns an
+- [x] **AC-4** — **Given** a provider is unavailable, rate-limited, or returns an
   invalid quote, **When** quoting runs, **Then** that provider is skipped and the
   engine still returns the remaining viable routes (no whole-engine failure).
 
 ## Tasks
 
-- [ ] **TASK-2.4.1** — Per-provider handler interface over `base-handler.ts` (Chainflip / Hydration / Uniswap / Kyber / SimpleSwap / Asset Hub / Optimex) (AC: 1, 3)
-- [ ] **TASK-2.4.2** — Multi-step swap→bridge route assembly behind one interface (AC: 2)
-- [ ] **TASK-2.4.3** — Quotes/route data sourced via the Services SDK data plane (AC: 1)
-- [ ] **TASK-2.4.4** — Provider failure / rate-limit isolation during quoting (AC: 4)
+- [x] **TASK-2.4.1** — Per-provider handler interface over `base-handler.ts` (Chainflip / Hydration / Uniswap / Kyber / SimpleSwap / Asset Hub / Optimex) (AC: 1, 3)
+- [x] **TASK-2.4.2** — Multi-step swap→bridge route assembly behind one interface (AC: 2)
+- [x] **TASK-2.4.3** — Quotes/route data sourced via the Services SDK data plane (AC: 1)
+- [x] **TASK-2.4.4** — Provider failure / rate-limit isolation during quoting (AC: 4)
 
 ## Dev notes
 

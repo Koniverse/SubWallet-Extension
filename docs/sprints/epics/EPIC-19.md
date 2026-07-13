@@ -3,14 +3,14 @@ id: EPIC-19
 title: "Onboarding, Localization & Engagement"
 status: backlog
 prd_ref:
+  - FR-152
+  - FR-153
   - FR-154
   - FR-155
   - FR-156
   - FR-157
   - FR-158
   - FR-159
-  - FR-160
-  - FR-161
 arch_ref:
   - AD-23
   - AD-24
@@ -85,18 +85,18 @@ notification feed and bundled locale files ride the same delivery substrate.
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-154 | [US-19.1](../stories/US-19.1-wallet-create-restore-onboarding-wrapper.md) | 📋 backlog |
-| FR-155 | [US-19.2](../stories/US-19.2-multi-language-i18n-round-1.md) | 📋 backlog |
-| FR-156 | [US-19.3](../stories/US-19.3-additional-ui-languages.md) | 📋 backlog |
-| FR-157 | [US-19.4](../stories/US-19.4-in-app-campaign-banners.md) | 📋 backlog |
-| FR-158 | [US-19.5](../stories/US-19.5-airdrop-quest-mission-display.md) | 📋 backlog |
-| FR-159 | [US-19.6](../stories/US-19.6-nft-mint-campaigns.md) | 📋 backlog |
-| FR-160 | [US-19.7](../stories/US-19.7-mission-pools-reward-program.md) | 📋 backlog |
-| FR-161 | [US-19.8](../stories/US-19.8-in-app-notification-center.md) | 📋 backlog |
+| FR-152 | [US-19.1](../stories/US-19.1-wallet-create-restore-onboarding-wrapper.md) | ✅ done |
+| FR-153 | [US-19.2](../stories/US-19.2-multi-language-i18n-round-1.md) | ✅ done |
+| FR-154 | [US-19.3](../stories/US-19.3-additional-ui-languages.md) | 📋 backlog |
+| FR-155 | [US-19.4](../stories/US-19.4-in-app-campaign-banners.md) | ✅ done |
+| FR-156 | [US-19.5](../stories/US-19.5-airdrop-quest-mission-display.md) | ✅ done |
+| FR-157 | [US-19.6](../stories/US-19.6-nft-mint-campaigns.md) | 📋 backlog |
+| FR-158 | [US-19.7](../stories/US-19.7-mission-pools-reward-program.md) | ✅ done |
+| FR-159 | [US-19.8](../stories/US-19.8-in-app-notification-center.md) | ✅ done |
 
 > FR statuses above are **story-planning** statuses (Stream B; all `📋 backlog`).
-> The shipped state of each capability lives in [PRD](../../PRD.md#functional-requirements): FR-154, FR-155,
-> FR-157..161 are `✅ shipped` (retroactive stories), FR-156 is `📋 planned`
+> The shipped state of each capability lives in [PRD](../../PRD.md#functional-requirements): FR-152, FR-153,
+> FR-155..161 are `✅ shipped` (retroactive stories), FR-154 is `📋 planned`
 > (forward). `done` + `version_shipped` are backfilled in version reconciliation.
 > FR-4 (online i18n hot-update *transport*) is **not** owned here — it is owned by
 > [EPIC-1](EPIC-1.md) ([US-1.4](../stories/US-1.4-online-i18n-hot-update.md)) and
@@ -124,17 +124,17 @@ notification feed and bundled locale files ride the same delivery substrate.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-19.1](../stories/US-19.1-wallet-create-restore-onboarding-wrapper.md) | Wallet create/restore onboarding wrapper (backup reminder, T&C) | First-run UX wrapper around create/restore: backup reminder + terms acceptance gates | 📋 backlog | — |
-| [US-19.2](../stories/US-19.2-multi-language-i18n-round-1.md) | Multi-language i18n (VI/ZH/JA/RU) | Bundled Round-1 localization with a language picker, English-canonical | 📋 backlog | — |
+| [US-19.1](../stories/US-19.1-wallet-create-restore-onboarding-wrapper.md) | Wallet create/restore onboarding wrapper (backup reminder, T&C) | First-run UX wrapper around create/restore: backup reminder + terms acceptance gates | ✅ done | 1.1.68 |
+| [US-19.2](../stories/US-19.2-multi-language-i18n-round-1.md) | Multi-language i18n (VI/ZH/JA/RU) | Bundled Round-1 localization with a language picker, English-canonical | ✅ done | 1.1.11 |
 | [US-19.3](../stories/US-19.3-additional-ui-languages.md) | Additional UI languages (DE/FR/…) | Extend the bundled-locale set to more languages (forward) | 📋 backlog | — |
-| [US-19.4](../stories/US-19.4-in-app-campaign-banners.md) | In-app campaign banners | Remotely configured marketing banners shown in-app | 📋 backlog | — |
-| [US-19.5](../stories/US-19.5-airdrop-quest-mission-display.md) | Airdrop / quest mission display | Show airdrop and quest missions with progress and claim entry | 📋 backlog | — |
+| [US-19.4](../stories/US-19.4-in-app-campaign-banners.md) | In-app campaign banners | Remotely configured marketing banners shown in-app | ✅ done | 1.1.18 |
+| [US-19.5](../stories/US-19.5-airdrop-quest-mission-display.md) | Airdrop / quest mission display | Show airdrop and quest missions with progress and claim entry | ✅ done | 1.1.46 |
 | [US-19.6](../stories/US-19.6-nft-mint-campaigns.md) | NFT mint campaigns | Display and enter NFT-mint campaigns from in-app surfaces | 📋 backlog | — |
-| [US-19.7](../stories/US-19.7-mission-pools-reward-program.md) | Mission Pools reward program | The Mission Pools reward-program surface (eligibility, rewards, entry) | 📋 backlog | — |
-| [US-19.8](../stories/US-19.8-in-app-notification-center.md) | In-app notification center | One feed for transaction status, campaign alerts and system messages | 📋 backlog | — |
+| [US-19.7](../stories/US-19.7-mission-pools-reward-program.md) | Mission Pools reward program | The Mission Pools reward-program surface (eligibility, rewards, entry) | ✅ done | 1.1.46 |
+| [US-19.8](../stories/US-19.8-in-app-notification-center.md) | In-app notification center | One feed for transaction status, campaign alerts and system messages | ✅ done | 1.3.4 |
 
 > US-19.1, US-19.2, US-19.4..19.8 are **retroactive** (the capability already ships);
-> US-19.3 is **forward** (📋 planned, FR-156). Each story materializes exactly one FR.
+> US-19.3 is **forward** (📋 planned, FR-154). Each story materializes exactly one FR.
 
 ## Object map & user-story interactions
 
@@ -142,14 +142,14 @@ notification feed and bundled locale files ride the same delivery substrate.
 
 | US | Primary entity / subsystem | FR |
 |---|---|---|
-| [US-19.1](../stories/US-19.1-wallet-create-restore-onboarding-wrapper.md) | First-run onboarding wrapper (backup-reminder + T&C gates) over EPIC-3 create/restore; settings-state acceptance/reminder flags | FR-154 |
-| [US-19.2](../stories/US-19.2-multi-language-i18n-round-1.md) | `i18n` loader + bundled `locales/{lng}/translation.json` (VI/ZH/JA/RU) + language picker | FR-155 |
-| [US-19.3](../stories/US-19.3-additional-ui-languages.md) | Additional bundled `locales/{lng}/translation.json` (DE/FR/…) on the US-19.2 loader | FR-156 |
-| [US-19.4](../stories/US-19.4-in-app-campaign-banners.md) | `MktCampaignService` app-banners (`fetchStaticData('app-banners')` → `appBannerSubject`) | FR-157 |
-| [US-19.5](../stories/US-19.5-airdrop-quest-mission-display.md) | Services-SDK mission feed (`subwalletApiSdk`) → `MissionInfo` display + earning deep-link | FR-158 |
-| [US-19.6](../stories/US-19.6-nft-mint-campaigns.md) | `MintCampaignService` (`unlockDotCampaign`) + `fetchStaticData` mint-campaign config | FR-159 |
-| [US-19.7](../stories/US-19.7-mission-pools-reward-program.md) | `MissionPool` reward-program surface (Services SDK → `MissionInfo`, eligibility + join deep-link) | FR-160 |
-| [US-19.8](../stories/US-19.8-in-app-notification-center.md) | `InappNotificationService` feed (DB + read/unread) + `CampaignService` notification campaigns + `NotificationService` OS notify | FR-161 |
+| [US-19.1](../stories/US-19.1-wallet-create-restore-onboarding-wrapper.md) | First-run onboarding wrapper (backup-reminder + T&C gates) over EPIC-3 create/restore; settings-state acceptance/reminder flags | FR-152 |
+| [US-19.2](../stories/US-19.2-multi-language-i18n-round-1.md) | `i18n` loader + bundled `locales/{lng}/translation.json` (VI/ZH/JA/RU) + language picker | FR-153 |
+| [US-19.3](../stories/US-19.3-additional-ui-languages.md) | Additional bundled `locales/{lng}/translation.json` (DE/FR/…) on the US-19.2 loader | FR-154 |
+| [US-19.4](../stories/US-19.4-in-app-campaign-banners.md) | `MktCampaignService` app-banners (`fetchStaticData('app-banners')` → `appBannerSubject`) | FR-155 |
+| [US-19.5](../stories/US-19.5-airdrop-quest-mission-display.md) | Services-SDK mission feed (`subwalletApiSdk`) → `MissionInfo` display + earning deep-link | FR-156 |
+| [US-19.6](../stories/US-19.6-nft-mint-campaigns.md) | `MintCampaignService` (`unlockDotCampaign`) + `fetchStaticData` mint-campaign config | FR-157 |
+| [US-19.7](../stories/US-19.7-mission-pools-reward-program.md) | `MissionPool` reward-program surface (Services SDK → `MissionInfo`, eligibility + join deep-link) | FR-158 |
+| [US-19.8](../stories/US-19.8-in-app-notification-center.md) | `InappNotificationService` feed (DB + read/unread) + `CampaignService` notification campaigns + `NotificationService` OS notify | FR-159 |
 
 ### End-to-end happy path
 
@@ -178,10 +178,10 @@ sequenceDiagram
 
 ## Cross-cutting invariants
 
-- **English-canonical, bundled-locale i18n ([NFR-13](../../PRD.md#non-functional-requirements), [FR-155](../../PRD.md#functional-requirements)):** every user-facing string is authored in English first; translations are bundled per locale in the extension package and loaded from `locales/{lng}/translation.json`. No story may ship a locale-only string with no English source, and a missing translation key MUST fall back to English rather than render the raw key. Enforced by [US-19.2](../stories/US-19.2-multi-language-i18n-round-1.md), extended by [US-19.3](../stories/US-19.3-additional-ui-languages.md).
+- **English-canonical, bundled-locale i18n ([NFR-13](../../PRD.md#non-functional-requirements), [FR-153](../../PRD.md#functional-requirements)):** every user-facing string is authored in English first; translations are bundled per locale in the extension package and loaded from `locales/{lng}/translation.json`. No story may ship a locale-only string with no English source, and a missing translation key MUST fall back to English rather than render the raw key. Enforced by [US-19.2](../stories/US-19.2-multi-language-i18n-round-1.md), extended by [US-19.3](../stories/US-19.3-additional-ui-languages.md).
 - **Remote content is release-free and degrades gracefully (AD-23, AD-24, AD-25):** campaign banners, quests, mission pools and the notification feed are remotely configured and fetched through the Services SDK / cache-proxy substrate; a content fetch that fails MUST degrade to "no campaign / empty feed" without breaking the host screen — never a blank or crashed page. Enforced by [US-19.4](../stories/US-19.4-in-app-campaign-banners.md), [US-19.5](../stories/US-19.5-airdrop-quest-mission-display.md), [US-19.8](../stories/US-19.8-in-app-notification-center.md).
-- **Onboarding wraps, it does not generate keys (FR-154):** the first-run flow only adds the backup-reminder and T&C *gates* around EPIC-3's create/restore; no key material, mnemonic, or derivation logic lives in EPIC-19 (AD-04 — keyring confined to background). Enforced by [US-19.1](../stories/US-19.1-wallet-create-restore-onboarding-wrapper.md).
-- **Campaigns link out, they do not re-implement (FR-158, FR-160):** a quest or Mission Pools entry that targets earning/staking deep-links into the EPIC-12 EarningService surface and never re-implements stake/unstake; campaign claims that move funds route through the existing transaction flows. Enforced by [US-19.5](../stories/US-19.5-airdrop-quest-mission-display.md), [US-19.7](../stories/US-19.7-mission-pools-reward-program.md).
+- **Onboarding wraps, it does not generate keys (FR-152):** the first-run flow only adds the backup-reminder and T&C *gates* around EPIC-3's create/restore; no key material, mnemonic, or derivation logic lives in EPIC-19 (AD-04 — keyring confined to background). Enforced by [US-19.1](../stories/US-19.1-wallet-create-restore-onboarding-wrapper.md).
+- **Campaigns link out, they do not re-implement (FR-156, FR-158):** a quest or Mission Pools entry that targets earning/staking deep-links into the EPIC-12 EarningService surface and never re-implements stake/unstake; campaign claims that move funds route through the existing transaction flows. Enforced by [US-19.5](../stories/US-19.5-airdrop-quest-mission-display.md), [US-19.7](../stories/US-19.7-mission-pools-reward-program.md).
 
 ## Cross-story testing requirements
 

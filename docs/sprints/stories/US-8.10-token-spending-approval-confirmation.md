@@ -2,16 +2,16 @@
 id: US-8.10
 title: "Token spending-approval confirmation"
 epic: EPIC-8
-status: backlog
+status: done
 priority: P1
 points: 3
 sprint:
-version_shipped:
+version_shipped: 1.1.36
 prd_ref: [FR-83]
 arch_ref: [AD-21]
 depends_on:
-assignee:
-commit:
+assignee: S2kael
+commit: 75fdb07167, c6faf2e744, 3f0a3b125b
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -44,26 +44,26 @@ version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a flow that requires an ERC-20 / PSP-22 allowance,
+- [x] **AC-1** — **Given** a flow that requires an ERC-20 / PSP-22 allowance,
   **When** the approval step is reached, **Then** a dedicated confirmation shows the
   token, the spender contract, and the requested allowance amount before any
   `approve` is signed.
-- [ ] **AC-2** — **Given** the approval confirmation, **When** the user reviews it,
+- [x] **AC-2** — **Given** the approval confirmation, **When** the user reviews it,
   **Then** the allowance amount is displayed in the token's real units (base units
   formatted by decimals), not a raw integer or a hidden max value.
-- [ ] **AC-3** — **Given** the confirmation, **When** the user rejects it, **Then**
+- [x] **AC-3** — **Given** the confirmation, **When** the user rejects it, **Then**
   no `approve` extrinsic is submitted and the dependent spend does not proceed.
-- [ ] **AC-4** — **Given** an existing sufficient allowance, **When** the same spend
+- [x] **AC-4** — **Given** an existing sufficient allowance, **When** the same spend
   is attempted again, **Then** a redundant approval is not requested (no
   unnecessary second `approve`).
 
 ## Tasks
 
-- [ ] **TASK-8.10.1** — Spending-approval confirmation: token + spender + allowance amount (AC: 1, 2)
-  - [ ] Presented through the RequestService handler (AD-21).
-- [ ] **TASK-8.10.2** — Format the allowance in token real units; no hidden max (AC: 2)
-- [ ] **TASK-8.10.3** — Reject path: no `approve` submitted, dependent spend halted (AC: 3)
-- [ ] **TASK-8.10.4** — Skip approval when a sufficient allowance already exists (AC: 4)
+- [x] **TASK-8.10.1** — Spending-approval confirmation: token + spender + allowance amount (AC: 1, 2)
+  - [x] Presented through the RequestService handler (AD-21).
+- [x] **TASK-8.10.2** — Format the allowance in token real units; no hidden max (AC: 2)
+- [x] **TASK-8.10.3** — Reject path: no `approve` submitted, dependent spend halted (AC: 3)
+- [x] **TASK-8.10.4** — Skip approval when a sufficient allowance already exists (AC: 4)
 
 ## Dev notes
 

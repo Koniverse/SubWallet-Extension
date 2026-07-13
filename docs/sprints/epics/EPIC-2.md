@@ -80,14 +80,14 @@ those features reuse.
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-5 | [US-2.1](../stories/US-2.1-unified-account-keyring-engine.md) | 📋 backlog |
-| FR-6 | [US-2.2](../stories/US-2.2-chainservice-live-api-per-chain.md) | 📋 backlog |
-| FR-7 | [US-2.3](../stories/US-2.3-earningservice-pool-handler-engine.md) | 📋 backlog |
-| FR-8 | [US-2.4](../stories/US-2.4-swapservice-routing-engine.md) | 📋 backlog |
-| FR-9 | [US-2.5](../stories/US-2.5-balance-detection-and-aggregation-engine.md) | 📋 backlog |
-| FR-10 | [US-2.6](../stories/US-2.6-fee-engine.md) | 📋 backlog |
-| FR-11 | [US-2.7](../stories/US-2.7-requestservice-approval-queue.md) | 📋 backlog |
-| FR-12 | [US-2.8](../stories/US-2.8-transaction-lifecycle-engine.md) | 📋 backlog |
+| FR-5 | [US-2.1](../stories/US-2.1-unified-account-keyring-engine.md) | ✅ done |
+| FR-6 | [US-2.2](../stories/US-2.2-chainservice-live-api-per-chain.md) | ✅ done |
+| FR-7 | [US-2.3](../stories/US-2.3-earningservice-pool-handler-engine.md) | ✅ done |
+| FR-8 | [US-2.4](../stories/US-2.4-swapservice-routing-engine.md) | ✅ done |
+| FR-9 | [US-2.5](../stories/US-2.5-balance-detection-and-aggregation-engine.md) | ✅ done |
+| FR-10 | [US-2.6](../stories/US-2.6-fee-engine.md) | ✅ done |
+| FR-11 | [US-2.7](../stories/US-2.7-requestservice-approval-queue.md) | ✅ done |
+| FR-12 | [US-2.8](../stories/US-2.8-transaction-lifecycle-engine.md) | ✅ done |
 
 > FR statuses below are **story-planning** statuses (Stream B; all `📋 backlog`).
 > The real shipped state is `🟢 Shipped — 8/8 FRs` in [PRD](../../PRD.md#functional-requirements); every
@@ -115,14 +115,14 @@ those features reuse.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-2.1](../stories/US-2.1-unified-account-keyring-engine.md) | Unified-Account keyring engine | One seed derived into addresses across five ecosystems, confined to the background | 📋 backlog | — |
-| [US-2.2](../stories/US-2.2-chainservice-live-api-per-chain.md) | ChainService (live API per chain) | A managed, memory-bounded API object per network for 200+ chains | 📋 backlog | — |
-| [US-2.3](../stories/US-2.3-earningservice-pool-handler-engine.md) | EarningService pool-handler engine | A `BasePoolHandler` tree exposing yield positions via RxJS subjects | 📋 backlog | — |
-| [US-2.4](../stories/US-2.4-swapservice-routing-engine.md) | SwapService routing engine | Per-provider handlers producing quotes and multi-step swap→bridge routes behind one interface | 📋 backlog | — |
-| [US-2.5](../stories/US-2.5-balance-detection-and-aggregation-engine.md) | Balance detection & aggregation engine | Aggregate transferable/locked balances across all accounts and 200+ chains | 📋 backlog | — |
-| [US-2.6](../stories/US-2.6-fee-engine.md) | Fee engine | Estimate fees across Substrate tips, EVM EIP-1559 gas and non-native fee tokens | 📋 backlog | — |
-| [US-2.7](../stories/US-2.7-requestservice-approval-queue.md) | RequestService approval queue | The central confirmation queue every connect/signature/transaction passes through | 📋 backlog | — |
-| [US-2.8](../stories/US-2.8-transaction-lifecycle-engine.md) | Transaction lifecycle engine | Drive every transaction through build→validate→sign→submit→track→history on one status machine | 📋 backlog | — |
+| [US-2.1](../stories/US-2.1-unified-account-keyring-engine.md) | Unified-Account keyring engine | One seed derived into addresses across five ecosystems, confined to the background | ✅ done | 1.3.1 |
+| [US-2.2](../stories/US-2.2-chainservice-live-api-per-chain.md) | ChainService (live API per chain) | A managed, memory-bounded API object per network for 200+ chains | ✅ done | 1.0.1 |
+| [US-2.3](../stories/US-2.3-earningservice-pool-handler-engine.md) | EarningService pool-handler engine | A `BasePoolHandler` tree exposing yield positions via RxJS subjects | ✅ done | 1.1.36 |
+| [US-2.4](../stories/US-2.4-swapservice-routing-engine.md) | SwapService routing engine | Per-provider handlers producing quotes and multi-step swap→bridge routes behind one interface | ✅ done | 1.1.55 |
+| [US-2.5](../stories/US-2.5-balance-detection-and-aggregation-engine.md) | Balance detection & aggregation engine | Aggregate transferable/locked balances across all accounts and 200+ chains | ✅ done | 0.2.2 |
+| [US-2.6](../stories/US-2.6-fee-engine.md) | Fee engine | Estimate fees across Substrate tips, EVM EIP-1559 gas and non-native fee tokens | ✅ done | 1.1.41 |
+| [US-2.7](../stories/US-2.7-requestservice-approval-queue.md) | RequestService approval queue | The central confirmation queue every connect/signature/transaction passes through | ✅ done | 1.0.1 |
+| [US-2.8](../stories/US-2.8-transaction-lifecycle-engine.md) | Transaction lifecycle engine | Drive every transaction through build→validate→sign→submit→track→history on one status machine | ✅ done | 1.0.1 |
 
 > All 8 stories are **retroactive** — the engines already ship in the product.
 > They are catalogued one-per-engine-FR (1:1) so each shared contract is reviewable.

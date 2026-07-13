@@ -2,16 +2,16 @@
 id: US-4.1
 title: "Add/remove networks + custom RPC"
 epic: EPIC-4
-status: backlog
+status: done
 priority: P1
 points: 3
 sprint:
-version_shipped:
+version_shipped: 0.4.3
 prd_ref: [FR-31]
 arch_ref: [AD-02]
 depends_on:
-assignee:
-commit:
+assignee: saltict
+commit: 4e32896869, a2ef6ef7a3, af8c77e83d
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -43,23 +43,23 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the Manage Networks screen, **When** the user enables or
+- [x] **AC-1** — **Given** the Manage Networks screen, **When** the user enables or
   adds a network, **Then** a `ChainService` API object is created and the network
   becomes active with a connectivity indicator.
-- [ ] **AC-2** — **Given** an active network, **When** the user enters a custom RPC
+- [x] **AC-2** — **Given** an active network, **When** the user enters a custom RPC
   URL, **Then** the chain reconnects through that endpoint and the override
   persists across restarts.
-- [ ] **AC-3** — **Given** a network the user removes/disables, **When** removal is
+- [x] **AC-3** — **Given** a network the user removes/disables, **When** removal is
   confirmed, **Then** the chain is disconnected and its API object torn down.
-- [ ] **AC-4** — **Given** an invalid or unreachable custom RPC URL, **When** the
+- [x] **AC-4** — **Given** an invalid or unreachable custom RPC URL, **When** the
   user saves it, **Then** a clear connection error is shown and the prior working
   endpoint is retained (nothing is silently broken).
 
 ## Tasks
 
-- [ ] **TASK-4.1.1** — Manage-Networks add/enable/remove flow wired to `ChainService` lifecycle (AC: 1, 3)
-- [ ] **TASK-4.1.2** — Per-chain custom-RPC override: persist + reconnect (AC: 2)
-- [ ] **TASK-4.1.3** — Custom-RPC validation + connection-failure error state, keep last-good endpoint (AC: 4)
+- [x] **TASK-4.1.1** — Manage-Networks add/enable/remove flow wired to `ChainService` lifecycle (AC: 1, 3)
+- [x] **TASK-4.1.2** — Per-chain custom-RPC override: persist + reconnect (AC: 2)
+- [x] **TASK-4.1.3** — Custom-RPC validation + connection-failure error state, keep last-good endpoint (AC: 4)
 
 ## Dev notes
 
@@ -101,7 +101,11 @@ integration).
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-d08`; trace confidence: high, rule: first-delivery).
+
+**Evidence:** CHANGELOG "## [0.4.3] — 2022-05-31": "Custom network, Custom Endpoint (#36)" — earliest bullet delivering add/remove networks with a custom RPC endpoint; delivered via feature branch koni/dev/issue-36-52 whose PR #229 merge (4e32896869, 196 files) and delete-network feature commit (a2ef6ef7a3) are verified ancestors of v0.4.3. Later "Temporarily remove 'Add custom network' (#464)" in 0.5.3 was explicitly temporary and the capability returned (custom-network bullets resume in 1.x), so no removal flag.
+
+Commits `4e32896869, a2ef6ef7a3, af8c77e83d` verified contained in the v0.4.3 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

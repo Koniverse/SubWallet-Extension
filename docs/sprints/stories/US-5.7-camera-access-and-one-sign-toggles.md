@@ -2,16 +2,16 @@
 id: US-5.7
 title: "Camera-access + One-Sign toggles"
 epic: EPIC-5
-status: backlog
+status: done
 priority: P0
 points: 3
 sprint:
-version_shipped:
+version_shipped: 1.3.21
 prd_ref: [FR-59, FR-60]
 arch_ref: [AD-03]
 depends_on:
-assignee:
-commit:
+assignee: S2kael
+commit: 2f5a47c2df, ff5b6b565e, 872d7b808a
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -52,27 +52,27 @@ during version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the security settings, **When** the user toggles
+- [x] **AC-1** — **Given** the security settings, **When** the user toggles
   camera access off, **Then** QR-scanning surfaces do not request the camera and
   the camera permission is not held; toggling it on re-enables QR scanning (FR-59).
-- [ ] **AC-2** — **Given** the One-Sign toggle is **off** (default), **When** the
+- [x] **AC-2** — **Given** the One-Sign toggle is **off** (default), **When** the
   user performs a multi-step transaction sequence, **Then** each step is confirmed
   individually (no single-signature batching).
-- [ ] **AC-3** — **Given** the One-Sign toggle is **on**, **When** the user
+- [x] **AC-3** — **Given** the One-Sign toggle is **on**, **When** the user
   performs a supported multi-step sequence, **Then** the sequence is confirmed with
   a single approval (FR-60), delegating to the EPIC-8 one-sign mechanism.
-- [ ] **AC-4** — Both toggles persist across sessions and default to the
+- [x] **AC-4** — Both toggles persist across sessions and default to the
   conservative posture (camera off until enabled, One-Sign off) on a fresh install.
-- [ ] **AC-5** — **Given** the One-Sign toggle is on, **When** the user reaches an
+- [x] **AC-5** — **Given** the One-Sign toggle is on, **When** the user reaches an
   *unsupported* sequence, **Then** the flow falls back to per-step confirmation
   rather than silently batching an unsupported set.
 
 ## Tasks
 
-- [ ] **TASK-5.7.1** — Camera-access toggle: gate the QR-scan camera permission (AC: 1) — no camera request when off
-- [ ] **TASK-5.7.2** — One-Sign toggle wiring into the EPIC-8 multi-step flow (AC: 2, 3) — off ⇒ per-step, on ⇒ single approval
-- [ ] **TASK-5.7.3** — Persist both settings with conservative defaults (AC: 4) — over the typed bus (AD-03)
-- [ ] **TASK-5.7.4** — Unsupported-sequence fallback to per-step confirmation (AC: 5)
+- [x] **TASK-5.7.1** — Camera-access toggle: gate the QR-scan camera permission (AC: 1) — no camera request when off
+- [x] **TASK-5.7.2** — One-Sign toggle wiring into the EPIC-8 multi-step flow (AC: 2, 3) — off ⇒ per-step, on ⇒ single approval
+- [x] **TASK-5.7.3** — Persist both settings with conservative defaults (AC: 4) — over the typed bus (AD-03)
+- [x] **TASK-5.7.4** — Unsupported-sequence fallback to per-step confirmation (AC: 5)
 
 ## Dev notes
 

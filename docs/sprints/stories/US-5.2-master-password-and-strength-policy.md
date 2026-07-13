@@ -2,16 +2,16 @@
 id: US-5.2
 title: "Master password & strength policy"
 epic: EPIC-5
-status: backlog
+status: done
 priority: P0
 points: 3
 sprint:
-version_shipped:
+version_shipped: 1.0.2
 prd_ref: [FR-53]
 arch_ref: [AD-04]
 depends_on:
-assignee:
-commit:
+assignee: S2kael
+commit: 26d1307998d2eb08fe192d137304d541c7a3db0e, b9fb6e4ffcaee50dd2ebc149a3373611a9752c10
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -45,28 +45,28 @@ reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a fresh wallet, **When** the user sets a master
+- [x] **AC-1** — **Given** a fresh wallet, **When** the user sets a master
   password meeting the strength policy, **Then** the policy is enforced (a weak
   password is rejected with guidance) and the password is accepted only once it
   passes.
-- [ ] **AC-2** — **Given** an accepted master password, **When** accounts are
+- [x] **AC-2** — **Given** an accepted master password, **When** accounts are
   persisted, **Then** key bytes are stored AES-256-GCM-encrypted under a key
   derived from that password (NFR-3); no plaintext key bytes are written to
   storage.
-- [ ] **AC-3** — **Given** any number of accounts (created or imported), **Then**
+- [x] **AC-3** — **Given** any number of accounts (created or imported), **Then**
   exactly one master password covers all of them — importing an account does not
   prompt for a new password.
-- [ ] **AC-4** — **Given** the keyring runs only in the background (AD-04),
+- [x] **AC-4** — **Given** the keyring runs only in the background (AD-04),
   **When** the UI submits a password, **Then** encryption/decryption happens in
   the background and no decrypted key bytes ever cross the `pri(…)` bus to the UI.
 
 ## Tasks
 
-- [ ] **TASK-5.2.1** — Master-password set + strength-policy enforcement (AC: 1)
-  - [ ] Reject below-threshold passwords with actionable feedback.
-- [ ] **TASK-5.2.2** — Derive at-rest encryption key; encrypt all accounts (AC: 2) — browser-passworder, AES-256-GCM
-- [ ] **TASK-5.2.3** — Single-password-covers-all-accounts wiring (AC: 3)
-- [ ] **TASK-5.2.4** — Confirm no decrypted key bytes leave the background (AC: 4) — assert bus payloads carry no key material
+- [x] **TASK-5.2.1** — Master-password set + strength-policy enforcement (AC: 1)
+  - [x] Reject below-threshold passwords with actionable feedback.
+- [x] **TASK-5.2.2** — Derive at-rest encryption key; encrypt all accounts (AC: 2) — browser-passworder, AES-256-GCM
+- [x] **TASK-5.2.3** — Single-password-covers-all-accounts wiring (AC: 3)
+- [x] **TASK-5.2.4** — Confirm no decrypted key bytes leave the background (AC: 4) — assert bus payloads carry no key material
 
 ## Dev notes
 

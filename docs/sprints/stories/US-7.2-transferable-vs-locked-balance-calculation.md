@@ -2,16 +2,16 @@
 id: US-7.2
 title: "Transferable vs locked/frozen balance calculation"
 epic: EPIC-7
-status: backlog
+status: done
 priority: P1
 points: 3
 sprint:
-version_shipped:
+version_shipped: 0.2.5
 prd_ref: [FR-69]
 arch_ref: [AD-07]
 depends_on: [US-7.1]
-assignee:
-commit:
+assignee: Quangdm-cdm
+commit: 9a9b3b284c, 8ea62e7e9f
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -46,28 +46,28 @@ story is **retroactive** — the capability already ships; `commit` /
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a Substrate account with reserved/frozen amounts (ED,
+- [x] **AC-1** — **Given** a Substrate account with reserved/frozen amounts (ED,
   staking lock, vesting), **When** the token detail is shown, **Then** transferable
   and locked/frozen are displayed separately and transferable = free − max(frozen,
   reserved-as-applicable) per the chain's balance model.
-- [ ] **AC-2** — **Given** the home screen shows a transferable figure, **When** the
+- [x] **AC-2** — **Given** the home screen shows a transferable figure, **When** the
   user opens the send flow for that token, **Then** the max-sendable amount derives
   from the *same* transferable calculation (no second computation).
-- [ ] **AC-3** — **Given** a token whose entire balance is locked/frozen, **When**
+- [x] **AC-3** — **Given** a token whose entire balance is locked/frozen, **When**
   the user views it, **Then** transferable shows 0 and the send affordance is
   disabled with an explanation, rather than offering a send that would fail.
-- [ ] **AC-4** — **Given** EVM and UTXO tokens (no Substrate lock model), **When**
+- [x] **AC-4** — **Given** EVM and UTXO tokens (no Substrate lock model), **When**
   displayed, **Then** transferable reflects that chain's available-balance rule
   without misapplying Substrate reserve semantics.
 
 ## Tasks
 
-- [ ] **TASK-7.2.1** — Render transferable vs locked/frozen split per token in the dashboard (AC: 1, 4)
-  - [ ] Consume the per-chain balance breakdown from the aggregated subject (US-7.1); apply per-ecosystem available-balance rules.
-- [ ] **TASK-7.2.2** — Expose a single transferable calculation reused by the send flow (AC: 2)
-  - [ ] Ensure EPIC-8 send-validation imports the same helper; no duplicate math.
-- [ ] **TASK-7.2.3** — Fully-locked / zero-transferable handling (AC: 3)
-  - [ ] Show transferable 0; disable send with a reason (locked/frozen).
+- [x] **TASK-7.2.1** — Render transferable vs locked/frozen split per token in the dashboard (AC: 1, 4)
+  - [x] Consume the per-chain balance breakdown from the aggregated subject (US-7.1); apply per-ecosystem available-balance rules.
+- [x] **TASK-7.2.2** — Expose a single transferable calculation reused by the send flow (AC: 2)
+  - [x] Ensure EPIC-8 send-validation imports the same helper; no duplicate math.
+- [x] **TASK-7.2.3** — Fully-locked / zero-transferable handling (AC: 3)
+  - [x] Show transferable 0; disable send with a reason (locked/frozen).
 
 ## Dev notes
 

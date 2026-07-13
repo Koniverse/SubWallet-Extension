@@ -3,7 +3,7 @@ id: EPIC-17
 title: "Proxy Accounts"
 status: backlog
 prd_ref:
-  - FR-150
+  - FR-148
 arch_ref:
   - AD-16
   - AD-04
@@ -57,7 +57,7 @@ executes immediately; a multisig needs threshold approvals collected over time.
 The proxy-vs-multisig boundary is drawn explicitly in Out of scope below.
 
 > FR statuses below are **story-planning** statuses; the shipped state of the
-> capability lives in [PRD](../../PRD.md#functional-requirements) (FR-150 is `✅ shipped` — these are
+> capability lives in [PRD](../../PRD.md#functional-requirements) (FR-148 is `✅ shipped` — these are
 > retroactive stories). `done` + `version_shipped` are backfilled in version
 > reconciliation.
 
@@ -73,14 +73,14 @@ The proxy-vs-multisig boundary is drawn explicitly in Out of scope below.
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-150 | [US-17.1](../stories/US-17.1-proxy-types-and-authority-management.md) | 📋 backlog |
-| FR-150 | [US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md) | 📋 backlog |
+| FR-148 | [US-17.1](../stories/US-17.1-proxy-types-and-authority-management.md) | ✅ done |
+| FR-148 | [US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md) | ✅ done |
 
-> FR-150 is a single functional requirement split across two stories by
+> FR-148 is a single functional requirement split across two stories by
 > capability: US-17.1 owns the account/authority **model** (add a proxy, choose
 > a proxy type, manage the relationship); US-17.2 owns the signing-time
 > **behaviour** (the Sign Selector picks which controlling account signs, and
-> the proxied-by provenance is displayed). Both must ship for FR-150 to be
+> the proxied-by provenance is displayed). Both must ship for FR-148 to be
 > complete.
 
 ## AD Coverage
@@ -100,13 +100,13 @@ The proxy-vs-multisig boundary is drawn explicitly in Out of scope below.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-17.1](../stories/US-17.1-proxy-types-and-authority-management.md) | Proxy types & authority management | Add a proxy to a Substrate account, choose a named pallet proxy type, and manage the delegated-authority relationship | 📋 backlog | — |
-| [US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md) | Proxy signing (Sign Selector) + proxied-by display | At signing time a Sign Selector picks which controlling account signs, and the proxied-by provenance is shown end to end | 📋 backlog | — |
+| [US-17.1](../stories/US-17.1-proxy-types-and-authority-management.md) | Proxy types & authority management | Add a proxy to a Substrate account, choose a named pallet proxy type, and manage the delegated-authority relationship | ✅ done | 1.3.72 |
+| [US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md) | Proxy signing (Sign Selector) + proxied-by display | At signing time a Sign Selector picks which controlling account signs, and the proxied-by provenance is shown end to end | ✅ done | 1.3.72 |
 
 ## Cross-cutting invariants
 
-- **Proxy signs with its own key; executes on behalf of the proxied account ([FR-150](../../PRD.md#functional-requirements), [AD-16](../../ARCHITECTURE.md#architecture-decisions)):** a proxied transaction is signed by the *proxy* account's key but executes *for* the proxied account (wrapped as `proxy.proxy(...)`). The sender of the signature and the on-behalf-of account are two distinct accounts and must never be collapsed into one. Enforced by [US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md).
-- **Proxied-by provenance is always visible ([FR-150](../../PRD.md#functional-requirements)):** wherever a proxied transaction appears — Sign Selector, confirmation screen, and resulting history entry — the UI must show *both* the signing proxy account and the proxied (on-behalf-of) account. A proxied transaction that renders as an ordinary self-signed one is a defect, not a cosmetic gap. Enforced by [US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md).
+- **Proxy signs with its own key; executes on behalf of the proxied account ([FR-148](../../PRD.md#functional-requirements), [AD-16](../../ARCHITECTURE.md#architecture-decisions)):** a proxied transaction is signed by the *proxy* account's key but executes *for* the proxied account (wrapped as `proxy.proxy(...)`). The sender of the signature and the on-behalf-of account are two distinct accounts and must never be collapsed into one. Enforced by [US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md).
+- **Proxied-by provenance is always visible ([FR-148](../../PRD.md#functional-requirements)):** wherever a proxied transaction appears — Sign Selector, confirmation screen, and resulting history entry — the UI must show *both* the signing proxy account and the proxied (on-behalf-of) account. A proxied transaction that renders as an ordinary self-signed one is a defect, not a cosmetic gap. Enforced by [US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md).
 - **Only named pallet proxy types, Substrate-only ([AD-16](../../ARCHITECTURE.md#architecture-decisions)):** the wallet supports only the proxy types the Polkadot `proxy` pallet defines (no custom types) and only for Substrate software accounts (no EVM-solo, no Ledger-EVM). Authority that the chosen proxy type does not grant must be rejected before signing, not after submit. Enforced by [US-17.1](../stories/US-17.1-proxy-types-and-authority-management.md) (type model) and [US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md) (signing-time authority check).
 - **Key stays in the background keyring ([AD-04](../../ARCHITECTURE.md#architecture-decisions)):** proxy reuses the non-custodial keyring boundary — the controlling key never leaves the background service worker; proxy introduces no new custody path. Enforced by [US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md).
 

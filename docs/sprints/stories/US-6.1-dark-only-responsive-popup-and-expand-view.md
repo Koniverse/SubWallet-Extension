@@ -2,16 +2,16 @@
 id: US-6.1
 title: "Dark-only responsive UI: popup and full-page expand view"
 epic: EPIC-6
-status: backlog
+status: done
 priority: P2
 points: 3
 sprint:
-version_shipped:
+version_shipped: 1.0.1
 prd_ref: [FR-63]
 arch_ref: [AD-05]
 depends_on:
-assignee:
-commit:
+assignee: lw-cdm
+commit: 973e1606114374148925b0d5868c263211251134, 659c3e2890ce58d50502d5cf66dced25f60658bb, ad2567d9ae57b640d85cf6b2cecd69e05e08fd53
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -47,33 +47,33 @@ backfilled during version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** any screen in the wallet, **When** it renders,
+- [x] **AC-1** — **Given** any screen in the wallet, **When** it renders,
   **Then** it uses the dark theme palette and design tokens from
   `@subwallet/extension-koni-ui` (no per-screen ad-hoc colors).
-- [ ] **AC-2** — **Given** the same UI opened as the constrained extension popup
+- [x] **AC-2** — **Given** the same UI opened as the constrained extension popup
   versus the full-page expand view, **When** the viewport changes, **Then** the
   layout adapts responsively from a single code path (no popup-only / page-only
   duplicate screens).
-- [ ] **AC-3** — **Given** the Settings screen, **When** the user looks for a
+- [x] **AC-3** — **Given** the Settings screen, **When** the user looks for a
   theme/appearance toggle, **Then** no user-selectable light-theme option is
   exposed (theme selector hidden — FR-63).
-- [ ] **AC-4** — **Given** the popup is open and the user triggers "expand",
+- [x] **AC-4** — **Given** the popup is open and the user triggers "expand",
   **When** the full page opens, **Then** the same route renders with the wider
   layout and no state is lost in the transition.
 
 ## Tasks
 
-- [ ] **TASK-6.1.1** — Define the dark-only theme palette + design tokens and
+- [x] **TASK-6.1.1** — Define the dark-only theme palette + design tokens and
   wire the theme provider (AC: 1)
-  - [ ] Confirm `ThemeNames.DARK` is the applied default in
+  - [x] Confirm `ThemeNames.DARK` is the applied default in
     `packages/extension-koni-ui/src/themes.ts` / `ThemeContext.tsx`.
-- [ ] **TASK-6.1.2** — Implement the responsive popup ↔ expand-view layout from a
+- [x] **TASK-6.1.2** — Implement the responsive popup ↔ expand-view layout from a
   single component tree (AC: 2, 4)
-  - [ ] Verify the expand-view entry point reuses the popup routes at a wider
+  - [x] Verify the expand-view entry point reuses the popup routes at a wider
     breakpoint rather than a parallel screen set.
-- [ ] **TASK-6.1.3** — Hide the theme selector in Settings so light is not
+- [x] **TASK-6.1.3** — Hide the theme selector in Settings so light is not
   user-selectable (AC: 3)
-- [ ] **TASK-6.1.4** — Verify state continuity across the popup → expand
+- [x] **TASK-6.1.4** — Verify state continuity across the popup → expand
   transition (AC: 4)
 
 ## Dev notes

@@ -2,16 +2,16 @@
 id: US-3.4
 title: "Export keys & multi-account management"
 epic: EPIC-3
-status: backlog
+status: done
 priority: P1
 points: 3
 sprint:
-version_shipped:
+version_shipped: 1.0.1
 prd_ref: [FR-19, FR-20]
 arch_ref: [AD-04]
 depends_on: [US-3.1, US-3.2, US-2.1]
-assignee:
-commit:
+assignee: S2kael
+commit: a3312aa1ae, d5aff956e3, cc1240280e
 created: 2026-06-11
 updated: 2026-06-11
 ---
@@ -46,27 +46,27 @@ reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an unlocked wallet, **When** the user requests an
+- [x] **AC-1** — **Given** an unlocked wallet, **When** the user requests an
   export and re-enters the correct master password, **Then** the seed phrase /
   private key is revealed (produced in the background, AD-04) and is never
   emitted on the message bus.
-- [ ] **AC-2** — **Given** an export request, **When** the user enters the
+- [x] **AC-2** — **Given** an export request, **When** the user enters the
   **wrong** master password, **Then** the secret is not revealed and a clear
   error is shown (no reveal-without-gate path).
-- [ ] **AC-3** — **Given** a wallet with several accounts, **When** the user
+- [x] **AC-3** — **Given** a wallet with several accounts, **When** the user
   creates, renames, and switches accounts, **Then** each account keeps its own
   name and the active account drives the rest of the UI.
-- [ ] **AC-4** — **Given** a multi-account wallet, **When** an account is
+- [x] **AC-4** — **Given** a multi-account wallet, **When** an account is
   removed, **Then** only that account is removed and the remaining accounts and
   the wallet itself are unaffected.
 
 ## Tasks
 
-- [ ] **TASK-3.4.1** — Export seed phrase + private key, master-password-gated (AC: 1, 2)
-  - [ ] Produce secret in background keyring; assert nothing on the `pri(…)`/`pub(…)` bus.
-- [ ] **TASK-3.4.2** — Wrong-password rejection on export (AC: 2)
-- [ ] **TASK-3.4.3** — Multi-account create / rename / switch (AC: 3)
-- [ ] **TASK-3.4.4** — Account removal isolation (AC: 4)
+- [x] **TASK-3.4.1** — Export seed phrase + private key, master-password-gated (AC: 1, 2)
+  - [x] Produce secret in background keyring; assert nothing on the `pri(…)`/`pub(…)` bus.
+- [x] **TASK-3.4.2** — Wrong-password rejection on export (AC: 2)
+- [x] **TASK-3.4.3** — Multi-account create / rename / switch (AC: 3)
+- [x] **TASK-3.4.4** — Account removal isolation (AC: 4)
 
 ## Dev notes
 

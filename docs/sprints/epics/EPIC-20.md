@@ -68,7 +68,7 @@ invariants; the feature epics keep their feature behavior.
 This is also a deliberately **distributed** model. Feature-local performance stays
 where the feature lives: each feature epic keeps its own hardening story
 ([US-7.7](../stories/US-7.7-balance-cache-invalidation-hardening.md) balance-cache,
-[US-12.16](../stories/US-12.16-earning-performance-and-cache-hardening.md)
+[US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md)
 earning performance, etc.). EPIC-20 owns only the *cross-cutting* program — the
 concerns that no single feature epic can own because they span all of them. The
 boundary is drawn explicitly in Out of scope.
@@ -84,7 +84,7 @@ boundary is drawn explicitly in Out of scope.
 
 ### Out of scope
 
-- **Feature-local performance hardening clusters** — owned by their feature epics, not by EPIC-20. Balance-cache freshness lives in [EPIC-7](EPIC-7.md) ([US-7.7](../stories/US-7.7-balance-cache-invalidation-hardening.md)); earning-surface performance lives in [EPIC-12](EPIC-12.md) ([US-12.16](../stories/US-12.16-earning-performance-and-cache-hardening.md)); swap-routing robustness lives in [EPIC-11](EPIC-11.md) ([US-11.8](../stories/US-11.8-cross-chain-swap-routing.md)). EPIC-20 publishes the shared budgets those stories must meet; it does not re-own the per-feature defending work.
+- **Feature-local performance hardening clusters** — owned by their feature epics, not by EPIC-20. Balance-cache freshness lives in [EPIC-7](EPIC-7.md) ([US-7.7](../stories/US-7.7-balance-cache-invalidation-hardening.md)); earning-surface performance lives in [EPIC-12](EPIC-12.md) ([US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md)); swap-routing robustness lives in [EPIC-11](EPIC-11.md) ([US-11.8](../stories/US-11.8-cross-chain-swap-routing.md)). EPIC-20 publishes the shared budgets those stories must meet; it does not re-own the per-feature defending work.
 - **The actual feature behavior being optimized** — owned by the feature epic. The portfolio aggregate is [EPIC-7](EPIC-7.md); the earning list is [EPIC-12](EPIC-12.md); the NFT collection is [EPIC-9](EPIC-9.md); the transaction-history surface is [EPIC-8](EPIC-8.md). EPIC-20 optimizes the *how-fast / how-much-memory* of these surfaces, never the *what* — it adds no new feature behavior to any of them.
 - **The MV3 service-worker substrate itself** — the decision to run the background as an MV3 service worker (AD-08) is owned by [EPIC-1](EPIC-1.md). EPIC-20 owns the *lifecycle phasing and idle behavior* (AD-20) that rides on top of that substrate, not the substrate decision.
 - **The Services SDK and cache/CDN proxy engines** — the backend aggregation layer (AD-24) and the `api-cache` / `static-data` / `ipfs-files` proxy layer (AD-25) are built in [EPIC-2](EPIC-2.md) and consumed across the read epics. EPIC-20 enforces that the client *routes through* them instead of fanning out redundantly; it does not build the backend.
@@ -125,8 +125,8 @@ boundary is drawn explicitly in Out of scope.
 | [NFR-20](../../PRD.md#non-functional-requirements) | Services SDK aggregation; reduce per-chain RPC fan-out | [US-20.2](../stories/US-20.2-api-call-optimization.md) |
 | [NFR-21](../../PRD.md#non-functional-requirements) | Cache / CDN proxy layer for market/metadata/media | [US-20.2](../stories/US-20.2-api-call-optimization.md) |
 | [NFR-11](../../PRD.md#non-functional-requirements) | Read-path memory ≤72 MB regardless of chain count | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) |
-| [NFR-11](../../PRD.md#non-functional-requirements) (shared) | Many-account submit/close must not block the main thread | [US-20.4](../stories/US-20.4-many-account-submit-performance.md) |
-| [NFR-17](../../PRD.md#non-functional-requirements) | List render performance on heavy selection/collection screens | [US-20.5](../stories/US-20.5-list-rendering-performance.md) |
+| _(no covering NFR — PRD gap)_ | Many-account submit/close must not block the main thread | [US-20.4](../stories/US-20.4-many-account-submit-performance.md) |
+| [NFR-21](../../PRD.md#non-functional-requirements) (partial) | List screens read slow-changing config from the static-data cache, not a per-render sweep — the render cost itself has _no covering NFR_ (PRD gap) | [US-20.5](../stories/US-20.5-list-rendering-performance.md) |
 | [NFR-17](../../PRD.md#non-functional-requirements) (shared) | Web-surface portability/performance (webapp / web-runner) | [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) |
 
 ## Stories
@@ -141,7 +141,7 @@ boundary is drawn explicitly in Out of scope.
 | [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) | WebApp & web-runner performance | WebApp animations + list pagination and a web-runner shared worker across tabs | 📋 backlog | — |
 
 > Every EPIC-20 story owns **no FR** (cf. the
-> [US-12.15](../stories/US-12.15-earning-reward-and-apy-accuracy-hardening.md) /
+> [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) /
 > [US-7.7](../stories/US-7.7-balance-cache-invalidation-hardening.md) FR-less
 > defending-story pattern): each defends one or more performance NFRs and absorbs
 > the cross-cutting performance-program issues, rather than materializing a
@@ -172,8 +172,8 @@ HAPPY-PATH: N/A — performance/lifecycle epic; optimizations are cross-cutting,
 ## Cross-cutting invariants
 
 - **Read path stays memory-bounded ([NFR-11](../../PRD.md#non-functional-requirements), AD-07):** every balance/token read rides the lightweight WsProvider path; a full `@polkadot/api` ApiPromise is instantiated only for extrinsic construction, never for a read. The ≤72 MB budget MUST hold regardless of chain count. Enforced by [US-20.3](../stories/US-20.3-read-path-memory-budget.md); upheld by every read epic (EPIC-7, EPIC-9, EPIC-12).
-- **Many accounts never block the main thread ([NFR-11](../../PRD.md#non-functional-requirements)):** per-account work on submit, close, and refresh is bounded and off the critical UI path; the screen never freezes because the account count is large. Enforced by [US-20.4](../stories/US-20.4-many-account-submit-performance.md).
-- **Cached-first paint, progressive refresh ([NFR-12](../../PRD.md#non-functional-requirements)):** on popup open the background serves last-known cached state immediately and refreshes progressively with visible skeletons; a blank wait while data loads is a defect. Owned cross-cutting by [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md); each read surface implements it (US-7.1, US-12.16).
+- **Many accounts never block the main thread** _(no covering NFR — PRD gap; NFR-11 is a memory/connection-strategy row, not a main-thread one)_**:** per-account work on submit, close, and refresh is bounded and off the critical UI path; the screen never freezes because the account count is large. Enforced by [US-20.4](../stories/US-20.4-many-account-submit-performance.md).
+- **Cached-first paint, progressive refresh ([NFR-12](../../PRD.md#non-functional-requirements)):** on popup open the background serves last-known cached state immediately and refreshes progressively with visible skeletons; a blank wait while data loads is a defect. Owned cross-cutting by [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md); each read surface implements it (US-7.1, US-12.14).
 - **API calls go through optimization / proxy, not redundant fan-out ([NFR-20](../../PRD.md#non-functional-requirements), [NFR-21](../../PRD.md#non-functional-requirements), AD-24, AD-25):** aggregated multi-chain data is fetched through the Services SDK and market/metadata/media through the cache/CDN proxies; the client never re-issues a request another in-flight request already covers, and no request class may flood out the others (the #4021 notification case). Enforced by [US-20.2](../stories/US-20.2-api-call-optimization.md).
 - **Idle background is quiet ([NFR-8](../../PRD.md#non-functional-requirements), AD-20):** a backgrounded MV3 worker performs no avoidable polling, chain connections, or API calls; `pub(…)` wakes it partially, `pri(…)`/`mobile(…)` fully, and last-disconnect sleeps it. Enforced by [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md).
 
@@ -188,7 +188,7 @@ HAPPY-PATH: N/A — performance/lifecycle epic; optimizations are cross-cutting,
 
 > The request-count budget harness set up by US-20.2 is reused by US-20.4 for the
 > many-account submit path. These are *standing* performance tests, in the spirit
-> of [US-12.15](../stories/US-12.15-earning-reward-and-apy-accuracy-hardening.md)'s
+> of [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md)'s
 > regression-coverage task tying issues to standing tests.
 
 ## Performance budgets & invariants

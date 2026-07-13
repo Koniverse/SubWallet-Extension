@@ -92,15 +92,15 @@ proxy (AD-19) so their keys never ship in the bundle.
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-52 | [US-5.1](../stories/US-5.1-phishing-site-and-address-protection.md) | 📋 backlog |
-| FR-53 | [US-5.2](../stories/US-5.2-master-password-and-strength-policy.md) | 📋 backlog |
-| FR-54 | [US-5.3](../stories/US-5.3-forgot-password-reset-wallet.md) | 📋 backlog |
-| FR-55 | [US-5.4](../stories/US-5.4-unified-unlock-and-auto-lock-flow.md) | 📋 backlog |
-| FR-56 | [US-5.5](../stories/US-5.5-seed-phrase-input-safety.md) | 📋 backlog |
-| FR-57 | [US-5.6](../stories/US-5.6-auto-lock-timer-and-unlock-type.md) | 📋 backlog |
-| FR-58 | [US-5.6](../stories/US-5.6-auto-lock-timer-and-unlock-type.md) | 📋 backlog |
-| FR-59 | [US-5.7](../stories/US-5.7-camera-access-and-one-sign-toggles.md) | 📋 backlog |
-| FR-60 | [US-5.7](../stories/US-5.7-camera-access-and-one-sign-toggles.md) | 📋 backlog |
+| FR-52 | [US-5.1](../stories/US-5.1-phishing-site-and-address-protection.md) | ✅ done |
+| FR-53 | [US-5.2](../stories/US-5.2-master-password-and-strength-policy.md) | ✅ done |
+| FR-54 | [US-5.3](../stories/US-5.3-forgot-password-reset-wallet.md) | ✅ done |
+| FR-55 | [US-5.4](../stories/US-5.4-unified-unlock-and-auto-lock-flow.md) | ✅ done |
+| FR-56 | [US-5.5](../stories/US-5.5-seed-phrase-input-safety.md) | ✅ done |
+| FR-57 | [US-5.6](../stories/US-5.6-auto-lock-timer-and-unlock-type.md) | ✅ done |
+| FR-58 | [US-5.6](../stories/US-5.6-auto-lock-timer-and-unlock-type.md) | ✅ done |
+| FR-59 | [US-5.7](../stories/US-5.7-camera-access-and-one-sign-toggles.md) | ✅ done |
+| FR-60 | [US-5.7](../stories/US-5.7-camera-access-and-one-sign-toggles.md) | ✅ done |
 | FR-61 | [US-5.8](../stories/US-5.8-blockaid-transaction-risk-scanning.md) | 📋 backlog |
 | FR-62 | [US-5.9](../stories/US-5.9-anti-scam-address-screening.md) | 📋 backlog |
 
@@ -120,13 +120,13 @@ proxy (AD-19) so their keys never ship in the bundle.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-5.1](../stories/US-5.1-phishing-site-and-address-protection.md) | Phishing site & address protection | Block known phishing sites/addresses via @polkadot/phishing + ChainPatrol | 📋 backlog | — |
-| [US-5.2](../stories/US-5.2-master-password-and-strength-policy.md) | Master password & strength policy | One master password (strength-enforced) wraps all accounts | 📋 backlog | — |
-| [US-5.3](../stories/US-5.3-forgot-password-reset-wallet.md) | Forgot password → reset wallet | Non-recoverable password ⇒ reset-and-re-import path | 📋 backlog | — |
-| [US-5.4](../stories/US-5.4-unified-unlock-and-auto-lock-flow.md) | Unified unlock / auto-lock flow | One unlock surface; auto-lock relocks the whole wallet | 📋 backlog | — |
-| [US-5.5](../stories/US-5.5-seed-phrase-input-safety.md) | Seed-phrase input safety | Seed shown via `<input>`, never `<textarea>` (demonic-vuln) | 📋 backlog | — |
-| [US-5.6](../stories/US-5.6-auto-lock-timer-and-unlock-type.md) | Auto-lock timer + unlock type | Configurable inactivity timer; per-action vs per-session unlock | 📋 backlog | — |
-| [US-5.7](../stories/US-5.7-camera-access-and-one-sign-toggles.md) | Camera-access + One-Sign toggles | User opt-in for camera (QR scan) and single-approval batching | 📋 backlog | — |
+| [US-5.1](../stories/US-5.1-phishing-site-and-address-protection.md) | Phishing site & address protection | Block known phishing sites/addresses via @polkadot/phishing + ChainPatrol | ✅ done | 0.35.1 |
+| [US-5.2](../stories/US-5.2-master-password-and-strength-policy.md) | Master password & strength policy | One master password (strength-enforced) wraps all accounts | ✅ done | 1.0.2 |
+| [US-5.3](../stories/US-5.3-forgot-password-reset-wallet.md) | Forgot password → reset wallet | Non-recoverable password ⇒ reset-and-re-import path | ✅ done | 1.0.4 |
+| [US-5.4](../stories/US-5.4-unified-unlock-and-auto-lock-flow.md) | Unified unlock / auto-lock flow | One unlock surface; auto-lock relocks the whole wallet | ✅ done | 1.0.2 |
+| [US-5.5](../stories/US-5.5-seed-phrase-input-safety.md) | Seed-phrase input safety | Seed shown via `<input>`, never `<textarea>` (demonic-vuln) | ✅ done | 1.1.10 |
+| [US-5.6](../stories/US-5.6-auto-lock-timer-and-unlock-type.md) | Auto-lock timer + unlock type | Configurable inactivity timer; per-action vs per-session unlock | ✅ done | 1.1.10 |
+| [US-5.7](../stories/US-5.7-camera-access-and-one-sign-toggles.md) | Camera-access + One-Sign toggles | User opt-in for camera (QR scan) and single-approval batching | ✅ done | 1.3.21 |
 | [US-5.8](../stories/US-5.8-blockaid-transaction-risk-scanning.md) | Blockaid tx/signature risk scanning | Flag risky EVM transactions/signatures before signing | 📋 backlog | — |
 | [US-5.9](../stories/US-5.9-anti-scam-address-screening.md) | Anti-scam address screening | Screen recipient addresses against Merkle Science scam data | 📋 backlog | — |
 | [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md) | Security audit & remediation hardening | Remediate audit + false-positive findings (#4471, #4929, #4959, #4889, #4998), each regression-guarded | 📋 backlog | — |

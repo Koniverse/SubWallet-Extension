@@ -6,11 +6,11 @@ status: done
 priority: P1
 points: 2
 sprint:
-version_shipped: 1.3.80
+version_shipped: 1.3.82
 prd_ref: []
 arch_ref: []
 depends_on: []
-assignee:
+assignee: tunghp2002
 commit: d68259d1ca
 created: 2026-07-09
 updated: 2026-07-09
@@ -26,15 +26,15 @@ When the wallet receives a transaction payload that cannot be decoded (malformed
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a malformed transaction payload, **When** the decode path is invoked, **Then** the app shows a user-facing error message instead of crashing.
-- [ ] **AC-2** — **Given** an error from the decode path, **When** the error is caught, **Then** the error context is logged for debugging.
+- [x] **AC-1** — **Given** a malformed transaction payload, **When** the decode path is invoked, **Then** the app shows a user-facing error message instead of crashing.
+- [x] **AC-2** — **Given** an error from the decode path, **When** the error is caught, **Then** the error context is logged for debugging.
 
 ## Tasks
 
-- [ ] Identify the payload decode entry points in the transaction flow
-- [ ] Add try/catch around decode operations
-- [ ] Wire the catch handler to a user-facing error display
-- [ ] Add error logging for debugging
+- [x] Identify the payload decode entry points in the transaction flow
+- [x] Add try/catch around decode operations
+- [x] Wire the catch handler to a user-facing error display
+- [x] Add error logging for debugging
 
 ## Dev notes — References
 

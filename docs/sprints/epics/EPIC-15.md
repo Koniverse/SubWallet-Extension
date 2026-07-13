@@ -3,11 +3,11 @@ id: EPIC-15
 title: "On-Chain Governance"
 status: backlog
 prd_ref:
+  - FR-139
+  - FR-140
   - FR-141
   - FR-142
   - FR-143
-  - FR-144
-  - FR-145
 arch_ref:
   - AD-07
   - AD-24
@@ -36,10 +36,10 @@ transferable/locked split) but offers no way to *participate* in chain
 governance: a user holding DOT/KSM has voting power they cannot exercise inside
 SubWallet. EPIC-15 closes that gap. It owns the **governance read-and-act path**:
 the OpenGov referenda list + detail and conviction vote / revote / unvote
-(FR-141), the locked-token detail view and the post-period unlock flow (FR-142),
+(FR-139), the locked-token detail view and the post-period unlock flow (FR-140),
 the legacy Governance V1 (Democracy) display-only view for chains still on the
-old pallet (FR-143), and the planned Phase-2 expansion of delegation + governance
-tracks (FR-144) and a dedicated web-app governance surface (FR-145).
+old pallet (FR-141), and the planned Phase-2 expansion of delegation + governance
+tracks (FR-142) and a dedicated web-app governance surface (FR-143).
 
 This epic adds both a *read path* (referenda indexing, conviction-lock status)
 and a constrained *write path* (the vote / unlock extrinsics). Referendum and
@@ -81,15 +81,15 @@ balance.
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-141 | [US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md) | 📋 backlog |
-| FR-142 | [US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md) | 📋 backlog |
-| FR-143 | [US-15.3](../stories/US-15.3-governance-v1-democracy-display-only.md) | 📋 backlog |
-| FR-144 | [US-15.4](../stories/US-15.4-opengov-delegation-and-governance-tracks.md) | 📋 backlog |
-| FR-145 | [US-15.5](../stories/US-15.5-web-app-governance-surface.md) | 📋 backlog |
+| FR-139 | [US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md) | ✅ done |
+| FR-140 | [US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md) | ✅ done |
+| FR-141 | [US-15.3](../stories/US-15.3-governance-v1-democracy-display-only.md) | ✅ done |
+| FR-142 | [US-15.4](../stories/US-15.4-opengov-delegation-and-governance-tracks.md) | 📋 backlog |
+| FR-143 | [US-15.5](../stories/US-15.5-web-app-governance-surface.md) | 📋 backlog |
 
 > FR statuses above are **story-planning** statuses (Stream B; all `📋 backlog`).
-> The shipped state of each capability lives in [PRD](../../PRD.md#functional-requirements): FR-141..143
-> are `✅ shipped` (retroactive stories), FR-144 is `📋 planned`, FR-145 is
+> The shipped state of each capability lives in [PRD](../../PRD.md#functional-requirements): FR-139..143
+> are `✅ shipped` (retroactive stories), FR-142 is `📋 planned`, FR-143 is
 > `📋 planned` (forward). `done` + `version_shipped` are backfilled in version
 > reconciliation. The conviction-LOCKED *balance* figure (FR-69) is owned by
 > [EPIC-7](EPIC-7.md), referenced here only as a downstream dependent.
@@ -114,9 +114,9 @@ balance.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md) | OpenGov referenda + conviction voting | Browse OpenGov referenda and cast/revote/unvote with conviction multipliers | 📋 backlog | — |
-| [US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md) | Locked-token detail & unlock flow | See conviction-vote locks and unlock tokens once the lock period ends | 📋 backlog | — |
-| [US-15.3](../stories/US-15.3-governance-v1-democracy-display-only.md) | Governance V1 (Democracy) display-only | Read legacy Democracy referenda on chains still on the old pallet | 📋 backlog | — |
+| [US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md) | OpenGov referenda + conviction voting | Browse OpenGov referenda and cast/revote/unvote with conviction multipliers | ✅ done | 1.3.70 |
+| [US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md) | Locked-token detail & unlock flow | See conviction-vote locks and unlock tokens once the lock period ends | ✅ done | 1.3.70 |
+| [US-15.3](../stories/US-15.3-governance-v1-democracy-display-only.md) | Governance V1 (Democracy) display-only | Read legacy Democracy referenda on chains still on the old pallet | ✅ done | 1.3.70 |
 | [US-15.4](../stories/US-15.4-opengov-delegation-and-governance-tracks.md) | OpenGov Phase 2: delegation & tracks | Delegate voting power and participate per governance track | 📋 backlog | — |
 | [US-15.5](../stories/US-15.5-web-app-governance-surface.md) | Web-app governance surface | The full OpenGov governance experience inside the standalone web app | 📋 backlog | — |
 
@@ -126,11 +126,11 @@ balance.
 
 ## Cross-cutting invariants
 
-- **Referendum/track data comes through the backend, not on-device indexing ([FR-141](../../PRD.md#functional-requirements), AD-24):** OpenGov and Democracy referendum lists, detail, and track metadata are aggregated through the Services SDK backend across chains; no governance story may stand up a per-chain on-device referendum indexer. Enforced by [US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md), reused by [US-15.3](../stories/US-15.3-governance-v1-democracy-display-only.md), [US-15.4](../stories/US-15.4-opengov-delegation-and-governance-tracks.md).
-- **The conviction lock is read from the balance model, never re-derived ([FR-142](../../PRD.md#functional-requirements), [FR-69](../../PRD.md#functional-requirements)):** the locked figure governance shows is the same `locked` reservation EPIC-7 authors in the transferable/locked split; the unlock flow releases it, but governance never computes a second balance figure. Enforced by [US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md); the home-screen display of that figure is owned by [EPIC-7](EPIC-7.md).
-- **Vote and unlock extrinsics are signed in the background only ([FR-141](../../PRD.md#functional-requirements), AD-03):** the conviction-vote, revote/unvote, and unlock extrinsics are constructed and signed in the background service worker and surfaced to the UI through the typed `pri()` bus; no key material or raw extrinsic signing path is exposed in the governance UI. Enforced by [US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md), [US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md).
-- **Conviction-lock reads stay on the lightweight read path ([FR-142](../../PRD.md#functional-requirements), AD-07, NFR-11):** reading a vote-lock status / unlockable amount rides the lightweight WsProvider read path and must not force a full `@polkadot/api` ApiPromise; the full ApiPromise is instantiated only to *construct* the vote/unlock extrinsic. Enforced by [US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md).
-- **Shared background logic renders identically across surfaces ([FR-145](../../PRD.md#functional-requirements), NFR-17):** the web-app governance surface (US-15.5) consumes the same `extension-base` governance logic and RxJS subjects as the extension popup; it re-renders, it does not re-implement, the OpenGov flow. Enforced by [US-15.5](../stories/US-15.5-web-app-governance-surface.md).
+- **Referendum/track data comes through the backend, not on-device indexing ([FR-139](../../PRD.md#functional-requirements), AD-24):** OpenGov and Democracy referendum lists, detail, and track metadata are aggregated through the Services SDK backend across chains; no governance story may stand up a per-chain on-device referendum indexer. Enforced by [US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md), reused by [US-15.3](../stories/US-15.3-governance-v1-democracy-display-only.md), [US-15.4](../stories/US-15.4-opengov-delegation-and-governance-tracks.md).
+- **The conviction lock is read from the balance model, never re-derived ([FR-140](../../PRD.md#functional-requirements), [FR-69](../../PRD.md#functional-requirements)):** the locked figure governance shows is the same `locked` reservation EPIC-7 authors in the transferable/locked split; the unlock flow releases it, but governance never computes a second balance figure. Enforced by [US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md); the home-screen display of that figure is owned by [EPIC-7](EPIC-7.md).
+- **Vote and unlock extrinsics are signed in the background only ([FR-139](../../PRD.md#functional-requirements), AD-03):** the conviction-vote, revote/unvote, and unlock extrinsics are constructed and signed in the background service worker and surfaced to the UI through the typed `pri()` bus; no key material or raw extrinsic signing path is exposed in the governance UI. Enforced by [US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md), [US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md).
+- **Conviction-lock reads stay on the lightweight read path ([FR-140](../../PRD.md#functional-requirements), AD-07, NFR-11):** reading a vote-lock status / unlockable amount rides the lightweight WsProvider read path and must not force a full `@polkadot/api` ApiPromise; the full ApiPromise is instantiated only to *construct* the vote/unlock extrinsic. Enforced by [US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md).
+- **Shared background logic renders identically across surfaces ([FR-143](../../PRD.md#functional-requirements), NFR-17):** the web-app governance surface (US-15.5) consumes the same `extension-base` governance logic and RxJS subjects as the extension popup; it re-renders, it does not re-implement, the OpenGov flow. Enforced by [US-15.5](../stories/US-15.5-web-app-governance-surface.md).
 
 ## Cross-story testing requirements
 

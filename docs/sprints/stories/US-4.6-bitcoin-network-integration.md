@@ -2,16 +2,16 @@
 id: US-4.6
 title: "Bitcoin network integration"
 epic: EPIC-4
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 1.3.42
 prd_ref: [FR-37]
 arch_ref: [AD-12, AD-19]
 depends_on: [US-4.1]
-assignee:
-commit:
+assignee: frenkie-ng
+commit: a6dfc0bd26, 49d460215b
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -43,24 +43,24 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an account, **When** Bitcoin is enabled, **Then** the
+- [x] **AC-1** — **Given** an account, **When** Bitcoin is enabled, **Then** the
   keyring exposes all three address types (BIP44 Legacy / BIP84 Native SegWit /
   BIP86 Taproot), defaulting to Native SegWit (AD-12).
-- [ ] **AC-2** — **Given** an enabled Bitcoin network, **When** balances load,
+- [x] **AC-2** — **Given** an enabled Bitcoin network, **When** balances load,
   **Then** UTXO/balance data resolves through the backend-proxied indexer (no key
   in the bundle, AD-19).
-- [ ] **AC-3** — **Given** the three address types derive from one account,
+- [x] **AC-3** — **Given** the three address types derive from one account,
   **When** the user views them, **Then** they all originate from the unified seed
   (no extra account/backup, AD-11).
-- [ ] **AC-4** — **Given** the Bitcoin indexer is unreachable, **When** data is
+- [x] **AC-4** — **Given** the Bitcoin indexer is unreachable, **When** data is
   requested, **Then** a clear unavailable state is shown without breaking other
   ecosystems.
 
 ## Tasks
 
-- [ ] **TASK-4.6.1** — Bitcoin keyring: three address types per account, default Native SegWit (AC: 1, 3)
-- [ ] **TASK-4.6.2** — Bitcoin API object + backend-proxied indexer for UTXO/balance reads (AC: 2)
-- [ ] **TASK-4.6.3** — Indexer-unavailable error state (AC: 4)
+- [x] **TASK-4.6.1** — Bitcoin keyring: three address types per account, default Native SegWit (AC: 1, 3)
+- [x] **TASK-4.6.2** — Bitcoin API object + backend-proxied indexer for UTXO/balance reads (AC: 2)
+- [x] **TASK-4.6.3** — Indexer-unavailable error state (AC: 4)
 
 ## Dev notes
 
@@ -105,7 +105,7 @@ system integration).
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (batch 1, commit `571f3085be`). Version `1.3.42` is the release whose docs/CHANGELOG.md bullet first delivers this story's headline capability; commits `a6dfc0bd26, 49d460215b` were resolved from that bullet's issue number (`git log --grep`, filtered to a ±270-day window around the release date to exclude same-numbered upstream polkadot-js PRs) and each verified contained in the v1.3.42 anchor via `git merge-base --is-ancestor`. Assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

@@ -7,7 +7,7 @@ priority: P2
 points: 5
 sprint:
 version_shipped:
-prd_ref: []
+prd_ref: [FR-85, FR-89, FR-92]
 arch_ref: [AD-24, AD-25]
 depends_on: [US-9.1, US-9.5]
 assignee:

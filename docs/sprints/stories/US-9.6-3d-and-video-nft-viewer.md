@@ -2,16 +2,16 @@
 id: US-9.6
 title: "3D and video NFT viewer"
 epic: EPIC-9
-status: backlog
+status: done
 priority: P2
 points: 5
 sprint:
-version_shipped:
+version_shipped: 0.6.5
 prd_ref: [FR-90]
 arch_ref: [AD-25]
 depends_on: [US-9.1]
-assignee:
-commit:
+assignee: nulllpc
+commit: bf810b9a187f08cd875edb5c5a827629167717c8, b6f96a6db3, 0695046c7cc81c33dca6a0f0124e968306f79c4e
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -39,16 +39,16 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an NFT whose media is a 3D model, **When** the user opens item detail, **Then** an interactive model-viewer renders it (rotation / camera controls).
-- [ ] **AC-2** — **Given** an NFT whose media is a video, **When** the user opens item detail, **Then** the video renders and can be played.
-- [ ] **AC-3** — **Given** an NFT whose rich-media asset fails to load, **When** the user opens item detail, **Then** the renderer falls back to the static image/preview rather than showing a broken element.
+- [x] **AC-1** — **Given** an NFT whose media is a 3D model, **When** the user opens item detail, **Then** an interactive model-viewer renders it (rotation / camera controls).
+- [x] **AC-2** — **Given** an NFT whose media is a video, **When** the user opens item detail, **Then** the video renders and can be played.
+- [x] **AC-3** — **Given** an NFT whose rich-media asset fails to load, **When** the user opens item detail, **Then** the renderer falls back to the static image/preview rather than showing a broken element.
 
 ## Tasks
 
-- [ ] **TASK-9.6.1** — Media-type detection in item detail (3D model / video / image) (AC: 1, 2, 3)
-- [ ] **TASK-9.6.2** — 3D model-viewer render path with rotation / camera-controls props (AC: 1)
-- [ ] **TASK-9.6.3** — Video render path (AC: 2)
-- [ ] **TASK-9.6.4** — Fallback to static image/preview when rich media fails (AC: 3)
+- [x] **TASK-9.6.1** — Media-type detection in item detail (3D model / video / image) (AC: 1, 2, 3)
+- [x] **TASK-9.6.2** — 3D model-viewer render path with rotation / camera-controls props (AC: 1)
+- [x] **TASK-9.6.3** — Video render path (AC: 2)
+- [x] **TASK-9.6.4** — Fallback to static image/preview when rich media fails (AC: 3)
 
 ## Dev notes
 
@@ -85,7 +85,11 @@ already shipped.
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-d08`; trace confidence: high, rule: completion).
+
+**Evidence:** CHANGELOG [0.6.5] — 2022-09-24: "Support 3D viewer for NFT (#662)". Title enumerates two components (3D + video); the video render path shipped much earlier (commit 0695046c7c, 2022-02-09, first tagged v0.2.5 — never named in a bullet; the 1.1.3 bullet "Fixed bug video NFT size (#1651)" proves prior existence), so the 3D viewer in 0.6.5 completes the enumeration. Verified at tag v0.6.5 that NftItem.tsx contains both the model-viewer and video render paths; all commits pass merge-base --is-ancestor v0.6.5. ("Support display 3D NFT (#1516)" in 1.0.10 is a re-delivery after the v1.0 UI rewrite.)
+
+Commits `bf810b9a187f08cd875edb5c5a827629167717c8, b6f96a6db3, 0695046c7cc81c33dca6a0f0124e968306f79c4e` verified contained in the v0.6.5 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

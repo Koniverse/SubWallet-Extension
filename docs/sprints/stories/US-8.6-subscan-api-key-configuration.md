@@ -2,16 +2,16 @@
 id: US-8.6
 title: "Subscan API-key configuration"
 epic: EPIC-8
-status: backlog
+status: done
 priority: P2
 points: 3
 sprint:
-version_shipped:
+version_shipped: 1.3.75
 prd_ref: [FR-79]
 arch_ref:
 depends_on: [US-8.5]
-assignee:
-commit:
+assignee: tunghp2002
+commit: 1554ae3f4c, a07266ae23, 79e8a13060
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -44,26 +44,26 @@ version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the settings screen, **When** the user enters a Subscan
+- [x] **AC-1** — **Given** the settings screen, **When** the user enters a Subscan
   API key, **Then** it is persisted locally and subsequent Subscan-backed queries
   (history, transfers, staking rewards) use the personal key instead of the shared
   default.
-- [ ] **AC-2** — **Given** no personal key is configured, **When** Subscan-backed
+- [x] **AC-2** — **Given** no personal key is configured, **When** Subscan-backed
   queries run, **Then** they fall back to the shared default key and the feature
   works unchanged.
-- [ ] **AC-3** — **Given** an invalid or unauthorized key, **When** the user saves
+- [x] **AC-3** — **Given** an invalid or unauthorized key, **When** the user saves
   it, **Then** validation surfaces an error (key not accepted) rather than silently
   degrading every query.
-- [ ] **AC-4** — **Given** a configured key, **When** the user removes it, **Then**
+- [x] **AC-4** — **Given** a configured key, **When** the user removes it, **Then**
   the wallet reverts to the shared default key with no lingering use of the removed
   key.
 
 ## Tasks
 
-- [ ] **TASK-8.6.1** — Settings field to enter / edit / remove the Subscan API key (AC: 1, 4)
-- [ ] **TASK-8.6.2** — Persist the key in local settings state (not bundled, not shared) (AC: 1)
-- [ ] **TASK-8.6.3** — Thread the personal key into the Subscan request path; default fallback (AC: 1, 2)
-- [ ] **TASK-8.6.4** — Validate the key on save; surface an error if rejected (AC: 3)
+- [x] **TASK-8.6.1** — Settings field to enter / edit / remove the Subscan API key (AC: 1, 4)
+- [x] **TASK-8.6.2** — Persist the key in local settings state (not bundled, not shared) (AC: 1)
+- [x] **TASK-8.6.3** — Thread the personal key into the Subscan request path; default fallback (AC: 1, 2)
+- [x] **TASK-8.6.4** — Validate the key on save; surface an error if rejected (AC: 3)
 
 ## Dev notes
 

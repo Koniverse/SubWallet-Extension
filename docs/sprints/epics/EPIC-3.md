@@ -82,21 +82,21 @@ policy belongs to EPIC-5 (security) and signing/submission to EPIC-8
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-13 | [US-3.1](../stories/US-3.1-create-a-new-wallet-via-seed-phrase.md) | 📋 backlog |
-| FR-14 | [US-3.2](../stories/US-3.2-import-account-via-seed-phrase-or-private-key.md) | 📋 backlog |
-| FR-15 | [US-3.2](../stories/US-3.2-import-account-via-seed-phrase-or-private-key.md) | 📋 backlog |
-| FR-16 | [US-3.3](../stories/US-3.3-import-account-via-json-qr-trust-wallet.md) | 📋 backlog |
-| FR-17 | [US-3.3](../stories/US-3.3-import-account-via-json-qr-trust-wallet.md) | 📋 backlog |
-| FR-18 | [US-3.3](../stories/US-3.3-import-account-via-json-qr-trust-wallet.md) | 📋 backlog |
-| FR-19 | [US-3.4](../stories/US-3.4-export-keys-multi-account-management.md) | 📋 backlog |
-| FR-20 | [US-3.4](../stories/US-3.4-export-keys-multi-account-management.md) | 📋 backlog |
-| FR-21 | [US-3.5](../stories/US-3.5-the-unified-account-model.md) | 📋 backlog |
-| FR-22 | [US-3.5](../stories/US-3.5-the-unified-account-model.md) | 📋 backlog |
-| FR-23 | [US-3.5](../stories/US-3.5-the-unified-account-model.md) | 📋 backlog |
-| FR-24 | [US-3.6](../stories/US-3.6-watch-only-accounts-address-book.md) | 📋 backlog |
-| FR-25 | [US-3.6](../stories/US-3.6-watch-only-accounts-address-book.md) | 📋 backlog |
-| FR-26 | [US-3.7](../stories/US-3.7-account-derivation-custom-path-child-accounts.md) | 📋 backlog |
-| FR-27 | [US-3.7](../stories/US-3.7-account-derivation-custom-path-child-accounts.md) | 📋 backlog |
+| FR-13 | [US-3.1](../stories/US-3.1-create-a-new-wallet-via-seed-phrase.md) | ✅ done |
+| FR-14 | [US-3.2](../stories/US-3.2-import-account-via-seed-phrase-or-private-key.md) | ✅ done |
+| FR-15 | [US-3.2](../stories/US-3.2-import-account-via-seed-phrase-or-private-key.md) | ✅ done |
+| FR-16 | [US-3.3](../stories/US-3.3-import-account-via-json-qr-trust-wallet.md) | ✅ done |
+| FR-17 | [US-3.3](../stories/US-3.3-import-account-via-json-qr-trust-wallet.md) | ✅ done |
+| FR-18 | [US-3.3](../stories/US-3.3-import-account-via-json-qr-trust-wallet.md) | ✅ done |
+| FR-19 | [US-3.4](../stories/US-3.4-export-keys-multi-account-management.md) | ✅ done |
+| FR-20 | [US-3.4](../stories/US-3.4-export-keys-multi-account-management.md) | ✅ done |
+| FR-21 | [US-3.5](../stories/US-3.5-the-unified-account-model.md) | ✅ done |
+| FR-22 | [US-3.5](../stories/US-3.5-the-unified-account-model.md) | ✅ done |
+| FR-23 | [US-3.9](../stories/US-3.9-unified-to-solo-account-split.md) | 📋 backlog |
+| FR-24 | [US-3.6](../stories/US-3.6-watch-only-accounts-address-book.md) | ✅ done |
+| FR-25 | [US-3.6](../stories/US-3.6-watch-only-accounts-address-book.md) | ✅ done |
+| FR-26 | [US-3.7](../stories/US-3.7-account-derivation-custom-path-child-accounts.md) | ✅ done |
+| FR-27 | [US-3.7](../stories/US-3.7-account-derivation-custom-path-child-accounts.md) | ✅ done |
 | FR-28 | [US-3.8](../stories/US-3.8-account-recovery-identity-roadmap.md) | 📋 backlog |
 | FR-29 | [US-3.8](../stories/US-3.8-account-recovery-identity-roadmap.md) | 📋 backlog |
 | FR-30 | [US-3.8](../stories/US-3.8-account-recovery-identity-roadmap.md) | 📋 backlog |
@@ -124,14 +124,15 @@ policy belongs to EPIC-5 (security) and signing/submission to EPIC-8
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-3.1](../stories/US-3.1-create-a-new-wallet-via-seed-phrase.md) | Create a new wallet via seed phrase | Generate seed + master password + backup → a Unified Account | 📋 backlog | — |
-| [US-3.2](../stories/US-3.2-import-account-via-seed-phrase-or-private-key.md) | Import account via seed phrase or private key | Bring an account in by seed (→ unified) or private key (→ solo) | 📋 backlog | — |
-| [US-3.3](../stories/US-3.3-import-account-via-json-qr-trust-wallet.md) | Import account via JSON / QR / Trust Wallet | The remaining import formats | 📋 backlog | — |
-| [US-3.4](../stories/US-3.4-export-keys-multi-account-management.md) | Export keys & multi-account management | Export seed/key; manage multiple named accounts | 📋 backlog | — |
-| [US-3.5](../stories/US-3.5-the-unified-account-model.md) | The Unified Account model | One seed → five ecosystems + solo↔unified | 📋 backlog | — |
-| [US-3.6](../stories/US-3.6-watch-only-accounts-address-book.md) | Watch-only accounts & address book | Read-only monitoring + saved recipients | 📋 backlog | — |
-| [US-3.7](../stories/US-3.7-account-derivation-custom-path-child-accounts.md) | Account derivation: custom path & child accounts | Custom + auto-index derived accounts | 📋 backlog | — |
+| [US-3.1](../stories/US-3.1-create-a-new-wallet-via-seed-phrase.md) | Create a new wallet via seed phrase | Generate seed + master password + backup → a Unified Account | ✅ done | 0.2.1 |
+| [US-3.2](../stories/US-3.2-import-account-via-seed-phrase-or-private-key.md) | Import account via seed phrase or private key | Bring an account in by seed (→ unified) or private key (→ solo) | ✅ done | 0.2.8 |
+| [US-3.3](../stories/US-3.3-import-account-via-json-qr-trust-wallet.md) | Import account via JSON / QR / Trust Wallet | The remaining import formats | ✅ done | 1.3.71 |
+| [US-3.4](../stories/US-3.4-export-keys-multi-account-management.md) | Export keys & multi-account management | Export seed/key; manage multiple named accounts | ✅ done | 1.0.1 |
+| [US-3.5](../stories/US-3.5-the-unified-account-model.md) | The Unified Account model | One seed → five ecosystems + solo↔unified | ✅ done | 1.3.1 |
+| [US-3.6](../stories/US-3.6-watch-only-accounts-address-book.md) | Watch-only accounts & address book | Read-only monitoring + saved recipients | ✅ done | 1.0.2 |
+| [US-3.7](../stories/US-3.7-account-derivation-custom-path-child-accounts.md) | Account derivation: custom path & child accounts | Custom + auto-index derived accounts | ✅ done | 0.24.1 |
 | [US-3.8](../stories/US-3.8-account-recovery-identity-roadmap.md) | Account recovery & identity (roadmap) | Social recovery, session keys, DID (planned) | 📋 backlog | — |
+| [US-3.9](../stories/US-3.9-unified-to-solo-account-split.md) | Unified → Solo account split | Split a unified account back into per-chain solo accounts (FR-23, forward) | 📋 backlog | — |
 
 > All eight stories (US-3.1–3.8) are authored and linked above — sizes follow
 > scope. The `📋 backlog` status is the Stream-B story-planning state; shipped
@@ -159,6 +160,7 @@ secret material is created/parsed/stored **only** in the background keyring
 | [US-3.6](../stories/US-3.6-watch-only-accounts-address-book.md) | `AccountSecretHandler` (`accountsCreateExternalV2`, `isReadOnly`) + keyring `contacts` subject (address book) | FR-24, FR-25 |
 | [US-3.7](../stories/US-3.7-account-derivation-custom-path-child-accounts.md) | `AccountDeriveHandler` (`getDeriveSuggestion` via `findUnifiedNextDerive`/`findSoloNextDerive`, `validateDerivePath`, `derivationAccountProxyCreate`) | FR-26, FR-27 |
 | [US-3.8](../stories/US-3.8-account-recovery-identity-roadmap.md) | _(roadmap — no handler yet; would extend `KeyringService` / `AccountContext`)_ | FR-28, FR-29, FR-30 |
+| [US-3.9](../stories/US-3.9-unified-to-solo-account-split.md) | _(forward — inverts the solo→unified merge in `AccountContext`; no split surface exists at v1.3.82)_ | FR-23 |
 
 ### End-to-end happy path
 

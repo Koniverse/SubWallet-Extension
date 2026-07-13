@@ -77,11 +77,11 @@ here; currency-converted *amounts* are computed by the balance epic
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-63 | [US-6.1](../stories/US-6.1-dark-only-responsive-popup-and-expand-view.md) | 📋 backlog |
-| FR-64 | [US-6.2](../stories/US-6.2-web-app-feature-parity.md) | 📋 backlog |
-| FR-65 | [US-6.3](../stories/US-6.3-mobile-web-runner-webview.md) | 📋 backlog |
-| FR-66 | [US-6.4](../stories/US-6.4-settings-management.md) | 📋 backlog |
-| FR-67 | [US-6.5](../stories/US-6.5-display-fiat-currency-selection.md) | 📋 backlog |
+| FR-63 | [US-6.1](../stories/US-6.1-dark-only-responsive-popup-and-expand-view.md) | ✅ done |
+| FR-64 | [US-6.2](../stories/US-6.2-web-app-feature-parity.md) | ✅ done |
+| FR-65 | [US-6.3](../stories/US-6.3-mobile-web-runner-webview.md) | ✅ done |
+| FR-66 | [US-6.4](../stories/US-6.4-settings-management.md) | ✅ done |
+| FR-67 | [US-6.5](../stories/US-6.5-display-fiat-currency-selection.md) | ✅ done |
 
 > FR statuses above are **story-planning** statuses (Stream B; all `📋 backlog`).
 > The real shipped state of each capability lives in [PRD](../../PRD.md#functional-requirements) — all of
@@ -107,11 +107,11 @@ here; currency-converted *amounts* are computed by the balance epic
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-6.1](../stories/US-6.1-dark-only-responsive-popup-and-expand-view.md) | Dark-only responsive popup & expand view | One dark-only theme + responsive layout across popup and full-page expand | 📋 backlog | — |
-| [US-6.2](../stories/US-6.2-web-app-feature-parity.md) | Web app with feature parity | A standalone browser web app reusing the same background, at parity with the extension | 📋 backlog | — |
-| [US-6.3](../stories/US-6.3-mobile-web-runner-webview.md) | Mobile web-runner / WebView | Run the shared background inside a WebView iframe for mobile/non-extension hosts | 📋 backlog | — |
-| [US-6.4](../stories/US-6.4-settings-management.md) | Settings management | Manage network selection, token preferences, and account metadata | 📋 backlog | — |
-| [US-6.5](../stories/US-6.5-display-fiat-currency-selection.md) | Display fiat-currency selection | Pick the fiat currency used to display balances and prices | 📋 backlog | — |
+| [US-6.1](../stories/US-6.1-dark-only-responsive-popup-and-expand-view.md) | Dark-only responsive popup & expand view | One dark-only theme + responsive layout across popup and full-page expand | ✅ done | 1.0.1 |
+| [US-6.2](../stories/US-6.2-web-app-feature-parity.md) | Web app with feature parity | A standalone browser web app reusing the same background, at parity with the extension | ✅ done | 1.1.36 |
+| [US-6.3](../stories/US-6.3-mobile-web-runner-webview.md) | Mobile web-runner / WebView | Run the shared background inside a WebView iframe for mobile/non-extension hosts | ✅ done | 0.4.2 |
+| [US-6.4](../stories/US-6.4-settings-management.md) | Settings management | Manage network selection, token preferences, and account metadata | ✅ done | 0.4.3 |
+| [US-6.5](../stories/US-6.5-display-fiat-currency-selection.md) | Display fiat-currency selection | Pick the fiat currency used to display balances and prices | ✅ done | 1.1.60 |
 | [US-6.6](../stories/US-6.6-design-system-and-ux-hardening.md) | Design-system & UX hardening | Real UI/UX bug + iteration fixes across extension & WebApp — scaling/border/scroll regressions, mobile & incomplete-list layout, Confirmation screen, number display | 📋 backlog | — |
 
 > Every FR is assigned a story ID up front (FR order) so numbering is locked — no

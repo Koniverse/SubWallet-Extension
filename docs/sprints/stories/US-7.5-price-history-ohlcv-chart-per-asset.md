@@ -2,16 +2,16 @@
 id: US-7.5
 title: "Price history (OHLCV) chart per asset"
 epic: EPIC-7
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 1.3.33
 prd_ref: [FR-72]
 arch_ref: [AD-25]
 depends_on: [US-7.4]
-assignee:
-commit:
+assignee: Thiendekaco
+commit: 7c7aa2869b0a6d04ff380951f0564d81868f2e33, a7c5edd6471d5d3f73a633ec8fd5bbc03c548461, c349c1f6f60a8da1b75978f9eeb15b0817086526
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -43,25 +43,25 @@ reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an asset with historical data, **When** the user opens its
+- [x] **AC-1** — **Given** an asset with historical data, **When** the user opens its
   chart and selects a range (1D / 1W / 1M / 1Y), **Then** the OHLCV series for that
   range renders, fetched through the `api-cache` proxy (AD-25).
-- [ ] **AC-2** — **Given** the user switches ranges repeatedly, **When** a range was
+- [x] **AC-2** — **Given** the user switches ranges repeatedly, **When** a range was
   already loaded, **Then** it is served from cache without a redundant upstream fetch.
-- [ ] **AC-3** — **Given** an asset with no historical data (newly listed / unsupported),
+- [x] **AC-3** — **Given** an asset with no historical data (newly listed / unsupported),
   **When** its chart is opened, **Then** an explicit empty state is shown rather than a
   broken or blank chart.
-- [ ] **AC-4** — **Given** the history proxy is unreachable, **When** the chart loads,
+- [x] **AC-4** — **Given** the history proxy is unreachable, **When** the chart loads,
   **Then** the last cached series for the selected range is shown marked stale (or the
   empty state if none), and the chart does not error.
 
 ## Tasks
 
-- [ ] **TASK-7.5.1** — Range-scoped OHLCV chart with a range selector (AC: 1)
-  - [ ] Fetch the historical series via `api-cache`; render OHLCV; reuse the price-proxy mock fixture from US-7.4.
-- [ ] **TASK-7.5.2** — Per-range cache so range flips don't refetch (AC: 2)
-- [ ] **TASK-7.5.3** — Empty + degraded states (AC: 3, 4)
-  - [ ] No-data → explicit empty state; proxy-down → stale cached series or empty, never error.
+- [x] **TASK-7.5.1** — Range-scoped OHLCV chart with a range selector (AC: 1)
+  - [x] Fetch the historical series via `api-cache`; render OHLCV; reuse the price-proxy mock fixture from US-7.4.
+- [x] **TASK-7.5.2** — Per-range cache so range flips don't refetch (AC: 2)
+- [x] **TASK-7.5.3** — Empty + degraded states (AC: 3, 4)
+  - [x] No-data → explicit empty state; proxy-down → stale cached series or empty, never error.
 
 ## Dev notes
 

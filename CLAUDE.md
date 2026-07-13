@@ -9,13 +9,13 @@ See [AGENTS.md](AGENTS.md) for the full project guide.
 koni-docs:
   plugins: []
   docs_path: docs/
-  active_sprint: <TBD-after-sub-task-2>
+  active_sprint: sprint-2026-W28
   version_file: VERSION
 
 ## Active Context <!-- koni-docs:auto-update -->
-- Sprint: (not started — pending sub-task 2)
-- Active Stories:
-- Last Version: 1.3.79
+- Sprint: sprint-2026-W28 (2026-07-06 → 2026-07-12)
+- Active Stories: 👀 US-21.1 Contributor identity map · 🚧 US-21.2 History backfill
+- Last Version: 1.3.83
 - Recent Decisions:
 - Recent Lessons:
 <!-- /koni-docs:auto-update -->

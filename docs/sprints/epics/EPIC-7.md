@@ -80,11 +80,11 @@ number; EPIC-8 enforces it against the existential-deposit guard.
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-68 | [US-7.1](../stories/US-7.1-aggregate-portfolio-across-accounts-and-chains.md) | 📋 backlog |
+| FR-68 | [US-7.1](../stories/US-7.1-aggregate-portfolio-across-accounts-and-chains.md) | ✅ done |
 | FR-69 (shared with EPIC-8) | [US-7.2](../stories/US-7.2-transferable-vs-locked-balance-calculation.md) | 📋 backlog |
-| FR-70 | [US-7.3](../stories/US-7.3-auto-detect-tokens-show-hide-zero-balance.md) | 📋 backlog |
-| FR-71 | [US-7.4](../stories/US-7.4-real-time-token-price-and-per-asset-chart.md) | 📋 backlog |
-| FR-72 | [US-7.5](../stories/US-7.5-price-history-ohlcv-chart-per-asset.md) | 📋 backlog |
+| FR-70 | [US-7.3](../stories/US-7.3-auto-detect-tokens-show-hide-zero-balance.md) | ✅ done |
+| FR-71 | [US-7.4](../stories/US-7.4-real-time-token-price-and-per-asset-chart.md) | ✅ done |
+| FR-72 | [US-7.5](../stories/US-7.5-price-history-ohlcv-chart-per-asset.md) | ✅ done |
 | FR-73 | [US-7.6](../stories/US-7.6-balance-history-portfolio-value-over-time.md) | 📋 backlog |
 
 > FR statuses above are **story-planning** statuses (Stream B; all `📋 backlog`).
@@ -112,11 +112,11 @@ number; EPIC-8 enforces it against the existential-deposit guard.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-7.1](../stories/US-7.1-aggregate-portfolio-across-accounts-and-chains.md) | Aggregate portfolio across accounts and chains | One dashboard summing value across every account and 200+ chains | 📋 backlog | — |
-| [US-7.2](../stories/US-7.2-transferable-vs-locked-balance-calculation.md) | Transferable vs locked/frozen balance calculation | Split each balance into transferable vs locked/frozen, trusted by send flows | 📋 backlog | — |
-| [US-7.3](../stories/US-7.3-auto-detect-tokens-show-hide-zero-balance.md) | Auto-detect tokens; show/hide zero-balance | Auto-detect held tokens and let users hide zero-balance dust | 📋 backlog | — |
-| [US-7.4](../stories/US-7.4-real-time-token-price-and-per-asset-chart.md) | Real-time token price and per-asset chart | Live USD value per asset plus a current-period price chart | 📋 backlog | — |
-| [US-7.5](../stories/US-7.5-price-history-ohlcv-chart-per-asset.md) | Price history (OHLCV) chart per asset | Historical OHLCV chart with selectable ranges per asset | 📋 backlog | — |
+| [US-7.1](../stories/US-7.1-aggregate-portfolio-across-accounts-and-chains.md) | Aggregate portfolio across accounts and chains | One dashboard summing value across every account and 200+ chains | ✅ done | 0.2.2 |
+| [US-7.2](../stories/US-7.2-transferable-vs-locked-balance-calculation.md) | Transferable vs locked/frozen balance calculation | Split each balance into transferable vs locked/frozen, trusted by send flows | ✅ done | 0.2.5 |
+| [US-7.3](../stories/US-7.3-auto-detect-tokens-show-hide-zero-balance.md) | Auto-detect tokens; show/hide zero-balance | Auto-detect held tokens and let users hide zero-balance dust | ✅ done | 1.0.2 |
+| [US-7.4](../stories/US-7.4-real-time-token-price-and-per-asset-chart.md) | Real-time token price and per-asset chart | Live USD value per asset plus a current-period price chart | ✅ done | 1.3.33 |
+| [US-7.5](../stories/US-7.5-price-history-ohlcv-chart-per-asset.md) | Price history (OHLCV) chart per asset | Historical OHLCV chart with selectable ranges per asset | ✅ done | 1.3.33 |
 | [US-7.6](../stories/US-7.6-balance-history-portfolio-value-over-time.md) | Balance history (portfolio value over time) | Historical portfolio value series over time (planned) | 📋 backlog | — |
 | [US-7.7](../stories/US-7.7-balance-cache-invalidation-hardening.md) | Balance-cache invalidation hardening | Keep the home-screen balance cache correct under change: multi-step balance-change listening (#4337), crowdloan in locked composition (#1583), stale-cache invalidation on account removal (#2410) plus the account-switch / chain-toggle / transfer-submit invariant | 📋 backlog | — |
 

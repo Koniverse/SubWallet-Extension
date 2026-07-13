@@ -2,16 +2,16 @@
 id: US-2.1
 title: "Unified-Account keyring engine"
 epic: EPIC-2
-status: backlog
+status: done
 priority: P0
 points: 8
 sprint:
-version_shipped:
+version_shipped: 1.3.1
 prd_ref: [FR-5]
 arch_ref: [AD-04, AD-11]
 depends_on:
-assignee:
-commit:
+assignee: S2kael
+commit: 87901e2961ef9bbeee9f3381b1763f97aa96ad8a, 97de5d35e0008743a140074f7f11a6d59e420b85, fa2ffc25f61030aaff319f60502261dcafd1ccab
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -55,30 +55,30 @@ This story is **Retroactive** — the engine already ships; `commit` /
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a single seed phrase parsed in the background, **When**
+- [x] **AC-1** — **Given** a single seed phrase parsed in the background, **When**
   the keyring materializes a unified account, **Then** it exposes correct,
   reproducible addresses for Substrate, EVM, Bitcoin, TON and Cardano (AD-11,
   NFR-18).
-- [ ] **AC-2** — **Given** any keyring operation (create / import / derive /
+- [x] **AC-2** — **Given** any keyring operation (create / import / derive /
   export / sign), **When** it runs, **Then** the seed and private-key bytes are
   confined to the background service worker and never appear on the `pri(…)` /
   `pub(…)` message bus or in inject scripts (AD-04).
-- [ ] **AC-3** — **Given** a unified account, **When** the user converts it to a
+- [x] **AC-3** — **Given** a unified account, **When** the user converts it to a
   per-chain solo account (or vice-versa), **Then** the derivation is
   deterministic and the resulting addresses match those produced directly from
   the same seed (AD-11).
-- [ ] **AC-4** — **Given** an invalid secret (bad mnemonic checksum or malformed
+- [x] **AC-4** — **Given** an invalid secret (bad mnemonic checksum or malformed
   private key), **When** it is submitted to the keyring, **Then** the operation
   is rejected with a typed error and no partial account is persisted.
 
 ## Tasks
 
-- [ ] **TASK-2.1.1** — Per-ecosystem derivation: one seed → Substrate / EVM / BTC / TON / Cardano addresses (AC: 1)
-  - [ ] Confirm reproducibility across fresh installs with no server dependency (NFR-18).
-- [ ] **TASK-2.1.2** — Background-only key isolation boundary (AC: 2)
-  - [ ] Assert no seed/private-key bytes on the `pri(…)`/`pub(…)` bus or inject scripts.
-- [ ] **TASK-2.1.3** — Unified↔solo conversion / derivation graph (AC: 3)
-- [ ] **TASK-2.1.4** — Secret validation + typed-error / no-partial-persist path (AC: 4)
+- [x] **TASK-2.1.1** — Per-ecosystem derivation: one seed → Substrate / EVM / BTC / TON / Cardano addresses (AC: 1)
+  - [x] Confirm reproducibility across fresh installs with no server dependency (NFR-18).
+- [x] **TASK-2.1.2** — Background-only key isolation boundary (AC: 2)
+  - [x] Assert no seed/private-key bytes on the `pri(…)`/`pub(…)` bus or inject scripts.
+- [x] **TASK-2.1.3** — Unified↔solo conversion / derivation graph (AC: 3)
+- [x] **TASK-2.1.4** — Secret validation + typed-error / no-partial-persist path (AC: 4)
 
 ## Dev notes
 

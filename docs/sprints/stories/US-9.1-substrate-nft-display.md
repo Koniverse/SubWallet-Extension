@@ -2,16 +2,16 @@
 id: US-9.1
 title: "Substrate NFT display (RMRK / Unique / PSP-34)"
 epic: EPIC-9
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 0.6.7
 prd_ref: [FR-85]
 arch_ref: [AD-24]
 depends_on:
-assignee:
-commit:
+assignee: nulllpc
+commit: 6e4091bf3f, 824a020641, 88402e9c33
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -40,19 +40,19 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an account holding NFTs on a supported Substrate chain (RMRK, Unique/Quartz, Asset Hub, PSP-34/WASM), **When** the NFT screen loads, **Then** each collection appears in the grid with its name, image and item count.
-- [ ] **AC-2** — **Given** a collection in the grid, **When** the user opens it, **Then** the items render with name and media resolved through the IPFS gateway pipeline.
-- [ ] **AC-3** — **Given** an account holding no Substrate NFTs, **When** the screen loads, **Then** an empty state is shown (no error, no spinner stuck).
-- [ ] **AC-4** — **Given** the Services SDK backend is unreachable for a chain, **When** detection runs, **Then** that chain degrades gracefully (other chains still display) and a non-blocking error is surfaced.
+- [x] **AC-1** — **Given** an account holding NFTs on a supported Substrate chain (RMRK, Unique/Quartz, Asset Hub, PSP-34/WASM), **When** the NFT screen loads, **Then** each collection appears in the grid with its name, image and item count.
+- [x] **AC-2** — **Given** a collection in the grid, **When** the user opens it, **Then** the items render with name and media resolved through the IPFS gateway pipeline.
+- [x] **AC-3** — **Given** an account holding no Substrate NFTs, **When** the screen loads, **Then** an empty state is shown (no error, no spinner stuck).
+- [x] **AC-4** — **Given** the Services SDK backend is unreachable for a chain, **When** detection runs, **Then** that chain degrades gracefully (other chains still display) and a non-blocking error is surfaced.
 
 ## Tasks
 
-- [ ] **TASK-9.1.1** — Substrate NFT handlers (RMRK / Unique / Statemine / PSP-34) producing collections + items via `NftService` (AC: 1, 2)
-  - [ ] Subtask 9.1.1.1 — Register handlers in the NFT handler registry (`packages/extension-base/src/services/nft-service/nft-handlers/`)
-  - [ ] Subtask 9.1.1.2 — Map SDK collection/item payloads to `NftCollection` / `NftItem`
-- [ ] **TASK-9.1.2** — Collection grid + item detail rendering with IPFS-resolved media (AC: 2)
-- [ ] **TASK-9.1.3** — Empty state for accounts with no Substrate NFTs (AC: 3)
-- [ ] **TASK-9.1.4** — Per-chain degraded path when the backend is unreachable (AC: 4)
+- [x] **TASK-9.1.1** — Substrate NFT handlers (RMRK / Unique / Statemine / PSP-34) producing collections + items via `NftService` (AC: 1, 2)
+  - [x] Subtask 9.1.1.1 — Register handlers in the NFT handler registry (`packages/extension-base/src/services/nft-service/nft-handlers/`)
+  - [x] Subtask 9.1.1.2 — Map SDK collection/item payloads to `NftCollection` / `NftItem`
+- [x] **TASK-9.1.2** — Collection grid + item detail rendering with IPFS-resolved media (AC: 2)
+- [x] **TASK-9.1.3** — Empty state for accounts with no Substrate NFTs (AC: 3)
+- [x] **TASK-9.1.4** — Per-chain degraded path when the backend is unreachable (AC: 4)
 
 ## Dev notes
 
@@ -91,7 +91,11 @@ already shipped.
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-d08`; trace confidence: medium, rule: completion).
+
+**Evidence:** Title enumerates RMRK / Unique / PSP-34, so completion rule applies: RMRK+Unique display first shipped in 0.2.1 ("Integration RMRK's NFT display feature", "Integration Unique's NFT display feature", 2022-02-10; Statemine/Asset Hub by 0.2.8 "Send and Receive NFT: Acala, RMRK, Quartz, Statemine"), and the enumeration completes in 0.6.7 (2022-10-22) — "Support token import for PSP-22 and PSP-34 (#477)" — where commit 6e4091bf3f created the wasm_nft PSP-34 display handler (packages/extension-koni-base/src/api/nft/wasm_nft/index.ts); all commits verified ancestors of v0.6.7. Confidence medium (not high) because the 0.6.7 bullet says "token import" rather than NFT display (display proven by the handler-creation commit) and the capability grew across releases 0.2.1→0.6.7.
+
+Commits `6e4091bf3f, 824a020641, 88402e9c33` verified contained in the v0.6.7 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

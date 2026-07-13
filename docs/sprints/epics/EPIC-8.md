@@ -89,16 +89,16 @@ their own epics.
 
 | FR | Story | Status |
 | ---- | ------- | -------- |
-| FR-74 | [US-8.1](../stories/US-8.1-send-native-and-fungible-tokens.md) | 📋 backlog |
-| FR-75 | [US-8.2](../stories/US-8.2-receive-qr-and-copyable-address.md) | 📋 backlog |
-| FR-76 | [US-8.3](../stories/US-8.3-custom-fee-and-tip.md) | 📋 backlog |
-| FR-77 | [US-8.4](../stories/US-8.4-pay-fees-with-non-native-token.md) | 📋 backlog |
-| FR-78 | [US-8.5](../stories/US-8.5-on-chain-transaction-history.md) | 📋 backlog |
-| FR-79 | [US-8.6](../stories/US-8.6-subscan-api-key-configuration.md) | 📋 backlog |
-| FR-80 | [US-8.7](../stories/US-8.7-existential-deposit-safety-guard.md) | 📋 backlog |
-| FR-81 | [US-8.8](../stories/US-8.8-metadata-hash-signing.md) | 📋 backlog |
-| FR-82 | [US-8.9](../stories/US-8.9-multi-step-one-sign-signing.md) | 📋 backlog |
-| FR-83 | [US-8.10](../stories/US-8.10-token-spending-approval-confirmation.md) | 📋 backlog |
+| FR-74 | [US-8.1](../stories/US-8.1-send-native-and-fungible-tokens.md) | ✅ done |
+| FR-75 | [US-8.2](../stories/US-8.2-receive-qr-and-copyable-address.md) | ✅ done |
+| FR-76 | [US-8.3](../stories/US-8.3-custom-fee-and-tip.md) | ✅ done |
+| FR-77 | [US-8.4](../stories/US-8.4-pay-fees-with-non-native-token.md) | ✅ done |
+| FR-78 | [US-8.5](../stories/US-8.5-on-chain-transaction-history.md) | ✅ done |
+| FR-79 | [US-8.6](../stories/US-8.6-subscan-api-key-configuration.md) | ✅ done |
+| FR-80 | [US-8.7](../stories/US-8.7-existential-deposit-safety-guard.md) | ✅ done |
+| FR-81 | [US-8.8](../stories/US-8.8-metadata-hash-signing.md) | ✅ done |
+| FR-82 | [US-8.9](../stories/US-8.9-multi-step-one-sign-signing.md) | ✅ done |
+| FR-83 | [US-8.10](../stories/US-8.10-token-spending-approval-confirmation.md) | ✅ done |
 | FR-84 | [US-8.11](../stories/US-8.11-export-transaction-history.md) | 📋 backlog |
 
 > FR statuses above are **story-planning** statuses (Stream B; all `📋 backlog`).
@@ -125,23 +125,26 @@ their own epics.
 
 | ID | Title | Goal | Status | Version |
 | --- | --- | --- | --- | --- |
-| [US-8.1](../stories/US-8.1-send-native-and-fungible-tokens.md) | Send native & fungible tokens | Send native + ERC-20/PSP-22 tokens across all five ecosystems | 📋 backlog | — |
-| [US-8.2](../stories/US-8.2-receive-qr-and-copyable-address.md) | Receive (QR + copyable address) | Show a per-ecosystem receive QR code and copyable address | 📋 backlog | — |
-| [US-8.3](../stories/US-8.3-custom-fee-and-tip.md) | Custom fee / tip | Let the user set a custom fee and tip on Substrate and EVM sends | 📋 backlog | — |
-| [US-8.4](../stories/US-8.4-pay-fees-with-non-native-token.md) | Pay fees with a non-native token | Pay transaction fees in a non-native token (Asset Hub, Hydration) | 📋 backlog | — |
-| [US-8.5](../stories/US-8.5-on-chain-transaction-history.md) | On-chain transaction history | Show on-chain history merged from SubQuery/SubSquid indexers | 📋 backlog | — |
-| [US-8.6](../stories/US-8.6-subscan-api-key-configuration.md) | Subscan API-key configuration | Configure a personal Subscan API key to raise shared rate limits | 📋 backlog | — |
-| [US-8.7](../stories/US-8.7-existential-deposit-safety-guard.md) | Existential-deposit safety guard | Warn before a transfer that would drop the sender below the ED | 📋 backlog | — |
-| [US-8.8](../stories/US-8.8-metadata-hash-signing.md) | Metadata-hash signing | Verified extrinsic review via metadata hash (Ledger Generic) | 📋 backlog | — |
-| [US-8.9](../stories/US-8.9-multi-step-one-sign-signing.md) | Multi-step / one-sign signing | Approve sequential transactions with a single confirmation | 📋 backlog | — |
-| [US-8.10](../stories/US-8.10-token-spending-approval-confirmation.md) | Token spending-approval confirmation | Surface an ERC-20/PSP-22 allowance approval step before spend | 📋 backlog | — |
+| [US-8.1](../stories/US-8.1-send-native-and-fungible-tokens.md) | Send native & fungible tokens | Send native + ERC-20/PSP-22 tokens across all five ecosystems | ✅ done | 0.4.1 |
+| [US-8.2](../stories/US-8.2-receive-qr-and-copyable-address.md) | Receive (QR + copyable address) | Show a per-ecosystem receive QR code and copyable address | ✅ done | 0.2.5 |
+| [US-8.3](../stories/US-8.3-custom-fee-and-tip.md) | Custom fee / tip | Let the user set a custom fee and tip on Substrate and EVM sends | ✅ done | 1.3.24 |
+| [US-8.4](../stories/US-8.4-pay-fees-with-non-native-token.md) | Pay fees with a non-native token | Pay transaction fees in a non-native token (Asset Hub, Hydration) | ✅ done | 1.3.18 |
+| [US-8.5](../stories/US-8.5-on-chain-transaction-history.md) | On-chain transaction history | Show on-chain history merged from SubQuery/SubSquid indexers | ✅ done | 0.2.7 |
+| [US-8.6](../stories/US-8.6-subscan-api-key-configuration.md) | Subscan API-key configuration | Configure a personal Subscan API key to raise shared rate limits | ✅ done | 1.3.75 |
+| [US-8.7](../stories/US-8.7-existential-deposit-safety-guard.md) | Existential-deposit safety guard | Warn before a transfer that would drop the sender below the ED | ✅ done | 0.2.5 |
+| [US-8.8](../stories/US-8.8-metadata-hash-signing.md) | Metadata-hash signing | Verified extrinsic review via metadata hash (Ledger Generic) | ✅ done | 1.2.5 |
+| [US-8.9](../stories/US-8.9-multi-step-one-sign-signing.md) | Multi-step / one-sign signing | Approve sequential transactions with a single confirmation | ✅ done | 1.3.21 |
+| [US-8.10](../stories/US-8.10-token-spending-approval-confirmation.md) | Token spending-approval confirmation | Surface an ERC-20/PSP-22 allowance approval step before spend | ✅ done | 1.1.36 |
 | [US-8.11](../stories/US-8.11-export-transaction-history.md) | Export transaction history | Export the transaction history to a file (planned) | 📋 backlog | — |
 | [US-8.12](../stories/US-8.12-fee-bigint-and-gas-estimation-hardening.md) | Fee/BigInt & gas-estimation hardening | Fix fee-estimation accuracy, non-native fee payment, ED/BigInt transfer-max/all edges, and error surfacing (#4649/#4552/#2643/#4936/#4043/#3314/#4985/#3240) | 📋 backlog | — |
-| [US-8.13](../stories/US-8.13-payload-decode-error-handling.md) | Payload decode error handling | Show a user-facing error instead of crashing when a transaction payload cannot be decoded | ✅ done | 1.3.80 |
+| [US-8.13](../stories/US-8.13-payload-decode-error-handling.md) | Payload decode error handling | Show a user-facing error instead of crashing when a transaction payload cannot be decoded | ✅ done | 1.3.82 |
 
 > US-8.1..8.11 each materialize one FR (FR-74..84); US-8.12 is the epic's
 > bug/iteration (hardening) cluster and owns no FR — it defends the fee / BigInt /
-> gas-estimation correctness NFRs. US-8.13 is a shipped hardening fix (Issue #4989).
+> gas-estimation *correctness* of the FR surfaces they harden (FR-76 / FR-77 / FR-80) —
+> the PRD states no correctness NFR. US-8.13 is a shipped hardening fix (Issue #4989)
+> and maps to no requirement at all: nothing in the PRD covers crash-resistance or
+> error surfacing on the confirmation screen (recorded as a PRD gap in US-21.2).
 
 ## Object map & user-story interactions
 

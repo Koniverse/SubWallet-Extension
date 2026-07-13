@@ -2,16 +2,16 @@
 id: US-2.2
 title: "ChainService — live API object per chain"
 epic: EPIC-2
-status: backlog
+status: done
 priority: P0
 points: 8
 sprint:
-version_shipped:
+version_shipped: 1.0.1
 prd_ref: [FR-6]
 arch_ref: [AD-02, AD-07]
 depends_on:
-assignee:
-commit:
+assignee: nulllpc
+commit: 5c409b4fed470d0eccead52af6505c8d5f315309, e7dd01a79396934f9bf04fb83fe6e346c4d392fc
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -55,27 +55,27 @@ This story is **Retroactive** — the engine already ships; `commit` /
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a supported network, **When** a feature requests its
+- [x] **AC-1** — **Given** a supported network, **When** a feature requests its
   API, **Then** ChainService returns a single managed API object
   (`SubstrateApi` / `EvmApi`) for that chain and reuses it rather than creating
   a duplicate (AD-02).
-- [ ] **AC-2** — **Given** balance/token queries across many chains, **When** the
+- [x] **AC-2** — **Given** balance/token queries across many chains, **When** the
   read path runs, **Then** it uses the lightweight WsProvider connector and does
   **not** instantiate a full ApiPromise, keeping memory bounded (AD-07).
-- [ ] **AC-3** — **Given** a chain connection drops, **When** the lifecycle
+- [x] **AC-3** — **Given** a chain connection drops, **When** the lifecycle
   manager detects it, **Then** it retries/reconnects and the cached metadata is
   reused without a full cold reload (AD-02).
-- [ ] **AC-4** — **Given** an unreachable or misconfigured RPC endpoint, **When**
+- [x] **AC-4** — **Given** an unreachable or misconfigured RPC endpoint, **When**
   a connection is attempted, **Then** the chain is marked disconnected and the
   failure is surfaced without crashing other chains' API objects.
 
 ## Tasks
 
-- [ ] **TASK-2.2.1** — One managed `SubstrateApi`/`EvmApi` per network with reuse (AC: 1)
-- [ ] **TASK-2.2.2** — Lightweight WsProvider read path; defer full ApiPromise to extrinsic construction (AC: 2)
-  - [ ] Confirm memory envelope holds as chain count grows (AD-07).
-- [ ] **TASK-2.2.3** — Connect/disconnect/retry lifecycle + metadata cache (AC: 3)
-- [ ] **TASK-2.2.4** — Per-chain failure isolation on bad endpoints (AC: 4)
+- [x] **TASK-2.2.1** — One managed `SubstrateApi`/`EvmApi` per network with reuse (AC: 1)
+- [x] **TASK-2.2.2** — Lightweight WsProvider read path; defer full ApiPromise to extrinsic construction (AC: 2)
+  - [x] Confirm memory envelope holds as chain count grows (AD-07).
+- [x] **TASK-2.2.3** — Connect/disconnect/retry lifecycle + metadata cache (AC: 3)
+- [x] **TASK-2.2.4** — Per-chain failure isolation on bad endpoints (AC: 4)
 
 ## Dev notes
 

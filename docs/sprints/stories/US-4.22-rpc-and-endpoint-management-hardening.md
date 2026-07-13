@@ -7,7 +7,7 @@ priority: P1
 points: 3
 sprint:
 version_shipped:
-prd_ref: []
+prd_ref: [FR-31, FR-35]
 arch_ref: [AD-02]
 depends_on: [US-4.1]
 assignee:

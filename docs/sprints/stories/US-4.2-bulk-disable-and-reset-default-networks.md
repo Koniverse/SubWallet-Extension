@@ -2,16 +2,16 @@
 id: US-4.2
 title: "Bulk disable + reset to default networks"
 epic: EPIC-4
-status: backlog
+status: done
 priority: P1
 points: 2
 sprint:
-version_shipped:
+version_shipped: 0.4.3
 prd_ref: [FR-32, FR-33]
 arch_ref: [AD-02]
 depends_on: [US-4.1]
-assignee:
-commit:
+assignee: nulllpc
+commit: 8522b18ccc, 4e32896869
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -43,20 +43,20 @@ Materializes [FR-32, FR-33](../../PRD.md#epic-4--chain-management).
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** several active networks, **When** the user triggers
+- [x] **AC-1** — **Given** several active networks, **When** the user triggers
   "disable all", **Then** a confirmation is shown, and on confirm every network is
   disabled and its API object disconnected (FR-32).
-- [ ] **AC-2** — **Given** a customized active set, **When** the user triggers
+- [x] **AC-2** — **Given** a customized active set, **When** the user triggers
   "reset to default", **Then** the active set returns to the curated default
   networks (FR-33).
-- [ ] **AC-3** — **Given** the "disable all" confirmation, **When** the user
+- [x] **AC-3** — **Given** the "disable all" confirmation, **When** the user
   cancels, **Then** no network is disabled and state is unchanged (the guard is
   honoured).
 
 ## Tasks
 
-- [ ] **TASK-4.2.1** — Disable-all action with confirmation modal, batched `ChainService` disconnect (AC: 1, 3)
-- [ ] **TASK-4.2.2** — Reset-to-default: restore curated default active set (AC: 2)
+- [x] **TASK-4.2.1** — Disable-all action with confirmation modal, batched `ChainService` disconnect (AC: 1, 3)
+- [x] **TASK-4.2.2** — Reset-to-default: restore curated default active set (AC: 2)
 
 ## Dev notes
 
@@ -96,7 +96,11 @@ surface, internal review only, per SKILL §3a-bis.
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-d08`; trace confidence: medium, rule: completion).
+
+**Evidence:** CHANGELOG 0.4.3 (2022-05-31): "Custom network, Custom Endpoint (#36)" — umbrella bullet for the issue-36-52 network-settings work whose commit 8522b18ccc adds disableAllNetworks + resetDefaultNetwork handlers AND the "Disable all"/"Reset to default" UI in Settings/networks/Networks.tsx, delivering both enumerated components (FR-32+FR-33) simultaneously; later bullets are not first delivery — 1.3.78 "Disable all networks' switch to Manage Networks page (#4970)" re-adds the switch UI after the 1.0 rewrite, and the 2022-10-18 commit "Fix error can not disconnect all or reset to default in network settings" proves the capability predated it; both reported commits pass merge-base --is-ancestor v0.4.3.
+
+Commits `8522b18ccc, 4e32896869` verified contained in the v0.4.3 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

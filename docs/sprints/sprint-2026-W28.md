@@ -10,8 +10,8 @@ goal: "Launch EPIC-21 docs conformance program — contributor map, history back
 
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | 🚧 in-progress | new | [link](stories/US-21.1-contributor-identity-map.md) |
-| US-21.2 | History backfill | EPIC-21 | P1 | 13 | 📋 backlog | new | [link](stories/US-21.2-history-backfill.md) |
+| US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | 👀 review | new | [link](stories/US-21.1-contributor-identity-map.md) |
+| US-21.2 | History backfill | EPIC-21 | P1 | 13 | 🚧 in-progress | new | [link](stories/US-21.2-history-backfill.md) |
 | US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | 📋 backlog | new | [link](stories/US-21.3-conformance-close-out.md) |
 
 ## Sprint goal recap

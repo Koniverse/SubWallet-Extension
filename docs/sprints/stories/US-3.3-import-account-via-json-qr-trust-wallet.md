@@ -2,16 +2,16 @@
 id: US-3.3
 title: "Import account via JSON / QR / Trust Wallet"
 epic: EPIC-3
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 1.3.71
 prd_ref: [FR-16, FR-17, FR-18]
 arch_ref: [AD-04, AD-11]
 depends_on: [US-3.2, US-2.1]
-assignee:
-commit:
+assignee: bluezdot
+commit: e3453f101af3d7a5d3388f08e1fc130e024a42dd, c0a2b55a98ddd265d4a842fc30c55424170fbd9e, 41c8c56ea7b5318c6eb4cf46e0237ffec81c5670
 created: 2026-06-11
 updated: 2026-06-11
 ---
@@ -56,28 +56,28 @@ Materializes [FR-16](../../PRD.md#functional-requirements), [FR-17](../../PRD.md
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a valid JSON keystore file and its correct password,
+- [x] **AC-1** — **Given** a valid JSON keystore file and its correct password,
   **When** the user imports it, **Then** the account(s) are decrypted **in the
   background** (AD-04) and added; a batch file restores every account it
   contains.
-- [ ] **AC-2** — **Given** a valid account QR code, **When** the user scans it,
+- [x] **AC-2** — **Given** a valid account QR code, **When** the user scans it,
   **Then** the encoded account is parsed in the background and added with the
   correct address(es).
-- [ ] **AC-3** — **Given** a Trust Wallet recovery phrase, **When** the user
+- [x] **AC-3** — **Given** a Trust Wallet recovery phrase, **When** the user
   imports it, **Then** a **solo** account is derived on the Trust Wallet
   derivation path and the resulting addresses match Trust Wallet's.
-- [ ] **AC-4** — **Given** a malformed JSON file, a wrong keystore password, or
+- [x] **AC-4** — **Given** a malformed JSON file, a wrong keystore password, or
   an unrecognized QR payload, **When** the user submits it, **Then** import is
   rejected with a clear error and no partial account is persisted.
 
 ## Tasks
 
-- [ ] **TASK-3.3.1** — JSON keystore import: single + batch restore (AC: 1, 4)
-  - [ ] Decrypt with keystore password in the background keyring; persist under master password.
-- [ ] **TASK-3.3.2** — QR-code account import via camera scan (AC: 2, 4)
-  - [ ] Decode payload in background; validate before persisting.
-- [ ] **TASK-3.3.3** — Trust Wallet phrase import on Trust derivation path (AC: 3)
-- [ ] **TASK-3.3.4** — Shared validation + error states across all three formats (AC: 4)
+- [x] **TASK-3.3.1** — JSON keystore import: single + batch restore (AC: 1, 4)
+  - [x] Decrypt with keystore password in the background keyring; persist under master password.
+- [x] **TASK-3.3.2** — QR-code account import via camera scan (AC: 2, 4)
+  - [x] Decode payload in background; validate before persisting.
+- [x] **TASK-3.3.3** — Trust Wallet phrase import on Trust derivation path (AC: 3)
+- [x] **TASK-3.3.4** — Shared validation + error states across all three formats (AC: 4)
 
 ## Dev notes
 

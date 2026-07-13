@@ -2,16 +2,16 @@
 id: US-1.1
 title: "MV3 service-worker background for Chrome/Firefox compliance"
 epic: EPIC-1
-status: backlog
+status: done
 priority: P0
 points: 8
 sprint:
-version_shipped:
+version_shipped: 1.2.7
 prd_ref: [FR-1]
 arch_ref: [AD-08, AD-20]
 depends_on:
-assignee:
-commit:
+assignee: saltict
+commit: f268562cdac6c1b65afed42924452cbfa3ceb360, ec35731e50ce11b9ecedd1d75ee6a399b9cfcb91, 49a361953cde851226b1f86cf54db6b559eb7917
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -53,41 +53,41 @@ output loadable in Firefox (chunk splitting) is owned by the sibling
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a Chrome 102+ install, **When** the extension is
+- [x] **AC-1** — **Given** a Chrome 102+ install, **When** the extension is
   loaded, **Then** the background runs as an MV3 service worker (not a persistent
   page) and WASM crypto initializes under the `wasm-unsafe-eval` CSP without a
   CSP violation (AD-08).
-- [ ] **AC-2** — **Given** a running background with persisted settings, account
+- [x] **AC-2** — **Given** a running background with persisted settings, account
   metadata and network state, **When** the service worker is evicted and later
   woken, **Then** that state is fully rehydrated from `chrome.storage.local` /
   dexie and no wallet data is lost (NFR-8).
-- [ ] **AC-3** — **Given** the four-state lifecycle (AD-20), **When** a `pub(…)`
+- [x] **AC-3** — **Given** the four-state lifecycle (AD-20), **When** a `pub(…)`
   message arrives, **Then** the worker wakes *partially*; **And** when a
   `pri(…)`/`mobile(…)` message arrives it wakes *fully*; **And** after the last
   port disconnects it returns to Sleep after `SLEEP_TIMEOUT`.
-- [ ] **AC-4** — **Given** repeated or concurrent wake triggers, **When** they
+- [x] **AC-4** — **Given** repeated or concurrent wake triggers, **When** they
   arrive during a transition, **Then** the `ServiceStatus` machine keeps the
   transition idempotent and does NOT start all chains for a request that needs
   only a few (no duplicate Start-Fully).
-- [ ] **AC-5** — **Given** the produced MV3 build, **When** it is submitted to
+- [x] **AC-5** — **Given** the produced MV3 build, **When** it is submitted to
   Firefox, **Then** the manifest is accepted (MV3 descriptor + CSP valid for
   Firefox) — the cross-browser compliance unhappy path.
 
 ## Tasks
 
-- [ ] **TASK-1.1.1** — Rebuild the background entry as an MV3 service worker (AC: 1)
-  - [ ] Author `packages/extension-koni/src/background.ts` as the service-worker entry compiled from `manifest.json` (MV3 descriptor).
-  - [ ] Add `wasm-unsafe-eval` to the manifest CSP so `@polkadot` / Cardano WASM loads (Chrome 102+).
-- [ ] **TASK-1.1.2** — Implement the four-state lifecycle (AC: 3, 4)
-  - [ ] Wire `ActionHandler` + `connectionMap` for Init → Start-Partially → Start-Fully → Sleep in `extension-koni`.
-  - [ ] Map `pub(…)` → partial wake, `pri(…)`/`mobile(…)` → full wake, last-disconnect → Sleep after `SLEEP_TIMEOUT`.
-  - [ ] Add the `HeartBeat` keep-alive while ports are open.
-- [ ] **TASK-1.1.3** — Make transitions idempotent via `ServiceStatus` (AC: 4)
-  - [ ] Use the `generalStatus` machine in `State.ts` so concurrent wakes do not double-start chains.
-- [ ] **TASK-1.1.4** — State persistence + rehydration on wake (AC: 2)
-  - [ ] Persist settings/account-metadata/network state to `chrome.storage.local` + dexie; rehydrate on cold wake.
-- [ ] **TASK-1.1.5** — Cross-browser manifest validation (AC: 5)
-  - [ ] Validate the MV3 manifest + CSP load in both Chrome and Firefox.
+- [x] **TASK-1.1.1** — Rebuild the background entry as an MV3 service worker (AC: 1)
+  - [x] Author `packages/extension-koni/src/background.ts` as the service-worker entry compiled from `manifest.json` (MV3 descriptor).
+  - [x] Add `wasm-unsafe-eval` to the manifest CSP so `@polkadot` / Cardano WASM loads (Chrome 102+).
+- [x] **TASK-1.1.2** — Implement the four-state lifecycle (AC: 3, 4)
+  - [x] Wire `ActionHandler` + `connectionMap` for Init → Start-Partially → Start-Fully → Sleep in `extension-koni`.
+  - [x] Map `pub(…)` → partial wake, `pri(…)`/`mobile(…)` → full wake, last-disconnect → Sleep after `SLEEP_TIMEOUT`.
+  - [x] Add the `HeartBeat` keep-alive while ports are open.
+- [x] **TASK-1.1.3** — Make transitions idempotent via `ServiceStatus` (AC: 4)
+  - [x] Use the `generalStatus` machine in `State.ts` so concurrent wakes do not double-start chains.
+- [x] **TASK-1.1.4** — State persistence + rehydration on wake (AC: 2)
+  - [x] Persist settings/account-metadata/network state to `chrome.storage.local` + dexie; rehydrate on cold wake.
+- [x] **TASK-1.1.5** — Cross-browser manifest validation (AC: 5)
+  - [x] Validate the MV3 manifest + CSP load in both Chrome and Firefox.
 
 ## Dev notes
 

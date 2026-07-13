@@ -3,9 +3,9 @@ id: EPIC-18
 title: "Multisig Accounts"
 status: backlog
 prd_ref:
+  - FR-149
+  - FR-150
   - FR-151
-  - FR-152
-  - FR-153
 arch_ref:
   - AD-17
   - AD-04
@@ -30,17 +30,17 @@ Before this epic, every account is single-authority: one key signs, one key subm
 ([EPIC-3](EPIC-3.md)). EPIC-18 adds the **M-of-N shared-authority custody model** for
 native Substrate multisig ([AD-17](../../ARCHITECTURE.md#architecture-decisions)). It
 owns three things end-to-end: creating and managing a multisig account
-(deterministic, off-chain — FR-151), detecting and approving the pending transactions
-that multisig produces (on-chain, no indexer — FR-152), and the planned Phase-2
+(deterministic, off-chain — FR-149), detecting and approving the pending transactions
+that multisig produces (on-chain, no indexer — FR-150), and the planned Phase-2
 enrichment that auto-detects activated multisig accounts and pulls richer history from
-an indexer (FR-153).
+an indexer (FR-151).
 
 The design is deliberately infrastructure-free for Phase 1. The multisig address is
 derived **off-chain** from the signatory set + threshold (no account-creation
 transaction), and pending transactions are detected by reading on-chain pallet state
 directly (`as_multi` / `approveAsMulti`), **without an indexer**. That is what lets
 multi-party custody ship without standing up a custodial service or a backend
-indexing pipeline. The indexer dependency only appears in Phase 2 (FR-153), and even
+indexing pipeline. The indexer dependency only appears in Phase 2 (FR-151), and even
 then only to *enrich* history and detail — the core approve/execute path never depends
 on it.
 
@@ -70,13 +70,13 @@ two are explicitly *not* the same thing (see Out of scope).
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-151 | [US-18.1](../stories/US-18.1-multisig-account-creation-and-management.md) | 📋 backlog |
-| FR-152 | [US-18.2](../stories/US-18.2-pending-transaction-detection-and-approval.md) | 📋 backlog |
-| FR-153 | [US-18.3](../stories/US-18.3-auto-detection-indexer-history-and-optimization.md) | 📋 backlog |
+| FR-149 | [US-18.1](../stories/US-18.1-multisig-account-creation-and-management.md) | ✅ done |
+| FR-150 | [US-18.2](../stories/US-18.2-pending-transaction-detection-and-approval.md) | ✅ done |
+| FR-151 | [US-18.3](../stories/US-18.3-auto-detection-indexer-history-and-optimization.md) | 📋 backlog |
 
 > FR statuses above are **story-planning** statuses (Stream B; all `📋 backlog`).
-> Shipped state lives in [PRD](../../PRD.md#functional-requirements): FR-151/FR-152 are `✅ shipped`
-> (retroactive stories), FR-153 is `📋 planned` (forward, Phase 2). `done` +
+> Shipped state lives in [PRD](../../PRD.md#functional-requirements): FR-149/FR-150 are `✅ shipped`
+> (retroactive stories), FR-151 is `📋 planned` (forward, Phase 2). `done` +
 > `version_shipped` are backfilled in version reconciliation.
 
 ## AD Coverage
@@ -97,8 +97,8 @@ two are explicitly *not* the same thing (see Out of scope).
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-18.1](../stories/US-18.1-multisig-account-creation-and-management.md) | Multisig account creation (deterministic off-chain) & management | Create/manage an M-of-N multisig whose address derives off-chain from signatories + threshold, no on-chain tx | 📋 backlog | — |
-| [US-18.2](../stories/US-18.2-pending-transaction-detection-and-approval.md) | Pending-tx detection + role-differentiated approval | Detect pending multisig txs on-chain (no indexer) and approve/reject with initiator-vs-co-signer flows | 📋 backlog | — |
+| [US-18.1](../stories/US-18.1-multisig-account-creation-and-management.md) | Multisig account creation (deterministic off-chain) & management | Create/manage an M-of-N multisig whose address derives off-chain from signatories + threshold, no on-chain tx | ✅ done | 1.3.74 |
+| [US-18.2](../stories/US-18.2-pending-transaction-detection-and-approval.md) | Pending-tx detection + role-differentiated approval | Detect pending multisig txs on-chain (no indexer) and approve/reject with initiator-vs-co-signer flows | ✅ done | 1.3.74 |
 | [US-18.3](../stories/US-18.3-auto-detection-indexer-history-and-optimization.md) | Auto-detection + indexer history + Phase-2 optimization | Auto-detect activated multisig accounts and enrich history/detail via indexer (planned) | 📋 backlog | — |
 
 > US-18.1/US-18.2 are retroactive (shipped); US-18.3 is forward (Phase 2) and absorbs
@@ -107,10 +107,10 @@ two are explicitly *not* the same thing (see Out of scope).
 
 ## Cross-cutting invariants
 
-- **Deterministic off-chain multisig address ([FR-151](../../PRD.md#functional-requirements), AD-17):** the same signatory set + the same threshold always derives the same multisig address, computed entirely client-side with **no account-creation transaction and no server**. Re-entering the same signatories and threshold on a fresh install reproduces the identical address. Enforced by [US-18.1](../stories/US-18.1-multisig-account-creation-and-management.md).
-- **Threshold-before-submit ([FR-152](../../PRD.md#functional-requirements), AD-17):** an M-of-N transaction MUST collect the threshold number of distinct signatory approvals before it is submitted for execution; below threshold it stays pending, and a single signatory can never unilaterally execute. Enforced by [US-18.2](../stories/US-18.2-pending-transaction-detection-and-approval.md).
-- **One approval per signatory ([FR-152](../../PRD.md#functional-requirements)):** each signatory's approval counts once toward the threshold; a repeated approval from the same signatory does not advance the count. Enforced by [US-18.2](../stories/US-18.2-pending-transaction-detection-and-approval.md).
-- **Indexer-free core path ([FR-152](../../PRD.md#functional-requirements), AD-17):** Phase-1 pending-tx detection and approval read on-chain pallet state directly; no multisig flow in Phase 1 may depend on an indexer. The indexer dependency (AD-24) is confined to Phase-2 enrichment ([US-18.3](../stories/US-18.3-auto-detection-indexer-history-and-optimization.md)).
+- **Deterministic off-chain multisig address ([FR-149](../../PRD.md#functional-requirements), AD-17):** the same signatory set + the same threshold always derives the same multisig address, computed entirely client-side with **no account-creation transaction and no server**. Re-entering the same signatories and threshold on a fresh install reproduces the identical address. Enforced by [US-18.1](../stories/US-18.1-multisig-account-creation-and-management.md).
+- **Threshold-before-submit ([FR-150](../../PRD.md#functional-requirements), AD-17):** an M-of-N transaction MUST collect the threshold number of distinct signatory approvals before it is submitted for execution; below threshold it stays pending, and a single signatory can never unilaterally execute. Enforced by [US-18.2](../stories/US-18.2-pending-transaction-detection-and-approval.md).
+- **One approval per signatory ([FR-150](../../PRD.md#functional-requirements)):** each signatory's approval counts once toward the threshold; a repeated approval from the same signatory does not advance the count. Enforced by [US-18.2](../stories/US-18.2-pending-transaction-detection-and-approval.md).
+- **Indexer-free core path ([FR-150](../../PRD.md#functional-requirements), AD-17):** Phase-1 pending-tx detection and approval read on-chain pallet state directly; no multisig flow in Phase 1 may depend on an indexer. The indexer dependency (AD-24) is confined to Phase-2 enrichment ([US-18.3](../stories/US-18.3-auto-detection-indexer-history-and-optimization.md)).
 - **No key for the multisig address (AD-04):** the multisig address holds no private key of its own; authority is the signatory set, and each signatory signs with its own keyring/hardware key. The keyring never gains a "multisig key".
 
 ## Acceptance criteria (propagated from stories)

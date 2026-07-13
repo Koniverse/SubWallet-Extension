@@ -2,16 +2,16 @@
 id: US-4.5
 title: "EVM network support"
 epic: EPIC-4
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 0.3.1
 prd_ref: [FR-36]
 arch_ref: [AD-02]
 depends_on: [US-4.1]
-assignee:
-commit:
+assignee: saltict
+commit: 0c2496445d, d25d55138f, 8c243ea1be
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -41,22 +41,22 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the registry, **When** the user enables an EVM network
+- [x] **AC-1** — **Given** the registry, **When** the user enables an EVM network
   (mainnet / L2 / EVM parachain), **Then** an `EvmApi` object connects and the
   network becomes active.
-- [ ] **AC-2** — **Given** the unified account, **When** EVM is enabled, **Then**
+- [x] **AC-2** — **Given** the unified account, **When** EVM is enabled, **Then**
   the EVM address derives from the same seed (no separate backup) and shows
   balances on enabled EVM chains.
-- [ ] **AC-3** — **Given** an EVM chain with a custom RPC, **When** the user sets
+- [x] **AC-3** — **Given** an EVM chain with a custom RPC, **When** the user sets
   it, **Then** the `EvmApi` connects through that endpoint (reuses US-4.1).
-- [ ] **AC-4** — **Given** an EVM RPC that is unreachable, **When** connection is
+- [x] **AC-4** — **Given** an EVM RPC that is unreachable, **When** connection is
   attempted, **Then** the network shows unavailable without blocking other chains.
 
 ## Tasks
 
-- [ ] **TASK-4.5.1** — `EvmApi` per-chain object: connect/disconnect lifecycle via `ChainService` (AC: 1, 4)
-- [ ] **TASK-4.5.2** — EVM account derivation from the unified seed + balance reads (AC: 2)
-- [ ] **TASK-4.5.3** — Custom-RPC + connectivity status for EVM chains (AC: 3, 4)
+- [x] **TASK-4.5.1** — `EvmApi` per-chain object: connect/disconnect lifecycle via `ChainService` (AC: 1, 4)
+- [x] **TASK-4.5.2** — EVM account derivation from the unified seed + balance reads (AC: 2)
+- [x] **TASK-4.5.3** — Custom-RPC + connectivity status for EVM chains (AC: 3, 4)
 
 ## Dev notes
 
@@ -100,7 +100,11 @@ integration).
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-d08`; trace confidence: medium, rule: first-delivery).
+
+**Evidence:** CHANGELOG [0.3.1] — 2022-04-05: "Support EVM Account for Astar Network (issue #92)" — earliest bullet delivering a usable EVM network (earlier 0.2.8 "Import Private key for EVM account from Metamask" is account import only); balances followed in 0.3.2 ("Display Astar(EVM) tokens balances and ERC20 tokens (issue #92)") under the same issue. Confidence medium because the story's broad scope (Ethereum mainnet, L2s, EvmApi under ChainService) grew across many later releases; commits verified with git merge-base --is-ancestor against v0.3.1.
+
+Commits `0c2496445d, d25d55138f, 8c243ea1be` verified contained in the v0.3.1 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

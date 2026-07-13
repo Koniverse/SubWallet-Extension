@@ -63,7 +63,7 @@ runtime* translation channel (FR-4).
 
 - **The wallet engines (keyring, ChainService, EarningService, balance/fee/request/transaction)** — owned by [EPIC-2](EPIC-2.md). EPIC-1 provides the monorepo and runtime they live in; it does not implement them.
 - **The per-network registry and chain auto-update feature** (add/remove networks, token metadata refresh) — owned by [EPIC-4](EPIC-4.md) (FR-34). EPIC-1 owns only the generic online hot-update *mechanism*; EPIC-4 owns the chain-management *feature* that consumes it.
-- **Bundled per-locale UI translations** (VI/ZH/JA/RU and the multi-language UI) — owned by [EPIC-19](EPIC-19.md) (FR-155). EPIC-1 owns only the online runtime i18n hot-update (FR-4); the shipped-in-package locale files are EPIC-19's.
+- **Bundled per-locale UI translations** (VI/ZH/JA/RU and the multi-language UI) — owned by [EPIC-19](EPIC-19.md) (FR-153). EPIC-1 owns only the online runtime i18n hot-update (FR-4); the shipped-in-package locale files are EPIC-19's.
 - **Per-chain XCM route configuration as a transfer feature** — owned by [EPIC-13](EPIC-13.md). EPIC-1 owns only the release-free toggle *delivery* via the chain-list channel (AD-09, NFR-15).
 - **The backend Services SDK and market-data cache proxies for balances/prices/NFT media** — owned by their consuming engine epics ([EPIC-2](EPIC-2.md), [EPIC-7](EPIC-7.md)). EPIC-1 anchors only the static-data / chain-list slice of the CDN proxy layer (AD-25).
 
@@ -71,9 +71,9 @@ runtime* translation channel (FR-4).
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-1 | [US-1.1](../stories/US-1.1-mv3-service-worker-background.md) | 📋 backlog |
-| FR-2 | [US-1.2](../stories/US-1.2-yarn-3-monorepo-shared-across-extension-web-mobile.md) | 📋 backlog |
-| FR-3 | [US-1.3](../stories/US-1.3-online-chain-list-hot-update.md) | 📋 backlog |
+| FR-1 | [US-1.1](../stories/US-1.1-mv3-service-worker-background.md) | ✅ done |
+| FR-2 | [US-1.2](../stories/US-1.2-yarn-3-monorepo-shared-across-extension-web-mobile.md) | ✅ done |
+| FR-3 | [US-1.3](../stories/US-1.3-online-chain-list-hot-update.md) | ✅ done |
 | FR-4 | [US-1.4](../stories/US-1.4-online-i18n-hot-update.md) | 📋 backlog |
 
 > FR statuses above are **story-planning** statuses (Stream B; all `📋 backlog`).
@@ -101,9 +101,9 @@ runtime* translation channel (FR-4).
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-1.1](../stories/US-1.1-mv3-service-worker-background.md) | MV3 service-worker background | Run the background as an MV3 service worker that survives shutdown/wake and is accepted by Chrome and Firefox | 📋 backlog | — |
-| [US-1.2](../stories/US-1.2-yarn-3-monorepo-shared-across-extension-web-mobile.md) | Yarn 3 monorepo shared across extension/web/mobile | One `extension-base` core reused by extension, web app and mobile web-runner | 📋 backlog | — |
-| [US-1.3](../stories/US-1.3-online-chain-list-hot-update.md) | Online chain-list hot-update | Add networks/tokens/logos and toggle XCM routes without a release | 📋 backlog | — |
+| [US-1.1](../stories/US-1.1-mv3-service-worker-background.md) | MV3 service-worker background | Run the background as an MV3 service worker that survives shutdown/wake and is accepted by Chrome and Firefox | ✅ done | 1.2.7 |
+| [US-1.2](../stories/US-1.2-yarn-3-monorepo-shared-across-extension-web-mobile.md) | Yarn 3 monorepo shared across extension/web/mobile | One `extension-base` core reused by extension, web app and mobile web-runner | ✅ done | 1.1.36 |
+| [US-1.3](../stories/US-1.3-online-chain-list-hot-update.md) | Online chain-list hot-update | Add networks/tokens/logos and toggle XCM routes without a release | ✅ done | 1.1.50 |
 | [US-1.4](../stories/US-1.4-online-i18n-hot-update.md) | Online i18n hot-update | Fetch updated UI translations at runtime without a release | 📋 backlog | — |
 | [US-1.5](../stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md) | Build, CI, packaging & supply-chain hardening | Keep the build/webpack/packaging pipeline shippable across browsers (Firefox MV3, Brave uninstall, Jest env, online-resource fallback) and the dependency tree auditable (lockfile / npm-registry / audit gate, NFR-19) | 📋 backlog | — |
 

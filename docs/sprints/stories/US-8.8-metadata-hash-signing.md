@@ -2,16 +2,16 @@
 id: US-8.8
 title: "Metadata-hash signing"
 epic: EPIC-8
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 1.2.5
 prd_ref: [FR-81]
 arch_ref: [AD-21]
 depends_on:
-assignee:
-commit:
+assignee: saltict
+commit: d0e7d312ec
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -46,26 +46,26 @@ are backfilled during version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a Substrate extrinsic to be signed, **When** the signing
+- [x] **AC-1** — **Given** a Substrate extrinsic to be signed, **When** the signing
   request is built, **Then** the check-metadata-hash signed extension is populated
   with the correct runtime metadata hash for the target chain.
-- [ ] **AC-2** — **Given** a Polkadot Generic Ledger app, **When** the user signs
+- [x] **AC-2** — **Given** a Polkadot Generic Ledger app, **When** the user signs
   the extrinsic, **Then** the device decodes and displays the extrinsic's
   human-readable details (call, amount, destination) rather than a blind hash.
-- [ ] **AC-3** — **Given** the signing flow, **When** the request is presented,
+- [x] **AC-3** — **Given** the signing flow, **When** the request is presented,
   **Then** it is routed through the RequestService per-ecosystem Substrate handler
   (AD-21), not signed inline in the feature flow.
-- [ ] **AC-4** — **Given** a chain whose metadata hash cannot be obtained or
+- [x] **AC-4** — **Given** a chain whose metadata hash cannot be obtained or
   verified, **When** the user attempts metadata-hash signing, **Then** the flow
   surfaces a clear unsupported/error state instead of producing an extrinsic that
   the device will reject or mis-decode.
 
 ## Tasks
 
-- [ ] **TASK-8.8.1** — Populate the check-metadata-hash signed extension with the correct chain metadata hash (AC: 1)
-- [ ] **TASK-8.8.2** — Route the signing request through the RequestService Substrate handler (AC: 3)
-- [ ] **TASK-8.8.3** — Verify Generic Ledger app decodes the extrinsic to human-readable detail (AC: 2)
-- [ ] **TASK-8.8.4** — Unsupported/error state when the metadata hash is unavailable or unverifiable (AC: 4)
+- [x] **TASK-8.8.1** — Populate the check-metadata-hash signed extension with the correct chain metadata hash (AC: 1)
+- [x] **TASK-8.8.2** — Route the signing request through the RequestService Substrate handler (AC: 3)
+- [x] **TASK-8.8.3** — Verify Generic Ledger app decodes the extrinsic to human-readable detail (AC: 2)
+- [x] **TASK-8.8.4** — Unsupported/error state when the metadata hash is unavailable or unverifiable (AC: 4)
 
 ## Dev notes
 

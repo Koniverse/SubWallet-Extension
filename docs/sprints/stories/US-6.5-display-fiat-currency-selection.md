@@ -2,16 +2,16 @@
 id: US-6.5
 title: "Select display fiat currency for balances and prices"
 epic: EPIC-6
-status: backlog
+status: done
 priority: P2
 points: 2
 sprint:
-version_shipped:
+version_shipped: 1.1.60
 prd_ref: [FR-67]
 arch_ref: [AD-03]
 depends_on: [US-6.4]
-assignee:
-commit:
+assignee: saltict
+commit: d4f9d30e83, 8cccdd03e8, 6124ae2e6c
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -32,7 +32,7 @@ others), persisted by the background `SettingService` via the
 
 The scope boundary is deliberate and narrow: this story owns the **picker and the
 persisted preference**, not the conversion math. The balance epic
-([EPIC-7](EPIC-7.md)) reads the selected currency and computes/formats the
+([EPIC-7](../epics/EPIC-7.md)) reads the selected currency and computes/formats the
 converted amounts on every balance and price surface — that is why this is a
 small story (a settings selector + a persisted preference), not a large one.
 Conversion rates themselves are sourced through the cache/proxy layer
@@ -45,27 +45,27 @@ backfilled during version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the Settings currency entry, **When** the user selects
+- [x] **AC-1** — **Given** the Settings currency entry, **When** the user selects
   a supported `CurrencyType`, **Then** the choice is persisted via
   `pri(settings.savePriceCurrency)` and survives reload / app restart.
-- [ ] **AC-2** — **Given** a selected display currency, **When** balances and
+- [x] **AC-2** — **Given** a selected display currency, **When** balances and
   prices render, **Then** they display in the selected currency's symbol/format
   across every surface (the conversion itself is performed by EPIC-7 reading this
   preference).
-- [ ] **AC-3** — **Given** no prior selection, **When** the wallet first runs,
+- [x] **AC-3** — **Given** no prior selection, **When** the wallet first runs,
   **Then** the display currency defaults to USD (`DEFAULT_CURRENCY`).
-- [ ] **AC-4** — **Given** the selection is changed, **When** the new currency is
+- [x] **AC-4** — **Given** the selection is changed, **When** the new currency is
   applied, **Then** all open balance/price surfaces re-render in the new currency
   without requiring a manual refresh.
 
 ## Tasks
 
-- [ ] **TASK-6.5.1** — Currency-selector UI in Settings over the supported
+- [x] **TASK-6.5.1** — Currency-selector UI in Settings over the supported
   `CurrencyType` set (AC: 1, 3)
-- [ ] **TASK-6.5.2** — Persist the choice via `pri(settings.savePriceCurrency)`
+- [x] **TASK-6.5.2** — Persist the choice via `pri(settings.savePriceCurrency)`
   on the background `SettingService` (AC: 1, 4)
-  - [ ] Confirm `DEFAULT_CURRENCY = 'usd'` as the fallback default.
-- [ ] **TASK-6.5.3** — Ensure balance/price surfaces re-render reactively on
+  - [x] Confirm `DEFAULT_CURRENCY = 'usd'` as the fallback default.
+- [x] **TASK-6.5.3** — Ensure balance/price surfaces re-render reactively on
   change (the preference is the source of truth EPIC-7 reads) (AC: 2, 4)
 
 ## Dev notes
@@ -81,7 +81,7 @@ backfilled during version reconciliation.
 
 - Builds on [US-6.4](US-6.4-settings-management.md) — the currency selector lives
   in the Settings surface that story owns.
-- Required by [EPIC-7](EPIC-7.md) balance stories — they read the persisted
+- Required by [EPIC-7](../epics/EPIC-7.md) balance stories — they read the persisted
   `CurrencyType` to convert and format displayed amounts. This story does NOT
   perform the conversion.
 

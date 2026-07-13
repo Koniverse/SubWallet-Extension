@@ -2,16 +2,16 @@
 id: US-5.4
 title: "Unified unlock / auto-lock flow"
 epic: EPIC-5
-status: backlog
+status: done
 priority: P0
 points: 3
 sprint:
-version_shipped:
+version_shipped: 1.0.2
 prd_ref: [FR-55]
 arch_ref: [AD-03, AD-04]
 depends_on: [US-5.2]
-assignee:
-commit:
+assignee: S2kael
+commit: 26d1307998, 896ccb5263, 3d4d28e56e
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -46,26 +46,26 @@ reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a locked wallet, **When** the user enters the correct
+- [x] **AC-1** — **Given** a locked wallet, **When** the user enters the correct
   master password, **Then** the entire wallet unlocks through one surface and all
   accounts become usable.
-- [ ] **AC-2** — **Given** an unlocked wallet, **When** the user locks it (manually
+- [x] **AC-2** — **Given** an unlocked wallet, **When** the user locks it (manually
   or via auto-lock), **Then** the in-memory decrypted key is cleared in the
   background and no feature can sign until re-unlock.
-- [ ] **AC-3** — **Given** an unlock attempt with the wrong password, **When**
+- [x] **AC-3** — **Given** an unlock attempt with the wrong password, **When**
   submitted, **Then** the wallet stays locked and surfaces an error (no partial
   unlock).
-- [ ] **AC-4** — **Given** the MV3 service worker sleeps and wakes while locked,
+- [x] **AC-4** — **Given** the MV3 service worker sleeps and wakes while locked,
   **When** it wakes, **Then** the wallet remains locked (it never silently
   re-unlocks across the lifecycle, LESSONS §7).
 
 ## Tasks
 
-- [ ] **TASK-5.4.1** — Single unlock surface validating the master password (AC: 1, 3)
-  - [ ] Validate in the background keyring (AD-04); surface only locked/unlocked over the bus (AD-03).
-- [ ] **TASK-5.4.2** — Unified lock action clears the in-memory key (AC: 2)
-- [ ] **TASK-5.4.3** — Wrong-password handling keeps the wallet locked (AC: 3)
-- [ ] **TASK-5.4.4** — Lock state survives MV3 wake/sleep without auto-unlock (AC: 4) — reconstruct safely on wake (LESSONS §7)
+- [x] **TASK-5.4.1** — Single unlock surface validating the master password (AC: 1, 3)
+  - [x] Validate in the background keyring (AD-04); surface only locked/unlocked over the bus (AD-03).
+- [x] **TASK-5.4.2** — Unified lock action clears the in-memory key (AC: 2)
+- [x] **TASK-5.4.3** — Wrong-password handling keeps the wallet locked (AC: 3)
+- [x] **TASK-5.4.4** — Lock state survives MV3 wake/sleep without auto-unlock (AC: 4) — reconstruct safely on wake (LESSONS §7)
 
 ## Dev notes
 

@@ -2,16 +2,16 @@
 id: US-4.7
 title: "TON network integration"
 epic: EPIC-4
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 1.3.1
 prd_ref: [FR-38]
 arch_ref: [AD-13]
 depends_on: [US-4.1]
-assignee:
-commit:
+assignee: bluezdot
+commit: 7119ac0e44, e23ecdf9a2
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -44,24 +44,24 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an account, **When** TON is enabled, **Then** a TON
+- [x] **AC-1** — **Given** an account, **When** TON is enabled, **Then** a TON
   address is derived from the unified seed using the selected wallet-contract
   version (default v5), and balances load via TonCenter (AD-13).
-- [ ] **AC-2** — **Given** an enabled TON account, **When** the user selects a
+- [x] **AC-2** — **Given** an enabled TON account, **When** the user selects a
   different contract version (v3r1 / v3r2 / v4 / v5), **Then** the corresponding
   address is shown and its balance resolves, with no separate seed/backup (AD-11).
-- [ ] **AC-3** — **Given** a TON account holding Jetton tokens, **When** balances
+- [x] **AC-3** — **Given** a TON account holding Jetton tokens, **When** balances
   load, **Then** TEP-74 Jettons are listed alongside native TON.
-- [ ] **AC-4** — **Given** the TonCenter endpoint is unreachable, **When** data is
+- [x] **AC-4** — **Given** the TonCenter endpoint is unreachable, **When** data is
   requested, **Then** a clear unavailable state is shown without breaking other
   ecosystems.
 
 ## Tasks
 
-- [ ] **TASK-4.7.1** — TON API object via `@ton/ton` TonClient against TonCenter, wired into `ChainService` (AC: 1, 4)
-- [ ] **TASK-4.7.2** — Selectable wallet-contract version (v3r1/v3r2/v4/v5, default v5) with per-version address derivation (AC: 1, 2)
-- [ ] **TASK-4.7.3** — TEP-74 Jetton asset type + balance read (AC: 3)
-- [ ] **TASK-4.7.4** — TonCenter-unavailable error state (AC: 4)
+- [x] **TASK-4.7.1** — TON API object via `@ton/ton` TonClient against TonCenter, wired into `ChainService` (AC: 1, 4)
+- [x] **TASK-4.7.2** — Selectable wallet-contract version (v3r1/v3r2/v4/v5, default v5) with per-version address derivation (AC: 1, 2)
+- [x] **TASK-4.7.3** — TEP-74 Jetton asset type + balance read (AC: 3)
+- [x] **TASK-4.7.4** — TonCenter-unavailable error state (AC: 4)
 
 ## Dev notes
 
@@ -106,7 +106,7 @@ external system integration).
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (batch 1, commit `571f3085be`). Version `1.3.1` is the release whose docs/CHANGELOG.md bullet first delivers this story's headline capability; commits `7119ac0e44, e23ecdf9a2` were resolved from that bullet's issue number (`git log --grep`, filtered to a ±270-day window around the release date to exclude same-numbered upstream polkadot-js PRs) and each verified contained in the v1.3.1 anchor via `git merge-base --is-ancestor`. Assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

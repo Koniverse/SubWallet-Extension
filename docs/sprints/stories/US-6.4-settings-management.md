@@ -2,16 +2,16 @@
 id: US-6.4
 title: "Settings management: network selection, token preferences, account metadata"
 epic: EPIC-6
-status: backlog
+status: done
 priority: P2
 points: 3
 sprint:
-version_shipped:
+version_shipped: 0.4.3
 prd_ref: [FR-66]
 arch_ref: [AD-03]
 depends_on:
-assignee:
-commit:
+assignee: saltict
+commit: af8c77e83def34654b1c7c81f786f0aa0a1370da, da4625282849d4d6f83061e0020238b13830f363, 79c57961eb82defe446d61346d57578d443dff2c
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -38,8 +38,8 @@ All preference reads/writes cross the typed message bus
 mutates chain or key state directly; it sends `pri(…)` requests the background
 applies. This story owns the **preference surface**, not the *behavior* behind
 every entry point: the security entries (master password, auto-lock) render here
-but their policy is owned by [EPIC-5](EPIC-5.md), and account-identity flows are
-owned by [EPIC-3](EPIC-3.md). Display-currency selection — also a Settings entry
+but their policy is owned by [EPIC-5](../epics/EPIC-5.md), and account-identity flows are
+owned by [EPIC-3](../epics/EPIC-3.md). Display-currency selection — also a Settings entry
 — is split into its own story [US-6.5](US-6.5-display-fiat-currency-selection.md)
 because it has its own FR (FR-67).
 
@@ -49,33 +49,33 @@ backfilled during version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the Settings screen, **When** the user enables or
+- [x] **AC-1** — **Given** the Settings screen, **When** the user enables or
   disables a network, **Then** the change persists via the background
   `SettingService` and the affected chain's assets appear/disappear across the
   app.
-- [ ] **AC-2** — **Given** token preferences, **When** the user toggles a token's
+- [x] **AC-2** — **Given** token preferences, **When** the user toggles a token's
   visibility (or adds a custom token), **Then** the preference persists and is
   honored on every balance/asset surface.
-- [ ] **AC-3** — **Given** account metadata, **When** the user renames or
+- [x] **AC-3** — **Given** account metadata, **When** the user renames or
   re-labels an account, **Then** the new name persists and is reflected
   everywhere the account is shown.
-- [ ] **AC-4** — **Given** any Settings mutation, **When** it is applied, **Then**
+- [x] **AC-4** — **Given** any Settings mutation, **When** it is applied, **Then**
   it is sent over the typed `pri(…)` message bus
   ([AD-03](../../ARCHITECTURE.md#architecture-decisions)) — the UI never mutates
   chain/key state directly.
-- [ ] **AC-5** — **Given** an invalid preference input (e.g. a malformed custom-
+- [x] **AC-5** — **Given** an invalid preference input (e.g. a malformed custom-
   token contract), **When** the user submits it, **Then** the setting is rejected
   with a clear error and no partial/corrupt state is persisted.
 
 ## Tasks
 
-- [ ] **TASK-6.4.1** — Network selection UI + persistence via `SettingService`
+- [x] **TASK-6.4.1** — Network selection UI + persistence via `SettingService`
   (AC: 1, 4)
-- [ ] **TASK-6.4.2** — Token preference / visibility + custom-token entry (AC: 2,
+- [x] **TASK-6.4.2** — Token preference / visibility + custom-token entry (AC: 2,
   4, 5)
-- [ ] **TASK-6.4.3** — Account metadata (rename / label) persistence and
+- [x] **TASK-6.4.3** — Account metadata (rename / label) persistence and
   propagation (AC: 3, 4)
-- [ ] **TASK-6.4.4** — Validate preference inputs and surface error states; ensure
+- [x] **TASK-6.4.4** — Validate preference inputs and surface error states; ensure
   the theme selector stays hidden (FR-63, US-6.1) (AC: 5)
 
 ## Dev notes
@@ -94,8 +94,8 @@ backfilled during version reconciliation.
 - Sibling [US-6.5](US-6.5-display-fiat-currency-selection.md) — the display-currency
   entry lives in this same Settings surface but is materialized separately under
   FR-67.
-- Renders entry points whose behavior is owned by [EPIC-5](EPIC-5.md) (security
-  settings) and [EPIC-3](EPIC-3.md) (account flows) — this story does not own
+- Renders entry points whose behavior is owned by [EPIC-5](../epics/EPIC-5.md) (security
+  settings) and [EPIC-3](../epics/EPIC-3.md) (account flows) — this story does not own
   those policies.
 
 ### What we explicitly did NOT do

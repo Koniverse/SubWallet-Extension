@@ -2,16 +2,16 @@
 id: US-9.5
 title: "NFT transfer (send)"
 epic: EPIC-9
-status: backlog
+status: done
 priority: P1
 points: 3
 sprint:
-version_shipped:
+version_shipped: 0.2.8
 prd_ref: [FR-89]
 arch_ref:
 depends_on: [US-9.1, US-9.3]
-assignee:
-commit:
+assignee: nulllpc
+commit: c586a78109, b5d6f46647, f30463904d
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -38,16 +38,16 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an owned NFT and a valid recipient address, **When** the user confirms the send, **Then** a standard-appropriate transfer request is built, signed via the transaction pipeline, submitted, and appears in history.
-- [ ] **AC-2** — **Given** a recipient address that is invalid or wrong-format for the NFT's chain, **When** the user attempts to send, **Then** a clear validation error is shown and nothing is submitted.
-- [ ] **AC-3** — **Given** the account lacks the native balance to pay the transfer fee, **When** the user attempts to send, **Then** an insufficient-fee error is shown before signing.
+- [x] **AC-1** — **Given** an owned NFT and a valid recipient address, **When** the user confirms the send, **Then** a standard-appropriate transfer request is built, signed via the transaction pipeline, submitted, and appears in history.
+- [x] **AC-2** — **Given** a recipient address that is invalid or wrong-format for the NFT's chain, **When** the user attempts to send, **Then** a clear validation error is shown and nothing is submitted.
+- [x] **AC-3** — **Given** the account lacks the native balance to pay the transfer fee, **When** the user attempts to send, **Then** an insufficient-fee error is shown before signing.
 
 ## Tasks
 
-- [ ] **TASK-9.5.1** — Build the standard-appropriate NFT transfer request (Substrate extrinsic / EVM `transferFrom`) (AC: 1)
-- [ ] **TASK-9.5.2** — Hand the request to the transaction pipeline; track the result in history (AC: 1)
-- [ ] **TASK-9.5.3** — Recipient address validation per chain (AC: 2)
-- [ ] **TASK-9.5.4** — Pre-sign fee/balance check (AC: 3)
+- [x] **TASK-9.5.1** — Build the standard-appropriate NFT transfer request (Substrate extrinsic / EVM `transferFrom`) (AC: 1)
+- [x] **TASK-9.5.2** — Hand the request to the transaction pipeline; track the result in history (AC: 1)
+- [x] **TASK-9.5.3** — Recipient address validation per chain (AC: 2)
+- [x] **TASK-9.5.4** — Pre-sign fee/balance check (AC: 3)
 
 ## Dev notes
 
@@ -83,7 +83,11 @@ already shipped.
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-d08`; trace confidence: high, rule: first-delivery).
+
+**Evidence:** CHANGELOG [0.2.8] — 2022-03-18: "Send and Receive NFT: Acala, RMRK, Quartz, Statemine" — earliest bullet delivering NFT send (0.2.1/0.2.2 were display-only); feature commit c586a78109 "done transfer nft" (2022-03-17) is first tagged in v0.2.8 (merge-base ancestor verified, NOT in v0.2.7).
+
+Commits `c586a78109, b5d6f46647, f30463904d` verified contained in the v0.2.8 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

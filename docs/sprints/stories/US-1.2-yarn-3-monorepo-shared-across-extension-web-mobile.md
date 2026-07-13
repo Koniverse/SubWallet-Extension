@@ -2,16 +2,16 @@
 id: US-1.2
 title: "Yarn 3 monorepo shared across extension, web app and mobile"
 epic: EPIC-1
-status: backlog
+status: done
 priority: P0
 points: 5
 sprint:
-version_shipped:
+version_shipped: 1.1.36
 prd_ref: [FR-2]
 arch_ref: [AD-05, AD-06]
 depends_on:
-assignee:
-commit:
+assignee: saltict
+commit: 918864fcfb, b319f9a32b
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -54,32 +54,32 @@ that keeps it under the Firefox limit is hardened in
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the monorepo, **When** the workspace is installed,
+- [x] **AC-1** — **Given** the monorepo, **When** the workspace is installed,
   **Then** the codebase resolves as Yarn 3 packages with explicit peer/runtime
   dependencies and `@subwallet/extension-base` is a shared dependency of
   `extension-koni`, `webapp` and `web-runner` (AD-05).
-- [ ] **AC-2** — **Given** the shared core, **When** `extension-base` is built,
+- [x] **AC-2** — **Given** the shared core, **When** `extension-base` is built,
   **Then** it contains no import of an extension-only, webapp-only or
   web-runner-only API — the same background logic is portable across all three
   contexts (NFR-17).
-- [ ] **AC-3** — **Given** the extension Webpack build, **When** it emits its
+- [x] **AC-3** — **Given** the extension Webpack build, **When** it emits its
   output, **Then** the bundle is split into many chunks and **no single emitted
   file exceeds Firefox's ~4 MB per-file submission limit** (AD-06, NFR-9).
-- [ ] **AC-4** — **Given** dependency policy, **When** the lockfile and manifests
+- [x] **AC-4** — **Given** dependency policy, **When** the lockfile and manifests
   are inspected, **Then** the Yarn 3 lock is committed and core wallet packages
   declare no private-registry dependency (NFR-19) — the supply-chain unhappy path
   (a private/unpublished core dep) is rejected.
 
 ## Tasks
 
-- [ ] **TASK-1.2.1** — Establish the twelve-package Yarn 3 workspace (AC: 1)
-  - [ ] Define package boundaries with explicit peer/runtime deps per AD-05; wire `extension-base` as the shared core.
-- [ ] **TASK-1.2.2** — Enforce `extension-base` platform-agnosticism (AC: 2)
-  - [ ] Keep extension/webapp/web-runner-specific code out of `extension-base`; build all three targets to prove portability (NFR-17).
-- [ ] **TASK-1.2.3** — Configure Webpack 5 chunk splitting (AC: 3)
-  - [ ] Set `packages/extension-koni/webpack.config.cjs` to split output into sub-4 MB chunks (AD-06).
-- [ ] **TASK-1.2.4** — Dependency-hygiene gate (AC: 4)
-  - [ ] Commit the Yarn 3 lockfile; assert no private-registry deps in core packages (NFR-19).
+- [x] **TASK-1.2.1** — Establish the twelve-package Yarn 3 workspace (AC: 1)
+  - [x] Define package boundaries with explicit peer/runtime deps per AD-05; wire `extension-base` as the shared core.
+- [x] **TASK-1.2.2** — Enforce `extension-base` platform-agnosticism (AC: 2)
+  - [x] Keep extension/webapp/web-runner-specific code out of `extension-base`; build all three targets to prove portability (NFR-17).
+- [x] **TASK-1.2.3** — Configure Webpack 5 chunk splitting (AC: 3)
+  - [x] Set `packages/extension-koni/webpack.config.cjs` to split output into sub-4 MB chunks (AD-06).
+- [x] **TASK-1.2.4** — Dependency-hygiene gate (AC: 4)
+  - [x] Commit the Yarn 3 lockfile; assert no private-registry deps in core packages (NFR-19).
 
 ## Dev notes
 

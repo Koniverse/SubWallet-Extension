@@ -310,11 +310,11 @@ Dev server:    `yarn web-runner:dev`
 
 ### Release versioning
 
-The canonical user-facing version is `1.3.79`, recorded in:
-- Root `package.json` (`"version": "1.3.79"`)
+The canonical user-facing version is `1.3.82`, recorded in:
+- Root `package.json` (`"version": "1.3.82"`)
 - `VERSION` file (repo root)
 
-Internal monorepo packages carry the suffix `-1` (`1.3.79-1`).
+Internal monorepo packages carry a `-N` suffix (`1.3.82-0`).
 CI (GitHub Actions) generates dev versions automatically; stable releases
 require manual version bump in root `package.json` and `CHANGELOG.md`
 update before tagging.

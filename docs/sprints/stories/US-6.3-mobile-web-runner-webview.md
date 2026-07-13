@@ -2,16 +2,16 @@
 id: US-6.3
 title: "Mobile app support via web-runner / WebView strategy"
 epic: EPIC-6
-status: backlog
+status: done
 priority: P2
 points: 5
 sprint:
-version_shipped:
+version_shipped: 0.4.2
 prd_ref: [FR-65]
 arch_ref: [AD-05, AD-03]
 depends_on: [US-6.1]
-assignee:
-commit:
+assignee: saltict
+commit: b319f9a32b, db39e513c1, 77e5bce0d3
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -52,32 +52,32 @@ story is **retroactive** — the capability already ships in the product; `commi
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the `@subwallet/web-runner` host, **When** it loads in
+- [x] **AC-1** — **Given** the `@subwallet/web-runner` host, **When** it loads in
   a WebView/iframe context, **Then** it runs the same `extension-base` background
   logic the extension uses (no native reimplementation of keyring/chain/signing).
-- [ ] **AC-2** — **Given** the mobile UI, **When** it invokes a background
+- [x] **AC-2** — **Given** the mobile UI, **When** it invokes a background
   operation, **Then** it communicates **only** over the typed
   `pri(…)`/`pub(…)`/`mobile(…)` message bus
   ([AD-03](../../ARCHITECTURE.md#architecture-decisions)) — never a direct key or
   RPC call from the UI layer.
-- [ ] **AC-3** — **Given** the mobile host starts, **When** it initializes,
+- [x] **AC-3** — **Given** the mobile host starts, **When** it initializes,
   **Then** it re-injects reset data and **always full-starts** (no idle sleep
   state, unlike the extension's MV3 wake/sleep lifecycle).
-- [ ] **AC-4** — **Given** the WebView loses or re-establishes its context, **When**
+- [x] **AC-4** — **Given** the WebView loses or re-establishes its context, **When**
   the host re-injects, **Then** the background re-initializes deterministically
   without leaking key material across the bridge boundary.
 
 ## Tasks
 
-- [ ] **TASK-6.3.1** — Host `extension-base` inside the WebView iframe via
+- [x] **TASK-6.3.1** — Host `extension-base` inside the WebView iframe via
   `@subwallet/web-runner` (AC: 1)
-  - [ ] Confirm entry/build in `packages/web-runner/webpack.config.cjs`.
-- [ ] **TASK-6.3.2** — Route all UI ↔ background traffic over the typed message
+  - [x] Confirm entry/build in `packages/web-runner/webpack.config.cjs`.
+- [x] **TASK-6.3.2** — Route all UI ↔ background traffic over the typed message
   bus, including the `mobile(…)` wake path (AC: 2)
-  - [ ] Verify no keyring/RPC access leaks into the mobile UI package.
-- [ ] **TASK-6.3.3** — Implement the re-inject-then-full-start lifecycle (no sleep
+  - [x] Verify no keyring/RPC access leaks into the mobile UI package.
+- [x] **TASK-6.3.3** — Implement the re-inject-then-full-start lifecycle (no sleep
   state) (AC: 3, 4)
-- [ ] **TASK-6.3.4** — Verify deterministic re-init on WebView context reset with
+- [x] **TASK-6.3.4** — Verify deterministic re-init on WebView context reset with
   no key bytes crossing the bridge (AC: 4)
 
 ## Dev notes
@@ -89,7 +89,7 @@ story is **retroactive** — the capability already ships in the product; `commi
 - [AD-03](../../ARCHITECTURE.md#architecture-decisions) — the WebView host
   crosses the same UI/background message-bus boundary; the `mobile(…)` message
   wakes the background fully. (AD-03's primary implementation is owned by
-  [EPIC-2](EPIC-2.md); referenced here as the boundary the host honors.)
+  [EPIC-2](../epics/EPIC-2.md); referenced here as the boundary the host honors.)
 - [NFR-17](../../PRD.md#non-functional-requirements) — cross-platform portability of `extension-base` to the
   mobile WebView context.
 - This story does NOT introduce new AD entries.
@@ -100,7 +100,7 @@ story is **retroactive** — the capability already ships in the product; `commi
   the dark-only responsive UI (`extension-koni-ui`).
 - Sibling [US-6.2](US-6.2-web-app-feature-parity.md) — the other shared-background
   platform target; both depend on `extension-base` staying host-agnostic.
-- Consumes the request/lifecycle plumbing owned by [EPIC-2](EPIC-2.md)
+- Consumes the request/lifecycle plumbing owned by [EPIC-2](../epics/EPIC-2.md)
   (RequestService, MV3/mobile lifecycle); this story does not own it.
 
 ### What we explicitly did NOT do

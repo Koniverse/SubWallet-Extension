@@ -2,16 +2,16 @@
 id: US-2.6
 title: "Fee engine"
 epic: EPIC-2
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 1.1.41
 prd_ref: [FR-10]
 arch_ref: [AD-02]
 depends_on: [US-2.2]
-assignee:
-commit:
+assignee: saltict
+commit: 9209aaa16e, fd79e17afc, 73a2df0372
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -46,24 +46,24 @@ This story is **Retroactive** — the engine already ships; `commit` /
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a Substrate extrinsic, **When** a fee is estimated,
+- [x] **AC-1** — **Given** a Substrate extrinsic, **When** a fee is estimated,
   **Then** the engine returns the partial fee and supports an optional tip.
-- [ ] **AC-2** — **Given** an EVM transaction, **When** a fee is estimated,
+- [x] **AC-2** — **Given** an EVM transaction, **When** a fee is estimated,
   **Then** the engine returns an EIP-1559 estimate (base + priority) usable for
   submission.
-- [ ] **AC-3** — **Given** a chain that supports non-native fee tokens (e.g.
+- [x] **AC-3** — **Given** a chain that supports non-native fee tokens (e.g.
   Asset Hub `assetConversion`), **When** the user pays the fee in a non-native
   token, **Then** the engine computes the fee in that token.
-- [ ] **AC-4** — **Given** fee-rate data is unavailable for a chain, **When**
+- [x] **AC-4** — **Given** fee-rate data is unavailable for a chain, **When**
   estimation runs, **Then** the engine surfaces a typed "fee unavailable" result
   rather than returning a silent zero or stale value that could under-fund a tx.
 
 ## Tasks
 
-- [ ] **TASK-2.6.1** — Substrate partial-fee + optional tip estimation (AC: 1)
-- [ ] **TASK-2.6.2** — EVM EIP-1559 gas estimation (AC: 2)
-- [ ] **TASK-2.6.3** — Non-native fee-token computation (Asset Hub `assetConversion`) (AC: 3)
-- [ ] **TASK-2.6.4** — Typed "fee unavailable" path when rate data is missing (AC: 4)
+- [x] **TASK-2.6.1** — Substrate partial-fee + optional tip estimation (AC: 1)
+- [x] **TASK-2.6.2** — EVM EIP-1559 gas estimation (AC: 2)
+- [x] **TASK-2.6.3** — Non-native fee-token computation (Asset Hub `assetConversion`) (AC: 3)
+- [x] **TASK-2.6.4** — Typed "fee unavailable" path when rate data is missing (AC: 4)
 
 ## Dev notes
 

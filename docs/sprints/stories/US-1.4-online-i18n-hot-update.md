@@ -30,7 +30,7 @@ is published.
 All user-facing strings are authored in English first and translations are
 **bundled per locale** in the extension package, loaded from
 `locales/{lng}/translation.json` (NFR-13). That bundling is owned by
-[EPIC-19](../epics/EPIC-19.md) (FR-155, the VI/ZH/JA/RU multi-language UI). What is
+[EPIC-19](../epics/EPIC-19.md) (FR-153, the VI/ZH/JA/RU multi-language UI). What is
 *missing* is a way to update those translations between releases — exactly the
 release-free delivery problem the chain-list already solved
 ([US-1.3](US-1.3-online-chain-list-hot-update.md)).
@@ -90,18 +90,18 @@ Extension - Feature Request: Online i18n Management with Texterify Integration, 
 ### Cross-story dependencies
 
 - Builds on [US-1.3](US-1.3-online-chain-list-hot-update.md) — reuses the AD-25 fetch + bundled-fallback helper rather than rebuilding it.
-- Consumes the bundled per-locale files owned by [EPIC-19](../epics/EPIC-19.md) (FR-155); this story adds only the *online override* layer on top.
+- Consumes the bundled per-locale files owned by [EPIC-19](../epics/EPIC-19.md) (FR-153); this story adds only the *online override* layer on top.
 
 ### What we explicitly did NOT do
 
-- No new bundled languages — that is FR-155 / [EPIC-19](../epics/EPIC-19.md). This story only adds the runtime override channel for languages that already ship.
+- No new bundled languages — that is FR-153 / [EPIC-19](../epics/EPIC-19.md). This story only adds the runtime override channel for languages that already ship.
 - No translation-authoring tooling/CMS — out of scope; the channel consumes a published payload.
 
 ### References
 
 - [Source: PRD FR-4](../../PRD.md#functional-requirements) — online i18n hot-update (planned)
 - [Source: PRD NFR-13](../../PRD.md#non-functional-requirements) — English-canonical i18n, bundled per-locale, planned online hot-update
-- [Source: PRD FR-155](../../PRD.md#functional-requirements) — bundled multi-language UI (EPIC-19, the language set this overrides)
+- [Source: PRD FR-153](../../PRD.md#functional-requirements) — bundled multi-language UI (EPIC-19, the language set this overrides)
 - [Source: ARCHITECTURE AD-25](../../ARCHITECTURE.md#architecture-decisions)
 - [Roadmap: #4560](https://github.com/Koniverse/SubWallet-Extension/issues/4560) — Online i18n Management with Texterify Integration
 - [Roadmap: #4746](https://github.com/Koniverse/SubWallet-Extension/issues/4746) — [i18n][Research] Technical study & documentation for online i18n

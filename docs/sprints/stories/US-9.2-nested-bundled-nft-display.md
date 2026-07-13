@@ -2,16 +2,16 @@
 id: US-9.2
 title: "Nested / bundled NFT display"
 epic: EPIC-9
-status: backlog
+status: done
 priority: P1
 points: 3
 sprint:
-version_shipped:
+version_shipped: 1.3.80
 prd_ref: [FR-86]
 arch_ref: [AD-24]
 depends_on: [US-9.1]
-assignee:
-commit:
+assignee: frenkie-ng
+commit: 896d66c588, bef3b8ad5b, c46bd61c02
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -37,16 +37,16 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an NFT that bundles children, **When** the user opens it, **Then** it is shown as a bundle with its nested tokens listed and a way to drill into each child.
-- [ ] **AC-2** — **Given** a child NFT viewed inside a bundle, **When** the user navigates up, **Then** the parent is resolved and shown (parent lookup walks `parentId`).
-- [ ] **AC-3** — **Given** a non-nested NFT, **When** the user opens it, **Then** it renders as a normal item (no empty "bundle" affordance).
+- [x] **AC-1** — **Given** an NFT that bundles children, **When** the user opens it, **Then** it is shown as a bundle with its nested tokens listed and a way to drill into each child.
+- [x] **AC-2** — **Given** a child NFT viewed inside a bundle, **When** the user navigates up, **Then** the parent is resolved and shown (parent lookup walks `parentId`).
+- [x] **AC-3** — **Given** a non-nested NFT, **When** the user opens it, **Then** it renders as a normal item (no empty "bundle" affordance).
 
 ## Tasks
 
-- [ ] **TASK-9.2.1** — Bundle-tree resolution in the Unique handler (`isBundle`, `nestingTokens`, `nestingLevel`, `parentId`) (AC: 1, 2)
-- [ ] **TASK-9.2.2** — Nested-NFT UI: bundle detail + structure view + navigate into children (AC: 1)
-- [ ] **TASK-9.2.3** — Parent lookup hook walking `parentId` for up-navigation (AC: 2)
-- [ ] **TASK-9.2.4** — Non-nested item path unaffected (AC: 3)
+- [x] **TASK-9.2.1** — Bundle-tree resolution in the Unique handler (`isBundle`, `nestingTokens`, `nestingLevel`, `parentId`) (AC: 1, 2)
+- [x] **TASK-9.2.2** — Nested-NFT UI: bundle detail + structure view + navigate into children (AC: 1)
+- [x] **TASK-9.2.3** — Parent lookup hook walking `parentId` for up-navigation (AC: 2)
+- [x] **TASK-9.2.4** — Non-nested item path unaffected (AC: 3)
 
 ## Dev notes
 
@@ -82,7 +82,11 @@ already shipped.
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-d08`; trace confidence: medium, rule: first-delivery).
+
+**Evidence:** 1.3.80 (2026-06-02): "Implement NFTService + Migrate EVM & Unique Network NFT logic (Phase 1) (#4884)" — the bullet names the NFT-service/Unique migration rather than "nested NFT display" explicitly, but git shows the capability was born inside that work: isBundle/nestingTokens first appear in 896d66c588 "[Issue-4768] Implement UI for Nested NFT" (2025-12-05), and every nesting commit (Issue-4768 + Issue-4884, incl. "Build bundle NFT data on collection detail view") is first tagged v1.3.80 and absent from v1.3.79 (merge-base checks pass); earlier Unique bullets (1.1.36 #2580, 0.2.1) delivered only flat display with no nesting code.
+
+Commits `896d66c588, bef3b8ad5b, c46bd61c02` verified contained in the v1.3.80 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

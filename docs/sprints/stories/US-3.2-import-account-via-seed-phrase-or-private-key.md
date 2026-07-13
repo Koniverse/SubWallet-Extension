@@ -2,16 +2,16 @@
 id: US-3.2
 title: "Import account via seed phrase or private key"
 epic: EPIC-3
-status: backlog
+status: done
 priority: P0
 points: 3
 sprint:
-version_shipped:
+version_shipped: 0.2.8
 prd_ref: [FR-14, FR-15]
 arch_ref: [AD-04, AD-11]
 depends_on: [US-3.1]
-assignee:
-commit:
+assignee: Quangdm-cdm
+commit: 71198073234a9f4d42920f0f8c72ddc48833d20c, b22f8c246cdcc9dcf2bbdf140b8397efaf6c846e, 9cc5ab6ebd2770a9e145edbba652c4e8fc52c180
 created: 2026-06-11
 updated: 2026-06-11
 ---
@@ -40,26 +40,26 @@ already shipped; `commit` / `version_shipped` backfilled in reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a valid 12/24-word mnemonic, **When** the user imports
+- [x] **AC-1** — **Given** a valid 12/24-word mnemonic, **When** the user imports
   it, **Then** a Unified Account is created with correct addresses across all five
   ecosystems (AD-11) and the secret is parsed only in the background (AD-04).
-- [ ] **AC-2** — **Given** a valid private key, **When** the user imports it,
+- [x] **AC-2** — **Given** a valid private key, **When** the user imports it,
   **Then** a solo account for the matching ecosystem is created and usable for
   signing.
-- [ ] **AC-3** — **Given** an invalid mnemonic (bad checksum/word) or malformed
+- [x] **AC-3** — **Given** an invalid mnemonic (bad checksum/word) or malformed
   private key, **When** the user submits it, **Then** import is rejected with a
   clear error and no partial account is persisted.
-- [ ] **AC-4** — **Given** any successful import, **Then** the secret is stored
+- [x] **AC-4** — **Given** any successful import, **Then** the secret is stored
   encrypted at rest under the master password (NFR-3); no plaintext key bytes are
   written to storage.
 
 ## Tasks
 
-- [ ] **TASK-3.2.1** — Seed-phrase import → Unified Account (AC: 1, 4)
-  - [ ] Validate mnemonic checksum; derive all-ecosystem addresses in background.
-- [ ] **TASK-3.2.2** — Private-key import → solo account (AC: 2, 4)
-  - [ ] Detect curve/ecosystem; create solo account.
-- [ ] **TASK-3.2.3** — Input validation + error states for both paths (AC: 3)
+- [x] **TASK-3.2.1** — Seed-phrase import → Unified Account (AC: 1, 4)
+  - [x] Validate mnemonic checksum; derive all-ecosystem addresses in background.
+- [x] **TASK-3.2.2** — Private-key import → solo account (AC: 2, 4)
+  - [x] Detect curve/ecosystem; create solo account.
+- [x] **TASK-3.2.3** — Input validation + error states for both paths (AC: 3)
 
 ## Dev notes
 

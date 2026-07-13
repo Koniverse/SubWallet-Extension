@@ -2,16 +2,16 @@
 id: US-4.3
 title: "Auto-update chain list & token metadata"
 epic: EPIC-4
-status: backlog
+status: done
 priority: P1
 points: 3
 sprint:
-version_shipped:
+version_shipped: 1.1.50
 prd_ref: [FR-34]
 arch_ref: [AD-23, AD-25]
 depends_on:
-assignee:
-commit:
+assignee: S2kael
+commit: d4bb42fea3838255a103dcd45ca1286184f6acfc, 78c857751bdf2b2e2acf7ef68f3fd9ea5461d056, 40a60fcd720e88a730efa969f22c52ba9ac62cf3
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -43,20 +43,20 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the chain list is updated in the static-data source,
+- [x] **AC-1** — **Given** the chain list is updated in the static-data source,
   **When** the client refreshes, **Then** new/changed chains appear without an
   extension update.
-- [ ] **AC-2** — **Given** token metadata changes upstream, **When** the asset
+- [x] **AC-2** — **Given** token metadata changes upstream, **When** the asset
   registry refreshes, **Then** the new token metadata is reflected in the wallet
   without a release.
-- [ ] **AC-3** — **Given** the static-data proxy is unreachable, **When** the
+- [x] **AC-3** — **Given** the static-data proxy is unreachable, **When** the
   client loads, **Then** it falls back to the bundled chain-list/token JSON and
   still functions (no blank registry).
 
 ## Tasks
 
-- [ ] **TASK-4.3.1** — `fetchStaticData` consumption of chain-list + asset-registry from the cache/CDN proxy (AC: 1, 2)
-- [ ] **TASK-4.3.2** — Bundled-JSON fallback when the proxy is unavailable (AC: 3)
+- [x] **TASK-4.3.1** — `fetchStaticData` consumption of chain-list + asset-registry from the cache/CDN proxy (AC: 1, 2)
+- [x] **TASK-4.3.2** — Bundled-JSON fallback when the proxy is unavailable (AC: 3)
 
 ## Dev notes
 
@@ -102,7 +102,11 @@ internal integration, no external system to build, per SKILL §3a-bis.
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-d08`; trace confidence: medium, rule: completion).
+
+**Evidence:** CHANGELOG 1.1.50 (2024-03-28): "Integrate asset online (#2790)" — completes the title's enumeration (token metadata online) after chain-list data online updates shipped in 1.1.34 "Update RPC online (#2463)" / 1.1.35 "Update disabled XCM channels online (#2463)"; commit d4bb42fea3 ("[Issue-2790] Add feature update asset map and asset ref map online", adds chain-service/utils/patch.ts) is first tagged in v1.1.50 (not in v1.1.49), all commits pass merge-base --is-ancestor v1.1.50. Medium confidence because the capability grew across releases (a May-2023 attempt, Issue-1319, was disabled via 9f3a7d8e91 before ever running; the mechanism was later refactored into chain-online-service in 1.3.8 #3132) and no single bullet literally says "auto-update chain list".
+
+Commits `d4bb42fea3838255a103dcd45ca1286184f6acfc, 78c857751bdf2b2e2acf7ef68f3fd9ea5461d056, 40a60fcd720e88a730efa969f22c52ba9ac62cf3` verified contained in the v1.1.50 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

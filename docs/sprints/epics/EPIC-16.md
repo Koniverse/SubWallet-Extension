@@ -3,10 +3,10 @@ id: EPIC-16
 title: "Hardware Wallet Signing"
 status: in-progress
 prd_ref:
+  - FR-144
+  - FR-145
   - FR-146
   - FR-147
-  - FR-148
-  - FR-149
 arch_ref:
   - AD-04
 created: 2026-06-11
@@ -46,17 +46,17 @@ queue to [EPIC-2](EPIC-2.md) (RequestService), and software-key accounts to
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-146 | [US-16.1](../stories/US-16.1-ledger-hardware-wallet-signing.md) | 📋 backlog |
-| FR-147 | [US-16.2](../stories/US-16.2-qr-signing-keystone-and-polkadot-vault.md) | 📋 backlog |
-| FR-148 | [US-16.2](../stories/US-16.2-qr-signing-keystone-and-polkadot-vault.md) | 📋 backlog |
-| FR-149 | [US-16.3](../stories/US-16.3-additional-hardware-wallets.md) | 📋 backlog |
+| FR-144 | [US-16.1](../stories/US-16.1-ledger-hardware-wallet-signing.md) | ✅ done |
+| FR-145 | [US-16.2](../stories/US-16.2-qr-signing-keystone-and-polkadot-vault.md) | ✅ done |
+| FR-146 | [US-16.2](../stories/US-16.2-qr-signing-keystone-and-polkadot-vault.md) | ✅ done |
+| FR-147 | [US-16.3](../stories/US-16.3-additional-hardware-wallets.md) | 📋 backlog |
 
 ## Stories
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-16.1](../stories/US-16.1-ledger-hardware-wallet-signing.md) | Ledger hardware-wallet signing | Sign over USB across Substrate generic/per-chain/EVM apps, key never leaves device | 📋 backlog | — |
-| [US-16.2](../stories/US-16.2-qr-signing-keystone-and-polkadot-vault.md) | QR-based signing — Keystone & Polkadot Vault | Fully-offline QR display→scan→submit signing round trip | 📋 backlog | — |
+| [US-16.1](../stories/US-16.1-ledger-hardware-wallet-signing.md) | Ledger hardware-wallet signing | Sign over USB across Substrate generic/per-chain/EVM apps, key never leaves device | ✅ done | 0.5.4 |
+| [US-16.2](../stories/US-16.2-qr-signing-keystone-and-polkadot-vault.md) | QR-based signing — Keystone & Polkadot Vault | Fully-offline QR display→scan→submit signing round trip | ✅ done | 0.5.4 |
 | [US-16.3](../stories/US-16.3-additional-hardware-wallets.md) | Additional hardware wallets (roadmap) | Trezor, Tangem, D'Cent, Keystone 3 Pro | 📋 backlog | — |
 
 ## Cross-cutting invariants
@@ -66,7 +66,7 @@ queue to [EPIC-2](EPIC-2.md) (RequestService), and software-key accounts to
   payload/signature. Enforced by each story's AC-1.
 - **Transport-adapter abstraction:** a new device is a new transport adapter on the
   shared signing surface (USB / QR / NFC), not new signing logic — the basis for
-  the planned devices in FR-149.
+  the planned devices in FR-147.
 
 ## Acceptance criteria (propagated from stories)
 

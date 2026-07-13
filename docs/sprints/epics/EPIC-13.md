@@ -3,6 +3,8 @@ id: EPIC-13
 title: "Cross-Chain Bridge & XCM"
 status: backlog
 prd_ref:
+  - FR-126
+  - FR-127
   - FR-128
   - FR-129
   - FR-130
@@ -11,8 +13,6 @@ prd_ref:
   - FR-133
   - FR-134
   - FR-135
-  - FR-136
-  - FR-137
 arch_ref:
   - AD-09
   - AD-18
@@ -93,20 +93,20 @@ it bridges.
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-128 | [US-13.1](../stories/US-13.1-xcm-parachain-transfers.md) | 📋 backlog |
-| FR-129 | [US-13.2](../stories/US-13.2-snowbridge-eth-asset-hub.md) | 📋 backlog |
-| FR-130 | [US-13.3](../stories/US-13.3-avail-bridge.md) | 📋 backlog |
-| FR-131 | [US-13.4](../stories/US-13.4-polygon-unified-bridge.md) | 📋 backlog |
-| FR-132 | [US-13.5](../stories/US-13.5-across-protocol.md) | 📋 backlog |
-| FR-133 | [US-13.6](../stories/US-13.6-bridge-claim-withdrawal-step.md) | 📋 backlog |
-| FR-134 | [US-13.7](../stories/US-13.7-bittensor-tao-subtensor-evm-bridge.md) | 📋 backlog |
-| FR-135 | [US-13.8](../stories/US-13.8-bittensor-alpha-token-bridges.md) | 📋 backlog |
-| FR-136 | [US-13.9](../stories/US-13.9-hyperbridge.md) | 📋 backlog |
-| FR-137 | [US-13.10](../stories/US-13.10-axelar-cross-chain.md) | 📋 backlog |
+| FR-126 | [US-13.1](../stories/US-13.1-xcm-parachain-transfers.md) | ✅ done |
+| FR-127 | [US-13.2](../stories/US-13.2-snowbridge-eth-asset-hub.md) | ✅ done |
+| FR-128 | [US-13.3](../stories/US-13.3-avail-bridge.md) | ✅ done |
+| FR-129 | [US-13.4](../stories/US-13.4-polygon-unified-bridge.md) | ✅ done |
+| FR-130 | [US-13.5](../stories/US-13.5-across-protocol.md) | ✅ done |
+| FR-131 | [US-13.6](../stories/US-13.6-bridge-claim-withdrawal-step.md) | ✅ done |
+| FR-132 | [US-13.7](../stories/US-13.7-bittensor-tao-subtensor-evm-bridge.md) | ✅ done |
+| FR-133 | [US-13.8](../stories/US-13.8-bittensor-alpha-token-bridges.md) | 📋 backlog |
+| FR-134 | [US-13.9](../stories/US-13.9-hyperbridge.md) | 📋 backlog |
+| FR-135 | [US-13.10](../stories/US-13.10-axelar-cross-chain.md) | 📋 backlog |
 
 > FR statuses above are **story-planning** statuses (Stream B; all `📋 backlog`).
-> The shipped state of each capability lives in [PRD](../../PRD.md#functional-requirements): FR-128..134 are
-> `✅ shipped` (retroactive stories), FR-135/136/137 are `📋 planned` (forward).
+> The shipped state of each capability lives in [PRD](../../PRD.md#functional-requirements): FR-126..134 are
+> `✅ shipped` (retroactive stories), FR-133/136/137 are `📋 planned` (forward).
 > `done` + `version_shipped` are backfilled in version reconciliation. US-13.11 is a
 > bridge-reliability hardening cluster and owns no FR — it defends the
 > ParaSpell-delegation invariant (AD-18) and the async-bridge claim/finalization
@@ -131,13 +131,13 @@ it bridges.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-13.1](../stories/US-13.1-xcm-parachain-transfers.md) | XCM parachain transfers (fee est + per-route toggle) | Move tokens between Polkadot/Kusama parachains via ParaSpell-built XCM with fee estimation and per-route runtime toggle | 📋 backlog | — |
-| [US-13.2](../stories/US-13.2-snowbridge-eth-asset-hub.md) | Snowbridge (ETH ↔ Asset Hub) | Bridge assets between Ethereum and Polkadot Asset Hub via Snowbridge | 📋 backlog | — |
-| [US-13.3](../stories/US-13.3-avail-bridge.md) | Avail bridge (Avail ↔ Ethereum) | Bridge assets between Avail and Ethereum | 📋 backlog | — |
-| [US-13.4](../stories/US-13.4-polygon-unified-bridge.md) | Polygon Unified Bridge (Polygon ↔ Ethereum) | Bridge assets between Polygon and Ethereum via the Polygon Unified Bridge | 📋 backlog | — |
-| [US-13.5](../stories/US-13.5-across-protocol.md) | Across protocol cross-chain bridge | Bridge assets via the Across intent-based protocol (Bridge-Swap-Bridge routing) | 📋 backlog | — |
-| [US-13.6](../stories/US-13.6-bridge-claim-withdrawal-step.md) | Bridge claim / withdrawal step | Finalize asynchronous bridges (Avail, Polygon) with a destination-chain claim step | 📋 backlog | — |
-| [US-13.7](../stories/US-13.7-bittensor-tao-subtensor-evm-bridge.md) | Bittensor TAO ↔ Subtensor-EVM bridge | Move TAO between the native Subtensor chain and Subtensor-EVM, bidirectionally | 📋 backlog | — |
+| [US-13.1](../stories/US-13.1-xcm-parachain-transfers.md) | XCM parachain transfers (fee est + per-route toggle) | Move tokens between Polkadot/Kusama parachains via ParaSpell-built XCM with fee estimation and per-route runtime toggle | ✅ done | 0.4.4 |
+| [US-13.2](../stories/US-13.2-snowbridge-eth-asset-hub.md) | Snowbridge (ETH ↔ Asset Hub) | Bridge assets between Ethereum and Polkadot Asset Hub via Snowbridge | ✅ done | 1.2.9 |
+| [US-13.3](../stories/US-13.3-avail-bridge.md) | Avail bridge (Avail ↔ Ethereum) | Bridge assets between Avail and Ethereum | ✅ done | 1.3.4 |
+| [US-13.4](../stories/US-13.4-polygon-unified-bridge.md) | Polygon Unified Bridge (Polygon ↔ Ethereum) | Bridge assets between Polygon and Ethereum via the Polygon Unified Bridge | ✅ done | 1.3.8 |
+| [US-13.5](../stories/US-13.5-across-protocol.md) | Across protocol cross-chain bridge | Bridge assets via the Across intent-based protocol (Bridge-Swap-Bridge routing) | ✅ done | 1.3.31 |
+| [US-13.6](../stories/US-13.6-bridge-claim-withdrawal-step.md) | Bridge claim / withdrawal step | Finalize asynchronous bridges (Avail, Polygon) with a destination-chain claim step | ✅ done | 1.3.4 |
+| [US-13.7](../stories/US-13.7-bittensor-tao-subtensor-evm-bridge.md) | Bittensor TAO ↔ Subtensor-EVM bridge | Move TAO between the native Subtensor chain and Subtensor-EVM, bidirectionally | ✅ done | 1.3.78 |
 | [US-13.8](../stories/US-13.8-bittensor-alpha-token-bridges.md) | Bittensor alpha-token bridges | Planned alpha-token bridge family (alpha ↔ Subtensor-EVM; xTAO/xAlpha → Base) | 📋 backlog | — |
 | [US-13.9](../stories/US-13.9-hyperbridge.md) | Hyperbridge integration | Planned Hyperbridge cross-chain provider integration | 📋 backlog | — |
 | [US-13.10](../stories/US-13.10-axelar-cross-chain.md) | Axelar cross-chain integration | Planned Axelar cross-chain provider integration | 📋 backlog | — |
@@ -154,16 +154,16 @@ it bridges.
 
 | US | Primary entity / subsystem | FR |
 |---|---|---|
-| [US-13.1](../stories/US-13.1-xcm-parachain-transfers.md) | XCM transfer builder (ParaSpell) + per-route toggle | FR-128 |
-| [US-13.2](../stories/US-13.2-snowbridge-eth-asset-hub.md) | Snowbridge provider handler | FR-129 |
-| [US-13.3](../stories/US-13.3-avail-bridge.md) | Avail bridge provider handler | FR-130 |
-| [US-13.4](../stories/US-13.4-polygon-unified-bridge.md) | Polygon Unified Bridge provider handler | FR-131 |
-| [US-13.5](../stories/US-13.5-across-protocol.md) | Across protocol provider handler | FR-132 |
-| [US-13.6](../stories/US-13.6-bridge-claim-withdrawal-step.md) | Destination-chain claim/withdrawal step | FR-133 |
-| [US-13.7](../stories/US-13.7-bittensor-tao-subtensor-evm-bridge.md) | Bittensor TAO↔EVM native bridge handler | FR-134 |
-| [US-13.8](../stories/US-13.8-bittensor-alpha-token-bridges.md) | Bittensor alpha-token bridge handlers | FR-135 |
-| [US-13.9](../stories/US-13.9-hyperbridge.md) | Hyperbridge provider handler | FR-136 |
-| [US-13.10](../stories/US-13.10-axelar-cross-chain.md) | Axelar provider handler | FR-137 |
+| [US-13.1](../stories/US-13.1-xcm-parachain-transfers.md) | XCM transfer builder (ParaSpell) + per-route toggle | FR-126 |
+| [US-13.2](../stories/US-13.2-snowbridge-eth-asset-hub.md) | Snowbridge provider handler | FR-127 |
+| [US-13.3](../stories/US-13.3-avail-bridge.md) | Avail bridge provider handler | FR-128 |
+| [US-13.4](../stories/US-13.4-polygon-unified-bridge.md) | Polygon Unified Bridge provider handler | FR-129 |
+| [US-13.5](../stories/US-13.5-across-protocol.md) | Across protocol provider handler | FR-130 |
+| [US-13.6](../stories/US-13.6-bridge-claim-withdrawal-step.md) | Destination-chain claim/withdrawal step | FR-131 |
+| [US-13.7](../stories/US-13.7-bittensor-tao-subtensor-evm-bridge.md) | Bittensor TAO↔EVM native bridge handler | FR-132 |
+| [US-13.8](../stories/US-13.8-bittensor-alpha-token-bridges.md) | Bittensor alpha-token bridge handlers | FR-133 |
+| [US-13.9](../stories/US-13.9-hyperbridge.md) | Hyperbridge provider handler | FR-134 |
+| [US-13.10](../stories/US-13.10-axelar-cross-chain.md) | Axelar provider handler | FR-135 |
 | [US-13.11](../stories/US-13.11-xcm-runtime-upgrade-paraspell-version-hardening.md) | ParaSpell/runtime resilience + bridge claim / error-surfacing / fee-re-query reliability | — |
 
 ### End-to-end happy path

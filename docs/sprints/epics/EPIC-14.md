@@ -3,9 +3,9 @@ id: EPIC-14
 title: "Fiat On/Off-Ramp"
 status: backlog
 prd_ref:
+  - FR-136
+  - FR-137
   - FR-138
-  - FR-139
-  - FR-140
 arch_ref:
   - AD-19
   - AD-23
@@ -33,10 +33,10 @@ backend-built order URL.
 Before this epic, a new user who has completed onboarding has an empty wallet
 and no in-product path to fund it — they must acquire crypto on an exchange and
 transfer it in. The fiat-gateway closes that gap: it owns the **fiat on-ramp**
-(buy crypto with a card via Transak, Banxa, Coinbase Pay, and Meld — FR-138),
-the **fiat off-ramp** (sell crypto for fiat via Transak — FR-139), and the
+(buy crypto with a card via Transak, Banxa, Coinbase Pay, and Meld — FR-136),
+the **fiat off-ramp** (sell crypto for fiat via Transak — FR-137), and the
 **forward expansion** to additional on-ramp providers and native payment rails
-(MoonPay, Ramp.Network, Apple Pay / Google Pay — FR-140).
+(MoonPay, Ramp.Network, Apple Pay / Google Pay — FR-138).
 
 This epic was **split out of the old "onboarding" area**. Funding the wallet is
 not part of creating or restoring it: onboarding/wallet-create is owned by
@@ -73,13 +73,13 @@ balances itself.
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-138 | [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md) | 📋 backlog |
-| FR-139 | [US-14.2](../stories/US-14.2-fiat-off-ramp-sell-crypto-for-fiat.md) | 📋 backlog |
-| FR-140 | [US-14.3](../stories/US-14.3-additional-on-ramp-providers.md) | 📋 backlog |
+| FR-136 | [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md) | ✅ done |
+| FR-137 | [US-14.2](../stories/US-14.2-fiat-off-ramp-sell-crypto-for-fiat.md) | ✅ done |
+| FR-138 | [US-14.3](../stories/US-14.3-additional-on-ramp-providers.md) | 📋 backlog |
 
 > FR statuses above are **story-planning** statuses (Stream B; all `📋 backlog`).
-> The shipped state of each capability lives in [PRD](../../PRD.md#functional-requirements): FR-138 and
-> FR-139 are `✅ shipped` (retroactive stories), FR-140 is `📋 planned` (forward).
+> The shipped state of each capability lives in [PRD](../../PRD.md#functional-requirements): FR-136 and
+> FR-137 are `✅ shipped` (retroactive stories), FR-138 is `📋 planned` (forward).
 > `done` + `version_shipped` are backfilled during version reconciliation.
 
 ## AD Coverage
@@ -104,8 +104,8 @@ balances itself.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md) | Fiat on-ramp: buy crypto with card | Buy crypto with a card via aggregated regulated providers (Transak, Banxa, Coinbase Pay, Meld) | 📋 backlog | — |
-| [US-14.2](../stories/US-14.2-fiat-off-ramp-sell-crypto-for-fiat.md) | Fiat off-ramp: sell crypto for fiat | Sell crypto for fiat via the Transak hand-off (`action: SELL`) | 📋 backlog | — |
+| [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md) | Fiat on-ramp: buy crypto with card | Buy crypto with a card via aggregated regulated providers (Transak, Banxa, Coinbase Pay, Meld) | ✅ done | 0.5.7 |
+| [US-14.2](../stories/US-14.2-fiat-off-ramp-sell-crypto-for-fiat.md) | Fiat off-ramp: sell crypto for fiat | Sell crypto for fiat via the Transak hand-off (`action: SELL`) | ✅ done | 1.3.56 |
 | [US-14.3](../stories/US-14.3-additional-on-ramp-providers.md) | Additional on-ramp providers | Add MoonPay, Ramp.Network and native Apple Pay / Google Pay rails as new adapters | 📋 backlog | — |
 
 > US-14.1 and US-14.2 are retroactive (capability already ships); US-14.3 is
@@ -114,9 +114,9 @@ balances itself.
 ## Cross-cutting invariants
 
 - **Secret provider keys never ship in the bundle ([NFR-16](../../PRD.md#non-functional-requirements), AD-19, AD-24):** any provider whose order URL requires a *secret* credential (e.g. Transak) must have that URL minted server-side through the SubWallet Services SDK (`transakApi.generateOrderUrl`) / backend proxy — never assembled in-client from a bundled secret. Provider *publishable* keys that the provider intends to be client-side (e.g. Meld's `publicKey` wizard key) are the documented exception and may appear in client URL builders. Enforced by [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md); reviewers reject any new adapter that bundles a secret credential.
-- **Provider-agnostic buy/sell surface ([FR-138](../../PRD.md#functional-requirements), [FR-140](../../PRD.md#functional-requirements)):** a new on-ramp provider is a **new adapter** (`CreateBuyOrderFunction` keyed by `SupportService`), not a new buy-UI branch. The buy/sell screen selects asset + address + provider and dispatches through the adapter map; it MUST NOT grow a per-provider `if` ladder. Enforced by [US-14.3](../stories/US-14.3-additional-on-ramp-providers.md); the adapter contract is set up by [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md).
-- **Provider/token roster is release-free config ([FR-138](../../PRD.md#functional-requirements), AD-23, AD-25):** which providers are available, which tokens each supports, and per-provider `isSuspended` state are served from `buyServiceInfos` / `buyTokenConfigs` via `fetchStaticData` — not hard-coded — so a provider outage or a new supported token is a config change, not an extension release. Enforced by [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md).
-- **SubWallet never takes fiat custody (FR-138, FR-139):** the wallet only opens the provider's hosted flow; KYC, payment capture, and settlement all live with the provider. No story in this epic moves fiat or stores payment data. Enforced across [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md) and [US-14.2](../stories/US-14.2-fiat-off-ramp-sell-crypto-for-fiat.md).
+- **Provider-agnostic buy/sell surface ([FR-136](../../PRD.md#functional-requirements), [FR-138](../../PRD.md#functional-requirements)):** a new on-ramp provider is a **new adapter** (`CreateBuyOrderFunction` keyed by `SupportService`), not a new buy-UI branch. The buy/sell screen selects asset + address + provider and dispatches through the adapter map; it MUST NOT grow a per-provider `if` ladder. Enforced by [US-14.3](../stories/US-14.3-additional-on-ramp-providers.md); the adapter contract is set up by [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md).
+- **Provider/token roster is release-free config ([FR-136](../../PRD.md#functional-requirements), AD-23, AD-25):** which providers are available, which tokens each supports, and per-provider `isSuspended` state are served from `buyServiceInfos` / `buyTokenConfigs` via `fetchStaticData` — not hard-coded — so a provider outage or a new supported token is a config change, not an extension release. Enforced by [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md).
+- **SubWallet never takes fiat custody (FR-136, FR-137):** the wallet only opens the provider's hosted flow; KYC, payment capture, and settlement all live with the provider. No story in this epic moves fiat or stores payment data. Enforced across [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md) and [US-14.2](../stories/US-14.2-fiat-off-ramp-sell-crypto-for-fiat.md).
 
 ## Acceptance criteria (propagated from stories)
 

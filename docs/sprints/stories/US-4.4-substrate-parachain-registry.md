@@ -2,16 +2,16 @@
 id: US-4.4
 title: "Substrate parachain registry (200+)"
 epic: EPIC-4
-status: backlog
+status: done
 priority: P1
 points: 3
 sprint:
-version_shipped:
+version_shipped: 1.0.1
 prd_ref: [FR-35]
 arch_ref: [AD-02, AD-07]
 depends_on: [US-4.1]
-assignee:
-commit:
+assignee: saltict
+commit: f5464cf01e, e7dd01a793
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -44,23 +44,23 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the network registry, **When** the user browses it,
+- [x] **AC-1** — **Given** the network registry, **When** the user browses it,
   **Then** 200+ Substrate networks (relay + parachains) are listed and searchable.
-- [ ] **AC-2** — **Given** an enabled Substrate chain, **When** it connects via
+- [x] **AC-2** — **Given** an enabled Substrate chain, **When** it connects via
   `SubstrateApi`, **Then** a live connectivity status (connected / connecting /
   unavailable) is shown.
-- [ ] **AC-3** — **Given** many enabled Substrate chains, **When** the wallet runs,
+- [x] **AC-3** — **Given** many enabled Substrate chains, **When** the wallet runs,
   **Then** balance/token queries use the lightweight WsProvider so RAM does not
   scale with the full ApiPromise per chain (AD-07).
-- [ ] **AC-4** — **Given** a chain whose endpoint is unreachable, **When** connection
+- [x] **AC-4** — **Given** a chain whose endpoint is unreachable, **When** connection
   is attempted, **Then** its status shows unavailable without blocking the rest of
   the registry.
 
 ## Tasks
 
-- [ ] **TASK-4.4.1** — Registry of 200+ Substrate networks (relay + parachains), searchable (AC: 1)
-- [ ] **TASK-4.4.2** — Per-chain live connectivity status driven by `SubstrateApi` connect state (AC: 2, 4)
-- [ ] **TASK-4.4.3** — WsProvider-first connection; defer full `ApiPromise` to extrinsic build (AC: 3)
+- [x] **TASK-4.4.1** — Registry of 200+ Substrate networks (relay + parachains), searchable (AC: 1)
+- [x] **TASK-4.4.2** — Per-chain live connectivity status driven by `SubstrateApi` connect state (AC: 2, 4)
+- [x] **TASK-4.4.3** — WsProvider-first connection; defer full `ApiPromise` to extrinsic build (AC: 3)
 
 ## Dev notes
 
@@ -109,7 +109,7 @@ already shipped.
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Traced 2026-07-13 (US-21.2 straggler pass; the batch-2 verifier had nulled this one as "predates tagged history"). **Completion rule** — the story's headline enumerates *200+ networks* **and** *live per-chain connectivity status*, so the version is the release that completes the enumeration, not the one that started it. The three rungs, each verified against the tree at that release's commit: an in-repo Substrate registry shipped in **0.0.1** (`endpoints.ts`, 31 networks: 3 relay + 25 parachains — a Koni original, empty at every pre-fork polkadot-js release commit); live `NETWORK_STATUS` first appears in **0.4.3**; and the in-repo registry never exceeded **76** networks (plateau 0.4.3 → 0.8.4), so *200+* is only true from **1.0.1**, the first release depending on the external `@subwallet/chain-list` package (`f5464cf01e`, "[Issue-894] Move @subwallet/chain to @subwallet/chain-list") alongside `ChainService`'s `_ChainConnectionStatus` (`e7dd01a793`). 1.0.1 has no tag; both commits verified contained in its release commit `ad2567d9ae` from docs/CHANGELOG.md.
 
 ## Cross-references
 

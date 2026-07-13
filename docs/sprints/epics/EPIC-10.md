@@ -87,14 +87,14 @@ page.
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-94 | [US-10.1](../stories/US-10.1-evm-provider-injection-eip-1193-eip-6963.md) | 📋 backlog |
-| FR-95 | [US-10.2](../stories/US-10.2-substrate-inject-api-injectedweb3.md) | 📋 backlog |
-| FR-96 | [US-10.3](../stories/US-10.3-walletconnect-v2-substrate-and-evm.md) | 📋 backlog |
-| FR-97 | [US-10.4](../stories/US-10.4-cardano-cip-30-connector.md) | 📋 backlog |
+| FR-94 | [US-10.1](../stories/US-10.1-evm-provider-injection-eip-1193-eip-6963.md) | ✅ done |
+| FR-95 | [US-10.2](../stories/US-10.2-substrate-inject-api-injectedweb3.md) | ✅ done |
+| FR-96 | [US-10.3](../stories/US-10.3-walletconnect-v2-substrate-and-evm.md) | ✅ done |
+| FR-97 | [US-10.4](../stories/US-10.4-cardano-cip-30-connector.md) | ✅ done |
 | FR-98 | [US-10.5](../stories/US-10.5-bitcoin-dapp-connection-psbt.md) | 📋 backlog |
 | FR-99 | [US-10.6](../stories/US-10.6-ton-dapp-connection.md) | 📋 backlog |
-| FR-100 | [US-10.7](../stories/US-10.7-dapp-authorization-ui-per-origin.md) | 📋 backlog |
-| FR-101 | [US-10.8](../stories/US-10.8-arbitrary-message-signing.md) | 📋 backlog |
+| FR-100 | [US-10.7](../stories/US-10.7-dapp-authorization-ui-per-origin.md) | ✅ done |
+| FR-101 | [US-10.8](../stories/US-10.8-arbitrary-message-signing.md) | ✅ done |
 | FR-102 | [US-10.9](../stories/US-10.9-dapp-createtransaction-api-rfc-6213.md) | 📋 backlog |
 
 > US-10.10 (multi-wallet coexistence hardening), US-10.11 (WalletConnect
@@ -121,14 +121,14 @@ page.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-10.1](../stories/US-10.1-evm-provider-injection-eip-1193-eip-6963.md) | EVM provider injection (EIP-1193 / EIP-6963) | MetaMask-compatible `window.ethereum` injected into every dApp page | 📋 backlog | — |
-| [US-10.2](../stories/US-10.2-substrate-inject-api-injectedweb3.md) | Substrate inject API (injectedWeb3) | Polkadot dApps see SubWallet via `window.injectedWeb3` | 📋 backlog | — |
-| [US-10.3](../stories/US-10.3-walletconnect-v2-substrate-and-evm.md) | WalletConnect v2 (Substrate + EVM) | Pair dApps over WalletConnect for both chain families | 📋 backlog | — |
-| [US-10.4](../stories/US-10.4-cardano-cip-30-connector.md) | Cardano CIP-30 connector | Cardano dApps connect, sign and submit via CIP-30 | 📋 backlog | — |
+| [US-10.1](../stories/US-10.1-evm-provider-injection-eip-1193-eip-6963.md) | EVM provider injection (EIP-1193 / EIP-6963) | MetaMask-compatible `window.ethereum` injected into every dApp page | ✅ done | 1.1.25 |
+| [US-10.2](../stories/US-10.2-substrate-inject-api-injectedweb3.md) | Substrate inject API (injectedWeb3) | Polkadot dApps see SubWallet via `window.injectedWeb3` | ✅ done | 0.2.1 |
+| [US-10.3](../stories/US-10.3-walletconnect-v2-substrate-and-evm.md) | WalletConnect v2 (Substrate + EVM) | Pair dApps over WalletConnect for both chain families | ✅ done | 1.1.1 |
+| [US-10.4](../stories/US-10.4-cardano-cip-30-connector.md) | Cardano CIP-30 connector | Cardano dApps connect, sign and submit via CIP-30 | ✅ done | 1.3.32 |
 | [US-10.5](../stories/US-10.5-bitcoin-dapp-connection-psbt.md) | Bitcoin dApp connection (PSBT) | Bitcoin dApps connect, get addresses and sign PSBTs | 📋 backlog | — |
 | [US-10.6](../stories/US-10.6-ton-dapp-connection.md) | TON dApp connection | TON dApps connect and request signatures | 📋 backlog | — |
-| [US-10.7](../stories/US-10.7-dapp-authorization-ui-per-origin.md) | dApp authorization UI (per-origin) | Manage website access: per-origin / per-account, with revocation | 📋 backlog | — |
-| [US-10.8](../stories/US-10.8-arbitrary-message-signing.md) | Arbitrary message signing | personal_sign / signTypedData / signMessage / signData across ecosystems | 📋 backlog | — |
+| [US-10.7](../stories/US-10.7-dapp-authorization-ui-per-origin.md) | dApp authorization UI (per-origin) | Manage website access: per-origin / per-account, with revocation | ✅ done | 0.36.1 |
+| [US-10.8](../stories/US-10.8-arbitrary-message-signing.md) | Arbitrary message signing | personal_sign / signTypedData / signMessage / signData across ecosystems | ✅ done | 0.14.1 |
 | [US-10.9](../stories/US-10.9-dapp-createtransaction-api-rfc-6213.md) | dApp createTransaction API (RFC #6213) | A dApp builds a tx the wallet signs — Polkadot-JS RFC #6213 | 📋 backlog | — |
 | [US-10.10](../stories/US-10.10-multi-wallet-coexistence-hardening.md) | Multi-wallet coexistence hardening | Coexist with other injected wallets without fighting over `window.ethereum` | 📋 backlog | — |
 | [US-10.11](../stories/US-10.11-walletconnect-session-and-dashboard-hardening.md) | WalletConnect session & dashboard hardening | Reconcile WC v2 sessions to live relay state; reject dead-session requests | 📋 backlog | — |

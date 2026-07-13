@@ -41,6 +41,15 @@ previous version, anchored on this block, per the koni-docs changelog template)
 
 ---
 
+## [1.3.83] — 2026-07-09 — Release 1.3.83 (Koni) — v1.3.83
+
+### Added
+- Add earning term and condition display mechanism (#5007)
+
+**Commit**: c5aff28d5f
+
+---
+
 ## [1.3.82] — 2026-07-06 — Release 1.3.82 (Koni) — v1.3.82
 
 Features & Updates:

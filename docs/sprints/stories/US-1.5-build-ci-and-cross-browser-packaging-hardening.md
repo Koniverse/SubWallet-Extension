@@ -7,7 +7,7 @@ priority: P2
 points: 8
 sprint:
 version_shipped:
-prd_ref: []
+prd_ref: [NFR-19, NFR-9, NFR-8]
 arch_ref: [AD-05, AD-06, AD-08, AD-25]
 depends_on: [US-1.1]
 assignee:
@@ -44,7 +44,7 @@ into near-duplicate stories; keeping one story keeps the webpack/MV3/packaging
 fixes coordinated under a shared regression suite.
 
 Unlike the feature stories in this epic (US-1.1–US-1.4), this story carries no new
-FR. It **defends the FR-1 (MV3 service-worker background) and FR-2 (monorepo /
+FR. Its `prd_ref` points at the NFRs it actually defends — NFR-19 (supply chain), NFR-9 (Firefox chunk limit), NFR-8 (MV3). It **defends the FR-1 (MV3 service-worker background) and FR-2 (monorepo /
 cross-target packaging) build surface** against real-world drift across the
 supported browsers. The real issues anchoring it group into seven themes:
 
@@ -209,7 +209,8 @@ build/packaging + CI-gate bundle plus a shared regression task. It carries no FR
 - [Issue #1270](https://github.com/Koniverse/SubWallet-Extension/issues/1270) — Style error when importing invalid JSON file (build-time error UX)
 - [Issue #4197](https://github.com/Koniverse/SubWallet-Extension/issues/4197) — umbrella performance/quality program (supply-chain facet; NFR-19 standing policy)
 - [Source: PRD FR-1](../../PRD.md#functional-requirements) — MV3 service-worker background (build surface defended)
-- [Source: PRD FR-2](../../PRD.md#functional-requirements) — Yarn 3 monorepo / cross-target packaging (build surface defended)
+- [Source: PRD NFR-9 / NFR-8 / NFR-19](../../PRD.md#non-functional-requirements) — Firefox chunk limit, MV3 compatibility, dependency auditability
+- [Source: PRD FR-2](../../PRD.md#functional-requirements) — Yarn 3 monorepo (code reuse across platforms — NOT the cross-browser packaging this story hardens; build surface defended)
 - [Source: PRD NFR-19](../../PRD.md#non-functional-requirements) — dependency auditability / supply-chain hygiene (defended)
 - [Source: ARCHITECTURE AD-05, AD-06, AD-08, AD-25](../../ARCHITECTURE.md#architecture-decisions)
 

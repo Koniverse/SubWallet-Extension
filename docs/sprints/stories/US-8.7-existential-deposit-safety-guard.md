@@ -2,16 +2,16 @@
 id: US-8.7
 title: "Existential-deposit safety guard"
 epic: EPIC-8
-status: backlog
+status: done
 priority: P1
 points: 3
 sprint:
-version_shipped:
+version_shipped: 0.2.5
 prd_ref: [FR-80]
 arch_ref: [AD-02]
 depends_on:
-assignee:
-commit:
+assignee: LeeW0ng
+commit: 6ec77efe5c1528150a6250938ee94e59c4f5f36a
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -46,28 +46,28 @@ backfilled during version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a Substrate transfer whose post-transfer free balance
+- [x] **AC-1** — **Given** a Substrate transfer whose post-transfer free balance
   (after amount + fee) would fall below the chain's existential deposit, **When**
   the user reaches confirmation, **Then** an explicit ED warning is shown and the
   user must acknowledge it before the transfer can be submitted.
-- [ ] **AC-2** — **Given** a transfer that leaves the sender at or above the ED,
+- [x] **AC-2** — **Given** a transfer that leaves the sender at or above the ED,
   **When** the user confirms, **Then** no ED warning is shown and the send proceeds
   normally.
-- [ ] **AC-3** — **Given** the ED check, **When** it runs, **Then** the threshold
+- [x] **AC-3** — **Given** the ED check, **When** it runs, **Then** the threshold
   comparison is done in integer base units against the chain's ED constant
   (`bigint` / `BN`), with no float coercion.
-- [ ] **AC-4** — **Given** an account holding locked/reserved balance that would be
+- [x] **AC-4** — **Given** an account holding locked/reserved balance that would be
   affected by reaping, **When** a reaping transfer is attempted, **Then** the
   warning makes the consequence explicit (dust + dependent-state loss), not a
   generic message.
 
 ## Tasks
 
-- [ ] **TASK-8.7.1** — Per-chain ED computation: post-transfer balance vs ED constant via ChainService (AC: 1, 3)
-- [ ] **TASK-8.7.2** — Acknowledged-warning gate in the confirmation step (AC: 1, 4)
-- [ ] **TASK-8.7.3** — No warning on safe transfers; no false positives (AC: 2)
-- [ ] **TASK-8.7.4** — Expose the guard as the single shared check consumed by all send flows (AC: 1)
-  - [ ] Wired into US-8.1 / US-8.3 / US-8.4 rather than re-derived per flow.
+- [x] **TASK-8.7.1** — Per-chain ED computation: post-transfer balance vs ED constant via ChainService (AC: 1, 3)
+- [x] **TASK-8.7.2** — Acknowledged-warning gate in the confirmation step (AC: 1, 4)
+- [x] **TASK-8.7.3** — No warning on safe transfers; no false positives (AC: 2)
+- [x] **TASK-8.7.4** — Expose the guard as the single shared check consumed by all send flows (AC: 1)
+  - [x] Wired into US-8.1 / US-8.3 / US-8.4 rather than re-derived per flow.
 
 ## Dev notes
 

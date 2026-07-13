@@ -179,6 +179,47 @@ commit SHA — never `pending`) apply to `docs/CHANGELOG.md`, which is where
 
 GitHub issue → story/epic migration is **pending sub-task 3**.
 
+### The two version spaces (extension vs web app)
+
+One repo, **two products, two release lineages that share a version-number series
+but are not the same product**:
+
+| | Branches | Released as | Now at | Changelog |
+| --- | --- | --- | --- | --- |
+| **extension** | `master`, `subwallet-dev` | git tags `vX.Y.Z` | 1.3.82 | `docs/CHANGELOG.md` (canonical) |
+| **web app** | `webapp`, `webapp-dev` | **untagged** — `[CI Skip] release/stable X.Y.Z` commits on `origin/webapp` | 1.3.56 | `CHANGELOG.md` *on the `webapp` branch* |
+
+`origin/master` is **not** an ancestor of `origin/webapp` (hundreds of commits
+diverge). **Extension v1.3.56 and web-app 1.3.56 are different releases.** Never
+compare a version number across the two without saying which space it is in.
+
+So a story's `version_shipped` is meaningless on its own. Stories default to the
+extension space; a story that shipped in the web app declares it:
+
+```yaml
+version_shipped: 1.3.56     # bare semver, RULE-16 — unchanged
+version_space: webapp       # omit for extension (the default)
+```
+
+Proving a version in each space:
+
+```bash
+# extension — the tag is the anchor
+git merge-base --is-ancestor <sha> v1.3.56
+
+# web app — there is no tag; the release COMMIT is the anchor
+git log --format='%H %s' origin/webapp --grep='^\[CI Skip\] release/stable'
+git merge-base --is-ancestor <sha> <that-release-sha>
+```
+
+**Containment is necessary, not sufficient.** A commit can sit in a release whose
+tree no longer renders the feature (see
+[US-19.6](docs/sprints/stories/US-19.6-nft-mint-campaigns.md): the mint commits are
+ancestors of every tag from v1.1.36, but the surface was deleted before that tag and
+the build never injects `NFT_MINTING_HOST`). When containment and the shipped tree
+disagree, **the tree wins** — check `git ls-tree <release> <path>` and the build's
+env injection before calling a capability shipped.
+
 ## 8. Koniverse pipeline
 
 This repo follows the Koniverse product development pipeline:

@@ -84,14 +84,14 @@ EPIC-9 builds the NFT-shaped transfer request and hands it to that pipeline.
 
 | FR | Story | Status |
 |----|-------|--------|
-| FR-85 | [US-9.1](../stories/US-9.1-substrate-nft-display.md) | 📋 backlog |
-| FR-86 | [US-9.2](../stories/US-9.2-nested-bundled-nft-display.md) | 📋 backlog |
-| FR-87 | [US-9.3](../stories/US-9.3-evm-nft-display.md) | 📋 backlog |
+| FR-85 | [US-9.1](../stories/US-9.1-substrate-nft-display.md) | ✅ done |
+| FR-86 | [US-9.2](../stories/US-9.2-nested-bundled-nft-display.md) | ✅ done |
+| FR-87 | [US-9.3](../stories/US-9.3-evm-nft-display.md) | ✅ done |
 | FR-88 | [US-9.4](../stories/US-9.4-erc-1155-nft-support.md) | 📋 backlog |
-| FR-89 | [US-9.5](../stories/US-9.5-nft-transfer-send.md) | 📋 backlog |
-| FR-90 | [US-9.6](../stories/US-9.6-3d-and-video-nft-viewer.md) | 📋 backlog |
+| FR-89 | [US-9.5](../stories/US-9.5-nft-transfer-send.md) | ✅ done |
+| FR-90 | [US-9.6](../stories/US-9.6-3d-and-video-nft-viewer.md) | ✅ done |
 | FR-91 (btc-api shared with EPIC-4) | [US-9.7](../stories/US-9.7-bitcoin-ordinals-display.md) | 📋 backlog |
-| FR-92 | [US-9.8](../stories/US-9.8-custom-nft-import.md) | 📋 backlog |
+| FR-92 | [US-9.8](../stories/US-9.8-custom-nft-import.md) | ✅ done |
 | FR-93 | [US-9.9](../stories/US-9.9-additional-collections-and-standards.md) | 📋 backlog |
 
 > [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) is a
@@ -115,14 +115,14 @@ EPIC-9 builds the NFT-shaped transfer request and hands it to that pipeline.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-9.1](../stories/US-9.1-substrate-nft-display.md) | Substrate NFT display (RMRK / Unique / PSP-34) | Show Substrate NFT collections across RMRK 1.0/2.0, Unique/Quartz, Asset Hub and PSP-34/WASM | 📋 backlog | — |
-| [US-9.2](../stories/US-9.2-nested-bundled-nft-display.md) | Nested / bundled NFT display | Render parent–child bundles and let users navigate the nesting tree | 📋 backlog | — |
-| [US-9.3](../stories/US-9.3-evm-nft-display.md) | EVM NFT display (ERC-721) | Detect + show ERC-721 collections across EVM chains | 📋 backlog | — |
+| [US-9.1](../stories/US-9.1-substrate-nft-display.md) | Substrate NFT display (RMRK / Unique / PSP-34) | Show Substrate NFT collections across RMRK 1.0/2.0, Unique/Quartz, Asset Hub and PSP-34/WASM | ✅ done | 0.6.7 |
+| [US-9.2](../stories/US-9.2-nested-bundled-nft-display.md) | Nested / bundled NFT display | Render parent–child bundles and let users navigate the nesting tree | ✅ done | 1.3.80 |
+| [US-9.3](../stories/US-9.3-evm-nft-display.md) | EVM NFT display (ERC-721) | Detect + show ERC-721 collections across EVM chains | ✅ done | 0.3.1 |
 | [US-9.4](../stories/US-9.4-erc-1155-nft-support.md) | ERC-1155 NFT support | Display + transfer multi-token-standard NFTs | 📋 backlog | — |
-| [US-9.5](../stories/US-9.5-nft-transfer-send.md) | NFT transfer (send) | Send an NFT to any compatible address | 📋 backlog | — |
-| [US-9.6](../stories/US-9.6-3d-and-video-nft-viewer.md) | 3D and video NFT viewer | Render 3D models and video NFTs in item detail | 📋 backlog | — |
+| [US-9.5](../stories/US-9.5-nft-transfer-send.md) | NFT transfer (send) | Send an NFT to any compatible address | ✅ done | 0.2.8 |
+| [US-9.6](../stories/US-9.6-3d-and-video-nft-viewer.md) | 3D and video NFT viewer | Render 3D models and video NFTs in item detail | ✅ done | 0.6.5 |
 | [US-9.7](../stories/US-9.7-bitcoin-ordinals-display.md) | Bitcoin Ordinals / inscriptions display | Show Ordinals inscriptions held on a Bitcoin account | 📋 backlog | — |
-| [US-9.8](../stories/US-9.8-custom-nft-import.md) | Custom NFT import | Add a collection by contract (ERC-721 / PSP-34) | 📋 backlog | — |
+| [US-9.8](../stories/US-9.8-custom-nft-import.md) | Custom NFT import | Add a collection by contract (ERC-721 / PSP-34) | ✅ done | 0.4.1 |
 | [US-9.9](../stories/US-9.9-additional-collections-and-standards.md) | Additional collections & standards (ERC-6551) | Onboard Ternoa/Joystream/Aventus + ERC-6551 token-bound accounts | 📋 backlog | — |
 | [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | NFT display & transfer hardening | Harden NFT detail render, cross-browser display, transfer amount/message and import validation | 📋 backlog | — |
 

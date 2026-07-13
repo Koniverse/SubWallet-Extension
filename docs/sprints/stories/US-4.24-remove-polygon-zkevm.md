@@ -6,12 +6,12 @@ status: done
 priority: P1
 points: 3
 sprint:
-version_shipped: 1.3.80
+version_shipped: 1.3.82
 prd_ref:
   - FR-36
 arch_ref: []
 depends_on: []
-assignee:
+assignee: tunghp2002
 commit: e276306dd6
 created: 2026-07-09
 updated: 2026-07-09
@@ -27,16 +27,16 @@ Polygon zkEVM was previously integrated under EPIC-4 (EVM network support, FR-36
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the codebase, **When** Polygon zkEVM related code is identified, **Then** it is removed.
-- [ ] **AC-2** — **Given** the chainlist package, **When** Polygon zkEVM is removed, **Then** the chainlist is updated to reflect the change.
-- [ ] **AC-3** — **Given** the development domain configuration, **When** the change is made, **Then** the domain is updated.
+- [x] **AC-1** — **Given** the codebase, **When** Polygon zkEVM related code is identified, **Then** it is removed.
+- [x] **AC-2** — **Given** the chainlist package, **When** Polygon zkEVM is removed, **Then** the chainlist is updated to reflect the change.
+- [x] **AC-3** — **Given** the development domain configuration, **When** the change is made, **Then** the domain is updated.
 
 ## Tasks
 
-- [ ] Remove Polygon zkEVM from network registry
-- [ ] Update chainlist to remove Polygon zkEVM entries
-- [ ] Update development domain configuration
-- [ ] Upgrade @subwallet/chain-list to stable 0.2.128
+- [x] Remove Polygon zkEVM from network registry
+- [x] Update chainlist to remove Polygon zkEVM entries
+- [x] Update development domain configuration
+- [x] Upgrade @subwallet/chain-list to stable 0.2.128
 
 ## Dev notes — References
 

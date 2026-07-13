@@ -2,16 +2,16 @@
 id: US-4.11
 title: "Custom token import (ERC-20 / PSP-22)"
 epic: EPIC-4
-status: backlog
+status: done
 priority: P1
 points: 3
 sprint:
-version_shipped:
+version_shipped: 0.6.7
 prd_ref: [FR-42]
 arch_ref: [AD-02]
 depends_on: [US-4.1]
-assignee:
-commit:
+assignee: nulllpc
+commit: 2b181e4c8a, 52d791e49c, 35f5a8aa31
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -43,24 +43,24 @@ already shipped.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an enabled EVM chain, **When** the user pastes a valid
+- [x] **AC-1** — **Given** an enabled EVM chain, **When** the user pastes a valid
   ERC-20 contract address, **Then** the token's symbol/decimals are read on-chain
   and a custom asset-registry entry is created.
-- [ ] **AC-2** — **Given** an enabled Substrate contract chain, **When** the user
+- [x] **AC-2** — **Given** an enabled Substrate contract chain, **When** the user
   pastes a valid PSP-22 contract address, **Then** the token is imported the same
   way.
-- [ ] **AC-3** — **Given** an imported custom token, **When** the portfolio
+- [x] **AC-3** — **Given** an imported custom token, **When** the portfolio
   refreshes, **Then** its balance is detected and it is transferable like a
   registry token.
-- [ ] **AC-4** — **Given** an invalid contract address, an address on a disabled
+- [x] **AC-4** — **Given** an invalid contract address, an address on a disabled
   chain, or a non-token contract, **When** the user attempts import, **Then** a
   clear validation error is shown and no registry entry is created.
 
 ## Tasks
 
-- [ ] **TASK-4.11.1** — Import-by-contract flow: read on-chain token metadata (symbol/decimals) per ecosystem (AC: 1, 2)
-- [ ] **TASK-4.11.2** — Write custom entry into the asset registry; wire into balance detection (AC: 3)
-- [ ] **TASK-4.11.3** — Validation: bad/duplicate/non-token contract, disabled chain → error, no entry (AC: 4)
+- [x] **TASK-4.11.1** — Import-by-contract flow: read on-chain token metadata (symbol/decimals) per ecosystem (AC: 1, 2)
+- [x] **TASK-4.11.2** — Write custom entry into the asset registry; wire into balance detection (AC: 3)
+- [x] **TASK-4.11.3** — Validation: bad/duplicate/non-token contract, disabled chain → error, no entry (AC: 4)
 
 ## Dev notes
 
@@ -104,7 +104,11 @@ ecosystem, no external system): read metadata + write a registry entry, per SKIL
 
 ## Implementation notes
 
-_Retroactive — capability already shipped. Fill `commit` / `version_shipped` during reconciliation._
+Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-d08`; trace confidence: high, rule: completion).
+
+**Evidence:** Title enumerates ERC-20 + PSP-22, so completion rule applies: ERC-20 import first shipped in 0.4.1 ("Support import ERC20 and ERC721 for EVM Networks (#160)"), and the enumeration completes in 0.6.7 ("Support token import for PSP-22 and PSP-34 (#477)", 2022-10-22); the PSP-22 work landed via PR #698 (branch koni/dev/issue-635) whose merge and feature commits are all ancestors of v0.6.7 (verified with git merge-base --is-ancestor), with v0.6.7 the first tag containing them.
+
+Commits `2b181e4c8a, 52d791e49c, 35f5a8aa31` verified contained in the v0.6.7 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
 ## Cross-references
 

@@ -2,16 +2,16 @@
 id: US-2.3
 title: "EarningService pool-handler engine"
 epic: EPIC-2
-status: backlog
+status: done
 priority: P1
 points: 8
 sprint:
-version_shipped:
+version_shipped: 1.1.36
 prd_ref: [FR-7]
 arch_ref: [AD-22]
 depends_on: [US-2.2]
-assignee:
-commit:
+assignee: S2kael
+commit: 4e07f00c038fc83d50c6a4114eed05ec2b5aa3c6, 87da363f59886d6e77d9f4562e642063efba6678, 222fb694163870422264bbf2be1c9e0de169c4d2
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -51,28 +51,28 @@ This story is **Retroactive** — the engine already ships; `commit` /
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an account with positions across pool types, **When**
+- [x] **AC-1** — **Given** an account with positions across pool types, **When**
   EarningService runs, **Then** each position is produced by the matching
   `BasePoolHandler` subclass (native / nomination-pool / collator /
   liquid-staking / lending / dTAO subnet) and exposed via an RxJS subject
   (AD-22).
-- [ ] **AC-2** — **Given** a new yield protocol, **When** it is added as a
+- [x] **AC-2** — **Given** a new yield protocol, **When** it is added as a
   `BasePoolHandler` subclass, **Then** it integrates without modifying shared
   EarningService logic (extensibility seam, AD-22).
-- [ ] **AC-3** — **Given** an account / chain / transaction event, **When** it
+- [x] **AC-3** — **Given** an account / chain / transaction event, **When** it
   fires, **Then** the affected handlers recompute and the RxJS subjects emit
   updated positions.
-- [ ] **AC-4** — **Given** a pool's data source is unavailable or returns
+- [x] **AC-4** — **Given** a pool's data source is unavailable or returns
   malformed data, **When** a handler polls it, **Then** that handler degrades
   gracefully (no position emitted / stale flagged) without breaking sibling
   handlers.
 
 ## Tasks
 
-- [ ] **TASK-2.3.1** — `BasePoolHandler` tree: native / nomination-pool / collator / liquid-staking / lending / dTAO (AC: 1)
-- [ ] **TASK-2.3.2** — Subclass-only extensibility seam — no shared-logic edits to add a protocol (AC: 2)
-- [ ] **TASK-2.3.3** — Event-driven recompute + RxJS subject emission (AC: 3)
-- [ ] **TASK-2.3.4** — Per-handler degradation on missing/malformed pool data (AC: 4)
+- [x] **TASK-2.3.1** — `BasePoolHandler` tree: native / nomination-pool / collator / liquid-staking / lending / dTAO (AC: 1)
+- [x] **TASK-2.3.2** — Subclass-only extensibility seam — no shared-logic edits to add a protocol (AC: 2)
+- [x] **TASK-2.3.3** — Event-driven recompute + RxJS subject emission (AC: 3)
+- [x] **TASK-2.3.4** — Per-handler degradation on missing/malformed pool data (AC: 4)
 
 ## Dev notes
 

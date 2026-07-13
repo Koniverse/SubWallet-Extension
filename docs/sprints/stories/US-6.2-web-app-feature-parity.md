@@ -2,16 +2,16 @@
 id: US-6.2
 title: "Web app (standalone browser app) with feature parity to the extension"
 epic: EPIC-6
-status: backlog
+status: done
 priority: P2
 points: 5
 sprint:
-version_shipped:
+version_shipped: 1.1.36
 prd_ref: [FR-64]
 arch_ref: [AD-05]
 depends_on: [US-6.1]
-assignee:
-commit:
+assignee: saltict
+commit: 918864fcfb33157282a901b1e1fe2cfc81976f1a, 5bcfa96704687201b7c7c4ec158aad173aef3c1b
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -53,33 +53,33 @@ story is **retroactive** — the capability already ships in the product; `commi
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the `@subwallet/webapp` build, **When** it is served
+- [x] **AC-1** — **Given** the `@subwallet/webapp` build, **When** it is served
   as a standalone browser app (no extension installed), **Then** the wallet runs
   end-to-end (create/import account, view balances, send) from the same
   `extension-base` background logic.
-- [ ] **AC-2** — **Given** a feature implemented in `@subwallet/extension-base`,
+- [x] **AC-2** — **Given** a feature implemented in `@subwallet/extension-base`,
   **When** it is invoked from the web app, **Then** it behaves at parity with the
   extension (no background logic forked into the web layer — AD-05).
-- [ ] **AC-3** — **Given** the web app loads, **When** the background initializes,
+- [x] **AC-3** — **Given** the web app loads, **When** the background initializes,
   **Then** it **full-starts on load with no sleep state** (vs. the extension's
   MV3 wake/sleep lifecycle), and platform differences live only in the
   host/UI layer.
-- [ ] **AC-4** — **Given** the web app is open in a desktop browser, **When** the
+- [x] **AC-4** — **Given** the web app is open in a desktop browser, **When** the
   viewport changes, **Then** the dark-only responsive layout from US-6.1 applies
   (no separate web-only theme).
 
 ## Tasks
 
-- [ ] **TASK-6.2.1** — Stand up the `@subwallet/webapp` bundle combining
+- [x] **TASK-6.2.1** — Stand up the `@subwallet/webapp` bundle combining
   `extension-base` + `extension-web-ui` (AC: 1)
-  - [ ] Confirm entry/build in `packages/webapp/webpack.config.cjs`
+  - [x] Confirm entry/build in `packages/webapp/webpack.config.cjs`
     (`yarn webapp:build`).
-- [ ] **TASK-6.2.2** — Keep all background logic in `extension-base`; web-specific
+- [x] **TASK-6.2.2** — Keep all background logic in `extension-base`; web-specific
   adaptations stay in `extension-web-ui` (AC: 2)
-  - [ ] Audit that no chain/key logic is reimplemented in the web UI package.
-- [ ] **TASK-6.2.3** — Wire the web full-start-on-load lifecycle (no sleep
+  - [x] Audit that no chain/key logic is reimplemented in the web UI package.
+- [x] **TASK-6.2.3** — Wire the web full-start-on-load lifecycle (no sleep
   state) (AC: 3)
-- [ ] **TASK-6.2.4** — Verify the dark-only responsive design system renders in
+- [x] **TASK-6.2.4** — Verify the dark-only responsive design system renders in
   the web app (AC: 4)
 
 ## Dev notes

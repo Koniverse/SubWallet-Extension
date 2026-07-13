@@ -2,16 +2,16 @@
 id: US-3.1
 title: "Create a new wallet via seed phrase"
 epic: EPIC-3
-status: backlog
+status: done
 priority: P0
 points: 3
 sprint:
-version_shipped:
+version_shipped: 0.2.1
 prd_ref: [FR-13]
 arch_ref: [AD-04, AD-11]
 depends_on:
-assignee:
-commit:
+assignee: jacogr
+commit: 0b6bcd2bb9, f5a00988b0, 1e96fdce1d
 created: 2026-06-11
 updated: 2026-06-11
 ---
@@ -43,27 +43,27 @@ reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** a fresh install, **When** the user chooses "Create new
+- [x] **AC-1** — **Given** a fresh install, **When** the user chooses "Create new
   wallet", **Then** a 12/24-word mnemonic is generated **in the background** and
   no seed bytes appear in any UI/inject message (AD-04).
-- [ ] **AC-2** — **Given** a generated seed, **When** the user sets a master
+- [x] **AC-2** — **Given** a generated seed, **When** the user sets a master
   password that meets the strength policy (FR-53), **Then** the key is encrypted
   at rest (NFR-3) and the wallet subsequently unlocks only with that password.
-- [ ] **AC-3** — **Given** the backup-confirmation step, **When** the user has not
+- [x] **AC-3** — **Given** the backup-confirmation step, **When** the user has not
   correctly re-entered the seed words, **Then** wallet creation cannot complete
   (no skip path).
-- [ ] **AC-4** — **Given** creation completes, **Then** exactly one Unified Account
+- [x] **AC-4** — **Given** creation completes, **Then** exactly one Unified Account
   exists exposing correct addresses for Substrate, EVM, Bitcoin, TON and Cardano
   (AD-11).
 
 ## Tasks
 
-- [ ] **TASK-3.1.1** — Generate seed entropy in the background keyring (AC: 1)
-  - [ ] Confirm no mnemonic bytes are emitted on the `pri(…)`/`pub(…)` bus.
-- [ ] **TASK-3.1.2** — Master-password set + encrypt-at-rest (AC: 2)
-  - [ ] Enforce strength policy (FR-53); persist via browser-passworder (NFR-3).
-- [ ] **TASK-3.1.3** — Mandatory backup-confirmation gate (AC: 3)
-- [ ] **TASK-3.1.4** — Materialize the Unified Account + verify per-ecosystem addresses (AC: 4)
+- [x] **TASK-3.1.1** — Generate seed entropy in the background keyring (AC: 1)
+  - [x] Confirm no mnemonic bytes are emitted on the `pri(…)`/`pub(…)` bus.
+- [x] **TASK-3.1.2** — Master-password set + encrypt-at-rest (AC: 2)
+  - [x] Enforce strength policy (FR-53); persist via browser-passworder (NFR-3).
+- [x] **TASK-3.1.3** — Mandatory backup-confirmation gate (AC: 3)
+- [x] **TASK-3.1.4** — Materialize the Unified Account + verify per-ecosystem addresses (AC: 4)
 
 ## Dev notes
 

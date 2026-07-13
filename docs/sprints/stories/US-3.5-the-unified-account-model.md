@@ -2,16 +2,16 @@
 id: US-3.5
 title: "The Unified Account model"
 epic: EPIC-3
-status: backlog
+status: done
 priority: P1
 points: 8
 sprint:
-version_shipped:
-prd_ref: [FR-21, FR-22, FR-23]
+version_shipped: 1.3.1
+prd_ref: [FR-21, FR-22]
 arch_ref: [AD-11, AD-12, AD-13, AD-14, AD-15]
 depends_on: [US-3.1, US-3.2, US-2.1]
-assignee:
-commit:
+assignee: saltict
+commit: 97de5d35e0008743a140074f7f11a6d59e420b85, 87901e2961ef9bbeee9f3381b1763f97aa96ad8a
 created: 2026-06-11
 updated: 2026-06-11
 ---
@@ -59,30 +59,26 @@ Materializes [FR-21](../../PRD.md#functional-requirements), [FR-22](../../PRD.md
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** one seed, **When** a unified account is materialized,
+- [x] **AC-1** — **Given** one seed, **When** a unified account is materialized,
   **Then** correct addresses exist for Substrate, EVM, Bitcoin, TON and Cardano
   simultaneously (AD-11), each honoring its per-ecosystem model (AD-12/13/14/15).
-- [ ] **AC-2** — **Given** the same seed and derivation path on a fresh install,
+- [x] **AC-2** — **Given** the same seed and derivation path on a fresh install,
   **When** the unified account is reproduced, **Then** the addresses are
   identical with no server dependency (NFR-18, deterministic derivation).
-- [ ] **AC-3** — **Given** several solo accounts that share one underlying seed,
+- [x] **AC-3** — **Given** several solo accounts that share one underlying seed,
   **When** the user merges them, **Then** a single unified account results and
   the prior solo entries are reconciled (FR-22).
-- [ ] **AC-4** — **Given** an attempt to merge solo accounts that do **not**
+- [x] **AC-4** — **Given** an attempt to merge solo accounts that do **not**
   share the same seed, **When** the user submits the merge, **Then** it is
   rejected with a clear error and no account is altered.
-- [ ] **AC-5** *(forward — FR-23)* — **Given** a unified account, **When** the
-  user splits it, **Then** per-chain solo accounts result without re-entering the
-  seed. _Not yet implemented; tracked for the FR-23 milestone._
 
 ## Tasks
 
-- [ ] **TASK-3.5.1** — Unified derivation across all five ecosystems (AC: 1, 2)
-  - [ ] Honor per-ecosystem models AD-12 (BTC address types) / AD-13 (TON version) / AD-14 (Cardano) / AD-15 (Bittensor).
-- [ ] **TASK-3.5.2** — Deterministic-derivation verification on fresh install (AC: 2)
-- [ ] **TASK-3.5.3** — Solo → Unified merge (AC: 3, 4)
-  - [ ] Reject merges across mismatched seeds.
-- [ ] **TASK-3.5.4** *(forward — FR-23)* — Unified → Solo split (AC: 5)
+- [x] **TASK-3.5.1** — Unified derivation across all five ecosystems (AC: 1, 2)
+  - [x] Honor per-ecosystem models AD-12 (BTC address types) / AD-13 (TON version) / AD-14 (Cardano) / AD-15 (Bittensor).
+- [x] **TASK-3.5.2** — Deterministic-derivation verification on fresh install (AC: 2)
+- [x] **TASK-3.5.3** — Solo → Unified merge (AC: 3, 4)
+  - [x] Reject merges across mismatched seeds.
 
 ## Dev notes
 
@@ -154,6 +150,15 @@ Materializes [FR-21](../../PRD.md#functional-requirements), [FR-22](../../PRD.md
 _FR-21 and FR-22 are retroactive — already shipped; fill `commit` /
 `version_shipped` during version reconciliation. FR-23 (Unified → Solo split) is
 forward / planned — implement and verify AC-5 when the milestone is scheduled._
+
+**Scope correction (2026-07-13, US-21.2):** this story originally carried a *forward*
+AC-5 / TASK-3.5.4 for the **unified → solo split** (FR-23), left unticked on purpose.
+The batch backfill ticked every open AC when it flipped the story to `done`, which
+silently turned FR-23 into `✅ shipped` in the PRD — it is not: at v1.3.82 the keyring
+service has no split surface at all. The forward scope now lives in
+[US-3.9](US-3.9-unified-to-solo-account-split.md) and FR-23 is back to `📋 planned`.
+This story is `done` for what it actually shipped: the unified model (FR-21) and the
+solo → unified merge (FR-22).
 
 ## Cross-references
 

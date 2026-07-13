@@ -2,16 +2,16 @@
 id: US-8.9
 title: "Multi-step / one-sign signing"
 epic: EPIC-8
-status: backlog
+status: done
 priority: P1
 points: 5
 sprint:
-version_shipped:
+version_shipped: 1.3.21
 prd_ref: [FR-82]
 arch_ref: [AD-21]
 depends_on:
-assignee:
-commit:
+assignee: bluezdot
+commit: 43109748d6f026293e4315de77e0b89b68b32b8f, 3e32fb425365f103caea93ba4c917d7c1f5a82f0, ff5b6b565ec79a6d23ed0d24680502a2aba5b8be
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -48,27 +48,27 @@ version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an action that decomposes into multiple sequential
+- [x] **AC-1** — **Given** an action that decomposes into multiple sequential
   transactions, **When** One-Sign is enabled, **Then** the user approves the whole
   sequence with a single confirmation and each step is then submitted in order
   through the transaction lifecycle.
-- [ ] **AC-2** — **Given** the single confirmation, **When** it is presented,
+- [x] **AC-2** — **Given** the single confirmation, **When** it is presented,
   **Then** it discloses every step in the sequence (what each transaction does), not
   just the first — the user is not signing hidden steps.
-- [ ] **AC-3** — **Given** a step in the sequence fails, **When** the lifecycle runs
+- [x] **AC-3** — **Given** a step in the sequence fails, **When** the lifecycle runs
   the batch, **Then** subsequent steps do not silently proceed and the failure is
   surfaced with the sequence's partial state.
-- [ ] **AC-4** — **Given** One-Sign is disabled (toggle off), **When** a
+- [x] **AC-4** — **Given** One-Sign is disabled (toggle off), **When** a
   multi-step action runs, **Then** each step requires its own confirmation (the
   per-step approval behaviour is unchanged).
 
 ## Tasks
 
-- [ ] **TASK-8.9.1** — Sequence model: decompose an action into ordered lifecycle steps (AC: 1)
-- [ ] **TASK-8.9.2** — Single-confirmation approval surface that discloses every step (AC: 1, 2)
-  - [ ] Presented through the RequestService handler (AD-21).
-- [ ] **TASK-8.9.3** — Drive steps in order through the lifecycle; halt on failure (AC: 1, 3)
-- [ ] **TASK-8.9.4** — Honour the One-Sign toggle; per-step confirmation when off (AC: 4)
+- [x] **TASK-8.9.1** — Sequence model: decompose an action into ordered lifecycle steps (AC: 1)
+- [x] **TASK-8.9.2** — Single-confirmation approval surface that discloses every step (AC: 1, 2)
+  - [x] Presented through the RequestService handler (AD-21).
+- [x] **TASK-8.9.3** — Drive steps in order through the lifecycle; halt on failure (AC: 1, 3)
+- [x] **TASK-8.9.4** — Honour the One-Sign toggle; per-step confirmation when off (AC: 4)
 
 ## Dev notes
 

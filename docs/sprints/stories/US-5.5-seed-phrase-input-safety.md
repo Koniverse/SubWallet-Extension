@@ -2,16 +2,16 @@
 id: US-5.5
 title: "Seed-phrase input safety"
 epic: EPIC-5
-status: backlog
+status: done
 priority: P0
 points: 2
 sprint:
-version_shipped:
+version_shipped: 1.1.10
 prd_ref: [FR-56]
 arch_ref: [AD-04]
 depends_on:
-assignee:
-commit:
+assignee: S2kael
+commit: b6ed1bab75, 3bdec2605f, 4489d8ee5c
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -46,20 +46,20 @@ reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** any seed-phrase or private-key entry field, **When**
+- [x] **AC-1** — **Given** any seed-phrase or private-key entry field, **When**
   it renders, **Then** it is an `<input>` element (not a `<textarea>`) with
   browser autocomplete/autofill disabled.
-- [ ] **AC-2** — **Given** a user types a seed phrase, **When** the field is used,
+- [x] **AC-2** — **Given** a user types a seed phrase, **When** the field is used,
   **Then** the secret is not written to the browser autocomplete/autofill cache.
-- [ ] **AC-3** — **Given** the codebase, **When** scanned, **Then** no
+- [x] **AC-3** — **Given** the codebase, **When** scanned, **Then** no
   seed-phrase / private-key field uses a `<textarea>` element (regression guard,
   LESSONS §29).
 
 ## Tasks
 
-- [ ] **TASK-5.5.1** — Ensure all seed/key fields render as `<input>` with autocomplete off (AC: 1)
-- [ ] **TASK-5.5.2** — Verify no secret reaches the autocomplete/autofill cache (AC: 2)
-- [ ] **TASK-5.5.3** — Add a lint/grep regression guard against `<textarea>` for secret fields (AC: 3) — LESSONS §29
+- [x] **TASK-5.5.1** — Ensure all seed/key fields render as `<input>` with autocomplete off (AC: 1)
+- [x] **TASK-5.5.2** — Verify no secret reaches the autocomplete/autofill cache (AC: 2)
+- [x] **TASK-5.5.3** — Add a lint/grep regression guard against `<textarea>` for secret fields (AC: 3) — LESSONS §29
 
 ## Dev notes
 

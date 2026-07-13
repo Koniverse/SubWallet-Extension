@@ -2,16 +2,16 @@
 id: US-8.1
 title: "Send native & fungible tokens"
 epic: EPIC-8
-status: backlog
+status: done
 priority: P1
 points: 3
 sprint:
-version_shipped:
+version_shipped: 0.4.1
 prd_ref: [FR-74]
 arch_ref: [AD-02]
 depends_on: [US-8.7]
-assignee:
-commit:
+assignee: saltict
+commit: f9a9f7c03aad78aac5671c32524f53867af7cad8, de3efec71278634a3d8af07c4e97c8f432b9499c, 05004aa19b45420e4039ea74c808b6d6e8b7cbe7
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -47,30 +47,30 @@ version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** an account with a transferable native balance, **When**
+- [x] **AC-1** — **Given** an account with a transferable native balance, **When**
   the user enters a valid recipient and amount and confirms, **Then** the transfer
   is built via the chain's ChainService API (AD-02) and submitted through the
   shared transaction lifecycle, appearing in history.
-- [ ] **AC-2** — **Given** a fungible token (ERC-20 on EVM, PSP-22 on WASM),
+- [x] **AC-2** — **Given** a fungible token (ERC-20 on EVM, PSP-22 on WASM),
   **When** the user sends it, **Then** the correct contract transfer is built for
   that ecosystem and the token's decimals are honoured in base units (no float).
-- [ ] **AC-3** — **Given** a send across each supported ecosystem (Substrate, EVM,
+- [x] **AC-3** — **Given** a send across each supported ecosystem (Substrate, EVM,
   Bitcoin, TON, Cardano), **When** the recipient address is for that ecosystem,
   **Then** the send succeeds; an address that does not match the selected
   token's ecosystem is rejected with an inline validation error before submission.
-- [ ] **AC-4** — **Given** an amount that exceeds the transferable balance (or
+- [x] **AC-4** — **Given** an amount that exceeds the transferable balance (or
   leaves too little for fees), **When** the user attempts to confirm, **Then** the
   send is blocked with a clear error and no transaction is submitted.
 
 ## Tasks
 
-- [ ] **TASK-8.1.1** — Send form: recipient + token + amount with transferable-balance bound (AC: 1, 4)
-  - [ ] Read transferable balance from the balance engine (EPIC-7, FR-69).
-- [ ] **TASK-8.1.2** — Per-ecosystem transfer build via ChainService (AC: 1, 2, 3)
-  - [ ] Native Substrate `balances.transfer`; EVM ERC-20 `transfer`; PSP-22; BTC UTXO; TON jetton; Cardano asset.
-- [ ] **TASK-8.1.3** — Address + ecosystem validation; reject cross-ecosystem mismatch inline (AC: 3)
-- [ ] **TASK-8.1.4** — Submit through the shared transaction lifecycle; record in history (AC: 1)
-- [ ] **TASK-8.1.5** — Amount/decimals in base units (no float); block over-balance sends (AC: 2, 4)
+- [x] **TASK-8.1.1** — Send form: recipient + token + amount with transferable-balance bound (AC: 1, 4)
+  - [x] Read transferable balance from the balance engine (EPIC-7, FR-69).
+- [x] **TASK-8.1.2** — Per-ecosystem transfer build via ChainService (AC: 1, 2, 3)
+  - [x] Native Substrate `balances.transfer`; EVM ERC-20 `transfer`; PSP-22; BTC UTXO; TON jetton; Cardano asset.
+- [x] **TASK-8.1.3** — Address + ecosystem validation; reject cross-ecosystem mismatch inline (AC: 3)
+- [x] **TASK-8.1.4** — Submit through the shared transaction lifecycle; record in history (AC: 1)
+- [x] **TASK-8.1.5** — Amount/decimals in base units (no float); block over-balance sends (AC: 2, 4)
 
 ## Dev notes
 

@@ -7,7 +7,7 @@ priority: P1
 points: 5
 sprint:
 version_shipped:
-prd_ref: []
+prd_ref: [FR-76, FR-77, FR-80]
 arch_ref: [AD-02, AD-25]
 depends_on: [US-8.1, US-8.3, US-8.4, US-8.7]
 assignee:
@@ -30,9 +30,12 @@ down to the ED, and — when something does go wrong — is told why.
 
 ## Background
 
-This is the **bug / iteration (hardening) cluster** for EPIC-8 — it owns no FR. It
-defends the fee/amount/ED arithmetic-correctness NFR behind the user-facing send and
-confirmation surfaces (the fee-estimation usage of US-8.3 / US-8.4, the ED-threshold
+This is the **bug / iteration (hardening) cluster** for EPIC-8. It defends the
+*correctness* of the fee / amount / ED arithmetic behind the user-facing send and
+confirmation surfaces — `prd_ref` therefore points at the FRs whose surfaces it keeps
+honest (FR-76 custom fee/tip, FR-77 non-native fee token, FR-80 ED guard). **There is
+no "arithmetic-correctness NFR"** — an earlier draft of this story claimed one; none of
+the PRD's 21 NFR rows covers numeric correctness (the fee-estimation usage of US-8.3 / US-8.4, the ED-threshold
 math of US-8.7, and the send amount bounds of US-8.1). It does **not** re-implement
 the fee engine (FR-10, owned by [EPIC-2](../epics/EPIC-2.md)); it hardens the
 EPIC-8-facing usage of it and closes the real reported defects below, keeping them

@@ -2,16 +2,16 @@
 id: US-5.6
 title: "Auto-lock timer + unlock type"
 epic: EPIC-5
-status: backlog
+status: done
 priority: P0
 points: 3
 sprint:
-version_shipped:
+version_shipped: 1.1.10
 prd_ref: [FR-57, FR-58]
 arch_ref: [AD-03]
 depends_on: [US-5.4]
-assignee:
-commit:
+assignee: saltict
+commit: 7abcb1c1f6, 10d23f6f74, 29fc2e536b
 created: 2026-06-12
 updated: 2026-06-12
 ---
@@ -49,26 +49,26 @@ during version reconciliation.
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — **Given** the security settings, **When** the user sets an
+- [x] **AC-1** — **Given** the security settings, **When** the user sets an
   auto-lock inactivity timer, **Then** the wallet auto-locks after that period of
   inactivity and the setting persists across sessions (FR-57).
-- [ ] **AC-2** — **Given** the unlock type set to **per-action**, **When** the
+- [x] **AC-2** — **Given** the unlock type set to **per-action**, **When** the
   user performs a protected action, **Then** the master password is required for
   each such action (FR-58).
-- [ ] **AC-3** — **Given** the unlock type set to **per-session**, **When** the
+- [x] **AC-3** — **Given** the unlock type set to **per-session**, **When** the
   user has unlocked once, **Then** protected actions proceed without re-prompting
   until the wallet locks (FR-58).
-- [ ] **AC-4** — **Given** the policy is enforced in the background, **When** a
+- [x] **AC-4** — **Given** the policy is enforced in the background, **When** a
   setting is changed, **Then** it takes effect immediately and the new policy is
   applied by the background lock/signing gate (not only the UI) — a UI cannot
   relax it (AD-03).
 
 ## Tasks
 
-- [ ] **TASK-5.6.1** — Configurable auto-lock inactivity timer + persistence (AC: 1)
-- [ ] **TASK-5.6.2** — Per-action unlock type — re-prompt each protected action (AC: 2)
-- [ ] **TASK-5.6.3** — Per-session unlock type — unlock once until lock (AC: 3)
-- [ ] **TASK-5.6.4** — Enforce both policies in the background lock/signing gate (AC: 4) — settings over the typed bus (AD-03)
+- [x] **TASK-5.6.1** — Configurable auto-lock inactivity timer + persistence (AC: 1)
+- [x] **TASK-5.6.2** — Per-action unlock type — re-prompt each protected action (AC: 2)
+- [x] **TASK-5.6.3** — Per-session unlock type — unlock once until lock (AC: 3)
+- [x] **TASK-5.6.4** — Enforce both policies in the background lock/signing gate (AC: 4) — settings over the typed bus (AD-03)
 
 ## Dev notes
 
