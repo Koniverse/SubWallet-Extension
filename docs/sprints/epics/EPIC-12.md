@@ -15,6 +15,7 @@ prd_ref:
   - FR-123
   - FR-124
   - FR-125
+  - FR-160
 arch_ref:
   - AD-22
   - AD-23
@@ -116,6 +117,8 @@ power, not yield — owned by EPIC-15).
 | FR-123 | [US-12.10](../stories/US-12.10-bittensor-alpha-token-liquid-staking.md) | 📋 backlog |
 | FR-124 | [US-12.11](../stories/US-12.11-trusted-stake-alpha-index.md) | 👀 review |
 | FR-125 | [US-12.12](../stories/US-12.12-staking-for-additional-networks-enjin-phala-xx.md) | 📋 backlog |
+| FR-160 | [US-12.15](../stories/US-12.15-earning-term-and-condition-display.md) | ✅ done |
+| NFR-22 | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) — financial-figure accuracy (rewards / APY) | 📋 backlog |
 
 > FR statuses above are **story-planning** statuses (Stream B; all `📋 backlog`).
 > The shipped state of each capability lives in [PRD](../../PRD.md#functional-requirements): FR-114..122

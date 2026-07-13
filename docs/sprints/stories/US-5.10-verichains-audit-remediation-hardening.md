@@ -7,13 +7,13 @@ priority: P1
 points: 5
 sprint:
 version_shipped:
-prd_ref: [NFR-16, FR-52]
+prd_ref: [NFR-16, NFR-25, FR-52]
 arch_ref: [AD-04, AD-03, AD-19]
 depends_on: [US-5.1, US-5.2]
 assignee:
 commit:
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-13
 ---
 
 ## Goal
@@ -152,6 +152,7 @@ building new ones.
 
 ### References
 
+- [Source: PRD NFR-25](../../PRD.md#non-functional-requirements) — web-surface hardening (CSP + reverse tabnabbing). **This story owns it.**
 - [Issue #4471](https://github.com/Koniverse/SubWallet-Extension/issues/4471) — UX improvements from the UX bounty audit (tracker, 3 sub-items) — audit-driven remediation
 - [Issue #4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929) — security check: all API keys are open, not in `.env` config
 - [Issue #4959](https://github.com/Koniverse/SubWallet-Extension/issues/4959) — [WebApp] fix reverse tabnabbing & implement Content Security Policy (CSP)

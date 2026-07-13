@@ -142,9 +142,12 @@ for the contributor workflow.
 - **PR template:** `.github/PULL_REQUEST_TEMPLATE/resolve-issue.md` — fill
   every section, link the issue, attach screenshots for UI changes.
 - **Versioning:** Root `package.json` carries the user-facing semver
-  (currently `1.3.79`). `packages/*` carry a per-monorepo internal version
-  with `-N` suffix (currently `1.3.79-1`). The canonical user-facing
-  version also lives in `VERSION` (repo root, per koni-docs §0).
+  (`1.3.83` on `master`). `packages/*` carry a per-monorepo internal version
+  with a `-N` suffix (`1.3.83-0`). The canonical user-facing version also
+  lives in `VERSION` (repo root, per koni-docs §0). A feature branch's
+  `package.json` lags `master` until the release commit is merged — **`VERSION`
+  and `docs/CHANGELOG.md`, not the branch's `package.json`, are what the docs
+  layer tracks.**
 
 ## 7. Documentation
 
@@ -159,6 +162,47 @@ Current docs at the repo root:
 
 Canonical `docs/` content per koni-docs spec (BRIEF, PRD, ARCHITECTURE,
 CONTEXT, LESSONS, SETUP, sprints/, CHANGELOG) is **authored**.
+
+### How the docs are allowed to change — five standing rules
+
+These are not EPIC-21's rules; they are the project's. Each was paid for by a defect
+that reached the owner before it reached a check. Full reasoning in `docs/CONTEXT.md`.
+
+**1. An ID is an identity, not a position.** FR / NFR / US numbers are permanent. The
+single gapless renumber of 2026-07-13 was a **one-time exception and will not recur**
+([D94](docs/CONTEXT.md)). New FRs **append at the end**; the **Epic column is the
+authoritative grouping**, never the number range — which is why FR-160 belongs to
+EPIC-12 (FR-114…125) and must not be "fixed". A retired number is retired, never
+reused (NFR-11).
+
+**2. A requirement needs pain, a check, and an owner.** Before an FR or NFR enters
+`docs/PRD.md`: *(a)* evidence someone felt the pain, *(b)* a way to check it, *(c)* a
+story that defends it, named in the row. NFR-11 was **retired** for failing all three —
+a ≤72 MB budget, unmeasured across 302 releases, guarding a mechanism that was never
+built ([D96](docs/CONTEXT.md)). **An unmeasured, unenforced requirement is folklore, and
+folklore in a PRD is worse than a blank line, because it reads as a commitment.**
+
+**3. A docs epic changes the map, never the territory.** It *may* correct any doc the
+code proves wrong — delete a story describing work that never existed, mark an FR
+unshipped, add an FR for a capability that demonstrably shipped without one. It *may
+not* decide what the product **should** do: every product decision **escalates to the
+owner and lands in `docs/CONTEXT.md` as a dated `D` entry** ([D97](docs/CONTEXT.md)).
+That seam is checkable — *an FR or NFR whose status a docs epic changed, with no `D`
+entry to cite, is a violation.*
+
+**4. The done-gate has two branches.** A story that materializes a requirement is `done`
+only with `version_shipped` (RULE-16) + a CHANGELOG entry + every AC ticked. A story in
+an epic that materializes no requirement (`prd_ref: []` at the epic — docs, tooling,
+infra) **ships in no release**: it is `done` when every AC is ticked, `commit` names a
+real SHA, and `validate` exits zero. Its `version_shipped` is empty **on purpose**.
+Corollary: **a `done` story may not carry an unticked AC** — forward scope must *leave*
+the story into its own (this is how FR-23 came to be marked shipped though never built).
+
+**5. Write a rule as a boundary of authority, never as a prediction.** EPIC-21's charter
+said it *"never changes the PRD's functional requirements"* — a **fact about scope**, and
+a fact about scope expires the moment scope moves. It was violated on day one, because an
+epic that checks docs against code must be able to fix what it proves wrong. A rule that
+cannot be checked is a rule nobody notices breaking ([LESSONS §65](docs/LESSONS.md)).
 
 ### The two change logs
 
@@ -186,7 +230,7 @@ but are not the same product**:
 
 | | Branches | Released as | Now at | Changelog |
 | --- | --- | --- | --- | --- |
-| **extension** | `master`, `subwallet-dev` | git tags `vX.Y.Z` | 1.3.82 | `docs/CHANGELOG.md` (canonical) |
+| **extension** | `master`, `subwallet-dev` | git tags `vX.Y.Z` | 1.3.83 | `docs/CHANGELOG.md` (canonical) |
 | **web app** | `webapp`, `webapp-dev` | **untagged** — `[CI Skip] release/stable X.Y.Z` commits on `origin/webapp` | 1.3.56 | `CHANGELOG.md` *on the `webapp` branch* |
 
 `origin/master` is **not** an ancestor of `origin/webapp` (hundreds of commits

@@ -7,13 +7,13 @@ priority: P1
 points: 2
 sprint:
 version_shipped: 1.3.82
-prd_ref: []
+prd_ref: [NFR-24]
 arch_ref: []
 depends_on: []
 assignee: tunghp2002
 commit: d68259d1ca
 created: 2026-07-09
-updated: 2026-07-09
+updated: 2026-07-13
 ---
 
 ## Goal
@@ -38,6 +38,7 @@ When the wallet receives a transaction payload that cannot be decoded (malformed
 
 ## Dev notes — References
 
+- [Source: PRD NFR-24](../../PRD.md#non-functional-requirements) — degrade, never blank. **This story owns it.**
 - Source: Issue #4989 — commit `d68259d1ca`
 
 ## Verification commands

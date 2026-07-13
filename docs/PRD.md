@@ -46,7 +46,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 ## Functional Requirements
 
-  The wallet's 159 functional requirements, grouped by epic and ordered by importance (foundation first). Each epic states what it covers, why it matters, and its status; the FR table lists every requirement inline with its status. User stories are populated per epic by Stream B under `docs/sprints/`.
+  The wallet's 160 functional requirements, grouped by epic and ordered by importance (foundation first). Each epic states what it covers, why it matters, and its status; the FR table lists every requirement inline with its status. User stories are populated per epic by Stream B under `docs/sprints/`.
 
 **Status key:** ✅ shipped · 🚧 in progress (active PR/branch, not yet released) · 📋 planned (no code yet) · ⏸️ withdrawn (was in the product, since removed — the story keeps whatever status its delivery earned). Epic badge: 🟢 mostly/fully shipped · 🟡 partially shipped · 🔵 roadmap.
 
@@ -214,8 +214,15 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-157 | NFT mint campaigns — ran on the web-app Earning Dashboard (CD deploy, Oct–Nov 2023 campaign); in no numbered release of either product, surface since removed | P2 | ⏸️ withdrawn | EPIC-19 |
 | FR-158 | Mission Pools reward program | P2 | ✅ shipped | EPIC-19 |
 | FR-159 | In-app notification center for transaction status, campaign alerts, and system messages | P2 | ✅ shipped | EPIC-19 |
+| FR-160 | Earning term-and-condition display: a pool's terms are shown and must be accepted before the first earning position on it | P1 | ✅ shipped | EPIC-12 |
 
 </details>
+
+> **On FR-160's number.** An FR number is an **identity, not a position**. FR-160 belongs to
+> EPIC-12 (whose other rows are FR-114…125), because it was found *after* the table was
+> numbered — it shipped in 1.3.83 with no FR to its name. New FRs **append at the end**; the
+> **Epic column is the authoritative grouping**, never the number range. Do not "fix" this by
+> renumbering — see [CONTEXT D94](CONTEXT.md) (the one-time renumber) and [D98](CONTEXT.md).
 
 ### Foundation & Platform
 
@@ -437,9 +444,9 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 #### EPIC-12 — earning
 
-- **Covers:** Native / nomination-pool / collator / liquid / dApp staking, Bittensor dTAO, Interlay lending, plus earning-path simulation and XCM deposit routing.
+- **Covers:** Native / nomination-pool / collator / liquid / dApp staking, Bittensor dTAO, Interlay lending, plus earning-path simulation, XCM deposit routing, and the pool term-and-condition gate.
 - **Why it matters:** SubWallet's largest feature area and biggest differentiator — where users grow their holdings.
-- **Status:** 🟡 **Partially shipped** — 8/12 FRs
+- **Status:** 🟡 **Partially shipped** — 9/13 FRs
 
 | FR | Requirement | Status |
 | ---- | ------------- | -------- |
@@ -455,6 +462,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-123 | Bittensor alpha-token liquid staking | 📋 planned |
 | FR-124 | Trusted Stake — alpha index staking integration, incl. the wallet-side auto-rebalancing delegate-staking flow | 🚧 in progress |
 | FR-125 | In-app staking for additional networks (Enjin, Phala, xx Network, and others) | 📋 planned |
+| FR-160 | Earning term-and-condition display: a pool's terms are shown and must be accepted before the first earning position on it | ✅ shipped |
 
 #### EPIC-13 — bridge-xcm
 
@@ -574,8 +582,8 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | NFR-12 — Cold-start: cached-first paint, progressive refresh | [US-20.1](sprints/stories/US-20.1-core-structure-and-lifecycle-refactor.md) |
 | NFR-20 — Services SDK aggregation; reduce per-chain RPC fan-out | [US-20.2](sprints/stories/US-20.2-api-call-optimization.md) |
 | NFR-21 — Cache / CDN proxy layer for market/metadata/media | [US-20.2](sprints/stories/US-20.2-api-call-optimization.md) |
-| _(no covering NFR — PRD gap)_ — Many-account submit/close must not block the main thread | [US-20.4](sprints/stories/US-20.4-many-account-submit-performance.md) |
-| NFR-17 — List render performance on heavy selection/collection screens | [US-20.5](sprints/stories/US-20.5-list-rendering-performance.md) |
+| NFR-23 — Many-account submit/close must not block the main thread | [US-20.4](sprints/stories/US-20.4-many-account-submit-performance.md) |
+| NFR-23 — List render performance on heavy selection/collection screens | [US-20.5](sprints/stories/US-20.5-list-rendering-performance.md) |
 | NFR-17 (shared) — Web-surface portability/performance (webapp / web-runner) | [US-20.6](sprints/stories/US-20.6-webapp-and-web-runner-performance.md) |
 | NFR-19 — Dependency auditability: Yarn 3 lockfile, npm-only registry | [US-1.5](sprints/stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md) |
 
@@ -633,5 +641,16 @@ This project is **requirement-centric**: stories link back to the PRD through `p
 | NFR-19 | Dependency auditability: Yarn 3 lock file committed; all packages published to npm; no private registry dependencies for core wallet logic | Supply Chain |
 | NFR-20 | SubWallet Services SDK backend: aggregated balance, fee, swap, and XCM/NFT data is fetched through the SubWallet Services SDK backend (`sw-services`, via `@subwallet-monorepos/subwallet-services-sdk`) instead of being computed entirely on-device — reducing per-chain RPC load and centralizing multi-chain data aggregation | Performance / Availability |
 | NFR-21 | Data cache & CDN proxy layer: market data (token prices, exchange rates, EVM gas) is served through SubWallet cache proxies (`api-cache`, with `static-cache` / `chain-data` JSON fallback); online chain-list and token/asset metadata come from `static-data` / `chain-list-assets`; NFT media is fetched via the `ipfs-files` IPFS gateway — these front upstream providers to reduce rate-limit exposure, enable release-free data updates, and provide fallbacks when an upstream is unavailable | Performance / Availability |
+| NFR-22 | **Financial-figure accuracy:** every monetary figure the wallet displays — balance, reward, APY/APR, fee, swap quote — either matches its source of truth (chain state, or the aggregator the figure is sourced from) or is shown as **unavailable**. A figure that cannot be computed reliably is never rendered as a confident number. **Defended by** [US-12.13](sprints/stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) (rewards/APY) and [US-8.12](sprints/stories/US-8.12-fee-bigint-and-gas-estimation-hardening.md) (fees). | Correctness |
+| NFR-23 | **Responsiveness under account scale:** wallet-wide operations (submit, close, list render, balance fan-out) stay responsive as the account count grows — no operation blocks the main thread long enough to freeze the UI, and per-account work is batched rather than issued one call per account. **Defended by** [US-20.4](sprints/stories/US-20.4-many-account-submit-performance.md) (submit/close, main thread) and [US-20.5](sprints/stories/US-20.5-list-rendering-performance.md) (list render). | Performance |
+| NFR-24 | **Degrade, never blank:** a malformed, unexpected, or undecodable payload from any external source (dApp, chain, indexer, aggregator) degrades to an explicit error state the user can act on — never a blank screen, a silent no-op, or a crashed popup. Applies first to the confirmation screen, where the user is being asked to sign. **Defended by** [US-8.13](sprints/stories/US-8.13-payload-decode-error-handling.md). | Reliability |
+| NFR-25 | **Web-surface hardening:** the web app and web-runner enforce a Content-Security-Policy, and every externally-controlled link opens with `noopener`/`noreferrer` (reverse-tabnabbing). The extension's MV3 CSP (NFR-8) does not cover these surfaces — they are separately built and separately exposed. **Defended by** [US-5.10](sprints/stories/US-5.10-verichains-audit-remediation-hardening.md). | Security |
+
+> **The bar a requirement must clear to be on this page** ([CONTEXT D96](CONTEXT.md), [D98](CONTEXT.md)):
+> **(1)** evidence someone felt the pain, **(2)** a way to check it, **(3)** a story that owns it.
+> NFR-11 was retired for failing all three — an unmeasured, unenforced requirement is folklore,
+> and folklore in a PRD is worse than a blank line, because it reads as a commitment. Each of
+> NFR-22…25 names its defending story above; if a requirement's story is ever deleted without a
+> replacement, the requirement goes with it.
 
 ---

@@ -1587,3 +1587,58 @@ A requirement that nobody measures and nobody enforces **is already deleted in p
 **Citations**: [D2](#d2-replace-apipromise-with-a-lightweight-connector-for-balancetoken-queries), [D95](#d95-the-lightweight-read-connector-revision-of-d2-was-never-implemented--measure-before-refactoring); AD-07; PRD NFR-11 (retired); [US-20.3](sprints/stories/US-20.3-read-path-memory-budget.md) (deprecated); CHANGELOG 0.2.2
 
 ---
+
+### D97. What a docs epic may change — and when a story that ships in no release is done
+
+**Context**: [EPIC-21](sprints/epics/EPIC-21.md)'s charter promised the epic *"never changes the product scope, the PRD's functional requirements, or any epic's story set."* By the time its three stories closed it had done all three: two FRs withdrawn ([D92](#d92-the-prd-needs-a--withdrawn-state--shipped-is-not-forever)), one NFR retired ([D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95)), the FR table renumbered ([D94](#d94-one-time-gapless-renumber-of-fr-and-epic-12-story-ids--never-again)), two duplicate stories and one phantom integration deleted, one story carved out ([US-3.9](sprints/stories/US-3.9-unified-to-solo-account-split.md)). A second question fell out of the same epic: **all three of its stories were stuck at `review`**, because the done-gate wants `version_shipped` + a CHANGELOG entry, and documentation ships in no release.
+
+**Decision — two rules, one principle.**
+
+1. **A docs epic changes the map, never the territory.** It *may* correct any doc the code proves wrong — including deleting a story, marking an FR unshipped, or adding an FR for a capability that demonstrably shipped without one. It *may not* decide what the product **should** do. **Every product decision escalates to the owner and lands here as a dated `D` entry.** That is the seam, and unlike the old prohibition **it is checkable**: an FR or NFR whose status a docs epic changed, with no `D` entry to cite, is a violation.
+2. **The done-gate has two branches.** A story that materializes a requirement is `done` only with `version_shipped` (RULE-16). A story in an epic that materializes no requirement (`prd_ref: []` at the epic level — docs, tooling, infra) **ships in no release**: it is `done` when every AC is ticked, `commit` names a real SHA, and `koni-docs validate` exits zero. `version_shipped` stays empty **on purpose**, not by omission.
+
+**Rationale**: The old charter was not wrong about intent — *"nobody may smuggle a product decision into a docs epic"* is exactly right, and it survives as rule 1. It was wrong about **mechanism**: it was phrased as a *fact about scope* ("never touches X"), and a fact about scope expires the moment scope moves. It expired on day one, because **an epic whose job is to check the docs against the code must be able to fix the docs it proves wrong.** A charter that forbids correcting the lies it finds is a charter that guarantees stale docs.
+
+Leaving it unfixed was not neutral. It forces one of two outcomes, both bad: either the next maintainer **obeys** it, leaves a known-false doc in place, and docs rot becomes *protected by policy*; or they **ignore** it — and the team learns that a rule in this system need not be true. That second one is the expensive one. A doc system's entire value rests on "the rules mean what they say"; the first ignored rule is the cheapest one, and the tenth is free.
+
+Rule 2 exists for the same reason in miniature: without it a docs story can never leave `review`, so `review` comes to mean two different things — *"awaiting a reviewer"* and *"finished, but unrepresentable"* — and a kanban column that means two things is a dead column.
+
+**What was considered and rejected**: (a) a *"docs version space"* alongside extension/webapp ([D91](#d91-one-repo-two-version-spaces--declare-the-space-never-mix-the-numbers)) — a second version axis nobody would maintain, to number releases that do not exist; (b) leaving the charter as-is and annotating it `⚠️ superseded`, keeping the historical record intact. (b) was genuinely close and the record it wanted is preserved anyway — the rewritten charter opens by quoting the original and saying why it failed.
+
+**Impact**: EPIC-21 → `done`; US-21.1 / US-21.2 / US-21.3 → `done` with `commit` set and `version_shipped` empty; sprint-2026-W28 closed. The rules are restated for all future epics in `AGENTS.md §7`, not only in EPIC-21 — the charter of one epic is the wrong home for a standing rule, and **every future conformance pass will look like EPIC-21**, so whatever that charter says is what the next five audits will do.
+
+**Date**: 2026-07-13
+**Version**: docs-only (against v1.3.83)
+**Citations**: [EPIC-21](sprints/epics/EPIC-21.md); [D92](#d92-the-prd-needs-a--withdrawn-state--shipped-is-not-forever), [D93](#d93-prd_ref-holds-fr-n-or-nfr-n--the-project-is-requirement-centric-not-fr-centric), [D94](#d94-one-time-gapless-renumber-of-fr-and-epic-12-story-ids--never-again), [D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95); [LESSONS §65](LESSONS.md); AGENTS.md §7
+
+---
+
+### D98. Close the five PRD gaps — one FR the product already shipped, four NFRs that had no home
+
+**Context**: The [EPIC-21](sprints/epics/EPIC-21.md) conformance pass surfaced five things the product does, or is expected to do, that **no requirement in the PRD asks for**. Four of them already had stories; those stories sat at `prd_ref: []`, defending nothing on paper.
+
+**Decision**: Close all five, applying the bar that [D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95) used to *kill* NFR-11 — **a requirement earns a place in the PRD only with (1) evidence someone felt the pain, (2) a way to check it, and (3) a story that owns it.**
+
+| Gap | Verdict | Landed as | Owner |
+| --- | --- | --- | --- |
+| Earning term-and-condition display | **Not a gap — a missing row.** It *shipped* in 1.3.83 (#5007). The PRD must describe the product that exists. | **FR-160** ✅ shipped | [US-12.15](sprints/stories/US-12.15-earning-term-and-condition-display.md) |
+| Displayed financial figures may be wrong | Pain: #3527, #2708, #4987 (alpha price vs TaoStats). Checkable against chain/source. | **NFR-22** — accuracy or *unavailable*; never a confident wrong number | [US-12.13](sprints/stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md), [US-8.12](sprints/stories/US-8.12-fee-bigint-and-gas-estimation-hardening.md) |
+| UI freezes as account count grows | Pain: #4984 — code is *already written* on `koni/dev/issue-4984`. Checkable (main-thread block, per-account fan-out). | **NFR-23** — responsiveness under account scale | [US-20.4](sprints/stories/US-20.4-many-account-submit-performance.md), [US-20.5](sprints/stories/US-20.5-list-rendering-performance.md) |
+| A bad payload blanks the confirmation screen | Pain: #4989, #4148 — already cost a shipped fix. Checkable by test. | **NFR-24** — degrade to an error state, never a blank screen | [US-8.13](sprints/stories/US-8.13-payload-decode-error-handling.md) |
+| WebApp has no CSP; external links can reverse-tabnab | Pain: audit finding #4959. Checkable at build. | **NFR-25** — web-surface hardening | [US-5.10](sprints/stories/US-5.10-verichains-audit-remediation-hardening.md) |
+
+**Rationale**: The four NFRs pass a bar NFR-11 failed on all three counts. NFR-11's pain was **four years cold** (one incident, in 0.2.2), it had **no probe**, and its umbrella tracker had **zero commits** — folklore. Each of NFR-22…25 has a live tracker issue, a mechanical check, and a story already written to defend it. The difference is not that these feel more important; it is that **someone is provably already paying for them.**
+
+FR-160 is a different animal and worth naming as such: it is the first case of **the product shipping a capability the PRD never asked for.** The story existed and was `done`; only the requirement was missing. That is the failure mode the issue→story coverage index (US-21.4, deferred) exists to catch systematically — 1094 issues cited in the CHANGELOG, only 65 claimed by a story.
+
+**On FR-160's number**: it belongs to EPIC-12 (FR-114…125) but sits at 160, after EPIC-19's rows. This is **correct and must not be "fixed"**. An FR number is an **identity, not a position**: new FRs append at the end, and the **Epic column is the authoritative grouping**, never the number range. Renumbering to restore the range would contradict [D94](#d94-one-time-gapless-renumber-of-fr-and-epic-12-story-ids--never-again) one day after it declared the renumber a one-time exception — and would break every reference for a cosmetic gain.
+
+**What was considered and rejected**: recording the four gaps as a dated *"known gaps"* list instead of as requirements. Rejected — a known-gaps list is a requirement with no owner and no check, which is precisely the shape of the thing we just retired. If the pain is real enough to write down, it is real enough to assign; if it is not, it should not be in the doc at all.
+
+**Impact**: 160 FRs (119 → 120 shipped), 24 live NFRs (NFR-11 remains tombstoned, never reused). Seven stories move off `prd_ref: []` and now defend something nameable. EPIC-12 → 9/13 FRs. The **US-20.4** row in EPIC-20's NFR table stops reading *"(no covering NFR — PRD gap)"*.
+
+**Date**: 2026-07-13
+**Version**: docs-only (against v1.3.83)
+**Citations**: [D93](#d93-prd_ref-holds-fr-n-or-nfr-n--the-project-is-requirement-centric-not-fr-centric), [D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95), [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done); PRD FR-160, NFR-22…25; CHANGELOG 1.3.83 (#5007)
+
+---

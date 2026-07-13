@@ -976,4 +976,23 @@ See [CONTEXT D95](CONTEXT.md) (revision of D2), [US-20.3](sprints/stories/US-20.
 
 ---
 
+## 65. A rule phrased as a fact about scope expires; phrase it as a principle
+
+**What happened**: [EPIC-21](sprints/epics/EPIC-21.md)'s charter promised that the epic *"never changes the product scope, the PRD's functional requirements, or any epic's story set."* It was written to prevent a real abuse — smuggling a product decision into a docs cleanup — and that intent was right. But by the end of the epic it had withdrawn two FRs, retired an NFR, renumbered the FR table, deleted three stories and carved out a new one. **The rule was broken on day one, and it could not have been otherwise:** an epic whose job is to check the docs against the code *must* be able to fix the docs it proves wrong.
+
+**The bug was the grammar, not the intent.** The charter stated a **fact about scope** — *"never touches X"* — and a fact about scope expires the moment scope moves. Restated as a **principle** — *"a docs epic changes the map, never the territory; every product decision escalates and lands in CONTEXT as a `D` entry"* — it says the same thing, permits the work that had to happen, and **does not expire** ([CONTEXT D97](CONTEXT.md)).
+
+**The tell that separates the two**: a principle can be **checked**. *"Never touches an FR"* was violated eight times and nothing surfaced it, because nothing could. *"An FR whose status changed with no `D` entry to cite is a violation"* is a grep. The rule that survives is the one with a check attached — the same bar [D96](CONTEXT.md) applied to requirements, now applied to process.
+
+**Why it is worth fixing rather than ignoring** — leaving a false rule in place is not neutral, it picks the worse of two outcomes:
+
+- **Obeyed**: the next maintainer reads it, declines to fix the false doc it forbids them to touch, and **docs rot becomes protected by policy**.
+- **Ignored** (what actually happened): the team learns that a rule here need not be true. That is the expensive one — a doc system's whole value rests on *"the rules mean what they say"*. **The first ignored rule is the cheapest one; the tenth is free.**
+
+**The rule for next time**: write a rule as a *boundary of authority* ("may change A, must escalate B"), never as a *prediction about what will get touched*. And note that this class of error is **invisible to tooling** — `validate` does not read prose. A false charter is caught only when a human happens to read it right after it is violated. When that moment arrives, spend the ten minutes.
+
+See [CONTEXT D97](CONTEXT.md), [EPIC-21](sprints/epics/EPIC-21.md), [§64](#64-a-doc-stated-invariant-is-a-claim-not-evidence--check-the-code-before-you-build-a-story-to-guard-it).
+
+---
+
 _End of LESSONS.md_

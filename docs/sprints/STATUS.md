@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-13 10:21:46 UTC
+> Last generated: 2026-07-13 10:43:54 UTC
 > Total stories: 174
 
 ## 📋 Backlog (54)
@@ -74,16 +74,13 @@ _No stories_
 | US-20.1 | Core-structure & lifecycle refactor | EPIC-20 | P1 | 8 | — | — |
 | US-20.2 | API-call optimization | EPIC-20 | P1 | 5 | — | — |
 
-## 👀 Review (4)
+## 👀 Review (1)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | — | tunghp2002 |
-| US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | sprint-2026-W28 | tunghp2002 |
-| US-21.2 | History backfill | EPIC-21 | P1 | 13 | sprint-2026-W28 | tunghp2002 |
-| US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (113)
+## ✅ Done (116)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -147,6 +144,9 @@ _No stories_
 | US-2.6 | Fee engine | EPIC-2 | P1 | 5 | — | saltict |
 | US-2.7 | RequestService approval queue | EPIC-2 | P0 | 8 | — | S2kael |
 | US-2.8 | Transaction lifecycle engine | EPIC-2 | P0 | 8 | — | saltict |
+| US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | sprint-2026-W28 | tunghp2002 |
+| US-21.2 | History backfill | EPIC-21 | P1 | 13 | sprint-2026-W28 | tunghp2002 |
+| US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
 | US-3.1 | Create a new wallet via seed phrase | EPIC-3 | P0 | 3 | — | jacogr |
 | US-3.2 | Import account via seed phrase or private key | EPIC-3 | P0 | 3 | — | Quangdm-cdm |
 | US-3.3 | Import account via JSON / QR / Trust Wallet | EPIC-3 | P1 | 5 | — | bluezdot |
@@ -218,8 +218,8 @@ _No stories_
 - 📋 **Backlog**: 54
 - 🟢 **Ready**: 0
 - 🟡 **In Progress**: 2
-- 👀 **Review**: 4
-- ✅ **Done**: 113
+- 👀 **Review**: 1
+- ✅ **Done**: 116
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 

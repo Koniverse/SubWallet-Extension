@@ -7,13 +7,13 @@ priority: P1
 points: 5
 sprint:
 version_shipped:
-prd_ref: [FR-76, FR-77, FR-80]
+prd_ref: [FR-76, FR-77, FR-80, NFR-22]
 arch_ref: [AD-02, AD-25]
 depends_on: [US-8.1, US-8.3, US-8.4, US-8.7]
 assignee:
 commit:
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-13
 ---
 
 ## Goal
@@ -190,6 +190,7 @@ cross-product effort.
 
 ### References
 
+- [Source: PRD NFR-22](../../PRD.md#non-functional-requirements) — financial-figure accuracy. **This story owns it** for fees.
 - [Issue #4043](https://github.com/Koniverse/SubWallet-Extension/issues/4043) — Fix bug paying fee with non-native tokens
 - [Issue #4552](https://github.com/Koniverse/SubWallet-Extension/issues/4552) — Re-check estimated-fee logic when paying with a non-native token (PAH network)
 - [Issue #4649](https://github.com/Koniverse/SubWallet-Extension/issues/4649) — Re-check display estimated fee for substrate/EVM on Transfer / confirmation
