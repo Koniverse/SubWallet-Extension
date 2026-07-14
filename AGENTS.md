@@ -188,6 +188,12 @@ numbers collide the same way. So: resolving `version → date` from the CHANGELO
 A duplicate identifier is a **signal you crossed a lineage boundary**, not a nuisance
 ([LESSONS §62/§63/§66](docs/LESSONS.md)).
 
+And **`version_shipped` names a release of *this* product.** A capability inherited from the
+polkadot-js fork shipped to a SubWallet user in **0.2.1** — SubWallet's first release — not in
+the upstream release it was written for. Upstream provenance (release, author, commit) belongs
+in the story's notes, which can say *"a polkadot-js release, not ours"*; a semver field cannot
+([D101](docs/CONTEXT.md)).
+
 **2. A requirement needs pain, a check, and an owner.** Before an FR or NFR enters
 `docs/PRD.md`: *(a)* evidence someone felt the pain, *(b)* a way to check it, *(c)* a
 story that defends it, named in the row. NFR-11 was **retired** for failing all three —

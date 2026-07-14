@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-14 03:21:49 UTC
+> Last generated: 2026-07-14 03:42:42 UTC
 > Total stories: 177
 
 ## 📋 Backlog (56)
@@ -90,8 +90,8 @@ _No stories_
 | US-10.2 | Substrate inject API (injectedWeb3) | EPIC-10 | P1 | 5 | sprint-2022-M02 | jacogr |
 | US-10.3 | WalletConnect v2 (Substrate + EVM) | EPIC-10 | P1 | 5 | sprint-2023-M07 | S2kael |
 | US-10.4 | Cardano CIP-30 connector | EPIC-10 | P1 | 5 | sprint-2025-M04 | Thiendekaco |
-| US-10.7 | dApp authorization UI (per-origin) | EPIC-10 | P1 | 3 | sprint-2021-M01 | Tbaut |
-| US-10.8 | Arbitrary message signing | EPIC-10 | P1 | 3 | sprint-2019-M12 | c410-f3r |
+| US-10.7 | dApp authorization UI (per-origin) | EPIC-10 | P1 | 3 | sprint-2022-M02 | Tbaut |
+| US-10.8 | Arbitrary message signing | EPIC-10 | P1 | 3 | sprint-2022-M02 | c410-f3r |
 | US-11.1 | In-wallet swap via Chainflip | EPIC-11 | P1 | 5 | sprint-2024-M04 | frenkie-ng |
 | US-11.2 | In-wallet swap via Hydration DEX | EPIC-11 | P1 | 5 | sprint-2024-M04 | frenkie-ng |
 | US-11.3 | In-wallet swap via Uniswap (V3/V4 + UniswapX) | EPIC-11 | P1 | 5 | sprint-2025-M05 | bluezdot |
@@ -155,7 +155,7 @@ _No stories_
 | US-3.4 | Export keys & multi-account management | EPIC-3 | P1 | 3 | sprint-2023-M03 | S2kael |
 | US-3.5 | The Unified Account model | EPIC-3 | P1 | 8 | sprint-2024-M10 | saltict |
 | US-3.6 | Watch-only accounts & address book | EPIC-3 | P2 | 3 | sprint-2023-M04 | saltict |
-| US-3.7 | Account derivation: custom path & child accounts | EPIC-3 | P2 | 3 | sprint-2020-M04 | barrutko |
+| US-3.7 | Account derivation: custom path & child accounts | EPIC-3 | P2 | 3 | sprint-2022-M02 | barrutko |
 | US-4.1 | Add/remove networks + custom RPC | EPIC-4 | P1 | 3 | sprint-2022-M05 | saltict |
 | US-4.2 | Bulk disable + reset to default networks | EPIC-4 | P1 | 2 | sprint-2022-M05 | nulllpc |
 | US-4.3 | Auto-update chain list & token metadata | EPIC-4 | P1 | 3 | sprint-2024-M03 | S2kael |
@@ -168,7 +168,7 @@ _No stories_
 | US-4.11 | Custom token import (ERC-20 / PSP-22) | EPIC-4 | P1 | 3 | sprint-2022-M10 | nulllpc |
 | US-4.12 | Token registry enable/disable | EPIC-4 | P1 | 2 | sprint-2023-M03 | nulllpc |
 | US-4.24 | Remove Polygon zkEVM logic and update chainlist | EPIC-4 | P1 | 3 | sprint-2026-M07 | tunghp2002 |
-| US-5.1 | Phishing site & address protection | EPIC-5 | P0 | 5 | sprint-2020-M11 | Tbaut |
+| US-5.1 | Phishing site & address protection | EPIC-5 | P0 | 5 | sprint-2022-M02 | Tbaut |
 | US-5.2 | Master password & strength policy | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
 | US-5.3 | Forgot password → reset wallet | EPIC-5 | P0 | 3 | sprint-2023-M05 | S2kael |
 | US-5.4 | Unified unlock / auto-lock flow | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |

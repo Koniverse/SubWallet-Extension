@@ -1715,3 +1715,27 @@ Applied to EPIC-20 — three shipped capabilities got the retroactive story ever
 **Citations**: [D94](#d94-one-time-gapless-renumber-of-fr-and-epic-12-story-ids--never-again), [D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95), [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done), [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system); [US-3.9](sprints/stories/US-3.9-unified-to-solo-account-split.md) (the same cut, from US-3.5); AGENTS.md §7 rule 1; [LESSONS §64](LESSONS.md)
 
 ---
+
+### D101. `version_shipped` names a release of *this* product — inherited features ship at 0.2.1
+
+**Context**: Four stories carried a `version_shipped` that **is not a SubWallet release**: US-10.8 → `0.14.1`, US-3.7 → `0.24.1`, US-5.1 → `0.35.1`, US-10.7 → `0.36.1`. Those are **polkadot-js** releases, inherited with the fork ([LESSONS §66](LESSONS.md)); their authors — `c410-f3r`, `barrutko`, `Tbaut` — are polkadot-js maintainers. The [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system) sprint pass surfaced them by bucketing four stories into windows dated **2019–2021**, before SubWallet existed.
+
+**Decision**: **`version_shipped` answers one question — *"which release of **this product** first put this capability in a user's hands?"*** For a capability inherited from the fork, that is **0.2.1** (2022-02-10), SubWallet's first release. All four are corrected. Upstream provenance — release, author, commit — moves into each story's Implementation notes, where it is richer and cannot be misread as a SubWallet version.
+
+**Verified, not assumed**: each upstream commit is an ancestor of **v0.2.5** — SubWallet's earliest tag — by `git merge-base --is-ancestor`. (0.2.1 is untagged, so v0.2.5 is its anchor under the [US-21.2](sprints/stories/US-21.2-history-backfill.md) rule: no tag → the CHANGELOG release commit → else the earliest tag ≥ the version.) So the capability provably shipped in SubWallet's first tagged build.
+
+**Rationale — the old number did not merely lack provenance, it *misinformed***. Read on SubWallet's own version line, `0.35.1` sits **after `0.8.1` (2023-02) and before `1.0.1` (2023-03)**. A reader would place phishing protection in **early 2023**. SubWallet has had it **since day one**. The number was not a harmless artefact of the fork — it pointed at the wrong end of the product's life.
+
+It was also **internally inconsistent**, which is what proves it was an accident rather than a convention: [US-10.2](sprints/stories/US-10.2-substrate-inject-api.md) (`injectedWeb3`, by `jacogr`) and [US-3.1](sprints/stories/US-3.1-create-wallet-seed-phrase.md) (create-wallet, also `jacogr`) are **equally inherited** — and both already said **0.2.1**. Four stories out of six went one way; the rule below makes all six agree.
+
+**`assignee` stays the upstream author.** They wrote the code, and that is true. `assignee` records *who delivered the work*; `version_shipped` records *when this product shipped it*. Conflating them is what produced the error.
+
+**What was considered and rejected**: keeping the upstream version "for provenance". Provenance is not lost — it is *relocated* to the place that can express it (a table in the story, naming the upstream release, author and commit). A frontmatter field constrained to `^\d+\.\d+\.\d+$` cannot say *"a polkadot-js release, not ours"*. Forcing it to carry a meaning it cannot express is how the misinformation happened.
+
+**Impact**: four stories corrected to `version_shipped: 0.2.1`, `sprint: sprint-2022-M02`. **The four reconstructed windows dated 2019–2021 are deleted** — they were empty once the stories moved, and they had been asserting that SubWallet ran sprints before it existed. **The project's earliest window is now 2022-M02, SubWallet's first month**, which is finally true.
+
+**Date**: 2026-07-14
+**Version**: docs-only (against v1.3.83)
+**Citations**: [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system); [LESSONS §66](LESSONS.md); [US-21.2](sprints/stories/US-21.2-history-backfill.md) (the anchor rule); AGENTS.md §7 rule 1b
+
+---

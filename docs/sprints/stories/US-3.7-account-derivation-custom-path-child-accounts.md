@@ -5,15 +5,15 @@ epic: EPIC-3
 status: done
 priority: P2
 points: 3
-sprint: sprint-2020-M04
-version_shipped: 0.24.1
+sprint: sprint-2022-M02
+version_shipped: 0.2.1
 prd_ref: [FR-26, FR-27]
 arch_ref: [AD-04, AD-11]
 depends_on: [US-3.5, US-2.1]
 assignee: barrutko
 commit: eeac2c1064c591dd33af129a323d2c57ce191bfa, d0de8c0f34c11d1506b68ff592c2ddc451919caa
 created: 2026-06-11
-updated: 2026-06-11
+updated: 2026-07-14
 ---
 
 ## Goal
@@ -114,6 +114,27 @@ reconciliation.
 **Commit**:
 
 ## Implementation notes
+
+**Inherited from polkadot-js — `version_shipped` corrected 2026-07-14 ([CONTEXT D101](../../CONTEXT.md)).**
+This capability was **not built by SubWallet**. It came with the fork: SubWallet-Extension is a
+fork of the **polkadot-js extension**, and inherited its git history, tags and CHANGELOG.
+
+| | |
+| --- | --- |
+| Upstream release | **0.24.1** (2020-04-19) — a **polkadot-js** release, not a SubWallet one |
+| Upstream author | `barrutko` — a polkadot-js maintainer |
+| Upstream commit | `eeac2c1064c591dd33af129a323d2c57ce191bfa` — account derivation (custom path / child accounts) |
+| **Reached a SubWallet user in** | **0.2.1** (2022-02-10) — SubWallet's **first** release |
+
+This story used to carry `version_shipped: 0.24.1`, which was **actively misleading**: read
+on SubWallet's version line, `0.24.1` sits *after* 0.8.1 — so the docs implied the capability
+arrived mid-2023, when in fact **SubWallet had it from day one**. `version_shipped` answers
+*"which release of **this product** first gave a user this capability"*; the answer is
+**0.2.1**. Verified: the upstream commit is an ancestor of **v0.2.5**, SubWallet's earliest
+tag (`git merge-base --is-ancestor`; 0.2.1 itself is untagged, so v0.2.5 is its anchor per the
+[US-21.2](US-21.2-history-backfill.md) rule).
+
+`assignee` stays `barrutko` — they wrote the code, and that is true. See [LESSONS §66](../../LESSONS.md).
 
 _Retroactive story — capability already shipped. Fill `commit`,
 `version_shipped` and any implementation caveats during version reconciliation._
