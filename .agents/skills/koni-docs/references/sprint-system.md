@@ -8,7 +8,26 @@
 | Story `id:` frontmatter | `US-<EPIC>.<N>[.<SUB>]` | `US-3.7` |
 | Task ID (inside story) | `TASK-<US-id>.<n>` | `TASK-3.7.1` |
 | Epic file | `EPIC-<N>.md` or `EPIC-DS.md` | `EPIC-3.md` |
-| Sprint file | `sprint-YYYY-WNN.md` | `sprint-2026-W19.md` |
+| Sprint file (planned) | `sprint-YYYY-WNN.md` — ISO week | `sprint-2026-W19.md` |
+| Sprint file (reconstructed) | `sprint-YYYY-MNN.md` — calendar month | `sprint-2024-M02.md` |
+
+## Reconstructed windows (`M` cadence)
+
+A project that adopts koni-docs on top of existing history has stories that
+shipped **before any sprint existed**. They still need a `sprint`: work that
+is past `backlog` must be locatable in time.
+
+Do **not** invent weekly sprints for them — a week bucket implies a planning
+cadence that never happened. Use a **month** window instead:
+
+| | `W` — planned | `M` — reconstructed |
+|---|---|---|
+| Means | The team **committed** to this scope in this ISO week | These stories **shipped** in this calendar month, per the CHANGELOG |
+| `goal` | Written **before** the work | Derived **after**, from the releases in the window |
+| Velocity | Meaningful | **Meaningless** — points were assigned retroactively. Never chart it. |
+
+A reconstructed sprint file MUST say so in its body, so no reader mistakes it
+for a plan. Once the sprint system is live, all new sprints are `W`.
 
 ## Story status flow
 

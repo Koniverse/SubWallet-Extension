@@ -168,12 +168,25 @@ CONTEXT, LESSONS, SETUP, sprints/, CHANGELOG) is **authored**.
 These are not EPIC-21's rules; they are the project's. Each was paid for by a defect
 that reached the owner before it reached a check. Full reasoning in `docs/CONTEXT.md`.
 
+**These six live here on purpose.** The koni-docs spec is vendored from
+`Koniverse/Koni-Skills` and the CLI ships from npm — the next skill install or
+`npm i -g` overwrites both. `AGENTS.md` is the only copy nothing overwrites.
+
 **1. An ID is an identity, not a position.** FR / NFR / US numbers are permanent. The
 single gapless renumber of 2026-07-13 was a **one-time exception and will not recur**
 ([D94](docs/CONTEXT.md)). New FRs **append at the end**; the **Epic column is the
 authoritative grouping**, never the number range — which is why FR-160 belongs to
 EPIC-12 (FR-114…125) and must not be "fixed". A retired number is retired, never
 reused (NFR-11).
+
+**1b. Every identifier space in this repo has a stowaway.** The repo is a polkadot-js fork,
+so it inherited that project's numbering: **51 of the 303 releases in `docs/CHANGELOG.md`
+predate 2022 and are not this product**, and six version numbers (`0.2.1`, `0.3.1`, `0.4.1`,
+`0.6.1`, `0.7.1`, `0.8.1`) appear **twice** — once as SubWallet, once as polkadot-js. Issue
+numbers collide the same way. So: resolving `version → date` from the CHANGELOG takes the
+**newest** match (the file is newest-first); grepping git for an issue number is **date-windowed**.
+A duplicate identifier is a **signal you crossed a lineage boundary**, not a nuisance
+([LESSONS §62/§63/§66](docs/LESSONS.md)).
 
 **2. A requirement needs pain, a check, and an owner.** Before an FR or NFR enters
 `docs/PRD.md`: *(a)* evidence someone felt the pain, *(b)* a way to check it, *(c)* a
@@ -198,7 +211,18 @@ real SHA, and `validate` exits zero. Its `version_shipped` is empty **on purpose
 Corollary: **a `done` story may not carry an unticked AC** — forward scope must *leave*
 the story into its own (this is how FR-23 came to be marked shipped though never built).
 
-**5. Write a rule as a boundary of authority, never as a prediction.** EPIC-21's charter
+**5. Every story past `backlog` sits in a sprint window — `W` planned, `M` reconstructed.**
+`sprint` is **required** once a story leaves `backlog`: work in flight must be locatable in
+time. Two cadences (`^sprint-\d{4}-[WM]\d{2}$`): **`W`** = a real ISO week the team
+committed to. **`M`** = a **reconstructed** calendar month, for the 113 stories that shipped
+before the sprint system existed (2022-02 → 2026-07). A reconstructed window states so in
+its own body: its `goal` is derived from the CHANGELOG *after the fact*, its points are
+retroactive, and **velocity computed on it is meaningless — never chart it**
+([D99](docs/CONTEXT.md)). The authority for *"when did this ship"* is `version_shipped` +
+`commit`, provable with `git merge-base --is-ancestor`; **a sprint label proves nothing** —
+it is a locator, not evidence.
+
+**6. Write a rule as a boundary of authority, never as a prediction.** EPIC-21's charter
 said it *"never changes the PRD's functional requirements"* — a **fact about scope**, and
 a fact about scope expires the moment scope moves. It was violated on day one, because an
 epic that checks docs against code must be able to fix what it proves wrong. A rule that

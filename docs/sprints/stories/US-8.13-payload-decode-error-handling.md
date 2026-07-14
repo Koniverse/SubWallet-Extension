@@ -5,7 +5,7 @@ epic: EPIC-8
 status: done
 priority: P1
 points: 2
-sprint:
+sprint: sprint-2026-M07
 version_shipped: 1.3.82
 prd_ref: [NFR-24]
 arch_ref: []

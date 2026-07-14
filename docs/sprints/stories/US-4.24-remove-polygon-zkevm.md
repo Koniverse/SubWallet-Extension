@@ -5,7 +5,7 @@ epic: EPIC-4
 status: done
 priority: P1
 points: 3
-sprint:
+sprint: sprint-2026-M07
 version_shipped: 1.3.82
 prd_ref:
   - FR-36

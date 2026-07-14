@@ -5,7 +5,7 @@ epic: EPIC-6
 status: done
 priority: P2
 points: 2
-sprint:
+sprint: sprint-2024-M04
 version_shipped: 1.1.60
 prd_ref: [FR-67]
 arch_ref: [AD-03]

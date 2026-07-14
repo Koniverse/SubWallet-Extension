@@ -5,7 +5,7 @@ epic: EPIC-5
 status: done
 priority: P0
 points: 5
-sprint:
+sprint: sprint-2020-M11
 version_shipped: 0.35.1
 prd_ref: [FR-52]
 arch_ref: [AD-19]

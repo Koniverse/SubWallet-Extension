@@ -995,4 +995,31 @@ See [CONTEXT D97](CONTEXT.md), [EPIC-21](sprints/epics/EPIC-21.md), [§64](#64-a
 
 ---
 
+## 66. The CHANGELOG carries a third lineage — 51 inherited polkadot-js releases, six of them colliding
+
+**What happened**: Bucketing 113 stories into release months, six landed in **2019** — including *"Create a new wallet via seed phrase"* and *"Send native & fungible tokens"*. SubWallet did not exist in 2019.
+
+`docs/CHANGELOG.md` holds **303 releases, and 51 of them predate 2022** — they are the inherited **polkadot-js extension** history this repo was forked from. Six version numbers appear **twice**, in two different products:
+
+| Version | SubWallet (Koni) | polkadot-js (inherited) |
+| --- | --- | --- |
+| 0.2.1 | 2022-02-10 | 2019-07-12 |
+| 0.3.1 | 2022-04-05 | 2019-07-14 |
+| 0.4.1 | 2022-05-11 | 2019-07-18 |
+| 0.6.1 | 2022-09-13 | 2019-08-03 |
+| 0.7.1 | 2022-11-10 | 2019-08-19 |
+| 0.8.1 | 2023-02-03 | 2019-08-25 |
+
+A naive `dict()` over the file kept the **last** match — the 2019 one — and silently dated six of the wallet's most fundamental capabilities to a product that was not this one.
+
+**The lesson**: [§62](#62-one-repo-two-release-lineages--the-same-version-number-means-two-different-products) said *two* lineages (extension, web app). **There are three.** The third is not a branch — it is **history the repo inherited**, sitting in the same file, in the same format, indistinguishable by shape. And it is the most dangerous of the three, because the other two at least live on different branches; this one is interleaved in one file, sorted newest-first, waiting for a parser that takes the wrong end.
+
+**The rule**: when resolving `version → date` from `docs/CHANGELOG.md`, **the newest match wins** — the file is newest-first, so the first hit is the Koni one. And treat a duplicate version number as a **signal, not a nuisance**: it means you are reading across a lineage boundary. This is [§63](#63-issue-numbers-in-git-history-collide-with-inherited-upstream-polkadot-js-prs--always-date-window-the-grep) in a second costume — that one was inherited *issue numbers*, this one is inherited *releases*. **Anything a fork inherits, it inherits the numbering of.** Assume every identifier space in this repo has a stowaway until proven otherwise.
+
+**Still open**: the 51 inherited entries are not marked as such in `docs/CHANGELOG.md`. Any future tool that reads the file will hit the same trap. Marking them is cheap and has not been done.
+
+See [CONTEXT D99](CONTEXT.md), [§62](#62-one-repo-two-release-lineages--the-same-version-number-means-two-different-products), [§63](#63-issue-numbers-in-git-history-collide-with-inherited-upstream-polkadot-js-prs--always-date-window-the-grep).
+
+---
+
 _End of LESSONS.md_

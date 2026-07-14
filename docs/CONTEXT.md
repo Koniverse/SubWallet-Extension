@@ -1642,3 +1642,38 @@ FR-160 is a different animal and worth naming as such: it is the first case of *
 **Citations**: [D93](#d93-prd_ref-holds-fr-n-or-nfr-n--the-project-is-requirement-centric-not-fr-centric), [D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95), [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done); PRD FR-160, NFR-22…25; CHANGELOG 1.3.83 (#5007)
 
 ---
+
+### D99. Reconstructed sprint windows — an `M` cadence for history that predates the sprint system
+
+**Context**: The frontmatter spec said `sprint` was *conditional* and `''` was valid; the viewer's `warnings.ts` treated it as **required for every story past `backlog`**. Same package, two rules — so 117 of 174 stories were flagged for a field the spec said they were entitled to leave empty. That noise buried the 3 warnings that were real (a 39:1 ratio). Filling the field honestly was blocked by a second problem: the spec's sprint ID regex allowed **only `W`** (ISO week), and 113 stories shipped across **63 distinct weeks** — for a project whose sprint system did not exist until 2026-07.
+
+**Decision**: **Sync the spec to the tool, and give the tool an honest way to be satisfied.**
+
+1. **`sprint` is required once a story leaves `backlog`.** Work past backlog must be locatable in time. This matches what `warnings.ts` already enforced.
+2. **Sprint IDs accept two cadences: `^sprint-\d{4}-[WM]\d{2}$`.** `W` = a **planned** ISO week. `M` = a **reconstructed** calendar month, for history that predates the sprint system. 44 `M` files now cover 2022-02 → 2026-07.
+3. **`version_shipped` is required for `done` only when the story's epic materializes a requirement.** A story in an epic with `prd_ref: []` (docs / tooling / infra) ships in no release — [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done). The spec now says this; `warnings.ts` does not yet know it.
+
+**Rationale — why `M`, not 63 weekly files.** A weekly bucket **asserts a planning rhythm that never happened**. A monthly one asserts far less: *these stories shipped in this month, per the CHANGELOG*. That is a fact, checkable against `docs/CHANGELOG.md`. The cadence is the honesty dial, and coarser is more honest here — this is the same instinct that made 63 feel wrong in the first place.
+
+Every reconstructed file says so in its own body, in a banner no reader can miss: `goal` is **derived after the fact**, points are **retroactive**, and **velocity computed on these windows is meaningless — do not chart it.** The authority for *"when did this ship"* remains `version_shipped` + `commit`, which `git merge-base --is-ancestor` can prove; **a sprint label cannot prove anything.** The sprint file is a locator, not evidence.
+
+**What was considered and rejected**: (a) leaving `sprint` empty and patching `warnings.ts` to stop asking — cheapest, but it discards a real signal: *a story claiming to be in flight while sitting on no board*. That signal caught US-20.1 / US-20.2 (see Impact). (b) 63 weekly files — spec-compliant, but each one a stronger false claim than the month it sits in. (c) Using `M` **without** changing the spec — it passes `validate` today only because **nothing enforces the sprint ID regex**. That is not permission; it is a gap. Shipping on it would plant a mine that detonates the day koni-docs enforces its own spec — exactly how `status: done` (a sprint-status value the spec forbids) survived a commit two days ago.
+
+**Impact**: 44 new `docs/sprints/sprint-YYYY-MNN.md`; `sprint` set on **113** stories. Viewer warnings **120 → 7**, and the residue is now readable:
+
+| Still flagged | Why |
+| --- | --- |
+| US-21.1 / 21.2 / 21.3 — no `version_shipped` | **Tool lag.** Correct per D97 and per the amended spec; `warnings.ts` has not caught up. |
+| US-20.3 — deprecated, no `sprint` / `assignee` | **Tool bug.** A deprecated story is dead; it should require nothing. |
+| **US-20.1 / US-20.2 — `in-progress`, no owner, no sprint** | **Real.** They are not in progress. They are **stalled**: partially shipped years ago, zero commits since on every remaining tracker. `in-progress` is a claim the git history denies. |
+| **US-12.11 — `review`, on no sprint** | **Real.** Trusted Stake (#4946) is genuinely in review, but no sprint is open to hold it. |
+
+The last two rows are the point of the exercise: they were **invisible under 117 false positives**. The status of US-20.1 / US-20.2 / US-12.11 is a scheduling decision and is left to the owner — not silently rewritten here ([D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done) rule 1: the map, never the territory).
+
+**Not durable in place**: the spec is vendored from `Koniverse/Koni-Skills` and `warnings.ts` ships in the npm package — the next `chore: install koni-docs skill` or `npm i -g` overwrites both. The rules are therefore restated in **`AGENTS.md §7`**, which nothing overwrites, and both changes are queued upstream.
+
+**Date**: 2026-07-14
+**Version**: docs-only (against v1.3.83)
+**Citations**: [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done); `frontmatter-spec.md` §2 / §3.1; `sprint-system.md` §Reconstructed windows; `viewer/lib/warnings.ts`; [LESSONS §66](LESSONS.md)
+
+---

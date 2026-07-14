@@ -45,7 +45,7 @@ Plus three structural IDs used as container references:
 | Namespace | Lives in | Canonical regex | Example |
 |---|---|---|---|
 | **Epic** | `docs/sprints/epics/EPIC-N.md` | `^EPIC-\d+$` | `EPIC-4` |
-| **Sprint** | `docs/sprints/sprint-YYYY-WNN.md` | `^sprint-\d{4}-W\d{2}$` | `sprint-2026-W22` |
+| **Sprint** | `docs/sprints/sprint-YYYY-WNN.md` | `^sprint-\d{4}-[WM]\d{2}$` | `sprint-2026-W22`, `sprint-2024-M02` |
 | **Version** | `VERSION` file + `CHANGELOG.md` headers | `^\d+\.\d+\.\d+$` (bare, no `v`) | `0.7.3` |
 
 **Anything that is not one of these IDs does not belong in an ID-typed
@@ -69,8 +69,8 @@ Implementation notes.
 | `status` | enum | **YES** | `backlog \| ready \| in-progress \| review \| done \| blocked \| deprecated` | |
 | `priority` | enum | recommended | `P0 \| P1 \| P2 \| P3` | |
 | `points` | scalar | recommended | `1 \| 2 \| 3 \| 5 \| 8 \| 13 \| ''` (Fibonacci) | `''` = unsized. |
-| `sprint` | scalar string | conditional | `^sprint-\d{4}-W\d{2}$` or `''` | Set when committed to a sprint. |
-| `version_shipped` | scalar string | conditional | `^\d+\.\d+\.\d+$` (bare semver, no `v`) | MANDATORY when `status: done` (RULE-16). |
+| `sprint` | scalar string | **YES** when `status != backlog` | `^sprint-\d{4}-[WM]\d{2}$` or `''` | Every story past `backlog` belongs to a sprint window. `''` only while `backlog`. **`W` = a planned ISO week. `M` = a reconstructed calendar month** — used when history predates the sprint system (see `sprint-system.md` §Reconstructed windows). |
+| `version_shipped` | scalar string | conditional | `^\d+\.\d+\.\d+$` (bare semver, no `v`) | MANDATORY when `status: done` **and the story's epic materializes a requirement**. A story in an epic with `prd_ref: []` (docs / tooling / infra) ships in no release: it is `done` on ACs + a real `commit`, and `version_shipped` stays empty **on purpose**. |
 | `prd_ref` | **list of strings** | optional | every entry MUST match `^FR-\d+$` or `^NFR-\d+$` | FR rows synced by `koni-docs sync`. **Do not put AD-N here** — use `arch_ref`. |
 | `arch_ref` | **list of strings** | optional | every entry MUST match `^AD-\d+$` | Architecture Decisions this story materializes. |
 | `depends_on` | **list of strings** | optional | every entry MUST match `^US-\d+\.\d+$` | Stories whose artifacts this story consumes. |

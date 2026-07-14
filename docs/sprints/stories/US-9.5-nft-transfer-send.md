@@ -5,7 +5,7 @@ epic: EPIC-9
 status: done
 priority: P1
 points: 3
-sprint:
+sprint: sprint-2022-M03
 version_shipped: 0.2.8
 prd_ref: [FR-89]
 arch_ref:
