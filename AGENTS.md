@@ -170,7 +170,32 @@ that reached the owner before it reached a check. Full reasoning in `docs/CONTEX
 
 **These six live here on purpose.** The koni-docs spec is vendored from
 `Koniverse/Koni-Skills` and the CLI ships from npm — the next skill install or
-`npm i -g` overwrites both. `AGENTS.md` is the only copy nothing overwrites.
+`npm i -g` overwrites both. `AGENTS.md` is the only copy nothing overwrites, and
+**it is the authority** where it and the tool disagree.
+
+> ### ⚠️ The viewer's warnings are not this project's health metric
+>
+> `npx koni-docs validate` is — **it exits 0**. The viewer (`koni-docs preview`) has known
+> defects we have chosen not to file ([D102](docs/CONTEXT.md)); it will keep showing **5
+> warnings that are not defects**, and you should not "fix" your data to silence them:
+>
+> - **`sprint` demanded of every non-`backlog` story.** The spec (§3.1) calls the field
+>   **conditional** and lists `''` as valid. `warnings.ts:39` disagrees with its own spec.
+> - **`version_shipped` demanded of every `done` story.** Impossible for a story in an epic
+>   with `prd_ref: []` — it ships in **no release** (rule 4 above). Ours stay empty on purpose.
+> - **`assignee` demanded of a `deprecated` story.** A dead story needs no owner.
+> - **Sprint and epic pages render through the *story* field grid** — so a sprint shows
+>   `Story ID`, `Epic —`, `Assignee —`, and **`Points 0`**. A sprint has exactly five fields
+>   (`id`, `status`, `start`, `end`, `goal`; spec §3.3) and **none of those**.
+>   **`Points 0` is fabricated** — absent is not zero. Our 21-point sprint renders as `0`.
+>
+> **Do not add fields to a sprint file to make the UI go green.** Inventing data to satisfy a
+> tool is the exact failure this whole docs program spent a week unwinding.
+>
+> Root cause of all of it: **`validate` checks that references *resolve*, never that values are
+> *legal*** — no enum check, no ID-pattern check. That is how a sprint `status: done` (the
+> *story* enum) survived a commit here, and how a non-spec `sprint-2022-M10` passes today.
+> **A rule with no check is a rule nobody notices breaking** — see rule 6.
 
 **1. An ID is an identity, not a position.** FR / NFR / US numbers are permanent. The
 single gapless renumber of 2026-07-13 was a **one-time exception and will not recur**

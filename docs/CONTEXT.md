@@ -1739,3 +1739,32 @@ It was also **internally inconsistent**, which is what proves it was an accident
 **Citations**: [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system); [LESSONS §66](LESSONS.md); [US-21.2](sprints/stories/US-21.2-history-backfill.md) (the anchor rule); AGENTS.md §7 rule 1b
 
 ---
+
+### D102. Do not file the koni-docs bugs upstream — carry the divergence, and say so (revision of D99)
+
+**Context**: [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system) closed with *"both changes are queued upstream."* They are not, and will not be. A draft issue for `@koniverse/koni-docs` was written on 2026-07-14 and **withdrawn on the owner's call.** This entry exists because **D99's sentence is now false**, and CONTEXT is append-only: a claim that stops being true gets a revision, not a quiet edit ([RULE-7](../.agents/skills/koni-docs/references/rules.md)).
+
+**Decision**: **No upstream issue.** The three koni-docs defects stay unreported, and this project **knowingly diverges** from the shipped tool:
+
+| Defect | Where |
+| --- | --- |
+| `warnings.ts` requires `sprint` for every non-`backlog` story — the spec (§3.1) calls it **conditional**, with `''` an explicitly valid value | `src/viewer/lib/warnings.ts:39` |
+| `warnings.ts` requires `version_shipped` on every `done` story — impossible for a story in an epic with `prd_ref: []`, which ships in no release ([D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done)) | `src/viewer/lib/warnings.ts:40` |
+| Sprint and epic pages render through the **story** field grid (`Story ID`, `Epic —`, `Assignee —`, **`Points 0`**) — a sprint has five fields (§3.3) and none of those | `src/viewer/pages/docs/[...file].astro:43` |
+| *(root cause of all three)* `validate` enforces that references **resolve**, never that values are **legal** — no enum check, no ID-pattern check. This is why a sprint `status: done` (the *story* enum) and a non-spec `sprint-2022-M10` both pass | — |
+
+**What this costs us, stated plainly so nobody is surprised later:**
+
+1. **The viewer will keep showing 5 warnings that are not defects** — 3 docs stories with no `version_shipped` (correct per D97), 1 `deprecated` story with no owner (a dead story needs none), 1 genuinely-in-`review` story with no open sprint (an owner decision). **The viewer's warning count is not this project's health metric. `npx koni-docs validate` is** — it exits 0.
+2. **The vendored spec is a local fork.** The next `chore: install koni-docs skill` **overwrites** `.agents/skills/koni-docs/references/` and the `[WM]` cadence + the `version_shipped` carve-out disappear. **The rules therefore live in `AGENTS.md §7`, which nothing overwrites** — and that file, not the skill, is the authority here.
+3. **Sprint pages will keep rendering `Points 0`.** Absent is not zero; the viewer fabricates that. Do not "fix" it by adding fields to sprint files — **a sprint has no `points` field**, and inventing one to make a UI go green is exactly the failure this whole program has been unwinding.
+
+**Rationale**: filing costs little, but the value only lands **if and when upstream merges** — and until then the project is in precisely the same state. The defects are already documented here and warned about in `AGENTS.md`, which is what actually protects the next maintainer. Reporting them is worth doing when someone owns the follow-through; nobody does today, and **a filed-and-forgotten issue is another doc that says work is happening when it is not** — the exact thing [D100](#d100-a-story-is-the-unit-of-status--split-epic-20-where-the-truth-changes-not-where-the-phases-do) was about.
+
+**If this is revisited**, everything needed is in this entry plus [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done) / [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system): the four defects, their file and line, and the proposed rule (`sprint` required for work **in flight** — `in-progress` / `review` / `blocked` — never for `done`, where `version_shipped` + `commit` is strictly stronger evidence because `git merge-base --is-ancestor` can prove it and a sprint label cannot).
+
+**Date**: 2026-07-14
+**Version**: docs-only (against v1.3.83)
+**Citations**: revises [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system); [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done), [D100](#d100-a-story-is-the-unit-of-status--split-epic-20-where-the-truth-changes-not-where-the-phases-do); AGENTS.md §7
+
+---
