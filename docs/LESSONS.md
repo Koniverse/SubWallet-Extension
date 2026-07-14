@@ -1052,3 +1052,48 @@ and version differ by the **same three years, for the same reason** — a fact.
 **Cost of learning it**: nearly re-merged the polkadot-js inheritance into SubWallet's first
 sprint to make the dates "line up", which would have re-asserted that this team wrote the
 polkadot-js extension.
+
+## 68. A ticked checkbox is a claim about the code — and only a command that runs can refute it
+
+**What happened**: [US-5.1](sprints/stories/US-5.1-phishing-site-and-address-protection.md) —
+`done`, **P0**, every AC ticked — claimed *"no provider API key is exposed in the client"*. The
+extension calls `app.chainpatrol.io` **directly**. It also claimed flagged recipient addresses
+are blocked; **nothing screens an address anywhere in the repo**. Four ticks, four falsehoods,
+one of them a **security** property.
+
+None of it was hidden. The story's own Implementation notes said *"the address arm never shipped
+in this repo"* — **eight lines below a ticked AC-2 asserting it had.** The evidence and the
+checkbox contradicted each other **inside one file**, and STATUS.md counts the checkbox.
+
+**The measurement that explains it.** Every story carries a `## Verification commands` table. Of
+the **119 `done` stories**:
+
+| | |
+| --- | --- |
+| have the section | **119** — perfect compliance |
+| have **one command a machine can run** | **12** |
+| have **only** *"Manual: …"* prose | **101** |
+
+AC-4's verification row was *"Forward: disable proxy reachability → check still runs…"*. That is
+a **paragraph**. Nothing in the repository **could** have contradicted it. The table was fully
+present and almost entirely inert — **the ritual of verification without the act**.
+
+**The rule**: an AC is a claim *about the code*. A claim about code is refuted by **running
+something**, never by re-reading the sentence. So:
+
+- **`grep` beats "Manual: check that…"** even when grep is crude. `rg -q checkIfDenied` would
+  have passed; `rg -q checkAddress` would have **failed**, and AC-2 dies in seconds.
+- **A batch operation that ticks boxes is a batch of claims.** The backfill that flipped 113
+  stories to `done` ticked every open AC as it went. Ticking is not bookkeeping — it is
+  **asserting**, once per box, that the code does a thing.
+- **A correction that fixes one instance and does not sweep the class is half a correction.** The
+  2026-07-13 pass caught exactly one of US-5.1's five bad ticks and stopped.
+
+**And the sweep itself teaches something**: searching the corpus for *"stories that admit they
+didn't ship"* returned **15 hits, 14 false** — four swap stories saying an API key *"never shipped
+in the bundle"* (the **desired** state), four saying a *button* "is disabled". **A false tick is
+not greppable.** The only mechanical defence is the one the template already demands and nobody
+supplies: **a command.**
+
+**Cost of learning it**: a P0 security AC asserted, for a month, that a third-party API key was
+not in the client. It is.

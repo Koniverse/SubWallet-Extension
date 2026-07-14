@@ -106,7 +106,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-49 | Chain abstraction SDK: package multi-chain logic as a developer-facing service for external… | P2 | 📋 planned | EPIC-4 |
 | FR-50 | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction and cross-chain intent standards integration | P2 | 📋 planned | EPIC-4 |
 | FR-51 | AI / DeFAI features (AI agent; AI-assisted swap / earn / transfer; chain-abstraction UX) | P2 | 📋 planned | EPIC-4 |
-| FR-52 | Phishing protection: block known phishing sites and addresses via @polkadot/phishing list an… | P0 | ✅ shipped | EPIC-5 |
+| FR-52 | Phishing **site** blocking: full-screen block for origins on the @polkadot/phishing denylist, online auto-update. **Addresses are NOT screened** (that is FR-62). ChainPatrol integrated but disabled. | P0 | ✅ shipped | EPIC-5 |
 | FR-53 | Master password with strength policy covering all accounts | P0 | ✅ shipped | EPIC-5 |
 | FR-54 | Forgot password → reset wallet (master password is non-recoverable; reset clears accounts an… | P0 | ✅ shipped | EPIC-5 |
 | FR-55 | Unified unlock / auto-lock flow | P0 | ✅ shipped | EPIC-5 |
@@ -321,7 +321,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 | ---- | ------------- | -------- |
-| FR-52 | Phishing protection: block known phishing sites and addresses via @polkadot/phishing list (ChainPatrol API integrated but currently disabled) | ✅ shipped |
+| FR-52 | Phishing **site** blocking: full-screen block for origins on the `@polkadot/phishing` denylist (`checkIfDenied`), with online list auto-update. **Scope narrowed 2026-07-14 ([D107](CONTEXT.md)): the row used to say "sites **and addresses**" and was marked shipped. No address is screened anywhere — the repo imports exactly one symbol from `@polkadot/phishing`, and it takes an origin. Address screening is **FR-62**, honestly `📋 planned`.** ChainPatrol is integrated but **disabled** (it flagged YouTube and Facebook) and calls `app.chainpatrol.io` **directly from the client** — no proxy, contrary to AD-19 ([#4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929), owed by US-5.10 AC-2). | ✅ shipped |
 | FR-53 | Master password with strength policy covering all accounts | ✅ shipped |
 | FR-54 | Forgot password → reset wallet (master password is non-recoverable; reset clears accounts and requires re-import) | ✅ shipped |
 | FR-55 | Unified unlock / auto-lock flow | ✅ shipped |

@@ -115,13 +115,29 @@ reconciliation.
 
 ## Implementation notes
 
+> ## ⚠️ Every version number below this line is **polkadot-js's**, not SubWallet's
+>
+> This story is **inherited** — the code was written upstream, years before SubWallet existed
+> ([CONTEXT D105](../../CONTEXT.md)). This section quotes **two different products' version
+> lines**, and they are not comparable:
+>
+> | | |
+> | --- | --- |
+> | **SubWallet** (this product) | `0.2.1` (2022-02-10, the first release) → `1.3.83`. **This is the only line `version_shipped` may name.** |
+> | **polkadot-js** (upstream, inherited) | everything below, always beside a **pre-2022 date**. |
+>
+> **Read the date, not the number.** Six version numbers exist in *both* lines
+> ([LESSONS §66](../../LESSONS.md)) — the date never collides. And do not "fix" a number below
+> to look like SubWallet's: they are quotations of upstream's CHANGELOG and git tags, and
+> rewriting them makes the citation unverifiable ([CONTEXT D106](../../CONTEXT.md)).
+
 **Inherited from polkadot-js — `version_shipped` corrected 2026-07-14 ([CONTEXT D101](../../CONTEXT.md)).**
 This capability was **not built by SubWallet**. It came with the fork: SubWallet-Extension is a
 fork of the **polkadot-js extension**, and inherited its git history, tags and CHANGELOG.
 
 | | |
 | --- | --- |
-| Upstream release | **0.24.1** (2020-04-19) — a **polkadot-js** release, not a SubWallet one |
+| Upstream release | **polkadot-js 0.24.1**, **2020-04-19** — *not on SubWallet\'s version line* |
 | Upstream author | `barrutko` — a polkadot-js maintainer |
 | Upstream commit | `eeac2c1064c591dd33af129a323d2c57ce191bfa` — account derivation (custom path / child accounts) |
 | **Reached a SubWallet user in** | **0.2.1** (2022-02-10) — SubWallet's **first** release |

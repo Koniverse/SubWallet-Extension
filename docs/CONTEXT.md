@@ -1959,3 +1959,90 @@ anchor" corrected — the tag does not exist, as its own evidence paragraph alre
 **Citations**: [D101](#d101-version_shipped-names-a-release-of-this-product--inherited-features-ship-at-021); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D105](#d105-the-fork-boundary-is-its-own-window--inherited-work-does-not-go-on-this-teams-board); [LESSONS §66](LESSONS.md); `scripts/koni-docs-check-ids.mjs`
 
 ---
+
+### D107. A ticked AC is a claim about the code — four of US-5.1's were false, and one was a P0 security claim
+
+**Context**: [US-5.1](sprints/stories/US-5.1-phishing-site-and-address-protection.md) was
+`done`, P0, with every AC and task ticked. The code says otherwise:
+
+| Ticked | What the code does |
+| --- | --- |
+| **AC-2** — a flagged recipient address is blocked on the transfer path | **Nothing screens an address, anywhere.** The repo imports exactly one symbol from `@polkadot/phishing` — `checkIfDenied`, which takes an **origin** (`Tabs.ts:38`). |
+| **AC-4** — *"no provider API key is exposed in the client"* | `chainPatrolCheckUrl` calls `https://app.chainpatrol.io/api/v2/asset/check` **directly from the extension**. There is no proxy. AD-19 is the target, not the code ([#4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929)). |
+| **TASK-5.1.1** (sub) — route ChainPatrol via the backend proxy | see above — no proxy |
+| **TASK-5.1.5** — *"false-positive regression coverage"* | **There is no phishing test in this repo at all.** |
+
+The story's *own* Implementation notes already said the first one — *"the address arm never
+shipped in this repo"* — while its AC-2 sat ticked eight lines above. **The evidence and the
+checkbox contradicted each other inside one file, and the checkbox is what STATUS.md counts.**
+
+Cause: the US-21.2 batch backfill ticked every open AC when it flipped a story to `done`. A
+[scope correction](sprints/stories/US-5.1-phishing-site-and-address-protection.md) on
+2026-07-13 caught **one** of them (AC-6) and stopped. This is [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention)'s
+lesson in a new field: *the correction that finds one instance and does not sweep for the class
+is half a correction.*
+
+**Why it matters more than a docs bug.** AC-4 is a **security claim on a P0 story**: *no API key
+in the client bundle.* A maintainer reading it concludes the key is safe and looks elsewhere.
+**A false negative in a security AC is not a stale doc — it is a lie that redirects attention.**
+
+**Decision — three parts:**
+
+1. **Remove AC-2 and AC-4, and TASK-5.1.2 / 5.1.4 / 5.1.5.** They were ticked and false; forward
+   scope must **leave** the story (rule 4), not sit inside it wearing a tick. **Their numbers are
+   not reused** (rule 1). Scope re-homed where it is honestly owned: address screening →
+   **FR-62** / [US-5.9](sprints/stories/US-5.9-anti-scam-address-screening.md) (`📋 planned`);
+   the proxy, the ChainPatrol re-enable, and the regression suite →
+   [US-5.10](sprints/stories/US-5.10-verichains-audit-remediation-hardening.md) AC-2.
+2. **AC-5 stays ticked — with its guard named as absent.** *"A legitimate site is not falsely
+   blocked"* is **true today**, and true for an uncomfortable reason: the thing that flagged
+   YouTube (ChainPatrol) is **switched off**. It is an **observed property, not a guarded one**,
+   and the story now says so. A green AC whose green comes from a disabled feature is worth one
+   sentence, not a tick and silence.
+3. **Narrow FR-52.** The row read *"block known phishing sites **and addresses**"* — `✅ shipped`.
+   Half of it never shipped. The PRD has **no `partial` status** (`✅ 🚧 📋 ⏸️`), and inventing one
+   would be the wrong fix anyway: **an FR that is half-shipped was two requirements.** FR-52 is
+   now *site* blocking, `✅ shipped` and true. The address half already had a home — **FR-62**,
+   `📋 planned` — so nothing was lost and no FR was minted. This is
+   [D100](#d100-a-story-is-the-unit-of-status--split-epic-20-where-the-truth-changes-not-where-the-phases-do)
+   one layer up: *the unit of status is the unit of truth.*
+
+**Boundary check ([rule 3](../AGENTS.md))**: this changes the **map**. The code was not touched;
+no decision was taken about what phishing protection *should* do. FR-52's text now describes what
+the product does, which a docs epic may correct — and this `D` entry is the escalation the rule
+requires. **The open question for the owner is a product one and stays open**: *should the
+`@polkadot/phishing` **address** denylist be screened on the transfer path at all, or is FR-62
+(Merkle Science) the whole of the address story?* Nothing here answers that.
+
+**We swept for the class, and the sweep is the real finding.** A text search for stories that are
+`done`, fully ticked, and whose prose admits something did not ship returned **15 candidates —
+and 14 were false positives**: the swap stories say an API key *"never shipped in the bundle"*
+(which is the **desired** state, NFR-16), and four more say a *button* "is disabled". **A false
+tick is not greppable.** Only reading the code against the AC finds it.
+
+So we measured the thing that *should* find it — the `## Verification commands` table every story
+carries:
+
+| Of the **119 `done` stories** | |
+| --- | --- |
+| have a Verification commands section | **119** — full compliance |
+| have **at least one command a machine can run** | **12** |
+| have **only** *"Manual: …"* prose | **101** |
+
+**That is why AC-4 survived.** Its verification row read *"Forward: disable proxy reachability →
+check still runs on the bundled list"* — a **paragraph**, not a command. Nothing in the repo
+**could** have falsified it. The table was 100% present and 90% inert: the ritual of verification
+without the act ([LESSONS §68](LESSONS.md)).
+
+**We are not fixing 101 stories in this commit, and we are not pretending otherwise.** Writing
+one real command per AC across the corpus is a body of work that needs an owner, not a sweep at
+the end of an unrelated change. It is logged here as an **open gap with a number**, which is the
+one thing it has never had.
+
+**Impact**: US-5.1 retitled to what it is (*"Phishing site blocking"*); 2 ACs and 3 tasks
+removed; the verification table now has a row that honestly says **"no command — this is the
+point."** FR-52 corrected in both PRD tables. `validate` exits 0 · `check-ids` exits 0.
+
+**Citations**: [D100](#d100-a-story-is-the-unit-of-status--split-epic-20-where-the-truth-changes-not-where-the-phases-do); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [AGENTS.md §7 rules 1, 3, 4](../AGENTS.md); [LESSONS §64](LESSONS.md)
+
+---

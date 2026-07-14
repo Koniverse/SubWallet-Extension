@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-14 11:10:08 UTC
+> Last generated: 2026-07-14 11:19:12 UTC
 > Total stories: 177
 
 ## 📋 Backlog (56)
@@ -168,7 +168,7 @@ _No stories_
 | US-4.11 | Custom token import (ERC-20 / PSP-22) | EPIC-4 | P1 | 3 | sprint-2022-M10 | nulllpc |
 | US-4.12 | Token registry enable/disable | EPIC-4 | P1 | 2 | sprint-2023-M03 | nulllpc |
 | US-4.24 | Remove Polygon zkEVM logic and update chainlist | EPIC-4 | P1 | 3 | sprint-2026-M07 | tunghp2002 |
-| US-5.1 | Phishing site & address protection | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
+| US-5.1 | Phishing site blocking (@polkadot/phishing denylist) | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
 | US-5.2 | Master password & strength policy | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
 | US-5.3 | Forgot password → reset wallet | EPIC-5 | P0 | 3 | sprint-2023-M05 | S2kael |
 | US-5.4 | Unified unlock / auto-lock flow | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
