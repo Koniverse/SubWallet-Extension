@@ -1677,3 +1677,41 @@ The last two rows are the point of the exercise: they were **invisible under 117
 **Citations**: [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done); `frontmatter-spec.md` §2 / §3.1; `sprint-system.md` §Reconstructed windows; `viewer/lib/warnings.ts`; [LESSONS §66](LESSONS.md)
 
 ---
+
+### D100. A story is the unit of status — split EPIC-20 where the truth changes, not where the phases do
+
+**Context**: [US-20.1](sprints/stories/US-20.1-core-structure-and-lifecycle-refactor.md) and [US-20.2](sprints/stories/US-20.2-api-call-optimization.md) both sat at `in-progress` with **no assignee and no sprint**. The viewer flagged them; 117 false positives were burying the signal until [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system) cleared the noise. The flag was right. Both stories were carrying **work that shipped years ago** *and* **work nobody has ever started**, under one status that was false in both directions. US-20.1 even said so out loud: *"`in-progress` is the least wrong status the enum offers — read it as **stalled after P1**."* A story that asks its readers to decode it is a story that is drawn wrong.
+
+**Decision — the rule**: **A story is the unit of status. If two halves of a story have different truths, it is not one story.** Cut it where the truth changes.
+
+Applied to EPIC-20 — three shipped capabilities got the retroactive story every other shipped capability in this repo already has, and the unstarted work stayed behind, honestly:
+
+| New — `done`, retroactive | Shipped | Author (from git) |
+| --- | --- | --- |
+| [US-20.7](sprints/stories/US-20.7-mv3-wake-depth-split.md) — MV3 wake-depth split (#4428 + the #4478 regression fix) | 1.3.42 / 1.3.43 | `saltict` |
+| [US-20.8](sprints/stories/US-20.8-api-request-strategy-v2.md) — `api-request-strategy-v2`: md5 response cache, group cancellation, adaptive backoff (#4448) | 1.3.47 | `S2kael` |
+| [US-20.9](sprints/stories/US-20.9-aggregated-data-via-services-sdk.md) — aggregate reads via the external Services SDK, 18 call sites (#4465) | 1.3.52 | `bluezdot` |
+
+| Narrowed — `backlog`, **unowned on purpose** | What is left | Evidence |
+| --- | --- | --- |
+| **US-20.1** — lifecycle P2/P3 | chain-granular wake, ZK-Asset/MantaPay removal, cron/subscription → services, the missing lifecycle harness | #4427 / #4445 / #4446: **zero commits** |
+| **US-20.2** — request economy | in-flight dedup, an **app-wide** cap, the unbounded notification loop | #4447 / #4021: **zero commits** |
+
+**Rationale — why not the cheaper fixes.** Two were on the table and both make the docs *look* better while making them *less* true:
+
+1. **Set `assignee` to the last committer.** Evidence-based, and wrong. `assignee` means *"who owns this now"*, not *"who last touched the code"*. `bluezdot` shipped the SDK migration eleven months ago; naming him owner of the *unstarted* request-economy work would be inventing an owner. Worse: **an unowned story with a name on it is more dangerous than an unowned one, because it looks handled.** The blank `assignee` was the only thing telling the truth.
+2. **Leave the status as `in-progress` and move on.** That is the claim git denies — the last commit on any of these issues is **none**, and umbrella `#4197` has sat at zero for about a year.
+
+**And EPIC-20 was owed these stories anyway.** [US-21.2](sprints/stories/US-21.2-history-backfill.md) built **113 retroactive stories** across 19 epics. EPIC-20 was **excluded from the trace set because it was classified as "roadmap"** — so its shipped work was never checked against git and never got stories. This is not new scope; it is **finishing a backfill that skipped one epic** ([LESSONS §64](LESSONS.md): an epic's classification is an assumption, not evidence).
+
+**No renumber.** US-20.1 and US-20.2 **keep their IDs** — they still exist, narrowed — so all 11 files referencing them stay valid. New work appends at 20.7/20.8/20.9. This is rule 1 of `AGENTS.md §7` paying for itself: **an ID is an identity, not a position.** Contrast the FR renumber of [D94](#d94-one-time-gapless-renumber-of-fr-and-epic-12-story-ids--never-again), which touched 386 references and nearly destroyed an audit trail.
+
+**Impact**: 174 → 177 stories. EPIC-20: 3 `done`, 5 `backlog`, 1 `deprecated` — no `in-progress`, because **nothing in it is in progress**. Viewer warnings **7 → 4**, and the 4 that remain are all tool bugs (3× `version_shipped` on docs stories per [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done), 1× `assignee` demanded of a `deprecated` story) plus [US-12.11](sprints/stories/US-12.11-trusted-stake-alpha-index.md), which is genuinely in `review` with no open sprint to hold it — an owner decision, not a docs one.
+
+**What the split makes visible**: [US-20.2](sprints/stories/US-20.2-api-call-optimization.md) AC-3 — `fetchAllAvailBridgeClaimable` is an **unbounded `while (isContinue)` pagination loop**, no page cap, no rate limit, fired **4× per address across every Substrate and EVM address on a 30-minute cron**, errors swallowed by `.catch(console.error)`. Live in v1.3.83, in a `backlog` story **nobody owns**. That is the cheapest real win in EPIC-20 and the recommended home for the 3 points freed by deprecating US-20.3 ([D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95)).
+
+**Date**: 2026-07-14
+**Version**: docs-only (against v1.3.83)
+**Citations**: [D94](#d94-one-time-gapless-renumber-of-fr-and-epic-12-story-ids--never-again), [D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95), [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done), [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system); [US-3.9](sprints/stories/US-3.9-unified-to-solo-account-split.md) (the same cut, from US-3.5); AGENTS.md §7 rule 1; [LESSONS §64](LESSONS.md)
+
+---

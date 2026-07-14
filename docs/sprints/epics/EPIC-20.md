@@ -89,8 +89,8 @@ boundary is drawn explicitly in Out of scope.
 
 | # | Pillar | Stories | Purpose |
 |---|---|---|---|
-| 1 | **Core structure & lifecycle** | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | Phased Init/Start/StartFull lifecycle + background-idle; remove deprecated features; refactor cron/subscription into services; refine the data-processing architecture |
-| 2 | **Request economy** | [US-20.2](../stories/US-20.2-api-call-optimization.md) | Eliminate redundant API fan-out, cap per-window requests, fix the notification-fetch flood that suspends other requests and blocks opening the extension |
+| 1 | **Core structure & lifecycle** | ✅ [US-20.7](../stories/US-20.7-mv3-wake-depth-split.md) · 📋 [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | **Shipped (1.3.42):** wake *depth* — `pub(` starts the core only, `pri(`/`mobile(` also starts the 11 data services. **Not started:** wake *granularity* (every wake still calls `resumeAllNetworks()`), ZK-Asset/MantaPay removal, cron/subscription → services |
+| 2 | **Request economy** | ✅ [US-20.8](../stories/US-20.8-api-request-strategy-v2.md) · ✅ [US-20.9](../stories/US-20.9-aggregated-data-via-services-sdk.md) · 📋 [US-20.2](../stories/US-20.2-api-call-optimization.md) | **Shipped:** response cache + group cancellation + adaptive backoff (1.3.47), aggregate reads via the Services SDK (1.3.52). **Not started:** in-flight dedup, an *app-wide* cap, and the unbounded notification-fetch loop (#4021) that is still live |
 | 3 | **Memory & scale** | [US-20.3](../stories/US-20.3-read-path-memory-budget.md), [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | ~~Hold the ≤72 MB read-path budget~~ — **NFR-11 retired, US-20.3 deprecated** ([D96](../../CONTEXT.md)); what remains is NFR-23: stop the many-account submit / history-popup freeze |
 | 4 | **Render performance** | [US-20.5](../stories/US-20.5-list-rendering-performance.md), [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) | List/render performance across heavy screens; WebApp animation + pagination and web-runner cross-tab rendering |
 
@@ -156,10 +156,10 @@ boundary is drawn explicitly in Out of scope.
 
 | NFR | Concern | Story |
 |-----|---------|-------|
-| [NFR-8](../../PRD.md#non-functional-requirements) | MV3 service-worker shutdown/wake state persistence | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) |
-| [NFR-12](../../PRD.md#non-functional-requirements) | Cold-start: cached-first paint, progressive refresh | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) |
-| [NFR-20](../../PRD.md#non-functional-requirements) | Services SDK aggregation; reduce per-chain RPC fan-out | [US-20.2](../stories/US-20.2-api-call-optimization.md) |
-| [NFR-21](../../PRD.md#non-functional-requirements) | Cache / CDN proxy layer for market/metadata/media | [US-20.2](../stories/US-20.2-api-call-optimization.md) |
+| [NFR-8](../../PRD.md#non-functional-requirements) | MV3 service-worker shutdown/wake state persistence | ✅ [US-20.7](../stories/US-20.7-mv3-wake-depth-split.md) (wake depth, 1.3.42) · 📋 [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) (idle heartbeat, chain granularity) |
+| [NFR-12](../../PRD.md#non-functional-requirements) | Cold-start: cached-first paint, progressive refresh | 📋 [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) — **not met**: 9 `Skeleton` refs app-wide, none on the Tokens home screen, no ≤300 ms instrumentation |
+| [NFR-20](../../PRD.md#non-functional-requirements) | Services SDK aggregation; reduce per-chain RPC fan-out | ✅ [US-20.9](../stories/US-20.9-aggregated-data-via-services-sdk.md) (1.3.52) · 📋 [US-20.2](../stories/US-20.2-api-call-optimization.md) (in-flight dedup, app-wide cap) |
+| [NFR-21](../../PRD.md#non-functional-requirements) | Cache / CDN proxy layer for market/metadata/media | ✅ [US-20.8](../stories/US-20.8-api-request-strategy-v2.md) (1.3.47) · 📋 [US-20.2](../stories/US-20.2-api-call-optimization.md) (stale-on-error fallback) |
 | ~~NFR-11~~ **retired** ([D96](../../CONTEXT.md)) | ~~Read-path memory ≤72 MB~~ — never measured, mechanism never built | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) |
 | [NFR-23](../../PRD.md#non-functional-requirements) | Many-account submit/close must not block the main thread | [US-20.4](../stories/US-20.4-many-account-submit-performance.md) |
 | [NFR-21](../../PRD.md#non-functional-requirements) + [NFR-23](../../PRD.md#non-functional-requirements) | List screens read slow-changing config from the static-data cache, not a per-render sweep (NFR-21); the render cost itself is now covered by **NFR-23** ([D98](../../CONTEXT.md) — it was a PRD gap until 2026-07-13) | [US-20.5](../stories/US-20.5-list-rendering-performance.md) |
@@ -173,6 +173,9 @@ boundary is drawn explicitly in Out of scope.
 | [US-20.2](../stories/US-20.2-api-call-optimization.md) | API-call optimization | Remove redundant API fan-out, cap per-window requests, and fix the notification-fetch flood that suspends other requests and blocks opening the extension | 🚧 in-progress | — |
 | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | Read-path memory budget | Hold the ≤72 MB balance/read-path budget regardless of chain count via the lightweight WsProvider path | ⏸️ deprecated | — |
 | [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | Many-account submit performance | Stop the freeze when, with many accounts, a user submits a tx then closes the history popup | 📋 backlog | — |
+| [US-20.7](../stories/US-20.7-mv3-wake-depth-split.md) | MV3 wake-depth split | `pub(` wakes the core only; `pri(`/`mobile(` additionally starts the 11 data services (#4428 + #4478 fix) | ✅ done | 1.3.42 |
+| [US-20.8](../stories/US-20.8-api-request-strategy-v2.md) | API request strategy v2 | md5-keyed 60 s response cache, group cancellation, per-window cap, adaptive backoff (#4448) | ✅ done | 1.3.47 |
+| [US-20.9](../stories/US-20.9-aggregated-data-via-services-sdk.md) | Aggregated data via Services SDK | 18 aggregate call sites routed off-device; in-repo SDK deleted (#4465) | ✅ done | 1.3.52 |
 | [US-20.5](../stories/US-20.5-list-rendering-performance.md) | List rendering performance | Make heavy lists/screens (NFT / Receive / customization / select token / select network) render fast | 📋 backlog | — |
 | [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) | WebApp & web-runner performance | WebApp animations + list pagination and a web-runner shared worker across tabs | 📋 backlog | — |
 

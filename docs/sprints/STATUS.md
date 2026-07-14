@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-14 02:31:22 UTC
-> Total stories: 174
+> Last generated: 2026-07-14 03:21:49 UTC
+> Total stories: 177
 
-## 📋 Backlog (54)
+## 📋 Backlog (56)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -33,6 +33,8 @@
 | US-18.3 | Auto-detection + indexer history + Phase-2 optimization | EPIC-18 | P2 | 5 | — | — |
 | US-19.3 | Additional UI languages (DE/FR/…) | EPIC-19 | P3 | 3 | — | — |
 | US-19.6 | NFT mint campaigns | EPIC-19 | P2 | 3 | — | — |
+| US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
+| US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | — | — |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | — | — |
 | US-20.5 | List rendering performance | EPIC-20 | P2 | 5 | — | — |
 | US-20.6 | WebApp & web-runner performance | EPIC-20 | P2 | 5 | — | — |
@@ -67,12 +69,9 @@
 
 _No stories_
 
-## 🟡 In Progress (2)
+## 🟡 In Progress (0)
 
-| ID | Title | Epic | Pri | Points | Sprint | Assignee |
-|---|---|---|---|---|---|---|
-| US-20.1 | Core-structure & lifecycle refactor | EPIC-20 | P1 | 8 | — | — |
-| US-20.2 | API-call optimization | EPIC-20 | P1 | 5 | — | — |
+_No stories_
 
 ## 👀 Review (1)
 
@@ -80,7 +79,7 @@ _No stories_
 |---|---|---|---|---|---|---|
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | — | tunghp2002 |
 
-## ✅ Done (116)
+## ✅ Done (119)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -144,6 +143,9 @@ _No stories_
 | US-2.6 | Fee engine | EPIC-2 | P1 | 5 | sprint-2024-M03 | saltict |
 | US-2.7 | RequestService approval queue | EPIC-2 | P0 | 8 | sprint-2023-M03 | S2kael |
 | US-2.8 | Transaction lifecycle engine | EPIC-2 | P0 | 8 | sprint-2023-M03 | saltict |
+| US-20.7 | MV3 wake-depth split (pub → partial, pri → full) | EPIC-20 | P1 | 5 | sprint-2025-M06 | saltict |
+| US-20.8 | API request strategy v2 — response cache, group cancellation, adaptive backoff | EPIC-20 | P1 | 5 | sprint-2025-M07 | S2kael |
+| US-20.9 | Aggregated data routed through the external Services SDK | EPIC-20 | P1 | 5 | sprint-2025-M08 | bluezdot |
 | US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | sprint-2026-W28 | tunghp2002 |
 | US-21.2 | History backfill | EPIC-21 | P1 | 13 | sprint-2026-W28 | tunghp2002 |
 | US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
@@ -215,12 +217,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 54
+- 📋 **Backlog**: 56
 - 🟢 **Ready**: 0
-- 🟡 **In Progress**: 2
+- 🟡 **In Progress**: 0
 - 👀 **Review**: 1
-- ✅ **Done**: 116
+- ✅ **Done**: 119
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 
-✓ WIP: 2/3 stories in-progress.
+✓ WIP: 0/3 stories in-progress.
