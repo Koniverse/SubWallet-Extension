@@ -1023,3 +1023,32 @@ See [CONTEXT D99](CONTEXT.md), [§62](#62-one-repo-two-release-lineages--the-sam
 ---
 
 _End of LESSONS.md_
+
+## 67. Two fields that answer different questions will sometimes disagree — reconciling them deletes the fact
+
+**What happened**: Twice in one week, a field looked "wrong" and the instinct was to make it
+match its neighbour. Both times the mismatch **was the information.**
+
+- An epic's `status` said `in-progress` while the PRD's badge said the capability was
+  **delivered**. The badge counts **FRs** (*is the capability in the product?*); the status
+  counts **stories** (*is the work finished?*). A shipped epic with one deferred story is
+  honestly both ([D103](CONTEXT.md)).
+- Six inherited stories say `sprint: sprint-2022-M01` (work done upstream, 2019–2021) and
+  `version_shipped: 0.2.1` (**2022-02-10**). The window closes a month *before* the release
+  it shipped in ([D105](CONTEXT.md)).
+
+In both cases "fixing" the mismatch would have been one `sed` away, and would have destroyed
+the only record of a real distinction — *shipped* vs *finished*; *built* vs *acquired*.
+
+**The rule**: before you align two fields, **say out loud what question each one answers.**
+If the questions differ, a disagreement is **data, not drift** — and the fix is to *write down
+why they differ*, next to them, where the next person will find it before their `sed` does.
+
+**The tell**: a mismatch that is *stable and explainable* is a fact. A mismatch that is
+*arbitrary and unexplainable* is drift. Sixteen epics whose `status` contradicted their own
+stories in sixteen different directions — drift ([D103](CONTEXT.md)). Six stories whose sprint
+and version differ by the **same three years, for the same reason** — a fact.
+
+**Cost of learning it**: nearly re-merged the polkadot-js inheritance into SubWallet's first
+sprint to make the dates "line up", which would have re-asserted that this team wrote the
+polkadot-js extension.

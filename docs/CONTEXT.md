@@ -1856,3 +1856,53 @@ was never the missing part — **writing the check was.**
 **Citations**: [AGENTS.md §7 rule 7](../AGENTS.md); [D102](#d102-do-not-file-the-koni-docs-bugs-upstream--carry-the-divergence-and-say-so-revision-of-d99); [LESSONS §65](LESSONS.md); `scripts/koni-docs-check-ids.mjs`
 
 ---
+
+### D105. The fork boundary is its own window — inherited work does not go on this team's board
+
+**Context**: `sprint-2022-M02` — SubWallet's first month — listed **11 done stories, 44
+points.** Six of them were the polkadot-js extension: seed-phrase wallet creation, account
+derivation, `injectedWeb3`, per-origin dApp authorization, arbitrary message signing,
+phishing protection. **The team wrote none of them.** The repo's first commit is
+**2019-05-20** (*"Initial commit aka code from heaven"*, Jaco Greeff, polkadot-js);
+SubWallet's first is **2022-01-12**. Everything between is inheritance.
+
+[D101](#d101-version_shipped-names-a-release-of-this-product--inherited-features-ship-at-021)
+fixed the *version* — those capabilities reached a SubWallet user in **0.2.1**, not in the
+2019 upstream release they were written for — and that was right, but it left the sprint
+alone. So the board said the team delivered 11 stories in February 2022. **It delivered 5.**
+
+**Decision** — a third kind of window, [`sprint-2022-M01`](sprints/sprint-2022-M01.md):
+`start: 2019-05-20`, `end: 2022-01-11`, holding exactly the six inherited stories. It is
+**32 months long**, it is the earliest window on the board, and it **ships nothing**. Its
+`id` names the month it *ends* — January 2022, when the team took the wheel.
+
+**The load-bearing part: `sprint` and `version_shipped` now disagree here, and must.**
+These six say `sprint: sprint-2022-M01` and `version_shipped: 0.2.1`, and 0.2.1 shipped
+**2022-02-10 — a month after the window closes.** That is not drift. The fields answer
+**different questions**, and for inherited code the answers are three years apart:
+
+| Field | Question | Answer |
+| --- | --- | --- |
+| `sprint` | *When was the work done?* | 2019-05 → 2022-01, **upstream** |
+| `version_shipped` | *When did a **SubWallet** user get it?* | **0.2.1**, 2022-02-10 |
+
+For all 171 other stories these collapse into one month and the distinction is invisible.
+Here it is the entire content. **Do not reconcile them** — moving these six into February
+re-asserts that the team built them, which is the exact claim this window retracts. It is
+[D103](#d103-epic-status-is-derived-from-its-stories--and-it-answers-a-different-question-than-the-prd-badge)'s
+shape again, one layer down: two fields, two questions, one tempting and destructive merge.
+
+**What the split makes visible** — and this is worth more than the tidiness: with the
+inherited six lifted out, `sprint-2022-M02` answers *what did forking polkadot-js actually
+buy, and what did SubWallet have to build?* The fork gave it a **single-chain wallet**. The
+five stories left are balance detection **across chains**, portfolio aggregation, the
+transferable-vs-locked split, and the existential-deposit guard. **The product is the
+multi-chain part.** That sentence was unreadable while the two lineages shared a table.
+
+**Impact**: 22 points moved off the team's first month (44 → 22, 11 stories → 5). No story's
+`version_shipped` changed. Both checks green. Also surfaced: **0.2.3 is claimed by no story**
+— logged in the window, not silently dropped.
+
+**Citations**: [D101](#d101-version_shipped-names-a-release-of-this-product--inherited-features-ship-at-021); [D103](#d103-epic-status-is-derived-from-its-stories--and-it-answers-a-different-question-than-the-prd-badge); [D99](#d99-reconstructed-m-sprint-windows--and-the-wm-cadence); [LESSONS §66](LESSONS.md), [§67](LESSONS.md); `sprints/sprint-2022-M01.md`
+
+---

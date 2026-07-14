@@ -255,6 +255,16 @@ retroactive, and **velocity computed on it is meaningless — never chart it**
 `commit`, provable with `git merge-base --is-ancestor`; **a sprint label proves nothing** —
 it is a locator, not evidence.
 
+**5b. One window is not a month: the fork boundary.** `sprint-2022-M01` spans **2019-05-20 →
+2022-01-11** — from polkadot-js's first commit to SubWallet's — and holds the six capabilities
+the product **inherited** rather than built. It ships nothing; its 22 points were never spent
+by this team. **Its stories' `sprint` and `version_shipped` disagree on purpose**: the work
+was done upstream (this window), the release that carried it to a SubWallet user is `0.2.1`
+(2022-02-10, the *next* month). `sprint` answers *when was it built*; `version_shipped`
+answers *when did a user get it*. For the other 171 stories those collapse into one month and
+you never notice. **Do not "fix" the gap** — merging them back into February re-asserts that
+this team wrote the polkadot-js extension ([D105](docs/CONTEXT.md), [LESSONS §67](docs/LESSONS.md)).
+
 **6. Write a rule as a boundary of authority, never as a prediction.** EPIC-21's charter
 said it *"never changes the PRD's functional requirements"* — a **fact about scope**, and
 a fact about scope expires the moment scope moves. It was violated on day one, because an

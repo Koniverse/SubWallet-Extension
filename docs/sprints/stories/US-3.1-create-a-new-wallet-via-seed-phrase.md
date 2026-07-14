@@ -5,7 +5,7 @@ epic: EPIC-3
 status: done
 priority: P0
 points: 3
-sprint: sprint-2022-M02
+sprint: sprint-2022-M01
 version_shipped: 0.2.1
 prd_ref: [FR-13]
 arch_ref: [AD-04, AD-11]
@@ -13,7 +13,7 @@ depends_on:
 assignee: jacogr
 commit: 0b6bcd2bb9, f5a00988b0, 1e96fdce1d
 created: 2026-06-11
-updated: 2026-06-11
+updated: 2026-07-14
 ---
 
 ## Goal
