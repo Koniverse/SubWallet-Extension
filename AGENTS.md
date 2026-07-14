@@ -219,7 +219,22 @@ And **`version_shipped` names a release of *this* product.** A capability inheri
 polkadot-js fork shipped to a SubWallet user in **0.2.1** — SubWallet's first release — not in
 the upstream release it was written for. Upstream provenance (release, author, commit) belongs
 in the story's notes, which can say *"a polkadot-js release, not ours"*; a semver field cannot
-([D101](docs/CONTEXT.md)).
+([D101](docs/CONTEXT.md)). **Guard the field, label the prose** — `check-ids` rejects a
+`version_shipped` that is not a `(Koni)` row in the CHANGELOG, and where even a label cannot
+disambiguate (US-3.1: its upstream release *is also numbered* `0.2.1`), the story names that
+release **by date**. Notating upstream versions in prose was tried and **rejected**: the same
+number appears as a reference, a **verbatim CHANGELOG quote**, and a **git tag**, and rewriting
+the last two makes the quote false and the tag imaginary ([D106](docs/CONTEXT.md)).
+
+**1c. `commit:` names what made the capability true — and a release bump made nothing true.**
+Three stories cited a `[CI Skip]` version-bump commit, because a string match on `0.2.1` found
+the **wrong lineage's** release commit. A bump commit is worse than a missing one: it *resolves*,
+so every check passes — a citation to the wrong page of the right book. `check-ids` rejects
+`[CI Skip]` in `commit:`. **The same SHA may still be a legitimate *anchor*** for
+`git merge-base --is-ancestor` — it marks where a release was cut. Anchor and delivery are two
+roles; only one belongs in the field ([D106](docs/CONTEXT.md)). And the tags collide too:
+**`v0.7.1` in this repo is polkadot-js's, from 2019** — never merge-base a SubWallet 0.7.1 story
+against it.
 
 **2. A requirement needs pain, a check, and an owner.** Before an FR or NFR enters
 `docs/PRD.md`: *(a)* evidence someone felt the pain, *(b)* a way to check it, *(c)* a

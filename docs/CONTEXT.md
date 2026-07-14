@@ -1906,3 +1906,56 @@ multi-chain part.** That sentence was unreadable while the two lineages shared a
 **Citations**: [D101](#d101-version_shipped-names-a-release-of-this-product--inherited-features-ship-at-021); [D103](#d103-epic-status-is-derived-from-its-stories--and-it-answers-a-different-question-than-the-prd-badge); [D99](#d99-reconstructed-m-sprint-windows--and-the-wm-cadence); [LESSONS §66](LESSONS.md), [§67](LESSONS.md); `sprints/sprint-2022-M01.md`
 
 ---
+
+### D106. `commit:` names what made the capability true — a release bump made nothing true
+
+**Context**: Reviewing the six inherited stories, `US-3.1` (create a wallet from a seed
+phrase) carried `commit: 0b6bcd2bb9, f5a00988b0, 1e96fdce1d`. The third is
+**`[CI Skip] 0.2.1`, Travis CI, 2019-07-12** — polkadot-js's version-bump commit. It changed
+a number in `package.json`. It did not make a seed phrase create a wallet.
+
+It is in that field for a precise reason, and the reason is the collision: the backfill matched
+the string **`0.2.1`** and found the **wrong lineage's** release commit. SubWallet's 0.2.1 is
+**2022-02-10**; polkadot-js's is **2019-07-12**; the string is identical
+([LESSONS §66](LESSONS.md)). Two more stories carried the same class of value — `US-10.7`
+(`[CI Skip] release/stable 0.36.1`) and `US-9.5` (`[CI Skip] release/stable 0.2.8`).
+
+**A release-bump commit is worse than a missing one.** A missing commit is an obvious gap. A
+bump commit *resolves* — `git show` prints something, `git merge-base` succeeds — so every check
+we had passed. It is a **citation to the wrong page of the right book.**
+
+**Decision — three checks, in `scripts/koni-docs-check-ids.mjs`** (rule 7's script, extended;
+`version_shipped` and `commit` are identifiers too, they just name things outside `docs/`):
+
+1. **`version_shipped` must be a release of *this* product** — a `(Koni)` row in the CHANGELOG.
+   This is [D101](#d101-version_shipped-names-a-release-of-this-product--inherited-features-ship-at-021)
+   made mechanical. It would have caught the original defect — four stories once carried an
+   upstream `version_shipped` — at the moment it was written. **Currently 0 violations.**
+2. **`commit` must not name a CI release bump** (`[CI Skip]`) and must resolve. **3 cleared.**
+3. **The colliding tags.** `v0.7.1` in this repo points at **2019-08-19 — polkadot-js's**. A
+   story shipped in SubWallet's 0.7.1 that verifies against `v0.7.1` is checking its ancestry
+   against **a different product's history**. No story uses 0.7.1 today; the check fires the day
+   one does.
+
+**What we tried and rejected.** The first attempt notated upstream versions as `pjs/0.35.1`, to
+make them unmistakable in prose. It corrupted the evidence: those numbers appear in **three
+roles** — a reference to a release, a **verbatim quote** of a CHANGELOG heading (`## [0.14.1]`),
+and a **git tag name** (`v0.36.1`). Prefixing the first is right; prefixing the other two makes
+the quote false and the tag non-existent, and no regex can tell them apart. **The notation was
+the wrong tool: the danger was never the prose — it was the field.** Guard the field; label the
+prose. `US-3.1` shows what "label" means at the limit: its upstream release *number is also
+0.2.1*, so the story names that release **by date**, because the date is the only handle that
+can mean one thing.
+
+**Anchor ≠ delivery.** `1e96fdce1d` is a fine **anchor** — it marks where a release was cut, and
+`merge-base` against it is exactly how [US-10.2](sprints/stories/US-10.2-substrate-inject-api-injectedweb3.md)
+proves ancestry when no `v0.2.1` tag exists. It is not a fine **`commit:`**. Same SHA, two roles,
+one legitimate. The check rejects it in the field and leaves the anchor alone.
+
+**Impact**: 3 bump commits removed; provenance written into `US-3.1` and `US-10.2`, the two
+inherited stories that never said they were inherited; a `US-10.2` line claiming a "v0.2.1
+anchor" corrected — the tag does not exist, as its own evidence paragraph already said.
+
+**Citations**: [D101](#d101-version_shipped-names-a-release-of-this-product--inherited-features-ship-at-021); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D105](#d105-the-fork-boundary-is-its-own-window--inherited-work-does-not-go-on-this-teams-board); [LESSONS §66](LESSONS.md); `scripts/koni-docs-check-ids.mjs`
+
+---

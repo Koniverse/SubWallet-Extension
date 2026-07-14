@@ -11,7 +11,7 @@ prd_ref: [FR-89]
 arch_ref:
 depends_on: [US-9.1, US-9.3]
 assignee: nulllpc
-commit: c586a78109, b5d6f46647, f30463904d
+commit: c586a78109, b5d6f46647
 created: 2026-06-12
 updated: 2026-06-12
 ---

@@ -11,7 +11,7 @@ prd_ref: [FR-13]
 arch_ref: [AD-04, AD-11]
 depends_on:
 assignee: jacogr
-commit: 0b6bcd2bb9, f5a00988b0, 1e96fdce1d
+commit: 0b6bcd2bb9, f5a00988b0
 created: 2026-06-11
 updated: 2026-07-14
 ---
@@ -107,8 +107,32 @@ reconciliation.
 
 ## Implementation notes
 
-_Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
-and any implementation caveats during version reconciliation._
+**Inherited from polkadot-js — this capability was not built by SubWallet.** It arrived with
+the fork, in the repository's **first commit** ([CONTEXT D105](../../CONTEXT.md)).
+
+| | |
+| --- | --- |
+| Upstream author | `jacogr` (Jaco Greeff) — polkadot-js |
+| Upstream commits | `0b6bcd2bb9` (2019-05-20, *"Initial commit aka code from heaven"*) · `f5a00988b0` (2019-05-20, refresh accounts on create/import) |
+| Upstream release | **polkadot-js's first public release, 2019-07-12.** Named by **date, not number** — see below |
+| **Reached a SubWallet user in** | **0.2.1** (2022-02-10) — SubWallet's **first** release |
+
+**Why the upstream release is named by date.** polkadot-js's first release is numbered
+**`0.2.1`**. So is SubWallet's. They are three years and one product apart, and the string is
+identical — this story is the sharpest instance of the six-way version collision
+([LESSONS §66](../../LESSONS.md), [AGENTS.md §7 rule 1b](../../../AGENTS.md)). Writing
+*"upstream release 0.2.1"* here would be a sentence no reader — and no script — could
+disambiguate. **The date can only mean one of them.** Use it.
+
+There is no `v0.2.1` tag in this repo to anchor against; SubWallet's earliest tag is `v0.2.5`,
+which is what [US-21.2](US-21.2-history-backfill.md) verifies these commits against
+(`git merge-base --is-ancestor`, exit 0).
+
+**A CI release-bump commit was removed from `commit:` on 2026-07-14** — `1e96fdce1d`
+(*"Travis CI [CI Skip] 0.2.1"*, 2019-07-12) was polkadot-js's version bump for the **other**
+0.2.1. It delivered nothing, and it was in this field only because a string match on `"0.2.1"`
+found the wrong lineage. `commit:` names what made the capability true
+([CONTEXT D106](../../CONTEXT.md)).
 
 ## Cross-references
 
