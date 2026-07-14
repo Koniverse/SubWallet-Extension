@@ -163,12 +163,12 @@ Current docs at the repo root:
 Canonical `docs/` content per koni-docs spec (BRIEF, PRD, ARCHITECTURE,
 CONTEXT, LESSONS, SETUP, sprints/, CHANGELOG) is **authored**.
 
-### How the docs are allowed to change — five standing rules
+### How the docs are allowed to change — seven standing rules
 
 These are not EPIC-21's rules; they are the project's. Each was paid for by a defect
 that reached the owner before it reached a check. Full reasoning in `docs/CONTEXT.md`.
 
-**These six live here on purpose.** The koni-docs spec is vendored from
+**These seven live here on purpose.** The koni-docs spec is vendored from
 `Koniverse/Koni-Skills` and the CLI ships from npm — the next skill install or
 `npm i -g` overwrites both. `AGENTS.md` is the only copy nothing overwrites, and
 **it is the authority** where it and the tool disagree.
@@ -194,7 +194,9 @@ that reached the owner before it reached a check. Full reasoning in `docs/CONTEX
 >
 > Root cause of all of it: **`validate` checks that references *resolve*, never that values are
 > *legal*** — no enum check, no ID-pattern check. That is how a sprint `status: done` (the
-> *story* enum) survived a commit here, and how a non-spec `sprint-2022-M10` passes today.
+> *story* enum) survived a commit here, and why `sprint-9999-Q0` would pass today. And it
+> reads **only frontmatter** — an ID named in a *sentence* is invisible to it, which is how
+> three files came to cite a story number that was never written (rule 7).
 > **A rule with no check is a rule nobody notices breaking** — see rule 6.
 
 **1. An ID is an identity, not a position.** FR / NFR / US numbers are permanent. The
@@ -258,6 +260,19 @@ said it *"never changes the PRD's functional requirements"* — a **fact about s
 a fact about scope expires the moment scope moves. It was violated on day one, because an
 epic that checks docs against code must be able to fix what it proves wrong. A rule that
 cannot be checked is a rule nobody notices breaking ([LESSONS §65](docs/LESSONS.md)).
+
+**7. Every ID named anywhere must resolve — prose included.** `validate` reads only
+frontmatter, so an ID cited in a *sentence* can name a document that does not exist and
+nothing notices. A deferred story was cited by number in three files — the W28 retro,
+CONTEXT, and a story's dev notes — and **no such story was ever written**; the number made
+three documents promise a thing that was only ever an idea. **Minting an ID is a promise
+the document exists.** For work that is real but unwritten, **describe the gap and give it
+no ID** — an ID is earned by a file, not by an intention. The check is
+`node scripts/koni-docs-check-ids.mjs` (exit 1 on any dangling
+`US-` / `EPIC-` / `sprint-` / `FR-` / `NFR-` / `AD-`). It skips two archives on purpose —
+`docs/notes/YYYY-MM-DD-*` and `docs/superpowers/` are snapshots of a moment and correctly
+name the IDs that were true *then* — and it counts a **tombstoned** row (`~~NFR-11~~`) as
+existing, because a retired ID is retired, not absent (rule 1).
 
 ### The two change logs
 

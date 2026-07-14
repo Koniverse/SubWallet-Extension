@@ -80,6 +80,6 @@ resolves to a GitHub login, and STATUS.md is generated rather than hand-kept.
 
 | Item | Why it is not in this sprint |
 | --- | --- |
-| **US-21.4 — issue → story coverage index** | The CHANGELOG cites **1094 issues; only 65 are claimed by any story (94% unclaimed).** Most need only a link, but the 75 "capability-ish" 1.3.x entries are the bucket that can hide a missing FR (e.g. #4692 HOLLAR mainnet, #4829 Bittensor Root staking, #4795 Tanssi collator APY). Deferred by the owner — a real gap, deliberately left open rather than half-closed. |
+| **Issue → story coverage index** *(no story owns it — an open gap, not a planned deliverable)* | The CHANGELOG cites **1094 issues; only 65 are claimed by any story (94% unclaimed).** Most need only a link, but the 75 "capability-ish" 1.3.x entries are the bucket that can hide a missing FR (e.g. #4692 HOLLAR mainnet, #4829 Bittensor Root staking, #4795 Tanssi collator APY). Deferred by the owner — a real gap, deliberately left open rather than half-closed. |
 | **US-20.3 — read-path memory budget** | ⏸️ **deprecated**, not carried. The requirement it defended no longer exists ([D96](../CONTEXT.md)). |
 | **The 3 freed points** | Recommended spend: merge `koni/dev/issue-4984` (multicall3 balance batching, written and unmerged) and fix #4021 (unbounded `while (isContinue)` notification pagination, firing 4× per address every 30 min). Both are live, measurable waste — unlike the memory budget we just retired. |

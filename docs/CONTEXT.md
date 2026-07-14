@@ -1629,7 +1629,7 @@ Rule 2 exists for the same reason in miniature: without it a docs story can neve
 
 **Rationale**: The four NFRs pass a bar NFR-11 failed on all three counts. NFR-11's pain was **four years cold** (one incident, in 0.2.2), it had **no probe**, and its umbrella tracker had **zero commits** — folklore. Each of NFR-22…25 has a live tracker issue, a mechanical check, and a story already written to defend it. The difference is not that these feel more important; it is that **someone is provably already paying for them.**
 
-FR-160 is a different animal and worth naming as such: it is the first case of **the product shipping a capability the PRD never asked for.** The story existed and was `done`; only the requirement was missing. That is the failure mode the issue→story coverage index (US-21.4, deferred) exists to catch systematically — 1094 issues cited in the CHANGELOG, only 65 claimed by a story.
+FR-160 is a different animal and worth naming as such: it is the first case of **the product shipping a capability the PRD never asked for.** The story existed and was `done`; only the requirement was missing. That is the failure mode an **issue→story coverage index** would catch systematically — 1094 issues cited in the CHANGELOG, only 65 claimed by a story. **No story owns that index; it is an open gap, not a planned deliverable.**
 
 **On FR-160's number**: it belongs to EPIC-12 (FR-114…125) but sits at 160, after EPIC-19's rows. This is **correct and must not be "fixed"**. An FR number is an **identity, not a position**: new FRs append at the end, and the **Epic column is the authoritative grouping**, never the number range. Renumbering to restore the range would contradict [D94](#d94-one-time-gapless-renumber-of-fr-and-epic-12-story-ids--never-again) one day after it declared the renumber a one-time exception — and would break every reference for a cosmetic gain.
 
@@ -1803,5 +1803,56 @@ Only one surface is still hand-kept and unchecked: the **PRD badge**. It is accu
 **Date**: 2026-07-14
 **Version**: docs-only (against v1.3.83)
 **Citations**: [D100](#d100-a-story-is-the-unit-of-status--split-epic-20-where-the-truth-changes-not-where-the-phases-do); `frontmatter-spec.md` §3.2; [LESSONS §65](LESSONS.md)
+
+---
+
+### D104. An ID is a promise that a document exists — do not mint one for an intention
+
+**Context**: The W28 retro deferred an *"issue → story coverage index"* and gave it a story
+number. Nothing was written. That number then travelled: the retro's out-of-scope table,
+this log, and a story's dev notes — **three documents naming a file that does not exist.**
+
+`npx koni-docs validate` never saw it. It reads **frontmatter only**, so an ID cited in a
+*sentence* is invisible to it — the same blind spot as [D102](#d102-do-not-file-the-koni-docs-bugs-upstream--carry-the-divergence-and-say-so-revision-of-d99)'s
+*"`validate` checks that references resolve, never that values are legal"*, one layer out.
+The defect survived a full conformance epic and its close-out sweep.
+
+Worth being precise about *why it is a defect*, because it looks harmless. The gap it named
+was **real** and honestly described. What was false was the **number**: an ID says *there is
+a document, go read it.* A reader who follows it finds nothing and cannot tell whether the
+story was deleted, renamed, or never existed — so they cannot tell whether the work is
+dropped, done, or pending. **A missing document is a worse signal than no document**, because
+absence of an ID is silence, while a dangling ID is a lie with a citation.
+
+**Decision** — two parts, and the second is the one that lasts:
+
+1. **Describe the gap, give it no ID.** The coverage gap stays written in all three places;
+   the story number is gone from every one. An ID is **earned by a file**, not by an
+   intention. Work that is real but unwritten is a gap, not a story.
+2. **Check it** — `node scripts/koni-docs-check-ids.mjs`, now [AGENTS.md §7 rule 7](../AGENTS.md).
+   Every `US-` / `EPIC-` / `sprint-` / `FR-` / `NFR-` / `AD-` named **anywhere** in the doc
+   surface (prose included, plus `AGENTS.md` and `CLAUDE.md`) must resolve; exit 1 otherwise.
+   Two deliberate carve-outs, both stated in the script: **dated archives**
+   (`docs/notes/YYYY-MM-DD-*`, `docs/superpowers/`) are snapshots and correctly name the IDs
+   that were true *then*; a **tombstoned row** (`~~NFR-11~~`) counts as existing, because a
+   retired ID is retired, not absent ([D96](#d96-retire-nfr-11--an-unmeasured-budget-for-a-mechanism-never-built), rule 1).
+
+**Impact**: 4 dangling IDs cleared — the story number in three files, plus a **zero-padded
+FR reference** in [US-21.2](sprints/stories/US-21.2-history-backfill.md) (an FR-1 written
+with a leading zero, which is a different string and therefore a different ID). Both checks
+now green: `validate` exits 0, `check-ids` exits 0 across **255 files**.
+
+A note for whoever next writes a rule here: **this entry tripped its own check.** The first
+draft quoted the bad ID literally to explain the fix, and `check-ids` failed the commit. That
+is correct behaviour, and it is the cheapest possible proof the rule has teeth — so state a
+defunct ID by **description**, never by literal. An ID in this repo has exactly one meaning:
+*a document exists at this name.*
+
+**The lesson under it is [§65](LESSONS.md) for the third time**: the rule *"every ID must
+resolve"* was believed by everyone and enforced on **one field in one file type**. Nobody was
+breaking it on purpose; there was simply nowhere it could be caught. Writing the rule down
+was never the missing part — **writing the check was.**
+
+**Citations**: [AGENTS.md §7 rule 7](../AGENTS.md); [D102](#d102-do-not-file-the-koni-docs-bugs-upstream--carry-the-divergence-and-say-so-revision-of-d99); [LESSONS §65](LESSONS.md); `scripts/koni-docs-check-ids.mjs`
 
 ---

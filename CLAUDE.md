@@ -16,7 +16,7 @@ koni-docs:
 - Sprint: sprint-2026-W28 — closed, 21/21 pts. None open.
 - Active Stories: none
 - Last Version: 1.3.83
-- Recent Decisions: D99 (reconstructed `M` sprint windows) · D100 (a story is the unit of status) · D101 (`version_shipped` names a release of *this* product) · D102 (koni-docs divergence carried, not filed) · D103 (epic `status` derived from its stories)
+- Recent Decisions: D100 (a story is the unit of status) · D101 (`version_shipped` names a release of *this* product) · D102 (koni-docs divergence carried, not filed) · D103 (epic `status` derived from its stories) · D104 (an ID is a promise a document exists — `check-ids` enforces it)
 - Recent Lessons: §65 (a rule with no check is a rule nobody notices breaking) · §66 (three release lineages, not two — the CHANGELOG carries inherited polkadot-js history)
 
 See `.active-context.md` (gitignored, per-developer) for live snapshot;
