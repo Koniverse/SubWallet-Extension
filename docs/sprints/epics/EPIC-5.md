@@ -1,7 +1,7 @@
 ---
 id: EPIC-5
 title: "Wallet Security"
-status: backlog
+status: in-progress
 prd_ref:
   - FR-52
   - FR-53
@@ -19,7 +19,7 @@ arch_ref:
   - AD-03
   - AD-19
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-14
 ---
 
 ## Goal

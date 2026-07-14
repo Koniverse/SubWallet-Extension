@@ -1,7 +1,7 @@
 ---
 id: EPIC-2
 title: "Core Platform Engines"
-status: backlog
+status: done
 prd_ref:
   - FR-5
   - FR-6
@@ -20,7 +20,7 @@ arch_ref:
   - AD-22
   - AD-24
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-14
 ---
 
 > **⚠️ Corrected 2026-07-13 — AD-07's mechanism does not exist.** Wherever this file says

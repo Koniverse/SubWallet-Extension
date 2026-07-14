@@ -1768,3 +1768,40 @@ It was also **internally inconsistent**, which is what proves it was an accident
 **Citations**: revises [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system); [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done), [D100](#d100-a-story-is-the-unit-of-status--split-epic-20-where-the-truth-changes-not-where-the-phases-do); AGENTS.md §7
 
 ---
+
+### D103. Epic `status` is derived from its stories — and it answers a different question than the PRD badge
+
+**Context**: A final sweep found **16 of 21 epics carried a `status` their own stories contradict.** [EPIC-2](sprints/epics/EPIC-2.md) — the engine core, **8/8 stories `done`** — said **`backlog`**. So did EPIC-17 (2/2 done). Eleven more had shipped stories and still said `backlog`. Meanwhile EPIC-1 / EPIC-3 / EPIC-11 / EPIC-16 said **`in-progress`** with **zero stories in flight** — the same lie [D100](#d100-a-story-is-the-unit-of-status--split-epic-20-where-the-truth-changes-not-where-the-phases-do) had just removed one layer down.
+
+The cause is dull and worth naming: **nothing derives this field and nothing checks it, so it drifted to garbage.** `koni-docs sync` propagates *story* status; epic `status` is hand-kept, and hands forget. It is [LESSONS §65](LESSONS.md) again — a rule with no check is a rule nobody notices breaking.
+
+**Decision — derive it, mechanically, from the story set:**
+
+| Stories (ignoring `deprecated` — a dead story is not pending work) | Epic `status` |
+| --- | --- |
+| none `done` | `backlog` |
+| all `done` | `done` |
+| otherwise | `in-progress` |
+
+**Why `in-progress` is honest for an epic but was a lie for US-20.1.** The enums differ, and that is the whole of it. A **story** has seven values: US-20.1's remaining scope has **zero commits**, so `backlog` was both *available* and *true* — `in-progress` was a choice to misrepresent. An **epic** has three (`backlog | in-progress | done`, spec §3.2). For an epic that is 12-done / 12-backlog, `backlog` is false (it started) and `done` is false (it has not finished), so **`in-progress` is the only true value the enum offers**. Not a softer standard — a different alphabet.
+
+**The PRD badge and the epic `status` are not redundant, and must not be reconciled.** They answer different questions:
+
+| Surface | Question | EPIC-6 |
+| --- | --- | --- |
+| **PRD badge** (🟢 / 🟡 / 🔵) | *Is the **capability** delivered?* — counts **FRs** | 🟢 — **5/5 FRs shipped** |
+| **Epic `status`** | *Is the **work** in this epic finished?* — counts **stories** | `in-progress` — **5/6 stories**; [US-6.6](sprints/stories/US-6.6-design-system-and-ux-hardening.md) (hardening, owns no FR) is open |
+
+Both are correct. An epic can have every FR shipped and still carry open hardening or NFR work. **Do not "fix" one to match the other** — that would delete a real distinction to make two numbers agree.
+
+**Impact**: 16 epics corrected. Final state — **`done`: 3** (EPIC-2, EPIC-17, EPIC-21) · **`in-progress`: 18** · **`backlog`: 0**.
+
+**No epic is `backlog`**, and that is the honest headline: **every one of the 21 epics has shipped something.** The field had been claiming otherwise for 13 of them.
+
+Only one surface is still hand-kept and unchecked: the **PRD badge**. It is accurate today (verified against the FR tables in this sweep) — and it is therefore the next field to rot, for exactly the reason this entry exists.
+
+**Date**: 2026-07-14
+**Version**: docs-only (against v1.3.83)
+**Citations**: [D100](#d100-a-story-is-the-unit-of-status--split-epic-20-where-the-truth-changes-not-where-the-phases-do); `frontmatter-spec.md` §3.2; [LESSONS §65](LESSONS.md)
+
+---

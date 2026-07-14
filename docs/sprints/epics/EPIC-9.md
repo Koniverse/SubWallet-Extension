@@ -1,7 +1,7 @@
 ---
 id: EPIC-9
 title: "NFT Management"
-status: backlog
+status: in-progress
 prd_ref:
   - FR-85
   - FR-86
@@ -16,7 +16,7 @@ arch_ref:
   - AD-24
   - AD-25
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-14
 ---
 
 ## Goal

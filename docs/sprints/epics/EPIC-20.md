@@ -1,7 +1,7 @@
 ---
 id: EPIC-20
 title: "Performance & Lifecycle"
-status: backlog
+status: in-progress
 prd_ref: []
 arch_ref:
   - AD-07
@@ -11,7 +11,7 @@ arch_ref:
   - AD-24
   - AD-25
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-14
 ---
 
 > **⚠️ Corrected 2026-07-13 — AD-07's mechanism does not exist.** Wherever this file says

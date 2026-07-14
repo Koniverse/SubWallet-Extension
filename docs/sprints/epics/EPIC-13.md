@@ -1,7 +1,7 @@
 ---
 id: EPIC-13
 title: "Cross-Chain Bridge & XCM"
-status: backlog
+status: in-progress
 prd_ref:
   - FR-126
   - FR-127
@@ -19,7 +19,7 @@ arch_ref:
   - AD-19
   - AD-24
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-14
 ---
 
 ## Goal

@@ -1,7 +1,7 @@
 ---
 id: EPIC-6
 title: "UI & User Experience"
-status: backlog
+status: in-progress
 prd_ref:
   - FR-63
   - FR-64
@@ -12,7 +12,7 @@ arch_ref:
   - AD-05
   - AD-03
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-14
 ---
 
 ## Goal

@@ -1,7 +1,7 @@
 ---
 id: EPIC-17
 title: "Proxy Accounts"
-status: backlog
+status: done
 prd_ref:
   - FR-148
 arch_ref:
@@ -9,7 +9,7 @@ arch_ref:
   - AD-04
   - AD-21
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-14
 ---
 
 ## Goal

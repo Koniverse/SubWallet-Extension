@@ -1,7 +1,7 @@
 ---
 id: EPIC-8
 title: "Transactions & Transfers"
-status: backlog
+status: in-progress
 prd_ref:
   - FR-74
   - FR-75
@@ -20,7 +20,7 @@ arch_ref:
   - AD-24
   - AD-25
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-14
 ---
 
 ## Goal

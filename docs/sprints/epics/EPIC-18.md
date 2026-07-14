@@ -1,7 +1,7 @@
 ---
 id: EPIC-18
 title: "Multisig Accounts"
-status: backlog
+status: in-progress
 prd_ref:
   - FR-149
   - FR-150
@@ -11,7 +11,7 @@ arch_ref:
   - AD-04
   - AD-24
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-14
 ---
 
 ## Goal

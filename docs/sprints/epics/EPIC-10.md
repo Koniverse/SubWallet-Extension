@@ -1,7 +1,7 @@
 ---
 id: EPIC-10
 title: "dApp Connectivity"
-status: backlog
+status: in-progress
 prd_ref:
   - FR-94
   - FR-95
@@ -18,7 +18,7 @@ arch_ref:
   - AD-13
   - AD-14
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-14
 ---
 
 ## Goal

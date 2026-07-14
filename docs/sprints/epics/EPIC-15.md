@@ -1,7 +1,7 @@
 ---
 id: EPIC-15
 title: "On-Chain Governance"
-status: backlog
+status: in-progress
 prd_ref:
   - FR-139
   - FR-140
@@ -14,7 +14,7 @@ arch_ref:
   - AD-03
   - AD-25
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-14
 ---
 
 > **⚠️ Corrected 2026-07-13 — AD-07's mechanism does not exist.** Wherever this file says

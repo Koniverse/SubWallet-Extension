@@ -1,7 +1,7 @@
 ---
 id: EPIC-7
 title: "Portfolio & Balances"
-status: backlog
+status: in-progress
 prd_ref:
   - FR-68
   - FR-69
@@ -15,7 +15,7 @@ arch_ref:
   - AD-25
   - AD-23
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-14
 ---
 
 > **⚠️ Corrected 2026-07-13 — AD-07's mechanism does not exist.** Wherever this file says

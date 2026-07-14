@@ -1,7 +1,7 @@
 ---
 id: EPIC-19
 title: "Onboarding, Localization & Engagement"
-status: backlog
+status: in-progress
 prd_ref:
   - FR-152
   - FR-153
@@ -16,7 +16,7 @@ arch_ref:
   - AD-24
   - AD-25
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-14
 ---
 
 ## Goal
