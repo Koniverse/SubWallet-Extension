@@ -8,10 +8,12 @@
 //
 // A maintenance story documents the RECORD, never invents behaviour (LESSONS §68):
 //   status   done if the issue is CLOSED, else backlog (we hold no sprint for open work)
-//   version  the (Koni) release that cites it in the CHANGELOG, else empty (shipped date
-//            unknown — a closed issue with no changelog line)
+//   version  the (Koni) release that cites it in the CHANGELOG, else the first release tag that
+//            contains the [Issue-N] commit (git-provable, like GitHub's "shipped in vX"), else the
+//            release of the issue a "resolved in #N" comment points to (shipped via #N), else empty
 //   sprint   the release month if shipped, else the close month, else empty
-//   assignee tracker assignee, else the git [Issue-N] implementer, else empty
+//   assignee tracker assignee, else the git [Issue-N] implementer, else — for a "shipped via #N"
+//            story — the assignee of #N (who did the work there), else empty
 //   commit   the feature commit(s), never a [CI Skip] release bump (D106)
 //
 // Idempotent: every file it writes carries `generated_by: koni-docs-gen-maintenance`;
@@ -29,6 +31,9 @@ const TODAY = '2026-07-15';
 const MARK = 'koni-docs-gen-maintenance';
 
 const all = JSON.parse(fs.readFileSync('/tmp/all2.json', 'utf8'));
+// tracker assignees per issue — used both for a story's own assignee and, for a "shipped via #N"
+// story, to inherit the assignee of the issue the work was actually done under.
+const assigneesByNum = new Map(all.map((o) => [o.number, (o.assignees || []).map((a) => a.login)]));
 // GitHub sub-issue graph: number → {parent, subs}. Built by the audit fetch (GraphQL).
 const rel = fs.existsSync('/tmp/rel.json') ? JSON.parse(fs.readFileSync('/tmp/rel.json', 'utf8')) : {};
 const relOf = (n) => rel[String(n)] || {};
@@ -55,6 +60,13 @@ const prIssueRefs = (p) => {
 
   return s;
 };
+// "shipped via #N" — a done issue whose work was done under another issue, per a "resolved in #N"
+// comment (koni-docs-fetch-issue-pointers). source# → target#. The generator inherits the target's
+// release for version_shipped, labelled as via #N — never as this issue's own commit.
+const pointerOf = new Map(
+  Object.entries(fs.existsSync('/tmp/issue-pointers.json') ? JSON.parse(fs.readFileSync('/tmp/issue-pointers.json', 'utf8')) : {})
+    .map(([s, t]) => [Number(s), Number(t)])
+);
 
 // GitHub Projects board #2 "SubWallet.App - Development": the workflow Status an OPEN issue
 // actually sits in. The tracker only knows OPEN/CLOSED; the board is where "In Review" lives.
@@ -125,6 +137,35 @@ for (const ver of KONI) {
 
   if (t.status === 0 && t.stdout.trim() && t.stdout.trim() < FORK) colliding.add(ver);
 }
+
+// The release a commit first shipped in — the earliest `v<koni-release>` tag that contains it,
+// exactly what GitHub's "shipped in v1.0.2" chip shows. This is the SECOND source of
+// version_shipped, used only when the CHANGELOG names no release for the issue: a git-provable
+// version (the tag contains the commit ⇒ the merge-base check passes by construction), never a
+// guess. Betas and colliding pre-fork tags are excluded; empty when no stable release contains it.
+const semverCmp = (a, b) => {
+  const x = a.split('.').map(Number);
+  const y = b.split('.').map(Number);
+
+  return x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
+};
+const releaseTagCache = new Map();
+const firstReleaseTag = (sha) => {
+  if (!sha) return '';
+
+  if (releaseTagCache.has(sha)) return releaseTagCache.get(sha);
+
+  const r = spawnSync('git', ['tag', '--contains', sha], { encoding: 'utf8' });
+  const cands = r.status === 0
+    ? r.stdout.split('\n').map((s) => s.trim()).filter(Boolean)
+      .map((t) => t.replace(/^v/, '')).filter((v) => KONI.has(v) && !colliding.has(v))
+    : [];
+  const out = cands.length ? cands.sort(semverCmp)[0] : '';
+
+  releaseTagCache.set(sha, out);
+
+  return out;
+};
 
 // ---- git: issue → feature commits (no merge, no docs, no CI bump) ------------
 
@@ -232,7 +273,7 @@ for (const rows of groups.values()) {
   const sh = shipped.get(head.number);
   const closed = rows.map((r) => r.closedAt).filter(Boolean).sort()[0];
   const area = routeArea(head.title);
-  const asg = rows.map((r) => (r.assignees || [])[0]?.login).find(Boolean)
+  let asg = rows.map((r) => (r.assignees || [])[0]?.login).find(Boolean)
     || nums.map(implementer).find(Boolean) || '';
   const shas = [...new Set(nums.flatMap((i) => commitsOf.get(i) || []))].slice(0, 5);
 
@@ -254,7 +295,29 @@ for (const rows of groups.values()) {
     deadReason = rows.some((r) => r.stateReason === 'DUPLICATE') ? 'DUPLICATE' : 'NOT_PLANNED';
   }
 
-  const ver = (status === 'done' && sh) ? sh.v : '';
+  // version: the CHANGELOG release that cites the issue, else — for a done story with a resolvable
+  // [Issue-N] commit — the first release tag that contains that commit (git-provable, D106)
+  let ver = (status === 'done' && sh) ? sh.v : '';
+
+  if (!ver && status === 'done' && shas.length) ver = firstReleaseTag(shas[0]);
+
+  // last resort: the work was done under another issue ("resolved in #N") — inherit that issue's
+  // release, recorded as "shipped via #N", never as this issue's own commit
+  let via = null;
+  let viaSha = '';
+
+  if (!ver && status === 'done') {
+    const tgt = nums.map((n) => pointerOf.get(n)).find(Boolean);
+
+    if (tgt) {
+      const tv = shipped.get(tgt)?.v || firstReleaseTag((commitsOf.get(tgt) || [])[0]);
+
+      if (tv) { ver = tv; via = tgt; viaSha = (commitsOf.get(tgt) || [])[0] || ''; }
+    }
+  }
+
+  // if this issue has no assignee of its own but shipped via #N, the person who did #N did this work
+  if (!asg && via) asg = (assigneesByNum.get(via) || [])[0] || implementer(via) || '';
   const shipDate = sh ? sh.date : (closed ? closed.slice(0, 10) : null);
   // done → its release month; in-flight (non-backlog open) → the board iteration, or the
   // active sprint if the board holds none; backlog & deprecated → no window
@@ -277,7 +340,7 @@ for (const rows of groups.values()) {
     .filter((p) => [...prIssueRefs(p)].some((i) => numsSet.has(i)))
     .slice(0, 5);
 
-  specs.push({ nums, title, area, asg, shas, status, deadReason, ver, sprint, shipDate, parents, subs, prs, boardStatus });
+  specs.push({ nums, title, area, asg, shas, status, deadReason, ver, via, viaSha, sprint, shipDate, parents, subs, prs, boardStatus });
 }
 
 // ---- maintenance epics: one per area present, in area order + uncategorized --
@@ -540,6 +603,11 @@ for (const s of [...byEpic.values()].flat()) {
   } else if (s.prs.length) {
     verify = `implemented by ${prList} (title declares the issue) · \`gh pr view ${s.prs[0]}\``;
     evidence = `implementing PR${s.ver ? ` + release ${s.ver}` : ''}`;
+  } else if (s.via) {
+    verify = s.viaSha
+      ? `\`git merge-base --is-ancestor ${s.viaSha} v${s.ver}\` exits 0 — work shipped via [#${s.via}](${url(s.via)})`
+      : `shipped via [#${s.via}](${url(s.via)}) → release ${s.ver} · [coverage index](../../notes/changelog-coverage.md)`;
+    evidence = `shipped via #${s.via} in ${s.ver}`;
   } else if (s.ver) {
     verify = `[coverage index](../../notes/changelog-coverage.md) — CHANGELOG names release ${s.ver}`;
     evidence = `CHANGELOG release ${s.ver}`;
@@ -557,7 +625,9 @@ for (const s of [...byEpic.values()].flat()) {
   const goalState = dead
     ? `Closed **${s.deadReason}**${s.shipDate ? ` (${s.shipDate})` : ''} — did not ship.`
     : (s.status === 'done'
-      ? `Shipped/closed${s.shipDate ? ` ${s.shipDate}` : ''}.`
+      ? (s.via
+        ? `Shipped via #${s.via} in release ${s.ver}${s.shipDate ? ` (closed ${s.shipDate})` : ''} — the work was done under that issue, not here.`
+        : `Shipped/closed${s.shipDate ? ` ${s.shipDate}` : ''}.`)
       : `Open${boardLabel}.`);
 
   // sub-issue graph cross-links (GitHub parent/sub-issue relationships)
@@ -610,7 +680,7 @@ ${relBlock}
 
 ## References
 
-- [Issue ${nums}](${url(s.nums[0])})${s.prs.length ? `\n- Implemented by ${prList} (PR title declares this issue)` : ''}
+- [Issue ${nums}](${url(s.nums[0])})${s.via ? `\n- Work shipped via [#${s.via}](${url(s.via)}) — a "resolved in #${s.via}" comment on the tracker points there` : ''}${s.prs.length ? `\n- Implemented by ${prList} (PR title declares this issue)` : ''}
 - [CHANGELOG coverage index](../../notes/changelog-coverage.md)
 
 ## Verification commands

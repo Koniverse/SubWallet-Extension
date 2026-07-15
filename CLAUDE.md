@@ -17,7 +17,7 @@ koni-docs:
 - Active Stories: none
 - Last Version: 1.3.83
 - Recent Decisions: D105 (fork boundary is its own window) · D106 (`commit:` names what made the capability true) · D107 (a ticked AC is a claim about the code) · D108 (every tracker issue gets a story in a 20-epic maintenance layer; FR map stays clean)
-- Recent Lessons: §67 (two fields answering different questions may disagree — reconciling them deletes the fact) · §68 (a ticked checkbox is a claim about the code; 101 of 119 done stories have no command that could refute one) · §69 (a link an API hands you is a claim, not a fact — GitHub's closing-PR field was 41% wrong; verify against the developer's [Issue-N] title)
+- Recent Lessons: §68 (a ticked checkbox is a claim about the code; 101 of 119 done stories have no command that could refute one) · §69 (a link an API hands you is a claim, not a fact — GitHub's closing-PR field was 41% wrong; verify against the developer's [Issue-N] title) · §70 (unrecoverable is a claim too — 367 blank versions sat one `git tag --contains` away; check git before declaring a gap)
 
 See `.active-context.md` (gitignored, per-developer) for live snapshot;
 copy from `.active-context.example.md` on first checkout.

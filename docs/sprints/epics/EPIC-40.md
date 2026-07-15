@@ -51,7 +51,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 |---|---|---|---|---|---|
 | [US-40.1](../stories/US-40.1-add-url-and-update-logo-for-subspace-network.md) | ✅ done | Add URL and update logo for Subspace network | [#10](https://github.com/Koniverse/SubWallet-Extension/issues/10) | minhle2994 | 1.0.5 |
 | [US-40.2](../stories/US-40.2-review-data-subscriptions-and-app-performance.md) | ✅ done | Review data subscriptions and app performance | [#1181](https://github.com/Koniverse/SubWallet-Extension/issues/1181) | S2kael | — |
-| [US-40.3](../stories/US-40.3-optimize-extension-web-runner-flow.md) | ✅ done | Optimize extension - web runner flow | [#1463](https://github.com/Koniverse/SubWallet-Extension/issues/1463) | saltict | — |
+| [US-40.3](../stories/US-40.3-optimize-extension-web-runner-flow.md) | ✅ done | Optimize extension - web runner flow | [#1463](https://github.com/Koniverse/SubWallet-Extension/issues/1463) | saltict | 1.0.7 |
 | [US-40.4](../stories/US-40.4-optimize-zk-not-implement-in-some-evironement-like-weba.md) | ✅ done | Optimize ZK - Not implement in some evironement like WebApp and Mobile | [#1628](https://github.com/Koniverse/SubWallet-Extension/issues/1628) | nulllpc | — |
 | [US-40.5](../stories/US-40.5-webapp-improve-performance.md) | ✅ done | WebApp- Improve performance | [#1794](https://github.com/Koniverse/SubWallet-Extension/issues/1794) | lw-cdm | — |
 | [US-40.6](../stories/US-40.6-webapp-extension-review-all-performance-problems.md) | ✅ done | WebApp \| Extension - Review all performance problems | [#2182](https://github.com/Koniverse/SubWallet-Extension/issues/2182) | saltict | — |
@@ -68,7 +68,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-40.17](../stories/US-40.17-update-lock-time-of-mv3-extension.md) | ✅ done | Update lock time of MV3 extension | [#3144](https://github.com/Koniverse/SubWallet-Extension/issues/3144) | saltict | 1.2.4 |
 | [US-40.18](../stories/US-40.18-fixed-some-bug-related-to-mv3.md) | ✅ done | Fixed some bug related to MV3 | [#3146](https://github.com/Koniverse/SubWallet-Extension/issues/3146) | saltict | 1.2.2 |
 | [US-40.19](../stories/US-40.19-re-test-mv3-on-firefox.md) | ✅ done | Re-test MV3 on Firefox | [#3330](https://github.com/Koniverse/SubWallet-Extension/issues/3330) | haiyenvu23 | — |
-| [US-40.20](../stories/US-40.20-extension-check-validate-on-firefox-when-submit-mv3-ver.md) | ✅ done | Extension - Check validate on Firefox when submit MV3 version for Firefox browser | [#3364](https://github.com/Koniverse/SubWallet-Extension/issues/3364) | saltict | — |
+| [US-40.20](../stories/US-40.20-extension-check-validate-on-firefox-when-submit-mv3-ver.md) | ✅ done | Extension - Check validate on Firefox when submit MV3 version for Firefox browser | [#3364](https://github.com/Koniverse/SubWallet-Extension/issues/3364) | saltict | 1.2.28 |
 
 ## Acceptance criteria
 

@@ -50,9 +50,9 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | US | Status | Title | Issue | Assignee | Shipped |
 |---|---|---|---|---|---|
 | [US-39.1](../stories/US-39.1-create-pr-to-intergrate-subwallet-into-web3-onboard.md) | ✅ done | Create PR to intergrate SubWallet into web3-onboard | [#1045](https://github.com/Koniverse/SubWallet-Extension/issues/1045) | S2kael | — |
-| [US-39.2](../stories/US-39.2-update-manage-message-and-notification-in-extension.md) | ✅ done | Update manage message and notification in extension | [#1227](https://github.com/Koniverse/SubWallet-Extension/issues/1227) | S2kael | — |
+| [US-39.2](../stories/US-39.2-update-manage-message-and-notification-in-extension.md) | ✅ done | Update manage message and notification in extension | [#1227](https://github.com/Koniverse/SubWallet-Extension/issues/1227) | S2kael | 1.1.2 |
 | [US-39.3](../stories/US-39.3-support-notification-in-browser-and-banner-in-app.md) | ✅ done | Support notification in browser and banner in app | [#2000](https://github.com/Koniverse/SubWallet-Extension/issues/2000) | S2kael | 1.1.18 |
-| [US-39.4](../stories/US-39.4-webapp-disable-browser-notification-type-setting.md) | ✅ done | WebApp - Disable Browser notification type setting | [#2117](https://github.com/Koniverse/SubWallet-Extension/issues/2117) | lw-cdm | — |
+| [US-39.4](../stories/US-39.4-webapp-disable-browser-notification-type-setting.md) | ✅ done | WebApp - Disable Browser notification type setting | [#2117](https://github.com/Koniverse/SubWallet-Extension/issues/2117) | lw-cdm | 1.1.36 |
 | [US-39.5](../stories/US-39.5-re-check-order-campaign.md) | ✅ done | Re-check order campaign | [#2144](https://github.com/Koniverse/SubWallet-Extension/issues/2144) | saltict | — |
 | [US-39.6](../stories/US-39.6-set-up-notifications-for-mobile-devices-in-case-of-data.md) | ✅ done | Set up notifications for mobile devices in case of data loss on iOS 17.1 | [#2230](https://github.com/Koniverse/SubWallet-Extension/issues/2230) | Sokol142196 | — |
 | [US-39.7](../stories/US-39.7-webapp-support-marketing-campaign-feature-for-webapp.md) | ✅ done | WebApp - Support marketing campaign feature for webapp | [#2552](https://github.com/Koniverse/SubWallet-Extension/issues/2552) | frenkie-ng | — |

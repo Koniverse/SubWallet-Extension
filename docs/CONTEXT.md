@@ -2124,13 +2124,14 @@ status in step with the tracker's close reasons.
   not the structured "duplicate of #X" action. So the original is not recoverable from the API; the
   deprecated banner says exactly that rather than guessing a canonical.
 - **A closed issue is not proof of shipped code — so `done` now carries an evidence tier.** Of 2208
-  done stories: **1103** have a merge-base-provable commit, **200** an implementing PR (title declares
-  the issue — see the correction below), **211** a CHANGELOG release, and **694** have *none of the
-  three* — `done` rests only on the tracker's COMPLETED label (mostly pre-2023 issues closed before
-  the `[Issue-N]` commit / PR-link conventions). Each story states its tier in AC-1, and the 694 say
-  plainly *"no commit, PR, or changelog line links code to this issue."* The label is kept as the
-  team's own record, but it is never dressed up as code evidence — the [LESSONS §68](LESSONS.md) line,
-  applied to provenance strength, not just AC text.
+  done stories: **1031** have a commit provable against its release by `merge-base`, **72** a commit
+  not yet in any stable release, **200** an implementing PR (title declares the issue — see the PR
+  correction below), **211** a CHANGELOG release, and **694** have *none* — `done` rests only on the
+  tracker's COMPLETED label (mostly pre-2023 issues closed before the `[Issue-N]` commit / PR-link
+  conventions). Each story states its tier in AC-1, and the 694 say plainly *"no commit, PR, or
+  changelog line links code to this issue."* The label is kept as the team's own record, but it is
+  never dressed up as code evidence — the [LESSONS §68](LESSONS.md) line, applied to provenance
+  strength, not just AC text.
 
 **Follow-up — the "closing PR" links were 41% wrong; corrected against the PR title (2026-07-15).**
 A recheck of the done stories' fields asked whether the PR evidence could be trusted. It could not.
@@ -2155,10 +2156,42 @@ spurious PR link and **22** open stories carried a nonsensical *"Closed by PR"*.
   — that signal is reliable. This is [LESSONS §68](LESSONS.md) turned on our own generator: a linked
   PR is a *claim* the PR did this issue's work, and a claim gets verified or dropped, never trusted
   because an API returned it.
-- **Rejected as fabrication.** The same recheck confirmed `version_shipped` (1197 empty) and the
-  remaining `assignee` gaps stay empty — no CHANGELOG line proves a release, and deriving an assignee
-  from the (now-distrusted) PR author was tried and reverted. Honest-empty over plausible-but-false.
+- **The `assignee` line held; the "`version_shipped` unrecoverable" line did not.** Deriving an
+  assignee from the (now-distrusted) PR author was tried and reverted — honest-empty over
+  plausible-but-false. But the claim that the 1197 empty `version_shipped` fields were *unrecoverable*
+  was itself an overclaim, corrected below: the CHANGELOG is not the only proof of a release.
 
-**Citations**: [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-gen-maintenance.mjs`, `scripts/koni-docs-fetch-pr-titles.mjs`, `scripts/koni-docs-changelog-coverage.mjs`
+**Follow-up — `version_shipped` WAS recoverable: the commit's first release tag (2026-07-15).**
+The recheck declared the 1197 empty `version_shipped` fields unrecoverable because no `(Koni)`
+CHANGELOG line named the issue. That overlooked a second, *stronger* source: for a done story with a
+resolvable `[Issue-N]` commit, the first `v<release>` tag that **contains** that commit is the release
+it shipped in — exactly GitHub's *"shipped in v1.0.2"* chip, and git-provable (the tag contains the
+commit ⇒ `git merge-base --is-ancestor` passes by construction). Issue #1240 exposed it: closed, a
+merged `[Issue-1240]` PR, tagged **v1.0.2** on GitHub — yet our field was blank because the CHANGELOG
+never listed it. `firstReleaseTag()` now fills `version_shipped` from that tag when the CHANGELOG has
+none (CHANGELOG still wins when present; betas and colliding pre-fork tags excluded). **367 done
+stories gained a git-provable version (1011 → 1378 carry a release)**, and each one's AC-1 check became
+a real `git merge-base --is-ancestor <sha> v<ver>` instead of *"commit present in git."* The lesson
+([§70](LESSONS.md)): *unrecoverable* is a claim too — do not assert it from one source without checking
+whether git already holds the answer.
+
+**Third source — "resolved in #N": the work was done under another issue.** A remaining slice of the
+tracker-only stories are closed COMPLETED but carry *no* commit and *no* CHANGELOG line because the fix
+landed under a **different** issue — the closing comment says *"Resolved in #N"*, *"Fixed by #N"*,
+*"Done in #N"* (or Vietnamese *"gộp vào #N"*). #3390 *"Recheck and support Ledger for Avail"* is the
+case: closed, no assignee, no commit — its comment says *"Done in #2982"*, and #2982 shipped in **v1.2.22**.
+`scripts/koni-docs-fetch-issue-pointers.mjs` reads the comments and extracts that pointer — **tightly**:
+the verb must be immediately followed by a connective and the number (*"resolved in #N"*, not *"related
+issue #N"* or *"resolve the bug on #N"*), which cut a loose first pass of 64 down to **26** genuine
+links (the same precision-over-recall discipline [§69](LESSONS.md) forced on the PR links). The
+generator inherits the target's release, recorded as **`shipped via #N`** with a `merge-base` check
+against *that* issue's commit — never dressed up as this issue's own work. **26 more done stories gained
+a version (1378 → 1404).** The 804 still empty genuinely have no code trail — no commit, no changelog
+line, no "resolved in #N" pointer. The same pointer also fills the **assignee**: 8 of these 26 had none
+of their own, so they inherit #N's — whoever did the work there did this. #3390 → **S2kael**, who owns
+#2982. (Contrast the reverted PR-author guess: that rested on a signal already proven unreliable; this
+rests on a tightly-verified pointer to where the work demonstrably happened.)
+
+**Citations**: [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-gen-maintenance.mjs`, `scripts/koni-docs-fetch-pr-titles.mjs`, `scripts/koni-docs-fetch-issue-pointers.mjs`, `scripts/koni-docs-changelog-coverage.mjs`
 
 ---

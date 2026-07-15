@@ -1128,3 +1128,25 @@ input is as false as the input, wherever you write it.
 
 **Cost of learning it**: 243 stories shipped (and were pushed) asserting a specific PR closed an
 issue it had nothing to do with.
+
+## 70. "Unrecoverable" is a claim too — check whether git already holds the answer
+
+**What happened**: the field-completeness recheck ([§69](#69-a-link-an-api-hands-you-is-a-claim-not-a-fact--githubs-closedbypullrequestsreferences-was-41-wrong))
+declared 1197 `done` stories' empty `version_shipped` **unrecoverable** — "no `(Koni)` CHANGELOG line
+names the issue, milestones aren't versions, nothing proves which release shipped it." That reasoning
+was sound about the CHANGELOG and **wrong about the conclusion**, because it stopped at one source.
+A resolvable `[Issue-N]` commit was already recorded in most of those stories, and the first `v<x.y.z>`
+tag that **contains** a commit *is* the release it shipped in — the same fact GitHub renders as a
+"shipped in v1.0.2" chip. Issue #1240 made it undeniable: closed, a merged `[Issue-1240]` PR, a
+**v1.0.2** chip on the tracker — and a blank field, because the CHANGELOG never listed it. Deriving
+from `git tag --contains` filled **367** of them, git-provable, and turned each one's verification from
+*"commit present in git"* into a `merge-base` check that actually runs.
+
+**The rule**: before writing *"unrecoverable"* / *"unknown"* / *"can't be derived,"* enumerate the
+sources, not just the first one that came to mind. A negative claim (the data does not exist) is as
+falsifiable as a positive one, and it is lazier to make — it ends the search instead of doing it. Here
+the stronger source was **local**: `git tag --contains` needs no API, no cache, no network. The order
+that would have caught it: what does git already know, before what does an external service report.
+
+**Cost of learning it**: 367 `done` stories carried a blank release for a day while the exact version
+sat one `git tag --contains` away — and the recheck had written *"unrecoverable"* over it.
