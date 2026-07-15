@@ -10,7 +10,7 @@ version_shipped:
 prd_ref: [NFR-16, NFR-25, FR-52]
 arch_ref: [AD-04, AD-03, AD-19]
 depends_on: [US-5.1, US-5.2]
-assignee:
+assignee: frenkie-ng
 commit:
 created: 2026-06-12
 updated: 2026-07-15

@@ -10,7 +10,7 @@ version_shipped:
 prd_ref: [FR-45]
 arch_ref: [AD-02]
 depends_on: [US-4.1]
-assignee:
+assignee: bluezdot
 commit:
 created: 2026-06-12
 updated: 2026-07-15

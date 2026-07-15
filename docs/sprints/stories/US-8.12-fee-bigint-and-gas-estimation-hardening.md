@@ -10,7 +10,7 @@ version_shipped:
 prd_ref: [FR-76, FR-77, FR-80, NFR-22]
 arch_ref: [AD-02, AD-25]
 depends_on: [US-8.1, US-8.3, US-8.4, US-8.7]
-assignee:
+assignee: bluezdot
 commit:
 created: 2026-06-12
 updated: 2026-07-15

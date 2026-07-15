@@ -46,7 +46,8 @@ const prsOf = new Map(prCache.map((o) => [o.number, (o.closedByPullRequestsRefer
 // GitHub's closedByPullRequestsReferences is loose — it links PRs that merely mention an issue, and
 // often a PR about a DIFFERENT issue (41% of the raw links were spurious). So a linked PR is trusted
 // only when its title declares an `[Issue-N]` (or `#N`) that the story actually owns — the same
-// developer-authored convention the commit tier trusts. pr# → title, from koni-docs-fetch-pr-titles.
+// developer-authored convention the commit tier trusts. pr# → title, built by a one-off local fetch
+// helper (kept in the session scratchpad, not the repo — setup scaffolding, not durable tooling).
 const prTitle = new Map(
   Object.entries(fs.existsSync('/tmp/pr-titles.json') ? JSON.parse(fs.readFileSync('/tmp/pr-titles.json', 'utf8')) : {})
     .map(([n, t]) => [Number(n), t])
@@ -61,8 +62,9 @@ const prIssueRefs = (p) => {
   return s;
 };
 // "shipped via #N" — a done issue whose work was done under another issue, per a "resolved in #N"
-// comment (koni-docs-fetch-issue-pointers). source# → target#. The generator inherits the target's
-// release for version_shipped, labelled as via #N — never as this issue's own commit.
+// comment. source# → target#, built by a one-off local fetch helper (session scratchpad, not the
+// repo). The generator inherits the target's release for version_shipped, labelled as via #N —
+// never as this issue's own commit.
 const pointerOf = new Map(
   Object.entries(fs.existsSync('/tmp/issue-pointers.json') ? JSON.parse(fs.readFileSync('/tmp/issue-pointers.json', 'utf8')) : {})
     .map(([s, t]) => [Number(s), Number(t)])

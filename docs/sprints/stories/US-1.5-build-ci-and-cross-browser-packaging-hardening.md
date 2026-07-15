@@ -10,7 +10,7 @@ version_shipped:
 prd_ref: [NFR-19, NFR-9, NFR-8]
 arch_ref: [AD-05, AD-06, AD-08, AD-25]
 depends_on: [US-1.1]
-assignee:
+assignee: saltict
 commit:
 created: 2026-06-12
 updated: 2026-07-15

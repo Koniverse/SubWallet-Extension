@@ -10,7 +10,7 @@ version_shipped:
 prd_ref: [FR-50]
 arch_ref: [AD-02, AD-24]
 depends_on: [US-4.5]
-assignee:
+assignee: saltict
 commit:
 created: 2026-06-12
 updated: 2026-07-15

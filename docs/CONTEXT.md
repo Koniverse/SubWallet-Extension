@@ -2147,7 +2147,7 @@ spurious PR link and **22** open stories carried a nonsensical *"Closed by PR"*.
 - **The fix — trust the PR *title*, not GitHub's link.** A linked PR survives only if its title
   declares an `[Issue-N]`/`#N` the story owns — the same developer-authored convention the commit
   tier trusts, and exactly what separates the genuine #3571 *"[Issue-2751]"* from the spurious #1948.
-  `scripts/koni-docs-fetch-pr-titles.mjs` builds the `pr# → title` cache; the generator filters on it.
+  a one-off local fetch built the `pr# → title` cache (kept in the session scratchpad, not the repo); the generator filters on it.
   **1294 → 1051** PR-citing stories; the 243 all-spurious dropped to their next honest tier (CHANGELOG
   or tracker-label). Wording changed from *"closed by PR … → MERGED"* to *"implemented by PR (title
   declares the issue)"*: these PRs carry the work, but most issues were closed by hand, not auto-closed
@@ -2180,7 +2180,7 @@ tracker-only stories are closed COMPLETED but carry *no* commit and *no* CHANGEL
 landed under a **different** issue — the closing comment says *"Resolved in #N"*, *"Fixed by #N"*,
 *"Done in #N"* (or Vietnamese *"gộp vào #N"*). #3390 *"Recheck and support Ledger for Avail"* is the
 case: closed, no assignee, no commit — its comment says *"Done in #2982"*, and #2982 shipped in **v1.2.22**.
-`scripts/koni-docs-fetch-issue-pointers.mjs` reads the comments and extracts that pointer — **tightly**:
+a one-off local fetch (kept in the session scratchpad, not the repo) reads the comments and extracts that pointer — **tightly**:
 the verb must be immediately followed by a connective and the number (*"resolved in #N"*, not *"related
 issue #N"* or *"resolve the bug on #N"*), which cut a loose first pass of 64 down to **26** genuine
 links (the same precision-over-recall discipline [§69](LESSONS.md) forced on the PR links). The
@@ -2192,6 +2192,6 @@ of their own, so they inherit #N's — whoever did the work there did this. #339
 #2982. (Contrast the reverted PR-author guess: that rested on a signal already proven unreliable; this
 rests on a tightly-verified pointer to where the work demonstrably happened.)
 
-**Citations**: [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-gen-maintenance.mjs`, `scripts/koni-docs-fetch-pr-titles.mjs`, `scripts/koni-docs-fetch-issue-pointers.mjs`, `scripts/koni-docs-changelog-coverage.mjs`
+**Citations**: [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-gen-maintenance.mjs`, `scripts/koni-docs-changelog-coverage.mjs` (the pr-title and issue-pointer fetch helpers are one-off setup, kept in the session scratchpad, not the repo)
 
 ---

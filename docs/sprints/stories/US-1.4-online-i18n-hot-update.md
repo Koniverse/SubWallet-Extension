@@ -10,7 +10,7 @@ version_shipped:
 prd_ref: [FR-4]
 arch_ref: [AD-25]
 depends_on: [US-1.3]
-assignee:
+assignee: frenkie-ng
 commit:
 created: 2026-06-12
 updated: 2026-07-15
