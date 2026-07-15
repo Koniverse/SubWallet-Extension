@@ -2,10 +2,10 @@
 id: US-4.20
 title: "AI / DeFAI features"
 epic: EPIC-4
-status: backlog
+status: in-progress
 priority: P2
 points: 8
-sprint:
+sprint: sprint-2026-W28
 version_shipped:
 prd_ref: [FR-51]
 arch_ref: [AD-24]
@@ -13,9 +13,13 @@ depends_on: [US-4.18]
 assignee:
 commit:
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-15
 external_deps: [ai_provider, services_sdk_backend]
 ---
+
+## Status refresh — 2026-07-15
+
+> Synced from GitHub Projects board #2 ("SubWallet.App – Development"): issue #4158 is **Implementing** there, so this story moves `backlog` → `in-progress` (sprint `sprint-2026-W28`). Only status/sprint changed; Goal, AC and reasoning below are untouched. The board is the live source for workflow state.
 
 ## Goal
 

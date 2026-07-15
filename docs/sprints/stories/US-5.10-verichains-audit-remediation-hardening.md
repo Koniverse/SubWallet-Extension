@@ -2,10 +2,10 @@
 id: US-5.10
 title: "Security audit & remediation hardening"
 epic: EPIC-5
-status: backlog
+status: review
 priority: P1
 points: 5
-sprint:
+sprint: sprint-2026-W28
 version_shipped:
 prd_ref: [NFR-16, NFR-25, FR-52]
 arch_ref: [AD-04, AD-03, AD-19]
@@ -13,8 +13,12 @@ depends_on: [US-5.1, US-5.2]
 assignee:
 commit:
 created: 2026-06-12
-updated: 2026-07-13
+updated: 2026-07-15
 ---
+
+## Status refresh — 2026-07-15
+
+> Synced from GitHub Projects board #2 ("SubWallet.App – Development"): issue #4959 is **In Review** there, so this story moves `backlog` → `review` (sprint `sprint-2026-W28`). Only status/sprint changed; Goal, AC and reasoning below are untouched. The board is the live source for workflow state.
 
 ## Goal
 

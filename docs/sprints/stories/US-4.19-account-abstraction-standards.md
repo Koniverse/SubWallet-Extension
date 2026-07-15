@@ -2,10 +2,10 @@
 id: US-4.19
 title: "Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683)"
 epic: EPIC-4
-status: backlog
+status: in-progress
 priority: P2
 points: 8
-sprint:
+sprint: sprint-2026-W28
 version_shipped:
 prd_ref: [FR-50]
 arch_ref: [AD-02, AD-24]
@@ -13,8 +13,12 @@ depends_on: [US-4.5]
 assignee:
 commit:
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-15
 ---
+
+## Status refresh — 2026-07-15
+
+> Synced from GitHub Projects board #2 ("SubWallet.App – Development"): issue #4210 is **Follow Up** there, so this story moves `backlog` → `in-progress` (sprint `sprint-2026-W28`). Only status/sprint changed; Goal, AC and reasoning below are untouched. The board is the live source for workflow state.
 
 ## Goal
 

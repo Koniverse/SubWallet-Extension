@@ -2,10 +2,10 @@
 id: US-1.5
 title: "Build, CI, packaging & supply-chain hardening"
 epic: EPIC-1
-status: backlog
+status: ready
 priority: P2
 points: 8
-sprint:
+sprint: sprint-2026-W28
 version_shipped:
 prd_ref: [NFR-19, NFR-9, NFR-8]
 arch_ref: [AD-05, AD-06, AD-08, AD-25]
@@ -13,8 +13,12 @@ depends_on: [US-1.1]
 assignee:
 commit:
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-15
 ---
+
+## Status refresh — 2026-07-15
+
+> Synced from GitHub Projects board #2 ("SubWallet.App – Development"): issue #3904 is **Ready to Implement** there, so this story moves `backlog` → `ready` (sprint `sprint-2026-W28`). Only status/sprint changed; Goal, AC and reasoning below are untouched. The board is the live source for workflow state.
 
 ## Goal
 

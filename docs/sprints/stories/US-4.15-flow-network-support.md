@@ -2,10 +2,10 @@
 id: US-4.15
 title: "Flow network support (Cadence & EVM)"
 epic: EPIC-4
-status: backlog
+status: in-progress
 priority: P1
 points: 5
-sprint:
+sprint: sprint-2026-W28
 version_shipped:
 prd_ref: [FR-46]
 arch_ref: [AD-02]
@@ -13,8 +13,12 @@ depends_on: [US-4.1]
 assignee:
 commit:
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-15
 ---
+
+## Status refresh — 2026-07-15
+
+> Synced from GitHub Projects board #2 ("SubWallet.App – Development"): issue #4760 is **Follow Up** there, so this story moves `backlog` → `in-progress` (sprint `sprint-2026-W28`). Only status/sprint changed; Goal, AC and reasoning below are untouched. The board is the live source for workflow state.
 
 ## Goal
 

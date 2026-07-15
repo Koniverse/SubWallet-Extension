@@ -2,10 +2,10 @@
 id: US-4.22
 title: "RPC & endpoint-management hardening"
 epic: EPIC-4
-status: backlog
+status: review
 priority: P1
 points: 3
-sprint:
+sprint: sprint-2026-W28
 version_shipped:
 prd_ref: [FR-31, FR-35]
 arch_ref: [AD-02]
@@ -13,8 +13,12 @@ depends_on: [US-4.1]
 assignee:
 commit:
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-15
 ---
+
+## Status refresh — 2026-07-15
+
+> Synced from GitHub Projects board #2 ("SubWallet.App – Development"): issue #4451 is **In Review** there, so this story moves `backlog` → `review` (sprint `sprint-2026-W28`). Only status/sprint changed; Goal, AC and reasoning below are untouched. The board is the live source for workflow state.
 
 ## Goal
 

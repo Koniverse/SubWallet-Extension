@@ -2,10 +2,10 @@
 id: US-1.4
 title: "Online i18n hot-update (runtime remote translations)"
 epic: EPIC-1
-status: backlog
+status: ready
 priority: P0
 points: 3
-sprint:
+sprint: sprint-2026-W28
 version_shipped:
 prd_ref: [FR-4]
 arch_ref: [AD-25]
@@ -13,8 +13,12 @@ depends_on: [US-1.3]
 assignee:
 commit:
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-15
 ---
+
+## Status refresh — 2026-07-15
+
+> Synced from GitHub Projects board #2 ("SubWallet.App – Development"): issue #4746 is **Ready to Implement** there, so this story moves `backlog` → `ready` (sprint `sprint-2026-W28`). Only status/sprint changed; Goal, AC and reasoning below are untouched. The board is the live source for workflow state.
 
 ## Goal
 
