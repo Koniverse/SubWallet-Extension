@@ -1,6 +1,6 @@
 # CHANGELOG coverage index
 
-> **Generated — do not hand-edit.** `node scripts/koni-docs-changelog-coverage.mjs`.
+> **Generated — do not hand-edit.** Built by a one-off local helper (kept in the setup scratchpad, not the repo).
 > This is the ERP data source: every issue cited in a SubWallet (Koni) CHANGELOG
 > release, the release it shipped in, and who implemented it. It indexes the
 > **record**, not the code — it makes no acceptance-criteria claim ([LESSONS §68](../LESSONS.md)).

@@ -2085,11 +2085,12 @@ owning story; the ERP reads across both layers, the FR reader reads only the fir
   ([D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true)).
   2416/2707 resolved an assignee; the rest are left empty, not filled with a plausible name.
 
-**Reproducible, not a dump.** `scripts/koni-docs-gen-maintenance.mjs` builds all of it from the
-tracker cache + CHANGELOG and is **idempotent** — it owns exactly the files marked
-`generated_by: koni-docs-gen-maintenance` and rebuilds them, so a re-run after new issues close
-is one command. It excludes its own output when computing what is already owned, or it would wipe
-itself (the bug that proved the rule).
+**Generated, then frozen.** A one-off local generator built all of it from the tracker cache +
+CHANGELOG — idempotent, owning exactly the files marked `generated_by: koni-docs-gen-maintenance`.
+It is **kept in the setup scratchpad, not the repo**: it wipes and rebuilds every owned file from
+six `/tmp` caches, so someone re-running it without those exact caches would blank the recovered
+provenance. The generated docs are the durable artifact; the generator is scaffolding. Only the
+read-only validator `scripts/koni-docs-check-ids.mjs` stays in the repo (safe for anyone to run).
 
 **Boundary ([rule 3](../AGENTS.md))**: this changes the **map** — it adds a documentation layer;
 it touches no code and decides nothing about what the product should do. The area routing is a
@@ -2124,14 +2125,25 @@ status in step with the tracker's close reasons.
   not the structured "duplicate of #X" action. So the original is not recoverable from the API; the
   deprecated banner says exactly that rather than guessing a canonical.
 - **A closed issue is not proof of shipped code — so `done` now carries an evidence tier.** Of 2208
-  done stories: **1031** have a commit provable against its release by `merge-base`, **72** a commit
-  not yet in any stable release, **200** an implementing PR (title declares the issue — see the PR
-  correction below), **211** a CHANGELOG release, and **694** have *none* — `done` rests only on the
-  tracker's COMPLETED label (mostly pre-2023 issues closed before the `[Issue-N]` commit / PR-link
-  conventions). Each story states its tier in AC-1, and the 694 say plainly *"no commit, PR, or
-  changelog line links code to this issue."* The label is kept as the team's own record, but it is
-  never dressed up as code evidence — the [LESSONS §68](LESSONS.md) line, applied to provenance
-  strength, not just AC text.
+  done stories: **1362** have a commit provable against its release by `merge-base`, **86** a commit
+  not yet in any stable release, **11** an implementing PR (title declares the issue — see the PR
+  correction below), **107** a CHANGELOG release, **27** shipped via another issue (*resolved in #N*),
+  and **615** have *none* — `done` rests only on the tracker's COMPLETED label (mostly pre-2023 issues
+  closed before any commit / PR-link convention). Each story states its tier in AC-1, and the 615 say
+  plainly *"no commit, PR, or changelog line links code to this issue."* The label is kept as the
+  team's own record, but it is never dressed up as code evidence — the [LESSONS §68](LESSONS.md) line,
+  applied to provenance strength, not just AC text.
+  - **The issue tag has variants, and some devs skipped it entirely.** The commit scan first matched
+    only `[Issue-2501]` (hyphen); 180 issues wrote `[Issue 2501]` (space) or `[Issue #2501]` — the same
+    self-declared link, missed by a too-strict regex (broadened to `/\[Issue[-\s]*#?\s*(\d+)\]/i`). But
+    a newcomer who never learned the convention wrote *no* issue reference at all — commit #2d5374ff
+    is just *"Do not show the Export account screen…"*. Those are recoverable only through the **PR
+    branch**: the merge *"Merge pull request #886 from …/koni/dev/issue-885"* names the issue in the
+    branch (a dev-authored link as reliable as the tag), and its second parent's feature commits are
+    #885's work. **193 done stories** gained a commit this way (each carrying a *"commit found via PR
+    #N"* note so the link stays traceable), lifting commit-bearing done from 1103 → **1448** and
+    git-provable `version_shipped` to **1504**. Reliable because the dev named the branch — not
+    GitHub's inferred `closedByPullRequestsReferences`, which the PR-title correction below had to undo.
 
 **Follow-up — the "closing PR" links were 41% wrong; corrected against the PR title (2026-07-15).**
 A recheck of the done stories' fields asked whether the PR evidence could be trusted. It could not.
@@ -2192,6 +2204,6 @@ of their own, so they inherit #N's — whoever did the work there did this. #339
 #2982. (Contrast the reverted PR-author guess: that rested on a signal already proven unreliable; this
 rests on a tightly-verified pointer to where the work demonstrably happened.)
 
-**Citations**: [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-gen-maintenance.mjs`, `scripts/koni-docs-changelog-coverage.mjs` (the pr-title and issue-pointer fetch helpers are one-off setup, kept in the session scratchpad, not the repo)
+**Citations**: [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-check-ids.mjs` (the only tool kept in the repo — the generator, coverage, and fetch helpers are one-off setup scaffolding, kept in the session scratchpad, not the repo)
 
 ---
