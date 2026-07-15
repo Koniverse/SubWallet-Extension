@@ -2046,3 +2046,91 @@ point."** FR-52 corrected in both PRD tables. `validate` exits 0 · `check-ids` 
 **Citations**: [D100](#d100-a-story-is-the-unit-of-status--split-epic-20-where-the-truth-changes-not-where-the-phases-do); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [AGENTS.md §7 rules 1, 3, 4](../AGENTS.md); [LESSONS §64](LESSONS.md)
 
 ---
+
+### D108. Every tracker issue gets a story — in a maintenance-epic layer, so the FR map stays the FR map
+
+**Context**: The FR stories cover **6%** of the issues the project has shipped — 71 of ~1124 in
+the CHANGELOG, 229 of 2964 on the tracker. The owner wants the ERP to answer *"who shipped what,
+under which issue"* for **all** of it, and directed: **1 issue = 1 US**, except issues a main-FR
+story already carries; and **classify across epics by area**, not one dumping ground.
+
+The tension this resolves: a koni-docs story is the **contract for an FR**
+([templates/story.md](../.agents/skills/koni-docs/references/templates/story.md)), but 2735
+tracker issues materialize no FR — they are fixes, chore bumps (logos, endpoints, token lists),
+UI polish, small increments. Minting 2735 of them as US-4.x / US-6.x would bury the 24 real
+EPIC-4 FR stories under 345 maintenance stubs, and a reader could no longer see the requirement
+set. The unit of a story would stop meaning one thing.
+
+**Decision — a parallel layer.** Twenty **maintenance epics** (`EPIC-22`…`EPIC-41`), one per
+product area plus one *Uncategorized*, each holding one story per unowned issue in its area. The
+21 product epics are untouched — they remain the FR map. Every shipped issue now has exactly one
+owning story; the ERP reads across both layers, the FR reader reads only the first.
+
+**What a maintenance story is — and the line it does not cross:**
+
+- **It records the tracker, not the code.** Its one AC is a *coverage* assertion — "issue #N
+  shipped in vX" or "#N is closed" — with a runnable check (`git merge-base` against the release,
+  or `gh issue view`). It invents **no** Given/When/Then. That is [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim)/[LESSONS §68](LESSONS.md)
+  held as a hard line across 2707 files: the one thing worse than 6% coverage is 100% coverage of
+  fabricated claims.
+- **Honest state, not flattering state.** 300 open issues are `backlog` with no sprint — we hold
+  no window for unfinished work and do not invent one. A closed issue with no CHANGELOG line is
+  `done` with **empty `version_shipped`** (shipped date unknown) — [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate)'s
+  `prd_ref: []` branch, which is why the done-gate does not demand a version here.
+- **`points: 1` is a count, not a Fibonacci estimate**, and a maintenance epic's rollup measures
+  **issue throughput, never effort**. Summing it with the product stories' points is meaningless
+  and forbidden in each epic's charter.
+- **`assignee` and `commit` are derived, never guessed.** Tracker assignee first, else the git
+  `[Issue-N]` implementer; a `[CI Skip]` release bump is never a `commit`
+  ([D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true)).
+  2416/2707 resolved an assignee; the rest are left empty, not filled with a plausible name.
+
+**Reproducible, not a dump.** `scripts/koni-docs-gen-maintenance.mjs` builds all of it from the
+tracker cache + CHANGELOG and is **idempotent** — it owns exactly the files marked
+`generated_by: koni-docs-gen-maintenance` and rebuilds them, so a re-run after new issues close
+is one command. It excludes its own output when computing what is already owned, or it would wipe
+itself (the bug that proved the rule).
+
+**Boundary ([rule 3](../AGENTS.md))**: this changes the **map** — it adds a documentation layer;
+it touches no code and decides nothing about what the product should do. The area routing is a
+title heuristic and each story says so (*"capability area (guess)"*); the **Uncategorized** epic
+(498 stories) is the honest confession that 18% of titles do not classify themselves.
+
+**Impact**: 20 maintenance epics · **2707 stories** (2407 done, 300 backlog) · 2 new sprint
+windows. CHANGELOG coverage 6% → **99%** (1113/1124; 3 stragglers). `npx koni-docs validate`
+exits 0 · `node scripts/koni-docs-check-ids.mjs` exits 0 across 2996 files.
+
+**Recheck against GitHub (2026-07-15).** An audit re-fetched all 2964 issues with close reason and
+the sub-issue graph, and caught three things:
+
+- **Status was `done` for closed-but-not-shipped issues.** GitHub's `stateReason` distinguishes
+  `COMPLETED` (2323) from `NOT_PLANNED` (185) and `DUPLICATE` (16). A CLOSED issue is not a shipped
+  one. **199 stories flipped `done` → `deprecated`** with a banner and no `version_shipped`/`sprint`
+  — declined and duplicate work is recorded for coverage, never counted as delivered.
+- **Duplicates**: 0 internal (no issue owns two stories); the 16 GitHub-marked duplicates are the
+  deprecated set above.
+- **Parent/sub-issues**: 413 stories are sub-issues whose parent also has a story, 117 are umbrellas.
+  Not double records — a sub-issue is real work — but the parent aggregates them, so each carries an
+  **Issue graph** cross-link and umbrella stories say *"do not add my points to my children's."*
+- **Freshness**: 0 issues changed state and 0 are new since the cache — the data matches GitHub.
+
+The audit is the same generator plus `/tmp/rel.json` (the GraphQL sub-issue graph); re-running keeps
+status in step with the tracker's close reasons.
+
+**Follow-up — how duplicates and PR-less closes are handled.** Two questions the audit raised:
+
+- **The 16 duplicates point nowhere machine-readable.** GitHub's `MarkedAsDuplicateEvent` carries a
+  `canonical` link, but none of these 16 has one — they were closed with the *reason* "duplicate",
+  not the structured "duplicate of #X" action. So the original is not recoverable from the API; the
+  deprecated banner says exactly that rather than guessing a canonical.
+- **A closed issue is not proof of shipped code — so `done` now carries an evidence tier.** Of 2208
+  done stories: **1103** have a merge-base-provable commit, **341** a closing PR, **125** a CHANGELOG
+  release, and **639** have *none of the three* — `done` rests only on the tracker's COMPLETED label
+  (mostly pre-2023 issues closed before the `[Issue-N]` commit / PR-link conventions). Each story
+  states its tier in AC-1, and the 639 say plainly *"no commit, PR, or changelog line links code to
+  this issue."* The label is kept as the team's own record, but it is never dressed up as code
+  evidence — the [LESSONS §68](LESSONS.md) line, applied to provenance strength, not just AC text.
+
+**Citations**: [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-gen-maintenance.mjs`, `scripts/koni-docs-changelog-coverage.mjs`
+
+---

@@ -136,6 +136,18 @@ const stories = fs.existsSync(path.join(DOCS, 'sprints/stories'))
   ? fs.readdirSync(path.join(DOCS, 'sprints/stories')).filter((f) => f.endsWith('.md'))
   : [];
 
+// git tags whose name is a Koni version but whose commit predates the fork: the tag is
+// polkadot-js's, inherited. `version_shipped: 0.7.1` is still VALID — SubWallet shipped a
+// 0.7.1 — but nothing may anchor a merge-base on `v0.7.1`, because that tag is the wrong
+// product's history (D106). The hazard is the ANCHOR, not the field.
+const collidingTags = new Set();
+
+for (const ver of KONI_RELEASES) {
+  const t = spawnSync('git', ['log', '-1', '--format=%cs', `v${ver}`], { encoding: 'utf8' });
+
+  if (t.status === 0 && t.stdout.trim() && t.stdout.trim() < FORK) collidingTags.add(ver);
+}
+
 for (const f of stories) {
   const d = storyFm(path.join(DOCS, 'sprints/stories', f));
   const id = d.id || f;
@@ -145,17 +157,6 @@ for (const f of stories) {
     badField.push(`${id}  version_shipped: ${v} — not a release of this product (no "(Koni)" row in CHANGELOG.md)`);
   }
 
-  // The landmine: six version numbers exist in both lineages, and a git tag can point
-  // at only one commit. `v0.7.1` is polkadot-js's, from 2019 — so verifying a SubWallet
-  // 0.7.1 story against it compares against a different product's history.
-  if (v && KONI_RELEASES.has(v)) {
-    const t = spawnSync('git', ['log', '-1', '--format=%cs', `v${v}`], { encoding: 'utf8' });
-
-    if (t.status === 0 && t.stdout.trim() < FORK) {
-      badField.push(`${id}  version_shipped: ${v} — the tag v${v} is polkadot-js's (${t.stdout.trim()}), NOT this release. Do not use it as a merge-base anchor.`);
-    }
-  }
-
   for (const sha of (d.commit || '').split(',').map((s) => s.trim()).filter(Boolean)) {
     const r = spawnSync('git', ['log', '-1', '--format=%s', sha], { encoding: 'utf8' });
 
@@ -163,6 +164,15 @@ for (const f of stories) {
       badField.push(`${id}  commit: ${sha} — no such commit`);
     } else if (/\[CI Skip\]/i.test(r.stdout)) {
       badField.push(`${id}  commit: ${sha} — a CI release bump ("${r.stdout.trim().slice(0, 40)}"), which delivered nothing`);
+    }
+  }
+
+  // the real landmine: a merge-base anchored on an inherited tag
+  const body = fs.readFileSync(path.join(DOCS, 'sprints/stories', f), 'utf8');
+
+  for (const ver of collidingTags) {
+    if (new RegExp(`merge-base[^\\n]*\\bv${ver.replace(/\./g, '\\.')}\\b`).test(body)) {
+      badField.push(`${id}  anchors merge-base on v${ver} — that tag is polkadot-js's (pre-fork), not this release (D106). Verify against the release commit instead.`);
     }
   }
 }
