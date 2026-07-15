@@ -41,6 +41,57 @@ review, from the Projects board), 3 backlog (open, not yet started), 3 deprecate
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
 
+## Stories
+
+Every story in this ledger, in issue order — click a US to open its tracker link, evidence and
+verification. **Assignee** is who the tracker or the `[Issue-N]` PR/commit names (`—` where nobody
+is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line proves one.
+
+| US | Status | Title | Issue | Assignee | Shipped |
+|---|---|---|---|---|---|
+| [US-34.1](../stories/US-34.1-integrate-on-ramp-feature-to-buy-crypto-from-fiat-curre.md) | ✅ done | Integrate on-ramp feature to buy crypto from fiat currencies | [#245](https://github.com/Koniverse/SubWallet-Extension/issues/245) | S2kael | 0.5.7 |
+| [US-34.2](../stories/US-34.2-fix-bug-happens-when-user-disconnect-network-or-remove.md) | ✅ done | Fix bug happens when user disconnect network or remove account that selected to buy cryptos | [#609](https://github.com/Koniverse/SubWallet-Extension/issues/609) | S2kael | 0.5.7 |
+| [US-34.3](../stories/US-34.3-fix-transak-logo.md) | ✅ done | Fix Transak logo | [#616](https://github.com/Koniverse/SubWallet-Extension/issues/616) | S2kael | 0.5.9 |
+| [US-34.4](../stories/US-34.4-support-on-ramp-for-binance-etheneum-network.md) | ✅ done | Support on-ramp for Binance & Etheneum network | [#736](https://github.com/Koniverse/SubWallet-Extension/issues/736) | S2kael | 0.6.7 |
+| [US-34.5](../stories/US-34.5-upgrade-ui-buy-token.md) | ✅ done | Upgrade UI - Buy token | [#1029](https://github.com/Koniverse/SubWallet-Extension/issues/1029) | lw-cdm | — |
+| [US-34.6](../stories/US-34.6-integrate-banxa-for-fiat-on-ramp.md) | ✅ done | Integrate Banxa for fiat on-ramp | [#1084](https://github.com/Koniverse/SubWallet-Extension/issues/1084) | S2kael | 1.1.6 |
+| [US-34.7](../stories/US-34.7-upgrade-ui-disable-button-buy-token-in-the-token-detail.md) | ✅ done | Upgrade UI - Disable button buy token in the token detail screen | [#1130](https://github.com/Koniverse/SubWallet-Extension/issues/1130) | S2kael | — |
+| [US-34.8](../stories/US-34.8-add-support-for-neer-on-transak.md) | ✅ done | Add support for $NEER on Transak | [#1317](https://github.com/Koniverse/SubWallet-Extension/issues/1317) | S2kael | 1.0.4 |
+| [US-34.9](../stories/US-34.9-update-some-banxa-and-transak-api-with-api-key-from-env.md) | ✅ done | Update some banxa and transak api with api key from environments | [#1746](https://github.com/Koniverse/SubWallet-Extension/issues/1746) | S2kael | — |
+| [US-34.10](../stories/US-34.10-webapp-do-not-buy-token-transak.md) | ✅ done | WebApp - Do not buy token (Transak) | [#1755](https://github.com/Koniverse/SubWallet-Extension/issues/1755) | lw-cdm | — |
+| [US-34.11](../stories/US-34.11-improve-case-delete-connection-when-reset-wallet.md) | ✅ done | Improve case delete connection when reset wallet | [#1760](https://github.com/Koniverse/SubWallet-Extension/issues/1760) | S2kael | 1.1.9 |
+| [US-34.12](../stories/US-34.12-webapp-still-show-list-token-when-buy-from-token-detail.md) | ✅ done | WebApp - Still show list token when buy from token detail screen | [#1799](https://github.com/Koniverse/SubWallet-Extension/issues/1799) | lw-cdm | — |
+| [US-34.13](../stories/US-34.13-integrate-coinbase-pay-fiat-on-ramp-feature.md) | ✅ done | Integrate Coinbase Pay fiat on-ramp feature | [#1834](https://github.com/Koniverse/SubWallet-Extension/issues/1834) | S2kael | 1.1.11 |
+| [US-34.14](../stories/US-34.14-update-list-of-tokens-supported-on-fiat-onramp-feature.md) | ✅ done | Update list of tokens supported on fiat-onramp feature | [#1848](https://github.com/Koniverse/SubWallet-Extension/issues/1848) | S2kael | 1.1.11 |
+| [US-34.15](../stories/US-34.15-ui-bug-on-the-buy-token-screen-on-the-firefox-browser.md) | ✅ done | UI bug on the Buy token screen on the Firefox browser | [#1849](https://github.com/Koniverse/SubWallet-Extension/issues/1849) | frenkie-ng | — |
+| [US-34.16](../stories/US-34.16-webapp-do-not-buy-token-buy-transak.md) | ✅ done | WebApp - Do not buy token buy Transak | [#1869](https://github.com/Koniverse/SubWallet-Extension/issues/1869) | S2kael | — |
+| [US-34.17](../stories/US-34.17-sorting-the-token-list-to-buy.md) | ✅ done | Sorting the token list to buy | [#2025](https://github.com/Koniverse/SubWallet-Extension/issues/2025) | S2kael | 1.1.20 |
+| [US-34.18](../stories/US-34.18-updated-list-of-tokens-supported-by-transak.md) | ✅ done | Updated list of tokens supported by Transak | [#2026](https://github.com/Koniverse/SubWallet-Extension/issues/2026) | S2kael | 1.1.17 |
+| [US-34.19](../stories/US-34.19-update-online-token-list-in-fiat-onramp-feature.md) | ✅ done | Update online token list in fiat-onramp feature | [#2031](https://github.com/Koniverse/SubWallet-Extension/issues/2031) | S2kael | 1.1.20 |
+| [US-34.20](../stories/US-34.20-integrate-onramp-fiat-on-ramp-feature.md) | 📋 backlog | Integrate Onramp fiat on-ramp feature | [#2045](https://github.com/Koniverse/SubWallet-Extension/issues/2045) | Thiendekaco | — |
+| [US-34.21](../stories/US-34.21-webapp-effect-when-open-modal-select-token-select-accou.md) | ✅ done | [WebApp] Effect when open modal Select token, Select account in case Buy token | [#2211](https://github.com/Koniverse/SubWallet-Extension/issues/2211) | Thiendekaco | — |
+| [US-34.22](../stories/US-34.22-follow-up-case-token-list-to-buy-is-empty.md) | ⏸️ deprecated | Follow up case Token list to buy is empty | [#2298](https://github.com/Koniverse/SubWallet-Extension/issues/2298) | — | — |
+| [US-34.23](../stories/US-34.23-add-support-for-azero-fiat-onramp-on-banxa.md) | ✅ done | Add support for AZERO fiat onramp on Banxa | [#2319](https://github.com/Koniverse/SubWallet-Extension/issues/2319) | S2kael | 1.1.26 |
+| [US-34.24](../stories/US-34.24-re-check-case-list-token-to-buy-is-empty-after-run-stat.md) | ✅ done | Re-check case List token to buy is empty after run static content | [#2322](https://github.com/Koniverse/SubWallet-Extension/issues/2322) | saltict | — |
+| [US-34.25](../stories/US-34.25-unified-account-bug-related-to-the-buy-token-feature.md) | ✅ done | Unified account - Bug related to the Buy token feature | [#3550](https://github.com/Koniverse/SubWallet-Extension/issues/3550) | frenkie-ng | — |
+| [US-34.26](../stories/US-34.26-extension-re-check-list-token-for-buy-feature.md) | ✅ done | Extension - Re-check list token for Buy feature | [#3738](https://github.com/Koniverse/SubWallet-Extension/issues/3738) | S2kael | — |
+| [US-34.27](../stories/US-34.27-integrate-off-ramp.md) | ✅ done | Integrate off-ramp | [#3801](https://github.com/Koniverse/SubWallet-Extension/issues/3801) | tunghp2002 | — |
+| [US-34.28](../stories/US-34.28-support-transak-on-ramp-for-more-tokens.md) | ✅ done | Support Transak on-ramp for more tokens | [#3802](https://github.com/Koniverse/SubWallet-Extension/issues/3802) | tunghp2002 | — |
+| [US-34.29](../stories/US-34.29-webapp-improve-off-ramp-for-transak.md) | 📋 backlog | WebApp - Improve off-ramp for Transak | [#3839](https://github.com/Koniverse/SubWallet-Extension/issues/3839) | — | — |
+| [US-34.30](../stories/US-34.30-research-meld-on-ramp.md) | ⏸️ deprecated | Research Meld on-ramp | [#3842](https://github.com/Koniverse/SubWallet-Extension/issues/3842) | nulllpc | — |
+| [US-34.31](../stories/US-34.31-extension-integrate-off-ramp-transak.md) | ✅ done | Extension - Integrate off-ramp Transak | [#3843](https://github.com/Koniverse/SubWallet-Extension/issues/3843) | frenkie-ng | — |
+| [US-34.32](../stories/US-34.32-add-support-for-vara-fiat-onramp-on-banxa.md) | ✅ done | Add support for VARA fiat onramp on Banxa | [#3885](https://github.com/Koniverse/SubWallet-Extension/issues/3885) | PDTnhah | — |
+| [US-34.33](../stories/US-34.33-extension-review-list-buy-token.md) | ✅ done | Extension - Review list Buy token | [#3951](https://github.com/Koniverse/SubWallet-Extension/issues/3951) | — | — |
+| [US-34.34](../stories/US-34.34-add-onramp-support-for-more-tokens.md) | ✅ done | Add onramp support for more tokens | [#4264](https://github.com/Koniverse/SubWallet-Extension/issues/4264) | PDTnhah | — |
+| [US-34.35](../stories/US-34.35-tao-on-ramp-integration-in-subwallet.md) | ✅ done | TAO On-ramp Integration in SubWallet | [#4358](https://github.com/Koniverse/SubWallet-Extension/issues/4358) | PDTnhah | 1.3.43 |
+| [US-34.36](../stories/US-34.36-extension-improve-off-ramp-flow-for-seamless-token-sell.md) | 📋 backlog | [Extension] Improve off-ramp flow for seamless token selling experience | [#4453](https://github.com/Koniverse/SubWallet-Extension/issues/4453) | — | — |
+| [US-34.37](../stories/US-34.37-support-buy-token-btc-bitcoin.md) | ✅ done | Support buy token BTC (Bitcoin) | [#4490](https://github.com/Koniverse/SubWallet-Extension/issues/4490) | S2kael | 1.3.47 |
+| [US-34.38](../stories/US-34.38-update-coinbase-on-ramp-feature.md) | ✅ done | Update coinbase on-ramp feature | [#4572](https://github.com/Koniverse/SubWallet-Extension/issues/4572) | Thiendekaco | 1.3.52 |
+| [US-34.39](../stories/US-34.39-check-buy-options-for-dot-ksm-token.md) | ✅ done | Check buy options for DOT & KSM token | [#4815](https://github.com/Koniverse/SubWallet-Extension/issues/4815) | PDTnhah | 1.3.65 |
+| [US-34.40](../stories/US-34.40-update-transak-widget-url.md) | ✅ done | Update Transak Widget URL | [#4835](https://github.com/Koniverse/SubWallet-Extension/issues/4835) | tunghp2002 | 1.3.68 |
+| [US-34.41](../stories/US-34.41-webapp-update-transak-widget-url.md) | ✅ done | WebApp - Update Transak Widget URL | [#4882](https://github.com/Koniverse/SubWallet-Extension/issues/4882) | — | — |
+| [US-34.42](../stories/US-34.42-extension-display-incorrect-token-in-buy-t-ken-screen-w.md) | ⏸️ deprecated | Extension - Display incorrect token in buy tọken screen when selecting meld option | [#4999](https://github.com/Koniverse/SubWallet-Extension/issues/4999) | tunghp2002 | — |
+
 ## Acceptance criteria
 
 - [ ] **AC-1** — Every Fiat Ramp issue with no FR story has exactly one story here; its status matches the tracker (done = COMPLETED, backlog = open, deprecated = not-planned/duplicate).

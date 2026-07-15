@@ -41,6 +41,35 @@ review, from the Projects board), 8 backlog (open, not yet started), 0 deprecate
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
 
+## Stories
+
+Every story in this ledger, in issue order — click a US to open its tracker link, evidence and
+verification. **Assignee** is who the tracker or the `[Issue-N]` PR/commit names (`—` where nobody
+is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line proves one.
+
+| US | Status | Title | Issue | Assignee | Shipped |
+|---|---|---|---|---|---|
+| [US-38.1](../stories/US-38.1-support-multisig-features.md) | ✅ done | Support multisig features | [#1426](https://github.com/Koniverse/SubWallet-Extension/issues/1426) | nulllpc | — |
+| [US-38.2](../stories/US-38.2-multisig-support-multisig-account.md) | 🚧 in-progress | [Multisig] Support Multisig account | [#1677](https://github.com/Koniverse/SubWallet-Extension/issues/1677) | bluezdot | — |
+| [US-38.3](../stories/US-38.3-multisig-extension-support.md) | 📋 backlog | [Multisig] Extension support | [#4696](https://github.com/Koniverse/SubWallet-Extension/issues/4696) | bluezdot | — |
+| [US-38.4](../stories/US-38.4-multisig-mobile-support.md) | 📋 backlog | [Multisig] Mobile support | [#4697](https://github.com/Koniverse/SubWallet-Extension/issues/4697) | — | — |
+| [US-38.5](../stories/US-38.5-multisig-webapp-support.md) | 📋 backlog | [Multisig] WebApp support | [#4698](https://github.com/Koniverse/SubWallet-Extension/issues/4698) | — | — |
+| [US-38.6](../stories/US-38.6-multisig-reseach-multisig-technical-research.md) | ✅ done | [Multisig][Reseach] Multisig Technical Research | [#4744](https://github.com/Koniverse/SubWallet-Extension/issues/4744) | bluezdot | — |
+| [US-38.7](../stories/US-38.7-multisig-extension-phase-1-core-multisig-management.md) | 🚧 in-progress | [Multisig] [Extension] Phase 1: Core Multisig Management | [#4838](https://github.com/Koniverse/SubWallet-Extension/issues/4838) | bluezdot | — |
+| [US-38.8](../stories/US-38.8-multisig-extension-phase-1-multisig-account-management.md) | ✅ done | [Multisig] [Extension] [Phase 1] Multisig Account Management | [#4841](https://github.com/Koniverse/SubWallet-Extension/issues/4841) | bluezdot | — |
+| [US-38.9](../stories/US-38.9-multisig-extension-phase-1-pending-transaction-detectio.md) | ✅ done | [Multisig] [Extension] [Phase 1] Pending Transaction Detection | [#4842](https://github.com/Koniverse/SubWallet-Extension/issues/4842) | bluezdot | — |
+| [US-38.10](../stories/US-38.10-multisig-extension-phase-1-implement-multisig-actions.md) | ✅ done | [Multisig] [Extension] [Phase 1] Implement Multisig Actions | [#4843](https://github.com/Koniverse/SubWallet-Extension/issues/4843) | bluezdot | — |
+| [US-38.11](../stories/US-38.11-multisig-extension-phase-2-multisig-account-detection.md) | 📋 backlog | [Multisig] [Extension] [Phase 2] Multisig Account Detection | [#4844](https://github.com/Koniverse/SubWallet-Extension/issues/4844) | bluezdot | — |
+| [US-38.12](../stories/US-38.12-multisig-extension-phase-1-background.md) | ✅ done | [Multisig] [Extension] [Phase 1] Background | [#4856](https://github.com/Koniverse/SubWallet-Extension/issues/4856) | bluezdot | — |
+| [US-38.13](../stories/US-38.13-multisig-extension-phase-1-create-multisig-account.md) | 📋 backlog | [Multisig] [Extension] [Phase 1] Create Multisig account | [#4869](https://github.com/Koniverse/SubWallet-Extension/issues/4869) | frenkie-ng | — |
+| [US-38.14](../stories/US-38.14-multisig-extension-phase-1-experiments-and-init-core-se.md) | ✅ done | [Multisig] [Extension] [Phase 1] Experiments and Init Core Service | [#4870](https://github.com/Koniverse/SubWallet-Extension/issues/4870) | bluezdot | — |
+| [US-38.15](../stories/US-38.15-multisig-extension-phase-1-implement-history-screen.md) | 📋 backlog | [Multisig] [Extension] [Phase 1] Implement History screen | [#4871](https://github.com/Koniverse/SubWallet-Extension/issues/4871) | frenkie-ng | — |
+| [US-38.16](../stories/US-38.16-multisig-extension-phase-1-implement-notification-scree.md) | 📋 backlog | [Multisig] [Extension] [Phase 1] Implement Notification screen | [#4874](https://github.com/Koniverse/SubWallet-Extension/issues/4874) | frenkie-ng | — |
+| [US-38.17](../stories/US-38.17-multisig-extension-phase-1-handle-mechanism-to-trigger.md) | ✅ done | [Multisig] [Extension] [Phase 1] Handle mechanism to trigger multisig notifications | [#4913](https://github.com/Koniverse/SubWallet-Extension/issues/4913) | bluezdot | — |
+| [US-38.18](../stories/US-38.18-multisig-extension-phase-1-classify-and-handle-data-for.md) | ✅ done | [Multisig] [Extension] [Phase 1] Classify and handle data for all multisig types | [#4921](https://github.com/Koniverse/SubWallet-Extension/issues/4921) | bluezdot | — |
+| [US-38.19](../stories/US-38.19-multisig-extension-phase-2-improve-display-multisig-det.md) | 📋 backlog | [Multisig] [Extension] [Phase 2] Improve display Multisig detail by type | [#4927](https://github.com/Koniverse/SubWallet-Extension/issues/4927) | bluezdot | — |
+| [US-38.20](../stories/US-38.20-multisig-extension-phase-1-handle-init-multisig-transac.md) | ✅ done | [Multisig] [Extension] [Phase 1] Handle Init Multisig Transaction | [#4938](https://github.com/Koniverse/SubWallet-Extension/issues/4938) | bluezdot | — |
+
 ## Acceptance criteria
 
 - [ ] **AC-1** — Every Multisig issue with no FR story has exactly one story here; its status matches the tracker (done = COMPLETED, backlog = open, deprecated = not-planned/duplicate).

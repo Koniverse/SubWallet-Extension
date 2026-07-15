@@ -41,6 +41,30 @@ review, from the Projects board), 1 backlog (open, not yet started), 3 deprecate
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
 
+## Stories
+
+Every story in this ledger, in issue order — click a US to open its tracker link, evidence and
+verification. **Assignee** is who the tracker or the `[Issue-N]` PR/commit names (`—` where nobody
+is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line proves one.
+
+| US | Status | Title | Issue | Assignee | Shipped |
+|---|---|---|---|---|---|
+| [US-37.1](../stories/US-37.1-support-proxy-account-management.md) | ⏸️ deprecated | Support Proxy Account Management | [#163](https://github.com/Koniverse/SubWallet-Extension/issues/163) | saltict | — |
+| [US-37.2](../stories/US-37.2-webapp-proxy-the-mempools-api-via-cloudflare-worker.md) | ⏸️ deprecated | WebApp - Proxy the mempools API via Cloudflare worker | [#4610](https://github.com/Koniverse/SubWallet-Extension/issues/4610) | anhntk54 | — |
+| [US-37.3](../stories/US-37.3-proxy-account-doc-write-technical-documentation-for-pro.md) | ✅ done | [Proxy Account][Doc] Write Technical Documentation for Proxy Account Support | [#4726](https://github.com/Koniverse/SubWallet-Extension/issues/4726) | PDTnhah | — |
+| [US-37.4](../stories/US-37.4-proxy-account-extension-manage-proxy-accounts.md) | ⏸️ deprecated | [Proxy Account][Extension] Manage Proxy Accounts | [#4727](https://github.com/Koniverse/SubWallet-Extension/issues/4727) | — | — |
+| [US-37.5](../stories/US-37.5-proxy-account-extension-background-logic-integration.md) | ✅ done | [Proxy Account][Extension] Background logic Integration | [#4770](https://github.com/Koniverse/SubWallet-Extension/issues/4770) | tunghp2002 | — |
+| [US-37.6](../stories/US-37.6-proxy-account-extension-manage-proxy-ui.md) | ✅ done | [Proxy Account][Extension] Manage Proxy UI | [#4776](https://github.com/Koniverse/SubWallet-Extension/issues/4776) | Thiendekaco | — |
+| [US-37.7](../stories/US-37.7-proxy-account-extension-add-proxy-form.md) | ✅ done | [Proxy Account][Extension] Add Proxy Form | [#4777](https://github.com/Koniverse/SubWallet-Extension/issues/4777) | Thiendekaco | — |
+| [US-37.8](../stories/US-37.8-proxy-account-extension-add-remove-confirmation.md) | ✅ done | [Proxy Account][Extension] Add / Remove Confirmation | [#4778](https://github.com/Koniverse/SubWallet-Extension/issues/4778) | Thiendekaco | — |
+| [US-37.9](../stories/US-37.9-proxy-account-extension-select-proxy-account-for-signin.md) | ✅ done | [Proxy Account][Extension] Select Proxy Account for Signing | [#4779](https://github.com/Koniverse/SubWallet-Extension/issues/4779) | Thiendekaco | — |
+| [US-37.10](../stories/US-37.10-initialize-proxy-service.md) | ✅ done | Initialize Proxy Service | [#4780](https://github.com/Koniverse/SubWallet-Extension/issues/4780) | tunghp2002 | — |
+| [US-37.11](../stories/US-37.11-handle-proxy-extrinsic.md) | ✅ done | Handle proxy extrinsic | [#4781](https://github.com/Koniverse/SubWallet-Extension/issues/4781) | tunghp2002 | — |
+| [US-37.12](../stories/US-37.12-intergrate-proxy-account-with-others-extrinsic.md) | ✅ done | Intergrate proxy account with others extrinsic | [#4782](https://github.com/Koniverse/SubWallet-Extension/issues/4782) | tunghp2002 | — |
+| [US-37.13](../stories/US-37.13-history-intergrate-proxy-account.md) | ✅ done | History intergrate Proxy Account | [#4783](https://github.com/Koniverse/SubWallet-Extension/issues/4783) | tunghp2002 | — |
+| [US-37.14](../stories/US-37.14-proxy-account-extension-remove-proxy-form.md) | ✅ done | [Proxy Account][Extension] Remove Proxy Form | [#4786](https://github.com/Koniverse/SubWallet-Extension/issues/4786) | Thiendekaco | — |
+| [US-37.15](../stories/US-37.15-get-stake-history-of-proxy-account-for-proxied-account.md) | 📋 backlog | Get stake history of proxy account for proxied account | [#4947](https://github.com/Koniverse/SubWallet-Extension/issues/4947) | — | — |
+
 ## Acceptance criteria
 
 - [ ] **AC-1** — Every Proxy issue with no FR story has exactly one story here; its status matches the tracker (done = COMPLETED, backlog = open, deprecated = not-planned/duplicate).

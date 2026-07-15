@@ -402,10 +402,25 @@ _None — ${mM ? 'reconstructed from the tracker in 2026' : 'derived from the bo
 }
 
 // maintenance epics
+const STATUS_LABEL = {
+  done: '✅ done', backlog: '📋 backlog', 'in-progress': '🚧 in-progress',
+  review: '👀 review', ready: '🟢 ready', blocked: '⛔ blocked', deprecated: '⏸️ deprecated'
+};
+
 for (const [area, ep] of maintEpic) {
   const list = byEpic.get(ep) || [];
 
   if (!list.length) continue;
+
+  // the clickable ledger — one row per story, in issue order, so the epic is navigable and the
+  // ERP can read status + assignee without opening every file
+  const cell = (x) => String(x || '—').replace(/\|/g, '\\|');
+  const storyRows = list.map((s) => {
+    const file = `${s.id}-${slug(s.title)}.md`;
+    const issues = s.nums.map((n) => `[#${n}](${url(n)})`).join(', ');
+
+    return `| [${s.id}](../stories/${file}) | ${STATUS_LABEL[s.status] || s.status} | ${cell(s.title)} | ${issues} | ${cell(s.asg)} | ${s.ver || '—'} |`;
+  }).join('\n');
 
   const done = list.filter((s) => s.status === 'done').length;
   const backlog = list.filter((s) => s.status === 'backlog').length;
@@ -461,6 +476,16 @@ review, from the Projects board), ${backlog} backlog (open, not yet started), ${
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
+
+## Stories
+
+Every story in this ledger, in issue order — click a US to open its tracker link, evidence and
+verification. **Assignee** is who the tracker or the \`[Issue-N]\` PR/commit names (\`—\` where nobody
+is recorded); **Shipped** is the \`(Koni)\` release, \`—\` when no CHANGELOG line proves one.
+
+| US | Status | Title | Issue | Assignee | Shipped |
+|---|---|---|---|---|---|
+${storyRows}
 
 ## Acceptance criteria
 

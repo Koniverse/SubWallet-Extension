@@ -41,6 +41,34 @@ review, from the Projects board), 5 backlog (open, not yet started), 2 deprecate
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
 
+## Stories
+
+Every story in this ledger, in issue order — click a US to open its tracker link, evidence and
+verification. **Assignee** is who the tracker or the `[Issue-N]` PR/commit names (`—` where nobody
+is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line proves one.
+
+| US | Status | Title | Issue | Assignee | Shipped |
+|---|---|---|---|---|---|
+| [US-22.1](../stories/US-22.1-make-the-wallet-extension-in-chrome-persist-it-s-state.md) | ✅ done | Make the wallet extension in chrome persist it's state when changing focus | [#334](https://github.com/Koniverse/SubWallet-Extension/issues/334) | saltict | — |
+| [US-22.2](../stories/US-22.2-try-to-remove-webrequest-from-manifest-xml.md) | ✅ done | Try to remove 'webRequest' from manifest.xml | [#1406](https://github.com/Koniverse/SubWallet-Extension/issues/1406) | saltict | — |
+| [US-22.3](../stories/US-22.3-handling-the-cross-origin-request-blocked-on-firefox-br.md) | 📋 backlog | Handling the Cross-Origin Request Blocked on Firefox browser | [#1934](https://github.com/Koniverse/SubWallet-Extension/issues/1934) | lw-cdm | — |
+| [US-22.4](../stories/US-22.4-webapp-re-check-camera-detection-on-the-firefox-browser.md) | ✅ done | WebApp - Re-check camera detection on the Firefox browser | [#1938](https://github.com/Koniverse/SubWallet-Extension/issues/1938) | S2kael | — |
+| [US-22.5](../stories/US-22.5-fixed-bug-ipfs-in-firefox-browser.md) | ✅ done | Fixed bug IPFS in Firefox browser | [#1995](https://github.com/Koniverse/SubWallet-Extension/issues/1995) | S2kael | 1.1.18 |
+| [US-22.6](../stories/US-22.6-build-chainlist-page.md) | 📋 backlog | Build Chainlist page | [#2131](https://github.com/Koniverse/SubWallet-Extension/issues/2131) | tunghp2002 | — |
+| [US-22.7](../stories/US-22.7-webapp-update-build-number-for-webapp.md) | ✅ done | WebApp \| Update build number for WebApp | [#2231](https://github.com/Koniverse/SubWallet-Extension/issues/2231) | anhntk54 | — |
+| [US-22.8](../stories/US-22.8-web-runner-backup-and-restore-indexed-db.md) | ✅ done | Web Runner \| Backup and restore indexed DB | [#2276](https://github.com/Koniverse/SubWallet-Extension/issues/2276) | saltict | — |
+| [US-22.9](../stories/US-22.9-build-some-middleware-services.md) | ⏸️ deprecated | Build some middleware services | [#2455](https://github.com/Koniverse/SubWallet-Extension/issues/2455) | saltict | — |
+| [US-22.10](../stories/US-22.10-do-not-navigate-the-chrome-store-in-case-disable-extens.md) | ⏸️ deprecated | Do not navigate the Chrome store in case disable Extension SubWallet yet | [#2471](https://github.com/Koniverse/SubWallet-Extension/issues/2471) | — | — |
+| [US-22.11](../stories/US-22.11-build-tracking-dashboard-across-platforms.md) | 📋 backlog | Build tracking dashboard across platforms | [#2529](https://github.com/Koniverse/SubWallet-Extension/issues/2529) | saltict | — |
+| [US-22.12](../stories/US-22.12-build-a-user-support-system.md) | ✅ done | Build a user support system | [#2534](https://github.com/Koniverse/SubWallet-Extension/issues/2534) | saltict | — |
+| [US-22.13](../stories/US-22.13-extension-recheck-time-of-stop-background-on-firefox-br.md) | 📋 backlog | Extension - Recheck time of stop background on Firefox browser | [#3222](https://github.com/Koniverse/SubWallet-Extension/issues/3222) | Thiendekaco | — |
+| [US-22.14](../stories/US-22.14-build-ton-chainlist.md) | ✅ done | Build Ton chainlist | [#3455](https://github.com/Koniverse/SubWallet-Extension/issues/3455) | bluezdot | — |
+| [US-22.15](../stories/US-22.15-webapp-fix-bug-cors-on-firefox-s-extension-and-webapp.md) | ✅ done | WebApp - Fix bug CORS on Firefox's extension and WebApp | [#3992](https://github.com/Koniverse/SubWallet-Extension/issues/3992) | Thiendekaco | — |
+| [US-22.16](../stories/US-22.16-setup-github-action-deploy-cho-subwallet-backend.md) | ✅ done | Setup github action để deploy cho SubWallet backend | [#4118](https://github.com/Koniverse/SubWallet-Extension/issues/4118) | jonathanhoang12 | — |
+| [US-22.17](../stories/US-22.17-deploying-bittensor-ecosystem-features.md) | ✅ done | Deploying Bittensor ecosystem features | [#4189](https://github.com/Koniverse/SubWallet-Extension/issues/4189) | tunghp2002 | — |
+| [US-22.18](../stories/US-22.18-build-chainlist-stable-v0-2-103.md) | ✅ done | Build chainlist stable v0.2.103 | [#4239](https://github.com/Koniverse/SubWallet-Extension/issues/4239) | S2kael | — |
+| [US-22.19](../stories/US-22.19-add-logic-for-testing-development-build-with-koni-browe.md) | 📋 backlog | Add logic for testing development build with Koni Brower Runner | [#4602](https://github.com/Koniverse/SubWallet-Extension/issues/4602) | saltict | — |
+
 ## Acceptance criteria
 
 - [ ] **AC-1** — Every Build & Platform issue with no FR story has exactly one story here; its status matches the tracker (done = COMPLETED, backlog = open, deprecated = not-planned/duplicate).
