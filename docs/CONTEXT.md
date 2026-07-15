@@ -2124,13 +2124,41 @@ status in step with the tracker's close reasons.
   not the structured "duplicate of #X" action. So the original is not recoverable from the API; the
   deprecated banner says exactly that rather than guessing a canonical.
 - **A closed issue is not proof of shipped code — so `done` now carries an evidence tier.** Of 2208
-  done stories: **1103** have a merge-base-provable commit, **341** a closing PR, **125** a CHANGELOG
-  release, and **639** have *none of the three* — `done` rests only on the tracker's COMPLETED label
-  (mostly pre-2023 issues closed before the `[Issue-N]` commit / PR-link conventions). Each story
-  states its tier in AC-1, and the 639 say plainly *"no commit, PR, or changelog line links code to
-  this issue."* The label is kept as the team's own record, but it is never dressed up as code
-  evidence — the [LESSONS §68](LESSONS.md) line, applied to provenance strength, not just AC text.
+  done stories: **1103** have a merge-base-provable commit, **200** an implementing PR (title declares
+  the issue — see the correction below), **211** a CHANGELOG release, and **694** have *none of the
+  three* — `done` rests only on the tracker's COMPLETED label (mostly pre-2023 issues closed before
+  the `[Issue-N]` commit / PR-link conventions). Each story states its tier in AC-1, and the 694 say
+  plainly *"no commit, PR, or changelog line links code to this issue."* The label is kept as the
+  team's own record, but it is never dressed up as code evidence — the [LESSONS §68](LESSONS.md) line,
+  applied to provenance strength, not just AC text.
 
-**Citations**: [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-gen-maintenance.mjs`, `scripts/koni-docs-changelog-coverage.mjs`
+**Follow-up — the "closing PR" links were 41% wrong; corrected against the PR title (2026-07-15).**
+A recheck of the done stories' fields asked whether the PR evidence could be trusted. It could not.
+The generator read GitHub's `closedByPullRequestsReferences`, which turns out to be **loose**: it
+returns PRs that merely mention an issue, PRs about a *different* issue, and it is inconsistent over
+time (issue #32 returned PR #130 at fetch, `(none)` on recheck). Verified live via each issue's
+`ClosedEvent.closer`: of 25 sampled done stories on the PR tier, **0** were actually closed by the
+cited PR. Measured across the layer: of 341 done stories citing a PR as their evidence, **141 (41%)**
+named a PR whose `[Issue-N]` title belongs to another issue — e.g. a story for #1947 ("token logo")
+cited PR #1948 *"[Issue-1941] Update chainlist"*. Across all statuses, **243** stories had a wholly
+spurious PR link and **22** open stories carried a nonsensical *"Closed by PR"*.
+
+- **The fix — trust the PR *title*, not GitHub's link.** A linked PR survives only if its title
+  declares an `[Issue-N]`/`#N` the story owns — the same developer-authored convention the commit
+  tier trusts, and exactly what separates the genuine #3571 *"[Issue-2751]"* from the spurious #1948.
+  `scripts/koni-docs-fetch-pr-titles.mjs` builds the `pr# → title` cache; the generator filters on it.
+  **1294 → 1051** PR-citing stories; the 243 all-spurious dropped to their next honest tier (CHANGELOG
+  or tracker-label). Wording changed from *"closed by PR … → MERGED"* to *"implemented by PR (title
+  declares the issue)"*: these PRs carry the work, but most issues were closed by hand, not auto-closed
+  by the merge — the old wording overclaimed twice (wrong PR **and** wrong verb).
+- **What did *not* move.** The `commit` tier (1103, `[Issue-N]` in the git subject) was never affected
+  — that signal is reliable. This is [LESSONS §68](LESSONS.md) turned on our own generator: a linked
+  PR is a *claim* the PR did this issue's work, and a claim gets verified or dropped, never trusted
+  because an API returned it.
+- **Rejected as fabrication.** The same recheck confirmed `version_shipped` (1197 empty) and the
+  remaining `assignee` gaps stay empty — no CHANGELOG line proves a release, and deriving an assignee
+  from the (now-distrusted) PR author was tried and reverted. Honest-empty over plausible-but-false.
+
+**Citations**: [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-gen-maintenance.mjs`, `scripts/koni-docs-fetch-pr-titles.mjs`, `scripts/koni-docs-changelog-coverage.mjs`
 
 ---

@@ -1097,3 +1097,34 @@ supplies: **a command.**
 
 **Cost of learning it**: a P0 security AC asserted, for a month, that a third-party API key was
 not in the client. It is.
+
+## 69. A link an API hands you is a claim, not a fact — GitHub's `closedByPullRequestsReferences` was 41% wrong
+
+**What happened**: the maintenance generator recorded, for each closed issue, the "closing PR" that
+GitHub's `closedByPullRequestsReferences` field returned — and cited it as evidence the issue shipped
+(*"closed by PR #X → MERGED"*). A field-completeness recheck tested the claim against each issue's
+authoritative `ClosedEvent.closer`: of 25 sampled done stories, **0** were actually closed by the
+cited PR. The field is **loose** — it returns PRs that merely mention an issue, PRs whose `[Issue-N]`
+title belongs to a *different* issue, and it is even inconsistent between fetches (issue #32 → PR #130
+one minute, `(none)` the next). Across the layer, **141 of 341 (41%)** done-story PR links named the
+wrong issue's PR; a story for #1947 *"token logo"* cited PR #1948 *"[Issue-1941] Update chainlist"*.
+
+**The tell**: the wrong links were invisible until cross-checked, because a PR number resolves to a
+real, merged PR — it just isn't *this issue's* PR. "The link resolves" is the same trap as "the AC is
+ticked" ([§68](#68-a-ticked-checkbox-is-a-claim-about-the-code--and-only-a-command-that-runs-can-refute-it)):
+a referent that exists is not a referent that is *correct*.
+
+**The rule**: when an external API asserts a relationship (X closed Y, X owns Y, X caused Y), treat it
+as a claim to verify against a signal the humans authored, not a fact to copy. Here the reliable
+signal was the developer's own `[Issue-N]` tag in the PR title — the same convention the commit tier
+already trusts. A link survives only if the PR title declares an issue the story owns; the rest drop
+to their next honest tier. The distrust does not extend to everything: the `[Issue-N]` **commit** tier
+was untouched, because that signal is a human's declaration in the git subject, not an API's inference.
+
+**Corollary — do not launder a rejected signal into a different field.** The same recheck tried
+deriving a missing `assignee` from the closing-PR *author*. When the PR link itself proved
+untrustworthy, the derived assignee inherited the rot; it was reverted. A value built on a distrusted
+input is as false as the input, wherever you write it.
+
+**Cost of learning it**: 243 stories shipped (and were pushed) asserting a specific PR closed an
+issue it had nothing to do with.

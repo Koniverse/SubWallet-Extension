@@ -32,11 +32,29 @@ const all = JSON.parse(fs.readFileSync('/tmp/all2.json', 'utf8'));
 // GitHub sub-issue graph: number → {parent, subs}. Built by the audit fetch (GraphQL).
 const rel = fs.existsSync('/tmp/rel.json') ? JSON.parse(fs.readFileSync('/tmp/rel.json', 'utf8')) : {};
 const relOf = (n) => rel[String(n)] || {};
-// closing PRs per issue — the second-strongest evidence a closed issue shipped, after a
-// resolvable [Issue-N] commit and before the CHANGELOG. Absent all three, `done` rests only
-// on the tracker's COMPLETED label, and the story must say so.
+// PRs GitHub links to each issue — the second-strongest evidence a closed issue shipped, after a
+// resolvable [Issue-N] commit and before the CHANGELOG (but only the genuine links survive, see
+// prTitle below). Absent all three, `done` rests only on the tracker's COMPLETED label, and the
+// story must say so.
 const prCache = fs.existsSync('/tmp/pr.json') ? JSON.parse(fs.readFileSync('/tmp/pr.json', 'utf8')) : [];
 const prsOf = new Map(prCache.map((o) => [o.number, (o.closedByPullRequestsReferences || []).map((p) => p.number)]));
+// GitHub's closedByPullRequestsReferences is loose — it links PRs that merely mention an issue, and
+// often a PR about a DIFFERENT issue (41% of the raw links were spurious). So a linked PR is trusted
+// only when its title declares an `[Issue-N]` (or `#N`) that the story actually owns — the same
+// developer-authored convention the commit tier trusts. pr# → title, from koni-docs-fetch-pr-titles.
+const prTitle = new Map(
+  Object.entries(fs.existsSync('/tmp/pr-titles.json') ? JSON.parse(fs.readFileSync('/tmp/pr-titles.json', 'utf8')) : {})
+    .map(([n, t]) => [Number(n), t])
+);
+const prIssueRefs = (p) => {
+  const t = prTitle.get(p) || '';
+  const s = new Set();
+
+  for (const m of t.matchAll(/\[?\s*issue\s*-?\s*:?\s*#?(\d{2,5})\s*\]?/ig)) s.add(Number(m[1]));
+  for (const m of t.matchAll(/#(\d{2,5})/g)) s.add(Number(m[1]));
+
+  return s;
+};
 
 // GitHub Projects board #2 "SubWallet.App - Development": the workflow Status an OPEN issue
 // actually sits in. The tracker only knows OPEN/CLOSED; the board is where "In Review" lives.
@@ -252,7 +270,12 @@ for (const rows of groups.values()) {
   const title = (sh ? sh.bullet : head.title).replace(/\s*\(#[\d,# ]+\)\s*$/, '').replace(/\s*\(issue #[\d,# ]+\)\s*$/i, '').replace(/"/g, "'").trim().slice(0, 120) || `Issue #${head.number}`;
   const parents = [...new Set(nums.map((n) => relOf(n).parent).filter(Boolean))];
   const subs = nums.reduce((a, n) => a + (relOf(n).subs || 0), 0);
-  const prs = [...new Set(nums.flatMap((n) => prsOf.get(n) || []))].slice(0, 5);
+  // keep a linked PR only if its title declares an issue this story owns — drops the spurious
+  // GitHub links (a PR about another issue, or one that names no issue at all)
+  const numsSet = new Set(nums);
+  const prs = [...new Set(nums.flatMap((n) => prsOf.get(n) || []))]
+    .filter((p) => [...prIssueRefs(p)].some((i) => numsSet.has(i)))
+    .slice(0, 5);
 
   specs.push({ nums, title, area, asg, shas, status, deadReason, ver, sprint, shipDate, parents, subs, prs, boardStatus });
 }
@@ -469,8 +492,10 @@ for (const s of [...byEpic.values()].flat()) {
     : '';
 
   // evidence tiers for a shipped story, strongest first: a resolvable feature commit
-  // (merge-base provable) → a closing PR → the CHANGELOG release → only the tracker's
-  // COMPLETED label. The last is stated plainly so nobody reads code evidence into it.
+  // (merge-base provable) → an implementing PR (title declares [Issue-N], filtered above) → the
+  // CHANGELOG release → only the tracker's COMPLETED label. The last is stated plainly so nobody
+  // reads code evidence into it. "Implementing", not "closing": the PR carries the [Issue-N] work,
+  // but most issues here were closed by hand, not auto-closed by the merge — do not overclaim.
   const prList = s.prs.map((p) => `[PR #${p}](https://github.com/Koniverse/SubWallet-Extension/pull/${p})`).join(', ');
   let verify;
   let evidence;
@@ -488,8 +513,8 @@ for (const s of [...byEpic.values()].flat()) {
     verify = `commit ${s.shas[0]} present in git${s.ver ? ` (release ${s.ver}; tag not a valid merge-base anchor)` : ''}`;
     evidence = 'commit';
   } else if (s.prs.length) {
-    verify = `closed by ${prList} · \`gh pr view ${s.prs[0]}\` → MERGED`;
-    evidence = `closing PR${s.ver ? ` + release ${s.ver}` : ''}`;
+    verify = `implemented by ${prList} (title declares the issue) · \`gh pr view ${s.prs[0]}\``;
+    evidence = `implementing PR${s.ver ? ` + release ${s.ver}` : ''}`;
   } else if (s.ver) {
     verify = `[coverage index](../../notes/changelog-coverage.md) — CHANGELOG names release ${s.ver}`;
     evidence = `CHANGELOG release ${s.ver}`;
@@ -560,7 +585,7 @@ ${relBlock}
 
 ## References
 
-- [Issue ${nums}](${url(s.nums[0])})${s.prs.length ? `\n- Closed by ${prList}` : ''}
+- [Issue ${nums}](${url(s.nums[0])})${s.prs.length ? `\n- Implemented by ${prList} (PR title declares this issue)` : ''}
 - [CHANGELOG coverage index](../../notes/changelog-coverage.md)
 
 ## Verification commands
