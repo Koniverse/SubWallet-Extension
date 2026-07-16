@@ -35,7 +35,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | ID | What | Status |
 |---|---|---|
 | [US-42.1](../stories/US-42.1-qc-issue-5013-stake-and-unstake-screen-bugs.md) | Stake/unstake screen bugs (#5013) | done |
-| [US-42.2](../stories/US-42.2-qc-cypress-token-on-base.md) | Cypress token on Base shows correctly (#703) | ready |
+| [US-42.2](../stories/US-42.2-qc-cypress-token-on-base.md) | Cypress token on Base shows correctly (#703) | in-progress — 1 bug found |
 
 More rows get added here as testing starts.
 
