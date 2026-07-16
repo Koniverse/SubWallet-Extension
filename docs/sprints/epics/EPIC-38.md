@@ -4,7 +4,7 @@ title: "Maintenance — Multisig"
 status: in-progress
 prd_ref: []
 created: 2026-07-15
-updated: 2026-07-15
+updated: 2026-07-16
 generated_by: koni-docs-gen-maintenance
 ---
 
@@ -40,9 +40,16 @@ second copy of the scope — and their `points` are never summed with EPIC-18's*
 
 ## Scope
 
-**20 stories** — 13 done (shipped), 2 in flight (ready / in-progress /
-review, from the Projects board), 5 backlog (open, not yet started), 0 deprecated
-(closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
+**20 stories** — 12 done (shipped), 0 in flight (ready / in-progress /
+review, from the Projects board), 4 backlog (open, not yet started), 4 deprecated. Two senses of
+**deprecated** here: the usual (closed **not-planned / duplicate** — never shipped), and **4
+umbrellas retired to [EPIC-18](EPIC-18.md)** — [US-38.1](../stories/US-38.1-support-multisig-features.md)
+(#1426), [US-38.2](../stories/US-38.2-multisig-support-multisig-account.md) (#1677),
+[US-38.3](../stories/US-38.3-multisig-extension-support.md) (#4696), and
+[US-38.7](../stories/US-38.7-multisig-extension-phase-1-core-multisig-management.md) (#4838, the
+Phase-1 umbrella — closed COMPLETED on the tracker 2026-07-16) were **feature/phase-level** issues
+the FR epic already owns, so a ledger story here double-tracked them ([D108](../../CONTEXT.md) does
+not double-claim an FR-owned issue). They are retired, not chores. Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
 
@@ -54,13 +61,13 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 
 | US | Status | Title | Issue | Assignee | Shipped |
 |---|---|---|---|---|---|
-| [US-38.1](../stories/US-38.1-support-multisig-features.md) | ✅ done | Support multisig features | [#1426](https://github.com/Koniverse/SubWallet-Extension/issues/1426) | nulllpc | — |
-| [US-38.2](../stories/US-38.2-multisig-support-multisig-account.md) | 🚧 in-progress | [Multisig] Support Multisig account | [#1677](https://github.com/Koniverse/SubWallet-Extension/issues/1677) | bluezdot | — |
-| [US-38.3](../stories/US-38.3-multisig-extension-support.md) | 📋 backlog | [Multisig] Extension support | [#4696](https://github.com/Koniverse/SubWallet-Extension/issues/4696) | bluezdot | — |
+| [US-38.1](../stories/US-38.1-support-multisig-features.md) | ⏸️ retired → [EPIC-18](EPIC-18.md) | Support multisig features *(umbrella)* | [#1426](https://github.com/Koniverse/SubWallet-Extension/issues/1426) | nulllpc | — |
+| [US-38.2](../stories/US-38.2-multisig-support-multisig-account.md) | ⏸️ retired → [EPIC-18](EPIC-18.md) | [Multisig] Support Multisig account *(umbrella)* | [#1677](https://github.com/Koniverse/SubWallet-Extension/issues/1677) | bluezdot | — |
+| [US-38.3](../stories/US-38.3-multisig-extension-support.md) | ⏸️ retired → [EPIC-18](EPIC-18.md) | [Multisig] Extension support *(umbrella)* | [#4696](https://github.com/Koniverse/SubWallet-Extension/issues/4696) | bluezdot | — |
 | [US-38.4](../stories/US-38.4-multisig-mobile-support.md) | 📋 backlog | [Multisig] Mobile support | [#4697](https://github.com/Koniverse/SubWallet-Extension/issues/4697) | — | — |
 | [US-38.5](../stories/US-38.5-multisig-webapp-support.md) | 📋 backlog | [Multisig] WebApp support | [#4698](https://github.com/Koniverse/SubWallet-Extension/issues/4698) | — | — |
 | [US-38.6](../stories/US-38.6-multisig-reseach-multisig-technical-research.md) | ✅ done | [Multisig][Reseach] Multisig Technical Research | [#4744](https://github.com/Koniverse/SubWallet-Extension/issues/4744) | bluezdot | — |
-| [US-38.7](../stories/US-38.7-multisig-extension-phase-1-core-multisig-management.md) | 🚧 in-progress | [Multisig] [Extension] Phase 1: Core Multisig Management | [#4838](https://github.com/Koniverse/SubWallet-Extension/issues/4838) | bluezdot | — |
+| [US-38.7](../stories/US-38.7-multisig-extension-phase-1-core-multisig-management.md) | ⏸️ retired → [EPIC-18](EPIC-18.md) | [Multisig] [Extension] Phase 1: Core Multisig Management *(umbrella)* | [#4838](https://github.com/Koniverse/SubWallet-Extension/issues/4838) | bluezdot | — |
 | [US-38.8](../stories/US-38.8-multisig-extension-phase-1-multisig-account-management.md) | ✅ done | [Multisig] [Extension] [Phase 1] Multisig Account Management | [#4841](https://github.com/Koniverse/SubWallet-Extension/issues/4841) | bluezdot | 1.3.74 |
 | [US-38.9](../stories/US-38.9-multisig-extension-phase-1-pending-transaction-detectio.md) | ✅ done | [Multisig] [Extension] [Phase 1] Pending Transaction Detection | [#4842](https://github.com/Koniverse/SubWallet-Extension/issues/4842) | bluezdot | 1.3.74 |
 | [US-38.10](../stories/US-38.10-multisig-extension-phase-1-implement-multisig-actions.md) | ✅ done | [Multisig] [Extension] [Phase 1] Implement Multisig Actions | [#4843](https://github.com/Koniverse/SubWallet-Extension/issues/4843) | bluezdot | 1.3.74 |
@@ -77,5 +84,5 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — Every Multisig issue with no FR story has exactly one story here; its status matches the tracker (done = COMPLETED, backlog = open, deprecated = not-planned/duplicate).
+- [ ] **AC-1** — Every Multisig issue with no FR story has exactly one story here; its status matches the tracker (done = COMPLETED, backlog = open, deprecated = not-planned/duplicate, **or a feature umbrella retired to [EPIC-18](EPIC-18.md)**).
 - [x] **AC-2** — `npx koni-docs validate` and `node scripts/koni-docs-check-ids.mjs` exit 0.

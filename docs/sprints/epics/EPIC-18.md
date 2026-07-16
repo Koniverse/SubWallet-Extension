@@ -11,7 +11,7 @@ arch_ref:
   - AD-04
   - AD-24
 created: 2026-06-12
-updated: 2026-07-14
+updated: 2026-07-16
 ---
 
 ## Goal
@@ -27,6 +27,18 @@ server — can move the funds alone.
 > the **FR contract** (FR-149/150/151); EPIC-38 is the **issue ledger** of the same area. They
 > overlap by design — the FR is the contract, the tickets are its issues — and their `points` are
 > never summed.
+>
+> **Feature-umbrella issues are owned here, not double-tracked.** The tracker's umbrella tickets —
+> **#1426** (2023 *"Support multisig features"* scoping, closed/superseded), **#1677** (*"Support
+> Multisig account"*, the parent umbrella, open for Phase 2), **#4696** (*"Extension support"*,
+> Phase-1 shipped in v1.3.74), and **#4838** (the *"Phase 1: Core Multisig Management"* umbrella,
+> closed COMPLETED on the tracker 2026-07-16) — are feature/phase-level, so this FR epic owns them.
+> Their EPIC-38 ledger stories ([US-38.1](../stories/US-38.1-support-multisig-features.md) /
+> [US-38.2](../stories/US-38.2-multisig-support-multisig-account.md) /
+> [US-38.3](../stories/US-38.3-multisig-extension-support.md) /
+> [US-38.7](../stories/US-38.7-multisig-extension-phase-1-core-multisig-management.md)) were
+> **retired 2026-07-16** to avoid double-claiming what an FR already contracts
+> ([CONTEXT D108](../../CONTEXT.md)).
 
 ## Overview
 
