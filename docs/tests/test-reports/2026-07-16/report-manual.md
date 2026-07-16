@@ -9,7 +9,7 @@ Not tied to one epic — this covers today's test tasks only.
 | Environment | PR build |
 | Runner | manual (extension) |
 | Build under test | Koniverse/SubWallet-Extension @ koni-qc |
-| Tasks tested | US-42.1, US-42.2 |
+| Tasks tested | US-42.1, US-42.2, US-42.3 |
 | Total bugs found | 1 |
 | P0 | 0 |
 | P1 | 0 |
@@ -43,6 +43,19 @@ Amount field (34 CP) displays correctly. Transaction still goes through — this
 
 **Retest (fresh install + upgrade)**: dev fixed the fee display — network fee now shows the correct amount on both install conditions. No bugs remaining.
 
+## US-42.3 — Polkadot Hub EVM chain ([ChainList #701](https://github.com/Koniverse/SubWallet-ChainList/issues/701))
+
+Checked on fresh install and on an upgraded install.
+
+### Bugs
+
+None found. All checks passed:
+
+- Chain shows up with the correct name and logo, connects without errors.
+- Native token balance matches the block explorer.
+- Sending and receiving both work.
+- Block-explorer link opens the correct page on blockscout.polkadot.io.
+
 ---
 
 ## Summary
@@ -51,3 +64,4 @@ Amount field (34 CP) displays correctly. Transaction still goes through — this
 |---|---|---|
 | US-42.1 | 0 | done |
 | US-42.2 | 1 (BUG-42.2-01, fixed) | done |
+| US-42.3 | 0 | done |
