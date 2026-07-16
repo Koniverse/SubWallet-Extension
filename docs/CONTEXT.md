@@ -2125,11 +2125,12 @@ status in step with the tracker's close reasons.
   not the structured "duplicate of #X" action. So the original is not recoverable from the API; the
   deprecated banner says exactly that rather than guessing a canonical.
 - **A closed issue is not proof of shipped code — so `done` now carries an evidence tier.** Of 2208
-  done stories: **1365** have a commit provable against its release by `merge-base`, **86** a commit
+  done stories: **1367** have a commit provable against its release by `merge-base`, **86** a commit
   not yet in any stable release, **8** an implementing PR (title declares the issue — see the PR
-  correction below), **107** a CHANGELOG release, **27** shipped via another issue (*resolved in #N*),
-  and **615** have *none* — `done` rests only on the tracker's COMPLETED label (mostly pre-2023 issues
-  closed before any commit / PR-link convention). Each story states its tier in AC-1, and the 615 say
+  correction below), **107** a CHANGELOG release, **38** shipped via another issue (*resolved in #N*,
+  or a closing-PR sibling bundle — see the tracker-only follow-up below), and **602** have *none* —
+  `done` rests only on the tracker's COMPLETED label (mostly pre-2023 issues
+  closed before any commit / PR-link convention). Each story states its tier in AC-1, and the 602 say
   plainly *"no commit, PR, or changelog line links code to this issue."* The label is kept as the
   team's own record, but it is never dressed up as code evidence — the [LESSONS §68](LESSONS.md) line,
   applied to provenance strength, not just AC text.
@@ -2227,6 +2228,30 @@ nothing (D106). **Three (#4692, #2688, #4593) have no local git trace at all** �
 tagged commit. `assignee` was **left empty on #2054** rather than guessed: its commits are Nam Phạm's,
 but the board's tracker-owner (the authoritative assignee) maps a committer to many different owners, so
 git author ≠ assignee — honest-empty over a plausible-but-false login ([§69](LESSONS.md)).
+
+**Follow-up — the tracker-only tier hid work that shipped via a closing PR (2026-07-16).** #1781 (*"'All
+Accounts' not showing first, Firefox"*) sat on the tracker-only tier — *"no commit, PR, or changelog line
+links code to this issue"* — yet it **had** shipped: GitHub records it closed by PR #2320, whose single
+commit `e9f54d6a67` (*"Sort the Current account on top in the Account selector"*, titled `[Issue-2318]`)
+is the same account-selector-ordering fix #1781 reports. It fell to tracker-only because the §69 PR-title
+pass — correctly refusing PRs whose title declares a *different* issue — **conflated two things it dropped
+together**: genuinely wrong links (the 41%) and genuine *same-area sibling bundles* where the dev tagged
+the lead issue. So the 614 tracker-only stories were re-audited against git. Only **37 had any closing-PR
+at all** (the tier is mostly right); **25 (issue, PR) pairs were version-recoverable** (the PR's merge is
+in local git). Each was judged by comparing the tracker title to the PR title, and **13 high-confidence
+ones recovered** — the PR title either matches this issue's title near-verbatim (#363 *"Update Bifrost
+Polkadot Parachain"*, #2782 *"Unable to scroll list account"*), is self-referential (#135 *is* *"Refactor
+code for PR #133"*), or **lists this issue in a multi-issue tag a single-number scan missed** (#526
+`[Issue 411 + 526]`; #1244/#1246 `[Issue 1232,1233,1236,1246,1244]`; #2295 `[Issue-2116, 2295]`). **Two
+gained a commit** — #1244/#1246 share the commit `5d29e31bf0`, whose subject names them both — and **11
+gained a version only**, recorded as *shipped via PR #N* with a `merge-base` check against the PR's merge,
+the commit left empty because it is tagged for the sibling (the same discipline as the *resolved in #N*
+tier: inherit the release where the work demonstrably landed, never claim which commit fixed *this* one).
+Tracker-only **615 → 602**; commit-bearing done **1451 → 1453**; version-bearing **1506 → 1519**. The
+remaining ~10 recoverable pairs were **held back**, not recovered: their PR is a generic *"Update
+chainlist"* / MV3 / *"fix some minor bugs"* whose link to the specific issue is exactly the same-area
+judgment §69 warns can be 41% wrong — a provable *version* is worthless if the PR did not actually fix
+this issue, so those stay tracker-only until verified rather than dressed up.
 
 **Citations**: [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-check-ids.mjs` (the only tool kept in the repo — the generator, coverage, and fetch helpers are one-off setup scaffolding, kept in the session scratchpad, not the repo)
 

@@ -118,8 +118,18 @@ during version reconciliation.
 
 ## Implementation notes
 
-_Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
-and any implementation caveats during version reconciliation._
+**Two toggles, two lineages — one built here, one inherited.** This story bundles a setting
+SubWallet built with one that arrived with the fork:
+
+| Capability | Built by | Commit | Lineage |
+| --- | --- | --- | --- |
+| **One-Sign toggle** | `S2kael` (SubWallet) | `2f5a47c2df` (`[Issue-3901]`), merged in `ff5b6b565e` (PR #4056) | this product — shipped **1.3.21** (2025-02) |
+| **Camera-access toggle** | `jacogr` (Jaco Greeff) — polkadot-js | `872d7b808a` *"Allow settings for camera (#183)"* (2019-10-24) | **inherited**, pre-fork — came with the fork ([CONTEXT D105](../../CONTEXT.md)); reached a SubWallet user in **0.2.1** |
+
+`assignee` and `version_shipped` name the **new** half (the One-Sign toggle). The camera-access
+toggle is **not SubWallet's work** — it is **Inherited from polkadot-js**, flagged here for the same reason the
+pure-inherited stories are ([CONTEXT D101](../../CONTEXT.md), [LESSONS §66](../../LESSONS.md)): a
+pre-fork commit sitting under a SubWallet-assigned story would otherwise read as ours.
 
 ## Cross-references
 
