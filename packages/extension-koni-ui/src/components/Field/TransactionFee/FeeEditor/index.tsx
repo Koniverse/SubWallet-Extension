@@ -59,6 +59,7 @@ type Props = ThemeProps & {
 const modalId = 'FeeEditorModalId';
 
 const FEE_TYPES_CAN_SHOW: Array<FeeChainType | undefined> = ['substrate', 'evm', 'bitcoin'];
+const feeNumberMetadata = { maxNumberFormat: 8 };
 
 const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, destChainValue, estimateFee, feeOptionsInfo, feePercentageSpecialCase, feeType, isLoadingFee = false, isLoadingToken, listTokensCanPayFee, nativeTokenSlug, onSelect, onSetTokenPayFee, renderFieldNode, selectedFeeOption, tokenPayFeeSlug, tokenSlug }: Props): React.ReactElement<Props> => {
   const { t } = useTranslation();
@@ -256,6 +257,7 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
                     <Number
                       className={'__fee-value'}
                       decimal={isNativeTokenValue ? nativeTokenDecimals : decimals}
+                      metadata={feeNumberMetadata}
                       prefix={'~ '}
                       suffix={isNativeTokenValue ? nativeTokenSymbol : symbol}
                       value={isNativeTokenValue ? estimateFee : convertedEstimatedFee}
@@ -320,6 +322,7 @@ const Component = ({ chainValue, className, crossChainFee, currentTokenPayFee, d
                     <Number
                       className={'__fee-value'}
                       decimal={transferTokenDecimals}
+                      metadata={feeNumberMetadata}
                       prefix={'~ '}
                       suffix={transferTokenSymbol}
                       value={isNativeTokenValue ? crossChainFee : convertedCrossChainFee}
