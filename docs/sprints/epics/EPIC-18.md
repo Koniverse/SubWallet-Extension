@@ -22,6 +22,12 @@ transaction only executes once the threshold number of signatories have approved
 on-chain. The epic delivers shared-authority custody where no single key — and no
 server — can move the funds alone.
 
+> **Implementation ledger →** the individual tracker tickets that built this feature — Phase-1
+> build tasks, screens, fixes — live in [EPIC-38](EPIC-38.md), one story per issue. This epic is
+> the **FR contract** (FR-149/150/151); EPIC-38 is the **issue ledger** of the same area. They
+> overlap by design — the FR is the contract, the tickets are its issues — and their `points` are
+> never summed.
+
 ## Overview
 
 ### Business context

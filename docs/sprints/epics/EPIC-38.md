@@ -10,7 +10,7 @@ generated_by: koni-docs-gen-maintenance
 
 ## Goal
 
-Incremental work, fixes and chores for the **Multisig** area ([EPIC-18](EPIC-18.md)) that materialize no FR of their own. One story per tracker issue, so the CHANGELOG and issue tracker are fully claimed
+The **Multisig** area's tracker issues ([EPIC-18](EPIC-18.md)) — the Phase-1 build tickets that *collectively* implemented the shipped FRs (FR-149, FR-150), plus the fixes and chores around them. None carries an FR **of its own** (the contracts are EPIC-18's), so each becomes one owning story per tracker issue and the CHANGELOG and issue tracker are fully claimed
 and the ERP can answer "who shipped what, under which issue" for this area. This epic is a
 **ledger, not a plan** — it was generated from the tracker and CHANGELOG by a one-off local
 generator (kept in the setup scratchpad, not the repo: it wipes and rebuilds every `generated_by`
@@ -18,11 +18,15 @@ file from six `/tmp` caches, so re-running it without those caches would destroy
 
 ## Why separate from EPIC-18
 
-The 21 product epics are the **FR map**: each story there is a requirement's contract. These
-issues materialize no FR — they are fixes, chore bumps, and small increments. Keeping them here
-leaves [EPIC-18](EPIC-18.md) readable as the requirement set, while
-still giving every shipped issue exactly one owning story ([CONTEXT D107](../../CONTEXT.md) on
-keeping the unit of status honest).
+The 21 product epics are the **FR map**: each story there is a requirement's contract — [EPIC-18](EPIC-18.md)
+holds exactly three (FR-149, FR-150, FR-151). This epic holds the **tracker issues** of the same
+area: the Phase-1 build tickets (#4841 account management, #4869 create-account screen, …) that
+*collectively* materialized FR-149 and FR-150, plus fixes and chores. They **implement** the FRs
+but carry no FR **of their own** — so keeping them here leaves [EPIC-18](EPIC-18.md) readable as a
+three-contract requirement set instead of a 20-ticket backlog, while every shipped issue still gets
+exactly one owning story ([CONTEXT D107](../../CONTEXT.md) on keeping the unit of status honest).
+**The overlap with EPIC-18 is intentional — the FR is the contract, these are its issues, not a
+second copy of the scope — and their `points` are never summed with EPIC-18's** (see below).
 
 ## What a story here is — and is not
 
@@ -36,8 +40,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**20 stories** — 10 done (shipped), 2 in flight (ready / in-progress /
-review, from the Projects board), 8 backlog (open, not yet started), 0 deprecated
+**20 stories** — 13 done (shipped), 2 in flight (ready / in-progress /
+review, from the Projects board), 5 backlog (open, not yet started), 0 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -62,10 +66,10 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-38.10](../stories/US-38.10-multisig-extension-phase-1-implement-multisig-actions.md) | ✅ done | [Multisig] [Extension] [Phase 1] Implement Multisig Actions | [#4843](https://github.com/Koniverse/SubWallet-Extension/issues/4843) | bluezdot | 1.3.74 |
 | [US-38.11](../stories/US-38.11-multisig-extension-phase-2-multisig-account-detection.md) | 📋 backlog | [Multisig] [Extension] [Phase 2] Multisig Account Detection | [#4844](https://github.com/Koniverse/SubWallet-Extension/issues/4844) | bluezdot | — |
 | [US-38.12](../stories/US-38.12-multisig-extension-phase-1-background.md) | ✅ done | [Multisig] [Extension] [Phase 1] Background | [#4856](https://github.com/Koniverse/SubWallet-Extension/issues/4856) | bluezdot | 1.3.74 |
-| [US-38.13](../stories/US-38.13-multisig-extension-phase-1-create-multisig-account.md) | 📋 backlog | [Multisig] [Extension] [Phase 1] Create Multisig account | [#4869](https://github.com/Koniverse/SubWallet-Extension/issues/4869) | frenkie-ng | — |
+| [US-38.13](../stories/US-38.13-multisig-extension-phase-1-create-multisig-account.md) | ✅ done | [Multisig] [Extension] [Phase 1] Create Multisig account | [#4869](https://github.com/Koniverse/SubWallet-Extension/issues/4869) | frenkie-ng | 1.3.74 |
 | [US-38.14](../stories/US-38.14-multisig-extension-phase-1-experiments-and-init-core-se.md) | ✅ done | [Multisig] [Extension] [Phase 1] Experiments and Init Core Service | [#4870](https://github.com/Koniverse/SubWallet-Extension/issues/4870) | bluezdot | 1.3.74 |
-| [US-38.15](../stories/US-38.15-multisig-extension-phase-1-implement-history-screen.md) | 📋 backlog | [Multisig] [Extension] [Phase 1] Implement History screen | [#4871](https://github.com/Koniverse/SubWallet-Extension/issues/4871) | frenkie-ng | — |
-| [US-38.16](../stories/US-38.16-multisig-extension-phase-1-implement-notification-scree.md) | 📋 backlog | [Multisig] [Extension] [Phase 1] Implement Notification screen | [#4874](https://github.com/Koniverse/SubWallet-Extension/issues/4874) | frenkie-ng | — |
+| [US-38.15](../stories/US-38.15-multisig-extension-phase-1-implement-history-screen.md) | ✅ done | [Multisig] [Extension] [Phase 1] Implement History screen | [#4871](https://github.com/Koniverse/SubWallet-Extension/issues/4871) | frenkie-ng | 1.3.74 |
+| [US-38.16](../stories/US-38.16-multisig-extension-phase-1-implement-notification-scree.md) | ✅ done | [Multisig] [Extension] [Phase 1] Implement Notification screen | [#4874](https://github.com/Koniverse/SubWallet-Extension/issues/4874) | frenkie-ng | 1.3.74 |
 | [US-38.17](../stories/US-38.17-multisig-extension-phase-1-handle-mechanism-to-trigger.md) | ✅ done | [Multisig] [Extension] [Phase 1] Handle mechanism to trigger multisig notifications | [#4913](https://github.com/Koniverse/SubWallet-Extension/issues/4913) | bluezdot | 1.3.74 |
 | [US-38.18](../stories/US-38.18-multisig-extension-phase-1-classify-and-handle-data-for.md) | ✅ done | [Multisig] [Extension] [Phase 1] Classify and handle data for all multisig types | [#4921](https://github.com/Koniverse/SubWallet-Extension/issues/4921) | bluezdot | — |
 | [US-38.19](../stories/US-38.19-multisig-extension-phase-2-improve-display-multisig-det.md) | 📋 backlog | [Multisig] [Extension] [Phase 2] Improve display Multisig detail by type | [#4927](https://github.com/Koniverse/SubWallet-Extension/issues/4927) | bluezdot | — |
