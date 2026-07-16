@@ -2125,8 +2125,8 @@ status in step with the tracker's close reasons.
   not the structured "duplicate of #X" action. So the original is not recoverable from the API; the
   deprecated banner says exactly that rather than guessing a canonical.
 - **A closed issue is not proof of shipped code — so `done` now carries an evidence tier.** Of 2208
-  done stories: **1362** have a commit provable against its release by `merge-base`, **86** a commit
-  not yet in any stable release, **11** an implementing PR (title declares the issue — see the PR
+  done stories: **1365** have a commit provable against its release by `merge-base`, **86** a commit
+  not yet in any stable release, **8** an implementing PR (title declares the issue — see the PR
   correction below), **107** a CHANGELOG release, **27** shipped via another issue (*resolved in #N*),
   and **615** have *none* — `done` rests only on the tracker's COMPLETED label (mostly pre-2023 issues
   closed before any commit / PR-link convention). Each story states its tier in AC-1, and the 615 say
@@ -2203,6 +2203,30 @@ line, no "resolved in #N" pointer. The same pointer also fills the **assignee**:
 of their own, so they inherit #N's — whoever did the work there did this. #3390 → **S2kael**, who owns
 #2982. (Contrast the reverted PR-author guess: that rested on a signal already proven unreliable; this
 rests on a tightly-verified pointer to where the work demonstrably happened.)
+
+**Follow-up — the "implementing PR" tier audited, three more convention gaps (2026-07-16).** The 11
+done stories left on the PR tier — a PR whose title declares the issue, but no commit — were checked
+one by one against git. **Three were recoverable**, each a fresh variant of the same "dev-authored link
+the regex didn't match" gap: **#867** (US-32.47) shipped on a **misspelled branch** — *"Merge pull
+request #876 from …/koni/dev/**isue**-867"* (no second `s`), which the PR-branch scan skipped; **#2054**
+(US-32.140) tagged its commits *"[Webapp - issue 2054]"* — the issue number is there but the bracket
+does not start with `Issue`, so the subject regex missed it; **#1197** (US-28.54) wrote no tag at all,
+recoverable only because its branch `koni/dev/issue-1197` was **integrated by a plain `Merge branch …`,
+not a `Merge pull request #P`** — the merge form the PR-branch scan keyed on. All three verify by
+`merge-base --is-ancestor` against the release (0.7.4; and 1.1.36 / 1.0.2 recovered by `firstReleaseTag`,
+which the two also lacked), so they leave the PR tier for the commit+release tier (**11 → 8**;
+commit-bearing done **1448 → 1451**, git-provable version **1504 → 1506**). **The remaining eight stay
+honestly commit-less**, and the audit named why each: **four are bundle PRs** — the PR title declares
+this issue but every commit *and* the branch are tagged for a **sibling** (#3054's PR #3317 is branch
+`issue-3148`, all three commits `[Issue-3148]`; likewise #3809→`3788`, #763→bundle `717/736/759`,
+#1241→bundle `1242/1247`). Attaching a sibling's commit is the **bundle-inference we already reject**:
+the developer tagged that code for the other issue, and *which* commit fixed *this* one is a guess, not
+a fact ([D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true)).
+**One is a release-bump squash** — #1249's "PR" #1252 is the commit *"0.46.1 (#1252)"*, which delivered
+nothing (D106). **Three (#4692, #2688, #4593) have no local git trace at all** — branch deleted, no
+tagged commit. `assignee` was **left empty on #2054** rather than guessed: its commits are Nam Phạm's,
+but the board's tracker-owner (the authoritative assignee) maps a committer to many different owners, so
+git author ≠ assignee — honest-empty over a plausible-but-false login ([§69](LESSONS.md)).
 
 **Citations**: [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-check-ids.mjs` (the only tool kept in the repo — the generator, coverage, and fetch helpers are one-off setup scaffolding, kept in the session scratchpad, not the repo)
 
