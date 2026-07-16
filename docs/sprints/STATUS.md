@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-16 07:54:46 UTC
-> Total stories: 2886
+> Last generated: 2026-07-16 11:48:00 UTC
+> Total stories: 2887
 
 ## 📋 Backlog (296)
 
@@ -305,7 +305,7 @@
 | US-9.9 | Additional NFT collections & standards (ERC-6551) | EPIC-9 | P2 | 5 | — | — |
 | US-9.10 | NFT display & transfer hardening | EPIC-9 | P2 | 5 | — | — |
 
-## 🟢 Ready (16)
+## 🟢 Ready (15)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -323,7 +323,6 @@
 | US-41.418 | Support DeDot | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.423 | Implement Light-client related issues | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
 | US-41.429 | Other improvements | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
-| US-42.2 | Test — Cypress (CP) token on Base shows correctly in wallet (#703) | EPIC-42 | P3 | 3 | sprint-2026-W29 | MaiThuongNinni |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
 ## 🟡 In Progress (28)
@@ -376,7 +375,7 @@
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W28 | frenkie-ng |
 
-## ✅ Done (2330)
+## ✅ Done (2331)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2070,7 +2069,6 @@
 | US-33.61 | Support more XCM channels | EPIC-33 | P3 | 1 | sprint-2024-M06 | nulllpc |
 | US-33.62 | WebApp - Update validate for popup warning cross-chain PAH --> KAH | EPIC-33 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
 | US-33.63 | Fix bug not showing popup Swap confirmation when swap with Injected account | EPIC-33 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-33.64 | XCM version error on Pioneer | EPIC-33 | P3 | 1 | sprint-2024-M09 | bluezdot |
 | US-33.66 | Extension - Support XCM for Mythos | EPIC-33 | P3 | 1 | sprint-2024-M08 | nulllpc |
 | US-33.67 | Implement SnowBridge sdk to prevent asset loss | EPIC-33 | P3 | 1 | sprint-2025-M04 | S2kael |
 | US-33.68 | Extension - Update XCM to V4 | EPIC-33 | P3 | 1 | sprint-2025-M08 | bluezdot |
@@ -2310,8 +2308,8 @@
 | US-41.11 | Some experience improvements when adding Substrate and EVM parallel running mechanism | EPIC-41 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
 | US-41.12 | Adding Phala, Oak, Dolphin, Mangata X to the extension | EPIC-41 | P3 | 1 | sprint-2022-M04 | hieudd |
 | US-41.13 | Update Polkadex Paraid | EPIC-41 | P3 | 1 | sprint-2022-M04 | hieudd |
-| US-41.14 | Refactor code for pull request #133 | EPIC-41 | P3 | 1 | sprint-2022-M04 | — |
-| US-41.15 | InputAddress: No longer get data directly from the global object of the background page. Instead, use messages to get th | EPIC-41 | P3 | 1 | sprint-2022-M05 | — |
+| US-41.14 | Refactor code for pull request #133 | EPIC-41 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
+| US-41.15 | InputAddress: No longer get data directly from the global object of the background page. Instead, use messages to get th | EPIC-41 | P3 | 1 | sprint-2022-M05 | lw-cdm |
 | US-41.16 | Extension expand window | EPIC-41 | P3 | 1 | sprint-2022-M08 | S2kael |
 | US-41.18 | Fix bug and improve some experience | EPIC-41 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
 | US-41.19 | Bug on getAddressTokens of quartz_nft | EPIC-41 | P3 | 1 | sprint-2022-M05 | nulllpc |
@@ -2676,6 +2674,8 @@
 | US-41.495 | Extension – Some issues when merging in version 1.3.78 | EPIC-41 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
 | US-41.498 | Wallet | EPIC-41 | P3 | 1 | sprint-2026-M07 | — |
 | US-42.1 | Test — Stake/unstake screen bugs after upgrade (#5013) | EPIC-42 | P2 | 3 | sprint-2026-W29 | MaiThuongNinni |
+| US-42.2 | Test — Cypress (CP) token on Base shows correctly in wallet (#703) | EPIC-42 | P3 | 3 | sprint-2026-W29 | MaiThuongNinni |
+| US-42.3 | Test — Polkadot Hub EVM chain works correctly in wallet (#701) | EPIC-42 | P3 | 3 | sprint-2026-W29 | MaiThuongNinni |
 | US-5.1 | Phishing site blocking (@polkadot/phishing denylist) | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
 | US-5.2 | Master password & strength policy | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
 | US-5.3 | Forgot password → reset wallet | EPIC-5 | P0 | 3 | sprint-2023-M05 | S2kael |
@@ -2715,7 +2715,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (204)
+## 🗑️ Deprecated (205)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2860,6 +2860,7 @@ _No stories_
 | US-33.32 | Add XCM Support Between Picasso and Statemine | EPIC-33 | P3 | 1 | — | — |
 | US-33.57 | Handle XCM delivery fee | EPIC-33 | P3 | 1 | — | — |
 | US-33.59 | Add support XCM channels for DED | EPIC-33 | P3 | 1 | — | nulllpc |
+| US-33.64 | XCM version error on Pioneer | EPIC-33 | P3 | 1 | sprint-2024-M09 | bluezdot |
 | US-33.99 | [Bug] Prevent bug transfer cross-chain due to Asset Hub Migration | EPIC-33 | P3 | 1 | — | bluezdot |
 | US-34.22 | Follow up case Token list to buy is empty | EPIC-34 | P3 | 1 | — | — |
 | US-34.30 | Research Meld on-ramp | EPIC-34 | P3 | 1 | — | nulllpc |
@@ -2929,11 +2930,11 @@ _No stories_
 ## Summary
 
 - 📋 **Backlog**: 296
-- 🟢 **Ready**: 16
+- 🟢 **Ready**: 15
 - 🟡 **In Progress**: 28
 - 👀 **Review**: 12
-- ✅ **Done**: 2330
+- ✅ **Done**: 2331
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 204
+- 🗑️ **Deprecated**: 205
 
 ⚠️  **WIP limit exceeded**: 28 stories in-progress (limit: 3).

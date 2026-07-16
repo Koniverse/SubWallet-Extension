@@ -36,8 +36,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**105 stories** — 90 done (shipped), 3 in flight (ready / in-progress /
-review, from the Projects board), 6 backlog (open, not yet started), 6 deprecated
+**105 stories** — 89 done (shipped), 3 in flight (ready / in-progress /
+review, from the Projects board), 6 backlog (open, not yet started), 7 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -113,7 +113,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-33.61](../stories/US-33.61-support-more-xcm-channels.md) | ✅ done | Support more XCM channels | [#3134](https://github.com/Koniverse/SubWallet-Extension/issues/3134) | nulllpc | 1.2.4 |
 | [US-33.62](../stories/US-33.62-webapp-update-validate-for-popup-warning-cross-chain-pa.md) | ✅ done | WebApp - Update validate for popup warning cross-chain PAH --> KAH | [#3216](https://github.com/Koniverse/SubWallet-Extension/issues/3216) | frenkie-ng | 1.2.14 |
 | [US-33.63](../stories/US-33.63-fix-bug-not-showing-popup-swap-confirmation-when-swap-w.md) | ✅ done | Fix bug not showing popup Swap confirmation when swap with Injected account | [#3230](https://github.com/Koniverse/SubWallet-Extension/issues/3230) | frenkie-ng | 1.2.12 |
-| [US-33.64](../stories/US-33.64-xcm-version-error-on-pioneer.md) | ✅ done | XCM version error on Pioneer | [#3252](https://github.com/Koniverse/SubWallet-Extension/issues/3252) | bluezdot | — |
+| [US-33.64](../stories/US-33.64-xcm-version-error-on-pioneer.md) | ⏸️ deprecated | XCM version error on Pioneer | [#3252](https://github.com/Koniverse/SubWallet-Extension/issues/3252) | bluezdot | — |
 | [US-33.65](../stories/US-33.65-improve-experience-when-users-wait-to-receive-tokens-af.md) | 📋 backlog | Improve experience when users wait to receive tokens after XCM | [#3288](https://github.com/Koniverse/SubWallet-Extension/issues/3288) | bluezdot | — |
 | [US-33.66](../stories/US-33.66-extension-support-xcm-for-mythos.md) | ✅ done | Extension - Support XCM for Mythos | [#3389](https://github.com/Koniverse/SubWallet-Extension/issues/3389) | nulllpc | 1.2.24 |
 | [US-33.67](../stories/US-33.67-implement-snowbridge-sdk-to-prevent-asset-loss.md) | ✅ done | Implement SnowBridge sdk to prevent asset loss | [#3416](https://github.com/Koniverse/SubWallet-Extension/issues/3416) | S2kael | — |
@@ -158,5 +158,5 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — Every XCM & Bridge issue with no FR story has exactly one story here; its status matches the tracker (done = COMPLETED, backlog = open, deprecated = not-planned/duplicate).
+- [ ] **AC-1** — Every XCM & Bridge issue with no FR story has exactly one story here; its status matches the tracker (done = COMPLETED **and shipped**, backlog = open, deprecated = not-planned/duplicate **or closed-`completed` on GitHub but resolved by deprecation — feature/channel retired, fix unshipped, e.g. [US-33.64](../stories/US-33.64-xcm-version-error-on-pioneer.md)**).
 - [x] **AC-2** — `npx koni-docs validate` and `node scripts/koni-docs-check-ids.mjs` exit 0.
