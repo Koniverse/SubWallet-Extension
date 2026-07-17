@@ -99,4 +99,3 @@ _Forward-planned — not yet shipped. Fill `commit` / `version_shipped` on deliv
 
 - [PRD FR-88](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.3](US-9.3-evm-nft-display.md) · [US-9.5](US-9.5-nft-transfer-send.md)
 - [Roadmap issue #4881](https://github.com/Koniverse/SubWallet-Extension/issues/4881) — Add support for ERC-1155 token standard for NFTs on Ethereum
-</content>

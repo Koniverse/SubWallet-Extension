@@ -100,4 +100,3 @@ Commits `6e4091bf3f, 824a020641, 88402e9c33` verified contained in the v0.6.7 an
 ## Cross-references
 
 - [PRD FR-85](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.2](US-9.2-nested-bundled-nft-display.md) · [US-9.3](US-9.3-evm-nft-display.md)
-</content>

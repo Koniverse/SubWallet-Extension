@@ -131,4 +131,3 @@ and any implementation caveats during version reconciliation._
 - [Epic EPIC-7](../epics/EPIC-7.md)
 - [Epic EPIC-8](../epics/EPIC-8.md)
 - [US-7.1](US-7.1-aggregate-portfolio-across-accounts-and-chains.md)
-</content>

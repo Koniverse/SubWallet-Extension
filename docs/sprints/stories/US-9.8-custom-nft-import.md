@@ -86,4 +86,3 @@ Traced 2026-07-13 (US-21.2 straggler pass — this story was never a batch-2 can
 ## Cross-references
 
 - [PRD FR-92](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.1](US-9.1-substrate-nft-display.md) · [US-9.3](US-9.3-evm-nft-display.md)
-</content>

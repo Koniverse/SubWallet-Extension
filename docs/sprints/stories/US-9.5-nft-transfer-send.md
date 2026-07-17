@@ -92,4 +92,3 @@ Commits `c586a78109, b5d6f46647, f30463904d` verified contained in the v0.2.8 an
 ## Cross-references
 
 - [PRD FR-89](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.4](US-9.4-erc-1155-nft-support.md)
-</content>

@@ -91,4 +91,3 @@ Commits `896d66c588, bef3b8ad5b, c46bd61c02` verified contained in the v1.3.80 a
 ## Cross-references
 
 - [PRD FR-86](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.1](US-9.1-substrate-nft-display.md)
-</content>

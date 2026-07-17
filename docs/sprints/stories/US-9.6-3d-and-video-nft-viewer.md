@@ -94,4 +94,3 @@ Commits `bf810b9a187f08cd875edb5c5a827629167717c8, b6f96a6db3, 0695046c7cc81c33d
 ## Cross-references
 
 - [PRD FR-90](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.1](US-9.1-substrate-nft-display.md) · [US-9.10](US-9.10-nft-display-and-transfer-hardening.md)
-</content>

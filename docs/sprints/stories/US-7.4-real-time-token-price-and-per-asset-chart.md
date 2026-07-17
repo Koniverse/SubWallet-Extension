@@ -117,4 +117,3 @@ and any implementation caveats during version reconciliation._
 - [PRD FR-71](../../PRD.md#functional-requirements)
 - [Epic EPIC-7](../epics/EPIC-7.md)
 - [US-7.5](US-7.5-price-history-ohlcv-chart-per-asset.md)
-</content>

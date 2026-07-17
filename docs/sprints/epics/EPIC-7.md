@@ -213,5 +213,3 @@ sequenceDiagram
 - [ ] Each asset shows a historical OHLCV chart with selectable ranges — [US-7.5](../stories/US-7.5-price-history-ohlcv-chart-per-asset.md)
 - [ ] The portfolio shows historical total value over time — [US-7.6](../stories/US-7.6-balance-history-portfolio-value-over-time.md) (planned)
 - [ ] Balance/price caches invalidate on account-switch, chain-toggle and transfer-submit so the home screen never shows a stale figure after a state change — [US-7.7](../stories/US-7.7-balance-cache-invalidation-hardening.md)
-</content>
-</invoke>

@@ -113,4 +113,3 @@ and any implementation caveats during version reconciliation._
 - [PRD FR-70](../../PRD.md#functional-requirements)
 - [Epic EPIC-7](../epics/EPIC-7.md)
 - [US-7.1](US-7.1-aggregate-portfolio-across-accounts-and-chains.md)
-</content>

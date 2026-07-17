@@ -142,5 +142,3 @@ _Hardening story — no FR; consolidates NFT display/transfer-correctness issues
 ## Cross-references
 
 - [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.1](US-9.1-substrate-nft-display.md) · [US-9.5](US-9.5-nft-transfer-send.md) · [US-9.8](US-9.8-custom-nft-import.md) · [#2124](https://github.com/Koniverse/SubWallet-Extension/issues/2124) · [#2946](https://github.com/Koniverse/SubWallet-Extension/issues/2946) · [#3030](https://github.com/Koniverse/SubWallet-Extension/issues/3030) · [#3241](https://github.com/Koniverse/SubWallet-Extension/issues/3241) · [#4859](https://github.com/Koniverse/SubWallet-Extension/issues/4859)
-</content>
-</invoke>

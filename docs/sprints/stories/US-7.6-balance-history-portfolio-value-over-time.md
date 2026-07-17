@@ -130,4 +130,3 @@ _Forward / planned story — authored ahead of implementation. Fill `commit`,
 - [US-7.4](US-7.4-real-time-token-price-and-per-asset-chart.md)
 - [US-7.5](US-7.5-price-history-ohlcv-chart-per-asset.md)
 - [Roadmap issue #4121](https://github.com/Koniverse/SubWallet-Extension/issues/4121) — Support portfolio chart
-</content>

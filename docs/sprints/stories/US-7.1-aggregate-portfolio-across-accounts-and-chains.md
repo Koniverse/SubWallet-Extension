@@ -144,4 +144,3 @@ Traced 2026-07-13 (US-21.2 straggler pass). Same first-delivery bullet as the en
 - [Epic EPIC-7](../epics/EPIC-7.md)
 - [US-2.5](US-2.5-balance-detection-and-aggregation-engine.md)
 - [US-7.2](US-7.2-transferable-vs-locked-balance-calculation.md)
-</content>

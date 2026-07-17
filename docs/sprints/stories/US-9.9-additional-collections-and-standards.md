@@ -96,4 +96,3 @@ _Forward-looking — FR-93 is `📋 planned`. Fill `commit` / `version_shipped` 
 
 - [PRD FR-93](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.1](US-9.1-substrate-nft-display.md) · [US-9.3](US-9.3-evm-nft-display.md)
 - [Roadmap issue #2485](https://github.com/Koniverse/SubWallet-Extension/issues/2485) — Research ERC-6551
-</content>
