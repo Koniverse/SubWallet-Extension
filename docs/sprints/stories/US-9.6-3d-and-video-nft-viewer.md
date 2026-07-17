@@ -91,6 +91,16 @@ Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-
 
 Commits `bf810b9a187f08cd875edb5c5a827629167717c8, b6f96a6db3, 0695046c7cc81c33dca6a0f0124e968306f79c4e` verified contained in the v0.6.5 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
+## Incremental work, fixes & chores
+
+This capability's tracker issues — the initial 3D-viewer delivery and its follow-ups (3D re-delivery after the v1.0 UI rewrite, video sizing). Chronological by shipped release; the earliest video render path (v0.2.5) predates issue tracking and is evidenced by commit `0695046c7c` (see Implementation notes).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.6.5 | [#662](https://github.com/Koniverse/SubWallet-Extension/issues/662) | Support 3D viewer for NFT | ✅ done |
+| 1.0.10 | [#1516](https://github.com/Koniverse/SubWallet-Extension/issues/1516) | Support display 3D NFT | ✅ done |
+| 1.1.3 | [#1651](https://github.com/Koniverse/SubWallet-Extension/issues/1651) | Fix Video NFT size | ✅ done |
+
 ## Cross-references
 
 - [PRD FR-90](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.1](US-9.1-substrate-nft-display.md) · [US-9.10](US-9.10-nft-display-and-transfer-hardening.md)

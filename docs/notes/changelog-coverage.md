@@ -495,55 +495,55 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#1654](https://github.com/Koniverse/SubWallet-Extension/issues/1654) | Fixed bug Show incorrect transaction time on the history screen (#1654) | 1.1.3 | 2023-07-21 | US-28.89 |
 | [#1657](https://github.com/Koniverse/SubWallet-Extension/issues/1657) | Fixed bug Do not validate amount of the recipient address in case send token (#1657) | 1.1.3 | 2023-07-21 | US-28.90 |
 | [#1872](https://github.com/Koniverse/SubWallet-Extension/issues/1872) | Allow paste Amount to send (#1872) | 1.1.13 | 2023-09-21 | US-28.96 |
-| [#12](https://github.com/Koniverse/SubWallet-Extension/issues/12) | Integrate Snow EVM network (#12) | 1.0.5 | 2023-05-21 | US-9.12 |
-| [#3762](https://github.com/Koniverse/SubWallet-Extension/issues/3762) | Fixed bug send NFT on Ethereum network (#3762) | 1.3.9 | 2024-12-09 | US-9.14 |
-| [#3791](https://github.com/Koniverse/SubWallet-Extension/issues/3791) | Fix bug show OG WUD BURN NFT Collection (#3791) | 1.3.3 | 2024-10-16 | US-9.16 |
-| [#3818](https://github.com/Koniverse/SubWallet-Extension/issues/3818) | Fixed bug import NFT (#3837) (#3818) | 1.3.49 | 2025-07-28 | US-9.15 |
-| [#3837](https://github.com/Koniverse/SubWallet-Extension/issues/3837) | Fixed bug import NFT (#3837) (#3818) | 1.3.49 | 2025-07-28 | US-9.15 |
-| [#3854](https://github.com/Koniverse/SubWallet-Extension/issues/3854) | Integration NFT for Story Protocol (#3854) | 1.3.7 | 2024-11-23 | US-9.12 |
+| [#12](https://github.com/Koniverse/SubWallet-Extension/issues/12) | Integrate Snow EVM network (#12) | 1.0.5 | 2023-05-21 | US-9.3 |
+| [#3762](https://github.com/Koniverse/SubWallet-Extension/issues/3762) | Fixed bug send NFT on Ethereum network (#3762) | 1.3.9 | 2024-12-09 | US-9.5 |
+| [#3791](https://github.com/Koniverse/SubWallet-Extension/issues/3791) | Fix bug show OG WUD BURN NFT Collection (#3791) | 1.3.3 | 2024-10-16 | US-9.10 |
+| [#3818](https://github.com/Koniverse/SubWallet-Extension/issues/3818) | Fixed bug import NFT (#3837) (#3818) | 1.3.49 | 2025-07-28 | US-9.8 |
+| [#3837](https://github.com/Koniverse/SubWallet-Extension/issues/3837) | Fixed bug import NFT (#3837) (#3818) | 1.3.49 | 2025-07-28 | US-9.8 |
+| [#3854](https://github.com/Koniverse/SubWallet-Extension/issues/3854) | Integration NFT for Story Protocol (#3854) | 1.3.7 | 2024-11-23 | US-9.3 |
 | [#4132](https://github.com/Koniverse/SubWallet-Extension/issues/4132) | Fixed bug Do not display NFT images on Vara network, PAH (#4132) | 1.3.56 | 2025-09-11 | US-9.13 |
-| [#4568](https://github.com/Koniverse/SubWallet-Extension/issues/4568) | Support show NFT haven't method tokenOfOwnerByIndex (#4568) | 1.3.68 | 2025-12-03 | US-9.15 |
-| [#4625](https://github.com/Koniverse/SubWallet-Extension/issues/4625) | Unable to import NFT ERC-721 on Rari chain (#4625) | 1.3.68 | 2025-12-03 | US-9.15 |
-| [#4884](https://github.com/Koniverse/SubWallet-Extension/issues/4884) | Implement NFTService + Migrate EVM & Unique Network NFT logic (Phase 1) (#4884) | 1.3.80 | 2026-06-02 | US-9.2 |
-| [#105](https://github.com/Koniverse/SubWallet-Extension/issues/105) | Some problems related to NFT function (issue #105) | 0.3.3 | 2022-04-08 | US-9.16 |
-| [#109](https://github.com/Koniverse/SubWallet-Extension/issues/109) | Improve NFT display with extending mode (issue #109) | 0.3.3 | 2022-04-08 | US-9.16 |
-| [#184](https://github.com/Koniverse/SubWallet-Extension/issues/184) | Integrate new cross-chain tokens on Karura (RMRK, ARIS, QTZ, ...) (#184) | 0.4.2 | 2022-05-20 | US-9.11 |
-| [#200](https://github.com/Koniverse/SubWallet-Extension/issues/200) | Fix bug can not load NFT (#200) | 0.4.1 | 2022-05-11 | US-9.16 |
-| [#209](https://github.com/Koniverse/SubWallet-Extension/issues/209) | Fix bug can not send EVM NFT (#209) | 0.4.1 | 2022-05-11 | US-9.14 |
-| [#27](https://github.com/Koniverse/SubWallet-Extension/issues/27) | Update RPC endpoint for Mangata (#27) | 1.0.5 | 2023-05-21 | US-9.12 |
-| [#265](https://github.com/Koniverse/SubWallet-Extension/issues/265) | Bug Send NFT when balance is too low (#265) | 0.4.3 | 2022-05-31 | US-9.14 |
-| [#321](https://github.com/Koniverse/SubWallet-Extension/issues/321) | Fix bug "Encountered an error, please try again" when Send NFT (#321) | 0.4.4 | 2022-06-08 | US-9.14 |
+| [#4568](https://github.com/Koniverse/SubWallet-Extension/issues/4568) | Support show NFT haven't method tokenOfOwnerByIndex (#4568) | 1.3.68 | 2025-12-03 | US-9.8 |
+| [#4625](https://github.com/Koniverse/SubWallet-Extension/issues/4625) | Unable to import NFT ERC-721 on Rari chain (#4625) | 1.3.68 | 2025-12-03 | US-9.8 |
+| [#4884](https://github.com/Koniverse/SubWallet-Extension/issues/4884) | Implement NFTService + Migrate EVM & Unique Network NFT logic (Phase 1) (#4884) | 1.3.80 | 2026-06-02 | US-9.20 |
+| [#105](https://github.com/Koniverse/SubWallet-Extension/issues/105) | Some problems related to NFT function (issue #105) | 0.3.3 | 2022-04-08 | US-9.10 |
+| [#109](https://github.com/Koniverse/SubWallet-Extension/issues/109) | Improve NFT display with extending mode (issue #109) | 0.3.3 | 2022-04-08 | US-9.10 |
+| [#184](https://github.com/Koniverse/SubWallet-Extension/issues/184) | Integrate new cross-chain tokens on Karura (RMRK, ARIS, QTZ, ...) (#184) | 0.4.2 | 2022-05-20 | US-9.1 |
+| [#200](https://github.com/Koniverse/SubWallet-Extension/issues/200) | Fix bug can not load NFT (#200) | 0.4.1 | 2022-05-11 | US-9.10 |
+| [#209](https://github.com/Koniverse/SubWallet-Extension/issues/209) | Fix bug can not send EVM NFT (#209) | 0.4.1 | 2022-05-11 | US-9.5 |
+| [#27](https://github.com/Koniverse/SubWallet-Extension/issues/27) | Update RPC endpoint for Mangata (#27) | 1.0.5 | 2023-05-21 | US-9.3 |
+| [#265](https://github.com/Koniverse/SubWallet-Extension/issues/265) | Bug Send NFT when balance is too low (#265) | 0.4.3 | 2022-05-31 | US-9.5 |
+| [#321](https://github.com/Koniverse/SubWallet-Extension/issues/321) | Fix bug "Encountered an error, please try again" when Send NFT (#321) | 0.4.4 | 2022-06-08 | US-9.5 |
 | [#480](https://github.com/Koniverse/SubWallet-Extension/issues/480) | Optimize NFT loading with <https://nft.storage/> (#480) | 0.5.3 | 2022-07-29 | US-9.13 |
-| [#517](https://github.com/Koniverse/SubWallet-Extension/issues/517) | Add Moonpets NFT (#517) | 0.5.4 | 2022-08-05 | US-9.12 |
+| [#517](https://github.com/Koniverse/SubWallet-Extension/issues/517) | Add Moonpets NFT (#517) | 0.5.4 | 2022-08-05 | US-9.3 |
 | [#557](https://github.com/Koniverse/SubWallet-Extension/issues/557) | Fix bug happens when NFT image error (#557) | 0.5.6 | 2022-08-24 | US-9.13 |
 | [#639](https://github.com/Koniverse/SubWallet-Extension/issues/639) | Add support for USDC & stEWT (#639) | 1.3.72 | 2026-01-14 | US-29.38 |
-| [#643](https://github.com/Koniverse/SubWallet-Extension/issues/643) | Add more attributes to NFT collection and item (#643) | 0.6.4 | 2022-09-22 | US-9.16 |
-| [#29](https://github.com/Koniverse/SubWallet-Extension/issues/29) | Update Zeitgeist and Subsocial integration (#29) | 1.0.5 | 2023-05-21 | US-9.11 |
-| [#649](https://github.com/Koniverse/SubWallet-Extension/issues/649) | Integrate Pioneer Network NFT (#649) | 0.6.5 | 2022-09-24 | US-9.11 |
-| [#747](https://github.com/Koniverse/SubWallet-Extension/issues/747) | Issue sending Bit.Country NFT and displaying BIT token (#747) | 0.6.8 | 2022-10-31 | US-9.14 |
-| [#759](https://github.com/Koniverse/SubWallet-Extension/issues/759) | Unable to send NFT with QR Account in case of network not selected (#759) | 0.6.8 | 2022-10-31 | US-9.14 |
-| [#864](https://github.com/Koniverse/SubWallet-Extension/issues/864) | Fix bug NFT displays an error after update function parses transaction in case upgrade version (#864) | 0.7.4 | 2022-12-04 | US-9.16 |
+| [#643](https://github.com/Koniverse/SubWallet-Extension/issues/643) | Add more attributes to NFT collection and item (#643) | 0.6.4 | 2022-09-22 | US-9.10 |
+| [#29](https://github.com/Koniverse/SubWallet-Extension/issues/29) | Update Zeitgeist and Subsocial integration (#29) | 1.0.5 | 2023-05-21 | US-9.1 |
+| [#649](https://github.com/Koniverse/SubWallet-Extension/issues/649) | Integrate Pioneer Network NFT (#649) | 0.6.5 | 2022-09-24 | US-9.1 |
+| [#747](https://github.com/Koniverse/SubWallet-Extension/issues/747) | Issue sending Bit.Country NFT and displaying BIT token (#747) | 0.6.8 | 2022-10-31 | US-9.5 |
+| [#759](https://github.com/Koniverse/SubWallet-Extension/issues/759) | Unable to send NFT with QR Account in case of network not selected (#759) | 0.6.8 | 2022-10-31 | US-9.5 |
+| [#864](https://github.com/Koniverse/SubWallet-Extension/issues/864) | Fix bug NFT displays an error after update function parses transaction in case upgrade version (#864) | 0.7.4 | 2022-12-04 | US-9.10 |
 | [#893](https://github.com/Koniverse/SubWallet-Extension/issues/893) | Update RMRK NFT endpoints (#893) | 0.7.5 | 2022-12-15 | US-9.13 |
-| [#950](https://github.com/Koniverse/SubWallet-Extension/issues/950) | Do not show sub0 Lisbon 2022 NFT (#950) | 0.7.7 | 2022-12-28 | US-9.11 |
+| [#950](https://github.com/Koniverse/SubWallet-Extension/issues/950) | Do not show sub0 Lisbon 2022 NFT (#950) | 0.7.7 | 2022-12-28 | US-9.1 |
 | [#963](https://github.com/Koniverse/SubWallet-Extension/issues/963) | Update RMRK NFT endpoints (#963) | 0.8.1 | 2023-02-03 | US-9.13 |
-| [#1095](https://github.com/Koniverse/SubWallet-Extension/issues/1095) | Update logic for ink 4.0 and delete old PSP token (#1095) | 0.8.3 | 2023-03-29 | US-9.11 |
-| [#34](https://github.com/Koniverse/SubWallet-Extension/issues/34) | Send & Receive Moonbeam / Moonriver NFT (issue #34) | 0.3.1 | 2022-04-05 | US-9.12 |
-| [#1335](https://github.com/Koniverse/SubWallet-Extension/issues/1335) | Integrate Land/Estate NFT on Pioneer's metaverses (#1335) | 1.1.2 | 2023-07-14 | US-9.11 |
-| [#1404](https://github.com/Koniverse/SubWallet-Extension/issues/1404) | Fix bug show Moonfit’s NFT (#1404) | 1.0.6 | 2023-05-26 | US-9.12 |
+| [#1095](https://github.com/Koniverse/SubWallet-Extension/issues/1095) | Update logic for ink 4.0 and delete old PSP token (#1095) | 0.8.3 | 2023-03-29 | US-9.1 |
+| [#34](https://github.com/Koniverse/SubWallet-Extension/issues/34) | Send & Receive Moonbeam / Moonriver NFT (issue #34) | 0.3.1 | 2022-04-05 | US-9.3 |
+| [#1335](https://github.com/Koniverse/SubWallet-Extension/issues/1335) | Integrate Land/Estate NFT on Pioneer's metaverses (#1335) | 1.1.2 | 2023-07-14 | US-9.1 |
+| [#1404](https://github.com/Koniverse/SubWallet-Extension/issues/1404) | Fix bug show Moonfit’s NFT (#1404) | 1.0.6 | 2023-05-26 | US-9.3 |
 | [#1414](https://github.com/Koniverse/SubWallet-Extension/issues/1414) | Update RMRK API (#1414) | 1.0.6 | 2023-05-26 | US-9.13 |
 | [#1602](https://github.com/Koniverse/SubWallet-Extension/issues/1602) | Fixed NFT Gateway problems with non-extension environment (#1602) | 1.1.1 | 2023-07-06 | US-9.13 |
-| [#44](https://github.com/Koniverse/SubWallet-Extension/issues/44) | Integrate Astar NFT (issue #44) | 0.3.2 | 2022-04-07 | US-9.11 |
+| [#44](https://github.com/Koniverse/SubWallet-Extension/issues/44) | Integrate Astar NFT (issue #44) | 0.3.2 | 2022-04-07 | US-9.1 |
 | [#1672](https://github.com/Koniverse/SubWallet-Extension/issues/1672) | Can not load another NFTs when collection contain any NFT with wrong information (#1672) | 1.1.4 | 2023-07-24 | US-9.13 |
-| [#1784](https://github.com/Koniverse/SubWallet-Extension/issues/1784) | Show collection ID and NFT Id in the NFT detail screen (#1784) | 1.1.8 | 2023-08-12 | US-9.16 |
-| [#1817](https://github.com/Koniverse/SubWallet-Extension/issues/1817) | Fix a few minor bugs with NFT (#1817) | 1.1.9 | 2023-08-22 | US-9.16 |
-| [#52](https://github.com/Koniverse/SubWallet-Extension/issues/52) | Integrate Bit.Country NFT: Display, Send, Receive (issue #52) | 0.3.1 | 2022-04-05 | US-9.11 |
-| [#2029](https://github.com/Koniverse/SubWallet-Extension/issues/2029) | Fixed bug Do not show Acala, Karura NFT (#2029) | 1.1.18 | 2023-10-20 | US-9.11 |
-| [#2373](https://github.com/Koniverse/SubWallet-Extension/issues/2373) | Fixed bug show transfer NFT history details (#2373) | 1.1.27 | 2023-12-20 | US-9.14 |
-| [#2748](https://github.com/Koniverse/SubWallet-Extension/issues/2748) | Fixed bug error page on NFT details screen (#2748) | 1.1.44 | 2024-03-16 | US-9.16 |
-| [#3115](https://github.com/Koniverse/SubWallet-Extension/issues/3115) | Fix error when fetching with Avail network (#3115) | 1.1.68 | 2024-05-25 | US-9.18 |
-| [#3133](https://github.com/Koniverse/SubWallet-Extension/issues/3133) | Fix bug Show incorrect Amount on Transaction history, Transaction confirmation for transfer NFT (#3133) | 1.2.10 | 2024-06-25 | US-9.14 |
-| [#3559](https://github.com/Koniverse/SubWallet-Extension/issues/3559) | Support Ternoa NFT (#3559) | 1.3.2 | 2024-10-12 | US-9.11 |
-| [#3609](https://github.com/Koniverse/SubWallet-Extension/issues/3609) | Add validate tokenOfOwnerByIndex when import NFT (#3609) | 1.3.2 | 2024-10-12 | US-9.15 |
+| [#1784](https://github.com/Koniverse/SubWallet-Extension/issues/1784) | Show collection ID and NFT Id in the NFT detail screen (#1784) | 1.1.8 | 2023-08-12 | US-9.10 |
+| [#1817](https://github.com/Koniverse/SubWallet-Extension/issues/1817) | Fix a few minor bugs with NFT (#1817) | 1.1.9 | 2023-08-22 | US-9.10 |
+| [#52](https://github.com/Koniverse/SubWallet-Extension/issues/52) | Integrate Bit.Country NFT: Display, Send, Receive (issue #52) | 0.3.1 | 2022-04-05 | US-9.1 |
+| [#2029](https://github.com/Koniverse/SubWallet-Extension/issues/2029) | Fixed bug Do not show Acala, Karura NFT (#2029) | 1.1.18 | 2023-10-20 | US-9.1 |
+| [#2373](https://github.com/Koniverse/SubWallet-Extension/issues/2373) | Fixed bug show transfer NFT history details (#2373) | 1.1.27 | 2023-12-20 | US-9.5 |
+| [#2748](https://github.com/Koniverse/SubWallet-Extension/issues/2748) | Fixed bug error page on NFT details screen (#2748) | 1.1.44 | 2024-03-16 | US-9.10 |
+| [#3115](https://github.com/Koniverse/SubWallet-Extension/issues/3115) | Fix error when fetching with Avail network (#3115) | 1.1.68 | 2024-05-25 | US-9.1 |
+| [#3133](https://github.com/Koniverse/SubWallet-Extension/issues/3133) | Fix bug Show incorrect Amount on Transaction history, Transaction confirmation for transfer NFT (#3133) | 1.2.10 | 2024-06-25 | US-9.5 |
+| [#3559](https://github.com/Koniverse/SubWallet-Extension/issues/3559) | Support Ternoa NFT (#3559) | 1.3.2 | 2024-10-12 | US-9.1 |
+| [#3609](https://github.com/Koniverse/SubWallet-Extension/issues/3609) | Add validate tokenOfOwnerByIndex when import NFT (#3609) | 1.3.2 | 2024-10-12 | US-9.8 |
 | [#1762](https://github.com/Koniverse/SubWallet-Extension/issues/1762) | Fixed bug do not delete connection when reset wallet (#1762) | 1.1.8 | 2023-08-12 | US-30.100 |
 | [#1806](https://github.com/Koniverse/SubWallet-Extension/issues/1806) | Update Banxa service (#1806) | 1.1.9 | 2023-08-22 | US-30.105 |
 | [#1906](https://github.com/Koniverse/SubWallet-Extension/issues/1906) | Add injected placeholder to avoid extension cannot load in the first time (#1906) | 1.1.13 | 2023-09-21 | US-30.110 |
@@ -1139,12 +1139,12 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#1224](https://github.com/Koniverse/SubWallet-Extension/issues/1224) | Reset Wallet Feature (#1224) | 1.0.4 | 2023-05-12 | US-41.99 |
 | [#1798](https://github.com/Koniverse/SubWallet-Extension/issues/1798) | Improve import security (#1798) | 1.1.10 | 2023-08-26 | US-5.5 |
 | [#4989](https://github.com/Koniverse/SubWallet-Extension/issues/4989) | Signing popup crashes with "Unable to create Enum via index 9" when SignerPayload.assetId is a V5 cross-consensus Location (#4989) | 1.3.82 | 2026-07-06 | US-8.13 |
-| [#2580](https://github.com/Koniverse/SubWallet-Extension/issues/2580) | Unique Network and Quartz NFTs support (#2580) | 1.1.36 | 2024-02-06 | US-9.2 |
+| [#2580](https://github.com/Koniverse/SubWallet-Extension/issues/2580) | Unique Network and Quartz NFTs support (#2580) | 1.1.36 | 2024-02-06 | US-9.1 |
 | [#33](https://github.com/Koniverse/SubWallet-Extension/issues/33) | Display Moonbeam / Moonriver NFT (issue #33) | 0.3.1 | 2022-04-05 | US-9.3 |
 | [#662](https://github.com/Koniverse/SubWallet-Extension/issues/662) | Support 3D viewer for NFT (#662) | 0.6.5 | 2022-09-24 | US-9.6 |
 | [#1516](https://github.com/Koniverse/SubWallet-Extension/issues/1516) | Support display 3D NFT (#1516) | 1.0.10 | 2023-06-17 | US-9.6 |
 | [#1651](https://github.com/Koniverse/SubWallet-Extension/issues/1651) | Fixed bug video NFT size (#1651) | 1.1.3 | 2023-07-21 | US-9.6 |
-| [#3726](https://github.com/Koniverse/SubWallet-Extension/issues/3726) | Support ERC-1155 (#3726) | 1.3.5 | 2024-10-31 | US-9.8 |
+| [#3726](https://github.com/Koniverse/SubWallet-Extension/issues/3726) | Support ERC-1155 (#3726) | 1.3.5 | 2024-10-31 | US-9.4 |
 
 ## Linked — no citation, but an existing story owns the capability (inferred)
 

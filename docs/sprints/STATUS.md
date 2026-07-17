@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-17 09:47:46 UTC
-> Total stories: 2784
+> Last generated: 2026-07-17 11:06:55 UTC
+> Total stories: 2777
 
-## 📋 Backlog (293)
+## 📋 Backlog (292)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -298,8 +298,7 @@
 | US-9.4 | ERC-1155 NFT support (display & transfer) | EPIC-9 | P2 | 5 | — | — |
 | US-9.7 | Bitcoin Ordinals / inscriptions display | EPIC-9 | P2 | 5 | — | — |
 | US-9.9 | Additional NFT collections & standards (ERC-6551) | EPIC-9 | P2 | 5 | — | — |
-| US-9.10 | NFT display & transfer hardening | EPIC-9 | P2 | 5 | — | — |
-| US-9.20 | Client-side NFT Service & SDK migration | EPIC-9 | P3 | 1 | — | frenkie-ng |
+| US-9.10 | NFT display & UI hardening | EPIC-9 | P2 | 5 | — | — |
 | US-9.21 | NFT portfolio management | EPIC-9 | P3 | 1 | — | — |
 
 ## 🟢 Ready (15)
@@ -322,7 +321,7 @@
 | US-41.429 | Other improvements | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (28)
+## 🟡 In Progress (29)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -354,6 +353,7 @@
 | US-41.426 | Product review Q3-2024 | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
 | US-41.444 | 🚀 Migration to ink! v6 & Support for pallet_revive on Polkadot Hub | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.496 | WebApp - Update the latest code 1.3.83 | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
+| US-9.20 | Client-side NFT Service & SDK migration | EPIC-9 | P3 | 1 | — | frenkie-ng |
 
 ## 👀 Review (12)
 
@@ -372,7 +372,7 @@
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W28 | frenkie-ng |
 
-## ✅ Done (2230)
+## ✅ Done (2223)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2595,14 +2595,7 @@
 | US-9.5 | NFT transfer (send) | EPIC-9 | P1 | 3 | sprint-2022-M03 | nulllpc |
 | US-9.6 | 3D and video NFT viewer | EPIC-9 | P2 | 5 | sprint-2022-M09 | nulllpc |
 | US-9.8 | Custom NFT import | EPIC-9 | P2 | 3 | sprint-2022-M05 | nulllpc |
-| US-9.11 | Substrate NFT collection & chain integrations | EPIC-9 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
-| US-9.12 | EVM NFT collection integrations | EPIC-9 | P3 | 1 | sprint-2024-M11 | tunghp2002 |
 | US-9.13 | NFT media & IPFS gateway pipeline | EPIC-9 | P3 | 1 | sprint-2025-M09 | Thiendekaco |
-| US-9.14 | NFT send / transfer hardening | EPIC-9 | P3 | 1 | sprint-2024-M12 | PDTnhah |
-| US-9.15 | NFT import & validation hardening | EPIC-9 | P3 | 1 | sprint-2025-M12 | frenkie-ng |
-| US-9.16 | NFT display, detail & webapp UI hardening | EPIC-9 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
-| US-9.17 | Bitcoin Ordinals & inscriptions (shipped) | EPIC-9 | P3 | 1 | sprint-2023-M12 | nulllpc |
-| US-9.18 | Avail Light Client NFT | EPIC-9 | P3 | 1 | sprint-2024-M07 | bluezdot |
 | US-9.19 | NFT service migration | EPIC-9 | P3 | 1 | sprint-2023-M06 | nulllpc |
 | US-29.38 | Add support for USDC & stEWT | EPIC-9 | P3 | 1 | sprint-2026-M01 | nulllpc |
 | US-29.79 | [Grab 100 MDOT] Mint NFT | EPIC-9 | P3 | 1 | sprint-2023-M10 | saltict |
@@ -2826,12 +2819,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 293
+- 📋 **Backlog**: 292
 - 🟢 **Ready**: 15
-- 🟡 **In Progress**: 28
+- 🟡 **In Progress**: 29
 - 👀 **Review**: 12
-- ✅ **Done**: 2230
+- ✅ **Done**: 2223
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 206
 
-⚠️  **WIP limit exceeded**: 28 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 29 stories in-progress (limit: 3).

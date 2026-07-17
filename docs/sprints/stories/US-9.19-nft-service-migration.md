@@ -8,6 +8,7 @@ points: 1
 sprint: sprint-2023-M06
 version_shipped: 1.0.2
 prd_ref: []
+arch_ref: [AD-24]
 assignee: nulllpc
 commit: e58a9257cb, c42ae99dc9, f143eacc34
 created: 2026-07-17
@@ -34,7 +35,7 @@ Chronological by shipped release (1.0.2). The former one-issue-per-story id (ret
 
 ## Evidence
 
-Issue #967 ("Migrate NFT feature") shipped in **v1.0.2** as the combined **"[Issue 1006 + 967] Migrate NFT feature into new UI"** PR. The delivering commits are tagged with the sibling **#1006** ("Upgrade UI - Screen Home / NFT", part of [US-9.16](US-9.16-nft-display-detail-and-webapp-ui-hardening.md)); #1006's own record claims only its *later* UI-fix commits, so the **migration** commits are unclaimed and are exactly this issue's goal ([D106](../../CONTEXT.md) — content over tag):
+Issue #967 ("Migrate NFT feature") shipped in **v1.0.2** as the combined **"[Issue 1006 + 967] Migrate NFT feature into new UI"** PR. The delivering commits are tagged with the sibling **#1006** ("Upgrade UI - Screen Home / NFT", part of [US-9.10](US-9.10-nft-display-and-transfer-hardening.md)); #1006's own record claims only its *later* UI-fix commits, so the **migration** commits are unclaimed and are exactly this issue's goal ([D106](../../CONTEXT.md) — content over tag):
 
 - `e58a9257cb` — *"[Issue-1006] merge upgrade-ui"*
 - `c42ae99dc9` — *"[Issue-1006] finish NFTCollectionDetail"*
@@ -54,4 +55,4 @@ by `nulllpc` (git author *Nam Phạm* → `nulllpc`, repo-owner-confirmed in the
 
 ## Cross-references
 
-- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md) · [US-9.16](US-9.16-nft-display-detail-and-webapp-ui-hardening.md) (sibling #1006) · [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md)
+- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md) · [US-9.10](US-9.10-nft-display-and-transfer-hardening.md) (sibling #1006) · [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md)

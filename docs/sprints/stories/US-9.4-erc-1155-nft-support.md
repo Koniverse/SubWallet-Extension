@@ -95,6 +95,14 @@ Materializes [FR-88](../../PRD.md#functional-requirements). **Forward-planned**
 
 _Forward-planned — not yet shipped. Fill `commit` / `version_shipped` on delivery._
 
+## Incremental work, fixes & chores
+
+ERC-1155 support is **partial**, so this story stays `backlog`: a **RARI-chain-specific** handler shipped (#3726, v1.3.5 — `packages/extension-base/src/koni/api/nft/rari/`), but **general EVM ERC-1155** items are filtered out during NFT parsing (a later `[Issue-4568]` fix, *"ignore ERC1155 items during EVM NFT parsing"*). FR-88 — general ERC-1155 **display + transfer** across EVM chains — is **not** yet delivered.
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.3.5 | [#3726](https://github.com/Koniverse/SubWallet-Extension/issues/3726) | Support ERC-1155 (RARI chain) | ✅ done |
+
 ## Cross-references
 
 - [PRD FR-88](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.3](US-9.3-evm-nft-display.md) · [US-9.5](US-9.5-nft-transfer-send.md)

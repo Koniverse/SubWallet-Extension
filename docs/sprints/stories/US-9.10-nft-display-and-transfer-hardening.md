@@ -1,6 +1,6 @@
 ---
 id: US-9.10
-title: "NFT display & transfer hardening"
+title: "NFT display & UI hardening"
 epic: EPIC-9
 status: backlog
 priority: P2
@@ -16,7 +16,6 @@ created: 2026-06-12
 updated: 2026-06-12
 ---
 
-> **Consolidated tracker issue (2026-07-17):** #2858 (*WebApp — Adjust showing/validating address on Send token/NFT/History, round 2* — backlog) is tracked under this story. See [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md).
 
 ## Goal
 
@@ -140,6 +139,40 @@ here, while signing/broadcast stay owned by EPIC-8/EPIC-2.
 ## Implementation notes
 
 _Hardening story — no FR; consolidates NFT display/transfer-correctness issues #2124, #2946, #3030, #3241, #4859. Re-grounded from an earlier mis-scoped "IPFS gateway & rendering" framing. Fill `commit` / `version_shipped` on delivery._
+
+## Incremental work, fixes & chores
+
+Beyond the requirement above, **25 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+
+> 4 issue(s) below are ⏸ **deprecated** — closed not-planned / superseded, never shipped.
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.3.3 | [#105](https://github.com/Koniverse/SubWallet-Extension/issues/105) | Some problems related to NFT function | ✅ done |
+| 0.3.3 | [#109](https://github.com/Koniverse/SubWallet-Extension/issues/109) | Improve NFT display with extending mode | ✅ done |
+| 0.3.4 | [#102](https://github.com/Koniverse/SubWallet-Extension/issues/102) | Improve get NFT flow | ✅ done |
+| 0.4.1 | [#200](https://github.com/Koniverse/SubWallet-Extension/issues/200) | Fix bug can not load NFT | ✅ done |
+| 0.6.4 | [#643](https://github.com/Koniverse/SubWallet-Extension/issues/643) | Add more attributes to NFT collection and item | ✅ done |
+| 0.7.4 | [#864](https://github.com/Koniverse/SubWallet-Extension/issues/864) | Fix bug NFT displays an error after update function parses transaction in case upgrade version | ✅ done |
+| 1.0.2 | [#1006](https://github.com/Koniverse/SubWallet-Extension/issues/1006) | Upgrade UI - Screen Home / NFT | ✅ done |
+| 1.0.2 | [#1172](https://github.com/Koniverse/SubWallet-Extension/issues/1172) | Upgrade UI - Improve some issues related to the NFT feature | ✅ done |
+| 1.0.2 | [#1235](https://github.com/Koniverse/SubWallet-Extension/issues/1235) | Still showing sent NFT when using 2 different browser | ✅ done |
+| 1.1.8 | [#1784](https://github.com/Koniverse/SubWallet-Extension/issues/1784) | Show collection ID and NFT Id in the NFT detail screen | ✅ done |
+| 1.1.9 | [#1817](https://github.com/Koniverse/SubWallet-Extension/issues/1817) | Fix a few minor bugs with NFT | ✅ done |
+| 1.1.36 | [#1683](https://github.com/Koniverse/SubWallet-Extension/issues/1683) | WebApp - Bugs related Manage NFT feature | ✅ done |
+| 1.1.36 | [#1835](https://github.com/Koniverse/SubWallet-Extension/issues/1835) | WebApp - Still showing sent NFT | ✅ done |
+| 1.1.36 | [#1978](https://github.com/Koniverse/SubWallet-Extension/issues/1978) | WebApp - NFT isn't displayed after import successfully | ✅ done |
+| 1.1.44 | [#2748](https://github.com/Koniverse/SubWallet-Extension/issues/2748) | Fixed bug error page on NFT details screen | ✅ done |
+| 1.3.3 | [#3791](https://github.com/Koniverse/SubWallet-Extension/issues/3791) | Fix bug show OG WUD BURN NFT Collection | ✅ done |
+| — | [#95](https://github.com/Koniverse/SubWallet-Extension/issues/95) | Display incorrect screen when click on “Back to Homepage” button in case Send NFT History has just been recorded on Subs | ✅ done |
+| — | [#97](https://github.com/Koniverse/SubWallet-Extension/issues/97) | Can't open or takes a long time to open the extension if I previously turned off the extension in the NFT tab ... | ✅ done |
+| — | [#1151](https://github.com/Koniverse/SubWallet-Extension/issues/1151) | Upgrade UI - Still show NFT when turning off the network | ✅ done |
+| — | [#1154](https://github.com/Koniverse/SubWallet-Extension/issues/1154) | Upgrade UI - Still shows NFT sent | ✅ done |
+| — | [#1258](https://github.com/Koniverse/SubWallet-Extension/issues/1258) | Show duplicate network enable message in the import token, import nft screen | ⏸ deprecated |
+| — | [#1300](https://github.com/Koniverse/SubWallet-Extension/issues/1300) | Bug when URL NFT collection fails | ⏸ deprecated |
+| — | [#1909](https://github.com/Koniverse/SubWallet-Extension/issues/1909) | WebApp - Re- check NFT of the Statemine network | ⏸ deprecated |
+| — | [#2106](https://github.com/Koniverse/SubWallet-Extension/issues/2106) | Do not delete NFT data when reset wallet | ⏸ deprecated |
+| — | [#2858](https://github.com/Koniverse/SubWallet-Extension/issues/2858) | WebApp - Adjust showing/validating address on Send token, Send NFT, History (Round 2) | 📋 backlog |
 
 ## Cross-references
 

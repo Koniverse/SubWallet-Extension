@@ -97,6 +97,44 @@ Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-
 
 Commits `6e4091bf3f, 824a020641, 88402e9c33` verified contained in the v0.6.7 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
+## Incremental work, fixes & chores
+
+Beyond the requirement above, **28 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+
+> 3 issue(s) below are ⏸ **deprecated** — closed not-planned / superseded, never shipped.
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.3.1 | [#52](https://github.com/Koniverse/SubWallet-Extension/issues/52) | Integrate Bit.Country NFT: Display, Send, Receive | ✅ done |
+| 0.3.2 | [#44](https://github.com/Koniverse/SubWallet-Extension/issues/44) | Integrate Astar NFT | ✅ done |
+| 0.3.4 | [#175](https://github.com/Koniverse/SubWallet-Extension/issues/175) | Update Astar NFT: Astar Pass & Astar Cats | ✅ done |
+| 0.4.2 | [#184](https://github.com/Koniverse/SubWallet-Extension/issues/184) | Integrate new cross-chain tokens on Karura (RMRK, ARIS, QTZ, ...) | ✅ done |
+| 0.6.4 | [#654](https://github.com/Koniverse/SubWallet-Extension/issues/654) | Add owner attribute to Pioneer NFT | ✅ done |
+| 0.6.5 | [#649](https://github.com/Koniverse/SubWallet-Extension/issues/649) | Integrate Pioneer Network NFT | ✅ done |
+| 0.6.7 | [#635](https://github.com/Koniverse/SubWallet-Extension/issues/635) | Integration ArtZero NFT | ✅ done |
+| 0.7.7 | [#950](https://github.com/Koniverse/SubWallet-Extension/issues/950) | Do not show sub0 Lisbon 2022 NFT | ✅ done |
+| 0.8.3 | [#1095](https://github.com/Koniverse/SubWallet-Extension/issues/1095) | Update logic for ink 4.0 and delete old PSP token | ✅ done |
+| 1.0.5 | [#29](https://github.com/Koniverse/SubWallet-Extension/issues/29) | Update Zeitgeist and Subsocial integration | ✅ done |
+| 1.1.2 | [#1335](https://github.com/Koniverse/SubWallet-Extension/issues/1335) | Integrate Land/Estate NFT on Pioneer's metaverses | ✅ done |
+| 1.1.18 | [#2029](https://github.com/Koniverse/SubWallet-Extension/issues/2029) | Fixed bug Do not show Acala, Karura NFT | ✅ done |
+| 1.1.36 | [#2580](https://github.com/Koniverse/SubWallet-Extension/issues/2580) | Unique Network and Quartz NFTs support | ✅ done |
+| 1.1.68 | [#3115](https://github.com/Koniverse/SubWallet-Extension/issues/3115) | Fix error when fetching with Avail network | ✅ done |
+| 1.2.21 | [#3191](https://github.com/Koniverse/SubWallet-Extension/issues/3191) | Support Avail Light Client NFT | ✅ done |
+| 1.3.2 | [#3559](https://github.com/Koniverse/SubWallet-Extension/issues/3559) | Support Ternoa NFT | ✅ done |
+| — | [#28](https://github.com/Koniverse/SubWallet-Extension/issues/28) | Send / Receive NFT: Acala & Karura | ✅ done |
+| — | [#30](https://github.com/Koniverse/SubWallet-Extension/issues/30) | Send / Receive NFT: Statemine / Statemint | ✅ done |
+| — | [#194](https://github.com/Koniverse/SubWallet-Extension/issues/194) | Collect NFT on Singular.app but it doesnt show on SubWallet | ✅ done |
+| — | [#205](https://github.com/Koniverse/SubWallet-Extension/issues/205) | Add Polka Potions NFT collection | ✅ done |
+| — | [#230](https://github.com/Koniverse/SubWallet-Extension/issues/230) | Integrate NFTs on Altair NFT Playground | ⏸ deprecated |
+| — | [#603](https://github.com/Koniverse/SubWallet-Extension/issues/603) | Integrate Gromlins NFT | ⏸ deprecated |
+| — | [#622](https://github.com/Koniverse/SubWallet-Extension/issues/622) | Support Bit.Country'NFT Trading and Land Portfolio | ✅ done |
+| — | [#688](https://github.com/Koniverse/SubWallet-Extension/issues/688) | Support Zeitgeist NFT | ✅ done |
+| — | [#1285](https://github.com/Koniverse/SubWallet-Extension/issues/1285) | Add ArtZero API for Astar's NFT | ✅ done |
+| — | [#1441](https://github.com/Koniverse/SubWallet-Extension/issues/1441) | Integrate Unique's NFT into SubWallet | ✅ done |
+| — | [#1646](https://github.com/Koniverse/SubWallet-Extension/issues/1646) | Support Zk Assets NFT | ⏸ deprecated |
+| — | [#2195](https://github.com/Koniverse/SubWallet-Extension/issues/2195) | Recheck the impact on NFT features when ArtZero updates its API | ✅ done |
+| — | [#3126](https://github.com/Koniverse/SubWallet-Extension/issues/3126) | Support Avail light client NFT | ✅ done |
+
 ## Cross-references
 
 - [PRD FR-85](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.2](US-9.2-nested-bundled-nft-display.md) · [US-9.3](US-9.3-evm-nft-display.md)

@@ -7,7 +7,8 @@ priority: P3
 points: 1
 sprint: sprint-2025-M09
 version_shipped: 1.3.56
-prd_ref: []
+prd_ref: [NFR-21]
+arch_ref: [AD-25]
 assignee: Thiendekaco
 commit: d8d80ba60f
 created: 2026-07-17

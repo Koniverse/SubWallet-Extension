@@ -65,9 +65,10 @@ EPIC-9 builds the NFT-shaped transfer request and hands it to that pipeline.
 | # | Pillar | Stories | Purpose |
 |---|---|---|---|
 | 1 | **Multi-standard display** | [US-9.1](../stories/US-9.1-substrate-nft-display.md), [US-9.2](../stories/US-9.2-nested-bundled-nft-display.md), [US-9.3](../stories/US-9.3-evm-nft-display.md), [US-9.4](../stories/US-9.4-erc-1155-nft-support.md), [US-9.7](../stories/US-9.7-bitcoin-ordinals-display.md) | Detect + show collections across Substrate, EVM, ERC-1155 and Bitcoin under one grid |
-| 2 | **Rich media rendering** | [US-9.6](../stories/US-9.6-3d-and-video-nft-viewer.md), [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | 3D / video viewer + NFT display & transfer correctness hardening (detail render, cross-browser display, transfer amount/message, import validation) |
+| 2 | **Rich media rendering** | [US-9.6](../stories/US-9.6-3d-and-video-nft-viewer.md), [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md), [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | 3D / video viewer + IPFS media pipeline + NFT display/UI correctness hardening (detail render, cross-browser display) |
 | 3 | **Collection extensibility** | [US-9.8](../stories/US-9.8-custom-nft-import.md), [US-9.9](../stories/US-9.9-additional-collections-and-standards.md) | Custom import by contract + additional collections / ERC-6551 token-bound accounts |
 | 4 | **Transfer** | [US-9.5](../stories/US-9.5-nft-transfer-send.md) | Build and send an NFT to any compatible address |
+| 5 | **NFT service & portfolio** | [US-9.19](../stories/US-9.19-nft-service-migration.md), [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md), [US-9.21](../stories/US-9.21-nft-portfolio-management.md) | NFT-service migration, client-side SDK migration, and portfolio management |
 
 ### Out of scope
 
@@ -95,16 +96,18 @@ EPIC-9 builds the NFT-shaped transfer request and hands it to that pipeline.
 | FR-93 | [US-9.9](../stories/US-9.9-additional-collections-and-standards.md) | 📋 backlog |
 
 > [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) is a
-> cross-cutting hardening story with **no FR** — it defends NFT display &
-> transfer correctness (detail render, cross-browser display, transfer
-> amount/message, import validation) across the display/transfer FRs above.
+> cross-cutting hardening story with **no FR** — it defends NFT display & UI
+> correctness (detail render, cross-browser display) across the display FRs
+> above. Transfer hardening now lives in [US-9.5](../stories/US-9.5-nft-transfer-send.md),
+> import validation in [US-9.8](../stories/US-9.8-custom-nft-import.md), and the
+> media pipeline in [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md).
 
 ## AD Coverage
 
 | AD | Title | Story |
 |----|-------|-------|
-| AD-24 | Backend Services SDK for multi-chain data aggregation (NFT) | [US-9.1](../stories/US-9.1-substrate-nft-display.md), [US-9.3](../stories/US-9.3-evm-nft-display.md), [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) |
-| AD-25 | Cache / CDN proxy layer — `ipfs-files` NFT media gateway | [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) |
+| AD-24 | Backend Services SDK for multi-chain data aggregation (NFT) | [US-9.1](../stories/US-9.1-substrate-nft-display.md), [US-9.3](../stories/US-9.3-evm-nft-display.md), [US-9.19](../stories/US-9.19-nft-service-migration.md), [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) |
+| AD-25 | Cache / CDN proxy layer — `ipfs-files` NFT media gateway | [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md) |
 
 > AD-22 (handler-per-type class hierarchy) is *referenced* — the NFT handler
 > registry follows the same pattern — but its primary materialization lives in
@@ -113,58 +116,28 @@ EPIC-9 builds the NFT-shaped transfer request and hands it to that pipeline.
 
 ## Stories
 
-EPIC-9 carries **two tiers of story**, both listed here so the epic reads as one set:
-
-- **FR-materializing stories** (`US-9.1`–`US-9.10`) — the requirement contracts mapped in [FR Coverage](#fr-coverage) and [Feature pillars](#feature-pillars) above.
-- **Consolidated maintenance stories** (`US-9.11`–`US-9.21`) — 114 tracker issues of incremental NFT work, grouped by capability (they materialize **no FR**). Each story carries a chronological timeline of its issues; `assignee` / `commit` / `sprint` / `version_shipped` are a representative anchor from the most recent constituent. Full issue→story map: [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
-
-Two mis-area issues stay under their retired `US-29.x` id, flagged for relocation.
-
-### FR-materializing stories (requirement contracts)
+Each NFT capability is **one story** — it carries its requirement (where it materializes an FR) *and* its full incremental-work history (fixes, chores, chain/collection integrations) as an "Incremental work, fixes & chores" timeline inside the story. There is no separate maintenance layer. **14 capability stories** below; 2 mis-area issues are kept for relocation.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-9.1](../stories/US-9.1-substrate-nft-display.md) | Substrate NFT display (RMRK / Unique / PSP-34) | Show Substrate NFT collections across RMRK 1.0/2.0, Unique/Quartz, Asset Hub and PSP-34/WASM | ✅ done | 0.6.7 |
-| [US-9.2](../stories/US-9.2-nested-bundled-nft-display.md) | Nested / bundled NFT display | Render parent–child bundles and let users navigate the nesting tree | ✅ done | 1.3.80 |
-| [US-9.3](../stories/US-9.3-evm-nft-display.md) | EVM NFT display (ERC-721) | Detect + show ERC-721 collections across EVM chains | ✅ done | 0.3.1 |
+| [US-9.1](../stories/US-9.1-substrate-nft-display.md) | Substrate NFT display (RMRK / Unique / PSP-34) | Substrate NFT collections + all Substrate chain/collection integrations | ✅ done | 0.6.7 |
+| [US-9.2](../stories/US-9.2-nested-bundled-nft-display.md) | Nested / bundled NFT display | Render parent–child bundles + nesting-tree navigation | ✅ done | 1.3.80 |
+| [US-9.3](../stories/US-9.3-evm-nft-display.md) | EVM NFT display (ERC-721) | ERC-721 collections + all EVM chain/collection integrations | ✅ done | 0.3.1 |
 | [US-9.4](../stories/US-9.4-erc-1155-nft-support.md) | ERC-1155 NFT support | Display + transfer multi-token-standard NFTs | 📋 backlog | — |
-| [US-9.5](../stories/US-9.5-nft-transfer-send.md) | NFT transfer (send) | Send an NFT to any compatible address | ✅ done | 0.2.8 |
+| [US-9.5](../stories/US-9.5-nft-transfer-send.md) | NFT transfer (send + hardening) | Send an NFT to any compatible address + all transfer hardening | ✅ done | 0.2.8 |
 | [US-9.6](../stories/US-9.6-3d-and-video-nft-viewer.md) | 3D and video NFT viewer | Render 3D models and video NFTs in item detail | ✅ done | 0.6.5 |
-| [US-9.7](../stories/US-9.7-bitcoin-ordinals-display.md) | Bitcoin Ordinals / inscriptions display | Show Ordinals inscriptions held on a Bitcoin account | 📋 backlog | — |
-| [US-9.8](../stories/US-9.8-custom-nft-import.md) | Custom NFT import | Add a collection by contract (ERC-721 / PSP-34) | ✅ done | 0.4.1 |
+| [US-9.7](../stories/US-9.7-bitcoin-ordinals-display.md) | Bitcoin Ordinals / inscriptions | Ordinals/inscriptions (webapp shipped; full extension support planned) | 📋 backlog | — |
+| [US-9.8](../stories/US-9.8-custom-nft-import.md) | Custom NFT import & validation | Import a collection by contract + all import/validation hardening | ✅ done | 0.4.1 |
 | [US-9.9](../stories/US-9.9-additional-collections-and-standards.md) | Additional collections & standards (ERC-6551) | Onboard Ternoa/Joystream/Aventus + ERC-6551 token-bound accounts | 📋 backlog | — |
-| [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | NFT display & transfer hardening | Harden NFT detail render, cross-browser display, transfer amount/message and import validation | 📋 backlog | — |
+| [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | NFT display & UI hardening | Detail render, cross-browser display, webapp UI correctness | 📋 backlog | — |
+| [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md) | NFT media & IPFS gateway pipeline | RMRK/IPFS endpoints, resolver, image-error & media reliability | ✅ done | 1.3.56 |
+| [US-9.19](../stories/US-9.19-nft-service-migration.md) | NFT service migration | Migrate the NFT feature into the new UI/service architecture | ✅ done | 1.0.2 |
+| [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) | Client-side NFT Service & SDK migration | Client-side NftService + migrate existing logic to the SDK | 📋 backlog | — |
+| [US-9.21](../stories/US-9.21-nft-portfolio-management.md) | NFT portfolio management | Organize and curate the NFTs a user holds | 📋 backlog | — |
 
-> US-9.9 (FR-93) is **📋 planned** in the PRD; it is authored here as `backlog` per Stream-B convention, with the planned state noted in its Background.
-
-### Consolidated maintenance stories (capability history — no FR)
-
-Grouped from **114 tracker issues** (formerly one story each). The **Goal** column leads with the issue count; **Version** is the last release the capability shipped in (the full span is in each story's timeline).
-
-| ID | Title | Goal | Status | Version |
-|---|---|---|---|---|
-| [US-9.11](../stories/US-9.11-substrate-nft-collection-and-chain-integrations.md) | Substrate NFT collection & chain integrations | 25 issues — onboard NFT for Substrate chains/collections (Astar, Bit.Country, Pioneer, Unique, Ternoa…) | ✅ done | 1.3.2 |
-| [US-9.12](../stories/US-9.12-evm-nft-collection-integrations.md) | EVM NFT collection integrations | 9 issues — onboard EVM NFT collections (Moonbeam, MoonFit, Snow, Story Protocol) | ✅ done | 1.3.7 |
-| [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md) | NFT media & IPFS gateway pipeline | 14 issues — RMRK/IPFS endpoints, resolver, image-error & media handling | ✅ done | 1.3.56 |
-| [US-9.14](../stories/US-9.14-nft-send-transfer-hardening.md) | NFT send / transfer hardening | 17 issues — harden NFT send (QR, address input, amount, Vara/Ethereum) | ✅ done | 1.3.9 |
-| [US-9.15](../stories/US-9.15-nft-import-and-validation-hardening.md) | NFT import & validation hardening | 11 issues — robust custom import + tokenOfOwnerByIndex validation | ✅ done | 1.3.68 |
-| [US-9.16](../stories/US-9.16-nft-display-detail-and-webapp-ui-hardening.md) | NFT display, detail & webapp UI hardening | 24 issues — display/detail/webapp UI correctness across the app's evolution | ✅ done | 1.3.3 |
-| [US-9.17](../stories/US-9.17-bitcoin-ordinals-and-inscriptions-shipped.md) | Bitcoin Ordinals & inscriptions (shipped) | 4 issues — Ordinals/inscriptions on webapp + BTC data source | ✅ done | 1.1.36 |
-| [US-9.18](../stories/US-9.18-avail-light-client-nft.md) | Avail Light Client NFT | 3 issues — Avail light-client NFT + fetch-error fixes | ✅ done | 1.2.21 |
-| [US-9.19](../stories/US-9.19-nft-service-migration.md) | NFT service migration | 1 issue — migrate the NFT feature into the new UI/service architecture | ✅ done | 1.0.2 |
-| [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) | Client-side NFT Service & SDK migration | 1 issue — client-side NFT Service + SDK migration | 📋 backlog | — |
-| [US-9.21](../stories/US-9.21-nft-portfolio-management.md) | NFT portfolio management | 1 issue — organize/curate held NFTs | 📋 backlog | — |
-
-> **4 more issues folded into the FR stories above:** **#4768** → [US-9.2](../stories/US-9.2-nested-bundled-nft-display.md) · **#4246 / #4295** → [US-9.7](../stories/US-9.7-bitcoin-ordinals-display.md) · **#2858** → [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md). Totals: **114 issues → 11 consolidated + 4 into FR stories** (2 more kept below = 116).
-
-### Kept in place — mis-area (pending relocation)
-
-Two non-NFT issues (routed here by the title heuristic) stay under their retired `US-29.x` id, flagged for relocation when their target epic is processed:
-
-| ID | Title | Goal | Status | Version |
-|---|---|---|---|---|
-| [US-29.38](../stories/US-29.38-add-support-for-usdc-stewt.md) | Add support for USDC & stEWT | Token support (not NFT) — mis-area, → EPIC-7 | ✅ done | 1.3.72 |
-| [US-29.79](../stories/US-29.79-grab-100-mdot-mint-nft.md) | [Grab 100 MDOT] Mint NFT | Mint-NFT campaign (not core NFT) — mis-area, → EPIC-19 | ✅ done | 1.1.36 |
+> **US-9.9** (FR-93) is 📋 planned in the PRD; authored here as `backlog` per Stream-B convention. **US-9.7** / **US-9.10** are `backlog` at the requirement level (the FR/hardening capability is not signed off) even though shipped incremental work appears in their timelines.
+>
+> **Kept in place — mis-area, pending relocation:** [US-29.38](../stories/US-29.38-add-support-for-usdc-stewt.md) (#639 USDC & stEWT — token support → EPIC-7) · [US-29.79](../stories/US-29.79-grab-100-mdot-mint-nft.md) (#1967 Mint NFT campaign → EPIC-19). Full issue→story map: [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
 
 ## Object map & user-story interactions
 
@@ -181,7 +154,11 @@ Two non-NFT issues (routed here by the title heuristic) stay under their retired
 | [US-9.7](../stories/US-9.7-bitcoin-ordinals-display.md) | Ordinals handler over `btc-api` inscriptions | FR-91 |
 | [US-9.8](../stories/US-9.8-custom-nft-import.md) | `NftImport` form + `upsertCustomToken` | FR-92 |
 | [US-9.9](../stories/US-9.9-additional-collections-and-standards.md) | New chain handlers + ERC-6551 token-bound accounts | FR-93 |
-| [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | NFT detail render + transfer-request confirmation + cross-browser display + import validation | — |
+| [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | NFT detail render + cross-browser display + webapp UI hardening | — |
+| [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md) | `NftService` IPFS media pipeline (`baseParseIPFSUrl` → `getRandomIpfsGateway`, multi-gateway fallback) | NFR-21 |
+| [US-9.19](../stories/US-9.19-nft-service-migration.md) | NFT feature migration onto the new-UI service architecture | AD-24 |
+| [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) | Client-side `NftService` + Services SDK migration | AD-24 |
+| [US-9.21](../stories/US-9.21-nft-portfolio-management.md) | NFT portfolio management (curation / organization) | — |
 
 ### End-to-end happy path
 
@@ -212,7 +189,7 @@ sequenceDiagram
 ## Cross-cutting invariants
 
 - **Standard-agnostic display ([FR-85](../../PRD.md#functional-requirements), [FR-87](../../PRD.md#functional-requirements)):** every standard plugs in as an `NftService` handler (`BaseNftHandler` subclass) feeding one collection grid + item-detail view; no story may add a standard-specific NFT-UI branch. Enforced per-story by a "new standard ⇒ new handler, not new screen" review check.
-- **All NFT media flows through the IPFS gateway proxy ([NFR-21](../../PRD.md#non-functional-requirements), AD-25):** no component fetches a raw `ipfs://` / pinned-gateway URL directly; everything is resolved through `baseParseIPFSUrl` → `getRandomIpfsGateway` with `ipfs-files.subwallet.app` as the weighted primary and public-gateway fallbacks. Enforced per-story by a "new render path resolves through the IPFS helper, never a raw gateway literal" review check on the media-rendering stories ([US-9.6](../stories/US-9.6-3d-and-video-nft-viewer.md)).
+- **All NFT media flows through the IPFS gateway proxy ([NFR-21](../../PRD.md#non-functional-requirements), AD-25):** no component fetches a raw `ipfs://` / pinned-gateway URL directly; everything is resolved through `baseParseIPFSUrl` → `getRandomIpfsGateway` with `ipfs-files.subwallet.app` as the weighted primary and public-gateway fallbacks. Enforced per-story by a "new render path resolves through the IPFS helper, never a raw gateway literal" review check on the media-rendering stories ([US-9.6](../stories/US-9.6-3d-and-video-nft-viewer.md), [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md)).
 - **Aggregated reads, not on-device full scans ([NFR-20](../../PRD.md#non-functional-requirements), AD-24):** collection/item detection is sourced through the Services SDK backend; handlers do not enumerate every contract on-chain from the client.
 - **Keyed Ordinals proxy is never bypassed ([NFR-16](../../PRD.md#non-functional-requirements), owned by EPIC-4):** the Bitcoin Ordinals read path goes through the `btc-api` service-token proxy; no provider key is read on-device. EPIC-9 consumes this guarantee, it does not weaken it. Enforced by [US-9.7](../stories/US-9.7-bitcoin-ordinals-display.md).
 - **Transfer assembly only, never signing here ([FR-89](../../PRD.md#functional-requirements)):** NFT stories build the transfer request and hand it to the EPIC-8/EPIC-2 signing pipeline; no story signs or broadcasts inside the NFT subsystem.
@@ -223,7 +200,7 @@ sequenceDiagram
 |---|---|---|
 | **NFT-collection load fixture (per-standard handler → shared grid)** | [US-9.1](../stories/US-9.1-substrate-nft-display.md), [US-9.2](../stories/US-9.2-nested-bundled-nft-display.md), [US-9.3](../stories/US-9.3-evm-nft-display.md), [US-9.7](../stories/US-9.7-bitcoin-ordinals-display.md), [US-9.9](../stories/US-9.9-additional-collections-and-standards.md) | Mock Services SDK backend payloads mapped to `NftCollection` / `NftItem` through `NftService` handlers |
 | **NFT transfer / submit harness** | [US-9.5](../stories/US-9.5-nft-transfer-send.md), [US-9.4](../stories/US-9.4-erc-1155-nft-support.md), [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | Transfer-request builder + stubbed TransactionService signing pipeline (amount/recipient/fee validation, confirmation amount/message) |
-| **Media-render / item-detail fixture** | [US-9.6](../stories/US-9.6-3d-and-video-nft-viewer.md), [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | `NftItemDetail` renderer with IPFS-gateway-proxy stub (media-type detection, gateway fallback, placeholder degrade) |
+| **Media-render / item-detail fixture** | [US-9.6](../stories/US-9.6-3d-and-video-nft-viewer.md), [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md), [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | `NftItemDetail` renderer with IPFS-gateway-proxy stub (media-type detection, gateway fallback, placeholder degrade) |
 | **Custom-import validation fixture** | [US-9.8](../stories/US-9.8-custom-nft-import.md), [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | `NftImport` form + `upsertCustomToken` with on-chain contract/standard validation + duplicate guard |
 
 > **Cross-reference:** executable scenarios for this epic live in
@@ -234,8 +211,8 @@ sequenceDiagram
 
 | Concern | Budget | Story | Rationale |
 |---|---|---|---|
-| **NFT media render** | Failed/slow media/detail degrades to a placeholder; never blocks the grid | [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | A single dead asset / failing detail must not freeze the whole collectibles surface |
-| **Gateway fallback** | On gateway error, retry the next gateway in the weighted set before surfacing a render error | [US-9.6](../stories/US-9.6-3d-and-video-nft-viewer.md) | Upstream IPFS gateways are flaky; one 5xx should not lose the image |
+| **NFT media render** | Failed/slow media/detail degrades to a placeholder; never blocks the grid | [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md) | A single dead asset / failing detail must not freeze the whole collectibles surface |
+| **Gateway fallback** | On gateway error, retry the next gateway in the weighted set before surfacing a render error | [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md) | Upstream IPFS gateways are flaky; one 5xx should not lose the image |
 
 ## Acceptance criteria (propagated from stories)
 
@@ -248,4 +225,8 @@ sequenceDiagram
 - [ ] Bitcoin Ordinals inscriptions are shown for a Bitcoin account — [US-9.7](../stories/US-9.7-bitcoin-ordinals-display.md)
 - [ ] A collection can be imported by contract address with validation — [US-9.8](../stories/US-9.8-custom-nft-import.md)
 - [ ] Additional collections / ERC-6551 token-bound accounts surface (planned) — [US-9.9](../stories/US-9.9-additional-collections-and-standards.md)
-- [ ] NFT detail renders without an error page, collections display cross-browser, transfer shows correct amount/message, and import is validated — [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md)
+- [ ] NFT detail renders without an error page and collections display correctly cross-browser — [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md)
+- [x] NFT media resolves reliably through the IPFS gateway pipeline with multi-gateway fallback — [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md)
+- [x] The NFT feature runs on the new-UI service architecture — [US-9.19](../stories/US-9.19-nft-service-migration.md)
+- [ ] Client-side NFT Service + SDK migration (planned) — [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md)
+- [ ] NFT portfolio management (planned) — [US-9.21](../stories/US-9.21-nft-portfolio-management.md)

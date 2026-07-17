@@ -16,7 +16,6 @@ created: 2026-06-12
 updated: 2026-06-12
 ---
 
-> **Consolidated tracker issues (2026-07-17):** #4246 (*Support RUNE & Ordinal for Bitcoin*) and #4295 (*Support showing Rune and Inscription*) — both backlog — are tracked under this story; the shipped webapp-ordinals work is [US-9.17](US-9.17-bitcoin-ordinals-and-inscriptions-shipped.md). See [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md).
 
 ## Goal
 
@@ -93,6 +92,19 @@ Ordinals/inscription display exists only on an unreleased branch: no docs/CHANGE
 delivers it and no commit implementing it is contained in any release tag. The PRD row (FR-91)
 was marked `✅ shipped` in error and is now `🚧 in progress` — code exists, no release carries it.
 Flip this story to `done` only when a release actually ships it.
+
+## Incremental work, fixes & chores
+
+Beyond the requirement above, **6 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.1.36 | [#2380](https://github.com/Koniverse/SubWallet-Extension/issues/2380) | Showing ordinals on webapp | ✅ done |
+| 1.1.36 | [#2399](https://github.com/Koniverse/SubWallet-Extension/issues/2399) | Add more inscriptions on SubWallet Web app | ✅ done |
+| — | [#4246](https://github.com/Koniverse/SubWallet-Extension/issues/4246) | Extension - Support RUNE & Ordinal for Bitcoin | 📋 backlog |
+| — | [#4295](https://github.com/Koniverse/SubWallet-Extension/issues/4295) | Support showing Rune and Inscription | 📋 backlog |
+| — | [#4991](https://github.com/Koniverse/SubWallet-Extension/issues/4991) | Replace hosted BTC APIs with Blockstream API and evaluate Runes/Ordinals alternatives | ✅ done |
+| — | [#4997](https://github.com/Koniverse/SubWallet-Extension/issues/4997) | Bitcoin on-chain data mismatch on host API (Fees, Inscriptions, Runes) | ✅ done |
 
 ## Cross-references
 

@@ -87,6 +87,25 @@ Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-
 
 Commits `5493ff4f0483999ebfbb67049b37bbb8e838b229, 73dfc19b8ecf7107415d943e21aebb672407b2a2, fc11432fdd9487eeb38140571f086a9446db2cad` verified contained in the v0.3.1 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
+## Incremental work, fixes & chores
+
+Beyond the requirement above, **9 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+
+> 1 issue(s) below are ⏸ **deprecated** — closed not-planned / superseded, never shipped.
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.3.1 | [#34](https://github.com/Koniverse/SubWallet-Extension/issues/34) | Send & Receive Moonbeam / Moonriver NFT | ✅ done |
+| 0.3.1 | [#33](https://github.com/Koniverse/SubWallet-Extension/issues/33) | Display Moonbeam / Moonriver NFT | ✅ done |
+| 0.5.4 | [#517](https://github.com/Koniverse/SubWallet-Extension/issues/517) | Add Moonpets NFT | ✅ done |
+| 0.5.6 | [#467](https://github.com/Koniverse/SubWallet-Extension/issues/467) | Integration MoonFit NFT | ✅ done |
+| 1.0.5 | [#12](https://github.com/Koniverse/SubWallet-Extension/issues/12) | Integrate Snow EVM network | ✅ done |
+| 1.0.5 | [#27](https://github.com/Koniverse/SubWallet-Extension/issues/27) | Update RPC endpoint for Mangata | ✅ done |
+| 1.0.6 | [#1404](https://github.com/Koniverse/SubWallet-Extension/issues/1404) | Fix bug show Moonfit’s NFT | ✅ done |
+| 1.3.7 | [#3854](https://github.com/Koniverse/SubWallet-Extension/issues/3854) | Integration NFT for Story Protocol | ✅ done |
+| — | [#3850](https://github.com/Koniverse/SubWallet-Extension/issues/3850) | Extension - Integration NFT for Story Protocol | ⏸ deprecated |
+| — | [#4028](https://github.com/Koniverse/SubWallet-Extension/issues/4028) | Extension - Follow display NFT for Story Odyssey Testnet after mainnet | ✅ done |
+
 ## Cross-references
 
 - [PRD FR-87](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.1](US-9.1-substrate-nft-display.md) · [US-9.4](US-9.4-erc-1155-nft-support.md)

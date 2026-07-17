@@ -83,6 +83,27 @@ already shipped.
 
 Traced 2026-07-13 (US-21.2 straggler pass — this story was never a batch-2 candidate; the PRD/story mismatch surfaced during the AC-4 reconcile). First delivery: **[0.4.1] — 2022-05-11**, "Support import ERC20 and ERC721 for EVM Networks (#160)" — the first import-by-contract-address capability anywhere in the CHANGELOG (earlier releases only ship per-chain NFT integrations and *account* import). `fee3068038` adds `ImportEvmNft.tsx` (contract-address form + chain selector → `upsertEvmToken`), `1c6623c258` adds `getERC721Contract` + on-chain validation, `e8b62bc00e` wires custom contracts into the NFT handlers; merged via PR #244 (branch `koni/dev/issue-160`). All commits verified contained in `v0.4.1`. **Scope note:** only the ERC-721 path shipped in 0.4.1 — PSP-34 custom import followed in 0.6.7 (#477) and ERC-1155 in 1.3.5 (#3726).
 
+## Incremental work, fixes & chores
+
+Beyond the requirement above, **11 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+
+> 3 issue(s) below are ⏸ **deprecated** — closed not-planned / superseded, never shipped.
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.1.36 | [#1216](https://github.com/Koniverse/SubWallet-Extension/issues/1216) | Do not save Collection name input when import NFT | ✅ done |
+| 1.3.2 | [#3609](https://github.com/Koniverse/SubWallet-Extension/issues/3609) | Add validate tokenOfOwnerByIndex when import NFT | ✅ done |
+| 1.3.2 | [#3699](https://github.com/Koniverse/SubWallet-Extension/issues/3699) | Extension - Add validate when import NFT in case there is no method tokenOfOwnerByIndex | ✅ done |
+| 1.3.16 | [#380](https://github.com/Koniverse/SubWallet-Extension/issues/380) | Bug happens when user perform import tokens, import NFT | ✅ done |
+| 1.3.49 | [#3818](https://github.com/Koniverse/SubWallet-Extension/issues/3818) | Fixed bug import NFT (#3837) | ✅ done |
+| 1.3.49 | [#3837](https://github.com/Koniverse/SubWallet-Extension/issues/3837) | Extension - Can't import NFT | ✅ done |
+| 1.3.68 | [#4568](https://github.com/Koniverse/SubWallet-Extension/issues/4568) | Support show NFT haven't method tokenOfOwnerByIndex | ✅ done |
+| 1.3.68 | [#4625](https://github.com/Koniverse/SubWallet-Extension/issues/4625) | Unable to import NFT ERC-721 on Rari chain | ✅ done |
+| — | [#620](https://github.com/Koniverse/SubWallet-Extension/issues/620) | Import NFT button not showing after viewing NFT details | ✅ done |
+| — | [#1430](https://github.com/Koniverse/SubWallet-Extension/issues/1430) | Crash app in case import NFT by ERC20, PSP22 contract | ⏸ deprecated |
+| — | [#3841](https://github.com/Koniverse/SubWallet-Extension/issues/3841) | Extension - Don't show NFT although imported successfully | ⏸ deprecated |
+| — | [#3990](https://github.com/Koniverse/SubWallet-Extension/issues/3990) | Extension - Unable to import NFT | ⏸ deprecated |
+
 ## Cross-references
 
 - [PRD FR-92](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.1](US-9.1-substrate-nft-display.md) · [US-9.3](US-9.3-evm-nft-display.md)

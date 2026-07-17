@@ -89,6 +89,32 @@ Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-
 
 Commits `c586a78109, b5d6f46647, f30463904d` verified contained in the v0.2.8 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
+## Incremental work, fixes & chores
+
+Beyond the requirement above, **17 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+
+> 2 issue(s) below are ⏸ **deprecated** — closed not-planned / superseded, never shipped.
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.4.1 | [#209](https://github.com/Koniverse/SubWallet-Extension/issues/209) | Fix bug can not send EVM NFT | ✅ done |
+| 0.4.3 | [#265](https://github.com/Koniverse/SubWallet-Extension/issues/265) | Bug Send NFT when balance is too low | ✅ done |
+| 0.4.4 | [#321](https://github.com/Koniverse/SubWallet-Extension/issues/321) | Fix bug 'Encountered an error, please try again' when Send NFT | ✅ done |
+| 0.6.8 | [#747](https://github.com/Koniverse/SubWallet-Extension/issues/747) | Issue sending Bit.Country NFT and displaying BIT token | ✅ done |
+| 0.6.8 | [#759](https://github.com/Koniverse/SubWallet-Extension/issues/759) | Unable to send NFT with QR Account in case of network not selected | ✅ done |
+| 1.1.27 | [#2373](https://github.com/Koniverse/SubWallet-Extension/issues/2373) | Fixed bug show transfer NFT history details | ✅ done |
+| 1.1.36 | [#1830](https://github.com/Koniverse/SubWallet-Extension/issues/1830) | WebApp - Error page in case send NFT | ✅ done |
+| 1.1.36 | [#1957](https://github.com/Koniverse/SubWallet-Extension/issues/1957) | WebApp - Can't navigate Address book screen when send NFT | ✅ done |
+| 1.1.55 | [#2695](https://github.com/Koniverse/SubWallet-Extension/issues/2695) | WebApp - Adjust showing/validating address on Send token, Send NFT, History | ✅ done |
+| 1.2.10 | [#3133](https://github.com/Koniverse/SubWallet-Extension/issues/3133) | Fix bug Show incorrect Amount on Transaction history, Transaction confirmation for transfer NFT | ✅ done |
+| 1.3.1 | [#3537](https://github.com/Koniverse/SubWallet-Extension/issues/3537) | Unified account - Update address input component for NFT transfer | ✅ done |
+| 1.3.9 | [#3762](https://github.com/Koniverse/SubWallet-Extension/issues/3762) | Fixed bug send NFT on Ethereum network | ✅ done |
+| — | [#350](https://github.com/Koniverse/SubWallet-Extension/issues/350) | [QR] [Transfer] [NFT] Support transfer NFT via QR | ✅ done |
+| — | [#729](https://github.com/Koniverse/SubWallet-Extension/issues/729) | Show incorrect NFT quantity on All Accounts mode in case send NFT on the same wallet | ✅ done |
+| — | [#1132](https://github.com/Koniverse/SubWallet-Extension/issues/1132) | An error occurs when send WASM NFT | ⏸ deprecated |
+| — | [#3287](https://github.com/Koniverse/SubWallet-Extension/issues/3287) | WebApp - Show incorrect Amount on Transaction confirmation for transfer NFT | ⏸ deprecated |
+| — | [#3716](https://github.com/Koniverse/SubWallet-Extension/issues/3716) | Extension - Don't show transferable balance when send NFT on Vara network | ✅ done |
+
 ## Cross-references
 
 - [PRD FR-89](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.4](US-9.4-erc-1155-nft-support.md)
