@@ -16,6 +16,8 @@ created: 2026-06-12
 updated: 2026-06-12
 ---
 
+> **Consolidated tracker issue (2026-07-17):** #4768 (*Implement UI to support the Nested NFT standard*, shipped 1.3.80) was folded into this story. See [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md).
+
 ## Goal
 
 A user holding nested NFTs (e.g. on Unique Network, where one NFT can bundle

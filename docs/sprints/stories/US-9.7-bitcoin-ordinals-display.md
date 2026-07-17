@@ -16,6 +16,8 @@ created: 2026-06-12
 updated: 2026-06-12
 ---
 
+> **Consolidated tracker issues (2026-07-17):** #4246 (*Support RUNE & Ordinal for Bitcoin*) and #4295 (*Support showing Rune and Inscription*) — both backlog — are tracked under this story; the shipped webapp-ordinals work is [US-9.17](US-9.17-bitcoin-ordinals-and-inscriptions-shipped.md). See [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md).
+
 ## Goal
 
 A user with a Bitcoin account sees the Ordinals inscriptions they hold rendered

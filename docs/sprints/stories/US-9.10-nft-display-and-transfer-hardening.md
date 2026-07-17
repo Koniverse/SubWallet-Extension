@@ -16,6 +16,8 @@ created: 2026-06-12
 updated: 2026-06-12
 ---
 
+> **Consolidated tracker issue (2026-07-17):** #2858 (*WebApp — Adjust showing/validating address on Send token/NFT/History, round 2* — backlog) is tracked under this story. See [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md).
+
 ## Goal
 
 Keep the collectibles surface correct end-to-end: opening an NFT renders its
