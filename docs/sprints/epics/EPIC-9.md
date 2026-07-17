@@ -113,6 +113,15 @@ EPIC-9 builds the NFT-shaped transfer request and hands it to that pipeline.
 
 ## Stories
 
+EPIC-9 carries **two tiers of story**, both listed here so the epic reads as one set:
+
+- **FR-materializing stories** (`US-9.1`–`US-9.10`) — the requirement contracts mapped in [FR Coverage](#fr-coverage) and [Feature pillars](#feature-pillars) above.
+- **Consolidated maintenance stories** (`US-9.11`–`US-9.21`) — 114 tracker issues of incremental NFT work, grouped by capability (they materialize **no FR**). Each story carries a chronological timeline of its issues; `assignee` / `commit` / `sprint` / `version_shipped` are a representative anchor from the most recent constituent. Full issue→story map: [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+
+Two mis-area issues stay under their retired `US-29.x` id, flagged for relocation.
+
+### FR-materializing stories (requirement contracts)
+
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
 | [US-9.1](../stories/US-9.1-substrate-nft-display.md) | Substrate NFT display (RMRK / Unique / PSP-34) | Show Substrate NFT collections across RMRK 1.0/2.0, Unique/Quartz, Asset Hub and PSP-34/WASM | ✅ done | 0.6.7 |
@@ -126,8 +135,36 @@ EPIC-9 builds the NFT-shaped transfer request and hands it to that pipeline.
 | [US-9.9](../stories/US-9.9-additional-collections-and-standards.md) | Additional collections & standards (ERC-6551) | Onboard Ternoa/Joystream/Aventus + ERC-6551 token-bound accounts | 📋 backlog | — |
 | [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | NFT display & transfer hardening | Harden NFT detail render, cross-browser display, transfer amount/message and import validation | 📋 backlog | — |
 
-> US-9.9 (FR-93) is **📋 planned** in the PRD; it is authored here as
-> `backlog` per Stream-B convention, with the planned state noted in its Background.
+> US-9.9 (FR-93) is **📋 planned** in the PRD; it is authored here as `backlog` per Stream-B convention, with the planned state noted in its Background.
+
+### Consolidated maintenance stories (capability history — no FR)
+
+Grouped from **114 tracker issues** (formerly one story each). The **Goal** column leads with the issue count; **Version** is the last release the capability shipped in (the full span is in each story's timeline).
+
+| ID | Title | Goal | Status | Version |
+|---|---|---|---|---|
+| [US-9.11](../stories/US-9.11-substrate-nft-collection-and-chain-integrations.md) | Substrate NFT collection & chain integrations | 25 issues — onboard NFT for Substrate chains/collections (Astar, Bit.Country, Pioneer, Unique, Ternoa…) | ✅ done | 1.3.2 |
+| [US-9.12](../stories/US-9.12-evm-nft-collection-integrations.md) | EVM NFT collection integrations | 9 issues — onboard EVM NFT collections (Moonbeam, MoonFit, Snow, Story Protocol) | ✅ done | 1.3.7 |
+| [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md) | NFT media & IPFS gateway pipeline | 14 issues — RMRK/IPFS endpoints, resolver, image-error & media handling | ✅ done | 1.3.56 |
+| [US-9.14](../stories/US-9.14-nft-send-transfer-hardening.md) | NFT send / transfer hardening | 17 issues — harden NFT send (QR, address input, amount, Vara/Ethereum) | ✅ done | 1.3.9 |
+| [US-9.15](../stories/US-9.15-nft-import-and-validation-hardening.md) | NFT import & validation hardening | 11 issues — robust custom import + tokenOfOwnerByIndex validation | ✅ done | 1.3.68 |
+| [US-9.16](../stories/US-9.16-nft-display-detail-and-webapp-ui-hardening.md) | NFT display, detail & webapp UI hardening | 24 issues — display/detail/webapp UI correctness across the app's evolution | ✅ done | 1.3.3 |
+| [US-9.17](../stories/US-9.17-bitcoin-ordinals-and-inscriptions-shipped.md) | Bitcoin Ordinals & inscriptions (shipped) | 4 issues — Ordinals/inscriptions on webapp + BTC data source | ✅ done | 1.1.36 |
+| [US-9.18](../stories/US-9.18-avail-light-client-nft.md) | Avail Light Client NFT | 3 issues — Avail light-client NFT + fetch-error fixes | ✅ done | 1.2.21 |
+| [US-9.19](../stories/US-9.19-nft-service-migration.md) | NFT service migration | 1 issue — migrate the NFT feature to the service architecture | ✅ done | — |
+| [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) | Client-side NFT Service & SDK migration | 1 issue — client-side NFT Service + SDK migration | 📋 backlog | — |
+| [US-9.21](../stories/US-9.21-nft-portfolio-management.md) | NFT portfolio management | 1 issue — organize/curate held NFTs | 📋 backlog | — |
+
+> **4 more issues folded into the FR stories above:** **#4768** → [US-9.2](../stories/US-9.2-nested-bundled-nft-display.md) · **#4246 / #4295** → [US-9.7](../stories/US-9.7-bitcoin-ordinals-display.md) · **#2858** → [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md). Totals: **114 issues → 11 consolidated + 4 into FR stories** (2 more kept below = 116).
+
+### Kept in place — mis-area (pending relocation)
+
+Two non-NFT issues (routed here by the title heuristic) stay under their retired `US-29.x` id, flagged for relocation when their target epic is processed:
+
+| ID | Title | Goal | Status | Version |
+|---|---|---|---|---|
+| [US-29.38](../stories/US-29.38-add-support-for-usdc-stewt.md) | Add support for USDC & stEWT | Token support (not NFT) — mis-area, → EPIC-7 | ✅ done | 1.3.72 |
+| [US-29.79](../stories/US-29.79-grab-100-mdot-mint-nft.md) | [Grab 100 MDOT] Mint NFT | Mint-NFT campaign (not core NFT) — mis-area, → EPIC-19 | ✅ done | 1.1.36 |
 
 ## Object map & user-story interactions
 
@@ -212,47 +249,3 @@ sequenceDiagram
 - [ ] A collection can be imported by contract address with validation — [US-9.8](../stories/US-9.8-custom-nft-import.md)
 - [ ] Additional collections / ERC-6551 token-bound accounts surface (planned) — [US-9.9](../stories/US-9.9-additional-collections-and-standards.md)
 - [ ] NFT detail renders without an error page, collections display cross-browser, transfer shows correct amount/message, and import is validated — [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md)
-
-## Maintenance & incremental work — consolidated stories
-
-> **Consolidated 2026-07-17.** The NFT area's incremental work (116 tracker issues, formerly one
-> story each in the folded-in `US-29.x` ledger) is now grouped into **capability-scoped stories** so
-> the area reads as a development narrative rather than 116 stubs. Each groups related issues with a
-> clear boundary and a chronological timeline; full issue→story traceability is inside each story and
-> in [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md).
->
-> These materialize **no FR** (the requirement set is the FR Coverage + pillar tables above).
-> `points`/`version_shipped`/`sprint` are empty on the done ones — a capability grew across many
-> releases (the per-issue release is in the story's timeline). From here on, ongoing fixes and
-> improvements are added as **new US per sprint**, not one-per-issue.
-
-### Consolidated stories
-
-Grouped from 114 issues (the other 2 are kept in place, below). **Issues** = tracker issues folded
-into that story; **Releases** = span of shipped versions across them.
-
-| US | Status | Capability | Issues | Releases |
-|---|---|---|---|---|
-| [US-9.11](../stories/US-9.11-substrate-nft-collection-and-chain-integrations.md) | ✅ done | Substrate NFT collection & chain integrations | 25 | 0.3.1 → 1.3.2 |
-| [US-9.12](../stories/US-9.12-evm-nft-collection-integrations.md) | ✅ done | EVM NFT collection integrations | 9 | 0.3.1 → 1.3.7 |
-| [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md) | ✅ done | NFT media & IPFS gateway pipeline | 14 | 0.4.3 → 1.3.56 |
-| [US-9.14](../stories/US-9.14-nft-send-transfer-hardening.md) | ✅ done | NFT send / transfer hardening | 17 | 0.4.1 → 1.3.9 |
-| [US-9.15](../stories/US-9.15-nft-import-and-validation-hardening.md) | ✅ done | NFT import & validation hardening | 11 | 1.1.36 → 1.3.68 |
-| [US-9.16](../stories/US-9.16-nft-display-detail-and-webapp-ui-hardening.md) | ✅ done | NFT display, detail & webapp UI hardening | 24 | 0.3.3 → 1.3.3 |
-| [US-9.17](../stories/US-9.17-bitcoin-ordinals-and-inscriptions-shipped.md) | ✅ done | Bitcoin Ordinals & inscriptions (shipped) | 4 | 1.1.36 → 1.1.36 |
-| [US-9.18](../stories/US-9.18-avail-light-client-nft.md) | ✅ done | Avail Light Client NFT | 3 | 1.1.68 → 1.2.21 |
-| [US-9.19](../stories/US-9.19-nft-service-migration.md) | ✅ done | NFT service migration | 1 | — |
-| [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) | 📋 backlog | Client-side NFT Service & SDK migration | 1 | — |
-| [US-9.21](../stories/US-9.21-nft-portfolio-management.md) | 📋 backlog | NFT portfolio management | 1 | — |
-
-> Plus 4 issues folded into existing FR stories: **#4768** → [US-9.2](../stories/US-9.2-nested-bundled-nft-display.md) · **#4246/#4295** → [US-9.7](../stories/US-9.7-bitcoin-ordinals-display.md) · **#2858** → [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md). Totals: **110 issues → 11 consolidated stories** (9 done, 2 backlog).
-
-### Kept in place — mis-area, pending relocation
-
-Two non-NFT issues (routed here by the title heuristic) stay as their retired `US-29.x` id, flagged
-for relocation when their target epic is processed:
-
-| US | Status | Why it is not NFT | Issue | Target |
-|---|---|---|---|---|
-| [US-29.38](../stories/US-29.38-add-support-for-usdc-stewt.md) | ✅ done | USDC & stEWT is **token support** | [#639](https://github.com/Koniverse/SubWallet-Extension/issues/639) | EPIC-7 |
-| [US-29.79](../stories/US-29.79-grab-100-mdot-mint-nft.md) | ✅ done | a **mint-NFT campaign**, not core capability | [#1967](https://github.com/Koniverse/SubWallet-Extension/issues/1967) | EPIC-19 |
