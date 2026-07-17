@@ -36,8 +36,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**253 stories** — 208 done (shipped), 3 in flight (ready / in-progress /
-review, from the Projects board), 22 backlog (open, not yet started), 20 deprecated
+**253 stories** — 207 done (shipped), 3 in flight (ready / in-progress /
+review, from the Projects board), 22 backlog (open, not yet started), 21 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -219,7 +219,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-23.167](../stories/US-23.167-webapp-ui-bug-in-case-import-by-seed-phrase.md) | ✅ done | WebApp - UI bug in case import by seed phrase | [#3488](https://github.com/Koniverse/SubWallet-Extension/issues/3488) | frenkie-ng | — |
 | [US-23.168](../stories/US-23.168-fix-ui-bugs-for-unified-account-round-2.md) | ✅ done | Fix UI bugs for Unified account (round 2) | [#3496](https://github.com/Koniverse/SubWallet-Extension/issues/3496) | lw-cdm | 1.3.1 |
 | [US-23.169](../stories/US-23.169-unified-account-add-validate-unique-for-account-name.md) | ✅ done | Unified account - Add validate unique for Account Name | [#3505](https://github.com/Koniverse/SubWallet-Extension/issues/3505) | frenkie-ng | 1.3.1 |
-| [US-23.170](../stories/US-23.170-unified-account-add-logic-to-choose-account-type-unifie.md) | ✅ done | Unified account - Add logic to choose account type (unified/solo) when import by seed phrase (discuss more for UX) | [#3509](https://github.com/Koniverse/SubWallet-Extension/issues/3509) | frenkie-ng | — |
+| [US-23.170](../stories/US-23.170-unified-account-add-logic-to-choose-account-type-unifie.md) | ⏸️ deprecated | Unified account - Add logic to choose account type (unified/solo) when import by seed phrase (discuss more for UX) | [#3509](https://github.com/Koniverse/SubWallet-Extension/issues/3509) | frenkie-ng | — |
 | [US-23.171](../stories/US-23.171-checklist-and-testing-for-unified-account-create-import.md) | ⏸️ deprecated | Checklist and Testing for Unified account: Create, Import... | [#3510](https://github.com/Koniverse/SubWallet-Extension/issues/3510) | ThaoNguyen998 | — |
 | [US-23.172](../stories/US-23.172-unified-account-add-feature-to-switch-walletcontract-ve.md) | ✅ done | Unified-account - Add feature to switch WalletContract version for ton | [#3512](https://github.com/Koniverse/SubWallet-Extension/issues/3512) | frenkie-ng | 1.3.1 |
 | [US-23.173](../stories/US-23.173-unified-account-update-address-input-component.md) | ✅ done | Unified account - Update Address Input component | [#3524](https://github.com/Koniverse/SubWallet-Extension/issues/3524) | lw-cdm | 1.3.1 |

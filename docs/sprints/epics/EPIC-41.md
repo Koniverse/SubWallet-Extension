@@ -36,8 +36,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**498 stories** — 376 done (shipped), 13 in flight (ready / in-progress /
-review, from the Projects board), 65 backlog (open, not yet started), 44 deprecated
+**498 stories** — 375 done (shipped), 13 in flight (ready / in-progress /
+review, from the Projects board), 65 backlog (open, not yet started), 45 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -283,7 +283,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-41.231](../stories/US-41.231-extension-update-newest-t-c-content.md) | ⏸️ deprecated | Extension - Update newest T&C content | [#2432](https://github.com/Koniverse/SubWallet-Extension/issues/2432) | Thiendekaco | — |
 | [US-41.232](../stories/US-41.232-periodically-check-some-features.md) | ✅ done | Periodically check some features | [#2434](https://github.com/Koniverse/SubWallet-Extension/issues/2434) | nulllpc | — |
 | [US-41.233](../stories/US-41.233-update-chain-list.md) | ✅ done | Update chain-list | [#2447](https://github.com/Koniverse/SubWallet-Extension/issues/2447) | bluezdot | 1.1.30 |
-| [US-41.234](../stories/US-41.234-seperate-validation-logic-into-a-new-service.md) | ✅ done | Seperate validation logic into a new service | [#2451](https://github.com/Koniverse/SubWallet-Extension/issues/2451) | nulllpc | — |
+| [US-41.234](../stories/US-41.234-seperate-validation-logic-into-a-new-service.md) | ⏸️ deprecated | Seperate validation logic into a new service | [#2451](https://github.com/Koniverse/SubWallet-Extension/issues/2451) | nulllpc | — |
 | [US-41.235](../stories/US-41.235-merge-all-platform-in-to-same-codebase.md) | ✅ done | Merge all platform in to same codebase | [#2459](https://github.com/Koniverse/SubWallet-Extension/issues/2459) | saltict | — |
 | [US-41.236](../stories/US-41.236-implement-auto-recover-to-avoid-app-reset-on-android-an.md) | ⏸️ deprecated | Implement auto recover to avoid app reset on Android and ios lower than 17 | [#2462](https://github.com/Koniverse/SubWallet-Extension/issues/2462) | nguyenduythuc | — |
 | [US-41.237](../stories/US-41.237-update-chain-list.md) | ✅ done | Update chain-list | [#2465](https://github.com/Koniverse/SubWallet-Extension/issues/2465) | bluezdot | 1.1.31 |

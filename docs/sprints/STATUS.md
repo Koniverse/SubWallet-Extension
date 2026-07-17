@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-16 11:48:00 UTC
+> Last generated: 2026-07-17 02:28:35 UTC
 > Total stories: 2887
 
 ## 📋 Backlog (296)
@@ -375,7 +375,7 @@
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W28 | frenkie-ng |
 
-## ✅ Done (2331)
+## ✅ Done (2322)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -601,7 +601,6 @@
 | US-23.167 | WebApp - UI bug in case import by seed phrase | EPIC-23 | P3 | 1 | sprint-2024-M10 | frenkie-ng |
 | US-23.168 | Fix UI bugs for Unified account (round 2) | EPIC-23 | P3 | 1 | sprint-2024-M08 | lw-cdm |
 | US-23.169 | Unified account - Add validate unique for Account Name | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-23.170 | Unified account - Add logic to choose account type (unified/solo) when import by seed phrase (discuss more for UX) | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
 | US-23.172 | Unified-account - Add feature to switch WalletContract version for ton | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
 | US-23.173 | Unified account - Update Address Input component | EPIC-23 | P3 | 1 | sprint-2024-M09 | lw-cdm |
 | US-23.174 | Unified account - Update export/import UI | EPIC-23 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
@@ -1636,7 +1635,6 @@
 | US-31.27 | WebApp - Update logo for Hydration provider on the Swap screen | EPIC-31 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
 | US-31.28 | Research Uniswap price impact | EPIC-31 | P3 | 1 | sprint-2024-M07 | bluezdot |
 | US-31.29 | Add support Swap Asset Hub | EPIC-31 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-31.30 | Update ChainFlip version | EPIC-31 | P3 | 1 | sprint-2025-M01 | saltict |
 | US-31.31 | Support XCM channels | EPIC-31 | P3 | 1 | sprint-2024-M09 | bluezdot |
 | US-31.33 | Research USDT, USDC swap volume on Hydration, Stellaswap | EPIC-31 | P3 | 1 | sprint-2024-M10 | saltict |
 | US-31.34 | Add Chainflip broker | EPIC-31 | P3 | 1 | sprint-2024-M09 | saltict |
@@ -1715,7 +1713,6 @@
 | US-32.20 | Fix some issues related to 'minimum stake' in cases stake more and unstake | EPIC-32 | P3 | 1 | sprint-2022-M08 | nulllpc |
 | US-32.21 | Fix staking data UI error | EPIC-32 | P3 | 1 | sprint-2022-M08 | nulllpc |
 | US-32.22 | Fix bug parsing Acala crowdloan data | EPIC-32 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-32.23 | Not showing staking record on account using different stash and controller account | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
 | US-32.24 | Add staking for $CAPS and add support for Ternoa's testnet Alphanet | EPIC-32 | P3 | 1 | sprint-2022-M09 | hieudd |
 | US-32.25 | Infinite loading when user stake DOT | EPIC-32 | P3 | 1 | sprint-2022-M09 | nulllpc |
 | US-32.26 | Handle estimated fee error on NFT sending + staking | EPIC-32 | P3 | 1 | sprint-2022-M09 | nulllpc |
@@ -1836,7 +1833,6 @@
 | US-32.157 | WebApp - Hide the Exclusive rewards tag | EPIC-32 | P3 | 1 | sprint-2023-M11 | lw-cdm |
 | US-32.158 | Fixed bug missing crowdloan | EPIC-32 | P3 | 1 | sprint-2023-M11 | lw-cdm |
 | US-32.159 | Fixed bug showing staking rewards on Moonbeam | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-32.160 | Showing incorrect data in staking feature in some cases | EPIC-32 | P3 | 1 | sprint-2024-M01 | S2kael |
 | US-32.161 | Improve validator/pool selection UX | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
 | US-32.162 | Update staking for Westend | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
 | US-32.163 | Fixed bug show staking earning status on Creditcoin | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
@@ -2042,7 +2038,6 @@
 | US-33.28 | Add XCM for Kusama --> Statemint | EPIC-33 | P3 | 1 | sprint-2023-M03 | nulllpc |
 | US-33.29 | Upgrade UI - Some issues related to XCM feature | EPIC-33 | P3 | 1 | sprint-2023-M06 | nulllpc |
 | US-33.30 | Incorrect fee when XCM GLMR Acala to Moombeam | EPIC-33 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-33.31 | Support for transferring xcm for Kintsugi | EPIC-33 | P3 | 1 | sprint-2025-M12 | nulllpc |
 | US-33.36 | Temporarily hide XCM channels from Moonbeam | EPIC-33 | P3 | 1 | sprint-2023-M05 | S2kael |
 | US-33.37 | Add support new XCM channels | EPIC-33 | P3 | 1 | sprint-2025-M09 | PDTnhah |
 | US-33.38 | Fixed bug Don’t show send history in case xcm on same account | EPIC-33 | P3 | 1 | sprint-2023-M06 | S2kael |
@@ -2070,13 +2065,11 @@
 | US-33.62 | WebApp - Update validate for popup warning cross-chain PAH --> KAH | EPIC-33 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
 | US-33.63 | Fix bug not showing popup Swap confirmation when swap with Injected account | EPIC-33 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
 | US-33.66 | Extension - Support XCM for Mythos | EPIC-33 | P3 | 1 | sprint-2024-M08 | nulllpc |
-| US-33.67 | Implement SnowBridge sdk to prevent asset loss | EPIC-33 | P3 | 1 | sprint-2025-M04 | S2kael |
 | US-33.68 | Extension - Update XCM to V4 | EPIC-33 | P3 | 1 | sprint-2025-M08 | bluezdot |
 | US-33.69 | Support Snowbridge transfer from Ethereum -> Mythos for MYTH | EPIC-33 | P3 | 1 | sprint-2024-M10 | bluezdot |
 | US-33.70 | Fix bug XCM | EPIC-33 | P3 | 1 | sprint-2024-M09 | bluezdot |
 | US-33.71 | Fix bug XCM for channel: DOT: KAH -> PAH | EPIC-33 | P3 | 1 | sprint-2024-M09 | bluezdot |
 | US-33.72 | Fixed bug XCM USDT: PAH -> ASTR | EPIC-33 | P3 | 1 | sprint-2025-M04 | bluezdot |
-| US-33.73 | Integrate XCM/extrinsic dry run API | EPIC-33 | P3 | 1 | sprint-2025-M06 | — |
 | US-33.74 | Re-calculate max transferable for XCM native token | EPIC-33 | P3 | 1 | sprint-2024-M09 | nulllpc |
 | US-33.75 | Fixed bug XCM for Acala | EPIC-33 | P3 | 1 | sprint-2025-M04 | bluezdot |
 | US-33.76 | Extension - Re-check Transfer Max for EVM account when XCM transfer | EPIC-33 | P3 | 1 | sprint-2024-M12 | tunghp2002 |
@@ -2214,7 +2207,6 @@
 | US-36.62 | Support Avail Recovery app | EPIC-36 | P3 | 1 | sprint-2025-M01 | PDTnhah |
 | US-36.63 | Unblock when perform stake on Bifrost with ledger account | EPIC-36 | P3 | 1 | sprint-2025-M06 | Thiendekaco |
 | US-36.65 | Support Avail bridge when using Ledger Nano S+ | EPIC-36 | P3 | 1 | sprint-2025-M04 | nulllpc |
-| US-36.66 | Check Polkadot Generic Ledger app for Creditcoin | EPIC-36 | P3 | 1 | sprint-2025-M05 | S2kael |
 | US-36.67 | Update ledger-substrate-js library | EPIC-36 | P3 | 1 | sprint-2025-M07 | Thiendekaco |
 | US-36.68 | Integrate Polkadot Ledger App | EPIC-36 | P3 | 1 | sprint-2025-M05 | — |
 | US-36.69 | Re-check and update block action when stake with ledger account | EPIC-36 | P3 | 1 | sprint-2025-M07 | Thiendekaco |
@@ -2482,7 +2474,6 @@
 | US-41.230 | WebApp - Update latest code for webapp (v1.1.29 extension) | EPIC-41 | P3 | 1 | sprint-2024-M01 | lw-cdm |
 | US-41.232 | Periodically check some features | EPIC-41 | P3 | 1 | sprint-2024-M06 | nulllpc |
 | US-41.233 | Update chain-list | EPIC-41 | P3 | 1 | sprint-2024-M01 | bluezdot |
-| US-41.234 | Seperate validation logic into a new service | EPIC-41 | P3 | 1 | sprint-2024-M05 | nulllpc |
 | US-41.235 | Merge all platform in to same codebase | EPIC-41 | P3 | 1 | sprint-2024-M02 | saltict |
 | US-41.237 | Update chain-list | EPIC-41 | P3 | 1 | sprint-2024-M01 | bluezdot |
 | US-41.238 | Support 'Request a feature' feature | EPIC-41 | P3 | 1 | sprint-2024-M01 | lw-cdm |
@@ -2715,7 +2706,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (205)
+## 🗑️ Deprecated (214)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2736,6 +2727,7 @@ _No stories_
 | US-23.146 | Block attach account Polkadot vault for network Moonbeam, Moonriver, Moonbase | EPIC-23 | P3 | 1 | — | nulllpc |
 | US-23.158 | [Bug] Import custom EVM Rpc | EPIC-23 | P3 | 1 | — | bluezdot |
 | US-23.162 | Fix bug do not show root screen after remove account (round 2) | EPIC-23 | P3 | 1 | — | frenkie-ng |
+| US-23.170 | Unified account - Add logic to choose account type (unified/solo) when import by seed phrase (discuss more for UX) | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
 | US-23.171 | Checklist and Testing for Unified account: Create, Import... | EPIC-23 | P3 | 1 | — | ThaoNguyen998 |
 | US-23.202 | Migrate unified account feature | EPIC-23 | P3 | 1 | — | — |
 | US-23.214 | Extension - Unable to open extension when update version in case wallet has multi-account | EPIC-23 | P3 | 1 | — | — |
@@ -2829,11 +2821,13 @@ _No stories_
 | US-31.17 | WebApp - Do not navigate to Swap screen in case connect WebApp with Extension | EPIC-31 | P3 | 1 | — | — |
 | US-31.20 | Extension - Improve Swap feature on extension | EPIC-31 | P3 | 1 | — | — |
 | US-31.22 | Extension MV3 - Unable to get quote when perform swap | EPIC-31 | P3 | 1 | — | Thiendekaco |
+| US-31.30 | Update ChainFlip version | EPIC-31 | P3 | 1 | sprint-2025-M01 | saltict |
 | US-31.32 | WebApp - Improve UI for selecting token to pay transaction fee on Hydration | EPIC-31 | P3 | 1 | — | — |
 | US-31.45 | Extension - Implement paid token exchange feature for Swap | EPIC-31 | P3 | 1 | — | frenkie-ng |
 | US-31.50 | Support dynamic swap pair | EPIC-31 | P3 | 1 | — | bluezdot |
 | US-31.77 | Update API for SimpleSwap | EPIC-31 | P3 | 1 | — | — |
 | US-32.17 | Support staking for cross-chain tokens inside parachains | EPIC-32 | P3 | 1 | — | hieudd |
+| US-32.23 | Not showing staking record on account using different stash and controller account | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
 | US-32.42 | Bug withdrawing GLMR stake | EPIC-32 | P3 | 1 | — | Sokol142196 |
 | US-32.54 | Update Claim reward feature for the Amplitude | EPIC-32 | P3 | 1 | — | nulllpc |
 | US-32.59 | Can't cancel staking compound task | EPIC-32 | P3 | 1 | — | — |
@@ -2845,6 +2839,7 @@ _No stories_
 | US-32.86 | Re-check staking-related issues | EPIC-32 | P3 | 1 | — | — |
 | US-32.88 | Re-check Staking Max Bifrost Kusama | EPIC-32 | P3 | 1 | — | S2kael |
 | US-32.156 | Follow-up get metadataStaking for Bifrost testnet | EPIC-32 | P3 | 1 | — | Sokol142196 |
+| US-32.160 | Showing incorrect data in staking feature in some cases | EPIC-32 | P3 | 1 | sprint-2024-M01 | S2kael |
 | US-32.175 | Update UI for mission pool feature | EPIC-32 | P3 | 1 | — | nguyenduythuc |
 | US-32.199 | Mobile - Add popup want to user claim reward when Astar update dApp staking v3 | EPIC-32 | P3 | 1 | — | — |
 | US-32.212 | Extension - Show log campaign unlock when click to any earning option to stake | EPIC-32 | P3 | 1 | — | saltict |
@@ -2857,10 +2852,13 @@ _No stories_
 | US-32.307 | WebApp - Adjust showing/validating address on Earning actions | EPIC-32 | P3 | 1 | — | — |
 | US-33.9 | Support sorting the default token list in the send fund/xcm transfer screen by network, by assets that have balances | EPIC-33 | P3 | 1 | — | — |
 | US-33.12 | Improve UI for XCM transaction with EVM provider | EPIC-33 | P3 | 1 | — | S2kael |
+| US-33.31 | Support for transferring xcm for Kintsugi | EPIC-33 | P3 | 1 | sprint-2025-M12 | nulllpc |
 | US-33.32 | Add XCM Support Between Picasso and Statemine | EPIC-33 | P3 | 1 | — | — |
 | US-33.57 | Handle XCM delivery fee | EPIC-33 | P3 | 1 | — | — |
 | US-33.59 | Add support XCM channels for DED | EPIC-33 | P3 | 1 | — | nulllpc |
 | US-33.64 | XCM version error on Pioneer | EPIC-33 | P3 | 1 | sprint-2024-M09 | bluezdot |
+| US-33.67 | Implement SnowBridge sdk to prevent asset loss | EPIC-33 | P3 | 1 | sprint-2025-M04 | S2kael |
+| US-33.73 | Integrate XCM/extrinsic dry run API | EPIC-33 | P3 | 1 | sprint-2025-M06 | — |
 | US-33.99 | [Bug] Prevent bug transfer cross-chain due to Asset Hub Migration | EPIC-33 | P3 | 1 | — | bluezdot |
 | US-34.22 | Follow up case Token list to buy is empty | EPIC-34 | P3 | 1 | — | — |
 | US-34.30 | Research Meld on-ramp | EPIC-34 | P3 | 1 | — | nulllpc |
@@ -2871,6 +2869,7 @@ _No stories_
 | US-36.19 | [Ledger] Support connect Ledger device for Centrifuge, Darwinia, Energy Web Chain | EPIC-36 | P3 | 1 | — | Quangdm-cdm |
 | US-36.26 | Support Ledger for Vara network | EPIC-36 | P3 | 1 | — | S2kael |
 | US-36.35 | Handle duplicate addresses when connecting Ledger accounts | EPIC-36 | P3 | 1 | — | Thiendekaco |
+| US-36.66 | Check Polkadot Generic Ledger app for Creditcoin | EPIC-36 | P3 | 1 | sprint-2025-M05 | S2kael |
 | US-36.71 | Extension - Error when transfer USDC on Ethereum Sepolia with Ledger EVM | EPIC-36 | P3 | 1 | — | Thiendekaco |
 | US-37.1 | Support Proxy Account Management | EPIC-37 | P3 | 1 | — | saltict |
 | US-37.2 | WebApp - Proxy the mempools API via Cloudflare worker | EPIC-37 | P3 | 1 | — | anhntk54 |
@@ -2909,6 +2908,7 @@ _No stories_
 | US-41.214 | Handle bug reset data on version IOS 17.1 (Round 3) | EPIC-41 | P3 | 1 | — | nguyenduythuc |
 | US-41.225 | Show minutes when withdraw time < 1 hour | EPIC-41 | P3 | 1 | — | nulllpc |
 | US-41.231 | Extension - Update newest T&C content | EPIC-41 | P3 | 1 | — | Thiendekaco |
+| US-41.234 | Seperate validation logic into a new service | EPIC-41 | P3 | 1 | sprint-2024-M05 | nulllpc |
 | US-41.236 | Implement auto recover to avoid app reset on Android and ios lower than 17 | EPIC-41 | P3 | 1 | — | nguyenduythuc |
 | US-41.276 | Extension - Handle bug provider undefined | EPIC-41 | P3 | 1 | — | S2kael |
 | US-41.294 | WebApp - Auto reset currency when reloading browser | EPIC-41 | P3 | 1 | — | frenkie-ng |
@@ -2933,8 +2933,8 @@ _No stories_
 - 🟢 **Ready**: 15
 - 🟡 **In Progress**: 28
 - 👀 **Review**: 12
-- ✅ **Done**: 2331
+- ✅ **Done**: 2322
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 205
+- 🗑️ **Deprecated**: 214
 
 ⚠️  **WIP limit exceeded**: 28 stories in-progress (limit: 3).

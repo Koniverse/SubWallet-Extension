@@ -36,8 +36,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**371 stories** — 320 done (shipped), 2 in flight (ready / in-progress /
-review, from the Projects board), 27 backlog (open, not yet started), 22 deprecated
+**371 stories** — 318 done (shipped), 2 in flight (ready / in-progress /
+review, from the Projects board), 27 backlog (open, not yet started), 24 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -72,7 +72,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-32.20](../stories/US-32.20-fix-some-issues-related-to-minimum-stake-in-cases-stake.md) | ✅ done | Fix some issues related to 'minimum stake' in cases stake more and unstake | [#555](https://github.com/Koniverse/SubWallet-Extension/issues/555) | nulllpc | 0.5.6 |
 | [US-32.21](../stories/US-32.21-fix-staking-data-ui-error.md) | ✅ done | Fix staking data UI error | [#567](https://github.com/Koniverse/SubWallet-Extension/issues/567) | nulllpc | 0.5.6 |
 | [US-32.22](../stories/US-32.22-fix-bug-parsing-acala-crowdloan-data.md) | ✅ done | Fix bug parsing Acala crowdloan data | [#568](https://github.com/Koniverse/SubWallet-Extension/issues/568) | nulllpc | 0.5.6 |
-| [US-32.23](../stories/US-32.23-not-showing-staking-record-on-account-using-different-s.md) | ✅ done | Not showing staking record on account using different stash and controller account | [#602](https://github.com/Koniverse/SubWallet-Extension/issues/602) | nulllpc | — |
+| [US-32.23](../stories/US-32.23-not-showing-staking-record-on-account-using-different-s.md) | ⏸️ deprecated | Not showing staking record on account using different stash and controller account | [#602](https://github.com/Koniverse/SubWallet-Extension/issues/602) | nulllpc | — |
 | [US-32.24](../stories/US-32.24-add-staking-for-caps-and-add-support-for-ternoa-s-testn.md) | ✅ done | Add staking for $CAPS and add support for Ternoa's testnet Alphanet | [#636](https://github.com/Koniverse/SubWallet-Extension/issues/636) | hieudd | 0.6.6 |
 | [US-32.25](../stories/US-32.25-infinite-loading-when-user-stake-dot.md) | ✅ done | Infinite loading when user stake DOT | [#641](https://github.com/Koniverse/SubWallet-Extension/issues/641) | nulllpc | 0.6.5 |
 | [US-32.26](../stories/US-32.26-handle-estimated-fee-error-on-nft-sending-staking.md) | ✅ done | Handle estimated fee error on NFT sending + staking | [#648](https://github.com/Koniverse/SubWallet-Extension/issues/648) | nulllpc | 0.6.5 |
@@ -209,7 +209,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-32.157](../stories/US-32.157-webapp-hide-the-exclusive-rewards-tag.md) | ✅ done | WebApp - Hide the Exclusive rewards tag | [#2192](https://github.com/Koniverse/SubWallet-Extension/issues/2192) | lw-cdm | 1.1.36 |
 | [US-32.158](../stories/US-32.158-fixed-bug-missing-crowdloan.md) | ✅ done | Fixed bug missing crowdloan | [#2199](https://github.com/Koniverse/SubWallet-Extension/issues/2199) | lw-cdm | 1.1.23 |
 | [US-32.159](../stories/US-32.159-fixed-bug-showing-staking-rewards-on-moonbeam.md) | ✅ done | Fixed bug showing staking rewards on Moonbeam | [#2213](https://github.com/Koniverse/SubWallet-Extension/issues/2213) | S2kael | 1.1.24 |
-| [US-32.160](../stories/US-32.160-showing-incorrect-data-in-staking-feature-in-some-cases.md) | ✅ done | Showing incorrect data in staking feature in some cases | [#2234](https://github.com/Koniverse/SubWallet-Extension/issues/2234) | S2kael | — |
+| [US-32.160](../stories/US-32.160-showing-incorrect-data-in-staking-feature-in-some-cases.md) | ⏸️ deprecated | Showing incorrect data in staking feature in some cases | [#2234](https://github.com/Koniverse/SubWallet-Extension/issues/2234) | S2kael | — |
 | [US-32.161](../stories/US-32.161-improve-validator-pool-selection-ux.md) | ✅ done | Improve validator/pool selection UX | [#2246](https://github.com/Koniverse/SubWallet-Extension/issues/2246) | S2kael | 1.1.24 |
 | [US-32.162](../stories/US-32.162-update-staking-for-westend.md) | ✅ done | Update staking for Westend | [#2275](https://github.com/Koniverse/SubWallet-Extension/issues/2275) | S2kael | 1.1.26 |
 | [US-32.163](../stories/US-32.163-fixed-bug-show-staking-earning-status-on-creditcoin.md) | ✅ done | Fixed bug show staking earning status on Creditcoin | [#2277](https://github.com/Koniverse/SubWallet-Extension/issues/2277) | S2kael | 1.1.24 |

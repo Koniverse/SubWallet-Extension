@@ -36,8 +36,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**105 stories** — 89 done (shipped), 3 in flight (ready / in-progress /
-review, from the Projects board), 6 backlog (open, not yet started), 7 deprecated
+**105 stories** — 86 done (shipped), 3 in flight (ready / in-progress /
+review, from the Projects board), 6 backlog (open, not yet started), 10 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -80,7 +80,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-33.28](../stories/US-33.28-add-xcm-for-kusama-statemint.md) | ✅ done | Add XCM for Kusama --> Statemint | [#1094](https://github.com/Koniverse/SubWallet-Extension/issues/1094) | nulllpc | 0.8.3 |
 | [US-33.29](../stories/US-33.29-upgrade-ui-some-issues-related-to-xcm-feature.md) | ✅ done | Upgrade UI - Some issues related to XCM feature | [#1141](https://github.com/Koniverse/SubWallet-Extension/issues/1141) | nulllpc | 1.0.2 |
 | [US-33.30](../stories/US-33.30-incorrect-fee-when-xcm-glmr-acala-to-moombeam.md) | ✅ done | Incorrect fee when XCM GLMR Acala to Moombeam | [#1218](https://github.com/Koniverse/SubWallet-Extension/issues/1218) | nulllpc | — |
-| [US-33.31](../stories/US-33.31-support-for-transferring-xcm-for-kintsugi.md) | ✅ done | Support for transferring xcm for Kintsugi | [#1264](https://github.com/Koniverse/SubWallet-Extension/issues/1264) | nulllpc | — |
+| [US-33.31](../stories/US-33.31-support-for-transferring-xcm-for-kintsugi.md) | ⏸️ deprecated | Support for transferring xcm for Kintsugi | [#1264](https://github.com/Koniverse/SubWallet-Extension/issues/1264) | nulllpc | — |
 | [US-33.32](../stories/US-33.32-add-xcm-support-between-picasso-and-statemine.md) | ⏸️ deprecated | Add XCM Support Between Picasso and Statemine | [#1302](https://github.com/Koniverse/SubWallet-Extension/issues/1302) | — | — |
 | [US-33.33](../stories/US-33.33-add-support-for-usdt-on-more-chains-and-update-param-fo.md) | 🚧 in-progress | Add support for USDT on more chains and update param for XCM on Astar | [#1352](https://github.com/Koniverse/SubWallet-Extension/issues/1352) | PDTnhah | — |
 | [US-33.34](../stories/US-33.34-bridge-tokens-from-octopus-network-to-near.md) | 📋 backlog | Bridge tokens from Octopus Network to Near | [#1367](https://github.com/Koniverse/SubWallet-Extension/issues/1367) | nulllpc | — |
@@ -116,13 +116,13 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-33.64](../stories/US-33.64-xcm-version-error-on-pioneer.md) | ⏸️ deprecated | XCM version error on Pioneer | [#3252](https://github.com/Koniverse/SubWallet-Extension/issues/3252) | bluezdot | — |
 | [US-33.65](../stories/US-33.65-improve-experience-when-users-wait-to-receive-tokens-af.md) | 📋 backlog | Improve experience when users wait to receive tokens after XCM | [#3288](https://github.com/Koniverse/SubWallet-Extension/issues/3288) | bluezdot | — |
 | [US-33.66](../stories/US-33.66-extension-support-xcm-for-mythos.md) | ✅ done | Extension - Support XCM for Mythos | [#3389](https://github.com/Koniverse/SubWallet-Extension/issues/3389) | nulllpc | 1.2.24 |
-| [US-33.67](../stories/US-33.67-implement-snowbridge-sdk-to-prevent-asset-loss.md) | ✅ done | Implement SnowBridge sdk to prevent asset loss | [#3416](https://github.com/Koniverse/SubWallet-Extension/issues/3416) | S2kael | — |
+| [US-33.67](../stories/US-33.67-implement-snowbridge-sdk-to-prevent-asset-loss.md) | ⏸️ deprecated | Implement SnowBridge sdk to prevent asset loss | [#3416](https://github.com/Koniverse/SubWallet-Extension/issues/3416) | S2kael | — |
 | [US-33.68](../stories/US-33.68-extension-update-xcm-to-v4.md) | ✅ done | Extension - Update XCM to V4 | [#3474](https://github.com/Koniverse/SubWallet-Extension/issues/3474) | bluezdot | — |
 | [US-33.69](../stories/US-33.69-support-snowbridge-transfer-from-ethereum-mythos-for-my.md) | ✅ done | Support Snowbridge transfer from Ethereum -> Mythos for MYTH | [#3502](https://github.com/Koniverse/SubWallet-Extension/issues/3502) | bluezdot | — |
 | [US-33.70](../stories/US-33.70-fix-bug-xcm.md) | ✅ done | Fix bug XCM | [#3519](https://github.com/Koniverse/SubWallet-Extension/issues/3519) | bluezdot | 1.2.28 |
 | [US-33.71](../stories/US-33.71-fix-bug-xcm-for-channel-dot-kah-pah.md) | ✅ done | Fix bug XCM for channel: DOT: KAH -> PAH | [#3561](https://github.com/Koniverse/SubWallet-Extension/issues/3561) | bluezdot | 1.2.29 |
 | [US-33.72](../stories/US-33.72-fixed-bug-xcm-usdt-pah-astr.md) | ✅ done | Fixed bug XCM USDT: PAH -> ASTR | [#3606](https://github.com/Koniverse/SubWallet-Extension/issues/3606) | bluezdot | 1.3.31 |
-| [US-33.73](../stories/US-33.73-integrate-xcm-extrinsic-dry-run-api.md) | ✅ done | Integrate XCM/extrinsic dry run API | [#3615](https://github.com/Koniverse/SubWallet-Extension/issues/3615) | — | — |
+| [US-33.73](../stories/US-33.73-integrate-xcm-extrinsic-dry-run-api.md) | ⏸️ deprecated | Integrate XCM/extrinsic dry run API | [#3615](https://github.com/Koniverse/SubWallet-Extension/issues/3615) | — | — |
 | [US-33.74](../stories/US-33.74-re-calculate-max-transferable-for-xcm-native-token.md) | ✅ done | Re-calculate max transferable for XCM native token | [#3617](https://github.com/Koniverse/SubWallet-Extension/issues/3617) | nulllpc | 1.2.30 |
 | [US-33.75](../stories/US-33.75-fixed-bug-xcm-for-acala.md) | ✅ done | Fixed bug XCM for Acala | [#3725](https://github.com/Koniverse/SubWallet-Extension/issues/3725) | bluezdot | 1.3.31 |
 | [US-33.76](../stories/US-33.76-extension-re-check-transfer-max-for-evm-account-when-xc.md) | ✅ done | Extension - Re-check Transfer Max for EVM account when XCM transfer | [#3876](https://github.com/Koniverse/SubWallet-Extension/issues/3876) | tunghp2002 | 1.3.8 |

@@ -36,8 +36,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**81 stories** — 66 done (shipped), 0 in flight (ready / in-progress /
-review, from the Projects board), 9 backlog (open, not yet started), 6 deprecated
+**81 stories** — 65 done (shipped), 0 in flight (ready / in-progress /
+review, from the Projects board), 9 backlog (open, not yet started), 7 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -115,7 +115,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-36.63](../stories/US-36.63-unblock-when-perform-stake-on-bifrost-with-ledger-accou.md) | ✅ done | Unblock when perform stake on Bifrost with ledger account | [#3931](https://github.com/Koniverse/SubWallet-Extension/issues/3931) | Thiendekaco | 1.3.43 |
 | [US-36.64](../stories/US-36.64-avail-space-support-avail-recovery-ledger-app.md) | 📋 backlog | Avail Space - Support Avail Recovery Ledger app | [#3994](https://github.com/Koniverse/SubWallet-Extension/issues/3994) | — | — |
 | [US-36.65](../stories/US-36.65-support-avail-bridge-when-using-ledger-nano-s.md) | ✅ done | Support Avail bridge when using Ledger Nano S+ | [#4225](https://github.com/Koniverse/SubWallet-Extension/issues/4225) | nulllpc | — |
-| [US-36.66](../stories/US-36.66-check-polkadot-generic-ledger-app-for-creditcoin.md) | ✅ done | Check Polkadot Generic Ledger app for Creditcoin | [#4357](https://github.com/Koniverse/SubWallet-Extension/issues/4357) | S2kael | — |
+| [US-36.66](../stories/US-36.66-check-polkadot-generic-ledger-app-for-creditcoin.md) | ⏸️ deprecated | Check Polkadot Generic Ledger app for Creditcoin | [#4357](https://github.com/Koniverse/SubWallet-Extension/issues/4357) | S2kael | — |
 | [US-36.67](../stories/US-36.67-update-ledger-substrate-js-library.md) | ✅ done | Update ledger-substrate-js library | [#4365](https://github.com/Koniverse/SubWallet-Extension/issues/4365) | Thiendekaco | 1.3.46 |
 | [US-36.68](../stories/US-36.68-integrate-polkadot-ledger-app.md) | ✅ done | Integrate Polkadot Ledger App | [#4408](https://github.com/Koniverse/SubWallet-Extension/issues/4408) | — | — |
 | [US-36.69](../stories/US-36.69-re-check-and-update-block-action-when-stake-with-ledger.md) | ✅ done | Re-check and update block action when stake with ledger account | [#4464](https://github.com/Koniverse/SubWallet-Extension/issues/4464) | Thiendekaco | 1.3.49 |

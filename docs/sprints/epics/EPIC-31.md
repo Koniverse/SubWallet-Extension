@@ -36,8 +36,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**109 stories** — 78 done (shipped), 9 in flight (ready / in-progress /
-review, from the Projects board), 11 backlog (open, not yet started), 11 deprecated
+**109 stories** — 77 done (shipped), 9 in flight (ready / in-progress /
+review, from the Projects board), 11 backlog (open, not yet started), 12 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -79,7 +79,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-31.27](../stories/US-31.27-webapp-update-logo-for-hydration-provider-on-the-swap-s.md) | ✅ done | WebApp - Update logo for Hydration provider on the Swap screen | [#3192](https://github.com/Koniverse/SubWallet-Extension/issues/3192) | frenkie-ng | 1.2.26 |
 | [US-31.28](../stories/US-31.28-research-uniswap-price-impact.md) | ✅ done | Research Uniswap price impact | [#3269](https://github.com/Koniverse/SubWallet-Extension/issues/3269) | bluezdot | 1.2.14 |
 | [US-31.29](../stories/US-31.29-add-support-swap-asset-hub.md) | ✅ done | Add support Swap Asset Hub | [#3272](https://github.com/Koniverse/SubWallet-Extension/issues/3272) | frenkie-ng | 1.2.14 |
-| [US-31.30](../stories/US-31.30-update-chainflip-version.md) | ✅ done | Update ChainFlip version | [#3274](https://github.com/Koniverse/SubWallet-Extension/issues/3274) | saltict | — |
+| [US-31.30](../stories/US-31.30-update-chainflip-version.md) | ⏸️ deprecated | Update ChainFlip version | [#3274](https://github.com/Koniverse/SubWallet-Extension/issues/3274) | saltict | — |
 | [US-31.31](../stories/US-31.31-support-xcm-channels.md) | ✅ done | Support XCM channels | [#3453](https://github.com/Koniverse/SubWallet-Extension/issues/3453) | bluezdot | 1.2.29 |
 | [US-31.32](../stories/US-31.32-webapp-improve-ui-for-selecting-token-to-pay-transactio.md) | ⏸️ deprecated | WebApp - Improve UI for selecting token to pay transaction fee on Hydration | [#3465](https://github.com/Koniverse/SubWallet-Extension/issues/3465) | — | — |
 | [US-31.33](../stories/US-31.33-research-usdt-usdc-swap-volume-on-hydration-stellaswap.md) | ✅ done | Research USDT, USDC swap volume on Hydration, Stellaswap | [#3482](https://github.com/Koniverse/SubWallet-Extension/issues/3482) | saltict | — |
