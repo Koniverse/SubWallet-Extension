@@ -6,7 +6,7 @@ status: done
 priority: P3
 points: 1
 sprint: sprint-2024-M10
-version_shipped: 
+version_shipped: 1.3.3
 prd_ref: []
 assignee: tunghp2002
 commit: a0eba39f51
@@ -22,7 +22,7 @@ Keep the NFT surface correct as the app evolved (extension → webapp, successiv
 
 Display/detail-screen fixes, Home/NFT UI upgrades, sent-NFT and turned-off-network visibility, cross-browser (2-browser) consistency, the manage-NFT webapp surface, and per-collection display bugs (OG WUD BURN, sub0 Lisbon).
 
-This is a **consolidated maintenance story**: it groups 24 related tracker issue(s) into one capability with a clear boundary, replacing the former one-issue-per-story ledger. It materializes **no FR** (the NFT requirement set is [US-9.1](US-9.1-substrate-nft-display.md)…[US-9.10](US-9.10-nft-display-and-transfer-hardening.md)); it records incremental work on this capability. Full issue→story traceability is the table below and [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md). **`assignee` / `commit` / `sprint` / `points` are a representative backfill anchor** — taken from the most recent constituent that carries a commit (the last row of the timeline), not the full set; the per-issue spread is the timeline below. `version_shipped` is left empty because the capability grew across many releases (0.3.3 → 1.3.3) — no single one delivered it.
+This is a **consolidated maintenance story**: it groups 24 related tracker issue(s) into one capability with a clear boundary, replacing the former one-issue-per-story ledger. It materializes **no FR** (the NFT requirement set is [US-9.1](US-9.1-substrate-nft-display.md)…[US-9.10](US-9.10-nft-display-and-transfer-hardening.md)); it records incremental work on this capability. Full issue→story traceability is the table below and [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md). **`assignee` / `commit` / `sprint` / `version_shipped` / `points` are a representative backfill anchor** — the most recent shipped constituent (the last row of the timeline), not the full set. The capability actually spans releases 0.3.3 → 1.3.3, so the timeline below is the full record — `version_shipped` names only the last.
 
 ## Development timeline & consolidated issues
 
