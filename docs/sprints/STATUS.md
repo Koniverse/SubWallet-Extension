@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-17 02:46:27 UTC
+> Last generated: 2026-07-17 04:45:31 UTC
 > Total stories: 2887
 
 ## 📋 Backlog (296)
@@ -129,11 +129,6 @@
 | US-28.181 | Extension - Improve show well-known tokens on top when Receive token | EPIC-28 | P3 | 1 | — | — |
 | US-28.185 | Extension - Add validate receipient address  when transfer | EPIC-28 | P3 | 1 | — | — |
 | US-28.190 | [Transaction] Ensure proper initialization when navigating via direct link | EPIC-28 | P3 | 1 | — | — |
-| US-29.21 | Add NFT portfolio management feature | EPIC-29 | P3 | 1 | — | — |
-| US-29.89 | WebApp - Adjust showing/validating address on Send token, Send NFT, History (Round 2) | EPIC-29 | P3 | 1 | — | — |
-| US-29.109 | Extension - Support RUNE & Ordinal for Bitcoin | EPIC-29 | P3 | 1 | — | — |
-| US-29.110 | Support showing Rune and Inscription | EPIC-29 | P3 | 1 | — | — |
-| US-29.114 | Implement Client-side NFT Service & Migrate Existing Logic to SDK | EPIC-29 | P3 | 1 | — | frenkie-ng |
 | US-3.8 | Account recovery & identity (roadmap) | EPIC-3 | P3 | 8 | — | — |
 | US-3.9 | Unified → Solo account split | EPIC-3 | P0 | 3 | — | — |
 | US-30.94 | WebApp - Implement Wallet Connect like DApp | EPIC-30 | P3 | 1 | — | — |
@@ -304,6 +299,11 @@
 | US-9.7 | Bitcoin Ordinals / inscriptions display | EPIC-9 | P2 | 5 | — | — |
 | US-9.9 | Additional NFT collections & standards (ERC-6551) | EPIC-9 | P2 | 5 | — | — |
 | US-9.10 | NFT display & transfer hardening | EPIC-9 | P2 | 5 | — | — |
+| US-29.21 | Add NFT portfolio management feature | EPIC-9 | P3 | 1 | — | — |
+| US-29.89 | WebApp - Adjust showing/validating address on Send token, Send NFT, History (Round 2) | EPIC-9 | P3 | 1 | — | — |
+| US-29.109 | Extension - Support RUNE & Ordinal for Bitcoin | EPIC-9 | P3 | 1 | — | — |
+| US-29.110 | Support showing Rune and Inscription | EPIC-9 | P3 | 1 | — | — |
+| US-29.114 | Implement Client-side NFT Service & Migrate Existing Logic to SDK | EPIC-9 | P3 | 1 | — | frenkie-ng |
 
 ## 🟢 Ready (15)
 
@@ -1335,104 +1335,6 @@
 | US-28.199 | [Extension] Refactor Available Balance logic for different transaction types | EPIC-28 | P3 | 1 | sprint-2026-M07 | tunghp2002 |
 | US-28.200 | Support Transfer Alpha Token | EPIC-28 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
 | US-28.201 | Turn off warning popup for transfers between PAH <> KAH | EPIC-28 | P3 | 1 | sprint-2026-M04 | PDTnhah |
-| US-29.1 | Integrate Snow EVM network | EPIC-29 | P3 | 1 | sprint-2023-M05 | minhle2994 |
-| US-29.2 | Update RPC endpoint for Mangata | EPIC-29 | P3 | 1 | sprint-2023-M05 | minhle2994 |
-| US-29.3 | Send / Receive NFT: Acala & Karura | EPIC-29 | P3 | 1 | sprint-2022-M03 | minhle2994 |
-| US-29.4 | Update Zeitgeist and Subsocial integration | EPIC-29 | P3 | 1 | sprint-2023-M05 | minhle2994 |
-| US-29.5 | Send / Receive NFT: Statemine / Statemint | EPIC-29 | P3 | 1 | sprint-2022-M03 | minhle2994 |
-| US-29.6 | Send & Receive Moonbeam / Moonriver NFT | EPIC-29 | P3 | 1 | sprint-2022-M04 | minhle2994 |
-| US-29.7 | Integrate Astar NFT | EPIC-29 | P3 | 1 | sprint-2022-M04 | minhle2994 |
-| US-29.8 | Integrate Bit.Country NFT: Display, Send, Receive | EPIC-29 | P3 | 1 | sprint-2022-M04 | nulllpc |
-| US-29.9 | Display incorrect screen when click on “Back to Homepage” button in case Send NFT History has just been recorded on Subs | EPIC-29 | P3 | 1 | sprint-2022-M04 | nulllpc |
-| US-29.10 | Can't open or takes a long time to open the extension if I previously turned off the extension in the NFT tab ... | EPIC-29 | P3 | 1 | sprint-2022-M04 | saltict |
-| US-29.11 | Improve get NFT flow | EPIC-29 | P3 | 1 | sprint-2022-M04 | nulllpc |
-| US-29.12 | Some problems related to NFT function | EPIC-29 | P3 | 1 | sprint-2022-M04 | nulllpc |
-| US-29.13 | Improve NFT display with extending mode | EPIC-29 | P3 | 1 | sprint-2022-M04 | nulllpc |
-| US-29.14 | Update Astar NFT: Astar Pass & Astar Cats | EPIC-29 | P3 | 1 | sprint-2022-M04 | nulllpc |
-| US-29.15 | Integrate new cross-chain tokens on Karura (RMRK, ARIS, QTZ, ...) | EPIC-29 | P3 | 1 | sprint-2022-M05 | hieudd |
-| US-29.16 | Collect NFT on Singular.app but it doesnt show on SubWallet | EPIC-29 | P3 | 1 | sprint-2022-M05 | nulllpc |
-| US-29.17 | Fix bug can not load NFT | EPIC-29 | P3 | 1 | sprint-2022-M05 | nulllpc |
-| US-29.18 | Add Polka Potions NFT collection | EPIC-29 | P3 | 1 | sprint-2022-M04 | — |
-| US-29.19 | Fix bug can not send EVM NFT | EPIC-29 | P3 | 1 | sprint-2022-M05 | nulllpc |
-| US-29.22 | Bug Send NFT when balance is too low | EPIC-29 | P3 | 1 | sprint-2022-M05 | nulllpc |
-| US-29.23 | Update ipfs gateway for rmrk | EPIC-29 | P3 | 1 | sprint-2022-M06 | nulllpc |
-| US-29.24 | Fix bug 'Encountered an error, please try again' when Send NFT | EPIC-29 | P3 | 1 | sprint-2022-M06 | nulllpc |
-| US-29.25 | [QR] [Transfer] [NFT] Support transfer NFT via QR | EPIC-29 | P3 | 1 | sprint-2022-M06 | S2kael |
-| US-29.26 | Bug happens when user perform import tokens, import NFT | EPIC-29 | P3 | 1 | sprint-2022-M06 | nulllpc |
-| US-29.27 | Error parsing JSON from RMRK NFT | EPIC-29 | P3 | 1 | sprint-2022-M07 | nulllpc |
-| US-29.28 | Integration MoonFit NFT | EPIC-29 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-29.29 | Optimize NFT loading with <https://nft.storage/> | EPIC-29 | P3 | 1 | sprint-2022-M07 | huukhai |
-| US-29.30 | Add Moonpets NFT | EPIC-29 | P3 | 1 | sprint-2022-M08 | hieudd |
-| US-29.31 | Fix bug happens when NFT image error | EPIC-29 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-29.33 | Bug happens when get NFT from ipfs-gateway.cloud | EPIC-29 | P3 | 1 | sprint-2022-M09 | — |
-| US-29.34 | Improved handling for case the NFT's source failure | EPIC-29 | P3 | 1 | sprint-2023-M06 | huukhai |
-| US-29.35 | Import NFT button not showing after viewing NFT details | EPIC-29 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-29.36 | Support Bit.Country'NFT Trading and Land Portfolio | EPIC-29 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-29.37 | Integration ArtZero NFT | EPIC-29 | P3 | 1 | sprint-2022-M10 | nulllpc |
-| US-29.38 | Add support for USDC & stEWT | EPIC-29 | P3 | 1 | sprint-2026-M01 | nulllpc |
-| US-29.39 | Add more attributes to NFT collection and item | EPIC-29 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-29.40 | Integrate Pioneer Network NFT | EPIC-29 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-29.41 | Add owner attribute to Pioneer NFT | EPIC-29 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-29.42 | Support Zeitgeist NFT | EPIC-29 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-29.43 | Show incorrect NFT quantity on All Accounts mode in case send NFT on the same wallet | EPIC-29 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-29.44 | Issue sending Bit.Country NFT and displaying BIT token | EPIC-29 | P3 | 1 | sprint-2022-M10 | nulllpc |
-| US-29.45 | Unable to send NFT with QR Account in case of network not selected | EPIC-29 | P3 | 1 | sprint-2022-M10 | S2kael |
-| US-29.46 | Update parsing IPFS link for NFT | EPIC-29 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-29.47 | Fix bug NFT displays an error after update function parses transaction in case upgrade version | EPIC-29 | P3 | 1 | sprint-2022-M12 | nulllpc |
-| US-29.48 | Update RMRK NFT endpoints | EPIC-29 | P3 | 1 | sprint-2022-M12 | nulllpc |
-| US-29.49 | Do not show sub0 Lisbon 2022 NFT | EPIC-29 | P3 | 1 | sprint-2022-M12 | nulllpc |
-| US-29.50 | Update RMRK NFT endpoints | EPIC-29 | P3 | 1 | sprint-2023-M02 | nulllpc |
-| US-29.51 | Migrate NFT feature | EPIC-29 | P3 | 1 | sprint-2023-M06 | — |
-| US-29.52 | Upgrade UI - Screen Home / NFT | EPIC-29 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-29.53 | Update logic for ink 4.0 and delete old PSP token | EPIC-29 | P3 | 1 | sprint-2023-M03 | nulllpc |
-| US-29.55 | Upgrade UI - Still show NFT when turning off the network | EPIC-29 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-29.56 | Upgrade UI - Still shows NFT sent | EPIC-29 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-29.57 | Upgrade UI - Improve some issues related to the NFT feature | EPIC-29 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-29.58 | Do not save Collection name input when import NFT | EPIC-29 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-29.59 | Still showing sent NFT when using 2 different browser | EPIC-29 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-29.61 | Add ArtZero API for Astar's NFT | EPIC-29 | P3 | 1 | sprint-2025-M03 | — |
-| US-29.63 | Integrate Land/Estate NFT on Pioneer's metaverses | EPIC-29 | P3 | 1 | sprint-2023-M07 | nulllpc |
-| US-29.64 | Fix bug show Moonfit’s NFT | EPIC-29 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-29.65 | Update RMRK API | EPIC-29 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-29.67 | Integrate Unique's NFT into SubWallet | EPIC-29 | P3 | 1 | sprint-2024-M09 | nulllpc |
-| US-29.68 | Fixed NFT Gateway problems with non-extension environment | EPIC-29 | P3 | 1 | sprint-2023-M07 | saltict |
-| US-29.70 | Fix IPFS resolver NFT Problems | EPIC-29 | P3 | 1 | sprint-2023-M09 | saltict |
-| US-29.71 | Can not load another NFTs when collection contain any NFT with wrong information | EPIC-29 | P3 | 1 | sprint-2023-M07 | nulllpc |
-| US-29.72 | WebApp - Bugs related Manage NFT feature | EPIC-29 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-29.73 | Show collection ID and NFT Id in the NFT detail screen | EPIC-29 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-29.74 | Fix a few minor bugs with NFT | EPIC-29 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-29.75 | WebApp - Error page in case send NFT | EPIC-29 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-29.76 | WebApp - Still showing sent NFT | EPIC-29 | P3 | 1 | sprint-2023-M09 | lw-cdm |
-| US-29.78 | WebApp - Can't navigate Address book screen when send NFT | EPIC-29 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-29.79 | [Grab 100 MDOT] Mint NFT | EPIC-29 | P3 | 1 | sprint-2023-M10 | saltict |
-| US-29.80 | WebApp - NFT isn't displayed after import successfully | EPIC-29 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-29.81 | Fixed bug Do not show Acala, Karura NFT | EPIC-29 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-29.83 | Recheck the impact on NFT features when ArtZero updates its API | EPIC-29 | P3 | 1 | sprint-2024-M04 | S2kael |
-| US-29.84 | Fixed bug show transfer NFT history details | EPIC-29 | P3 | 1 | sprint-2023-M12 | lw-cdm |
-| US-29.85 | Showing ordinals on webapp | EPIC-29 | P3 | 1 | sprint-2024-M01 | S2kael |
-| US-29.86 | Add more inscriptions on SubWallet Web app | EPIC-29 | P3 | 1 | sprint-2023-M12 | nulllpc |
-| US-29.87 | WebApp - Adjust showing/validating address on Send token, Send NFT, History | EPIC-29 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-29.88 | Fixed bug error page on NFT details screen | EPIC-29 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-29.90 | Fix error when fetching with Avail network | EPIC-29 | P3 | 1 | sprint-2024-M05 | S2kael |
-| US-29.91 | Support Avail light client NFT | EPIC-29 | P3 | 1 | sprint-2024-M08 | nulllpc |
-| US-29.92 | Fix bug Show incorrect Amount on Transaction history, Transaction confirmation for transfer NFT | EPIC-29 | P3 | 1 | sprint-2024-M06 | Thiendekaco |
-| US-29.93 | Support Avail Light Client NFT | EPIC-29 | P3 | 1 | sprint-2024-M07 | bluezdot |
-| US-29.95 | Unified account - Update address input component for NFT transfer | EPIC-29 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-29.96 | Support Ternoa NFT | EPIC-29 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
-| US-29.97 | Add validate tokenOfOwnerByIndex when import NFT | EPIC-29 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
-| US-29.98 | Extension - Add validate when import NFT in case there is no method tokenOfOwnerByIndex | EPIC-29 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
-| US-29.99 | Extension - Don't show transferable balance when send NFT on Vara network | EPIC-29 | P3 | 1 | sprint-2024-M09 | — |
-| US-29.100 | Fixed bug send NFT on Ethereum network | EPIC-29 | P3 | 1 | sprint-2024-M12 | PDTnhah |
-| US-29.101 | Fix bug show OG WUD BURN NFT Collection | EPIC-29 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
-| US-29.102 | Fixed bug import NFT (#3837) | EPIC-29 | P3 | 1 | sprint-2025-M07 | PDTnhah |
-| US-29.105 | Integration NFT for Story Protocol | EPIC-29 | P3 | 1 | sprint-2024-M11 | tunghp2002 |
-| US-29.107 | Extension - Follow display NFT for Story Odyssey Testnet after mainnet | EPIC-29 | P3 | 1 | sprint-2025-M03 | ThaoNguyen998 |
-| US-29.108 | Fixed bug Do not display NFT images on Vara network, PAH | EPIC-29 | P3 | 1 | sprint-2025-M09 | Thiendekaco |
-| US-29.111 | Support show NFT haven't method tokenOfOwnerByIndex | EPIC-29 | P3 | 1 | sprint-2025-M12 | frenkie-ng |
-| US-29.112 | Unable to import NFT ERC-721 on Rari chain | EPIC-29 | P3 | 1 | sprint-2025-M12 | frenkie-ng |
-| US-29.113 | Implement UI to support the Nested NFT standard | EPIC-29 | P3 | 1 | sprint-2026-M01 | frenkie-ng |
-| US-29.115 | Replace hosted BTC APIs with Blockstream API and evaluate Runes/Ordinals alternatives | EPIC-29 | P3 | 1 | sprint-2026-M06 | tunghp2002 |
-| US-29.116 | Bitcoin on-chain data mismatch on host API (Fees, Inscriptions, Runes) | EPIC-29 | P3 | 1 | sprint-2026-M06 | anhntk54 |
 | US-3.1 | Create a new wallet via seed phrase | EPIC-3 | P0 | 3 | sprint-2022-M01 | jacogr |
 | US-3.2 | Import account via seed phrase or private key | EPIC-3 | P0 | 3 | sprint-2022-M03 | Quangdm-cdm |
 | US-3.3 | Import account via JSON / QR / Trust Wallet | EPIC-3 | P1 | 5 | sprint-2025-M12 | bluezdot |
@@ -2696,6 +2598,104 @@
 | US-9.5 | NFT transfer (send) | EPIC-9 | P1 | 3 | sprint-2022-M03 | nulllpc |
 | US-9.6 | 3D and video NFT viewer | EPIC-9 | P2 | 5 | sprint-2022-M09 | nulllpc |
 | US-9.8 | Custom NFT import | EPIC-9 | P2 | 3 | sprint-2022-M05 | nulllpc |
+| US-29.1 | Integrate Snow EVM network | EPIC-9 | P3 | 1 | sprint-2023-M05 | minhle2994 |
+| US-29.2 | Update RPC endpoint for Mangata | EPIC-9 | P3 | 1 | sprint-2023-M05 | minhle2994 |
+| US-29.3 | Send / Receive NFT: Acala & Karura | EPIC-9 | P3 | 1 | sprint-2022-M03 | minhle2994 |
+| US-29.4 | Update Zeitgeist and Subsocial integration | EPIC-9 | P3 | 1 | sprint-2023-M05 | minhle2994 |
+| US-29.5 | Send / Receive NFT: Statemine / Statemint | EPIC-9 | P3 | 1 | sprint-2022-M03 | minhle2994 |
+| US-29.6 | Send & Receive Moonbeam / Moonriver NFT | EPIC-9 | P3 | 1 | sprint-2022-M04 | minhle2994 |
+| US-29.7 | Integrate Astar NFT | EPIC-9 | P3 | 1 | sprint-2022-M04 | minhle2994 |
+| US-29.8 | Integrate Bit.Country NFT: Display, Send, Receive | EPIC-9 | P3 | 1 | sprint-2022-M04 | nulllpc |
+| US-29.9 | Display incorrect screen when click on “Back to Homepage” button in case Send NFT History has just been recorded on Subs | EPIC-9 | P3 | 1 | sprint-2022-M04 | nulllpc |
+| US-29.10 | Can't open or takes a long time to open the extension if I previously turned off the extension in the NFT tab ... | EPIC-9 | P3 | 1 | sprint-2022-M04 | saltict |
+| US-29.11 | Improve get NFT flow | EPIC-9 | P3 | 1 | sprint-2022-M04 | nulllpc |
+| US-29.12 | Some problems related to NFT function | EPIC-9 | P3 | 1 | sprint-2022-M04 | nulllpc |
+| US-29.13 | Improve NFT display with extending mode | EPIC-9 | P3 | 1 | sprint-2022-M04 | nulllpc |
+| US-29.14 | Update Astar NFT: Astar Pass & Astar Cats | EPIC-9 | P3 | 1 | sprint-2022-M04 | nulllpc |
+| US-29.15 | Integrate new cross-chain tokens on Karura (RMRK, ARIS, QTZ, ...) | EPIC-9 | P3 | 1 | sprint-2022-M05 | hieudd |
+| US-29.16 | Collect NFT on Singular.app but it doesnt show on SubWallet | EPIC-9 | P3 | 1 | sprint-2022-M05 | nulllpc |
+| US-29.17 | Fix bug can not load NFT | EPIC-9 | P3 | 1 | sprint-2022-M05 | nulllpc |
+| US-29.18 | Add Polka Potions NFT collection | EPIC-9 | P3 | 1 | sprint-2022-M04 | — |
+| US-29.19 | Fix bug can not send EVM NFT | EPIC-9 | P3 | 1 | sprint-2022-M05 | nulllpc |
+| US-29.22 | Bug Send NFT when balance is too low | EPIC-9 | P3 | 1 | sprint-2022-M05 | nulllpc |
+| US-29.23 | Update ipfs gateway for rmrk | EPIC-9 | P3 | 1 | sprint-2022-M06 | nulllpc |
+| US-29.24 | Fix bug 'Encountered an error, please try again' when Send NFT | EPIC-9 | P3 | 1 | sprint-2022-M06 | nulllpc |
+| US-29.25 | [QR] [Transfer] [NFT] Support transfer NFT via QR | EPIC-9 | P3 | 1 | sprint-2022-M06 | S2kael |
+| US-29.26 | Bug happens when user perform import tokens, import NFT | EPIC-9 | P3 | 1 | sprint-2022-M06 | nulllpc |
+| US-29.27 | Error parsing JSON from RMRK NFT | EPIC-9 | P3 | 1 | sprint-2022-M07 | nulllpc |
+| US-29.28 | Integration MoonFit NFT | EPIC-9 | P3 | 1 | sprint-2023-M06 | S2kael |
+| US-29.29 | Optimize NFT loading with <https://nft.storage/> | EPIC-9 | P3 | 1 | sprint-2022-M07 | huukhai |
+| US-29.30 | Add Moonpets NFT | EPIC-9 | P3 | 1 | sprint-2022-M08 | hieudd |
+| US-29.31 | Fix bug happens when NFT image error | EPIC-9 | P3 | 1 | sprint-2022-M08 | nulllpc |
+| US-29.33 | Bug happens when get NFT from ipfs-gateway.cloud | EPIC-9 | P3 | 1 | sprint-2022-M09 | — |
+| US-29.34 | Improved handling for case the NFT's source failure | EPIC-9 | P3 | 1 | sprint-2023-M06 | huukhai |
+| US-29.35 | Import NFT button not showing after viewing NFT details | EPIC-9 | P3 | 1 | sprint-2022-M09 | nulllpc |
+| US-29.36 | Support Bit.Country'NFT Trading and Land Portfolio | EPIC-9 | P3 | 1 | sprint-2023-M05 | nulllpc |
+| US-29.37 | Integration ArtZero NFT | EPIC-9 | P3 | 1 | sprint-2022-M10 | nulllpc |
+| US-29.38 | Add support for USDC & stEWT | EPIC-9 | P3 | 1 | sprint-2026-M01 | nulllpc |
+| US-29.39 | Add more attributes to NFT collection and item | EPIC-9 | P3 | 1 | sprint-2022-M09 | nulllpc |
+| US-29.40 | Integrate Pioneer Network NFT | EPIC-9 | P3 | 1 | sprint-2022-M09 | nulllpc |
+| US-29.41 | Add owner attribute to Pioneer NFT | EPIC-9 | P3 | 1 | sprint-2022-M09 | nulllpc |
+| US-29.42 | Support Zeitgeist NFT | EPIC-9 | P3 | 1 | sprint-2022-M09 | nulllpc |
+| US-29.43 | Show incorrect NFT quantity on All Accounts mode in case send NFT on the same wallet | EPIC-9 | P3 | 1 | sprint-2023-M06 | nulllpc |
+| US-29.44 | Issue sending Bit.Country NFT and displaying BIT token | EPIC-9 | P3 | 1 | sprint-2022-M10 | nulllpc |
+| US-29.45 | Unable to send NFT with QR Account in case of network not selected | EPIC-9 | P3 | 1 | sprint-2022-M10 | S2kael |
+| US-29.46 | Update parsing IPFS link for NFT | EPIC-9 | P3 | 1 | sprint-2022-M11 | nulllpc |
+| US-29.47 | Fix bug NFT displays an error after update function parses transaction in case upgrade version | EPIC-9 | P3 | 1 | sprint-2022-M12 | nulllpc |
+| US-29.48 | Update RMRK NFT endpoints | EPIC-9 | P3 | 1 | sprint-2022-M12 | nulllpc |
+| US-29.49 | Do not show sub0 Lisbon 2022 NFT | EPIC-9 | P3 | 1 | sprint-2022-M12 | nulllpc |
+| US-29.50 | Update RMRK NFT endpoints | EPIC-9 | P3 | 1 | sprint-2023-M02 | nulllpc |
+| US-29.51 | Migrate NFT feature | EPIC-9 | P3 | 1 | sprint-2023-M06 | — |
+| US-29.52 | Upgrade UI - Screen Home / NFT | EPIC-9 | P3 | 1 | sprint-2023-M04 | nulllpc |
+| US-29.53 | Update logic for ink 4.0 and delete old PSP token | EPIC-9 | P3 | 1 | sprint-2023-M03 | nulllpc |
+| US-29.55 | Upgrade UI - Still show NFT when turning off the network | EPIC-9 | P3 | 1 | sprint-2023-M04 | nulllpc |
+| US-29.56 | Upgrade UI - Still shows NFT sent | EPIC-9 | P3 | 1 | sprint-2023-M06 | nulllpc |
+| US-29.57 | Upgrade UI - Improve some issues related to the NFT feature | EPIC-9 | P3 | 1 | sprint-2023-M06 | S2kael |
+| US-29.58 | Do not save Collection name input when import NFT | EPIC-9 | P3 | 1 | sprint-2023-M04 | S2kael |
+| US-29.59 | Still showing sent NFT when using 2 different browser | EPIC-9 | P3 | 1 | sprint-2023-M04 | nulllpc |
+| US-29.61 | Add ArtZero API for Astar's NFT | EPIC-9 | P3 | 1 | sprint-2025-M03 | — |
+| US-29.63 | Integrate Land/Estate NFT on Pioneer's metaverses | EPIC-9 | P3 | 1 | sprint-2023-M07 | nulllpc |
+| US-29.64 | Fix bug show Moonfit’s NFT | EPIC-9 | P3 | 1 | sprint-2023-M05 | nulllpc |
+| US-29.65 | Update RMRK API | EPIC-9 | P3 | 1 | sprint-2023-M05 | nulllpc |
+| US-29.67 | Integrate Unique's NFT into SubWallet | EPIC-9 | P3 | 1 | sprint-2024-M09 | nulllpc |
+| US-29.68 | Fixed NFT Gateway problems with non-extension environment | EPIC-9 | P3 | 1 | sprint-2023-M07 | saltict |
+| US-29.70 | Fix IPFS resolver NFT Problems | EPIC-9 | P3 | 1 | sprint-2023-M09 | saltict |
+| US-29.71 | Can not load another NFTs when collection contain any NFT with wrong information | EPIC-9 | P3 | 1 | sprint-2023-M07 | nulllpc |
+| US-29.72 | WebApp - Bugs related Manage NFT feature | EPIC-9 | P3 | 1 | sprint-2023-M08 | lw-cdm |
+| US-29.73 | Show collection ID and NFT Id in the NFT detail screen | EPIC-9 | P3 | 1 | sprint-2023-M08 | nulllpc |
+| US-29.74 | Fix a few minor bugs with NFT | EPIC-9 | P3 | 1 | sprint-2023-M08 | nulllpc |
+| US-29.75 | WebApp - Error page in case send NFT | EPIC-9 | P3 | 1 | sprint-2023-M08 | lw-cdm |
+| US-29.76 | WebApp - Still showing sent NFT | EPIC-9 | P3 | 1 | sprint-2023-M09 | lw-cdm |
+| US-29.78 | WebApp - Can't navigate Address book screen when send NFT | EPIC-9 | P3 | 1 | sprint-2023-M10 | S2kael |
+| US-29.79 | [Grab 100 MDOT] Mint NFT | EPIC-9 | P3 | 1 | sprint-2023-M10 | saltict |
+| US-29.80 | WebApp - NFT isn't displayed after import successfully | EPIC-9 | P3 | 1 | sprint-2023-M10 | S2kael |
+| US-29.81 | Fixed bug Do not show Acala, Karura NFT | EPIC-9 | P3 | 1 | sprint-2023-M10 | S2kael |
+| US-29.83 | Recheck the impact on NFT features when ArtZero updates its API | EPIC-9 | P3 | 1 | sprint-2024-M04 | S2kael |
+| US-29.84 | Fixed bug show transfer NFT history details | EPIC-9 | P3 | 1 | sprint-2023-M12 | lw-cdm |
+| US-29.85 | Showing ordinals on webapp | EPIC-9 | P3 | 1 | sprint-2024-M01 | S2kael |
+| US-29.86 | Add more inscriptions on SubWallet Web app | EPIC-9 | P3 | 1 | sprint-2023-M12 | nulllpc |
+| US-29.87 | WebApp - Adjust showing/validating address on Send token, Send NFT, History | EPIC-9 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
+| US-29.88 | Fixed bug error page on NFT details screen | EPIC-9 | P3 | 1 | sprint-2024-M03 | bluezdot |
+| US-29.90 | Fix error when fetching with Avail network | EPIC-9 | P3 | 1 | sprint-2024-M05 | S2kael |
+| US-29.91 | Support Avail light client NFT | EPIC-9 | P3 | 1 | sprint-2024-M08 | nulllpc |
+| US-29.92 | Fix bug Show incorrect Amount on Transaction history, Transaction confirmation for transfer NFT | EPIC-9 | P3 | 1 | sprint-2024-M06 | Thiendekaco |
+| US-29.93 | Support Avail Light Client NFT | EPIC-9 | P3 | 1 | sprint-2024-M07 | bluezdot |
+| US-29.95 | Unified account - Update address input component for NFT transfer | EPIC-9 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
+| US-29.96 | Support Ternoa NFT | EPIC-9 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
+| US-29.97 | Add validate tokenOfOwnerByIndex when import NFT | EPIC-9 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
+| US-29.98 | Extension - Add validate when import NFT in case there is no method tokenOfOwnerByIndex | EPIC-9 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
+| US-29.99 | Extension - Don't show transferable balance when send NFT on Vara network | EPIC-9 | P3 | 1 | sprint-2024-M09 | — |
+| US-29.100 | Fixed bug send NFT on Ethereum network | EPIC-9 | P3 | 1 | sprint-2024-M12 | PDTnhah |
+| US-29.101 | Fix bug show OG WUD BURN NFT Collection | EPIC-9 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
+| US-29.102 | Fixed bug import NFT (#3837) | EPIC-9 | P3 | 1 | sprint-2025-M07 | PDTnhah |
+| US-29.105 | Integration NFT for Story Protocol | EPIC-9 | P3 | 1 | sprint-2024-M11 | tunghp2002 |
+| US-29.107 | Extension - Follow display NFT for Story Odyssey Testnet after mainnet | EPIC-9 | P3 | 1 | sprint-2025-M03 | ThaoNguyen998 |
+| US-29.108 | Fixed bug Do not display NFT images on Vara network, PAH | EPIC-9 | P3 | 1 | sprint-2025-M09 | Thiendekaco |
+| US-29.111 | Support show NFT haven't method tokenOfOwnerByIndex | EPIC-9 | P3 | 1 | sprint-2025-M12 | frenkie-ng |
+| US-29.112 | Unable to import NFT ERC-721 on Rari chain | EPIC-9 | P3 | 1 | sprint-2025-M12 | frenkie-ng |
+| US-29.113 | Implement UI to support the Nested NFT standard | EPIC-9 | P3 | 1 | sprint-2026-M01 | frenkie-ng |
+| US-29.115 | Replace hosted BTC APIs with Blockstream API and evaluate Runes/Ordinals alternatives | EPIC-9 | P3 | 1 | sprint-2026-M06 | tunghp2002 |
+| US-29.116 | Bitcoin on-chain data mismatch on host API (Fees, Inscriptions, Runes) | EPIC-9 | P3 | 1 | sprint-2026-M06 | anhntk54 |
 
 ## 🚫 Blocked (0)
 
@@ -2779,19 +2779,6 @@ _No stories_
 | US-28.126 | WebApp - Adjust showing/validating address when transfer assets | EPIC-28 | P3 | 1 | — | saltict |
 | US-28.152 | Update transferable balance calculation for other pallets | EPIC-28 | P3 | 1 | — | nulllpc |
 | US-28.156 | Extension - Improve block transfer to empty account | EPIC-28 | P3 | 1 | — | — |
-| US-29.20 | Integrate NFTs on Altair NFT Playground | EPIC-29 | P3 | 1 | — | Sokol142196 |
-| US-29.32 | Integrate Gromlins NFT | EPIC-29 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-29.54 | An error occurs when send WASM NFT | EPIC-29 | P3 | 1 | — | Sokol142196 |
-| US-29.60 | Show duplicate network enable message in the import token, import nft screen | EPIC-29 | P3 | 1 | — | Sokol142196 |
-| US-29.62 | Bug when URL NFT collection fails | EPIC-29 | P3 | 1 | — | nulllpc |
-| US-29.66 | Crash app in case import NFT by ERC20, PSP22 contract | EPIC-29 | P3 | 1 | — | Sokol142196 |
-| US-29.69 | Support Zk Assets NFT | EPIC-29 | P3 | 1 | — | — |
-| US-29.77 | WebApp - Re- check NFT of the Statemine network | EPIC-29 | P3 | 1 | sprint-2024-M09 | tunghp2002 |
-| US-29.82 | Do not delete NFT data when reset wallet | EPIC-29 | P3 | 1 | — | — |
-| US-29.94 | WebApp - Show incorrect Amount on Transaction confirmation for transfer NFT | EPIC-29 | P3 | 1 | — | frenkie-ng |
-| US-29.103 | Extension - Don't show NFT although imported successfully | EPIC-29 | P3 | 1 | — | PDTnhah |
-| US-29.104 | Extension - Integration NFT for Story Protocol | EPIC-29 | P3 | 1 | — | — |
-| US-29.106 | Extension - Unable to import NFT | EPIC-29 | P3 | 1 | — | PDTnhah |
 | US-30.11 | Support Multi-Sign | EPIC-30 | P3 | 1 | — | saltict |
 | US-30.17 | Get an existential deposit warning when doing a sign transactions | EPIC-30 | P3 | 1 | — | lw-cdm |
 | US-30.29 | Classify connected/cancelled/rejected status for the connect to the DApps | EPIC-30 | P3 | 1 | — | — |
@@ -2924,6 +2911,19 @@ _No stories_
 | US-41.476 | Extension - Default enable DOT (PAH) & KSM (KAH) | EPIC-41 | P3 | 1 | — | PDTnhah |
 | US-41.478 | Webapp - Default enable DOT (PAH) & KSM (KAH) | EPIC-41 | P3 | 1 | — | lw-cdm |
 | US-41.480 | Extension - Add support for Unique' Nested NFTs | EPIC-41 | P3 | 1 | — | — |
+| US-29.20 | Integrate NFTs on Altair NFT Playground | EPIC-9 | P3 | 1 | — | Sokol142196 |
+| US-29.32 | Integrate Gromlins NFT | EPIC-9 | P3 | 1 | sprint-2022-M09 | nulllpc |
+| US-29.54 | An error occurs when send WASM NFT | EPIC-9 | P3 | 1 | — | Sokol142196 |
+| US-29.60 | Show duplicate network enable message in the import token, import nft screen | EPIC-9 | P3 | 1 | — | Sokol142196 |
+| US-29.62 | Bug when URL NFT collection fails | EPIC-9 | P3 | 1 | — | nulllpc |
+| US-29.66 | Crash app in case import NFT by ERC20, PSP22 contract | EPIC-9 | P3 | 1 | — | Sokol142196 |
+| US-29.69 | Support Zk Assets NFT | EPIC-9 | P3 | 1 | — | — |
+| US-29.77 | WebApp - Re- check NFT of the Statemine network | EPIC-9 | P3 | 1 | sprint-2024-M09 | tunghp2002 |
+| US-29.82 | Do not delete NFT data when reset wallet | EPIC-9 | P3 | 1 | — | — |
+| US-29.94 | WebApp - Show incorrect Amount on Transaction confirmation for transfer NFT | EPIC-9 | P3 | 1 | — | frenkie-ng |
+| US-29.103 | Extension - Don't show NFT although imported successfully | EPIC-9 | P3 | 1 | — | PDTnhah |
+| US-29.104 | Extension - Integration NFT for Story Protocol | EPIC-9 | P3 | 1 | — | — |
+| US-29.106 | Extension - Unable to import NFT | EPIC-9 | P3 | 1 | — | PDTnhah |
 
 ---
 
