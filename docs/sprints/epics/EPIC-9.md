@@ -151,7 +151,7 @@ Grouped from **114 tracker issues** (formerly one story each). The **Goal** colu
 | [US-9.16](../stories/US-9.16-nft-display-detail-and-webapp-ui-hardening.md) | NFT display, detail & webapp UI hardening | 24 issues — display/detail/webapp UI correctness across the app's evolution | ✅ done | 1.3.3 |
 | [US-9.17](../stories/US-9.17-bitcoin-ordinals-and-inscriptions-shipped.md) | Bitcoin Ordinals & inscriptions (shipped) | 4 issues — Ordinals/inscriptions on webapp + BTC data source | ✅ done | 1.1.36 |
 | [US-9.18](../stories/US-9.18-avail-light-client-nft.md) | Avail Light Client NFT | 3 issues — Avail light-client NFT + fetch-error fixes | ✅ done | 1.2.21 |
-| [US-9.19](../stories/US-9.19-nft-service-migration.md) | NFT service migration | 1 issue — migrate the NFT feature to the service architecture | ✅ done | — |
+| [US-9.19](../stories/US-9.19-nft-service-migration.md) | NFT service migration | 1 issue — migrate the NFT feature into the new UI/service architecture | ✅ done | 1.0.2 |
 | [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) | Client-side NFT Service & SDK migration | 1 issue — client-side NFT Service + SDK migration | 📋 backlog | — |
 | [US-9.21](../stories/US-9.21-nft-portfolio-management.md) | NFT portfolio management | 1 issue — organize/curate held NFTs | 📋 backlog | — |
 

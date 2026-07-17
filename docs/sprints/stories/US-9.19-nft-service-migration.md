@@ -6,36 +6,52 @@ status: done
 priority: P3
 points: 1
 sprint: sprint-2023-M06
-version_shipped: 
+version_shipped: 1.0.2
 prd_ref: []
-assignee: 
-commit: 
+assignee: nulllpc
+commit: e58a9257cb, c42ae99dc9, f143eacc34
 created: 2026-07-17
 updated: 2026-07-17
 ---
 
 ## Goal
 
-Migrate the NFT feature onto the then-current service architecture (#967). The forward-looking client-side NFT Service + SDK migration continues in [US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md).
+Migrate the NFT feature onto the new-UI service architecture (#967) — shipped in **v1.0.2** as the "Migrate NFT feature into new UI" work. The forward-looking client-side NFT Service + SDK migration continues in [US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md).
 
 ## Scope
 
-The NFT-feature service migration. Superseded, going forward, by the client-side NFT Service work.
+The NFT-feature migration into the new UI / service architecture (v1.0.2). Superseded, going forward, by the client-side NFT Service work ([US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md)).
 
-This is a **consolidated maintenance story**: it groups 1 related tracker issue(s) into one capability with a clear boundary, replacing the former one-issue-per-story ledger. It materializes **no FR** (the NFT requirement set is [US-9.1](US-9.1-substrate-nft-display.md)…[US-9.10](US-9.10-nft-display-and-transfer-hardening.md)); it records incremental work on this capability. Full issue→story traceability is the table below and [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md). **`assignee` / `commit` / `sprint` / `points` are a representative backfill anchor** — the most recent constituent, not the full set. `version_shipped` stays empty: no constituent shipped in a named `(Koni)` release.
+This is a **consolidated maintenance story**: it groups 1 related tracker issue into one capability, replacing the former one-issue-per-story ledger. It materializes **no FR** (the NFT requirement set is [US-9.1](US-9.1-substrate-nft-display.md)…[US-9.10](US-9.10-nft-display-and-transfer-hardening.md)); it records incremental work on this capability. Full issue→story traceability is the table below and [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md). **`assignee` / `commit` / `sprint` / `version_shipped` / `points` are a representative backfill anchor** — here, the delivering migration work itself (see Evidence).
 
 ## Development timeline & consolidated issues
 
-Chronological by shipped release (—); `—` = closed with no CHANGELOG line. The former one-issue-per-story ids (retired, never reused — [AGENTS.md](../../../AGENTS.md) rule 1) are listed in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+Chronological by shipped release (1.0.2). The former one-issue-per-story id (retired, never reused — [AGENTS.md](../../../AGENTS.md) rule 1) is listed in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
-| — | [#967](https://github.com/Koniverse/SubWallet-Extension/issues/967) | Migrate NFT feature | ✅ done |
+| 1.0.2 | [#967](https://github.com/Koniverse/SubWallet-Extension/issues/967) | Migrate NFT feature | ✅ done |
+
+## Evidence
+
+Issue #967 ("Migrate NFT feature") shipped in **v1.0.2** as the combined **"[Issue 1006 + 967] Migrate NFT feature into new UI"** PR. The delivering commits are tagged with the sibling **#1006** ("Upgrade UI - Screen Home / NFT", part of [US-9.16](US-9.16-nft-display-detail-and-webapp-ui-hardening.md)); #1006's own record claims only its *later* UI-fix commits, so the **migration** commits are unclaimed and are exactly this issue's goal ([D106](../../CONTEXT.md) — content over tag):
+
+- `e58a9257cb` — *"[Issue-1006] merge upgrade-ui"*
+- `c42ae99dc9` — *"[Issue-1006] finish NFTCollectionDetail"*
+- `f143eacc34` — *"[Issue-1006] update handling NFT image"*
+
+by `nulllpc` (git author *Nam Phạm* → `nulllpc`, repo-owner-confirmed in the [contributor map](../../notes/contributor-map.md)). All verified ancestors of `v1.0.2`.
 
 ## Acceptance criteria
 
-- [x] **AC-1** — All 1 pursued issue(s) below are closed **COMPLETED** and the capability is present in the app (evidence: the release column + each issue's tracker close). No issue in this group was declined.
+- [x] **AC-1** — Issue #967 is closed **COMPLETED** and **shipped in v1.0.2**; evidence: the migration commits above are ancestors of `v1.0.2`, delivered as the "Migrate NFT feature into new UI" PR (subject tags sibling #1006 — [D106](../../CONTEXT.md)).
+
+## Verification commands
+
+| AC | Command |
+| --- | --- |
+| AC-1 | `git merge-base --is-ancestor e58a9257cb v1.0.2` exits 0 · `git merge-base --is-ancestor c42ae99dc9 v1.0.2` exits 0 |
 
 ## Cross-references
 
-- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md) · [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md)
+- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md) · [US-9.16](US-9.16-nft-display-detail-and-webapp-ui-hardening.md) (sibling #1006) · [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md)

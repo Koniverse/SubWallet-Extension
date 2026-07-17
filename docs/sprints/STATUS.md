@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-17 07:59:18 UTC
+> Last generated: 2026-07-17 09:47:46 UTC
 > Total stories: 2784
 
 ## 📋 Backlog (293)
@@ -2603,7 +2603,7 @@
 | US-9.16 | NFT display, detail & webapp UI hardening | EPIC-9 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
 | US-9.17 | Bitcoin Ordinals & inscriptions (shipped) | EPIC-9 | P3 | 1 | sprint-2023-M12 | nulllpc |
 | US-9.18 | Avail Light Client NFT | EPIC-9 | P3 | 1 | sprint-2024-M07 | bluezdot |
-| US-9.19 | NFT service migration | EPIC-9 | P3 | 1 | sprint-2023-M06 | — |
+| US-9.19 | NFT service migration | EPIC-9 | P3 | 1 | sprint-2023-M06 | nulllpc |
 | US-29.38 | Add support for USDC & stEWT | EPIC-9 | P3 | 1 | sprint-2026-M01 | nulllpc |
 | US-29.79 | [Grab 100 MDOT] Mint NFT | EPIC-9 | P3 | 1 | sprint-2023-M10 | saltict |
 
