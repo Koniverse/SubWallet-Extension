@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-17 02:28:35 UTC
+> Last generated: 2026-07-17 02:39:21 UTC
 > Total stories: 2887
 
 ## 📋 Backlog (296)
@@ -375,7 +375,7 @@
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W28 | frenkie-ng |
 
-## ✅ Done (2322)
+## ✅ Done (2323)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2070,6 +2070,7 @@
 | US-33.70 | Fix bug XCM | EPIC-33 | P3 | 1 | sprint-2024-M09 | bluezdot |
 | US-33.71 | Fix bug XCM for channel: DOT: KAH -> PAH | EPIC-33 | P3 | 1 | sprint-2024-M09 | bluezdot |
 | US-33.72 | Fixed bug XCM USDT: PAH -> ASTR | EPIC-33 | P3 | 1 | sprint-2025-M04 | bluezdot |
+| US-33.73 | Integrate XCM/extrinsic dry run API | EPIC-33 | P3 | 1 | sprint-2025-M06 | bluezdot |
 | US-33.74 | Re-calculate max transferable for XCM native token | EPIC-33 | P3 | 1 | sprint-2024-M09 | nulllpc |
 | US-33.75 | Fixed bug XCM for Acala | EPIC-33 | P3 | 1 | sprint-2025-M04 | bluezdot |
 | US-33.76 | Extension - Re-check Transfer Max for EVM account when XCM transfer | EPIC-33 | P3 | 1 | sprint-2024-M12 | tunghp2002 |
@@ -2706,7 +2707,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (214)
+## 🗑️ Deprecated (213)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2858,7 +2859,6 @@ _No stories_
 | US-33.59 | Add support XCM channels for DED | EPIC-33 | P3 | 1 | — | nulllpc |
 | US-33.64 | XCM version error on Pioneer | EPIC-33 | P3 | 1 | sprint-2024-M09 | bluezdot |
 | US-33.67 | Implement SnowBridge sdk to prevent asset loss | EPIC-33 | P3 | 1 | sprint-2025-M04 | S2kael |
-| US-33.73 | Integrate XCM/extrinsic dry run API | EPIC-33 | P3 | 1 | sprint-2025-M06 | — |
 | US-33.99 | [Bug] Prevent bug transfer cross-chain due to Asset Hub Migration | EPIC-33 | P3 | 1 | — | bluezdot |
 | US-34.22 | Follow up case Token list to buy is empty | EPIC-34 | P3 | 1 | — | — |
 | US-34.30 | Research Meld on-ramp | EPIC-34 | P3 | 1 | — | nulllpc |
@@ -2933,8 +2933,8 @@ _No stories_
 - 🟢 **Ready**: 15
 - 🟡 **In Progress**: 28
 - 👀 **Review**: 12
-- ✅ **Done**: 2322
+- ✅ **Done**: 2323
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 214
+- 🗑️ **Deprecated**: 213
 
 ⚠️  **WIP limit exceeded**: 28 stories in-progress (limit: 3).

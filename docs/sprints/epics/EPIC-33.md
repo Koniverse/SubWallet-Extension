@@ -36,8 +36,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**105 stories** — 86 done (shipped), 3 in flight (ready / in-progress /
-review, from the Projects board), 6 backlog (open, not yet started), 10 deprecated
+**105 stories** — 87 done (shipped), 3 in flight (ready / in-progress /
+review, from the Projects board), 6 backlog (open, not yet started), 9 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -122,7 +122,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-33.70](../stories/US-33.70-fix-bug-xcm.md) | ✅ done | Fix bug XCM | [#3519](https://github.com/Koniverse/SubWallet-Extension/issues/3519) | bluezdot | 1.2.28 |
 | [US-33.71](../stories/US-33.71-fix-bug-xcm-for-channel-dot-kah-pah.md) | ✅ done | Fix bug XCM for channel: DOT: KAH -> PAH | [#3561](https://github.com/Koniverse/SubWallet-Extension/issues/3561) | bluezdot | 1.2.29 |
 | [US-33.72](../stories/US-33.72-fixed-bug-xcm-usdt-pah-astr.md) | ✅ done | Fixed bug XCM USDT: PAH -> ASTR | [#3606](https://github.com/Koniverse/SubWallet-Extension/issues/3606) | bluezdot | 1.3.31 |
-| [US-33.73](../stories/US-33.73-integrate-xcm-extrinsic-dry-run-api.md) | ⏸️ deprecated | Integrate XCM/extrinsic dry run API | [#3615](https://github.com/Koniverse/SubWallet-Extension/issues/3615) | — | — |
+| [US-33.73](../stories/US-33.73-integrate-xcm-extrinsic-dry-run-api.md) | ✅ done | Integrate XCM/extrinsic dry run API | [#3615](https://github.com/Koniverse/SubWallet-Extension/issues/3615) | bluezdot | 1.3.31 |
 | [US-33.74](../stories/US-33.74-re-calculate-max-transferable-for-xcm-native-token.md) | ✅ done | Re-calculate max transferable for XCM native token | [#3617](https://github.com/Koniverse/SubWallet-Extension/issues/3617) | nulllpc | 1.2.30 |
 | [US-33.75](../stories/US-33.75-fixed-bug-xcm-for-acala.md) | ✅ done | Fixed bug XCM for Acala | [#3725](https://github.com/Koniverse/SubWallet-Extension/issues/3725) | bluezdot | 1.3.31 |
 | [US-33.76](../stories/US-33.76-extension-re-check-transfer-max-for-evm-account-when-xc.md) | ✅ done | Extension - Re-check Transfer Max for EVM account when XCM transfer | [#3876](https://github.com/Koniverse/SubWallet-Extension/issues/3876) | tunghp2002 | 1.3.8 |
