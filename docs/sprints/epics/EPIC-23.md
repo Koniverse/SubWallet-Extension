@@ -36,7 +36,7 @@ keeping the unit of status honest).
 
 ## Scope
 
-**253 stories** — 207 done (shipped), 3 in flight (ready / in-progress /
+**253 stories** — 206 done (shipped), 3 in flight (ready / in-progress /
 review, from the Projects board), 22 backlog (open, not yet started), 21 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
@@ -198,7 +198,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-23.146](../stories/US-23.146-block-attach-account-polkadot-vault-for-network-moonbea.md) | ⏸️ deprecated | Block attach account Polkadot vault for network Moonbeam, Moonriver, Moonbase | [#3022](https://github.com/Koniverse/SubWallet-Extension/issues/3022) | nulllpc | — |
 | [US-23.147](../stories/US-23.147-add-popup-remind-backup-account-popup-hi-n-th-ngay-khi.md) | ✅ done | Add popup remind backup account (popup hiển thị ngay khi mở trình duyệt) | [#3050](https://github.com/Koniverse/SubWallet-Extension/issues/3050) | Thiendekaco | 1.1.68 |
 | [US-23.148](../stories/US-23.148-fix-bug-show-blank-screen-when-attach-account.md) | ✅ done | Fix bug Show blank screen when attach account | [#3054](https://github.com/Koniverse/SubWallet-Extension/issues/3054) | frenkie-ng | 1.2.22 |
-| [US-23.149](../stories/US-23.149-webapp-qr-code-of-the-receiving-address-is-lost.md) | ✅ done | WebApp - QR code of the receiving address is lost | [#3083](https://github.com/Koniverse/SubWallet-Extension/issues/3083) | frenkie-ng | — |
+| [US-23.149](../stories/US-23.149-webapp-qr-code-of-the-receiving-address-is-lost.md) | ⏸️ deprecated | WebApp - QR code of the receiving address is lost | [#3083](https://github.com/Koniverse/SubWallet-Extension/issues/3083) | frenkie-ng | — |
 | [US-23.150](../stories/US-23.150-add-highlight-button-export-multi-account-when-navigate.md) | ✅ done | Add highlight button Export multi account when navigate to select account screen | [#3090](https://github.com/Koniverse/SubWallet-Extension/issues/3090) | Thiendekaco | 1.1.68 |
 | [US-23.151](../stories/US-23.151-extension-still-show-qr-code-when-change-from-specific.md) | 📋 backlog | Extension - Still show QR code when change from specific account to All accounts mode | [#3106](https://github.com/Koniverse/SubWallet-Extension/issues/3106) | frenkie-ng | — |
 | [US-23.152](../stories/US-23.152-support-mv3-on-firefox.md) | ✅ done | Support MV3 on Firefox | [#3108](https://github.com/Koniverse/SubWallet-Extension/issues/3108) | frenkie-ng | 1.2.7 |

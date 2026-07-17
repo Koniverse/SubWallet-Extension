@@ -36,7 +36,7 @@ keeping the unit of status honest).
 
 ## Scope
 
-**81 stories** — 65 done (shipped), 0 in flight (ready / in-progress /
+**81 stories** — 64 done (shipped), 0 in flight (ready / in-progress /
 review, from the Projects board), 9 backlog (open, not yet started), 7 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
@@ -89,7 +89,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-36.37](../stories/US-36.37-integrate-avail-ledger-app.md) | ✅ done | Integrate Avail Ledger app | [#2982](https://github.com/Koniverse/SubWallet-Extension/issues/2982) | S2kael | 1.2.22 |
 | [US-36.38](../stories/US-36.38-add-ledger-support-for-a0-testnet.md) | ✅ done | Add Ledger support for A0 testnet | [#3080](https://github.com/Koniverse/SubWallet-Extension/issues/3080) | S2kael | — |
 | [US-36.39](../stories/US-36.39-fixed-bug-sign-transaction-failed-for-some-tokens-with.md) | ✅ done | Fixed bug Sign transaction failed for some tokens with Aleph Zero Ledger account | [#3145](https://github.com/Koniverse/SubWallet-Extension/issues/3145) | S2kael | 1.2.5 |
-| [US-36.40](../stories/US-36.40-extension-improve-perform-transaction-with-account-ledg.md) | ✅ done | Extension - Improve perform transaction with account Ledger of dApps utilizing both EVM and Substrate | [#3173](https://github.com/Koniverse/SubWallet-Extension/issues/3173) | Thiendekaco | — |
+| [US-36.40](../stories/US-36.40-extension-improve-perform-transaction-with-account-ledg.md) | ⏸️ deprecated | Extension - Improve perform transaction with account Ledger of dApps utilizing both EVM and Substrate | [#3173](https://github.com/Koniverse/SubWallet-Extension/issues/3173) | Thiendekaco | — |
 | [US-36.41](../stories/US-36.41-add-support-ledger-for-polkadex.md) | ✅ done | Add support Ledger for Polkadex | [#3231](https://github.com/Koniverse/SubWallet-Extension/issues/3231) | S2kael | 1.2.16 |
 | [US-36.42](../stories/US-36.42-fix-bug-show-incorrect-screen-when-perform-earning-acti.md) | ✅ done | Fix bug Show incorrect screen when perform earning actions with Ledger's EVM account | [#3254](https://github.com/Koniverse/SubWallet-Extension/issues/3254) | S2kael | 1.2.11 |
 | [US-36.43](../stories/US-36.43-webapp-review-and-support-polkadot-ledger-app-from-zond.md) | ✅ done | WebApp - Review and support Polkadot Ledger app from Zondax for WebApp | [#3256](https://github.com/Koniverse/SubWallet-Extension/issues/3256) | frenkie-ng | 1.2.14 |

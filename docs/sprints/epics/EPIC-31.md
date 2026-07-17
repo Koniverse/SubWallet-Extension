@@ -36,7 +36,7 @@ keeping the unit of status honest).
 
 ## Scope
 
-**109 stories** — 77 done (shipped), 9 in flight (ready / in-progress /
+**109 stories** — 76 done (shipped), 9 in flight (ready / in-progress /
 review, from the Projects board), 11 backlog (open, not yet started), 12 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
@@ -70,7 +70,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-31.18](../stories/US-31.18-optimize-swap-pair-selection.md) | ✅ done | Optimize swap pair selection | [#2902](https://github.com/Koniverse/SubWallet-Extension/issues/2902) | nulllpc | — |
 | [US-31.19](../stories/US-31.19-webapp-show-incorrect-recipient-on-swap-confirmation-sc.md) | ✅ done | WebApp - Show incorrect recipient on Swap confirmation screen | [#2912](https://github.com/Koniverse/SubWallet-Extension/issues/2912) | frenkie-ng | 1.1.57 |
 | [US-31.20](../stories/US-31.20-extension-improve-swap-feature-on-extension.md) | ⏸️ deprecated | Extension - Improve Swap feature on extension | [#2918](https://github.com/Koniverse/SubWallet-Extension/issues/2918) | — | — |
-| [US-31.21](../stories/US-31.21-extension-do-not-get-swap-quote.md) | ✅ done | Extension - Do not get Swap quote | [#2925](https://github.com/Koniverse/SubWallet-Extension/issues/2925) | nulllpc | — |
+| [US-31.21](../stories/US-31.21-extension-do-not-get-swap-quote.md) | ⏸️ deprecated | Extension - Do not get Swap quote | [#2925](https://github.com/Koniverse/SubWallet-Extension/issues/2925) | nulllpc | — |
 | [US-31.22](../stories/US-31.22-extension-mv3-unable-to-get-quote-when-perform-swap.md) | ⏸️ deprecated | Extension MV3 - Unable to get quote when perform swap | [#2992](https://github.com/Koniverse/SubWallet-Extension/issues/2992) | Thiendekaco | — |
 | [US-31.23](../stories/US-31.23-fixed-bug-can-t-hit-the-confirm-button-on-tos-of-the-sw.md) | ✅ done | Fixed bug Can't hit the 'Confirm' button on ToS of the Swap feature | [#3007](https://github.com/Koniverse/SubWallet-Extension/issues/3007) | frenkie-ng | 1.1.62 |
 | [US-31.24](../stories/US-31.24-improve-swap-quote-fetching-speed.md) | ✅ done | Improve swap quote fetching speed | [#3104](https://github.com/Koniverse/SubWallet-Extension/issues/3104) | nulllpc | 1.2.3 |

@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-17 02:39:21 UTC
+> Last generated: 2026-07-17 02:46:27 UTC
 > Total stories: 2887
 
 ## 📋 Backlog (296)
@@ -375,7 +375,7 @@
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W28 | frenkie-ng |
 
-## ✅ Done (2323)
+## ✅ Done (2317)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -585,7 +585,6 @@
 | US-23.144 | WebApp - Implement UI for export multi-account | EPIC-23 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
 | US-23.147 | Add popup remind backup account (popup hiển thị ngay khi mở trình duyệt) | EPIC-23 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
 | US-23.148 | Fix bug Show blank screen when attach account | EPIC-23 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-23.149 | WebApp - QR code of the receiving address is lost | EPIC-23 | P3 | 1 | sprint-2024-M12 | frenkie-ng |
 | US-23.150 | Add highlight button Export multi account when navigate to select account screen | EPIC-23 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
 | US-23.152 | Support MV3 on Firefox | EPIC-23 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
 | US-23.153 | Extension - MV3 - Still show icon ZK mode on Export account screen in case upgrade version MV2 -> MV3 | EPIC-23 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
@@ -1097,7 +1096,6 @@
 | US-26.145 | Extension - Fix some UI bug | EPIC-26 | P3 | 1 | sprint-2024-M01 | frenkie-ng |
 | US-26.147 | Improve notification/banner in app feature (Round 2) | EPIC-26 | P3 | 1 | sprint-2025-M03 | — |
 | US-26.149 | Research and build system for i18n (localization management) | EPIC-26 | P3 | 1 | sprint-2025-M03 | saltict |
-| US-26.150 | Extension - Improved display order of campain banner | EPIC-26 | P3 | 1 | sprint-2025-M03 | ThaoNguyen998 |
 | US-26.151 | Restructure Settings screen | EPIC-26 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
 | US-26.152 | WebApp - Restructure Settings screen | EPIC-26 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
 | US-26.154 | Improve display collators list | EPIC-26 | P3 | 1 | sprint-2024-M11 | tunghp2002 |
@@ -1366,7 +1364,6 @@
 | US-29.29 | Optimize NFT loading with <https://nft.storage/> | EPIC-29 | P3 | 1 | sprint-2022-M07 | huukhai |
 | US-29.30 | Add Moonpets NFT | EPIC-29 | P3 | 1 | sprint-2022-M08 | hieudd |
 | US-29.31 | Fix bug happens when NFT image error | EPIC-29 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-29.32 | Integrate Gromlins NFT | EPIC-29 | P3 | 1 | sprint-2022-M09 | nulllpc |
 | US-29.33 | Bug happens when get NFT from ipfs-gateway.cloud | EPIC-29 | P3 | 1 | sprint-2022-M09 | — |
 | US-29.34 | Improved handling for case the NFT's source failure | EPIC-29 | P3 | 1 | sprint-2023-M06 | huukhai |
 | US-29.35 | Import NFT button not showing after viewing NFT details | EPIC-29 | P3 | 1 | sprint-2022-M09 | nulllpc |
@@ -1406,7 +1403,6 @@
 | US-29.74 | Fix a few minor bugs with NFT | EPIC-29 | P3 | 1 | sprint-2023-M08 | nulllpc |
 | US-29.75 | WebApp - Error page in case send NFT | EPIC-29 | P3 | 1 | sprint-2023-M08 | lw-cdm |
 | US-29.76 | WebApp - Still showing sent NFT | EPIC-29 | P3 | 1 | sprint-2023-M09 | lw-cdm |
-| US-29.77 | WebApp - Re- check NFT of the Statemine network | EPIC-29 | P3 | 1 | sprint-2024-M09 | tunghp2002 |
 | US-29.78 | WebApp - Can't navigate Address book screen when send NFT | EPIC-29 | P3 | 1 | sprint-2023-M10 | S2kael |
 | US-29.79 | [Grab 100 MDOT] Mint NFT | EPIC-29 | P3 | 1 | sprint-2023-M10 | saltict |
 | US-29.80 | WebApp - NFT isn't displayed after import successfully | EPIC-29 | P3 | 1 | sprint-2023-M10 | S2kael |
@@ -1628,7 +1624,6 @@
 | US-31.16 | Implement Swap feature for extension | EPIC-31 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
 | US-31.18 | Optimize swap pair selection | EPIC-31 | P3 | 1 | sprint-2025-M04 | nulllpc |
 | US-31.19 | WebApp - Show incorrect recipient on Swap confirmation screen | EPIC-31 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-31.21 | Extension - Do not get Swap quote | EPIC-31 | P3 | 1 | sprint-2024-M06 | nulllpc |
 | US-31.23 | Fixed bug Can't hit the 'Confirm' button on ToS of the Swap feature | EPIC-31 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
 | US-31.24 | Improve swap quote fetching speed | EPIC-31 | P3 | 1 | sprint-2024-M06 | nulllpc |
 | US-31.26 | WebApp - Update some message related to earning and swap feature | EPIC-31 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
@@ -2189,7 +2184,6 @@
 | US-36.37 | Integrate Avail Ledger app | EPIC-36 | P3 | 1 | sprint-2024-M07 | S2kael |
 | US-36.38 | Add Ledger support for A0 testnet | EPIC-36 | P3 | 1 | sprint-2024-M07 | S2kael |
 | US-36.39 | Fixed bug Sign transaction failed for some tokens with Aleph Zero Ledger account | EPIC-36 | P3 | 1 | sprint-2024-M06 | S2kael |
-| US-36.40 | Extension - Improve perform transaction with account Ledger of dApps utilizing both EVM and Substrate | EPIC-36 | P3 | 1 | sprint-2024-M07 | Thiendekaco |
 | US-36.41 | Add support Ledger for Polkadex | EPIC-36 | P3 | 1 | sprint-2024-M07 | S2kael |
 | US-36.42 | Fix bug Show incorrect screen when perform earning actions with Ledger's EVM account | EPIC-36 | P3 | 1 | sprint-2024-M06 | S2kael |
 | US-36.43 | WebApp - Review and support Polkadot Ledger app from Zondax for WebApp | EPIC-36 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
@@ -2707,7 +2701,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (213)
+## 🗑️ Deprecated (219)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2726,6 +2720,7 @@ _No stories_
 | US-23.135 | Ui bug when account address is long | EPIC-23 | P3 | 1 | — | — |
 | US-23.142 | Extension - Implement UI for export all accounts feature | EPIC-23 | P3 | 1 | — | lw-cdm |
 | US-23.146 | Block attach account Polkadot vault for network Moonbeam, Moonriver, Moonbase | EPIC-23 | P3 | 1 | — | nulllpc |
+| US-23.149 | WebApp - QR code of the receiving address is lost | EPIC-23 | P3 | 1 | sprint-2024-M12 | frenkie-ng |
 | US-23.158 | [Bug] Import custom EVM Rpc | EPIC-23 | P3 | 1 | — | bluezdot |
 | US-23.162 | Fix bug do not show root screen after remove account (round 2) | EPIC-23 | P3 | 1 | — | frenkie-ng |
 | US-23.170 | Unified account - Add logic to choose account type (unified/solo) when import by seed phrase (discuss more for UX) | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
@@ -2761,6 +2756,7 @@ _No stories_
 | US-26.113 | WebApp - Support multiple language | EPIC-26 | P3 | 1 | — | — |
 | US-26.130 | Vara's withdrawal amount is displayed incorrectly | EPIC-26 | P3 | 1 | — | S2kael |
 | US-26.148 | Optimize UX/UI round 1 | EPIC-26 | P3 | 1 | — | Sokol142196 |
+| US-26.150 | Extension - Improved display order of campain banner | EPIC-26 | P3 | 1 | sprint-2025-M03 | ThaoNguyen998 |
 | US-26.180 | Extension - Check get online history from subscan | EPIC-26 | P3 | 1 | — | PDTnhah |
 | US-27.22 | Add refresh button for balance screen | EPIC-27 | P3 | 1 | — | saltict |
 | US-27.23 | Re-check balance after withdrawing successfully | EPIC-27 | P3 | 1 | — | ThaoNguyen998 |
@@ -2784,11 +2780,13 @@ _No stories_
 | US-28.152 | Update transferable balance calculation for other pallets | EPIC-28 | P3 | 1 | — | nulllpc |
 | US-28.156 | Extension - Improve block transfer to empty account | EPIC-28 | P3 | 1 | — | — |
 | US-29.20 | Integrate NFTs on Altair NFT Playground | EPIC-29 | P3 | 1 | — | Sokol142196 |
+| US-29.32 | Integrate Gromlins NFT | EPIC-29 | P3 | 1 | sprint-2022-M09 | nulllpc |
 | US-29.54 | An error occurs when send WASM NFT | EPIC-29 | P3 | 1 | — | Sokol142196 |
 | US-29.60 | Show duplicate network enable message in the import token, import nft screen | EPIC-29 | P3 | 1 | — | Sokol142196 |
 | US-29.62 | Bug when URL NFT collection fails | EPIC-29 | P3 | 1 | — | nulllpc |
 | US-29.66 | Crash app in case import NFT by ERC20, PSP22 contract | EPIC-29 | P3 | 1 | — | Sokol142196 |
 | US-29.69 | Support Zk Assets NFT | EPIC-29 | P3 | 1 | — | — |
+| US-29.77 | WebApp - Re- check NFT of the Statemine network | EPIC-29 | P3 | 1 | sprint-2024-M09 | tunghp2002 |
 | US-29.82 | Do not delete NFT data when reset wallet | EPIC-29 | P3 | 1 | — | — |
 | US-29.94 | WebApp - Show incorrect Amount on Transaction confirmation for transfer NFT | EPIC-29 | P3 | 1 | — | frenkie-ng |
 | US-29.103 | Extension - Don't show NFT although imported successfully | EPIC-29 | P3 | 1 | — | PDTnhah |
@@ -2821,6 +2819,7 @@ _No stories_
 | US-31.5 | Update UI for the approve token popup when swap on the dApp | EPIC-31 | P3 | 1 | — | Sokol142196 |
 | US-31.17 | WebApp - Do not navigate to Swap screen in case connect WebApp with Extension | EPIC-31 | P3 | 1 | — | — |
 | US-31.20 | Extension - Improve Swap feature on extension | EPIC-31 | P3 | 1 | — | — |
+| US-31.21 | Extension - Do not get Swap quote | EPIC-31 | P3 | 1 | sprint-2024-M06 | nulllpc |
 | US-31.22 | Extension MV3 - Unable to get quote when perform swap | EPIC-31 | P3 | 1 | — | Thiendekaco |
 | US-31.30 | Update ChainFlip version | EPIC-31 | P3 | 1 | sprint-2025-M01 | saltict |
 | US-31.32 | WebApp - Improve UI for selecting token to pay transaction fee on Hydration | EPIC-31 | P3 | 1 | — | — |
@@ -2869,6 +2868,7 @@ _No stories_
 | US-36.19 | [Ledger] Support connect Ledger device for Centrifuge, Darwinia, Energy Web Chain | EPIC-36 | P3 | 1 | — | Quangdm-cdm |
 | US-36.26 | Support Ledger for Vara network | EPIC-36 | P3 | 1 | — | S2kael |
 | US-36.35 | Handle duplicate addresses when connecting Ledger accounts | EPIC-36 | P3 | 1 | — | Thiendekaco |
+| US-36.40 | Extension - Improve perform transaction with account Ledger of dApps utilizing both EVM and Substrate | EPIC-36 | P3 | 1 | sprint-2024-M07 | Thiendekaco |
 | US-36.66 | Check Polkadot Generic Ledger app for Creditcoin | EPIC-36 | P3 | 1 | sprint-2025-M05 | S2kael |
 | US-36.71 | Extension - Error when transfer USDC on Ethereum Sepolia with Ledger EVM | EPIC-36 | P3 | 1 | — | Thiendekaco |
 | US-37.1 | Support Proxy Account Management | EPIC-37 | P3 | 1 | — | saltict |
@@ -2933,8 +2933,8 @@ _No stories_
 - 🟢 **Ready**: 15
 - 🟡 **In Progress**: 28
 - 👀 **Review**: 12
-- ✅ **Done**: 2323
+- ✅ **Done**: 2317
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 213
+- 🗑️ **Deprecated**: 219
 
 ⚠️  **WIP limit exceeded**: 28 stories in-progress (limit: 3).

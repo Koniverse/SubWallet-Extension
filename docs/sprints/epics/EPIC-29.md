@@ -36,7 +36,7 @@ keeping the unit of status honest).
 
 ## Scope
 
-**116 stories** — 100 done (shipped), 0 in flight (ready / in-progress /
+**116 stories** — 98 done (shipped), 0 in flight (ready / in-progress /
 review, from the Projects board), 5 backlog (open, not yet started), 11 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
@@ -81,7 +81,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-29.29](../stories/US-29.29-optimize-nft-loading-with-https-nft-storage.md) | ✅ done | Optimize NFT loading with <https://nft.storage/> | [#480](https://github.com/Koniverse/SubWallet-Extension/issues/480) | huukhai | 0.5.3 |
 | [US-29.30](../stories/US-29.30-add-moonpets-nft.md) | ✅ done | Add Moonpets NFT | [#517](https://github.com/Koniverse/SubWallet-Extension/issues/517) | hieudd | 0.5.4 |
 | [US-29.31](../stories/US-29.31-fix-bug-happens-when-nft-image-error.md) | ✅ done | Fix bug happens when NFT image error | [#557](https://github.com/Koniverse/SubWallet-Extension/issues/557) | nulllpc | 0.5.6 |
-| [US-29.32](../stories/US-29.32-integrate-gromlins-nft.md) | ✅ done | Integrate Gromlins NFT | [#603](https://github.com/Koniverse/SubWallet-Extension/issues/603) | nulllpc | — |
+| [US-29.32](../stories/US-29.32-integrate-gromlins-nft.md) | ⏸️ deprecated | Integrate Gromlins NFT | [#603](https://github.com/Koniverse/SubWallet-Extension/issues/603) | nulllpc | — |
 | [US-29.33](../stories/US-29.33-bug-happens-when-get-nft-from-ipfs-gateway-cloud.md) | ✅ done | Bug happens when get NFT from ipfs-gateway.cloud | [#614](https://github.com/Koniverse/SubWallet-Extension/issues/614) | — | — |
 | [US-29.34](../stories/US-29.34-improved-handling-for-case-the-nft-s-source-failure.md) | ✅ done | Improved handling for case the NFT's source failure | [#619](https://github.com/Koniverse/SubWallet-Extension/issues/619) | huukhai | — |
 | [US-29.35](../stories/US-29.35-import-nft-button-not-showing-after-viewing-nft-details.md) | ✅ done | Import NFT button not showing after viewing NFT details | [#620](https://github.com/Koniverse/SubWallet-Extension/issues/620) | nulllpc | — |
@@ -126,7 +126,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-29.74](../stories/US-29.74-fix-a-few-minor-bugs-with-nft.md) | ✅ done | Fix a few minor bugs with NFT | [#1817](https://github.com/Koniverse/SubWallet-Extension/issues/1817) | nulllpc | 1.1.9 |
 | [US-29.75](../stories/US-29.75-webapp-error-page-in-case-send-nft.md) | ✅ done | WebApp - Error page in case send NFT | [#1830](https://github.com/Koniverse/SubWallet-Extension/issues/1830) | lw-cdm | 1.1.36 |
 | [US-29.76](../stories/US-29.76-webapp-still-showing-sent-nft.md) | ✅ done | WebApp - Still showing sent NFT | [#1835](https://github.com/Koniverse/SubWallet-Extension/issues/1835) | lw-cdm | 1.1.36 |
-| [US-29.77](../stories/US-29.77-webapp-re-check-nft-of-the-statemine-network.md) | ✅ done | WebApp - Re- check NFT of the Statemine network | [#1909](https://github.com/Koniverse/SubWallet-Extension/issues/1909) | tunghp2002 | — |
+| [US-29.77](../stories/US-29.77-webapp-re-check-nft-of-the-statemine-network.md) | ⏸️ deprecated | WebApp - Re- check NFT of the Statemine network | [#1909](https://github.com/Koniverse/SubWallet-Extension/issues/1909) | tunghp2002 | — |
 | [US-29.78](../stories/US-29.78-webapp-can-t-navigate-address-book-screen-when-send-nft.md) | ✅ done | WebApp - Can't navigate Address book screen when send NFT | [#1957](https://github.com/Koniverse/SubWallet-Extension/issues/1957) | S2kael | 1.1.36 |
 | [US-29.79](../stories/US-29.79-grab-100-mdot-mint-nft.md) | ✅ done | [Grab 100 MDOT] Mint NFT | [#1967](https://github.com/Koniverse/SubWallet-Extension/issues/1967) | saltict | 1.1.36 |
 | [US-29.80](../stories/US-29.80-webapp-nft-isn-t-displayed-after-import-successfully.md) | ✅ done | WebApp - NFT isn't displayed after import successfully | [#1978](https://github.com/Koniverse/SubWallet-Extension/issues/1978) | S2kael | 1.1.36 |

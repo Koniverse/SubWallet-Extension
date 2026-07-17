@@ -36,7 +36,7 @@ keeping the unit of status honest).
 
 ## Scope
 
-**189 stories** — 159 done (shipped), 0 in flight (ready / in-progress /
+**189 stories** — 158 done (shipped), 0 in flight (ready / in-progress /
 review, from the Projects board), 21 backlog (open, not yet started), 9 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
@@ -199,7 +199,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-26.147](../stories/US-26.147-improve-notification-banner-in-app-feature-round-2.md) | ✅ done | Improve notification/banner in app feature (Round 2) | [#2496](https://github.com/Koniverse/SubWallet-Extension/issues/2496) | — | — |
 | [US-26.148](../stories/US-26.148-optimize-ux-ui-round-1.md) | ⏸️ deprecated | Optimize UX/UI round 1 | [#2525](https://github.com/Koniverse/SubWallet-Extension/issues/2525) | Sokol142196 | — |
 | [US-26.149](../stories/US-26.149-research-and-build-system-for-i18n-localization-managem.md) | ✅ done | Research and build system for i18n (localization management) | [#2532](https://github.com/Koniverse/SubWallet-Extension/issues/2532) | saltict | — |
-| [US-26.150](../stories/US-26.150-extension-improved-display-order-of-campain-banner.md) | ✅ done | Extension - Improved display order of campain banner | [#2571](https://github.com/Koniverse/SubWallet-Extension/issues/2571) | ThaoNguyen998 | — |
+| [US-26.150](../stories/US-26.150-extension-improved-display-order-of-campain-banner.md) | ⏸️ deprecated | Extension - Improved display order of campain banner | [#2571](https://github.com/Koniverse/SubWallet-Extension/issues/2571) | ThaoNguyen998 | — |
 | [US-26.151](../stories/US-26.151-restructure-settings-screen.md) | ✅ done | Restructure Settings screen | [#2647](https://github.com/Koniverse/SubWallet-Extension/issues/2647) | frenkie-ng | 1.1.41 |
 | [US-26.152](../stories/US-26.152-webapp-restructure-settings-screen.md) | ✅ done | WebApp - Restructure Settings screen | [#2701](https://github.com/Koniverse/SubWallet-Extension/issues/2701) | frenkie-ng | 1.1.55 |
 | [US-26.153](../stories/US-26.153-webapp-change-the-position-of-the-toast-and-popup.md) | 📋 backlog | WebApp - Change the position of the toast and popup | [#2736](https://github.com/Koniverse/SubWallet-Extension/issues/2736) | — | — |
