@@ -116,7 +116,7 @@ EPIC-9 builds the NFT-shaped transfer request and hands it to that pipeline.
 
 ## Stories
 
-Each NFT capability is **one story** — it carries its requirement (where it materializes an FR) *and* its full incremental-work history (fixes, chores, chain/collection integrations) as an "Incremental work, fixes & chores" timeline inside the story. There is no separate maintenance layer. **14 capability stories** below; 2 mis-area issues are kept for relocation.
+Each NFT capability is **one story** — it carries its requirement (where it materializes an FR) *and* its full incremental-work history (fixes, chores, chain/collection integrations) as an "Incremental work, fixes & chores" timeline inside the story. There is no separate maintenance layer. **14 capability stories** below — the whole NFT area.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
@@ -137,7 +137,7 @@ Each NFT capability is **one story** — it carries its requirement (where it ma
 
 > **US-9.9** (FR-93) is 📋 planned in the PRD; authored here as `backlog` per Stream-B convention. **US-9.7** / **US-9.10** are `backlog` at the requirement level (the FR/hardening capability is not signed off) even though shipped incremental work appears in their timelines.
 >
-> **Kept in place — mis-area, pending relocation:** [US-29.38](../stories/US-29.38-add-support-for-usdc-stewt.md) (#639 USDC & stEWT — token support → EPIC-7) · [US-29.79](../stories/US-29.79-grab-100-mdot-mint-nft.md) (#1967 Mint NFT campaign → EPIC-19). Full issue→story map: [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+> Two mis-area issues a title heuristic had routed here — **#639** (USDC & stEWT, token support) and **#1967** (Mint-NFT campaign) — were **relocated 2026-07-17** to [EPIC-24](EPIC-24.md) and [EPIC-39](EPIC-39.md). Full issue→story map: [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
 
 ## Object map & user-story interactions
 

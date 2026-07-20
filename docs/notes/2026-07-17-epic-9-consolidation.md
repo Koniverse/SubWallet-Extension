@@ -18,7 +18,7 @@ materializes an FR) *and* its incremental-work timeline. The FR capabilities kee
 (`US-9.1`…`US-9.10`) and absorb their issues; capabilities with no FR — media pipeline, service
 migration, client-side SDK, portfolio — are their own stories (`US-9.13`, `US-9.19`, `US-9.20`,
 `US-9.21`). The intermediate consolidated ids (`US-9.11`/`9.12`/`9.14`/`9.15`/`9.16`/`9.17`/`9.18`)
-were **retired** into these homes. Two mis-area issues stay under their retired `US-29.x` id.
+were **retired** into these homes. Two mis-area issues were relocated to their real area (see below).
 
 Traceability is preserved **per issue** — every issue appears in a capability story's timeline and
 in the map below.
@@ -45,12 +45,12 @@ in the map below.
 | [US-9.20](../sprints/stories/US-9.20-client-side-nft-service-and-sdk-migration.md) | Client-side NFT Service & SDK migration | 🚧 in-progress | 1 |
 | [US-9.21](../sprints/stories/US-9.21-nft-portfolio-management.md) | NFT portfolio management | 📋 backlog | 1 |
 
-## Kept in place — mis-area, pending relocation
+## Relocated out of the NFT area (mis-area)
 
 | Prev. ID | Issue | Note |
 | --- | --- | --- |
-| `US-29.38` | #639 | USDC & stEWT -- token support -> EPIC-7 |
-| `US-29.79` | #1967 | Grab 100 MDOT Mint NFT -- campaign -> EPIC-19 |
+| `US-29.38` | #639 | USDC & stEWT — token support → **US-24.341** (EPIC-24) |
+| `US-29.79` | #1967 | Mint-NFT campaign → **US-39.20** (EPIC-39) |
 
 ## Full issue -> capability map (the 116 retired `US-29.x`, by issue #)
 
@@ -93,7 +93,7 @@ in the map below.
 | [#620](https://github.com/Koniverse/SubWallet-Extension/issues/620) | Import NFT button not showing after viewing NFT detail | `US-29.35` | US-9.8 |
 | [#622](https://github.com/Koniverse/SubWallet-Extension/issues/622) | Support Bit.Country'NFT Trading and Land Portfolio | `US-29.36` | US-9.1 |
 | [#635](https://github.com/Koniverse/SubWallet-Extension/issues/635) | Integration ArtZero NFT | `US-29.37` | US-9.1 |
-| [#639](https://github.com/Koniverse/SubWallet-Extension/issues/639) | Add support for USDC & stEWT | `US-29.38` | **US-29.38** (kept — mis-area) |
+| [#639](https://github.com/Koniverse/SubWallet-Extension/issues/639) | Add support for USDC & stEWT | `US-29.38` | US-24.341 |
 | [#643](https://github.com/Koniverse/SubWallet-Extension/issues/643) | Add more attributes to NFT collection and item | `US-29.39` | US-9.10 |
 | [#649](https://github.com/Koniverse/SubWallet-Extension/issues/649) | Integrate Pioneer Network NFT | `US-29.40` | US-9.1 |
 | [#654](https://github.com/Koniverse/SubWallet-Extension/issues/654) | Add owner attribute to Pioneer NFT | `US-29.41` | US-9.1 |
@@ -134,7 +134,7 @@ in the map below.
 | [#1835](https://github.com/Koniverse/SubWallet-Extension/issues/1835) | WebApp - Still showing sent NFT | `US-29.76` | US-9.10 |
 | [#1909](https://github.com/Koniverse/SubWallet-Extension/issues/1909) | WebApp - Re- check NFT of the Statemine network | `US-29.77` | US-9.10 |
 | [#1957](https://github.com/Koniverse/SubWallet-Extension/issues/1957) | WebApp - Can't navigate Address book screen when send  | `US-29.78` | US-9.5 |
-| [#1967](https://github.com/Koniverse/SubWallet-Extension/issues/1967) | [Grab 100 MDOT] Mint NFT | `US-29.79` | **US-29.79** (kept — mis-area) |
+| [#1967](https://github.com/Koniverse/SubWallet-Extension/issues/1967) | [Grab 100 MDOT] Mint NFT | `US-29.79` | US-39.20 |
 | [#1978](https://github.com/Koniverse/SubWallet-Extension/issues/1978) | WebApp - NFT isn't displayed after import successfully | `US-29.80` | US-9.10 |
 | [#2029](https://github.com/Koniverse/SubWallet-Extension/issues/2029) | Fixed bug Do not show Acala, Karura NFT | `US-29.81` | US-9.1 |
 | [#2106](https://github.com/Koniverse/SubWallet-Extension/issues/2106) | Do not delete NFT data when reset wallet | `US-29.82` | US-9.10 |
@@ -175,6 +175,6 @@ in the map below.
 
 ## Verification
 
-- 116 retired ids accounted for: 114 folded into 11 capability stories; 2 kept in place.
+- 116 retired ids accounted for: 114 folded into 11 capability stories; 2 relocated to EPIC-24 / EPIC-39.
 - Every retired id (`US-29.x` + intermediate `US-9.11`–`US-9.18`) remapped on the live surface.
 - `node scripts/koni-docs-check-ids.mjs` and `npx koni-docs validate` exit 0.

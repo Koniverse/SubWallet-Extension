@@ -516,7 +516,7 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#480](https://github.com/Koniverse/SubWallet-Extension/issues/480) | Optimize NFT loading with <https://nft.storage/> (#480) | 0.5.3 | 2022-07-29 | US-9.13 |
 | [#517](https://github.com/Koniverse/SubWallet-Extension/issues/517) | Add Moonpets NFT (#517) | 0.5.4 | 2022-08-05 | US-9.3 |
 | [#557](https://github.com/Koniverse/SubWallet-Extension/issues/557) | Fix bug happens when NFT image error (#557) | 0.5.6 | 2022-08-24 | US-9.13 |
-| [#639](https://github.com/Koniverse/SubWallet-Extension/issues/639) | Add support for USDC & stEWT (#639) | 1.3.72 | 2026-01-14 | US-29.38 |
+| [#639](https://github.com/Koniverse/SubWallet-Extension/issues/639) | Add support for USDC & stEWT (#639) | 1.3.72 | 2026-01-14 | US-24.341 |
 | [#643](https://github.com/Koniverse/SubWallet-Extension/issues/643) | Add more attributes to NFT collection and item (#643) | 0.6.4 | 2022-09-22 | US-9.10 |
 | [#29](https://github.com/Koniverse/SubWallet-Extension/issues/29) | Update Zeitgeist and Subsocial integration (#29) | 1.0.5 | 2023-05-21 | US-9.1 |
 | [#649](https://github.com/Koniverse/SubWallet-Extension/issues/649) | Integrate Pioneer Network NFT (#649) | 0.6.5 | 2022-09-24 | US-9.1 |

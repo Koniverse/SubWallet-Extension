@@ -36,7 +36,7 @@ keeping the unit of status honest).
 
 ## Scope
 
-**340 stories** — 286 done (shipped), 2 in flight (ready / in-progress /
+**341 stories** — 287 done (shipped), 2 in flight (ready / in-progress /
 review, from the Projects board), 34 backlog (open, not yet started), 18 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
@@ -390,6 +390,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-24.338](../stories/US-24.338-extension-update-chain-list-stable-v0-2-124.md) | 🟢 ready | Extension - Update chain-list stable v0.2.124 | [#4935](https://github.com/Koniverse/SubWallet-Extension/issues/4935) | PDTnhah | — |
 | [US-24.339](../stories/US-24.339-unable-to-turn-network-when-no-add-correct-api-key.md) | ✅ done | Unable to turn network when no add correct API key | [#4972](https://github.com/Koniverse/SubWallet-Extension/issues/4972) | tunghp2002 | 1.3.76 |
 | [US-24.340](../stories/US-24.340-update-paraspell-api-integration-to-v1.md) | ✅ done | Update ParaSpell API integration to v1 | [#4979](https://github.com/Koniverse/SubWallet-Extension/issues/4979) | tunghp2002 | 1.3.79 |
+| [US-24.341](../stories/US-24.341-add-support-for-usdc-stewt.md) | ✅ done | Add support for USDC & stEWT | [#639](https://github.com/Koniverse/SubWallet-Extension/issues/639) | nulllpc | 1.3.72 |
 
 ## Acceptance criteria
 

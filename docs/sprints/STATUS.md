@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-17 11:06:55 UTC
+> Last generated: 2026-07-20 02:39:50 UTC
 > Total stories: 2777
 
 ## 📋 Backlog (292)
@@ -946,6 +946,7 @@
 | US-24.336 | Display token name and subnet ID for subnet tokens \| Bittensor | EPIC-24 | P3 | 1 | sprint-2026-M03 | Thiendekaco |
 | US-24.339 | Unable to turn network when no add correct API key | EPIC-24 | P3 | 1 | sprint-2026-M03 | tunghp2002 |
 | US-24.340 | Update ParaSpell API integration to v1 | EPIC-24 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
+| US-24.341 | Add support for USDC & stEWT | EPIC-24 | P3 | 1 | sprint-2026-M01 | nulllpc |
 | US-25.1 | External Security Audit | EPIC-25 | P3 | 1 | sprint-2022-M03 | hieudd |
 | US-25.2 | Leverage phishing website & addresses database to protect users | EPIC-25 | P3 | 1 | sprint-2022-M04 | saltict |
 | US-25.3 | Update @polkadot/phishing | EPIC-25 | P3 | 1 | sprint-2023-M06 | saltict |
@@ -2151,6 +2152,7 @@
 | US-39.16 | WebApp - Support Notification in-app | EPIC-39 | P3 | 1 | sprint-2025-M03 | frenkie-ng |
 | US-39.18 | In-app Notifications | EPIC-39 | P3 | 1 | sprint-2025-M05 | — |
 | US-39.19 | Fixed bug Error page when use marketing campaign | EPIC-39 | P3 | 1 | sprint-2025-M06 | lw-cdm |
+| US-39.20 | [Grab 100 MDOT] Mint NFT | EPIC-39 | P3 | 1 | sprint-2023-M10 | saltict |
 | US-4.1 | Add/remove networks + custom RPC | EPIC-4 | P1 | 3 | sprint-2022-M05 | saltict |
 | US-4.2 | Bulk disable + reset to default networks | EPIC-4 | P1 | 2 | sprint-2022-M05 | nulllpc |
 | US-4.3 | Auto-update chain list & token metadata | EPIC-4 | P1 | 3 | sprint-2024-M03 | S2kael |
@@ -2597,8 +2599,6 @@
 | US-9.8 | Custom NFT import | EPIC-9 | P2 | 3 | sprint-2022-M05 | nulllpc |
 | US-9.13 | NFT media & IPFS gateway pipeline | EPIC-9 | P3 | 1 | sprint-2025-M09 | Thiendekaco |
 | US-9.19 | NFT service migration | EPIC-9 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-29.38 | Add support for USDC & stEWT | EPIC-9 | P3 | 1 | sprint-2026-M01 | nulllpc |
-| US-29.79 | [Grab 100 MDOT] Mint NFT | EPIC-9 | P3 | 1 | sprint-2023-M10 | saltict |
 
 ## 🚫 Blocked (0)
 

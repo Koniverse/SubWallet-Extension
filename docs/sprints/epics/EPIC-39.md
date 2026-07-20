@@ -36,7 +36,7 @@ keeping the unit of status honest).
 
 ## Scope
 
-**19 stories** — 14 done (shipped), 1 in flight (ready / in-progress /
+**20 stories** — 15 done (shipped), 1 in flight (ready / in-progress /
 review, from the Projects board), 3 backlog (open, not yet started), 1 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
@@ -69,6 +69,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-39.17](../stories/US-39.17-improve-mkt-campaign-features.md) | 📋 backlog | Improve MKT campaign features | [#4182](https://github.com/Koniverse/SubWallet-Extension/issues/4182) | nulllpc | — |
 | [US-39.18](../stories/US-39.18-in-app-notifications.md) | ✅ done | In-app Notifications | [#4370](https://github.com/Koniverse/SubWallet-Extension/issues/4370) | — | — |
 | [US-39.19](../stories/US-39.19-fixed-bug-error-page-when-use-marketing-campaign.md) | ✅ done | Fixed bug Error page when use marketing campaign | [#4403](https://github.com/Koniverse/SubWallet-Extension/issues/4403) | lw-cdm | 1.3.41 |
+| [US-39.20](../stories/US-39.20-grab-100-mdot-mint-nft.md) | ✅ done | [Grab 100 MDOT] Mint NFT | [#1967](https://github.com/Koniverse/SubWallet-Extension/issues/1967) | saltict | 1.1.36 |
 
 ## Acceptance criteria
 
