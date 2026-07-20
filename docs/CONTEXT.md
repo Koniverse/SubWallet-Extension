@@ -2256,3 +2256,46 @@ this issue, so those stay tracker-only until verified rather than dressed up.
 **Citations**: [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-check-ids.mjs` (the only tool kept in the repo — the generator, coverage, and fetch helpers are one-off setup scaffolding, kept in the session scratchpad, not the repo)
 
 ---
+
+### D109. The requirement column has five meanings
+
+**Context**: [EPIC-9](sprints/epics/EPIC-9.md)'s *US ↔ entity / subsystem matrix* had four cells
+a reader could not decode. [US-9.10](sprints/stories/US-9.10-nft-display-and-transfer-hardening.md)
+showed `—` while its own frontmatter carried `prd_ref: [FR-85, FR-89, FR-92]`; US-9.19/US-9.20
+showed **`AD-24`** in a column headed `FR` — an architecture id in a requirement column, which
+[rules.md](../.agents/skills/koni-docs/references/rules.md) ("one namespace per field") forbids in
+`prd_ref` and which no reader can distinguish from a real requirement; and
+[US-9.13](sprints/stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md) showed `NFR-21`, which is
+legal ([frontmatter-spec §3.1](../.agents/skills/koni-docs/references/frontmatter-spec.md):
+`prd_ref` accepts `FR-` and `NFR-`) but sat under a header promising only `FR`.
+
+Writing a paragraph in EPIC-9 explaining all this would fix EPIC-9 and leave the same paragraph to
+be re-written for **41 epics** — and re-written *differently* each time, which is how a convention
+stops being one. The same gap already exists elsewhere: [EPIC-20](sprints/epics/EPIC-20.md)'s matrix
+shows `—` for US-20.2 / US-20.5 / US-20.6, all of which carry `NFR-` refs in frontmatter.
+
+**Decision — the notation is defined here, and every epic links to it.** The header is
+**`FR / NFR`**, and the cell reads:
+
+| Cell | Means |
+| --- | --- |
+| `FR-N` | The story **owns** that requirement — it is the FR's single owner in the epic's FR Coverage table. |
+| `FR-N (defends)` | The story ships no new requirement; it **hardens** FRs owned elsewhere. It carries them in its own `prd_ref` (they are what its ACs protect) but is *not* an owner in FR Coverage. Established practice, not a new rule — `US-4.21`, `US-4.22`, `US-7.7`, `US-13.11` already do this. |
+| `NFR-N` | The story materializes a **non-functional** PRD row. Legal in `prd_ref`; a *feature-local* NFR clause stays in its own epic — [PRD](PRD.md)'s NFR coverage table is EPIC-20's and says so ("feature-local perf stays in each epic's hardening story"). |
+| `— (AD-N)` | **No PRD requirement at all** — the story materializes an *architecture decision*. AD ids never enter `prd_ref`; they live in `arch_ref` and the epic's AD Coverage table. The parenthesis is navigation, not a requirement claim. |
+| `—` | **Genuinely no requirement yet** — future scope the PRD has not specified. When it is scoped it earns an FR and the cell fills. |
+
+An epic's matrix carries **one line** pointing here. The distinction that matters is the last two:
+`— (AD-N)` and `—` look alike but say opposite things — *"this is architecture, deliberately not a
+requirement"* versus *"this is unspecified"*. Collapsing them, as the bare `—` did, is the same class
+of error as [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim):
+an empty cell reads as *"nothing to see"* when it is in fact a claim about coverage.
+
+**Boundary ([rule 3](../AGENTS.md))**: notation only. No story's `prd_ref` changed — the frontmatter
+was already right in every case; the table was under-reporting it.
+
+**Citations**: [frontmatter-spec §3.1](../.agents/skills/koni-docs/references/frontmatter-spec.md);
+[rules.md](../.agents/skills/koni-docs/references/rules.md) §"one namespace per field";
+[templates/epic.md](../.agents/skills/koni-docs/references/templates/epic.md) §9
+
+---

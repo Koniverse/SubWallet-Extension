@@ -16,7 +16,7 @@ arch_ref:
   - AD-24
   - AD-25
 created: 2026-06-12
-updated: 2026-07-17
+updated: 2026-07-20
 ---
 
 ## Goal
@@ -95,10 +95,11 @@ EPIC-9 builds the NFT-shaped transfer request and hands it to that pipeline.
 | FR-92 | [US-9.8](../stories/US-9.8-custom-nft-import.md) | ✅ done |
 | FR-93 | [US-9.9](../stories/US-9.9-additional-collections-and-standards.md) | 📋 backlog |
 
-> [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) is a
-> cross-cutting hardening story with **no FR** — it defends NFT display & UI
-> correctness (detail render, cross-browser display) across the display FRs
-> above. Transfer hardening now lives in [US-9.5](../stories/US-9.5-nft-transfer-send.md),
+> [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) **owns no FR
+> row above** — it is a cross-cutting hardening story that *defends* FR-85 / FR-89 /
+> FR-92 (it carries them in `prd_ref`; they are what its ACs protect) rather than
+> materializing a requirement of its own. It hardens NFT display & UI correctness
+> (detail render, cross-browser display) across the display FRs above. Transfer hardening now lives in [US-9.5](../stories/US-9.5-nft-transfer-send.md),
 > import validation in [US-9.8](../stories/US-9.8-custom-nft-import.md), and the
 > media pipeline in [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md).
 
@@ -143,7 +144,7 @@ Each NFT capability is **one story** — it carries its requirement (where it ma
 
 ### US ↔ entity / subsystem matrix
 
-| US | Primary entity / subsystem | FR |
+| US | Primary entity / subsystem | FR / NFR |
 |---|---|---|
 | [US-9.1](../stories/US-9.1-substrate-nft-display.md) | `NftService` + Substrate handlers (RMRK / Unique / Statemine / PSP-34) | FR-85 |
 | [US-9.2](../stories/US-9.2-nested-bundled-nft-display.md) | `UniqueNftHandler` bundle tree (`isBundle`, `nestingTokens`, `parentId`) | FR-86 |
@@ -154,11 +155,13 @@ Each NFT capability is **one story** — it carries its requirement (where it ma
 | [US-9.7](../stories/US-9.7-bitcoin-ordinals-display.md) | Ordinals handler over `btc-api` inscriptions | FR-91 |
 | [US-9.8](../stories/US-9.8-custom-nft-import.md) | `NftImport` form + `upsertCustomToken` | FR-92 |
 | [US-9.9](../stories/US-9.9-additional-collections-and-standards.md) | New chain handlers + ERC-6551 token-bound accounts | FR-93 |
-| [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | NFT detail render + cross-browser display + webapp UI hardening | — |
+| [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | NFT detail render + cross-browser display + webapp UI hardening | FR-85, FR-89, FR-92 (defends) |
 | [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md) | `NftService` IPFS media pipeline (`baseParseIPFSUrl` → `getRandomIpfsGateway`, multi-gateway fallback) | NFR-21 |
-| [US-9.19](../stories/US-9.19-nft-service-migration.md) | NFT feature migration onto the new-UI service architecture | AD-24 |
-| [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) | Client-side `NftService` + Services SDK migration | AD-24 |
+| [US-9.19](../stories/US-9.19-nft-service-migration.md) | NFT feature migration onto the new-UI service architecture | — (AD-24) |
+| [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) | Client-side `NftService` + Services SDK migration | — (AD-24) |
 | [US-9.21](../stories/US-9.21-nft-portfolio-management.md) | NFT portfolio management (curation / organization) | — |
+
+> Cell notation: [CONTEXT D109](../../CONTEXT.md#d109-the-requirement-column-has-five-meanings--write-the-legend-once-not-once-per-epic).
 
 ### End-to-end happy path
 
