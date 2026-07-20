@@ -163,12 +163,12 @@ Current docs at the repo root:
 Canonical `docs/` content per koni-docs spec (BRIEF, PRD, ARCHITECTURE,
 CONTEXT, LESSONS, SETUP, sprints/, CHANGELOG) is **authored**.
 
-### How the docs are allowed to change — seven standing rules
+### How the docs are allowed to change — eight standing rules
 
 These are not EPIC-21's rules; they are the project's. Each was paid for by a defect
 that reached the owner before it reached a check. Full reasoning in `docs/CONTEXT.md`.
 
-**These seven live here on purpose.** The koni-docs spec is vendored from
+**These eight live here on purpose.** The koni-docs spec is vendored from
 `Koniverse/Koni-Skills` and the CLI ships from npm — the next skill install or
 `npm i -g` overwrites both. `AGENTS.md` is the only copy nothing overwrites, and
 **it is the authority** where it and the tool disagree.

@@ -1,10 +1,10 @@
 ---
 id: EPIC-42
 title: "QA Coverage Tracking"
-status: in-progress
+status: done
 prd_ref: []
 created: 2026-07-16
-updated: 2026-07-16
+updated: 2026-07-20
 ---
 
 ## Goal

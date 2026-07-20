@@ -19,28 +19,36 @@ Phase 2) — that is information, not drift. **An ID is an identity, not a posit
 **A blank `Notes` cell means _not audited_, not _verified current_.** Only entries checked
 against the code, the PRD or the CHANGELOG carry a note.
 
-**Audited so far: 77 of the 109.** All 74 entries reconstructed in the two bulk backfills
-(`908a04f4b5` 2026-06-04, `f902a644c6` 2026-06-09) have now been checked against the code —
-**38 carried at least one wrong claim.** They were not recorded when the decisions were made;
-they were inferred from other docs, and the inference invented pallet names, node URLs,
-formulas and shipped states. Each is corrected **in place** with the evidence, because an entry
-that was never a decision is not a decision being revised ([RULE-7](../.agents/skills/koni-docs/references/rules.md)
-protects decisions someone acted on); the originals are in `git log -p docs/CONTEXT.md`.
-Two of the errors had already propagated into the PRD — **FR-1** (MV3 on Firefox) and **FR-97**
-(CIP-30 method names) — and were corrected there in the same pass.
+**All 109 entries have been audited against the code, the PRD and the CHANGELOG (2026-07-20).**
+**53 carried at least one wrong claim.**
 
-The remaining **32 are unaudited and unmarked**: D1–D5, D7, D19, D60, D62–D65, D90–D109.
-(D19 sits in that list because only its `Version` field was checked, not its claims.)
+The defect is concentrated, and its cause is structural: **80 of the 109 were reconstructed in
+three bulk commits** — `908a04f4b5` and `f902a644c6` (2026-06, 74 entries) and `9c00a28419`
+(*"add Phase 5 (D60-D65) from Notion product reports"*, 6 entries). None was recorded when the
+decision was made. They were inferred from other documents, and the inference invented pallet
+names, a node URL that appears in no commit, fee formulas, API methods, a `clientId`, a "Degen
+Mode", and shipped states for work that never shipped. Of those 80, **44 were wrong**.
+
+Two errors had already propagated into the PRD — **FR-1** (MV3 on Firefox; Firefox has been MV2
+since 2024-08) and **FR-97** (CIP-30 method names) — and were corrected there.
+
+Everything is corrected **in place** with the evidence, because an entry that was never a decision
+is not a decision being revised ([RULE-7](../.agents/skills/koni-docs/references/rules.md) protects
+decisions someone acted on). Originals are in `git log -p docs/CONTEXT.md`.
+
+**Census figures are dated, not rewritten.** A number that was right on its date is not an error —
+`174 → 177 stories` was true on 2026-07-14 and reads as a lie only because nothing said *when*. Those
+carry an *(as of …)* marker and the current value.
 
 | D | Decision | Phase | Notes |
 | --- | --- | --- | --- |
-| [D1](#d1-fork-polkadot-js-extension-rather-than-copying-code) | Fork polkadot-js extension rather than copying code | P0 |  |
-| [D2](#d2-replace-apipromise-with-a-lightweight-connector-for-balancetoken-queries) | Replace ApiPromise with a lightweight connector for balance/token queries | P0 | revised by [D95](#d95-the-lightweight-read-connector-revision-of-d2-was-never-implemented--measure-before-refactoring) |
-| [D3](#d3-rebuild-the-background-layer-for-chrome-manifest-v3-initial-research) | Rebuild the background layer for Chrome Manifest V3 (initial research) | P0 |  |
-| [D4](#d4-create-a-modified-subwalletkeyring-that-exposes-private-key-after-unlock) | Create a modified @subwallet/keyring that exposes private key after unlock | P0 |  |
-| [D5](#d5-expose-both-re-nominate-and-unbond-then-rebond-flows-for-validator-switching) | Expose both re-nominate and unbond-then-rebond flows for validator switching | P0 |  |
+| [D1](#d1-fork-polkadot-js-extension-rather-than-copying-code) | Fork polkadot-js extension rather than copying code | P0 | ❌ **corrected (2026-07-20)** — `origin`/`upstream` named backwards; the rebase path has never been used |
+| [D2](#d2-replace-apipromise-with-a-lightweight-connector-for-balancetoken-queries) | Replace ApiPromise with a lightweight connector for balance/token queries | P0 | ❌ never implemented — **[D95]** revision now also marked inline in the entry body |
+| [D3](#d3-rebuild-the-background-layer-for-chrome-manifest-v3-initial-research) | Rebuild the background layer for Chrome Manifest V3 (initial research) | P0 | ⚠️ **corrected (2026-07-20)** — research stage; the redesign landed 2023-12, shipped v1.2.1 |
+| [D4](#d4-create-a-modified-subwalletkeyring-that-exposes-private-key-after-unlock) | Create a modified @subwallet/keyring that exposes private key after unlock | P0 | ⚠️ **date/version corrected (2026-07-20)** — 2022-12-17 / v1.0.2, not 2022-08 / pre-v0.6.x |
+| [D5](#d5-expose-both-re-nominate-and-unbond-then-rebond-flows-for-validator-switching) | Expose both re-nominate and unbond-then-rebond flows for validator switching | P0 | ⚠️ **version corrected (2026-07-20)** — v1.3.48 (2025), not pre-v0.6.x. Both pallet paths verified ✅ |
 | [D6](#d6-scope-mv3-migration-storage-to-chromestorage-defer-pouchdb) | Scope MV3 migration storage to chrome.storage (defer PouchDB) | P0 |  |
-| [D7](#d7-scope-custom-network-support-to-pure-evm-or-pure-substrate-only) | Scope custom network support to pure EVM or pure Substrate only | P0 |  |
+| [D7](#d7-scope-custom-network-support-to-pure-evm-or-pure-substrate-only) | Scope custom network support to pure EVM or pure Substrate only | P0 | ✅ verified 2026-07-20 — `insertChain` still enforces the pure-EVM / pure-Substrate split |
 | [D8](#d8-temporarily-hide-substrate-private-key-export-no-wallet-supports-re-import-yet) | Temporarily hide Substrate private-key export (no wallet supports re-import… | P0 | ⚠️ **version corrected (2026-07-20)** — v1.1.36 via the `upgrade-ui` branch, not v0.6.7. Security claim itself verified ✅ |
 | [D9](#d9-deprioritise-pouchdb-for-cross-platform-storage) | Deprioritise PouchDB for cross-platform storage | P0 |  |
 | [D10](#d10-defer-step-3-of-online-chain-list-auto-update-immediate-provider-change) | Defer step 3 of online chain-list auto-update (immediate provider change) | P0 | ⚠️ **superseded by code (2026-07-20)** — step 3 shipped; when the risk was accepted is unrecorded |
@@ -51,7 +59,7 @@ The remaining **32 are unaudited and unmarked**: D1–D5, D7, D19, D60, D62–D6
 | [D15](#d15-adopt-eip-6963-multi-provider-discovery-alongside-windowethereum-injection) | Adopt EIP-6963 multi-provider discovery alongside window.ethereum injection | P1 | ⚠️ **version corrected (2026-07-20)** — v1.1.25 → v1.1.26, not v1.1.12 |
 | [D16](#d16-defer-custom-derived-path-feature-to-avoid-milestone-6-scope-creep) | Defer custom derived-path feature to avoid Milestone 6 scope creep | P1 | ✅ **resolved (2026-07-20)** — the deferred feature shipped (FR-26); history, not a live constraint |
 | [D18](#d18-implement-full-opengov-voting-not-read-only-for-polkadot-governance) | Implement full OpenGov voting (not read-only) for Polkadot governance | P1 | ⚠️ **Impact corrected (2026-07-20)** — delegation + web-app governance had not shipped (FR-142/FR-143 📋) |
-| [D19](#d19-refactor-balance-service-to-new-service-architecture-centralise-cache-invalidation) | Refactor balance service to new service architecture (centralise cache inval… | P1 | ⚠️ **version corrected (2026-07-20)** — v1.1.52, not v1.1.27 |
+| [D19](#d19-refactor-balance-service-to-new-service-architecture-centralise-cache-invalidation) | Refactor balance service to new service architecture (centralise cache inval… | P1 | ✅ verified 2026-07-20 — `BalanceService` + account-mutation invalidation confirmed |
 | [D21](#d21-rename-staking-feature-to-earning-across-all-platforms) | Rename "Staking" feature to "Earning" across all platforms | P1 | ⚠️ **version corrected (2026-07-20)** — v1.1.36 → v1.1.37, not v1.1.34 |
 | [D22](#d22-xcm-transfer-max-formula-reserve-12-ed--2-fee-to-prevent-dust-loss) | XCM Transfer Max formula: reserve 1.2× ED + 2× fee to prevent dust loss | P1 | ❌ **corrected (2026-07-20)** — the `1.2×ED + 2×fee` formula welded two unrelated constants; no ED term exists |
 | [D24](#d24-grc-20-token-type-renamed-to-vft-vara-fungible-token) | GRC-20 token type renamed to VFT (Vara Fungible Token) | P1 | ⚠️ **corrected (2026-07-20)** — version/date wrong; the claimed GRC-20→VFT migration job does not exist |
@@ -113,12 +121,12 @@ The remaining **32 are unaudited and unmarked**: D1–D5, D7, D19, D60, D62–D6
 | [D57](#d57-no-display-of-reverse-proxied-by-relationship-in-the-manage-proxies-screen) | No display of reverse "proxied-by" relationship in the Manage Proxies screen | P3 |  |
 | [D58](#d58-scope-bittensor-on-chain-swap-via-the-swapstakelimit-extrinsic-not-third-party-provider-for-alpha) | Scope Bittensor On-Chain Swap via `swapStakeLimit` Pallet (Not Third-Party P… | P3 | ❌ **corrected (2026-07-20)** — `swapStakeLimit` is an extrinsic, not a pallet; no separate swap screen |
 | [D59](#d59-scope-proxy-support-to-substrate-polkadot-pallet-accounts-only--exclude-evm-solo-and-ledger-evm) | Scope proxy support to Substrate (Polkadot pallet) accounts only — exclude E… | P3 | ⚠️ **(2026-07-20)** — flag is `supportProxy`; legacy-Ledger exclusion was unrecorded |
-| [D60](#d60-compute-fee-level-parameters-and-fee-logic-on-the-backend-consumed-via-a-subscribe-based-feeservice) | Compute fee-level parameters and fee logic on the backend, consumed via a su… | P3 |  |
+| [D60](#d60-compute-fee-level-parameters-and-fee-logic-on-the-backend-consumed-via-a-subscribe-based-feeservice) | Compute fee-level parameters and fee logic on the backend, consumed via a su… | P3 | ❌ **corrected (2026-07-20)** — `calculateGasFeeParams` still client-side; `FeeService` predates this entry by 18 months |
 | [D61](#d61-pay-transaction-fees-in-non-native-tokens-on-asset-hub-via-the-assetconversion-pallet) | Pay transaction fees in non-native tokens on Asset Hub via the `assetConvers… | P3 |  |
-| [D62](#d62-migrate-coinbase-on-ramp-to-the-secure-init-backend-session-token-flow) | Migrate Coinbase on-ramp to the secure-init (backend session-token) flow | P3 |  |
-| [D63](#d63-adapt-kyberswap-aggregator-integration-to-its-divergent-slippage--price-impact-rules) | Adapt KyberSwap aggregator integration to its divergent slippage / price-imp… | P3 |  |
-| [D64](#d64-model-xcm-fees-as-source-execution--source-delivery-sender-paid-vs-remotetransport-amount-paid-validated-by-paraspell-dry-run) | Model XCM fees as source-execution + source-delivery (sender-paid) vs remote… | P3 |  |
-| [D65](#d65-model-walletconnect-as-a-single-connection-merging-pair--session-with-separate-substrate--evm-sessions-wallet-role-only) | Model WalletConnect as a single "Connection" merging pair + session, with se… | P3 |  |
+| [D62](#d62-migrate-coinbase-on-ramp-to-the-secure-init-backend-session-token-flow) | Migrate Coinbase on-ramp to the secure-init (backend session-token) flow | P3 | ⚠️ **(2026-07-20)** — extension side verified; backend internals live in another repo, marked unverified |
+| [D63](#d63-adapt-kyberswap-aggregator-integration-to-its-divergent-slippage--price-impact-rules) | Adapt KyberSwap aggregator integration to its divergent slippage / price-imp… | P3 | ❌ **corrected (2026-07-20)** — no "Degen Mode", no `clientId`, no price-impact thresholds anywhere in the code |
+| [D64](#d64-model-xcm-fees-as-source-execution--source-delivery-sender-paid-vs-remotetransport-amount-paid-validated-by-paraspell-dry-run) | Model XCM fees as source-execution + source-delivery (sender-paid) vs remote… | P3 | ❌ **corrected (2026-07-20)** — the three-part fee model does not exist; shipped model is origin + destination |
+| [D65](#d65-model-walletconnect-as-a-single-connection-merging-pair--session-with-separate-substrate--evm-sessions-wallet-role-only) | Model WalletConnect as a single "Connection" merging pair + session, with se… | P3 | ❌ **corrected (2026-07-20)** — one session carries both namespaces; it is not one session per ecosystem |
 | [D66](#d66-aggregate-multi-chain-data-through-the-subwallet-services-sdk-backend-rather-than-computing-it-on-device) | Aggregate multi-chain data through the SubWallet Services SDK backend rather… | P3 |  |
 | [D67](#d67-front-market-data-metadata-and-nft-media-behind-subwallet-cachecdn-proxies-with-static-fallback) | Front market data, metadata and NFT media behind SubWallet cache/CDN proxies… | P3 |  |
 | [D70](#d70-one-sign-single-signature-batch-approval-is-a-toggle--shipped-on-by-default) | One-Sign (single-signature batch approval) is opt-in and off by default | P3 | ⚠️ **corrected 2026-07-20** — the 2026-06 backfill inverted the default; ships **on** (`DEFAULT_ALLOW_ONE_SIGN = true`) |
@@ -126,24 +134,23 @@ The remaining **32 are unaudited and unmarked**: D1–D5, D7, D19, D60, D62–D6
 | [D90](#d90-run-two-changelogs-until-the-ci-release-gate-is-migrated) | Run two changelogs until the CI release gate is migrated | P4 | rule → **AGENTS §7** (*The two change logs*) · still binding, CI gate not migrated |
 | [D91](#d91-one-repo-two-version-spaces--declare-the-space-never-mix-the-numbers) | One repo, two version spaces — declare the space, never mix the numbers | P4 | rule → **AGENTS §7** (*The two version spaces*) |
 | [D92](#d92-the-prd-needs-a--withdrawn-state--shipped-is-not-forever) | The PRD needs a `⏸️ withdrawn` state — "shipped" is not forever | P4 |  |
-| [D93](#d93-prd_ref-holds-fr-n-or-nfr-n--the-project-is-requirement-centric-not-fr-centric) | `prd_ref` holds `FR-N` **or** `NFR-N` — the project is requirement-centric,… | P4 | rule → **AGENTS §7 rule 8** · census *(6 stories)* is as of 2026-07-13 |
+| [D93](#d93-prd_ref-holds-fr-n-or-nfr-n--the-project-is-requirement-centric-not-fr-centric) | `prd_ref` holds `FR-N` **or** `NFR-N` — the project is requirement-centric,… | P4 | rule → **AGENTS §7 rule 8** · census dated; the "2604 more" written 2026-07-20 was the total, corrected same day |
 | [D94](#d94-one-time-gapless-renumber-of-fr-and-epic-12-story-ids--never-again) | One-time gapless renumber of FR and EPIC-12 story IDs — never again | P4 | rule → **AGENTS §7 rule 1** · renumber itself is a finished one-off |
 | [D95](#d95-the-lightweight-read-connector-revision-of-d2-was-never-implemented--measure-before-refactoring) | The lightweight read connector (revision of D2) was never implemented — meas… | P4 | decision reversed by D96 the same day; its evidence still stands |
-| [D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95) | Retire the memory requirement (NFR-11) — delete on evidence, not on a guess | P4 | rule → **AGENTS §7 rule 2** |
+| [D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95) | Retire the memory requirement (NFR-11) — delete on evidence, not on a guess | P4 | rule → **AGENTS §7 rule 2** · NFR census dated (20 live → 24 after D98) |
 | [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done) | What a docs epic may change — and when a story that ships in no release is d… | P4 | rule → **AGENTS §7 rules 3 + 4** |
-| [D98](#d98-close-the-five-prd-gaps--one-fr-the-product-already-shipped-four-nfrs-that-had-no-home) | Close the five PRD gaps — one FR the product already shipped, four NFRs that… | P4 | finished action — its *"no story owns the coverage index"* gap was closed by D108 |
-| [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system) | Reconstructed sprint windows — an `M` cadence for history that predates the… | P4 | rule → **AGENTS §7 rule 5** · partly revised by D102 |
-| [D100](#d100-a-story-is-the-unit-of-status--split-epic-20-where-the-truth-changes-not-where-the-phases-do) | A story is the unit of status — split EPIC-20 where the truth changes, not w… | P4 | rule → **AGENTS §7 rule 1** · census *(177 stories)* is as of 2026-07-13 |
-| [D101](#d101-version_shipped-names-a-release-of-this-product--inherited-features-ship-at-021) | `version_shipped` names a release of *this* product — inherited features shi… | P4 | rule → **AGENTS §7 rule 1b** |
-| [D102](#d102-do-not-file-the-koni-docs-bugs-upstream--carry-the-divergence-and-say-so-revision-of-d99) | Do not file the koni-docs bugs upstream — carry the divergence, and say so | P4 | rule → **AGENTS §7** warning box · the *"5 warnings"* count is as of 2026-07-13; now in the hundreds |
-| [D103](#d103-epic-status-is-derived-from-its-stories--and-it-answers-a-different-question-than-the-prd-badge) | Epic `status` is derived from its stories — and it answers a different quest… | P4 | census *(21 epics)* is as of 2026-07-13; now 41 |
-| [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention) | An ID is a promise that a document exists — do not mint one for an intention | P4 | rule → **AGENTS §7 rule 7** |
-| [D105](#d105-the-fork-boundary-is-its-own-window--inherited-work-does-not-go-on-this-teams-board) | The fork boundary is its own window — inherited work does not go on this tea… | P4 | rule → **AGENTS §7 rule 5b** |
+| [D98](#d98-close-the-five-prd-gaps--one-fr-the-product-already-shipped-four-nfrs-that-had-no-home) | Close the five PRD gaps — one FR the product already shipped, four NFRs that… | P4 | finished action — the coverage-index gap it declares open was **closed by D108** (2026-07-15) |
+| [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system) | Reconstructed sprint windows — an `M` cadence for history that predates the… | P4 | rule → **AGENTS §7 rule 5** · partly revised by D102 · `M`-window census dated (44 → 55) |
+| [D100](#d100-a-story-is-the-unit-of-status--split-epic-20-where-the-truth-changes-not-where-the-phases-do) | A story is the unit of status — split EPIC-20 where the truth changes, not w… | P4 | rule → **AGENTS §7 rule 1** · censuses dated (177 stories → 2777; 4 warnings → 966) |
+| [D101](#d101-version_shipped-names-a-release-of-this-product--inherited-features-ship-at-021) | `version_shipped` names a release of *this* product — inherited features shi… | P4 | rule → **AGENTS §7 rule 1b** · 2 dead links fixed; the `sprint` half was superseded by D105 |
+| [D102](#d102-do-not-file-the-koni-docs-bugs-upstream--carry-the-divergence-and-say-so-revision-of-d99) | Do not file the koni-docs bugs upstream — carry the divergence, and say so | P4 | rule → **AGENTS §7** warning box · the "5 warnings" count dated — 966 today, same defects |
+| [D103](#d103-epic-status-is-derived-from-its-stories--and-it-answers-a-different-question-than-the-prd-badge) | Epic `status` is derived from its stories — and it answers a different quest… | P4 | census dated (21 epics → 41). One live exception found and fixed: EPIC-42 was `in-progress` with 3/3 done |
+| [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention) | An ID is a promise that a document exists — do not mint one for an intention | P4 | rule → **AGENTS §7 rule 7** · file-count census dated (255 → 2895) |
+| [D105](#d105-the-fork-boundary-is-its-own-window--inherited-work-does-not-go-on-this-teams-board) | The fork boundary is its own window — inherited work does not go on this tea… | P4 | rule → **AGENTS §7 rule 5b** · story-count census dated (171 → 2771). Window and points verified ✅ |
 | [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true) | `commit:` names what made the capability true — a release bump made nothing… | P4 | rule → **AGENTS §7 rule 1c** |
-| [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim) | A ticked AC is a claim about the code — four of US-5.1's were false, and one… | P4 | census *(119 done stories)* is as of 2026-07-13; now 2223 |
-| [D108](#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map) | Every tracker issue gets a story — in a maintenance-epic layer, so the FR ma… | P4 |  |
-| [D109](#d109-the-requirement-column-has-five-meanings--write-the-legend-once-not-once-per-epic) | The requirement column has five meanings — write the legend once, not once p… | P4 | rule → **AGENTS §7 rule 8** · applied to EPIC-9 only; 20 epics still carry a bare `FR`-only matrix |
-
+| [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim) | A ticked AC is a claim about the code — four of US-5.1's were false, and one… | P4 | census dated (119 done → 2223). The US-5.1 corrections it describes were verified as landed ✅ |
+| [D108](#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map) | Every tracker issue gets a story — in a maintenance-epic layer, so the FR ma… | P4 | census dated — the layer is **19** epics / 2593 stories today, not 20 / 2707 |
+| [D109](#d109-the-requirement-column-has-five-meanings--write-the-legend-once-not-once-per-epic) | The requirement column has five meanings — write the legend once, not once p… | P4 | rule → **AGENTS §7 rule 8** · **self-corrected same day** — applied to all 13 remaining epics hours after it claimed otherwise |
 ---
 
 
@@ -183,6 +190,15 @@ The remaining **32 are unaudited and unmarked**: D1–D5, D7, D19, D60, D62–D6
 **Alternatives considered**:
 - Keep `ApiPromise` but limit concurrent connections — rejected: still RAM-intensive and limits network support.
 - Use SubQuery/SubSquid APIs for all data — rejected: introduces off-chain dependency risk and latency.
+
+> **Revised — this was never implemented.** See
+> [D95](#d95-the-lightweight-read-connector-revision-of-d2-was-never-implemented--measure-before-refactoring):
+> `SubstrateApi` still builds a full `ApiPromise` eagerly and the word "lightweight" appears nowhere
+> in `packages/*/src`. AD-07 is marked ⚠️ NEVER IMPLEMENTED in ARCHITECTURE.md and NFR-11 was retired
+> ([D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95)).
+> The memory figures below are 2022 MV2 measurements and were never reproduced. *(2026-07-20: this
+> marker previously existed only in the decision index and in ARCHITECTURE.md — a reader landing on
+> D2 saw an unqualified claim.)*
 
 **Impact**: Dramatically reduced per-session RAM; separate `Dotsama connector` / `ChainService` architecture created to manage lightweight connections.
 
@@ -228,8 +244,8 @@ The remaining **32 are unaudited and unmarked**: D1–D5, D7, D19, D60, D62–D6
 
 **Impact**: New `@subwallet/keyring` package; EVM signing flow no longer requires per-transaction key export.
 
-**Date**: 2022-08-01
-**Version**: pre-v0.6.x
+**Date**: 2022-12-17 *(corrected 2026-07-20 — `@subwallet/keyring` first enters `package.json` in `2342f27ae5`; the original entry said 2022-08-01)*
+**Version**: v1.0.2 *(corrected 2026-07-20 — first stable tag containing that commit; the original said pre-v0.6.x)*
 
 **Citations**: [#433](https://github.com/Koniverse/SubWallet-Extension/issues/433)
 
@@ -247,10 +263,15 @@ The remaining **32 are unaudited and unmarked**: D1–D5, D7, D19, D60, D62–D6
 - Only support unbond-then-rebond flow for simplicity — rejected: creates unnecessary wait and confusion.
 - Auto-compound rewards as default — rejected: user should opt in.
 
-**Impact**: Staking UX updated to present both paths; re-nomination shortcut added.
+**Impact**: Both paths exist today — `handleChangeEarningValidator` issues a bare `api.tx.staking.nominate(...)` (re-nominate, no unbond) and the unbond path uses `api.tx.staking.rebond(...)` (`earning-service/handlers/native-staking/relay-chain.ts`, `changeValidator: true`).
+
+> **Version corrected 2026-07-20 — roughly three years early.** The entry said `pre-v0.6.x` (2022).
+> The CHANGELOG puts *"Support Change validator feature (#4214)"* in **v1.3.48 (2025-07-21)**,
+> followed by #4539 (v1.3.53) and #4540 (v1.3.54); no validator-switch line exists anywhere in the
+> 2022 region. The decision and both pallet calls are real — only the shipping date was inferred.
 
 **Date**: 2022-08-01
-**Version**: pre-v0.6.x
+**Version**: **v1.3.48** *(corrected 2026-07-20 — see Impact; the original said pre-v0.6.x)*
 
 **Citations**: [#504](https://github.com/Koniverse/SubWallet-Extension/issues/504)
 
@@ -1663,11 +1684,23 @@ The remaining **32 are unaudited and unmarked**: D1–D5, D7, D19, D60, D62–D6
 
 **Context**: Supporting per-level custom fees (EVM `gasPrice` / `maxFeePerGas` / `maxPriorityFeePerGas`; Substrate tip) and keeping fee logic adjustable required estimating fee parameters that change with network conditions. Doing this purely in-extension meant every fee-logic fix needed a full extension release.
 
-**Decision**: Move fee-parameter calculation (`calculateGasFeeParams`) and fee-data sourcing to the SubWallet backend, and have the extension consume online fee data through a subscribe-based `FeeService` that subscribes on demand and cancels when no requests remain. EVM custom max-fee input is validated against a `> 1.5 × base fee` guard; RPCs that do not support custom fees fall back to default estimation (#4559).
+**Decision**: Source EVM fee data online rather than deriving it per call, and consume it through a subscribe-based `FeeService` that subscribes on demand and cancels when no requests remain. EVM custom max-fee input is validated against a `1.5 × base fee` guard; RPCs that do not support custom fees fall back to default estimation (#4559).
 
 **Rationale**: Backend-sourced fee data can be hotfixed without shipping a build, and a subscribe controller minimises fee-param call frequency. Client-side-only computation would have frozen fee logic to the release cadence.
 
-**Impact**: Adds `FeeService` and a backend fee endpoint; fee-level UI reads live data; EVM/Substrate fee paths share one parameter source.
+**Impact**: Fee-level UI reads live data; EVM/Substrate fee paths share one parameter source; RPC fallback added (#4559, v1.3.53).
+
+> **Corrected 2026-07-20 — the central claim did not happen, and the credited work predates the entry.**
+> *"Move fee-parameter calculation (`calculateGasFeeParams`) … to the SubWallet backend"*:
+> `calculateGasFeeParams` still runs **client-side** (`fee-service/utils/index.ts`, called from
+> `fee-service/service.ts` with a local `_EvmApi`), and the file carries an open
+> `// TODO: … or move the logic to the backend`. What moved was fee **data sourcing** — Infura
+> `gas.api.infura.io` and the cache `https://api-cache.subwallet.app/sw-evm-gas/{{chain}}`.
+> *"Adds `FeeService` and a backend fee endpoint"*: both were added by **#2670**, shipped in
+> **v1.1.41 (2024-03-02)** — about eighteen months before this entry's date — not by this decision.
+> The guard was also stated backwards: it is a **minimum** (`baseGasFee × 1.5 + slowPriorityFee`),
+> not a `> 1.5 ×` cap. And the cited **#4371 has no commit and no CHANGELOG line**.
+> Reconstructed in bulk by `9c00a28419` (*"add Phase 5 (D60-D65) from Notion product reports"*).
 
 **Date**: 2025
 **Version**: v1.3.x
@@ -1698,7 +1731,7 @@ The remaining **32 are unaudited and unmarked**: D1–D5, D7, D19, D60, D62–D6
 
 **Context**: Coinbase deprecated client-side on-ramp initialisation in favour of a "secure init" flow requiring a server-generated session token. D34 covered the Meld on-ramp but not Coinbase, whose secret key must never ship in the extension bundle.
 
-**Decision**: Generate the Coinbase session in the SubWallet backend `small-features` proxy module: the backend mints a short-lived JWT (TTL ≤ 120s, cached ~110s), calls Coinbase to obtain a `sessionToken`, and returns a ready `pay.coinbase.com/onramp` URL that the UI opens. The frontend never holds the Coinbase secret.
+**Decision**: Generate the Coinbase session in the SubWallet backend `small-features` proxy module: the backend mints a short-lived JWT *(2026-07-20: the backend internals below — `sessionToken`, `small-features`, the TTL figures — live in a service repo not present here and are recorded as claimed, not verified; the extension-side migration is confirmed)* (TTL ≤ 120s, cached ~110s), calls Coinbase to obtain a `sessionToken`, and returns a ready `pay.coinbase.com/onramp` URL that the UI opens. The frontend never holds the Coinbase secret.
 
 **Rationale**: Coinbase's secure-init migration mandates server-side session-token generation; keeping the secret on the backend prevents key exposure in a publicly distributed bundle.
 
@@ -1714,11 +1747,22 @@ The remaining **32 are unaudited and unmarked**: D1–D5, D7, D19, D60, D62–D6
 
 **Context**: Integrating KyberSwap (EVM chains) surfaced rules that diverge from SubWallet's own quote model: Kyber caps slippage input at 2 decimals / 19.99% max, blocks very small amounts with "Unable to calculate Price Impact", and requires "Degen Mode" for price impact > 10%.
 
-**Decision**: Bridge the differences rather than constrain the wallet UI: enable `ignoreCappedSlippage` to honour the wallet's wider slippage range, silently enable Degen Mode when price impact > 10% (warn from > 1%), block swaps whose input is too small to price, and pass a stored `clientId` (treated like an API key) to avoid rate limits.
+**Decision**: Bridge the differences rather than constrain the wallet UI: enable `ignoreCappedSlippage` to honour the wallet's wider slippage range, and map the provider's liquidity / minimum-amount errors onto the wallet's own error states rather than rate limits.
 
 **Rationale**: Without these adaptations Kyber would reject or silently revert swaps that the wallet presents as valid, costing users gas. Aligning to the provider's constraints at the adapter layer keeps the shared swap UX consistent.
 
-**Impact**: KyberSwap swap handler carries provider-specific slippage/price-impact handling; `clientId` config added.
+**Impact**: KyberSwap handler sets `ignoreCappedSlippage: true` and maps provider errors (`insufficient liquidity` → `NOT_ENOUGH_LIQUIDITY`, `smaller than estimated` → `NOT_MEET_MIN_EXPECTED`); requests authenticate through the shared backend proxy (`fetchFromProxyService(ProxyServiceRoute.KYBER, …)`, NFR-16).
+
+> **Corrected 2026-07-20 — three claims with no counterpart in the code.**
+> *"silently enable **Degen Mode** when price impact > 10% (warn from > 1%)"*: the string "degen"
+> appears **nowhere** in `packages/`, there is no 10% / 1% threshold, and the handler's
+> `priceImpact` field is declared and then **never assigned or read**.
+> *"pass a stored **`clientId`** (treated like an API key)"* and *"`clientId` config added"*:
+> `clientId` does not exist in the codebase or anywhere in its history; Kyber calls go through the
+> shared proxy route, which is NFR-16's key-protection mechanism, not a Kyber-specific credential.
+> *"block swaps whose input is too small to price"* overstated a **reactive** error mapping as a
+> pre-check. `ignoreCappedSlippage` and the #4144 citation are correct.
+> Reconstructed in bulk by `9c00a28419`.
 
 **Date**: 2025
 **Version**: v1.3.x
@@ -1730,11 +1774,20 @@ The remaining **32 are unaudited and unmarked**: D1–D5, D7, D19, D60, D62–D6
 
 **Context**: After delivery fees were introduced, it was unclear which balance covers each XCM fee, risking under-reserving the sender's balance (see LESSONS §2 for the symptom).
 
-**Decision**: Attribute XCM fees explicitly: (1) SourceExecutionFee and (2) SourceDeliveryFee are paid from the **sender's** balance, while (3) remote/transport fees are taken out of the **sending amount**. SourceDeliveryFee is computed per transport class (DMP teleport/reserve, UMP teleport, HRMP) and validated by building the transaction and dry-running it through ParaSpell (extends AD-18).
+**Decision**: Attribute XCM fees explicitly by side: the **origin** fee is paid from the sender's balance, the **destination** fee is taken out of the sending amount. Both are returned by ParaSpell's `/xcm-fee` endpoint rather than derived locally, and validated by building the transaction and dry-running it through ParaSpell (extends AD-18).
 
 **Rationale**: A single explicit fee-attribution model prevents balance under-reservation and matches ParaSpell's dry-run output, which is the source of truth for delivery fees.
 
-**Impact**: XCM fee preview and balance validation use the three-part model; estimation runs a ParaSpell dry-run.
+**Impact**: XCM fee preview and balance validation use the two-sided model — `GetXcmFeeResult = { origin, destination }` (`balance-service/transfer/xcm/utils.ts`), consumed at `utils/fee/transfer.ts` as `estimatedFee = xcmFeeInfo?.origin.fee` and `crossChainFee = xcmFeeInfo?.destination?.fee`; estimation runs a ParaSpell dry-run (`dryRunXcm` / `dryRunPreviewXcm`, `feeType: 'dryRun' | 'paymentInfo'`).
+
+> **Corrected 2026-07-20 — the three-part model does not exist.** The entry named
+> **SourceExecutionFee**, **SourceDeliveryFee** and a third remote/transport fee, and said the
+> delivery fee is *"computed per transport class (DMP teleport/reserve, UMP teleport, HRMP)"*.
+> Neither identifier appears anywhere in `packages/` — the only commit in the whole repository
+> containing the string `SourceDeliveryFee` is `9c00a28419`, **the docs commit that added this
+> entry**. There is no transport-class logic either: `hrmp` / `dmp` / `ump` return zero hits in
+> `extension-base/src`. The shipped model is two fees, both from ParaSpell. The dry-run mechanism
+> and the #4133 citation are correct; the cited **#2792 has no CHANGELOG line**.
 
 **Date**: 2025
 **Version**: v1.3.x
@@ -1746,11 +1799,22 @@ The remaining **32 are unaudited and unmarked**: D1–D5, D7, D19, D60, D62–D6
 
 **Context**: WalletConnect v2 exposes both a "pair" and a "session" as distinct concepts, and supported chains/methods differ per ecosystem. Surfacing both raw concepts to users would be confusing.
 
-**Decision**: Expose a single user-facing "Connection" object that merges the underlying WC pair and session. Because chains and methods differ per ecosystem, keep Substrate and EVM as **separate sessions** under that one connection. Implement SubWallet in the WalletConnect **Wallet role only** (not the hybrid DApp role) initially, ship on extension before mobile, and deliberately omit editing a connection (delete-and-recreate instead). Complements the method-scope decision D13.
+**Decision**: Expose a single user-facing "Connection" object that merges the underlying WC pair and session. Chains and methods differ per ecosystem, so a connection carries **one namespace per ecosystem** (`eip155`, `polkadot`) inside a single session. Implement SubWallet in the WalletConnect **Wallet role only** (not the hybrid DApp role) initially, ship on extension before mobile, and deliberately omit editing a connection (delete-and-recreate instead). Complements the method-scope decision D13.
 
 **Rationale**: One merged concept lowers user cognitive load; separate per-ecosystem sessions are required because a single session cannot span the differing chain/method sets; Wallet-role-only and no-edit keep the first release's surface area small.
 
-**Impact**: `ConnectWCRequestHandler` and the connection list present one connection per dApp with per-ecosystem sessions underneath.
+**Impact**: `ConnectWCRequestHandler` exists; the connection list is keyed by **session topic — one row per session** (`WalletConnect/ConnectionList.tsx`), and the detail view renders every namespace of that one session.
+
+> **Corrected 2026-07-20 — "separate sessions per ecosystem" is not how it works.** A single
+> WalletConnect session carries **both** namespaces: `approveSession` iterates
+> `Object.entries(result.namespaces)` and makes **one** `#client.approve(result)` call, and the
+> account list reads `namespaces.eip155?.accounts` concatenated with `namespaces.polkadot?.accounts`
+> off that same session (`wallet-connect-service/index.ts`). The approval UI likewise builds one
+> `namespaceAccounts` map for one proposal. The *"merged pair + session"* object is also
+> unsupported — no such object exists; pairings are touched only in `resetWallet`, and the UI reads
+> sessions. The **Wallet-role-only** half of the decision holds (SignClient consumes
+> `session_proposal` / `session_request`; there is no DApp-side `connect()`), as do all four
+> citations. Reconstructed in bulk by `9c00a28419`.
 
 **Date**: 2024–2025
 **Version**: v1.2.x–v1.3.x
@@ -1963,7 +2027,7 @@ A requirement that nobody measures and nobody enforces **is already deleted in p
 
 **What was considered and rejected**: paying 3 points for the probe to "close the question forever". Rejected on priority, not on principle: the same points buy a fix for a *live, measurable* waste — the unbounded `while (isContinue)` notification pagination loop, fired 4× per address every 30 minutes ([US-20.2](sprints/stories/US-20.2-api-call-optimization.md) AC-3, issue #4021, zero commits). Measure a problem someone reports; do not measure a problem the docs invented.
 
-**Impact**: NFR count 21 → 20 live (NFR-11 tombstoned in the PRD table). `US-12.14`'s `prd_ref` drops NFR-11. Every "≤72 MB" budget line in EPIC-7 / EPIC-12 / EPIC-20 and in the read-path stories is struck through and marked historical. **The one thing that must survive this decision**: if a memory complaint ever appears, **measure first — do not re-derive an architecture decision from a guess.** That is precisely how AD-07 came to exist and rot for four years ([LESSONS §64](LESSONS.md)).
+**Impact**: NFR count 21 → 20 live (NFR-11 tombstoned in the PRD table) *(as of 2026-07-13; [D98](#d98-close-the-five-prd-gaps--one-fr-the-product-already-shipped-four-nfrs-that-had-no-home) added NFR-22…25 the same day — **24 live** on 2026-07-20)*. `US-12.14`'s `prd_ref` drops NFR-11. Every "≤72 MB" budget line in EPIC-7 / EPIC-12 / EPIC-20 and in the read-path stories is struck through and marked historical. **The one thing that must survive this decision**: if a memory complaint ever appears, **measure first — do not re-derive an architecture decision from a guess.** That is precisely how AD-07 came to exist and rot for four years ([LESSONS §64](LESSONS.md)).
 
 **Date**: 2026-07-13
 **Version**: docs-only (audit against v1.3.83)
@@ -2033,7 +2097,7 @@ FR-160 is a different animal and worth naming as such: it is the first case of *
 **Decision**: **Sync the spec to the tool, and give the tool an honest way to be satisfied.**
 
 1. **`sprint` is required once a story leaves `backlog`.** Work past backlog must be locatable in time. This matches what `warnings.ts` already enforced.
-2. **Sprint IDs accept two cadences: `^sprint-\d{4}-[WM]\d{2}$`.** `W` = a **planned** ISO week. `M` = a **reconstructed** calendar month, for history that predates the sprint system. 44 `M` files now cover 2022-02 → 2026-07.
+2. **Sprint IDs accept two cadences: `^sprint-\d{4}-[WM]\d{2}$`.** `W` = a **planned** ISO week. `M` = a **reconstructed** calendar month, for history that predates the sprint system. 44 `M` files cover 2022-02 → 2026-07 *(as of 2026-07-14; **55** on 2026-07-20, spanning sprint-2022-M01 → sprint-2026-M07 after [D105](#d105-the-fork-boundary-is-its-own-window--inherited-work-does-not-go-on-this-teams-board) and [D108](#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map))*.
 3. **`version_shipped` is required for `done` only when the story's epic materializes a requirement.** A story in an epic with `prd_ref: []` (docs / tooling / infra) ships in no release — [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done). The spec now says this; `warnings.ts` does not yet know it.
 
 **Rationale — why `M`, not 63 weekly files.** A weekly bucket **asserts a planning rhythm that never happened**. A monthly one asserts far less: *these stories shipped in this month, per the CHANGELOG*. That is a fact, checkable against `docs/CHANGELOG.md`. The cadence is the honesty dial, and coarser is more honest here — this is the same instinct that made 63 feel wrong in the first place.
@@ -2089,7 +2153,7 @@ Applied to EPIC-20 — three shipped capabilities got the retroactive story ever
 
 **No renumber.** US-20.1 and US-20.2 **keep their IDs** — they still exist, narrowed — so all 11 files referencing them stay valid. New work appends at 20.7/20.8/20.9. This is rule 1 of `AGENTS.md §7` paying for itself: **an ID is an identity, not a position.** Contrast the FR renumber of [D94](#d94-one-time-gapless-renumber-of-fr-and-epic-12-story-ids--never-again), which touched 386 references and nearly destroyed an audit trail.
 
-**Impact**: 174 → 177 stories. EPIC-20: 3 `done`, 5 `backlog`, 1 `deprecated` — no `in-progress`, because **nothing in it is in progress**. Viewer warnings **7 → 4**, and the 4 that remain are all tool bugs (3× `version_shipped` on docs stories per [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done), 1× `assignee` demanded of a `deprecated` story) plus [US-12.11](sprints/stories/US-12.11-trusted-stake-alpha-index.md), which is genuinely in `review` with no open sprint to hold it — an owner decision, not a docs one.
+**Impact**: 174 → 177 stories *(as of 2026-07-14; **2779** on 2026-07-20)*. EPIC-20: 3 `done`, 5 `backlog`, 1 `deprecated` — no `in-progress`, because **nothing in it is in progress**. Viewer warnings **7 → 4** *(as of 2026-07-14; **966** on 2026-07-20 under the same rules, 640 of them `done` stories with an empty `version_shipped` from the maintenance layer)*, and the 4 that remain are all tool bugs (3× `version_shipped` on docs stories per [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done), 1× `assignee` demanded of a `deprecated` story) plus [US-12.11](sprints/stories/US-12.11-trusted-stake-alpha-index.md), which is genuinely in `review` with no open sprint to hold it — an owner decision, not a docs one.
 
 **What the split makes visible**: [US-20.2](sprints/stories/US-20.2-api-call-optimization.md) AC-3 — `fetchAllAvailBridgeClaimable` is an **unbounded `while (isContinue)` pagination loop**, no page cap, no rate limit, fired **4× per address across every Substrate and EVM address on a 30-minute cron**, errors swallowed by `.catch(console.error)`. Live in v1.3.83, in a `backlog` story **nobody owns**. That is the cheapest real win in EPIC-20 and the recommended home for the 3 points freed by deprecating US-20.3 ([D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95)).
 
@@ -2109,13 +2173,13 @@ Applied to EPIC-20 — three shipped capabilities got the retroactive story ever
 
 **Rationale — the old number did not merely lack provenance, it *misinformed***. Read on SubWallet's own version line, `0.35.1` sits **after `0.8.1` (2023-02) and before `1.0.1` (2023-03)**. A reader would place phishing protection in **early 2023**. SubWallet has had it **since day one**. The number was not a harmless artefact of the fork — it pointed at the wrong end of the product's life.
 
-It was also **internally inconsistent**, which is what proves it was an accident rather than a convention: [US-10.2](sprints/stories/US-10.2-substrate-inject-api.md) (`injectedWeb3`, by `jacogr`) and [US-3.1](sprints/stories/US-3.1-create-wallet-seed-phrase.md) (create-wallet, also `jacogr`) are **equally inherited** — and both already said **0.2.1**. Four stories out of six went one way; the rule below makes all six agree.
+It was also **internally inconsistent**, which is what proves it was an accident rather than a convention: [US-10.2](sprints/stories/US-10.2-substrate-inject-api-injectedweb3.md) (`injectedWeb3`, by `jacogr`) and [US-3.1](sprints/stories/US-3.1-create-a-new-wallet-via-seed-phrase.md) (create-wallet, also `jacogr`) are **equally inherited** — and both already said **0.2.1**. Four stories out of six went one way; the rule below makes all six agree.
 
 **`assignee` stays the upstream author.** They wrote the code, and that is true. `assignee` records *who delivered the work*; `version_shipped` records *when this product shipped it*. Conflating them is what produced the error.
 
 **What was considered and rejected**: keeping the upstream version "for provenance". Provenance is not lost — it is *relocated* to the place that can express it (a table in the story, naming the upstream release, author and commit). A frontmatter field constrained to `^\d+\.\d+\.\d+$` cannot say *"a polkadot-js release, not ours"*. Forcing it to carry a meaning it cannot express is how the misinformation happened.
 
-**Impact**: four stories corrected to `version_shipped: 0.2.1`, `sprint: sprint-2022-M02`. **The four reconstructed windows dated 2019–2021 are deleted** — they were empty once the stories moved, and they had been asserting that SubWallet ran sprints before it existed. **The project's earliest window is now 2022-M02, SubWallet's first month**, which is finally true.
+**Impact**: four stories corrected to `version_shipped: 0.2.1`, `sprint: sprint-2022-M02` *(the sprint half was superseded four entries later — [D105](#d105-the-fork-boundary-is-its-own-window--inherited-work-does-not-go-on-this-teams-board) moved all six inherited stories to `sprint-2022-M01`, deliberately letting `sprint` and `version_shipped` disagree)*. **The four reconstructed windows dated 2019–2021 are deleted** — they were empty once the stories moved, and they had been asserting that SubWallet ran sprints before it existed. **The project's earliest window is now 2022-M02, SubWallet's first month**, which is finally true.
 
 **Date**: 2026-07-14
 **Version**: docs-only (against v1.3.83)
@@ -2138,7 +2202,7 @@ It was also **internally inconsistent**, which is what proves it was an accident
 
 **What this costs us, stated plainly so nobody is surprised later:**
 
-1. **The viewer will keep showing 5 warnings that are not defects** — 3 docs stories with no `version_shipped` (correct per D97), 1 `deprecated` story with no owner (a dead story needs none), 1 genuinely-in-`review` story with no open sprint (an owner decision). **The viewer's warning count is not this project's health metric. `npx koni-docs validate` is** — it exits 0.
+1. **The viewer will keep showing 5 warnings that are not defects** *(as of 2026-07-14; **966** on 2026-07-20 — the defects are unchanged, the corpus is 16× larger)* — 3 docs stories with no `version_shipped` (correct per D97), 1 `deprecated` story with no owner (a dead story needs none), 1 genuinely-in-`review` story with no open sprint (an owner decision). **The viewer's warning count is not this project's health metric. `npx koni-docs validate` is** — it exits 0.
 2. **The vendored spec is a local fork.** The next `chore: install koni-docs skill` **overwrites** `.agents/skills/koni-docs/references/` and the `[WM]` cadence + the `version_shipped` carve-out disappear. **The rules therefore live in `AGENTS.md §7`, which nothing overwrites** — and that file, not the skill, is the authority here.
 3. **Sprint pages will keep rendering `Points 0`.** Absent is not zero; the viewer fabricates that. Do not "fix" it by adding fields to sprint files — **a sprint has no `points` field**, and inventing one to make a UI go green is exactly the failure this whole program has been unwinding.
 
@@ -2177,9 +2241,9 @@ The cause is dull and worth naming: **nothing derives this field and nothing che
 
 Both are correct. An epic can have every FR shipped and still carry open hardening or NFR work. **Do not "fix" one to match the other** — that would delete a real distinction to make two numbers agree.
 
-**Impact**: 16 epics corrected. Final state — **`done`: 3** (EPIC-2, EPIC-17, EPIC-21) · **`in-progress`: 18** · **`backlog`: 0**.
+**Impact**: 16 epics corrected. Final state — **`done`: 3** (EPIC-2, EPIC-17, EPIC-21) · **`in-progress`: 18** · **`backlog`: 0** *(as of 2026-07-14; **41** epics on 2026-07-20 — done 5, in-progress 36, backlog 0. The derivation rule holds on 40 of 41: [EPIC-42](sprints/epics/EPIC-42.md) is `in-progress` with 3/3 stories `done`, which this rule says should be `done`)*.
 
-**No epic is `backlog`**, and that is the honest headline: **every one of the 21 epics has shipped something.** The field had been claiming otherwise for 13 of them.
+**No epic is `backlog`**, and that is the honest headline: **every one of the 21 epics has shipped something** *(as of 2026-07-14)*. The field had been claiming otherwise for 13 of them.
 
 Only one surface is still hand-kept and unchecked: the **PRD badge**. It is accurate today (verified against the FR tables in this sweep) — and it is therefore the next field to rot, for exactly the reason this entry exists.
 
@@ -2223,7 +2287,7 @@ absence of an ID is silence, while a dangling ID is a lie with a citation.
 **Impact**: 4 dangling IDs cleared — the story number in three files, plus a **zero-padded
 FR reference** in [US-21.2](sprints/stories/US-21.2-history-backfill.md) (an FR-1 written
 with a leading zero, which is a different string and therefore a different ID). Both checks
-now green: `validate` exits 0, `check-ids` exits 0 across **255 files**.
+now green: `validate` exits 0, `check-ids` exits 0 across **255 files** *(as of 2026-07-14; **2895** scanned, 5 archives skipped on 2026-07-20)*.
 
 A note for whoever next writes a rule here: **this entry tripped its own check.** The first
 draft quoted the bad ID literally to explain the fix, and `check-ids` failed the commit. That
@@ -2269,7 +2333,7 @@ These six say `sprint: sprint-2022-M01` and `version_shipped: 0.2.1`, and 0.2.1 
 | `sprint` | *When was the work done?* | 2019-05 → 2022-01, **upstream** |
 | `version_shipped` | *When did a **SubWallet** user get it?* | **0.2.1**, 2022-02-10 |
 
-For all 171 other stories these collapse into one month and the distinction is invisible.
+For all 171 other stories *(as of 2026-07-14; **2773** on 2026-07-20)* these collapse into one month and the distinction is invisible.
 Here it is the entire content. **Do not reconcile them** — moving these six into February
 re-asserts that the team built them, which is the exact claim this window retracts. It is
 [D103](#d103-epic-status-is-derived-from-its-stories--and-it-answers-a-different-question-than-the-prd-badge)'s
@@ -2406,7 +2470,7 @@ tick is not greppable.** Only reading the code against the AC finds it.
 So we measured the thing that *should* find it — the `## Verification commands` table every story
 carries:
 
-| Of the **119 `done` stories** | |
+| Of the **119 `done` stories** *(as of 2026-07-13; **2225** on 2026-07-20)* | |
 | --- | --- |
 | have a Verification commands section | **119** — full compliance |
 | have **at least one command a machine can run** | **12** |
@@ -2444,7 +2508,7 @@ UI polish, small increments. Minting 2735 of them as US-4.x / US-6.x would bury 
 EPIC-4 FR stories under 345 maintenance stubs, and a reader could no longer see the requirement
 set. The unit of a story would stop meaning one thing.
 
-**Decision — a parallel layer.** Twenty **maintenance epics** (`EPIC-22`…`EPIC-41`), one per
+**Decision — a parallel layer.** Twenty **maintenance epics** (`EPIC-22`…`EPIC-41`) *(2026-07-17: **19** — the NFT maintenance epic was folded back into [EPIC-9](sprints/epics/EPIC-9.md) and its number retired ([rule 7](../AGENTS.md) forbids naming it here, since no such document exists now). A later epic took a number inside the stated range but is a QA epic, not a maintenance one, so the range no longer describes the layer)*, one per
 product area plus one *Uncategorized*, each holding one story per unowned issue in its area. The
 21 product epics are untouched — they remain the FR map. Every shipped issue now has exactly one
 owning story; the ERP reads across both layers, the FR reader reads only the first.
@@ -2480,9 +2544,9 @@ it touches no code and decides nothing about what the product should do. The are
 title heuristic and each story says so (*"capability area (guess)"*); the **Uncategorized** epic
 (498 stories) is the honest confession that 18% of titles do not classify themselves.
 
-**Impact**: 20 maintenance epics · **2707 stories** (2407 done, 300 backlog) · 2 new sprint
+**Impact**: 20 maintenance epics · **2707 stories** (2407 done, 300 backlog) *(as of 2026-07-15; the layer is **19** epics and **2593** stories on 2026-07-20 — 2099 done, 253 backlog, 205 deprecated, 36 in flight)* · 2 new sprint
 windows. CHANGELOG coverage 6% → **99%** (1113/1124; 3 stragglers). `npx koni-docs validate`
-exits 0 · `node scripts/koni-docs-check-ids.mjs` exits 0 across 2996 files.
+exits 0 · `node scripts/koni-docs-check-ids.mjs` exits 0 across 2996 files *(2895 today)*.
 
 **Audited against the tracker, then against git (2026-07-15 → 07-16).** Six passes re-checked what
 the generator had claimed. They decided nothing new — they corrected evidence — so the pass-by-pass
@@ -2532,9 +2596,17 @@ and is overwritten on install ([D102](#d102-do-not-file-the-koni-docs-bugs-upstr
 [D93](#d93-prd_ref-holds-fr-n-or-nfr-n--the-project-is-requirement-centric-not-fr-centric)'s rule moved
 there in the same pass; both entries keep their reasoning and cede authority to §7.
 
-**Impact**: EPIC-9 corrected. **Not yet applied to the other 20 epics** — they still carry a bare
-`| FR |` matrix, including [EPIC-20](sprints/epics/EPIC-20.md), whose US-20.2 / US-20.5 / US-20.6 show
-`—` despite carrying `NFR-` refs in frontmatter. That is open work, not a shipped state.
+**Impact**: EPIC-9 corrected, then **all 13 remaining epic matrices** the same day (`4bb4c9fdef`):
+every one now heads its last column `FR / NFR` and carries the one-line pointer. 20 cells changed —
+every one had been *under*-reporting what the story's own frontmatter already said (12 stories carry
+`NFR-` refs, 2 carry only `arch_ref`, 6 defend FRs owned elsewhere). [EPIC-20](sprints/epics/EPIC-20.md),
+named above as the worst case, now shows `NFR-20, NFR-21` / `NFR-21, NFR-23` / `NFR-17, NFR-21` and
+`— (AD-07, AD-08)`. All 151 matrix rows re-derived from frontmatter: 0 mismatches.
+
+> *(2026-07-20: the paragraph above originally read "Not yet applied to the other 20 epics … That is
+> open work, not a shipped state." It was true when written and false a few hours later. Recorded
+> here rather than silently replaced — this entry is the shortest-lived stale claim in the log, and a
+> reminder that "as of" belongs on any sentence describing work in flight.)*
 
 **Boundary ([rule 3](../AGENTS.md))**: notation only. No story's `prd_ref` changed.
 

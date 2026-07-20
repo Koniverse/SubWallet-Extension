@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-20 08:54:25 UTC
-> Total stories: 2777
+> Last generated: 2026-07-20 11:48:20 UTC
+> Total stories: 2779
 
 ## 📋 Backlog (292)
 
@@ -372,7 +372,7 @@
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W28 | frenkie-ng |
 
-## ✅ Done (2223)
+## ✅ Done (2225)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2563,6 +2563,8 @@
 | US-42.1 | Test — Stake/unstake screen bugs after upgrade (#5013) | EPIC-42 | P2 | 3 | sprint-2026-W29 | MaiThuongNinni |
 | US-42.2 | Test — Cypress (CP) token on Base shows correctly in wallet (#703) | EPIC-42 | P3 | 3 | sprint-2026-W29 | MaiThuongNinni |
 | US-42.3 | Test — Polkadot Hub EVM chain works correctly in wallet (#701) | EPIC-42 | P3 | 3 | sprint-2026-W29 | MaiThuongNinni |
+| US-42.4 | Test — TUSDT token on Bittensor shows correctly in wallet (#699) | EPIC-42 | P3 | 3 | sprint-2026-W30 | MaiThuongNinni |
+| US-42.5 | Retest — XCM support for MYTH token between PAH and Hydration (#301) | EPIC-42 | P3 | 3 | sprint-2026-W30 | MaiThuongNinni |
 | US-5.1 | Phishing site blocking (@polkadot/phishing denylist) | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
 | US-5.2 | Master password & strength policy | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
 | US-5.3 | Forgot password → reset wallet | EPIC-5 | P0 | 3 | sprint-2023-M05 | S2kael |
@@ -2823,7 +2825,7 @@ _No stories_
 - 🟢 **Ready**: 15
 - 🟡 **In Progress**: 29
 - 👀 **Review**: 12
-- ✅ **Done**: 2223
+- ✅ **Done**: 2225
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 206
 

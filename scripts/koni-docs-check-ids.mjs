@@ -147,6 +147,34 @@ const slugsOf = (file) => {
 };
 
 const badAnchor = [];
+const badLink = [];
+
+// A link with no `#fragment` skipped the loop below entirely, so a path that
+// names no file was invisible: D101 cited `US-10.2-substrate-inject-api.md` and
+// `US-3.1-create-wallet-seed-phrase.md` for months — both real stories, both
+// under different filenames. Rule 7 did not catch them either, because the IDs
+// in the link *text* resolve fine; it is the href that is dead.
+
+for (const file of targets) {
+  const r = rel(file);
+
+  if (isArchive(r)) {
+    continue;
+  }
+
+  fs.readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
+    for (const [, target] of line.matchAll(/\]\(([^)\s#]+\.md)(?:#[^)]*)?\)/g)) {
+      if (/^[a-z]+:/i.test(target)) {
+        continue;
+      }
+
+      if (!fs.existsSync(path.resolve(path.dirname(file), target))) {
+        badLink.push(`${r}:${i + 1} → ${target}`);
+      }
+    }
+  });
+}
+
 
 for (const file of targets) {
   const r = rel(file);
@@ -164,7 +192,6 @@ for (const file of targets) {
 
       const dest = target ? path.resolve(path.dirname(file), target) : file;
 
-      // a missing FILE is a different defect; only judge anchors we can read
       if (!fs.existsSync(dest) || !dest.endsWith('.md')) {
         continue;
       }
@@ -312,6 +339,12 @@ if (badField.length) {
   console.log('');
 }
 
+if (badLink.length) {
+  console.log(`  ✗ ${badLink.length} link(s) to a file that does not exist:\n`);
+  badLink.forEach((b) => console.log(`    ${b}`));
+  console.log('');
+}
+
 if (badVersion.length) {
   console.log(`  ✗ ${badVersion.length} decision(s) shipping in a release older than the decision:\n`);
   badVersion.forEach((b) => console.log(`    ${b}`));
@@ -326,9 +359,9 @@ if (badAnchor.length) {
   console.log('    the top of the page. Usually the heading was retitled and its slug moved.\n');
 }
 
-if (!dangling.size && !badField.length && !badAnchor.length && !badVersion.length) {
+if (!dangling.size && !badField.length && !badAnchor.length && !badVersion.length && !badLink.length) {
   console.log('  ✓ every ID named in the doc surface resolves');
-  console.log('  ✓ every in-repo link lands on a heading that exists');
+  console.log('  ✓ every in-repo link resolves to a file, and to a heading when anchored');
   console.log('  ✓ no decision ships in a release older than itself');
   process.exit(0);
 }
