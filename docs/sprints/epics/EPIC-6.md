@@ -121,14 +121,16 @@ here; currency-converted *amounts* are computed by the balance epic
 
 ### US ↔ entity / subsystem matrix
 
-| US | Primary entity / subsystem | FR |
+| US | Primary entity / subsystem | FR / NFR |
 |---|---|---|
 | [US-6.1](../stories/US-6.1-dark-only-responsive-popup-and-expand-view.md) | `ThemeProvider` / `ThemeContext.tsx` + `themes.ts` (dark-only `ThemeNames.DARK`) + responsive popup/expand layout in `@subwallet/extension-koni-ui` | FR-63 |
 | [US-6.2](../stories/US-6.2-web-app-feature-parity.md) | `@subwallet/webapp` host bundling `extension-base` + `@subwallet/extension-web-ui` (`webpack.config.cjs`) | FR-64 |
 | [US-6.3](../stories/US-6.3-mobile-web-runner-webview.md) | `@subwallet/web-runner` WebView host over `extension-base` (`webpack.config.cjs`), `mobile(…)` bus path | FR-65 |
 | [US-6.4](../stories/US-6.4-settings-management.md) | `SettingService` (background) + `Popup/Settings/` surface (network / token / account-metadata preferences) | FR-66 |
 | [US-6.5](../stories/US-6.5-display-fiat-currency-selection.md) | `SettingService` `CurrencyType` preference via `pri(settings.savePriceCurrency)` (`RequestChangePriceCurrency`, `DEFAULT_CURRENCY = 'usd'`) | FR-67 |
-| [US-6.6](../stories/US-6.6-design-system-and-ux-hardening.md) | Shared design tokens + responsive layout in `extension-koni-ui` / `extension-web-ui`; `NumberDisplay.tsx`, `Popup/Confirmations/` | — |
+| [US-6.6](../stories/US-6.6-design-system-and-ux-hardening.md) | Shared design tokens + responsive layout in `extension-koni-ui` / `extension-web-ui`; `NumberDisplay.tsx`, `Popup/Confirmations/` | FR-63, FR-64 (defends) |
+
+> Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
 > **Happy path: N/A** — EPIC-6 is the experience shell, not a single end-to-end flow; its six stories span three independent concerns (responsive design system, cross-platform packaging, preference surfaces) that share no one canonical user path. The display-currency change (US-6.5: picker → `pri(settings.savePriceCurrency)` → `SettingService` persists `CurrencyType` → balance surfaces re-render) is the closest candidate, but its converted-amount step is owned by [EPIC-7](EPIC-7.md), so forcing one diagram here would misrepresent the epic's scope boundary.
 

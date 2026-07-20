@@ -105,6 +105,77 @@ for (const file of targets) {
   });
 }
 
+// ---- anchors: a link that lands nowhere on the page ------------------------
+//
+// Rule 7 catches an ID that names no document. It does not catch a link that
+// names a real document and a heading that is not in it — `](CONTEXT.md#d97-…)`
+// resolves as a file and dumps the reader at the top of a 2000-line log. Four of
+// these survived here for weeks: D96, D97 and D99 were retitled and the links that
+// cited their old slugs were never updated, because nothing looked.
+//
+// Slugs follow GitHub's rule: lowercase, drop everything that is not word/space/
+// hyphen (so `**bold**` and backticks vanish), spaces to hyphens. An em dash is
+// dropped rather than replaced, which is why a title containing " — " yields a
+// double hyphen.
+
+const slugify = (heading) =>
+  heading
+    .replace(/^#+\s*/, '')
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s/g, '-');
+
+const slugCache = new Map();
+
+const slugsOf = (file) => {
+  if (!slugCache.has(file)) {
+    const set = new Set();
+
+    if (fs.existsSync(file) && file.endsWith('.md')) {
+      for (const line of fs.readFileSync(file, 'utf8').split('\n')) {
+        if (/^#{1,6} /.test(line)) {
+          set.add(slugify(line));
+        }
+      }
+    }
+
+    slugCache.set(file, set);
+  }
+
+  return slugCache.get(file);
+};
+
+const badAnchor = [];
+
+for (const file of targets) {
+  const r = rel(file);
+
+  if (isArchive(r)) {
+    continue;
+  }
+
+  fs.readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
+    for (const [, target, anchor] of line.matchAll(/\]\(([^)\s#]*)#([a-z0-9][\w-]*)\)/g)) {
+      // external links carry their own anchors; we cannot see the page
+      if (/^[a-z]+:/i.test(target)) {
+        continue;
+      }
+
+      const dest = target ? path.resolve(path.dirname(file), target) : file;
+
+      // a missing FILE is a different defect; only judge anchors we can read
+      if (!fs.existsSync(dest) || !dest.endsWith('.md')) {
+        continue;
+      }
+
+      if (!slugsOf(dest).has(anchor)) {
+        badAnchor.push(`${r}:${i + 1} → ${target || path.basename(file)}#${anchor}`);
+      }
+    }
+  });
+}
+
 // ---- the two fields that name things OUTSIDE the docs ----------------------
 //
 // `version_shipped` names a release; `commit` names a commit. Both are identifiers,
@@ -191,8 +262,16 @@ if (badField.length) {
   console.log('');
 }
 
-if (!dangling.size && !badField.length) {
+if (badAnchor.length) {
+  console.log(`  ✗ ${badAnchor.length} link(s) to a heading that does not exist:\n`);
+  badAnchor.forEach((b) => console.log(`    ${b}`));
+  console.log('\n    A link that resolves as a file but not as a heading drops the reader at');
+  console.log('    the top of the page. Usually the heading was retitled and its slug moved.\n');
+}
+
+if (!dangling.size && !badField.length && !badAnchor.length) {
   console.log('  ✓ every ID named in the doc surface resolves');
+  console.log('  ✓ every in-repo link lands on a heading that exists');
   process.exit(0);
 }
 

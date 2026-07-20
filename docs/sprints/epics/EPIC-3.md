@@ -150,17 +150,19 @@ secret material is created/parsed/stored **only** in the background keyring
 (`@subwallet/ui-keyring`) and persisted through `AccountProxyStore` /
 `ModifyPairStore` / `CurrentAccountStore`.
 
-| US | Primary handler / store | FR |
+| US | Primary handler / store | FR / NFR |
 |---|---|---|
 | [US-3.1](../stories/US-3.1-create-a-new-wallet-via-seed-phrase.md) | `AccountMnemonicHandler` (`mnemonicCreateV2` → `accountsCreateSuriV2`) + `AccountProxyStore` | FR-13 |
 | [US-3.2](../stories/US-3.2-import-account-via-seed-phrase-or-private-key.md) | `AccountMnemonicHandler` (`accountsCreateSuriV2`, seed → unified) / `AccountSecretHandler` (`privateKeyValidateV2` → `accountsCreateWithSecret`, key → solo) | FR-14, FR-15 |
 | [US-3.3](../stories/US-3.3-import-account-via-json-qr-trust-wallet.md) | `AccountJsonHandler` (`jsonRestoreV2` / `batchRestoreV2`) · `AccountSecretHandler` (`accountsCreateExternalV2`, QR) · `AccountMnemonicHandler` (`ed25519-tw`, Trust path → solo) | FR-16, FR-17, FR-18 |
 | [US-3.4](../stories/US-3.4-export-keys-multi-account-management.md) | `AccountMnemonicHandler` (`exportAccountProxyMnemonic`) · `AccountSecretHandler` (`accountExportPrivateKey`) · `AccountModifyHandler` (`accountsEdit` / `accountProxyForget`) | FR-19, FR-20 |
-| [US-3.5](../stories/US-3.5-the-unified-account-model.md) | `AccountMnemonicHandler` derivation across `['sr25519', …EthereumKeypairTypes, 'ton', …CardanoKeypairTypes, …BitcoinKeypairTypes]` + `AccountMigrationHandler` (`migrateSoloToUnifiedAccount`) | FR-21, FR-22, FR-23 |
+| [US-3.5](../stories/US-3.5-the-unified-account-model.md) | `AccountMnemonicHandler` derivation across `['sr25519', …EthereumKeypairTypes, 'ton', …CardanoKeypairTypes, …BitcoinKeypairTypes]` + `AccountMigrationHandler` (`migrateSoloToUnifiedAccount`) | FR-21, FR-22 |
 | [US-3.6](../stories/US-3.6-watch-only-accounts-address-book.md) | `AccountSecretHandler` (`accountsCreateExternalV2`, `isReadOnly`) + keyring `contacts` subject (address book) | FR-24, FR-25 |
 | [US-3.7](../stories/US-3.7-account-derivation-custom-path-child-accounts.md) | `AccountDeriveHandler` (`getDeriveSuggestion` via `findUnifiedNextDerive`/`findSoloNextDerive`, `validateDerivePath`, `derivationAccountProxyCreate`) | FR-26, FR-27 |
 | [US-3.8](../stories/US-3.8-account-recovery-identity-roadmap.md) | _(roadmap — no handler yet; would extend `KeyringService` / `AccountContext`)_ | FR-28, FR-29, FR-30 |
 | [US-3.9](../stories/US-3.9-unified-to-solo-account-split.md) | _(forward — inverts the solo→unified merge in `AccountContext`; no split surface exists at v1.3.82)_ | FR-23 |
+
+> Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
 ### End-to-end happy path
 

@@ -141,7 +141,7 @@ number; EPIC-8 enforces it against the existential-deposit guard.
 
 ### US ↔ entity / subsystem matrix
 
-| US | Primary entity / subsystem | FR |
+| US | Primary entity / subsystem | FR / NFR |
 |---|---|---|
 | [US-7.1](../stories/US-7.1-aggregate-portfolio-across-accounts-and-chains.md) | `BalanceService.subscribeBalanceMap()` → `BalanceMapImpl.computeBalance` aggregated subject | FR-68 |
 | [US-7.2](../stories/US-7.2-transferable-vs-locked-balance-calculation.md) | `BalanceType` split over `BalanceItem` (`free` / `locked` / `lockedDetails`) | FR-69 |
@@ -149,7 +149,9 @@ number; EPIC-8 enforces it against the existential-deposit guard.
 | [US-7.4](../stories/US-7.4-real-time-token-price-and-per-asset-chart.md) | `PriceService.priceSubject` + `getPriceMap` via `api-cache` proxy | FR-71 |
 | [US-7.5](../stories/US-7.5-price-history-ohlcv-chart-per-asset.md) | `PriceService.getHistoryTokenPriceData` → `priceHistoryApi.getPriceHistory` (OHLCV, range-scoped) | FR-72 |
 | [US-7.6](../stories/US-7.6-balance-history-portfolio-value-over-time.md) | Portfolio value-over-time series (aggregated composition × historical prices, precomputed/cached) | FR-73 |
-| [US-7.7](../stories/US-7.7-balance-cache-invalidation-hardening.md) | `BalanceService.handleEvents` recompose/invalidate + `BalanceMapImpl.removeBalanceItems` | — |
+| [US-7.7](../stories/US-7.7-balance-cache-invalidation-hardening.md) | `BalanceService.handleEvents` recompose/invalidate + `BalanceMapImpl.removeBalanceItems` | FR-69, FR-68 (defends), NFR-12 |
+
+> Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
 ### End-to-end happy path
 

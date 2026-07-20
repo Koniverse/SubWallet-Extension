@@ -140,7 +140,7 @@ notification feed and bundled locale files ride the same delivery substrate.
 
 ### US ↔ entity / subsystem matrix
 
-| US | Primary entity / subsystem | FR |
+| US | Primary entity / subsystem | FR / NFR |
 |---|---|---|
 | [US-19.1](../stories/US-19.1-wallet-create-restore-onboarding-wrapper.md) | First-run onboarding wrapper (backup-reminder + T&C gates) over EPIC-3 create/restore; settings-state acceptance/reminder flags | FR-152 |
 | [US-19.2](../stories/US-19.2-multi-language-i18n-round-1.md) | `i18n` loader + bundled `locales/{lng}/translation.json` (VI/ZH/JA/RU) + language picker | FR-153 |
@@ -150,6 +150,8 @@ notification feed and bundled locale files ride the same delivery substrate.
 | [US-19.6](../stories/US-19.6-nft-mint-campaigns.md) | `MintCampaignService` (`unlockDotCampaign`) + `fetchStaticData` mint-campaign config | FR-157 |
 | [US-19.7](../stories/US-19.7-mission-pools-reward-program.md) | `MissionPool` reward-program surface (Services SDK → `MissionInfo`, eligibility + join deep-link) | FR-158 |
 | [US-19.8](../stories/US-19.8-in-app-notification-center.md) | `InappNotificationService` feed (DB + read/unread) + `CampaignService` notification campaigns + `NotificationService` OS notify | FR-159 |
+
+> Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
 ### End-to-end happy path
 

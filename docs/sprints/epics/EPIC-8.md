@@ -150,7 +150,7 @@ their own epics.
 
 ### US ↔ entity / subsystem matrix
 
-| US | Primary entity / subsystem | FR |
+| US | Primary entity / subsystem | FR / NFR |
 | --- | --- | --- |
 | [US-8.1](../stories/US-8.1-send-native-and-fungible-tokens.md) | Per-ecosystem `ChainService` transfer builder (`SubstrateApi` / `EvmApi` / BTC / TON / Cardano) | FR-74 |
 | [US-8.2](../stories/US-8.2-receive-qr-and-copyable-address.md) | Per-ecosystem address resolver + QR encoder (keyring/account layer) | FR-75 |
@@ -163,7 +163,9 @@ their own epics.
 | [US-8.9](../stories/US-8.9-multi-step-one-sign-signing.md) | One-Sign sequence model + RequestService batch confirmation | FR-82 |
 | [US-8.10](../stories/US-8.10-token-spending-approval-confirmation.md) | ERC-20/PSP-22 allowance confirmation via RequestService handler | FR-83 |
 | [US-8.11](../stories/US-8.11-export-transaction-history.md) | Merged-history serializer (CSV/JSON file export) | FR-84 |
-| [US-8.12](../stories/US-8.12-fee-bigint-and-gas-estimation-hardening.md) | Fee/BigInt/gas-estimation correctness guard over the send + fee surface | — |
+| [US-8.12](../stories/US-8.12-fee-bigint-and-gas-estimation-hardening.md) | Fee/BigInt/gas-estimation correctness guard over the send + fee surface | FR-76, FR-77, FR-80 (defends), NFR-22 |
+
+> Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
 ### End-to-end happy path
 

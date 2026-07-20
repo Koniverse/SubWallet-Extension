@@ -192,14 +192,16 @@ boundary is drawn explicitly in Out of scope.
 
 ### US ↔ entity / subsystem matrix
 
-| US | Primary entity / subsystem | FR |
+| US | Primary entity / subsystem | FR / NFR |
 |---|---|---|
-| [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | `KoniState` background lifecycle — `ServiceStatus` machine + `wakeup`/`_startFull`/`sleep`; `cronAndSubscription` services | — |
-| [US-20.2](../stories/US-20.2-api-call-optimization.md) | Request layer — Services SDK / `api-cache`·`static-data`·`ipfs-files` proxy routing + `InappNotificationService` fetch class | — |
-| [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | `SubstrateApi` read path — lightweight `WsProvider`; full `ApiPromise` deferred to extrinsic construction | — |
-| [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | Submit/close path — per-account subscription teardown + history-popup reconciliation off the main thread | — |
-| [US-20.5](../stories/US-20.5-list-rendering-performance.md) | `extension-koni-ui` heavy lists (NFT / Receive / customization-network / Select Token / Select Network) reading `fetchStaticData` | — |
-| [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) | `webapp` Dapps/Mission-Pools lists + `web-runner` shared-worker model | — |
+| [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | `KoniState` background lifecycle — `ServiceStatus` machine + `wakeup`/`_startFull`/`sleep`; `cronAndSubscription` services | NFR-8, NFR-12 |
+| [US-20.2](../stories/US-20.2-api-call-optimization.md) | Request layer — Services SDK / `api-cache`·`static-data`·`ipfs-files` proxy routing + `InappNotificationService` fetch class | NFR-20, NFR-21 |
+| [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | `SubstrateApi` read path — lightweight `WsProvider`; full `ApiPromise` deferred to extrinsic construction | — (AD-07, AD-08) |
+| [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | Submit/close path — per-account subscription teardown + history-popup reconciliation off the main thread | NFR-23 |
+| [US-20.5](../stories/US-20.5-list-rendering-performance.md) | `extension-koni-ui` heavy lists (NFT / Receive / customization-network / Select Token / Select Network) reading `fetchStaticData` | NFR-21, NFR-23 |
+| [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) | `webapp` Dapps/Mission-Pools lists + `web-runner` shared-worker model | NFR-17, NFR-21 |
+
+> Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
 > Every EPIC-20 story owns **no FR** (the epic is NFR-driven; `prd_ref` is empty by
 > design — see [NFR Coverage](#nfr-coverage)), so the FR column is `—` throughout.

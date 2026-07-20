@@ -114,7 +114,7 @@ AD-18), and the SwapService engine itself lives in [EPIC-2](EPIC-2.md).
 
 ### US ↔ entity / subsystem matrix
 
-| US | Primary entity / subsystem | FR |
+| US | Primary entity / subsystem | FR / NFR |
 |---|---|---|
 | [US-11.1](../stories/US-11.1-in-wallet-swap-via-chainflip.md) | Chainflip `SwapService` handler (keyed, cross-chain) | FR-103 |
 | [US-11.2](../stories/US-11.2-in-wallet-swap-via-hydration-dex.md) | Hydration omnipool handler (Substrate extrinsic) | FR-104 |
@@ -127,6 +127,8 @@ AD-18), and the SwapService engine itself lives in [EPIC-2](EPIC-2.md).
 | [US-11.9](../stories/US-11.9-in-wallet-swap-via-optimex.md) | Optimex handler (intent / solver-settled cross-chain) | FR-111 |
 | [US-11.10](../stories/US-11.10-in-wallet-swap-via-piperx.md) | PiperX handler (EVM DEX, planned) | FR-112 |
 | [US-11.11](../stories/US-11.11-in-wallet-swap-via-stellaswap.md) | StellaSwap handler (Moonbeam EVM DEX, planned) | FR-113 |
+
+> Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
 ### End-to-end happy path
 

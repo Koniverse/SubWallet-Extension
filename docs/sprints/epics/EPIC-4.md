@@ -206,7 +206,7 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 
 ### US ↔ entity / subsystem matrix
 
-| US | Primary entity / subsystem | FR |
+| US | Primary entity / subsystem | FR / NFR |
 | --- | --- | --- |
 | [US-4.1](../stories/US-4.1-add-remove-networks-and-custom-rpc.md) | `ChainService` network config + custom-RPC store | FR-31 |
 | [US-4.2](../stories/US-4.2-bulk-disable-and-reset-default-networks.md) | `ChainService` active-chain set | FR-32, FR-33 |
@@ -228,9 +228,11 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 | [US-4.18](../stories/US-4.18-chain-abstraction-sdk.md) | Chain-abstraction SDK package | FR-49 |
 | [US-4.19](../stories/US-4.19-account-abstraction-standards.md) | AA / intent standard adapters | FR-50 |
 | [US-4.20](../stories/US-4.20-ai-defai-features.md) | AI agent + DeFAI orchestration | FR-51 |
-| [US-4.21](../stories/US-4.21-asset-hub-migration-hardening.md) | Asset Hub migration — chain-list / default-set + API objects | — |
-| [US-4.22](../stories/US-4.22-rpc-and-endpoint-management-hardening.md) | RPC / endpoint management + custom-RPC validation | — |
-| [US-4.23](../stories/US-4.23-bitcoin-api-path-hardening.md) | Bitcoin indexer API path (backend-proxied) | — |
+| [US-4.21](../stories/US-4.21-asset-hub-migration-hardening.md) | Asset Hub migration — chain-list / default-set + API objects | FR-34, FR-31 (defends) |
+| [US-4.22](../stories/US-4.22-rpc-and-endpoint-management-hardening.md) | RPC / endpoint management + custom-RPC validation | FR-31, FR-35 (defends) |
+| [US-4.23](../stories/US-4.23-bitcoin-api-path-hardening.md) | Bitcoin indexer API path (backend-proxied) | FR-37 (defends), NFR-16 |
+
+> Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
 ### End-to-end happy path
 

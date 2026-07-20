@@ -143,7 +143,7 @@ those features reuse.
 
 ### US ↔ entity / subsystem matrix
 
-| US | Primary entity / subsystem | FR |
+| US | Primary entity / subsystem | FR / NFR |
 |---|---|---|
 | [US-2.1](../stories/US-2.1-unified-account-keyring-engine.md) | `KeyringService` (background keyring over `@subwallet/keyring` / `@subwallet/ui-keyring`) | FR-5 |
 | [US-2.2](../stories/US-2.2-chainservice-live-api-per-chain.md) | `ChainService` per-chain API objects (`SubstrateApi` / `EvmApi`) + WsProvider read path | FR-6 |
@@ -153,6 +153,8 @@ those features reuse.
 | [US-2.6](../stories/US-2.6-fee-engine.md) | `FeeService` (`subscribeChainFee` across Substrate / EVM / non-native fee tokens) | FR-10 |
 | [US-2.7](../stories/US-2.7-requestservice-approval-queue.md) | `RequestService` per-ecosystem handlers behind `PopupHandler` | FR-11 |
 | [US-2.8](../stories/US-2.8-transaction-lifecycle-engine.md) | `TransactionService` build→validate→sign→submit→track→history machine | FR-12 |
+
+> Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
 ### End-to-end happy path
 

@@ -139,7 +139,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 
 ### US ↔ entity / subsystem matrix
 
-| US | Primary entity / subsystem | FR |
+| US | Primary entity / subsystem | FR / NFR |
 |---|---|---|
 | [US-5.1](../stories/US-5.1-phishing-site-and-address-protection.md) | `Tabs.checkPhishing` → `checkIfDenied` (`@polkadot/phishing`) + TODO-disabled `chainPatrolCheckUrl` | FR-52 |
 | [US-5.2](../stories/US-5.2-master-password-and-strength-policy.md) | `KeyringService` master password + AES-256-GCM at-rest (browser-passworder) | FR-53 |
@@ -150,7 +150,9 @@ proxy (AD-19) so their keys never ship in the bundle.
 | [US-5.7](../stories/US-5.7-camera-access-and-one-sign-toggles.md) | `setCamera` (`pri(settings.saveCamera)`) + `setAllowOneSign` (`pri(settings.update.allowOneSign)`) | FR-59, FR-60 |
 | [US-5.8](../stories/US-5.8-blockaid-transaction-risk-scanning.md) | Blockaid scan on the `RequestService` EVM confirmation surface (`addConfirmation` / `confirmationsQueueSubject`) via backend proxy *(planned)* | FR-61 |
 | [US-5.9](../stories/US-5.9-anti-scam-address-screening.md) | Merkle Science recipient screen in the send-flow validation step via backend proxy *(planned)* | FR-62 |
-| [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md) | Audit / false-positive remediation across phishing match-list, bundle secret-hygiene, WebApp hardening | — |
+| [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md) | Audit / false-positive remediation across phishing match-list, bundle secret-hygiene, WebApp hardening | FR-52 (defends), NFR-16, NFR-25 |
+
+> Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
 ### End-to-end happy path
 

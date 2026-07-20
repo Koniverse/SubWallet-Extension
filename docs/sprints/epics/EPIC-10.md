@@ -138,7 +138,7 @@ page.
 
 ### US ↔ entity / subsystem matrix
 
-| US | Primary entity / subsystem | FR |
+| US | Primary entity / subsystem | FR / NFR |
 |---|---|---|
 | [US-10.1](../stories/US-10.1-evm-provider-injection-eip-1193-eip-6963.md) | EVM inject provider (`extension-compat-metamask`, `window.ethereum`) | FR-94 |
 | [US-10.2](../stories/US-10.2-substrate-inject-api-injectedweb3.md) | Substrate injector (`extension-inject`, `window.injectedWeb3`) | FR-95 |
@@ -149,9 +149,11 @@ page.
 | [US-10.7](../stories/US-10.7-dapp-authorization-ui-per-origin.md) | Per-origin authorization store + "Manage website access" UI | FR-100 |
 | [US-10.8](../stories/US-10.8-arbitrary-message-signing.md) | Sign-message request handlers (per ecosystem) | FR-101 |
 | [US-10.9](../stories/US-10.9-dapp-createtransaction-api-rfc-6213.md) | `createTransaction` Substrate inject API (RFC #6213) | FR-102 |
-| [US-10.10](../stories/US-10.10-multi-wallet-coexistence-hardening.md) | EVM injected-provider coexistence (`window.ethereum` / EIP-6963) | — |
-| [US-10.11](../stories/US-10.11-walletconnect-session-and-dashboard-hardening.md) | WalletConnect session reconciliation + dashboard | — |
-| [US-10.12](../stories/US-10.12-webapp-injected-account-caching.md) | Injected-account cache/reconcile on the inject bridge | — |
+| [US-10.10](../stories/US-10.10-multi-wallet-coexistence-hardening.md) | EVM injected-provider coexistence (`window.ethereum` / EIP-6963) | FR-94 (defends) |
+| [US-10.11](../stories/US-10.11-walletconnect-session-and-dashboard-hardening.md) | WalletConnect session reconciliation + dashboard | FR-96 (defends) |
+| [US-10.12](../stories/US-10.12-webapp-injected-account-caching.md) | Injected-account cache/reconcile on the inject bridge | — (AD-21) |
+
+> Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
 ### End-to-end happy path
 

@@ -152,7 +152,7 @@ it bridges.
 
 ### US ↔ entity / subsystem matrix
 
-| US | Primary entity / subsystem | FR |
+| US | Primary entity / subsystem | FR / NFR |
 |---|---|---|
 | [US-13.1](../stories/US-13.1-xcm-parachain-transfers.md) | XCM transfer builder (ParaSpell) + per-route toggle | FR-126 |
 | [US-13.2](../stories/US-13.2-snowbridge-eth-asset-hub.md) | Snowbridge provider handler | FR-127 |
@@ -164,7 +164,9 @@ it bridges.
 | [US-13.8](../stories/US-13.8-bittensor-alpha-token-bridges.md) | Bittensor alpha-token bridge handlers | FR-133 |
 | [US-13.9](../stories/US-13.9-hyperbridge.md) | Hyperbridge provider handler | FR-134 |
 | [US-13.10](../stories/US-13.10-axelar-cross-chain.md) | Axelar provider handler | FR-135 |
-| [US-13.11](../stories/US-13.11-xcm-runtime-upgrade-paraspell-version-hardening.md) | ParaSpell/runtime resilience + bridge claim / error-surfacing / fee-re-query reliability | — |
+| [US-13.11](../stories/US-13.11-xcm-runtime-upgrade-paraspell-version-hardening.md) | ParaSpell/runtime resilience + bridge claim / error-surfacing / fee-re-query reliability | FR-131, FR-126 (defends), NFR-20 |
+
+> Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
 ### End-to-end happy path
 

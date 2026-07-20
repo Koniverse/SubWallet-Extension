@@ -31,14 +31,14 @@ never been re-verified since they were written.
 | [D7](#d7-scope-custom-network-support-to-pure-evm-or-pure-substrate-only) | Scope custom network support to pure EVM or pure Substrate only | P0 |  |
 | [D8](#d8-temporarily-hide-substrate-private-key-export-no-wallet-supports-re-import-yet) | Temporarily hide Substrate private-key export (no wallet supports re-import… | P0 |  |
 | [D9](#d9-deprioritise-pouchdb-for-cross-platform-storage) | Deprioritise PouchDB for cross-platform storage | P0 |  |
-| [D10](#d10-defer-step-3-of-online-chain-list-auto-update-immediate-provider-change) | Defer step 3 of online chain-list auto-update (immediate provider change) | P0 | ⚠️ **obsolete** — step 3 shipped (`handleLatestChainData` re-inits chain APIs on an interval) |
+| [D10](#d10-defer-step-3-of-online-chain-list-auto-update-immediate-provider-change) | Defer step 3 of online chain-list auto-update (immediate provider change) | P0 | ⚠️ **superseded by code (2026-07-20)** — step 3 shipped; when the risk was accepted is unrecorded |
 | [D11](#d11-do-not-auto-select-validators-users-should-research-or-use-pools) | Do not auto-select validators; users should research or use pools | P0 |  |
 | [D12](#d12-fix-ledger-hid-conflicts-by-disconnecting-device-on-session-close-not-by-splitting-html-files) | Fix Ledger HID conflicts by disconnecting device on session close (not by sp… | P0 |  |
 | [D13](#d13-walletconnect-initial-integration-defers-eth_signtransaction-and-eth_signtypeddata) | WalletConnect initial integration defers eth_signTransaction and eth_signTyp… | P1 |  |
 | [D14](#d14-scope-zk-assets-manta-to-extension-only--exclude-webapp-and-mobile) | Scope ZK assets (Manta) to extension only — exclude WebApp and mobile | P1 |  |
 | [D15](#d15-adopt-eip-6963-multi-provider-discovery-alongside-windowethereum-injection) | Adopt EIP-6963 multi-provider discovery alongside window.ethereum injection | P1 |  |
-| [D16](#d16-defer-custom-derived-path-feature-to-avoid-milestone-6-scope-creep) | Defer custom derived-path feature to avoid Milestone 6 scope creep | P1 | ⚠️ **obsolete** — custom derivation path shipped (FR-26 ✅) |
-| [D18](#d18-implement-full-opengov-voting-not-read-only-for-polkadot-governance) | Implement full OpenGov voting (not read-only) for Polkadot governance | P1 | ⚠️ Impact overstated — it claims delegation + WebApp governance shipped; FR-142/FR-143 are 📋 planned |
+| [D16](#d16-defer-custom-derived-path-feature-to-avoid-milestone-6-scope-creep) | Defer custom derived-path feature to avoid Milestone 6 scope creep | P1 | ✅ **resolved (2026-07-20)** — the deferred feature shipped (FR-26); history, not a live constraint |
+| [D18](#d18-implement-full-opengov-voting-not-read-only-for-polkadot-governance) | Implement full OpenGov voting (not read-only) for Polkadot governance | P1 | ⚠️ **Impact corrected (2026-07-20)** — delegation + web-app governance had not shipped (FR-142/FR-143 📋) |
 | [D19](#d19-refactor-balance-service-to-new-service-architecture-centralise-cache-invalidation) | Refactor balance service to new service architecture (centralise cache inval… | P1 |  |
 | [D21](#d21-rename-staking-feature-to-earning-across-all-platforms) | Rename "Staking" feature to "Earning" across all platforms | P1 |  |
 | [D22](#d22-xcm-transfer-max-formula-reserve-12-ed--2-fee-to-prevent-dust-loss) | XCM Transfer Max formula: reserve 1.2× ED + 2× fee to prevent dust loss | P1 |  |
@@ -64,7 +64,7 @@ never been re-verified since they were written.
 | [D84](#d84-front-price--exchange-rate-data-with-a-cached-endpoint--bundled-static-fallback) | Front price & exchange-rate data with a cached endpoint + bundled static fal… | P2 |  |
 | [D85](#d85-serve-earning-data-from-a-middleware-service-cache-rather-than-polling-live-sources) | Serve earning data from a middleware-service cache rather than polling live… | P2 |  |
 | [D86](#d86-warn-and-require-unstaking-when-an-account-stakes-via-both-nomination-pool-and-direct-nomination) | Warn and require unstaking when an account stakes via both nomination pool a… | P2 |  |
-| [D87](#d87-retire-interlay-lending-by-controlled-deprecation-hide-option-keep-positions-allow-withdraw) | Retire Interlay lending by controlled deprecation (hide option, keep positio… | P2 | ⚠️ *"Lending later returns — see FR-120"* is wrong; FR-120 is the ⏸️ withdrawn row |
+| [D87](#d87-retire-interlay-lending-by-controlled-deprecation-hide-option-keep-positions-allow-withdraw) | Retire Interlay lending by controlled deprecation (hide option, keep positio… | P2 | ⚠️ **corrected (2026-07-20)** — *"lending later returns"* removed; FR-120 is the ⏸️ withdrawn row |
 | [D88](#d88-ship-mv3-on-firefox-gated-on-firefox--127) | Ship MV3 on Firefox, gated on Firefox ≥ 127 | P2 |  |
 | [D20](#d20-native-substrate-path-for-tao-staking-not-evm) | Native Substrate Path for TAO Staking (Not EVM) | P3 |  |
 | [D23](#d23-support-tep-74-jetton-standard-as-the-ton-token-type) | Support TEP-74 Jetton Standard as the TON Token Type | P3 |  |
@@ -109,7 +109,7 @@ never been re-verified since they were written.
 | [D65](#d65-model-walletconnect-as-a-single-connection-merging-pair--session-with-separate-substrate--evm-sessions-wallet-role-only) | Model WalletConnect as a single "Connection" merging pair + session, with se… | P3 |  |
 | [D66](#d66-aggregate-multi-chain-data-through-the-subwallet-services-sdk-backend-rather-than-computing-it-on-device) | Aggregate multi-chain data through the SubWallet Services SDK backend rather… | P3 |  |
 | [D67](#d67-front-market-data-metadata-and-nft-media-behind-subwallet-cachecdn-proxies-with-static-fallback) | Front market data, metadata and NFT media behind SubWallet cache/CDN proxies… | P3 |  |
-| [D70](#d70-one-sign-single-signature-batch-approval-is-opt-in-and-off-by-default) | One-Sign (single-signature batch approval) is opt-in and off by default | P3 | ⚠️ **corrected 2026-07-20** — the 2026-06 backfill inverted the default; ships **on** (`DEFAULT_ALLOW_ONE_SIGN = true`) |
+| [D70](#d70-one-sign-single-signature-batch-approval-is-a-toggle--shipped-on-by-default) | One-Sign (single-signature batch approval) is opt-in and off by default | P3 | ⚠️ **corrected 2026-07-20** — the 2026-06 backfill inverted the default; ships **on** (`DEFAULT_ALLOW_ONE_SIGN = true`) |
 | [D89](#d89-evaluated-and-dropped-swap-providers-1inch-acala-zenlink-parallel-finance) | Evaluated-and-dropped swap providers: 1inch, Acala, Zenlink, Parallel Finance | P3 |  |
 | [D90](#d90-run-two-changelogs-until-the-ci-release-gate-is-migrated) | Run two changelogs until the CI release gate is migrated | P4 | rule → **AGENTS §7** (*The two change logs*) · still binding, CI gate not migrated |
 | [D91](#d91-one-repo-two-version-spaces--declare-the-space-never-mix-the-numbers) | One repo, two version spaces — declare the space, never mix the numbers | P4 | rule → **AGENTS §7** (*The two version spaces*) |
@@ -341,12 +341,26 @@ never been re-verified since they were written.
 - Immediate provider update on chain-list change — rejected: breaks running connections.
 - Versioned chain-list with `olderVersions` field for compatibility tracking — evaluated but not implemented.
 
-**Impact**: RPC provider changes from chain-list are only applied on next extension start, not live.
+**Impact**: RPC provider changes from chain-list were applied only on next extension start, not live.
 
-**Date**: 2023-05-11
+> **No longer holds (verified 2026-07-20) — step 3 is in the code.** `updateLatestChainInfo`
+> reassigns `currentProvider` on an **ACTIVE** chain when its provider is missing or has changed
+> and pushes it to `needUpdateChainApiList`
+> ([`chain-service/utils/index.ts:675-686`](../packages/extension-base/src/services/chain-service/utils/index.ts));
+> `handleLatestChainData` then calls `initApiForChain` for each and logs *"Finished updating latest
+> RPC providers"* ([`chain-service/index.ts:810-828`](../packages/extension-base/src/services/chain-service/index.ts)),
+> driven by a `setInterval(LATEST_CHAIN_DATA_FETCHING_INTERVAL)` at `:803`. That is live provider
+> replacement — the behaviour this entry ruled out.
+>
+> **When and why the risk was accepted is not recorded anywhere**, and this entry is not evidence
+> of it: it was reconstructed in bulk on 2026-06-04 (`908a04f4b5`, *"add 29 chain/account
+> decisions"*), not written when the decision was made. What is certain is the 2023 deferral
+> (issue #1320) and the current code; the step between them is a gap, and is left as one.
+
+**Date**: 2023-05-11 *(entry reconstructed 2026-06-04; superseded by shipped code, noted 2026-07-20)*
 **Version**: v1.0.3
 
-**Citations**: [#1320](https://github.com/Koniverse/SubWallet-Extension/issues/1320)
+**Citations**: [#1320](https://github.com/Koniverse/SubWallet-Extension/issues/1320); `chain-service/utils/index.ts`, `chain-service/index.ts`
 
 ---
 
@@ -466,7 +480,14 @@ never been re-verified since they were written.
 **Alternatives considered**:
 - Implement immediately within Milestone 6 scope — rejected: scope creep risk.
 
-**Impact**: Custom derived path deferred; implementation tracked in [#3556](https://github.com/Koniverse/SubWallet-Extension/issues/3556).
+**Impact**: Custom derived path deferred out of Milestone 6; implementation tracked in [#3556](https://github.com/Koniverse/SubWallet-Extension/issues/3556).
+
+> **Resolved (verified 2026-07-20).** The deferral did what it was meant to do — the feature
+> shipped later. [FR-26](PRD.md#functional-requirements) *"Custom derivation path support for
+> advanced account creation"* is ✅ shipped, and the editable path field is live in
+> [`DeriveAccountActionModal.tsx:284-297`](../packages/extension-koni-ui/src/components/Modal/DeriveAccountActionModal.tsx)
+> (`name='suri'`), validated through `validateDerivePath`. This entry records a scheduling
+> decision that has run its course; it is history, not a live constraint.
 
 **Date**: 2023-11-01
 **Version**: v1.1.x
@@ -486,7 +507,17 @@ never been re-verified since they were written.
 **Alternatives considered**:
 - Read-only referendum listing without vote submission — rejected: insufficient value.
 
-**Impact**: Full OpenGov voting shipped in extension and WebApp, including track metadata, vote counting, and delegation logic.
+**Impact**: Full OpenGov voting shipped **in the extension** — [FR-139 / FR-140](PRD.md#functional-requirements) ✅, with track metadata and vote counting.
+
+> **Corrected 2026-07-20 — the Impact claimed two things that have not shipped.** It read
+> *"shipped in extension and WebApp, including … delegation logic"*. The PRD says otherwise:
+> **FR-142** (*OpenGov Phase 2: delegation support and governance tracks*) and **FR-143**
+> (*web-app governance*) are both 📋 **planned**, and the CHANGELOG carries only *"Support OpenGov
+> (Phase 1) (#4678)"* — no delegation line. The **decision** stands (full voting over read-only);
+> only its Impact overstated the result. Like D10 and D70, this entry was reconstructed in bulk on
+> 2026-06-04 (`908a04f4b5`) rather than recorded at the time, and the reconstruction inflated what
+> shipped. Delegation remains scoped by
+> [D47](#d47-phased-delegation-rollout--delegation-deferred-to-phase-2-of-opengov-implementation).
 
 **Date**: 2023-11-20
 **Version**: v1.1.x (shipped later via [PR #4301](https://github.com/Koniverse/SubWallet-Extension/pull/4301))
@@ -852,7 +883,16 @@ never been re-verified since they were written.
 ### D87. Retire Interlay lending by controlled deprecation (hide option, keep positions, allow withdraw)
 
 **Context**: Interlay lending was being wound down and the team had to retire it without trapping users holding open positions.
-**Decision**: Hide the Interlay lending option on the earning-options screen but keep showing existing positions, disable adding to them, and continue to allow withdraw. (Lending later returns to the product — see FR-120; this records the v1.2 deprecation step.)
+**Decision**: Hide the Interlay lending option on the earning-options screen but keep showing existing positions, disable adding to them, and continue to allow withdraw.
+
+> **Corrected 2026-07-20.** The entry read *"(Lending later returns to the product — see FR-120)"*.
+> It does not return: [FR-120](PRD.md#functional-requirements) — *"Lending integration (Interlay) …
+> shipped 1.1.36, removed in 1.2.12"* — is the ⏸️ **withdrawn** row, i.e. the record of this very
+> deprecation, not of a comeback. The unwind itself is intact in the code
+> (`earning-service/handlers/lending/interlay.ts` still exists so open positions can be withdrawn),
+> which is what the decision actually promised. Reconstructed in bulk on 2026-06-09
+> (`f902a644c6`), the same pass that produced [D70](#d70-one-sign-single-signature-batch-approval-is-a-toggle--shipped-on-by-default)'s
+> inverted default.
 **Rationale**: A graceful unwind lets users exit existing positions safely while preventing new exposure to a retiring product; a hard removal would strand funds.
 **Date**: 2024
 **Version**: v1.2.12
