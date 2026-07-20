@@ -114,7 +114,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-57 | Configurable extension auto-lock timer (lock the wallet after an inactivity timeout) | P0 | ✅ shipped | EPIC-5 |
 | FR-58 | Unlock type: require the master password on every protected action or only once per unlocked… | P0 | ✅ shipped | EPIC-5 |
 | FR-59 | Camera access permission toggle (enable/disable the camera for QR scanning) | P0 | ✅ shipped | EPIC-5 |
-| FR-60 | Single-approval (One-Sign) toggle: opt in to confirm multiple sequential transactions with a… | P0 | ✅ shipped | EPIC-5 |
+| FR-60 | Single-approval (One-Sign) toggle: confirm multiple sequential transactions with a single s… | P0 | ✅ shipped | EPIC-5 |
 | FR-61 | Blockaid transaction & signature risk scanning (EVM) | P0 | 📋 planned | EPIC-5 |
 | FR-62 | Anti-scam address screening (Merkle Science) | P0 | 📋 planned | EPIC-5 |
 | FR-63 | Dark-only UI + responsive extension popup and full-page expand view (theme selector hidden i… | P2 | ✅ shipped | EPIC-6 |
@@ -329,7 +329,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-57 | Configurable extension auto-lock timer (lock the wallet after an inactivity timeout) | ✅ shipped |
 | FR-58 | Unlock type: require the master password on every protected action or only once per unlocked session | ✅ shipped |
 | FR-59 | Camera access permission toggle (enable/disable the camera for QR scanning) | ✅ shipped |
-| FR-60 | Single-approval (One-Sign) toggle: opt in to confirm multiple sequential transactions with a single signature | ✅ shipped |
+| FR-60 | Single-approval (One-Sign) toggle: confirm multiple sequential transactions with a single signature — ships **on**, so the toggle is opt-**out** | ✅ shipped |
 | FR-61 | Blockaid transaction & signature risk scanning (EVM) | 📋 planned |
 | FR-62 | Anti-scam address screening (Merkle Science) | 📋 planned |
 

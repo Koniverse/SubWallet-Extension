@@ -20,28 +20,36 @@ updated: 2026-06-12
 
 The user controls two security-relevant conveniences from settings: a
 **camera-access** toggle that enables or disables the camera used for QR scanning
-(FR-59), and a **One-Sign** (single-approval) toggle that opts in to confirming
-multiple sequential transactions with a single signature (FR-60) — so each user
-can decide whether to widen their attack/permission surface for convenience or
-keep it minimal by default.
+(FR-59), and a **One-Sign** (single-approval) toggle controlling whether
+multiple sequential transactions are confirmed with a single signature (FR-60) — so
+each user can decide whether to widen their attack/permission surface for
+convenience or keep it minimal. **The two toggles ship with opposite defaults**:
+camera **off**, One-Sign **on**.
 
 ## Background
 
 These two FRs are merged into one story because they are a single Settings
-cluster of opt-in security toggles: each lets the user *enlarge* a normally-narrow
-surface, and each must be default-safe (off / minimal) so a user who never touches
-settings is in the conservative posture. The **camera-access toggle** (FR-59)
+cluster of security toggles: each lets the user *enlarge* or narrow a
+permission surface. They do **not** share a default — `DEFAULT_CAMERA_ENABLE = false`
+but `DEFAULT_ALLOW_ONE_SIGN = true`
+(`packages/extension-base/src/services/setting-service/constants.ts:19`, applied at
+`:57`). The **camera-access toggle** (FR-59)
 gates the browser camera permission used for QR-code scanning (Keystone / Polkadot
 Vault signing, address scanning); a user who never scans QR codes can keep the
-camera disabled so no surface requests it. The **One-Sign toggle** (FR-60) opts in
-to the single-approval flow where a sequence of transactions (e.g. an
-approve-then-swap, or a multi-step earning path) is confirmed once rather than
-per-step — a convenience that necessarily reduces the number of explicit
-confirmations, so it is opt-in, not default.
+camera disabled so no surface requests it. The **One-Sign toggle** (FR-60) governs
+the single-approval flow where a sequence of transactions (e.g. an approve-then-swap,
+or a multi-step earning path) is confirmed once rather than per-step. It ships **on**,
+so it is opt-**out**: a user who wants per-step confirmation turns it off. What
+narrows the exposure is not the default but three conditions in the mechanism — it
+applies only to `AccountSignMode.PASSWORD` accounts (never Ledger / QR / injected —
+`useOneSignProcess.ts:14`), only to processes of **3+ steps**, and only to `SWAP` and
+`EARNING` process types
+(`packages/extension-base/src/services/transaction-service/README.md` §One-Sign
+Multi-Step Process).
 
 The One-Sign *mechanism* (the multi-step batching itself) is materialized in the
 transaction epic ([EPIC-8](../epics/EPIC-8.md), FR-82); this story owns only the
-**security toggle** that turns it on and the default-safe posture. Both settings
+**security toggle** that controls it and the shipped defaults. Both settings
 are persisted and exchanged with the background over the typed bus (AD-03); their
 effect (whether the camera is requested, whether sequential signatures collapse
 into one) is enforced where the action runs, not in the toggle UI.
@@ -55,14 +63,15 @@ during version reconciliation.
 - [x] **AC-1** — **Given** the security settings, **When** the user toggles
   camera access off, **Then** QR-scanning surfaces do not request the camera and
   the camera permission is not held; toggling it on re-enables QR scanning (FR-59).
-- [x] **AC-2** — **Given** the One-Sign toggle is **off** (default), **When** the
-  user performs a multi-step transaction sequence, **Then** each step is confirmed
+- [x] **AC-2** — **Given** the One-Sign toggle is turned **off** by the user, **When**
+  the user performs a multi-step transaction sequence, **Then** each step is confirmed
   individually (no single-signature batching).
 - [x] **AC-3** — **Given** the One-Sign toggle is **on**, **When** the user
   performs a supported multi-step sequence, **Then** the sequence is confirmed with
   a single approval (FR-60), delegating to the EPIC-8 one-sign mechanism.
-- [x] **AC-4** — Both toggles persist across sessions and default to the
-  conservative posture (camera off until enabled, One-Sign off) on a fresh install.
+- [x] **AC-4** — Both toggles persist across sessions and, on a fresh install, take
+  their shipped defaults — **camera off**, **One-Sign on**
+  (`DEFAULT_CAMERA_ENABLE = false`, `DEFAULT_ALLOW_ONE_SIGN = true`).
 - [x] **AC-5** — **Given** the One-Sign toggle is on, **When** the user reaches an
   *unsupported* sequence, **Then** the flow falls back to per-step confirmation
   rather than silently batching an unsupported set.
@@ -104,7 +113,7 @@ during version reconciliation.
 | AC-1 | Manual: disable camera → QR scan surface does not request camera; enable → scan works |
 | AC-2 | Manual: One-Sign off → multi-step sequence confirms each step |
 | AC-3 | Manual: One-Sign on → supported sequence confirms with one approval |
-| AC-4 | Manual: fresh install → both toggles in conservative default; settings persist after restart |
+| AC-4 | `grep -E 'DEFAULT_(CAMERA_ENABLE\|ALLOW_ONE_SIGN)' packages/extension-base/src/services/setting-service/constants.ts` → `false` / `true` respectively, both applied in `DEFAULT_SETTING` (`:57`) · Manual: settings persist after restart |
 | AC-5 | Manual: One-Sign on + unsupported sequence → falls back to per-step |
 
 ## Changelog entry

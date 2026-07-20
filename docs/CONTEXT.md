@@ -109,7 +109,7 @@ never been re-verified since they were written.
 | [D65](#d65-model-walletconnect-as-a-single-connection-merging-pair--session-with-separate-substrate--evm-sessions-wallet-role-only) | Model WalletConnect as a single "Connection" merging pair + session, with se… | P3 |  |
 | [D66](#d66-aggregate-multi-chain-data-through-the-subwallet-services-sdk-backend-rather-than-computing-it-on-device) | Aggregate multi-chain data through the SubWallet Services SDK backend rather… | P3 |  |
 | [D67](#d67-front-market-data-metadata-and-nft-media-behind-subwallet-cachecdn-proxies-with-static-fallback) | Front market data, metadata and NFT media behind SubWallet cache/CDN proxies… | P3 |  |
-| [D70](#d70-one-sign-single-signature-batch-approval-is-opt-in-and-off-by-default) | One-Sign (single-signature batch approval) is opt-in and off by default | P3 | ⚠️ **contradicted by code** — `DEFAULT_ALLOW_ONE_SIGN = true` since the setting was created; owner decision pending |
+| [D70](#d70-one-sign-single-signature-batch-approval-is-opt-in-and-off-by-default) | One-Sign (single-signature batch approval) is opt-in and off by default | P3 | ⚠️ **corrected 2026-07-20** — the 2026-06 backfill inverted the default; ships **on** (`DEFAULT_ALLOW_ONE_SIGN = true`) |
 | [D89](#d89-evaluated-and-dropped-swap-providers-1inch-acala-zenlink-parallel-finance) | Evaluated-and-dropped swap providers: 1inch, Acala, Zenlink, Parallel Finance | P3 |  |
 | [D90](#d90-run-two-changelogs-until-the-ci-release-gate-is-migrated) | Run two changelogs until the CI release gate is migrated | P4 | rule → **AGENTS §7** (*The two change logs*) · still binding, CI gate not migrated |
 | [D91](#d91-one-repo-two-version-spaces--declare-the-space-never-mix-the-numbers) | One repo, two version spaces — declare the space, never mix the numbers | P4 | rule → **AGENTS §7** (*The two version spaces*) |
@@ -1562,19 +1562,37 @@ never been re-verified since they were written.
 
 ---
 
-### D70. One-Sign (single-signature batch approval) is opt-in and off by default
+### D70. One-Sign (single-signature batch approval) is a toggle — shipped **on** by default
 
 **Context**: Multi-step flows (swap / XCM approve-then-execute) otherwise prompt the user to sign each constituent transaction. One-Sign lets a single approval cover the whole batch.
 
-**Decision**: Expose One-Sign as an explicit Settings toggle (`allowOneSign`), **off by default**. When enabled, approving the first transaction implicitly approves the subsequent batch in the flow.
+**Decision**: Expose One-Sign as an explicit Settings toggle (`allowOneSign`), shipped **on by default** (`DEFAULT_ALLOW_ONE_SIGN = true`). When enabled, approving the first transaction implicitly approves the subsequent batch in the flow. A user who wants per-transaction confirmation turns it **off** — it is opt-**out**, not opt-in.
 
-**Rationale**: Collapsing several transactions under one signature is a convenience-vs-consent tradeoff; defaulting OFF preserves explicit per-transaction consent, and users opt in knowingly. Pairs with the multi-step signing capability (FR-82) and its settings toggle (FR-60).
+**Rationale**: Collapsing several transactions under one signature is a convenience-vs-consent tradeoff, and the shipped posture favours convenience — narrowed by three conditions rather than by the default: it applies only to `AccountSignMode.PASSWORD` accounts (never Ledger / QR / injected — `useOneSignProcess.ts:14`), only to processes of **3+ steps**, and only to `SWAP` and `EARNING` process types. Pairs with the multi-step signing capability (FR-82) and its settings toggle (FR-60).
 
-**Impact**: One-Sign gated behind the toggle; default flows keep per-tx confirmation.
+**Impact**: One-Sign active by default for password accounts on supported multi-step flows; other account types and all other flows keep per-tx confirmation regardless of the toggle.
 
-**Date**: 2025
-**Version**: v1.3.x
-**Citations**: code `allowOneSign`; PRD FR-82, FR-60
+> **Corrected 2026-07-20 — this entry was a bad reconstruction, not a revised decision.**
+> D70 was not recorded when the work happened; it was backfilled in bulk on 2026-06-09
+> (`f902a644c6`, *"add D66-D88"*) by inferring the decision from the docs, and the inference
+> **inverted the default**. It read *"off by default … defaulting OFF preserves explicit
+> per-transaction consent"* — a rationale no one on the team wrote. The code says
+> `DEFAULT_ALLOW_ONE_SIGN = true` ([`setting-service/constants.ts:19`](../packages/extension-base/src/services/setting-service/constants.ts),
+> applied at `:57`), and the implementer's own service README, added in `bb74b57fe4`
+> (*"[DOCS] Add note about one sign transaction"*), states *"User must enable 'Allow One Sign'
+> in security settings (**default: `true`**)"*. Two lines above it in the same constants file,
+> `DEFAULT_CAMERA_ENABLE = false` — the "default-safe" posture the docs described is real for
+> the camera toggle and was wrongly generalised to this one.
+>
+> Fixed **in place** rather than by appending a revision: append-only ([RULE-7](../.agents/skills/koni-docs/references/rules.md))
+> protects decisions someone acted on, and this entry has none — zero citations, and it records
+> a decision the team may never have made. Appending *"D70 was wrong"* would have preserved a
+> fabricated decision permanently and minted a real one to describe it. The original text is in
+> `git log -p docs/CONTEXT.md`.
+
+**Date**: 2025 *(entry reconstructed 2026-06-09; corrected 2026-07-20)*
+**Version**: v1.3.21 — [#3901](https://github.com/Koniverse/SubWallet-Extension/issues/3901) *"Allow signing once for multiple transactions"*
+**Citations**: `setting-service/constants.ts:19`; `useOneSignProcess.ts:14`; `transaction-service/README.md` §One-Sign Multi-Step Process; PRD FR-82, FR-60; [US-5.7](sprints/stories/US-5.7-camera-access-and-one-sign-toggles.md), [US-30.195](sprints/stories/US-30.195-allow-signing-once-for-multiple-transactions.md)
 
 ---
 
