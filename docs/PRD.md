@@ -55,7 +55,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | ID | Requirement | Priority | Status | Epic |
 | ---- | ------------- | ---------- | -------- | ------ |
-| FR-1 | Manifest V3 (MV3) service-worker background for Chrome/Firefox extension compliance | P0 | ✅ shipped | EPIC-1 |
+| FR-1 | Manifest V3 (MV3) service-worker background for Chrome extension compliance (Firefox shipped MV3 in 1.2.7 and was **rolled back to MV2** in 1.2.28, #3364 — `manifest-firefox.json` is MV2 today) | P0 | ✅ shipped | EPIC-1 |
 | FR-2 | Yarn 3 monorepo package structure enabling code reuse across extension, web app, and mobile | P0 | ✅ shipped | EPIC-1 |
 | FR-3 | Online chain-list hot-update mechanism (no release required) | P0 | ✅ shipped | EPIC-1 |
 | FR-4 | Online i18n hot-update — runtime remote translations (no release); bundled multi-language is… | P0 | 📋 planned | EPIC-1 |
@@ -151,7 +151,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-94 | MetaMask-compatible EVM provider injection (EIP-1193, EIP-6963 multi-provider discovery) int… | P1 | ✅ shipped | EPIC-10 |
 | FR-95 | Substrate inject API (window.injectedWeb3) for Polkadot dApp compatibility | P1 | ✅ shipped | EPIC-10 |
 | FR-96 | WalletConnect v2 — Substrate and EVM session support | P1 | ✅ shipped | EPIC-10 |
-| FR-97 | Cardano dApp connector: CIP-30 (connect, signData, signTx, submitTx, getUtxo) | P1 | ✅ shipped | EPIC-10 |
+| FR-97 | Cardano dApp connector: CIP-30 (enable, getNetworkId, getUtxos, getCollateral, getBalance, getUsedAddresses, getUnusedAddresses, getChangeAddress, getRewardAddresses, signData, signTx, submitTx) | P1 | ✅ shipped | EPIC-10 |
 | FR-98 | Bitcoin dApp connection: connect, getAddresses, signMessage, signPsbt, sendTransfer (code merged in 1.3.43, provider injection commented out — never enabled in a release) | P1 | 🚧 in progress | EPIC-10 |
 | FR-99 | TON dApp connection and signature requests | P1 | 📋 planned | EPIC-10 |
 | FR-100 | dApp authorization UI (Manage website access): per-origin connection management, per-account… | P1 | ✅ shipped | EPIC-10 |
@@ -234,7 +234,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 
 | FR | Requirement | Status |
 | ---- | ------------- | -------- |
-| FR-1 | Manifest V3 (MV3) service-worker background for Chrome/Firefox extension compliance | ✅ shipped |
+| FR-1 | Manifest V3 (MV3) service-worker background for Chrome extension compliance (Firefox rolled back to MV2 in 1.2.28, #3364) | ✅ shipped |
 | FR-2 | Yarn 3 monorepo package structure enabling code reuse across extension, web app, and mobile | ✅ shipped |
 | FR-3 | Online chain-list hot-update mechanism (no release required) | ✅ shipped |
 | FR-4 | Online i18n hot-update — runtime remote translations (no release); bundled multi-language is FR-153 | 📋 planned |
@@ -413,7 +413,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | FR-94 | MetaMask-compatible EVM provider injection (EIP-1193, EIP-6963 multi-provider discovery) into dApp pages | ✅ shipped |
 | FR-95 | Substrate inject API (window.injectedWeb3) for Polkadot dApp compatibility | ✅ shipped |
 | FR-96 | WalletConnect v2 — Substrate and EVM session support | ✅ shipped |
-| FR-97 | Cardano dApp connector: CIP-30 (connect, signData, signTx, submitTx, getUtxo) | ✅ shipped |
+| FR-97 | Cardano dApp connector: CIP-30 (enable, getNetworkId, getUtxos, getCollateral, getBalance, getUsedAddresses, getUnusedAddresses, getChangeAddress, getRewardAddresses, signData, signTx, submitTx) | ✅ shipped |
 | FR-98 | Bitcoin dApp connection: connect, getAddresses, signMessage, signPsbt, sendTransfer (code merged in 1.3.43, provider injection commented out — never enabled in a release) | 🚧 in progress |
 | FR-99 | TON dApp connection and signature requests | 📋 planned |
 | FR-100 | dApp authorization UI (Manage website access): per-origin connection management, per-account access control, and revocation | ✅ shipped |

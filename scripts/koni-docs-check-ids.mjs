@@ -196,6 +196,56 @@ const KONI_RELEASES = new Set(
 // SubWallet's first commit. Anything the repo did before this, polkadot-js did.
 const FORK = '2022-01-12';
 
+// ---- CONTEXT.md: a decision cannot ship in a release that predates it --------
+//
+// Fifty-one decisions were reconstructed in bulk (2026-06-04/09) by inferring them
+// from other docs rather than recording them at the time. A recurring defect: the
+// `**Version**` names a release that shipped BEFORE the decision date — which means
+// the version was guessed from an issue number, not read off the CHANGELOG.
+//
+// EXCLUDES `docs-only` entries. Those write `docs-only (against v1.3.83)`, where the
+// version is the product state the docs work was audited against — necessarily an
+// ALREADY-RELEASED version, so "released before the date" is correct there, not a
+// defect. Omitting this carve-out produces 10 false positives out of 18.
+
+const badVersion = [];
+
+{
+  const ctx = fs.readFileSync(path.join(DOCS, 'CONTEXT.md'), 'utf8');
+  const relDate = new Map(
+    [...changelog.matchAll(/^## \[(\d+\.\d+\.\d+)\][^\n]*?—\s*(\d{4}-\d{2}-\d{2})[^\n]*\(Koni\)/gm)]
+      .map((m) => [m[1], m[2]])
+  );
+
+  for (const entry of ctx.split(/\n(?=### D\d+\.)/)) {
+    const id = (entry.match(/^### (D\d+)\./) || [])[1];
+    const date = (entry.match(/^\*\*Date\*\*:\s*(\d{4}-\d{2}-\d{2})/m) || [])[1];
+    const verLine = (entry.match(/^\*\*Version\*\*:(.*)$/m) || [])[1];
+
+    if (!id || !date || !verLine || /docs-only/.test(verLine)) {
+      continue;
+    }
+
+    // Read the version from the line's CLAIM, not its footnote. A corrected entry
+    // annotates in italics — `v1.1.49 *(corrected … v1.1.48 released before …)*` —
+    // and that footnote quotes the OLD number precisely because it was wrong. Matching
+    // the whole line re-flags every entry the moment it is fixed, which is how this
+    // check first failed on D10.
+    const claim = verLine.replace(/\*\([^)]*\)\*/g, '');
+    const ver = (claim.match(/v?(\d+\.\d+\.\d+)/) || [])[1];
+
+    if (!ver) {
+      continue;
+    }
+
+    const rd = relDate.get(ver);
+
+    if (rd && rd < date) {
+      badVersion.push(`${id}: Version v${ver} released ${rd}, before its own Date ${date}`);
+    }
+  }
+}
+
 const storyFm = (file) => {
   const m = fs.readFileSync(file, 'utf8').match(/^---\n([\s\S]*?)\n---/);
 
@@ -262,6 +312,13 @@ if (badField.length) {
   console.log('');
 }
 
+if (badVersion.length) {
+  console.log(`  ✗ ${badVersion.length} decision(s) shipping in a release older than the decision:\n`);
+  badVersion.forEach((b) => console.log(`    ${b}`));
+  console.log('\n    A version that predates its own decision was inferred, not read off the');
+  console.log('    CHANGELOG. Find the release that actually carried the work.\n');
+}
+
 if (badAnchor.length) {
   console.log(`  ✗ ${badAnchor.length} link(s) to a heading that does not exist:\n`);
   badAnchor.forEach((b) => console.log(`    ${b}`));
@@ -269,9 +326,10 @@ if (badAnchor.length) {
   console.log('    the top of the page. Usually the heading was retitled and its slug moved.\n');
 }
 
-if (!dangling.size && !badField.length && !badAnchor.length) {
+if (!dangling.size && !badField.length && !badAnchor.length && !badVersion.length) {
   console.log('  ✓ every ID named in the doc surface resolves');
   console.log('  ✓ every in-repo link lands on a heading that exists');
+  console.log('  ✓ no decision ships in a release older than itself');
   process.exit(0);
 }
 

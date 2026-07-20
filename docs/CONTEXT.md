@@ -17,8 +17,20 @@ Phase 2) — that is information, not drift. **An ID is an identity, not a posit
 142 files *and in git commit messages*, which cannot be rewritten.
 
 **A blank `Notes` cell means _not audited_, not _verified current_.** Only entries checked
-against the code, the PRD or the CHANGELOG carry a note; 67 of the 89 product decisions have
-never been re-verified since they were written.
+against the code, the PRD or the CHANGELOG carry a note.
+
+**Audited so far: 77 of the 109.** All 74 entries reconstructed in the two bulk backfills
+(`908a04f4b5` 2026-06-04, `f902a644c6` 2026-06-09) have now been checked against the code —
+**38 carried at least one wrong claim.** They were not recorded when the decisions were made;
+they were inferred from other docs, and the inference invented pallet names, node URLs,
+formulas and shipped states. Each is corrected **in place** with the evidence, because an entry
+that was never a decision is not a decision being revised ([RULE-7](../.agents/skills/koni-docs/references/rules.md)
+protects decisions someone acted on); the originals are in `git log -p docs/CONTEXT.md`.
+Two of the errors had already propagated into the PRD — **FR-1** (MV3 on Firefox) and **FR-97**
+(CIP-30 method names) — and were corrected there in the same pass.
+
+The remaining **32 are unaudited and unmarked**: D1–D5, D7, D19, D60, D62–D65, D90–D109.
+(D19 sits in that list because only its `Version` field was checked, not its claims.)
 
 | D | Decision | Phase | Notes |
 | --- | --- | --- | --- |
@@ -29,21 +41,21 @@ never been re-verified since they were written.
 | [D5](#d5-expose-both-re-nominate-and-unbond-then-rebond-flows-for-validator-switching) | Expose both re-nominate and unbond-then-rebond flows for validator switching | P0 |  |
 | [D6](#d6-scope-mv3-migration-storage-to-chromestorage-defer-pouchdb) | Scope MV3 migration storage to chrome.storage (defer PouchDB) | P0 |  |
 | [D7](#d7-scope-custom-network-support-to-pure-evm-or-pure-substrate-only) | Scope custom network support to pure EVM or pure Substrate only | P0 |  |
-| [D8](#d8-temporarily-hide-substrate-private-key-export-no-wallet-supports-re-import-yet) | Temporarily hide Substrate private-key export (no wallet supports re-import… | P0 |  |
+| [D8](#d8-temporarily-hide-substrate-private-key-export-no-wallet-supports-re-import-yet) | Temporarily hide Substrate private-key export (no wallet supports re-import… | P0 | ⚠️ **version corrected (2026-07-20)** — v1.1.36 via the `upgrade-ui` branch, not v0.6.7. Security claim itself verified ✅ |
 | [D9](#d9-deprioritise-pouchdb-for-cross-platform-storage) | Deprioritise PouchDB for cross-platform storage | P0 |  |
 | [D10](#d10-defer-step-3-of-online-chain-list-auto-update-immediate-provider-change) | Defer step 3 of online chain-list auto-update (immediate provider change) | P0 | ⚠️ **superseded by code (2026-07-20)** — step 3 shipped; when the risk was accepted is unrecorded |
-| [D11](#d11-do-not-auto-select-validators-users-should-research-or-use-pools) | Do not auto-select validators; users should research or use pools | P0 |  |
-| [D12](#d12-fix-ledger-hid-conflicts-by-disconnecting-device-on-session-close-not-by-splitting-html-files) | Fix Ledger HID conflicts by disconnecting device on session close (not by sp… | P0 |  |
-| [D13](#d13-walletconnect-initial-integration-defers-eth_signtransaction-and-eth_signtypeddata) | WalletConnect initial integration defers eth_signTransaction and eth_signTyp… | P1 |  |
+| [D11](#d11-do-not-auto-select-validators-users-should-research-or-use-pools) | Do not auto-select validators; users should research or use pools | P0 | ⚠️ **superseded (2026-07-20)** — auto-select validator ships today (`autoSelectValidatorOptimally`), remotely curated |
+| [D12](#d12-fix-ledger-hid-conflicts-by-disconnecting-device-on-session-close-not-by-splitting-html-files) | Fix Ledger HID conflicts by disconnecting device on session close (not by sp… | P0 | ⚠️ **version corrected (2026-07-20)** — v1.1.1, not v1.0.9 |
+| [D13](#d13-walletconnect-initial-integration-defers-eth_signtransaction-and-eth_signtypeddata) | WalletConnect initial integration defers eth_signTransaction and eth_signTyp… | P1 | ⚠️ **half superseded (2026-07-20)** — `eth_signTypedData` now supported; `eth_signTransaction` still not |
 | [D14](#d14-scope-zk-assets-manta-to-extension-only--exclude-webapp-and-mobile) | Scope ZK assets (Manta) to extension only — exclude WebApp and mobile | P1 |  |
-| [D15](#d15-adopt-eip-6963-multi-provider-discovery-alongside-windowethereum-injection) | Adopt EIP-6963 multi-provider discovery alongside window.ethereum injection | P1 |  |
+| [D15](#d15-adopt-eip-6963-multi-provider-discovery-alongside-windowethereum-injection) | Adopt EIP-6963 multi-provider discovery alongside window.ethereum injection | P1 | ⚠️ **version corrected (2026-07-20)** — v1.1.25 → v1.1.26, not v1.1.12 |
 | [D16](#d16-defer-custom-derived-path-feature-to-avoid-milestone-6-scope-creep) | Defer custom derived-path feature to avoid Milestone 6 scope creep | P1 | ✅ **resolved (2026-07-20)** — the deferred feature shipped (FR-26); history, not a live constraint |
 | [D18](#d18-implement-full-opengov-voting-not-read-only-for-polkadot-governance) | Implement full OpenGov voting (not read-only) for Polkadot governance | P1 | ⚠️ **Impact corrected (2026-07-20)** — delegation + web-app governance had not shipped (FR-142/FR-143 📋) |
-| [D19](#d19-refactor-balance-service-to-new-service-architecture-centralise-cache-invalidation) | Refactor balance service to new service architecture (centralise cache inval… | P1 |  |
-| [D21](#d21-rename-staking-feature-to-earning-across-all-platforms) | Rename "Staking" feature to "Earning" across all platforms | P1 |  |
-| [D22](#d22-xcm-transfer-max-formula-reserve-12-ed--2-fee-to-prevent-dust-loss) | XCM Transfer Max formula: reserve 1.2× ED + 2× fee to prevent dust loss | P1 |  |
-| [D24](#d24-grc-20-token-type-renamed-to-vft-vara-fungible-token) | GRC-20 token type renamed to VFT (Vara Fungible Token) | P1 |  |
-| [D27](#d27-adopt-texterify-as-the-multilingual-management-platform) | Adopt Texterify as the multilingual management platform | P1 |  |
+| [D19](#d19-refactor-balance-service-to-new-service-architecture-centralise-cache-invalidation) | Refactor balance service to new service architecture (centralise cache inval… | P1 | ⚠️ **version corrected (2026-07-20)** — v1.1.52, not v1.1.27 |
+| [D21](#d21-rename-staking-feature-to-earning-across-all-platforms) | Rename "Staking" feature to "Earning" across all platforms | P1 | ⚠️ **version corrected (2026-07-20)** — v1.1.36 → v1.1.37, not v1.1.34 |
+| [D22](#d22-xcm-transfer-max-formula-reserve-12-ed--2-fee-to-prevent-dust-loss) | XCM Transfer Max formula: reserve 1.2× ED + 2× fee to prevent dust loss | P1 | ❌ **corrected (2026-07-20)** — the `1.2×ED + 2×fee` formula welded two unrelated constants; no ED term exists |
+| [D24](#d24-grc-20-token-type-renamed-to-vft-vara-fungible-token) | GRC-20 token type renamed to VFT (Vara Fungible Token) | P1 | ⚠️ **corrected (2026-07-20)** — version/date wrong; the claimed GRC-20→VFT migration job does not exist |
+| [D27](#d27-adopt-texterify-as-the-multilingual-management-platform) | Adopt Texterify as the multilingual management platform | P1 | ❓ **unverifiable (2026-07-20)** — Texterify has no footprint in this repo; the documented i18n flow is in-repo |
 | [D69](#d69-the-master-password-is-non-recoverable-by-design-forgot-password-resets-the-wallet) | The master password is non-recoverable by design; "forgot password" resets t… | P1 |  |
 | [D71](#d71-ship-swap-webapp-first-as-a-multi-provider-aggregator-extension-first-gets-a-deep-link-button) | Ship Swap WebApp-first as a multi-provider aggregator; extension first gets… | P1 |  |
 | [D72](#d72-auto-update-chain-metadata-over-an-api-instead-of-bundling-polkadot-jsapps-metadata) | Auto-update chain metadata over an API instead of bundling polkadot-js/apps… | P1 |  |
@@ -53,54 +65,54 @@ never been re-verified since they were written.
 | [D76](#d76-merge-the-two-dapp-connect-request-interfaces-into-one-connection-popup) | Merge the two dApp-connect request interfaces into one connection popup | P1 |  |
 | [D77](#d77-introduce-mission-pools-as-a-dedicated-remotely-driven-growthdiscovery-surface) | Introduce Mission Pools as a dedicated, remotely-driven growth/discovery sur… | P1 |  |
 | [D78](#d78-warn-not-block-on-cross-chain-transfers-to-a-centralized-exchange-cex-address) | Warn (not block) on cross-chain transfers to a centralized-exchange (CEX) ad… | P1 |  |
-| [D17](#d17-complete-mv3-migration-service-worker-lifecycle-dapp-connection-fetch-storage) | Complete MV3 migration (service-worker lifecycle, DApp connection, fetch, st… | P2 |  |
-| [D28](#d28-abandon-snowbridge-sdk-in-favour-of-paraspell-api-for-xcm-bridge-protection) | Abandon SnowBridge SDK in favour of ParaSpell API for XCM bridge protection | P2 |  |
+| [D17](#d17-complete-mv3-migration-service-worker-lifecycle-dapp-connection-fetch-storage) | Complete MV3 migration (service-worker lifecycle, DApp connection, fetch, st… | P2 | ❌ **corrected (2026-07-20)** — Impact claimed Firefox MV3; Firefox is MV2. Had propagated to PRD FR-1 |
+| [D28](#d28-abandon-snowbridge-sdk-in-favour-of-paraspell-api-for-xcm-bridge-protection) | Abandon SnowBridge SDK in favour of ParaSpell API for XCM bridge protection | P2 | ❌ **corrected (2026-07-20)** — SnowBridge SDK was not abandoned; it shipped in v1.3.54 (FR-127 ✅) |
 | [D68](#d68-ship-a-dark-only-product-ui-keep-the-theme-enum-but-hide-the-theme-selector) | Ship a dark-only product UI; keep the theme enum but hide the theme selector | P2 |  |
 | [D79](#d79-adopt-the-zondax-polkadot-generic--migration-ledger-apps-instead-of-per-chain-ledger-apps) | Adopt the Zondax Polkadot Generic + Migration Ledger apps instead of per-cha… | P2 |  |
 | [D80](#d80-adopt-the-checkmetadatahash-signed-extension-and-compute-the-metadata-hash-client-side) | Adopt the CheckMetadataHash signed extension and compute the metadata hash c… | P2 |  |
 | [D81](#d81-add-a-remote-block-action-online-kill-switch-for-transaction-submission) | Add a remote "Block action online" kill-switch for transaction submission | P2 |  |
-| [D82](#d82-serve-evm-accounts-through-the-substrate-injected-provider-for-dual-ecosystem-dapps) | Serve EVM accounts through the Substrate injected provider for dual-ecosyste… | P2 |  |
-| [D83](#d83-decouple-from-polkadotjs-by-removing-direct-api-calls-starting-with-balance-fetching) | Decouple from @polkadot/js by removing direct API calls (starting with balan… | P2 |  |
+| [D82](#d82-serve-evm-accounts-through-the-substrate-injected-provider-for-dual-ecosystem-dapps) | Serve EVM accounts through the Substrate injected provider for dual-ecosyste… | P2 | ⚠️ **(2026-07-20)** — the node-connection-status clause could not be tied to the Substrate path |
+| [D83](#d83-decouple-from-polkadotjs-by-routing-direct-api-calls-through-an-abstraction-starting-with-balance-fetching) | Decouple from @polkadot/js by removing direct API calls (starting with balan… | P2 | ⚠️ **corrected (2026-07-20)** — shipped as "hide", not "remove"; 52 files still import `@polkadot/api` |
 | [D84](#d84-front-price--exchange-rate-data-with-a-cached-endpoint--bundled-static-fallback) | Front price & exchange-rate data with a cached endpoint + bundled static fal… | P2 |  |
 | [D85](#d85-serve-earning-data-from-a-middleware-service-cache-rather-than-polling-live-sources) | Serve earning data from a middleware-service cache rather than polling live… | P2 |  |
 | [D86](#d86-warn-and-require-unstaking-when-an-account-stakes-via-both-nomination-pool-and-direct-nomination) | Warn and require unstaking when an account stakes via both nomination pool a… | P2 |  |
 | [D87](#d87-retire-interlay-lending-by-controlled-deprecation-hide-option-keep-positions-allow-withdraw) | Retire Interlay lending by controlled deprecation (hide option, keep positio… | P2 | ⚠️ **corrected (2026-07-20)** — *"lending later returns"* removed; FR-120 is the ⏸️ withdrawn row |
-| [D88](#d88-ship-mv3-on-firefox-gated-on-firefox--127) | Ship MV3 on Firefox, gated on Firefox ≥ 127 | P2 |  |
-| [D20](#d20-native-substrate-path-for-tao-staking-not-evm) | Native Substrate Path for TAO Staking (Not EVM) | P3 |  |
-| [D23](#d23-support-tep-74-jetton-standard-as-the-ton-token-type) | Support TEP-74 Jetton Standard as the TON Token Type | P3 |  |
-| [D25](#d25-use-toncore--tonton-tonclient-sdk-with-toncenter-api-v3) | Use `@ton/core` + `@ton/ton` (TonClient) SDK with TonCenter API v3 | P3 |  |
-| [D26](#d26-user-selectable-walletcontract-version-v3r1v3r2v4v5-default-v5) | User-Selectable WalletContract Version (v3r1/v3r2/v4/v5), Default v5 | P3 |  |
+| [D88](#d88-firefox-mv3-shipped-in-127--and-was-rolled-back-to-mv2-in-1228) | Firefox MV3 shipped in 1.2.7 — and was rolled back to MV2 in 1.2.28 | P2 | ❌ **corrected (2026-07-20)** — Firefox MV3 was rolled back to MV2 in v1.2.28; the 127 gate is about permissions |
+| [D20](#d20-native-substrate-path-for-tao-staking-not-evm) | Native Substrate Path for TAO Staking (Not EVM) | P3 | ❌ **corrected (2026-07-20)** — pallet name, node URL and date all wrong; the URL never existed in `packages/` |
+| [D23](#d23-support-tep-74-jetton-standard-as-the-ton-token-type) | Support TEP-74 Jetton Standard as the TON Token Type | P3 | ⚠️ **corrected (2026-07-20)** — "TEP-64 metadata fetching" unsupported by any code |
+| [D25](#d25-use-toncore--tonton-tonclient-sdk-with-toncenter-api-v3) | Use `@ton/core` + `@ton/ton` (TonClient) SDK with TonCenter API v3 | P3 | ⚠️ **corrected (2026-07-20)** — not TonCenter v3; it is a Koni proxy on the v2 JSON-RPC endpoint |
+| [D26](#d26-user-selectable-walletcontract-version-v3r1v3r2v4v5-default-v5) | User-Selectable WalletContract Version (v3r1/v3r2/v4/v5), Default v5 | P3 | ⚠️ **citation corrected (2026-07-20)** — #3700 is a different change; the issue setting the v5 default is unidentified |
 | [D29](#d29-scope-out-ton-dapp-connection-ton-connect-to-a-later-milestone) | Scope Out TON dApp Connection (TON Connect) to a Later Milestone | P3 |  |
-| [D30](#d30-use-blockfrost-as-the-cardano-chain-data-provider) | Use Blockfrost as the Cardano Chain Data Provider | P3 |  |
-| [D31](#d31-support-cardano-native-assets-cip-26-alongside-ada-transfers-defer-stakingdelegation) | Support Cardano Native Assets (CIP-26) Alongside ADA Transfers; Defer Stakin… | P3 |  |
+| [D30](#d30-use-blockfrost-as-the-cardano-chain-data-provider) | Use Blockfrost as the Cardano Chain Data Provider | P3 | ⚠️ **(2026-07-20)** — #4558 has no trace in git, CHANGELOG or code |
+| [D31](#d31-support-cardano-native-assets-cip-26-alongside-ada-transfers-defer-stakingdelegation) | Support Cardano Native Assets (CIP-26) Alongside ADA Transfers; Defer Stakin… | P3 | ⚠️ **(2026-07-20)** — ADA on-ramp #4264 unverifiable: no commit, no CHANGELOG line, no config entry |
 | [D32](#d32-cancel-dynamic-swap-pair-support-milestone-8-cancel) | Cancel dynamic swap pair support (Milestone 8 Cancel) | P3 |  |
-| [D33](#d33-adopt-dtao--alpha-token-subnet-staking-model) | Adopt dTAO / Alpha Token Subnet Staking Model | P3 |  |
-| [D34](#d34-integrate-meld-all-in-one-wizard-directly-supersedes-standalone-meld-research-task) | Integrate Meld All-in-One Wizard directly (supersedes standalone Meld resear… | P3 |  |
-| [D35](#d35-adopt-cip-30-as-the-cardano-dapp-connector-standard) | Adopt CIP-30 as the Cardano dApp Connector Standard | P3 |  |
-| [D36](#d36-bitcoin-dataindexer-strategy--koni-hosted-api-first-migrating-to-blockstream-public-api) | Bitcoin data/indexer strategy — Koni-hosted API first, migrating to Blockstr… | P3 |  |
+| [D33](#d33-adopt-dtao--alpha-token-subnet-staking-model) | Adopt dTAO / Alpha Token Subnet Staking Model | P3 | ⚠️ **(2026-07-20)** — `subnetid` metadata key not present in `packages/` |
+| [D34](#d34-integrate-meld-all-in-one-wizard-directly-supersedes-standalone-meld-research-task) | Integrate Meld All-in-One Wizard directly (supersedes standalone Meld resear… | P3 | ⚠️ **(2026-07-20)** — "Transak off-ramp in the same milestone" unsupported; off-ramp is web-app, v1.3.43 |
+| [D35](#d35-adopt-cip-30-as-the-cardano-dapp-connector-standard) | Adopt CIP-30 as the Cardano dApp Connector Standard | P3 | ⚠️ **corrected (2026-07-20)** — method names were `getUtxo`/`getRewardAddress`; PRD FR-97 carried the same error |
+| [D36](#d36-bitcoin-dataindexer-strategy--koni-hosted-api-first-migrating-to-blockstream-public-api) | Bitcoin data/indexer strategy — Koni-hosted API first, migrating to Blockstr… | P3 | ❌ **corrected (2026-07-20)** — testnet/mainnet hosts stated backwards; the mainnet migration is unshipped |
 | [D37](#d37-bitcoin-integrated-into-the-existing-unified-account-model-substrate--evm--ton--cardano--btc) | Bitcoin integrated into the existing Unified Account model (Substrate + EVM… | P3 |  |
 | [D38](#d38-three-bitcoin-address-types-bip44bip84bip86-supported-simultaneously-per-account) | Three Bitcoin address types (BIP44/BIP84/BIP86) supported simultaneously per… | P3 |  |
 | [D39](#d39-cancel-1inch-dex-aggregator-integration-economically-unviable-pricing) | Cancel 1inch DEX aggregator integration (economically unviable pricing) | P3 |  |
-| [D40](#d40-bitcoin-dapp-provider-injected-as-a-separate-namespace-with-psbt-based-signing) | Bitcoin dApp provider injected as a separate namespace with PSBT-based signing | P3 |  |
-| [D41](#d41-use-subsquare-api-as-the-primary-data-source-for-referenda-content-and-metadata) | Use Subsquare API as the primary data source for referenda content and metad… | P3 |  |
+| [D40](#d40-bitcoin-dapp-provider-injected-as-a-separate-namespace-with-psbt-based-signing) | Bitcoin dApp provider injected as a separate namespace with PSBT-based signing | P3 | ❌ **corrected (2026-07-20)** — the provider is **not** injected (`page.ts` line commented out); PRD FR-98 was right |
+| [D41](#d41-use-subsquare-api-as-the-primary-data-source-for-referenda-content-and-metadata) | Use Subsquare API as the primary data source for referenda content and metad… | P3 | ❌ **corrected (2026-07-20)** — Subsquare lives in the UI; `extension-base` has zero references |
 | [D42](#d42-move-blockfrost-api-calls-to-the-backend-proxy) | Move Blockfrost API Calls to the Backend Proxy | P3 |  |
 | [D43](#d43-crosschain-btc-swap-via-chainflip-btc--dot-and-optimex-btc--eth-1-click-btc--tbtc-deferred) | Crosschain BTC swap via Chainflip (BTC ↔ DOT) and Optimex (BTC ↔ ETH); 1-cli… | P3 |  |
-| [D44](#d44-migrate-paraspell-from-v4v5-to-v1-api-docs-v12-to-v13) | Migrate ParaSpell from V4/V5 to v1 API (docs v12-to-v13) | P3 |  |
+| [D44](#d44-migrate-paraspell-from-v4v5-to-v1-api-docs-v12-to-v13) | Migrate ParaSpell from V4/V5 to v1 API (docs v12-to-v13) | P3 | ⚠️ **citation corrected (2026-07-20)** — #4908 is the V5 migration; v1 is #4979 |
 | [D45](#d45-remain-on-paraspell-api-for-xcm-do-not-build-in-house-or-self-host) | Remain on ParaSpell API for XCM (do not build in-house or self-host) | P3 |  |
-| [D46](#d46-external-api-middleware--taostats-for-validator-data-static-cache-for-earning-data) | External API (Middleware / taostats) for Validator Data; Static Cache for Ea… | P3 |  |
+| [D46](#d46-external-api-middleware--taostats-for-validator-data-static-cache-for-earning-data) | External API (Middleware / taostats) for Validator Data; Static Cache for Ea… | P3 | ⚠️ **corrected (2026-07-20)** — validator min-stake is an on-chain RPC subscription, not middleware |
 | [D47](#d47-phased-delegation-rollout--delegation-deferred-to-phase-2-of-opengov-implementation) | Phased delegation rollout — delegation deferred to Phase 2 of OpenGov implem… | P3 |  |
 | [D48](#d48-scope-multisig-to-polkadot-substrate-chains-only-phase-1-defer-other-ecosystems) | Scope Multisig to Polkadot Substrate Chains Only (Phase 1); Defer Other Ecos… | P3 |  |
 | [D49](#d49-remove-the-crowdloans-tab-polkadot-agile-coretime-deprecates-slot-auctions) | Remove the Crowdloans tab (Polkadot Agile Coretime deprecates slot auctions) | P3 |  |
-| [D50](#d50-support-named-proxy-types-aligned-with-polkadot-pallet--no-custom-types) | Support named proxy types aligned with Polkadot pallet — no custom types | P3 |  |
+| [D50](#d50-support-named-proxy-types-aligned-with-polkadot-pallet--no-custom-types) | Support named proxy types aligned with Polkadot pallet — no custom types | P3 | ❌ **corrected (2026-07-20)** — `CancelProxy` unsupported (0 hits); dropdown is hardcoded, not on-chain |
 | [D51](#d51-proxy-signing-via-sign-selector-popup-on-existing-transaction-flows--no-separate-proxy-initiated-flow) | Proxy signing via "Sign Selector" popup on existing transaction flows — no s… | P3 |  |
 | [D52](#d52-governance-v1-democracy-pallet-chains-receive-display-only-support--voting-and-delegation-disabled) | Governance V1 (Democracy pallet) chains receive display-only support — votin… | P3 |  |
-| [D53](#d53-support-root-staking-reward-claim-options-root-claim-vs-alpha-claim) | Support Root Staking Reward Claim Options (Root Claim vs Alpha Claim) | P3 |  |
+| [D53](#d53-support-root-staking-reward-claim-options-root-claim-vs-alpha-claim) | Support Root Staking Reward Claim Options (Root Claim vs Alpha Claim) | P3 | ⚠️ **(2026-07-20)** — a modal, not a screen; shipped v1.3.76 |
 | [D54](#d54-approval-flow-uses-native-pallet-extrinsics-as_multi-approve_as_multi-cancel_as_multi-with-role-differentiated-actions) | Approval Flow Uses Native Pallet Extrinsics (`as_multi`, `approve_as_multi`,… | P3 |  |
 | [D55](#d55-deterministic-off-chain-account-creation-with-no-on-chain-transaction) | Deterministic Off-Chain Account Creation with No On-Chain Transaction | P3 |  |
 | [D56](#d56-on-chain-pending-transaction-detection-without-an-indexer-in-phase-1-indexer-integration-deferred-to-phase-2) | On-Chain Pending-Transaction Detection Without an Indexer in Phase 1; Indexe… | P3 |  |
 | [D57](#d57-no-display-of-reverse-proxied-by-relationship-in-the-manage-proxies-screen) | No display of reverse "proxied-by" relationship in the Manage Proxies screen | P3 |  |
-| [D58](#d58-scope-bittensor-on-chain-swap-via-swapstakelimit-pallet-not-third-party-provider-for-alpha) | Scope Bittensor On-Chain Swap via `swapStakeLimit` Pallet (Not Third-Party P… | P3 |  |
-| [D59](#d59-scope-proxy-support-to-substrate-polkadot-pallet-accounts-only--exclude-evm-solo-and-ledger-evm) | Scope proxy support to Substrate (Polkadot pallet) accounts only — exclude E… | P3 |  |
+| [D58](#d58-scope-bittensor-on-chain-swap-via-the-swapstakelimit-extrinsic-not-third-party-provider-for-alpha) | Scope Bittensor On-Chain Swap via `swapStakeLimit` Pallet (Not Third-Party P… | P3 | ❌ **corrected (2026-07-20)** — `swapStakeLimit` is an extrinsic, not a pallet; no separate swap screen |
+| [D59](#d59-scope-proxy-support-to-substrate-polkadot-pallet-accounts-only--exclude-evm-solo-and-ledger-evm) | Scope proxy support to Substrate (Polkadot pallet) accounts only — exclude E… | P3 | ⚠️ **(2026-07-20)** — flag is `supportProxy`; legacy-Ledger exclusion was unrecorded |
 | [D60](#d60-compute-fee-level-parameters-and-fee-logic-on-the-backend-consumed-via-a-subscribe-based-feeservice) | Compute fee-level parameters and fee logic on the backend, consumed via a su… | P3 |  |
 | [D61](#d61-pay-transaction-fees-in-non-native-tokens-on-asset-hub-via-the-assetconversion-pallet) | Pay transaction fees in non-native tokens on Asset Hub via the `assetConvers… | P3 |  |
 | [D62](#d62-migrate-coinbase-on-ramp-to-the-secure-init-backend-session-token-flow) | Migrate Coinbase on-ramp to the secure-init (backend session-token) flow | P3 |  |
@@ -302,7 +314,7 @@ never been re-verified since they were written.
 **Impact**: Export button hidden in account settings until import support ships.
 
 **Date**: 2023-04-18
-**Version**: v0.6.7
+**Version**: v1.1.36 *(corrected 2026-07-20 — commit `0aa3f1fc14`, 2023-04-18, reached a release only through the long-lived `upgrade-ui` branch; `git tag --contains` gives v1.1.36 as the first. v0.6.7 released 2022-10-22, six months before the commit)*
 
 **Citations**: [#1207](https://github.com/Koniverse/SubWallet-Extension/issues/1207), [#1142](https://github.com/Koniverse/SubWallet-Extension/issues/1142)
 
@@ -358,7 +370,7 @@ never been re-verified since they were written.
 > (issue #1320) and the current code; the step between them is a gap, and is left as one.
 
 **Date**: 2023-05-11 *(entry reconstructed 2026-06-04; superseded by shipped code, noted 2026-07-20)*
-**Version**: v1.0.3
+**Version**: — *(a deferral ships nothing. The original entry named v1.0.3, which released 2023-05-06, before the stated date; and the #1320 commit `0142c58b7a` is contained by **no** release tag, so no version can be derived for it. Left empty rather than guessed.)*
 
 **Citations**: [#1320](https://github.com/Koniverse/SubWallet-Extension/issues/1320); `chain-service/utils/index.ts`, `chain-service/index.ts`
 
@@ -376,8 +388,19 @@ never been re-verified since they were written.
 - Auto-select by highest APR — rejected: misleading and manipulable.
 - Auto-select by lowest commission — rejected: commission alone is not a reliable quality signal.
 
-**Impact**: No auto-validator-select feature shipped; nomination-pool path highlighted as the simpler option.
+**Impact**: No *client-side heuristic* auto-select shipped; the nomination-pool path was highlighted as the simpler option.
 
+
+> **Superseded (verified 2026-07-20).** Auto-selection ships today — `autoSelectValidatorOptimally()`
+> (`extension-koni-ui/src/utils/earning.ts`, mirrored in `extension-web-ui`), called from
+> `EarningValidatorSelector.tsx` and `ChangeValidator.tsx`, landed by commit `e346c7e2c1`
+> (*"[Issue-3365] Auto choose pool and validator for `avail_mainnet`"*).
+>
+> The reversal is narrower than it looks, and the original rationale partly survives in the
+> implementation: the selector filters out `commission === 100` and blocked validators and prefers
+> `identity && topQuartile`, and the candidate set is **remotely curated** — `fetchStaticData('direct-nomination-validator')`
+> — rather than computed client-side from APR, which is the specific thing this entry refused.
+> Reconstructed in bulk on 2026-06-04 (`908a04f4b5`).
 **Date**: 2023-05-30
 **Version**: v1.0.x
 
@@ -399,7 +422,7 @@ never been re-verified since they were written.
 **Impact**: Ledger device is disconnected when the popup or expand view is closed, preventing HID conflicts.
 
 **Date**: 2023-06-30
-**Version**: v1.0.9
+**Version**: v1.1.1 *(corrected 2026-07-20 — CHANGELOG: "Improved connection experience with Ledger (#1573)", 2023-07-06. v1.0.9 released 2023-06-13, before the first #1573 commit)*
 
 **Citations**: [#1573](https://github.com/Koniverse/SubWallet-Extension/issues/1573)
 
@@ -420,8 +443,15 @@ never been re-verified since they were written.
 **Alternatives considered**:
 - Implement with partial support and show unsupported error for missing methods — this was the chosen approach.
 
-**Impact**: Initial WalletConnect integration covers session creation/disconnect/sign for the core method set; callers get an explicit error for unsupported methods.
+**Impact**: Initial WalletConnect integration covered session creation/disconnect/sign for the core method set; callers get an explicit error for unsupported methods.
 
+
+> **Half superseded (verified 2026-07-20).** `eth_signTypedData` is supported today —
+> `wallet-connect-service/constants.ts` lists `ETH_SIGN_TYPED_DATA_V1/V3/V4` in
+> `WALLET_CONNECT_SUPPORTED_METHODS`, and `Eip155RequestHandler.ts` routes `eth_signTypedData`
+> (→ v4), v3 and v4 to `evmSign`. **`eth_signTransaction` is still unsupported**: the enum member
+> exists in `types.ts` but nothing handles it. The deferral was real; only one of its two halves is
+> still in force.
 **Date**: 2023-07-03
 **Version**: v1.1.1
 
@@ -463,7 +493,7 @@ never been re-verified since they were written.
 **Impact**: EIP-6963 RDNS registered; SubWallet visible as a distinct provider in dApps supporting multi-wallet discovery.
 
 **Date**: 2023-10-16
-**Version**: v1.1.12
+**Version**: v1.1.25 → v1.1.26 *(corrected 2026-07-20 — CHANGELOG: "Support EIP-6963 (#2021)" v1.1.25, rdns follow-up #2328 v1.1.26. v1.1.12 released 2023-09-15 and carries no 6963 work)*
 
 **Citations**: [#2021](https://github.com/Koniverse/SubWallet-Extension/issues/2021), [#2328](https://github.com/Koniverse/SubWallet-Extension/issues/2328)
 
@@ -540,7 +570,7 @@ never been re-verified since they were written.
 **Impact**: `BalanceService` class created; cache invalidated deterministically on account add/remove.
 
 **Date**: 2023-12-27
-**Version**: v1.1.27
+**Version**: v1.1.52 *(corrected 2026-07-20 — CHANGELOG: "Update balance service (#2416)", 2024-04-05. v1.1.27 released 2023-12-20, before the work)*
 
 **Citations**: [#2416](https://github.com/Koniverse/SubWallet-Extension/issues/2416)
 
@@ -561,7 +591,7 @@ never been re-verified since they were written.
 **Impact**: All Staking labels renamed to Earning; user notification shipped.
 
 **Date**: 2024-02-01
-**Version**: v1.1.34
+**Version**: v1.1.36 → v1.1.37 *(corrected 2026-07-20 — the Earning migration (#2361) first appears in v1.1.36; the intro popup (#2599) in v1.1.37. v1.1.34 contains neither)*
 
 **Citations**: [#2599](https://github.com/Koniverse/SubWallet-Extension/issues/2599)
 
@@ -571,18 +601,27 @@ never been re-verified since they were written.
 
 **Context**: Transfer Max via XCM could leave the source account with less than the existential deposit (ED), causing account reaping and balance loss.
 
-**Decision**: When transferring the maximum amount via XCM, reserve `1.2 × ED + 2 × fee` rather than sending the full transferable balance. For regular (non-XCM) transfers, show a warning on "Transfer All" rather than blocking.
+**Decision**: Two separate guards, both in `packages/extension-base/src/constants/index.ts`. **`XCM_FEE_RATIO = 2`** — the XCM max-transferable amount reserves twice the estimated fee: `maxTransferable = freeBalance − estimatedFee × 2` (`utils/fee/transfer.ts`), applied when the source token is native. **`XCM_MIN_AMOUNT_RATIO = 1.2`** — a *lower bound* on the amount being sent, raising `NOT_ENOUGH_VALUE` if the user sends too little (`core/logic-validation/transfer.ts`). For regular (non-XCM) native transfers the ED shortfall is a warning rather than a block; on "Transfer All" the ED check is skipped entirely.
 
 **Rationale**: The multipliers provide a safety buffer against fee estimation variance and ED rounding. Blocking entirely for non-XCM transfers is overly restrictive; a warning is sufficient.
 
 **Alternatives considered**:
 - Block transfer-max entirely for XCM — rejected: too restrictive.
-- Use a flat ED multiplier — rejected: less precise than the 1.2× formula.
+- Use a flat ED multiplier — rejected: less precise than a ratio.
 
-**Impact**: XCM Transfer Max capped at `transferable − 1.2 × ED − 2 × fee`; warning modal shown for non-XCM transfer-all.
+**Impact**: XCM Transfer Max capped at `transferable − 2 × fee`; a minimum-send floor of `1.2 × ED` rejects dust; ED warning modal on non-XCM native transfers.
 
-**Date**: 2024-07-01
-**Version**: v1.1.48
+> **Corrected 2026-07-20 — the formula was a fabrication.** The entry read *"reserve
+> `1.2 × ED + 2 × fee`"* and *"XCM Transfer Max capped at `transferable − 1.2 × ED − 2 × fee`"*.
+> Both constants are real and the numbers 1.2 and 2 are right, but they govern **two unrelated
+> rules** and were welded into one formula that exists nowhere: **there is no ED term at all** in
+> the XCM max-transferable computation. `1.2 × ED` is a floor on what you may *send*, not a reserve
+> subtracted from what you *can* send. The `Version` field also named v1.1.48, which released
+> 2024-03-25 — before the stated decision date; #2798 shipped in **v1.1.49** (2024-03-26).
+> Reconstructed in bulk on 2026-06-04 (`908a04f4b5`).
+
+**Date**: 2024-03-26 *(corrected 2026-07-20 — the original entry said 2024-07-01, three months after the work shipped; both fields were inferred)*
+**Version**: v1.1.49 *(corrected 2026-07-20 — CHANGELOG: "Check transfer logic that can potentially affect ED (#2798)", 2024-03-26. v1.1.48 released 2024-03-25, before the stated decision date)*
 
 **Citations**: [#2798](https://github.com/Koniverse/SubWallet-Extension/issues/2798)
 
@@ -599,10 +638,10 @@ never been re-verified since they were written.
 **Alternatives considered**:
 - Keep GRC-20 label with an internal alias — rejected: creates a two-name problem for the same standard.
 
-**Impact**: Token type renamed; migration job converts stored GRC-20 entries to VFT.
+**Impact**: `VFT` added as the Vara token type. *(2026-07-20: the original entry also claimed a "migration job converts stored GRC-20 entries to VFT". No such script exists — none of the 42 scripts in `services/migration-service/scripts/` nor its version registry mentions GRC-20 or VFT — and both `_AssetType.GRC20` and `_AssetType.VFT` are still live side by side in `utils/account/transform.ts`. The enum lives in the external `@subwallet/chain-list`, so an upstream migration cannot be ruled out from this repo; the claim is unverified here.)*
 
-**Date**: 2024-08-01
-**Version**: v1.1.66
+**Date**: 2024-07-05 *(corrected 2026-07-20 — the original entry said 2024-08-01, a month after the work shipped; both fields were inferred)*
+**Version**: v1.2.13 *(corrected 2026-07-20 — CHANGELOG: "Change token type from GRC-20 to VFT (#3268)", 2024-07-05)*
 
 **Citations**: [#3268](https://github.com/Koniverse/SubWallet-Extension/issues/3268), [#3290](https://github.com/Koniverse/SubWallet-Extension/issues/3290), [#3291](https://github.com/Koniverse/SubWallet-Extension/issues/3291), [PR #3271](https://github.com/Koniverse/SubWallet-Extension/pull/3271)
 
@@ -619,7 +658,7 @@ never been re-verified since they were written.
 **Alternatives considered**:
 - Continue with ad-hoc translation files managed in source control — rejected: not scalable as language count grows.
 
-**Impact**: Translation workflow moved to Texterify; keys synced from the CMS rather than manually in-repo.
+**Impact**: *(2026-07-20: unverified. Texterify is an external SaaS with **no footprint in this repo** — no config, no sync workflow in `.github/workflows/`, no script. The i18n workflow `docs/SETUP.md` documents is entirely in-repo — `i18next-scanner` → mapping JSON → `replace-in-file` — and locales are bundled and loaded from the bundle (`i18n/Backend.ts`), which is what a CMS workflow would have replaced. PRD FR-4 (online i18n hot-update) is still 📋 planned. The decision may have been real and later abandoned; nothing here can confirm or refute it.)*
 
 **Date**: 2024-09-09
 **Version**: v1.1.x
@@ -747,7 +786,24 @@ never been re-verified since they were written.
 **Alternatives considered**:
 - Delay MV3 migration and maintain MV2 branch until Chrome forced migration — rejected: timeline risk too high.
 
-**Impact**: Extension shipped as MV3 on Chrome and Firefox; a new MV3 UI design also shipped alongside.
+**Impact**: Extension shipped as MV3 **on Chrome**. The lifecycle redesign is in the code — `wakeup(fullWakeup = false)` (`State.ts`) and `sleep()` (`chain-service/index.ts`) implement the sleep/full split.
+
+> **Corrected 2026-07-20 — the Impact claimed Firefox, which is MV2.** It read *"shipped as MV3 on
+> Chrome **and Firefox**"*. Chrome is MV3 (`packages/extension-koni/manifest.json`:
+> `"manifest_version": 3`, `service_worker`), but Firefox ships
+> [`manifest-firefox.json`](../packages/extension-koni/manifest-firefox.json) with
+> `"manifest_version": 2` and a **persistent background page**, selected at build time by
+> `webpack.shared.cjs` when `isFirefox`. Firefox MV3 shipped in 1.2.7 and was **rolled back** by
+> commit `5c46c04e2e` (2024-08-21, *"[Issue-3364] Update build packaging and rollback Firefox to
+> MV2"*) — the only commit that has ever touched that file — released in 1.2.28. See
+> [D88](#d88-firefox-mv3-shipped-in-127--and-was-rolled-back-to-mv2-in-1228).
+>
+> The *"new MV3 UI design also shipped alongside"* clause is **unsupported** — no release line ties
+> a UI redesign to this work — and is removed rather than left as an unverifiable claim.
+>
+> This error had propagated to **PRD FR-1**, which read *"MV3 service-worker background for
+> **Chrome/Firefox** extension compliance ✅ shipped"*; corrected in the same pass. Reconstructed in
+> bulk on 2026-06-04 (`908a04f4b5`).
 
 **Date**: 2023-11-18
 **Version**: v1.2.1
@@ -760,17 +816,35 @@ never been re-verified since they were written.
 
 **Context**: A SnowBridge SDK implementation was underway to provide safety guards against asset loss on the Polkadot↔Ethereum bridge.
 
-**Decision**: Abandon the SnowBridge SDK implementation and rely on the ParaSpell API (already integrated) to provide the same protection.
+**Decision**: Defer the SnowBridge SDK for the 2024 bridge-protection work and rely on the ParaSpell API, already integrated, for XCM guards.
 
-**Rationale**: ParaSpell was already integrated and provides equivalent protection against asset loss without adding a new SDK dependency. Maintaining two bridge SDKs for overlapping functionality increases complexity.
+**Rationale**: ParaSpell was already integrated and covered the XCM routes then in scope without adding a second bridge SDK.
 
 **Alternatives considered**:
-- Implement SnowBridge SDK directly (`@snowbridge/api`) — rejected: redundant with ParaSpell.
+- Implement SnowBridge SDK directly (`@snowbridge/api`) — deferred at the time; **later adopted**, see below.
 
-**Impact**: SnowBridge SDK not shipped; ParaSpell API used for all XCM bridge operations.
+**Impact**: ParaSpell carried XCM bridge protection through the 1.2 line.
+
+> **Corrected 2026-07-20 — the SDK was not abandoned; it shipped, and the two are not alternatives.**
+> The entry read *"Abandon the SnowBridge SDK implementation"* and *"ParaSpell API used for **all**
+> XCM bridge operations"*. Both are false today:
+> `@snowbridge/api": "^0.2.13"` and `@snowbridge/registry` are declared dependencies
+> (`packages/extension-base/package.json`), imported by
+> `balance-service/transfer/xcm/snowBridge.ts` (`Context, contextConfigFor, toPolkadotV2`), added by
+> commit `a67d62b2dc` (2025-08-07) and first released in **v1.3.54** — about ten months after this
+> entry's stated date. **PRD FR-127** (*Snowbridge: ETH ↔ Polkadot Asset Hub bridge*) is ✅ shipped.
+>
+> And the *"redundant with ParaSpell"* rationale is contradicted by the routing: the two are
+> **disjoint**, not overlapping — `utils/fee/transfer.ts` computes
+> `isSubstrateParaspellXcm = !(… || isSnowBridgeEvmTransfer || …)`, i.e. Snowbridge routes are
+> explicitly *excluded* from the ParaSpell path.
+>
+> What survives is the 2024 scheduling call, which the wording above now states. Reconstructed in
+> bulk on 2026-06-04 (`908a04f4b5`); the `Version` field also named a release (v1.2.4, 2024-06-08)
+> that predates the stated decision date.
 
 **Date**: 2024-10-01
-**Version**: v1.2.4
+**Version**: v1.2.x (deferral) → **v1.3.54** (SnowBridge SDK shipped, #4593)
 
 **Citations**: [#3416](https://github.com/Koniverse/SubWallet-Extension/issues/3416)
 
@@ -828,7 +902,7 @@ never been re-verified since they were written.
 ### D82. Serve EVM accounts through the Substrate injected provider for dual-ecosystem dApps
 
 **Context**: Some dApps use the Substrate injected interface but need an EVM address (chains with both ecosystems). The Substrate provider previously exposed only Substrate accounts with `substrate`/`both` options.
-**Decision**: Extend the Substrate provider so a dApp can request and use an EVM address through the Substrate interface — adding an `evm` connection option alongside `substrate`/`both`, plus a node-connection-status check.
+**Decision**: Extend the Substrate provider so a dApp can request and use an EVM address through the Substrate interface — adding an `evm` connection option alongside `substrate`/`both`. *(2026-07-20: the original entry added "plus a node-connection-status check". The only such check found — `checkAndHandleProviderStatus` in `Tabs.ts` — sits on the **EVM** provider path, not the Substrate injected interface, and could not be tied to #3401/#2869.)*
 **Rationale**: Dual-ecosystem dApps connecting via the Substrate interface could not obtain an EVM address; exposing it through the existing provider reuses the established injection surface instead of forcing a separate path (inverse of the EIP-6963 EVM-provider work in D15).
 **Date**: 2024
 **Version**: v1.2.5 → v1.2.28
@@ -836,10 +910,21 @@ never been re-verified since they were written.
 
 ---
 
-### D83. Decouple from @polkadot/js by removing direct API calls (starting with balance fetching)
+### D83. Decouple from @polkadot/js by routing direct API calls through an abstraction (starting with balance fetching)
 
 **Context**: Extension code called `@polkadot/js` APIs directly throughout, tightly coupling features to that library and to the heavy `ApiPromise` model.
-**Decision**: Stop calling `@polkadot/js` directly and route through SubWallet's own abstraction, beginning with native-token balance fetching.
+**Decision**: Move toward routing `@polkadot/js` through SubWallet's own abstraction rather than calling it from feature code, beginning with native-token balance fetching. This is a **direction**, not a completed removal.
+
+> **Corrected 2026-07-20 — "removing" overstates what shipped.** The original title said *"by
+> **removing** direct API calls"* and the Decision *"**Stop** calling `@polkadot/js` directly"*. The
+> release line is narrower: CHANGELOG v1.2.24 reads *"**Hide** direct api usage of polkadot/js
+> (#3308)"* — a wrapper, not a removal. Direct calls are still the norm:
+> `balance-service/helpers/subscribe/substrate/index.ts` issues
+> `substrateApi.api.query.balances.locks/holds/freezes.multi(...)` and `query.system.account`, and
+> **52 files** under `extension-base/src` import `@polkadot/api` with 107 `ApiPromise` usages.
+> **PRD FR-6 already carries this correction** (*"the code does not: `SubstrateApi` builds a full
+> ApiPromise per chain"*), so the log overstated what the PRD had already qualified.
+> Reconstructed in bulk on 2026-06-09 (`f902a644c6`).
 **Rationale**: Direct calls make it hard to swap the connection layer or move logic to the lightweight connector / backend services; abstracting them is a prerequisite for backend-aggregated data (D66) and for not being locked to `@polkadot/js` internals (extends the motivation of D2).
 **Date**: 2024
 **Version**: v1.2.24
@@ -900,13 +985,26 @@ never been re-verified since they were written.
 
 ---
 
-### D88. Ship MV3 on Firefox, gated on Firefox ≥ 127
+### D88. Firefox MV3 shipped in 1.2.7 — and was rolled back to MV2 in 1.2.28
 
-**Context**: After the Chrome MV3 migration (D17), Firefox MV3 required separate validation (extension ID, file-size limits) and depended on runtime capabilities only present in newer Firefox.
-**Decision**: Ship the MV3 build on Firefox as well, gating it on Firefox ≥ 127 and prompting users on older versions to upgrade.
-**Rationale**: Firefox's MV3 service-worker behaviour only works correctly from v127, so cross-browser MV3 needed a minimum-version gate plus an upgrade nudge rather than assuming Chrome parity (extends D17).
+**Context**: After the Chrome MV3 migration ([D17](#d17-complete-mv3-migration-service-worker-lifecycle-dapp-connection-fetch-storage)), Firefox MV3 required separate validation (extension ID, file-size limits) and depended on runtime capabilities only present in newer Firefox.
+**Decision**: Ship the MV3 build on Firefox as well (v1.2.7, #3109/#3202), and warn users on Firefox below 127 — **then reverse it**: `manifest-firefox.json` was created as **MV2** by commit `5c46c04e2e` (2024-08-21, #3364) and released in **v1.2.28**. Firefox has been MV2 since.
+**Rationale**: The MV3 build did not hold up on Firefox; the rollback restored a persistent background page rather than carry a second, diverging service-worker path. Chrome parity was the goal and was not reached.
+
+> **Corrected 2026-07-20 — the entry recorded only the first half.** Its title and Decision read as
+> live shipped state (*"Ship the MV3 build on Firefox as well"*), while its own third citation,
+> **#3364, is the rollback**. Same shape as [D10](#d10-defer-step-3-of-online-chain-list-auto-update-immediate-provider-change)/[D16](#d16-defer-custom-derived-path-feature-to-avoid-milestone-6-scope-creep), inverted: an entry
+> frozen at the moment before the outcome.
+>
+> Two further inaccuracies in the original Rationale, both checked against the code:
+> **the 127 check is not an MV3 gate.** It survived the MV2 rollback and is still live, and it is
+> about *permissions*, not service workers — `useUpgradeFireFoxVersion.ts:44` fires on
+> `versionNumber < 127 && !isEnablePermission`, and the user-facing string says Firefox below 127
+> *"no longer supports automatic dApp access and phishing detection"*. And **"gating" overstates**:
+> `RemindUpgradeFirefoxVersion.tsx` is a dismissible modal, not a block.
+
 **Date**: 2024
-**Version**: v1.2.7
+**Version**: v1.2.7 (shipped) → **v1.2.28 (rolled back)**
 **Citations**: [#3109](https://github.com/Koniverse/SubWallet-Extension/issues/3109), [#3202](https://github.com/Koniverse/SubWallet-Extension/issues/3202), [#3364](https://github.com/Koniverse/SubWallet-Extension/issues/3364)
 
 ---
@@ -918,11 +1016,25 @@ never been re-verified since they were written.
 ### D20. Native Substrate Path for TAO Staking (Not EVM)
 
 **Context**: When SubWallet began implementing TAO in-app staking (#2505, Jan 2024), a choice existed between integrating Bittensor via its native Substrate/Substrate-based `delegation` pallet or via the Subtensor EVM compatibility layer.
-**Decision**: Implement TAO staking using the native Substrate path, calling Bittensor's native `delegation` pallet directly (via WebSocket RPC to archive nodes such as `wss://archivelb.nakamoto.opentensor.ai:9943`), with validator/delegate data pulled from the OpenTensor delegates JSON and middleware API.
+**Decision**: Implement TAO staking using the native Substrate path — calling Bittensor's `subtensorModule` pallet directly over WebSocket RPC — rather than through the Subtensor EVM bridge, with validator/delegate data from an off-chain source.
 **Rationale**: Because at the time of initial staking implementation, the native delegation model was the established, well-documented mechanism (`docs.bittensor.com/delegation`); the Subtensor EVM path existed but bridging between native TAO and Subtensor EVM was scoped as a separate later feature (#4901, Dec 2025), confirming the native-first decision.
 **Alternatives considered**:
 - Subtensor EVM path — deferred until Dec 2025 as a separate bridge feature (#4901), not chosen for core staking because native substrate was already the standard Bittensor interaction model.
 **Impact**: The staking service handler, balance subscription, and earning position logic all operate against the native Substrate chain; the Subtensor EVM bridge remains a distinct integration track.
+
+> **Corrected 2026-07-20 — a pallet name, a node URL and a date, none of which check out.**
+> *"Bittensor's native `delegation` pallet"*: the pallet is **`subtensorModule`**
+> (`earning-service/handlers/native-staking/tao.ts` calls it throughout); no `delegation` pallet
+> call exists anywhere in `packages/`.
+> *"archive nodes such as `wss://archivelb.nakamoto.opentensor.ai:9943`"*: that string has **never
+> appeared in `packages/` in any commit** (`git log --all -S` returns nothing) — the chain-list
+> endpoint is `wss://entrypoint-finney.opentensor.ai:443`. It reads as invented detail and is
+> removed rather than reproduced.
+> *"validator/delegate data pulled from the OpenTensor delegates JSON"*: true of the original 2024
+> implementation, since superseded — `tao.ts` now reads `fetchStaticCache('earning/dtao/validator.json')`
+> ([D46](#d46-external-api-middleware--taostats-for-validator-data-static-cache-for-earning-data)).
+> The **Date** (2024-01-22, *"#2505, Jan 2024"*) is wrong too: the implementing commit is 2024-09-16
+> and #2505 shipped in **v1.3.2** (2024-10-12). Reconstructed in bulk on 2026-06-04 (`908a04f4b5`).
 **Date**: 2024-01-22
 **Version**: v1.3.x (Milestone 8)
 **Citations**: [#2505](https://github.com/Koniverse/SubWallet-Extension/issues/2505), [#4901](https://github.com/Koniverse/SubWallet-Extension/issues/4901)
@@ -936,7 +1048,7 @@ never been re-verified since they were written.
 **Rationale**: Because TEP-74 is the only standardized fungible token spec on TON; without it, only native TON could be supported, excluding the large Jetton ecosystem (USDT on TON being the primary demand driver).
 **Alternatives considered**:
 - Supporting only native TON initially and deferring Jettons — partially done (mainnet was initially disabled in wallet even after chainlist addition, per #3455 comment), but Jetton balance was scoped into the same milestone.
-**Impact**: New `TEP74` token type enum in chainlist; Jetton-specific balance query and transfer message construction; Jetton metadata fetching per TEP-64.
+**Impact**: New `TEP74` token type enum in chainlist; Jetton-specific balance query and transfer message construction; Jetton metadata sourced from the chain-list registry *(2026-07-20: the original entry claimed on-chain "TEP-64" fetching; no `TEP64`/`getJettonData` reference exists in `packages/`, and `getSmartContractTokenInfo` handles only ERC20/721, PSP22/34, GRC20 and VFT — TEP74 falls through to an empty stub)*.
 **Date**: 2024-07-29
 **Version**: v1.3.x (Milestone 8 Experiment)
 **Citations**: [#3394](https://github.com/Koniverse/SubWallet-Extension/issues/3394), [#3455](https://github.com/Koniverse/SubWallet-Extension/issues/3455), [#3384](https://github.com/Koniverse/SubWallet-Extension/issues/3384)
@@ -946,12 +1058,23 @@ never been re-verified since they were written.
 ### D25. Use `@ton/core` + `@ton/ton` (TonClient) SDK with TonCenter API v3
 
 **Context**: When implementing TON balance display (#3384), transfers (#3449), and the chainlist (#3455), the team needed to choose an SDK and API provider.
-**Decision**: Use the `@ton/core` (^0.56.3), `@ton/crypto` (^3.2.0), and `@ton/ton` (^15.0.0) packages as the TON SDK, with a `TonClient` instance pointing to TonCenter API v3 (`toncenter.com/api/v3`) for RPC calls. Fee estimation is done by summing four on-chain fee components (`fwd_fee`, `in_fwd_fee`, `storage_fee`, `gas_fee`) retrieved from the TonCenter estimate endpoint, matching the approach used by `ton-wallet` (FT) and OpenMask.
+**Decision**: Use the `@ton/core` (^0.56.3), `@ton/crypto` (^3.2.0), and `@ton/ton` (^15.0.0) packages as the TON SDK, with a `TonClient` instance pointing at the chain-list RPC host (today `ton-rpc-mainnet.koni.studio`) over its **v2** JSON-RPC endpoint. Fee estimation is done by summing four on-chain fee components (`fwd_fee`, `in_fwd_fee`, `storage_fee`, `gas_fee`) retrieved from the TonCenter estimate endpoint, matching the approach used by `ton-wallet` (FT) and OpenMask.
 **Rationale**: Because `@ton/core` is the official Ton Foundation SDK; the TonCenter v3 API is the standard public RPC; and the 4-component fee sum matches the approach validated against peer wallets (ton-wallet, openmask), giving confidence in fee accuracy without requiring the newer `tonapi.io` battery mechanism (used only by TonKeeper v5+).
 **Alternatives considered**:
 - `tonweb` (older library) — not adopted; `@ton/ton` is the current standard.
 - TonAPI (`tonapi.io`) with battery/emulate endpoint (TonKeeper approach) — not chosen for initial integration because it represents a newer, wallet-specific mechanism; may be revisited.
-**Impact**: `TonApi` handler class in `extension-base` uses `TonClient` from `@ton/ton`; fee calculation logic sums 4 fee types from TonCenter v3.
+**Impact**: `TonApi` handler class in `extension-base` uses `TonClient` from `@ton/ton`; fee calculation sums 4 fee components and adds a constant safety margin.
+
+> **Corrected 2026-07-20 — the endpoint claim was wrong.** The entry said the client points at
+> *"TonCenter API v3 (`toncenter.com/api/v3`)"*. `TonApi.createProvider` builds
+> `` `${url}/jsonRPC` `` — the **v2** JSON-RPC endpoint — and the host comes from the chain-list
+> registry, today `https://ton-rpc-mainnet.koni.studio`, a Koni-hosted proxy, not `toncenter.com`.
+> Of the three direct REST calls, two are **v2** (`/api/v2/sendBocReturnHash`,
+> `/api/v2/getAddressState`) and one is v3 (`/api/v3/transactionsByMessage`).
+>
+> The fee claim was also imprecise: the code sums `fwd_fee + in_fwd_fee + storage_fee + gas_fee`
+> **and adds `EXTRA_TON_ESTIMATE_FEE`** — not a pure sum of four. The SDK versions in the Decision
+> all verify against `package.json`. Reconstructed in bulk on 2026-06-09 (`f902a644c6`).
 **Date**: 2024-08-12
 **Version**: v1.3.x (Milestone 8 Experiment)
 **Citations**: [#3449](https://github.com/Koniverse/SubWallet-Extension/issues/3449), [#3455](https://github.com/Koniverse/SubWallet-Extension/issues/3455), [#3384](https://github.com/Koniverse/SubWallet-Extension/issues/3384)
@@ -961,7 +1084,7 @@ never been re-verified since they were written.
 ### D26. User-Selectable WalletContract Version (v3r1/v3r2/v4/v5), Default v5
 
 **Context**: TON addresses are derived from WalletContract code, so different contract versions (v3r1, v3r2, v4, v5) produce different addresses from the same private key. During transfer implementation (#3449) the team noted "Handle WalletContract version which affects signature validation". Issue #3512 formalized this as a distinct feature.
-**Decision**: Expose a user-controlled WalletContract version switcher (supporting v3r1, v3r2, v4, v5). The default version is set to **v5** (#3700). Each account stores its current contract version; derived accounts inherit the parent's version at derivation time. Watch-only accounts do not show the switcher. The address shown in Receive, Transfer, and History screens updates immediately when the version is changed.
+**Decision**: Expose a user-controlled WalletContract version switcher (supporting v3r1, v3r2, v4, v5). The default version is **v5** (`DEFAULT_TON_WALLET_CONTRACT_VERSION = 'v5r1'` in `@subwallet/keyring`). *(2026-07-20: the original entry credited #3700, which is "Unified account — enable TON network by default" — a two-line change to `chain-service/constants.ts` with no contract-version content. The issue that set the default is not identified.)* Each account stores its current contract version; derived accounts inherit the parent's version at derivation time. Watch-only accounts do not show the switcher. The address shown in Receive, Transfer, and History screens updates immediately when the version is changed.
 **Rationale**: Because TON users who hold funds on legacy contract versions (v3/v4) would lose access to their balance if only the newest version were shown; and v5 is the current recommended version per TON documentation, so it is the right default for new accounts.
 **Alternatives considered**:
 - Hardcoding v4 (most common legacy version) — rejected; v5 is the current standard and users with v3 funds would be unable to receive.
@@ -995,7 +1118,7 @@ never been re-verified since they were written.
 **Alternatives considered**:
 - Self-hosted Cardano node — rejected because of infrastructure cost and operational overhead during the experimental milestone phase.
 - Other hosted providers (e.g., Koios) — not mentioned in the issues; Blockfrost was the explicit choice recorded in issue comments and the API key management work.
-**Impact**: The Blockfrost API key is embedded in (and later moved out of) the extension; a dedicated backend proxy was later built (#4368) to hide the key. Balance failures were directly tied to key expiry (#4164, #4558), showing tight coupling to this provider.
+**Impact**: The Blockfrost API key is embedded in (and later moved out of) the extension; a dedicated backend proxy was later built (#4368) to hide the key. Balance failures were directly tied to key expiry (#4164; a second issue #4558 is cited by the original entry but has no trace in git, CHANGELOG or code), showing tight coupling to this provider.
 **Date**: 2024-10-28
 **Version**: v1.3.x (Milestone 8 Experiment)
 **Citations**: [#3816](https://github.com/Koniverse/SubWallet-Extension/issues/3816), [#4164](https://github.com/Koniverse/SubWallet-Extension/issues/4164), [#4368](https://github.com/Koniverse/SubWallet-Extension/issues/4368)
@@ -1010,7 +1133,7 @@ never been re-verified since they were written.
 **Alternatives considered**:
 - ADA-only transfer at launch — rejected because native assets share the same UTXO flow and deferring them would leave a visible feature gap.
 - Staking in Milestone 8 — deferred; no implementation issues were filed for staking/delegation within the studied range.
-**Impact**: Transfer UI was built with UTXO-aware fee logic (extended UTXO edge cases tracked in #3942); the Max button for ADA was removed (#4016) due to UTXO complexity; ADA on-ramp added via Transak and Banxa (#4264). Staking remains out of scope.
+**Impact**: Transfer UI was built with UTXO-aware fee logic (extended UTXO edge cases tracked in #3942); the Max button for ADA was removed (#4016) due to UTXO complexity; ADA on-ramp reported via Transak and Banxa (#4264) *(2026-07-20: no commit, CHANGELOG line, or code reference for this issue exists in the repo — recorded as claimed, not verified)*. Staking remains out of scope.
 **Date**: 2024-11-23
 **Version**: v1.3.x (Milestone 8 Experiment)
 **Citations**: [#3862](https://github.com/Koniverse/SubWallet-Extension/issues/3862), [#3942](https://github.com/Koniverse/SubWallet-Extension/issues/3942), [#4016](https://github.com/Koniverse/SubWallet-Extension/issues/4016)
@@ -1041,7 +1164,7 @@ never been re-verified since they were written.
 ### D33. Adopt dTAO / Alpha Token Subnet Staking Model
 
 **Context**: In February 2025 Bittensor launched dTAO, introducing per-subnet alpha tokens; #4036 was raised to add dTAO staking support and #4151 to add alpha tokens as first-class local tokens.
-**Decision**: Model dTAO subnet staking as a distinct earning pool type that extends the existing TAO native staking handler (`SubnetStaking extends TAO Native Staking`, confirmed in #4520 refactor). Each subnet's alpha token is registered as a local token with `subnetid` in metadata (#4151). Custom slippage is exposed to users because subnet stake/unstake routes through an AMM-like mechanism (#4145). Alpha tokens are displayed and transferred like other local tokens (#4150, #4900).
+**Decision**: Model dTAO subnet staking as a distinct earning pool type that extends the existing TAO native staking handler (`SubnetStaking extends TAO Native Staking`, confirmed in #4520 refactor). Each subnet's alpha token is registered as a local token carrying its subnet id in metadata *(2026-07-20: the entry named a `subnetid` key; no such key exists in `packages/` — only `subnetIdentity`/`netuid`. If it is real it lives in the external SubWallet-ChainList registry)* (#4151). Custom slippage is exposed to users because subnet stake/unstake routes through an AMM-like mechanism (#4145). Alpha tokens are displayed and transferred like other local tokens (#4150, #4900).
 **Rationale**: Because dTAO changed the fundamental staking model from simple root delegation to per-subnet liquidity pools with price impact/slippage, requiring a dedicated pool type and user-facing slippage control; reusing the existing earning framework while sub-typing kept code duplication low (#4520).
 **Alternatives considered**:
 - Treating subnet staking identically to root delegation — rejected because dTAO has AMM slippage semantics that root delegation does not, requiring a custom confirmation and slippage UI.
@@ -1065,7 +1188,7 @@ never been re-verified since they were written.
 - Standalone Meld on-ramp research — superseded by Wizard availability.
 - Integrate Meld Wizard directly — chosen.
 
-**Impact**: Meld on-ramp shipped via Wizard; Transak off-ramp also integrated in the same milestone.
+**Impact**: Meld on-ramp shipped via Wizard; *(2026-07-20: the original entry added "Transak off-ramp also integrated in the same milestone". Unsupported — PRD FR-137 scopes off-ramp to the **web app**, there is no sell/off-ramp code in either UI package, and the off-ramp CHANGELOG lines (#4456, #4350) land in v1.3.43, three months after this v1.3.25 milestone.)*
 
 **Date**: 2025-03-10
 **Version**: v1.3.25
@@ -1077,11 +1200,11 @@ never been re-verified since they were written.
 ### D35. Adopt CIP-30 as the Cardano dApp Connector Standard
 
 **Context**: To enable SubWallet users to interact with Cardano dApps (e.g., Minswap, MeshJS), a dApp connection API was required. The Cardano Foundation provided feedback that SubWallet's initial CIP-30 implementation was missing `getRewardAddress` and that `signData` only worked with payment addresses (#4352).
-**Decision**: CIP-30 (the Cardano dApp–Wallet Web Bridge standard) was implemented as the sole dApp connector, covering `enable`, `getUsedAddresses`, `getChangeAddress`, `getRewardAddress`, `getUtxo`, `signData`, `signTx`, and `submitTx`. Stake-key signing for `signData` was added based on Cardano Foundation feedback.
+**Decision**: CIP-30 (the Cardano dApp–Wallet Web Bridge standard) was implemented as the sole dApp connector, covering `enable`, `getUsedAddresses`, `getChangeAddress`, `getRewardAddresses`, `getUtxos`, `signData`, `signTx`, and `submitTx`. Stake-key signing for `signData` was added based on Cardano Foundation feedback.
 **Rationale**: Because CIP-30 is the canonical Cardano ecosystem standard for wallet-to-dApp communication and is required by all major Cardano dApps, implementing it is the only viable path to dApp interoperability.
 **Alternatives considered**:
 - A proprietary connector — rejected; the Cardano ecosystem expects CIP-30 compliance and dApps will not integrate a non-standard API.
-**Impact**: Cardano dApp provider injection added to the extension; keyring upgraded to `@subwallet/keyring@0.1.11` for Cardano signing; UTXO/collateral retrieval refactored; error codes standardized. A follow-up issue (#4311) tracks remaining UX improvements for the signing flow.
+**Impact**: Cardano dApp provider injection added to the extension; keyring upgraded to `@subwallet/keyring@0.1.11` for Cardano signing; UTXO/collateral retrieval refactored; error codes standardized. A follow-up issue (#4311) is cited for remaining signing-flow UX work*(2026-07-20: no commit, CHANGELOG line, or code reference for this issue exists in the repo — recorded as claimed, not verified)*.
 **Date**: 2025-03-12
 **Version**: v1.3.x (Milestone 9)
 **Citations**: [#4100](https://github.com/Koniverse/SubWallet-Extension/issues/4100), [#4352](https://github.com/Koniverse/SubWallet-Extension/issues/4352)
@@ -1094,10 +1217,24 @@ never been re-verified since they were written.
 **Decision**: Initially deployed a self-hosted Koni API based on the OpenBit architecture (serving mainnet and testnet). For testnet, `btc-api-testnet.koni.studio` replaced the defunct `blockstream.info/testnet3` when testnet3 was retired (issue #4619). As of mid-2026 (issue #4991), the mainnet core BTC API is being replaced by the public `blockstream.info/api` to reduce backend maintenance cost; Runes/Ordinals indexing remains an open research item since Blockstream does not support those.
 **Rationale**: Because the hosted API introduced data-accuracy issues (wrong balances, invalid UTXO sets) that made mainnet transfers risky, and because Blockstream is a well-known, reliable public infrastructure, migrating core BTC data to Blockstream removes the self-hosting burden; Runes/Ordinals are deferred because no equivalent public API exists yet.
 **Alternatives considered**:
-- Unisat API for Rune UTXOs — partially used (`rune/address/${address}/utxo`) but not chosen as the primary source due to dependency concerns and coverage gaps.
+- Unisat API for Rune UTXOs — not adopted. The Rune UTXO path in the code is Koni's own (`rune/address/${address}/rune/utxo` on `btc-api.koni.studio`, `rune-service/index.ts`), not a Unisat URL.
 - Hiro APIs — evaluated and found to cover UTXO, Inscription, BRC-20, and Rune display needs; retained as a supplementary source candidate.
 - Continue self-hosting — rejected after repeated data-accuracy failures documented in #4997.
-**Impact**: Architecture split: core BTC balance/UTXO queries will use Blockstream public API; Rune and Ordinal features remain blocked on a future indexer decision; testnet now uses `btc-api-testnet.koni.studio`; PR #4992 implements the mainnet migration.
+**Impact**: As of 2026-07-20 the split has **not** shipped. Mainnet still routes through Koni's own indexer (`SubWalletMainnetRequestStrategy`, `BitcoinApi.ts`); **testnet** is the arm on public infrastructure, hardcoded to `https://blockstream.info/testnet/api/` and dispatched to `BlockStreamTestnetRequestStrategy` / `MempoolTestnetRequestStrategy`. Rune and Ordinal features remain blocked on a future indexer decision.
+
+> **Corrected 2026-07-20 — the testnet/mainnet arms were stated backwards, and the migration is
+> unshipped.** The entry read *"testnet now uses `btc-api-testnet.koni.studio`"* and *"`btc-api-testnet.koni.studio`
+> replaced the defunct `blockstream.info/testnet3`"*. The code says the opposite: `BitcoinApi.ts`
+> hardcodes `https://blockstream.info/testnet/api/` for testnet, and `btc-api.koni.studio` is the
+> **mainnet** host. **PRD NFR-16 already states it the right way round** — btc-api is the mainnet
+> indexer proxy, *"only Bitcoin testnet hits public Blockstream/mempool endpoints directly"* — so the
+> log contradicted the PRD, not the other way round. This is the same inversion as
+> [D70](#d70-one-sign-single-signature-batch-approval-is-a-toggle--shipped-on-by-default).
+>
+> *"PR #4992 implements the mainnet migration"* is likewise unshipped: **none** of #4991, #4992,
+> #4997, #4619 or #4112 appears in any CHANGELOG line. The `Date` (2025-03-18) and `Version`
+> (v1.3.42) also contradict the entry's own *"as of mid-2026 (issue #4991)"*. Reconstructed in bulk
+> on 2026-06-04 (`908a04f4b5`).
 **Date**: 2025-03-18
 **Version**: v1.3.42
 **Citations**: [#4112](https://github.com/Koniverse/SubWallet-Extension/issues/4112), [#4162](https://github.com/Koniverse/SubWallet-Extension/issues/4162), [#4619](https://github.com/Koniverse/SubWallet-Extension/issues/4619), [#4991](https://github.com/Koniverse/SubWallet-Extension/issues/4991), [#4997](https://github.com/Koniverse/SubWallet-Extension/issues/4997)
@@ -1158,12 +1295,25 @@ never been re-verified since they were written.
 ### D40. Bitcoin dApp provider injected as a separate namespace with PSBT-based signing
 
 **Context**: SubWallet already injects Substrate (`window.injectedWeb3`) and EVM (`window.ethereum`) providers. Adding Bitcoin required a design choice for how dApps would interact: use an existing standard (e.g., the Sats Connect / Leather wallet API), roll a custom namespace, or reuse the EVM provider.
-**Decision**: A dedicated Bitcoin namespace provider was injected into dApp pages, exposing a Bitcoin-specific API with methods: `Connect`, `GetAddresses`, `SignMessage`, `SignPsbt`, and `SendTransfer`. PSBT (Partially Signed Bitcoin Transaction) was chosen as the signing primitive. An initialization guard disables the provider until the wallet state is fully loaded.
+**Decision**: Build a dedicated Bitcoin namespace provider for dApp pages — `getAddresses`, `signMessage`, `signPsbt`, `sendTransfer` — rather than reuse the EVM provider. PSBT (Partially Signed Bitcoin Transaction) was chosen as the signing primitive. An initialization guard disables the provider until the wallet state is fully loaded.
 **Rationale**: Because PSBT is the Bitcoin ecosystem standard for wallet-signed transactions and is what major Bitcoin dApp protocols (e.g., Leather, Xverse) expect, adopting it ensures compatibility with existing Bitcoin dApps; a separate namespace avoids polluting the EVM or Substrate providers and mirrors how other multi-chain wallets segment their injection surface.
 **Alternatives considered**:
 - Reusing EVM provider with wrapped BTC calls — rejected because Bitcoin's UTXO model and address types are fundamentally incompatible with the EVM JSON-RPC interface.
 - WalletConnect for Bitcoin dApps — explicitly scoped out; Bitcoin is listed as a network that does not support WalletConnect connections (issue #4598).
-**Impact**: New injector module with auto-build script; 4-step transaction validation pipeline in the dApp injector; `signPsbt` and `sendTransfer` flows added to the signing background; WalletConnect connection now shows an "Unsupported network" screen for Bitcoin.
+**Impact**: Injector module, 4-step validation pipeline, and the `signPsbt` / `sendTransfer` signing flows all exist in the codebase; WalletConnect shows an "Unsupported network" screen for Bitcoin (#4598, v1.3.54). **The provider is not injected** — the call is commented out.
+
+> **Corrected 2026-07-20 — the entry described shipped behaviour that has never run.** It read
+> *"A dedicated Bitcoin namespace provider **was injected** into dApp pages"*. The single line that
+> would do it is disabled in [`packages/extension-koni/src/page.ts`](../packages/extension-koni/src/page.ts):
+> `// injectBitcoinExtension(initBitcoinProvider()); // Pending implementation => wait for
+> documentation and UI improvement` — while the EVM and Cardano injectors on the lines above are
+> live. **PRD FR-98 already records this correctly** (🚧 in progress, *"code merged in 1.3.43,
+> provider injection commented out — never enabled in a release"*), so the log contradicted the PRD.
+>
+> The method list was also wrong: the entry named five methods in PascalCase including **`Connect`**,
+> which does not exist. `Tabs.ts` exposes four — `getAddresses`, `signMessage`, `signPsbt`,
+> `sendTransfer`. And the `Version` (v1.3.54) disagrees with FR-98's 1.3.43 merge. Reconstructed in
+> bulk on 2026-06-04 (`908a04f4b5`).
 **Date**: 2025-04-10
 **Version**: v1.3.54
 **Citations**: [#4245](https://github.com/Koniverse/SubWallet-Extension/issues/4245), [#4598](https://github.com/Koniverse/SubWallet-Extension/issues/4598), [PR #4477](https://github.com/Koniverse/SubWallet-Extension/pull/4477), [PR #4397](https://github.com/Koniverse/SubWallet-Extension/pull/4397)
@@ -1173,12 +1323,20 @@ never been re-verified since they were written.
 ### D41. Use Subsquare API as the primary data source for referenda content and metadata
 
 **Context**: When prototyping OpenGov integration (#2222), the team needed to choose how to fetch referendum content (title, description, timeline, vote statistics) — directly from on-chain storage, from a third-party indexer, or a combination.
-**Decision**: Use Subsquare (or equivalent off-chain API) as the primary source for referendum content, track metadata, vote statistics, and timeline. On-chain RPC calls are used only for transaction submission (vote, unvote, delegate, unlock) and for real-time balance/lock data. The two sources are combined in `OpenGovService`.
+**Decision**: Use Subsquare (or equivalent off-chain API) as the primary source for referendum content, track metadata, vote statistics, and timeline. On-chain RPC calls are used only for transaction submission (vote, unvote, delegate, unlock) and for real-time balance/lock data. The two are combined in the Governance UI hooks, not in a background service.
 **Rationale**: On-chain storage does not contain human-readable descriptions, Markdown content, or pre-aggregated vote tallies, because that data is stored off-chain on IPFS/polkassembly and indexed by Subsquare. Fetching it entirely on-chain would require IPFS resolution per referendum and is impractical for a list view. Subsquare already provides a stable, structured API used by the wider Polkadot ecosystem.
 **Alternatives considered**:
 - Polkassembly API — evaluated but Subsquare was chosen as primary because it has broader parachain support and the prototype validated it first (#2222).
 - Pure on-chain RPC — rejected for content/metadata because on-chain storage does not include referendum descriptions or pre-indexed timelines; accepted for transaction submission only.
-**Impact**: `OpenGovService` maps chain slugs to Subsquare network identifiers (#4722); pagination and search are limited by Subsquare API capabilities (e.g., initial 20-item pagination bug #4678 was a Subsquare API limitation); vote count discrepancies between SubWallet and Subsquare on some networks are accepted as known variance.
+**Impact**: The slug → Subsquare-network map is `chainSlugToSubsquareApi` in the **UI** layer (`Popup/Home/Governance/shared.ts`, via `@subwallet/subsquare-api-sdk`), not in a background service (#4722); pagination and search are limited by Subsquare API capabilities (e.g., initial 20-item pagination bug #4678 was a Subsquare API limitation); vote count discrepancies between SubWallet and Subsquare on some networks are accepted as known variance.
+
+> **Corrected 2026-07-20 — the mechanism was wrong; the source choice was right.** The entry twice
+> named **`OpenGovService`** as where Subsquare and on-chain data meet. `packages/extension-base/src`
+> contains **zero** occurrences of the string "subsquare": `services/open-gov/index.ts` handles only
+> the on-chain half — vote / unvote / unlock extrinsics and the `govLockedInfo` subjects. Subsquare
+> lives entirely in the UI (`@subwallet/subsquare-api-sdk`, `chainSlugToSubsquareApi`). The
+> data-source decision itself holds — FR-139 / FR-140 are ✅ shipped. Reconstructed in bulk on
+> 2026-06-04 (`908a04f4b5`).
 **Date**: 2025-04-28
 **Version**: v1.3.x (Milestone 9)
 **Citations**: [#2222](https://github.com/Koniverse/SubWallet-Extension/issues/2222), [#4257](https://github.com/Koniverse/SubWallet-Extension/issues/4257), [#4678](https://github.com/Koniverse/SubWallet-Extension/issues/4678), [#4722](https://github.com/Koniverse/SubWallet-Extension/issues/4722)
@@ -1230,9 +1388,16 @@ never been re-verified since they were written.
 **Date**: 2025-07-01
 **Version**: v1.3.72–v1.3.79
 
-**Citations**: [#4908](https://github.com/Koniverse/SubWallet-Extension/issues/4908), [#4979](https://github.com/Koniverse/SubWallet-Extension/issues/4979), [PR #4909](https://github.com/Koniverse/SubWallet-Extension/pull/4909), [PR #4982](https://github.com/Koniverse/SubWallet-Extension/pull/4982)
+**Citations**: [#4979](https://github.com/Koniverse/SubWallet-Extension/issues/4908), [#4979](https://github.com/Koniverse/SubWallet-Extension/issues/4979), [PR #4909](https://github.com/Koniverse/SubWallet-Extension/pull/4909), [PR #4982](https://github.com/Koniverse/SubWallet-Extension/pull/4982)
 
 ---
+
+> **Citation corrected 2026-07-20.** The entry cited **#4908** as the v1 migration; the CHANGELOG
+> records #4908 as *"Migrate to ParaSpell V5"* (v1.3.72, 2026-01-14) — a separate, earlier step.
+> The v1 work is **#4979** (v1.3.79, 2026-05-21). The `Date` (2025-07-01) also precedes both
+> migrations by 6–10 months. The decision itself holds: `const version = '/v1';` with all six
+> endpoints on it (`balance-service/transfer/xcm/utils.ts`).
+
 
 ### D45. Remain on ParaSpell API for XCM (do not build in-house or self-host)
 
@@ -1264,7 +1429,15 @@ never been re-verified since they were written.
 **Alternatives considered**:
 - Increasing API key quota / rate-limit raising — attempted as a short-term fix (#3809, #4029) but did not resolve the structural over-polling problem.
 - Fetching data directly from on-chain RPC — not chosen because archive node queries at the required frequency would be even heavier.
-**Impact**: `subscribePoolPosition` interval logic refactored; pool metadata routing updated to point to static cache; validator min-stake now sourced from middleware with cache invalidation (#4520).
+**Impact**: `subscribePoolPosition` interval logic refactored; pool metadata routing updated to point to static cache (`earning/yield-pools.json`, `earning/targets/${slug}.json`, `earning/dtao/validator.json`).
+
+> **Corrected 2026-07-20 — one claim inverted.** The Impact said *"validator min-stake now sourced
+> from **middleware** with cache invalidation (#4520)"*. It is an **on-chain RPC subscription**:
+> `tao.ts` calls `substrateApi.api.rx.query.subtensorModule.nominatorMinRequiredStake()` and feeds
+> `minValidate` / `join` from it. The same evidence softens the entry's rejected alternative —
+> *"fetching data directly from on-chain RPC — not chosen"* — since pool statistics (`subnetTAO`,
+> `maxAllowedValidators`) are on-chain rx queries too. The static-cache decision itself holds.
+> Reconstructed in bulk on 2026-06-04 (`908a04f4b5`).
 **Date**: 2025-08-19
 **Version**: v1.3.x
 **Citations**: [#4623](https://github.com/Koniverse/SubWallet-Extension/issues/4623), [#3809](https://github.com/Koniverse/SubWallet-Extension/issues/3809), [#4058](https://github.com/Koniverse/SubWallet-Extension/issues/4058)
@@ -1325,12 +1498,22 @@ never been re-verified since they were written.
 ### D50. Support named proxy types aligned with Polkadot pallet — no custom types
 
 **Context**: When scoping the Proxy Account feature (#1676, #4725), the team had to decide how to model proxy permissions in the wallet UI.
-**Decision**: Support the standard on-chain proxy types as defined in the Polkadot proxy pallet — `Any`, `NonTransfer`, `Governance`, `Staking`, `CancelProxy`, and chain-specific variants where relevant — without inventing custom or cross-chain abstraction types.
+**Decision**: Support a fixed subset of the standard on-chain proxy types defined in the Polkadot proxy pallet — `Any`, `NonTransfer`, `Governance`, `Staking` — without inventing custom or cross-chain abstraction types.
 **Rationale**: Staying within protocol-standard types avoids complexity because any custom abstraction would diverge from on-chain reality and confuse users about the actual permission scope enforced by the runtime. Using native pallet types means the UI can directly reflect what the chain enforces.
 **Alternatives considered**:
 - Define simplified high-level "permission tiers" — rejected because the tier labels would not map 1:1 to what the chain enforces, increasing risk of user error.
 - Cross-ecosystem proxy abstraction — explicitly listed as a non-goal; custom proxy logic outside protocol standards is out of scope.
-**Impact**: `ProxyService` normalises response data into a unified structure keyed by chain-native proxy type; the Add Proxy Form exposes a dropdown populated from on-chain type enumeration; networks that use dApp staking instead of Staking pallet receive a filtered type list.
+**Impact**: `SubstrateProxyAccountService` normalises response data into a unified structure keyed by chain-native proxy type; the Add Proxy Form exposes a dropdown built from a hardcoded list; networks that use dApp staking instead of Staking pallet receive a filtered type list.
+
+> **Corrected 2026-07-20 — two claims the code refutes.** The Decision listed **`CancelProxy`** and
+> *"chain-specific variants where relevant"*; `grep -rn "CancelProxy" packages/` returns **zero
+> hits**, and the type is a closed union of four whose own comment says so:
+> `// Only support these 4 types for now` (`types/substrateProxyAccount/index.ts`). The Impact said
+> the dropdown is *"populated from on-chain type enumeration"*; it is a **static hardcoded array**
+> (`SubstrateProxyTypeSelector.tsx`) carrying the TODO *"can improve to get all support type
+> onchain, need improve later"*. On-chain enumeration exists only as a rejection check at submit
+> time. The class named — `ProxyService` — does not exist either; it is
+> `SubstrateProxyAccountService`. Reconstructed in bulk on 2026-06-04 (`908a04f4b5`).
 **Date**: 2025-10-02
 **Version**: v1.3.x (Milestone 9)
 **Citations**: [#1676](https://github.com/Koniverse/SubWallet-Extension/issues/1676), [#4725](https://github.com/Koniverse/SubWallet-Extension/issues/4725), [#4777](https://github.com/Koniverse/SubWallet-Extension/issues/4777)
@@ -1370,7 +1553,7 @@ never been re-verified since they were written.
 ### D53. Support Root Staking Reward Claim Options (Root Claim vs Alpha Claim)
 
 **Context**: In November 2025, Bittensor changed root staking emissions: rewards are no longer automatically converted to TAO; stakers must choose between Root Claim (alpha earned converts to TAO, awarded ~daily) and Alpha Claim (earned alpha remains staked on each subnet). Issue #4829 was raised to support this new model.
-**Decision**: Extend the TAO earning position model to read each account's current root claim type from chain and expose a UI for switching between Root Claim and Alpha Claim, implemented as background logic (#4851) and a new UI screen (#4852) referencing the design spec.
+**Decision**: Extend the TAO earning position model to read each account's current root claim type from chain and expose a UI for switching between Root Claim and Alpha Claim, implemented as background logic (#4851) and a new UI **modal** (`EarningBittensorClaimRewardTypeModal`) *(2026-07-20: the entry said "screen"; shipped v1.3.76, 2026-03-20, #4829)* referencing the design spec.
 **Rationale**: Because the Bittensor protocol mandated the change and ignoring it would leave users unable to manage where their staking rewards accrue; the two-option model is a direct reflection of the on-chain `rootClaimType` storage.
 **Alternatives considered**:
 - Auto-defaulting to Root Claim with no user option — rejected because Alpha Claim is a meaningful economic choice for users wanting to remain allocated to specific subnets.
@@ -1439,14 +1622,22 @@ never been re-verified since they were written.
 
 ---
 
-### D58. Scope Bittensor On-Chain Swap via `swapStakeLimit` Pallet (Not Third-Party Provider for Alpha)
+### D58. Scope Bittensor On-Chain Swap via the `swapStakeLimit` Extrinsic (Not Third-Party Provider for Alpha)
 
 **Context**: Swapping between TAO and alpha tokens was initially routed through SimpleSwap (#3855) for TAO/DOT pairs. For native TAO ↔ alpha token and alpha ↔ alpha swaps, a separate decision was needed in Dec 2025 when #4899 was raised.
 **Decision**: Implement native Bittensor on-chain swaps for TAO ↔ alpha and alpha ↔ alpha by calling the `swapStakeLimit` pallet directly on the Bittensor chain, distinct from the existing SimpleSwap provider path which handles cross-chain fiat/EVM pairs.
 **Rationale**: Because TAO ↔ alpha swaps are settled on-chain via the subnet AMM (the same AMM that drives dTAO slippage), making a native pallet call the correct integration point; routing them through a third-party aggregator would add latency, fees, and custodial risk for what is a native on-chain operation.
 **Alternatives considered**:
 - Routing alpha swaps through SimpleSwap or another off-chain aggregator — not chosen; SimpleSwap is only used for DOT ↔ TAO cross-chain pairs (#3855) and does not support alpha tokens.
-**Impact**: New swap handler using `swapStakeLimit` extrinsic; separate swap UI screen from the existing cross-chain swap flow.
+**Impact**: New swap handler (`swap-service/handler/bittensor-handler.ts`) calling the `swapStakeLimit` extrinsic; surfaced as `SwapProviderId.BITTENSOR` **inside the existing Swap screen**, not a separate one.
+
+> **Corrected 2026-07-20 — two claims wrong.** *"the `swapStakeLimit` **pallet**"* (title and
+> Decision): `swapStakeLimit` is an **extrinsic on the `subtensorModule` pallet**
+> (`api.tx.subtensorModule.swapStakeLimit(...)`), not a pallet. And *"separate swap UI screen from
+> the existing cross-chain swap flow"* is false — Bittensor is a provider branch inside the single
+> Swap screen (`Popup/Transaction/variants/Swap/index.tsx`, `isBittensorStakedSwap`); the only
+> files under `variants/Swap/` are `index.tsx`, `EmptySwapPairs.tsx` and `QuoteInfoArea.tsx`.
+> Reconstructed in bulk on 2026-06-04 (`908a04f4b5`).
 **Date**: 2025-12-10
 **Version**: v1.3.x
 **Citations**: [#4899](https://github.com/Koniverse/SubWallet-Extension/issues/4899), [#3855](https://github.com/Koniverse/SubWallet-Extension/issues/3855)
@@ -1461,7 +1652,7 @@ never been re-verified since they were written.
 **Alternatives considered**:
 - Show the tab but disable all actions for EVM accounts — rejected because it creates confusion about why the feature is unavailable.
 - Rely solely on RPC failure to surface incompatibility — rejected as a poor UX that surfaces errors only after user has invested in filling forms.
-**Impact**: Account detail screen filters the Manage Proxies tab by account type; network selector in Add Proxy is gated by chain-list metadata (`supportsProxy` flag synced with SubWallet-ChainList).
+**Impact**: Account detail screen filters the Manage Proxies tab by account type; network selector in Add Proxy is gated by chain-list metadata (`supportProxy` flag *(2026-07-20: the entry named `supportsProxy`; the chain-list field is `substrateInfo.supportProxy`)* synced with SubWallet-ChainList).
 **Date**: 2025-12-30
 **Version**: v1.3.x (Milestone 9 / 10 boundary)
 **Citations**: [#4725](https://github.com/Koniverse/SubWallet-Extension/issues/4725), [#4935](https://github.com/Koniverse/SubWallet-Extension/issues/4935)
