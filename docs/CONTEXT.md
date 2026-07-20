@@ -6,6 +6,135 @@
 
 ---
 
+## Decision index
+
+<!-- Navigation only. The entries below are the record; this table restates none of them. -->
+
+109 decisions, `D1`…`D109`, no gaps. Numbers are assigned when a decision is **recorded**;
+phases group by when it was **made**, so the two disagree twice (D69 sits in Phase 1, D17 in
+Phase 2) — that is information, not drift. **An ID is an identity, not a position**
+([AGENTS §7 rule 1](../AGENTS.md)): these numbers are permanent and are cited 586 times across
+142 files *and in git commit messages*, which cannot be rewritten.
+
+**A blank `Notes` cell means _not audited_, not _verified current_.** Only entries checked
+against the code, the PRD or the CHANGELOG carry a note; 67 of the 89 product decisions have
+never been re-verified since they were written.
+
+| D | Decision | Phase | Notes |
+| --- | --- | --- | --- |
+| [D1](#d1-fork-polkadot-js-extension-rather-than-copying-code) | Fork polkadot-js extension rather than copying code | P0 |  |
+| [D2](#d2-replace-apipromise-with-a-lightweight-connector-for-balancetoken-queries) | Replace ApiPromise with a lightweight connector for balance/token queries | P0 | revised by [D95](#d95-the-lightweight-read-connector-revision-of-d2-was-never-implemented--measure-before-refactoring) |
+| [D3](#d3-rebuild-the-background-layer-for-chrome-manifest-v3-initial-research) | Rebuild the background layer for Chrome Manifest V3 (initial research) | P0 |  |
+| [D4](#d4-create-a-modified-subwalletkeyring-that-exposes-private-key-after-unlock) | Create a modified @subwallet/keyring that exposes private key after unlock | P0 |  |
+| [D5](#d5-expose-both-re-nominate-and-unbond-then-rebond-flows-for-validator-switching) | Expose both re-nominate and unbond-then-rebond flows for validator switching | P0 |  |
+| [D6](#d6-scope-mv3-migration-storage-to-chromestorage-defer-pouchdb) | Scope MV3 migration storage to chrome.storage (defer PouchDB) | P0 |  |
+| [D7](#d7-scope-custom-network-support-to-pure-evm-or-pure-substrate-only) | Scope custom network support to pure EVM or pure Substrate only | P0 |  |
+| [D8](#d8-temporarily-hide-substrate-private-key-export-no-wallet-supports-re-import-yet) | Temporarily hide Substrate private-key export (no wallet supports re-import… | P0 |  |
+| [D9](#d9-deprioritise-pouchdb-for-cross-platform-storage) | Deprioritise PouchDB for cross-platform storage | P0 |  |
+| [D10](#d10-defer-step-3-of-online-chain-list-auto-update-immediate-provider-change) | Defer step 3 of online chain-list auto-update (immediate provider change) | P0 | ⚠️ **obsolete** — step 3 shipped (`handleLatestChainData` re-inits chain APIs on an interval) |
+| [D11](#d11-do-not-auto-select-validators-users-should-research-or-use-pools) | Do not auto-select validators; users should research or use pools | P0 |  |
+| [D12](#d12-fix-ledger-hid-conflicts-by-disconnecting-device-on-session-close-not-by-splitting-html-files) | Fix Ledger HID conflicts by disconnecting device on session close (not by sp… | P0 |  |
+| [D13](#d13-walletconnect-initial-integration-defers-eth_signtransaction-and-eth_signtypeddata) | WalletConnect initial integration defers eth_signTransaction and eth_signTyp… | P1 |  |
+| [D14](#d14-scope-zk-assets-manta-to-extension-only--exclude-webapp-and-mobile) | Scope ZK assets (Manta) to extension only — exclude WebApp and mobile | P1 |  |
+| [D15](#d15-adopt-eip-6963-multi-provider-discovery-alongside-windowethereum-injection) | Adopt EIP-6963 multi-provider discovery alongside window.ethereum injection | P1 |  |
+| [D16](#d16-defer-custom-derived-path-feature-to-avoid-milestone-6-scope-creep) | Defer custom derived-path feature to avoid Milestone 6 scope creep | P1 | ⚠️ **obsolete** — custom derivation path shipped (FR-26 ✅) |
+| [D18](#d18-implement-full-opengov-voting-not-read-only-for-polkadot-governance) | Implement full OpenGov voting (not read-only) for Polkadot governance | P1 | ⚠️ Impact overstated — it claims delegation + WebApp governance shipped; FR-142/FR-143 are 📋 planned |
+| [D19](#d19-refactor-balance-service-to-new-service-architecture-centralise-cache-invalidation) | Refactor balance service to new service architecture (centralise cache inval… | P1 |  |
+| [D21](#d21-rename-staking-feature-to-earning-across-all-platforms) | Rename "Staking" feature to "Earning" across all platforms | P1 |  |
+| [D22](#d22-xcm-transfer-max-formula-reserve-12-ed--2-fee-to-prevent-dust-loss) | XCM Transfer Max formula: reserve 1.2× ED + 2× fee to prevent dust loss | P1 |  |
+| [D24](#d24-grc-20-token-type-renamed-to-vft-vara-fungible-token) | GRC-20 token type renamed to VFT (Vara Fungible Token) | P1 |  |
+| [D27](#d27-adopt-texterify-as-the-multilingual-management-platform) | Adopt Texterify as the multilingual management platform | P1 |  |
+| [D69](#d69-the-master-password-is-non-recoverable-by-design-forgot-password-resets-the-wallet) | The master password is non-recoverable by design; "forgot password" resets t… | P1 |  |
+| [D71](#d71-ship-swap-webapp-first-as-a-multi-provider-aggregator-extension-first-gets-a-deep-link-button) | Ship Swap WebApp-first as a multi-provider aggregator; extension first gets… | P1 |  |
+| [D72](#d72-auto-update-chain-metadata-over-an-api-instead-of-bundling-polkadot-jsapps-metadata) | Auto-update chain metadata over an API instead of bundling polkadot-js/apps… | P1 |  |
+| [D73](#d73-separate-chain-status-live-connection-from-chain-state-configuration) | Separate chain "status" (live connection) from chain "state" (configuration) | P1 |  |
+| [D74](#d74-cache-earning-poolvalidator-data-client-side-for-performance) | Cache earning pool/validator data client-side for performance | P1 |  |
+| [D75](#d75-add-an-in-app-notification--banner-subsystem-browser-push--remotely-driven-banners) | Add an in-app notification + banner subsystem (browser push + remotely-drive… | P1 |  |
+| [D76](#d76-merge-the-two-dapp-connect-request-interfaces-into-one-connection-popup) | Merge the two dApp-connect request interfaces into one connection popup | P1 |  |
+| [D77](#d77-introduce-mission-pools-as-a-dedicated-remotely-driven-growthdiscovery-surface) | Introduce Mission Pools as a dedicated, remotely-driven growth/discovery sur… | P1 |  |
+| [D78](#d78-warn-not-block-on-cross-chain-transfers-to-a-centralized-exchange-cex-address) | Warn (not block) on cross-chain transfers to a centralized-exchange (CEX) ad… | P1 |  |
+| [D17](#d17-complete-mv3-migration-service-worker-lifecycle-dapp-connection-fetch-storage) | Complete MV3 migration (service-worker lifecycle, DApp connection, fetch, st… | P2 |  |
+| [D28](#d28-abandon-snowbridge-sdk-in-favour-of-paraspell-api-for-xcm-bridge-protection) | Abandon SnowBridge SDK in favour of ParaSpell API for XCM bridge protection | P2 |  |
+| [D68](#d68-ship-a-dark-only-product-ui-keep-the-theme-enum-but-hide-the-theme-selector) | Ship a dark-only product UI; keep the theme enum but hide the theme selector | P2 |  |
+| [D79](#d79-adopt-the-zondax-polkadot-generic--migration-ledger-apps-instead-of-per-chain-ledger-apps) | Adopt the Zondax Polkadot Generic + Migration Ledger apps instead of per-cha… | P2 |  |
+| [D80](#d80-adopt-the-checkmetadatahash-signed-extension-and-compute-the-metadata-hash-client-side) | Adopt the CheckMetadataHash signed extension and compute the metadata hash c… | P2 |  |
+| [D81](#d81-add-a-remote-block-action-online-kill-switch-for-transaction-submission) | Add a remote "Block action online" kill-switch for transaction submission | P2 |  |
+| [D82](#d82-serve-evm-accounts-through-the-substrate-injected-provider-for-dual-ecosystem-dapps) | Serve EVM accounts through the Substrate injected provider for dual-ecosyste… | P2 |  |
+| [D83](#d83-decouple-from-polkadotjs-by-removing-direct-api-calls-starting-with-balance-fetching) | Decouple from @polkadot/js by removing direct API calls (starting with balan… | P2 |  |
+| [D84](#d84-front-price--exchange-rate-data-with-a-cached-endpoint--bundled-static-fallback) | Front price & exchange-rate data with a cached endpoint + bundled static fal… | P2 |  |
+| [D85](#d85-serve-earning-data-from-a-middleware-service-cache-rather-than-polling-live-sources) | Serve earning data from a middleware-service cache rather than polling live… | P2 |  |
+| [D86](#d86-warn-and-require-unstaking-when-an-account-stakes-via-both-nomination-pool-and-direct-nomination) | Warn and require unstaking when an account stakes via both nomination pool a… | P2 |  |
+| [D87](#d87-retire-interlay-lending-by-controlled-deprecation-hide-option-keep-positions-allow-withdraw) | Retire Interlay lending by controlled deprecation (hide option, keep positio… | P2 | ⚠️ *"Lending later returns — see FR-120"* is wrong; FR-120 is the ⏸️ withdrawn row |
+| [D88](#d88-ship-mv3-on-firefox-gated-on-firefox--127) | Ship MV3 on Firefox, gated on Firefox ≥ 127 | P2 |  |
+| [D20](#d20-native-substrate-path-for-tao-staking-not-evm) | Native Substrate Path for TAO Staking (Not EVM) | P3 |  |
+| [D23](#d23-support-tep-74-jetton-standard-as-the-ton-token-type) | Support TEP-74 Jetton Standard as the TON Token Type | P3 |  |
+| [D25](#d25-use-toncore--tonton-tonclient-sdk-with-toncenter-api-v3) | Use `@ton/core` + `@ton/ton` (TonClient) SDK with TonCenter API v3 | P3 |  |
+| [D26](#d26-user-selectable-walletcontract-version-v3r1v3r2v4v5-default-v5) | User-Selectable WalletContract Version (v3r1/v3r2/v4/v5), Default v5 | P3 |  |
+| [D29](#d29-scope-out-ton-dapp-connection-ton-connect-to-a-later-milestone) | Scope Out TON dApp Connection (TON Connect) to a Later Milestone | P3 |  |
+| [D30](#d30-use-blockfrost-as-the-cardano-chain-data-provider) | Use Blockfrost as the Cardano Chain Data Provider | P3 |  |
+| [D31](#d31-support-cardano-native-assets-cip-26-alongside-ada-transfers-defer-stakingdelegation) | Support Cardano Native Assets (CIP-26) Alongside ADA Transfers; Defer Stakin… | P3 |  |
+| [D32](#d32-cancel-dynamic-swap-pair-support-milestone-8-cancel) | Cancel dynamic swap pair support (Milestone 8 Cancel) | P3 |  |
+| [D33](#d33-adopt-dtao--alpha-token-subnet-staking-model) | Adopt dTAO / Alpha Token Subnet Staking Model | P3 |  |
+| [D34](#d34-integrate-meld-all-in-one-wizard-directly-supersedes-standalone-meld-research-task) | Integrate Meld All-in-One Wizard directly (supersedes standalone Meld resear… | P3 |  |
+| [D35](#d35-adopt-cip-30-as-the-cardano-dapp-connector-standard) | Adopt CIP-30 as the Cardano dApp Connector Standard | P3 |  |
+| [D36](#d36-bitcoin-dataindexer-strategy--koni-hosted-api-first-migrating-to-blockstream-public-api) | Bitcoin data/indexer strategy — Koni-hosted API first, migrating to Blockstr… | P3 |  |
+| [D37](#d37-bitcoin-integrated-into-the-existing-unified-account-model-substrate--evm--ton--cardano--btc) | Bitcoin integrated into the existing Unified Account model (Substrate + EVM… | P3 |  |
+| [D38](#d38-three-bitcoin-address-types-bip44bip84bip86-supported-simultaneously-per-account) | Three Bitcoin address types (BIP44/BIP84/BIP86) supported simultaneously per… | P3 |  |
+| [D39](#d39-cancel-1inch-dex-aggregator-integration-economically-unviable-pricing) | Cancel 1inch DEX aggregator integration (economically unviable pricing) | P3 |  |
+| [D40](#d40-bitcoin-dapp-provider-injected-as-a-separate-namespace-with-psbt-based-signing) | Bitcoin dApp provider injected as a separate namespace with PSBT-based signing | P3 |  |
+| [D41](#d41-use-subsquare-api-as-the-primary-data-source-for-referenda-content-and-metadata) | Use Subsquare API as the primary data source for referenda content and metad… | P3 |  |
+| [D42](#d42-move-blockfrost-api-calls-to-the-backend-proxy) | Move Blockfrost API Calls to the Backend Proxy | P3 |  |
+| [D43](#d43-crosschain-btc-swap-via-chainflip-btc--dot-and-optimex-btc--eth-1-click-btc--tbtc-deferred) | Crosschain BTC swap via Chainflip (BTC ↔ DOT) and Optimex (BTC ↔ ETH); 1-cli… | P3 |  |
+| [D44](#d44-migrate-paraspell-from-v4v5-to-v1-api-docs-v12-to-v13) | Migrate ParaSpell from V4/V5 to v1 API (docs v12-to-v13) | P3 |  |
+| [D45](#d45-remain-on-paraspell-api-for-xcm-do-not-build-in-house-or-self-host) | Remain on ParaSpell API for XCM (do not build in-house or self-host) | P3 |  |
+| [D46](#d46-external-api-middleware--taostats-for-validator-data-static-cache-for-earning-data) | External API (Middleware / taostats) for Validator Data; Static Cache for Ea… | P3 |  |
+| [D47](#d47-phased-delegation-rollout--delegation-deferred-to-phase-2-of-opengov-implementation) | Phased delegation rollout — delegation deferred to Phase 2 of OpenGov implem… | P3 |  |
+| [D48](#d48-scope-multisig-to-polkadot-substrate-chains-only-phase-1-defer-other-ecosystems) | Scope Multisig to Polkadot Substrate Chains Only (Phase 1); Defer Other Ecos… | P3 |  |
+| [D49](#d49-remove-the-crowdloans-tab-polkadot-agile-coretime-deprecates-slot-auctions) | Remove the Crowdloans tab (Polkadot Agile Coretime deprecates slot auctions) | P3 |  |
+| [D50](#d50-support-named-proxy-types-aligned-with-polkadot-pallet--no-custom-types) | Support named proxy types aligned with Polkadot pallet — no custom types | P3 |  |
+| [D51](#d51-proxy-signing-via-sign-selector-popup-on-existing-transaction-flows--no-separate-proxy-initiated-flow) | Proxy signing via "Sign Selector" popup on existing transaction flows — no s… | P3 |  |
+| [D52](#d52-governance-v1-democracy-pallet-chains-receive-display-only-support--voting-and-delegation-disabled) | Governance V1 (Democracy pallet) chains receive display-only support — votin… | P3 |  |
+| [D53](#d53-support-root-staking-reward-claim-options-root-claim-vs-alpha-claim) | Support Root Staking Reward Claim Options (Root Claim vs Alpha Claim) | P3 |  |
+| [D54](#d54-approval-flow-uses-native-pallet-extrinsics-as_multi-approve_as_multi-cancel_as_multi-with-role-differentiated-actions) | Approval Flow Uses Native Pallet Extrinsics (`as_multi`, `approve_as_multi`,… | P3 |  |
+| [D55](#d55-deterministic-off-chain-account-creation-with-no-on-chain-transaction) | Deterministic Off-Chain Account Creation with No On-Chain Transaction | P3 |  |
+| [D56](#d56-on-chain-pending-transaction-detection-without-an-indexer-in-phase-1-indexer-integration-deferred-to-phase-2) | On-Chain Pending-Transaction Detection Without an Indexer in Phase 1; Indexe… | P3 |  |
+| [D57](#d57-no-display-of-reverse-proxied-by-relationship-in-the-manage-proxies-screen) | No display of reverse "proxied-by" relationship in the Manage Proxies screen | P3 |  |
+| [D58](#d58-scope-bittensor-on-chain-swap-via-swapstakelimit-pallet-not-third-party-provider-for-alpha) | Scope Bittensor On-Chain Swap via `swapStakeLimit` Pallet (Not Third-Party P… | P3 |  |
+| [D59](#d59-scope-proxy-support-to-substrate-polkadot-pallet-accounts-only--exclude-evm-solo-and-ledger-evm) | Scope proxy support to Substrate (Polkadot pallet) accounts only — exclude E… | P3 |  |
+| [D60](#d60-compute-fee-level-parameters-and-fee-logic-on-the-backend-consumed-via-a-subscribe-based-feeservice) | Compute fee-level parameters and fee logic on the backend, consumed via a su… | P3 |  |
+| [D61](#d61-pay-transaction-fees-in-non-native-tokens-on-asset-hub-via-the-assetconversion-pallet) | Pay transaction fees in non-native tokens on Asset Hub via the `assetConvers… | P3 |  |
+| [D62](#d62-migrate-coinbase-on-ramp-to-the-secure-init-backend-session-token-flow) | Migrate Coinbase on-ramp to the secure-init (backend session-token) flow | P3 |  |
+| [D63](#d63-adapt-kyberswap-aggregator-integration-to-its-divergent-slippage--price-impact-rules) | Adapt KyberSwap aggregator integration to its divergent slippage / price-imp… | P3 |  |
+| [D64](#d64-model-xcm-fees-as-source-execution--source-delivery-sender-paid-vs-remotetransport-amount-paid-validated-by-paraspell-dry-run) | Model XCM fees as source-execution + source-delivery (sender-paid) vs remote… | P3 |  |
+| [D65](#d65-model-walletconnect-as-a-single-connection-merging-pair--session-with-separate-substrate--evm-sessions-wallet-role-only) | Model WalletConnect as a single "Connection" merging pair + session, with se… | P3 |  |
+| [D66](#d66-aggregate-multi-chain-data-through-the-subwallet-services-sdk-backend-rather-than-computing-it-on-device) | Aggregate multi-chain data through the SubWallet Services SDK backend rather… | P3 |  |
+| [D67](#d67-front-market-data-metadata-and-nft-media-behind-subwallet-cachecdn-proxies-with-static-fallback) | Front market data, metadata and NFT media behind SubWallet cache/CDN proxies… | P3 |  |
+| [D70](#d70-one-sign-single-signature-batch-approval-is-opt-in-and-off-by-default) | One-Sign (single-signature batch approval) is opt-in and off by default | P3 | ⚠️ **contradicted by code** — `DEFAULT_ALLOW_ONE_SIGN = true` since the setting was created; owner decision pending |
+| [D89](#d89-evaluated-and-dropped-swap-providers-1inch-acala-zenlink-parallel-finance) | Evaluated-and-dropped swap providers: 1inch, Acala, Zenlink, Parallel Finance | P3 |  |
+| [D90](#d90-run-two-changelogs-until-the-ci-release-gate-is-migrated) | Run two changelogs until the CI release gate is migrated | P4 | rule → **AGENTS §7** (*The two change logs*) · still binding, CI gate not migrated |
+| [D91](#d91-one-repo-two-version-spaces--declare-the-space-never-mix-the-numbers) | One repo, two version spaces — declare the space, never mix the numbers | P4 | rule → **AGENTS §7** (*The two version spaces*) |
+| [D92](#d92-the-prd-needs-a--withdrawn-state--shipped-is-not-forever) | The PRD needs a `⏸️ withdrawn` state — "shipped" is not forever | P4 |  |
+| [D93](#d93-prd_ref-holds-fr-n-or-nfr-n--the-project-is-requirement-centric-not-fr-centric) | `prd_ref` holds `FR-N` **or** `NFR-N` — the project is requirement-centric,… | P4 | rule → **AGENTS §7 rule 8** · census *(6 stories)* is as of 2026-07-13 |
+| [D94](#d94-one-time-gapless-renumber-of-fr-and-epic-12-story-ids--never-again) | One-time gapless renumber of FR and EPIC-12 story IDs — never again | P4 | rule → **AGENTS §7 rule 1** · renumber itself is a finished one-off |
+| [D95](#d95-the-lightweight-read-connector-revision-of-d2-was-never-implemented--measure-before-refactoring) | The lightweight read connector (revision of D2) was never implemented — meas… | P4 | decision reversed by D96 the same day; its evidence still stands |
+| [D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95) | Retire the memory requirement (NFR-11) — delete on evidence, not on a guess | P4 | rule → **AGENTS §7 rule 2** |
+| [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done) | What a docs epic may change — and when a story that ships in no release is d… | P4 | rule → **AGENTS §7 rules 3 + 4** |
+| [D98](#d98-close-the-five-prd-gaps--one-fr-the-product-already-shipped-four-nfrs-that-had-no-home) | Close the five PRD gaps — one FR the product already shipped, four NFRs that… | P4 | finished action — its *"no story owns the coverage index"* gap was closed by D108 |
+| [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system) | Reconstructed sprint windows — an `M` cadence for history that predates the… | P4 | rule → **AGENTS §7 rule 5** · partly revised by D102 |
+| [D100](#d100-a-story-is-the-unit-of-status--split-epic-20-where-the-truth-changes-not-where-the-phases-do) | A story is the unit of status — split EPIC-20 where the truth changes, not w… | P4 | rule → **AGENTS §7 rule 1** · census *(177 stories)* is as of 2026-07-13 |
+| [D101](#d101-version_shipped-names-a-release-of-this-product--inherited-features-ship-at-021) | `version_shipped` names a release of *this* product — inherited features shi… | P4 | rule → **AGENTS §7 rule 1b** |
+| [D102](#d102-do-not-file-the-koni-docs-bugs-upstream--carry-the-divergence-and-say-so-revision-of-d99) | Do not file the koni-docs bugs upstream — carry the divergence, and say so | P4 | rule → **AGENTS §7** warning box · the *"5 warnings"* count is as of 2026-07-13; now in the hundreds |
+| [D103](#d103-epic-status-is-derived-from-its-stories--and-it-answers-a-different-question-than-the-prd-badge) | Epic `status` is derived from its stories — and it answers a different quest… | P4 | census *(21 epics)* is as of 2026-07-13; now 41 |
+| [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention) | An ID is a promise that a document exists — do not mint one for an intention | P4 | rule → **AGENTS §7 rule 7** |
+| [D105](#d105-the-fork-boundary-is-its-own-window--inherited-work-does-not-go-on-this-teams-board) | The fork boundary is its own window — inherited work does not go on this tea… | P4 | rule → **AGENTS §7 rule 5b** |
+| [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true) | `commit:` names what made the capability true — a release bump made nothing… | P4 | rule → **AGENTS §7 rule 1c** |
+| [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim) | A ticked AC is a claim about the code — four of US-5.1's were false, and one… | P4 | census *(119 done stories)* is as of 2026-07-13; now 2223 |
+| [D108](#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map) | Every tracker issue gets a story — in a maintenance-epic layer, so the FR ma… | P4 |  |
+| [D109](#d109-the-requirement-column-has-five-meanings--write-the-legend-once-not-once-per-epic) | The requirement column has five meanings — write the legend once, not once p… | P4 | rule → **AGENTS §7 rule 8** · applied to EPIC-9 only; 20 epics still carry a bare `FR`-only matrix |
+
+---
+
+
 ## Phase 0 — Foundation through v1.0 (2022–2023, shipped v0.3.x–v1.0.x)
 
 > Fork & Yarn-monorepo foundation, ChainService, keyring/storage model, and early dApp / MV3 groundwork.
@@ -1523,11 +1652,16 @@
 
 **Rationale**: Forcing a hardening story onto a capability FR is how false claims get in — and they did: US-8.12 and EPIC-8 cited an "arithmetic-correctness NFR" that does not exist; US-20.4/US-20.5 cited NFR-11/NFR-17 for properties those rows do not state.
 
-**Impact**: 19 stories mapped; nine NFRs now referenced. Six stories keep an empty `prd_ref` on purpose — the three EPIC-21 docs stories, plus four whose property the PRD genuinely does not state (see the PRD-gap list in US-21.2).
+**Impact**: 19 stories mapped; nine NFRs now referenced. Six stories kept an empty `prd_ref` on purpose *(as of 2026-07-13 — [D108](#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map) later added 2604 more, the whole maintenance layer)*.
+
+> **The rule now lives in [AGENTS.md §7 rule 8](../AGENTS.md)**, which states it together with the
+> other two namespaces (`arch_ref`, `depends_on`) and the five forms an epic-matrix cell may take
+> ([D109](#d109-the-requirement-column-has-five-meanings--write-the-legend-once-not-once-per-epic)).
+> This entry is kept for the reasoning; AGENTS.md is the authority.
 
 **Date**: 2026-07-13
 **Version**: docs-only
-**Citations**: [US-21.2](sprints/stories/US-21.2-history-backfill.md); frontmatter-spec §`prd_ref`
+**Citations**: [US-21.2](sprints/stories/US-21.2-history-backfill.md); frontmatter-spec §`prd_ref`; [AGENTS.md §7 rule 8](../AGENTS.md)
 
 ---
 
@@ -1835,7 +1969,7 @@ absence of an ID is silence, while a dangling ID is a lie with a citation.
    Two deliberate carve-outs, both stated in the script: **dated archives**
    (`docs/notes/YYYY-MM-DD-*`, `docs/superpowers/`) are snapshots and correctly name the IDs
    that were true *then*; a **tombstoned row** (`~~NFR-11~~`) counts as existing, because a
-   retired ID is retired, not absent ([D96](#d96-retire-nfr-11--an-unmeasured-budget-for-a-mechanism-never-built), rule 1).
+   retired ID is retired, not absent ([D96](#d96-retire-the-memory-requirement-nfr-11--delete-on-evidence-not-on-a-guess-revision-of-d95), rule 1).
 
 **Impact**: 4 dangling IDs cleared — the story number in three files, plus a **zero-padded
 FR reference** in [US-21.2](sprints/stories/US-21.2-history-backfill.md) (an FR-1 written
@@ -1903,7 +2037,7 @@ multi-chain part.** That sentence was unreadable while the two lineages shared a
 `version_shipped` changed. Both checks green. Also surfaced: **0.2.3 is claimed by no story**
 — logged in the window, not silently dropped.
 
-**Citations**: [D101](#d101-version_shipped-names-a-release-of-this-product--inherited-features-ship-at-021); [D103](#d103-epic-status-is-derived-from-its-stories--and-it-answers-a-different-question-than-the-prd-badge); [D99](#d99-reconstructed-m-sprint-windows--and-the-wm-cadence); [LESSONS §66](LESSONS.md), [§67](LESSONS.md); `sprints/sprint-2022-M01.md`
+**Citations**: [D101](#d101-version_shipped-names-a-release-of-this-product--inherited-features-ship-at-021); [D103](#d103-epic-status-is-derived-from-its-stories--and-it-answers-a-different-question-than-the-prd-badge); [D99](#d99-reconstructed-sprint-windows--an-m-cadence-for-history-that-predates-the-sprint-system); [LESSONS §66](LESSONS.md), [§67](LESSONS.md); `sprints/sprint-2022-M01.md`
 
 ---
 
@@ -2075,7 +2209,7 @@ owning story; the ERP reads across both layers, the FR reader reads only the fir
   fabricated claims.
 - **Honest state, not flattering state.** 300 open issues are `backlog` with no sprint — we hold
   no window for unfinished work and do not invent one. A closed issue with no CHANGELOG line is
-  `done` with **empty `version_shipped`** (shipped date unknown) — [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate)'s
+  `done` with **empty `version_shipped`** (shipped date unknown) — [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done)'s
   `prd_ref: []` branch, which is why the done-gate does not demand a version here.
 - **`points: 1` is a count, not a Fibonacci estimate**, and a maintenance epic's rollup measures
   **issue throughput, never effort**. Summing it with the product stories' points is meaningless
@@ -2101,201 +2235,62 @@ title heuristic and each story says so (*"capability area (guess)"*); the **Unca
 windows. CHANGELOG coverage 6% → **99%** (1113/1124; 3 stragglers). `npx koni-docs validate`
 exits 0 · `node scripts/koni-docs-check-ids.mjs` exits 0 across 2996 files.
 
-**Recheck against GitHub (2026-07-15).** An audit re-fetched all 2964 issues with close reason and
-the sub-issue graph, and caught three things:
+**Audited against the tracker, then against git (2026-07-15 → 07-16).** Six passes re-checked what
+the generator had claimed. They decided nothing new — they corrected evidence — so the pass-by-pass
+tally is not reproduced here; the two findings that became *rules* are [LESSONS §69](LESSONS.md) (a
+link an API hands you is a claim, not a fact) and [LESSONS §70](LESSONS.md) (*unrecoverable* is a
+claim too). What the passes changed:
 
-- **Status was `done` for closed-but-not-shipped issues.** GitHub's `stateReason` distinguishes
-  `COMPLETED` (2323) from `NOT_PLANNED` (185) and `DUPLICATE` (16). A CLOSED issue is not a shipped
-  one. **199 stories flipped `done` → `deprecated`** with a banner and no `version_shipped`/`sprint`
-  — declined and duplicate work is recorded for coverage, never counted as delivered.
-- **Duplicates**: 0 internal (no issue owns two stories); the 16 GitHub-marked duplicates are the
-  deprecated set above.
-- **Parent/sub-issues**: 413 stories are sub-issues whose parent also has a story, 117 are umbrellas.
-  Not double records — a sub-issue is real work — but the parent aggregates them, so each carries an
-  **Issue graph** cross-link and umbrella stories say *"do not add my points to my children's."*
-- **Freshness**: 0 issues changed state and 0 are new since the cache — the data matches GitHub.
+| Pass | Correction | Result |
+| --- | --- | --- |
+| Close reason | GitHub's `stateReason` separates `COMPLETED` (2323) from `NOT_PLANNED` (185) / `DUPLICATE` (16) — a closed issue is not a shipped one | **199 stories `done` → `deprecated`**, no version, no sprint |
+| Sub-issue graph | 413 stories are sub-issues whose parent also has a story; 117 are umbrellas | cross-links added; umbrella stories say *"do not add my points to my children's"* |
+| Closing-PR links | GitHub's `closedByPullRequestsReferences` is loose — of 341 done stories citing a PR, **141 (41%)** named a PR whose `[Issue-N]` title belongs to another issue. Trust the PR **title**, not the link ([§69](LESSONS.md)) | PR-citing **1294 → 1051**; 243 spurious dropped to their next honest tier |
+| First release tag | For a done story with a resolvable `[Issue-N]` commit, the first `v<release>` tag *containing* it is the release it shipped in — git-provable, and the CHANGELOG is not the only proof ([§70](LESSONS.md)) | **+367** git-provable versions |
+| *"Resolved in #N"* | 26 issues closed with the work landing under a **different** issue; recorded as `shipped via #N`, never dressed up as this issue's own commit | **+26** versions, +8 assignees |
+| PR-branch & tier audit | Dev-authored branch names (`koni/dev/issue-N`, including a misspelled `isue-867`) recover what the subject regex missed; the rest stay honestly commit-less — four are **bundle PRs** whose commits are tagged for a *sibling*, and attaching those is the bundle-inference [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true) rejects | commit-bearing done **1103 → 1453** |
 
-The audit is the same generator plus `/tmp/rel.json` (the GraphQL sub-issue graph); re-running keeps
-status in step with the tracker's close reasons.
+**Final evidence state (2026-07-16)**: 1453 done stories carry a commit provable against its release ·
+1519 carry a git-provable `version_shipped` · 602 remain tracker-only (no commit, no changelog line, no
+pointer). The gaps are left empty, not filled — `assignee` was **not** derived from a PR author, and ~10
+version-recoverable pairs were **held back** because their PR is a generic *"Update chainlist"* whose
+link to the specific issue is the same same-area judgment §69 measured at 41% wrong.
 
-**Follow-up — how duplicates and PR-less closes are handled.** Two questions the audit raised:
-
-- **The 16 duplicates point nowhere machine-readable.** GitHub's `MarkedAsDuplicateEvent` carries a
-  `canonical` link, but none of these 16 has one — they were closed with the *reason* "duplicate",
-  not the structured "duplicate of #X" action. So the original is not recoverable from the API; the
-  deprecated banner says exactly that rather than guessing a canonical.
-- **A closed issue is not proof of shipped code — so `done` now carries an evidence tier.** Of 2208
-  done stories: **1367** have a commit provable against its release by `merge-base`, **86** a commit
-  not yet in any stable release, **8** an implementing PR (title declares the issue — see the PR
-  correction below), **107** a CHANGELOG release, **38** shipped via another issue (*resolved in #N*,
-  or a closing-PR sibling bundle — see the tracker-only follow-up below), and **602** have *none* —
-  `done` rests only on the tracker's COMPLETED label (mostly pre-2023 issues
-  closed before any commit / PR-link convention). Each story states its tier in AC-1, and the 602 say
-  plainly *"no commit, PR, or changelog line links code to this issue."* The label is kept as the
-  team's own record, but it is never dressed up as code evidence — the [LESSONS §68](LESSONS.md) line,
-  applied to provenance strength, not just AC text.
-  - **The issue tag has variants, and some devs skipped it entirely.** The commit scan first matched
-    only `[Issue-2501]` (hyphen); 180 issues wrote `[Issue 2501]` (space) or `[Issue #2501]` — the same
-    self-declared link, missed by a too-strict regex (broadened to `/\[Issue[-\s]*#?\s*(\d+)\]/i`). But
-    a newcomer who never learned the convention wrote *no* issue reference at all — commit #2d5374ff
-    is just *"Do not show the Export account screen…"*. Those are recoverable only through the **PR
-    branch**: the merge *"Merge pull request #886 from …/koni/dev/issue-885"* names the issue in the
-    branch (a dev-authored link as reliable as the tag), and its second parent's feature commits are
-    #885's work. **193 done stories** gained a commit this way (each carrying a *"commit found via PR
-    #N"* note so the link stays traceable), lifting commit-bearing done from 1103 → **1448** and
-    git-provable `version_shipped` to **1504**. Reliable because the dev named the branch — not
-    GitHub's inferred `closedByPullRequestsReferences`, which the PR-title correction below had to undo.
-
-**Follow-up — the "closing PR" links were 41% wrong; corrected against the PR title (2026-07-15).**
-A recheck of the done stories' fields asked whether the PR evidence could be trusted. It could not.
-The generator read GitHub's `closedByPullRequestsReferences`, which turns out to be **loose**: it
-returns PRs that merely mention an issue, PRs about a *different* issue, and it is inconsistent over
-time (issue #32 returned PR #130 at fetch, `(none)` on recheck). Verified live via each issue's
-`ClosedEvent.closer`: of 25 sampled done stories on the PR tier, **0** were actually closed by the
-cited PR. Measured across the layer: of 341 done stories citing a PR as their evidence, **141 (41%)**
-named a PR whose `[Issue-N]` title belongs to another issue — e.g. a story for #1947 ("token logo")
-cited PR #1948 *"[Issue-1941] Update chainlist"*. Across all statuses, **243** stories had a wholly
-spurious PR link and **22** open stories carried a nonsensical *"Closed by PR"*.
-
-- **The fix — trust the PR *title*, not GitHub's link.** A linked PR survives only if its title
-  declares an `[Issue-N]`/`#N` the story owns — the same developer-authored convention the commit
-  tier trusts, and exactly what separates the genuine #3571 *"[Issue-2751]"* from the spurious #1948.
-  a one-off local fetch built the `pr# → title` cache (kept in the session scratchpad, not the repo); the generator filters on it.
-  **1294 → 1051** PR-citing stories; the 243 all-spurious dropped to their next honest tier (CHANGELOG
-  or tracker-label). Wording changed from *"closed by PR … → MERGED"* to *"implemented by PR (title
-  declares the issue)"*: these PRs carry the work, but most issues were closed by hand, not auto-closed
-  by the merge — the old wording overclaimed twice (wrong PR **and** wrong verb).
-- **What did *not* move.** The `commit` tier (1103, `[Issue-N]` in the git subject) was never affected
-  — that signal is reliable. This is [LESSONS §68](LESSONS.md) turned on our own generator: a linked
-  PR is a *claim* the PR did this issue's work, and a claim gets verified or dropped, never trusted
-  because an API returned it.
-- **The `assignee` line held; the "`version_shipped` unrecoverable" line did not.** Deriving an
-  assignee from the (now-distrusted) PR author was tried and reverted — honest-empty over
-  plausible-but-false. But the claim that the 1197 empty `version_shipped` fields were *unrecoverable*
-  was itself an overclaim, corrected below: the CHANGELOG is not the only proof of a release.
-
-**Follow-up — `version_shipped` WAS recoverable: the commit's first release tag (2026-07-15).**
-The recheck declared the 1197 empty `version_shipped` fields unrecoverable because no `(Koni)`
-CHANGELOG line named the issue. That overlooked a second, *stronger* source: for a done story with a
-resolvable `[Issue-N]` commit, the first `v<release>` tag that **contains** that commit is the release
-it shipped in — exactly GitHub's *"shipped in v1.0.2"* chip, and git-provable (the tag contains the
-commit ⇒ `git merge-base --is-ancestor` passes by construction). Issue #1240 exposed it: closed, a
-merged `[Issue-1240]` PR, tagged **v1.0.2** on GitHub — yet our field was blank because the CHANGELOG
-never listed it. `firstReleaseTag()` now fills `version_shipped` from that tag when the CHANGELOG has
-none (CHANGELOG still wins when present; betas and colliding pre-fork tags excluded). **367 done
-stories gained a git-provable version (1011 → 1378 carry a release)**, and each one's AC-1 check became
-a real `git merge-base --is-ancestor <sha> v<ver>` instead of *"commit present in git."* The lesson
-([§70](LESSONS.md)): *unrecoverable* is a claim too — do not assert it from one source without checking
-whether git already holds the answer.
-
-**Third source — "resolved in #N": the work was done under another issue.** A remaining slice of the
-tracker-only stories are closed COMPLETED but carry *no* commit and *no* CHANGELOG line because the fix
-landed under a **different** issue — the closing comment says *"Resolved in #N"*, *"Fixed by #N"*,
-*"Done in #N"* (or Vietnamese *"gộp vào #N"*). #3390 *"Recheck and support Ledger for Avail"* is the
-case: closed, no assignee, no commit — its comment says *"Done in #2982"*, and #2982 shipped in **v1.2.22**.
-a one-off local fetch (kept in the session scratchpad, not the repo) reads the comments and extracts that pointer — **tightly**:
-the verb must be immediately followed by a connective and the number (*"resolved in #N"*, not *"related
-issue #N"* or *"resolve the bug on #N"*), which cut a loose first pass of 64 down to **26** genuine
-links (the same precision-over-recall discipline [§69](LESSONS.md) forced on the PR links). The
-generator inherits the target's release, recorded as **`shipped via #N`** with a `merge-base` check
-against *that* issue's commit — never dressed up as this issue's own work. **26 more done stories gained
-a version (1378 → 1404).** The 804 still empty genuinely have no code trail — no commit, no changelog
-line, no "resolved in #N" pointer. The same pointer also fills the **assignee**: 8 of these 26 had none
-of their own, so they inherit #N's — whoever did the work there did this. #3390 → **S2kael**, who owns
-#2982. (Contrast the reverted PR-author guess: that rested on a signal already proven unreliable; this
-rests on a tightly-verified pointer to where the work demonstrably happened.)
-
-**Follow-up — the "implementing PR" tier audited, three more convention gaps (2026-07-16).** The 11
-done stories left on the PR tier — a PR whose title declares the issue, but no commit — were checked
-one by one against git. **Three were recoverable**, each a fresh variant of the same "dev-authored link
-the regex didn't match" gap: **#867** (US-32.47) shipped on a **misspelled branch** — *"Merge pull
-request #876 from …/koni/dev/**isue**-867"* (no second `s`), which the PR-branch scan skipped; **#2054**
-(US-32.140) tagged its commits *"[Webapp - issue 2054]"* — the issue number is there but the bracket
-does not start with `Issue`, so the subject regex missed it; **#1197** (US-28.54) wrote no tag at all,
-recoverable only because its branch `koni/dev/issue-1197` was **integrated by a plain `Merge branch …`,
-not a `Merge pull request #P`** — the merge form the PR-branch scan keyed on. All three verify by
-`merge-base --is-ancestor` against the release (0.7.4; and 1.1.36 / 1.0.2 recovered by `firstReleaseTag`,
-which the two also lacked), so they leave the PR tier for the commit+release tier (**11 → 8**;
-commit-bearing done **1448 → 1451**, git-provable version **1504 → 1506**). **The remaining eight stay
-honestly commit-less**, and the audit named why each: **four are bundle PRs** — the PR title declares
-this issue but every commit *and* the branch are tagged for a **sibling** (#3054's PR #3317 is branch
-`issue-3148`, all three commits `[Issue-3148]`; likewise #3809→`3788`, #763→bundle `717/736/759`,
-#1241→bundle `1242/1247`). Attaching a sibling's commit is the **bundle-inference we already reject**:
-the developer tagged that code for the other issue, and *which* commit fixed *this* one is a guess, not
-a fact ([D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true)).
-**One is a release-bump squash** — #1249's "PR" #1252 is the commit *"0.46.1 (#1252)"*, which delivered
-nothing (D106). **Three (#4692, #2688, #4593) have no local git trace at all** — branch deleted, no
-tagged commit. `assignee` was **left empty on #2054** rather than guessed: its commits are Nam Phạm's,
-but the board's tracker-owner (the authoritative assignee) maps a committer to many different owners, so
-git author ≠ assignee — honest-empty over a plausible-but-false login ([§69](LESSONS.md)).
-
-**Follow-up — the tracker-only tier hid work that shipped via a closing PR (2026-07-16).** #1781 (*"'All
-Accounts' not showing first, Firefox"*) sat on the tracker-only tier — *"no commit, PR, or changelog line
-links code to this issue"* — yet it **had** shipped: GitHub records it closed by PR #2320, whose single
-commit `e9f54d6a67` (*"Sort the Current account on top in the Account selector"*, titled `[Issue-2318]`)
-is the same account-selector-ordering fix #1781 reports. It fell to tracker-only because the §69 PR-title
-pass — correctly refusing PRs whose title declares a *different* issue — **conflated two things it dropped
-together**: genuinely wrong links (the 41%) and genuine *same-area sibling bundles* where the dev tagged
-the lead issue. So the 614 tracker-only stories were re-audited against git. Only **37 had any closing-PR
-at all** (the tier is mostly right); **25 (issue, PR) pairs were version-recoverable** (the PR's merge is
-in local git). Each was judged by comparing the tracker title to the PR title, and **13 high-confidence
-ones recovered** — the PR title either matches this issue's title near-verbatim (#363 *"Update Bifrost
-Polkadot Parachain"*, #2782 *"Unable to scroll list account"*), is self-referential (#135 *is* *"Refactor
-code for PR #133"*), or **lists this issue in a multi-issue tag a single-number scan missed** (#526
-`[Issue 411 + 526]`; #1244/#1246 `[Issue 1232,1233,1236,1246,1244]`; #2295 `[Issue-2116, 2295]`). **Two
-gained a commit** — #1244/#1246 share the commit `5d29e31bf0`, whose subject names them both — and **11
-gained a version only**, recorded as *shipped via PR #N* with a `merge-base` check against the PR's merge,
-the commit left empty because it is tagged for the sibling (the same discipline as the *resolved in #N*
-tier: inherit the release where the work demonstrably landed, never claim which commit fixed *this* one).
-Tracker-only **615 → 602**; commit-bearing done **1451 → 1453**; version-bearing **1506 → 1519**. The
-remaining ~10 recoverable pairs were **held back**, not recovered: their PR is a generic *"Update
-chainlist"* / MV3 / *"fix some minor bugs"* whose link to the specific issue is exactly the same-area
-judgment §69 warns can be 41% wrong — a provable *version* is worthless if the PR did not actually fix
-this issue, so those stay tracker-only until verified rather than dressed up.
-
-**Citations**: [D97](#d97-what-a-docs-epic-may-change--and-the-two-branch-done-gate); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-check-ids.mjs` (the only tool kept in the repo — the generator, coverage, and fetch helpers are one-off setup scaffolding, kept in the session scratchpad, not the repo)
+**Citations**: [D97](#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done); [D104](#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention); [D106](#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true); [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim); [LESSONS §68](LESSONS.md); `scripts/koni-docs-check-ids.mjs` (the only tool kept in the repo — the generator, coverage, and fetch helpers are one-off setup scaffolding, kept in the session scratchpad, not the repo)
 
 ---
 
-### D109. The requirement column has five meanings
+### D109. The requirement column has five meanings — write the legend once, not once per epic
 
-**Context**: [EPIC-9](sprints/epics/EPIC-9.md)'s *US ↔ entity / subsystem matrix* had four cells
-a reader could not decode. [US-9.10](sprints/stories/US-9.10-nft-display-and-transfer-hardening.md)
-showed `—` while its own frontmatter carried `prd_ref: [FR-85, FR-89, FR-92]`; US-9.19/US-9.20
-showed **`AD-24`** in a column headed `FR` — an architecture id in a requirement column, which
-[rules.md](../.agents/skills/koni-docs/references/rules.md) ("one namespace per field") forbids in
-`prd_ref` and which no reader can distinguish from a real requirement; and
-[US-9.13](sprints/stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md) showed `NFR-21`, which is
-legal ([frontmatter-spec §3.1](../.agents/skills/koni-docs/references/frontmatter-spec.md):
-`prd_ref` accepts `FR-` and `NFR-`) but sat under a header promising only `FR`.
+**Context**: [EPIC-9](sprints/epics/EPIC-9.md)'s *US ↔ entity matrix* had four cells a reader could
+not decode. [US-9.10](sprints/stories/US-9.10-nft-display-and-transfer-hardening.md) showed `—` while
+its own frontmatter carried `prd_ref: [FR-85, FR-89, FR-92]`; US-9.19/US-9.20 showed **`AD-24`** in a
+column headed `FR` — an architecture id in a requirement column; US-9.13 showed `NFR-21`, legal under
+[D93](#d93-prd_ref-holds-fr-n-or-nfr-n--the-project-is-requirement-centric-not-fr-centric) but sitting
+under a header promising only `FR`. No story's `prd_ref` was wrong — **the table was under-reporting
+what the frontmatter already said.**
 
-Writing a paragraph in EPIC-9 explaining all this would fix EPIC-9 and leave the same paragraph to
-be re-written for **41 epics** — and re-written *differently* each time, which is how a convention
-stops being one. The same gap already exists elsewhere: [EPIC-20](sprints/epics/EPIC-20.md)'s matrix
-shows `—` for US-20.2 / US-20.5 / US-20.6, all of which carry `NFR-` refs in frontmatter.
+**Decision**: the header is `FR / NFR` and the cell takes one of five forms, defined **once** in
+[AGENTS.md §7 rule 8](../AGENTS.md); each epic matrix carries a one-line pointer and restates nothing.
+Writing the legend into EPIC-9 would have left it to be re-written — differently — for 41 epics, which
+is how a convention stops being one. The distinction that earns the rule: `— (AD-N)` and `—` look
+alike and say opposite things, and collapsing them makes an empty cell read as *"nothing to see"* when
+it is a claim about coverage.
 
-**Decision — the notation is defined here, and every epic links to it.** The header is
-**`FR / NFR`**, and the cell reads:
+**Why the rule is in AGENTS.md and not here**: it is a notation convention, and §7 is where conventions
+that must survive a skill reinstall live — the koni-docs spec is vendored from `Koniverse/Koni-Skills`
+and is overwritten on install ([D102](#d102-do-not-file-the-koni-docs-bugs-upstream--carry-the-divergence-and-say-so-revision-of-d99)).
+[D93](#d93-prd_ref-holds-fr-n-or-nfr-n--the-project-is-requirement-centric-not-fr-centric)'s rule moved
+there in the same pass; both entries keep their reasoning and cede authority to §7.
 
-| Cell | Means |
-| --- | --- |
-| `FR-N` | The story **owns** that requirement — it is the FR's single owner in the epic's FR Coverage table. |
-| `FR-N (defends)` | The story ships no new requirement; it **hardens** FRs owned elsewhere. It carries them in its own `prd_ref` (they are what its ACs protect) but is *not* an owner in FR Coverage. Established practice, not a new rule — `US-4.21`, `US-4.22`, `US-7.7`, `US-13.11` already do this. |
-| `NFR-N` | The story materializes a **non-functional** PRD row. Legal in `prd_ref`; a *feature-local* NFR clause stays in its own epic — [PRD](PRD.md)'s NFR coverage table is EPIC-20's and says so ("feature-local perf stays in each epic's hardening story"). |
-| `— (AD-N)` | **No PRD requirement at all** — the story materializes an *architecture decision*. AD ids never enter `prd_ref`; they live in `arch_ref` and the epic's AD Coverage table. The parenthesis is navigation, not a requirement claim. |
-| `—` | **Genuinely no requirement yet** — future scope the PRD has not specified. When it is scoped it earns an FR and the cell fills. |
+**Impact**: EPIC-9 corrected. **Not yet applied to the other 20 epics** — they still carry a bare
+`| FR |` matrix, including [EPIC-20](sprints/epics/EPIC-20.md), whose US-20.2 / US-20.5 / US-20.6 show
+`—` despite carrying `NFR-` refs in frontmatter. That is open work, not a shipped state.
 
-An epic's matrix carries **one line** pointing here. The distinction that matters is the last two:
-`— (AD-N)` and `—` look alike but say opposite things — *"this is architecture, deliberately not a
-requirement"* versus *"this is unspecified"*. Collapsing them, as the bare `—` did, is the same class
-of error as [D107](#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim):
-an empty cell reads as *"nothing to see"* when it is in fact a claim about coverage.
+**Boundary ([rule 3](../AGENTS.md))**: notation only. No story's `prd_ref` changed.
 
-**Boundary ([rule 3](../AGENTS.md))**: notation only. No story's `prd_ref` changed — the frontmatter
-was already right in every case; the table was under-reporting it.
-
-**Citations**: [frontmatter-spec §3.1](../.agents/skills/koni-docs/references/frontmatter-spec.md);
-[rules.md](../.agents/skills/koni-docs/references/rules.md) §"one namespace per field";
-[templates/epic.md](../.agents/skills/koni-docs/references/templates/epic.md) §9
+**Date**: 2026-07-20
+**Version**: docs-only
+**Citations**: [AGENTS.md §7 rule 8](../AGENTS.md); [D93](#d93-prd_ref-holds-fr-n-or-nfr-n--the-project-is-requirement-centric-not-fr-centric); frontmatter-spec §3.1
 
 ---

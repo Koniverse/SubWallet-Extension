@@ -299,6 +299,27 @@ no ID** — an ID is earned by a file, not by an intention. The check is
 name the IDs that were true *then* — and it counts a **tombstoned** row (`~~NFR-11~~`) as
 existing, because a retired ID is retired, not absent (rule 1).
 
+**8. One namespace per field, and an empty cell is a claim.** `prd_ref` holds `FR-N` **or**
+`NFR-N` — capability stories cite the FR they materialize, hardening and performance stories
+cite the **NFR** they defend; forcing a hardening story onto a capability FR is how false
+claims get in ([D93](docs/CONTEXT.md)). `arch_ref` holds `AD-N` only; `depends_on` holds
+`US-N.N` only. An epic's **US ↔ entity matrix** therefore heads its last column `FR / NFR`,
+and every cell says one of exactly five things:
+
+| Cell | Means |
+| --- | --- |
+| `FR-N` | The story **owns** that requirement — it is the FR's single owner in the epic's FR Coverage table. |
+| `FR-N (defends)` | Ships no new requirement; it **hardens** FRs owned elsewhere, and carries them in its own `prd_ref` because they are what its ACs protect. Not an owner in FR Coverage. Established practice — `US-4.21`, `US-4.22`, `US-7.7`, `US-13.11`. |
+| `NFR-N` | Materializes a **non-functional** PRD row. A *feature-local* NFR clause stays in its own epic — the PRD's NFR coverage table belongs to EPIC-20 and says so (*"feature-local perf stays in each epic's hardening story"*). |
+| `— (AD-N)` | **No PRD requirement at all** — the story materializes an *architecture decision*. AD ids never enter `prd_ref`; they live in `arch_ref` and the epic's AD Coverage table. The parenthesis is navigation, not a requirement claim. |
+| `—` | **Genuinely no requirement yet** — future scope the PRD has not specified. When it is scoped it earns an FR and the cell fills. |
+
+The last two are the point. `— (AD-N)` and `—` look alike and say opposite things —
+*"deliberately not a requirement"* versus *"unspecified"*. A bare `—` for both reads as
+*"nothing to see"* when it is in fact a claim about coverage, which is rule 4's corollary
+one column over. An epic's matrix carries **one line** pointing here; it does not restate
+this table ([D109](docs/CONTEXT.md)).
+
 ### The two change logs
 
 `docs/CHANGELOG.md` is the **canonical** release history, in koni-docs format.

@@ -161,7 +161,7 @@ Each NFT capability is **one story** — it carries its requirement (where it ma
 | [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) | Client-side `NftService` + Services SDK migration | — (AD-24) |
 | [US-9.21](../stories/US-9.21-nft-portfolio-management.md) | NFT portfolio management (curation / organization) | — |
 
-> Cell notation: [CONTEXT D109](../../CONTEXT.md#d109-the-requirement-column-has-five-meanings--write-the-legend-once-not-once-per-epic).
+> Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
 ### End-to-end happy path
 
