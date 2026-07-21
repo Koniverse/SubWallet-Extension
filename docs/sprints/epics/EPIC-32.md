@@ -36,7 +36,7 @@ keeping the unit of status honest).
 
 ## Scope
 
-**371 stories** — 318 done (shipped), 2 in flight (ready / in-progress /
+**372 stories** — 318 done (shipped), 3 in flight (ready / in-progress /
 review, from the Projects board), 27 backlog (open, not yet started), 24 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
@@ -421,6 +421,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-32.369](../stories/US-32.369-remove-the-crowdloans-tab.md) | ✅ done | Remove the Crowdloans tab | [#4920](https://github.com/Koniverse/SubWallet-Extension/issues/4920) | frenkie-ng | 1.3.73 |
 | [US-32.370](../stories/US-32.370-fix-bug-get-earning-position-parachain.md) | ✅ done | Fix bug get Earning position parachain | [#4950](https://github.com/Koniverse/SubWallet-Extension/issues/4950) | tunghp2002 | 1.3.73 |
 | [US-32.371](../stories/US-32.371-extension-able-to-scroll-up-own-in-account-info-in-tao.md) | 📋 backlog | [ Extension ]  Able to scroll up /đown in account info in TAO direct nomination earnings | [#4974](https://github.com/Koniverse/SubWallet-Extension/issues/4974) | — | — |
+| [US-32.372](../stories/US-32.372-add-recommend-validator-for-native-and-subnet-staking.md) | 🟡 ready | Add recommend validator for native and subnet staking | [#5024](https://github.com/Koniverse/SubWallet-Extension/issues/5024) | tunghp2002 | — |
 
 ## Acceptance criteria
 

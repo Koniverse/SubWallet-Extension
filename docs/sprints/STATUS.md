@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-20 11:48:20 UTC
-> Total stories: 2779
+> Last generated: 2026-07-21 02:38:35 UTC
+> Total stories: 2780
 
 ## 📋 Backlog (292)
 
@@ -301,7 +301,7 @@
 | US-9.10 | NFT display & UI hardening | EPIC-9 | P2 | 5 | — | — |
 | US-9.21 | NFT portfolio management | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (15)
+## 🟢 Ready (16)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -313,6 +313,7 @@
 | US-30.56 | Integrate with AirGap Vault for QR signer | EPIC-30 | P3 | 1 | sprint-2026-W28 | PDTnhah |
 | US-31.25 | Extension - Show incorrect fee when swap | EPIC-31 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 | US-31.79 | Extension - Update content in-app for Swap (Round 2) | EPIC-31 | P3 | 1 | sprint-2026-W28 | Quangdm-cdm |
+| US-32.372 | Add recommend validator for native and subnet staking | EPIC-32 | P3 | 1 | sprint-2026-W30 | tunghp2002 |
 | US-39.13 | Extension - Check bug spam notification | EPIC-39 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.248 | Clean up i18n data and re-apply i18n | EPIC-41 | P3 | 1 | sprint-2026-W28 | frenkie-ng |
 | US-41.288 | Check for issues related to middleware services | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
@@ -2822,7 +2823,7 @@ _No stories_
 ## Summary
 
 - 📋 **Backlog**: 292
-- 🟢 **Ready**: 15
+- 🟢 **Ready**: 16
 - 🟡 **In Progress**: 29
 - 👀 **Review**: 12
 - ✅ **Done**: 2225
