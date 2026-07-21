@@ -39,6 +39,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.3](../stories/US-42.3-qc-polkadot-hub-evm-chain.md) | Polkadot Hub EVM chain works correctly (#701) | done |
 | [US-42.4](../stories/US-42.4-qc-tusdt-on-bittensor.md) | TUSDT token on Bittensor shows correctly (#699) | done |
 | [US-42.5](../stories/US-42.5-qc-myth-xcm-pah-hydration.md) | MYTH XCM between PAH and Hydration retest (#301) | done |
+| [US-42.6](../stories/US-42.6-qc-release-extension-v1-3-84.md) | Release extension v1.3.84 — dev, master, draft, production gate | ready |
 
 More rows get added here as testing starts.
 
