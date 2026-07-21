@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-21 02:38:35 UTC
-> Total stories: 2780
+> Last generated: 2026-07-21 05:21:01 UTC
+> Total stories: 2782
 
 ## 📋 Backlog (292)
 
@@ -301,7 +301,7 @@
 | US-9.10 | NFT display & UI hardening | EPIC-9 | P2 | 5 | — | — |
 | US-9.21 | NFT portfolio management | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (16)
+## 🟢 Ready (17)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -313,16 +313,17 @@
 | US-30.56 | Integrate with AirGap Vault for QR signer | EPIC-30 | P3 | 1 | sprint-2026-W28 | PDTnhah |
 | US-31.25 | Extension - Show incorrect fee when swap | EPIC-31 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 | US-31.79 | Extension - Update content in-app for Swap (Round 2) | EPIC-31 | P3 | 1 | sprint-2026-W28 | Quangdm-cdm |
-| US-32.372 | Add recommend validator for native and subnet staking | EPIC-32 | P3 | 1 | sprint-2026-W30 | tunghp2002 |
 | US-39.13 | Extension - Check bug spam notification | EPIC-39 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.248 | Clean up i18n data and re-apply i18n | EPIC-41 | P3 | 1 | sprint-2026-W28 | frenkie-ng |
 | US-41.288 | Check for issues related to middleware services | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.418 | Support DeDot | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.423 | Implement Light-client related issues | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
 | US-41.429 | Other improvements | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
+| US-42.6 | QC — Release SubWallet Extension v1.3.84 | EPIC-42 | P2 | 8 | sprint-2026-W30 | MaiThuongNinni |
+| US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (29)
+## 🟡 In Progress (30)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -340,6 +341,7 @@
 | US-31.102 | Extension - Support Hollar (Hydration) token in list token to paid fee | EPIC-31 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-31.105 | Improve the algorithm to support more swap path | EPIC-31 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-32.260 | Recheck and update cancel unstake logic for amplitude, krest native staking | EPIC-32 | P3 | 1 | sprint-2026-W28 | bluezdot |
+| US-32.372 | Add recommend validator for native and subnet staking | EPIC-32 | P3 | 1 | sprint-2026-W30 | tunghp2002 |
 | US-33.33 | Add support for USDT on more chains and update param for XCM on Astar | EPIC-33 | P3 | 1 | sprint-2026-W28 | PDTnhah |
 | US-33.85 | Review and add more XCM Channels | EPIC-33 | P3 | 1 | sprint-2026-W28 | saltict |
 | US-33.86 | Support bridge without XCM | EPIC-33 | P3 | 1 | sprint-2026-W28 | — |
@@ -2823,11 +2825,11 @@ _No stories_
 ## Summary
 
 - 📋 **Backlog**: 292
-- 🟢 **Ready**: 16
-- 🟡 **In Progress**: 29
+- 🟢 **Ready**: 17
+- 🟡 **In Progress**: 30
 - 👀 **Review**: 12
 - ✅ **Done**: 2225
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 206
 
-⚠️  **WIP limit exceeded**: 29 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 30 stories in-progress (limit: 3).
