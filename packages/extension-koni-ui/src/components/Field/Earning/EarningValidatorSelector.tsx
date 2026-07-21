@@ -105,7 +105,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const isSingleSelect = useMemo(() => _isSingleSelect || !isRelayChain, [_isSingleSelect, isRelayChain]);
   const hasReturn = useMemo(() => items[0]?.expectedReturn !== undefined, [items]);
 
-  const [defaultPoolMap, setDefaultPoolMap] = useState<Record<string, ChainRecommendValidator>>({});
+  const [defaultValidatorMap, setDefaultValidatorMap] = useState<Record<string, ChainRecommendValidator>>({});
 
   const maxPoolMembersValue = useMemo(() => {
     if (poolInfo.type === YieldPoolType.NATIVE_STAKING) { // todo: should also check chain group for pool
@@ -231,7 +231,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [items, sortSelection, sortValidator]);
 
   const validatorResultList = useMemo(() => {
-    const recommendedAddresses = defaultPoolMap[chain]?.preSelectValidators?.split(',') || [];
+    const recommendedAddresses = defaultValidatorMap[chain]?.preSelectValidators?.split(',') || [];
     const recommendedItems = resultList.filter((item) => recommendedAddresses.includes(item.address));
     const otherItems = resultList.filter((item) => !recommendedAddresses.includes(item.address));
 
@@ -246,7 +246,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     }
 
     return [recommendedHeader, ...recommendedItems, { isSectionHeader: true, identity: 'Others' }, ...otherItems];
-  }, [chain, defaultPoolMap, resultList]);
+  }, [chain, defaultValidatorMap, resultList]);
 
   const filterFunction = useMemo<(item: ValidatorDataType) => boolean>(() => {
     return (item) => {
@@ -393,12 +393,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   useEffect(() => {
     fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningPoolRecommendation) => {
-      setDefaultPoolMap(earningPoolRecommendation);
+      setDefaultValidatorMap(earningPoolRecommendation);
     }).catch(console.error);
   }, []);
 
   useEffect(() => {
-    const recommendValidator = defaultPoolMap[chain];
+    const recommendValidator = defaultValidatorMap[chain];
 
     if (recommendValidator) {
       setAutoValidator((old) => {
@@ -418,7 +418,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     } else {
       setAutoValidator('');
     }
-  }, [items, chain, defaultPoolMap]);
+  }, [items, chain, defaultValidatorMap]);
 
   useEffect(() => {
     const _default = nominations?.map((item) => getValidatorKey(item.validatorAddress, item.validatorIdentity)).join(',') || autoValidator || '';
