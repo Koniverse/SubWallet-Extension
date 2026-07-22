@@ -37,7 +37,7 @@ claimed without any of these being mistaken for extension work.
 This is a **consolidated maintenance story**: it groups 3 tracker issues into one boundary,
 replacing the former one-issue-per-story ledger. It materializes **no FR**, and it never will —
 an FR describes what the *wallet* does, and none of these is in the wallet. Full traceability is
-the table below and the [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md).
+the table below and the [consolidation note](../../notes/2026-07-22.md#b-epic-22-maintenance--build--platform-merged-into-epic-1).
 
 **Why these are grouped rather than distributed.** Each is real work the team tracked here, and
 each fails the test that would place it in any other story: there is no code in `packages/` to
@@ -108,4 +108,4 @@ inventing a release.
 
 ## Cross-references
 
-- [Epic EPIC-1](../epics/EPIC-1.md) · [US-1.5](US-1.5-build-ci-and-cross-browser-packaging-hardening.md) · [US-1.9](US-1.9-out-of-repo-tooling-not-yet-started.md) · [D66](../../CONTEXT.md#d66-aggregate-multi-chain-data-through-the-subwallet-services-sdk-backend-rather-than-computing-it-on-device) · [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md)
+- [Epic EPIC-1](../epics/EPIC-1.md) · [US-1.5](US-1.5-build-ci-and-cross-browser-packaging-hardening.md) · [US-1.9](US-1.9-out-of-repo-tooling-not-yet-started.md) · [D66](../../CONTEXT.md#d66-aggregate-multi-chain-data-through-the-subwallet-services-sdk-backend-rather-than-computing-it-on-device) · [consolidation note](../../notes/2026-07-22.md#b-epic-22-maintenance--build--platform-merged-into-epic-1)

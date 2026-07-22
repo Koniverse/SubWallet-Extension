@@ -119,7 +119,7 @@ and any implementation caveats during version reconciliation._
 ## Incremental work, fixes & chores
 
 **None from the security ledger — but 23 candidates are waiting.** No issue in the former
-security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21-epic-5-consolidation.md)).
+security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21.md)).
 That ledger held only 13 issues and they were almost all phishing.
 
 > **This capability's history is not empty — it is not yet folded.** A title scan of the **18

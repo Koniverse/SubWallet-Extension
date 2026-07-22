@@ -36,7 +36,7 @@ same work twice ([AGENTS.md](../../../AGENTS.md) rule 10). Re-derive with
 
 > Moved out of US-17.1's incremental-work table on 2026-07-22, where it sat as a row beside #4780,
 > its own child. All four children shipped in **1.3.72**; the umbrella has no release of its own.
-> [Umbrella sweep](../../notes/2026-07-22-umbrella-sweep.md).
+> [Umbrella sweep](../../notes/2026-07-22.md#d-umbrella-sweep-across-the-folded-stories).
 
 ## Overview
 
@@ -126,7 +126,7 @@ The proxy-vs-multisig boundary is drawn explicitly in Out of scope below.
 > **4** into [US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md),
 > #4947 became [US-17.3](../stories/US-17.3-proxy-stake-allocation-in-earning-history.md), and one
 > was **relocated out of the area** — #4610 proxies the mempool.space HTTP API, not a proxy
-> account. Forwarding map: [consolidation note](../../notes/2026-07-22-epic-17-consolidation.md).
+> account. Forwarding map: [consolidation note](../../notes/2026-07-22.md#a-epic-37-maintenance--proxy-merged-into-epic-17).
 
 ## Cross-cutting invariants
 

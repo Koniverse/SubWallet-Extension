@@ -33,7 +33,7 @@ clear boundary, replacing the former one-issue-per-story ledger. It materializes
 EPIC-5 requirement set is [US-5.1](US-5.1-phishing-site-and-address-protection.md)…[US-5.9](US-5.9-anti-scam-address-screening.md)
 — and the PRD has not scoped this capability, so it earns an FR only when it is specified. Full
 issue→story traceability is the table below and the
-[consolidation note](../../notes/2026-07-21-epic-5-consolidation.md). **Not yet delivered** —
+[consolidation note](../../notes/2026-07-21.md). **Not yet delivered** —
 `assignee` / `commit` / `sprint` / `version_shipped` stay empty until it ships; `points: 1` marks
 it as one backfill record.
 
@@ -53,7 +53,7 @@ is today the only such gate, and it is single-factor.
 
 Chronological by shipped release; `—` = not shipped. The former one-issue-per-story id (retired,
 never reused — [AGENTS.md](../../../AGENTS.md) rule 1) is listed in the
-[consolidation note](../../notes/2026-07-21-epic-5-consolidation.md).
+[consolidation note](../../notes/2026-07-21.md).
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -65,4 +65,4 @@ never reused — [AGENTS.md](../../../AGENTS.md) rule 1) is listed in the
 
 ## Cross-references
 
-- [Epic EPIC-5](../epics/EPIC-5.md) · [US-5.2](US-5.2-master-password-and-strength-policy.md) · [US-5.8](US-5.8-blockaid-transaction-risk-scanning.md) · [US-5.9](US-5.9-anti-scam-address-screening.md) · [consolidation note](../../notes/2026-07-21-epic-5-consolidation.md)
+- [Epic EPIC-5](../epics/EPIC-5.md) · [US-5.2](US-5.2-master-password-and-strength-policy.md) · [US-5.8](US-5.8-blockaid-transaction-risk-scanning.md) · [US-5.9](US-5.9-anti-scam-address-screening.md) · [consolidation note](../../notes/2026-07-21.md)

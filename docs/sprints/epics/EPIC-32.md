@@ -429,7 +429,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 > **cross-epic umbrella** over six shipped sub-issues — three here, two in [EPIC-24](EPIC-24.md),
 > one in [EPIC-34](EPIC-34.md) — so this ledger owns it by plurality and the story says so. The
 > six children were repointed to it in the same pass; the correction is recorded in the
-> [EPIC-1 consolidation note](../../notes/2026-07-22-epic-1-consolidation.md).
+> [EPIC-1 consolidation note](../../notes/2026-07-22.md#b-epic-22-maintenance--build--platform-merged-into-epic-1).
 
 ## Acceptance criteria
 

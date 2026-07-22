@@ -60,4 +60,4 @@ story over.
 
 ## Cross-references
 
-- [Epic EPIC-1](../epics/EPIC-1.md) · [US-1.6](US-1.6-platform-operations-and-out-of-repo-tooling.md) · [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md)
+- [Epic EPIC-1](../epics/EPIC-1.md) · [US-1.6](US-1.6-platform-operations-and-out-of-repo-tooling.md) · [consolidation note](../../notes/2026-07-22.md#b-epic-22-maintenance--build--platform-merged-into-epic-1)

@@ -150,7 +150,7 @@ _Hardening story — no FR; consolidates NFT display/transfer-correctness issues
 
 ## Incremental work, fixes & chores
 
-Beyond the requirement above, **24 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+Beyond the requirement above, **24 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17.md).
 
 > **All 24 are settled.** The one open row — WebApp address display/validation round 2
 > ([#2858](https://github.com/Koniverse/SubWallet-Extension/issues/2858)) — moved to

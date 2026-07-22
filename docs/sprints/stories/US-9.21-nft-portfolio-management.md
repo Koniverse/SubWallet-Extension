@@ -28,11 +28,11 @@ Add NFT portfolio-management (#250) — organizing and curating the NFTs a user 
 
 NFT portfolio management. Open, not started.
 
-This is a **consolidated maintenance story**: it groups 1 related tracker issue(s) into one capability with a clear boundary, replacing the former one-issue-per-story ledger. It materializes **no FR** (the NFT requirement set is [US-9.1](US-9.1-substrate-nft-display.md)…[US-9.10](US-9.10-nft-display-and-transfer-hardening.md)); it records incremental work on this capability. Full issue→story traceability is the table below and [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md). **This capability is not yet delivered** — `assignee` names the current owner where the tracker records one; `commit` / `sprint` / `version_shipped` stay empty until it ships. `points: 1` marks it as one backfill record.
+This is a **consolidated maintenance story**: it groups 1 related tracker issue(s) into one capability with a clear boundary, replacing the former one-issue-per-story ledger. It materializes **no FR** (the NFT requirement set is [US-9.1](US-9.1-substrate-nft-display.md)…[US-9.10](US-9.10-nft-display-and-transfer-hardening.md)); it records incremental work on this capability. Full issue→story traceability is the table below and [the 2026-07-17 note](../../notes/2026-07-17.md). **This capability is not yet delivered** — `assignee` names the current owner where the tracker records one; `commit` / `sprint` / `version_shipped` stay empty until it ships. `points: 1` marks it as one backfill record.
 
 ## Incremental work, fixes & chores
 
-Chronological by shipped release (—); `—` = closed with no CHANGELOG line. The former one-issue-per-story ids (retired, never reused — [AGENTS.md](../../../AGENTS.md) rule 1) are listed in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+Chronological by shipped release (—); `—` = closed with no CHANGELOG line. The former one-issue-per-story ids (retired, never reused — [AGENTS.md](../../../AGENTS.md) rule 1) are listed in the [consolidation note](../../notes/2026-07-17.md).
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -44,4 +44,4 @@ Chronological by shipped release (—); `—` = closed with no CHANGELOG line. T
 
 ## Cross-references
 
-- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.1](US-9.1-substrate-nft-display.md) · [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md)
+- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.1](US-9.1-substrate-nft-display.md) · [consolidation note](../../notes/2026-07-17.md)

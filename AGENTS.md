@@ -163,12 +163,12 @@ Current docs at the repo root:
 Canonical `docs/` content per koni-docs spec (BRIEF, PRD, ARCHITECTURE,
 CONTEXT, LESSONS, SETUP, sprints/, CHANGELOG) is **authored**.
 
-### How the docs are allowed to change — ten standing rules
+### How the docs are allowed to change — eleven standing rules
 
 These are not EPIC-21's rules; they are the project's. Each was paid for by a defect
 that reached the owner before it reached a check. Full reasoning in `docs/CONTEXT.md`.
 
-**These ten live here on purpose.** The koni-docs spec is vendored from
+**These eleven live here on purpose.** The koni-docs spec is vendored from
 `Koniverse/Koni-Skills` and the CLI ships from npm — the next skill install or
 `npm i -g` overwrites both. `AGENTS.md` is the only copy nothing overwrites, and
 **it is the authority** where it and the tool disagree.
@@ -377,6 +377,18 @@ pair is the check, and it is now in US-1.6's verification command.
 **The board's own tree is evidence, not truth.** `#43` (2022, hardware wallet) is listed under a
 2025 multisig issue and `#145` (a balance bug) under a nested-NFT UI task. Record the error where
 someone will find it; do not model it.
+
+**11. One note per day, named by the date.** `docs/notes/<YYYY-MM-DD>.md` — nothing after the
+date. A day's passes become lettered sections in that one file, with an index table at the top.
+2026-07-22 produced **four** separate `<date>-<slug>.md` notes before this rule existed, and a
+directory listing stopped telling you what happened and started telling you how many times someone
+wrote something down.
+
+A dated note is an **archive**: read-only history, the one place a retired ID may still be named,
+and `check-ids` skips it for exactly that reason. So the filename is a promise — `2026-07-22.md`
+says *this is everything from that day*. A slug on the end quietly breaks it, because the next pass
+gets its own slug instead of a section. Renaming one later costs a link rewrite across the whole
+surface (49 files, that time).
 
 ### The two change logs
 

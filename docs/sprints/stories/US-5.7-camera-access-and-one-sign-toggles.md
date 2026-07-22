@@ -158,7 +158,7 @@ heuristic had filed it under *Firefox* rather than under the capability it broke
 > the camera-access toggle this story owns (FR-59) failing on one browser. Filing it under build
 > tooling is the same mis-routing as [#4610](https://github.com/Koniverse/SubWallet-Extension/issues/4610)
 > ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)'s
-> title heuristic). Forwarding map: [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md).
+> title heuristic). Forwarding map: [consolidation note](../../notes/2026-07-22.md#b-epic-22-maintenance--build--platform-merged-into-epic-1).
 
 > **6 further candidates sit in ledgers not yet folded** — titles matching "camera" / "one sign"
 > across the Account, Transactions and dApp ledgers. Upper bound, not a count.

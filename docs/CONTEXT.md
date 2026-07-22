@@ -1986,11 +1986,11 @@ carry an *(as of …)* marker and the current value.
 
 **Rationale**: The blast radius was at its minimum (docs-only; no source, CI script or automation references an FR/US ID) and it only grows once the tree ships. The alternative was two permanent holes in a 159-row table.
 
-**Impact**: Anything written before 2026-07-13 (commit messages, review comments, chat) uses the old numbering. The full old→new mapping is in [2026-07-13-id-renumber.md](notes/2026-07-13-id-renumber.md).
+**Impact**: Anything written before 2026-07-13 (commit messages, review comments, chat) uses the old numbering. The full old→new mapping is in [2026-07-13.md](notes/2026-07-13.md).
 
 **Date**: 2026-07-13
 **Version**: docs-only
-**Citations**: [notes/2026-07-13-id-renumber.md](notes/2026-07-13-id-renumber.md)
+**Citations**: [notes/2026-07-13.md](notes/2026-07-13.md)
 
 ---
 

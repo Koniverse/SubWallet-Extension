@@ -59,4 +59,4 @@ this program exists to unwind.
 
 ## Cross-references
 
-- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.10](US-9.10-nft-display-and-transfer-hardening.md) · [US-9.5](US-9.5-nft-transfer-send.md) · [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md)
+- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.10](US-9.10-nft-display-and-transfer-hardening.md) · [US-9.5](US-9.5-nft-transfer-send.md) · [consolidation note](../../notes/2026-07-17.md)

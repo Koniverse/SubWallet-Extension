@@ -145,7 +145,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 > phishing issues into [US-5.1](../stories/US-5.1-phishing-site-and-address-protection.md),
 > 4 audit / secret-hygiene issues into [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md),
 > and #4125 became [US-5.11](../stories/US-5.11-two-factor-authentication-for-outgoing-transfers.md).
-> The forwarding map is the [consolidation note](../../notes/2026-07-21-epic-5-consolidation.md).
+> The forwarding map is the [consolidation note](../../notes/2026-07-21.md).
 
 ## Object map & user-story interactions
 

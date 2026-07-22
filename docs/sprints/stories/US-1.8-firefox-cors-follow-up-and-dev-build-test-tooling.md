@@ -67,4 +67,4 @@ test tooling**. Either may leave for its own story once someone starts it.
 
 ## Cross-references
 
-- [Epic EPIC-1](../epics/EPIC-1.md) · [US-1.5](US-1.5-build-ci-and-cross-browser-packaging-hardening.md) · [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md)
+- [Epic EPIC-1](../epics/EPIC-1.md) · [US-1.5](US-1.5-build-ci-and-cross-browser-packaging-hardening.md) · [consolidation note](../../notes/2026-07-22.md#b-epic-22-maintenance--build--platform-merged-into-epic-1)

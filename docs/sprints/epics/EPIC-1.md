@@ -118,7 +118,7 @@ runtime* translation channel (FR-4).
 > [US-1.6](../stories/US-1.6-platform-operations-and-out-of-repo-tooling.md), and **2 relocated to
 > other epics** — #1938 (camera on Firefox) and #1995 (IPFS on Firefox) were filed under the
 > browser they broke on rather than the capability that broke. Forwarding map:
-> [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md).
+> [consolidation note](../../notes/2026-07-22.md#b-epic-22-maintenance--build--platform-merged-into-epic-1).
 >
 > **US-1.7 / US-1.8 / US-1.9 are the unfinished halves of that fold.** Five of the folded issues
 > were still open, and leaving them beside shipped rows let US-1.1 read `✅ done @ 1.2.7` while

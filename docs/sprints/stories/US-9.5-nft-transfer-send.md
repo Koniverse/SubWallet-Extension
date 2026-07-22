@@ -96,7 +96,7 @@ Commits `c586a78109, b5d6f46647, f30463904d` verified contained in the v0.2.8 an
 
 ## Incremental work, fixes & chores
 
-Beyond the requirement above, **17 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+Beyond the requirement above, **17 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17.md).
 
 > 2 issue(s) below are ⏸ **deprecated** — closed not-planned / superseded, never shipped.
 

@@ -64,4 +64,4 @@ docs to decide by deleting a row.
 
 ## Cross-references
 
-- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.7](US-9.7-bitcoin-ordinals-display.md) · [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md)
+- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.7](US-9.7-bitcoin-ordinals-display.md) · [consolidation note](../../notes/2026-07-17.md)

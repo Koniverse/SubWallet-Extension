@@ -62,4 +62,4 @@ what the recheck must establish; this story does not assume either answer.
 
 ## Cross-references
 
-- [Epic EPIC-1](../epics/EPIC-1.md) · [US-1.1](US-1.1-mv3-service-worker-background.md) · [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md)
+- [Epic EPIC-1](../epics/EPIC-1.md) · [US-1.1](US-1.1-mv3-service-worker-background.md) · [consolidation note](../../notes/2026-07-22.md#b-epic-22-maintenance--build--platform-merged-into-epic-1)

@@ -29,7 +29,7 @@ Stand up the client-side `NftService` and move the EVM and Unique NFT handlers o
 
 ## Scope
 
-**Phase 1 of the client-side `NftService` + SDK migration**, shipped in **1.3.80** (#4884 — `NFTService` plus the EVM and Unique handlers). It materializes **no FR** (the NFT requirement set is [US-9.1](US-9.1-substrate-nft-display.md)…[US-9.10](US-9.10-nft-display-and-transfer-hardening.md)); a migration changes where logic runs, not what the wallet promises. Full issue→story traceability is the table below and [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md). `points: 1` marks it as one backfill record.
+**Phase 1 of the client-side `NftService` + SDK migration**, shipped in **1.3.80** (#4884 — `NFTService` plus the EVM and Unique handlers). It materializes **no FR** (the NFT requirement set is [US-9.1](US-9.1-substrate-nft-display.md)…[US-9.10](US-9.10-nft-display-and-transfer-hardening.md)); a migration changes where logic runs, not what the wallet promises. Full issue→story traceability is the table below and [the 2026-07-17 note](../../notes/2026-07-17.md). `points: 1` marks it as one backfill record.
 
 > **This story asserted the opposite until 2026-07-22.** Its AC-1 read *"This capability is
 > **open** — 1 issue(s) tracked below, not yet started. No release delivers it"* while its own
@@ -41,7 +41,7 @@ Stand up the client-side `NftService` and move the EVM and Unique NFT handlers o
 
 ## Incremental work, fixes & chores
 
-Chronological by shipped release (—); `—` = closed with no CHANGELOG line. The former one-issue-per-story ids (retired, never reused — [AGENTS.md](../../../AGENTS.md) rule 1) are listed in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+Chronological by shipped release (—); `—` = closed with no CHANGELOG line. The former one-issue-per-story ids (retired, never reused — [AGENTS.md](../../../AGENTS.md) rule 1) are listed in the [consolidation note](../../notes/2026-07-17.md).
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -73,4 +73,4 @@ Chronological by shipped release (—); `—` = closed with no CHANGELOG line. T
 
 ## Cross-references
 
-- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.19](US-9.19-nft-service-migration.md) · [US-9.24](US-9.24-client-side-nft-service-full-sdk-migration.md) · [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md)
+- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.19](US-9.19-nft-service-migration.md) · [US-9.24](US-9.24-client-side-nft-service-full-sdk-migration.md) · [consolidation note](../../notes/2026-07-17.md)

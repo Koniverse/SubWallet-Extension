@@ -50,7 +50,7 @@ Phase 1 is shipped and this is the part that is not
 > work. #4883 is an umbrella and belongs to [EPIC-9](../epics/EPIC-9.md)
 > ([AGENTS.md](../../../AGENTS.md) rule 10); the open leaf is **#4885**. That issue was also in the
 > wrong ledger — filed under Network & Token, whose ledger story is retired. Both corrections, and
-> the retired id, are in the [umbrella sweep](../../notes/2026-07-22-umbrella-sweep.md).
+> the retired id, are in the [umbrella sweep](../../notes/2026-07-22.md#d-umbrella-sweep-across-the-folded-stories).
 
 ## Incremental work, fixes & chores
 
@@ -70,4 +70,4 @@ Phase 1 is shipped and this is the part that is not
 
 ## Cross-references
 
-- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md) · [US-9.19](US-9.19-nft-service-migration.md) · [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md) · [umbrella sweep](../../notes/2026-07-22-umbrella-sweep.md)
+- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md) · [US-9.19](US-9.19-nft-service-migration.md) · [consolidation note](../../notes/2026-07-17.md) · [umbrella sweep](../../notes/2026-07-22.md#d-umbrella-sweep-across-the-folded-stories)

@@ -21,8 +21,11 @@ const DOCS = path.join(ROOT, 'docs');
 // IDs that were true then (e.g. the renumber note records the pre-renumber IDs).
 // superpowers/ holds planning artifacts from before the docs program. Both are
 // archives: read-only history, not the live surface. Skipped, and reported.
+// One note per day, named by the date alone (AGENTS.md rule 11); the older
+// `<date>-<slug>.md` form is still matched so a renamed file never silently
+// rejoins the live surface.
 const isArchive = (rel) =>
-  /^docs\/notes\/\d{4}-\d{2}-\d{2}-/.test(rel) || rel.startsWith('docs/superpowers/');
+  /^docs\/notes\/\d{4}-\d{2}-\d{2}(-[a-z0-9-]+)?\.md$/.test(rel) || rel.startsWith('docs/superpowers/');
 
 function walk (dir) {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {

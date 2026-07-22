@@ -26,7 +26,7 @@ server — can move the funds alone.
 > build tasks, screens, fixes — live **inside the stories below**, each as a row in that story's
 > own incremental-work table. The former one-issue-per-story maintenance ledger was dissolved on
 > 2026-07-22; the forwarding map is the
-> [consolidation note](../../notes/2026-07-22-epic-18-consolidation.md).
+> [consolidation note](../../notes/2026-07-22.md#c-epic-38-maintenance--multisig-merged-into-epic-18).
 
 ### Umbrella issues — owned by this epic, not by a story
 
@@ -148,7 +148,7 @@ All **26** multisig issues on the tracker are claimed: 7 umbrellas above, and 19
 the four stories — 7 in US-18.1, 7 in US-18.2, 3 in US-18.3, 2 in US-18.4. Six of them
 (#4839, #4845, #4855, #4872, #4875, #4963) had no story before the 2026-07-22 consolidation; two
 (#4872, #4875) are still `OPEN` on the board although their code is in `v1.3.74`. Both facts are
-evidenced in the [consolidation note](../../notes/2026-07-22-epic-18-consolidation.md).
+evidenced in the [consolidation note](../../notes/2026-07-22.md#c-epic-38-maintenance--multisig-merged-into-epic-18).
 
 ## Cross-cutting invariants
 

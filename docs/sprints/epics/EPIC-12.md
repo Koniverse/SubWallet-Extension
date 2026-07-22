@@ -125,7 +125,7 @@ power, not yield — owned by EPIC-15).
 > are `✅ shipped` (retroactive stories), and
 > FR-123 / FR-124 / FR-125 are `📋 planned` (forward; two FR rows were
 > absorbed/removed 2026-07-10 and the table renumbered gapless — see
-> [2026-07-13-id-renumber](../../notes/2026-07-13-id-renumber.md)). FR-125
+> [the 2026-07-13 note](../../notes/2026-07-13.md)). FR-125
 > (additional-network staking — Enjin / Phala / xx,
 > [US-12.12](../stories/US-12.12-staking-for-additional-networks-enjin-phala-xx.md))
 > is **📋 planned**: Enjin / Phala / xx have no code yet. The shipped Mythos /

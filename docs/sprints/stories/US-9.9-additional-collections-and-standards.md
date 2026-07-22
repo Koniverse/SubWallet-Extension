@@ -102,7 +102,7 @@ _Forward-looking — FR-93 is `📋 planned`. Fill `commit` / `version_shipped` 
 **None from the NFT ledger — but 27 candidates are waiting.** Of the 116 tracker issues in the
 former NFT maintenance ledger, folded into this epic's capabilities on 2026-07-17, **none landed
 here** — the note records this capability's count as **0**
-([consolidation note](../../notes/2026-07-17-epic-9-consolidation.md)).
+([consolidation note](../../notes/2026-07-17.md)).
 
 > **That is a checked absence within one ledger, not an empty history.** A title scan of the **18
 > ledgers still separate** finds **27 issues** mentioning NFT, sitting in EPIC-24, EPIC-26,
